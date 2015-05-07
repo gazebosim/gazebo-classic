@@ -74,7 +74,8 @@ namespace gazebo
     /// \class Node Node.hh transport/transport.hh
     /// \brief A node can advertise and subscribe topics, publish on
     ///        advertised topics and listen to subscribed topics.
-    class GZ_TRANSPORT_VISIBLE Node : public boost::enable_shared_from_this<Node>
+    class GZ_TRANSPORT_VISIBLE Node :
+      public boost::enable_shared_from_this<Node>
     {
       /// \brief Constructor
       public: Node();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -784,23 +784,28 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 // _WIN32
 #else
   // Establish our default return value, in case everything below fails.
-  std::string ret_addr("127.0.0.1");
+  std::string retAddr("127.0.0.1");
+
   // Look up our address.
   ULONG outBufLen = 0;
   PIP_ADAPTER_ADDRESSES addrs = NULL;
-  // Not sure whether these are the right flags, but they work for
-  // me on Windows 7
+
+  // Not sure whether these are the right flags, but they work
+  // on Windows 7
   ULONG flags = (GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST |
                  GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_FRIENDLY_NAME);
+
   // The first time, it'll fail; we're asking how much space is needed to
   // store the result.
   GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen);
+
   // Allocate the required space.
   addrs = new IP_ADAPTER_ADDRESSES[outBufLen];
   ULONG ret;
+
   // Now the call should succeed.
   if ((ret = GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen)) ==
-    NO_ERROR)
+      NO_ERROR)
   {
     // Iterate over all returned adapters, arbitrarily sticking with the
     // last non-loopback one that we find.
@@ -814,25 +819,32 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
         // ensures that we're only going to get IPv4 address here).
         sockaddr_in* sockaddress =
           reinterpret_cast<sockaddr_in*>(unicast->Address.lpSockaddr);
+
         // Make it a dotted quad
-        char ipv4_str[3*4+3+1];
-        sprintf(ipv4_str, "%d.%d.%d.%d",
+        char ipv4Str[3*4+3+1];
+
+        snprintf(ipv4Str, sizeof(ipv4Str), "%d.%d.%d.%d",
           sockaddress->sin_addr.S_un.S_un_b.s_b1,
           sockaddress->sin_addr.S_un.S_un_b.s_b2,
           sockaddress->sin_addr.S_un.S_un_b.s_b3,
           sockaddress->sin_addr.S_un.S_un_b.s_b4);
+
         // Ignore loopback address (that's our default anyway)
-        if (!strcmp(ipv4_str, "127.0.0.1"))
+        if (!strcmp(ipv4Str, "127.0.0.1"))
           continue;
-        ret_addr = ipv4_str;
+
+        retAddr = ipv4Str;
       }
     }
   }
   else
+  {
     gzerr << "GetAdaptersAddresses() failed: " << ret << std::endl;
+  }
+
   delete [] addrs;
 
-  if (ret_addr == "127.0.0.1")
+  if (retAddr == "127.0.0.1")
   {
     gzwarn <<
       "Couldn't find a preferred IP via the GetAdaptersAddresses() call; "
@@ -841,7 +853,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
       "but will almost certainly not work if you have remote processes."
       "Report to the disc-zmq development team to seek a fix." << std::endl;
   }
-  address = boost::asio::ip::address_v4::from_string(ret_addr);
+  address = boost::asio::ip::address_v4::from_string(retAddr);
 #endif
   }
 
@@ -859,8 +871,7 @@ bool Connection::ValidateIP(const std::string &_ip)
   struct sockaddr_in sa;
 
 #ifdef _WIN32
-  // int result = InetPton(AF_INET, _ip.c_str(), &(sa.sin_addr));
-  int result = 1;
+  int result = InetPton(AF_INET, _ip.c_str(), &(sa.sin_addr));
 #else
   int result = inet_pton(AF_INET, _ip.c_str(), &(sa.sin_addr));
 #endif

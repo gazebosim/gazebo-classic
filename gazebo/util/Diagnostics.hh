@@ -69,7 +69,7 @@ namespace gazebo
 
     /// \class DiagnosticManager Diagnostics.hh util/util.hh
     /// \brief A diagnostic manager class
-    class GAZEBO_VISIBLE DiagnosticManager :
+    class GZ_UTIL_VISIBLE DiagnosticManager :
       public SingletonT<DiagnosticManager>
     {
       /// \brief Constructor
@@ -164,7 +164,7 @@ namespace gazebo
 
     /// \class DiagnosticTimer Diagnostics.hh util/util.hh
     /// \brief A timer designed for diagnostics
-    class GAZEBO_VISIBLE DiagnosticTimer : public common::Timer
+    class GZ_UTIL_VISIBLE DiagnosticTimer : public common::Timer
     {
       /// \brief Constructor
       /// \param[in] _name Name of the timer
