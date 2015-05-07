@@ -785,15 +785,30 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
-  gui::model::Events::jointInserted(jointId, _joint->name,
-      _joint->parent->GetName(), _joint->child->GetName());
+
+  std::string parentName = _joint->parent->GetName();
+  std::string childName = _joint->child->GetName();
+
+  gui::model::Events::jointInserted(jointId, _joint->name, parentName,
+      childName);
 
   /// for nested model
-  if (_joint->parent->GetParent() != _joint->child->GetParent())
+  bool nested = false;
+  if (_joint->parent->GetParent() != _joint->parent->GetRootVisual())
+  {
+    parentName = _joint->parent->GetParent()->GetName();
+    nested = true;
+  }
+  if (_joint->child->GetParent() != _joint->child->GetRootVisual())
+  {
+    childName = _joint->child->GetParent()->GetName();
+    nested = true;
+  }
+
+  if (nested)
   {
     gui::model::Events::jointInserted(jointId +"_nested", _joint->name,
-        _joint->parent->GetParent()->GetName(),
-        _joint->child->GetParent()->GetName());
+        parentName, childName);
   }
 }
 
