@@ -914,18 +914,18 @@ std::string LogCommand::GetFileSizeStr(const std::string &_filename)
 /////////////////////////////////////////////////
 int LogCommand::GetChar()
 {
-  int ch = static_cast<int>(' ');
-  #ifndef _WIN32
+# ifndef _WIN32
   struct termios oldt, newt;
   tcgetattr(STDIN_FILENO, &oldt);
   newt = oldt;
   newt.c_lflag &= ~(ICANON | ECHO);
   tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  ch = getchar();
+  int ch = getchar();
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  #endif
-
   return ch;
+# else
+  return 'q';
+# endif
 }
 
 /////////////////////////////////////////////////
