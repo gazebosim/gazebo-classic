@@ -914,7 +914,7 @@ std::string LogCommand::GetFileSizeStr(const std::string &_filename)
 /////////////////////////////////////////////////
 int LogCommand::GetChar()
 {
-  int ch;
+  int ch = static_cast<int>(' ');
   #ifndef _WIN32
   struct termios oldt, newt;
   tcgetattr(STDIN_FILENO, &oldt);
