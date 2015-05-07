@@ -16,7 +16,7 @@
 */
 
 #include <boost/filesystem.hpp>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/common/SystemPaths.hh"
 

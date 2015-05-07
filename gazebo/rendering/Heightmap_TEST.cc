@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <boost/assign/list_of.hpp>
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class Heightmap_TEST : public ServerFixture

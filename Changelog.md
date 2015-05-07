@@ -1,4 +1,37 @@
 ## Gazebo 6.0
+1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
+    * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
+
+1. Windows support. This consists mostly of numerous small changes to support
+compilation on Windows.
+    * [Pull request #1616](https://bitbucket.org/osrf/gazebo/pull-request/1616)
+    * [Pull request #1618](https://bitbucket.org/osrf/gazebo/pull-request/1618)
+    * [Pull request #1620](https://bitbucket.org/osrf/gazebo/pull-request/1620)
+    * [Pull request #1625](https://bitbucket.org/osrf/gazebo/pull-request/1625)
+    * [Pull request #1626](https://bitbucket.org/osrf/gazebo/pull-request/1626)
+    * [Pull request #1627](https://bitbucket.org/osrf/gazebo/pull-request/1627)
+    * [Pull request #1628](https://bitbucket.org/osrf/gazebo/pull-request/1628)
+    * [Pull request #1629](https://bitbucket.org/osrf/gazebo/pull-request/1629)
+    * [Pull request #1630](https://bitbucket.org/osrf/gazebo/pull-request/1630)
+    * [Pull request #1631](https://bitbucket.org/osrf/gazebo/pull-request/1631)
+    * [Pull request #1632](https://bitbucket.org/osrf/gazebo/pull-request/1632)
+    * [Pull request #1633](https://bitbucket.org/osrf/gazebo/pull-request/1633)
+    * [Pull request #1635](https://bitbucket.org/osrf/gazebo/pull-request/1635)
+    * [Pull request #1637](https://bitbucket.org/osrf/gazebo/pull-request/1637)
+    * [Pull request #1639](https://bitbucket.org/osrf/gazebo/pull-request/1639)
+    * [Pull request #1647](https://bitbucket.org/osrf/gazebo/pull-request/1647)
+    * [Pull request #1650](https://bitbucket.org/osrf/gazebo/pull-request/1650)
+    * [Pull request #1651](https://bitbucket.org/osrf/gazebo/pull-request/1651)
+    * [Pull request #1653](https://bitbucket.org/osrf/gazebo/pull-request/1653)
+    * [Pull request #1654](https://bitbucket.org/osrf/gazebo/pull-request/1654)
+    * [Pull request #1657](https://bitbucket.org/osrf/gazebo/pull-request/1657)
+
+1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
+    * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
+
+1. Laser visualization renders light blue for rays that do not hit obstacles, and dark blue for other rays.
+    * [Pull request #1607](https://bitbucket.org/osrf/gazebo/pull-request/1607)
+    * [Issue #1576](https://bitbucket.org/osrf/gazebo/issue/1576)
 
 1. New accessors in LogPlay class.
     * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
@@ -19,8 +52,16 @@
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
+1. Show/hide toolbars using the menu bars and shortcut.
+   Added MainWindow::CloneAction.
+   Added Window menu to Model Editor.
+    * [Pull request #1584](https://bitbucket.org/osrf/gazebo/pull-request/1584)
+
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
+
+1. Added Visual::GetDepth() and Visual::GetNthAncestor()
+    * [Pull request #1613](https://bitbucket.org/osrf/gazebo/pull-request/1613)
 
 1. Added a context menu for links
     * [Pull request #1589](https://bitbucket.org/osrf/gazebo/pull-request/1589)
@@ -107,6 +148,9 @@
     1. Saving, exiting, generalizing SaveDialog.
         * [Pull request #1401](https://bitbucket.org/osrf/gazebo/pull-request/1401)
 
+    1. Inspectors redesign
+        * [Pull request #1586](https://bitbucket.org/osrf/gazebo/pull-request/1586)
+
     1. Edit existing model.
         * [Pull request #1425](https://bitbucket.org/osrf/gazebo/pull-request/1425)
 
@@ -151,9 +195,8 @@
         * [Pull request #1551](https://bitbucket.org/osrf/gazebo/pull-request/1551)
         * [Issue #1483](https://bitbucket.org/osrf/gazebo/issue/1483)
 
-    1. Added list of links and joints.
-        * [Pull request #1515](https://bitbucket.org/osrf/gazebo/pull-request/1515)
-        * [Issue #1418](https://bitbucket.org/osrf/gazebo/issue/1418)
+    1. Add schematic view to model editor
+        * [Pull request #1562](https://bitbucket.org/osrf/gazebo/pull-request/1562)
 
 1. Building editor updates
     1. Make palette tips tooltip clickable to open.

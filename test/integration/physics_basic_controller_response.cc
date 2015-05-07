@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/PID.hh"
 #include "SimplePendulumIntegrator.hh"
