@@ -38,6 +38,12 @@
 
 #include "quickstep_util.h"
 #include "quickstep_pgs_lcp.h"
+#ifndef TIMING
+#ifdef HDF5_INSTRUMENT
+#define DUMP
+std::vector<dReal> errors;
+#endif   //HDF5_INSTRUMENT
+#endif   //timing
 
 using namespace ode;
 
@@ -178,6 +184,9 @@ static void ComputeRows(
 
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal Jvnew_final = 0;
+#endif
+#ifdef HDF5_INSTRUMENT
+  errors.resize(num_iterations + precon_iterations + friction_iterations);
 #endif
   dRealMutablePtr caccel_ptr1;
   dRealMutablePtr caccel_ptr2;
@@ -739,6 +748,9 @@ static void ComputeRows(
     qs->rms_constraint_residual[3] = sqrt(residual_total_mean);
     qs->num_contacts = m_rms_dlambda[1];
 
+#ifdef HDF5_INSTRUMENT
+    errors[iteration] = residual_total_mean;
+#endif
     // debugging mutex locking
     //{
     //  // verify
@@ -818,6 +830,9 @@ static void ComputeRows(
   double end_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
   printf("      quickstep row thread %d start time %f ended time %f duration %f\n",thread_id,cur_time,end_time,end_time - cur_time);
   #endif
+#ifdef HDF5_INSTRUMENT
+  IFDUMP(h5_write_errors(DATA_FILE, errors.data(), errors.size()));
+#endif
 }
 
 //***************************************************************************

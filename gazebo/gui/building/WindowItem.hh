@@ -36,7 +36,8 @@ namespace gazebo
 
     /// \class WindowItem WindowItem.hh
     /// \brief 2D representation of a window.
-    class GAZEBO_VISIBLE WindowItem : public RectItem, public BuildingItem
+    class GZ_GUI_BUILDING_VISIBLE WindowItem :
+      public RectItem, public BuildingItem
     {
         Q_OBJECT
 

@@ -34,9 +34,10 @@
 #include "util.h"
 
 #ifndef _WIN32
-  #include <sys/time.h>
+#include <sys/time.h>
 #endif
-
+#include <sys/types.h>
+#include <unistd.h>
 #include "quickstep_util.h"
 #include "quickstep_cg_lcp.h"
 #include "quickstep_pgs_lcp.h"
@@ -387,6 +388,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
         //assign J to J_orig
         memcpy(J_orig, J, 12*m*sizeof(dReal));
       }
+#ifdef HDF5_INSTRUMENT
+      IFTIMING (dTimerNow ("Dump data"));
+      IFDUMP(h5dump_world(DATA_FILE, world, stepsize));
+#endif
 
       BEGIN_STATE_SAVE(context, tmp1state) {
         IFTIMING (dTimerNow ("compute rhs"));
