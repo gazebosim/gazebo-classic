@@ -85,9 +85,9 @@ RenderWidget::RenderWidget(QWidget *_parent)
     this->toolbar->addAction(g_sphereCreateAct);
   if (g_cylinderCreateAct)
     this->toolbar->addAction(g_cylinderCreateAct);
+  this->toolbar->addSeparator();
 
   // Insert lights
-  this->toolbar->addSeparator();
   if (g_pointLghtCreateAct)
     this->toolbar->addAction(g_pointLghtCreateAct);
   if (g_spotLghtCreateAct)
@@ -143,6 +143,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(this->toolbar);
+  toolLayout->addSpacing(10);
   this->toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);

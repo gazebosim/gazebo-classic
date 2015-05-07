@@ -928,8 +928,25 @@ void MainWindow::ViewOculus()
 /////////////////////////////////////////////////
 void MainWindow::DataLogger()
 {
-  gui::DataLogger *dataLogger = new gui::DataLogger(this);
-  dataLogger->show();
+  // If it was checked right now
+  if (g_dataLoggerAct->isChecked())
+  {
+    gui::DataLogger *dataLogger = new gui::DataLogger(this);
+    dataLogger->show();
+    connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
+  }
+  // Don't let the user uncheck it directly
+  else
+  {
+    g_dataLoggerAct->setChecked(true);
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnDataLoggerClosed()
+{
+  // Uncheck action on toolbar when user closes dialog
+  g_dataLoggerAct->setChecked(false);
 }
 
 /////////////////////////////////////////////////
@@ -1244,6 +1261,9 @@ void MainWindow::CreateActions()
       tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
+  g_dataLoggerAct->setToolTip(tr("Log Data (Ctrl+D)"));
+  g_dataLoggerAct->setCheckable(true);
+  g_dataLoggerAct->setChecked(false);
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
 
   g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
