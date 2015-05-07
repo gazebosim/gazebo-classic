@@ -87,7 +87,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 #else
   params["parentWindowHandle"] = _ogreHandle;
 #endif
-  params["externalGLControl"] = "true";
+  params["externalGLControl"] = "false";
   params["FSAA"] = "4";
   params["stereoMode"] = "Frame Sequential";
 
