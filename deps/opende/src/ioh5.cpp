@@ -1,4 +1,4 @@
-/* 
+/*
    Copyright (c) 2013 Claude Lacoursiere
 
    This software is provided 'as-is', without any express or implied
@@ -22,11 +22,9 @@
 
 reference:
    hdf5-based BPMD database: https://grasp.robotics.cs.rpi.edu/bpmd/
-*/ 
-
-
-#ifdef MBSFCLIB_HDF
-
+*/
+#include "gazebo/gazebo_config.h"
+#ifdef HDF5_INSTRUMENT
 #include "ioh5.h"
 #include <iostream>
 #include <sstream>              // for string manipulations.
@@ -37,17 +35,17 @@ reference:
 
 
 using namespace H5;
-namespace h5 { 
+namespace h5 {
   /// Verify that a given attribute is in the given group
   bool check_attr(const H5::H5Object &g, const std::string & name){
-    bool ret = false; 
-    try { 
+    bool ret = false;
+    try {
       Exception::dontPrint();
       Attribute a = g.openAttribute(name);
       a.close();
       ret = true;
     }
-    catch(H5::AttributeIException& error) { 
+    catch(H5::AttributeIException& error) {
     }
     return ret;
   }
@@ -56,7 +54,7 @@ namespace h5 {
 // logic here is to do runtime type identification so we have one and only
 // one templated function to write scalars, one and only one to write
 // one or two dimensional arrays.   The list is static and only used for
-// lookup.  This type of clumsy initialization is a necessary evil. 
+// lookup.  This type of clumsy initialization is a necessary evil.
   static    const h5_type h5_type_list[] = {
     {typeid(char)                  , PredType::NATIVE_CHAR,    IntType   ( PredType::NATIVE_CHAR    ),   "char"                   },
     {typeid(signed char)           , PredType::NATIVE_SCHAR,   IntType   ( PredType::NATIVE_SCHAR   ),   "signed char"            },
@@ -83,7 +81,7 @@ namespace h5 {
    PredType::NATIVE_HSIZE
    PredType::NATIVE_HSSIZE
    PredType::NATIVE_HERR
-*/ 
+*/
     {typeid(bool)                  , PredType::NATIVE_HBOOL,   IntType  (PredType::NATIVE_HBOOL     ),   "bool"                   },
     {typeid(int8_t)                , PredType::NATIVE_INT8,    IntType  (PredType::NATIVE_INT8      ),   "int 8"                  },
     {typeid(uint8_t)               , PredType::NATIVE_UINT8,   IntType  (PredType::NATIVE_UINT8     ),   "uint 8"                 },
@@ -98,15 +96,15 @@ namespace h5 {
     /** though this would be nice, plain old char * strings don't quite behave so this is ignored
         {typeid(char*), PredType::C_S1, StrType()},
 
-        Last entry is garbage indicating that we have not found the datatype. 
+        Last entry is garbage indicating that we have not found the datatype.
         That's detected at runtime by checking the typeinfo on the variable
-        you are trying to save.  New entries must be entred above this one. 
+        you are trying to save.  New entries must be entred above this one.
     */
     {typeid(void*)               , PredType::NATIVE_UINT64,  IntType(PredType::NATIVE_UINT64      ),   "UNKNOWN"}
-    // I mean it, DON'T put anything below this. 
+    // I mean it, DON'T put anything below this.
   };
 
-  // Unify creation of scalar and array data spaces.  
+  // Unify creation of scalar and array data spaces.
   H5::DataSpace   create_dataspace(const h2s & h){
     H5::DataSpace ret;
     try {
@@ -114,7 +112,7 @@ namespace h5 {
         ret = H5::DataSpace(H5S_SCALAR);
       }
       else{
-        const hsize_t *hh  = h; 
+        const hsize_t *hh  = h;
         ret = H5::DataSpace(2, hh);
       }
     } catch ( H5::DataSpaceIException& error  ){
@@ -122,84 +120,84 @@ namespace h5 {
     return ret;
   }
 
-  // Type identification to simplify the construction of dataypes. 
+  // Type identification to simplify the construction of dataypes.
   // This return the correct entry if found or garbage otherwise.  If the type
-  // is not found, the error flag in the returned struct 
-  // This is a linear search. A hash table might be more efficient. 
+  // is not found, the error flag in the returned struct
+  // This is a linear search. A hash table might be more efficient.
   const h5_type& h5_type_find(const std::type_info& type) {
     // Ignore the last entry for the search
-    size_t n_items = sizeof(h5_type_list)/sizeof(h5_type_list[0]) -1 ; 
+    size_t n_items = sizeof(h5_type_list)/sizeof(h5_type_list[0]) -1 ;
     size_t i=0;
     for (i=0; i < n_items; ++i )
       if ( h5_type_list[i].info == type )  break;
     // the following is safe since if we reached i == n_items, we are
     // returning the garbage entry which will not match the type of the
-    // argument. 
-    // Error checking is left to the caller. 
+    // argument.
+    // Error checking is left to the caller.
     return h5_type_list[i];
   }
- 
+
   const h5_type&  h5_type_find(const H5::DataType& type) {
-    size_t n_items = sizeof(h5_type_list)/sizeof(h5_type_list[0]) -1 ; 
+    size_t n_items = sizeof(h5_type_list)/sizeof(h5_type_list[0]) -1 ;
     size_t i=0;
     for (i=0; i < n_items; ++i )
       if ( h5_type_list[i].type == type )  break;
-    // Error checking is left to the caller. 
+    // Error checking is left to the caller.
     return h5_type_list[i];
-  }   
+  }
 
   const std::string&  h5_type_find_name(const H5::DataType& type) {
     return h5_type_find(type).name;
   }
-    
+
   // Read a string with attribute "name" from the named group or file in the buff argument
-  int get_string(const H5::CommonFG& g, const std::string &name, std::string & buff  ) { 
-    int ret = 0; 
-    try { 
+  int get_string(const H5::CommonFG& g, const std::string &name, std::string & buff  ) {
+    int ret = 0;
+    try {
       Exception::dontPrint();
       DataSet t  = g.openDataSet(name);
-      try { 
+      try {
         std::string tmp;
         tmp.resize(t.getStorageSize());
         t.read(tmp, t.getStrType());
         buff = tmp;
-        t.close(); 
-        ret = 1; 
-      } catch ( H5::DataSetIException& error ) { 
-      } 
+        t.close();
+        ret = 1;
+      } catch ( H5::DataSetIException& error ) {
+      }
     }
-    catch (H5::GroupIException& error ) { 
+    catch (H5::GroupIException& error ) {
     }
     return ret;
   }
-    
+
   // return an integer named "name" from a group or file
-  int get_integer(const H5::CommonFG& g, const std::string &name  ) { 
-    int ret = 0; 
-    try { 
+  int get_integer(const H5::CommonFG& g, const std::string &name  ) {
+    int ret = 0;
+    try {
       Exception::dontPrint();
       DataSet t  = g.openDataSet(name);
-      try { 
+      try {
         Exception::dontPrint();
         t.read(&ret, t.getIntType());
-        t.close(); 
-      } catch ( H5::DataSetIException& error ) { 
-      } 
+        t.close();
+      } catch ( H5::DataSetIException& error ) {
+      }
     }
-    catch (H5::GroupIException& error ) { 
+    catch (H5::GroupIException& error ) {
     }
     return ret;
   }
-#if 0 
+#if 0
   template <typename R>
-  int  get_array(const H5::CommonFG& g, const std::string &name, std::valarray<R>& v  ) { 
+  int  get_array(const H5::CommonFG& g, const std::string &name, std::valarray<R>& v  ) {
     int ret = 0;
-    try { 
+    try {
       Exception::dontPrint();
       DataSet t  = g.openDataSet(name);
-      try { 
+      try {
         Exception::dontPrint();
-        DataSpace ds = t.getSpace(); 
+        DataSpace ds = t.getSpace();
         // this is to make sure that we have enough room
         const h5_type & type = h5_type_find(typeid(v[0]));
         size_t  N = h2s().get_size(ds);
@@ -209,31 +207,31 @@ namespace h5 {
         t.read(v.data(), t.getDataType() );
         // at this point, we can't be certain that we have the correct
         // datatype for the array that was given so we use the conversion
-        // if necessary. 
+        // if necessary.
         t.getDataType().convert(type.type, N , v.data(), NULL, PropList());
 
-        t.close(); 
-        ret = 1; 
-      } catch ( H5::DataSetIException& error ) { 
-      } 
+        t.close();
+        ret = 1;
+      } catch ( H5::DataSetIException& error ) {
+      }
     }
-    catch (H5::GroupIException& error ) { 
+    catch (H5::GroupIException& error ) {
     }
     return ret;
   }
 #endif
-    
-  /// 
+
+  ///
   /// Create a hard link so that group or dataset named orig under source
   /// group f  is linked to group or dataset target unger group g
-  /// 
+  ///
   /// Curiously, the C++ API does not provide this simple and necessary
-  /// operation, and no explanation is provided as to why. 
+  /// operation, and no explanation is provided as to why.
   ///
   herr_t hard_link(const H5::CommonFG& f, const std::string & orig, H5::Group& g, const std::string& target){
     return H5Lcreate_hard( f.getLocId(), orig.c_str(), g.getLocId(), target.c_str(), 0, 0);
   }
-    
+
   // The name says it all.  This works for files or groups
   void dump_string(H5::CommonFG&g, const std::string &name, const std::string &s){
     try {
@@ -247,45 +245,45 @@ namespace h5 {
     }
   }
 
-  /** 
+  /**
       Open an existing H5File to append or create it from scratch if it
       does not exist.  It is the caller's responsibility to close that file
-      when writing is done. 
+      when writing is done.
 
-      The logic here is that datasets are valuable and one should not 
-      just truncate an existing file.  This library is designed so there 
-      is no possibility to overwrite data committed to a file by accident.  
+      The logic here is that datasets are valuable and one should not
+      just truncate an existing file.  This library is designed so there
+      is no possibility to overwrite data committed to a file by accident.
   */
-   H5::H5File * append_or_create(const std::string & filename) { 
-    H5File *file = 0; 
-    try { 
+   H5::H5File * append_or_create(const std::string & filename) {
+    H5File *file = 0;
+    try {
       Exception::dontPrint();
       file = new H5File(filename, H5F_ACC_RDWR);
-    } catch( FileIException& error ) { 
+    } catch( FileIException& error ) {
       try {
         file = new H5File(filename, H5F_ACC_TRUNC);
       } catch (FileIException& foo){
       }
     }
-    return file; 
+    return file;
   }
-    
+
   /** Open a group with a unique name in an existing H5File.  The groups
-      are labelled sequentially with an integer.  
+      are labelled sequentially with an integer.
 
       The H5::Group destructor closes the group automatically.  However, if a
-      groupis reused, it must be closed by the caller. 
+      groupis reused, it must be closed by the caller.
 
-      This function will not ovewrite data but append at the end of 
-      the list of groups in a file. 
+      This function will not ovewrite data but append at the end of
+      the list of groups in a file.
   */
-  H5::Group  append_problem(H5File *file, const std::string & name ) { 
+  H5::Group  append_problem(H5File *file, const std::string & name ) {
     const std::string ioh5_h5_problem("Problem");
-    const int ioh5_problem_width = 6; 
+    const int ioh5_problem_width = 6;
     H5::Group  root = file->openGroup("/");
     int n_groups = root.getNumObjs();
-    std::ostringstream buffer; 
-    buffer << name << std::setw(ioh5_problem_width) << std::setfill('0') << ++n_groups; 
+    std::ostringstream buffer;
+    buffer << name << std::setw(ioh5_problem_width) << std::setfill('0') << ++n_groups;
     std::string w = buffer.str();
     return root.createGroup(buffer.str());
   }
@@ -335,16 +333,16 @@ namespace h5 {
 
   void print_attributes( H5::H5Object& loc, const H5std_string attr_name, void *operator_data) {
     // this to make gcc shut up about unused arguments
-    H5::H5Object *l = &loc; void * f = operator_data; f = (void *)l;  l  = (H5::H5Object *)f; 
+    H5::H5Object *l = &loc; void * f = operator_data; f = (void *)l;  l  = (H5::H5Object *)f;
     H5std_string tmp_attr = attr_name;
 
-    // would be nice to find the name of the parent.  Dunno yet. 
+    // would be nice to find the name of the parent.  Dunno yet.
     //std::cerr << "Found attribute : " << attr_name << std::endl;
   }
 
   //
-  //  Specialization for strings. 
-  // 
+  //  Specialization for strings.
+  //
   template<>
   void set_scalar_attribute(H5::H5Object& g, const std::string &name, const std::string& val){
     try {
@@ -363,18 +361,18 @@ namespace h5 {
   }
 
   /**
-     Template specialization for strings. 
-       
+     Template specialization for strings.
+
      Read the value of the attribute with the given name from the given group.
      \return True if a write was made to val, false if there is no such attribute,
-     or if the attribute was of the wrong type. 
+     or if the attribute was of the wrong type.
 
   */
   template <>
   bool get_scalar_attribute(H5::H5Object & g, const std::string& name, std::string & result){
     try {
-      H5::Attribute attribute; 
-      try{ 
+      H5::Attribute attribute;
+      try{
         attribute = g.openAttribute(name);
       } catch ( const H5::AttributeIException &	 exception ) {
         return false;
@@ -383,7 +381,7 @@ namespace h5 {
         if ( attribute.getTypeClass() == H5T_STRING){
           attribute.read( attribute.getDataType(), result );
           return true;
-        } 
+        }
       } catch ( const H5::DataTypeIException& exception ) {
         return false;
       }
@@ -396,14 +394,14 @@ namespace h5 {
   ///
   /// Dump an array with knowledge of the datatype. This is the only
   /// function containing details of the datalayout and controls the
-  /// possible compression of the data on disk. 
-  H5::DataSet dump_array_raw(  H5::CommonFG & g,  const h5_type& t, 
+  /// possible compression of the data on disk.
+  H5::DataSet dump_array_raw(  H5::CommonFG & g,  const h5_type& t,
                                const std::string& name, const void *a, const size_t m, const size_t n){
     try {
       H5::DataSetIException::dontPrint();
-      H5::DSetCreatPropList prop; 
-      //prop.setChunk(2, h2s(m, n)); 
-      //prop.setDeflate(6); 
+      H5::DSetCreatPropList prop;
+      //prop.setChunk(2, h2s(m, n));
+      //prop.setDeflate(6);
       H5::DataSet dataset = g.createDataSet( name, t.type, create_dataspace(h2s(m, n)), prop);
       dataset.write( a, t.predicate);
       return dataset;
@@ -421,10 +419,10 @@ namespace h5 {
       }
 
       else if ( g.getObjTypeByIdx( i ) == H5G_GROUP ) {
-        std::string n = g.getObjnameByIdx(i) ; 
+        std::string n = g.getObjnameByIdx(i) ;
         Group child = g.openGroup(g.getObjnameByIdx(i));
         if ( find_first(child, fn) ){
-          return true; 
+          return true;
         }
       }
     }
@@ -432,4 +430,4 @@ namespace h5 {
   }
 
 }  /* namespace H5 */
-#endif // MBSFCLIB_HDF
+#endif // HDF5_INSTRUMENT

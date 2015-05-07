@@ -49,7 +49,7 @@ namespace gazebo
 
     /// \class Model Model.hh physics/physics.hh
     /// \brief A model is a collection of links, joints, and plugins.
-    class GAZEBO_VISIBLE Model : public Entity
+    class GZ_PHYSICS_VISIBLE Model : public Entity
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.

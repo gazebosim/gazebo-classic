@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright (c) 2013 Claude Lacoursiere
 
 This software is provided 'as-is', without any express or implied
@@ -20,9 +20,10 @@ freely, subject to the following restrictions:
    3. This notice may not be removed or altered from any source
    distribution.
 
-*/ 
+*/
 
-#ifdef MBSFCLIB_HDF
+#include "gazebo/gazebo_config.h"
+#ifdef HDF5_INSTRUMENT
 
 
 #ifndef H5_IO_C
@@ -33,7 +34,7 @@ struct dxWorld;
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void h5dump_world(const char * file, dxWorld * w, dReal stepsize); 
+  void h5dump_world(const char * file, dxWorld * w, dReal stepsize);
   void h5_write_errors(const char *, dReal * errors, unsigned int n);
 #ifdef __cplusplus
 }
@@ -41,4 +42,4 @@ extern "C" {
 
 #endif
 
-#endif // MBSFCLIB_HDF
+#endif // HDF5_INSTRUMENT
