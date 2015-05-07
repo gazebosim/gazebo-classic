@@ -54,6 +54,16 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     pad->name = padElem->Get<std::string>("name");
     pad->dest = padElem->Get<std::string>("destination");
 
+    if (padElem->HasElement("activation"))
+    {
+      pad->autoActivation =
+        padElem->Get<std::string>("activation") == "auto" ? true : false;
+    }
+    else
+    {
+      pad->autoActivation = true;
+    }
+
     sdf::ElementPtr outElem = padElem->GetElement("outgoing");
     pad->outgoingPose = outElem->Get<math::Pose>("pose");
     pad->outgoingBox = outElem->Get<math::Vector3>("box");
@@ -69,6 +79,28 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&TransporterPlugin::Update, this));
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(_world->GetName());
+
+  this->activationSub = this->node->Subscribe(
+      this->sdf->Get<std::string>("activation_topic"),
+      &TransporterPlugin::OnActivation, this);
+}
+
+/////////////////////////////////////////////////
+void TransporterPlugin::OnActivation(ConstGzStringPtr &_msg)
+{
+  std::map<std::string, Pad*>::iterator iter = this->pads.find(_msg->data());
+
+  {
+    if (iter != this->pads.end())
+    {
+      boost::mutex::scoped_lock lock(this->padMutex);
+      std::cout << "Activated[" << _msg->data() << "]\n";
+      iter->second->activated = true;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -76,9 +108,13 @@ void TransporterPlugin::Update()
 {
   physics::Model_V models = this->world->GetModels();
 
+  boost::mutex::scoped_lock lock(this->padMutex);
+
+  // Process each model.
   for (physics::Model_V::iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
+    // Skip models that are static
     if ((*iter)->IsStatic())
       continue;
 
@@ -89,8 +125,8 @@ void TransporterPlugin::Update()
       math::Vector3 min = padIter->second->outgoingPose.pos -
                           padIter->second->outgoingBox / 2.0;
 
-       math::Vector3 max = padIter->second->outgoingPose.pos +
-                           padIter->second->outgoingBox / 2.0;
+      math::Vector3 max = padIter->second->outgoingPose.pos +
+                          padIter->second->outgoingBox / 2.0;
 
       if (modelPose.pos.x > min.x && modelPose.pos.x < max.x &&
           modelPose.pos.y > min.y && modelPose.pos.y < max.y &&
@@ -99,11 +135,15 @@ void TransporterPlugin::Update()
         std::map<std::string, Pad*>::iterator destIter =
           this->pads.find(padIter->second->dest);
 
-        std::cout << "Inside Pad[" << padIter->first << "] Pose["
-                  << modelPose.pos << "] Dest[" << padIter->second->dest << "]\n";
-        if (destIter != this->pads.end())
+        /*std::cout << "Inside Pad[" << padIter->first << "] Pose["
+                  << modelPose.pos << "] Dest["
+                  << padIter->second->dest << "]\n";
+                  */
+
+        if (destIter != this->pads.end() &&
+            (padIter->second->autoActivation || padIter->second->activated))
         {
-          physics::ModelPtr destModel = this->world->GetModelBelowPoint(
+          /*physics::ModelPtr destModel = this->world->GetModelBelowPoint(
               destIter->second->incomingPose.pos);
 
           math::Pose destPose = destIter->second->incomingPose;
@@ -113,6 +153,11 @@ void TransporterPlugin::Update()
                       destModel->GetBoundingBox().max.z;
           destPose.pos.z -= dz;
           (*iter)->SetWorldPose(destPose);
+          */
+          math::Pose destPose = destIter->second->incomingPose;
+          (*iter)->SetWorldPose(destPose);
+
+          padIter->second->activated = false;
         }
       }
     }

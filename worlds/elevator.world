@@ -1,0 +1,230 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://elevator_shaft</uri>
+      <name>elevator1</name>
+      <pose>0 -1.5 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://elevator_shaft</uri>
+      <name>elevator2</name>
+      <pose>0 1.5 0 0 0 0</pose>
+    </include>
+
+    <model name="elevator1">
+      <pose>0 -1.5 0.1 0 0 0</pose>
+      <include>
+        <uri>model://single_door_elevator_car</uri>
+      </include>
+
+      <plugin filename="libElevatorPlugin.so" name="elevator1">
+        <lift_joint>elevator1::single_door_elevator_car::lift</lift_joint>
+        <door_joint>elevator1::single_door_elevator_car::door</door_joint>
+        <topic>~/elevator1</topic>
+      </plugin>
+    </model>
+
+    <model name="elevator2">
+      <pose>0 1.5 0.1 0 0 0</pose>
+      <include>
+        <uri>model://single_door_elevator_car</uri>
+      </include>
+
+      <plugin filename="libElevatorPlugin.so" name="elevator2">
+        <lift_joint>elevator2::single_door_elevator_car::lift</lift_joint>
+        <door_joint>elevator2::single_door_elevator_car::door</door_joint>
+        <topic>~/elevator2</topic>
+      </plugin>
+    </model>
+
+
+    <plugin filename="libEventPlugin.so" name="elevator1">
+      <region name="region1">
+        <pose>2 -1.5 0.5 0 0 0</pose>
+        <box>1 2 1</box>
+        <on_trigger>
+          <topic>~/elevator1</topic>
+          <msg type="string">
+            <data>0</data>
+          </msg>
+        </on_trigger>
+      </region>
+
+      <region name="region2">
+        <pose>2 -1.5 3.5 0 0 0</pose>
+        <box>1 2 1</box>
+        <on_trigger>
+          <topic>~/elevator1</topic>
+          <msg type="string">
+            <data>1</data>
+          </msg>
+        </on_trigger>
+      </region>
+
+      <region name="region3">
+        <pose>2 -1.5 6.5 0 0 0</pose>
+        <box>1 2 1</box>
+        <on_trigger>
+          <topic>~/elevator1</topic>
+          <msg type="string">
+            <data>2</data>
+          </msg>
+        </on_trigger>
+      </region>
+
+      <region name="region4">
+        <pose>2 -1.5 9.5 0 0 0</pose>
+        <box>1 2 1</box>
+        <on_trigger>
+          <topic>~/elevator1</topic>
+          <msg type="string">
+            <data>3</data>
+          </msg>
+        </on_trigger>
+      </region>
+    </plugin>
+
+    <plugin filename="libEventPlugin.so" name="elevator2">
+      <region name="region1">
+        <pose>2 1.5 0.5 0 0 0</pose>
+        <box>1 2 1</box>
+        <on_trigger>
+          <topic>~/elevator2</topic>
+          <msg type="string">
+            <data>0</data>
+          </msg>
+        </on_trigger>
+      </region>
+
+      <region name="region2">
+        <pose>2 1.5 3.5 0 0 0</pose>
+        <box>1 2 1</box>
+        <on_trigger>
+          <topic>~/elevator2</topic>
+          <msg type="string">
+            <data>1</data>
+          </msg>
+        </on_trigger>
+      </region>
+
+      <region name="region3">
+        <pose>2 1.5 6.5 0 0 0</pose>
+        <box>1 2 1</box>
+        <on_trigger>
+          <topic>~/elevator2</topic>
+          <msg type="string">
+            <data>2</data>
+          </msg>
+        </on_trigger>
+      </region>
+
+      <region name="region4">
+        <pose>2 1.5 9.5 0 0 0</pose>
+        <box>1 2 1</box>
+        <on_trigger>
+          <topic>~/elevator2</topic>
+          <msg type="string">
+            <data>3</data>
+          </msg>
+        </on_trigger>
+      </region>
+    </plugin>
+
+    <model name="floor0">
+      <pose>2.25 0 0.1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="floor_collision">
+          <geometry>
+            <box>
+              <size>2.0 15.0 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="floor_visual">
+          <geometry>
+            <box>
+              <size>2.0 15.0 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name="floor1">
+      <pose>2.25 0 3.1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="floor_collision">
+          <geometry>
+            <box>
+              <size>2.0 15.0 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="floor_visual">
+          <geometry>
+            <box>
+              <size>2.0 15.0 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name="floor2">
+      <pose>2.25 0 6.1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="floor_collision">
+          <geometry>
+            <box>
+              <size>2.0 15.0 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="floor_visual">
+          <geometry>
+            <box>
+              <size>2.0 15.0 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name="floor3">
+      <pose>2.25 0 9.1 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="floor_collision">
+          <geometry>
+            <box>
+              <size>2.0 15.0 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="floor_visual">
+          <geometry>
+            <box>
+              <size>2.0 15.0 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>
