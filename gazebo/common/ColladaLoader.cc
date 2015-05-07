@@ -44,7 +44,7 @@ using namespace common;
 /////////////////////////////////////////////////
 struct Vector3Hash : std::unary_function<const math::Vector3, std::size_t>
 {
-  std::size_t operator()(const math::Vector3 _v) const
+  std::size_t operator()(const math::Vector3 &_v) const
   {
     std::size_t seed = 0;
     boost::hash_combine(seed, _v.x);
@@ -57,7 +57,7 @@ struct Vector3Hash : std::unary_function<const math::Vector3, std::size_t>
 /////////////////////////////////////////////////
 struct Vector2dHash : std::unary_function<const math::Vector2d, std::size_t>
 {
-  std::size_t operator()(const math::Vector2d _v) const
+  std::size_t operator()(const math::Vector2d &_v) const
   {
     std::size_t seed = 0;
     boost::hash_combine(seed, _v.x);
