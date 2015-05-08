@@ -75,10 +75,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 gz_add_library(gazebo_gui_building ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
 target_link_libraries(gazebo_gui_building
-  gazebo_common
-  gazebo_transport
   gazebo_rendering
+  gazebo_transport
   gazebo_msgs
+  gazebo_common
   ${QT_LIBRARIES})
 
 gz_install_library(gazebo_gui_building)
