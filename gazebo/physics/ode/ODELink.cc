@@ -175,6 +175,7 @@ void ODELink::MoveCallback(dBodyID _id)
   const dReal *p;
   const dReal *r;
   ODELink *self = static_cast<ODELink*>(dBodyGetData(_id));
+  // self->poseMutex->lock();
 
   p = dBodyGetPosition(_id);
   r = dBodyGetQuaternion(_id);
@@ -188,7 +189,11 @@ void ODELink::MoveCallback(dBodyID _id)
       self->inertial->GetCoG());
 
   self->dirtyPose.pos -= cog;
+
+  // TODO: this is an ugly line of code. It's like this for speed.
   self->world->dataPtr->dirtyPoses.push_back(self);
+
+  // self->poseMutex->unlock();
 
   // get force and applied to this body
   if (_id)
