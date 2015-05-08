@@ -5,6 +5,8 @@ include_directories(SYSTEM
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${IGNITION-MATH_INCLUDE_DIRS}
+  ${TBB_INCLUDEDIR}
+  ${tinyxml_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -12,10 +14,20 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
+  ${TBB_LIBRARY_DIR}
+  ${CURL_LIBDIR}
 )
+
+if (WIN32)
+  include_directories(${libdl_include_dir})
+endif()
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
+if (WIN32)
+ add_definitions(-DBUILDING_DLL)
 endif()
 
 add_subdirectory(msgs)
@@ -58,7 +70,27 @@ target_link_libraries(gzserver
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
+  # Extra libs needed when linking statically (e.g., on WIN32)
+  gazebo_physics_ode
+  ${freeimage_LIBRARIES}
+  ${TBB_LIBRARIES}
 )
+
+if (HAVE_SIMBODY)
+  target_link_libraries(gzserver gazebo_physics_simbody)
+endif()
+
+if (HAVE_DART)
+  target_link_libraries(gzserver gazebo_physics_dart)
+endif()
+
+if (HAVE_BULLET)
+  target_link_libraries(gzserver gazebo_physics_bullet)
+endif()
+
+if (UNIX)
+  target_link_libraries(gzserver pthread)
+endif()
 
 target_link_libraries(gazebo
   libgazebo
