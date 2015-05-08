@@ -54,6 +54,7 @@ void ApplyWrenchVisual::Fini()
     return;
   }
 
+  // Destroy objects and nodes
   Ogre::SceneManager *manager = dPtr->scene->GetManager();
   if (!manager)
     return;
@@ -74,6 +75,22 @@ void ApplyWrenchVisual::Fini()
     if (manager->hasSceneNode(name))
       manager->destroySceneNode(manager->getSceneNode(name));
   }
+
+  // Remove visuals
+  if (dPtr->forceVisual &&
+      dPtr->scene->GetVisual(dPtr->forceVisual->GetName()))
+  {
+    dPtr->scene->RemoveVisual(dPtr->forceVisual);
+  }
+
+  if (dPtr->torqueVisual &&
+      dPtr->scene->GetVisual(dPtr->torqueVisual->GetName()))
+  {
+    dPtr->scene->RemoveVisual(dPtr->torqueVisual);
+  }
+
+  dPtr->forceVisual.reset();
+  dPtr->torqueVisual.reset();
 }
 
 ///////////////////////////////////////////////////
