@@ -209,7 +209,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       // Create a camera item
       QtProperty *topItem = this->variantManager->addProperty(
           QtVariantPropertyManager::groupTypeId(), tr("camera"));
-      this->propTreeBrowser->addProperty(topItem);
+      auto cameraBrowser = this->propTreeBrowser->addProperty(topItem);
 
       // Create and set the gui camera name
       std::string cameraName = cam->GetName();
@@ -226,7 +226,12 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
         math::Pose cameraPose = cam->GetWorldPose();
 
         this->FillPoseProperty(msgs::Convert(cameraPose), item);
-       // topItem->setExpanded(browserItem, true);
+        // set expanded to true by default for easier viewing
+        this->propTreeBrowser->setExpanded(cameraBrowser, true);
+        for (auto browser : cameraBrowser->children())
+        {
+          this->propTreeBrowser->setExpanded(browser, true);
+        }
       }
     }
     else
