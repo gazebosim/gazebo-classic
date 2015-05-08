@@ -33,7 +33,6 @@ macro (gz_build_tests)
       gtest_main
       gazebo_test_fixture
       libgazebo
-      pthread
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
@@ -81,7 +80,6 @@ if (VALID_DISPLAY)
     target_link_libraries(${BINARY_NAME}
       libgazebo
       gazebo_gui
-      pthread
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
