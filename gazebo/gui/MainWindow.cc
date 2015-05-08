@@ -1598,6 +1598,8 @@ void MainWindow::CreateMenuBar()
   cameraMenu->addSeparator();
   cameraMenu->addAction(g_fpsAct);
   cameraMenu->addAction(g_orbitAct);
+  cameraMenu->addSeparator();
+  cameraMenu->addAction(g_resetAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -1611,11 +1613,6 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCOMAct);
   viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
-  viewMenu->addSeparator();
-
-  viewMenu->addAction(g_resetAct);
-  viewMenu->addSeparator();
-
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
