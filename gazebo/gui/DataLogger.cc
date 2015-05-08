@@ -229,7 +229,7 @@ DataLogger::DataLogger(QWidget *_parent)
           this, SLOT(OnSetDestinationURI(QString)), Qt::QueuedConnection);
 
   // Timer used to hide the confirmation dialog
-  this->confirmationTimer = new QTimer();
+  this->confirmationTimer = new QTimer(this);
   connect(this->confirmationTimer, SIGNAL(timeout()), this,
       SLOT(OnConfirmationTimeout()));
 
