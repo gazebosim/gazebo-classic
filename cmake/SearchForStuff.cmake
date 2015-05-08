@@ -9,6 +9,11 @@ execute_process(COMMAND pkg-config --modversion protobuf
   OUTPUT_VARIABLE PROTOBUF_VERSION
   RESULT_VARIABLE protobuf_modversion_failed)
 
+# Detect the architecture
+include (${gazebo_cmake_dir}/TargetArch.cmake)
+target_architecture(ARCH)
+message(STATUS "Building for arch: ${ARCH}")
+
 ########################################
 # 1. can not use BUILD_TYPE_PROFILE is defined after include this module
 # 2. TODO: TOUPPER is a hack until we fix the build system to support standard build names
