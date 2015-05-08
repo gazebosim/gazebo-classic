@@ -58,21 +58,24 @@ static void* ComputeRows(void *p)
   dxPGSLCPParameters *params = (dxPGSLCPParameters *)p;
 
   #ifdef REPORT_THREAD_TIMING
+  int thread_id                 = params->thread_id;
   struct timeval tv;
   double cur_time;
   gettimeofday(&tv,NULL);
   cur_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  //printf("thread %d started at time %f\n",thread_id,cur_time);
+  // printf("thread %d started at time %f\n",thread_id,cur_time);
   #endif
 
-  int thread_id                 = params->thread_id;
   IndexError* order             = params->order;
   dxBody* const* body           = params->body;
+#ifdef RANDOMLY_REORDER_CONSTRAINTS
+#ifdef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
   boost::recursive_mutex* mutex = params->mutex;
+#endif
+#endif
   bool inline_position_correction = params->inline_position_correction;
   bool position_correction_thread = params->position_correction_thread;
 
-  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
   dxQuickStepParameters *qs    = params->qs;
   int startRow                 = params->nStart;   // 0
   int nRows                    = params->nChunkSize; // m
@@ -326,7 +329,8 @@ static void* ComputeRows(void *p)
 
       // THREAD_POSITION_CORRECTION
       dReal delta_erp = 0;
-      dReal delta_precon_erp = 0;
+      // precon does not support split position correction right now.
+      // dReal delta_precon_erp = 0;
 
       // setup pointers
       int b1 = jb[index*2];
@@ -928,6 +932,8 @@ static void* ComputeRows(void *p)
 #ifdef HDF5_INSTRUMENT
   IFDUMP(h5_write_errors(DATA_FILE, errors.data(), errors.size()));
 #endif
+
+  return NULL;
 }
 
 //***************************************************************************
@@ -1188,7 +1194,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 
   // prepare pointers for threads
   // params for solution with correction (_erp) term
-  dxPGSLCPParameters *params_erp;
+  dxPGSLCPParameters *params_erp = NULL;
   if (qs->thread_position_correction)
     params_erp = context->AllocateArray<dxPGSLCPParameters>(num_chunks);
 
@@ -1228,7 +1234,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 #else
     boost::thread params_erp_thread;
 #endif
-    if (qs->thread_position_correction)
+    if (qs->thread_position_correction && params_erp != NULL)
     {
       // setup params for ComputeRows
       IFTIMING (dTimerNow ("start pgs_erp rows"));
@@ -1299,6 +1305,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
         #ifdef USE_PTHREAD
         pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
                                      (void*)(&(params_erp[thread_id])));
+        if (pthread_err != 0)
+          dMessage (d_ERR_UASSERT, "internal error, cannot start pthread");
         #else
         params_erp_thread = boost::thread(*ComputeRows, (void*)(&(params_erp[thread_id])));
 
@@ -1308,6 +1316,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       #ifdef USE_PTHREAD
       pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
                                    (void*)(&(params_erp[thread_id])));
+      if (pthread_err != 0)
+        dMessage (d_ERR_UASSERT, "internal error, cannot start pthread");
       #else
       params_erp_thread = boost::thread(*ComputeRows, (void*)(&(params_erp[thread_id])));
       #endif
