@@ -3122,15 +3122,6 @@ void Scene::RemoveProjectors()
 }
 
 /////////////////////////////////////////////////
-void Scene::ViewLayer(const int32_t _layer)
-{
-  for (auto visual : this->dataPtr->visuals)
-  {
-    visual.second->ViewLayer(_layer);
-  }
-}
-
-/////////////////////////////////////////////////
 void Scene::ToggleLayer(const int32_t _layer)
 {
   for (auto visual : this->dataPtr->visuals)

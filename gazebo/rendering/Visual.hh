@@ -533,7 +533,6 @@ namespace gazebo
       /// on the specified layer it will be set visible, otherwise it will
       /// become invisible.
       /// \param[in] _layer Index of the layer to show.
-      public: void ViewLayer(const int32_t _layer);
       public: void ToggleLayer(const int32_t _layer);
 
       /// \internal

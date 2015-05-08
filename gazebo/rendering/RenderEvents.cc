@@ -23,3 +23,4 @@ using namespace rendering;
 event::EventT<void (const std::string &)> Events::createScene;
 event::EventT<void (const std::string &)> Events::removeScene;
 event::EventT<void (const int32_t)> Events::toggleLayer;
+event::EventT<void (const int32_t)> Events::newLayer;

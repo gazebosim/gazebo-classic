@@ -82,7 +82,6 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->boundingBox = NULL;
   this->dataPtr->useRTShader = _useRTShader;
   this->dataPtr->visibilityFlags = GZ_VISIBILITY_ALL;
-  this->dataPtr->layer = 0;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->dataPtr->sdf);
@@ -94,6 +93,8 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
   this->dataPtr->castShadows = true;
+  this->dataPtr->visible = true;
+  this->dataPtr->layer = -1;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -130,6 +131,8 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
   this->dataPtr->castShadows = true;
+  this->dataPtr->visible = true;
+  this->dataPtr->layer = -1;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -294,6 +297,7 @@ void Visual::Init()
   this->dataPtr->visible = true;
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
+  this->dataPtr->layer = -1;
 
   if (this->dataPtr->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
@@ -482,8 +486,7 @@ void Visual::Load()
     {
       this->dataPtr->layer =
         this->dataPtr->sdf->GetElement("meta")->Get<int32_t>("layer");
-
-      std::cout << "LAYER1[" << this->dataPtr->layer << "]\n";
+      rendering::Events::newLayer(this->dataPtr->layer);
     }
   }
 
@@ -2196,8 +2199,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     if (_msg->meta().has_layer())
     {
       this->dataPtr->layer = _msg->meta().layer();
-
-    std::cout << "LAYER2[" << this->dataPtr->layer << "]\n";
+      rendering::Events::newLayer(this->dataPtr->layer);
     }
   }
 
@@ -2947,22 +2949,6 @@ sdf::ElementPtr Visual::GetSDF() const
 }
 
 //////////////////////////////////////////////////
-void Visual::ViewLayer(const int32_t _layer)
-{
-  if (this->dataPtr->layer != _layer)
-  {
-    this->SetVisible(false, true);
-  }
-  else
-  {
-    for (auto child : this->dataPtr->children)
-    {
-      child->ViewLayer(_layer);
-    }
-  }
-}
-
-//////////////////////////////////////////////////
 void Visual::ToggleLayer(const int32_t _layer)
 {
   // Visuals with negative layers are always visible
@@ -2971,14 +2957,6 @@ void Visual::ToggleLayer(const int32_t _layer)
 
   if (this->dataPtr->layer == _layer)
   {
-    std::cout << "Toggle Visible\n";
     this->ToggleVisible();
-  }
-  else
-  {
-    for (auto child : this->dataPtr->children)
-    {
-      child->ToggleLayer(_layer);
-    }
   }
 }

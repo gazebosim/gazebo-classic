@@ -36,27 +36,37 @@ LayersWidget::LayersWidget(QWidget *_parent)
   this->setObjectName("layersList");
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  QListWidget *layerList = new QListWidget(this);
+  this->layerList = new QListWidget(this);
 
-  QListWidgetItem *item = new QListWidgetItem("Layer 1", layerList);
+  QListWidgetItem *item = new QListWidgetItem("Layer 0", this->layerList);
+  item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+  item->setCheckState(Qt::Checked);
+  item->setData(Qt::UserRole, QVariant(0));
+  this->layerList->addItem(item);
+
+  item = new QListWidgetItem("Layer 1", this->layerList);
   item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
   item->setCheckState(Qt::Checked);
   item->setData(Qt::UserRole, QVariant(1));
-  layerList->addItem(item);
+  this->layerList->addItem(item);
 
-  item = new QListWidgetItem("Layer 2", layerList);
+  item = new QListWidgetItem("Layer 2", this->layerList);
   item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
   item->setCheckState(Qt::Checked);
   item->setData(Qt::UserRole, QVariant(2));
-  layerList->addItem(item);
+  this->layerList->addItem(item);
 
-  mainLayout->addWidget(layerList);
+  mainLayout->addWidget(this->layerList);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  connect(layerList, SIGNAL(itemClicked(QListWidgetItem *)),
+  connect(this->layerList, SIGNAL(itemClicked(QListWidgetItem *)),
           this, SLOT(OnLayerSelected(QListWidgetItem *)));
+
+  this->connections.push_back(
+      rendering::Events::ConnectNewLayer(
+        boost::bind(&LayersWidget::OnNewLayer, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -67,6 +77,20 @@ LayersWidget::~LayersWidget()
 /////////////////////////////////////////////////
 void LayersWidget::OnLayerSelected(QListWidgetItem *_layer)
 {
-  std::cout << "On Layer[" << _layer->data(Qt::UserRole).toInt() << "]\n";
   rendering::Events::toggleLayer(_layer->data(Qt::UserRole).toInt());
+}
+
+/////////////////////////////////////////////////
+void LayersWidget::OnNewLayer(const int32_t _layer)
+{
+  std::ostringstream stream;
+  stream << "Layer " << _layer;
+
+  QListWidgetItem *item = new QListWidgetItem(stream.str().c_str(),
+      this->layerList);
+
+  item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+  item->setCheckState(Qt::Checked);
+  item->setData(Qt::UserRole, QVariant(_layer));
+  this->layerList->addItem(item);
 }

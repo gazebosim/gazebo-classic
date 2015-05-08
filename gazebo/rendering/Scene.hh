@@ -474,9 +474,7 @@ namespace gazebo
       /// on the specified layer it will be set visible, otherwise it will
       /// become invisible.
       /// \param[in] _layer Index of the layer to show.
-      /// \sa Visual::ViewLayer
-      public: void ViewLayer(const int32_t _layer);
-
+      /// \sa Visual::ToggleLayer
       public: void ToggleLayer(const int32_t _layer);
 
       /// \brief Helper function to setup the sky.

@@ -17,6 +17,10 @@
 #ifndef _GAZEBO_LAYERS_WIDGET_HH_
 #define _GAZEBO_LAYERS_WIDGET_HH_
 
+#include <vector>
+
+#include "gazebo/common/Events.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -31,6 +35,12 @@ namespace gazebo
       public: virtual ~LayersWidget();
 
       public slots: void OnLayerSelected(QListWidgetItem *_layer);
+      private: void OnNewLayer(const int32_t _layer);
+
+      private: QListWidget *layerList;
+
+      /// \brief Event connections
+      public: std::vector<event::ConnectionPtr> connections;
     };
   }
 }
