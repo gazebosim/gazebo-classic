@@ -85,10 +85,10 @@ else()
 endif()
 
 target_link_libraries(gazebo_gui_building
-  gazebo_common
-  gazebo_transport
   gazebo_rendering
+  gazebo_transport
   gazebo_msgs
+  gazebo_common
   ${QT_LIBRARIES})
 
 gz_install_library(gazebo_gui_building)
