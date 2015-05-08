@@ -330,7 +330,9 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
       while (childElem)
       {
         rendering::VisualPtr childVis;
-        childVis.reset(new rendering::Visual(modelName, modelVis));
+        std::string childName = childElem->Get<std::string>("name");
+        childVis.reset(new rendering::Visual(modelName + "::" + childName,
+            modelVis));
         childVis->Load();
         this->visuals.push_back(childVis);
 
@@ -341,8 +343,8 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
 
 //        std::string childName = modelVis->GetName() + "::" +
 //            childElem->Get<std::string>("name");
-
 //        childElem->GetAttribute("name")->Set(childName);
+
         std::pair<sdf::ElementPtr, rendering::VisualPtr> childPair(
             childElem, childVis);
         modelElemList.push_back(childPair);
