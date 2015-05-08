@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class ViewController ViewController.hh rendering/rendering.hh
     /// \brief Base class for view controllers.
-    class GAZEBO_VISIBLE ViewController
+    class GZ_RENDERING_VISIBLE ViewController
     {
       /// \brief Constructor
       /// \param[in] _camera The user camera to controll.
