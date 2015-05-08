@@ -281,6 +281,8 @@ void DataLogger::OnRecord(bool _toggle)
     QHBoxLayout *confirmationLayout = new QHBoxLayout();
     confirmationLayout->addWidget(confirmationLabel);
 
+    if (this->confirmationDialog)
+      this->confirmationDialog->hide();
     this->confirmationDialog = new QDialog(this, Qt::FramelessWindowHint);
     this->confirmationDialog->setLayout(confirmationLayout);
     this->confirmationDialog->setStyleSheet(
