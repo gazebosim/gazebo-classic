@@ -1770,14 +1770,14 @@ bool Camera::SetProjectionType(const std::string &_type)
   if (_type == "orthographic")
   {
     // Shadows do not work properly with orthographic projection
-    RTShaderSystem::DetachViewport(this->viewport, this->GetScene());
+    this->scene->SetShadowsEnabled(false);
     this->camera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
   }
   else if (_type == "perspective")
   {
     this->camera->setProjectionType(Ogre::PT_PERSPECTIVE);
     this->camera->setCustomProjectionMatrix(false);
-    RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
+    this->scene->SetShadowsEnabled(true);
   }
   else
   {
