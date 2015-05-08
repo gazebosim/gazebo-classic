@@ -122,31 +122,37 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
-gz_add_library(gazebo_physics ${sources})
+# Restore the shared library generation when circular dependencyon sensors
+# is solved: see bug 1516
+# gz_add_library(gazebo_physics ${sources})
+# target_link_libraries(gazebo_physics
+#  gazebo_common
+#  gazebo_util
+#  gazebo_physics_ode
+# )
 
-target_link_libraries(gazebo_physics
-  gazebo_common
-  gazebo_util
-  gazebo_physics_ode
-)
+#if (HAVE_BULLET)
+#  target_link_libraries(gazebo_physics gazebo_physics_bullet)
+#endif()
+#
+#if (HAVE_DART)
+#  target_link_libraries(gazebo_physics gazebo_physics_dart)
+#endif()
+#
+#if (HAVE_SIMBODY)
+#  target_link_libraries(gazebo_physics gazebo_physics_simbody)
+#endif()
+#
+#if (HAVE_GDAL)
+#  target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
+#endif()
+#
+# gz_install_library(gazebo_physics)
 
-if (HAVE_BULLET)
-  target_link_libraries(gazebo_physics gazebo_physics_bullet)
-endif()
+add_library(gazebo_physics OBJECT ${sources})
+set (physics_sensors_libs  ${physics_sensors_libs} $<TARGET_OBJECTS:gazebo_physics>
+    PARENT_SCOPE)
 
-if (HAVE_DART)
-  target_link_libraries(gazebo_physics gazebo_physics_dart)
-endif()
-
-if (HAVE_SIMBODY)
-  target_link_libraries(gazebo_physics gazebo_physics_simbody)
-endif()
-
-if (HAVE_GDAL)
-  target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
-endif()
-
-gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
 # unit tests

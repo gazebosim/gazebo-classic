@@ -20,8 +20,7 @@ macro (gz_build_tests)
       gtest_main
       gazebo_common
       gazebo_math
-      gazebo_physics
-      gazebo_sensors
+      gazebo_physics_sensors
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
@@ -33,13 +32,6 @@ macro (gz_build_tests)
       gtest
       gtest_main
       gazebo_test_fixture
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
       libgazebo
       pthread
       )
@@ -80,23 +72,15 @@ if (VALID_DISPLAY)
       gazebo_gui
       gazebo_common
       gazebo_math
-      gazebo_physics
-      gazebo_sensors
+      gazebo_physics_sensors
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
       )
 
     target_link_libraries(${BINARY_NAME}
-      gazebo_gui
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
       libgazebo
+      gazebo_gui
       pthread
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}

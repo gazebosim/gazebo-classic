@@ -44,6 +44,33 @@ if(HAVE_DART)
   add_dependencies(gazebo_physics_dart gazebo_msgs)
 endif()
 
+# Workaround to solve problems with circular dependency on
+# sensors <-> phsyics library
+# see bug 1516
+gz_add_library(gazebo_physics_sensors ${physics_sensors_libs})
+
+target_link_libraries(gazebo_physics_sensors
+		      gazebo_rendering
+                      gazebo_ode
+		      gazebo_util
+                      ${TBB_LIBRARIES})
+
+if (HAVE_GDAL)
+  target_link_libraries(gazebo_physics_sensors ${GDAL_LIBRARY})
+endif()
+
+if (HAVE_DART)
+  target_link_libraries(gazebo_physics_sensors ${DARTCore_LIBRARIES})
+endif()
+
+if (HAVE_SIMBODY)
+  target_link_libraries(gazebo_physics_sensors ${Simbody_LIBRARIES})
+endif()
+
+if (HAVE_BULLET)
+  target_link_libraries(gazebo_physics_sensors ${BULLET_LIBRARIES})
+endif()
+# end of the workaround hack
 
 gz_add_executable(gzserver server_main.cc)
 gz_add_executable(gazebo gazebo_main.cc)
@@ -53,8 +80,7 @@ target_link_libraries(gzserver
   gazebo_common
   gazebo_util
   gazebo_transport
-  gazebo_physics
-  gazebo_sensors
+  gazebo_physics_sensors
   gazebo_rendering
   gazebo_msgs
 )
@@ -65,8 +91,6 @@ target_link_libraries(gazebo
   gazebo_common
   gazebo_util
   gazebo_transport
-  gazebo_physics
-  gazebo_sensors
   gazebo_rendering
   gazebo_msgs
   gazebo_gui
@@ -88,8 +112,7 @@ target_link_libraries(libgazebo
   gazebo_common
   gazebo_util
   gazebo_transport
-  gazebo_physics
-  gazebo_sensors
+  gazebo_physics_sensors
   gazebo_rendering
   gazebo_msgs
   gazebo_math

@@ -57,11 +57,16 @@ set (gtest_sources
 )
 gz_build_tests(${gtest_sources})
 
-gz_add_library(gazebo_physics_dart ${headers} ${sources})
+# Restore the shared library generation when circular dependencyon sensors
+# is solved: see bug 1516
+#
+#gz_add_library(gazebo_physics_dart ${headers} ${sources})
+#target_link_libraries(gazebo_physics_dart ${DARTCore_LIBRARIES})
+#gz_install_library(gazebo_physics_dart)
 
-target_link_libraries(gazebo_physics_dart ${DARTCore_LIBRARIES})
-
-gz_install_library(gazebo_physics_dart)
+add_library(gazebo_physics_dart OBJECT ${headers} ${sources})
+set(physics_sensors_libs ${physics_sensors_libs} $<TARGET_OBJECTS:gazebo_physics_dart>
+    PARENT_SCOPE)
 gz_install_includes("physics/dart" ${headers})
 
 # unit tests

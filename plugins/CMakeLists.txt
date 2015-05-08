@@ -63,7 +63,7 @@ set(GAZEBO_PLUGIN_INSTALL_DIR
 )
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
+  target_link_libraries(${src} libgazebo ${ogre_libraries})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})
@@ -75,7 +75,7 @@ set_target_properties(BreakableJointPlugin PROPERTIES
 
 QT4_WRAP_CPP(TimerGUIPlugin_MOC TimerGUIPlugin.hh)
 add_library(TimerGUIPlugin SHARED TimerGUIPlugin.cc ${TimerGUIPlugin_MOC})
-target_link_libraries(TimerGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
+target_link_libraries(TimerGUIPlugin libgazebo ${ogre_libraries} ${QT_LIBRARIES})
 install (TARGETS TimerGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 gz_install_includes("plugins" TimerGUIPlugin.hh)
 

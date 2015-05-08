@@ -58,8 +58,13 @@ SimbodyTypes.hh
 SimbodyUniversalJoint.hh
 )
 
-gz_add_library(gazebo_physics_simbody ${sources})
-target_link_libraries(gazebo_physics_simbody ${Simbody_LIBRARIES})
-
-gz_install_library(gazebo_physics_simbody)
+# Restore the shared library generation when circular dependencyon sensors
+# is solved: see bug 1516
+#
+# gz_add_library(gazebo_physics_simbody ${sources})
+# target_link_libraries(gazebo_physics_simbody ${Simbody_LIBRARIES})
+# gz_install_library(gazebo_physics_simbody)
+add_library(gazebo_physics_simbody OBJECT ${sources})
+set(physics_sensors_libs ${physics_sensors_libs} $<TARGET_OBJECTS:gazebo_physics_simbody>
+    PARENT_SCOPE)
 gz_install_includes("physics/simbody" ${headers})

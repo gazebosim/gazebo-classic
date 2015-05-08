@@ -64,9 +64,15 @@ set (gtest_sources
 )
 gz_build_tests(${gtest_sources})
 
-gz_add_library(gazebo_physics_bullet ${sources})
-#add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
-target_link_libraries(gazebo_physics_bullet ${BULLET_LIBRARIES})
+# Restore the shared library generation when circular dependencyon sensors
+# is solved: see bug 1516
+# gz_add_library(gazebo_physics_bullet ${sources})
+# target_link_libraries(gazebo_physics_bullet ${BULLET_LIBRARIES})
+#gz_install_library(gazebo_physics_bullet)
 
-gz_install_library(gazebo_physics_bullet)
+add_library(gazebo_physics_bullet OBJECT ${sources})
+set(physics_sensors_libs ${physics_sensors_libs} $<TARGET_OBJECTS:gazebo_physics_bullet>
+    PARENT_SCOPE)
 gz_install_includes("physics/bullet" ${headers})
+
+#add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)

@@ -81,17 +81,21 @@ foreach (hdr ${headers})
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
 
+# Restore the shared library generation when circular dependencyon sensors
+# is solved: see bug 1516
+# gz_add_library(gazebo_sensors ${sources})
+# target_link_libraries(gazebo_sensors
+#  gazebo_common
+#  gazebo_rendering
+#  gazebo_physics
+#  ${libtool_library}
+#  ${Boost_LIBRARIES}
+#  ${ogre_ldflags}
+#  )
+# gz_install_library(gazebo_sensors)
 
-gz_add_library(gazebo_sensors ${sources})
+add_library(gazebo_sensors OBJECT ${sources})
+set (physics_sensors_libs  ${physics_sensors_libs} $<TARGET_OBJECTS:gazebo_sensors>
+    PARENT_SCOPE)
 
-target_link_libraries(gazebo_sensors
-  gazebo_common
-  gazebo_rendering
-  gazebo_physics
-  ${libtool_library}
-  ${Boost_LIBRARIES}
-  ${ogre_ldflags}
-  )
-
-gz_install_library(gazebo_sensors)
 gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)

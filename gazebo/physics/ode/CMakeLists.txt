@@ -65,16 +65,21 @@ set (gtest_sources
 )
 gz_build_tests(${gtest_sources})
 
-gz_add_library(gazebo_physics_ode ${headers} ${sources})
-target_link_libraries(gazebo_physics_ode
-  gazebo_ode
-  gazebo_opcode
-  gazebo_math
-  gazebo_common
-  ${TBB_LIBRARIES}
-)
+# Restore the shared library generation when circular dependencyon sensors
+# is solved: see bug 1516
+# gz_add_library(gazebo_physics_ode ${headers} ${sources})
+# target_link_libraries(gazebo_physics_ode
+#  gazebo_ode
+#  gazebo_opcode
+#  gazebo_math
+#  gazebo_common
+#  ${TBB_LIBRARIES}
+#)
+# gz_install_library(gazebo_physics_ode)
+add_library(gazebo_physics_ode OBJECT ${headers} ${sources})
+set (physics_sensors_libs  ${physics_sensors_libs} $<TARGET_OBJECTS:gazebo_physics_ode>
+    PARENT_SCOPE)
 
-gz_install_library(gazebo_physics_ode)
 gz_install_includes("physics/ode" ${headers})
 
 # unit tests
