@@ -195,6 +195,39 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
       }
     }
   }
+
+  // Test friction model
+  {
+    // Default value "pyramid_model"
+    const std::string frictionModel = "pyramid_model";
+    EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("friction_model")));
+    EXPECT_EQ(param, frictionModel);
+  }
+
+  {
+    // Switch to "cone_model" using SetFrictionModel
+    const std::string frictionModel = "cone_model";
+    odePhysics->SetFrictionModel(frictionModel);
+    EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("friction_model")));
+    EXPECT_EQ(param, frictionModel);
+  }
+
+  {
+    // Switch to "box_model" using SetParam
+    const std::string frictionModel = "box_model";
+    odePhysics->SetParam("friction_model", frictionModel);
+    EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("friction_model")));
+    EXPECT_EQ(param, frictionModel);
+  }
 }
 
 /////////////////////////////////////////////////
