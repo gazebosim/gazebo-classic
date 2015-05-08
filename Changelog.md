@@ -2,6 +2,10 @@
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
 
+1. Get/Set user camera pose in GUI.
+    * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
+    * [Issue #1595](https://bitbucket.org/osrf/gazebo/issue/1595)
+
 1. Windows support. This consists mostly of numerous small changes to support
 compilation on Windows.
     * [Pull request #1616](https://bitbucket.org/osrf/gazebo/pull-request/1616)
@@ -210,10 +214,6 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
-
-1. Get/Set user camera pose in GUI.
-    * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
-    * [Issue #1595](https://bitbucket.org/osrf/gazebo/issue/1595)
 
 1. Fix heightmap model texture loading.
     * [Pull request #1592](https://bitbucket.org/osrf/gazebo/pull-request/1592)
