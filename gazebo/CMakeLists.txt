@@ -62,9 +62,9 @@ endif()
 gz_add_library(gazebo_physics_sensors ${physics_sensors_libs})
 
 target_link_libraries(gazebo_physics_sensors
-		      gazebo_rendering
+                      gazebo_rendering
                       gazebo_ode
-		      gazebo_util
+                      gazebo_util
                       ${TBB_LIBRARIES})
 
 if (HAVE_GDAL)
