@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class Matrix4 Matrix4.hh math/gzmath.hh
     /// \brief A 3x3 matrix class
-    class GAZEBO_VISIBLE Matrix4
+    class GZ_MATH_VISIBLE Matrix4
     {
       /// \brief Constructor
       public: Matrix4();
@@ -128,6 +128,7 @@ namespace gazebo
       public: Vector3 TransformAffine(const Vector3 &_v) const;
 
       /// \brief Return the inverse matrix
+      /// \return Inverse of this matrix.
       public: Matrix4 Inverse() const;
 
       /// \brief Equal operator. this = _mat

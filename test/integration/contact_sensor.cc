@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
@@ -420,8 +420,12 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   msgs::Contacts contacts;
 
-  physics->SetContactMaxCorrectingVel(0);
-  physics->SetParam("iters", 100);
+  if (_physicsEngine == "_ode" || _physicsEngine == "bullet")
+  {
+    EXPECT_TRUE(physics->SetParam("iters", 100));
+    if (_physicsEngine == "ode")
+      EXPECT_TRUE(physics->SetParam("contact_max_correcting_vel", 0));
+  }
 
   world->Step(1);
 

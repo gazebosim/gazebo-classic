@@ -17,6 +17,7 @@
 #include "gazebo/common/Color.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Material.hh"
 
 using namespace gazebo;
@@ -157,6 +158,7 @@ void Material::Update(const gazebo::common::Material *_mat)
   common::Color specular = _mat->GetSpecular();
   common::Color emissive = _mat->GetEmissive();
 
+
   pass->setLightingEnabled(_mat->GetLighting());
   pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
   pass->setAmbient(ambient.r, ambient.g, ambient.b);
@@ -181,4 +183,37 @@ void Material::Update(const gazebo::common::Material *_mat)
     texState->setTextureName(_mat->GetTextureImage());
     texState->setName(_mat->GetTextureImage());
   }
+}
+
+//////////////////////////////////////////////////
+bool Material::GetMaterialAsColor(const std::string &_materialName,
+          common::Color &_ambient, common::Color &_diffuse,
+          common::Color &_specular, common::Color &_emissive)
+{
+  Ogre::MaterialPtr matPtr;
+
+  if (Ogre::MaterialManager::getSingleton().resourceExists(_materialName))
+  {
+    matPtr = Ogre::MaterialManager::getSingleton().getByName(_materialName,
+        "General");
+
+    if (matPtr.isNull())
+      return false;
+
+    Ogre::Technique *technique = matPtr->getTechnique(0);
+    if (technique)
+    {
+      Ogre::Pass *pass = technique->getPass(0);
+      if (pass)
+      {
+        _ambient = Conversions::Convert(pass->getAmbient());
+        _diffuse = Conversions::Convert(pass->getDiffuse());
+        _specular = Conversions::Convert(pass->getSpecular());
+        _emissive = Conversions::Convert(pass->getSelfIllumination());
+        return true;
+      }
+    }
+  }
+
+  return false;
 }

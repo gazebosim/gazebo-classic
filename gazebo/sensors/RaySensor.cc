@@ -19,6 +19,12 @@
  * Date: 23 february 2004
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -463,7 +469,16 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
         intensity = this->laserShape->GetRetro(j * this->GetRayCount() + i);
       }
 
-      if (!this->noises.empty())
+      // Mask ranges outside of min/max to +/- inf, as per REP 117
+      if (range >= this->GetRangeMax())
+      {
+        range = GZ_DBL_INF;
+      }
+      else if (range <= this->GetRangeMin())
+      {
+        range = -GZ_DBL_INF;
+      }
+      else if (!this->noises.empty())
       {
         // currently supports only one noise model per laser sensor
         range = this->noises[0]->Apply(range);

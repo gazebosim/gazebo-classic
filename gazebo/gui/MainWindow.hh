@@ -72,6 +72,10 @@ namespace gazebo
       /// \return A pointer to the render widget.
       public: RenderWidget *GetRenderWidget() const;
 
+      /// \brief Returns the state of the simulation, true if paused.
+      /// \return True if paused, false otherwise.
+      public: bool IsPaused() const;
+
       /// \brief Play simulation.
       public slots: void Play();
 
@@ -82,8 +86,36 @@ namespace gazebo
       /// \param[in] _on True to show the left pane, false to hide.
       public: void SetLeftPaneVisibility(bool _on);
 
+      /// \brief Add a menu to the main window menu bar.
+      /// \param[in] _menu Menu to be added.
+      public: void AddMenu(QMenu *_menu);
+
+      /// \brief Show a custom menubar. If NULL is used, the default menubar
+      /// is shown.
+      /// \param[in] _bar The menubar to show. NULL will show the default
+      /// menubar.
+      public: void ShowMenuBar(QMenuBar *_bar = NULL);
+
+      /// \brief Create a new action with information from the given action,
+      /// such as text and tooltip. The new action triggers the original action
+      /// and follows its checked state. This is used for example to have the
+      /// "same" action on the main window menu and the model editor menu,
+      /// since an action can't be added to 2 different menus.
+      /// \param[in] _action Action to be cloned.
+      /// \param[in] _parent Parent for the new action.
+      /// \return The new action.
+      public: QAction *CloneAction(QAction *_action, QObject *_parent);
+
+      /// \brief Get an editor by name
+      /// \param[in] _name Name of the editor.
+      /// \return Pointer to the editor.
+      public: Editor *GetEditor(const std::string &_name) const;
+
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
+
+      /// \brief A signal to indicate the main window is about to close.
+      signals: void Close();
 
       protected: void closeEvent(QCloseEvent *_event);
 
@@ -134,13 +166,33 @@ namespace gazebo
       private slots: void CaptureScreenshot();
 
       private slots: void InsertModel();
+
+      /// \brief Qt callback when the show grid action is triggered.
       private slots: void ShowGrid();
+
+      /// \brief Qt callback when the show collisions action is triggered.
       private slots: void ShowCollisions();
+
+      /// \brief Qt callback when the show joints action is triggered.
       private slots: void ShowJoints();
+
+      /// \brief Qt callback when the show contacts action is triggered.
       private slots: void ShowContacts();
+
+      /// \brief Qt callback when the show center of mass action is triggered.
       private slots: void ShowCOM();
+
+      /// \brief Qt callback when the show inertia action is triggered.
+      private slots: void ShowInertia();
+
       private slots: void Reset();
+
+      /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
+
+      /// \brief Qt callback when the show toolbars action is triggered.
+      private slots: void ShowToolbars();
+
       private slots: void FPS();
       private slots: void Orbit();
       private slots: void ViewOculus();
@@ -149,8 +201,8 @@ namespace gazebo
       private slots: void SetTransparent();
       private slots: void SetWireframe();
 
-      /// \brief Qt call back when the play action state changes
-      private slots: void OnPlayActionChanged();
+      /// \brief Qt callback when the show GUI overlays action is triggered.
+      private slots: void ShowGUIOverlays();
 
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
@@ -171,28 +223,23 @@ namespace gazebo
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
+
       private: void OnMoveMode(bool _mode);
 
       /// \brief Create most of the actions.
       private: void CreateActions();
 
+      /// \brief Delete the actions created in CreateActions.
+      private: void DeleteActions();
+
       /// \brief Create menus.
       private: void CreateMenus();
-
-      /// \brief Create the toolbars.
-      private: void CreateToolbars();
 
       /// \brief Create the main menu bar.
       private: void CreateMenuBar();
 
       /// \brief Create all the editors.
       private: void CreateEditors();
-
-      /// \brief Show a custom menubar. If NULL is used, the default menubar
-      /// is shown.
-      /// \param[in] _bar The menubar to show. NULL will show the default
-      /// menubar.
-      public: void ShowMenuBar(QMenuBar *_bar = NULL);
 
       private: void OnModel(ConstModelPtr &_msg);
 
@@ -205,7 +252,6 @@ namespace gazebo
       private: void OnManipMode(const std::string &_mode);
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
-      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       /// \brief Handle event for changing the manual step size.
       /// \param[in] _value New input step size.
@@ -276,8 +322,8 @@ namespace gazebo
       /// \brief User specified step size for manually stepping the world
       private: int inputStepSize;
 
-      /// \brief List of all the editors.
-      private: std::list<Editor*> editors;
+      /// \brief Map of all the editors to their names.
+      private: std::map<std::string, Editor *> editors;
 
       /// \brief List of all the align action groups.
       private: std::vector<QActionGroup *> alignActionGroups;

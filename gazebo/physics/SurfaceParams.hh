@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _SURFACEPARAMS_HH_
-#define _SURFACEPARAMS_HH_
+#ifndef _GAZEBO_SURFACEPARAMS_HH_
+#define _GAZEBO_SURFACEPARAMS_HH_
 
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class FrictionPyramid SurfaceParams.hh physics/physics.hh
     /// \brief Parameters used for friction pyramid model.
-    class GAZEBO_VISIBLE FrictionPyramid
+    class GZ_PHYSICS_VISIBLE FrictionPyramid
     {
       /// \brief Constructor.
       public: FrictionPyramid();
@@ -90,7 +91,7 @@ namespace gazebo
     /// \brief SurfaceParams defines various Surface contact parameters.
     /// These parameters defines the properties of a
     /// physics::Contact constraint.
-    class GAZEBO_VISIBLE SurfaceParams
+    class GZ_PHYSICS_VISIBLE SurfaceParams
     {
       /// \brief Constructor.
       public: SurfaceParams();
@@ -110,12 +111,21 @@ namespace gazebo
       /// \param[in] _msg Message to read values from.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
+      /// \brief Get access to FrictionPyramid data, if available.
+      /// \return Pointer to FrictionPyramid data or NULL if class does
+      /// not use FrictionPyramid data.
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+
       /// \brief Allow collision checking without generating a contact joint.
       public: bool collideWithoutContact;
 
       /// \brief Custom collision filtering used when collideWithoutContact is
       /// true.
       public: unsigned int collideWithoutContactBitmask;
+
+      /// \brief Custom collision filtering. Will override
+      /// collideWithoutContact.
+      public: unsigned int collideBitmask;
     };
     /// \}
   }

@@ -41,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet Link class
-    class GAZEBO_VISIBLE BulletLink : public Link
+    class GZ_PHYSICS_VISIBLE BulletLink : public Link
     {
       /// \brief Constructor
       public: BulletLink(EntityPtr _parent);
@@ -142,6 +142,10 @@ namespace gazebo
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force,
                   const math::Vector3 &_relpos);
+
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
 
       // Documentation inherited.
       public: virtual void AddTorque(const math::Vector3 &_torque);

@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 #define TOL 1e-6

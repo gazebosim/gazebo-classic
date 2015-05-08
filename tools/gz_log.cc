@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -908,16 +914,18 @@ std::string LogCommand::GetFileSizeStr(const std::string &_filename)
 /////////////////////////////////////////////////
 int LogCommand::GetChar()
 {
+# ifndef _WIN32
   struct termios oldt, newt;
-  int ch;
   tcgetattr(STDIN_FILENO, &oldt);
   newt = oldt;
   newt.c_lflag &= ~(ICANON | ECHO);
   tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  ch = getchar();
+  int ch = getchar();
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-
   return ch;
+# else
+  return 'q';
+# endif
 }
 
 /////////////////////////////////////////////////

@@ -267,6 +267,43 @@ TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
   CompareMsgsJointTypeToString(msgs::Joint::GEARBOX);
 }
 
+//////////////////////////////////////////////////
+void CompareMsgsGeometryTypeToString(const msgs::Geometry::Type _type)
+{
+  EXPECT_EQ(_type, msgs::ConvertGeometryType(msgs::ConvertGeometryType(_type)));
+}
+
+//////////////////////////////////////////////////
+TEST_F(MsgsTest, ConvertMsgsGeometryTypeToString)
+{
+  CompareMsgsGeometryTypeToString(msgs::Geometry::BOX);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::SPHERE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::CYLINDER);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::PLANE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::IMAGE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::HEIGHTMAP);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::MESH);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::POLYLINE);
+
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::BOX), "box");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::SPHERE), "sphere");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::CYLINDER), "cylinder");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::PLANE), "plane");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::IMAGE), "image");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::HEIGHTMAP), "heightmap");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::MESH), "mesh");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::POLYLINE), "polyline");
+
+  EXPECT_EQ(msgs::ConvertGeometryType("box"), msgs::Geometry::BOX);
+  EXPECT_EQ(msgs::ConvertGeometryType("sphere"), msgs::Geometry::SPHERE);
+  EXPECT_EQ(msgs::ConvertGeometryType("cylinder"), msgs::Geometry::CYLINDER);
+  EXPECT_EQ(msgs::ConvertGeometryType("plane"), msgs::Geometry::PLANE);
+  EXPECT_EQ(msgs::ConvertGeometryType("image"), msgs::Geometry::IMAGE);
+  EXPECT_EQ(msgs::ConvertGeometryType("heightmap"), msgs::Geometry::HEIGHTMAP);
+  EXPECT_EQ(msgs::ConvertGeometryType("mesh"), msgs::Geometry::MESH);
+  EXPECT_EQ(msgs::ConvertGeometryType("polyline"), msgs::Geometry::POLYLINE);
+}
+
 TEST_F(MsgsTest, SetVector3)
 {
   msgs::Vector3d msg;
@@ -884,6 +921,145 @@ TEST_F(MsgsTest, MeshFromSDF)
 }
 
 /////////////////////////////////////////////////
+TEST_F(MsgsTest, AxisFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("joint.sdf", sdf);
+  sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <joint name='arm' type='revolute'>\
+           <parent>arm_base</parent>\
+           <child>arm_shoulder</child>\
+           <axis>\
+             <xyz>0 0 1</xyz>\
+             <limit>\
+               <lower>0.01</lower>\
+               <upper>9</upper>\
+               <effort>2.2</effort>\
+               <velocity>0.1</velocity>\
+             </limit>\
+             <use_parent_model_frame>false</use_parent_model_frame>\
+             <dynamics>\
+               <damping>0.1</damping>\
+               <friction>0.2</friction>\
+             </dynamics>\
+           </axis>\
+         </joint>\
+      </sdf>", sdf);
+  msgs::Axis msg = msgs::AxisFromSDF(sdf->GetElement("axis"));
+
+  EXPECT_TRUE(msg.has_xyz());
+  EXPECT_EQ(msgs::Convert(msg.xyz()), math::Vector3(0, 0, 1));
+  EXPECT_TRUE(msg.has_limit_lower());
+  EXPECT_NEAR(msg.limit_lower(), 0.01, 1e-6);
+  EXPECT_TRUE(msg.has_limit_upper());
+  EXPECT_NEAR(msg.limit_upper(), 9, 1e-6);
+  EXPECT_TRUE(msg.has_limit_effort());
+  EXPECT_NEAR(msg.limit_effort(), 2.2, 1e-6);
+  EXPECT_TRUE(msg.has_limit_velocity());
+  EXPECT_NEAR(msg.limit_velocity(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_use_parent_model_frame());
+  EXPECT_EQ(msg.use_parent_model_frame(), false);
+  EXPECT_TRUE(msg.has_damping());
+  EXPECT_NEAR(msg.damping(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_friction());
+  EXPECT_NEAR(msg.friction(), 0.2, 1e-6);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, JointFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("joint.sdf", sdf);
+  sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <joint name='arm' type='revolute'>\
+           <pose>1 2 3 0 1.57 0</pose>\
+           <parent>arm_base</parent>\
+           <child>arm_shoulder</child>\
+           <axis>\
+             <xyz>1 0 0</xyz>\
+             <limit>\
+               <lower>0.1</lower>\
+               <upper>3.14</upper>\
+               <effort>2.4</effort>\
+               <velocity>0.4</velocity>\
+             </limit>\
+             <use_parent_model_frame>true</use_parent_model_frame>\
+             <dynamics>\
+               <damping>1.0</damping>\
+               <friction>0.1</friction>\
+             </dynamics>\
+           </axis>\
+           <physics>\
+             <ode>\
+               <cfm>0.2</cfm>\
+               <bounce>0.1</bounce>\
+               <velocity>1.1</velocity>\
+               <fudge_factor>0.4</fudge_factor>\
+               <limit>\
+                 <cfm>0.0</cfm>\
+                 <erp>0.9</erp>\
+               </limit>\
+               <suspension>\
+                 <cfm>0.1</cfm>\
+                 <erp>0.3</erp>\
+               </suspension>\
+             </ode>\
+           </physics>\
+         </joint>\
+      </gazebo>", sdf);
+  msgs::Joint msg = msgs::JointFromSDF(sdf);
+
+  EXPECT_TRUE(msg.has_name());
+  EXPECT_EQ(msg.name(), "arm");
+  EXPECT_TRUE(msg.has_type());
+  EXPECT_EQ(msgs::ConvertJointType(msg.type()), "revolute");
+  EXPECT_TRUE(msg.has_pose());
+  EXPECT_EQ(msgs::Convert(msg.pose()), math::Pose(1, 2, 3, 0, 1.57, 0));
+  EXPECT_TRUE(msg.has_parent());
+  EXPECT_EQ(msg.parent(), "arm_base");
+  EXPECT_TRUE(msg.has_child());
+  EXPECT_EQ(msg.child(), "arm_shoulder");
+  EXPECT_TRUE(msg.has_cfm());
+  EXPECT_NEAR(msg.cfm(), 0.2, 1e-6);
+  EXPECT_TRUE(msg.has_bounce());
+  EXPECT_NEAR(msg.bounce(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_velocity());
+  EXPECT_NEAR(msg.velocity(), 1.1, 1e-6);
+  EXPECT_TRUE(msg.has_fudge_factor());
+  EXPECT_NEAR(msg.fudge_factor(), 0.4, 1e-6);
+  EXPECT_TRUE(msg.has_limit_cfm());
+  EXPECT_NEAR(msg.limit_cfm(), 0.0, 1e-6);
+  EXPECT_TRUE(msg.has_limit_erp());
+  EXPECT_NEAR(msg.limit_erp(), 0.9, 1e-6);
+  EXPECT_TRUE(msg.has_suspension_cfm());
+  EXPECT_NEAR(msg.suspension_cfm(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_suspension_erp());
+  EXPECT_NEAR(msg.suspension_erp(), 0.3, 1e-6);
+
+  EXPECT_TRUE(msg.has_axis1());
+  EXPECT_TRUE(!msg.has_axis2());
+  const msgs::Axis axisMsg = msg.axis1();
+  EXPECT_TRUE(axisMsg.has_xyz());
+  EXPECT_EQ(msgs::Convert(axisMsg.xyz()), math::Vector3(1, 0, 0));
+  EXPECT_TRUE(axisMsg.has_limit_lower());
+  EXPECT_NEAR(axisMsg.limit_lower(), 0.1, 1e-6);
+  EXPECT_TRUE(axisMsg.has_limit_upper());
+  EXPECT_NEAR(axisMsg.limit_upper(), 3.14, 1e-6);
+  EXPECT_TRUE(axisMsg.has_limit_effort());
+  EXPECT_NEAR(axisMsg.limit_effort(), 2.4, 1e-6);
+  EXPECT_TRUE(axisMsg.has_limit_velocity());
+  EXPECT_NEAR(axisMsg.limit_velocity(), 0.4, 1e-6);
+  EXPECT_TRUE(axisMsg.has_use_parent_model_frame());
+  EXPECT_EQ(axisMsg.use_parent_model_frame(), true);
+  EXPECT_TRUE(axisMsg.has_damping());
+  EXPECT_NEAR(axisMsg.damping(), 1.0, 1e-6);
+  EXPECT_TRUE(axisMsg.has_friction());
+  EXPECT_NEAR(axisMsg.friction(), 0.1, 1e-6);
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, LinkToSDF)
 {
   const std::string name("test_link");
@@ -1184,7 +1360,7 @@ TEST_F(MsgsTest, GeometryToSDF)
   // polyline
   msgs::Geometry polylineMsg;
   polylineMsg.set_type(msgs::Geometry::POLYLINE);
-  msgs::Polyline *polylineGeom = polylineMsg.mutable_polyline();
+  msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
   polylineGeom->set_height(2.33);
   msgs::Set(polylineGeom->add_point(), math::Vector2d(0.5, 0.7));
   msgs::Set(polylineGeom->add_point(), math::Vector2d(3.5, 4.7));
@@ -1368,6 +1544,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msg.set_min_depth(0.0001);
   msg.set_collide_without_contact(true);
   msg.set_collide_without_contact_bitmask(0x0004);
+  msg.set_collide_bitmask(0x01);
 
   sdf::ElementPtr surfaceSDF = msgs::SurfaceToSDF(msg);
   sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
@@ -1394,6 +1571,8 @@ TEST_F(MsgsTest, SurfaceToSDF)
   EXPECT_TRUE(contactElem->Get<bool>("collide_without_contact"));
   EXPECT_EQ(contactElem->Get<unsigned int>("collide_without_contact_bitmask"),
       static_cast<unsigned int>(0x0004));
+  EXPECT_EQ(contactElem->Get<unsigned int>("collide_bitmask"),
+      static_cast<unsigned int>(0x01));
 }
 
 /////////////////////////////////////////////////
@@ -1871,4 +2050,3 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
   EXPECT_EQ(jointElem2->Get<math::Pose>("pose"), math::Pose());
 }
-

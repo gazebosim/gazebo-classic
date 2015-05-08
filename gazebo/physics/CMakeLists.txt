@@ -16,6 +16,16 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
+include_directories(${TBB_INCLUDEDIR})
+
+# Be sure to locate this definition *after* add_subdirectories
+# in order to get the proper visibility when building libs
+if (WIN32)
+  add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
+  include_directories(${libdl_include_dir})
+endif()
+
+
 set (sources
   Actor.cc
   Base.cc
@@ -45,6 +55,7 @@ set (sources
   PlaneShape.cc
   PolylineShape.cc
   Population.cc
+  PresetManager.cc
   RayShape.cc
   Road.cc
   Shape.cc
@@ -90,6 +101,7 @@ set (headers
   PlaneShape.hh
   PolylineShape.hh
   Population.hh
+  PresetManager.hh
   RayShape.hh
   Road.hh
   Shape.hh
@@ -121,6 +133,7 @@ target_link_libraries(gazebo_physics
 if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
 endif()
+
 if (HAVE_DART)
   target_link_libraries(gazebo_physics gazebo_physics_dart)
 endif()
@@ -144,6 +157,7 @@ set (gtest_sources
   Inertial_TEST.cc
   JointController_TEST.cc
   PhysicsEngine_TEST.cc
+  PresetManager_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
 )

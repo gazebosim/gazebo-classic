@@ -332,7 +332,7 @@ namespace gazebo
       return result;
     }
 
-    std::string ConvertJointType(const msgs::Joint::Type _type)
+    std::string ConvertJointType(const msgs::Joint::Type &_type)
     {
       std::string result;
       switch (_type)
@@ -377,6 +377,106 @@ namespace gazebo
           result = "unknown";
           gzerr << "Unrecognized JointType [" << _type << "]"
                 << std::endl;
+          break;
+        }
+      }
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Geometry::Type ConvertGeometryType(const std::string &_str)
+    {
+      msgs::Geometry::Type result = msgs::Geometry::BOX;
+      if (_str == "box")
+      {
+        result = msgs::Geometry::BOX;
+      }
+      else if (_str == "cylinder")
+      {
+        result = msgs::Geometry::CYLINDER;
+      }
+      else if (_str == "sphere")
+      {
+        result = msgs::Geometry::SPHERE;
+      }
+      else if (_str == "plane")
+      {
+        result = msgs::Geometry::PLANE;
+      }
+      else if (_str == "image")
+      {
+        result = msgs::Geometry::IMAGE;
+      }
+      else if (_str == "heightmap")
+      {
+        result = msgs::Geometry::HEIGHTMAP;
+      }
+      else if (_str == "mesh")
+      {
+        result = msgs::Geometry::MESH;
+      }
+      else if (_str == "polyline")
+      {
+        result = msgs::Geometry::POLYLINE;
+      }
+      else
+      {
+        gzwarn << "Geometry: '" << _str << "' is not recognized, "
+            << " returning type as msgs::Geometry::BOX." << std::endl;
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    std::string ConvertGeometryType(const msgs::Geometry::Type _type)
+    {
+      std::string result;
+      switch (_type)
+      {
+        case msgs::Geometry::BOX:
+        {
+          result = "box";
+          break;
+        }
+        case msgs::Geometry::CYLINDER:
+        {
+          result = "cylinder";
+          break;
+        }
+        case msgs::Geometry::SPHERE:
+        {
+          result = "sphere";
+          break;
+        }
+        case msgs::Geometry::PLANE:
+        {
+          result = "plane";
+          break;
+        }
+        case msgs::Geometry::IMAGE:
+        {
+          result = "image";
+          break;
+        }
+        case msgs::Geometry::HEIGHTMAP:
+        {
+          result = "heightmap";
+          break;
+        }
+        case msgs::Geometry::MESH:
+        {
+          result = "mesh";
+          break;
+        }
+        case msgs::Geometry::POLYLINE:
+        {
+          result = "polyline";
+          break;
+        }
+        default:
+        {
+          result = "unknown";
           break;
         }
       }
@@ -588,7 +688,6 @@ namespace gazebo
       return result;
     }
 
-
     /////////////////////////////////////////////////
     msgs::Geometry GeometryFromSDF(sdf::ElementPtr _sdf)
     {
@@ -636,15 +735,21 @@ namespace gazebo
       }
       else if (geomElem->GetName() == "polyline")
       {
+        sdf::ElementPtr polylineElem = geomElem;
         result.set_type(msgs::Geometry::POLYLINE);
-        result.mutable_polyline()->set_height(geomElem->Get<double>("height"));
-        sdf::ElementPtr pointElem = geomElem->GetElement("point");
-        while (pointElem)
+        while (polylineElem)
         {
-           math::Vector2d point = pointElem->Get<math::Vector2d>();
-           pointElem = pointElem->GetNextElement("point");
-           msgs::Vector2d *ptMsg = result.mutable_polyline()->add_point();
-           msgs::Set(ptMsg, point);
+          msgs::Polyline *polylineMsg = result.add_polyline();
+          polylineMsg->set_height(polylineElem->Get<double>("height"));
+          sdf::ElementPtr pointElem = polylineElem->GetElement("point");
+          while (pointElem)
+          {
+             math::Vector2d point = pointElem->Get<math::Vector2d>();
+             pointElem = pointElem->GetNextElement("point");
+             msgs::Vector2d *ptMsg = polylineMsg->add_point();
+             msgs::Set(ptMsg, point);
+          }
+          polylineElem = polylineElem->GetNextElement("polyline");
         }
       }
       else if (geomElem->GetName() == "image")
@@ -822,6 +927,114 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Axis AxisFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Axis result;
+
+      sdf::ElementPtr limitElem = _sdf->GetElement("limit");
+      result.set_limit_lower(limitElem->Get<double>("lower"));
+      result.set_limit_upper(limitElem->Get<double>("upper"));
+      result.set_limit_effort(limitElem->Get<double>("effort"));
+      result.set_limit_velocity(limitElem->Get<double>("velocity"));
+
+      result.set_use_parent_model_frame(
+          _sdf->Get<bool>("use_parent_model_frame"));
+
+      sdf::ElementPtr dynamicsElem = _sdf->GetElement("dynamics");
+      result.set_damping(dynamicsElem->Get<double>("damping"));
+      result.set_friction(dynamicsElem->Get<double>("friction"));
+
+      msgs::Set(result.mutable_xyz(), _sdf->Get<math::Vector3>("xyz"));
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Joint JointFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Joint result;
+
+      // Name
+      result.set_name(_sdf->Get<std::string>("name"));
+
+      // parent
+      if (_sdf->HasElement("parent"))
+         result.set_parent(_sdf->Get<std::string>("parent"));
+
+      // child
+      if (_sdf->HasElement("child"))
+         result.set_child(_sdf->Get<std::string>("child"));
+
+      // Pose
+      math::Pose jointPose;
+      if (_sdf->HasElement("pose"))
+        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
+
+      // Type
+      std::string type = _sdf->Get<std::string>("type");
+      result.set_type(msgs::ConvertJointType(type));
+
+      // axis1
+      if (_sdf->HasElement("axis"))
+      {
+        msgs::Axis *axis = result.mutable_axis1();
+        axis->CopyFrom(AxisFromSDF(_sdf->GetElement("axis")));
+        result.add_angle(0);
+      }
+
+      // axis2
+      if (_sdf->HasElement("axis2"))
+      {
+        msgs::Axis *axis = result.mutable_axis2();
+        axis->CopyFrom(AxisFromSDF(_sdf->GetElement("axis2")));
+        result.add_angle(0);
+      }
+
+      // physics
+      if (_sdf->HasElement("physics"))
+      {
+        sdf::ElementPtr physicsElem = _sdf->GetElement("physics");
+        if (physicsElem->HasElement("ode"))
+        {
+          sdf::ElementPtr odeElem = physicsElem->GetElement("ode");
+          if (odeElem->HasElement("cfm"))
+            result.set_cfm(odeElem->Get<double>("cfm"));
+          if (odeElem->HasElement("bounce"))
+            result.set_bounce(odeElem->Get<double>("bounce"));
+          if (odeElem->HasElement("velocity"))
+            result.set_velocity(odeElem->Get<double>("velocity"));
+          if (odeElem->HasElement("fudge_factor"))
+            result.set_fudge_factor(odeElem->Get<double>("fudge_factor"));
+
+          if (odeElem->HasElement("limit"))
+          {
+            sdf::ElementPtr odeLimitElem = odeElem->GetElement("limit");
+            if (odeLimitElem->HasElement("cfm"))
+              result.set_limit_cfm(odeLimitElem->Get<double>("cfm"));
+            if (odeLimitElem->HasElement("erp"))
+              result.set_limit_erp(odeLimitElem->Get<double>("erp"));
+          }
+          if (odeElem->HasElement("suspension"))
+          {
+            sdf::ElementPtr odeSuspensionElem =
+                odeElem->GetElement("suspension");
+            if (odeSuspensionElem->HasElement("cfm"))
+            {
+              result.set_suspension_cfm(
+                  odeSuspensionElem->Get<double>("cfm"));
+            }
+            if (odeSuspensionElem->HasElement("erp"))
+            {
+              result.set_suspension_erp(
+                  odeSuspensionElem->Get<double>("erp"));
+            }
+          }
+        }
+      }
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     sdf::ElementPtr VisualToSDF(const msgs::Visual &_msg,
         sdf::ElementPtr _sdf)
     {
@@ -969,7 +1182,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    std::string ConvertShaderType(const msgs::Material::ShaderType _type)
+    std::string ConvertShaderType(const msgs::Material::ShaderType &_type)
     {
       std::string result;
       switch (_type)
@@ -1437,6 +1650,11 @@ namespace gazebo
         contactElem->GetElement("collide_without_contact_bitmask")->Set(
             _msg.collide_without_contact_bitmask());
       }
+      if (_msg.has_collide_bitmask())
+      {
+        contactElem->GetElement("collide_bitmask")->Set(
+            _msg.collide_bitmask());
+      }
 
       sdf::ElementPtr odeElem = contactElem->GetElement("ode");
       sdf::ElementPtr bulletElem = contactElem->GetElement("bullet");
@@ -1602,20 +1820,22 @@ namespace gazebo
         geom = msgs::MeshToSDF(meshGeom, geom);
       }
       else if (_msg.type() == msgs::Geometry::POLYLINE &&
-          _msg.has_polyline())
+          _msg.polyline_size() > 0)
       {
-        sdf::ElementPtr geom = geometrySDF->GetElement("polyline");
-        gazebo::msgs::Polyline polylineGeom = _msg.polyline();
-        if (polylineGeom.has_height())
-          geom->GetElement("height")->Set(polylineGeom.height());
-        if (polylineGeom.point_size() > 0)
-          while (geom->HasElement("point"))
-            geom->GetElement("point")->RemoveFromParent();
+        if (_msg.polyline_size() > 0)
+          while (geometrySDF->HasElement("polyline"))
+            geometrySDF->GetElement("polyline")->RemoveFromParent();
 
-        for (int i = 0; i < polylineGeom.point_size(); ++i)
+        for (int j = 0; j < _msg.polyline_size(); ++j)
         {
-          sdf::ElementPtr pointElem = geom->AddElement("point");
-          pointElem->Set(msgs::Convert(polylineGeom.point(i)));
+          sdf::ElementPtr polylineElem = geometrySDF->AddElement("polyline");
+          if (_msg.polyline(j).has_height())
+            polylineElem->GetElement("height")->Set(_msg.polyline(j).height());
+          for (int i = 0; i < _msg.polyline(j).point_size(); ++i)
+          {
+            sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+            pointElem->Set(msgs::Convert(_msg.polyline(j).point(i)));
+          }
         }
       }
       else
@@ -1643,16 +1863,17 @@ namespace gazebo
       if (_msg.has_filename())
         meshSDF->GetElement("uri")->Set(_msg.filename());
 
-      sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
       if (_msg.has_submesh())
-        submeshElem->GetElement("name")->Set(_msg.submesh());
-      if (_msg.has_center_submesh())
-        submeshElem->GetElement("center")->Set(_msg.center_submesh());
-      if (_msg.has_scale())
       {
-        meshSDF->GetElement("scale")->Set(msgs::Convert(_msg.scale()));
+        sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
+        submeshElem->GetElement("name")->Set(_msg.submesh());
+        if (_msg.has_center_submesh())
+          submeshElem->GetElement("center")->Set(_msg.center_submesh());
+        if (_msg.has_scale())
+        {
+          meshSDF->GetElement("scale")->Set(msgs::Convert(_msg.scale()));
+        }
       }
-
       return meshSDF;
     }
 

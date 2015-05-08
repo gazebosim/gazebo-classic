@@ -36,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART Link class
-    class GAZEBO_VISIBLE DARTLink : public Link
+    class GZ_PHYSICS_VISIBLE DARTLink : public Link
     {
       /// \brief Constructor
       public: explicit DARTLink(EntityPtr _parent);
@@ -88,6 +88,10 @@ namespace gazebo
       public: virtual void AddForceAtRelativePosition(
           const math::Vector3 &_force,
           const math::Vector3 &_relpos);
+
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
 
       // Documentation inherited
       public: virtual void AddTorque(const math::Vector3 &_torque);

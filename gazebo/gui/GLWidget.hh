@@ -51,6 +51,15 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \enum SelectionLevels
+      /// \brief Unique identifiers for all selection levels supported.
+      public: enum SelectionLevels {
+                  /// \brief Model level
+                  MODEL,
+                  /// \brief Link level
+                  LINK
+                };
+
       public: GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
@@ -67,6 +76,9 @@ namespace gazebo
 
       signals: void clicked();
 
+      /// \brief QT signal to notify when we received a selection msg.
+      /// \param[in] _name Name of the selected entity.
+      signals: void selectionMsgReceived(const QString &_name);
 
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
@@ -151,6 +163,9 @@ namespace gazebo
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
 
+      /// \brief Deselect all visuals, removing highlight and publishing message
+      private: void DeselectAllVisuals();
+
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.
@@ -178,6 +193,10 @@ namespace gazebo
       /// \brief Qt callback when the model editor action is toggled.
       /// \param[in] _checked True if the model editor was checked.
       private slots: void OnModelEditor(bool _checked);
+
+      /// \brief Qt callback when a selection msg is received.
+      /// \param[in] The name of the selected entity.
+      private slots: void OnSelectionMsgEvent(const QString &_name);
 
       private: int windowId;
 
@@ -208,6 +227,9 @@ namespace gazebo
 
       /// \brief A list of selected visuals.
       private: std::vector<rendering::VisualPtr> selectedVisuals;
+
+      /// \brief Indicates how deep into the model to select.
+      private: SelectionLevels selectionLevel;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;

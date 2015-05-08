@@ -416,6 +416,12 @@ SubMesh::SubMesh()
 //////////////////////////////////////////////////
 SubMesh::SubMesh(const SubMesh *_mesh)
 {
+  if (!_mesh)
+  {
+    gzerr << "Submesh is NULL." << std::endl;
+    return;
+  }
+
   this->name = _mesh->name;
   this->materialIndex = _mesh->materialIndex;
   this->primitiveType = _mesh->primitiveType;
