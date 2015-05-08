@@ -56,10 +56,12 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       int id = -1;
       if (linkElem->HasAttribute("name"))
       {
+        std::string name = linkElem->Get<std::string>("name");
         physics::LinkPtr link =
-            this->model->GetLink(linkElem->Get<std::string>("name"));
+            this->model->GetLink(name);
         if (!link)
         {
+          gzwarn << "Specified link [" << name << "] not found." << std::endl;
           continue;
         }
         id = link->GetId();

@@ -183,9 +183,9 @@ void LiftDragPlugin::OnUpdate()
   // get direction of moment
   math::Vector3 momentDirection = ldNormal;
 
-  double vectorMagnitude = forwardI.GetLength() * velInLDPlane.GetLength();
+  double forwardVelocity = forwardI.GetLength() * velInLDPlane.GetLength();
   double cosAlpha = math::clamp(
-    forwardI.Dot(velInLDPlane) / vectorMagnitude, -1.0, 1.0);
+    forwardI.Dot(velInLDPlane) / forwardVelocity, -1.0, 1.0);
 
   // should never happen
   GZ_ASSERT(cosAlpha <= 1, "cosAlpha greater than domain for arccos!");
@@ -196,8 +196,8 @@ void LiftDragPlugin::OnUpdate()
   // get sign of alpha
   // take upwards component of velocity in lift-drag plane.
   // if sign == upward, then alpha is negative
-  vectorMagnitude = upwardI.GetLength() + velInLDPlane.GetLength();
-  double alphaSign = -upwardI.Dot(velInLDPlane)/vectorMagnitude;
+  double upwardVelocity = upwardI.GetLength() + velInLDPlane.GetLength();
+  double alphaSign = -upwardI.Dot(velInLDPlane)/upwardVelocity;
 
   if (alphaSign > 0.0)
     this->alpha = this->alpha0 + acos(cosAlpha);
