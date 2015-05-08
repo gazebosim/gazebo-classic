@@ -1,5 +1,3 @@
-include_directories(${OGRE_INCLUDE_DIRS})
-
 # define header and source files for the library
 set (SKYX_HEADER_FILES
   include/AtmosphereManager.h

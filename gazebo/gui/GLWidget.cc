@@ -905,9 +905,9 @@ std::string GLWidget::GetOgreHandle() const
   std::ostringstream ogreHandle;
 
 #if defined(__APPLE__)
-  ogreHandle << (unsigned)(this->winId());
-#elif defined(WIN32)
-  ogreHandle << (unsigned)(this->renderFrame->winId());
+  ogreHandle << (unsigned long)(this->winId());
+#elif defined(_MSC_VER)
+  ogreHandle << (unsigned long)(this->winId());
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);

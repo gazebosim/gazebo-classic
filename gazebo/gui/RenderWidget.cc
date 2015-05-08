@@ -138,11 +138,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   this->glWidget = new GLWidget(this->mainFrame);
 
-  /*this->msgOverlayLabel = new QLabel(this->glWidget);
+  this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(
       "QLabel { background-color : white; color : gray; }");
   this->msgOverlayLabel->setVisible(false);
-  */
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
