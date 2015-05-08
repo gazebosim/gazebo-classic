@@ -264,9 +264,9 @@ void OrthoViewController::Resize(
     const unsigned int _width, const unsigned int _height)
 {
   Ogre::Matrix4 proj = this->BuildScaledOrthoMatrix(
-      -_width / this->dataPtr->scale / 2.0,
+       _width / this->dataPtr->scale / -2.0,
        _width / this->dataPtr->scale / 2.0,
-      -_height / this->dataPtr->scale / 2.0,
+       _height / this->dataPtr->scale / -2.0,
        _height / this->dataPtr->scale / 2.0,
       -500, 500);
 
