@@ -40,7 +40,9 @@ gz_build_tests(${test_sources})
 add_executable(gz gz.cc gz_topic.cc gz_log.cc)
 target_link_libraries(gz
  libgazebo_client
+ gazebo_gui
  gazebo_physics_sensors
+ ${QT_LIBRARIES}
  ${Boost_LIBRARIES})
 
 #if(HAVE_BULLET)

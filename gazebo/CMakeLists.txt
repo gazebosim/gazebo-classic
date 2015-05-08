@@ -96,22 +96,10 @@ target_link_libraries(gzserver
   gazebo_rendering
   gazebo_msgs
   # Extra libs needed when linking statically (e.g., on WIN32)
-  gazebo_physics_ode
+  # gazebo_physics_ode
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
 )
-
-if (HAVE_SIMBODY)
-  target_link_libraries(gzserver gazebo_physics_simbody)
-endif()
-
-if (HAVE_DART)
-  target_link_libraries(gzserver gazebo_physics_dart)
-endif()
-
-if (HAVE_BULLET)
-  target_link_libraries(gzserver gazebo_physics_bullet)
-endif()
 
 if (UNIX)
   target_link_libraries(gzserver pthread)
