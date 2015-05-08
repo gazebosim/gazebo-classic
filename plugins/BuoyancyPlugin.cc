@@ -54,9 +54,10 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
          linkElem = this->sdf->GetNextElement("link"))
     {
       int id = -1;
+      std::string name = "";
       if (linkElem->HasAttribute("name"))
       {
-        std::string name = linkElem->Get<std::string>("name");
+        name = linkElem->Get<std::string>("name");
         physics::LinkPtr link =
             this->model->GetLink(name);
         if (!link)
@@ -66,17 +67,50 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
         }
         id = link->GetId();
       }
+      else
+      {
+        gzwarn << "Required attribute name missing from link [" << name
+               << "] in BuoyancyPlugin SDF" << std::endl;
+        // Exit if we didn't set ID
+        continue;
+      }
+
+      if (this->volPropsMap.count(id) != 0)
+      {
+        gzwarn << "Properties for link [" << name << "] already set, skipping "
+               << "second property block" << std::endl;
+      }
+
       if (linkElem->HasElement("center_of_volume"))
       {
         math::Vector3 cov =
             linkElem->GetElement("center_of_volume")->Get<math::Vector3>();
         this->volPropsMap[id].cov = cov;
       }
+      else
+      {
+        gzwarn << "Required element center_of_volume missing from link [" << name
+               << "] in BuoyancyPlugin SDF" << std::endl;
+        continue;
+      }
+
       if (linkElem->HasElement("volume"))
       {
-        double volume =
-            linkElem->GetElement("volume")->Get<double>();
+        double volume = linkElem->GetElement("volume")->Get<double>();
+        if (volume <= 0)
+        {
+          gzwarn << "Nonpositive volume specified in BuoyancyPlugin!" << std::endl;
+          // Remove the element from the map since it's invalid.
+          this->volPropsMap.erase(id);
+          continue;
+        }
         this->volPropsMap[id].volume = volume;
+      }
+      else
+      {
+        gzwarn << "Required element volume missing from element link [" << name
+               << "] in BuoyancyPlugin SDF" << std::endl;
+        continue;
       }
     }
   }
@@ -121,6 +155,7 @@ void BuoyancyPlugin::OnUpdate()
   {
     VolumeProperties volumeProperties = this->volPropsMap[link->GetId()];
     double volume = volumeProperties.volume;
+    GZ_ASSERT(volume > 0, "Nonpositive volume found in volume properties!");
 
     // By Archimedes' principle,
     // buoyancy = -(mass*gravity)*fluid_density/object_density

@@ -61,7 +61,8 @@ namespace gazebo
     /// \brief Constructor.
     public: BuoyancyPlugin();
 
-    // Documentation inherited
+    /// \brief Read the model SDF to compute volume and center of volume for
+    /// each link, and store those properties in volPropsMap.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     // Documentation inherited

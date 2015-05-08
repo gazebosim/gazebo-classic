@@ -185,11 +185,18 @@ void LiftDragPlugin::OnUpdate()
 
   double forwardVelocity = forwardI.GetLength() * velInLDPlane.GetLength();
   double cosAlpha = math::clamp(
-    forwardI.Dot(velInLDPlane) / forwardVelocity, -1.0, 1.0);
+    forwardI.Dot(velInLDPlane) / forwardVelocity, -0.99, 0.99);
 
   // should never happen
-  GZ_ASSERT(cosAlpha <= 1, "cosAlpha greater than domain for arccos!");
-  GZ_ASSERT(cosAlpha >= -1, "cosAlpha less than domain for arccos!");
+  if (cosAlpha >= 1)
+  {
+    gzwarn << "cosAlpha greater than domain for arccos!" << std::endl;
+    cosAlpha = 0.99;
+  } else if (cosAlpha <= -0.99)
+  {
+    gzwarn << "cosAlpha less than domain for arccos!" << std::endl;
+    cosAlpha = -0.99;
+  }
   // gzerr << "ca " << forwardI.Dot(velInLDPlane) /
   //   (forwardI.GetLength() * velInLDPlane.GetLength()) << "\n";
 
