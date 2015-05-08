@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include <OgreCamera.h>
 #include <OgreHardwareBufferManager.h>
+#include <OgreCamera.h>
 #include <OgreSceneNode.h>
 #include <OgreLight.h>
 #include <OgreTechnique.h>
