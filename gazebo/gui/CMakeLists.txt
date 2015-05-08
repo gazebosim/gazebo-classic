@@ -12,7 +12,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps
 )
 
-include_directories(${tinyxml_INCLUDE_DIRS})
+include_directories(${tinyxml_INCLUDE_DIRS} ${TBB_INCLUDEDIR})
 
 add_definitions(${QT_DEFINITIONS})
 
@@ -21,8 +21,6 @@ add_subdirectory(building)
 add_subdirectory(model)
 add_subdirectory(terrain)
 add_subdirectory(viewers)
-
-include_directories(${TBB_INCLUDEDIR})
 
 set (sources
   Actions.cc
