@@ -1,5 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+include_directories(${OGRE_INCLUDE_DIRS})
+
 set (sources
   DeferredLight.cc
   GBufferMaterialGenerator.cc
