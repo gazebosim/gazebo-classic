@@ -1710,11 +1710,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
     if (_msg->camera().has_projection_type())
     {
-      cam->SetProjectionType(_msg->camera().projection_type());
       g_cameraOrthoAct->setChecked(true);
-      // Disable view control options when in ortho projection
-      g_fpsAct->setEnabled(false);
-      g_orbitAct->setEnabled(false);
     }
 
     if (_msg->camera().has_track())

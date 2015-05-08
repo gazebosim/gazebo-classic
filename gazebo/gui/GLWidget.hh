@@ -199,10 +199,12 @@ namespace gazebo
       private slots: void OnSelectionMsgEvent(const QString &_name);
 
       /// \brief QT Callback that turns on orthographic projection
-      private slots: void OnOrtho();
+      /// \param[in] _checked Whether the action was checked or not.
+      private slots: void OnOrtho(bool _checked);
 
       /// \brief QT Callback that turns on perspective projection
-      private slots: void OnPerspective();
+      /// \param[in] _checked Whether the action was checked or not.
+      private slots: void OnPerspective(bool _checked);
 
       private: int windowId;
 
