@@ -134,6 +134,8 @@ public:
     { return dWorldGetQuickStepWarmStartFactor (get_id()); }
   int getQuickStepExtraFrictionIterations() const
     { return dWorldGetQuickStepExtraFrictionIterations (get_id()); }
+  int getQuickStepFrictionModel() const
+    { return dWorldGetQuickStepFrictionModel(get_id()); }
   void setQuickStepInertiaRatioReduction(bool irr)
     { dWorldSetQuickStepInertiaRatioReduction (get_id(), irr); }
   void setQuickStepContactResidualSmoothing(dReal smoo)
@@ -146,6 +148,8 @@ public:
     { dWorldSetQuickStepWarmStartFactor (get_id(), warm); }
   void setQuickStepExtraFrictionIterations(int iters)
     { dWorldSetQuickStepExtraFrictionIterations (get_id(), iters); }
+  void setQuickStepFrictionModel(int fricmodel)
+    { dWorldSetQuickStepFrictionModel(get_id(), fricmodel); }
 
   void  setAutoDisableLinearThreshold (dReal threshold)
     { dWorldSetAutoDisableLinearThreshold (get_id(), threshold); }

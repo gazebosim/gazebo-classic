@@ -1,11 +1,15 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+add_definitions(-DBUILDING_DLL_GZ_UTIL)
+
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
+include_directories(${TBB_INCLUDEDIR})
+
 include_directories(${tinyxml_INCLUDE_DIRS})
-set (sources 
+set (sources
   Diagnostics.cc
   LogPlay.cc
   LogRecord.cc
@@ -33,6 +37,7 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  LogPlay_TEST.cc
   LogRecord_TEST.cc
   OpenAL_TEST.cc
 )

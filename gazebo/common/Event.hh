@@ -45,7 +45,7 @@ namespace gazebo
     /// \internal
     // Private data members for Event class.
     // This must be in the header due to templatization.
-    class GAZEBO_VISIBLE EventPrivate
+    class GZ_COMMON_VISIBLE EventPrivate
     {
       // \brief Constructor
       public: EventPrivate();
@@ -56,7 +56,7 @@ namespace gazebo
 
     /// \class Event Event.hh common/common.hh
     /// \brief Base class for all events
-    class GAZEBO_VISIBLE Event
+    class GZ_COMMON_VISIBLE Event
     {
       /// \brief Constructor
       public: Event();
@@ -86,7 +86,7 @@ namespace gazebo
 
     /// \internal
     // Private data members for Connection class.
-    class GAZEBO_VISIBLE ConnectionPrivate
+    class GZ_COMMON_VISIBLE ConnectionPrivate
     {
       /// \brief Constructor.
       public: ConnectionPrivate();
@@ -107,7 +107,7 @@ namespace gazebo
     };
 
     /// \brief A class that encapsulates a connection.
-    class GAZEBO_VISIBLE Connection
+    class GZ_COMMON_VISIBLE Connection
     {
       /// \brief Constructor.
       public: Connection();
@@ -134,7 +134,7 @@ namespace gazebo
     /// \internal
     // Private data members for EventT<T> class.
     template< typename T>
-    class GAZEBO_VISIBLE EventTPrivate : public EventPrivate
+    class GZ_COMMON_VISIBLE EventTPrivate : public EventPrivate
     {
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
@@ -153,7 +153,7 @@ namespace gazebo
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.
     template< typename T>
-    class GAZEBO_VISIBLE EventT : public Event
+    class GZ_COMMON_VISIBLE EventT : public Event
     {
       /// \def EvtConnectionMap.
       /// \brief Event Connection map typedef.

@@ -14,6 +14,14 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  #define snprintf _snprintf
+#endif
+
 #include <stdio.h>
 #include <signal.h>
 #include <boost/lexical_cast.hpp>
@@ -239,7 +247,11 @@ bool Server::ParseArgs(int _argc, char **_argv)
       << "  Gazebo Version: "
       << util::LogPlay::Instance()->GetGazeboVersion() << "\n"
       << "  Random Seed: "
-      << util::LogPlay::Instance()->GetRandSeed() << "\n";
+      << util::LogPlay::Instance()->GetRandSeed() << "\n"
+      << "  Log Start Time: "
+      << util::LogPlay::Instance()->GetLogStartTime() << "\n"
+      << "  Log End Time: "
+      << util::LogPlay::Instance()->GetLogEndTime() << "\n";
 
     // Get the SDF world description from the log file
     std::string sdfString;
@@ -451,12 +463,14 @@ void Server::Fini()
 /////////////////////////////////////////////////
 void Server::Run()
 {
+#ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
   sigact.sa_handler = Server::SigInt;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+#endif
 
   if (this->stop)
     return;

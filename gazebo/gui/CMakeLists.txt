@@ -21,6 +21,7 @@ add_subdirectory(viewers)
 set (sources
   Actions.cc
   AlignWidget.cc
+  ApplyWrenchDialog.cc
   BoxMaker.cc
   CloneWindow.cc
   ConfigWidget.cc
@@ -59,6 +60,7 @@ set (sources
 set (qt_headers
   Actions.hh
   AlignWidget.hh
+  ApplyWrenchDialog.hh
   CloneWindow.hh
   ConfigWidget.hh
   DataLogger.hh
@@ -121,6 +123,7 @@ endif ()
 #endif()
 
 set (qt_tests
+  ApplyWrenchDialog_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc
@@ -158,41 +161,26 @@ add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
 target_link_libraries(gazebo_gui
+  libgazebo_client
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
-  libgazebo
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
-  pthread
 )
 
-target_link_libraries(gzclient
-  gazebo_common
-  gazebo_transport
-  gazebo_rendering
-  gazebo_sensors
-  gazebo_msgs
-  gazebo_gui
-  gazebo_gui_building
-  gazebo_gui_model
-  gazebo_gui_terrain
-  gazebo_gui_viewers
-  gzqtpropertybrowser
-  libgazebo
-  ${QT_LIBRARIES}
-  ${ogre_libraries}
-  ${Boost_LIBRARIES}
-  pthread
-)
+if (UNIX)
+  target_link_libraries(gazebo_gui pthread)
+endif()
+
+target_link_libraries(gzclient gazebo_gui)
 
 if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
