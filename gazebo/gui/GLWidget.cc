@@ -197,9 +197,9 @@ void GLWidget::Init()
 
   if (!this->sceneCreated)
   {
-    this->sceneCreated =
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
       this->windowId, this->userCamera);
+    this->sceneCreated = true;
   }
 
   this->renderFrame->lower();
