@@ -40,6 +40,7 @@ CollisionConfig::CollisionConfig()
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
   QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
+  addCollisionButton->setMaximumWidth(200);
   connect(addCollisionButton, SIGNAL(clicked()), this, SLOT(OnAddCollision()));
 
   mainLayout->addWidget(this->collisionsTreeWidget);
@@ -107,35 +108,40 @@ void CollisionConfig::UpdateCollision(const std::string &_name,
 void CollisionConfig::AddCollision(const std::string &_name,
     const msgs::Collision *_collisionMsg)
 {
-  // Create a top-level tree item for the path
-  QTreeWidgetItem *collisionItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->collisionsTreeWidget->addTopLevelItem(collisionItem);
-
-  QWidget *collisionItemWidget = new QWidget;
-  QHBoxLayout *collisionItemLayout = new QHBoxLayout;
+  // Collision name label
   QLabel *collisionLabel = new QLabel(QString(_name.c_str()));
 
-  QPushButton *removeCollisionButton = new QPushButton(tr("Remove"));
+  // Remove button
+  QToolButton *removeCollisionButton = new QToolButton(this);
+  removeCollisionButton->setFixedSize(QSize(30, 30));
+  removeCollisionButton->setToolTip("Remove " + QString(_name.c_str()));
+  removeCollisionButton->setIcon(QPixmap(":/images/trashcan.png"));
+  removeCollisionButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  removeCollisionButton->setIconSize(QSize(16, 16));
+  removeCollisionButton->setCheckable(false);
   connect(removeCollisionButton, SIGNAL(clicked()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(removeCollisionButton, this->counter);
 
+  // Item Layout
+  QHBoxLayout *collisionItemLayout = new QHBoxLayout;
   collisionItemLayout->addWidget(collisionLabel);
   collisionItemLayout->addWidget(removeCollisionButton);
   collisionItemLayout->setContentsMargins(10, 0, 0, 0);
+
+  // Item widget
+  QWidget *collisionItemWidget = new QWidget;
   collisionItemWidget->setLayout(collisionItemLayout);
+
+  // Top-level tree item
+  QTreeWidgetItem *collisionItem =
+      new QTreeWidgetItem(static_cast<QTreeWidgetItem *>(0));
+  this->collisionsTreeWidget->addTopLevelItem(collisionItem);
+
   this->collisionsTreeWidget->setItemWidget(collisionItem, 0,
       collisionItemWidget);
 
-  QTreeWidgetItem *collisionChildItem =
-    new QTreeWidgetItem(collisionItem);
-
-  QWidget *collisionWidget = new QWidget;
-  QVBoxLayout *collisionLayout = new QVBoxLayout;
-
-  ConfigWidget *configWidget = new ConfigWidget;
-
+  // ConfigWidget
   msgs::Collision msgToLoad;
   if (_collisionMsg)
     msgToLoad = *_collisionMsg;
@@ -165,6 +171,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   if (!frictionMsg->has_mu2())
     frictionMsg->set_mu2(1.0);
 
+  ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);
 
   configWidget->SetWidgetVisible("id", false);
@@ -178,19 +185,32 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configData->treeItem = collisionItem;
   configData->name = _name;
   this->configs[this->counter] = configData;
+
+  // Scroll area
   QScrollArea *scrollArea = new QScrollArea;
   scrollArea->setWidget(configWidget);
-  collisionLayout->addWidget(scrollArea);
-  this->counter++;
+  scrollArea->setWidgetResizable(true);
 
+  // Layout
+  QVBoxLayout *collisionLayout = new QVBoxLayout;
   collisionLayout->setContentsMargins(0, 0, 0, 0);
-  collisionWidget->setLayout(collisionLayout);
-  collisionWidget->setMinimumHeight(650);
+  collisionLayout->addWidget(scrollArea);
 
+  // Widget
+  QWidget *collisionWidget = new QWidget;
+  collisionWidget->setLayout(collisionLayout);
+  collisionWidget->setMinimumHeight(800);
+
+  // Child item
+  QTreeWidgetItem *collisionChildItem =
+      new QTreeWidgetItem(collisionItem);
   this->collisionsTreeWidget->setItemWidget(collisionChildItem, 0,
       collisionWidget);
+
   collisionItem->setExpanded(false);
   collisionChildItem->setExpanded(false);
+
+  this->counter++;
 }
 
 /////////////////////////////////////////////////
@@ -214,11 +234,42 @@ void CollisionConfig::OnRemoveCollision(int _id)
 
   CollisionConfigData *configData = this->configs[_id];
 
+  // Ask for confirmation
+  std::string msg;
+
+  if (this->configs.size() == 1)
+  {
+    msg = "Are you sure you want to remove " +
+        configData->name + "?\n\n" +
+        "This is the only collision. \n" +
+        "Without collisions, this link won't collide with anything.\n";
+  }
+  else
+  {
+    msg = "Are you sure you want to remove " +
+        configData->name + "?\n";
+  }
+
+  QMessageBox msgBox(QMessageBox::Warning, QString("Remove collision?"),
+      QString(msg.c_str()));
+  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+
+  QPushButton *cancelButton =
+      msgBox.addButton("Cancel", QMessageBox::RejectRole);
+  QPushButton *removeButton = msgBox.addButton("Remove",
+      QMessageBox::AcceptRole);
+  msgBox.setDefaultButton(removeButton);
+  msgBox.setEscapeButton(cancelButton);
+  msgBox.exec();
+  if (msgBox.clickedButton() != removeButton)
+    return;
+
+  // Remove
   int index = this->collisionsTreeWidget->indexOfTopLevelItem(
       configData->treeItem);
   this->collisionsTreeWidget->takeTopLevelItem(index);
 
-  emit CollisionRemoved(this->configs[_id]->name);
+  emit CollisionRemoved(configData->name);
   this->configs.erase(it);
 }
 

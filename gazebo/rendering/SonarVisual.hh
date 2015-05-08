@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class SonarVisual SonarVisual.hh rendering/rendering.hh
     /// \brief Visualization for sonar data.
-    class GAZEBO_VISIBLE SonarVisual : public Visual
+    class GZ_RENDERING_VISIBLE SonarVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.

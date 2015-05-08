@@ -26,12 +26,13 @@ using namespace gui;
 LinkConfig::LinkConfig()
 {
   this->setObjectName("LinkConfig");
-  QVBoxLayout *generalLayout = new QVBoxLayout;
 
-  this->configWidget = new ConfigWidget;
+  // Message
   msgs::Link linkMsg;
+
+  // ConfigWidget
+  this->configWidget = new ConfigWidget;
   configWidget->Load(&linkMsg);
-  generalLayout->addWidget(this->configWidget);
 
   // set default values
   // TODO: auto-fill them with SDF defaults
@@ -51,6 +52,15 @@ LinkConfig::LinkConfig()
   this->configWidget->SetWidgetReadOnly("name", true);
   this->configWidget->SetWidgetReadOnly("canonical", true);
   this->configWidget->SetWidgetReadOnly("enabled", true);
+
+  // Scroll area
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(this->configWidget);
+  scrollArea->setWidgetResizable(true);
+
+  // Layout
+  QVBoxLayout *generalLayout = new QVBoxLayout;
+  generalLayout->addWidget(scrollArea);
 
   this->setLayout(generalLayout);
 }

@@ -77,6 +77,15 @@ else ()
 endif ()
 
 ########################################
+include (FindHDF5)
+find_package(HDF5)
+
+if (NOT HDF5_FOUND)
+  BUILD_WARNING("HDF5 not found")
+else ()
+  message(STATUS "HDF5 Found")
+endif ()
+########################################
 # Find packages
 
 # In Visual Studio we use configure.bat to trick all path cmake 

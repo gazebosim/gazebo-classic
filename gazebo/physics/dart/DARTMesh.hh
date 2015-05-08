@@ -30,7 +30,7 @@ namespace gazebo
     /// \{
 
     /// \brief Triangle mesh collision helper class
-    class GAZEBO_VISIBLE DARTMesh
+    class GZ_PHYSICS_VISIBLE DARTMesh
     {
       /// \brief Constructor
       public: DARTMesh();
