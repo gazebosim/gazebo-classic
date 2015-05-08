@@ -169,11 +169,13 @@ set (resources resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
+gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 gz_add_executable(gzclient main.cc)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
+add_dependencies(gazebo_gui gazebo_msgs)
+add_dependencies(gzclient gazebo_gui)
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
 
 target_link_libraries(gazebo_gui
   libgazebo_client

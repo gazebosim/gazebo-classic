@@ -158,14 +158,14 @@ if (PKG_CONFIG_FOUND)
 
   # Use of tinyxml. System installation on UNIX. Internal copy on WIN
   if (UNIX)
-    message (STATUS "Using system tinyxml")
+    message (STATUS "Using system tinyxml.")
     set (USE_EXTERNAL_TINYXML True)
   elseif(WIN32)
-    message (STATUS "Using internal tinyxml code")
+    message (STATUS "Using internal tinyxml code.")
     set (USE_EXTERNAL_TINYXML False)
     add_definitions(-DTIXML_USE_STL)
   else()
-    message (STATUS "Unknown platform")
+    message (STATUS "Unknown platform, unable to configure tinyxml.")
     BUILD_ERROR("Unknown platform")
   endif()
 
