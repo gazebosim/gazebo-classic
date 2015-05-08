@@ -68,11 +68,17 @@ void LayersWidget::OnNewLayer(const int32_t _layer)
   std::ostringstream stream;
   stream << "Layer " << _layer;
 
-  QListWidgetItem *item = new QListWidgetItem(stream.str().c_str(),
-      this->layerList);
+  auto found = this->layerList->findItems(stream.str().c_str(),
+                                          Qt::MatchExactly);
 
-  item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-  item->setCheckState(Qt::Checked);
-  item->setData(Qt::UserRole, QVariant(_layer));
-  this->layerList->addItem(item);
+  if (found.empty())
+  {
+    QListWidgetItem *item = new QListWidgetItem(stream.str().c_str(),
+        this->layerList);
+
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+    item->setCheckState(Qt::Checked);
+    item->setData(Qt::UserRole, QVariant(_layer));
+    this->layerList->addItem(item);
+  }
 }
