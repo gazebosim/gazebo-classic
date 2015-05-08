@@ -38,24 +38,6 @@ LayersWidget::LayersWidget(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->layerList = new QListWidget(this);
 
-  QListWidgetItem *item = new QListWidgetItem("Layer 0", this->layerList);
-  item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-  item->setCheckState(Qt::Checked);
-  item->setData(Qt::UserRole, QVariant(0));
-  this->layerList->addItem(item);
-
-  item = new QListWidgetItem("Layer 1", this->layerList);
-  item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-  item->setCheckState(Qt::Checked);
-  item->setData(Qt::UserRole, QVariant(1));
-  this->layerList->addItem(item);
-
-  item = new QListWidgetItem("Layer 2", this->layerList);
-  item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-  item->setCheckState(Qt::Checked);
-  item->setData(Qt::UserRole, QVariant(2));
-  this->layerList->addItem(item);
-
   mainLayout->addWidget(this->layerList);
 
   this->setLayout(mainLayout);
