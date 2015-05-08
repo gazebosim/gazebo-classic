@@ -2,6 +2,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
+  ${TBB_INCLUDEDIR}
   skyx
   skyx/include
 )
@@ -12,6 +13,13 @@ endif()
 
 add_subdirectory(skyx)
 add_subdirectory(selection_buffer)
+
+if (WIN32)
+  include_directories(${libdl_include_dir})
+endif()
+
+include_directories(${tinyxml_INCLUDE_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS})
 
 set (sources
   ApplyWrenchVisual.cc
@@ -58,6 +66,15 @@ set (sources
   WindowManager.cc
   WrenchVisual.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+endif()
 
 set (headers
   ApplyWrenchVisual.hh
@@ -145,6 +162,11 @@ link_directories(
   ${ogre_library_dirs}
 )
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_RENDERING")
+if (WIN32)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
+endif()
+
 gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries(gazebo_rendering
@@ -155,13 +177,14 @@ target_link_libraries(gazebo_rendering
   gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
+  ${tinyxml_LIBRARIES}
 )
 
 if (HAVE_OCULUS)
   target_link_libraries(gazebo_rendering ${OculusVR_LIBRARIES})
 endif()
 
-if (NOT APPLE)
+if (NOT APPLE AND NOT WIN32)
   target_link_libraries(gazebo_rendering X11)
 endif()
 
