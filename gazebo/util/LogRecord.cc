@@ -15,6 +15,21 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+
+  #include <io.h>
+
+  // Seems like W_OK does not exists on Windows.
+  // Reading access function documentation, the value should be 2
+  // http://msdn.microsoft.com/en-us/library/1w06ktdy.aspx
+  // Test for write permission.
+  #define W_OK    2
+  #define access _access
+#endif
+
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
@@ -23,6 +38,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <iomanip>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Base64.hh"
 #include "gazebo/common/Console.hh"
@@ -50,9 +66,12 @@ LogRecord::LogRecord()
   this->readyToStart = false;
 
   // Get the user's home directory
-  // \todo getenv is not portable, and there is no generic cross-platform
-  // method. Must check OS and choose a method
-  char *homePath = getenv("HOME");
+#ifndef _WIN32
+  const char *homePath = common::getEnv("HOME");
+#else
+  const char *homePath = common::getEnv("HOMEPATH");
+#endif
+
   GZ_ASSERT(homePath, "HOME environment variable is missing");
 
   if (!homePath)

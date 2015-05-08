@@ -563,6 +563,52 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
       odeMass->I[0*4+2], odeMass->I[1*4+2]);
 }
 
+Friction_Model ODEPhysics::ConvertFrictionModel(const std::string &_fricModel)
+{
+  Friction_Model result = pyramid_friction;
+  if (_fricModel.compare("pyramid_model") == 0)
+      result = pyramid_friction;
+  else if (_fricModel.compare("cone_model") == 0)
+      result = cone_friction;
+  else if (_fricModel.compare("box_model") == 0)
+      result = box_friction;
+  else
+    gzerr << "Unrecognized friction model ["
+          << _fricModel
+          << "], returning pyramid friction"
+          << std::endl;
+  return result;
+}
+
+std::string ODEPhysics::ConvertFrictionModel(const Friction_Model _fricModel)
+{
+  std::string result;
+  switch (_fricModel)
+  {
+    case pyramid_friction:
+    {
+      result = "pyramid_model";
+      break;
+    }
+    case cone_friction:
+    {
+      result = "cone_model";
+      break;
+    }
+    case box_friction:
+    {
+      result = "box_model";
+      break;
+    }
+    default:
+    {
+      result = "unknown";
+      gzerr << "Unrecognized friction model [" << _fricModel << "]"
+            << std::endl;
+    }
+  }
+  return result;
+}
 //////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
@@ -586,6 +632,17 @@ void ODEPhysics::SetSORPGSW(double _w)
   this->sdf->GetElement("ode")->GetElement(
       "solver")->GetElement("sor")->Set(_w);
   dWorldSetQuickStepW(this->dataPtr->worldId, _w);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetFrictionModel(const std::string &_fricModel)
+{
+  /// Uncomment this until sdformat changes (sdformat repo issue #96)
+  ///
+  /// this->sdf->GetElement("ode")->GetElement(
+  ///   "solver")->GetElement("friction_model")->Set(_fricModel);
+  dWorldSetQuickStepFrictionModel(this->dataPtr->worldId,
+    ConvertFrictionModel(_fricModel));
 }
 
 //////////////////////////////////////////////////
@@ -649,6 +706,13 @@ double ODEPhysics::GetSORPGSW()
 {
   return this->sdf->GetElement("ode")->GetElement(
       "solver")->Get<double>("sor");
+}
+
+//////////////////////////////////////////////////
+std::string ODEPhysics::GetFrictionModel() const
+{
+  return ConvertFrictionModel(
+    dWorldGetQuickStepFrictionModel(this->dataPtr->worldId));
 }
 
 //////////////////////////////////////////////////
@@ -1205,6 +1269,8 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       odeElem->GetElement("solver")->GetElement("sor")->Set(value);
       dWorldSetQuickStepW(this->dataPtr->worldId, value);
     }
+    else if (_key == "friction_model")
+      this->SetFrictionModel(boost::any_cast<std::string>(_value));
     else if (_key == "contact_max_correcting_vel")
     {
       double value = boost::any_cast<double>(_value);
@@ -1354,6 +1420,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepWarmStartFactor(this->dataPtr->worldId);
   else if (_key == "extra_friction_iterations")
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
+  else if (_key == "friction_model")
+    _value = this->GetFrictionModel();
   else
   {
     return PhysicsEngine::GetParam(_key, _value);
