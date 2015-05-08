@@ -66,7 +66,7 @@ DataLogger::DataLogger(QWidget *_parent)
   this->statusLabel->setFixedWidth(80);
 
   // Timer used to blink the status label
-  this->statusTimer = new QTimer();
+  this->statusTimer = new QTimer(this);
   connect(this->statusTimer, SIGNAL(timeout()), this, SLOT(OnBlinkStatus()));
 
   // Duration of logging
