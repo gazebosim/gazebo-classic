@@ -47,6 +47,10 @@ namespace gazebo
       /// \brief Initialize the controller.
       public: virtual void Init();
 
+      // Documentation inherited
+      public: virtual void Init(const math::Vector3 &_focalPoint,
+                  const double _yaw = 0, const double _pitch = 0);
+
       /// \brief Get the type name of this view controller.
       /// \return The view controller name: "ortho".
       public: static std::string GetTypeString();

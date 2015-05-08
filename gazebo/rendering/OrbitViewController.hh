@@ -45,9 +45,9 @@ namespace gazebo
       /// \brief Initialize the controller.
       public: virtual void Init();
 
-      /// \brief Initialze the controller with a focal point.
-      /// \param[in] _focalPoint Point to look at.
-      public: virtual void Init(const math::Vector3 &_focalPoint);
+      // Documentation inherited
+      public: virtual void Init(const math::Vector3 &_focalPoint,
+                  const double _yaw = 0, const double _pitch = 0);
 
       /// \brief Update.
       public: virtual void Update();
@@ -77,6 +77,10 @@ namespace gazebo
 
       // Documentation inherited from parent
       public: virtual void HandleKeyPressEvent(const std::string &_key);
+
+      public: double Pitch() const;
+
+      public: double Yaw() const;
 
       /// \brief Translate the focal point in the local coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
@@ -117,9 +121,6 @@ namespace gazebo
       /// \brief Distance to the focal point.
       protected: float distance;
 
-      /// \brief The focal point.
-      protected: math::Vector3 focalPoint;
-
       /// \brief A reference visual.
       protected: VisualPtr refVisual;
 
@@ -129,6 +130,9 @@ namespace gazebo
       /// \brief A flag used to inidicate that the view controller has just
       /// been initialized.
       protected: bool init;
+
+      /// \brief The focal point.
+      protected: math::Vector3 focalPoint;
     };
     /// \}
   }

@@ -40,7 +40,8 @@ ViewController::~ViewController()
 }
 
 //////////////////////////////////////////////////
-void ViewController::Init(const math::Vector3 &/*_focalPoint*/)
+void ViewController::Init(const math::Vector3 &/*_focalPoint*/,
+    double /*_yaw*/, double /*_pitch*/)
 {
 }
 

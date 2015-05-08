@@ -348,17 +348,32 @@ void UserCamera::SetViewController(const std::string &_type)
   std::string vc = this->dataPtr->viewController->GetTypeString();
 
   if (_type == OrbitViewController::GetTypeString())
+  {
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
+    this->dataPtr->viewController->Init();
+  }
   else if (_type == OrthoViewController::GetTypeString())
+  {
     this->dataPtr->viewController = this->dataPtr->orthoViewController;
+    if (vc == "orbit")
+    {
+      this->dataPtr->viewController->Init(
+          this->dataPtr->orbitViewController->GetFocalPoint(),
+          this->dataPtr->orbitViewController->Yaw(),
+          this->dataPtr->orbitViewController->Pitch());
+    }
+    else
+      this->dataPtr->viewController->Init();
+  }
   else if (_type == FPSViewController::GetTypeString())
+  {
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
+    this->dataPtr->viewController->Init();
+  }
   else
     gzthrow("Invalid view controller type: " + _type);
 
   this->dataPtr->prevViewControllerName = vc;
-
-  this->dataPtr->viewController->Init();
 }
 
 //////////////////////////////////////////////////
