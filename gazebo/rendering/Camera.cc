@@ -1317,8 +1317,10 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setShadowsEnabled(true);
     this->viewport->setOverlaysEnabled(false);
 
-    if (this->camera->getProjectionType() != Ogre::PT_ORTHOGRAPHIC)
-      RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
+    if (this->camera->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
+      this->scene->SetShadowsEnabled(false);
+
+    RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
