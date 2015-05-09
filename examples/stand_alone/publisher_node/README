@@ -1,6 +1,6 @@
-Gazebo Publisher Example
+Gazebo Publish from Node Example
 
-This is very simple example of how to publish a gazebo topic.
+This is very simple example of how to publish to a gazebo topic without creating a Publisher.
 
 ===================
 Build Instructions
@@ -20,10 +20,10 @@ Execute Instructions
 
  * Launch gazebo as usual then from the build directory above:
 
-  $ ./publisher
+  $ ./publisher_node
 
  * In gazebo, from the menu bar select 'Window' > 'Topic Visualization'
- * Click the topic you are publishing [/pose_example]
+ * Click the topic you are publishing [~/pose_example]
  * Click ok
 
 
