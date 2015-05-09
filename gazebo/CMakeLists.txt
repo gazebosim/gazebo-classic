@@ -149,7 +149,6 @@ set(headers
   gazebo_client.hh
   gazebo_core.hh
   gazebo.hh
-  gazebo_shared.hh
   Master.hh
   Server.hh
 )
