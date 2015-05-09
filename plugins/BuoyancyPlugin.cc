@@ -89,7 +89,8 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       }
       else
       {
-        gzwarn << "Required element center_of_volume missing from link [" << name
+        gzwarn << "Required element center_of_volume missing from link ["
+               << name
                << "] in BuoyancyPlugin SDF" << std::endl;
         continue;
       }
@@ -99,7 +100,8 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
         double volume = linkElem->GetElement("volume")->Get<double>();
         if (volume <= 0)
         {
-          gzwarn << "Nonpositive volume specified in BuoyancyPlugin!" << std::endl;
+          gzwarn << "Nonpositive volume specified in BuoyancyPlugin!"
+                 << std::endl;
           // Remove the element from the map since it's invalid.
           this->volPropsMap.erase(id);
           continue;

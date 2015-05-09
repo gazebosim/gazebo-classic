@@ -192,7 +192,8 @@ void LiftDragPlugin::OnUpdate()
   {
     gzwarn << "cosAlpha greater than domain for arccos!" << std::endl;
     cosAlpha = 0.99;
-  } else if (cosAlpha <= -0.99)
+  }
+  else if (cosAlpha <= -0.99)
   {
     gzwarn << "cosAlpha less than domain for arccos!" << std::endl;
     cosAlpha = -0.99;
