@@ -14,6 +14,14 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <stdio.h>
 #include <signal.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -137,7 +145,11 @@ bool Command::Run(int _argc, char **_argv)
   {
     int argvLen = strlen(_argv[i]) + 1;
     this->argv[i] = new char[argvLen];
+    #ifndef _WIN32
     snprintf(this->argv[i], argvLen, "%s", _argv[i]);
+    #else
+    sprintf_s(this->argv[i], argvLen, "%s", _argv[i]);
+    #endif
   }
 
   // The SDF find file callback.

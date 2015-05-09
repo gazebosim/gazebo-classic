@@ -15,10 +15,19 @@
  *
 */
 
-#include <dirent.h>
 #include <sstream>
+
 #include <boost/filesystem.hpp>
 #include <sdf/sdf.hh>
+
+#ifndef _WIN32
+  #include <dirent.h>
+#else
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  #include "gazebo/common/win_dirent.h"
+#endif
 
 // Moved to top to avoid osx compilation errors
 #include "gazebo/math/Rand.hh"
@@ -1056,7 +1065,8 @@ bool Camera::SaveFrame(const unsigned char *_image,
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
 
   // OGRE 1.9 renames codeToFile to encodeToFile
-  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+  // Looks like 1.9RC, which we're using on Windows, doesn't have this change.
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
   pCodec->codeToFile(stream, filename, codecDataPtr);
   #else
   pCodec->encodeToFile(stream, filename, codecDataPtr);
@@ -1725,8 +1735,7 @@ void Camera::UpdateFOV()
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
       static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov =
-      this->sdf->Get<double>("horizontal_fov");
+    double hfov = this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);

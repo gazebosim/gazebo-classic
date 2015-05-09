@@ -56,9 +56,9 @@ if (ENABLE_SCREEN_TESTS)
 endif()
 
 set (libraries_to_link
-  gazebo_common
   gazebo_rendering
   gazebo_msgs
+  gazebo_common
 )
 
 if (HAVE_GRAPHVIZ)

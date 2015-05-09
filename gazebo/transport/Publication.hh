@@ -41,7 +41,7 @@ namespace gazebo
     /// \class Publication Publication.hh transport/transport.hh
     /// \brief A publication for a topic. This facilitates transport of
     /// messages
-    class GAZEBO_VISIBLE Publication
+    class GZ_TRANSPORT_VISIBLE Publication
     {
       /// \brief Constructor
       /// \param[in] _topic The topic we're publishing

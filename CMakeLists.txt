@@ -155,6 +155,10 @@ endif (NOT CMAKE_BUILD_TYPE)
 # uppercase old supported and deprecated modes
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
 
+if (NOT DEFINED HDF5_INSTRUMENT)
+  set (HDF5_INSTRUMENT FALSE)
+endif()
+
 set (BUILD_TYPE_PROFILE FALSE)
 set (BUILD_TYPE_RELEASE FALSE)
 set (BUILD_TYPE_RELWITHDEBINFO FALSE)
@@ -348,41 +352,64 @@ else (build_errors)
   ########################################
   # Make the cmake config files
   set(PKG_NAME ${PROJECT_NAME_UPPER})
+
+  # Order is important, if A depends on B, please add B after A.
+  # The list should have at the very end the libraries 
+  # without internal interdependencies
   set(PKG_LIBRARIES
     gazebo
-    gazebo_common
-    gazebo_gimpact
-    gazebo_gui
     gazebo_gui_building
     gazebo_gui_viewers
-    gazebo_math
-    gazebo_msgs
-    gazebo_ode
-    gazebo_opcode
-    gazebo_opende_ou
-    gazebo_physics
-    gazebo_physics_ode
+    gazebo_gui_model
+    gazebo_gui
+    gazebo_sensors
     gazebo_rendering
     gazebo_selection_buffer
-    gazebo_sensors
-    gazebo_skyx
-    gazebo_transport
-    gazebo_util)
+  )
 
-  if (NOT CCD_FOUND)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
+  # "Second level" deps. Depends on a variety of first level deps
+  if (HAVE_DART)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_dart)
+  endif()
+  if (HAVE_BULLET)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
+  endif()
+  if (HAVE_SIMBODY)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_simbody)
   endif()
 
   if (INCLUDE_PLAYER)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
   endif()
 
-  if (HAVE_BULLET)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
-  endif()
+  set(PKG_LIBRARIES ${PKG_LIBRARIES}
+    gazebo_physics_ode
+    gazebo_physics
+    gazebo_ode
+  )
 
+  # "First level" deps, mostly depends on math and/or common
   if (${OGRE_VERSION} GREATER 1.7.4)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
+  endif()
+
+  set(PKG_LIBRARIES ${PKG_LIBRARIES}
+    gazebo_transport
+    gazebo_msgs
+    gazebo_util
+    gazebo_common)
+
+  # No other internal dependencies:
+  set(PKG_LIBRARIES ${PKG_LIBRARIES}
+    gazebo_skyx
+    gazebo_gimpact
+    gazebo_opcode
+    gazebo_opende_ou
+    gazebo_math
+  )
+
+  if (NOT CCD_FOUND)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
   endif()
 
   set(PKG_DEPENDS Boost Protobuf SDFormat OGRE)

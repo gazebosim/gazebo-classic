@@ -332,7 +332,7 @@ namespace gazebo
       return result;
     }
 
-    std::string ConvertJointType(const msgs::Joint::Type _type)
+    std::string ConvertJointType(const msgs::Joint::Type &_type)
     {
       std::string result;
       switch (_type)
@@ -1182,7 +1182,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    std::string ConvertShaderType(const msgs::Material::ShaderType _type)
+    std::string ConvertShaderType(const msgs::Material::ShaderType &_type)
     {
       std::string result;
       switch (_type)
