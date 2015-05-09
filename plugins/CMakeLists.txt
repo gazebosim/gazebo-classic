@@ -30,6 +30,7 @@ set (plugins
   ActuatorPlugin
   ArrangePlugin
   BreakableJointPlugin
+  BuoyancyPlugin
   CameraPlugin
   CartDemoPlugin
   ContactPlugin
