@@ -179,7 +179,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
 
-
   this->mainFrame->setLayout(frameLayout);
   this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);
 
@@ -225,11 +224,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
       }
     }
   }
-
-  this->installEventFilter(this);
-  this->setFocusPolicy(Qt::StrongFocus);
-  this->setMouseTracking(true);
-  this->setFocus(Qt::OtherFocusReason);
 }
 
 /////////////////////////////////////////////////
@@ -254,7 +248,6 @@ void RenderWidget::Init()
 /////////////////////////////////////////////////
 void RenderWidget::InsertWidget(unsigned int _index, QWidget *_widget)
 {
-return;
   if (static_cast<int>(_index) <= this->splitter->count())
   {
     // set equal size for now. There should always be at least one widget
@@ -391,54 +384,4 @@ void RenderWidget::AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem)
   _plugin->Load(_elem);
 
   _plugin->show();
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::keyPressEvent(QKeyEvent *_event)
-{
-  this->glWidget->keyPressEvent(_event);
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::keyReleaseEvent(QKeyEvent *_event)
-{
-  this->glWidget->keyReleaseEvent(_event);
-}
-
-void RenderWidget::moveEvent(QMoveEvent *_e)
-{
-  this->glWidget->moveEvent(_e);
-}
-
-void RenderWidget::wheelEvent(QWheelEvent *_event)
-{
-  this->glWidget->wheelEvent(_event);
-}
-void RenderWidget::mousePressEvent(QMouseEvent *_event)
-{
-  this->glWidget->mousePressEvent(_event);
-}
-void RenderWidget::mouseDoubleClickEvent(QMouseEvent *_event)
-{
-  this->glWidget->mouseDoubleClickEvent(_event);
-}
-void RenderWidget::mouseMoveEvent(QMouseEvent *_event)
-{
-  this->glWidget->mouseMoveEvent(_event);
-}
-void RenderWidget::mouseReleaseEvent(QMouseEvent *_event)
-{
-  this->glWidget->mouseReleaseEvent(_event);
-}
-
-/////////////////////////////////////////////////
-bool RenderWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
-{
-  if (_event->type() == QEvent::Enter)
-  {
-    this->setFocus(Qt::OtherFocusReason);
-    return true;
-  }
-
-  return false;
 }

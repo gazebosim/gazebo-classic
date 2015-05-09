@@ -88,20 +88,10 @@ namespace gazebo
       /// \param[in] _show Whether or not to show the toolbar.
       public: void ShowToolbar(const bool _show);
 
-      protected: virtual void moveEvent(QMoveEvent *_e);
-      protected: void keyPressEvent(QKeyEvent *_event);
-      protected: void keyReleaseEvent(QKeyEvent *_event);
-      protected: void wheelEvent(QWheelEvent *_event);
-      protected: void mousePressEvent(QMouseEvent *_event);
-      protected: void mouseDoubleClickEvent(QMouseEvent *_event);
-      protected: void mouseMoveEvent(QMouseEvent *_event);
-      protected: void mouseReleaseEvent(QMouseEvent *_event);
-
 
       /// \brief Qt callback to clear overlay message if a duration is
       /// specified
       private slots: void OnClearOverlayMsg();
-      private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       private: void OnFullScreen(bool &_value);
 
