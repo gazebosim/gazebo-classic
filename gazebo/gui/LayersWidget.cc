@@ -44,7 +44,7 @@ LayersWidget::LayersWidget(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  connect(this->dataPtr->layerList, SIGNAL(itemClicked(QListWidgetItem *)),
+  connect(this->dataPtr->layerList, SIGNAL(itemChanged(QListWidgetItem *)),
           this, SLOT(OnLayerSelected(QListWidgetItem *)));
 
   this->dataPtr->connections.push_back(
@@ -77,12 +77,20 @@ void LayersWidget::OnNewLayer(const int32_t _layer)
   // Only add layers that do not already exist.
   if (found.empty())
   {
+    // Disconnect temporarily to prevent bad signals
+    disconnect(this->dataPtr->layerList, SIGNAL(itemChanged(QListWidgetItem *)),
+               this, SLOT(OnLayerSelected(QListWidgetItem *)));
+
     QListWidgetItem *item = new QListWidgetItem(stream.str().c_str(),
         this->dataPtr->layerList);
 
-    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     item->setCheckState(Qt::Checked);
     item->setData(Qt::UserRole, QVariant(_layer));
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     this->dataPtr->layerList->addItem(item);
+
+    // Reconnect.
+    connect(this->dataPtr->layerList, SIGNAL(itemChanged(QListWidgetItem *)),
+               this, SLOT(OnLayerSelected(QListWidgetItem *)));
   }
 }
