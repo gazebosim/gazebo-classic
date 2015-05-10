@@ -529,6 +529,12 @@ namespace gazebo
       /// \brief Clear parents.
       public: void ClearParent();
 
+      /// \brief Set which layer is currently being viewed. If the visual is
+      /// on the specified layer it will be set visible, otherwise it will
+      /// become invisible.
+      /// \param[in] _layer Index of the layer to show.
+      public: void ToggleLayer(const int32_t _layer);
+
       /// \internal
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to private data.
