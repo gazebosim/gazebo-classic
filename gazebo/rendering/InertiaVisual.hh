@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class InertiaVisual InertiaVisual.hh rendering/rendering.hh
     /// \brief Basic Inertia visualization
-    class GAZEBO_VISIBLE InertiaVisual : public Visual
+    class GZ_RENDERING_VISIBLE InertiaVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual

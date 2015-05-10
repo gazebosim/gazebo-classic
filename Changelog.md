@@ -1,10 +1,37 @@
 ## Gazebo 6.0
+1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
+    * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
+
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
 
 1. Windows support. This consists mostly of numerous small changes to support
 compilation on Windows.
     * [Pull request #1616](https://bitbucket.org/osrf/gazebo/pull-request/1616)
+    * [Pull request #1618](https://bitbucket.org/osrf/gazebo/pull-request/1618)
+    * [Pull request #1620](https://bitbucket.org/osrf/gazebo/pull-request/1620)
+    * [Pull request #1625](https://bitbucket.org/osrf/gazebo/pull-request/1625)
+    * [Pull request #1626](https://bitbucket.org/osrf/gazebo/pull-request/1626)
+    * [Pull request #1627](https://bitbucket.org/osrf/gazebo/pull-request/1627)
+    * [Pull request #1628](https://bitbucket.org/osrf/gazebo/pull-request/1628)
+    * [Pull request #1629](https://bitbucket.org/osrf/gazebo/pull-request/1629)
+    * [Pull request #1630](https://bitbucket.org/osrf/gazebo/pull-request/1630)
+    * [Pull request #1631](https://bitbucket.org/osrf/gazebo/pull-request/1631)
+    * [Pull request #1632](https://bitbucket.org/osrf/gazebo/pull-request/1632)
+    * [Pull request #1633](https://bitbucket.org/osrf/gazebo/pull-request/1633)
+    * [Pull request #1635](https://bitbucket.org/osrf/gazebo/pull-request/1635)
+    * [Pull request #1637](https://bitbucket.org/osrf/gazebo/pull-request/1637)
+    * [Pull request #1639](https://bitbucket.org/osrf/gazebo/pull-request/1639)
+    * [Pull request #1647](https://bitbucket.org/osrf/gazebo/pull-request/1647)
+    * [Pull request #1650](https://bitbucket.org/osrf/gazebo/pull-request/1650)
+    * [Pull request #1651](https://bitbucket.org/osrf/gazebo/pull-request/1651)
+    * [Pull request #1653](https://bitbucket.org/osrf/gazebo/pull-request/1653)
+    * [Pull request #1654](https://bitbucket.org/osrf/gazebo/pull-request/1654)
+    * [Pull request #1657](https://bitbucket.org/osrf/gazebo/pull-request/1657)
+    * [Pull request #1658](https://bitbucket.org/osrf/gazebo/pull-request/1658)
+    * [Pull request #1659](https://bitbucket.org/osrf/gazebo/pull-request/1659)
+    * [Pull request #1660](https://bitbucket.org/osrf/gazebo/pull-request/1660)
+    * [Pull request #1661](https://bitbucket.org/osrf/gazebo/pull-request/1661)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
@@ -39,6 +66,9 @@ compilation on Windows.
 
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
+
+1. Added Visual::GetDepth() and Visual::GetNthAncestor()
+    * [Pull request #1613](https://bitbucket.org/osrf/gazebo/pull-request/1613)
 
 1. Added a context menu for links
     * [Pull request #1589](https://bitbucket.org/osrf/gazebo/pull-request/1589)
@@ -124,6 +154,9 @@ compilation on Windows.
 
     1. Saving, exiting, generalizing SaveDialog.
         * [Pull request #1401](https://bitbucket.org/osrf/gazebo/pull-request/1401)
+
+    1. Inspectors redesign
+        * [Pull request #1586](https://bitbucket.org/osrf/gazebo/pull-request/1586)
 
     1. Edit existing model.
         * [Pull request #1425](https://bitbucket.org/osrf/gazebo/pull-request/1425)
@@ -436,6 +469,11 @@ compilation on Windows.
     * [Pull request #1318](https://bitbucket.org/osrf/gazebo/pull-request/1318)
 
 ## Gazebo 4.0
+
+### Gazebo 4.1.3 (xxxx-xx-xx)
+
+1. Fix heightmap model texture loading.
+    * [Pull request #1595](https://bitbucket.org/osrf/gazebo/pull-request/1595)
 
 ### Gazebo 4.1.2 (2015-03-20)
 
