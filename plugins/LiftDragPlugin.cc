@@ -192,12 +192,12 @@ void LiftDragPlugin::OnUpdate()
   // should never happen
   if (cosAlpha >= max)
   {
-    //gzwarn << "cosAlpha greater than domain for arccos!" << std::endl;
+    // gzwarn << "cosAlpha greater than domain for arccos!" << std::endl;
     cosAlpha = max;
   }
   else if (cosAlpha <= min)
   {
-    //gzwarn << "cosAlpha less than domain for arccos!" << std::endl;
+    // gzwarn << "cosAlpha less than domain for arccos!" << std::endl;
     cosAlpha = min;
   }
   // gzerr << "ca " << forwardI.Dot(velInLDPlane) /
