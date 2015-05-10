@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <iostream>
 
 #include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/gui/LayersWidgetPrivate.hh"
 #include "gazebo/gui/LayersWidget.hh"
 
 using namespace gazebo;
@@ -31,22 +32,22 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 LayersWidget::LayersWidget(QWidget *_parent)
-  : QWidget(_parent)
+  : QWidget(_parent), dataPtr(new LayersWidgetPrivate)
 {
   this->setObjectName("layersList");
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  this->layerList = new QListWidget(this);
+  this->dataPtr->layerList = new QListWidget(this);
 
-  mainLayout->addWidget(this->layerList);
+  mainLayout->addWidget(this->dataPtr->layerList);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  connect(this->layerList, SIGNAL(itemClicked(QListWidgetItem *)),
+  connect(this->dataPtr->layerList, SIGNAL(itemClicked(QListWidgetItem *)),
           this, SLOT(OnLayerSelected(QListWidgetItem *)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       rendering::Events::ConnectNewLayer(
         boost::bind(&LayersWidget::OnNewLayer, this, _1)));
 }
@@ -54,6 +55,8 @@ LayersWidget::LayersWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 LayersWidget::~LayersWidget()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -68,17 +71,18 @@ void LayersWidget::OnNewLayer(const int32_t _layer)
   std::ostringstream stream;
   stream << "Layer " << _layer;
 
-  auto found = this->layerList->findItems(stream.str().c_str(),
+  auto found = this->dataPtr->layerList->findItems(stream.str().c_str(),
                                           Qt::MatchExactly);
 
+  // Only add layers that do not already exist.
   if (found.empty())
   {
     QListWidgetItem *item = new QListWidgetItem(stream.str().c_str(),
-        this->layerList);
+        this->dataPtr->layerList);
 
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     item->setCheckState(Qt::Checked);
     item->setData(Qt::UserRole, QVariant(_layer));
-    this->layerList->addItem(item);
+    this->dataPtr->layerList->addItem(item);
   }
 }

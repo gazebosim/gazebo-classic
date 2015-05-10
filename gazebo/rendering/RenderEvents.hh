@@ -72,14 +72,14 @@ namespace gazebo
                   event::ConnectionPtr _connection)
               {toggleLayer.Disconnect(_connection);}
 
-      /// \brief Connect to a layer toggle event.
+      /// \brief Connect to a new layer event.
       /// \param[in] _subscriber Callback to trigger when event occurs.
       /// \return Pointer the connection. This must stay in scope.
       public: template<typename T>
               static event::ConnectionPtr ConnectNewLayer(T _subscriber)
               {return newLayer.Connect(_subscriber);}
 
-      /// \brief Disconnect from a layer toggle event.
+      /// \brief Disconnect from a new layer event.
       /// \param[in] _connection The connection to disconnect.
       public: static void DisconnectNewLayer(
                   event::ConnectionPtr _connection)
@@ -94,7 +94,7 @@ namespace gazebo
       /// \brief The event used to turn on/off a layer.
       public: static event::EventT<void (const int32_t)> toggleLayer;
 
-      /// \brief The event used to turn on/off a layer.
+      /// \brief The event used to indicate that a new layer is present.
       public: static event::EventT<void (const int32_t)> newLayer;
     };
     /// \}
