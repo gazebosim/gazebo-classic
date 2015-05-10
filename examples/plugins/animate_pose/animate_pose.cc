@@ -35,12 +35,12 @@ namespace gazebo
       gazebo::common::PoseKeyFrame *key;
 
       key = anim->CreateKeyFrame(0);
-      key->SetTranslation(ignition::math::Vector3d(0, 0, 0));
-      key->SetRotation(ignition::math::Quaterniond(0, 0, 0));
+      key->Translation(ignition::math::Vector3d(0, 0, 0));
+      key->Rotation(ignition::math::Quaterniond(0, 0, 0));
 
       key = anim->CreateKeyFrame(1000.0);
-      key->SetTranslation(ignition::math::Vector3d(5, 0, 0));
-      key->SetRotation(ignition::math::Quaterniond(0, 0, 1.5707));
+      key->Translation(ignition::math::Vector3d(5, 0, 0));
+      key->Rotation(ignition::math::Quaterniond(0, 0, 1.5707));
 
       _parent->SetAnimation(anim);
     }
