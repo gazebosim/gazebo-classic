@@ -175,7 +175,7 @@ Ogre::RenderWindow *RenderEngine::CreateOgreWindow(
     window->reposition(0, 0);
     window->setAutoUpdated(true);
     window->setVisible(true);
-   
+
     // Store the normal render window.
     if (_width > 1 && _height > 1)
       this->window = window;

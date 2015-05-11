@@ -137,6 +137,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
+  this->glWidget->Init();
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(
@@ -237,12 +238,6 @@ RenderWidget::~RenderWidget()
 
   // we created the scene here we are responsible for removing it.
   rendering::remove_scene(gui::get_world());
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::Init()
-{
-  this->glWidget->Init();
 }
 
 /////////////////////////////////////////////////

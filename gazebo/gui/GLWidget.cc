@@ -64,6 +64,9 @@ GLWidget::GLWidget(QWidget *_parent)
 {
   rendering::load();
 
+  this->setAttribute(Qt::WA_OpaquePaintEvent, true);
+  this->setAttribute(Qt::WA_PaintOnScreen, true);
+
   this->setObjectName("GLWidget");
   this->state = "select";
   this->sceneCreated = false;
@@ -78,9 +81,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->setAttribute(Qt::WA_PaintOnScreen, true);
 
   this->renderFrame = new QFrame;
-  this->renderFrame->setFrameShape(QFrame::NoFrame);
-  this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
+  this->renderFrame->setObjectName("renderFrame");
   this->renderFrame->show();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -171,24 +172,20 @@ GLWidget::GLWidget(QWidget *_parent)
   connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
       SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
 
-  this->setAttribute(Qt::WA_OpaquePaintEvent, true);
-  this->setAttribute(Qt::WA_PaintOnScreen, true);
 }
 
 /////////////////////////////////////////////////
 void GLWidget::Init()
 {
-  std::string winHandle = this->GetOgreHandle();
+  QApplication::flush();
+  QApplication::syncX();
 
-  //QApplication::flush();
-  //QApplication::syncX();
+  std::string winHandle = this->GetOgreHandle();
 
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(winHandle, this->width(), this->height());
-
-  std::cout << "My Window Id=" << this->windowId << "\n";
-
   rendering::init();
+
   this->scene = rendering::create_scene(gui::get_world(), true);
   if (!this->scene)
     std::cerr << "!!!!!!!!!!!!!!!!!!!Unable to create scene\n";
