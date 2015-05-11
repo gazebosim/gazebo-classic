@@ -154,6 +154,7 @@ macro (gz_setup_windows)
 
     # And we want exceptions
     add_definitions("/EHsc")
+
     if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
       # Not need if proper cmake gnerator (-G "...Win64") is passed to cmake
       # Enable as a second measeure to workaround over bug
