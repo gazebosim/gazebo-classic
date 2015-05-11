@@ -39,27 +39,11 @@
         <!-- Parameters -->
         <player>
           <team>Blue</team>
-          <left_controller>
-            <rod>0</rod>
-            <rod>1</rod>
-          </left_controller>
-          <right_controller>
-            <rod>2</rod>
-            <rod>3</rod>
-          </right_controller>
         </player>
-        <player>
+        <!--<player>
           <team>Red</team>
           <invert_control>0</invert_control>
-          <left_controller>
-            <rod>0</rod>
-            <rod>1</rod>
-          </left_controller>
-          <right_controller>
-            <rod>2</rod>
-            <rod>3</rod>
-          </right_controller>
-        </player>
+        </player>-->
       </plugin>
     </model>
 
