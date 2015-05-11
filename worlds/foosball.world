@@ -40,10 +40,10 @@
         <player>
           <team>Blue</team>
         </player>
-        <player>
+        <!--<player>
           <team>Red</team>
           <invert_control>0</invert_control>
-        </player>
+        </player>-->
       </plugin>
     </model>
 

@@ -150,7 +150,7 @@ void FoosballPlayer::Update()
   }
 
   // Restart the ball position.
-  if (msg->left().button_1() || msg->right().button_1())
+  if (msg->left().trigger() > 0.5 || msg->right().trigger() > 0.5)
     this->restartBallPending = true;
   else if (this->restartBallPending)
   {
