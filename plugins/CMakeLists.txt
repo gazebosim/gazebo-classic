@@ -35,6 +35,8 @@ set (plugins
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
+  ElevatorPlugin
+  EventPlugin
   ForceTorquePlugin
   GpuRayPlugin
   ImuSensorPlugin
