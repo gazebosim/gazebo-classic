@@ -149,12 +149,14 @@ void RenderEngine::Load()
     this->SetupResources();
   }
 
-  std::stringstream stream;
+/*  std::stringstream stream;
   stream << (int32_t)this->dummyWindowId;
 
   this->windowManager->CreateWindow(stream.str(), 1, 1);
   this->CheckSystemCapabilities();
+  */
 }
+
 
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::CreateScene(const std::string &_name,
@@ -292,6 +294,9 @@ void RenderEngine::PostRender()
 //////////////////////////////////////////////////
 void RenderEngine::Init()
 {
+  std::cerr << "RenderEngine::Init\n";
+  this->CheckSystemCapabilities();
+
   if (this->renderPathType == NONE)
   {
     gzwarn << "Cannot initialize render engine since "

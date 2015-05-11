@@ -80,16 +80,19 @@ GLWidget::GLWidget(QWidget *_parent)
   this->setAttribute(Qt::WA_PaintOnScreen, true);
 
   this->renderFrame = new QFrame;
-  this->renderFrame->setFrameShape(QFrame::NoFrame);
   this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
-  this->renderFrame->setContentsMargins(0, 0, 0, 0);
   this->renderFrame->show();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
+
+  /*this->connections.push_back(
+      rendering::Events::ConnectCreateScene(
+        boost::bind(&GLWidget::OnCreateScene, this, _1)));
+  */
 
   this->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -169,15 +172,15 @@ GLWidget::GLWidget(QWidget *_parent)
   connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
       SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
 
-}
+  this->show();
 
-/////////////////////////////////////////////////
-void GLWidget::Init()
-{
+std::cout << "GLWidget::Init\n";
   QApplication::flush();
   QApplication::syncX();
 
+std::cout << "GetOgreHandle\n";
   std::string winHandle = this->GetOgreHandle();
+  std::cout << "Window Handle[" << winHandle << "]\n";
 
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(winHandle, this->width(), this->height());
@@ -188,15 +191,6 @@ void GLWidget::Init()
     std::cerr << "!!!!!!!!!!!!!!!!!!!Unable to create scene\n";
 
   this->OnCreateScene(this->scene->GetName());
-
-  if (!this->sceneCreated)
-  {
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->windowId, this->userCamera);
-    this->sceneCreated = true;
-  }
-
-  this->renderFrame->lower();
 }
 
 /////////////////////////////////////////////////
@@ -264,6 +258,7 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
   {
+  std::cout << "Render\n";
     event::Events::preRender();
 
     // Tell all the cameras to render
@@ -935,6 +930,7 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::OnCreateScene(const std::string &_name)
 {
+std::cout << "OnCreateScene\n";
   this->hoverVis.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
 

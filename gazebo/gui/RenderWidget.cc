@@ -136,7 +136,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
-  this->glWidget->Init();
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(

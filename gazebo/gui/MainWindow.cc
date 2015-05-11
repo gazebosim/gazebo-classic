@@ -102,10 +102,10 @@ MainWindow::MainWindow()
   this->node->Init();
   gui::set_world(this->node->GetTopicNamespace());
 
-  this->mainWidget = new QWidget;
+  QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  this->mainWidget->show();
-  this->setCentralWidget(this->mainWidget);
+  mainWidget->show();
+  this->setCentralWidget(mainWidget);
 
   this->setDockOptions(QMainWindow::AnimatedDocks);
 
@@ -124,7 +124,10 @@ MainWindow::MainWindow()
   this->AddToLeftColumn("default", this->tabWidget);
 
   this->toolsWidget = new ToolsWidget();
-  this->renderWidget = new RenderWidget(this->mainWidget);
+
+  this->renderWidget = new RenderWidget(mainWidget);
+
+  this->CreateEditors();
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -151,9 +154,9 @@ MainWindow::MainWindow()
 
   mainLayout->setSpacing(0);
   mainLayout->addLayout(centerLayout, 1);
-  mainLayout->addWidget(new QSizeGrip(this->mainWidget), 0,
+  mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
                         Qt::AlignBottom | Qt::AlignRight);
-  this->mainWidget->setLayout(mainLayout);
+  mainWidget->setLayout(mainLayout);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
@@ -220,8 +223,6 @@ MainWindow::~MainWindow()
 /////////////////////////////////////////////////
 void MainWindow::Load()
 {
-  this->CreateEditors();
-
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
 #ifdef HAVE_OCULUS
   int oculusAutoLaunch = getINIProperty<int>("oculus.autolaunch", 0);
