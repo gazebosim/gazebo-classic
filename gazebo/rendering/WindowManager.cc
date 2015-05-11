@@ -196,3 +196,9 @@ Ogre::RenderWindow *WindowManager::GetWindow(uint32_t _id)
   else
     return NULL;
 }
+
+//////////////////////////////////////////////////
+size_t WindowManager::WindowCount() const
+{
+  return this->windows.size();
+}
