@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -81,18 +80,16 @@ GLWidget::GLWidget(QWidget *_parent)
   this->setAttribute(Qt::WA_PaintOnScreen, true);
 
   this->renderFrame = new QFrame;
-  this->renderFrame->setObjectName("renderFrame");
+  this->renderFrame->setFrameShape(QFrame::NoFrame);
+  this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
+                                   QSizePolicy::Expanding);
+  this->renderFrame->setContentsMargins(0, 0, 0, 0);
   this->renderFrame->show();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
-
-  /*this->connections.push_back(
-      rendering::Events::ConnectCreateScene(
-        boost::bind(&GLWidget::OnCreateScene, this, _1)));
-  */
 
   this->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -871,6 +868,12 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
   this->userCamera->SetWorldPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
+
+  if (this->windowId >= 0)
+  {
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->windowId, this->userCamera);
+  }
 }
 
 /////////////////////////////////////////////////

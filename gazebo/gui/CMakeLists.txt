@@ -5,7 +5,6 @@ include ( ${QT_USE_FILE} )
 link_directories(
   ${Boost_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
-  ${TBB_LIBRARYDIR}
 )
 
 include_directories(
@@ -21,8 +20,6 @@ add_subdirectory(building)
 add_subdirectory(model)
 add_subdirectory(terrain)
 add_subdirectory(viewers)
-
-include_directories(${TBB_INCLUDEDIR})
 
 set (sources
   Actions.cc
@@ -222,7 +219,3 @@ gz_install_library(gazebo_gui)
 gz_install_includes("gui" ${headers} ${qt_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
 manpage(gzclient 1)
-
-# QT4_WRAP_CPP(test_MOC test.hh)
-# gz_add_executable(gztest test.cc ${test_MOC})
-# target_link_libraries(gztest ${QT_LIBRARIES} ${ogre_libraries})
