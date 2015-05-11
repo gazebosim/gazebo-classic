@@ -493,7 +493,7 @@ void SimbodyPhysics::UpdateCollision()
              this->contact.calcContactPatchDetailsById(
                state, simbodyContact.getContactId(), patch);
 
-          // loop through detials of patch
+          // loop through details of patch
           if (found)
           {
             for (int i = 0; i < patch.getNumDetails(); ++i)
