@@ -1405,19 +1405,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         boost::shared_ptr<physics::PlaneShape> p =
           boost::dynamic_pointer_cast<physics::PlaneShape>((*ci)->GetShape());
 
-        /*
-        // Add a contact surface to represent the ground.
-        // Half space normal is -x; must rotate about y to make it +z.
-        int surfNum = this->matter.Ground().updBody().addContactSurface(
-           Rotation(Pi/2, YAxis),
-           ContactSurface(ContactGeometry::HalfSpace(), material));
-
-        // store ContactGeometry pointer in SimbodyCollision object
-        SimTK::ContactSurface &groundContactSurf =
-          this->matter.Ground().updBody().updContactSurface(surfNum);
-        sc->SetCollisionShape(&groundContactSurf.updShape());
-        */
-
         // by default, simbody HalfSpace normal is in the -X direction
         // rotate it based on normal vector specified by user
         // Create a rotation whos x-axis is in the
