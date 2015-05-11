@@ -83,6 +83,7 @@ namespace gazebo
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
+      protected: virtual void showEvent(QShowEvent *_e);
       protected: virtual void enterEvent(QEvent * event);
 
 
@@ -93,11 +94,6 @@ namespace gazebo
       protected: void mouseDoubleClickEvent(QMouseEvent *_event);
       protected: void mouseMoveEvent(QMouseEvent *_event);
       protected: void mouseReleaseEvent(QMouseEvent *_event);
-
-      /// \brief Orerride paintEngine to stop Qt from trying to draw on top
-      /// of Ogre
-      /// \return NULL
-      protected: virtual QPaintEngine *paintEngine() const;
 
       private: std::string GetOgreHandle() const;
 
@@ -201,6 +197,12 @@ namespace gazebo
       /// \brief Qt callback when a selection msg is received.
       /// \param[in] The name of the selected entity.
       private slots: void OnSelectionMsgEvent(const QString &_name);
+
+      /// \brief QT Callback that turns on orthographic projection
+      private slots: void OnOrtho();
+
+      /// \brief QT Callback that turns on perspective projection
+      private slots: void OnPerspective();
 
       private: int windowId;
 
