@@ -61,6 +61,7 @@ extern ModelRightMenu *g_modelRightMenu;
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
 {
+  rendering::load();
   this->setObjectName("GLWidget");
   this->state = "select";
   this->sceneCreated = false;
@@ -222,6 +223,11 @@ void GLWidget::showEvent(QShowEvent *_event)
   {
     this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
         CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+
+    rendering::init();
+
+    rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
+
     if (this->userCamera)
     {
       rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
