@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,18 @@
  * limitations under the License.
  *
 */
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/GuiIface.hh"
 
-//////////////////////////////////////////////////
-int main(int _argc, char **_argv)
+#ifndef _GAZEBO_PROJECTION_TEST_HH_
+#define _GAZEBO_PROJECTION_TEST_HH_
+
+#include "gazebo/gui/QTestFixture.hh"
+
+/// \brief A test class for orthographic and perspective projections
+class Projection_TEST : public QTestFixture
 {
-  Q_INIT_RESOURCE(resources);
-  int result = 0;
-  if (!gazebo::gui::run(_argc, _argv))
-    result = -1;
-  return result;
-}
+  Q_OBJECT
+
+  /// \brief Test orthographic and perspective projections.
+  private slots: void Projection();
+};
+#endif

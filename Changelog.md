@@ -32,6 +32,9 @@ compilation on Windows.
     * [Pull request #1659](https://bitbucket.org/osrf/gazebo/pull-request/1659)
     * [Pull request #1660](https://bitbucket.org/osrf/gazebo/pull-request/1660)
     * [Pull request #1661](https://bitbucket.org/osrf/gazebo/pull-request/1661)
+    * [Pull request #1669](https://bitbucket.org/osrf/gazebo/pull-request/1669)
+    * [Pull request #1670](https://bitbucket.org/osrf/gazebo/pull-request/1670)
+    * [Pull request #1672](https://bitbucket.org/osrf/gazebo/pull-request/1672)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
@@ -470,10 +473,16 @@ compilation on Windows.
 
 ## Gazebo 4.0
 
-### Gazebo 4.1.3 (xxxx-xx-xx)
+### Gazebo 4.1.3 (2015-05-07)
 
 1. Fix heightmap model texture loading.
     * [Pull request #1595](https://bitbucket.org/osrf/gazebo/pull-request/1595)
+1. Fix visual collision scale on separate client
+    * [Pull request #1585](https://bitbucket.org/osrf/gazebo/pull-request/1585)
+1. Fix several clang compiler warnings
+    * [Pull request #1594](https://bitbucket.org/osrf/gazebo/pull-request/1594)
+1. Fix blank save / browse dialogs
+    * [Pull request #1544](https://bitbucket.org/osrf/gazebo/pull-request/1544)
 
 ### Gazebo 4.1.2 (2015-03-20)
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,20 @@
  * limitations under the License.
  *
 */
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/GuiIface.hh"
+#ifndef _GAZEBO_ORTHOVIEWCONTROLLER_PRIVATE_HH_
+#define _GAZEBO_ORTHOVIEWCONTROLLER_PRIVATE_HH_
 
-//////////////////////////////////////////////////
-int main(int _argc, char **_argv)
+namespace gazebo
 {
-  Q_INIT_RESOURCE(resources);
-  int result = 0;
-  if (!gazebo::gui::run(_argc, _argv))
-    result = -1;
-  return result;
+  namespace rendering
+  {
+    /// \internal
+    /// \brief OrthoViewController private data.
+    class OrthoViewControllerPrivate
+    {
+      /// \brief Scale used for zooming within the orthographic view
+      public: double scale;
+    };
+  }
 }
+#endif

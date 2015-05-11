@@ -14,6 +14,12 @@
  * limitations under the License.
  *
  */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sdf/sdf.hh>
 #include <boost/scoped_ptr.hpp>
 
@@ -465,6 +471,9 @@ void MainWindow::Save()
       cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
+
+      cameraElem->GetElement("projection_type")->Set(cam->GetProjectionType());
+
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.Root()->ToString("");
     }
@@ -1243,6 +1252,21 @@ void MainWindow::CreateActions()
   g_viewOculusAct->setEnabled(false);
 #endif
 
+  g_cameraOrthoAct = new QAction(tr("Orthographic"), this);
+  g_cameraOrthoAct->setStatusTip(tr("Orthographic Projection"));
+  g_cameraOrthoAct->setCheckable(true);
+  g_cameraOrthoAct->setChecked(false);
+
+  g_cameraPerspectiveAct = new QAction(tr("Perspective"), this);
+  g_cameraPerspectiveAct->setStatusTip(tr("Perspective Projection"));
+  g_cameraPerspectiveAct->setCheckable(true);
+  g_cameraPerspectiveAct->setChecked(true);
+
+  QActionGroup *projectionActionGroup = new QActionGroup(this);
+  projectionActionGroup->addAction(g_cameraOrthoAct);
+  projectionActionGroup->addAction(g_cameraPerspectiveAct);
+  projectionActionGroup->setExclusive(true);
+
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
@@ -1540,6 +1564,12 @@ void MainWindow::DeleteActions()
 
   delete g_alignAct;
   g_alignAct = 0;
+
+  delete g_cameraOrthoAct;
+  g_cameraOrthoAct = 0;
+
+  delete g_cameraPerspectiveAct;
+  g_cameraPerspectiveAct = 0;
 }
 
 
@@ -1571,6 +1601,15 @@ void MainWindow::CreateMenuBar()
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
 
+  QMenu *cameraMenu = bar->addMenu(tr("&Camera"));
+  cameraMenu->addAction(g_cameraOrthoAct);
+  cameraMenu->addAction(g_cameraPerspectiveAct);
+  cameraMenu->addSeparator();
+  cameraMenu->addAction(g_fpsAct);
+  cameraMenu->addAction(g_orbitAct);
+  cameraMenu->addSeparator();
+  cameraMenu->addAction(g_resetAct);
+
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
   viewMenu->addSeparator();
@@ -1583,13 +1622,6 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCOMAct);
   viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
-  viewMenu->addSeparator();
-
-  viewMenu->addAction(g_resetAct);
-  viewMenu->addSeparator();
-
-  viewMenu->addAction(g_fpsAct);
-  viewMenu->addAction(g_orbitAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
@@ -1680,6 +1712,15 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     if (_msg->camera().has_view_controller())
     {
       cam->SetViewController(_msg->camera().view_controller());
+    }
+
+    if (_msg->camera().has_projection_type())
+    {
+      cam->SetProjectionType(_msg->camera().projection_type());
+      g_cameraOrthoAct->setChecked(true);
+      // Disable view control options when in ortho projection
+      g_fpsAct->setEnabled(false);
+      g_orbitAct->setEnabled(false);
     }
 
     if (_msg->camera().has_track())
