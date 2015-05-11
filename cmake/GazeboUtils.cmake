@@ -135,18 +135,23 @@ macro (gz_setup_windows)
     # Using static linking in Windows by default
     set(BUILD_SHARED_LIBS FALSE)
     add_definitions(-DBUILDING_STATIC_LIBS -DWIN32_LEAN_AND_MEAN)
+
     # Need for M_PI constant
     add_definitions(-D_USE_MATH_DEFINES) 
+
     # Don't pull in the Windows min/max macros
     add_definitions(-DNOMINMAX) 
+
     # Use dynamic linking for boost
     add_definitions(-DBOOST_ALL_DYN_LINK)
+
     # And force linking to MSVC dynamic runtime
     if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
       add_definitions("/MDd")
     else()
       add_definitions("/MD")
     endif()
+
     # And we want exceptions
     add_definitions("/EHsc")
     if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
