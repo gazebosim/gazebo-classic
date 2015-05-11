@@ -127,10 +127,9 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 
   if (window)
   {
-    window->setActive(true);
-    window->setVisible(true);
-    window->setAutoUpdated(false);
     window->reposition(0, 0);
+    window->setAutoUpdated(true);
+    window->setVisible(true);
 
     this->windows.push_back(window);
   }
