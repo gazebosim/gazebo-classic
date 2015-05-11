@@ -360,6 +360,8 @@ void Scene::Init()
 
   Road2d *road = new Road2d();
   road->Load(this->dataPtr->worldVisual);
+
+  std::cout << "Scene initialized\n";
 }
 
 //////////////////////////////////////////////////

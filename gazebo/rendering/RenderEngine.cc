@@ -327,6 +327,7 @@ void RenderEngine::Init()
   for (unsigned int i = 0; i < this->scenes.size(); i++)
     this->scenes[i]->Init();
 
+std::cout << "Render engine initialized\n";
   this->initialized = true;
 }
 
