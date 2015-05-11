@@ -1275,6 +1275,9 @@ void Camera::CreateCamera()
   this->camera = this->scene->GetManager()->createCamera(
       this->scopedUniqueName);
 
+  if (this->sdf->HasElement("projection_type"))
+    this->SetProjectionType(this->sdf->Get<std::string>("projection_type"));
+
   this->camera->setFixedYawAxis(false);
   this->camera->yaw(Ogre::Degree(-90.0));
   this->camera->roll(Ogre::Degree(-90.0));
@@ -1313,6 +1316,9 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
     this->viewport->setOverlaysEnabled(false);
+
+    if (this->camera->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
+      this->scene->SetShadowsEnabled(false);
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
@@ -1759,4 +1765,45 @@ float Camera::GetAvgFPS() const
 unsigned int Camera::GetTriangleCount() const
 {
   return this->renderTarget->getTriangleCount();
+}
+
+//////////////////////////////////////////////////
+bool Camera::SetProjectionType(const std::string &_type)
+{
+  bool result = true;
+
+  if (_type == "orthographic")
+  {
+    // Shadows do not work properly with orthographic projection
+    this->scene->SetShadowsEnabled(false);
+    this->camera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
+  }
+  else if (_type == "perspective")
+  {
+    this->camera->setProjectionType(Ogre::PT_PERSPECTIVE);
+    this->camera->setCustomProjectionMatrix(false);
+    this->scene->SetShadowsEnabled(true);
+  }
+  else
+  {
+    gzerr << "Invalid projection type[" << _type << "]. "
+      << "Valid values are 'perspective' and 'orthographic'.\n";
+    result = false;
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string Camera::GetProjectionType() const
+{
+  if (this->camera->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
+  {
+    return "orthographic";
+  }
+  // There are only two types of projection in OGRE.
+  else
+  {
+    return "perspective";
+  }
 }

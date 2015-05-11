@@ -155,7 +155,8 @@ if (ENABLE_SCREEN_TESTS)
       GLWidget_TEST2.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
-      ModelSnap_TEST.cc)
+      ModelSnap_TEST.cc
+      Projection_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
