@@ -21,7 +21,7 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 
-#define TOL 1e-6
+#define TOL 1e-4
 #define TOL_CONT 2.0
 
 using namespace gazebo;

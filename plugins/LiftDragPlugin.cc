@@ -184,20 +184,20 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 momentDirection = ldNormal;
 
   double forwardVelocity = forwardI.GetLength() * velInLDPlane.GetLength();
-  double min = -1+1e-6;
-  double max = 1-1e-6;
+  double min = -1+1e-10;
+  double max = 1-1e-10;
   double cosAlpha = math::clamp(
     forwardI.Dot(velInLDPlane) / forwardVelocity, min, max);
 
   // should never happen
-  if (cosAlpha >= max)
+  if (cosAlpha > max)
   {
-    //gzwarn << "cosAlpha greater than domain for arccos!" << std::endl;
+    gzwarn << "cosAlpha greater than domain for arccos!" << std::endl;
     cosAlpha = max;
   }
-  else if (cosAlpha <= min)
+  else if (cosAlpha < min)
   {
-    //gzwarn << "cosAlpha less than domain for arccos!" << std::endl;
+    gzwarn << "cosAlpha less than domain for arccos!" << std::endl;
     cosAlpha = min;
   }
   // gzerr << "ca " << forwardI.Dot(velInLDPlane) /
