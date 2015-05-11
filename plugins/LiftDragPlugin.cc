@@ -339,6 +339,11 @@ void LiftDragPlugin::OnUpdate()
     gzerr << "torque: " << torque << "\n";
   }
 
+  // Correct for nan or inf
+  force.Correct();
+  this->cp.Correct();
+  torque.Correct();
+
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);
   this->link->AddTorque(torque);
