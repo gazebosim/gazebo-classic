@@ -33,7 +33,7 @@ GZ_REGISTER_MODEL_PLUGIN(FoosballTablePlugin)
 /////////////////////////////////////////////////
 FoosballPlayer::FoosballPlayer(const std::string &_hydraTopic)
   : hydraTopic(_hydraTopic),
-    hydra({{"left_controller", {}}, {"right_controller", {}}}),
+    hydra({{"left_controller", {2}}, {"right_controller", {3}}}),
     lastHydraPose({{"left_controller", {0, 0}}, {"right_controller", {0, 0}}})
 {
 }
@@ -72,37 +72,11 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   {
     std::string transName = "Foosball::trans" + team + std::to_string(i);
     std::string rotName = "Foosball::rot" + team + std::to_string(i);
+
     // Create a new rod and make it controllable by this controller.
     this->rods.push_back(
       {_model->GetJoint(transName), _model->GetJoint(rotName)});
   }
-
-  /*// Read the <left_controller> and <right_controller> elements.
-  for (auto const &side : {"left_controller", "right_controller"})
-  {
-    if (_sdf->HasElement(side))
-    {
-      sdf::ElementPtr controllerElem = _sdf->GetElement(side);
-      if (!controllerElem->HasElement("rod"))
-      {
-        std::cerr << "FoosballPlayer::Load() Missing <rod> element in "
-                  << "<" << side << "> section" << std::endl;
-        return false;
-      }
-
-      for (auto rodElem = controllerElem->GetElement("rod"); rodElem;
-        rodElem = rodElem->GetNextElement("rod"))
-      {
-        std::string rodNumber = rodElem->GetValue()->GetAsString();
-        std::string transName = "Foosball::trans" + team + rodNumber;
-        std::string rotName = "Foosball::rot" + team + rodNumber;
-
-        // Create a new rod and make it controllable by this controller.
-        Rod_t rod = {_model->GetJoint(transName), _model->GetJoint(rotName)};
-        this->hydra[side].push_back(rod);
-      }
-    }
-  }*/
 
   // Check if we have to invert the control for this player.
   if (_sdf->HasElement("invert_control"))
@@ -264,7 +238,10 @@ void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
 
   // Left controller moving left.
   if (_leftDir < -0.5 && left > 0)
+  {
     newLeft = left - 1;
+    leftChanged = true;
+  }
 
   // Left controller moving right.
   if ((_leftDir > 0.5 && (right - left > 1)) ||
@@ -272,6 +249,7 @@ void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
         right < kNumRodsPerTeam - 1))
   {
     newLeft = left + 1;
+    leftChanged = true;
   }
 
   // Right controller moving left.
@@ -280,11 +258,15 @@ void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
         left > 0))
   {
     newRight = right - 1;
+    rightChanged = true;
   }
 
   // Right controller moving right.
   if (_rightDir > 0.5 && right < kNumRodsPerTeam - 1)
+  {
     newRight = right + 1;
+    rightChanged = true;
+  }
 
   // Restore the position/orientation of the new left rod.
   if (leftChanged)
