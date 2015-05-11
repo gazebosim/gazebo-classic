@@ -645,12 +645,12 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &_name,
   camera->Init();
   this->dataPtr->userCameras.push_back(camera);
 
-  /*if (!this->dataPtr->forest)
+  if (!this->dataPtr->forest)
   {
     // create Forest
     this->dataPtr->forest = new Forest(shared_from_this());
     this->dataPtr->forest->Load();
-  }*/
+  }
 
   return camera;
 }

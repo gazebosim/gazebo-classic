@@ -401,11 +401,16 @@ void Forest::Update(bool _force)
     //if (this->scene->GetUserCameraCount() == 0u)
       //return;
 
-    if (this->scene->GetOculusCameraCount() == 0u)
-      return;
-
-    this->camera = boost::dynamic_pointer_cast<Camera>(
-        this->scene->GetOculusCamera(0));
+    if (this->scene->GetOculusCameraCount() != 0u)
+    {
+      this->camera = boost::dynamic_pointer_cast<Camera>(
+          this->scene->GetOculusCamera(0));
+    }
+    else if (this->scene->GetUserCameraCount() != 0u)
+    {
+      this->camera = boost::dynamic_pointer_cast<Camera>(
+          this->scene->GetUserCamera(0));
+    }
     if (!this->camera)
       return;
   }
