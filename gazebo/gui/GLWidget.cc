@@ -166,6 +166,14 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
       SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
+
+  // Connect the ortho action
+  connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
+          SLOT(OnOrtho()));
+
+  // Connect the perspective action
+  connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
+          SLOT(OnPerspective()));
 }
 
 /////////////////////////////////////////////////
@@ -1317,4 +1325,22 @@ void GLWidget::OnModelEditor(bool _checked)
 
   // Manually deselect, in case the editor was opened with Ctrl
   this->DeselectAllVisuals();
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnOrtho()
+{
+  // Disable view control options when in ortho projection
+  g_fpsAct->setEnabled(false);
+  g_orbitAct->setEnabled(false);
+  this->userCamera->SetProjectionType("orthographic");
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnPerspective()
+{
+  // Enable view control options when in perspective projection
+  g_fpsAct->setEnabled(true);
+  g_orbitAct->setEnabled(true);
+  this->userCamera->SetProjectionType("perspective");
 }
