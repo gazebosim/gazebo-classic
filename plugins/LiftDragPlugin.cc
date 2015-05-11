@@ -184,8 +184,8 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 momentDirection = ldNormal;
 
   double forwardVelocity = forwardI.GetLength() * velInLDPlane.GetLength();
-  double min = -1+1e-10;
-  double max = 1-1e-10;
+  double min = -1;
+  double max = 1;
   double cosAlpha = math::clamp(
     forwardI.Dot(velInLDPlane) / forwardVelocity, min, max);
 
