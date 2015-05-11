@@ -43,8 +43,6 @@ namespace gazebo
       public: RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
-
-      public: void Init();
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
@@ -87,7 +85,6 @@ namespace gazebo
       /// \brief Set the visibility of the toolbar.
       /// \param[in] _show Whether or not to show the toolbar.
       public: void ShowToolbar(const bool _show);
-
 
       /// \brief Qt callback to clear overlay message if a duration is
       /// specified

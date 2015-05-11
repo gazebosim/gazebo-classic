@@ -148,15 +148,7 @@ void RenderEngine::Load()
     // Setup the available resources
     this->SetupResources();
   }
-
-/*  std::stringstream stream;
-  stream << (int32_t)this->dummyWindowId;
-
-  this->windowManager->CreateWindow(stream.str(), 1, 1);
-  this->CheckSystemCapabilities();
-  */
 }
-
 
 //////////////////////////////////////////////////
 ScenePtr RenderEngine::CreateScene(const std::string &_name,
@@ -294,6 +286,13 @@ void RenderEngine::PostRender()
 //////////////////////////////////////////////////
 void RenderEngine::Init()
 {
+  if (this->windowManager->WindowCount() <= 0)
+  {
+    std::stringstream stream;
+    stream << static_cast<unsigned long>(this->dummyWindowId);
+    this->windowManager->CreateWindow(stream.str(), 1, 1);
+  }
+
   std::cerr << "RenderEngine::Init\n";
   this->CheckSystemCapabilities();
 

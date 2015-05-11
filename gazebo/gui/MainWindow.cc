@@ -48,8 +48,6 @@
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
-#include "gazebo/rendering/RenderEngine.hh"
-#include "gazebo/rendering/WindowManager.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"

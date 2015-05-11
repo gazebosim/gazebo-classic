@@ -444,29 +444,12 @@ MainWindow::MainWindow()
   this->show();
 }
 
-/////////////////////////////////////////////////
-MyApplication::MyApplication(int &argc,char **argv)
-: QApplication(argc, argv)
-{
-}
-
-/////////////////////////////////////////////////
-bool MyApplication::notify(QObject *_receiver, QEvent *_event)
-{
-  // Uncomment to see all events received by the QT application
-  // See: http://doc.qt.io/qt-4.8/qevent.html#Type-enum
-  // std::cout << "Receiver[" << _receiver->objectName().toStdString()
-  //           << "] Event[" << _event->type() << "]\n";
-
-  // Send the event onto QT.
-  return QApplication::notify(_receiver, _event);
-}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   // Create the application
-  MyApplication *app = new MyApplication(argc, argv);
+  QApplication *app = new QApplication(argc, argv);
 
   // Create the main window
   MainWindow *main = new MainWindow();

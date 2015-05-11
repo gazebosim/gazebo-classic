@@ -94,6 +94,11 @@ namespace gazebo
       protected: void mouseMoveEvent(QMouseEvent *_event);
       protected: void mouseReleaseEvent(QMouseEvent *_event);
 
+      /// \brief Orerride paintEngine to stop Qt from trying to draw on top
+      /// of Ogre
+      /// \return NULL
+      protected: virtual QPaintEngine *paintEngine() const;
+
       private: std::string GetOgreHandle() const;
 
       /// \brief Callback for a mouse move event.

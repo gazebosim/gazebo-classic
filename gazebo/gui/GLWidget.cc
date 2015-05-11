@@ -894,10 +894,8 @@ std::string GLWidget::GetOgreHandle() const
 {
   std::ostringstream ogreHandle;
 
-#if defined(__APPLE__)
-  ogreHandle << (unsigned long)(this->winId());
-#elif defined(_MSC_VER)
-  ogreHandle << (unsigned long)(this->winId());
+#if defined(__APPLE__) || defined(_MSC_VER)
+  ogreHandle << reinterpret_cast<unsigned long>(this->winId());
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
@@ -1326,4 +1324,10 @@ void GLWidget::OnModelEditor(bool _checked)
 
   // Manually deselect, in case the editor was opened with Ctrl
   this->DeselectAllVisuals();
+}
+
+/////////////////////////////////////////////////
+QPaintEngine *GLWidget::paintEngine() const
+{
+  return NULL;
 }
