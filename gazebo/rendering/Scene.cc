@@ -2734,7 +2734,7 @@ void Scene::SetShadowsEnabled(bool _value)
   bool shadowOverride = true;
   for (std::vector<UserCameraPtr>::iterator iter =
        this->dataPtr->userCameras.begin();
-       iter != this->dataPtr->userCameras.end() && stereoOverride; ++iter)
+       iter != this->dataPtr->userCameras.end() && shadowOverride; ++iter)
   {
     shadowOverride = !(*iter)->StereoEnabled() &&
                      (*iter)->GetProjectionType() != "orthographic";
