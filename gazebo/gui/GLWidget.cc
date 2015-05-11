@@ -82,7 +82,8 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->renderFrame = new QFrame;
   this->renderFrame->setObjectName("renderFrame");
-  this->renderFrame->show();
+  this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
+                                   QSizePolicy::Expanding);
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
@@ -127,8 +128,6 @@ GLWidget::GLWidget(QWidget *_parent)
         boost::bind(&GLWidget::OnAlignMode, this, _1, _2, _3, _4)));
 
   this->renderFrame->setMouseTracking(true);
-  this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
   this->setMouseTracking(true);
 
   this->entityMaker = NULL;
@@ -173,11 +172,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
       SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
-}
 
-/////////////////////////////////////////////////
-void GLWidget::Init()
-{
+  this->show();
+
 std::cout << "GLWidget::Init\n";
   QApplication::flush();
   QApplication::syncX();
@@ -195,15 +192,6 @@ std::cout << "GetOgreHandle\n";
     std::cerr << "!!!!!!!!!!!!!!!!!!!Unable to create scene\n";
 
   this->OnCreateScene(this->scene->GetName());
-
-  if (!this->sceneCreated)
-  {
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->windowId, this->userCamera);
-    this->sceneCreated = true;
-  }
-
-  this->renderFrame->lower();
 }
 
 /////////////////////////////////////////////////
@@ -937,6 +925,7 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::OnCreateScene(const std::string &_name)
 {
+std::cout << "OnCreateScene\n";
   this->hoverVis.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
 
@@ -945,6 +934,12 @@ void GLWidget::OnCreateScene(const std::string &_name)
   ModelManipulator::Instance()->Init();
   ModelSnap::Instance()->Init();
   ModelAlign::Instance()->Init();
+
+  if (!this->sceneCreated)
+  {
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+      this->windowId, this->userCamera);
+  }
 
   this->sceneCreated = true;
 }

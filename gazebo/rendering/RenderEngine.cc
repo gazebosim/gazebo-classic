@@ -294,6 +294,7 @@ void RenderEngine::PostRender()
 //////////////////////////////////////////////////
 void RenderEngine::Init()
 {
+  std::cerr << "RenderEngine::Init\n";
   this->CheckSystemCapabilities();
 
   if (this->renderPathType == NONE)
