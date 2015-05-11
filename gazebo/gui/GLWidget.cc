@@ -127,6 +127,8 @@ GLWidget::GLWidget(QWidget *_parent)
         boost::bind(&GLWidget::OnAlignMode, this, _1, _2, _3, _4)));
 
   this->renderFrame->setMouseTracking(true);
+  this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
+                                   QSizePolicy::Expanding);
   this->setMouseTracking(true);
 
   this->entityMaker = NULL;
@@ -171,16 +173,18 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
       SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
-
 }
 
 /////////////////////////////////////////////////
 void GLWidget::Init()
 {
+std::cout << "GLWidget::Init\n";
   QApplication::flush();
   QApplication::syncX();
 
+std::cout << "GetOgreHandle\n";
   std::string winHandle = this->GetOgreHandle();
+  std::cout << "Window Handle[" << winHandle << "]\n";
 
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(winHandle, this->width(), this->height());
@@ -267,6 +271,7 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
   {
+  std::cout << "Render\n";
     event::Events::preRender();
 
     // Tell all the cameras to render
