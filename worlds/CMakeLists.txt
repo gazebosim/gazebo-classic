@@ -56,6 +56,7 @@ set (files
   stacks.world
   trigger.world
   twin_rotor_demo.world
+  underwater.world
   willowgarage.world
   wireless_sensors.world
 )
