@@ -140,7 +140,7 @@ void LayersWidget_TEST::ToggleLayers()
     }
 
     // Make sure the black count is zero. This means the visual
-    // is visible and compelty fills the camera field of view.
+    // is visible and completely fills the camera field of view.
     QVERIFY(blackCount == 0);
   }
 
