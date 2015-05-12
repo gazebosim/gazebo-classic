@@ -66,15 +66,21 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->setObjectName("GLWidget");
   this->state = "select";
-  this->sceneCreated = false;
   this->copyEntityName = "";
   this->modelEditorEnabled = false;
 
+  this->setFocusPolicy(Qt::StrongFocus);
+
   this->windowId = -1;
+
+  this->setAttribute(Qt::WA_OpaquePaintEvent, true);
+  this->setAttribute(Qt::WA_PaintOnScreen, true);
+
   this->renderFrame = new QFrame(this);
   this->renderFrame->setFrameShape(QFrame::NoFrame);
   this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
+  this->renderFrame->setContentsMargins(0, 0, 0, 0);
   this->renderFrame->show();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -114,8 +120,6 @@ GLWidget::GLWidget(QWidget *_parent)
       gui::Events::ConnectAlignMode(
         boost::bind(&GLWidget::OnAlignMode, this, _1, _2, _3, _4)));
 
-  this->setFocusPolicy(Qt::StrongFocus);
-  this->setFocus(Qt::OtherFocusReason);
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
 
@@ -169,9 +173,6 @@ GLWidget::GLWidget(QWidget *_parent)
   // Connect the perspective action
   connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
           SLOT(OnPerspective()));
-
-  this->setAttribute(Qt::WA_OpaquePaintEvent, true);
-  this->setAttribute(Qt::WA_PaintOnScreen, true);
 }
 
 /////////////////////////////////////////////////
@@ -197,9 +198,9 @@ void GLWidget::Init()
   }
   else
   {
+    this->OnCreateScene(this->scene->GetName());
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-		  this->windowId, this->userCamera);
-    this->sceneCreated = true;
+      this->windowId, this->userCamera);
   }
 }
 
@@ -296,7 +297,6 @@ void GLWidget::resizeEvent(QResizeEvent *_e)
 /////////////////////////////////////////////////
 void GLWidget::keyPressEvent(QKeyEvent *_event)
 {
-std::cerr << "Key Press Event\n";
   if (!this->scene)
     return;
 
@@ -477,7 +477,6 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::mousePressEvent(QMouseEvent *_event)
 {
-std::cerr << "Mouse press Event\n";
   if (!this->scene)
     return;
 
@@ -628,7 +627,6 @@ std::cout << "Wheel Event\n";
 /////////////////////////////////////////////////
 void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 {
-std::cerr << "GLWidget::mouseMoveEvent\n";
   if (!this->scene)
     return;
 
@@ -685,7 +683,6 @@ void GLWidget::OnMouseMoveNormal()
 /////////////////////////////////////////////////
 void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
 {
-std::cerr << "Mouse release Event\n";
   if (!this->scene)
     return;
 

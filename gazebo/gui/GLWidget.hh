@@ -96,7 +96,7 @@ namespace gazebo
       protected: void mouseMoveEvent(QMouseEvent *_event);
       protected: void mouseReleaseEvent(QMouseEvent *_event);
 
-      /// \brief Override paintEngine to stop Qt From trying to draw on top of 
+      /// \brief Override paintEngine to stop Qt From trying to draw on top of
       /// OGRE.
       protected: virtual QPaintEngine *paintEngine() const;
 
@@ -262,10 +262,6 @@ namespace gazebo
 
       /// \brief Name of entity that is being copied.
       private: std::string copyEntityName;
-
-      /// \brief Flag that is set to true when GLWidget has responded to
-      ///  OnCreateScene
-      private: bool sceneCreated;
 
       /// \brief True if the model editor is up, false otherwise
       private: bool modelEditorEnabled;

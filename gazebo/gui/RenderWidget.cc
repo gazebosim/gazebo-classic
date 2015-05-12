@@ -293,7 +293,6 @@ void RenderWidget::RemoveScene(const std::string &_name)
 /////////////////////////////////////////////////
 void RenderWidget::CreateScene(const std::string &_name)
 {
-  std::cerr << "SHOULD NOT GET HERE\n";
   rendering::create_scene(_name, true);
 }
 
