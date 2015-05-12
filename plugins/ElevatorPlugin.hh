@@ -18,6 +18,9 @@
 #ifndef _GAZEBO_ELEVATOR_PLUGIN_HH_
 #define _GAZEBO_ELEVATOR_PLUGIN_HH_
 
+#include <string>
+#include <list>
+
 #include <sdf/sdf.hh>
 
 #include <gazebo/transport/Node.hh>

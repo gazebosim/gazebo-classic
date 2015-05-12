@@ -31,6 +31,7 @@ GZ_REGISTER_MODEL_PLUGIN(ElevatorPlugin)
 
 /////////////////////////////////////////////////
 ElevatorPlugin::ElevatorPlugin()
+  : doorController(NULL), liftController(NULL)
 {
 }
 
@@ -293,7 +294,7 @@ bool ElevatorPlugin::DoorController::Update()
 
 /////////////////////////////////////////////////
 ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint)
-  : floor(0), liftJoint(_liftJoint)
+  : floor(0), liftJoint(_liftJoint), state(STATIONARY)
 {
   this->liftPID.Init(100000, 0, 100000.0);
 }
