@@ -167,6 +167,10 @@ namespace gazebo
 
       /// \brief type
       public: Visual::VisualType type;
+      
+      /// \brief Index of the layer to which this visual belongs. Layers
+      /// act similar to layers in photoshop.
+      public: int32_t layer;
     };
     /// \}
   }

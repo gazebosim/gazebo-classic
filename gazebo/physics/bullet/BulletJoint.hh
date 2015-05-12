@@ -38,7 +38,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all joints
-    class GAZEBO_VISIBLE BulletJoint : public Joint
+    class GZ_PHYSICS_VISIBLE BulletJoint : public Joint
     {
       /// \brief Constructor
       public: BulletJoint(BasePtr _parent);

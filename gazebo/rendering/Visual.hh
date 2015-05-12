@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: Ogre Visual Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
 
-#ifndef _VISUAL_HH_
-#define _VISUAL_HH_
+#ifndef _GAZEBO_VISUAL_HH_
+#define _GAZEBO_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
@@ -59,7 +55,8 @@ namespace gazebo
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
+    class GZ_RENDERING_VISIBLE Visual :
+      public boost::enable_shared_from_this<Visual>
     {
       /// \brief Type of visual
       public: enum VisualType
@@ -549,6 +546,11 @@ namespace gazebo
       /// \brief Clear parents.
       public: void ClearParent();
 
+      /// \brief Toggle layer visibility. If the visual is
+      /// on the specified layer its visibility will be toggled.
+      /// \param[in] _layer Index of the layer to toggle.
+      public: void ToggleLayer(const int32_t _layer);
+      
       /// \brief Get type of visual.
       /// \return Visual type.
       public: VisualType GetType() const;
