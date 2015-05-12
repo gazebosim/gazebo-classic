@@ -14,10 +14,14 @@
  * limitations under the License.
  *
 */
-
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
+
+#include <gazebo/msgs/msgs.hh>
+
+#include <gazebo/transport/Node.hh>
+#include <gazebo/transport/Subscriber.hh>
 
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/Model.hh>
@@ -29,52 +33,50 @@ using namespace gazebo;
 GZ_REGISTER_WORLD_PLUGIN(EventPlugin)
 
 /////////////////////////////////////////////////
-EventPlugin::EventPlugin()
-{
-}
-
-/////////////////////////////////////////////////
-EventPlugin::~EventPlugin()
-{
-}
-
-/////////////////////////////////////////////////
 void EventPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
-  printf("LOAD\n");
   GZ_ASSERT(_world, "EventPlugin world pointer is NULL");
   GZ_ASSERT(_sdf, "EventPlugin sdf pointer is NULL");
+
   this->world = _world;
   this->sdf = _sdf;
 
+  // Setup communication
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_world->GetName());
 
+  // Read all the regions.
   sdf::ElementPtr regionElem = _sdf->GetElement("region");
   while (regionElem)
   {
+    // Create a new region
     EventPlugin::Region *region = new EventPlugin::Region;
 
+    // Get the region's name
     region->name = regionElem->Get<std::string>("name");
 
+    // Get the region's pose and bounding box
     region->pose = regionElem->Get<math::Pose>("pose");
     region->box = regionElem->Get<math::Vector3>("box");
 
+    // Get the message that should be transmitted when an event occurs.
     sdf::ElementPtr triggerElem = regionElem->GetElement("on_trigger");
     std::string topic = triggerElem->Get<std::string>("topic");
     sdf::ElementPtr msgElem = triggerElem->GetElement("msg");
     std::string data = msgElem->Get<std::string>("data");
     region->msg = data;
 
-    std::cout << "Publish on topic[" << topic << "]\n";
+    // Create the event publisher
     region->pub = this->node->Advertise<msgs::GzString>(topic);
 
-
+    // Store the region
     this->regions[region->name] = region;
 
+    // Get the next region, if one exists.
     regionElem = regionElem->GetNextElement("region");
   }
 
+  // Connect to the update event.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&EventPlugin::Update, this));
 }
@@ -82,6 +84,7 @@ void EventPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void EventPlugin::Update()
 {
+  // Get all the models.
   physics::Model_V models = this->world->GetModels();
 
   // Process each model.
@@ -93,7 +96,8 @@ void EventPlugin::Update()
       continue;
 
     math::Pose modelPose = (*iter)->GetWorldPose();
-    // std::cout << "ModelPose[" << modelPose << "]\n";
+
+    // Check if the model's pose is inside a specified region
     for (std::map<std::string, Region*>::iterator rIter = this->regions.begin();
          rIter != this->regions.end(); ++rIter)
     {
@@ -102,8 +106,8 @@ void EventPlugin::Update()
 
       math::Vector3 max = rIter->second->pose.pos +
                           rIter->second->box / 2.0;
-      // std::cout << "Pose[" << rIter->second->pose.pos << "] Box[" << rIter->second->box << "] Min[" << min << "] Max[" << max << "] \n";
 
+      // If inside, then transmit the desired message.
       if (modelPose.pos.x > min.x && modelPose.pos.x < max.x &&
           modelPose.pos.y > min.y && modelPose.pos.y < max.y &&
           modelPose.pos.z > min.z && modelPose.pos.z < max.z)

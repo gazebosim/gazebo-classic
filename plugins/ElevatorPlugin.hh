@@ -19,6 +19,8 @@
 #define _GAZEBO_ELEVATOR_PLUGIN_HH_
 
 #include <mutex>
+#include <string>
+#include <list>
 
 #include <sdf/sdf.hh>
 
