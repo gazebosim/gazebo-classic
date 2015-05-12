@@ -2930,7 +2930,7 @@ Visual::VisualType Visual::GetType() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetType(Visual::VisualType _type)
+void Visual::SetType(const Visual::VisualType _type)
 {
   this->dataPtr->type = _type;
 }

@@ -555,7 +555,7 @@ namespace gazebo
 
       /// \brief Set type of visual.
       /// \param[in] _type Visual type.
-      public: void SetType(VisualType _type);
+      public: void SetType(const VisualType _type);
 
       /// \internal
       /// \brief Constructor used by inherited classes
