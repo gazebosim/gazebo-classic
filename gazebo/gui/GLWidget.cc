@@ -83,7 +83,7 @@ GLWidget::GLWidget(QWidget *_parent)
   /*this->connections.push_back(
       rendering::Events::ConnectCreateScene(
         boost::bind(&GLWidget::OnCreateScene, this, _1)));
-	*/
+  */
 
   this->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -189,7 +189,7 @@ void GLWidget::Init()
     CreateWindow(winHandle, this->width(), this->height());
 
   std::cout << "My Window Id=" << this->windowId << "\n";
- 
+
   rendering::init();
   this->scene = rendering::create_scene(gui::get_world(), true);
   if (!this->scene)
@@ -200,7 +200,7 @@ void GLWidget::Init()
   if (!this->sceneCreated)
   {
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-		  this->windowId, this->userCamera);
+      this->windowId, this->userCamera);
     this->sceneCreated = true;
   }
 
@@ -268,7 +268,7 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   {
     this->sceneCreated =
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-		  this->windowId, this->userCamera);
+      this->windowId, this->userCamera);
   }*/
 
   // Timing may cause GLWidget to miss the OnCreateScene event. So, we check
@@ -307,8 +307,6 @@ std::cerr << "4\n";
 /////////////////////////////////////////////////
 void GLWidget::resizeEvent(QResizeEvent *_e)
 {
-std::cerr << "\nGLWidget::resizeEvent[" << _e->size().width() << "x" << _e->size().height() << "]\n";
-
   if (this->windowId >= 0)
   {
     rendering::RenderEngine::Instance()->GetWindowManager()->Resize(
@@ -889,7 +887,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     std::cerr << "Has user camera\n";
     this->userCamera = _scene->GetUserCamera(0);
   }
-   
+
    std::cerr << "Resize camera WxH[" << this->width() << " " << this->height() << "]\n";
   //this->userCamera->Resize(this->width(), this->height());
 
@@ -941,10 +939,8 @@ std::string GLWidget::GetOgreHandle() const
 {
   std::ostringstream ogreHandle;
 
-#if defined(__APPLE__)
-  ogreHandle << (unsigned)(this->winId());
-#elif defined(WIN32)
-  ogreHandle << (unsigned)(this->renderFrame->winId());
+#if defined(__APPLE__) || defined(WIN32)
+  ogreHandle << (unsigned long)(this->winId());
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
@@ -980,8 +976,6 @@ void GLWidget::OnCreateScene(const std::string &_name)
   ModelManipulator::Instance()->Init();
   ModelSnap::Instance()->Init();
   ModelAlign::Instance()->Init();
-
-  std::cerr << "OnCreateScene\n";
 }
 
 /////////////////////////////////////////////////
