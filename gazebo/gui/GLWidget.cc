@@ -76,7 +76,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
 
-  this->renderFrame = new QFrame(this);
+  this->renderFrame = new QFrame;
   this->renderFrame->setFrameShape(QFrame::NoFrame);
   this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
