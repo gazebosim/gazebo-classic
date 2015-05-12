@@ -22,6 +22,7 @@ include_directories(${tinyxml_INCLUDE_DIRS})
 link_directories(${tinyxml_LIBRARY_DIRS})
 
 set (sources
+  ApplyWrenchVisual.cc
   ArrowVisual.cc
   AxisVisual.cc
   Camera.cc
@@ -45,6 +46,7 @@ set (sources
   Material.cc
   MovableText.cc
   OrbitViewController.cc
+  OrthoViewController.cc
   Projector.cc
   RayQuery.cc
   RenderEngine.cc
@@ -76,6 +78,7 @@ if (NOT USE_EXTERNAL_TINYXML)
 endif()
 
 set (headers
+  ApplyWrenchVisual.hh
   ArrowVisual.hh
   AxisVisual.hh
   Camera.hh
@@ -99,6 +102,7 @@ set (headers
   Material.hh
   MovableText.hh
   OrbitViewController.hh
+  OrthoViewController.hh
   Projector.hh
   RayQuery.hh
   RenderEngine.hh

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,17 @@
  *
 */
 
-#include "gazebo/rendering/RenderEvents.hh"
+#ifndef _GAZEBO_PROJECTION_TEST_HH_
+#define _GAZEBO_PROJECTION_TEST_HH_
 
-using namespace gazebo;
-using namespace rendering;
+#include "gazebo/gui/QTestFixture.hh"
 
-event::EventT<void (const std::string &)> Events::createScene;
-event::EventT<void (const std::string &)> Events::removeScene;
-event::EventT<void (const int32_t)> Events::toggleLayer;
-event::EventT<void (const int32_t)> Events::newLayer;
+/// \brief A test class for orthographic and perspective projections
+class Projection_TEST : public QTestFixture
+{
+  Q_OBJECT
+
+  /// \brief Test orthographic and perspective projections.
+  private slots: void Projection();
+};
+#endif
