@@ -61,7 +61,9 @@ extern ModelRightMenu *g_modelRightMenu;
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
 {
+  // Load the rendering engine.
   rendering::load();
+
   this->setObjectName("GLWidget");
   this->state = "select";
   this->sceneCreated = false;
@@ -80,10 +82,6 @@ GLWidget::GLWidget(QWidget *_parent)
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
-  /*this->connections.push_back(
-      rendering::Events::ConnectCreateScene(
-        boost::bind(&GLWidget::OnCreateScene, this, _1)));
-  */
 
   this->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -182,29 +180,28 @@ void GLWidget::Init()
 {
   std::string winHandle = this->GetOgreHandle();
 
-  //QApplication::flush();
-  //QApplication::syncX();
+  QApplication::flush();
+  QApplication::syncX();
 
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(winHandle, this->width(), this->height());
 
-  std::cout << "My Window Id=" << this->windowId << "\n";
-
   rendering::init();
+
   this->scene = rendering::create_scene(gui::get_world(), true);
+
   if (!this->scene)
-    std::cerr << "!!!!!!!!!!!!!!!!!!!Unable to create scene\n";
-
-  this->OnCreateScene(this->scene->GetName());
-
-  if (!this->sceneCreated)
+  {
+    gzerr << "GLWidget could not create a scene. This will likely result "
+      << "in a blank screen.\n";
+    return;
+  }
+  else
   {
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
       this->windowId, this->userCamera);
     this->sceneCreated = true;
   }
-
-  this->renderFrame->lower();
 }
 
 /////////////////////////////////////////////////
@@ -264,27 +261,6 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 /////////////////////////////////////////////////
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
-  /*if (!this->sceneCreated)
-  {
-    this->sceneCreated =
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->windowId, this->userCamera);
-  }*/
-
-  // Timing may cause GLWidget to miss the OnCreateScene event. So, we check
-  // here to make sure it's handled.
-  /*if (!this->sceneCreated)// && rendering::get_scene())
-  {
-    std::cerr << "Paint event, create[" << this->width() << "x" << this->height() << "]\n";
-
-    if (!rendering::get_scene())
-    {
-      this->scene = rendering::create_scene(gui::get_world(), true);
-    }
-
-std::cerr << "4\n";
-  }*/
-
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
   {
@@ -301,6 +277,7 @@ std::cerr << "4\n";
   }
 
   this->update();
+
   _e->accept();
 }
 
@@ -875,21 +852,15 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   else
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
-  std::cerr << "Create User Camera\n";
   if (_scene->GetUserCameraCount() == 0)
   {
-    std::cerr << "NO user cameras\n";
     this->userCamera = _scene->CreateUserCamera(cameraName,
         gazebo::gui::getINIProperty<int>("rendering.stereo", 0));
   }
   else
   {
-    std::cerr << "Has user camera\n";
     this->userCamera = _scene->GetUserCamera(0);
   }
-
-   std::cerr << "Resize camera WxH[" << this->width() << " " << this->height() << "]\n";
-  //this->userCamera->Resize(this->width(), this->height());
 
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
@@ -903,12 +874,6 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
   this->userCamera->SetWorldPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
-
-  /*if (this->windowId >= 0)
-  {
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-        this->windowId, this->userCamera);
-  }*/
 }
 
 /////////////////////////////////////////////////
