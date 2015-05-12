@@ -239,12 +239,6 @@ RenderWidget::~RenderWidget()
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::Init()
-{
-  // this->glWidget->Init();
-}
-
-/////////////////////////////////////////////////
 void RenderWidget::InsertWidget(unsigned int _index, QWidget *_widget)
 {
   if (static_cast<int>(_index) <= this->splitter->count())

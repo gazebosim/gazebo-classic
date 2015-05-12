@@ -222,8 +222,6 @@ MainWindow::~MainWindow()
 /////////////////////////////////////////////////
 void MainWindow::Load()
 {
-  this->renderWidget->Init();
-
   this->CreateEditors();
 
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);

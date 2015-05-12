@@ -174,12 +174,6 @@ GLWidget::GLWidget(QWidget *_parent)
   connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
           SLOT(OnPerspective()));
 
-	  this->Init();
-}
-
-/////////////////////////////////////////////////
-void GLWidget::Init()
-{
   std::string winHandle = this->GetOgreHandle();
 
   QApplication::flush();
@@ -196,7 +190,6 @@ void GLWidget::Init()
   {
     gzerr << "GLWidget could not create a scene. This will likely result "
       << "in a blank screen.\n";
-    return;
   }
   else
   {
@@ -610,7 +603,6 @@ void GLWidget::OnMousePressMakeEntity()
 /////////////////////////////////////////////////
 void GLWidget::wheelEvent(QWheelEvent *_event)
 {
-std::cout << "Wheel Event\n";
   if (!this->scene)
     return;
 
