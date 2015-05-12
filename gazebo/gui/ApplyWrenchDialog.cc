@@ -14,6 +14,11 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -22,6 +27,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/ApplyWrenchVisual.hh"
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ApplyWrenchDialogPrivate.hh"
@@ -393,10 +399,16 @@ void ApplyWrenchDialog::Init(const std::string &_modelName,
     const std::string &_linkName)
 {
   if (!this->SetModel(_modelName))
+  {
+    this->Fini();
     return;
+  }
 
   if (!this->SetLink(_linkName))
+  {
+    this->Fini();
     return;
+  }
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
 
@@ -410,6 +422,12 @@ void ApplyWrenchDialog::Fini()
   this->dataPtr->wrenchPub.reset();
   this->dataPtr->node->Fini();
   this->dataPtr->connections.clear();
+
+  if (this->dataPtr->applyWrenchVisual)
+  {
+    this->dataPtr->applyWrenchVisual->Fini();
+  }
+  this->dataPtr->applyWrenchVisual.reset();
 
   this->deleteLater();
 }
@@ -529,6 +547,7 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
     return false;
   }
   this->dataPtr->linkVisual = vis;
+  this->AttachVisuals();
 
   // Set publisher
   std::string topicName = "~/";
@@ -693,6 +712,15 @@ void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
   {
     this->dataPtr->forcePosRadio->setChecked(true);
   }
+
+  // Visuals
+  if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "No wrench visual found, so it won't be updated" << std::endl;
+    return;
+  }
+
+  this->dataPtr->applyWrenchVisual->SetForcePos(this->dataPtr->forcePosVector);
 }
 
 /////////////////////////////////////////////////
@@ -705,6 +733,15 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force)
   this->SetSpinValue(this->dataPtr->forceYSpin, _force.y);
   this->SetSpinValue(this->dataPtr->forceZSpin, _force.z);
   this->SetSpinValue(this->dataPtr->forceMagSpin, _force.GetLength());
+
+  // Visuals
+  if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "No wrench visual found, so it won't be updated" << std::endl;
+    return;
+  }
+
+  this->dataPtr->applyWrenchVisual->SetForce(_force);
 }
 
 /////////////////////////////////////////////////
@@ -717,6 +754,30 @@ void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque)
   this->SetSpinValue(this->dataPtr->torqueYSpin, _torque.y);
   this->SetSpinValue(this->dataPtr->torqueZSpin, _torque.z);
   this->SetSpinValue(this->dataPtr->torqueMagSpin, _torque.GetLength());
+
+  // Visuals
+  if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "No wrench visual found, so it won't be updated" << std::endl;
+    return;
+  }
+
+  this->dataPtr->applyWrenchVisual->SetTorque(_torque);
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::SetCoM(const math::Vector3 &_com)
+{
+  this->dataPtr->comVector = _com;
+
+  // Visuals
+  if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "No wrench visual found, so it won't be updated" << std::endl;
+    return;
+  }
+
+  this->dataPtr->applyWrenchVisual->SetCoM(this->dataPtr->comVector);
 }
 
 /////////////////////////////////////////////////
@@ -732,4 +793,64 @@ void ApplyWrenchDialog::OnPreRender()
   if (!vis)
     this->Fini();
 }
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::AttachVisuals()
+{
+  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
+  {
+    gzerr << "Camera or scene missing" << std::endl;
+    return;
+  }
+  if (!this->dataPtr->linkVisual)
+  {
+    gzerr << "No link visual specified." << std::endl;
+    return;
+  }
+
+  // Attaching for the first time
+  if (!this->dataPtr->applyWrenchVisual)
+  {
+    // Generate unique name
+    std::string visNameBase = this->dataPtr->modelName + "__APPLY_WRENCH__";
+    rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+        GetVisual(visNameBase);
+
+    std::string visName(visNameBase);
+    int count = 0;
+    while (vis)
+    {
+      visName = visNameBase + std::to_string(count);
+      vis = gui::get_active_camera()->GetScene()->GetVisual(visName);
+      ++count;
+    }
+
+    this->dataPtr->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(
+        visName, this->dataPtr->linkVisual));
+
+    this->dataPtr->applyWrenchVisual->Load();
+  }
+  // Different link
+  else if (!this->dataPtr->applyWrenchVisual->GetParent() ||
+      this->dataPtr->applyWrenchVisual->GetParent() !=
+      this->dataPtr->linkVisual)
+  {
+    this->dataPtr->linkVisual->AttachVisual(this->dataPtr->applyWrenchVisual);
+    this->dataPtr->applyWrenchVisual->Resize();
+  }
+
+  if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzwarn << "Failed to attach wrench visual. " <<
+        "Dialog will work without it." << std::endl;
+  }
+
+  // Set COM
+  this->SetCoM(this->dataPtr->linkToCOMMap[this->dataPtr->linkName]);
+  // Apply force at com by default
+  this->SetForcePos(this->dataPtr->comVector);
+  this->SetTorque(this->dataPtr->torqueVector);
+  this->SetForce(this->dataPtr->forceVector);
+}
+
 

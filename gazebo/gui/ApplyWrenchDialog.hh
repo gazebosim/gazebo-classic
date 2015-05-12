@@ -119,21 +119,28 @@ namespace gazebo
       /// \param[in] _value New value.
       private: void SetSpinValue(QDoubleSpinBox *_spin, double _value);
 
-      /// \brief Set force position vector and update spins.
+      /// \brief Set force position vector, send it to visuals and update spins.
       /// \param[in] _forcePos New force position.
       private: void SetForcePos(const math::Vector3 &_forcePos);
 
-      /// \brief Set force vector and update spins.
+      /// \brief Set force vector, send it to visuals and update spins.
       /// \param[in] _force New force.
       private: void SetForce(const math::Vector3 &_force);
 
-      /// \brief Set torque vector and update spins.
+      /// \brief Set torque vector, send it to visuals and update spins.
       /// \param[in] _torque New torque.
       private: void SetTorque(const math::Vector3 &_torque);
 
       /// \brief Callback on prerender to check if target link hasn't been
       /// deleted.
       private: void OnPreRender();
+
+      /// \brief Attach apply wrench visual to target link.
+      private: void AttachVisuals();
+
+      /// \brief Set CoM vector and send it to visuals.
+      /// \param[in] _com CoM position in link frame.
+      private: void SetCoM(const math::Vector3 &_com);
 
       /// \internal
       /// \brief Pointer to private data.

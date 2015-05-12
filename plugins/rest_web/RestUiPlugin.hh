@@ -18,8 +18,8 @@
 #ifndef _REST_UI_PLUGIN_HH_
 #define _REST_UI_PLUGIN_HH_
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/gui/qt.h>
