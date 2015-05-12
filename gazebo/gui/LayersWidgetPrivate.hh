@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
+#ifndef _GAZEBO_LAYERS_WIDGET_PRIVATE_HH_
+#define _GAZEBO_LAYERS_WIDGET_PRIVATE_HH_
 
-#include "gazebo/rendering/RenderEvents.hh"
+#include <vector>
+#include "gazebo/gui/qt.h"
 
-using namespace gazebo;
-using namespace rendering;
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \internal
+    /// \brief Private data for the LayersWidget class.
+    class LayersWidgetPrivate
+    {
+      /// \brief List of all the layers
+      public: QListWidget *layerList;
 
-event::EventT<void (const std::string &)> Events::createScene;
-event::EventT<void (const std::string &)> Events::removeScene;
-event::EventT<void (const int32_t)> Events::toggleLayer;
-event::EventT<void (const int32_t)> Events::newLayer;
+      /// \brief Event connections
+      public: std::vector<event::ConnectionPtr> connections;
+    };
+  }
+}
+#endif
