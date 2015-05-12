@@ -61,8 +61,8 @@ gz_add_executable(gzserver server_main.cc)
 gz_add_executable(gazebo gazebo_main.cc)
 
 target_link_libraries(gzserver
-  gazebo_common
   libgazebo
+  gazebo_common
   gazebo_util
   gazebo_transport
   gazebo_physics
