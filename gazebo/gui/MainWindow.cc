@@ -137,6 +137,13 @@ MainWindow::MainWindow()
   this->splitter->addWidget(this->toolsWidget);
   this->splitter->setContentsMargins(0, 0, 0, 0);
 
+#ifdef _WIN32
+  // The splitter appears solid white in Windows, so we make it transparent.
+  this->splitter->setStyleSheet(
+  "QSplitter { color: #ffffff; background-color: transparent; }"
+  "QSplitter::handle { color: #ffffff; background-color: transparent; }");
+#endif
+
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
   sizes.push_back(this->width() - MINIMUM_TAB_WIDTH);
