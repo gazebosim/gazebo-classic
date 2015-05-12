@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_ELEVATOR_PLUGIN_HH_
 #define _GAZEBO_ELEVATOR_PLUGIN_HH_
 
+#include <mutex>
+
 #include <sdf/sdf.hh>
 
 #include <gazebo/transport/Node.hh>
@@ -30,6 +32,8 @@
 
 namespace gazebo
 {
+  /// \brief Plugin to control a elevator. This plugin will listen for
+  /// door and lift events.
   class GAZEBO_VISIBLE ElevatorPlugin : public ModelPlugin
   {
     /// \brief Constructor.
@@ -38,18 +42,23 @@ namespace gazebo
     /// \brief Destructor.
     public: ~ElevatorPlugin();
 
-    /// \brief Load the plugin.
-    /// \param[in] _world Pointer to world
-    /// \param[in] _sdf Pointer to the SDF configuration.
+    // Documentation inherited
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    /// \brief Update the plugin once every iteration of simulation.
     private: void Update();
 
+    /// \brief Receives messages on the elevator's topic.
+    /// \param[in] _msg The string message that contains a command.
     private: void OnElevator(ConstGzStringPtr &_msg);
 
-    /// \brief World pointer.
+    /// \brief Pointer to the elevator model.
     private: physics::ModelPtr model;
+
+    /// \brief Pointer to the joint that lifts the elevator
     private: physics::JointPtr liftJoint;
+
+    /// \brief Pointer to the joint that opens the door
     private: physics::JointPtr doorJoint;
 
     /// \brief SDF pointer.
@@ -58,93 +67,196 @@ namespace gazebo
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
 
+    /// \brief Node for communication
     private: transport::NodePtr node;
+
+    /// \brief Used to subscribe to command message. This will call the
+    /// OnElevator function when a message arrives.
     private: transport::SubscriberPtr elevatorSub;
 
+    /// \brief Controller for opening and closing the elevator door.
     private: class DoorController
              {
+               /// \brief Door targets.
                public: enum Target {OPEN, CLOSE};
+
+               /// \brief Door motion states
                public: enum State {MOVING, STATIONARY};
 
+               /// \brief Constructor
+               /// \param[in] _doorJoint Pointer to the joint that should be
+               /// controlled.
                public: DoorController(physics::JointPtr _doorJoint);
+
+               /// \brief Set the target for the door (OPEN or CLOSE).
+               /// \param[in] _target The target for the door.
                public: void SetTarget(
                            ElevatorPlugin::DoorController::Target _target);
 
+               /// \brief Get the current state.
+               /// \return Current state.
                public: ElevatorPlugin::DoorController::State GetState() const;
+
+               /// \brief Get the current target.
+               /// \return Current target.
                public: ElevatorPlugin::DoorController::Target GetTarget() const;
 
+               /// \brief Update the controller.
                public: virtual bool Update();
 
+               /// \brief Pointer to the door joint.
                public: physics::JointPtr doorJoint;
+
+               /// \brief Current door state
                public: State state;
+
+               /// \brief Current door target
                public: Target target;
+
+               /// \brief PID controller for the door.
                public: common::PID doorPID;
              };
 
+    /// \brief Controller for raising and lowering the elevator.
     private: class LiftController
              {
+               /// \brief Lift stat
                public: enum State {MOVING, STATIONARY};
+
+               /// \brief Constructor
+               /// \param[in] _liftJoint Pointer to the joint that should be
+               /// controlled.
                public: LiftController(physics::JointPtr _liftJoint);
+
+               /// \brief Set the current floor to move to.
+               /// \param[in] _floor Floor number.
                public: void SetFloor(int _floor);
+
+               /// \brief Get the current floor.
+               /// \return Floor number
                public: int GetFloor() const;
+
+               /// \brief Get the current state.
+               /// \return Current lift state.
                public: ElevatorPlugin::LiftController::State GetState() const;
 
+               /// \brief Update the controller.
                public: virtual bool Update();
 
+               /// \brief State of the controller.
                public: State state;
+
+               /// \brief Floor the elevator is on or moving to.
                public: int floor;
+
+               /// \brief Joint to control
                public: physics::JointPtr liftJoint;
+
+               /// \brief PID controller.
                public: common::PID liftPID;
              };
 
+    /// \brief State base class
     private: class State
              {
+               /// \brief Constructor
                public: State() : started(false) {}
+
+               /// \brief State name
                public: std::string name;
+
+               /// \brief Used to start a state.
                public: virtual void Start() {}
+
+               /// \brief Used to update a state.
                public: virtual bool Update() {return true;}
+
+               /// \brief True when started.
                protected: bool started;
              };
 
+    /// \brief State used to close the elevator door.
     private: class CloseState : public State
              {
+               /// \brief Constructor.
+               /// \param[in] _ctrl Elevator door controller
                public: CloseState(ElevatorPlugin::DoorController *_ctrl);
+
+               // Documentation inherited
                public: virtual void Start();
+
+               // Documentation inherited
                public: virtual bool Update();
+
+               /// \brief Pointer to the door controller.
                public: ElevatorPlugin::DoorController *ctrl;
              };
 
+    /// \brief State used to open the elevator door.
     private: class OpenState : public State
              {
+               /// \brief Constructor.
+               /// \param[in] _ctrl Elevator door controller
                public: OpenState(ElevatorPlugin::DoorController *_ctrl);
+
+               // Documentation inherited
                public: virtual void Start();
+
+               // Documentation inherited
                public: virtual bool Update();
+
+               /// \brief Pointer to the door controller.
                public: ElevatorPlugin::DoorController *ctrl;
              };
 
+    /// \brief State used to move the elevator to a floor.
     private: class MoveState : public State
              {
+               /// \brief Constructor
                public: MoveState(int _floor, LiftController *_ctrl);
+
+               // Documentation inherited
                public: virtual void Start();
+
+               // Documentation inherited
                public: virtual bool Update();
+
+               /// \brief Target floor number.
                public: int floor;
+
+               /// \brief Lift controller.
                public: LiftController *ctrl;
              };
 
+    /// \brief State used to make the elevetor wait.
     private: class WaitState : public State
              {
+               /// \brief Constructor
                public: WaitState();
+
+               // Documentation inherited
                public: virtual void Start();
+
+               // Documentation inherited
                public: virtual bool Update();
+
+               /// \brief Start time.
                public: common::Time start;
              };
 
+    /// \brief Door controller.
     private: DoorController *doorController;
+
+    /// \brief Lift controller.
     private: LiftController *liftController;
 
+    /// \brief List of states that should be executed.
     private: std::list<State*> states;
 
-    private: boost::mutex stateMutex;
+    /// \brief Mutex to protect states.
+    private: std::mutex stateMutex;
+
+    private: float floorHeight;
   };
 }
 #endif

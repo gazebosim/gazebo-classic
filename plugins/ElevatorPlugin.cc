@@ -37,6 +37,13 @@ ElevatorPlugin::ElevatorPlugin()
 /////////////////////////////////////////////////
 ElevatorPlugin::~ElevatorPlugin()
 {
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+
+  delete this->doorController;
+  this->doorController = NULL;
+
+  delete this->liftController;
+  this->liftController = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -47,12 +54,22 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->model = _model;
   this->sdf = _sdf;
 
-  this->sdf->PrintValues("");
+  // Get the elevator topic.
   std::string elevatorTopic = "~/elevator";
   if (this->sdf->HasElement("topic"))
     elevatorTopic = this->sdf->Get<std::string>("topic");
-  std::cout << "ELEVATOR TOPIC[" << elevatorTopic << "]\n";
 
+  if (this->sdf->HasElement("floor_height"))
+    this->floorHeight = this->sdf->Get<float>("floor_height");
+  else
+  {
+    this->floorHeight = 3.0;
+    gzwarn << "No <floor_height> specified for elevator plugin. "
+           << "Using a height of 3 meters. This value may cause "
+           << "the elevator to move incorrectly.\n";
+  }
+
+  // Get the lift joint
   std::string liftJointName = this->sdf->Get<std::string>("lift_joint");
   this->liftJoint = this->model->GetJoint(liftJointName);
   if (!this->liftJoint)
@@ -62,6 +79,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return;
   }
 
+  // Get the door joint
   std::string doorJointName = this->sdf->Get<std::string>("door_joint");
   this->doorJoint = this->model->GetJoint(doorJointName);
   if (!this->doorJoint)
@@ -71,15 +89,19 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return;
   }
 
+  // Create the door and lift controllers.
   this->doorController = new DoorController(this->doorJoint);
   this->liftController = new LiftController(this->liftJoint);
 
+  // Connect to the update event.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&ElevatorPlugin::Update, this));
 
+  // Create the node for communication
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->GetName());
 
+  // Subscribe to the elevator topic.
   this->elevatorSub = this->node->Subscribe(elevatorTopic,
       &ElevatorPlugin::OnElevator, this);
 }
@@ -87,19 +109,30 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->stateMutex);
+  std::lock_guard<std::mutex> lock(this->stateMutex);
 
+  // Ignore messages when the elevator is currently busy.
   if (!this->states.empty())
     return;
 
+  // Currently we only expect the message to contain a floor to move to.
   try
   {
-    int floor = boost::lexical_cast<int>(_msg->data());
+    int floor = std::stoi(_msg->data());
 
+    // Step 1: close the door.
     this->states.push_back(new CloseState(this->doorController));
+
+    // Step 2: Move to the correct floor.
     this->states.push_back(new MoveState(floor, this->liftController));
+
+    // Step 3: Open the door
     this->states.push_back(new OpenState(this->doorController));
+
+    // Step 4: Wait
     this->states.push_back(new WaitState);
+
+    // Step 5: Close the door
     this->states.push_back(new CloseState(this->doorController));
   }
   catch(...)
@@ -112,11 +145,12 @@ void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void ElevatorPlugin::Update()
 {
-  boost::mutex::scoped_lock lock(this->stateMutex);
+  std::lock_guard<std::mutex> lock(this->stateMutex);
 
   // Process the states
   if (!this->states.empty())
   {
+    // Update the front state, and remove it if the state is done
     if (this->states.front()->Update())
     {
       this->states.pop_front();
@@ -302,7 +336,7 @@ ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint)
 bool ElevatorPlugin::LiftController::Update()
 {
   double error = this->liftJoint->GetAngle(0).Radian() -
-    (this->floor * 3) + 0.1;
+    (this->floor * this->floorHeight) + 0.1;
   double force = this->liftPID.Update(error, common::Time(0, 1000000));
 
   this->liftJoint->SetForce(0, force);

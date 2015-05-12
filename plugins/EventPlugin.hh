@@ -37,11 +37,10 @@ namespace gazebo
     /// \brief Destructor.
     public: ~EventPlugin();
 
-    /// \brief Load the plugin.
-    /// \param[in] _world Pointer to world
-    /// \param[in] _sdf Pointer to the SDF configuration.
+    // Documentation inherited
     public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
+    /// \brief World update callback.
     private: void Update();
 
     /// \brief World pointer.
