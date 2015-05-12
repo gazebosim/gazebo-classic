@@ -82,7 +82,6 @@ GLWidget::GLWidget(QWidget *_parent)
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
-
   this->connections.push_back(
       rendering::Events::ConnectRemoveScene(
         boost::bind(&GLWidget::OnRemoveScene, this, _1)));
@@ -199,7 +198,7 @@ void GLWidget::Init()
   else
   {
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->windowId, this->userCamera);
+		  this->windowId, this->userCamera);
     this->sceneCreated = true;
   }
 }
@@ -904,8 +903,10 @@ std::string GLWidget::GetOgreHandle() const
 {
   std::ostringstream ogreHandle;
 
-#if defined(__APPLE__) || defined(WIN32)
+#if defined(__APPLE__)
   ogreHandle << (unsigned long)(this->winId());
+#elif defined(WIN32)
+  ogreHandle << reinterpret_cast<uint64_t>(this->renderFrame->winId());
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
