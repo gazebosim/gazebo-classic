@@ -157,7 +157,7 @@ macro (gz_setup_windows)
 
     if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
       # Not need if proper cmake gnerator (-G "...Win64") is passed to cmake
-      # Enable as a second measeure to workaround over bug
+      # Enable as a second measure to workaround over bug
       # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240 
       set(CMAKE_SHARED_LINKER_FLAGS "/machine:x64")
     endif()
