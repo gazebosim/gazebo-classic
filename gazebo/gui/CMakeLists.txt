@@ -5,6 +5,7 @@ include ( ${QT_USE_FILE} )
 link_directories(
   ${Boost_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
+  ${TBB_LIBRARYDIR}
 )
 
 include_directories(
@@ -20,6 +21,8 @@ add_subdirectory(building)
 add_subdirectory(model)
 add_subdirectory(terrain)
 add_subdirectory(viewers)
+
+include_directories(${TBB_INCLUDEDIR})
 
 set (sources
   Actions.cc
@@ -170,13 +173,10 @@ set (resources resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
+
 gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 gz_add_executable(gzclient main.cc)
-
-add_dependencies(gazebo_gui gazebo_msgs)
-add_dependencies(gzclient gazebo_gui)
-
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
 
 target_link_libraries(gazebo_gui
   libgazebo_client

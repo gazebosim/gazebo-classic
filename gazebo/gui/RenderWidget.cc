@@ -42,7 +42,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("renderWidget");
-  this->show();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
@@ -237,6 +236,12 @@ RenderWidget::~RenderWidget()
 
   // we created the scene here we are responsible for removing it.
   rendering::remove_scene(gui::get_world());
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::Init()
+{
+  this->glWidget->Init();
 }
 
 /////////////////////////////////////////////////

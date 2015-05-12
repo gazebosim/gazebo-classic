@@ -63,6 +63,8 @@ namespace gazebo
       public: GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
+      public: void Init();
+
       /// \brief View a scene in this widget.
       /// This will use the scene's UserCamera to visualize the scene.
       /// If a UserCamera does not exist, one is created with the
@@ -83,7 +85,6 @@ namespace gazebo
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
-      protected: virtual void showEvent(QShowEvent *_e);
       protected: virtual void enterEvent(QEvent * event);
 
 

@@ -148,6 +148,11 @@ void RenderEngine::Load()
     // Setup the available resources
     this->SetupResources();
   }
+
+    std::stringstream stream;
+    stream << (int32_t)this->dummyWindowId;
+
+    this->windowManager->CreateWindow(stream.str(), 1, 1);
 }
 
 //////////////////////////////////////////////////
