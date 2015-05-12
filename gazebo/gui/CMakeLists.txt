@@ -5,7 +5,6 @@ include ( ${QT_USE_FILE} )
 link_directories(
   ${Boost_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
-  ${TBB_LIBRARYDIR}
 )
 
 include_directories(
@@ -21,8 +20,6 @@ add_subdirectory(building)
 add_subdirectory(model)
 add_subdirectory(terrain)
 add_subdirectory(viewers)
-
-include_directories(${TBB_INCLUDEDIR})
 
 set (sources
   Actions.cc

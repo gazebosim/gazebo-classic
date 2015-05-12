@@ -148,11 +148,6 @@ void RenderEngine::Load()
     // Setup the available resources
     this->SetupResources();
   }
-
-    std::stringstream stream;
-    stream << (int32_t)this->dummyWindowId;
-
-    this->windowManager->CreateWindow(stream.str(), 1, 1);
 }
 
 //////////////////////////////////////////////////
@@ -291,6 +286,7 @@ void RenderEngine::PostRender()
 //////////////////////////////////////////////////
 void RenderEngine::Init()
 {
+  // Create a window if one does not exist. gzserver makes use of this.
   if (this->windowManager->WindowCount() <= 0)
   {
     std::stringstream stream;

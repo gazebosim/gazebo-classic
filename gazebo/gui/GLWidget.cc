@@ -173,6 +173,8 @@ GLWidget::GLWidget(QWidget *_parent)
   // Connect the perspective action
   connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
           SLOT(OnPerspective()));
+
+	  this->Init();
 }
 
 /////////////////////////////////////////////////
