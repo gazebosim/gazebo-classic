@@ -145,5 +145,11 @@ if (UNIX)
 endif()
 gz_install_library(libgazebo_client)
 
-set(headers Server.hh Master.hh gazebo.hh gazebo_core.hh)
+set(headers
+  gazebo_client.hh
+  gazebo_core.hh
+  gazebo.hh
+  Master.hh
+  Server.hh
+)
 gz_install_includes("" ${headers})
