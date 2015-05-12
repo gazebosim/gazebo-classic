@@ -39,6 +39,7 @@ set (sources
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
+  LayersWidget.cc
   LightMaker.cc
   LogPlayWidget.cc
   MainWindow.cc
@@ -80,6 +81,7 @@ set (qt_headers
   GLWidget.hh
   InsertModelWidget.hh
   JointControlWidget.hh
+  LayersWidget.hh
   LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
@@ -153,6 +155,7 @@ if (ENABLE_SCREEN_TESTS)
       ConfigWidget_TEST.cc
       GLWidget_TEST.cc
       GLWidget_TEST2.cc
+      LayersWidget_TEST.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
       ModelSnap_TEST.cc

@@ -148,9 +148,11 @@ void LiftDragPlugin::OnUpdate()
   // ldNormal vector to lift-drag-plane described in inertial frame
   math::Vector3 ldNormal = forwardI.Cross(upwardI).Normalize();
 
+  double min = -1;
+  double max = 1;
   // check sweep (angle between vel and lift-drag-plane)
   double sinSweepAngle =
-      math::clamp(ldNormal.Dot(vel) / vel.GetLength(), -1.0, 1.0);
+      math::clamp(ldNormal.Dot(vel) / vel.GetLength(), min, max);
 
   // get cos from trig identity
   double cosSweepAngle2 = 1.0 - sinSweepAngle * sinSweepAngle;
@@ -184,22 +186,9 @@ void LiftDragPlugin::OnUpdate()
   math::Vector3 momentDirection = ldNormal;
 
   double forwardVelocity = forwardI.GetLength() * velInLDPlane.GetLength();
-  double min = -1+1e-6;
-  double max = 1-1e-6;
   double cosAlpha = math::clamp(
     forwardI.Dot(velInLDPlane) / forwardVelocity, min, max);
 
-  // should never happen
-  if (cosAlpha >= max)
-  {
-    //gzwarn << "cosAlpha greater than domain for arccos!" << std::endl;
-    cosAlpha = max;
-  }
-  else if (cosAlpha <= min)
-  {
-    //gzwarn << "cosAlpha less than domain for arccos!" << std::endl;
-    cosAlpha = min;
-  }
   // gzerr << "ca " << forwardI.Dot(velInLDPlane) /
   //   (forwardI.GetLength() * velInLDPlane.GetLength()) << "\n";
 
@@ -338,6 +327,11 @@ void LiftDragPlugin::OnUpdate()
     gzerr << "force: " << force << "\n";
     gzerr << "torque: " << torque << "\n";
   }
+
+  // Correct for nan or inf
+  force.Correct();
+  this->cp.Correct();
+  torque.Correct();
 
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);

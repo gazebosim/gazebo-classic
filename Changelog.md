@@ -5,6 +5,10 @@
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
 
+1. Get/Set user camera pose in GUI.
+    * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
+    * [Issue #1595](https://bitbucket.org/osrf/gazebo/issue/1595)
+
 1. Windows support. This consists mostly of numerous small changes to support
 compilation on Windows.
     * [Pull request #1616](https://bitbucket.org/osrf/gazebo/pull-request/1616)
@@ -144,6 +148,9 @@ compilation on Windows.
 
 1. Added Apply Force/Torque dialog
     * [Pull request #1600](https://bitbucket.org/osrf/gazebo/pull-request/1600)
+
+1. Added Apply Force/Torque visuals
+    * [Pull request #1619](https://bitbucket.org/osrf/gazebo/pull-request/1619)
 
 1. Added inertia pose getter for COMVisual and COMVisual_TEST
     * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)

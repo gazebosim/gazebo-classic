@@ -34,7 +34,6 @@ SimbodyCollision::SimbodyCollision(LinkPtr _parent)
 //////////////////////////////////////////////////
 SimbodyCollision::~SimbodyCollision()
 {
-  delete this->collisionShape;
   this->collisionShape = NULL;
 }
 
