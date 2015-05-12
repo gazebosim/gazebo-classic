@@ -199,9 +199,9 @@ void GLWidget::Init()
 
   if (!this->sceneCreated)
   {
-    this->sceneCreated =
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
 		  this->windowId, this->userCamera);
+    this->sceneCreated = true;
   }
 
   this->renderFrame->lower();
@@ -1384,4 +1384,10 @@ void GLWidget::OnPerspective()
   g_fpsAct->setEnabled(true);
   g_orbitAct->setEnabled(true);
   this->userCamera->SetProjectionType("perspective");
+}
+
+/////////////////////////////////////////////////
+QPaintEngine *GLWidget::paintEngine() const
+{
+  return NULL;
 }
