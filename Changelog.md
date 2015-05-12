@@ -145,6 +145,9 @@ compilation on Windows.
 1. Added Apply Force/Torque dialog
     * [Pull request #1600](https://bitbucket.org/osrf/gazebo/pull-request/1600)
 
+1. Added Apply Force/Torque visuals
+    * [Pull request #1619](https://bitbucket.org/osrf/gazebo/pull-request/1619)
+
 1. Added inertia pose getter for COMVisual and COMVisual_TEST
     * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)
 

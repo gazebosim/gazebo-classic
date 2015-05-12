@@ -22,6 +22,7 @@ include_directories(${tinyxml_INCLUDE_DIRS})
 link_directories(${tinyxml_LIBRARY_DIRS})
 
 set (sources
+  ApplyWrenchVisual.cc
   ArrowVisual.cc
   AxisVisual.cc
   Camera.cc
@@ -77,6 +78,7 @@ if (NOT USE_EXTERNAL_TINYXML)
 endif()
 
 set (headers
+  ApplyWrenchVisual.hh
   ArrowVisual.hh
   AxisVisual.hh
   Camera.hh
