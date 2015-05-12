@@ -303,6 +303,7 @@ dxBody *dBodyCreate (dxWorld *w)
 
   b->contactp = NULL;
 
+  b->id_mode = false;
   return b;
 }
 

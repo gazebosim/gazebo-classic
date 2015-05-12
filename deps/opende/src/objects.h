@@ -178,6 +178,7 @@ struct dxBody : public dObject {
   dxBody(dxWorld *w);
 
   dxContactParameters* contactp; // option to set contact max_vel and min_depths per body
+  bool id_mode;  // inverse dynamics mode, treat body velocity as rhs
 };
 
 
