@@ -96,6 +96,7 @@ namespace gazebo
 
       /// \brief Override paintEngine to stop Qt From trying to draw on top of
       /// OGRE.
+      /// \return NULL.
       protected: virtual QPaintEngine *paintEngine() const;
 
       private: std::string GetOgreHandle() const;

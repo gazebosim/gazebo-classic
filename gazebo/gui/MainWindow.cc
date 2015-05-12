@@ -128,6 +128,8 @@ MainWindow::MainWindow()
 
   this->renderWidget = new RenderWidget(mainWidget);
 
+  this->CreateEditors();
+
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
   this->splitter = new QSplitter(this);
@@ -222,8 +224,6 @@ MainWindow::~MainWindow()
 /////////////////////////////////////////////////
 void MainWindow::Load()
 {
-  this->CreateEditors();
-
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
 #ifdef HAVE_OCULUS
   int oculusAutoLaunch = getINIProperty<int>("oculus.autolaunch", 0);

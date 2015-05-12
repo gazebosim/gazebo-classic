@@ -895,7 +895,7 @@ std::string GLWidget::GetOgreHandle() const
   std::ostringstream ogreHandle;
 
 #if defined(__APPLE__)
-  ogreHandle << (unsigned long)(this->winId());
+  ogreHandle << reinterpret_cast<uint64_t>(this->winId());
 #elif defined(WIN32)
   ogreHandle << reinterpret_cast<uint64_t>(this->renderFrame->winId());
 #else
