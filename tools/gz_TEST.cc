@@ -616,11 +616,11 @@ TEST_F(gzTest, SDF)
   // Regenerate each sum using:
   // gz sdf -d -v <major.minor> | sha1sum'
   std::map<std::string, std::string> descSums;
-  descSums["1.0"] = "5235eb8464a96505c2a31fe96327d704e45c9cc4";
-  descSums["1.2"] = "870d8c02800c3ac75e85c58657ee8cc2c1079a92";
-  descSums["1.3"] = "549f8f2e9231820897616dac4da42220aafe5aa8";
-  descSums["1.4"] = "3d6e8cbd0410a6e65060f2f5c32f546d25af5873";
-  descSums["1.5"] = "273a4f016654ffc237bbf3638e9e2c013171d9da";
+  descSums["1.0"] = "a02fbc1275100569c99d860044563f669934c0fc";
+  descSums["1.2"] = "f524458ace57d6aabbbc2303da208f65af37ef53";
+  descSums["1.3"] = "74a3aa8d31f97328175f43d03410be55631fa0e1";
+  descSums["1.4"] = "057f26137669d9d7eeb5a8c6f51e4f4077d9ddcf";
+  descSums["1.5"] = "e4f109dcb78dbccc161614daee5f428519725ebb";
 
   // Test each descSum
   for (std::map<std::string, std::string>::iterator iter = descSums.begin();
@@ -639,7 +639,7 @@ TEST_F(gzTest, SDF)
   docSums["1.2"] = "27f9d91080ce8aa18eac27c9d899fde2d4b78785";
   docSums["1.3"] = "ad80986d42eae97baf277118f52d7e8b951d8ea1";
   docSums["1.4"] = "153ddd6ba6797c37c7fcddb2be5362c9969d97a1";
-  docSums["1.5"] = "ffbead7b207372d25db5419629365ff6fc27b12c";
+  docSums["1.5"] = "c06051e30115dd06e0c2b727f9e70bd3bcc88a38";
 
   // Test each docSum
   for (std::map<std::string, std::string>::iterator iter = docSums.begin();
@@ -670,7 +670,7 @@ TEST_F(gzTest, SDF)
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "8d705cf60cfdb944764bdc0176050168253aa752");
+    EXPECT_EQ(shasum, "64dcab58596d2d2dbc596a37ee198bda58cc2b8a");
   }
 
   path = PROJECT_BINARY_PATH;
