@@ -258,6 +258,11 @@
 
 ## Gazebo 4.0
 
+### Gazebo 4.x.x (2015-xx-xx)
+
+1. Fix build for Bullet 2.83, enable angle wrapping for BulletHingeJoint
+    * [Pull request #1664](https://bitbucket.org/osrf/gazebo/pull-request/1664)
+
 ### Gazebo 4.1.3 (2015-05-07)
 
 1. Fix heightmap model texture loading.
