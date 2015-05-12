@@ -154,14 +154,15 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
-  # Use pkg_check_modules and fallback to manual detection (needed, at least, for MacOS)
+  # Use pkg_check_modules and fallback to manual detection
+  # (needed, at least, for MacOS)
 
-  # Use of tinyxml. System installation on UNIX. Internal copy on WIN
-  if (UNIX)
+  # Use system installation on UNIX and Apple, and internal copy on Windows
+  if (UNIX OR APPLE)
     message (STATUS "Using system tinyxml.")
     set (USE_EXTERNAL_TINYXML True)
   elseif(WIN32)
-    message (STATUS "Using internal tinyxml code.")
+    message (STATUS "Using internal tinyxml.")
     set (USE_EXTERNAL_TINYXML False)
     add_definitions(-DTIXML_USE_STL)
   else()
