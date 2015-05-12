@@ -193,6 +193,7 @@ void GLWidget::Init()
   if (!this->sceneCreated)
   {
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+      this->windowId, this->userCamera);
 		  this->windowId, this->userCamera);
     this->sceneCreated = true;
   }
@@ -908,9 +909,8 @@ std::string GLWidget::GetOgreHandle() const
 {
   std::ostringstream ogreHandle;
 
-#if defined(__APPLE__)
-  ogreHandle << (unsigned)(this->winId());
-#elif defined(WIN32)
+#if defined(__APPLE__) || defined(WIN32)
+  ogreHandle << (unsigned long)(this->winId());
   ogreHandle << reinterpret_cast<uint64_t>(this->renderFrame->winId());
 #else
   QX11Info info = x11Info();
