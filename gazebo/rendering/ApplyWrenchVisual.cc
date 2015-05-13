@@ -93,6 +93,7 @@ void ApplyWrenchVisual::Fini()
   if (dPtr->rotTool &&
       dPtr->scene->GetVisual(dPtr->rotTool->GetName()))
   {
+    dPtr->rotTool->Fini();
     dPtr->scene->RemoveVisual(dPtr->rotTool);
   }
 
