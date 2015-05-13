@@ -33,4 +33,4 @@ target_link_libraries(integrated_main ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${P
 
 
 add_executable(independent_listener independent_listener.cc)
-target_link_libraries(independent_listener ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
+target_link_libraries(independent_listener ${GAZEBO_LIBRARIES} gazebo_client ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)

@@ -13,4 +13,4 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_executable(arrange_plugin_test arrange_plugin_test.cc)
-target_link_libraries(arrange_plugin_test ${GAZEBO_LIBRARIES} ${PROTOBUF_LIBRARIES})
+target_link_libraries(arrange_plugin_test ${GAZEBO_LIBRARIES} gazebo_client ${PROTOBUF_LIBRARIES})

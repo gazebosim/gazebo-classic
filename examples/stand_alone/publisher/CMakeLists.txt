@@ -15,5 +15,5 @@ find_package(Protobuf REQUIRED)
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
-add_executable(publisher  publisher.cc)
-target_link_libraries(publisher  ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
+add_executable(publisher publisher.cc)
+target_link_libraries(publisher ${GAZEBO_LIBRARIES} gazebo_client ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
