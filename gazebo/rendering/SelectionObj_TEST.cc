@@ -129,17 +129,23 @@ TEST_F(SelectionObj_TEST, LoadFini)
 
   EXPECT_TRUE(scene != NULL);
 
-  // Load
+  // Create and load visual
   rendering::SelectionObjPtr obj;
   obj.reset(new rendering::SelectionObj("obj", scene->GetWorldVisual()));
   obj->Load();
   EXPECT_TRUE(obj != NULL);
+
+  // Check that it was added to the scene (by Load)
   EXPECT_EQ(scene->GetVisual("obj"), obj);
 
-  // Fini
-  // obj->Fini();
+  // Finish visual and remove it from the scene
+  obj->Fini();
   scene->RemoveVisual(obj);
+
+  // Check that it was removed
   EXPECT_TRUE(scene->GetVisual("obj") == NULL);
+
+  // Reset pointer
   obj.reset();
   EXPECT_TRUE(obj == NULL);
 
@@ -148,11 +154,18 @@ TEST_F(SelectionObj_TEST, LoadFini)
   obj2.reset(new rendering::SelectionObj("obj", scene->GetWorldVisual()));
   obj2->Load();
   EXPECT_TRUE(obj2 != NULL);
-  EXPECT_EQ(scene->GetVisual("obj"), obj2);
-std::cout << obj2->GetName() << std::endl;
 
-  // Fini
+  // Check that the scene returns the new visual
+  EXPECT_EQ(scene->GetVisual("obj"), obj2);
+
+  // Finish visual and remove it from the scene
   obj2->Fini();
+  scene->RemoveVisual(obj2);
+
+  // Check that it was removed
+  EXPECT_TRUE(scene->GetVisual("obj") == NULL);
+
+  // Reset pointer
   obj2.reset();
   EXPECT_TRUE(obj2 == NULL);
 }

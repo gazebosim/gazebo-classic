@@ -89,76 +89,68 @@ void SelectionObj::Fini()
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  // Detach from the parent
-  if (dPtr->parent)
-    dPtr->parent->DetachVisual(this->GetName());
-
-  // Destroy objects and nodes
+  // Destroy objects and nodes created by this visual
   Ogre::SceneManager *manager = dPtr->scene->GetManager();
   if (!manager)
     return;
 
-  // Remove objects
+  // Destroy objects
   std::vector<std::string> prefixes = {
-      "__SELECTION_OBJ_ROT_X___",
-      "__SELECTION_OBJ_ROT_Y___",
-      "__SELECTION_OBJ_ROT_Z___"};
+      "__SELECTION_OBJ_TRANS_SHAFT_X__",
+      "__SELECTION_OBJ_TRANS_SHAFT_Y__",
+      "__SELECTION_OBJ_TRANS_SHAFT_Z__",
+      "__SELECTION_OBJ_TRANS_HEAD_X__",
+      "__SELECTION_OBJ_TRANS_HEAD_Y__",
+      "__SELECTION_OBJ_TRANS_HEAD_Z__",
+      "__SELECTION_OBJ_ROT_X__",
+      "__SELECTION_OBJ_ROT_Y__",
+      "__SELECTION_OBJ_ROT_Z__",
+      "__SELECTION_OBJ_SCALE_SHAFT_X__",
+      "__SELECTION_OBJ_SCALE_SHAFT_Y__",
+      "__SELECTION_OBJ_SCALE_SHAFT_Z__",
+      "__SELECTION_OBJ_SCALE_HEAD_X__",
+      "__SELECTION_OBJ_SCALE_HEAD_Y__",
+      "__SELECTION_OBJ_SCALE_HEAD_Z__",
+      };
 
   for (auto prefix : prefixes)
   {
     std::string name = prefix + this->GetName();
     if (manager->hasEntity(name))
+    {
       manager->destroyMovableObject(manager->getEntity(name));
-
-//    name += "NODE_";
-//    if (manager->hasSceneNode(name))
-//      manager->destroySceneNode(manager->getSceneNode(name));
+    }
   }
 
+  // Destroy nodes
+  prefixes = {
+      "__SELECTION_OBJ__TRANS_SHAFT_NODE_X__",
+      "__SELECTION_OBJ_TRANS_SHAFT_NODE_Y__",
+      "__SELECTION_OBJ_TRANS_SHAFT_NODE_Z__",
+      "__SELECTION_OBJ__TRANS_HEAD_NODE_X__",
+      "__SELECTION_OBJ_TRANS_HEAD_NODE_Y__",
+      "__SELECTION_OBJ_TRANS_HEAD_NODE_Z__",
+      "__SELECTION_OBJ__ROT_NODE_X__",
+      "__SELECTION_OBJ__ROT_NODE_Y__",
+      "__SELECTION_OBJ__ROT_NODE_Z__",
+      "__SELECTION_OBJ__SCALE_SHAFT_NODE_X__",
+      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Y__",
+      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Z__",
+      "__SELECTION_OBJ__SCALE_HEAD_NODE_X__",
+      "__SELECTION_OBJ_SCALE_HEAD_NODE_Y__",
+      "__SELECTION_OBJ_SCALE_HEAD_NODE_Z__",
+      };
 
-/*
-
-  if (dPtr->rotXVisual)
+  for (auto prefix : prefixes)
   {
-    dPtr->rotXVisual->DestroyAllAttachedMovableObjects(
-        dPtr->rotXVisual->GetSceneNode());
-  }
-  if (dPtr->rotYVisual)
-  {
-    dPtr->rotYVisual->DestroyAllAttachedMovableObjects(
-         dPtr->rotYVisual->GetSceneNode());
-  }
-  if (dPtr->rotZVisual)
-  {
-    dPtr->rotZVisual->DestroyAllAttachedMovableObjects(
-        dPtr->rotZVisual->GetSceneNode());
+    std::string name = prefix + this->GetName();
+    if (manager->hasSceneNode(name))
+    {
+      manager->destroySceneNode(manager->getSceneNode(name));
+    }
   }
 
-  dPtr->rotVisual.reset();
-  dPtr->rotXVisual.reset();
-  dPtr->rotYVisual.reset();
-  dPtr->rotZVisual.reset();
-u/
-  dPtr->scene->RemoveVisual(shared_from_this());
-
-
-  // Clear scene node
-  if (dPtr->sceneNode != NULL)
-  {
-    dPtr->sceneNode->detachAllObjects();
-    dPtr->scene->GetManager()->destroySceneNode(
-        dPtr->sceneNode);
-    dPtr->sceneNode = NULL;
-  }
-
-  if (dPtr->preRenderConnection)
-  {
-    event::Events::DisconnectPreRender(dPtr->preRenderConnection);
-    dPtr->preRenderConnection.reset();
-  }
-
-  dPtr->scene.reset();
-*/
+  Visual::Fini();
 }
 
 /////////////////////////////////////////////////
