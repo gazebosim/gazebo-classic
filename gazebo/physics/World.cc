@@ -2168,3 +2168,12 @@ void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
 }
+
+/////////////////////////////////////////////////
+void World::_AddDirty(Entity *_entity)
+{
+  boost::recursive_mutex::scoped_lock lock(
+        *this->dataPtr->physicsEngine->GetPhysicsUpdateMutex());
+
+  this->dataPtr->dirtyPoses.push_back(_entity);
+}

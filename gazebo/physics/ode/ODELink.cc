@@ -191,7 +191,7 @@ void ODELink::MoveCallback(dBodyID _id)
   self->dirtyPose.pos -= cog;
 
   // TODO: this is an ugly line of code. It's like this for speed.
-  self->world->dataPtr->dirtyPoses.push_back(self);
+  self->world->_AddDirty(self);
 
   // self->poseMutex->unlock();
 

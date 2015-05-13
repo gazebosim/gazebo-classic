@@ -332,6 +332,14 @@ namespace gazebo
       /// \param[in] _name Name of the model to remove.
       public: void RemoveModel(const std::string &_name);
 
+      /// \internal
+      /// \brief Inform the World that an Entity has moved. The Entity
+      /// is added to a list that will be processed by the World.
+      /// Only a physics engine implementation should call this function. 
+      /// If you are unsure whether you should use this function, do not.
+      /// \param[in] _entity Entity that has moved.
+      public: void _AddDirty(Entity *_entity);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -465,9 +473,6 @@ namespace gazebo
       /// \internal
       /// \brief Private data pointer.
       private: WorldPrivate *dataPtr;
-
-      /// Friend ODELink so that it has access to dataPtr->dirtyPoses
-      private: friend class ODELink;
 
       /// Friend DARTLink so that it has access to dataPtr->dirtyPoses
       private: friend class DARTLink;
