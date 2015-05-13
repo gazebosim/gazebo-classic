@@ -99,11 +99,15 @@ void Forest::Load()
     return;
 
   // TODO: Extend to other types of cameras. How about multiple cameras sensors?
-  if (this->scene->GetUserCameraCount() == 0u)
-    return;
+//  if (this->scene->GetUserCameraCount() == 0u)
+//    return;
 
-  this->camera = boost::dynamic_pointer_cast<Camera>(
-      this->scene->GetOculusCamera(0));
+//  this->camera = boost::dynamic_pointer_cast<Camera>(
+//      this->scene->GetUserCamera(0));
+
+//  // TODO REMOVE ME
+//  this->camera = boost::dynamic_pointer_cast<Camera>(
+//      this->scene->GetCamera(0));
 
   this->connections.push_back(event::Events::ConnectRender(
         boost::bind(&Forest::Update, this, false)));
@@ -156,7 +160,7 @@ void Forest::LoadScene()
   // Create and configure a new PagedGeometry instance for this->grass
   this->grass = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 100);
   this->grass->setCoordinateSystem(upAxis, rightAxis);
-  this->grass->addDetailLevel<Forests::GrassPage>(300);
+  this->grass->addDetailLevel<Forests::GrassPage>(150);
 
   // Create a GrassLoader object
   Forests::GrassLoader *grassLoader = new Forests::GrassLoader(this->grass);
@@ -184,7 +188,7 @@ void Forest::LoadScene()
   //Sway 1/2 a cycle every second
   l->setSwaySpeed(0.4f);
   //Relatively dense this->grass
-  l->setDensity(4.0f);
+  l->setDensity(3.0f);
   l->setRenderTechnique(Forests::GRASSTECH_SPRITE);
   //Distant this->grass should slowly raise out of the ground when coming in range
   l->setFadeTechnique(Forests::FADETECH_GROW);
@@ -222,7 +226,7 @@ void Forest::LoadScene()
   //Sway 1/2 a cycle every second
   l2->setSwaySpeed(0.4f);
   //Relatively dense this->grass
-  l2->setDensity(4.0f);
+  l2->setDensity(3.0f);
 //  l->setRenderTechnique(Forests::GRASSTECH_SPRITE);
   //Distant this->grass should slowly raise out of the ground when coming in range
   l2->setFadeTechnique(Forests::FADETECH_GROW);
@@ -284,11 +288,11 @@ void Forest::LoadScene()
   this->trees->setCustomParam(tree2->getName(), "windFactorY", 0.013);
   #endif
 
-  //Randomly place 10000 copies of the tree on the terrain
+  //Randomly place copies of the tree on the terrain
   Ogre::Vector3 position = Ogre::Vector3::ZERO;
   Ogre::Radian yaw;
   Ogre::Real scale;
-  for (int i = 0; i < 8000; i++)
+  for (int i = 0; i < 6000; i++)
   {
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
 
@@ -322,7 +326,7 @@ void Forest::LoadScene()
   // -------------------------------------- LOAD BUSHES ------------------------
 
   // Create and configure a new PagedGeometry instance for this->bushes
-  this->bushes = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 250);
+  this->bushes = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 200);
   this->bushes->setCoordinateSystem(upAxis, rightAxis);
 
   #ifdef WIND
@@ -362,7 +366,7 @@ void Forest::LoadScene()
   #endif
 
   // Randomly place 20,000 this->bushes on the terrain
-  for (int i = 0; i < 10000; i++){
+  for (int i = 0; i < 5000; i++){
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
     position.x = Ogre::Math::RangeRandom(-500, 500);
     position.y = Ogre::Math::RangeRandom(-500, 500);
@@ -383,9 +387,34 @@ void Forest::LoadScene()
   this->initialized = true;
 }
 
+int updateRate = 0;
 //////////////////////////////////////////////////
 void Forest::Update(bool _force)
 {
+  updateRate++;
+  if (updateRate%3 == 0)
+    return;
+
+  if (!this->camera)
+  {
+    // TODO: Extend to other types of cameras. How about multiple cameras sensors?
+    //if (this->scene->GetUserCameraCount() == 0u)
+      //return;
+
+    if (this->scene->GetOculusCameraCount() != 0u)
+    {
+      this->camera = boost::dynamic_pointer_cast<Camera>(
+          this->scene->GetOculusCamera(0));
+    }
+    else if (this->scene->GetUserCameraCount() != 0u)
+    {
+      this->camera = boost::dynamic_pointer_cast<Camera>(
+          this->scene->GetUserCamera(0));
+    }
+    if (!this->camera)
+      return;
+  }
+
   if (!this->initialized)
   {
     this->heightmap = this->scene->GetHeightmap();
