@@ -66,7 +66,7 @@ namespace gazebo
       /// \brief Called when the GUI enters/leaves full-screen mode.
       /// \param[in] _value True when entering full screen, false when
       /// leaving.
-      private: void OnFullScreen(bool &_value);
+      private: void OnFullScreen(bool _value);
 
       /// \brief Called when a world stats message is received.
       /// \param[in] _msg World statistics message.
