@@ -152,7 +152,6 @@ void RenderEngine::Load()
   // Apple needs a dummy window created here to render properly.
 #ifdef Q_OS_MAC
   this->windowManager->CreateWindow(std::to_string(this->dummyWindowId), 1, 1);
-  this->CheckSystemCapabilities();
 #endif
 }
 

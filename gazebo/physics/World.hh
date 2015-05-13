@@ -335,7 +335,7 @@ namespace gazebo
       /// \internal
       /// \brief Inform the World that an Entity has moved. The Entity
       /// is added to a list that will be processed by the World.
-      /// Only a physics engine implementation should call this function. 
+      /// Only a physics engine implementation should call this function.
       /// If you are unsure whether you should use this function, do not.
       /// \param[in] _entity Entity that has moved.
       public: void _AddDirty(Entity *_entity);
