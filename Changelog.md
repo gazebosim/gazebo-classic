@@ -1,4 +1,7 @@
 ## Gazebo 6.0
+1. Implement forward/backwards multi-step for log playback.
+    * [Pull request #1623](https://bitbucket.org/osrf/gazebo/pull-request/1623)
+
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
 

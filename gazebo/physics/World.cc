@@ -220,6 +220,8 @@ void World::Load(sdf::ElementPtr _sdf)
                                            &World::OnFactoryMsg, this);
   this->dataPtr->controlSub = this->dataPtr->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
+  this->dataPtr->playbackControlSub = this->dataPtr->node->Subscribe(
+      "~/playback_control", &World::OnPlaybackControl, this);
 
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
                                            &World::OnRequest, this, true);
@@ -487,12 +489,27 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
-  if (!this->IsPaused() || this->dataPtr->stepInc > 0)
+  if (this->dataPtr->stepInc < 0)
+  {
+    // Step back: This is implemented by going to the beginning of the log file,
+    // and then, step forward up to the target frame.
+    // ToDo: Use keyframes in the log file to speed up this process.
+    util::LogPlay::Instance()->Rewind();
+    this->dataPtr->stepInc = this->dataPtr->iterations + this->dataPtr->stepInc;
+    if (this->dataPtr->stepInc < 1)
+      this->dataPtr->stepInc = 1;
+    this->dataPtr->iterations = 0;
+  }
+
+  while (!this->IsPaused() || this->dataPtr->stepInc > 0)
   {
     std::string data;
     if (!util::LogPlay::Instance()->Step(data))
     {
+      // There are no more chunks, time to exit.
       this->SetPaused(true);
+      this->dataPtr->stepInc = 0;
+      break;
     }
     else
     {
@@ -543,6 +560,10 @@ void World::LogStep()
 
     if (this->dataPtr->stepInc > 0)
       this->dataPtr->stepInc--;
+
+    // We only run one step if we are in play mode.
+    if (!this->IsPaused())
+      break;
   }
 
   this->PublishWorldStats();
@@ -1175,6 +1196,22 @@ void World::OnControl(ConstWorldControlPtr &_data)
       if (_data->reset().has_model_only() && _data->reset().model_only())
         this->dataPtr->resetModelOnly = true;
     }
+  }
+}
+
+//////////////////////////////////////////////////
+void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
+{
+  if (_data->has_pause())
+    this->SetPaused(_data->pause());
+
+  if (_data->has_multi_step())
+  {
+    // stepWorld is a blocking call so set stepInc directly so that world stats
+    // will still be published
+    this->SetPaused(true);
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
+    this->dataPtr->stepInc = _data->multi_step();
   }
 }
 
