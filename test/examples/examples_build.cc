@@ -112,12 +112,12 @@ TEST_P(ExamplesBuild_Standalone, Standalone)
 ///////////////////////////////////////////////////////////////////
 INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
   "actuator"
-  , "animated_box"
-  , "arrange"
+  // , "animated_box"
+  // , "arrange"
   , "clone_simulation"
   , "custom_main"
-  , "listener"
-  , "publisher"
+  // , "listener"
+  // , "publisher"
   , "test_fixture"
 ));
 
