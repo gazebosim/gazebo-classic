@@ -151,10 +151,7 @@ void RenderEngine::Load()
 
   // Apple needs a dummy window created here to render properly.
 #ifdef Q_OS_MAC
-  std::stringstream stream;
-  stream << (int32_t)this->dummyWindowId;
-
-  this->windowManager->CreateWindow(stream.str(), 1, 1);
+  this->windowManager->CreateWindow(std::to_string(this->dummyWindowId), 1, 1);
   this->CheckSystemCapabilities();
 #endif
 }
@@ -299,7 +296,7 @@ void RenderEngine::Init()
   if (this->windowManager->WindowCount() <= 0)
   {
     this->windowManager->CreateWindow(
-        std::to_string(static_cast<uint32_t>(this->dummyWindowId)), 1, 1);
+        std::to_string(this->dummyWindowId), 1, 1);
   }
 
   this->CheckSystemCapabilities();
