@@ -289,9 +289,8 @@ void RenderEngine::Init()
   // Create a window if one does not exist. gzserver makes use of this.
   if (this->windowManager->WindowCount() <= 0)
   {
-    std::stringstream stream;
-    stream << static_cast<uint32_t>(this->dummyWindowId);
-    this->windowManager->CreateWindow(stream.str(), 1, 1);
+    this->windowManager->CreateWindow(
+        std::to_string(static_cast<uint32_t>(this->dummyWindowId)), 1, 1);
   }
 
   this->CheckSystemCapabilities();
