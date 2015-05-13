@@ -173,11 +173,15 @@ GLWidget::GLWidget(QWidget *_parent)
   // Connect the perspective action
   connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
           SLOT(OnPerspective()));
+}
 
-  std::string winHandle = this->GetOgreHandle();
-
+/////////////////////////////////////////////////
+void GLWidget::showEvent(QShowEvent *_event)
+{
   QApplication::flush();
   QApplication::syncX();
+
+  std::string winHandle = this->GetOgreHandle();
 
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(winHandle, this->width(), this->height());
@@ -197,6 +201,9 @@ GLWidget::GLWidget(QWidget *_parent)
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
       this->windowId, this->userCamera);
   }
+
+  QWidget::showEvent(_event);
+  this->setFocus();
 }
 
 /////////////////////////////////////////////////

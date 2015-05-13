@@ -80,6 +80,7 @@ namespace gazebo
       /// \param[in] _name Name of the selected entity.
       signals: void selectionMsgReceived(const QString &_name);
 
+      protected: virtual void showEvent(QShowEvent *_e);
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
