@@ -100,7 +100,7 @@ QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GUI_MODEL")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI_MODEL")
 
 if (WIN32)
   add_library(gazebo_gui_model STATIC ${sources} ${headers_MOC} ${headers} ${resources_RCC})

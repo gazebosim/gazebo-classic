@@ -39,7 +39,7 @@ compilation on Windows.
     * [Pull request #1669](https://bitbucket.org/osrf/gazebo/pull-request/1669)
     * [Pull request #1670](https://bitbucket.org/osrf/gazebo/pull-request/1670)
     * [Pull request #1672](https://bitbucket.org/osrf/gazebo/pull-request/1672)
-    * [Pull request #1679](https://bitbucket.org/osrf/gazebo/pull-request/1679)
+    * [Pull request #1682](https://bitbucket.org/osrf/gazebo/pull-request/1682)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
@@ -480,6 +480,11 @@ compilation on Windows.
     * [Pull request #1318](https://bitbucket.org/osrf/gazebo/pull-request/1318)
 
 ## Gazebo 4.0
+
+### Gazebo 4.x.x (2015-xx-xx)
+
+1. Fix build for Bullet 2.83, enable angle wrapping for BulletHingeJoint
+    * [Pull request #1664](https://bitbucket.org/osrf/gazebo/pull-request/1664)
 
 ### Gazebo 4.1.3 (2015-05-07)
 
