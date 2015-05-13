@@ -176,37 +176,6 @@ GLWidget::GLWidget(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::showEvent(QShowEvent *_event)
-{
-  QApplication::flush();
-  QApplication::syncX();
-
-  std::string winHandle = this->GetOgreHandle();
-
-  this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
-    CreateWindow(winHandle, this->width(), this->height());
-
-  rendering::init();
-
-  this->scene = rendering::create_scene(gui::get_world(), true);
-
-  if (!this->scene)
-  {
-    gzerr << "GLWidget could not create a scene. This will likely result "
-      << "in a blank screen.\n";
-  }
-  else
-  {
-    this->OnCreateScene(this->scene->GetName());
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->windowId, this->userCamera);
-  }
-
-  QWidget::showEvent(_event);
-  this->setFocus();
-}
-
-/////////////////////////////////////////////////
 GLWidget::~GLWidget()
 {
   MouseEventHandler::Instance()->RemovePressFilter("glwidget");
@@ -241,6 +210,37 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
   }
 
   return false;
+}
+
+/////////////////////////////////////////////////
+void GLWidget::showEvent(QShowEvent *_event)
+{
+  QApplication::flush();
+  QApplication::syncX();
+
+  std::string winHandle = this->GetOgreHandle();
+
+  this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
+    CreateWindow(winHandle, this->width(), this->height());
+
+  rendering::init();
+
+  this->scene = rendering::create_scene(gui::get_world(), true);
+
+  if (!this->scene)
+  {
+    gzerr << "GLWidget could not create a scene. This will likely result "
+      << "in a blank screen.\n";
+  }
+  else
+  {
+    this->OnCreateScene(this->scene->GetName());
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+      this->windowId, this->userCamera);
+  }
+
+  QWidget::showEvent(_event);
+  this->setFocus();
 }
 
 /////////////////////////////////////////////////
