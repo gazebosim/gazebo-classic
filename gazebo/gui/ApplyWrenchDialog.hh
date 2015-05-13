@@ -21,6 +21,7 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -113,6 +114,19 @@ namespace gazebo
       /// \brief Qt callback when the the torque clear button is clicked.
       private slots: void OnTorqueClear();
 
+      /// \brief Qt callback when entering a manipulation mode.
+      private slots: void OnManipulation();
+
+      /// \brief Filter events from other Qt objects.
+      /// param[in] _obj Qt object watched by the event filter
+      /// param[in] _event Qt event to be filtered.
+      /// \return True to stop event propagation.
+      private slots: bool eventFilter(QObject *_object, QEvent *_event);
+
+      /// \brief Handle change events related to this dialog.
+      /// param[in] _event Qt event.
+      private slots: void changeEvent(QEvent *_event);
+
       /// \brief Set the value of a specific spin without triggering signals to
       /// avoid recursion loops.
       /// \param[in] _spin Spin whose value will be changed.
@@ -125,11 +139,17 @@ namespace gazebo
 
       /// \brief Set force vector, send it to visuals and update spins.
       /// \param[in] _force New force.
-      private: void SetForce(const math::Vector3 &_force);
+      /// \param[in] _rotatedByMouse If rotated by mouse, update force visual
+      /// but not the rot tool.
+      private: void SetForce(const math::Vector3 &_force,
+          bool _rotatedByMouse = false);
 
       /// \brief Set torque vector, send it to visuals and update spins.
       /// \param[in] _torque New torque.
-      private: void SetTorque(const math::Vector3 &_torque);
+      /// \param[in] _rotatedByMouse If rotated by mouse, update torque visual
+      /// but not the rot tool.
+      private: void SetTorque(const math::Vector3 &_torque,
+          bool _rotatedByMouse = false);
 
       /// \brief Callback on prerender to check if target link hasn't been
       /// deleted.
@@ -141,6 +161,43 @@ namespace gazebo
       /// \brief Set CoM vector and send it to visuals.
       /// \param[in] _com CoM position in link frame.
       private: void SetCoM(const math::Vector3 &_com);
+
+      /// \brief Callback for a mouse press event.
+      /// \param[in] _event The mouse press event
+      /// \return True if handled by this function.
+      private: bool OnMousePress(const common::MouseEvent &_event);
+
+      /// \brief Callback for a mouse release event.
+      /// \param[in] _event The mouse release event
+      /// \return True if handled by this function.
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Callback for a mouse move event.
+      /// \param[in] _event The mouse move event
+      /// \return True if handled by this function.
+      private: bool OnMouseMove(const common::MouseEvent &_event);
+
+      /// \brief Set the mode to either "force", "torque" or "none".
+      /// \param[in] _mode Current mode.
+      private: void SetMode(const std::string &_mode);
+
+      /// \brief Update force vector with direction given by mouse, magnitude
+      /// from spin.
+      /// \param[in] _dir New direction.
+      private: void NewForceDirection(const math::Vector3 &_dir);
+
+      /// \brief Update torque vector with direction given by mouse, magnitude
+      /// from spin.
+      /// \param[in] _dir New direction.
+      private: void NewTorqueDirection(const math::Vector3 &_dir);
+
+      /// \brief Set this dialog to be active, visuals visible and mouse
+      /// filters on.
+      /// \param[in] _active True to make it active.
+      private: void SetActive(bool _active);
+
+      /// \brief Set this dialog window to be active.
+      private: void ActivateWindow();
 
       /// \internal
       /// \brief Pointer to private data.

@@ -59,11 +59,17 @@ namespace gazebo
 
       /// \brief Update force vector, force text and mode.
       /// \param[in] _forceVector New vector.
-      public: void SetForce(const math::Vector3 &_forceVector);
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
+      public: void SetForce(const math::Vector3 &_forceVector,
+          bool _rotatedByMouse);
 
       /// \brief Update torque vector, torque text and mode.
       /// \param[in] _torqueVector New vector.
-      public: void SetTorque(const math::Vector3 &_torqueVector);
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
+      public: void SetTorque(const math::Vector3 &_torqueVector,
+          bool _rotatedByMouse);
 
       /// \brief Update the force visual according to the force and force
       /// position vectors.
@@ -76,12 +82,37 @@ namespace gazebo
       /// \brief Resize all children according to target link's size.
       public: void Resize();
 
+      /// \brief Returns the force visual.
+      /// \return Pointer to force visual.
+      public: rendering::VisualPtr GetForceVisual() const;
+
+      /// \brief Returns the torque visual.
+      /// \return Pointer to torque visual.
+      public: rendering::VisualPtr GetTorqueVisual() const;
+
+      /// \brief Returns the rotation tool.
+      /// \return Pointer to rotation tool.
+      public: rendering::SelectionObjPtr GetRotTool() const;
+
+      /// \brief Set the mode to "force", "torque" or "none", update colors
+      /// and visibility accordingly.
+      /// \param[in] _mode New mode.
+      public: void SetMode(const std::string &_mode);
+
       /// \brief Get the rotation to point the positive Z axis to the
       /// given direction.
       /// \param[in] _dir Direction vector.
       /// \return Resulting quaternion
       private: math::Quaternion GetQuaternionFromVector(
           const math::Vector3 &_dir);
+
+      /// \brief Set this to be visible or not.
+      /// \param[in] _visible If true, force and torque visuals will be visible
+      /// and the rot tool will be visible if mode is not "none".
+      /// \param[in] _cascade Only needed when _visible is false. If _cascade is
+      /// true, force and torque visuals are hidden. If false, they are still
+      /// visible but with disabled colors.
+      public: void SetVisible(bool _visible, bool _cascade = false);
     };
     /// \}
   }

@@ -118,6 +118,46 @@ TEST_F(SelectionObj_TEST, SelectionObjTest)
 }
 
 /////////////////////////////////////////////////
+TEST_F(SelectionObj_TEST, LoadFini)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+
+  if (!scene)
+    scene = gazebo::rendering::create_scene("default", false);
+
+  EXPECT_TRUE(scene != NULL);
+
+  // Load
+  rendering::SelectionObjPtr obj;
+  obj.reset(new rendering::SelectionObj("obj", scene->GetWorldVisual()));
+  obj->Load();
+  EXPECT_TRUE(obj != NULL);
+  EXPECT_EQ(scene->GetVisual("obj"), obj);
+
+  // Fini
+  // obj->Fini();
+  scene->RemoveVisual(obj);
+  EXPECT_TRUE(scene->GetVisual("obj") == NULL);
+  obj.reset();
+  EXPECT_TRUE(obj == NULL);
+
+  // Create another visual with the same name
+  rendering::SelectionObjPtr obj2;
+  obj2.reset(new rendering::SelectionObj("obj", scene->GetWorldVisual()));
+  obj2->Load();
+  EXPECT_TRUE(obj2 != NULL);
+  EXPECT_EQ(scene->GetVisual("obj"), obj2);
+std::cout << obj2->GetName() << std::endl;
+
+  // Fini
+  obj2->Fini();
+  obj2.reset();
+  EXPECT_TRUE(obj2 == NULL);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

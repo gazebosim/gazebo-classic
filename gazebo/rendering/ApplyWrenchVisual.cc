@@ -20,6 +20,7 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/ApplyWrenchVisualPrivate.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
 
@@ -89,8 +90,15 @@ void ApplyWrenchVisual::Fini()
     dPtr->scene->RemoveVisual(dPtr->torqueVisual);
   }
 
+  if (dPtr->rotTool &&
+      dPtr->scene->GetVisual(dPtr->rotTool->GetName()))
+  {
+    dPtr->scene->RemoveVisual(dPtr->rotTool);
+  }
+
   dPtr->forceVisual.reset();
   dPtr->torqueVisual.reset();
+  dPtr->rotTool.reset();
 }
 
 ///////////////////////////////////////////////////
@@ -105,6 +113,7 @@ void ApplyWrenchVisual::Load()
     return;
   }
 
+  dPtr->selectedMaterial = "Gazebo/OrangeTransparentOverlay";
   dPtr->unselectedMaterial = "Gazebo/DarkOrangeTransparentOverlay";
 
   // Force visual
@@ -195,14 +204,34 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueLine->AddPoint(0, 0, 0);
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
 
+std::cout << "Load A" << std::endl;
+  // Rotation manipulator
+  dPtr->rotTool.reset(new rendering::SelectionObj(
+      this->GetName() + "__SELECTION_OBJ", shared_from_this()));
+std::cout << "Load A" << std::endl;
+  dPtr->rotTool->Load();
+std::cout << "Load A" << std::endl;
+  dPtr->rotTool->SetMode("rotate");
+std::cout << "Load A" << std::endl;
+  dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_X, false);
+std::cout << "Load A" << std::endl;
+  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Y,
+      "Gazebo/DarkMagentaTransparent");
+  dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Z,
+      "Gazebo/DarkMagentaTransparent");
+std::cout << "Load B" << std::endl;
+
   // Initialize
   dPtr->forceVector = math::Vector3::Zero;
   dPtr->torqueVector = math::Vector3::Zero;
+std::cout << "Load A" << std::endl;
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   this->Resize();
   this->UpdateForceVisual();
   this->UpdateTorqueVisual();
+  this->SetMode("none");
+std::cout << "Load end" << std::endl;
 }
 
 ///////////////////////////////////////////////////
@@ -237,23 +266,51 @@ void ApplyWrenchVisual::SetForcePos(const math::Vector3 &_forcePosVector)
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector)
+void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector,
+    bool _rotatedByMouse)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   dPtr->forceVector = _forceVector;
-  this->UpdateForceVisual();
+  dPtr->rotatedByMouse = _rotatedByMouse;
+
+//  this->UpdateForceVisual();
+  if (_forceVector == math::Vector3::Zero)
+  {
+    if (dPtr->torqueVector == math::Vector3::Zero)
+      this->SetMode("none");
+    else
+      this->SetMode("torque");
+  }
+  else
+  {
+    this->SetMode("force");
+  }
 }
 
 ///////////////////////////////////////////////////
-void ApplyWrenchVisual::SetTorque(const math::Vector3 &_torqueVector)
+void ApplyWrenchVisual::SetTorque(const math::Vector3 &_torqueVector,
+    bool _rotatedByMouse)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   dPtr->torqueVector = _torqueVector;
-  this->UpdateTorqueVisual();
+  dPtr->rotatedByMouse = _rotatedByMouse;
+
+//  this->UpdateTorqueVisual();
+  if (_torqueVector == math::Vector3::Zero)
+  {
+    if (dPtr->forceVector == math::Vector3::Zero)
+      this->SetMode("none");
+    else
+      this->SetMode("force");
+  }
+  else
+  {
+    this->SetMode("torque");
+  }
 }
 
 ///////////////////////////////////////////////////
@@ -262,14 +319,14 @@ void ApplyWrenchVisual::UpdateForceVisual()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->forceVisual)
+  if (!dPtr->forceVisual || !dPtr->rotTool)
   {
     gzwarn << "No force visual" << std::endl;
     return;
   }
 
   // Protect forceVisual
-  std::lock_guard<std::mutex> lock(dPtr->mutex);
+//  std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   math::Vector3 normVec = dPtr->forceVector;
   normVec.Normalize();
@@ -286,6 +343,11 @@ void ApplyWrenchVisual::UpdateForceVisual()
   // Set arrow tip to forcePosVector
   dPtr->forceVisual->SetPosition(-normVec * 0.28 *
       dPtr->forceVisual->GetScale().z + dPtr->forcePosVector);
+
+  // Rotation tool
+  dPtr->rotTool->SetPosition(dPtr->forcePosVector);
+  if (!dPtr->rotatedByMouse)
+    dPtr->rotTool->SetRotation(quat);
 }
 
 ///////////////////////////////////////////////////
@@ -294,14 +356,14 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->torqueVisual)
+  if (!dPtr->torqueVisual || !dPtr->rotTool)
   {
     gzwarn << "No torque visual" << std::endl;
     return;
   }
 
   // Protect torqueVisual
-  std::lock_guard<std::mutex> lock(dPtr->mutex);
+//  std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   math::Vector3 normVec = dPtr->torqueVector;
   normVec.Normalize();
@@ -320,6 +382,11 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
   dPtr->torqueVisual->SetPosition(normVec*linkDiagonal*0.75 + dPtr->comVector);
   dPtr->torqueLine->SetPoint(1,
       math::Vector3(0, 0, -linkDiagonal*0.75)/dPtr->torqueVisual->GetScale());
+
+  // Rotation tool
+  dPtr->rotTool->SetPosition(dPtr->comVector);
+  if (!dPtr->rotatedByMouse)
+    dPtr->rotTool->SetRotation(quat);
 }
 
 /////////////////////////////////////////////////
@@ -328,14 +395,15 @@ void ApplyWrenchVisual::Resize()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->parent || !dPtr->forceVisual || !dPtr->torqueVisual)
+  if (!dPtr->parent || !dPtr->forceVisual || !dPtr->torqueVisual ||
+      !dPtr->rotTool)
   {
     gzwarn << "ApplyWrenchVisual is incomplete." << std::endl;
     return;
   }
 
   // Protect force/torque visuals
-  std::lock_guard<std::mutex> lock(dPtr->mutex);
+//  std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   double linkSize = std::max(0.1,
       dPtr->parent->GetBoundingBox().GetSize().GetLength());
@@ -349,4 +417,155 @@ void ApplyWrenchVisual::Resize()
   dPtr->torqueVisual->SetScale(math::Vector3(linkSize,
                                              linkSize,
                                              linkSize));
+
+  // Rot tool
+  dPtr->rotTool->SetScale(math::Vector3(0.75*linkSize,
+                                        0.75*linkSize,
+                                        0.75*linkSize));
+}
+
+///////////////////////////////////////////////////
+rendering::VisualPtr ApplyWrenchVisual::GetForceVisual() const
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->forceVisual)
+  {
+    gzerr << "Force visual not found, but it should exist." << std::endl;
+    return NULL;
+  }
+
+//  std::lock_guard<std::mutex> lock(dPtr->mutex);
+
+  return dPtr->forceVisual;
+}
+
+///////////////////////////////////////////////////
+rendering::VisualPtr ApplyWrenchVisual::GetTorqueVisual() const
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->torqueVisual)
+  {
+    gzerr << "Torque visual not found, but it should exist." << std::endl;
+    return NULL;
+  }
+
+//  std::lock_guard<std::mutex> lock(dPtr->mutex);
+
+  return dPtr->torqueVisual;
+}
+
+///////////////////////////////////////////////////
+rendering::SelectionObjPtr ApplyWrenchVisual::GetRotTool() const
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->rotTool)
+  {
+    gzerr << "Rot tool not found, but it should exist." << std::endl;
+    return NULL;
+  }
+
+  return dPtr->rotTool;
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchVisual::SetMode(const std::string &_mode)
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->forceVisual || !dPtr->torqueVisual || !dPtr->rotTool)
+  {
+    gzerr << "Some visual is missing!" << std::endl;
+    return;
+  }
+
+  // Protect force/torque visuals
+//  std::lock_guard<std::mutex> lock(dPtr->mutex);
+
+  dPtr->mode = _mode;
+
+  if (_mode == "force")
+  {
+    dPtr->forceVisual->SetMaterial(dPtr->selectedMaterial);
+    dPtr->torqueVisual->SetMaterial(dPtr->unselectedMaterial);
+
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+
+    this->UpdateForceVisual();
+  }
+  else if (_mode == "torque")
+  {
+    dPtr->torqueVisual->SetMaterial(dPtr->selectedMaterial);
+    dPtr->forceVisual->SetMaterial(dPtr->unselectedMaterial);
+
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+
+    this->UpdateTorqueVisual();
+  }
+  else if (_mode == "none")
+  {
+    // Dark visuals
+    dPtr->forceVisual->SetMaterial(dPtr->unselectedMaterial);
+    dPtr->torqueVisual->SetMaterial(dPtr->unselectedMaterial);
+    // hide rot
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
+  }
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchVisual::SetVisible(bool _visible, bool _cascade)
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->forceVisual || !dPtr->torqueVisual || !dPtr->rotTool)
+  {
+    gzwarn << "Some visual is missing!" << std::endl;
+    return;
+  }
+
+  // Protect force/torque visuals
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
+
+  if (_visible)
+  {
+    dPtr->forceVisual->SetVisible(true);
+    dPtr->torqueVisual->SetVisible(true);
+
+    if (dPtr->mode != "none")
+    {
+      dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, true);
+      dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, true);
+      if (dPtr->mode == "force")
+        dPtr->forceVisual->SetMaterial(dPtr->selectedMaterial);
+      else
+        dPtr->torqueVisual->SetMaterial(dPtr->selectedMaterial);
+    }
+  }
+  else
+  {
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Y, false);
+    dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
+
+    // Use cascade to hide mode visuals or not
+    if (_cascade)
+    {
+      dPtr->forceVisual->SetVisible(false);
+      dPtr->torqueVisual->SetVisible(false);
+    }
+    else
+    {
+      dPtr->forceVisual->SetMaterial(dPtr->unselectedMaterial);
+      dPtr->torqueVisual->SetMaterial(dPtr->unselectedMaterial);
+    }
+  }
 }

@@ -84,6 +84,84 @@ void SelectionObj::Load()
 }
 
 /////////////////////////////////////////////////
+void SelectionObj::Fini()
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  // Detach from the parent
+  if (dPtr->parent)
+    dPtr->parent->DetachVisual(this->GetName());
+
+  // Destroy objects and nodes
+  Ogre::SceneManager *manager = dPtr->scene->GetManager();
+  if (!manager)
+    return;
+
+  // Remove objects
+  std::vector<std::string> prefixes = {
+      "__SELECTION_OBJ_ROT_X___",
+      "__SELECTION_OBJ_ROT_Y___",
+      "__SELECTION_OBJ_ROT_Z___"};
+
+  for (auto prefix : prefixes)
+  {
+    std::string name = prefix + this->GetName();
+    if (manager->hasEntity(name))
+      manager->destroyMovableObject(manager->getEntity(name));
+
+//    name += "NODE_";
+//    if (manager->hasSceneNode(name))
+//      manager->destroySceneNode(manager->getSceneNode(name));
+  }
+
+
+/*
+
+  if (dPtr->rotXVisual)
+  {
+    dPtr->rotXVisual->DestroyAllAttachedMovableObjects(
+        dPtr->rotXVisual->GetSceneNode());
+  }
+  if (dPtr->rotYVisual)
+  {
+    dPtr->rotYVisual->DestroyAllAttachedMovableObjects(
+         dPtr->rotYVisual->GetSceneNode());
+  }
+  if (dPtr->rotZVisual)
+  {
+    dPtr->rotZVisual->DestroyAllAttachedMovableObjects(
+        dPtr->rotZVisual->GetSceneNode());
+  }
+
+  dPtr->rotVisual.reset();
+  dPtr->rotXVisual.reset();
+  dPtr->rotYVisual.reset();
+  dPtr->rotZVisual.reset();
+u/
+  dPtr->scene->RemoveVisual(shared_from_this());
+
+
+  // Clear scene node
+  if (dPtr->sceneNode != NULL)
+  {
+    dPtr->sceneNode->detachAllObjects();
+    dPtr->scene->GetManager()->destroySceneNode(
+        dPtr->sceneNode);
+    dPtr->sceneNode = NULL;
+  }
+
+  if (dPtr->preRenderConnection)
+  {
+    event::Events::DisconnectPreRender(dPtr->preRenderConnection);
+    dPtr->preRenderConnection.reset();
+  }
+
+  dPtr->scene.reset();
+*/
+}
+
+/////////////////////////////////////////////////
 void SelectionObj::Attach(rendering::VisualPtr _vis)
 {
   SelectionObjPrivate *dPtr =
