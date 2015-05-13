@@ -892,28 +892,25 @@ rendering::UserCameraPtr GLWidget::GetCamera() const
 //////////////////////////////////////////////////
 std::string GLWidget::GetOgreHandle() const
 {
-  std::string handle;
+  std::string ogreHandle;
 
 #if defined(__APPLE__)
-  handle = std::to_string(this->winId());
+  ogreHandle = std::to_string(this->winId());
 #elif defined(WIN32)
-  handle = std::to_string(
+  ogreHandle = std::to_string(
       reinterpret_cast<uint32_t>(this->renderFrame->winId()));
 #else
-  std::ostringstream ogreHandle;
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
   GZ_ASSERT(q_parent, "q_parent is null");
 
-  ogreHandle << reinterpret_cast<uint64_t>(info.display())
-             << ":"
-             << static_cast<uint32_t>(info.screen())
-             << ":"
-             << static_cast<uint64_t>(q_parent->winId());
-  return ogreHandle.str();
+  ogreHandle =
+    std::to_string(reinterpret_cast<uint64_t>(info.display())) + ":" +
+    std::to_string(static_cast<uint32_t>(info.screen())) + ":" +
+    std::to_string(static_cast<uint64_t>(q_parent->winId()));
 #endif
 
-  return handle;
+  return ogreHandle;
 }
 
 /////////////////////////////////////////////////
