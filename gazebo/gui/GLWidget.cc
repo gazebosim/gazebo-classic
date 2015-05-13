@@ -240,6 +240,7 @@ void GLWidget::showEvent(QShowEvent *_event)
   }
 
   QWidget::showEvent(_event);
+
   this->setFocus();
 }
 
