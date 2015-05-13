@@ -36,6 +36,8 @@ TEST_F(Issue1208Test, Reset)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
 
+  world->Step(1);
+
   // There is a WorldPlugin attached to this world.
   // It has a counter that increments with each call of Init.
   // It then sets the value of that counter to the
