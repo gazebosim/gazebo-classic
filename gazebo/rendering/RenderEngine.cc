@@ -290,7 +290,7 @@ void RenderEngine::Init()
   if (this->windowManager->WindowCount() <= 0)
   {
     std::stringstream stream;
-    stream << static_cast<unsigned long>(this->dummyWindowId);
+    stream << static_cast<uint32_t>(this->dummyWindowId);
     this->windowManager->CreateWindow(stream.str(), 1, 1);
   }
 
