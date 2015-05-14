@@ -982,7 +982,6 @@ void MainWindow_TEST::SetUserCameraPoseSDF()
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
-
 }
 
 // Generate a main function for the test
