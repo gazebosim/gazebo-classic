@@ -155,6 +155,9 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   bool hasStartButton = false;
   bool hasResetButton = false;
 
+  // If a countdown time was given in SDF, read the countdown time and
+  // initialize the Timer object as a countdown timer.
+  // Time is read in SDF as (seconds nanosecnds)
   if (_elem->HasElement("countdown_time"))
   {
     common::Time maxTime =

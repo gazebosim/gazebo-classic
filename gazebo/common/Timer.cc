@@ -82,10 +82,13 @@ Time Timer::GetElapsed() const
     Time currentTime = Time::GetWallTime();
     Time elapsedTime = currentTime - this->start;
 
+    // If we're counting down, return the countdown time minus the total
+    // elapsed time.
     if (this->countdown)
     {
       if (elapsedTime > this->maxTime)
       {
+        // If elapsed time is past the countdown time, return 0 (out of time)
         return Time(0);
       }
       return this->maxTime - elapsedTime;
