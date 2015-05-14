@@ -1095,12 +1095,13 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
     msg.set_selected(true);
     this->selectionPub->Publish(msg);
   }
-  else
+  else if (g_copyAct)
   {
     g_copyAct->setEnabled(false);
   }
 
-  g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
+  if (g_alignAct)
+    g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
 }
 
 /////////////////////////////////////////////////
