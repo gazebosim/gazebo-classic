@@ -322,6 +322,10 @@ namespace gazebo
       {
         result = msgs::Joint::GEARBOX;
       }
+      else if (_str == "fixed")
+      {
+        result = msgs::Joint::FIXED;
+      }
       else
       {
         gzerr << "Unrecognized JointType ["
@@ -370,6 +374,11 @@ namespace gazebo
         case msgs::Joint::GEARBOX:
         {
           result = "gearbox";
+          break;
+        }
+        case msgs::Joint::FIXED:
+        {
+          result = "fixed";
           break;
         }
         default:

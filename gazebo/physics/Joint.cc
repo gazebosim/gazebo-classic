@@ -515,6 +515,10 @@ msgs::Joint::Type Joint::GetMsgType() const
   {
     return msgs::Joint::UNIVERSAL;
   }
+  else if (this->HasType(Base::FIXED_JOINT))
+  {
+    return msgs::Joint::FIXED;
+  }
 
   gzerr << "No joint recognized in type ["
         << this->GetType()
