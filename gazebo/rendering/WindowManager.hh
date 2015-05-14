@@ -92,10 +92,6 @@ namespace gazebo
       /// \return Pointer to the render window, NULL if the id is invalid.
       public: Ogre::RenderWindow *GetWindow(uint32_t _id);
 
-      /// \brief Get the number of windows.
-      /// \return The number of windows that have been created.
-      public: size_t WindowCount() const;
-
       /// \brief All the render windows.
       private: std::vector<Ogre::RenderWindow *> windows;
 

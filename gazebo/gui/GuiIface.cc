@@ -244,6 +244,10 @@ bool gui::load()
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
+  // Load the rendering engine.
+  rendering::load();
+  rendering::init();
+
   g_main_win = new gui::MainWindow();
 
   g_main_win->Load();

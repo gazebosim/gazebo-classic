@@ -1694,6 +1694,8 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
   if (_msg->has_camera())
   {
     rendering::UserCameraPtr cam = gui::get_active_camera();
+    if (!cam)
+      gzerr << "Camera has not been created\n";
 
     if (_msg->camera().has_pose())
     {

@@ -61,9 +61,6 @@ extern ModelRightMenu *g_modelRightMenu;
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
 {
-  // Load the rendering engine.
-  rendering::load();
-
   this->setObjectName("GLWidget");
   this->state = "select";
   this->copyEntityName = "";
@@ -173,6 +170,26 @@ GLWidget::GLWidget(QWidget *_parent)
   // Connect the perspective action
   connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
           SLOT(OnPerspective()));
+
+  // Create the scene. This must be done in the constructor so that
+  // we can then create a user camera.
+  this->scene = rendering::create_scene(gui::get_world(), true);
+
+  if (!this->scene)
+  {
+    gzerr << "GLWidget could not create a scene. This will likely result "
+      << "in a blank screen.\n";
+  }
+  else
+  {
+    // This will ultimately create a user camera. We need to create a user
+    // camera in the constructor so that communications (such as via the
+    // ~/gui topic) can work properly (see MainWindow::OnGUI).
+    //
+    // All of this means that we must have a GL Context by this point. So,
+    // we have to create a dummy 1x1 window in RenderEngine::Load.
+    this->OnCreateScene(this->scene->GetName());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -223,6 +240,9 @@ void GLWidget::showEvent(QShowEvent *_event)
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(winHandle, this->width(), this->height());
 
+  rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+      this->windowId, this->userCamera);
+  /*
   rendering::init();
 
   this->scene = rendering::create_scene(gui::get_world(), true);
@@ -239,6 +259,7 @@ void GLWidget::showEvent(QShowEvent *_event)
       this->windowId, this->userCamera);
   }
 
+  */
   QWidget::showEvent(_event);
 
   this->setFocus();

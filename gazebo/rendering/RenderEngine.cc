@@ -149,10 +149,13 @@ void RenderEngine::Load()
     this->SetupResources();
   }
 
-  // Apple needs a dummy window created here to render properly.
-#ifdef Q_OS_MAC
+  // Create a 1x1 render window so that we can grab a GL context. Based on
+  // testing, this is a hard requirement by Apple. We also need it to
+  // properly initialize GLWidget and UserCameras. See the GLWidget
+  // constructor.
   this->windowManager->CreateWindow(std::to_string(this->dummyWindowId), 1, 1);
-#endif
+
+  this->CheckSystemCapabilities();
 }
 
 //////////////////////////////////////////////////
@@ -291,15 +294,6 @@ void RenderEngine::PostRender()
 //////////////////////////////////////////////////
 void RenderEngine::Init()
 {
-  // Create a window if one does not exist. gzserver makes use of this.
-  if (this->windowManager->WindowCount() <= 0)
-  {
-    this->windowManager->CreateWindow(
-        std::to_string(this->dummyWindowId), 1, 1);
-  }
-
-  this->CheckSystemCapabilities();
-
   if (this->renderPathType == NONE)
   {
     gzwarn << "Cannot initialize render engine since "
