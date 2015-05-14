@@ -13,6 +13,17 @@ import "vector3d.proto";
 
 message Visual
 {
+  /// \brief Optional meta information for the visual. The information
+  /// contained within this element should be used to provide additional
+  /// feedback to an end user.
+  message Meta
+  {
+    /// \brief The layer in which this visual is displayed. The layer number
+    /// is useful for programs, such as Gazebo, that put visuals in different
+    /// layers for enhanced visualization.
+    optional int32 layer       = 1;
+  }
+
   required string name         = 1;
   optional uint32 id           = 2; 
   required string parent_name  = 3;
@@ -29,4 +40,7 @@ message Visual
   optional bool is_static      = 13;
   optional Plugin plugin       = 14;
   optional Vector3d scale      = 15;
+
+  /// \brief Option meta information associated with this visual.
+  optional Meta meta           = 16;
 }

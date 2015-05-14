@@ -102,6 +102,10 @@ QAction *gazebo::gui::g_viewWireframeAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_viewOculusAct = 0;
 GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_cameraOrthoAct = 0;
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_cameraPerspectiveAct = 0;
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_resetAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showToolbarsAct = 0;

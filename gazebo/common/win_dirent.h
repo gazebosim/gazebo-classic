@@ -38,6 +38,7 @@
 #define _AMD64_
 #endif
 
+#include <cstdint>
 #include <stdio.h>
 #include <stdarg.h>
 #include <windef.h>

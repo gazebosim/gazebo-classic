@@ -1,0 +1,89 @@
+/*
+ * Copyright (C) 2015 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+#ifndef _GAZEBO_APPLYWRENCHVISUAL_HH_
+#define _GAZEBO_APPLYWRENCHVISUAL_HH_
+
+#include <string>
+
+#include "gazebo/rendering/Visual.hh"
+
+namespace gazebo
+{
+  namespace rendering
+  {
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \class ApplyWrenchVisual ApplyWrenchVisual.hh rendering/rendering.hh
+    /// \brief Visualization for the apply wrench GUI
+    class GAZEBO_VISIBLE ApplyWrenchVisual : public Visual
+    {
+      /// \brief Constructor
+      /// \param[in] _name Name of the visual
+      /// \param[in] _parentVis Pointer to the parent visual
+      public: ApplyWrenchVisual(const std::string &_name, VisualPtr _parentVis);
+
+      /// \brief Destructor
+      public: virtual ~ApplyWrenchVisual();
+
+      // Documentation inherited.
+      public: void Load();
+
+      // Documentation inherited.
+      public: void Fini();
+
+      /// \brief Set the CoM vector and update the position of the torque
+      /// visual.
+      /// \param[in] _comVector New vector.
+      public: void SetCoM(const math::Vector3 &_comVector);
+
+      /// \brief Set the force position vector and update the position of the
+      /// force visual.
+      /// \param[in] _forcePosVector New vector.
+      public: void SetForcePos(const math::Vector3 &_forcePosVector);
+
+      /// \brief Update force vector, force text and mode.
+      /// \param[in] _forceVector New vector.
+      public: void SetForce(const math::Vector3 &_forceVector);
+
+      /// \brief Update torque vector, torque text and mode.
+      /// \param[in] _torqueVector New vector.
+      public: void SetTorque(const math::Vector3 &_torqueVector);
+
+      /// \brief Update the force visual according to the force and force
+      /// position vectors.
+      public: void UpdateForceVisual();
+
+      /// \brief Update the torque visual according to the torque and CoM
+      /// vectors.
+      public: void UpdateTorqueVisual();
+
+      /// \brief Resize all children according to target link's size.
+      public: void Resize();
+
+      /// \brief Get the rotation to point the positive Z axis to the
+      /// given direction.
+      /// \param[in] _dir Direction vector.
+      /// \return Resulting quaternion
+      private: math::Quaternion GetQuaternionFromVector(
+          const math::Vector3 &_dir);
+    };
+    /// \}
+  }
+}
+#endif
