@@ -16,6 +16,9 @@
  */
 
 #include "gazebo/common/Console.hh"
+
+#include "gazebo/transport/Node.hh"
+
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/LogPlayWidgetPrivate.hh"
@@ -78,6 +81,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   stepBackButton->setIconSize(smallIconSize);
   stepBackButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
+  connect(stepBackButton, SIGNAL(clicked()), this, SLOT(OnStepBack()));
 
   // Jump start
   QToolButton *jumpStartButton = new QToolButton(this);
@@ -148,6 +152,13 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
+
+  // Transport
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  this->dataPtr->logPlaybackControlPub = this->dataPtr->node->
+      Advertise<msgs::LogPlaybackControl>("~/playback_control");
 }
 
 /////////////////////////////////////////////////
@@ -196,24 +207,39 @@ void LogPlayWidget::OnPause()
 void LogPlayWidget::OnStepForward()
 {
   // TODO: Add possibility to change number of steps
-  g_stepAct->trigger();
+  msgs::LogPlaybackControl msg;
+  msg.set_multi_step(1);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+  //g_stepAct->trigger();
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnStepBack()
 {
+  msgs::LogPlaybackControl msg;
+  msg.set_multi_step(-1);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+
   gzdbg << "send Step Back msg" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnJumpStart()
 {
+  msgs::LogPlaybackControl msg;
+  msg.set_rewind(true);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+
   gzdbg << "send Jump Start msg" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnJumpEnd()
 {
+  msgs::LogPlaybackControl msg;
+  msg.set_forward(true);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+
   gzdbg << "send Jump End msg" << std::endl;
 }
 
@@ -354,7 +380,7 @@ void LogPlayView::SetCurrentTime(int _msec)
   if (this->dataPtr->currentTimeItem->isSelected())
     return;
 
-std::cout << "Start: " << this->dataPtr->startTime << " Current: " << _msec << std::endl;
+//std::cout << "Start: " << this->dataPtr->startTime << " Current: " << _msec << std::endl;
 
   double relPos = double(_msec - this->dataPtr->startTime) /
       (this->dataPtr->endTime - this->dataPtr->startTime);

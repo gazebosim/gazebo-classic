@@ -47,6 +47,12 @@ namespace gazebo
 
       /// \brief Paused state of the simulation.
       public: TimePanel *timePanel;
+
+      /// \brief Node used for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: transport::PublisherPtr logPlaybackControlPub;
     };
 
     /// \class LogPlayViewPrivate LogPlayViewPrivate.hh
