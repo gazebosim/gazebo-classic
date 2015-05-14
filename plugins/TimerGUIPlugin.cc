@@ -155,6 +155,13 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   bool hasStartButton = false;
   bool hasResetButton = false;
 
+  if (_elem->HasElement("countdown_time"))
+  {
+    common::Time maxTime =
+        _elem->GetElement("countdown_time")->Get<common::Time>();
+    this->timer = common::Timer(maxTime, true);
+  }
+
   // Check if there is a start button
   if (_elem->HasElement("start_stop_button"))
   {
