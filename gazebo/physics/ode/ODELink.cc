@@ -190,7 +190,7 @@ void ODELink::MoveCallback(dBodyID _id)
 
   self->dirtyPose.pos -= cog;
 
-  // TODO: this is an ugly line of code. It's like this for speed.
+  // Tell the world that our pose has changed.
   self->world->_AddDirty(self);
 
   // self->poseMutex->unlock();

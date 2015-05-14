@@ -83,7 +83,13 @@ namespace gazebo
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
+
+      /// \brief Custom processing for the QT showEvent. Based on empirical
+      /// evidence, we believe Mac needs to create the render window in this
+      /// function.
+      /// \param[in] _e The QT show event information.
       protected: virtual void showEvent(QShowEvent *_e);
+
       protected: virtual void enterEvent(QEvent * event);
 
 

@@ -232,36 +232,25 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::showEvent(QShowEvent *_event)
 {
+  // These two functions are most applicable for Linux.
   QApplication::flush();
   QApplication::syncX();
 
+  // Get the window handle in a form that OGRE can use.
   std::string winHandle = this->GetOgreHandle();
 
+  // Create the OGRE render window
   this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
     CreateWindow(winHandle, this->width(), this->height());
 
+  // Attach the user camera to the window
   rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
       this->windowId, this->userCamera);
-  /*
-  rendering::init();
 
-  this->scene = rendering::create_scene(gui::get_world(), true);
-
-  if (!this->scene)
-  {
-    gzerr << "GLWidget could not create a scene. This will likely result "
-      << "in a blank screen.\n";
-  }
-  else
-  {
-    this->OnCreateScene(this->scene->GetName());
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->windowId, this->userCamera);
-  }
-
-  */
+  // Let QT continue processing the show event.
   QWidget::showEvent(_event);
 
+  // Grab focus.
   this->setFocus();
 }
 

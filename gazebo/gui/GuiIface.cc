@@ -234,6 +234,10 @@ bool gui::load()
 
   g_modelRightMenu = new gui::ModelRightMenu();
 
+  // Load the rendering engine.
+  rendering::load();
+  rendering::init();
+
   g_argv = new char*[g_argc];
   for (int i = 0; i < g_argc; i++)
   {
@@ -243,10 +247,6 @@ bool gui::load()
 
   g_app = new QApplication(g_argc, g_argv);
   set_style();
-
-  // Load the rendering engine.
-  rendering::load();
-  rendering::init();
 
   g_main_win = new gui::MainWindow();
 
