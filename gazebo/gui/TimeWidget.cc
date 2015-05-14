@@ -90,6 +90,7 @@ TimeWidget::TimeWidget(QWidget *_parent)
   if (g_stepAct)
   {
     playToolbar->addAction(g_stepAct);
+    std::cout << "Timewidget enable[" << this->dataPtr->paused << "]\n";
     g_stepAct->setEnabled(this->dataPtr->paused);
   }
   this->dataPtr->stepToolBarLabelAction =

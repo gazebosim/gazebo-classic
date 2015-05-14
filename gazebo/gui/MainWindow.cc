@@ -1052,6 +1052,7 @@ void MainWindow::CreateActions()
   g_stepAct->setStatusTip(tr("Step the world"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
   this->CreateDisabledIcon(":/images/end.png", g_stepAct);
+  g_stepAct->setEnabled(false);
 
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
