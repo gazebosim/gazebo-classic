@@ -16,6 +16,7 @@
 */
 
 #include "ServerFixture.hh"
+#include "gazebo/gazebo_config.h"
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "helper_physics_generator.hh"
@@ -99,12 +100,15 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////
 void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 {
-  /// \TODO: bullet hinge angles are wrapped (#1074)
+#ifndef LIBBULLET_VERSION_GT_282
+  /// bullet hinge angles are wrapped for 2.82 and less
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Aborting test for bullet, see issues #1074.\n";
+    gzerr << "Aborting test for bullet, angle wrapping requires bullet 2.83"
+          << std::endl;
     return;
   }
+#endif
 
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -126,6 +130,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     ASSERT_TRUE(joint != NULL);
 
     // set velocity to 2 pi rad/s and step forward 1.5 seconds.
+    // angle should reach 3 pi rad.
     double vel = 2*M_PI;
     unsigned int stepSize = 50;
     unsigned int stepCount = 30;
