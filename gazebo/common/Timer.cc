@@ -49,6 +49,11 @@ void Timer::Start()
     this->start = Time::GetWallTime();
     this->reset = false;
   }
+  else if (!this->running)
+  {
+    // Add the time that has elapsed since stopping to the start time.
+    this->start += (Time::GetWallTime() - this->stop);
+  }
 
   this->running = true;
 }
@@ -58,6 +63,8 @@ void Timer::Stop()
 {
   this->stop = Time::GetWallTime();
   this->running = false;
+
+  // We need to do something to freeze the start time
 }
 
 //////////////////////////////////////////////////
