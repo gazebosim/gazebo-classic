@@ -1,6 +1,6 @@
 ## Gazebo 6.0
 1. Added "countdown" behavior for common::Timer and exposed the feature in TimerGUIPlugin.
-    * [Pull request #]()
+    * [Pull request #1690](https://bitbucket.org/osrf/gazebo/pull-request/1690)
 
 1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
     * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
