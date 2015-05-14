@@ -198,6 +198,10 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void PhysicsPropertyChanged(QtProperty *_item);
 
+      /// \brief Called when a GUI property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void GUIPropertyChanged(QtProperty *_item);
+
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
 
@@ -211,10 +215,22 @@ namespace gazebo
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
 
+      /// \brief GUI tree item.
+      private: QTreeWidgetItem *guiItem;
+
+      /// \brief Scene tree item.
       private: QTreeWidgetItem *sceneItem;
+
+      /// \brief Physics tree item.
       private: QTreeWidgetItem *physicsItem;
+
+      /// \brief Models tree item.
       private: QTreeWidgetItem *modelsItem;
+
+      /// \brief Lights tree item.
       private: QTreeWidgetItem *lightsItem;
+
+      /// \brief Spherical coordinates tree item.
       private: QTreeWidgetItem *sphericalCoordItem;
 
       private: QtVariantPropertyManager *variantManager;
