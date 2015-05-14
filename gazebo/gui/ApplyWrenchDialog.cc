@@ -29,6 +29,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
 
+#include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ApplyWrenchDialogPrivate.hh"
 #include "gazebo/gui/ApplyWrenchDialog.hh"
@@ -425,6 +426,9 @@ void ApplyWrenchDialog::Fini()
 
   if (this->dataPtr->applyWrenchVisual)
   {
+    MouseEventHandler::Instance()->RemoveReleaseFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+
     this->dataPtr->applyWrenchVisual->Fini();
   }
   this->dataPtr->applyWrenchVisual.reset();
@@ -557,6 +561,14 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   this->dataPtr->wrenchPub.reset();
   this->dataPtr->wrenchPub =
       this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
+
+  // MouseRelease filter to gain focus
+  if (this->dataPtr->applyWrenchVisual)
+  {
+    MouseEventHandler::Instance()->AddReleaseFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+  }
 
   return true;
 }
@@ -853,4 +865,37 @@ void ApplyWrenchDialog::AttachVisuals()
   this->SetForce(this->dataPtr->forceVector);
 }
 
+/////////////////////////////////////////////////
+bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera || !this->dataPtr->applyWrenchVisual)
+    return false;
 
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+
+  if (!vis || _event.dragging)
+    return false;
+
+  if (vis == this->dataPtr->applyWrenchVisual->GetForceVisual() ||
+      vis == this->dataPtr->applyWrenchVisual->GetTorqueVisual())
+  {
+    this->ActivateWindow();
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::ActivateWindow()
+{
+  if (!this->isActiveWindow())
+  {
+    // Clear focus before activating not to trigger FucusIn
+    QWidget *focusedWidget = this->focusWidget();
+    if (focusedWidget)
+      focusedWidget->clearFocus();
+
+    this->activateWindow();
+  }
+}
