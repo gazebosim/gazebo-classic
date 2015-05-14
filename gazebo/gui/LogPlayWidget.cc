@@ -107,6 +107,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->dataPtr->stepSpin = new QSpinBox();
   this->dataPtr->stepSpin->setMaximumWidth(30);
   this->dataPtr->stepSpin->setValue(1);
+  this->dataPtr->stepSpin->setRange(1, 10000);
 
   QHBoxLayout *stepLayout = new QHBoxLayout();
   stepLayout->addWidget(stepLabel);
@@ -209,13 +210,19 @@ void LogPlayWidget::SetPaused(const bool _paused)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPlay()
 {
-  g_playAct->trigger();
+  msgs::LogPlaybackControl msg;
+  msg.set_pause(false);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+ // g_playAct->trigger();
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPause()
 {
-  g_pauseAct->trigger();
+  msgs::LogPlaybackControl msg;
+  msg.set_pause(true);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+  // g_pauseAct->trigger();
 }
 
 /////////////////////////////////////////////////
