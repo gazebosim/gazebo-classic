@@ -101,14 +101,29 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   jumpEndButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
 
+  // Step size
+  QLabel *stepLabel = new QLabel("Step: ");
+
+  this->dataPtr->stepSpin = new QSpinBox();
+  this->dataPtr->stepSpin->setMaximumWidth(30);
+  this->dataPtr->stepSpin->setValue(1);
+
+  QHBoxLayout *stepLayout = new QHBoxLayout();
+  stepLayout->addWidget(stepLabel);
+  stepLayout->addWidget(this->dataPtr->stepSpin);
+
+  stepLayout->setAlignment(stepLabel, Qt::AlignRight);
+  stepLayout->setAlignment(this->dataPtr->stepSpin, Qt::AlignLeft);
+
   // Play layout
-  QHBoxLayout *playLayout = new QHBoxLayout();
-  playLayout->addWidget(jumpStartButton);
-  playLayout->addWidget(stepBackButton);
-  playLayout->addWidget(playButton);
-  playLayout->addWidget(pauseButton);
-  playLayout->addWidget(stepForwardButton);
-  playLayout->addWidget(jumpEndButton);
+  QGridLayout *playLayout = new QGridLayout();
+  playLayout->addWidget(jumpStartButton, 0, 0);
+  playLayout->addWidget(stepBackButton, 0, 1);
+  playLayout->addWidget(playButton, 0, 2);
+  playLayout->addWidget(pauseButton, 0, 3);
+  playLayout->addWidget(stepForwardButton, 0, 4);
+  playLayout->addWidget(jumpEndButton, 0, 5);
+  playLayout->addLayout(stepLayout, 1, 0, 1, 6);
 
   // View
   this->dataPtr->view = new LogPlayView(this);
@@ -208,7 +223,7 @@ void LogPlayWidget::OnStepForward()
 {
   // TODO: Add possibility to change number of steps
   msgs::LogPlaybackControl msg;
-  msg.set_multi_step(1);
+  msg.set_multi_step(this->dataPtr->stepSpin->value());
   this->dataPtr->logPlaybackControlPub->Publish(msg);
   //g_stepAct->trigger();
 }
@@ -217,10 +232,8 @@ void LogPlayWidget::OnStepForward()
 void LogPlayWidget::OnStepBack()
 {
   msgs::LogPlaybackControl msg;
-  msg.set_multi_step(-1);
+  msg.set_multi_step(-this->dataPtr->stepSpin->value());
   this->dataPtr->logPlaybackControlPub->Publish(msg);
-
-  gzdbg << "send Step Back msg" << std::endl;
 }
 
 /////////////////////////////////////////////////

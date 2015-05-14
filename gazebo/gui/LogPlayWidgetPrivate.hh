@@ -53,6 +53,9 @@ namespace gazebo
 
       /// \brief Used to start, stop, and step simulation.
       public: transport::PublisherPtr logPlaybackControlPub;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: QSpinBox *stepSpin;
     };
 
     /// \class LogPlayViewPrivate LogPlayViewPrivate.hh
