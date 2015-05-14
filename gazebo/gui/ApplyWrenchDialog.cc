@@ -403,27 +403,22 @@ ApplyWrenchDialog::~ApplyWrenchDialog()
 void ApplyWrenchDialog::Init(const std::string &_modelName,
     const std::string &_linkName)
 {
-std::cout << "Init  qqq" << std::endl;
   if (!this->SetModel(_modelName))
   {
     this->Fini();
     return;
   }
-std::cout << "Init  dwww" << std::endl;
 
   if (!this->SetLink(_linkName))
   {
     this->Fini();
     return;
   }
-std::cout << "Initgwegvrdes" << std::endl;
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
-std::cout << "Init  dddd" << std::endl;
 
   this->move(QCursor::pos());
   this->show();
-std::cout << "/Init" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -568,9 +563,7 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   }
   this->dataPtr->linkVisual = vis;
 
-std::cout << "SetLink A" << std::endl;
   this->AttachVisuals();
-std::cout << "SetLink B" << std::endl;
 
   // Set publisher
   std::string topicName = "~/";
@@ -592,7 +585,6 @@ std::cout << "SetLink B" << std::endl;
         "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
         boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
   }
-std::cout << "SetLink C" << std::endl;
 
   return true;
 }
@@ -888,7 +880,6 @@ void ApplyWrenchDialog::AttachVisuals()
   // Attaching for the first time
   if (!this->dataPtr->applyWrenchVisual)
   {
-std::cout << "AttachVisuals A" << std::endl;
     // Generate unique name
     std::string visName = this->dataPtr->modelName + "__APPLY_WRENCH__";
     rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
@@ -902,17 +893,14 @@ std::cout << "AttachVisuals A" << std::endl;
 
     this->dataPtr->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(
         visName, this->dataPtr->linkVisual));
-std::cout << "AttachVisuals 2" << std::endl;
 
     this->dataPtr->applyWrenchVisual->Load();
-std::cout << "AttachVisuals 3" << std::endl;
   }
   // Different link
   else if (!this->dataPtr->applyWrenchVisual->GetParent() ||
       this->dataPtr->applyWrenchVisual->GetParent() !=
       this->dataPtr->linkVisual)
   {
-std::cout << "AttachVisuals B" << std::endl;
     this->dataPtr->linkVisual->AttachVisual(this->dataPtr->applyWrenchVisual);
     this->dataPtr->applyWrenchVisual->Resize();
   }

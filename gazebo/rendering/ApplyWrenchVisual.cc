@@ -205,34 +205,26 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueLine->AddPoint(0, 0, 0);
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
 
-std::cout << "Load A" << std::endl;
   // Rotation manipulator
   dPtr->rotTool.reset(new rendering::SelectionObj(
       this->GetName() + "__SELECTION_OBJ", shared_from_this()));
-std::cout << "Load A" << std::endl;
   dPtr->rotTool->Load();
-std::cout << "Load A" << std::endl;
   dPtr->rotTool->SetMode("rotate");
-std::cout << "Load A" << std::endl;
   dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_X, false);
-std::cout << "Load A" << std::endl;
   dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Y,
       "Gazebo/DarkMagentaTransparent");
   dPtr->rotTool->SetHandleMaterial(SelectionObj::ROT_Z,
       "Gazebo/DarkMagentaTransparent");
-std::cout << "Load B" << std::endl;
 
   // Initialize
   dPtr->forceVector = math::Vector3::Zero;
   dPtr->torqueVector = math::Vector3::Zero;
-std::cout << "Load A" << std::endl;
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   this->Resize();
   this->UpdateForceVisual();
   this->UpdateTorqueVisual();
   this->SetMode("none");
-std::cout << "Load end" << std::endl;
 }
 
 ///////////////////////////////////////////////////
