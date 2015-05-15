@@ -184,6 +184,8 @@ void ElevatorPlugin::Update(const common::UpdateInfo &_info)
 void ElevatorPlugin::Reset()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->stateMutex);
+  for (auto s: this->states)
+    delete s;
   this->dataPtr->states.clear();
   this->dataPtr->doorController->Reset();
   this->dataPtr->liftController->Reset();
