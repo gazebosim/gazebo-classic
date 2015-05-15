@@ -26,7 +26,7 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/Model.hh>
 
-#include "plugins/OccupiedEventSource.hh"
+#include "plugins/events/OccupiedEventSource.hh"
 
 using namespace gazebo;
 
@@ -47,7 +47,7 @@ void OccupiedEventSource::Load(const sdf::ElementPtr _sdf)
   EventSource::Load(_sdf);
 
   if (_sdf->HasElement("region"))
-    this->regionName = _sdf->GetElement("region")->Get<std::string>();
+    this->regionName = _sdf->Get<std::string>("region");
   else
   {
     gzerr << "SimEventPlugin event[" << this->name << "] "
@@ -88,6 +88,9 @@ void OccupiedEventSource::Load(const sdf::ElementPtr _sdf)
     // Setup communication
     this->node = transport::NodePtr(new transport::Node());
     this->node->Init(this->world->GetName());
+    this->msgPub = this->node->Advertise<gazebo::msgs::GzString>(topic);
+
+    this->msg.set_data(data);
 
     // Connect to the update event.
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -111,25 +114,10 @@ void OccupiedEventSource::Update()
 
     math::Pose modelPose = (*iter)->GetWorldPose();
 
-    // Check if the model's pose is inside a specified region
-    for (std::map<std::string, Region*>::iterator rIter = this->regions.begin();
-         rIter != this->regions.end(); ++rIter)
+    // If inside, then transmit the desired message.
+    if (this->regions[this->regionName]->Contains(modelPose.pos))
     {
-      math::Vector3 min = rIter->second->pose.pos -
-                          rIter->second->box / 2.0;
-
-      math::Vector3 max = rIter->second->pose.pos +
-                          rIter->second->box / 2.0;
-
-      // If inside, then transmit the desired message.
-      if (modelPose.pos.x > min.x && modelPose.pos.x < max.x &&
-          modelPose.pos.y > min.y && modelPose.pos.y < max.y &&
-          modelPose.pos.z > min.z && modelPose.pos.z < max.z)
-      {
-        msgs::GzString msg;
-        msg.set_data(rIter->second->msg);
-        rIter->second->pub->Publish(msg);
-      }
+      this->msgPub->Publish(this->msg);
     }
   }
 }

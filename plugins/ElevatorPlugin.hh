@@ -131,7 +131,9 @@ namespace gazebo
                /// \brief Constructor
                /// \param[in] _liftJoint Pointer to the joint that should be
                /// controlled.
-               public: LiftController(physics::JointPtr _liftJoint);
+               /// \param[in] _floorHeight Height of each floor.
+               public: LiftController(physics::JointPtr _liftJoint,
+                                      float _floorHeight);
 
                /// \brief Destructor
                public: virtual ~LiftController() = default;
@@ -158,7 +160,7 @@ namespace gazebo
                public: int floor;
 
                /// \brief Height of each floor.
-               public: int floorHeight;
+               public: float floorHeight;
 
                /// \brief Joint to control
                public: physics::JointPtr liftJoint;
@@ -266,8 +268,6 @@ namespace gazebo
 
     /// \brief Mutex to protect states.
     private: std::mutex stateMutex;
-
-    private: float floorHeight;
   };
 }
 #endif

@@ -39,7 +39,7 @@ class SimEventsTest : public ServerFixture,
   //public: void ModelInAndOutOfRegion(const std::string &_physicsEngine);
   public: void OccupiedEventSource(const std::string &_physicsEngine);
 };
-/*
+
 // globals to exchange data between threads
 boost::mutex g_mutex;
 unsigned int g_event_count = 0;
@@ -209,8 +209,6 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   EXPECT_GT(countAfter2, countBefore2);
 }
 
-*/
-
 // test macro
 TEST_P(SimEventsTest, OccupiedEventSource)
 {
@@ -226,32 +224,32 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   // simbody stepTo() failure
   if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
 
-  this->Load("worlds/elevator.world", true, _physicsEngine);
+  this->Load("worlds/elevator.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
 
   // Get the elevator model
   physics::ModelPtr elevatorModel = world->GetModel("elevator");
 
-  std::cout << "Elevator Pose1["
-            << elevatorModel->GetWorldPose().pos << "]\n";
+  gzdbg << "Elevator Pose1["
+        << elevatorModel->GetWorldPose().pos << "]\n";
 
   // Make sure the elevator is on the ground level
-  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 1.0);
-  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 0.0);
+  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 0.08);
+  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 0.07);
 
   // Spawn a box on the second floor, which should call the elevator up.
   this->SpawnBox("_my_test_box_", math::Vector3(0.5, 0.5, 0.5),
-      math::Vector3(0, 0, 3.6), math::Vector3(0, 0, 0));
+      math::Vector3(2, 0, 3.65), math::Vector3(0, 0, 0));
 
-  // Step the world forward.
-  world->Step(10000);
+  // Wait for elevator to move. 10 seconds is more than long enough.
+  common::Time::Sleep(10);
 
-  std::cout << "Elevator Pose2["
-            << elevatorModel->GetWorldPose().pos << "]\n";
+  gzdbg << "Elevator Pose2["
+        << elevatorModel->GetWorldPose().pos << "]\n";
 
   // Make sure the elevator has moved upd to the second floor.
-  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 3.5);
-  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.0);
+  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 3.08);
+  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.05);
 }
 
 // magic macro

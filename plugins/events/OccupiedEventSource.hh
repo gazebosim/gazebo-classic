@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_OCCUPIED_EVENT_SOURCE_HH_
-#define _GAZEBO_OCCUPIED_EVENT_SOURCE_HH_
+#ifndef _GAZEBO_PLUGINS_EVENTS_OCCUPIED_EVENT_SOURCE_HH_
+#define _GAZEBO_PLUGINS_EVENTS_OCCUPIED_EVENT_SOURCE_HH_
 
 #include <string>
 #include <map>
@@ -28,6 +28,7 @@
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/util/system.hh>
 
+#include "Region.hh"
 #include "EventSource.hh"
 
 namespace gazebo
@@ -58,7 +59,8 @@ namespace gazebo
   {
     /// \brief Constructor.
     public: OccupiedEventSource(transport::PublisherPtr _pub,
-    physics::WorldPtr _world, const std::map<std::string, RegionPtr> &_regions);
+                physics::WorldPtr _world,
+                const std::map<std::string, RegionPtr> &_regions);
 
     /// \brief Destructor.
     public: ~OccupiedEventSource() = default;
@@ -69,43 +71,26 @@ namespace gazebo
     /// \brief Update function called once every cycle
     private: void Update();
 
-    /// \brief World pointer.
-    private: physics::WorldPtr world;
-
     /// \brief SDF pointer.
     private: sdf::ElementPtr sdf;
 
-    /// \brief Description of a region that will trigger an event.
-    private: class Region
-             {
-               /// \brief Name of the region
-               public: std::string name;
-
-               /// \brief Center pose of the region
-               public: math::Pose pose;
-
-               /// \brief Box that encapsulates the region. The box is
-               /// centered at the pose.
-               public: math::Vector3 box;
-
-               /// \brief String message that is transmitted when an event
-               /// occurs.
-               public: std::string msg;
-
-               /// \brief Publisher that transmits the message when an event
-               /// occurs.
-               public: transport::PublisherPtr pub;
-             };
-
-
     /// \brief Map of region names to regions.
-    private: std::map<std::string, Region*> regions;
+    private: std::map<std::string, RegionPtr> regions;
+
+    /// \brief String message that is transmitted when an event occurs.
+    public: msgs::GzString msg;
+
+    /// \brief Publisher that transmits the message when an event occurs.
+    public: transport::PublisherPtr msgPub;
 
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
 
     /// \brief Pointer to a transport node.
     private: transport::NodePtr node;
+
+    /// \brief The region used for the in region check.
+    private: std::string regionName;
   };
 }
 #endif

@@ -60,11 +60,11 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("topic"))
     elevatorTopic = this->sdf->Get<std::string>("topic");
 
+  float floorHeight = 3.0;
   if (this->sdf->HasElement("floor_height"))
-    this->floorHeight = this->sdf->Get<float>("floor_height");
+    floorHeight = this->sdf->Get<float>("floor_height");
   else
   {
-    this->floorHeight = 3.0;
     gzwarn << "No <floor_height> specified for elevator plugin. "
            << "Using a height of 3 meters. This value may cause "
            << "the elevator to move incorrectly.\n";
@@ -92,7 +92,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Create the door and lift controllers.
   this->doorController = new DoorController(this->doorJoint);
-  this->liftController = new LiftController(this->liftJoint);
+  this->liftController = new LiftController(this->liftJoint, floorHeight);
 
   // Connect to the update event.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -110,7 +110,6 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
 {
-  std::cout << "OnElevator[" << _msg->DebugString() << "]\n";
   std::lock_guard<std::mutex> lock(this->stateMutex);
 
   // Ignore messages when the elevator is currently busy.
@@ -328,8 +327,10 @@ bool ElevatorPlugin::DoorController::Update()
 }
 
 /////////////////////////////////////////////////
-ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint)
-  : state(STATIONARY), floor(0), liftJoint(_liftJoint)
+ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint,
+    float _floorHeight)
+  : state(STATIONARY), floor(0), floorHeight(_floorHeight),
+    liftJoint(_liftJoint)
 {
   this->liftPID.Init(100000, 0, 100000.0);
 }
@@ -338,7 +339,7 @@ ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint)
 bool ElevatorPlugin::LiftController::Update()
 {
   double error = this->liftJoint->GetAngle(0).Radian() -
-    (this->floor * this->floorHeight) + 0.1;
+    (this->floor * this->floorHeight);
   double force = this->liftPID.Update(error, common::Time(0, 1000000));
 
   this->liftJoint->SetForce(0, force);
