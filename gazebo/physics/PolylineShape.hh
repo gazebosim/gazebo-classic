@@ -17,6 +17,12 @@
 #ifndef _GAZEBO_POLYLINESHAPE_HH_
 #define _GAZEBO_POLYLINESHAPE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <vector>
 #include "gazebo/physics/Shape.hh"
 
@@ -29,7 +35,7 @@ namespace gazebo
 
     /// \class PolylineShape PolylineShape.hh physics/physcs.hh
     /// \brief Polyline geometry primitive.
-    class GAZEBO_VISIBLE PolylineShape : public Shape
+    class GZ_PHYSICS_VISIBLE PolylineShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

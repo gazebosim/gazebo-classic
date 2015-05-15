@@ -19,7 +19,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "helper_physics_generator.hh"
 
 #define PHYSICS_TOL 1e-2

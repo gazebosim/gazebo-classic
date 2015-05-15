@@ -24,6 +24,10 @@
 #include "gazebo/common/ColladaExporterPrivate.hh"
 #include "gazebo/common/ColladaExporter.hh"
 
+#ifdef _WIN32
+  #define snprintf _snprintf
+#endif
+
 using namespace gazebo;
 using namespace common;
 

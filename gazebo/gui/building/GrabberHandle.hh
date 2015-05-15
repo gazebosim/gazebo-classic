@@ -26,7 +26,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE GrabberHandle : public QGraphicsItem
+    class GZ_GUI_BUILDING_VISIBLE GrabberHandle : public QGraphicsItem
     {
       /// \brief Constructor
       /// \param[in] _parent Parent graphics item
