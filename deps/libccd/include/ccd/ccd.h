@@ -18,6 +18,31 @@
 #ifndef __CCD_H__
 #define __CCD_H__
 
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_CCD
+    #ifdef __GNUC__
+      #define CCD_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define CCD_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define CCD_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define CCD_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define CCD_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define CCD_VISIBLE __attribute__ ((visibility ("default")))
+    #define CCD_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define CCD_VISIBLE
+    #define CCD_HIDDEN
+  #endif
+#endif
+
 #include <ccd/vec3.h>
 
 #ifdef __cplusplus
@@ -71,7 +96,7 @@ typedef struct _ccd_t ccd_t;
 /**
  * Default first direction.
  */
-void ccdFirstDirDefault(const void *o1, const void *o2, ccd_vec3_t *dir);
+CCD_VISIBLE void ccdFirstDirDefault(const void *o1, const void *o2, ccd_vec3_t *dir);
 
 #define CCD_INIT(ccd) \
     do { \
@@ -122,7 +147,7 @@ int ccdGJKPenetration(const void *obj1, const void *obj2, const ccd_t *ccd,
 /**
  * Returns true if two given objects intersect - MPR algorithm is used.
  */
-int ccdMPRIntersect(const void *obj1, const void *obj2, const ccd_t *ccd);
+CCD_VISIBLE int ccdMPRIntersect(const void *obj1, const void *obj2, const ccd_t *ccd);
 
 /**
  * Computes penetration of obj2 into obj1.
@@ -136,7 +161,7 @@ int ccdMPRIntersect(const void *obj1, const void *obj2, const ccd_t *ccd);
  *
  * Returns 0 if obj1 and obj2 intersect, otherwise -1 is returned.
  */
-int ccdMPRPenetration(const void *obj1, const void *obj2, const ccd_t *ccd,
+CCD_VISIBLE int ccdMPRPenetration(const void *obj1, const void *obj2, const ccd_t *ccd,
                       ccd_real_t *depth, ccd_vec3_t *dir, ccd_vec3_t *pos);
 
 #ifdef __cplusplus

@@ -57,8 +57,9 @@ namespace gazebo
   /// \param[in] _argc Number of commandline arguments.
   /// \param[in] _argv The commandline arguments.
   /// \return True on success.
+  /// \sa gazebo_client.hh
   GAZEBO_VISIBLE
-  bool setupClient(int _argc = 0, char **_argv = 0);
+  bool setupClient(int _argc = 0, char **_argv = 0) GAZEBO_DEPRECATED(6.0);
 
   /// \brief Start a gazebo client. This starts transportation, and makes it
   /// possible to connect to a running simulation.
@@ -68,8 +69,10 @@ namespace gazebo
   /// arguments are only parsed by the system plugins.
   /// \sa gazebo::SystemPlugin::Load()
   /// \return True on success.
+  /// \sa gazebo_client.hh
   GAZEBO_VISIBLE
-  bool setupClient(const std::vector<std::string> &_args);
+  bool setupClient(const std::vector<std::string> &_args)
+  GAZEBO_DEPRECATED(6.0);
 
   /// \brief Create and load a new world from an SDF world file.
   /// \param[in] _worldFile The world file to load from.

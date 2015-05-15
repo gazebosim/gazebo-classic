@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class AxisVisual AxisVisual.hh rendering/rendering.hh
     /// \brief Basic axis visualization
-    class GAZEBO_VISIBLE AxisVisual : public Visual
+    class GZ_RENDERING_VISIBLE AxisVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the AxisVisual

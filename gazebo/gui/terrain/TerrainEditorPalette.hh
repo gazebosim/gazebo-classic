@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class TerrainEditorPalette TerrainEditorPalette.hh
     /// \brief A palette of building items which can be added to the editor.
-    class GAZEBO_VISIBLE TerrainEditorPalette : public QWidget
+    class GZ_GUI_TERRAIN_VISIBLE TerrainEditorPalette : public QWidget
     {
       Q_OBJECT
 

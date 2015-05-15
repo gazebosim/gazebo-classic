@@ -23,6 +23,15 @@ if (HAVE_DART)
   link_directories(${DARTCore_LIBRARY_DIRS})
 endif()
 
+if (CURL_FOUND)
+  include_directories(${CURL_INCLUDEDIR})
+  link_directories(${CURL_LIBDIR})
+  if (WIN32)
+    add_definitions(-DCURL_STATICLIB)
+  endif()
+endif()
+
+
 set (test_sources
   gz_log_TEST.cc
   gz_TEST.cc
@@ -32,8 +41,24 @@ gz_build_tests(${test_sources})
 
 add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_joy.cc)
 target_link_libraries(gz
- gazebo_gui gazebo_physics gazebo_util
- gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES} pthread)
+ libgazebo_client
+ gazebo_msgs gazebo_common gazebo_transport gazebo_gui gazebo_physics
+ gazebo_physics_ode gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES})
+
+if(HAVE_BULLET)
+  target_link_libraries(gz gazebo_physics_bullet)
+endif()
+if (HAVE_SIMBODY)
+  target_link_libraries(gz gazebo_physics_simbody)
+endif()
+if(HAVE_DART)
+  target_link_libraries(gz gazebo_physics_dart)
+endif()
+
+if (UNIX)
+  target_link_libraries(gz pthread)
+endif()
+
 gz_install_executable(gz)
 
 roffman(gz 1)

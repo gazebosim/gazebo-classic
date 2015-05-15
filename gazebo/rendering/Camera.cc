@@ -15,10 +15,19 @@
  *
 */
 
-#include <dirent.h>
 #include <sstream>
+
 #include <boost/filesystem.hpp>
 #include <sdf/sdf.hh>
+
+#ifndef _WIN32
+  #include <dirent.h>
+#else
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  #include "gazebo/common/win_dirent.h"
+#endif
 
 // Moved to top to avoid osx compilation errors
 #include "gazebo/math/Rand.hh"
@@ -1056,7 +1065,8 @@ bool Camera::SaveFrame(const unsigned char *_image,
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
 
   // OGRE 1.9 renames codeToFile to encodeToFile
-  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+  // Looks like 1.9RC, which we're using on Windows, doesn't have this change.
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
   pCodec->codeToFile(stream, filename, codecDataPtr);
   #else
   pCodec->encodeToFile(stream, filename, codecDataPtr);
@@ -1265,6 +1275,9 @@ void Camera::CreateCamera()
   this->camera = this->scene->GetManager()->createCamera(
       this->scopedUniqueName);
 
+  if (this->sdf->HasElement("projection_type"))
+    this->SetProjectionType(this->sdf->Get<std::string>("projection_type"));
+
   this->camera->setFixedYawAxis(false);
   this->camera->yaw(Ogre::Degree(-90.0));
   this->camera->roll(Ogre::Degree(-90.0));
@@ -1303,6 +1316,9 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
     this->viewport->setOverlaysEnabled(false);
+
+    if (this->camera->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
+      this->scene->SetShadowsEnabled(false);
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
@@ -1725,8 +1741,7 @@ void Camera::UpdateFOV()
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
       static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov =
-      this->sdf->Get<double>("horizontal_fov");
+    double hfov = this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
@@ -1747,4 +1762,45 @@ float Camera::GetAvgFPS() const
 unsigned int Camera::GetTriangleCount() const
 {
   return this->renderTarget->getTriangleCount();
+}
+
+//////////////////////////////////////////////////
+bool Camera::SetProjectionType(const std::string &_type)
+{
+  bool result = true;
+
+  if (_type == "orthographic")
+  {
+    // Shadows do not work properly with orthographic projection
+    this->scene->SetShadowsEnabled(false);
+    this->camera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
+  }
+  else if (_type == "perspective")
+  {
+    this->camera->setProjectionType(Ogre::PT_PERSPECTIVE);
+    this->camera->setCustomProjectionMatrix(false);
+    this->scene->SetShadowsEnabled(true);
+  }
+  else
+  {
+    gzerr << "Invalid projection type[" << _type << "]. "
+      << "Valid values are 'perspective' and 'orthographic'.\n";
+    result = false;
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string Camera::GetProjectionType() const
+{
+  if (this->camera->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
+  {
+    return "orthographic";
+  }
+  // There are only two types of projection in OGRE.
+  else
+  {
+    return "perspective";
+  }
 }

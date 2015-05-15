@@ -4,6 +4,8 @@ include_directories(SYSTEM
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
+  ${TBB_INCLUDEDIR}
+  ${tinyxml_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -11,10 +13,20 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
+  ${TBB_LIBRARY_DIR}
+  ${CURL_LIBDIR}
 )
+
+if (WIN32)
+  include_directories(${libdl_include_dir})
+endif()
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
+if (WIN32)
+ add_definitions(-DBUILDING_DLL)
 endif()
 
 add_subdirectory(msgs)
@@ -26,6 +38,7 @@ add_subdirectory(gui)
 add_subdirectory(physics)
 add_subdirectory(sensors)
 add_subdirectory(util)
+add_subdirectory(test)
 
 add_dependencies(gazebo_physics gazebo_msgs)
 add_dependencies(gazebo_physics_ode gazebo_msgs)
@@ -44,10 +57,11 @@ if(HAVE_DART)
 endif()
 
 
-gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
-gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
+gz_add_executable(gzserver server_main.cc)
+gz_add_executable(gazebo gazebo_main.cc)
 
 target_link_libraries(gzserver
+  libgazebo
   gazebo_common
   gazebo_util
   gazebo_transport
@@ -55,10 +69,31 @@ target_link_libraries(gzserver
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
-  pthread
+  # Extra libs needed when linking statically (e.g., on WIN32)
+  gazebo_physics_ode
+  ${freeimage_LIBRARIES}
+  ${TBB_LIBRARIES}
 )
 
+if (HAVE_SIMBODY)
+  target_link_libraries(gzserver gazebo_physics_simbody)
+endif()
+
+if (HAVE_DART)
+  target_link_libraries(gzserver gazebo_physics_dart)
+endif()
+
+if (HAVE_BULLET)
+  target_link_libraries(gzserver gazebo_physics_bullet)
+endif()
+
+if (UNIX)
+  target_link_libraries(gzserver pthread)
+endif()
+
 target_link_libraries(gazebo
+  libgazebo
+  libgazebo_client
   gazebo_common
   gazebo_util
   gazebo_transport
@@ -67,7 +102,6 @@ target_link_libraries(gazebo
   gazebo_rendering
   gazebo_msgs
   gazebo_gui
-  pthread
 )
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
@@ -79,7 +113,7 @@ gz_install_executable(gazebo)
 manpage(gzserver 1)
 manpage(gazebo 1)
 
-gz_add_library(libgazebo Server.cc Master.cc gazebo.cc)
+gz_add_library(libgazebo Server.cc Master.cc gazebo.cc gazebo_shared.cc)
 set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")
 
 target_link_libraries(libgazebo
@@ -91,11 +125,31 @@ target_link_libraries(libgazebo
   gazebo_rendering
   gazebo_msgs
   gazebo_math
-  pthread
 )
+if (UNIX)
+  target_link_libraries(libgazebo pthread)
+endif()
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)
 
-set(headers Server.hh Master.hh gazebo.hh gazebo_core.hh)
+gz_add_library(libgazebo_client gazebo_client.cc gazebo_shared.cc)
+set_target_properties(libgazebo_client PROPERTIES OUTPUT_NAME "gazebo_client")
+target_link_libraries(libgazebo_client
+  gazebo_common
+  gazebo_transport
+  gazebo_util
+)
+if (UNIX)
+  target_link_libraries(libgazebo_client pthread)
+endif()
+gz_install_library(libgazebo_client)
+
+set(headers
+  gazebo_client.hh
+  gazebo_core.hh
+  gazebo.hh
+  Master.hh
+  Server.hh
+)
 gz_install_includes("" ${headers})
