@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _INREGIONEVENTSOURCE_HH_
-#define _INREGIONEVENTSOURCE_HH_
+#ifndef _GAZEBO_INREGIONEVENTSOURCE_HH_
+#define _GAZEBO_INREGIONEVENTSOURCE_HH_
 
 #include <map>
 #include <string>
@@ -69,16 +69,15 @@ namespace gazebo
   std::ostream& operator << (std::ostream &_out, const Region &_region);
 
   /// \brief The event generator class
-  class  InRegionEventSource: public EventSource
+  class InRegionEventSource: public EventSource
   {
     /// \brief Constructor
     /// \param[in] _pub the publisher for the SimEvents
     /// \param[in] _world Pointer to the world.
     /// \param[in] _regions dictionary of regions in the world
     public: InRegionEventSource(transport::PublisherPtr _pub,
-                                physics::WorldPtr _world,
-                                const std::map<std::string, RegionPtr>
-                                                              &_regions);
+                physics::WorldPtr _world,
+                const std::map<std::string, RegionPtr> &_regions);
 
     /// \brief Initialize the event
     public: virtual void Init();
@@ -92,7 +91,7 @@ namespace gazebo
     /// \brief Loads the full name of the model and the region from the world
     /// file.
     /// \param[in] _sdf
-    public: virtual void Load(const sdf::ElementPtr &_sdf);
+    public: virtual void Load(const sdf::ElementPtr _sdf);
 
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;

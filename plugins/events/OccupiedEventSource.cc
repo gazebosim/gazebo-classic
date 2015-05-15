@@ -26,63 +26,77 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/Model.hh>
 
-#include "plugins/EventPlugin.hh"
+#include "plugins/OccupiedEventSource.hh"
 
 using namespace gazebo;
 
-GZ_REGISTER_WORLD_PLUGIN(EventPlugin)
-
-/////////////////////////////////////////////////
-void EventPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
+////////////////////////////////////////////////////////////////////////////////
+OccupiedEventSource::OccupiedEventSource(transport::PublisherPtr _pub,
+    physics::WorldPtr _world, const std::map<std::string, RegionPtr> &_regions)
+  : EventSource(_pub, "occupied", _world), regions(_regions)
 {
-  GZ_ASSERT(_world, "EventPlugin world pointer is NULL");
-  GZ_ASSERT(_sdf, "EventPlugin sdf pointer is NULL");
-
-  this->world = _world;
-  this->sdf = _sdf;
-
-  // Setup communication
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_world->GetName());
-
-  // Read all the regions.
-  sdf::ElementPtr regionElem = _sdf->GetElement("region");
-  while (regionElem)
-  {
-    // Create a new region
-    EventPlugin::Region *region = new EventPlugin::Region;
-
-    // Get the region's name
-    region->name = regionElem->Get<std::string>("name");
-
-    // Get the region's pose and bounding box
-    region->pose = regionElem->Get<math::Pose>("pose");
-    region->box = regionElem->Get<math::Vector3>("box");
-
-    // Get the message that should be transmitted when an event occurs.
-    sdf::ElementPtr triggerElem = regionElem->GetElement("on_trigger");
-    std::string topic = triggerElem->Get<std::string>("topic");
-    sdf::ElementPtr msgElem = triggerElem->GetElement("msg");
-    std::string data = msgElem->Get<std::string>("data");
-    region->msg = data;
-
-    // Create the event publisher
-    region->pub = this->node->Advertise<msgs::GzString>(topic);
-
-    // Store the region
-    this->regions[region->name] = region;
-
-    // Get the next region, if one exists.
-    regionElem = regionElem->GetNextElement("region");
-  }
-
-  // Connect to the update event.
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&EventPlugin::Update, this));
 }
 
 /////////////////////////////////////////////////
-void EventPlugin::Update()
+void OccupiedEventSource::Load(const sdf::ElementPtr _sdf)
+{
+  std::string topic;
+  std::string data;
+
+  GZ_ASSERT(_sdf, "OccupiedEventSource sdf pointer is NULL");
+  EventSource::Load(_sdf);
+
+  if (_sdf->HasElement("region"))
+    this->regionName = _sdf->GetElement("region")->Get<std::string>();
+  else
+  {
+    gzerr << "SimEventPlugin event[" << this->name << "] "
+          << "is missing a region element. This event will be ignored.\n";
+  }
+
+  // Get the topic name
+  if (_sdf->HasElement("topic"))
+    topic = _sdf->Get<std::string>("topic");
+  else
+  {
+    gzerr << "Missing <topic>, child of <event> with name[" << this->name
+      << "]. This event will be skipped.\n";
+  }
+
+  // Get message data
+  if (_sdf->HasElement("msg_data"))
+  {
+    data = _sdf->Get<std::string>("msg_data");
+  }
+  else
+  {
+    gzerr << "Missing <msg_data>, child of <event> with name[" << this->name
+      << "]. This event will be skipped.\n";
+  }
+
+  auto regionIter = this->regions.find(this->regionName);
+  if (regionIter == this->regions.end())
+  {
+    gzerr << "Unkown region with name[" << this->regionName << "] "
+          << "in <event> with name[" << this->name << "]. "
+          << "This event will be skipped.\n";
+  }
+
+  // Setup communications and connect to world update if everything is okay.
+  if (!topic.empty() && !data.empty() && regionIter != this->regions.end())
+  {
+    // Setup communication
+    this->node = transport::NodePtr(new transport::Node());
+    this->node->Init(this->world->GetName());
+
+    // Connect to the update event.
+    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&OccupiedEventSource::Update, this));
+  }
+}
+
+/////////////////////////////////////////////////
+void OccupiedEventSource::Update()
 {
   // Get all the models.
   physics::Model_V models = this->world->GetModels();

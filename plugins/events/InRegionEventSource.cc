@@ -21,15 +21,14 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 InRegionEventSource::InRegionEventSource(transport::PublisherPtr _pub,
-                                         physics::WorldPtr _world,
-                                         const std::map<std::string, RegionPtr>
-                                                                      &_regions)
-  :EventSource(_pub, "region", _world), regions(_regions), isInside(false)
+    physics::WorldPtr _world,
+    const std::map<std::string, RegionPtr> &_regions)
+  : EventSource(_pub, "region", _world), regions(_regions), isInside(false)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InRegionEventSource::Load(const sdf::ElementPtr &_sdf)
+void InRegionEventSource::Load(const sdf::ElementPtr _sdf)
 {
   EventSource::Load(_sdf);
   if (_sdf->HasElement("model"))

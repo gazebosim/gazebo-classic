@@ -110,6 +110,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
 {
+  std::cout << "OnElevator[" << _msg->DebugString() << "]\n";
   std::lock_guard<std::mutex> lock(this->stateMutex);
 
   // Ignore messages when the elevator is currently busy.
@@ -328,7 +329,7 @@ bool ElevatorPlugin::DoorController::Update()
 
 /////////////////////////////////////////////////
 ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint)
-  : floor(0), liftJoint(_liftJoint), state(STATIONARY)
+  : state(STATIONARY), floor(0), liftJoint(_liftJoint)
 {
   this->liftPID.Init(100000, 0, 100000.0);
 }

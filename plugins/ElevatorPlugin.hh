@@ -90,6 +90,9 @@ namespace gazebo
                /// controlled.
                public: DoorController(physics::JointPtr _doorJoint);
 
+               /// \brief Destructor
+               public: virtual ~DoorController() = default;
+
                /// \brief Set the target for the door (OPEN or CLOSE).
                /// \param[in] _target The target for the door.
                public: void SetTarget(
@@ -130,6 +133,9 @@ namespace gazebo
                /// controlled.
                public: LiftController(physics::JointPtr _liftJoint);
 
+               /// \brief Destructor
+               public: virtual ~LiftController() = default;
+
                /// \brief Set the current floor to move to.
                /// \param[in] _floor Floor number.
                public: void SetFloor(int _floor);
@@ -150,6 +156,9 @@ namespace gazebo
 
                /// \brief Floor the elevator is on or moving to.
                public: int floor;
+
+               /// \brief Height of each floor.
+               public: int floorHeight;
 
                /// \brief Joint to control
                public: physics::JointPtr liftJoint;

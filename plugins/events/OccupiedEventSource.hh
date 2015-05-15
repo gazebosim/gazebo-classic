@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_EVENT_PLUGIN_HH_
-#define _GAZEBO_EVENT_PLUGIN_HH_
+#ifndef _GAZEBO_OCCUPIED_EVENT_SOURCE_HH_
+#define _GAZEBO_OCCUPIED_EVENT_SOURCE_HH_
 
 #include <string>
 #include <map>
@@ -28,20 +28,43 @@
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/util/system.hh>
 
+#include "EventSource.hh"
+
 namespace gazebo
 {
-  /// \brief A plugin that transmits a message when an event occurs. Events
-  /// a specified in SDF.
-  class GAZEBO_VISIBLE EventPlugin : public WorldPlugin
+  /// \brief A plugin that transmits a message when an in-region event occurs.
+  /// Events are specified in SDF. The following is example usage:
+  //
+  /// \verbatim
+  ///    <plugin filename="libSimEventsPlugin.so" name="event_plugin">
+  ///      <region>
+  ///        <name>region1</name>
+  ///        <volume>
+  ///          <min>1.5 -1 0</min>
+  ///          <max>2.5 1 1</max>
+  ///        </volume>
+  ///      </region>
+  ///
+  ///      <event>
+  ///        <name>region1_event</name>
+  ///        <type>occupied</type>
+  ///        <topic>~/elevator</topic>
+  ///        <region>region1</region>
+  ///        <msg_data>0</msg_data>
+  ///      </event>
+  ///   </plugin>
+  /// \endverbatim
+  class GAZEBO_VISIBLE OccupiedEventSource : public EventSource
   {
     /// \brief Constructor.
-    public: EventPlugin() = default;
+    public: OccupiedEventSource(transport::PublisherPtr _pub,
+    physics::WorldPtr _world, const std::map<std::string, RegionPtr> &_regions);
 
     /// \brief Destructor.
-    public: ~EventPlugin() = default;
+    public: ~OccupiedEventSource() = default;
 
     // Documentation inherited
-    public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
+    public: virtual void Load(const sdf::ElementPtr _sdf);
 
     /// \brief Update function called once every cycle
     private: void Update();

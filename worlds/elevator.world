@@ -16,28 +16,41 @@
          The topics used in this message match up with topics used by the
          plugin in the elevator model below
     -->
-    <plugin filename="libEventPlugin.so" name="elevator_event_plugin">
-      <region name="region1">
-        <pose>2 0 0.5 0 0 0</pose>
-        <box>1 2 1</box>
-        <on_trigger>
-          <topic>~/elevator</topic>
-          <msg type="string">
-            <data>0</data>
-          </msg>
-        </on_trigger>
+    <plugin filename="libSimEventsPlugin.so" name="elevator_event_plugin">
+      <region>
+        <name>region1</name>
+        <volume>
+          <min>1.5 -1 0</min>
+          <max>2.5 1 1</max>
+        </volume>
       </region>
 
-      <region name="region2">
-        <pose>2 0 3.5 0 0 0</pose>
-        <box>1 2 1</box>
-        <on_trigger>
-          <topic>~/elevator</topic>
-          <msg type="string">
-            <data>1</data>
-          </msg>
-        </on_trigger>
+      <!--
+      <region>
+        <name>region2</name>
+        <volume>
+          <min>1.5 -1 3</min>
+          <max>2.5 1 4</max>
+        </volume>
       </region>
+-->
+
+      <event>
+        <name>region1_event</name>
+        <type>occupied</type>
+        <region>region1</region>
+        <topic>~/elevator</topic>
+        <msg_data>0</msg_data>
+      </event>
+      <!--
+      <event>
+        <name>region2_event</name>
+        <type>occupied</type>
+        <region>region2</region>
+        <topic>~/elevator</topic>
+        <msg_data>1</msg_data>
+      </event>
+-->
     </plugin>
 
     <!-- The elevator car -->

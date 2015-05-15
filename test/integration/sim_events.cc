@@ -34,11 +34,12 @@ bool SKIP_FAILING_TESTS = true;
 class SimEventsTest : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
-  public: void SimPauseRun(const std::string &_physicsEngine);
-  public: void SpawnAndDeleteModel(const std::string &_physicsEngine);
-  public: void ModelInAndOutOfRegion(const std::string &_physicsEngine);
+  //public: void SimPauseRun(const std::string &_physicsEngine);
+  //public: void SpawnAndDeleteModel(const std::string &_physicsEngine);
+  //public: void ModelInAndOutOfRegion(const std::string &_physicsEngine);
+  public: void OccupiedEventSource(const std::string &_physicsEngine);
 };
-
+/*
 // globals to exchange data between threads
 boost::mutex g_mutex;
 unsigned int g_event_count = 0;
@@ -206,6 +207,51 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   can1->SetWorldPose(math::Pose(10, 10, 0, 0, 0, 0));
   unsigned int countAfter2 = WaitForNewEvent(countBefore2, 10, 100);
   EXPECT_GT(countAfter2, countBefore2);
+}
+
+*/
+
+// test macro
+TEST_P(SimEventsTest, OccupiedEventSource)
+{
+  OccupiedEventSource(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+// OccupiedEventSource:
+// Load test world, move model and verify that events are generated.
+////////////////////////////////////////////////////////////////////////
+void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
+{
+  // simbody stepTo() failure
+  if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
+
+  this->Load("worlds/elevator.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+
+  // Get the elevator model
+  physics::ModelPtr elevatorModel = world->GetModel("elevator");
+
+  std::cout << "Elevator Pose1["
+            << elevatorModel->GetWorldPose().pos << "]\n";
+
+  // Make sure the elevator is on the ground level
+  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 1.0);
+  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 0.0);
+
+  // Spawn a box on the second floor, which should call the elevator up.
+  this->SpawnBox("_my_test_box_", math::Vector3(0.5, 0.5, 0.5),
+      math::Vector3(0, 0, 3.6), math::Vector3(0, 0, 0));
+
+  // Step the world forward.
+  world->Step(10000);
+
+  std::cout << "Elevator Pose2["
+            << elevatorModel->GetWorldPose().pos << "]\n";
+
+  // Make sure the elevator has moved upd to the second floor.
+  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 3.5);
+  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.0);
 }
 
 // magic macro
