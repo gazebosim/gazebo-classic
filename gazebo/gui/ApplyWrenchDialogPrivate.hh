@@ -108,6 +108,9 @@ namespace gazebo
 
       /// \brief Map link name to link CoM vector.
       public: std::map<std::string, math::Vector3> linkToCOMMap;
+
+      /// \brief Interactive visual which represents the wrench to be applied.
+      public: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
     };
   }
 }

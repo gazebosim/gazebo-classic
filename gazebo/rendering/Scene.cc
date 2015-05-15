@@ -118,6 +118,10 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
+  this->dataPtr->connections.push_back(
+      rendering::Events::ConnectToggleLayer(
+        boost::bind(&Scene::ToggleLayer, this, _1)));
+
   this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
   this->dataPtr->visSub =
@@ -3117,4 +3121,13 @@ void Scene::RemoveProjectors()
     delete iter->second;
   }
   this->dataPtr->projectors.clear();
+}
+
+/////////////////////////////////////////////////
+void Scene::ToggleLayer(const int32_t _layer)
+{
+  for (auto visual : this->dataPtr->visuals)
+  {
+    visual.second->ToggleLayer(_layer);
+  }
 }

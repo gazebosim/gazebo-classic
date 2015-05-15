@@ -834,6 +834,15 @@ namespace gazebo
       if (_sdf->HasElement("laser_retro"))
         result.set_laser_retro(_sdf->Get<double>("laser_retro"));
 
+      // Set the meta information
+      if (_sdf->HasElement("meta"))
+      {
+        auto metaElem = _sdf->GetElement("meta");
+        auto meta = result.mutable_meta();
+        if (metaElem->HasElement("layer"))
+          meta->set_layer(metaElem->Get<int32_t>("layer"));
+      }
+
       // Load the geometry
       if (_sdf->HasElement("geometry"))
       {
@@ -1054,6 +1063,16 @@ namespace gazebo
       {
         visualSDF.reset(new sdf::Element);
         sdf::initFile("visual.sdf", visualSDF);
+      }
+
+      // Set the meta information
+      if (_msg.has_meta())
+      {
+        if (_msg.meta().has_layer())
+        {
+          visualSDF->GetElement("meta")->GetElement("layer")->Set(
+              _msg.meta().layer());
+        }
       }
 
       if (_msg.has_name())
