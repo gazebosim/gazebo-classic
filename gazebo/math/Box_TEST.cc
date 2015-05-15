@@ -101,7 +101,7 @@ TEST_F(BoxTest, OperatorPlus)
 }
 
 /////////////////////////////////////////////////
-TEST(BoxTest, Contains)
+TEST_F(BoxTest, Contains)
 {
   math::Box box = math::Box(math::Vector3(0, 0, 0), math::Vector3(1, 1, 1));
 
