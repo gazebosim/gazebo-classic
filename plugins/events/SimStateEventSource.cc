@@ -24,7 +24,6 @@ SimStateEventSource::SimStateEventSource(transport::PublisherPtr _pub,
                                          physics::WorldPtr _world)
   :EventSource(_pub, "sim_state", _world), hasPaused(false)
 {
-  std::cout << "New sim state\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +36,6 @@ SimStateEventSource::~SimStateEventSource()
 void SimStateEventSource::Load(const sdf::ElementPtr _sdf)
 {
   EventSource::Load(_sdf);
-  std::cout << "sim state load[" << this->name << "]\n";
 
   // Listen to the pause event. This event is broadcast every
   // simulation iteration.
