@@ -66,6 +66,24 @@ void OrthoViewController::Init()
 }
 
 //////////////////////////////////////////////////
+void OrthoViewController::Init(const math::Vector3 &_focalPoint,
+    double _yaw, double _pitch)
+{
+  this->dataPtr->scale = 100;
+
+  int width = this->camera->GetViewportWidth();
+  int height = this->camera->GetViewportHeight();
+
+  if (width > 0 && height > 0)
+  {
+    // set up the view projection
+    this->Zoom(1.0);
+  }
+
+  OrbitViewController::Init(_focalPoint, _yaw, _pitch);
+}
+
+//////////////////////////////////////////////////
 std::string OrthoViewController::GetTypeString()
 {
   return TYPE_STRING;
@@ -260,12 +278,13 @@ void OrthoViewController::Zoom(const float _amount,
 }
 
 //////////////////////////////////////////////////
-void OrthoViewController::Resize(int _width, int _height)
+void OrthoViewController::Resize(
+    const unsigned int _width, const unsigned int _height)
 {
   Ogre::Matrix4 proj = this->BuildScaledOrthoMatrix(
-      -_width / this->dataPtr->scale / 2.0,
+       _width / this->dataPtr->scale / -2.0,
        _width / this->dataPtr->scale / 2.0,
-      -_height / this->dataPtr->scale / 2.0,
+       _height / this->dataPtr->scale / -2.0,
        _height / this->dataPtr->scale / 2.0,
       -500, 500);
 

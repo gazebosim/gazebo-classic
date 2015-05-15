@@ -28,6 +28,7 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Skeleton.hh"
+#include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/WireBox.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -93,6 +94,8 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
   this->dataPtr->castShadows = true;
+  this->dataPtr->visible = true;
+  this->dataPtr->layer = -1;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -129,6 +132,8 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
   this->dataPtr->castShadows = true;
+  this->dataPtr->visible = true;
+  this->dataPtr->layer = -1;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -291,6 +296,7 @@ void Visual::Init()
   this->dataPtr->visible = true;
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
+  this->dataPtr->layer = -1;
 
   if (this->dataPtr->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
@@ -472,6 +478,17 @@ void Visual::Load()
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
   this->LoadPlugins();
   this->dataPtr->scene->AddVisual(shared_from_this());
+
+  // Set meta information
+  if (this->dataPtr->sdf->HasElement("meta"))
+  {
+    if (this->dataPtr->sdf->GetElement("meta")->HasElement("layer"))
+    {
+      this->dataPtr->layer =
+        this->dataPtr->sdf->GetElement("meta")->Get<int32_t>("layer");
+      rendering::Events::newLayer(this->dataPtr->layer);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1556,7 +1573,7 @@ uint32_t Visual::GetVisibilityFlags()
 //////////////////////////////////////////////////
 void Visual::ToggleVisible()
 {
-  this->SetVisible(!this->GetVisible());
+  this->SetVisible(!this->GetVisible(), true);
 }
 
 //////////////////////////////////////////////////
@@ -1846,7 +1863,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       {
         std::string str = Ogre::any_cast<std::string>(any);
         if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans"
-            || str.substr(0, 5) == "scale")
+            || str.substr(0, 5) == "scale" ||
+            str.find("_APPLY_WRENCH_") != std::string::npos)
           continue;
       }
 
@@ -2193,7 +2211,15 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     this->MakeStatic();
     */
 
-//  std::cerr << " UPDATE FROM MSG " << this->GetName() << std::endl;
+  // Set meta information
+  if (_msg->has_meta())
+  {
+    if (_msg->meta().has_layer())
+    {
+      this->dataPtr->layer = _msg->meta().layer();
+      rendering::Events::newLayer(this->dataPtr->layer);
+    }
+  }
 
   if (_msg->has_pose())
     this->SetPose(msgs::Convert(_msg->pose()));
@@ -2940,6 +2966,19 @@ sdf::ElementPtr Visual::GetSDF() const
   return this->dataPtr->sdf;
 }
 
+//////////////////////////////////////////////////
+void Visual::ToggleLayer(const int32_t _layer)
+{
+  // Visuals with negative layers are always visible
+  if (this->dataPtr->layer < 0)
+    return;
+
+  if (this->dataPtr->layer == _layer)
+  {
+    this->ToggleVisible();
+  }
+}
+
 /////////////////////////////////////////////////
 bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
 {
@@ -2956,3 +2995,6 @@ bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
 
   return false;
 }
+
+
+

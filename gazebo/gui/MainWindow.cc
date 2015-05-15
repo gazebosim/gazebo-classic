@@ -14,6 +14,12 @@
  * limitations under the License.
  *
  */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sdf/sdf.hh>
 #include <boost/scoped_ptr.hpp>
 
@@ -44,6 +50,7 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
+#include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/ToolsWidget.hh"
@@ -104,11 +111,13 @@ MainWindow::MainWindow()
 
   this->modelListWidget = new ModelListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
+  LayersWidget *layersWidget = new LayersWidget(this);
 
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
   this->tabWidget->addTab(this->modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
+  this->tabWidget->addTab(layersWidget, "Layers");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
@@ -1597,6 +1606,8 @@ void MainWindow::CreateMenuBar()
   cameraMenu->addSeparator();
   cameraMenu->addAction(g_fpsAct);
   cameraMenu->addAction(g_orbitAct);
+  cameraMenu->addSeparator();
+  cameraMenu->addAction(g_resetAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
@@ -1610,11 +1621,6 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCOMAct);
   viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
-  viewMenu->addSeparator();
-
-  viewMenu->addAction(g_resetAct);
-  viewMenu->addSeparator();
-
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
