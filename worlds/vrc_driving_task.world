@@ -359,8 +359,35 @@
       </link>
     </model>
 
-    <model name="launchpad">
-      <pose>-128 -334 -0.996 0 0 0</pose>
+    <model name="start_pad">
+      <pose>-3 0 0.5 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 6 2</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 6 2</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="end_pad">
+      <pose>202.895309 99.914574 0.5 0 0 0</pose>
       <static>true</static>
       <link name="link">
         <collision name="collision">
