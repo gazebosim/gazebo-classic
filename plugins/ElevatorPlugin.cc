@@ -134,22 +134,22 @@ void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
     int floor = std::stoi(_msg->data());
 
     // Step 1: close the door.
-    this->dataPtr->states.push_back(ElevatorPluginPrivate::CloseState(
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
           this->dataPtr->doorController));
 
     // Step 2: Move to the correct floor.
-    this->dataPtr->states.push_back(ElevatorPluginPrivate::MoveState(
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::MoveState(
           floor, this->dataPtr->liftController));
 
     // Step 3: Open the door
-    this->dataPtr->states.push_back(ElevatorPluginPrivate::OpenState(
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::OpenState(
           this->dataPtr->doorController));
 
     // Step 4: Wait
-    this->dataPtr->states.push_back(ElevatorPluginPrivate::WaitState());
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::WaitState());
 
     // Step 5: Close the door
-    this->dataPtr->states.push_back(ElevatorPluginPrivate::CloseState(
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
           this->dataPtr->doorController));
   }
   catch(...)
@@ -168,8 +168,9 @@ void ElevatorPlugin::Update(const common::UpdateInfo &_info)
   if (!this->dataPtr->states.empty())
   {
     // Update the front state, and remove it if the state is done
-    if (this->dataPtr->states.front().Update())
+    if (this->dataPtr->states.front()->Update())
     {
+      delete this->dataPtr->states.front();
       this->dataPtr->states.pop_front();
     }
   }
@@ -199,6 +200,8 @@ ElevatorPluginPrivate::~ElevatorPluginPrivate()
   delete this->liftController;
   this->liftController = NULL;
 
+  for (auto s: this->states)
+    delete s;
   this->states.clear();
 }
 
@@ -434,6 +437,7 @@ bool ElevatorPluginPrivate::LiftController::Update(
 
   double error = this->liftJoint->GetAngle(0).Radian() -
     (this->floor * this->floorHeight);
+
   double force = this->liftPID.Update(error, _info.simTime - this->prevSimTime);
   this->prevSimTime = _info.simTime;
 

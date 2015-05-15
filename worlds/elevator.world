@@ -173,7 +173,7 @@
           </limit>
   
           <dynamics>
-            <damping>20</damping>
+            <damping>50</damping>
           </dynamics>
         </axis>
         <physics>

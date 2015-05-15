@@ -177,6 +177,9 @@ namespace gazebo
       /// \brief Constructor
       public: State() : started(false) {}
 
+      /// \brief Destructor
+      public: virtual ~State() = default;
+
       /// \brief State name
       public: std::string name;
 
@@ -290,7 +293,7 @@ namespace gazebo
     public: LiftController *liftController;
 
     /// \brief List of states that should be executed.
-    public: std::list<State> states;
+    public: std::list<State*> states;
 
     /// \brief Mutex to protect states.
     public: std::mutex stateMutex;
