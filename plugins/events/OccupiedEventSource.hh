@@ -57,7 +57,7 @@ namespace gazebo
   /// \endverbatim
   class GAZEBO_VISIBLE OccupiedEventSource : public EventSource
   {
-    /// \brief Constructor.
+    // Documentation inherited
     public: OccupiedEventSource(transport::PublisherPtr _pub,
                 physics::WorldPtr _world,
                 const std::map<std::string, RegionPtr> &_regions);
