@@ -114,12 +114,12 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-set (gtest_sources
-)
+set (gtest_sources)
 
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
+  COMVisual_TEST.cc
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc

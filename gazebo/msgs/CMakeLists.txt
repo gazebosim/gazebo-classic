@@ -81,6 +81,9 @@ set (msgs
   raysensor.proto
   request.proto
   response.proto
+  rest_error.proto
+  rest_login.proto
+  rest_post.proto
   road.proto
   scene.proto
   selection.proto

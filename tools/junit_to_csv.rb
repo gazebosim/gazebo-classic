@@ -4,7 +4,7 @@ require 'rexml/document'
 
 xml = File.read(ARGV[0])
 
-doc, arrayOfHashes, hashOfArrays = REXML::Document.new(xml), [], {}
+doc, arrayOfHashes = REXML::Document.new(xml), []
 doc.elements.each('testsuites/testsuite/testcase') do |t|
   arrayOfHashes << t.attributes
 end
@@ -13,10 +13,9 @@ sortedKeys.delete("value_param")
 puts sortedKeys.join(',')
 
 arrayOfHashes.each do |h|
-  row = [];
+  row = []
   sortedKeys.each do |k|
     row << h[k]
   end
   puts row.join(',')
 end
-

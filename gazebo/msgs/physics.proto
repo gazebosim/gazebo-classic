@@ -39,11 +39,11 @@ message Physics
   optional double real_time_update_rate      = 14;  // generic param
   optional double max_step_size              = 15;  // generic param
 
+  // The name of this physics profile (not to be confused with type)
+  optional string profile_name               = 16;
+
   optional PhysicsBullet bullet              = 39;
   optional PhysicsDART dart                  = 40;
   optional PhysicsODE ode                    = 41;
   optional PhysicsSimbody simbody            = 42;
-
-  // The name of this physics profile (not to be confused with type)
-  optional string profile_name               = 16;
 }

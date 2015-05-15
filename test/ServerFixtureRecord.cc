@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,28 @@
  *
 */
 
-#include <stdio.h>
 #include <string>
 
 #include "gazebo/math/SignalStats.hh"
+#include "gazebo/math/Vector3Stats.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
 
 /////////////////////////////////////////////////
-void ServerFixture::Record(const std::string &_name, double _data)
+void ServerFixture::Record(const std::string &_name, const double _data)
 {
-    std::ostringstream stream;
-    stream << _data;
-    RecordProperty(_name, stream.str());
+  RecordProperty(_name, std::to_string(_data));
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::Record(const std::string &_prefix,
                            const math::SignalStats &_stats)
 {
-  std::map<std::string, double> map = _stats.Map();
-  for (std::map<std::string, double>::iterator iter = map.begin();
-       iter != map.end(); ++iter)
+  auto map = _stats.Map();
+  for (auto const &stat : map)
   {
-    Record(_prefix + iter->first, iter->second);
+    this->Record(_prefix + stat.first, stat.second);
   }
 }
 
@@ -47,9 +44,8 @@ void ServerFixture::Record(const std::string &_prefix,
 void ServerFixture::Record(const std::string &_prefix,
                            const math::Vector3Stats &_stats)
 {
-  Record(_prefix + "_x_", _stats.X());
-  Record(_prefix + "_y_", _stats.Y());
-  Record(_prefix + "_z_", _stats.Z());
-  Record(_prefix + "_mag_", _stats.Mag());
+  this->Record(_prefix + "_x_", _stats.X());
+  this->Record(_prefix + "_y_", _stats.Y());
+  this->Record(_prefix + "_z_", _stats.Z());
+  this->Record(_prefix + "_mag_", _stats.Mag());
 }
-

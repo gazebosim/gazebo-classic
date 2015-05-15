@@ -89,10 +89,9 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   EXPECT_NEAR((lowerAngles.Z().Map())["maxAbs"], 0.0, g_angle_z_tol);
 
   // Record statistics on pitch and yaw angles
-  this->Record("upper_pitch_", upperAngles.Y());
-  this->Record("lower_pitch_", lowerAngles.Y());
-  this->Record("upper_yaw_", upperAngles.Z());
-  this->Record("lower_yaw_", lowerAngles.Z());
+  RecordProperty("engine", _physicsEngine);
+  this->Record("lowerAngles", lowerAngles);
+  this->Record("upperAngles", upperAngles);
 }
 
 TEST_P(PhysicsTest, InertiaRatioPendulum)
