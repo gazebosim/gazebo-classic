@@ -3,7 +3,7 @@
   <world name="default">
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>-128 -334 30 0 1.57071 0</pose>
+        <pose>-25 -65 30 0 1.57071 0</pose>
       </camera>
     </gui>
     <scene>
@@ -123,7 +123,7 @@
 
 
     <model name="launchpad">
-      <pose>-128 -334 -0.996 0 0 0</pose>
+      <pose>-25 -65 -0.996 0 0 0</pose>
       <static>true</static>
       <link name="link">
         <collision name="collision">
@@ -335,7 +335,7 @@
 -->
 
     <model name="iris">>
-      <pose>-128 -334 0.78 0 0 0</pose>
+      <pose>-25 -65 0.78 0 0 3.14</pose>
       <include>
         <uri>model://iris_test</uri>
       </include>
@@ -374,10 +374,10 @@
       <plugin name="drone" filename="libDronePlugin.so">
         <base_link>iris::base_link</base_link>
         <base_joint>base_world</base_joint>
-        <damping>10.0</damping>
-        <base_pid_pos cmd_max="10000.0" cmd_min="-10000.0"
-                      d="0.01" i="0" p="200.0"/>
-        <base_pid_rot cmd_max="10000.0" cmd_min="-10000.0"
+        <damping>15.0</damping>
+        <base_pid_pos cmd_max="5000.0" cmd_min="-5000.0"
+                      d="0.01" i="0" p="80.0"/>
+        <base_pid_rot cmd_max="5000.0" cmd_min="-5000.0"
                       d="0.01" i="0" p="100.0"/>
       </plugin>
     </model>

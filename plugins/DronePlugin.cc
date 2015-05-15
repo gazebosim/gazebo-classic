@@ -208,7 +208,7 @@ void DronePlugin::OnUpdate()
   this->targetBaseLinkPose.pos += dt.Double() *
     baseLinkPose.rot.RotateVector(maxVelocity * this->velocity);
 
-  double fakeTorqueScale = 5.0;
+  double fakeTorqueScale = 2.0;
   math::Vector3 fakeRpyBodyFrame(-fakeTorqueScale * this->velocity.y,
    fakeTorqueScale * this->velocity.x, 0.0);
 

@@ -207,7 +207,7 @@ void Forest::LoadScene()
   //have any knowledge of where you want the maps to be applied). In this case, the maps are applied
   //to the same boundaries as the terrain.
   //(0,0)-(500,500) is the full boundaries of the terrain
-  l->setMapBounds(Forests::TBounds(-500, -500, 500, 500));
+  l->setMapBounds(Forests::TBounds(-100, -100, 100, 100));
 
 
   // -------------------------------------- LOAD GRASS TYPE 2 -----------------------
@@ -236,7 +236,7 @@ void Forest::LoadScene()
   //have any knowledge of where you want the maps to be applied). In this case, the maps are applied
   //to the same boundaries as the terrain.
   //(0,0)-(500,500) is the full boundaries of the terrain
-  l2->setMapBounds(Forests::TBounds(-500, -500, 500, 500));
+  l2->setMapBounds(Forests::TBounds(-100, -100, 100, 100));
 
   //-------------------------------------- LOAD TREES --------------------------------------
   //Create and configure a new PagedGeometry instance
@@ -246,7 +246,7 @@ void Forest::LoadScene()
   //Set the camera so PagedGeometry knows how to calculate LODs
   this->trees->setCamera(this->camera->GetOgreCamera());
   //Set the size of each page of geometry
-  this->trees->setPageSize(100);
+  this->trees->setPageSize(80);
   //Use infinite paging mode
   this->trees->setInfinite();
 
@@ -259,7 +259,7 @@ void Forest::LoadScene()
   this->trees->addDetailLevel<Forests::ImpostorPage>(700, 50);  //Use impostors up to 400 units, and for for 50 more units
 
   // Create a new TreeLoader2D object
-  Forests::TreeLoader3D *treeLoader = new Forests::TreeLoader3D(this->trees, Forests::TBounds(-500, -500, 500, 500));
+  Forests::TreeLoader3D *treeLoader = new Forests::TreeLoader3D(this->trees, Forests::TBounds(-100, -100, 100, 100));
   this->trees->setPageLoader(treeLoader);  //Assign the "treeLoader" to be used to load geometry for the PagedGeometry instance
 
   // Supply a height function to TreeLoader2D so it can calculate tree Y values
@@ -292,12 +292,12 @@ void Forest::LoadScene()
   Ogre::Vector3 position = Ogre::Vector3::ZERO;
   Ogre::Radian yaw;
   Ogre::Real scale;
-  for (int i = 0; i < 6000; i++)
+  for (int i = 0; i < 600; i++)
   {
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
 
-    position.x = Ogre::Math::RangeRandom(-500, 500);
-    position.y = Ogre::Math::RangeRandom(-500, 500);
+    position.x = Ogre::Math::RangeRandom(-100, 100);
+    position.y = Ogre::Math::RangeRandom(-100, 100);
     position.z = Forest::GetTerrainHeight(position.x, position.y);
 
     // hardcode to remove trees at specific places on heightmap
@@ -326,19 +326,19 @@ void Forest::LoadScene()
   // -------------------------------------- LOAD BUSHES ------------------------
 
   // Create and configure a new PagedGeometry instance for this->bushes
-  this->bushes = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 200);
+  this->bushes = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 100);
   this->bushes->setCoordinateSystem(upAxis, rightAxis);
 
   #ifdef WIND
   this->bushes->addDetailLevel<Forests::WindBatchPage>(50, 50);
   #else
-  this->bushes->addDetailLevel<Forests::BatchPage>(400, 50);
+  this->bushes->addDetailLevel<Forests::BatchPage>(200, 50);
   #endif
 //  this->bushes->addDetailLevel<Forests::ImpostorPage>(400, 50);
 
   // Create a new TreeLoader3D object for the this->bushes
   Forests::TreeLoader3D *bushLoader =
-      new Forests::TreeLoader3D(this->bushes, Forests::TBounds(-500, -500, 500, 500));
+      new Forests::TreeLoader3D(this->bushes, Forests::TBounds(-100, -100, 100, 100));
   this->bushes->setPageLoader(bushLoader);
 
   // Supply the height function to TreeLoader2D so it can calculate tree Y values
@@ -366,10 +366,10 @@ void Forest::LoadScene()
   #endif
 
   // Randomly place 20,000 this->bushes on the terrain
-  for (int i = 0; i < 5000; i++){
+  for (int i = 0; i < 1000; i++){
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
-    position.x = Ogre::Math::RangeRandom(-500, 500);
-    position.y = Ogre::Math::RangeRandom(-500, 500);
+    position.x = Ogre::Math::RangeRandom(-100, 100);
+    position.y = Ogre::Math::RangeRandom(-100, 100);
     position.z = Forest::GetTerrainHeight(position.x, position.y);
 
     float rnd = Ogre::Math::UnitRandom();
