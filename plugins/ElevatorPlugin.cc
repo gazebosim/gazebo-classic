@@ -23,6 +23,7 @@
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/Joint.hh>
 
+#include "plugins/ElevatorPluginPrivate.hh"
 #include "plugins/ElevatorPlugin.hh"
 
 using namespace gazebo;
@@ -31,20 +32,25 @@ GZ_REGISTER_MODEL_PLUGIN(ElevatorPlugin)
 
 /////////////////////////////////////////////////
 ElevatorPlugin::ElevatorPlugin()
-  : doorController(NULL), liftController(NULL)
+  : dataPtr(new ElevatorPluginPrivate)
 {
+  this->dataPtr->doorController = NULL;
+  this->dataPtr->liftController = NULL;
 }
 
 /////////////////////////////////////////////////
 ElevatorPlugin::~ElevatorPlugin()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
 
-  delete this->doorController;
-  this->doorController = NULL;
+  delete this->dataPtr->doorController;
+  this->dataPtr->doorController = NULL;
 
-  delete this->liftController;
-  this->liftController = NULL;
+  delete this->dataPtr->liftController;
+  this->dataPtr->liftController = NULL;
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -52,17 +58,17 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "ElevatorPlugin model pointer is NULL");
   GZ_ASSERT(_sdf, "ElevatorPlugin sdf pointer is NULL");
-  this->model = _model;
-  this->sdf = _sdf;
+  this->dataPtr->model = _model;
+  this->dataPtr->sdf = _sdf;
 
   // Get the elevator topic.
   std::string elevatorTopic = "~/elevator";
-  if (this->sdf->HasElement("topic"))
-    elevatorTopic = this->sdf->Get<std::string>("topic");
+  if (this->dataPtr->sdf->HasElement("topic"))
+    elevatorTopic = this->dataPtr->sdf->Get<std::string>("topic");
 
   float floorHeight = 3.0;
-  if (this->sdf->HasElement("floor_height"))
-    floorHeight = this->sdf->Get<float>("floor_height");
+  if (this->dataPtr->sdf->HasElement("floor_height"))
+    floorHeight = this->dataPtr->sdf->Get<float>("floor_height");
   else
   {
     gzwarn << "No <floor_height> specified for elevator plugin. "
@@ -71,9 +77,11 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Get the lift joint
-  std::string liftJointName = this->sdf->Get<std::string>("lift_joint");
-  this->liftJoint = this->model->GetJoint(liftJointName);
-  if (!this->liftJoint)
+  std::string liftJointName =
+    this->dataPtr->sdf->Get<std::string>("lift_joint");
+
+  this->dataPtr->liftJoint = this->dataPtr->model->GetJoint(liftJointName);
+  if (!this->dataPtr->liftJoint)
   {
     gzerr << "Unable to find lift joint[" << liftJointName << "].\n";
     gzerr << "The elevator plugin is disabled.\n";
@@ -81,9 +89,11 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Get the door joint
-  std::string doorJointName = this->sdf->Get<std::string>("door_joint");
-  this->doorJoint = this->model->GetJoint(doorJointName);
-  if (!this->doorJoint)
+  std::string doorJointName =
+    this->dataPtr->sdf->Get<std::string>("door_joint");
+
+  this->dataPtr->doorJoint = this->dataPtr->model->GetJoint(doorJointName);
+  if (!this->dataPtr->doorJoint)
   {
     gzerr << "Unable to find door joint[" << doorJointName << "].\n";
     gzerr << "The elevator plugin is disabled.\n";
@@ -91,29 +101,31 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Create the door and lift controllers.
-  this->doorController = new DoorController(this->doorJoint);
-  this->liftController = new LiftController(this->liftJoint, floorHeight);
+  this->dataPtr->doorController = new ElevatorPluginPrivate::DoorController(
+      this->dataPtr->doorJoint);
+  this->dataPtr->liftController = new ElevatorPluginPrivate::LiftController(
+      this->dataPtr->liftJoint, floorHeight);
 
   // Connect to the update event.
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&ElevatorPlugin::Update, this, _1));
 
   // Create the node for communication
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->GetName());
 
   // Subscribe to the elevator topic.
-  this->elevatorSub = this->node->Subscribe(elevatorTopic,
+  this->dataPtr->elevatorSub = this->dataPtr->node->Subscribe(elevatorTopic,
       &ElevatorPlugin::OnElevator, this);
 }
 
 /////////////////////////////////////////////////
 void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
 {
-  std::lock_guard<std::mutex> lock(this->stateMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->stateMutex);
 
   // Ignore messages when the elevator is currently busy.
-  if (!this->states.empty())
+  if (!this->dataPtr->states.empty())
     return;
 
   // Currently we only expect the message to contain a floor to move to.
@@ -122,19 +134,23 @@ void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
     int floor = std::stoi(_msg->data());
 
     // Step 1: close the door.
-    this->states.push_back(new CloseState(this->doorController));
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
+          this->dataPtr->doorController));
 
     // Step 2: Move to the correct floor.
-    this->states.push_back(new MoveState(floor, this->liftController));
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::MoveState(
+          floor, this->dataPtr->liftController));
 
     // Step 3: Open the door
-    this->states.push_back(new OpenState(this->doorController));
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::OpenState(
+          this->dataPtr->doorController));
 
     // Step 4: Wait
-    this->states.push_back(new WaitState);
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::WaitState);
 
     // Step 5: Close the door
-    this->states.push_back(new CloseState(this->doorController));
+    this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
+          this->dataPtr->doorController));
   }
   catch(...)
   {
@@ -146,49 +162,49 @@ void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void ElevatorPlugin::Update(const common::UpdateInfo &_info)
 {
-  std::lock_guard<std::mutex> lock(this->stateMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->stateMutex);
 
   // Process the states
-  if (!this->states.empty())
+  if (!this->dataPtr->states.empty())
   {
     // Update the front state, and remove it if the state is done
-    if (this->states.front()->Update())
+    if (this->dataPtr->states.front()->Update())
     {
-      this->states.pop_front();
+      this->dataPtr->states.pop_front();
     }
   }
 
   // Update the controllers
-  this->doorController->Update(_info);
-  this->liftController->Update(_info);
+  this->dataPtr->doorController->Update(_info);
+  this->dataPtr->liftController->Update(_info);
 }
 
 ////////////////////////////////////////////////
 void ElevatorPlugin::Reset()
 {
-  this->states.clear();
-  this->doorController->Reset();
-  this->liftController->Reset();
+  this->dataPtr->states.clear();
+  this->dataPtr->doorController->Reset();
+  this->dataPtr->liftController->Reset();
 }
 
 ////////////////////////////////////////////////
 // CloseState Class
 
 /////////////////////////////////////////////////
-ElevatorPlugin::CloseState::CloseState(DoorController *_ctrl)
+ElevatorPluginPrivate::CloseState::CloseState(DoorController *_ctrl)
   : State(), ctrl(_ctrl)
 {
 }
 
 /////////////////////////////////////////////////
-void ElevatorPlugin::CloseState::Start()
+void ElevatorPluginPrivate::CloseState::Start()
 {
-  this->ctrl->SetTarget(ElevatorPlugin::DoorController::CLOSE);
+  this->ctrl->SetTarget(ElevatorPluginPrivate::DoorController::CLOSE);
   this->started = true;
 }
 
 /////////////////////////////////////////////////
-bool ElevatorPlugin::CloseState::Update()
+bool ElevatorPluginPrivate::CloseState::Update()
 {
   if (!this->started)
   {
@@ -197,8 +213,10 @@ bool ElevatorPlugin::CloseState::Update()
   }
   else
   {
-    return this->ctrl->GetTarget() == ElevatorPlugin::DoorController::CLOSE &&
-      this->ctrl->GetState() == ElevatorPlugin::DoorController::STATIONARY;
+    return this->ctrl->GetTarget() ==
+      ElevatorPluginPrivate::DoorController::CLOSE &&
+      this->ctrl->GetState() ==
+      ElevatorPluginPrivate::DoorController::STATIONARY;
   }
 }
 
@@ -206,20 +224,20 @@ bool ElevatorPlugin::CloseState::Update()
 // OpenState Class
 
 /////////////////////////////////////////////////
-ElevatorPlugin::OpenState::OpenState(DoorController *_ctrl)
+ElevatorPluginPrivate::OpenState::OpenState(DoorController *_ctrl)
   : State(), ctrl(_ctrl)
 {
 }
 
 /////////////////////////////////////////////////
-void ElevatorPlugin::OpenState::Start()
+void ElevatorPluginPrivate::OpenState::Start()
 {
-  this->ctrl->SetTarget(ElevatorPlugin::DoorController::OPEN);
+  this->ctrl->SetTarget(ElevatorPluginPrivate::DoorController::OPEN);
   this->started = true;
 }
 
 /////////////////////////////////////////////////
-bool ElevatorPlugin::OpenState::Update()
+bool ElevatorPluginPrivate::OpenState::Update()
 {
   if (!this->started)
   {
@@ -228,8 +246,10 @@ bool ElevatorPlugin::OpenState::Update()
   }
   else
   {
-    return this->ctrl->GetTarget() == ElevatorPlugin::DoorController::OPEN &&
-      this->ctrl->GetState() == ElevatorPlugin::DoorController::STATIONARY;
+    return this->ctrl->GetTarget() ==
+      ElevatorPluginPrivate::DoorController::OPEN &&
+      this->ctrl->GetState() ==
+      ElevatorPluginPrivate::DoorController::STATIONARY;
   }
 }
 
@@ -237,20 +257,20 @@ bool ElevatorPlugin::OpenState::Update()
 // MoveState Class
 
 /////////////////////////////////////////////////
-ElevatorPlugin::MoveState::MoveState(int _floor, LiftController *_ctrl)
+ElevatorPluginPrivate::MoveState::MoveState(int _floor, LiftController *_ctrl)
   : State(), floor(_floor), ctrl(_ctrl)
 {
 }
 
 /////////////////////////////////////////////////
-void ElevatorPlugin::MoveState::Start()
+void ElevatorPluginPrivate::MoveState::Start()
 {
   this->ctrl->SetFloor(this->floor);
   this->started = true;
 }
 
 /////////////////////////////////////////////////
-bool ElevatorPlugin::MoveState::Update()
+bool ElevatorPluginPrivate::MoveState::Update()
 {
   if (!this->started)
   {
@@ -259,7 +279,8 @@ bool ElevatorPlugin::MoveState::Update()
   }
   else
   {
-    return this->ctrl->GetState() == ElevatorPlugin::LiftController::STATIONARY;
+    return this->ctrl->GetState() ==
+      ElevatorPluginPrivate::LiftController::STATIONARY;
   }
 }
 
@@ -267,20 +288,20 @@ bool ElevatorPlugin::MoveState::Update()
 // WaitState Class
 
 /////////////////////////////////////////////////
-ElevatorPlugin::WaitState::WaitState()
+ElevatorPluginPrivate::WaitState::WaitState()
   : State()
 {
 }
 
 /////////////////////////////////////////////////
-void ElevatorPlugin::WaitState::Start()
+void ElevatorPluginPrivate::WaitState::Start()
 {
   this->start = common::Time::GetWallTime();
   this->started = true;
 }
 
 /////////////////////////////////////////////////
-bool ElevatorPlugin::WaitState::Update()
+bool ElevatorPluginPrivate::WaitState::Update()
 {
   if (!this->started)
   {
@@ -300,41 +321,43 @@ bool ElevatorPlugin::WaitState::Update()
 // DoorController Class
 
 /////////////////////////////////////////////////
-ElevatorPlugin::DoorController::DoorController(physics::JointPtr _doorJoint)
+ElevatorPluginPrivate::DoorController::DoorController(
+    physics::JointPtr _doorJoint)
   : doorJoint(_doorJoint), state(STATIONARY), target(CLOSE)
 {
   this->doorPID.Init(2, 0, 1.0);
 }
 
 /////////////////////////////////////////////////
-void ElevatorPlugin::DoorController::SetTarget(
-    ElevatorPlugin::DoorController::Target _target)
+void ElevatorPluginPrivate::DoorController::SetTarget(
+    ElevatorPluginPrivate::DoorController::Target _target)
 {
   this->target = _target;
 }
 
 /////////////////////////////////////////////////
-ElevatorPlugin::DoorController::Target
-ElevatorPlugin::DoorController::GetTarget() const
+ElevatorPluginPrivate::DoorController::Target
+ElevatorPluginPrivate::DoorController::GetTarget() const
 {
   return this->target;
 }
 
 /////////////////////////////////////////////////
-ElevatorPlugin::DoorController::State
-ElevatorPlugin::DoorController::GetState() const
+ElevatorPluginPrivate::DoorController::State
+ElevatorPluginPrivate::DoorController::GetState() const
 {
   return this->state;
 }
 
 /////////////////////////////////////////////////
-void ElevatorPlugin::DoorController::Reset()
+void ElevatorPluginPrivate::DoorController::Reset()
 {
   this->prevSimTime = common::Time::Zero;
 }
 
 /////////////////////////////////////////////////
-bool ElevatorPlugin::DoorController::Update(const common::UpdateInfo &_info)
+bool ElevatorPluginPrivate::DoorController::Update(
+    const common::UpdateInfo &_info)
 {
   // Bootstrap the time.
   if (this->prevSimTime == common::Time::Zero)
@@ -345,9 +368,12 @@ bool ElevatorPlugin::DoorController::Update(const common::UpdateInfo &_info)
 
   double errorTarget = this->target == OPEN ? 1.0 : 0.0;
 
-  double doorError = this->doorJoint->GetAngle(0).Radian() - errorTarget;
+  double doorError = this->doorJoint->GetAngle(0).Radian() -
+    errorTarget;
+
   double doorForce = this->doorPID.Update(doorError,
       _info.simTime - this->prevSimTime);
+
   this->doorJoint->SetForce(0, doorForce);
 
   if (std::abs(doorError) < 0.05)
@@ -366,8 +392,8 @@ bool ElevatorPlugin::DoorController::Update(const common::UpdateInfo &_info)
 // LiftController Class
 
 /////////////////////////////////////////////////
-ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint,
-    float _floorHeight)
+ElevatorPluginPrivate::LiftController::LiftController(
+    physics::JointPtr _liftJoint, float _floorHeight)
   : state(STATIONARY), floor(0), floorHeight(_floorHeight),
     liftJoint(_liftJoint)
 {
@@ -375,13 +401,14 @@ ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint,
 }
 
 /////////////////////////////////////////////////
-void ElevatorPlugin::LiftController::Reset()
+void ElevatorPluginPrivate::LiftController::Reset()
 {
   this->prevSimTime = common::Time::Zero;
 }
 
 /////////////////////////////////////////////////
-bool ElevatorPlugin::LiftController::Update(const common::UpdateInfo &_info)
+bool ElevatorPluginPrivate::LiftController::Update(
+    const common::UpdateInfo &_info)
 {
   // Bootstrap the time.
   if (this->prevSimTime == common::Time::Zero)
@@ -399,31 +426,31 @@ bool ElevatorPlugin::LiftController::Update(const common::UpdateInfo &_info)
 
   if (std::abs(error) < 0.15)
   {
-    this->state = ElevatorPlugin::LiftController::STATIONARY;
+    this->state = ElevatorPluginPrivate::LiftController::STATIONARY;
     return true;
   }
   else
   {
-    this->state = ElevatorPlugin::LiftController::MOVING;
+    this->state = ElevatorPluginPrivate::LiftController::MOVING;
     return false;
   }
 }
 
 /////////////////////////////////////////////////
-void ElevatorPlugin::LiftController::SetFloor(int _floor)
+void ElevatorPluginPrivate::LiftController::SetFloor(int _floor)
 {
   this->floor = _floor;
 }
 
 /////////////////////////////////////////////////
-int ElevatorPlugin::LiftController::GetFloor() const
+int ElevatorPluginPrivate::LiftController::GetFloor() const
 {
   return this->floor;
 }
 
 /////////////////////////////////////////////////
-ElevatorPlugin::LiftController::State
-ElevatorPlugin::LiftController::GetState() const
+ElevatorPluginPrivate::LiftController::State
+ElevatorPluginPrivate::LiftController::GetState() const
 {
   return this->state;
 }
