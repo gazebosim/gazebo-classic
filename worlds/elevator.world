@@ -12,11 +12,12 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <!-- World plugin that publishes event messages
-         The topics used in this message match up with topics used by the
-         plugin in the elevator model below
+    <!-- World plugin that publishes event messages.
+         The topics used in these messages match up with topics used by the
+         plugin in the elevator model below.
     -->
     <plugin filename="libSimEventsPlugin.so" name="elevator_event_plugin">
+      <!-- Region on the ground floor, in front of the elevator -->
       <region>
         <name>region1</name>
         <volume>
@@ -25,6 +26,7 @@
         </volume>
       </region>
 
+      <!-- Region on the first floor, in front of the elevator -->
       <region>
         <name>region2</name>
         <volume>
@@ -33,6 +35,7 @@
         </volume>
       </region>
 
+      <!-- Event publisher for ground floor-->
       <event>
         <name>region1_event</name>
         <type>occupied</type>
@@ -41,6 +44,7 @@
         <msg_data>0</msg_data>
       </event>
 
+      <!-- Event publisher for first floor-->
       <event>
         <name>region2_event</name>
         <type>occupied</type>
@@ -48,7 +52,6 @@
         <topic>~/elevator</topic>
         <msg_data>1</msg_data>
       </event>
-
     </plugin>
 
     <!-- The elevator car -->
@@ -157,7 +160,6 @@
           </dynamics>
         </axis>
       </joint>
-
 
       <joint name="lift" type="prismatic">
         <parent>world</parent>
@@ -324,7 +326,6 @@
         </visual>
       </link>
     </model>
-
 
   </world>
 </sdf>

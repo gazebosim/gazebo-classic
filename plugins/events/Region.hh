@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <sdf/sdf.hh>
 #include "gazebo/math/Vector3.hh"
@@ -26,7 +27,7 @@
 
 namespace gazebo
 {
-  /// \brief A region, made of a list of volumes
+  /// \brief A region, made of a list of boxes
   class Region
   {
     /// \brief Constructor
@@ -36,20 +37,20 @@ namespace gazebo
     public: virtual ~Region() = default;
 
     /// \brief Load from a world file (inside a SimEvent plugin element)
-    /// \param[in] _sdf the region element
+    /// \param[in] _sdf The <region> element
     public: void Load(const sdf::ElementPtr &_sdf);
 
-    /// \brief Checks if a point lies inside the region
-    /// \param[in] _p point
+    /// \brief Check if a point lies inside the region
+    /// \param[in] _p Point to check
     public: bool Contains(const math::Vector3 &_p) const;
 
     /// \brief Output operator to print a region to the console.
-    /// \param[in] _out the output stream.
-    /// \param[in] _region the instance to write out.
+    /// \param[in] _out The output stream.
+    /// \param[in] _region The instance to write out.
     public: friend std::ostream& operator<<(std::ostream &_out,
                                             const Region &_region);
 
-    /// \brief name of the region (as defined in the world file)
+    /// \brief Name of the region (as defined in the world file)
     public: std::string name;
 
     /// \brief The list of volumes inside this region

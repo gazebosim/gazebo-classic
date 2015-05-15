@@ -20,6 +20,7 @@
 
 #include <list>
 #include <mutex>
+#include <string>
 
 #include <sdf/sdf.hh>
 
@@ -34,14 +35,34 @@ namespace gazebo
   /// \brief Private data for the ElevatorPlugin
   class ElevatorPluginPrivate
   {
+    /// \brief Constructor
+    public: ElevatorPluginPrivate() = default;
+
+    /// \brief Destructor
+    public: virtual ~ElevatorPluginPrivate();
+
     /// \brief Controller for opening and closing the elevator door.
     public: class DoorController
     {
+      /// \enum Target
       /// \brief Door targets.
-      public: enum Target {OPEN, CLOSE};
+      public: enum Target {
+                /// \brief Open the door
+                OPEN,
 
+                /// \brief Close the door
+                CLOSE
+              };
+
+      /// \enum State
       /// \brief Door motion states
-      public: enum State {MOVING, STATIONARY};
+      public: enum State {
+                /// \brief The door is moving
+                MOVING,
+
+                /// \brief The door is stationary
+                STATIONARY
+              };
 
       /// \brief Constructor
       /// \param[in] _doorJoint Pointer to the joint that should be
@@ -91,8 +112,15 @@ namespace gazebo
     /// \brief Controller for raising and lowering the elevator.
     public: class LiftController
     {
-      /// \brief Lift stat
-      public: enum State {MOVING, STATIONARY};
+      /// \enum State
+      /// \brief Lift state
+      public: enum State {
+                /// \brief The lift is moving
+                MOVING,
+
+                /// \brief The lift is stationary
+                STATIONARY
+              };
 
       /// \brief Constructor
       /// \param[in] _liftJoint Pointer to the joint that should be
@@ -200,6 +228,8 @@ namespace gazebo
     public: class MoveState : public State
     {
       /// \brief Constructor
+      /// \param[in] _floor Floor index to move to.
+      /// \param[in] _ctrl Lift controller pointer.
       public: MoveState(int _floor, LiftController *_ctrl);
 
       // Documentation inherited
@@ -260,7 +290,7 @@ namespace gazebo
     public: LiftController *liftController;
 
     /// \brief List of states that should be executed.
-    public: std::list<State*> states;
+    public: std::list<State> states;
 
     /// \brief Mutex to protect states.
     public: std::mutex stateMutex;

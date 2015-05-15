@@ -112,10 +112,8 @@ void OccupiedEventSource::Update()
     if ((*iter)->IsStatic())
       continue;
 
-    math::Pose modelPose = (*iter)->GetWorldPose();
-
     // If inside, then transmit the desired message.
-    if (this->regions[this->regionName]->Contains(modelPose.pos))
+    if (this->regions[this->regionName]->Contains((*iter)->GetWorldPose().pos))
     {
       this->msgPub->Publish(this->msg);
     }

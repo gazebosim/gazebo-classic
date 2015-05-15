@@ -21,8 +21,7 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 InRegionEventSource::InRegionEventSource(transport::PublisherPtr _pub,
-    physics::WorldPtr _world,
-    const std::map<std::string, RegionPtr> &_regions)
+    physics::WorldPtr _world, const std::map<std::string, RegionPtr> &_regions)
   : EventSource(_pub, "region", _world), regions(_regions), isInside(false)
 {
 }
