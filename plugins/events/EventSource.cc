@@ -34,6 +34,7 @@ EventSource::EventSource(transport::PublisherPtr _pub,
   :type(_type), world(_world), active(true), pub(_pub)
 {
   GZ_ASSERT(_world, "EventSource world pointer is NULL");
+  GZ_ASSERT(_pub, "EventSource pub pointer is NULL");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

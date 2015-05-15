@@ -222,7 +222,7 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   gzdbg << "Elevator Pose2["
         << elevatorModel->GetWorldPose().pos << "]\n";
 
-  // Make sure the elevator has moved upd to the second floor.
+  // Make sure the elevator has moved up to the second floor.
   EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 3.08);
   EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.05);
 }

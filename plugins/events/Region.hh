@@ -42,11 +42,13 @@ namespace gazebo
 
     /// \brief Check if a point lies inside the region
     /// \param[in] _p Point to check
+    /// \return True if point is in region
     public: bool Contains(const math::Vector3 &_p) const;
 
     /// \brief Output operator to print a region to the console.
     /// \param[in] _out The output stream.
     /// \param[in] _region The instance to write out.
+    /// \return the stream
     public: friend std::ostream& operator<<(std::ostream &_out,
                                             const Region &_region);
 

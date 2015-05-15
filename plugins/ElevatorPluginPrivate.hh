@@ -248,7 +248,7 @@ namespace gazebo
       public: LiftController *ctrl;
     };
 
-    /// \brief State used to make the elevetor wait.
+    /// \brief State used to make the elevator wait.
     public: class WaitState : public State
     {
       /// \brief Constructor
