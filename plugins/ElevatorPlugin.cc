@@ -96,7 +96,7 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Connect to the update event.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&ElevatorPlugin::Update, this));
+      boost::bind(&ElevatorPlugin::Update, this, _1));
 
   // Create the node for communication
   this->node = transport::NodePtr(new transport::Node());
@@ -138,13 +138,13 @@ void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
   }
   catch(...)
   {
-    std::cerr << "Unable to process elevator message["
-              << _msg->data() << "]\n";
+    gzerr << "Unable to process elevator message["
+          << _msg->data() << "]\n";
   }
 }
 
 /////////////////////////////////////////////////
-void ElevatorPlugin::Update()
+void ElevatorPlugin::Update(const common::UpdateInfo &_info)
 {
   std::lock_guard<std::mutex> lock(this->stateMutex);
 
@@ -159,9 +159,20 @@ void ElevatorPlugin::Update()
   }
 
   // Update the controllers
-  this->doorController->Update();
-  this->liftController->Update();
+  this->doorController->Update(_info);
+  this->liftController->Update(_info);
 }
+
+////////////////////////////////////////////////
+void ElevatorPlugin::Reset()
+{
+  this->states.clear();
+  this->doorController->Reset();
+  this->liftController->Reset();
+}
+
+////////////////////////////////////////////////
+// CloseState Class
 
 /////////////////////////////////////////////////
 ElevatorPlugin::CloseState::CloseState(DoorController *_ctrl)
@@ -191,6 +202,9 @@ bool ElevatorPlugin::CloseState::Update()
   }
 }
 
+////////////////////////////////////////////////
+// OpenState Class
+
 /////////////////////////////////////////////////
 ElevatorPlugin::OpenState::OpenState(DoorController *_ctrl)
   : State(), ctrl(_ctrl)
@@ -219,6 +233,9 @@ bool ElevatorPlugin::OpenState::Update()
   }
 }
 
+////////////////////////////////////////////////
+// MoveState Class
+
 /////////////////////////////////////////////////
 ElevatorPlugin::MoveState::MoveState(int _floor, LiftController *_ctrl)
   : State(), floor(_floor), ctrl(_ctrl)
@@ -245,6 +262,9 @@ bool ElevatorPlugin::MoveState::Update()
     return this->ctrl->GetState() == ElevatorPlugin::LiftController::STATIONARY;
   }
 }
+
+////////////////////////////////////////////////
+// WaitState Class
 
 /////////////////////////////////////////////////
 ElevatorPlugin::WaitState::WaitState()
@@ -276,6 +296,9 @@ bool ElevatorPlugin::WaitState::Update()
   }
 }
 
+////////////////////////////////////////////////
+// DoorController Class
+
 /////////////////////////////////////////////////
 ElevatorPlugin::DoorController::DoorController(physics::JointPtr _doorJoint)
   : doorJoint(_doorJoint), state(STATIONARY), target(CLOSE)
@@ -305,13 +328,26 @@ ElevatorPlugin::DoorController::GetState() const
 }
 
 /////////////////////////////////////////////////
-bool ElevatorPlugin::DoorController::Update()
+void ElevatorPlugin::DoorController::Reset()
 {
+  this->prevSimTime = common::Time::Zero;
+}
+
+/////////////////////////////////////////////////
+bool ElevatorPlugin::DoorController::Update(const common::UpdateInfo &_info)
+{
+  // Bootstrap the time.
+  if (this->prevSimTime == common::Time::Zero)
+  {
+    this->prevSimTime = _info.simTime;
+    return false;
+  }
+
   double errorTarget = this->target == OPEN ? 1.0 : 0.0;
 
   double doorError = this->doorJoint->GetAngle(0).Radian() - errorTarget;
   double doorForce = this->doorPID.Update(doorError,
-      common::Time(0, 1000000));
+      _info.simTime - this->prevSimTime);
   this->doorJoint->SetForce(0, doorForce);
 
   if (std::abs(doorError) < 0.05)
@@ -326,6 +362,9 @@ bool ElevatorPlugin::DoorController::Update()
   }
 }
 
+////////////////////////////////////////////////
+// LiftController Class
+
 /////////////////////////////////////////////////
 ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint,
     float _floorHeight)
@@ -336,11 +375,25 @@ ElevatorPlugin::LiftController::LiftController(physics::JointPtr _liftJoint,
 }
 
 /////////////////////////////////////////////////
-bool ElevatorPlugin::LiftController::Update()
+void ElevatorPlugin::LiftController::Reset()
 {
+  this->prevSimTime = common::Time::Zero;
+}
+
+/////////////////////////////////////////////////
+bool ElevatorPlugin::LiftController::Update(const common::UpdateInfo &_info)
+{
+  // Bootstrap the time.
+  if (this->prevSimTime == common::Time::Zero)
+  {
+    this->prevSimTime = _info.simTime;
+    return false;
+  }
+
   double error = this->liftJoint->GetAngle(0).Radian() -
     (this->floor * this->floorHeight);
-  double force = this->liftPID.Update(error, common::Time(0, 1000000));
+  double force = this->liftPID.Update(error, _info.simTime - this->prevSimTime);
+  this->prevSimTime = _info.simTime;
 
   this->liftJoint->SetForce(0, force);
 

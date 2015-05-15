@@ -35,7 +35,10 @@
 namespace gazebo
 {
   /// \brief Plugin to control a elevator. This plugin will listen for
-  /// door and lift events.
+  /// door and lift events on a specified topic.
+  /// \verbatim
+  ///    <plugin filename="libSimEventsPlugin.so" name="event_plugin">
+  /// \endverbatim
   class GAZEBO_VISIBLE ElevatorPlugin : public ModelPlugin
   {
     /// \brief Constructor.
@@ -48,7 +51,11 @@ namespace gazebo
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     /// \brief Update the plugin once every iteration of simulation.
-    private: void Update();
+    /// \param[in] _info Update information provided by the server.
+    private: void Update(const common::UpdateInfo &_info);
+
+    /// \brief Reset the plugin
+    public: virtual void Reset();
 
     /// \brief Receives messages on the elevator's topic.
     /// \param[in] _msg The string message that contains a command.
@@ -106,8 +113,13 @@ namespace gazebo
                /// \return Current target.
                public: ElevatorPlugin::DoorController::Target GetTarget() const;
 
+               /// \brief Reset the controller
+               public: void Reset();
+
                /// \brief Update the controller.
-               public: virtual bool Update();
+               /// \param[in] _info Update information provided by the server.
+               /// \return True if the target has been reached.
+               public: virtual bool Update(const common::UpdateInfo &_info);
 
                /// \brief Pointer to the door joint.
                public: physics::JointPtr doorJoint;
@@ -120,6 +132,9 @@ namespace gazebo
 
                /// \brief PID controller for the door.
                public: common::PID doorPID;
+
+               /// \brief Previous simulation time.
+               public: common::Time prevSimTime;
              };
 
     /// \brief Controller for raising and lowering the elevator.
@@ -150,8 +165,13 @@ namespace gazebo
                /// \return Current lift state.
                public: ElevatorPlugin::LiftController::State GetState() const;
 
+               /// \brief Reset the controller
+               public: void Reset();
+
                /// \brief Update the controller.
-               public: virtual bool Update();
+               /// \param[in] _info Update information provided by the server.
+               /// \return True if the target has been reached.
+               public: virtual bool Update(const common::UpdateInfo &_info);
 
                /// \brief State of the controller.
                public: State state;
@@ -167,6 +187,9 @@ namespace gazebo
 
                /// \brief PID controller.
                public: common::PID liftPID;
+
+               /// \brief Previous simulation time.
+               public: common::Time prevSimTime;
              };
 
     /// \brief State base class

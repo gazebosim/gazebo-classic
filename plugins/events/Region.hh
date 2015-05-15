@@ -17,6 +17,9 @@
 #ifndef _GAZEBO_PLUGIN_EVENTS_REGION_HH_
 #define _GAZEBO_PLUGIN_EVENTS_REGION_HH_
 
+#include <string>
+#include <vector>
+
 #include <sdf/sdf.hh>
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Box.hh"
