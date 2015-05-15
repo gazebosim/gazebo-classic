@@ -293,7 +293,7 @@ namespace gazebo
     public: LiftController *liftController;
 
     /// \brief List of states that should be executed.
-    public: std::list<State*> states;
+    public: std::list<State *> states;
 
     /// \brief Mutex to protect states.
     public: std::mutex stateMutex;
