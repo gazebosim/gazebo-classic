@@ -14,14 +14,11 @@
  * limitations under the License.
  *
 */
-
-
 #include <limits>
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
 
-// #include "gazebo/physics/physics.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
@@ -34,9 +31,9 @@ bool SKIP_FAILING_TESTS = true;
 class SimEventsTest : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
-  //public: void SimPauseRun(const std::string &_physicsEngine);
-  //public: void SpawnAndDeleteModel(const std::string &_physicsEngine);
-  //public: void ModelInAndOutOfRegion(const std::string &_physicsEngine);
+  public: void SimPauseRun(const std::string &_physicsEngine);
+  public: void SpawnAndDeleteModel(const std::string &_physicsEngine);
+  public: void ModelInAndOutOfRegion(const std::string &_physicsEngine);
   public: void OccupiedEventSource(const std::string &_physicsEngine);
 };
 
@@ -82,8 +79,8 @@ std::string GetEventData()
 // waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewEvent(unsigned int current,
-                             unsigned int max_tries = 10,
-                             unsigned int ms = 10)
+                             unsigned int max_tries = 1000,
+                             unsigned int ms = 50)
 {
   for (unsigned int i = 0; i < max_tries; i++)
   {
@@ -95,12 +92,6 @@ unsigned int WaitForNewEvent(unsigned int current,
     common::Time::MSleep(ms);
   }
   return GetEventCount();
-}
-
-// test macro
-TEST_P(SimEventsTest, ModelInAnOutOfRegion)
-{
-  ModelInAndOutOfRegion(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -129,12 +120,6 @@ void SimEventsTest::SimPauseRun(const std::string &_physicsEngine)
   SetPause(false);
   count_after = WaitForNewEvent(count_before);
   EXPECT_GT(count_after, count_before);
-}
-
-// test macro
-TEST_P(SimEventsTest, SimPauseRun)
-{
-  SimPauseRun(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -170,11 +155,6 @@ void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
   EXPECT_EQ(GetEventType(), "existence");
 }
 
-// test macro
-TEST_P(SimEventsTest, SpawnAndDeleteModel)
-{
-  SpawnAndDeleteModel(GetParam());
-}
 
 ////////////////////////////////////////////////////////////////////////
 // ModelInAndOutOfRegion:
@@ -207,12 +187,6 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   can1->SetWorldPose(math::Pose(10, 10, 0, 0, 0, 0));
   unsigned int countAfter2 = WaitForNewEvent(countBefore2, 10, 100);
   EXPECT_GT(countAfter2, countBefore2);
-}
-
-// test macro
-TEST_P(SimEventsTest, OccupiedEventSource)
-{
-  OccupiedEventSource(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -252,8 +226,29 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.05);
 }
 
-// magic macro
+// Run all test cases
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, SimEventsTest, PHYSICS_ENGINE_VALUES);
+
+// test macro
+TEST_P(SimEventsTest, SimPauseRun)
+{
+  SimPauseRun(GetParam());
+}
+
+TEST_P(SimEventsTest, SpawnAndDeleteModel)
+{
+  SpawnAndDeleteModel(GetParam());
+}
+
+TEST_P(SimEventsTest, ModelInAnOutOfRegion)
+{
+  ModelInAndOutOfRegion(GetParam());
+}
+
+TEST_P(SimEventsTest, OccupiedEventSource)
+{
+  OccupiedEventSource(GetParam());
+}
 
 // main, where we can specify to skip certain tests
 int main(int argc, char **argv)
@@ -263,7 +258,6 @@ int main(int argc, char **argv)
     std::string skipStr = argv[1];
     if (skipStr == "no_skip")
     {
-      std::cout << "Not skipping failing tests" << std::endl;
       SKIP_FAILING_TESTS = false;
     }
   }
