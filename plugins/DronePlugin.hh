@@ -69,6 +69,9 @@ namespace gazebo
     // Documentation Inherited.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    /// \brief Reset the plugin.
+    public: virtual void Reset();
+
     /// \brief Callback for World Update events.
     private: virtual void OnUpdate();
 
@@ -107,6 +110,9 @@ namespace gazebo
 
     /// \brief: target link control pose
     private: math::Pose targetBaseLinkPose;
+
+    /// \brief: initial base link pose.
+    private: math::Pose initPose;
 
     /// \brief: mutex for writing targetBaseLinkPose
     private: common::Time lastSimTime;

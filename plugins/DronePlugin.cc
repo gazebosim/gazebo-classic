@@ -123,6 +123,7 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->baseJoint->SetParam("stop_cfm", 0, 1.0/baseJointImplicitDamping);
 
   this->targetBaseLinkPose = this->baseLink->GetWorldPose();
+  this->initPose = this->targetBaseLinkPose;
 
   this->baseLink->SetGravityMode(false);
 
@@ -144,6 +145,24 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&DronePlugin::OnUpdate, this));
+}
+
+/////////////////////////////////////////////////
+void DronePlugin::Reset()
+{
+  if (this->model)
+    this->lastSimTime = this->model->GetWorld()->GetSimTime();
+
+  this->targetBaseLinkPose = this->initPose;
+
+  this->posPid.Reset();
+  this->rotPid.Reset();
+
+  this->wrench.force = math::Vector3::Zero;
+  this->wrench.torque = math::Vector3::Zero;
+
+  this->velocity = math::Vector3::Zero;
+  this->yawSpeed = 0;
 }
 
 /////////////////////////////////////////////////

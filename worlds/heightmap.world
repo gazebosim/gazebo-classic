@@ -382,5 +382,7 @@
       </plugin>
     </model>
 
+    <plugin name="drone_world" filename="libDroneDemoWorldPlugin.so"/>
+
   </world>
 </sdf>
