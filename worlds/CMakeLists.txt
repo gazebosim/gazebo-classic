@@ -26,6 +26,7 @@ set (files
   multilink_shape.world
   openal.world
   ortho.world
+  osrf_elevator.world
   pioneer2dx.world
   pioneer2dx_camera.world
   pioneer2dx_laser.world
