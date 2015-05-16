@@ -81,17 +81,25 @@ namespace gazebo
     /// \param[in] _side "left_controller" or "right_controller".
     private: void SwitchRod(const double _leftDir, const double _rightDir);
 
+    private: void PublishVisualMsg(std::string &_name, std::string &_parentName,
+        std::string &_color);
+
     /// \brief Num of rods on the table per team.
     private: unsigned int kNumRodsPerTeam = 4;
 
     /// \brief Pointer to the model;
     private: physics::ModelPtr model;
 
+    private: std::string team;
+
     /// \brief Pointer to a node for communication.
     private: transport::NodePtr gzNode;
 
     /// \brief "Restart ball" publisher.
     private: transport::PublisherPtr restartBallPub;
+
+    /// \brief "Restart ball" publisher.
+    private: transport::PublisherPtr visualPub;
 
     /// \brief Pointer to the update event connection.
     private: event::ConnectionPtr updateConnection;
@@ -125,6 +133,9 @@ namespace gazebo
 
     /// \brief The vector of rods controlled by this player.
     private: Rod_V rods;
+
+    /// \brief The vector of rods controlled by this player.
+    private: std::vector<std::string> shafts;
 
     /// \brief Stores the last known X position and roll angle.
     /// of the left/right controller. Those parameters are the ones we use in

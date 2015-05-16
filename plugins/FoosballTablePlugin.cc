@@ -48,6 +48,8 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->restartBallPub =
     this->gzNode->Advertise<msgs::Int>("~/foosball_demo/restart_ball");
 
+  this->visualPub = this->gzNode->Advertise<msgs::Visual>("~/visual");
+
   GZ_ASSERT(_model, "FoosballPlugin _model pointer is NULL");
   this->model = _model;
   GZ_ASSERT(_sdf, "FoosballPlugin _sdf pointer is NULL");
@@ -59,8 +61,8 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
               << "section" << std::endl;
     return false;
   }
-  std::string team = _sdf->Get<std::string>("team");
-  if (team != "Blue" && team != "Red")
+  this->team = _sdf->Get<std::string>("team");
+  if (this->team != "Blue" && this->team != "Red")
   {
     std::cerr << "FoosballPlayer::Load() Invalid <team> value in player "
               << "section. Allowed values are 'Blue' or 'Red'" << std::endl;
@@ -70,12 +72,17 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Fill the vector of rods.
   for (unsigned int i = 0; i < this->kNumRodsPerTeam; ++i)
   {
-    std::string transName = "Foosball::trans" + team + std::to_string(i);
-    std::string rotName = "Foosball::rot" + team + std::to_string(i);
+    std::string transName = "Foosball::trans" + this->team + std::to_string(i);
+    std::string rotName = "Foosball::rot" + this->team + std::to_string(i);
 
     // Create a new rod and make it controllable by this controller.
     this->rods.push_back(
       {_model->GetJoint(transName), _model->GetJoint(rotName)});
+
+    // Visuals
+    std::string shaftName =
+        "foosball::Foosball::shaft" + this->team + std::to_string(i);
+    this->shafts.push_back(shaftName);
   }
 
   // Check if we have to invert the control for this player.
@@ -271,26 +278,68 @@ void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
   // Restore the position/orientation of the new left rod.
   if (leftChanged)
   {
+    // Reset previous active rod's color
+    std::string name =
+        this->shafts[this->hydra["left_controller"]] + "::handle";
+    std::string parentName = this->shafts[this->hydra["left_controller"]];
+    std::string color = "Gazebo/Black";
+    this->PublishVisualMsg(name, parentName, color);
+
+    // Update index
     this->hydra["left_controller"] = newLeft;
+
     // Restore the position to the last known Hydra position.
     auto &activeRod = this->rods[this->hydra["left_controller"]];
     activeRod.at(0)->SetPosition(0,
       this->lastRodPose["left_controller"].at(0).Radian());
     activeRod.at(1)->SetPosition(0,
       this->lastRodPose["left_controller"].at(1).Radian());
+
+    // Publish active rod msg
+    name = this->shafts[this->hydra["left_controller"]] + "::handle";
+    parentName = this->shafts[this->hydra["left_controller"]];
+    color = "Gazebo/" + this->team;
+    this->PublishVisualMsg(name, parentName, color);
   }
 
   // Restore the position/orientation of the new right rod.
   if (rightChanged)
   {
+    // Reset previous active rod's color
+    std::string name =
+        this->shafts[this->hydra["right_controller"]] + "::handle";
+    std::string parentName = this->shafts[this->hydra["right_controller"]];
+    std::string color = "Gazebo/Black";
+    this->PublishVisualMsg(name, parentName, color);
+
+    // Update index
     this->hydra["right_controller"] = newRight;
+
     // Restore the position to the last known Hydra position.
     auto &activeRod = this->rods[this->hydra["right_controller"]];
     activeRod.at(0)->SetPosition(0,
       this->lastRodPose["right_controller"].at(0).Radian());
     activeRod.at(1)->SetPosition(0,
       this->lastRodPose["right_controller"].at(1).Radian());
+
+    // Publish active rod msg
+    name = this->shafts[this->hydra["right_controller"]] + "::handle";
+    parentName = this->shafts[this->hydra["right_controller"]];
+    color = "Gazebo/" + this->team;
+    this->PublishVisualMsg(name, parentName, color);
   }
+}
+
+/////////////////////////////////////////////////
+void FoosballPlayer::PublishVisualMsg(std::string &_name,
+    std::string &_parentName, std::string &_color)
+{
+  msgs::Visual visualMsg;
+  visualMsg.set_name(_name);
+  visualMsg.set_parent_name(_parentName);
+  visualMsg.mutable_material()->mutable_script()->set_name(_color);
+
+  this->visualPub->Publish(visualMsg);
 }
 
 /////////////////////////////////////////////////
