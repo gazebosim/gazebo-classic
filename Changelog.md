@@ -1,4 +1,8 @@
 ## Gazebo 6.0
+
+1. Fixed collide bitmask by changing default value from 0x1 to 0xffff.
+    * [Pull request #1696](https://bitbucket.org/osrf/gazebo/pull-request/1696)
+
 1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
     * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
 
