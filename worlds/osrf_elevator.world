@@ -2,7 +2,7 @@
 <sdf version="1.5">
   <world name="default">
     <!-- Disable shadows for now since they make the interiors
-         look aweful -->
+         look awful -->
     <scene>
       <shadows>0</shadows>
     </scene>
