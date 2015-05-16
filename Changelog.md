@@ -1,4 +1,7 @@
 ## Gazebo 6.0
+1. Added world with OSRF building and an elevator
+    * [Pull request #1697](https://bitbucket.org/osrf/gazebo/pull-request/1697)
+
 1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
     * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
 
