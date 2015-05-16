@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _EXISTENCEVENTSOURCE_HH_
-#define _EXISTENCEVENTSOURCE_HH_
+#ifndef _GAZEBO_EXISTENCEVENTSOURCE_HH_
+#define _GAZEBO_EXISTENCEVENTSOURCE_HH_
 
 #include <string>
 
@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \brief Reads the model filter and event name.
     /// \param[in] _sdf the element for this event source
-    public: virtual void Load(const sdf::ElementPtr &_sdf);
+    public: virtual void Load(const sdf::ElementPtr _sdf);
 
     /// \brief callback for gazebo event
     /// \param[in] _model the name of the model
