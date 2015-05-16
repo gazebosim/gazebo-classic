@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Fixed collide bitmask by changing default value from 0x1 to 0xffff.
+    * [Pull request #1696](https://bitbucket.org/osrf/gazebo/pull-request/1696)
+
 1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
     * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
 
