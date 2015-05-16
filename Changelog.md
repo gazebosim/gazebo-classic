@@ -1,4 +1,6 @@
 ## Gazebo 6.0
+1. Added world with OSRF building and an elevator
+    * [Pull request #1697](https://bitbucket.org/osrf/gazebo/pull-request/1697)
 
 1. Fixed collide bitmask by changing default value from 0x1 to 0xffff.
     * [Pull request #1696](https://bitbucket.org/osrf/gazebo/pull-request/1696)
