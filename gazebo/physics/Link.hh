@@ -28,6 +28,7 @@
 #endif
 
 #include <map>
+#include <mutex>
 #include <vector>
 #include <string>
 
@@ -618,6 +619,9 @@ namespace gazebo
 
       /// \brief This flag is set to true when the link is initialized.
       protected: bool initialized;
+
+      /// \brief Mutex to protect the inertial pointer
+      protected: std::mutex inertialMutex;
 
       /// \brief Event used when the link is enabled or disabled.
       private: event::EventT<void (bool)> enabledSignal;

@@ -262,6 +262,7 @@ void Link::Fini()
   this->parentJoints.clear();
   this->childJoints.clear();
   this->collisions.clear();
+  std::lock_guard<std::mutex> lock(this->inertialMutex);
   this->inertial.reset();
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
@@ -602,6 +603,7 @@ void Link::SetAngularAccel(const math::Vector3 &_accel)
 math::Pose Link::GetWorldCoGPose() const
 {
   math::Pose pose = this->GetWorldPose();
+  std::lock_guard<std::mutex> lock(this->inertialMutex);
   pose.pos += pose.rot.RotateVector(this->inertial->GetCoG());
   return pose;
 }
@@ -623,12 +625,14 @@ math::Vector3 Link::GetRelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeLinearAccel() const
 {
+  std::lock_guard<std::mutex> lock(this->inertialMutex);
   return this->GetRelativeForce() / this->inertial->GetMass();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldLinearAccel() const
 {
+  std::lock_guard<std::mutex> lock(this->inertialMutex);
   return this->GetWorldForce() / this->inertial->GetMass();
 }
 
@@ -712,6 +716,7 @@ void Link::SetInertial(const InertialPtr &/*_inertial*/)
 //////////////////////////////////////////////////
 math::Pose Link::GetWorldInertialPose() const
 {
+  std::lock_guard<std::mutex> lock(this->inertialMutex);
   math::Pose inertialPose;
   if (this->inertial)
     inertialPose = this->inertial->GetPose();
@@ -721,6 +726,7 @@ math::Pose Link::GetWorldInertialPose() const
 //////////////////////////////////////////////////
 math::Matrix3 Link::GetWorldInertiaMatrix() const
 {
+  std::lock_guard<std::mutex> lock(this->inertialMutex);
   math::Matrix3 moi;
   if (this->inertial)
   {
@@ -798,7 +804,11 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.mutable_inertial()->set_iyy(this->inertial->GetIYY());
   _msg.mutable_inertial()->set_iyz(this->inertial->GetIYZ());
   _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
-  msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
+
+  {
+    std::lock_guard<std::mutex> lock(this->inertialMutex);
+    msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
+  }
 
   for (Collision_V::iterator iter = this->collisions.begin();
       iter != this->collisions.end(); ++iter)

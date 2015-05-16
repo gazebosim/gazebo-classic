@@ -93,6 +93,7 @@ void ODELink::Init()
 
   if (this->linkId)
   {
+    //std::lock_guard<std::mutex> lock(this->inertialMutex);
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
     math::Vector3 cogVec = this->inertial->GetCoG();
     Base_V::iterator iter;
@@ -184,6 +185,7 @@ void ODELink::MoveCallback(dBodyID _id)
   self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
+  //std::lock_guard<std::mutex> lock(this->inertialMutex);
   GZ_ASSERT(self->inertial != NULL, "Inertial pointer is NULL");
   math::Vector3 cog = self->dirtyPose.rot.RotateVector(
       self->inertial->GetCoG());
@@ -276,6 +278,7 @@ void ODELink::OnPoseChange()
 
   const math::Pose myPose = this->GetWorldPose();
 
+  //std::lock_guard<std::mutex> lock(this->inertialMutex);
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
 
@@ -372,6 +375,7 @@ void ODELink::UpdateMass()
   // The CoG must always be (0, 0, 0)
   math::Vector3 cog(0, 0, 0);
 
+  //std::lock_guard<std::mutex> lock(this->inertialMutex);
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   // give ODE un-rotated inertia
   math::Matrix3 moi = this->inertial->GetMOI(
@@ -410,6 +414,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
   if (this->linkId)
   {
     dVector3 dvel;
+    //std::lock_guard<std::mutex> lock(this->inertialMutex);
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
     math::Vector3 offsetFromCoG = _offset - this->inertial->GetCoG();
     dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
@@ -435,6 +440,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
   {
     dVector3 dvel;
     math::Pose wPose = this->GetWorldPose();
+    //std::lock_guard<std::mutex> lock(this->inertialMutex);
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
     math::Vector3 offsetFromCoG =
         wPose.rot.RotateVectorReverse(_q * _offset)
