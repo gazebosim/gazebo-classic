@@ -133,6 +133,9 @@ FoosballGUIPlugin::FoosballGUIPlugin()
   this->restartGamePub =
     this->gzNode->Advertise<msgs::Int>("~/foosball_demo/restart_game");
 
+  this->shakeTablePub =
+    this->gzNode->Advertise<msgs::Int>("~/foosball_demo/shake_table");
+
   // Connect hotkeys
   QShortcut *restartGame = new QShortcut(QKeySequence("F2"), this);
   QObject::connect(restartGame, SIGNAL(activated()), this,
@@ -141,6 +144,10 @@ FoosballGUIPlugin::FoosballGUIPlugin()
   QShortcut *restartBall = new QShortcut(QKeySequence("F1"), this);
   QObject::connect(restartBall, SIGNAL(activated()), this,
       SLOT(OnRestartBall()));
+
+  QShortcut *shakeTable = new QShortcut(QKeySequence("F3"), this);
+  QObject::connect(shakeTable, SIGNAL(activated()), this,
+      SLOT(OnShakeTable()));
 }
 
 /////////////////////////////////////////////////
@@ -226,6 +233,14 @@ void FoosballGUIPlugin::OnRestartBall()
   msgs::Int msg;
   msg.set_data(1);
   this->restartBallPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void FoosballGUIPlugin::OnShakeTable()
+{
+  msgs::Int msg;
+  msg.set_data(1);
+  this->shakeTablePub->Publish(msg);
 }
 
 /////////////////////////////////////////////////

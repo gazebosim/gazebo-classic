@@ -21,6 +21,7 @@
 #include <sdf/sdf.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
@@ -353,6 +354,7 @@ void FoosballTablePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "FoosballPlugin _model pointer is NULL");
   GZ_ASSERT(_sdf, "FoosballPlugin _sdf pointer is NULL");
+  this->model = _model;
 
   // Create the players.
   int counter = 0;
@@ -370,6 +372,13 @@ void FoosballTablePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
     boost::bind(&FoosballTablePlugin::Update, this, _1));
+
+  // Subscribe to shake table
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(_model->GetWorld()->GetName());
+  this->shakeTableSub =
+    this->node->Subscribe("~/foosball_demo/shake_table",
+    &FoosballTablePlugin::OnShakeTable, this);
 }
 
 /////////////////////////////////////////////////
@@ -378,3 +387,21 @@ void FoosballTablePlugin::Update(const common::UpdateInfo & /*_info*/)
   for (auto &player : this->players)
     player->Update();
 }
+
+/////////////////////////////////////////////////
+void FoosballTablePlugin::OnShakeTable(ConstIntPtr &/*_unused*/)
+{
+  if (!this->model || !this->model->GetLink("Foosball::table"))
+    return;
+
+  double randX = math::Rand::GetDblUniform(-1, 1);
+  double randY = math::Rand::GetDblUniform(-1, 1);
+  double randZ = math::Rand::GetDblUniform(0, 1);
+
+  this->model->GetLink("Foosball::table")->AddLinkForce(
+      math::Vector3(0, 0, 10000*randZ));
+
+  this->model->GetLink("Foosball::table")->AddRelativeTorque(
+      math::Vector3(10000*randX, 10000*randY, 0));
+}
+
