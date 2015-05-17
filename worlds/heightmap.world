@@ -26,101 +26,36 @@
     </include>
 
     <include>
-      <pose>-315.32 -240.286 6.00 0 -0 0</pose>
+      <pose>-71 -38. 6.00 0 0 0</pose>
+      <name>arrow_1</name>
       <uri>model://arrow</uri>
     </include>
 
     <include>
-      <pose>-350.106 88.5294 6.00 0 0 -0.590655</pose>
+      <pose>-35 42 6.00 0 0 -1.57</pose>
+      <name>arrow_2</name>
       <uri>model://arrow</uri>
     </include>
 
     <include>
-      <pose>-173.446 -135.167 6.00 0 -0 0</pose>
+      <pose>2.0 -17 6.00 0 0 -1.57</pose>
+      <name>arrow_3</name>
       <uri>model://arrow</uri>
     </include>
+
 
     <include>
-      <pose>144 -211 6.00 0 -0 2.80022</pose>
+      <pose>28 49 6.00 0 0 -1.8</pose>
+      <name>arrow_4</name>
       <uri>model://arrow</uri>
     </include>
+
 
     <include>
-      <pose>-130 -274 6.00 0 -0 1.55694</pose>
+      <pose>68 -37 6.00 0 0 2.5</pose>
+      <name>arrow_5</name>
       <uri>model://arrow</uri>
     </include>
-
-    <include>
-      <pose>-326 -101 6.00 -0 -0 -0.590655</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>-247.238 112.065 6.00 0 0 -0.590655</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>-26.8128 138.55 6.00 0 0 -2.75376</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>23.5836 40.5435 6.00 0 0 -1.32445</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>82.527 -80.0123 6.00 0 0 -0.590655</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>61.8318 136.62 6.00 0 0 -1.29183</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>218.582 278.205 6.00 0 0 -2.37814</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>348 18 6.00 0 -0 2.83574</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>331 -167 6.00 0 -0 2.78717</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>226.079 -323.215 6.00 0 -0 2.22653</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>-136 237 6.00 0 0 -1.72285</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>276 158 6.00 0 0 -2.71746</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>96 71 6.00 0 0 0</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-    <include>
-      <pose>-37 33 6.00 0 0 -1.57</pose>
-      <uri>model://arrow</uri>
-    </include>
-
-
 
     <model name="launchpad">
       <pose>-25 -65 -0.996 0 0 0</pose>
@@ -143,6 +78,33 @@
           <material>
             <script>
               <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="landingpad">
+      <pose>20 -74 -0.996 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 6 2</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 6 2</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
             </script>
           </material>
         </visual>
@@ -381,8 +343,6 @@
                       d="0.01" i="0" p="100.0"/>
       </plugin>
     </model>
-
-    <plugin name="drone_world" filename="libDroneDemoWorldPlugin.so"/>
 
   </world>
 </sdf>

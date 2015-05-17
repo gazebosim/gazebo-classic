@@ -126,6 +126,18 @@ float Forest::GetTerrainHeight(const float _x, const float _y, void *_userdata)
 }
 
 //////////////////////////////////////////////////
+math::Vector3 Forest::GetTerrainSize()
+{
+  Heightmap *hm = RenderEngine::Instance()->GetScene()->GetHeightmap();
+  if (hm)
+  {
+    return hm->GetSize();
+  }
+
+  return math::Vector3::Zero;
+}
+
+//////////////////////////////////////////////////
 float Forest::GetGrassTerrainHeight(const float _x, const float _y, void *_userdata)
 {
   // TODO HACK! fix coordinate system transform in paged geometry then
@@ -148,7 +160,16 @@ void Forest::LoadScene()
   // Setup the fog up to 1500 units away
   // this->scene->GetManager()->setFog(FOG_LINEAR, viewport->getBackgroundColour(), 0, 100, 900);
 
+  int forestDensitiy = 1;
+  int defaultForestSize = 200;
+  math::Vector3 terrainSize = Forest::GetTerrainSize();
+  if (terrainSize == math::Vector3::Zero)
+    terrainSize = math::Vector3(defaultForestSize, defaultForestSize, 1);
+  forestDensitiy = terrainSize.x / defaultForestSize;
+  forestDensitiy *= forestDensitiy;
 
+  Forests::TBounds forestBounds(-terrainSize.x*0.5, -terrainSize.y*0.5,
+      terrainSize.y*0.5, terrainSize.y*0.5);
   Ogre::Vector3 upAxis = Ogre::Vector3(0, 0, 1);
   Ogre::Vector3 rightAxis = Ogre::Vector3(0, 1, 0);
   uint32_t visibilityFlags = GZ_VISIBILITY_GUI;
@@ -207,7 +228,7 @@ void Forest::LoadScene()
   //have any knowledge of where you want the maps to be applied). In this case, the maps are applied
   //to the same boundaries as the terrain.
   //(0,0)-(500,500) is the full boundaries of the terrain
-  l->setMapBounds(Forests::TBounds(-100, -100, 100, 100));
+  l->setMapBounds(forestBounds);
 
 
   // -------------------------------------- LOAD GRASS TYPE 2 -----------------------
@@ -236,7 +257,7 @@ void Forest::LoadScene()
   //have any knowledge of where you want the maps to be applied). In this case, the maps are applied
   //to the same boundaries as the terrain.
   //(0,0)-(500,500) is the full boundaries of the terrain
-  l2->setMapBounds(Forests::TBounds(-100, -100, 100, 100));
+  l2->setMapBounds(forestBounds);
 
   //-------------------------------------- LOAD TREES --------------------------------------
   //Create and configure a new PagedGeometry instance
@@ -259,7 +280,8 @@ void Forest::LoadScene()
   this->trees->addDetailLevel<Forests::ImpostorPage>(700, 50);  //Use impostors up to 400 units, and for for 50 more units
 
   // Create a new TreeLoader2D object
-  Forests::TreeLoader3D *treeLoader = new Forests::TreeLoader3D(this->trees, Forests::TBounds(-100, -100, 100, 100));
+  Forests::TreeLoader3D *treeLoader =
+      new Forests::TreeLoader3D(this->trees, forestBounds);
   this->trees->setPageLoader(treeLoader);  //Assign the "treeLoader" to be used to load geometry for the PagedGeometry instance
 
   // Supply a height function to TreeLoader2D so it can calculate tree Y values
@@ -292,12 +314,12 @@ void Forest::LoadScene()
   Ogre::Vector3 position = Ogre::Vector3::ZERO;
   Ogre::Radian yaw;
   Ogre::Real scale;
-  for (int i = 0; i < 600; i++)
+  for (int i = 0; i < 600*forestDensitiy; i++)
   {
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
 
-    position.x = Ogre::Math::RangeRandom(-100, 100);
-    position.y = Ogre::Math::RangeRandom(-100, 100);
+    position.x = Ogre::Math::RangeRandom(forestBounds.left, forestBounds.right);
+    position.y = Ogre::Math::RangeRandom(forestBounds.bottom, forestBounds.top);
     position.z = Forest::GetTerrainHeight(position.x, position.y);
 
     // hardcode to remove trees at specific places on heightmap
@@ -338,7 +360,7 @@ void Forest::LoadScene()
 
   // Create a new TreeLoader3D object for the this->bushes
   Forests::TreeLoader3D *bushLoader =
-      new Forests::TreeLoader3D(this->bushes, Forests::TBounds(-100, -100, 100, 100));
+      new Forests::TreeLoader3D(this->bushes, forestBounds);
   this->bushes->setPageLoader(bushLoader);
 
   // Supply the height function to TreeLoader2D so it can calculate tree Y values
@@ -348,13 +370,16 @@ void Forest::LoadScene()
   bushLoader->setColorMap("terrain_lightmap.jpg");
 
   // Load a bush entity
-  Ogre::Entity *fern = this->scene->GetManager()->createEntity("Fern", "farn1.mesh");
+  Ogre::Entity *fern =
+      this->scene->GetManager()->createEntity("Fern", "farn1.mesh");
   fern->setVisibilityFlags(visibilityFlags);
 
-  Ogre::Entity *plant = this->scene->GetManager()->createEntity("Plant", "plant2.mesh");
+  Ogre::Entity *plant =
+      this->scene->GetManager()->createEntity("Plant", "plant2.mesh");
   plant->setVisibilityFlags(visibilityFlags);
 
-  Ogre::Entity *mushroom = this->scene->GetManager()->createEntity("Mushroom", "shroom1_1.mesh");
+  Ogre::Entity *mushroom =
+      this->scene->GetManager()->createEntity("Mushroom", "shroom1_1.mesh");
   mushroom->setVisibilityFlags(visibilityFlags);
 
   #ifdef WIND
@@ -366,10 +391,10 @@ void Forest::LoadScene()
   #endif
 
   // Randomly place 20,000 this->bushes on the terrain
-  for (int i = 0; i < 1000; i++){
+  for (int i = 0; i < 1000* forestDensitiy; i++){
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
-    position.x = Ogre::Math::RangeRandom(-100, 100);
-    position.y = Ogre::Math::RangeRandom(-100, 100);
+    position.x = Ogre::Math::RangeRandom(forestBounds.left, forestBounds.right);
+    position.y = Ogre::Math::RangeRandom(forestBounds.bottom, forestBounds.top);
     position.z = Forest::GetTerrainHeight(position.x, position.y);
 
     float rnd = Ogre::Math::UnitRandom();

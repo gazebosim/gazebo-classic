@@ -63,16 +63,20 @@ namespace gazebo
       /// \param[in] _x Position x
       /// \param[in] _y Position y
       /// \param[in] _userdata User data.
-      /// \return height in meterx
+      /// \return height in meters
       private: static float GetTerrainHeight(const float _x, const float _y,
           void *_userdata = NULL);
+
+      /// \brief Get the size of terrain
+      /// \return Size in meters
+      private: static math::Vector3 GetTerrainSize();
 
       /// \brief Get the height of terrain at specific location
       /// TODO merge with GetTerrainHeight later
       /// \param[in] _x Position x
       /// \param[in] _y Position y
       /// \param[in] _userdata User data.
-      /// \return height in meterx
+      /// \return height in meters
       private: static float GetGrassTerrainHeight(const float _x,
           const float _y, void *_userdata = NULL);
 
