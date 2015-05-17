@@ -1217,6 +1217,23 @@ TEST_F(MsgsTest, VisualToSDF)
   EXPECT_EQ(materialName, scriptElem->Get<std::string>("name"));
   EXPECT_TRUE(scriptElem->HasElement("uri"));
   EXPECT_EQ(uri, scriptElem->Get<std::string>("uri"));
+
+  // Test the meta.layer property
+  {
+    msgs::Visual msg;
+    auto metaMsg = msg.mutable_meta();
+    metaMsg->set_layer(1);
+
+    sdf::ElementPtr visSdf = msgs::VisualToSDF(msg);
+    EXPECT_TRUE(visSdf->HasElement("meta"));
+    EXPECT_TRUE(visSdf->GetElement("meta")->HasElement("layer"));
+    EXPECT_EQ(visSdf->GetElement("meta")->Get<int32_t>("layer"), 1);
+
+    msgs::Visual msg2 = msgs::VisualFromSDF(visSdf);
+    EXPECT_TRUE(msg2.has_meta());
+    EXPECT_TRUE(msg2.meta().has_layer());
+    EXPECT_EQ(msg2.meta().layer(), 1);
+  }
 }
 
 /////////////////////////////////////////////////

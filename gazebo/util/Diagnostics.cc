@@ -14,12 +14,15 @@
  * limitations under the License.
  *
  */
-/* Desc: A diagnostic class
- * Author: Nate Koenig
- * Date: 2 Feb 2011
- */
+#ifdef _WIN32
+  #include <algorithm>
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/transport/transport.hh"
@@ -31,11 +34,15 @@ using namespace util;
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
-
-  this->enabled = false;
+#ifndef _WIN32
+  const char *homePath = common::getEnv("HOME");
+#else
+  const char *homePath = common::getEnv("HOMEPATH");
+#endif
+  this->logPath = homePath;
 
   // Get the base of the time logging path
-  if (!getenv("HOME"))
+  if (!homePath)
   {
     common::SystemPaths *paths = common::SystemPaths::Instance();
     gzwarn << "HOME environment variable missing. Diagnostic timing " <<
@@ -44,20 +51,26 @@ DiagnosticManager::DiagnosticManager()
   }
   else
   {
-    this->logPath = getenv("HOME");
     this->logPath /= ".gazebo";
   }
 
-  this->logPath = this->logPath / "diagnostics" /
-    common::Time::GetWallTimeAsISOString();
+  std::string timeStr = common::Time::GetWallTimeAsISOString();
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&DiagnosticManager::Update, this, _1));
+#ifdef _WIN32
+  std::replace(timeStr.begin(), timeStr.end(), ':', '_');
+#endif
+
+  this->logPath = this->logPath / "diagnostics" / timeStr;
+
+  // Make sure the path exists.
+  if (!boost::filesystem::exists(this->logPath))
+    boost::filesystem::create_directories(this->logPath);
 }
 
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
   this->Fini();
 }
 
@@ -67,7 +80,11 @@ void DiagnosticManager::Init(const std::string &_worldName)
   this->node.reset(new transport::Node());
 
   this->node->Init(_worldName);
+
   this->pub = this->node->Advertise<msgs::Diagnostics>("~/diagnostics");
+
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&DiagnosticManager::Update, this, _1));
 
   this->controlSub = this->node->Subscribe("~/diagnostic/control",
       &DiagnosticManager::OnControl, this, true);
@@ -400,5 +417,3 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
   // Store the prev lap time.
   this->prevLap = elapsed;
 }
-
-

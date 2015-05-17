@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class UserCamera UserCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
-    class GAZEBO_VISIBLE UserCamera : public Camera
+    class GZ_RENDERING_VISIBLE UserCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
@@ -193,6 +193,9 @@ namespace gazebo
       ///
       /// \param[in] _enable True to turn on stereo, false to turn off.
       public: void EnableStereo(bool _enable);
+
+      // Documentation inherited.
+      public: virtual bool SetProjectionType(const std::string &_type);
 
       /// \brief Set the camera to be attached to a visual.
       ///
