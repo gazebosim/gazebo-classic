@@ -14,6 +14,12 @@
  * limitations under the License.
  *
  */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <iomanip>
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -36,7 +42,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("renderWidget");
-  this->show();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
@@ -45,15 +50,15 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  QFrame *toolFrame = new QFrame;
-  toolFrame->setObjectName("toolFrame");
-  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  this->toolFrame = new QFrame;
+  this->toolFrame->setObjectName("toolFrame");
+  this->toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
   this->toolbar = new QToolBar;
   QHBoxLayout *toolLayout = new QHBoxLayout;
   toolLayout->setContentsMargins(0, 0, 0, 0);
 
-  QActionGroup *actionGroup = new QActionGroup(toolFrame);
+  QActionGroup *actionGroup = new QActionGroup(this->toolFrame);
   if (g_arrowAct)
   {
     actionGroup->addAction(g_arrowAct);
@@ -128,10 +133,9 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(this->toolbar);
-  toolFrame->setLayout(toolLayout);
+  this->toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
-  rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(
@@ -155,7 +159,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QFrame *render3DFrame = new QFrame;
   render3DFrame->setObjectName("render3DFrame");
   QVBoxLayout *render3DLayout = new QVBoxLayout;
-  render3DLayout->addWidget(toolFrame);
+  render3DLayout->addWidget(this->toolFrame);
   render3DLayout->addWidget(this->glWidget);
   render3DLayout->setContentsMargins(0, 0, 0, 0);
   render3DLayout->setSpacing(0);
@@ -241,13 +245,18 @@ void RenderWidget::InsertWidget(unsigned int _index, QWidget *_widget)
   {
     // set equal size for now. There should always be at least one widget
     // (render3DFrame) in the splitter.
-    QList<int> sizes = this->splitter->sizes();
-    GZ_ASSERT(sizes.size() > 0, "RenderWidget splitter has no child widget");
+    int childCount = this->splitter->count();
+    GZ_ASSERT(childCount > 0,
+        "RenderWidget splitter has no child widget");
 
-    sizes.insert(_index, sizes[0]);
+    QSize widgetSize = this->size();
+    int newSize = widgetSize.height() / (this->splitter->count()+1);
+    QList<int> newSizes;
+    for (int i = 0; i < childCount+1; ++i)
+      newSizes.append(newSize);
 
     this->splitter->insertWidget(_index, _widget);
-    this->splitter->setSizes(sizes);
+    this->splitter->setSizes(newSizes);
     this->splitter->setStretchFactor(_index, 1);
   }
   else
@@ -321,11 +330,11 @@ void RenderWidget::ShowToolbar(const bool _show)
   {
     if (_show)
     {
-      this->toolbar->show();
+      this->toolFrame->show();
     }
     else
     {
-      this->toolbar->hide();
+      this->toolFrame->hide();
     }
   }
 }

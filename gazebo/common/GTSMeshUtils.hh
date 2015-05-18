@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \class GTSMeshUtils GTSMeshUtils.hh common/common.hh
     /// \brief Creates GTS utilities for meshes
-    class GAZEBO_VISIBLE GTSMeshUtils
+    class GZ_COMMON_VISIBLE GTSMeshUtils
     {
       /// \brief Perform delaunay triangulation on input vertices.
       /// \param[in] _path A path can contain multiple subpath, which in turn

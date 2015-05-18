@@ -25,7 +25,7 @@ namespace gazebo
   namespace rendering
   {
     /// \brief Class for skipping materials which do not have the scheme defined
-    class GAZEBO_VISIBLE NullSchemeHandler :
+    class GZ_RENDERING_DEFERRED_VISIBLE NullSchemeHandler :
       public Ogre::MaterialManager::Listener
     {
       /** @copydoc MaterialManager::Listener::handleSchemeNotFound */
