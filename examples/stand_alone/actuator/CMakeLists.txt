@@ -9,10 +9,20 @@ find_package(Boost ${MIN_BOOST_VERSION} REQUIRED system filesystem regex program
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
-include_directories(${GAZEBO_INCLUDE_DIRS}
-  ${SDFormat_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS}
-  ${SDFormat_LIBRARY_DIRS} ${GAZEBO_LIBRARY_DIRS})
+include_directories(
+  ${SDFormat_INCLUDE_DIRS}
+  ${GAZEBO_INCLUDE_DIRS}
+)
+link_directories(
+  ${SDFormat_LIBRARY_DIRS}
+  ${GAZEBO_LIBRARY_DIRS}
+)
 
 add_executable(actuator main.cc)
-target_link_libraries(actuator ${SDFormat_LIBRARIES} ${GAZEBO_LIBRARIES} ${PROTOBUF_LIBRARIES}  ${Boost_LIBRARIES} pthread)
+target_link_libraries(actuator
+  ${SDFormat_LIBRARIES}
+  ${GAZEBO_LIBRARIES}
+  ${PROTOBUF_LIBRARIES}
+  ${Boost_LIBRARIES}
+  pthread
+)

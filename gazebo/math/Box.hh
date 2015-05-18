@@ -113,6 +113,11 @@ namespace gazebo
       /// \return The new box
       public: Box operator-(const Vector3 &_v);
 
+      /// \brief Check if a point lies inside or on the box.
+      /// \param[in] _p Point to check.
+      /// \return True if the point is inside or on the box.
+      public: bool Contains(const math::Vector3 &_p) const;
+
       /// \brief Output operator
       /// \param[in] _out Output stream
       /// \param[in] _b Box to output to the stream

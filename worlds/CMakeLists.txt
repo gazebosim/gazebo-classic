@@ -5,6 +5,7 @@ set (files
   cart_demo.world
   contact.world
   depth_camera.world
+  elevator.world
   empty_1_0.world
   empty_bullet.world
   empty_sky.world
@@ -26,6 +27,7 @@ set (files
   multilink_shape.world
   openal.world
   ortho.world
+  osrf_elevator.world
   pioneer2dx.world
   pioneer2dx_camera.world
   pioneer2dx_laser.world

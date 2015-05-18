@@ -168,6 +168,14 @@ Box Box::operator-(const Vector3 &_v)
 }
 
 //////////////////////////////////////////////////
+bool Box::Contains(const Vector3 &_p) const
+{
+  return _p.x >= this->min.x && _p.x <= this->max.x &&
+         _p.y >= this->min.y && _p.y <= this->max.y &&
+         _p.z >= this->min.z && _p.z <= this->max.z;
+}
+
+//////////////////////////////////////////////////
 ignition::math::Box Box::Ign() const
 {
   return ignition::math::Box(this->min.Ign(), this->max.Ign());
