@@ -924,5 +924,65 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_cameraPerspectiveAct);
 }
 
+/////////////////////////////////////////////////
+void MainWindow_TEST::SetUserCameraPoseSDF()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/usercamera_test.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  cam->SetCaptureData(true);
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  const unsigned char *data = cam->GetImageData();
+  unsigned int width = cam->GetImageWidth();
+  unsigned int height = cam->GetImageHeight();
+  unsigned int depth = cam->GetImageDepth();
+
+  // Part 1 : The user camera should be positioned so that it sees only
+  // a white box
+  {
+    int blackCount = 0;
+
+    // Get the number of black pixels
+    for (unsigned int y = 0; y < height; ++y)
+    {
+      for (unsigned int x = 0; x < width*depth; ++x)
+      {
+        if (data[y*(width*depth) + x] <= 10)
+          blackCount++;
+      }
+    }
+
+    // Make sure the black count is zero. This means the camera is
+    // positioned correctly
+    QVERIFY(blackCount == 0);
+  }
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(MainWindow_TEST)

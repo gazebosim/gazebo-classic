@@ -15,6 +15,8 @@ include (FindPkgConfig)
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(GAZEBO gazebo)
 endif()
+string (REPLACE ";" " " GAZEBO_CFLAGS "${GAZEBO_CFLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CFLAGS}")
 
 
 # include appropriate directories
