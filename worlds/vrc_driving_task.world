@@ -265,6 +265,68 @@
       <static>true</static>
       <pose>141 35.5 0 0 0 -2.35</pose>
     </include>
+
+  <!-- hidden collision boundaries -->
+    <model name='collision_boundary'>
+      <static>true</static>
+      <pose>-200 0 0 0 0 0</pose>
+      <link name='link1'>
+        <pose>-39.6294 -161.665 0 0 -0 0</pose>
+        <collision name='collision'>
+          <pose>250 0 125 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>500 1 250</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <link name='link2'>
+        <pose>-37.2168 163.644 0 0 -0 0</pose>
+        <collision name='collision'>
+         <pose>250 0 125 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>500 1 250</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <link name='link3'>
+        <pose>174.786 -19.1829 0 0 -0 0</pose>
+        <collision name='collision'>
+          <pose>250 0 125 0 -0 1.5708</pose>
+          <geometry>
+            <box>
+              <size>500 1 250</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      <link name='link4'>
+        <pose>-205.26 -9.85249 0 0 -0 0</pose>
+        <collision name='collision'>
+         <pose>250 0 125 0 -0 1.5708</pose>
+          <geometry>
+            <box>
+              <size>500 1 250</size>
+            </box>
+          </geometry>
+       </collision>
+      </link>
+      <link name='link5'>
+        <pose>107.321 27.057 0 0 -0 0</pose>
+        <collision name='collision'>
+          <pose>125 0 200 1.5708 -0 0</pose>
+          <geometry>
+            <box>
+              <size>500 1 500</size>
+            </box>
+          </geometry>
+       </collision>
+      </link>
+    </model>
+
     <road name="main_street">
       <width>7.34</width>
       <point>0 0 0.01</point>
