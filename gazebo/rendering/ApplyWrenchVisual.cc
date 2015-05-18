@@ -49,10 +49,7 @@ void ApplyWrenchVisual::Fini()
     dPtr->torqueVisual->DeleteDynamicLine(dPtr->torqueLine);
 
   if (!dPtr->scene)
-  {
-    gzerr << "Scene shouldn't be cleared before destroying nodes." << std::endl;
     return;
-  }
 
   // Destroy objects and nodes
   Ogre::SceneManager *manager = dPtr->scene->GetManager();
