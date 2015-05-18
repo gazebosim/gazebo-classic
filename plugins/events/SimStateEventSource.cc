@@ -73,4 +73,5 @@ void SimStateEventSource::OnPause(const bool _pause)
     json = "{\"state\": \"running\" }";
   }
   this->Emit(json);
+  this->hasPaused = _pause;
 }
