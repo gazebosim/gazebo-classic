@@ -75,7 +75,8 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
+    class GZ_RENDERING_VISIBLE Camera :
+      public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -528,6 +529,18 @@ namespace gazebo
       /// \brief Get the distortion model of this camera.
       /// \return Distortion model.
       public: DistortionPtr GetDistortion() const;
+
+      /// \brief Set the type of projection used by the camera.
+      /// \param[in] _type The type of projection: "perspective" or
+      /// "orthographic".
+      /// \return True if successful.
+      /// \sa GetProjectionType()
+      public: virtual bool SetProjectionType(const std::string &_type);
+
+      /// \brief Return the projection type as a string.
+      /// \return "perspective" or "orthographic"
+      /// \sa SetProjectionType(const std::string &_type)
+      public: std::string GetProjectionType() const;
 
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();

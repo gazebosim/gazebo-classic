@@ -16,7 +16,7 @@
 */
 
 #include <boost/thread.hpp>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "RAMLibrary.hh"
 
 using namespace gazebo;

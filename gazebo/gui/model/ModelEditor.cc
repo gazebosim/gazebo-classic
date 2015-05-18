@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
@@ -32,6 +33,10 @@
 #include "gazebo/gui/model/ModelEditorPrivate.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 
+#ifdef HAVE_GRAPHVIZ
+#include "gazebo/gui/model/SchematicViewWidget.hh"
+#endif
+
 using namespace gazebo;
 using namespace gui;
 
@@ -43,6 +48,26 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   // Create the model editor tab
   this->dataPtr->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->dataPtr->modelPalette);
+
+  this->dataPtr->schematicViewAct = NULL;
+  this->dataPtr->svWidget = NULL;
+#ifdef HAVE_GRAPHVIZ
+  RenderWidget *renderWidget = _mainWindow->GetRenderWidget();
+  this->dataPtr->svWidget = new SchematicViewWidget(renderWidget);
+  this->dataPtr->svWidget->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
+  this->dataPtr->svWidget->Init();
+  renderWidget->InsertWidget(0, this->dataPtr->svWidget);
+  this->dataPtr->svWidget->hide();
+
+  this->dataPtr->schematicViewAct =
+      new QAction(tr("Schematic View"), this->mainWindow);
+  this->dataPtr->schematicViewAct->setStatusTip(tr("Sch&ematic View"));
+  this->dataPtr->schematicViewAct->setShortcut(tr("Ctrl+E"));
+  this->dataPtr->schematicViewAct->setCheckable(true);
+  connect(this->dataPtr->schematicViewAct, SIGNAL(toggled(bool)), this,
+      SLOT(OnSchematicView(bool)));
+#endif
 
   this->dataPtr->newAct = new QAction(tr("&New"), this->mainWindow);
   this->dataPtr->newAct->setStatusTip(tr("New"));
@@ -76,6 +101,12 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->showJointsAct, SIGNAL(toggled(bool)),
       this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
       SLOT(ShowJoints(bool)));
+
+  // Clone actions from main window
+  this->dataPtr->showToolbarsAct =
+      this->mainWindow->CloneAction(g_showToolbarsAct, this);
+  this->dataPtr->fullScreenAct =
+      this->mainWindow->CloneAction(g_fullScreenAct, this);
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
@@ -229,6 +260,24 @@ void ModelEditor::Exit()
 }
 
 /////////////////////////////////////////////////
+void ModelEditor::OnSchematicView(bool _show)
+{
+  if (!this->dataPtr->svWidget)
+    return;
+
+  if (_show)
+  {
+#ifdef HAVE_GRAPHVIZ
+    this->dataPtr->svWidget->show();
+  }
+  else
+  {
+    this->dataPtr->svWidget->hide();
+#endif
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelEditor::CreateMenus()
 {
   if (this->dataPtr->menuBar)
@@ -245,6 +294,15 @@ void ModelEditor::CreateMenus()
 
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(this->dataPtr->showJointsAct);
+
+  QMenu *windowMenu = this->dataPtr->menuBar->addMenu(tr("&Window"));
+  if (this->dataPtr->schematicViewAct)
+  {
+    windowMenu->addAction(this->dataPtr->schematicViewAct);
+    windowMenu->addSeparator();
+  }
+  windowMenu->addAction(this->dataPtr->showToolbarsAct);
+  windowMenu->addAction(this->dataPtr->fullScreenAct);
 }
 
 /////////////////////////////////////////////////
@@ -283,6 +341,8 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("modelEditorTab");
     this->mainWindow->ShowMenuBar(this->dataPtr->menuBar);
+    if (!g_showToolbarsAct->isChecked())
+      g_showToolbarsAct->trigger();
     this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
   }
   else
@@ -293,6 +353,17 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     if (!this->dataPtr->mainWindowPaused)
       this->mainWindow->Play();
   }
+
+#ifdef HAVE_GRAPHVIZ
+  if (this->dataPtr->svWidget && this->dataPtr->schematicViewAct)
+  {
+    this->dataPtr->svWidget->setVisible(
+        !this->dataPtr->active && this->dataPtr->schematicViewAct->isChecked());
+    if (!this->dataPtr->active)
+      this->dataPtr->svWidget->Reset();
+  }
+#endif
+
   this->dataPtr->active = !this->dataPtr->active;
   this->ToggleToolbar();
   // g_editModelAct->setChecked(this->dataPtr->active);

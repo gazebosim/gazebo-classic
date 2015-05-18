@@ -21,7 +21,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/SelectionObj.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class SelectionObj_TEST : public ServerFixture

@@ -28,7 +28,7 @@ namespace gazebo
   {
     namespace model
     {
-      class GAZEBO_VISIBLE Events
+      class GZ_GUI_MODEL_VISIBLE Events
       {
         /// \brief Connect a boost::slot to the finish model signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -345,11 +345,12 @@ namespace gazebo
         /// \brief Notify that a link has been inserted.
         public: static event::EventT<void (std::string)> linkInserted;
 
-        /// \brief Notify that a joint has been inserted. The first
-        /// string is the joint's unique id and the second string is the
-        /// joint name.
-        public: static event::EventT<void (std::string, std::string)>
-            jointInserted;
+        /// \brief Notify that a joint has been inserted. The first string is
+        /// the joint's unique id, the second string is the joint name, the
+        /// third is the parent link's name, the fourth is the child link's
+        /// name. All names scoped.
+        public: static event::EventT<void (std::string, std::string,
+            std::string, std::string)> jointInserted;
 
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
