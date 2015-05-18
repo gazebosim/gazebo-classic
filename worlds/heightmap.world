@@ -1,6 +1,11 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>-25 -65 30 0 1.57071 0</pose>
+      </camera>
+    </gui>
     <scene>
       <sky>
         <clouds>
@@ -20,8 +25,105 @@
       <uri>model://flight_heightmap</uri>
     </include>
 
+    <include>
+      <pose>-315.32 -240.286 6.00 0 -0 0</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>-350.106 88.5294 6.00 0 0 -0.590655</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>-173.446 -135.167 6.00 0 -0 0</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>144 -211 6.00 0 -0 2.80022</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>-130 -274 6.00 0 -0 1.55694</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>-326 -101 6.00 -0 -0 -0.590655</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>-247.238 112.065 6.00 0 0 -0.590655</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>-26.8128 138.55 6.00 0 0 -2.75376</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>23.5836 40.5435 6.00 0 0 -1.32445</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>82.527 -80.0123 6.00 0 0 -0.590655</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>61.8318 136.62 6.00 0 0 -1.29183</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>218.582 278.205 6.00 0 0 -2.37814</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>348 18 6.00 0 -0 2.83574</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>331 -167 6.00 0 -0 2.78717</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>226.079 -323.215 6.00 0 -0 2.22653</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>-136 237 6.00 0 0 -1.72285</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>276 158 6.00 0 0 -2.71746</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>96 71 6.00 0 0 0</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+    <include>
+      <pose>-37 33 6.00 0 0 -1.57</pose>
+      <uri>model://arrow</uri>
+    </include>
+
+
+
     <model name="launchpad">
-      <pose>-128 -334 -0.996 0 0 0</pose>
+      <pose>-25 -65 -0.996 0 0 0</pose>
       <static>true</static>
       <link name="link">
         <collision name="collision">
@@ -114,22 +216,43 @@
       </link>
     </model>
 
+<!--
     <model name="box">
-      <pose>-128 -334 0.78 0 0 3.1415</pose>
-      <static>true</static>
+      <pose>-128 -334 0.78 0 0 0</pose>
+      <static>false</static>
       <link name="link">
+        <inertial>
+          <pose>0 0 -0.2 0 0 0</pose>
+          <mass>2.0</mass>
+          <inertia>
+          <ixx>0.004</ixx>
+          <ixy>0.000</ixy>
+          <ixz>0.000</ixz>
+          <iyy>0.004</iyy>
+          <iyz>0.000</iyz>
+          <izz>0.004</izz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>
               <size>.4 .4 .4</size>
             </box>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0</mu>
+                <mu2>0</mu2>
+              </ode>
+            </friction>
+          </surface>
         </collision>
 
         <visual name="visual">
           <geometry>
             <box>
-              <size>.1 .1 .1</size>
+              <size>.4 .4 .4</size>
             </box>
           </geometry>
         </visual>
@@ -148,8 +271,115 @@
           </material>
         </visual>
 
+        <sensor name="camera" type="camera">
+          <pose>0 0 0 0 0 0</pose>
+          <camera>
+            <horizontal_fov>2.0</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>15000</far>
+            </clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>25</update_rate>
+          <visualize>true</visualize>
+        </sensor>
+
       </link>
-      <plugin name="drone" filename="libDronePlugin.so"/>
+      <joint name='base_world' type='revolute'>
+        <child>link</child>
+        <parent>world</parent>
+        <axis>
+          <xyz>0 0 1.0</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>10000</effort>
+            <velocity>-1</velocity>
+          </limit>
+          <dynamics>
+            <damping>2</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+          <use_parent_model_frame>1</use_parent_model_frame>
+        </axis>
+        <physics>
+          <provide_feedback>1</provide_feedback>
+          <ode>
+            <provide_feedback>1</provide_feedback>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <cfm_damping>1</cfm_damping>
+            <limit>
+              <cfm>0.01</cfm>
+              <erp>0</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <plugin name="drone" filename="libDronePlugin.so">
+        <base_link>link</base_link>
+        <base_joint>base_world</base_joint>
+        <damping>10.0</damping>
+        <base_pid_pos cmd_max="10000.0" cmd_min="-10000.0"
+                      d="0.01" i="0" p="200.0"/>
+        <base_pid_rot cmd_max="10000.0" cmd_min="-10000.0"
+                      d="0.01" i="0" p="100.0"/>
+      </plugin>
+    </model>
+-->
+
+    <model name="iris">>
+      <pose>-25 -65 0.78 0 0 3.14</pose>
+      <include>
+        <uri>model://iris_test</uri>
+      </include>
+      <joint name='base_world' type='revolute'>
+        <child>iris::base_link</child>
+        <parent>world</parent>
+        <axis>
+          <xyz>0 0 1.0</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+            <effort>10000</effort>
+            <velocity>-1</velocity>
+          </limit>
+          <dynamics>
+            <damping>2</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+          <use_parent_model_frame>1</use_parent_model_frame>
+        </axis>
+        <physics>
+          <provide_feedback>1</provide_feedback>
+          <ode>
+            <provide_feedback>1</provide_feedback>
+            <implicit_spring_damper>1</implicit_spring_damper>
+            <cfm_damping>1</cfm_damping>
+            <limit>
+              <cfm>0.01</cfm>
+              <erp>0</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+      <plugin name="drone" filename="libDronePlugin.so">
+        <base_link>iris::base_link</base_link>
+        <base_joint>base_world</base_joint>
+        <damping>15.0</damping>
+        <base_pid_pos cmd_max="5000.0" cmd_min="-5000.0"
+                      d="0.01" i="0" p="80.0"/>
+        <base_pid_rot cmd_max="5000.0" cmd_min="-5000.0"
+                      d="0.01" i="0" p="100.0"/>
+      </plugin>
     </model>
 
   </world>

@@ -99,11 +99,15 @@ void Forest::Load()
     return;
 
   // TODO: Extend to other types of cameras. How about multiple cameras sensors?
-  if (this->scene->GetUserCameraCount() == 0u)
-    return;
+//  if (this->scene->GetUserCameraCount() == 0u)
+//    return;
 
-  this->camera = boost::dynamic_pointer_cast<Camera>(
-      this->scene->GetUserCamera(0));
+//  this->camera = boost::dynamic_pointer_cast<Camera>(
+//      this->scene->GetUserCamera(0));
+
+//  // TODO REMOVE ME
+//  this->camera = boost::dynamic_pointer_cast<Camera>(
+//      this->scene->GetCamera(0));
 
   this->connections.push_back(event::Events::ConnectRender(
         boost::bind(&Forest::Update, this, false)));
@@ -156,7 +160,7 @@ void Forest::LoadScene()
   // Create and configure a new PagedGeometry instance for this->grass
   this->grass = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 100);
   this->grass->setCoordinateSystem(upAxis, rightAxis);
-  this->grass->addDetailLevel<Forests::GrassPage>(300);
+  this->grass->addDetailLevel<Forests::GrassPage>(150);
 
   // Create a GrassLoader object
   Forests::GrassLoader *grassLoader = new Forests::GrassLoader(this->grass);
@@ -184,7 +188,7 @@ void Forest::LoadScene()
   //Sway 1/2 a cycle every second
   l->setSwaySpeed(0.4f);
   //Relatively dense this->grass
-  l->setDensity(4.0f);
+  l->setDensity(3.0f);
   l->setRenderTechnique(Forests::GRASSTECH_SPRITE);
   //Distant this->grass should slowly raise out of the ground when coming in range
   l->setFadeTechnique(Forests::FADETECH_GROW);
@@ -203,7 +207,7 @@ void Forest::LoadScene()
   //have any knowledge of where you want the maps to be applied). In this case, the maps are applied
   //to the same boundaries as the terrain.
   //(0,0)-(500,500) is the full boundaries of the terrain
-  l->setMapBounds(Forests::TBounds(-500, -500, 500, 500));
+  l->setMapBounds(Forests::TBounds(-100, -100, 100, 100));
 
 
   // -------------------------------------- LOAD GRASS TYPE 2 -----------------------
@@ -222,7 +226,7 @@ void Forest::LoadScene()
   //Sway 1/2 a cycle every second
   l2->setSwaySpeed(0.4f);
   //Relatively dense this->grass
-  l2->setDensity(4.0f);
+  l2->setDensity(3.0f);
 //  l->setRenderTechnique(Forests::GRASSTECH_SPRITE);
   //Distant this->grass should slowly raise out of the ground when coming in range
   l2->setFadeTechnique(Forests::FADETECH_GROW);
@@ -232,7 +236,7 @@ void Forest::LoadScene()
   //have any knowledge of where you want the maps to be applied). In this case, the maps are applied
   //to the same boundaries as the terrain.
   //(0,0)-(500,500) is the full boundaries of the terrain
-  l2->setMapBounds(Forests::TBounds(-500, -500, 500, 500));
+  l2->setMapBounds(Forests::TBounds(-100, -100, 100, 100));
 
   //-------------------------------------- LOAD TREES --------------------------------------
   //Create and configure a new PagedGeometry instance
@@ -242,7 +246,7 @@ void Forest::LoadScene()
   //Set the camera so PagedGeometry knows how to calculate LODs
   this->trees->setCamera(this->camera->GetOgreCamera());
   //Set the size of each page of geometry
-  this->trees->setPageSize(100);
+  this->trees->setPageSize(80);
   //Use infinite paging mode
   this->trees->setInfinite();
 
@@ -255,7 +259,7 @@ void Forest::LoadScene()
   this->trees->addDetailLevel<Forests::ImpostorPage>(700, 50);  //Use impostors up to 400 units, and for for 50 more units
 
   // Create a new TreeLoader2D object
-  Forests::TreeLoader3D *treeLoader = new Forests::TreeLoader3D(this->trees, Forests::TBounds(-500, -500, 500, 500));
+  Forests::TreeLoader3D *treeLoader = new Forests::TreeLoader3D(this->trees, Forests::TBounds(-100, -100, 100, 100));
   this->trees->setPageLoader(treeLoader);  //Assign the "treeLoader" to be used to load geometry for the PagedGeometry instance
 
   // Supply a height function to TreeLoader2D so it can calculate tree Y values
@@ -284,16 +288,16 @@ void Forest::LoadScene()
   this->trees->setCustomParam(tree2->getName(), "windFactorY", 0.013);
   #endif
 
-  //Randomly place 10000 copies of the tree on the terrain
+  //Randomly place copies of the tree on the terrain
   Ogre::Vector3 position = Ogre::Vector3::ZERO;
   Ogre::Radian yaw;
   Ogre::Real scale;
-  for (int i = 0; i < 8000; i++)
+  for (int i = 0; i < 600; i++)
   {
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
 
-    position.x = Ogre::Math::RangeRandom(-500, 500);
-    position.y = Ogre::Math::RangeRandom(-500, 500);
+    position.x = Ogre::Math::RangeRandom(-100, 100);
+    position.y = Ogre::Math::RangeRandom(-100, 100);
     position.z = Forest::GetTerrainHeight(position.x, position.y);
 
     // hardcode to remove trees at specific places on heightmap
@@ -322,19 +326,19 @@ void Forest::LoadScene()
   // -------------------------------------- LOAD BUSHES ------------------------
 
   // Create and configure a new PagedGeometry instance for this->bushes
-  this->bushes = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 250);
+  this->bushes = new Forests::PagedGeometry(this->camera->GetOgreCamera(), 100);
   this->bushes->setCoordinateSystem(upAxis, rightAxis);
 
   #ifdef WIND
   this->bushes->addDetailLevel<Forests::WindBatchPage>(50, 50);
   #else
-  this->bushes->addDetailLevel<Forests::BatchPage>(400, 50);
+  this->bushes->addDetailLevel<Forests::BatchPage>(200, 50);
   #endif
 //  this->bushes->addDetailLevel<Forests::ImpostorPage>(400, 50);
 
   // Create a new TreeLoader3D object for the this->bushes
   Forests::TreeLoader3D *bushLoader =
-      new Forests::TreeLoader3D(this->bushes, Forests::TBounds(-500, -500, 500, 500));
+      new Forests::TreeLoader3D(this->bushes, Forests::TBounds(-100, -100, 100, 100));
   this->bushes->setPageLoader(bushLoader);
 
   // Supply the height function to TreeLoader2D so it can calculate tree Y values
@@ -362,10 +366,10 @@ void Forest::LoadScene()
   #endif
 
   // Randomly place 20,000 this->bushes on the terrain
-  for (int i = 0; i < 10000; i++){
+  for (int i = 0; i < 1000; i++){
     yaw = Ogre::Degree(Ogre::Math::RangeRandom(0, 360));
-    position.x = Ogre::Math::RangeRandom(-500, 500);
-    position.y = Ogre::Math::RangeRandom(-500, 500);
+    position.x = Ogre::Math::RangeRandom(-100, 100);
+    position.y = Ogre::Math::RangeRandom(-100, 100);
     position.z = Forest::GetTerrainHeight(position.x, position.y);
 
     float rnd = Ogre::Math::UnitRandom();
@@ -383,9 +387,34 @@ void Forest::LoadScene()
   this->initialized = true;
 }
 
+int updateRate = 0;
 //////////////////////////////////////////////////
 void Forest::Update(bool _force)
 {
+  updateRate++;
+  if (updateRate%3 == 0)
+    return;
+
+  if (!this->camera)
+  {
+    // TODO: Extend to other types of cameras. How about multiple cameras sensors?
+    //if (this->scene->GetUserCameraCount() == 0u)
+      //return;
+
+    if (this->scene->GetOculusCameraCount() != 0u)
+    {
+      this->camera = boost::dynamic_pointer_cast<Camera>(
+          this->scene->GetOculusCamera(0));
+    }
+    else if (this->scene->GetUserCameraCount() != 0u)
+    {
+      this->camera = boost::dynamic_pointer_cast<Camera>(
+          this->scene->GetUserCamera(0));
+    }
+    if (!this->camera)
+      return;
+  }
+
   if (!this->initialized)
   {
     this->heightmap = this->scene->GetHeightmap();
