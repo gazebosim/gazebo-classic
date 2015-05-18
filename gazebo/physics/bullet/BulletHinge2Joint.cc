@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -38,6 +34,8 @@ BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world, BasePtr _parent)
   GZ_ASSERT(_world, "bullet world pointer is NULL");
   this->bulletWorld = _world;
   this->bulletHinge2 = NULL;
+  this->angleOffset[0] = 0.0;
+  this->angleOffset[1] = 0.0;
 }
 
 //////////////////////////////////////////////////
