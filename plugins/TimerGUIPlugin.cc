@@ -201,15 +201,16 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
     // events to reposition the timer
     if (p.x < 0 || p.y < 0)
     {
-      this->posX = p.x - s.x;
-      this->posY = p.y - s.y;
       this->parent()->installEventFilter(this);
     }
 
     if (p.x < 0)
     {
       if (this->parent())
+      {
+        this->posX = p.x - s.x;
         p.x = static_cast<QWidget *>(this->parent())->width() + this->posX;
+      }
       else
       {
         gzwarn << "Couldn't get parent, setting position x to zero" <<
@@ -221,7 +222,10 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
     if (p.y < 0)
     {
       if (this->parent())
+      {
+        this->posY = p.y - s.y;
         p.y = static_cast<QWidget *>(this->parent())->height() + this->posY;
+      }
       else
       {
         gzwarn << "Couldn't get parent, setting position y to zero" <<
@@ -401,8 +405,21 @@ bool TimerGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
   QWidget *widget = qobject_cast<QWidget *>(_obj);
   if (widget == this->parent() && _event->type() == QEvent::Resize)
   {
-    this->move(widget->width() + this->posX,
-               widget->height() + this->posY);
+    int pX = this->posX;
+    int pY = this->posY;
+
+    // Zero values mean that was a positive position, so keep the same
+    if (pX == 0)
+      pX = this->pos().x();
+    else
+      pX = widget->width() + pX;
+
+    if (pY == 0)
+      pY = this->pos().y();
+    else
+      pY = widget->height() + pY;
+
+    this->move(pX, pY);
   }
   return QObject::eventFilter(_obj, _event);
 }
