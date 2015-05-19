@@ -204,6 +204,7 @@ void FoosballDemoPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->restartGameSub =
     this->gzNode->Subscribe("~/foosball_demo/restart_game",
     &FoosballDemoPlugin::OnRestartGame, this);
+  this->visualPub = this->gzNode->Advertise<msgs::Visual>("~/visual");
 
   // Connect to the update event.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -254,6 +255,7 @@ void FoosballDemoPlugin::SetCurrentState(State<FoosballDemoPlugin> &_newState)
   {
     this->currentState = &_newState;
     this->currentState->Initialize();
+    this->ShowRedBlueGoals(this->scoreA, this->scoreB);
   }
 }
 
@@ -278,3 +280,40 @@ void FoosballDemoPlugin::OnRestartGame(ConstIntPtr &/*_unused*/)
   this->currentState = &kickoffState;
   this->currentState->Initialize();
 }
+
+/////////////////////////////////////////////////
+void FoosballDemoPlugin::ShowRedBlueGoals(unsigned int _red,
+                                          unsigned int _blue)
+{
+  for (auto i = 0u; i < 5; ++i)
+  {
+      std::string name = "foosball::Foosball::table::goal_visual_";
+      std::string parent = "foosball::Foosball::table";
+      this->SetVisualVisibility(name + "Red_" + std::to_string(i),
+                             parent,
+                             i < _red);
+
+      this->SetVisualVisibility(name + "Blue_" + std::to_string(i),
+                             parent,
+                             i < _blue);
+  }
+}
+
+/////////////////////////////////////////////////
+void FoosballDemoPlugin::SetVisualVisibility(const std::string &_name,
+                                          const std::string &_parentName,
+                                          bool _visible)
+{
+  msgs::Visual visualMsg;
+  visualMsg.set_name(_name);
+  visualMsg.set_parent_name(_parentName);
+
+  visualMsg.mutable_material()->mutable_script()->set_name("Gazebo/White");
+  if (_visible)
+    visualMsg.set_transparency(0);
+  else
+    visualMsg.set_transparency(1.0);
+  this->visualPub->Publish(visualMsg);
+}
+
+

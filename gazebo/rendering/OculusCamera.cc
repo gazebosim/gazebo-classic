@@ -264,8 +264,8 @@ void OculusCamera::Update()
 
     // Move camera visual - note that it might break the model's kinematics
     this->dataPtr->cameraVisual->SetPose(math::Pose(math::Vector3(
-        -ovrpose.Position.z, 
-        -ovrpose.Position.x, 
+        -ovrpose.Position.z,
+        -ovrpose.Position.x,
          ovrpose.Position.y), math::Quaternion(
          ovrpose.Orientation.w,
         -ovrpose.Orientation.z,
