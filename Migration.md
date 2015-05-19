@@ -12,10 +12,6 @@
     + ***Removed:*** protected: double far
     + ***Replacement:*** protected: double farClip
 
-1. **gazebo/rendering/Visual.hh**
-    + ***Removed:*** public: void Fini();
-    + ***Replacement:*** public: virtual void Fini();
-
 1. **gazebo/common/MeshManager.hh**
     + ***Removed:*** void CreateExtrudedPolyline(const std::string &_name, const std::vector<math::Vector2d> &_vertices, const double &_height, const math::Vector2d &_uvCoords)
     + ***Replacement:*** void CreateExtrudedPolyline(const std::string &_name, const const std::vector<std::vector<math::Vector2d> > &_vertices, const double &_height, const math::Vector2d &_uvCoords)

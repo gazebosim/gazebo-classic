@@ -88,8 +88,6 @@ void ApplyWrenchVisual::Fini()
 
   dPtr->forceVisual.reset();
   dPtr->torqueVisual.reset();
-
-  Visual::Fini();
 }
 
 ///////////////////////////////////////////////////

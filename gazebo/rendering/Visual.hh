@@ -81,7 +81,7 @@ namespace gazebo
       public: void Init();
 
       /// \brief Helper for the destructor
-      public: virtual void Fini();
+      public: void Fini();
 
       /// \brief Clone the visual with a new name.
       /// \param[in] _name Name of the cloned Visual.
