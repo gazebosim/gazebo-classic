@@ -63,8 +63,6 @@ void Timer::Stop()
 {
   this->stop = Time::GetWallTime();
   this->running = false;
-
-  // We need to do something to freeze the start time
 }
 
 //////////////////////////////////////////////////
