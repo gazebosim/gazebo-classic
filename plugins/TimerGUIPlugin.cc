@@ -197,30 +197,54 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
     math::Vector2d p = _elem->Get<math::Vector2d>("pos");
 
     // Negative positions are counted from the ends
+    // If there are negative positions, we need to filter window resize
+    // events to reposition the timer
+    if (p.x < 0 || p.y < 0)
+    {
+      this->posX = p.x - s.x;
+      this->posY = p.y - s.y;
+      this->parent()->installEventFilter(this);
+    }
+
     if (p.x < 0)
     {
-      p.x = static_cast<QWidget*>(parent())->width() + p.x - s.x;
+      if (this->parent())
+        p.x = static_cast<QWidget *>(this->parent())->width() + this->posX;
+      else
+      {
+        gzwarn << "Couldn't get parent, setting position x to zero" <<
+            std::endl;
+        p.x = 0;
+      }
     }
 
     if (p.y < 0)
     {
-      p.y = static_cast<QWidget*>(parent())->height() + p.y - s.y;
+      if (this->parent())
+        p.y = static_cast<QWidget *>(this->parent())->height() + this->posY;
+      else
+      {
+        gzwarn << "Couldn't get parent, setting position y to zero" <<
+            std::endl;
+        p.y = 0;
+      }
     }
 
     // Check for x position greater than parent width
-    if (parent() && p.x > static_cast<QWidget*>(parent())->width())
+    if (parent() && p.x > static_cast<QWidget *>(this->parent())->width())
     {
       gzwarn << "GUI widget x pos > parent width, "
         << "clamping to parent width - this widget's width.\n";
-      p.x = static_cast<QWidget*>(parent())->width() - this->width();
+      p.x = static_cast<QWidget *>(this->parent())->width() - this->width();
     }
 
     // Check for y position greater than parent height
-    if (parent() && p.y > static_cast<QWidget*>(parent())->height())
+    if (parent() && p.y > static_cast<QWidget *>(this->parent())->height())
     {
       gzwarn << "GUI widget y pos > parent height, "
         << "clamping to parent height - this widget's height.\n";
-      p.y = static_cast<QWidget*>(parent())->height() - this->height();
+      p.y = static_cast<QWidget *>(this->parent())->height() -
+          this->height();
     }
 
     this->move(p.x, p.y);
@@ -371,3 +395,14 @@ void TimerGUIPlugin::OnResetButton()
   this->Reset();
 }
 
+/////////////////////////////////////////////////
+bool TimerGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
+{
+  QWidget *widget = qobject_cast<QWidget *>(_obj);
+  if (widget == this->parent() && _event->type() == QEvent::Resize)
+  {
+    this->move(widget->width() + this->posX,
+               widget->height() + this->posY);
+  }
+  return QObject::eventFilter(_obj, _event);
+}
