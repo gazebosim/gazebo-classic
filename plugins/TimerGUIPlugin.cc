@@ -196,18 +196,15 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   {
     math::Vector2d p = _elem->Get<math::Vector2d>("pos");
 
-    // Check for negative x position
+    // Negative positions are counted from the ends
     if (p.x < 0)
     {
-      gzwarn << "GUI widget x pos < 0, clamping to 0.\n";
-      p.x = 0;
+      p.x = static_cast<QWidget*>(parent())->width() + p.x - s.x;
     }
 
-    // Check for negative y position
     if (p.y < 0)
     {
-      gzwarn << "GUI widget y pos < 0, clamping to 0.\n";
-      p.y = 0;
+      p.y = static_cast<QWidget*>(parent())->height() + p.y - s.y;
     }
 
     // Check for x position greater than parent width
