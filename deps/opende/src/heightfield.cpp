@@ -8,7 +8,9 @@
 // Prevents warnings about the following unused functions:
 // DescendingTriangleSort
 // DistancePointToLine
+#ifdef __clang__
 #pragma clang diagnostic ignored "-Wunused-function"
+#endif
 
 #include <ode/common.h>
 #include <ode/collision.h>
