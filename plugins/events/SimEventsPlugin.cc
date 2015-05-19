@@ -15,14 +15,15 @@
  *
 */
 
+#include "InRegionEventSource.hh"
+#include "ExistenceEventSource.hh"
+#include "OccupiedEventSource.hh"
 
 #include "SimEventsPlugin.hh"
-
 
 using namespace gazebo;
 using namespace sdf;
 using namespace physics;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimEventsPlugin::OnModelInfo(ConstModelPtr &_msg)
@@ -63,17 +64,22 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   this->sdf = _sdf;
 
   // Create a new transport node
-  transport::NodePtr node(new transport::Node());
+  this->node = transport::NodePtr(new transport::Node());
+
   // Initialize the node with the world name
-  node->Init(_parent->GetName());
+  this->node->Init(_parent->GetName());
+
   // Create a publisher on the Rest plugin topic
-  pub = node->Advertise<gazebo::msgs::SimEvent>("/gazebo/sim_events");
+  this->pub = this->node->Advertise<gazebo::msgs::SimEvent>(
+      "/gazebo/sim_events");
+
   // Subscribe to model spawning
-  spawnSub = node->Subscribe("~/model/info",
-                             &SimEventsPlugin::OnModelInfo,
-                             this);
+  this->spawnSub = this->node->Subscribe("~/model/info",
+      &SimEventsPlugin::OnModelInfo, this);
+
   // detect model deletion
-  requestSub = node->Subscribe("~/request", &SimEventsPlugin::OnRequest, this);
+  this->requestSub = this->node->Subscribe("~/request",
+      &SimEventsPlugin::OnRequest, this);
 
   // regions are defined outside of events, so that they can be shared
   // between events....
@@ -81,7 +87,7 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   sdf::ElementPtr child = this->sdf->GetElement("region");
   while (child)
   {
-    Region* r = new Region;
+    Region *r = new Region;
     r->Load(child);
     RegionPtr region;
     region.reset(r);
@@ -110,6 +116,11 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
                                           this->world,
                                           this->regions));
     }
+    else if (eventType == "occupied")
+    {
+      event.reset(new OccupiedEventSource(this->pub,
+            this->world, this->regions));
+    }
     else if (eventType == "existence" )
     {
       event.reset(new ExistenceEventSource(this->pub, this->world) );
@@ -121,6 +132,7 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
       m += "\" of type: \"" + eventType + "\" in SimEvents plugin";
       throw SimEventsException(m.c_str());
     }
+
     if (event)
     {
       event->Load(child);
@@ -146,8 +158,6 @@ void SimEventsPlugin::Init()
     models.insert(name);
   }
 }
-
-
 
 // Register this plugin with the simulator
 GZ_REGISTER_WORLD_PLUGIN(SimEventsPlugin)
