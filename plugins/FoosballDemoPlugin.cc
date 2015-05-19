@@ -307,8 +307,6 @@ void FoosballDemoPlugin::SetVisualVisibility(const std::string &_name,
   msgs::Visual visualMsg;
   visualMsg.set_name(_name);
   visualMsg.set_parent_name(_parentName);
-
-  visualMsg.mutable_material()->mutable_script()->set_name("Gazebo/White");
   if (_visible)
     visualMsg.set_transparency(0);
   else
