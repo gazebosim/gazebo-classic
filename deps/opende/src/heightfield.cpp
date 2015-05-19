@@ -5,6 +5,10 @@
 //  Benoit CHAPEROT 2003-2004 http://www.jstarlab.com
 //  Some code inspired by Magic Software
 
+// Prevents warnings about the following unused functions:
+// DescendingTriangleSort
+// DistancePointToLine
+#pragma clang diagnostic ignored "-Wunused-function"
 
 #include <ode/common.h>
 #include <ode/collision.h>

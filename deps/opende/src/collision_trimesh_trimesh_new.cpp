@@ -27,6 +27,10 @@
 #pragma warning(disable:4244 4305)  // for VC++, no precision loss complaints
 #endif
 
+// Prevents warnings about the following unused functions:
+// dMin
+#pragma clang diagnostic ignored "-Wunused-function"
+
 #include <ode/collision.h>
 #include <ode/matrix.h>
 #include <ode/rotation.h>
