@@ -560,7 +560,7 @@ ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
 ODE_API dReal dWorldGetQuickStepContactResidualSmoothing (dWorldID);
 
 /**
- * @brief Get friction residual exponential smoothing coefficient.
+ * @brief Get option to turn on experimental threaded position correction.
  * @ingroup world
  */
 ODE_API bool dWorldGetQuickStepThreadPositionCorrection (dWorldID);
