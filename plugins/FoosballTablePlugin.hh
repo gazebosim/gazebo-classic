@@ -209,11 +209,24 @@ namespace gazebo
     /// \param[in] _info Update information provided by the server.
     private: void Update(const common::UpdateInfo &_info);
 
+    /// \brief Callback executed when the ball needs to be restarted.
+    /// \param[in] _unused Unused parameter.
+    private: void OnShakeTable(ConstIntPtr &/*_unused*/);
+
     /// \brief Pointer to the update event connection.
     private: event::ConnectionPtr updateConnection;
 
     /// \brief Vector of players that will control the foosball rods.
     private: std::vector<std::unique_ptr<FoosballPlayer>> players;
+
+    /// \brief Node used for using Gazebo communications.
+    private: transport::NodePtr node;
+
+    /// \brief Subscriber pointer.
+    private: transport::SubscriberPtr shakeTableSub;
+
+    /// \brief Pointer to the model;
+    private: physics::ModelPtr model;
   };
 }
 #endif

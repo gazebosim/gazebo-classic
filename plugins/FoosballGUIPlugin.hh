@@ -61,6 +61,9 @@ namespace gazebo
     /// \brief Publish restart ball message on hotkey.
     public slots: void OnRestartBall();
 
+    /// \brief Publish restart ball message on hotkey.
+    public slots: void OnShakeTable();
+
     /// \brief Set time display.
     /// \param[in] _time Time string.
     signals: void SetTime(QString _time);
@@ -99,6 +102,9 @@ namespace gazebo
 
     /// \brief "Restart ball" publisher.
     private: transport::PublisherPtr restartBallPub;
+
+    /// \brief "Restart ball" publisher.
+    private: transport::PublisherPtr shakeTablePub;
 
     /// \brief Pointer to the render widget used to get width.
     private: QWidget *renderWidget;
