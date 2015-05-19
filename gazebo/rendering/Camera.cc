@@ -1755,7 +1755,10 @@ void Camera::UpdateFOV()
 //////////////////////////////////////////////////
 float Camera::GetAvgFPS() const
 {
-  return this->renderTarget->getAverageFPS();
+  if (this->renderTarget)
+    return this->renderTarget->getAverageFPS();
+  else
+    return 0.0f;
 }
 
 //////////////////////////////////////////////////
