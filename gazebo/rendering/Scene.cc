@@ -1935,7 +1935,7 @@ void Scene::PreRender()
   if (this->GetUserCameraCount() == 1)
   {
     double scale = this->dataPtr->userCameras[0]->GetWorldPosition().Distance(
-        math::Vector3::Zero) * 0.05;
+        math::Vector3::Zero) * 0.1;
     this->dataPtr->originVisual->SetScale(math::Vector3(scale, scale, scale));
   }
   else
