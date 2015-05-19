@@ -395,13 +395,27 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   QVERIFY(!applyWrenchDialogBox->isActiveWindow());
   QVERIFY(!applyWrenchDialogSphere->isActiveWindow());
 
-  // Click on the box's force visual
-  QPoint clickPoint(glWidget->width()/2, glWidget->height()/2);
+  // Find the box's torque visual
+  gazebo::math::Vector2i mousePoint(glWidget->width()/2, glWidget->height()/2);
+  for (int i = 0; i < 100; ++i)
+  {
+    gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint);
+    if (vis && vis->GetName().find("TORQUE") != std::string::npos &&
+        vis->GetNthAncestor(2) &&
+        vis->GetNthAncestor(2)->GetName() == "multilink::box_link")
+    {
+      break;
+    }
+    mousePoint.x += 5;
+  }
+
+  // Click on the box's torque visual
+  QPoint clickPoint(mousePoint.x, mousePoint.y);
   QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, clickPoint, 100);
   QCoreApplication::processEvents();
 
   // Process some events and draw the screen
-  for (size_t i = 0; i < 100; ++i)
+  for (size_t i = 0; i < 10; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
