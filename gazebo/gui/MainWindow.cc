@@ -14,6 +14,12 @@
  * limitations under the License.
  *
  */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sdf/sdf.hh>
 #include <boost/scoped_ptr.hpp>
 
@@ -44,6 +50,7 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
+#include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/ToolsWidget.hh"
@@ -104,11 +111,13 @@ MainWindow::MainWindow()
 
   this->modelListWidget = new ModelListWidget(this);
   InsertModelWidget *insertModel = new InsertModelWidget(this);
+  LayersWidget *layersWidget = new LayersWidget(this);
 
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
   this->tabWidget->addTab(this->modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
+  this->tabWidget->addTab(layersWidget, "Layers");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
@@ -128,11 +137,18 @@ MainWindow::MainWindow()
   this->splitter->addWidget(this->toolsWidget);
   this->splitter->setContentsMargins(0, 0, 0, 0);
 
+#ifdef _WIN32
+  // The splitter appears solid white in Windows, so we make it transparent.
+  this->splitter->setStyleSheet(
+  "QSplitter { color: #ffffff; background-color: transparent; }"
+  "QSplitter::handle { color: #ffffff; background-color: transparent; }");
+#endif
+
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
   sizes.push_back(this->width() - MINIMUM_TAB_WIDTH);
   sizes.push_back(0);
-  splitter->setSizes(sizes);
+  this->splitter->setSizes(sizes);
 
   this->splitter->setStretchFactor(0, 0);
   this->splitter->setStretchFactor(1, 2);
@@ -201,6 +217,8 @@ MainWindow::MainWindow()
   // Use a signal/slot to load plugins. This makes the process thread safe.
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
+
+  this->show();
 }
 
 /////////////////////////////////////////////////
@@ -243,8 +261,6 @@ void MainWindow::Load()
 /////////////////////////////////////////////////
 void MainWindow::Init()
 {
-  this->renderWidget->show();
-
   // Default window size is entire desktop.
   QSize winSize = QApplication::desktop()->screenGeometry().size();
 
@@ -462,6 +478,9 @@ void MainWindow::Save()
       cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
+
+      cameraElem->GetElement("projection_type")->Set(cam->GetProjectionType());
+
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.Root()->ToString("");
     }
@@ -1050,6 +1069,7 @@ void MainWindow::CreateActions()
   g_stepAct->setStatusTip(tr("Step the world"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
   this->CreateDisabledIcon(":/images/end.png", g_stepAct);
+  g_stepAct->setEnabled(false);
 
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
@@ -1256,6 +1276,21 @@ void MainWindow::CreateActions()
 #ifndef HAVE_OCULUS
   g_viewOculusAct->setEnabled(false);
 #endif
+
+  g_cameraOrthoAct = new QAction(tr("Orthographic"), this);
+  g_cameraOrthoAct->setStatusTip(tr("Orthographic Projection"));
+  g_cameraOrthoAct->setCheckable(true);
+  g_cameraOrthoAct->setChecked(false);
+
+  g_cameraPerspectiveAct = new QAction(tr("Perspective"), this);
+  g_cameraPerspectiveAct->setStatusTip(tr("Perspective Projection"));
+  g_cameraPerspectiveAct->setCheckable(true);
+  g_cameraPerspectiveAct->setChecked(true);
+
+  QActionGroup *projectionActionGroup = new QActionGroup(this);
+  projectionActionGroup->addAction(g_cameraOrthoAct);
+  projectionActionGroup->addAction(g_cameraPerspectiveAct);
+  projectionActionGroup->setExclusive(true);
 
   g_dataLoggerAct = new QAction(QIcon(":images/log_record.png"),
       tr("&Log Data"), this);
@@ -1558,6 +1593,12 @@ void MainWindow::DeleteActions()
 
   delete g_alignAct;
   g_alignAct = 0;
+
+  delete g_cameraOrthoAct;
+  g_cameraOrthoAct = 0;
+
+  delete g_cameraPerspectiveAct;
+  g_cameraPerspectiveAct = 0;
 }
 
 
@@ -1589,6 +1630,15 @@ void MainWindow::CreateMenuBar()
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
 
+  QMenu *cameraMenu = bar->addMenu(tr("&Camera"));
+  cameraMenu->addAction(g_cameraOrthoAct);
+  cameraMenu->addAction(g_cameraPerspectiveAct);
+  cameraMenu->addSeparator();
+  cameraMenu->addAction(g_fpsAct);
+  cameraMenu->addAction(g_orbitAct);
+  cameraMenu->addSeparator();
+  cameraMenu->addAction(g_resetAct);
+
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
   viewMenu->addSeparator();
@@ -1601,13 +1651,6 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCOMAct);
   viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
-  viewMenu->addSeparator();
-
-  viewMenu->addAction(g_resetAct);
-  viewMenu->addSeparator();
-
-  viewMenu->addAction(g_fpsAct);
-  viewMenu->addAction(g_orbitAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
@@ -1697,6 +1740,15 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     if (_msg->camera().has_view_controller())
     {
       cam->SetViewController(_msg->camera().view_controller());
+    }
+
+    if (_msg->camera().has_projection_type())
+    {
+      cam->SetProjectionType(_msg->camera().projection_type());
+      g_cameraOrthoAct->setChecked(true);
+      // Disable view control options when in ortho projection
+      g_fpsAct->setEnabled(false);
+      g_orbitAct->setEnabled(false);
     }
 
     if (_msg->camera().has_track())

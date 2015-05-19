@@ -78,7 +78,10 @@ namespace gazebo
 
         /// \brief Limit ratios of inertias of adjacent links (note that the
         /// corresponding SDF tag is "use_dynamic_moi_rescaling")
-        INERTIA_RATIO_REDUCTION
+        INERTIA_RATIO_REDUCTION,
+
+        /// \brief friction model
+        FRICTION_MODEL
       };
 
       /// \brief Constructor.
@@ -153,6 +156,9 @@ namespace gazebo
       public: virtual void SetContactSurfaceLayer(double layer_depth);
 
       // Documentation inherited
+      public: virtual void SetFrictionModel(const std::string &_fricModel);
+
+      // Documentation inherited
       public: virtual void SetMaxContacts(unsigned int max_contacts);
 
       // Documentation inherited
@@ -172,6 +178,11 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetContactMaxCorrectingVel();
+
+      // Documentation inherited
+      /// \brief get friction model
+      /// \return a friction model string
+      public: virtual std::string GetFrictionModel() const;
 
       // Documentation inherited
       public: virtual double GetContactSurfaceLayer();
@@ -214,6 +225,20 @@ namespace gazebo
       /// \param[in] _intertial Pointer to an Inertial object that will be
       /// converted.
       public: static void ConvertMass(void *_odeMass, InertialPtr _inertial);
+
+      /// \brief Convert a string to a Friction_Model enum.
+      /// \param[in] _fricModel Friction model string.
+      /// \return A Friction_Model enum. Defaults to pyramid_friction
+      /// if _fricModel is unrecognized.
+      public: static Friction_Model
+              ConvertFrictionModel(const std::string &_fricModel);
+
+      /// \brief Convert a Friction_Model enum to a string.
+      /// \param[in] _fricModel Friction_Model enum.
+      /// \return Friction model string. Returns "unknown" if
+      /// _fricModel is unrecognized.
+      public: static std::string
+              ConvertFrictionModel(const Friction_Model _fricModel);
 
       /// \brief Get the step type (quick, world).
       /// \return The step type.
