@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class Box Box.hh math/gzmath.hh
     /// \brief Mathematical representation of a box and related functions.
-    class GAZEBO_VISIBLE Box
+    class GZ_MATH_VISIBLE Box
     {
       /// \brief Default constructor
       public: Box();
@@ -96,6 +96,11 @@ namespace gazebo
       /// \param _v The vector to use during subtraction
       /// \return The new box
       public: Box operator-(const Vector3 &_v);
+
+      /// \brief Check if a point lies inside or on the box.
+      /// \param[in] _p Point to check.
+      /// \return True if the point is inside or on the box.
+      public: bool Contains(const math::Vector3 &_p) const;
 
       /// \brief Output operator
       /// \param[in] _out Output stream

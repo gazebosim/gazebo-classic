@@ -14,9 +14,16 @@
  * limitations under the License.
  *
  */
+#ifdef _WIN32
+  #include <algorithm>
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <iomanip>
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/math/SignalStats.hh"
@@ -29,8 +36,14 @@ using namespace util;
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
+#ifndef _WIN32
+  const char *homePath = common::getEnv("HOME");
+#else
+  const char *homePath = common::getEnv("HOMEPATH");
+#endif
+
   // Get the base of the time logging path
-  if (!getenv("HOME"))
+  if (!homePath)
   {
     common::SystemPaths *paths = common::SystemPaths::Instance();
     gzwarn << "HOME environment variable missing. Diagnostic timing " <<
@@ -39,12 +52,17 @@ DiagnosticManager::DiagnosticManager()
   }
   else
   {
-    this->logPath = getenv("HOME");
+  this->logPath = homePath;
     this->logPath /= ".gazebo";
   }
 
-  this->logPath = this->logPath / "diagnostics" /
-    common::Time::GetWallTimeAsISOString();
+  std::string timeStr = common::Time::GetWallTimeAsISOString();
+
+#ifdef _WIN32
+  std::replace(timeStr.begin(), timeStr.end(), ':', '_');
+#endif
+
+  this->logPath /= "diagnostics" / timeStr;
 
   // Make sure the path exists.
   if (!boost::filesystem::exists(this->logPath))

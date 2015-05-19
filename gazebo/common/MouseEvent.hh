@@ -29,7 +29,7 @@ namespace gazebo
 
     /// \class MouseEvent MouseEvent.hh common/common.hh
     /// \brief Generic description of a mouse event.
-    class GAZEBO_VISIBLE MouseEvent
+    class GZ_COMMON_VISIBLE MouseEvent
     {
       /// \brief Standard mouse buttons enumeration.
       public: enum Buttons {NO_BUTTON = 0x0, LEFT = 0x1, MIDDLE = 0x2,

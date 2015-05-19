@@ -84,7 +84,7 @@ void FrictionPyramid::SetMu(unsigned int _index, double _mu)
 SurfaceParams::SurfaceParams()
   : collideWithoutContact(false),
     collideWithoutContactBitmask(1),
-    collideBitmask(1)
+    collideBitmask(65535)
 {
 }
 

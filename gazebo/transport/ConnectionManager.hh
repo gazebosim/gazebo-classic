@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class ConnectionManager ConnectionManager.hh transport/transport.hh
     /// \brief Manager of connections
-    class GAZEBO_VISIBLE ConnectionManager :
+    class GZ_TRANSPORT_VISIBLE ConnectionManager :
       public SingletonT<ConnectionManager>
     {
       /// \brief Constructor

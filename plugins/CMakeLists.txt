@@ -30,11 +30,13 @@ set (plugins
   ArrangePlugin
   BoxThrusterPlugin
   BreakableJointPlugin
+  BuoyancyPlugin
   CameraPlugin
   CartDemoPlugin
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
+  ElevatorPlugin
   ForceTorquePlugin
   GpuRayPlugin
   ImuSensorPlugin

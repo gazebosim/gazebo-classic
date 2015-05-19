@@ -65,7 +65,8 @@ namespace gazebo
     /// \brief Representation of an entire scene graph.
     ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.
-    class GAZEBO_VISIBLE Scene : public boost::enable_shared_from_this<Scene>
+    class GZ_RENDERING_VISIBLE Scene :
+      public boost::enable_shared_from_this<Scene>
     {
       public: enum SkyXMode {
         GZ_SKYX_ALL = 0x0FFFFFFF,
@@ -467,6 +468,12 @@ namespace gazebo
 
       /// \brief Remove all projectors.
       public: void RemoveProjectors();
+
+      /// \brief Toggle layer visilibility. This will process all visuals.
+      /// If a visual is on the specified layer its visiblity will be
+      /// toggled. Visuals with a negative layer index are always visible.
+      /// \param[in] _layer Index of the layer to toggle.
+      public: void ToggleLayer(const int32_t _layer);
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();

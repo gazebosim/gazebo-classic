@@ -28,6 +28,7 @@
 #include <ode/common.h>
 #include <ode/odemath.h>
 #include <ode/rotation.h>
+#include <ode/objects.h>
 #include <ode/timer.h>
 #include <ode/error.h>
 #include <ode/matrix.h>
@@ -36,9 +37,19 @@
 #include "objects.h"
 #include "joints/joint.h"
 #include "util.h"
-#include <sys/time.h>
+
+#ifndef _WIN32
+  #include <sys/time.h>
+#endif
+
 #include "quickstep_util.h"
 #include "quickstep_pgs_lcp.h"
+#ifndef TIMING
+#ifdef HDF5_INSTRUMENT
+#define DUMP
+std::vector<dReal> errors;
+#endif   //HDF5_INSTRUMENT
+#endif   //timing
 
 using namespace ode;
  
@@ -47,28 +58,31 @@ static void* ComputeRows(void *p)
   dxPGSLCPParameters *params = (dxPGSLCPParameters *)p;
 
   #ifdef REPORT_THREAD_TIMING
+  int thread_id                 = params->thread_id;
   struct timeval tv;
   double cur_time;
   gettimeofday(&tv,NULL);
   cur_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  //printf("thread %d started at time %f\n",thread_id,cur_time);
+  // printf("thread %d started at time %f\n",thread_id,cur_time);
   #endif
 
-  int thread_id                 = params->thread_id;
   IndexError* order             = params->order;
   dxBody* const* body           = params->body;
+#ifdef RANDOMLY_REORDER_CONSTRAINTS
+#ifdef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
   boost::recursive_mutex* mutex = params->mutex;
+#endif
+#endif
   bool inline_position_correction = params->inline_position_correction;
   bool position_correction_thread = params->position_correction_thread;
 
-  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
   dxQuickStepParameters *qs    = params->qs;
   int startRow                 = params->nStart;   // 0
   int nRows                    = params->nChunkSize; // m
 #ifdef USE_1NORM
   int m                        = params->m; // m used for rms error computation
 #endif
-  // int nb                       = params->nb;
+  int nb                       = params->nb;
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal stepsize               = params->stepsize;
   dRealMutablePtr vnew         = params->vnew;
@@ -167,6 +181,7 @@ static void* ComputeRows(void *p)
   int precon_iterations = qs->precon_iterations;
   dReal pgs_lcp_tolerance = qs->pgs_lcp_tolerance;
   int friction_iterations = qs->friction_iterations;
+  Friction_Model friction_model = qs->friction_model;
   dReal smooth_contacts = qs->smooth_contacts;
 
 #ifdef SHOW_CONVERGENCE
@@ -180,6 +195,9 @@ static void* ComputeRows(void *p)
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal Jvnew_final = 0;
 #endif
+#ifdef HDF5_INSTRUMENT
+  errors.resize(num_iterations + precon_iterations + friction_iterations);
+#endif
   dRealMutablePtr caccel_ptr1;
   dRealMutablePtr caccel_ptr2;
 
@@ -189,7 +207,7 @@ static void* ComputeRows(void *p)
 
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
-  int total_iterations = precon_iterations + num_iterations + 
+  int total_iterations = precon_iterations + num_iterations +
     friction_iterations;
   for (int iteration = 0; iteration < total_iterations; ++iteration)
   {
@@ -210,7 +228,7 @@ static void* ComputeRows(void *p)
       m_rms_dlambda[1] = 0;
     }
 
-#ifdef REORDER_CONSTRAINTS
+#ifdef REORDER_CONSTRAINTS //FIXME: do it for lambda_erp and last_lambda_erp
     // constraints with findex < 0 always come first.
     if (iteration < 2) {
       // for the first two iterations, solve the constraints in
@@ -311,7 +329,8 @@ static void* ComputeRows(void *p)
 
       // THREAD_POSITION_CORRECTION
       dReal delta_erp = 0;
-      dReal delta_precon_erp = 0;
+      // precon does not support split position correction right now.
+      // dReal delta_precon_erp = 0;
 
       // setup pointers
       int b1 = jb[index*2];
@@ -524,17 +543,20 @@ static void* ComputeRows(void *p)
               delta_erp -= quickstep::dot6(caccel_erp_ptr2, J_ptr + 6);
           }
 
-          // set the limits for this constraint.
-          // this is the place where the QuickStep method differs from the
-          // direct LCP solving method, since that method only performs this
-          // limit adjustment once per time step, whereas this method performs
-          // once per iteration per constraint row.
-          // the constraints are ordered so that all lambda[] values needed have
-          // already been computed.
-          dReal hi_act, lo_act;
-          /// THREAD_POSITION_CORRECTION
-          dReal hi_act_erp, lo_act_erp;
-          if (constraint_index >= 0) {
+        // set the limits for this constraint.
+        // this is the place where the QuickStep method differs from the
+        // direct LCP solving method, since that method only performs this
+        // limit adjustment once per time step, whereas this method performs
+        // once per iteration per constraint row.
+        // the constraints are ordered so that all lambda[] values needed have
+        // already been computed.
+        dReal hi_act, lo_act;
+        /// THREAD_POSITION_CORRECTION
+        dReal hi_act_erp, lo_act_erp;
+        if (constraint_index >= 0)
+        {
+          if (friction_model == pyramid_friction)
+          {
             // FOR erp throttled by info.c_v_max or info.c
             hi_act = dFabs (hi[index] * lambda[constraint_index]);
             lo_act = -hi_act;
@@ -543,19 +565,40 @@ static void* ComputeRows(void *p)
               hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
               lo_act_erp = -hi_act_erp;
             }
-          } else {
-            // FOR erp throttled by info.c_v_max or info.c
+          }
+          else if (friction_model == cone_friction)
+          {
+            quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
+                constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
+          }
+          else if(friction_model == box_friction)
+          {
+            hi_act = hi[index];
+            lo_act = -hi_act;
+            hi_act_erp = hi[index];
+            lo_act_erp = -hi_act_erp;
+          }
+          else
+          {
+              // initialize the hi and lo to get rid of warnings
+              hi_act = dInfinity;
+              lo_act = -dInfinity;
+              hi_act_erp = dInfinity;
+              lo_act_erp = -dInfinity;
+              dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
+          }
+        } else {
+              // FOR erp throttled by info.c_v_max or info.c
             hi_act = hi[index];
             lo_act = lo[index];
             if (inline_position_correction)
             {
               hi_act_erp = hi[index];
               lo_act_erp = lo[index];
-            }
-          }
-
-          // compute lambda and clamp it to [lo,hi].
-          // @@@ SSE not a win here
+             }
+           }
+        // compute lambda and clamp it to [lo,hi].
+        // @@@ SSE not a win here
 #undef SSE_CLAMP
 #ifndef SSE_CLAMP
           // FOR erp throttled by info.c_v_max or info.c
@@ -663,7 +706,7 @@ static void* ComputeRows(void *p)
           // update vnew incrementally
           //   add stepsize * delta_caccel to the body velocity
           //   vnew = vnew + dt * delta_caccel
-          quickstep::sum6(vnew_ptr1, stepsize*delta, iMJ_ptr);;
+          quickstep::sum6(vnew_ptr1, stepsize*delta, iMJ_ptr);
           if (caccel_ptr2)
             quickstep::sum6(vnew_ptr2, stepsize*delta, iMJ_ptr + 6);
 
@@ -794,6 +837,9 @@ static void* ComputeRows(void *p)
     qs->rms_constraint_residual[3] = sqrt(residual_total_mean);
     qs->num_contacts = m_rms_dlambda[1];
 
+#ifdef HDF5_INSTRUMENT
+    errors[iteration] = residual_total_mean;
+#endif
     // debugging mutex locking
     //{
     //  // verify
@@ -882,6 +928,12 @@ static void* ComputeRows(void *p)
   // doing below seems to slow things down
   // if (position_correction_thread)
   //   pthread_exit(NULL);
+
+#ifdef HDF5_INSTRUMENT
+  IFDUMP(h5_write_errors(DATA_FILE, errors.data(), errors.size()));
+#endif
+
+  return NULL;
 }
 
 //***************************************************************************
@@ -1142,7 +1194,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 
   // prepare pointers for threads
   // params for solution with correction (_erp) term
-  dxPGSLCPParameters *params_erp;
+  dxPGSLCPParameters *params_erp = NULL;
   if (qs->thread_position_correction)
     params_erp = context->AllocateArray<dxPGSLCPParameters>(num_chunks);
 
@@ -1182,7 +1234,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 #else
     boost::thread params_erp_thread;
 #endif
-    if (qs->thread_position_correction)
+    if (qs->thread_position_correction && params_erp != NULL)
     {
       // setup params for ComputeRows
       IFTIMING (dTimerNow ("start pgs_erp rows"));
@@ -1253,6 +1305,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
         #ifdef USE_PTHREAD
         pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
                                      (void*)(&(params_erp[thread_id])));
+        if (pthread_err != 0)
+          dMessage (d_ERR_UASSERT, "internal error, cannot start pthread");
         #else
         params_erp_thread = boost::thread(*ComputeRows, (void*)(&(params_erp[thread_id])));
 
@@ -1262,6 +1316,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       #ifdef USE_PTHREAD
       pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
                                    (void*)(&(params_erp[thread_id])));
+      if (pthread_err != 0)
+        dMessage (d_ERR_UASSERT, "internal error, cannot start pthread");
       #else
       params_erp_thread = boost::thread(*ComputeRows, (void*)(&(params_erp[thread_id])));
       #endif
@@ -1372,6 +1428,143 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   printf("    quickstep threads start time %f stopped time %f duration %f\n",
          cur_time,end_time,end_time - cur_time);
   #endif
+}
+
+void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_erp, dReal& hi_act_erp,
+    int *jb, dRealPtr J_orig, int index, int constraint_index, int startRow, int nRows,
+    const int nb, dxBody * const *body, int i, const IndexError *order, const int *findex,
+    dRealPtr /*lo*/, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp)
+{
+  // This computes the corresponding hi_act and lo_act for friction constraints.
+  // For each contact, we have lambda_n, lambda_f1, and lambda_f2.
+  // Now couple the two friction and to satisfy the cone Coulomb friction  model
+  // tangential velocity at the contact frame:
+  // v_f1 = J_f1 * v
+  // v_f2 = J_f2 * v
+  // v_f1 = J(0:5)*v_b1_global + J(6:11)*v_b2_global,
+  // v_f2 = J2(0:5) * v_b1_global + J2(6:11)*v_b2_global
+  // v = sqrt(v_f1^2 + v_f2^2);
+  //
+  // if (v < eps)
+  //   lo_act_f1  = 0;
+  //   hi_act_f1  = 0;
+  //   lo_act_f2  = 0;
+  //   hi_act_f2  = 0;
+  // else
+  //   hi_act_f1 =  abs(v_f1) / v  *  (mu * lambda_n);
+  //   lo_act_f1 = - lo_act_f1;
+  //   hi_act_f2 =  abs(v_f2) / v  *  (mu * lambda_n);
+  //   lo_act_f2 = - lo_act_f2;
+  // end
+  //
+  dReal v_f1, v_f2, v;
+  v_f1 = 0.0; v_f2 = 0.0, v = 0.0;
+  int b1 = jb[index*2];
+  int b2 = jb[index*2+1];
+  int bodycounter = 0;
+  int ivel=0;
+
+  // J_ptr has been scaled! use J_orig_ptr here!
+  dRealPtr J_orig_ptr = J_orig + index*12;
+  dReal body1_vel[6];
+  dReal body2_vel[6];
+  dSetZero(body1_vel, 6);
+  dSetZero(body2_vel, 6);
+  dxBody *const *const bodyend = body + nb;
+  for (dxBody *const *bodycurr = body; bodycurr != bodyend; bodycurr++, bodycounter++)
+  {
+    dxBody *b_ptr = *bodycurr;
+    // first direction
+    if (b1 >= 0)
+    {
+      if (bodycounter == b1)
+      {
+        for (ivel = 0; ivel < 3; ivel++)
+        {
+          body1_vel[ivel] = b_ptr->lvel[ivel];
+          body1_vel[ivel+3] = b_ptr->avel[ivel];
+        }
+      }
+    }
+    if (b2 >= 0)
+    {
+      if (bodycounter == b2)
+      {
+        for (ivel = 0; ivel < 3; ivel++)
+        {
+          body2_vel[ivel] = b_ptr->lvel[ivel];
+          body2_vel[ivel+3] = b_ptr->avel[ivel];
+        }
+      }
+    }
+  }
+  //startRow, nRows;
+  int previndex, nextindex, prev_constraint_index, next_constraint_index;
+  if (i == startRow)
+  {
+    prev_constraint_index = -100;
+    next_constraint_index = constraint_index;
+  }
+  else if (i == startRow+nRows-1)
+  {
+    prev_constraint_index = constraint_index;
+    next_constraint_index = -100;
+  }
+  else
+  {
+    previndex = order[i-1].index;
+    nextindex = order[i+1].index;
+    prev_constraint_index = findex[previndex];
+    next_constraint_index = findex[nextindex];
+  }
+
+  if (constraint_index == next_constraint_index)
+  {
+    // body1 was always the 1st body in the body pair
+    dRealPtr J_next_ptr =  J_orig + index*12 + 12;
+    v_f1 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
+    v_f2 = quickstep::dot6(J_next_ptr, body1_vel) + quickstep::dot6(J_next_ptr+6, body2_vel);
+  }
+  else if (constraint_index == prev_constraint_index)
+  {
+    dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
+    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr, body2_vel);
+    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr, body2_vel);
+  }
+  else
+  {
+    dMessage (d_ERR_LCP, "constraint index error");
+  }
+
+
+  v = sqrt(v_f1*v_f1 + v_f2*v_f2);
+  if (dFabs(v) < 1e-18)
+  {
+    hi_act = 0.0; lo_act = 0.0;
+  }
+  else
+  {
+    if (constraint_index == next_constraint_index)
+    {
+      // first direction  ---> corresponds to the primary friction direction
+      hi_act = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda[constraint_index]);
+      lo_act = -hi_act;
+      hi_act_erp = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
+      lo_act_erp = -hi_act;
+    }
+    else if (constraint_index == prev_constraint_index)
+    {
+      // second-direction  ---> corresponds to the secondary friction direction
+      hi_act = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda[constraint_index]);
+      lo_act = -hi_act;
+      hi_act_erp = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
+      lo_act_erp = -hi_act;
+    }
+    else
+    {
+      dMessage (d_ERR_LCP, "constraint index error");
+    }
+  } // if-else (abs(v)< eps)
 }
 
 size_t quickstep::EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/)

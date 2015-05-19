@@ -160,3 +160,11 @@ Box Box::operator-(const Vector3 &_v)
 {
   return Box(this->min - _v, this->max - _v);
 }
+
+//////////////////////////////////////////////////
+bool Box::Contains(const Vector3 &_p) const
+{
+  return _p.x >= this->min.x && _p.x <= this->max.x &&
+         _p.y >= this->min.y && _p.y <= this->max.y &&
+         _p.z >= this->min.z && _p.z <= this->max.z;
+}

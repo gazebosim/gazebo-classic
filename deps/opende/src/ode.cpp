@@ -1691,6 +1691,7 @@ dxWorld * dWorldCreate()
   w->qs.row_reorder1 = true;
   w->qs.warm_start = 0.5;
   w->qs.friction_iterations = 10;
+  w->qs.friction_model = pyramid_friction;
 
   w->contactp.max_vel = dInfinity;
   w->contactp.min_depth = 0;
@@ -2330,6 +2331,12 @@ int  dWorldGetQuickStepExtraFrictionIterations (dWorldID w)
   return w->qs.friction_iterations;
 }
 
+Friction_Model dWorldGetQuickStepFrictionModel (dWorldID w)
+{
+  dAASSERT(w);
+  return w->qs.friction_model;
+}
+
 void dWorldSetQuickStepInertiaRatioReduction (dWorldID w, bool irr)
 {
 	dAASSERT(w);
@@ -2367,6 +2374,11 @@ void dWorldSetQuickStepExtraFrictionIterations (dWorldID w, int iters)
 }
 
 
+void dWorldSetQuickStepFrictionModel (dWorldID w, Friction_Model fricmodel)
+{
+  dAASSERT(w);
+  w->qs.friction_model = fricmodel;
+}
 
 
 
