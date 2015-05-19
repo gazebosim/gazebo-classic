@@ -19,11 +19,7 @@
 * LICENSE.TXT and LICENSE-BSD.TXT for more details.                     *
 *                                                                       *
 *************************************************************************/
-#ifdef USE_PTHREAD  // option set in deps/opende/CMakeLists.txt -DUSE_PTHREAD
-#include <pthread.h>
-#else
-#include <boost/thread.hpp>
-#endif
+#include <thread>
 
 #include <ode/common.h>
 #include <ode/odemath.h>
@@ -1229,11 +1225,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     int nEnd   = i + chunk + qs->num_overlap;
     if (nEnd > m) nEnd = m;
 
-#ifdef USE_PTHREAD
-    pthread_t params_erp_thread;
-#else
-    boost::thread params_erp_thread;
-#endif
+    std::thread params_erp_thread;
+
     if (qs->thread_position_correction && params_erp != NULL)
     {
       // setup params for ComputeRows
@@ -1290,9 +1283,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
         thread_id,i,m,chunk,nStart,nEnd);
 #endif
 
-#ifdef USE_PTHREAD
-      int pthread_err;
-#endif
 #ifdef USE_TPROW
       if (row_threadpool && row_threadpool->size() > 1)
       {
@@ -1302,25 +1292,12 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       }
       else
       {
-        #ifdef USE_PTHREAD
-        pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
-                                     (void*)(&(params_erp[thread_id])));
-        if (pthread_err != 0)
-          dMessage (d_ERR_UASSERT, "internal error, cannot start pthread");
-        #else
-        params_erp_thread = boost::thread(*ComputeRows, (void*)(&(params_erp[thread_id])));
-
-        #endif
+        params_erp_thread = std::thread(*ComputeRows,
+	  (void*)(&(params_erp[thread_id])));
       }
 #else
-      #ifdef USE_PTHREAD
-      pthread_err = pthread_create(&params_erp_thread, NULL, ComputeRows,
-                                   (void*)(&(params_erp[thread_id])));
-      if (pthread_err != 0)
-        dMessage (d_ERR_UASSERT, "internal error, cannot start pthread");
-      #else
-      params_erp_thread = boost::thread(*ComputeRows, (void*)(&(params_erp[thread_id])));
-      #endif
+      params_erp_thread = std::thread(*ComputeRows,
+        (void*)(&(params_erp[thread_id])));
 #endif
     }
 
@@ -1398,11 +1375,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     if (qs->thread_position_correction)
     {
       IFTIMING (dTimerNow ("wait for params_erp threads"));
-      #ifdef USE_PTHREAD
-      pthread_join(params_erp_thread, NULL);
-      #else
       params_erp_thread.join();
-      #endif
       IFTIMING (dTimerNow ("params_erp threads done"));
     }
   }
