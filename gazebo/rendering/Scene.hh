@@ -384,6 +384,10 @@ namespace gazebo
       /// \param[in] _enabled Set to true to turn on the grid
       public: void SetGrid(bool _enabled);
 
+      /// \brief Show/hide the world origin indicator.
+      /// \param[in] _show True to show the origin.
+      public: void ShowOrigin(bool _show);
+
       /// \brief Get the top level world visual.
       /// \return Pointer to the world visual.
       public: VisualPtr GetWorldVisual() const;

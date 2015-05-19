@@ -808,6 +808,15 @@ void MainWindow::ShowGrid()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowOrigin()
+{
+  msgs::Scene msg;
+  msg.set_name(gui::get_world());
+  msg.set_origin(g_showOriginAct->isChecked());
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowJoints()
 {
   if (g_showJointsAct->isChecked())
@@ -1171,6 +1180,13 @@ void MainWindow::CreateActions()
   connect(g_showGridAct, SIGNAL(triggered()), this,
           SLOT(ShowGrid()));
 
+  g_showOriginAct = new QAction(tr("Origin"), this);
+  g_showOriginAct->setStatusTip(tr("Show World Origin"));
+  g_showOriginAct->setCheckable(true);
+  g_showOriginAct->setChecked(true);
+  connect(g_showOriginAct, SIGNAL(triggered()), this,
+          SLOT(ShowOrigin()));
+
   g_transparentAct = new QAction(tr("Transparent"), this);
   g_transparentAct->setStatusTip(tr("Transparent"));
   g_transparentAct->setCheckable(true);
@@ -1519,6 +1535,9 @@ void MainWindow::DeleteActions()
   delete g_showGridAct;
   g_showGridAct = 0;
 
+  delete g_showOriginAct;
+  g_showOriginAct = 0;
+
   delete g_transparentAct;
   g_transparentAct = 0;
 
@@ -1620,6 +1639,7 @@ void MainWindow::CreateMenuBar()
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
+  viewMenu->addAction(g_showOriginAct);
   viewMenu->addSeparator();
 
   viewMenu->addAction(g_transparentAct);

@@ -28,6 +28,7 @@
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/AxisVisual.hh"
 #include "gazebo/rendering/LaserVisual.hh"
 #include "gazebo/rendering/SonarVisual.hh"
 #include "gazebo/rendering/WrenchVisual.hh"
@@ -165,7 +166,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   // \TODO: This causes the Scene to occasionally miss the response to
   // scene_info
   // this->responsePub =
-      this->dataPtr->node->Advertise<msgs::Response>("~/response");
+  //    this->dataPtr->node->Advertise<msgs::Response>("~/response");
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
       &Scene::OnResponse, this, true);
   this->dataPtr->sceneSub =
@@ -357,6 +358,17 @@ void Scene::Init()
 
   // Force shadows on.
   this->SetShadowsEnabled(true);
+
+  // Create origin visual
+  this->dataPtr->originVisual.reset(new AxisVisual("__WORLD_ORIGIN__",
+      this->dataPtr->worldVisual));
+  this->dataPtr->originVisual->Load();
+  this->dataPtr->originVisual->ShowAxisHead(0, false);
+  this->dataPtr->originVisual->ShowAxisHead(1, false);
+  this->dataPtr->originVisual->ShowAxisHead(2, false);
+  this->dataPtr->originVisual->SetAxisMaterial(0, "Gazebo/Red");
+  this->dataPtr->originVisual->SetAxisMaterial(1, "Gazebo/Green");
+  this->dataPtr->originVisual->SetAxisMaterial(2, "Gazebo/Blue");
 
   this->dataPtr->requestPub->WaitForConnection();
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
@@ -1472,6 +1484,9 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   if (_msg->has_grid())
     this->SetGrid(_msg->grid());
 
+  if (_msg->has_origin())
+    this->ShowOrigin(_msg->origin());
+
   // Process the sky message.
   if (_msg->has_sky())
   {
@@ -1914,6 +1929,18 @@ void Scene::PreRender()
         this->SelectVisual(this->dataPtr->selectionMsg->name(), "normal");
       this->dataPtr->selectionMsg.reset();
     }
+  }
+
+  // Resize origin visual according to the user camera zoom
+  if (this->GetUserCameraCount() == 1)
+  {
+    double scale = this->dataPtr->userCameras[0]->GetWorldPosition().Distance(
+        math::Vector3::Zero) * 0.05;
+    this->dataPtr->originVisual->SetScale(math::Vector3(scale, scale, scale));
+  }
+  else
+  {
+    this->dataPtr->originVisual->SetScale(math::Vector3::One);
   }
 }
 
@@ -2906,6 +2933,12 @@ void Scene::SetGrid(bool _enabled)
       this->dataPtr->grids[i]->Enable(_enabled);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowOrigin(bool _show)
+{
+  this->dataPtr->originVisual->SetVisible(_show);
 }
 
 //////////////////////////////////////////////////

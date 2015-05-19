@@ -170,6 +170,9 @@ namespace gazebo
       /// \brief Qt callback when the show grid action is triggered.
       private slots: void ShowGrid();
 
+      /// \brief Qt callback when the show origin action is triggered.
+      private slots: void ShowOrigin();
+
       /// \brief Qt callback when the show collisions action is triggered.
       private slots: void ShowCollisions();
 
