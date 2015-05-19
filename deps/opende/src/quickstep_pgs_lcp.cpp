@@ -427,7 +427,9 @@ static void* ComputeRows(void *p)
         }
 
         // compute lambda and clamp it to [lo,hi].
-        // @@@ SSE not a win here
+        // @@@ SSE is used to speed up vector math
+        // operations with gcc compiler when defined
+        // but SSE is not a win here, #undef for now
 #undef SSE_CLAMP
 #ifndef SSE_CLAMP
         lambda[index] = old_lambda+ delta_precon;
