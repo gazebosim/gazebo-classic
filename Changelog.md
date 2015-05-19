@@ -1,4 +1,13 @@
 ## Gazebo 6.0
+1. Added world with OSRF building and an elevator
+    * [Pull request #1697](https://bitbucket.org/osrf/gazebo/pull-request/1697)
+
+1. Fixed collide bitmask by changing default value from 0x1 to 0xffff.
+    * [Pull request #1696](https://bitbucket.org/osrf/gazebo/pull-request/1696)
+
+1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
+    * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+
 1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
     * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
 
@@ -39,6 +48,8 @@ compilation on Windows.
     * [Pull request #1669](https://bitbucket.org/osrf/gazebo/pull-request/1669)
     * [Pull request #1670](https://bitbucket.org/osrf/gazebo/pull-request/1670)
     * [Pull request #1672](https://bitbucket.org/osrf/gazebo/pull-request/1672)
+    * [Pull request #1682](https://bitbucket.org/osrf/gazebo/pull-request/1682)
+    * [Pull request #1683](https://bitbucket.org/osrf/gazebo/pull-request/1683)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
