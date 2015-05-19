@@ -245,32 +245,40 @@ void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
   bool leftChanged = false, rightChanged = false;
 
   // Left controller moving left.
-  if (_leftDir < -0.5 && left > 0)
+  if ((this->invert > 0 && _leftDir < -0.5 && left > 0) ||
+      (this->invert < 0 && _leftDir > 0.5 &&
+       ((left - right > 1) || (left - right == 1 && _rightDir > 0.5 &&
+         right > 0))))
+
   {
     newLeft = left - 1;
     leftChanged = true;
   }
 
   // Left controller moving right.
-  if ((_leftDir > 0.5 && (right - left > 1)) ||
-      (_leftDir > 0.5 && (right - left == 1) && _rightDir > 0.5 &&
-        right < kNumRodsPerTeam - 1))
+  if ((this->invert > 0 && _leftDir > 0.5 && (right - left > 1 ||
+      (right - left == 1 && _rightDir > 0.5 && right < kNumRodsPerTeam - 1))) ||
+      (this->invert < 0 && _leftDir < -0.5 && left < kNumRodsPerTeam - 1))
   {
     newLeft = left + 1;
     leftChanged = true;
   }
 
   // Right controller moving left.
-  if ((_rightDir < -0.5 && (right - left > 1)) ||
-      (_rightDir < -0.5 && (right - left == 1) && _leftDir < -0.5 &&
-        left > 0))
+  if ((this->invert > 0 && _rightDir < -0.5 && (right - left > 2 ||
+      (right - left == 2 && _leftDir <= 0.5) ||
+      (right - left == 1 && _leftDir < -0.5 && left > 0))) ||
+      (this->invert < 0 && _rightDir > 0.5 && right > 0))
   {
     newRight = right - 1;
     rightChanged = true;
   }
 
   // Right controller moving right.
-  if (_rightDir > 0.5 && right < kNumRodsPerTeam - 1)
+  if ((this->invert > 0 && _rightDir > 0.5 && right < kNumRodsPerTeam - 1) ||
+      (this->invert < 0 && _rightDir < -0.5 && ((left - right > 2) ||
+       (left - right == 2 && _leftDir <= 0.5) ||
+       (left - right == 1 && _leftDir < -0.5 && left < kNumRodsPerTeam - 1))))
   {
     newRight = right + 1;
     rightChanged = true;
@@ -306,12 +314,15 @@ void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
   // Restore the position/orientation of the new right rod.
   if (rightChanged)
   {
-    // Reset previous active rod's color
-    std::string name =
+    if (right != newLeft)
+    {
+      // Reset previous active rod's color
+      std::string name =
         this->shafts[this->hydra["right_controller"]] + "::handle";
-    std::string parentName = this->shafts[this->hydra["right_controller"]];
-    std::string color = "Gazebo/Black";
-    this->PublishVisualMsg(name, parentName, color);
+      std::string parentName = this->shafts[this->hydra["right_controller"]];
+      std::string color = "Gazebo/Black";
+      this->PublishVisualMsg(name, parentName, color);
+    }
 
     // Update index
     this->hydra["right_controller"] = newRight;
@@ -324,9 +335,10 @@ void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
       this->lastRodPose["right_controller"].at(1).Radian());
 
     // Publish active rod msg
-    name = this->shafts[this->hydra["right_controller"]] + "::handle";
-    parentName = this->shafts[this->hydra["right_controller"]];
-    color = "Gazebo/" + this->team;
+    std::string name =
+      this->shafts[this->hydra["right_controller"]] + "::handle";
+    std::string parentName = this->shafts[this->hydra["right_controller"]];
+    std::string color = "Gazebo/" + this->team;
     this->PublishVisualMsg(name, parentName, color);
   }
 }

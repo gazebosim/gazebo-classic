@@ -40,7 +40,7 @@ namespace gazebo
   {
     /// \def Rod_t
     /// \brief A rod is composed by two joints (prismatic and revolute).
-    using Rod_t = std::array<physics::JointPtr, 2>;
+    typedef std::array<physics::JointPtr, 2> Rod_t;
 
     /// \def Rod_V
     /// \brief A vector of rods.
