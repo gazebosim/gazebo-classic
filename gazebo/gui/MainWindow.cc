@@ -812,7 +812,7 @@ void MainWindow::ShowOrigin()
 {
   msgs::Scene msg;
   msg.set_name(gui::get_world());
-  msg.set_origin(g_showOriginAct->isChecked());
+  msg.set_show_origin(g_showOriginAct->isChecked());
   this->scenePub->Publish(msg);
 }
 

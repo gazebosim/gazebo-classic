@@ -1280,10 +1280,10 @@ namespace gazebo
       else
         result.set_grid(true);
 
-      if (_sdf->HasElement("origin"))
-        result.set_origin(_sdf->Get<bool>("origin"));
+      if (_sdf->HasElement("show_origin"))
+        result.set_show_origin(_sdf->Get<bool>("show_origin"));
       else
-        result.set_origin(true);
+        result.set_show_origin(true);
 
       if (_sdf->HasElement("ambient"))
         result.mutable_ambient()->CopyFrom(

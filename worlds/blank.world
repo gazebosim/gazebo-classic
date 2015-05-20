@@ -6,7 +6,7 @@
       <background>1 1 1 1</background>
       <shadows>false</shadows>
       <grid>false</grid>
-      <origin>false</origin>
+      <show_origin>false</show_origin>
     </scene>
   </world>
 </sdf>
