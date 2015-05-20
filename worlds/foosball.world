@@ -87,7 +87,7 @@
       <plugin name="FoosballGUI" filename="libFoosballGUIPlugin.so"></plugin>
 
       <camera name='user_camera'>
-        <pose>0.03112 0.05 3 1e-05 1.5658 1.57221</pose>
+        <pose>0.019163 -0.581061 3.21216 0 1.3378 1.5642</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>
