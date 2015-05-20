@@ -53,21 +53,10 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this->recordButton, SIGNAL(toggled(bool)),
           this, SLOT(OnRecord(bool)));
 
-  // Create the status frame, which contains the duration label, size
-  // label, and a one word text message.
-  // {
-  QFrame *statusFrame = new QFrame;
-  statusFrame->setFixedWidth(240);
-  statusFrame->setObjectName("dataLoggerStatusFrame");
-
   // Textual status information
   this->statusLabel = new QLabel("Ready");
   this->statusLabel->setObjectName("dataLoggerStatusLabel");
   this->statusLabel->setFixedWidth(80);
-
-  // Timer used to blink the status label
-  this->statusTimer = new QTimer();
-  connect(this->statusTimer, SIGNAL(timeout()), this, SLOT(OnBlinkStatus()));
 
   // Duration of logging
   this->timeLabel = new QLabel("00:00:00.000");
@@ -78,141 +67,113 @@ DataLogger::DataLogger(QWidget *_parent)
   this->sizeLabel = new QLabel("(0.00 B)");
   this->sizeLabel->setObjectName("dataLoggerSizeLabel");
 
-  QHBoxLayout *timeLayout = new QHBoxLayout;
-  timeLayout->addStretch(1);
-  timeLayout->addWidget(this->statusLabel);
-  timeLayout->addSpacing(5);
-  timeLayout->addWidget(this->timeLabel);
-
-  QHBoxLayout *sizeLayout = new QHBoxLayout;
-  sizeLayout->addStretch(1);
-  sizeLayout->addWidget(this->sizeLabel);
-
-  QVBoxLayout *statusFrameLayout = new QVBoxLayout;
-  statusFrameLayout->addLayout(timeLayout);
-  statusFrameLayout->addLayout(sizeLayout);
-
-  statusFrame->setLayout(statusFrameLayout);
-  // }
-
-  // Create the settings frame, where the user can input a save-to location
-  // {
-  QFrame *settingsMasterFrame = new QFrame;
-  settingsMasterFrame->setObjectName("dataLoggerSettingFrame");
-
-  this->logList = new QTextBrowser(this);
-  this->logList->setObjectName("dataLoggerRecordingsList");
-
-  QVBoxLayout *logListLayout = new QVBoxLayout;
-  logListLayout->addWidget(this->logList);
-
-  /*QHBoxLayout *filenameLayout = new QHBoxLayout;
-  this->filenameEdit = new QLineEdit;
-  this->filenameEdit->setText("~/.gazebo/log");
-  filenameLayout->addWidget(new QLabel("Save to:"));
-  filenameLayout->addWidget(this->filenameEdit);
-
-  this->browseButton = new QPushButton("Browse");
-  this->browseButton->setFixedHeight(23);
-  this->browseButton->setFocusPolicy(Qt::NoFocus);
-  connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
-
-  filenameLayout->addWidget(browseButton);
-  */
-
-  QHBoxLayout *settingExpandLayout = new QHBoxLayout;
-
-  this->settingExpandButton = new QPushButton("Recordings");
-  this->settingExpandButton->setObjectName("expandButton");
-  this->settingExpandButton->setCheckable(true);
-  this->settingExpandButton->setChecked(false);
-  this->settingExpandButton->setFocusPolicy(Qt::NoFocus);
-  connect(settingExpandButton, SIGNAL(toggled(bool)),
-          this, SLOT(OnToggleSettings(bool)));
-
-  settingExpandLayout->setContentsMargins(0, 0, 0, 0);
-  settingExpandLayout->addWidget(this->settingExpandButton);
-  settingExpandLayout->addStretch(1);
-
-  /// Create the frame that can be hidden by toggling the setting's button
-  this->settingsFrame = new QFrame;
-  QVBoxLayout *settingsLayout = new QVBoxLayout;
-  settingsLayout->setContentsMargins(2, 2, 2, 2);
-  settingsLayout->addLayout(logListLayout);
-  this->settingsFrame->setLayout(settingsLayout);
-  this->settingsFrame->hide();
-
-  QVBoxLayout *settingsMasterFrameLayout = new QVBoxLayout;
-  settingsMasterFrameLayout->setContentsMargins(2, 2, 2, 2);
-
-  settingsMasterFrameLayout->addLayout(settingExpandLayout);
-  settingsMasterFrameLayout->addWidget(this->settingsFrame);
-  settingsMasterFrame->setLayout(settingsMasterFrameLayout);
-  // }
-
-  // Layout to position the record button vertically
-  QVBoxLayout *buttonLayout = new QVBoxLayout;
-  buttonLayout->setContentsMargins(0, 0, 0, 0);
-  buttonLayout->addWidget(this->recordButton);
-  buttonLayout->addStretch(4);
-
-  // Layout to position the status information vertically
-  QVBoxLayout *statusLayout = new QVBoxLayout;
-  statusLayout->setContentsMargins(0, 0, 0, 0);
-  statusLayout->addWidget(statusFrame);
-
-  // Horizontal layout for the record button and status information
-  QHBoxLayout *topLayout = new QHBoxLayout;
-  topLayout->setContentsMargins(0, 0, 0, 0);
-  topLayout->addLayout(buttonLayout);
-  topLayout->addStretch(4);
-  topLayout->addLayout(statusLayout);
-
-  QHBoxLayout *destPathLayout = new QHBoxLayout;
-  this->destPath = new QLineEdit;
-  this->destPath->setReadOnly(true);
-  this->destPath->setObjectName("dataLoggerDestnationPathLabel");
-  this->destPath->setStyleSheet(
-      "QLineEdit {color: #aeaeae; font-size: 11px; "
-      "background-color: transparent;}");
-
-  QLabel *pathLabel = new QLabel("Path: ");
-  pathLabel->setStyleSheet(
+  // Address label
+  QLabel *uriLabel = new QLabel("Address: ");
+  uriLabel->setStyleSheet(
       "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
 
-  destPathLayout->setContentsMargins(0, 0, 0, 0);
-  destPathLayout->addSpacing(4);
-  destPathLayout->addWidget(pathLabel);
-  destPathLayout->addWidget(this->destPath);
-
-  QHBoxLayout *destURILayout = new QHBoxLayout;
+  // Address URI Line Edit
   this->destURI = new QLineEdit;
   this->destURI->setReadOnly(true);
   this->destURI->setObjectName("dataLoggerDestnationURILabel");
   this->destURI->setStyleSheet(
       "QLineEdit {color: #aeaeae; font-size: 11px; background: transparent}");
-  QLabel *uriLabel = new QLabel("Address: ");
-  uriLabel->setStyleSheet(
+
+  // "Save to" label
+  QLabel *pathLabel = new QLabel("Save to: ");
+  pathLabel->setStyleSheet(
       "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
-  destURILayout->setContentsMargins(0, 0, 0, 0);
-  destURILayout->addSpacing(4);
-  destURILayout->addWidget(uriLabel);
-  destURILayout->addWidget(this->destURI);
+
+  // Destination path Line Edit
+  this->destPath = new QLineEdit();
+  this->destPath->setObjectName("dataLoggerDestnationPathLabel");
+  this->destPath->setMinimumWidth(300);
+
+  // Browser button
+  this->browseButton = new QPushButton("Browse");
+  this->browseButton->setFixedHeight(23);
+  this->browseButton->setFixedWidth(100);
+  this->browseButton->setFocusPolicy(Qt::NoFocus);
+  connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
+
+  // Insert widgets in the top layout
+  QGridLayout *topLayout = new QGridLayout();
+  topLayout->addWidget(this->recordButton, 0, 0, 2, 1);
+  topLayout->addWidget(this->statusLabel, 0, 1, 2, 2);
+  topLayout->addWidget(this->timeLabel, 0, 3);
+  topLayout->addWidget(this->sizeLabel, 1, 3);
+  topLayout->addWidget(uriLabel, 2, 0);
+  topLayout->addWidget(this->destURI, 2, 1, 1, 3);
+  topLayout->addWidget(pathLabel, 3, 0);
+  topLayout->addWidget(this->destPath, 3, 1, 1, 2);
+  topLayout->addWidget(this->browseButton, 3, 3);
+
+  // Align widgets within layout
+  topLayout->setAlignment(this->statusLabel, Qt::AlignCenter);
+  topLayout->setAlignment(this->timeLabel, Qt::AlignRight);
+  topLayout->setAlignment(this->sizeLabel, Qt::AlignRight | Qt::AlignTop);
+  topLayout->setAlignment(uriLabel, Qt::AlignRight);
+  topLayout->setAlignment(pathLabel, Qt::AlignRight);
+
+  // Put the layout in a widget to be able to control size
+  QWidget *topWidget = new QWidget();
+  topWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  topWidget->setLayout(topLayout);
+
+  // Button which toggles recordings
+  QRadioButton *recordingsButton = new QRadioButton();
+  recordingsButton->setChecked(false);
+  recordingsButton->setFocusPolicy(Qt::NoFocus);
+  recordingsButton->setText("Recordings");
+  recordingsButton->setStyleSheet(
+     "QRadioButton {\
+        color: #d0d0d0;\
+      }\
+      QRadioButton::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QRadioButton::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
+  connect(recordingsButton, SIGNAL(toggled(bool)), this,
+      SLOT(OnToggleSettings(bool)));
+
+  // List of recorded logs
+  this->logList = new QTextBrowser(this);
+  this->logList->setObjectName("dataLoggerRecordingsList");
+
+  // Layout to hold the list
+  QVBoxLayout *settingsLayout = new QVBoxLayout;
+  settingsLayout->setContentsMargins(2, 2, 2, 2);
+  settingsLayout->addWidget(logList);
+
+  // Frame that can be hidden by toggling the expand button
+  this->settingsFrame = new QFrame();
+  this->settingsFrame->setObjectName("dataLoggerSettingFrame");
+  this->settingsFrame->setLayout(settingsLayout);
+  this->settingsFrame->hide();
+
+  // Insert widgets in the bottom layout
+  QVBoxLayout *bottomLayout = new QVBoxLayout;
+  bottomLayout->setContentsMargins(2, 2, 2, 2);
+  bottomLayout->addWidget(recordingsButton);
+  bottomLayout->addWidget(this->settingsFrame);
+
+  // Put the layout in a widget to be able to control size
+  QWidget *bottomWidget = new QWidget();
+  bottomWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  bottomWidget->setLayout(bottomLayout);
 
   // Mainlayout for the whole widget
-  // Create the main layout for this widget
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addLayout(topLayout);
-  mainLayout->addLayout(destURILayout);
-  mainLayout->addLayout(destPathLayout);
-  mainLayout->addWidget(settingsMasterFrame);
+  mainLayout->addWidget(topWidget);
+  mainLayout->addWidget(bottomWidget);
 
   // Let the stylesheet handle the margin sizes
   mainLayout->setContentsMargins(2, 2, 2, 2);
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
-  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
   // Create a QueuedConnection to set time. This is used for thread safety.
   connect(this, SIGNAL(SetTime(QString)),
@@ -231,6 +192,10 @@ DataLogger::DataLogger(QWidget *_parent)
   // This is used for thread safety.
   connect(this, SIGNAL(SetDestinationURI(QString)),
           this, SLOT(OnSetDestinationURI(QString)), Qt::QueuedConnection);
+
+  // Timer used to blink the status label
+  this->statusTimer = new QTimer();
+  connect(this->statusTimer, SIGNAL(timeout()), this, SLOT(OnBlinkStatus()));
 
   // Timer used to hide the confirmation dialog
   this->confirmationTimer = new QTimer();
@@ -347,10 +312,8 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
       // Display the leaf log filename
       if (_msg->log_file().has_full_path() && !basePath.empty())
       {
-        std::string leaf = _msg->log_file().full_path();
-        if (!leaf.empty())
-          leaf = leaf.substr(basePath.size());
-        this->SetDestinationPath(QString::fromStdString(leaf));
+        std::string fullPath = _msg->log_file().full_path();
+        this->SetDestinationPath(QString::fromStdString(fullPath));
       }
     }
 

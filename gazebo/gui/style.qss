@@ -207,11 +207,6 @@ QToolButton#dataLoggerRecordButton:hover
   background-color: #dddddd;
 }
 
-QToolButton#dataLoggerStopButton:hover
-{
-  background-color: #dddddd;
-}
-
 QListView
 {
   color: #d0d0d0;
