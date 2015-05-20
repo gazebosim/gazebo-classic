@@ -102,6 +102,9 @@ namespace gazebo
     /// \brief "Restart ball" publisher.
     private: transport::PublisherPtr restartBallPub;
 
+    /// \brief "Shake table" publisher.
+    private: transport::PublisherPtr shakeTablePub;
+
     /// \brief "Restart ball" publisher.
     private: transport::PublisherPtr visualPub;
 
@@ -213,7 +216,7 @@ namespace gazebo
     /// \param[in] _info Update information provided by the server.
     private: void Update(const common::UpdateInfo &_info);
 
-    /// \brief Callback executed when the ball needs to be restarted.
+    /// \brief Callback to shake the table.
     /// \param[in] _unused Unused parameter.
     private: void OnShakeTable(ConstIntPtr &/*_unused*/);
 
@@ -231,6 +234,9 @@ namespace gazebo
 
     /// \brief Pointer to the model;
     private: physics::ModelPtr model;
+
+    /// \brief Multiplier for the torques applied to shake the table.
+    private: double shakePower = 1000;
   };
 }
 #endif
