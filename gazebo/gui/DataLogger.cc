@@ -67,6 +67,12 @@ DataLogger::DataLogger(QWidget *_parent)
   this->sizeLabel = new QLabel("(0.00 B)");
   this->sizeLabel->setObjectName("dataLoggerSizeLabel");
 
+  // Horizontal separator
+  QFrame *separator = new QFrame();
+  separator->setFrameShape(QFrame::HLine);
+  separator->setLineWidth(1);
+  separator->setFixedHeight(30);
+
   // Address label
   QLabel *uriLabel = new QLabel("Address: ");
   uriLabel->setStyleSheet(
@@ -90,35 +96,10 @@ DataLogger::DataLogger(QWidget *_parent)
   this->destPath->setMinimumWidth(300);
 
   // Browser button
-  this->browseButton = new QPushButton("Browse");
-  this->browseButton->setFixedHeight(23);
-  this->browseButton->setFixedWidth(100);
-  this->browseButton->setFocusPolicy(Qt::NoFocus);
+  QPushButton *browseButton = new QPushButton("Browse");
+  browseButton->setFixedWidth(100);
+  browseButton->setFocusPolicy(Qt::NoFocus);
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
-
-  // Insert widgets in the top layout
-  QGridLayout *topLayout = new QGridLayout();
-  topLayout->addWidget(this->recordButton, 0, 0, 2, 1);
-  topLayout->addWidget(this->statusLabel, 0, 1, 2, 2);
-  topLayout->addWidget(this->timeLabel, 0, 3);
-  topLayout->addWidget(this->sizeLabel, 1, 3);
-  topLayout->addWidget(uriLabel, 2, 0);
-  topLayout->addWidget(this->destURI, 2, 1, 1, 3);
-  topLayout->addWidget(pathLabel, 3, 0);
-  topLayout->addWidget(this->destPath, 3, 1, 1, 2);
-  topLayout->addWidget(this->browseButton, 3, 3);
-
-  // Align widgets within layout
-  topLayout->setAlignment(this->statusLabel, Qt::AlignCenter);
-  topLayout->setAlignment(this->timeLabel, Qt::AlignRight);
-  topLayout->setAlignment(this->sizeLabel, Qt::AlignRight | Qt::AlignTop);
-  topLayout->setAlignment(uriLabel, Qt::AlignRight);
-  topLayout->setAlignment(pathLabel, Qt::AlignRight);
-
-  // Put the layout in a widget to be able to control size
-  QWidget *topWidget = new QWidget();
-  topWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  topWidget->setLayout(topLayout);
 
   // Button which toggles recordings
   QRadioButton *recordingsButton = new QRadioButton();
@@ -138,6 +119,32 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(recordingsButton, SIGNAL(toggled(bool)), this,
       SLOT(OnToggleSettings(bool)));
 
+  // Insert widgets in the top layout
+  QGridLayout *topLayout = new QGridLayout();
+  topLayout->addWidget(this->recordButton, 0, 0, 2, 1);
+  topLayout->addWidget(this->statusLabel, 0, 1, 2, 2);
+  topLayout->addWidget(this->timeLabel, 0, 3);
+  topLayout->addWidget(this->sizeLabel, 1, 3);
+  topLayout->addWidget(separator, 2, 0, 1, 4);
+  topLayout->addWidget(uriLabel, 3, 0);
+  topLayout->addWidget(this->destURI, 3, 1, 1, 3);
+  topLayout->addWidget(pathLabel, 4, 0);
+  topLayout->addWidget(this->destPath, 4, 1, 1, 2);
+  topLayout->addWidget(browseButton, 4, 3);
+  topLayout->addWidget(recordingsButton, 5, 0, 1, 4);
+
+  // Align widgets within layout
+  topLayout->setAlignment(this->statusLabel, Qt::AlignCenter);
+  topLayout->setAlignment(this->timeLabel, Qt::AlignRight);
+  topLayout->setAlignment(this->sizeLabel, Qt::AlignRight | Qt::AlignTop);
+  topLayout->setAlignment(uriLabel, Qt::AlignRight);
+  topLayout->setAlignment(pathLabel, Qt::AlignRight);
+
+  // Put the layout in a widget to be able to control size
+  QWidget *topWidget = new QWidget();
+  topWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  topWidget->setLayout(topLayout);
+
   // List of recorded logs
   this->logList = new QTextBrowser(this);
   this->logList->setObjectName("dataLoggerRecordingsList");
@@ -151,23 +158,15 @@ DataLogger::DataLogger(QWidget *_parent)
   this->settingsFrame = new QFrame();
   this->settingsFrame->setObjectName("dataLoggerSettingFrame");
   this->settingsFrame->setLayout(settingsLayout);
+  this->settingsFrame->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
   this->settingsFrame->hide();
-
-  // Insert widgets in the bottom layout
-  QVBoxLayout *bottomLayout = new QVBoxLayout;
-  bottomLayout->setContentsMargins(2, 2, 2, 2);
-  bottomLayout->addWidget(recordingsButton);
-  bottomLayout->addWidget(this->settingsFrame);
-
-  // Put the layout in a widget to be able to control size
-  QWidget *bottomWidget = new QWidget();
-  bottomWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  bottomWidget->setLayout(bottomLayout);
 
   // Mainlayout for the whole widget
   QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
   mainLayout->addWidget(topWidget);
-  mainLayout->addWidget(bottomWidget);
+  mainLayout->addWidget(this->settingsFrame);
 
   // Let the stylesheet handle the margin sizes
   mainLayout->setContentsMargins(2, 2, 2, 2);

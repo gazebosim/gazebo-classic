@@ -104,12 +104,6 @@ namespace gazebo
       /// \brief The button used to start and pause logging.
       private: QToolButton *recordButton;
 
-      /// \brief The button used to show/hide the settings frame.
-      private: QPushButton *settingExpandButton;
-
-      /// \brief The button used to stop logging.
-      private: QToolButton *stopButton;
-
       /// \brief Label to display the log time.
       private: QLabel *timeLabel;
 
@@ -136,9 +130,6 @@ namespace gazebo
 
       /// \brief Frame that holds settings.
       private: QFrame *settingsFrame;
-
-      /// \brief Button to browse for a log recording directory
-      private: QPushButton *browseButton;
 
       // private: QListWidget *logList;
       private: QTextBrowser *logList;
