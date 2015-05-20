@@ -49,6 +49,9 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->restartBallPub =
     this->gzNode->Advertise<msgs::Int>("~/foosball_demo/restart_ball");
 
+  this->shakeTablePub =
+    this->gzNode->Advertise<msgs::Int>("~/foosball_demo/shake_table");
+
   this->visualPub = this->gzNode->Advertise<msgs::Visual>("~/visual");
 
   GZ_ASSERT(_model, "FoosballPlugin _model pointer is NULL");
@@ -132,14 +135,23 @@ void FoosballPlayer::Update()
   }
 
   // Restart the ball position.
-  if (msg->left().trigger() > 0.5 || msg->right().trigger() > 0.5)
+  if (msg->left().button_joy() && msg->right().button_joy())
     this->restartBallPending = true;
-  else if (this->restartBallPending)
+  if (this->restartBallPending && !msg->left().button_joy() &&
+      !msg->right().button_joy())
   {
     msgs::Int restartBallMsg;
     restartBallMsg.set_data(1);
     this->restartBallPub->Publish(restartBallMsg);
     this->restartBallPending = false;
+  }
+
+  // Shake table while both triggers pressed
+  if (msg->left().trigger() > 0.5 && msg->right().trigger() > 0.5)
+  {
+    msgs::Int msg;
+    msg.set_data(1);
+    this->shakeTablePub->Publish(msg);
   }
 
   if (this->activated)
@@ -368,6 +380,10 @@ void FoosballTablePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     ++counter;
   }
 
+  // Get table shake properties
+  if (_sdf->HasElement("shake_power"))
+    this->shakePower = _sdf->Get<double>("shake_power");
+
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -396,12 +412,8 @@ void FoosballTablePlugin::OnShakeTable(ConstIntPtr &/*_unused*/)
 
   double randX = math::Rand::GetDblUniform(-1, 1);
   double randY = math::Rand::GetDblUniform(-1, 1);
-  double randZ = math::Rand::GetDblUniform(0, 1);
-
-  this->model->GetLink("Foosball::table")->AddLinkForce(
-      math::Vector3(0, 0, 10000*randZ));
 
   this->model->GetLink("Foosball::table")->AddRelativeTorque(
-      math::Vector3(10000*randX, 10000*randY, 0));
+      math::Vector3(this->shakePower*randX, this->shakePower*randY, 0));
 }
 

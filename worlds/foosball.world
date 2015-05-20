@@ -44,6 +44,7 @@
           <team>Red</team>
           <invert_control>0</invert_control>
         </player>
+        <shake_power>3000</shake_power>
       </plugin>
     </model>
 
