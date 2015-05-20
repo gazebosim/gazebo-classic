@@ -241,7 +241,7 @@ void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
 {
   unsigned int left = this->hydra["left_controller"];
   unsigned int right = this->hydra["right_controller"];
-  unsigned newLeft, newRight;
+  unsigned newLeft = 0, newRight = 0;
   bool leftChanged = false, rightChanged = false;
 
   // Left controller moving left.

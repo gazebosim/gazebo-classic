@@ -194,6 +194,19 @@ namespace gazebo
     /// \param[in] _newState New state to transition.
     public: void SetCurrentState(State<FoosballDemoPlugin> &_newState);
 
+    /// \brief Shows the score as players (up to 5) in the cup holders
+    /// \param[in] _red The red score
+    /// \param[in] _blue The blue score
+    private: void ShowRedBlueGoals(unsigned int _blue, unsigned int _red) const;
+
+    /// \brief Show or Hide a visible (by sending a Visual msg)
+    /// \param[in] _name The name of the visual
+    /// \param[in] _parent The name of the parent
+    /// \param[in] _visible Visible if true, invisible if false
+    private: void SetVisualVisibility(const std::string &_name,
+                                      const std::string &_parent,
+                                      bool _visible) const;
+
     /// \brief Seconds remaining to finish the game.
     public: common::Time gameTime;
 
@@ -268,6 +281,9 @@ namespace gazebo
 
     /// \brief Mutex to avoid race conditions.
     private: std::mutex mutex;
+
+    /// \brief Visual topic  publisher (show hide goal markers).
+    private: transport::PublisherPtr visualPub;
   };
 }
 #endif

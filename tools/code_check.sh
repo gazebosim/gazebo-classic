@@ -68,6 +68,7 @@ echo "*:gazebo/common/SVGLoader.hh:49" >> $SUPPRESS
 echo "*:gazebo/common/SVGLoader.cc:439" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
+echo "*:plugins/FoosballTablePlugin.hh:43" >> $SUPPRESS
 
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
@@ -132,7 +133,7 @@ elif [ $QUICK_CHECK -eq 1 ]; then
       DO_CPPCHECK=1
     elif [ $CPPCHECK_LT_157 -eq 0 ]; then
       DO_CPPCHECK=1
-    fi 
+    fi
 
     if [ $DO_CPPCHECK -eq 1 ]; then
       $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \

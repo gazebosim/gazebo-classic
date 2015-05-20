@@ -81,6 +81,10 @@ namespace gazebo
     /// \param[in] _side "left_controller" or "right_controller".
     private: void SwitchRod(const double _leftDir, const double _rightDir);
 
+    /// \brief Set the material color of a visual element
+    /// \param[in] _name The visual element's name
+    /// \param[in] _parentName The visual's parent element
+    /// \param[in] _color The material's color
     private: void PublishVisualMsg(std::string &_name, std::string &_parentName,
         std::string &_color);
 
