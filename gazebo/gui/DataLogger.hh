@@ -82,6 +82,9 @@ namespace gazebo
       /// state.
       private slots: void OnToggleSettings(bool _checked);
 
+      /// \brief QT callback for blinking the status message.
+      private slots: void OnBlinkStatus();
+
       /// \brief QT callback for timing out the confirmation message.
       private slots: void OnConfirmationTimeout();
 
@@ -121,6 +124,12 @@ namespace gazebo
 
       /// \brief Label to display status information.
       private: QLabel *statusLabel;
+
+      /// \brief Timer used to blink the status label.
+      private: QTimer *statusTimer;
+
+      /// \brief Keep track of the time the status label blinks.
+      private: double statusTime;
 
       /// \brief Name of the log file path
       private: QLineEdit *filenameEdit;
