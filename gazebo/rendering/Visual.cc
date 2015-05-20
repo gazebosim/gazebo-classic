@@ -197,6 +197,9 @@ Visual::~Visual()
   this->dataPtr->parent.reset();
   this->dataPtr->children.clear();
 
+  this->dataPtr->visPub.reset();
+  this->dataPtr->node.reset();
+
   delete this->dataPtr;
   this->dataPtr = 0;
 }
@@ -238,6 +241,9 @@ void Visual::Fini()
 
   RTShaderSystem::Instance()->DetachEntity(this);
   this->dataPtr->scene.reset();
+
+  if (this->dataPtr->node.get() != NULL)
+    this->dataPtr->node->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -490,6 +496,13 @@ void Visual::Load()
       rendering::Events::newLayer(this->dataPtr->layer);
     }
   }
+
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+
+  this->dataPtr->node->Init(this->GetName());
+
+  this->dataPtr->visPub =
+    this->dataPtr->node->Advertise<msgs::Visual>("~/visual_updates");
 }
 
 //////////////////////////////////////////////////
@@ -2390,6 +2403,9 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       if (_msg->material().has_normal_map())
         this->SetNormalMap(_msg->material().normal_map());
     }
+
+    // Re-publish update message with possibly changed visual properties
+    this->dataPtr->visPub->Publish(*_msg, true);
   }
 
   if (_msg->has_transparency())

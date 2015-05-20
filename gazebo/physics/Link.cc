@@ -32,6 +32,7 @@
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
@@ -111,6 +112,8 @@ Link::~Link()
   this->dataPub.reset();
   this->wrenchSub.reset();
   this->connections.clear();
+
+  this->visualUpdateSub.reset();
 
   delete this->publishDataMutex;
   this->publishDataMutex = NULL;
@@ -887,6 +890,19 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   }
   if (_msg.collision_size()>0)
     this->UpdateSurface();
+
+  // Process visuals
+  if (_msg.visual_size() > 0)
+  {
+      for (unsigned int k = 0; k < _msg.visual_size(); k++)
+      {
+         const msgs::Visual& vis_msg = _msg.visual(k);
+         if (this->visuals.find(vis_msg.id()) != this->visuals.end())
+         {
+           this->visPub->Publish(vis_msg);
+         }
+      }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1204,6 +1220,11 @@ void Link::UpdateVisualMsg()
         msg.set_parent_id(this->GetId());
         msg.set_is_static(this->IsStatic());
 
+        // Subscribe to visual updates for visuals associated with this link.
+        std::string topicName("/gazebo/" + visName + "/visual_updates");
+        this->visualUpdateSub =
+          this->node->Subscribe(topicName, &Link::OnVisualUpdateMsg, this);
+
         auto iter = this->visuals.find(msg.id());
         if (iter != this->visuals.end())
           gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
@@ -1212,6 +1233,32 @@ void Link::UpdateVisualMsg()
 
       visualElem = visualElem->GetNextElement("visual");
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void Link::OnVisualUpdateMsg(ConstVisualPtr &_msg)
+{
+  const msgs::Visual& vis_msg = *(_msg.get());
+
+  bool visualFound = false;
+  uint32_t visual_id = GZ_UINT32_MAX;
+
+  for (auto const visual : this->visuals)
+  {
+    if (visual.second.name().compare(vis_msg.name()) == 0)
+    {
+      visualFound = true;
+      visual_id = visual.first;
+      break;
+    }
+  }
+
+  if (visualFound)
+  {
+    msgs::Visual& old_vis_msg = this->visuals.find(visual_id)->second;
+    old_vis_msg.CopyFrom(vis_msg);
+    old_vis_msg.set_id(visual_id);
   }
 }
 

@@ -36,6 +36,8 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
+#include "gazebo/transport/TransportTypes.hh"
+
 namespace Ogre
 {
   class MovableObject;
@@ -167,6 +169,12 @@ namespace gazebo
       /// \brief Index of the layer to which this visual belongs. Layers
       /// act similar to layers in photoshop.
       public: int32_t layer;
+
+      /// \brief Publisher for visual update messages.
+      public: transport::PublisherPtr visPub;
+
+      /// \brief Node for visual update messages.
+      public: transport::NodePtr node;
     };
     /// \}
   }

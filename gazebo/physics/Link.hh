@@ -585,6 +585,14 @@ namespace gazebo
       /// \brief Update visual msgs.
       private: void UpdateVisualMsg();
 
+      /// \brief Handler for visual update messages.
+      /// \param[in] _msg Visual message with updates.
+      private: void OnVisualUpdateMsg(ConstVisualPtr &_msg);
+
+      /// \brief Subscriber for visual update messages received
+      /// from visuals associated with this link.
+      private: transport::SubscriberPtr visualUpdateSub;
+
       /// \brief Called when a new wrench message arrives. The wrench's force,
       /// torque and force offset are described in the link frame,
       /// \param[in] _msg The wrench message.
