@@ -326,7 +326,7 @@ void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
   // Restore the position/orientation of the new right rod.
   if (rightChanged)
   {
-    if (right != newLeft)
+    if (!leftChanged || right != newLeft)
     {
       // Reset previous active rod's color
       std::string name =
