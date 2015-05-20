@@ -170,8 +170,8 @@ namespace gazebo
     /// a rod depending on the player's viewpoint.
     private: double invert = 1.0;
 
-    /// \brief We have to restart the ball position.
-    private: bool restartBallPending = false;
+    /// \brief We have to invert the controller.
+    private: bool invertControlPending = false;
   };
 
   /// \class FoosballTablePlugin FoosballTablePlugin.hh

@@ -134,24 +134,27 @@ void FoosballPlayer::Update()
     this->resetPoseLeft = msgs::Convert(msg->left().pose());
   }
 
-  // Restart the ball position.
+  // Invert the controller.
   if (msg->left().button_joy() && msg->right().button_joy())
-    this->restartBallPending = true;
-  if (this->restartBallPending && !msg->left().button_joy() &&
+    this->invertControlPending = true;
+  if (this->invertControlPending && !msg->left().button_joy() &&
       !msg->right().button_joy())
   {
-    msgs::Int restartBallMsg;
-    restartBallMsg.set_data(1);
-    this->restartBallPub->Publish(restartBallMsg);
-    this->restartBallPending = false;
+    this->invert *= -1.0;
+
+    // Swap left/right controllers.
+    auto &leftRods = this->hydra["left_controller"];
+    auto &rightRods = this->hydra["right_controller"];
+    std::swap(leftRods, rightRods);
+    this->invertControlPending = false;
   }
 
   // Shake table while both triggers pressed
   if (msg->left().trigger() > 0.5 && msg->right().trigger() > 0.5)
   {
-    msgs::Int msg;
-    msg.set_data(1);
-    this->shakeTablePub->Publish(msg);
+    msgs::Int shakeMsg;
+    shakeMsg.set_data(1);
+    this->shakeTablePub->Publish(shakeMsg);
   }
 
   if (this->activated)
@@ -426,6 +429,6 @@ void FoosballTablePlugin::OnShakeTable(ConstIntPtr &/*_unused*/)
   double randY = math::Rand::GetDblUniform(-1, 1);
 
   this->model->GetLink("Foosball::table")->AddRelativeTorque(
-      math::Vector3(this->shakePower*randX, this->shakePower*randY, 0));
+      math::Vector3(this->shakePower * randX, this->shakePower * randY, 0));
 }
 
