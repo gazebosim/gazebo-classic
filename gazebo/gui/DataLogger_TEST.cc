@@ -85,8 +85,7 @@ void DataLogger_TEST::RecordButton()
 
     // Make sure the status label says "Recording"
     txt = statusLabel->text().toStdString();
-    QVERIFY(txt == "Recording");
-
+    QVERIFY(txt == "Recording...");
 
     // Toggle the record button, which stops logging.
     recordButton->toggle();
@@ -98,7 +97,6 @@ void DataLogger_TEST::RecordButton()
     // Make sure the initial time is zero
     txt = timeLabel->text().toStdString();
     QVERIFY(txt == "00:00:00.000");
-
 
     // Make sure the status label says "Ready"
     txt = statusLabel->text().toStdString();
