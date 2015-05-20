@@ -47,6 +47,8 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
   /// \TODO: what's flat plate drag?
   this->cdaStall = 1.0;
   this->cmaStall = 0.0;
+
+  std::cout << "Constructor" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -115,6 +117,8 @@ void LiftDragPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     this->link = this->model->GetLink(this->linkName);
     GZ_ASSERT(link, "Link was NULL");
   }
+
+  std::cerr << "Loading plugin" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -304,7 +308,7 @@ void LiftDragPlugin::OnUpdate()
   //      this->link->GetName() == "wing_2") &&
   //     (vel.GetLength() > 50.0 &&
   //      vel.GetLength() < 50.0))
-  if (0)
+  if (true)
   {
     gzerr << "=============================\n";
     gzerr << "Link: [" << this->link->GetName()

@@ -3,7 +3,7 @@
   <world name="default">
     <gui>
       <camera name="user_camera">
-        <pose>10 0 3 0 0 3.141592</pose>
+        <pose>10 0 3 0 0 0</pose>
       </camera>
     </gui>
 
@@ -21,14 +21,14 @@
               <size>10000 10000</size>
             </plane>
           </geometry>
-          <surface>
+          <!--<surface>
             <friction>
               <ode>
                 <mu>1</mu>
                 <mu2>1</mu2>
               </ode>
             </friction>
-          </surface>
+          </surface>-->
         </collision>
         <visual name="visual">
           <cast_shadows>false</cast_shadows>
@@ -48,12 +48,95 @@
       </link>
     </model>
 
-    <include>
-      <pose>0 0 0.495 0 0 0</pose>
-      <uri>model://cessna</uri>
-    <include>
+    <model name="cessna">
+      <include>
+        <pose>0 0 0.495 0 0 0</pose>
+        <uri>model://cessna</uri>
+      </include>
 
-    <plugin name="gazebo_left_wing" filename="libLiftDragPlugin.so">
+      <plugin name="gazebo_propeller" filename="libLiftDragPlugin.so">
+        <a0>0.1</a0>
+        <cla>10</cla>
+        <cda>0.001</cda>
+        <cma>0</cma>
+        <alpha_stall>10</alpha_stall>
+        <cla_stall>0</cla_stall>
+        <cda_stall>0.01</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>0 0 0</cp>
+        <area>0.2</area>
+        <air_density>1.2041</air_density>
+        <upward>0 0 1</upward>
+        <forward>-1 0 0</forward>
+        <link_name>cessna::propeller</link_name>
+      </plugin>
+
+      <!--<plugin name="gazebo_left_wing" filename="libLiftDragPlugin.so">
+        <a0>0.15984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-1 2.205 1.5</cp>
+        <area>800.08255</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>cessna::body</link_name>
+      </plugin>
+
+      <plugin name="gazebo_right_wing" filename="libLiftDragPlugin.so">
+        <a0>0.15984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-1 -2.205 1.5</cp>
+        <area>800.08255</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>cessna::body</link_name>
+      </plugin>-->
+    </model>
+
+    <!--<plugin name="gazebo_propeller" filename="libLiftDragPlugin.so">
+      <cla>1.05</cla>
+      <cda>1.05</cda>
+      <alpha_stall>1</alpha_stall>
+      <alpha>1</alpha>
+      <cla_stall>0</cla_stall>
+      <area>200.9021952792000001</area>
+      <air_density>1.2041</air_density>
+      <upward>-1 0 0</upward>
+      <forward>0 0 1</forward>
+      <link_name>cessna::propeller</link_name>
+    </plugin>-->
+
+    <!--<plugin name="gazebo_propeller" filename="libLiftDragPlugin.so">
+      <a0>0.1</a0>
+      <cla>10.000</cla>
+      <cda>0.001</cda>
+      <cma>0.00</cma>
+      <alpha_stall>10.0</alpha_stall>
+      <cla_stall>0.0</cla_stall>
+      <cda_stall>0.01</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <cp>0.0 0 0</cp>
+      <area>0.2</area>
+      <air_density>1.2041</air_density>
+      <forward>1 0 0</forward>
+      <upward>0 0 1</upward>
+      <link_name>cessna::propeller</link_name>
+    </plugin>-->
+
+    <!--<plugin name="gazebo_left_wing" filename="libLiftDragPlugin.so">
       <a0>0.05984281113</a0>
       <cla>4.752798721</cla>
       <cda>0.6417112299</cda>
@@ -119,7 +202,7 @@
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
       <link_name>cessna::body</link_name>
-    </plugin>
+    </plugin>-->
 
   </world>
 </sdf>
