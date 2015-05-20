@@ -48,11 +48,12 @@ DiagnosticManager::DiagnosticManager()
     common::SystemPaths *paths = common::SystemPaths::Instance();
     gzwarn << "HOME environment variable missing. Diagnostic timing " <<
       "information will be logged to " << paths->GetTmpPath() << "\n";
-    this->logPath = paths->GetTmpPath() + "/gazebo";
+    this->logPath = paths->GetTmpPath();
+    this->logPath /= "gazebo";
   }
   else
   {
-  this->logPath = homePath;
+    this->logPath = homePath;
     this->logPath /= ".gazebo";
   }
 
@@ -62,7 +63,8 @@ DiagnosticManager::DiagnosticManager()
   std::replace(timeStr.begin(), timeStr.end(), ':', '_');
 #endif
 
-  this->logPath /= "diagnostics" / timeStr;
+  this->logPath /= "diagnostics";
+  this->logPath /= timeStr;
 
   // Make sure the path exists.
   if (!boost::filesystem::exists(this->logPath))
