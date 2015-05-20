@@ -1484,8 +1484,8 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   if (_msg->has_grid())
     this->SetGrid(_msg->grid());
 
-  if (_msg->has_show_origin())
-    this->ShowOrigin(_msg->show_origin());
+  if (_msg->has_origin_visual())
+    this->ShowOrigin(_msg->origin_visual());
 
   // Process the sky message.
   if (_msg->has_sky())

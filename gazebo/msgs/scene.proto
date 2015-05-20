@@ -27,7 +27,7 @@ message Scene
   repeated Joint joint         = 10;
 
   /// \brief Show/hide world origin indicator.
-  optional bool show_origin    = 11;
+  optional bool origin_visual  = 11;
 }
 
 
