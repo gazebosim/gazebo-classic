@@ -282,8 +282,8 @@ void FoosballDemoPlugin::OnRestartGame(ConstIntPtr &/*_unused*/)
 }
 
 /////////////////////////////////////////////////
-void FoosballDemoPlugin::ShowRedBlueGoals(unsigned int _red,
-                                          unsigned int _blue)
+void FoosballDemoPlugin::ShowRedBlueGoals(unsigned int _blue,
+                                          unsigned int _red) const
 {
   for (auto i = 0u; i < 5; ++i)
   {
@@ -302,7 +302,7 @@ void FoosballDemoPlugin::ShowRedBlueGoals(unsigned int _red,
 /////////////////////////////////////////////////
 void FoosballDemoPlugin::SetVisualVisibility(const std::string &_name,
                                           const std::string &_parentName,
-                                          bool _visible)
+                                          bool _visible) const
 {
   msgs::Visual visualMsg;
   visualMsg.set_name(_name);

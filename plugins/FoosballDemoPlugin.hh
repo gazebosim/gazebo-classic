@@ -197,7 +197,7 @@ namespace gazebo
     /// \brief Shows the score as players (up to 5) in the cup holders
     /// \param[in] _red The red score
     /// \param[in] _blue The blue score
-    private: void ShowRedBlueGoals(unsigned int _red, unsigned int _blue);
+    private: void ShowRedBlueGoals(unsigned int _blue, unsigned int _red) const;
 
     /// \brief Show or Hide a visible (by sending a Visual msg)
     /// \param[in] _name The name of the visual
@@ -205,7 +205,7 @@ namespace gazebo
     /// \param[in] _visible Visible if true, invisible if false
     private: void SetVisualVisibility(const std::string &_name,
                                       const std::string &_parent,
-                                      bool _visible);
+                                      bool _visible) const;
 
     /// \brief Seconds remaining to finish the game.
     public: common::Time gameTime;
