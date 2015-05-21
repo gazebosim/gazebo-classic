@@ -39,9 +39,6 @@ namespace gazebo
       /// \param[in] _vis Parent Visual
       public: OriginVisual(const std::string &_name, VisualPtr _vis);
 
-      /// \brief Destructor
-      public: virtual ~OriginVisual();
-
       /// \brief Load the visual with default parameters
       public: virtual void Load();
     };

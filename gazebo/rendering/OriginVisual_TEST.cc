@@ -55,7 +55,6 @@ TEST_F(OriginVisual_TEST, Load)
   // Reset pointer
   origin.reset();
   EXPECT_TRUE(origin == NULL);
-
 }
 
 /////////////////////////////////////////////////

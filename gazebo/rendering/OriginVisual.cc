@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Center of Mass Visualization Class
- * Author: Nate Koenig
- */
 
 #include "gazebo/math/Vector3.hh"
 
@@ -30,11 +27,6 @@ using namespace rendering;
 /////////////////////////////////////////////////
 OriginVisual::OriginVisual(const std::string &_name, VisualPtr _vis)
   : Visual(*new OriginVisualPrivate, _name, _vis, false)
-{
-}
-
-/////////////////////////////////////////////////
-OriginVisual::~OriginVisual()
 {
 }
 
