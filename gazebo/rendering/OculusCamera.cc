@@ -753,7 +753,7 @@ void OculusCamera::Oculus()
   this->dataPtr->externalViewport->setOverlaysEnabled(true);
 
   // Set up IPD in meters:
-  float ipd = ovrHmd_GetFloat(this->dataPtr->hmd, OVR_KEY_IPD,  0.064f);
+  float ipd = ovrHmd_GetFloat(this->dataPtr->hmd, OVR_KEY_IPD,  0.0635f);
   this->camera->setPosition(-ipd * 0.5, 0, 0);
   this->dataPtr->rightCamera->setPosition(ipd * 0.5, 0, 0);
 }
