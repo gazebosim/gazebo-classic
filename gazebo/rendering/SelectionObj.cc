@@ -90,63 +90,41 @@ void SelectionObj::Fini()
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
   // Destroy objects and nodes created by this visual
+  if (!dPtr->scene)
+    return;
   Ogre::SceneManager *manager = dPtr->scene->GetManager();
   if (!manager)
     return;
 
-  // Destroy objects
-  std::vector<std::string> prefixes = {
-      "__SELECTION_OBJ_TRANS_SHAFT_X__",
-      "__SELECTION_OBJ_TRANS_SHAFT_Y__",
-      "__SELECTION_OBJ_TRANS_SHAFT_Z__",
-      "__SELECTION_OBJ_TRANS_HEAD_X__",
-      "__SELECTION_OBJ_TRANS_HEAD_Y__",
-      "__SELECTION_OBJ_TRANS_HEAD_Z__",
-      "__SELECTION_OBJ_ROT_X__",
-      "__SELECTION_OBJ_ROT_Y__",
-      "__SELECTION_OBJ_ROT_Z__",
-      "__SELECTION_OBJ_SCALE_SHAFT_X__",
-      "__SELECTION_OBJ_SCALE_SHAFT_Y__",
-      "__SELECTION_OBJ_SCALE_SHAFT_Z__",
-      "__SELECTION_OBJ_SCALE_HEAD_X__",
-      "__SELECTION_OBJ_SCALE_HEAD_Y__",
-      "__SELECTION_OBJ_SCALE_HEAD_Z__",
-      };
-
-  for (auto prefix : prefixes)
+  // transVisual / rotVisual / scaleVisual
+  for (auto i = 0; i < this->GetChildCount(); ++i)
   {
-    std::string name = prefix + this->GetName();
-    if (manager->hasEntity(name))
-    {
-      manager->destroyMovableObject(manager->getEntity(name));
-    }
-  }
+    if (!this->GetChild(i))
+      continue;
 
-  // Destroy nodes
-  prefixes = {
-      "__SELECTION_OBJ__TRANS_SHAFT_NODE_X__",
-      "__SELECTION_OBJ_TRANS_SHAFT_NODE_Y__",
-      "__SELECTION_OBJ_TRANS_SHAFT_NODE_Z__",
-      "__SELECTION_OBJ__TRANS_HEAD_NODE_X__",
-      "__SELECTION_OBJ_TRANS_HEAD_NODE_Y__",
-      "__SELECTION_OBJ_TRANS_HEAD_NODE_Z__",
-      "__SELECTION_OBJ__ROT_NODE_X__",
-      "__SELECTION_OBJ__ROT_NODE_Y__",
-      "__SELECTION_OBJ__ROT_NODE_Z__",
-      "__SELECTION_OBJ__SCALE_SHAFT_NODE_X__",
-      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Y__",
-      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Z__",
-      "__SELECTION_OBJ__SCALE_HEAD_NODE_X__",
-      "__SELECTION_OBJ_SCALE_HEAD_NODE_Y__",
-      "__SELECTION_OBJ_SCALE_HEAD_NODE_Z__",
-      };
-
-  for (auto prefix : prefixes)
-  {
-    std::string name = prefix + this->GetName();
-    if (manager->hasSceneNode(name))
+    // transXVisual / transYVisual / transZVisual
+    for (unsigned int j = 0; j < this->GetChild(i)->GetChildCount(); ++j)
     {
-      manager->destroySceneNode(manager->getSceneNode(name));
+      if (!this->GetChild(i)->GetChild(j) ||
+          !this->GetChild(i)->GetChild(j)->GetSceneNode())
+      {
+        continue;
+      }
+
+      // transShaftXNode / transHeadXNode
+      for (auto k = this->GetChild(i)->GetChild(j)->GetSceneNode()->
+          numChildren()-1; k >= 0; --k)
+      {
+        Ogre::SceneNode *toDestroy =
+            reinterpret_cast<Ogre::SceneNode *>(
+            this->GetChild(i)->
+            GetChild(j)->
+            GetSceneNode()->
+            getChild(k));
+
+        manager->destroyMovableObject(toDestroy->getAttachedObject(0));
+        manager->destroySceneNode(toDestroy);
+      }
     }
   }
 
