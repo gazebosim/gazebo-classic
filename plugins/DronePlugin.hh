@@ -24,6 +24,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/common/PID.hh"
 
 namespace gazebo
 {
@@ -31,6 +32,33 @@ namespace gazebo
   {
     class Joystick;
   }
+
+  class WrenchHelper
+  {
+    /// \brief Operator =
+    /// \param[in] _wrench wrench to set from.
+    /// \return *this
+    public: WrenchHelper &operator =(const WrenchHelper &_wrench);
+
+    /// \brief Operator +
+    /// \param[in] _wrench wrench to add
+    /// \return *this
+    public: inline WrenchHelper &operator +(const WrenchHelper &_wrench);
+
+    /// \brief Operator -
+    /// \param[in] _wrench wrench to subtract
+    /// \return *this
+    public: inline WrenchHelper &operator -(const WrenchHelper &_wrench);
+
+    /// \brief linear forces
+    public: math::Vector3 force;
+
+    /// \brief angular torques
+    public: math::Vector3 torque;
+
+    /// \brief reference link frame
+    public: physics::LinkPtr referenceFrame;
+  };
 
   /// \brief A plugin that simulates lift and drag.
   class DronePlugin : public ModelPlugin
@@ -58,6 +86,33 @@ namespace gazebo
     private: double pitchSpeed;
 
     private: math::Vector3 velocity;
+
+    private: sdf::ElementPtr sdf;
+
+    /// \brief PID for controlling base link position in world frame.
+    private: common::PID posPid;
+
+    /// \brief PID for controlling base link orientation in world frame.
+    private: common::PID rotPid;
+
+    /// \brief base link to be pid'd
+    private: physics::LinkPtr baseLink;
+
+    /// \brief: a pointer to the base link "floating" joint for positioning
+    /// the link in space. This joint is provides implicit viscous damping
+    /// of the base link motion.
+    private: physics::JointPtr baseJoint;
+
+    private: physics::Joint_V rotorJoints;
+
+    /// \brief: target link control pose
+    private: math::Pose targetBaseLinkPose;
+
+    /// \brief: mutex for writing targetBaseLinkPose
+    private: common::Time lastSimTime;
+
+    /// \brief force for moving the arm base link to target location.
+    private: WrenchHelper wrench;
 
     public: physics::RayShapePtr testRay;
   };

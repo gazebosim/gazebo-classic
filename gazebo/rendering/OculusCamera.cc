@@ -39,7 +39,7 @@
 using namespace gazebo;
 using namespace rendering;
 
-const float g_defaultNearClip = 0.001f;
+const float g_defaultNearClip = 0.1f;
 const float g_defaultFarClip = 500.0f;
 
 //////////////////////////////////////////////////
@@ -76,11 +76,11 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   {
     case ovrHmd_DK1:
       // A little bit extra for safety
-      this->SetRenderRate(70.0);
+      this->SetRenderRate(80.0);
       break;
     case ovrHmd_DK2:
       // A little bit extra for safety
-      this->SetRenderRate(80.0);
+      this->SetRenderRate(90.0);
       break;
     case ovrHmd_None:
       gzerr << "Unable to handle Oculus with type 'None'\n";
@@ -722,7 +722,7 @@ void OculusCamera::Oculus()
   this->dataPtr->externalCamera =
     this->dataPtr->externalSceneManager->createCamera(
         "_OculusRiftExternalCamera_INTERNAL_");
-  this->dataPtr->externalCamera->setFarClipDistance(50);
+  this->dataPtr->externalCamera->setFarClipDistance(5);
   this->dataPtr->externalCamera->setNearClipDistance(0.001);
   this->dataPtr->externalCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
   this->dataPtr->externalCamera->setOrthoWindow(2, 2);
