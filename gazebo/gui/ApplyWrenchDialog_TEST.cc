@@ -398,7 +398,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   // Find the box's torque visual
   bool found = false;
   gazebo::math::Vector2i mousePoint(glWidget->width()/2, glWidget->height()/2);
-  for (int i = 0; i < 200; ++i)
+  while (mousePoint.x < glWidget->width())
   {
     gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint);
     if (vis && vis->GetName().find("TORQUE") != std::string::npos &&
