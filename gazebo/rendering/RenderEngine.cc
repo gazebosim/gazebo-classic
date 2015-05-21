@@ -149,10 +149,12 @@ void RenderEngine::Load()
     this->SetupResources();
   }
 
-  std::stringstream stream;
-  stream << (int32_t)this->dummyWindowId;
+  // Create a 1x1 render window so that we can grab a GL context. Based on
+  // testing, this is a hard requirement by Apple. We also need it to
+  // properly initialize GLWidget and UserCameras. See the GLWidget
+  // constructor.
+  this->windowManager->CreateWindow(std::to_string(this->dummyWindowId), 1, 1);
 
-  this->windowManager->CreateWindow(stream.str(), 1, 1);
   this->CheckSystemCapabilities();
 }
 

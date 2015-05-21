@@ -2168,3 +2168,10 @@ void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
 }
+
+/////////////////////////////////////////////////
+void World::_AddDirty(Entity *_entity)
+{
+  GZ_ASSERT(_entity != NULL, "_entity is NULL");
+  this->dataPtr->dirtyPoses.push_back(_entity);
+}
