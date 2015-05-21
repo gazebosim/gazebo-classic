@@ -20,7 +20,7 @@ $ make
 
 There are several ways to interact with the animation. Below you can find how to run
 the standalone example, which defines the animation programatically. It is also 
-possible to create  
+possible to define the animation parameters in the SDF file.
 
 ### Run then standalone publisher
 
