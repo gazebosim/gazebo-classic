@@ -257,7 +257,7 @@ namespace gazebo
       public: VisualPtr worldVisual;
 
       /// \brief Visual representing the world origin frame.
-      public: AxisVisualPtr originVisual;
+      public: OriginVisualPtr originVisual;
 
       /// \brief Pointer to a visual selected by a user via the GUI.
       public: VisualPtr selectedVis;

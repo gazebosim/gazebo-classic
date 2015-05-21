@@ -28,7 +28,6 @@
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/AxisVisual.hh"
 #include "gazebo/rendering/LaserVisual.hh"
 #include "gazebo/rendering/SonarVisual.hh"
 #include "gazebo/rendering/WrenchVisual.hh"
@@ -46,7 +45,7 @@
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
-#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/OriginVisual.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
 #include "gazebo/rendering/RFIDTagVisual.hh"
 #include "gazebo/rendering/VideoVisual.hh"
@@ -360,15 +359,9 @@ void Scene::Init()
   this->SetShadowsEnabled(true);
 
   // Create origin visual
-  this->dataPtr->originVisual.reset(new AxisVisual("__WORLD_ORIGIN__",
+  this->dataPtr->originVisual.reset(new OriginVisual("__WORLD_ORIGIN__",
       this->dataPtr->worldVisual));
   this->dataPtr->originVisual->Load();
-  this->dataPtr->originVisual->ShowAxisHead(0, false);
-  this->dataPtr->originVisual->ShowAxisHead(1, false);
-  this->dataPtr->originVisual->ShowAxisHead(2, false);
-  this->dataPtr->originVisual->SetAxisMaterial(0, "Gazebo/Red");
-  this->dataPtr->originVisual->SetAxisMaterial(1, "Gazebo/Green");
-  this->dataPtr->originVisual->SetAxisMaterial(2, "Gazebo/Blue");
 
   this->dataPtr->requestPub->WaitForConnection();
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
@@ -1929,18 +1922,6 @@ void Scene::PreRender()
         this->SelectVisual(this->dataPtr->selectionMsg->name(), "normal");
       this->dataPtr->selectionMsg.reset();
     }
-  }
-
-  // Resize origin visual according to the user camera zoom
-  if (this->GetUserCameraCount() == 1)
-  {
-    double scale = this->dataPtr->userCameras[0]->GetWorldPosition().Distance(
-        math::Vector3::Zero) * 0.1;
-    this->dataPtr->originVisual->SetScale(math::Vector3(scale, scale, scale));
-  }
-  else
-  {
-    this->dataPtr->originVisual->SetScale(math::Vector3::One);
   }
 }
 

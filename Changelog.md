@@ -77,7 +77,7 @@ compilation on Windows.
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
-1. Added world origin indicator.
+1. Added world origin indicator rendering::OriginVisual.
     * [Pull request #1700](https://bitbucket.org/osrf/gazebo/pull-request/1700)
 
 1. Show/hide toolbars using the menu bars and shortcut.

@@ -60,12 +60,10 @@ void ArrowVisual::Load()
   Ogre::MovableObject *shaftObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__SHAFT__", "axis_shaft"));
-  shaftObj->setCastShadows(false);
 
   Ogre::MovableObject *headObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__HEAD__", "axis_head"));
-  headObj->setCastShadows(false);
 
   dPtr->shaftNode =
       dPtr->sceneNode->createChildSceneNode(
@@ -86,7 +84,6 @@ void ArrowVisual::Load()
   Ogre::MovableObject *rotationObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
           this->GetName()+"__ROTATION__", "rotation_tube"));
-  rotationObj->setCastShadows(false);
 
   dPtr->rotationNode =
       dPtr->sceneNode->createChildSceneNode(
