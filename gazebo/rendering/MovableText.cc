@@ -45,14 +45,14 @@ using namespace rendering;
 //////////////////////////////////////////////////
 MovableText::MovableText()
     : camera(NULL),
-    renderWindow(NULL) ,
-    font(NULL) ,
+    renderWindow(NULL),
+    font(NULL),
     viewportAspectCoef(0.75),
-    spaceWidth(0) ,
-    updateColors(true) ,
-    vertAlign(V_BELOW) ,
-    horizAlign(H_LEFT) ,
-    onTop(false) ,
+    spaceWidth(0),
+    updateColors(true),
+    vertAlign(V_BELOW),
+    horizAlign(H_LEFT),
+    onTop(false),
     baseline(0.0)
 {
   this->renderOp.vertexData = NULL;
@@ -60,6 +60,7 @@ MovableText::MovableText()
   this->dirty = true;
   this->mutex = new boost::recursive_mutex();
   this->aabb = new Ogre::AxisAlignedBox;
+  std::cout << "Create movable text\n";
 }
 
 //////////////////////////////////////////////////
@@ -102,6 +103,8 @@ void MovableText::Load(const std::string &name_,
   this->SetFontName(this->fontName);
 
   this->_setupGeometry();
+
+  std::cout << "Loaded movable text\n";
 }
 
 //////////////////////////////////////////////////
@@ -109,6 +112,7 @@ void MovableText::Update()
 {
   if (this->dirty)
   {
+    std::cout << "Update movable text\n";
     this->_setupGeometry();
     this->dirty = false;
   }

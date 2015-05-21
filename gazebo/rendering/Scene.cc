@@ -596,15 +596,24 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 //////////////////////////////////////////////////
 OculusCameraPtr Scene::GetOculusCamera(const unsigned int _index) const
 {
-  if (_index < this->dataPtr->oculusCameras.size())
+  if (this->dataPtr->oculusCameras.size() > 0)
   {
-    return this->dataPtr->oculusCameras[_index];
+    if (_index < this->dataPtr->oculusCameras.size())
+    {
+      return this->dataPtr->oculusCameras[_index];
+    }
+    else
+    {
+      gzerr << "Invalid oculus camera index of[" << _index
+            << "]. Max allowed value is["
+            << this->dataPtr->oculusCameras.size()-1 << "]\n";
+      return NULL;
+    }
   }
   else
   {
-    gzerr << "Invalid oculus camera index of[" << _index
-          << "]. Max allowed value is["
-          << this->dataPtr->oculusCameras.size()-1 << "]\n";
+    gzerr << "No oculus camera detected.\n";
+    return NULL;
   }
 }
 
@@ -640,12 +649,12 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &_name,
   camera->Init();
   this->dataPtr->userCameras.push_back(camera);
 
-  /*if (!this->dataPtr->forest)
+  if (!this->dataPtr->forest)
   {
     // create Forest
     this->dataPtr->forest = new Forest(shared_from_this());
     this->dataPtr->forest->Load();
-  }*/
+  }
 
   return camera;
 }

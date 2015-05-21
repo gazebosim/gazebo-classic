@@ -20,11 +20,18 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/common/Timer.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/PID.hh"
+
+namespace boost
+{
+  class recursive_mutex;
+  class thread;
+}
 
 namespace gazebo
 {
@@ -66,8 +73,17 @@ namespace gazebo
     /// \brief Constructor.
     public: DronePlugin();
 
+    /// \brief Destructor.
+    public: ~DronePlugin();
+
     // Documentation Inherited.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+
+    /// \brief Reset the plugin.
+    public: virtual void Reset();
+
+    /// \brief Thread that listens to joystick input.
+    public: void PollJoystick();
 
     /// \brief Callback for World Update events.
     private: virtual void OnUpdate();
@@ -108,6 +124,9 @@ namespace gazebo
     /// \brief: target link control pose
     private: math::Pose targetBaseLinkPose;
 
+    /// \brief: initial base link pose.
+    private: math::Pose initPose;
+
     /// \brief: mutex for writing targetBaseLinkPose
     private: common::Time lastSimTime;
 
@@ -115,6 +134,30 @@ namespace gazebo
     private: WrenchHelper wrench;
 
     public: physics::RayShapePtr testRay;
+
+    /// \brief Transportation node.
+    private: transport::NodePtr node;
+
+    /// \brief Publisher for world pause and reset msgs.
+    private: transport::PublisherPtr worldControlPub;
+
+    /// \brief Mutex to protect the joystic msg.
+    private: boost::recursive_mutex *joyMutex;
+
+    /// \brief A thread that listens to joystick input.
+    private: boost::thread *joyThread;
+
+    /// \brief True to quit the plugin.
+    private: bool quit;
+
+    /// \brief Joystick message.
+    private: msgs::Joysticks joyMsg;
+
+    /// \brief Timer for the drone flight time.
+    private: common::Timer timer;
+
+    /// \brief Max drone flight time.
+    private: common::Time timeLimit;
   };
 }
 #endif

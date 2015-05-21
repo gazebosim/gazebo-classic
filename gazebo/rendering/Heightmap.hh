@@ -104,6 +104,10 @@ namespace gazebo
       /// \return The height at the specified location
       public: double GetHeight(double _x, double _y, double _z = 1000);
 
+      /// \brief Get the size of the heightmap.
+      ///  \return Size in meters.
+      public: math::Vector3 GetSize() const;
+
       /// \brief Flatten the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
       /// \param[in] _mousePos Position of the mouse in viewport

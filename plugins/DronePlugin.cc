@@ -18,19 +18,15 @@
 #include <algorithm>
 #include <string>
 
-
-#include "gazebo/rendering/RenderingIface.hh"
-#include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/OculusCamera.hh"
+#include <boost/thread.hpp>
 
 #include "gazebo/math/Helpers.hh"
 
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Assert.hh"
 #include "gazebo/util/Joystick.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
+#include "gazebo/util/Joystick.hh"
 #include "plugins/DronePlugin.hh"
 
 using namespace gazebo;
@@ -42,6 +38,7 @@ DronePlugin::DronePlugin()
 {
   this->joy = new util::Joystick();
   this->yawSpeed = 0;
+  this->quit = false;
 }
 
 /////////////////////////////////////////////////
@@ -123,6 +120,7 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->baseJoint->SetParam("stop_cfm", 0, 1.0/baseJointImplicitDamping);
 
   this->targetBaseLinkPose = this->baseLink->GetWorldPose();
+  this->initPose = this->targetBaseLinkPose;
 
   this->baseLink->SetGravityMode(false);
 
@@ -142,48 +140,173 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->rotorJoints.push_back(this->model->GetJoint("iris::rotor_2_joint"));
   this->rotorJoints.push_back(this->model->GetJoint("iris::rotor_1_joint"));
 
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->worldControlPub =
+      this->node->Advertise<msgs::WorldControl>(
+          "~/world_control");
+
+  this->timeLimit = common::Time(180);
+  this->joyMutex = new boost::recursive_mutex();
+  this->joyThread = new boost::thread(
+      boost::bind(&DronePlugin::PollJoystick, this));
+
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&DronePlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
+DronePlugin::~DronePlugin()
+{
+  this->quit = true;
+
+  this->joyThread->join();
+  delete this->joyThread;
+  this->joyThread = NULL;
+
+  delete this->joyMutex;
+  this->joyMutex = NULL;
+
+  delete this->joy;
+  this->joy = NULL;
+}
+
+/////////////////////////////////////////////////
+void DronePlugin::Reset()
+{
+  if (this->model)
+    this->lastSimTime = this->model->GetWorld()->GetSimTime();
+
+  this->targetBaseLinkPose = this->initPose;
+
+  this->posPid.Reset();
+  this->rotPid.Reset();
+
+  this->wrench.force = math::Vector3::Zero;
+  this->wrench.torque = math::Vector3::Zero;
+
+  this->velocity = math::Vector3::Zero;
+  this->yawSpeed = 0;
+
+  if (this->baseLink)
+    this->baseLink->SetGravityMode(false);
+
+  this->timer.Stop();
+  this->timer.Reset();
+}
+
+/////////////////////////////////////////////////
+void DronePlugin::PollJoystick()
+{
+  while (!this->quit)
+  {
+    common::Time::MSleep(10);
+    msgs::Joysticks msg;
+    if (this->joy->Poll(msg))
+
+    boost::recursive_mutex::scoped_lock lock(*this->joyMutex);
+    this->joyMsg = msg;
+
+    if (this->joyMsg.joy_size() > 0)
+    {
+      if (this->joyMsg.joy(0).button_size() > 0)
+      {
+        bool startButton = false;
+        bool selectButton = false;
+        for (int i = 0; i < this->joyMsg.joy(0).button_size(); ++i)
+        {
+          if (this->joyMsg.joy(0).button(i).index() == 3 &&
+              this->joyMsg.joy(0).button(i).state() == 1)
+            startButton = true;
+          if (this->joyMsg.joy(0).button(i).index() == 0 &&
+              this->joyMsg.joy(0).button(i).state() == 1)
+            selectButton = true;
+        }
+
+        if (startButton || selectButton)
+        {
+          msgs::WorldControl worldControlMsg;
+          if (selectButton)
+            worldControlMsg.mutable_reset()->set_all(true);
+          else if (startButton)
+          {
+            worldControlMsg.set_pause(!this->model->GetWorld()->IsPaused());
+          }
+          this->worldControlPub->Publish(worldControlMsg);
+        }
+
+      }
+      // std::cout << this->joyMsg.DebugString();
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void DronePlugin::OnUpdate()
 {
+  if (!this->timer.GetRunning())
+  {
+    math::Vector3 dist =
+        this->baseLink->GetWorldPose().pos - this->initPose.pos;
+    if (dist.GetLength() > 1.0)
+    {
+      this->timer.Start();
+      std::cerr << "timer starts now!" << std::endl;
+    }
+  }
+  else if (this->timer.GetElapsed() > this->timeLimit)
+  {
+    if (this->baseLink)
+    {
+      this->wrench.force = math::Vector3::Zero;
+      this->wrench.torque = math::Vector3::Zero;
+      this->baseLink->AddForceAtRelativePosition(this->wrench.force,
+        math::Vector3(0, 0, 0.2));
+      this->baseLink->AddTorque(this->wrench.torque);
+      this->baseLink->SetGravityMode(true);
+    }
+    return;
+  }
+
+
   common::Time curTime = this->model->GetWorld()->GetSimTime();
   common::Time dt = curTime - this->lastSimTime;
   this->lastSimTime = curTime;
 
-  msgs::Joysticks msg;
-  if (this->joy->Poll(msg))
+  // msgs::Joysticks this->joyMsg;
+  // if (this->joy->Poll(this->joyMsg))
   {
-    if (msg.joy_size() > 0)
+    boost::recursive_mutex::scoped_lock lock(*this->joyMutex);
+    if (this->joyMsg.joy_size() > 0)
     {
-      for (int i = 0; i < msg.joy(0).analog_axis_size(); ++i)
+      for (int i = 0; i < this->joyMsg.joy(0).analog_axis_size(); ++i)
       {
-        if (msg.joy(0).analog_axis(i).index() == 4)
+        if (this->joyMsg.joy(0).analog_axis(i).index() == 4)
         {
           // Forward motion (pitch)
-          this->velocity.x = msg.joy(0).analog_axis(i).value()/(-32768.0);
+          this->velocity.x =
+              this->joyMsg.joy(0).analog_axis(i).value()/(-32768.0);
         }
-        else if (msg.joy(0).analog_axis(i).index() == 3)
+        else if (this->joyMsg.joy(0).analog_axis(i).index() == 3)
         {
           // Lateral motion (roll)
-          this->velocity.y = msg.joy(0).analog_axis(i).value()/(-32768.0);
+          this->velocity.y =
+              this->joyMsg.joy(0).analog_axis(i).value()/(-32768.0);
         }
-        else if (msg.joy(0).analog_axis(i).index() == 1)
+        else if (this->joyMsg.joy(0).analog_axis(i).index() == 1)
         {
           // Up/down
-          this->velocity.z = msg.joy(0).analog_axis(i).value()/(-32768.0);
+          this->velocity.z =
+              this->joyMsg.joy(0).analog_axis(i).value()/(-32768.0);
         }
 
-        else if (msg.joy(0).analog_axis(i).index() == 0)
+        else if (this->joyMsg.joy(0).analog_axis(i).index() == 0)
         {
           // Yaw
-          this->yawSpeed = msg.joy(0).analog_axis(i).value()/(-32768.0);
+          this->yawSpeed =
+              this->joyMsg.joy(0).analog_axis(i).value()/(-32768.0);
         }
-
       }
-      // std::cout << msg.DebugString();
     }
 
     // std::cout << "velocity[" << this->velocity << "]\n";

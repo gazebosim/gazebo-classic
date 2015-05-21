@@ -708,6 +708,12 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
 }
 
 /////////////////////////////////////////////////
+math::Vector3 Heightmap::GetSize() const
+{
+  return this->terrainSize;
+}
+
+/////////////////////////////////////////////////
 Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
     math::Vector2i _mousePos)
 {
