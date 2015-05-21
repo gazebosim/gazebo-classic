@@ -14,6 +14,12 @@
  * limitations under the License.
  *
  */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <iomanip>
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -36,7 +42,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("renderWidget");
-  this->show();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
@@ -131,7 +136,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
-  rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(

@@ -28,6 +28,7 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Skeleton.hh"
+#include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/WireBox.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -93,6 +94,8 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
   this->dataPtr->castShadows = true;
+  this->dataPtr->visible = true;
+  this->dataPtr->layer = -1;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -129,6 +132,8 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
   this->dataPtr->castShadows = true;
+  this->dataPtr->visible = true;
+  this->dataPtr->layer = -1;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -240,9 +245,11 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 {
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
-  for (auto iter: this->dataPtr->children)
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->dataPtr->children.begin();
+      iter != this->dataPtr->children.end(); ++iter)
   {
-    iter->Clone(iter->GetName(), result);
+    (*iter)->Clone((*iter)->GetName(), result);
   }
 
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
@@ -291,6 +298,7 @@ void Visual::Init()
   this->dataPtr->visible = true;
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
+  this->dataPtr->layer = -1;
 
   if (this->dataPtr->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
@@ -331,7 +339,6 @@ void Visual::Load()
   std::string subMesh = this->GetSubMeshName();
   bool centerSubMesh = this->GetCenterSubMesh();
 
-//  std::cerr << " LOAD " << this->GetName() << std::endl;
   if (!mesh.empty())
   {
     try
@@ -472,6 +479,17 @@ void Visual::Load()
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
   this->LoadPlugins();
   this->dataPtr->scene->AddVisual(shared_from_this());
+
+  // Set meta information
+  if (this->dataPtr->sdf->HasElement("meta"))
+  {
+    if (this->dataPtr->sdf->GetElement("meta")->HasElement("layer"))
+    {
+      this->dataPtr->layer =
+        this->dataPtr->sdf->GetElement("meta")->Get<int32_t>("layer");
+      rendering::Events::newLayer(this->dataPtr->layer);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -581,9 +599,6 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
 
   if (!this->HasAttachedObject(_obj->getName()))
   {
-//    std::cerr << this->GetName() << " " << this->GetId() <<
-//        " attach " << _obj->getName() << std::endl;
-
     // update to use unique materials
     Ogre::Entity *entity = dynamic_cast<Ogre::Entity *>(_obj);
     if (entity)
@@ -1556,7 +1571,7 @@ uint32_t Visual::GetVisibilityFlags()
 //////////////////////////////////////////////////
 void Visual::ToggleVisible()
 {
-  this->SetVisible(!this->GetVisible());
+  this->SetVisible(!this->GetVisible(), true);
 }
 
 //////////////////////////////////////////////////
@@ -1813,10 +1828,6 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 math::Box Visual::GetBoundingBox() const
 {
-/*  rendering::VisualPtr rootVis = this->GetRootVisual();
-  rootVis->GetSceneNode()->_updateBounds();
-  rootVis->GetSceneNode()->_update(true, true);*/
-
   math::Box box;
   this->GetBoundsHelper(this->GetSceneNode(), box);
   return box;
@@ -1846,7 +1857,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       {
         std::string str = Ogre::any_cast<std::string>(any);
         if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans"
-            || str.substr(0, 5) == "scale")
+            || str.substr(0, 5) == "scale" ||
+            str.find("_APPLY_WRENCH_") != std::string::npos)
           continue;
       }
 
@@ -1855,11 +1867,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       math::Vector3 min;
       math::Vector3 max;
 
-        min = Conversions::Convert(bb.getMinimum());
-        max = Conversions::Convert(bb.getMaximum());
-//        std::cerr << "BEFORE bbox " << obj->getName() << " " <<  min << " VS " << max
-//            << " scale " << node->_getDerivedScale() << " vs " <<
-//            node->getScale() <<  std::endl;
+      min = Conversions::Convert(bb.getMinimum());
+      max = Conversions::Convert(bb.getMaximum());
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
@@ -1877,13 +1886,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         // get oriented bounding box in object's local space
         bb.transformAffine(transform);
 
-
         min = Conversions::Convert(bb.getMinimum());
         max = Conversions::Convert(bb.getMaximum());
-
-//        std::cerr << "AFTER bbox " << obj->getName() << " " <<  min << " VS " << max
-//            << " scale " << node->_getDerivedScale() << " vs " <<
-//            node->getScale() <<  std::endl;
       }
 
       box.Merge(math::Box(min, max));
@@ -2193,7 +2197,15 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     this->MakeStatic();
     */
 
-//  std::cerr << " UPDATE FROM MSG " << this->GetName() << std::endl;
+  // Set meta information
+  if (_msg->has_meta())
+  {
+    if (_msg->meta().has_layer())
+    {
+      this->dataPtr->layer = _msg->meta().layer();
+      rendering::Events::newLayer(this->dataPtr->layer);
+    }
+  }
 
   if (_msg->has_pose())
     this->SetPose(msgs::Convert(_msg->pose()));
@@ -2938,6 +2950,19 @@ void Visual::SetId(uint32_t _id)
 sdf::ElementPtr Visual::GetSDF() const
 {
   return this->dataPtr->sdf;
+}
+
+//////////////////////////////////////////////////
+void Visual::ToggleLayer(const int32_t _layer)
+{
+  // Visuals with negative layers are always visible
+  if (this->dataPtr->layer < 0)
+    return;
+
+  if (this->dataPtr->layer == _layer)
+  {
+    this->ToggleVisible();
+  }
 }
 
 /////////////////////////////////////////////////

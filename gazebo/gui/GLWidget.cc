@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <math.h>
 
 #include "gazebo/common/Assert.hh"
@@ -57,7 +63,6 @@ GLWidget::GLWidget(QWidget *_parent)
 {
   this->setObjectName("GLWidget");
   this->state = "select";
-  this->sceneCreated = false;
   this->copyEntityName = "";
   this->modelEditorEnabled = false;
 
@@ -74,14 +79,11 @@ GLWidget::GLWidget(QWidget *_parent)
                                    QSizePolicy::Expanding);
   this->renderFrame->setContentsMargins(0, 0, 0, 0);
   this->renderFrame->show();
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
-
-  this->connections.push_back(
-      rendering::Events::ConnectCreateScene(
-        boost::bind(&GLWidget::OnCreateScene, this, _1)));
 
   this->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -168,6 +170,26 @@ GLWidget::GLWidget(QWidget *_parent)
   // Connect the perspective action
   connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
           SLOT(OnPerspective()));
+
+  // Create the scene. This must be done in the constructor so that
+  // we can then create a user camera.
+  this->scene = rendering::create_scene(gui::get_world(), true);
+
+  if (!this->scene)
+  {
+    gzerr << "GLWidget could not create a scene. This will likely result "
+      << "in a blank screen.\n";
+  }
+  else
+  {
+    // This will ultimately create a user camera. We need to create a user
+    // camera in the constructor so that communications (such as via the
+    // ~/gui topic) can work properly (see MainWindow::OnGUI).
+    //
+    // All of this means that we must have a GL Context by this point. So,
+    // we have to create a dummy 1x1 window in RenderEngine::Load.
+    this->OnCreateScene(this->scene->GetName());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1337,4 +1359,10 @@ void GLWidget::OnPerspective()
   g_fpsAct->setEnabled(true);
   g_orbitAct->setEnabled(true);
   this->userCamera->SetProjectionType("perspective");
+}
+
+/////////////////////////////////////////////////
+QPaintEngine *GLWidget::paintEngine() const
+{
+  return NULL;
 }

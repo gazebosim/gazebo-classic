@@ -45,7 +45,10 @@ namespace gazebo
 
       /// \brief Initialize with a focus point.
       /// \param[in] _focalPoint The point to look at.
-      public: virtual void Init(const math::Vector3 &_focalPoint);
+      /// \param[in] _yaw Initial yaw angle.
+      /// \param[in] _pitch Initial pitch angle.
+      public: virtual void Init(const math::Vector3 &_focalPoint,
+                  const double _yaw = 0, const double _pitch = 0);
 
       /// \brief Update the controller, which should update the position
       /// of the Camera.
@@ -54,7 +57,8 @@ namespace gazebo
       /// \brief Called by the UserCamera when a resize event occurs.
       /// \param[in] _width New width
       /// \param[in] _height New height
-      public: virtual void Resize(int _width, int _height);
+      public: virtual void Resize(const unsigned int _width,
+                                  const unsigned int _height);
 
       /// \brief Set whether the controller is enabled.
       /// \param[in] _value True if the controller is enabled.

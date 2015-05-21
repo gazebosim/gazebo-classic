@@ -47,6 +47,10 @@ namespace gazebo
       /// \brief Initialize the controller.
       public: virtual void Init();
 
+      // Documentation inherited
+      public: virtual void Init(const math::Vector3 &_focalPoint,
+                  const double _yaw = 0, const double _pitch = 0);
+
       /// \brief Get the type name of this view controller.
       /// \return The view controller name: "ortho".
       public: static std::string GetTypeString();
@@ -56,13 +60,14 @@ namespace gazebo
       public: virtual void HandleMouseEvent(const common::MouseEvent &_event);
 
       /// \brief Zoom the camera.
-      /// \param[in] _amount Zoom quatity.
-      /// \param[in] _screenPos Position on screen to zoom to
+      /// \param[in] _amount Zoom quantity.
+      /// \param[in] _point Position on screen to zoom to
       private: void Zoom(const float _amount,
                          const math::Vector2i &_point = math::Vector2i(0, 0));
 
       // Documentation inherited
-      public: virtual void Resize(int _width, int _height);
+      public: virtual void Resize(const unsigned int _width,
+                                  const unsigned int _height);
 
       /// \brief Build a custom scaled orthographic projection matrix.
       /// \param[in] _left Left position

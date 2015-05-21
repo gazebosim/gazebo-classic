@@ -83,7 +83,13 @@ namespace gazebo
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
+
+      /// \brief Custom processing for the QT showEvent. Based on empirical
+      /// evidence, we believe Mac needs to create the render window in this
+      /// function.
+      /// \param[in] _e The QT show event information.
       protected: virtual void showEvent(QShowEvent *_e);
+
       protected: virtual void enterEvent(QEvent * event);
 
 
@@ -94,6 +100,11 @@ namespace gazebo
       protected: void mouseDoubleClickEvent(QMouseEvent *_event);
       protected: void mouseMoveEvent(QMouseEvent *_event);
       protected: void mouseReleaseEvent(QMouseEvent *_event);
+
+      /// \brief Override paintEngine to stop Qt From trying to draw on top of
+      /// OGRE.
+      /// \return NULL.
+      protected: virtual QPaintEngine *paintEngine() const;
 
       private: std::string GetOgreHandle() const;
 
@@ -257,10 +268,6 @@ namespace gazebo
 
       /// \brief Name of entity that is being copied.
       private: std::string copyEntityName;
-
-      /// \brief Flag that is set to true when GLWidget has responded to
-      ///  OnCreateScene
-      private: bool sceneCreated;
 
       /// \brief True if the model editor is up, false otherwise
       private: bool modelEditorEnabled;
