@@ -415,6 +415,7 @@ void ApplyWrenchDialog::Init(const std::string &_modelName,
 
   this->move(QCursor::pos());
   this->show();
+  this->ActivateWindow();
 }
 
 /////////////////////////////////////////////////
