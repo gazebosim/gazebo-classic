@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-find_package(ignition-math)
+find_package(ignition-math2)
 find_package(Gazebo)
 
 set(CMAKE_CXX_FLAGS ${IGNITION-MATH_CXX_FLAGS})

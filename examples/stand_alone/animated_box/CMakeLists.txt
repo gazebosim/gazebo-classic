@@ -10,7 +10,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 find_package(Protobuf REQUIRED)
 find_package(gazebo REQUIRED)
-find_package(ignition-math REQUIRED)
+find_package(ignition-math2 REQUIRED)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
