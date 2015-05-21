@@ -39,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet btMotionState encapsulation
-    class GAZEBO_VISIBLE BulletMotionState : public btMotionState
+    class GZ_PHYSICS_VISIBLE BulletMotionState : public btMotionState
     {
       /// \brief Constructor
       public: BulletMotionState(LinkPtr _link);

@@ -18,6 +18,8 @@ set (resources ../resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI_TERRAIN")
+
 add_library(gazebo_gui_terrain STATIC ${sources} ${headers_MOC}
   ${headers} ${resources_RCC})
 

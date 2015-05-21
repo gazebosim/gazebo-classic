@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include <boost/algorithm/string/find.hpp>
 #include <boost/regex.hpp>
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class WirelessReceiver_TEST : public ServerFixture

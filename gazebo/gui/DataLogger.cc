@@ -15,6 +15,14 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  // For _access()
+  #include <io.h>
+#endif
+
 #include <boost/filesystem.hpp>
 #include <stdio.h>
 
@@ -55,7 +63,11 @@ DataLogger::DataLogger(QWidget *_parent)
   // Textual status information
   this->statusLabel = new QLabel("Ready");
   this->statusLabel->setObjectName("dataLoggerStatusLabel");
-  this->statusLabel->setFixedWidth(70);
+  this->statusLabel->setFixedWidth(80);
+
+  // Timer used to blink the status label
+  this->statusTimer = new QTimer(this);
+  connect(this->statusTimer, SIGNAL(timeout()), this, SLOT(OnBlinkStatus()));
 
   // Duration of logging
   this->timeLabel = new QLabel("00:00:00.000");
@@ -248,7 +260,8 @@ void DataLogger::OnRecord(bool _toggle)
     // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record_stop.png"));
 
-    this->statusLabel->setText("Recording");
+    this->statusLabel->setText("Recording...");
+    this->statusTimer->start(100);
 
     // Tell the server to start data logging
     msgs::LogControl msg;
@@ -262,6 +275,8 @@ void DataLogger::OnRecord(bool _toggle)
     this->recordButton->setIcon(QPixmap(":/images/record.png"));
 
     this->statusLabel->setText("Ready");
+    this->statusLabel->setStyleSheet("QLabel{color: #aeaeae}");
+    this->statusTimer->stop();
 
     // Tell the server to stop data logging
     msgs::LogControl msg;
@@ -412,7 +427,13 @@ void DataLogger::OnBrowse()
 
   // Make sure the path is writable.
   // Note: This is not cross-platform compatible.
+#ifdef _WIN32
+  // Check for write-only (2) and read-write (6)
+  if ((_access(path.string().c_str(), 2) != 0) &&
+      (_access(path.string().c_str(), 6) != 0))
+#else
   if (access(path.string().c_str(), W_OK) != 0)
+#endif
   {
     QMessageBox msgBox(this);
     std::ostringstream stream;
@@ -429,3 +450,20 @@ void DataLogger::OnBrowse()
 
   this->SetFilename(QString::fromStdString(path.string()));
 }
+
+/////////////////////////////////////////////////
+void DataLogger::OnBlinkStatus()
+{
+  this->statusTime += 1.0/10;
+
+  if (this->statusTime >= 1)
+    this->statusTime = 0;
+
+  this->statusLabel->setStyleSheet(QString::fromStdString(
+      "QLabel{color: rgb("+
+          std::to_string(255+(128*(this->statusTime-1)))+", "+
+          std::to_string(255+(128*(this->statusTime-1)))+", "+
+          std::to_string(255+(128*(this->statusTime-1)))+
+      ")}"));
+}
+

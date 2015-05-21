@@ -128,7 +128,7 @@ namespace gazebo
     /// \return Joint type string. Returns "unknown" if
     /// _type is unrecognized.
     GAZEBO_VISIBLE
-    std::string ConvertJointType(const msgs::Joint::Type _type);
+    std::string ConvertJointType(const msgs::Joint::Type &_type);
 
     /// \brief Convert a string to a msgs::Geometry::Type enum.
     /// \param[in] _str Geometry type string.
@@ -326,7 +326,7 @@ namespace gazebo
     /// \return Shader type string. Returns "unknown" if
     /// _type is unrecognized.
     GAZEBO_VISIBLE
-    std::string ConvertShaderType(const msgs::Material::ShaderType _type);
+    std::string ConvertShaderType(const msgs::Material::ShaderType &_type);
 
     /// \brief Create a msgs::Fog from a fog SDF element
     /// \param[in] _sdf The sdf element

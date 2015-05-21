@@ -45,7 +45,7 @@ namespace gazebo
     /// state information to a World.
     ///
     /// \sa LogRecord, State
-    class GAZEBO_VISIBLE LogPlay : public SingletonT<LogPlay>
+    class GZ_UTIL_VISIBLE LogPlay : public SingletonT<LogPlay>
     {
       /// \brief Constructor
       private: LogPlay();
