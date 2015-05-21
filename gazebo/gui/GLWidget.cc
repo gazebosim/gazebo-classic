@@ -270,11 +270,6 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 /////////////////////////////////////////////////
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
-  // Timing may cause GLWidget to miss the OnCreateScene event. So, we check
-  // here to make sure it's handled.
-  if (!this->sceneCreated && rendering::get_scene())
-    this->OnCreateScene(rendering::get_scene()->GetName());
-
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
   {
@@ -955,8 +950,6 @@ void GLWidget::OnCreateScene(const std::string &_name)
   ModelManipulator::Instance()->Init();
   ModelSnap::Instance()->Init();
   ModelAlign::Instance()->Init();
-
-  this->sceneCreated = true;
 }
 
 /////////////////////////////////////////////////
