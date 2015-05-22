@@ -355,6 +355,7 @@ else (build_errors)
   # without internal interdependencies
   set(PKG_LIBRARIES
     gazebo
+    gazebo_client
     gazebo_gui_building
     gazebo_gui_viewers
     gazebo_gui_model
