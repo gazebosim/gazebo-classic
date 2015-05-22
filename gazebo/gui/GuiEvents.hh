@@ -85,7 +85,7 @@ namespace gazebo
               static event::ConnectionPtr ConnectShowToolbars(T _subscriber)
               { return showToolbars.Connect(_subscriber); }
 
-      /// \brief Disconnect a signal from the fullscreen signal
+      /// \brief Disconnect a signal from the show toolbars signal
       public: static void DisconnectShowToolbars(event::ConnectionPtr
           _subscriber)
               { showToolbars.Disconnect(_subscriber); }
