@@ -48,6 +48,7 @@ std::vector<dReal> errors;
 #endif   //timing
 
 using namespace ode;
+
 static void* ComputeRows(void *p)
 {
   dxPGSLCPParameters *params = (dxPGSLCPParameters *)p;
