@@ -219,6 +219,9 @@ inline void scaled_add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal 
 }
 
 // dot product of two vector a and b with length 6
+// define ODE_SSE to enable SSE, which is used to speed up
+// vector math operations with gcc compiler
+// macro SSE is renamed to ODE_SSE due to conflict with Eigen3 in DART
 inline dReal dot6(dRealPtr a, dRealPtr b)
 {
 #ifdef ODE_SSE
