@@ -183,7 +183,7 @@ MainWindow::MainWindow()
       gui::Events::ConnectFullScreen(
         boost::bind(&MainWindow::OnFullScreen, this, _1)));
 
-   this->connections.push_back(
+  this->connections.push_back(
       gui::Events::ConnectShowToolbars(
         boost::bind(&MainWindow::OnShowToolbars, this, _1)));
 
