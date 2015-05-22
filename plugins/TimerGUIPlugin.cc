@@ -235,7 +235,7 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
     }
 
     // Check for x position greater than parent width
-    if (parent() && p.x > static_cast<QWidget *>(this->parent())->width())
+    if (this->parent() && p.x > static_cast<QWidget *>(this->parent())->width())
     {
       gzwarn << "GUI widget x pos > parent width, "
         << "clamping to parent width - this widget's width.\n";
@@ -243,7 +243,8 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
     }
 
     // Check for y position greater than parent height
-    if (parent() && p.y > static_cast<QWidget *>(this->parent())->height())
+    if (this->parent() &&
+        p.y > static_cast<QWidget *>(this->parent())->height())
     {
       gzwarn << "GUI widget y pos > parent height, "
         << "clamping to parent height - this widget's height.\n";
@@ -256,8 +257,8 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   else
   {
     int xPos, yPos;
-    if (parent())
-       xPos = static_cast<QWidget*>(parent())->width() - this->width() - 10;
+    if (this->parent())
+       xPos = static_cast<QWidget*>(this->parent())->width() - this->width() - 10;
     else
       xPos = 600;
 
