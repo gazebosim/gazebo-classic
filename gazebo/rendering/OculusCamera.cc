@@ -25,6 +25,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -39,7 +40,7 @@
 using namespace gazebo;
 using namespace rendering;
 
-const float g_defaultNearClip = 0.001f;
+const float g_defaultNearClip = 0.01f;
 const float g_defaultFarClip = 500.0f;
 
 //////////////////////////////////////////////////
@@ -466,6 +467,9 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
 
+  if (this->GetScene()->GetSkyX() != NULL)
+    rt->addListener(this->GetScene()->GetSkyX());
+
   rt = this->dataPtr->renderTextureRight->getBuffer()->getRenderTarget();
   rt->addViewport(this->dataPtr->rightCamera);
   rt->getViewport(0)->setClearEveryFrame(true);
@@ -476,6 +480,9 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   rt->getViewport(0)->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
+
+  if (this->GetScene()->GetSkyX() != NULL)
+    rt->addListener(this->GetScene()->GetSkyX());
 
   ovrFovPort fovLeft = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];
   ovrFovPort fovRight = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Right];
