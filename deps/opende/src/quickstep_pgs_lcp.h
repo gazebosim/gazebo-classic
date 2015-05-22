@@ -44,9 +44,6 @@ void PGS_LCP (dxWorldProcessContext *context,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
   dxQuickStepParameters *qs
-#ifdef USE_TPROW
-  , boost::threadpool::pool* row_threadpool
-#endif
   );
 
 /// \brief Compute the hi and lo bound for cone friction model to project onto

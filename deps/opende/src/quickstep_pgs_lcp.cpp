@@ -20,6 +20,9 @@
 *                                                                       *
 *************************************************************************/
 #include <thread>
+#include <memory>
+#include <mutex>
+#include <condition_variable>
 
 #include <ode/common.h>
 #include <ode/odemath.h>
@@ -49,9 +52,9 @@ std::vector<dReal> errors;
 
 using namespace ode;
 
-static void* ComputeRows(void *p)
+static void ComputeRows(dxPGSLCPParameters *p)
 {
-  dxPGSLCPParameters *params = (dxPGSLCPParameters *)p;
+  dxPGSLCPParameters *params = p;
 
   #ifdef REPORT_THREAD_TIMING
   int thread_id                 = params->thread_id;
@@ -931,8 +934,69 @@ static void* ComputeRows(void *p)
   IFDUMP(h5_write_errors(DATA_FILE, errors.data(), errors.size()));
 #endif
 
-  return NULL;
+  return;
 }
+
+class PersistantThread
+{
+  /// \brief Constructor
+  public: PersistantThread()
+          : stop(false), params(NULL)
+          {
+            std::cout << "New PT\n";
+            this->thread = std::thread(&PersistantThread::Run, this);
+          }
+
+  /// \brief Destructor
+  public: virtual ~PersistantThread()
+          {
+            std::cout << "Delete PT\n";
+            this->stop = true;
+            this->condition.notify_one();
+            this->thread.join();
+            this->finishedCondition.notify_one();
+          }
+
+  /// \brief Run the thread using a loop.
+  public: void Run()
+          {
+            for (;;)
+            {
+              std::unique_lock<std::mutex> lock(this->mutex);
+              this->condition.wait(lock);
+
+              if (this->stop)
+                break;
+              ComputeRows(this->params);
+
+              std::unique_lock<std::mutex> flock(this->finishedMutex);
+              this->finishedCondition.notify_one();
+            }
+          }
+
+  /// \brief True will stop the thread
+  public: bool stop;
+
+  /// \brief The params to pass to ComputeRows
+  public: dxPGSLCPParameters *params;
+
+  /// \brief The thread
+  public: std::thread thread;
+
+  /// \brief Mutex used in conjunction with the condition variable.
+  public: std::mutex mutex;
+  public: std::mutex finishedMutex;
+
+  /// \brief Condition variable used to trigger ComputeRows
+  public: std::condition_variable condition;
+
+  public: std::condition_variable finishedCondition;
+};
+
+// Just using one PersistantThread. It's possible to create a vector of
+// these if more are needed.
+static std::shared_ptr<PersistantThread> g_paramsThread(
+    new PersistantThread());
 
 //***************************************************************************
 // PGS_LCP method was previously SOR_LCP
@@ -956,11 +1020,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
-  dxQuickStepParameters *qs
-#ifdef USE_TPROW
-  , boost::threadpool::pool* row_threadpool
-#endif
-  )
+  dxQuickStepParameters *qs)
 {
 
   // precompute iMJ = inv(M)*J'
@@ -1227,83 +1287,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     int nEnd   = i + chunk + qs->num_overlap;
     if (nEnd > m) nEnd = m;
 
-    std::thread params_erp_thread;
-
-    if (qs->thread_position_correction && params_erp != NULL)
-    {
-      // setup params for ComputeRows
-      IFTIMING (dTimerNow ("start pgs_erp rows"));
-      //////////////////////////////////////////////////////
-      /// repeat for position projection
-      /// setup params_erp for ComputeRows
-      //////////////////////////////////////////////////////
-      params_erp[thread_id].thread_id = thread_id;
-      params_erp[thread_id].order     = order;
-      params_erp[thread_id].body      = body;
-      params_erp[thread_id].mutex     = mutex;
-      params_erp[thread_id].inline_position_correction = false;
-      params_erp[thread_id].position_correction_thread = true;
-#ifdef PENETRATION_JVERROR_CORRECTION
-      params_erp[thread_id].stepsize = stepsize;
-      params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
-#endif
-      params_erp[thread_id].qs  = qs;
-      // if every one reorders constraints, this might just work
-      // comment out below if using defaults (0 and m) so every
-      // thread runs through all joints
-      params_erp[thread_id].nStart = nStart;   // 0
-      params_erp[thread_id].nChunkSize = nEnd - nStart; // m
-      params_erp[thread_id].m = m; // m
-      params_erp[thread_id].nb = nb;
-      params_erp[thread_id].jb = jb;
-      params_erp[thread_id].findex = findex;
-      params_erp[thread_id].skip_friction = false;  // might be a save, but need to test more
-      params_erp[thread_id].hi = hi;
-      params_erp[thread_id].lo = lo;
-      params_erp[thread_id].invMOI = invMOI;
-      params_erp[thread_id].MOI= MOI;
-      params_erp[thread_id].Ad = Ad;
-      params_erp[thread_id].Adcfm = Adcfm;
-      params_erp[thread_id].Adcfm_precon = Adcfm_precon;
-      params_erp[thread_id].J = J;
-      params_erp[thread_id].iMJ = iMJ;
-      params_erp[thread_id].rhs_precon  = rhs_precon;
-      params_erp[thread_id].J_precon  = J_precon;
-      params_erp[thread_id].J_orig  = J_orig;
-      params_erp[thread_id].cforce  = cforce;
-
-      params_erp[thread_id].rhs = rhs_erp;
-      params_erp[thread_id].caccel = caccel_erp;
-      params_erp[thread_id].lambda = lambda_erp;
-
-#ifdef REORDER_CONSTRAINTS
-      params_erp[thread_id].last_lambda  = last_lambda_erp;
-#endif
-
-#ifdef DEBUG_CONVERGENCE_TOLERANCE
-      printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
-        thread_id,i,m,chunk,nStart,nEnd);
-#endif
-
-#ifdef USE_TPROW
-      if (row_threadpool && row_threadpool->size() > 1)
-      {
-        // skip threadpool if less than 2 threads allocated
-        // printf("threading out for params_erp\n");
-        row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&params_erp[thread_id])));
-      }
-      else
-      {
-        params_erp_thread = std::thread(*ComputeRows,
-          (void*)(&(params_erp[thread_id])));
-      }
-#else
-      params_erp_thread = std::thread(*ComputeRows,
-        (void*)(&(params_erp[thread_id])));
-#endif
-    }
-
-
     // setup params for ComputeRows non_erp
     params[thread_id].thread_id = thread_id;
     params[thread_id].order     = order;
@@ -1361,40 +1344,91 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
       thread_id,i,m,chunk,nStart,nEnd);
 #endif
-#ifdef USE_TPROW
-    if (row_threadpool && row_threadpool->size() > 0)
+
+    if (qs->thread_position_correction && params_erp != NULL)
     {
-      // skip threadpool if less than 2 threads allocated
-      // printf("threading out for params\n");
-      row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&(params[thread_id]))));
-    }
-    else
-      ComputeRows((void*)(&(params[thread_id])));
-#else
-    ComputeRows((void*)(&(params[thread_id])));
+      // setup params for ComputeRows
+      IFTIMING (dTimerNow ("start pgs_erp rows"));
+      //////////////////////////////////////////////////////
+      /// repeat for position projection
+      /// setup params_erp for ComputeRows
+      //////////////////////////////////////////////////////
+      params_erp[thread_id].thread_id = thread_id;
+      params_erp[thread_id].order     = order;
+      params_erp[thread_id].body      = body;
+      params_erp[thread_id].mutex     = mutex;
+      params_erp[thread_id].inline_position_correction = false;
+      params_erp[thread_id].position_correction_thread = true;
+#ifdef PENETRATION_JVERROR_CORRECTION
+      params_erp[thread_id].stepsize = stepsize;
+      params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
+#endif
+      params_erp[thread_id].qs  = qs;
+      // if every one reorders constraints, this might just work
+      // comment out below if using defaults (0 and m) so every
+      // thread runs through all joints
+      params_erp[thread_id].nStart = nStart;   // 0
+      params_erp[thread_id].nChunkSize = nEnd - nStart; // m
+      params_erp[thread_id].m = m; // m
+      params_erp[thread_id].nb = nb;
+      params_erp[thread_id].jb = jb;
+      params_erp[thread_id].findex = findex;
+      params_erp[thread_id].skip_friction = false;  // might be a save, but need to test more
+      params_erp[thread_id].hi = hi;
+      params_erp[thread_id].lo = lo;
+      params_erp[thread_id].invMOI = invMOI;
+      params_erp[thread_id].MOI= MOI;
+      params_erp[thread_id].Ad = Ad;
+      params_erp[thread_id].Adcfm = Adcfm;
+      params_erp[thread_id].Adcfm_precon = Adcfm_precon;
+      params_erp[thread_id].J = J;
+      params_erp[thread_id].iMJ = iMJ;
+      params_erp[thread_id].rhs_precon  = rhs_precon;
+      params_erp[thread_id].J_precon  = J_precon;
+      params_erp[thread_id].J_orig  = J_orig;
+      params_erp[thread_id].cforce  = cforce;
+
+      params_erp[thread_id].rhs = rhs_erp;
+      params_erp[thread_id].caccel = caccel_erp;
+      params_erp[thread_id].lambda = lambda_erp;
+
+#ifdef REORDER_CONSTRAINTS
+      params_erp[thread_id].last_lambda  = last_lambda_erp;
 #endif
 
-    if (qs->thread_position_correction && params_erp_thread.joinable())
-    {
-      IFTIMING (dTimerNow ("wait for params_erp threads"));
-      params_erp_thread.join();
-      IFTIMING (dTimerNow ("params_erp threads done"));
-    }
-  }
+#ifdef DEBUG_CONVERGENCE_TOLERANCE
+      printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
+          thread_id,i,m,chunk,nStart,nEnd);
+#endif
 
+      // Set the new parameters
+      g_paramsThread->params = &(params_erp[thread_id]);
+
+      // Grab a lock on the finished mutex
+      std::unique_lock<std::mutex> lockA(g_paramsThread->finishedMutex);
+      {
+        // Grab a lock on the main compute mutex
+        std::unique_lock<std::mutex> innerLock(g_paramsThread->mutex);
+
+        // Trigger the ComputeRows function
+        g_paramsThread->condition.notify_one();
+      }
+
+      // Parallel ComputeRowos
+      ComputeRows(&(params[thread_id]));
+
+      // Wait for the threaded ComputeRows to finish
+      g_paramsThread->finishedCondition.wait(lockA);
+    }
+    else
+      ComputeRows(&(params[thread_id]));
+  }
 
   // check time for scheduling, this is usually very quick
   //gettimeofday(&tv,NULL);
   //double wait_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
   //printf("      quickstep done scheduling start time %f stopped time %f duration %f\n",
   //       cur_time,wait_time,wait_time - cur_time);
-
-#ifdef USE_TPROW
-  IFTIMING (dTimerNow ("wait for threads"));
-  if (row_threadpool && row_threadpool->size() > 0)
-    row_threadpool->wait();
-  IFTIMING (dTimerNow ("threads done"));
-#endif
 
 
   #ifdef REPORT_THREAD_TIMING
