@@ -1217,7 +1217,7 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     // will still be published
     this->SetPaused(true);
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
-    this->dataPtr->stepInc = _data->multi_step();
+    this->dataPtr->stepInc += _data->multi_step();
   }
 }
 
