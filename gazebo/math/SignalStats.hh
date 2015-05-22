@@ -65,6 +65,22 @@ namespace gazebo
     };
     /// \}
 
+    /// \class SignalMaximum SignalStats.hh math/gzmath.hh
+    /// \brief Computing the maximum value of a discretely sampled signal.
+    class GZ_VISIBLE SignalMaximum : public SignalStatistic
+    {
+      // Documentation inherited.
+      public: virtual double Value() const;
+
+      /// \brief Get a short version of the name of this statistical measure.
+      /// \return "max"
+      public: virtual std::string ShortName() const;
+
+      // Documentation inherited.
+      public: virtual void InsertData(const double _data);
+    };
+    /// \}
+
     /// \class SignalMean SignalStats.hh math/gzmath.hh
     /// \brief Computing the mean value of a discretely sampled signal.
     class GZ_MATH_VISIBLE SignalMean : public SignalStatistic
@@ -74,6 +90,22 @@ namespace gazebo
 
       /// \brief Get a short version of the name of this statistical measure.
       /// \return "mean"
+      public: virtual std::string ShortName() const;
+
+      // Documentation inherited.
+      public: virtual void InsertData(const double _data);
+    };
+    /// \}
+
+    /// \class SignalMinimum SignalStats.hh math/gzmath.hh
+    /// \brief Computing the minimum value of a discretely sampled signal.
+    class GZ_VISIBLE SignalMinimum : public SignalStatistic
+    {
+      // Documentation inherited.
+      public: virtual double Value() const;
+
+      /// \brief Get a short version of the name of this statistical measure.
+      /// \return "min"
       public: virtual std::string ShortName() const;
 
       // Documentation inherited.

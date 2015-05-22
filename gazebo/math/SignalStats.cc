@@ -53,6 +53,28 @@ void SignalStatistic::Reset()
 }
 
 //////////////////////////////////////////////////
+double SignalMaximum::Value() const
+{
+  return this->dataPtr->data;
+}
+
+//////////////////////////////////////////////////
+std::string SignalMaximum::ShortName() const
+{
+  return "max";
+}
+
+//////////////////////////////////////////////////
+void SignalMaximum::InsertData(const double _data)
+{
+  if (this->dataPtr->count == 0 || _data > this->dataPtr->data)
+  {
+    this->dataPtr->data = _data;
+  }
+  this->dataPtr->count++;
+}
+
+//////////////////////////////////////////////////
 double SignalMean::Value() const
 {
   if (this->dataPtr->count == 0)
@@ -72,6 +94,28 @@ std::string SignalMean::ShortName() const
 void SignalMean::InsertData(const double _data)
 {
   this->dataPtr->data += _data;
+  this->dataPtr->count++;
+}
+
+//////////////////////////////////////////////////
+double SignalMinimum::Value() const
+{
+  return this->dataPtr->data;
+}
+
+//////////////////////////////////////////////////
+std::string SignalMinimum::ShortName() const
+{
+  return "min";
+}
+
+//////////////////////////////////////////////////
+void SignalMinimum::InsertData(const double _data)
+{
+  if (this->dataPtr->count == 0 || _data < this->dataPtr->data)
+  {
+    this->dataPtr->data = _data;
+  }
   this->dataPtr->count++;
 }
 
@@ -202,7 +246,7 @@ bool SignalStats::InsertStatistic(const std::string &_name)
 {
   // Check if the statistic is already inserted
   {
-    std::map<std::string, double> map = this->Map();
+    auto map = this->Map();
     if (map.find(_name) != map.end())
     {
       std::cerr << "Unable to InsertStatistic ["
@@ -214,25 +258,29 @@ bool SignalStats::InsertStatistic(const std::string &_name)
   }
 
   SignalStatisticPtr stat;
-  if (_name == "maxAbs")
+  if (_name == "max")
+  {
+    stat.reset(new SignalMaximum());
+  }
+  else if (_name == "maxAbs")
   {
     stat.reset(new SignalMaxAbsoluteValue());
-    this->dataPtr->stats.push_back(stat);
   }
   else if (_name == "mean")
   {
     stat.reset(new SignalMean());
-    this->dataPtr->stats.push_back(stat);
+  }
+  else if (_name == "min")
+  {
+    stat.reset(new SignalMinimum());
   }
   else if (_name == "rms")
   {
     stat.reset(new SignalRootMeanSquare());
-    this->dataPtr->stats.push_back(stat);
   }
   else if (_name == "var")
   {
     stat.reset(new SignalVariance());
-    this->dataPtr->stats.push_back(stat);
   }
   else
   {
@@ -243,6 +291,7 @@ bool SignalStats::InsertStatistic(const std::string &_name)
               << std::endl;
     return false;
   }
+  this->dataPtr->stats.push_back(stat);
   return true;
 }
 
