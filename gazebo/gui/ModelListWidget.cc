@@ -237,6 +237,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     else
     {
       this->propTreeBrowser->clear();
+std::cout << "ModelList" << std::endl;
       event::Events::setSelectedEntity(name, "normal");
     }
   }

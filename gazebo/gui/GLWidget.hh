@@ -78,7 +78,7 @@ namespace gazebo
 
       /// \brief QT signal to notify when we received a selection msg.
       /// \param[in] _name Name of the selected entity.
-      signals: void selectionMsgReceived(const QString &_name);
+      signals: void selectionMsgReceived(const QString &_name, bool _selected);
 
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
@@ -157,10 +157,21 @@ namespace gazebo
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
 
+      /// \brief Clips the name and calls SetSelectedVisual if the visual is
+      /// not selected yet.
+      /// \param[in] _name Name containing the world's name
+      /// \param[in] _mode Normal, translate, rotate, etc...
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
+      /// \brief Callback when a selection message has been received.
+      /// \param[in] _msg Selection message which was received.
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
+
+      /// \brief Callback when a selection message has been received.
+      /// \param[in] _msg Selection message which was received.
+      private: void PublishSelectionMsg(rendering::VisualPtr _vis,
+          bool _selected = true);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
 
@@ -172,7 +183,13 @@ namespace gazebo
 
       /// \brief Set the selected visual, which will highlight the
       /// visual
+      /// \param[in] _vis Pointer to the visual.
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
+
+      /// \brief Set the selected visual, which will highlight the
+      /// visual
+      /// \param[in] _vis Pointer to the visual.
+      private: void DeselectVisual(rendering::VisualPtr _vis);
 
       /// \brief Deselect all visuals, removing highlight and publishing message
       private: void DeselectAllVisuals();
@@ -207,7 +224,8 @@ namespace gazebo
 
       /// \brief Qt callback when a selection msg is received.
       /// \param[in] The name of the selected entity.
-      private slots: void OnSelectionMsgEvent(const QString &_name);
+      private slots: void OnSelectionMsgEvent(const QString &_name,
+          bool _selected);
 
       /// \brief QT Callback that turns on orthographic projection
       private slots: void OnOrtho();
