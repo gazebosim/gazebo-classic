@@ -17,6 +17,7 @@
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
+#include <gazebo/gui/Actions.hh>
 #include "FoosballGUIPlugin.hh"
 
 using namespace gazebo;
@@ -160,6 +161,9 @@ void FoosballGUIPlugin::Load(sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_sdf, "FoosballGUIPlugin _sdf pointer is NULL");
   this->sdf = _sdf;
+
+  gui::Events::fullScreen(true);
+  gui::Events::showToolbars(false);
 }
 
 /////////////////////////////////////////////////
