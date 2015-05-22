@@ -885,9 +885,8 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
     this->ActivateWindow();
     return true;
   }
-
   // Link clicked: activate dialog and propagate event
-  if (vis->GetNthAncestor(2) ==
+  else if (vis->GetNthAncestor(2) ==
       this->dataPtr->applyWrenchVisual->GetNthAncestor(2))
   {
     this->ActivateWindow();
