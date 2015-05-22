@@ -67,7 +67,7 @@ namespace gazebo
 
     /// \class SignalMaximum SignalStats.hh math/gzmath.hh
     /// \brief Computing the maximum value of a discretely sampled signal.
-    class GZ_VISIBLE SignalMaximum : public SignalStatistic
+    class GZ_MATH_VISIBLE SignalMaximum : public SignalStatistic
     {
       // Documentation inherited.
       public: virtual double Value() const;
@@ -99,7 +99,7 @@ namespace gazebo
 
     /// \class SignalMinimum SignalStats.hh math/gzmath.hh
     /// \brief Computing the minimum value of a discretely sampled signal.
-    class GZ_VISIBLE SignalMinimum : public SignalStatistic
+    class GZ_MATH_VISIBLE SignalMinimum : public SignalStatistic
     {
       // Documentation inherited.
       public: virtual double Value() const;
