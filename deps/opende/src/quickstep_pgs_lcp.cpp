@@ -48,7 +48,6 @@ std::vector<dReal> errors;
 #endif   //timing
 
 using namespace ode;
-
 static void* ComputeRows(void *p)
 {
   dxPGSLCPParameters *params = (dxPGSLCPParameters *)p;
@@ -1295,7 +1294,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       else
       {
         params_erp_thread = std::thread(*ComputeRows,
-    (void*)(&(params_erp[thread_id])));
+          (void*)(&(params_erp[thread_id])));
       }
 #else
       params_erp_thread = std::thread(*ComputeRows,
