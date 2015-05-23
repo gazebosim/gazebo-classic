@@ -149,8 +149,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->skeletonPoseSub =
       this->dataPtr->node->Subscribe("~/skeleton_pose/info",
       &Scene::OnSkeletonPoseMsg, this);
-  this->dataPtr->selectionSub = this->dataPtr->node->Subscribe("~/selection",
-      &Scene::OnSelectionMsg, this);
   this->dataPtr->skySub =
       this->dataPtr->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
   this->dataPtr->modelInfoSub = this->dataPtr->node->Subscribe("~/model/info",
@@ -199,7 +197,6 @@ void Scene::Clear()
   this->dataPtr->sensorSub.reset();
   this->dataPtr->sceneSub.reset();
   this->dataPtr->skeletonPoseSub.reset();
-  this->dataPtr->selectionSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
   this->dataPtr->lightSub.reset();
@@ -209,7 +206,6 @@ void Scene::Clear()
   this->dataPtr->lightPub.reset();
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
-  this->dataPtr->selectionMsg.reset();
 
   this->dataPtr->joints.clear();
 
@@ -1905,15 +1901,6 @@ void Scene::PreRender()
     // official time stamp of approval
     this->dataPtr->sceneSimTimePosesApplied =
         this->dataPtr->sceneSimTimePosesReceived;
-
-    if (this->dataPtr->selectionMsg)
-    {
-      if (!this->dataPtr->selectedVis ||
-          this->dataPtr->selectionMsg->name() !=
-          this->dataPtr->selectedVis->GetName())
-        this->SelectVisual(this->dataPtr->selectionMsg->name(), "normal");
-      this->dataPtr->selectionMsg.reset();
-    }
   }
 }
 
@@ -2565,12 +2552,6 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
   }
 
   return true;
-}
-
-/////////////////////////////////////////////////
-void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
-{
-  this->dataPtr->selectionMsg = _msg;
 }
 
 /////////////////////////////////////////////////
