@@ -97,7 +97,7 @@ void SelectionObj::Fini()
     return;
 
   // transVisual / rotVisual / scaleVisual
-  for (auto i = 0; i < this->GetChildCount(); ++i)
+  for (unsigned int i = 0; i < this->GetChildCount(); ++i)
   {
     if (!this->GetChild(i))
       continue;
