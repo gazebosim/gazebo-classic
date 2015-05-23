@@ -18,7 +18,6 @@
 #include <sys/time.h>
 #include <gtest/gtest.h>
 
-#include "gazebo/common/Timer.hh"
 #include "gazebo/common/Time.hh"
 #include "test/util.hh"
 
@@ -28,11 +27,6 @@ class TimeTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(TimeTest, Time)
 {
-  common::Timer timer;
-  timer.Start();
-  common::Time::MSleep(100);
-  EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
-
   struct timeval tv;
   gettimeofday(&tv, NULL);
   common::Time time(tv);

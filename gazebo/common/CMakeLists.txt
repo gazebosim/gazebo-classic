@@ -138,6 +138,7 @@ set (gtest_sources
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
+  Timer_TEST.cc
 )
 
 if (HAVE_GTS)
