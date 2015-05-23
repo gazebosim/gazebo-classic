@@ -76,10 +76,6 @@ namespace gazebo
 
       signals: void clicked();
 
-      /// \brief QT signal to notify when we received a selection msg.
-      /// \param[in] _name Name of the selected entity.
-      signals: void selectionMsgReceived(const QString &_name);
-
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
@@ -157,14 +153,13 @@ namespace gazebo
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
 
+      /// \brief Callback for a select entity event.
+      /// \param[in] _name Entity name.
+      /// \param[in] _mode Selection mode.
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
-
       private: bool eventFilter(QObject *_obj, QEvent *_event);
-
-      private: void ClearSelection();
 
       private: void PushHistory(const std::string &_visName,
                                 const math::Pose &_pose);
@@ -172,7 +167,13 @@ namespace gazebo
 
       /// \brief Set the selected visual, which will highlight the
       /// visual
+      /// \param[in] _vis Pointer to the visual.
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
+
+      /// \brief Set the selected visual, which will highlight the
+      /// visual
+      /// \param[in] _vis Pointer to the visual.
+      private: void DeselectVisual(rendering::VisualPtr _vis);
 
       /// \brief Deselect all visuals, removing highlight and publishing message
       private: void DeselectAllVisuals();
@@ -205,10 +206,6 @@ namespace gazebo
       /// \param[in] _checked True if the model editor was checked.
       private slots: void OnModelEditor(bool _checked);
 
-      /// \brief Qt callback when a selection msg is received.
-      /// \param[in] The name of the selected entity.
-      private slots: void OnSelectionMsgEvent(const QString &_name);
-
       /// \brief QT Callback that turns on orthographic projection
       private slots: void OnOrtho();
 
@@ -240,8 +237,6 @@ namespace gazebo
       /// \brief Light maker
       private: LightMaker lightMaker;
 
-      private: rendering::VisualPtr hoverVis;
-
       /// \brief A list of selected visuals.
       private: std::vector<rendering::VisualPtr> selectedVisuals;
 
@@ -254,7 +249,7 @@ namespace gazebo
       /// \brief Publishes information about user selections.
       private: transport::PublisherPtr selectionPub;
 
-      private: transport::SubscriberPtr selectionSub, requestSub;
+      private: transport::SubscriberPtr requestSub;
 
       private: std::string keyText;
       private: Qt::KeyboardModifiers keyModifiers;

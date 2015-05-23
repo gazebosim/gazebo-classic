@@ -118,12 +118,6 @@ void SonarVisual::Update()
     return;
 
   // Skip the update if the user is moving the sonar.
-  if (this->GetScene()->GetSelectedVisual() &&
-      this->GetRootVisual()->GetName() ==
-      this->GetScene()->GetSelectedVisual()->GetName())
-  {
-    return;
-  }
 
   float rangeDelta = dPtr->sonarMsg->sonar().range_max()
       - dPtr->sonarMsg->sonar().range_min();

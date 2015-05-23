@@ -91,12 +91,6 @@ void LaserVisual::Update()
   boost::mutex::scoped_lock lock(dPtr->mutex);
 
   // Skip the update if the user is moving the laser.
-  if ((this->GetScene()->GetSelectedVisual() &&
-      this->GetRootVisual()->GetName() ==
-      this->GetScene()->GetSelectedVisual()->GetName()))
-  {
-    return;
-  }
 
   if (!dPtr->laserMsg || !dPtr->receivedMsg)
     return;

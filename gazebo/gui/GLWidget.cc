@@ -128,10 +128,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
 
-  // Subscribes to selection messages.
-  this->selectionSub = this->node->Subscribe("~/selection",
-      &GLWidget::OnSelectionMsg, this);
-
   // Publishes information about user selections.
   this->selectionPub =
     this->node->Advertise<msgs::Selection>("~/selection");
@@ -159,9 +155,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this,
       SLOT(OnModelEditor(bool)));
-
-  connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
-      SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
 
   // Connect the ortho action
   connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
@@ -203,7 +196,6 @@ GLWidget::~GLWidget()
   this->connections.clear();
   this->node.reset();
   this->modelPub.reset();
-  this->selectionSub.reset();
   this->selectionPub.reset();
 
   ModelManipulator::Instance()->Clear();
@@ -794,12 +786,11 @@ void GLWidget::OnMouseReleaseNormal()
       {
         // Can't select a link and a model at the same time
         if (this->selectionLevel == SelectionLevels::LINK)
-          this->DeselectAllVisuals();
+          event::Events::setSelectedEntity("", "normal");
 
         selectVis = modelVis;
         this->selectionLevel = SelectionLevels::MODEL;
       }
-      this->SetSelectedVisual(selectVis);
       event::Events::setSelectedEntity(selectVis->GetName(), "normal");
 
       // Open context menu
@@ -818,7 +809,7 @@ void GLWidget::OnMouseReleaseNormal()
       }
     }
     else
-      this->SetSelectedVisual(rendering::VisualPtr());
+      event::Events::setSelectedEntity("", "normal");
   }
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
@@ -896,8 +887,6 @@ void GLWidget::Clear()
   gui::clear_active_camera();
   this->userCamera.reset();
   this->scene.reset();
-  this->SetSelectedVisual(rendering::VisualPtr());
-  this->hoverVis.reset();
   this->keyModifiers = 0;
 }
 
@@ -943,9 +932,6 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::OnCreateScene(const std::string &_name)
 {
-  this->hoverVis.reset();
-  this->SetSelectedVisual(rendering::VisualPtr());
-
   this->ViewScene(rendering::get_scene(_name));
 
   ModelManipulator::Instance()->Init();
@@ -967,7 +953,7 @@ void GLWidget::OnMoveMode(bool _mode)
 void GLWidget::OnCreateEntity(const std::string &_type,
                               const std::string &_data)
 {
-  this->ClearSelection();
+  event::Events::setSelectedEntity("", "normal");
 
   if (this->entityMaker)
     this->entityMaker->Stop();
@@ -1036,21 +1022,6 @@ void GLWidget::OnOrbit()
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
-{
-  if (_msg->has_selected() && _msg->selected())
-  {
-    this->selectionMsgReceived(QString(_msg->name().c_str()));
-  }
-}
-
-/////////////////////////////////////////////////
-void GLWidget::OnSelectionMsgEvent(const QString &_name)
-{
-  this->OnSetSelectedEntity(_name.toStdString(), "normal");
-}
-
-/////////////////////////////////////////////////
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
   // deselect all if not in multi-selection mode.
@@ -1061,15 +1032,17 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 
   boost::mutex::scoped_lock lock(this->selectedVisMutex);
 
-  msgs::Selection msg;
+  g_copyAct->setEnabled(false);
 
   if (_vis && !_vis->IsPlane())
   {
+    // Set selection level
     if (_vis == _vis->GetRootVisual())
       this->selectionLevel = SelectionLevels::MODEL;
     else
       this->selectionLevel = SelectionLevels::LINK;
 
+    // Highlight
     _vis->SetHighlighted(true);
 
     // enable multi-selection if control is pressed
@@ -1088,35 +1061,59 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
         this->selectedVisuals.push_back(vis);
       }
     }
+
+    // Enable copying
     g_copyAct->setEnabled(true);
 
+    // Publish selection message
+    msgs::Selection msg;
     msg.set_id(_vis->GetId());
     msg.set_name(_vis->GetName());
     msg.set_selected(true);
     this->selectionPub->Publish(msg);
   }
-  else if (g_copyAct)
-  {
-    g_copyAct->setEnabled(false);
-  }
 
+  // Enable aligning
   if (g_alignAct)
     g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
+}
+
+////////////////////////////////////////////////
+void GLWidget::DeselectVisual(rendering::VisualPtr _vis)
+{
+  if (!_vis)
+    return;
+
+  boost::mutex::scoped_lock lock(this->selectedVisMutex);
+
+  // Default selection level
+  this->selectionLevel = SelectionLevels::MODEL;
+
+  // Remove highlight
+  _vis->SetHighlighted(false);
+
+  // Erase from list
+  auto it = std::find(this->selectedVisuals.begin(),
+      this->selectedVisuals.end(), _vis);
+  if (it == this->selectedVisuals.end())
+    this->selectedVisuals.erase(it);
+
+  // Publish selection message
+  msgs::Selection msg;
+  msg.set_id(_vis->GetId());
+  msg.set_name(_vis->GetName());
+  msg.set_selected(false);
+  this->selectionPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void GLWidget::DeselectAllVisuals()
 {
-  boost::mutex::scoped_lock lock(this->selectedVisMutex);
+  // boost::mutex::scoped_lock lock(this->selectedVisMutex);
 
-  msgs::Selection msg;
   for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
   {
-    this->selectedVisuals[i]->SetHighlighted(false);
-    msg.set_id(this->selectedVisuals[i]->GetId());
-    msg.set_name(this->selectedVisuals[i]->GetName());
-    msg.set_selected(false);
-    this->selectionPub->Publish(msg);
+    this->DeselectVisual(this->selectedVisuals[i]);
   }
   this->selectedVisuals.clear();
 }
@@ -1191,7 +1188,7 @@ void GLWidget::Paste(const std::string &_name)
 
     if (isLight || isModel)
     {
-      this->ClearSelection();
+      event::Events::setSelectedEntity("", "normal");
       if (this->entityMaker)
         this->entityMaker->Stop();
 
@@ -1216,48 +1213,35 @@ void GLWidget::Paste(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::ClearSelection()
-{
-  if (this->hoverVis)
-  {
-    this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-    this->hoverVis.reset();
-  }
-
-  this->SetSelectedVisual(rendering::VisualPtr());
-
-  this->scene->SelectVisual("", "normal");
-}
-
-/////////////////////////////////////////////////
 void GLWidget::OnSetSelectedEntity(const std::string &_name,
                                    const std::string &_mode)
 {
   if (!_name.empty())
   {
+    // Clip off world name - is this still needed?
     std::string name = _name;
     boost::replace_first(name, gui::get_world()+"::", "");
 
+    // Get visual from name
     rendering::VisualPtr selection = this->scene->GetVisual(name);
 
-    std::vector<rendering::VisualPtr>::iterator it =
-      std::find(this->selectedVisuals.begin(),
-          this->selectedVisuals.end(), selection);
+    // Select visual
+    this->SetSelectedVisual(selection);
 
-    // Shortcircuit the case when GLWidget already selected the visual.
-    if (it == this->selectedVisuals.end() || _name != (*it)->GetName())
-    {
-      this->SetSelectedVisual(selection);
-      this->scene->SelectVisual(name, _mode);
-    }
+    // Accept updates according to mode
+    if (_mode == "move")
+      this->scene->SetVisualAcceptsUpdates(_name, false);
+    else
+      this->scene->SetVisualAcceptsUpdates("", true);
   }
   else if (!this->selectedVisuals.empty())
   {
+    // Deselect all
     this->SetSelectedVisual(rendering::VisualPtr());
-    this->scene->SelectVisual("", _mode);
-  }
 
-  this->hoverVis.reset();
+    // All accept updates
+    this->scene->SetVisualAcceptsUpdates("", true);
+  }
 }
 
 /////////////////////////////////////////////////

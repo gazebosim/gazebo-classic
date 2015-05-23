@@ -196,8 +196,11 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       }
     }
     this->dataPtr->originalVisualPose.clear();
-    if (this->dataPtr->scene)
-      this->dataPtr->scene->SelectVisual("", "normal");
+
+    event::Events::setSelectedEntity("", "normal");
+  //  if (this->dataPtr->scene)
+   //   this->dataPtr->scene->SelectVisual("", "normal");
+
     if (!_publish)
       return;
   }
@@ -267,8 +270,10 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
         this->SetHighlighted(vis, true);
       }
       // prevent the visual pose from being updated by the server
-      if (this->dataPtr->scene)
-        this->dataPtr->scene->SelectVisual(vis->GetName(), "move");
+      event::Events::setSelectedEntity(vis->GetName(), "move");
+
+      //if (this->dataPtr->scene)
+        //this->dataPtr->scene->SelectVisual(vis->GetName(), "move");
     }
 
     if (_axis == "x")

@@ -193,9 +193,6 @@ namespace gazebo
       /// \brief List of skeleton message to process.
       public: SkeletonPoseMsgs_L skeletonPoseMsgs;
 
-      /// \brief A message used to select an object.
-      public: boost::shared_ptr<msgs::Selection const> selectionMsg;
-
       /// \brief Mutex to lock the various message buffers.
       public: boost::mutex *receiveMutex;
 
@@ -225,9 +222,6 @@ namespace gazebo
 
       /// \brief Subscribe to joint updates.
       public: transport::SubscriberPtr jointSub;
-
-      /// \brief Subscribe to selection updates.
-      public: transport::SubscriberPtr selectionSub;
 
       /// \brief Subscribe to reponses.
       public: transport::SubscriberPtr responseSub;
@@ -318,6 +312,8 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      public: std::vector<std::string> visualsNotToUpdate;
     };
   }
 }

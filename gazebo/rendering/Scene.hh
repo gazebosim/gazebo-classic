@@ -244,12 +244,6 @@ namespace gazebo
       /// \return Pointer to the visual, NULL if not found.
       public: VisualPtr GetVisual(uint32_t _id) const;
 
-      /// \brief Select a visual by name.
-      /// \param[in] _name Name of the visual to select.
-      /// \param[in] _mode Selection mode (normal, or move).
-      public: void SelectVisual(const std::string &_name,
-                                const std::string &_mode);
-
       /// \brief Get an entity at a pixel location using a camera. Used for
       ///        mouse picking.
       /// \param[in] _camera The ogre camera, used to do mouse picking
@@ -400,11 +394,6 @@ namespace gazebo
       /// \brief Clear rendering::Scene
       public: void Clear();
 
-      /// \brief Get the currently selected visual.
-      /// \return Pointer to the currently selected visual, or NULL if
-      /// nothing is selected.
-      public: VisualPtr GetSelectedVisual() const;
-
       /// \brief Enable or disable wireframe for all visuals.
       /// \param[in] _show True to enable wireframe for all visuals.
       public: void SetWireframe(bool _show);
@@ -474,6 +463,15 @@ namespace gazebo
       /// toggled. Visuals with a negative layer index are always visible.
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
+
+      /// \brief Toggle layer visilibility. This will process all visuals.
+      /// If a visual is on the specified layer its visiblity will be
+      /// toggled. Visuals with a negative layer index are always visible.
+      /// \param[in] _layer Index of the layer to toggle.
+      public: void SetVisualAcceptsUpdates(const std::string &_name,
+          bool _accept);
+
+      public: bool GetVisualAcceptsUpdates(const std::string &_name);
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();
@@ -576,10 +574,6 @@ namespace gazebo
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
       private: void ProcessRequestMsg(ConstRequestPtr &_msg);
-
-      /// \brief Selection message callback.
-      /// \param[in] _msg The message data.
-      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       /// \brief Sky message callback.
       /// \param[in] _msg The message data.

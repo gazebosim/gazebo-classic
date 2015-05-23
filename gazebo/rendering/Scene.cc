@@ -149,8 +149,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->skeletonPoseSub =
       this->dataPtr->node->Subscribe("~/skeleton_pose/info",
       &Scene::OnSkeletonPoseMsg, this);
-  this->dataPtr->selectionSub = this->dataPtr->node->Subscribe("~/selection",
-      &Scene::OnSelectionMsg, this);
   this->dataPtr->skySub =
       this->dataPtr->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
   this->dataPtr->modelInfoSub = this->dataPtr->node->Subscribe("~/model/info",
@@ -175,7 +173,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   sdf::initFile("scene.sdf", this->dataPtr->sdf);
 
   this->dataPtr->terrain = NULL;
-  this->dataPtr->selectedVis.reset();
 
   this->dataPtr->sceneSimTimePosesApplied = common::Time();
   this->dataPtr->sceneSimTimePosesReceived = common::Time();
@@ -199,7 +196,6 @@ void Scene::Clear()
   this->dataPtr->sensorSub.reset();
   this->dataPtr->sceneSub.reset();
   this->dataPtr->skeletonPoseSub.reset();
-  this->dataPtr->selectionSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
   this->dataPtr->lightSub.reset();
@@ -209,7 +205,6 @@ void Scene::Clear()
   this->dataPtr->lightPub.reset();
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
-  this->dataPtr->selectionMsg.reset();
 
   this->dataPtr->joints.clear();
 
@@ -741,19 +736,6 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 uint32_t Scene::GetVisualCount() const
 {
   return this->dataPtr->visuals.size();
-}
-
-//////////////////////////////////////////////////
-void Scene::SelectVisual(const std::string &_name, const std::string &_mode)
-{
-  this->dataPtr->selectedVis = this->GetVisual(_name);
-  this->dataPtr->selectionMode = _mode;
-}
-
-//////////////////////////////////////////////////
-VisualPtr Scene::GetSelectedVisual() const
-{
-  return this->dataPtr->selectedVis;
 }
 
 //////////////////////////////////////////////////
@@ -1848,10 +1830,8 @@ void Scene::PreRender()
       Visual_M::iterator iter = this->dataPtr->visuals.find(pIter->first);
       if (iter != this->dataPtr->visuals.end() && iter->second)
       {
-        // If an object is selected, don't let the physics engine move it.
-        if (!this->dataPtr->selectedVis
-            || this->dataPtr->selectionMode != "move" ||
-            iter->first != this->dataPtr->selectedVis->GetId())
+        // See if visual accepts updates
+        if (this->GetVisualAcceptsUpdates(iter->second->GetName()))
         {
           math::Pose pose = msgs::Convert(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
@@ -1880,10 +1860,8 @@ void Scene::PreRender()
           Visual_M::iterator iter2 = this->dataPtr->visuals.find(pose_msg.id());
           if (iter2 != this->dataPtr->visuals.end())
           {
-            // If an object is selected, don't let the physics engine move it.
-            if (!this->dataPtr->selectedVis ||
-                this->dataPtr->selectionMode != "move" ||
-                iter->first != this->dataPtr->selectedVis->GetId())
+            // See if visual accepts updates
+            if (this->GetVisualAcceptsUpdates(iter2->second->GetName()))
             {
               math::Pose pose = msgs::Convert(pose_msg);
               iter2->second->SetPose(pose);
@@ -1905,15 +1883,6 @@ void Scene::PreRender()
     // official time stamp of approval
     this->dataPtr->sceneSimTimePosesApplied =
         this->dataPtr->sceneSimTimePosesReceived;
-
-    if (this->dataPtr->selectionMsg)
-    {
-      if (!this->dataPtr->selectedVis ||
-          this->dataPtr->selectionMsg->name() !=
-          this->dataPtr->selectedVis->GetName())
-        this->SelectVisual(this->dataPtr->selectionMsg->name(), "normal");
-      this->dataPtr->selectionMsg.reset();
-    }
   }
 }
 
@@ -2568,12 +2537,6 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
-{
-  this->dataPtr->selectionMsg = _msg;
-}
-
-/////////////////////////////////////////////////
 void Scene::OnModelMsg(ConstModelPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
@@ -2837,9 +2800,6 @@ void Scene::RemoveVisual(uint32_t _id)
 
     vis->Fini();
     this->dataPtr->visuals.erase(iter);
-    if (this->dataPtr->selectedVis && this->dataPtr->selectedVis->GetId() ==
-        vis->GetId())
-      this->dataPtr->selectedVis.reset();
   }
 }
 
@@ -3130,4 +3090,36 @@ void Scene::ToggleLayer(const int32_t _layer)
   {
     visual.second->ToggleLayer(_layer);
   }
+}
+
+/////////////////////////////////////////////////
+void Scene::SetVisualAcceptsUpdates(const std::string &_name, bool _accept)
+{
+  auto it = std::find(this->dataPtr->visualsNotToUpdate.begin(),
+      this->dataPtr->visualsNotToUpdate.end(), _name);
+
+  // Add visual to not to update list
+  if (it == this->dataPtr->visualsNotToUpdate.end() && !_accept)
+  {
+    this->dataPtr->visualsNotToUpdate.push_back(_name);
+  }
+  // Remove visual from list
+  else if (it != this->dataPtr->visualsNotToUpdate.end() && _accept)
+  {
+    this->dataPtr->visualsNotToUpdate.erase(it);
+  }
+  // If an empty name is given, all visuals can accept updates
+  else if (_name.empty() && _accept)
+  {
+    this->dataPtr->visualsNotToUpdate.clear();
+  }
+}
+
+/////////////////////////////////////////////////
+bool Scene::GetVisualAcceptsUpdates(const std::string &_name)
+{
+  auto it = std::find(this->dataPtr->visualsNotToUpdate.begin(),
+      this->dataPtr->visualsNotToUpdate.end(), _name);
+
+  return (it == this->dataPtr->visualsNotToUpdate.end());
 }
