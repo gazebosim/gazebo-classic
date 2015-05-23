@@ -82,6 +82,9 @@ compilation on Windows.
    Added Window menu to Model Editor.
     * [Pull request #1584](https://bitbucket.org/osrf/gazebo/pull-request/1584)
 
+1. Added event to show/hide toolbars.
+    * [Pull request #1707](https://bitbucket.org/osrf/gazebo/pull-request/1707)
+
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
