@@ -188,6 +188,10 @@ bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
         iter != this->objects.end(); ++iter)
   {
     physics::ModelPtr model = iter->second->model;
+    if (!model)
+    {
+      return false;
+    }
     math::Pose pose;
     Pose_M::iterator poseIter = arrangement.find(iter->first);
     if (poseIter != arrangement.end())
@@ -207,4 +211,3 @@ bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
   }
   return true;
 }
-
