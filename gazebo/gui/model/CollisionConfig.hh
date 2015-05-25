@@ -130,7 +130,7 @@ namespace gazebo
       /// \brief A map of collision items to their id.
       private: std::map<int, QTreeWidgetItem *> collisionItems;
 
-      /// \brief Layout which holds all visual items.
+      /// \brief Layout which holds all collision items.
       private: QVBoxLayout *listLayout;
     };
     /// \}
