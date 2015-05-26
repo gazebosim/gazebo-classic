@@ -7,6 +7,10 @@
       </camera>
     </gui>
 
+    <scene>
+      <ambient> 0.25 0.3 0.5 1</ambient>
+    </scene>
+
     <include>
       <uri>model://sun</uri>
     </include>
@@ -41,7 +45,7 @@
             </box>
           </geometry>
         </collision>
-        <visual name="visual">
+        <!--<visual name="visual">
           <cast_shadows>false</cast_shadows>
           <geometry>
             <box>
@@ -54,7 +58,7 @@
               <name>Gazebo/BlueTransparent</name>
             </script>
           </material>
-        </visual>
+        </visual>-->
       </link>
     </model>
 
