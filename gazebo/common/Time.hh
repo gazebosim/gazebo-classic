@@ -424,7 +424,6 @@ namespace gazebo
       /// preserve the internal seconds and nanoseconds separation
       private: inline void Correct()
                {
-                 const int32_t nsInSec = 1000000000;
                  // In the case sec and nsec have different signs, normalize
                  if (this->sec > 0 && this->nsec < 0)
                  {
