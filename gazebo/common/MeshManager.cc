@@ -493,6 +493,22 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     gzerr << "GTS library not found. Can not extrude polyline" << std::endl;
     return;
   #endif
+  auto polys = _polys;
+  // close all the loops
+  for (auto &poly : polys)
+  {
+    // does the poly ends with the first point?
+    auto first = poly[0];
+    auto last = poly[poly.size()-1];
+    double d = (first.x - last.x) * (first.x - last.x);
+    d += (first.y - last.y) * (first.y - last.y);
+    // within range
+    if (d >  tol * tol )
+    {
+      // add the first point at the end
+      poly.push_back(first);
+    }
+  }
 
   if (this->HasMesh(_name))
   {
@@ -508,7 +524,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
 
   std::vector<math::Vector2d> vertices;
   std::vector<math::Vector2i> edges;
-  MeshManager::ConvertPolylinesToVerticesAndEdges(_polys,
+  MeshManager::ConvertPolylinesToVerticesAndEdges(polys,
                                                   tol,
                                                   vertices,
                                                   edges);
