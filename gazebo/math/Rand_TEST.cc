@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ TEST_F(RandTest, Rand)
   EXPECT_GE(i, 1);
 
   i = math::Rand::GetIntNormal(2, 3);
+  EXPECT_LE(i, GZ_INT32_MAX);
+  EXPECT_GE(i, -GZ_INT32_MAX);
 
   // Test setting the random number seed
   {

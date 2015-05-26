@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ class Factory : public WorldPlugin
           </model>\
         </sdf>");
     // Demonstrate using a custom model name.
-    sdf::ElementPtr model = sphereSDF.root->GetElement("model");
+    sdf::ElementPtr model = sphereSDF.Root()->GetElement("model");
     model->GetAttribute("name")->SetFromString("unique_sphere");
     _parent->InsertModelSDF(sphereSDF);
 

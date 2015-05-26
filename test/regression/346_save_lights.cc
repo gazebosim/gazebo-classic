@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <gazebo/rendering/rendering.hh>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -31,7 +31,7 @@ TEST_F(Issue346Test, SaveLights)
 {
   Load("worlds/empty.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   std::string spotLightName = "spot_light";
   math::Vector3 spotLightPos(1, 2, 5);
@@ -58,13 +58,13 @@ TEST_F(Issue346Test, SaveLights)
   sdf::SDFPtr sdf(new sdf::SDF);
   ASSERT_TRUE(sdf::init(sdf));
   ASSERT_TRUE(sdf::readFile(common::find_file(filenameOut), sdf));
-  ASSERT_TRUE(sdf->root);
+  ASSERT_TRUE(sdf->Root() != NULL);
 
   // Verify there is one spot light and one point light
   int hasSpotLight = 0;
   int hasPointLight = 0;
-  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
-  ASSERT_TRUE(worldElem);
+  sdf::ElementPtr worldElem = sdf->Root()->GetElement("world");
+  ASSERT_TRUE(worldElem != NULL);
   sdf::ElementPtr lightElem = worldElem->GetElement("light");
   while (lightElem)
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,4 +102,23 @@ TEST_F(Matrix3Test, Multiplication)
 
     EXPECT_EQ(matrix * matrix, matrix2);
   }
+}
+
+TEST_F(Matrix3Test, Inverse)
+{
+  // Inverse of identity matrix is itself
+  EXPECT_EQ(math::Matrix3::IDENTITY, math::Matrix3::IDENTITY.Inverse());
+
+  // Matrix multiplied by its inverse results in the identity matrix
+  math::Matrix3 matrix1(-2, 4, 0, 0.1, 9, 55, -7, 1, 26);
+  math::Matrix3 matrix2 = matrix1.Inverse();
+  EXPECT_EQ(matrix1 * matrix2, math::Matrix3::IDENTITY);
+  EXPECT_EQ(matrix2 * matrix1, math::Matrix3::IDENTITY);
+
+  // Inverse of inverse results in the same matrix
+  EXPECT_EQ((matrix1.Inverse()).Inverse(), matrix1);
+
+  // Invert multiplication by scalar
+  double scalar = 2.5;
+  EXPECT_EQ((matrix1 * scalar).Inverse(), matrix1.Inverse() * (1.0/scalar));
 }

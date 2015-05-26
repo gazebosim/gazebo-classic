@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace gazebo
   namespace common
   {
     /// \brief Private class attributes for ModelDatabase.
-    class GAZEBO_VISIBLE ModelDatabasePrivate
+    class GZ_COMMON_VISIBLE ModelDatabasePrivate
     {
       /// \brief Thread to update the model cache.
       public: boost::thread *updateCacheThread;

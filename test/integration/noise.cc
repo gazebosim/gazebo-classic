@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
@@ -100,19 +100,19 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
   // Expect the range to be within (max-noise) < max < (max+noise), see
   // custom noise model in RaySensorNoisePlugin.
   // Noise rate value also taken directly from plugin.
-  bool foundNoise = false;
   double fixedNoiseRate = 0.005;
   double noise = maxRange*fixedNoiseRate;
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
   {
     double range = raySensor->GetRange(i);
-    if (fabs(range - maxRange) > LASER_TOL)
-      foundNoise = true;
+    if (std::isinf(range))
+    {
+      continue;
+    }
 
     EXPECT_TRUE(range >= maxRange - noise);
     EXPECT_TRUE(range <= maxRange + noise);
   }
-  EXPECT_TRUE(foundNoise);
 }
 
 TEST_P(NoiseTest, NoisePlugin)

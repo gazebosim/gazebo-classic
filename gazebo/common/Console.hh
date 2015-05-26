@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@
 #include <sstream>
 #include <string>
 
-#include <boost/thread.hpp>
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <boost/thread.hpp>
+#endif
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
@@ -64,7 +66,7 @@ namespace gazebo
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
-    class GAZEBO_VISIBLE FileLogger : public std::ostream
+    class GZ_COMMON_VISIBLE FileLogger : public std::ostream
     {
       /// \brief Constructor.
       /// \param[in] _filename Filename to write into. If empty,
@@ -130,7 +132,7 @@ namespace gazebo
 
     /// \class Logger Logger.hh common/common.hh
     /// \brief Terminal logger.
-    class GAZEBO_VISIBLE Logger : public std::ostream
+    class GZ_COMMON_VISIBLE Logger : public std::ostream
     {
       /// \enum LogType.
       /// \brief Output destination type.
@@ -199,7 +201,7 @@ namespace gazebo
     /// \class Console Console.hh common/common.hh
     /// \brief Container for loggers, and global logging options
     /// (such as verbose vs. quiet output).
-    class GAZEBO_VISIBLE Console
+    class GZ_COMMON_VISIBLE Console
     {
       /// \brief Set quiet output.
       /// \param[in] q True to prevent warning.

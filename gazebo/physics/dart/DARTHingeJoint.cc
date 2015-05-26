@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,9 +78,6 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(unsigned int _index) const
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494/
-  // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3(globalAxis);
 }
 
@@ -89,11 +86,8 @@ void DARTHingeJoint::SetAxis(unsigned int _index, const math::Vector3& _axis)
 {
   if (_index == 0)
   {
-    //--------------------------------------------------------------------------
-    // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494
-    // joint-axis-reference-frame-doesnt-match
-    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
+    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
+        this->GetAxisFrameOffset(0).RotateVector(_axis));
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;

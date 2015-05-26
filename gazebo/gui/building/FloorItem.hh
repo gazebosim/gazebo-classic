@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,15 @@ namespace gazebo
   namespace gui
   {
     class BuildingItem;
-    class WallItem;
+    class WallSegmentItem;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class FloorItem FloorItem.hh
     /// \brief 2D representation of a floor.
-    class GAZEBO_VISIBLE FloorItem : public RectItem, public BuildingItem
+    class GZ_GUI_BUILDING_VISIBLE FloorItem :
+      public RectItem, public BuildingItem
     {
       Q_OBJECT
 
@@ -56,8 +57,8 @@ namespace gazebo
       public: virtual double GetSceneRotation() const;
 
       /// \brief Attach walls so the floor can auto expand to hold the wall.
-      /// \param[in] _wallItem Wall item to attach to the floor.
-      public: void AttachWall(WallItem *_wallItem);
+      /// \param[in] _wallSegmentItem Wall item to attach to the floor.
+      public: void AttachWallSegment(WallSegmentItem *_wallSegmentItem);
 
       // Documentation inherited.
       private: virtual void paint(QPainter *_painter,
@@ -78,13 +79,13 @@ namespace gazebo
       private slots: void RecalculateBoundingBox();
 
       /// \brief Qt callback when a wall is being deleted.
-      private slots: void WallDeleted();
+      private slots: void WallSegmentDeleted();
 
       /// \brief Update the floor properties and emit Qt signals
       private: void Update();
 
       /// \brief Emit floor changed Qt signals.
-      private: void FloorChanged();
+      public: void FloorChanged();
 
       /// \brief Emit size changed Qt signals.
       private: void SizeChanged();
@@ -106,7 +107,7 @@ namespace gazebo
       private: bool dirty;
 
       /// \brief A list of wall items that the floor item holds.
-      private: std::vector<WallItem *> walls;
+      private: std::vector<WallSegmentItem *> wallSegments;
 
       /// \brief Bounding box of the floor item.
       private: QPolygonF floorBoundingRect;

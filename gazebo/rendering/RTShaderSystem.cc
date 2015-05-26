@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <sys/stat.h>
 #include <boost/bind.hpp>
@@ -94,7 +100,8 @@ void RTShaderSystem::Fini()
   // Finalize RTShader system.
   if (this->shaderGenerator != NULL)
   {
-#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+    // On Windows, we're using 1.9RC1, which doesn't have a bunch of changes.
+#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
     Ogre::RTShader::ShaderGenerator::finalize();
 #else
     Ogre::RTShader::ShaderGenerator::destroy();
@@ -148,6 +155,22 @@ void RTShaderSystem::RemoveScene(ScenePtr _scene)
     this->shaderGenerator->removeAllShaderBasedTechniques();
     this->shaderGenerator->flushShaderCache();
     // this->UpdateShaders();
+  }
+}
+
+//////////////////////////////////////////////////
+void RTShaderSystem::RemoveScene(const std::string &_scene)
+{
+  if (!this->initialized)
+    return;
+
+  for (auto iter : this->scenes)
+  {
+    if (iter->GetName() == _scene)
+    {
+      this->RemoveScene(iter);
+      return;
+    }
   }
 }
 
@@ -386,7 +409,11 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           stream << tmpdir << "/gazebo-" << user << "-rtshaderlibcache" << "/";
           cachePath = stream.str();
           // Create the directory
+#ifdef _WIN32
+          if (mkdir(cachePath.c_str()) != 0)
+#else
           if (mkdir(cachePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
+#endif
           {
             if (errno != EEXIST)
             {
@@ -487,7 +514,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   }
 
   double shadowFarDistance = 500;
-  double cameraNearClip = 0.1;
+  double cameraNearClip = 0.01;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
   Ogre::PSSMShadowCameraSetup *cameraSetup =

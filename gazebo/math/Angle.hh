@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ namespace gazebo
 
   /// \class Angle Angle.hh math/gzmath.hh
   /// \brief An angle and related functions.
-  class GAZEBO_VISIBLE Angle
+  class GZ_MATH_VISIBLE Angle
   {
     /// \brief math::Angle(0)
     public: static const Angle Zero;

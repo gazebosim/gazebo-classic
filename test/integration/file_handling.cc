@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 */
 
 #include <boost/filesystem.hpp>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/common/SystemPaths.hh"
 
@@ -59,12 +59,18 @@ TEST_F(FileHandling, Save)
 
   // Wait until the file exists
   i = 0;
-  while (i < 10 && (file = fopen(filename.str().c_str(), "r")) == NULL)
+  while (i < 10)
   {
+    file = fopen(filename.str().c_str(), "r");
+    if (file != NULL)
+    {
+      fclose(file);
+      break;
+    }
+
     i++;
     common::Time::MSleep(100);
   }
-  fclose(file);
 
   EXPECT_LT(i, 10);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE LaserView : public TopicView
+    class GZ_GUI_VIEWERS_VISIBLE LaserView : public TopicView
     {
       Q_OBJECT
 

@@ -12,10 +12,12 @@ set (sources
   Quaternion.cc
   Rand.cc
   RotationSpline.cc
+  SignalStats.cc
   Spline.cc
   Vector2d.cc
   Vector2i.cc
   Vector3.cc
+  Vector3Stats.cc
   Vector4.cc
 )
 
@@ -33,10 +35,12 @@ set (headers
   Quaternion.hh
   Rand.hh
   RotationSpline.hh
+  SignalStats.hh
   Spline.hh
   Vector2d.hh
   Vector2i.hh
   Vector3.hh
+  Vector3Stats.hh
   Vector4.hh
 )
 
@@ -51,10 +55,12 @@ set (gtest_sources
   Quaternion_TEST.cc
   Rand_TEST.cc
   RotationSpline_TEST.cc
+  SignalStats_TEST.cc
   Spline_TEST.cc
   Vector2d_TEST.cc
   Vector2i_TEST.cc
   Vector3_TEST.cc
+  Vector3Stats_TEST.cc
   Vector4_TEST.cc
 )
 gz_build_tests(${gtest_sources})
@@ -67,6 +73,7 @@ endforeach()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gzmath.hh.in
                ${CMAKE_CURRENT_BINARY_DIR}/gzmath.hh )
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MATH")
 
 gz_add_library(gazebo_math ${sources})
 target_link_libraries(gazebo_math ${Boost_LIBRARIES})

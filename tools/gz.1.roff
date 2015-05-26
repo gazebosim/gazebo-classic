@@ -1,4 +1,4 @@
-.TH "GZ" "1" "March 2014" "" ""
+.TH "GZ" "1" "September 2014" "" ""
 .
 .SH "NAME"
 \fBgz\fR \- Gazebo command line tool for control and analysis.
@@ -267,6 +267,14 @@ Spawn model from SDF file.
 .
 Spawn model from SDF string, pass by a pipe.
 .TP
+.B \-i, \-\-info
+.
+Output model state information to the terminal.
+.TP
+.B \-p, \-\-pose
+.
+Output model pose as a space separated 6\-tuple: x y z roll pitch yaw.
+.TP
 .B \-x, \-\-pose\-x arg x value
 .TP
 .B \-y, \-\-pose\-y arg y value
@@ -319,6 +327,10 @@ Number of iterations.
 .B \-u, \-\-update\-rate\fR=\fIarg\fR
 .
 Target real\-time update rate.
+.TP
+.B \-o, \-\-profile\fR=\fIarg\fR
+.
+Preset physics profile.
 .UNINDENT
 .SS sdf
 .sp

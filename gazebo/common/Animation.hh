@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ namespace gazebo
     /// \class Animation Animation.hh common/common.hh
     /// \brief Manages an animation, which is a collection of keyframes and
     /// the ability to interpolate between the keyframes
-    class GAZEBO_VISIBLE Animation
+    class GZ_COMMON_VISIBLE Animation
     {
       /// \brief Constructor
       /// \param[in] _name Name of the animation, should be unique
@@ -122,7 +122,7 @@ namespace gazebo
     /// \{
 
     /// \brief A pose animation.
-    class GAZEBO_VISIBLE PoseAnimation : public Animation
+    class GZ_COMMON_VISIBLE PoseAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.
@@ -164,7 +164,7 @@ namespace gazebo
     /// \{
 
     /// \brief A numeric animation.
-    class GAZEBO_VISIBLE NumericAnimation : public Animation
+    class GZ_COMMON_VISIBLE NumericAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.

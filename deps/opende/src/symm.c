@@ -20,7 +20,7 @@ typedef short ftnlen;
 typedef int logical;
 typedef double doublereal;
 
-#define dabs(x) (doublereal)abs(x)
+#define dabs(x) (doublereal)fabs(x)
 #define min(a,b) ((a) <= (b) ? (a) : (b))
 #define max(a,b) ((a) >= (b) ? (a) : (b))
 #define dmax(a,b) (doublereal)max(a,b)

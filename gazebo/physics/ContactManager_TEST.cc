@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/physics/ContactManager.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -107,6 +107,8 @@ TEST_F(ContactManagerTest, RemoveFilter)
     ss << name << i;
     std::map<std::string, physics::CollisionPtr> collisions;
     collisionMap["collision"] = physics::CollisionPtr();
+    ASSERT_TRUE(collisionMap["collision"] == NULL);
+
     manager->CreateFilter(ss.str(), collisions);
     EXPECT_TRUE(manager->HasFilter(ss.str()));
     EXPECT_EQ(manager->GetFilterCount(), i+1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include "heights_cmp.h"
 #include "helper_physics_generator.hh"
 #include "images_cmp.h"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -33,6 +33,7 @@ class HeightmapTest : public ServerFixture,
   public: void PhysicsLoad(const std::string &_physicsEngine);
   public: void WhiteAlpha(const std::string &_physicsEngine);
   public: void WhiteNoAlpha(const std::string &_physicsEngine);
+  public: void Volume(const std::string &_physicsEngine);
   public: void NotSquareImage();
   public: void InvalidSizeImage();
   // public: void Heights(const std::string &_physicsEngine);
@@ -58,7 +59,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   }
 
   physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
@@ -67,7 +68,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
     boost::dynamic_pointer_cast<physics::HeightmapShape>(
         collision->GetShape());
 
-  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
@@ -111,7 +112,7 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 
   Load("worlds/white_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
@@ -119,7 +120,7 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
   physics::HeightmapShapePtr shape =
     boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
 
-  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
@@ -143,7 +144,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
 
   Load("worlds/white_no_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
 
   physics::CollisionPtr collision =
     model->GetLink("link")->GetCollision("collision");
@@ -151,7 +152,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   physics::HeightmapShapePtr shape =
     boost::dynamic_pointer_cast<physics::HeightmapShape>(collision->GetShape());
 
-  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
@@ -192,6 +193,41 @@ void HeightmapTest::InvalidSizeImage()
 
   this->server->Fini();
   delete this->server;
+}
+
+/////////////////////////////////////////////////
+void HeightmapTest::Volume(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "simbody")
+  {
+    // SimbodyHeightmapShape unimplemented. ComputeVolume actually returns 0 as
+    // an error code, which is the correct answer, but we'll skip it for now.
+    gzerr << "Aborting test for "
+          << _physicsEngine
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for "
+          << _physicsEngine
+          << ", see issue #909" << std::endl;
+    return;
+  }
+
+  Load("worlds/heightmap_test.world", true, _physicsEngine);
+
+  physics::ModelPtr model = GetModel("heightmap");
+  EXPECT_TRUE(model != NULL);
+
+  physics::CollisionPtr collision =
+    model->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr shape =
+    boost::dynamic_pointer_cast<physics::HeightmapShape>(
+        collision->GetShape());
+
+  EXPECT_DOUBLE_EQ(shape->ComputeVolume(), 0);
 }
 
 /*
@@ -347,6 +383,12 @@ TEST_P(HeightmapTest, WhiteAlpha)
 TEST_P(HeightmapTest, WhiteNoAlpha)
 {
   WhiteNoAlpha(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, Volume)
+{
+  Volume(GetParam());
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,7 +128,7 @@ namespace gazebo
       ///         problem by using SetActive(false) <your accessor loop>
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
-      /// \return Returns DBL_MAX for no detection.
+      /// \return Returns RangeMax for no detection.
       public: double GetRange(unsigned int _index);
 
       /// \brief Get all the ranges

@@ -39,13 +39,15 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Load a GUI plugin.
 * -s, --server-plugin arg :
  Load a server plugin.
+* -o, --profile arg :
+ Physics preset profile name from the options in the world file.
 
 
 ## AUTHOR
   Open Source Robotics Foundation
 
 ## COPYRIGHT 
-  Copyright (C) 2012-2014 Open Source Robotics Foundation
+  Copyright (C) 2012-2015 Open Source Robotics Foundation
        
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.

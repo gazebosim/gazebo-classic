@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,18 +43,18 @@ TEST_F(BoxShapeTest, Scale)
   boxSDF->SetFromString(boxStr.str());
 
   physics::BoxShapePtr box(new physics::BoxShape(physics::CollisionPtr()));
-  sdf::ElementPtr elem = boxSDF->root;
-  ASSERT_TRUE(elem);
+  sdf::ElementPtr elem = boxSDF->Root();
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("box");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   box->Load(elem);
 
   // Test scaling with unit size
@@ -129,6 +129,53 @@ TEST_F(BoxShapeTest, Scale)
   EXPECT_DOUBLE_EQ(size.x, 0.5);
   EXPECT_DOUBLE_EQ(size.y, 1.0);
   EXPECT_DOUBLE_EQ(size.z, 2.5);
+}
+
+TEST_F(BoxShapeTest, Volume)
+{
+  std::ostringstream boxStr;
+  boxStr << "<sdf version ='" << SDF_VERSION << "'>"
+    << "<model name='model'>"
+    << "<link name ='link'>"
+    <<   "<collision name ='collision'>"
+    <<     "<geometry>"
+    <<       "<box>"
+    <<         "<size>1.0 1.0 1.0</size>"
+    <<       "</box>"
+    <<     "</geometry>"
+    <<   "</collision>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  sdf::SDFPtr boxSDF(new sdf::SDF);
+  boxSDF->SetFromString(boxStr.str());
+
+  physics::BoxShapePtr box(new physics::BoxShape(physics::CollisionPtr()));
+  sdf::ElementPtr elem = boxSDF->Root();
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("model");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("link");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("collision");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("geometry");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("box");
+  ASSERT_TRUE(elem != NULL);
+  box->Load(elem);
+
+  // A 1x1x1 box has volume 1
+  EXPECT_DOUBLE_EQ(box->ComputeVolume(), 1.0);
+
+  box->SetSize(math::Vector3(2.0, 3.0, 4.0));
+
+  EXPECT_DOUBLE_EQ(box->ComputeVolume(), 24.0);
+
+  // The bounding box approximation should be 0 because the Shape has no
+  // Collision parent
+  EXPECT_DOUBLE_EQ(box->Shape::ComputeVolume(), 0);
 }
 
 int main(int argc, char **argv)

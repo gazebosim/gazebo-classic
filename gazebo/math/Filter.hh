@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace gazebo
   /// \class Filter Filter.hh math/gzmath.hh
   /// \brief Filter base class
   template <class T>
-  class GAZEBO_VISIBLE Filter
+  class GZ_MATH_VISIBLE Filter
   {
     /// \brief Destructor.
     public: virtual ~Filter() {}
@@ -60,7 +60,7 @@ namespace gazebo
   /// \brief A one-pole DSP filter.
   /// \sa http://www.earlevel.com/main/2012/12/15/a-one-pole-filter/
   template <class T>
-  class GAZEBO_VISIBLE OnePole : public Filter<T>
+  class GZ_MATH_VISIBLE OnePole : public Filter<T>
   {
     /// \brief Constructor.
     public: OnePole() : a0(0), b1(0) {}
@@ -99,7 +99,7 @@ namespace gazebo
 
   /// \class OnePoleQuaternion Filter.hh math/gzmath.hh
   /// \brief One-pole quaternion filter.
-  class GAZEBO_VISIBLE OnePoleQuaternion : public OnePole<math::Quaternion>
+  class GZ_MATH_VISIBLE OnePoleQuaternion : public OnePole<math::Quaternion>
   {
     /// \brief Constructor.
     public: OnePoleQuaternion()
@@ -128,7 +128,7 @@ namespace gazebo
 
   /// \class OnePoleVector3 Filter.hh math/gzmath.hh
   /// \brief One-pole vector3 filter.
-  class GAZEBO_VISIBLE OnePoleVector3 : public OnePole<math::Vector3>
+  class GZ_MATH_VISIBLE OnePoleVector3 : public OnePole<math::Vector3>
   {
     /// \brief Constructor.
     public: OnePoleVector3()
@@ -150,7 +150,7 @@ namespace gazebo
   /// \brief Bi-quad filter base class.
   /// \sa http://www.earlevel.com/main/2003/03/02/the-bilinear-z-transform/
   template <class T>
-  class GAZEBO_VISIBLE BiQuad : public Filter<T>
+  class GZ_MATH_VISIBLE BiQuad : public Filter<T>
   {
     /// \brief Constructor.
     public: BiQuad()
@@ -223,7 +223,7 @@ namespace gazebo
 
   /// \class BiQuadVector3 Filter.hh math/gzmath.hh
   /// \brief BiQuad vector3 filter
-  class GAZEBO_VISIBLE BiQuadVector3 : public BiQuad<math::Vector3>
+  class GZ_MATH_VISIBLE BiQuadVector3 : public BiQuad<math::Vector3>
   {
     /// \brief Constructor.
     public: BiQuadVector3()

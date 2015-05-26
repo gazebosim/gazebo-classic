@@ -5,6 +5,7 @@ set (files
   cart_demo.world
   contact.world
   depth_camera.world
+  elevator.world
   empty_1_0.world
   empty_bullet.world
   empty_sky.world
@@ -16,14 +17,21 @@ set (files
   heightmap_dem.world
   heightmap.world
   hydra_demo.world
+  initial_velocity.world
   joint_damping_demo.world
+  joint_friction_demo.world
   joints.world
   lights.world
   mud_bitmask.world
   mud.world
   multilink_shape.world
   openal.world
+  ortho.world
+  osrf_elevator.world
   pioneer2dx.world
+  pioneer2dx_camera.world
+  pioneer2dx_laser.world
+  pioneer2dx_laser_camera.world
   plane_demo.world
   plane_propeller_demo.world
   plugin.world
@@ -44,6 +52,7 @@ set (files
   robocup_3Dsim.world
   rubble.world
   shapes.world
+  shapes_layers.world
   simple_arm.world
   simple_gripper.world
   single_rotor_demo.world
@@ -52,6 +61,7 @@ set (files
   stacks.world
   trigger.world
   twin_rotor_demo.world
+  underwater.world
   willowgarage.world
   wireless_sensors.world
 )

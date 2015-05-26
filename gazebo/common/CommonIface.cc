@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  #include <Windows.h>
+#endif
+
+#include <cstdlib>
+
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
@@ -73,4 +79,19 @@ std::string common::find_file_path(const std::string &_file)
     int index = filepath.find_last_of("/");
     return filepath.substr(0, index);
   }
+}
+
+/////////////////////////////////////////////////
+const char *common::getEnv(const char *_name)
+{
+#ifdef _WIN32
+  const DWORD buffSize = 65535;
+  static char buffer[buffSize];
+  if (GetEnvironmentVariable(_name, buffer, buffSize))
+    return buffer;
+  else
+    return NULL;
+#else
+  return getenv(_name);
+#endif
 }

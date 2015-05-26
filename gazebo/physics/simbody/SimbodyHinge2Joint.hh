@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ namespace gazebo
     /// \{
 
     /// \brief A two axis hinge joint
-    class GAZEBO_VISIBLE SimbodyHinge2Joint : public Hinge2Joint<SimbodyJoint>
+    class GZ_PHYSICS_VISIBLE SimbodyHinge2Joint :
+      public Hinge2Joint<SimbodyJoint>
     {
       /// \brief Constructor
       public: SimbodyHinge2Joint(SimTK::MultibodySystem *world,

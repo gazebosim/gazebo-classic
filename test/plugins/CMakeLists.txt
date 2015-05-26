@@ -14,6 +14,9 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
+  ExceptionModelPluginConstructor
+  ExceptionModelPluginInit
+  ExceptionModelPluginLoad
   ForceTorqueModelRemovalTestPlugin
   Issue1208Plugin
   ModelTrajectoryTestPlugin

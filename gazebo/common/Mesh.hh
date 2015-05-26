@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class Mesh Mesh.hh common/common.hh
     /// \brief A 3D mesh
-    class GAZEBO_VISIBLE Mesh
+    class GZ_COMMON_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();
@@ -190,7 +190,7 @@ namespace gazebo
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    class GAZEBO_VISIBLE NodeAssignment
+    class GZ_COMMON_VISIBLE NodeAssignment
     {
       /// \brief Constructor.
       public: NodeAssignment();
@@ -206,7 +206,7 @@ namespace gazebo
     };
 
     /// \brief A child mesh
-    class GAZEBO_VISIBLE SubMesh
+    class GZ_COMMON_VISIBLE SubMesh
     {
       /// \brief An enumeration of the geometric mesh primitives
       public: enum PrimitiveType {POINTS, LINES, LINESTRIPS, TRIANGLES,

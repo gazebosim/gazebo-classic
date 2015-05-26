@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/CameraSensor.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "images_cmp.h"
 #include "helper_physics_generator.hh"
 

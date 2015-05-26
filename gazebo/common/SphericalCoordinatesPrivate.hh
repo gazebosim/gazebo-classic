@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace gazebo
     /// \class SphericalCoordinatesPrivate SphericalCoordinatesPrivate.hh
     ///        commmon/common.hh
     /// \brief Private data for the SphericalCoordinates class.
-    class GAZEBO_VISIBLE SphericalCoordinatesPrivate
+    class GZ_COMMON_VISIBLE SphericalCoordinatesPrivate
     {
       /// \brief Type of surface being used.
       public: SphericalCoordinates::SurfaceType surfaceType;
