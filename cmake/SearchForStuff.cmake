@@ -77,6 +77,15 @@ else ()
 endif ()
 
 ########################################
+include (FindHDF5)
+find_package(HDF5)
+
+if (NOT HDF5_FOUND)
+  BUILD_WARNING("HDF5 not found")
+else ()
+  message(STATUS "HDF5 Found")
+endif ()
+########################################
 # Find packages
 
 # In Visual Studio we use configure.bat to trick all path cmake 
@@ -124,7 +133,7 @@ if (PKG_CONFIG_FOUND)
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
   #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
-  if (SIMBODY_FOUND)
+  if (Simbody_FOUND)
     set (HAVE_SIMBODY TRUE)
   else()
     BUILD_WARNING ("Simbody not found, for simbody physics engine option, please install libsimbody-dev.")
@@ -143,15 +152,25 @@ if (PKG_CONFIG_FOUND)
     set (HAVE_DART FALSE)
   endif()
 
-  # Go for external tinyxml if not set
-  if (NOT DEFINED USE_EXTERNAL_TINYXML)
+  #################################################
+  # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
+  # Use pkg_check_modules and fallback to manual detection
+  # (needed, at least, for MacOS)
+
+  # Use system installation on UNIX and Apple, and internal copy on Windows
+  if (UNIX OR APPLE)
+    message (STATUS "Using system tinyxml.")
     set (USE_EXTERNAL_TINYXML True)
+  elseif(WIN32)
+    message (STATUS "Using internal tinyxml.")
+    set (USE_EXTERNAL_TINYXML False)
+    add_definitions(-DTIXML_USE_STL)
+  else()
+    message (STATUS "Unknown platform, unable to configure tinyxml.")
+    BUILD_ERROR("Unknown platform")
   endif()
 
   if (USE_EXTERNAL_TINYXML)
-    #################################################
-    # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
-    # Use pkg_check_modules and fallback to manual detection (needed, at least, for MacOS)
     pkg_check_modules(tinyxml tinyxml)
     if (NOT tinyxml_FOUND)
         find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
@@ -203,7 +222,9 @@ if (PKG_CONFIG_FOUND)
     if (NOT LIBTAR_FOUND)
        BUILD_ERROR("Missing: libtar")
     endif()
-  endif(NOT WIN32)
+  else()
+    set(libtar_LIBRARIES "")
+  endif()
 
   #################################################
   # Find TBB
@@ -312,6 +333,7 @@ if (PKG_CONFIG_FOUND)
   if (NOT CCD_FOUND)
     message(STATUS "Using internal copy of libccd")
     set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARY_DIRS "${CMAKE_BINARY_DIR}/deps/libccd")
     set(CCD_LIBRARIES gazebo_ccd)
   endif()
 
@@ -414,6 +436,10 @@ if (PKG_CONFIG_FOUND)
     add_definitions( -DLIBBULLET_VERSION=0.0 )
     BUILD_WARNING ("Bullet > 2.82 not found, for bullet physics engine option, please install libbullet2.82-dev.")
   endif()
+  
+  if (BULLET_VERSION VERSION_GREATER 2.82)
+    add_definitions( -DLIBBULLET_VERSION_GT_282 )
+  endif()
 
   ########################################
   # Find libusb
@@ -448,7 +474,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 3.0.3)
+set (SDFormat_MIN_VERSION 3.0.4)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
@@ -467,14 +493,6 @@ endif()
 
 ########################################
 # Find Boost, if not specified manually
-if (WIN32)
-  # Boost source compiles static lib by default 
-  # and ogre use static too by default. No more
-  # reasons to choose boost static libs
-  set(Boost_USE_STATIC_LIBS        ON) 
-  set(Boost_USE_MULTITHREADED      ON)
-  set(Boost_USE_STATIC_RUNTIME    OFF)
-endif()
 include(FindBoost)
 find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams date_time)
 
@@ -515,7 +533,6 @@ else ()
   set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
 endif ()
 
-
 ########################################
 # Include man pages stuff
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
@@ -540,6 +557,18 @@ find_program(XSLTPROC xsltproc)
 if (NOT EXISTS ${XSLTPROC})
   BUILD_WARNING("xsltproc not found. The check_test_ran.py script will cause tests to fail.")
 endif()
+
+########################################
+# Find graphviz
+include (${gazebo_cmake_dir}/FindGraphviz.cmake)
+if (NOT GRAPHVIZ_FOUND)
+  message (STATUS "Looking for libgraphviz-dev - not found")
+  BUILD_WARNING ("Graphviz not found, Model editor's schematic view will be disabled.")
+  set (HAVE_GRAPHVIZ OFF CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+else ()
+  message (STATUS "Looking for libgraphviz-dev - found")
+  set (HAVE_GRAPHVIZ ON CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+endif ()
 
 ########################################
 # Find QWT (QT graphing library)

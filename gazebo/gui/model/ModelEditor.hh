@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
-    class GAZEBO_VISIBLE ModelEditor : public Editor
+    class GZ_GUI_MODEL_VISIBLE ModelEditor : public Editor
     {
       Q_OBJECT
 
@@ -81,6 +81,10 @@ namespace gazebo
       /// \brief Callback when an action in the toolbar has been triggered.
       /// \param[in] _action Triggered action.
       private slots: void OnAction(QAction *_action);
+
+      /// \brief Show the schematic view widget
+      /// \param[in] _show True to show the widget, false to hide it.
+      private slots: void OnSchematicView(bool _show);
 
       /// \brief Callback when the model has been completed.
       private: void OnFinish();

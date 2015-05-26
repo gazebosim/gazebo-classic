@@ -10,10 +10,14 @@ macro (gz_build_tests)
     if(USE_LOW_MEMORY_TESTS)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
     endif(USE_LOW_MEMORY_TESTS)
-    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file}
+                   ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
+
+    link_directories(${PROJECT_BINARY_DIR}/test)
     add_dependencies(${BINARY_NAME}
-      gtest gtest_main
+      gtest
+      gtest_main
       gazebo_common
       gazebo_math
       gazebo_physics
@@ -21,23 +25,20 @@ macro (gz_build_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
-      server_fixture
+      gazebo_test_fixture
       )
 
 
     target_link_libraries(${BINARY_NAME}
-      libgtest.a
-      libgtest_main.a
-      ${CMAKE_BINARY_DIR}/test/libserver_fixture.a
-      gazebo_common
-      gazebo_math
+      # This two libraries are need to workaround on bug 
+      # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
+      # libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
-      pthread
+      gazebo_test_fixture
+      gtest
+      gtest_main
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
@@ -84,16 +85,13 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      gazebo_gui
-      gazebo_common
-      gazebo_math
+      # This two libraries are need to workaround on bug 
+      # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
+      # gazebo_gui and libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
-      pthread
+      gazebo_gui
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )

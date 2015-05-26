@@ -45,7 +45,7 @@ namespace gazebo
 
     /// \class ModelEditorPalette ModelEditorPalette.hh
     /// \brief A palette of model items which can be added to the editor.
-    class GAZEBO_VISIBLE ModelEditorPalette : public QWidget
+    class GZ_GUI_MODEL_VISIBLE ModelEditorPalette : public QWidget
     {
       Q_OBJECT
 
@@ -149,8 +149,11 @@ namespace gazebo
       /// \brief Add a joint to the tree.
       /// \param[in] _jointId Unique joint identifying name.
       /// \param[in] _jointName Scoped name which can be changed by the user.
+      /// \param[in] _jointName Scoped name of the parent link.
+      /// \param[in] _jointName Scoped name of the child link.
       private: void OnJointInserted(const std::string &_jointId,
-          const std::string &_jointName);
+          const std::string &_jointName, const std::string &_parentName,
+          const std::string &_childName);
 
       /// \brief Remove a link from the tree.
       /// \param[in] _linkId Unique link identifying name.

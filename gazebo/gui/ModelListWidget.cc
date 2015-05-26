@@ -14,6 +14,13 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
@@ -191,7 +198,42 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
                                              this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
     }
+    else if (name == "GUI")
+    {
+      QtVariantProperty *item = NULL;
 
+      rendering::UserCameraPtr cam = gui::get_active_camera();
+      if (!cam)
+        return;
+
+      // Create a camera item
+      QtProperty *topItem = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("camera"));
+      auto cameraBrowser = this->propTreeBrowser->addProperty(topItem);
+
+      // Create and set the gui camera name
+      std::string cameraName = cam->GetName();
+      item = this->variantManager->addProperty(QVariant::String, tr("name"));
+      item->setValue(cameraName.c_str());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
+
+      // Create and set the gui camera pose
+      item = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("pose"));
+      {
+        topItem->addSubProperty(item);
+        math::Pose cameraPose = cam->GetWorldPose();
+
+        this->FillPoseProperty(msgs::Convert(cameraPose), item);
+        // set expanded to true by default for easier viewing
+        this->propTreeBrowser->setExpanded(cameraBrowser, true);
+        for (auto browser : cameraBrowser->children())
+        {
+          this->propTreeBrowser->setExpanded(browser, true);
+        }
+      }
+    }
     else
     {
       this->propTreeBrowser->clear();
@@ -567,6 +609,8 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->ScenePropertyChanged(_item);
   else if (currentItem == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
+  else if (currentItem == this->guiItem)
+    this->GUIPropertyChanged(_item);
 }
 
 /////////////////////////////////////////////////
@@ -631,6 +675,37 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 }
 
 /////////////////////////////////////////////////
+void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
+{
+  // Only camera pose editable for now
+  QtProperty *cameraProperty = this->GetChildItem("camera");
+  if (!cameraProperty)
+    return;
+
+  QtProperty *cameraPoseProperty = this->GetChildItem(cameraProperty, "pose");
+  if (!cameraPoseProperty)
+    return;
+
+  if (cameraPoseProperty)
+  {
+    std::string changedProperty = _item->propertyName().toStdString();
+    if (changedProperty == "x"
+      || changedProperty == "y"
+      || changedProperty == "z"
+      || changedProperty == "roll"
+      || changedProperty == "pitch"
+      || changedProperty == "yaw")
+    {
+      msgs::Pose poseMsg;
+      this->FillPoseMsg(cameraPoseProperty, &poseMsg, poseMsg.GetDescriptor());
+      rendering::UserCameraPtr cam = gui::get_active_camera();
+      if (cam)
+        cam->SetWorldPose(msgs::Convert(poseMsg));
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 {
   msgs::Physics msg;
@@ -677,7 +752,7 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::ScenePropertyChanged(QtProperty * /*_item*/)
+void ModelListWidget::ScenePropertyChanged(QtProperty */*_item*/)
 {
   msgs::Scene msg;
 
@@ -2176,9 +2251,13 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   {
     item = this->variantManager->addProperty(QVariant::Double, "roll");
     _parent->addSubProperty(item);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "decimals", 6);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "singleStep", 0.05);
   }
-  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
   item->setValue(rpy.x);
 
   // Add Pitch value
@@ -2187,9 +2266,13 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   {
     item = this->variantManager->addProperty(QVariant::Double, "pitch");
     _parent->addSubProperty(item);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "decimals", 6);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "singleStep", 0.05);
   }
-  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
   item->setValue(rpy.y);
 
   // Add Yaw value
@@ -2198,9 +2281,13 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   {
     item = this->variantManager->addProperty(QVariant::Double, "yaw");
     _parent->addSubProperty(item);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "decimals", 6);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "singleStep", 0.05);
   }
-  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
   item->setValue(rpy.z);
 }
 
@@ -2294,8 +2381,17 @@ void ModelListWidget::ResetTree()
 
   // Create the top level of items in the tree widget
   {
+    // GUI item
+    this->guiItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("GUI"))));
+    this->guiItem->setData(0, Qt::UserRole, QVariant(tr("GUI")));
+    this->modelTreeWidget->addTopLevelItem(this->guiItem);
+
+    // Scene item
     this->ResetScene();
 
+    // Spherical coordinates item
     this->sphericalCoordItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Spherical Coordinates"))));
@@ -2303,18 +2399,21 @@ void ModelListWidget::ResetTree()
         Qt::UserRole, QVariant(tr("Spherical Coordinates")));
     this->modelTreeWidget->addTopLevelItem(this->sphericalCoordItem);
 
+    // Physics item
     this->physicsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Physics"))));
     this->physicsItem->setData(0, Qt::UserRole, QVariant(tr("Physics")));
     this->modelTreeWidget->addTopLevelItem(this->physicsItem);
 
+    // Models item
     this->modelsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Models"))));
     this->modelsItem->setData(0, Qt::UserRole, QVariant(tr("Models")));
     this->modelTreeWidget->addTopLevelItem(this->modelsItem);
 
+    // Lights item
     this->lightsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Lights"))));
