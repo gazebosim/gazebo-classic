@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/test/ServerFixture.hh"
+#include "gazebo/common/Timer.hh"
 #include "gazebo/physics/physics.hh"
 #include "helper_physics_generator.hh"
 
@@ -89,6 +90,10 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
 
   // Set solver type and unthrottle update rate
   physics->SetParam("solver_type", _solverType);
+  if (_solverType == "world")
+  {
+    physics->SetParam("ode_quiet", true);
+  }
   physics->SetRealTimeUpdateRate(0.0);
 
   // Expect no island threads by default
@@ -112,7 +117,7 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
             << "\t Min[" << baseMinTime << "]\n";
 
   // Turn on 2 island threads
-  physicsEngine->SetParam("island_threads", 2);
+  physics->SetParam("island_threads", 2);
 
   // Collect threaded statistics
   common::Time threadAvgTime, threadMaxTime, threadMinTime;
