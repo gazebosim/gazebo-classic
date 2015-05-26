@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: Ogre Visual Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
 
-#ifndef _VISUAL_HH_
-#define _VISUAL_HH_
+#ifndef _GAZEBO_VISUAL_HH_
+#define _GAZEBO_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
@@ -59,7 +55,8 @@ namespace gazebo
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
+    class GZ_RENDERING_VISIBLE Visual :
+      public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
@@ -408,6 +405,19 @@ namespace gazebo
       /// visual.
       public: VisualPtr GetRootVisual();
 
+      /// \brief Get the nth ancestor counting from the world visual.
+      /// GetNthAncestor(0) returns the world visual. GetNthAncestor(1) returns
+      /// the RootVisual. GetNthAncestor(2) returns the ancestor which is a
+      /// child of the root visual and so on.
+      /// \param[in] _n Depth of the ancestor.
+      /// \return The nth ancestor counting from the world.
+      public: VisualPtr GetNthAncestor(unsigned int _n);
+
+      /// \brief Get the depth of this visual, where 0 is the depth of the
+      /// world visual.
+      /// \return This visual's depth.
+      public: unsigned int GetDepth() const;
+
       /// \brief Get the shader type.
       /// \return String of the shader type: "vertex", "pixel",
       /// "normal_map_object_space", "normal_map_tangent_space".
@@ -514,6 +524,11 @@ namespace gazebo
 
       /// \brief Clear parents.
       public: void ClearParent();
+
+      /// \brief Toggle layer visibility. If the visual is
+      /// on the specified layer its visibility will be toggled.
+      /// \param[in] _layer Index of the layer to toggle.
+      public: void ToggleLayer(const int32_t _layer);
 
       /// \internal
       /// \brief Constructor used by inherited classes

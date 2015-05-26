@@ -65,7 +65,7 @@ namespace gazebo
     /// guarantees that all data is stored.
     ///
     /// \sa Logplay, State
-    class GAZEBO_VISIBLE LogRecord : public SingletonT<LogRecord>
+    class GZ_UTIL_VISIBLE LogRecord : public SingletonT<LogRecord>
     {
       /// \brief Constructor
       private: LogRecord();

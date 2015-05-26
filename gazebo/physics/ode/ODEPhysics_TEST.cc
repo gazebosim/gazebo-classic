@@ -21,7 +21,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -194,6 +194,39 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
         EXPECT_EQ(flag, boost::any_cast<bool>(odePhysics->GetParam(key2)));
       }
     }
+  }
+
+  // Test friction model
+  {
+    // Default value "pyramid_model"
+    const std::string frictionModel = "pyramid_model";
+    EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("friction_model")));
+    EXPECT_EQ(param, frictionModel);
+  }
+
+  {
+    // Switch to "cone_model" using SetFrictionModel
+    const std::string frictionModel = "cone_model";
+    odePhysics->SetFrictionModel(frictionModel);
+    EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("friction_model")));
+    EXPECT_EQ(param, frictionModel);
+  }
+
+  {
+    // Switch to "box_model" using SetParam
+    const std::string frictionModel = "box_model";
+    odePhysics->SetParam("friction_model", frictionModel);
+    EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("friction_model")));
+    EXPECT_EQ(param, frictionModel);
   }
 }
 

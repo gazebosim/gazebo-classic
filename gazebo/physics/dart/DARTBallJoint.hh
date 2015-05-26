@@ -27,7 +27,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief An DARTBallJoint
-    class GAZEBO_VISIBLE DARTBallJoint : public BallJoint<DARTJoint>
+    class GZ_PHYSICS_VISIBLE DARTBallJoint : public BallJoint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of the Joint
