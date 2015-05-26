@@ -129,7 +129,7 @@ class Colliders_TBB
 };
 
 //////////////////////////////////////////////////
-extern "C" void dMessageQuiet (int, const char *, va_list)
+extern "C" void dMessageQuiet(int, const char *, va_list)
 {
 }
 
