@@ -1357,7 +1357,6 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
         gzerr << "boost any_cast error:" << e.what() << "\n";
         return false;
       }
-      gzdbg << "dWorldSetIslandThreads: " << value << std::endl;
       dWorldSetIslandThreads(this->dataPtr->worldId, value);
     }
     else
@@ -1445,6 +1444,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else if (_key == "friction_model")
     _value = this->GetFrictionModel();
+  else if (_key == "island_threads")
+    _value = dWorldGetIslandThreads(this->dataPtr->worldId);
   else
   {
     return PhysicsEngine::GetParam(_key, _value);
