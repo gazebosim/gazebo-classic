@@ -45,20 +45,6 @@
             </box>
           </geometry>
         </collision>
-        <!--<visual name="visual">
-          <cast_shadows>false</cast_shadows>
-          <geometry>
-            <box>
-              <size>100 100 .1</size>
-            </box>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/BlueTransparent</name>
-            </script>
-          </material>
-        </visual>-->
       </link>
     </model>
 
