@@ -402,11 +402,22 @@ void LogPlayView::SetCurrentTime(int _msec)
 
 //std::cout << "Start: " << this->dataPtr->startTime << " Current: " << _msec << std::endl;
 
-  double relPos = double(_msec - this->dataPtr->startTime) /
-      (this->dataPtr->endTime - this->dataPtr->startTime);
+  double relPos;
+  if (_msec < this->dataPtr->startTime)
+  {
+    relPos = 0.0;
+  }
+  else
+  {
+    relPos = double(_msec - this->dataPtr->startTime) /
+        (this->dataPtr->endTime - this->dataPtr->startTime);
+  }
 
-  if (relPos < 0 || relPos > 1)
+  if (relPos < 0.0 || relPos > 1.0)
+  {
+    gzerr << "Requested inexistent time [" << _msec << "] msec" << std::endl;
     return;
+  }
 
   this->dataPtr->currentTimeItem->setPos(
       this->dataPtr->margin +
