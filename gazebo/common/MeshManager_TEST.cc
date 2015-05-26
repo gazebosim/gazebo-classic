@@ -136,7 +136,6 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   subpath03.push_back(math::Vector2d(2.27467, 1.0967));
   subpath03.push_back(math::Vector2d(1.81094, 2.35418));
   subpath03.push_back(math::Vector2d(2.74009, 2.35418));
-  subpath03.push_back(math::Vector2d(2.27467, 1.0967));
 
   std::vector<math::Vector2d> subpath04;
   subpath04.push_back(math::Vector2d(2.08173, 0.7599));
@@ -147,7 +146,6 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   subpath04.push_back(math::Vector2d(1.7077, 2.63851));
   subpath04.push_back(math::Vector2d(1.47753, 3.28672));
   subpath04.push_back(math::Vector2d(1.11704, 3.28672));
-  subpath04.push_back(math::Vector2d(2.08173, 0.7599));
 
   path2.push_back(subpath03);
   path2.push_back(subpath04);

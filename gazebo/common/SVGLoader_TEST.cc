@@ -28,12 +28,14 @@ using namespace gazebo;
 class SVGLoader : public gazebo::testing::AutoLogFixture { };
 
 
-unsigned int samples = 10;
+// tolerance
+// minimum distance between 2 distinct points
+double tol = 0.05;
 
 /////////////////////////////////////////////////
 TEST_F(SVGLoader, LoadPaths)
 {
-  common::SVGLoader loader(samples);
+  common::SVGLoader loader(10);
   std::vector<common::SVGPath> paths;
 
   // bad path
@@ -181,6 +183,31 @@ TEST_F(SVGLoader, ghost_edges)
   // the test file has 2 paths inside
   EXPECT_EQ(1u, paths.size());
   EXPECT_EQ(1u, paths[0].polylines.size());
+}
+
+/////////////////////////////////////////////////
+TEST_F(SVGLoader, ClosedLoops)
+{
+  // this tests the PathsToClosedPolylines function
+  common::SVGLoader loader(3);
+  std::vector<common::SVGPath> paths;
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/chassis.svg";
+  bool success = loader.Parse(filePath, paths);
+  EXPECT_EQ(true, success);
+
+  // save for inspection
+  std::ofstream out("gaps.html");
+  loader.DumpPaths(paths, out);
+  out.close();
+
+
+  std::vector< std::vector<math::Vector2d> > closedPolys;
+  std::vector< std::vector<math::Vector2d> > openPolys;
+
+  loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
+  EXPECT_EQ(0u, openPolys.size());
+  EXPECT_EQ(23u, closedPolys.size());
 }
 
 /////////////////////////////////////////////////

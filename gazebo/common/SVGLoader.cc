@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <tinyxml.h>
+#include <utility>
 
 #include <gazebo/common/Console.hh>
 #include <gazebo/common/Assert.hh>
@@ -857,3 +858,115 @@ function draw(showCtrlPoints)
   _out << footer << std::endl;
 }
 
+/////////////////////////////////////////////////
+bool Vector2dCompare(const math::Vector2d &a, const math::Vector2d &b,
+                     double tol)
+{
+  double x = a.x - b.x;
+  double y = a.y - b.y;
+  // is squared distance smaller than squared tolerance?
+  if (x*x + y*y < tol * tol)
+  {
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+void SVGLoader::PathsToClosedPolylines(
+                      const std::vector<common::SVGPath> &_paths,
+                      double tol,
+                      std::vector< std::vector<math::Vector2d> > &_closedPolys,
+                      std::vector< std::vector<math::Vector2d> > &_openPolys)
+{
+  // first we extract all polyline into a vector of line segments
+  std::list<std::pair<math::Vector2d, math::Vector2d> > segments;
+  for (auto &path : _paths)
+  {
+    for (auto &poly : path.polylines)
+    {
+      math::Vector2d startPoint = poly[0];
+      for (unsigned int i =1; i < poly.size(); ++i)
+      {
+        const math::Vector2d &endPoint = poly[i];
+        double length = endPoint.Distance(startPoint);
+        if (length < tol)
+        {
+          gzerr << "segment between " << startPoint
+                << " and " << endPoint << " is too short: "
+                << length << std::endl;
+        }
+        else
+        {
+          segments.push_back(std::make_pair(startPoint, endPoint));
+          startPoint = endPoint;
+        }
+      }
+    }
+  }
+  // then we remove segments until there are none left
+  while (!segments.empty())
+  {
+    // start a new polyline, made from the 2 points of
+    // the next available segment.
+    std::vector<math::Vector2d> polyline;
+    auto &s = segments.front();
+    polyline.push_back(s.first);
+    polyline.push_back(s.second);
+    // remove the segment from the list
+    segments.pop_front();
+    // this flag will be false if the polyline has no
+    // new segment
+    bool segmentFound = true;
+    // this flag is true when the polyline is closed
+    bool loopClosed = false;
+    while (segmentFound && !loopClosed)
+    {
+      // find the segment in the polyline
+      segmentFound = false;
+      for (auto it = segments.begin(); it != segments.end(); ++it)
+      {
+        auto seg = *it;
+        math::Vector2d nextPoint;
+        if (Vector2dCompare(polyline.back(), seg.first, tol))
+        {
+          nextPoint = seg.second;
+          segmentFound = true;
+        }
+        if (Vector2dCompare(polyline.back(), seg.second, tol))
+        {
+          nextPoint = seg.first;
+          segmentFound = true;
+        }
+        if (segmentFound)
+        {
+          // remove the segment from the list of all remaining segments
+          segments.erase(it);
+          // add the new point to the polyline
+          polyline.push_back(nextPoint);
+          // verify if the polyline is closed
+          if (Vector2dCompare(nextPoint, polyline[0], tol))
+          {
+            // the loop is closed, we don't need another segment
+            loopClosed = true;
+          }
+          // the segment has been found
+          // get out of the for loop.
+          break;
+        }
+      }
+    }
+    // the new polyline is complete
+    if (loopClosed)
+    {
+      gzerr << "closed!" << std::endl << std::endl;
+      _closedPolys.push_back(polyline);
+    }
+    else
+    {
+      double gap = polyline.back().Distance(polyline.front());
+      gzerr << "Open! gap=" << gap << std::endl << std::endl;
+      _openPolys.push_back(polyline);
+    }
+  }
+}
