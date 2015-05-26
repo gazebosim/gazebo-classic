@@ -50,10 +50,6 @@ namespace gazebo
       /// \param[in] _string String representation of size.
       signals: void SetSize(QString _string);
 
-      /// \brief A signal used to set the filename.
-      /// \param[in] _string The log filename
-      signals: void SetFilename(QString _string);
-
       /// \brief A signal used to set the destination path label.
       /// \param[in] _string The log destination directory
       signals: void SetDestinationPath(QString _string);
@@ -106,6 +102,9 @@ namespace gazebo
 
       /// \brief Label to display the log time.
       private: QLabel *timeLabel;
+
+      /// \brief Label to display the log destination path.
+      private: QString basePath;
 
       /// \brief Label to display the log destination path.
       private: QLineEdit *destPath;

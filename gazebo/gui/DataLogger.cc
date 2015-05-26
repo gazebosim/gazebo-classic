@@ -26,6 +26,9 @@
 #include <boost/filesystem.hpp>
 #include <stdio.h>
 
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/SystemPaths.hh"
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/DataLogger.hh"
@@ -94,6 +97,7 @@ DataLogger::DataLogger(QWidget *_parent)
   this->destPath = new QLineEdit();
   this->destPath->setObjectName("dataLoggerDestnationPathLabel");
   this->destPath->setMinimumWidth(300);
+  this->destPath->setReadOnly(true);
 
   // Browser button
   QPushButton *browseButton = new QPushButton("Browse");
@@ -213,6 +217,29 @@ DataLogger::DataLogger(QWidget *_parent)
   // messages.
   this->sub = this->node->Subscribe<msgs::LogStatus>("~/log/status",
       &DataLogger::OnStatus, this);
+
+  // Fill the path with the home folder - duplicated from util/LogRecord
+#ifndef _WIN32
+  const char *homePath = common::getEnv("HOME");
+#else
+  const char *homePath = common::getEnv("HOMEPATH");
+#endif
+
+  GZ_ASSERT(homePath, "HOME environment variable is missing");
+
+  if (!homePath)
+  {
+    common::SystemPaths *paths = common::SystemPaths::Instance();
+    this->basePath = QString::fromStdString(paths->GetTmpPath() + "/gazebo");
+  }
+  else
+  {
+    this->basePath =
+        QString::fromStdString(boost::filesystem::path(homePath).string());
+  }
+
+  this->basePath = this->basePath + "/.gazebo/log/";
+  this->SetDestinationPath(this->basePath);
 }
 
 /////////////////////////////////////////////////
@@ -266,6 +293,9 @@ void DataLogger::OnRecord(bool _toggle)
     this->statusLabel->setStyleSheet("QLabel{color: #aeaeae}");
     this->statusTimer->stop();
 
+    // Change the Save to box
+    this->SetDestinationPath(this->basePath);
+
     // Tell the server to stop data logging
     msgs::LogControl msg;
     msg.set_stop(true);
@@ -303,16 +333,17 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
   // If there is log file information in the message...
   if (_msg->has_log_file())
   {
-    // If there is file name information...
-    if (_msg->log_file().has_base_path())
+    // If there is file name information and we're recording...
+    if (_msg->log_file().has_base_path() && this->recordButton->isChecked())
     {
-      std::string basePath = _msg->log_file().base_path();
+      std::string logBasePath = _msg->log_file().base_path();
 
-      // Display the leaf log filename
-      if (_msg->log_file().has_full_path() && !basePath.empty())
+      // Display the log path
+      if (_msg->log_file().has_full_path() && !logBasePath.empty())
       {
         std::string fullPath = _msg->log_file().full_path();
-        this->SetDestinationPath(QString::fromStdString(fullPath));
+        if (!fullPath.empty())
+          this->SetDestinationPath(QString::fromStdString(fullPath));
       }
     }
 
@@ -358,8 +389,6 @@ void DataLogger::OnSetDestinationPath(QString _filename)
 {
   if (!_filename.isEmpty())
     this->destPath->setText(_filename);
-  else
-    this->destPath->setText("");
 }
 
 /////////////////////////////////////////////////
@@ -383,10 +412,19 @@ void DataLogger::OnToggleSettings(bool _checked)
 /////////////////////////////////////////////////
 void DataLogger::OnBrowse()
 {
-  boost::filesystem::path path = QFileDialog::getExistingDirectory(this,
-      tr("Set log directory"), this->filenameEdit->text(),
-      QFileDialog::ShowDirsOnly |
-      QFileDialog::DontResolveSymlinks).toStdString();
+  QFileDialog fileDialog(this, tr("Set log directory"), QDir::homePath());
+  fileDialog.setFileMode(QFileDialog::Directory);
+  fileDialog.setOptions(QFileDialog::ShowDirsOnly
+      | QFileDialog::DontResolveSymlinks);
+
+  if (fileDialog.exec() != QDialog::Accepted)
+    return;
+
+  QStringList selected = fileDialog.selectedFiles();
+  if (selected.empty())
+    return;
+
+  boost::filesystem::path path = selected[0].toStdString();
 
   // Make sure the  directory exists
   if (!boost::filesystem::exists(path))
@@ -405,7 +443,7 @@ void DataLogger::OnBrowse()
     QMessageBox msgBox(this);
     std::ostringstream stream;
     stream << "Path " << path << " is not a directory. Please only specify a "
-           << "directory for data logging.";
+        << "directory for data logging.";
     msgBox.setText(stream.str().c_str());
     msgBox.exec();
     return;
@@ -434,7 +472,8 @@ void DataLogger::OnBrowse()
   msg.set_base_path(path.string());
   this->pub->Publish(msg);
 
-  this->SetFilename(QString::fromStdString(path.string()));
+  this->basePath = QString::fromStdString(path.string());
+  this->SetDestinationPath(this->basePath);
 }
 
 /////////////////////////////////////////////////
