@@ -299,6 +299,10 @@ void MainWindow::Init()
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 
+  this->FullScreen();
+  this->renderWidget->ShowTimePanel(false);
+  this->renderWidget->ShowToolbar(false);
+
   gui::Events::mainWindowReady();
 }
 

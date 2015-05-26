@@ -48,20 +48,26 @@
       <uri>model://vrc_driving_terrain</uri>
     </include>
     <include>
-      <uri>model://construction_barrel</uri>
-      <name>barrel_1</name>
-      <pose>30 -1.0 0 0 0 0</pose>
+      <uri>model://arrow</uri>
+      <name>arrow_1</name>
+      <pose>30 0.173604 0.5 0 1.5707 -1.5707</pose>
     </include>
     <include>
-      <uri>model://construction_barrel</uri>
-      <name>barrel_2</name>
-      <pose>60 1.2 0 0 0 0</pose>
+      <uri>model://arrow</uri>
+      <name>arrow_2</name>
+      <pose>97.973106 -0.093623 0.5 0 1.5707 -1.1707</pose>
     </include>
     <include>
-      <uri>model://construction_barrel</uri>
-      <name>barrel_3</name>
-      <pose>108 5 0 0 0 0</pose>
+      <uri>model://arrow</uri>
+      <name>arrow_3</name>
+      <pose>149.906403 50.379269 0.5 0 1.5707 0</pose>
     </include>
+    <include>
+      <uri>model://arrow</uri>
+      <name>arrow_4</name>
+      <pose>150.297058 100.021057 0.5 0 1.5707 -1.5707</pose>
+    </include>
+
     <include>
       <uri>model://speed_limit_sign</uri>
       <name>speed_sign_1</name>
@@ -352,72 +358,35 @@
       </link>
     </model>
 
-    <model name="start_pad">
-      <pose>-3 0 0.5 0 0 0</pose>
-      <static>true</static>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>6 6 2</size>
-            </box>
-          </geometry>
-        </collision>
+    <include>
+      <pose>-3 0 0.5 0 0 3.1415</pose>
+      <uri>model://startpad</uri>
+    </include>
 
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>6 6 2</size>
-            </box>
-          </geometry>
-          <material>
-            <script>
-              <name>Gazebo/Grey</name>
-            </script>
-          </material>
-        </visual>
-      </link>
-    </model>
-
-    <model name="end_pad">
+    <include>
       <pose>202.895309 99.914574 0.5 0 0 0</pose>
-      <static>true</static>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>6 6 2</size>
-            </box>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>6 6 2</size>
-            </box>
-          </geometry>
-          <material>
-            <script>
-              <name>Gazebo/Grey</name>
-            </script>
-          </material>
-        </visual>
-      </link>
-    </model>
+      <uri>model://endpad</uri>
+    </include>
 
     <!-- hoops -->
     <include>
       <name>hoop0</name>
-      <uri>model://hoop</uri>
       <pose>8.58556 -0.434182 0 0 0 1.5707</pose>
+      <uri>model://hoop</uri>
     </include>
-
+    <include>
+      <uri>model://number1</uri>
+      <pose>8.58556 -0.434182 8.5 0 0 0</pose>
+    </include>
 
     <include>
       <name>hoop1</name>
       <uri>model://hoop</uri>
       <pose>43 3 0 0 -0 1.5707</pose>
+    </include>
+    <include>
+      <uri>model://number2</uri>
+      <pose>43 3 8.5 0 0 0</pose>
     </include>
 
     <include>
@@ -425,11 +394,19 @@
       <uri>model://hoop</uri>
       <pose>70.4883 -4 0 0 -0 1.5707</pose>
     </include>
+    <include>
+      <uri>model://number3</uri>
+      <pose>70.4883 -4 8.5 0 0 0</pose>
+    </include>
 
     <include>
       <name>hoop3</name>
       <uri>model://hoop</uri>
       <pose>85 15 0 0 -0 1.5707</pose>
+    </include>
+    <include>
+      <uri>model://number4</uri>
+      <pose>85 15 8.5 0 0 0</pose>
     </include>
 
     <include>
@@ -437,11 +414,19 @@
       <uri>model://hoop</uri>
       <pose>122 14 0 0 -0 1.5707</pose>
     </include>
+    <include>
+      <uri>model://number5</uri>
+      <pose>122 14 8.5 0 0 0</pose>
+    </include>
 
     <include>
       <name>hoop5</name>
       <uri>model://hoop</uri>
       <pose>145 59.463 0 0 -0 2.3561</pose>
+    </include>
+    <include>
+      <uri>model://number6</uri>
+      <pose>145 59.463 8.5 0 0 0</pose>
     </include>
 
     <include>
@@ -449,11 +434,19 @@
       <uri>model://hoop</uri>
       <pose>156.525 99 0 0 -0 2.3561</pose>
     </include>
+    <include>
+      <uri>model://number7</uri>
+      <pose>156.525 99 8.5 0 0 0</pose>
+    </include>
 
     <include>
       <name>hoop7</name>
       <uri>model://hoop</uri>
       <pose>166 109 0 0 -0 1.5707</pose>
+    </include>
+    <include>
+      <uri>model://number8</uri>
+      <pose>166 109 8.5 0 0 0</pose>
     </include>
 
     <include>
@@ -461,11 +454,9 @@
       <uri>model://hoop</uri>
       <pose>185 93.5472 0 0 -0 1.5707</pose>
     </include>
-
     <include>
-      <name>hoop9</name>
-      <uri>model://hoop</uri>
-      <pose>197.427 99.4973 0 0 -0 1.5707</pose>
+      <uri>model://number9</uri>
+      <pose>185 93.5472 8.5 0 0 0</pose>
     </include>
 
     <model name="iris">
@@ -518,5 +509,16 @@
       </plugin>
     </model>
 
+    <model name="skylimit">
+      <static>true</static>
+      <pose>0 0 40 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box><size>1000 1000 0.5</size></box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
   </world>
 </sdf>

@@ -140,6 +140,7 @@ namespace gazebo
 
     /// \brief Publisher for world pause and reset msgs.
     private: transport::PublisherPtr worldControlPub;
+    private: transport::PublisherPtr timerPub;
 
     /// \brief Mutex to protect the joystic msg.
     private: boost::recursive_mutex *joyMutex;

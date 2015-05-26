@@ -40,6 +40,7 @@ set (plugins
   ElevatorPlugin
   ForceTorquePlugin
   GpuRayPlugin
+  HoopPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin

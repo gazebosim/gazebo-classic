@@ -213,10 +213,17 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void UserCamera::Update()
 {
+  static bool tracking = false;
   Camera::Update();
 
   if (this->dataPtr->viewController)
     this->dataPtr->viewController->Update();
+
+  if (!tracking && this->scene->GetVisual("iris"))
+  {
+    this->TrackVisual("iris");
+    tracking = true;
+  }
 
   // publish camera pose
   this->dataPtr->posePub->Publish(msgs::Convert(this->GetWorldPose()));

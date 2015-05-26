@@ -98,7 +98,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   // Connect to the render signal
   this->connections.push_back(
-      event::Events::ConnectPostRender(boost::bind(&Camera::Update, this)));
+      event::Events::ConnectPreRender(boost::bind(&Camera::Update, this)));
 
   if (_autoRender)
   {
@@ -342,8 +342,21 @@ void Camera::Update()
   }
   else if (this->dataPtr->trackedVisual)
   {
-    math::Vector3 direction = this->dataPtr->trackedVisual->GetWorldPose().pos -
-                              this->GetWorldPose().pos;
+    math::Vector3 offset(-10, 0, 3);
+
+    math::Vector3 visPos = this->dataPtr->trackedVisual->GetWorldPose().pos;
+
+    offset = this->dataPtr->trackedVisual->GetWorldPose().rot.RotateVector(
+        offset);
+
+    math::Vector3 myPos = this->dataPtr->trackedVisual->GetWorldPose().pos + offset;
+
+    math::Vector3 direction =  visPos - myPos;//this->GetWorldPose().pos;
+
+    /*math::Vector3 myPos = visPos;
+    myPos.z += 3.0;
+    myPos.x -= 10;
+    */
 
     double yaw = atan2(direction.y, direction.x);
     double pitch = atan2(-direction.z,
@@ -381,11 +394,13 @@ void Camera::Update()
     displacement.Normalize();
     displacement *= scaling;
 
-    math::Vector3 localPos =
+    /*math::Vector3 localPos =
       Conversions::Convert(this->sceneNode->_getDerivedPosition());
     math::Vector3 pos = localPos + displacement;
 
-    this->SetWorldPosition(pos);
+    this->SetWorldPosition(localPos);
+    */
+    this->SetWorldPosition(myPos);
   }
 }
 

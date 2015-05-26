@@ -146,6 +146,8 @@ void DronePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       this->node->Advertise<msgs::WorldControl>(
           "~/world_control");
 
+  this->timerPub = this->node->Advertise<msgs::Time>("~/timer");
+
   this->timeLimit = common::Time(180);
   this->joyMutex = new boost::recursive_mutex();
   this->joyThread = new boost::thread(
@@ -203,40 +205,31 @@ void DronePlugin::PollJoystick()
     common::Time::MSleep(10);
     msgs::Joysticks msg;
     if (this->joy->Poll(msg))
-
-    boost::recursive_mutex::scoped_lock lock(*this->joyMutex);
-    this->joyMsg = msg;
-
-    if (this->joyMsg.joy_size() > 0)
     {
-      if (this->joyMsg.joy(0).button_size() > 0)
+      boost::recursive_mutex::scoped_lock lock(*this->joyMutex);
+      this->joyMsg = msg;
+
+      if (this->joyMsg.joy_size() > 0)
       {
-        bool startButton = false;
-        bool selectButton = false;
-        for (int i = 0; i < this->joyMsg.joy(0).button_size(); ++i)
+        if (this->joyMsg.joy(0).button_size() > 0)
         {
-          if (this->joyMsg.joy(0).button(i).index() == 3 &&
-              this->joyMsg.joy(0).button(i).state() == 1)
-            startButton = true;
-          if (this->joyMsg.joy(0).button(i).index() == 0 &&
-              this->joyMsg.joy(0).button(i).state() == 1)
-            selectButton = true;
-        }
-
-        if (startButton || selectButton)
-        {
-          msgs::WorldControl worldControlMsg;
-          if (selectButton)
-            worldControlMsg.mutable_reset()->set_all(true);
-          else if (startButton)
+          bool startButton = false;
+          for (int i = 0; i < this->joyMsg.joy(0).button_size(); ++i)
           {
-            worldControlMsg.set_pause(!this->model->GetWorld()->IsPaused());
+            if (this->joyMsg.joy(0).button(i).index() == 7 &&
+                this->joyMsg.joy(0).button(i).state() == 1)
+              startButton = true;
           }
-          this->worldControlPub->Publish(worldControlMsg);
-        }
 
+          if (startButton)
+          {
+            msgs::WorldControl worldControlMsg;
+            worldControlMsg.mutable_reset()->set_all(true);
+            this->worldControlPub->Publish(worldControlMsg);
+          }
+
+        }
       }
-      // std::cout << this->joyMsg.DebugString();
     }
   }
 }
@@ -244,6 +237,11 @@ void DronePlugin::PollJoystick()
 /////////////////////////////////////////////////
 void DronePlugin::OnUpdate()
 {
+  msgs::Time timeMsg;
+  timeMsg.set_sec((this->timeLimit- this->timer.GetElapsed()).sec);
+  timeMsg.set_nsec(0);
+  this->timerPub->Publish(timeMsg);
+
   if (!this->timer.GetRunning())
   {
     math::Vector3 dist =
@@ -251,7 +249,6 @@ void DronePlugin::OnUpdate()
     if (dist.GetLength() > 1.0)
     {
       this->timer.Start();
-      std::cerr << "timer starts now!" << std::endl;
     }
   }
   else if (this->timer.GetElapsed() > this->timeLimit)
@@ -369,4 +366,5 @@ void DronePlugin::OnUpdate()
   this->wrench.torque.z = this->rotPid.Update(errorRot.z, dt);
 
   this->baseLink->AddTorque(this->wrench.torque);
+
 }

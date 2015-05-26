@@ -48,12 +48,19 @@ namespace gazebo
     public: virtual void Reset();
 
     private: void Update();
+    private: void OnTime(ConstTimePtr &_msg);
 
     private: rendering::VisualPtr vis;
 
     private: rendering::MovableText *text;
 
     private: event::ConnectionPtr updateConnection;
+
+    /// \brief Transportation node.
+    private: transport::NodePtr node;
+    private: transport::SubscriberPtr timerSub;
+    private: int sec;
+    private: int min;
   };
 }
 #endif
