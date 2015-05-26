@@ -1,4 +1,13 @@
 ## Gazebo 6.0
+1. Added world with OSRF building and an elevator
+    * [Pull request #1697](https://bitbucket.org/osrf/gazebo/pull-request/1697)
+
+1. Fixed collide bitmask by changing default value from 0x1 to 0xffff.
+    * [Pull request #1696](https://bitbucket.org/osrf/gazebo/pull-request/1696)
+
+1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
+    * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+
 1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
     * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
 
@@ -72,6 +81,9 @@ compilation on Windows.
    Added MainWindow::CloneAction.
    Added Window menu to Model Editor.
     * [Pull request #1584](https://bitbucket.org/osrf/gazebo/pull-request/1584)
+
+1. Added event to show/hide toolbars.
+    * [Pull request #1707](https://bitbucket.org/osrf/gazebo/pull-request/1707)
 
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
@@ -153,6 +165,9 @@ compilation on Windows.
 
 1. Added Apply Force/Torque visuals
     * [Pull request #1619](https://bitbucket.org/osrf/gazebo/pull-request/1619)
+
+1. Added Apply Force/Torque OnMouseRelease and ActivateWindow
+    * [Pull request #1699](https://bitbucket.org/osrf/gazebo/pull-request/1699)
 
 1. Added inertia pose getter for COMVisual and COMVisual_TEST
     * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)

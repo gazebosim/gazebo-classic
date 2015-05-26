@@ -32,8 +32,8 @@
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ApplyWrenchDialogPrivate.hh"
 #include "gazebo/gui/ApplyWrenchDialog.hh"
 
@@ -419,6 +419,7 @@ void ApplyWrenchDialog::Init(const std::string &_modelName,
 
   this->move(QCursor::pos());
   this->show();
+  this->ActivateWindow();
 }
 
 /////////////////////////////////////////////////
@@ -562,7 +563,6 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
     return false;
   }
   this->dataPtr->linkVisual = vis;
-
   this->AttachVisuals();
 
   // Set publisher
@@ -578,7 +578,7 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   if (this->dataPtr->mainWindow)
     this->dataPtr->mainWindow->installEventFilter(this);
 
-  // MouseRelease even when it's inactive, to be able to regain focus
+  // MouseRelease filter to gain focus
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->AddReleaseFilter(
@@ -952,7 +952,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
 }
 
 /////////////////////////////////////////////////
-bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
+bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera || !this->dataPtr->applyWrenchVisual)
@@ -964,7 +964,7 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
   if (!vis || _event.dragging)
     return false;
 
-  // Set active and change mode
+  // Force/torque clicked: activate dialog and prevent event propagation
   if (vis == this->dataPtr->applyWrenchVisual->GetForceVisual())
   {
     this->ActivateWindow();
@@ -988,6 +988,12 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent & _event)
       this->SetTorque(this->dataPtr->torqueVector);
 
     return true;
+  }
+  // Link clicked: activate dialog and propagate event
+  else if (vis->GetNthAncestor(2) ==
+      this->dataPtr->applyWrenchVisual->GetNthAncestor(2))
+  {
+    this->ActivateWindow();
   }
   return false;
 }
@@ -1184,10 +1190,11 @@ void ApplyWrenchDialog::ActivateWindow()
 {
   if (!this->isActiveWindow())
   {
-    // Clear focus before activating not to trigger mode change due to FucusIn
+    // Clear focus before activating not to trigger FucusIn
     QWidget *focusedWidget = this->focusWidget();
     if (focusedWidget)
       focusedWidget->clearFocus();
+
     this->activateWindow();
   }
 }
