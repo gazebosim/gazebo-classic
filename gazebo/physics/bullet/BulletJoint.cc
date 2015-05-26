@@ -500,15 +500,66 @@ void BulletJoint::ApplyStiffnessDamping()
     }
     else
     {
-      btGeneric6DofConstraint stiffnessDampingConstraint;
-      stiffnessDampingConstraint = new btGeneric6DofConstraint(
-        *(bulletChildLink->GetBulletLink()),
-        *(bulletParentLink->GetBulletLink()),
-        BulletTypes::ConvertVector3(pivotChild),
-        BulletTypes::ConvertVector3(pivotParent),
-        BulletTypes::ConvertVector3(axisChild),
-        BulletTypes::ConvertVector3(axisParent);
-        );
+      // Cast to BulletLink
+      BulletLinkPtr bulletChildLink =
+        boost::static_pointer_cast<BulletLink>(this->childLink);
+      BulletLinkPtr bulletParentLink =
+        boost::static_pointer_cast<BulletLink>(this->parentLink);
+
+      math::Quaternion axisFrame = this->GetAxisFrame(0);
+      math::Vector3 initialWorldAxis =
+        axisFrame.RotateVector(this->GetLocalAxis(0u));
+      // Get axis unit vector (expressed in world frame).
+      math::Vector3 axis = initialWorldAxis;
+      if (axis == math::Vector3::Zero)
+      {
+        gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
+        axis.Set(0, 0, 1);
+      }
+
+      // Local variables used to compute pivots and axes in body-fixed frames
+      // for the parent and child links.
+      math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
+      math::Pose pose;
+
+      // Initialize pivots to anchorPos, which is expressed in the
+      // world coordinate frame.
+      pivotParent = this->anchorPos;
+      pivotChild = this->anchorPos;
+
+      // Check if parentLink exists. If not, the parent will be the world.
+      if (this->parentLink)
+      {
+        // Compute relative pose between joint anchor and CoG of parent link.
+        pose = this->parentLink->GetWorldCoGPose();
+        // Subtract CoG position from anchor position, both in world frame.
+        pivotParent -= pose.pos;
+        // Rotate pivot offset and axis into body-fixed frame of parent.
+        pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+        axisParent = pose.rot.RotateVectorReverse(axis);
+        axisParent = axisParent.Normalize();
+      }
+      // Check if childLink exists. If not, the child will be the world.
+      if (this->childLink)
+      {
+        // Compute relative pose between joint anchor and CoG of child link.
+        pose = this->childLink->GetWorldCoGPose();
+        // Subtract CoG position from anchor position, both in world frame.
+        pivotChild -= pose.pos;
+        // Rotate pivot offset and axis into body-fixed frame of child.
+        pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+        axisChild = pose.rot.RotateVectorReverse(axis);
+        axisChild = axisChild.Normalize();
+      }
+      // btGeneric6DofConstraint* stiffnessDampingConstraint;
+      // stiffnessDampingConstraint = new btGeneric6DofConstraint(
+      //   *(bulletChildLink->GetBulletLink()),
+      //   *(bulletParentLink->GetBulletLink()),
+      //   BulletTypes::ConvertVector3(pivotChild),
+      //   BulletTypes::ConvertVector3(pivotParent),
+      //   BulletTypes::ConvertVector3(axisChild),
+      //   BulletTypes::ConvertVector3(axisParent)
+      //   );
     }
   }
 }
