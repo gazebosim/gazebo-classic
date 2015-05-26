@@ -97,6 +97,8 @@ void ApplyWrenchVisual::Fini()
   dPtr->forceVisual.reset();
   dPtr->torqueVisual.reset();
   dPtr->rotTool.reset();
+
+  Visual::Fini();
 }
 
 ///////////////////////////////////////////////////

@@ -78,7 +78,7 @@ namespace gazebo
       public: void Load();
 
       // Documentation inherited.
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Attach the selection object to the given visual
       /// \param[in] _vis Pointer to visual to which the selection object

@@ -138,8 +138,7 @@ TEST_F(SelectionObj_TEST, LoadFini)
   // Check that it was added to the scene (by Load)
   EXPECT_EQ(scene->GetVisual("obj"), obj);
 
-  // Finish visual and remove it from the scene
-  obj->Fini();
+  // Remove it from the scene (Fini is called)
   scene->RemoveVisual(obj);
 
   // Check that it was removed
@@ -158,8 +157,7 @@ TEST_F(SelectionObj_TEST, LoadFini)
   // Check that the scene returns the new visual
   EXPECT_EQ(scene->GetVisual("obj"), obj2);
 
-  // Finish visual and remove it from the scene
-  obj2->Fini();
+  // Remove it from the scene (Fini is called)
   scene->RemoveVisual(obj2);
 
   // Check that it was removed
