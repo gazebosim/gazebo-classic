@@ -207,6 +207,28 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
     dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, true);
   }
 
+  if (solverElem->HasElement("num_island_threads"))
+  {
+    gzerr << solverElem->Get<int>("num_island_threads") << "\n";
+    dWorldSetQuickStepThreads(this->dataPtr->worldId,
+      solverElem->Get<int>("num_island_threads"));
+  }
+  else
+  {
+    dWorldSetQuickStepThreads(this->dataPtr->worldId, 0);
+  }
+
+  if (solverElem->HasElement("use_thread_position_correction"))
+  {
+    gzerr << solverElem->Get<bool>("use_thread_position_correction") << "\n";
+    dWorldSetQuickStepThreadPositionCorrection(this->dataPtr->worldId,
+      solverElem->Get<bool>("use_thread_position_correction"));
+  }
+  else
+  {
+    dWorldSetQuickStepThreadPositionCorrection(this->dataPtr->worldId, false);
+  }
+
   /// \TODO: defaultvelocity decay!? This is BAD if it's true.
   dWorldSetDamping(this->dataPtr->worldId, 0.0001, 0.0001);
 
