@@ -199,6 +199,13 @@ void LogPlayWidget::SetPaused(const bool _paused)
   {
     emit ShowPlay();
     emit HidePause();
+
+    // Check if there are pending steps and publish now that it's paused
+    if (this->dataPtr->pendingStep != 0)
+    {
+      this->PublishMultistep(this->dataPtr->pendingStep);
+      this->dataPtr->pendingStep = 0;
+    }
   }
   else
   {
@@ -228,19 +235,31 @@ void LogPlayWidget::OnPause()
 /////////////////////////////////////////////////
 void LogPlayWidget::OnStepForward()
 {
-  // TODO: Add possibility to change number of steps
-  msgs::LogPlaybackControl msg;
-  msg.set_multi_step(this->dataPtr->stepSpin->value());
-  this->dataPtr->logPlaybackControlPub->Publish(msg);
-  //g_stepAct->trigger();
+  if (this->dataPtr->paused)
+  {
+    this->PublishMultistep(this->dataPtr->stepSpin->value());
+  }
+  // If currently playing, first pause and only then step, to sync with server
+  else
+  {
+    this->OnPause();
+    this->dataPtr->pendingStep = this->dataPtr->stepSpin->value();
+  }
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnStepBack()
 {
-  msgs::LogPlaybackControl msg;
-  msg.set_multi_step(-this->dataPtr->stepSpin->value());
-  this->dataPtr->logPlaybackControlPub->Publish(msg);
+  if (this->dataPtr->paused)
+  {
+    this->PublishMultistep(-this->dataPtr->stepSpin->value());
+  }
+  // If currently playing, first pause and only then step, to sync with server
+  else
+  {
+    this->OnPause();
+    this->dataPtr->pendingStep = -this->dataPtr->stepSpin->value();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -303,6 +322,14 @@ void LogPlayWidget::EmitSetEndTime(QString _timeString, int _timeInt)
   this->SetEndTime(QString::fromStdString(timeString));
   // start time in view
   this->SetEndTime(_timeInt);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::PublishMultistep(int _step)
+{
+  msgs::LogPlaybackControl msg;
+  msg.set_multi_step(_step);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////

@@ -111,6 +111,10 @@ namespace gazebo
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void SetEndTime(int _time);
 
+      /// \brief Publish a multistep message.
+      /// \param[in] _step Number of steps.
+      private: void PublishMultistep(int _step);
+
       /// \internal
       /// \brief Pointer to private data.
       private: LogPlayWidgetPrivate *dataPtr;

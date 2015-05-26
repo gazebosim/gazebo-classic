@@ -56,6 +56,10 @@ namespace gazebo
 
       /// \brief Used to start, stop, and step simulation.
       public: QSpinBox *stepSpin;
+
+      /// \brief Number of steps pending to be published once the simulation
+      /// is paused.
+      public: int pendingStep = 0;
     };
 
     /// \class LogPlayViewPrivate LogPlayViewPrivate.hh
