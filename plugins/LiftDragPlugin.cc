@@ -110,21 +110,32 @@ void LiftDragPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("link_name"))
   {
     sdf::ElementPtr elem = _sdf->GetElement("link_name");
+    GZ_ASSERT(elem, "Element link_name doesn't exist!");
     this->linkName = elem->Get<std::string>();
     this->link = this->model->GetLink(this->linkName);
+    GZ_ASSERT(link, "Link was NULL");
   }
 }
 
 /////////////////////////////////////////////////
 void LiftDragPlugin::Init()
 {
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&LiftDragPlugin::OnUpdate, this));
+  if (this->link)
+  {
+    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+            boost::bind(&LiftDragPlugin::OnUpdate, this));
+  }
+  else
+  {
+    gzwarn << "Link with name[" << this->linkName << "] not found. "
+           << "The LiftDragPlugin will not generate forces\n";
+  }
 }
 
 /////////////////////////////////////////////////
 void LiftDragPlugin::OnUpdate()
 {
+  GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
   math::Vector3 vel = this->link->GetWorldLinearVel(this->cp);
 
@@ -146,11 +157,14 @@ void LiftDragPlugin::OnUpdate()
   // ldNormal vector to lift-drag-plane described in inertial frame
   math::Vector3 ldNormal = forwardI.Cross(upwardI).Normalize();
 
+  double min = -1;
+  double max = 1;
   // check sweep (angle between vel and lift-drag-plane)
-  double sinSweepAngle = ldNormal.Dot(vel) / vel.GetLength();
+  double sinSweepAngle =
+      math::clamp(ldNormal.Dot(vel) / vel.GetLength(), min, max);
 
   // get cos from trig identity
-  double cosSweepAngle2 = (1.0 - sinSweepAngle * sinSweepAngle);
+  double cosSweepAngle2 = 1.0 - sinSweepAngle * sinSweepAngle;
   this->sweep = asin(sinSweepAngle);
 
   // truncate sweep to within +/-90 deg
@@ -180,19 +194,19 @@ void LiftDragPlugin::OnUpdate()
   // get direction of moment
   math::Vector3 momentDirection = ldNormal;
 
+  double forwardVelocity = forwardI.GetLength() * velInLDPlane.GetLength();
   double cosAlpha = math::clamp(
-    forwardI.Dot(velInLDPlane) /
-    (forwardI.GetLength() * velInLDPlane.GetLength()), -1.0, 1.0);
+    forwardI.Dot(velInLDPlane) / forwardVelocity, min, max);
+
   // gzerr << "ca " << forwardI.Dot(velInLDPlane) /
   //   (forwardI.GetLength() * velInLDPlane.GetLength()) << "\n";
 
   // get sign of alpha
   // take upwards component of velocity in lift-drag plane.
   // if sign == upward, then alpha is negative
-  double alphaSign = -upwardI.Dot(velInLDPlane)/
-    (upwardI.GetLength() + velInLDPlane.GetLength());
+  double upwardVelocity = upwardI.GetLength() + velInLDPlane.GetLength();
+  double alphaSign = -upwardI.Dot(velInLDPlane)/upwardVelocity;
 
-  // double sinAlpha = sqrt(1.0 - cosAlpha * cosAlpha);
   if (alphaSign > 0.0)
     this->alpha = this->alpha0 + acos(cosAlpha);
   else
@@ -322,6 +336,11 @@ void LiftDragPlugin::OnUpdate()
     gzerr << "force: " << force << "\n";
     gzerr << "torque: " << torque << "\n";
   }
+
+  // Correct for nan or inf
+  force.Correct();
+  this->cp.Correct();
+  torque.Correct();
 
   // apply forces at cg (with torques for position shift)
   this->link->AddForceAtRelativePosition(force, this->cp);

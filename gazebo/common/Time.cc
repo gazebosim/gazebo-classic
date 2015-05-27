@@ -18,6 +18,7 @@
 #ifdef _WIN32
   #include <Windows.h>
   #include <Winsock2.h>
+  #include <cstdint>
   struct timespec
   {
     int64_t tv_sec;
@@ -175,7 +176,7 @@ const Time &Time::GetWallTime()
     static_cast<double>(cpuFreq.QuadPart);
   uint32_t deltaSec = static_cast<uint32_t>(floor(dDeltaCpuTime));
   uint32_t deltaNSec = static_cast<uint32_t>(
-      math::round((dDeltaCpuTime-deltaSec) * this->nsInSec));
+      std::round((dDeltaCpuTime-deltaSec) * nsInSec));
 
   int64_t secSum  = static_cast<int64_t>(startSec) +
     static_cast<int64_t>(deltaSec);
@@ -184,11 +185,11 @@ const Time &Time::GetWallTime()
 
   // Normalize
   {
-    int64_t nsecPart = nsecSum % this->nsInSec;
-    int64_t secPart = secSum + nsecSum / this->nsInSec;
+    int64_t nsecPart = nsecSum % nsInSec;
+    int64_t secPart = secSum + nsecSum / nsInSec;
     if (nsecPart < 0)
     {
-      nsecPart += this->nsInSec;
+      nsecPart += nsInSec;
       --secPart;
     }
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <scene>
+      <ambient>1 1 1 1</ambient>
+      <background>0 0 0 1</background>
+      <grid>false</grid>
+    </scene>
+
+    <gui>
+      <camera name="user">
+        <pose>10 0 10 0 0.7 0</pose>
+        <projection_type>orthographic</projection_type>
+      </camera>
+    </gui>
+
+    <model name="wall1">
+      <static>true</static>
+      <pose>500 0 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1000 1 .2</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+ </world>
+</sdf>
