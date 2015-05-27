@@ -116,8 +116,17 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
             << "\t Max[" << baseMaxTime << "]\n"
             << "\t Min[" << baseMinTime << "]\n";
 
-  // Turn on 2 island threads
-  physics->SetParam("island_threads", 2);
+  // Turn on island threads
+  {
+    int threads;
+    physics->SetParam("island_threads", 2);
+    EXPECT_NO_THROW(
+      threads = boost::any_cast<int>(physics->GetParam("island_threads")));
+    EXPECT_EQ(2, threads);
+  }
+
+  // Take 500 steps to warm up.
+  world->Step(500);
 
   // Collect threaded statistics
   common::Time threadAvgTime, threadMaxTime, threadMinTime;
