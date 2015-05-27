@@ -304,7 +304,8 @@ void LiftDragPlugin::OnUpdate()
   else
     cm = this->cma * this->alpha * cosSweepAngle;
 
-  // reset cm to zero, as cm needs testing
+  /// \TODO: implement cm
+  /// for now, reset cm to zero, as cm needs testing
   cm = 0.0;
 
   // compute moment (torque) at cp
