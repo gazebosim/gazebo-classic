@@ -1,0 +1,87 @@
+<?xml version="1.0" ?>
+<%
+  require 'matrix'
+  # Friction direction demo world
+  # Spawn objects with different friction directions arrayed in a semi-circle
+
+  # Boxes
+  # Inertial parameters
+  # Aluminum 2700 kg/m^3
+  density = 2700.0
+  dx = 0.2
+  dy = dx / 3.0
+  dz = dx / 10.0
+  dd = dx
+  mass = density * dx * dy * dz 
+  ixx = 1.0 / 12 * mass * (dy*dy + dz*dz)
+  iyy = 1.0 / 12 * mass * (dz*dz + dx*dx)
+  izz = 1.0 / 12 * mass * (dx*dx + dy*dy)
+
+  # Number of boxes and placement radius
+  N = 17
+  radius = dd * 20
+
+  # Orientation angles
+  angles = Math::PI * Vector.elements(Array(0..N), copy=true) / N.to_f
+
+  # revolute_friction = [0.0, 0.1, 1.0, 10.0]
+  # prismatic_friction = [0.0, 5.0, 9.0, 9.81]
+  # universal_friction = [0.0, 0.1, 1.0, 10.0]
+
+  def a_to_s(array=[])
+    array.map(&:to_s).join(" ")
+  end
+%>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+<%
+  # Revolute joints
+  i = 0
+  angles.each do |angle|
+    i = i + 1
+    name = 'box_' + i.to_s
+    x0 = radius * Math::cos(angle)
+    y0 = radius * Math::sin(angle)
+    z0 = dz / 2.0
+%>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= a_to_s([x0, y0, z0]) %> 0 0 <%= angle %></pose>
+      <link name="link">
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+<%
+  end
+%>
+  </world>
+</sdf>
