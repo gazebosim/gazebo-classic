@@ -1,6 +1,12 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(${BULLET_INCLUDE_DIRS})
+message(status "\n\n\n${BULLET_INCLUDE_DIRS}\n\n\n------------------\n\n\n")
+  
+include_directories(
+  ${BULLET_INCLUDE_DIRS}
+  # needed for bullet3
+  ${BULLET_INCLUDE_DIRS}/bullet
+)
 
 link_directories(${BULLET_LIBRARY_DIRS})
 

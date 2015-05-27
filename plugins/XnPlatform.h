@@ -63,9 +63,9 @@
 	#endif
 
 	#include "Win32/XnPlatformWin32.h"
-#elif (linux && (i386 || __x86_64__))
+#elif ((__linux__ || linux) && (i386 || __x86_64__))
 	#include "Linux-x86/XnPlatformLinux-x86.h"
-#elif (linux && __arm__)
+#elif ((__linux__ || linux) && __arm__)
 	#include "Linux-Arm/XnPlatformLinux-Arm.h"
 #elif (__APPLE__)
 	#include "MacOSX/XnPlatformMacOSX.h"
