@@ -210,12 +210,12 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   if (solverElem->HasElement("num_island_threads"))
   {
     gzerr << solverElem->Get<int>("num_island_threads") << "\n";
-    dWorldSetQuickStepThreads(this->dataPtr->worldId,
+    dWorldSetIslandThreads(this->dataPtr->worldId,
       solverElem->Get<int>("num_island_threads"));
   }
   else
   {
-    dWorldSetQuickStepThreads(this->dataPtr->worldId, 0);
+    dWorldSetIslandThreads(this->dataPtr->worldId, 0);
   }
 
   if (solverElem->HasElement("use_thread_position_correction"))
