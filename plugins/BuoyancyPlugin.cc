@@ -24,7 +24,9 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(BuoyancyPlugin)
 
 /////////////////////////////////////////////////
-BuoyancyPlugin::BuoyancyPlugin() : fluidDensity(1000.0)
+BuoyancyPlugin::BuoyancyPlugin()
+  // Density of liquid water at 1 atm pressure and 15 degrees Celsius.
+  : fluidDensity(999.1026)
 {
 }
 
