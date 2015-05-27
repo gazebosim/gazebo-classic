@@ -237,7 +237,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
       boost::any_cast<int>(odePhysics->GetParam("island_threads")));
     EXPECT_FALSE(islandThreads);
 
-    // try turning it off, then on again
+    // try enabling threads, then disabling
     std::vector<int> threads = {1, 2, 3, 0};
     for (auto const islandThreadsSet : threads)
     {
@@ -257,7 +257,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
       odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
     EXPECT_FALSE(odeQuiet);
 
-    // try turning it off, then on again
+    // try turning it on, then off again
     std::vector<bool> bools = {true, false};
     for (const bool odeQuietSet : bools)
     {
