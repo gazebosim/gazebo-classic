@@ -197,7 +197,7 @@ TEST_F(SVGLoader, ClosedLoops)
   EXPECT_EQ(true, success);
 
   // save for inspection
-  std::ofstream out("gaps.html");
+  std::ofstream out("chassis.html");
   loader.DumpPaths(paths, out);
   out.close();
 

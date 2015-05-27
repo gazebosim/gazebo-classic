@@ -892,9 +892,8 @@ void SVGLoader::PathsToClosedPolylines(
         double length = endPoint.Distance(startPoint);
         if (length < tol)
         {
-          gzerr << "segment between " << startPoint
-                << " and " << endPoint << " is too short: "
-                << length << std::endl;
+          gzmsg << "Ignoring short segment (length: "
+                << length << ")" <<std::endl;
         }
         else
         {
@@ -959,13 +958,13 @@ void SVGLoader::PathsToClosedPolylines(
     // the new polyline is complete
     if (loopClosed)
     {
-      gzerr << "closed!" << std::endl << std::endl;
       _closedPolys.push_back(polyline);
     }
     else
     {
-      double gap = polyline.back().Distance(polyline.front());
-      gzerr << "Open! gap=" << gap << std::endl << std::endl;
+      gzmsg << "Line segments that are not part of a closed paths have"
+         << " been found with the current minimum distance of " << tol
+         << " between 2 points."  << std::endl << std::endl;
       _openPolys.push_back(polyline);
     }
   }

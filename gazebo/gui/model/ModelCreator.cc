@@ -640,43 +640,55 @@ std::string ModelCreator::AddShape(LinkType _type,
       return std::string();
     }
 
+    // SVG paths do not map to sdf polylines, because we now allow a countour
+    // to be made of multiple svg disjoint paths.
+    // For this reason, we compute the closed polylines that can be extruded
+    // in this step
+    std::vector< std::vector<math::Vector2d> > closedPolys;
+    std::vector< std::vector<math::Vector2d> > openPolys;
+    svgLoader.PathsToClosedPolylines(paths, 0.05, closedPolys, openPolys);
+    if (closedPolys.size() == 0)
+    {
+      gzerr << "No closed polylines found on file [" << _uri << "]"
+        << std::endl;
+      return std::string();
+    }
+    if (openPolys.size() > 0)
+    {
+      gzmsg << "There are " << openPolys.size() << "open polylines. "
+        << "They will be ignored." << std::endl;
+    }
     // Find extreme values to center the polylines
     math::Vector2d min(paths[0].polylines[0][0]);
     math::Vector2d max(min);
-    for (common::SVGPath p : paths)
+
+    for (std::vector<math::Vector2d> poly : closedPolys)
     {
-      for (std::vector<math::Vector2d> poly : p.polylines)
+      for (math::Vector2d pt : poly)
       {
-        for (math::Vector2d pt : poly)
-        {
-          if (pt.x < min.x)
-            min.x = pt.x;
-          if (pt.y < min.y)
-            min.y = pt.y;
-          if (pt.x > max.x)
-            max.x = pt.x;
-          if (pt.y > max.y)
-            max.y = pt.y;
-        }
+        if (pt.x < min.x)
+          min.x = pt.x;
+        if (pt.y < min.y)
+          min.y = pt.y;
+        if (pt.x > max.x)
+          max.x = pt.x;
+        if (pt.y > max.y)
+          max.y = pt.y;
       }
     }
-
-    for (common::SVGPath p : paths)
+    for (std::vector<math::Vector2d> poly : closedPolys)
     {
-      for (std::vector<math::Vector2d> poly : p.polylines)
-      {
-        sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
-        polylineElem->GetElement("height")->Set(_size.z);
+      sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
+      polylineElem->GetElement("height")->Set(_size.z);
 
-        for (math::Vector2d pt : poly)
-        {
-          // Translate to center
-          pt = pt - min - (max-min)*0.5;
-          // Swap X and Y so Z will point up
-          // (in 2D it points into the screen)
-          sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-          pointElem->Set(math::Vector2d(pt.y*_size.y, pt.x*_size.x));
-        }
+      for (math::Vector2d pt : poly)
+      {
+        // Translate to center
+        pt = pt - min - (max-min)*0.5;
+        // Swap X and Y so Z will point up
+        // (in 2D it points into the screen)
+        sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+        pointElem->Set(math::Vector2d(pt.y*_size.y, pt.x*_size.x));
       }
     }
   }
