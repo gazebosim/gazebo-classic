@@ -3,6 +3,7 @@ set (files
   blank.world
   camera.world
   cart_demo.world
+  cessna_demo.world
   contact.world
   depth_camera.world
   elevator.world
