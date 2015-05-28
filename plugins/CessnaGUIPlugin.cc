@@ -16,7 +16,6 @@
 */
 
 #include <algorithm>
-#include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/gui/Actions.hh>
 #include "CessnaGUIPlugin.hh"
@@ -27,8 +26,12 @@ using namespace gazebo;
 GZ_REGISTER_GUI_PLUGIN(CessnaGUIPlugin)
 
 /////////////////////////////////////////////////
-CessnaGUIPlugin::CessnaGUIPlugin() : GUIPlugin()
+CessnaGUIPlugin::CessnaGUIPlugin()
+  : GUIPlugin()
 {
+  // This is needed to avoid the creation of a black widget with default size.
+  this->resize(0, 0);
+
   // Set the increment or decrement in angle per key pressed.
   this->angleStep.SetFromDegree(1.0);
 
@@ -75,13 +78,6 @@ CessnaGUIPlugin::CessnaGUIPlugin() : GUIPlugin()
 /////////////////////////////////////////////////
 CessnaGUIPlugin::~CessnaGUIPlugin()
 {
-}
-
-/////////////////////////////////////////////////
-void CessnaGUIPlugin::Load(sdf::ElementPtr _sdf)
-{
-  GZ_ASSERT(_sdf, "CessnaGUIPlugin _sdf pointer is NULL");
-  this->sdf = _sdf;
 }
 
 /////////////////////////////////////////////////

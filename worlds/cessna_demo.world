@@ -3,7 +3,7 @@
   <world name="default">
     <gui>
       <!-- A plugin for controlling the Cessna with the keyboard -->
-      <plugin name="sample" filename="libCessnaGUIPlugin.so"/>
+      <plugin name="cessna_keyboard" filename="libCessnaGUIPlugin.so"/>
 
       <camera name="user_camera">
         <pose>-16 0 4 0 0 0</pose>

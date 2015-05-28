@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_GUI_CESSNA_PLUGIN_HH_
 #define _GAZEBO_GUI_CESSNA_PLUGIN_HH_
 
-#include <sdf/sdf.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
@@ -40,32 +39,29 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~CessnaGUIPlugin();
 
-    // Documentation inherited.
-    public: void Load(sdf::ElementPtr _elem);
-
     /// \brief Increase the propeller RPMs.
-    public slots: void OnIncreaseThrust();
+    protected slots: void OnIncreaseThrust();
 
     /// \brief Decrease the propeller RPMs.
-    public slots: void OnDecreaseThrust();
+    protected slots: void OnDecreaseThrust();
 
     /// \brief Increase the flaps angle.
-    public slots: void OnIncreaseFlaps();
+    protected slots: void OnIncreaseFlaps();
 
     /// \brief Decrease the flaps angle.
-    public slots: void OnDecreaseFlaps();
+    protected slots: void OnDecreaseFlaps();
 
     /// \brief Increase the elevators angle
-    public slots: void OnIncreaseElevators();
+    protected slots: void OnIncreaseElevators();
 
     /// \brief Decrease the elevators angle.
-    public slots: void OnDecreaseElevators();
+    protected slots: void OnDecreaseElevators();
 
     /// \brief Increase the rudder angle.
-    public slots: void OnIncreaseRudder();
+    protected slots: void OnIncreaseRudder();
 
     /// \brief Decrease the rudder angle.
-    public slots: void OnDecreaseRudder();
+    protected slots: void OnDecreaseRudder();
 
     /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
