@@ -237,7 +237,7 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   }
   else if (this->dataPtr->logPlayWidget->isVisible())
   {
-    // Set current time (simulation time) in text and in ms
+    // Set current time
     this->dataPtr->logPlayWidget->EmitSetCurrentTime(
         msgs::Convert(_msg->sim_time()));
 

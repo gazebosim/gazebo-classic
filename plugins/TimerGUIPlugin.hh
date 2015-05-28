@@ -102,11 +102,6 @@ namespace gazebo
     /// \brief Handles the prerender callback
     private: void PreRender();
 
-    /// \brief Helper function to format time string.
-    /// \param[in] _msg Time message.
-    /// \return Time formatted as a string.
-    private: std::string FormatTime(const common::Time &_time) const;
-
     /// \brief Node used to establish communication with gzserver.
     private: transport::NodePtr node;
 
