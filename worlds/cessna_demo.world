@@ -21,7 +21,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>10000 10000</size>
+              <size>5000 5000</size>
             </plane>
           </geometry>
           <surface>
@@ -56,7 +56,7 @@
           <geometry>
             <plane>
               <normal>0 0 1</normal>
-              <size>10000 10000</size>
+              <size>5000 5000</size>
             </plane>
           </geometry>
           <material>
