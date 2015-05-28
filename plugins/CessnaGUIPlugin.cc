@@ -58,22 +58,22 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   QObject::connect(decreaseFlaps, SIGNAL(activated()), this,
       SLOT(OnDecreaseFlaps()));
 
-  // ideally right arrow key
+  // ideally left arrow key
   QShortcut *increaseRoll = new QShortcut(QKeySequence("s"), this);
   QObject::connect(increaseRoll, SIGNAL(activated()), this,
       SLOT(OnIncreaseRoll()));
 
-  // ideally left arrow key
+  // ideally right arrow key
   QShortcut *decreaseRoll = new QShortcut(QKeySequence("x"), this);
   QObject::connect(decreaseRoll, SIGNAL(activated()), this,
       SLOT(OnDecreaseRoll()));
 
-  // ideally up arrow key
+  // ideally down arrow key
   QShortcut *increaseElevators = new QShortcut(QKeySequence("d"), this);
   QObject::connect(increaseElevators, SIGNAL(activated()), this,
       SLOT(OnIncreaseElevators()));
 
-  // ideally down arrow key
+  // ideally up arrow key
   QShortcut *decreaseElevators = new QShortcut(QKeySequence("c"), this);
   QObject::connect(decreaseElevators, SIGNAL(activated()), this,
       SLOT(OnDecreaseElevators()));
