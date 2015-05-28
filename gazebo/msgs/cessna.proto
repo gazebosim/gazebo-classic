@@ -25,5 +25,5 @@ message Cessna
   optional int32 elevators = 6;
 
   /// Target ruddle angle in rads.
-  optional int32 ruddle = 7;
+  optional int32 rudder = 7;
 }

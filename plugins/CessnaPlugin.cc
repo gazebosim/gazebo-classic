@@ -93,7 +93,7 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Read the required joint name parameters.
   std::vector<std::string> requiredParams = {"propeller","left_aileron",
-    "left_flap", "right_aileron", "right_flap", "elevators", "ruddle"};
+    "left_flap", "right_aileron", "right_flap", "elevators", "rudder"};
 
   for (size_t i = 0; i < requiredParams.size(); ++i)
   {
@@ -179,8 +179,8 @@ void CessnaPlugin::OnControl(ConstCessnaPtr &_msg)
     this->cmds[kRightFlap] = _msg->right_flap();
   if (_msg->has_elevators())
     this->cmds[kElevators] = _msg->elevators();
-  if (_msg->has_ruddle())
-    this->cmds[kRuddle] = _msg->ruddle();
+  if (_msg->has_rudder())
+    this->cmds[kRudder] = _msg->rudder();
 }
 
 /////////////////////////////////////////////////
@@ -214,7 +214,7 @@ void CessnaPlugin::PublishState()
   float rightAileron = this->joints[kRightAileron]->GetAngle(0).Radian();
   float rightFlap = this->joints[kRightFlap]->GetAngle(0).Radian();
   float elevators = this->joints[kElevators]->GetAngle(0).Radian();
-  float ruddle = this->joints[kRuddle]->GetAngle(0).Radian();
+  float rudder = this->joints[kRudder]->GetAngle(0).Radian();
 
   msgs::Cessna msg;
   msg.set_propeller_speed(propellerSpeed);
@@ -223,7 +223,7 @@ void CessnaPlugin::PublishState()
   msg.set_right_aileron(rightAileron);
   msg.set_right_flap(rightFlap);
   msg.set_elevators(elevators);
-  msg.set_ruddle(ruddle);
+  msg.set_rudder(rudder);
 
   this->statePub->Publish(msg);
 }

@@ -62,7 +62,7 @@
         <right_aileron>cessna::right_aileron_joint</right_aileron>
         <right_flap>cessna::right_flap_joint</right_flap>
         <elevators>cessna::elevators_joint</elevators>
-        <ruddle>cessna::rudder_joint</ruddle>
+        <rudder>cessna::rudder_joint</rudder>
       </plugin>
     </model>
 

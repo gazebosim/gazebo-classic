@@ -33,6 +33,7 @@ set (plugins
   CameraPlugin
   CartDemoPlugin
   CessnaPlugin
+  CessnaGUIPlugin
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin

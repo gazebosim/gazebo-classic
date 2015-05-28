@@ -41,7 +41,7 @@ namespace gazebo
   /// <right_aileron>     Name of the joint controlling the right aileron.
   /// <right_flap>        Name of the joint controlling the right flap.
   /// <elevators>         Name of the joint controlling the rear elevators.
-  /// <ruddle>            Name of the joint controlling the ruddle.
+  /// <rudder>            Name of the joint controlling the rudder.
   ///
   /// The following parameters are optional:
   /// <propeller_p_gain> P gain for the PID that controls the propeller's speed.
@@ -100,7 +100,7 @@ namespace gazebo
     private: static const unsigned int kRightAileron = 2;
     private: static const unsigned int kRightFlap    = 3;
     private: static const unsigned int kElevators    = 4;
-    private: static const unsigned int kRuddle       = 5;
+    private: static const unsigned int kRudder       = 5;
     private: static const unsigned int kPropeller    = 6;
 
     /// \brief Pointer to the update event connection.
