@@ -32,6 +32,7 @@ set (plugins
   BuoyancyPlugin
   CameraPlugin
   CartDemoPlugin
+  CessnaPlugin
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
