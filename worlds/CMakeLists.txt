@@ -19,6 +19,7 @@ set (files
   heightmap.world
   hydra_demo.world
   initial_velocity.world
+  iris_standoff_demo.world
   joint_damping_demo.world
   joint_friction_demo.world
   joints.world

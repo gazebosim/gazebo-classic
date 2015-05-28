@@ -132,13 +132,22 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void LiftDragPlugin::Init()
 {
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&LiftDragPlugin::OnUpdate, this));
+  if (this->link)
+  {
+    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+            boost::bind(&LiftDragPlugin::OnUpdate, this));
+  }
+  else
+  {
+    gzwarn << "Link with name[" << this->linkName << "] not found. "
+           << "The LiftDragPlugin will not generate forces\n";
+  }
 }
 
 /////////////////////////////////////////////////
 void LiftDragPlugin::OnUpdate()
 {
+  GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
   math::Vector3 velI = this->link->GetWorldLinearVel(this->cp);
 
