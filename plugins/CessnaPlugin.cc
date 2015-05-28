@@ -129,6 +129,9 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       pid.SetDGain(_sdf->Get<double>("surfaces_d_gain"));
   }
 
+  // Controller time control.
+  this->lastControllerUpdateTime = this->model->GetWorld()->GetSimTime();
+
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -138,8 +141,8 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   std::string prefix = "~/" + this->model->GetName() + "/";
-  this->statePub = this->node->Advertise<msgs::Cessna>(prefix + "cessna_state");
-  this->controlSub = this->node->Subscribe(prefix + "cessna_control",
+  this->statePub = this->node->Advertise<msgs::Cessna>(prefix + "state");
+  this->controlSub = this->node->Subscribe(prefix + "control",
     &CessnaPlugin::OnControl, this);
 }
 

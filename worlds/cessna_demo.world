@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>10 0 3 0 0 3.141592</pose>
+      </camera>
+    </gui>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>10000 10000</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>10000 10000</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/WoodFloor</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="cessna">
+      <include>
+        <uri>model://cessna</uri>
+      </include>
+
+      <!-- A plugin for controlling the thrust and control surfaces -->
+      <plugin name="cessna_control" filename="libCessnaPlugin.so">
+        <propeller>cessna::propeller_joint</propeller>
+        <propeller_max_rpm>2500</propeller_max_rpm>
+        <left_aileron>cessna::left_aileron_joint</left_aileron>
+        <left_flap>cessna::left_flap_joint</left_flap>
+        <right_aileron>cessna::right_aileron_joint</right_aileron>
+        <right_flap>cessna::right_flap_joint</right_flap>
+        <elevators>cessna::elevators_joint</elevators>
+        <ruddle>cessna::rudder_joint</ruddle>
+      </plugin>
+    </model>
+
+  </world>
+</sdf>
