@@ -96,6 +96,11 @@ namespace gazebo
       /// \return Time as a float in seconds
       public: float Float() const;
 
+      /// \brief Get the time as a string formatted as "DD hh:mm:ss.mmm".
+      /// \return String representing time.
+      public: std::string FormattedString(bool _day = true, bool _hour = true,
+          bool _min = true, bool _sec = true, bool _msec = true) const;
+
       /// \brief Sleep for the specified time
       /// \param[in] _time Sleep time
       /// \return Time actually slept

@@ -255,6 +255,50 @@ float Time::Float() const
 }
 
 /////////////////////////////////////////////////
+std::string Time::FormattedString(bool _day, bool _hour, bool _min, bool _sec,
+    bool _msec) const
+{
+  std::ostringstream stream;
+  unsigned int day, hour, min, s, msec;
+
+  stream.str("");
+
+  s = this->sec;
+
+  day = s / 86400;
+  s -= day * 86400;
+
+  hour = s / 3600;
+  s -= hour * 3600;
+
+  min = s / 60;
+  s -= min * 60;
+
+  msec = rint(this->nsec * 1e-6);
+
+  if (_day)
+    stream << std::setw(2) << std::setfill('0') << day;
+  if (_day && (_hour || _min || _sec || _msec))
+    stream << " ";
+  if (_hour)
+    stream << std::setw(2) << std::setfill('0') << hour;
+  if (_hour && (_min || _sec || _msec))
+    stream << ":";
+  if (_min)
+    stream << std::setw(2) << std::setfill('0') << min;
+  if (_min && (_sec || _msec))
+    stream << ":";
+  if (_sec)
+    stream << std::setw(2) << std::setfill('0') << s;
+  if (_sec && _msec)
+    stream << ".";
+  if (_msec)
+    stream << std::setw(3) << std::setfill('0') << msec;
+
+  return stream.str();
+}
+
+/////////////////////////////////////////////////
 Time Time::Sleep(const common::Time &_time)
 {
   Time result;
