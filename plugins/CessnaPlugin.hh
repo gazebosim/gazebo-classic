@@ -94,7 +94,7 @@ namespace gazebo
     /// \param[in] _dt time step size since last update.
     private: void UpdatePIDs(double _dt);
 
-    /// \brief Publish Robotiq Hand state.
+    /// \brief Publish Cessna state.
     private: void PublishState();
 
     /// \brief Joint indexes.

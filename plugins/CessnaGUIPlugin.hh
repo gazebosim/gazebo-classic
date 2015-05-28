@@ -40,28 +40,28 @@ namespace gazebo
     public: virtual ~CessnaGUIPlugin();
 
     /// \brief Increase the propeller RPMs.
-    protected slots: void OnIncreaseThrust();
+    private slots: void OnIncreaseThrust();
 
     /// \brief Decrease the propeller RPMs.
-    protected slots: void OnDecreaseThrust();
+    private slots: void OnDecreaseThrust();
 
     /// \brief Increase the flaps angle.
-    protected slots: void OnIncreaseFlaps();
+    private slots: void OnIncreaseFlaps();
 
     /// \brief Decrease the flaps angle.
-    protected slots: void OnDecreaseFlaps();
+    private slots: void OnDecreaseFlaps();
 
     /// \brief Increase the elevators angle
-    protected slots: void OnIncreaseElevators();
+    private slots: void OnIncreaseElevators();
 
     /// \brief Decrease the elevators angle.
-    protected slots: void OnDecreaseElevators();
+    private slots: void OnDecreaseElevators();
 
     /// \brief Increase the rudder angle.
-    protected slots: void OnIncreaseRudder();
+    private slots: void OnIncreaseRudder();
 
     /// \brief Decrease the rudder angle.
-    protected slots: void OnDecreaseRudder();
+    private slots: void OnDecreaseRudder();
 
     /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
@@ -73,7 +73,7 @@ namespace gazebo
     private: transport::PublisherPtr controlPub;
 
     /// \brief Target thrust percentage.
-    private: int targetThrust = 0;
+    private: float targetThrust = 0.0f;
 
     /// \brief Target flaps angle in degrees.
     private: math::Angle targetFlaps = math::Angle::Zero;

@@ -6,24 +6,24 @@ package gazebo.msgs;
 
 message Cessna
 {
-  /// Target RPM of the propeller.
-  optional int32 propeller_speed = 1;
+  /// \brief Target RPM of the propeller.
+  optional float propeller_speed = 1;
 
-  /// Target left aileron angle in rads.
+  /// \brief Target left aileron angle in rads.
   optional float left_aileron = 2;
 
-  /// Target left flap angle in rads.
+  /// \brief Target left flap angle in rads.
   optional float left_flap = 3;
 
-  /// Target right aileron angle in rads.
+  /// \brief Target right aileron angle in rads.
   optional float right_aileron = 4;
 
-  /// Target right flap angle in rads.
+  /// \brief Target right flap angle in rads.
   optional float right_flap = 5;
 
-  /// Target elevators angle in rads.
+  /// \brief Target elevators angle in rads.
   optional float elevators = 6;
 
-  /// Target ruddle angle in rads.
+  /// \brief Target ruddle angle in rads.
   optional float rudder = 7;
 }

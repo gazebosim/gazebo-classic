@@ -149,7 +149,7 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void CessnaPlugin::Update(const common::UpdateInfo & /*_info*/)
+void CessnaPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
@@ -170,7 +170,7 @@ void CessnaPlugin::OnControl(ConstCessnaPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  if (_msg->has_propeller_speed() && std::abs(_msg->propeller_speed()) <= 100)
+  if (_msg->has_propeller_speed() && std::abs(_msg->propeller_speed()) <= 1)
     this->cmds[kPropeller] = _msg->propeller_speed();
   if (_msg->has_left_aileron())
     this->cmds[kLeftAileron] = _msg->left_aileron();
@@ -191,7 +191,7 @@ void CessnaPlugin::UpdatePIDs(double _dt)
 {
   // Velocity PID for the propeller.
   double vel = this->joints[kPropeller]->GetVelocity(0);
-  double target = this->propellerMaxRpm * this->cmds[kPropeller] / 100.0;
+  double target = this->propellerMaxRpm * this->cmds[kPropeller];
   double error = vel - target;
   double force = this->propellerPID.Update(error, _dt);
   this->joints[kPropeller]->SetForce(0, force);

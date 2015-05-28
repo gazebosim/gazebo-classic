@@ -84,7 +84,7 @@ CessnaGUIPlugin::~CessnaGUIPlugin()
 void CessnaGUIPlugin::OnIncreaseThrust()
 {
   msgs::Cessna msg;
-  this->targetThrust = std::min(this->targetThrust + 1, 100);
+  this->targetThrust = std::min(this->targetThrust + 0.01f, 1.0f);
   msg.set_propeller_speed(this->targetThrust);
   this->controlPub->Publish(msg);
 }
@@ -93,7 +93,7 @@ void CessnaGUIPlugin::OnIncreaseThrust()
 void CessnaGUIPlugin::OnDecreaseThrust()
 {
   msgs::Cessna msg;
-  this->targetThrust = std::max(this->targetThrust - 1, 0);
+  this->targetThrust = std::max(this->targetThrust - 0.01f, 0.0f);
   msg.set_propeller_speed(this->targetThrust);
   this->controlPub->Publish(msg);
 }
