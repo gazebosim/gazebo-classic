@@ -118,6 +118,10 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
+  this->dataPtr->connections.push_back(
+      rendering::Events::ConnectToggleLayer(
+        boost::bind(&Scene::ToggleLayer, this, _1)));
+
   this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
   this->dataPtr->visSub =
@@ -2729,16 +2733,18 @@ void Scene::SetSky()
 void Scene::SetShadowsEnabled(bool _value)
 {
   // If a usercamera is set to stereo mode, then turn off shadows.
+  // If a usercamera uses orthographic projection, then turn off shadows.
   // Our shadow mapping technique disables stereo.
-  bool stereoOverride = true;
+  bool shadowOverride = true;
   for (std::vector<UserCameraPtr>::iterator iter =
        this->dataPtr->userCameras.begin();
-       iter != this->dataPtr->userCameras.end() && stereoOverride; ++iter)
+       iter != this->dataPtr->userCameras.end() && shadowOverride; ++iter)
   {
-    stereoOverride = !(*iter)->StereoEnabled();
+    shadowOverride = !(*iter)->StereoEnabled() &&
+                     (*iter)->GetProjectionType() != "orthographic";
   }
 
-  _value = _value && stereoOverride;
+  _value = _value && shadowOverride;
 
   this->dataPtr->sdf->GetElement("shadows")->Set(_value);
 
@@ -3115,4 +3121,13 @@ void Scene::RemoveProjectors()
     delete iter->second;
   }
   this->dataPtr->projectors.clear();
+}
+
+/////////////////////////////////////////////////
+void Scene::ToggleLayer(const int32_t _layer)
+{
+  for (auto visual : this->dataPtr->visuals)
+  {
+    visual.second->ToggleLayer(_layer);
+  }
 }
