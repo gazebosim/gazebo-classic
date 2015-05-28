@@ -74,8 +74,7 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
     for (auto const &param : this->dataPtr->parameterMap)
     {
       // disable params we know can't be set
-      if (param.first != "type" &&
-          !_physicsEngine->SetParam(param.first, param.second))
+      if (!_physicsEngine->SetParam(param.first, param.second))
       {
         gzwarn << "Couldn't set parameter [" << param.first
           << "] in physics engine" << std::endl;

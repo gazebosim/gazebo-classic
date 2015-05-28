@@ -1241,7 +1241,7 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 
   try
   {
-    if (_key == "solver_type")
+    if (_key == "solver_type" || _key == "type")
     {
       this->SetStepType(boost::any_cast<std::string>(_value));
     }
@@ -1404,7 +1404,7 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
 
-  if (_key == "solver_type")
+  if (_key == "solver_type" || _key == "type")
   {
     _value = odeElem->GetElement("solver")->Get<std::string>("type");
   }
