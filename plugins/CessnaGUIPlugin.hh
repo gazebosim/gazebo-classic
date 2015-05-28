@@ -51,6 +51,12 @@ namespace gazebo
     /// \brief Decrease the flaps angle.
     private slots: void OnDecreaseFlaps();
 
+    /// \brief Increase Roll
+    private slots: void OnIncreaseRoll();
+
+    /// \brief Decrease Roll
+    private slots: void OnDecreaseRoll();
+
     /// \brief Increase the elevators angle
     private slots: void OnIncreaseElevators();
 
@@ -77,6 +83,9 @@ namespace gazebo
 
     /// \brief Target flaps angle in degrees.
     private: math::Angle targetFlaps = math::Angle::Zero;
+
+    /// \brief Target aileron angle in degrees.
+    private: math::Angle targetRoll = math::Angle::Zero;
 
     /// \brief Target elevators angle in degrees.
     private: math::Angle targetElevators = math::Angle::Zero;

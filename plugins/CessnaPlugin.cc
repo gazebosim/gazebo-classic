@@ -33,7 +33,7 @@ GZ_REGISTER_MODEL_PLUGIN(CessnaPlugin)
 CessnaPlugin::CessnaPlugin()
 {
   // PID default parameters.
-  this->propellerPID.Init(50.0, 0.1, 1, 0.0, 0.0, 20.0, -20.0);
+  this->propellerPID.Init(50.0, 0.1, 1, 0.0, 0.0, 20000.0, -20000.0);
   this->propellerPID.SetCmd(0.0);
 
   for (auto &pid : this->controlSurfacesPID)
@@ -191,7 +191,8 @@ void CessnaPlugin::UpdatePIDs(double _dt)
 {
   // Velocity PID for the propeller.
   double vel = this->joints[kPropeller]->GetVelocity(0);
-  double target = this->propellerMaxRpm * this->cmds[kPropeller];
+  double maxVel = this->propellerMaxRpm*2.0*M_PI/60.0;
+  double target = maxVel * this->cmds[kPropeller];
   double error = vel - target;
   double force = this->propellerPID.Update(error, _dt);
   this->joints[kPropeller]->SetForce(0, force);
@@ -210,8 +211,9 @@ void CessnaPlugin::UpdatePIDs(double _dt)
 void CessnaPlugin::PublishState()
 {
   // Read the current state.
-  double propellerRpms = this->joints[kPropeller]->GetVelocity(0);
-  int32_t propellerSpeed = 100.0 * propellerRpms / this->propellerMaxRpm;
+  double propellerRpms = this->joints[kPropeller]->GetVelocity(0)
+    /(2.0*M_PI)*60.0;
+  float propellerSpeed = propellerRpms / this->propellerMaxRpm;
   float leftAileron = this->joints[kLeftAileron]->GetAngle(0).Radian();
   float leftFlap = this->joints[kLeftFlap]->GetAngle(0).Radian();
   float rightAileron = this->joints[kRightAileron]->GetAngle(0).Radian();

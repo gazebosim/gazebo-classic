@@ -133,6 +133,18 @@ namespace gazebo
     /// \brief Pointer to link currently targeted by mud joint.
     protected: physics::LinkPtr link;
 
+    /// \brief Names of a joint that actuates a control surface for
+    /// this lifting body
+    protected: std::string controlJointName;
+
+    /// \brief Pointer to a joint that actuates a control surface for
+    /// this lifting body
+    protected: physics::JointPtr controlJoint;
+
+    /// \brief how much to change CL per radian of control surface joint
+    /// value.
+    protected: double controlJointRadToCL;
+
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;
   };

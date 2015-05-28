@@ -50,6 +50,9 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
   /// \TODO: what's flat plate drag?
   this->cdaStall = 1.0;
   this->cmaStall = 0.0;
+
+  /// how much to change CL per every radian of the control joint value 
+  this->controlJointRadToCL = 4.0;
 }
 
 /////////////////////////////////////////////////
@@ -125,8 +128,20 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
     GZ_ASSERT(elem, "Element link_name doesn't exist!");
     this->linkName = elem->Get<std::string>();
     this->link = this->model->GetLink(this->linkName);
-    GZ_ASSERT(link, "Link was NULL");
+    GZ_ASSERT(this->link, "Link was NULL");
   }
+
+  if (_sdf->HasElement("control_joint_name"))
+  {
+    sdf::ElementPtr elem = _sdf->GetElement("control_joint_name");
+    GZ_ASSERT(elem, "Element control_joint_name doesn't exist!");
+    this->controlJointName = elem->Get<std::string>();
+    this->controlJoint = this->model->GetJoint(this->controlJointName);
+    GZ_ASSERT(this->controlJointName, "controlJoint was NULL");
+  }
+
+  if (_sdf->HasElement("control_joint_rad_to_cl"))
+    this->controlJointRadToCL = _sdf->Get<double>("control_joint_rad_to_cl");
 }
 
 /////////////////////////////////////////////////
@@ -265,6 +280,14 @@ void LiftDragPlugin::OnUpdate()
   }
   else
     cl = this->cla * this->alpha * cosSweepAngle;
+
+  // modify cl per control joint value
+  if (this->controlJoint)
+  {
+    double controlAngle = this->controlJoint->GetAngle(0).Radian();
+    cl = cl + this->controlJointRadToCL * controlAngle;
+    /// \TODO: also change cm and cd
+  }
 
   // compute lift force at cp
   math::Vector3 lift = cl * q * this->area * liftDirection;

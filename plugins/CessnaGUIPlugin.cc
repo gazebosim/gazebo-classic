@@ -50,13 +50,21 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   QObject::connect(decreaseThrust, SIGNAL(activated()), this,
       SLOT(OnDecreaseThrust()));
 
-  QShortcut *increaseFlaps = new QShortcut(QKeySequence("s"), this);
+  QShortcut *increaseFlaps = new QShortcut(QKeySequence("g"), this);
   QObject::connect(increaseFlaps, SIGNAL(activated()), this,
       SLOT(OnIncreaseFlaps()));
 
-  QShortcut *decreaseFlaps = new QShortcut(QKeySequence("x"), this);
+  QShortcut *decreaseFlaps = new QShortcut(QKeySequence("b"), this);
   QObject::connect(decreaseFlaps, SIGNAL(activated()), this,
       SLOT(OnDecreaseFlaps()));
+
+  QShortcut *increaseRoll = new QShortcut(QKeySequence("s"), this);
+  QObject::connect(increaseRoll, SIGNAL(activated()), this,
+      SLOT(OnIncreaseRoll()));
+
+  QShortcut *decreaseRoll = new QShortcut(QKeySequence("x"), this);
+  QObject::connect(decreaseRoll, SIGNAL(activated()), this,
+      SLOT(OnDecreaseRoll()));
 
   QShortcut *increaseElevators = new QShortcut(QKeySequence("d"), this);
   QObject::connect(increaseElevators, SIGNAL(activated()), this,
@@ -84,7 +92,7 @@ CessnaGUIPlugin::~CessnaGUIPlugin()
 void CessnaGUIPlugin::OnIncreaseThrust()
 {
   msgs::Cessna msg;
-  this->targetThrust = std::min(this->targetThrust + 0.01f, 1.0f);
+  this->targetThrust = std::min(this->targetThrust + 0.1f, 1.0f);
   msg.set_propeller_speed(this->targetThrust);
   this->controlPub->Publish(msg);
 }
@@ -93,7 +101,7 @@ void CessnaGUIPlugin::OnIncreaseThrust()
 void CessnaGUIPlugin::OnDecreaseThrust()
 {
   msgs::Cessna msg;
-  this->targetThrust = std::max(this->targetThrust - 0.01f, 0.0f);
+  this->targetThrust = std::max(this->targetThrust - 0.1f, 0.0f);
   msg.set_propeller_speed(this->targetThrust);
   this->controlPub->Publish(msg);
 }
@@ -105,9 +113,7 @@ void CessnaGUIPlugin::OnIncreaseFlaps()
   if (this->targetFlaps.Degree() < 30)
     this->targetFlaps += this->angleStep;
 
-  msg.set_left_aileron(this->targetFlaps.Radian());
   msg.set_left_flap(this->targetFlaps.Radian());
-  msg.set_right_aileron(this->targetFlaps.Radian());
   msg.set_right_flap(this->targetFlaps.Radian());
   this->controlPub->Publish(msg);
 }
@@ -119,10 +125,32 @@ void CessnaGUIPlugin::OnDecreaseFlaps()
   if (this->targetFlaps.Degree() > -30)
     this->targetFlaps -= this->angleStep;
 
-  msg.set_left_aileron(this->targetFlaps.Radian());
   msg.set_left_flap(this->targetFlaps.Radian());
-  msg.set_right_aileron(this->targetFlaps.Radian());
   msg.set_right_flap(this->targetFlaps.Radian());
+  this->controlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void CessnaGUIPlugin::OnIncreaseRoll()
+{
+  msgs::Cessna msg;
+  if (this->targetRoll.Degree() < 30)
+    this->targetRoll += this->angleStep;
+
+  msg.set_left_aileron(this->targetRoll.Radian());
+  msg.set_right_aileron(-this->targetRoll.Radian());
+  this->controlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void CessnaGUIPlugin::OnDecreaseRoll()
+{
+  msgs::Cessna msg;
+  if (this->targetRoll.Degree() > -30)
+    this->targetRoll -= this->angleStep;
+
+  msg.set_left_aileron(this->targetRoll.Radian());
+  msg.set_right_aileron(-this->targetRoll.Radian());
   this->controlPub->Publish(msg);
 }
 
