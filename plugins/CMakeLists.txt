@@ -86,6 +86,7 @@ foreach (src ${GUIplugins})
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
   target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${GUIplugins})
 
 add_subdirectory(events)
