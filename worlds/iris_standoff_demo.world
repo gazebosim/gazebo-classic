@@ -3,7 +3,7 @@
   <world name="default">
     <gui>
       <camera name="user_camera">
-        <pose>20 0 3 0 0 3.141592</pose>
+        <pose>10 0 1 0 0 3.141592</pose>
       </camera>
     </gui>
     <physics type="ode">

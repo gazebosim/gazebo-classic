@@ -195,9 +195,9 @@
         <propeller_p_gain>10000</propeller_p_gain>
         <propeller_i_gain>0</propeller_i_gain>
         <propeller_d_gain>0</propeller_d_gain>
-        <surfaces_p_gain>50</surfaces_p_gain>
+        <surfaces_p_gain>2000</surfaces_p_gain>
         <surfaces_i_gain>0</surfaces_i_gain>
-        <surfaces_d_gain>0.2</surfaces_d_gain>
+        <surfaces_d_gain>0</surfaces_d_gain>
       </plugin>
 
       <plugin name="propeller_top_blade" filename="libLiftDragPlugin.so">
@@ -249,7 +249,7 @@
         <upward>0 0 1</upward>
         <link_name>cessna_c172::body</link_name>
         <control_joint_name>cessna_c172::left_aileron_joint</control_joint_name>
-        <control_joint_rad_to_cl>2.0</control_joint_rad_to_cl>
+        <control_joint_rad_to_cl>-2.0</control_joint_rad_to_cl>
       </plugin>
 
       <plugin name="right_wing" filename="libLiftDragPlugin.so">
@@ -268,7 +268,7 @@
         <upward>0 0 1</upward>
         <link_name>cessna_c172::body</link_name>
         <control_joint_name>cessna_c172::right_aileron_joint</control_joint_name>
-        <control_joint_rad_to_cl>2.0</control_joint_rad_to_cl>
+        <control_joint_rad_to_cl>-2.0</control_joint_rad_to_cl>
       </plugin>
 
       <plugin name="elevator" filename="libLiftDragPlugin.so">
@@ -287,7 +287,7 @@
         <upward>0 0 1</upward>
         <link_name>cessna_c172::body</link_name>
         <control_joint_name>cessna_c172::elevators_joint</control_joint_name>
-        <control_joint_rad_to_cl>4.0</control_joint_rad_to_cl>
+        <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
       </plugin>
 
       <plugin name="rudder" filename="libLiftDragPlugin.so">
