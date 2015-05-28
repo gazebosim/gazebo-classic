@@ -44,7 +44,7 @@ namespace gazebo
     public: void Load(sdf::ElementPtr _elem);
 
     /// \brief Increase the propeller RPMs.
-    public slots: void OnIncreaseThust();
+    public slots: void OnIncreaseThrust();
 
     /// \brief Decrease the propeller RPMs.
     public slots: void OnDecreaseThrust();
@@ -67,23 +67,14 @@ namespace gazebo
     /// \brief Decrease the rudder angle.
     public slots: void OnDecreaseRudder();
 
-    /// \brief Qt event filter currently used to filter resize events.
-    /// \param[in] _obj Object that is watched by the event filter.
-    /// \param[in] _event Qt event.
-    /// \return True if the event is handled.
-    private: bool eventFilter(QObject *_obj, QEvent *_event);
-
     /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
 
     /// \brief Pointer to a node for communication.
     private: transport::NodePtr gzNode;
 
-    /// \brief "Restart game" publisher.
+    /// \brief Control publisher.
     private: transport::PublisherPtr controlPub;
-
-    /// \brief Pointer to the render widget used to get width.
-    private: QWidget *renderWidget;
 
     /// \brief Target thrust percentage.
     private: int targetThrust = 0;

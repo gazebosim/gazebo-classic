@@ -33,12 +33,12 @@ GZ_REGISTER_MODEL_PLUGIN(CessnaPlugin)
 CessnaPlugin::CessnaPlugin()
 {
   // PID default parameters.
-  this->propellerPID.Init(1.0, 0, 0.5, 0.0, 0.0, 20.0, -20.0);
+  this->propellerPID.Init(50.0, 0.1, 1, 0.0, 0.0, 20.0, -20.0);
   this->propellerPID.SetCmd(0.0);
 
   for (auto &pid : this->controlSurfacesPID)
   {
-    pid.Init(1.0, 0, 0.5, 0.0, 0.0, 20.0, -20.0);
+    pid.Init(50.0, 0.1, 1, 0.0, 0.0, 20.0, -20.0);
     pid.SetCmd(0.0);
   }
 }
@@ -87,13 +87,13 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->propellerMaxRpm = _sdf->Get<int32_t>("propeller_max_rpm");
   if (this->propellerMaxRpm == 0)
   {
-    gzerr << "Maximum propeller RPMs cannt be 0" << std::endl;
+    gzerr << "Maximum propeller RPMs cannot be 0" << std::endl;
     return;
   }
 
   // Read the required joint name parameters.
-  std::vector<std::string> requiredParams = {"propeller","left_aileron",
-    "left_flap", "right_aileron", "right_flap", "elevators", "rudder"};
+  std::vector<std::string> requiredParams = {"left_aileron", "left_flap",
+    "right_aileron", "right_flap", "elevators", "rudder", "propeller"};
 
   for (size_t i = 0; i < requiredParams.size(); ++i)
   {
@@ -132,8 +132,8 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Controller time control.
   this->lastControllerUpdateTime = this->model->GetWorld()->GetSimTime();
 
-  // Listen to the update event. This event is broadcast every
-  // simulation iteration.
+  // Listen to the update event. This event is broadcast every simulation
+  // iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
     boost::bind(&CessnaPlugin::Update, this, _1));
 
@@ -144,6 +144,8 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->statePub = this->node->Advertise<msgs::Cessna>(prefix + "state");
   this->controlSub = this->node->Subscribe(prefix + "control",
     &CessnaPlugin::OnControl, this);
+
+  gzlog << "Cessna ready to fly. The force will be with you" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -167,6 +169,7 @@ void CessnaPlugin::Update(const common::UpdateInfo & /*_info*/)
 void CessnaPlugin::OnControl(ConstCessnaPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
+
   if (_msg->has_propeller_speed() && std::abs(_msg->propeller_speed()) <= 100)
     this->cmds[kPropeller] = _msg->propeller_speed();
   if (_msg->has_left_aileron())

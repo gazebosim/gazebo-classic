@@ -32,28 +32,20 @@ CessnaGUIPlugin::CessnaGUIPlugin() : GUIPlugin()
   // Set the increment or decrement in angle per key pressed.
   this->angleStep.SetFromDegree(1.0);
 
-  // Match window's width.
-  gui::MainWindow *mainWindow = gui::get_main_window();
-  if (mainWindow)
-  {
-    this->renderWidget = mainWindow->GetRenderWidget();
-    this->renderWidget->installEventFilter(this);
-    this->resize(this->renderWidget->width(), 100);
-  }
-
   // Initialize transport.
   this->gzNode = transport::NodePtr(new transport::Node());
   this->gzNode->Init();
-  this->controlPub = this->gzNode->Advertise<msgs::Cessna>("~/cessna/control");
+  this->controlPub =
+    this->gzNode->Advertise<msgs::Cessna>("~/cessna_c172/control");
 
   // Connect hotkeys
   QShortcut *increaseThrust = new QShortcut(QKeySequence("a"), this);
   QObject::connect(increaseThrust, SIGNAL(activated()), this,
-      SLOT(OnIncreaseThust()));
+      SLOT(OnIncreaseThrust()));
 
   QShortcut *decreaseThrust = new QShortcut(QKeySequence("z"), this);
   QObject::connect(decreaseThrust, SIGNAL(activated()), this,
-      SLOT(OnDecreaseThust()));
+      SLOT(OnDecreaseThrust()));
 
   QShortcut *increaseFlaps = new QShortcut(QKeySequence("s"), this);
   QObject::connect(increaseFlaps, SIGNAL(activated()), this,
@@ -90,13 +82,10 @@ void CessnaGUIPlugin::Load(sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_sdf, "CessnaGUIPlugin _sdf pointer is NULL");
   this->sdf = _sdf;
-
-  //gui::Events::fullScreen(true);
-  //gui::Events::showToolbars(false);
 }
 
 /////////////////////////////////////////////////
-void CessnaGUIPlugin::OnIncreaseThust()
+void CessnaGUIPlugin::OnIncreaseThrust()
 {
   msgs::Cessna msg;
   this->targetThrust = std::min(this->targetThrust + 1, 100);
@@ -184,15 +173,3 @@ void CessnaGUIPlugin::OnDecreaseRudder()
   msg.set_rudder(this->targetRudder.Radian());
   this->controlPub->Publish(msg);
 }
-
-/////////////////////////////////////////////////
-bool CessnaGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
-{
-  QWidget *widget = qobject_cast<QWidget *>(_obj);
-  if (widget == this->renderWidget && _event->type() == QEvent::Resize)
-  {
-    this->resize(this->renderWidget->width(), 100);
-  }
-  return QObject::eventFilter(_obj, _event);
-}
-

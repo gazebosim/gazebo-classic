@@ -2,8 +2,11 @@
 <sdf version="1.4">
   <world name="default">
     <gui>
+      <!-- A plugin for controlling the Cessna with the keyboard -->
+      <plugin name="sample" filename="libCessnaGUIPlugin.so"/>
+
       <camera name="user_camera">
-        <pose>10 0 3 0 0 3.141592</pose>
+        <pose>-16 0 4 0 0 0</pose>
       </camera>
     </gui>
 
@@ -48,21 +51,21 @@
       </link>
     </model>
 
-    <model name="cessna">
+    <model name="cessna_c172">
       <include>
         <uri>model://cessna</uri>
       </include>
 
       <!-- A plugin for controlling the thrust and control surfaces -->
       <plugin name="cessna_control" filename="libCessnaPlugin.so">
-        <propeller>cessna::propeller_joint</propeller>
+        <propeller>cessna_c172::propeller_joint</propeller>
         <propeller_max_rpm>2500</propeller_max_rpm>
-        <left_aileron>cessna::left_aileron_joint</left_aileron>
-        <left_flap>cessna::left_flap_joint</left_flap>
-        <right_aileron>cessna::right_aileron_joint</right_aileron>
-        <right_flap>cessna::right_flap_joint</right_flap>
-        <elevators>cessna::elevators_joint</elevators>
-        <rudder>cessna::rudder_joint</rudder>
+        <left_aileron>cessna_c172::left_aileron_joint</left_aileron>
+        <left_flap>cessna_c172::left_flap_joint</left_flap>
+        <right_aileron>cessna_c172::right_aileron_joint</right_aileron>
+        <right_flap>cessna_c172::right_flap_joint</right_flap>
+        <elevators>cessna_c172::elevators_joint</elevators>
+        <rudder>cessna_c172::rudder_joint</rudder>
       </plugin>
     </model>
 

@@ -10,20 +10,20 @@ message Cessna
   optional int32 propeller_speed = 1;
 
   /// Target left aileron angle in rads.
-  optional int32 left_aileron = 2;
+  optional float left_aileron = 2;
 
   /// Target left flap angle in rads.
-  optional int32 left_flap = 3;
+  optional float left_flap = 3;
 
   /// Target right aileron angle in rads.
-  optional int32 right_aileron = 4;
+  optional float right_aileron = 4;
 
   /// Target right flap angle in rads.
-  optional int32 right_flap = 5;
+  optional float right_flap = 5;
 
   /// Target elevators angle in rads.
-  optional int32 elevators = 6;
+  optional float elevators = 6;
 
   /// Target ruddle angle in rads.
-  optional int32 rudder = 7;
+  optional float rudder = 7;
 }

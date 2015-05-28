@@ -20,6 +20,7 @@
 
 #include <array>
 #include <mutex>
+#include <string>
 #include <sdf/sdf.hh>
 #include <gazebo/common/PID.hh>
 #include <gazebo/common/Plugin.hh>
@@ -30,7 +31,7 @@
 
 namespace gazebo
 {
-  /// \brief Allow controlling the control surfaces of a Cessna plane. This
+  /// \brief Allow moving the control surfaces of a Cessna C-172 plane. This
   /// plugin might be used with other models that have similar control surfaces.
   ///
   /// The plugin requires the following parameters:
@@ -55,10 +56,10 @@ namespace gazebo
   ///                   control surfaces.
   ///
   /// The plugin will be subscribed to the following topic:
-  /// "~/<model_name>/cessna_control" The expected value is a Cessna message.
+  /// "~/<model_name>/control" The expected value is a Cessna message.
   ///
   /// The plugin will advertise the following topic with the current state:
-  /// "~/<model_name>/cessna_state"
+  /// "~/<model_name>/state"
   class GAZEBO_VISIBLE CessnaPlugin : public ModelPlugin
   {
     /// \brief Constructor.
@@ -78,13 +79,15 @@ namespace gazebo
     /// \return True if the SDF parameter is found and the joint name is found,
     ///         false otherwise.
     private: bool FindJoint(const std::string &_sdfParam,
-                            sdf::ElementPtr _sdf,
-                            physics::JointPtr &_joint);
+        sdf::ElementPtr _sdf, physics::JointPtr &_joint);
 
     /// \brief Update the control surfaces controllers.
     /// \param[in] _info Update information provided by the server.
     private: void Update(const common::UpdateInfo &_info);
 
+    /// \brief Callback executed when a new message containing control commands
+    /// is received.
+    /// \param[in] _msg New message containing control commands.
     private: void OnControl(ConstCessnaPtr &_msg);
 
     /// \brief Update PID Joint controllers.
@@ -92,9 +95,9 @@ namespace gazebo
     private: void UpdatePIDs(double _dt);
 
     /// \brief Publish Robotiq Hand state.
-  private: void PublishState();
+    private: void PublishState();
 
-    /// \brief Joint indexes. Do not change the order.
+    /// \brief Joint indexes.
     private: static const unsigned int kLeftAileron  = 0;
     private: static const unsigned int kLeftFlap     = 1;
     private: static const unsigned int kRightAileron = 2;
@@ -122,7 +125,7 @@ namespace gazebo
     private: std::array<physics::JointPtr, 7> joints;
 
     /// \brief Max propeller RPM.
-    private: int32_t propellerMaxRpm;
+    private: int32_t propellerMaxRpm = 2500;
 
     /// \brief Next command to be applied to the propeller and control surfaces.
     private: std::array<float, 7>cmds = {{0, 0, 0, 0, 0, 0, 0}};
