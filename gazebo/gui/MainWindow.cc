@@ -767,8 +767,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->menuBar->hide();
     this->setContentsMargins(0, 0, 0, 0);
     this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
-    g_fullScreenAct->setChecked(true);
-    g_fullscreen = true;
   }
   else
   {
@@ -776,9 +774,9 @@ void MainWindow::OnFullScreen(bool _value)
     this->leftColumn->show();
     this->toolsWidget->show();
     this->menuBar->show();
-    g_fullScreenAct->setChecked(false);
-    g_fullscreen = false;
   }
+  g_fullScreenAct->setChecked(_value);
+  g_fullscreen = _value;
 }
 
 /////////////////////////////////////////////////
@@ -788,14 +786,13 @@ void MainWindow::OnShowToolbars(bool _value)
   {
     this->GetRenderWidget()->GetTimePanel()->show();
     this->GetRenderWidget()->GetToolbar()->show();
-    g_showToolbarsAct->setChecked(true);
   }
   else
   {
     this->GetRenderWidget()->GetTimePanel()->hide();
     this->GetRenderWidget()->GetToolbar()->hide();
-    g_showToolbarsAct->setChecked(false);
   }
+  g_showToolbarsAct->setChecked(_value);
 }
 
 /////////////////////////////////////////////////
