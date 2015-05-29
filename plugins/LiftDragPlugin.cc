@@ -51,7 +51,7 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
   this->cdaStall = 1.0;
   this->cmaStall = 0.0;
 
-  /// how much to change CL per every radian of the control joint value 
+  /// how much to change CL per every radian of the control joint value
   this->controlJointRadToCL = 4.0;
 }
 
@@ -137,7 +137,6 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
     GZ_ASSERT(elem, "Element control_joint_name doesn't exist!");
     this->controlJointName = elem->Get<std::string>();
     this->controlJoint = this->model->GetJoint(this->controlJointName);
-    GZ_ASSERT(this->controlJointName, "controlJoint was NULL");
   }
 
   if (_sdf->HasElement("control_joint_rad_to_cl"))

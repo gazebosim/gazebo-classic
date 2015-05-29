@@ -170,20 +170,23 @@ void CessnaPlugin::OnControl(ConstCessnaPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  if (_msg->has_propeller_speed() && std::abs(_msg->propeller_speed()) <= 1)
-    this->cmds[kPropeller] = _msg->propeller_speed();
-  if (_msg->has_left_aileron())
-    this->cmds[kLeftAileron] = _msg->left_aileron();
+  if (_msg->has_cmd_propeller_speed() &&
+      std::abs(_msg->cmd_propeller_speed()) <= 1)
+  {
+    this->cmds[kPropeller] = _msg->cmd_propeller_speed();
+  }
+  if (_msg->has_cmd_left_aileron())
+    this->cmds[kLeftAileron] = _msg->cmd_left_aileron();
   if (_msg->has_left_flap())
-    this->cmds[kLeftFlap] = _msg->left_flap();
-  if (_msg->has_right_aileron())
-    this->cmds[kRightAileron] = _msg->right_aileron();
-  if (_msg->has_right_flap())
-    this->cmds[kRightFlap] = _msg->right_flap();
-  if (_msg->has_elevators())
-    this->cmds[kElevators] = _msg->elevators();
-  if (_msg->has_rudder())
-    this->cmds[kRudder] = _msg->rudder();
+    this->cmds[kLeftFlap] = _msg->cmd_left_flap();
+  if (_msg->has_cmd_right_aileron())
+    this->cmds[kRightAileron] = _msg->cmd_right_aileron();
+  if (_msg->has_cmd_right_flap())
+    this->cmds[kRightFlap] = _msg->cmd_right_flap();
+  if (_msg->has_cmd_elevators())
+    this->cmds[kElevators] = _msg->cmd_elevators();
+  if (_msg->has_cmd_rudder())
+    this->cmds[kRudder] = _msg->cmd_rudder();
 }
 
 /////////////////////////////////////////////////
@@ -222,6 +225,7 @@ void CessnaPlugin::PublishState()
   float rudder = this->joints[kRudder]->GetAngle(0).Radian();
 
   msgs::Cessna msg;
+  // Set the observed state.
   msg.set_propeller_speed(propellerSpeed);
   msg.set_left_aileron(leftAileron);
   msg.set_left_flap(leftFlap);
@@ -229,6 +233,15 @@ void CessnaPlugin::PublishState()
   msg.set_right_flap(rightFlap);
   msg.set_elevators(elevators);
   msg.set_rudder(rudder);
+
+  // Set the target state.
+  msg.set_cmd_propeller_speed(this->cmds[kPropeller]);
+  msg.set_cmd_left_aileron(this->cmds[kLeftAileron]);
+  msg.set_cmd_left_flap(this->cmds[kLeftFlap]);
+  msg.set_cmd_right_aileron(this->cmds[kRightAileron]);
+  msg.set_cmd_right_flap(this->cmds[kRightFlap]);
+  msg.set_cmd_elevators(this->cmds[kElevators]);
+  msg.set_cmd_rudder(this->cmds[kRudder]);
 
   this->statePub->Publish(msg);
 }

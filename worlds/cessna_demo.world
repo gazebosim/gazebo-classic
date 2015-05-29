@@ -76,113 +76,16 @@
       </include>
 
       <link name="blade_1_visual">
-        <!-- <pose>0 0 0.855+0.495 0 0 0</pose> -->
         <pose>1.79 0 1.350 0 0 0</pose>
-        <visual name="visual_root_tip">
-          <pose>0 0 0 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.05</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_root">
-          <pose>-0.37 0 0 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.15</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_top_blade_tip">
-          <pose>-0.37 0 1.1 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.05</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_bottom_blade_tip">
-          <pose>-0.37 0 -1.1 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.05</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_top_blade_cp">
-          <pose>-0.37 0 0.77 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.05</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_bottom_blade_cp">
-          <pose>-0.37 0 -0.77 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.05</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_top_blade_cp_forward">
-          <pose>-0.37 -0.1 0.77 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.03</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_bottom_blade_cp_forward">
-          <pose>-0.37 0.1 -0.77 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.03</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_top_blade_cp_upward">
-          <pose>-0.27 0 0.77 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.03</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_bottom_blade_cp_upward">
-          <pose>-0.27 0 -0.77 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.03</radius>
-            </sphere>
-          </geometry>
-        </visual>
         <gravity>0</gravity>
       </link>
 
       <link name="wing_body_debug_visuals">
         <pose>0 0 0.495 0 0 0</pose>
-        <visual name="visual_left_wing_cp">
-          <pose>-1 2.205 1.5 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.15</radius>
-            </sphere>
-          </geometry>
-        </visual>
-        <visual name="visual_right_wing_cp">
-          <pose>-1 -2.205 1.5 0 0 0</pose>
-          <geometry>
-            <sphere>
-              <radius>0.15</radius>
-            </sphere>
-          </geometry>
-        </visual>
         <gravity>0</gravity>
       </link>
 
-      <!-- A plugin for controlling the thrust and control surfaces -->
+      <!-- Plugins for controlling the thrust and control surfaces -->
       <plugin name="cessna_control" filename="libCessnaPlugin.so">
         <propeller>cessna_c172::propeller_joint</propeller>
         <propeller_max_rpm>2500</propeller_max_rpm>
@@ -199,7 +102,6 @@
         <surfaces_i_gain>0</surfaces_i_gain>
         <surfaces_d_gain>0</surfaces_d_gain>
       </plugin>
-
       <plugin name="propeller_top_blade" filename="libLiftDragPlugin.so">
         <a0>0.4</a0>
         <cla>4.752798721</cla>
@@ -267,7 +169,9 @@
         <forward>1 0 0</forward>
         <upward>0 0 1</upward>
         <link_name>cessna_c172::body</link_name>
-        <control_joint_name>cessna_c172::right_aileron_joint</control_joint_name>
+        <control_joint_name>
+          cessna_c172::right_aileron_joint
+        </control_joint_name>
         <control_joint_rad_to_cl>-2.0</control_joint_rad_to_cl>
       </plugin>
 
