@@ -201,7 +201,8 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this->statusTimer, SIGNAL(timeout()), this, SLOT(OnBlinkStatus()));
 
   // Timer used to hide the confirmation dialog
-  this->confirmationTimer = new QTimer();
+  this->confirmationDialog = NULL;
+  this->confirmationTimer = new QTimer(this);
   connect(this->confirmationTimer, SIGNAL(timeout()), this,
       SLOT(OnConfirmationTimeout()));
 
@@ -277,6 +278,8 @@ void DataLogger::OnRecord(bool _toggle)
     QHBoxLayout *confirmationLayout = new QHBoxLayout();
     confirmationLayout->addWidget(confirmationLabel);
 
+    if (this->confirmationDialog)
+      this->confirmationDialog->close();
     this->confirmationDialog = new QDialog(this, Qt::FramelessWindowHint);
     this->confirmationDialog->setLayout(confirmationLayout);
     this->confirmationDialog->setStyleSheet(
@@ -443,7 +446,7 @@ void DataLogger::OnBrowse()
     QMessageBox msgBox(this);
     std::ostringstream stream;
     stream << "Path " << path << " is not a directory. Please only specify a "
-        << "directory for data logging.";
+           << "directory for data logging.";
     msgBox.setText(stream.str().c_str());
     msgBox.exec();
     return;
@@ -498,4 +501,3 @@ void DataLogger::OnConfirmationTimeout()
   this->confirmationDialog->close();
   this->confirmationTimer->stop();
 }
-
