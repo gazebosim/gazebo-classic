@@ -83,11 +83,10 @@ TimePanel::TimePanel(QWidget *_parent)
       boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
-  this->OnPlayActionChanged();
 }
 
 /////////////////////////////////////////////////
-void TimePanel::OnFullScreen(bool & /*_value*/)
+void TimePanel::OnFullScreen(bool /*_value*/)
 {
   /*if (_value)
     this->hide();
@@ -279,6 +278,10 @@ std::string TimePanel::FormatTime(const msgs::Time &_msg)
 void TimePanel::Update()
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+
+  // Avoid apparent race condition on start, seen on Windows.
+  if (!this->dataPtr->simTimes.size() || !this->dataPtr->realTimes.size())
+    return;
 
   std::ostringstream percent;
 

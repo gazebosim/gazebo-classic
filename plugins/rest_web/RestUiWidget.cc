@@ -23,11 +23,15 @@ using namespace gazebo;
 
 /////////////////////////////////////////////////
 RestUiWidget::RestUiWidget(QWidget *_parent,
+                           QAction &_login,
+                           QAction &_logout,
                            const std::string &_menuTitle,
                            const std::string &_loginTitle,
                            const std::string &_urlLabel,
                            const std::string &_defautlUrl)
   : QWidget(_parent),
+    loginMenuAction(_login),
+    logoutMenuAction(_logout),
     title(_menuTitle),
     node(new gazebo::transport::Node()),
     logoutDialog(this, _defautlUrl),
@@ -55,6 +59,8 @@ void RestUiWidget::Logout()
     msg.set_url(url);
     gzmsg << "Loging out from: " << url << std::endl;
     this->logoutPub->Publish(msg);
+    this->loginMenuAction.setEnabled(true);
+    this->logoutMenuAction.setEnabled(false);
   }
 }
 
@@ -68,6 +74,8 @@ void RestUiWidget::Login()
     msg.set_username(this->loginDialog.GetUsername());
     msg.set_password(this->loginDialog.GetPassword());
     this->loginPub->Publish(msg);
+    this->loginMenuAction.setEnabled(false);
+    this->logoutMenuAction.setEnabled(true);
   }
 }
 
@@ -91,6 +99,14 @@ void RestUiWidget::Update()
     ConstRestErrorPtr msg = this->msgRespQ.front();
     std::string msgStr = msg->msg();
     this->msgRespQ.pop_front();
+
+    // look for login error, and reenable the login menu if necessary
+    if (msgStr.find("There was a problem trying to login to the server") == 0)
+    {
+      loginMenuAction.setEnabled(true);
+      logoutMenuAction.setEnabled(false);
+    }
+
     if (msg->type() == "Error")
     {
       msgStr += "\n\nIf the server is not available, ";

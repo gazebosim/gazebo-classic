@@ -325,7 +325,7 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
   {
     gazebo::msgs::RestError msg;
     std::string errorMsg;
-    errorMsg = "There was a problem trying to login the server: ";
+    errorMsg = "There was a problem trying to login to the server: ";
     errorMsg += x.what();
     msg.set_type("Error");
     msg.set_msg(errorMsg);

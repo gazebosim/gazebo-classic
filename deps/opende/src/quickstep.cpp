@@ -35,9 +35,9 @@
 
 #ifndef _WIN32
 #include <sys/time.h>
-#endif
 #include <sys/types.h>
 #include <unistd.h>
+#endif
 #include "quickstep_util.h"
 #include "quickstep_cg_lcp.h"
 #include "quickstep_pgs_lcp.h"
@@ -385,6 +385,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
           // double check jb_ptr length
           dIASSERT (jb_ptr == jb+2*m);
         }
+        //assign J to J_orig
+        memcpy(J_orig, J, 12*m*sizeof(dReal));
       }
 #ifdef HDF5_INSTRUMENT
       IFTIMING (dTimerNow ("Dump data"));
