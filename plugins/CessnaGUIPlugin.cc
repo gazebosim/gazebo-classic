@@ -42,9 +42,9 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   this->controlPub =
     this->gzNode->Advertise<msgs::Cessna>("~/cessna_c172/control");
   this->stateSub = this->gzNode->Subscribe<msgs::Cessna>(
-    "~/cessna_c172/control", &CessnaGUIPlugin::OnState, this);
+    "~/cessna_c172/state", &CessnaGUIPlugin::OnState, this);
 
-  // Connect hotkeys
+  // Connect hotkeys.
   QShortcut *increaseThrust = new QShortcut(QKeySequence("w"), this);
   QObject::connect(increaseThrust, SIGNAL(activated()), this,
       SLOT(OnIncreaseThrust()));
@@ -69,7 +69,8 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   QObject::connect(decreaseRoll, SIGNAL(activated()), this,
       SLOT(OnDecreaseRoll()));
 
-  QShortcut *increaseElevators = new QShortcut(QKeySequence(Qt::Key_Down), this);
+  QShortcut *increaseElevators =
+    new QShortcut(QKeySequence(Qt::Key_Down), this);
   QObject::connect(increaseElevators, SIGNAL(activated()), this,
       SLOT(OnIncreaseElevators()));
 
@@ -77,11 +78,11 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   QObject::connect(decreaseElevators, SIGNAL(activated()), this,
       SLOT(OnDecreaseElevators()));
 
-  QShortcut *increaseRudder = new QShortcut(QKeySequence("a"), this);
+  QShortcut *increaseRudder = new QShortcut(QKeySequence("d"), this);
   QObject::connect(increaseRudder, SIGNAL(activated()), this,
       SLOT(OnIncreaseRudder()));
 
-  QShortcut *decreaseRudder = new QShortcut(QKeySequence("d"), this);
+  QShortcut *decreaseRudder = new QShortcut(QKeySequence("a"), this);
   QObject::connect(decreaseRudder, SIGNAL(activated()), this,
       SLOT(OnDecreaseRudder()));
 
@@ -96,7 +97,6 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   QShortcut *presetLanding = new QShortcut(QKeySequence('3'), this);
   QObject::connect(presetLanding, SIGNAL(activated()), this,
       SLOT(OnPresetLanding()));
-
 }
 
 /////////////////////////////////////////////////
@@ -268,7 +268,7 @@ void CessnaGUIPlugin::OnIncreaseRudder()
   if (rudder.Degree() < 30)
   {
     rudder += this->angleStep;
-    msg.set_cmd_elevators(rudder.Radian());
+    msg.set_cmd_rudder(rudder.Radian());
     this->controlPub->Publish(msg);
   }
 }
@@ -283,10 +283,10 @@ void CessnaGUIPlugin::OnDecreaseRudder()
   }
 
   msgs::Cessna msg;
-  if (rudder.Degree() < -30)
+  if (rudder.Degree() > -30)
   {
-    rudder += this->angleStep;
-    msg.set_cmd_elevators(rudder.Radian());
+    rudder -= this->angleStep;
+    msg.set_cmd_rudder(rudder.Radian());
     this->controlPub->Publish(msg);
   }
 }

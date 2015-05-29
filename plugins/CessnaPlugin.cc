@@ -177,7 +177,7 @@ void CessnaPlugin::OnControl(ConstCessnaPtr &_msg)
   }
   if (_msg->has_cmd_left_aileron())
     this->cmds[kLeftAileron] = _msg->cmd_left_aileron();
-  if (_msg->has_left_flap())
+  if (_msg->has_cmd_left_flap())
     this->cmds[kLeftFlap] = _msg->cmd_left_flap();
   if (_msg->has_cmd_right_aileron())
     this->cmds[kRightAileron] = _msg->cmd_right_aileron();

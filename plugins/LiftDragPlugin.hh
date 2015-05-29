@@ -38,9 +38,6 @@ namespace gazebo
     // Documentation Inherited.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
-    // Documentation Inherited.
-    public: virtual void Init();
-
     /// \brief Callback for World Update events.
     protected: virtual void OnUpdate();
 
@@ -55,9 +52,6 @@ namespace gazebo
 
     /// \brief Pointer to model containing plugin.
     protected: physics::ModelPtr model;
-
-    /// \brief Name of model containing plugin.
-    protected: std::string modelName;
 
     /// \brief Coefficient of Lift / alpha slope.
     /// Lift = C_L * q * S
@@ -132,10 +126,6 @@ namespace gazebo
 
     /// \brief Pointer to link currently targeted by mud joint.
     protected: physics::LinkPtr link;
-
-    /// \brief Names of a joint that actuates a control surface for
-    /// this lifting body
-    protected: std::string controlJointName;
 
     /// \brief Pointer to a joint that actuates a control surface for
     /// this lifting body
