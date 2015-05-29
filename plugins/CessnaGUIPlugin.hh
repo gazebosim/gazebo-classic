@@ -40,7 +40,9 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~CessnaGUIPlugin();
 
-    /////////////////////////////////////////////////
+    /// \brief Callback that receives a control message from
+    /// the ~/cessna_c172/control topic.
+    /// \param[in] _msg Control msg.
     private: void OnState(ConstCessnaPtr &_msg);
 
     /// \brief Increase the propeller RPMs.
