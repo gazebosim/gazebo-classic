@@ -1,0 +1,2840 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- A copy of the pr2 model sans sensors and projector -->
+    <model name="pr2">
+      <static>0</static>
+      <link name="base_footprint">
+        <self_collide>0</self_collide>
+        <inertial>
+          <mass>118.001000</mass>
+          <pose>-0.062421 0.000000 0.201365 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>8.431730</ixx>
+            <ixy>-0.009720</ixy>
+            <ixz>1.901570</ixz>
+            <iyy>8.533050</iyy>
+            <iyz>-0.007380</iyz>
+            <izz>3.787470</izz>
+          </inertia>
+        </inertial>
+        <collision name="base_footprint_geom">
+          <pose>0.000000 0.000000 0.071000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <box>
+              <size>0.001000 0.001000 0.001000</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="base_footprint_geom_visual">
+          <geometry>
+            <box>
+              <size>0.010000 0.010000 0.010000</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name="base_footprint_geom_base_bellow_link">
+          <pose>-0.290000 0.000000 0.851000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <box>
+              <size>0.050000 0.370000 0.300000</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="base_footprint_geom_base_bellow_link_visual">
+          <pose>-0.290000 0.000000 0.851000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <box>
+              <size>0.050000 0.370000 0.300000</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name="base_footprint_geom_base_link">
+          <pose>0.000000 0.000000 0.051000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/base_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="base_footprint_geom_base_link_visual">
+          <pose>0.000000 0.000000 0.051000 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/base.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <link name="bl_caster_rotation_link">
+        <self_collide>0</self_collide>
+        <pose>-0.224600 0.224600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>3.473080</mass>
+          <pose>0.000000 0.000000 0.070000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="bl_caster_rotation_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/caster_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="bl_caster_rotation_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/caster.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="bl_caster_l_wheel_link">
+        <self_collide>0</self_collide>
+        <pose>-0.224600 0.273600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.440360</mass>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="bl_caster_l_wheel_link_geom">
+          <pose>0.000000 0.000000 0.000000 1.570800 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.074792</radius>
+              <length>0.034000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="bl_caster_l_wheel_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/wheel.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="bl_caster_r_wheel_link">
+        <self_collide>0</self_collide>
+        <pose>-0.224600 0.175600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.440360</mass>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="bl_caster_r_wheel_link_geom">
+          <pose>0.000000 0.000000 0.000000 1.570800 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.074792</radius>
+              <length>0.034000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="bl_caster_r_wheel_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/wheel.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="br_caster_rotation_link">
+        <self_collide>0</self_collide>
+        <pose>-0.224600 -0.224600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>3.473080</mass>
+          <pose>0.000000 0.000000 0.070000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="br_caster_rotation_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/caster_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="br_caster_rotation_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/caster.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="br_caster_l_wheel_link">
+        <self_collide>0</self_collide>
+        <pose>-0.224600 -0.175600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.440360</mass>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="br_caster_l_wheel_link_geom">
+          <pose>0.000000 0.000000 0.000000 1.570800 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.074792</radius>
+              <length>0.034000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="br_caster_l_wheel_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/wheel.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="br_caster_r_wheel_link">
+        <self_collide>0</self_collide>
+        <pose>-0.224600 -0.273600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.440360</mass>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="br_caster_r_wheel_link_geom">
+          <pose>0.000000 0.000000 0.000000 1.570800 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.074792</radius>
+              <length>0.034000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="br_caster_r_wheel_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/wheel.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="fl_caster_rotation_link">
+        <self_collide>0</self_collide>
+        <pose>0.224600 0.224600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>3.473080</mass>
+          <pose>0.000000 0.000000 0.070000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="fl_caster_rotation_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/caster_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="fl_caster_rotation_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/caster.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="fl_caster_l_wheel_link">
+        <self_collide>0</self_collide>
+        <pose>0.224600 0.273600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.440360</mass>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="fl_caster_l_wheel_link_geom">
+          <pose>0.000000 0.000000 0.000000 1.570800 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.074792</radius>
+              <length>0.034000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="fl_caster_l_wheel_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/wheel.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="fl_caster_r_wheel_link">
+        <self_collide>0</self_collide>
+        <pose>0.224600 0.175600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.440360</mass>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="fl_caster_r_wheel_link_geom">
+          <pose>0.000000 0.000000 0.000000 1.570800 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.074792</radius>
+              <length>0.034000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="fl_caster_r_wheel_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/wheel.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="fr_caster_rotation_link">
+        <self_collide>0</self_collide>
+        <pose>0.224600 -0.224600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>3.473080</mass>
+          <pose>0.000000 0.000000 0.070000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="fr_caster_rotation_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/caster_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="fr_caster_rotation_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/caster.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="fr_caster_l_wheel_link">
+        <self_collide>0</self_collide>
+        <pose>0.224600 -0.175600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.440360</mass>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="fr_caster_l_wheel_link_geom">
+          <pose>0.000000 0.000000 0.000000 1.570800 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.074792</radius>
+              <length>0.034000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="fr_caster_l_wheel_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/wheel.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="fr_caster_r_wheel_link">
+        <self_collide>0</self_collide>
+        <pose>0.224600 -0.273600 0.079200 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.440360</mass>
+          <inertia>
+            <ixx>0.012412</ixx>
+            <ixy>-0.000712</ixy>
+            <ixz>0.000503</ixz>
+            <iyy>0.015218</iyy>
+            <iyz>-0.000004</iyz>
+            <izz>0.011764</izz>
+          </inertia>
+        </inertial>
+        <collision name="fr_caster_r_wheel_link_geom">
+          <pose>0.000000 0.000000 0.000000 1.570800 -0.000000 0.000000</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.074792</radius>
+              <length>0.034000</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="fr_caster_r_wheel_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/base_v0/wheel.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="torso_lift_link">
+        <self_collide>0</self_collide>
+        <pose>-0.050000 0.000000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>36.449000</mass>
+          <pose>-0.099499 -0.000004 -0.086764 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>2.792330</ixx>
+            <ixy>0.004280</ixy>
+            <ixz>-0.160631</ixz>
+            <iyy>2.521060</iyy>
+            <iyz>0.029689</iyz>
+            <izz>0.536551</izz>
+          </inertia>
+        </inertial>
+        <collision name="torso_lift_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/torso_v0/torso_lift_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="torso_lift_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/torso_v0/torso_lift.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <link name="head_pan_link">
+        <self_collide>0</self_collide>
+        <pose>-0.067070 0.000000 1.172130 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>6.339000</mass>
+          <pose>0.010907 0.031693 0.090507 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.032498</ixx>
+            <ixy>0.000636</ixy>
+            <ixz>0.002585</ixz>
+            <iyy>0.046546</iyy>
+            <iyz>-0.002453</iyz>
+            <izz>0.057653</izz>
+          </inertia>
+        </inertial>
+        <collision name="head_pan_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/head_v0/head_pan_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="head_pan_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/head_v0/head_pan.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="head_tilt_link">
+        <self_collide>0</self_collide>
+        <pose>0.000930 0.000000 1.172130 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>5.319000</mass>
+          <pose>-0.005151 -0.014635 0.072819 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.126134</ixx>
+            <ixy>0.000237</ixy>
+            <ixz>0.011881</ixz>
+            <iyy>0.165102</iyy>
+            <iyz>0.001606</iyz>
+            <izz>0.166947</izz>
+          </inertia>
+        </inertial>
+        <collision name="head_tilt_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/head_v0/head_tilt_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="head_tilt_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/head_v0/head_tilt.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="head_tilt_link_geom_head_mount_kinect_ir_link">
+          <pose>-0.147067 0.012500 0.291953 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <sphere>
+              <radius>0.000500</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="head_tilt_link_geom_head_mount_kinect_ir_link_visual">
+          <pose>-0.147067 0.012500 0.291953 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <sphere>
+              <radius>0.000250</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Red</name></script>
+          </material>
+        </visual>
+        <collision name="head_tilt_link_geom_head_mount_kinect_rgb_link">
+          <pose>-0.147067 0.017500 0.291953 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <sphere>
+              <radius>0.000500</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="head_tilt_link_geom_head_mount_kinect_rgb_link_visual">
+          <pose>-0.147067 0.017500 0.291953 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <sphere>
+              <radius>0.000250</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Red</name></script>
+          </material>
+        </visual>
+        <collision name="head_tilt_link_geom_head_mount_link">
+          <pose>-0.114800 0.000000 0.155500 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <sphere>
+              <radius>0.000500</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="head_tilt_link_geom_head_mount_link_visual">
+          <pose>-0.114800 0.000000 0.155500 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/sensors/kinect_prosilica_v0/115x100_swept_back--coarse.STL</uri>
+              <scale>0.001000 0.001000 0.001000</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="head_tilt_link_geom_head_mount_prosilica_link">
+          <pose>-0.161257 0.012500 0.244421 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <sphere>
+              <radius>0.000500</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="head_tilt_link_geom_head_mount_prosilica_link_visual">
+          <pose>-0.161257 0.012500 0.244421 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <sphere>
+              <radius>0.000250</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Red</name></script>
+          </material>
+        </visual>
+        <collision name="head_tilt_link_geom_head_plate_frame">
+          <pose>0.023200 0.000000 0.064500 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <box>
+              <size>0.010000 0.010000 0.010000</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="head_tilt_link_geom_head_plate_frame_visual">
+          <pose>0.023200 0.000000 0.064500 0.000000 -0.000000 0.000000</pose>
+          <geometry>
+            <box>
+              <size>0.010000 0.010000 0.010000</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Grey</name></script>
+          </material>
+        </visual>
+      </link>
+      <link name="l_shoulder_pan_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>-0.050000 0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>25.799300</mass>
+          <pose>-0.001201 0.024513 -0.098231 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.866179</ixx>
+            <ixy>-0.060865</ixy>
+            <ixz>-0.121181</ixz>
+            <iyy>0.874217</iyy>
+            <iyz>-0.058866</iyz>
+            <izz>0.273538</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_shoulder_pan_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/shoulder_pan.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_shoulder_pan_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/shoulder_pan.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="l_shoulder_lift_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.050000 0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>2.749880</mass>
+          <pose>0.021950 -0.026640 -0.031270 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.021056</ixx>
+            <ixy>0.004967</ixy>
+            <ixz>-0.001948</ixz>
+            <iyy>0.021272</iyy>
+            <iyz>0.001104</iyz>
+            <izz>0.019758</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_shoulder_lift_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/shoulder_lift.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_shoulder_lift_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/shoulder_lift.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="l_upper_arm_roll_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.050000 0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>6.117690</mass>
+          <pose>0.210551 0.016309 -0.000561 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.025306</ixx>
+            <ixy>-0.003393</ixy>
+            <ixz>0.000608</ixz>
+            <iyy>0.084737</iyy>
+            <iyz>-0.000200</iyz>
+            <izz>0.086016</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_upper_arm_roll_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/upper_arm_roll_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_upper_arm_roll_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/upper_arm_roll.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="l_upper_arm_roll_link_geom_l_upper_arm_link">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/upper_arm.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_upper_arm_roll_link_geom_l_upper_arm_link_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/upper_arm.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="l_elbow_flex_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.450000 0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>1.903270</mass>
+          <pose>0.010140 0.000320 -0.012110 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.003465</ixx>
+            <ixy>0.000041</ixy>
+            <ixz>0.000432</ixz>
+            <iyy>0.004416</iyy>
+            <iyz>-0.000040</iyz>
+            <izz>0.003592</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_elbow_flex_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/elbow_flex.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_elbow_flex_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/elbow_flex.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="l_forearm_roll_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.450000 0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>2.689680</mass>
+          <pose>0.180727 -0.000163 -0.008583 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.014668</ixx>
+            <ixy>0.000052</ixy>
+            <ixz>0.000656</ixz>
+            <iyy>0.026279</iyy>
+            <iyz>-0.000013</iyz>
+            <izz>0.027775</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_forearm_roll_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/forearm_roll_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_forearm_roll_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/forearm_roll.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="l_forearm_roll_link_geom_l_forearm_link">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/forearm.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_forearm_roll_link_geom_l_forearm_link_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/forearm.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <link name="l_wrist_flex_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.771000 0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.614020</mass>
+          <pose>-0.001570 0.000000 -0.000750 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000652</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000003</ixz>
+            <iyy>0.000198</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.000645</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_wrist_flex_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/wrist_flex.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_wrist_flex_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/wrist_flex.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="l_wrist_roll_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.771000 0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.681070</mass>
+          <pose>0.056408 0.000451 -0.001014 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.011352</ixx>
+            <ixy>-0.000016</ixy>
+            <ixz>-0.000001</ixz>
+            <iyy>0.011677</iyy>
+            <iyz>-0.000001</iyz>
+            <izz>0.011866</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_wrist_roll_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/wrist_roll_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_wrist_roll_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/wrist_roll.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="l_wrist_roll_link_geom_l_gripper_motor_accelerometer_link">
+          <geometry>
+            <box>
+              <size>0.001000 0.001000 0.001000</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="l_wrist_roll_link_geom_l_gripper_motor_accelerometer_link_visual">
+          <geometry>
+            <box>
+              <size>0.001000 0.001000 0.001000</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name="l_wrist_roll_link_geom_l_gripper_palm_link">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/gripper_palm.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="l_wrist_roll_link_geom_l_gripper_palm_link_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/gripper_palm.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="l_gripper_l_finger_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.847910 0.198000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.171260</mass>
+          <pose>0.035980 0.017300 -0.001640 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000078</ixx>
+            <ixy>0.000001</ixy>
+            <ixz>-0.000010</ixz>
+            <iyy>0.000197</iyy>
+            <iyz>-0.000003</iyz>
+            <izz>0.000181</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_gripper_l_finger_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>500.000000</mu>
+                <mu2>500.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.000000</kp>
+                <kd>1.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="l_gripper_l_finger_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="l_gripper_l_finger_tip_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.939280 0.202950 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.044190</mass>
+          <pose>0.004230 0.002840 0.000000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000008</ixx>
+            <ixy>0.000006</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.000010</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.000015</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_gripper_l_finger_tip_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger_tip.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>500.000000</mu>
+                <mu2>500.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>10000000.000000</kp>
+                <kd>1.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="l_gripper_l_finger_tip_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger_tip.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <link name="l_gripper_motor_slider_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.939280 0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.010000</mass>
+          <inertia>
+            <ixx>0.001000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.001000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.001000</izz>
+          </inertia>
+        </inertial>
+        <velocity_decay />
+      </link>
+      <link name="l_gripper_motor_screw_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.939280 0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.010000</mass>
+          <inertia>
+            <ixx>0.000100</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.000100</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.000100</izz>
+          </inertia>
+        </inertial>
+        <velocity_decay />
+      </link>
+      <link name="l_gripper_r_finger_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.847910 0.178000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.173890</mass>
+          <pose>0.035760 -0.017360 -0.000950 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000077</ixx>
+            <ixy>-0.000002</ixy>
+            <ixz>-0.000008</ixz>
+            <iyy>0.000198</iyy>
+            <iyz>0.000002</iyz>
+            <izz>0.000181</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_gripper_r_finger_link_geom">
+          <pose>0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>500.000000</mu>
+                <mu2>500.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.000000</kp>
+                <kd>1.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="l_gripper_r_finger_link_geom_visual">
+          <pose>0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="l_gripper_r_finger_tip_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.939280 0.173050 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.044190</mass>
+          <pose>0.004230 -0.002840 0.000000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000008</ixx>
+            <ixy>-0.000006</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.000010</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.000015</izz>
+          </inertia>
+        </inertial>
+        <collision name="l_gripper_r_finger_tip_link_geom">
+          <pose>0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger_tip.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>500.000000</mu>
+                <mu2>500.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>10000000.000000</kp>
+                <kd>1.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="l_gripper_r_finger_tip_link_geom_visual">
+          <pose>0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger_tip.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <link name="laser_tilt_mount_link">
+        <self_collide>0</self_collide>
+        <pose>0.048930 0.000000 1.017680 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.592000</mass>
+          <pose>-0.001134 0.001667 -0.007067 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.001296</ixx>
+            <ixy>0.000023</ixy>
+            <ixz>0.000037</ixz>
+            <iyy>0.001086</iyy>
+            <iyz>0.000035</iyz>
+            <izz>0.000895</izz>
+          </inertia>
+        </inertial>
+        <collision name="laser_tilt_mount_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/tilting_laser_v0/tilting_hokuyo_L.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.000000</mu>
+                <mu2>0.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000000000.000000</kp>
+                <kd>10000.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="laser_tilt_mount_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/tilting_laser_v0/tilting_hokuyo.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <link name="r_shoulder_pan_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>-0.050000 -0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>25.799300</mass>
+          <pose>-0.001201 0.024513 -0.098231 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.866179</ixx>
+            <ixy>-0.060865</ixy>
+            <ixz>-0.121181</ixz>
+            <iyy>0.874217</iyy>
+            <iyz>-0.058866</iyz>
+            <izz>0.273538</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_shoulder_pan_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/shoulder_pan.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.000000</mu>
+                <mu2>0.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000000000.000000</kp>
+                <kd>10000.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="r_shoulder_pan_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/shoulder_pan.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="r_shoulder_lift_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.050000 -0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>2.749880</mass>
+          <pose>0.021950 -0.026640 -0.031270 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.021056</ixx>
+            <ixy>0.004967</ixy>
+            <ixz>-0.001948</ixz>
+            <iyy>0.021272</iyy>
+            <iyz>0.001104</iyz>
+            <izz>0.019758</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_shoulder_lift_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/shoulder_lift.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.000000</mu>
+                <mu2>0.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000000000.000000</kp>
+                <kd>10000.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="r_shoulder_lift_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/shoulder_lift.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="r_upper_arm_roll_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.050000 -0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>6.117690</mass>
+          <pose>0.210482 -0.015945 -0.000197 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.025378</ixx>
+            <ixy>0.003757</ixy>
+            <ixz>-0.000709</ixz>
+            <iyy>0.084737</iyy>
+            <iyz>-0.000179</iyz>
+            <izz>0.086088</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_upper_arm_roll_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/upper_arm_roll_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="r_upper_arm_roll_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/shoulder_v0/upper_arm_roll.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="r_upper_arm_roll_link_geom_r_upper_arm_link">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/upper_arm.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="r_upper_arm_roll_link_geom_r_upper_arm_link_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/upper_arm.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="r_elbow_flex_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.450000 -0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>1.903270</mass>
+          <pose>0.010140 0.000320 -0.012110 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.003465</ixx>
+            <ixy>0.000041</ixy>
+            <ixz>0.000432</ixz>
+            <iyy>0.004416</iyy>
+            <iyz>-0.000040</iyz>
+            <izz>0.003592</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_elbow_flex_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/elbow_flex.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="r_elbow_flex_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/elbow_flex.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="r_forearm_roll_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.450000 -0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>2.689680</mass>
+          <pose>0.180727 -0.000163 -0.008583 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.014668</ixx>
+            <ixy>0.000052</ixy>
+            <ixz>0.000656</ixz>
+            <iyy>0.026279</iyy>
+            <iyz>-0.000013</iyz>
+            <izz>0.027775</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_forearm_roll_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/forearm_roll_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="r_forearm_roll_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/upper_arm_v0/forearm_roll.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="r_forearm_roll_link_geom_r_forearm_link">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/forearm.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="r_forearm_roll_link_geom_r_forearm_link_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/forearm.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <link name="r_wrist_flex_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.771000 -0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.614020</mass>
+          <pose>-0.001570 0.000000 -0.000750 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000652</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000003</ixz>
+            <iyy>0.000198</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.000645</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_wrist_flex_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/wrist_flex.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="r_wrist_flex_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/wrist_flex.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="r_wrist_roll_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.771000 -0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.681070</mass>
+          <pose>0.056408 0.000451 -0.001014 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.011352</ixx>
+            <ixy>-0.000016</ixy>
+            <ixz>-0.000001</ixz>
+            <iyy>0.011677</iyy>
+            <iyz>-0.000001</iyz>
+            <izz>0.011866</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_wrist_roll_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/wrist_roll_L.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="r_wrist_roll_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/forearm_v0/wrist_roll.stl</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name="r_wrist_roll_link_geom_r_gripper_motor_accelerometer_link">
+          <geometry>
+            <box>
+              <size>0.001000 0.001000 0.001000</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="r_wrist_roll_link_geom_r_gripper_motor_accelerometer_link_visual">
+          <geometry>
+            <box>
+              <size>0.001000 0.001000 0.001000</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name="r_wrist_roll_link_geom_r_gripper_palm_link">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/gripper_palm.stl</uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="r_wrist_roll_link_geom_r_gripper_palm_link_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/gripper_palm.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="r_gripper_l_finger_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.847910 -0.178000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.171260</mass>
+          <pose>0.035980 0.017300 -0.001640 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000078</ixx>
+            <ixy>0.000001</ixy>
+            <ixz>0.000010</ixz>
+            <iyy>0.000197</iyy>
+            <iyz>-0.000003</iyz>
+            <izz>0.000181</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_gripper_l_finger_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>500.000000</mu>
+                <mu2>500.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.000000</kp>
+                <kd>1.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="r_gripper_l_finger_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="r_gripper_l_finger_tip_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.939280 -0.173050 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.044190</mass>
+          <pose>0.004230 0.002840 0.000000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000008</ixx>
+            <ixy>0.000006</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.000010</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.000015</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_gripper_l_finger_tip_link_geom">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger_tip.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>500.000000</mu>
+                <mu2>500.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>10000000.000000</kp>
+                <kd>1.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="r_gripper_l_finger_tip_link_geom_visual">
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger_tip.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <link name="r_gripper_motor_slider_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.939280 -0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.010000</mass>
+          <inertia>
+            <ixx>0.001000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.001000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.001000</izz>
+          </inertia>
+        </inertial>
+        <velocity_decay />
+      </link>
+      <link name="r_gripper_motor_screw_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.939280 -0.188000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.010000</mass>
+          <inertia>
+            <ixx>0.000100</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.000100</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.000100</izz>
+          </inertia>
+        </inertial>
+        <velocity_decay />
+      </link>
+      <link name="r_gripper_r_finger_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.847910 -0.198000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.173890</mass>
+          <pose>0.035760 -0.017360 -0.000950 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000077</ixx>
+            <ixy>-0.000002</ixy>
+            <ixz>-0.000008</ixz>
+            <iyy>0.000198</iyy>
+            <iyz>0.000002</iyz>
+            <izz>0.000181</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_gripper_r_finger_link_geom">
+          <pose>0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>500.000000</mu>
+                <mu2>500.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1000000.000000</kp>
+                <kd>1.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="r_gripper_r_finger_link_geom_visual">
+          <pose>0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay />
+      </link>
+      <link name="r_gripper_r_finger_tip_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.939280 -0.202950 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.044190</mass>
+          <pose>0.004230 -0.002840 0.000000 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000008</ixx>
+            <ixy>-0.000006</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.000010</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.000015</izz>
+          </inertia>
+        </inertial>
+        <collision name="r_gripper_r_finger_tip_link_geom">
+          <pose>0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger_tip.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>500.000000</mu>
+                <mu2>500.000000</mu2>
+                <slip1>0.000000</slip1>
+                <slip2>0.000000</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>10000000.000000</kp>
+                <kd>1.000000</kd>
+                <max_vel>100.000000</max_vel>
+                <min_depth>0.000000</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="r_gripper_r_finger_tip_link_geom_visual">
+          <pose>0.000000 0.000000 0.000000 -3.141590 0.000000 0.000000</pose>
+          <geometry>
+            <mesh>
+              <uri>model://pr2/meshes/gripper_v0/l_finger_tip.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <link name="torso_lift_motor_screw_link">
+        <self_collide>0</self_collide>
+        <pose>-0.150000 0.000000 0.751000 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>1.000000</mass>
+          <inertia>
+            <ixx>0.001000</ixx>
+            <ixy>0.000000</ixy>
+            <ixz>0.000000</ixz>
+            <iyy>0.001000</iyy>
+            <iyz>0.000000</iyz>
+            <izz>0.001000</izz>
+          </inertia>
+        </inertial>
+        <velocity_decay />
+      </link>
+      <link name="r_gripper_l_parallel_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.829910 -0.157000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.171260</mass>
+          <pose>0.035980 0.017300 -0.001640 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000078</ixx>
+            <ixy>0.000001</ixy>
+            <ixz>-0.000010</ixz>
+            <iyy>0.000197</iyy>
+            <iyz>-0.000003</iyz>
+            <izz>0.000181</izz>
+          </inertia>
+        </inertial>
+        <velocity_decay />
+      </link>
+      <link name="r_gripper_r_parallel_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.829910 -0.219000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.173890</mass>
+          <pose>0.035760 -0.017360 -0.000950 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000077</ixx>
+            <ixy>-0.000002</ixy>
+            <ixz>-0.000008</ixz>
+            <iyy>0.000198</iyy>
+            <iyz>0.000002</iyz>
+            <izz>0.000181</izz>
+          </inertia>
+        </inertial>
+        <velocity_decay />
+      </link>
+      <link name="l_gripper_l_parallel_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.829910 0.219000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.171260</mass>
+          <pose>0.035980 0.017300 -0.001640 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000078</ixx>
+            <ixy>0.000001</ixy>
+            <ixz>0.000010</ixz>
+            <iyy>0.000197</iyy>
+            <iyz>-0.000003</iyz>
+            <izz>0.000181</izz>
+          </inertia>
+        </inertial>
+        <velocity_decay />
+      </link>
+      <link name="l_gripper_r_parallel_link">
+        <self_collide>0</self_collide>
+        <gravity>0</gravity>
+        <pose>0.829910 0.157000 0.790675 0.000000 -0.000000 0.000000</pose>
+        <inertial>
+          <mass>0.173890</mass>
+          <pose>0.035760 -0.017360 -0.000950 0.000000 -0.000000 0.000000</pose>
+          <inertia>
+            <ixx>0.000077</ixx>
+            <ixy>-0.000002</ixy>
+            <ixz>0.000008</ixz>
+            <iyy>0.000198</iyy>
+            <iyz>0.000002</iyz>
+            <izz>0.000181</izz>
+          </inertia>
+        </inertial>
+        <velocity_decay />
+      </link>
+      <joint name="bl_caster_rotation_joint" type="revolute">
+        <parent>base_footprint</parent>
+        <child>bl_caster_rotation_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="bl_caster_l_wheel_joint" type="revolute">
+        <parent>bl_caster_rotation_link</parent>
+        <child>bl_caster_l_wheel_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="bl_caster_r_wheel_joint" type="revolute">
+        <parent>bl_caster_rotation_link</parent>
+        <child>bl_caster_r_wheel_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="br_caster_rotation_joint" type="revolute">
+        <parent>base_footprint</parent>
+        <child>br_caster_rotation_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="br_caster_l_wheel_joint" type="revolute">
+        <parent>br_caster_rotation_link</parent>
+        <child>br_caster_l_wheel_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="br_caster_r_wheel_joint" type="revolute">
+        <parent>br_caster_rotation_link</parent>
+        <child>br_caster_r_wheel_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="fl_caster_rotation_joint" type="revolute">
+        <parent>base_footprint</parent>
+        <child>fl_caster_rotation_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="fl_caster_l_wheel_joint" type="revolute">
+        <parent>fl_caster_rotation_link</parent>
+        <child>fl_caster_l_wheel_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="fl_caster_r_wheel_joint" type="revolute">
+        <parent>fl_caster_rotation_link</parent>
+        <child>fl_caster_r_wheel_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="fr_caster_rotation_joint" type="revolute">
+        <parent>base_footprint</parent>
+        <child>fr_caster_rotation_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="fr_caster_l_wheel_joint" type="revolute">
+        <parent>fr_caster_rotation_link</parent>
+        <child>fr_caster_l_wheel_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="fr_caster_r_wheel_joint" type="revolute">
+        <parent>fr_caster_rotation_link</parent>
+        <child>fr_caster_r_wheel_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="torso_lift_joint" type="prismatic">
+        <parent>base_footprint</parent>
+        <child>torso_lift_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <limit>
+            <lower>0.000000</lower>
+            <upper>0.330000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="head_pan_joint" type="revolute">
+        <parent>torso_lift_link</parent>
+        <child>head_pan_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>2.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-3.006993</lower>
+            <upper>3.006993</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="head_tilt_joint" type="revolute">
+        <parent>head_pan_link</parent>
+        <child>head_tilt_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>10.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-0.471237</lower>
+            <upper>1.396260</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_shoulder_pan_joint" type="revolute">
+        <parent>torso_lift_link</parent>
+        <child>l_shoulder_pan_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>10.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-0.714602</lower>
+            <upper>2.285404</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_shoulder_lift_joint" type="revolute">
+        <parent>l_shoulder_pan_link</parent>
+        <child>l_shoulder_lift_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>10.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-0.523601</lower>
+            <upper>1.396300</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_upper_arm_roll_joint" type="revolute">
+        <parent>l_shoulder_lift_link</parent>
+        <child>l_upper_arm_roll_link</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.100000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-0.800000</lower>
+            <upper>3.900008</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_elbow_flex_joint" type="revolute">
+        <parent>l_upper_arm_roll_link</parent>
+        <child>l_elbow_flex_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>1.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-2.321305</lower>
+            <upper>0.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_forearm_roll_joint" type="revolute">
+        <parent>l_elbow_flex_link</parent>
+        <child>l_forearm_roll_link</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.100000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_wrist_flex_joint" type="revolute">
+        <parent>l_forearm_roll_link</parent>
+        <child>l_wrist_flex_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.100000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-2.180004</lower>
+            <upper>0.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_wrist_roll_joint" type="revolute">
+        <parent>l_wrist_flex_link</parent>
+        <child>l_wrist_roll_link</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.100000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_l_finger_joint" type="revolute">
+        <parent>l_wrist_roll_link</parent>
+        <child>l_gripper_l_finger_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.020000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>0.000000</lower>
+            <upper>0.548000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_l_finger_tip_joint" type="revolute">
+        <parent>l_gripper_l_finger_link</parent>
+        <child>l_gripper_l_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 -1.000000</xyz>
+          <dynamics>
+            <damping>0.001000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>0.000000</lower>
+            <upper>0.548000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_motor_slider_joint" type="prismatic">
+        <parent>l_wrist_roll_link</parent>
+        <child>l_gripper_motor_slider_link</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <limit>
+            <lower>-0.100000</lower>
+            <upper>0.100000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_motor_screw_joint" type="revolute">
+        <parent>l_gripper_motor_slider_link</parent>
+        <child>l_gripper_motor_screw_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.000100</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_r_finger_joint" type="revolute">
+        <parent>l_wrist_roll_link</parent>
+        <child>l_gripper_r_finger_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 -1.000000</xyz>
+          <dynamics>
+            <damping>0.020000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>0.000000</lower>
+            <upper>0.548000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_r_finger_tip_joint" type="revolute">
+        <parent>l_gripper_r_finger_link</parent>
+        <child>l_gripper_r_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.001000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>0.000000</lower>
+            <upper>0.548000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="laser_tilt_mount_joint" type="revolute">
+        <parent>torso_lift_link</parent>
+        <child>laser_tilt_mount_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.008000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-0.785400</lower>
+            <upper>1.483530</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_shoulder_pan_joint" type="revolute">
+        <parent>torso_lift_link</parent>
+        <child>r_shoulder_pan_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>10.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-2.285404</lower>
+            <upper>0.714602</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_shoulder_lift_joint" type="revolute">
+        <parent>r_shoulder_pan_link</parent>
+        <child>r_shoulder_lift_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>10.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-0.523601</lower>
+            <upper>1.396300</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_upper_arm_roll_joint" type="revolute">
+        <parent>r_shoulder_lift_link</parent>
+        <child>r_upper_arm_roll_link</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.100000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-3.900008</lower>
+            <upper>0.800000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_elbow_flex_joint" type="revolute">
+        <parent>r_upper_arm_roll_link</parent>
+        <child>r_elbow_flex_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>1.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-2.321305</lower>
+            <upper>0.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_forearm_roll_joint" type="revolute">
+        <parent>r_elbow_flex_link</parent>
+        <child>r_forearm_roll_link</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.100000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_wrist_flex_joint" type="revolute">
+        <parent>r_forearm_roll_link</parent>
+        <child>r_wrist_flex_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.100000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-2.180004</lower>
+            <upper>0.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_wrist_roll_joint" type="revolute">
+        <parent>r_wrist_flex_link</parent>
+        <child>r_wrist_roll_link</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.100000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_l_finger_joint" type="revolute">
+        <parent>r_wrist_roll_link</parent>
+        <child>r_gripper_l_finger_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.020000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>0.000000</lower>
+            <upper>0.548000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_l_finger_tip_joint" type="revolute">
+        <parent>r_gripper_l_finger_link</parent>
+        <child>r_gripper_l_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 -1.000000</xyz>
+          <dynamics>
+            <damping>0.001000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>0.000000</lower>
+            <upper>0.548000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_motor_slider_joint" type="prismatic">
+        <parent>r_wrist_roll_link</parent>
+        <child>r_gripper_motor_slider_link</child>
+        <axis>
+          <xyz>1.000000 0.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-0.100000</lower>
+            <upper>0.100000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_motor_screw_joint" type="revolute">
+        <parent>r_gripper_motor_slider_link</parent>
+        <child>r_gripper_motor_screw_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.000100</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_r_finger_joint" type="revolute">
+        <parent>r_wrist_roll_link</parent>
+        <child>r_gripper_r_finger_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 -1.000000</xyz>
+          <dynamics>
+            <damping>0.020000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>0.000000</lower>
+            <upper>0.548000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_r_finger_tip_joint" type="revolute">
+        <parent>r_gripper_r_finger_link</parent>
+        <child>r_gripper_r_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.001000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>0.000000</lower>
+            <upper>0.548000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="torso_lift_motor_screw_joint" type="revolute">
+        <parent>base_footprint</parent>
+        <child>torso_lift_motor_screw_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.000100</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="torso_lift_screw_torso_lift_joint" type="screw">
+        <parent>torso_lift_link</parent>
+        <child>torso_lift_motor_screw_link</child>
+        <thread_pitch>3141.600000</thread_pitch>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_r_screw_screw_joint" type="screw">
+        <parent>r_gripper_r_finger_tip_link</parent>
+        <child>r_gripper_motor_screw_link</child>
+        <thread_pitch>-3141.600000</thread_pitch>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_l_screw_screw_joint" type="screw">
+        <parent>r_gripper_l_finger_tip_link</parent>
+        <child>r_gripper_motor_screw_link</child>
+        <thread_pitch>3141.600000</thread_pitch>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_r_parallel_root_joint" type="revolute">
+        <pose>0.058910 -0.031000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <parent>r_gripper_r_parallel_link</parent>
+        <child>r_wrist_roll_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 -1.000000</xyz>
+          <dynamics>
+            <damping>0.200000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_l_parallel_root_joint" type="revolute">
+        <pose>0.058910 0.031000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <parent>r_gripper_l_parallel_link</parent>
+        <child>r_wrist_roll_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.200000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_r_parallel_tip_joint" type="revolute">
+        <pose>-0.018000 -0.021000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <parent>r_gripper_r_parallel_link</parent>
+        <child>r_gripper_r_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_l_parallel_tip_joint" type="revolute">
+        <pose>-0.018000 0.021000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <parent>r_gripper_l_parallel_link</parent>
+        <child>r_gripper_l_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="r_gripper_joint" type="prismatic">
+        <parent>r_gripper_r_finger_tip_link</parent>
+        <child>r_gripper_l_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_r_screw_screw_joint" type="screw">
+        <parent>l_gripper_r_finger_tip_link</parent>
+        <child>l_gripper_motor_screw_link</child>
+        <thread_pitch>-3141.600000</thread_pitch>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_l_screw_screw_joint" type="screw">
+        <parent>l_gripper_l_finger_tip_link</parent>
+        <child>l_gripper_motor_screw_link</child>
+        <thread_pitch>3141.600000</thread_pitch>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_r_parallel_root_joint" type="revolute">
+        <pose>0.058910 -0.031000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <parent>l_gripper_r_parallel_link</parent>
+        <child>l_wrist_roll_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 -1.000000</xyz>
+          <dynamics>
+            <damping>0.200000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_l_parallel_root_joint" type="revolute">
+        <pose>0.058910 0.031000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <parent>l_gripper_l_parallel_link</parent>
+        <child>l_wrist_roll_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.200000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_r_parallel_tip_joint" type="revolute">
+        <pose>-0.018000 -0.021000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <parent>l_gripper_r_parallel_link</parent>
+        <child>l_gripper_r_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <dynamics>
+            <damping>0.000000</damping>
+            <friction>0.000000</friction>
+          </dynamics>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_l_parallel_tip_joint" type="revolute">
+        <pose>-0.018000 0.021000 0.000000 0.000000 -0.000000 0.000000</pose>
+        <parent>l_gripper_l_parallel_link</parent>
+        <child>l_gripper_l_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="l_gripper_joint" type="prismatic">
+        <parent>l_gripper_r_finger_tip_link</parent>
+        <child>l_gripper_l_finger_tip_link</child>
+        <axis>
+          <xyz>0.000000 1.000000 0.000000</xyz>
+          <limit>
+            <lower>-10000000000000000.000000</lower>
+            <upper>10000000000000000.000000</upper>
+            <effort>0.000000</effort>
+            <velocity>4.000000</velocity>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+    </model>
+
+  </world>
+</sdf>
