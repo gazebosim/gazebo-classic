@@ -1992,13 +1992,14 @@ void World::PublishWorldStats()
 
   if (util::LogPlay::Instance()->IsOpen())
   {
-    msgs::LogStatistics logStats;
+    msgs::LogPlaybackStatistics logStats;
     msgs::Set(logStats.mutable_start_time(),
         util::LogPlay::Instance()->GetLogStartTime());
     msgs::Set(logStats.mutable_end_time(),
         util::LogPlay::Instance()->GetLogEndTime());
 
-    this->dataPtr->worldStatsMsg.mutable_log_stats()->CopyFrom(logStats);
+    this->dataPtr->worldStatsMsg.mutable_log_playback_stats()->CopyFrom(
+        logStats);
   }
 
   if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())

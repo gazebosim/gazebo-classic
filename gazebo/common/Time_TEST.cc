@@ -26,6 +26,7 @@ using namespace gazebo;
 
 class TimeTest : public gazebo::testing::AutoLogFixture { };
 
+/////////////////////////////////////////////////
 TEST_F(TimeTest, Time)
 {
   common::Timer timer;
@@ -136,6 +137,45 @@ TEST_F(TimeTest, Time)
   EXPECT_DOUBLE_EQ(nsec, common::Time::MicToNano(usec));
 }
 
+/////////////////////////////////////////////////
+TEST_F(TimeTest, String)
+{
+  common::Time time(0);
+
+  // Hide elements
+  EXPECT_EQ(time.FormattedString(), "00 00:00:00.000");
+  EXPECT_EQ(time.FormattedString(false), "00:00:00.000");
+  EXPECT_EQ(time.FormattedString(false, false), "00:00.000");
+  EXPECT_EQ(time.FormattedString(false, false, false), "00.000");
+  EXPECT_EQ(time.FormattedString(false, false, false, false), "000");
+  EXPECT_EQ(time.FormattedString(false, false, false, false, false), "");
+  EXPECT_EQ(time.FormattedString(true, true, true, true, true),
+      "00 00:00:00.000");
+  EXPECT_EQ(time.FormattedString(true, true, true, true, false),
+      "00 00:00:00");
+  EXPECT_EQ(time.FormattedString(true, true, true, false, false),
+      "00 00:00");
+  EXPECT_EQ(time.FormattedString(true, true, false, false, false),
+      "00 00");
+  EXPECT_EQ(time.FormattedString(true, false, false, false, false),
+      "00");
+
+  // 1 min
+  time = common::Time(60);
+  EXPECT_EQ(time.FormattedString(), "00 00:01:00.000");
+
+  // 2.5 hours
+  time = common::Time(9000);
+  EXPECT_EQ(time.FormattedString(), "00 02:30:00.000");
+
+  // 3 days
+  time = common::Time(259200);
+  EXPECT_EQ(time.FormattedString(), "03 00:00:00.000");
+
+  // Large time, nanoseconds are lost
+  time = common::Time(1234567890, 123456789);
+  EXPECT_EQ(time.FormattedString(), "14288 23:31:30.123");
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

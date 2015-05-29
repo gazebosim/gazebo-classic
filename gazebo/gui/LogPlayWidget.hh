@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_LOG_PLAY_WIDGET_HH_
 #define _GAZEBO_LOG_PLAY_WIDGET_HH_
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/util/system.hh"
@@ -29,6 +30,8 @@ namespace gazebo
     class LogPlayViewPrivate;
     class TimePanel;
 
+    /// \class LogPlayWidget LogPlayWidget.hh
+    /// \brief Widget which displays log playback options.
     class GAZEBO_VISIBLE LogPlayWidget : public QWidget
     {
       Q_OBJECT
@@ -49,20 +52,17 @@ namespace gazebo
       /// indicates the simulation is running
       public: void SetPaused(const bool _paused);
 
-      /// \brief Emit signal to set current time line edit and item.
-      /// \param[in] _timeString String representation of sim time.
-      /// \param[in] _timeInt Integer representation of sim time.
-      public: void EmitSetCurrentTime(QString _timeString, int _timeInt);
+      /// \brief Emit signal to set current time.
+      /// \param[in] _time Current time.
+      public: void EmitSetCurrentTime(common::Time _time);
 
-      /// \brief Emit signal to set current time line edit and item.
-      /// \param[in] _timeString String representation of sim time.
-      /// \param[in] _timeInt Integer representation of sim time.
-      public: void EmitSetStartTime(QString _timeString, int _timeInt);
+      /// \brief Emit signal to set start time.
+      /// \param[in] _time Start time.
+      public: void EmitSetStartTime(common::Time _time);
 
-      /// \brief Emit signal to set current time line edit and item.
-      /// \param[in] _timeString String representation of sim time.
-      /// \param[in] _timeInt Integer representation of sim time.
-      public: void EmitSetEndTime(QString _timeString, int _timeInt);
+      /// \brief Emit signal to set end time.
+      /// \param[in] _time End time.
+      public: void EmitSetEndTime(common::Time _time);
 
       /// \brief Play simulation.
       public slots: void OnPlay();
@@ -98,18 +98,21 @@ namespace gazebo
       /// \param[in] _string String representation of current time.
       signals: void SetCurrentTime(const QString &);
 
-      /// \brief Qt signal used to set the current time line edit.
+      /// \brief Qt signal used to set the end time line edit.
       /// \param[in] _string String representation of current time.
       signals: void SetEndTime(const QString &);
 
-      /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void SetCurrentTime(int _time);
+      /// \brief Qt signal used to set the current time in the view.
+      /// \param[in] _time Time in ms.
+      signals: void SetCurrentTime(int _time);
 
-      /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void SetStartTime(int _time);
+      /// \brief Qt signal used to set the start time in the view.
+      /// \param[in] _time Time in ms.
+      signals: void SetStartTime(int _time);
 
-      /// \brief Qt signal when the joint creation process has ended.
-      Q_SIGNALS: void SetEndTime(int _time);
+      /// \brief Qt signal used to set the end time in the view.
+      /// \param[in] _time Eime in ms.
+      signals: void SetEndTime(int _time);
 
       /// \brief Publish a multistep message.
       /// \param[in] _step Number of steps.
@@ -120,7 +123,8 @@ namespace gazebo
       private: LogPlayWidgetPrivate *dataPtr;
     };
 
-    // TODO
+    /// \class LogPlayView LogPlayView.hh
+    /// \brief View within LogPlayWidget which displays the timeline.
     class GAZEBO_VISIBLE LogPlayView: public QGraphicsView
     {
       Q_OBJECT
@@ -128,14 +132,20 @@ namespace gazebo
       /// \brief Constructor;
       public: LogPlayView(LogPlayWidget *_parent = 0);
 
-      /// \brief Play simulation.
-      public slots: void SetCurrentTime(int _sec);
+      /// \brief Set the position of the current time item.
+      /// \param[in] _msec Absolute time in ms.
+      public slots: void SetCurrentTime(int _msec);
 
-      /// \brief Play simulation.
-      public slots: void SetStartTime(int _sec);
+      /// \brief Set the log start time.
+      /// \param[in] _msec Start time in ms.
+      public slots: void SetStartTime(int _msec);
 
-      /// \brief Play simulation.
-      public slots: void SetEndTime(int _sec);
+      /// \brief Set the log end time.
+      /// \param[in] _msec End time position in ms.
+      public slots: void SetEndTime(int _msec);
+
+      /// \brief Draw the timeline.
+      public slots: void DrawTimeline();
 
       /// \brief Qt mouse release event.
       /// \param[in] _event Qt mouse event.
@@ -154,7 +164,8 @@ namespace gazebo
       private: LogPlayViewPrivate *dataPtr;
     };
 
-    // TODO
+    /// \class CurrentTimeItem CurrentTimeItem.hh
+    /// \brief Item which represents the current time within the view.
     class GAZEBO_VISIBLE CurrentTimeItem: public QObject,
         public QGraphicsRectItem
     {

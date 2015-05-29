@@ -103,6 +103,9 @@ compilation on Windows.
 1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
     * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
 
+1. Added Time::FormattedString and removed all other FormatTime functions.
+    * [Pull request #1710](https://bitbucket.org/osrf/gazebo/pull-request/1710)
+
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
 
