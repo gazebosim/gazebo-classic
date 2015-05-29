@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_GUI_CESSNA_PLUGIN_HH_
 #define _GAZEBO_GUI_CESSNA_PLUGIN_HH_
 
+#include <mutex>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
@@ -39,6 +40,9 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~CessnaGUIPlugin();
 
+    /////////////////////////////////////////////////
+    private: void OnState(ConstCessnaPtr &_msg);
+
     /// \brief Increase the propeller RPMs.
     private slots: void OnIncreaseThrust();
 
@@ -51,7 +55,13 @@ namespace gazebo
     /// \brief Decrease the flaps angle.
     private slots: void OnDecreaseFlaps();
 
-    /// \brief Increase the elevators angle
+    /// \brief Increase Roll.
+    private slots: void OnIncreaseRoll();
+
+    /// \brief Decrease Roll.
+    private slots: void OnDecreaseRoll();
+
+    /// \brief Increase the elevators angle.
     private slots: void OnIncreaseElevators();
 
     /// \brief Decrease the elevators angle.
@@ -63,6 +73,15 @@ namespace gazebo
     /// \brief Decrease the rudder angle.
     private slots: void OnDecreaseRudder();
 
+    /// \brief Take-off preset.
+    private slots: void OnPresetTakeOff();
+
+    /// \brief Cruise preset.
+    private slots: void OnPresetCruise();
+
+    /// \brief Landing preset.
+    private slots: void OnPresetLanding();
+
     /// \brief SDF for this plugin.
     private: sdf::ElementPtr sdf;
 
@@ -72,20 +91,17 @@ namespace gazebo
     /// \brief Control publisher.
     private: transport::PublisherPtr controlPub;
 
-    /// \brief Target thrust percentage.
-    private: float targetThrust = 0.0f;
-
-    /// \brief Target flaps angle in degrees.
-    private: math::Angle targetFlaps = math::Angle::Zero;
-
-    /// \brief Target elevators angle in degrees.
-    private: math::Angle targetElevators = math::Angle::Zero;
-
-    /// \brief Target rudder angle in degrees.
-    private: math::Angle targetRudder = math::Angle::Zero;
+    /// \brief State subscriber.
+    private: transport::SubscriberPtr stateSub;
 
     /// \brief Angle increment/decrement each time a key is pressed;
     private: math::Angle angleStep;
+
+    /// \brief State received from the Cessna plugin.
+    private: msgs::Cessna state;
+
+    /// \brief Protection.
+    private: std::mutex mutex;
   };
 }
 
