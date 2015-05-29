@@ -1,4 +1,10 @@
 ## Gazebo 6.0
+1. Added a plugin to control a Cessna C-172 via messages (CessnaPlugin), and a
+GUI plugin to test this functionality with the keyboard (CessnaGUIPlugin). Added
+world with the Cessna model and the two previous plugins loaded
+(cessna_demo.world).
+    * [Pull request #1712](https://bitbucket.org/osrf/gazebo/pull-request/1712)
+
 1. Added world with OSRF building and an elevator
     * [Pull request #1697](https://bitbucket.org/osrf/gazebo/pull-request/1697)
 

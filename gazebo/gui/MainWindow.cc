@@ -775,6 +775,8 @@ void MainWindow::OnFullScreen(bool _value)
     this->toolsWidget->show();
     this->menuBar->show();
   }
+  g_fullScreenAct->setChecked(_value);
+  g_fullscreen = _value;
 }
 
 /////////////////////////////////////////////////
@@ -790,6 +792,7 @@ void MainWindow::OnShowToolbars(bool _value)
     this->GetRenderWidget()->GetTimePanel()->hide();
     this->GetRenderWidget()->GetToolbar()->hide();
   }
+  g_showToolbarsAct->setChecked(_value);
 }
 
 /////////////////////////////////////////////////
