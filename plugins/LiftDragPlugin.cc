@@ -66,7 +66,6 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(_model, "LiftDragPlugin _model pointer is NULL");
   GZ_ASSERT(_sdf, "LiftDragPlugin _sdf pointer is NULL");
   this->model = _model;
-  this->modelName = _model->GetName();
   this->sdf = _sdf;
 
   this->world = this->model->GetWorld();
@@ -125,36 +124,34 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
   {
     sdf::ElementPtr elem = _sdf->GetElement("link_name");
     GZ_ASSERT(elem, "Element link_name doesn't exist!");
-    this->linkName = elem->Get<std::string>();
-    this->link = this->model->GetLink(this->linkName);
+    std::string linkName = elem->Get<std::string>();
+    this->link = this->model->GetLink(linkName);
     GZ_ASSERT(this->link, "Link was NULL");
+
+    if (!this->link)
+    {
+      gzerr << "Link with name[" << linkName << "] not found. "
+        << "The LiftDragPlugin will not generate forces\n";
+    }
+    else
+    {
+      this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+          boost::bind(&LiftDragPlugin::OnUpdate, this));
+    }
   }
 
   if (_sdf->HasElement("control_joint_name"))
   {
-    sdf::ElementPtr elem = _sdf->GetElement("control_joint_name");
-    GZ_ASSERT(elem, "Element control_joint_name doesn't exist!");
-    this->controlJointName = elem->Get<std::string>();
-    this->controlJoint = this->model->GetJoint(this->controlJointName);
+    std::string controlJointName = _sdf->Get<std::string>("control_joint_name");
+    this->controlJoint = this->model->GetJoint(controlJointName);
+    if (!this->controlJoint)
+    {
+      gzerr << "Joint with name[" << controlJointName << "] does not exist.\n";
+    }
   }
 
   if (_sdf->HasElement("control_joint_rad_to_cl"))
     this->controlJointRadToCL = _sdf->Get<double>("control_joint_rad_to_cl");
-}
-
-/////////////////////////////////////////////////
-void LiftDragPlugin::Init()
-{
-  if (this->link)
-  {
-    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-            boost::bind(&LiftDragPlugin::OnUpdate, this));
-  }
-  else
-  {
-    gzwarn << "Link with name[" << this->linkName << "] not found. "
-           << "The LiftDragPlugin will not generate forces\n";
-  }
 }
 
 /////////////////////////////////////////////////
