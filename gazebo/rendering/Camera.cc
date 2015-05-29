@@ -371,7 +371,9 @@ void Camera::Update()
     this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
           currYaw + yawAdj));
 
-    double origDistance = 8.0;
+    /// \TODO: make this a parameter, for larger objects, we want
+    /// to follow it from larger distance.
+    double origDistance = 20.0;
     double distance = direction.GetLength();
     double error = origDistance - distance;
 
