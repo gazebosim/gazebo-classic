@@ -78,11 +78,11 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   QObject::connect(decreaseElevators, SIGNAL(activated()), this,
       SLOT(OnDecreaseElevators()));
 
-  QShortcut *increaseRudder = new QShortcut(QKeySequence("a"), this);
+  QShortcut *increaseRudder = new QShortcut(QKeySequence("d"), this);
   QObject::connect(increaseRudder, SIGNAL(activated()), this,
       SLOT(OnIncreaseRudder()));
 
-  QShortcut *decreaseRudder = new QShortcut(QKeySequence("d"), this);
+  QShortcut *decreaseRudder = new QShortcut(QKeySequence("a"), this);
   QObject::connect(decreaseRudder, SIGNAL(activated()), this,
       SLOT(OnDecreaseRudder()));
 
@@ -268,7 +268,7 @@ void CessnaGUIPlugin::OnIncreaseRudder()
   if (rudder.Degree() < 30)
   {
     rudder += this->angleStep;
-    msg.set_cmd_elevators(rudder.Radian());
+    msg.set_cmd_rudder(rudder.Radian());
     this->controlPub->Publish(msg);
   }
 }
@@ -283,10 +283,10 @@ void CessnaGUIPlugin::OnDecreaseRudder()
   }
 
   msgs::Cessna msg;
-  if (rudder.Degree() < -30)
+  if (rudder.Degree() > -30)
   {
-    rudder += this->angleStep;
-    msg.set_cmd_elevators(rudder.Radian());
+    rudder -= this->angleStep;
+    msg.set_cmd_rudder(rudder.Radian());
     this->controlPub->Publish(msg);
   }
 }
