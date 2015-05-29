@@ -1,5 +1,6 @@
 ## Gazebo 6.0
-1. Added multiple LiftDrag plugins to fly the Cessna C-172 model.
+1. Added multiple LiftDrag plugins to the cessna_demo.world to allow the Cessna
+C-172 model fly.
     * [Pull request #1715](https://bitbucket.org/osrf/gazebo/pull-request/1715)
 
 1. Added a plugin to control a Cessna C-172 via messages (CessnaPlugin), and a
