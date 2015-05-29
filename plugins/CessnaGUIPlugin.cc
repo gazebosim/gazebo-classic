@@ -42,7 +42,7 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   this->controlPub =
     this->gzNode->Advertise<msgs::Cessna>("~/cessna_c172/control");
   this->stateSub = this->gzNode->Subscribe<msgs::Cessna>(
-    "~/cessna_c172/control", &CessnaGUIPlugin::OnState, this);
+    "~/cessna_c172/state", &CessnaGUIPlugin::OnState, this);
 
   // Connect hotkeys.
   QShortcut *increaseThrust = new QShortcut(QKeySequence("w"), this);
