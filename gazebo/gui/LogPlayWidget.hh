@@ -131,6 +131,9 @@ namespace gazebo
       /// \param[in] _msec End time position in ms.
       public slots: void SetEndTime(int _msec);
 
+      /// \brief Draw the timeline.
+      public slots: void DrawTimeline();
+
       /// \internal
       /// \brief Pointer to private data.
       private: LogPlayViewPrivate *dataPtr;

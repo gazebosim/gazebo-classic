@@ -184,46 +184,51 @@ void LogPlayWidget::OnStepForward()
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetCurrentTime(common::Time _time)
 {
-  // Current time line edit
+  // Make sure it's within limits
+  if (_time < this->dataPtr->startTime)
+  {
+    _time = this->dataPtr->startTime;
+  }
+  else if (_time > this->dataPtr->endTime)
+  {
+    _time = this->dataPtr->endTime;
+  }
+
+  // Update current time line edit
   this->SetCurrentTime(QString::fromStdString(_time.FormattedString(
       !this->dataPtr->lessThan1h, !this->dataPtr->lessThan1h)));
 
-  // current time item in view
+  // Update current time item in view
   this->SetCurrentTime(_time.sec * 1e3 + _time.nsec * 1e-6);
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetStartTime(common::Time _time)
 {
-  // start time in view
+  this->dataPtr->startTime = _time;
+
+  // Update start time in view
   this->SetStartTime(_time.sec * 1e3 + _time.nsec * 1e-6);
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetEndTime(common::Time _time)
 {
-  unsigned int day, hour, sec;
-
-  sec = _time.sec;
-
-  day = sec / 86400;
-  sec -= day * 86400;
-
-  hour = sec / 3600;
-  sec -= hour * 3600;
+  this->dataPtr->endTime = _time;
 
   // Use shorter string if less than 1h
-  if (day == 0 && hour == 0)
+  if (_time < common::Time(3600))
     this->dataPtr->lessThan1h = true;
 
+  // Update end time label
   std::string timeString = _time.FormattedString(
       !this->dataPtr->lessThan1h, !this->dataPtr->lessThan1h);
 
   timeString = "/   " + timeString;
 
-  // end time line edit
   this->SetEndTime(QString::fromStdString(timeString));
-  // start time in view
+
+  // Update end time in view
   this->SetEndTime(_time.sec * 1e3 + _time.nsec * 1e-6);
 }
 
@@ -255,7 +260,7 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   line->setPen(QPen(QColor(50, 50, 50, 255), 2));
   graphicsScene->addItem(line);
 
-  // Current time line
+  // Current time item
   this->dataPtr->currentTimeItem = new CurrentTimeItem();
   this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin,
       this->dataPtr->sceneHeight/2);
@@ -265,26 +270,10 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
 /////////////////////////////////////////////////
 void LogPlayView::SetCurrentTime(int _msec)
 {
-  if (this->dataPtr->currentTimeItem->isSelected())
-    return;
+  double relPos = double(_msec - this->dataPtr->startTime) /
+      (this->dataPtr->endTime - this->dataPtr->startTime);
 
-  double relPos;
-  if (_msec < this->dataPtr->startTime)
-  {
-    relPos = 0.0;
-  }
-  else if (_msec > this->dataPtr->endTime)
-  {
-    relPos = 1.0;
-  }
-  else
-  {
-    relPos = double(_msec - this->dataPtr->startTime) /
-        (this->dataPtr->endTime - this->dataPtr->startTime);
-  }
-
-  this->dataPtr->currentTimeItem->setPos(
-      this->dataPtr->margin +
+  this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin +
       (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
       this->dataPtr->sceneHeight/2);
 }
@@ -300,51 +289,80 @@ void LogPlayView::SetEndTime(int _msec)
 {
   this->dataPtr->endTime = _msec;
 
+  this->DrawTimeline();
+}
+
+/////////////////////////////////////////////////
+void LogPlayView::DrawTimeline()
+{
+  if (this->dataPtr->timelineDrawn)
+    return;
+
   int totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+  int intervals = 10;
+
+  // Interval is a round number of seconds in ms
+  int roundStartTime = (this->dataPtr->startTime/1000)*1000;
+  int interval = (round((totalTime/1000)/10.0))*1000;
 
   // Time line
   int tickHeight = 15;
-  double interval = double(totalTime) / 10;
-  for (int i = 0; i <= 10; ++i)
+  for (int i = 0; i <= intervals; ++i)
   {
-    double relPos = (interval*i)/totalTime;
+    // Time
+    int msec;
+    if (i == 0)
+    {
+      msec = this->dataPtr->startTime;
+    }
+    else if (i == intervals)
+    {
+      msec = this->dataPtr->endTime;
+    }
+    else
+    {
+      msec = roundStartTime + interval * i;
+    }
+
+    if (msec < this->dataPtr->startTime || msec > this->dataPtr->endTime)
+      continue;
+
+    double relPos = double(msec - this->dataPtr->startTime) / totalTime;
 
     // Tick
-    QGraphicsLineItem *tick = new QGraphicsLineItem(
-        0, -tickHeight, 0, 0);
-    tick->setPos(
-        this->dataPtr->margin +
+    QGraphicsLineItem *tick = new QGraphicsLineItem(0, -tickHeight, 0, 0);
+    tick->setPos(this->dataPtr->margin +
         (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
         this->dataPtr->sceneHeight/2);
     tick->setPen(QPen(QColor(50, 50, 50, 255), 2));
     this->scene()->addItem(tick);
 
     // Text
-    std::ostringstream stream;
-    unsigned int min, sec, msec;
+    int sec = msec / 1000;
+    int nsec = (msec - sec * 1000)*1000000;
+    common::Time time(sec, nsec);
 
-    stream.str("");
-
-    msec = this->dataPtr->startTime + interval * i;
-
-    min = msec / 60000;
-    msec -= min * 60000;
-
-    sec = msec / 1000;
-    msec -= sec * 60000;
-
-    stream << std::setw(2) << std::setfill('0') << min << ":";
-    stream << std::setw(2) << std::setfill('0') << sec;
+    std::string timeText;
+    if (i == 0 || i == intervals)
+    {
+      timeText = time.FormattedString(false, false);
+    }
+    else
+    {
+      timeText = time.FormattedString(false, false, true, true, false);
+    }
 
     QGraphicsSimpleTextItem *tickText = new QGraphicsSimpleTextItem(
-        QString::fromStdString(stream.str()));
+        QString::fromStdString(timeText));
     tickText->setBrush(QBrush(QColor(50, 50, 50, 255)));
     tickText->setPos(
-        this->dataPtr->margin +
+        this->dataPtr->margin - tickText->boundingRect().width()*0.5 +
         (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
         this->dataPtr->sceneHeight/2 - 3 * tickHeight);
     this->scene()->addItem(tickText);
   }
+
+  this->dataPtr->timelineDrawn = true;
 }
 
 /////////////////////////////////////////////////

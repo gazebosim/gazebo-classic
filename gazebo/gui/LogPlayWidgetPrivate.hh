@@ -33,6 +33,12 @@ namespace gazebo
       /// \brief Paused state of the simulation.
       public: TimePanel *timePanel;
 
+      /// \brief Log start time.
+      public: common::Time startTime;
+
+      /// \brief Log end time.
+      public: common::Time endTime;
+
       /// \brief If log is less than 1 hour long.
       public: bool lessThan1h;
 
@@ -61,6 +67,9 @@ namespace gazebo
 
       /// \brief Margin from the ends.
       public: int margin;
+
+      /// \brief Whether the timeline has already been drawn.
+      public: bool timelineDrawn = false;
      };
   }
 }
