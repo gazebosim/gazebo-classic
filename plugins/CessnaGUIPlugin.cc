@@ -146,53 +146,39 @@ void CessnaGUIPlugin::OnDecreaseThrust()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnIncreaseFlaps()
 {
-  math::Angle leftFlap;
-  math::Angle rightFlap;
+  math::Angle flap;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    leftFlap.SetFromRadian(this->state.cmd_left_flap());
-    rightFlap.SetFromRadian(this->state.cmd_right_flap());
+    flap.SetFromRadian(this->state.cmd_left_flap());
   }
 
   msgs::Cessna msg;
-  if (leftFlap.Degree() < 30)
+  if (flap.Degree() < 30)
   {
-    leftFlap += this->angleStep;
-    msg.set_cmd_left_flap(leftFlap.Radian());
+    flap += this->angleStep;
+    msg.set_cmd_left_flap(flap.Radian());
+    msg.set_cmd_right_flap(flap.Radian());
+    this->controlPub->Publish(msg);
   }
-  if (rightFlap.Degree() < 30)
-  {
-    rightFlap += this->angleStep;
-    msg.set_cmd_right_flap(rightFlap.Radian());
-  }
-
-  this->controlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnDecreaseFlaps()
 {
-  math::Angle leftFlap;
-  math::Angle rightFlap;
+  math::Angle flap;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    leftFlap.SetFromRadian(this->state.cmd_left_flap());
-    rightFlap.SetFromRadian(this->state.cmd_right_flap());
+    flap.SetFromRadian(this->state.cmd_left_flap());
   }
 
   msgs::Cessna msg;
-  if (leftFlap.Degree() > -30)
+  if (flap.Degree() > -30)
   {
-    leftFlap -= this->angleStep;
-    msg.set_cmd_left_flap(leftFlap.Radian());
+    flap -= this->angleStep;
+    msg.set_cmd_left_flap(flap.Radian());
+    msg.set_cmd_right_flap(flap.Radian());
+    this->controlPub->Publish(msg);
   }
-  if (rightFlap.Degree() > -30)
-  {
-    rightFlap -= this->angleStep;
-    msg.set_cmd_right_flap(rightFlap.Radian());
-  }
-
-  this->controlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
