@@ -1,4 +1,10 @@
 ## Gazebo 6.0
+1. Added a plugin to control a Cessna C-172 via messages (CessnaPlugin), and a
+GUI plugin to test this functionality with the keyboard (CessnaGUIPlugin). Added
+world with the Cessna model and the two previous plugins loaded
+(cessna_demo.world).
+    * [Pull request #1712](https://bitbucket.org/osrf/gazebo/pull-request/1712)
+
 1. Added world with OSRF building and an elevator
     * [Pull request #1697](https://bitbucket.org/osrf/gazebo/pull-request/1697)
 
@@ -13,6 +19,11 @@
 
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
+
+1. Add option to parallelize the ODE quickstep constraint solver,
+which solves an LCP twice with different parameters in order
+to corrected for position projection errors.
+    * [Pull request #1561](https://bitbucket.org/osrf/gazebo/pull-request/1561)
 
 1. Get/Set user camera pose in GUI.
     * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
@@ -84,6 +95,9 @@ compilation on Windows.
    Added MainWindow::CloneAction.
    Added Window menu to Model Editor.
     * [Pull request #1584](https://bitbucket.org/osrf/gazebo/pull-request/1584)
+
+1. Added event to show/hide toolbars.
+    * [Pull request #1707](https://bitbucket.org/osrf/gazebo/pull-request/1707)
 
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
@@ -165,6 +179,9 @@ compilation on Windows.
 
 1. Added Apply Force/Torque visuals
     * [Pull request #1619](https://bitbucket.org/osrf/gazebo/pull-request/1619)
+
+1. Added Apply Force/Torque OnMouseRelease and ActivateWindow
+    * [Pull request #1699](https://bitbucket.org/osrf/gazebo/pull-request/1699)
 
 1. Added inertia pose getter for COMVisual and COMVisual_TEST
     * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)

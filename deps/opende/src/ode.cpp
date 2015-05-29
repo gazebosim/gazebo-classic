@@ -1687,6 +1687,7 @@ dxWorld * dWorldCreate()
   w->qs.num_contacts = 0;
   w->qs.dynamic_inertia_reduction = true;
   w->qs.smooth_contacts = 0.01;
+  w->qs.thread_position_correction = false;
   w->qs.row_reorder1 = true;
   w->qs.warm_start = 0.5;
   w->qs.friction_iterations = 10;
@@ -2306,6 +2307,12 @@ dReal  dWorldGetQuickStepContactResidualSmoothing (dWorldID w)
   return w->qs.smooth_contacts;
 }
 
+bool  dWorldGetQuickStepThreadPositionCorrection (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.thread_position_correction;
+}
+
 bool  dWorldGetQuickStepExperimentalRowReordering (dWorldID w)
 {
 	dAASSERT(w);
@@ -2340,6 +2347,12 @@ void dWorldSetQuickStepContactResidualSmoothing (dWorldID w, dReal smoo)
 {
 	dAASSERT(w);
   w->qs.smooth_contacts = smoo;
+}
+
+void dWorldSetQuickStepThreadPositionCorrection (dWorldID w, bool thread)
+{
+	dAASSERT(w);
+  w->qs.thread_position_correction = thread;
 }
 
 void dWorldSetQuickStepExperimentalRowReordering (dWorldID w, bool order)
