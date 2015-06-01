@@ -121,9 +121,6 @@ namespace gazebo
     /// \brief Smoothed velocity
     protected: math::Vector3 velSmooth;
 
-    /// \brief Names of allowed target links, specified in sdf parameters.
-    protected: std::string linkName;
-
     /// \brief Pointer to link currently targeted by mud joint.
     protected: physics::LinkPtr link;
 
