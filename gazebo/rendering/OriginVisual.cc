@@ -31,6 +31,17 @@ OriginVisual::OriginVisual(const std::string &_name, VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+OriginVisual::~OriginVisual()
+{
+  OriginVisualPrivate *dPtr =
+      reinterpret_cast<OriginVisualPrivate *>(this->dataPtr);
+
+  this->DeleteDynamicLine(dPtr->xLine);
+  this->DeleteDynamicLine(dPtr->yLine);
+  this->DeleteDynamicLine(dPtr->zLine);
+}
+
+/////////////////////////////////////////////////
 void OriginVisual::Load()
 {
   Visual::Load();
@@ -40,23 +51,23 @@ void OriginVisual::Load()
 
   dPtr->length = 1000;
 
-  DynamicLines *xLine = this->CreateDynamicLine(
+  dPtr->xLine = this->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
-  xLine->setMaterial("Gazebo/Red");
-  xLine->AddPoint(math::Vector3::Zero);
-  xLine->AddPoint(math::Vector3::UnitX*dPtr->length);
+  dPtr->xLine->setMaterial("Gazebo/Red");
+  dPtr->xLine->AddPoint(math::Vector3::Zero);
+  dPtr->xLine->AddPoint(math::Vector3::UnitX*dPtr->length);
 
-  DynamicLines *yLine = this->CreateDynamicLine(
+  dPtr->yLine = this->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
-  yLine->setMaterial("Gazebo/Green");
-  yLine->AddPoint(math::Vector3::Zero);
-  yLine->AddPoint(math::Vector3::UnitY*dPtr->length);
+  dPtr->yLine->setMaterial("Gazebo/Green");
+  dPtr->yLine->AddPoint(math::Vector3::Zero);
+  dPtr->yLine->AddPoint(math::Vector3::UnitY*dPtr->length);
 
-  DynamicLines *zLine = this->CreateDynamicLine(
+  dPtr->zLine = this->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
-  zLine->setMaterial("Gazebo/Blue");
-  zLine->AddPoint(math::Vector3::Zero);
-  zLine->AddPoint(math::Vector3::UnitZ*dPtr->length);
+  dPtr->zLine->setMaterial("Gazebo/Blue");
+  dPtr->zLine->AddPoint(math::Vector3::Zero);
+  dPtr->zLine->AddPoint(math::Vector3::UnitZ*dPtr->length);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

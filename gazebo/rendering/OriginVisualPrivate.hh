@@ -38,6 +38,15 @@ namespace gazebo
     {
       /// \brief Length of lines
       public: double length;
+
+      /// \brief Line on the X axis.
+      public: DynamicLines *xLine;
+
+      /// \brief Line on the Y axis.
+      public: DynamicLines *yLine;
+
+      /// \brief Line on the Z axis.
+      public: DynamicLines *zLine;
     };
   }
 }
