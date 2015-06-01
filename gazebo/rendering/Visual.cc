@@ -490,7 +490,6 @@ void Visual::Load()
       rendering::Events::newLayer(this->dataPtr->layer);
     }
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -1858,7 +1857,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       {
         std::string str = Ogre::any_cast<std::string>(any);
         if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans"
-            || str.substr(0, 5) == "scale")
+            || str.substr(0, 5) == "scale" ||
+            str.find("_APPLY_WRENCH_") != std::string::npos)
           continue;
       }
 

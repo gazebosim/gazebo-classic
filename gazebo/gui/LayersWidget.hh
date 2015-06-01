@@ -17,30 +17,41 @@
 #ifndef _GAZEBO_LAYERS_WIDGET_HH_
 #define _GAZEBO_LAYERS_WIDGET_HH_
 
-#include <vector>
-
 #include "gazebo/common/Events.hh"
-
-#include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private class
+    class LayersWidgetPrivate;
+
+    /// \brief A widget that manages visualization layers. This widget is
+    /// added to the left-hand tabset.
     class GZ_GUI_VISIBLE LayersWidget : public QWidget
     {
       Q_OBJECT
+
+      /// \brief Constructor
+      /// \param[in] _parent Parent widget pointer.
       public: LayersWidget(QWidget *_parent = 0);
+
+      /// \brief Destructor
       public: virtual ~LayersWidget();
 
-      public slots: void OnLayerSelected(QListWidgetItem *_layer);
+      /// \brief QT callback, triggered when a layer is selected.
+      /// \param[in] _layer Pointer to the widget that was selected.
+      private slots: void OnLayerSelected(QListWidgetItem *_layer);
+
+      /// \brief Gazebo callback, triggered when a new layer is added.
+      /// \param[in] _layer Number of the new layer
       private: void OnNewLayer(const int32_t _layer);
 
-      private: QListWidget *layerList;
-
-      /// \brief Event connections
-      public: std::vector<event::ConnectionPtr> connections;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: LayersWidgetPrivate *dataPtr;
     };
   }
 }

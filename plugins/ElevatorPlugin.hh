@@ -18,18 +18,31 @@
 #ifndef _GAZEBO_ELEVATOR_PLUGIN_HH_
 #define _GAZEBO_ELEVATOR_PLUGIN_HH_
 
+#include <string>
+
 #include <sdf/sdf.hh>
 
-#include <gazebo/transport/Node.hh>
-#include <gazebo/transport/Subscriber.hh>
-
 #include <gazebo/common/Plugin.hh>
-#include <gazebo/common/PID.hh>
 #include <gazebo/util/system.hh>
-#include <gazebo/msgs/msgs.hh>
 
 namespace gazebo
 {
+  /// Forward declare private data.
+  class ElevatorPluginPrivate;
+
+  /// \brief Plugin to control a elevator. This plugin will listen for
+  /// door and lift events on a specified topic.
+  ///
+  /// \verbatim
+  ///   <plugin filename="libElevatorPlugin.so" name="elevator_plugin">
+  ///     <lift_joint>elevator::lift</lift_joint>
+  ///     <door_joint>elevator::door</door_joint>
+  ///     <floor_height>3.075</floor_height>
+  ///     <topic>~/elevator</topic>
+  ///   </plugin>
+  /// \endverbatim
+  ///
+  /// See worlds/elevator.world for a complete example.
   class GAZEBO_VISIBLE ElevatorPlugin : public ModelPlugin
   {
     /// \brief Constructor.
@@ -38,113 +51,22 @@ namespace gazebo
     /// \brief Destructor.
     public: ~ElevatorPlugin();
 
-    /// \brief Load the plugin.
-    /// \param[in] _world Pointer to world
-    /// \param[in] _sdf Pointer to the SDF configuration.
+    // Documentation inherited
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
-    private: void Update();
+    // Documentation inherited
+    public: virtual void Reset();
 
+    /// \brief Update the plugin once every iteration of simulation.
+    /// \param[in] _info Update information provided by the server.
+    private: void Update(const common::UpdateInfo &_info);
+
+    /// \brief Receives messages on the elevator's topic.
+    /// \param[in] _msg The string message that contains a command.
     private: void OnElevator(ConstGzStringPtr &_msg);
 
-    /// \brief World pointer.
-    private: physics::ModelPtr model;
-    private: physics::JointPtr liftJoint;
-    private: physics::JointPtr doorJoint;
-
-    /// \brief SDF pointer.
-    private: sdf::ElementPtr sdf;
-
-    /// \brief Pointer to the update event connection
-    private: event::ConnectionPtr updateConnection;
-
-    private: transport::NodePtr node;
-    private: transport::SubscriberPtr elevatorSub;
-
-    private: class DoorController
-             {
-               public: enum Target {OPEN, CLOSE};
-               public: enum State {MOVING, STATIONARY};
-
-               public: DoorController(physics::JointPtr _doorJoint);
-               public: void SetTarget(
-                           ElevatorPlugin::DoorController::Target _target);
-
-               public: ElevatorPlugin::DoorController::State GetState() const;
-               public: ElevatorPlugin::DoorController::Target GetTarget() const;
-
-               public: virtual bool Update();
-
-               public: physics::JointPtr doorJoint;
-               public: State state;
-               public: Target target;
-               public: common::PID doorPID;
-             };
-
-    private: class LiftController
-             {
-               public: enum State {MOVING, STATIONARY};
-               public: LiftController(physics::JointPtr _liftJoint);
-               public: void SetFloor(int _floor);
-               public: int GetFloor() const;
-               public: ElevatorPlugin::LiftController::State GetState() const;
-
-               public: virtual bool Update();
-
-               public: State state;
-               public: int floor;
-               public: physics::JointPtr liftJoint;
-               public: common::PID liftPID;
-             };
-
-    private: class State
-             {
-               public: State() : started(false) {}
-               public: std::string name;
-               public: virtual void Start() {}
-               public: virtual bool Update() {return true;}
-               protected: bool started;
-             };
-
-    private: class CloseState : public State
-             {
-               public: CloseState(ElevatorPlugin::DoorController *_ctrl);
-               public: virtual void Start();
-               public: virtual bool Update();
-               public: ElevatorPlugin::DoorController *ctrl;
-             };
-
-    private: class OpenState : public State
-             {
-               public: OpenState(ElevatorPlugin::DoorController *_ctrl);
-               public: virtual void Start();
-               public: virtual bool Update();
-               public: ElevatorPlugin::DoorController *ctrl;
-             };
-
-    private: class MoveState : public State
-             {
-               public: MoveState(int _floor, LiftController *_ctrl);
-               public: virtual void Start();
-               public: virtual bool Update();
-               public: int floor;
-               public: LiftController *ctrl;
-             };
-
-    private: class WaitState : public State
-             {
-               public: WaitState();
-               public: virtual void Start();
-               public: virtual bool Update();
-               public: common::Time start;
-             };
-
-    private: DoorController *doorController;
-    private: LiftController *liftController;
-
-    private: std::list<State*> states;
-
-    private: boost::mutex stateMutex;
+    /// \brief Private data pointer
+    private: ElevatorPluginPrivate *dataPtr;
   };
 }
 #endif

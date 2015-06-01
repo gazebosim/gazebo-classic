@@ -4,11 +4,14 @@ include ( ${QT_USE_FILE} )
 
 link_directories(
   ${Boost_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
 )
+
+include_directories(${tinyxml_INCLUDE_DIRS})
 
 add_definitions(${QT_DEFINITIONS})
 
@@ -57,6 +60,15 @@ set (sources
   ToolsWidget.cc
   TopicSelector.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+endif()
 
 set (qt_headers
   Actions.hh
@@ -143,9 +155,11 @@ if (ENABLE_SCREEN_TESTS)
       ConfigWidget_TEST.cc
       GLWidget_TEST.cc
       GLWidget_TEST2.cc
+      LayersWidget_TEST.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
-      ModelSnap_TEST.cc)
+      ModelSnap_TEST.cc
+      Projection_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
@@ -162,6 +176,8 @@ gz_add_executable(gzclient main.cc)
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
+
 target_link_libraries(gazebo_gui
   libgazebo_client
   gazebo_common
@@ -176,6 +192,7 @@ target_link_libraries(gazebo_gui
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
+  ${tinyxml_LIBRARIES}
 )
 
 if (UNIX)
@@ -184,11 +201,14 @@ endif()
 
 target_link_libraries(gzclient gazebo_gui)
 
+if (UNIX)
+  target_link_libraries(gzclient pthread)
+endif()
+
 if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
-
 
 add_definitions(${QT_DEFINITIONS})
 

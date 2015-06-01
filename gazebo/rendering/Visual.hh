@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: Ogre Visual Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
 
-#ifndef _VISUAL_HH_
-#define _VISUAL_HH_
+#ifndef _GAZEBO_VISUAL_HH_
+#define _GAZEBO_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
@@ -529,10 +525,9 @@ namespace gazebo
       /// \brief Clear parents.
       public: void ClearParent();
 
-      /// \brief Set which layer is currently being viewed. If the visual is
-      /// on the specified layer it will be set visible, otherwise it will
-      /// become invisible.
-      /// \param[in] _layer Index of the layer to show.
+      /// \brief Toggle layer visibility. If the visual is
+      /// on the specified layer its visibility will be toggled.
+      /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
 
       /// \internal
