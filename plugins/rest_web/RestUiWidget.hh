@@ -44,6 +44,8 @@ namespace gazebo
     /// \param[in] _urlLabel Url label.
     /// \param[in] _defaultUrl Default url.
     public: RestUiWidget(QWidget *_parent,
+                         QAction &_login,
+                         QAction &_logout,
                          const std::string &_menuTitle,
                          const std::string &_loginTitle,
                          const std::string &_urlLabel,
@@ -65,6 +67,12 @@ namespace gazebo
     /// \brief Called everytime a response  message is received.
     /// \param[in] _msg Rest error message.
     private: void OnResponse(ConstRestErrorPtr &_msg);
+
+    /// \brief Login menu item
+    private: QAction &loginMenuAction;
+
+    /// \brief Logout menu item
+    private: QAction &logoutMenuAction;
 
     /// \brief The title to use when displaying dialog/message windows
     private: std::string title;

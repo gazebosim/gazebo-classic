@@ -45,7 +45,7 @@ RestWebPlugin::RestWebPlugin()
   C_STATUS Result = ::UuidCreate(uuid);
   if (Result != RPC_S_OK)
   {
-    std::cerr << "Call to UuidCreate return a non success RPC call. " <<
+    gzerr << "Call to UuidCreate return a non success RPC call. " <<
                  "Return code: " << Result << std::endl;
   }
   char* szUuid = NULL;
@@ -67,7 +67,6 @@ RestWebPlugin::RestWebPlugin()
 #else
   this->session = common::Time::GetWallTimeAsISOString();
 #endif
-
 
 #endif
 
@@ -235,7 +234,7 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
     physics::WorldPtr world = physics::get_world();
     if (!world)
     {
-      gzerr << "World is null" << std::endl;
+      gzerr << "Can't access world before web service POST" << std::endl;
     }
     else
     {
@@ -330,7 +329,7 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
   {
     gazebo::msgs::RestError msg;
     std::string errorMsg;
-    errorMsg = "There was a problem trying to login the server: ";
+    errorMsg = "There was a problem trying to login to the server: ";
     errorMsg += x.what();
     msg.set_type("Error");
     msg.set_msg(errorMsg);

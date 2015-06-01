@@ -31,7 +31,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 RestUiLogoutDialog::RestUiLogoutDialog(QWidget *_parent,
                                      const std::string &_defaultUrl)
-    :url(_defaultUrl.c_str())
+    :QDialog(_parent), url(_defaultUrl.c_str())
 {
   setWindowTitle(tr("Logout"));
   setModal(true);

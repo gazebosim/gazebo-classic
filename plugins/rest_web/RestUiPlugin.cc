@@ -95,10 +95,16 @@ void RestUiPlugin::OnMainWindowReady()
 
   QAction *loginAct = new QAction(QString("&Login"), menu);
   loginAct->setStatusTip(QString("Login to web service"));
+  QAction *logoutAct = new QAction(QString("Log&out"), menu);
+  logoutAct->setStatusTip(QString("Logout from web service"));
+  logoutAct->setEnabled(false);
+
   gui::MainWindow *mainWindow = gui::get_main_window();
   // create a global widget instance, to act as a global QT object
   // the RestUiPlugin class is not a QT object
   this->widget = new RestUiWidget(mainWindow,
+                            *loginAct,
+                            *logoutAct,
                             this->menuTitle.c_str(),
                             this->loginTitle.c_str(),
                             this->urlLabel.c_str(),
@@ -108,10 +114,10 @@ void RestUiPlugin::OnMainWindowReady()
                    this->widget, SLOT(Login()));
   menu->addAction(loginAct);
 
-  QAction *logoutAct = new QAction(QString("Log&out"), menu);
-  logoutAct->setStatusTip(QString("Logout from web service"));
   QObject::connect(logoutAct, SIGNAL(triggered()),
                    this->widget, SLOT(Logout()));
+
+  menu->addAction(logoutAct);
 
   menu->addAction(logoutAct);
 
