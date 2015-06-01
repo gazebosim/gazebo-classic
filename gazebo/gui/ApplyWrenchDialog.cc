@@ -416,6 +416,9 @@ void ApplyWrenchDialog::Init(const std::string &_modelName,
   }
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
+  connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  connect(g_translateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
 
   this->move(QCursor::pos());
   this->show();
