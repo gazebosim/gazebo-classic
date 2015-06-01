@@ -1593,7 +1593,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     if (_msg.link(j).visual_size() > 0)
     {
       // note: the first visual in the link is the link visual
-      boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+      msgs::VisualPtr vm(new msgs::Visual(
             _msg.link(j).visual(0)));
       this->dataPtr->linkVisualMsgs.push_back(vm);
     }
