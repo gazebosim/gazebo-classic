@@ -19,6 +19,9 @@ set (GAZEBO_PATCH_VERSION 6)
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
 
+# Not installed in the system, used for internal tools and scripts
+file(WRITE ${PROJECT_BINARY_DIR}/VERSION ${GAZEBO_VERSION_FULL})
+
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
 
 set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
