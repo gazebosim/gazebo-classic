@@ -54,8 +54,8 @@ namespace gazebo
     public: virtual ~CessnaGUIPlugin();
 
     /// \brief Callback that receives a control message from
-    /// the ~/cessna_c172/control topic.
-    /// \param[in] _msg Control msg.
+    /// the ~/cessna_c172/state topic.
+    /// \param[in] _msg State msg.
     private: void OnState(ConstCessnaPtr &_msg);
 
     /// \brief Increase the propeller RPMs.
