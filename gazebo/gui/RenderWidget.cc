@@ -42,7 +42,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("renderWidget");
-  this->show();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
@@ -137,7 +136,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
-  rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(

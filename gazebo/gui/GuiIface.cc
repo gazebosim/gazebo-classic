@@ -18,6 +18,7 @@
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
+  #define snprintf _snprintf
 #endif
 
 #include <signal.h>
@@ -167,7 +168,6 @@ namespace gazebo
 void gui::init()
 {
   g_modelRightMenu->Init();
-  g_main_win->show();
   g_main_win->Init();
 }
 
@@ -234,6 +234,7 @@ bool gui::load()
 
   g_modelRightMenu = new gui::ModelRightMenu();
 
+  // Load the rendering engine.
   rendering::load();
   rendering::init();
 
@@ -250,7 +251,6 @@ bool gui::load()
   g_main_win = new gui::MainWindow();
 
   g_main_win->Load();
-  g_main_win->resize(1024, 768);
 
   return true;
 }

@@ -1873,11 +1873,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       math::Vector3 min;
       math::Vector3 max;
 
-        min = Conversions::Convert(bb.getMinimum());
-        max = Conversions::Convert(bb.getMaximum());
-//        std::cerr << "BEFORE bbox " << obj->getName() << " " <<  min << " VS " << max
-//            << " scale " << node->_getDerivedScale() << " vs " <<
-//            node->getScale() <<  std::endl;
+      min = Conversions::Convert(bb.getMinimum());
+      max = Conversions::Convert(bb.getMaximum());
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
@@ -1898,10 +1895,6 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 
         min = Conversions::Convert(bb.getMinimum());
         max = Conversions::Convert(bb.getMaximum());
-
-//        std::cerr << "AFTER bbox " << obj->getName() << " " <<  min << " VS " << max
-//            << " scale " << node->_getDerivedScale() << " vs " <<
-//            node->getScale() <<  std::endl;
       }
 
       box.Merge(math::Box(min, max));
@@ -2977,6 +2970,23 @@ void Visual::ToggleLayer(const int32_t _layer)
   {
     this->ToggleVisible();
   }
+}
+
+/////////////////////////////////////////////////
+bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
+{
+  if (!_visual)
+    return false;
+
+  rendering::VisualPtr vis = _visual->GetParent();
+  while (vis)
+  {
+    if (vis->GetName() == this->GetName())
+      return true;
+    vis = vis->GetParent();
+  }
+
+  return false;
 }
 
 /////////////////////////////////////////////////

@@ -136,11 +136,18 @@ MainWindow::MainWindow()
   this->splitter->addWidget(this->toolsWidget);
   this->splitter->setContentsMargins(0, 0, 0, 0);
 
+#ifdef _WIN32
+  // The splitter appears solid white in Windows, so we make it transparent.
+  this->splitter->setStyleSheet(
+  "QSplitter { color: #ffffff; background-color: transparent; }"
+  "QSplitter::handle { color: #ffffff; background-color: transparent; }");
+#endif
+
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
   sizes.push_back(this->width() - MINIMUM_TAB_WIDTH);
   sizes.push_back(0);
-  splitter->setSizes(sizes);
+  this->splitter->setSizes(sizes);
 
   this->splitter->setStretchFactor(0, 0);
   this->splitter->setStretchFactor(1, 2);
@@ -209,6 +216,8 @@ MainWindow::MainWindow()
   // Use a signal/slot to load plugins. This makes the process thread safe.
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
+
+  this->show();
 }
 
 /////////////////////////////////////////////////
@@ -251,8 +260,6 @@ void MainWindow::Load()
 /////////////////////////////////////////////////
 void MainWindow::Init()
 {
-  this->renderWidget->show();
-
   // Default window size is entire desktop.
   QSize winSize = QApplication::desktop()->screenGeometry().size();
 
@@ -1044,6 +1051,7 @@ void MainWindow::CreateActions()
   g_stepAct->setStatusTip(tr("Step the world"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
   this->CreateDisabledIcon(":/images/end.png", g_stepAct);
+  g_stepAct->setEnabled(false);
 
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
