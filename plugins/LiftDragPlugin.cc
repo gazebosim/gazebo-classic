@@ -127,8 +127,8 @@ void LiftDragPlugin::Init()
   }
   else
   {
-    gzwarn << "Link not found for LiftDragPlugin. No lift/drag forces will be "
-           << "generated." << std::endl;
+    gzwarn << "Link with name[" << this->linkName << "] not found. "
+           << "The LiftDragPlugin will not generate forces\n";
   }
 }
 
