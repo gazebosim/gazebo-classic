@@ -33,7 +33,7 @@ GZ_REGISTER_MODEL_PLUGIN(CessnaPlugin)
 CessnaPlugin::CessnaPlugin()
 {
   // PID default parameters.
-  this->propellerPID.Init(50.0, 0.1, 1, 0.0, 0.0, 20.0, -20.0);
+  this->propellerPID.Init(50.0, 0.1, 1, 0.0, 0.0, 20000.0, -20000.0);
   this->propellerPID.SetCmd(0.0);
 
   for (auto &pid : this->controlSurfacesPID)
@@ -170,20 +170,23 @@ void CessnaPlugin::OnControl(ConstCessnaPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  if (_msg->has_propeller_speed() && std::abs(_msg->propeller_speed()) <= 1)
-    this->cmds[kPropeller] = _msg->propeller_speed();
-  if (_msg->has_left_aileron())
-    this->cmds[kLeftAileron] = _msg->left_aileron();
-  if (_msg->has_left_flap())
-    this->cmds[kLeftFlap] = _msg->left_flap();
-  if (_msg->has_right_aileron())
-    this->cmds[kRightAileron] = _msg->right_aileron();
-  if (_msg->has_right_flap())
-    this->cmds[kRightFlap] = _msg->right_flap();
-  if (_msg->has_elevators())
-    this->cmds[kElevators] = _msg->elevators();
-  if (_msg->has_rudder())
-    this->cmds[kRudder] = _msg->rudder();
+  if (_msg->has_cmd_propeller_speed() &&
+      std::abs(_msg->cmd_propeller_speed()) <= 1)
+  {
+    this->cmds[kPropeller] = _msg->cmd_propeller_speed();
+  }
+  if (_msg->has_cmd_left_aileron())
+    this->cmds[kLeftAileron] = _msg->cmd_left_aileron();
+  if (_msg->has_cmd_left_flap())
+    this->cmds[kLeftFlap] = _msg->cmd_left_flap();
+  if (_msg->has_cmd_right_aileron())
+    this->cmds[kRightAileron] = _msg->cmd_right_aileron();
+  if (_msg->has_cmd_right_flap())
+    this->cmds[kRightFlap] = _msg->cmd_right_flap();
+  if (_msg->has_cmd_elevators())
+    this->cmds[kElevators] = _msg->cmd_elevators();
+  if (_msg->has_cmd_rudder())
+    this->cmds[kRudder] = _msg->cmd_rudder();
 }
 
 /////////////////////////////////////////////////
@@ -191,7 +194,8 @@ void CessnaPlugin::UpdatePIDs(double _dt)
 {
   // Velocity PID for the propeller.
   double vel = this->joints[kPropeller]->GetVelocity(0);
-  double target = this->propellerMaxRpm * this->cmds[kPropeller];
+  double maxVel = this->propellerMaxRpm*2.0*M_PI/60.0;
+  double target = maxVel * this->cmds[kPropeller];
   double error = vel - target;
   double force = this->propellerPID.Update(error, _dt);
   this->joints[kPropeller]->SetForce(0, force);
@@ -210,8 +214,9 @@ void CessnaPlugin::UpdatePIDs(double _dt)
 void CessnaPlugin::PublishState()
 {
   // Read the current state.
-  double propellerRpms = this->joints[kPropeller]->GetVelocity(0);
-  int32_t propellerSpeed = 100.0 * propellerRpms / this->propellerMaxRpm;
+  double propellerRpms = this->joints[kPropeller]->GetVelocity(0)
+    /(2.0*M_PI)*60.0;
+  float propellerSpeed = propellerRpms / this->propellerMaxRpm;
   float leftAileron = this->joints[kLeftAileron]->GetAngle(0).Radian();
   float leftFlap = this->joints[kLeftFlap]->GetAngle(0).Radian();
   float rightAileron = this->joints[kRightAileron]->GetAngle(0).Radian();
@@ -220,6 +225,7 @@ void CessnaPlugin::PublishState()
   float rudder = this->joints[kRudder]->GetAngle(0).Radian();
 
   msgs::Cessna msg;
+  // Set the observed state.
   msg.set_propeller_speed(propellerSpeed);
   msg.set_left_aileron(leftAileron);
   msg.set_left_flap(leftFlap);
@@ -227,6 +233,15 @@ void CessnaPlugin::PublishState()
   msg.set_right_flap(rightFlap);
   msg.set_elevators(elevators);
   msg.set_rudder(rudder);
+
+  // Set the target state.
+  msg.set_cmd_propeller_speed(this->cmds[kPropeller]);
+  msg.set_cmd_left_aileron(this->cmds[kLeftAileron]);
+  msg.set_cmd_left_flap(this->cmds[kLeftFlap]);
+  msg.set_cmd_right_aileron(this->cmds[kRightAileron]);
+  msg.set_cmd_right_flap(this->cmds[kRightFlap]);
+  msg.set_cmd_elevators(this->cmds[kElevators]);
+  msg.set_cmd_rudder(this->cmds[kRudder]);
 
   this->statePub->Publish(msg);
 }

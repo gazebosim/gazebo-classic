@@ -1441,7 +1441,7 @@ material Gazebo/Grass
       {
         scale .02 .02
         texture grass.jpg
-        filtering anistropic
+        filtering anisotropic
         max_anisotropy 16
       }
     }
