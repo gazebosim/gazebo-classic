@@ -26,7 +26,7 @@ class Scene_TEST : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-TEST_F(Scene_TEST, AddRemoveVisuals)
+/*TEST_F(Scene_TEST, AddRemoveVisuals)
 {
   Load("worlds/empty.world");
 
@@ -56,7 +56,7 @@ TEST_F(Scene_TEST, AddRemoveVisuals)
   scene->RemoveVisual(visual1);
   EXPECT_EQ(scene->GetVisualCount(), 2u);
   EXPECT_FALSE(scene->GetVisual("visual1"));
-}
+}*/
 
 /////////////////////////////////////////////////
 TEST_F(Scene_TEST, RemoveModelVisual)
@@ -120,6 +120,7 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   // Send request to delete the box model
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
+    common::Time::MSleep(1000);
   transport::requestNoReply(node, "entity_delete", "box");
 
   sleep = 0;

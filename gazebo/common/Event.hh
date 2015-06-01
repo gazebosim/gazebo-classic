@@ -21,11 +21,11 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <memory>
+#include <mutex>
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/Time.hh>
@@ -138,7 +138,8 @@ namespace gazebo
     {
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
-      typedef std::map<int, boost::function<T>*> EvtConnectionMap;
+      typedef std::map<int,
+              std::shared_ptr<boost::function<T>>> EvtConnectionMap;
 
       /// \brief Array of connection callbacks.
       public: EvtConnectionMap connections;
@@ -147,7 +148,7 @@ namespace gazebo
       public: std::vector<int> connectionsToErase;
 
       /// \brief A thread lock.
-      public: boost::mutex connectionsEraseMutex;
+      public: std::recursive_mutex mutex;
     };
 
     /// \class EventT Event.hh common/common.hh
@@ -157,7 +158,7 @@ namespace gazebo
     {
       /// \def EvtConnectionMap.
       /// \brief Event Connection map typedef.
-      typedef std::map<int, boost::function<T>*> EvtConnectionMap;
+      typedef std::map<int, boost::function<T>> EvtConnectionMap;
 
       /// \brief Constructor.
       public: EventT();
@@ -191,13 +192,12 @@ namespace gazebo
       public: void Signal()
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto &iter: this->myDataPtr->connections)
                 {
-                  if (iter->second)
-                    (*iter->second)();
+                  if (iter.second)
+                    (*iter.second)();
                 }
               }
 
@@ -334,13 +334,11 @@ namespace gazebo
               void Signal(const P &_p)
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto iter: this->myDataPtr->connections)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p);
+                  (*iter.second)(_p);
                 }
               }
 
@@ -351,13 +349,11 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2)
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto iter: this->myDataPtr->connections)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2);
+                  (*iter.second)(_p1, _p2);
                 }
               }
 
@@ -369,13 +365,11 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3)
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                      iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto iter: this->myDataPtr->connections)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3);
+                  (*iter.second)(_p1, _p2, _p3);
                 }
               }
 
@@ -389,13 +383,11 @@ namespace gazebo
                           const P4 &_p4)
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                        iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto iter: this->myDataPtr->connections)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4);
+                  (*iter.second)(_p1, _p2, _p3, _p4);
                 }
               }
 
@@ -411,13 +403,11 @@ namespace gazebo
                           const P4 &_p4, const P5 &_p5)
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                          iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto iter: this->myDataPtr->connections)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5);
+                  (*iter.second)(_p1, _p2, _p3, _p4, _p5);
                 }
               }
 
@@ -435,13 +425,11 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6)
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto iter: this->myDataPtr->connections)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6);
+                  (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6);
                 }
               }
 
@@ -459,13 +447,11 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7)
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto iter: this->myDataPtr->connections.begin())
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+                  (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
                 }
               }
 
@@ -485,13 +471,11 @@ namespace gazebo
                   const P8 &_p8)
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto iter: this->myDataPtr->connections)
                 {
-                  if (iter->second)
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+                  (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
                 }
               }
 
@@ -513,13 +497,11 @@ namespace gazebo
                   const P8 &_p8, const P9 &_p9)
           {
             this->myDataPtr->signaled = true;
-            this->Cleanup();
-            for (typename EvtConnectionMap::iterator iter =
-                this->myDataPtr->connections.begin();
-                iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+            //this->Cleanup();
+            for (auto iter: this->myDataPtr->connections)
             {
-              if (iter->second)
-                (*iter->second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+              (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
             }
           }
 
@@ -542,16 +524,12 @@ namespace gazebo
                   const P8 &_p8, const P9 &_p9, const P10 &_p10)
               {
                 this->myDataPtr->signaled = true;
-                this->Cleanup();
-                for (typename EvtConnectionMap::iterator iter =
-                    this->myDataPtr->connections.begin();
-                    iter != this->myDataPtr->connections.end(); ++iter)
+                std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+                //this->Cleanup();
+                for (auto iter: this->myDataPtr->connections)
                 {
-                  if (iter->second)
-                  {
-                    (*iter->second)(_p1, _p2, _p3, _p4, _p5,
-                      _p6, _p7, _p8, _p9, _p10);
-                  }
+                  (*iter.second)(_p1, _p2, _p3, _p4, _p5,
+                                  _p6, _p7, _p8, _p9, _p10);
                 }
               }
 
@@ -574,13 +552,6 @@ namespace gazebo
     template<typename T>
     EventT<T>::~EventT()
     {
-      for (typename EvtConnectionMap::iterator iter =
-          this->myDataPtr->connections.begin();
-          iter != this->myDataPtr->connections.end(); ++iter)
-      {
-        delete iter->second;
-      }
-
       this->myDataPtr->connections.clear();
     }
 
@@ -589,14 +560,18 @@ namespace gazebo
     template<typename T>
     ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
     {
-      int index = 0;
-      if (!this->myDataPtr->connections.empty())
+      int index = this->myDataPtr->connections.size();
+      /*if (!this->myDataPtr->connections.empty())
       {
+        const auto &iter = this->myDataPtr->connections.rbegin();
+        index = iter.first + 1;
+
         typename EvtConnectionMap::reverse_iterator iter =
           this->myDataPtr->connections.rbegin();
         index = iter->first + 1;
-      }
-      this->myDataPtr->connections[index] = new boost::function<T>(_subscriber);
+      }*/
+      this->myDataPtr->connections[index].reset(
+          new boost::function<T>(_subscriber));
       return ConnectionPtr(new Connection(this, index));
     }
 
@@ -626,12 +601,13 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
-      boost::mutex::scoped_lock lock(this->myDataPtr->connectionsEraseMutex);
-      auto it = this->myDataPtr->connections.find(_id);
+
+      const auto &it = this->myDataPtr->connections.find(_id);
       if (it != this->myDataPtr->connections.end())
       {
-        delete it->second;
-        it->second = NULL;
+        std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
+        this->myDataPtr->connections.erase(it);
+        // it->second.reset();
         this->myDataPtr->connectionsToErase.push_back(_id);
       }
     }
@@ -640,16 +616,13 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Cleanup()
     {
+      //std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
       if (this->myDataPtr->connectionsToErase.empty())
         return;
-      boost::mutex::scoped_lock lock(this->myDataPtr->connectionsEraseMutex);
 
-      for (std::vector<int>::iterator iter =
-          this->myDataPtr->connectionsToErase.begin();
-          iter != this->myDataPtr->connectionsToErase.end(); ++iter)
+      for (auto &iter: this->myDataPtr->connectionsToErase)
       {
-        typename EvtConnectionMap::iterator iter2 =
-          this->myDataPtr->connections.find(*iter);
+        auto iter2 = this->myDataPtr->connections.find(iter);
         if (iter2 != this->myDataPtr->connections.end())
         {
           this->myDataPtr->connections.erase(iter2);
