@@ -44,6 +44,8 @@ DataLogger::DataLogger(QWidget *_parent)
   this->setObjectName("dataLogger");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Data Logger"));
+  // Popup doesn't have a MenuBar
+  this->setWindowFlags(this->windowFlags() & Qt::Popup);
 
   // The record button allows the user to start and pause data recording
   this->recordButton = new QToolButton(this);
