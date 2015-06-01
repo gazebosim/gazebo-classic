@@ -94,12 +94,12 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   currentTime->setMaximumWidth(110);
   currentTime->setAlignment(Qt::AlignRight);
   currentTime->setStyleSheet("\
-      QLineEdit{\
+      QLineEdit {\
         background-color: #808080;\
         color: #cfcfcf;\
         font-size: 15px;\
       }\
-      QLineEdit:focus{\
+      QLineEdit:focus {\
         background-color: #707070;\
       }");
   connect(this, SIGNAL(SetCurrentTime(const QString &)), currentTime,
@@ -270,7 +270,7 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
 /////////////////////////////////////////////////
 void LogPlayView::SetCurrentTime(int _msec)
 {
-  double relPos = double(_msec - this->dataPtr->startTime) /
+  double relPos = static_cast<double>(_msec - this->dataPtr->startTime) /
       (this->dataPtr->endTime - this->dataPtr->startTime);
 
   this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin +
@@ -299,35 +299,44 @@ void LogPlayView::DrawTimeline()
     return;
 
   int totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+
+  // Aim for this number, but some samples might be added/removed
   int intervals = 10;
 
   // Interval is a round number of seconds in ms
   int roundStartTime = (this->dataPtr->startTime/1000)*1000;
-  int interval = (round((totalTime/1000)/10.0))*1000;
+  int interval = (round((totalTime/1000.0)/intervals))*1000;
 
   // Time line
   int tickHeight = 15;
-  for (int i = 0; i <= intervals; ++i)
+  int msec = this->dataPtr->startTime;
+  int i = 0;
+  while (msec >= this->dataPtr->startTime && msec < this->dataPtr->endTime)
   {
-    // Time
-    int msec;
-    if (i == 0)
-    {
-      msec = this->dataPtr->startTime;
-    }
-    else if (i == intervals)
-    {
-      msec = this->dataPtr->endTime;
-    }
-    else
+    // Start time
+    if (i != 0)
     {
       msec = roundStartTime + interval * i;
     }
 
-    if (msec < this->dataPtr->startTime || msec > this->dataPtr->endTime)
-      continue;
+    // If first interval too close, shift by 1s
+    if (msec != this->dataPtr->startTime &&
+        msec < this->dataPtr->startTime + interval*0.3)
+    {
+      roundStartTime += 1000;
+      msec = roundStartTime + interval * i;
+    }
 
-    double relPos = double(msec - this->dataPtr->startTime) / totalTime;
+    // If last interval too close, skip to end
+    if (msec > this->dataPtr->endTime - interval*0.3)
+    {
+      msec = this->dataPtr->endTime;
+    }
+    ++i;
+
+    // Relative position
+    double relPos = static_cast<double>(msec - this->dataPtr->startTime) /
+        totalTime;
 
     // Tick
     QGraphicsLineItem *tick = new QGraphicsLineItem(0, -tickHeight, 0, 0);
@@ -343,7 +352,7 @@ void LogPlayView::DrawTimeline()
     common::Time time(sec, nsec);
 
     std::string timeText;
-    if (i == 0 || i == intervals)
+    if (msec == this->dataPtr->startTime || msec == this->dataPtr->endTime)
     {
       timeText = time.FormattedString(false, false);
     }
