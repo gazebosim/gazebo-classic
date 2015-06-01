@@ -126,6 +126,8 @@ public:
     { return dWorldGetQuickStepInertiaRatioReduction (get_id()); }
   dReal getQuickStepContactResidualSmoothing() const
     { return dWorldGetQuickStepContactResidualSmoothing (get_id()); }
+  bool getQuickStepThreadPositionCorrection() const
+    { return dWorldGetQuickStepThreadPositionCorrection (get_id()); }
   bool getQuickStepExperimentalRowReordering() const
     { return dWorldGetQuickStepExperimentalRowReordering (get_id()); }
   dReal getQuickStepWarmStartFactor() const
@@ -138,6 +140,8 @@ public:
     { dWorldSetQuickStepInertiaRatioReduction (get_id(), irr); }
   void setQuickStepContactResidualSmoothing(dReal smoo)
     { dWorldSetQuickStepContactResidualSmoothing (get_id(), smoo); }
+  void setQuickStepThreadPositionCorrection(bool thread)
+    { dWorldSetQuickStepThreadPositionCorrection (get_id(), thread); }
   void setQuickStepExperimentalRowReordering(bool order)
     { dWorldSetQuickStepExperimentalRowReordering (get_id(), order); }
   void setQuickStepWarmStartFactor(dReal warm)
