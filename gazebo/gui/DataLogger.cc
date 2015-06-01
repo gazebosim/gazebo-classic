@@ -284,12 +284,14 @@ void DataLogger::OnRecord(bool _toggle)
     this->confirmationTimer->start(2000);
     QLabel *confirmationLabel = new QLabel("Saved to \n" +
         this->destPath->text());
+    confirmationLabel->setObjectName("dataLoggerConfirmationLabel");
     QHBoxLayout *confirmationLayout = new QHBoxLayout();
     confirmationLayout->addWidget(confirmationLabel);
 
     if (this->confirmationDialog)
       this->confirmationDialog->close();
     this->confirmationDialog = new QDialog(this, Qt::FramelessWindowHint);
+    this->confirmationDialog->setObjectName("dataLoggerConfirmationDialog");
     this->confirmationDialog->setLayout(confirmationLayout);
     this->confirmationDialog->setStyleSheet(
         "QDialog {background-color: #eee}\

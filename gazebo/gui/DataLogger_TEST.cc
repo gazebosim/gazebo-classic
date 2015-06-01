@@ -34,28 +34,38 @@ void DataLogger_TEST::RecordButton()
     QCoreApplication::processEvents();
 
     // Get the record button
-    QToolButton *recordButton = dataLogger->findChild<QToolButton*>(
+    QToolButton *recordButton = dataLogger->findChild<QToolButton *>(
         "dataLoggerRecordButton");
 
     // Get the destination label
-    QLineEdit *destPathLabel = dataLogger->findChild<QLineEdit*>(
+    QLineEdit *destPathLabel = dataLogger->findChild<QLineEdit *>(
         "dataLoggerDestnationPathLabel");
 
     // Get the time label
-    QLabel *timeLabel = dataLogger->findChild<QLabel*>("dataLoggerTimeLabel");
+    QLabel *timeLabel = dataLogger->findChild<QLabel *>("dataLoggerTimeLabel");
 
     // Get the status label
     QLabel *statusLabel =
-      dataLogger->findChild<QLabel*>("dataLoggerStatusLabel");
+      dataLogger->findChild<QLabel *>("dataLoggerStatusLabel");
 
     // Get the size label
-    QLabel *sizeLabel = dataLogger->findChild<QLabel*>("dataLoggerSizeLabel");
+    QLabel *sizeLabel = dataLogger->findChild<QLabel *>("dataLoggerSizeLabel");
 
     QVERIFY(recordButton != NULL);
     QVERIFY(destPathLabel != NULL);
     QVERIFY(sizeLabel != NULL);
     QVERIFY(timeLabel != NULL);
     QVERIFY(statusLabel != NULL);
+
+    std::string txt;
+
+    // Make sure the initial size is zero
+    txt = sizeLabel->text().toStdString();
+    QVERIFY(txt == "0.00 B");
+
+    // Make sure the initial time is zero
+    txt = timeLabel->text().toStdString();
+    QVERIFY(txt == "00:00:00.000");
 
     // Toggle the record button, which starts logging.
     recordButton->toggle();
@@ -69,19 +79,9 @@ void DataLogger_TEST::RecordButton()
       gazebo::common::Time::MSleep(100);
     }
 
-    std::string txt;
-
     // Make sure the destination log file is correct.
     txt = destPathLabel->text().toStdString();
     QVERIFY(txt.find("test/state.log") != std::string::npos);
-
-    // Make sure the initial size is zero
-    txt = sizeLabel->text().toStdString();
-    QVERIFY(txt == "0.00 B");
-
-    // Make sure the initial time is zero
-    txt = timeLabel->text().toStdString();
-    QVERIFY(txt == "00:00:00.000");
 
     // Make sure the status label says "Recording"
     txt = statusLabel->text().toStdString();
@@ -89,6 +89,13 @@ void DataLogger_TEST::RecordButton()
 
     // Toggle the record button, which stops logging.
     recordButton->toggle();
+
+    // Wait for a log status return message
+    while (destPathLabel->text().toStdString().empty())
+    {
+      QCoreApplication::processEvents();
+      gazebo::common::Time::MSleep(100);
+    }
 
     // Make sure the initial size is zero
     txt = sizeLabel->text().toStdString();
@@ -101,6 +108,29 @@ void DataLogger_TEST::RecordButton()
     // Make sure the status label says "Ready"
     txt = statusLabel->text().toStdString();
     QVERIFY(txt == "Ready");
+
+    // Get the confirmation dialog
+    QDialog *confirmationDialog = dataLogger->findChild<QDialog *>(
+        "dataLoggerConfirmationDialog");
+    QVERIFY(confirmationDialog != NULL);
+    QVERIFY(confirmationDialog->isVisible());
+
+    // Get the confirmation label
+    QLabel *confirmationLabel = confirmationDialog->findChild<QLabel *>(
+        "dataLoggerConfirmationLabel");
+    QVERIFY(confirmationLabel != NULL);
+
+    // Make sure the confirmation label contains the correct file
+    txt = confirmationLabel->text().toStdString();
+    QVERIFY(txt.find("test/state.log"));
+
+    // Make sure the confirmation disappears after 2s
+    for (size_t i = 0; i < 21; ++i)
+    {
+      QCoreApplication::processEvents();
+      gazebo::common::Time::MSleep(100);
+    }
+    QVERIFY(!confirmationDialog->isVisible());
 
     dataLogger->hide();
   }
