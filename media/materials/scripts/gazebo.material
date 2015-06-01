@@ -1408,3 +1408,43 @@ material Gazebo/BuildingFrame
     }
   }
 }
+
+material Gazebo/Runway
+{
+  receive_shadows on
+
+  technique
+  {
+    pass
+    {
+      ambient 0.5 0.5 0.5 1.000000
+
+      texture_unit
+      {
+        texture runway.png
+      }
+    }
+  }
+}
+
+material Gazebo/Grass
+{
+  receive_shadows on
+
+  technique
+  {
+    pass
+    {
+      ambient 0.5 0.5 0.5 1.000000
+
+      texture_unit
+      {
+        scale .02 .02
+        texture grass.jpg
+        filtering anisotropic
+        max_anisotropy 16
+      }
+    }
+  }
+}
+
