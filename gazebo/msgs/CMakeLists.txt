@@ -5,6 +5,7 @@ set (msgs
   boxgeom.proto
   camerasensor.proto
   camera_cmd.proto
+  cessna.proto
   collision.proto
   color.proto
   contact.proto

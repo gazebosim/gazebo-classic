@@ -183,6 +183,10 @@ MainWindow::MainWindow()
         boost::bind(&MainWindow::OnFullScreen, this, _1)));
 
   this->connections.push_back(
+      gui::Events::ConnectShowToolbars(
+        boost::bind(&MainWindow::OnShowToolbars, this, _1)));
+
+  this->connections.push_back(
       gui::Events::ConnectMoveMode(
         boost::bind(&MainWindow::OnMoveMode, this, _1)));
 
@@ -770,6 +774,24 @@ void MainWindow::OnFullScreen(bool _value)
     this->toolsWidget->show();
     this->menuBar->show();
   }
+  g_fullScreenAct->setChecked(_value);
+  g_fullscreen = _value;
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnShowToolbars(bool _value)
+{
+  if (_value)
+  {
+    this->GetRenderWidget()->GetTimePanel()->show();
+    this->GetRenderWidget()->GetToolbar()->show();
+  }
+  else
+  {
+    this->GetRenderWidget()->GetTimePanel()->hide();
+    this->GetRenderWidget()->GetToolbar()->hide();
+  }
+  g_showToolbarsAct->setChecked(_value);
 }
 
 /////////////////////////////////////////////////
@@ -888,16 +910,7 @@ void MainWindow::FullScreen()
 /////////////////////////////////////////////////
 void MainWindow::ShowToolbars()
 {
-  if (g_showToolbarsAct->isChecked())
-  {
-    this->GetRenderWidget()->GetTimePanel()->show();
-    this->GetRenderWidget()->GetToolbar()->show();
-  }
-  else
-  {
-    this->GetRenderWidget()->GetTimePanel()->hide();
-    this->GetRenderWidget()->GetToolbar()->hide();
-  }
+  gui::Events::showToolbars(g_showToolbarsAct->isChecked());
 }
 
 /////////////////////////////////////////////////
