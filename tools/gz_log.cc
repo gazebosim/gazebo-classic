@@ -556,7 +556,7 @@ std::string StateFilter::Filter(const std::string &_stateString)
       << "<sim_time>" << state.GetSimTime() << "</sim_time>\n"
       << "<real_time>" << state.GetRealTime() << "</real_time>\n"
       << "<wall_time>" << state.GetWallTime() << "</wall_time>\n"
-      << "<iterations>" << state.GetIterations() << "</iterations>\n";;
+      << "<iterations>" << state.GetIterations() << "</iterations>\n";
   }
 
   result << this->filter.Filter(state);
