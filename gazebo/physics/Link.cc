@@ -17,6 +17,7 @@
 
 #include <sstream>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportIface.hh"
@@ -55,10 +56,12 @@ Link::Link(EntityPtr _parent)
   this->publishData = false;
   this->publishDataMutex = new boost::recursive_mutex();
 
+#if GAZEBO_MAJOR_VERSION <= 4
   // Do not merge this forward, this->scale variable has been removed from
   // the Link class in favor of using the one from the Entity class.
   // Entity already sets scale to one in its constructor.
-  this->scale = math::Vector3::One;
+  this->Link::scale = math::Vector3::One;
+#endif
 }
 
 
