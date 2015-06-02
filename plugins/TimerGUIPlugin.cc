@@ -268,7 +268,8 @@ void TimerGUIPlugin::PreRender()
 {
   boost::mutex::scoped_lock lock(this->timerMutex);
   this->SetTime(QString::fromStdString(
-        this->timer.GetElapsed().FormattedString(1)));
+      this->timer.GetElapsed().FormattedString(
+      common::Time::FormatOption::HOURS)));
 }
 
 /////////////////////////////////////////////////

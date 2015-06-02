@@ -144,53 +144,89 @@ TEST_F(TimeTest, String)
 
   // Several combinations
   EXPECT_EQ(time.FormattedString(), "00 00:00:00.000");
-  EXPECT_EQ(time.FormattedString(1), "00:00:00.000");
-  EXPECT_EQ(time.FormattedString(2), "00:00.000");
-  EXPECT_EQ(time.FormattedString(3), "00.000");
-  EXPECT_EQ(time.FormattedString(4), "000");
-  EXPECT_EQ(time.FormattedString(0, 4), "00 00:00:00.000");
-  EXPECT_EQ(time.FormattedString(0, 3), "00 00:00:00");
-  EXPECT_EQ(time.FormattedString(0, 2), "00 00:00");
-  EXPECT_EQ(time.FormattedString(0, 1), "00 00");
-  EXPECT_EQ(time.FormattedString(0, 0), "00");
-
-  // Inexistent indices default to maximum index (4)
-  EXPECT_EQ(time.FormattedString(10, 10), "000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS),
+                                 "00:00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MINUTES),
+                                 "00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::SECONDS),
+                                 "00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MILLISECONDS),
+                                 "000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::MILLISECONDS),
+                                 "00 00:00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::SECONDS),
+                                 "00 00:00:00");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::MINUTES),
+                                 "00 00:00");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::HOURS),
+                                 "00 00");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::DAYS),
+                                 "00");
 
   // start > end: start pushes end
-  EXPECT_EQ(time.FormattedString(4, 2), "000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MILLISECONDS,
+                                 common::Time::FormatOption::MINUTES),
+                                 "000");
 
   // 1 second
   time = common::Time(0, 1000000000);
   EXPECT_EQ(time.FormattedString(), "00 00:00:01.000");
-  EXPECT_EQ(time.FormattedString(4, 4), "1000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MILLISECONDS,
+                                 common::Time::FormatOption::MILLISECONDS),
+                                 "1000");
 
   // 30.5 seconds
   time = common::Time(30, 500000000);
   EXPECT_EQ(time.FormattedString(), "00 00:00:30.500");
-  EXPECT_EQ(time.FormattedString(3, 3), "30");
-  EXPECT_EQ(time.FormattedString(4, 4), "30500");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::SECONDS,
+                                 common::Time::FormatOption::SECONDS),
+                                 "30");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MILLISECONDS,
+                                 common::Time::FormatOption::MILLISECONDS),
+                                 "30500");
 
   // 1 min
   time = common::Time(60);
   EXPECT_EQ(time.FormattedString(), "00 00:01:00.000");
-  EXPECT_EQ(time.FormattedString(3, 3), "60");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::SECONDS,
+                                 common::Time::FormatOption::SECONDS),
+                                 "60");
 
   // 2.5 hours
   time = common::Time(9000);
   EXPECT_EQ(time.FormattedString(), "00 02:30:00.000");
-  EXPECT_EQ(time.FormattedString(1, 2), "02:30");
-  EXPECT_EQ(time.FormattedString(3, 3), "9000");
-  EXPECT_EQ(time.FormattedString(2, 2), "150");
-  EXPECT_EQ(time.FormattedString(1, 1), "02");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS,
+                                 common::Time::FormatOption::MINUTES),
+                                 "02:30");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::SECONDS,
+                                 common::Time::FormatOption::SECONDS),
+                                 "9000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MINUTES,
+                                 common::Time::FormatOption::MINUTES),
+                                 "150");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS,
+                                 common::Time::FormatOption::HOURS),
+                                 "02");
 
   // 3 days
   time = common::Time(259200);
   EXPECT_EQ(time.FormattedString(), "03 00:00:00.000");
-  EXPECT_EQ(time.FormattedString(0, 0), "03");
-  EXPECT_EQ(time.FormattedString(1), "72:00:00.000");
-  EXPECT_EQ(time.FormattedString(1, 1), "72");
-  EXPECT_EQ(time.FormattedString(2, 2), "4320");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::DAYS),
+                                 "03");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS),
+                                 "72:00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS,
+                                 common::Time::FormatOption::HOURS),
+                                 "72");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MINUTES,
+                                 common::Time::FormatOption::MINUTES),
+                                 "4320");
 
   // Large time
   time = common::Time(1234567890, 123456789);

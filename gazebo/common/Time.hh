@@ -41,6 +41,22 @@ namespace gazebo
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;
 
+      /// \enum Format options
+      /// \brief Options for formatting time as a string.
+      public: enum FormatOption
+      {
+        /// \brief Days
+        DAYS = 0,
+        /// \brief Hours
+        HOURS = 1,
+        /// \brief Minutes
+        MINUTES = 2,
+        /// \brief Seconds
+        SECONDS = 3,
+        /// \brief Milliseconds
+        MILLISECONDS = 4
+      };
+
       /// \brief Constructors
       public: Time();
 
@@ -97,13 +113,12 @@ namespace gazebo
       public: float Float() const;
 
       /// \brief Get the time as a string formatted as "DD hh:mm:ss.mmm", with
-      /// the option to choose the start/end. Options for start/end are:
-      /// 0: days, 1: hours, 2: minutes, 3: seconds, 4: milliseconds
-      /// \param[in] _start Start point (0 to 4).
-      /// \param[in] _end End point (0 to 4).
+      /// the option to choose the start/end.
+      /// \param[in] _start Start point.
+      /// \param[in] _end End point.
       /// \return String representing time.
-      public: std::string FormattedString(unsigned int _start = 0,
-          unsigned int _end = 4) const;
+      public: std::string FormattedString(FormatOption _start = DAYS,
+          FormatOption _end = MILLISECONDS) const;
 
       /// \brief Sleep for the specified time
       /// \param[in] _time Sleep time

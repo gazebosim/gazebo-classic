@@ -255,13 +255,13 @@ float Time::Float() const
 }
 
 /////////////////////////////////////////////////
-std::string Time::FormattedString(unsigned int _start, unsigned int _end) const
+std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
 {
-  if (_start > 4)
+  if (_start > MILLISECONDS)
   {
     gzwarn << "Invalid start [" << _start << "], using millisecond [4]." <<
         std::endl;
-    _start = 4;
+    _start = MILLISECONDS;
   }
 
   if (_end < _start)
@@ -271,11 +271,11 @@ std::string Time::FormattedString(unsigned int _start, unsigned int _end) const
     _end = _start;
   }
 
-  if (_end > 4)
+  if (_end > MILLISECONDS)
   {
     gzwarn << "Invalid end [" << _end << "], using millisecond [4]." <<
         std::endl;
-    _end = 4;
+    _end = MILLISECONDS;
   }
 
   std::ostringstream stream;
