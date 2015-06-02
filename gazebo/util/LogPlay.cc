@@ -87,7 +87,7 @@ void LogPlay::Open(const std::string &_logFile)
   this->ReadLogTimes();
 
   // Extract the initial "iterations" value from the log.
-  this->ReadIterations();
+  this->iterationsFound = this->ReadIterations();
 }
 
 /////////////////////////////////////////////////
@@ -107,10 +107,18 @@ std::string LogPlay::GetHeader() const
   return stream.str();
 }
 
+/////////////////////////////////////////////////
 uint64_t LogPlay::GetInitialIterations() const
 {
   return this->initialIterations;
 }
+
+/////////////////////////////////////////////////
+bool LogPlay::HasIterations() const
+{
+  return this->iterationsFound;
+}
+
 
 /////////////////////////////////////////////////
 void LogPlay::ReadHeader()
@@ -216,13 +224,14 @@ void LogPlay::ReadLogTimes()
 }
 
 /////////////////////////////////////////////////
-void LogPlay::ReadIterations()
+bool LogPlay::ReadIterations()
 {
   if (this->GetChunkCount() < 2u)
   {
     gzwarn << "Unable to extract iteration information. No chunks available "
-           << "with <iterations> information." << std::endl;
-    return;
+           << "with <iterations> information. Assuming that the first "
+           << "<iterations> value is 0." << std::endl;
+    return false;
   }
 
   const std::string kStartDelim = "<iterations>";
@@ -241,12 +250,14 @@ void LogPlay::ReadIterations()
     std::string iterations = chunk.substr(from + kStartDelim.size(), length);
     std::stringstream ss(iterations);
     ss >> this->initialIterations;
+    return true;
   }
   else
   {
     gzwarn << "Unable to find <iterations>...</iterations> tags in the first "
-           << "chunk." << std::endl;
-    return;
+           << "chunk. Assuming that the first <iterations> value is 0."
+           << std::endl;
+    return false;
   }
 }
 

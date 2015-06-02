@@ -507,6 +507,14 @@ void World::LogStep()
 
       this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
 
+      // If the log file does not contain iterations we have to manually
+      // increase the iteration counter in logPlayState.
+      if (!util::LogPlay::Instance()->HasIterations())
+      {
+        this->dataPtr->logPlayState.SetIterations(
+          this->dataPtr->iterations + 1);
+      }
+
       // Process insertions
       if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
       {
