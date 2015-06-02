@@ -19,8 +19,8 @@
 #include <ignition/math/Vector3.hh>
 
 /////////////////////////////////////////////////
-// Migrattion from gazebo::math::Vector3 to ignition::math::Vector3 examples
-// See Ignition documentation http://ignitionrobotics.org/libraries/ign_math/api
+// Migration from gazebo::math::Vector3 to ignition::math::Vector3 examples
+// See Ignition documentation http://ignitionrobotics.org/libraries/math
 int main()
 {
   // Construction
