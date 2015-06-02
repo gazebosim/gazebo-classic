@@ -550,7 +550,7 @@ namespace gazebo
       /// on the specified layer its visibility will be toggled.
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
-      
+
       /// \brief Get type of visual.
       /// \return Visual type.
       public: VisualType GetType() const;
