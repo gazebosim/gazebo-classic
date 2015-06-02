@@ -175,6 +175,11 @@ TEST_F(TimeTest, String)
   // Large time, nanoseconds are lost
   time = common::Time(1234567890, 123456789);
   EXPECT_EQ(time.FormattedString(), "14288 23:31:30.123");
+
+    // 1 min
+  time = common::Time(3600);
+  EXPECT_EQ(time.FormattedString(false, false, false, true, true), "3600:00.000");
+
 }
 
 /////////////////////////////////////////////////
