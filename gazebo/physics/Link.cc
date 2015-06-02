@@ -325,6 +325,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("inertial"))
   {
     sdf::ElementPtr inertialElem = this->sdf->GetElement("inertial");
+    std::lock_guard<std::mutex> lock(this->inertialMutex);
     this->inertial->UpdateParameters(inertialElem);
   }
 
@@ -603,7 +604,6 @@ void Link::SetAngularAccel(const math::Vector3 &_accel)
 math::Pose Link::GetWorldCoGPose() const
 {
   math::Pose pose = this->GetWorldPose();
-  std::lock_guard<std::mutex> lock(this->inertialMutex);
   pose.pos += pose.rot.RotateVector(this->inertial->GetCoG());
   return pose;
 }
@@ -625,14 +625,12 @@ math::Vector3 Link::GetRelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeLinearAccel() const
 {
-  std::lock_guard<std::mutex> lock(this->inertialMutex);
   return this->GetRelativeForce() / this->inertial->GetMass();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldLinearAccel() const
 {
-  std::lock_guard<std::mutex> lock(this->inertialMutex);
   return this->GetWorldForce() / this->inertial->GetMass();
 }
 
@@ -716,7 +714,6 @@ void Link::SetInertial(const InertialPtr &/*_inertial*/)
 //////////////////////////////////////////////////
 math::Pose Link::GetWorldInertialPose() const
 {
-  std::lock_guard<std::mutex> lock(this->inertialMutex);
   math::Pose inertialPose;
   if (this->inertial)
     inertialPose = this->inertial->GetPose();
@@ -726,7 +723,6 @@ math::Pose Link::GetWorldInertialPose() const
 //////////////////////////////////////////////////
 math::Matrix3 Link::GetWorldInertiaMatrix() const
 {
-  std::lock_guard<std::mutex> lock(this->inertialMutex);
   math::Matrix3 moi;
   if (this->inertial)
   {
