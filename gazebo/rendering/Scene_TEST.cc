@@ -26,7 +26,7 @@ class Scene_TEST : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-/*TEST_F(Scene_TEST, AddRemoveVisuals)
+TEST_F(Scene_TEST, AddRemoveVisuals)
 {
   Load("worlds/empty.world");
 
@@ -56,7 +56,7 @@ class Scene_TEST : public ServerFixture
   scene->RemoveVisual(visual1);
   EXPECT_EQ(scene->GetVisualCount(), 2u);
   EXPECT_FALSE(scene->GetVisual("visual1"));
-}*/
+}
 
 /////////////////////////////////////////////////
 TEST_F(Scene_TEST, RemoveModelVisual)
