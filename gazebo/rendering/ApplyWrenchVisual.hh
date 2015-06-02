@@ -45,7 +45,7 @@ namespace gazebo
       public: void Load();
 
       // Documentation inherited.
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Set the CoM vector and update the position of the torque
       /// visual.

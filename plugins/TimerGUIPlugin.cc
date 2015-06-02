@@ -142,6 +142,10 @@ TimerGUIPlugin::TimerGUIPlugin()
   // Connect to the PreRender Gazebo signal
   this->connections.push_back(event::Events::ConnectPreRender(
                               boost::bind(&TimerGUIPlugin::PreRender, this)));
+
+  // Initialize variables
+  this->posX = 0;
+  this->posY = 0;
 }
 
 /////////////////////////////////////////////////
@@ -258,7 +262,10 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   {
     int xPos, yPos;
     if (this->parent())
-      xPos = static_cast<QWidget*>(this->parent())->width() - this->width() -10;
+    {
+      xPos = static_cast<QWidget *>(this->parent())->width() - this->width() -
+          10;
+    }
     else
       xPos = 600;
 

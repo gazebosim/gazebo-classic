@@ -1,4 +1,14 @@
 ## Gazebo 6.0
+1. Added multiple LiftDrag plugins to the cessna_demo.world to allow the Cessna
+C-172 model to fly.
+    * [Pull request #1715](https://bitbucket.org/osrf/gazebo/pull-request/1715)
+
+1. Added a plugin to control a Cessna C-172 via messages (CessnaPlugin), and a
+GUI plugin to test this functionality with the keyboard (CessnaGUIPlugin). Added
+world with the Cessna model and the two previous plugins loaded
+(cessna_demo.world).
+    * [Pull request #1712](https://bitbucket.org/osrf/gazebo/pull-request/1712)
+
 1. Added world with OSRF building and an elevator
     * [Pull request #1697](https://bitbucket.org/osrf/gazebo/pull-request/1697)
 
@@ -13,6 +23,11 @@
 
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
+
+1. Add option to parallelize the ODE quickstep constraint solver,
+which solves an LCP twice with different parameters in order
+to corrected for position projection errors.
+    * [Pull request #1561](https://bitbucket.org/osrf/gazebo/pull-request/1561)
 
 1. Get/Set user camera pose in GUI.
     * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
@@ -100,6 +115,9 @@ compilation on Windows.
 1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
     * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
 
+1. Display confirmation message after log is saved
+    * [Pull request #1646](https://bitbucket.org/osrf/gazebo/pull-request/1646)
+
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
 
@@ -120,6 +138,9 @@ compilation on Windows.
 
 1. Set material of SelectionObj's handles.
     * [Pull request #1472](https://bitbucket.org/osrf/gazebo/pull-request/1472)
+
+1. Add SelectionObj::Fini with tests and make Visual::Fini virtual
+    * [Pull request #1685](https://bitbucket.org/osrf/gazebo/pull-request/1685)
 
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
