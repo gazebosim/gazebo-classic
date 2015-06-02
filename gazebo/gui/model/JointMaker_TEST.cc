@@ -28,7 +28,6 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 void JointMaker_TEST::JointState()
 {
-  return;
   this->Load("worlds/empty.world");
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
@@ -52,7 +51,6 @@ void JointMaker_TEST::JointState()
 /////////////////////////////////////////////////
 void JointMaker_TEST::CreateRemoveJoint()
 {
-  return;
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -137,7 +135,6 @@ void JointMaker_TEST::CreateRemoveJoint()
 /////////////////////////////////////////////////
 void JointMaker_TEST::JointDefaultProperties()
 {
-  return;
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -262,11 +259,10 @@ void JointMaker_TEST::JointDefaultProperties()
   qFuzzyCompare(prisAxis1Msg.friction(), 0.0);
   QCOMPARE(prisAxis1Msg.use_parent_model_frame(), false);
 
-  //delete jointMaker;
+  delete jointMaker;
   mainWindow->close();
   delete mainWindow;
 }
-
 
 /////////////////////////////////////////////////
 void JointMaker_TEST::ShowJoints()
