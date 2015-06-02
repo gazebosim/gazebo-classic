@@ -54,7 +54,7 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~RestUiWidget() = default;
 
-     /// \brief QT callback (from the window menu)
+    /// \brief QT callback (from the window menu)
     public slots: void Login();
 
     /// \brief QT callback (from the window menu)

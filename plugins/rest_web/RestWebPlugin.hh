@@ -73,7 +73,7 @@ namespace gazebo
     /// \brief Gazebo pub/sub node
     private: gazebo::transport::NodePtr node;
 
-     /// \brief Gazebo subscriber for login requests
+    /// \brief Gazebo subscriber for login requests
     private: gazebo::transport::SubscriberPtr subLogin;
 
     /// \brief Gazebo subscriber for logout requests

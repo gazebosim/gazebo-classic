@@ -42,8 +42,6 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
       "/gazebo/rest/rest_login");
   this->logoutPub = node->Advertise<gazebo::msgs::RestLogout>(
       "/gazebo/rest/rest_logout");
-  // this for a problem where the server cannot subscribe to the topic
-//  this->loginPub->WaitForConnection();
   this->errorSub = node->Subscribe("/gazebo/rest/rest_error",
                               &RestUiWidget::OnResponse,
                               this);

@@ -30,15 +30,13 @@ namespace gazebo
     class RestUiWidget;
 
     /// \class RestUiLoginDialog RestUiLoginDialog.hh RestUiLoginDialog.hh
-    /// \brief Provides a means to login to a webservice
+    /// \brief Provides a means to logout from a webservice
     class GAZEBO_VISIBLE RestUiLogoutDialog : public QDialog
     {
       Q_OBJECT
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget
-      /// \param[in] _title The dialog window title bar text
-      /// \param[in] _url Label the title of the url (ex: super webservice url)
       /// \param[in] _defaultUrl Url text for the url (ex: https://superweb.com)
       public: RestUiLogoutDialog(QWidget *_parent,
                               const std::string &_defautlUrl);
