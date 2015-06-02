@@ -86,6 +86,54 @@ void SelectionObj::Load()
 }
 
 /////////////////////////////////////////////////
+void SelectionObj::Fini()
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  // Destroy objects and nodes created by this visual
+  if (!dPtr->scene)
+    return;
+  Ogre::SceneManager *manager = dPtr->scene->GetManager();
+  if (!manager)
+    return;
+
+  // transVisual / rotVisual / scaleVisual
+  for (unsigned int i = 0; i < this->GetChildCount(); ++i)
+  {
+    if (!this->GetChild(i))
+      continue;
+
+    // transXVisual / transYVisual / transZVisual
+    for (unsigned int j = 0; j < this->GetChild(i)->GetChildCount(); ++j)
+    {
+      if (!this->GetChild(i)->GetChild(j) ||
+          !this->GetChild(i)->GetChild(j)->GetSceneNode())
+      {
+        continue;
+      }
+
+      // transShaftXNode / transHeadXNode
+      for (auto k = this->GetChild(i)->GetChild(j)->GetSceneNode()->
+          numChildren()-1; k >= 0; --k)
+      {
+        Ogre::SceneNode *toDestroy =
+            reinterpret_cast<Ogre::SceneNode *>(
+            this->GetChild(i)->
+            GetChild(j)->
+            GetSceneNode()->
+            getChild(k));
+
+        manager->destroyMovableObject(toDestroy->getAttachedObject(0));
+        manager->destroySceneNode(toDestroy);
+      }
+    }
+  }
+
+  Visual::Fini();
+}
+
+/////////////////////////////////////////////////
 void SelectionObj::Attach(rendering::VisualPtr _vis)
 {
   SelectionObjPrivate *dPtr =
