@@ -2,6 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface RestLogout
+/// \brief Message for login out of a REST service.
 
 message RestLogout
 {

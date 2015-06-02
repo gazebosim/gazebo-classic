@@ -33,16 +33,16 @@ RestUiLogoutDialog::RestUiLogoutDialog(QWidget *_parent,
                                      const std::string &_defaultUrl)
     :QDialog(_parent), url(_defaultUrl.c_str())
 {
-  setWindowTitle(tr("Logout"));
-  setModal(true);
+  this->setWindowTitle(tr("Logout"));
+  this->setModal(true);
 
-  labelUrl = new QLabel(this);
-  labelUrl->setText(tr(_defaultUrl.c_str()));
+  this->labelUrl = new QLabel(this);
+  this->labelUrl->setText(tr(_defaultUrl.c_str()));
 
-  buttons = new QDialogButtonBox(this);
-  buttons->addButton(QDialogButtonBox::Ok);
-  buttons->button(QDialogButtonBox::Ok)->setText("Logout");
-  buttons->button(QDialogButtonBox::Ok)->setDefault(true);
+  this->buttons = new QDialogButtonBox(this);
+  this->buttons->addButton(QDialogButtonBox::Ok);
+  this->buttons->button(QDialogButtonBox::Ok)->setText("Logout");
+  this->buttons->button(QDialogButtonBox::Ok)->setDefault(true);
   buttons->addButton(QDialogButtonBox::Cancel);
 
   // place components

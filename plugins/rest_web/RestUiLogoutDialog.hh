@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _REST_LOGOUT_DIALOG_HH_
-#define _REST_LOGOUT_DIALOG_HH_
+#ifndef _GAZEBO_REST_LOGOUT_DIALOG_HH_
+#define _GAZEBO_REST_LOGOUT_DIALOG_HH_
 
 #include <string>
 
@@ -29,7 +29,6 @@ namespace gazebo
   {
     class RestUiWidget;
 
-    /// \class RestUiLoginDialog RestUiLoginDialog.hh RestUiLoginDialog.hh
     /// \brief Provides a means to logout from a webservice
     class GAZEBO_VISIBLE RestUiLogoutDialog : public QDialog
     {
