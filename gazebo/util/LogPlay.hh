@@ -125,6 +125,10 @@ namespace gazebo
       /// \return Header of the open log file.
       public: std::string GetHeader() const;
 
+      /// \brief Get the initial simulation iterations from a log file.
+      /// \return Initial simulation iteration contained in the log file.
+      public: uint64_t GetInitialIterations() const;
+
       /// \brief Helper function to get chunk data from XML.
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.
@@ -137,6 +141,10 @@ namespace gazebo
       /// \brief Update the internal variables that keep track of the times
       /// where the log started and finished (simulation time).
       private: void ReadLogTimes();
+
+      /// \brief Update the internal variable that keep track of the initial
+      /// "iterations" value.
+      private: void ReadIterations();
 
       /// \brief The XML document of the log file.
       private: TiXmlDocument xmlDoc;
@@ -170,6 +178,9 @@ namespace gazebo
       private: std::string encoding;
 
       private: std::string currentChunk;
+
+      /// \brief Initial simulation iteration contained in the log file.
+      private: uint64_t initialIterations;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;
