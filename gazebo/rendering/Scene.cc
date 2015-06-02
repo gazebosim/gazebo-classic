@@ -162,10 +162,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
       &Scene::OnRequest, this);
 
-  // \TODO: This causes the Scene to occasionally miss the response to
-  // scene_info
-  // this->responsePub =
-  //    this->dataPtr->node->Advertise<msgs::Response>("~/response");
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
       &Scene::OnResponse, this, true);
   this->dataPtr->sceneSub =
