@@ -485,23 +485,25 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
     this->scene->GetManager()->destroyAnimation("cameratrack");
   }
 
+  rendering::VisualPtr moveToVisual;
+
   // TODO zoom into model instead of visual as nested model currently has
   // incorrect bounding box
   rendering::VisualPtr topLevelVis = _visual->GetNthAncestor(2);
 
-  math::Box box;
-
   if (topLevelVis)
-    box = topLevelVis->GetBoundingBox();
+    moveToVisual = topLevelVis;
   else
-    box = _visual->GetBoundingBox();
+    moveToVisual = _visual;
+
+  math::Box box = moveToVisual->GetBoundingBox();
 
   math::Vector3 size = box.GetSize();
   double maxSize = std::max(std::max(size.x, size.y), size.z);
 
   math::Vector3 start = this->GetWorldPose().pos;
   start.Correct();
-  math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
+  math::Vector3 end = box.GetCenter() + moveToVisual->GetWorldPose().pos;
   end.Correct();
   math::Vector3 dir = end - start;
   dir.Correct();
