@@ -119,6 +119,12 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       this->SetParam(dParamVel,
           elem->GetElement("velocity")->Get<double>());
   }
+
+  // cache joint force torque feedback wrench
+  gazebo::event::ConnectionPtr jointFeedbackConnection =
+    physics::Joint::ConnectJointUpdate(
+    boost::bind(&ODEJoint::CacheForceTorque, this));
+  this->updateConnections.push_back(jointFeedbackConnection);
 }
 
 //////////////////////////////////////////////////
@@ -641,7 +647,7 @@ void ODEJoint::Reset()
 }
 
 //////////////////////////////////////////////////
-JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
+void ODEJoint::CacheForceTorque()
 {
   // Note that:
   // f2, t2 are the force torque measured on parent body's cg
@@ -799,7 +805,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       if (!this->childLink)
       {
         gzerr << "Both parent and child links are invalid, abort.\n";
-        return JointWrench();
+        this->wrench = JointWrench();
       }
       else
       {
@@ -828,9 +834,14 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     // forgot to set provide_feedback?
     gzwarn << "GetForceTorque: forgot to set <provide_feedback>?\n";
   }
+}
 
+//////////////////////////////////////////////////
+JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
+{
   return this->wrench;
 }
+
 
 //////////////////////////////////////////////////
 bool ODEJoint::UsesImplicitSpringDamper()

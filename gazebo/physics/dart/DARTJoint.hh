@@ -60,6 +60,9 @@ namespace gazebo
       public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
 
       // Documentation inherited.
+      public: virtual void CacheForceTorque();
+
+      // Documentation inherited.
       public: virtual void Detach();
 
       /// \brief Set the anchor point
