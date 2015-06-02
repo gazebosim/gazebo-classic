@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -180,17 +186,17 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 
   if (!this->pauseIncoming && !_onlyOut)
   {
-    int s = 0;
     {
+      int s = 0;
       boost::recursive_mutex::scoped_lock lock(this->nodeMutex);
       s = this->nodes.size();
-    }
 
-    for (int i = 0; i < s; ++i)
-    {
-      this->nodes[i]->ProcessIncoming();
-      if (this->pauseIncoming)
-        break;
+      for (int i = 0; i < s; ++i)
+      {
+        this->nodes[i]->ProcessIncoming();
+        if (this->pauseIncoming)
+          break;
+      }
     }
   }
 }

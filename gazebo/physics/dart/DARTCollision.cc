@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTPlaneShape.hh"
+#include "gazebo/physics/dart/DARTSurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -33,11 +34,12 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTCollision::DARTCollision(LinkPtr _link)
   : Collision(_link),
-    dtBodyNode(NULL),
     dtCollisionShape(NULL)
 {
   this->SetName("DART_Collision");
-  this->surface.reset(new SurfaceParams());
+  this->surface.reset(new DARTSurfaceParams());
+  this->dtBodyNode
+      = boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
 }
 
 //////////////////////////////////////////////////
@@ -55,9 +57,6 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
-
-  this->dtBodyNode
-      = boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
 }
 
 //////////////////////////////////////////////////
@@ -76,6 +75,15 @@ void DARTCollision::Init()
     {
       math::Pose relativePose = this->GetRelativePose();
       this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+    }
+    else
+    {
+      // change ground plane to be near semi-infinite.
+      dart::dynamics::BoxShape *dtBoxShape =
+        dynamic_cast<dart::dynamics::BoxShape *>(this->dtCollisionShape);
+      dtBoxShape->setSize(Eigen::Vector3d(2100, 2100, 2100.0));
+      dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100.0/2.0));
+      // gzerr << "plane box modified\n";
     }
   }
 }
@@ -144,4 +152,10 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape *_shape,
 dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
 {
   return dtCollisionShape;
+}
+
+/////////////////////////////////////////////////
+DARTSurfaceParamsPtr DARTCollision::GetDARTSurface() const
+{
+  return boost::dynamic_pointer_cast<DARTSurfaceParams>(this->surface);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,8 @@ namespace gazebo
     /// class encapsulates all three. Point lights are light light bulbs,
     /// spot lights project a cone of light, and directional lights are light
     /// sun light.
-    class GAZEBO_VISIBLE Light
+    class GZ_RENDERING_VISIBLE Light :
+      public boost::enable_shared_from_this<Light>
     {
       /// \brief Constructor.
       /// \param[in] _scene Pointer to the scene that contains the Light.
@@ -181,6 +182,12 @@ namespace gazebo
       /// \brief Update a light source from a message.
       /// \param[in] _msg Light message to update from
       public: void UpdateFromMsg(ConstLightPtr &_msg);
+
+      /// \brief Clone the light with a new name
+      /// \param[in] _name Name of the cloned light.
+      /// \param[in] _scene Scene to contain the light.
+      /// \return a clone of the light
+      public: LightPtr Clone(const std::string &_name, ScenePtr _scene);
 
       /// \brief On pose change callback
       protected: virtual void OnPoseChange() {}

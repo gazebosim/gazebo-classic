@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <sstream>
 
@@ -55,7 +61,6 @@ Link::Link(EntityPtr _parent)
   this->publishData = false;
   this->publishDataMutex = new boost::recursive_mutex();
 }
-
 
 //////////////////////////////////////////////////
 Link::~Link()
@@ -104,6 +109,7 @@ Link::~Link()
 
   this->requestPub.reset();
   this->dataPub.reset();
+  this->wrenchSub.reset();
   this->connections.clear();
 
   delete this->publishDataMutex;
@@ -115,13 +121,18 @@ Link::~Link()
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
-  bool needUpdate = false;
-
   Entity::Load(_sdf);
 
-  // before loading child collsion, we have to figure out of selfCollide is true
-  // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  // before loading child collision, we have to figure out if selfCollide is
+  // true and modify parent class Entity so this body has its own spaceId
+  if (this->sdf->HasElement("self_collide"))
+  {
+    this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  }
+  else
+  {
+    this->SetSelfCollide(this->GetModel()->GetSelfCollide());
+  }
   this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetSelfCollide, this));
 
@@ -201,21 +212,21 @@ void Link::Load(sdf::ElementPtr _sdf)
       this->audioContactsSub = this->node->Subscribe(topic,
           &Link::OnCollision, this);
     }
-
-    needUpdate = true;
   }
 
   if (_sdf->HasElement("audio_sink"))
   {
-    needUpdate = true;
     this->audioSink = util::OpenAL::Instance()->CreateSink(
         _sdf->GetElement("audio_sink"));
   }
 #endif
 
-  if (needUpdate)
-    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&Link::Update, this, _1)));
+  this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&Link::Update, this, _1)));
+
+  std::string topicName = "~/" + this->GetScopedName() + "/wrench";
+  boost::replace_all(topicName, "::", "/");
+  this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
 }
 
 //////////////////////////////////////////////////
@@ -324,7 +335,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
     this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
-  // before loading child collsiion, we have to figure out if
+  // before loading child collision, we have to figure out if
   // selfCollide is true and modify parent class Entity so this
   // body has its own spaceId
   this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
@@ -450,18 +461,27 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   }
 #endif
 
-  // Apply our linear accel
-  // this->SetForce(this->linearAccel);
-
-  // Apply our angular accel
-  // this->SetTorque(this->angularAccel);
-
   // FIXME: race condition on factory-based model loading!!!!!
    /*if (this->GetEnabled() != this->enabled)
    {
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
+
+  if (!this->wrenchMsgs.empty())
+  {
+    std::vector<msgs::Wrench> messages;
+    {
+      boost::mutex::scoped_lock lock(this->wrenchMsgMutex);
+      messages = this->wrenchMsgs;
+      this->wrenchMsgs.clear();
+    }
+
+    for (auto it : messages)
+    {
+      this->ProcessWrenchMsg(it);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -575,7 +595,7 @@ void Link::SetLinearAccel(const math::Vector3 &_accel)
 void Link::SetAngularAccel(const math::Vector3 &_accel)
 {
   this->SetEnabled(true);
-  this->angularAccel = _accel * this->inertial->GetMass();
+  this->angularAccel = _accel;
 }
 
 //////////////////////////////////////////////////
@@ -615,13 +635,26 @@ math::Vector3 Link::GetWorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeAngularAccel() const
 {
-  return this->GetRelativeTorque() / this->inertial->GetMass();
+  return this->GetWorldPose().rot.RotateVectorReverse(
+    this->GetWorldAngularAccel());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularAccel() const
 {
-  return this->GetWorldTorque() / this->inertial->GetMass();
+  // I: inertia matrix in world frame
+  // T: sum of external torques in world frame
+  // L: angular momentum of CoG in world frame
+  // w: angular velocity in world frame
+  // return I^-1 * (T - w x L)
+  return this->GetWorldInertiaMatrix().Inverse() * (this->GetWorldTorque()
+    - this->GetWorldAngularVel().Cross(this->GetWorldAngularMomentum()));
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Link::GetWorldAngularMomentum() const
+{
+  return this->GetWorldInertiaMatrix() * this->GetWorldAngularVel();
 }
 
 //////////////////////////////////////////////////
@@ -781,9 +814,10 @@ void Link::FillMsg(msgs::Link &_msg)
       sensor->FillMsg(*_msg.add_sensor());
   }
 
-  // Parse visuals from SDF
   if (this->visuals.empty())
     this->ParseVisuals();
+  else
+    this->UpdateVisualMsg();
 
   for (Visuals_M::iterator iter = this->visuals.begin();
       iter != this->visuals.end(); ++iter)
@@ -1033,32 +1067,10 @@ void Link::OnCollision(ConstContactsPtr &_msg)
 /////////////////////////////////////////////////
 void Link::ParseVisuals()
 {
-  // TODO: this shouldn't be in the physics sim
-  if (this->sdf->HasElement("visual"))
-  {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
-    while (visualElem)
-    {
-      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+  this->UpdateVisualMsg();
 
-      std::string visName = this->GetScopedName() + "::" + msg.name();
-      msg.set_name(visName);
-      msg.set_id(physics::getUniqueId());
-      msg.set_parent_name(this->GetScopedName());
-      msg.set_parent_id(this->GetId());
-      msg.set_is_static(this->IsStatic());
-
-      this->visPub->Publish(msg);
-
-      Visuals_M::iterator iter = this->visuals.find(msg.id());
-      if (iter != this->visuals.end())
-        gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
-
-      this->visuals[msg.id()] = msg;
-
-      visualElem = visualElem->GetNextElement("visual");
-    }
-  }
+  for (auto const it : this->visuals)
+    this->visPub->Publish(it.second);
 }
 
 /////////////////////////////////////////////////
@@ -1100,19 +1112,107 @@ void Link::SetScale(const math::Vector3 &_scale)
     }
   }
 
-/*  for (unsigned int i = 0; i < this->visuals.size(); ++i)
+  // update the visual sdf to ensure cloning and saving has the correct values.
+  this->UpdateVisualGeomSDF(_scale);
+
+  this->scale = _scale;
+}
+
+//////////////////////////////////////////////////
+void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
+{
+  // TODO: this shouldn't be in the physics sim
+  if (this->sdf->HasElement("visual"))
   {
-    msgs::Visual msg;
-    msg.set_name(this->visuals[i]);
-    if (this->parent)
-      msg.set_parent_name(this->parent->GetScopedName());
-    else
-      msg.set_parent_name("");
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
 
-    msgs::Set(msg.mutable_scale(), _scale);
+      if (geomElem->HasElement("box"))
+      {
+        math::Vector3 size =
+            geomElem->GetElement("box")->Get<math::Vector3>("size");
+        geomElem->GetElement("box")->GetElement("size")->Set(
+            _scale/this->scale*size);
+      }
+      else if (geomElem->HasElement("sphere"))
+      {
+        // update radius the same way as collision shapes
+        double radius = geomElem->GetElement("sphere")->Get<double>("radius");
+        double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
+        double oldRadius = std::max(this->scale.z,
+            std::max(this->scale.x, this->scale.y));
+        geomElem->GetElement("sphere")->GetElement("radius")->Set(
+            newRadius/oldRadius*radius);
+      }
+      else if (geomElem->HasElement("cylinder"))
+      {
+        // update radius the same way as collision shapes
+        double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
+        double newRadius = std::max(_scale.x, _scale.y);
+        double oldRadius = std::max(this->scale.x, this->scale.y);
 
-    this->visPub->Publish(msg);
-  }*/
+        double length = geomElem->GetElement("cylinder")->Get<double>("length");
+        geomElem->GetElement("cylinder")->GetElement("radius")->Set(
+            newRadius/oldRadius*radius);
+        geomElem->GetElement("cylinder")->GetElement("length")->Set(
+            _scale.z/this->scale.z*length);
+      }
+      else if (geomElem->HasElement("mesh"))
+        geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
+
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::UpdateVisualMsg()
+{
+  // TODO: this shouldn't be in the physics sim
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+
+      bool newVis = true;
+      std::string linkName = this->GetScopedName();
+
+      // update visual msg if it exists
+      for (auto &iter : this->visuals)
+      {
+        std::string visName = linkName + "::" +
+            visualElem->Get<std::string>("name");
+        if (iter.second.name() == visName)
+        {
+          iter.second.mutable_geometry()->CopyFrom(msg.geometry());
+          newVis = false;
+          break;
+        }
+      }
+
+      // add to visual msgs if not found.
+      if (newVis)
+      {
+        std::string visName = this->GetScopedName() + "::" + msg.name();
+        msg.set_name(visName);
+        msg.set_id(physics::getUniqueId());
+        msg.set_parent_name(this->GetScopedName());
+        msg.set_parent_id(this->GetId());
+        msg.set_is_static(this->IsStatic());
+
+        auto iter = this->visuals.find(msg.id());
+        if (iter != this->visuals.end())
+          gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
+        this->visuals[msg.id()] = msg;
+      }
+
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1155,4 +1255,177 @@ double Link::GetWorldEnergyKinetic() const
 double Link::GetWorldEnergy() const
 {
   return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
+}
+
+/////////////////////////////////////////////////
+void Link::MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                     const math::Pose &_worldReferenceFrameDst)
+{
+  math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
+    + _worldReferenceFrameDst;
+  this->SetWorldPose(targetWorldPose);
+  this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
+}
+
+/////////////////////////////////////////////////
+bool Link::FindAllConnectedLinksHelper(const LinkPtr &_originalParentLink,
+  Link_V &_connectedLinks, bool _fistLink)
+{
+  // debug
+  // std::string pn;
+  // if (_originalParentLink) pn = _originalParentLink->GetName();
+  // gzerr << "subsequent call to find connected links: "
+  //       << " parent " << pn
+  //       << " this link " << this->GetName() << "\n";
+
+  // get all child joints from this link
+  Link_V childLinks = this->GetChildJointsLinks();
+
+  // gzerr << "debug: child links are: ";
+  // for (Link_V::iterator li = childLinks.begin();
+  //                       li != childLinks.end(); ++li)
+  //   std::cout << (*li)->GetName() << " ";
+  // std::cout << "\n";
+
+  // loop through all joints where this link is a parent link of the joint
+  for (Link_V::iterator li = childLinks.begin();
+                        li != childLinks.end(); ++li)
+  {
+    // gzerr << "debug: checking " << (*li)->GetName() << "\n";
+
+    // check child link of each child joint recursively
+    if ((*li).get() == _originalParentLink.get())
+    {
+      // if parent is a child, failed search to find a nice subset of links
+      gzdbg << "we have a loop! cannot find nice subset of connected links,"
+            << " this link " << this->GetName() << " connects back to"
+            << " parent " << _originalParentLink->GetName() << ".\n";
+      _connectedLinks.clear();
+      return false;
+    }
+    else if (this->ContainsLink(_connectedLinks, (*li)))
+    {
+      // do nothing
+      // gzerr << "debug: do nothing with " << (*li)->GetName() << "\n";
+    }
+    else
+    {
+      // gzerr << "debug: add and recurse " << (*li)->GetName() << "\n";
+      // add child link to list
+      _connectedLinks.push_back((*li));
+
+      // recursively check if child link has already been checked
+      // if it returns false, it looped back to parent, mark flag and break
+      // from current for-loop.
+      if (!(*li)->FindAllConnectedLinksHelper(_originalParentLink,
+        _connectedLinks))
+      {
+        // one of the recursed link is the parent link
+        return false;
+      }
+    }
+  }
+
+  /// \todo: later we can optimize loop below by merging and using a flag.
+
+  // search parents, but if this is the first search, keep going, otherwise
+  // flag failure
+  // get all parent joints from this link
+  Link_V parentLinks = this->GetParentJointsLinks();
+
+  // loop through all joints where this link is a parent link of the joint
+  for (Link_V::iterator li = parentLinks.begin();
+                        li != parentLinks.end(); ++li)
+  {
+    // check child link of each child joint recursively
+    if ((*li).get() == _originalParentLink.get())
+    {
+      if (_fistLink)
+      {
+        // this is the first child link, simply skip if the parent is
+        // the _originalParentLink
+      }
+      else
+      {
+        // if parent is a child, failed search to find a nice subset of links
+        gzdbg << "we have a loop! cannot find nice subset of connected links,"
+              << " this link " << this->GetName() << " connects back to"
+              << " parent " << _originalParentLink->GetName() << ".\n";
+        _connectedLinks.clear();
+        return false;
+      }
+    }
+    else if (this->ContainsLink(_connectedLinks, (*li)))
+    {
+      // do nothing
+    }
+    else
+    {
+      // add parent link to list
+      _connectedLinks.push_back((*li));
+
+      // recursively check if parent link has already been checked
+      // if it returns false, it looped back to parent, mark flag and break
+      // from current for-loop.
+      if (!(*li)->FindAllConnectedLinksHelper(_originalParentLink,
+        _connectedLinks))
+      {
+        // one of the recursed link is the parent link
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Link::ContainsLink(const Link_V &_vector, const LinkPtr &_value)
+{
+  for (Link_V::const_iterator iter = _vector.begin();
+       iter != _vector.end(); ++iter)
+  {
+    if ((*iter).get() == _value.get())
+      return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+msgs::Visual Link::GetVisualMessage(const std::string &_name) const
+{
+  msgs::Visual result;
+
+  Visuals_M::const_iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+    if (iter->second.name() == _name)
+      break;
+
+  if (iter != this->visuals.end())
+    result = iter->second;
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(this->wrenchMsgMutex);
+  this->wrenchMsgs.push_back(*_msg);
+}
+
+//////////////////////////////////////////////////
+void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
+{
+  math::Vector3 pos = math::Vector3::Zero;
+  if (_msg.has_force_offset())
+  {
+    pos = msgs::Convert(_msg.force_offset());
+  }
+
+  const math::Vector3 force = msgs::Convert(_msg.force());
+  this->AddLinkForce(force, pos);
+
+  const math::Vector3 torque = msgs::Convert(_msg.torque());
+  this->AddRelativeTorque(torque);
 }

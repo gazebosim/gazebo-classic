@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace gazebo
     /// transport/transport.hh
     /// \brief Reads data from a remote advertiser, and passes the data
     /// along to local subscribers
-    class GAZEBO_VISIBLE PublicationTransport
+    class GZ_TRANSPORT_VISIBLE PublicationTransport
     {
       /// \brief Constructor
       /// \param[in] _topic Topic that we're publishing

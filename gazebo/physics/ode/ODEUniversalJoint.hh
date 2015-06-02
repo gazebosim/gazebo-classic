@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ namespace gazebo
   namespace physics
   {
     /// \brief A universal joint.
-    class GAZEBO_VISIBLE ODEUniversalJoint : public UniversalJoint<ODEJoint>
+    class GZ_PHYSICS_ODE_VISIBLE ODEUniversalJoint :
+      public UniversalJoint<ODEJoint>
     {
       /// \brief Constructor.
       /// \param[in] _worldId ODE world id.
@@ -82,12 +83,15 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
-                                        unsigned int _index,
-                                        const boost::any &_value);
+                                    unsigned int _index,
+                                    const boost::any &_value);
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
-                                                unsigned int _index);
+                                      unsigned int _index);
+
+      // Documentation inherited
+      public: virtual double GetParam(unsigned int _parameter) const;
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

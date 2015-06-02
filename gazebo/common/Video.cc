@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ bool Video::Load(const std::string &_filename)
   if (this->formatCtx || this->avFrame || this->codecCtx)
     this->Cleanup();
 
-  this->avFrame = avcodec_alloc_frame();
+  this->avFrame = common::AVFrameAlloc();
 
   // Open video file
   if (avformat_open_input(&this->formatCtx, _filename.c_str(), NULL, NULL) < 0)

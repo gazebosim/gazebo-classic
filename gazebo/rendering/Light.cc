@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,11 +51,19 @@ Light::Light(ScenePtr _scene)
 Light::~Light()
 {
   if (this->light)
+  {
     this->scene->GetManager()->destroyLight(this->GetName());
+  }
 
-  this->visual->DeleteDynamicLine(this->line);
-  this->scene->RemoveVisual(this->visual);
-  this->visual.reset();
+  this->scene->GetManager()->destroyEntity(
+      this->GetName() + "_selection_sphere");
+
+  if (this->visual)
+  {
+    this->visual->DeleteDynamicLine(this->line);
+    this->scene->RemoveVisual(this->visual);
+    this->visual.reset();
+  }
 
   this->sdf->Reset();
   this->sdf.reset();
@@ -68,6 +76,7 @@ void Light::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
   this->Load();
+  this->scene->AddLight(shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -206,17 +215,19 @@ void Light::CreateVisual()
 
     // Create a scene node to hold the light selection object.
     Ogre::SceneNode *visSceneNode;
-    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode(
-        this->GetName() + "_SELECTION_NODE_");
+    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode();
 
     // Make sure the unit_sphere has been inserted.
     this->visual->InsertMesh("unit_sphere");
 
+    Ogre::Entity *ent =
+        visSceneNode->getCreator()->createEntity(this->GetName() +
+        "_selection_sphere", "unit_sphere");
+
+    ent->setMaterialName("Gazebo/White");
+
     // Create the selection object.
-    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>
-      (visSceneNode->getCreator()->createEntity(this->GetName() +
-                                                "_selection_sphere",
-                                                "unit_sphere"));
+    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>(ent);
 
     // Attach the selection object to the light visual
     visSceneNode->attachObject(obj);
@@ -224,7 +235,7 @@ void Light::CreateVisual()
     // Make sure the selection object is rendered only in the selection
     // buffer.
     obj->setVisibilityFlags(GZ_VISIBILITY_SELECTION);
-    obj->setUserAny(Ogre::Any(this->GetName()));
+    obj->getUserObjectBindings().setUserAny(Ogre::Any(this->GetName()));
     obj->setCastShadows(false);
 
     // Scale the selection object to roughly match the light visual size.
@@ -600,4 +611,19 @@ void Light::FillMsg(msgs::Light &_msg) const
     _msg.set_spot_outer_angle(elem->Get<double>("outer_angle"));
     _msg.set_spot_falloff(elem->Get<double>("falloff"));
   }
+}
+
+//////////////////////////////////////////////////
+LightPtr Light::Clone(const std::string &_name, ScenePtr _scene)
+{
+  LightPtr result(new Light(_scene));
+  sdf::ElementPtr sdfCopy(new sdf::Element);
+  sdfCopy->Copy(this->sdf);
+  sdfCopy->GetAttribute("name")->Set(_name);
+  result->Load(sdfCopy);
+
+  result->SetPosition(this->GetPosition());
+  result->SetRotation(this->GetRotation());
+
+  return result;
 }

@@ -17,7 +17,8 @@
       <direction>0.0 0.2 -8.0</direction>
       <cast_shadows>true</cast_shadows>
     </light>
-    <actor name="actor1" static="true">
+    <actor name="actor1">
+      <static>true</static>
       <pose>0 0 0 0 0 0</pose>
       <skin>
         <filename>talk_a.dae</filename>
@@ -29,7 +30,8 @@
         <auto_start>true</auto_start>
       </script>
     </actor>
-    <actor name="actor2" static="true">
+    <actor name="actor2">
+      <static>true</static>
       <pose>0 0 0 0 0 0</pose>
       <skin>
         <filename>talk_b.dae</filename>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include <sys/time.h>
 #include <gtest/gtest.h>
 
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
@@ -88,6 +88,12 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  if (_physicsEngine == "simbody")
+  {
+    // default accuracy flunks this test, increase accuracy setting
+    physics->SetParam("accuracy", 0.0001);
+  }
+
   double z = 3;
   double gravityZ = physics->GetGravity().z;
   double stepSize = physics->GetMaxStepSize();
@@ -105,7 +111,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   sensors::ImuSensorPtr imuSensor =
       boost::dynamic_pointer_cast<sensors::ImuSensor>(sensor);
 
-  ASSERT_TRUE(imuSensor);
+  ASSERT_TRUE(imuSensor != NULL);
 
   sensors::SensorManager::Instance()->Init();
   imuSensor->SetActive(true);

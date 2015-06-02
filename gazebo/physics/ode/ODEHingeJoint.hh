@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A single axis hinge joint.
-    class GAZEBO_VISIBLE ODEHingeJoint : public HingeJoint<ODEJoint>
+    class GZ_PHYSICS_ODE_VISIBLE ODEHingeJoint : public HingeJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.

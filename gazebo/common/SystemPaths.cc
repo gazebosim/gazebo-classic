@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,23 @@
  *
  */
 
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#include <boost/filesystem.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
+#include <boost/filesystem.hpp>
 #include <sdf/sdf.hh>
+
+#include <sys/stat.h>
+#include <sys/types.h>
+
+// See below for Windows dirent include. cpplint complains about system
+// header order if "win_dirent.h" is in the wrong location.
+#ifndef _WIN32
+  #include <dirent.h>
+#else
+  #include "win_dirent.h"
+#endif
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -33,7 +40,6 @@
 
 using namespace gazebo;
 using namespace common;
-
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
@@ -86,7 +92,11 @@ SystemPaths::SystemPaths()
   DIR *dir = opendir(fullPath.c_str());
   if (!dir)
   {
+#ifdef _WIN32
+    mkdir(fullPath.c_str());
+#else
     mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
+#endif
   }
   else
     closedir(dir);
@@ -175,12 +185,11 @@ void SystemPaths::UpdateModelPaths()
   char *pathCStr = getenv("GAZEBO_MODEL_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
-    //  << "Set GAZEBO_RESOURCE_PATH to gazebo's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = GAZEBO_MODEL_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   /// \TODO: Use boost to split string.
   size_t pos1 = 0;
@@ -488,6 +497,13 @@ void SystemPaths::AddModelPaths(const std::string &_path)
     pos2 = _path.find(delim, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddModelPathsUpdate(const std::string &_path)
+{
+  this->AddModelPaths(_path);
+  updateModelRequest(_path);
 }
 
 /////////////////////////////////////////////////

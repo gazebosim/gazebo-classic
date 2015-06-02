@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief ODE joint interface
-    class GAZEBO_VISIBLE ODEJoint : public Joint
+    class GZ_PHYSICS_ODE_VISIBLE ODEJoint : public Joint
     {
       /// \brief internal variables used for implicit damping
       public:  enum CFMMode
@@ -81,6 +81,9 @@ namespace gazebo
       public: virtual void SetDamping(unsigned int _index, double _damping);
 
       // Documentation inherited.
+      public: virtual bool SetPosition(unsigned int _index, double _position);
+
+      // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,
                                         const double _stiffness);
 
@@ -117,6 +120,10 @@ namespace gazebo
       /// \brief Get flag indicating whether implicit spring damper is enabled.
       /// \return True if implicit spring damper is used.
       public: bool UsesImplicitSpringDamper();
+
+      /// \brief Set flag indicating whether implicit spring damper is enabled.
+      /// \param[in] _implicit True if implicit spring damper is used.
+      public: void UseImplicitSpringDamper(const bool _implicit);
 
       /// \brief simulate implicit spring and damper with CFM/ERP
       /// and meddling with Joint limits.

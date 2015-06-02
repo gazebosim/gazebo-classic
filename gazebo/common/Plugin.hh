@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,10 @@
 #ifndef _GZ_PLUGIN_HH_
 #define _GZ_PLUGIN_HH_
 
-#include <unistd.h>
+#ifndef _WIN32
+  #include <unistd.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -59,14 +62,16 @@ namespace gazebo
     /// \brief A System plugin
     SYSTEM_PLUGIN,
     /// \brief A Visual plugin
-    VISUAL_PLUGIN
+    VISUAL_PLUGIN,
+    /// \brief A GUI plugin
+    GUI_PLUGIN
   };
 
 
   /// \class PluginT Plugin.hh common/common.hh
   /// \brief A class which all plugins must inherit from
   template<class T>
-  class GAZEBO_VISIBLE PluginT
+  class GZ_COMMON_VISIBLE PluginT
   {
     /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
@@ -97,16 +102,16 @@ namespace gazebo
     /// \brief Get the short name of the handler
     public: std::string GetHandle() const
             {
-              return this->handle;
+              return this->handleName;
             }
 
     /// \brief a class method that creates a plugin from a file name.
     /// It locates the shared library and loads it dynamically.
     /// \param[in] _filename the path to the shared library.
-    /// \param[in] _handle short name of the handler
+    /// \param[in] _name short name of the plugin
     /// \return Shared Pointer to this class type
     public: static TPtr Create(const std::string &_filename,
-                const std::string &_handle)
+                const std::string &_name)
             {
               TPtr result;
               // PluginPtr result;
@@ -166,7 +171,7 @@ namespace gazebo
               result.reset(registerFunc.func());
               result->dlHandle = dlHandle;
 
-              result->handle = _handle;
+              result->handleName = _name;
               result->filename = filename;
 
               return result;
@@ -186,7 +191,7 @@ namespace gazebo
     protected: std::string filename;
 
     /// \brief Short name
-    protected: std::string handle;
+    protected: std::string handleName;
 
     /// \brief Pointer to shared library registration function definition
     private: typedef union
@@ -201,9 +206,9 @@ namespace gazebo
 
   /// \class WorldPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::World.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
-  class GAZEBO_VISIBLE WorldPlugin : public PluginT<WorldPlugin>
+  /// <a href="http://gazebosim.org/tutorials/?tut=plugins_world
+  /// &cat=write_plugin">reference</a>.
+  class GZ_COMMON_VISIBLE WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Constructor
     public: WorldPlugin()
@@ -226,9 +231,9 @@ namespace gazebo
   };
 
   /// \brief A plugin with access to physics::Model.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
-  class GAZEBO_VISIBLE ModelPlugin : public PluginT<ModelPlugin>
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_model
+  /// &cat=write_plugin">reference</a>.
+  class GZ_COMMON_VISIBLE ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Constructor
     public: ModelPlugin()
@@ -255,9 +260,9 @@ namespace gazebo
 
   /// \class SensorPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::Sensor.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
-  class GAZEBO_VISIBLE SensorPlugin : public PluginT<SensorPlugin>
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
+  /// &cat=write_plugin">reference</a>.
+  class GZ_COMMON_VISIBLE SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Constructor
     public: SensorPlugin()
@@ -283,10 +288,10 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=system_plugin
+  /// &cat=write_plugin">reference</a>
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
-  class GAZEBO_VISIBLE SystemPlugin : public PluginT<SystemPlugin>
+  class GZ_COMMON_VISIBLE SystemPlugin : public PluginT<SystemPlugin>
   {
     /// \brief Constructor
     public: SystemPlugin()
@@ -312,9 +317,9 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
-  class GAZEBO_VISIBLE VisualPlugin : public PluginT<VisualPlugin>
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
+  /// &cat=write_plugin">reference</a>.
+  class GZ_COMMON_VISIBLE VisualPlugin : public PluginT<VisualPlugin>
   {
     public: VisualPlugin()
              {this->type = VISUAL_PLUGIN;}
@@ -337,6 +342,7 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
+
   /// \}
 
 /// \brief Plugin registration function for model plugin. Part of the shared
@@ -344,8 +350,8 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::ModelPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::ModelPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::ModelPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -356,8 +362,8 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_WORLD_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::WorldPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::WorldPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::WorldPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -368,8 +374,8 @@ namespace gazebo
 /// the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::SensorPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::SensorPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::SensorPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -380,8 +386,8 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::SystemPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::SystemPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::SystemPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -392,8 +398,8 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_VISUAL_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::VisualPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_COMMON_VISIBLE gazebo::VisualPlugin *RegisterPlugin(); \
+  GZ_COMMON_VISIBLE \
   gazebo::VisualPlugin *RegisterPlugin() \
   {\
     return new classname();\

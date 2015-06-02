@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,12 @@
 #ifndef _SPHERESHAPE_HH_
 #define _SPHERESHAPE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
@@ -35,7 +41,7 @@ namespace gazebo
 
     /// \class SphereShape SphereShape.hh physics/physics.hh
     /// \brief Sphere collision shape.
-    class GAZEBO_VISIBLE SphereShape : public Shape
+    class GZ_PHYSICS_VISIBLE SphereShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
@@ -66,6 +72,9 @@ namespace gazebo
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
     };
     /// \}
   }

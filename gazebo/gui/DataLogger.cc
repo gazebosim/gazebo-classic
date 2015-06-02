@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,14 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  // For _access()
+  #include <io.h>
+#endif
 
 #include <boost/filesystem.hpp>
 #include <stdio.h>
@@ -55,7 +63,11 @@ DataLogger::DataLogger(QWidget *_parent)
   // Textual status information
   this->statusLabel = new QLabel("Ready");
   this->statusLabel->setObjectName("dataLoggerStatusLabel");
-  this->statusLabel->setFixedWidth(70);
+  this->statusLabel->setFixedWidth(80);
+
+  // Timer used to blink the status label
+  this->statusTimer = new QTimer(this);
+  connect(this->statusTimer, SIGNAL(timeout()), this, SLOT(OnBlinkStatus()));
 
   // Duration of logging
   this->timeLabel = new QLabel("00:00:00.000");
@@ -220,6 +232,12 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this, SIGNAL(SetDestinationURI(QString)),
           this, SLOT(OnSetDestinationURI(QString)), Qt::QueuedConnection);
 
+  // Timer used to hide the confirmation dialog
+  this->confirmationDialog = NULL;
+  this->confirmationTimer = new QTimer(this);
+  connect(this->confirmationTimer, SIGNAL(timeout()), this,
+      SLOT(OnConfirmationTimeout()));
+
   // Create a node from communication.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -248,7 +266,8 @@ void DataLogger::OnRecord(bool _toggle)
     // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record_stop.png"));
 
-    this->statusLabel->setText("Recording");
+    this->statusLabel->setText("Recording...");
+    this->statusTimer->start(100);
 
     // Tell the server to start data logging
     msgs::LogControl msg;
@@ -261,7 +280,32 @@ void DataLogger::OnRecord(bool _toggle)
     // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record.png"));
 
+    // Display confirmation
+    this->confirmationTimer->start(2000);
+    QLabel *confirmationLabel = new QLabel("Saved to \n" +
+        this->destPath->text());
+    confirmationLabel->setObjectName("dataLoggerConfirmationLabel");
+    QHBoxLayout *confirmationLayout = new QHBoxLayout();
+    confirmationLayout->addWidget(confirmationLabel);
+
+    if (this->confirmationDialog)
+      this->confirmationDialog->close();
+    this->confirmationDialog = new QDialog(this, Qt::FramelessWindowHint);
+    this->confirmationDialog->setObjectName("dataLoggerConfirmationDialog");
+    this->confirmationDialog->setLayout(confirmationLayout);
+    this->confirmationDialog->setStyleSheet(
+        "QDialog {background-color: #eee}\
+         QLabel {color: #111}");
+    this->confirmationDialog->setModal(false);
+    this->confirmationDialog->show();
+    this->confirmationDialog->move(this->mapToGlobal(
+        QPoint((this->width()-this->confirmationDialog->width())*0.5,
+        this->height() + 10)));
+
+    // Change the status
     this->statusLabel->setText("Ready");
+    this->statusLabel->setStyleSheet("QLabel{color: #aeaeae}");
+    this->statusTimer->stop();
 
     // Tell the server to stop data logging
     msgs::LogControl msg;
@@ -412,7 +456,13 @@ void DataLogger::OnBrowse()
 
   // Make sure the path is writable.
   // Note: This is not cross-platform compatible.
+#ifdef _WIN32
+  // Check for write-only (2) and read-write (6)
+  if ((_access(path.string().c_str(), 2) != 0) &&
+      (_access(path.string().c_str(), 6) != 0))
+#else
   if (access(path.string().c_str(), W_OK) != 0)
+#endif
   {
     QMessageBox msgBox(this);
     std::ostringstream stream;
@@ -428,4 +478,27 @@ void DataLogger::OnBrowse()
   this->pub->Publish(msg);
 
   this->SetFilename(QString::fromStdString(path.string()));
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnBlinkStatus()
+{
+  this->statusTime += 1.0/10;
+
+  if (this->statusTime >= 1)
+    this->statusTime = 0;
+
+  this->statusLabel->setStyleSheet(QString::fromStdString(
+      "QLabel{color: rgb("+
+          std::to_string(255+(128*(this->statusTime-1)))+", "+
+          std::to_string(255+(128*(this->statusTime-1)))+", "+
+          std::to_string(255+(128*(this->statusTime-1)))+
+      ")}"));
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnConfirmationTimeout()
+{
+  this->confirmationDialog->close();
+  this->confirmationTimer->stop();
 }

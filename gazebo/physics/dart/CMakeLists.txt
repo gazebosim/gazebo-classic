@@ -12,13 +12,16 @@ set (sources
     DARTHingeJoint.cc
     DARTHinge2Joint.cc
     DARTJoint.cc
+    DARTMesh.cc
     DARTMeshShape.cc
     DARTModel.cc
     DARTMultiRayShape.cc
     DARTPhysics.cc
+    DARTPolylineShape.cc
     DARTRayShape.cc
     DARTScrewJoint.cc
     DARTSliderJoint.cc
+    DARTSurfaceParams.cc
     DARTUniversalJoint.cc
 )
 
@@ -32,15 +35,18 @@ SET (headers
     DARTHinge2Joint.hh
     DARTJoint.hh
     DARTLink.hh
+    DARTMesh.hh
     DARTMeshShape.hh
     DARTModel.hh
     DARTMultiRayShape.hh
     DARTPhysics.hh
     DARTPlaneShape.hh
+    DARTPolylineShape.hh
     DARTRayShape.hh
     DARTScrewJoint.hh
     DARTSliderJoint.hh
     DARTSphereShape.hh
+    DARTSurfaceParams.hh
     DARTTypes.hh
     DARTUniversalJoint.hh
     dart_inc.h
@@ -56,6 +62,7 @@ gz_add_library(gazebo_physics_dart ${headers} ${sources})
 target_link_libraries(gazebo_physics_dart ${DARTCore_LIBRARIES})
 
 gz_install_library(gazebo_physics_dart)
+gz_install_includes("physics/dart" ${headers})
 
 # unit tests
 #set (gtest_sources

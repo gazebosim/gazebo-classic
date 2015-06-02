@@ -6,6 +6,8 @@ include_directories (
   ${PROTOBUF_INCLUDE_DIR}
 )
 
+include ( ${QT_USE_FILE} )
+
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
@@ -22,9 +24,11 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 if(HAVE_DART)
-  include_directories ( ${DART_INCLUDE_DIRS} )
-  link_directories ( ${DART_LIBRARY_DIRS} )
+  include_directories ( ${DARTCore_INCLUDE_DIRS} )
+  link_directories ( ${DARTCore_LIBRARY_DIRS} )
 endif()
+
+add_definitions(${QT_DEFINITIONS})
 
 set(tests
   aero_plugin.cc
@@ -32,7 +36,6 @@ set(tests
   concave_mesh.cc
   contact_sensor.cc
   dem.cc
-  factory.cc
   file_handling.cc
   gripper.cc
   gz_joint.cc
@@ -46,6 +49,7 @@ set(tests
   joint_gearbox.cc
   joint_revolute.cc
   joint_screw.cc
+  joint_set_position_test.cc
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
@@ -55,22 +59,41 @@ set(tests
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_basic_controller_response.cc
+  physics_collision.cc
   physics_friction.cc
+  physics_inertia_ratio.cc
   physics_link.cc
   physics_msgs.cc
+  physics_presets.cc
   physics_thread_safe.cc
   pioneer2dx.cc
+  plugin.cc
+  rest_web.cc
+  road.cc
+  sensor.cc
   server_fixture.cc
+  sim_events.cc
   speed.cc
+  speed_thread_pr2.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
   transceiver.cc
   transport.cc
   world.cc
+  world_clone.cc
   world_entity_below_point.cc
+  world_population.cc
   worlds_installed.cc
   )
+
+if (HAVE_GTS)
+  set(tests
+    ${tests}
+    polyline.cc
+  )
+endif()
 
 if (MANPAGES_SUPPORT)
   set (tests ${tests}
@@ -81,8 +104,11 @@ gz_build_tests(${tests})
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
-  set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
+  set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+
+  # Add plugin dependency
+  add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 endif()
 
 set(display_tests
@@ -94,6 +120,7 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  factory.cc
   gpu_laser.cc
   gz_camera.cc
   heightmap.cc
@@ -108,11 +135,15 @@ set(dri_tests
 
 gz_build_dri_tests(${dri_tests})
 
+set(qt_tests
+  insert_model.cc
+)
+
+gz_build_qt_tests(${qt_tests})
 
 if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
+  set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
-
-  # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
 endif()

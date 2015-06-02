@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class TransmitterVisual TransmitterVisual.hh rendering/rendering.hh
     /// \brief Visualization for the wireless propagation data.
-    class GAZEBO_VISIBLE TransmitterVisual : public Visual
+    class GZ_RENDERING_VISIBLE TransmitterVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.

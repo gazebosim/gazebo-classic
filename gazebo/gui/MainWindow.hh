@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,16 @@
 #include <vector>
 #include <list>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
+
+#ifdef HAVE_OCULUS
+#include "gazebo/gui/OculusWindow.hh"
+#endif
 
 namespace gazebo
 {
@@ -36,6 +41,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
+    class SpaceNav;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
@@ -66,11 +72,50 @@ namespace gazebo
       /// \return A pointer to the render widget.
       public: RenderWidget *GetRenderWidget() const;
 
+      /// \brief Returns the state of the simulation, true if paused.
+      /// \return True if paused, false otherwise.
+      public: bool IsPaused() const;
+
       /// \brief Play simulation.
       public slots: void Play();
 
       /// \brief Pause simulation.
       public slots: void Pause();
+
+      /// \brief Set whether the left pane is visible
+      /// \param[in] _on True to show the left pane, false to hide.
+      public: void SetLeftPaneVisibility(bool _on);
+
+      /// \brief Add a menu to the main window menu bar.
+      /// \param[in] _menu Menu to be added.
+      public: void AddMenu(QMenu *_menu);
+
+      /// \brief Show a custom menubar. If NULL is used, the default menubar
+      /// is shown.
+      /// \param[in] _bar The menubar to show. NULL will show the default
+      /// menubar.
+      public: void ShowMenuBar(QMenuBar *_bar = NULL);
+
+      /// \brief Create a new action with information from the given action,
+      /// such as text and tooltip. The new action triggers the original action
+      /// and follows its checked state. This is used for example to have the
+      /// "same" action on the main window menu and the model editor menu,
+      /// since an action can't be added to 2 different menus.
+      /// \param[in] _action Action to be cloned.
+      /// \param[in] _parent Parent for the new action.
+      /// \return The new action.
+      public: QAction *CloneAction(QAction *_action, QObject *_parent);
+
+      /// \brief Get an editor by name
+      /// \param[in] _name Name of the editor.
+      /// \return Pointer to the editor.
+      public: Editor *GetEditor(const std::string &_name) const;
+
+      /// \brief A signal to trigger loading of GUI plugins.
+      signals: void AddPlugins();
+
+      /// \brief A signal to indicate the main window is about to close.
+      signals: void Close();
 
       protected: void closeEvent(QCloseEvent *_event);
 
@@ -86,9 +131,11 @@ namespace gazebo
       /// \brief Save GUI configuration to INI file.
       private slots: void SaveINI();
 
+      /// \brief Clone a simulation.
+      private slots: void Clone();
+
       private slots: void About();
       private slots: void Step();
-      private slots: void NewModel();
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -99,6 +146,13 @@ namespace gazebo
 
       /// \brief Qt callback when the scale mode is triggered.
       private slots: void Scale();
+
+      /// \brief Qt callback when the main align action is triggered. Currently
+      /// just resets the child align actions.
+      private slots: void Align();
+
+      /// \brief Qt callback when the snap mode is triggered.
+      private slots: void Snap();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
@@ -112,22 +166,43 @@ namespace gazebo
       private slots: void CaptureScreenshot();
 
       private slots: void InsertModel();
+
+      /// \brief Qt callback when the show grid action is triggered.
       private slots: void ShowGrid();
+
+      /// \brief Qt callback when the show collisions action is triggered.
       private slots: void ShowCollisions();
+
+      /// \brief Qt callback when the show joints action is triggered.
       private slots: void ShowJoints();
+
+      /// \brief Qt callback when the show contacts action is triggered.
       private slots: void ShowContacts();
+
+      /// \brief Qt callback when the show center of mass action is triggered.
       private slots: void ShowCOM();
+
+      /// \brief Qt callback when the show inertia action is triggered.
+      private slots: void ShowInertia();
+
       private slots: void Reset();
+
+      /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
+
+      /// \brief Qt callback when the show toolbars action is triggered.
+      private slots: void ShowToolbars();
+
       private slots: void FPS();
       private slots: void Orbit();
+      private slots: void ViewOculus();
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
       private slots: void SetWireframe();
 
-      /// \brief Qt call back when the play action state changes
-      private slots: void OnPlayActionChanged();
+      /// \brief Qt callback when the show GUI overlays action is triggered.
+      private slots: void ShowGUIOverlays();
 
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
@@ -138,29 +213,37 @@ namespace gazebo
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
 
+      /// \brief Callback for adding plugins.
+      private slots: void OnAddPlugins();
+
+      /// \brief Qt call back when one of the editor actions is triggered.
+      /// \param[in] _action Action in the group which was triggered.
+      private slots: void OnEditorGroup(QAction *_action);
+
+      /// \brief Toggle full screen display.
+      /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
+
+      /// \brief Toggle toolbars display.
+      /// \param[in] _value True to display toolbars.
+      private: void OnShowToolbars(bool _value);
+
       private: void OnMoveMode(bool _mode);
 
       /// \brief Create most of the actions.
       private: void CreateActions();
 
+      /// \brief Delete the actions created in CreateActions.
+      private: void DeleteActions();
+
       /// \brief Create menus.
       private: void CreateMenus();
-
-      /// \brief Create the toolbars.
-      private: void CreateToolbars();
 
       /// \brief Create the main menu bar.
       private: void CreateMenuBar();
 
       /// \brief Create all the editors.
       private: void CreateEditors();
-
-      /// \brief Show a custom menubar. If NULL is used, the default menubar
-      /// is shown.
-      /// \param[in] _bar The menubar to show. NULL will show the default
-      /// menubar.
-      public: void ShowMenuBar(QMenuBar *_bar = NULL);
 
       private: void OnModel(ConstModelPtr &_msg);
 
@@ -173,7 +256,6 @@ namespace gazebo
       private: void OnManipMode(const std::string &_mode);
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
-      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       /// \brief Handle event for changing the manual step size.
       /// \param[in] _value New input step size.
@@ -199,7 +281,6 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
       private: transport::PublisherPtr serverControlPub;
-      private: transport::PublisherPtr selectionPub;
       private: transport::PublisherPtr requestPub;
       private: transport::PublisherPtr scenePub;
       private: transport::SubscriberPtr responseSub;
@@ -245,8 +326,27 @@ namespace gazebo
       /// \brief User specified step size for manually stepping the world
       private: int inputStepSize;
 
-      /// \brief List of all the editors.
-      private: std::list<Editor*> editors;
+      /// \brief Map of all the editors to their names.
+      private: std::map<std::string, Editor *> editors;
+
+      /// \brief List of all the align action groups.
+      private: std::vector<QActionGroup *> alignActionGroups;
+
+      /// \brief Space navigator interface.
+      private: SpaceNav *spacenav;
+
+#ifdef HAVE_OCULUS
+      private: gui::OculusWindow *oculusWindow;
+#endif
+
+      /// \brief Buffer of plugin messages to process.
+      private: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
+
+      /// \brief Mutext to protect plugin loading.
+      private: boost::mutex pluginLoadMutex;
+
+      /// \brief Splitter for the main window.
+      private: QSplitter *splitter;
     };
   }
 }

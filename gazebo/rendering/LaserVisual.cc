@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Laser Visualization Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
@@ -61,8 +63,12 @@ LaserVisual::~LaserVisual()
   {
     this->DeleteDynamicLine(dPtr->rayFans[i]);
     dPtr->rayFans[i] = NULL;
+
+    this->DeleteDynamicLine(dPtr->noHitRayFans[i]);
+    dPtr->noHitRayFans[i] = NULL;
   }
   dPtr->rayFans.clear();
+  dPtr->noHitRayFans.clear();
 }
 
 /////////////////////////////////////////////////
@@ -100,7 +106,9 @@ void LaserVisual::Update()
   double angle = dPtr->laserMsg->scan().angle_min();
   double verticalAngle = dPtr->laserMsg->scan().vertical_angle_min();
   double r;
+  double noHitRange;
   math::Vector3 pt;
+  math::Vector3 noHitPt;
   math::Pose offset = msgs::Convert(dPtr->laserMsg->scan().world_pose()) -
                       this->GetWorldPose();
 
@@ -117,9 +125,17 @@ void LaserVisual::Update()
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
       dPtr->rayFans[j]->setMaterial("Gazebo/BlueLaser");
       dPtr->rayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+
+      // No hit ray fans display rays that do not hit obstacles.
+      dPtr->noHitRayFans.push_back(
+          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
+      dPtr->noHitRayFans[j]->setMaterial("Gazebo/LightBlueLaser");
+      dPtr->noHitRayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
     dPtr->rayFans[j]->SetPoint(0, offset.pos);
+    dPtr->noHitRayFans[j]->SetPoint(0, offset.pos);
 
     angle = dPtr->laserMsg->scan().angle_min();
     unsigned int count = dPtr->laserMsg->scan().count();
@@ -130,10 +146,19 @@ void LaserVisual::Update()
       axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
       pt = (axis * r) + offset.pos;
 
+      noHitRange = std::isinf(r) ? dPtr->laserMsg->scan().range_max() : 0;
+      noHitPt = (axis * noHitRange) + offset.pos;
+
       if (i+1 >= dPtr->rayFans[j]->GetPointCount())
+      {
         dPtr->rayFans[j]->AddPoint(pt);
+        dPtr->noHitRayFans[j]->AddPoint(noHitPt);
+      }
       else
+      {
         dPtr->rayFans[j]->SetPoint(i+1, pt);
+        dPtr->noHitRayFans[j]->SetPoint(i+1, noHitPt);
+      }
 
       angle += dPtr->laserMsg->scan().angle_step();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh shape
- * Author: Nate Koenig
- * Date: 16 Oct 2009
- */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/thread/recursive_mutex.hpp>
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/MeshManager.hh"
@@ -76,18 +79,26 @@ void MeshShape::Init()
   if (this->sdf->HasElement("submesh"))
   {
     sdf::ElementPtr submeshElem = this->sdf->GetElement("submesh");
-    this->submesh = new common::SubMesh(
-      this->mesh->GetSubMesh(submeshElem->Get<std::string>("name")));
-
-    if (!this->submesh)
-      gzthrow("Unable to get submesh with name[" +
-          submeshElem->Get<std::string>("name") + "]");
-
-    // Center the submesh if specified in SDF.
-    if (submeshElem->HasElement("center") &&
-        submeshElem->Get<bool>("center"))
+    std::string submeshName = submeshElem->Get<std::string>("name");
+    if (submeshName != "__default__" && !submeshName.empty())
     {
-      this->submesh->Center();
+      const common::SubMesh *smesh = this->mesh->GetSubMesh(submeshName);
+      if (smesh)
+      {
+        this->submesh = new common::SubMesh(
+          this->mesh->GetSubMesh(submeshName));
+
+        if (!this->submesh)
+          gzthrow("Unable to get submesh with name[" +
+              submeshElem->Get<std::string>("name") + "]");
+
+        // Center the submesh if specified in SDF.
+        if (submeshElem->HasElement("center") &&
+            submeshElem->Get<bool>("center"))
+        {
+          this->submesh->Center();
+        }
+      }
     }
   }
 }

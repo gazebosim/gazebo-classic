@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,15 +30,16 @@ namespace gazebo
 
     /// \class Box Box.hh math/gzmath.hh
     /// \brief Mathematical representation of a box and related functions.
-    class GAZEBO_VISIBLE Box
+    class GZ_MATH_VISIBLE Box
     {
       /// \brief Default constructor
       public: Box();
 
-      /// \brief Constructor
-      /// \param[in] _min Minimum corner of the box
-      /// \param[in] _max Maximum corner of the box
-      public: Box(const Vector3 &_min, const Vector3 &_max);
+      /// \brief Constructor. This constructor will compute the box's
+      /// minumum and maximum corners based on the two arguments.
+      /// \param[in] _vec1 One corner of the box
+      /// \param[in] _vec2 Another corner of the box
+      public: Box(const Vector3 &_vec1, const Vector3 &_vec2);
 
       /// \brief Copy Constructor
       /// \param[in]  _b Box to copy
@@ -95,6 +96,11 @@ namespace gazebo
       /// \param _v The vector to use during subtraction
       /// \return The new box
       public: Box operator-(const Vector3 &_v);
+
+      /// \brief Check if a point lies inside or on the box.
+      /// \param[in] _p Point to check.
+      /// \return True if the point is inside or on the box.
+      public: bool Contains(const math::Vector3 &_p) const;
 
       /// \brief Output operator
       /// \param[in] _out Output stream

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,12 @@ namespace gazebo
       /// state.
       private slots: void OnToggleSettings(bool _checked);
 
+      /// \brief QT callback for blinking the status message.
+      private slots: void OnBlinkStatus();
+
+      /// \brief QT callback for timing out the confirmation message.
+      private slots: void OnConfirmationTimeout();
+
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
       private: void OnStatus(ConstLogStatusPtr &_msg);
@@ -119,6 +125,12 @@ namespace gazebo
       /// \brief Label to display status information.
       private: QLabel *statusLabel;
 
+      /// \brief Timer used to blink the status label.
+      private: QTimer *statusTimer;
+
+      /// \brief Keep track of the time the status label blinks.
+      private: double statusTime;
+
       /// \brief Name of the log file path
       private: QLineEdit *filenameEdit;
 
@@ -130,6 +142,12 @@ namespace gazebo
 
       // private: QListWidget *logList;
       private: QTextBrowser *logList;
+
+      /// \brief Dialog that displays confirmation after saving.
+      private: QDialog *confirmationDialog;
+
+      /// \brief Timer used to timeout confirmation dialog.
+      private: QTimer *confirmationTimer;
     };
     /// \}
   }

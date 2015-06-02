@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index)
   : QGraphicsItem(_parent)
 {
   this->index = _index;
-  this-> mouseDownX = 0;
-  this-> mouseDownY = 0;
+  this->mouseDownX = 0;
+  this->mouseDownY = 0;
   this->borderColor = Qt::black;
   this->width = 8;
   this->height = 8;
   this->widthGrabBuffer = 10;
   this->heightGrabBuffer = 10;
-  this-> mouseButtonState = QEvent::GraphicsSceneMouseRelease;
+  this->mouseButtonState = QEvent::GraphicsSceneMouseRelease;
   this->setParentItem(_parent);
 
   this->setZValue(_parent->zValue() + 1);

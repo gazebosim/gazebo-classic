@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ void DARTHinge2Joint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTHinge2Joint::GetAnchor(unsigned int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
@@ -98,7 +98,7 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
 
   if (_index == 0)
   {
-    Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                           this->dtJoint->getLocalTransform().inverse() *
                           this->dtJoint->getTransformFromParentBodyNode();
     Eigen::Vector3d axis = this->dtUniveralJoint->getAxis1();
@@ -107,7 +107,7 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
   }
   else if (_index == 1)
   {
-    Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                           this->dtJoint->getTransformFromChildBodyNode();
     Eigen::Vector3d axis = this->dtUniveralJoint->getAxis2();
 
@@ -131,12 +131,12 @@ math::Angle DARTHinge2Joint::GetAngleImpl(unsigned int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
+    double radianAngle = this->dtJoint->getPosition(0);
     result.SetFromRadian(radianAngle);
   }
   else if (_index == 1)
   {
-    double radianAngle = this->dtJoint->getGenCoord(1)->get_q();
+    double radianAngle = this->dtJoint->getPosition(1);
     result.SetFromRadian(radianAngle);
   }
   else
@@ -153,9 +153,9 @@ double DARTHinge2Joint::GetVelocity(unsigned int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_dq();
+    result = this->dtJoint->getVelocity(0);
   else if (_index == 1)
-    result = this->dtJoint->getGenCoord(1)->get_dq();
+    result = this->dtJoint->getVelocity(1);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -166,9 +166,9 @@ double DARTHinge2Joint::GetVelocity(unsigned int _index) const
 void DARTHinge2Joint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_dq(_vel);
+    this->dtJoint->setVelocity(0, _vel);
   else if (_index == 1)
-    this->dtJoint->getGenCoord(1)->set_dq(_vel);
+    this->dtJoint->setVelocity(1, _vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -179,11 +179,21 @@ double DARTHinge2Joint::GetMaxForce(unsigned int _index)
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_tauMax();
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(0);
+    result = this->dtJoint->getForceUpperLimit(0);
+  }
   else if (_index == 1)
-    result = this->dtJoint->getGenCoord(1)->get_tauMax();
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(1);
+    result = this->dtJoint->getForceUpperLimit(1);
+  }
   else
+  {
     gzerr << "Invalid index[" << _index << "]\n";
+  }
 
   return result;
 }
@@ -192,20 +202,28 @@ double DARTHinge2Joint::GetMaxForce(unsigned int _index)
 void DARTHinge2Joint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tauMax(_force);
+  {
+    this->dtJoint->setForceLowerLimit(0, -_force);
+    this->dtJoint->setForceUpperLimit(0, _force);
+  }
   else if (_index == 1)
-    this->dtJoint->getGenCoord(1)->set_tauMax(_force);
+  {
+    this->dtJoint->setForceLowerLimit(1, -_force);
+    this->dtJoint->setForceUpperLimit(1, _force);
+  }
   else
+  {
     gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
 void DARTHinge2Joint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tau(_effort);
+    this->dtJoint->setForce(0, _effort);
   else if (_index == 1)
-    this->dtJoint->getGenCoord(1)->set_tau(_effort);
+    this->dtJoint->setForce(1, _effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

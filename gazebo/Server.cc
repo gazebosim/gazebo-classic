@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,19 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  #define snprintf _snprintf
+#endif
+
 #include <stdio.h>
 #include <signal.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -33,10 +42,13 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
@@ -52,6 +64,8 @@ bool Server::stop = true;
 Server::Server()
 {
   this->initialized = false;
+  this->systemPluginsArgc = 0;
+  this->systemPluginsArgv = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -97,13 +111,13 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Compression encoding format for log data (zlib|bz2|txt).")
     ("record_path", po::value<std::string>()->default_value(""),
      "Absolute path in which to store state data")
-    ("seed",  po::value<double>(),
-     "Start with a given random number seed.")
-    ("iters",  po::value<unsigned int>(),
-     "Number of iterations to simulate.")
+    ("seed",  po::value<double>(), "Start with a given random number seed.")
+    ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
-     "Load a plugin.");
+     "Load a plugin.")
+    ("profile,o", po::value<std::string>(),
+     "Physics preset profile name from the options in the world file.");
 
   po::options_description hiddenDesc("Hidden options");
   hiddenDesc.add_options()
@@ -233,7 +247,11 @@ bool Server::ParseArgs(int _argc, char **_argv)
       << "  Gazebo Version: "
       << util::LogPlay::Instance()->GetGazeboVersion() << "\n"
       << "  Random Seed: "
-      << util::LogPlay::Instance()->GetRandSeed() << "\n";
+      << util::LogPlay::Instance()->GetRandSeed() << "\n"
+      << "  Log Start Time: "
+      << util::LogPlay::Instance()->GetLogStartTime() << "\n"
+      << "  Log End Time: "
+      << util::LogPlay::Instance()->GetLogEndTime() << "\n";
 
     // Get the SDF world description from the log file
     std::string sdfString;
@@ -260,6 +278,22 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // Load the server
     if (!this->LoadFile(configFilename, physics))
       return false;
+
+    if (this->vm.count("profile"))
+    {
+      std::string profileName = this->vm["profile"].as<std::string>();
+      if (physics::get_world()->GetPresetManager()->HasProfile(profileName))
+      {
+        physics::get_world()->GetPresetManager()->CurrentProfile(profileName);
+        gzmsg << "Setting physics profile to [" << profileName << "]."
+              << std::endl;
+      }
+      else
+      {
+        gzerr << "Specified profile [" << profileName << "] was not found."
+              << std::endl;
+      }
+    }
   }
 
   this->ProcessParams();
@@ -300,7 +334,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  return this->LoadImpl(sdf->root, _physics);
+  return this->LoadImpl(sdf->Root(), _physics);
 }
 
 /////////////////////////////////////////////////
@@ -320,7 +354,7 @@ bool Server::LoadString(const std::string &_sdfString)
     return false;
   }
 
-  return this->LoadImpl(sdf->root);
+  return this->LoadImpl(sdf->Root());
 }
 
 /////////////////////////////////////////////////
@@ -429,12 +463,14 @@ void Server::Fini()
 /////////////////////////////////////////////////
 void Server::Run()
 {
+#ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
   sigact.sa_handler = Server::SigInt;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+#endif
 
   if (this->stop)
     return;
@@ -539,7 +575,84 @@ void Server::ProcessControlMsgs()
   for (iter = this->controlMsgs.begin();
        iter != this->controlMsgs.end(); ++iter)
   {
-    if ((*iter).has_save_world_name())
+    if ((*iter).has_clone() && (*iter).clone())
+    {
+      bool success = true;
+      std::string host;
+      std::string port;
+      physics::WorldPtr world;
+
+      // Get the world's name to be cloned.
+      std::string worldName = "";
+      if ((*iter).has_save_world_name())
+        worldName = (*iter).save_world_name();
+
+      // Get the world pointer.
+      try
+      {
+        world = physics::get_world(worldName);
+      }
+      catch(const common::Exception &)
+      {
+        gzwarn << "Unable to clone a server. Unknown world ["
+               << (*iter).save_world_name() << "]" << std::endl;
+        success = false;
+      }
+
+      // Check if the message contains a port for the new server.
+      if ((*iter).has_new_port())
+        port = boost::lexical_cast<std::string>((*iter).new_port());
+      else
+      {
+        gzwarn << "Unable to clone a server. Port is missing" << std::endl;
+        success = false;
+      }
+
+      if (success)
+      {
+        // world should not be NULL at this point.
+        GZ_ASSERT(world, "NULL world pointer");
+
+        // Save the world's state in a temporary file (clone.<PORT>.world).
+        boost::filesystem::path tmpDir =
+            boost::filesystem::temp_directory_path();
+        boost::filesystem::path worldFilename = "clone." + port + ".world";
+        boost::filesystem::path worldPath = tmpDir / worldFilename;
+        world->Save(worldPath.string());
+
+        // Get the hostname from the current server's master.
+        unsigned int unused;
+        transport::get_master_uri(host, unused);
+
+        // Command to be executed for cloning the server. The new server will
+        // load the world file /tmp/clone.<PORT>.world
+        std::string cmd = "GAZEBO_MASTER_URI=http://" + host + ":" + port +
+            " gzserver " + worldPath.string() + " &";
+
+        // Spawn a new gzserver process and load the saved world.
+        if (std::system(cmd.c_str()) == 0)
+        {
+          gzlog << "Cloning world [" << worldName << "]. "
+                << "Connect to the server by typing:\n\tGAZEBO_MASTER_URI="
+                << "http://" << host << ":" << port << " gzclient" << std::endl;
+        }
+        else
+        {
+          gzerr << "Unable to clone a simulation running the following command:"
+                << std::endl << "\t[" << cmd << "]" << std::endl;
+          success = false;
+        }
+      }
+
+      // Notify the result.
+      msgs::WorldModify worldMsg;
+      worldMsg.set_world_name(worldName);
+      worldMsg.set_cloned(success);
+      if (success)
+        worldMsg.set_cloned_uri("http://" + host + ":" + port);
+      this->worldModPub->Publish(worldMsg);
+    }
+    else if ((*iter).has_save_world_name())
     {
       physics::WorldPtr world = physics::get_world((*iter).save_world_name());
       if ((*iter).has_save_filename())
@@ -595,7 +708,7 @@ bool Server::OpenWorld(const std::string & /*_filename*/)
 
   gazebo::transport::clear_buffers();
 
-  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
+  sdf::ElementPtr worldElem = sdf->Root()->GetElement("world");
 
   physics::WorldPtr world = physics::create_world();
 

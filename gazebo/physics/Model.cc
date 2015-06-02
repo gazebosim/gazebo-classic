@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -67,10 +73,20 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
-  this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
-      boost::bind(&Entity::IsStatic, this));
+  if (this->sdf->HasElement("static"))
+  {
+    this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
+        boost::bind(&Entity::IsStatic, this));
+  }
 
-  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+  if (this->sdf->HasElement("self_collide"))
+  {
+    this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  }
+
+  if (this->sdf->HasElement("allow_auto_disable"))
+    this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -318,9 +334,9 @@ void Model::Fini()
 {
   Entity::Fini();
 
+  this->plugins.clear();
   this->attachedModels.clear();
   this->joints.clear();
-  this->plugins.clear();
   this->links.clear();
   this->canonicalLink.reset();
 }
@@ -367,23 +383,31 @@ void Model::Reset()
 {
   Entity::Reset();
 
-  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Reset();
-  }
-
-  // reset link velocities when resetting model
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
-  {
-    (*liter)->ResetPhysicsStates();
-  }
+  this->ResetPhysicsStates();
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
+  }
+
+  // Reset plugins after links and joints,
+  // so that plugins can restore initial conditions
+  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Reset();
+  }
+}
+
+//////////////////////////////////////////////////
+void Model::ResetPhysicsStates()
+{
+  // reset link velocities when resetting model
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
+  {
+    (*liter)->ResetPhysicsStates();
   }
 }
 
@@ -728,8 +752,27 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string pluginName = _sdf->Get<std::string>("name");
   std::string filename = _sdf->Get<std::string>("filename");
-  gazebo::ModelPluginPtr plugin =
-    gazebo::ModelPlugin::Create(filename, pluginName);
+
+  gazebo::ModelPluginPtr plugin;
+
+  try
+  {
+    plugin = gazebo::ModelPlugin::Create(filename, pluginName);
+  }
+  catch(...)
+  {
+    gzerr << "Exception occured in the constructor of plugin with name["
+      << pluginName << "] and filename[" << filename << "]. "
+      << "This plugin will not run.\n";
+
+    // Log the message. gzerr has problems with this in 1.9. Remove the
+    // gzlog command in gazebo2.
+    gzlog << "Exception occured in the constructor of plugin with name["
+      << pluginName << "] and filename[" << filename << "]. "
+      << "This plugin will not run." << std::endl;
+    return;
+  }
+
   if (plugin)
   {
     if (plugin->GetType() != MODEL_PLUGIN)
@@ -742,8 +785,43 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
     }
 
     ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
-    plugin->Load(myself, _sdf);
-    plugin->Init();
+
+    try
+    {
+      plugin->Load(myself, _sdf);
+    }
+    catch(...)
+    {
+      gzerr << "Exception occured in the Load function of plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run.\n";
+
+      // Log the message. gzerr has problems with this in 1.9. Remove the
+      // gzlog command in gazebo2.
+      gzlog << "Exception occured in the Load function of plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run." << std::endl;
+      return;
+    }
+
+    try
+    {
+      plugin->Init();
+    }
+    catch(...)
+    {
+      gzerr << "Exception occured in the Init function of plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run\n";
+
+      // Log the message. gzerr has problems with this in 1.9. Remove the
+      // gzlog command in gazebo2.
+      gzlog << "Exception occured in the Init function of plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run." << std::endl;
+      return;
+    }
+
     this->plugins.push_back(plugin);
   }
 }
@@ -792,6 +870,7 @@ void Model::FillMsg(msgs::Model &_msg)
 {
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
+  _msg.set_self_collide(this->GetSelfCollide());
   msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
   _msg.set_id(this->GetId());
   msgs::Set(_msg.mutable_scale(), this->scale);
@@ -1005,6 +1084,18 @@ void Model::SetAutoDisable(bool _auto)
 bool Model::GetAutoDisable() const
 {
   return this->sdf->Get<bool>("allow_auto_disable");
+}
+
+/////////////////////////////////////////////////
+void Model::SetSelfCollide(bool _self_collide)
+{
+  this->sdf->GetElement("self_collide")->Set(_self_collide);
+}
+
+/////////////////////////////////////////////////
+bool Model::GetSelfCollide() const
+{
+  return this->sdf->Get<bool>("self_collide");
 }
 
 /////////////////////////////////////////////////

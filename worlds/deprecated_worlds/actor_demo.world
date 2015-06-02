@@ -30,7 +30,8 @@
         </visual>
       </link>
     </model>
-    <actor name="actor1" static="true">
+    <actor name="actor1">
+      <static>true</static>
       <origin pose="0 0 0 0 0 0" />
       <skin filename="walk.dae" scale="1.0" />
       <!-- resource files -->

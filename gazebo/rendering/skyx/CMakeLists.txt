@@ -47,9 +47,6 @@ set (VCLOUDS_SOURCE_FILES
   src/VClouds/VClouds.cpp
 )
 
-set (CMAKE_C_FLAGS "")
-set (CMAKE_CXX_FLAGS "")
-
 #set_source_files_properties(${SKYX_SOURCE_FILES} ${SKYX_HEADER_FILES}
 #                      ${VCLOUDS_SOURCE_FILES} ${VCLOUDS_HEADER_FILES}
 #                      PROPERTIES COMPILE_FLAGS
@@ -57,6 +54,8 @@ set (CMAKE_CXX_FLAGS "")
 #
 # Add include directory
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSKYX_LIB")
 
 gz_add_library(gazebo_skyx ${SKYX_SOURCE_FILES} ${VCLOUDS_SOURCE_FILES})
 target_link_libraries(gazebo_skyx ${OGRE_LIBRARIES})

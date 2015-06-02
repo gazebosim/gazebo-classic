@@ -42,17 +42,29 @@ if (NOT PROTOBUF_PROTOC_LIBRARY)
   BUILD_ERROR ("Missing: Google Protobuf Compiler Library (libprotoc-dev)")
 endif()
 
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  set (GZ_PROTOBUF_LIBRARY ${PROTOBUF_LIBRARY_DEBUG})
+  set (GZ_PROTOBUF_PROTOC_LIBRARY ${PROTOBUF_PROTOC_LIBRARY_DEBUG})
+else()
+  set (GZ_PROTOBUF_LIBRARY ${PROTOBUF_LIBRARY})
+  set (GZ_PROTOBUF_PROTOC_LIBRARY ${PROTOBUF_PROTOC_LIBRARY})
+endif()
+
 ########################################
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")
 else ()
- APPEND_TO_CACHED_LIST(gazeboserver_include_dirs
-                       ${gazeboserver_include_dirs_desc}
-                       ${OPENGL_INCLUDE_DIR})
- APPEND_TO_CACHED_LIST(gazeboserver_link_libs
-                       ${gazeboserver_link_libs_desc}
-                       ${OPENGL_LIBRARIES})
+ if (OPENGL_INCLUDE_DIR)
+   APPEND_TO_CACHED_LIST(gazeboserver_include_dirs
+                         ${gazeboserver_include_dirs_desc}
+                         ${OPENGL_INCLUDE_DIR})
+ endif()
+ if (OPENGL_LIBRARIES)
+   APPEND_TO_CACHED_LIST(gazeboserver_link_libs
+                         ${gazeboserver_link_libs_desc}
+                         ${OPENGL_LIBRARIES})
+ endif()
 endif ()
 
 ########################################
@@ -65,14 +77,24 @@ else ()
 endif ()
 
 ########################################
+include (FindHDF5)
+find_package(HDF5)
+
+if (NOT HDF5_FOUND)
+  BUILD_WARNING("HDF5 not found")
+else ()
+  message(STATUS "HDF5 Found")
+endif ()
+########################################
 # Find packages
+
+# In Visual Studio we use configure.bat to trick all path cmake 
+# variables so let's consider that as a replacement for pkgconfig
+if (MSVC)
+  set (PKG_CONFIG_FOUND TRUE)
+endif()
+
 if (PKG_CONFIG_FOUND)
-
-  pkg_check_modules(SDF sdformat>=2.0.0)
-  if (NOT SDF_FOUND)
-    BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
-  endif()
-
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -106,29 +128,12 @@ if (PKG_CONFIG_FOUND)
     endif()
   endif ()
 
-  pkg_check_modules(CEGUI CEGUI)
-  pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
-  if (NOT CEGUI_FOUND)
-    BUILD_WARNING ("CEGUI not found, opengl GUI will be disabled.")
-    set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
-  else()
-    message (STATUS "Looking for CEGUI, found")
-    if (NOT CEGUI_OGRE_FOUND)
-      BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
-      set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
-    else()
-      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI")
-      set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
-      message (STATUS "Looking for CEGUI-OGRE, found")
-    endif()
-  endif()
-
   #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
-  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 
+  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
-  if (SIMBODY_FOUND)
+  if (Simbody_FOUND)
     set (HAVE_SIMBODY TRUE)
   else()
     BUILD_WARNING ("Simbody not found, for simbody physics engine option, please install libsimbody-dev.")
@@ -137,61 +142,88 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore QUIET)
+  find_package(DARTCore 4.3.3 QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - found")
     set (HAVE_DART TRUE)
   else()
     message (STATUS "Looking for DARTCore - not found")
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core3.")
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core4-dev.")
     set (HAVE_DART FALSE)
   endif()
 
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
-  # Use pkg_check_modules and fallback to manual detection (needed, at least, for MacOS)
-  pkg_check_modules(tinyxml tinyxml)
-  if (NOT tinyxml_FOUND)
-      find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
-      find_library(tinyxml_LIBRARIES NAMES tinyxml)
-      set (tinyxml_FAIL False) 
-      if (NOT tinyxml_INCLUDE_DIRS)
-        message (STATUS "Looking for tinyxml headers - not found")
-        set (tinyxml_FAIL True) 
-      endif()
-      if (NOT tinyxml_LIBRARIES)
-        message (STATUS "Looking for tinyxml library - not found")
-        set (tinyxml_FAIL True) 
-      endif()
-  endif()
-        
-  if (tinyxml_FAIL)
-    message (STATUS "Looking for tinyxml.h - not found")
-    BUILD_ERROR("Missing: tinyxml")
+  # Use pkg_check_modules and fallback to manual detection
+  # (needed, at least, for MacOS)
+
+  # Use system installation on UNIX and Apple, and internal copy on Windows
+  if (UNIX OR APPLE)
+    message (STATUS "Using system tinyxml.")
+    set (USE_EXTERNAL_TINYXML True)
+  elseif(WIN32)
+    message (STATUS "Using internal tinyxml.")
+    set (USE_EXTERNAL_TINYXML False)
+    add_definitions(-DTIXML_USE_STL)
+  else()
+    message (STATUS "Unknown platform, unable to configure tinyxml.")
+    BUILD_ERROR("Unknown platform")
   endif()
 
-  #################################################
-  # Find libtar.
-  find_path (libtar_INCLUDE_DIRS libtar.h)
-  find_library(libtar_LIBRARIES tar)
-  set (LIBTAR_FOUND True)
+  if (USE_EXTERNAL_TINYXML)
+    pkg_check_modules(tinyxml tinyxml)
+    if (NOT tinyxml_FOUND)
+        find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
+        find_library(tinyxml_LIBRARIES NAMES tinyxml)
+        set (tinyxml_FAIL False)
+        if (NOT tinyxml_INCLUDE_DIRS)
+          message (STATUS "Looking for tinyxml headers - not found")
+          set (tinyxml_FAIL True)
+        endif()
+        if (NOT tinyxml_LIBRARIES)
+          message (STATUS "Looking for tinyxml library - not found")
+          set (tinyxml_FAIL True)
+        endif()
+    endif()
 
-  if (NOT libtar_INCLUDE_DIRS)
-    message (STATUS "Looking for libtar.h - not found")
-    set (LIBTAR_FOUND False)
-  else ()
-    message (STATUS "Looking for libtar.h - found")
-    include_directories(${libtar_INCLUDE_DIRS})
-  endif ()
-  if (NOT libtar_LIBRARIES)
-    message (STATUS "Looking for libtar.so - not found")
-    set (LIBTAR_FOUND False)
-  else ()
-    message (STATUS "Looking for libtar.so - found")
-  endif ()
+    if (tinyxml_FAIL)
+      message (STATUS "Looking for tinyxml.h - not found")
+      BUILD_ERROR("Missing: tinyxml")
+    endif()
+  else()
+    # Needed in WIN32 since in UNIX the flag is added in the code installed
+    message (STATUS "Skipping search for tinyxml")
+    set (tinyxml_INCLUDE_DIRS "")
+    set (tinyxml_LIBRARIES "")
+    set (tinyxml_LIBRARY_DIRS "")
+  endif()
 
-  if (NOT LIBTAR_FOUND)
-     BUILD_ERROR("Missing: libtar")
+  if (NOT WIN32)
+    #################################################
+    # Find libtar.
+    find_path (libtar_INCLUDE_DIRS libtar.h)
+    find_library(libtar_LIBRARIES tar)
+    set (LIBTAR_FOUND True)
+
+    if (NOT libtar_INCLUDE_DIRS)
+      message (STATUS "Looking for libtar.h - not found")
+      set (LIBTAR_FOUND False)
+    else ()
+      message (STATUS "Looking for libtar.h - found")
+      include_directories(${libtar_INCLUDE_DIRS})
+    endif ()
+    if (NOT libtar_LIBRARIES)
+      message (STATUS "Looking for libtar.so - not found")
+      set (LIBTAR_FOUND False)
+    else ()
+      message (STATUS "Looking for libtar.so - found")
+    endif ()
+
+    if (NOT LIBTAR_FOUND)
+       BUILD_ERROR("Missing: libtar")
+    endif()
+  else()
+    set(libtar_LIBRARIES "")
   endif()
 
   #################################################
@@ -211,9 +243,23 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find OGRE
-  execute_process(COMMAND pkg-config --modversion OGRE
-                  OUTPUT_VARIABLE OGRE_VERSION)
-  string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
+  # On Windows, we assume that all the OGRE* defines are passed in manually
+  # to CMake.
+  if (NOT WIN32)
+    execute_process(COMMAND pkg-config --modversion OGRE
+                    OUTPUT_VARIABLE OGRE_VERSION)
+    string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
+
+    string (REGEX REPLACE "^([0-9]+).*" "\\1"
+      OGRE_MAJOR_VERSION "${OGRE_VERSION}")
+    string (REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1"
+      OGRE_MINOR_VERSION "${OGRE_VERSION}")
+    string (REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1"
+      OGRE_PATCH_VERSION ${OGRE_VERSION})
+
+    set(OGRE_VERSION
+      ${OGRE_MAJOR_VERSION}.${OGRE_MINOR_VERSION}.${OGRE_PATCH_VERSION})
+  endif()
 
   pkg_check_modules(OGRE-RTShaderSystem
                     OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
@@ -231,13 +277,10 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  # There are some runtime problems to solve with ogre-1.9. 
-  # Please read gazebo issues: 994, 995, 996
-  pkg_check_modules(MAX_VALID_OGRE OGRE<=1.8.9)
+  # There are some runtime problems to solve with ogre-1.9.
+  # Please read gazebo issues: 994, 995
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
-  elseif (NOT MAX_VALID_OGRE_FOUND)
-    BUILD_ERROR("Bad Ogre3d version: gazebo using ${OGRE_VERSION} ogre version has known bugs in runtime (issue #996). Please use 1.7 or 1.8 series")
   else ()
     set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
@@ -270,14 +313,18 @@ if (PKG_CONFIG_FOUND)
 
   # Also find OGRE's plugin directory, which is provided in its .pc file as the
   # `plugindir` variable.  We have to call pkg-config manually to get it.
-  execute_process(COMMAND pkg-config --variable=plugindir OGRE
-                  OUTPUT_VARIABLE _pkgconfig_invoke_result
-                  RESULT_VARIABLE _pkgconfig_failed)
-  if(_pkgconfig_failed)
-    BUILD_WARNING ("Failed to find OGRE's plugin directory.  The build will succeed, but gazebo will likely fail to run.")
-  else()
-    # This variable will be substituted into cmake/setup.sh.in
-    set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
+  # On Windows, we assume that all the OGRE* defines are passed in manually
+  # to CMake.
+  if (NOT WIN32)
+    execute_process(COMMAND pkg-config --variable=plugindir OGRE
+                    OUTPUT_VARIABLE _pkgconfig_invoke_result
+                    RESULT_VARIABLE _pkgconfig_failed)
+    if(_pkgconfig_failed)
+      BUILD_WARNING ("Failed to find OGRE's plugin directory.  The build will succeed, but gazebo will likely fail to run.")
+    else()
+      # This variable will be substituted into cmake/setup.sh.in
+      set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
+    endif()
   endif()
 
   ########################################
@@ -286,6 +333,7 @@ if (PKG_CONFIG_FOUND)
   if (NOT CCD_FOUND)
     message(STATUS "Using internal copy of libccd")
     set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARY_DIRS "${CMAKE_BINARY_DIR}/deps/libccd")
     set(CCD_LIBRARIES gazebo_ccd)
   endif()
 
@@ -372,8 +420,8 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  # First and preferred option is to look for bullet standard pkgconfig, 
-  # so check it first. if it is not present, check for the OSRF 
+  # First and preferred option is to look for bullet standard pkgconfig,
+  # so check it first. if it is not present, check for the OSRF
   # custom bullet2.82.pc file
   pkg_check_modules(BULLET bullet>=2.82)
   if (NOT BULLET_FOUND)
@@ -388,12 +436,56 @@ if (PKG_CONFIG_FOUND)
     add_definitions( -DLIBBULLET_VERSION=0.0 )
     BUILD_WARNING ("Bullet > 2.82 not found, for bullet physics engine option, please install libbullet2.82-dev.")
   endif()
+  
+  if (BULLET_VERSION VERSION_GREATER 2.82)
+    add_definitions( -DLIBBULLET_VERSION_GT_282 )
+  endif()
 
+  ########################################
+  # Find libusb
+  pkg_check_modules(libusb-1.0 libusb-1.0)
+  if (NOT libusb-1.0_FOUND)
+    BUILD_WARNING ("libusb-1.0 not found. USB peripherals support will be disabled.")
+    set (HAVE_USB OFF CACHE BOOL "HAVE USB" FORCE)
+  else()
+    message (STATUS "Looking for libusb-1.0 - found. USB peripherals support enabled.")
+    set (HAVE_USB ON CACHE BOOL "HAVE USB" FORCE)
+    include_directories(${libusb-1.0_INCLUDE_DIRS})
+    link_directories(${libusb-1.0_LIBRARY_DIRS})
+  endif ()
+
+  #################################################
+  # Find Oculus SDK.
+  pkg_check_modules(OculusVR OculusVR)
+
+  if (HAVE_USB AND OculusVR_FOUND)
+    message (STATUS "Oculus Rift support enabled.")
+    set (HAVE_OCULUS ON CACHE BOOL "HAVE OCULUS" FORCE)
+    include_directories(SYSTEM ${OculusVR_INCLUDE_DIRS})
+    link_directories(${OculusVR_LIBRARY_DIRS})
+  else ()
+    BUILD_WARNING ("Oculus Rift support will be disabled.")
+    set (HAVE_OCULUS OFF CACHE BOOL "HAVE OCULUS" FORCE)
+  endif()
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Error: pkg-config not found")
 endif ()
 
+########################################
+# Find SDFormat
+set (SDFormat_MIN_VERSION 3.0.4)
+find_package(SDFormat ${SDFormat_MIN_VERSION})
+
+if (NOT SDFormat_FOUND)
+  message (STATUS "Looking for SDFormat - not found")
+  BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION}. Required for reading and writing SDF files.")
+else()
+  message (STATUS "Looking for SDFormat - found")
+endif()
+
+########################################
+# Find QT
 find_package (Qt4)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
@@ -408,8 +500,6 @@ if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
-
-
 
 ########################################
 # Find libdl
@@ -426,6 +516,7 @@ find_library(libdl_library dl /usr/lib /usr/local/lib)
 if (NOT libdl_library)
   message (STATUS "Looking for libdl - not found")
   BUILD_ERROR ("Missing libdl: Required for plugins.")
+  set(libdl_library "")
 else (NOT libdl_library)
   message (STATUS "Looking for libdl - found")
 endif ()
@@ -449,20 +540,51 @@ include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
 
 ########################################
+# Find Space Navigator header and library
+find_library(SPNAV_LIBRARY NAMES spnav)
+find_file(SPNAV_HEADER NAMES spnav.h)
+if (SPNAV_LIBRARY AND SPNAV_HEADER)
+  message(STATUS "Looking for libspnav and spnav.h - found")
+  set(HAVE_SPNAV TRUE)
+else()
+  message(STATUS "Looking for libspnav and spnav.h - not found")
+  set(HAVE_SPNAV FALSE)
+endif()
+
+########################################
+# Find xsltproc, which is used by tools/check_test_ran.py
+find_program(XSLTPROC xsltproc)
+if (NOT EXISTS ${XSLTPROC})
+  BUILD_WARNING("xsltproc not found. The check_test_ran.py script will cause tests to fail.")
+endif()
+
+########################################
+# Find graphviz
+include (${gazebo_cmake_dir}/FindGraphviz.cmake)
+if (NOT GRAPHVIZ_FOUND)
+  message (STATUS "Looking for libgraphviz-dev - not found")
+  BUILD_WARNING ("Graphviz not found, Model editor's schematic view will be disabled.")
+  set (HAVE_GRAPHVIZ OFF CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+else ()
+  message (STATUS "Looking for libgraphviz-dev - found")
+  set (HAVE_GRAPHVIZ ON CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+endif ()
+
+########################################
 # Find QWT (QT graphing library)
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include
 #  /usr/local/include
-#  "$ENV{LIB_DIR}/include" 
-#  "$ENV{INCLUDE}" 
+#  "$ENV{LIB_DIR}/include"
+#  "$ENV{INCLUDE}"
 #  PATH_SUFFIXES qwt-qt4 qwt qwt5
 #  )
 #
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS 
+#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
 #  /usr/lib
 #  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib" 
-#  "$ENV{LIB}/lib" 
+#  "$ENV{LIB_DIR}/lib"
+#  "$ENV{LIB}/lib"
 #  )
 #
 #if (QWT_INCLUDE_DIR AND QWT_LIBRARY)

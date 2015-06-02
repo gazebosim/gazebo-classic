@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,9 @@ namespace gazebo
 
       /// \brief Renders the laser data.
       public: std::vector<DynamicLines *> rayFans;
+
+      /// \brief Renders laser data for rays that do not hit obstacles.
+      public: std::vector<DynamicLines *> noHitRayFans;
 
       /// \brief Mutex to protect the contact message.
       public: boost::mutex mutex;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,12 @@
 
 #ifndef _GAZEBO_PHYSICS_BASE_HH_
 #define _GAZEBO_PHYSICS_BASE_HH_
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
@@ -65,12 +71,13 @@ namespace gazebo
       "ray",
       "plane",
       "sphere",
-      "trimesh"
+      "trimesh",
+      "polyline"
     };
 
     /// \class Base Base.hh physics/physics.hh
     /// \brief Base class for most physics classes
-    class GAZEBO_VISIBLE Base : public boost::enable_shared_from_this<Base>
+    class GZ_PHYSICS_VISIBLE Base : public boost::enable_shared_from_this<Base>
     {
       /// \enum EntityType
       /// \brief Unique identifiers for all entity types.
@@ -129,6 +136,8 @@ namespace gazebo
                 SPHERE_SHAPE    = 0x01000000,
                 /// \brief MeshShape type
                 MESH_SHAPE      = 0x02000000,
+                /// \brief PolylineShape type
+                POLYLINE_SHAPE  = 0x04000000,
 
                 /// \brief Indicates a collision shape used for sensing
                 SENSOR_COLLISION = 0x10000000
@@ -258,9 +267,12 @@ namespace gazebo
       public: unsigned int GetType() const;
 
       /// \brief Return the name of this entity with the model scope
-      /// world::model1::...::modelN::entityName
+      /// model1::...::modelN::entityName
+      /// \param[in] _prependWorldName True to prended the returned string
+      /// with the world name. The result will be
+      /// world::model1::...::modelN::entityName.
       /// \return The scoped name.
-      public: std::string GetScopedName() const;
+      public: std::string GetScopedName(bool _prependWorldName = false) const;
 
       /// \brief Print this object to screen via gzmsg.
       /// \param[in] _prefix Usually a set of spaces.

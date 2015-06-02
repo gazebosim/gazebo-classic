@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@
 #include "gazebo/physics/dart/DARTCylinderShape.hh"
 #include "gazebo/physics/dart/DARTPlaneShape.hh"
 #include "gazebo/physics/dart/DARTMeshShape.hh"
+#include "gazebo/physics/dart/DARTPolylineShape.hh"
 #include "gazebo/physics/dart/DARTMultiRayShape.hh"
 #include "gazebo/physics/dart/DARTHeightmapShape.hh"
 
@@ -63,8 +64,8 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
   this->dtWorld = new dart::simulation::World;
-  this->dtWorld->getConstraintHandler()->setCollisionDetector(
-        new dart::collision::DARTCollisionDetector());
+//  this->dtWorld->getConstraintSolver()->setCollisionDetector(
+//        new dart::collision::DARTCollisionDetector());
 //  this->dtWorld->getConstraintHandler()->setAllowablePenetration(1e-6);
 //  this->dtWorld->getConstraintHandler()->setMaxReducingPenetrationVelocity(
 //        0.01);
@@ -87,6 +88,9 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
 
   // Gravity
   math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  // ODEPhysics checks this, so we will too.
+  if (g == math::Vector3(0, 0, 0))
+    gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
 
   // Time step
@@ -139,20 +143,18 @@ void DARTPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
 
-  dart::constraint::ConstraintDynamics *dtConstraintDynamics =
-      this->dtWorld->getConstraintHandler();
+  dart::constraint::ConstraintSolver *dtConstraintSolver =
+      this->dtWorld->getConstraintSolver();
   dart::collision::CollisionDetector *dtCollisionDetector =
-      dtConstraintDynamics->getCollisionDetector();
+      dtConstraintSolver->getCollisionDetector();
   int numContacts = dtCollisionDetector->getNumContacts();
 
   for (int i = 0; i < numContacts; ++i)
   {
     const dart::collision::Contact &dtContact =
         dtCollisionDetector->getContact(i);
-    dart::dynamics::BodyNode *dtBodyNode1 =
-        dtContact.collisionNode1->getBodyNode();
-    dart::dynamics::BodyNode *dtBodyNode2 =
-        dtContact.collisionNode2->getBodyNode();
+    dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1;
+    dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2;
 
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
@@ -186,10 +188,10 @@ void DARTPhysics::UpdateCollision()
     // calculate torque in world frame
     Eigen::Vector3d torqueA =
         (dtContact.point -
-         dtBodyNode1->getWorldTransform().translation()).cross(force);
+         dtBodyNode1->getTransform().translation()).cross(force);
     Eigen::Vector3d torqueB =
         (dtContact.point -
-         dtBodyNode2->getWorldTransform().translation()).cross(-force);
+         dtBodyNode2->getTransform().translation()).cross(-force);
 
     // Convert from world to link frame
     localForce1 = body1Pose.rot.RotateVectorReverse(
@@ -322,6 +324,8 @@ ShapePtr DARTPhysics::CreateShape(const std::string &_type,
     shape.reset(new DARTMultiRayShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new DARTMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new DARTPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new DARTHeightmapShape(collision));
   else if (_type == "map" || _type == "image")
@@ -377,78 +381,69 @@ void DARTPhysics::DebugPrint() const
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(const std::string &_key) const
 {
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
+}
+
+//////////////////////////////////////////////////
+bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
+  if (!this->sdf->HasElement("dart"))
+  {
+    return PhysicsEngine::GetParam(_key, _value);
+  }
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  // physics dart element not yet added to sdformat
+  // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
 
   if (_key == "max_contacts")
   {
-    return dartElem->GetElement("max_contacts")->Get<int>();
+    _value = dartElem->GetElement("max_contacts")->Get<int>();
   }
   else if (_key == "min_step_size")
   {
-    return dartElem->GetElement("solver")->Get<double>("min_step_size");
+    _value = dartElem->GetElement("solver")->Get<double>("min_step_size");
   }
   else
   {
-    gzwarn << _key << " is not supported in ode" << std::endl;
-    return 0;
+    return PhysicsEngine::GetParam(_key, _value);
   }
 
-  gzerr << "We should not be here, something is wrong." << std::endl;
-  return 0;
+  return true;
 }
 
 //////////////////////////////////////////////////
 bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   /// \TODO fill this out, see issue #1115
-  if (_key == "max_contacts")
+  try
   {
-    int value;
-    try
+    if (_key == "max_contacts")
     {
-      value = boost::any_cast<int>(_value);
+      int value = boost::any_cast<int>(_value);
+      gzerr << "Setting [" << _key << "] in DART to [" << value
+            << "] not yet supported.\n";
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "min_step_size")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      double value = boost::any_cast<double>(_value);
+      gzerr << "Setting [" << _key << "] in DART to [" << value
+            << "] not yet supported.\n";
     }
-    gzerr << "Setting [" << _key << "] in DART to [" << value
-          << "] not yet supported.\n";
+    else
+    {
+      if (_key == "max_step_size")
+      {
+        this->dtWorld->setTimeStep(boost::any_cast<double>(_value));
+      }
+      return PhysicsEngine::SetParam(_key, _value);
+    }
   }
-  else if (_key == "min_step_size")
+  catch(boost::bad_any_cast &e)
   {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    gzerr << "Setting [" << _key << "] in DART to [" << value
-          << "] not yet supported.\n";
-  }
-  else if (_key == "max_step_size")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    this->dtWorld->setTimeStep(value);
-  }
-  else
-  {
-    gzwarn << _key << " is not supported in DART" << std::endl;
+    gzerr << "DARTPhysics::SetParam(" << _key << ") boost::any_cast error: "
+          << e.what() << std::endl;
     return false;
   }
   return true;
@@ -488,6 +483,11 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
@@ -509,9 +509,6 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class KeyFrame KeyFrame.hh common/common.hh
     /// \brief A key frame in an animation
-    class GAZEBO_VISIBLE KeyFrame
+    class GZ_COMMON_VISIBLE KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
@@ -48,7 +48,7 @@ namespace gazebo
     };
 
     /// \brief A keyframe for a PoseAnimation
-    class GAZEBO_VISIBLE PoseKeyFrame : public KeyFrame
+    class GZ_COMMON_VISIBLE PoseKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
@@ -81,7 +81,7 @@ namespace gazebo
     };
 
     /// \brief A keyframe for a NumericAnimation
-    class GAZEBO_VISIBLE NumericKeyFrame : public KeyFrame
+    class GZ_COMMON_VISIBLE NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe

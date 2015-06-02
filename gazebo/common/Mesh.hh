@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MESH_HH_
-#define _MESH_HH_
+#ifndef _GAZEBO_MESH_HH_
+#define _GAZEBO_MESH_HH_
 
 #include <vector>
 #include <string>
@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class Mesh Mesh.hh common/common.hh
     /// \brief A 3D mesh
-    class GAZEBO_VISIBLE Mesh
+    class GZ_COMMON_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();
@@ -107,6 +107,11 @@ namespace gazebo
       /// \param[in] _index the index
       /// \return the material or NULL if the index is out of bounds
       public: const Material *GetMaterial(int _index) const;
+
+      /// \brief Get the index of material
+      /// \param[in] _mat the material
+      /// \return the index of the material or -1 if not found.
+      public: int GetMaterialIndex(const Material *_mat) const;
 
       /// \brief Get a child mesh
       /// \param[in] _i the index
@@ -185,7 +190,7 @@ namespace gazebo
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    class GAZEBO_VISIBLE NodeAssignment
+    class GZ_COMMON_VISIBLE NodeAssignment
     {
       /// \brief Constructor.
       public: NodeAssignment();
@@ -201,7 +206,7 @@ namespace gazebo
     };
 
     /// \brief A child mesh
-    class GAZEBO_VISIBLE SubMesh
+    class GZ_COMMON_VISIBLE SubMesh
     {
       /// \brief An enumeration of the geometric mesh primitives
       public: enum PrimitiveType {POINTS, LINES, LINESTRIPS, TRIANGLES,

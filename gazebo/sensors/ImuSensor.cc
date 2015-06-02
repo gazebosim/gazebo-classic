@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,12 @@
  * Date: 6 September 2008
 */
 
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -243,6 +249,8 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
   double dt = (timestamp - this->lastMeasurementTime).Double();
 
+  this->lastMeasurementTime = timestamp;
+
   if (dt > 0.0)
   {
     boost::mutex::scoped_lock lock(this->mutex);
@@ -282,8 +290,6 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
               (imuPose - this->referencePose).rot);
 
     this->lastLinearVel = imuWorldLinearVel;
-
-    this->lastMeasurementTime = timestamp;
 
     if (this->noiseActive)
     {

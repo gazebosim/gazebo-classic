@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include "gazebo/physics/physics.hh"
 // #include "gazebo/physics/Joint.hh"
 // #include "gazebo/physics/ScrewJoint.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"
 
@@ -57,11 +57,6 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
   if (_physicsEngine == "bullet")
   {
     gzerr << "Aborting test for bullet, see issues #1074.\n";
-    return;
-  }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issues #1096.\n";
     return;
   }
 
@@ -282,7 +277,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 
   if (_physicsEngine == "dart")
   {
-    gzerr << "DART Screw Joint not yet implemented.\n";
+    gzerr << "Aborting test for dart, see issues #1096.\n";
     return;
   }
 
@@ -488,12 +483,6 @@ TEST_P(JointTestScrew, ScrewJointForce)
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Screw Joint not yet implemented.\n";
-    return;
-  }
-
   // Load pr2 world
   ServerFixture::Load("worlds/pr2.world", true, _physicsEngine);
 
@@ -514,6 +503,16 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   // get model, joints and get links
   physics::ModelPtr model = world->GetModel("pr2");
   physics::LinkPtr link_00 = model->GetLink("torso_lift_link");
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << _physicsEngine
+          << " is broken for this test,"
+          << " because of the pr2 gripper's closed kinematic chain,"
+          << " see issue #1435."
+          << std::endl;
+    return;
+  }
 
   // drop from some height
   model->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));

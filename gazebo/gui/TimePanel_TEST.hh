@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the DataLogger widget.
+/// \brief A test class for the TimePanel widget.
 class TimePanel_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test that the TimePanel gets valid times from the server.
-  private slots: void ValidTimes();
+  /// \brief Test setting the play/pause state.
+  private slots: void SetPaused();
 };
 
 #endif

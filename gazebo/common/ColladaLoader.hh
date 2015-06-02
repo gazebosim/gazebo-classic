@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class ColladaLoader ColladaLoader.hh common/common.hh
     /// \brief Class used to load Collada mesh files
-    class GAZEBO_VISIBLE ColladaLoader : public MeshLoader
+    class GZ_COMMON_VISIBLE ColladaLoader : public MeshLoader
     {
       /// \brief Constructor
       public: ColladaLoader();

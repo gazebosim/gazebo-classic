@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ColladaExporterPrivate.hh"
 #include "gazebo/common/ColladaExporter.hh"
+
+#ifdef _WIN32
+  #define snprintf _snprintf
+#endif
 
 using namespace gazebo;
 using namespace common;

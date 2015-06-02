@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace gazebo
     ///
     /// State of a Model includes the state of all its child Links and
     /// Joints.
-    class GAZEBO_VISIBLE ModelState : public State
+    class GZ_PHYSICS_VISIBLE ModelState : public State
     {
       /// \brief Default constructor.
       public: ModelState();

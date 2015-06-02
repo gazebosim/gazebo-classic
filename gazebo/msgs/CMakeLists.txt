@@ -5,6 +5,7 @@ set (msgs
   boxgeom.proto
   camerasensor.proto
   camera_cmd.proto
+  cessna.proto
   collision.proto
   color.proto
   contact.proto
@@ -12,18 +13,20 @@ set (msgs
   contactsensor.proto
   cylindergeom.proto
   diagnostics.proto
+  distortion.proto
   factory.proto
+  fluid.proto
   fog.proto
   friction.proto
   geometry.proto
   gps.proto
-  gui_overlay_config.proto
   gui_camera.proto
   gui.proto
   gz_string.proto
   gz_string_v.proto
   header.proto
   heightmapgeom.proto
+  hydra.proto
   imagegeom.proto
   image.proto
   image_stamped.proto
@@ -36,6 +39,7 @@ set (msgs
   joint_cmd.proto
   joint_wrench.proto
   joint_wrench_stamped.proto
+  joystick.proto
   laserscan.proto
   laserscan_stamped.proto
   light.proto
@@ -54,6 +58,7 @@ set (msgs
   pid.proto
   plugin.proto
   pointcloud.proto
+  polylinegeom.proto
   pose.proto
   pose_animation.proto
   pose_stamped.proto
@@ -71,12 +76,16 @@ set (msgs
   raysensor.proto
   request.proto
   response.proto
+  rest_error.proto
+  rest_login.proto
+  rest_post.proto
   road.proto
   scene.proto
   selection.proto
   sensor.proto
   server_control.proto
   shadows.proto
+  sim_event.proto
   sky.proto
   spheregeom.proto
   spherical_coordinates.proto
@@ -109,7 +118,10 @@ gz_build_tests(${msgs_tests_sources})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
-target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)
+target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC_LIBRARY})
+if (UNIX)
+  target_link_libraries(gazebomsgs_out pthread)
+endif()
 
 set (sources msgs.cc MsgFactory.cc)
 set (headers msgs.hh MsgFactory.hh)
@@ -137,30 +149,42 @@ foreach(FIL ${msgs})
   list(APPEND PROTO_SRCS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc")
   list(APPEND PROTO_HDRS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h")
 
+  # Need to add .exe to executable in windows
+  if (WIN32)
+     set(gazebomsgs_out_binary "gazebomsgs_out.exe")
+  else()
+     set(gazebomsgs_out_binary "gazebomsgs_out")
+  endif()
+
   add_custom_command(
     OUTPUT
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/gazebomsgs_out --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out ${CMAKE_CURRENT_BINARY_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
+    ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/${gazebomsgs_out_binary} --cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
     DEPENDS ${ABS_FIL} gazebomsgs_out
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )
 endforeach()
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MSGS")
+
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
-# Need to add default visibility to gazebo_msgs
-get_target_property(current_property gazebo_msgs COMPILE_FLAGS)
-if(NOT current_property) # property non-existent or empty
-  set_target_properties(gazebo_msgs PROPERTIES GENERATED TRUE COMPILE_FLAGS "-fvisibility=default")
-else()
-  set_target_properties(gazebo_msgs PROPERTIES COMPILE_FLAGS "${current_property} -fvisibility=default")
+if (UNIX)
+  # Need to add default visibility to gazebo_msgs
+  get_target_property(current_property gazebo_msgs COMPILE_FLAGS)
+  if(NOT current_property) # property non-existent or empty
+    set_target_properties(gazebo_msgs PROPERTIES GENERATED TRUE COMPILE_FLAGS "-fvisibility=default")
+  else()
+    set_target_properties(gazebo_msgs PROPERTIES COMPILE_FLAGS "${current_property} -fvisibility=default")
+  endif()
 endif()
+
 target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
-  ${PROTOBUF_LIBRARY}
+  ${GZ_PROTOBUF_LIBRARY}
 )
 
 add_dependencies(gazebo_msgs gazebomsgs_out)

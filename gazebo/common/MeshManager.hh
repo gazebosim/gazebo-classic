@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace gazebo
 
     /// \class MeshManager MeshManager.hh common/common.hh
     /// \brief Maintains and manages all meshes
-    class GAZEBO_VISIBLE MeshManager : public SingletonT<MeshManager>
+    class GZ_COMMON_VISIBLE MeshManager : public SingletonT<MeshManager>
     {
       /// \brief Constructor
       private: MeshManager();
@@ -120,6 +120,22 @@ namespace gazebo
                              const math::Vector3 &_sides,
                              const math::Vector2d &_uvCoords);
 
+      /// \brief Create an extruded mesh from polylines. The polylines are
+      /// assumed to be closed and non-intersecting. Delaunay triangulation is
+      /// applied to create the resulting mesh. If there is more than one
+      /// polyline, a ray casting algorithm will be used to identify the
+      /// exterior/interior edges and remove holes from the 2D shape before
+      /// extrusion.
+      /// \param[in] _name the name of the new mesh
+      /// \param[in] _vertices A multidimensional vector of polylines and their
+      /// vertices. Each element in the outer vector consists of a vector of
+      /// vertices that describe one polyline.
+      /// edges and remove the holes in the shape.
+      /// \param[in] _height the height of extrusion
+      public: void CreateExtrudedPolyline(const std::string &_name,
+                  const std::vector<std::vector<math::Vector2d> > &_vertices,
+                  double _height);
+
       /// \brief Create a cylinder mesh
       /// \param[in] _name the name of the new mesh
       /// \param[in] _radius the radius of the cylinder in the x y plane
@@ -127,7 +143,7 @@ namespace gazebo
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       public: void CreateCylinder(const std::string &_name,
-                              float _radius,
+                                  float _radius,
                                   float _height,
                                   int _rings,
                                   int _segments);
@@ -139,7 +155,7 @@ namespace gazebo
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       public: void CreateCone(const std::string &_name,
-                          float _radius,
+                              float _radius,
                               float _height,
                               int _rings,
                               int _segments);
@@ -154,12 +170,14 @@ namespace gazebo
       /// \param[in] _height the height along z
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
+      /// \param[in] _arc the arc angle in radians
       public: void CreateTube(const std::string &_name,
                               float _innerRadius,
                               float _outterRadius,
                               float _height,
                               int _rings,
-                              int _segments);
+                              int _segments,
+                              double _arc = 2.0 * M_PI);
 
       /// \brief Create mesh for a plane
       /// \param[in] _name

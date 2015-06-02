@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 */
 
 #include <boost/filesystem.hpp>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class GzModel : public ServerFixture
@@ -31,7 +31,7 @@ TEST_F(GzModel, Spawn)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   std::string cmd;
   boost::filesystem::path path;
@@ -49,7 +49,7 @@ TEST_F(GzModel, Spawn)
 
     world->Step(100);
 
-    EXPECT_TRUE(world->GetModel("my_model"));
+    EXPECT_TRUE(world->GetModel("my_model") != NULL);
   }
 
   // Spawn another box at a different location
@@ -63,10 +63,10 @@ TEST_F(GzModel, Spawn)
     custom_exec(cmd);
     world->Step(100);
 
-    EXPECT_TRUE(world->GetModel("next_model"));
+    EXPECT_TRUE(world->GetModel("next_model") != NULL);
 
     physics::ModelPtr model = world->GetModel("next_model");
-    ASSERT_TRUE(model);
+    ASSERT_TRUE(model != NULL);
 
     // Check the pose of the spawned model
     math::Pose pose = model->GetWorldPose();
@@ -91,7 +91,7 @@ TEST_F(GzModel, SpawnAndDelete)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "models" / "box.sdf";
@@ -121,7 +121,7 @@ TEST_F(GzModel, SpawnAndMove)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "models" / "box.sdf";

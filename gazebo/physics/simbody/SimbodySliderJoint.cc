@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,13 @@ void SimbodySliderJoint::SetAxis(unsigned int /*_index*/,
 void SimbodySliderJoint::SetVelocity(unsigned int _index, double _rate)
 {
   if (_index < this->GetAngleCount())
+  {
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
+  }
   else
     gzerr << "SetVelocity _index too large.\n";
 }

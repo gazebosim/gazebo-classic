@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,19 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  #define snprintf _snprintf
+#endif
 
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gazebo.hh"
+#include "gazebo/gazebo_client.hh"
 
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
@@ -29,6 +35,12 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
+
+#ifdef WIN32
+# define HOMEDIR "HOMEPATH"
+#else
+# define HOMEDIR "HOME"
+#endif  // WIN32
 
 // These are needed by QT. They need to stay valid during the entire
 // lifetime of the application, and argc > 0 and argv must contain one valid
@@ -48,7 +60,7 @@ gui::ModelRightMenu *g_modelRightMenu = NULL;
 std::string g_worldname = "default";
 
 QApplication *g_app;
-gui::MainWindow *g_main_win;
+gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
 
@@ -65,7 +77,7 @@ void print_usage()
 void signal_handler(int)
 {
   gazebo::gui::stop();
-  gazebo::shutdown();
+  gazebo::client::shutdown();
 }
 
 //////////////////////////////////////////////////
@@ -107,7 +119,7 @@ bool parse_args(int _argc, char **_argv)
 
   if (vm.count("verbose"))
   {
-    gazebo::printVersion();
+    gazebo::client::printVersion();
     gazebo::common::Console::SetQuiet(false);
   }
 
@@ -120,7 +132,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::addPlugin(*iter);
+      gazebo::client::addPlugin(*iter);
     }
   }
 
@@ -156,14 +168,39 @@ namespace gazebo
 void gui::init()
 {
   g_modelRightMenu->Init();
-  g_main_win->show();
   g_main_win->Init();
 }
 
 /////////////////////////////////////////////////
-bool gui::loadINI(const boost::filesystem::path &_file)
+bool gui::loadINI(boost::filesystem::path _file)
 {
   bool result = true;
+
+  // Only use the environment variables if _file is empty.
+  if (_file.empty())
+  {
+    // Get the gui.ini path environment variable
+    char *guiINIFile = getenv("GAZEBO_GUI_INI_FILE");
+    char *home = getenv(HOMEDIR);
+
+    // If the environment variable was specified
+    if (guiINIFile)
+    {
+      _file = guiINIFile;
+      if (!boost::filesystem::exists(_file))
+      {
+        gzerr << "GAZEBO_GUI_INI_FILE does not exist: " << _file << std::endl;
+        return false;
+      }
+    }
+    else if (home)
+    {
+      // Check the home directory
+      // Construct the path to gui.ini
+      _file = home;
+      _file = _file / ".gazebo" / "gui.ini";
+    }
+  }
 
   // Create the gui.ini file if it doesn't exist.
   if (!boost::filesystem::exists(_file))
@@ -171,6 +208,8 @@ bool gui::loadINI(const boost::filesystem::path &_file)
     gui::setINIProperty("geometry.x", 0);
     gui::setINIProperty("geometry.y", 0);
     gui::saveINI(_file);
+    gzwarn << "Couldn't locate specified .ini. Creating file at " << _file
+          << std::endl;
   }
 
   try
@@ -184,32 +223,18 @@ bool gui::loadINI(const boost::filesystem::path &_file)
     result = false;
   }
 
+  gzlog << "Loaded .ini file from: " << _file << std::endl;
   return result;
 }
 
 /////////////////////////////////////////////////
 bool gui::load()
 {
-  bool result = true;
-
-  // Get the HOME path
-  char *home = getenv("HOME");
-  if (home)
-  {
-    // Construct the path to gui.ini
-    boost::filesystem::path path = home;
-    path = path / ".gazebo" / "gui.ini";
-    result = gui::loadINI(path);
-  }
-  else
-  {
-    gzerr << "HOME environment variable not found. "
-      "Unable to read ~/.gazebo/gui.ini file.\n";
-    result = false;
-  }
+  gui::loadINI();
 
   g_modelRightMenu = new gui::ModelRightMenu();
 
+  // Load the rendering engine.
   rendering::load();
   rendering::init();
 
@@ -226,22 +251,24 @@ bool gui::load()
   g_main_win = new gui::MainWindow();
 
   g_main_win->Load();
-  g_main_win->resize(1024, 768);
 
-  return result;
+  return true;
 }
 
 /////////////////////////////////////////////////
 unsigned int gui::get_entity_id(const std::string &_name)
 {
-  return g_main_win->GetEntityId(_name);
+  if (g_main_win)
+    return g_main_win->GetEntityId(_name);
+  else
+    return 0;
 }
 
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
-  gzLogInit("gzclient.log");
+  gzLogInit("client-", "gzclient.log");
 
   // Make sure the model database has started
   gazebo::common::ModelDatabase::Instance()->Start();
@@ -249,7 +276,7 @@ bool gui::run(int _argc, char **_argv)
   if (!parse_args(_argc, _argv))
     return false;
 
-  if (!gazebo::setupClient())
+  if (!gazebo::client::setup(_argc, _argv))
     return false;
 
   if (!gazebo::gui::load())
@@ -257,6 +284,7 @@ bool gui::run(int _argc, char **_argv)
 
   gazebo::gui::init();
 
+#ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
@@ -266,18 +294,21 @@ bool gui::run(int _argc, char **_argv)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return false;
   }
+#endif
 
   g_app->exec();
 
   gazebo::gui::fini();
-  gazebo::shutdown();
+  gazebo::client::shutdown();
+
+  delete g_main_win;
   return true;
 }
 
 /////////////////////////////////////////////////
 void gui::stop()
 {
-  gazebo::shutdown();
+  gazebo::client::shutdown();
   g_active_camera.reset();
   g_app->quit();
 }
@@ -332,4 +363,10 @@ bool gui::saveINI(const boost::filesystem::path &_file)
     result = false;
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+gui::MainWindow *gui::get_main_window()
+{
+  return g_main_win;
 }
