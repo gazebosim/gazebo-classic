@@ -325,17 +325,6 @@ void Scene::Init()
   for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
     this->dataPtr->grids[i]->Init();
 
-  // Create Sky. This initializes SkyX, and makes it invisible. A Sky
-  // message must be received (via a scene message or on the ~/sky topic).
-  try
-  {
-    this->SetSky();
-  }
-  catch(...)
-  {
-    gzerr << "Failed to create the sky\n";
-  }
-
   // Create Fog
   if (this->dataPtr->sdf->HasElement("fog"))
   {
@@ -1475,6 +1464,30 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   // Process the sky message.
   if (_msg->has_sky())
   {
+    if (!this->dataPtr->skyx)
+    {
+      // Create Sky. This initializes SkyX, and makes it invisible. A Sky
+      // message must be received (via a scene message or on the ~/sky topic).
+      try
+      {
+        this->SetSky();
+      }
+      catch(...)
+      {
+        gzerr << "Failed to create the sky\n";
+      }
+
+      // tell all cameras to start rendering the sky
+      for (auto camera : this->dataPtr->cameras)
+        camera->GetViewport()->getTarget()->addListener(this->dataPtr->skyx);
+      for (auto camera : this->dataPtr->userCameras)
+        camera->GetViewport()->getTarget()->addListener(this->dataPtr->skyx);
+#ifdef HAVE_OCULUS
+      for (auto camera : this->dataPtr->oculusCameras)
+        camera->GetViewport()->getTarget()->addListener(this->dataPtr->skyx);
+#endif
+    }
+
     boost::shared_ptr<msgs::Sky> sm(new msgs::Sky(_msg->sky()));
     this->OnSkyMsg(sm);
   }
