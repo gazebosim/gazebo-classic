@@ -420,6 +420,7 @@ void DataLogger::OnBrowse()
 {
   QFileDialog fileDialog(this, tr("Set log directory"), QDir::homePath());
   fileDialog.setFileMode(QFileDialog::Directory);
+  fileDialog.setFilter(QDir::AllDirs | QDir::Hidden);
   fileDialog.setOptions(QFileDialog::ShowDirsOnly
       | QFileDialog::DontResolveSymlinks);
 
