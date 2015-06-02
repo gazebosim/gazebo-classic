@@ -1,4 +1,8 @@
 ## Gazebo 6.0
+1. Added multiple LiftDrag plugins to the cessna_demo.world to allow the Cessna
+C-172 model to fly.
+    * [Pull request #1715](https://bitbucket.org/osrf/gazebo/pull-request/1715)
+
 1. Added a plugin to control a Cessna C-172 via messages (CessnaPlugin), and a
 GUI plugin to test this functionality with the keyboard (CessnaGUIPlugin). Added
 world with the Cessna model and the two previous plugins loaded
@@ -111,6 +115,9 @@ compilation on Windows.
 1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
     * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
 
+1. Display confirmation message after log is saved
+    * [Pull request #1646](https://bitbucket.org/osrf/gazebo/pull-request/1646)
+
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
 
@@ -131,6 +138,9 @@ compilation on Windows.
 
 1. Set material of SelectionObj's handles.
     * [Pull request #1472](https://bitbucket.org/osrf/gazebo/pull-request/1472)
+
+1. Add SelectionObj::Fini with tests and make Visual::Fini virtual
+    * [Pull request #1685](https://bitbucket.org/osrf/gazebo/pull-request/1685)
 
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
