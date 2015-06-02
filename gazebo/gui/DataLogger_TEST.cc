@@ -85,7 +85,7 @@ void DataLogger_TEST::RecordButton()
 
     // Make sure the status label says "Recording"
     txt = statusLabel->text().toStdString();
-    QVERIFY(txt == "Recording");
+    QVERIFY(txt == "Recording...");
 
 
     // Toggle the record button, which stops logging.
