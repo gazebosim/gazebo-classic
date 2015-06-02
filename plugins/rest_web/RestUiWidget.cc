@@ -55,7 +55,7 @@ void RestUiWidget::Logout()
     gazebo::msgs::RestLogout msg;
     std::string url = this->loginDialog.GetUrl();
     msg.set_url(url);
-    gzmsg << "Loging out from: " << url << std::endl;
+    gzmsg << "Logging out from: " << url << std::endl;
     this->logoutPub->Publish(msg);
     this->loginMenuAction.setEnabled(true);
     this->logoutMenuAction.setEnabled(false);
