@@ -97,15 +97,13 @@ namespace gazebo
       public: float Float() const;
 
       /// \brief Get the time as a string formatted as "DD hh:mm:ss.mmm", with
-      /// the option to hide specific elements.
-      /// \param[in] _day Whether to show digits for days.
-      /// \param[in] _hour Whether to show digits for hours.
-      /// \param[in] _min Whether to show digits for minutes.
-      /// \param[in] _sec Whether to show digits for seconds.
-      /// \param[in] _msec Whether to show digits for miliseconds.
+      /// the option to choose the start/end. Options for start/end are:
+      /// 0: days, 1: hours, 2: minutes, 3: seconds, 4: milliseconds
+      /// \param[in] _start Start point (0 to 4).
+      /// \param[in] _end End point (0 to 4).
       /// \return String representing time.
-      public: std::string FormattedString(bool _day = true, bool _hour = true,
-          bool _min = true, bool _sec = true, bool _msec = true) const;
+      public: std::string FormattedString(unsigned int _start = 0,
+          unsigned int _end = 4) const;
 
       /// \brief Sleep for the specified time
       /// \param[in] _time Sleep time
