@@ -157,7 +157,7 @@ TEST_F(TimeTest, String)
   // Inexistent indices default to maximum index (4)
   EXPECT_EQ(time.FormattedString(10, 10), "000");
 
-  // start > end: start puxes end
+  // start > end: start pushes end
   EXPECT_EQ(time.FormattedString(4, 2), "000");
 
   // 1 second
