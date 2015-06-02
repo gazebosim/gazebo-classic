@@ -16,16 +16,26 @@
  */
 #include <gtest/gtest.h>
 #include <stdio.h>
+#include "test_config.h"
 
 TEST(PkgConfig, Config)
 {
   char cmd[1024];
 
-  snprintf(cmd, sizeof(cmd), "cmake %s", SOURCE_DIR);
-  std::cout << "CMD[" << cmd << "]\n";
+  // Create a build directory in the project binary directory so that we
+  // don't pollute the source tree
+  snprintf(cmd, sizeof(cmd), "mkdir %s/test/pkgconfig/plugin",
+      PROJECT_BINARY_PATH);
+  system(cmd);
 
+  // Run cmake
+  snprintf(cmd, sizeof(cmd), "cd %s/test/pkgconfig/plugin; cmake %s",
+      PROJECT_BINARY_PATH, SOURCE_DIR);
   ASSERT_EQ(system(cmd), 0);
-  snprintf(cmd, sizeof(cmd), "make");
+
+  // Make
+  snprintf(cmd, sizeof(cmd), "cd %s/test/pkgconfig/plugin; make",
+      PROJECT_BINARY_PATH);
   ASSERT_EQ(system(cmd), 0);
 }
 
