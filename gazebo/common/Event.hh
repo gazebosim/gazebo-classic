@@ -577,7 +577,6 @@ namespace gazebo
         this->myDataPtr->connections.erase(it);
       }
     }
-
     /// \}
   }
 }
