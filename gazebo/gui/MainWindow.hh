@@ -224,6 +224,10 @@ namespace gazebo
       /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
 
+      /// \brief Toggle toolbars display.
+      /// \param[in] _value True to display toolbars.
+      private: void OnShowToolbars(bool _value);
+
       private: void OnMoveMode(bool _mode);
 
       /// \brief Create most of the actions.

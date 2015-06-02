@@ -577,10 +577,6 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: void ProcessRequestMsg(ConstRequestPtr &_msg);
 
-      /// \brief Selection message callback.
-      /// \param[in] _msg The message data.
-      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
-
       /// \brief Sky message callback.
       /// \param[in] _msg The message data.
       private: void OnSkyMsg(ConstSkyPtr &_msg);
