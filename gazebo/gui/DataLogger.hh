@@ -85,6 +85,9 @@ namespace gazebo
       /// \brief QT callback for blinking the status message.
       private slots: void OnBlinkStatus();
 
+      /// \brief QT callback for timing out the confirmation message.
+      private slots: void OnConfirmationTimeout();
+
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
       private: void OnStatus(ConstLogStatusPtr &_msg);
@@ -139,6 +142,12 @@ namespace gazebo
 
       // private: QListWidget *logList;
       private: QTextBrowser *logList;
+
+      /// \brief Dialog that displays confirmation after saving.
+      private: QDialog *confirmationDialog;
+
+      /// \brief Timer used to timeout confirmation dialog.
+      private: QTimer *confirmationTimer;
     };
     /// \}
   }
