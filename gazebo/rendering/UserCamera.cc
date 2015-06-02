@@ -488,8 +488,13 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   // TODO zoom into model instead of visual as nested model currently has
   // incorrect bounding box
   rendering::VisualPtr topLevelVis = _visual->GetNthAncestor(2);
-  math::Box box = topLevelVis->GetBoundingBox();
-//  math::Box box = _visual->GetBoundingBox();
+
+  math::Box box;
+
+  if (topLevelVis)
+    box = topLevelVis->GetBoundingBox();
+  else
+    box = _visual->GetBoundingBox();
 
   math::Vector3 size = box.GetSize();
   double maxSize = std::max(std::max(size.x, size.y), size.z);
