@@ -182,9 +182,9 @@ TEST_F(Scene_TEST, VisualType)
   ASSERT_TRUE(cylinder != NULL);
 
   // Verify type is VT_MODEL
-  EXPECT_TRUE(box->GetType() == rendering::Visual::VT_MODEL);
-  EXPECT_TRUE(sphere->GetType() == rendering::Visual::VT_MODEL);
-  EXPECT_TRUE(cylinder->GetType() == rendering::Visual::VT_MODEL);
+  EXPECT_TRUE(box->GetType() == rendering::VT_MODEL);
+  EXPECT_TRUE(sphere->GetType() == rendering::VT_MODEL);
+  EXPECT_TRUE(cylinder->GetType() == rendering::VT_MODEL);
 
   // Check that the link visuals were properly added
   rendering::VisualPtr boxLink = scene->GetVisual("box::link");
@@ -195,9 +195,9 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(cylinderLink != NULL);
 
   // Verify type is VT_LINK
-  EXPECT_TRUE(boxLink->GetType() == rendering::Visual::VT_LINK);
-  EXPECT_TRUE(sphereLink->GetType() == rendering::Visual::VT_LINK);
-  EXPECT_TRUE(cylinderLink->GetType() == rendering::Visual::VT_LINK);
+  EXPECT_TRUE(boxLink->GetType() == rendering::VT_LINK);
+  EXPECT_TRUE(sphereLink->GetType() == rendering::VT_LINK);
+  EXPECT_TRUE(cylinderLink->GetType() == rendering::VT_LINK);
 
   // Check that the visual visuals were properly added
   rendering::VisualPtr boxVisual = scene->GetVisual("box::link::visual");
@@ -209,9 +209,9 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(cylinderVisual != NULL);
 
   // Verify type is VT_VISUAL
-  EXPECT_TRUE(boxVisual->GetType() == rendering::Visual::VT_VISUAL);
-  EXPECT_TRUE(sphereVisual->GetType() == rendering::Visual::VT_VISUAL);
-  EXPECT_TRUE(cylinderVisual->GetType() == rendering::Visual::VT_VISUAL);
+  EXPECT_TRUE(boxVisual->GetType() == rendering::VT_VISUAL);
+  EXPECT_TRUE(sphereVisual->GetType() == rendering::VT_VISUAL);
+  EXPECT_TRUE(cylinderVisual->GetType() == rendering::VT_VISUAL);
 
   // Check that the collision visuals were properly added
   rendering::VisualPtr boxCollision = scene->GetVisual("box::link::collision");
@@ -224,9 +224,9 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(cylinderCollision != NULL);
 
   // Verify type is VT_COLLISION
-  EXPECT_TRUE(boxCollision->GetType() == rendering::Visual::VT_COLLISION);
-  EXPECT_TRUE(sphereCollision->GetType() ==rendering::Visual::VT_COLLISION);
-  EXPECT_TRUE(cylinderCollision->GetType() == rendering::Visual::VT_COLLISION);
+  EXPECT_TRUE(boxCollision->GetType() == rendering::VT_COLLISION);
+  EXPECT_TRUE(sphereCollision->GetType() ==rendering::VT_COLLISION);
+  EXPECT_TRUE(cylinderCollision->GetType() == rendering::VT_COLLISION);
 
   // Check that the inertia visuals were properly added
   rendering::VisualPtr boxInertia =
@@ -240,9 +240,9 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(cylinderInertia != NULL);
 
   // Verify type is VT_PHYSICS
-  EXPECT_TRUE(boxInertia->GetType() == rendering::Visual::VT_PHYSICS);
-  EXPECT_TRUE(sphereInertia->GetType() ==rendering::Visual::VT_PHYSICS);
-  EXPECT_TRUE(cylinderInertia->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(boxInertia->GetType() == rendering::VT_PHYSICS);
+  EXPECT_TRUE(sphereInertia->GetType() ==rendering::VT_PHYSICS);
+  EXPECT_TRUE(cylinderInertia->GetType() == rendering::VT_PHYSICS);
 
   // Check that the COM visuals were properly added
   rendering::VisualPtr boxCOM = scene->GetVisual("box::link_COM_VISUAL__");
@@ -255,9 +255,9 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(cylinderCOM != NULL);
 
   // Verify type is VT_PHYSICS
-  EXPECT_TRUE(boxCOM->GetType() == rendering::Visual::VT_PHYSICS);
-  EXPECT_TRUE(cylinderCOM->GetType() ==rendering::Visual::VT_PHYSICS);
-  EXPECT_TRUE(cylinderCOM->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(boxCOM->GetType() == rendering::VT_PHYSICS);
+  EXPECT_TRUE(cylinderCOM->GetType() ==rendering::VT_PHYSICS);
+  EXPECT_TRUE(cylinderCOM->GetType() == rendering::VT_PHYSICS);
 }
 
 /////////////////////////////////////////////////

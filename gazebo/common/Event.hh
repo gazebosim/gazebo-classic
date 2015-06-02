@@ -139,7 +139,7 @@ namespace gazebo
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
       typedef std::map<int,
-              std::shared_ptr<boost::function<T>>> EvtConnectionMap;
+              std::shared_ptr<boost::function<T> > > EvtConnectionMap;
 
       /// \brief Array of connection callbacks.
       public: EvtConnectionMap connections;
@@ -343,7 +343,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        for (auto &iter: this->myDataPtr->connections)
           (*iter.second)(_p);
       }
 
@@ -355,7 +355,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        for (auto &iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2);
       }
 
@@ -368,7 +368,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        for (auto &iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3);
       }
 
@@ -383,7 +383,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        for (auto &iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4);
       }
 
@@ -400,7 +400,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        for (auto &iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5);
       }
 
@@ -418,7 +418,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        for (auto &iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6);
       }
 
@@ -437,7 +437,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections.begin())
+        for (auto &iter: this->myDataPtr->connections.begin())
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
       }
 
@@ -458,7 +458,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        for (auto &iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
       }
 
@@ -481,7 +481,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        for (auto &iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
       }
 
@@ -505,7 +505,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        for (auto &iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
       }
 
@@ -536,7 +536,7 @@ namespace gazebo
       int index = 0;
       if (!this->myDataPtr->connections.empty())
       {
-        const auto &iter = this->myDataPtr->connections.rbegin();
+        auto const &iter = this->myDataPtr->connections.rbegin();
         index = iter->first + 1;
       }
       this->myDataPtr->connections[index].reset(
@@ -570,7 +570,7 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
-      const auto &it = this->myDataPtr->connections.find(_id);
+      auto const &it = this->myDataPtr->connections.find(_id);
       if (it != this->myDataPtr->connections.end())
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);

@@ -214,13 +214,22 @@ void Visual::Fini()
   }
 
   // Detach all children
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  if (this->dataPtr->sceneNode)
   {
-    this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
-    (*iter)->dataPtr->parent.reset();
-    (*iter).reset();
+    std::vector<VisualPtr>::iterator iter;
+    for (iter = this->dataPtr->children.begin();
+        iter != this->dataPtr->children.end(); ++iter)
+    {
+      if (*iter)
+      {
+        if ((*iter)->GetSceneNode())
+          this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
+        else
+          std::cerr << "ERRORR[" << (*iter)->GetName() << "]\n";
+        // this->dataPtr->scene->RemoveVisual(*iter);
+        //(*iter)->dataPtr->parent.reset();
+      }
+    }
   }
 
   this->dataPtr->children.clear();
@@ -660,7 +669,8 @@ unsigned int Visual::GetAttachedObjectCount() const
 //////////////////////////////////////////////////
 void Visual::DetachObjects()
 {
-  this->dataPtr->sceneNode->detachAllObjects();
+  if (this->dataPtr->sceneNode)
+    this->dataPtr->sceneNode->detachAllObjects();
   this->dataPtr->meshName = "";
   this->dataPtr->subMeshName = "";
   this->dataPtr->myMaterialName = "";
@@ -1665,16 +1675,19 @@ math::Pose Visual::GetWorldPose() const
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
 
-  vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-  pose.pos.x = vpos.x;
-  pose.pos.y = vpos.y;
-  pose.pos.z = vpos.z;
+  if (this->dataPtr->sceneNode)
+  {
+    vpos = this->dataPtr->sceneNode->_getDerivedPosition();
+    pose.pos.x = vpos.x;
+    pose.pos.y = vpos.y;
+    pose.pos.z = vpos.z;
 
-  vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-  pose.rot.w = vquatern.w;
-  pose.rot.x = vquatern.x;
-  pose.rot.y = vquatern.y;
-  pose.rot.z = vquatern.z;
+    vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
+    pose.rot.w = vquatern.w;
+    pose.rot.x = vquatern.x;
+    pose.rot.y = vquatern.y;
+    pose.rot.z = vquatern.z;
+  }
 
   return pose;
 }
@@ -2952,13 +2965,13 @@ sdf::ElementPtr Visual::GetSDF() const
 }
 
 //////////////////////////////////////////////////
-Visual::VisualType Visual::GetType() const
+rendering::VisualType Visual::GetType() const
 {
   return this->dataPtr->type;
 }
 
 //////////////////////////////////////////////////
-void Visual::SetType(const Visual::VisualType _type)
+void Visual::SetType(const rendering::VisualType _type)
 {
   this->dataPtr->type = _type;
 }

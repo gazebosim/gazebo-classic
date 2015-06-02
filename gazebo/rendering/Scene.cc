@@ -1806,7 +1806,7 @@ void Scene::PreRender()
   for (visualIter = modelVisualMsgsCopy.begin();
       visualIter != modelVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, Visual::VT_MODEL))
+    if (this->ProcessVisualMsg(*visualIter, VT_MODEL))
       modelVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1816,7 +1816,7 @@ void Scene::PreRender()
   for (visualIter = linkVisualMsgsCopy.begin();
       visualIter != linkVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, Visual::VT_LINK))
+    if (this->ProcessVisualMsg(*visualIter, VT_LINK))
       linkVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1825,7 +1825,7 @@ void Scene::PreRender()
   // Process the visual messages.
   for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, Visual::VT_VISUAL))
+    if (this->ProcessVisualMsg(*visualIter, VT_VISUAL))
       visualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1835,7 +1835,7 @@ void Scene::PreRender()
   for (visualIter = collisionVisualMsgsCopy.begin();
       visualIter != collisionVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, Visual::VT_COLLISION))
+    if (this->ProcessVisualMsg(*visualIter, VT_COLLISION))
       collisionVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -2442,7 +2442,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
+bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
 {
   bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
@@ -3039,8 +3039,8 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
   for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
-    Visual::VisualType visType = childVis->GetType();
-    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
+    rendering::VisualType visType = childVis->GetType();
+    if (visType == VT_PHYSICS || visType == VT_SENSOR)
     {
       toRemove.push_back(childVis);
     }

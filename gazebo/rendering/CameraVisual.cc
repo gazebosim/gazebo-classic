@@ -46,13 +46,21 @@ CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 CameraVisual::~CameraVisual()
 {
-  CameraVisualPrivate *dPtr =
+  std::cout << "Delete camera visual\n";
+  /*CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
+  dPtr->connections.clear();
 
-  if (dPtr->scene)
+  if (dPtr->scene && dPtr->camera)
     dPtr->scene->RemoveCamera(dPtr->camera->GetName());
 
   dPtr->camera.reset();
+
+      */
+  this->DetachObjects();
+/*  this->dataPtr->scene->GetManager()->destroyEntity(
+      this->GetName() + "__plane");
+      */
 }
 
 /////////////////////////////////////////////////
@@ -90,12 +98,16 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   plane.normal = Ogre::Vector3::NEGATIVE_UNIT_X;
   plane.d = dist;
 
-  Ogre::MeshManager::getSingleton().createPlane(this->GetName() + "__floor",
-      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-      plane, width, height, 1, 1, true, 1, 1.0f, 1.0f,
-      Ogre::Vector3::UNIT_Z);
+  if (!Ogre::MeshManager::getSingleton().resourceExists(
+        this->GetName() + "__floor"))
+  {
+    Ogre::MeshManager::getSingleton().createPlane(this->GetName() + "__floor",
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        plane, width, height, 1, 1, true, 1, 1.0f, 1.0f,
+        Ogre::Vector3::UNIT_Z);
+  }
 
-  Ogre::Entity* planeEnt =
+  Ogre::Entity *planeEnt =
     dPtr->scene->GetManager()->createEntity(this->GetName() + "__plane",
         this->GetName() + "__floor");
   planeEnt->setMaterialName(this->GetName()+"_RTT_material");

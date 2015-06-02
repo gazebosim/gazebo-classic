@@ -567,7 +567,7 @@ namespace gazebo
       /// \param[in] _type Type of visual.
       /// \return True if message is processed successfully.
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg,
-          Visual::VisualType _type = Visual::VT_ENTITY);
+          rendering::VisualType _type = rendering::VT_ENTITY);
 
       /// \brief Light message callback.
       /// \param[in] _msg The message data.

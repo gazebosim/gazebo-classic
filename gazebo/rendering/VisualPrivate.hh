@@ -59,11 +59,19 @@ namespace gazebo
       /// \brief Constructor
       public: VisualPrivate()
               : sceneNode(NULL),
+                transparency(0),
+                castShadows(true),
+                isStatic(false),
                 staticGeom(NULL),
+                visible(true),
                 ribbonTrail(NULL),
                 skeleton(NULL),
                 animState(NULL),
-                boundingBox(NULL)
+                useRTShader(true),
+                initialized(false),
+                boundingBox(NULL),
+                lighting(true),
+                type(VT_ENTITY)
       {
       }
 
@@ -180,7 +188,7 @@ namespace gazebo
       public: uint32_t visibilityFlags;
 
       /// \brief type
-      public: Visual::VisualType type;
+      public: rendering::VisualType type;
 
       /// \brief Index of the layer to which this visual belongs. Layers
       /// act similar to layers in photoshop.
