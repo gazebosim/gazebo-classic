@@ -208,33 +208,9 @@ void Visual::Fini()
 
   // Detach from the parent
   if (this->dataPtr->parent)
-  {
     this->dataPtr->parent->DetachVisual(this->GetName());
-    this->dataPtr->parent.reset();
-  }
 
-  // Detach all children
   if (this->dataPtr->sceneNode)
-  {
-    std::vector<VisualPtr>::iterator iter;
-    for (iter = this->dataPtr->children.begin();
-        iter != this->dataPtr->children.end(); ++iter)
-    {
-      if (*iter)
-      {
-        if ((*iter)->GetSceneNode())
-          this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
-        else
-          std::cerr << "ERRORR[" << (*iter)->GetName() << "]\n";
-        // this->dataPtr->scene->RemoveVisual(*iter);
-        //(*iter)->dataPtr->parent.reset();
-      }
-    }
-  }
-
-  this->dataPtr->children.clear();
-
-  if (this->dataPtr->sceneNode != NULL)
   {
     this->dataPtr->sceneNode->detachAllObjects();
     this->dataPtr->scene->GetManager()->destroySceneNode(
@@ -594,7 +570,8 @@ void Visual::DetachVisual(const std::string &_name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
-      this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
+      if (this->dataPtr->sceneNode)
+        this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
       childVis->GetParent().reset();
       break;
     }

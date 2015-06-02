@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera Visualization Class
- * Author: Nate Koenig
- */
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -46,21 +43,7 @@ CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 CameraVisual::~CameraVisual()
 {
-  std::cout << "Delete camera visual\n";
-  /*CameraVisualPrivate *dPtr =
-      reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
-  dPtr->connections.clear();
-
-  if (dPtr->scene && dPtr->camera)
-    dPtr->scene->RemoveCamera(dPtr->camera->GetName());
-
-  dPtr->camera.reset();
-
-      */
-  this->DetachObjects();
-/*  this->dataPtr->scene->GetManager()->destroyEntity(
-      this->GetName() + "__plane");
-      */
+  this->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -154,4 +137,25 @@ void CameraVisual::Update()
     return;
 
   dPtr->camera->Render();
+}
+
+/////////////////////////////////////////////////
+void CameraVisual::Fini()
+{
+  /*CameraVisualPrivate *dPtr =
+      reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
+  dPtr->connections.clear();
+
+  if (dPtr->scene && dPtr->camera)
+    dPtr->scene->RemoveCamera(dPtr->camera->GetName());
+
+  dPtr->camera.reset();
+
+      */
+  this->DetachObjects();
+  if (this->dataPtr->scene)
+  {
+    this->dataPtr->scene->GetManager()->destroyEntity(
+        this->GetName() + "__plane");
+  }
 }
