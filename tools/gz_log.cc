@@ -53,6 +53,8 @@ std::ostringstream &FilterBase::Out(std::ostringstream &_stream,
       _stream << _state.GetRealTime().Double() << " ";
     else if (this->stamp == "wall")
       _stream << _state.GetWallTime().Double() << " ";
+    else if (this->stamp == "iterations")
+      _stream << _state.GetIterations() << " ";
     _stream.setf(flags);
   }
 
@@ -553,7 +555,8 @@ std::string StateFilter::Filter(const std::string &_stateString)
       << "<state world_name='" << state.GetName() << "'>\n"
       << "<sim_time>" << state.GetSimTime() << "</sim_time>\n"
       << "<real_time>" << state.GetRealTime() << "</real_time>\n"
-      << "<wall_time>" << state.GetWallTime() << "</wall_time>\n";
+      << "<wall_time>" << state.GetWallTime() << "</wall_time>\n"
+      << "<iterations>" << state.GetIterations() << "</iterations>\n";;
   }
 
   result << this->filter.Filter(state);
