@@ -495,7 +495,6 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
-  //std::cout << "1st logStep() Iterations: " << this->dataPtr->iterations << std::endl;
   if (this->dataPtr->stepInc < 0)
   {
     // Step back: This is implemented by going to the beginning of the log file,
@@ -503,11 +502,9 @@ void World::LogStep()
     // ToDo: Use keyframes in the log file to speed up this process.
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = this->dataPtr->iterations + this->dataPtr->stepInc
-        - util::LogPlay::Instance()->GetInitialIterations();
-    std::cout << "StepInc: " << this->dataPtr->stepInc << std::endl;
+        - util::LogPlay::Instance()->GetInitialIterations() + 2;
     if (this->dataPtr->stepInc < 1)
       this->dataPtr->stepInc = 1;
-    //this->dataPtr->iterations = 0;
   }
 
   while (!this->IsPaused() || this->dataPtr->stepInc > 0)
@@ -564,8 +561,6 @@ void World::LogStep()
 
       this->SetState(this->dataPtr->logPlayState);
       this->Update();
-      std::cout << "Iterations: " << this->dataPtr->iterations << std::endl;
-      //this->dataPtr->iterations++;
     }
 
     if (this->dataPtr->stepInc > 0)
