@@ -741,7 +741,7 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
-  if (this->dataPtr->scale == _scale || !this->dataPtr->sceneNode)
+  if (this->dataPtr->scale == _scale)
     return;
 
   this->dataPtr->scale = _scale;
@@ -1648,15 +1648,13 @@ void Visual::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
-  if (this->dataPtr->sceneNode)
-    this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
+  this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
-  if (this->dataPtr->sceneNode)
-    this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
+  this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
 //////////////////////////////////////////////////
@@ -1667,19 +1665,16 @@ math::Pose Visual::GetWorldPose() const
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
 
-  if (this->dataPtr->sceneNode)
-  {
-    vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-    pose.pos.x = vpos.x;
-    pose.pos.y = vpos.y;
-    pose.pos.z = vpos.z;
+  vpos = this->dataPtr->sceneNode->_getDerivedPosition();
+  pose.pos.x = vpos.x;
+  pose.pos.y = vpos.y;
+  pose.pos.z = vpos.z;
 
-    vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-    pose.rot.w = vquatern.w;
-    pose.rot.x = vquatern.x;
-    pose.rot.y = vquatern.y;
-    pose.rot.z = vquatern.z;
-  }
+  vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
+  pose.rot.w = vquatern.w;
+  pose.rot.x = vquatern.x;
+  pose.rot.y = vquatern.y;
+  pose.rot.z = vquatern.z;
 
   return pose;
 }
