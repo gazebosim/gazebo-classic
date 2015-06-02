@@ -333,8 +333,7 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto &iter: this->myDataPtr->connections)
-          if (*iter.second)
-            (*iter.second)();
+          (*iter.second)();
       }
 
       /// \brief Signal the event with one parameter.

@@ -56,6 +56,20 @@ namespace gazebo
     /// \brief Private data for the Visual class
     class VisualPrivate
     {
+      /// \brief Constructor
+      public: VisualPrivate()
+              : sceneNode(NULL),
+                staticGeom(NULL),
+                ribbonTrail(NULL),
+                skeleton(NULL),
+                animState(NULL),
+                boundingBox(NULL)
+      {
+      }
+
+      /// \brief Default destructor
+      public: virtual ~VisualPrivate() = default;
+
       /// \brief Pointer to the visual's scene.
       public: ScenePtr scene;
 
@@ -167,7 +181,7 @@ namespace gazebo
 
       /// \brief type
       public: Visual::VisualType type;
-      
+
       /// \brief Index of the layer to which this visual belongs. Layers
       /// act similar to layers in photoshop.
       public: int32_t layer;
