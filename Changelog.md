@@ -107,6 +107,9 @@ compilation on Windows.
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
+1. Timer GUI Plugin: Treat negative positions as positions from the ends
+    * [Pull request #1703](https://bitbucket.org/osrf/gazebo/pull-request/1703)
+
 1. Added Visual::GetDepth() and Visual::GetNthAncestor()
     * [Pull request #1613](https://bitbucket.org/osrf/gazebo/pull-request/1613)
 
