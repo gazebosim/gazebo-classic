@@ -119,12 +119,6 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       this->SetParam(dParamVel,
           elem->GetElement("velocity")->Get<double>());
   }
-
-  // cache joint force torque feedback wrench
-  gazebo::event::ConnectionPtr jointFeedbackConnection =
-    physics::Joint::ConnectJointUpdate(
-    boost::bind(&ODEJoint::CacheForceTorque, this));
-  this->updateConnections.push_back(jointFeedbackConnection);
 }
 
 //////////////////////////////////////////////////
@@ -831,7 +825,7 @@ void ODEJoint::CacheForceTorque()
   }
   else
   {
-    // forgot to set provide_feedback?
+    // provide_feedback not set
     gzwarn << "GetForceTorque: forgot to set <provide_feedback>?\n";
   }
 }

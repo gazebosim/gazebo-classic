@@ -253,6 +253,15 @@ void DARTPhysics::UpdatePhysics()
           = boost::dynamic_pointer_cast<DARTLink>(links.at(j));
       dartLinkItr->updateDirtyPoseFromDARTTransformation();
     }
+
+    physics::Joint_V joints = modelItr->GetJoints();
+    for (physics::Joint_V::iterator jx = joints.begin();
+         jx != joints.end(); ++jx)
+    {
+      DARTJointPtr dartJoint =
+        boost::dynamic_pointer_cast<physics::DARTJoint>(*jx);
+      dartJoint->CacheForceTorque();
+    }
   }
 
   // this->lastUpdateTime = currTime;

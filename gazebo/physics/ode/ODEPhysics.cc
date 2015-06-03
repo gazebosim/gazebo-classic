@@ -458,6 +458,23 @@ void ODEPhysics::UpdatePhysics()
              col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(t2);
       }
     }
+
+    // cache force torques
+    physics::Model_V models = this->world->GetModels();
+    for (physics::Model_V::iterator mi = models.begin();
+         mi != models.end(); ++mi)
+    {
+      physics::Joint_V joints = (*mi)->GetJoints();
+      for (physics::Joint_V::iterator jx = joints.begin();
+           jx != joints.end(); ++jx)
+      {
+        ODEJointPtr odeJoint =
+          boost::dynamic_pointer_cast<physics::ODEJoint>(*jx);
+        dJointFeedback *fb = odeJoint->GetFeedback();
+        if (fb)
+          odeJoint->CacheForceTorque();
+      }
+    }
   }
 
   DIAG_TIMER_STOP("ODEPhysics::UpdatePhysics");

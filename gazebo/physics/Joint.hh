@@ -670,9 +670,6 @@ namespace gazebo
       /// \brief apply damping for adding viscous damping forces on updates
       protected: gazebo::event::ConnectionPtr applyDamping;
 
-      /// \brief connection to jointUpdate calls
-      protected: std::vector<gazebo::event::ConnectionPtr> updateConnections;
-
       /// \brief Store Joint effort limit as specified in SDF
       protected: double effortLimit[MAX_JOINT_AXIS];
 

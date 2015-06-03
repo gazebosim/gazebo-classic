@@ -57,12 +57,6 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
   // In Joint::Load(sdf::ElementPtr), this joint stored the information of the
   // parent link and child link.
   Joint::Load(_sdf);
-
-  // cache joint force torque feedback wrench
-  gazebo::event::ConnectionPtr jointFeedbackConnection =
-    physics::Joint::ConnectJointUpdate(
-    boost::bind(&DARTJoint::CacheForceTorque, this));
-  this->updateConnections.push_back(jointFeedbackConnection);
 }
 
 //////////////////////////////////////////////////
