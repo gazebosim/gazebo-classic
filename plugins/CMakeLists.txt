@@ -27,6 +27,7 @@ endif()
 
 set (plugins
   ActuatorPlugin
+  ArduCopterPlugin
   ArrangePlugin
   BreakableJointPlugin
   BuoyancyPlugin
