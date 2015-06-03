@@ -27,8 +27,6 @@ namespace gazebo
 {
   namespace gui
   {
-    class RestUiWidget;
-
     /// \brief Provides a means to logout from a webservice
     class GAZEBO_VISIBLE RestUiLogoutDialog : public QDialog
     {
@@ -38,7 +36,7 @@ namespace gazebo
       /// \param[in] _parent Parent QWidget
       /// \param[in] _defaultUrl Url text for the url (ex: https://superweb.com)
       public: RestUiLogoutDialog(QWidget *_parent,
-                              const std::string &_defautlUrl);
+                                 const std::string &_defautlUrl);
 
       /// \brief Slot for the AcceptLogin event
       public slots: void SlotAcceptLogout();
