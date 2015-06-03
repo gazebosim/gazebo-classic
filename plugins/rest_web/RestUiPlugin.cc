@@ -103,12 +103,12 @@ void RestUiPlugin::OnMainWindowReady()
   // create a global widget instance, to act as a global QT object
   // the RestUiPlugin class is not a QT object
   this->widget = new RestUiWidget(mainWindow,
-                            *loginAct,
-                            *logoutAct,
-                            this->menuTitle.c_str(),
-                            this->loginTitle.c_str(),
-                            this->urlLabel.c_str(),
-                            this->defaultUrl.c_str());
+                                  *loginAct,
+                                  *logoutAct,
+                                  this->menuTitle.c_str(),
+                                  this->loginTitle.c_str(),
+                                  this->urlLabel.c_str(),
+                                  this->defaultUrl.c_str());
 
   QObject::connect(loginAct, SIGNAL(triggered()),
                    this->widget, SLOT(Login()));
