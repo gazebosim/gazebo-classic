@@ -7,6 +7,8 @@
 
 ### Gazebo 4.1.3 (2015-05-07)
 
+1. Fix saving visual geom SDF values
+    * [Pull request #1597](https://bitbucket.org/osrf/gazebo/pull-request/1597)
 1. Fix heightmap model texture loading.
     * [Pull request #1595](https://bitbucket.org/osrf/gazebo/pull-request/1595)
 1. Fix visual collision scale on separate client
