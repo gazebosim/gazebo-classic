@@ -362,6 +362,33 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   // Check that box dialog has focus
   QVERIFY(applyWrenchDialogBox->isActiveWindow());
 
+  // Get the ApplyWrenchVisual for the box
+  gazebo::rendering::ApplyWrenchVisualPtr boxApplyWrenchVis =
+      boost::dynamic_pointer_cast<gazebo::rendering::ApplyWrenchVisual>(
+      scene->GetVisual("multilink__APPLY_WRENCH__"));
+  QVERIFY(boxApplyWrenchVis != NULL);
+  QVERIFY(boxApplyWrenchVis->GetParent() == boxLinkVis);
+
+  // Check that the force visual is visible and inactive
+  QVERIFY(boxApplyWrenchVis->GetForceVisual() != NULL);
+  QVERIFY(boxApplyWrenchVis->GetForceVisual()->GetMaterialName().find(
+      "Gazebo/DarkOrangeTransparentOverlay") != std::string::npos);
+
+  // Check that the torque visual is visible and inactive
+  QVERIFY(boxApplyWrenchVis->GetTorqueVisual() != NULL);
+  QVERIFY(boxApplyWrenchVis->GetTorqueVisual()->GetMaterialName().find(
+      "Gazebo/DarkOrangeTransparentOverlay") != std::string::npos);
+
+  // Check that rot tool is not visible, not selected and in rotate mode
+  QVERIFY(!boxApplyWrenchVis->GetRotTool()->GetHandleVisible(
+      gazebo::rendering::SelectionObj::SelectionMode::ROT_Y));
+  QVERIFY(!boxApplyWrenchVis->GetRotTool()->GetHandleVisible(
+      gazebo::rendering::SelectionObj::SelectionMode::ROT_Z));
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetState() ==
+      gazebo::rendering::SelectionObj::SelectionMode::SELECTION_NONE);
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetMode() ==
+      gazebo::rendering::SelectionObj::SelectionMode::ROT);
+
   // Initialize dialog for the sphere link
   gazebo::gui::ApplyWrenchDialog *applyWrenchDialogSphere =
       new gazebo::gui::ApplyWrenchDialog();
@@ -379,6 +406,33 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   QVERIFY(!applyWrenchDialogBox->isActiveWindow());
   QVERIFY(applyWrenchDialogSphere->isActiveWindow());
 
+  // Get the ApplyWrenchVisual for the sphere
+  gazebo::rendering::ApplyWrenchVisualPtr sphereApplyWrenchVis =
+      boost::dynamic_pointer_cast<gazebo::rendering::ApplyWrenchVisual>(
+      scene->GetVisual("multilink__APPLY_WRENCH__0"));
+  QVERIFY(sphereApplyWrenchVis != NULL);
+  QVERIFY(sphereApplyWrenchVis->GetParent() == sphereLinkVis);
+
+  // Check that the force visual is visible and inactive
+  QVERIFY(sphereApplyWrenchVis->GetForceVisual() != NULL);
+  QVERIFY(sphereApplyWrenchVis->GetForceVisual()->GetMaterialName().find(
+      "Gazebo/DarkOrangeTransparentOverlay") != std::string::npos);
+
+  // Check that the torque visual is visible and inactive
+  QVERIFY(sphereApplyWrenchVis->GetTorqueVisual() != NULL);
+  QVERIFY(sphereApplyWrenchVis->GetTorqueVisual()->GetMaterialName().find(
+      "Gazebo/DarkOrangeTransparentOverlay") != std::string::npos);
+
+  // Check that rot tool is not visible, not selected and in rotate mode
+  QVERIFY(!sphereApplyWrenchVis->GetRotTool()->GetHandleVisible(
+      gazebo::rendering::SelectionObj::SelectionMode::ROT_Y));
+  QVERIFY(!sphereApplyWrenchVis->GetRotTool()->GetHandleVisible(
+      gazebo::rendering::SelectionObj::SelectionMode::ROT_Z));
+  QVERIFY(sphereApplyWrenchVis->GetRotTool()->GetState() ==
+      gazebo::rendering::SelectionObj::SelectionMode::SELECTION_NONE);
+  QVERIFY(sphereApplyWrenchVis->GetRotTool()->GetMode() ==
+      gazebo::rendering::SelectionObj::SelectionMode::ROT);
+
   // Give focus to main window
   mainWindow->activateWindow();
 
@@ -395,15 +449,24 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   QVERIFY(!applyWrenchDialogBox->isActiveWindow());
   QVERIFY(!applyWrenchDialogSphere->isActiveWindow());
 
+  // Get spins
+  QList<QDoubleSpinBox *> spins =
+      applyWrenchDialogBox->findChildren<QDoubleSpinBox *>();
+  QVERIFY(spins.size() == 11u);
+
+  // Check spins values
+  for (auto i = 0; i < spins.size(); ++i)
+  {
+    QCOMPARE(spins[i]->value(), 0.0);
+  }
+
   // Find the box's torque visual
   bool found = false;
   gazebo::math::Vector2i mousePoint(glWidget->width()/2, glWidget->height()/2);
   while (mousePoint.x < glWidget->width())
   {
     gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint);
-    if (vis && vis->GetName().find("TORQUE") != std::string::npos &&
-        vis->GetNthAncestor(2) &&
-        vis->GetNthAncestor(2)->GetName() == "multilink::box_link")
+    if (vis && vis == boxApplyWrenchVis->GetTorqueVisual())
     {
       found = true;
       break;
@@ -411,30 +474,86 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
     mousePoint.x += 5;
   }
 
-  if (found)
+  if (!found)
   {
-    // Click on the box's torque visual
-    QPoint clickPoint(mousePoint.x, mousePoint.y);
-    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, clickPoint,
-        100);
+    std::cout << "Couldn't find torque visual, interrupting test." << std::endl;
+    return;
+  }
+
+  // Click on the box's torque visual
+  QPoint clickPoint(mousePoint.x, mousePoint.y);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, clickPoint,
+      100);
+  QCoreApplication::processEvents();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
-
-    // Process some events and draw the screen
-    for (size_t i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
-
-    // Check that box dialog has focus
-    QVERIFY(applyWrenchDialogBox->isActiveWindow());
-    QVERIFY(!applyWrenchDialogSphere->isActiveWindow());
+    mainWindow->repaint();
   }
-  else
+
+  // Check that box dialog has focus
+  QVERIFY(applyWrenchDialogBox->isActiveWindow());
+  QVERIFY(!applyWrenchDialogSphere->isActiveWindow());
+
+  // Check that torque spins changed to UnitX
+  QCOMPARE(spins[7]->value(), 1.0);
+  QCOMPARE(spins[8]->value(), 0.0);
+  QCOMPARE(spins[9]->value(), 0.0);
+  QCOMPARE(spins[10]->value(), 1.0);
+
+  // Check that torque visual is the only one highlighted
+  QVERIFY(boxApplyWrenchVis->GetForceVisual()->GetMaterialName().find(
+      "Gazebo/DarkOrangeTransparentOverlay") != std::string::npos);
+  QVERIFY(boxApplyWrenchVis->GetTorqueVisual()->GetMaterialName().find(
+      "Gazebo/OrangeTransparentOverlay") != std::string::npos);
+
+  // Check that rot tool is visible and not highlighted
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetHandleVisible(
+      gazebo::rendering::SelectionObj::SelectionMode::ROT_Y));
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetHandleVisible(
+      gazebo::rendering::SelectionObj::SelectionMode::ROT_Z));
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetState() ==
+      gazebo::rendering::SelectionObj::SelectionMode::SELECTION_NONE);
+
+  // Find the rot tool
+  std::string manipState = "";
+  while (mousePoint.y < glWidget->height())
   {
-    std::cout << "Couldn't find torque visual, not testing click." << std::endl;
+    gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint, manipState);
+    if (!vis && manipState == "rot_y")
+    {
+      mousePoint.y += 10;
+      break;
+    }
+    mousePoint.y += 5;
   }
+
+  if (manipState.empty())
+  {
+    return;
+  }
+
+  // Mouse press on the rot tool
+  QPoint pressPoint(mousePoint.x, mousePoint.y);
+  QTest::mouseMove(glWidget, pressPoint);
+  QTest::qWait(1000);
+  QTest::mousePress(glWidget, Qt::LeftButton, Qt::NoModifier, pressPoint,
+      100);
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that rot tool is highlighted
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetState() ==
+      gazebo::rendering::SelectionObj::SelectionMode::ROT_Y);
 
   // Clean up
   delete applyWrenchDialogBox;

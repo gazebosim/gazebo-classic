@@ -884,14 +884,17 @@ void ApplyWrenchDialog::AttachVisuals()
   if (!this->dataPtr->applyWrenchVisual)
   {
     // Generate unique name
-    std::string visName = this->dataPtr->modelName + "__APPLY_WRENCH__";
+    std::string visNameBase = this->dataPtr->modelName + "__APPLY_WRENCH__";
     rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
-        GetVisual(visName);
-    if (vis)
+        GetVisual(visNameBase);
+
+    std::string visName(visNameBase);
+    int count = 0;
+    while (vis)
     {
-      gzerr << "A visual named [" << visName << "] already exists."
-          << std::endl;
-      return;
+      visName = visNameBase + std::to_string(count);
+      vis = gui::get_active_camera()->GetScene()->GetVisual(visName);
+      ++count;
     }
 
     this->dataPtr->applyWrenchVisual.reset(new rendering::ApplyWrenchVisual(
@@ -992,12 +995,6 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
 
     return true;
   }
-  // Link clicked: activate dialog and propagate event
-  else if (vis->GetNthAncestor(2) ==
-      this->dataPtr->applyWrenchVisual->GetNthAncestor(2))
-  {
-    this->ActivateWindow();
-  }
   return false;
 }
 
@@ -1008,7 +1005,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent & _event)
   if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
 
-  // Dragging tool, slightly modified from ModelManipulator::RotateEntity
+  // Dragging tool, adapted from ModelManipulator::RotateEntity
   if (_event.dragging && _event.button == common::MouseEvent::LEFT &&
       this->dataPtr->draggingTool)
   {
@@ -1260,11 +1257,16 @@ void ApplyWrenchDialog::changeEvent(QEvent *_event)
   // Focus in this dialog
   if (_event->type() == QEvent::ActivationChange)
   {
-    if (!this->dataPtr->mainWindow)
-      return;
+    // During tests it seems not to find main window, so this is true by default
+    bool mainWindowActive = true;
 
-    this->SetActive(this->isActiveWindow() ||
-        this->dataPtr->mainWindow->isActiveWindow());
+    if (this->dataPtr->mainWindow &&
+        !this->dataPtr->mainWindow->isActiveWindow())
+    {
+      mainWindowActive = false;
+    }
+
+    this->SetActive(this->isActiveWindow() || mainWindowActive);
   }
 }
 

@@ -104,6 +104,8 @@ void ApplyWrenchVisual::Fini()
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::Load()
 {
+  Visual::Load();
+
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
