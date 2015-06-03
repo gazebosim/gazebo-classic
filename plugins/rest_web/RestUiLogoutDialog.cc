@@ -30,8 +30,8 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 RestUiLogoutDialog::RestUiLogoutDialog(QWidget *_parent,
-                                     const std::string &_defaultUrl)
-    :QDialog(_parent), url(_defaultUrl.c_str())
+                                       const std::string &_defaultUrl)
+  : QDialog(_parent), url(_defaultUrl.c_str())
 {
   this->setWindowTitle(tr("Logout"));
   this->setModal(true);
