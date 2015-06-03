@@ -10,13 +10,12 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 find_package(Protobuf REQUIRED)
 find_package(gazebo REQUIRED)
-find_package(ignition-math2 REQUIRED)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 # include appropriate directories
-include_directories(${GAZEBO_INCLUDE_DIRS} ${IGNITION-MATH_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS} ${IGNITION-MATH_LIBRARY_DIRS})
+include_directories(${GAZEBO_INCLUDE_DIRS})
+link_directories(${GAZEBO_LIBRARY_DIRS})
 
 # Create libraries and executables
 
@@ -28,4 +27,4 @@ target_link_libraries(integrated_main ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${P
 
 
 add_executable(independent_listener independent_listener.cc)
-target_link_libraries(independent_listener ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${IGNITION-MATH_LIBRARIES} pthread)
+target_link_libraries(independent_listener ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
