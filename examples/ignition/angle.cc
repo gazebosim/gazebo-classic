@@ -20,7 +20,7 @@
 
 /////////////////////////////////////////////////
 // Migration from gazebo::math::Angle to ignition::math::Angle examples
-// See Ignition documentation http://ignitionrobotics.org/libraries/ign_math/api
+// See Ignition documentation http://ignitionrobotics.org/libraries/math
 int main()
 {
   // Construction

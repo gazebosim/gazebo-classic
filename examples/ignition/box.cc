@@ -20,7 +20,7 @@
 
 /////////////////////////////////////////////////
 // Migration from gazebo::math::Box to ignition::math::Box examples
-// See Ignition documentation http://ignitionrobotics.org/libraries/ign_math/api
+// See Ignition documentation http://ignitionrobotics.org/libraries/math
 int main()
 {
   // Construction
