@@ -25,17 +25,17 @@ TEST(PkgConfig, Config)
   // Create a build directory in the project binary directory so that we
   // don't pollute the source tree
   snprintf(cmd, sizeof(cmd), "mkdir %s/test/pkgconfig/plugin",
-      PROJECT_BINARY_PATH);
-  system(cmd);
+           PROJECT_BINARY_PATH);
+  ASSERT_TRUE(system(cmd) > -1);
 
   // Run cmake
   snprintf(cmd, sizeof(cmd), "cd %s/test/pkgconfig/plugin; cmake %s",
-      PROJECT_BINARY_PATH, SOURCE_DIR);
+           PROJECT_BINARY_PATH, SOURCE_DIR);
   ASSERT_EQ(system(cmd), 0);
 
   // Make
   snprintf(cmd, sizeof(cmd), "cd %s/test/pkgconfig/plugin; make",
-      PROJECT_BINARY_PATH);
+           PROJECT_BINARY_PATH);
   ASSERT_EQ(system(cmd), 0);
 }
 
