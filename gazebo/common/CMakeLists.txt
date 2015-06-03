@@ -138,8 +138,16 @@ set (gtest_sources
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
-  Timer_TEST.cc
 )
+
+# Timer test fails on OSX
+# See issue #1626
+if (NOT APPLE)
+  set (gtest_sources
+    ${gtest_sources}
+    Timer_TEST.cc
+  )
+endif()
 
 if (HAVE_GTS)
 set (sources
