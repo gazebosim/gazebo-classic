@@ -22,6 +22,8 @@
 #include "gazebo/gazebo.hh"
 #include "ServerFixture.hh"
 
+#include "test_config.h"
+
 using namespace gazebo;
 
 /////////////////////////////////////////////////

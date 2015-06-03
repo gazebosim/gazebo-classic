@@ -52,8 +52,6 @@
 #include "gazebo/Server.hh"
 #include "gazebo/util/system.hh"
 
-#include "test_config.h"
-
 namespace gazebo
 {
   std::string custom_exec(std::string _cmd);
