@@ -43,8 +43,8 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
   this->logoutPub = node->Advertise<gazebo::msgs::RestLogout>(
       "/gazebo/rest/rest_logout");
   this->errorSub = node->Subscribe("/gazebo/rest/rest_error",
-                              &RestUiWidget::OnResponse,
-                              this);
+                                   &RestUiWidget::OnResponse,
+                                   this);
 }
 
 /////////////////////////////////////////////////
