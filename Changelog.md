@@ -92,6 +92,9 @@ compilation on Windows.
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
+1. Added world origin indicator rendering::OriginVisual.
+    * [Pull request #1700](https://bitbucket.org/osrf/gazebo/pull-request/1700)
+
 1. Show/hide toolbars using the menu bars and shortcut.
    Added MainWindow::CloneAction.
    Added Window menu to Model Editor.
@@ -103,6 +106,9 @@ compilation on Windows.
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
+1. Timer GUI Plugin: Treat negative positions as positions from the ends
+    * [Pull request #1703](https://bitbucket.org/osrf/gazebo/pull-request/1703)
+
 1. Added Visual::GetDepth() and Visual::GetNthAncestor()
     * [Pull request #1613](https://bitbucket.org/osrf/gazebo/pull-request/1613)
 
@@ -111,6 +117,9 @@ compilation on Windows.
 
 1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
     * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
+
+1. Display confirmation message after log is saved
+    * [Pull request #1646](https://bitbucket.org/osrf/gazebo/pull-request/1646)
 
 1. Added Time::FormattedString and removed all other FormatTime functions.
     * [Pull request #1710](https://bitbucket.org/osrf/gazebo/pull-request/1710)
@@ -135,6 +144,9 @@ compilation on Windows.
 
 1. Set material of SelectionObj's handles.
     * [Pull request #1472](https://bitbucket.org/osrf/gazebo/pull-request/1472)
+
+1. Add SelectionObj::Fini with tests and make Visual::Fini virtual
+    * [Pull request #1685](https://bitbucket.org/osrf/gazebo/pull-request/1685)
 
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
