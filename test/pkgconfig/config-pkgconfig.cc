@@ -26,7 +26,7 @@ TEST(PkgConfig, Config)
   // don't pollute the source tree
   snprintf(cmd, sizeof(cmd), "mkdir %s/test/pkgconfig/plugin",
            PROJECT_BINARY_PATH);
-  ASSERT_TRUE(system(cmd) > -1);
+  ASSERT_GT(system(cmd), -1);
 
   // Run cmake
   snprintf(cmd, sizeof(cmd), "cd %s/test/pkgconfig/plugin; cmake %s",
