@@ -51,6 +51,7 @@ std::string Time::wallTimeISO;
 struct timespec Time::clockResolution;
 const Time Time::Zero = common::Time(0, 0);
 const int32_t Time::nsInSec = 1000000000L;
+const int32_t Time::nsInMs = 1000000;
 
 /////////////////////////////////////////////////
 Time::Time()
@@ -176,7 +177,7 @@ const Time &Time::GetWallTime()
     static_cast<double>(cpuFreq.QuadPart);
   uint32_t deltaSec = static_cast<uint32_t>(floor(dDeltaCpuTime));
   uint32_t deltaNSec = static_cast<uint32_t>(
-      std::round((dDeltaCpuTime-deltaSec) * nsInSec));
+      std::round((dDeltaCpuTime-deltaSec) * this->nsInSec));
 
   int64_t secSum  = static_cast<int64_t>(startSec) +
     static_cast<int64_t>(deltaSec);
@@ -185,11 +186,11 @@ const Time &Time::GetWallTime()
 
   // Normalize
   {
-    int64_t nsecPart = nsecSum % nsInSec;
-    int64_t secPart = secSum + nsecSum / nsInSec;
+    int64_t nsecPart = nsecSum % this->nsInSec;
+    int64_t secPart = secSum + nsecSum / this->nsInSec;
     if (nsecPart < 0)
     {
-      nsecPart += nsInSec;
+      nsecPart += this->nsInSec;
       --secPart;
     }
 
@@ -245,13 +246,13 @@ void Time::Set(double _seconds)
 double Time::Double() const
 {
   return (static_cast<double>(this->sec) +
-          static_cast<double>(this->nsec)*1e-9);
+          static_cast<double>(this->nsec) / this->nsInSec);
 }
 
 /////////////////////////////////////////////////
 float Time::Float() const
 {
-  return (this->sec + this->nsec * 1e-9f);
+  return (this->sec + this->nsec / static_cast<float>(this->nsInSec));
 }
 
 /////////////////////////////////////////////////
@@ -287,7 +288,7 @@ std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
   s = this->sec;
 
   // Get milliseconds
-  msec = rint(this->nsec * 1e-6);
+  msec = rint(this->nsec / this->nsInMs);
 
   // Get seconds from milliseconds
   int seconds = msec / 1000;

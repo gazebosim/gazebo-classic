@@ -451,24 +451,30 @@ namespace gazebo
                  // In the case sec and nsec have different signs, normalize
                  if (this->sec > 0 && this->nsec < 0)
                  {
-                   int32_t n = abs(this->nsec / nsInSec) + 1;
+                   int32_t n = abs(this->nsec / this->nsInSec) + 1;
                    this->sec -= n;
-                   this->nsec += n * nsInSec;
+                   this->nsec += n * this->nsInSec;
                  }
                  if (this->sec < 0 && this->nsec > 0)
                  {
-                   int32_t n = abs(this->nsec / nsInSec) + 1;
+                   int32_t n = abs(this->nsec / this->nsInSec) + 1;
                    this->sec += n;
-                   this->nsec -= n * nsInSec;
+                   this->nsec -= n * this->nsInSec;
                  }
 
                  // Make any corrections
-                 this->sec += this->nsec / nsInSec;
-                 this->nsec = this->nsec % nsInSec;
+                 this->sec += this->nsec / this->nsInSec;
+                 this->nsec = this->nsec % this->nsInSec;
                }
 
       private: static struct timespec clockResolution;
+
+      /// \brief Constant multiplier to convert from nanoseconds to seconds.
       private: static const int32_t nsInSec;
+
+      /// \brief Constant multiplier to convert from nanoseconds to
+      /// milliseconds.
+      private: static const int32_t nsInMs;
     };
     /// \}
   }
