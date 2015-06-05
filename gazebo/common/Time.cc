@@ -246,13 +246,13 @@ void Time::Set(double _seconds)
 double Time::Double() const
 {
   return (static_cast<double>(this->sec) +
-          static_cast<double>(this->nsec) / this->nsInSec);
+          static_cast<double>(this->nsec)*1e-9);
 }
 
 /////////////////////////////////////////////////
 float Time::Float() const
 {
-  return (this->sec + this->nsec / static_cast<float>(this->nsInSec));
+  return (this->sec + this->nsec * 1e-9f);
 }
 
 /////////////////////////////////////////////////
@@ -288,7 +288,7 @@ std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
   s = this->sec;
 
   // Get milliseconds
-  msec = rint(this->nsec / this->nsInMs);
+  msec = this->nsec / this->nsInMs;
 
   // Get seconds from milliseconds
   int seconds = msec / 1000;
