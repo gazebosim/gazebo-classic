@@ -32,6 +32,17 @@ GZ_REGISTER_MODEL_PLUGIN(ArduCopterPlugin)
 ////////////////////////////////////////////////////////////////////////////////
 ArduCopterPlugin::ArduCopterPlugin()
 {
+  // socket
+  this->handle = socket(AF_INET, SOCK_DGRAM /*SOCK_STREAM*/, 0);
+  fcntl(this->handle, F_SETFD, FD_CLOEXEC);
+  int one = 1;
+  setsockopt(this->handle, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+
+  this->bind("127.0.0.1", 9002);
+
+  setsockopt(this->handle, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+  //fcntl(this->handle, F_SETFL, fcntl(this->handle, F_GETFL, 0) & ~O_NONBLOCK);
+  fcntl(this->handle, F_SETFL, fcntl(this->handle, F_GETFL, 0) | O_NONBLOCK);
 }
 
 /////////////////////////////////////////////////
@@ -188,13 +199,17 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     }
   }
 
+  std::string imuLinkName;
+  getSdfParam<std::string>(_sdf, "imuLinkName", imuLinkName, "iris/imu_link");
+  this->imuLink = this->model->GetLink(imuLinkName);
+
   /* do this with fdm sender
   imu_pub_ = node_handle_->advertise<sensor_msgs::Imu>("imu", 1);
   pose_pub_ = node_handle_->advertise<gazebo_msgs::ModelState>("pose", 1);
   */
 
   // Controller time control.
-  this->lastControllerUpdateTime = this->model->GetWorld()->GetSimTime();
+  this->lastControllerUpdateTime = 0; // this->model->GetWorld()->GetSimTime();
 
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
@@ -215,12 +230,12 @@ void ArduCopterPlugin::Update(const common::UpdateInfo &/*_info*/)
 
   gazebo::common::Time curTime = this->model->GetWorld()->GetSimTime();
 
+  // Update the control surfaces and publish the new state.
   if (curTime > this->lastControllerUpdateTime)
   {
-    // Update the control surfaces and publish the new state.
+    this->SendState();
     this->GetMotorCommand();
     this->UpdatePIDs((curTime - this->lastControllerUpdateTime).Double());
-    this->SendState();
   }
 
   this->lastControllerUpdateTime = curTime;
@@ -252,8 +267,68 @@ void ArduCopterPlugin::UpdatePIDs(double _dt)
 /////////////////////////////////////////////////
 void ArduCopterPlugin::GetMotorCommand()
 {
+  servo_packet pkt;
+  /*
+    we re-send the servo packet every 0.1 seconds until we get a
+    reply. This allows us to cope with some packet loss to the FDM
+  */
+  while (this->recv(&pkt, sizeof(pkt), 100) != sizeof(pkt)) {
+    // send_servos(input);
+    usleep(100);
+  }
+
+  for (unsigned i = 0; i < this->rotors.size(); ++i)
+  {
+    this->rotors[i].cmd = pkt.motor_speed[i];
+  }
 }
+
 /////////////////////////////////////////////////
 void ArduCopterPlugin::SendState()
 {
+  // send_fdm
+  fdm_packet pkt;
+
+  pkt.timestamp = this->model->GetWorld()->GetSimTime().Double();
+
+  math::Pose imuPose = this->imuLink->GetWorldPose();
+  math::Vector3 gravity =
+    this->model->GetWorld()->GetPhysicsEngine()->GetGravity();
+  math::Vector3 linearAccel = this->imuLink->GetRelativeLinearAccel();
+  // rotate gravity into imu frame, subtract it
+  linearAccel = linearAccel - imuPose.rot.RotateVectorReverse(gravity);
+  // signs go from link frame to vehicle frame
+  pkt.imu_linear_acceleration_xyz[0] =  linearAccel.x;
+  pkt.imu_linear_acceleration_xyz[1] = -linearAccel.y;
+  pkt.imu_linear_acceleration_xyz[2] = -linearAccel.z;
+
+  math::Vector3 angularVel = this->imuLink->GetRelativeAngularVel();
+  // signs go from link frame to vehicle frame
+  pkt.imu_angular_velocity_rpy[0] =  angularVel.x;
+  pkt.imu_angular_velocity_rpy[1] = -angularVel.y;
+  pkt.imu_angular_velocity_rpy[2] = -angularVel.z;
+
+  math::Quaternion worldQ = imuPose.rot;
+  // signs go from link frame to vehicle frame
+  pkt.imu_orientation_quat[0] =  worldQ.w;
+  pkt.imu_orientation_quat[1] =  worldQ.x;
+  pkt.imu_orientation_quat[2] = -worldQ.y;
+  pkt.imu_orientation_quat[3] = -worldQ.z;
+
+  // math::Pose modelPose = this->model->GetWorldPose();
+  math::Pose modelPose = this->imuLink->GetWorldPose();
+  math::Vector3 worldPos = modelPose.pos;
+  math::Vector3 worldVel = this->imuLink->GetWorldLinearVel();
+  // signs go from gazebo world frame to ned earth frame
+  pkt.velocity_xyz[0] =  worldVel.x;
+  pkt.velocity_xyz[1] = -worldVel.y;
+  pkt.velocity_xyz[2] = -worldVel.z;
+  pkt.position_xyz[0] =  worldPos.x;
+  pkt.position_xyz[1] = -worldPos.y;
+  pkt.position_xyz[2] = -worldPos.z;
+
+  struct sockaddr_in sockaddr;
+  this->make_sockaddr("127.0.0.1", 9003, sockaddr);
+  ::sendto(this->handle, &pkt, sizeof(pkt), 0,
+    (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 }

@@ -18,6 +18,15 @@
 #ifndef _GAZEBO_ARDUCOPTER_PLUGIN_HH_
 #define _GAZEBO_ARDUCOPTER_PLUGIN_HH_
 
+// #include <fcntl.h>
+// #include <unistd.h>
+// #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+// #include <sys/select.h>
+
 #include <array>
 #include <mutex>
 #include <string>
@@ -132,6 +141,7 @@ namespace gazebo
                        this->iMax, this->iMin,
                        this->cmdMax, this->cmdMin);
       }
+
       public: ~Rotor() {}
 
       /// \brief rotor id
@@ -211,6 +221,70 @@ namespace gazebo
 
     /// \brief Controller update mutex.
     private: std::mutex mutex;
+
+    private: bool bind(const char *address, uint16_t port)
+    {
+        struct sockaddr_in sockaddr;
+        make_sockaddr(address, port, sockaddr);
+
+        if (::bind(this->handle,
+          (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0) {
+            return false;
+        }
+        return true;
+    }
+
+    // socket stuff
+    private: void make_sockaddr(const char *address, uint16_t port,
+      struct sockaddr_in &sockaddr)
+    {
+      memset(&sockaddr, 0, sizeof(sockaddr));
+
+      #ifdef HAVE_SOCK_SIN_LEN
+        sockaddr.sin_len = sizeof(sockaddr);
+      #endif
+
+      sockaddr.sin_port = htons(port);
+      sockaddr.sin_family = AF_INET;
+      sockaddr.sin_addr.s_addr = inet_addr(address);
+    }
+
+    private: ssize_t recv(void *buf, size_t size, uint32_t timeout_ms)
+    {
+        fd_set fds;
+        struct timeval tv;
+
+        FD_ZERO(&fds);
+        FD_SET(this->handle, &fds);
+
+        tv.tv_sec = timeout_ms / 1000;
+        tv.tv_usec = (timeout_ms % 1000) * 1000UL;
+
+        if (select(this->handle+1, &fds, NULL, NULL, &tv) != 1) {
+            return -1;
+        }
+        
+        return ::recv(this->handle, buf, size, 0);
+    }
+
+    private: struct servo_packet
+    {
+      float motor_speed[4];
+    };
+
+    private: struct fdm_packet
+    {
+      double timestamp;
+      double imu_angular_velocity_rpy[3];
+      double imu_linear_acceleration_xyz[3];
+      double imu_orientation_quat[4];
+      double velocity_xyz[3];
+      double position_xyz[3];
+    };
+        
+    private: int handle;
+
+    private: physics::LinkPtr imuLink;
   };
 }
 #endif

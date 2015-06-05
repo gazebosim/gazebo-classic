@@ -3,15 +3,15 @@
   <world name="default">
     <gui>
       <camera name="user_camera">
-        <pose>10 0 1 0 0 3.141592</pose>
+        <pose>5 0 1 0 0.2 3.141592</pose>
       </camera>
     </gui>
     <physics type="ode">
-      <gravity>0.0 0.0 -10.00</gravity>
+      <gravity>0.0 0.0 -9.81</gravity>
       <ode>
         <solver>
           <type>quick</type>
-          <iters>2000</iters>
+          <iters>100</iters>
           <sor>1.0</sor>
         </solver>
         <constraints>
@@ -21,8 +21,8 @@
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
-      <real_time_update_rate>1000</real_time_update_rate>
-      <max_step_size>0.001</max_step_size>
+      <real_time_update_rate>400</real_time_update_rate>
+      <max_step_size>0.0025</max_step_size>
     </physics>
     <include>
       <uri>model://sun</uri>
@@ -564,9 +564,10 @@
         <link_name>iris::rotor_3</link_name>
       </plugin>
       <plugin name="arducopter_plugin" filename="libArduCopterPlugin.so">
+        <imuLinkName>iris::iris/imu_link</imuLinkName>
         <rotor id="0">
-          <jointName>rotor_0_joint</jointName>
-          <linkName>rotor_0</linkName>
+          <jointName>iris::rotor_0_joint</jointName>
+          <linkName>iris::rotor_0</linkName>
           <turningDirection>ccw</turningDirection>
           <timeConstantUp>0.0125</timeConstantUp>
           <timeConstantDown>0.025</timeConstantDown>
@@ -580,8 +581,8 @@
           <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="1">
-          <jointName>rotor_1_joint</jointName>
-          <linkName>rotor_1</linkName>
+          <jointName>iris::rotor_1_joint</jointName>
+          <linkName>iris::rotor_1</linkName>
           <turningDirection>ccw</turningDirection>
           <timeConstantUp>0.0125</timeConstantUp>
           <timeConstantDown>0.025</timeConstantDown>
@@ -596,8 +597,8 @@
           <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="2">
-          <jointName>rotor_2_joint</jointName>
-          <linkName>rotor_2</linkName>
+          <jointName>iris::rotor_2_joint</jointName>
+          <linkName>iris::rotor_2</linkName>
           <turningDirection>cw</turningDirection>
           <timeConstantUp>0.0125</timeConstantUp>
           <timeConstantDown>0.025</timeConstantDown>
@@ -612,8 +613,8 @@
           <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="3">
-          <jointName>rotor_3_joint</jointName>
-          <linkName>rotor_3</linkName>
+          <jointName>iris::rotor_3_joint</jointName>
+          <linkName>iris::rotor_3</linkName>
           <turningDirection>cw</turningDirection>
           <timeConstantUp>0.0125</timeConstantUp>
           <timeConstantDown>0.025</timeConstantDown>
