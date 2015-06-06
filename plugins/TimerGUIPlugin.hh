@@ -102,11 +102,6 @@ namespace gazebo
     /// \brief Handles the prerender callback
     private: void PreRender();
 
-    /// \brief Helper function to format time string.
-    /// \param[in] _msg Time message.
-    /// \return Time formatted as a string.
-    private: std::string FormatTime(const common::Time &_time) const;
-
     /// \brief Qt event filter currently used to filter resize events.
     /// \param[in] _obj Object that is watched by the event filter.
     /// \param[in] _event Qt event.

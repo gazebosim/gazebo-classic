@@ -51,6 +51,7 @@ std::string Time::wallTimeISO;
 struct timespec Time::clockResolution;
 const Time Time::Zero = common::Time(0, 0);
 const int32_t Time::nsInSec = 1000000000L;
+const int32_t Time::nsInMs = 1000000;
 
 /////////////////////////////////////////////////
 Time::Time()
@@ -176,7 +177,7 @@ const Time &Time::GetWallTime()
     static_cast<double>(cpuFreq.QuadPart);
   uint32_t deltaSec = static_cast<uint32_t>(floor(dDeltaCpuTime));
   uint32_t deltaNSec = static_cast<uint32_t>(
-      std::round((dDeltaCpuTime-deltaSec) * nsInSec));
+      std::round((dDeltaCpuTime-deltaSec) * this->nsInSec));
 
   int64_t secSum  = static_cast<int64_t>(startSec) +
     static_cast<int64_t>(deltaSec);
@@ -185,11 +186,11 @@ const Time &Time::GetWallTime()
 
   // Normalize
   {
-    int64_t nsecPart = nsecSum % nsInSec;
-    int64_t secPart = secSum + nsecSum / nsInSec;
+    int64_t nsecPart = nsecSum % this->nsInSec;
+    int64_t secPart = secSum + nsecSum / this->nsInSec;
     if (nsecPart < 0)
     {
-      nsecPart += nsInSec;
+      nsecPart += this->nsInSec;
       --secPart;
     }
 
@@ -252,6 +253,111 @@ double Time::Double() const
 float Time::Float() const
 {
   return (this->sec + this->nsec * 1e-9f);
+}
+
+/////////////////////////////////////////////////
+std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
+{
+  if (_start > MILLISECONDS)
+  {
+    gzwarn << "Invalid start [" << _start << "], using millisecond [4]." <<
+        std::endl;
+    _start = MILLISECONDS;
+  }
+
+  if (_end < _start)
+  {
+    gzwarn << "Invalid end [" << _end << "], using start [" << _start << "]."
+        << std::endl;
+    _end = _start;
+  }
+
+  if (_end > MILLISECONDS)
+  {
+    gzwarn << "Invalid end [" << _end << "], using millisecond [4]." <<
+        std::endl;
+    _end = MILLISECONDS;
+  }
+
+  std::ostringstream stream;
+  unsigned int s, msec;
+
+  stream.str("");
+
+  // Get seconds
+  s = this->sec;
+
+  // Get milliseconds
+  msec = this->nsec / this->nsInMs;
+
+  // Get seconds from milliseconds
+  int seconds = msec / 1000;
+  msec -= seconds * 1000;
+  s += seconds;
+
+  // Days
+  if (_start <= 0)
+  {
+    unsigned int day = s / 86400;
+    s -= day * 86400;
+    stream << std::setw(2) << std::setfill('0') << day;
+  }
+
+  // Hours
+  if (_end >= 1)
+  {
+    if (_start < 1)
+      stream << " ";
+
+    if (_start <= 1)
+    {
+      unsigned int hour = s / 3600;
+      s -= hour * 3600;
+      stream << std::setw(2) << std::setfill('0') << hour;
+    }
+  }
+
+  // Minutes
+  if (_end >= 2)
+  {
+    if (_start < 2)
+      stream << ":";
+
+    if (_start <= 2)
+    {
+      unsigned int min = s / 60;
+      s -= min * 60;
+      stream << std::setw(2) << std::setfill('0') << min;
+    }
+  }
+
+  // Seconds
+  if (_end >= 3)
+  {
+    if (_start < 3)
+      stream << ":";
+
+    if (_start <= 3)
+    {
+      stream << std::setw(2) << std::setfill('0') << s;
+    }
+  }
+
+  // Milliseconds
+  if (_end >= 4)
+  {
+    if (_start < 4)
+      stream << ".";
+    else
+      msec = msec + s * 1000;
+
+    if (_start <= 4)
+    {
+      stream << std::setw(3) << std::setfill('0') << msec;
+    }
+  }
+
+  return stream.str();
 }
 
 /////////////////////////////////////////////////
