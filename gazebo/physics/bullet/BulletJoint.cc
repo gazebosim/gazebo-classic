@@ -194,6 +194,7 @@ void BulletJoint::CacheForceTorque()
   else
   {
     /// \TODO: implement for other joint types
+    // note that for fixed joint no further modification is needed
     // gzerr << "force torque for joint type [" << this->GetType()
     //       << "] not implemented, returns false results!!\n";
   }

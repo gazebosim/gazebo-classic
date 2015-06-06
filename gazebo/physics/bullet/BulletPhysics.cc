@@ -38,6 +38,7 @@
 #include "gazebo/physics/bullet/BulletSliderJoint.hh"
 #include "gazebo/physics/bullet/BulletHinge2Joint.hh"
 #include "gazebo/physics/bullet/BulletScrewJoint.hh"
+#include "gazebo/physics/bullet/BulletFixedJoint.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -728,6 +729,8 @@ JointPtr BulletPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new BulletHinge2Joint(this->dynamicsWorld, _parent));
   else if (_type == "screw")
     joint.reset(new BulletScrewJoint(this->dynamicsWorld, _parent));
+  else if (_type == "fixed")
+    joint.reset(new BulletFixedJoint(this->dynamicsWorld, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 

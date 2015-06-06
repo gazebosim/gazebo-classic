@@ -7,11 +7,12 @@ link_directories(${DARTCore_LIBRARY_DIRS})
 set (sources
     DARTBallJoint.cc
     DARTCollision.cc
-    DARTLink.cc
+    DARTFixedJoint.cc
     DARTHeightmapShape.cc
     DARTHingeJoint.cc
     DARTHinge2Joint.cc
     DARTJoint.cc
+    DARTLink.cc
     DARTMesh.cc
     DARTMeshShape.cc
     DARTModel.cc
@@ -30,6 +31,7 @@ SET (headers
     DARTBoxShape.hh
     DARTCollision.hh
     DARTCylinderShape.hh
+    DARTFixedJoint.hh
     DARTHeightmapShape.hh
     DARTHingeJoint.hh
     DARTHinge2Joint.hh

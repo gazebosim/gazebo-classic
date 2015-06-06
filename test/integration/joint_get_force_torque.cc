@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,21 +120,24 @@ class JointGetForceTorqueTest : public ServerFixture,
               << "  </link>"
               << "  <joint name='joint' type='"
               << _opt.jointType << "'>"
-              << "  <parent>world</parent>"
-              << "  <child>link</child>";
+              << "    <parent>world</parent>"
+              << "    <child>link</child>";
             //if( _opt.jointType != "fixed" )
             {
               modelStr
-                << "<axis>"
-                << "  <limit>"
-                << "    <lower>0.0</lower>"
-                << "    <upper>0.0</upper>"
-                << "  </limit>"
-                << "  <xyz>" << _opt.jointAxis << "</xyz>"
-                << "</axis>";
+                << "  <axis>"
+                << "    <limit>"
+                << "      <lower>0.0</lower>"
+                << "      <upper>0.0</upper>"
+                << "    </limit>"
+                << "    <xyz>" << _opt.jointAxis << "</xyz>"
+                << "  </axis>";
             }
             modelStr
-              << "  </joint>"
+              << "<physics>"
+              << "  <provide_feedback>true</provide_feedback>"
+              << "</physics>"
+              << "</joint>"
               << "</model>";
 
             physics::WorldPtr world = physics::get_world("default");
@@ -198,7 +201,7 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
     ASSERT_TRUE(joint != NULL);
 
     // wait some time to get a clean measure
-    common::Time::MSleep(100);
+    common::Time::MSleep(50);
 
     physics::JointWrench W = joint->GetForceTorque(0u);
 
@@ -210,19 +213,19 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
     math::Vector3 f = mass*g;
     math::Vector3 tau = mass*com.Cross(g);
 
-    EXPECT_NEAR(-f.x,W.body1Force.x,TOL_FORCE);
-    EXPECT_NEAR(-f.y,W.body1Force.y,TOL_FORCE);
-    EXPECT_NEAR(-f.z,W.body1Force.z,TOL_FORCE);
-    EXPECT_NEAR(-tau.x,W.body1Torque.x,TOL_TORQUE);
-    EXPECT_NEAR(-tau.y,W.body1Torque.y,TOL_TORQUE);
-    EXPECT_NEAR(-tau.z,W.body1Torque.z,TOL_TORQUE);
+    EXPECT_NEAR(-f.x, W.body1Force.x, TOL_FORCE);
+    EXPECT_NEAR(-f.y, W.body1Force.y, TOL_FORCE);
+    EXPECT_NEAR(-f.z, W.body1Force.z, TOL_FORCE);
+    EXPECT_NEAR(-tau.x, W.body1Torque.x, TOL_TORQUE);
+    EXPECT_NEAR(-tau.y, W.body1Torque.y, TOL_TORQUE);
+    EXPECT_NEAR(-tau.z, W.body1Torque.z, TOL_TORQUE);
 
-    EXPECT_NEAR(f.x,W.body2Force.x,TOL_FORCE);
-    EXPECT_NEAR(f.y,W.body2Force.y,TOL_FORCE);
-    EXPECT_NEAR(f.z,W.body2Force.z,TOL_FORCE);
-    EXPECT_NEAR(tau.x,W.body2Torque.x,TOL_TORQUE);
-    EXPECT_NEAR(tau.y,W.body2Torque.y,TOL_TORQUE);
-    EXPECT_NEAR(tau.z,W.body2Torque.z,TOL_TORQUE);
+    EXPECT_NEAR(f.x, W.body2Force.x, TOL_FORCE);
+    EXPECT_NEAR(f.y, W.body2Force.y, TOL_FORCE);
+    EXPECT_NEAR(f.z, W.body2Force.z, TOL_FORCE);
+    EXPECT_NEAR(tau.x, W.body2Torque.x, TOL_TORQUE);
+    EXPECT_NEAR(tau.y, W.body2Torque.y, TOL_TORQUE);
+    EXPECT_NEAR(tau.z, W.body2Torque.z, TOL_TORQUE);
 }
 
 
@@ -234,30 +237,22 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
 // (actual fixed joint, or revolute/prismatic joint
 //  with zero limis) and then check the GetForceTorque
 // output against analytical solution.
-void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physicsEngine)
+void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
 {
-  Load("worlds/empty.world", false, _physicsEngine);
+  Load("worlds/empty.world", false, _physEng);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  EXPECT_EQ(physics->GetType(), _physEng);
 
   // test for a fixed joint
   SpawnGetFTBoxOptions opt;
   opt.jointType = "fixed";
 
-  if( _physicsEngine != "simbody" )
-  {
-    gzerr << "Aborting test since fixed joints are implemented only"
-          << " on simbody"
-          << std::endl;
-    return;
-  }
-
-  GetFTDemoHelper(physics,_physicsEngine,opt);
+  GetFTDemoHelper(physics, _physEng, opt);
 
   // test a revolute joint against all axis
   /*
