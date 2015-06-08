@@ -40,16 +40,6 @@ namespace gazebo
 
       /// \brief Slot for the AcceptLogin event
       public slots: void SlotAcceptLogout();
-
-      /// \brief A label for the url component that appears on the
-      /// logout dialog
-      private: QLabel *labelUrl;
-
-      /// \brief The standard dialog buttons
-      private: QDialogButtonBox *buttons;
-
-      /// \brief The web server url
-      private: std::string url;
     };
   }
 }

@@ -15,7 +15,6 @@
  *
 */
 
-#include <curl/curl.h>
 #include <QMessageBox>
 #include "RestUiWidget.hh"
 
@@ -93,7 +92,6 @@ void RestUiWidget::Update()
   // Login problem?
   while (!this->msgRespQ.empty())
   {
-    std::string titleStr = this->title;
     ConstRestErrorPtr msg = this->msgRespQ.front();
     std::string msgStr = msg->msg();
     this->msgRespQ.pop_front();
@@ -101,8 +99,8 @@ void RestUiWidget::Update()
     // look for login error, and reenable the login menu if necessary
     if (msgStr.find("There was a problem trying to login to the server") == 0)
     {
-      loginMenuAction.setEnabled(true);
-      logoutMenuAction.setEnabled(false);
+      this->loginMenuAction.setEnabled(true);
+      this->logoutMenuAction.setEnabled(false);
     }
 
     if (msg->type() == "Error")
@@ -110,13 +108,13 @@ void RestUiWidget::Update()
       msgStr += "\n\nIf the server is not available, ";
       msgStr += "logout to hide theses messages.";
       QMessageBox::critical(this,
-                            tr(titleStr.c_str()),
+                            tr(this->title.c_str()),
                             tr(msgStr.c_str()));
     }
     else
     {
       QMessageBox::information(this,
-                               tr(titleStr.c_str()),
+                               tr(this->title.c_str()),
                                tr(msgStr.c_str()));
     }
   }

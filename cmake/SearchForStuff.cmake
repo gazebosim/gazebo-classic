@@ -560,14 +560,32 @@ endif()
 
 ########################################
 # Find uuid-dev Library
-pkg_check_modules(uuid uuid)
-if (uuid_FOUND)
-  message (STATUS "Looking for uuid - found")
+#pkg_check_modules(uuid uuid)
+#if (uuid_FOUND)
+#  message (STATUS "Looking for uuid - found")
+#  set (HAVE_UUID TRUE)
+#else ()
+#  set (HAVE_UUID FALSE)
+#  BUILD_WARNING ("uuid-dev library not found - Gazebo will not have uuid support.")
+#endif ()
+
+########################################
+# Find uuid
+#  - In UNIX we use uuid library.
+#  - In Windows the native RPC call, no dependency needed.
+if (UNIX)
+  pkg_check_modules(uuid uuid)
+  if (uuid_FOUND)
+    message (STATUS "Looking for uuid - found")
+    set (HAVE_UUID TRUE)
+  else ()
+    set (HAVE_UUID FALSE)
+    BUILD_WARNING ("uuid-dev library not found - Gazebo will not have uuid support.")
+  endif ()
+else()
+  message (STATUS "Using Windows RPC UuidCreate function")
   set (HAVE_UUID TRUE)
-else ()
-  set (HAVE_UUID FALSE)
-  BUILD_WARNING ("uuid-dev library not found - Gazebo will not have uuid support.")
-endif ()
+endif()
 
 ########################################
 # Find graphviz
