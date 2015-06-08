@@ -238,4 +238,3 @@ bool GTSMeshUtils::DelaunayTriangulation(
   gts_object_destroy(GTS_OBJECT(surface));
   return true;
 }
-
