@@ -132,7 +132,8 @@ namespace gazebo
       /// \brief Times for the state data
       protected: common::Time wallTime, realTime, simTime;
 
-      /// \brief The number of simulation iterations
+      /// \brief The number of simulation iterations when this state was
+      /// generated.
       protected: uint64_t iterations;
     };
     /// \}
