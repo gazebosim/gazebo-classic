@@ -195,8 +195,15 @@ void LogPlayWidget::EmitSetCurrentTime(common::Time _time)
   }
 
   // Update current time line edit
-  this->SetCurrentTime(QString::fromStdString(_time.FormattedString(
-      !this->dataPtr->lessThan1h, !this->dataPtr->lessThan1h)));
+  if (this->dataPtr->lessThan1h)
+  {
+    this->SetCurrentTime(QString::fromStdString(_time.FormattedString(
+        common::Time::FormatOption::MINUTES)));
+  }
+  else
+  {
+    this->SetCurrentTime(QString::fromStdString(_time.FormattedString()));
+  }
 
   // Update current time item in view
   this->SetCurrentTime(_time.sec * 1e3 + _time.nsec * 1e-6);
@@ -221,8 +228,15 @@ void LogPlayWidget::EmitSetEndTime(common::Time _time)
     this->dataPtr->lessThan1h = true;
 
   // Update end time label
-  std::string timeString = _time.FormattedString(
-      !this->dataPtr->lessThan1h, !this->dataPtr->lessThan1h);
+  std::string timeString;
+  if (this->dataPtr->lessThan1h)
+  {
+    timeString = _time.FormattedString(common::Time::FormatOption::MINUTES);
+  }
+  else
+  {
+    timeString = _time.FormattedString();
+  }
 
   timeString = "/   " + timeString;
 
@@ -354,11 +368,12 @@ void LogPlayView::DrawTimeline()
     std::string timeText;
     if (msec == this->dataPtr->startTime || msec == this->dataPtr->endTime)
     {
-      timeText = time.FormattedString(false, false);
+      timeText = time.FormattedString(common::Time::FormatOption::MINUTES);
     }
     else
     {
-      timeText = time.FormattedString(false, false, true, true, false);
+      timeText = time.FormattedString(common::Time::FormatOption::MINUTES,
+          common::Time::FormatOption::SECONDS);
     }
 
     QGraphicsSimpleTextItem *tickText = new QGraphicsSimpleTextItem(
