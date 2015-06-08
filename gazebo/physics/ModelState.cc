@@ -542,15 +542,9 @@ void ModelState::SetIterations(const uint64_t _iterations)
 {
   State::SetIterations(_iterations);
 
-  for (LinkState_M::iterator iter = this->linkStates.begin();
-       iter != this->linkStates.end(); ++iter)
-  {
-    iter->second.SetIterations(_iterations);
-  }
+  for (auto &linkState : this->linkStates)
+    linkState.second.SetIterations(_iterations);
 
-  for (JointState_M::iterator iter = this->jointStates.begin();
-       iter != this->jointStates.end(); ++iter)
-  {
-    iter->second.SetIterations(_iterations);
-  }
+  for (auto &jointState : this->jointStates)
+    jointState.second.SetIterations(_iterations);
 }

@@ -148,7 +148,7 @@ namespace gazebo
       /// where the log started and finished (simulation time).
       private: void ReadLogTimes();
 
-      /// \brief Update the internal variable that keep track of the initial
+      /// \brief Update the internal variable that keeps track of the initial
       /// "iterations" value.
       private: bool ReadIterations();
 

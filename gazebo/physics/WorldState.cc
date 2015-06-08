@@ -361,9 +361,6 @@ void WorldState::SetIterations(const uint64_t _iterations)
 {
   State::SetIterations(_iterations);
 
-  for (ModelState_M::iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
-  {
-    iter->second.SetIterations(_iterations);
-  }
+  for (auto &modelState : this->modelStates)
+    modelState.second.SetIterations(_iterations);
 }

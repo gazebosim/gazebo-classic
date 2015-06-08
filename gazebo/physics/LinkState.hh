@@ -58,7 +58,7 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp
-      /// \param[im] _iterations Simulation iterations.
+      /// \param[in] _iterations Simulation iterations.
       public: LinkState(const LinkPtr _link, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
@@ -84,7 +84,8 @@ namespace gazebo
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
       /// \param[in] _realTime Real time stamp.
-      /// \param[in] _simTime Sim time stamp
+      /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: void Load(const LinkPtr _link, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations);
 
@@ -161,7 +162,8 @@ namespace gazebo
       public: virtual void SetSimTime(const common::Time &_time);
 
       /// \brief Set the simulation iterations when this state was generated
-      /// \param[in] _time Simulation iterations when the data was recorded.
+      /// \param[in] _iterations Simulation iterations when the data was
+      /// recorded.
       public: virtual void SetIterations(const uint64_t _iterations);
 
       /// \brief Assignment operator

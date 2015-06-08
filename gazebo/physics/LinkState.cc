@@ -360,10 +360,6 @@ void LinkState::SetIterations(const uint64_t _iterations)
 {
   State::SetIterations(_iterations);
 
-  for (std::vector<CollisionState>::iterator
-       iter = this->collisionStates.begin();
-       iter != this->collisionStates.end(); ++iter)
-  {
-    (*iter).SetIterations(_iterations);
-  }
+  for (auto &collisionState : this->collisionStates)
+    collisionState.SetIterations(_iterations);
 }

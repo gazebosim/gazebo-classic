@@ -191,7 +191,8 @@ namespace gazebo
       public: virtual void SetSimTime(const common::Time &_time);
 
       /// \brief Set the simulation iterations when this state was generated
-      /// \param[in] _time Simulation iterations when the data was recorded.
+      /// \param[in] _iterations Simulation iterations when the data was
+      /// recorded.
       public: virtual void SetIterations(const uint64_t _iterations);
 
       /// \brief Assignment operator

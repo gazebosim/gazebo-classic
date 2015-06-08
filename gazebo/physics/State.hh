@@ -58,7 +58,7 @@ namespace gazebo
       /// typically the name of an Entity.
       /// \pararm _realTime Clock time since simulation started.
       /// \param _simTime Simulation time associated with this State info.
-      /// \param _iterations Simulation iterations sinde simulation started.
+      /// \param _iterations Simulation iterations since simulation started.
       public: State(const std::string &_name,
                     const common::Time &_realTime,
                     const common::Time &_simTime,
@@ -105,8 +105,8 @@ namespace gazebo
       /// \return Simulation time when the data was recorded.
       public: common::Time GetSimTime() const;
 
-      /// \bruief Get the iterations when this state was generated
-      /// return Iterations when the data was recorded
+      /// \brief Get the iterations when this state was generated
+      /// \return Iterations when the data was recorded
       public: uint64_t GetIterations() const;
 
       /// \brief Set the wall time when this state was generated
