@@ -44,7 +44,7 @@ namespace gazebo
       /// \brief Perform delaunay triangulation on input vertices.
       /// \param[in] _vertices A list of all vertices
       /// \param[in] _edges A list of edges. Each edge is made of 2 vertex
-      /// indices from _vertices)
+      /// indices from _vertices
       /// \param[out] _submesh A submesh that will be populated with the
       /// resulting triangles.
       /// \return True on success.
@@ -56,7 +56,7 @@ namespace gazebo
       /// \brief Perform delaunay triangulation on input vertices.
       /// \param[in] _vertices A list of all vertices
       /// \param[in] _edges A list of edges. Each edge is made of 2 vertex
-      /// indices from _vertices)
+      /// indices from _vertices
       /// \return Triangulated GTS surface.
       private: static GtsSurface *DelaunayTriangulation(
                                   const std::vector<math::Vector2d> &_vertices,
