@@ -81,6 +81,12 @@ namespace gazebo
       /// \brief End time in milliseconds.
       public: int endTime;
 
+      /// \brief Log start time has been set or not.
+      public: bool startTimeSet;
+
+      /// \brief Log end time has been set or not.
+      public: bool endTimeSet;
+
       /// \brief Width of this view's scene.
       public: int sceneWidth;
 

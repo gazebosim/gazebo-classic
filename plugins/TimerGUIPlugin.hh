@@ -102,6 +102,12 @@ namespace gazebo
     /// \brief Handles the prerender callback
     private: void PreRender();
 
+    /// \brief Qt event filter currently used to filter resize events.
+    /// \param[in] _obj Object that is watched by the event filter.
+    /// \param[in] _event Qt event.
+    /// \return True if the event is handled.
+    private: bool eventFilter(QObject *_obj, QEvent *_event);
+
     /// \brief Node used to establish communication with gzserver.
     private: transport::NodePtr node;
 
@@ -128,6 +134,14 @@ namespace gazebo
 
     /// \brief Reset button.
     private: QPushButton *resetButton;
+
+    /// \brief Number of pixels from the timer's left side and the
+    /// window's right side. Only needed for negative positions.
+    private: int posX;
+
+    /// \brief Number of pixels from the timer's top and the window's
+    /// bottom. Only needed for negative positions.
+    private: int posY;
   };
 }
 

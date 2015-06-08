@@ -124,12 +124,13 @@ namespace gazebo
     };
 
     /// \class LogPlayView LogPlayView.hh
-    /// \brief View within LogPlayWidget which displays the timeline.
+    /// \brief View for the timeline.
     class GAZEBO_VISIBLE LogPlayView: public QGraphicsView
     {
       Q_OBJECT
 
       /// \brief Constructor;
+      /// \param[in] _parent Parent widget.
       public: LogPlayView(LogPlayWidget *_parent = 0);
 
       /// \brief Set the position of the current time item.
