@@ -3,7 +3,7 @@
   <world name="default">
     <gui>
       <camera name="user_camera">
-        <pose>5 0 1 0 0.2 3.141592</pose>
+        <pose>-5 0 1 0 0.2 0</pose>
       </camera>
     </gui>
     <physics type="ode">
@@ -436,7 +436,7 @@
         <a0>0.1</a0>
         <alpha_stall>0.4</alpha_stall>
         <cla>5.000</cla>
-        <cda>0.0001</cda>
+        <cda>0.3</cda>
         <cma>0.00</cma>
         <cla_stall>-1.0</cla_stall>
         <cda_stall>0.0</cda_stall>
@@ -452,7 +452,7 @@
         <a0>0.1</a0>
         <alpha_stall>0.4</alpha_stall>
         <cla>5.000</cla>
-        <cda>0.0001</cda>
+        <cda>0.3</cda>
         <cma>0.00</cma>
         <cla_stall>-1.0</cla_stall>
         <cda_stall>0.0</cda_stall>
@@ -469,7 +469,7 @@
         <a0>0.1</a0>
         <alpha_stall>0.4</alpha_stall>
         <cla>5.000</cla>
-        <cda>0.0001</cda>
+        <cda>0.3</cda>
         <cma>0.00</cma>
         <cla_stall>-1.0</cla_stall>
         <cda_stall>0.0</cda_stall>
@@ -485,7 +485,7 @@
         <a0>0.1</a0>
         <alpha_stall>0.4</alpha_stall>
         <cla>5.000</cla>
-        <cda>0.0001</cda>
+        <cda>0.3</cda>
         <cma>0.00</cma>
         <cla_stall>-1.0</cla_stall>
         <cda_stall>0.0</cda_stall>
@@ -502,7 +502,7 @@
         <a0>0.1</a0>
         <alpha_stall>0.4</alpha_stall>
         <cla>5.000</cla>
-        <cda>0.0001</cda>
+        <cda>0.3</cda>
         <cma>0.00</cma>
         <cla_stall>-1.0</cla_stall>
         <cda_stall>0.0</cda_stall>
@@ -518,7 +518,7 @@
         <a0>0.1</a0>
         <alpha_stall>0.4</alpha_stall>
         <cla>5.000</cla>
-        <cda>0.0001</cda>
+        <cda>0.3</cda>
         <cma>0.00</cma>
         <cla_stall>-1.0</cla_stall>
         <cda_stall>0.0</cda_stall>
@@ -535,7 +535,7 @@
         <a0>0.1</a0>
         <alpha_stall>0.4</alpha_stall>
         <cla>5.000</cla>
-        <cda>0.0001</cda>
+        <cda>0.3</cda>
         <cma>0.00</cma>
         <cla_stall>-1.0</cla_stall>
         <cda_stall>0.0</cda_stall>
@@ -551,7 +551,7 @@
         <a0>0.1</a0>
         <alpha_stall>0.4</alpha_stall>
         <cla>5.000</cla>
-        <cda>0.0001</cda>
+        <cda>0.3</cda>
         <cma>0.00</cma>
         <cla_stall>-1.0</cla_stall>
         <cda_stall>0.0</cda_stall>

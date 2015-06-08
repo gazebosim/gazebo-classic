@@ -293,40 +293,64 @@ void ArduCopterPlugin::SendState()
   pkt.timestamp = this->model->GetWorld()->GetSimTime().Double();
 
   math::Pose imuPose = this->imuLink->GetWorldPose();
+
+  // additional offset for imu to be facing:
+  //   x forward
+  //   y right
+  //   z down
+  const math::Pose imuRotationOffset = math::Pose(0, 0, 0, M_PI, 0, 0);
+  // any imu information nees to be rotated into this pose
+
+  // get linear acceleration
+  math::Vector3 linearAccel = this->imuLink->GetRelativeLinearAccel();
+
+  // rotate gravity into imu frame, subtract it
   math::Vector3 gravity =
     this->model->GetWorld()->GetPhysicsEngine()->GetGravity();
-  math::Vector3 linearAccel = this->imuLink->GetRelativeLinearAccel();
-  // rotate gravity into imu frame, subtract it
   linearAccel = linearAccel - imuPose.rot.RotateVectorReverse(gravity);
-  // signs go from link frame to vehicle frame
-  pkt.imu_linear_acceleration_xyz[0] =  linearAccel.x;
-  pkt.imu_linear_acceleration_xyz[1] = -linearAccel.y;
-  pkt.imu_linear_acceleration_xyz[2] = -linearAccel.z;
+  // rotate linearAccel by offset
+  linearAccel = imuRotationOffset.rot.RotateVectorReverse(linearAccel);
+  // copy to pkt
+  pkt.imu_linear_acceleration_xyz[0] = linearAccel.x;
+  pkt.imu_linear_acceleration_xyz[1] = linearAccel.y;
+  pkt.imu_linear_acceleration_xyz[2] = linearAccel.z;
 
+  // get angular velocity
   math::Vector3 angularVel = this->imuLink->GetRelativeAngularVel();
-  // signs go from link frame to vehicle frame
-  pkt.imu_angular_velocity_rpy[0] =  angularVel.x;
-  pkt.imu_angular_velocity_rpy[1] = -angularVel.y;
-  pkt.imu_angular_velocity_rpy[2] = -angularVel.z;
+  // rotate linearAccel by offset
+  angularVel = imuRotationOffset.rot.RotateVectorReverse(angularVel);
+  // copy to pkt
+  pkt.imu_angular_velocity_rpy[0] = angularVel.x;
+  pkt.imu_angular_velocity_rpy[1] = angularVel.y;
+  pkt.imu_angular_velocity_rpy[2] = angularVel.z;
 
-  math::Quaternion worldQ = imuPose.rot;
-  // signs go from link frame to vehicle frame
-  pkt.imu_orientation_quat[0] =  worldQ.w;
-  pkt.imu_orientation_quat[1] =  worldQ.x;
-  pkt.imu_orientation_quat[2] = -worldQ.y;
-  pkt.imu_orientation_quat[3] = -worldQ.z;
+  // get orientation with offset added
+  math::Quaternion worldQ = (imuRotationOffset + imuPose).rot;
+  pkt.imu_orientation_quat[0] = worldQ.w;
+  pkt.imu_orientation_quat[1] = worldQ.x;
+  pkt.imu_orientation_quat[2] = worldQ.y;
+  pkt.imu_orientation_quat[3] = worldQ.z;
 
+  // get inertial pose and velocity
+  //
+  /// convert gazebo world frame to north-east-downward
+  /// in gazebo, x is forward, y is left and z is up
+  /// in NED, x is north, -y is east and -z is downward
+  //
   // math::Pose modelPose = this->model->GetWorldPose();
   math::Pose modelPose = this->imuLink->GetWorldPose();
-  math::Vector3 worldPos = modelPose.pos;
-  math::Vector3 worldVel = this->imuLink->GetWorldLinearVel();
-  // signs go from gazebo world frame to ned earth frame
-  pkt.velocity_xyz[0] =  worldVel.x;
-  pkt.velocity_xyz[1] = -worldVel.y;
-  pkt.velocity_xyz[2] = -worldVel.z;
-  pkt.position_xyz[0] =  worldPos.x;
-  pkt.position_xyz[1] = -worldPos.y;
-  pkt.position_xyz[2] = -worldPos.z;
+  const math::Pose worldToNED = math::Pose(0, 0, 0, M_PI, 0, 0);
+  math::Vector3 worldPos = worldToNED.rot.RotateVectorReverse(modelPose.pos);
+  pkt.position_xyz[0] = worldPos.x;
+  pkt.position_xyz[1] = worldPos.y;
+  pkt.position_xyz[2] = worldPos.z;
+
+  math::Vector3 worldVel = worldToNED.rot.RotateVectorReverse(
+    this->imuLink->GetWorldLinearVel());
+  // velocity in NED
+  pkt.velocity_xyz[0] = worldVel.x;
+  pkt.velocity_xyz[1] = worldVel.y;
+  pkt.velocity_xyz[2] = worldVel.z;
 
   struct sockaddr_in sockaddr;
   this->make_sockaddr("127.0.0.1", 9003, sockaddr);
