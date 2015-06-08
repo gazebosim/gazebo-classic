@@ -96,6 +96,9 @@ compilation on Windows.
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
+1. Added world origin indicator rendering::OriginVisual.
+    * [Pull request #1700](https://bitbucket.org/osrf/gazebo/pull-request/1700)
+
 1. Show/hide toolbars using the menu bars and shortcut.
    Added MainWindow::CloneAction.
    Added Window menu to Model Editor.
@@ -121,6 +124,9 @@ compilation on Windows.
 
 1. Display confirmation message after log is saved
     * [Pull request #1646](https://bitbucket.org/osrf/gazebo/pull-request/1646)
+
+1. Added Time::FormattedString and removed all other FormatTime functions.
+    * [Pull request #1710](https://bitbucket.org/osrf/gazebo/pull-request/1710)
 
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
@@ -532,6 +538,8 @@ compilation on Windows.
 
 ### Gazebo 4.1.3 (2015-05-07)
 
+1. Fix saving visual geom SDF values
+    * [Pull request #1597](https://bitbucket.org/osrf/gazebo/pull-request/1597)
 1. Fix heightmap model texture loading.
     * [Pull request #1595](https://bitbucket.org/osrf/gazebo/pull-request/1595)
 1. Fix visual collision scale on separate client
