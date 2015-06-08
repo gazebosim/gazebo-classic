@@ -26,6 +26,7 @@ class TimerTest : public gazebo::testing::AutoLogFixture
 {
 };
 
+/////////////////////////////////////////////////
 TEST_F(TimerTest, Timer)
 {
   common::Timer timer;
@@ -38,21 +39,24 @@ TEST_F(TimerTest, Timer)
   common::Time::MSleep(200);
   EXPECT_TRUE(timer.GetRunning());
   common::Time elapsed = timer.GetElapsed();
-  EXPECT_NEAR(elapsed.nsec, 2e8, 1e5);
+  EXPECT_GE(elapsed.nsec, 200000000);
+  EXPECT_LE(elapsed.nsec, 200200000);
   EXPECT_EQ(elapsed.sec, 0);
 
   // Check that the time after stopping and sleeping matches the time right
   // before pausing
   timer.Stop();
   common::Time::MSleep(100);
-  EXPECT_NEAR(elapsed.nsec, timer.GetElapsed().nsec, 1e5);
+  EXPECT_GE(elapsed.nsec, timer.GetElapsed().nsec - 100000);
+  EXPECT_LE(elapsed.nsec, timer.GetElapsed().nsec + 100000);
   EXPECT_EQ(elapsed.sec, timer.GetElapsed().sec);
   EXPECT_FALSE(timer.GetRunning());
 
   // Expect that we start from where we left off
   timer.Start();
   common::Time::MSleep(100);
-  EXPECT_NEAR(timer.GetElapsed().nsec, 3e8, 1e6);
+  EXPECT_GE(timer.GetElapsed().nsec, 300000000);
+  EXPECT_LE(timer.GetElapsed().nsec, 301000000);
   EXPECT_EQ(timer.GetElapsed().sec, 0);
 
   // Expect reset to reset the current time and stop the timer
@@ -62,6 +66,7 @@ TEST_F(TimerTest, Timer)
   EXPECT_FALSE(timer.GetRunning());
 }
 
+/////////////////////////////////////////////////
 TEST_F(TimerTest, CountdownTimer)
 {
   // Count down from 1 second
@@ -75,21 +80,24 @@ TEST_F(TimerTest, CountdownTimer)
   common::Time::MSleep(200);
   EXPECT_TRUE(timer.GetRunning());
   common::Time elapsed = timer.GetElapsed();
-  EXPECT_NEAR(elapsed.nsec, 8e8, 1e5);
+  EXPECT_GE(elapsed.nsec, 799800000);
+  EXPECT_LE(elapsed.nsec, 800100000);
   EXPECT_EQ(elapsed.sec, 0);
 
   // Check that the time after stopping and sleeping matches the time right
   // before pausing
   timer.Stop();
   common::Time::MSleep(100);
-  EXPECT_NEAR(elapsed.nsec, timer.GetElapsed().nsec, 1e5);
+  EXPECT_GE(elapsed.nsec, timer.GetElapsed().nsec - 100000);
+  EXPECT_LE(elapsed.nsec, timer.GetElapsed().nsec + 100000);
   EXPECT_EQ(elapsed.sec, timer.GetElapsed().sec);
   EXPECT_FALSE(timer.GetRunning());
 
   // Expect that we start from where we left off
   timer.Start();
   common::Time::MSleep(100);
-  EXPECT_NEAR(timer.GetElapsed().nsec, 7e8, 1e6);
+  EXPECT_GE(timer.GetElapsed().nsec, 699000000);
+  EXPECT_LE(timer.GetElapsed().nsec, 701000000);
   EXPECT_EQ(timer.GetElapsed().sec, 0);
 
   // Expect reset to reset the current time and stop the timer
