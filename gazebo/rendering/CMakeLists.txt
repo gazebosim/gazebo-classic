@@ -46,6 +46,7 @@ set (sources
   Material.cc
   MovableText.cc
   OrbitViewController.cc
+  OriginVisual.cc
   OrthoViewController.cc
   Projector.cc
   RayQuery.cc
@@ -102,6 +103,7 @@ set (headers
   Material.hh
   MovableText.hh
   OrbitViewController.hh
+  OriginVisual.hh
   OrthoViewController.hh
   Projector.hh
   RayQuery.hh
@@ -144,6 +146,7 @@ set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
+  OriginVisual_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
