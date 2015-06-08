@@ -279,6 +279,9 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
   this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin,
       this->dataPtr->sceneHeight/2);
   graphicsScene->addItem(this->dataPtr->currentTimeItem);
+
+  this->dataPtr->startTimeSet = true;
+  this->dataPtr->endTimeSet = true;
 }
 
 /////////////////////////////////////////////////
@@ -296,14 +299,17 @@ void LogPlayView::SetCurrentTime(int _msec)
 void LogPlayView::SetStartTime(int _msec)
 {
   this->dataPtr->startTime = _msec;
+  this->dataPtr->startTimeSet = true;
 }
 
 /////////////////////////////////////////////////
 void LogPlayView::SetEndTime(int _msec)
 {
   this->dataPtr->endTime = _msec;
+  this->dataPtr->endTimeSet = true;
 
-  this->DrawTimeline();
+  if (this->dataPtr->startTimeSet)
+    this->DrawTimeline();
 }
 
 /////////////////////////////////////////////////
@@ -327,22 +333,23 @@ void LogPlayView::DrawTimeline()
   int i = 0;
   while (msec >= this->dataPtr->startTime && msec < this->dataPtr->endTime)
   {
-    // Start time
+    // Intermediate samples have a round number
     if (i != 0)
     {
       msec = roundStartTime + interval * i;
     }
 
     // If first interval too close, shift by 1s
+    int endSpace = interval * 0.9;
     if (msec != this->dataPtr->startTime &&
-        msec < this->dataPtr->startTime + interval*0.3)
+        msec < this->dataPtr->startTime + endSpace)
     {
       roundStartTime += 1000;
       msec = roundStartTime + interval * i;
     }
 
     // If last interval too close, skip to end
-    if (msec > this->dataPtr->endTime - interval*0.3)
+    if (msec > this->dataPtr->endTime - endSpace)
     {
       msec = this->dataPtr->endTime;
     }
@@ -352,7 +359,7 @@ void LogPlayView::DrawTimeline()
     double relPos = static_cast<double>(msec - this->dataPtr->startTime) /
         totalTime;
 
-    // Tick
+    // Tick vertical line
     QGraphicsLineItem *tick = new QGraphicsLineItem(0, -tickHeight, 0, 0);
     tick->setPos(this->dataPtr->margin +
         (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
@@ -393,7 +400,6 @@ void LogPlayView::DrawTimeline()
 CurrentTimeItem::CurrentTimeItem()
 {
   this->setEnabled(true);
-  this->setRect(-8, -25, 16, 50);
   this->setZValue(10);
 }
 
@@ -404,7 +410,7 @@ void CurrentTimeItem::paint(QPainter *_painter,
   int lineHeight = 50;
   int lineWidth = 3;
 
-  // Line
+  // Vertical line
   QLineF vLine(-lineWidth/10.0, -lineHeight/2.0,
                -lineWidth/10.0, +lineHeight/2.0);
 
