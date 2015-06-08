@@ -1,4 +1,14 @@
 ## Gazebo 6.0
+1. Added multiple LiftDrag plugins to the cessna_demo.world to allow the Cessna
+C-172 model to fly.
+    * [Pull request #1715](https://bitbucket.org/osrf/gazebo/pull-request/1715)
+
+1. Added a plugin to control a Cessna C-172 via messages (CessnaPlugin), and a
+GUI plugin to test this functionality with the keyboard (CessnaGUIPlugin). Added
+world with the Cessna model and the two previous plugins loaded
+(cessna_demo.world).
+    * [Pull request #1712](https://bitbucket.org/osrf/gazebo/pull-request/1712)
+
 1. Added world with OSRF building and an elevator
     * [Pull request #1697](https://bitbucket.org/osrf/gazebo/pull-request/1697)
 
@@ -13,6 +23,11 @@
 
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
+
+1. Add option to parallelize the ODE quickstep constraint solver,
+which solves an LCP twice with different parameters in order
+to corrected for position projection errors.
+    * [Pull request #1561](https://bitbucket.org/osrf/gazebo/pull-request/1561)
 
 1. Get/Set user camera pose in GUI.
     * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
@@ -62,6 +77,10 @@ compilation on Windows.
     * [Pull request #1655](https://bitbucket.org/osrf/gazebo/pull-request/1655)
     * [Issue #1574](https://bitbucket.org/osrf/gazebo/issue/1574)
 
+1. ignition-math is now a dependency.
+    + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
+    + [Gazebo::math migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
+
 1. Detect uuid library during compilation.
     * [Pull request #1655](https://bitbucket.org/osrf/gazebo/pull-request/1655)
     * [Issue #1572](https://bitbucket.org/osrf/gazebo/issue/1572)
@@ -85,6 +104,9 @@ compilation on Windows.
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
+1. Added world origin indicator rendering::OriginVisual.
+    * [Pull request #1700](https://bitbucket.org/osrf/gazebo/pull-request/1700)
+
 1. Show/hide toolbars using the menu bars and shortcut.
    Added MainWindow::CloneAction.
    Added Window menu to Model Editor.
@@ -96,6 +118,9 @@ compilation on Windows.
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
 
+1. Timer GUI Plugin: Treat negative positions as positions from the ends
+    * [Pull request #1703](https://bitbucket.org/osrf/gazebo/pull-request/1703)
+
 1. Added Visual::GetDepth() and Visual::GetNthAncestor()
     * [Pull request #1613](https://bitbucket.org/osrf/gazebo/pull-request/1613)
 
@@ -104,6 +129,12 @@ compilation on Windows.
 
 1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
     * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
+
+1. Display confirmation message after log is saved
+    * [Pull request #1646](https://bitbucket.org/osrf/gazebo/pull-request/1646)
+
+1. Added Time::FormattedString and removed all other FormatTime functions.
+    * [Pull request #1710](https://bitbucket.org/osrf/gazebo/pull-request/1710)
 
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
@@ -125,6 +156,9 @@ compilation on Windows.
 
 1. Set material of SelectionObj's handles.
     * [Pull request #1472](https://bitbucket.org/osrf/gazebo/pull-request/1472)
+
+1. Add SelectionObj::Fini with tests and make Visual::Fini virtual
+    * [Pull request #1685](https://bitbucket.org/osrf/gazebo/pull-request/1685)
 
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
@@ -512,6 +546,8 @@ compilation on Windows.
 
 ### Gazebo 4.1.3 (2015-05-07)
 
+1. Fix saving visual geom SDF values
+    * [Pull request #1597](https://bitbucket.org/osrf/gazebo/pull-request/1597)
 1. Fix heightmap model texture loading.
     * [Pull request #1595](https://bitbucket.org/osrf/gazebo/pull-request/1595)
 1. Fix visual collision scale on separate client

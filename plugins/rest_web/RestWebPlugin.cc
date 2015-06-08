@@ -111,36 +111,6 @@ void RestWebPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 }
 
 //////////////////////////////////////////////////
-std::string FormatTime(int _sec, int _nsec)
-{
-  std::ostringstream stream;
-  unsigned int day, hour, min, sec, msec;
-
-  stream.str("");
-
-  sec = _sec;
-
-  day = sec / 86400;
-  sec -= day * 86400;
-
-  hour = sec / 3600;
-  sec -= hour * 3600;
-
-  min = sec / 60;
-  sec -= min * 60;
-
-  msec = rint(_nsec * 1e-6);
-
-  stream << std::setw(2) << std::setfill('0') << day << " ";
-  stream << std::setw(2) << std::setfill('0') << hour << ":";
-  stream << std::setw(2) << std::setfill('0') << min << ":";
-  stream << std::setw(2) << std::setfill('0') << sec << ".";
-  stream << std::setw(3) << std::setfill('0') << msec;
-
-  return stream.str();
-}
-
-//////////////////////////////////////////////////
 void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
 {
   try
@@ -186,17 +156,17 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
 
     event += "\"real_time\": ";
     event += "\"";
-    event += FormatTime(realT.sec(), realT.nsec());
+    event += msgs::Convert(realT).FormattedString();
     event += "\", ";
 
     event += "\"sim_time\": ";
     event += "\"";
-    event += FormatTime(simT.sec(), simT.nsec());
+    event += msgs::Convert(simT).FormattedString();
     event += "\", ";
 
     event += "\"pause_time\": ";
     event += "\"";
-    event += FormatTime(pauseT.sec(), pauseT.nsec());
+    event += msgs::Convert(pauseT).FormattedString();
     event += "\"";
 
     event += "}\n";  // world element
@@ -262,19 +232,19 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
       event += "\"real_time\": ";
       event += "\"";
       t = world->GetRealTime();
-      event += FormatTime(t.sec, t.nsec);
+      event += t.FormattedString();
       event += "\", ";
 
       event += "\"sim_time\": ";
       event += "\"";
       t = world->GetSimTime();
-      event += FormatTime(t.sec, t.nsec);
+      event += t.FormattedString();
       event += "\", ";
 
       event += "\"pause_time\": ";
       event += "\"";
       t = world->GetPauseTime();
-      event += FormatTime(t.sec, t.nsec);
+      event += t.FormattedString();
       event += "\" ";
 
       event += "}";
