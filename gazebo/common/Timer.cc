@@ -31,7 +31,7 @@ Timer::Timer()
 }
 
 //////////////////////////////////////////////////
-Timer::Timer(const Time &_maxTime, bool _countdown = true)
+Timer::Timer(const Time &_maxTime, const bool _countdown = true)
   : reset(true), running(false), countdown(_countdown), maxTime(_maxTime)
 {
 }
@@ -99,7 +99,7 @@ Time Timer::GetElapsed() const
     if (elapsedTime > this->maxTime)
     {
       // If elapsed time is past the countdown time, return 0 (out of time)
-      return Time(0);
+      return Time::Zero;
     }
     return this->maxTime - elapsedTime;
   }
