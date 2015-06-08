@@ -44,7 +44,7 @@ namespace gazebo
       /// \param[in] _maxTime The time to count down from.
       /// \param[in] _countdown. Whether or not to count down. True by default
       /// if this constructor is used.
-      public: Timer(const Time &_maxTime, bool _countdown);
+      public: Timer(const Time &_maxTime, const bool _countdown = true);
 
       /// \brief Destructor
       public: virtual ~Timer();

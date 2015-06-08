@@ -31,7 +31,7 @@ Timer::Timer()
 }
 
 //////////////////////////////////////////////////
-Timer::Timer(const Time &_maxTime, const bool _countdown = true)
+Timer::Timer(const Time &_maxTime, const bool _countdown)
   : reset(true), running(false), countdown(_countdown), maxTime(_maxTime)
 {
 }
