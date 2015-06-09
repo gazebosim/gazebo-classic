@@ -208,24 +208,9 @@ void Visual::Fini()
 
   // Detach from the parent
   if (this->dataPtr->parent)
-  {
     this->dataPtr->parent->DetachVisual(this->GetName());
-    this->dataPtr->parent.reset();
-  }
 
-  // Detach all children
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
-  {
-    this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
-    (*iter)->dataPtr->parent.reset();
-    (*iter).reset();
-  }
-
-  this->dataPtr->children.clear();
-
-  if (this->dataPtr->sceneNode != NULL)
+  if (this->dataPtr->sceneNode)
   {
     this->dataPtr->sceneNode->detachAllObjects();
     this->dataPtr->scene->GetManager()->destroySceneNode(
@@ -585,7 +570,8 @@ void Visual::DetachVisual(const std::string &_name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
-      this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
+      if (this->dataPtr->sceneNode)
+        this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
       childVis->GetParent().reset();
       break;
     }
@@ -660,7 +646,8 @@ unsigned int Visual::GetAttachedObjectCount() const
 //////////////////////////////////////////////////
 void Visual::DetachObjects()
 {
-  this->dataPtr->sceneNode->detachAllObjects();
+  if (this->dataPtr->sceneNode)
+    this->dataPtr->sceneNode->detachAllObjects();
   this->dataPtr->meshName = "";
   this->dataPtr->subMeshName = "";
   this->dataPtr->myMaterialName = "";
@@ -1665,16 +1652,19 @@ math::Pose Visual::GetWorldPose() const
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
 
-  vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-  pose.pos.x = vpos.x;
-  pose.pos.y = vpos.y;
-  pose.pos.z = vpos.z;
+  if (this->dataPtr->sceneNode)
+  {
+    vpos = this->dataPtr->sceneNode->_getDerivedPosition();
+    pose.pos.x = vpos.x;
+    pose.pos.y = vpos.y;
+    pose.pos.z = vpos.z;
 
-  vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-  pose.rot.w = vquatern.w;
-  pose.rot.x = vquatern.x;
-  pose.rot.y = vquatern.y;
-  pose.rot.z = vquatern.z;
+    vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
+    pose.rot.w = vquatern.w;
+    pose.rot.x = vquatern.x;
+    pose.rot.y = vquatern.y;
+    pose.rot.z = vquatern.z;
+  }
 
   return pose;
 }
@@ -2952,13 +2942,13 @@ sdf::ElementPtr Visual::GetSDF() const
 }
 
 //////////////////////////////////////////////////
-Visual::VisualType Visual::GetType() const
+rendering::VisualType Visual::GetType() const
 {
   return this->dataPtr->type;
 }
 
 //////////////////////////////////////////////////
-void Visual::SetType(const Visual::VisualType _type)
+void Visual::SetType(const rendering::VisualType _type)
 {
   this->dataPtr->type = _type;
 }

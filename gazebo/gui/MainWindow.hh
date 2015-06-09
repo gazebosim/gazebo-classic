@@ -22,6 +22,8 @@
 #include <vector>
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
@@ -169,6 +171,9 @@ namespace gazebo
 
       /// \brief Qt callback when the show grid action is triggered.
       private slots: void ShowGrid();
+
+      /// \brief Qt callback when the show origin action is triggered.
+      private slots: void ShowOrigin();
 
       /// \brief Qt callback when the show collisions action is triggered.
       private slots: void ShowCollisions();

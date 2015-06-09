@@ -56,6 +56,28 @@ namespace gazebo
     /// \brief Private data for the Visual class
     class VisualPrivate
     {
+      /// \brief Constructor
+      public: VisualPrivate()
+              : sceneNode(NULL),
+                transparency(0),
+                castShadows(true),
+                isStatic(false),
+                staticGeom(NULL),
+                visible(true),
+                ribbonTrail(NULL),
+                skeleton(NULL),
+                animState(NULL),
+                useRTShader(true),
+                initialized(false),
+                boundingBox(NULL),
+                lighting(true),
+                type(VT_ENTITY)
+      {
+      }
+
+      /// \brief Default destructor
+      public: virtual ~VisualPrivate() = default;
+
       /// \brief Pointer to the visual's scene.
       public: ScenePtr scene;
 
@@ -166,8 +188,8 @@ namespace gazebo
       public: uint32_t visibilityFlags;
 
       /// \brief type
-      public: Visual::VisualType type;
-      
+      public: rendering::VisualType type;
+
       /// \brief Index of the layer to which this visual belongs. Layers
       /// act similar to layers in photoshop.
       public: int32_t layer;

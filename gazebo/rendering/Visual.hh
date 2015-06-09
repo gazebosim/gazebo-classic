@@ -58,27 +58,6 @@ namespace gazebo
     class GZ_RENDERING_VISIBLE Visual :
       public boost::enable_shared_from_this<Visual>
     {
-      /// \brief Type of visual
-      public: enum VisualType
-              {
-                /// \brief Entity visual
-                VT_ENTITY,
-                /// \brief Model visual
-                VT_MODEL,
-                /// \brief Link visual
-                VT_LINK,
-                /// \brief Visual visual
-                VT_VISUAL,
-                /// \brief Collision visual
-                VT_COLLISION,
-                /// \brief Sensor visual
-                VT_SENSOR,
-                /// \brief GUI visual
-                VT_GUI,
-                /// \brief Physics data visual
-                VT_PHYSICS
-              };
-
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
       /// \param[in] _parent Parent of the visual.

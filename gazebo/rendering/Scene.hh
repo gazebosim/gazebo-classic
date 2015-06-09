@@ -385,6 +385,10 @@ namespace gazebo
       /// \param[in] _enabled Set to true to turn on the grid
       public: void SetGrid(bool _enabled);
 
+      /// \brief Show/hide the world origin indicator.
+      /// \param[in] _show True to show the origin.
+      public: void ShowOrigin(bool _show);
+
       /// \brief Get the top level world visual.
       /// \return Pointer to the world visual.
       public: VisualPtr GetWorldVisual() const;
@@ -567,7 +571,7 @@ namespace gazebo
       /// \param[in] _type Type of visual.
       /// \return True if message is processed successfully.
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg,
-          Visual::VisualType _type = Visual::VT_ENTITY);
+          rendering::VisualType _type = rendering::VT_ENTITY);
 
       /// \brief Light message callback.
       /// \param[in] _msg The message data.
@@ -580,10 +584,6 @@ namespace gazebo
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
       private: void ProcessRequestMsg(ConstRequestPtr &_msg);
-
-      /// \brief Selection message callback.
-      /// \param[in] _msg The message data.
-      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       /// \brief Sky message callback.
       /// \param[in] _msg The message data.
