@@ -70,8 +70,11 @@ namespace gazebo
                 useRTShader(true),
                 initialized(false),
                 boundingBox(NULL),
+                id(0),
                 lighting(true),
-                type(VT_ENTITY)
+                visibilityFlags(GZ_VISIBILITY_ALL),
+                type(VT_ENTITY),
+                layer(0)
       {
       }
 
