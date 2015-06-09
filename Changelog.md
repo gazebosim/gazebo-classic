@@ -2,6 +2,9 @@
 1. Added browse button to log record dialog.
     * [Pull request #1719](https://bitbucket.org/osrf/gazebo/pull-request/1719)
 
+1. Added simulation iterations to the world state.
+    * [Pull request #1722](https://bitbucket.org/osrf/gazebo/pull-request/1722)
+
 1. Added multiple LiftDrag plugins to the cessna_demo.world to allow the Cessna
 C-172 model to fly.
     * [Pull request #1715](https://bitbucket.org/osrf/gazebo/pull-request/1715)
@@ -20,6 +23,9 @@ world with the Cessna model and the two previous plugins loaded
 
 1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
     * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+
+1. Added countdown behavior for common::Timer and exposed the feature in TimerGUIPlugin.
+    * [Pull request #1690](https://bitbucket.org/osrf/gazebo/pull-request/1690)
 
 1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
     * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
