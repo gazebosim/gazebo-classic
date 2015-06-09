@@ -362,6 +362,10 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   // Check that box dialog has focus
   QVERIFY(applyWrenchDialogBox->isActiveWindow());
 
+  // Check mode
+  QVERIFY(applyWrenchDialogBox->GetMode() ==
+      gazebo::gui::ApplyWrenchDialog::Mode::NONE);
+
   // Get the ApplyWrenchVisual for the box
   gazebo::rendering::ApplyWrenchVisualPtr boxApplyWrenchVis =
       boost::dynamic_pointer_cast<gazebo::rendering::ApplyWrenchVisual>(
@@ -405,6 +409,10 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   // Check that sphere dialog has focus
   QVERIFY(!applyWrenchDialogBox->isActiveWindow());
   QVERIFY(applyWrenchDialogSphere->isActiveWindow());
+
+  // Check mode
+  QVERIFY(applyWrenchDialogSphere->GetMode() ==
+      gazebo::gui::ApplyWrenchDialog::Mode::NONE);
 
   // Get the ApplyWrenchVisual for the sphere
   gazebo::rendering::ApplyWrenchVisualPtr sphereApplyWrenchVis =
@@ -498,6 +506,10 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   QVERIFY(applyWrenchDialogBox->isActiveWindow());
   QVERIFY(!applyWrenchDialogSphere->isActiveWindow());
 
+  // Check mode
+  QVERIFY(applyWrenchDialogBox->GetMode() ==
+      gazebo::gui::ApplyWrenchDialog::Mode::TORQUE);
+
   // Check that torque spins changed to UnitX
   QCOMPARE(spins[7]->value(), 1.0);
   QCOMPARE(spins[8]->value(), 0.0);
@@ -536,12 +548,9 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
     return;
   }
 
-  // Mouse press on the rot tool
+  // Move mouse to the rot tool
   QPoint pressPoint(mousePoint.x, mousePoint.y);
   QTest::mouseMove(glWidget, pressPoint);
-  QTest::qWait(1000);
-  QTest::mousePress(glWidget, Qt::LeftButton, Qt::NoModifier, pressPoint,
-      100);
 
   // Process some events and draw the screen
   for (size_t i = 0; i < 10; ++i)
@@ -554,6 +563,49 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   // Check that rot tool is highlighted
   QVERIFY(boxApplyWrenchVis->GetRotTool()->GetState() ==
       gazebo::rendering::SelectionObj::SelectionMode::ROT_Y);
+
+  // Get/check the initial visual poses
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetPose() ==
+      gazebo::math::Pose::Zero);
+
+  gazebo::math::Pose boxTorquePose0 =
+      boxApplyWrenchVis->GetTorqueVisual()->GetPose();
+  gazebo::math::Pose boxForcePose0 =
+      boxApplyWrenchVis->GetForceVisual()->GetPose();
+
+  // Drag the tool
+  QTestEventList events;
+  events.addMousePress(Qt::LeftButton, Qt::NoModifier, pressPoint, 100);
+  events.addDelay(1000);
+  events.addMouseMove(QPoint(pressPoint.x(), pressPoint.y()-100), 100);
+  events.simulate(glWidget);
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 100; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check mode
+  QVERIFY(applyWrenchDialogBox->GetMode() ==
+      gazebo::gui::ApplyWrenchDialog::Mode::TORQUE);
+
+  // Check that only rot tool and torque were rotated
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetPose().pos ==
+      gazebo::math::Vector3::Zero);
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetPose().rot !=
+      gazebo::math::Vector3::Zero);
+  QVERIFY(boxApplyWrenchVis->GetTorqueVisual()->GetPose() !=
+      boxTorquePose0);
+  QVERIFY(boxApplyWrenchVis->GetForceVisual()->GetPose() == boxForcePose0);
+
+  // Check that only torque spins X and Z changed
+  QVERIFY(spins[7]->value() < 1.0);
+  QCOMPARE(spins[8]->value(), 0.0);
+  QVERIFY(spins[9]->value() > 0.0);
+  QCOMPARE(spins[10]->value(), 1.0);
 
   // Clean up
   delete applyWrenchDialogBox;

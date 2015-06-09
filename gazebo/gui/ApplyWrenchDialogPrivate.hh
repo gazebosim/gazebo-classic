@@ -23,6 +23,7 @@
 #include <mutex>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/ApplyWrenchDialog.hh"
 
 namespace gazebo
 {
@@ -125,8 +126,8 @@ namespace gazebo
       /// and "rot_z".
       public: std::string manipState;
 
-      /// \brief Current mode, either "force", "torque" or "none".
-      public: std::string mode;
+      /// \brief Current mode, either force, torque or none.
+      public: ApplyWrenchDialog::Mode mode;
 
       /// \brief Mutex to protect variables.
       public: std::mutex mutex;

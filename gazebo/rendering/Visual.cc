@@ -215,7 +215,8 @@ void Visual::Fini()
   for (iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
   {
-    this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
+    if (this->dataPtr->sceneNode && (*iter)->GetSceneNode())
+      this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
     (*iter)->dataPtr->parent.reset();
     (*iter).reset();
   }

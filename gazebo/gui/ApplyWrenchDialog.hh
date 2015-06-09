@@ -40,6 +40,18 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \enum Modes
+      /// \brief Dialog is in one of these modes at each time.
+      public: enum Mode
+      {
+        /// \brief None
+        NONE = 0,
+        /// \brief Force
+        FORCE = 1,
+        /// \brief Torque
+        TORQUE = 2
+      };
+
       /// \brief Constructor.
       /// \param[in] _parent Parent QWidget.
       public: ApplyWrenchDialog(QWidget *_parent = 0);
@@ -57,6 +69,10 @@ namespace gazebo
 
       /// \brief Finish the dialog.
       public: void Fini();
+
+      /// \brief Get the mode, either force, torque or none.
+      /// \return Current mode.
+      public: Mode GetMode() const;
 
       /// \brief Set model to which wrench will be applied.
       /// \param[in] _modelName Scoped model name.
@@ -177,18 +193,18 @@ namespace gazebo
       /// \return True if handled by this function.
       private: bool OnMouseMove(const common::MouseEvent &_event);
 
-      /// \brief Set the mode to either "force", "torque" or "none".
+      /// \brief Set the mode to either force, torque or none.
       /// \param[in] _mode Current mode.
-      private: void SetMode(const std::string &_mode);
+      private: void SetMode(Mode _mode);
 
       /// \brief Update force vector with direction given by mouse, magnitude
       /// from spin.
-      /// \param[in] _dir New direction.
+      /// \param[in] _dir New direction, doesn't need to be normalized.
       private: void NewForceDirection(const math::Vector3 &_dir);
 
       /// \brief Update torque vector with direction given by mouse, magnitude
       /// from spin.
-      /// \param[in] _dir New direction.
+      /// \param[in] _dir New direction, doesn't need to be normalized.
       private: void NewTorqueDirection(const math::Vector3 &_dir);
 
       /// \brief Set this dialog to be active, visuals visible and mouse
