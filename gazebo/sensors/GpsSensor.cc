@@ -70,7 +70,7 @@ void GpsSensor::Load(const std::string &_worldName)
     this->topicName += '/' + this->sdf->Get<std::string>("topic");
   boost::replace_all(this->topicName, "::", "/");
 
-  this->gpsPub = this->node->Advertise<msgs::GPS>(this->topicName, 50);
+  this->gpsPub = this->node->Advertise<msgs::Gps>(this->topicName, 50);
 
   // Parse sdf noise parameters
   sdf::ElementPtr gpsElem = this->sdf->GetElement("gps");
@@ -130,6 +130,7 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
     {
       // Get postion in Cartesian gazebo frame
       math::Pose gpsPose = this->pose + this->parentLink->GetWorldPose();
+      msgs::Set(this->lastGpsMsg.mutable_world_pos(), gpsPose.pos);
 
       // Apply position noise before converting to global frame
       gpsPose.pos.x = this->noises[0]->Apply(gpsPose.pos.x);
@@ -191,4 +192,21 @@ math::Angle GpsSensor::GetLatitude() const
 double GpsSensor::GetAltitude() const
 {
   return this->lastGpsMsg.altitude();
+}
+
+//////////////////////////////////////////////////
+void GpsSensor::AddSatellite(const std::string &sid, const math::Vector3 &pos, double snr)
+{
+  // Add a new satellite
+  msgs::Satellite* sv =  this->lastGpsMsg.add_satellites();
+  sv->set_id(sid);
+  gazebo::msgs::Set(sv->mutable_pos(),pos);
+  sv->set_snr(snr);
+}
+
+//////////////////////////////////////////////////
+void GpsSensor::ClearSatellites()
+{
+  // Clear satellites in view
+  this->lastGpsMsg.clear_satellites();
 }

@@ -36,6 +36,7 @@ set (sources
   DynamicRenderable.cc
   FPSViewController.cc
   GpuLaser.cc
+  GpsVisual.cc
   Grid.cc
   Heightmap.cc
   InertiaVisual.cc

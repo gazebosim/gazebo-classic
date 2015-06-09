@@ -1,13 +1,15 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface GPS
-/// \brief Data from a GPS sensor
+/// \interface Gps
+/// \brief Data from a Gps sensor
 
 
 import "time.proto";
+import "satellite.proto";
+import "vector3d.proto";
 
-message GPS
+message Gps
 {
   required Time time                    = 1;
   required string link_name             = 2;
@@ -17,4 +19,6 @@ message GPS
   optional double velocity_east         = 6;
   optional double velocity_north        = 7;
   optional double velocity_up           = 8;
+  required Vector3d world_pos           = 9;
+  repeated Satellite satellites         = 10;
 }

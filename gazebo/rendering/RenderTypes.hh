@@ -47,6 +47,7 @@ namespace gazebo
     class UserCamera;
     class DepthCamera;
     class GpuLaser;
+    class GpsVisual;
     class DynamicLines;
     class Visual;
     class LaserVisual;
@@ -94,6 +95,10 @@ namespace gazebo
     /// \def GpuLaserPtr
     /// \brief Shared pointer to GpuLaser
     typedef boost::shared_ptr<GpuLaser> GpuLaserPtr;
+
+    /// \def GpsVisualPtr
+    /// \brief Shared pointer to GpsVisual
+    typedef boost::shared_ptr<GpsVisual> GpsVisualPtr;
 
     /// \def DynamicLinesPtr
     /// \brief Shared pointer to DynamicLines

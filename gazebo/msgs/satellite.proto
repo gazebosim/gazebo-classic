@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Satellite
+/// \brief Information about a GPS satellite
+
+import "vector3d.proto";
+
+message Satellite
+{
+  required string   id  = 1;
+  required Vector3d pos = 2;
+  required double   snr = 3;
+}

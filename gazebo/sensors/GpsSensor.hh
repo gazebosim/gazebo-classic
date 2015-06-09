@@ -74,6 +74,12 @@ namespace gazebo
       /// \return Current altitude above sea level.
       public: double GetAltitude() const;
 
+      /// \brief Add a new satellite to the view vector
+      public: void AddSatellite(const std::string &sid, const math::Vector3 &pos, double snr);
+
+      /// \brief Clear all current satellites in view
+      public: void ClearSatellites();
+
       /// \brief GPS data publisher.
       private: transport::PublisherPtr gpsPub;
 
@@ -87,7 +93,7 @@ namespace gazebo
       private: common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief Stores most recent GPS sensor data.
-      private: msgs::GPS lastGpsMsg;
+      private: msgs::Gps lastGpsMsg;
     };
     /// \}
   }

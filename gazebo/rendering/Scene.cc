@@ -44,6 +44,7 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
+#include "gazebo/rendering/GpsVisual.hh"
 #include "gazebo/rendering/Grid.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
@@ -1945,6 +1946,23 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       laserVis->Load();
       laserVis->SetId(_msg->id());
       this->dataPtr->visuals[_msg->id()] = laserVis;
+    }
+  }
+  else if (_msg->type() == "gps" && _msg->visualize()
+      && !_msg->topic().empty())
+  {
+    std::string gpsVisualName = _msg->parent() + "::" + _msg->name();
+    if (this->dataPtr->visuals.find(_msg->id()) == this->dataPtr->visuals.end())
+    {
+      VisualPtr parentVis = this->GetVisual(_msg->parent_id());
+      if (!parentVis)
+        return false;
+
+      GpsVisualPtr gpsVis(new GpsVisual(
+            gpsVisualName+"_GUIONLY_gps_vis", parentVis, _msg->topic()));
+      gpsVis->Load();
+      gpsVis->SetId(_msg->id());
+      this->dataPtr->visuals[_msg->id()] = gpsVis;
     }
   }
   else if ((_msg->type() == "sonar") && _msg->visualize()

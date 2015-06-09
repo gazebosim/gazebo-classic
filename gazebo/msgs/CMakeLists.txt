@@ -71,6 +71,7 @@ set (msgs
   publishers.proto
   publish.proto
   quaternion.proto
+  satellite.proto
   sonar.proto
   sonar_stamped.proto
   raysensor.proto
