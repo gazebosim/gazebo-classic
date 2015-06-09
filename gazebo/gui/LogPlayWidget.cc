@@ -15,6 +15,7 @@
  *
  */
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/LogPlayWidget.hh"
@@ -212,6 +213,13 @@ void LogPlayWidget::EmitSetCurrentTime(common::Time _time)
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetStartTime(common::Time _time)
 {
+  if (_time > this->dataPtr->endTime)
+  {
+    gzwarn << "Start time [" << _time << "] after end time [" <<
+        this->dataPtr->endTime << "]. Not updating." << std::endl;
+    return;
+  }
+
   this->dataPtr->startTime = _time;
 
   // Update start time in view
@@ -221,6 +229,13 @@ void LogPlayWidget::EmitSetStartTime(common::Time _time)
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetEndTime(common::Time _time)
 {
+  if (_time < this->dataPtr->startTime)
+  {
+    gzwarn << "End time [" << _time << "] before start time [" <<
+        this->dataPtr->startTime << "]. Not updating." << std::endl;
+    return;
+  }
+
   this->dataPtr->endTime = _time;
 
   // Use shorter string if less than 1h
