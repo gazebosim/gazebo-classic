@@ -45,8 +45,7 @@ GpsSensor::GpsSensor()
 /////////////////////////////////////////////////
 GpsSensor::~GpsSensor()
 {
-  for (int i = 0; i < 6; i++)
-    this->noises[i].reset();
+  this->noises.clear();
 }
 
 /////////////////////////////////////////////////
