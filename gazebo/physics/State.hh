@@ -56,7 +56,7 @@ namespace gazebo
       /// Construct a State object using some basic information.
       /// \param _name Name associated with the State information. This is
       /// typically the name of an Entity.
-      /// \pararm _realTime Clock time since simulation started.
+      /// \param _realTime Clock time since simulation started.
       /// \param _simTime Simulation time associated with this State info.
       /// \param _iterations Simulation iterations since simulation started.
       public: State(const std::string &_name,
