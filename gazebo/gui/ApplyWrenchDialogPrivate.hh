@@ -114,7 +114,7 @@ namespace gazebo
       /// \brief Interactive visual which represents the wrench to be applied.
       public: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
 
-      /// \brief Indicate whether mousepress is dragging on top the
+      /// \brief Indicate whether mouse is dragging on top the
       /// rotation tool or not.
       public: bool draggingTool;
 

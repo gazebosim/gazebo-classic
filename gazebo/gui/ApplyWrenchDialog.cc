@@ -1157,7 +1157,8 @@ void ApplyWrenchDialog::SetActive(bool _active)
   if (_active)
   {
     // Set visible
-    this->dataPtr->applyWrenchVisual->SetVisible(true);
+    this->dataPtr->applyWrenchVisual->SetMode(
+        static_cast<rendering::ApplyWrenchVisual::Mode>(this->GetMode()));
 
     // Set selected
     event::Events::setSelectedEntity(this->dataPtr->linkName, "normal");
@@ -1175,7 +1176,8 @@ void ApplyWrenchDialog::SetActive(bool _active)
   }
   else
   {
-    this->dataPtr->applyWrenchVisual->SetVisible(false);
+    this->dataPtr->applyWrenchVisual->SetMode(
+        rendering::ApplyWrenchVisual::Mode::NONE);
 
     MouseEventHandler::Instance()->RemovePressFilter(
         "dialog_"+this->dataPtr->applyWrenchVisual->GetName());

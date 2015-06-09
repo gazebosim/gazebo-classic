@@ -155,15 +155,13 @@ namespace gazebo
 
       /// \brief Set force vector, send it to visuals and update spins.
       /// \param[in] _force New force.
-      /// \param[in] _rotatedByMouse If rotated by mouse, update force visual
-      /// but not the rot tool.
+      /// \param[in] _rotatedByMouse Rot tool has been rotated by the mouse.
       private: void SetForce(const math::Vector3 &_force,
           bool _rotatedByMouse = false);
 
       /// \brief Set torque vector, send it to visuals and update spins.
       /// \param[in] _torque New torque.
-      /// \param[in] _rotatedByMouse If rotated by mouse, update torque visual
-      /// but not the rot tool.
+      /// \param[in] _rotatedByMouse Rot tool has been rotated by the mouse.
       private: void SetTorque(const math::Vector3 &_torque,
           bool _rotatedByMouse = false);
 

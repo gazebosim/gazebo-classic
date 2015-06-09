@@ -33,6 +33,18 @@ namespace gazebo
     /// \brief Visualization for the apply wrench GUI
     class GAZEBO_VISIBLE ApplyWrenchVisual : public Visual
     {
+      /// \enum Modes
+      /// \brief Visual is in one of these modes at each time.
+      public: enum Mode
+      {
+        /// \brief None
+        NONE = 0,
+        /// \brief Force
+        FORCE = 1,
+        /// \brief Torque
+        TORQUE = 2
+      };
+
       /// \brief Constructor
       /// \param[in] _name Name of the visual
       /// \param[in] _parentVis Pointer to the parent visual
@@ -94,10 +106,10 @@ namespace gazebo
       /// \return Pointer to rotation tool.
       public: rendering::SelectionObjPtr GetRotTool() const;
 
-      /// \brief Set the mode to "force", "torque" or "none", update colors
+      /// \brief Set the mode to force, torque or none, update colors
       /// and visibility accordingly.
       /// \param[in] _mode New mode.
-      public: void SetMode(const std::string &_mode);
+      public: void SetMode(Mode _mode);
 
       /// \brief Get the rotation to point the positive Z axis to the
       /// given direction.
@@ -105,14 +117,6 @@ namespace gazebo
       /// \return Resulting quaternion
       private: math::Quaternion GetQuaternionFromVector(
           const math::Vector3 &_dir);
-
-      /// \brief Set this to be visible or not.
-      /// \param[in] _visible If true, force and torque visuals will be visible
-      /// and the rot tool will be visible if mode is not "none".
-      /// \param[in] _cascade Only needed when _visible is false. If _cascade is
-      /// true, force and torque visuals are hidden. If false, they are still
-      /// visible but with disabled colors.
-      public: void SetVisible(bool _visible, bool _cascade = false);
     };
     /// \}
   }

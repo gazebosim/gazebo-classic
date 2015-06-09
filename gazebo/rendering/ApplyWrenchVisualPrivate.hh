@@ -63,9 +63,6 @@ namespace gazebo
       /// \brief Rotation tool composed of two circles.
       public: rendering::SelectionObjPtr rotTool;
 
-      /// \brief Current mode, either "force", "torque" or "none".
-      public: std::string mode;
-
       /// \brief If true, the rotation tool was rotated by the mouse and
       /// shouldn't be oriented again according to the vector.
       public: bool rotatedByMouse;

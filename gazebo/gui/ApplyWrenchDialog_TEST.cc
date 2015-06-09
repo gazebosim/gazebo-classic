@@ -346,6 +346,18 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   gazebo::math::Pose sphereLinkPose = sphereLinkVis->GetWorldPose();
   QVERIFY(sphereLinkPose == sphereLinkVis->GetWorldPose());
 
+  // Move the mouse to the corner of the screen so the dialogs open there
+  QTest::mouseMove(glWidget, QPoint(-glWidget->width()*0.5,
+                                    -glWidget->height()*0.5));
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
   // Initialize dialog for the box link
   gazebo::gui::ApplyWrenchDialog *applyWrenchDialogBox =
       new gazebo::gui::ApplyWrenchDialog();
