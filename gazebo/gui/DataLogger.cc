@@ -232,6 +232,12 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this, SIGNAL(SetDestinationURI(QString)),
           this, SLOT(OnSetDestinationURI(QString)), Qt::QueuedConnection);
 
+  // Timer used to hide the confirmation dialog
+  this->confirmationDialog = NULL;
+  this->confirmationTimer = new QTimer(this);
+  connect(this->confirmationTimer, SIGNAL(timeout()), this,
+      SLOT(OnConfirmationTimeout()));
+
   // Create a node from communication.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -274,6 +280,29 @@ void DataLogger::OnRecord(bool _toggle)
     // Switch the icon
     this->recordButton->setIcon(QPixmap(":/images/record.png"));
 
+    // Display confirmation
+    this->confirmationTimer->start(2000);
+    QLabel *confirmationLabel = new QLabel("Saved to \n" +
+        this->destPath->text());
+    confirmationLabel->setObjectName("dataLoggerConfirmationLabel");
+    QHBoxLayout *confirmationLayout = new QHBoxLayout();
+    confirmationLayout->addWidget(confirmationLabel);
+
+    if (this->confirmationDialog)
+      this->confirmationDialog->close();
+    this->confirmationDialog = new QDialog(this, Qt::FramelessWindowHint);
+    this->confirmationDialog->setObjectName("dataLoggerConfirmationDialog");
+    this->confirmationDialog->setLayout(confirmationLayout);
+    this->confirmationDialog->setStyleSheet(
+        "QDialog {background-color: #eee}\
+         QLabel {color: #111}");
+    this->confirmationDialog->setModal(false);
+    this->confirmationDialog->show();
+    this->confirmationDialog->move(this->mapToGlobal(
+        QPoint((this->width()-this->confirmationDialog->width())*0.5,
+        this->height() + 10)));
+
+    // Change the status
     this->statusLabel->setText("Ready");
     this->statusLabel->setStyleSheet("QLabel{color: #aeaeae}");
     this->statusTimer->stop();
@@ -467,3 +496,9 @@ void DataLogger::OnBlinkStatus()
       ")}"));
 }
 
+/////////////////////////////////////////////////
+void DataLogger::OnConfirmationTimeout()
+{
+  this->confirmationDialog->close();
+  this->confirmationTimer->stop();
+}
