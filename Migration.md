@@ -23,7 +23,8 @@
 1. **gazebo/physics/ModelState.hh**
     + ***Removed:*** public: ModelState(const ModelPtr _model, const
     common::Time &_realTime, const common::Time &_simTime)
-    + ***Replacement:*** public: ModelState(const ModelPtr _model, const common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    + ***Replacement:*** public: ModelState(const ModelPtr _model, const
+    common::Time &_realTime, const common::Time &_simTime, const uint64_t
     _iterations)
     + ***Removed:*** public: void Load(const ModelPtr _model, const common::Time
     &_realTime, const common::Time &_simTime)
