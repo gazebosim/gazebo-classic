@@ -302,8 +302,13 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
 /////////////////////////////////////////////////
 void LogPlayView::SetCurrentTime(int _msec)
 {
+  int totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+
+  if (totalTime == 0)
+    return;
+
   double relPos = static_cast<double>(_msec - this->dataPtr->startTime) /
-      (this->dataPtr->endTime - this->dataPtr->startTime);
+      totalTime;
 
   this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin +
       (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
@@ -334,6 +339,9 @@ void LogPlayView::DrawTimeline()
     return;
 
   int totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+
+  if (totalTime == 0)
+    return;
 
   // Aim for this number, but some samples might be added/removed
   int intervals = 10;
