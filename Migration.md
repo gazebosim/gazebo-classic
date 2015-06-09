@@ -101,8 +101,8 @@
     + public: virtual void SetIterations(const uint64_t _iterations)
 
 1. **gazebo/util/LogPlay.hh**
-    + public: uint64_t GetInitialIterations() const;
-    + public: bool HasIterations() const;
+    + public: uint64_t GetInitialIterations() const
+    + public: bool HasIterations() const
 
 ## Gazebo 4.X to 5.X
 
