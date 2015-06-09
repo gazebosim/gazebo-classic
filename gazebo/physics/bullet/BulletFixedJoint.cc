@@ -76,7 +76,7 @@ void BulletFixedJoint::Init()
             bulletParentLink->GetBulletLink()->getCenterOfMassTransform());
     math::Pose jointPoseWrtWorld      = this->GetWorldPose();
     math::Pose jointPoseWrtLinkPoseBullet =
-        (linkPoseBulletWrtWorld.GetInverse())*jointPoseWrtWorld;
+        jointPoseWrtWorld + (linkPoseBulletWrtWorld.GetInverse());
     jointPoseWrtParentLinkBullet =
         BulletTypes::ConvertPose(jointPoseWrtLinkPoseBullet);
   }
@@ -89,7 +89,7 @@ void BulletFixedJoint::Init()
             bulletChildLink->GetBulletLink()->getCenterOfMassTransform());
     math::Pose jointPoseWrtWorld      = this->GetWorldPose();
     math::Pose jointPoseWrtLinkPoseBullet =
-        (linkPoseBulletWrtWorld.GetInverse())*jointPoseWrtWorld;
+        jointPoseWrtWorld + (linkPoseBulletWrtWorld.GetInverse());
     jointPoseWrtChildLinkBullet =
         BulletTypes::ConvertPose(jointPoseWrtLinkPoseBullet);
   }

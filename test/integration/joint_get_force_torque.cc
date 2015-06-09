@@ -144,21 +144,22 @@ class JointGetForceTorqueTest : public ServerFixture,
             world->InsertModelString(modelStr.str());
 
             physics::ModelPtr model;
-            common::Time wait(100, 0);
+            unsigned stepsToWait =  1000;
 
-            common::Time wallStart = common::Time::GetWallTime();
-            unsigned int waitCount = 0;
-            while (wait > (common::Time::GetWallTime() - wallStart) &&
+            unsigned int stepCount = 0;
+            while (stepCount < stepsToWait &&
                    !this->HasEntity(modelName.str()))
             {
-              common::Time::MSleep(10);
-              if (++waitCount % 100 == 0)
+              world->Step(10);
+              stepCount += 10;
+              if (++stepCount % 100 == 0)
               {
-                gzwarn << "Waiting " << waitCount / 100 << " seconds for "
+                gzwarn << "Waiting " << stepCount << " steps for "
                        << "box to spawn." << std::endl;
               }
             }
-            if (this->HasEntity(modelName.str()) && waitCount >= 100)
+
+            if (this->HasEntity(modelName.str()))
               gzwarn << "box has spawned." << std::endl;
 
             if (world != NULL)
@@ -168,10 +169,12 @@ class JointGetForceTorqueTest : public ServerFixture,
           }
 
   /// \brief Helper function for GetForceTorqueDemo
+  /// \param[in] _world         Pointer to the world object
   /// \param[in] _physics       Pointer to the physics object.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _options       Options for the joint to test.
-  public: void GetFTDemoHelper(physics::PhysicsEnginePtr _physics,
+  public: void GetFTDemoHelper(physics::WorldPtr _world,
+                               physics::PhysicsEnginePtr _physics,
                                const std::string &_physicsEngine,
                                const SpawnGetFTBoxOptions & opt);
 
@@ -184,10 +187,13 @@ class JointGetForceTorqueTest : public ServerFixture,
 };
 
 void JointGetForceTorqueTest::GetFTDemoHelper(
+                                           physics::WorldPtr _world,
                                            physics::PhysicsEnginePtr _physics,
-                                           const std::string& /*_physicsEngine*/,
+                                           const std::string& _physicsEngine,
                                            const SpawnGetFTBoxOptions& opt)
 {
+    gzdbg << "GetFTDemoHelper for physics " << _physicsEngine
+          << "joint type " << opt.jointType << " joint axis " << opt.jointAxis << std::endl;
     math::Vector3 g = _physics->GetGravity();
     double mass = opt.mass;
     math::Vector3 com = opt.inertialPose.pos;
@@ -201,7 +207,7 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
     ASSERT_TRUE(joint != NULL);
 
     // wait some time to get a clean measure
-    common::Time::MSleep(50);
+    _world->Step(20);
 
     physics::JointWrench W = joint->GetForceTorque(0u);
 
@@ -239,7 +245,7 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
 // output against analytical solution.
 void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
 {
-  Load("worlds/empty.world", false, _physEng);
+  Load("worlds/empty.world", true, _physEng);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -252,9 +258,10 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   SpawnGetFTBoxOptions opt;
   opt.jointType = "fixed";
 
-  GetFTDemoHelper(physics, _physEng, opt);
+  GetFTDemoHelper(world, physics, _physEng, opt);
 
   // test a revolute joint against all axis
+
   /*
   for(int i=0; i < 3; i++)
   {
@@ -273,9 +280,9 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
         break;
     }
 
-    GetFTDemoHelper(physics,_physicsEngine,opt);
-  }
-  */
+    GetFTDemoHelper(world, physics,_physEng,opt);
+  }*/
+
   // test a prismatic joint against all axis
   /*
   for(int i=0; i < 3; i++)
@@ -296,7 +303,7 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
     }
 
 
-    GetFTDemoHelper(physics,_physicsEngine,opt);
+    GetFTDemoHelper(world, physics,_physicsEngine,opt);
   }
   */
 }
