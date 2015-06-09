@@ -102,7 +102,7 @@
 
 1. **gazebo/util/LogPlay.hh**
     + public: uint64_t GetInitialIterations() const;
-    + bool HasIterations() const;
+    + public: bool HasIterations() const;
 
 ## Gazebo 4.X to 5.X
 
