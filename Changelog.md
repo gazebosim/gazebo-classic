@@ -76,6 +76,10 @@ compilation on Windows.
 1. Add VisualType enum to Visual and clean up visuals when entity is deleted.
     * [Pull request #1614](https://bitbucket.org/osrf/gazebo/pull-request/1614)
 
+1. ignition-math is now a dependency. 
+    + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
+    + [Gazebo::math migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
+
 1. New accessors in LogPlay class.
     * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
 
