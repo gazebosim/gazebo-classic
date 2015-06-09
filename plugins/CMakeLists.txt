@@ -53,6 +53,7 @@ set (plugins
   RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
+  Small2dGimbalPlugin
   SonarPlugin
   SphereAtlasDemoPlugin
   VehiclePlugin)
