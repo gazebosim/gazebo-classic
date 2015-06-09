@@ -213,7 +213,7 @@ void LogPlayWidget::EmitSetCurrentTime(common::Time _time)
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetStartTime(common::Time _time)
 {
-  if (_time > this->dataPtr->endTime)
+  if (_time >= this->dataPtr->endTime)
   {
     gzwarn << "Start time [" << _time << "] after end time [" <<
         this->dataPtr->endTime << "]. Not updating." << std::endl;
@@ -229,7 +229,7 @@ void LogPlayWidget::EmitSetStartTime(common::Time _time)
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetEndTime(common::Time _time)
 {
-  if (_time < this->dataPtr->startTime)
+  if (_time <= this->dataPtr->startTime)
   {
     gzwarn << "End time [" << _time << "] before start time [" <<
         this->dataPtr->startTime << "]. Not updating." << std::endl;
