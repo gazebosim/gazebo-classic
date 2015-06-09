@@ -16,7 +16,7 @@
     _iterations)
     + ***Removed:*** public: void Load(const LinkPtr _link, const common::Time
     &_realTime, const common::Time &_simTime)
-    + ***Replacement:*** public: void LinkState(const LinkPtr _link, const
+    + ***Replacement:*** public: void Load(const LinkPtr _link, const
     common::Time &_realTime, const common::Time &_simTime, const uint64_t
     _iterations)
 
@@ -44,9 +44,6 @@
     + ***Replacement:*** public: void Load(const ModelPtr _model, const
     common::Time &_realTime, const common::Time &_simTime, const uint64_t
     _iterations)
-
-
-
 
 1. ignition-math is now a dependency.
     + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
