@@ -28,24 +28,32 @@ using namespace gui;
 VisualConfig::VisualConfig()
 {
   this->setObjectName("VisualConfig");
-  QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  this->visualsTreeWidget = new QTreeWidget();
-  this->visualsTreeWidget->setColumnCount(1);
-  this->visualsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->visualsTreeWidget->header()->hide();
-  this->visualsTreeWidget->setIndentation(4);
+  // Layout for list
+  this->listLayout = new QVBoxLayout();
+  this->listLayout->setContentsMargins(0, 0, 0, 0);
+  this->listLayout->setAlignment(Qt::AlignTop);
 
-  this->visualsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  connect(this->visualsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-      this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
+  // Widget for list, which will be scrollable
+  QWidget *listWidget = new QWidget();
+  listWidget->setLayout(this->listLayout);
+  listWidget->setStyleSheet("QWidget{background-color: #808080}");
 
+  // Scroll area for list
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(listWidget);
+  scrollArea->setWidgetResizable(true);
+
+  // Add Visual button
   QPushButton *addVisualButton = new QPushButton(tr("+ &Another Visual"));
   addVisualButton->setMaximumWidth(200);
   connect(addVisualButton, SIGNAL(clicked()), this, SLOT(OnAddVisual()));
 
-  mainLayout->addWidget(this->visualsTreeWidget);
+  // Main layout
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->addWidget(scrollArea);
   mainLayout->addWidget(addVisualButton);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
   this->counter = 0;
@@ -84,18 +92,33 @@ unsigned int VisualConfig::GetVisualCount() const
 void VisualConfig::Reset()
 {
   for (auto &it : this->configs)
+  {
+    this->listLayout->removeWidget(it.second->widget);
     delete it.second;
+  }
 
   this->configs.clear();
-  this->visualsTreeWidget->clear();
 }
 
 /////////////////////////////////////////////////
 void VisualConfig::AddVisual(const std::string &_name,
     const msgs::Visual *_visualMsg)
 {
-  // Visual name label
-  QLabel *visualLabel = new QLabel(QString(_name.c_str()));
+  // Header button
+  QRadioButton *headerButton = new QRadioButton();
+  headerButton->setChecked(false);
+  headerButton->setFocusPolicy(Qt::NoFocus);
+  headerButton->setText(QString(_name.c_str()));
+  headerButton->setStyleSheet(
+     "QRadioButton {\
+        color: #d0d0d0;\
+      }\
+      QRadioButton::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QRadioButton::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
 
   // Remove button
   QToolButton *removeVisualButton = new QToolButton(this);
@@ -109,21 +132,15 @@ void VisualConfig::AddVisual(const std::string &_name,
       SLOT(map()));
   this->signalMapper->setMapping(removeVisualButton, this->counter);
 
-  // Item Layout
-  QHBoxLayout *visualItemLayout = new QHBoxLayout;
-  visualItemLayout->addWidget(visualLabel);
-  visualItemLayout->addWidget(removeVisualButton);
-  visualItemLayout->setContentsMargins(10, 0, 0, 0);
+  // Header Layout
+  QHBoxLayout *headerLayout = new QHBoxLayout;
+  headerLayout->setContentsMargins(0, 0, 0, 0);
+  headerLayout->addWidget(headerButton);
+  headerLayout->addWidget(removeVisualButton);
 
-  // Item widget
-  QWidget *visualItemWidget = new QWidget;
-  visualItemWidget->setLayout(visualItemLayout);
-
-  // Top-level tree item
-  QTreeWidgetItem *visualItem =
-      new QTreeWidgetItem(static_cast<QTreeWidgetItem *>(0));
-  this->visualsTreeWidget->addTopLevelItem(visualItem);
-  this->visualsTreeWidget->setItemWidget(visualItem, 0, visualItemWidget);
+  // Header widget
+  QWidget *headerWidget = new QWidget;
+  headerWidget->setLayout(headerLayout);
 
   // ConfigWidget
   msgs::Visual msgToLoad;
@@ -138,6 +155,7 @@ void VisualConfig::AddVisual(const std::string &_name,
 
   ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);
+  configWidget->hide();
 
   configWidget->SetWidgetVisible("id", false);
   configWidget->SetWidgetVisible("name", false);
@@ -158,34 +176,27 @@ void VisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetReadOnly("scale", true);
   configWidget->SetWidgetReadOnly("plugin", true);
 
+  // Item layout
+  QVBoxLayout *itemLayout = new QVBoxLayout();
+  itemLayout->addWidget(headerWidget);
+  itemLayout->addWidget(configWidget);
+
+  // Put the layout in a widget which can be added/deleted
+  QWidget *item = new QWidget();
+  item->setLayout(itemLayout);
+
+  // Add to the list
+  this->listLayout->addWidget(item);
+
+  // Fill ConfigData
   VisualConfigData *configData = new VisualConfigData;
   configData->configWidget = configWidget;
   configData->id =  this->counter;
-  configData->treeItem = visualItem;
+  configData->widget = item;
   configData->name = _name;
+  connect(headerButton, SIGNAL(toggled(bool)), configData,
+           SLOT(OnToggleItem(bool)));
   this->configs[this->counter] = configData;
-
-  // Scroll area
-  QScrollArea *scrollArea = new QScrollArea;
-  scrollArea->setWidget(configWidget);
-  scrollArea->setWidgetResizable(true);
-
-  // Layout
-  QVBoxLayout *visualLayout = new QVBoxLayout;
-  visualLayout->setContentsMargins(0, 0, 0, 0);
-  visualLayout->addWidget(scrollArea);
-
-  // Widget
-  QWidget *visualWidget = new QWidget;
-  visualWidget->setLayout(visualLayout);
-  visualWidget->setMinimumHeight(800);
-
-  // Child item
-  QTreeWidgetItem *visualChildItem = new QTreeWidgetItem(visualItem);
-  this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
-
-  visualItem->setExpanded(false);
-  visualChildItem->setExpanded(false);
 
   this->counter++;
 }
@@ -203,14 +214,6 @@ void VisualConfig::UpdateVisual(const std::string &_name,
       break;
     }
   }
-}
-
-/////////////////////////////////////////////////
-void VisualConfig::OnItemSelection(QTreeWidgetItem *_item,
-                                         int /*_column*/)
-{
-  if (_item && _item->childCount() > 0)
-    _item->setExpanded(!_item->isExpanded());
 }
 
 /////////////////////////////////////////////////
@@ -256,9 +259,8 @@ void VisualConfig::OnRemoveVisual(int _id)
     return;
 
   // Remove
-  int index = this->visualsTreeWidget->indexOfTopLevelItem(
-      configData->treeItem);
-  this->visualsTreeWidget->takeTopLevelItem(index);
+  this->listLayout->removeWidget(configData->widget);
+  delete configData->widget;
 
   emit VisualRemoved(configData->name);
   this->configs.erase(it);
@@ -317,4 +319,13 @@ void VisualConfig::SetMaterial(const std::string &_name,
       break;
     }
   }
+}
+
+/////////////////////////////////////////////////
+void VisualConfigData::OnToggleItem(bool _checked)
+{
+  if (_checked)
+    this->configWidget->show();
+  else
+    this->configWidget->hide();
 }
