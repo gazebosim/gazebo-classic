@@ -216,9 +216,6 @@ void Scene::Clear()
   delete this->dataPtr->terrain;
   this->dataPtr->terrain = NULL;
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
-
   while (!this->dataPtr->visuals.empty())
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
 
@@ -246,6 +243,9 @@ void Scene::Clear()
   for (unsigned int i = 0; i < this->dataPtr->userCameras.size(); ++i)
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
+
+  delete this->dataPtr->skyx;
+  this->dataPtr->skyx = NULL;
 
   RTShaderSystem::Instance()->RemoveScene(this->GetName());
   RTShaderSystem::Instance()->Clear();
@@ -324,6 +324,17 @@ void Scene::Init()
 
   for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
     this->dataPtr->grids[i]->Init();
+
+  // Create Sky. This initializes SkyX, and makes it invisible. A Sky
+  // message must be received (via a scene message or on the ~/sky topic).
+  try
+  {
+    this->SetSky();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to create the sky\n";
+  }
 
   // Create Fog
   if (this->dataPtr->sdf->HasElement("fog"))
@@ -1464,30 +1475,6 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   // Process the sky message.
   if (_msg->has_sky())
   {
-    if (!this->dataPtr->skyx)
-    {
-      // Create Sky. This initializes SkyX, and makes it invisible. A Sky
-      // message must be received (via a scene message or on the ~/sky topic).
-      try
-      {
-        this->SetSky();
-      }
-      catch(...)
-      {
-        gzerr << "Failed to create the sky\n";
-      }
-
-      // tell all cameras to start rendering the sky
-      for (auto camera : this->dataPtr->cameras)
-        camera->GetViewport()->getTarget()->addListener(this->dataPtr->skyx);
-      for (auto camera : this->dataPtr->userCameras)
-        camera->GetViewport()->getTarget()->addListener(this->dataPtr->skyx);
-#ifdef HAVE_OCULUS
-      for (auto camera : this->dataPtr->oculusCameras)
-        camera->GetViewport()->getTarget()->addListener(this->dataPtr->skyx);
-#endif
-    }
-
     boost::shared_ptr<msgs::Sky> sm(new msgs::Sky(_msg->sky()));
     this->OnSkyMsg(sm);
   }
@@ -1530,7 +1517,6 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
   }
-
   return true;
 }
 
@@ -2166,6 +2152,8 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->sceneMsgs.push_back(sm);
   this->dataPtr->requestMsg = NULL;
 }
@@ -2599,6 +2587,9 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   if (!this->dataPtr->skyx)
     return;
 
+  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
+  this->dataPtr->skyx->update(0);
+
   this->dataPtr->skyx->setVisible(true);
 
   SkyX::VClouds::VClouds *vclouds =
@@ -2736,9 +2727,6 @@ void Scene::SetSky()
   // vclouds->getLightningManager()->setLightningTimeMultiplier(
   //    preset.vcLightningsTM);
 
-  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
-
-  this->dataPtr->skyx->update(0);
   this->dataPtr->skyx->setVisible(false);
 }
 
