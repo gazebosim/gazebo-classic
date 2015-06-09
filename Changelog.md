@@ -1,4 +1,7 @@
 ## Gazebo 6.0
+1. Added browse button to log record dialog.
+    * [Pull request #1719](https://bitbucket.org/osrf/gazebo/pull-request/1719)
+
 1. Added multiple LiftDrag plugins to the cessna_demo.world to allow the Cessna
 C-172 model to fly.
     * [Pull request #1715](https://bitbucket.org/osrf/gazebo/pull-request/1715)
