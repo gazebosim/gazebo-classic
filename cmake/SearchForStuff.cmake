@@ -571,6 +571,16 @@ else ()
 endif ()
 
 ########################################
+# Find ignition math
+find_package(ignition-math2 QUIET)
+if (NOT ignition-math2_FOUND)
+  message(STATUS "Looking for ignition-math2-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition math2 library.")
+else()
+  message(STATUS "Looking for ignition-math2-config.cmake - found")
+endif()
+
+########################################
 # Find QWT (QT graphing library)
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include
