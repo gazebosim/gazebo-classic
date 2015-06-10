@@ -55,8 +55,7 @@ To change the input parameters, you can modify the world file sdf:
     Example (in sdf file):
     
     <plugin name="model_move" filename="libmodel_move.so">
-        <path>5 5 0 0 0 0
-              5 -5 0 0 0 0
-              0 0 0 0 0 0</path>
-	<n_points>3</n_points>
+	<pose>5 5 0 0 0 0</pose>
+	<pose>5 -5 0 0 0 0</pose>
+	<pose>0 0 0 0 0 0</pose>
     </plugin>

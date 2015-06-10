@@ -85,7 +85,7 @@ void ModelMove::initiateMove()
 
 void ModelMove::getPathMsg(PoseAnimationPtr &msg)
 {
-  gzmsg << "Received path message." << std::endl;
+  gzmsg << "[model_move] Received path message" << std::endl;
 
   this->num_points = msg->pose_size();
   this->path = new math::Vector3[this->num_points];
@@ -107,7 +107,8 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   // Either get parameters from sdf
   if (_sdf->HasElement("path") && _sdf->HasElement("n_points"))
   {
-    gzmsg << "Processing path defined in the SDF file" << std::endl;
+    gzmsg << "[model_move] Processing path defined in the SDF file" 
+          << std::endl;
 
     sdf::Vector3 sdf_pose =
       _sdf->GetParent()->GetElement("pose")->Get<sdf::Pose>().pos;
@@ -127,12 +128,10 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     }
     initiateMove();
   }
-  else  // Or get parameters from gazebo topics
-  {
-    std::string path_topic_name = std::string("~/") + _parent->GetName() + "/model_move";
 
-    gzmsg << "Subscribed to receive paths in: "<< path_topic_name << std::endl;
-    pathSubscriber = node->Subscribe(path_topic_name, &ModelMove::getPathMsg,
-                                     this);
-  }
+  std::string path_topic_name = std::string("~/") + _parent->GetName() + "/model_move";
+  pathSubscriber = node->Subscribe(path_topic_name, &ModelMove::getPathMsg,
+                                   this);
+  gzmsg << "[model_move] Subscribed to receive paths in: "<< path_topic_name 
+        << std::endl;
 }
