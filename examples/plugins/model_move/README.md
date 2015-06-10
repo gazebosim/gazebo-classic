@@ -3,7 +3,7 @@
 This is a simple plugin example for moving a model to a specified set of goal points.
 
 The displacement is not kinematic aware, it uses the Pose Animation as described in
-the tutorial: http://gazebosim.org/tutorials?tut=animated_box 
+the [tutorial](http://gazebosim.org/tutorials?tut=animated_box):
 
 ## Build Instructions
 
