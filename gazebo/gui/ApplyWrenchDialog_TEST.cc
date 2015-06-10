@@ -552,7 +552,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
     gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint, manipState);
     if (!vis && manipState == "rot_y")
     {
-      mousePoint.y += 10;
+      mousePoint.y += 20;
       break;
     }
     mousePoint.y += 5;
