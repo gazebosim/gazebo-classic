@@ -106,8 +106,7 @@ namespace gazebo
 
       /// \brief Jump to the beginning of the log file. The next step() call
       /// will return the first data "chunk".
-      /// \return True If the function succeed or false otherwise.
-      public: bool Rewind();
+      public: void Rewind();
 
       /// \brief Get the number of chunks (steps) in the open log file.
       /// \return The number of recorded states in the log file.

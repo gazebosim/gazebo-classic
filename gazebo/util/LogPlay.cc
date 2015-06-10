@@ -360,17 +360,10 @@ bool LogPlay::Step(std::string &_data)
 }
 
 /////////////////////////////////////////////////
-bool LogPlay::Rewind()
+void LogPlay::Rewind()
 {
   this->currentChunk.clear();
-  this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-  if (!logCurrXml)
-  {
-    gzerr << "Unable to jump to the beginning of the log file\n";
-    return false;
-  }
-
-  return true;
+  this->logCurrXml = this->logStartXml;
 }
 
 /////////////////////////////////////////////////
