@@ -88,6 +88,8 @@ QAction *gazebo::gui::g_showCollisionsAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showGridAct = 0;
 GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_showOriginAct = 0;
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showContactsAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showJointsAct = 0;

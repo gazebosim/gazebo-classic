@@ -3,6 +3,7 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
+  ${IGNITION-MATH_INCLUDE_DIRS}
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common
@@ -23,6 +24,12 @@ endif()
 
 if (HAVE_DART)
   link_directories(${DARTCore_LIBRARY_DIRS})
+endif()
+
+if (HAVE_UUID)
+  include_directories(${uuid_INCLUDE_DIRS})
+  link_directories(${uuid_LIBRARY_DIRS})
+  add_definitions(${uuid_CFLAGS})
 endif()
 
 set (plugins

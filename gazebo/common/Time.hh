@@ -41,6 +41,22 @@ namespace gazebo
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;
 
+      /// \enum Format options
+      /// \brief Options for formatting time as a string.
+      public: enum FormatOption
+      {
+        /// \brief Days
+        DAYS = 0,
+        /// \brief Hours
+        HOURS = 1,
+        /// \brief Minutes
+        MINUTES = 2,
+        /// \brief Seconds
+        SECONDS = 3,
+        /// \brief Milliseconds
+        MILLISECONDS = 4
+      };
+
       /// \brief Constructors
       public: Time();
 
@@ -95,6 +111,14 @@ namespace gazebo
       /// \brief Get the time as a float
       /// \return Time as a float in seconds
       public: float Float() const;
+
+      /// \brief Get the time as a string formatted as "DD hh:mm:ss.mmm", with
+      /// the option to choose the start/end.
+      /// \param[in] _start Start point.
+      /// \param[in] _end End point.
+      /// \return String representing time.
+      public: std::string FormattedString(FormatOption _start = DAYS,
+          FormatOption _end = MILLISECONDS) const;
 
       /// \brief Sleep for the specified time
       /// \param[in] _time Sleep time
@@ -427,24 +451,30 @@ namespace gazebo
                  // In the case sec and nsec have different signs, normalize
                  if (this->sec > 0 && this->nsec < 0)
                  {
-                   int32_t n = abs(this->nsec / nsInSec) + 1;
+                   int32_t n = abs(this->nsec / this->nsInSec) + 1;
                    this->sec -= n;
-                   this->nsec += n * nsInSec;
+                   this->nsec += n * this->nsInSec;
                  }
                  if (this->sec < 0 && this->nsec > 0)
                  {
-                   int32_t n = abs(this->nsec / nsInSec) + 1;
+                   int32_t n = abs(this->nsec / this->nsInSec) + 1;
                    this->sec += n;
-                   this->nsec -= n * nsInSec;
+                   this->nsec -= n * this->nsInSec;
                  }
 
                  // Make any corrections
-                 this->sec += this->nsec / nsInSec;
-                 this->nsec = this->nsec % nsInSec;
+                 this->sec += this->nsec / this->nsInSec;
+                 this->nsec = this->nsec % this->nsInSec;
                }
 
       private: static struct timespec clockResolution;
+
+      /// \brief Constant multiplier to convert from nanoseconds to seconds.
       private: static const int32_t nsInSec;
+
+      /// \brief Constant multiplier to convert from nanoseconds to
+      /// milliseconds.
+      private: static const int32_t nsInMs;
     };
     /// \}
   }

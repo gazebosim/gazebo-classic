@@ -27,7 +27,7 @@
 
 namespace gazebo
 {
-  class HydraDemoPlugin : public ModelPlugin
+  class GAZEBO_VISIBLE HydraDemoPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: HydraDemoPlugin();
