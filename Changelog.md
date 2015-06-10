@@ -2,6 +2,9 @@
 1. Implement forward/backwards multi-step for log playback.
     * [Pull request #1623](https://bitbucket.org/osrf/gazebo/pull-request/1623)
 
+1. Added simulation iterations to the world state.
+    * [Pull request #1722](https://bitbucket.org/osrf/gazebo/pull-request/1722)
+
 1. Added multiple LiftDrag plugins to the cessna_demo.world to allow the Cessna
 C-172 model to fly.
     * [Pull request #1715](https://bitbucket.org/osrf/gazebo/pull-request/1715)
@@ -20,6 +23,9 @@ world with the Cessna model and the two previous plugins loaded
 
 1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
     * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+
+1. Added countdown behavior for common::Timer and exposed the feature in TimerGUIPlugin.
+    * [Pull request #1690](https://bitbucket.org/osrf/gazebo/pull-request/1690)
 
 1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
     * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
@@ -75,6 +81,10 @@ compilation on Windows.
 1. Laser visualization renders light blue for rays that do not hit obstacles, and dark blue for other rays.
     * [Pull request #1607](https://bitbucket.org/osrf/gazebo/pull-request/1607)
     * [Issue #1576](https://bitbucket.org/osrf/gazebo/issue/1576)
+
+1. ignition-math is now a dependency. 
+    + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
+    + [Gazebo::math migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
 
 1. New accessors in LogPlay class.
     * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
