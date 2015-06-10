@@ -211,7 +211,11 @@ math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
     return math::Angle();
   }
 
+#ifdef LIBBULLET_VERSION_GT_282
+  btRotationalLimitMotor2 *motor =
+#else
   btRotationalLimitMotor *motor =
+#endif
     this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_hiLimit;
@@ -229,7 +233,11 @@ math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
     return math::Angle(0.0);
   }
 
+#ifdef LIBBULLET_VERSION_GT_282
+  btRotationalLimitMotor2 *motor =
+#else
   btRotationalLimitMotor *motor =
+#endif
     this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_loLimit;
