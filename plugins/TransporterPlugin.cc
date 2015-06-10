@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
@@ -22,142 +21,158 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/Model.hh>
 
+#include "plugins/TransporterPluginPrivate.hh"
 #include "plugins/TransporterPlugin.hh"
 
 using namespace gazebo;
 
+// Register the plugin
 GZ_REGISTER_WORLD_PLUGIN(TransporterPlugin)
 
 /////////////////////////////////////////////////
 TransporterPlugin::TransporterPlugin()
+  : dataPtr(new TransporterPluginPrivate)
 {
 }
 
 /////////////////////////////////////////////////
 TransporterPlugin::~TransporterPlugin()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
+  bool hasManualActivation = false;
+
   GZ_ASSERT(_world, "TransporterPlugin world pointer is NULL");
   GZ_ASSERT(_sdf, "TransporterPlugin sdf pointer is NULL");
-  this->world = _world;
-  this->sdf = _sdf;
 
+  this->dataPtr->world = _world;
+
+  // Read each pad element
   sdf::ElementPtr padElem = _sdf->GetElement("pad");
   while (padElem)
   {
-    TransporterPlugin::Pad *pad = new TransporterPlugin::Pad;
+    // Create a new pad
+    std::shared_ptr<TransporterPluginPrivate::Pad> pad(
+        new TransporterPluginPrivate::Pad);
 
+    // Set the pad's name and destination
     pad->name = padElem->Get<std::string>("name");
     pad->dest = padElem->Get<std::string>("destination");
 
+    // Set the pad's activation type. The default is auto activation.
     if (padElem->HasElement("activation"))
     {
       pad->autoActivation =
         padElem->Get<std::string>("activation") == "auto" ? true : false;
+
+      // Store that the user has at least one pad with manual activation.
+      // This info is used to trigger a warning message below.
+      if (!pad->autoActivation)
+        hasManualActivation = true;
     }
     else
     {
       pad->autoActivation = true;
     }
 
+    // Read the outgoing information
     sdf::ElementPtr outElem = padElem->GetElement("outgoing");
-    pad->outgoingPose = outElem->Get<math::Pose>("pose");
-    pad->outgoingBox = outElem->Get<math::Vector3>("box");
+    pad->outgoingBox.min = outElem->Get<math::Vector3>("min");
+    pad->outgoingBox.max = outElem->Get<math::Vector3>("max");
 
+    // Read the incoming information
     sdf::ElementPtr inElem = padElem->GetElement("incoming");
     pad->incomingPose = inElem->Get<math::Pose>("pose");
-    pad->incomingBox = inElem->Get<math::Vector3>("box");
 
-    this->pads[pad->name] = pad;
+    // Store the pad
+    this->dataPtr->pads[pad->name] = pad;
 
+    // Get the next pad element
     padElem = padElem->GetNextElement("pad");
   }
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  // Connect to the update event
+  this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&TransporterPlugin::Update, this));
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_world->GetName());
+  // Listen on the activation topic, if present. This topic is used for
+  // manual activation.
+  if (_sdf->HasElement("activation_topic"))
+  {
+    // Create and initialize the node.
+    this->dataPtr->node = transport::NodePtr(new transport::Node());
+    this->dataPtr->node->Init(_world->GetName());
 
-  this->activationSub = this->node->Subscribe(
-      this->sdf->Get<std::string>("activation_topic"),
-      &TransporterPlugin::OnActivation, this);
+    // Subscribe to the activation topic.
+    this->dataPtr->activationSub = this->dataPtr->node->Subscribe(
+        _sdf->Get<std::string>("activation_topic"),
+        &TransporterPlugin::OnActivation, this);
+  }
+  else if (hasManualActivation)
+  {
+    gzerr << "Manual activation of a transporter pad has been requested, "
+      << "but no <activation_topic> is present in the plugin's SDF.\n";
+  }
 }
 
 /////////////////////////////////////////////////
 void TransporterPlugin::OnActivation(ConstGzStringPtr &_msg)
 {
-  std::map<std::string, Pad*>::iterator iter = this->pads.find(_msg->data());
-
+  // Find the pad
+  const auto &iter = this->dataPtr->pads.find(_msg->data());
+  if (iter != this->dataPtr->pads.end())
   {
-    if (iter != this->pads.end())
-    {
-      boost::mutex::scoped_lock lock(this->padMutex);
-      std::cout << "Activated[" << _msg->data() << "]\n";
-      iter->second->activated = true;
-    }
+    // Activate the pad.
+    std::lock_guard<std::mutex> lock(this->dataPtr->padMutex);
+    iter->second->activated = true;
+  }
+  else
+  {
+    gzwarn << "Unknown transporter pad[" << _msg->data() << "]\n";
   }
 }
 
 /////////////////////////////////////////////////
 void TransporterPlugin::Update()
 {
-  physics::Model_V models = this->world->GetModels();
+  // Get all the models
+  physics::Model_V models = this->dataPtr->world->GetModels();
 
-  boost::mutex::scoped_lock lock(this->padMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->padMutex);
 
   // Process each model.
-  for (physics::Model_V::iterator iter = models.begin();
-       iter != models.end(); ++iter)
+  for (auto &iter : models)
   {
     // Skip models that are static
-    if ((*iter)->IsStatic())
+    if (iter->IsStatic())
       continue;
 
-    math::Pose modelPose = (*iter)->GetWorldPose();
-    for (std::map<std::string, Pad*>::iterator padIter = this->pads.begin();
-         padIter != this->pads.end(); ++padIter)
+    // Get the model's pose
+    math::Pose modelPose = iter->GetWorldPose();
+
+    // Iterate over all pads
+    for (const auto &padIter : this->dataPtr->pads)
     {
-      math::Vector3 min = padIter->second->outgoingPose.pos -
-                          padIter->second->outgoingBox / 2.0;
-
-      math::Vector3 max = padIter->second->outgoingPose.pos +
-                          padIter->second->outgoingBox / 2.0;
-
-      if (modelPose.pos.x > min.x && modelPose.pos.x < max.x &&
-          modelPose.pos.y > min.y && modelPose.pos.y < max.y &&
-          modelPose.pos.z > min.z && modelPose.pos.z < max.z)
+      // Check if the model is in the pad's outgoing box.
+      if (padIter.second->outgoingBox.Contains(modelPose.pos))
       {
-        std::map<std::string, Pad*>::iterator destIter =
-          this->pads.find(padIter->second->dest);
+        // Get the destination pad
+        const auto &destIter = this->dataPtr->pads.find(padIter.second->dest);
 
-        /*std::cout << "Inside Pad[" << padIter->first << "] Pose["
-                  << modelPose.pos << "] Dest["
-                  << padIter->second->dest << "]\n";
-                  */
-
-        if (destIter != this->pads.end() &&
-            (padIter->second->autoActivation || padIter->second->activated))
+        // Make sure we can transport the model
+        if (destIter != this->dataPtr->pads.end() &&
+            (padIter.second->autoActivation || padIter.second->activated))
         {
-          /*physics::ModelPtr destModel = this->world->GetModelBelowPoint(
-              destIter->second->incomingPose.pos);
+          // Move the model
+          iter->SetWorldPose(destIter->second->incomingPose);
 
-          math::Pose destPose = destIter->second->incomingPose;
-          (*iter)->SetWorldPose(destPose);
-
-          double dz = (*iter)->GetBoundingBox().min.z -
-                      destModel->GetBoundingBox().max.z;
-          destPose.pos.z -= dz;
-          (*iter)->SetWorldPose(destPose);
-          */
-          math::Pose destPose = destIter->second->incomingPose;
-          (*iter)->SetWorldPose(destPose);
-
-          padIter->second->activated = false;
+          // Deactivate the pad. This is used by manually activated pads.
+          padIter.second->activated = false;
         }
       }
     }

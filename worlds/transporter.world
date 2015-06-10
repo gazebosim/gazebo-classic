@@ -1,10 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
-    <physics type="ode">
-      <gravity>-3 0 -9.8</gravity>
-    </physics>
-
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
@@ -23,13 +19,12 @@
         <activation>auto</activation>
 
         <outgoing>
-          <pose>0 1.5 0.7 0 0 0</pose>
-          <box>2.5 2.5 1</box>
+          <min>-.5 -.5 0</min>
+          <max>.5 .5 1</max>
         </outgoing>
 
         <incoming>
-          <pose>0 -1.5 0.7 0 0 0</pose>
-          <box>2.5 2.5 1</box>
+          <pose>2 3.5 0 0 0 0</pose>
         </incoming>
       </pad>
 
@@ -38,127 +33,15 @@
         <activation>manual</activation>
 
         <outgoing>
-          <pose>10 0 0 0 0 0</pose>
-          <box>1 1 1</box>
+          <min>-.5 3.0 0</min>
+          <max>.5 4.0 1</max>
         </outgoing>
 
         <incoming>
-          <pose>0 1.5 3.2 0 0 0</pose>
-          <box>2.5 2.5 1</box>
+          <pose>2 0 0 0 0 0</pose>
         </incoming>
       </pad>
     </plugin>
-
-
-    <model name="sphere">
-      <pose>4 1.5 0.4 0 0 0</pose>
-      <link name="link">
-        <inertial>
-          <mass>10</mass>
-        </inertial>
-        <collision name="collision">
-          <geometry>
-            <sphere>
-              <radius>.2</radius>
-            </sphere>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <sphere>
-              <radius>.2</radius>
-            </sphere>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-
-    <include>
-      <uri>model://elevator</uri>
-      <name>elevator1</name>
-      <pose>0 -1.5 0 0 0 0</pose>
-    </include>
-
-    <include>
-      <uri>model://elevator</uri>
-      <name>elevator2</name>
-      <pose>0 1.5 0 0 0 0</pose>
-    </include>
-
-    <model name="floors">
-      <static>true</static>
-      <pose>-10 0 0 0 0 0</pose>
-      <link name="link">
-        <collision name="floor0_collision">
-          <pose>0 0 0.1 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>30 15 0.2</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="floor0_visual">
-          <pose>0 0 0.1 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>30 15 0.2</size>
-            </box>
-          </geometry>
-        </visual>
-
-        <collision name="floor1_collision">
-          <pose>0 0 3.1 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>30 15 0.2</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="floor1_visual">
-          <pose>0 0 3.1 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>30 15 0.2</size>
-            </box>
-          </geometry>
-        </visual>
-
-        <collision name="floor2_collision">
-          <pose>0 0 6.1 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>30 15 0.2</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="floor2_visual">
-          <pose>0 0 6.1 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>30 15 0.2</size>
-            </box>
-          </geometry>
-        </visual>
-
-        <collision name="floor3_collision">
-          <pose>0 0 9.1 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>30 15 0.2</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="floor3_visual">
-          <pose>0 0 9.1 0 0 0</pose>
-          <geometry>
-            <box>
-              <size>30 15 0.2</size>
-            </box>
-          </geometry>
-        </visual>
-
-      </link>
-    </model>
 
   </world>
 </sdf>

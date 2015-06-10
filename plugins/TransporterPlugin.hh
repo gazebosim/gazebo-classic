@@ -14,76 +14,94 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_TRANSPORTER_PLUGIN_HH_
 #define _GAZEBO_TRANSPORTER_PLUGIN_HH_
 
-#include <sdf/sdf.hh>
-
-#include <gazebo/transport/Node.hh>
-#include <gazebo/transport/Subscriber.hh>
-
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/util/system.hh>
-#include <gazebo/msgs/msgs.hh>
 
 namespace gazebo
 {
+  // Forward declare private data class
+  class TransporterPluginPrivate;
+
+  /// \brief A plugin that allows models to transport (teleport) to
+  /// a new location. A transporter plugin uses multiple named <pads>, where
+  /// each <pad> defines an outgoing region, an incoming pose, and
+  /// a destination pad.
+  ///
+  /// When a model enters a pad's outgoing region it is moved the
+  /// destination pad's incoming pose. This means the transporter plugin is
+  /// only useful if at least two pads are defined.
+  ///
+  /// The following is example usage:
+  ///
+  /// \verbatim
+  ///  <plugin filename="libTransporterPlugin.so" name="transporter">
+  ///    <!-- Topic that facilitates manual activation of a pad. An
+  ///    activation message is only meaningful for pad's with manual
+  ///    activation. An activation message consists of
+  ///    a string message on this topic with a pad's name to activate. -->
+  ///    <activation_topic>~/transporter</activation_topic>
+  ///
+  ///    <!-- Pad 1, which is automatically updated. This means any model
+  ///    that enter the outgoing region will be moved -->
+  ///    <pad name="pad1">
+  ///      <destination>pad2</destination>
+  ///      <activation>auto</activation>
+  ///
+  ///      <outgoing>
+  ///        <min>-.5 -.5 0</min>
+  ///        <max>.5 .5 1</max>
+  ///      </outgoing>
+  ///
+  ///      <incoming>
+  ///        <pose>2 3.5 0 0 0 0</pose>
+  ///      </incoming>
+  ///    </pad>
+  ///
+  ///    <!-- Pad 2, which is manually updated. This means a model will be
+  ///    moved only if it is in the outgoing region and an activation
+  ///    message has been received. An activation message consists of
+  ///    a string message on the <activation_topic> topic with
+  ///    the pad's name. -->
+  ///    <pad name="pad2">
+  ///      <destination>pad1</destination>
+  ///      <activation>manual</activation>
+  ///
+  ///      <outgoing>
+  ///        <min>-.5 3.0 0</min>
+  ///        <max>.5 4.0 1</max>
+  ///      </outgoing>
+  ///
+  ///      <incoming>
+  ///        <pose>2 0 0 0 0 0</pose>
+  ///      </incoming>
+  ///    </pad>
+  ///  </plugin>
+  /// \endverbatim
   class GAZEBO_VISIBLE TransporterPlugin : public WorldPlugin
   {
     /// \brief Constructor.
     public: TransporterPlugin();
 
     /// \brief Destructor.
-    public: ~TransporterPlugin();
+    public: virtual ~TransporterPlugin();
 
-    /// \brief Load the plugin.
-    /// \param[in] _world Pointer to world
-    /// \param[in] _sdf Pointer to the SDF configuration.
+    // Documentation inherited
     public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
+    /// \brief Update the plugin. This is updated every iteration of
+    /// simulation.
     private: void Update();
 
+    /// \brief Callback that receives activation messages.
+    /// \param[in] _msg String message that indicates what transporter pad
+    /// was activated.
     private: void OnActivation(ConstGzStringPtr &_msg);
 
-    /// \brief World pointer.
-    private: physics::WorldPtr world;
-
-    /// \brief SDF pointer.
-    private: sdf::ElementPtr sdf;
-
-    private: class Pad
-             {
-               public: std::string name;
-               public: std::string dest;
-
-               public: math::Pose incomingPose;
-               public: math::Pose outgoingPose;
-
-               public: math::Vector3 incomingBox;
-               public: math::Vector3 outgoingBox;
-
-               /// \brief True if the pad should automatically teleport.
-               /// False will cause the pad to wait for an activation
-               /// signal. See this plugin's <activation_topic> xml element.
-               public: bool autoActivation;
-
-               /// \brief This flag is used for manual activation of a pad.
-               /// It is set to true when a string message that contains
-               /// the name of the pad is sent over the activation topic.
-               public: bool activated;
-             };
-
-
-    private: std::map<std::string, Pad*> pads;
-
-    /// \brief Pointer to the update event connection
-    private: event::ConnectionPtr updateConnection;
-
-    private: transport::NodePtr node;
-    private: transport::SubscriberPtr activationSub;
-
-    private: boost::mutex padMutex;
+    /// \brief Private data pointer.
+    private: TransporterPluginPrivate *dataPtr;
   };
 }
 #endif
