@@ -110,9 +110,9 @@ void RaySensor::Load(const std::string &_worldName)
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    this->noises.push_back(
+    this->noises[RayNoise] =
         NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
-        this->GetType()));
+        this->GetType());
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -478,10 +478,10 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
       {
         range = -GZ_DBL_INF;
       }
-      else if (!this->noises.empty())
+      else if (this->noises.find(RayNoise) != this->noises.end())
       {
         // currently supports only one noise model per laser sensor
-        range = this->noises[0]->Apply(range);
+        range = this->noises[RayNoise]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
 

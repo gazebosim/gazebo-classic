@@ -149,15 +149,14 @@ void MultiCameraSensor::Init()
     // Handle noise model settings.
     if (cameraSdf->HasElement("noise"))
     {
-      NoisePtr noise =
+      this->noises[MultiCameraNoise] =
           NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
           this->GetType());
-      this->noises.push_back(noise);
-      noise->SetCamera(camera);
+      this->noises[MultiCameraNoise]->SetCamera(camera);
     }
     else
     {
-      this->noises.push_back(NoisePtr(new Noise(Noise::NONE)));
+      this->noises[MultiCameraNoise] = NoisePtr(new Noise(Noise::NONE));
     }
 
     {

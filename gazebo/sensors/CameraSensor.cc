@@ -146,11 +146,10 @@ void CameraSensor::Init()
 
     if (cameraSdf->HasElement("noise"))
     {
-      NoisePtr noise =
-          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
+      this->noises[CameraNoise] =
+        NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
         this->GetType());
-      this->noises.push_back(noise);
-      noise->SetCamera(this->camera);
+      this->noises[CameraNoise]->SetCamera(this->camera);
     }
   }
   else

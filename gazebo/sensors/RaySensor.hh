@@ -39,6 +39,9 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
+    /// \brief Noise streams for the ray sensor
+    enum RaySensorNoise {RayNoise};
+
     /// \class RaySensor RaySensor.hh sensors/sensors.hh
     /// \brief Sensor with one or more rays.
     ///

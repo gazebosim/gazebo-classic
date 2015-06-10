@@ -35,6 +35,9 @@ namespace gazebo
     /// \brief A set of sensor classes, functions, and definitions
     /// \{
 
+    /// \brief Noise streams for the multicamera sensor
+    enum MultiCameraSensorNoise {MultiCameraNoise};
+
     /// \class MultiCameraSensor MultiCameraSensor.hh sensors/sensors.hh
     /// \brief Multiple camera sensor. This sensor type can create one or
     /// more synchronized cameras.

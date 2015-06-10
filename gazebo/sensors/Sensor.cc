@@ -86,9 +86,7 @@ Sensor::~Sensor()
     this->sdf->Reset();
   this->sdf.reset();
   this->connections.clear();
-
-  for (unsigned int i = 0; i < this->noises.size(); ++i)
-    this->noises[i].reset();
+  this->noises.clear();
 }
 
 //////////////////////////////////////////////////
@@ -236,8 +234,8 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
-  for (unsigned int i= 0; i < this->noises.size(); ++i)
-    this->noises[i]->Fini();
+  for (std::map<int,NoisePtr>::iterator it = noises.begin(); it != noises.end(); it++)
+    it->second->Fini();
 
   this->active = false;
   this->plugins.clear();
@@ -398,14 +396,14 @@ SensorCategory Sensor::GetCategory() const
 }
 
 //////////////////////////////////////////////////
-NoisePtr Sensor::GetNoise(unsigned int _index) const
+NoisePtr Sensor::GetNoise(int _index) const
 {
-  if (_index >= this->noises.size())
+  if (this->noises.find(_index) == this->noises.end())
   {
-    gzerr << "Get noise index out of range" << std::endl;
+    gzerr << "Get noise index not valid" << std::endl;
     return NoisePtr();
   }
-  return this->noises[_index];
+  return this->noises.at(_index);
 }
 
 //////////////////////////////////////////////////
