@@ -216,6 +216,12 @@ void Scene::Clear()
 
   this->dataPtr->visuals.clear();
 
+  if (this->dataPtr->originVisual)
+  {
+    this->dataPtr->originVisual->Fini();
+    this->dataPtr->originVisual.reset();
+  }
+
   if (this->dataPtr->worldVisual)
   {
     this->dataPtr->worldVisual->Fini();
