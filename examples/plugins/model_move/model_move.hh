@@ -68,6 +68,9 @@ namespace gazebo
     /// \brief Subscriber to get path messages
     private: transport::SubscriberPtr pathSubscriber;
 
+    /// \brief Full name of the topic listening for paths
+    private: std::string path_topic_name;
+
     /// \brief Number of goal points supplied to the plugin
     private: int num_points;
 

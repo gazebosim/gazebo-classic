@@ -107,6 +107,8 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   // Either get parameters from sdf
   if (_sdf->HasElement("path") && _sdf->HasElement("n_points"))
   {
+    gzmsg << "Processing path defined in the SDF file" << std::endl;
+
     sdf::Vector3 sdf_pose =
       _sdf->GetParent()->GetElement("pose")->Get<sdf::Pose>().pos;
     this->start_point =
@@ -127,9 +129,10 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   }
   else  // Or get parameters from gazebo topics
   {
-    gzmsg << "Not path found in the SDF file" << std::endl
-    gzmsg << "Waiting to receive the path via gztopic" << std::endl;
-    pathSubscriber = node->Subscribe("/gazebo/default/pose_animation",
-                                     &ModelMove::getPathMsg, this);
+    std::string path_topic_name = std::string("~/") + _parent->GetName() + "/model_move";
+
+    gzmsg << "Subscribed to receive paths in: "<< path_topic_name << std::endl;
+    pathSubscriber = node->Subscribe(path_topic_name, &ModelMove::getPathMsg,
+                                     this);
   }
 }

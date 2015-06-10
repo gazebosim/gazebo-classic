@@ -43,13 +43,17 @@ int main(int argc, char * argv[])
   transport::NodePtr node(new gazebo::transport::Node());
   node->Init("default");
 
+  // modelmove_world is the name of the testing world
+  const std::string topic_name = "/gazebo/modelmove_world/" + msg.model_name()
+                                  + "/model_move";
   gazebo::transport::PublisherPtr pathPub =
-    node->Advertise<msgs::PoseAnimation>("/gazebo/default/pose_animation");
-  std::cout << "Waiting for connection...\n";
+    node->Advertise<msgs::PoseAnimation>(topic_name);
+
+  std::cout << "Waiting for connection in " << topic_name << std::endl;
   pathPub->WaitForConnection();
   pathPub->Publish(msg);
 
-  std::cout << "Path published!\n\n";
+  std::cout << "Path published!" << std::endl;
 
   gazebo::transport::fini();
   return 0;
