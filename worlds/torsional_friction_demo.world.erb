@@ -1,0 +1,168 @@
+<?xml version="1.0" ?>
+<%
+  # Torsional friction demo world
+  # Create objects with single points of contact and initial velocity
+  # They should decelerate if friction is nonzero
+
+  # Aluminum 2700 kg/m^3
+  density = 2700.0
+  mass = {}
+  ixx = {}
+  iyy = {}
+  izz = {}
+
+  # Geometry and inertial parameters: sphere
+  radius = 0.1
+  mass[:sphere] = density * 4.0 * Math::PI / 3.0 * radius **3
+  ixx[:sphere] = mass[:sphere] * 0.4 * radius**2
+  iyy[:sphere] = ixx[:sphere]
+  izz[:sphere] = ixx[:sphere]
+
+  # Geometry and inertial parameters: box
+  dx = 2 * radius
+  dy, dz = dx, dx
+  dd = Math.sqrt(dx**2 + dy**2 + dz**2)
+  mass[:box] = density * dx * dy * dz
+  ixx[:box] = 1.0 / 12 * mass[:box] * (dy*dy + dz*dz)
+  iyy[:box] = 1.0 / 12 * mass[:box] * (dz*dz + dx*dx)
+  izz[:box] = 1.0 / 12 * mass[:box] * (dx*dx + dy*dy)
+
+  # initial velocity and friction
+  spin0 = 2*Math::PI
+  sphere_friction = [0.0, 0.1, 1.0, 10.0]
+  box_friction = [0.0, 0.1, 1.0, 10.0]
+%>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+<%  # Spheres
+    i = 0
+    sphere_friction.each do |f|
+      i = i + 1
+      name = 'sphere_' + i.to_s
+%>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= radius*4*i %> 0 <%= radius %>  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass><%= mass[:sphere] %></mass>
+          <inertia>
+            <ixx><%= ixx[:sphere] %></ixx>
+            <iyy><%= iyy[:sphere] %></iyy>
+            <izz><%= izz[:sphere] %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
+        <linear>0 0 0</linear>
+        <angular>0 0 <%= spin0 %></angular>
+      </plugin>
+    </model>
+<%  end %>
+<%  # Boxes
+    i = 0
+    box_friction.each do |f|
+      i = i + 1
+      name = 'box_' + i.to_s
+%>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= dd*2*i %> 2 <%= dd/2 %>  <%= Math::PI/4 %> <%= Math.atan(1.0/Math.sqrt(2)) %> 0</pose>
+      <link name="link">
+        <inertial>
+          <mass><%= mass[:box] %></mass>
+          <inertia>
+            <ixx><%= ixx[:box] %></ixx>
+            <iyy><%= iyy[:box] %></iyy>
+            <izz><%= izz[:box] %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
+        <linear>0 0 0</linear>
+        <angular>0 0 <%= spin0 %></angular>
+      </plugin>
+    </model>
+<%  end %>
+<%  # Boxes with artificially low center of mass
+    i = 0
+    box_friction.each do |f|
+      i = i + 1
+      name = 'box_low_cog_' + i.to_s
+%>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= dd*2*i %> 4 <%= dd/2 %>  <%= Math::PI/4 %> <%= Math.atan(1.0/Math.sqrt(2)) %> 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>1 -1 -1  0 0 0</pose>
+          <mass><%= mass[:box] %></mass>
+          <inertia>
+            <ixx><%= ixx[:box] %></ixx>
+            <iyy><%= iyy[:box] %></iyy>
+            <izz><%= izz[:box] %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
+        <linear>0 0 0</linear>
+        <angular>0 0 <%= spin0 %></angular>
+      </plugin>
+    </model>
+<%  end %>
+  </world>
+</sdf>
