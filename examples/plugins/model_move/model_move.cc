@@ -29,6 +29,9 @@
 
 using namespace gazebo;
 
+ModelMove::ModelMove()
+{ }
+
 void ModelMove::move(math::Vector3 *start, math::Vector3 *end,
                      math::Vector3 *translation)
 {
@@ -56,10 +59,12 @@ void ModelMove::move(math::Vector3 *start, math::Vector3 *end,
 
 void ModelMove::initiateMove()
 {
-  float path_length = start_point.Distance(path->x, path->y, path->z);
+  // get distance from starting point to the first of the goals
+  float path_length = start_position.Distance(this->path_goals[0].pos);
 
-  for (int i = 0; i < this->num_points-1; i++)
-    path_length += path[i].Distance(path[i+1].x, path[i+1].y, path[i+1].z);
+  // to calculate the full distance, add the distance between goals
+  for (int i = 0; i < this->path_goals.size()-1; i++)
+    path_length += path_goals[i].pos.Distance(path_goals[i+1].pos);
 
   // create the animation
   this->anim =
@@ -75,9 +80,11 @@ void ModelMove::initiateMove()
 
   math::Vector3 translation = math::Vector3(0, 0, 0);
 
-  move(&start_point, path, &translation);
-  for (int i = 0; i < this->num_points-1; i++)
-    move(path+i, path+i+1, &translation);
+  // Move to the start_position to first goal
+  move(&start_position, &path_goals[0].pos, &translation);
+
+  for (int i = 0; i < this->path_goals.size()-1; i++)
+    move(&path_goals[i].pos, &path_goals[i+1].pos, &translation);
 
   // set the animation
   this->model->SetAnimation(anim);
@@ -87,51 +94,70 @@ void ModelMove::getPathMsg(PoseAnimationPtr &msg)
 {
   gzmsg << "[model_move] Received path message" << std::endl;
 
-  this->num_points = msg->pose_size();
-  this->path = new math::Vector3[this->num_points];
-
-  for (int i = 0; i < this->num_points; i++)
-    path[i] = gazebo::msgs::Convert(msg->pose(i)).pos;
+  // Store message poses into the path_goals and launch movement
+  for (int i = 0; i < msg->pose_size(); i++)
+    this->path_goals.push_back(gazebo::msgs::Convert(msg->pose(i)));
 
   initiateMove();
+}
+
+bool ModelMove::LoadGoalsFromSDF(const sdf::ElementPtr _sdf)
+{
+  gzmsg << "[model_move] Processing path goals defined in the SDF file"
+        << std::endl;
+  GZ_ASSERT(_sdf, "_sdf element is null");
+
+  if (! _sdf->HasElement("pose"))
+  {
+    gzerr << "[model_move] SDF with goals tag but without pose/s element/s"
+          << std::endl;
+    return false;
+  }
+
+  sdf::ElementPtr poseElem = _sdf->GetElement("pose");
+
+  while (poseElem)
+  {
+    this->path_goals.push_back(poseElem->Get<math::Pose>());
+    poseElem = poseElem->GetNextElement("pose");
+  }
+
+  GZ_ASSERT(this->path_goals.size() > 0, "path_goals should not be zero");
+  return true;
 }
 
 void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Store the pointer to the model
   this->model = _parent;
-
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->GetName());
 
-  // Either get parameters from sdf
-  if (_sdf->HasElement("path") && _sdf->HasElement("n_points"))
+  // Get parameters from sdf, if provided
+  if (_sdf->HasElement("goals"))
   {
-    gzmsg << "[model_move] Processing path defined in the SDF file" 
-          << std::endl;
-
-    sdf::Vector3 sdf_pose =
-      _sdf->GetParent()->GetElement("pose")->Get<sdf::Pose>().pos;
-    this->start_point =
-      math::Vector3(sdf_pose.x, sdf_pose.y, sdf_pose.z);
-    this->num_points =
-      std::stoi(_sdf->GetElement("n_points")->Get<std::string>());
-    this->path =
-      new math::Vector3[this->num_points];
-
-    std::stringstream stream(_sdf->GetElement("path")->Get<std::string>());
-    for (int i = 0; i < this->num_points; i++)
+    if (this->LoadGoalsFromSDF(_sdf->GetElement("goals")))
     {
-      float f1, f2, f3;
-      stream >> f1 >> f2 >> f3;
-      path[i] = math::Vector3(f1, f2, f3);
+      // Ready to start the move. Store the initial pose of the model
+      // and call initiateMove
+      sdf::Vector3 sdf_pose =
+        _sdf->GetParent()->GetElement("pose")->Get<sdf::Pose>().pos;
+      this->start_position =
+        math::Vector3(sdf_pose.x, sdf_pose.y, sdf_pose.z);
+
+      initiateMove();
     }
-    initiateMove();
+    else
+    {
+      gzerr << "[model_move] Problems on loading goals from sdf "
+            << "made the movement impossible" << std::endl;
+    }
   }
 
+  // Create the subscriber
   std::string path_topic_name = std::string("~/") + _parent->GetName() + "/model_move";
   pathSubscriber = node->Subscribe(path_topic_name, &ModelMove::getPathMsg,
                                    this);
-  gzmsg << "[model_move] Subscribed to receive paths in: "<< path_topic_name 
+  gzmsg << "[model_move] Subscribed to receive paths in: "<< path_topic_name
         << std::endl;
 }

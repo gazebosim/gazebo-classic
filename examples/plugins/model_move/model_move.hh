@@ -29,10 +29,7 @@ namespace gazebo
   class ModelMove : public ModelPlugin
   {
     /// \brief constructor
-    public: ModelMove() :
-              num_points(0),
-              path(new math::Vector3())
-      {};
+    public: ModelMove();
 
     /// \brief Perform movement of the model
     /// \param[in] start starting point
@@ -40,6 +37,11 @@ namespace gazebo
     /// \param[in,out] translation translation done before start
     private: void move(math::Vector3 *start, math::Vector3 *end,
                        math::Vector3 *translation);
+
+    /// \brief Parse goals defined in the SDF
+    /// \param[in] _sdf sdf pointer corresponding to goals element
+    /// \return True if parsing was succesfull or not
+    private: bool LoadGoalsFromSDF(const sdf::ElementPtr _sdf);
 
     /// \brief prepare the movement of the model.
     ///
@@ -68,14 +70,11 @@ namespace gazebo
     /// \brief Subscriber to get path messages
     private: transport::SubscriberPtr pathSubscriber;
 
-    /// \brief Number of goal points supplied to the plugin
-    private: int num_points;
-
     /// \brief Starting point of the path to follow
-    private: math::Vector3 start_point;
+    private: math::Vector3 start_position;
 
     /// \brief Path to follow
-    private: math::Vector3 *path;
+    private: std::vector<math::Pose> path_goals;
   };
 
   // Register this plugin with the simulator
