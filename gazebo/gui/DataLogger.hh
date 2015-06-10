@@ -50,10 +50,6 @@ namespace gazebo
       /// \param[in] _string String representation of size.
       signals: void SetSize(QString _string);
 
-      /// \brief A signal used to set the filename.
-      /// \param[in] _string The log filename
-      signals: void SetFilename(QString _string);
-
       /// \brief A signal used to set the destination path label.
       /// \param[in] _string The log destination directory
       signals: void SetDestinationPath(QString _string);
@@ -104,16 +100,13 @@ namespace gazebo
       /// \brief The button used to start and pause logging.
       private: QToolButton *recordButton;
 
-      /// \brief The button used to show/hide the settings frame.
-      private: QPushButton *settingExpandButton;
-
-      /// \brief The button used to stop logging.
-      private: QToolButton *stopButton;
-
       /// \brief Label to display the log time.
       private: QLabel *timeLabel;
 
-      /// \brief Label to display the log destination path.
+      /// \brief Log base path.
+      private: QString basePath;
+
+      /// \brief Line edit to display the log destination path.
       private: QLineEdit *destPath;
 
       /// \brief Label to display the log destination uri.
@@ -136,9 +129,6 @@ namespace gazebo
 
       /// \brief Frame that holds settings.
       private: QFrame *settingsFrame;
-
-      /// \brief Button to browse for a log recording directory
-      private: QPushButton *browseButton;
 
       // private: QListWidget *logList;
       private: QTextBrowser *logList;
