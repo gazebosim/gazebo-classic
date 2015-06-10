@@ -159,6 +159,16 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   bool hasStartButton = false;
   bool hasResetButton = false;
 
+  // If a countdown time was given in SDF, read the countdown time and
+  // initialize the Timer object as a countdown timer.
+  // Time is read in SDF as (seconds nanosecnds)
+  if (_elem->HasElement("countdown_time"))
+  {
+    common::Time maxTime =
+        _elem->GetElement("countdown_time")->Get<common::Time>();
+    this->timer = common::Timer(maxTime, true);
+  }
+
   // Check if there is a start button
   if (_elem->HasElement("start_stop_button"))
   {
@@ -301,7 +311,8 @@ void TimerGUIPlugin::PreRender()
 {
   boost::mutex::scoped_lock lock(this->timerMutex);
   this->SetTime(QString::fromStdString(
-        this->FormatTime(this->timer.GetElapsed())));
+      this->timer.GetElapsed().FormattedString(
+      common::Time::FormatOption::HOURS)));
 }
 
 /////////////////////////////////////////////////
@@ -358,38 +369,6 @@ void TimerGUIPlugin::Reset()
     boost::mutex::scoped_lock lock(this->timerMutex);
     this->timer.Reset();
   }
-}
-
-/////////////////////////////////////////////////
-std::string TimerGUIPlugin::FormatTime(const common::Time &_time) const
-{
-  std::ostringstream stream;
-  unsigned int day, hour, min, sec, msec;
-
-  stream.str("");
-
-  sec = _time.sec;
-
-  day = sec / 86400;
-  sec -= day * 86400;
-
-  hour = sec / 3600;
-  sec -= hour * 3600;
-
-  min = sec / 60;
-  sec -= min * 60;
-
-  msec = rint(_time.nsec * 1e-6);
-
-  // \todo Add in ability to specify time format in SDF.
-  // stream << std::setw(2) << std::setfill('0') << day << " ";
-
-  stream << std::setw(2) << std::setfill('0') << hour << ":";
-  stream << std::setw(2) << std::setfill('0') << min << ":";
-  stream << std::setw(2) << std::setfill('0') << sec << ".";
-  stream << std::setw(3) << std::setfill('0') << msec;
-
-  return stream.str();
 }
 
 ////////////////////////////////////////////////
