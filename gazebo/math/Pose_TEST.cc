@@ -42,12 +42,12 @@ TEST_F(PoseTest, Pose)
     EXPECT_TRUE(math::equal((B + A).rot.GetAsEuler().z, 3.0*M_PI/4.0));
 
     // and A * B is the same as B + A
-    EXPECT_TRUE(math::equal((A * B).pos.x, 1.0 + 1.0/sqrt(2)));
-    EXPECT_TRUE(math::equal((A * B).pos.y,       1.0/sqrt(2)));
-    EXPECT_TRUE(math::equal((A * B).pos.z,               0.0));
-    EXPECT_TRUE(math::equal((A * B).rot.GetAsEuler().x,  0.0));
-    EXPECT_TRUE(math::equal((A * B).rot.GetAsEuler().y,  0.0));
-    EXPECT_TRUE(math::equal((A * B).rot.GetAsEuler().z, 3.0*M_PI/4.0));
+    EXPECT_TRUE(math::equal((B * A).pos.x, 1.0 + 1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((B * A).pos.y,       1.0/sqrt(2)));
+    EXPECT_TRUE(math::equal((B * A).pos.z,               0.0));
+    EXPECT_TRUE(math::equal((B * A).rot.GetAsEuler().x,  0.0));
+    EXPECT_TRUE(math::equal((B * A).rot.GetAsEuler().y,  0.0));
+    EXPECT_TRUE(math::equal((B * A).rot.GetAsEuler().z, 3.0*M_PI/4.0));
   }
   {
     // If:
@@ -117,7 +117,7 @@ TEST_F(PoseTest, Pose)
       math::Pose(11.314, 16.0487, 15.2559, 1.49463, 0.184295, 2.13932));
 
   // Same as above using operator*
-  pose =  math::Pose(4, 5, 6, .4, .5, .6) * math::Pose(1, 2, 3, .1, .2, .3);
+  pose =  math::Pose(1, 2, 3, .1, .2, .3) * math::Pose(4, 5, 6, .4, .5, .6);
   EXPECT_TRUE(pose ==
       math::Pose(5.74534, 7.01053, 8.62899, 0.675732, 0.535753, 1.01174));
 
