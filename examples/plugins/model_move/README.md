@@ -43,12 +43,12 @@ $ ./path_publisher
 * Go to the build directory and run gazebo with the example world
 ```
 $ cd build
-$ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move_with_movement.world &
+$ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move_with_movement.world
 ```
 
 To change the input parameters, you can modify the world file sdf:
 
-    <path> is the sequence of goal point, as a string of space-separated integers, 
+    <path> is the sequence of goal points, as a string of space-separated integers, 
            six ints per point as per gazebo Pose.
     <n_points> is the number of specified goal points.
 
