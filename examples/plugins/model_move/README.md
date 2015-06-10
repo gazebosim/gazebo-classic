@@ -49,14 +49,14 @@ $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move_with_move
 To change the input parameters, you can modify the world file sdf:
 
     <goals> container of the list of poses to be reached by the model
-     <pose> 6 floats (position, orientation) to be threated as goals
+    <pose> 6 floats (position, orientation) to be threated as goals
 
     Example (in sdf file):
     
     <plugin name="model_move" filename="libmodel_move.so">
       <goals>
-	<pose>5 5 0 0 0 0</pose>
-	<pose>5 -5 0 0 0 0</pose>
-	<pose>0 0 0 0 0 0</pose>
-     </goal>
+        <pose>5 5 0 0 0 0</pose>
+        <pose>5 -5 0 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
+      </goals>
     </plugin>
