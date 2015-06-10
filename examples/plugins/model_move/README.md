@@ -22,17 +22,18 @@ There are several ways to interact with the animation. Below you can find how to
 the standalone example, which defines the animation programatically. It is also 
 possible to define the animation parameters in the SDF file.
 
-### Run then standalone publisher
+### Run the standalone publisher
 
 * Go to the build directory and run gazebo with the example world
 ```
 $ cd build
-$ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world &
+$ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
 ```
 
 * Publish the path publisher
 
 ```
+... open a new terminal ...
 $ cd build
 $ ./path_publisher
 ```
