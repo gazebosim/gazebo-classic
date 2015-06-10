@@ -61,7 +61,7 @@ void DataLogger_TEST::RecordButton()
 
     // Make sure the initial size is zero
     txt = sizeLabel->text().toStdString();
-    QVERIFY(txt == "0.00 B");
+    QVERIFY(txt == "(0.00 B)");
 
     // Make sure the initial time is zero
     txt = timeLabel->text().toStdString();
@@ -71,7 +71,8 @@ void DataLogger_TEST::RecordButton()
     recordButton->toggle();
 
     // Wait for a log status return message
-    while (destPathLabel->text().toStdString().empty())
+    while (destPathLabel->text().toStdString().find(".log") ==
+        std::string::npos)
     {
       // The following line tell QT to process its events. This is vital for
       // all tests, but it must be run in the main thread.
@@ -81,7 +82,7 @@ void DataLogger_TEST::RecordButton()
 
     // Make sure the destination log file is correct.
     txt = destPathLabel->text().toStdString();
-    QVERIFY(txt.find("test/state.log") != std::string::npos);
+    QVERIFY(txt.find("state.log") != std::string::npos);
 
     // Make sure the status label says "Recording"
     txt = statusLabel->text().toStdString();
@@ -91,17 +92,22 @@ void DataLogger_TEST::RecordButton()
     recordButton->toggle();
 
     // Wait for a log status return message
-    while (destPathLabel->text().toStdString().empty())
+    while (destPathLabel->text().toStdString().find(".log") !=
+        std::string::npos)
     {
       QCoreApplication::processEvents();
       gazebo::common::Time::MSleep(100);
     }
 
-    // Make sure the initial size is zero
-    txt = sizeLabel->text().toStdString();
-    QVERIFY(txt == "0.00 B");
+    // Make sure there's no log file (only path)
+    txt = destPathLabel->text().toStdString();
+    QVERIFY(txt.find(".log") == std::string::npos);
 
-    // Make sure the initial time is zero
+    // Make sure size is back to zero
+    txt = sizeLabel->text().toStdString();
+    QVERIFY(txt == "(0.00 B)");
+
+    // Make sure time is back to zero
     txt = timeLabel->text().toStdString();
     QVERIFY(txt == "00:00:00.000");
 

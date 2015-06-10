@@ -1,4 +1,7 @@
 ## Gazebo 6.0
+1. Added browse button to log record dialog.
+    * [Pull request #1719](https://bitbucket.org/osrf/gazebo/pull-request/1719)
+
 1. Implement forward/backwards multi-step for log playback.
     * [Pull request #1623](https://bitbucket.org/osrf/gazebo/pull-request/1623)
 
