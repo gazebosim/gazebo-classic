@@ -22,6 +22,7 @@
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/physics.hh>
+#include <gazebo/sensors/sensors.hh>
 #include <gazebo/transport/transport.hh>
 #include "plugins/ArduCopterPlugin.hh"
 
@@ -203,10 +204,15 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   getSdfParam<std::string>(_sdf, "imuLinkName", imuLinkName, "iris/imu_link");
   this->imuLink = this->model->GetLink(imuLinkName);
 
-  /* do this with fdm sender
-  imu_pub_ = node_handle_->advertise<sensor_msgs::Imu>("imu", 1);
-  pose_pub_ = node_handle_->advertise<gazebo_msgs::ModelState>("pose", 1);
-  */
+  // Get sensors
+  this->imuSensor =
+    boost::dynamic_pointer_cast<sensors::ImuSensor>
+      (sensors::SensorManager::Instance()->GetSensor(
+        this->model->GetWorld()->GetName()
+        + "::" + this->model->GetScopedName()
+        + "::iris::iris/imu_link::imu_sensor"));
+  if (!this->imuSensor)
+    gzerr << "imu_sensor not found\n" << "\n";
 
   // Controller time control.
   this->lastControllerUpdateTime = 0; // this->model->GetWorld()->GetSimTime();
@@ -292,40 +298,34 @@ void ArduCopterPlugin::SendState()
 
   pkt.timestamp = this->model->GetWorld()->GetSimTime().Double();
 
-  math::Pose imuPose = this->imuLink->GetWorldPose();
-
-  // additional offset for imu to be facing:
+  // asssumed that the imu orientation is:
   //   x forward
   //   y right
   //   z down
-  const math::Pose imuRotationOffset = math::Pose(0, 0, 0, M_PI, 0, 0);
-  // any imu information nees to be rotated into this pose
 
   // get linear acceleration
-  math::Vector3 linearAccel = this->imuLink->GetRelativeLinearAccel();
+  math::Vector3 linearAccel = this->imuSensor->GetLinearAcceleration();
 
   // rotate gravity into imu frame, subtract it
-  math::Vector3 gravity =
-    this->model->GetWorld()->GetPhysicsEngine()->GetGravity();
-  linearAccel = linearAccel - imuPose.rot.RotateVectorReverse(gravity);
-  // rotate linearAccel by offset
-  linearAccel = imuRotationOffset.rot.RotateVectorReverse(linearAccel);
+  // math::Vector3 gravity =
+  //   this->model->GetWorld()->GetPhysicsEngine()->GetGravity();
+  // linearAccel = linearAccel -
+  //   this->imuLink.GetWorldPose().rot.RotateVectorReverse(gravity);
+
   // copy to pkt
   pkt.imu_linear_acceleration_xyz[0] = linearAccel.x;
   pkt.imu_linear_acceleration_xyz[1] = linearAccel.y;
   pkt.imu_linear_acceleration_xyz[2] = linearAccel.z;
 
   // get angular velocity
-  math::Vector3 angularVel = this->imuLink->GetRelativeAngularVel();
-  // rotate linearAccel by offset
-  angularVel = imuRotationOffset.rot.RotateVectorReverse(angularVel);
+  math::Vector3 angularVel = this->imuSensor->GetAngularVelocity();
   // copy to pkt
   pkt.imu_angular_velocity_rpy[0] = angularVel.x;
   pkt.imu_angular_velocity_rpy[1] = angularVel.y;
   pkt.imu_angular_velocity_rpy[2] = angularVel.z;
 
   // get orientation with offset added
-  math::Quaternion worldQ = (imuRotationOffset + imuPose).rot;
+  math::Quaternion worldQ = this->imuSensor->GetOrientation();
   pkt.imu_orientation_quat[0] = worldQ.w;
   pkt.imu_orientation_quat[1] = worldQ.x;
   pkt.imu_orientation_quat[2] = worldQ.y;
@@ -333,20 +333,14 @@ void ArduCopterPlugin::SendState()
 
   // get inertial pose and velocity
   //
-  /// convert gazebo world frame to north-east-downward
-  /// in gazebo, x is forward, y is left and z is up
-  /// in NED, x is north, -y is east and -z is downward
-  //
   // math::Pose modelPose = this->model->GetWorldPose();
   math::Pose modelPose = this->imuLink->GetWorldPose();
-  const math::Pose worldToNED = math::Pose(0, 0, 0, M_PI, 0, 0);
-  math::Vector3 worldPos = worldToNED.rot.RotateVectorReverse(modelPose.pos);
+  math::Vector3 worldPos = modelPose.pos;
   pkt.position_xyz[0] = worldPos.x;
   pkt.position_xyz[1] = worldPos.y;
   pkt.position_xyz[2] = worldPos.z;
 
-  math::Vector3 worldVel = worldToNED.rot.RotateVectorReverse(
-    this->imuLink->GetWorldLinearVel());
+  math::Vector3 worldVel = this->imuLink->GetWorldLinearVel();
   // velocity in NED
   pkt.velocity_xyz[0] = worldVel.x;
   pkt.velocity_xyz[1] = worldVel.y;
