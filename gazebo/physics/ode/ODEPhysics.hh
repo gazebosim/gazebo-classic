@@ -162,7 +162,8 @@ namespace gazebo
       public: virtual void SetFrictionModel(const std::string &_fricModel);
 
       // Documentation inherited
-      public: virtual void SetWorldStepSolverType(const std::string &_worldSolverType);
+      public: virtual void
+              SetWorldStepSolverType(const std::string &_worldSolverType);
 
       // Documentation inherited
       public: virtual void SetMaxContacts(unsigned int max_contacts);

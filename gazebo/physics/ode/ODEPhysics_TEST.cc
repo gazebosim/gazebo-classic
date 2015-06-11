@@ -261,8 +261,6 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
       odePhysics->GetParam("world_step_solver")));
     EXPECT_EQ(param, worldSolverType);
   }
-
-
 }
 
 /////////////////////////////////////////////////

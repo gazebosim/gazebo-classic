@@ -614,7 +614,8 @@ std::string ODEPhysics::ConvertFrictionModel(const Friction_Model _fricModel)
 }
 
 //////////////////////////////////////////////////
-World_Solver_Type ODEPhysics::ConvertWorldStepSolverType(const std::string &_solverType)
+World_Solver_Type
+ODEPhysics::ConvertWorldStepSolverType(const std::string &_solverType)
 {
   World_Solver_Type result = ODE_DEFAULT;
   if (_solverType.compare("ODE_DANTZIG") == 0)
@@ -632,7 +633,8 @@ World_Solver_Type ODEPhysics::ConvertWorldStepSolverType(const std::string &_sol
 }
 
 //////////////////////////////////////////////////
-std::string ODEPhysics::ConvertWorldStepSolverType(const World_Solver_Type _solverType)
+std::string
+ODEPhysics::ConvertWorldStepSolverType(const World_Solver_Type _solverType)
 {
   std::string result;
   switch (_solverType)
