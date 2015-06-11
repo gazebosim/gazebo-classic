@@ -793,18 +793,24 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING(dTimerNow ("solving LCP problem"));
 
-      if (solver_type == DART_PGS)
-      {
-        const int mskip = dPAD(m);
-#ifdef HAVE_DART
-        dSolveLCP_dart_pgs(m, mskip, A, lambda, rhs, nub, lo, hi, findex);
-#endif
-      }
-      else
+      if (solver_type == ODE_DEFAULT)
       {
         // solve the LCP problem and get lambda.
         // this will destroy A but that's OK
         dSolveLCP (context, m, A, lambda, rhs, NULL, nub, lo, hi, findex);
+      }
+      else if (solver_type == DART_PGS)
+      {
+#ifdef HAVE_DART
+        const int mskip = dPAD(m);
+        dSolveLCP_dart_pgs(m, mskip, A, lambda, rhs, nub, lo, hi, findex);
+#else
+        dMessage(d_ERR_LCP, "HAVE_DART is NOT defined");
+#endif
+      }
+      else
+      {
+        dMessage(d_ERR_LCP, "Unrecognized Solver Type");
       }
     } END_STATE_SAVE(context, lcpstate);
 

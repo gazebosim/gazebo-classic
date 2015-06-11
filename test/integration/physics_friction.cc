@@ -21,6 +21,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "helper_physics_generator.hh"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 
@@ -569,10 +570,12 @@ TEST_P(PhysicsFrictionTest, FrictionDemo)
   FrictionDemo(GetParam());
 }
 
+#ifdef HAVE_DART
 TEST_F(PhysicsFrictionTest, FrictionDemoWorldStep)
 {
   FrictionDemo("ode", "world", "DART_PGS");
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, MaximumDissipation)
