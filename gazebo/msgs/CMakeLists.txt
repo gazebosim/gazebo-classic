@@ -79,6 +79,7 @@ set (msgs
   response.proto
   rest_error.proto
   rest_login.proto
+  rest_logout.proto
   rest_post.proto
   road.proto
   scene.proto

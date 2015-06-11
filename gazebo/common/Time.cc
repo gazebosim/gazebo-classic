@@ -67,7 +67,7 @@ Time::Time()
   double period = 1.0/freq.QuadPart;
   clockResolution.tv_sec = static_cast<int64_t>(floor(period));
   clockResolution.tv_nsec =
-    static_cast<int64_t>((period - floor(period)) * this->nsInSec);
+    static_cast<int64_t>((period - floor(period)) * nsInSec);
 #else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
@@ -177,7 +177,7 @@ const Time &Time::GetWallTime()
     static_cast<double>(cpuFreq.QuadPart);
   uint32_t deltaSec = static_cast<uint32_t>(floor(dDeltaCpuTime));
   uint32_t deltaNSec = static_cast<uint32_t>(
-      std::round((dDeltaCpuTime-deltaSec) * this->nsInSec));
+      std::round((dDeltaCpuTime-deltaSec) * nsInSec));
 
   int64_t secSum  = static_cast<int64_t>(startSec) +
     static_cast<int64_t>(deltaSec);
@@ -186,11 +186,11 @@ const Time &Time::GetWallTime()
 
   // Normalize
   {
-    int64_t nsecPart = nsecSum % this->nsInSec;
-    int64_t secPart = secSum + nsecSum / this->nsInSec;
+    int64_t nsecPart = nsecSum % nsInSec;
+    int64_t secPart = secSum + nsecSum / nsInSec;
     if (nsecPart < 0)
     {
-      nsecPart += this->nsInSec;
+      nsecPart += nsInSec;
       --secPart;
     }
 
@@ -238,7 +238,7 @@ void Time::Set(int32_t _sec, int32_t _nsec)
 void Time::Set(double _seconds)
 {
   this->sec = (int32_t)(floor(_seconds));
-  this->nsec = (int32_t)(round((_seconds - this->sec) * this->nsInSec));
+  this->nsec = (int32_t)(round((_seconds - this->sec) * nsInSec));
   this->Correct();
 }
 
@@ -288,7 +288,7 @@ std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
   s = this->sec;
 
   // Get milliseconds
-  msec = this->nsec / this->nsInMs;
+  msec = this->nsec / nsInMs;
 
   // Get seconds from milliseconds
   int seconds = msec / 1000;
