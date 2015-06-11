@@ -796,7 +796,9 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       if (solver_type == DART_PGS)
       {
         const int mskip = dPAD(m);
+#ifdef HAVE_DART
         dSolveLCP_dart_pgs(m, mskip, A, lambda, rhs, nub, lo, hi, findex);
+#endif
       }
       else
       {
