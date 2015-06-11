@@ -81,7 +81,10 @@ namespace gazebo
         INERTIA_RATIO_REDUCTION,
 
         /// \brief friction model
-        FRICTION_MODEL
+        FRICTION_MODEL,
+
+        /// \brief LCP Solver
+        WORLD_SOLVER_TYPE
       };
 
       /// \brief Constructor.
@@ -159,6 +162,9 @@ namespace gazebo
       public: virtual void SetFrictionModel(const std::string &_fricModel);
 
       // Documentation inherited
+      public: virtual void SetWorldStepSolverType(const std::string &_worldSolverType);
+
+      // Documentation inherited
       public: virtual void SetMaxContacts(unsigned int max_contacts);
 
       // Documentation inherited
@@ -183,6 +189,11 @@ namespace gazebo
       /// \brief get friction model
       /// \return a friction model string
       public: virtual std::string GetFrictionModel() const;
+
+      // Documentation inherited
+      /// \brief get solver for world step
+      /// \return a solver string
+      public: virtual std::string GetWorldStepSolverType() const;
 
       // Documentation inherited
       public: virtual double GetContactSurfaceLayer();
@@ -239,6 +250,20 @@ namespace gazebo
       /// _fricModel is unrecognized.
       public: static std::string
               ConvertFrictionModel(const Friction_Model _fricModel);
+
+      /// \brief Convert a World_Solver_Type enum to a string.
+      /// \param[in] _solverType World_Solver_Type enum.
+      /// \return world solver type string. Returns "unknown" if
+      /// _solverType is unrecognized.
+      public: static std::string
+              ConvertWorldStepSolverType(const World_Solver_Type _solverType);
+
+      /// \brief Convert a string to a World_Solver_Type enum.
+      /// \param[in] _solverType world solver type string.
+      /// \return A World_Solver_Type enum. Defaults to ODE_DEFAULT
+      /// if _solverType is unrecognized.
+      public: static World_Solver_Type
+              ConvertWorldStepSolverType(const std::string &_solverType);
 
       /// \brief Get the step type (quick, world).
       /// \return The step type.

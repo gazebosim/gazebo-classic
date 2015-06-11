@@ -38,9 +38,14 @@ enum Friction_Model {
   cone_friction,
   box_friction
 };
-
-/**
- * @defgroup world World
+/// \brief  Enum for World_Solver_Type
+/// Enum of world stepper LCP solver choices
+enum World_Solver_Type{
+  ODE_DEFAULT,
+  DART_PGS,
+  BULLET_PGS
+};
+/** * @defgroup world World
  *
  * The world object is a container for rigid bodies and joints. Objects in
  * different worlds can not interact, for example rigid bodies from two
@@ -591,6 +596,12 @@ ODE_API int dWorldGetQuickStepExtraFrictionIterations (dWorldID);
 ODE_API Friction_Model dWorldGetQuickStepFrictionModel(dWorldID);
 
 /**
+ * @brief Get the LCP Solver for world step.
+ * @ingroup world
+ */
+ODE_API World_Solver_Type dWorldGetWorldStepSolverType(dWorldID);
+
+/**
  * @brief Option to turn on inertia ratio reduction.
  * @ingroup world
  * @param irr set to true to turn on inertia ratio reduction.
@@ -651,6 +662,13 @@ ODE_API void dWorldSetQuickStepExtraFrictionIterations (dWorldID, int iters);
  * @param enum for friction model
  */
 ODE_API void dWorldSetQuickStepFrictionModel(dWorldID, Friction_Model fricmodel);
+
+/**
+ * @brief Set the LCP Solver from: ODE_DEFAULT, DART_PGS, BULLET_PGS
+ * @ingroup world
+ * @param enum for LCP Solver
+ */
+ODE_API void dWorldSetWorldStepSolverType(dWorldID, World_Solver_Type solverType);
 
 /* PGS experimental parameters */
 
