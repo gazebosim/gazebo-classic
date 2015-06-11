@@ -33,7 +33,6 @@
 #endif
 #include "step_dart_pgs_wrapper.h"
 #include <iostream>
-using namespace dart::constraint;
 
 bool dSolveLCP_dart_pgs(int m, int mskip, dReal *A, dReal *x, dReal *b,
         int nub, dReal *lo, dReal *hi, int *findex)
@@ -42,9 +41,11 @@ bool dSolveLCP_dart_pgs(int m, int mskip, dReal *A, dReal *x, dReal *b,
     bool DART_PGS = true;
     if(m>0)
     {
-      PGSOption option;
+#ifdef HAVE_DART
+      dart::constraint::PGSOption option;
       option.setDefault();
-      DART_PGS = solvePGS(m, mskip, nub, A, x, b, lo, hi, findex, &option);
+      DART_PGS = dart::constraint::solvePGS(m, mskip, nub, A, x, b, lo, hi, findex, &option);
+#endif
     }
     return DART_PGS;
 }
