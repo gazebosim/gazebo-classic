@@ -67,6 +67,7 @@ TEST(WorldsInstalled, checkWorlds)
     if (dir_itr->path().filename().extension() == ".world")
     {
       std::string cmd = "gz sdf --check " + dir_itr->path().string();
+      std::cerr << cmd << std::endl;
       std::string result = customExec(cmd);
 
       bool success = boost::algorithm::find_first(result, "Check complete");

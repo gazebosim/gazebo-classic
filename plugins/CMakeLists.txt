@@ -26,6 +26,12 @@ if (HAVE_DART)
   link_directories(${DARTCore_LIBRARY_DIRS})
 endif()
 
+if (HAVE_UUID)
+  include_directories(${uuid_INCLUDE_DIRS})
+  link_directories(${uuid_LIBRARY_DIRS})
+  add_definitions(${uuid_CFLAGS})
+endif()
+
 set (plugins
   ActuatorPlugin
   ArrangePlugin
