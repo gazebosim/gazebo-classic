@@ -8,8 +8,6 @@ find_package(Boost REQUIRED COMPONENTS system)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
-find_package(Protobuf REQUIRED)
-find_package(SDFormat REQUIRED)
 find_package(Gazebo REQUIRED)
 
 if (NOT MSVC)
@@ -23,7 +21,7 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 # Create libraries and executables
 
 add_executable(path_publisher path_publisher.cc)
-target_link_libraries(path_publisher ${GAZEBO_LIBRARIES} ${PROTOBUF_LIBRARIES})
+target_link_libraries(path_publisher ${GAZEBO_LIBRARIES} ${PROTOBUF_LIBRARIES} ${Boost_LIBRARIES})
 
 add_library(model_move SHARED model_move.cc)
 target_link_libraries(model_move ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${SDF_LIBRARIES} ${PROTOBUF_LIBRARIES})
