@@ -85,9 +85,17 @@ compilation on Windows.
     * [Pull request #1607](https://bitbucket.org/osrf/gazebo/pull-request/1607)
     * [Issue #1576](https://bitbucket.org/osrf/gazebo/issue/1576)
 
-1. ignition-math is now a dependency. 
+1. Alert user of connection problems when using the REST service plugin
+    * [Pull request #1655](https://bitbucket.org/osrf/gazebo/pull-request/1655)
+    * [Issue #1574](https://bitbucket.org/osrf/gazebo/issue/1574)
+
+1. ignition-math is now a dependency.
     + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
     + [Gazebo::math migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
+
+1. Detect uuid library during compilation.
+    * [Pull request #1655](https://bitbucket.org/osrf/gazebo/pull-request/1655)
+    * [Issue #1572](https://bitbucket.org/osrf/gazebo/issue/1572)
 
 1. New accessors in LogPlay class.
     * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
