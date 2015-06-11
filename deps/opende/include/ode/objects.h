@@ -45,7 +45,8 @@ enum World_Solver_Type{
   DART_PGS,
   BULLET_PGS
 };
-/** * @defgroup world World
+/**
+ *  @defgroup world World
  *
  * The world object is a container for rigid bodies and joints. Objects in
  * different worlds can not interact, for example rigid bodies from two
