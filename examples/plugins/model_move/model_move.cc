@@ -107,7 +107,7 @@ bool ModelMove::LoadGoalsFromSDF(const sdf::ElementPtr _sdf)
         << std::endl;
   GZ_ASSERT(_sdf, "_sdf element is null");
 
-  if (! _sdf->HasElement("pose"))
+  if (!_sdf->HasElement("pose"))
   {
     gzerr << "[model_move] SDF with goals tag but without pose/s element/s"
           << std::endl;
@@ -155,7 +155,8 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   }
 
   // Create the subscriber
-  std::string path_topic_name = std::string("~/") + _parent->GetName() + "/model_move";
+  std::string path_topic_name = std::string("~/") + _parent->GetName()
+                                + "/model_move";
   pathSubscriber = node->Subscribe(path_topic_name, &ModelMove::getPathMsg,
                                    this);
   gzmsg << "[model_move] Subscribed to receive paths in: "<< path_topic_name

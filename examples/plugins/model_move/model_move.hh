@@ -18,6 +18,8 @@
 #ifndef MODEL_MOVE_HH
 #define MODEL_MOVE_HH 1
 
+#include <vector>
+
 namespace gazebo
 {
   typedef const
