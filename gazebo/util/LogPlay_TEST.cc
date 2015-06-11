@@ -149,8 +149,6 @@ TEST_F(LogPlay_TEST, Chunks)
 /// \brief Test Rewind().
 TEST_F(LogPlay_TEST, Rewind)
 {
-  std::string chunk;
-
   gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
 
   // Open a correct log file.
@@ -162,6 +160,10 @@ TEST_F(LogPlay_TEST, Rewind)
 
   // Read the first entry in the log file.
   std::string firstEntry;
+  // Consume the first chunk because it does not have <state>
+  // ToDo: Fix this.
+  EXPECT_TRUE(player->Step(firstEntry));
+  // Read the first world state.
   EXPECT_TRUE(player->Step(firstEntry));
 
   // Step a few more times.
@@ -170,7 +172,7 @@ TEST_F(LogPlay_TEST, Rewind)
     EXPECT_TRUE(player->Step(logEntry));
 
   // Rewind and read the first entry again.
-  player->Rewind();
+  EXPECT_TRUE(player->Rewind());
   std::string entry;
   EXPECT_TRUE(player->Step(entry));
   EXPECT_EQ(entry, firstEntry);
