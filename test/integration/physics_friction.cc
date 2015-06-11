@@ -191,7 +191,9 @@ class PhysicsFrictionTest : public ServerFixture,
 
   /// \brief Use the friction_demo world.
   /// \param[in] _physicsEngine Physics engine to use.
-  public: void FrictionDemo(const std::string &_physicsEngine);
+  public: void FrictionDemo(const std::string &_physicsEngine,
+                            const std::string &_solverType="quick",
+                            const std::string &_worldSolverType="ODE_DANTZIG");
 
   /// \brief Friction test of maximum dissipation principle.
   /// Basically test that friction force vector is aligned with
@@ -219,7 +221,9 @@ class PhysicsFrictionTest : public ServerFixture,
 // box has a different coefficient of friction. These friction coefficients
 // are chosen to be close to the value that would prevent sliding according
 // to the Coulomb model.
-void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
+void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
+                                       const std::string &_solverType,
+                                       const std::string &_worldSolverType)
 {
   if (_physicsEngine == "simbody")
   {
@@ -238,6 +242,15 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
+
+  if (_physicsEngine == "ode")
+  {
+    // Set solver type
+    physics->SetParam("solver_type", _solverType);
+
+    // Set world step solver type
+    physics->SetParam("world_step_solver", _worldSolverType);
+  }
 
   // Custom gravity vector for this demo world.
   EXPECT_DOUBLE_EQ(g.x, 0);
@@ -270,13 +283,13 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
     {
       math::Vector3 vel = box->model->GetWorldLinearVel();
       EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(vel.z, 0, g_friction_tolerance);
+      EXPECT_NEAR(vel.z, 0, 2*g_friction_tolerance);
 
       // Coulomb friction model
       if (box->friction >= 1.0)
       {
         // Friction is large enough to prevent motion
-        EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
+        EXPECT_NEAR(vel.y, 0, 2*g_friction_tolerance);
       }
       else
       {
@@ -554,6 +567,11 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 TEST_P(PhysicsFrictionTest, FrictionDemo)
 {
   FrictionDemo(GetParam());
+}
+
+TEST_F(PhysicsFrictionTest, FrictionDemoWorldStep)
+{
+  FrictionDemo("ode", "world", "DART_PGS");
 }
 
 /////////////////////////////////////////////////
