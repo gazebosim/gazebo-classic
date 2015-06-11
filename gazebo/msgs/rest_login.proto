@@ -2,6 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface RestLogin
+/// \brief A message to login to a REST service
 
 message RestLogin
 {

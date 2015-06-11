@@ -109,6 +109,7 @@ JointMaker::~JointMaker()
     delete this->mouseJoint;
     this->mouseJoint = NULL;
   }
+
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     while (this->joints.size() > 0)

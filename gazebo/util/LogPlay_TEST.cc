@@ -97,9 +97,20 @@ TEST_F(LogPlay_TEST, Accessors)
   EXPECT_EQ(player->GetEncoding(), "zlib");
   EXPECT_EQ(player->GetHeader(), expectedHeader.str());
   EXPECT_EQ(player->GetChunkCount(), 5u);
+  EXPECT_FALSE(player->HasIterations());
+  EXPECT_EQ(player->GetInitialIterations(), 0u);
 
   std::string chunk;
   EXPECT_TRUE(player->GetChunk(0, chunk));
+
+  // Open a correct log file including <iterations>.
+  logFilePath = TEST_PATH;
+  logFilePath /= boost::filesystem::path("logs");
+  logFilePath /= boost::filesystem::path("state2.log");
+
+  EXPECT_NO_THROW(player->Open(logFilePath.string()));
+  EXPECT_TRUE(player->HasIterations());
+  EXPECT_EQ(player->GetInitialIterations(), 23700u);
 }
 
 /////////////////////////////////////////////////
