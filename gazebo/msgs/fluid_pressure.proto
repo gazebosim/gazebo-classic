@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface FluidPressure
+/// \brief Data from a fluid pressure sensor
+
+import "time.proto";
+import "vector3d.proto";
+
+message FluidPRessure
+{
+  required Time stamp            = 1;
+  required string entity_name    = 2;
+  required double fluid_pressure = 3;
+}

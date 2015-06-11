@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _IMUSENSOR_HH_
-#define _IMUSENSOR_HH_
+#ifndef _MAGNETOMETERSENSOR_HH_
+#define _MAGNETOMETERSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -32,19 +32,15 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \brief Noise streams for the IMU sensor
-    enum ImuSensorNoise {AngVelNoiseX, AngVelNoiseY, AngVelNoiseZ,
-        LinAccNoiseX, LinAccNoiseY, LinAccNoiseZ};
-
-    /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
-    /// \brief An IMU sensor.
-    class GAZEBO_VISIBLE ImuSensor: public Sensor
+    /// \class ImuSensor MagnetometerSensor.hh sensors/sensors.hh
+    /// \brief A magnetic field strength sensor.
+    class GAZEBO_VISIBLE MagnetometerSensor: public Sensor
     {
       /// \brief Constructor.
       public: ImuSensor();
 
       /// \brief Destructor.
-      public: virtual ~ImuSensor();
+      public: virtual ~MagnetometerSensor();
 
       // Documentation inherited.
       protected: void Load(const std::string &_worldName, sdf::ElementPtr _sdf);
@@ -65,21 +61,9 @@ namespace gazebo
       /// \return Imu message.
       public: msgs::IMU GetImuMessage() const;
 
-      /// \brief Returns the angular velocity.
-      /// \return Angular velocity.
-      public: math::Vector3 GetAngularVelocity() const;
-
-      /// \brief Returns the imu linear acceleration
-      /// \return Linear acceleration.
-      public: math::Vector3 GetLinearAcceleration() const;
-
-      /// \brief get orientation of the IMU relative to the reference pose
-      /// \return returns the orientation quaternion of the IMU relative to
-      /// the imu reference pose.
-      public: math::Quaternion GetOrientation() const;
-
-      /// \brief Sets the current pose as the IMU reference pose
-      public: void SetReferencePose();
+      /// \brief Returns the body-frame magnetic field strength
+      /// \return Magnetic field strength
+      public: math::Vector3 GetMagneticField() const;
 
       // Documentation inherited.
       public: virtual bool IsActive();
@@ -123,7 +107,42 @@ namespace gazebo
 
       /// \brief True if new link data is received
       private: bool dataDirty;
-      
+
+      /// \brief Which noise type we support
+      private: enum NoiseModelType
+      {
+        NONE,
+        GAUSSIAN
+      };
+
+      /// \brief If true, apply the noise model specified by other noise
+      /// parameters
+      private: bool noiseActive;
+
+      /// \brief Which type of noise we're applying
+      private: enum NoiseModelType noiseType;
+
+      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
+      /// from which we sample when adding noise to accelerations
+      private: double accelNoiseMean;
+
+      /// \brief If accelNoiseType==GAUSSIAN, the standard devation of the
+      /// distibution from which we sample when adding noise to accelerations
+      private: double accelNoiseStdDev;
+
+      /// \brief If noiseType==GAUSSIAN, the bias we'll add to acceleratations
+      private: double accelBias;
+
+      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
+      /// from which we sample when adding noise to rates
+      private: double rateNoiseMean;
+
+      /// \brief If noiseType==GAUSSIAN, the standard devation of the
+      /// distibution from which we sample when adding noise to rates
+      private: double rateNoiseStdDev;
+
+      /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
+      private: double rateBias;
     };
     /// \}
   }

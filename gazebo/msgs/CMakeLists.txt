@@ -17,6 +17,7 @@ set (msgs
   distortion.proto
   factory.proto
   fluid.proto
+  fluid_pressure.proto
   fog.proto
   friction.proto
   geometry.proto
@@ -48,6 +49,7 @@ set (msgs
   link_data.proto
   log_control.proto
   log_status.proto
+  magnetometer.proto
   material.proto
   meshgeom.proto
   model.proto
