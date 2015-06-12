@@ -332,7 +332,7 @@ namespace gazebo
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
 
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)();
       }
 
@@ -343,7 +343,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)(_p);
       }
 
@@ -355,7 +355,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2);
       }
 
@@ -368,7 +368,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3);
       }
 
@@ -383,7 +383,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4);
       }
 
@@ -400,7 +400,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5);
       }
 
@@ -418,7 +418,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6);
       }
 
@@ -437,7 +437,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections.begin())
+        for (auto iter: this->myDataPtr->connections.begin())
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
       }
 
@@ -458,7 +458,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
       }
 
@@ -481,7 +481,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
       }
 
@@ -505,7 +505,7 @@ namespace gazebo
       {
         std::lock_guard<std::recursive_mutex> lock(this->myDataPtr->mutex);
         this->myDataPtr->signaled = true;
-        for (auto &iter: this->myDataPtr->connections)
+        for (auto iter: this->myDataPtr->connections)
           (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
       }
 
