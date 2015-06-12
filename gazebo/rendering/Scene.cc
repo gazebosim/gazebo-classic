@@ -45,7 +45,7 @@
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
-#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/OriginVisual.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
 #include "gazebo/rendering/RFIDTagVisual.hh"
 #include "gazebo/rendering/VideoVisual.hh"
@@ -149,8 +149,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->skeletonPoseSub =
       this->dataPtr->node->Subscribe("~/skeleton_pose/info",
       &Scene::OnSkeletonPoseMsg, this);
-  this->dataPtr->selectionSub = this->dataPtr->node->Subscribe("~/selection",
-      &Scene::OnSelectionMsg, this);
   this->dataPtr->skySub =
       this->dataPtr->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
   this->dataPtr->modelInfoSub = this->dataPtr->node->Subscribe("~/model/info",
@@ -162,10 +160,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
       &Scene::OnRequest, this);
 
-  // \TODO: This causes the Scene to occasionally miss the response to
-  // scene_info
-  // this->responsePub =
-      this->dataPtr->node->Advertise<msgs::Response>("~/response");
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
       &Scene::OnResponse, this, true);
   this->dataPtr->sceneSub =
@@ -199,7 +193,6 @@ void Scene::Clear()
   this->dataPtr->sensorSub.reset();
   this->dataPtr->sceneSub.reset();
   this->dataPtr->skeletonPoseSub.reset();
-  this->dataPtr->selectionSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
   this->dataPtr->lightSub.reset();
@@ -209,7 +202,6 @@ void Scene::Clear()
   this->dataPtr->lightPub.reset();
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
-  this->dataPtr->selectionMsg.reset();
 
   this->dataPtr->joints.clear();
 
@@ -220,6 +212,12 @@ void Scene::Clear()
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
 
   this->dataPtr->visuals.clear();
+
+  if (this->dataPtr->originVisual)
+  {
+    this->dataPtr->originVisual->Fini();
+    this->dataPtr->originVisual.reset();
+  }
 
   if (this->dataPtr->worldVisual)
   {
@@ -357,6 +355,11 @@ void Scene::Init()
 
   // Force shadows on.
   this->SetShadowsEnabled(true);
+
+  // Create origin visual
+  this->dataPtr->originVisual.reset(new OriginVisual("__WORLD_ORIGIN__",
+      this->dataPtr->worldVisual));
+  this->dataPtr->originVisual->Load();
 
   this->dataPtr->requestPub->WaitForConnection();
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
@@ -1472,6 +1475,9 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   if (_msg->has_grid())
     this->SetGrid(_msg->grid());
 
+  if (_msg->has_origin_visual())
+    this->ShowOrigin(_msg->origin_visual());
+
   // Process the sky message.
   if (_msg->has_sky())
   {
@@ -1904,15 +1910,6 @@ void Scene::PreRender()
     // official time stamp of approval
     this->dataPtr->sceneSimTimePosesApplied =
         this->dataPtr->sceneSimTimePosesReceived;
-
-    if (this->dataPtr->selectionMsg)
-    {
-      if (!this->dataPtr->selectedVis ||
-          this->dataPtr->selectionMsg->name() !=
-          this->dataPtr->selectedVis->GetName())
-        this->SelectVisual(this->dataPtr->selectionMsg->name(), "normal");
-      this->dataPtr->selectionMsg.reset();
-    }
   }
 }
 
@@ -2569,12 +2566,6 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
-{
-  this->dataPtr->selectionMsg = _msg;
-}
-
-/////////////////////////////////////////////////
 void Scene::OnModelMsg(ConstModelPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
@@ -2907,6 +2898,12 @@ void Scene::SetGrid(bool _enabled)
       this->dataPtr->grids[i]->Enable(_enabled);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowOrigin(bool _show)
+{
+  this->dataPtr->originVisual->SetVisible(_show);
 }
 
 //////////////////////////////////////////////////
