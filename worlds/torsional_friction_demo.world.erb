@@ -34,6 +34,11 @@
 %>
 <sdf version="1.5">
   <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>7 -3 2.5 0 0.27 2.35</pose>
+      </camera>
+    </gui>
     <include>
       <uri>model://ground_plane</uri>
     </include>
@@ -73,6 +78,12 @@
               <radius><%= radius %></radius>
             </sphere>
           </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+            </script>
+          </material>
         </visual>
       </link>
       <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
