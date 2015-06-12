@@ -325,6 +325,13 @@ void LogPlayWidget::EmitSetCurrentTime(common::Time _time)
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetStartTime(common::Time _time)
 {
+  if (_time >= this->dataPtr->endTime)
+  {
+    gzwarn << "Start time [" << _time << "] after end time [" <<
+        this->dataPtr->endTime << "]. Not updating." << std::endl;
+    return;
+  }
+
   this->dataPtr->startTime = _time;
 
   // Update start time in view
@@ -334,6 +341,13 @@ void LogPlayWidget::EmitSetStartTime(common::Time _time)
 /////////////////////////////////////////////////
 void LogPlayWidget::EmitSetEndTime(common::Time _time)
 {
+  if (_time <= this->dataPtr->startTime)
+  {
+    gzwarn << "End time [" << _time << "] before start time [" <<
+        this->dataPtr->startTime << "]. Not updating." << std::endl;
+    return;
+  }
+
   this->dataPtr->endTime = _time;
 
   // Use shorter string if less than 1h
@@ -411,8 +425,13 @@ void LogPlayView::SetCurrentTime(int _msec)
   if (this->dataPtr->currentTimeItem->isSelected())
     return;
 
+  int totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+
+  if (totalTime == 0)
+    return;
+
   double relPos = static_cast<double>(_msec - this->dataPtr->startTime) /
-      (this->dataPtr->endTime - this->dataPtr->startTime);
+      totalTime;
 
   this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin +
       (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
@@ -443,6 +462,9 @@ void LogPlayView::DrawTimeline()
     return;
 
   int totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+
+  if (totalTime == 0)
+    return;
 
   // Aim for this number, but some samples might be added/removed
   int intervals = 10;
