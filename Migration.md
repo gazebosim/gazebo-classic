@@ -2,7 +2,51 @@
 
 ### Modifications
 
-1. ignition-math is now a dependency. 
+1. **gazebo/physics/JointState.hh**
+    + ***Removed:*** public: JointState(JointPtr _joint, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: JointState(JointPtr _joint, const common::Time
+    &_realTime, const common::Time &_simTime, const uint64_t _iterations)
+
+1. **gazebo/physics/LinkState.hh**
+    + ***Removed:*** public: LinkState(const LinkPtr _link, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: LinkState(const LinkPtr _link,
+    const common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+    + ***Removed:*** public: void Load(const LinkPtr _link, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: void Load(const LinkPtr _link, const
+    common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+
+1. **gazebo/physics/ModelState.hh**
+    + ***Removed:*** public: ModelState(const ModelPtr _model, const
+    common::Time &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: ModelState(const ModelPtr _model, const
+    common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+    + ***Removed:*** public: void Load(const ModelPtr _model, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: void Load(const ModelPtr _model, const
+    common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+
+1. **gazebo/physics/State.hh**
+    + ***Removed:*** public: State(const std::string &_name, const
+    common::Time &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: State(const std::string &_name,
+    const common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+
+1. **gazebo/physics/ModelState.hh**
+    + ***Removed:*** public: void Load(const ModelPtr _model, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: void Load(const ModelPtr _model, const
+    common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+
+1. ignition-math is now a dependency.
     + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
     + [Gazebo migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
 
@@ -41,6 +85,24 @@
 1. **gazebo/gui/RenderWidget.hh**
     + The ShowEditor(bool _show)
 
+### Additions
+
+1. **gazebo/physics/LinkState.hh**
+    + public: virtual void SetIterations(const uint64_t _iterations)
+
+1. **gazebo/physics/ModelState.hh**
+    + public: virtual void SetIterations(const uint64_t _iterations)
+
+1. **gazebo/physics/State.hh**
+    + public: uint64_t GetIterations() const
+    + public: virtual void SetIterations(const uint64_t _iterations)
+
+1. **gazebo/physics/WorldState.hh**
+    + public: virtual void SetIterations(const uint64_t _iterations)
+
+1. **gazebo/util/LogPlay.hh**
+    + public: uint64_t GetInitialIterations() const
+    + public: bool HasIterations() const
 
 ## Gazebo 4.X to 5.X
 

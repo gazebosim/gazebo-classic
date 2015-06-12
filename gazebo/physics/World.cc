@@ -507,6 +507,14 @@ void World::LogStep()
 
       this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
 
+      // If the log file does not contain iterations we have to manually
+      // increase the iteration counter in logPlayState.
+      if (!util::LogPlay::Instance()->HasIterations())
+      {
+        this->dataPtr->logPlayState.SetIterations(
+          this->dataPtr->iterations + 1);
+      }
+
       // Process insertions
       if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
       {
@@ -544,7 +552,6 @@ void World::LogStep()
 
       this->SetState(this->dataPtr->logPlayState);
       this->Update();
-      this->dataPtr->iterations++;
     }
 
     if (this->dataPtr->stepInc > 0)
@@ -1732,6 +1739,7 @@ void World::SetState(const WorldState &_state)
 {
   this->SetSimTime(_state.GetSimTime());
   this->dataPtr->logRealTime = _state.GetRealTime();
+  this->dataPtr->iterations = _state.GetIterations();
 
   const ModelState_M modelStates = _state.GetModelStates();
   for (auto const &modelState : modelStates)
