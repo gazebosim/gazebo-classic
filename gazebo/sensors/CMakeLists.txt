@@ -8,13 +8,16 @@ set (sources
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
+  FluidPressureSensor.cc
   ForceTorqueSensor.cc
   GaussianNoiseModel.cc
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
+  MagnetometerSensor.cc
   MultiCameraSensor.cc
   Noise.cc
+  OrnsteinNoiseModel.cc
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
@@ -32,11 +35,13 @@ set (headers
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
+  FluidPressureSensor.hh
   ForceTorqueSensor.hh
   GaussianNoiseModel.hh
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
+  MagnetometerSensor.hh
   MultiCameraSensor.hh
   Noise.hh
   RaySensor.hh
@@ -54,9 +59,11 @@ set (headers
 )
 
 set (gtest_sources
+  FluidPressureSensor_TEST.cc
   ForceTorqueSensor_TEST.cc
   GpsSensor_TEST.cc
   ImuSensor_TEST.cc
+  MagnetometerSensor_TEST.cc
   Noise_TEST.cc
   RaySensor_TEST.cc
   Sensor_TEST.cc
