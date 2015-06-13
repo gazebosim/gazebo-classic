@@ -113,6 +113,24 @@ math::Vector3 PhysicsEngine::GetGravity() const
 }
 
 //////////////////////////////////////////////////
+math::Vector3 PhysicsEngine::GetMagneticField() const
+{
+  return this->sdf->Get<math::Vector3>("magnetic_field");
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetTemperature() const
+{
+  return this->sdf->Get<double>("temperature");
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::GetPressure() const
+{
+  return this->sdf->Get<double>("pressure");
+}
+
+//////////////////////////////////////////////////
 CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
                                             const std::string &_linkName)
 {
@@ -243,6 +261,12 @@ bool PhysicsEngine::SetParam(const std::string &_key,
       this->sdf->GetElement("magnetic_field")->
           Set(boost::any_cast<math::Vector3>(copy));
     }
+    else if (_key == "temperature")
+      this->sdf->GetElement("temperature")->
+          Set(boost::any_cast<double>(_value));
+    else if (_key == "pressure")
+      this->sdf->GetElement("pressure")->
+          Set(boost::any_cast<double>(_value));
     else
     {
       gzwarn << "SetParam failed for [" << _key << "] in physics engine "
@@ -286,7 +310,11 @@ bool PhysicsEngine::GetParam(const std::string &_key,
   else if (_key == "gravity")
     _value = this->GetGravity();
   else if (_key == "magnetic_field")
-    _value = this->sdf->Get<math::Vector3>("magnetic_field");
+    _value = this->GetMagneticField();
+  else if (_key == "temperature")
+    _value = this->GetTemperature();
+  else if (_key == "pressure")
+    _value = this->GetPressure();
   else
   {
     gzwarn << "GetParam failed for [" << _key << "] in physics engine "
