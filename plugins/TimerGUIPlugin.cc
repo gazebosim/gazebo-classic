@@ -142,6 +142,10 @@ TimerGUIPlugin::TimerGUIPlugin()
   // Connect to the PreRender Gazebo signal
   this->connections.push_back(event::Events::ConnectPreRender(
                               boost::bind(&TimerGUIPlugin::PreRender, this)));
+
+  // Initialize variables
+  this->posX = 0;
+  this->posY = 0;
 }
 
 /////////////////////////////////////////////////
@@ -154,6 +158,16 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
 {
   bool hasStartButton = false;
   bool hasResetButton = false;
+
+  // If a countdown time was given in SDF, read the countdown time and
+  // initialize the Timer object as a countdown timer.
+  // Time is read in SDF as (seconds nanosecnds)
+  if (_elem->HasElement("countdown_time"))
+  {
+    common::Time maxTime =
+        _elem->GetElement("countdown_time")->Get<common::Time>();
+    this->timer = common::Timer(maxTime, true);
+  }
 
   // Check if there is a start button
   if (_elem->HasElement("start_stop_button"))
@@ -196,34 +210,60 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   {
     math::Vector2d p = _elem->Get<math::Vector2d>("pos");
 
-    // Check for negative x position
-    if (p.x < 0)
+    // Negative positions are counted from the ends
+    // If there are negative positions, we need to filter window resize
+    // events to reposition the timer
+    if (p.x < 0 || p.y < 0)
     {
-      gzwarn << "GUI widget x pos < 0, clamping to 0.\n";
-      p.x = 0;
+      this->parent()->installEventFilter(this);
     }
 
-    // Check for negative y position
+    if (p.x < 0)
+    {
+      if (this->parent())
+      {
+        this->posX = p.x - s.x;
+        p.x = static_cast<QWidget *>(this->parent())->width() + this->posX;
+      }
+      else
+      {
+        gzwarn << "Couldn't get parent, setting position x to zero" <<
+            std::endl;
+        p.x = 0;
+      }
+    }
+
     if (p.y < 0)
     {
-      gzwarn << "GUI widget y pos < 0, clamping to 0.\n";
-      p.y = 0;
+      if (this->parent())
+      {
+        this->posY = p.y - s.y;
+        p.y = static_cast<QWidget *>(this->parent())->height() + this->posY;
+      }
+      else
+      {
+        gzwarn << "Couldn't get parent, setting position y to zero" <<
+            std::endl;
+        p.y = 0;
+      }
     }
 
     // Check for x position greater than parent width
-    if (parent() && p.x > static_cast<QWidget*>(parent())->width())
+    if (this->parent() && p.x > static_cast<QWidget *>(this->parent())->width())
     {
       gzwarn << "GUI widget x pos > parent width, "
         << "clamping to parent width - this widget's width.\n";
-      p.x = static_cast<QWidget*>(parent())->width() - this->width();
+      p.x = static_cast<QWidget *>(this->parent())->width() - this->width();
     }
 
     // Check for y position greater than parent height
-    if (parent() && p.y > static_cast<QWidget*>(parent())->height())
+    if (this->parent() &&
+        p.y > static_cast<QWidget *>(this->parent())->height())
     {
       gzwarn << "GUI widget y pos > parent height, "
         << "clamping to parent height - this widget's height.\n";
-      p.y = static_cast<QWidget*>(parent())->height() - this->height();
+      p.y = static_cast<QWidget *>(this->parent())->height() -
+          this->height();
     }
 
     this->move(p.x, p.y);
@@ -231,8 +271,11 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   else
   {
     int xPos, yPos;
-    if (parent())
-       xPos = static_cast<QWidget*>(parent())->width() - this->width() - 10;
+    if (this->parent())
+    {
+      xPos = static_cast<QWidget *>(this->parent())->width() - this->width() -
+          10;
+    }
     else
       xPos = 600;
 
@@ -268,7 +311,8 @@ void TimerGUIPlugin::PreRender()
 {
   boost::mutex::scoped_lock lock(this->timerMutex);
   this->SetTime(QString::fromStdString(
-        this->FormatTime(this->timer.GetElapsed())));
+      this->timer.GetElapsed().FormattedString(
+      common::Time::FormatOption::HOURS)));
 }
 
 /////////////////////////////////////////////////
@@ -327,38 +371,6 @@ void TimerGUIPlugin::Reset()
   }
 }
 
-/////////////////////////////////////////////////
-std::string TimerGUIPlugin::FormatTime(const common::Time &_time) const
-{
-  std::ostringstream stream;
-  unsigned int day, hour, min, sec, msec;
-
-  stream.str("");
-
-  sec = _time.sec;
-
-  day = sec / 86400;
-  sec -= day * 86400;
-
-  hour = sec / 3600;
-  sec -= hour * 3600;
-
-  min = sec / 60;
-  sec -= min * 60;
-
-  msec = rint(_time.nsec * 1e-6);
-
-  // \todo Add in ability to specify time format in SDF.
-  // stream << std::setw(2) << std::setfill('0') << day << " ";
-
-  stream << std::setw(2) << std::setfill('0') << hour << ":";
-  stream << std::setw(2) << std::setfill('0') << min << ":";
-  stream << std::setw(2) << std::setfill('0') << sec << ".";
-  stream << std::setw(3) << std::setfill('0') << msec;
-
-  return stream.str();
-}
-
 ////////////////////////////////////////////////
 void TimerGUIPlugin::OnStartStopButton()
 {
@@ -374,3 +386,27 @@ void TimerGUIPlugin::OnResetButton()
   this->Reset();
 }
 
+/////////////////////////////////////////////////
+bool TimerGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
+{
+  QWidget *widget = qobject_cast<QWidget *>(_obj);
+  if (widget == this->parent() && _event->type() == QEvent::Resize)
+  {
+    int pX = this->posX;
+    int pY = this->posY;
+
+    // Zero values mean that was a positive position, so keep the same
+    if (pX == 0)
+      pX = this->pos().x();
+    else
+      pX = widget->width() + pX;
+
+    if (pY == 0)
+      pY = this->pos().y();
+    else
+      pY = widget->height() + pY;
+
+    this->move(pX, pY);
+  }
+  return QObject::eventFilter(_obj, _event);
+}

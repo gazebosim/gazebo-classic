@@ -140,6 +140,15 @@ set (gtest_sources
   Time_TEST.cc
 )
 
+# Timer test fails on OSX
+# See issue #1626
+if (NOT APPLE)
+  set (gtest_sources
+    ${gtest_sources}
+    Timer_TEST.cc
+  )
+endif()
+
 if (HAVE_GTS)
 set (sources
   ${sources}
@@ -193,6 +202,7 @@ set_property(
 
 target_link_libraries(gazebo_common
   gazebo_math
+  ${IGNITION-MATH_LIBRARIES}
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}

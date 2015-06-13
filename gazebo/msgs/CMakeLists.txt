@@ -1,10 +1,12 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   axis.proto
   boxgeom.proto
   camerasensor.proto
   camera_cmd.proto
+  cessna.proto
   collision.proto
   color.proto
   contact.proto
@@ -83,6 +85,7 @@ set (msgs
   response.proto
   rest_error.proto
   rest_login.proto
+  rest_logout.proto
   rest_post.proto
   road.proto
   scene.proto

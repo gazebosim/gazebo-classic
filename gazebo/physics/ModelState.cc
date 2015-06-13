@@ -32,8 +32,8 @@ ModelState::ModelState()
 
 /////////////////////////////////////////////////
 ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
-    const common::Time &_simTime)
-: State(_model->GetName(), _realTime, _simTime)
+    const common::Time &_simTime, const uint64_t _iterations)
+: State(_model->GetName(), _realTime, _simTime, _iterations)
 {
   this->pose = _model->GetWorldPose();
 
@@ -42,7 +42,7 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
   for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
   {
     this->linkStates.insert(std::make_pair((*iter)->GetName(),
-          LinkState(*iter, _realTime, _simTime)));
+          LinkState(*iter, _realTime, _simTime, _iterations)));
   }
 
   // Copy all the joints
@@ -51,14 +51,14 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
        iter != joints.end(); ++iter)
   {
     this->jointStates.insert(std::make_pair((*iter)->GetName(),
-          JointState(*iter, _realTime, _simTime)));
+          JointState(*iter, _realTime, _simTime, _iterations)));
   }*/
 }
 
 /////////////////////////////////////////////////
 ModelState::ModelState(const ModelPtr _model)
 : State(_model->GetName(), _model->GetWorld()->GetRealTime(),
-        _model->GetWorld()->GetSimTime())
+        _model->GetWorld()->GetSimTime(), _model->GetWorld()->GetIterations())
 {
   this->pose = _model->GetWorldPose();
 
@@ -94,19 +94,21 @@ ModelState::~ModelState()
 
 /////////////////////////////////////////////////
 void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
-    const common::Time &_simTime)
+    const common::Time &_simTime, const uint64_t _iterations)
 {
   this->name = _model->GetName();
   this->wallTime = common::Time::GetWallTime();
   this->realTime = _realTime;
   this->simTime = _simTime;
+  this->iterations = _iterations;
   this->pose = _model->GetWorldPose();
 
   // Load all the links
   const Link_V links = _model->GetLinks();
   for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
   {
-    this->linkStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime);
+    this->linkStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime,
+        _iterations);
   }
 
   // Remove links that no longer exist. We determine this by check the time
@@ -125,7 +127,8 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
   for (Joint_V::const_iterator iter = joints.begin();
       iter != joints.end(); ++iter)
   {
-    this->jointStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime);
+    this->jointStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime,
+        _iterations);
   }
 
   // Remove joints that no longer exist. We determine this by check the time
@@ -532,4 +535,16 @@ void ModelState::SetSimTime(const common::Time &_time)
   {
     iter->second.SetSimTime(_time);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelState::SetIterations(const uint64_t _iterations)
+{
+  State::SetIterations(_iterations);
+
+  for (auto &linkState : this->linkStates)
+    linkState.second.SetIterations(_iterations);
+
+  for (auto &jointState : this->jointStates)
+    jointState.second.SetIterations(_iterations);
 }
