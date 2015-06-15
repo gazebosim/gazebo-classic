@@ -90,7 +90,7 @@ void ModelMove::initiateMove()
   this->model->SetAnimation(anim);
 }
 
-void ModelMove::getPathMsg(PoseAnimationPtr &msg)
+void ModelMove::getPathMsg(ConstPoseAnimationPtr &msg)
 {
   gzmsg << "[model_move] Received path message" << std::endl;
 

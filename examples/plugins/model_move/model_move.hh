@@ -18,13 +18,11 @@
 #ifndef MODEL_MOVE_HH
 #define MODEL_MOVE_HH 1
 
+#include <gazebo/msgs/pose_animation.pb.h>
 #include <vector>
 
 namespace gazebo
 {
-  typedef const
-    boost::shared_ptr<const gazebo::msgs::PoseAnimation> PoseAnimationPtr;
-
   /// \class model_move.hh model_move.cc
   /// \brief A plugin to transport a model from point to point using
   /// pose animation.
@@ -53,7 +51,7 @@ namespace gazebo
 
     /// \brief callback to run when recieve a path message
     /// \param [in] msg path message received to animate
-    public: void getPathMsg(PoseAnimationPtr &msg);
+    public: void getPathMsg(ConstPoseAnimationPtr &msg);
 
     /// \brief Plugin Load function
     /// \param[in] _parent Model pointer to the model defining this plugin
