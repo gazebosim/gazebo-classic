@@ -35,8 +35,8 @@ namespace gazebo
     /// \param[in] start starting point
     /// \param[in] end goal point
     /// \param[in,out] translation translation done before start
-    private: void move(math::Vector3 *start, math::Vector3 *end,
-                       math::Vector3 *translation);
+    private: void move(const math::Vector3 &start, const math::Vector3 &end,
+                       math::Vector3 &translation);
 
     /// \brief Parse goals defined in the SDF
     /// \param[in] _sdf sdf pointer corresponding to goals element
