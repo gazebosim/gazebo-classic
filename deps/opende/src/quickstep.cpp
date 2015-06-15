@@ -259,6 +259,11 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *lambda = context->AllocateArray<dReal> (m);
   dReal *lambda_erp = context->AllocateArray<dReal> (m);
 
+  dSetZero(caccel, nb*6);
+  dSetZero(caccel_erp, nb*6);
+  dSetZero(lambda, m);
+  dSetZero(lambda_erp, m);
+
   // Get Joint Information, setup Jacobians by calling getInfo2.
   if (m > 0) {
     dReal *cfm, *lo, *hi, *rhs, *rhs_erp, *rhs_precon;

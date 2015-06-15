@@ -116,6 +116,7 @@ INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
   // , "arrange"
   , "clone_simulation"
   , "custom_main"
+  , "custom_main_pkgconfig"
   // , "listener"
   // , "publisher"
   , "test_fixture"

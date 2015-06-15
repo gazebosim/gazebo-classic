@@ -32,6 +32,7 @@ set CURL_LIBRARY_NAME=libcurl_a
 @set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\Source
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
+@set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
 
 @set TBB_PATH=%cd%\..\..\tbb43_20141023oss
 @set TBB_LIBRARY_DIR=%TBB_PATH%\lib\intel64\vc12
@@ -59,7 +60,7 @@ set OGRE_LIB_SUFFIX=.lib
 @set PATH=%QT4_BIN_DIR%;%PATH%
 
 cmake -G "NMake Makefiles"^
-    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%"^
+    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%"^
     -DUSE_EXTERNAL_TINYXML:BOOL=False^
     -DFREEIMAGE_RUNS=1^
     -DPROTOBUF_SRC_ROOT_FOLDER="%PROTOBUF_PATH%"^
