@@ -1,5 +1,13 @@
 ## Gazebo 6.0
-1. Implement forward/backwards multi-step for log playback.
+1. Implement forward/backwards multi-step for log playback. Now, the semantics
+of a multi-step while playing back a log session are different from a multi-step
+during a live simulation. While playback, a multi-step simulates all the
+intermediate steps as before, but the client only perceives a single step.
+E.g: You have a log file containing a 1 hour simulation session. You want to
+jump to the minute 00H::30M::00S to check a specific aspect of the simulation.
+You should not see continuous updates until minute 00H:30M:00S. Instead, you
+should visualize a single jump to the specific instant of the simulation that
+you are interested.
     * [Pull request #1623](https://bitbucket.org/osrf/gazebo/pull-request/1623)
 
 1. Added browse button to log record dialog.
