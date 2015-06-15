@@ -32,11 +32,11 @@ using namespace gazebo;
 ModelMove::ModelMove()
 { }
 
-void ModelMove::move(math::Vector3 *start, math::Vector3 *end,
-                     math::Vector3 *translation)
+void ModelMove::move(const math::Vector3 &start, const math::Vector3 &end,
+                     math::Vector3 &translation)
 {
-  int duration = floor(start->Distance((*end).x, (*end).y, (*end).z));
-  math::Vector3 diff = *end - *start;
+  int duration = floor(start.Distance(end.x, end.y, end.z));
+  math::Vector3 diff = end - start;
   float x_step = diff.x / duration;
   float y_step = diff.y / duration;
   float z_step = diff.z / duration;
@@ -46,15 +46,15 @@ void ModelMove::move(math::Vector3 *start, math::Vector3 *end,
   {
     gazebo::common::PoseKeyFrame * key = anim->CreateKeyFrame(i+curr_frame);
     key->SetTranslation(math::Vector3(
-         (*translation).x + x_step * i,
-         (*translation).y + y_step * i,
-         (*translation).z + z_step * i));
+         translation.x + x_step * i,
+         translation.y + y_step * i,
+         translation.z + z_step * i));
     key->SetRotation(math::Quaternion(0, 0, 0));
   }
 
-  translation->Set((*translation).x + x_step*duration,
-       (*translation).y + y_step*duration,
-       (*translation).z + z_step*duration);
+  translation.Set(translation.x + x_step*duration,
+                  translation.y + y_step*duration,
+                  translation.z + z_step*duration);
 }
 
 void ModelMove::initiateMove()
@@ -81,10 +81,10 @@ void ModelMove::initiateMove()
   math::Vector3 translation = math::Vector3(0, 0, 0);
 
   // Move to the start_position to first goal
-  move(&start_position, &path_goals[0].pos, &translation);
+  move(start_position, path_goals[0].pos, translation);
 
   for (int i = 0; i < this->path_goals.size()-1; i++)
-    move(&path_goals[i].pos, &path_goals[i+1].pos, &translation);
+    move(path_goals[i].pos, path_goals[i+1].pos, translation);
 
   // set the animation
   this->model->SetAnimation(anim);
