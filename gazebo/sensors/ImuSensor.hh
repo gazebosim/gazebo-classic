@@ -32,10 +32,6 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \brief Noise streams for the IMU sensor
-    enum ImuSensorNoise {AngVelNoiseX, AngVelNoiseY, AngVelNoiseZ,
-        LinAccNoiseX, LinAccNoiseY, LinAccNoiseZ};
-
     /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
     /// \brief An IMU sensor.
     class GAZEBO_VISIBLE ImuSensor: public Sensor

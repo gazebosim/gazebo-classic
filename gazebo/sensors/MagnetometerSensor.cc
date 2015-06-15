@@ -21,14 +21,13 @@
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/sensors/SensorFactory.hh"
-
 #include "gazebo/common/common.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/Noise.hh"
 #include "gazebo/transport/transport.hh"
 
+#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/noise/Noise.hh"
 #include "gazebo/sensors/MagnetometerSensor.hh"
 
 using namespace gazebo;

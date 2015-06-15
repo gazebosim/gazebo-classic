@@ -58,15 +58,21 @@ namespace gazebo
       {
         NONE,
         CUSTOM,
-        GAUSSIAN
+        EXPONENTIAL,
+        GAUSSIAN,
+        GAUSSIAN_PROCESS,
+        ORNSTEIN,              
+        WIENER
       };
 
       /// \brief Constructor. This should not be called directly unless creating
       /// an empty noise model. Use NoiseFactory::NewNoiseModel to instantiate
-      /// a new noise model.
-      /// \param[in] _type Type of noise model.
+      /// a new noise model. The quantization argument is optional, and if specified
+      /// will quantize the result of each Apply(...) call.
+      /// \param[in] _type  Type of noise model.
+      /// \param[in] _quant Quantization unit
       /// \sa NoiseFactory::NewNoiseModel
-      public: explicit Noise(NoiseType _type);
+      public: explicit Noise(NoiseType _type, long _quant);
 
       /// \brief Destructor.
       public: virtual ~Noise();

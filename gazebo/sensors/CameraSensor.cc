@@ -40,9 +40,8 @@
 #include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/noise/Noise.hh"
 #include "gazebo/sensors/CameraSensor.hh"
-#include "gazebo/sensors/Noise.hh"
-
 
 using namespace gazebo;
 using namespace sensors;

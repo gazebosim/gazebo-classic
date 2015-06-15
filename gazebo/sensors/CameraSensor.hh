@@ -37,9 +37,6 @@ namespace gazebo
     /// \addtogroup gazebo_sensors Sensors
     /// \{
 
-    /// \brief Noise streams for the camera sensor
-    enum CameraSensorNoise {CameraNoise};
-
     /// \class CameraSensor CameraSensor.hh sensors/sensors.hh
     /// \brief Basic camera sensor
     ///

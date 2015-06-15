@@ -25,7 +25,7 @@
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/sensors/GaussianNoiseModel.hh"
-#include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/noise/Noise.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -44,7 +44,8 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
   // Check for 'gaussian' noise. The 'gaussian_quantized' type is kept for
   // backward compatibility.
   if (typeString == "gaussian" ||
-      typeString == "gaussian_quantized")
+      typeString == "gaussian_quantized" ||
+      typeString == "gaussian_wiener")
   {
     if (_sensorType == "camera" || _sensorType == "depth" ||
       _sensorType == "multicamera")

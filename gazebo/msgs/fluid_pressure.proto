@@ -7,7 +7,7 @@ package gazebo.msgs;
 import "time.proto";
 import "vector3d.proto";
 
-message FluidPRessure
+message FluidPressure
 {
   required Time stamp            = 1;
   required string entity_name    = 2;

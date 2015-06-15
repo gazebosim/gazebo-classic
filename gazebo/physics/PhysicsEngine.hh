@@ -151,11 +151,11 @@ namespace gazebo
 
       /// \brief Return the temperature (in Kelvin)
       /// \return The temperature
-      public: virtual math::Vector3 GetTemperature() const;
+      public: virtual double GetTemperature() const;
 
       /// \brief Return the fluid pressure (in Pascals)
       /// \return The pressure
-      public: virtual math::Vector3 GetPressure() const;      
+      public: virtual double GetPressure() const;      
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map

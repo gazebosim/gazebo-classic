@@ -38,7 +38,9 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/noise/Noise.hh"
 #include "gazebo/sensors/ImuSensor.hh"
+
 
 using namespace gazebo;
 using namespace sensors;
