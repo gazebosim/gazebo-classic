@@ -37,18 +37,26 @@ namespace gazebo
     class DepthCameraSensor;
     class ContactSensor;
     class ImuSensor;
+    class MagnetometerSensor;
+    class OrientationSensor;
+    class FluidPpressureSensor;
     class GpuRaySensor;
     class RFIDSensor;
     class RFIDTag;
     class SonarSensor;
     class ForceTorqueSensor;
     class GpsSensor;
-    class Noise;
-    class GaussianNoiseModel;
-    class ImageGaussianNoiseModel;
     class WirelessTransceiver;
     class WirelessTransmitter;
     class WirelessReceiver;
+
+    class Noise;
+    class ExponentialNoiseModel;
+    class GaussianNoiseModel;
+    class GPMapNoiseModel;
+    class ImageGaussianNoiseModel;
+    class OrnsteinNoiseModel;
+    class WienerNoiseModel;
 
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
@@ -74,13 +82,25 @@ namespace gazebo
     /// \brief Shared pointer to ContactSensor
     typedef boost::shared_ptr<ContactSensor> ContactSensorPtr;
 
-    /// \def ImuSensorPtr
-    /// \brief Shared pointer to ImuSensor
-    typedef boost::shared_ptr<ImuSensor> ImuSensorPtr;
+    /// \def ForceTorqueSensorPtr
+    /// \brief Shared pointer to ForceTorqueSensor
+    typedef boost::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
+
+    /// \def FLuidPressureSensorPtr
+    /// \brief Shared pointer to FluidPressureSensor
+    typedef boost::shared_ptr<FluidPressureSensor> FluidPressureSensorPtr;
+
+    /// \def GpsSensorPtr
+    /// \brief Shared pointer to GpsSensor
+    typedef boost::shared_ptr<GpsSensor> GpsSensorPtr;
 
     /// \def GpuRaySensorPtr
     /// \brief Shared pointer to GpuRaySensor
     typedef boost::shared_ptr<GpuRaySensor> GpuRaySensorPtr;
+
+    /// \def ImuSensorPtr
+    /// \brief Shared pointer to ImuSensor
+    typedef boost::shared_ptr<ImuSensor> ImuSensorPtr;
 
     /// \def RFIDSensorPtr
     /// \brief Shared pointer to RFIDSensor
@@ -94,25 +114,9 @@ namespace gazebo
     /// \brief Shared pointer to SonarSensor
     typedef boost::shared_ptr<SonarSensor> SonarSensorPtr;
 
-    /// \def ForceTorqueSensorPtr
-    /// \brief Shared pointer to ForceTorqueSensor
-    typedef boost::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
-
-    /// \def GpsSensorPtr
-    /// \brief Shared pointer to GpsSensor
-    typedef boost::shared_ptr<GpsSensor> GpsSensorPtr;
-
-    /// \def NoisePtr
-    /// \brief Shared pointer to Noise
-    typedef boost::shared_ptr<Noise> NoisePtr;
-
-    /// \def GaussianNoisePtr
-    /// \brief Shared pointer to Noise
-    typedef boost::shared_ptr<GaussianNoiseModel> GaussianNoiseModelPtr;
-
-    /// \brief Shared pointer to Noise
-    typedef boost::shared_ptr<ImageGaussianNoiseModel>
-        ImageGaussianNoiseModelPtr;
+    /// \def OrientationSensorPtr
+    /// \brief Shared pointer to OrientationSensor
+    typedef boost::shared_ptr<OrientationSensor> OrientationSensorPtr;
 
     /// \def WirelessTransceiverPtr
     /// \brief Shared pointer to WirelessTransceiver
@@ -150,13 +154,29 @@ namespace gazebo
     /// \brief Vector of ContactSensor shared pointers
     typedef std::vector<ContactSensorPtr> ContactSensor_V;
 
-    /// \def ImuSensor_V
-    /// \brief Vector of ImuSensor shared pointers
-    typedef std::vector<ImuSensorPtr> ImuSensor_V;
+    /// \def FluidPressureSensor_V
+    /// \brief Vector of FluidPRessureSensor shared pointers
+    typedef std::vector<FluidPressureSensorPtr> FluidPressureSensor_V;
 
     /// \def GpuRaySensor_V
     /// \brief Vector of GpuRaySensor shared pointers
     typedef std::vector<GpuRaySensorPtr> GpuRaySensor_V;
+
+    /// \def GpsSensor_V
+    /// \brief Vector of GpsSensor shared pointers
+    typedef std::vector<GpsSensorPtr> GpsSensor_V;
+
+    /// \def ImuSensor_V
+    /// \brief Vector of ImuSensor shared pointers
+    typedef std::vector<ImuSensorPtr> ImuSensor_V;
+
+    /// \def MagnetometerSensor_V
+    /// \brief Vector of MagnetometerSensor shared pointers
+    typedef std::vector<MagnetometerSensorPtr> MagnetometerSensor_V;
+
+    /// \def OrientationSensor_V
+    /// \brief Vector of OrientationSensor shared pointers
+    typedef std::vector<OrientationSensorPtr> OrientationSensor_V;
 
     /// \def RFIDSensor_V
     /// \brief Vector of RFIDSensors
@@ -177,6 +197,34 @@ namespace gazebo
     /// \def WirelessReceiver_V
     /// \brief Vector of WirelessReceiver
     typedef std::vector<WirelessReceiver> WirelessReceiver_V;
+
+    /// \def NoisePtr
+    /// \brief Shared pointer to Noise
+    typedef boost::shared_ptr<Noise> NoisePtr;
+
+    /// \def ExponentialNoisePtr
+    /// \brief Shared pointer to exponential noise model
+    typedef boost::shared_ptr<ExponentialNoiseModel> ExponentialNoiseModelPtr;
+
+    /// \def GaussianNoisePtr
+    /// \brief Shared pointer to gaussian noise model
+    typedef boost::shared_ptr<GaussianNoiseModel> GaussianNoiseModelPtr;
+
+    /// \def GaussianNoisePtr
+    /// \brief Shared pointer to image gaussian noise model
+    typedef boost::shared_ptr<ImageGaussianNoiseModel> ImageGaussianNoiseModelPtr;
+
+    /// \def GPMaplNoisePtr
+    /// \brief Shared pointer to GP map noise model
+    typedef boost::shared_ptr<GPMapNoiseModel> GPMapNoiseModelPtr;
+
+    /// \def WienerNoisePtr
+    /// \brief Shared pointer to wiener noise model
+    typedef boost::shared_ptr<WienerNoiseModel> WienerNoiseModelPtr;
+
+    /// \def OrnsteinNoisePtr
+    /// \brief Shared pointer to ornstein noise model
+    typedef boost::shared_ptr<OrnsteinNoiseModel> OrnsteinNoiseModelPtr;
 
     /// \def SensorNoiseTypes
     /// \brief Eumeration of all sensor noise types
@@ -199,28 +247,30 @@ namespace gazebo
       VelLonNoiseMeters = 6,
       VelAltNoiseMeters = 7,
 
-      /// \brief Noise streams for the fluid pressure sensor
-      /// \sa FluidPressureSensor
-      FluidPressureNoisePascals = 8,
-
       /// \brief Noise streams for the inertial measurement unit sensor
       /// \sa ImuSensor
-      AngVelNoiseX = 9,
-      AngVelNoiseY = 10,
-      AngVelNoiseZ = 11,
-      LinAccNoiseX = 12,
-      LinAccNoiseY = 13, 
-      LinAccNoiseZ = 14,
+      AngVelNoiseX = 8,
+      AngVelNoiseY = 9,
+      AngVelNoiseZ = 10,
+      LinAccNoiseX = 11,
+      LinAccNoiseY = 12, 
+      LinAccNoiseZ = 13,
 
       /// \brief Noise streams for the magnetometer sensor
       /// \sa MagnetometerSensor
-      MagneticFieldNoiseX = 15,
-      MagneticFieldNoiseY = 16,
-      MagneticFieldNoiseZ = 17,
+      MagneticFieldNoiseX = 14,
+      MagneticFieldNoiseY = 15,
+      MagneticFieldNoiseZ = 16,
+
+      /// \brief Noise streams for the Orientation sensor
+      /// \sa MagnetometerSensor
+      OrientationNoiseX = 17,
+      OrientationNoiseY = 18,
+      OrientationNoiseZ = 19,
 
       /// \brief Noise streams for the multicamera sensor
       /// \sa MultiCameraSensor
-      MultiCameraNoise = 18
+      MultiCameraNoise = 20
 
     };
 

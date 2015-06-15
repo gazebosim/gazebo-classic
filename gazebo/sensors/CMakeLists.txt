@@ -22,6 +22,7 @@ set (sources
   ImuSensor.cc
   MagnetometerSensor.cc
   MultiCameraSensor.cc
+  OrientationSensor.cc
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
@@ -53,6 +54,7 @@ set (headers
   ImuSensor.hh
   MagnetometerSensor.hh
   MultiCameraSensor.hh
+  OrientationSensor.hh
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh
@@ -79,6 +81,7 @@ set (gtest_sources
   GpsSensor_TEST.cc
   ImuSensor_TEST.cc
   MagnetometerSensor_TEST.cc
+  OrientationSensor_TEST.cc
   RaySensor_TEST.cc
   Sensor_TEST.cc
   SonarSensor_TEST.cc
