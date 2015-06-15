@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Mafgnetometer sensor
- * Author: Andrew Symington
- * Date: 10 June 2015
-*/
-
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -26,18 +21,14 @@
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Rand.hh"
-
-#include "gazebo/physics/Link.hh"
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
-
 #include "gazebo/sensors/SensorFactory.hh"
+
+#include "gazebo/common/common.hh"
+#include "gazebo/math/gzmath.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/Noise.hh"
+#include "gazebo/transport/transport.hh"
+
 #include "gazebo/sensors/MagnetometerSensor.hh"
 
 using namespace gazebo;
@@ -45,302 +36,106 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("magnetometer", MagnetometerSensor)
 
-//////////////////////////////////////////////////
+/////////////////////////////////////////////////
 MagnetometerSensor::MagnetometerSensor()
-  : Sensor(sensors::OTHER)
+: Sensor(sensors::OTHER)
 {
-  this->dataIndex = 0;
-  this->dataDirty = false;
-  this->incomingLinkData[0].reset();
-  this->incomingLinkData[1].reset();
 }
 
-//////////////////////////////////////////////////
+/////////////////////////////////////////////////
 MagnetometerSensor::~MagnetometerSensor()
 {
 }
 
-//////////////////////////////////////////////////
+/////////////////////////////////////////////////
 void MagnetometerSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
-
-  if (this->sdf->HasElement("imu") &&
-      this->sdf->GetElement("imu")->HasElement("topic") &&
-      this->sdf->GetElement("imu")->Get<std::string>("topic")
-      != "__default_topic__")
-  {
-    this->pub = this->node->Advertise<msgs::IMU>(
-        this->sdf->GetElement("imu")->Get<std::string>("topic"), 500);
-  }
-  else
-  {
-    std::string topicName = "~/";
-    topicName += this->parentName + "/" + this->GetName() + "/imu";
-    boost::replace_all(topicName, "::", "/");
-
-    this->pub = this->node->Advertise<msgs::IMU>(topicName, 500);
-  }
-
-  // Handle noise model settings.
-  this->noiseActive = false;
-  sdf::ElementPtr imuElem = this->sdf->GetElement("imu");
-  if (imuElem->HasElement("noise"))
-  {
-    sdf::ElementPtr noiseElem = imuElem->GetElement("noise");
-    std::string type = noiseElem->Get<std::string>("type");
-    if (type == "gaussian")
-    {
-      this->noiseActive = true;
-      this->noiseType = GAUSSIAN;
-      this->rateNoiseMean = 0.0;
-      this->rateNoiseStdDev = 0.0;
-      this->rateBias = 0.0;
-      this->accelNoiseMean = 0.0;
-      this->accelNoiseStdDev = 0.0;
-      this->accelBias = 0.0;
-      if (noiseElem->HasElement("rate"))
-      {
-        sdf::ElementPtr rateElem = noiseElem->GetElement("rate");
-        this->rateNoiseMean = rateElem->Get<double>("mean");
-        this->rateNoiseStdDev = rateElem->Get<double>("stddev");
-        double rateBiasMean = rateElem->Get<double>("bias_mean");
-        double rateBiasStddev = rateElem->Get<double>("bias_stddev");
-        // Sample the bias that we'll use later
-        this->rateBias = math::Rand::GetDblNormal(rateBiasMean, rateBiasStddev);
-        // With equal probability, we pick a negative bias (by convention,
-        // rateBiasMean should be positive, though it would work fine if
-        // negative).
-        if (math::Rand::GetDblUniform() < 0.5)
-          this->rateBias = -this->rateBias;
-        gzlog << "applying Gaussian noise model to rate with mean " <<
-          this->rateNoiseMean << " and stddev " << this->rateNoiseStdDev <<
-          ", bias " << this->rateBias << std::endl;
-      }
-      if (noiseElem->HasElement("accel"))
-      {
-        sdf::ElementPtr accelElem = noiseElem->GetElement("accel");
-        this->accelNoiseMean = accelElem->Get<double>("mean");
-        this->accelNoiseStdDev = accelElem->Get<double>("stddev");
-        double accelBiasMean = accelElem->Get<double>("bias_mean");
-        double accelBiasStddev = accelElem->Get<double>("bias_stddev");
-        // Sample the bias that we'll use later
-        this->accelBias = math::Rand::GetDblNormal(accelBiasMean,
-                                                   accelBiasStddev);
-        // With equal probability, we pick a negative bias (by convention,
-        // accelBiasMean should be positive, though it would work fine if
-        // negative).
-        if (math::Rand::GetDblUniform() < 0.5)
-          this->accelBias = -this->accelBias;
-        gzlog << "applying Gaussian noise model to accel with mean " <<
-          this->accelNoiseMean << " and stddev " << this->accelNoiseStdDev <<
-          ", bias " << this->accelBias << std::endl;
-      }
-    }
-    else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
-        std::endl;
-  }
-
-  this->parentEntity->SetPublishData(true);
-
-  std::string topic = "~/" + this->parentEntity->GetScopedName();
-  this->linkDataSub = this->node->Subscribe(topic,
-    &ImuSensor::OnLinkData, this);
 }
 
-//////////////////////////////////////////////////
-void ImuSensor::Load(const std::string &_worldName)
+/////////////////////////////////////////////////
+void MagnetometerSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
-      this->world->GetEntity(this->parentName));
+  physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
+  this->parentLink = boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
-  if (!this->parentEntity)
+  this->lastMagnetometerMsg.set_link_name(this->parentName);
+
+  this->topicName = "~/" + this->parentName + '/' + this->GetName();
+  if (this->sdf->HasElement("topic"))
+    this->topicName += '/' + this->sdf->Get<std::string>("topic");
+  boost::replace_all(this->topicName, "::", "/");
+
+  this->magPub = this->node->Advertise<msgs::Magnetometer>(this->topicName, 50);
+
+  // Parse sdf noise parameters
+  sdf::ElementPtr magElem = this->sdf->GetElement("magnetometer");
+
+  // Load magnetic field noise parameters
   {
-    gzthrow("IMU has invalid parent[" + this->parentName +
-            "]. Must be a link\n");
+    sdf::ElementPtr fieldElem = magElem->GetElement("magnetic_field");
+    this->noises[MagneticFieldNoiseX] = NoiseFactory::NewNoiseModel(
+      fieldElem->GetElement("body_x")->GetElement("noise"));
+    this->noises[MagneticFieldNoiseY] =  NoiseFactory::NewNoiseModel(
+      fieldElem->GetElement("body_y")->GetElement("noise"));
+    this->noises[MagneticFieldNoiseZ] = NoiseFactory::NewNoiseModel(
+      fieldElem->GetElement("body_z")->GetElement("noise"));
   }
-  this->referencePose = this->pose + this->parentEntity->GetWorldPose();
-  this->lastLinearVel = this->referencePose.rot.RotateVector(
-    this->parentEntity->GetWorldLinearVel());
+}
+
+/////////////////////////////////////////////////
+void MagnetometerSensor::Fini()
+{
+  Sensor::Fini();
+  this->parentLink.reset();
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::Init()
+void MagnetometerSensor::Init()
 {
   Sensor::Init();
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::Fini()
+bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
 {
-  this->parentEntity->SetPublishData(false);
-  this->pub.reset();
-  Sensor::Fini();
-}
-
-//////////////////////////////////////////////////
-msgs::IMU ImuSensor::GetImuMessage() const
-{
-  boost::mutex::scoped_lock lock(this->mutex);
-  return this->imuMsg;
-}
-
-//////////////////////////////////////////////////
-void ImuSensor::OnLinkData(ConstLinkDataPtr &_msg)
-{
-  boost::mutex::scoped_lock lock(this->mutex);
-  // Store the contacts message for processing in UpdateImpl
-  this->incomingLinkData[this->dataIndex] = _msg;
-  this->dataDirty = true;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 ImuSensor::GetAngularVelocity() const
-{
-  boost::mutex::scoped_lock lock(this->mutex);
-  return msgs::Convert(this->imuMsg.angular_velocity());
-}
-
-//////////////////////////////////////////////////
-math::Vector3 ImuSensor::GetLinearAcceleration() const
-{
-  boost::mutex::scoped_lock lock(this->mutex);
-  return msgs::Convert(this->imuMsg.linear_acceleration());
-}
-
-//////////////////////////////////////////////////
-math::Quaternion ImuSensor::GetOrientation() const
-{
-  boost::mutex::scoped_lock lock(this->mutex);
-  return msgs::Convert(this->imuMsg.orientation());
-}
-
-//////////////////////////////////////////////////
-void ImuSensor::SetReferencePose()
-{
-  this->referencePose = this->pose + this->parentEntity->GetWorldPose();
-}
-
-//////////////////////////////////////////////////
-bool ImuSensor::UpdateImpl(bool /*_force*/)
-{
-  msgs::LinkData msg;
-  int readIndex = 0;
-
+  // Get latest pose information
+  if (this->parentLink)
   {
-    boost::mutex::scoped_lock lock(this->mutex);
-
-    // Don't do anything if there is no new data to process.
-    if (!this->dataDirty)
-      return false;
-
-    readIndex = this->dataIndex;
-    this->dataIndex ^= 1;
-    this->dataDirty = false;
-  }
-
-  // toggle the index
-  msg.CopyFrom(*this->incomingLinkData[readIndex].get());
-
-  common::Time timestamp = msgs::Convert(msg.time());
-
-  double dt = (timestamp - this->lastMeasurementTime).Double();
-
-  this->lastMeasurementTime = timestamp;
-
-  if (dt > 0.0)
-  {
-    boost::mutex::scoped_lock lock(this->mutex);
-
-    this->imuMsg.set_entity_name(this->parentName);
-
-    this->gravity = this->world->GetPhysicsEngine()->GetGravity();
-
-    msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
-
-    math::Pose parentEntityPose = this->parentEntity->GetWorldPose();
-    math::Pose imuPose = this->pose + parentEntityPose;
-
-    // Set the IMU angular velocity
-    math::Vector3 imuWorldAngularVel
-        = msgs::Convert(msg.angular_velocity());
-
-    msgs::Set(this->imuMsg.mutable_angular_velocity(),
-              imuPose.rot.GetInverse().RotateVector(
-              imuWorldAngularVel));
-
-    // Compute and set the IMU linear acceleration
-    math::Vector3 imuWorldLinearVel
-        = msgs::Convert(msg.linear_velocity());
-    // Get the correct vel for imu's that are at an offset from parent link
-    imuWorldLinearVel +=
-        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
-    this->linearAcc = imuPose.rot.GetInverse().RotateVector(
-      (imuWorldLinearVel - this->lastLinearVel) / dt);
-
-    // Add contribution from gravity
-    this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
-    msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
-
-    // Set the IMU orientation
-    msgs::Set(this->imuMsg.mutable_orientation(),
-              (imuPose - this->referencePose).rot);
-
-    this->lastLinearVel = imuWorldLinearVel;
-
-    if (this->noiseActive)
+    // Measure position and apply noise
     {
-      switch (this->noiseType)
-      {
-        case GAUSSIAN:
-          // Add Gaussian noise + fixed bias to each rate
-          this->imuMsg.mutable_angular_velocity()->set_x(
-            this->imuMsg.angular_velocity().x() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean,
-              this->rateNoiseStdDev));
-          this->imuMsg.mutable_angular_velocity()->set_y(
-            this->imuMsg.angular_velocity().y() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean,
-              this->rateNoiseStdDev));
-          this->imuMsg.mutable_angular_velocity()->set_z(
-            this->imuMsg.angular_velocity().z() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean,
-              this->rateNoiseStdDev));
+      // Get pose in gazebo reference frame
+      math::Pose magPose = this->pose + this->parentLink->GetWorldPose();
 
-          // Add Gaussian noise + fixed bias to each acceleration
-          this->imuMsg.mutable_linear_acceleration()->set_x(
-            this->imuMsg.linear_acceleration().x() + this->accelBias +
-            math::Rand::GetDblNormal(this->accelNoiseMean,
-                                     this->accelNoiseStdDev));
-          this->imuMsg.mutable_linear_acceleration()->set_y(
-            this->imuMsg.linear_acceleration().y() + this->accelBias +
-            math::Rand::GetDblNormal(this->accelNoiseMean,
-                                     this->accelNoiseStdDev));
-          this->imuMsg.mutable_linear_acceleration()->set_z(
-            this->imuMsg.linear_acceleration().z() + this->accelBias +
-            math::Rand::GetDblNormal(this->accelNoiseMean,
-                                     this->accelNoiseStdDev));
+      // Get the reference magnetic field
+      math::Vector3 M = this->world->GetPhysicsEngine()->GetMagneticField();
 
-          // TODO: add noise to orientation
-          break;
-        default:
-          GZ_ASSERT(false, "Invalid noise model type");
-      }
+      // Rotate the magnetic field into the body frame
+      M = magPose.rot.GetInverse().RotateVector(M);
+
+      // Apply position noise before converting to global frame
+      magPose.x = this->noises[MagneticFieldNoiseX]->Apply(magPose.x);
+      magPose.y = this->noises[MagneticFieldNoiseY]->Apply(magPose.y);
+      magPose.z = this->noises[MagneticFieldNoiseZ]->Apply(magPose.z);
     }
-
-    if (this->pub)
-      this->pub->Publish(this->imuMsg);
   }
+
+  // Save the time of the measurement
+  this->lastMeasurementTime = this->world->GetSimTime();
+  msgs::Set(this->lastMagMsg.mutable_time(), this->lastMeasurementTime);
+
+  // Publish the message if needed
+  if (this->magPub)
+    this->magPub->Publish(this->lastMagMsg);
 
   return true;
 }
 
 //////////////////////////////////////////////////
-bool ImuSensor::IsActive()
+math::Vector3 MagnetometerSensor::GetMagneticField() const
 {
-  return this->active ||
-         (this->pub && this->pub->HasConnections());
+  boost::mutex::scoped_lock lock(this->mutex);
+  return msgs::Convert(this->magMsg.magnetic_field());
 }

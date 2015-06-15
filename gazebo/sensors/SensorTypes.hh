@@ -178,6 +178,51 @@ namespace gazebo
     /// \brief Vector of WirelessReceiver
     typedef std::vector<WirelessReceiver> WirelessReceiver_V;
 
+    /// \def SensorNoiseTypes
+    /// \brief Eumeration of all sensor noise types
+    enum SensorNoiseTypes
+    {
+      /// \brief Noise streams for the Camera sensor
+      /// \sa CameraSensor
+      CameraNoise = 0,
+
+      /// \brief Noise streams for the fluid pressure sensor
+      /// \sa FluidPressureSensor
+      FluidPressureNoise = 1,
+
+      /// \brief Noise streams for the GPS sensor
+      /// \sa GpsSensor
+      PosLatNoiseMeters = 2,
+      PosLonNoiseMeters = 3, 
+      PosAltNoiseMeters = 4,
+      VelLatNoiseMeters = 5, 
+      VelLonNoiseMeters = 6,
+      VelAltNoiseMeters = 7,
+
+      /// \brief Noise streams for the fluid pressure sensor
+      /// \sa FluidPressureSensor
+      FluidPressureNoisePascals = 8,
+
+      /// \brief Noise streams for the inertial measurement unit sensor
+      /// \sa ImuSensor
+      AngVelNoiseX = 9,
+      AngVelNoiseY = 10,
+      AngVelNoiseZ = 11,
+      LinAccNoiseX = 12,
+      LinAccNoiseY = 13, 
+      LinAccNoiseZ = 14,
+
+      /// \brief Noise streams for the magnetometer sensor
+      /// \sa MagnetometerSensor
+      MagneticFieldNoiseX = 15,
+      MagneticFieldNoiseY = 16,
+      MagneticFieldNoiseZ = 17,
+
+      /// \brief Noise streams for the multicamera sensor
+      /// \sa MultiCameraSensor
+      MultiCameraNoise = 18
+
+    };
 
     /// \}
   }

@@ -61,18 +61,21 @@ void FluidPressureSensor::Load(const std::string &_worldName)
   // Save the link to which this sensor is attached
   physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
   this->parentLink = boost::dynamic_pointer_cast<physics::Link>(parentEntity);
-  this->lastFluidPressureMsg.set_link_name(this->parentName);
+  this->lastFpMsg.set_link_name(this->parentName);
 
   // Create a message publisher to send out measurements
   this->topicName = "~/" + this->parentName + '/' + this->GetName();
   if (this->sdf->HasElement("topic"))
     this->topicName += '/' + this->sdf->Get<std::string>("topic");
   boost::replace_all(this->topicName, "::", "/");
-  this->fluidPressurePub = this->node->Advertise<msgs::FluidPressure>(this->topicName, 50);
+  this->fpPub = this->node->Advertise<msgs::FluidPressure>(this->topicName, 50);
+
+  // Parse sdf noise parameters
+  sdf::ElementPtr fpElem = this->sdf->GetElement("fluid_pressure");
 
   // Parse sdf noise parameters
   this->noises[FluidPressureNoisePascals] = NoiseFactory::NewNoiseModel(
-    this->sdf->GetElement("horizontal")->GetElement("noise"));
+    fpElem->->GetElement("noise"));
 }
 
 /////////////////////////////////////////////////
@@ -95,7 +98,7 @@ bool FluidPressureSensor::UpdateImpl(bool /*_force*/)
   if (this->parentLink)
   {
     // Measure position and apply noise
-    math::Pose fluidPressurePose = this->pose + this->parentLink->GetWorldPose();
+    math::Pose fpPose = this->pose + this->parentLink->GetWorldPose();
 
     // Reference: https://en.wikipedia.org/wiki/Atmospheric_pressure
     double p0 = this->world->GetPhysicsEngine()->GetPressure();              // Reference pressure
@@ -104,7 +107,7 @@ bool FluidPressureSensor::UpdateImpl(bool /*_force*/)
     double L  = 0.0065;                                                      // Temperature lapse rate
     double R  = 8.31447;                                                     // Universal gas constant
     double M  = 0.0289644;                                                   // Molar mass of dry air
-    double h  = fluidPressurePose.pos.z;                                     // Altitude          
+    double h  = fpPose.pos.z;                                                // Altitude          
 
     // Calculate the pressure based on the altitude
     double p = p0 * exp(1.0 - L * h / t0, g * M / R / L);
@@ -113,16 +116,16 @@ bool FluidPressureSensor::UpdateImpl(bool /*_force*/)
     p = this->noises[FluidPressureNoisePascals].Apply(p);
 
     // Set the sensor value
-    this->lastFluidPressureMsg.set_fluid_pressure(p);
+    this->lastFpMsg.set_fluid_pressure(p);
   }
 
   // Set the measurement time
   this->lastMeasurementTime = this->world->GetSimTime();
-  msgs::Set(this->lastFluidPressureMsg.mutable_time(), this->lastMeasurementTime);
+  msgs::Set(this->lastFpMsg.mutable_time(), this->lastMeasurementTime);
 
   // If we are publishing the sensor measurements, do so now
-  if (this->fluidPressurePub)
-    this->fluidPressurePub->Publish(this->lastFluidPressureMsg);
+  if (this->fpPub)
+    this->fpPub->Publish(this->lastFpMsg);
 
   return true;
 }
@@ -130,5 +133,5 @@ bool FluidPressureSensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 double FluidPressureSensor::GetFluidPressure() const
 {
-  return this->lastFluidPressureMsg.fluid_pressure();
+  return this->lastFpMsg.fluid_pressure();
 }

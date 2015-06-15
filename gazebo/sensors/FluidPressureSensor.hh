@@ -36,9 +36,6 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \brief Noise streams for the GPS sensor
-    enum FluidPressureNoise {FluidPressureNoisePascals};
-
     /// \class FluidPressureSensor FluidPressureSensor.hh sensors/sensors.hh
     /// \brief FluidPressureSensor to provide position measurement.
     class GAZEBO_VISIBLE FluidPressureSensor: public Sensor
@@ -70,7 +67,7 @@ namespace gazebo
       public: double GetFluidPressure() const;
 
       /// \brief Fluid pressure data publisher.
-      private: transport::PublisherPtr fluidPressurePub;
+      private: transport::PublisherPtr fpPub;
 
       /// \brief Topic name for fluid pressure data publisher.
       private: std::string topicName;
@@ -79,7 +76,7 @@ namespace gazebo
       private: physics::LinkPtr parentLink;
 
       /// \brief Stores most recent fluid pressure sensor data.
-      private: msgs::FluidPressure lastFluidPressureMsg;
+      private: msgs::FluidPressure lastFpMsg;
     };
     /// \}
   }

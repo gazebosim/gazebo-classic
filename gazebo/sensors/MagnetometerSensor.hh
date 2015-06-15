@@ -15,14 +15,18 @@
  *
 */
 
-#ifndef _MAGNETOMETERSENSOR_HH_
-#define _MAGNETOMETERSENSOR_HH_
+#ifndef _MAGNETOMETER_SENSOR_HH_
+#define _MAGNETOMETER_SENSOR_HH_
 
-#include <vector>
 #include <string>
 
-#include "gazebo/physics/PhysicsTypes.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -32,117 +36,47 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \class ImuSensor MagnetometerSensor.hh sensors/sensors.hh
-    /// \brief A magnetic field strength sensor.
+    /// \class MagnetometerSensor MagnetometerSensor.hh sensors/sensors.hh
+    /// \brief MagnetometerSensor to provide position measurement.
     class GAZEBO_VISIBLE MagnetometerSensor: public Sensor
     {
       /// \brief Constructor.
-      public: ImuSensor();
+      public: MagnetometerSensor();
 
       /// \brief Destructor.
       public: virtual ~MagnetometerSensor();
 
-      // Documentation inherited.
-      protected: void Load(const std::string &_worldName, sdf::ElementPtr _sdf);
+      // Documentation inherited
+      public: virtual void Load(const std::string & _worldName,
+                                sdf::ElementPtr _sdf);
 
-      // Documentation inherited.
-      protected: virtual void Load(const std::string &_worldName);
+      // Documentation inherited
+      public: virtual void Load(const std::string & _worldName);
 
-      /// \brief Initialize the IMU.
+      // Documentation inherited
       public: virtual void Init();
 
       // Documentation inherited
       protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
-      protected: virtual void Fini();
+      public: virtual void Fini();
 
-      /// \brief Returns the imu message
-      /// \return Imu message.
-      public: msgs::IMU GetImuMessage() const;
+      /// \brief Accessor for current amagnetic field in Tesla
+      /// \return Current magnetic field
+      public: math::Vector3 MagnetometerSensor::GetMagneticField()  const;
 
-      /// \brief Returns the body-frame magnetic field strength
-      /// \return Magnetic field strength
-      public: math::Vector3 GetMagneticField() const;
+      /// \brief GPS data publisher.
+      private: transport::PublisherPtr magPub;
 
-      // Documentation inherited.
-      public: virtual bool IsActive();
+      /// \brief Topic name for GPS data publisher.
+      private: std::string topicName;
 
-      /// \brief Callback when link data is received
-      /// \param[in] _msg Message containing link data
-      private: void OnLinkData(ConstLinkDataPtr &_msg);
+      /// \brief Parent link of this sensor.
+      private: physics::LinkPtr parentLink;
 
-      /// \brief Imu reference pose
-      private: math::Pose referencePose;
-
-      /// \brief Save previous imu linear velocity for computing acceleration.
-      private: math::Vector3 lastLinearVel;
-
-      /// \brief Imu linear acceleration
-      private: math::Vector3 linearAcc;
-
-      /// \brief store gravity vector to be added to the imu output.
-      private: math::Vector3 gravity;
-
-      /// \brief Imu data publisher
-      private: transport::PublisherPtr pub;
-
-      /// \brief Subscriber to link data published by parent entity
-      private: transport::SubscriberPtr linkDataSub;
-
-      /// \brief Parent entity which the IMU is attached to
-      private: physics::LinkPtr parentEntity;
-
-      /// \brief Imu message
-      private: msgs::IMU imuMsg;
-
-      /// \brief Mutex to protect reads and writes.
-      private: mutable boost::mutex mutex;
-
-      /// \brief Buffer for storing link data
-      private: boost::shared_ptr<msgs::LinkData const> incomingLinkData[2];
-
-      /// \brief Index for accessing element in the link data array
-      private: unsigned int dataIndex;
-
-      /// \brief True if new link data is received
-      private: bool dataDirty;
-
-      /// \brief Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-
-      /// \brief If true, apply the noise model specified by other noise
-      /// parameters
-      private: bool noiseActive;
-
-      /// \brief Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
-
-      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
-      /// from which we sample when adding noise to accelerations
-      private: double accelNoiseMean;
-
-      /// \brief If accelNoiseType==GAUSSIAN, the standard devation of the
-      /// distibution from which we sample when adding noise to accelerations
-      private: double accelNoiseStdDev;
-
-      /// \brief If noiseType==GAUSSIAN, the bias we'll add to acceleratations
-      private: double accelBias;
-
-      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
-      /// from which we sample when adding noise to rates
-      private: double rateNoiseMean;
-
-      /// \brief If noiseType==GAUSSIAN, the standard devation of the
-      /// distibution from which we sample when adding noise to rates
-      private: double rateNoiseStdDev;
-
-      /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
-      private: double rateBias;
+      /// \brief Stores most recent magnetometer sensor data.
+      private: msgs::Magnetometer lastMagMsg;
     };
     /// \}
   }
