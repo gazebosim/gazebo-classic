@@ -67,6 +67,7 @@ namespace gazebo
     class SelectionObj;
     class RayQuery;
     class Distortion;
+    class ReferenceGeometry;
 
 #ifdef HAVE_OCULUS
     class OculusCamera;
@@ -175,6 +176,10 @@ namespace gazebo
     /// \def DistortionPtr
     /// \brief Shared pointer to Distortion
     typedef boost::shared_ptr<Distortion> DistortionPtr;
+
+    /// \def ReferenceGeometryPtr
+    /// \brief Shared pointer to ReferenceGeometry
+    typedef boost::shared_ptr<ReferenceGeometry> ReferenceGeometryPtr;
 
 #ifdef HAVE_OCULUS
     /// \def OculusCameraPtr

@@ -50,6 +50,7 @@ set (sources
   OrthoViewController.cc
   Projector.cc
   RayQuery.cc
+  ReferenceGeometry.cc
   RenderEngine.cc
   RenderEvents.cc
   RenderingIface.cc
@@ -107,6 +108,7 @@ set (headers
   OrthoViewController.hh
   Projector.hh
   RayQuery.hh
+  ReferenceGeometry.hh
   RenderEngine.hh
   RenderEvents.hh
   RenderingIface.hh
@@ -147,6 +149,7 @@ set (gtest_sources_dri
   Heightmap_TEST.cc
   JointVisual_TEST.cc
   OriginVisual_TEST.cc
+  ReferenceGeometry_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
