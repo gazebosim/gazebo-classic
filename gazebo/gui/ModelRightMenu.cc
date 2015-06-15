@@ -115,6 +115,13 @@ ModelRightMenu::ModelRightMenu()
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
 
+  state = new ViewState(this, "show_link_origin", "hide_link_origin");
+  state->action = new QAction(tr("Link Origin"), this);
+  state->action->setStatusTip(tr("Show link origins"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
   // \todo Reimplement
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));

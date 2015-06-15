@@ -68,6 +68,7 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_showJointsAct;
     extern GZ_GUI_VISIBLE QAction *g_showCOMAct;
     extern GZ_GUI_VISIBLE QAction *g_showInertiaAct;
+    extern GZ_GUI_VISIBLE QAction *g_showLinkOriginAct;
     extern GZ_GUI_VISIBLE QAction *g_transparentAct;
 
     extern GZ_GUI_VISIBLE QAction *g_resetAct;

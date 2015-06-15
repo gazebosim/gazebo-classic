@@ -287,6 +287,9 @@ namespace gazebo
       /// \brief True when all inertias should be visualized.
       public: bool showInertias;
 
+      /// \brief True when all link origins should be visualized.
+      public: bool showLinkOrigins;
+
       /// \brief True when all collisions should be visualized.
       public: bool showCollisions;
 

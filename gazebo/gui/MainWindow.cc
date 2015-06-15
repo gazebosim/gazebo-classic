@@ -900,6 +900,17 @@ void MainWindow::ShowInertia()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowLinkOrigin()
+{
+  if (g_showLinkOriginAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_link_origin", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_link_origin", "all");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowContacts()
 {
   if (g_showContactsAct->isChecked())
@@ -1227,6 +1238,13 @@ void MainWindow::CreateActions()
   g_showInertiaAct->setChecked(false);
   connect(g_showInertiaAct, SIGNAL(triggered()), this,
       SLOT(ShowInertia()));
+
+  g_showLinkOriginAct = new QAction(tr("Link Origins"), this);
+  g_showLinkOriginAct->setStatusTip(tr("Show link origins"));
+  g_showLinkOriginAct->setCheckable(true);
+  g_showLinkOriginAct->setChecked(false);
+  connect(g_showLinkOriginAct, SIGNAL(triggered()), this,
+      SLOT(ShowLinkOrigin()));
 
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
@@ -1563,6 +1581,9 @@ void MainWindow::DeleteActions()
   delete g_showInertiaAct;
   g_showInertiaAct = 0;
 
+  delete g_showLinkOriginAct;
+  g_showLinkOriginAct = 0;
+
   delete g_showContactsAct;
   g_showContactsAct = 0;
 
@@ -1662,6 +1683,7 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showJointsAct);
   viewMenu->addAction(g_showCOMAct);
   viewMenu->addAction(g_showInertiaAct);
+  viewMenu->addAction(g_showLinkOriginAct);
   viewMenu->addAction(g_showContactsAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));

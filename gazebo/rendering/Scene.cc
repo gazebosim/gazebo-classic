@@ -35,6 +35,7 @@
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
+#include "gazebo/rendering/AxisVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -96,6 +97,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->initialized = false;
   this->dataPtr->showCOMs = false;
   this->dataPtr->showInertias = false;
+  this->dataPtr->showLinkOrigins = false;
   this->dataPtr->showCollisions = false;
   this->dataPtr->showJoints = false;
   this->dataPtr->transparent = false;
@@ -2091,6 +2093,11 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     this->CreateInertiaVisual(_msg, linkVis);
   }
 
+  if (!this->GetVisual(_msg->name() + "_LINK_ORIGIN_VISUAL__"))
+  {
+    this->CreateLinkOriginVisual(_msg, linkVis);
+  }
+
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
@@ -2320,6 +2327,30 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
         vis->ShowInertia(false);
     }
   }
+  else if (_msg->request() == "show_link_origin")
+  {
+    if (_msg->data() == "all")
+      this->ShowLinkOrigins(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowLinkOrigin(true);
+      else
+        gzerr << "Unable to find link origin visual[" << _msg->data() << "]\n";
+    }
+  }
+  else if (_msg->request() == "hide_link_origin")
+  {
+    if (_msg->data() == "all")
+      this->ShowLinkOrigins(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowLinkOrigin(false);
+    }
+  }
   else if (_msg->request() == "set_transparent")
   {
     if (_msg->data() == "all")
@@ -2478,6 +2509,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 
       visual->ShowCOM(this->dataPtr->showCOMs);
       visual->ShowInertia(this->dataPtr->showInertias);
+      visual->ShowLinkOrigin(this->dataPtr->showLinkOrigins);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
       visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
@@ -2955,10 +2987,25 @@ void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 {
   InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
-      "_Inertia_VISUAL__", _linkVisual));
+      "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_elem);
   inertiaVis->SetVisible(false);
   this->dataPtr->visuals[inertiaVis->GetId()] = inertiaVis;
+}
+
+/////////////////////////////////////////////////
+void Scene::CreateLinkOriginVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+{
+  AxisVisualPtr linkOriginVis(new AxisVisual(_msg->name() +
+      "_LINK_ORIGIN_VISUAL__", _linkVisual));
+  linkOriginVis->Load(_msg);
+
+  linkOriginVis->ShowAxisHead(0, false);
+  linkOriginVis->ShowAxisHead(1, false);
+  linkOriginVis->ShowAxisHead(2, false);
+
+  linkOriginVis->SetVisible(this->dataPtr->showLinkOrigins);
+  this->dataPtr->visuals[linkOriginVis->GetId()] = linkOriginVis;
 }
 
 /////////////////////////////////////////////////
@@ -3001,6 +3048,16 @@ void Scene::ShowInertias(bool _show)
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ShowInertia(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowLinkOrigins(bool _show)
+{
+  this->dataPtr->showLinkOrigins = _show;
+  for (auto visual : this->dataPtr->visuals)
+  {
+    visual.second->ShowLinkOrigin(_show);
   }
 }
 

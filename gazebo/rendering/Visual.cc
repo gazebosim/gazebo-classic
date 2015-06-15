@@ -2827,6 +2827,18 @@ void Visual::ShowInertia(bool _show)
 }
 
 //////////////////////////////////////////////////
+void Visual::ShowLinkOrigin(bool _show)
+{
+  if (this->GetName().find("LINK_ORIGIN_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  for (auto &child : this->dataPtr->children)
+  {
+    child->ShowLinkOrigin(_show);
+  }
+}
+
+//////////////////////////////////////////////////
 void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
 {
   if (!this->dataPtr->skeleton)

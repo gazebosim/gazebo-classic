@@ -43,6 +43,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~AxisVisual();
 
+      /// \brief Load from a message
+      /// \param[in] _msg Pointer to the message
+      public: virtual void Load(ConstLinkPtr &_msg);
+
       /// \brief Load the axis visual
       public: virtual void Load();
 

@@ -36,6 +36,12 @@ namespace gazebo
 
       /// \brief Pointer to the z-axis visual.
       public: ArrowVisualPtr zAxis;
+
+      /// \brief Parent element name.
+      public: std::string elementName;
+
+      /// \brief Scale based on the size of the parent element.
+      public: math::Vector3 scaleToElement;
     };
   }
 }
