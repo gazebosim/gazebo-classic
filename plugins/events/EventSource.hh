@@ -24,7 +24,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/transport/TransportTypes.hh"
-
+ 
 #include "SimEventsException.hh"
 
 namespace gazebo

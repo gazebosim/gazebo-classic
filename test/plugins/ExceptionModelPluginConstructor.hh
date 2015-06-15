@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+ 
 #ifndef _GAZEBO_EXCEPTION_MODEL_PLUGIN_CONSTRUCTOR_HH_
 #define _GAZEBO_EXCEPTION_MODEL_PLUGIN_CONSTRUCTOR_HH_
 

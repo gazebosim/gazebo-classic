@@ -21,14 +21,13 @@
 #include <map>
 #include <string>
 #include <vector>
-
 #include "plugins/events/Region.hh"
 #include "plugins/events/EventSource.hh"
 
 namespace gazebo
 {
   /// \brief The event generator class
-  class InRegionEventSource: public EventSource
+  class GAZEBO_VISIBLE InRegionEventSource: public EventSource
   {
     /// \brief Constructor
     /// \param[in] _pub the publisher for the SimEvents

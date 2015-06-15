@@ -17,6 +17,12 @@
 #ifndef _GAZEBO_GUI_CESSNA_PLUGIN_HH_
 #define _GAZEBO_GUI_CESSNA_PLUGIN_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <mutex>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>

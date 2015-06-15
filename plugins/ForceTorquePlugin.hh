@@ -18,15 +18,16 @@
 #ifndef _GAZEBO_FORCE_TORQUE_PLUGIN_HH_
 #define _GAZEBO_FORCE_TORQUE_PLUGIN_HH_
 
+#include "gazebo/util/system.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/util/system.hh"
+
 
 namespace gazebo
 {
   /// \brief An base class plugin for custom force torque sensor processing.
-  class GAZEBO_VISIBLE ForceTorquePlugin : public SensorPlugin
+  class GZ_PLUGIN_VISIBLE ForceTorquePlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: ForceTorquePlugin();

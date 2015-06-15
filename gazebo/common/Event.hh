@@ -153,7 +153,7 @@ namespace gazebo
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.
     template< typename T>
-    class GZ_COMMON_VISIBLE EventT : public Event
+    class EventT : public Event
     {
       /// \def EvtConnectionMap.
       /// \brief Event Connection map typedef.

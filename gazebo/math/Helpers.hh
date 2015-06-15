@@ -137,6 +137,10 @@ namespace gazebo
       return sum / _values.size();
     }
 
+//because windows defines min and max macros in minwindef.h
+#ifdef min
+    #undef min
+#endif    
     /// \brief get the maximum value of vector of values
     /// \param[in] _values the vector of values
     /// \return maximum
@@ -150,6 +154,10 @@ namespace gazebo
       return max;
     }
 
+//because windows defines min and max macros in minwindef.h
+#ifdef max
+    #undef max
+#endif    
     /// \brief get the minimum value of vector of values
     /// \param[in] _values the vector of values
     /// \return minimum

@@ -22,13 +22,12 @@
 #include <set>
 #include <string>
 #include <vector>
-
 #include "SimEventsException.hh"
 #include "SimStateEventSource.hh"
 
 namespace gazebo
 {
-  class SimEventsPlugin : public WorldPlugin
+  class GAZEBO_VISIBLE SimEventsPlugin : public WorldPlugin
   {
     /// \brief Destrutor
     public: virtual ~SimEventsPlugin();

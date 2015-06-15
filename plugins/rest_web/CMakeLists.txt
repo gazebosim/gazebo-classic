@@ -1,3 +1,7 @@
+if (WIN32)
+  add_definitions(-DBUILDING_DLL)
+endif()
+
 link_directories(
   ${GAZEBO_LIBRARY_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}

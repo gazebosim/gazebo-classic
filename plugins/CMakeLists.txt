@@ -1,3 +1,7 @@
+if (WIN32)
+  add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN)
+endif()
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
@@ -28,7 +32,7 @@ endif()
 set (plugins
   ActuatorPlugin
   ArrangePlugin
-  BreakableJointPlugin
+  #BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
   CartDemoPlugin
@@ -69,17 +73,20 @@ set (GUIplugins
 set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/
 )
+
+
 foreach (src ${plugins})
-  add_library(${src} SHARED ${src}.cc)
+  #plugins must be shared libraries
+  add_library(${src} SHARED ${src}.cc) 
   target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})
 
-target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
-set_target_properties(BreakableJointPlugin PROPERTIES
-  INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
-)
+#target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
+#set_target_properties(BreakableJointPlugin PROPERTIES
+  #INSTALL_RPATH "${GAZEBO_PLUGIN_INSTALL_DIR}"
+#)
 
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)
@@ -89,5 +96,8 @@ foreach (src ${GUIplugins})
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${GUIplugins})
 
+if (NOT WIN32)
+  add_subdirectory(rest_web)
+endif()
+
 add_subdirectory(events)
-add_subdirectory(rest_web)

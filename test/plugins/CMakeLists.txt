@@ -23,7 +23,11 @@ set (plugins
   SpringTestPlugin
 )
 
+if (WIN32)
+  add_definitions(-DBUILDING_DLL)	
+endif()
+
 foreach (src ${plugins})
-  add_library(${src} SHARED ${src}.cc)
+	add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
 endforeach (src ${plugins})
