@@ -501,7 +501,11 @@ void World::LogStep()
     // and then, step forward up to the target frame.
     // ToDo: Use keyframes in the log file to speed up this process.
     if (!util::LogPlay::Instance()->Rewind())
+    {
       gzerr << "Error processing a negative multi-step" << std::endl;
+      this->dataPtr->stepInc = 0;
+      return;
+    }
 
     this->dataPtr->stepInc = this->dataPtr->iterations + this->dataPtr->stepInc;
 
