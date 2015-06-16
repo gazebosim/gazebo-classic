@@ -33,6 +33,10 @@ using namespace rendering;
 AxisVisual::AxisVisual(const std::string &_name, VisualPtr _vis)
   : Visual(*new AxisVisualPrivate, _name, _vis, false)
 {
+  AxisVisualPrivate *dPtr =
+      reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_GUI;
 }
 
 /////////////////////////////////////////////////

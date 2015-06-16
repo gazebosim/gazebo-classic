@@ -22,6 +22,8 @@
 #include <vector>
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"

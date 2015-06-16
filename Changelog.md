@@ -1,4 +1,15 @@
 ## Gazebo 6.0
+1. Implement forward/backwards multi-step for log playback. Now, the semantics
+of a multi-step while playing back a log session are different from a multi-step
+during a live simulation. While playback, a multi-step simulates all the
+intermediate steps as before, but the client only perceives a single step.
+E.g: You have a log file containing a 1 hour simulation session. You want to
+jump to the minute 00H::30M::00S to check a specific aspect of the simulation.
+You should not see continuous updates until minute 00H:30M:00S. Instead, you
+should visualize a single jump to the specific instant of the simulation that
+you are interested.
+    * [Pull request #1623](https://bitbucket.org/osrf/gazebo/pull-request/1623)
+
 1. Added browse button to log record dialog.
     * [Pull request #1719](https://bitbucket.org/osrf/gazebo/pull-request/1719)
 
@@ -81,6 +92,9 @@ compilation on Windows.
 1. Laser visualization renders light blue for rays that do not hit obstacles, and dark blue for other rays.
     * [Pull request #1607](https://bitbucket.org/osrf/gazebo/pull-request/1607)
     * [Issue #1576](https://bitbucket.org/osrf/gazebo/issue/1576)
+
+1. Add VisualType enum to Visual and clean up visuals when entity is deleted.
+    * [Pull request #1614](https://bitbucket.org/osrf/gazebo/pull-request/1614)
 
 1. Alert user of connection problems when using the REST service plugin
     * [Pull request #1655](https://bitbucket.org/osrf/gazebo/pull-request/1655)

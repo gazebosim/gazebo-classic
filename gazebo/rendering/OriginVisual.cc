@@ -28,6 +28,9 @@ using namespace rendering;
 OriginVisual::OriginVisual(const std::string &_name, VisualPtr _vis)
   : Visual(*new OriginVisualPrivate, _name, _vis, false)
 {
+  OriginVisualPrivate *dPtr =
+      reinterpret_cast<OriginVisualPrivate *>(this->dataPtr);
+  dPtr->type = VT_GUI;
 }
 
 /////////////////////////////////////////////////
@@ -71,4 +74,3 @@ void OriginVisual::Load()
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
-

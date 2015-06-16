@@ -31,6 +31,7 @@
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -571,7 +572,10 @@ namespace gazebo
 
       /// \brief Process a visual message.
       /// \param[in] _msg The message data.
-      private: bool ProcessVisualMsg(ConstVisualPtr &_msg);
+      /// \param[in] _type Type of visual.
+      /// \return True if message is processed successfully.
+      private: bool ProcessVisualMsg(ConstVisualPtr &_msg,
+          rendering::VisualType _type = rendering::VT_ENTITY);
 
       /// \brief Light message callback.
       /// \param[in] _msg The message data.
@@ -629,6 +633,11 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateLinkOriginVisual(ConstLinkPtr &_msg,
           VisualPtr _linkVisual);
+
+      /// \brief Helper function to remove all visualizations attached to a
+      /// visual.
+      /// \param[in] _vis Visual that the visualizations are attached to.
+      private: void RemoveVisualizations(VisualPtr _vis);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -534,6 +534,14 @@ namespace gazebo
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
 
+      /// \brief Get type of visual.
+      /// \return Visual type.
+      public: VisualType GetType() const;
+
+      /// \brief Set type of visual.
+      /// \param[in] _type Visual type.
+      public: void SetType(const VisualType _type);
+
       /// \internal
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to private data.
