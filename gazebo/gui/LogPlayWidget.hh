@@ -54,15 +54,15 @@ namespace gazebo
 
       /// \brief Emit signal to set current time.
       /// \param[in] _time Current time.
-      public: void EmitSetCurrentTime(common::Time _time);
+      public: void EmitSetCurrentTime(const common::Time &_time);
 
       /// \brief Emit signal to set start time.
       /// \param[in] _time Start time.
-      public: void EmitSetStartTime(common::Time _time);
+      public: void EmitSetStartTime(const common::Time &_time);
 
       /// \brief Emit signal to set end time.
       /// \param[in] _time End time.
-      public: void EmitSetEndTime(common::Time _time);
+      public: void EmitSetEndTime(const common::Time &_time);
 
       /// \brief Play simulation.
       public slots: void OnPlay();
@@ -94,16 +94,16 @@ namespace gazebo
       signals: void SetEndTime(const QString &);
 
       /// \brief Qt signal used to set the current time in the view.
-      /// \param[in] _time Time in ms.
-      signals: void SetCurrentTime(int _time);
+      /// \param[in] _time Current time.
+      signals: void SetCurrentTime(const common::Time &_time);
 
       /// \brief Qt signal used to set the start time in the view.
-      /// \param[in] _time Time in ms.
-      signals: void SetStartTime(int _time);
+      /// \param[in] _time Start time.
+      signals: void SetStartTime(const common::Time &_time);
 
       /// \brief Qt signal used to set the end time in the view.
-      /// \param[in] _time Eime in ms.
-      signals: void SetEndTime(int _time);
+      /// \param[in] _time End time.
+      signals: void SetEndTime(const common::Time &_time);
 
       /// \internal
       /// \brief Pointer to private data.
@@ -121,16 +121,16 @@ namespace gazebo
       public: LogPlayView(LogPlayWidget *_parent = 0);
 
       /// \brief Set the position of the current time item.
-      /// \param[in] _msec Absolute time in ms.
-      public slots: void SetCurrentTime(int _msec);
+      /// \param[in] _msec Current time.
+      public slots: void SetCurrentTime(const common::Time &_time);
 
       /// \brief Set the log start time.
-      /// \param[in] _msec Start time in ms.
-      public slots: void SetStartTime(int _msec);
+      /// \param[in] _msec Start time.
+      public slots: void SetStartTime(const common::Time &_time);
 
       /// \brief Set the log end time.
-      /// \param[in] _msec End time position in ms.
-      public slots: void SetEndTime(int _msec);
+      /// \param[in] _msec End time.
+      public slots: void SetEndTime(const common::Time &_time);
 
       /// \brief Draw the timeline.
       public slots: void DrawTimeline();

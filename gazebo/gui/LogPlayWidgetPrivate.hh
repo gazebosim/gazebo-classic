@@ -39,6 +39,9 @@ namespace gazebo
       /// \brief Log end time.
       public: common::Time endTime;
 
+      /// \brief Log current time.
+      public: common::Time currentTime;
+
       /// \brief If log is less than 1 hour long.
       public: bool lessThan1h;
 
@@ -54,10 +57,10 @@ namespace gazebo
       public: CurrentTimeItem *currentTimeItem;
 
       /// \brief Start time in milliseconds.
-      public: int startTime;
+      public: common::Time startTime;
 
       /// \brief End time in milliseconds.
-      public: int endTime;
+      public: common::Time endTime;
 
       /// \brief Log start time has been set or not.
       public: bool startTimeSet;
