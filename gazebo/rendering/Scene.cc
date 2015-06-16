@@ -1831,7 +1831,28 @@ void Scene::PreRender()
   // Process the visual messages.
   for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_VISUAL))
+    VisualType visualType = VT_VISUAL;
+    if ((*visualIter)->has_type())
+    {
+      switch ((*visualIter)->type())
+      {
+        case msgs::Visual::MODEL:
+          visualType = VT_MODEL;
+          break;
+        case msgs::Visual::LINK:
+          visualType = VT_LINK;
+          break;
+        case msgs::Visual::COLLISION:
+          visualType = VT_COLLISION;
+          break;
+        case msgs::Visual::VISUAL:
+          visualType = VT_VISUAL;
+          break;
+        default:
+          break;
+      }
+    }
+    if (this->ProcessVisualMsg(*visualIter, visualType))
       visualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -2533,6 +2554,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
       result = true;
       visual->LoadFromMsg(_msg);
       visual->SetType(_type);
+
+      std::cerr << visual->GetName() << " " << _type << std::endl;
 
       this->dataPtr->visuals[visual->GetId()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||

@@ -101,11 +101,11 @@ void Collision::Load(sdf::ElementPtr _sdf)
   else
     gzwarn << "No shape has been specified. Error!!!\n";
 
-  if (!this->shape->HasType(Base::MULTIRAY_SHAPE) &&
+/*  if (!this->shape->HasType(Base::MULTIRAY_SHAPE) &&
       !this->shape->HasType(Base::RAY_SHAPE))
   {
     this->visPub->Publish(this->CreateCollisionVisual());
-  }
+  }*/
 }
 
 //////////////////////////////////////////////////
@@ -333,6 +333,7 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
+  msg.set_type(msgs::Visual::COLLISION);
   msgs::Set(msg.mutable_pose(), this->GetRelativePose());
   msg.mutable_material()->mutable_script()->add_uri(
       "file://media/materials/scripts/gazebo.material");
