@@ -52,10 +52,11 @@ TEST_F(ReferenceGeometry_TEST, ReferenceGeometryTest)
   referenceGeomVis->Load();
 
   EXPECT_EQ(referenceGeomVis->GetReferenceGeometryType(),
-      ReferenceGeometry::RGT_NONE);
+      rendering::ReferenceGeometry::RGT_NONE);
   EXPECT_EQ(referenceGeomVis->GetChildCount(), 0u);
 
-  referenceGeomVis->SetReferenceGeometry(ReferenceGeometry::RGT_AXIS);
+  referenceGeomVis->SetReferenceGeometryType(
+      rendering::ReferenceGeometry::RGT_AXIS);
   EXPECT_GT(referenceGeomVis->GetChildCount(), 0u);
 }
 

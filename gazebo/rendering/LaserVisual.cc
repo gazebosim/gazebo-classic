@@ -41,6 +41,8 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VT_SENSOR;
+
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
