@@ -172,7 +172,7 @@ TEST_F(Scene_TEST, VisualType)
   int sleep = 0;
   int maxSleep = 10;
   rendering::VisualPtr box, sphere, cylinder, newBox;
-  while ((!box || !sphere || !cylinder) && sleep < maxSleep)
+  while ((!box || !sphere || !cylinder || !newBox) && sleep < maxSleep)
   {
     box = scene->GetVisual("box");
     cylinder = scene->GetVisual("cylinder");
