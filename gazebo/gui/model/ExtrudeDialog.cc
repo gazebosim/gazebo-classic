@@ -194,11 +194,11 @@ void ExtrudeDialog::UpdateView()
   // Find extreme values to center and scale
   math::Vector2d min(paths[0].polylines[0][0]);
   math::Vector2d max(min);
-  for (auto p : paths)
+  for (const auto &p : paths)
   {
-    for (auto poly : p.polylines)
+    for (const auto &poly : p.polylines)
     {
-      for (auto pt : poly)
+      for (const auto &pt : poly)
       {
         if (pt.x < min.x)
           min.x = pt.x;

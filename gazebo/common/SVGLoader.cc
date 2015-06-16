@@ -408,8 +408,12 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       case 'Z':
       case 'z':
         {
-          if (!(_polyline.front() == _polyline.back()))
-            _polyline.push_back(_polyline.front());
+          auto &p = _polyline.front();
+          if (_polyline.back().Distance(p) > 1e-5)
+          {
+            gzerr << "Zz" << _polyline.back().Distance(p) << std::endl;
+            _polyline.push_back(p);
+          }
           break;
         }
       default:
@@ -656,14 +660,13 @@ bool SVGLoader::Parse(const std::string &_filename,
   {
     // load the named file and dump its structure to STDOUT
     TiXmlDocument doc(_filename.c_str());
-    bool loadOkay = doc.LoadFile();
-    if (!loadOkay)
+    if (!doc.LoadFile())
     {
       std::ostringstream os;
       gzerr << "Failed to load file " <<  _filename << std::endl;
       gzerr << os.str() << std::endl;
+      return false;
     }
-
     this->GetSvgPaths(&doc, _paths);
     return true;
   }
@@ -859,23 +862,19 @@ function draw(showCtrlPoints)
 }
 
 /////////////////////////////////////////////////
-bool Vector2dCompare(const math::Vector2d &a, const math::Vector2d &b,
-                     double tol)
+bool Vector2dCompare(const math::Vector2d &_a, const math::Vector2d &_b,
+                     double _tol)
 {
-  double x = a.x - b.x;
-  double y = a.y - b.y;
+  double x = _a.x - _b.x;
+  double y = _a.y - _b.y;
   // is squared distance smaller than squared tolerance?
-  if (x*x + y*y < tol * tol)
-  {
-    return true;
-  }
-  return false;
+  return (x*x + y*y < _tol * _tol);
 }
 
 /////////////////////////////////////////////////
 void SVGLoader::PathsToClosedPolylines(
                       const std::vector<common::SVGPath> &_paths,
-                      double tol,
+                      double _tol,
                       std::vector< std::vector<math::Vector2d> > &_closedPolys,
                       std::vector< std::vector<math::Vector2d> > &_openPolys)
 {
@@ -890,7 +889,7 @@ void SVGLoader::PathsToClosedPolylines(
       {
         const math::Vector2d &endPoint = poly[i];
         double length = endPoint.Distance(startPoint);
-        if (length < tol)
+        if (length < _tol)
         {
           gzmsg << "Ignoring short segment (length: "
                 << length << ")" <<std::endl;
@@ -927,12 +926,12 @@ void SVGLoader::PathsToClosedPolylines(
       {
         auto seg = *it;
         math::Vector2d nextPoint;
-        if (Vector2dCompare(polyline.back(), seg.first, tol))
+        if (Vector2dCompare(polyline.back(), seg.first, _tol))
         {
           nextPoint = seg.second;
           segmentFound = true;
         }
-        if (Vector2dCompare(polyline.back(), seg.second, tol))
+        if (Vector2dCompare(polyline.back(), seg.second, _tol))
         {
           nextPoint = seg.first;
           segmentFound = true;
@@ -944,7 +943,7 @@ void SVGLoader::PathsToClosedPolylines(
           // add the new point to the polyline
           polyline.push_back(nextPoint);
           // verify if the polyline is closed
-          if (Vector2dCompare(nextPoint, polyline[0], tol))
+          if (Vector2dCompare(nextPoint, polyline[0], _tol))
           {
             // the loop is closed, we don't need another segment
             loopClosed = true;
@@ -963,7 +962,7 @@ void SVGLoader::PathsToClosedPolylines(
     else
     {
       gzmsg << "Line segments that are not part of a closed paths have"
-         << " been found with the current minimum distance of " << tol
+         << " been found with the current minimum distance of " << _tol
          << " between 2 points."  << std::endl << std::endl;
       _openPolys.push_back(polyline);
     }

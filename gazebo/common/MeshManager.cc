@@ -529,13 +529,11 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
                                                   vertices,
                                                   edges);
   #if HAVE_GTS
+  if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, subMesh))
   {
-    if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, subMesh))
-    {
-      gzerr << "Unable to triangulate polyline." << std::endl;
-      delete mesh;
-      return;
-    }
+    gzerr << "Unable to triangulate polyline." << std::endl;
+    delete mesh;
+    return;
   }
   #endif
 
@@ -1268,7 +1266,8 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
 #endif
 
 //////////////////////////////////////////////////
-size_t AddPointToVerticesTable(std::vector<math::Vector2d> &_vertices,
+size_t MeshManager::AddIfNotExistsPointToVerticesTable(
+                     std::vector<math::Vector2d> &_vertices,
                      const math::Vector2d &_p,
                      double _tol)
 {
@@ -1288,24 +1287,6 @@ size_t AddPointToVerticesTable(std::vector<math::Vector2d> &_vertices,
 }
 
 //////////////////////////////////////////////////
-void AddEdge(std::vector<math::Vector2i> &_edges,
-             size_t a,
-             size_t b)
-{
-  // store the smaller index first, in case we have
-  // to seach for duplicate edges
-  if (a < b)
-  {
-    size_t tmp = a;
-    a = b;
-    b = tmp;
-  }
-  math::Vector2i e(a, b);
-  _edges.push_back(e);
-}
-
-
-//////////////////////////////////////////////////
 void MeshManager::ConvertPolylinesToVerticesAndEdges(
                       const std::vector<std::vector<math::Vector2d> > &_polys,
                       double _tol,
@@ -1318,8 +1299,10 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
     for (auto i = 1u; i != poly.size(); ++i)
     {
       auto p = poly[i];
-      auto startPointIndex = AddPointToVerticesTable(_vertices, previous, _tol);
-      auto endPointIndex = AddPointToVerticesTable(_vertices, p, _tol);
+      auto startPointIndex = AddIfNotExistsPointToVerticesTable(_vertices,
+                                                              previous, _tol);
+      auto endPointIndex = AddIfNotExistsPointToVerticesTable(_vertices,
+                                                              p, _tol);
       // current end point is now the starting point for the next edge
       previous = p;
       if (startPointIndex == endPointIndex)
@@ -1327,7 +1310,9 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
         gzwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
         continue;
       }
-      AddEdge(edges, startPointIndex, endPointIndex);
+      // add the new edge
+      math::Vector2i e(startPointIndex, endPointIndex);
+      edges.push_back(e);
     }
   }
 }

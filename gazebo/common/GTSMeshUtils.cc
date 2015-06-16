@@ -132,7 +132,7 @@ GtsSurface *GTSMeshUtils::DelaunayTriangulation(
   GtsSurface *surface;
   verticesList = NULL;
 
-  for (auto vertex : _vertices)
+  for (const auto &vertex : _vertices)
   {
     verticesList = g_slist_append(verticesList,
           gts_vertex_new(gts_vertex_class(),
@@ -141,7 +141,7 @@ GtsSurface *GTSMeshUtils::DelaunayTriangulation(
 
   GtsFifo *edgeList;
   edgeList = gts_fifo_new();
-  for (auto edge : _edges)
+  for (const auto &edge : _edges)
   {
     gts_fifo_push(edgeList,
             gts_edge_new(GTS_EDGE_CLASS(gts_constraint_class()),
@@ -238,3 +238,4 @@ bool GTSMeshUtils::DelaunayTriangulation(
   gts_object_destroy(GTS_OBJECT(surface));
   return true;
 }
+

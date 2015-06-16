@@ -650,13 +650,13 @@ std::string ModelCreator::AddShape(LinkType _type,
     std::vector< std::vector<math::Vector2d> > closedPolys;
     std::vector< std::vector<math::Vector2d> > openPolys;
     svgLoader.PathsToClosedPolylines(paths, 0.05, closedPolys, openPolys);
-    if (closedPolys.size() == 0)
+    if (closedPolys.empty())
     {
       gzerr << "No closed polylines found on file [" << _uri << "]"
         << std::endl;
       return std::string();
     }
-    if (openPolys.size() > 0)
+    if (!openPolys.empty())
     {
       gzmsg << "There are " << openPolys.size() << "open polylines. "
         << "They will be ignored." << std::endl;
@@ -665,9 +665,9 @@ std::string ModelCreator::AddShape(LinkType _type,
     math::Vector2d min(paths[0].polylines[0][0]);
     math::Vector2d max(min);
 
-    for (std::vector<math::Vector2d> poly : closedPolys)
+    for (const std::vector<math::Vector2d> &poly : closedPolys)
     {
-      for (math::Vector2d pt : poly)
+      for (const math::Vector2d &pt : poly)
       {
         if (pt.x < min.x)
           min.x = pt.x;
@@ -679,15 +679,15 @@ std::string ModelCreator::AddShape(LinkType _type,
           max.y = pt.y;
       }
     }
-    for (std::vector<math::Vector2d> poly : closedPolys)
+    for (const std::vector<math::Vector2d> &poly : closedPolys)
     {
       sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
       polylineElem->GetElement("height")->Set(_size.z);
 
-      for (math::Vector2d pt : poly)
+      for (const math::Vector2d &p : poly)
       {
         // Translate to center
-        pt = pt - min - (max-min)*0.5;
+        math::Vector2d pt = p - min - (max-min)*0.5;
         // Swap X and Y so Z will point up
         // (in 2D it points into the screen)
         sdf::ElementPtr pointElem = polylineElem->AddElement("point");

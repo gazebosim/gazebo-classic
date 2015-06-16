@@ -244,7 +244,19 @@ namespace gazebo
                       const std::vector<std::vector<math::Vector2d> > &_polys,
                       double _tol,
                       std::vector<math::Vector2d> &_vertices,
-                      std::vector<math::Vector2i> &edges);
+                      std::vector<math::Vector2i> &_edges);
+
+      /// \brief Check a point againts a list, and adds it to the list
+      /// if it is not in the list already.
+      /// \param[in] _vertices the vertex table where points are stored
+      /// \param[in] _p the point coordinates
+      /// \param[in] _tol the maximum distance under which 2 points are
+      /// considered to be the same point.
+      /// \return the index of the point.
+      private: static size_t AddIfNotExistsPointToVerticesTable(
+                      std::vector<math::Vector2d> &_vertices,
+                      const math::Vector2d &_p,
+                      double _tol);
 
       /// \brief 3D mesh loader for COLLADA files
       private: ColladaLoader *colladaLoader;
