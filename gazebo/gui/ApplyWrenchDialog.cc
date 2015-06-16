@@ -470,10 +470,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
     rendering::VisualPtr childVis = vis->GetChild(i);
     std::string linkName = childVis->GetName();
 
-    // Issue #1553: This is failing to get real links sometimes:
-    // uint32_t flags = childVis->GetVisibilityFlags();
-    // if (!((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI)))
-    if (linkName.find("_GL_MANIP_") == std::string::npos)
+    if (childVis->GetType() == rendering::VT_LINK)
     {
       std::string unscopedLinkName = linkName.substr(linkName.find("::") + 2);
       this->dataPtr->linksComboBox->addItem(

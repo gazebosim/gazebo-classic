@@ -760,8 +760,7 @@ void GLWidget::OnMouseReleaseNormal()
       for (unsigned int i = 0; i < modelVis->GetChildCount(); ++i)
       {
         // Find out if there's only one link in the model
-        uint32_t flags = modelVis->GetChild(i)->GetVisibilityFlags();
-        if ((flags != GZ_VISIBILITY_ALL) && (flags & GZ_VISIBILITY_GUI))
+        if (modelVis->GetChild(i)->GetType() != rendering::VT_LINK)
         {
           continue;
         }

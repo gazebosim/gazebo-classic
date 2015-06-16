@@ -2532,6 +2532,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
     {
       result = true;
       visual->LoadFromMsg(_msg);
+std::cout << "SetType Scene: " << visual->GetName() << "  " << _type << std::endl;
       visual->SetType(_type);
 
       this->dataPtr->visuals[visual->GetId()] = visual;
