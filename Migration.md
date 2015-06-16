@@ -87,6 +87,12 @@
 
 ### Additions
 
+1. **gazebo/msgs/log_playback_control.proto**
+    + New message to control the playback from a log file.
+
+1. **gazebo/util/LogPlay.hh**
+    + public: bool Rewind()
+
 1. **gazebo/physics/LinkState.hh**
     + public: virtual void SetIterations(const uint64_t _iterations)
 
