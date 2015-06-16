@@ -264,7 +264,6 @@ void JointMaker_TEST::JointDefaultProperties()
   delete mainWindow;
 }
 
-
 /////////////////////////////////////////////////
 void JointMaker_TEST::ShowJoints()
 {
