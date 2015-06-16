@@ -83,18 +83,19 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   // View
   this->dataPtr->view = new LogPlayView(this);
-  connect(this, SIGNAL(SetCurrentTime(int)), this->dataPtr->view,
-      SLOT(SetCurrentTime(int)));
-  connect(this, SIGNAL(SetStartTime(int)), this->dataPtr->view,
-      SLOT(SetStartTime(int)));
-  connect(this, SIGNAL(SetEndTime(int)), this->dataPtr->view,
-      SLOT(SetEndTime(int)));
+  connect(this, SIGNAL(SetCurrentTime(const common::Time &)),
+      this->dataPtr->view, SLOT(SetCurrentTime(const common::Time &)));
+  connect(this, SIGNAL(SetStartTime(const common::Time &)),
+      this->dataPtr->view, SLOT(SetStartTime(const common::Time &)));
+  connect(this, SIGNAL(SetEndTime(const common::Time &)),
+      this->dataPtr->view, SLOT(SetEndTime(const common::Time &)));
 
   // Time
   QLineEdit *currentTime = new QLineEdit();
   currentTime->setMaximumWidth(110);
   currentTime->setAlignment(Qt::AlignRight);
-  currentTime->setStyleSheet("\
+  currentTime->setObjectName("logPlayCurrentTime");
+/*  currentTime->setStyleSheet("\
       QLineEdit {\
         background-color: #808080;\
         color: #cfcfcf;\
@@ -103,6 +104,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
       QLineEdit:focus {\
         background-color: #707070;\
       }");
+      */
   connect(this, SIGNAL(SetCurrentTime(const QString &)), currentTime,
       SLOT(setText(const QString &)));
 
@@ -183,17 +185,11 @@ void LogPlayWidget::OnStepForward()
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::EmitSetCurrentTime(common::Time _time)
+void LogPlayWidget::EmitSetCurrentTime(const common::Time &_time)
 {
   // Make sure it's within limits
-  if (_time < this->dataPtr->startTime)
-  {
-    _time = this->dataPtr->startTime;
-  }
-  else if (_time > this->dataPtr->endTime)
-  {
-    _time = this->dataPtr->endTime;
-  }
+  common::Time time = std::min(std::max(_time, this->dataPtr->startTime),
+                               this->dataPtr->endTime);
 
   // Update current time line edit
   if (this->dataPtr->lessThan1h)
@@ -207,11 +203,11 @@ void LogPlayWidget::EmitSetCurrentTime(common::Time _time)
   }
 
   // Update current time item in view
-  this->SetCurrentTime(_time.sec * 1e3 + _time.nsec * 1e-6);
+  this->SetCurrentTime(_time);
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::EmitSetStartTime(common::Time _time)
+void LogPlayWidget::EmitSetStartTime(const common::Time &_time)
 {
   if (_time >= this->dataPtr->endTime)
   {
@@ -223,11 +219,11 @@ void LogPlayWidget::EmitSetStartTime(common::Time _time)
   this->dataPtr->startTime = _time;
 
   // Update start time in view
-  this->SetStartTime(_time.sec * 1e3 + _time.nsec * 1e-6);
+  this->SetStartTime(_time);
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::EmitSetEndTime(common::Time _time)
+void LogPlayWidget::EmitSetEndTime(const common::Time &_time)
 {
   if (_time <= this->dataPtr->startTime)
   {
@@ -239,7 +235,7 @@ void LogPlayWidget::EmitSetEndTime(common::Time _time)
   this->dataPtr->endTime = _time;
 
   // Use shorter string if less than 1h
-  if (_time < common::Time(3600))
+  if (_time < common::Time::Hour)
     this->dataPtr->lessThan1h = true;
 
   // Update end time label
@@ -258,7 +254,7 @@ void LogPlayWidget::EmitSetEndTime(common::Time _time)
   this->SetEndTime(QString::fromStdString(timeString));
 
   // Update end time in view
-  this->SetEndTime(_time.sec * 1e3 + _time.nsec * 1e-6);
+  this->SetEndTime(_time);
 }
 
 /////////////////////////////////////////////////
@@ -300,15 +296,14 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-void LogPlayView::SetCurrentTime(int _msec)
+void LogPlayView::SetCurrentTime(const common::Time &_time)
 {
-  int totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+  common::Time totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
 
   if (totalTime == 0)
     return;
 
-  double relPos = static_cast<double>(_msec - this->dataPtr->startTime) /
-      totalTime;
+  double relPos = ((_time - this->dataPtr->startTime) / totalTime).Double();
 
   this->dataPtr->currentTimeItem->setPos(this->dataPtr->margin +
       (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
@@ -316,16 +311,16 @@ void LogPlayView::SetCurrentTime(int _msec)
 }
 
 /////////////////////////////////////////////////
-void LogPlayView::SetStartTime(int _msec)
+void LogPlayView::SetStartTime(const common::Time &_time)
 {
-  this->dataPtr->startTime = _msec;
+  this->dataPtr->startTime = _time;
   this->dataPtr->startTimeSet = true;
 }
 
 /////////////////////////////////////////////////
-void LogPlayView::SetEndTime(int _msec)
+void LogPlayView::SetEndTime(const common::Time &_time)
 {
-  this->dataPtr->endTime = _msec;
+  this->dataPtr->endTime = _time;
   this->dataPtr->endTimeSet = true;
 
   if (this->dataPtr->startTimeSet)
@@ -338,72 +333,60 @@ void LogPlayView::DrawTimeline()
   if (this->dataPtr->timelineDrawn)
     return;
 
-  int totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+  common::Time totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
 
-  if (totalTime == 0)
+  if (totalTime == common::Time::Zero)
     return;
 
   // Aim for this number, but some samples might be added/removed
   int intervals = 10;
 
-  // Interval is a round number of seconds in ms
-  int roundStartTime = (this->dataPtr->startTime/1000)*1000;
-  int interval = (round((totalTime/1000.0)/intervals))*1000;
+  // Interval is the time between tick marks
+  common::Time interval = totalTime / intervals;
 
   // Time line
   int tickHeight = 15;
-  int msec = this->dataPtr->startTime;
-  int i = 0;
-  while (msec >= this->dataPtr->startTime && msec < this->dataPtr->endTime)
-  {
-    // Intermediate samples have a round number
-    if (i != 0)
-    {
-      msec = roundStartTime + interval * i;
-    }
 
+  for (common::Time timeIter = this->dataPtr->startTime;
+       timeIter <= this->dataPtr->endTime; timeIter += interval)
+  {
     // If first interval too close, shift by 1s
-    int endSpace = interval * 0.9;
-    if (msec != this->dataPtr->startTime &&
-        msec < this->dataPtr->startTime + endSpace)
+    common::Time endSpace = interval * 0.9;
+    if (timeIter != this->dataPtr->startTime &&
+        timeIter < this->dataPtr->startTime + endSpace)
     {
-      roundStartTime += 1000;
-      msec = roundStartTime + interval * i;
+      timeIter += common::Time(1,0);
     }
 
     // If last interval too close, skip to end
-    if (msec > this->dataPtr->endTime - endSpace)
+    if (timeIter > this->dataPtr->endTime - endSpace)
     {
-      msec = this->dataPtr->endTime;
+      timeIter = this->dataPtr->endTime;
     }
-    ++i;
 
     // Relative position
-    double relPos = static_cast<double>(msec - this->dataPtr->startTime) /
-        totalTime;
+    double relPos = ((timeIter - this->dataPtr->startTime) /
+                     totalTime).Double();
 
     // Tick vertical line
     QGraphicsLineItem *tick = new QGraphicsLineItem(0, -tickHeight, 0, 0);
     tick->setPos(this->dataPtr->margin +
         (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin)*relPos,
-        this->dataPtr->sceneHeight/2);
+         this->dataPtr->sceneHeight/2);
     tick->setPen(QPen(QColor(50, 50, 50, 255), 2));
     this->scene()->addItem(tick);
 
     // Text
-    int sec = msec / 1000;
-    int nsec = (msec - sec * 1000)*1000000;
-    common::Time time(sec, nsec);
-
     std::string timeText;
-    if (msec == this->dataPtr->startTime || msec == this->dataPtr->endTime)
+    if (timeIter == this->dataPtr->startTime ||
+        timeIter == this->dataPtr->endTime)
     {
-      timeText = time.FormattedString(common::Time::FormatOption::MINUTES);
+      timeText = timeIter.FormattedString(common::Time::FormatOption::MINUTES);
     }
     else
     {
-      timeText = time.FormattedString(common::Time::FormatOption::MINUTES,
-          common::Time::FormatOption::SECONDS);
+      timeText = timeIter.FormattedString(common::Time::FormatOption::MINUTES,
+                                          common::Time::FormatOption::SECONDS);
     }
 
     QGraphicsSimpleTextItem *tickText = new QGraphicsSimpleTextItem(

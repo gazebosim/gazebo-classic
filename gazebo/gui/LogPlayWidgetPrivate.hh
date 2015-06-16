@@ -54,10 +54,10 @@ namespace gazebo
       public: CurrentTimeItem *currentTimeItem;
 
       /// \brief Start time in milliseconds.
-      public: int startTime;
+      public: common::Time startTime;
 
       /// \brief End time in milliseconds.
-      public: int endTime;
+      public: common::Time endTime;
 
       /// \brief Log start time has been set or not.
       public: bool startTimeSet;
