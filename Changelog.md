@@ -2,6 +2,9 @@
 
 ### Gazebo 5.x.x
 
+1. Fix BulletSliderJoint friction for bullet 2.83
+    * [Pull request #1686](https://bitbucket.org/osrf/gazebo/pull-request/1686)
+
 1. Fix heightmap model texture loading.
     * [Pull request #1592](https://bitbucket.org/osrf/gazebo/pull-request/1592)
 
