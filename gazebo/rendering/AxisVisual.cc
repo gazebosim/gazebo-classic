@@ -101,7 +101,10 @@ void AxisVisual::Load()
   if (dPtr->scaleToElement != math::Vector3::Zero)
     this->SetScale(dPtr->scaleToElement);
 
-//  this->GetSceneNode()->setInheritScale(false);
+  // Don't scale with link
+  if (dPtr->parent && dPtr->parent->GetType() == VT_LINK)
+    this->GetSceneNode()->setInheritScale(false);
+
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
 
