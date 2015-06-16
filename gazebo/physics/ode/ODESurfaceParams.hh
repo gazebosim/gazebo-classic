@@ -112,6 +112,9 @@ namespace gazebo
       ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double slip2;
 
+      /// \brief Artificial contact slip in torsional dirction.
+      public: double slip3;
+
       /// \brief Friction pyramid parameters (mu1, mu2).
       /// Note that the primary friction pyramid direction can be specified
       /// by fdir1, otherwise a vector constrained to be perpendicular to the

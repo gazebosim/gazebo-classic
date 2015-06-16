@@ -88,11 +88,14 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
             frictionOdeElem->Get<double>("mu"));
           this->frictionPyramid->SetMuSecondary(
             frictionOdeElem->Get<double>("mu2"));
+          this->frictionPyramid->SetMuTorsion(
+            frictionOdeElem->Get<double>("mu3"));
           this->frictionPyramid->direction1 =
             frictionOdeElem->Get<math::Vector3>("fdir1");
 
           this->slip1 = frictionOdeElem->Get<double>("slip1");
           this->slip2 = frictionOdeElem->Get<double>("slip2");
+          this->slip3 = frictionOdeElem->Get<double>("slip3");
         }
       }
     }
@@ -126,6 +129,7 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 
   _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
   _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
+  _msg.mutable_friction()->set_mu3(this->frictionPyramid->GetMuTorsion());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
@@ -153,6 +157,8 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
       this->frictionPyramid->SetMuPrimary(_msg.friction().mu());
     if (_msg.friction().has_mu2())
       this->frictionPyramid->SetMuSecondary(_msg.friction().mu2());
+    if (_msg.friction().has_mu3())
+      this->frictionPyramid->SetMuTorsion(_msg.friction().mu3());
     if (_msg.friction().has_slip1())
       this->slip1 = _msg.friction().slip1();
     if (_msg.friction().has_slip2())

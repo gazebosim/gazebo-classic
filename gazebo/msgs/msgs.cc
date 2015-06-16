@@ -1645,6 +1645,8 @@ namespace gazebo
           physicsEngElem->GetElement("mu")->Set(friction.mu());
         if (friction.has_mu2())
           physicsEngElem->GetElement("mu2")->Set(friction.mu2());
+        if (friction.has_mu3())
+          physicsEngElem->GetElement("mu3")->Set(friction.mu3());
         if (friction.has_fdir1())
         {
           physicsEngElem->GetElement("fdir1")->Set(
@@ -1654,6 +1656,8 @@ namespace gazebo
           physicsEngElem->GetElement("slip1")->Set(friction.slip1());
         if (friction.has_slip2())
           physicsEngElem->GetElement("slip2")->Set(friction.slip2());
+        if (friction.has_slip3())
+          physicsEngElem->GetElement("slip3")->Set(friction.slip3());
       }
       sdf::ElementPtr bounceElem = surfaceSDF->GetElement("bounce");
       if (_msg.has_restitution_coefficient())

@@ -39,7 +39,7 @@ dxJointContact::dxJointContact( dxWorld *w ) :
 void
 dxJointContact::getSureMaxInfo( SureMaxInfo* info )
 {
-    info->max_m = 3; // ...as the actual m is very likely to hit the maximum
+    info->max_m = 4; // ...as the actual m is very likely to hit the maximum
 }
 
 
@@ -56,7 +56,7 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
         if ( contact.surface.mu2 < 0 ) contact.surface.mu2 = 0;
         if ( contact.surface.mu2 > 0 ) m++;
         if ( contact.surface.mu3 < 0 ) contact.surface.mu3 = 0;
-      //  if ( contact.surface.mu3 > 0 ) m++;
+        if ( contact.surface.mu3 > 0 ) m++;
         if (_dequal(contact.surface.mu, dInfinity)) nub ++;
         if (_dequal(contact.surface.mu2, dInfinity)) nub ++;
         if (_dequal(contact.surface.mu3, dInfinity)) nub ++;
@@ -301,7 +301,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
 
     // now do jacobian for rotational forces
     dVector3 t3 = {0, 0, 0};
-/*
+
     // third friction direction (torsional)
     if ( the_m >= 4 )
     {
@@ -313,7 +313,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         // Angular, body 1
         info->J1a[s3+0] = t3[0];
         info->J1a[s3+1] = t3[1];
-        info->J1a[s3+2] = t3[2];
+        info->J1a[s3+2] = 1;
         if ( node[1].body )
         {
             // Linear, body 2
@@ -324,7 +324,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             // Angular, body 2
             info->J2a[s3+0] = -t3[0];
             info->J2a[s3+1] = -t3[1];
-            info->J2a[s3+2] = -t3[2];
+            info->J2a[s3+2] = -1;
         }
         // set right hand side
         if ( contact.surface.mode & dContactMotion2 )
@@ -335,6 +335,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         // mode
         if ( contact.surface.mode & dContactMu3 )
         {
+            contact.surface.mu3 = 0.001;
             info->lo[3] = -contact.surface.mu3;
             info->hi[3] = contact.surface.mu3;
         }
@@ -349,7 +350,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         // set slip (constraint force mixing)
         if ( contact.surface.mode & dContactSlip3 )
             info->cfm[3] = contact.surface.slip3;
-    }*/
+    }
 }
 
 dJointType

@@ -49,6 +49,10 @@ namespace gazebo
       /// \return Friction coefficient in secondary direction.
       public: double GetMuSecondary();
 
+      /// \brief Get the torsional friction coefficient.
+      /// \return Torsional friction coefficient.
+      public: double GetMuTorsion();
+
       /// \brief Set the friction coefficient in the primary direction.
       /// \param[in] _mu Friction coefficient.
       public: void SetMuPrimary(double _mu);
@@ -56,6 +60,10 @@ namespace gazebo
       /// \brief Set the friction coefficient in the secondary direction.
       /// \param[in] _mu Friction coefficient.
       public: void SetMuSecondary(double _mu);
+
+      /// \brief Set the torsional friction coefficient.
+      /// \param[in] _mu Torsional friction coefficient.
+      public: void SetMuTorsion(double _mu);
 
       /// \brief Get the friction coefficient in a single direction.
       /// \param[in] _index Index of friction direction, 0 for primary,
@@ -84,7 +92,8 @@ namespace gazebo
       /// \brief Array of dry friction coefficients. mu[0] is in the
       /// primary direction as defined by the friction pyramid.
       /// mu[1] is in the second direction.
-      private: double mu[2];
+      /// mu[2] is in the torsional friction.
+      private: double mu[3];
     };
 
     /// \class SurfaceParams SurfaceParams.hh physics/physics.hh

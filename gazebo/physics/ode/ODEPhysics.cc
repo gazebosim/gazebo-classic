@@ -985,11 +985,13 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Set the contact surface parameter flags.
   contact.surface.mode = dContactBounce |
                          dContactMu2 |
+                         dContactMu3 |
                          dContactSoftERP |
                          dContactSoftCFM |
                          dContactApprox1 |
                          dContactSlip1 |
-                         dContactSlip2;
+                         dContactSlip2 |
+                         dContactSlip3;
 
   ODESurfaceParamsPtr surf1 = _collision1->GetODESurface();
   ODESurfaceParamsPtr surf2 = _collision2->GetODESurface();
@@ -1054,13 +1056,16 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                 surf2->GetFrictionPyramid()->GetMuPrimary());
   contact.surface.mu2 = std::min(surf1->GetFrictionPyramid()->GetMuSecondary(),
                                  surf2->GetFrictionPyramid()->GetMuSecondary());
-
+  contact.surface.mu3 = std::min(surf1->GetFrictionPyramid()->GetMuTorsion(),
+                                 surf2->GetFrictionPyramid()->GetMuTorsion());
 
   // Set the slip values
   contact.surface.slip1 = std::min(surf1->slip1,
                                    surf2->slip1);
   contact.surface.slip2 = std::min(surf1->slip2,
                                    surf2->slip2);
+  contact.surface.slip3 = std::min(surf1->slip3,
+                                   surf2->slip3);
 
   // Set the bounce values
   contact.surface.bounce = std::min(surf1->bounce,
