@@ -2555,8 +2555,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
       visual->LoadFromMsg(_msg);
       visual->SetType(_type);
 
-      std::cerr << visual->GetName() << " " << _type << std::endl;
-
       this->dataPtr->visuals[visual->GetId()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
           visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)

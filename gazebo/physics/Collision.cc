@@ -100,12 +100,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
     gzwarn << "No shape has been specified. Error!!!\n";
-
-/*  if (!this->shape->HasType(Base::MULTIRAY_SHAPE) &&
-      !this->shape->HasType(Base::RAY_SHAPE))
-  {
-    this->visPub->Publish(this->CreateCollisionVisual());
-  }*/
 }
 
 //////////////////////////////////////////////////
@@ -285,6 +279,8 @@ void Collision::FillMsg(msgs::Collision &_msg)
   if (!this->HasType(physics::Base::SENSOR_COLLISION))
   {
     _msg.add_visual()->CopyFrom(*this->visualMsg);
+    // TODO remove the need to create the special collision visual msg and
+    // let the gui handle this.
     _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
   }
 }
