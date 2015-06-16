@@ -17,6 +17,7 @@
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/gazebo_config.h"
+#include "gazebo/math/SignalStats.hh"
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "helper_physics_generator.hh"
@@ -100,16 +101,6 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////
 void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 {
-#ifndef LIBBULLET_VERSION_GT_282
-  /// bullet hinge angles are wrapped for 2.82 and less
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "Aborting test for bullet, angle wrapping requires bullet 2.83"
-          << std::endl;
-    return;
-  }
-#endif
-
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -141,6 +132,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 
     joint->SetVelocity(0, vel);
 
+    math::SignalMaxAbsoluteValue angleErrorMax;
     // expect that joint velocity is constant
     // and that joint angle is unwrapped
     for (unsigned int i = 0; i < stepCount; ++i)
@@ -148,7 +140,18 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
       world->Step(stepSize);
       EXPECT_NEAR(joint->GetVelocity(0), vel, g_tolerance);
       double time = world->GetSimTime().Double();
-      EXPECT_NEAR(joint->GetAngle(0).Radian(), time*vel, g_tolerance);
+      angleErrorMax.InsertData(joint->GetAngle(0).Radian() - time*vel);
+    }
+#ifndef LIBBULLET_VERSION_GT_282
+    if (_physicsEngine == "bullet")
+    {
+      gzerr << "Skipping portion of test, angle wrapping requires bullet 2.83"
+            << std::endl;
+    }
+    else
+#endif
+    {
+      EXPECT_NEAR(angleErrorMax.Value(), 0.0, g_tolerance);
     }
   }
 }
