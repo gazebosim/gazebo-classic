@@ -29,8 +29,8 @@
 
   # initial velocity and friction
   spin0 = 2*Math::PI
-  sphere_friction = [0.0, 0.1, 1.0, 10.0]
-  box_friction = [0.0, 0.1, 1.0, 10.0]
+  sphere_friction = [0.0, 0.01, 0.05, 0.1, 1.0]
+  box_friction = [0.0, 0.01, 0.05, 0.1, 1.0]
 %>
 <sdf version="1.5">
   <world name="default">
@@ -71,6 +71,15 @@
               <radius><%= radius %></radius>
             </sphere>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= f %></mu>
+                <mu2><%= f %></mu2>
+                <mu3><%= f %></mu3>
+              </ode>
+            </friction>
+          </surface>
         </collision>
         <visual name="visual">
           <geometry>
@@ -118,6 +127,15 @@
               <size><%= dx %> <%= dy %> <%= dz %></size>
             </box>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= f %></mu>
+                <mu2><%= f %></mu2>
+                <mu3><%= f %></mu3>
+              </ode>
+            </friction>
+          </surface>
         </collision>
         <visual name="visual">
           <geometry>
@@ -160,6 +178,15 @@
               <size><%= dx %> <%= dy %> <%= dz %></size>
             </box>
           </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= f %></mu>
+                <mu2><%= f %></mu2>
+                <mu3><%= f %></mu3>
+              </ode>
+            </friction>
+          </surface>
         </collision>
         <visual name="visual">
           <geometry>

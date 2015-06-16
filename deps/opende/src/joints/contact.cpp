@@ -335,7 +335,6 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         // mode
         if ( contact.surface.mode & dContactMu3 )
         {
-            contact.surface.mu3 = 0.001;
             info->lo[3] = -contact.surface.mu3;
             info->hi[3] = contact.surface.mu3;
         }

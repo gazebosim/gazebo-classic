@@ -184,6 +184,8 @@ void CollisionConfig::AddCollision(const std::string &_name,
     frictionMsg->set_mu(1.0);
   if (!frictionMsg->has_mu2())
     frictionMsg->set_mu2(1.0);
+  if (!frictionMsg->has_mu3())
+    frictionMsg->set_mu3(1.0);
 
   ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);
