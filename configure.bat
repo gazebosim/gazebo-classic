@@ -60,7 +60,7 @@ set OGRE_LIB_SUFFIX=.lib
 @set PATH=%QT4_BIN_DIR%;%PATH%
 
 cmake -G "NMake Makefiles"^
-    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%"^
+    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%"^
     -DUSE_EXTERNAL_TINYXML:BOOL=False^
     -DFREEIMAGE_RUNS=1^
     -DPROTOBUF_SRC_ROOT_FOLDER="%PROTOBUF_PATH%"^
@@ -80,6 +80,9 @@ cmake -G "NMake Makefiles"^
     -DTBB_FOUND=1^
     -DTBB_INCLUDEDIR="%TBB_INCLUDEDIR%"^
     -DTBB_LIBRARY_DIR="%TBB_LIBRARY_DIR%"^
+    -DIGNITION-MATH_INCLUDE_DIRS:STRING="..\..\ign-math\build\install\%build_type%\include\ignition\math2"^
+    -DIGNITION-MATH_LIBRARY_DIRS:STRING="..\..\ign-math\build\install\%build_type%\lib"^
+    -DIGNITION-MATH_LIBRARIES="ignition-math2"^
     -DCMAKE_INSTALL_PREFIX="install\%build_type%"^
     -DCMAKE_BUILD_TYPE="%build_type%"^
     -DENABLE_TESTS_COMPILATION:BOOL=False^
