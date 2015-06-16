@@ -32,6 +32,7 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/ReferenceGeometry.hh"
 
 #include "gazebo/math/Quaternion.hh"
 
@@ -707,6 +708,14 @@ std::string ModelCreator::AddShape(LinkType _type,
   // override orientation as it's more natural to insert objects upright rather
   // than inserting it in the model frame.
   linkVisual->SetWorldPose(math::Pose(linkPos, math::Quaternion()));
+
+  // create reference geometry
+  rendering::ReferenceGeometryPtr refGeom;
+  refGeom.reset(new rendering::ReferenceGeometry(
+      linkVisual->GetName() + "_refgeom", linkVisual));
+  refGeom->Load();
+  refGeom->SetReferenceGeometryType(rendering::ReferenceGeometry::RGT_AXIS);
+
 
   this->mouseVisual = linkVisual;
 

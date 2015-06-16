@@ -31,6 +31,7 @@ ReferenceGeometry::ReferenceGeometry(const std::string &_name, VisualPtr _vis)
   ReferenceGeometryPrivate *dPtr =
       reinterpret_cast<ReferenceGeometryPrivate *>(this->dataPtr);
 
+  dPtr->type = VT_GUI;
   dPtr->referenceGeometryType = RGT_NONE;
 }
 
@@ -77,7 +78,10 @@ void ReferenceGeometry::SetReferenceGeometryType(ReferenceGeometryType _type)
     if (!dPtr->axisLine)
     {
       dPtr->axisLine = this->CreateDynamicLine();
+      dPtr->axisLine->AddPoint(0, 0, -0.5);
+      dPtr->axisLine->AddPoint(0, 0, 0.5);
     }
+    this->SetTransparency(0.5);
   }
 }
 
@@ -99,7 +103,8 @@ VisualPtr ReferenceGeometry::CreateAxis()
   cylinderVis.reset(new Visual("reference_geom_axis", shared_from_this()));
   cylinderVis->Load();
   cylinderVis->AttachMesh("unit_cylinder");
-  cylinderVis->SetVisibilityFlags(GZ_VISIBILITY_SELECTABLE);
+  cylinderVis->SetScale(math::Vector3(0.1, 0.1, 1.0));
+//  cylinderVis->SetVisibilityFlags(GZ_VISIBILITY_SELECTABLE);
 
   return cylinderVis;
 }
