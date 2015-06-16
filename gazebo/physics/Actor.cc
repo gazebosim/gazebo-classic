@@ -14,6 +14,14 @@
  * limitations under the License.
  *
 */
+
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 #include <limits>
@@ -276,12 +284,12 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
           if (pIter == points.begin() && !math::equal(pIter->first, 0.0))
           {
             key = anim->CreateKeyFrame(0.0);
-            key->SetTranslation(pIter->second.pos);
-            key->SetRotation(pIter->second.rot);
+            key->Translation(pIter->second.pos.Ign());
+            key->Rotation(pIter->second.rot.Ign());
           }
           key = anim->CreateKeyFrame(pIter->first);
-          key->SetTranslation(pIter->second.pos);
-          key->SetRotation(pIter->second.rot);
+          key->Translation(pIter->second.pos.Ign());
+          key->Rotation(pIter->second.rot.Ign());
         }
 
         this->trajectories[this->trajInfo[idx].id] = anim;
@@ -490,8 +498,8 @@ void Actor::Update()
     common::PoseKeyFrame posFrame(0.0);
     this->trajectories[tinfo.id]->SetTime(scriptTime);
     this->trajectories[tinfo.id]->GetInterpolatedKeyFrame(posFrame);
-    modelPose.pos = posFrame.GetTranslation();
-    modelPose.rot = posFrame.GetRotation();
+    modelPose.pos = posFrame.Translation();
+    modelPose.rot = posFrame.Rotation();
 
     if (this->lastTraj == tinfo.id)
       this->pathLength += fabs(this->lastPos.Distance(modelPose.pos));
@@ -499,7 +507,9 @@ void Actor::Update()
     {
       common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
         (this->trajectories[tinfo.id]->GetKeyFrame(0));
-      this->pathLength = fabs(modelPose.pos.Distance(frame0->GetTranslation()));
+      math::Vector3 vector3Ign;
+      vector3Ign = frame0->Translation();
+      this->pathLength = fabs(modelPose.pos.Distance(vector3Ign));
     }
     this->lastPos = modelPose.pos;
   }

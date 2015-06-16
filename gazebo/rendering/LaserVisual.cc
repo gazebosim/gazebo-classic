@@ -14,10 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Laser Visualization Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
@@ -38,6 +40,8 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
 {
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_SENSOR;
 
   dPtr->receivedMsg = false;
 
@@ -61,8 +65,12 @@ LaserVisual::~LaserVisual()
   {
     this->DeleteDynamicLine(dPtr->rayFans[i]);
     dPtr->rayFans[i] = NULL;
+
+    this->DeleteDynamicLine(dPtr->noHitRayFans[i]);
+    dPtr->noHitRayFans[i] = NULL;
   }
   dPtr->rayFans.clear();
+  dPtr->noHitRayFans.clear();
 }
 
 /////////////////////////////////////////////////
@@ -97,18 +105,13 @@ void LaserVisual::Update()
 
   dPtr->receivedMsg = false;
 
-  double angle = dPtr->laserMsg->scan().angle_min();
   double verticalAngle = dPtr->laserMsg->scan().vertical_angle_min();
-  double r;
-  math::Vector3 pt;
   math::Pose offset = msgs::Convert(dPtr->laserMsg->scan().world_pose()) -
                       this->GetWorldPose();
 
   unsigned int vertCount = dPtr->laserMsg->scan().has_vertical_count() ?
       dPtr->laserMsg->scan().vertical_count() : 1u;
 
-  math::Quaternion ray;
-  math::Vector3 axis;
   for (unsigned int j = 0; j < vertCount; ++j)
   {
     if (j+1 > dPtr->rayFans.size())
@@ -117,23 +120,43 @@ void LaserVisual::Update()
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
       dPtr->rayFans[j]->setMaterial("Gazebo/BlueLaser");
       dPtr->rayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+
+      // No hit ray fans display rays that do not hit obstacles.
+      dPtr->noHitRayFans.push_back(
+          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
+      dPtr->noHitRayFans[j]->setMaterial("Gazebo/LightBlueLaser");
+      dPtr->noHitRayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
     dPtr->rayFans[j]->SetPoint(0, offset.pos);
+    dPtr->noHitRayFans[j]->SetPoint(0, offset.pos);
 
-    angle = dPtr->laserMsg->scan().angle_min();
+    double angle = dPtr->laserMsg->scan().angle_min();
     unsigned int count = dPtr->laserMsg->scan().count();
     for (unsigned int i = 0; i < count; ++i)
     {
-      r = dPtr->laserMsg->scan().ranges(j*count + i);
-      ray.SetFromEuler(math::Vector3(0.0, -verticalAngle, angle));
-      axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
-      pt = (axis * r) + offset.pos;
+      double r = dPtr->laserMsg->scan().ranges(j*count + i);
+      math::Quaternion ray(math::Vector3(0.0, -verticalAngle, angle));
+      math::Vector3 axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
+
+      double hitRange = std::isinf(r) ? 0 : r;
+      math::Vector3 pt = (axis * hitRange) + offset.pos;
+
+      double noHitRange =
+        std::isinf(r) ? dPtr->laserMsg->scan().range_max() : 0;
+      math::Vector3 noHitPt = (axis * noHitRange) + offset.pos;
 
       if (i+1 >= dPtr->rayFans[j]->GetPointCount())
+      {
         dPtr->rayFans[j]->AddPoint(pt);
+        dPtr->noHitRayFans[j]->AddPoint(noHitPt);
+      }
       else
+      {
         dPtr->rayFans[j]->SetPoint(i+1, pt);
+        dPtr->noHitRayFans[j]->SetPoint(i+1, noHitPt);
+      }
 
       angle += dPtr->laserMsg->scan().angle_step();
     }

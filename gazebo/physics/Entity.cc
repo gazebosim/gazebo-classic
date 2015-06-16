@@ -19,6 +19,12 @@
  * Date: 03 Apr 2007
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/msgs/msgs.hh"
@@ -588,8 +594,8 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
-  offset.pos = kf.GetTranslation();
-  offset.rot = kf.GetRotation();
+  offset.pos = kf.Translation();
+  offset.rot = kf.Rotation();
 
   this->SetWorldPose(offset);
   this->prevAnimationTime = _info.simTime;

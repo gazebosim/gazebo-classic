@@ -5,6 +5,6 @@ includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 Name: gazebo
 Description: Gazebo Libraries
 Version: @GAZEBO_VERSION_FULL@
-Requires.private: sdformat protobuf
+Requires: sdformat protobuf @TBB_PKG_CONFIG@ ignition-math2
 Libs: -Wl,-rpath,${prefix}/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins -L${libdir} -L${prefix}/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins -lgazebo_transport -lgazebo_physics -lgazebo_sensors -lgazebo_rendering -lgazebo_gui -lgazebo_msgs -lgazebo_math -lgazebo_common -lgazebo @Boost_PKGCONFIG_LIBS@ @APPLE_PKGCONFIG_LIBS@
-CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@ @Boost_PKGCONFIG_CFLAGS@
+CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@ @Boost_PKGCONFIG_CFLAGS@ -std=c++11

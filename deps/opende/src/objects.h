@@ -30,6 +30,7 @@
 #include <ode/common.h>
 #include <ode/memory.h>
 #include <ode/mass.h>
+#include <ode/objects.h>
 #include "array.h"
 #include <boost/threadpool.hpp>
 
@@ -48,7 +49,6 @@ enum {
   dxBodyMaxAngularSpeed =           128,// use maximum angular speed
   dxBodyGyroscopic =                256// use gyroscopic term
 };
-
 
 // base class that does correct object allocation / deallocation
 
@@ -118,9 +118,11 @@ struct dxQuickStepParameters {
   int num_contacts;           // for monitoring number of contacts
   bool dynamic_inertia_reduction;  // turn on/off quickstep inertia reduction.
   dReal smooth_contacts;  // control quickstep smoothing for contact solution.
+  bool thread_position_correction;  // threaded position correction computations
   bool row_reorder1;  // control quickstep row reordering
   dReal warm_start;  // warm start factor, 0: no warm start, 1: full warm start
   int friction_iterations;  // extra quickstep iterations friction.
+  Friction_Model friction_model;  // friction model, enum type Friction_Model
 };
 
 // robust-step parameters
