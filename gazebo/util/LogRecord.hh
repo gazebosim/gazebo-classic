@@ -256,11 +256,6 @@ namespace gazebo
         /// \return The complete filename.
         public: std::string GetCompleteFilename() const;
 
-        /// \brief Update the internal variables that keep track of the times
-        /// where the log started and finished (simulation time).
-        /// \param[in] _logStream String containing a chunk of the log file.
-        private: void UpdateLogTime(const std::string &_logStream);
-
         /// \brief Pointer to the log record parent.
         public: LogRecord *parent;
 
@@ -278,15 +273,6 @@ namespace gazebo
 
         /// \brief Complete file path.
         private: boost::filesystem::path completePath;
-
-        /// \brief Log start time (simulation time).
-        private: std::string logStartTime;
-
-        /// \brief Log end time (simulation time).
-        private: std::string logEndTime;
-
-        /// \brief True when we have not updated the log yet.
-        private: bool isFirstUpdate;
       };
       /// \endcond
 

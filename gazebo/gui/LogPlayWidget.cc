@@ -277,9 +277,9 @@ void LogPlayWidget::OnStepBack()
 /////////////////////////////////////////////////
 void LogPlayWidget::OnJumpStart()
 {
-  msgs::LogPlaybackControl msg;
-  msg.set_rewind(true);
-  this->dataPtr->logPlaybackControlPub->Publish(msg);
+  // msgs::LogPlaybackControl msg;
+  // msg.set_rewind(true);
+  // this->dataPtr->logPlaybackControlPub->Publish(msg);
 
   gzdbg << "send Jump Start msg" << std::endl;
 }
@@ -287,9 +287,9 @@ void LogPlayWidget::OnJumpStart()
 /////////////////////////////////////////////////
 void LogPlayWidget::OnJumpEnd()
 {
-  msgs::LogPlaybackControl msg;
-  msg.set_forward(true);
-  this->dataPtr->logPlaybackControlPub->Publish(msg);
+  // msgs::LogPlaybackControl msg;
+  // msg.set_forward(true);
+  // this->dataPtr->logPlaybackControlPub->Publish(msg);
 
   gzdbg << "send Jump End msg" << std::endl;
 }

@@ -1237,6 +1237,7 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 
   if (_data->has_multi_step())
   {
+std::cout << _data->multi_step() << std::endl;
     // stepWorld is a blocking call so set stepInc directly so that world stats
     // will still be published
     this->SetPaused(true);

@@ -27,15 +27,6 @@ namespace gazebo
     /// \brief Private data for the LogPlayWidget class
     class LogPlayWidgetPrivate
     {
-      /// \brief Event based connections.
-      public: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief List of simulation times used to compute averages.
-      public: std::list<common::Time> simTimes;
-
-      /// \brief Mutex to protect the memeber variables.
-      public: boost::mutex mutex;
-
       /// \brief Paused state of the simulation.
       public: bool paused;
 
