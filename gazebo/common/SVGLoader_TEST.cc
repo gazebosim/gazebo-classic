@@ -42,7 +42,7 @@ TEST_F(SVGLoader, LoadPaths)
   bool success;
   std::string bad = "/not/a/file.svg";
   success = loader.Parse(bad, paths);
-  EXPECT_EQ(true, success);
+  EXPECT_FALSE(success);
 
   std::string filePath = std::string(PROJECT_SOURCE_PATH);
   filePath += "/test/data/svg/loader.svg";
