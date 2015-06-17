@@ -246,14 +246,14 @@ namespace gazebo
                       std::vector<math::Vector2d> &_vertices,
                       std::vector<math::Vector2i> &_edges);
 
-      /// \brief Check a point againts a list, and adds it to the list
-      /// if it is not in the list already.
+      /// \brief Check a point againts a list, and only adds it to the list
+      /// if it is not there already.
       /// \param[in] _vertices the vertex table where points are stored
       /// \param[in] _p the point coordinates
       /// \param[in] _tol the maximum distance under which 2 points are
       /// considered to be the same point.
       /// \return the index of the point.
-      private: static size_t AddIfNotExistsPointToVerticesTable(
+      private: static size_t AddUniquePointToVerticesTable(
                       std::vector<math::Vector2d> &_vertices,
                       const math::Vector2d &_p,
                       double _tol);

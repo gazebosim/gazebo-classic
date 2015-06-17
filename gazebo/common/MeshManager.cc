@@ -1266,7 +1266,7 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
 #endif
 
 //////////////////////////////////////////////////
-size_t MeshManager::AddIfNotExistsPointToVerticesTable(
+size_t MeshManager::AddUniquePointToVerticesTable(
                      std::vector<math::Vector2d> &_vertices,
                      const math::Vector2d &_p,
                      double _tol)
@@ -1299,9 +1299,9 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
     for (auto i = 1u; i != poly.size(); ++i)
     {
       auto p = poly[i];
-      auto startPointIndex = AddIfNotExistsPointToVerticesTable(_vertices,
+      auto startPointIndex = AddUniquePointToVerticesTable(_vertices,
                                                               previous, _tol);
-      auto endPointIndex = AddIfNotExistsPointToVerticesTable(_vertices,
+      auto endPointIndex = AddUniquePointToVerticesTable(_vertices,
                                                               p, _tol);
       // current end point is now the starting point for the next edge
       previous = p;
