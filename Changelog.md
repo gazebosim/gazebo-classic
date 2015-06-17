@@ -1,4 +1,11 @@
 ## Gazebo 6.0
+1. Implement more control options for log playback:
+  1. Rewind: The simulation starts from the beginning.
+  1. Forward: The simulation jumps to the end of the log file.
+  1. Seek: The simulation jumps to a specific point specified by its simulation
+  time.
+      * [Pull request #1623](https://bitbucket.org/osrf/gazebo/pull-request/1623)
+
 1. Implement forward/backwards multi-step for log playback. Now, the semantics
 of a multi-step while playing back a log session are different from a multi-step
 during a live simulation. While playback, a multi-step simulates all the
