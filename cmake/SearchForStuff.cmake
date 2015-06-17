@@ -229,8 +229,10 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find TBB
   pkg_check_modules(TBB tbb)
+  set (TBB_PKG_CONFIG "tbb")
   if (NOT TBB_FOUND)
     message(STATUS "TBB not found, attempting to detect manually")
+    set (TBB_PKG_CONFIG "")
 
     find_library(tbb_library tbb ENV LD_LIBRARY_PATH)
     if (tbb_library)
