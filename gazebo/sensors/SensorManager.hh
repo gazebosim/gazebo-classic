@@ -129,6 +129,18 @@ namespace gazebo
                                        const std::string &_parentName,
                                        uint32_t _parentId);
 
+      /// \brief Add a sensor from an SDF element. This function will also Load
+      /// and Init the sensor.
+      /// \param[in] _elem The SDF element that describes the sensor
+      /// \param[in] _worldName Name of the world in which to create the sensor
+      /// \param[in] _parentName The name of the parent link which the sensor is
+      /// attached to.
+      /// \return The name of the sensor
+      public: void OnCreateSensor(sdf::ElementPtr _elem,
+                                  std::string _worldName,
+                                  std::string _parentName,
+                                  uint32_t _parentId);
+
       /// \brief Get a sensor
       /// \param[in] _name The name of a sensor to find.
       /// \return A pointer to the sensor. NULL if not found.
@@ -278,6 +290,18 @@ namespace gazebo
 
       /// \brief Pointer to the sim time event handler.
       private: SimTimeEventHandler *simTimeEventHandler;
+
+      /// \brief All the worlds that have sensors.
+      private: std::map<std::string, physics::WorldPtr> worlds;
+
+      /// \brief Connect to the time reset event.
+      private: event::ConnectionPtr timeResetConnection;
+
+      /// \brief Connect to the create sensor event.
+      private: event::ConnectionPtr createSensorConnection;
+
+      /// \brief Connect to the remove sensor event.
+      private: event::ConnectionPtr removeSensorConnection;
     };
     /// \}
   }

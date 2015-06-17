@@ -69,8 +69,6 @@ target_link_libraries(gzserver
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
-  # Extra libs needed when linking statically (e.g., on WIN32)
-  gazebo_physics_ode
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
 )
