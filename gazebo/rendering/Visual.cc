@@ -597,6 +597,9 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   // if (this->dataPtr->sdf->GetElement("geometry")->HasElement("plane"))
   // _obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_EARLY+1);
 
+  if (!_obj)
+    return;
+
   if (!this->HasAttachedObject(_obj->getName()))
   {
     // update to use unique materials
@@ -2549,8 +2552,9 @@ std::string Visual::GetMeshName() const
           polylines.push_back(vertices);
         }
 
-        meshManager->CreateExtrudedPolyline(polyLineName, polylines,
-            geomElem->GetElement("polyline")->Get<double>("height"));
+        if (!meshManager->CreateExtrudedPolyline(polyLineName, polylines,
+            geomElem->GetElement("polyline")->Get<double>("height")))
+          return std::string();
       }
       return polyLineName;
     }

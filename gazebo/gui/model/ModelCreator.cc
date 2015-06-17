@@ -753,10 +753,14 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   collisionVis->SetMaterial("Gazebo/Orange");
   collisionVis->SetTransparency(
       math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
+
   // fix for transparency alpha compositing
-  Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
-      getAttachedObject(0);
-  colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+  if (collisionVis->GetSceneNode()->numAttachedObjects() > 0)
+  {
+    Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
+        getAttachedObject(0);
+    colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+  }
   link->AddCollision(collisionVis);
 
   std::string linkName = link->linkVisual->GetName();
@@ -952,9 +956,12 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
     colVisual->SetTransparency(
         math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
     // fix for transparency alpha compositing
-    Ogre::MovableObject *colObj = colVisual->GetSceneNode()->
-        getAttachedObject(0);
-    colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+    if (colVisual->GetSceneNode()->numAttachedObjects() > 0)
+    {
+      Ogre::MovableObject *colObj = colVisual->GetSceneNode()->
+          getAttachedObject(0);
+      colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+    }
 
     // Add to link
     link->AddCollision(colVisual);

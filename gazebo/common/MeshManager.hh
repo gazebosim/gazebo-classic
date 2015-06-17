@@ -133,7 +133,8 @@ namespace gazebo
       /// vertices that describe one polyline.
       /// edges and remove the holes in the shape.
       /// \param[in] _height the height of extrusion
-      public: void CreateExtrudedPolyline(const std::string &_name,
+      /// \return True if the extrusion is successful.
+      public: bool CreateExtrudedPolyline(const std::string &_name,
                   const std::vector<std::vector<math::Vector2d> > &_vertices,
                   double _height);
 

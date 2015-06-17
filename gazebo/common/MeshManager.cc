@@ -483,9 +483,14 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateExtrudedPolyline(const std::string &_name,
+bool MeshManager::CreateExtrudedPolyline(const std::string &_name,
     const std::vector<std::vector<math::Vector2d> > &_polys, double _height)
 {
+  if (this->HasMesh(_name))
+  {
+    return false;
+  }
+
   // distance tolerence between 2 points. This is used when creating a list
   // of distinct points in the polylines.
   double tol = 1e-4;
@@ -510,14 +515,8 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     }
   }
 
-  if (this->HasMesh(_name))
-  {
-    return;
-  }
-
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -533,7 +532,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   {
     gzerr << "Unable to triangulate polyline." << std::endl;
     delete mesh;
-    return;
+    return false;
   }
   #endif
 
@@ -621,7 +620,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   if (normals.size() != edges.size())
   {
     gzerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
-    return;
+    return false;
   }
 
   unsigned int numVertices = subMesh->GetVertexCount();
@@ -691,6 +690,8 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
       subMesh->AddNormal(normals[i]);
     }
   }
+  this->meshes.insert(std::make_pair(_name, mesh));
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -1316,5 +1317,3 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
     }
   }
 }
-
-
