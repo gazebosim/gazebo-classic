@@ -29,6 +29,8 @@
       </pad>
 
       <pad name="pad2">
+        <!-- See examples/stand_alone_transporter.cc for an example of
+             activating a manual transporter -->
         <destination>pad1</destination>
         <activation>manual</activation>
 
