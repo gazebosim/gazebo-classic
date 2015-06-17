@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _IMUSENSOR_HH_
-#define _IMUSENSOR_HH_
+#ifndef _IMU_SENSOR_HH_
+#define _IMU_SENSOR_HH_
 
 #include <vector>
 #include <string>

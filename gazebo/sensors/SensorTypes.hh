@@ -39,7 +39,7 @@ namespace gazebo
     class ImuSensor;
     class MagnetometerSensor;
     class OrientationSensor;
-    class FluidPpressureSensor;
+    class FluidPressureSensor;
     class GpuRaySensor;
     class RFIDSensor;
     class RFIDTag;
@@ -101,6 +101,10 @@ namespace gazebo
     /// \def ImuSensorPtr
     /// \brief Shared pointer to ImuSensor
     typedef boost::shared_ptr<ImuSensor> ImuSensorPtr;
+
+    /// \def MagnetometerSensorPtr
+    /// \brief Shared pointer to ImuSensor
+    typedef boost::shared_ptr<MagnetometerSensor> MagnetometerSensorPtr;
 
     /// \def RFIDSensorPtr
     /// \brief Shared pointer to RFIDSensor

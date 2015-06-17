@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Orientation
+/// \brief Data from an orientation sensor, e.g AHRS
+
+
+import "time.proto";
+import "vector3d.proto";
+import "quaternion.proto";
+
+message Orientation
+{
+  required Time stamp                   = 1;
+  required string entity_name           = 2;
+  required Quaternion quaternion        = 3;
+  required Vector3d euler               = 4;
+}

@@ -115,9 +115,9 @@ bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
       M = magPose.rot.GetInverse().RotateVector(M);
 
       // Apply position noise before converting to global frame
-      magPose.x = this->noises[MagneticFieldNoiseX]->Apply(magPose.x);
-      magPose.y = this->noises[MagneticFieldNoiseY]->Apply(magPose.y);
-      magPose.z = this->noises[MagneticFieldNoiseZ]->Apply(magPose.z);
+      M.x = this->noises[MagneticFieldNoiseX]->Apply(M.x);
+      M.y = this->noises[MagneticFieldNoiseY]->Apply(M.y);
+      M.z = this->noises[MagneticFieldNoiseZ]->Apply(M.z);
     }
   }
 
