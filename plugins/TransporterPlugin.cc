@@ -124,7 +124,7 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 void TransporterPlugin::OnActivation(ConstGzStringPtr &_msg)
 {
   // Find the pad
-  const auto &iter = this->dataPtr->pads.find(_msg->data());
+  auto const &iter = this->dataPtr->pads.find(_msg->data());
   if (iter != this->dataPtr->pads.end())
   {
     // Activate the pad.
@@ -156,13 +156,13 @@ void TransporterPlugin::Update()
     math::Pose modelPose = iter->GetWorldPose();
 
     // Iterate over all pads
-    for (const auto &padIter : this->dataPtr->pads)
+    for (auto const &padIter : this->dataPtr->pads)
     {
       // Check if the model is in the pad's outgoing box.
       if (padIter.second->outgoingBox.Contains(modelPose.pos))
       {
         // Get the destination pad
-        const auto &destIter = this->dataPtr->pads.find(padIter.second->dest);
+        auto const &destIter = this->dataPtr->pads.find(padIter.second->dest);
 
         // Make sure we can transport the model
         if (destIter != this->dataPtr->pads.end() &&

@@ -16,7 +16,10 @@
 
       <pad name="pad1">
         <destination>pad2</destination>
-        <activation>auto</activation>
+
+        <!-- See examples/stand_alone_transporter.cc for an example of
+             activating a manual transporter -->
+        <activation>manual</activation>
 
         <outgoing>
           <min>-.5 -.5 0</min>
@@ -29,10 +32,8 @@
       </pad>
 
       <pad name="pad2">
-        <!-- See examples/stand_alone_transporter.cc for an example of
-             activating a manual transporter -->
         <destination>pad1</destination>
-        <activation>manual</activation>
+        <activation>auto</activation>
 
         <outgoing>
           <min>-.5 3.0 0</min>

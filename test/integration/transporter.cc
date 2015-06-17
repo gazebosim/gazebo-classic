@@ -43,7 +43,7 @@ TEST_F(TransporterTest, Transport)
 
   // Move the box onto the auto transport pad
   boxModel->SetWorldPose(math::Pose(100.5, 0, 0.5, 0, 0, 0));
-  common::Time::Sleep(common::Time(1,0));
+  common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box moved to the correct location
   EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 0.0, 1e-3);
@@ -51,7 +51,7 @@ TEST_F(TransporterTest, Transport)
 
   // Move the box away
   boxModel->SetWorldPose(math::Pose(10, 10, 0.5, 0, 0, 0));
-  common::Time::Sleep(common::Time(1,0));
+  common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box is in the correct location
   EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 10.0, 1e-3);
@@ -59,7 +59,7 @@ TEST_F(TransporterTest, Transport)
 
   // Move the box to the manual transporter pad
   boxModel->SetWorldPose(math::Pose(-100.5, 0, 0.5, 0, 0, 0));
-  common::Time::Sleep(common::Time(1,0));
+  common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box is in the correct location
   EXPECT_NEAR(boxModel->GetWorldPose().pos.x, -100.5, 1e-3);
@@ -84,7 +84,7 @@ TEST_F(TransporterTest, Transport)
     pub->Publish(msg);
   }
 
-  common::Time::Sleep(common::Time(1,0));
+  common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box moved to the correct location
   EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 0, 1e-3);

@@ -36,9 +36,9 @@ int main(int _argc, char **_argv)
   // Wait for a subscriber to connect
   pub->WaitForConnection();
 
-  // Tell pad2 to activate
+  // Tell pad1 to activate
   gazebo::msgs::GzString msg;
-  msg.set_data("pad2");
+  msg.set_data("pad1");
   pub->Publish(msg);
 
   // Make sure to shut everything down.
