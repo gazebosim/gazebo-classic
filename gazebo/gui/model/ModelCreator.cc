@@ -643,7 +643,7 @@ std::string ModelCreator::AddShape(LinkType _type,
       return std::string();
     }
 
-    // SVG paths do not map to sdf polylines, because we now allow a countour
+    // SVG paths do not map to sdf polylines, because we now allow a contour
     // to be made of multiple svg disjoint paths.
     // For this reason, we compute the closed polylines that can be extruded
     // in this step
