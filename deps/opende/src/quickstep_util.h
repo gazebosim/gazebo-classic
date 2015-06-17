@@ -171,7 +171,8 @@ struct dxPGSLCPParameters {
     dRealMutablePtr lambda_erp;
 
 #ifdef REORDER_CONSTRAINTS
-    dRealMutablePtr last_lambda ;
+    dRealMutablePtr last_lambda;
+    dRealMutablePtr last_mu_mg;
 #endif
 };
 // ****************************************************************

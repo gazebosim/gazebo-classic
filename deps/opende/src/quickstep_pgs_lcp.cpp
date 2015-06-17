@@ -104,6 +104,7 @@ static void* ComputeRows(void *p)
 
   /// MG
   dRealMutablePtr mg_mu       = params->mg_mu;
+
   /// THREAD_POSITION_CORRECTION
   dRealPtr rhs_erp             = params->rhs_erp;
   dRealMutablePtr caccel_erp   = params->caccel_erp;
@@ -111,11 +112,15 @@ static void* ComputeRows(void *p)
 
 #ifdef REORDER_CONSTRAINTS
   dRealMutablePtr last_lambda  = params->last_lambda;
+  /// MG
+  dRealMutablePtr last_mg_mu   = params->last_mg_mu;
 #endif
 
   //printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
-  //for (int i=startRow; i<startRow+nRows; i++) // swap within boundary of our own segment
-  //  printf("wwwwwwwwwwwww>id %d start %d n %d  order[%d].index=%d\n",thread_id,startRow,nRows,i,order[i].index);
+  //for (int i=startRow; i<startRow+nRows; i++)
+  // swap within boundary of our own segment
+  //  printf("wwwwwwwwwwwww>id %d start %d n %d  order[%d].index=%d\n",
+  //  thread_id, startRow, nRows, i, order[i].index);
 
   /*  DEBUG PRINTOUTS
   // print J_orig
@@ -128,7 +133,8 @@ static void* ComputeRows(void *p)
   }
   printf("\n");
 
-  // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
+  // print J, J_precon (already premultiplied by inverse of diagonal of LHS)
+  // and rhs_precon and rhs
   printf("J_precon\n");
   for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
