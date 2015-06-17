@@ -161,6 +161,7 @@ struct dxPGSLCPParameters {
     dRealPtr rhs;
     dRealMutablePtr caccel;
     dRealMutablePtr lambda;
+    dRealMutablePtr mg_mu;
 
     /// Only used if THREAD_POSITION_CORRECTION is not active,
     /// in that case, compute both updates in the same

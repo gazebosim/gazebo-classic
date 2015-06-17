@@ -102,6 +102,8 @@ static void* ComputeRows(void *p)
   dRealMutablePtr caccel       = params->caccel;
   dRealMutablePtr lambda       = params->lambda;
 
+  /// MG
+  dRealMutablePtr mg_mu       = params->mg_mu;
   /// THREAD_POSITION_CORRECTION
   dRealPtr rhs_erp             = params->rhs_erp;
   dRealMutablePtr caccel_erp   = params->caccel_erp;
