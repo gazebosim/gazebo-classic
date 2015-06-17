@@ -18,9 +18,6 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <gazebo/math/gzmath.hh>
-
-#include <iostream>
 
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
@@ -39,9 +36,9 @@ int main(int _argc, char **_argv)
   // Wait for a subscriber to connect
   pub->WaitForConnection();
 
-  // Convert to a pose message
+  // Tell pad2 to activate
   gazebo::msgs::GzString msg;
-  msg.set_data("pad1");
+  msg.set_data("pad2");
   pub->Publish(msg);
 
   // Make sure to shut everything down.
