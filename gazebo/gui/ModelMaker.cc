@@ -14,6 +14,13 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
 #include "gazebo/msgs/msgs.hh"
@@ -249,7 +256,8 @@ void ModelMaker::Stop()
 {
   // Remove the temporary visual from the scene
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  scene->RemoveVisual(this->modelVisual);
+  for (auto vis : this->visuals)
+    scene->RemoveVisual(vis);
   this->modelVisual.reset();
   this->visuals.clear();
   this->modelSDF.reset();

@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -34,6 +40,8 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
 {
   WrenchVisualPrivate *dPtr =
       reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_PHYSICS;
 
   dPtr->enabled = true;
   dPtr->receivedMsg = false;

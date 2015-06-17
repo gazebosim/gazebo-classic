@@ -14,6 +14,13 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
 #include "gazebo/transport/Node.hh"
@@ -76,11 +83,10 @@ TimePanel::TimePanel(QWidget *_parent)
       boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
-  this->OnPlayActionChanged();
 }
 
 /////////////////////////////////////////////////
-void TimePanel::OnFullScreen(bool & /*_value*/)
+void TimePanel::OnFullScreen(bool /*_value*/)
 {
   /*if (_value)
     this->hide();
@@ -218,12 +224,13 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   if (this->dataPtr->timeWidget->isVisible())
   {
     // Set simulation time
-    this->dataPtr->timeWidget->EmitSetSimTime(
-        QString::fromStdString(FormatTime(_msg->sim_time())));
+    this->dataPtr->timeWidget->EmitSetSimTime(QString::fromStdString(
+        msgs::Convert(_msg->sim_time()).FormattedString()));
 
     // Set real time
-    this->dataPtr->timeWidget->EmitSetRealTime(
-        QString::fromStdString(FormatTime(_msg->real_time())));
+    this->dataPtr->timeWidget->EmitSetRealTime(QString::fromStdString(
+        msgs::Convert(_msg->real_time()).FormattedString()));
+
 
     // Set the iterations
     this->dataPtr->timeWidget->EmitSetIterations(QString::fromStdString(
@@ -232,46 +239,19 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   else if (this->dataPtr->logPlayWidget->isVisible())
   {
     // Set simulation time
-    this->dataPtr->logPlayWidget->EmitSetCurrentTime(
-        QString::fromStdString(FormatTime(_msg->sim_time())));
+    this->dataPtr->logPlayWidget->EmitSetCurrentTime(QString::fromStdString(
+        msgs::Convert(_msg->sim_time()).FormattedString()));
   }
 }
-
-/////////////////////////////////////////////////
-std::string TimePanel::FormatTime(const msgs::Time &_msg)
-{
-  std::ostringstream stream;
-  unsigned int day, hour, min, sec, msec;
-
-  stream.str("");
-
-  sec = _msg.sec();
-
-  day = sec / 86400;
-  sec -= day * 86400;
-
-  hour = sec / 3600;
-  sec -= hour * 3600;
-
-  min = sec / 60;
-  sec -= min * 60;
-
-  msec = rint(_msg.nsec() * 1e-6);
-
-  stream << std::setw(2) << std::setfill('0') << day << " ";
-  stream << std::setw(2) << std::setfill('0') << hour << ":";
-  stream << std::setw(2) << std::setfill('0') << min << ":";
-  stream << std::setw(2) << std::setfill('0') << sec << ".";
-  stream << std::setw(3) << std::setfill('0') << msec;
-
-  return stream.str();
-}
-
 
 /////////////////////////////////////////////////
 void TimePanel::Update()
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+
+  // Avoid apparent race condition on start, seen on Windows.
+  if (!this->dataPtr->simTimes.size() || !this->dataPtr->realTimes.size())
+    return;
 
   std::ostringstream percent;
 

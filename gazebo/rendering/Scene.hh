@@ -31,6 +31,7 @@
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -65,7 +66,8 @@ namespace gazebo
     /// \brief Representation of an entire scene graph.
     ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.
-    class GAZEBO_VISIBLE Scene : public boost::enable_shared_from_this<Scene>
+    class GZ_RENDERING_VISIBLE Scene :
+      public boost::enable_shared_from_this<Scene>
     {
       public: enum SkyXMode {
         GZ_SKYX_ALL = 0x0FFFFFFF,
@@ -383,6 +385,10 @@ namespace gazebo
       /// \param[in] _enabled Set to true to turn on the grid
       public: void SetGrid(bool _enabled);
 
+      /// \brief Show/hide the world origin indicator.
+      /// \param[in] _show True to show the origin.
+      public: void ShowOrigin(bool _show);
+
       /// \brief Get the top level world visual.
       /// \return Pointer to the world visual.
       public: VisualPtr GetWorldVisual() const;
@@ -467,6 +473,12 @@ namespace gazebo
 
       /// \brief Remove all projectors.
       public: void RemoveProjectors();
+
+      /// \brief Toggle layer visilibility. This will process all visuals.
+      /// If a visual is on the specified layer its visiblity will be
+      /// toggled. Visuals with a negative layer index are always visible.
+      /// \param[in] _layer Index of the layer to toggle.
+      public: void ToggleLayer(const int32_t _layer);
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();
@@ -556,7 +568,10 @@ namespace gazebo
 
       /// \brief Process a visual message.
       /// \param[in] _msg The message data.
-      private: bool ProcessVisualMsg(ConstVisualPtr &_msg);
+      /// \param[in] _type Type of visual.
+      /// \return True if message is processed successfully.
+      private: bool ProcessVisualMsg(ConstVisualPtr &_msg,
+          rendering::VisualType _type = rendering::VT_ENTITY);
 
       /// \brief Light message callback.
       /// \param[in] _msg The message data.
@@ -569,10 +584,6 @@ namespace gazebo
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
       private: void ProcessRequestMsg(ConstRequestPtr &_msg);
-
-      /// \brief Selection message callback.
-      /// \param[in] _msg The message data.
-      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       /// \brief Sky message callback.
       /// \param[in] _msg The message data.
@@ -612,6 +623,11 @@ namespace gazebo
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateInertiaVisual(sdf::ElementPtr _elem,
           VisualPtr _linkVisual);
+
+      /// \brief Helper function to remove all visualizations attached to a
+      /// visual.
+      /// \param[in] _vis Visual that the visualizations are attached to.
+      private: void RemoveVisualizations(VisualPtr _vis);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -49,7 +49,7 @@ namespace gazebo
 
     /// \class BuildingMaker BuildingMaker.hh
     /// \brief Create and manage 3D visuals of a building.
-    class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
+    class GZ_GUI_BUILDING_VISIBLE BuildingMaker : public EntityMaker
     {
       /// \enum SaveState
       /// \brief Save states for the building editor.

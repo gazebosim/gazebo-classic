@@ -18,6 +18,6 @@ add_library(gtest STATIC gtest/src/gtest-all.cc)
 add_library(gtest_main STATIC gtest/src/gtest_main.cc)
 target_link_libraries(gtest_main gtest)
 
-add_executable(test test.cc)
-target_link_libraries(test gtest gtest_main gazebo_test_fixture
+add_executable(test_example test.cc)
+target_link_libraries(test_example gtest gtest_main gazebo_test_fixture
   ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})

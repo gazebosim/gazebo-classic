@@ -28,6 +28,7 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Skeleton.hh"
+#include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/WireBox.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -93,6 +94,8 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
   this->dataPtr->castShadows = true;
+  this->dataPtr->visible = true;
+  this->dataPtr->layer = -1;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -129,6 +132,8 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
   this->dataPtr->castShadows = true;
+  this->dataPtr->visible = true;
+  this->dataPtr->layer = -1;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -205,19 +210,7 @@ void Visual::Fini()
   if (this->dataPtr->parent)
     this->dataPtr->parent->DetachVisual(this->GetName());
 
-  // Detach all children
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
-  {
-    this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
-    (*iter)->dataPtr->parent.reset();
-    (*iter).reset();
-  }
-
-  this->dataPtr->children.clear();
-
-  if (this->dataPtr->sceneNode != NULL)
+  if (this->dataPtr->sceneNode)
   {
     this->dataPtr->sceneNode->detachAllObjects();
     this->dataPtr->scene->GetManager()->destroySceneNode(
@@ -288,11 +281,13 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 //////////////////////////////////////////////////
 void Visual::Init()
 {
+  this->dataPtr->type = VT_ENTITY;
   this->dataPtr->transparency = 0.0;
   this->dataPtr->isStatic = false;
   this->dataPtr->visible = true;
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
+  this->dataPtr->layer = -1;
 
   if (this->dataPtr->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
@@ -473,6 +468,17 @@ void Visual::Load()
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
   this->LoadPlugins();
   this->dataPtr->scene->AddVisual(shared_from_this());
+
+  // Set meta information
+  if (this->dataPtr->sdf->HasElement("meta"))
+  {
+    if (this->dataPtr->sdf->GetElement("meta")->HasElement("layer"))
+    {
+      this->dataPtr->layer =
+        this->dataPtr->sdf->GetElement("meta")->Get<int32_t>("layer");
+      rendering::Events::newLayer(this->dataPtr->layer);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -564,7 +570,8 @@ void Visual::DetachVisual(const std::string &_name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
-      this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
+      if (this->dataPtr->sceneNode)
+        this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
       childVis->GetParent().reset();
       break;
     }
@@ -639,7 +646,8 @@ unsigned int Visual::GetAttachedObjectCount() const
 //////////////////////////////////////////////////
 void Visual::DetachObjects()
 {
-  this->dataPtr->sceneNode->detachAllObjects();
+  if (this->dataPtr->sceneNode)
+    this->dataPtr->sceneNode->detachAllObjects();
   this->dataPtr->meshName = "";
   this->dataPtr->subMeshName = "";
   this->dataPtr->myMaterialName = "";
@@ -1554,7 +1562,7 @@ uint32_t Visual::GetVisibilityFlags()
 //////////////////////////////////////////////////
 void Visual::ToggleVisible()
 {
-  this->SetVisible(!this->GetVisible());
+  this->SetVisible(!this->GetVisible(), true);
 }
 
 //////////////////////////////////////////////////
@@ -1644,16 +1652,19 @@ math::Pose Visual::GetWorldPose() const
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
 
-  vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-  pose.pos.x = vpos.x;
-  pose.pos.y = vpos.y;
-  pose.pos.z = vpos.z;
+  if (this->dataPtr->sceneNode)
+  {
+    vpos = this->dataPtr->sceneNode->_getDerivedPosition();
+    pose.pos.x = vpos.x;
+    pose.pos.y = vpos.y;
+    pose.pos.z = vpos.z;
 
-  vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-  pose.rot.w = vquatern.w;
-  pose.rot.x = vquatern.x;
-  pose.rot.y = vquatern.y;
-  pose.rot.z = vquatern.z;
+    vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
+    pose.rot.w = vquatern.w;
+    pose.rot.x = vquatern.x;
+    pose.rot.y = vquatern.y;
+    pose.rot.z = vquatern.z;
+  }
 
   return pose;
 }
@@ -1840,7 +1851,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       {
         std::string str = Ogre::any_cast<std::string>(any);
         if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans"
-            || str.substr(0, 5) == "scale")
+            || str.substr(0, 5) == "scale" ||
+            str.find("_APPLY_WRENCH_") != std::string::npos)
           continue;
       }
 
@@ -2176,6 +2188,16 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     this->MakeStatic();
     */
 
+  // Set meta information
+  if (_msg->has_meta())
+  {
+    if (_msg->meta().has_layer())
+    {
+      this->dataPtr->layer = _msg->meta().layer();
+      rendering::Events::newLayer(this->dataPtr->layer);
+    }
+  }
+
   if (_msg->has_pose())
     this->SetPose(msgs::Convert(_msg->pose()));
 
@@ -2388,10 +2410,47 @@ VisualPtr Visual::GetParent() const
 VisualPtr Visual::GetRootVisual()
 {
   VisualPtr p = shared_from_this();
-  while (p->GetParent() && p->GetParent()->GetName() != "__world_node__")
+  while (p->GetParent() &&
+      p->GetParent() != this->dataPtr->scene->GetWorldVisual())
+  {
     p = p->GetParent();
+  }
 
   return p;
+}
+
+//////////////////////////////////////////////////
+VisualPtr Visual::GetNthAncestor(unsigned int _n)
+{
+  // Get visual's depth
+  unsigned int depth = this->GetDepth();
+
+  // Must be deeper than ancestor
+  if (depth < _n)
+    return NULL;
+
+  // Get ancestor
+  VisualPtr p = shared_from_this();
+  while (p->GetParent() && depth != _n)
+  {
+    p = p->GetParent();
+    --depth;
+  }
+
+  return p;
+}
+
+//////////////////////////////////////////////////
+unsigned int Visual::GetDepth() const
+{
+  boost::shared_ptr<Visual const> p = shared_from_this();
+  unsigned int depth = 0;
+  while (p->GetParent())
+  {
+    p = p->GetParent();
+    ++depth;
+  }
+  return depth;
 }
 
 //////////////////////////////////////////////////
@@ -2602,8 +2661,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
   if (!this->dataPtr->preRenderConnection)
   {
     this->dataPtr->preRenderConnection =
-      event::Events::ConnectPreRender(boost::bind(&Visual::Update,
-      shared_from_this()));
+      event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
   }
 }
 
@@ -2642,8 +2700,7 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
   this->dataPtr->prevAnimTime = common::Time::GetWallTime();
 
   this->dataPtr->preRenderConnection =
-    event::Events::ConnectPreRender(boost::bind(&Visual::Update,
-    shared_from_this()));
+    event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
 }
 
 //////////////////////////////////////////////////
@@ -2882,4 +2939,29 @@ void Visual::SetId(uint32_t _id)
 sdf::ElementPtr Visual::GetSDF() const
 {
   return this->dataPtr->sdf;
+}
+
+//////////////////////////////////////////////////
+rendering::VisualType Visual::GetType() const
+{
+  return this->dataPtr->type;
+}
+
+//////////////////////////////////////////////////
+void Visual::SetType(const rendering::VisualType _type)
+{
+  this->dataPtr->type = _type;
+}
+
+//////////////////////////////////////////////////
+void Visual::ToggleLayer(const int32_t _layer)
+{
+  // Visuals with negative layers are always visible
+  if (this->dataPtr->layer < 0)
+    return;
+
+  if (this->dataPtr->layer == _layer)
+  {
+    this->ToggleVisible();
+  }
 }

@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <time.h>
 
 #include <tbb/parallel_for.h>
@@ -498,8 +504,25 @@ void World::LogStep()
     // Step back: This is implemented by going to the beginning of the log file,
     // and then, step forward up to the target frame.
     // ToDo: Use keyframes in the log file to speed up this process.
-    util::LogPlay::Instance()->Rewind();
+    if (!util::LogPlay::Instance()->Rewind())
+    {
+      gzerr << "Error processing a negative multi-step" << std::endl;
+      this->dataPtr->stepInc = 0;
+      return;
+    }
+
     this->dataPtr->stepInc = this->dataPtr->iterations + this->dataPtr->stepInc;
+
+    // For some reason, the first two chunks contains the same <iterations>
+    // value. If the log file contains <iterations> we will load the same
+    // iterations value twice and this will affect the way we're stepping back.
+    // ToDo: Fix the source of the problem for avoiding this extra step.
+    if (util::LogPlay::Instance()->HasIterations())
+    {
+      this->dataPtr->stepInc +=
+        2 - util::LogPlay::Instance()->GetInitialIterations();
+    }
+
     if (this->dataPtr->stepInc < 1)
       this->dataPtr->stepInc = 1;
     this->dataPtr->iterations = 0;
@@ -528,6 +551,14 @@ void World::LogStep()
       sdf::readString(data, this->dataPtr->logPlayStateSDF);
 
       this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
+
+      // If the log file does not contain iterations we have to manually
+      // increase the iteration counter in logPlayState.
+      if (!util::LogPlay::Instance()->HasIterations())
+      {
+        this->dataPtr->logPlayState.SetIterations(
+          this->dataPtr->iterations + 1);
+      }
 
       // Process insertions
       if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
@@ -566,7 +597,6 @@ void World::LogStep()
 
       this->SetState(this->dataPtr->logPlayState);
       this->Update();
-      this->dataPtr->iterations++;
     }
 
     {
@@ -1234,7 +1264,7 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     // will still be published
     this->SetPaused(true);
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
-    this->dataPtr->stepInc = _data->multi_step();
+    this->dataPtr->stepInc += _data->multi_step();
   }
 
   if (_data->has_seek())
@@ -1808,6 +1838,7 @@ void World::SetState(const WorldState &_state)
 {
   this->SetSimTime(_state.GetSimTime());
   this->dataPtr->logRealTime = _state.GetRealTime();
+  this->dataPtr->iterations = _state.GetIterations();
 
   const ModelState_M modelStates = _state.GetModelStates();
   for (auto const &modelState : modelStates)
@@ -2243,4 +2274,11 @@ bool World::GetEnablePhysicsEngine()
 void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
+}
+
+/////////////////////////////////////////////////
+void World::_AddDirty(Entity *_entity)
+{
+  GZ_ASSERT(_entity != NULL, "_entity is NULL");
+  this->dataPtr->dirtyPoses.push_back(_entity);
 }

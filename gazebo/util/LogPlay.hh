@@ -45,7 +45,7 @@ namespace gazebo
     /// state information to a World.
     ///
     /// \sa LogRecord, State
-    class GAZEBO_VISIBLE LogPlay : public SingletonT<LogPlay>
+    class GZ_UTIL_VISIBLE LogPlay : public SingletonT<LogPlay>
     {
       /// \brief Constructor
       private: LogPlay();
@@ -130,6 +130,16 @@ namespace gazebo
       /// \return Header of the open log file.
       public: std::string GetHeader() const;
 
+      /// \brief Get the initial simulation iterations from a log file.
+      /// \return Initial simulation iteration contained in the log file.
+      public: uint64_t GetInitialIterations() const;
+
+      /// \brief Return if the log file contains the <iterations> tag. Old log
+      /// files may not have the <iterations> tag.
+      /// \return True if <iterations> was found in the log file or
+      /// false otherwise.
+      public: bool HasIterations() const;
+
       /// \brief Helper function to get chunk data from XML.
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.
@@ -142,6 +152,10 @@ namespace gazebo
       /// \brief Update the internal variables that keep track of the times
       /// where the log started and finished (simulation time).
       private: void ReadLogTimes();
+
+      /// \brief Update the internal variable that keeps track of the initial
+      /// "iterations" value.
+      private: bool ReadIterations();
 
       /// \brief The XML document of the log file.
       private: TiXmlDocument xmlDoc;
@@ -175,6 +189,13 @@ namespace gazebo
       private: std::string encoding;
 
       private: std::string currentChunk;
+
+      /// \brief Initial simulation iteration contained in the log file.
+      private: uint64_t initialIterations;
+
+      /// \brief True if <iterations> is found in the log file. Old log versions
+      /// may not include this tag in the log files.
+      private: bool iterationsFound;
 
       /// \brief A mutex to avoid race conditions.
       private: std::mutex mutex;

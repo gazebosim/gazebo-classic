@@ -45,7 +45,7 @@
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
-#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/OriginVisual.hh"
 #include "gazebo/rendering/RFIDVisual.hh"
 #include "gazebo/rendering/RFIDTagVisual.hh"
 #include "gazebo/rendering/VideoVisual.hh"
@@ -118,6 +118,10 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
+  this->dataPtr->connections.push_back(
+      rendering::Events::ConnectToggleLayer(
+        boost::bind(&Scene::ToggleLayer, this, _1)));
+
   this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
   this->dataPtr->visSub =
@@ -145,8 +149,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->skeletonPoseSub =
       this->dataPtr->node->Subscribe("~/skeleton_pose/info",
       &Scene::OnSkeletonPoseMsg, this);
-  this->dataPtr->selectionSub = this->dataPtr->node->Subscribe("~/selection",
-      &Scene::OnSelectionMsg, this);
   this->dataPtr->skySub =
       this->dataPtr->node->Subscribe("~/sky", &Scene::OnSkyMsg, this);
   this->dataPtr->modelInfoSub = this->dataPtr->node->Subscribe("~/model/info",
@@ -158,10 +160,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
       &Scene::OnRequest, this);
 
-  // \TODO: This causes the Scene to occasionally miss the response to
-  // scene_info
-  // this->responsePub =
-      this->dataPtr->node->Advertise<msgs::Response>("~/response");
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
       &Scene::OnResponse, this, true);
   this->dataPtr->sceneSub =
@@ -195,7 +193,6 @@ void Scene::Clear()
   this->dataPtr->sensorSub.reset();
   this->dataPtr->sceneSub.reset();
   this->dataPtr->skeletonPoseSub.reset();
-  this->dataPtr->selectionSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
   this->dataPtr->lightSub.reset();
@@ -205,7 +202,6 @@ void Scene::Clear()
   this->dataPtr->lightPub.reset();
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
-  this->dataPtr->selectionMsg.reset();
 
   this->dataPtr->joints.clear();
 
@@ -219,6 +215,12 @@ void Scene::Clear()
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
 
   this->dataPtr->visuals.clear();
+
+  if (this->dataPtr->originVisual)
+  {
+    this->dataPtr->originVisual->Fini();
+    this->dataPtr->originVisual.reset();
+  }
 
   if (this->dataPtr->worldVisual)
   {
@@ -353,6 +355,11 @@ void Scene::Init()
 
   // Force shadows on.
   this->SetShadowsEnabled(true);
+
+  // Create origin visual
+  this->dataPtr->originVisual.reset(new OriginVisual("__WORLD_ORIGIN__",
+      this->dataPtr->worldVisual));
+  this->dataPtr->originVisual->Load();
 
   this->dataPtr->requestPub->WaitForConnection();
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
@@ -1468,6 +1475,9 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   if (_msg->has_grid())
     this->SetGrid(_msg->grid());
 
+  if (_msg->has_origin_visual())
+    this->ShowOrigin(_msg->origin_visual());
+
   // Process the sky message.
   if (_msg->has_sky())
   {
@@ -1523,11 +1533,11 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   std::string modelName, linkName;
 
   modelName = _msg.name() + "::";
-  for (int j = 0; j < _msg.visual_size(); j++)
+  for (int j = 0; j < _msg.visual_size(); ++j)
   {
     boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
           _msg.visual(j)));
-    this->dataPtr->visualMsgs.push_back(vm);
+    this->dataPtr->modelVisualMsgs.push_back(vm);
   }
 
   // Set the scale of the model visual
@@ -1542,16 +1552,16 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     vm->mutable_scale()->set_x(_msg.scale().x());
     vm->mutable_scale()->set_y(_msg.scale().y());
     vm->mutable_scale()->set_z(_msg.scale().z());
-    this->dataPtr->visualMsgs.push_back(vm);
+    this->dataPtr->modelVisualMsgs.push_back(vm);
   }
 
-  for (int j = 0; j < _msg.joint_size(); j++)
+  for (int j = 0; j < _msg.joint_size(); ++j)
   {
     boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
           _msg.joint(j)));
     this->dataPtr->jointMsgs.push_back(jm);
 
-    for (int k = 0; k < _msg.joint(j).sensor_size(); k++)
+    for (int k = 0; k < _msg.joint(j).sensor_size(); ++k)
     {
       boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
             _msg.joint(j).sensor(k)));
@@ -1559,7 +1569,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     }
   }
 
-  for (int j = 0; j < _msg.link_size(); j++)
+  for (int j = 0; j < _msg.link_size(); ++j)
   {
     linkName = modelName + _msg.link(j).name();
 
@@ -1586,25 +1596,33 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
       this->dataPtr->linkMsgs.push_back(lm);
     }
 
-    for (int k = 0; k < _msg.link(j).visual_size(); k++)
+    if (_msg.link(j).visual_size() > 0)
+    {
+      // note: the first visual in the link is the link visual
+      msgs::VisualPtr vm(new msgs::Visual(
+            _msg.link(j).visual(0)));
+      this->dataPtr->linkVisualMsgs.push_back(vm);
+    }
+
+    for (int k = 1; k < _msg.link(j).visual_size(); ++k)
     {
       boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
             _msg.link(j).visual(k)));
       this->dataPtr->visualMsgs.push_back(vm);
     }
 
-    for (int k = 0; k < _msg.link(j).collision_size(); k++)
+    for (int k = 0; k < _msg.link(j).collision_size(); ++k)
     {
       for (int l = 0;
           l < _msg.link(j).collision(k).visual_size(); l++)
       {
         boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
               _msg.link(j).collision(k).visual(l)));
-        this->dataPtr->visualMsgs.push_back(vm);
+        this->dataPtr->collisionVisualMsgs.push_back(vm);
       }
     }
 
-    for (int k = 0; k < _msg.link(j).sensor_size(); k++)
+    for (int k = 0; k < _msg.link(j).sensor_size(); ++k)
     {
       boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
             _msg.link(j).sensor(k)));
@@ -1692,7 +1710,10 @@ void Scene::PreRender()
   ModelMsgs_L modelMsgsCopy;
   SensorMsgs_L sensorMsgsCopy;
   LightMsgs_L lightMsgsCopy;
+  VisualMsgs_L modelVisualMsgsCopy;
+  VisualMsgs_L linkVisualMsgsCopy;
   VisualMsgs_L visualMsgsCopy;
+  VisualMsgs_L collisionVisualMsgsCopy;
   JointMsgs_L jointMsgsCopy;
   LinkMsgs_L linkMsgsCopy;
 
@@ -1716,11 +1737,26 @@ void Scene::PreRender()
               std::back_inserter(lightMsgsCopy));
     this->dataPtr->lightMsgs.clear();
 
+    std::copy(this->dataPtr->modelVisualMsgs.begin(),
+              this->dataPtr->modelVisualMsgs.end(),
+              std::back_inserter(modelVisualMsgsCopy));
+    this->dataPtr->modelVisualMsgs.clear();
+
+    std::copy(this->dataPtr->linkVisualMsgs.begin(),
+              this->dataPtr->linkVisualMsgs.end(),
+              std::back_inserter(linkVisualMsgsCopy));
+    this->dataPtr->linkVisualMsgs.clear();
+
     this->dataPtr->visualMsgs.sort(VisualMessageLessOp);
     std::copy(this->dataPtr->visualMsgs.begin(),
               this->dataPtr->visualMsgs.end(),
               std::back_inserter(visualMsgsCopy));
     this->dataPtr->visualMsgs.clear();
+
+    std::copy(this->dataPtr->collisionVisualMsgs.begin(),
+              this->dataPtr->collisionVisualMsgs.end(),
+              std::back_inserter(collisionVisualMsgsCopy));
+    this->dataPtr->collisionVisualMsgs.clear();
 
     std::copy(this->dataPtr->jointMsgs.begin(), this->dataPtr->jointMsgs.end(),
               std::back_inserter(jointMsgsCopy));
@@ -1772,11 +1808,41 @@ void Scene::PreRender()
       ++lightIter;
   }
 
+  // Process the model visual messages.
+  for (visualIter = modelVisualMsgsCopy.begin();
+      visualIter != modelVisualMsgsCopy.end();)
+  {
+    if (this->ProcessVisualMsg(*visualIter, VT_MODEL))
+      modelVisualMsgsCopy.erase(visualIter++);
+    else
+      ++visualIter;
+  }
+
+  // Process the link visual messages.
+  for (visualIter = linkVisualMsgsCopy.begin();
+      visualIter != linkVisualMsgsCopy.end();)
+  {
+    if (this->ProcessVisualMsg(*visualIter, VT_LINK))
+      linkVisualMsgsCopy.erase(visualIter++);
+    else
+      ++visualIter;
+  }
+
   // Process the visual messages.
   for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter))
+    if (this->ProcessVisualMsg(*visualIter, VT_VISUAL))
       visualMsgsCopy.erase(visualIter++);
+    else
+      ++visualIter;
+  }
+
+  // Process the collision visual messages.
+  for (visualIter = collisionVisualMsgsCopy.begin();
+      visualIter != collisionVisualMsgsCopy.end();)
+  {
+    if (this->ProcessVisualMsg(*visualIter, VT_COLLISION))
+      collisionVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
   }
@@ -1822,8 +1888,17 @@ void Scene::PreRender()
     std::copy(lightMsgsCopy.begin(), lightMsgsCopy.end(),
         std::front_inserter(this->dataPtr->lightMsgs));
 
+    std::copy(modelVisualMsgsCopy.begin(), modelVisualMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->modelVisualMsgs));
+
+    std::copy(linkVisualMsgsCopy.begin(), linkVisualMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->linkVisualMsgs));
+
     std::copy(visualMsgsCopy.begin(), visualMsgsCopy.end(),
         std::front_inserter(this->dataPtr->visualMsgs));
+
+    std::copy(collisionVisualMsgsCopy.begin(), collisionVisualMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->collisionVisualMsgs));
 
     std::copy(jointMsgsCopy.begin(), jointMsgsCopy.end(),
         std::front_inserter(this->dataPtr->jointMsgs));
@@ -1901,15 +1976,6 @@ void Scene::PreRender()
     // official time stamp of approval
     this->dataPtr->sceneSimTimePosesApplied =
         this->dataPtr->sceneSimTimePosesReceived;
-
-    if (this->dataPtr->selectionMsg)
-    {
-      if (!this->dataPtr->selectedVis ||
-          this->dataPtr->selectionMsg->name() !=
-          this->dataPtr->selectedVis->GetName())
-        this->SelectVisual(this->dataPtr->selectionMsg->name(), "normal");
-      this->dataPtr->selectionMsg.reset();
-    }
   }
 }
 
@@ -2373,7 +2439,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
+bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
 {
   bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
@@ -2466,6 +2532,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     {
       result = true;
       visual->LoadFromMsg(_msg);
+      visual->SetType(_type);
 
       this->dataPtr->visuals[visual->GetId()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
@@ -2561,12 +2628,6 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
   }
 
   return true;
-}
-
-/////////////////////////////////////////////////
-void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
-{
-  this->dataPtr->selectionMsg = _msg;
 }
 
 /////////////////////////////////////////////////
@@ -2729,16 +2790,18 @@ void Scene::SetSky()
 void Scene::SetShadowsEnabled(bool _value)
 {
   // If a usercamera is set to stereo mode, then turn off shadows.
+  // If a usercamera uses orthographic projection, then turn off shadows.
   // Our shadow mapping technique disables stereo.
-  bool stereoOverride = true;
+  bool shadowOverride = true;
   for (std::vector<UserCameraPtr>::iterator iter =
        this->dataPtr->userCameras.begin();
-       iter != this->dataPtr->userCameras.end() && stereoOverride; ++iter)
+       iter != this->dataPtr->userCameras.end() && shadowOverride; ++iter)
   {
-    stereoOverride = !(*iter)->StereoEnabled();
+    shadowOverride = !(*iter)->StereoEnabled() &&
+                     (*iter)->GetProjectionType() != "orthographic";
   }
 
-  _value = _value && stereoOverride;
+  _value = _value && shadowOverride;
 
   this->dataPtr->sdf->GetElement("shadows")->Set(_value);
 
@@ -2829,6 +2892,8 @@ void Scene::RemoveVisual(uint32_t _id)
         ++piter;
     }
 
+    this->RemoveVisualizations(vis);
+
     vis->Fini();
     this->dataPtr->visuals.erase(iter);
     if (this->dataPtr->selectedVis && this->dataPtr->selectedVis->GetId() ==
@@ -2902,6 +2967,12 @@ void Scene::SetGrid(bool _enabled)
   }
 }
 
+/////////////////////////////////////////////////
+void Scene::ShowOrigin(bool _show)
+{
+  this->dataPtr->originVisual->SetVisible(_show);
+}
+
 //////////////////////////////////////////////////
 std::string Scene::StripSceneName(const std::string &_name) const
 {
@@ -2952,10 +3023,27 @@ void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 {
   InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
-      "_Inertia_VISUAL__", _linkVisual));
+      "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_elem);
   inertiaVis->SetVisible(false);
   this->dataPtr->visuals[inertiaVis->GetId()] = inertiaVis;
+}
+
+/////////////////////////////////////////////////
+void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
+{
+  std::vector<VisualPtr> toRemove;
+  for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr childVis = _vis->GetChild(i);
+    rendering::VisualType visType = childVis->GetType();
+    if (visType == VT_PHYSICS || visType == VT_SENSOR)
+    {
+      toRemove.push_back(childVis);
+    }
+  }
+  for (auto vis : toRemove)
+    this->RemoveVisual(vis);
 }
 
 /////////////////////////////////////////////////
@@ -3115,4 +3203,13 @@ void Scene::RemoveProjectors()
     delete iter->second;
   }
   this->dataPtr->projectors.clear();
+}
+
+/////////////////////////////////////////////////
+void Scene::ToggleLayer(const int32_t _layer)
+{
+  for (auto visual : this->dataPtr->visuals)
+  {
+    visual.second->ToggleLayer(_layer);
+  }
 }

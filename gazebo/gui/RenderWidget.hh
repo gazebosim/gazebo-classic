@@ -110,6 +110,10 @@ namespace gazebo
 
       /// \brief Bottom frame that holds the play/pause widgets
       private: QFrame *bottomFrame;
+
+      /// \brief Frame which holds the top toolbar.
+      private: QFrame *toolFrame;
+
       private: QLabel *xyzLabel;
       private: QLineEdit *xPosEdit;
       private: QLineEdit *yPosEdit;
@@ -124,6 +128,7 @@ namespace gazebo
 
       /// \brief Widget for the top toolbar
       private: QToolBar *toolbar;
+
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 

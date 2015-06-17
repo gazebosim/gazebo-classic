@@ -1,0 +1,217 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <gui>
+      <!-- A plugin for controlling the Cessna with the keyboard -->
+      <plugin name="cessna_keyboard" filename="libCessnaGUIPlugin.so"/>
+
+      <camera name="user_camera">
+        <pose>-16 0 4 0 0 0</pose>
+      </camera>
+    </gui>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>5000 5000</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="runway">
+          <pose>700 0 0.1 0 0 0</pose>
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>1829 45</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Runway</name>
+            </script>
+          </material>
+        </visual>
+
+        <visual name="grass">
+          <pose>0 0 -0.1 0 0 0</pose>
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>5000 5000</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grass</name>
+            </script>
+          </material>
+        </visual>
+
+      </link>
+    </model>
+
+    <model name="cessna_c172">
+      <include>
+        <uri>model://cessna</uri>
+      </include>
+
+      <link name="blade_1_visual">
+        <pose>1.79 0 1.350 0 0 0</pose>
+        <gravity>0</gravity>
+      </link>
+
+      <link name="wing_body_debug_visuals">
+        <pose>0 0 0.495 0 0 0</pose>
+        <gravity>0</gravity>
+      </link>
+
+      <!-- Plugins for controlling the thrust and control surfaces -->
+      <plugin name="cessna_control" filename="libCessnaPlugin.so">
+        <propeller>cessna_c172::propeller_joint</propeller>
+        <propeller_max_rpm>2500</propeller_max_rpm>
+        <left_aileron>cessna_c172::left_aileron_joint</left_aileron>
+        <left_flap>cessna_c172::left_flap_joint</left_flap>
+        <right_aileron>cessna_c172::right_aileron_joint</right_aileron>
+        <right_flap>cessna_c172::right_flap_joint</right_flap>
+        <elevators>cessna_c172::elevators_joint</elevators>
+        <rudder>cessna_c172::rudder_joint</rudder>
+        <propeller_p_gain>10000</propeller_p_gain>
+        <propeller_i_gain>0</propeller_i_gain>
+        <propeller_d_gain>0</propeller_d_gain>
+        <surfaces_p_gain>2000</surfaces_p_gain>
+        <surfaces_i_gain>0</surfaces_i_gain>
+        <surfaces_d_gain>0</surfaces_d_gain>
+      </plugin>
+      <plugin name="propeller_top_blade" filename="libLiftDragPlugin.so">
+        <a0>0.4</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0</cma>
+        <alpha_stall>1.5</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.37 0 0.77</cp>
+        <area>0.1</area>
+        <air_density>1.2041</air_density>
+        <forward>0 -1 0</forward>
+        <upward>1 0 0</upward>
+        <link_name>cessna_c172::propeller</link_name>
+      </plugin>
+      <plugin name="propeller_bottom_blade" filename="libLiftDragPlugin.so">
+        <a0>0.4</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>0</cma>
+        <alpha_stall>1.5</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-0.37 0 -0.77</cp>
+        <area>0.1</area>
+        <air_density>1.2041</air_density>
+        <forward>0 1 0</forward>
+        <upward>1 0 0</upward>
+        <link_name>cessna_c172::propeller</link_name>
+      </plugin>
+
+      <plugin name="left_wing" filename="libLiftDragPlugin.so">
+        <a0>0.05984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-1 2.205 1.5</cp>
+        <area>8.08255</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>cessna_c172::body</link_name>
+        <control_joint_name>cessna_c172::left_aileron_joint</control_joint_name>
+        <control_joint_rad_to_cl>-2.0</control_joint_rad_to_cl>
+      </plugin>
+
+      <plugin name="right_wing" filename="libLiftDragPlugin.so">
+        <a0>0.05984281113</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-1 -2.205 1.5</cp>
+        <area>8.08255</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>cessna_c172::body</link_name>
+        <control_joint_name>
+          cessna_c172::right_aileron_joint
+        </control_joint_name>
+        <control_joint_rad_to_cl>-2.0</control_joint_rad_to_cl>
+      </plugin>
+
+      <plugin name="elevator" filename="libLiftDragPlugin.so">
+        <a0>-0.2</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-5.45 0 0.55</cp>
+        <area>2.03458</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 0 1</upward>
+        <link_name>cessna_c172::body</link_name>
+        <control_joint_name>cessna_c172::elevators_joint</control_joint_name>
+        <control_joint_rad_to_cl>-4.0</control_joint_rad_to_cl>
+      </plugin>
+
+      <plugin name="rudder" filename="libLiftDragPlugin.so">
+        <a0>0</a0>
+        <cla>4.752798721</cla>
+        <cda>0.6417112299</cda>
+        <cma>-1.8</cma>
+        <alpha_stall>0.3391428111</alpha_stall>
+        <cla_stall>-3.85</cla_stall>
+        <cda_stall>-0.9233984055</cda_stall>
+        <cma_stall>0</cma_stall>
+        <cp>-6 0 1.55</cp>
+        <area>1.5329</area>
+        <air_density>1.2041</air_density>
+        <forward>1 0 0</forward>
+        <upward>0 1 0</upward>
+        <link_name>cessna_c172::body</link_name>
+        <control_joint_name>cessna_c172::rudder_joint</control_joint_name>
+        <control_joint_rad_to_cl>4.0</control_joint_rad_to_cl>
+      </plugin>
+    </model>
+  </world>
+</sdf>
