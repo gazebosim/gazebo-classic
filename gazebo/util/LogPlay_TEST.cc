@@ -146,6 +146,39 @@ TEST_F(LogPlay_TEST, Chunks)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test Rewind().
+TEST_F(LogPlay_TEST, Rewind)
+{
+  gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
+
+  // Open a correct log file.
+  boost::filesystem::path logFilePath(TEST_PATH);
+  logFilePath /= boost::filesystem::path("logs");
+  logFilePath /= boost::filesystem::path("state.log");
+
+  EXPECT_NO_THROW(player->Open(logFilePath.string()));
+
+  // Read the first entry in the log file.
+  std::string firstEntry;
+  // Consume the first chunk because it does not have <state>
+  // ToDo: Fix this.
+  EXPECT_TRUE(player->Step(firstEntry));
+  // Read the first world state.
+  EXPECT_TRUE(player->Step(firstEntry));
+
+  // Step a few more times.
+  std::string logEntry;
+  for (int i = 0; i < 5; ++i)
+    EXPECT_TRUE(player->Step(logEntry));
+
+  // Rewind and read the first entry again.
+  EXPECT_TRUE(player->Rewind());
+  std::string entry;
+  EXPECT_TRUE(player->Step(entry));
+  EXPECT_EQ(entry, firstEntry);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
