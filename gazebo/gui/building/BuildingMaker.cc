@@ -763,9 +763,13 @@ void BuildingMaker::GenerateSDF()
 
   modelElem->GetAttribute("name")->Set(
       GetFolderNameFromModelName(this->modelName));
-  math::Pose modelOrigin(
+  math::Pose modelOrigin = math::Pose::Zero;
+  if (this->previewVisual)
+  {
+    modelOrigin = math::Pose(
       this->previewVisual->GetBoundingBox().GetCenter().x,
       this->previewVisual->GetBoundingBox().GetCenter().y, 0, 0, 0, 0);
+  }
   modelElem->GetElement("pose")->Set(modelOrigin);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
