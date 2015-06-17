@@ -146,7 +146,7 @@ void TransporterPlugin::Update()
   std::lock_guard<std::mutex> lock(this->dataPtr->padMutex);
 
   // Process each model.
-  for (auto &iter : models)
+  for (auto const &iter : models)
   {
     // Skip models that are static
     if (iter->IsStatic())

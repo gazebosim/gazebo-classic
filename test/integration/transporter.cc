@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ TEST_F(TransporterTest, Transport)
   boxModel->SetWorldPose(math::Pose(100.5, 0, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
-  // Check that the box moved to the correct location
+  // Check that the box transported to the correct location
   EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 0.0, 1e-3);
   EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 0.0, 1e-3);
 
@@ -86,7 +86,7 @@ TEST_F(TransporterTest, Transport)
 
   common::Time::Sleep(common::Time(1, 0));
 
-  // Check that the box moved to the correct location
+  // Check that the box transported to the correct location
   EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 0, 1e-3);
   EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 0, 1e-3);
 }

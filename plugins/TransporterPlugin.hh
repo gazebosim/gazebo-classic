@@ -30,56 +30,58 @@ namespace gazebo
   /// each <pad> defines an outgoing region, an incoming pose, and
   /// a destination pad.
   ///
-  /// When a model enters a pad's outgoing region it is moved the
+  /// When a model enters a pad's outgoing region it is moved to the
   /// destination pad's incoming pose. This means the transporter plugin is
   /// only useful if at least two pads are defined.
   ///
-  /// The following is example usage:
+  /// The following is example usage in SDF:
   ///
-  /// \verbatim
-  ///  <plugin filename="libTransporterPlugin.so" name="transporter">
-  ///    <!-- Topic that facilitates manual activation of a pad. An
-  ///    activation message is only meaningful for pad's with manual
-  ///    activation. An activation message consists of
-  ///    a string message on this topic with a pad's name to activate. -->
-  ///    <activation_topic>~/transporter</activation_topic>
-  ///
-  ///    <!-- Pad 1, which is automatically updated. This means any model
-  ///    that enter the outgoing region will be moved -->
-  ///    <pad name="pad1">
-  ///      <destination>pad2</destination>
-  ///      <activation>auto</activation>
-  ///
-  ///      <outgoing>
-  ///        <min>-.5 -.5 0</min>
-  ///        <max>.5 .5 1</max>
-  ///      </outgoing>
-  ///
-  ///      <incoming>
-  ///        <pose>2 3.5 0 0 0 0</pose>
-  ///      </incoming>
-  ///    </pad>
-  ///
-  ///    <!-- Pad 2, which is manually updated. This means a model will be
-  ///    moved only if it is in the outgoing region and an activation
-  ///    message has been received. An activation message consists of
-  ///    a string message on the <activation_topic> topic with
-  ///    the pad's name. -->
-  ///    <pad name="pad2">
-  ///      <destination>pad1</destination>
-  ///      <activation>manual</activation>
-  ///
-  ///      <outgoing>
-  ///        <min>-.5 3.0 0</min>
-  ///        <max>.5 4.0 1</max>
-  ///      </outgoing>
-  ///
-  ///      <incoming>
-  ///        <pose>2 0 0 0 0 0</pose>
-  ///      </incoming>
-  ///    </pad>
-  ///  </plugin>
-  /// \endverbatim
+  /** \verbatim
+    <plugin filename="libTransporterPlugin.so" name="transporter">
+      <!-- Topic that facilitates manual activation of a pad. An
+      activation message is only meaningful for pad's with manual
+      activation. An activation message consists of
+      a string message on this topic with a pad's name to activate.
+      See examples/stand_alone/transporter.cc for an example for
+      triggering a manual pad. -->
+      <activation_topic>~/transporter</activation_topic>
+
+      <!-- Pad 1, which is automatically updated. This means any model
+      that enter the outgoing region will be moved. -->
+      <pad name="pad1">
+        <destination>pad2</destination>
+        <activation>auto</activation>
+
+        <outgoing>
+          <min>-.5 -.5 0</min>
+          <max>.5 .5 1</max>
+        </outgoing>
+
+        <incoming>
+          <pose>2 3.5 0 0 0 0</pose>
+        </incoming>
+      </pad>
+
+      <!-- Pad 2 is manually updated. This means a model will be
+      moved only if it is in the outgoing region and an activation
+      message has been received. An activation message consists of
+      a string message on the <activation_topic> topic with
+      the pad's name. -->
+      <pad name="pad2">
+        <destination>pad1</destination>
+        <activation>manual</activation>
+
+        <outgoing>
+          <min>-.5 3.0 0</min>
+          <max>.5 4.0 1</max>
+        </outgoing>
+
+        <incoming>
+          <pose>2 0 0 0 0 0</pose>
+        </incoming>
+      </pad>
+    </plugin>
+   \endverbatim */
   class GAZEBO_VISIBLE TransporterPlugin : public WorldPlugin
   {
     /// \brief Constructor.

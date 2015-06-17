@@ -12,9 +12,7 @@ make
 # Run
 
 1. Start Gazebo from a terminal
->
-gazebo worlds/transporter.world
->
+>gazebo worlds/transporter.world
 1. Using the GUI, place and object, such as a sphere, at the origin.
 1. In a new terminal, run the transporter
 >./transporter
