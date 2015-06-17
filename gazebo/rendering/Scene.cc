@@ -1831,7 +1831,28 @@ void Scene::PreRender()
   // Process the visual messages.
   for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_VISUAL))
+    VisualType visualType = VT_VISUAL;
+    if ((*visualIter)->has_type())
+    {
+      switch ((*visualIter)->type())
+      {
+        case msgs::Visual::MODEL:
+          visualType = VT_MODEL;
+          break;
+        case msgs::Visual::LINK:
+          visualType = VT_LINK;
+          break;
+        case msgs::Visual::COLLISION:
+          visualType = VT_COLLISION;
+          break;
+        case msgs::Visual::VISUAL:
+          visualType = VT_VISUAL;
+          break;
+        default:
+          break;
+      }
+    }
+    if (this->ProcessVisualMsg(*visualIter, visualType))
       visualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;

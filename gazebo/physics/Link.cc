@@ -352,6 +352,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
       msg.set_name(this->GetScopedName() + "::" + msg.name());
       msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
+      msg.set_type(msgs::Visual::VISUAL);
 
       this->visPub->Publish(msg);
 
@@ -800,10 +801,13 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
   msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
 
-  for (Collision_V::iterator iter = this->collisions.begin();
-      iter != this->collisions.end(); ++iter)
+  for (auto child : this->children)
   {
-    (*iter)->FillMsg(*_msg.add_collision());
+    if (child->HasType(Base::COLLISION))
+    {
+      CollisionPtr collision = boost::static_pointer_cast<Collision>(child);
+      collision->FillMsg(*_msg.add_collision());
+    }
   }
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
@@ -1203,6 +1207,7 @@ void Link::UpdateVisualMsg()
         msg.set_parent_name(this->GetScopedName());
         msg.set_parent_id(this->GetId());
         msg.set_is_static(this->IsStatic());
+        msg.set_type(msgs::Visual::VISUAL);
 
         auto iter = this->visuals.find(msg.id());
         if (iter != this->visuals.end())
