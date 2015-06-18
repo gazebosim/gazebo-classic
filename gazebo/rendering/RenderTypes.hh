@@ -62,6 +62,7 @@ namespace gazebo
     class RFIDVisual;
     class RFIDTagVisual;
     class ApplyWrenchVisual;
+    class OriginVisual;
     class WindowManager;
     class SelectionObj;
     class RayQuery;
@@ -155,6 +156,10 @@ namespace gazebo
     /// \brief Shared pointer to ApplyWrenchVisual
     typedef boost::shared_ptr<ApplyWrenchVisual> ApplyWrenchVisualPtr;
 
+    /// \def OriginVisualPtr
+    /// \brief Shared pointer to OriginVisual
+    typedef boost::shared_ptr<OriginVisual> OriginVisualPtr;
+
     /// \def WindowManager
     /// \brief Shared pointer to WindowManager
     typedef boost::shared_ptr<WindowManager> WindowManagerPtr;
@@ -204,6 +209,27 @@ namespace gazebo
 
       /// \brief N/A
       RENDERING_MESH_RESOURCE = 6
+    };
+
+    /// \brief Type of visual
+    enum VisualType
+    {
+      /// \brief Entity visual
+      VT_ENTITY,
+      /// \brief Model visual
+      VT_MODEL,
+      /// \brief Link visual
+      VT_LINK,
+      /// \brief Visual visual
+      VT_VISUAL,
+      /// \brief Collision visual
+      VT_COLLISION,
+      /// \brief Sensor visual
+      VT_SENSOR,
+      /// \brief GUI visual
+      VT_GUI,
+      /// \brief Physics data visual
+      VT_PHYSICS
     };
   }
 }

@@ -29,9 +29,9 @@ State::State()
 
 /////////////////////////////////////////////////
 State::State(const std::string &_name, const common::Time &_realTime,
-             const common::Time &_simTime)
+             const common::Time &_simTime, const uint64_t _iterations)
 : name(_name), wallTime(common::Time::GetWallTime()), realTime(_realTime),
-  simTime(_simTime)
+  simTime(_simTime), iterations(_iterations)
 {
 }
 
@@ -76,12 +76,19 @@ common::Time State::GetSimTime() const
 }
 
 /////////////////////////////////////////////////
+uint64_t State::GetIterations() const
+{
+  return this->iterations;
+}
+
+/////////////////////////////////////////////////
 State &State::operator=(const State &_state)
 {
   this->name = _state.name;
   this->wallTime = _state.wallTime;
   this->realTime = _state.realTime;
   this->simTime = _state.simTime;
+  this->iterations = _state.iterations;
 
   return *this;
 }
@@ -97,7 +104,8 @@ State State::operator-(const State &_state) const
   }
 
   return State(this->name, this->realTime - _state.realTime,
-               this->simTime - _state.simTime);
+               this->simTime - _state.simTime,
+               this->iterations - _state.iterations);
 }
 
 /////////////////////////////////////////////////
@@ -116,4 +124,10 @@ void State::SetRealTime(const common::Time &_time)
 void State::SetSimTime(const common::Time &_time)
 {
   this->simTime = _time;
+}
+
+/////////////////////////////////////////////////
+void State::SetIterations(const uint64_t _iterations)
+{
+  this->iterations = _iterations;
 }

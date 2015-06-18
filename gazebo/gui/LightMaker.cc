@@ -190,22 +190,13 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
 
   double dist1 = plane.Distance(origin1, dir1);
 
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
+  // Calculate position
   p1 = origin1 + dir1 * dist1;
 
+  // Get snap point
   if (!_event.shift)
-  {
-    if (ceil(p1.x) - p1.x <= .4)
-      p1.x = ceil(p1.x);
-    else if (p1.x - floor(p1.x) <= .4)
-      p1.x = floor(p1.x);
+    p1 = this->GetSnappedPoint(p1);
 
-    if (ceil(p1.y) - p1.y <= .4)
-      p1.y = ceil(p1.y);
-    else if (p1.y - floor(p1.y) <= .4)
-      p1.y = floor(p1.y);
-  }
   p1.z = this->light->GetPosition().z;
 
   this->light->SetPosition(p1);

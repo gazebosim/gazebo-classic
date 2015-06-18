@@ -81,7 +81,7 @@ namespace gazebo
       public: void Init();
 
       /// \brief Helper for the destructor
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Clone the visual with a new name.
       /// \param[in] _name Name of the cloned Visual.
@@ -529,6 +529,14 @@ namespace gazebo
       /// on the specified layer its visibility will be toggled.
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
+
+      /// \brief Get type of visual.
+      /// \return Visual type.
+      public: VisualType GetType() const;
+
+      /// \brief Set type of visual.
+      /// \param[in] _type Visual type.
+      public: void SetType(const VisualType _type);
 
       /// \internal
       /// \brief Constructor used by inherited classes
