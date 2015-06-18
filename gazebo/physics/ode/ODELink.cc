@@ -386,7 +386,7 @@ void ODELink::UpdateMass()
 
   if (this->inertial->GetMass() > 0 && !this->GetKinematic())
     dBodySetMass(this->linkId, &odeMass);
-  else
+  else if (!this->GetKinematic())
     gzthrow("Setting custom link " + this->GetScopedName() + "mass to zero!");
 }
 
