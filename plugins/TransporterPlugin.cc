@@ -152,14 +152,14 @@ void TransporterPlugin::Update()
   std::lock_guard<std::mutex> lock(this->dataPtr->padMutex);
 
   // Process each model.
-  for (auto const &iter : models)
+  for (auto const &model : models)
   {
     // Skip models that are static
-    if (iter->IsStatic())
+    if (model->IsStatic())
       continue;
 
     // Get the model's pose
-    math::Pose modelPose = iter->GetWorldPose();
+    math::Pose modelPose = model->GetWorldPose();
 
     // Iterate over all pads
     for (auto const &padIter : this->dataPtr->pads)
@@ -175,7 +175,7 @@ void TransporterPlugin::Update()
             (padIter.second->autoActivation || padIter.second->activated))
         {
           // Move the model
-          iter->SetWorldPose(destIter->second->incomingPose);
+          model->SetWorldPose(destIter->second->incomingPose);
 
           // Deactivate the pad. This is used by manually activated pads.
           padIter.second->activated = false;
