@@ -234,8 +234,8 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
-  for (std::map<int,NoisePtr>::iterator it = noises.begin(); it != noises.end(); it++)
-    it->second->Fini();
+  for (auto &it : this->noises)
+    it.second->Fini();
 
   this->active = false;
   this->plugins.clear();
@@ -396,14 +396,14 @@ SensorCategory Sensor::GetCategory() const
 }
 
 //////////////////////////////////////////////////
-NoisePtr Sensor::GetNoise(int _index) const
+NoisePtr Sensor::GetNoise(const SensorNoiseType _type) const
 {
-  if (this->noises.find(_index) == this->noises.end())
+  if (this->noises.find(_type) == this->noises.end())
   {
     gzerr << "Get noise index not valid" << std::endl;
     return NoisePtr();
   }
-  return this->noises.at(_index);
+  return this->noises.at(_type);
 }
 
 //////////////////////////////////////////////////

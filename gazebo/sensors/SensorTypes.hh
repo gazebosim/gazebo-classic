@@ -178,34 +178,34 @@ namespace gazebo
     /// \brief Vector of WirelessReceiver
     typedef std::vector<WirelessReceiver> WirelessReceiver_V;
 
-    /// \def SensorNoiseTypes
+    /// \def SensorNoiseType
     /// \brief Eumeration of all sensor noise types
-    enum SensorNoiseTypes
+    enum SensorNoiseType
     {
       /// \brief Noise streams for the Camera sensor
       /// \sa CameraSensor
-      CameraNoise = 0,
+      CAMERA_NOISE = 0,
 
       /// \brief Noise streams for the GPU ray sensor
       /// \sa GpuRaySensor
-      GpuRayNoise = 1,
+      GPU_RAY_NOISE = 1,
 
       /// \brief Noise streams for the GPS sensor
       /// \sa GpsSensor
-      GpsPositionLatitudeNoiseMeters = 2,
-      GpsPositionLongitudeNoiseMeters = 3, 
-      GpsPositionAltitudeNoiseMeters = 4,
-      GpsVelocityLatitudeNoiseMeters = 5, 
-      GpsVelocityLongitudeNoiseMeters = 6,
-      GpsVelocityAltitudeNoiseMeters = 7,
+      GPS_POSITION_LATITUDE_NOISE_METERS = 2,
+      GPS_POSITION_LONGITUDE_NOISE_METERS = 3, 
+      GPS_POSITION_ALTITUDE_NOISE_METERS = 4,
+      GPS_VELOCITY_LATITUDE_NOISE_METERS = 5, 
+      GPS_VELOCITY_LONGITUDE_NOISE_METERS = 6,
+      GPS_VELOCITY_ALTITUDE_NOISE_METERS = 7,
 
       /// \brief Noise streams for the multicamera sensor
       /// \sa MultiCameraSensor
-      MultiCameraNoise = 8,
+      MULTI_CAMERA_NOISE = 8,
       
       /// \brief Noise streams for the ray sensor
       /// \sa RaySensor
-      RayNoise = 9
+      RAY_NOISE = 9
 
     };
 
