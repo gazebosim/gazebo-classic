@@ -172,7 +172,6 @@ void InsertModelWidget::Update()
     }
 
     this->dataPtr->modelBuffer.clear();
-    this->dataPtr->getModelsConnection.reset();
   }
   else
     QTimer::singleShot(1000, this, SLOT(Update()));
@@ -186,6 +185,7 @@ void InsertModelWidget::OnModels(
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   this->dataPtr->modelBuffer = _models;
+  this->dataPtr->getModelsConnection.reset();
 }
 
 /////////////////////////////////////////////////

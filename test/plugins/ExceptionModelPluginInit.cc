@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "plugins/ExceptionModelPluginInit.hh"
+ #include "plugins/ExceptionModelPluginInit.hh"
 
 using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(ExceptionModelPluginInit)
