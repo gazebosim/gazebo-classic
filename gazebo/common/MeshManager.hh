@@ -110,14 +110,16 @@ namespace gazebo
       /// \param[in] _radius radius of the sphere in meter
       /// \param[in] _rings number of circles on th y axis
       /// \param[in] _segments number of segment per circle
-      public: void CreateSphere(const std::string &_name, float _radius,
+      /// \return True if the sphere is successfully created.
+      public: bool CreateSphere(const std::string &_name, float _radius,
                                 int _rings, int _segments);
 
       /// \brief Create a Box mesh
       /// \param[in] _name the name of the new mesh
       /// \param[in] _sides the x y x dimentions of eah side in meter
       /// \param[in] _uvCoords the texture coordinates
-      public: void CreateBox(const std::string &_name,
+      /// \return True if the box is successfully created.
+      public: bool CreateBox(const std::string &_name,
                              const math::Vector3 &_sides,
                              const math::Vector2d &_uvCoords);
 
@@ -133,7 +135,7 @@ namespace gazebo
       /// vertices that describe one polyline.
       /// edges and remove the holes in the shape.
       /// \param[in] _height the height of extrusion
-      /// \return True if the extrusion is successful.
+      /// \return True if the polyline extrusion is successful.
       public: bool CreateExtrudedPolyline(const std::string &_name,
                   const std::vector<std::vector<math::Vector2d> > &_vertices,
                   double _height);
@@ -144,7 +146,8 @@ namespace gazebo
       /// \param[in] _height the height along z
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
-      public: void CreateCylinder(const std::string &_name,
+      /// \return True if the cylinder is successfully created.
+      public: bool CreateCylinder(const std::string &_name,
                                   float _radius,
                                   float _height,
                                   int _rings,
@@ -156,7 +159,8 @@ namespace gazebo
       /// \param[in] _height the height along z
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
-      public: void CreateCone(const std::string &_name,
+      /// \return True if the cone is successfully created.
+      public: bool CreateCone(const std::string &_name,
                               float _radius,
                               float _height,
                               int _rings,
@@ -173,7 +177,8 @@ namespace gazebo
       /// \param[in] _rings the number of circles along the height
       /// \param[in] _segments the number of segment per circle
       /// \param[in] _arc the arc angle in radians
-      public: void CreateTube(const std::string &_name,
+      /// \return True if the tube is successfully created.
+      public: bool CreateTube(const std::string &_name,
                               float _innerRadius,
                               float _outterRadius,
                               float _height,
@@ -186,7 +191,8 @@ namespace gazebo
       /// \param[in] _plane plane parameters
       /// \param[in] _segments number of segments in x and y
       /// \param[in] _uvTile the texture tile size in x and y
-      public: void CreatePlane(const std::string &_name,
+      /// \return True if the plane is successfully created.
+      public: bool CreatePlane(const std::string &_name,
                                const math::Plane &_plane,
                                const math::Vector2d &_segments,
                                const math::Vector2d &_uvTile);
@@ -198,12 +204,32 @@ namespace gazebo
       /// \param[in] _size the size of the plane in x and y
       /// \param[in] _segments the number of segments in x and y
       /// \param[in] _uvTile the texture tile size in x and y
-      public: void CreatePlane(const std::string &_name,
+      /// \return True if the plane is successfully created.
+      public: bool CreatePlane(const std::string &_name,
                                const math::Vector3 &_normal,
                                double _d,
                                const math::Vector2d &_size,
                                const math::Vector2d &_segments,
                                const math::Vector2d &_uvTile);
+
+      /// \brief Create a Camera mesh
+      /// \param[in] _name name of the new mesh
+      /// \param[in] _scale scaling factor for the camera
+      /// \return True if the camera mesh is successfully created.
+      public: bool CreateCamera(const std::string &_name, float _scale);
+
+#ifdef HAVE_GTS
+      /// \brief Create a boolean mesh from two meshes
+      /// \param[in] _name the name of the new mesh
+      /// \param[in] _m1 the parent mesh in the boolean operation
+      /// \param[in] _m2 the child mesh in the boolean operation
+      /// \param[in] _operation the boolean operation applied to the two meshes
+      /// \param[in] _offset _m2's pose offset from _m1
+      /// \return True if the boolean mesh is successfully created.
+      public: bool CreateBoolean(const std::string &_name, const Mesh *_m1,
+          const Mesh *_m2, const int _operation,
+          const math::Pose &_offset = math::Pose::Zero);
+#endif
 
       /// \brief Tesselate a 2D mesh
       ///
@@ -216,23 +242,6 @@ namespace gazebo
                                     int _meshWidth,
                                     int _meshHeight,
                                     bool _doubleSided);
-
-      /// \brief Create a Camera mesh
-      /// \param[in] _name name of the new mesh
-      /// \param[in] _scale scaling factor for the camera
-      public: void CreateCamera(const std::string &_name, float _scale);
-
-#ifdef HAVE_GTS
-      /// \brief Create a boolean mesh from two meshes
-      /// \param[in] _name the name of the new mesh
-      /// \param[in] _m1 the parent mesh in the boolean operation
-      /// \param[in] _m2 the child mesh in the boolean operation
-      /// \param[in] _operation the boolean operation applied to the two meshes
-      /// \param[in] _offset _m2's pose offset from _m1
-      public: void CreateBoolean(const std::string &_name, const Mesh *_m1,
-          const Mesh *_m2, const int _operation,
-          const math::Pose &_offset = math::Pose::Zero);
-#endif
 
       /// \brief Converts a vector of polylines into a table of vertices and
       /// a list of edges (each made of 2 points from the table of vertices.

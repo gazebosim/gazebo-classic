@@ -242,12 +242,12 @@ bool MeshManager::HasMesh(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateSphere(const std::string &name, float radius,
+bool MeshManager::CreateSphere(const std::string &name, float radius,
     int rings, int segments)
 {
   if (this->HasMesh(name))
   {
-    return;
+    return false;
   }
 
   int ring, seg;
@@ -299,24 +299,26 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
       }
     }
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
+bool MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
                               const math::Vector2d &segments,
                               const math::Vector2d &uvTile)
 {
-  this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
+  return this->CreatePlane(name, plane.normal, plane.d, plane.size, segments,
+      uvTile);
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreatePlane(const std::string &name,
+bool MeshManager::CreatePlane(const std::string &name,
     const math::Vector3 &normal, double d, const math::Vector2d &size,
     const math::Vector2d &segments, const math::Vector2d &uvTile)
 {
   if (this->HasMesh(name))
   {
-    return;
+    return false;
   }
 
   Mesh *mesh = new Mesh();
@@ -380,17 +382,18 @@ void MeshManager::CreatePlane(const std::string &name,
   }
 
   this->Tesselate2DMesh(subMesh, segments.x + 1, segments.y + 1, false);
+  return true;
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
+bool MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
     const math::Vector2d &uvCoords)
 {
   int i, k;
 
   if (this->HasMesh(name))
   {
-    return;
+    return false;
   }
 
   Mesh *mesh = new Mesh();
@@ -480,6 +483,8 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   // Set the indices
   for (i = 0; i < 36; i++)
     subMesh->AddIndex(ind[i]);
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -695,13 +700,13 @@ bool MeshManager::CreateExtrudedPolyline(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateCamera(const std::string &_name, float _scale)
+bool MeshManager::CreateCamera(const std::string &_name, float _scale)
 {
   int i, k;
 
   if (this->HasMesh(_name))
   {
-    return;
+    return false;
   }
 
   Mesh *mesh = new Mesh();
@@ -789,10 +794,11 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
     subMesh->AddIndex(ind[i]);
 
   mesh->RecalculateNormals();
+  return true;
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateCylinder(const std::string &name, float radius,
+bool MeshManager::CreateCylinder(const std::string &name, float radius,
                                  float height, int rings, int segments)
 {
   math::Vector3 vert, norm;
@@ -802,7 +808,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 
   if (this->HasMesh(name))
   {
-    return;
+    return false;
   }
 
   Mesh *mesh = new Mesh();
@@ -906,21 +912,22 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
       subMesh->AddIndex(verticeIndex - segments + seg);
     }
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateCone(const std::string &name, float radius,
+bool MeshManager::CreateCone(const std::string &name, float radius,
     float height, int rings, int segments)
 {
+  if (this->HasMesh(name))
+  {
+    return false;
+  }
+
   math::Vector3 vert, norm;
   unsigned int verticeIndex = 0;
   unsigned int i, j;
   int ring, seg;
-
-  if (this->HasMesh(name))
-  {
-    return;
-  }
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
@@ -1016,12 +1023,16 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   }
 
   mesh->RecalculateNormals();
+  return true;
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
+bool MeshManager::CreateTube(const std::string &_name, float _innerRadius,
     float _outerRadius, float _height, int _rings, int _segments, double _arc)
 {
+  if (this->HasMesh(_name))
+    return false;
+
   math::Vector3 vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
@@ -1035,9 +1046,6 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   float radius = 0;
 
   radius = _outerRadius;
-
-  if (this->HasMesh(_name))
-    return;
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
@@ -1183,6 +1191,7 @@ void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
   }
 
   mesh->RecalculateNormals();
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -1253,16 +1262,18 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
 
 #ifdef HAVE_GTS
 //////////////////////////////////////////////////
-void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
+bool MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
     const Mesh *_m2, int _operation, const math::Pose &_offset)
 {
   if (this->HasMesh(_name))
-    return;
+    return false;
 
   MeshCSG csg;
   Mesh *mesh = csg.CreateBoolean(_m1, _m2, _operation, _offset);
   mesh->SetName(_name);
   this->meshes.insert(std::make_pair(_name, mesh));
+
+  return true;
 }
 #endif
 
