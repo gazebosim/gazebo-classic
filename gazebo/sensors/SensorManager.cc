@@ -417,10 +417,10 @@ void SensorManager::SensorContainer::Fini()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Run()
 {
-  DIAG_TIMER_START("SensorContainer::Run create thread SensorContainer::RunLoop");
+  DIAG_TIMER_START("SensorContainer::Run create thread RunLoop");
   this->runThread = new boost::thread(
       boost::bind(&SensorManager::SensorContainer::RunLoop, this));
-  DIAG_TIMER_STOP("SensorContainer::Run create thread SensorContainer::RunLoop");
+  DIAG_TIMER_STOP("SensorContainer::Run create thread RunLoop");
 
   GZ_ASSERT(this->runThread, "Unable to create boost::thread.");
 }
@@ -432,14 +432,14 @@ void SensorManager::SensorContainer::Stop()
   this->runCondition.notify_all();
   if (this->runThread)
   {
-    DIAG_TIMER_START("SensorContainer::Stop destroy thread SensorContainer::RunLoop");
+    DIAG_TIMER_START("SensorContainer::Stop destroy thread RunLoop");
     // Note: calling interrupt seems to cause the thread to either block
     // or throw an exception, so commenting it out for now.
     // this->runThread->interrupt();
     this->runThread->join();
     delete this->runThread;
     this->runThread = NULL;
-    DIAG_TIMER_STOP("SensorContainer::Stop destroy thread SensorContainer::RunLoop");
+    DIAG_TIMER_STOP("SensorContainer::Stop destroy thread RunLoop");
   }
 }
 
