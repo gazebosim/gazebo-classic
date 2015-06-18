@@ -94,6 +94,11 @@ namespace gazebo
       /// all child links.
       public: void ResetPhysicsStates();
 
+      /// \brief Get the linear velocity of the model. The return value is
+      /// the linear velocity of the model's first link.
+      /// \return] The linear velocity of the model's first link.
+      public: math::Vector3 GetLinearVel() const;
+
       /// \brief Set the linear velocity of the model, and all its links.
       /// \param[in] _vel The new linear velocity.
       public: void SetLinearVel(const math::Vector3 &_vel);

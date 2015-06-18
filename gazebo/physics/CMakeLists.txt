@@ -49,6 +49,7 @@ set (sources
   Model.cc
   ModelState.cc
   MultiRayShape.cc
+  NullPhysics.cc
   PhysicsIface.cc
   PhysicsEngine.cc
   PhysicsFactory.cc
@@ -94,6 +95,7 @@ set (headers
   Model.hh
   ModelState.hh
   MultiRayShape.hh
+  NullPhysics.hh
   PhysicsIface.hh
   PhysicsEngine.hh
   PhysicsFactory.hh

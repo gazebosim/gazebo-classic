@@ -14,14 +14,8 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Factory for creating physics engine
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
-
-#ifndef _PHYSICSFACTORY_HH_
-#define _PHYSICSFACTORY_HH_
+#ifndef _GAZEBO_PHYSICSFACTORY_HH_
+#define _GAZEBO_PHYSICSFACTORY_HH_
 
 #include <string>
 #include <map>

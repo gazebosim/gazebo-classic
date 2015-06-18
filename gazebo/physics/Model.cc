@@ -412,6 +412,15 @@ void Model::ResetPhysicsStates()
 }
 
 //////////////////////////////////////////////////
+math::Vector3 Model::GetLinearVel() const
+{
+  math::Vector3 result;
+  if (!this->links.empty())
+    result = this->links.front()->GetWorldLinearVel();
+  return result;
+}
+
+//////////////////////////////////////////////////
 void Model::SetLinearVel(const math::Vector3 &_vel)
 {
   for (Link_V::iterator iter = this->links.begin();
