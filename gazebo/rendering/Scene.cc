@@ -1812,7 +1812,7 @@ void Scene::PreRender()
   for (visualIter = modelVisualMsgsCopy.begin();
       visualIter != modelVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_MODEL))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_MODEL))
       modelVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1822,7 +1822,7 @@ void Scene::PreRender()
   for (visualIter = linkVisualMsgsCopy.begin();
       visualIter != linkVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_LINK))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_LINK))
       linkVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1831,27 +1831,10 @@ void Scene::PreRender()
   // Process the visual messages.
   for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    VisualType visualType = VT_VISUAL;
+    Visual::VisualType visualType = Visual::VT_VISUAL;
     if ((*visualIter)->has_type())
-    {
-      switch ((*visualIter)->type())
-      {
-        case msgs::Visual::MODEL:
-          visualType = VT_MODEL;
-          break;
-        case msgs::Visual::LINK:
-          visualType = VT_LINK;
-          break;
-        case msgs::Visual::COLLISION:
-          visualType = VT_COLLISION;
-          break;
-        case msgs::Visual::VISUAL:
-          visualType = VT_VISUAL;
-          break;
-        default:
-          break;
-      }
-    }
+      visualType = Visual::ConvertVisualType((*visualIter)->type());
+
     if (this->ProcessVisualMsg(*visualIter, visualType))
       visualMsgsCopy.erase(visualIter++);
     else
@@ -1862,7 +1845,7 @@ void Scene::PreRender()
   for (visualIter = collisionVisualMsgsCopy.begin();
       visualIter != collisionVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_COLLISION))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_COLLISION))
       collisionVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -2460,7 +2443,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
+bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 {
   bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
@@ -3057,8 +3040,8 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
   for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
-    rendering::VisualType visType = childVis->GetType();
-    if (visType == VT_PHYSICS || visType == VT_SENSOR)
+    Visual::VisualType visType = childVis->GetType();
+    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
     {
       toRemove.push_back(childVis);
     }

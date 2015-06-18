@@ -801,7 +801,7 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
   msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
 
-  for (auto child : this->children)
+  for (auto &child : this->children)
   {
     if (child->HasType(Base::COLLISION))
     {
