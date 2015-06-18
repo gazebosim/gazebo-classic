@@ -116,6 +116,9 @@ void MultiCameraSensor::Init()
     }
   }
 
+  // Each camera has its own noise pointer
+  int noiseIndex = 0;
+
   // Create and initialize all the cameras
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
@@ -146,18 +149,20 @@ void MultiCameraSensor::Init()
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentId, true);
 
-    // Handle noise model settings.
     if (cameraSdf->HasElement("noise"))
     {
-      this->noises[MULTI_CAMERA_NOISE] =
-          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
-          this->GetType());
-      this->noises[MULTI_CAMERA_NOISE]->SetCamera(camera);
+      // Create a noise model and attach the camera
+      this->noises[noiseIndex] = NoiseFactory::NewNoiseModel(
+        cameraSdf->GetElement("noise"), this->GetType());
+      this->noises[noiseIndex]->SetCamera(camera);
     }
     else
     {
-      this->noises[MULTI_CAMERA_NOISE] = NoisePtr(new Noise(Noise::NONE));
+      this->noises[noiseIndex] = NoisePtr(new Noise(Noise::NONE));
     }
+
+    // Increment the noise index -- one for each camera in the setup
+    noiseIndex++;
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);
