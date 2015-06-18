@@ -102,7 +102,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->toolbar->addSeparator();
 
   // Copy & Paste
-  this->toolbar->addSeparator();
   if (g_copyAct)
     this->toolbar->addAction(g_copyAct);
   if (g_pasteAct)
@@ -139,7 +138,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   // Empty space to push whatever comes next to the right
   QWidget *spacer = new QWidget();
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  this->toolbar->addWidget(spacer);
+  QAction *spacerAction = this->toolbar->addWidget(spacer);
+  spacerAction->setObjectName("toolbarSpacerAction");
 
   // Screenshot / logging
   if (g_screenshotAct)
