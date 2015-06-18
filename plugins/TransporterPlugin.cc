@@ -57,8 +57,7 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   while (padElem)
   {
     // Create a new pad
-    std::shared_ptr<TransporterPluginPrivate::Pad> pad(
-        new TransporterPluginPrivate::Pad);
+    auto pad = std::make_shared<TransporterPluginPrivate::Pad>();
 
     // Set the pad's name and destination
     pad->name = padElem->Get<std::string>("name");
@@ -67,8 +66,7 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     // Set the pad's activation type. The default is auto activation.
     if (padElem->HasElement("activation"))
     {
-      pad->autoActivation =
-        padElem->Get<std::string>("activation") == "auto" ? true : false;
+      pad->autoActivation = padElem->Get<std::string>("activation") == "auto";
 
       // Store that the user has at least one pad with manual activation.
       // This info is used to trigger a warning message below.
