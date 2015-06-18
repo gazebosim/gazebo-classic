@@ -45,11 +45,13 @@ TimePanel::TimePanel(QWidget *_parent)
 
   // Time Widget
   this->dataPtr->timeWidget = new TimeWidget(this);
+  this->dataPtr->timeWidget->setObjectName("timeWidget");
   connect(this, SIGNAL(SetTimeWidgetVisible(bool)),
       this->dataPtr->timeWidget, SLOT(setVisible(bool)));
 
   // LogPlay Widget
   this->dataPtr->logPlayWidget = new LogPlayWidget(this);
+  this->dataPtr->logPlayWidget->setObjectName("logPlayWidget");
   connect(this, SIGNAL(SetLogPlayWidgetVisible(bool)),
       this->dataPtr->logPlayWidget, SLOT(setVisible(bool)));
 

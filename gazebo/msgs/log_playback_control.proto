@@ -4,7 +4,6 @@ package gazebo.msgs;
 /// \interface LogPlaybackControl
 /// \brief A message that allows for control of log playback functions.
 
-
 message LogPlaybackControl
 {
   /// \brief Pause/play the log file.
