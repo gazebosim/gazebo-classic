@@ -63,6 +63,14 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     pad->name = padElem->Get<std::string>("name");
     pad->dest = padElem->Get<std::string>("destination");
 
+    // Check that a pad does not exist
+    if (this->dataPtr->pads.find(pad->name) != this->dataPtr->pads.end())
+    {
+      gzerr << "Transporter pad with name[" << pad->name << "] already exists."
+        << "The duplicate pad will not be loaded\n";
+      continue;
+    }
+
     // Set the pad's activation type. The default is auto activation.
     if (padElem->HasElement("activation"))
     {
