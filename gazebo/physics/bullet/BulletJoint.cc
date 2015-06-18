@@ -42,6 +42,7 @@ BulletJoint::BulletJoint(BasePtr _parent)
   this->stiffnessDampingInitialized = false;
   this->forceApplied[0] = 0;
   this->forceApplied[1] = 0;
+  this->stiffnessDampingConstraint = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -498,7 +499,7 @@ void BulletJoint::ApplyStiffnessDamping()
 
     // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
     }
-    else
+    else if (stiffnessDampingConstraint == NULL)
     {
       // Cast to BulletLink
       BulletLinkPtr bulletChildLink =
@@ -520,7 +521,7 @@ void BulletJoint::ApplyStiffnessDamping()
       // Local variables used to compute pivots and axes in body-fixed frames
       // for the parent and child links.
       math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
-      math::Pose pose;
+      math::Pose childPose, parentPose;
 
       // Initialize pivots to anchorPos, which is expressed in the
       // world coordinate frame.
@@ -531,35 +532,63 @@ void BulletJoint::ApplyStiffnessDamping()
       if (this->parentLink)
       {
         // Compute relative pose between joint anchor and CoG of parent link.
-        pose = this->parentLink->GetWorldCoGPose();
+        parentPose = this->parentLink->GetWorldCoGPose();
         // Subtract CoG position from anchor position, both in world frame.
-        pivotParent -= pose.pos;
+        pivotParent -= parentPose.pos;
         // Rotate pivot offset and axis into body-fixed frame of parent.
-        pivotParent = pose.rot.RotateVectorReverse(pivotParent);
-        axisParent = pose.rot.RotateVectorReverse(axis);
+        pivotParent = parentPose.rot.RotateVectorReverse(pivotParent);
+        axisParent = parentPose.rot.RotateVectorReverse(axis);
         axisParent = axisParent.Normalize();
       }
       // Check if childLink exists. If not, the child will be the world.
       if (this->childLink)
       {
         // Compute relative pose between joint anchor and CoG of child link.
-        pose = this->childLink->GetWorldCoGPose();
+        childPose = this->childLink->GetWorldCoGPose();
         // Subtract CoG position from anchor position, both in world frame.
-        pivotChild -= pose.pos;
+        pivotChild -= childPose.pos;
         // Rotate pivot offset and axis into body-fixed frame of child.
-        pivotChild = pose.rot.RotateVectorReverse(pivotChild);
-        axisChild = pose.rot.RotateVectorReverse(axis);
+        pivotChild = childPose.rot.RotateVectorReverse(pivotChild);
+        axisChild = childPose.rot.RotateVectorReverse(axis);
         axisChild = axisChild.Normalize();
       }
-      // btGeneric6DofConstraint* stiffnessDampingConstraint;
-      // stiffnessDampingConstraint = new btGeneric6DofConstraint(
-      //   *(bulletChildLink->GetBulletLink()),
-      //   *(bulletParentLink->GetBulletLink()),
-      //   BulletTypes::ConvertVector3(pivotChild),
-      //   BulletTypes::ConvertVector3(pivotParent),
-      //   BulletTypes::ConvertVector3(axisChild),
-      //   BulletTypes::ConvertVector3(axisParent)
-      //   );
+      if (bulletChildLink && bulletParentLink)
+      {
+        this->stiffnessDampingConstraint = new btGeneric6DofConstraint(
+          *(bulletChildLink->GetBulletLink()),
+          *(bulletParentLink->GetBulletLink()),
+          BulletTypes::ConvertPose(childPose),
+          BulletTypes::ConvertPose(parentPose),
+          // BulletTypes::ConvertVector3(axisChild),
+          // BulletTypes::ConvertVector3(axisParent)
+          true
+          );
+      }
+      else if (bulletChildLink)
+      {
+        this->stiffnessDampingConstraint = new btGeneric6DofConstraint(
+          *(bulletChildLink->GetBulletLink()),
+          BulletTypes::ConvertPose(childPose),
+          true
+          );
+      }
+      else if (bulletParentLink)
+      {
+        this->stiffnessDampingConstraint = new btGeneric6DofConstraint(
+          *(bulletParentLink->GetBulletLink()),
+          BulletTypes::ConvertPose(parentPose),
+          true
+          );
+      }
+      /*
+      btGeneric6DofConstraint(
+          btRigidBody& rbA,
+          btRigidBody& rbB,
+          const btTransform& frameInA,
+          const btTransform& frameInB,
+          bool useLinearReferenceFrameA);
+      */
+      gzerr << "damping done\n";
     }
   }
 }

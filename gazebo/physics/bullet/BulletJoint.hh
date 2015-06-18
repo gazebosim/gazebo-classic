@@ -124,6 +124,8 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void ApplyStiffnessDamping();
 
+      btGeneric6DofConstraint* stiffnessDampingConstraint;
+
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.
