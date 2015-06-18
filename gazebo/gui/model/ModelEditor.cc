@@ -173,7 +173,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 
   this->dataPtr->jointSeparatorAct = toolbar->insertSeparator(toolbarSpacer);
   toolbar->insertAction(toolbarSpacer, this->dataPtr->jointAct);
-  this->dataPtr->jointTypeAct = toolbar->insertWidget(toolbarSpacer, 
+  this->dataPtr->jointTypeAct = toolbar->insertWidget(toolbarSpacer,
       this->dataPtr->jointButton);
   this->dataPtr->jointAct->setVisible(false);
   this->dataPtr->jointSeparatorAct->setVisible(false);
