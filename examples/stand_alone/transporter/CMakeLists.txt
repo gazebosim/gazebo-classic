@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED system filesystem regex)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED system)
 
 find_package(gazebo REQUIRED)
 
