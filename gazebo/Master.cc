@@ -340,9 +340,9 @@ void Master::Run()
 //////////////////////////////////////////////////
 void Master::RunThread()
 {
-  DIAG_TIMER_START("Create thread Master::Run");
+  DIAG_TIMER_START("Master::RunThread create thread Master::Run");
   this->runThread = new boost::thread(boost::bind(&Master::Run, this));
-  DIAG_TIMER_STOP("Create thread Master::Run");
+  DIAG_TIMER_STOP("Master::RunThread create thread Master::Run");
 }
 
 //////////////////////////////////////////////////
@@ -519,11 +519,11 @@ void Master::Stop()
 
   if (this->runThread)
   {
-    DIAG_TIMER_START("Destroy thread Master::Run");
+    DIAG_TIMER_START("Master::Stop destroy thread Master::Run");
     this->runThread->join();
     delete this->runThread;
     this->runThread = NULL;
-    DIAG_TIMER_STOP("Destroy thread Master::Run");
+    DIAG_TIMER_STOP("Master::Stop destroy thread Master::Run");
   }
 }
 

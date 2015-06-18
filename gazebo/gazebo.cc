@@ -66,41 +66,47 @@ void gazebo::addPlugin(const std::string &_filename)
 /////////////////////////////////////////////////
 bool gazebo::setupServer(int _argc, char **_argv)
 {
+  DIAG_TIMER_START("gazebo::setupServer");
   std::string host = "";
   unsigned int port = 0;
 
   gazebo::transport::get_master_uri(host, port);
 
-  DIAG_TIMER_START("Create Master");
   g_master = new gazebo::Master();
+  DIAG_TIMER_LAP("gazebo::setupServer", "Create Master");
   g_master->Init(port);
   g_master->RunThread();
-  DIAG_TIMER_STOP("Create Master");
+  DIAG_TIMER_LAP("gazebo::setupServer", "Create Master thread");
 
   if (!gazebo_shared::setup("server-", _argc, _argv, g_plugins))
   {
     gzerr << "Unable to setup Gazebo\n";
     return false;
   }
+  DIAG_TIMER_LAP("gazebo::setupServer", "gazebo_shared::setup");
 
   if (!sensors::load())
   {
     gzerr << "Unable to load sensors\n";
     return false;
   }
+  DIAG_TIMER_LAP("gazebo::setupServer", "sensors::load");
 
   if (!gazebo::physics::load())
   {
     gzerr << "Unable to initialize physics.\n";
     return false;
   }
+  DIAG_TIMER_LAP("gazebo::setupServer", "physics::load");
 
   if (!sensors::init())
   {
     gzerr << "Unable to initialize sensors\n";
     return false;
   }
+  DIAG_TIMER_LAP("gazebo::setupServer", "sensors::init");
 
+  DIAG_TIMER_STOP("gazebo::setupServer");
   return true;
 }
 
@@ -176,34 +182,46 @@ bool gazebo::setupClient(const std::vector<std::string> &_args)
 /////////////////////////////////////////////////
 bool gazebo::shutdown()
 {
+  DIAG_TIMER_START("gazebo::shutdown");
   gazebo::physics::stop_worlds();
+  DIAG_TIMER_LAP("gazebo::shutdown", "physics::stop_worlds");
 
   gazebo::sensors::stop();
+  DIAG_TIMER_LAP("gazebo::shutdown", "sensors::stop");
 
   // Stop log recording
   util::LogRecord::Instance()->Stop();
+  DIAG_TIMER_LAP("gazebo::shutdown", "LogRecord::Stop");
 
   // Stop transport
   gazebo::transport::stop();
+  DIAG_TIMER_LAP("gazebo::shutdown", "transport::stop");
 
   // Make sure to shut everything down.
   boost::mutex::scoped_lock lock(fini_mutex);
   util::LogRecord::Instance()->Fini();
+  DIAG_TIMER_LAP("gazebo::shutdown", "LogRecord::Fini");
+
   g_plugins.clear();
+  DIAG_TIMER_LAP("gazebo::shutdown", "g_plugins.clear");
+
   gazebo::transport::fini();
+  DIAG_TIMER_LAP("gazebo::shutdown", "transport::fini");
 
   gazebo::physics::fini();
+  DIAG_TIMER_LAP("gazebo::shutdown", "physics::fini");
 
   gazebo::sensors::fini();
+  DIAG_TIMER_LAP("gazebo::shutdown", "sensors::fini");
 
-  DIAG_TIMER_START("Destroy Master");
   delete g_master;
   g_master = NULL;
-  DIAG_TIMER_STOP("Destroy Master");
+  DIAG_TIMER_LAP("gazebo::shutdown", "Destroy Master");
 
   // Cleanup model database.
   common::ModelDatabase::Instance()->Fini();
 
+  DIAG_TIMER_STOP("gazebo::shutdown");
   return true;
 }
 

@@ -417,10 +417,10 @@ void SensorManager::SensorContainer::Fini()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Run()
 {
-  DIAG_TIMER_START("Create thread SensorContainer::RunLoop");
+  DIAG_TIMER_START("SensorContainer::Run create thread SensorContainer::RunLoop");
   this->runThread = new boost::thread(
       boost::bind(&SensorManager::SensorContainer::RunLoop, this));
-  DIAG_TIMER_STOP("Create thread SensorContainer::RunLoop");
+  DIAG_TIMER_STOP("SensorContainer::Run create thread SensorContainer::RunLoop");
 
   GZ_ASSERT(this->runThread, "Unable to create boost::thread.");
 }
@@ -432,14 +432,14 @@ void SensorManager::SensorContainer::Stop()
   this->runCondition.notify_all();
   if (this->runThread)
   {
-    DIAG_TIMER_START("Destroy thread SensorContainer::RunLoop");
+    DIAG_TIMER_START("SensorContainer::Stop destroy thread SensorContainer::RunLoop");
     // Note: calling interrupt seems to cause the thread to either block
     // or throw an exception, so commenting it out for now.
     // this->runThread->interrupt();
     this->runThread->join();
     delete this->runThread;
     this->runThread = NULL;
-    DIAG_TIMER_STOP("Destroy thread SensorContainer::RunLoop");
+    DIAG_TIMER_STOP("SensorContainer::Stop destroy thread SensorContainer::RunLoop");
   }
 }
 
@@ -508,11 +508,13 @@ void SensorManager::SensorContainer::RunLoop()
         return;
       }
     }
+    DIAG_TIMER_LAP("SensorContainer::RunLoop loop", "wait empty");
 
     // Get the start time of the update.
     startTime = world->GetSimTime();
 
     this->Update(false);
+    DIAG_TIMER_LAP("SensorContainer::RunLoop loop", "Update");
 
     // Compute the time it took to update the sensors.
     // It's possible that the world time was reset during the Update. This
@@ -530,6 +532,7 @@ void SensorManager::SensorContainer::RunLoop()
         "Time to next sensor update is negative.");
 
     boost::mutex::scoped_lock timingLock(g_sensorTimingMutex);
+    DIAG_TIMER_LAP("SensorContainer::RunLoop loop", "timingLock");
 
     // Add an event to trigger when the appropriate simulation time has been
     // reached.
