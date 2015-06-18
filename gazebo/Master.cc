@@ -348,6 +348,7 @@ void Master::RunThread()
 //////////////////////////////////////////////////
 void Master::RunOnce()
 {
+  DIAG_TIMER_START("Master::RunOnce");
   Connection_M::iterator iter;
 
   // Process the incoming message queue
@@ -378,6 +379,7 @@ void Master::RunOnce()
       }
     }
   }
+  DIAG_TIMER_STOP("Master::RunOnce");
 }
 
 /////////////////////////////////////////////////

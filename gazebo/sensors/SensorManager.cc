@@ -446,6 +446,7 @@ void SensorManager::SensorContainer::Stop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
+  DIAG_TIMER_START("SensorContainer::RunLoop start");
   this->stop = false;
 
   physics::WorldPtr world = physics::get_world();
@@ -468,7 +469,10 @@ void SensorManager::SensorContainer::RunLoop()
   {
     this->runCondition.wait(lock2);
     if (this->stop)
+    {
+      DIAG_TIMER_STOP("SensorContainer::RunLoop start");
       return;
+    }
   }
 
   {
@@ -488,16 +492,21 @@ void SensorManager::SensorContainer::RunLoop()
     sleepTime.Set(1.0 / (maxUpdateRate));
   else
     sleepTime.Set(0, 1e6);
+  DIAG_TIMER_STOP("SensorContainer::RunLoop start");
 
   while (!this->stop)
   {
+    DIAG_TIMER_START("SensorContainer::RunLoop loop");
     // If all the sensors get deleted, wait here.
     // Use a while loop since world resets will notify the runCondition.
     while (this->sensors.empty())
     {
       this->runCondition.wait(lock2);
       if (this->stop)
+      {
+        DIAG_TIMER_STOP("SensorContainer::RunLoop loop");
         return;
+      }
     }
 
     // Get the start time of the update.
@@ -532,6 +541,7 @@ void SensorManager::SensorContainer::RunLoop()
     {
       this->runCondition.wait(timingLock);
     }
+    DIAG_TIMER_STOP("SensorContainer::RunLoop loop");
   }
 }
 
