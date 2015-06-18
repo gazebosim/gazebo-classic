@@ -36,6 +36,7 @@
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/util/Diagnostics.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -416,8 +417,10 @@ void SensorManager::SensorContainer::Fini()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Run()
 {
+  DIAG_TIMER_START("Create thread SensorContainer::RunLoop");
   this->runThread = new boost::thread(
       boost::bind(&SensorManager::SensorContainer::RunLoop, this));
+  DIAG_TIMER_STOP("Create thread SensorContainer::RunLoop");
 
   GZ_ASSERT(this->runThread, "Unable to create boost::thread.");
 }
@@ -429,12 +432,14 @@ void SensorManager::SensorContainer::Stop()
   this->runCondition.notify_all();
   if (this->runThread)
   {
+    DIAG_TIMER_START("Destroy thread SensorContainer::RunLoop");
     // Note: calling interrupt seems to cause the thread to either block
     // or throw an exception, so commenting it out for now.
     // this->runThread->interrupt();
     this->runThread->join();
     delete this->runThread;
     this->runThread = NULL;
+    DIAG_TIMER_STOP("Destroy thread SensorContainer::RunLoop");
   }
 }
 

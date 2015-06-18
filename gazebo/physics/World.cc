@@ -399,7 +399,9 @@ void World::Run(unsigned int _iterations)
   this->dataPtr->stop = false;
   this->dataPtr->stopIterations = _iterations;
 
+  DIAG_TIMER_START("Create thread World::RunLoop");
   this->dataPtr->thread = new boost::thread(boost::bind(&World::RunLoop, this));
+  DIAG_TIMER_STOP("Create thread World::RunLoop");
 }
 
 //////////////////////////////////////////////////
@@ -430,9 +432,11 @@ void World::Stop()
 
   if (this->dataPtr->thread)
   {
+    DIAG_TIMER_START("Destroy thread World::RunLoop");
     this->dataPtr->thread->join();
     delete this->dataPtr->thread;
     this->dataPtr->thread = NULL;
+    DIAG_TIMER_STOP("Destroy thread World::RunLoop");
   }
 }
 
@@ -454,8 +458,10 @@ void World::RunLoop()
   this->dataPtr->prevStates[1] = WorldState(shared_from_this());
   this->dataPtr->stateToggle = 0;
 
+  DIAG_TIMER_START("Create thread World::LogWorker");
   this->dataPtr->logThread =
     new boost::thread(boost::bind(&World::LogWorker, this));
+  DIAG_TIMER_STOP("Create thread World::LogWorker");
 
   if (!util::LogPlay::Instance()->IsOpen())
   {
@@ -481,6 +487,7 @@ void World::RunLoop()
 
   if (this->dataPtr->logThread)
   {
+    DIAG_TIMER_START("Destroy thread World::LogWorker");
     this->dataPtr->logCondition.notify_all();
     {
       boost::mutex::scoped_lock lock(this->dataPtr->logMutex);
@@ -489,6 +496,7 @@ void World::RunLoop()
     this->dataPtr->logThread->join();
     delete this->dataPtr->logThread;
     this->dataPtr->logThread = NULL;
+    DIAG_TIMER_STOP("Destroy thread World::LogWorker");
   }
 }
 

@@ -30,6 +30,7 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/gazebo_config.h"
@@ -70,9 +71,11 @@ bool gazebo::setupServer(int _argc, char **_argv)
 
   gazebo::transport::get_master_uri(host, port);
 
+  DIAG_TIMER_START("Create Master");
   g_master = new gazebo::Master();
   g_master->Init(port);
   g_master->RunThread();
+  DIAG_TIMER_STOP("Create Master");
 
   if (!gazebo_shared::setup("server-", _argc, _argv, g_plugins))
   {
@@ -193,8 +196,10 @@ bool gazebo::shutdown()
 
   gazebo::sensors::fini();
 
+  DIAG_TIMER_START("Destroy Master");
   delete g_master;
   g_master = NULL;
+  DIAG_TIMER_STOP("Destroy Master");
 
   // Cleanup model database.
   common::ModelDatabase::Instance()->Fini();

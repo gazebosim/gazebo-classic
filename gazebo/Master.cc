@@ -17,6 +17,7 @@
 #include <google/protobuf/descriptor.h>
 #include <set>
 #include "gazebo/transport/IOManager.hh"
+#include "gazebo/util/Diagnostics.hh"
 
 #include "Master.hh"
 
@@ -339,7 +340,9 @@ void Master::Run()
 //////////////////////////////////////////////////
 void Master::RunThread()
 {
+  DIAG_TIMER_START("Create thread Master::Run");
   this->runThread = new boost::thread(boost::bind(&Master::Run, this));
+  DIAG_TIMER_STOP("Create thread Master::Run");
 }
 
 //////////////////////////////////////////////////
@@ -514,9 +517,11 @@ void Master::Stop()
 
   if (this->runThread)
   {
+    DIAG_TIMER_START("Destroy thread Master::Run");
     this->runThread->join();
     delete this->runThread;
     this->runThread = NULL;
+    DIAG_TIMER_STOP("Destroy thread Master::Run");
   }
 }
 
