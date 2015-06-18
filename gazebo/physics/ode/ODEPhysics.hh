@@ -158,10 +158,12 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetContactSurfaceLayer(double layer_depth);
 
-      // Documentation inherited
+      /// \brief Set friction model type.
+      /// \param[in] _fricModel Type of friction model.
       public: virtual void SetFrictionModel(const std::string &_fricModel);
 
-      // Documentation inherited
+      /// \brief Set world step solver type.
+      /// \param[in] _worldSolverType Type of solver used by world step.
       public: virtual void
               SetWorldStepSolverType(const std::string &_worldSolverType);
 
@@ -186,14 +188,12 @@ namespace gazebo
       // Documentation inherited
       public: virtual double GetContactMaxCorrectingVel();
 
-      // Documentation inherited
-      /// \brief get friction model
-      /// \return a friction model string
+      /// \brief Get friction model.
+      /// \return Friction model type.
       public: virtual std::string GetFrictionModel() const;
 
-      // Documentation inherited
-      /// \brief get solver for world step
-      /// \return a solver string
+      /// \brief Get solver type for world step.
+      /// \return Type of solver used by world step.
       public: virtual std::string GetWorldStepSolverType() const;
 
       // Documentation inherited
