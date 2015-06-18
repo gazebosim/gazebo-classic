@@ -554,32 +554,44 @@ void BulletJoint::ApplyStiffnessDamping()
       }
       if (bulletChildLink && bulletParentLink)
       {
-        this->stiffnessDampingConstraint = new btGeneric6DofConstraint(
+        this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletChildLink->GetBulletLink()),
           *(bulletParentLink->GetBulletLink()),
           BulletTypes::ConvertPose(childPose),
           BulletTypes::ConvertPose(parentPose),
           // BulletTypes::ConvertVector3(axisChild),
           // BulletTypes::ConvertVector3(axisParent)
-          true
+          RO_XYZ
           );
       }
       else if (bulletChildLink)
       {
-        this->stiffnessDampingConstraint = new btGeneric6DofConstraint(
+        this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletChildLink->GetBulletLink()),
           BulletTypes::ConvertPose(childPose),
-          true
+          RO_XYZ
           );
       }
       else if (bulletParentLink)
       {
-        this->stiffnessDampingConstraint = new btGeneric6DofConstraint(
+        this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
           *(bulletParentLink->GetBulletLink()),
           BulletTypes::ConvertPose(parentPose),
-          true
+          RO_XYZ
           );
       }
+      for (unsigned int l = 0; l < 3; ++l)
+      {
+        this->stiffnessDampingConstraint->setParam(
+          BT_CONSTRAINT_STOP_ERP, 0, l);
+        this->stiffnessDampingConstraint->setParam(
+          BT_CONSTRAINT_STOP_CFM, 100.0, l);
+        this->stiffnessDampingConstraint->setParam(
+          BT_CONSTRAINT_ERP, 0, l);
+        this->stiffnessDampingConstraint->setParam(
+          BT_CONSTRAINT_CFM, 100.0, l);
+      }
+      // this->stiffnessDampingConstraint->setAngularLowerLimit
       /*
       btGeneric6DofConstraint(
           btRigidBody& rbA,
