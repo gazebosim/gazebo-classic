@@ -13,6 +13,9 @@ you are interested.
 1. Added browse button to log record dialog.
     * [Pull request #1719](https://bitbucket.org/osrf/gazebo/pull-request/1719)
 
+1. Improved SVG support: arcs in paths, and contours made of multiple paths.
+    * [Pull request #1608](https://bitbucket.org/osrf/gazebo/pull-request/1608)
+
 1. Added simulation iterations to the world state.
     * [Pull request #1722](https://bitbucket.org/osrf/gazebo/pull-request/1722)
 
@@ -267,6 +270,9 @@ compilation on Windows.
     1. Fix snapping inside editor.
         * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
         * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
+
+    1. Moved DataLogger from Window menu to the toolbar and moved screenshot button to the right.
+        * [Pull request #1665](https://bitbucket.org/osrf/gazebo/pull-request/1665)
 
     1. Keep loaded model's name.
         * [Pull request #1516](https://bitbucket.org/osrf/gazebo/pull-request/1516)
