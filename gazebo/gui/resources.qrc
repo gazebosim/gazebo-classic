@@ -62,6 +62,7 @@
   <file>images/log_jump_start.png</file>
   <file>images/log_jump_end.png</file>
   <file>images/trashcan.png</file>
+  <file>images/log_record.png</file>
 
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>
