@@ -140,6 +140,7 @@ set (qt_tests
   ApplyWrenchDialog_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
+  LogPlayWidget_TEST.cc
   ModelAlign_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc

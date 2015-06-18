@@ -92,17 +92,9 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   // Time
   QLineEdit *currentTime = new QLineEdit();
+  currentTime->setObjectName("logPlayCurrentTime");
   currentTime->setMaximumWidth(110);
   currentTime->setAlignment(Qt::AlignRight);
-  currentTime->setStyleSheet("\
-      QLineEdit {\
-        background-color: #808080;\
-        color: #cfcfcf;\
-        font-size: 15px;\
-      }\
-      QLineEdit:focus {\
-        background-color: #707070;\
-      }");
   connect(this, SIGNAL(SetCurrentTime(const QString &)), currentTime,
       SLOT(setText(const QString &)));
 
