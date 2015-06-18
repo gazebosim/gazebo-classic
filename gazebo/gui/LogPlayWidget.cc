@@ -351,6 +351,9 @@ void LogPlayView::DrawTimeline()
   common::Time interval = totalTime/intervals;
   interval.nsec = 0;
 
+  if (interval == common::Time::Zero)
+    interval = common::Time::Second;
+
   // Time line
   int tickHeight = 15;
   common::Time tickTime = this->dataPtr->startTime;
