@@ -222,6 +222,10 @@ MainWindow::MainWindow()
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
 
+  // Create data logger dialog
+  this->dataLogger = new gui::DataLogger(this);
+  connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
+
   this->show();
 }
 
@@ -969,17 +973,13 @@ void MainWindow::ViewOculus()
 /////////////////////////////////////////////////
 void MainWindow::DataLogger()
 {
-  // If it was checked right now
   if (g_dataLoggerAct->isChecked())
   {
-    gui::DataLogger *dataLogger = new gui::DataLogger(this);
-    dataLogger->show();
-    connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
+    this->dataLogger->show();
   }
-  // Don't let the user uncheck it directly
   else
   {
-    g_dataLoggerAct->setChecked(true);
+    this->dataLogger->close();
   }
 }
 

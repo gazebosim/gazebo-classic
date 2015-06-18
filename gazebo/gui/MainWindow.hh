@@ -24,6 +24,7 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/DataLogger.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -353,6 +354,9 @@ namespace gazebo
 
       /// \brief Splitter for the main window.
       private: QSplitter *splitter;
+
+      /// \brief Data logger dialog.
+      private: gui::DataLogger *dataLogger;
     };
   }
 }
