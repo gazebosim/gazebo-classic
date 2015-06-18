@@ -401,13 +401,22 @@ NoisePtr Sensor::GetNoise(unsigned int _index) const
   // By default, there is no noise
   SensorNoiseType noiseType = NO_NOISE;
 
-  // Map old integer index to new type
+  // Camera mapping
   if (this->GetType().compare("camera")==0)
+  {
     noiseType = CAMERA_NOISE;
+  }
+  // GpuRay mapping
   else if (this->GetType().compare("gpu_ray")==0)
+  {
     noiseType = GPU_RAY_NOISE;
+  }
+  // RaySensor mapping
   else if (this->GetType().compare("ray")==0)
+  {
     noiseType = RAY_NOISE;
+  }
+  // GpsSensor mapping
   else if (this->GetType().compare("gps")==0)
   {
     switch(_index)
@@ -421,6 +430,13 @@ NoisePtr Sensor::GetNoise(unsigned int _index) const
       default: noiseType = NO_NOISE; break;
     }
   }
+  // Special case: unlimited number of multi-camera noise streams
+  else if (this->GetType().compare("multicamera")==0)
+  {
+    if (this->noises.find(_index) != this->noises.end())
+      return this->noises.at(_index);
+  }
+
   return this->GetNoise(noiseType);
 }
 
