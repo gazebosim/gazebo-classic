@@ -192,12 +192,12 @@ namespace gazebo
 
       /// \brief Noise streams for the GPS sensor
       /// \sa GpsSensor
-      PositionLatitudeNoiseMeters = 2,
-      PositionLongitudeNoiseMeters = 3, 
-      PositionAltitudeNoiseMeters = 4,
-      VelocityLatitudeNoiseMeters = 5, 
-      VelocityLongitudeNoiseMeters = 6,
-      VelocityAltitudeNoiseMeters = 7,
+      GpsPositionLatitudeNoiseMeters = 2,
+      GpsPositionLongitudeNoiseMeters = 3, 
+      GpsPositionAltitudeNoiseMeters = 4,
+      GpsVelocityLatitudeNoiseMeters = 5, 
+      GpsVelocityLongitudeNoiseMeters = 6,
+      GpsVelocityAltitudeNoiseMeters = 7,
 
       /// \brief Noise streams for the multicamera sensor
       /// \sa MultiCameraSensor
