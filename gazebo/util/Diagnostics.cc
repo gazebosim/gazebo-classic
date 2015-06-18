@@ -281,8 +281,10 @@ void DiagnosticTimer::Stop()
     common::Time currTime = common::Time::GetWallTime();
 
     // Write out the total elapsed time.
-    this->log << this->name << " " << currTime << " "
-      << elapsed.Double() << std::endl;
+    this->log << this->name << " "
+              << pthread_self() << " "
+              << currTime << " "
+              << elapsed.Double() << std::endl;
     this->log.flush();
 
     DiagnosticManager::Instance()->AddTime(this->name, currTime, elapsed);
@@ -301,8 +303,10 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
   common::Time currTime = common::Time::GetWallTime();
 
   // Write out the delta time.
-  this->log << this->name << ":" << _prefix << " " <<
-    currTime << " " << delta.Double() << std::endl;
+  this->log << this->name << ":" << _prefix << " "
+            << pthread_self() << " "
+            << currTime << " "
+            << delta.Double() << std::endl;
 
   DiagnosticManager::Instance()->AddTime(this->name + ":" + _prefix,
       currTime, delta);
