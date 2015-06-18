@@ -121,15 +121,15 @@ namespace gazebo
       public: LogPlayView(LogPlayWidget *_parent = 0);
 
       /// \brief Set the position of the current time item.
-      /// \param[in] _msec Current time.
+      /// \param[in] _time Current time.
       public slots: void SetCurrentTime(const common::Time &_time);
 
       /// \brief Set the log start time.
-      /// \param[in] _msec Start time.
+      /// \param[in] _time Start time.
       public slots: void SetStartTime(const common::Time &_time);
 
       /// \brief Set the log end time.
-      /// \param[in] _msec End time.
+      /// \param[in] _time End time.
       public slots: void SetEndTime(const common::Time &_time);
 
       /// \brief Draw the timeline.
