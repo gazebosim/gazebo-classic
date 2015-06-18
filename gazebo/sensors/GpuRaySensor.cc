@@ -112,7 +112,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   // Handle noise model settings.
   if (rayElem->HasElement("noise"))
   {
-    this->noises[GPURayNoise] = 
+    this->noises[GpuRayNoise] = 
         NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
         this->GetType());
   }
@@ -609,9 +609,9 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       {
         range = -GZ_DBL_INF;
       }
-      else if (this->noises.find(GPURayNoise) != this->noises.end())
+      else if (this->noises.find(GpuRayNoise) != this->noises.end())
       {
-        range = this->noises[GPURayNoise]->Apply(range);
+        range = this->noises[GpuRayNoise]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
 

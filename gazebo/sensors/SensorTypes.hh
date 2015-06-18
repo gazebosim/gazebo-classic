@@ -186,18 +186,27 @@ namespace gazebo
       /// \sa CameraSensor
       CameraNoise = 0,
 
+      /// \brief Noise streams for the GPU ray sensor
+      /// \sa GpuRaySensor
+      GpuRayNoise = 1,
+
       /// \brief Noise streams for the GPS sensor
       /// \sa GpsSensor
-      PosLatNoiseMeters = 1,
-      PosLonNoiseMeters = 2, 
-      PosAltNoiseMeters = 3,
-      VelLatNoiseMeters = 4, 
-      VelLonNoiseMeters = 5,
-      VelAltNoiseMeters = 6,
+      PositionLatitudeNoiseMeters = 2,
+      PositionLongitudeNoiseMeters = 3, 
+      PositionAltitudeNoiseMeters = 4,
+      VelocityLatitudeNoiseMeters = 5, 
+      VelocityLongitudeNoiseMeters = 6,
+      VelocityAltitudeNoiseMeters = 7,
 
       /// \brief Noise streams for the multicamera sensor
       /// \sa MultiCameraSensor
-      MultiCameraNoise = 7
+      MultiCameraNoise = 8,
+      
+      /// \brief Noise streams for the ray sensor
+      /// \sa RaySensor
+      RayNoise = 9
+
     };
 
     /// \}

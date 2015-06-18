@@ -43,9 +43,6 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \brief Noise streams for the GPU ray sensor
-    enum GpuRaySensorNoise {GPURayNoise};
-
     /// \brief GPU based laser sensor
     ///
     /// This sensor cast rays into the world, tests for intersections, and

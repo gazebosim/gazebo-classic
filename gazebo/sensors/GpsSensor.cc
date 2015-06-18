@@ -76,22 +76,22 @@ void GpsSensor::Load(const std::string &_worldName)
   // Load position noise parameters
   {
     sdf::ElementPtr posElem = gpsElem->GetElement("position_sensing");
-    this->noises[PosLatNoiseMeters] = NoiseFactory::NewNoiseModel(
+    this->noises[PositionLatitudeNoiseMeters] = NoiseFactory::NewNoiseModel(
       posElem->GetElement("horizontal")->GetElement("noise"));
-    this->noises[PosLonNoiseMeters] =  NoiseFactory::NewNoiseModel(
+    this->noises[PositionLongitudeNoiseMeters] =  NoiseFactory::NewNoiseModel(
       posElem->GetElement("horizontal")->GetElement("noise"));
-    this->noises[PosAltNoiseMeters] = NoiseFactory::NewNoiseModel(
+    this->noises[PositionAltitudeNoiseMeters] = NoiseFactory::NewNoiseModel(
       posElem->GetElement("vertical")->GetElement("noise"));
   }
 
   // Load velocity noise parameters
   {
     sdf::ElementPtr velElem = gpsElem->GetElement("velocity_sensing");
-    this->noises[VelLatNoiseMeters] = NoiseFactory::NewNoiseModel(
+    this->noises[VelocityLatitudeNoiseMeters] = NoiseFactory::NewNoiseModel(
       velElem->GetElement("horizontal")->GetElement("noise"));
-    this->noises[VelLonNoiseMeters] = NoiseFactory::NewNoiseModel(
+    this->noises[VelocityLongitudeNoiseMeters] = NoiseFactory::NewNoiseModel(
       velElem->GetElement("horizontal")->GetElement("noise"));
-    this->noises[VelAltNoiseMeters] = NoiseFactory::NewNoiseModel(
+    this->noises[VelocityAltitudeNoiseMeters] = NoiseFactory::NewNoiseModel(
       velElem->GetElement("vertical")->GetElement("noise"));
   }
 }
@@ -124,9 +124,9 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
       math::Pose gpsPose = this->pose + this->parentLink->GetWorldPose();
 
       // Apply position noise before converting to global frame
-      gpsPose.pos.x = this->noises[PosLatNoiseMeters]->Apply(gpsPose.pos.x);
-      gpsPose.pos.y = this->noises[PosLonNoiseMeters]->Apply(gpsPose.pos.y);
-      gpsPose.pos.z = this->noises[PosAltNoiseMeters]->Apply(gpsPose.pos.z);
+      gpsPose.pos.x = this->noises[PositionLatitudeNoiseMeters]->Apply(gpsPose.pos.x);
+      gpsPose.pos.y = this->noises[PositionLongitudeNoiseMeters]->Apply(gpsPose.pos.y);
+      gpsPose.pos.z = this->noises[PositionAltitudeNoiseMeters]->Apply(gpsPose.pos.z);
 
       // Convert to global frames
       math::Vector3 spherical = this->sphericalCoordinates->
@@ -145,9 +145,9 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
       gpsVelocity = this->sphericalCoordinates->GlobalFromLocal(gpsVelocity);
 
       // Apply noise after converting to global frame
-      gpsVelocity.x = this->noises[VelLatNoiseMeters]->Apply(gpsVelocity.x);
-      gpsVelocity.y = this->noises[VelLonNoiseMeters]->Apply(gpsVelocity.y);
-      gpsVelocity.z = this->noises[VelAltNoiseMeters]->Apply(gpsVelocity.z);
+      gpsVelocity.x = this->noises[VelocityLatitudeNoiseMeters]->Apply(gpsVelocity.x);
+      gpsVelocity.y = this->noises[VelocityLongitudeNoiseMeters]->Apply(gpsVelocity.y);
+      gpsVelocity.z = this->noises[VelocityAltitudeNoiseMeters]->Apply(gpsVelocity.z);
 
       this->lastGpsMsg.set_velocity_east(gpsVelocity.x);
       this->lastGpsMsg.set_velocity_north(gpsVelocity.y);
