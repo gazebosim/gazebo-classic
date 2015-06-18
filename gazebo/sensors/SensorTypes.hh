@@ -178,6 +178,27 @@ namespace gazebo
     /// \brief Vector of WirelessReceiver
     typedef std::vector<WirelessReceiver> WirelessReceiver_V;
 
+    /// \def SensorNoiseTypes
+    /// \brief Eumeration of all sensor noise types
+    enum SensorNoiseTypes
+    {
+      /// \brief Noise streams for the Camera sensor
+      /// \sa CameraSensor
+      CameraNoise = 0,
+
+      /// \brief Noise streams for the GPS sensor
+      /// \sa GpsSensor
+      PosLatNoiseMeters = 1,
+      PosLonNoiseMeters = 2, 
+      PosAltNoiseMeters = 3,
+      VelLatNoiseMeters = 4, 
+      VelLonNoiseMeters = 5,
+      VelAltNoiseMeters = 6,
+
+      /// \brief Noise streams for the multicamera sensor
+      /// \sa MultiCameraSensor
+      MultiCameraNoise = 7
+    };
 
     /// \}
   }

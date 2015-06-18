@@ -36,10 +36,6 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \brief Noise streams for the GPS sensor
-    enum GpsSensorNoise {PosLatNoiseMeters, PosLonNoiseMeters, PosAltNoiseMeters,
-        VelLatNoiseMeters, VelLonNoiseMeters, VelAltNoiseMeters};
-
     /// \class GpsSensor GpsSensor.hh sensors/sensors.hh
     /// \brief GpsSensor to provide position measurement.
     class GAZEBO_VISIBLE GpsSensor: public Sensor
