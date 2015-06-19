@@ -402,36 +402,50 @@ NoisePtr Sensor::GetNoise(unsigned int _index) const
   SensorNoiseType noiseType = NO_NOISE;
 
   // Camera mapping
-  if (this->GetType().compare("camera")==0)
+  if (this->GetType().compare("camera") == 0)
   {
     noiseType = CAMERA_NOISE;
   }
   // GpuRay mapping
-  else if (this->GetType().compare("gpu_ray")==0)
+  else if (this->GetType().compare("gpu_ray") == 0)
   {
     noiseType = GPU_RAY_NOISE;
   }
   // RaySensor mapping
-  else if (this->GetType().compare("ray")==0)
+  else if (this->GetType().compare("ray") == 0)
   {
     noiseType = RAY_NOISE;
   }
   // GpsSensor mapping
-  else if (this->GetType().compare("gps")==0)
+  else if (this->GetType().compare("gps") == 0)
   {
-    switch(_index)
+    switch (_index)
     {
-      case 0: noiseType = GPS_POSITION_LATITUDE_NOISE_METERS;  break;
-      case 1: noiseType = GPS_POSITION_LONGITUDE_NOISE_METERS; break;
-      case 2: noiseType = GPS_POSITION_ALTITUDE_NOISE_METERS;  break;
-      case 3: noiseType = GPS_VELOCITY_LATITUDE_NOISE_METERS;  break; 
-      case 4: noiseType = GPS_VELOCITY_LONGITUDE_NOISE_METERS; break;
-      case 5: noiseType = GPS_VELOCITY_ALTITUDE_NOISE_METERS;  break;
-      default: noiseType = NO_NOISE; break;
+      case 0:
+        noiseType = GPS_POSITION_LATITUDE_NOISE_METERS;
+        break;
+      case 1:
+        noiseType = GPS_POSITION_LONGITUDE_NOISE_METERS;
+        break;
+      case 2:
+        noiseType = GPS_POSITION_ALTITUDE_NOISE_METERS;
+        break;
+      case 3:
+        noiseType = GPS_VELOCITY_LATITUDE_NOISE_METERS;
+        break;
+      case 4:
+        noiseType = GPS_VELOCITY_LONGITUDE_NOISE_METERS;
+        break;
+      case 5:
+        noiseType = GPS_VELOCITY_ALTITUDE_NOISE_METERS;
+        break;
+      default:
+        noiseType = NO_NOISE;
+        break;
     }
   }
   // Special case: unlimited number of multi-camera noise streams
-  else if (this->GetType().compare("multicamera")==0)
+  else if (this->GetType().compare("multicamera") == 0)
   {
     if (this->noises.find(_index) != this->noises.end())
       return this->noises.at(_index);

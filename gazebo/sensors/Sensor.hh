@@ -20,6 +20,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/mutex.hpp>
 #include <vector>
+#include <map>
 #include <string>
 
 #include <sdf/sdf.hh>
@@ -267,7 +268,12 @@ namespace gazebo
       protected: common::Time lastMeasurementTime;
 
       /// \brief Noise added to sensor data
-      protected: std::map<int,NoisePtr> noises;
+      /// The key maps to a SensorNoiseType, and is kept as an int value
+      /// for backward compatibilty with Gazebo 5&6.
+      /// \todo: Change to std::map<SensorNoiseType, NoisePtr> in Gazebo7.
+      /// Adding the word GAZEBO_DEPRECATED here so that a grep will find
+      /// the above note.
+      protected: std::map<int, NoisePtr> noises;
 
       /// \brief Mutex to protect resetting lastUpdateTime.
       private: boost::mutex mutexLastUpdateTime;

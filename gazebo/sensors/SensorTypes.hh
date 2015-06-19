@@ -194,21 +194,34 @@ namespace gazebo
       /// \sa GpuRaySensor
       GPU_RAY_NOISE = 2,
 
-      /// \brief Noise streams for the GPS sensor
+      /// \brief GPS position latitude noise streams
       /// \sa GpsSensor
       GPS_POSITION_LATITUDE_NOISE_METERS = 3,
-      GPS_POSITION_LONGITUDE_NOISE_METERS = 4, 
+
+      /// \brief GPS position longitude noise streams
+      /// \sa GpsSensor
+      GPS_POSITION_LONGITUDE_NOISE_METERS = 4,
+
+      /// \brief GPS position altitude noise streams
+      /// \sa GpsSensor
       GPS_POSITION_ALTITUDE_NOISE_METERS = 5,
-      GPS_VELOCITY_LATITUDE_NOISE_METERS = 6, 
+
+      /// \brief GPS velocity latitude noise streams
+      /// \sa GpsSensor
+      GPS_VELOCITY_LATITUDE_NOISE_METERS = 6,
+
+      /// \brief GPS velocity longitude noise streams
+      /// \sa GpsSensor
       GPS_VELOCITY_LONGITUDE_NOISE_METERS = 7,
+
+      /// \brief GPS velocity altitude noise streams
+      /// \sa GpsSensor
       GPS_VELOCITY_ALTITUDE_NOISE_METERS = 8,
-      
+
       /// \brief Noise streams for the ray sensor
       /// \sa RaySensor
       RAY_NOISE = 9
-
     };
-
     /// \}
   }
 }

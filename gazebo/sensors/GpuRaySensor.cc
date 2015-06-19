@@ -112,7 +112,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   // Handle noise model settings.
   if (rayElem->HasElement("noise"))
   {
-    this->noises[GPU_RAY_NOISE] = 
+    this->noises[GPU_RAY_NOISE] =
         NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
         this->GetType());
   }
