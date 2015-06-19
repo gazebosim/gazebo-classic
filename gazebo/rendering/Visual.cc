@@ -1495,6 +1495,21 @@ void Visual::SetHighlighted(bool _highlighted)
       this->dataPtr->boundingBox->Init(bbox);
     }
     this->dataPtr->boundingBox->SetVisible(true);
+
+    if (this->GetType() == VT_LINK)
+    {
+      VisualPtr linkOriginVis;
+      for (auto child : this->dataPtr->children)
+      {
+        if (child->GetName().find("LINK_ORIGIN_VISUAL__") != std::string::npos)
+          linkOriginVis = child;
+      }
+      if (linkOriginVis)
+      {
+        std::cout << linkOriginVis->GetName() << std::endl;
+        linkOriginVis->SetEmissive(common::Color::Red);
+      }
+    }
   }
   else if (this->dataPtr->boundingBox)
   {
