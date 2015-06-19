@@ -2942,13 +2942,13 @@ sdf::ElementPtr Visual::GetSDF() const
 }
 
 //////////////////////////////////////////////////
-rendering::VisualType Visual::GetType() const
+Visual::VisualType Visual::GetType() const
 {
   return this->dataPtr->type;
 }
 
 //////////////////////////////////////////////////
-void Visual::SetType(const rendering::VisualType _type)
+void Visual::SetType(const Visual::VisualType _type)
 {
   this->dataPtr->type = _type;
 }
@@ -2964,4 +2964,82 @@ void Visual::ToggleLayer(const int32_t _layer)
   {
     this->ToggleVisible();
   }
+}
+
+//////////////////////////////////////////////////
+Visual::VisualType Visual::ConvertVisualType(const msgs::Visual::Type &_type)
+{
+  Visual::VisualType visualType = Visual::VT_ENTITY;
+
+  switch (_type)
+  {
+    case msgs::Visual::ENTITY:
+      visualType = Visual::VT_ENTITY;
+      break;
+    case msgs::Visual::MODEL:
+      visualType = Visual::VT_MODEL;
+      break;
+    case msgs::Visual::LINK:
+      visualType = Visual::VT_LINK;
+      break;
+    case msgs::Visual::VISUAL:
+      visualType = Visual::VT_VISUAL;
+      break;
+    case msgs::Visual::COLLISION:
+      visualType = Visual::VT_COLLISION;
+      break;
+    case msgs::Visual::SENSOR:
+      visualType = Visual::VT_SENSOR;
+      break;
+    case msgs::Visual::GUI:
+      visualType = Visual::VT_GUI;
+      break;
+    case msgs::Visual::PHYSICS:
+      visualType = Visual::VT_PHYSICS;
+      break;
+    default:
+      gzerr << "Cannot convert visual type. Defaults to 'VT_ENTITY'"
+          << std::endl;
+      break;
+  }
+  return visualType;
+}
+
+//////////////////////////////////////////////////
+msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
+{
+  msgs::Visual::Type visualType = msgs::Visual::ENTITY;
+
+  switch (_type)
+  {
+    case Visual::VT_ENTITY:
+      visualType = msgs::Visual::ENTITY;
+      break;
+    case Visual::VT_MODEL:
+      visualType = msgs::Visual::MODEL;
+      break;
+    case Visual::VT_LINK:
+      visualType = msgs::Visual::LINK;
+      break;
+    case Visual::VT_VISUAL:
+      visualType = msgs::Visual::VISUAL;
+      break;
+    case Visual::VT_COLLISION:
+      visualType = msgs::Visual::COLLISION;
+      break;
+    case Visual::VT_SENSOR:
+      visualType = msgs::Visual::SENSOR;
+      break;
+    case Visual::VT_GUI:
+      visualType = msgs::Visual::GUI;
+      break;
+    case Visual::VT_PHYSICS:
+      visualType = msgs::Visual::PHYSICS;
+      break;
+    default:
+      gzerr << "Cannot convert visual type. Defaults to 'msgs::Visual::ENTITY'"
+          << std::endl;
+      break;
+  }
+  return visualType;
 }
