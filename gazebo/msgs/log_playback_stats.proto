@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface LogPlaybackStatistics
-/// \brief A message with statiscs about a log during playback.
+/// \brief A message with statistics about a log during playback.
 
 
 import "time.proto";
