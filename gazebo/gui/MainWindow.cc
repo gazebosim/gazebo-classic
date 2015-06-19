@@ -222,6 +222,10 @@ MainWindow::MainWindow()
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
 
+  // Create data logger dialog
+  this->dataLogger = new gui::DataLogger(this);
+  connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
+
   this->show();
 }
 
@@ -980,8 +984,21 @@ void MainWindow::ViewOculus()
 /////////////////////////////////////////////////
 void MainWindow::DataLogger()
 {
-  gui::DataLogger *dataLogger = new gui::DataLogger(this);
-  dataLogger->show();
+  if (g_dataLoggerAct->isChecked())
+  {
+    this->dataLogger->show();
+  }
+  else
+  {
+    this->dataLogger->close();
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnDataLoggerClosed()
+{
+  // Uncheck action on toolbar when user closes dialog
+  g_dataLoggerAct->setChecked(false);
 }
 
 /////////////////////////////////////////////////
@@ -1322,9 +1339,13 @@ void MainWindow::CreateActions()
   projectionActionGroup->addAction(g_cameraPerspectiveAct);
   projectionActionGroup->setExclusive(true);
 
-  g_dataLoggerAct = new QAction(tr("&Log Data"), this);
+  g_dataLoggerAct = new QAction(QIcon(":images/log_record.png"),
+      tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
+  g_dataLoggerAct->setToolTip(tr("Log Data (Ctrl+D)"));
+  g_dataLoggerAct->setCheckable(true);
+  g_dataLoggerAct->setChecked(false);
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
 
   g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
@@ -1689,7 +1710,6 @@ void MainWindow::CreateMenuBar()
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
-  windowMenu->addAction(g_dataLoggerAct);
   windowMenu->addAction(g_viewOculusAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_overlayAct);

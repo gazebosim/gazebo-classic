@@ -748,3 +748,14 @@ QAbstractSpinBox::down-arrow:hover
   width: 10px;
   height: 10px;
 }
+
+QLineEdit#logPlayCurrentTime
+{
+  background-color: #808080;
+        color: #cfcfcf;
+        font-size: 15px;
+}
+QLineEdit#logPlayCurrentTime:focus
+{
+  background-color: #707070;
+}
