@@ -84,6 +84,9 @@ namespace gazebo
       /// \brief QT callback for timing out the confirmation message.
       private slots: void OnConfirmationTimeout();
 
+      /// \brief QT callback when the dialog is closed.
+      private slots: void OnCancel();
+
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
       private: void OnStatus(ConstLogStatusPtr &_msg);
@@ -103,10 +106,10 @@ namespace gazebo
       /// \brief Label to display the log time.
       private: QLabel *timeLabel;
 
-      /// \brief Label to display the log destination path.
+      /// \brief Log base path.
       private: QString basePath;
 
-      /// \brief Label to display the log destination path.
+      /// \brief Line edit to display the log destination path.
       private: QLineEdit *destPath;
 
       /// \brief Label to display the log destination uri.

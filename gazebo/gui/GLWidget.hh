@@ -22,6 +22,8 @@
 #include <utility>
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -160,8 +162,6 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
-
       private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       private: void ClearSelection();
@@ -205,10 +205,6 @@ namespace gazebo
       /// \param[in] _checked True if the model editor was checked.
       private slots: void OnModelEditor(bool _checked);
 
-      /// \brief Qt callback when a selection msg is received.
-      /// \param[in] The name of the selected entity.
-      private slots: void OnSelectionMsgEvent(const QString &_name);
-
       /// \brief QT Callback that turns on orthographic projection
       private slots: void OnOrtho();
 
@@ -240,8 +236,6 @@ namespace gazebo
       /// \brief Light maker
       private: LightMaker lightMaker;
 
-      private: rendering::VisualPtr hoverVis;
-
       /// \brief A list of selected visuals.
       private: std::vector<rendering::VisualPtr> selectedVisuals;
 
@@ -254,7 +248,7 @@ namespace gazebo
       /// \brief Publishes information about user selections.
       private: transport::PublisherPtr selectionPub;
 
-      private: transport::SubscriberPtr selectionSub, requestSub;
+      private: transport::SubscriberPtr requestSub;
 
       private: std::string keyText;
       private: Qt::KeyboardModifiers keyModifiers;

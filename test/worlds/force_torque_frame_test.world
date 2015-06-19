@@ -166,7 +166,7 @@
         <parent>link_1</parent>
         <child>link_2</child>
         <!-- joint_12 at the interface between the two cylinders -->
-        <pose>0 -10 0 0 -0.7854 0</pose>
+        <pose>1.0 -10.0 0.0 0 -0.7854 0</pose>
         <axis>
           <limit>
             <lower>-0.0</lower>

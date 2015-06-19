@@ -128,10 +128,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
 
-  // Subscribes to selection messages.
-  this->selectionSub = this->node->Subscribe("~/selection",
-      &GLWidget::OnSelectionMsg, this);
-
   // Publishes information about user selections.
   this->selectionPub =
     this->node->Advertise<msgs::Selection>("~/selection");
@@ -159,9 +155,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this,
       SLOT(OnModelEditor(bool)));
-
-  connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
-      SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
 
   // Connect the ortho action
   connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
@@ -203,7 +196,6 @@ GLWidget::~GLWidget()
   this->connections.clear();
   this->node.reset();
   this->modelPub.reset();
-  this->selectionSub.reset();
   this->selectionPub.reset();
 
   ModelManipulator::Instance()->Clear();
@@ -897,7 +889,6 @@ void GLWidget::Clear()
   this->userCamera.reset();
   this->scene.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
-  this->hoverVis.reset();
   this->keyModifiers = 0;
 }
 
@@ -943,7 +934,6 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::OnCreateScene(const std::string &_name)
 {
-  this->hoverVis.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
 
   this->ViewScene(rendering::get_scene(_name));
@@ -1033,21 +1023,6 @@ void GLWidget::OnOrbit()
 {
   this->userCamera->SetViewController(
       rendering::OrbitViewController::GetTypeString());
-}
-
-/////////////////////////////////////////////////
-void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
-{
-  if (_msg->has_selected() && _msg->selected())
-  {
-    this->selectionMsgReceived(QString(_msg->name().c_str()));
-  }
-}
-
-/////////////////////////////////////////////////
-void GLWidget::OnSelectionMsgEvent(const QString &_name)
-{
-  this->OnSetSelectedEntity(_name.toStdString(), "normal");
 }
 
 /////////////////////////////////////////////////
@@ -1218,12 +1193,6 @@ void GLWidget::Paste(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::ClearSelection()
 {
-  if (this->hoverVis)
-  {
-    this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-    this->hoverVis.reset();
-  }
-
   this->SetSelectedVisual(rendering::VisualPtr());
 
   this->scene->SelectVisual("", "normal");
@@ -1256,8 +1225,6 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
     this->SetSelectedVisual(rendering::VisualPtr());
     this->scene->SelectVisual("", _mode);
   }
-
-  this->hoverVis.reset();
 }
 
 /////////////////////////////////////////////////

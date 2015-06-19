@@ -44,6 +44,8 @@ DataLogger::DataLogger(QWidget *_parent)
   this->setObjectName("dataLogger");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Data Logger"));
+  // Tool stays on top of parent window
+  this->setWindowFlags(this->windowFlags() & Qt::Tool);
 
   // The record button allows the user to start and pause data recording
   this->recordButton = new QToolButton(this);
@@ -98,6 +100,8 @@ DataLogger::DataLogger(QWidget *_parent)
   this->destPath->setObjectName("dataLoggerDestnationPathLabel");
   this->destPath->setMinimumWidth(300);
   this->destPath->setReadOnly(true);
+  this->destPath->setStyleSheet(
+      "QLineEdit {color: #aeaeae; font-size: 11px; background: transparent}");
 
   // Browser button
   QPushButton *browseButton = new QPushButton("Browse");
@@ -172,9 +176,6 @@ DataLogger::DataLogger(QWidget *_parent)
   mainLayout->addWidget(topWidget);
   mainLayout->addWidget(this->settingsFrame);
 
-  // Let the stylesheet handle the margin sizes
-  mainLayout->setContentsMargins(2, 2, 2, 2);
-
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
 
@@ -196,9 +197,12 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this, SIGNAL(SetDestinationURI(QString)),
           this, SLOT(OnSetDestinationURI(QString)), Qt::QueuedConnection);
 
+  connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
+
   // Timer used to blink the status label
   this->statusTimer = new QTimer();
   connect(this->statusTimer, SIGNAL(timeout()), this, SLOT(OnBlinkStatus()));
+  this->statusTime = 0;
 
   // Timer used to hide the confirmation dialog
   this->confirmationDialog = NULL;
@@ -275,12 +279,14 @@ void DataLogger::OnRecord(bool _toggle)
     this->confirmationTimer->start(2000);
     QLabel *confirmationLabel = new QLabel("Saved to \n" +
         this->destPath->text());
+    confirmationLabel->setObjectName("dataLoggerConfirmationLabel");
     QHBoxLayout *confirmationLayout = new QHBoxLayout();
     confirmationLayout->addWidget(confirmationLabel);
 
     if (this->confirmationDialog)
       this->confirmationDialog->close();
     this->confirmationDialog = new QDialog(this, Qt::FramelessWindowHint);
+    this->confirmationDialog->setObjectName("dataLoggerConfirmationDialog");
     this->confirmationDialog->setLayout(confirmationLayout);
     this->confirmationDialog->setStyleSheet(
         "QDialog {background-color: #eee}\
@@ -417,6 +423,7 @@ void DataLogger::OnBrowse()
 {
   QFileDialog fileDialog(this, tr("Set log directory"), QDir::homePath());
   fileDialog.setFileMode(QFileDialog::Directory);
+  fileDialog.setFilter(QDir::AllDirs | QDir::Hidden);
   fileDialog.setOptions(QFileDialog::ShowDirsOnly
       | QFileDialog::DontResolveSymlinks);
 
@@ -500,4 +507,11 @@ void DataLogger::OnConfirmationTimeout()
 {
   this->confirmationDialog->close();
   this->confirmationTimer->stop();
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnCancel()
+{
+  if (this->recordButton->isChecked())
+    this->recordButton->click();
 }

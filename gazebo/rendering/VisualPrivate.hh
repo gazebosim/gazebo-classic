@@ -33,6 +33,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -55,6 +56,31 @@ namespace gazebo
     /// \brief Private data for the Visual class
     class VisualPrivate
     {
+      /// \brief Constructor
+      public: VisualPrivate()
+              : sceneNode(NULL),
+                transparency(0),
+                castShadows(true),
+                isStatic(false),
+                staticGeom(NULL),
+                visible(true),
+                ribbonTrail(NULL),
+                skeleton(NULL),
+                animState(NULL),
+                useRTShader(true),
+                initialized(false),
+                boundingBox(NULL),
+                id(0),
+                lighting(true),
+                visibilityFlags(GZ_VISIBILITY_ALL),
+                type(VT_ENTITY),
+                layer(0)
+      {
+      }
+
+      /// \brief Default destructor
+      public: virtual ~VisualPrivate() = default;
+
       /// \brief Pointer to the visual's scene.
       public: ScenePtr scene;
 
@@ -163,6 +189,9 @@ namespace gazebo
 
       /// \brief Visibility flags of the visual.
       public: uint32_t visibilityFlags;
+
+      /// \brief type
+      public: rendering::VisualType type;
 
       /// \brief Index of the layer to which this visual belongs. Layers
       /// act similar to layers in photoshop.

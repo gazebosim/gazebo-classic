@@ -401,6 +401,10 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
+      /// \brief Called when log playback control message is received.
+      /// \param[in] _data The log playback control message.
+      private: void OnPlaybackControl(ConstLogPlaybackControlPtr &_data);
+
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
