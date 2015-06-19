@@ -279,6 +279,7 @@ bool gui::run(int _argc, char **_argv)
   // Initialize the informational logger. This will log warnings, and errors.
   gzLogInit("client-", "gzclient.log");
 
+
   // Make sure the model database has started
   gazebo::common::ModelDatabase::Instance()->Start();
 
@@ -292,6 +293,12 @@ bool gui::run(int _argc, char **_argv)
     return false;
 
   gazebo::gui::init();
+
+/*  QPixmap pixmap(":/images/gazebo.svg");
+  QSplashScreen *splash = new QSplashScreen(pixmap);
+  splash->show();
+  splash->showMessage("Loading Gazebo");*/
+
 
 #ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for

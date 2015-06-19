@@ -131,7 +131,7 @@ bool gazebo::setupClient(int _argc, char **_argv)
   int maxWaitCount = 10;
 
   // Wait for namespaces.
-  while (!gazebo::transport::waitForNamespaces(waitTime) &&
+/*  while (!gazebo::transport::waitForNamespaces(waitTime) &&
       (waitCount++) < maxWaitCount)
   {
     gzwarn << "Waited " << waitTime.Double() << "seconds for namespaces.\n";
@@ -142,7 +142,7 @@ bool gazebo::setupClient(int _argc, char **_argv)
     gzerr << "Waited " << (waitTime * waitCount).Double()
       << " seconds for namespaces. Giving up.\n";
   }
-
+*/
   return true;
 }
 
