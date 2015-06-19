@@ -126,23 +126,14 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   this->lengthSpinBox->setDecimals(3);
   this->lengthSpinBox->setValue(0.000);
   this->lengthSpinBox->setAlignment(Qt::AlignRight);
-  //QLabel *lengthCaptionLabel = new QLabel(
-  //  tr("(Distance from Start to End point)\n"));
 
   QLabel *lengthUnitLabel = new QLabel(tr("m"));
   lengthUnitLabel->setMaximumWidth(40);
 
-  QGridLayout *lengthLayout = new QGridLayout;
-  lengthLayout->addWidget(lengthLabel, 0, 0);
-  lengthLayout->addWidget(lengthSpinBox, 0, 1);
-  lengthLayout->addWidget(lengthUnitLabel, 0, 2);
-
-  //QVBoxLayout *lengthGroupLayout = new QVBoxLayout;
-  //lengthGroupLayout->addLayout(lengthLayout);
-  //lengthGroupLayout->addWidget(lengthCaptionLabel);
-
-  //QGroupBox *lengthGroupBox = new QGroupBox(tr("Length"));
-  //lengthGroupBox->setLayout(lengthGroupLayout);
+  QHBoxLayout *lengthLayout = new QHBoxLayout;
+  lengthLayout->addWidget(lengthLabel);
+  lengthLayout->addWidget(lengthSpinBox);
+  lengthLayout->addWidget(lengthUnitLabel);
 
   QLabel *heightLabel = new QLabel(tr("Height: "));
   this->heightSpinBox = new QDoubleSpinBox;
