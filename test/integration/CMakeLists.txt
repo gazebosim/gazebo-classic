@@ -81,6 +81,7 @@ set(tests
   surface_properties.cc
   transceiver.cc
   transport.cc
+  transporter.cc
   world.cc
   world_clone.cc
   world_entity_below_point.cc
