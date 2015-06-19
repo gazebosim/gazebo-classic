@@ -200,15 +200,16 @@ namespace gazebo
       public: uint32_t GetParentId() const;
 
       /// \brief Get the sensor's noise model.
-      /// Depracted in favour of GetNoise(const SensorNoiseType _type) 
+      /// Depracted in favour of GetNoise(const SensorNoiseType _type)
       /// which explicitly specifies the noise stream
       /// \param[in] _index Index of the noise model. For most sensors this
       /// will be 0. For a multi camera sensor the index can be >=0.
       /// \return The sensor's noise model.
-      public: NoisePtr GetNoise(unsigned int _index = 0) const GAZEBO_DEPRECATED(6.0);
+      public: NoisePtr GetNoise(unsigned int _index = 0) const
+              GAZEBO_DEPRECATED(6.0);
 
-      /// \brief Get the sensor's noise model for s specified noise type.
-      /// \param[in] _type Index of the noise type. Refer to  
+      /// \brief Get the sensor's noise model for a specified noise type.
+      /// \param[in] _type Index of the noise type. Refer to
       /// SensorNoiseType enumeration for possible indices
       /// \return The sensor's noise model for the given noise type
       public: NoisePtr GetNoise(const SensorNoiseType _type) const;
