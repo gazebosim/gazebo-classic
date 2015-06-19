@@ -55,6 +55,7 @@ set (sources
   SaveDialog.cc
   SpaceNav.cc
   SphereMaker.cc
+  SplashScreen.cc
   TimePanel.cc
   TimeWidget.cc
   ToolsWidget.cc
@@ -88,6 +89,7 @@ set (qt_headers
   ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
+  SplashScreen.hh
   SaveDialog.hh
   TimePanel.hh
   TimeWidget.hh
