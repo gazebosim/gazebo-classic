@@ -57,12 +57,14 @@ LaserVisual::~LaserVisual()
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
-  for (unsigned int i = 0; i < dPtr->rayFans.size(); ++i)
-  {
-    this->DeleteDynamicLine(dPtr->rayFans[i]);
-    dPtr->rayFans[i] = NULL;
-  }
+  for (auto ray : dPtr->rayFans)
+    this->DeleteDynamicLine(ray);
+
+  for (auto ray : dPtr->rayLines)
+    this->DeleteDynamicLine(ray);
+
   dPtr->rayFans.clear();
+  dPtr->rayLines.clear();
 }
 
 /////////////////////////////////////////////////
@@ -117,6 +119,11 @@ void LaserVisual::Update()
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
       dPtr->rayFans[j]->setMaterial("Gazebo/BlueLaser");
       dPtr->rayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+
+      dPtr->rayLines.push_back(
+          this->CreateDynamicLine(rendering::RENDERING_LINE_LIST));
+      dPtr->rayLines[j]->setMaterial("Gazebo/BlueLaser");
+
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
     dPtr->rayFans[j]->SetPoint(0, offset.pos);
@@ -130,6 +137,19 @@ void LaserVisual::Update()
       axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
       pt = (axis * r) + offset.pos;
 
+      // Draw the lines that represent each simulated ray
+      if (i >= dPtr->rayLines[j]->GetPointCount()/2)
+      {
+        dPtr->rayLines[j]->AddPoint(offset.pos);
+        dPtr->rayLines[j]->AddPoint(pt);
+      }
+      else
+      {
+        dPtr->rayLines[j]->SetPoint(i*2, offset.pos);
+        dPtr->rayLines[j]->SetPoint(i*2+1, pt);
+      }
+
+      // Draw the triangle fan that fill in the gaps for the laser rays
       if (i+1 >= dPtr->rayFans[j]->GetPointCount())
         dPtr->rayFans[j]->AddPoint(pt);
       else
