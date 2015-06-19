@@ -4,6 +4,8 @@ package gazebo.msgs;
 /// \interface LogPlaybackControl
 /// \brief A message that allows for control of log playback functions.
 
+import "time.proto";
+
 message LogPlaybackControl
 {
   /// \brief Pause/play the log file.
