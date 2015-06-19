@@ -47,21 +47,26 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   this->startXSpinBox->setSingleStep(0.001);
   this->startXSpinBox->setDecimals(3);
   this->startXSpinBox->setValue(0.000);
+  this->startXSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *startXUnitLabel = new QLabel(tr("m"));
+  startXUnitLabel->setMaximumWidth(40);
 
   this->startYSpinBox = new QDoubleSpinBox;
   this->startYSpinBox->setRange(-1000, 1000);
   this->startYSpinBox->setSingleStep(0.001);
   this->startYSpinBox->setDecimals(3);
   this->startYSpinBox->setValue(0.000);
+  this->startYSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *startYUnitLabel = new QLabel(tr("m"));
+  startYUnitLabel->setMaximumWidth(40);
 
   QGridLayout *startXYLayout = new QGridLayout;
   startXYLayout->addWidget(startXLabel, 0, 0);
   startXYLayout->addWidget(startXSpinBox, 0, 1);
+  startXYLayout->addWidget(startXUnitLabel, 0, 2);
   startXYLayout->addWidget(startYLabel, 1, 0);
   startXYLayout->addWidget(startYSpinBox, 1, 1);
-  startXYLayout->setColumnStretch(1, 1);
-  startXYLayout->setAlignment(startXSpinBox, Qt::AlignLeft);
-  startXYLayout->setAlignment(startYSpinBox, Qt::AlignLeft);
+  startXYLayout->addWidget(startYUnitLabel, 1, 2);
 
   QVBoxLayout *xyLayout = new QVBoxLayout;
   xyLayout->addWidget(startPointLabel);
@@ -79,26 +84,38 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   this->widthSpinBox->setSingleStep(0.001);
   this->widthSpinBox->setDecimals(3);
   this->widthSpinBox->setValue(0.000);
+  this->widthSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *widthUnitLabel = new QLabel(tr("m"));
+  widthUnitLabel->setMaximumWidth(40);
 
   this->depthSpinBox = new QDoubleSpinBox;
   this->depthSpinBox->setRange(-1000, 1000);
   this->depthSpinBox->setSingleStep(0.001);
   this->depthSpinBox->setDecimals(3);
   this->depthSpinBox->setValue(0.000);
+  this->depthSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *depthUnitLabel = new QLabel(tr("m"));
+  depthUnitLabel->setMaximumWidth(40);
 
   this->heightSpinBox = new QDoubleSpinBox;
   this->heightSpinBox->setRange(-1000, 1000);
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
   this->heightSpinBox->setValue(0.000);
+  this->heightSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *heightUnitLabel = new QLabel(tr("m"));
+  heightUnitLabel->setMaximumWidth(40);
 
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
   sizeLayout->addWidget(widthSpinBox, 0, 1);
+  sizeLayout->addWidget(widthUnitLabel, 0, 2);
   sizeLayout->addWidget(depthLabel, 1, 0);
   sizeLayout->addWidget(depthSpinBox, 1, 1);
+  sizeLayout->addWidget(depthUnitLabel, 1, 2);
   sizeLayout->addWidget(heightLabel, 2, 0);
   sizeLayout->addWidget(heightSpinBox, 2, 1);
+  sizeLayout->addWidget(heightUnitLabel, 2, 2);
 
   QLabel *stepsLabel = new QLabel(tr("# Steps: "));
   this->stepsSpinBox = new QSpinBox;

@@ -55,6 +55,9 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   this->widthSpinBox->setSingleStep(0.001);
   this->widthSpinBox->setDecimals(3);
   this->widthSpinBox->setValue(0.000);
+  this->widthSpinBox->setAlignment(Qt::AlignLeft);
+  QLabel *widthUnitLabel = new QLabel(tr("m"));
+  widthUnitLabel->setMaximumWidth(40);
 
   this->depthSpinBox = new QDoubleSpinBox;
   this->depthSpinBox->setRange(-1000, 1000);
@@ -67,14 +70,19 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
   this->heightSpinBox->setValue(0.000);
+  this->heightSpinBox->setAlignment(Qt::AlignLeft);
+  QLabel *heightUnitLabel = new QLabel(tr("m"));
+  heightUnitLabel->setMaximumWidth(40);
 
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
   sizeLayout->addWidget(widthSpinBox, 0, 1);
+  sizeLayout->addWidget(widthUnitLabel, 0, 2);
 //  sizeLayout->addWidget(depthLabel, 1, 0);
 //  sizeLayout->addWidget(depthSpinBox, 1, 1);
   sizeLayout->addWidget(heightLabel, 2, 0);
   sizeLayout->addWidget(heightSpinBox, 2, 1);
+  sizeLayout->addWidget(heightUnitLabel, 2, 2);
 
   QGroupBox *sizeGroupBox = new QGroupBox(tr("Size"));
   sizeGroupBox->setLayout(sizeLayout);
@@ -88,26 +96,38 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   this->positionXSpinBox->setSingleStep(0.001);
   this->positionXSpinBox->setDecimals(3);
   this->positionXSpinBox->setValue(0.000);
+  this->positionXSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *positionXUnitLabel = new QLabel(tr("m"));
+  positionXUnitLabel->setMaximumWidth(40);
 
   this->positionYSpinBox = new QDoubleSpinBox;
   this->positionYSpinBox->setRange(-1000, 1000);
   this->positionYSpinBox->setSingleStep(0.001);
   this->positionYSpinBox->setDecimals(3);
   this->positionYSpinBox->setValue(0.000);
+  this->positionYSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *positionYUnitLabel = new QLabel(tr("m"));
+  positionYUnitLabel->setMaximumWidth(40);
 
   this->elevationSpinBox = new QDoubleSpinBox;
   this->elevationSpinBox->setRange(-1000, 1000);
   this->elevationSpinBox->setSingleStep(0.001);
   this->elevationSpinBox->setDecimals(3);
   this->elevationSpinBox->setValue(0.000);
+  this->elevationSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *elevationUnitLabel = new QLabel(tr("m"));
+  elevationUnitLabel->setMaximumWidth(40);
 
   QGridLayout *positionLayout = new QGridLayout;
   positionLayout->addWidget(positionXLabel, 0, 0);
   positionLayout->addWidget(positionXSpinBox, 0, 1);
+  positionLayout->addWidget(positionXUnitLabel, 0, 2);
   positionLayout->addWidget(positionYLabel), 1, 0;
   positionLayout->addWidget(positionYSpinBox, 1, 1);
-  positionLayout->addWidget(elevationLabel, 0, 2);
-  positionLayout->addWidget(elevationSpinBox, 0, 3);
+  positionLayout->addWidget(positionYUnitLabel, 1, 2);
+  positionLayout->addWidget(elevationLabel, 0, 3);
+  positionLayout->addWidget(elevationSpinBox, 0, 4);
+  positionLayout->addWidget(elevationUnitLabel, 0, 5);
 
   QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
   positionGroupBox->setLayout(positionLayout);
