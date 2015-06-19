@@ -42,6 +42,7 @@ namespace gazebo
     /// \class GpuRaySensor GpuRaySensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
+
     /// \brief GPU based laser sensor
     ///
     /// This sensor cast rays into the world, tests for intersections, and

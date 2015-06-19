@@ -50,6 +50,8 @@ std::string Time::wallTimeISO;
 
 struct timespec Time::clockResolution;
 const Time Time::Zero = common::Time(0, 0);
+const Time Time::Second = common::Time(1, 0);
+const Time Time::Hour = common::Time(3600, 0);
 const int32_t Time::nsInSec = 1000000000L;
 const int32_t Time::nsInMs = 1000000;
 

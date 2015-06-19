@@ -210,27 +210,6 @@ namespace gazebo
       /// \brief N/A
       RENDERING_MESH_RESOURCE = 6
     };
-
-    /// \brief Type of visual
-    enum VisualType
-    {
-      /// \brief Entity visual
-      VT_ENTITY,
-      /// \brief Model visual
-      VT_MODEL,
-      /// \brief Link visual
-      VT_LINK,
-      /// \brief Visual visual
-      VT_VISUAL,
-      /// \brief Collision visual
-      VT_COLLISION,
-      /// \brief Sensor visual
-      VT_SENSOR,
-      /// \brief GUI visual
-      VT_GUI,
-      /// \brief Physics data visual
-      VT_PHYSICS
-    };
   }
 }
 #endif
