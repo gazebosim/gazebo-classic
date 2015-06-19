@@ -122,14 +122,18 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   stepLayout->setAlignment(this->dataPtr->stepSpin, Qt::AlignLeft);
 
   // Play layout
-  QGridLayout *playLayout = new QGridLayout();
-  playLayout->addWidget(jumpStartButton, 0, 0);
-  playLayout->addWidget(stepBackButton, 0, 1);
-  playLayout->addWidget(playButton, 0, 2);
-  playLayout->addWidget(pauseButton, 0, 3);
-  playLayout->addWidget(stepForwardButton, 0, 4);
-  playLayout->addWidget(jumpEndButton, 0, 5);
-  playLayout->addLayout(stepLayout, 1, 0, 1, 6);
+  QHBoxLayout *playLayout = new QHBoxLayout();
+  playLayout->addWidget(jumpStartButton);
+  playLayout->addWidget(stepBackButton);
+  playLayout->addWidget(playButton);
+  playLayout->addWidget(pauseButton);
+  playLayout->addWidget(stepForwardButton);
+  playLayout->addWidget(jumpEndButton);
+
+  // Controls layout
+  QVBoxLayout *controlsLayout = new QVBoxLayout();
+  controlsLayout->addLayout(playLayout);
+  controlsLayout->addLayout(stepLayout);
 
   // View
   this->dataPtr->view = new LogPlayView(this);
@@ -163,13 +167,13 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(leftSpacer);
-  mainLayout->addLayout(playLayout);
+  mainLayout->addLayout(controlsLayout);
   mainLayout->addWidget(this->dataPtr->view);
   mainLayout->addLayout(timeLayout);
   mainLayout->addWidget(rightSpacer);
 
   this->setLayout(mainLayout);
-  mainLayout->setAlignment(playLayout, Qt::AlignRight);
+  mainLayout->setAlignment(controlsLayout, Qt::AlignRight);
   mainLayout->setAlignment(timeLayout, Qt::AlignLeft);
 
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
