@@ -58,6 +58,27 @@ namespace gazebo
     class GZ_RENDERING_VISIBLE Visual :
       public boost::enable_shared_from_this<Visual>
     {
+      /// \brief Type of visual
+      public: enum VisualType
+      {
+        /// \brief Entity visual
+        VT_ENTITY,
+        /// \brief Model visual
+        VT_MODEL,
+        /// \brief Link visual
+        VT_LINK,
+        /// \brief Visual visual
+        VT_VISUAL,
+        /// \brief Collision visual
+        VT_COLLISION,
+        /// \brief Sensor visual
+        VT_SENSOR,
+        /// \brief GUI visual
+        VT_GUI,
+        /// \brief Physics data visual
+        VT_PHYSICS
+      };
+
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
       /// \param[in] _parent Parent of the visual.
@@ -536,11 +557,23 @@ namespace gazebo
 
       /// \brief Get type of visual.
       /// \return Visual type.
-      public: VisualType GetType() const;
+      public: Visual::VisualType GetType() const;
 
       /// \brief Set type of visual.
       /// \param[in] _type Visual type.
-      public: void SetType(const VisualType _type);
+      public: void SetType(const Visual::VisualType _type);
+
+      /// \brief Convert from msgs::Visual::Type to VisualType.
+      /// \param[in] _type A msgs::Visual::Type enum.
+      /// \return VisualType enum.
+      public: static Visual::VisualType ConvertVisualType(
+          const msgs::Visual::Type &_type);
+
+      /// \brief Convert from msgs::Visual::Type to VisualType.
+      /// \param[in] _type VisualType enum.
+      /// \return A msgs::Visual::Type enum.
+      public: static msgs::Visual::Type ConvertVisualType(
+          const Visual::VisualType &_type);
 
       /// \internal
       /// \brief Constructor used by inherited classes
