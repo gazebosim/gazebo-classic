@@ -21,7 +21,7 @@
     </physics>
 
     <% prng = Random.new(1234) %>
-    <% for i in 0..500 %>
+    <% for i in 0..1000 %>
       <model name="box_<%=i%>">
       <pose><%= prng.rand(-10.0..10.0) %> <%=prng.rand(-10.0..10.0)%> 0.05 0 0 <%=prng.rand(0.0..3.1415)%></pose>
       <link name="link">
