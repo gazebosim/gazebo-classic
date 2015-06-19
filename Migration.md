@@ -2,6 +2,10 @@
 
 ### Modifications
 
+1. **gazebo/msgs/world_stats.proto**
+    + ***Removed:*** optional bool log_playback = 8;
+    + ***Replacement:*** optional LogPlaybackStatistics log_playback_stats = 8;
+
 1. **gazebo/physics/JointState.hh**
     + ***Removed:*** public: JointState(JointPtr _joint, const common::Time
     &_realTime, const common::Time &_simTime)
