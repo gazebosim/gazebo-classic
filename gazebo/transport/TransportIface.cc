@@ -31,6 +31,8 @@
 #include "gazebo/transport/ConnectionManager.hh"
 #include "gazebo/transport/TransportIface.hh"
 
+#include "gazebo/util/Diagnostics.hh"
+
 using namespace gazebo;
 
 boost::thread *g_runThread = NULL;
@@ -113,9 +115,11 @@ bool transport::init(const std::string &_masterHost, unsigned int _masterPort,
 /////////////////////////////////////////////////
 void transport::run()
 {
+  DIAG_TIMER_START("transport::run create thread ConnectionManager::Run");
   g_stopped = false;
   g_runThread = new boost::thread(&transport::ConnectionManager::Run,
                                 transport::ConnectionManager::Instance());
+  DIAG_TIMER_STOP("transport::run create thread ConnectionManager::Run");
 }
 
 /////////////////////////////////////////////////
@@ -136,15 +140,18 @@ void transport::stop()
 /////////////////////////////////////////////////
 void transport::fini()
 {
+  DIAG_TIMER_START("transport::fini");
   transport::stop();
   if (g_runThread)
   {
     g_runThread->join();
     delete g_runThread;
     g_runThread = NULL;
+    DIAG_TIMER_LAP("transport::fini", "destroy thread ConnectionManager::Run");
   }
   transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Fini();
+  DIAG_TIMER_STOP("transport::fini");
 }
 
 /////////////////////////////////////////////////

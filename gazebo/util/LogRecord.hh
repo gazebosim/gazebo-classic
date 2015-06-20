@@ -33,7 +33,6 @@
 #include <boost/filesystem.hpp>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -356,15 +355,6 @@ namespace gazebo
 
       /// \brief Current simulation time.
       private: common::Time currTime;
-
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-
-      /// \brief Subscriber to log control messages.
-      private: transport::SubscriberPtr logControlSub;
-
-      /// \brief Publisher of log status messages.
-      private: transport::PublisherPtr logStatusPub;
 
       /// \brief All the event connections.
       private: event::Connection_V connections;

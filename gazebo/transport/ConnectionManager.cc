@@ -26,6 +26,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/ConnectionManager.hh"
+#include "gazebo/util/Diagnostics.hh"
 
 #include "gazebo/gazebo_config.h"
 
@@ -304,21 +305,27 @@ void ConnectionManager::RunUpdate()
 //////////////////////////////////////////////////
 void ConnectionManager::Run()
 {
+  DIAG_TIMER_START("ConnectionManager::Run");
   boost::mutex::scoped_lock lock(this->updateMutex);
 
   this->stopped = false;
 
   while (!this->stop && this->masterConn && this->masterConn->IsOpen())
   {
+    DIAG_TIMER_LAP("ConnectionManager::Run", "Loop start");
     this->RunUpdate();
+    DIAG_TIMER_LAP("ConnectionManager::Run", "RunUpdate");
     this->updateCondition.timed_wait(lock,
        boost::posix_time::milliseconds(100));
+    DIAG_TIMER_LAP("ConnectionManager::Run", "Loop end");
   }
   this->RunUpdate();
+  DIAG_TIMER_LAP("ConnectionManager::Run", "Last RunUpdate");
 
   this->stopped = true;
 
   this->masterConn->Shutdown();
+  DIAG_TIMER_STOP("ConnectionManager::Run");
 }
 
 //////////////////////////////////////////////////
@@ -700,5 +707,7 @@ ConnectionPtr ConnectionManager::FindConnection(const std::string &_host,
 //////////////////////////////////////////////////
 void ConnectionManager::TriggerUpdate()
 {
+  DIAG_TIMER_START("ConnectionManager::TriggerUpdate");
   this->updateCondition.notify_all();
+  DIAG_TIMER_STOP("ConnectionManager::TriggerUpdate");
 }

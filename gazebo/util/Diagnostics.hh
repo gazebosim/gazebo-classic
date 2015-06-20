@@ -24,8 +24,6 @@
 
 #include "gazebo/gazebo_config.h"
 
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/UpdateInfo.hh"
@@ -142,12 +140,6 @@ namespace gazebo
 
       /// \brief Path in which to store timing logs.
       private: boost::filesystem::path logPath;
-
-      /// \brief Node for publishing diagnostic data.
-      private: transport::NodePtr node;
-
-      /// \brief Publisher of diagnostic data.
-      private: transport::PublisherPtr pub;
 
       /// \brief The message to output
       private: msgs::Diagnostics msg;

@@ -25,7 +25,6 @@
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/transport/transport.hh"
 #include "gazebo/util/Diagnostics.hh"
 
 using namespace gazebo;
@@ -74,14 +73,8 @@ DiagnosticManager::~DiagnosticManager()
 }
 
 //////////////////////////////////////////////////
-void DiagnosticManager::Init(const std::string &_worldName)
+void DiagnosticManager::Init(const std::string &/*_worldName*/)
 {
-  this->node.reset(new transport::Node());
-
-  this->node->Init(_worldName);
-
-  this->pub = this->node->Advertise<msgs::Diagnostics>("~/diagnostics");
-
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&DiagnosticManager::Update, this, _1));
 }
@@ -103,20 +96,13 @@ void DiagnosticManager::Update(const common::UpdateInfo &_info)
   msgs::Set(this->msg.mutable_real_time(), _info.realTime);
   msgs::Set(this->msg.mutable_sim_time(), _info.simTime);
 
-  if (this->pub && this->pub->HasConnections())
-    this->pub->Publish(this->msg);
-
   this->msg.clear_time();
 }
 
 //////////////////////////////////////////////////
-void DiagnosticManager::AddTime(const std::string &_name,
-    common::Time &_wallTime, common::Time &_elapsedTime)
+void DiagnosticManager::AddTime(const std::string &/*_name*/,
+    common::Time &/*_wallTime*/, common::Time &/*_elapsedTime*/)
 {
-  msgs::Diagnostics::DiagTime *time = this->msg.add_time();
-  time->set_name(_name);
-  msgs::Set(time->mutable_elapsed(), _elapsedTime);
-  msgs::Set(time->mutable_wall(), _wallTime);
 }
 
 //////////////////////////////////////////////////

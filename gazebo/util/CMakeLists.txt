@@ -61,7 +61,6 @@ add_dependencies(gazebo_util
 
 target_link_libraries(gazebo_util
   gazebo_common
-  gazebo_transport
   gazebo_math
   gazebo_msgs
 )

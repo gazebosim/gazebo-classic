@@ -57,8 +57,9 @@ endif ()
 
 gz_add_library(gazebo_transport ${sources})
 target_link_libraries(gazebo_transport
-  gazebo_common 
-  gazebo_msgs 
+  gazebo_common
+  gazebo_msgs
+  gazebo_util
   ${Boost_LIBRARIES}
   ${TBB_LIBRARIES} 
 )

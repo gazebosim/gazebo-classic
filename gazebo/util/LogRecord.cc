@@ -48,7 +48,6 @@
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/math/Rand.hh"
-#include "gazebo/transport/transport.hh"
 #include "gazebo/util/LogRecord.hh"
 
 using namespace gazebo;
@@ -235,10 +234,6 @@ void LogRecord::Fini()
 
   // Remove all the logs.
   this->ClearLogs();
-
-  this->logControlSub.reset();
-  this->logStatusPub.reset();
-  this->node.reset();
 }
 
 //////////////////////////////////////////////////
@@ -327,16 +322,6 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
 
   // Update the pointer to the end of the log objects list.
   this->logsEnd = this->logs.end();
-
-  if (!this->node)
-  {
-    this->node = transport::NodePtr(new transport::Node());
-    this->node->Init();
-
-    this->logControlSub = this->node->Subscribe("~/log/control",
-        &LogRecord::OnLogControl, this);
-    this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
-  }
 }
 
 //////////////////////////////////////////////////
@@ -752,8 +737,7 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
 //////////////////////////////////////////////////
 void LogRecord::PublishLogStatus()
 {
-  if (this->logs.empty() || !this->logStatusPub ||
-      !this->logStatusPub->HasConnections())
+  if (this->logs.empty())
     return;
 
   /// \todo right now this function will only report on the first log.
@@ -769,9 +753,6 @@ void LogRecord::PublishLogStatus()
 
   // Get the full name of the log file
   msg.mutable_log_file()->set_full_path(this->GetFilename());
-
-  // Set the URI of th log file
-  msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
 
   // Get the size of the log file
   size = this->GetFileSize();
@@ -793,8 +774,6 @@ void LogRecord::PublishLogStatus()
     msg.mutable_log_file()->set_size(size / 1.0e9);
     msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
   }
-
-  this->logStatusPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
