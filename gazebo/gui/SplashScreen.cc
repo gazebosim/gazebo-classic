@@ -32,20 +32,21 @@ SplashScreen::SplashScreen()
   this->setObjectName("SplashScreen");
   QPixmap pixmap(":/images/splash.svg");
   QTextEdit *edit = new QTextEdit(
-    "<br><br>Welcome to Gazebo!<br><br>"
-    "Please prepare for some 3D robot awesomeness.<br><br>"
-    "Gazebo is now downloading models to prepare to start the simulation. Depending on your internet connection, this can take an arbitrarily long amount of time. If you have read this far, we apologize. Have a nice day.");
+      "<br><br>Welcome to Gazebo!<br><br>"
+      "Please prepare for some 3D robot awesomeness.<br><br>"
+      "Gazebo is now downloading models to prepare to start the simulation."
+      "Depending on your internet connection, this can take an arbitrarily "
+      "long amount of time. If you have read this far, we apologize. "
+      "Have a nice day.");
   edit->setAcceptRichText(true);
+  edit->setContentsMargins(0, 0, 0, 0);
+  edit->setFrameStyle(QFrame::NoFrame);
   this->dataPtr->splashScreen = new QSplashScreen(pixmap);
   QHBoxLayout *box = new QHBoxLayout();
   box->setContentsMargins(0, 0, 0, 0);
-  edit->setContentsMargins(0, 0, 0, 0);
-  edit->setFrameStyle(QFrame::NoFrame);
   this->dataPtr->splashScreen->setLayout(box);
   box->addItem(new QSpacerItem(350, 1));
   box->addWidget(edit);
-//  this->dataPtr->splashScreen->createNe
-  //this->dataPtr->splashScreen->layout()->addWidget(edit);
   this->dataPtr->splashScreen->show();
   ShowMessage("");
   QTimer::singleShot(10, this, SLOT(Update()));
@@ -72,13 +73,11 @@ void SplashScreen::ShowMessage(const std::string &_message)
 /////////////////////////////////////////////////
 void SplashScreen::Update()
 {
-  if (get_active_camera() && get_active_camera()->GetScene())
+  rendering::UserCameraPtr cam = get_active_camera();
+  if (cam && cam->GetScene() && cam->GetScene()->GetInitialized())
   {
-    if (get_active_camera()->GetScene()->GetInitialized())
-    {
-      this->dataPtr->splashScreen->hide();
-      return;
-    }
+    this->dataPtr->splashScreen->hide();
+    return;
   }
 
   QTimer::singleShot(100, this, SLOT(Update()));

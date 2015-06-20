@@ -29,6 +29,7 @@ namespace gazebo
     /// \brief Private data for the SplashScreen class
     class SplashScreenPrivate
     {
+      /// \brief Pointer to the splash screen widget.
       public: QSplashScreen *splashScreen;
     };
   }

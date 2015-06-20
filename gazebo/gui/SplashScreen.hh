@@ -18,7 +18,6 @@
 #define _GAZEBO_SPLASH_SCREEN_HH_
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/TimePanel.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -27,6 +26,7 @@ namespace gazebo
   {
     class SplashScreenPrivate;
 
+    /// \brief Splash screen that displays an icon and a message.
     class GAZEBO_VISIBLE SplashScreen : public QObject
     {
       Q_OBJECT
@@ -39,10 +39,11 @@ namespace gazebo
       public: virtual ~SplashScreen();
 
       /// \brief Show message in splash screen
+      /// \param[in] _message Message to be displayed in the splash screen.
       public: virtual void ShowMessage(const std::string &_message);
 
-      /// \brief Update splash screen
-      public slots: void Update();
+      /// \brief Qt callback to update the splash screen
+      private slots: void Update();
 
       /// \internal
       /// \brief Pointer to private data.
