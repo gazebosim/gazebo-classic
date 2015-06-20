@@ -37,8 +37,6 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   nameLayout->addWidget(stairsLabel);
   nameLayout->addWidget(stairsNameLabel);
 
-  QLabel *startPointLabel = new QLabel(tr("Start Point: "));
-
   QLabel *startXLabel = new QLabel(tr("x: "));
   QLabel *startYLabel = new QLabel(tr("y: "));
 
@@ -69,7 +67,6 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   startXYLayout->addWidget(startYUnitLabel, 1, 2);
 
   QVBoxLayout *xyLayout = new QVBoxLayout;
-  xyLayout->addWidget(startPointLabel);
   xyLayout->addLayout(startXYLayout);
 
   QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
@@ -106,6 +103,15 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   QLabel *heightUnitLabel = new QLabel(tr("m"));
   heightUnitLabel->setMaximumWidth(40);
 
+  QLabel *stepsLabel = new QLabel(tr("# Steps: "));
+  this->stepsSpinBox = new QSpinBox;
+  this->stepsSpinBox->setRange(1, 1000);
+  this->stepsSpinBox->setSingleStep(1);
+  this->stepsSpinBox->setValue(1);
+  this->stepsSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *stepsDummyLabel = new QLabel(tr(" "));
+  //stepsDummyLabel->setMaximumWidth(40);
+
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
   sizeLayout->addWidget(widthSpinBox, 0, 1);
@@ -114,25 +120,14 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   sizeLayout->addWidget(depthSpinBox, 1, 1);
   sizeLayout->addWidget(depthUnitLabel, 1, 2);
   sizeLayout->addWidget(heightLabel, 2, 0);
-  sizeLayout->addWidget(heightSpinBox, 2, 1);
+  sizeLayout->addWidget(this->heightSpinBox, 2, 1);
   sizeLayout->addWidget(heightUnitLabel, 2, 2);
-
-  QLabel *stepsLabel = new QLabel(tr("# Steps: "));
-  this->stepsSpinBox = new QSpinBox;
-  this->stepsSpinBox->setRange(1, 1000);
-  this->stepsSpinBox->setSingleStep(1);
-  this->stepsSpinBox->setValue(1);
-
-  QGridLayout *stepsLayout = new QGridLayout;
-  stepsLayout->addWidget(stepsLabel, 0, 0);
-  stepsLayout->addWidget(stepsSpinBox, 0, 1);
-
-  QVBoxLayout *sizeStepsLayout = new QVBoxLayout;
-  sizeStepsLayout->addLayout(sizeLayout);
-  sizeStepsLayout->addLayout(stepsLayout);
+  sizeLayout->addWidget(stepsLabel, 3, 0);
+  sizeLayout->addWidget(this->stepsSpinBox, 3, 1);
+  sizeLayout->addWidget(stepsDummyLabel, 3, 2);
 
   QGroupBox *sizeGroupBox = new QGroupBox(tr("Size"));
-  sizeGroupBox->setLayout(sizeStepsLayout);
+  sizeGroupBox->setLayout(sizeLayout);
 
   QLabel *colorLabel = new QLabel(tr("Color: "));
   this->colorComboBox = new QComboBox;
