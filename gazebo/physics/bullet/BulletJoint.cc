@@ -21,6 +21,7 @@
 
 #include <string>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
@@ -333,6 +334,7 @@ void BulletJoint::CacheForceTorque()
 //////////////////////////////////////////////////
 JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
+  GZ_ASSERT(this->constraint != NULL, "constraint should be valid");
   return this->wrench;
 }
 
@@ -354,6 +356,8 @@ void BulletJoint::SetupJointFeedback()
       gzerr << "Bullet Joint [" << this->GetName() << "] ID is invalid\n";
       getchar();
     }
+
+
   }
 }
 

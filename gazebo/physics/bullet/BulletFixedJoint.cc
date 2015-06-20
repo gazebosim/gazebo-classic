@@ -52,98 +52,104 @@ void BulletFixedJoint::Init()
 {
   FixedJoint<BulletJoint>::Init();
 
+  // Cast to BulletLink
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
-  // The constructor for btGeneric6DofSpringConstraint requires
-  // the frame of fixed joint expressed both in the bullet link frames
-  // for both the parent and the child link. Please note that the bullet
-  // link frames are different from the Gazebo link frames, because
-  // the bullet link frames are centered in the center of mass
-  // and are oriented with the principal inertia axes of the link.
-  // Furthermore the current Bullet link implementation in Gazebo
-  // is assuming that the Bullet link frame is coincident with the
-  // SDF Inertial frame, disregarding any off diagonal inertia tensor element.
-  btTransform jointPoseWrtParentLinkBullet, jointPoseWrtChildLinkBullet;
+  // Get axis unit vector (expressed in world frame).
+  math::Vector3 axis;
+  axis.Set(0, 0, 1);
+
+  // Local variables used to compute pivots and axes in body-fixed frames
+  // for the parent and child links.
+  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
+  math::Pose pose;
+
+  // Initialize pivots to anchorPos, which is expressed in the
+  // world coordinate frame.
+  pivotParent = this->anchorPos;
+  pivotChild = this->anchorPos;
 
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
-    math::Pose linkPoseBulletWrtWorld =
-        BulletTypes::ConvertPose(
-            bulletParentLink->GetBulletLink()->getCenterOfMassTransform());
-    math::Pose jointPoseWrtWorld      = this->GetWorldPose();
-    math::Pose jointPoseWrtLinkPoseBullet =
-        jointPoseWrtWorld + (linkPoseBulletWrtWorld.GetInverse());
-    jointPoseWrtParentLinkBullet =
-        BulletTypes::ConvertPose(jointPoseWrtLinkPoseBullet);
+    // Compute relative pose between joint anchor and CoG of parent link.
+    pose = this->parentLink->GetWorldCoGPose();
+    // Subtract CoG position from anchor position, both in world frame.
+    pivotParent -= pose.pos;
+    // Rotate pivot offset and axis into body-fixed frame of parent.
+    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+    axisParent = pose.rot.RotateVectorReverse(axis);
+    axisParent = axisParent.Normalize();
   }
-
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
-    math::Pose linkPoseBulletWrtWorld =
-        BulletTypes::ConvertPose(
-            bulletChildLink->GetBulletLink()->getCenterOfMassTransform());
-    math::Pose jointPoseWrtWorld      = this->GetWorldPose();
-    math::Pose jointPoseWrtLinkPoseBullet =
-        jointPoseWrtWorld + (linkPoseBulletWrtWorld.GetInverse());
-    jointPoseWrtChildLinkBullet =
-        BulletTypes::ConvertPose(jointPoseWrtLinkPoseBullet);
+    // Compute relative pose between joint anchor and CoG of child link.
+    pose = this->childLink->GetWorldCoGPose();
+    // Subtract CoG position from anchor position, both in world frame.
+    pivotChild -= pose.pos;
+    // Rotate pivot offset and axis into body-fixed frame of child.
+    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+    axisChild = pose.rot.RotateVectorReverse(axis);
+    axisChild = axisChild.Normalize();
   }
 
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
-    this->bulletFixed = new btGeneric6DofSpringConstraint(
-        *bulletParentLink->GetBulletLink(),
-        *bulletChildLink->GetBulletLink(),
-        jointPoseWrtParentLinkBullet, jointPoseWrtChildLinkBullet, true);
+    this->bulletFixed = new btHingeConstraint(
+        *(bulletChildLink->GetBulletLink()),
+        *(bulletParentLink->GetBulletLink()),
+        BulletTypes::ConvertVector3(pivotChild),
+        BulletTypes::ConvertVector3(pivotParent),
+        BulletTypes::ConvertVector3(axisChild),
+        BulletTypes::ConvertVector3(axisParent));
   }
-
   // If only the child exists, then create a joint between the child
   // and the world.
   else if (bulletChildLink)
   {
-    this->bulletFixed = new btGeneric6DofSpringConstraint(
-        *bulletChildLink->GetBulletLink(), jointPoseWrtChildLinkBullet, true);
+    this->bulletFixed = new btHingeConstraint(
+        *(bulletChildLink->GetBulletLink()),
+        BulletTypes::ConvertVector3(pivotChild),
+        BulletTypes::ConvertVector3(axisChild));
   }
   // If only the parent exists, then create a joint between the parent
   // and the world.
   else if (bulletParentLink)
   {
-    this->bulletFixed = new btGeneric6DofSpringConstraint(
-        *bulletParentLink->GetBulletLink(), jointPoseWrtParentLinkBullet, true);
+    this->bulletFixed = new btHingeConstraint(
+        *(bulletParentLink->GetBulletLink()),
+        BulletTypes::ConvertVector3(pivotParent),
+        BulletTypes::ConvertVector3(axisParent));
   }
   // Throw an error if no links are given.
   else
   {
-    gzerr << "joint without links\n";
+    gzerr << "unable to create bullet hinge without links.\n";
     return;
   }
 
   if (!this->bulletFixed)
   {
-    gzerr << "unable to create bullet fixed joint\n";
+    gzerr << "unable to create bullet hinge constraint\n";
     return;
   }
 
+  // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletFixed;
 
-  // Set the limit value for all degrees of freedom
-  this->bulletFixed->setLinearLowerLimit(btVector3(0,0,0));
-  this->bulletFixed->setLinearUpperLimit(btVector3(0,0,0));
-  this->bulletFixed->setAngularLowerLimit(btVector3(0,0,0));
-  this->bulletFixed->setAngularUpperLimit(btVector3(0,0,0));
+  this->bulletFixed->setLimit(0.0,0.0);
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
   this->bulletWorld->addConstraint(this->bulletFixed, true);
 
   // Allows access to impulse
-  this->constraint->enableFeedback(true);
+  this->bulletFixed->enableFeedback(true);
 
   // Setup Joint force and torque feedback
   this->SetupJointFeedback();

@@ -39,7 +39,7 @@ class JointGetForceTorqueTest : public ServerFixture,
   public: class SpawnGetFTBoxOptions
   {
     /// \brief Constructor.
-    public: SpawnGetFTBoxOptions() : mass(10.0)
+    public: SpawnGetFTBoxOptions() : mass(10.0), size(1.0,1.0,1.0)
             {
             }
 
@@ -48,11 +48,11 @@ class JointGetForceTorqueTest : public ServerFixture,
             {
             }
 
-    /// \brief Size of box to spawn.
-    public: math::Vector3 size;
-
     /// \brief Mass of box to spawn (inertia computed automatically).
     public: double mass;
+
+    /// \brief Size of box to spawn.
+    public: math::Vector3 size;
 
     /// \brief Model pose.
     public: math::Pose modelPose;
@@ -68,6 +68,9 @@ class JointGetForceTorqueTest : public ServerFixture,
 
     /// \brief Joint axis
     public: math::Vector3 jointAxis;
+
+    /// \brief If true the parent is a world, otherwise is a dummy link
+    public: bool parentIsWorld;
 
   };
 
@@ -90,7 +93,13 @@ class JointGetForceTorqueTest : public ServerFixture,
             modelStr
               << "<sdf version='" << SDF_VERSION << "'>"
               << "<model name ='" << modelName.str() << "'>"
-              << "  <pose>" << _opt.modelPose << "</pose>"
+              << "  <pose>" << _opt.modelPose << "</pose>";
+              if( !_opt.parentIsWorld )
+              {
+                modelStr
+                  << "<link name='dummy_link'></link>";
+              }
+            modelStr
               << "  <link name='link'>"
               << "    <pose>" << _opt.linkPose << "</pose>"
               << "    <inertial>"
@@ -117,10 +126,36 @@ class JointGetForceTorqueTest : public ServerFixture,
 //              << "        <box><size>" << _opt.size << "</size></box>"
 //              << "      </geometry>"
 //              << "    </visual>"
-              << "  </link>"
+              << "  </link>";
+              if( !_opt.parentIsWorld )
+              {
+                modelStr
+                  << "  <joint name='dummy_joint' type='fixed'>"
+                  << "  <parent>world</parent>"
+                  << "  <child>dummy_link</child>"
+                  << "  <axis>"
+                  << "    <limit>"
+                  << "      <lower>0.0</lower>"
+                  << "      <upper>0.0</upper>"
+                  << "    </limit>"
+                  << "    <xyz>" << _opt.jointAxis << "</xyz>"
+                  << "  </axis>"
+                  << "  </joint>";
+              }
+            modelStr
               << "  <joint name='joint' type='"
-              << _opt.jointType << "'>"
-              << "    <parent>world</parent>"
+              << _opt.jointType << "'>";
+              if( _opt.parentIsWorld )
+              {
+                modelStr
+                  << "    <parent>world</parent>";
+              }
+              else
+              {
+                modelStr
+                  << "    <parent>dummy_link</parent>";
+              }
+            modelStr
               << "    <child>link</child>";
             //if( _opt.jointType != "fixed" )
             {
@@ -150,9 +185,9 @@ class JointGetForceTorqueTest : public ServerFixture,
             while (stepCount < stepsToWait &&
                    !this->HasEntity(modelName.str()))
             {
-              world->Step(10);
-              stepCount += 10;
-              if (++stepCount % 100 == 0)
+              world->Step(1);
+              stepCount++;
+              if (stepCount % 200 == 0)
               {
                 gzwarn << "Waiting " << stepCount << " steps for "
                        << "box to spawn." << std::endl;
@@ -160,7 +195,7 @@ class JointGetForceTorqueTest : public ServerFixture,
             }
 
             if (this->HasEntity(modelName.str()))
-              gzwarn << "box has spawned." << std::endl;
+              gzdbg << "box has spawned." << std::endl;
 
             if (world != NULL)
               model = world->GetModel(modelName.str());
@@ -192,46 +227,88 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
                                            const std::string& _physicsEngine,
                                            const SpawnGetFTBoxOptions& opt)
 {
-    gzdbg << "GetFTDemoHelper for physics " << _physicsEngine
-          << "joint type " << opt.jointType << " joint axis " << opt.jointAxis << std::endl;
-    math::Vector3 g = _physics->GetGravity();
-    double mass = opt.mass;
-    math::Vector3 com = opt.inertialPose.pos;
+  gzdbg << "GetFTDemoHelper for physics " << _physicsEngine
+        << "joint type " << opt.jointType << " joint axis " << opt.jointAxis << std::endl;
+  math::Vector3 g = _physics->GetGravity();
+  double mass = opt.mass;
 
-    physics::ModelPtr model = SpawnBox(opt);
+  physics::ModelPtr model = SpawnBox(opt);
+  physics::LinkPtr  link  = model->GetLink("link");
+  physics::JointPtr joint = model->GetJoint("joint");
+  math::Vector3 com = link->GetWorldCoGPose().pos;
+  math::Vector3 jointOrigin = joint->GetWorldPose().pos;
 
-    ASSERT_TRUE(model->GetJointCount() == 1);
+  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(link != NULL);
 
-    physics::JointPtr joint = model->GetJoint("joint");
+  // do a simulation step to get a meaningful measure
+  _world->Step(1);
 
-    ASSERT_TRUE(joint != NULL);
+  // ode need some additional steps
+  if( _physicsEngine == "ode" )
+  {
+      _world->Step(9);
+  }
 
-    // wait some time to get a clean measure
-    _world->Step(20);
+  // bullet need some additional steps
+  // probably related to
+  if( _physicsEngine == "bullet" )
+  {
+      _world->Step(99);
+  }
 
-    physics::JointWrench W = joint->GetForceTorque(0u);
+  if( opt.parentIsWorld )
+  {
+      ASSERT_TRUE(model->GetJointCount() == 1);
+  }
+  else
+  {
+      ASSERT_TRUE(model->GetJointCount() == 2);
+  }
 
-    const int TOL_FORCE = 1.0;
-    const int TOL_TORQUE = 2.0;
+  //physics::JointPtr joint = model->GetJoint("joint");
 
-    // Everthing is expressed in world frame, so
-    // the math is easy
-    math::Vector3 f = mass*g;
-    math::Vector3 tau = mass*com.Cross(g);
+  ASSERT_TRUE(joint != NULL);
 
-    EXPECT_NEAR(-f.x, W.body1Force.x, TOL_FORCE);
-    EXPECT_NEAR(-f.y, W.body1Force.y, TOL_FORCE);
-    EXPECT_NEAR(-f.z, W.body1Force.z, TOL_FORCE);
-    EXPECT_NEAR(-tau.x, W.body1Torque.x, TOL_TORQUE);
-    EXPECT_NEAR(-tau.y, W.body1Torque.y, TOL_TORQUE);
-    EXPECT_NEAR(-tau.z, W.body1Torque.z, TOL_TORQUE);
+  physics::JointWrench W = joint->GetForceTorque(0u);
 
-    EXPECT_NEAR(f.x, W.body2Force.x, TOL_FORCE);
-    EXPECT_NEAR(f.y, W.body2Force.y, TOL_FORCE);
-    EXPECT_NEAR(f.z, W.body2Force.z, TOL_FORCE);
-    EXPECT_NEAR(tau.x, W.body2Torque.x, TOL_TORQUE);
-    EXPECT_NEAR(tau.y, W.body2Torque.y, TOL_TORQUE);
-    EXPECT_NEAR(tau.z, W.body2Torque.z, TOL_TORQUE);
+  const int TOL_FORCE = 1.0;
+  const int TOL_TORQUE = 2.0;
+
+  // Everthing is expressed in world frame, so
+  // the math is easy
+  math::Vector3 fWorld = mass*g;
+  math::Vector3 tauWorld = mass*(com-jointOrigin).Cross(g);
+
+  math::Pose parentPose;
+  math::Pose childPose = link->GetWorldPose();
+
+  if( !opt.parentIsWorld )
+  {
+      parentPose = link->GetParentJointsLinks()[0]->GetWorldPose();
+  }
+
+  math::Vector3 body1ForceExpected  = -(parentPose.rot.GetInverse()*fWorld);
+  math::Vector3 body1TorqueExpected = -(parentPose.rot.GetInverse()*tauWorld);
+  math::Vector3 body2ForceExpected  =   childPose.rot.GetInverse()*fWorld;
+  math::Vector3 body2TorqueExpected =   childPose.rot.GetInverse()*tauWorld;
+
+  EXPECT_NEAR(body1ForceExpected.x, W.body1Force.x, TOL_FORCE);
+  EXPECT_NEAR(body1ForceExpected.y, W.body1Force.y, TOL_FORCE);
+  EXPECT_NEAR(body1ForceExpected.z, W.body1Force.z, TOL_FORCE);
+  EXPECT_NEAR(body1TorqueExpected.x, W.body1Torque.x, TOL_TORQUE);
+  EXPECT_NEAR(body1TorqueExpected.y, W.body1Torque.y, TOL_TORQUE);
+  EXPECT_NEAR(body1TorqueExpected.z, W.body1Torque.z, TOL_TORQUE);
+
+  EXPECT_NEAR(body2ForceExpected.x, W.body2Force.x, TOL_FORCE);
+  EXPECT_NEAR(body2ForceExpected.y, W.body2Force.y, TOL_FORCE);
+  EXPECT_NEAR(body2ForceExpected.z, W.body2Force.z, TOL_FORCE);
+  EXPECT_NEAR(body2TorqueExpected.x, W.body2Torque.x, TOL_TORQUE);
+  EXPECT_NEAR(body2TorqueExpected.y, W.body2Torque.y, TOL_TORQUE);
+  EXPECT_NEAR(body2TorqueExpected.z, W.body2Torque.z, TOL_TORQUE);
+
+  // Remove model
+  _world->RemoveModel(model);
 }
 
 
@@ -257,12 +334,19 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   // test for a fixed joint
   SpawnGetFTBoxOptions opt;
   opt.jointType = "fixed";
+  opt.inertialPose.pos = math::Vector3(1.0,2.0,3.0);
+  opt.linkPose.rot.SetFromEuler(0.1,0.0,0.0);
 
+  opt.parentIsWorld = true;
+  GetFTDemoHelper(world, physics, _physEng, opt);
+
+  opt.parentIsWorld = false;
   GetFTDemoHelper(world, physics, _physEng, opt);
 
   // test a revolute joint against all axis
 
-  /*
+  if( _physEng == "bullet" )
+  {
   for(int i=0; i < 3; i++)
   {
     opt.jointType = "revolute";
@@ -281,31 +365,39 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
     }
 
     GetFTDemoHelper(world, physics,_physEng,opt);
-  }*/
+  }
+  }
 
   // test a prismatic joint against all axis
-  /*
-  for(int i=0; i < 3; i++)
+
+  // bullet and simbody GetForceTorque() is
+  // broken for prismatic joints
+  // see gazebo issues 1639 and 1640
+  if( _physEng != "bullet" &&
+      _physEng != "simbody" )
   {
-    opt.jointType = "prismatic";
 
-    switch( i )
+    for(int i=0; i < 3; i++)
     {
-    case 0:
-        opt.jointAxis = math::Vector3::UnitX;
-        break;
-    case 1:
-        opt.jointAxis = math::Vector3::UnitY;
-        break;
-    case 2:
-        opt.jointAxis = math::Vector3::UnitZ;
-        break;
+      opt.jointType = "prismatic";
+
+      switch( i )
+      {
+        case 0:
+          opt.jointAxis = math::Vector3::UnitX;
+          break;
+        case 1:
+          opt.jointAxis = math::Vector3::UnitY;
+          break;
+        case 2:
+          opt.jointAxis = math::Vector3::UnitZ;
+          break;
+      }
+
+      GetFTDemoHelper(world, physics,_physEng,opt);
     }
-
-
-    GetFTDemoHelper(world, physics,_physicsEngine,opt);
   }
-  */
+
 }
 
 /////////////////////////////////////////////////
