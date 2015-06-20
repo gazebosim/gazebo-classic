@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_SPLASH_SCREEN_HH_
 #define _GAZEBO_SPLASH_SCREEN_HH_
 
+#include <string>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
