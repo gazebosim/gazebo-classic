@@ -55,7 +55,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   this->widthSpinBox->setSingleStep(0.001);
   this->widthSpinBox->setDecimals(3);
   this->widthSpinBox->setValue(0.000);
-  this->widthSpinBox->setAlignment(Qt::AlignLeft);
+  this->widthSpinBox->setAlignment(Qt::AlignRight);
   QLabel *widthUnitLabel = new QLabel(tr("m"));
   widthUnitLabel->setMaximumWidth(40);
 
@@ -70,7 +70,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
   this->heightSpinBox->setValue(0.000);
-  this->heightSpinBox->setAlignment(Qt::AlignLeft);
+  this->heightSpinBox->setAlignment(Qt::AlignRight);
   QLabel *heightUnitLabel = new QLabel(tr("m"));
   heightUnitLabel->setMaximumWidth(40);
 

@@ -110,7 +110,6 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   this->stepsSpinBox->setValue(1);
   this->stepsSpinBox->setAlignment(Qt::AlignRight);
   QLabel *stepsDummyLabel = new QLabel(tr(" "));
-  //stepsDummyLabel->setMaximumWidth(40);
 
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
