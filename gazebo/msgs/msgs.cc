@@ -1289,6 +1289,11 @@ namespace gazebo
       else
         result.set_grid(true);
 
+      if (_sdf->HasElement("origin_visual"))
+        result.set_origin_visual(_sdf->Get<bool>("origin_visual"));
+      else
+        result.set_origin_visual(true);
+
       if (_sdf->HasElement("ambient"))
         result.mutable_ambient()->CopyFrom(
             Convert(_sdf->Get<common::Color>("ambient")));

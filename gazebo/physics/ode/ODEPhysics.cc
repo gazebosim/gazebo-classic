@@ -208,6 +208,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
     dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, true);
   }
 
+  /// \TODO: defaultvelocity decay!? This is BAD if it's true.
   dWorldSetDamping(this->dataPtr->worldId, 0.0001, 0.0001);
 
   // Help prevent "popping of deeply embedded object
@@ -1327,6 +1328,11 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepContactResidualSmoothing(this->dataPtr->worldId,
         boost::any_cast<double>(_value));
     }
+    else if (_key == "thread_position_correction")
+    {
+      dWorldSetQuickStepThreadPositionCorrection(this->dataPtr->worldId,
+        boost::any_cast<bool>(_value));
+    }
     else if (_key == "experimental_row_reordering")
     {
       dWorldSetQuickStepExperimentalRowReordering(this->dataPtr->worldId,
@@ -1414,6 +1420,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
   else if (_key == "contact_residual_smoothing")
     _value = dWorldGetQuickStepContactResidualSmoothing(this->dataPtr->worldId);
+  else if (_key == "thread_position_correction")
+    _value = dWorldGetQuickStepThreadPositionCorrection(this->dataPtr->worldId);
   else if (_key == "experimental_row_reordering")
   {
     _value = dWorldGetQuickStepExperimentalRowReordering
