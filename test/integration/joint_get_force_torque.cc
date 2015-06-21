@@ -39,7 +39,9 @@ class JointGetForceTorqueTest : public ServerFixture,
   public: class SpawnGetFTBoxOptions
   {
     /// \brief Constructor.
-    public: SpawnGetFTBoxOptions() : mass(10.0), size(1.0,1.0,1.0)
+    public: SpawnGetFTBoxOptions() : mass(10.0),
+                                     size(1.0, 1.0, 1.0),
+                                     parentIsWorld(false)
             {
             }
 
@@ -71,7 +73,6 @@ class JointGetForceTorqueTest : public ServerFixture,
 
     /// \brief If true the parent is a world, otherwise is a dummy link
     public: bool parentIsWorld;
-
   };
 
   /// \brief Spawn a box with friction coefficients and direction.
@@ -94,7 +95,7 @@ class JointGetForceTorqueTest : public ServerFixture,
               << "<sdf version='" << SDF_VERSION << "'>"
               << "<model name ='" << modelName.str() << "'>"
               << "  <pose>" << _opt.modelPose << "</pose>";
-              if( !_opt.parentIsWorld )
+              if ( !_opt.parentIsWorld )
               {
                 modelStr
                   << "<link name='dummy_link'></link>";
@@ -127,7 +128,7 @@ class JointGetForceTorqueTest : public ServerFixture,
 //              << "      </geometry>"
 //              << "    </visual>"
               << "  </link>";
-              if( !_opt.parentIsWorld )
+              if ( !_opt.parentIsWorld )
               {
                 modelStr
                   << "  <joint name='dummy_joint' type='fixed'>"
@@ -145,7 +146,7 @@ class JointGetForceTorqueTest : public ServerFixture,
             modelStr
               << "  <joint name='joint' type='"
               << _opt.jointType << "'>";
-              if( _opt.parentIsWorld )
+              if ( _opt.parentIsWorld )
               {
                 modelStr
                   << "    <parent>world</parent>";
@@ -157,7 +158,9 @@ class JointGetForceTorqueTest : public ServerFixture,
               }
             modelStr
               << "    <child>link</child>";
-            //if( _opt.jointType != "fixed" )
+            // Remove this line when sdf will support
+            // fixed joints without a dummy axis element
+            // if( _opt.jointType != "fixed" )
             {
               modelStr
                 << "  <axis>"
@@ -228,7 +231,8 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
                                            const SpawnGetFTBoxOptions& opt)
 {
   gzdbg << "GetFTDemoHelper for physics " << _physicsEngine
-        << "joint type " << opt.jointType << " joint axis " << opt.jointAxis << std::endl;
+        << "joint type " << opt.jointType
+        << " joint axis " << opt.jointAxis << std::endl;
   math::Vector3 g = _physics->GetGravity();
   double mass = opt.mass;
 
@@ -245,28 +249,26 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   _world->Step(1);
 
   // ode need some additional steps
-  if( _physicsEngine == "ode" )
+  if ( _physicsEngine == "ode" )
   {
       _world->Step(9);
   }
 
   // bullet need some additional steps
   // probably related to
-  if( _physicsEngine == "bullet" )
+  if ( _physicsEngine == "bullet" )
   {
       _world->Step(99);
   }
 
-  if( opt.parentIsWorld )
+  if ( opt.parentIsWorld )
   {
-      ASSERT_TRUE(model->GetJointCount() == 1);
+      ASSERT_EQ(model->GetJointCount(), 1);
   }
   else
   {
-      ASSERT_TRUE(model->GetJointCount() == 2);
+      ASSERT_EQ(model->GetJointCount(), 2);
   }
-
-  //physics::JointPtr joint = model->GetJoint("joint");
 
   ASSERT_TRUE(joint != NULL);
 
@@ -283,7 +285,7 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   math::Pose parentPose;
   math::Pose childPose = link->GetWorldPose();
 
-  if( !opt.parentIsWorld )
+  if ( !opt.parentIsWorld )
   {
       parentPose = link->GetParentJointsLinks()[0]->GetWorldPose();
   }
@@ -334,8 +336,8 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   // test for a fixed joint
   SpawnGetFTBoxOptions opt;
   opt.jointType = "fixed";
-  opt.inertialPose.pos = math::Vector3(1.0,2.0,3.0);
-  opt.linkPose.rot.SetFromEuler(0.1,0.0,0.0);
+  opt.inertialPose.pos = math::Vector3(1.0, 2.0, 3.0);
+  opt.linkPose.rot.SetFromEuler(0.1, 0.0, 0.0);
 
   opt.parentIsWorld = true;
   GetFTDemoHelper(world, physics, _physEng, opt);
@@ -345,27 +347,26 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
 
   // test a revolute joint against all axis
 
-  if( _physEng == "bullet" )
+  if ( _physEng == "bullet" )
   {
-  for(int i=0; i < 3; i++)
-  {
-    opt.jointType = "revolute";
-
-    switch( i )
+    for (int i = 0; i < 3; i++)
     {
-    case 0:
-        opt.jointAxis = math::Vector3::UnitX;
-        break;
-    case 1:
-        opt.jointAxis = math::Vector3::UnitY;
-        break;
-    case 2:
-        opt.jointAxis = math::Vector3::UnitZ;
-        break;
-    }
+        opt.jointType = "revolute";
+        switch ( i )
+        {
+        case 0:
+            opt.jointAxis = math::Vector3::UnitX;
+            break;
+        case 1:
+            opt.jointAxis = math::Vector3::UnitY;
+            break;
+        case 2:
+            opt.jointAxis = math::Vector3::UnitZ;
+            break;
+        }
 
-    GetFTDemoHelper(world, physics,_physEng,opt);
-  }
+        GetFTDemoHelper(world, physics, _physEng, opt);
+    }
   }
 
   // test a prismatic joint against all axis
@@ -373,15 +374,13 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   // bullet and simbody GetForceTorque() is
   // broken for prismatic joints
   // see gazebo issues 1639 and 1640
-  if( _physEng != "bullet" &&
-      _physEng != "simbody" )
+  if ( _physEng != "bullet" &&
+       _physEng != "simbody" )
   {
-
-    for(int i=0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
       opt.jointType = "prismatic";
-
-      switch( i )
+      switch ( i )
       {
         case 0:
           opt.jointAxis = math::Vector3::UnitX;
@@ -393,11 +392,9 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
           opt.jointAxis = math::Vector3::UnitZ;
           break;
       }
-
-      GetFTDemoHelper(world, physics,_physEng,opt);
+      GetFTDemoHelper(world, physics, _physEng, opt);
     }
   }
-
 }
 
 /////////////////////////////////////////////////

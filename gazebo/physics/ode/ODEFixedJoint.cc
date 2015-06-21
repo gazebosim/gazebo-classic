@@ -76,7 +76,8 @@ math::Vector3 ODEFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEFixedJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &/*_axis*/)
+void ODEFixedJoint::SetAxis(unsigned int /*_index*/,
+                            const math::Vector3 &/*_axis*/)
 {
   gzerr << "called invalid method SetAxis in a fixed joint\n";
 }

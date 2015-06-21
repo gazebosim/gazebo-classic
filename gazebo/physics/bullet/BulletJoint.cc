@@ -356,8 +356,6 @@ void BulletJoint::SetupJointFeedback()
       gzerr << "Bullet Joint [" << this->GetName() << "] ID is invalid\n";
       getchar();
     }
-
-
   }
 }
 

@@ -70,7 +70,8 @@ math::Vector3 DARTFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void DARTFixedJoint::SetAxis(unsigned int /*_index*/, const math::Vector3& /*_axis*/)
+void DARTFixedJoint::SetAxis(unsigned int /*_index*/,
+                             const math::Vector3& /*_axis*/)
 {
   gzerr << "called invalid method SetAxis in a fixed joint\n";
 

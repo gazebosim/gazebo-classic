@@ -142,7 +142,7 @@ void BulletFixedJoint::Init()
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletFixed;
 
-  this->bulletFixed->setLimit(0.0,0.0);
+  this->bulletFixed->setLimit(0.0, 0.0);
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
