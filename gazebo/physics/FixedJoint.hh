@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A fixed joint rigidly connecting two bodies
- * Author: Silvio Traversaro, Nate Koenig, Andrew Howard
- * Date: 22 April 2015
- */
 
 #ifndef _FIXEDJOINT_HH_
 #define _FIXEDJOINT_HH_

@@ -25,8 +25,6 @@
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/util/system.hh"
 
-class btFixedConstraint;
-
 namespace gazebo
 {
   namespace physics
