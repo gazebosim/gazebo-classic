@@ -483,7 +483,7 @@ TEST_F(MsgsTest, LightFromSDF_ListDirectional)
            <attenuation>\
              <range>20</range>\
              <constant>0.8</constant>\
-             <linear>0.01</liner>\
+             <linear>0.01</linear>\
              <quadratic>0.0</quadratic>\
            </attenuation>\
            <direction>1.0 1.0 -1.0</direction>\
@@ -617,7 +617,7 @@ TEST_F(MsgsTest, VisualFromSDF_CylinderVisual)
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
            <geometry>\
-             <cylinder><radius>1</radius><length>1.0</length></cylinder\
+             <cylinder><radius>1</radius><length>1.0</length></cylinder>\
            </geometry>\
            <material><script>Gazebo/Grey</script>\
            <shader type='normal_map_object_space'/>\
@@ -660,9 +660,9 @@ TEST_F(MsgsTest, VisualFromSDF_ImageVisual)
                <scale>1</scale>\
                <height>1</height>\
                <threshold>255</threshold>\
-               <granularity>10</granularit>\
+               <granularity>10</granularity>\
                <uri>test2.mesh</uri>\
-             <image>\
+             </image>\
            </geometry>\
            <material>\
              <script>Gazebo/Grey</script>\
@@ -729,7 +729,8 @@ TEST_F(MsgsTest, VisualFromSDF_ShaderTypeThrow)
                <pos>0 0 0</pos>\
              </heightmap>\
            </geometry>\
-           <shader type='throw'/>\
+           <material><script>Gazebo/Grey</script>\
+             <shader type='throw'/>\
            </material>\
          </visual>\
       </sdf>", sdf));
@@ -747,7 +748,7 @@ TEST_F(MsgsTest, VisualFromSDF_BadGeometryVisual)
            <geometry>\
            </geometry>\
            <material><script>Gazebo/Grey</script>\
-           <shader type='pixel'/>\
+             <shader type='pixel'/>\
            </material>\
          </visual>\
       </sdf>", sdf));
@@ -770,7 +771,7 @@ TEST_F(MsgsTest, VisualFromSDF_BadGeometryType)
              <bad_type/>\
            </geometry>\
            <material><script>Gazebo/Grey</script>\
-           <shader type='pixel'/>\
+             <shader type='pixel'/>\
            </material>\
          </visual>\
       </sdf>", sdf));
@@ -798,8 +799,13 @@ TEST_F(MsgsTest, VisualFromSDF_BadFogType)
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
            <shadows>true</shadows>\
-           <fog><color>1 1 1 1</color> <type>throw</type>\
-           <start>0</start> <end>10</end> <density>1</density> </fog>\
+           <fog>\
+             <color>1 1 1 1</color>\
+             <type>throw</type>\
+             <start>0</start>\
+             <end>10</end>\
+             <density>1</density>\
+           </fog>\
            <grid>false</grid>\
          </scene>\
       </sdf>", sdf));
@@ -816,7 +822,13 @@ TEST_F(MsgsTest, VisualSceneFromSDF_A)
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
            <shadows>true</shadows>\
-           <fog>1 1 1 1' type='linear' start='0' end='10' density='1'/>\
+           <fog>\
+             <color>1 1 1 1</color>\
+             <type>linear</type>\
+             <start>0</start>\
+             <end>10</end>\
+             <density>1</density>\
+           </fog>\
            <grid>false</grid>\
          </scene>\
       </sdf>", sdf));
@@ -833,8 +845,13 @@ TEST_F(MsgsTest, VisualSceneFromSDF_B)
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
            <shadows>false</shadows>\
-           <fog><color>1 1 1 1</color><type>exp</type><start>0</start>\
-           <end>10</end><density>1<density/>\
+           <fog>\
+             <color>1 1 1 1</color>\
+             <type>exp</type>\
+             <start>0</start>\
+             <end>10</end>\
+             <density>1</density>\
+           </fog>\
          </scene>\
       </sdf>", sdf));
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
@@ -850,9 +867,13 @@ TEST_F(MsgsTest, VisualSceneFromSDF_C)
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
            <shadows>false</shadows>\
-           <fog><color>1 1 1 1</color>\
-           <type>exp2</type><start>0</start><end>10</end>\
-           <density>1</density>\
+           <fog>\
+             <color>1 1 1 1</color>\
+             <type>exp2</type>\
+             <start>0</start>\
+             <end>10</end>\
+             <density>1</density>\
+           </fog>\
            <grid>true</grid>\
          </scene>\
       </sdf>", sdf));
@@ -901,7 +922,6 @@ TEST_F(MsgsTest, MeshFromSDF)
                </submesh>\
              </mesh>\
            </geometry>\
-         </visual>\
       </sdf>", sdf));
 
   msgs::MeshGeom msg = msgs::MeshFromSDF(sdf->GetElement("mesh"));
