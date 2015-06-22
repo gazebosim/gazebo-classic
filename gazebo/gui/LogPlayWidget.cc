@@ -17,6 +17,9 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Time.hh"
+
+#include "gazebo/transport/Node.hh"
+
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/LogPlayWidgetPrivate.hh"
@@ -75,11 +78,42 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
   connect(stepForwardButton, SIGNAL(clicked()), this, SLOT(OnStepForward()));
 
+  // Step back
+  QToolButton *stepBackButton = new QToolButton(this);
+  stepBackButton->setFixedSize(smallSize);
+  stepBackButton->setCheckable(false);
+  stepBackButton->setIcon(QPixmap(":/images/log_step_back.png"));
+  stepBackButton->setIconSize(smallIconSize);
+  stepBackButton->setStyleSheet(
+      QString("border-radius: %1px").arg(smallSize.width()/2-2));
+  connect(stepBackButton, SIGNAL(clicked()), this, SLOT(OnStepBack()));
+
+  // Step size
+  QLabel *stepLabel = new QLabel("Step: ");
+
+  this->dataPtr->stepSpin = new QSpinBox();
+  this->dataPtr->stepSpin->setMaximumWidth(30);
+  this->dataPtr->stepSpin->setValue(1);
+  this->dataPtr->stepSpin->setRange(1, 10000);
+
+  QHBoxLayout *stepLayout = new QHBoxLayout();
+  stepLayout->addWidget(stepLabel);
+  stepLayout->addWidget(this->dataPtr->stepSpin);
+
+  stepLayout->setAlignment(stepLabel, Qt::AlignRight);
+  stepLayout->setAlignment(this->dataPtr->stepSpin, Qt::AlignLeft);
+
   // Play layout
   QHBoxLayout *playLayout = new QHBoxLayout();
+  playLayout->addWidget(stepBackButton);
   playLayout->addWidget(playButton);
   playLayout->addWidget(pauseButton);
   playLayout->addWidget(stepForwardButton);
+
+  // Controls layout
+  QVBoxLayout *controlsLayout = new QVBoxLayout();
+  controlsLayout->addLayout(playLayout);
+  controlsLayout->addLayout(stepLayout);
 
   // View
   this->dataPtr->view = new LogPlayView(this);
@@ -113,17 +147,24 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(leftSpacer);
-  mainLayout->addLayout(playLayout);
+  mainLayout->addLayout(controlsLayout);
   mainLayout->addWidget(this->dataPtr->view);
   mainLayout->addLayout(timeLayout);
   mainLayout->addWidget(rightSpacer);
 
   this->setLayout(mainLayout);
-  mainLayout->setAlignment(playLayout, Qt::AlignRight);
+  mainLayout->setAlignment(controlsLayout, Qt::AlignRight);
   mainLayout->setAlignment(timeLayout, Qt::AlignLeft);
 
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
+
+  // Transport
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  this->dataPtr->logPlaybackControlPub = this->dataPtr->node->
+      Advertise<msgs::LogPlaybackControl>("~/playback_control");
 }
 
 /////////////////////////////////////////////////
@@ -148,6 +189,13 @@ void LogPlayWidget::SetPaused(const bool _paused)
   {
     emit ShowPlay();
     emit HidePause();
+
+    // Check if there are pending steps and publish now that it's paused
+    if (this->dataPtr->pendingStep != 0)
+    {
+      this->PublishMultistep(this->dataPtr->pendingStep);
+      this->dataPtr->pendingStep = 0;
+    }
   }
   else
   {
@@ -159,19 +207,47 @@ void LogPlayWidget::SetPaused(const bool _paused)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPlay()
 {
-  g_playAct->trigger();
+  msgs::LogPlaybackControl msg;
+  msg.set_pause(false);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnPause()
 {
-  g_pauseAct->trigger();
+  msgs::LogPlaybackControl msg;
+  msg.set_pause(true);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void LogPlayWidget::OnStepForward()
 {
-  g_stepAct->trigger();
+  if (this->dataPtr->paused)
+  {
+    this->PublishMultistep(this->dataPtr->stepSpin->value());
+  }
+  // If currently playing, first pause and only then step, to sync with server
+  else
+  {
+    this->OnPause();
+    this->dataPtr->pendingStep += this->dataPtr->stepSpin->value();
+  }
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::OnStepBack()
+{
+  if (this->dataPtr->paused)
+  {
+    this->PublishMultistep(-this->dataPtr->stepSpin->value());
+  }
+  // If currently playing, first pause and only then step, to sync with server
+  else
+  {
+    this->OnPause();
+    this->dataPtr->pendingStep += -this->dataPtr->stepSpin->value();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -257,6 +333,14 @@ void LogPlayWidget::EmitSetEndTime(const common::Time &_time)
   // Keep current time within bounds
   if (this->dataPtr->endTime < this->dataPtr->currentTime)
     this->EmitSetCurrentTime(this->dataPtr->endTime);
+}
+
+/////////////////////////////////////////////////
+void LogPlayWidget::PublishMultistep(int _step)
+{
+  msgs::LogPlaybackControl msg;
+  msg.set_multi_step(_step);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////

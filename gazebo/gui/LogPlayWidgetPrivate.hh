@@ -47,6 +47,19 @@ namespace gazebo
 
       /// \brief View which containes the timeline.
       public: LogPlayView *view;
+
+      /// \brief Node used for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: transport::PublisherPtr logPlaybackControlPub;
+
+      /// \brief Spin box which holds the step size.
+      public: QSpinBox *stepSpin;
+
+      /// \brief Number of steps pending to be published once the simulation
+      /// is paused.
+      public: int pendingStep = 0;
     };
 
     /// \class LogPlayViewPrivate LogPlayViewPrivate.hh

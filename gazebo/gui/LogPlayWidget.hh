@@ -73,6 +73,9 @@ namespace gazebo
       /// \brief Step simulation forward.
       public slots: void OnStepForward();
 
+      /// \brief Step simulation back.
+      public slots: void OnStepBack();
+
       /// \brief Qt signal to show the play button.
       signals: void ShowPlay();
 
@@ -104,6 +107,10 @@ namespace gazebo
       /// \brief Qt signal used to set the end time in the view.
       /// \param[in] _time End time.
       signals: void SetEndTime(const common::Time &_time);
+
+      /// \brief Publish a multistep message.
+      /// \param[in] _step Number of steps.
+      private: void PublishMultistep(int _step);
 
       /// \internal
       /// \brief Pointer to private data.
