@@ -20,7 +20,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/test/ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
@@ -738,6 +738,8 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
   // verify link body visual
   msgs::Visual visualMsg = linkMsg.visual(0);
   EXPECT_EQ(visualMsg.name(), "box_test::body");
+  EXPECT_TRUE(visualMsg.has_type());
+  EXPECT_EQ(visualMsg.type(), msgs::Visual::LINK);
   EXPECT_FALSE(visualMsg.has_geometry());
 
   // verify remaining visual msgs
@@ -749,6 +751,8 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
     if (i > 1)
       visName << i;
     EXPECT_EQ(visualMsg.name(), visName.str());
+    EXPECT_TRUE(visualMsg.has_type());
+    EXPECT_EQ(visualMsg.type(), msgs::Visual::VISUAL);
     msgs::Geometry geomMsg = visualMsg.geometry();
     EXPECT_TRUE(geomMsg.has_box());
     EXPECT_EQ(msgs::Convert(geomMsg.box().size()), boxSize);

@@ -18,7 +18,7 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 // How tightly to compare for deterministic values
 #define IMU_TOL 1e-5

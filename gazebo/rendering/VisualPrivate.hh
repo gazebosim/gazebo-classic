@@ -73,7 +73,7 @@ namespace gazebo
                 id(0),
                 lighting(true),
                 visibilityFlags(GZ_VISIBILITY_ALL),
-                type(VT_ENTITY),
+                type(Visual::VT_ENTITY),
                 layer(0)
       {
       }
@@ -191,7 +191,7 @@ namespace gazebo
       public: uint32_t visibilityFlags;
 
       /// \brief type
-      public: rendering::VisualType type;
+      public: Visual::VisualType type;
 
       /// \brief Index of the layer to which this visual belongs. Layers
       /// act similar to layers in photoshop.
