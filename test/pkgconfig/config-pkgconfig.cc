@@ -37,6 +37,7 @@ TEST(PkgConfig, Config)
     cmd, sizeof(cmd),
     "cd %s/test/pkgconfig/plugin; cmake %s -DGAZEBO_EXPECTED_VERSION=%s",
     PROJECT_BINARY_PATH, SOURCE_DIR, GAZEBO_EXPECTED_VERSION);
+  ASSERT_EQ(system(cmd), 0);
 
   // Make
   snprintf(cmd, sizeof(cmd), "make");
