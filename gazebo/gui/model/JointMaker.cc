@@ -114,7 +114,8 @@ JointMaker::~JointMaker()
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     while (this->joints.size() > 0)
     {
-      this->RemoveJoint(this->joints.begin()->first);
+      std::string jointName = this->joints.begin()->first;
+      this->RemoveJoint(jointName);
     }
     this->joints.clear();
   }
