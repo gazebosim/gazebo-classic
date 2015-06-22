@@ -21,8 +21,24 @@ TEST(PkgConfig, Config)
 {
   char cmd[1024];
 
-  snprintf(cmd, sizeof(cmd), "cmake %s", SOURCE_DIR);
+  // Delete previous build directory to not reuse previous CMakeCache
+  snprintf(cmd, sizeof(cmd), "rm -fr %s/test/pkgconfig/plugin",
+           PROJECT_BINARY_PATH);
   ASSERT_EQ(system(cmd), 0);
+
+  // Create a build directory in the project binary directory so that we
+  // don't pollute the source tree
+  snprintf(cmd, sizeof(cmd), "mkdir %s/test/pkgconfig/plugin",
+           PROJECT_BINARY_PATH);
+  ASSERT_EQ(system(cmd), 0);
+
+  // Run cmake
+  snprintf(
+    cmd, sizeof(cmd),
+    "cd %s/test/pkgconfig/plugin; cmake %s -DGAZEBO_EXPECTED_VERSION=%s",
+    PROJECT_BINARY_PATH, SOURCE_DIR, GAZEBO_EXPECTED_VERSION);
+
+  // Make
   snprintf(cmd, sizeof(cmd), "make");
   ASSERT_EQ(system(cmd), 0);
 }
