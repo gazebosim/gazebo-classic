@@ -734,7 +734,8 @@ TEST_F(MsgsTest, VisualFromSDF_ShaderTypeThrow)
            </material>\
          </visual>\
       </sdf>", sdf));
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+      common::Exception);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_BadGeometryVisual)
