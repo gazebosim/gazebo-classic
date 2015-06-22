@@ -66,11 +66,8 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   startXYLayout->addWidget(startYSpinBox, 1, 1);
   startXYLayout->addWidget(startYUnitLabel, 1, 2);
 
-  QVBoxLayout *xyLayout = new QVBoxLayout;
-  xyLayout->addLayout(startXYLayout);
-
   QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
-  positionGroupBox->setLayout(xyLayout);
+  positionGroupBox->setLayout(startXYLayout);
 
   QLabel *widthLabel = new QLabel(tr("Width: "));
   QLabel *depthLabel = new QLabel(tr("Depth: "));
