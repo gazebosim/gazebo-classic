@@ -13,6 +13,7 @@ set (sources
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
+  MagnetometerSensor.cc
   MultiCameraSensor.cc
   Noise.cc
   RaySensor.cc
@@ -37,6 +38,7 @@ set (headers
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
+  MagnetometerSensor.hh
   MultiCameraSensor.hh
   Noise.hh
   RaySensor.hh
@@ -57,6 +59,7 @@ set (gtest_sources
   ForceTorqueSensor_TEST.cc
   GpsSensor_TEST.cc
   ImuSensor_TEST.cc
+  MagnetometerSensor_TEST.cc
   Noise_TEST.cc
   RaySensor_TEST.cc
   Sensor_TEST.cc

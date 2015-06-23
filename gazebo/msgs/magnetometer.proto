@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Magnetometer
+/// \brief Data from a magnetic field strength sensor
+
+import "time.proto";
+import "vector3d.proto";
+
+message Magnetometer
+{
+  required Time stamp                = 1;
+  required string entity_name        = 2;
+  required Vector3d field_tesla      = 3;
+}

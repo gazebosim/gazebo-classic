@@ -33,6 +33,7 @@ namespace gazebo
     class Sensor;
     class RaySensor;
     class CameraSensor;
+    class MagnetometerSensor;
     class MultiCameraSensor;
     class DepthCameraSensor;
     class ContactSensor;
@@ -61,6 +62,10 @@ namespace gazebo
     /// \def CameraSensorPtr
     /// \brief Shared pointer to CameraSensor
     typedef boost::shared_ptr<CameraSensor> CameraSensorPtr;
+
+    /// \def MagnetometerSensorPtr
+    /// \brief Shared pointer to MagnetometerSensor
+    typedef boost::shared_ptr<MagnetometerSensor> MagnetometerSensorPtr;
 
     /// \def MultiCameraSensorPtr
     /// \brief Shared pointer to MultiCameraSensor
@@ -220,7 +225,19 @@ namespace gazebo
 
       /// \brief Noise streams for the ray sensor
       /// \sa RaySensor
-      RAY_NOISE = 9
+      RAY_NOISE = 9,
+
+      /// \brief Magnetometer body-frame X axis noise in Tesla
+      /// \sa MagnetometerSensor
+      MAGNETOMETER_X_NOISE_TESLA = 10,
+
+      /// \brief Magnetometer body-frame Y axis noise in Tesla
+      /// \sa MagnetometerSensor
+      MAGNETOMETER_Y_NOISE_TESLA = 11,
+
+      /// \brief Magnetometer body-frame Z axis noise in Tesla
+      /// \sa MagnetometerSensor
+      MAGNETOMETER_Z_NOISE_TESLA = 12
     };
     /// \}
   }

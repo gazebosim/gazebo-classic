@@ -113,6 +113,12 @@ math::Vector3 PhysicsEngine::GetGravity() const
 }
 
 //////////////////////////////////////////////////
+math::Vector3 PhysicsEngine::GetMagneticField() const
+{
+  return this->sdf->Get<math::Vector3>("magnetic_field");
+}
+
+//////////////////////////////////////////////////
 CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
                                             const std::string &_linkName)
 {

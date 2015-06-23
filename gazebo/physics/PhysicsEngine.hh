@@ -136,14 +136,18 @@ namespace gazebo
       public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent = ModelPtr()) = 0;
 
-      /// \brief Return the gavity vector.
-      /// \return The gavity vector.
+      /// \brief Return the gravity vector.
+      /// \return The gravity vector.
       public: virtual math::Vector3 GetGravity() const;
 
-      /// \brief Set the gavity vector.
-      /// \param[in] _gravity New gravity vector.
+      /// \brief Set the magnetic vector.
+      /// \param[in] _gravity New magnetic vector.
       public: virtual void SetGravity(
                   const gazebo::math::Vector3 &_gravity) = 0;
+
+      /// \brief Return the magnetic vector.
+      /// \return The magnetic vector.
+      public: virtual math::Vector3 GetMagneticField() const;
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
