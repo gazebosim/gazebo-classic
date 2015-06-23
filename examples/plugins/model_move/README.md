@@ -1,13 +1,15 @@
 # Model Movement Plugin
 
-This is a simple plugin example for moving a model to a specified set of goal points.
+This is a simple plugin example for moving a model to a specified set of
+goal points.
 
-The displacement is not kinematic aware, it uses the Pose Animation as described in
-the [tutorial](http://gazebosim.org/tutorials?tut=animated_box):
+The displacement is not kinematic aware, it uses the Pose Animation as
+described in the
+[tutorial](http://gazebosim.org/tutorials?tut=animated_box):
 
 ## Build Instructions
 
-* From this directory
+From this directory
 
 ```
 $ mkdir build
@@ -18,29 +20,32 @@ $ make
 
 ## Run Instructions
 
-There are several ways to interact with the animation. Below you can find how to run
-the standalone example, which defines the animation programatically. It is also 
-possible to define the animation parameters in the SDF file.
+There are several ways to interact with the animation. Below you can find
+how to run the standalone example, which defines the animation
+programatically. It is also possible to define the animation parameters in
+the SDF file.
 
 ### Run the standalone publisher
 
-* Go to the build directory and run gazebo with the example world
-```
-$ cd build
-$ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
-```
+1. Go to the build directory and run gazebo with the example world
 
-* Publish the path publisher
+    ```
+    $ cd build
+    $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
+    ```
 
-```
-... open a new terminal ...
-$ cd build
-$ ./path_publisher
-```
+1. Publish the path publisher
+
+    ```
+    ... open a new terminal ...
+    $ cd build
+    $ ./path_publisher
+    ```
 
 ### Use predefined animation from the SDF file
 
-* Go to the build directory and run gazebo with the example world
+Go to the build directory and run gazebo with the example world
+
 ```
 $ cd build
 $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move_with_movement.world
