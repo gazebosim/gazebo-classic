@@ -88,10 +88,7 @@ namespace gazebo
       private: physics::LinkPtr parentLink;
 
       /// \brief Stores most recent altimeter sensor data.
-      private: msgs::Altimeter lastAltMsg;
-
-      /// \brief Stores reference altitude agains which position is calculated
-      private: double refAlt;
+      private: msgs::Altimeter altMsg;
     };
     /// \}
   }

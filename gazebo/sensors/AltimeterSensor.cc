@@ -27,7 +27,7 @@
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
-#include "gazebo/sensors/noise/Noise.hh"
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/AltimeterSensor.hh"
 
 using namespace gazebo;
@@ -36,7 +36,7 @@ using namespace sensors;
 GZ_REGISTER_STATIC_SENSOR("altimeter", AltimeterSensor)
 
 /////////////////////////////////////////////////
-AltimeterSensor::AltimeterSensor() : refAlt(0.0)
+AltimeterSensor::AltimeterSensor()
 : Sensor(sensors::OTHER)
 {
 }
@@ -59,8 +59,6 @@ void AltimeterSensor::Load(const std::string &_worldName)
 
   physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
   this->parentLink = boost::dynamic_pointer_cast<physics::Link>(parentEntity);
-
-  this->altMsg.set_link_name(this->parentName);
 
   this->topicName = "~/" + this->parentName + '/' + this->GetName();
   if (this->sdf->HasElement("topic"))
@@ -111,11 +109,11 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
     math::Vector3 altVel = this->parentLink->GetWorldLinearVel(this->pose.pos);
 
     // Apply noise to the position and velocity 
-    this->altMsg.mutable_vertical_position() = 
-      this->noises[ALTIMETER_POSITION_NOISE_METERS].Apply(
-        altPose.pos.z - this->altMsg.vertical_reference());
-    this->altMsg.mutable_vertical_velocity() = 
-      this->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S].Apply(altVel.z);
+    this->altMsg.set_vertical_position(
+      this->noises[ALTIMETER_POSITION_NOISE_METERS]->Apply(
+        altPose.pos.z - this->altMsg.vertical_reference()));
+    this->altMsg.set_vertical_velocity( 
+      this->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S]->Apply(altVel.z));
   }
 
   // Save the time of the measurement
@@ -149,10 +147,10 @@ double AltimeterSensor::GetReferenceAltitude()
 //////////////////////////////////////////////////
 void AltimeterSensor::SetReferenceAltitude(double _refAlt)
 {
-  // Recompute the last altitude
-  return this->altMsg.mutable_vertical_position() -= _refAlt 
-    - this->altMsg.vertical_reference();
+  // Recompute the last altitude with the new vertical reference height
+  this->altMsg.set_vertical_position(this->altMsg.vertical_position() 
+    - (_refAlt - this->altMsg.vertical_reference()));
 
   // Save the new reference height
-  this->altMsg.mutable_vertical_reference() = _refAlt;
+  this->altMsg.set_vertical_reference(_refAlt);
 }
