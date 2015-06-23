@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef MODEL_MOVE_HH
-#define MODEL_MOVE_HH
+#ifndef _GAZEBO_MODEL_MOVE_HH_
+#define _GAZEBO_MODEL_MOVE_HH_
 
 #include <gazebo/msgs/pose_animation.pb.h>
 #include <vector>
