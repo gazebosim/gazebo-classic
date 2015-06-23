@@ -16,6 +16,7 @@
  */
 #include <gtest/gtest.h>
 #include <stdio.h>
+#include "test_config.h"
 
 TEST(PkgConfig, Config)
 {
