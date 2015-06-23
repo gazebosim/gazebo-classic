@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
- *
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -168,7 +167,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   // TODO Color and texture code is repeated on all dialogs.
   // Make a generalized widget
   this->InitColorComboBox();
-  QHBoxLayout *colorLayout = new QHBoxLayout();
+  QHBoxLayout *colorLayout = new QHBoxLayout;
   QLabel *colorLabel = new QLabel(tr("Color: "));
   QLabel *colorDummyLabel = new QLabel(tr(""));
   colorDummyLabel->setMaximumWidth(40);
@@ -177,7 +176,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   colorLayout->addWidget(colorDummyLabel);
 
   this->InitTextureComboBox();
-  QHBoxLayout *textureLayout = new QHBoxLayout();
+  QHBoxLayout *textureLayout = new QHBoxLayout;
   QLabel *textureLabel = new QLabel(tr("Texture: "));
   QLabel *textureDummyLabel= new QLabel(tr(""));
   textureDummyLabel->setMaximumWidth(40);
