@@ -1084,7 +1084,7 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 
   if (this->provideFeedback)
   {
-    if( this->feedback == NULL )
+    if (this->feedback == NULL)
     {
       this->feedback = new dJointFeedback;
       this->feedback->f1[0] = 0;

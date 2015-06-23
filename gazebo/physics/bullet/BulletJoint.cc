@@ -48,6 +48,7 @@ BulletJoint::BulletJoint(BasePtr _parent)
 BulletJoint::~BulletJoint()
 {
   delete this->constraint;
+  delete this->feedback;
   this->bulletWorld = NULL;
 }
 
@@ -346,9 +347,9 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 void BulletJoint::SetupJointFeedback()
 {
-  if (this->provideFeedback )
+  if (this->provideFeedback)
   {
-    if( this->feedback == NULL )
+    if (this->feedback == NULL)
     {
       this->feedback = new btJointFeedback;
       this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
