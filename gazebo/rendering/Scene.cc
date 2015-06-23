@@ -3076,6 +3076,8 @@ void Scene::CreateLinkOriginVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
   linkOriginVis->ShowAxisHead(1, false);
   linkOriginVis->ShowAxisHead(2, false);
 
+  linkOriginVis->SetType(Visual::VT_PHYSICS);
+
   linkOriginVis->SetVisible(this->dataPtr->showLinkOrigins);
   this->dataPtr->visuals[linkOriginVis->GetId()] = linkOriginVis;
 }

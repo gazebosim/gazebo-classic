@@ -241,16 +241,13 @@ namespace gazebo
       /// \return Emissive color.
       public: common::Color GetEmissive() const;
 
-      /// \brief Attach visualization axes
-      public: void AttachAxes();
-
       /// \brief Enable or disable wireframe for this visual.
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);
 
       /// \brief Set the transparency of a single visual without calling
       /// UpdateShaders.
-      private: void SetTransparencyInnerLoop();
+      private: void SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode);
 
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
@@ -271,7 +268,7 @@ namespace gazebo
       /// \return True if the visual is highlighted.
       public: bool GetHighlighted() const;
 
-      /// \brief Set the emissive value.
+      /// \brief Set the emissive value for this visual and its children.
       /// \param[in] _color The emissive color.
       public: virtual void SetEmissive(const common::Color &_color);
 
@@ -641,6 +638,13 @@ namespace gazebo
       /// the scale of the visual.
       /// \param[in] _scale Scale of visual
       private: void UpdateGeomSize(const math::Vector3 &_scale);
+
+      /// \brief Set the emissive value for the given scene node. It iterates
+      /// through all of the scene node's child scene nodes and entities.
+      /// \param[in] _sceneNode The scene node.
+      /// \param[in] _color The emissive color.
+      private: void SetSceneNodeEmissive(Ogre::SceneNode *_sceneNode,
+          const common::Color &_color);
 
       /// \internal
       /// \brief Pointer to private data.

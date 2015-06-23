@@ -117,6 +117,11 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   EXPECT_TRUE(scene->GetVisual("cylinder::link_COM_VISUAL__") != NULL);
   EXPECT_TRUE(scene->GetVisual("sphere::link_COM_VISUAL__") != NULL);
 
+  // Check that the link origin visuals were properly added
+  EXPECT_TRUE(scene->GetVisual("box::link_LINK_ORIGIN_VISUAL__") != NULL);
+  EXPECT_TRUE(scene->GetVisual("cylinder::link_LINK_ORIGIN_VISUAL__") != NULL);
+  EXPECT_TRUE(scene->GetVisual("sphere::link_LINK_ORIGIN_VISUAL__") != NULL);
+
   // Send request to delete the box model
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
@@ -145,6 +150,9 @@ TEST_F(Scene_TEST, RemoveModelVisual)
 
   // Check that the COM visuals were properly removed
   EXPECT_TRUE(scene->GetVisual("box::link_COM_VISUAL__") == NULL);
+
+  // Check that the link origin visuals were properly removed
+  EXPECT_TRUE(scene->GetVisual("box::link_LINK_ORIGIN_VISUAL__") == NULL);
 }
 
 /////////////////////////////////////////////////
@@ -284,6 +292,26 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(cylinderCOM->GetType() == rendering::Visual::VT_PHYSICS);
   EXPECT_TRUE(cylinderCOM->GetType() == rendering::Visual::VT_PHYSICS);
   EXPECT_TRUE(newBoxCOM->GetType() == rendering::Visual::VT_PHYSICS);
+
+  // Check that the link origin visuals were properly added
+  rendering::VisualPtr boxLinkOrigin =
+      scene->GetVisual("box::link_LINK_ORIGIN_VISUAL__");
+  rendering::VisualPtr sphereLinkOrigin =
+      scene->GetVisual("sphere::link_LINK_ORIGIN_VISUAL__");
+  rendering::VisualPtr cylinderLinkOrigin =
+      scene->GetVisual("cylinder::link_LINK_ORIGIN_VISUAL__");
+  rendering::VisualPtr newBoxLinkOrigin =
+      scene->GetVisual("new_box::body_LINK_ORIGIN_VISUAL__");
+  EXPECT_TRUE(boxLinkOrigin != NULL);
+  EXPECT_TRUE(sphereLinkOrigin != NULL);
+  EXPECT_TRUE(cylinderLinkOrigin != NULL);
+  EXPECT_TRUE(newBoxLinkOrigin != NULL);
+
+  // Verify type is VT_PHYSICS
+  EXPECT_TRUE(boxLinkOrigin->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(cylinderLinkOrigin->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(cylinderLinkOrigin->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(newBoxLinkOrigin->GetType() == rendering::Visual::VT_PHYSICS);
 }
 
 /////////////////////////////////////////////////

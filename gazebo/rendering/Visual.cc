@@ -1001,7 +1001,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
 
   // Re-apply the transparency filter for the last known transparency value
-  this->SetTransparencyInnerLoop();
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
 
   // Apply material to all child visuals
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
@@ -1216,11 +1216,38 @@ void Visual::SetSpecular(const common::Color &_color)
 //////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color)
 {
-  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
-      i++)
+  // For this scene node
+  this->SetSceneNodeEmissive(this->dataPtr->sceneNode, _color);
+
+  // For child nodes' scene nodes
+  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
+  {
+    Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode*>(
+        this->dataPtr->sceneNode->getChild(i));
+
+    this->SetSceneNodeEmissive(sn, _color);
+  }
+
+  // For child visuals
+  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  {
+    this->dataPtr->children[i]->SetEmissive(_color);
+  }
+
+  this->dataPtr->emissive = _color;
+
+  this->dataPtr->sdf->GetElement("material")
+      ->GetElement("emissive")->Set(_color);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetSceneNodeEmissive(Ogre::SceneNode *_sceneNode,
+    const common::Color &_color)
+{
+  for (unsigned int i = 0; i < _sceneNode->numAttachedObjects(); ++i)
   {
     Ogre::Entity *entity = NULL;
-    Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
+    Ogre::MovableObject *obj = _sceneNode->getAttachedObject(i);
 
     entity = dynamic_cast<Ogre::Entity*>(obj);
 
@@ -1252,16 +1279,6 @@ void Visual::SetEmissive(const common::Color &_color)
       }
     }
   }
-
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
-  {
-    this->dataPtr->children[i]->SetEmissive(_color);
-  }
-
-  this->dataPtr->emissive = _color;
-
-  this->dataPtr->sdf->GetElement("material")
-      ->GetElement("emissive")->Set(_color);
 }
 
 /////////////////////////////////////////////////
@@ -1287,57 +1304,6 @@ common::Color Visual::GetEmissive() const
 {
   return this->dataPtr->emissive;
 }
-
-/////////////////////////////////////////////////
-void Visual::AttachAxes()
-{
-  std::ostringstream nodeName;
-
-  nodeName << this->dataPtr->sceneNode->getName() << "_AXES_NODE";
-
-  if (!this->dataPtr->sceneNode->getCreator()->hasEntity("axis_cylinder"))
-    this->InsertMesh(common::MeshManager::Instance()->GetMesh("axis_cylinder"));
-
-  Ogre::SceneNode *node = this->dataPtr->sceneNode->createChildSceneNode(
-      nodeName.str());
-  Ogre::SceneNode *x, *y, *z;
-
-  x = node->createChildSceneNode(nodeName.str() + "_axisX");
-  x->setInheritScale(true);
-  x->translate(.25, 0, 0);
-  x->yaw(Ogre::Radian(M_PI/2.0));
-
-  y = node->createChildSceneNode(nodeName.str() + "_axisY");
-  y->setInheritScale(true);
-  y->translate(0, .25, 0);
-  y->pitch(Ogre::Radian(M_PI/2.0));
-
-  z = node->createChildSceneNode(nodeName.str() + "_axisZ");
-  z->translate(0, 0, .25);
-  z->setInheritScale(true);
-
-  Ogre::MovableObject *xobj, *yobj, *zobj;
-
-  xobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(
-        nodeName.str()+"X_AXIS", "axis_cylinder"));
-  xobj->setCastShadows(false);
-  ((Ogre::Entity*)xobj)->setMaterialName("Gazebo/Red");
-
-  yobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(
-        nodeName.str()+"Y_AXIS", "axis_cylinder"));
-  yobj->setCastShadows(false);
-  ((Ogre::Entity*)yobj)->setMaterialName("Gazebo/Green");
-
-  zobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(
-        nodeName.str()+"Z_AXIS", "axis_cylinder"));
-  zobj->setCastShadows(false);
-  ((Ogre::Entity*)zobj)->setMaterialName("Gazebo/Blue");
-
-  x->attachObject(xobj);
-  y->attachObject(yobj);
-  z->attachObject(zobj);
-}
-
 
 //////////////////////////////////////////////////
 void Visual::SetWireframe(bool _show)
@@ -1391,13 +1357,13 @@ void Visual::SetWireframe(bool _show)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetTransparencyInnerLoop()
+void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 {
-  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
+  for (unsigned int i = 0; i < _sceneNode->numAttachedObjects();
       i++)
   {
     Ogre::Entity *entity = NULL;
-    Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
+    Ogre::MovableObject *obj = _sceneNode->getAttachedObject(i);
 
     entity = dynamic_cast<Ogre::Entity*>(obj);
 
@@ -1463,14 +1429,21 @@ void Visual::SetTransparency(float _trans)
   this->dataPtr->transparency = std::min(
       std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
 
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  for (auto child : this->dataPtr->children)
   {
-    (*iter)->SetTransparency(_trans);
+    child->SetTransparency(_trans);
   }
 
-  this->SetTransparencyInnerLoop();
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
+
+  // For child nodes' scene nodes
+  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
+  {
+    Ogre::SceneNode *childSceneNode = dynamic_cast<Ogre::SceneNode*>(
+        this->dataPtr->sceneNode->getChild(i));
+
+    this->SetTransparencyInnerLoop(childSceneNode);
+  }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
@@ -1495,7 +1468,13 @@ void Visual::SetHighlighted(bool _highlighted)
       this->dataPtr->boundingBox->Init(bbox);
     }
     this->dataPtr->boundingBox->SetVisible(true);
+  }
+  else if (this->dataPtr->boundingBox)
+  {
+    this->dataPtr->boundingBox->SetVisible(false);
+  }
 
+    // Highlight link origins
     if (this->GetType() == VT_LINK)
     {
       VisualPtr linkOriginVis;
@@ -1506,15 +1485,12 @@ void Visual::SetHighlighted(bool _highlighted)
       }
       if (linkOriginVis)
       {
-        std::cout << linkOriginVis->GetName() << std::endl;
-        linkOriginVis->SetEmissive(common::Color::Red);
+        //linkOriginVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
+        //linkOriginVis->SetTransparency(0.1);
+        //linkOriginVis->SetCastShadows(false);
+        linkOriginVis->SetHighlighted(_highlighted);
       }
     }
-  }
-  else if (this->dataPtr->boundingBox)
-  {
-    this->dataPtr->boundingBox->SetVisible(false);
-  }
 }
 
 //////////////////////////////////////////////////
