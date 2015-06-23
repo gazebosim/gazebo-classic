@@ -37,10 +37,10 @@ ModelMove::ModelMove()
 }
 
 /////////////////////////////////////////////////
-void ModelMove::move(const math::Vector3 &_start, const math::Vector3 &_end,
+void ModelMove::Move(const math::Vector3 &_start, const math::Vector3 &_end,
                      math::Vector3 &_translation)
 {
-  int duration = floor(start.Distance(_end.x, _end.y, _end.z));
+  int duration = floor(_start.Distance(_end.x, _end.y, _end.z));
   math::Vector3 diff = _end - _start;
   float xStep = diff.x / duration;
   float yStep = diff.y / duration;
@@ -53,25 +53,25 @@ void ModelMove::move(const math::Vector3 &_start, const math::Vector3 &_end,
         i + currFrame);
 
     key->SetTranslation(math::Vector3(
-         translation.x + xStep * i,
-         translation.y + yStep * i,
-         translation.z + zStep * i));
+         _translation.x + xStep * i,
+         _translation.y + yStep * i,
+         _translation.z + zStep * i));
     key->SetRotation(math::Quaternion(0, 0, 0));
   }
 
-  translation.Set(translation.x + xStep * duration,
-                  translation.y + yStep * duration,
-                  translation.z + zStep * duration);
+  _translation.Set(_translation.x + xStep * duration,
+                   _translation.y + yStep * duration,
+                   _translation.z + zStep * duration);
 }
 
 /////////////////////////////////////////////////
 void ModelMove::InitiateMove()
 {
   // get distance from starting point to the first of the goals
-  float pathLength = this->startPosition.Distance(this->path_goals[0].pos);
+  float pathLength = this->startPosition.Distance(this->pathGoals[0].pos);
 
   // to calculate the full distance, add the distance between goals
-  for (int i = 0; i < this->path_goals.size()-1; ++i)
+  for (int i = 0; i < this->pathGoals.size()-1; ++i)
     pathLength += this->pathGoals[i].pos.Distance(this->pathGoals[i+1].pos);
 
   // create the animation
@@ -90,7 +90,7 @@ void ModelMove::InitiateMove()
   // Move to the start_position to first goal
   this->Move(this->startPosition, this->pathGoals[0].pos, translation);
 
-  for (int i = 0; i < this->path_goals.size()-1; ++i)
+  for (int i = 0; i < this->pathGoals.size()-1; ++i)
     this->Move(this->pathGoals[i].pos, this->pathGoals[i+1].pos, translation);
 
   // set the animation
@@ -98,11 +98,11 @@ void ModelMove::InitiateMove()
 }
 
 /////////////////////////////////////////////////
-void ModelMove::getPathMsg(ConstPoseAnimationPtr &_msg)
+void ModelMove::GetPathMsg(ConstPoseAnimationPtr &_msg)
 {
   gzmsg << "[model_move] Received path message" << std::endl;
 
-  // Store message poses into the path_goals and launch movement
+  // Store message poses into the pathGoals and launch movement
   for (int i = 0; i < _msg->pose_size(); ++i)
     this->pathGoals.push_back(gazebo::msgs::Convert(_msg->pose(i)));
 
@@ -131,7 +131,7 @@ bool ModelMove::LoadGoalsFromSDF(const sdf::ElementPtr _sdf)
     poseElem = poseElem->GetNextElement("pose");
   }
 
-  GZ_ASSERT(this->pathGoals.size() > 0, "path_goals should not be zero");
+  GZ_ASSERT(this->pathGoals.size() > 0, "pathGoals should not be zero");
 
   return true;
 }
