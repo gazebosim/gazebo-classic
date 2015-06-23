@@ -35,7 +35,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(wallLabel);
-  nameLayout->addWidget(wallNameLabel);
+  nameLayout->addWidget(this->wallNameLabel);
 
   QLabel *startLabel = new QLabel(tr("Start Point"));
   QLabel *endLabel = new QLabel(tr("End Point"));
@@ -87,25 +87,25 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QGridLayout *startXYLayout = new QGridLayout;
   startXYLayout->addWidget(startXLabel, 0, 0);
-  startXYLayout->addWidget(startXSpinBox, 0, 1);
+  startXYLayout->addWidget(this->startXSpinBox, 0, 1);
   startXYLayout->addWidget(startXUnitLabel, 0, 2);
   startXYLayout->addWidget(startYLabel, 1, 0);
-  startXYLayout->addWidget(startYSpinBox, 1, 1);
+  startXYLayout->addWidget(this->startYSpinBox, 1, 1);
   startXYLayout->addWidget(startYUnitLabel, 1, 2);
   startXYLayout->setColumnStretch(1, 1);
-  startXYLayout->setAlignment(startXSpinBox, Qt::AlignLeft);
-  startXYLayout->setAlignment(startYSpinBox, Qt::AlignLeft);
+  startXYLayout->setAlignment(this->startXSpinBox, Qt::AlignLeft);
+  startXYLayout->setAlignment(this->startYSpinBox, Qt::AlignLeft);
 
   QGridLayout *endXYLayout = new QGridLayout;
   endXYLayout->addWidget(endXLabel, 0, 0);
-  endXYLayout->addWidget(endXSpinBox, 0, 1);
+  endXYLayout->addWidget(this->endXSpinBox, 0, 1);
   endXYLayout->addWidget(endXUnitLabel, 0, 2);
   endXYLayout->addWidget(endYLabel, 1, 0);
-  endXYLayout->addWidget(endYSpinBox, 1, 1);
+  endXYLayout->addWidget(this->endYSpinBox, 1, 1);
   endXYLayout->addWidget(endYUnitLabel, 1, 2);
   endXYLayout->setColumnStretch(1, 1);
-  endXYLayout->setAlignment(endXSpinBox, Qt::AlignLeft);
-  endXYLayout->setAlignment(endYSpinBox, Qt::AlignLeft);
+  endXYLayout->setAlignment(this->endXSpinBox, Qt::AlignLeft);
+  endXYLayout->setAlignment(this->endYSpinBox, Qt::AlignLeft);
 
   QHBoxLayout *xyLayout = new QHBoxLayout;
   xyLayout->addLayout(startXYLayout);
@@ -121,7 +121,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QLabel *lengthLabel = new QLabel(tr("Length: "));
   this->lengthSpinBox = new QDoubleSpinBox;
-  this->lengthSpinBox->setRange(-1000, 1000);
+  this->lengthSpinBox->setRange(0, 1000);
   this->lengthSpinBox->setSingleStep(0.001);
   this->lengthSpinBox->setDecimals(3);
   this->lengthSpinBox->setValue(0.000);
@@ -132,12 +132,12 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QHBoxLayout *lengthLayout = new QHBoxLayout;
   lengthLayout->addWidget(lengthLabel);
-  lengthLayout->addWidget(lengthSpinBox);
+  lengthLayout->addWidget(this->lengthSpinBox);
   lengthLayout->addWidget(lengthUnitLabel);
 
   QLabel *heightLabel = new QLabel(tr("Height: "));
   this->heightSpinBox = new QDoubleSpinBox;
-  this->heightSpinBox->setRange(-1000, 1000);
+  this->heightSpinBox->setRange(0, 1000);
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
   this->heightSpinBox->setValue(0.000);
@@ -148,7 +148,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QLabel *thicknessLabel = new QLabel(tr("Thickness "));
   this->thicknessSpinBox = new QDoubleSpinBox;
-  this->thicknessSpinBox->setRange(-1000, 1000);
+  this->thicknessSpinBox->setRange(0, 1000);
   this->thicknessSpinBox->setSingleStep(0.001);
   this->thicknessSpinBox->setDecimals(3);
   this->thicknessSpinBox->setValue(0.000);
@@ -159,10 +159,10 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QGridLayout *heightThicknessLayout = new QGridLayout;
   heightThicknessLayout->addWidget(heightLabel, 0, 0);
-  heightThicknessLayout->addWidget(heightSpinBox, 0, 1);
+  heightThicknessLayout->addWidget(this->heightSpinBox, 0, 1);
   heightThicknessLayout->addWidget(heightUnitLabel, 0, 2);
   heightThicknessLayout->addWidget(thicknessLabel, 1, 0);
-  heightThicknessLayout->addWidget(thicknessSpinBox, 1, 1);
+  heightThicknessLayout->addWidget(this->thicknessSpinBox, 1, 1);
   heightThicknessLayout->addWidget(thicknessUnitLabel, 1, 2);
 
   // TODO Color and texture code is repeated on all dialogs.
@@ -190,7 +190,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QHBoxLayout *colorLayout = new QHBoxLayout;
   colorLayout->addWidget(colorLabel);
-  colorLayout->addWidget(colorComboBox);
+  colorLayout->addWidget(this->colorComboBox);
   colorLayout->addWidget(colorDummyLabel);
 
   QLabel *textureLabel = new QLabel(tr("Texture: "));
@@ -215,7 +215,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
 
   QHBoxLayout *textureLayout = new QHBoxLayout;
   textureLayout->addWidget(textureLabel);
-  textureLayout->addWidget(textureComboBox);
+  textureLayout->addWidget(this->textureComboBox);
   textureLayout->addWidget(textureDummyLabel);
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;

@@ -44,14 +44,14 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(itemlLabel);
-  nameLayout->addWidget(itemNameLabel);
+  nameLayout->addWidget(this->itemNameLabel);
 
   QLabel *widthLabel = new QLabel(tr("Width: "));
 //  QLabel *depthLabel = new QLabel(tr("Depth: "));
   QLabel *heightLabel = new QLabel(tr("Height: "));
 
   this->widthSpinBox = new QDoubleSpinBox;
-  this->widthSpinBox->setRange(-1000, 1000);
+  this->widthSpinBox->setRange(0, 1000);
   this->widthSpinBox->setSingleStep(0.001);
   this->widthSpinBox->setDecimals(3);
   this->widthSpinBox->setValue(0.000);
@@ -60,13 +60,13 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   widthUnitLabel->setMaximumWidth(40);
 
   this->depthSpinBox = new QDoubleSpinBox;
-  this->depthSpinBox->setRange(-1000, 1000);
+  this->depthSpinBox->setRange(0, 1000);
   this->depthSpinBox->setSingleStep(0.001);
   this->depthSpinBox->setDecimals(3);
   this->depthSpinBox->setValue(0.000);
 
   this->heightSpinBox = new QDoubleSpinBox;
-  this->heightSpinBox->setRange(-1000, 1000);
+  this->heightSpinBox->setRange(0, 1000);
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
   this->heightSpinBox->setValue(0.000);
@@ -76,12 +76,12 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
 
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
-  sizeLayout->addWidget(widthSpinBox, 0, 1);
+  sizeLayout->addWidget(this->widthSpinBox, 0, 1);
   sizeLayout->addWidget(widthUnitLabel, 0, 2);
 //  sizeLayout->addWidget(depthLabel, 1, 0);
-//  sizeLayout->addWidget(depthSpinBox, 1, 1);
+//  sizeLayout->addWidget(this->depthSpinBox, 1, 1);
   sizeLayout->addWidget(heightLabel, 2, 0);
-  sizeLayout->addWidget(heightSpinBox, 2, 1);
+  sizeLayout->addWidget(this->heightSpinBox, 2, 1);
   sizeLayout->addWidget(heightUnitLabel, 2, 2);
 
   QGroupBox *sizeGroupBox = new QGroupBox(tr("Size"));
@@ -110,7 +110,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   positionYUnitLabel->setMaximumWidth(40);
 
   this->elevationSpinBox = new QDoubleSpinBox;
-  this->elevationSpinBox->setRange(-1000, 1000);
+  this->elevationSpinBox->setRange(0, 1000);
   this->elevationSpinBox->setSingleStep(0.001);
   this->elevationSpinBox->setDecimals(3);
   this->elevationSpinBox->setValue(0.000);
@@ -120,13 +120,13 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
 
   QGridLayout *positionLayout = new QGridLayout;
   positionLayout->addWidget(positionXLabel, 0, 0);
-  positionLayout->addWidget(positionXSpinBox, 0, 1);
+  positionLayout->addWidget(this->positionXSpinBox, 0, 1);
   positionLayout->addWidget(positionXUnitLabel, 0, 2);
   positionLayout->addWidget(positionYLabel), 1, 0;
-  positionLayout->addWidget(positionYSpinBox, 1, 1);
+  positionLayout->addWidget(this->positionYSpinBox, 1, 1);
   positionLayout->addWidget(positionYUnitLabel, 1, 2);
   positionLayout->addWidget(elevationLabel, 0, 3);
-  positionLayout->addWidget(elevationSpinBox, 0, 4);
+  positionLayout->addWidget(this->elevationSpinBox, 0, 4);
   positionLayout->addWidget(elevationUnitLabel, 0, 5);
 
   QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
@@ -138,7 +138,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
 
   QHBoxLayout *typeLayout = new QHBoxLayout;
   typeLayout->addWidget(typeLabel);
-  typeLayout->addWidget(typeComboBox);
+  typeLayout->addWidget(this->typeComboBox);
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
