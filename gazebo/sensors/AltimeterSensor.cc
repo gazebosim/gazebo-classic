@@ -83,6 +83,10 @@ void AltimeterSensor::Load(const std::string &_worldName)
     this->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S] = 
       NoiseFactory::NewNoiseModel(vertVelElem->GetElement("noise"));
   }
+
+  // Initialise reference altitude
+  this->altMsg.set_vertical_reference(
+     (this->pose + this->parentLink->GetWorldPose()).pos.z);
 }
 
 /////////////////////////////////////////////////
