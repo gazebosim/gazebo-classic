@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Altimeter
+/// \brief Data from an atimeter sensor
+
+import "time.proto";
+
+message Altimeter
+{
+  required Time stamp                = 1;
+  required double vertical_position  = 2;
+  required double vertical_velocity  = 3;
+}

@@ -32,6 +32,7 @@ namespace gazebo
   {
     class Sensor;
     class RaySensor;
+    class AltimeterSensor;
     class CameraSensor;
     class MultiCameraSensor;
     class DepthCameraSensor;
@@ -57,6 +58,10 @@ namespace gazebo
     /// \def RaySensorPtr
     /// \brief Shared pointer to RaySensor
     typedef boost::shared_ptr<RaySensor> RaySensorPtr;
+
+    /// \def AltimeterSensorPtr
+    /// \brief Shared pointer to AltimeterSensor
+    typedef boost::shared_ptr<AltimeterSensor> AltimeterSensorPtr;
 
     /// \def CameraSensorPtr
     /// \brief Shared pointer to CameraSensor
@@ -133,6 +138,10 @@ namespace gazebo
     /// \def RaySensor_V
     /// \brief Vector of RaySensor shared pointers
     typedef std::vector<RaySensorPtr> RaySensor_V;
+
+    /// \def AltimeterSensor_V
+    /// \brief Vector of AltimeterSensor shared pointers
+    typedef std::vector<AltimeterSensor> AltimeterSensor_V;
 
     /// \def CameraSensor_V
     /// \brief Vector of CameraSensor shared pointers
@@ -220,7 +229,15 @@ namespace gazebo
 
       /// \brief Noise streams for the ray sensor
       /// \sa RaySensor
-      RAY_NOISE = 9
+      RAY_NOISE = 9,
+
+      /// \brief Vertical noise stream for the altimeter sensor
+      /// \sa AltimeterSensor
+      ALTIMETER_POSITION_NOISE_METERS = 10,
+
+      /// \brief Velocity noise streams for the altimeter sensor
+      /// \sa AltimeterSensor
+      ALTIMETER_VELOCITY_NOISE_METERS_PER_S = 11
     };
     /// \}
   }
