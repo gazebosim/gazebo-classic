@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Added measurement unit to building inspectors.
+    * [Pull request #1741](https://bitbucket.org/osrf/gazebo/pull-request/1741)
+
 1. Added a transporter plugin which allows models to move from one location
    to another based on their location and the location of transporter pads.
     * [Pull request #1738](https://bitbucket.org/osrf/gazebo/pull-request/1738)

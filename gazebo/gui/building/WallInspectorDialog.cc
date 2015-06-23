@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation *
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -129,10 +130,10 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   QLabel *lengthUnitLabel = new QLabel(tr("m"));
   lengthUnitLabel->setMaximumWidth(40);
 
-  QGridLayout *lengthLayout = new QGridLayout;
-  lengthLayout->addWidget(lengthLabel, 0, 0);
-  lengthLayout->addWidget(lengthSpinBox, 0, 1);
-  lengthLayout->addWidget(lengthUnitLabel, 0, 2);
+  QHBoxLayout *lengthLayout = new QHBoxLayout;
+  lengthLayout->addWidget(lengthLabel);
+  lengthLayout->addWidget(lengthSpinBox);
+  lengthLayout->addWidget(lengthUnitLabel);
 
   QLabel *heightLabel = new QLabel(tr("Height: "));
   this->heightSpinBox = new QDoubleSpinBox;
@@ -178,7 +179,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   this->InitTextureComboBox();
   QHBoxLayout *textureLayout = new QHBoxLayout;
   QLabel *textureLabel = new QLabel(tr("Texture: "));
-  QLabel *textureDummyLabel= new QLabel(tr(""));
+  QLabel *textureDummyLabel = new QLabel(tr(""));
   textureDummyLabel->setMaximumWidth(40);
   textureLayout->addWidget(textureLabel);
   textureLayout->addWidget(this->textureComboBox);
