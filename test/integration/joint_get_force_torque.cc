@@ -126,6 +126,12 @@ class JointGetForceTorqueTest : public ServerFixture,
               joint->set_parent("world");
               joint->set_child("dummy_link");
               joint->set_type(msgs::ConvertJointType("fixed"));
+              // remove the following four lines when we drop
+              // support for sdformat < 3.0.6
+              auto axis = joint->mutable_axis1();
+              msgs::Set(axis->mutable_xyz(), _opt.jointAxis);
+              axis->set_limit_lower(0.0);
+              axis->set_limit_upper(0.0);
             }
 
             msg.add_joint();
@@ -143,7 +149,9 @@ class JointGetForceTorqueTest : public ServerFixture,
             }
             joint->set_child("link");
 
-            if( _opt.jointType != "fixed" )
+            // remove this comment when we can drop support
+            // for old sdformat (< 3.0.6)
+            // if( _opt.jointType != "fixed" )
             {
               auto axis = joint->mutable_axis1();
               msgs::Set(axis->mutable_xyz(), _opt.jointAxis);
