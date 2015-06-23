@@ -29,7 +29,7 @@ const double g_friction_tolerance = 1e-3;
 class JointGetForceTorqueTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
-  protected: JointGetForceTorqueTest() : ServerFixture(), spawnCount(0)
+  protected: JointGetForceTorqueTest() : ServerFixture()
              {
              }
 
@@ -79,10 +79,10 @@ class JointGetForceTorqueTest : public ServerFixture,
   /// \param[in] _opt Options for friction box.
   public: physics::ModelPtr SpawnBox(const SpawnGetFTBoxOptions &_opt)
           {
-            msgs::Factory msg;
-            std::ostringstream modelStr;
-            std::ostringstream modelName;
-            modelName << "box_model" << this->spawnCount++;
+            msgs::Model msg;
+            std::string modelName = this->GetUniqueString("box_model");
+            msg.set_name(modelName);
+            msgs::Set(msg.mutable_pose(), _opt.modelPose);
 
             double dx = _opt.size.x;
             double dy = _opt.size.y;
@@ -91,102 +91,78 @@ class JointGetForceTorqueTest : public ServerFixture,
             double iyy = _opt.mass/12.0 * (dz*dz + dx*dx);
             double izz = _opt.mass/12.0 * (dx*dx + dy*dy);
 
-            modelStr
-              << "<sdf version='" << SDF_VERSION << "'>"
-              << "<model name ='" << modelName.str() << "'>"
-              << "  <pose>" << _opt.modelPose << "</pose>";
-              if ( !_opt.parentIsWorld )
-              {
-                modelStr
-                  << "<link name='dummy_link'></link>";
-              }
-            modelStr
-              << "  <link name='link'>"
-              << "    <pose>" << _opt.linkPose << "</pose>"
-              << "    <inertial>"
-              << "      <pose>" << _opt.inertialPose << "</pose>"
-              << "      <mass>" << _opt.mass << "</mass>"
-              << "      <inertia>"
-              << "        <ixx>" << ixx << "</ixx>"
-              << "        <iyy>" << iyy << "</iyy>"
-              << "        <izz>" << izz << "</izz>"
-              << "        <ixy>" << 0.0 << "</ixy>"
-              << "        <ixz>" << 0.0 << "</ixz>"
-              << "        <iyz>" << 0.0 << "</iyz>"
-              << "      </inertia>"
-              << "    </inertial>"
-//              << "    <collision name='collision'>"
-//              << "      <pose>" << _opt.collisionPose << "</pose>"
-//              << "      <geometry>"
-//              << "        <box><size>" << _opt.size << "</size></box>"
-//              << "      </geometry>"
-//              << "    </collision>"
-//              << "    <visual name='visual'>"
-//              << "      <pose>" << _opt.collisionPose << "</pose>"
-//              << "      <geometry>"
-//              << "        <box><size>" << _opt.size << "</size></box>"
-//              << "      </geometry>"
-//              << "    </visual>"
-              << "  </link>";
-              if ( !_opt.parentIsWorld )
-              {
-                modelStr
-                  << "  <joint name='dummy_joint' type='fixed'>"
-                  << "  <parent>world</parent>"
-                  << "  <child>dummy_link</child>"
-                  << "  <axis>"
-                  << "    <limit>"
-                  << "      <lower>0.0</lower>"
-                  << "      <upper>0.0</upper>"
-                  << "    </limit>"
-                  << "    <xyz>" << _opt.jointAxis << "</xyz>"
-                  << "  </axis>"
-                  << "  </joint>";
-              }
-            modelStr
-              << "  <joint name='joint' type='"
-              << _opt.jointType << "'>";
-              if ( _opt.parentIsWorld )
-              {
-                modelStr
-                  << "    <parent>world</parent>";
-              }
-              else
-              {
-                modelStr
-                  << "    <parent>dummy_link</parent>";
-              }
-            modelStr
-              << "    <child>link</child>";
-            // Remove this line when sdf will support
-            // fixed joints without a dummy axis element
-            // if( _opt.jointType != "fixed" )
+
+            if ( !_opt.parentIsWorld )
             {
-              modelStr
-                << "  <axis>"
-                << "    <limit>"
-                << "      <lower>0.0</lower>"
-                << "      <upper>0.0</upper>"
-                << "    </limit>"
-                << "    <xyz>" << _opt.jointAxis << "</xyz>"
-                << "  </axis>";
+              msg.add_link();
+              int linkCount = msg.link_size();
+              auto link = msg.mutable_link(linkCount-1);
+              link->set_name("dummy_link");
             }
-            modelStr
-              << "<physics>"
-              << "  <provide_feedback>true</provide_feedback>"
-              << "</physics>"
-              << "</joint>"
-              << "</model>";
+
+            msg.add_link();
+            int linkCount = msg.link_size();
+            auto link = msg.mutable_link(linkCount-1);
+            link->set_name("link");
+            msgs::Set(link->mutable_pose(), _opt.linkPose);
+            msgs::Inertial inertial;
+            inertial.set_mass(_opt.mass);
+            inertial.set_ixx(ixx);
+            inertial.set_iyy(iyy);
+            inertial.set_izz(izz);
+            inertial.set_ixy(0.0);
+            inertial.set_ixz(0.0);
+            inertial.set_iyz(0.0);
+            msgs::Set(inertial.mutable_pose(),_opt.inertialPose);
+
+            *(link->mutable_inertial()) = inertial;
+
+            if ( !_opt.parentIsWorld )
+            {
+              msg.add_joint();
+              int jointCount = msg.joint_size();
+              auto joint = msg.mutable_joint(jointCount-1);
+              joint->set_name("dummy_joint");
+              joint->set_parent("world");
+              joint->set_child("dummy_link");
+              joint->set_type(msgs::ConvertJointType("fixed"));
+            }
+
+            msg.add_joint();
+            int jointCount = msg.joint_size();
+            auto joint = msg.mutable_joint(jointCount-1);
+            joint->set_name("joint");
+            joint->set_type(msgs::ConvertJointType(_opt.jointType));
+            if ( _opt.parentIsWorld )
+            {
+              joint->set_parent("world");
+            }
+            else
+            {
+              joint->set_parent("dummy_link");
+            }
+            joint->set_child("link");
+
+            if( _opt.jointType != "fixed" )
+            {
+              auto axis = joint->mutable_axis1();
+              msgs::Set(axis->mutable_xyz(), _opt.jointAxis);
+              axis->set_limit_lower(0.0);
+              axis->set_limit_upper(0.0);
+            }
+            // how to add provide_feedback ?
 
             physics::WorldPtr world = physics::get_world("default");
-            world->InsertModelString(modelStr.str());
+            physics::ModelPtr model =this->SpawnModel(msg);
 
-            physics::ModelPtr model;
+            physics::JointPtr pJoint = model->GetJoint("joint");
+            pJoint->SetProvideFeedback(true);
+
             unsigned stepsToWait =  1000;
 
             unsigned int stepCount = 0;
             while (stepCount < stepsToWait &&
-                   !this->HasEntity(modelName.str()))
+                   !this->HasEntity(modelName))
             {
               world->Step(1);
               stepCount++;
@@ -197,11 +173,11 @@ class JointGetForceTorqueTest : public ServerFixture,
               }
             }
 
-            if (this->HasEntity(modelName.str()))
+            if (this->HasEntity(modelName))
               gzdbg << "box has spawned." << std::endl;
 
-            if (world != NULL)
-              model = world->GetModel(modelName.str());
+
+
 
             return model;
           }
@@ -219,9 +195,6 @@ class JointGetForceTorqueTest : public ServerFixture,
   /// \brief Test GetForceTorque method for different type joints
   /// \param[in] _physicsEngine Physics engine to use.
   public: void GetForceTorqueDemo(const std::string &_physicsEngine);
-
-  /// \brief Count of spawned models, used to ensure unique model names.
-  private: unsigned int spawnCount;
 };
 
 void JointGetForceTorqueTest::GetFTDemoHelper(
