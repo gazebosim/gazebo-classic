@@ -48,8 +48,8 @@ using namespace quickstep;
 
 void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
                       dRealPtr MOI, dxBody * const *body,
-                      const dReal /*stepsize1*/, dRealMutablePtr /*c*/, dRealMutablePtr J,
-                      int *jb, dRealMutablePtr rhs_precon)
+                      const dReal /*stepsize1*/, dRealMutablePtr /*c*/,
+                      dRealMutablePtr J, int *jb, dRealMutablePtr rhs_precon)
 {
     /**************************************************************************/
     /*                                                                        */
@@ -70,19 +70,19 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       //
       // tmp1 = M*v/h + fe
       //
-      dReal *tmp1curr = tmp1;
+      dReal *tmp1cur = tmp1;
       const dReal *MOIrow = MOI;
       dxBody *const *const bodyend = body + nb;
       for (dxBody *const *bodycurr = body; bodycurr != bodyend;
-           tmp1curr+=6, MOIrow+=12, bodycurr++) {
+           tmp1cur+=6, MOIrow+=12, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         // dReal body_mass = b_ptr->mass.mass;
         for (int j=0; j<3; j++)
-          tmp1curr[j] = b_ptr->facc[j];
+          tmp1cur[j] = b_ptr->facc[j];
         dReal tmpa[3];
         for (int j=0; j<3; j++) tmpa[j] = 0;
-        dMultiply0_331 (tmp1curr + 3,MOIrow,tmpa);
-        for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->tacc[k];
+        dMultiply0_331 (tmp1cur + 3,MOIrow,tmpa);
+        for (int k=0; k<3; k++) tmp1cur[3+k] += b_ptr->tacc[k];
       }
       //
       // rhs_precon = - J * (M*v/h + fe)
@@ -202,19 +202,22 @@ void dxQuickStepper (dxWorldProcessContext *context,
     }
   }
 
-  // get joint information (m = total constraint dimension, nub = number of unbounded variables).
+  // get joint information (m = total constraint dimension,
+  //                        nub = number of unbounded variables).
   // joints with m=0 are inactive and are removed from the joints array
   // entirely, so that the code that follows does not consider them.
-  dJointWithInfo1 *const jointiinfos = context->AllocateArray<dJointWithInfo1> (_nj);
+  dJointWithInfo1 *const jointiinfos =
+    context->AllocateArray<dJointWithInfo1> (_nj);
   int nj;
 
   {
     dJointWithInfo1 *jicurr = jointiinfos;
     dxJoint *const *const _jend = _joint + _nj;
-    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {  // jicurr=dest, _jcurr=src
+    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {
       dxJoint *j = *_jcurr;
       j->getInfo1 (&jicurr->info);
-      dIASSERT (jicurr->info.m >= 0 && jicurr->info.m <= 6 && jicurr->info.nub >= 0 && jicurr->info.nub <= jicurr->info.m);
+      dIASSERT (jicurr->info.m >= 0 && jicurr->info.m <= 6 &&
+                jicurr->info.nub >= 0 && jicurr->info.nub <= jicurr->info.m);
       if (jicurr->info.m > 0) {
         jicurr->joint = j;
         jicurr++;
@@ -226,7 +229,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
   context->ShrinkArray<dJointWithInfo1>(jointiinfos, _nj, nj);
 
   int m;
-  int mfb; // number of rows of Jacobian we will have to save for joint feedback
+  // number of rows of Jacobian we will have to save for joint feedback
+  int mfb;
 
   {
     int mcurr = 0, mfbcurr = 0;
@@ -327,9 +331,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
         // format:
         //
         //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 \    .
-        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2  )-- jacobian for joint 0, body 1 and body 2 (3 rows)
+        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2  )- jac for j0, b1, b2 (3 rows)
         //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 /
-        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 )--- jacobian for joint 1, body 1 and body 2 (3 rows)
+        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 )-- jac for j1, b1, b2 (3 rows)
         //   etc...
         //
         //   (lll) = linear jacobian data
@@ -416,18 +420,18 @@ void dxQuickStepper (dxWorldProcessContext *context,
         dReal *tmp1 = context->AllocateArray<dReal> (nb*6);
         dSetZero(tmp1,nb*6);
         // put v/h + invM*fe into tmp1
-        dReal *tmp1curr = tmp1;
+        dReal *tmp1cur = tmp1;
         const dReal *invMOIrow = invMOI;
         dxBody *const *const bodyend = body + nb;
         for (dxBody *const *bodycurr = body;
              bodycurr != bodyend;
-             tmp1curr+=6, invMOIrow+=12, bodycurr++) {
+             tmp1cur+=6, invMOIrow+=12, bodycurr++) {
           dxBody *b_ptr = *bodycurr;
           dReal body_invMass = b_ptr->invMass;
           for (int j=0; j<3; j++)
-            tmp1curr[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
-          dMultiply0_331 (tmp1curr + 3,invMOIrow,b_ptr->tacc);
-          for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->avel[k] * stepsize1;
+            tmp1cur[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
+          dMultiply0_331 (tmp1cur + 3,invMOIrow,b_ptr->tacc);
+          for (int k=0; k<3; k++) tmp1cur[3+k] += b_ptr->avel[k] * stepsize1;
         }
 
         // put J*tmp1 into rhs

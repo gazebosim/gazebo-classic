@@ -172,7 +172,7 @@ struct dxPGSLCPParameters {
 
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda;
-    dRealMutablePtr last_mu_mg;
+    dRealMutablePtr last_mg_mu;
 #endif
 };
 // ****************************************************************
