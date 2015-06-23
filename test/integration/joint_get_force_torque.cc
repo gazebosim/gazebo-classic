@@ -113,7 +113,7 @@ class JointGetForceTorqueTest : public ServerFixture,
             inertial.set_ixy(0.0);
             inertial.set_ixz(0.0);
             inertial.set_iyz(0.0);
-            msgs::Set(inertial.mutable_pose(),_opt.inertialPose);
+            msgs::Set(inertial.mutable_pose(), _opt.inertialPose);
 
             *(link->mutable_inertial()) = inertial;
 
