@@ -35,7 +35,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(stairsLabel);
-  nameLayout->addWidget(stairsNameLabel);
+  nameLayout->addWidget(this->stairsNameLabel);
 
   QLabel *startXLabel = new QLabel(tr("x: "));
   QLabel *startYLabel = new QLabel(tr("y: "));
@@ -60,10 +60,10 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
 
   QGridLayout *startXYLayout = new QGridLayout;
   startXYLayout->addWidget(startXLabel, 0, 0);
-  startXYLayout->addWidget(startXSpinBox, 0, 1);
+  startXYLayout->addWidget(this->startXSpinBox, 0, 1);
   startXYLayout->addWidget(startXUnitLabel, 0, 2);
   startXYLayout->addWidget(startYLabel, 1, 0);
-  startXYLayout->addWidget(startYSpinBox, 1, 1);
+  startXYLayout->addWidget(this->startYSpinBox, 1, 1);
   startXYLayout->addWidget(startYUnitLabel, 1, 2);
 
   QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
@@ -74,7 +74,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   QLabel *heightLabel = new QLabel(tr("Height: "));
 
   this->widthSpinBox = new QDoubleSpinBox;
-  this->widthSpinBox->setRange(-1000, 1000);
+  this->widthSpinBox->setRange(0, 1000);
   this->widthSpinBox->setSingleStep(0.001);
   this->widthSpinBox->setDecimals(3);
   this->widthSpinBox->setValue(0.000);
@@ -83,7 +83,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   widthUnitLabel->setMaximumWidth(40);
 
   this->depthSpinBox = new QDoubleSpinBox;
-  this->depthSpinBox->setRange(-1000, 1000);
+  this->depthSpinBox->setRange(0, 1000);
   this->depthSpinBox->setSingleStep(0.001);
   this->depthSpinBox->setDecimals(3);
   this->depthSpinBox->setValue(0.000);
@@ -92,7 +92,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   depthUnitLabel->setMaximumWidth(40);
 
   this->heightSpinBox = new QDoubleSpinBox;
-  this->heightSpinBox->setRange(-1000, 1000);
+  this->heightSpinBox->setRange(0, 1000);
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
   this->heightSpinBox->setValue(0.000);
@@ -110,10 +110,10 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
 
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
-  sizeLayout->addWidget(widthSpinBox, 0, 1);
+  sizeLayout->addWidget(this->widthSpinBox, 0, 1);
   sizeLayout->addWidget(widthUnitLabel, 0, 2);
   sizeLayout->addWidget(depthLabel, 1, 0);
-  sizeLayout->addWidget(depthSpinBox, 1, 1);
+  sizeLayout->addWidget(this->depthSpinBox, 1, 1);
   sizeLayout->addWidget(depthUnitLabel, 1, 2);
   sizeLayout->addWidget(heightLabel, 2, 0);
   sizeLayout->addWidget(this->heightSpinBox, 2, 1);
