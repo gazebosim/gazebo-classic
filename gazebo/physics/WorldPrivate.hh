@@ -78,6 +78,21 @@ namespace gazebo
       /// \brief Number of steps in increment by.
       public: int stepInc;
 
+      /// \brief Holds the iteration of the current chunk, which might differ
+      /// from the current playback iteration. This happens because the log
+      /// file might skip iterations.
+      public: unsigned int logNextIteration = true;
+
+      /// \brief Whether the currently loaded log chunk should be processed.
+      /// We don't want to process it before the playback iteration matches
+      /// the chunk iteration.
+      public: bool processCurrentChunk = true;
+
+      /// \brief Whether to step the log file to the next available chunk.
+      /// We should only step to the next chunk after the current chunk has
+      /// been processed.
+      public: bool stepToNextChunk = true;
+
       /// \brief All the event connections.
       public: event::Connection_V connections;
 
