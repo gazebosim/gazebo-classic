@@ -145,6 +145,14 @@ void BulletJoint::Detach()
   delete this->constraint;
 }
 
+void BulletJoint::SetProvideFeedback(bool _enable)
+{
+  Joint::SetProvideFeedback(_enable);
+
+  this->SetupJointFeedback();
+}
+
+
 //////////////////////////////////////////////////
 void BulletJoint::CacheForceTorque()
 {
@@ -338,21 +346,21 @@ JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 void BulletJoint::SetupJointFeedback()
 {
-  if (this->provideFeedback)
+  if (this->provideFeedback )
   {
-    this->feedback = new btJointFeedback;
-    this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
-    this->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
-    this->feedback->m_appliedTorqueBodyA = btVector3(0, 0, 0);
-    this->feedback->m_appliedTorqueBodyB = btVector3(0, 0, 0);
+    if( this->feedback == NULL )
+    {
+      this->feedback = new btJointFeedback;
+      this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
+      this->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
+      this->feedback->m_appliedTorqueBodyA = btVector3(0, 0, 0);
+      this->feedback->m_appliedTorqueBodyB = btVector3(0, 0, 0);
+    }
 
     if (this->constraint)
       this->constraint->setJointFeedback(this->feedback);
     else
-    {
       gzerr << "Bullet Joint [" << this->GetName() << "] ID is invalid\n";
-      getchar();
-    }
   }
 }
 
