@@ -29,7 +29,7 @@ class AltimeterSensor_TEST : public ServerFixture,
   public testing::WithParamInterface<const char*>
 {
   public: void BasicAltimeterSensorCheck(const std::string &_physicsEngine);
-  public: void RotateAltimeterSensorCheck(const std::string &_physicsEngine);
+  public: void NonzeroAltimeterSensorCheck(const std::string &_physicsEngine);
 };
 
 // A noise-free magnetic field strength sensor
@@ -55,7 +55,7 @@ void AltimeterSensor_TEST::BasicAltimeterSensorCheck(
   physics::WorldPtr world = physics::get_world("default");
 
   sdf::ElementPtr sdf(new sdf::Element);
-  sdf::initFile("altimeter.sdf", sdf);
+  sdf::initFile("sensor.sdf", sdf);
   sdf::readString(altSensorString, sdf);
 
   // Create the IMU sensor
@@ -125,7 +125,7 @@ TEST_P(AltimeterSensor_TEST, BasicAltimeterSensorCheck)
 }
 
 /////////////////////////////////////////////////
-TEST_P(ImuSensor_TEST, NonzeroAltimeterSensorCheck)
+TEST_P(AltimeterSensor_TEST, NonzeroAltimeterSensorCheck)
 {
   NonzeroAltimeterSensorCheck(GetParam());
 }
