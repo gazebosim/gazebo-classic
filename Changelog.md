@@ -315,6 +315,7 @@ compilation on Windows.
     1. Make palette tips tooltip clickable to open.
         * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
         * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
+
     1. Add measurement unit to building inspectors.
         * [Pull request #1741](https://bitbucket.org/osrf/gazebo/pull-request/1741)
         * [Issue #1363](https://bitbucket.org/osrf/gazebo/issue/1363)
