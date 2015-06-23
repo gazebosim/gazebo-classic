@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _FIXEDJOINT_HH_
-#define _FIXEDJOINT_HH_
+#ifndef _GAZEBO_FIXEDJOINT_HH_
+#define _GAZEBO_FIXEDJOINT_HH_
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
@@ -38,7 +38,7 @@ namespace gazebo
       /// \param[in] _parent Parent link
       public: FixedJoint(BasePtr _parent) : T(_parent)
               { this->AddType(Base::FIXED_JOINT); }
-      ///  \brief Destructor
+      /// \brief Destructor
       public: virtual ~FixedJoint()
               { }
 
