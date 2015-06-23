@@ -150,34 +150,12 @@ class JointGetForceTorqueTest : public ServerFixture,
               axis->set_limit_lower(0.0);
               axis->set_limit_upper(0.0);
             }
-            // how to add provide_feedback ?
 
             physics::WorldPtr world = physics::get_world("default");
             physics::ModelPtr model =this->SpawnModel(msg);
 
             physics::JointPtr pJoint = model->GetJoint("joint");
             pJoint->SetProvideFeedback(true);
-
-            unsigned stepsToWait =  1000;
-
-            unsigned int stepCount = 0;
-            while (stepCount < stepsToWait &&
-                   !this->HasEntity(modelName))
-            {
-              world->Step(1);
-              stepCount++;
-              if (stepCount % 200 == 0)
-              {
-                gzwarn << "Waiting " << stepCount << " steps for "
-                       << "box to spawn." << std::endl;
-              }
-            }
-
-            if (this->HasEntity(modelName))
-              gzdbg << "box has spawned." << std::endl;
-
-
-
 
             return model;
           }
@@ -224,7 +202,7 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   // ode need some additional steps
   if ( _physicsEngine == "ode" )
   {
-      _world->Step(9);
+      _world->Step(15);
   }
 
   // bullet need some additional steps
@@ -375,7 +353,7 @@ TEST_P(JointGetForceTorqueTest, GetForceTorqueDemo)
 {
   GetForceTorqueDemo(GetParam());
 }
-
+//
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointGetForceTorqueTest,
                         PHYSICS_ENGINE_VALUES);
 
