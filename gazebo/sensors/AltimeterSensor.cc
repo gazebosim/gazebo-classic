@@ -111,14 +111,11 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
     math::Vector3 altVel = this->parentLink->GetWorldLinearVel(this->pose.pos);
 
     // Apply noise to the position and velocity 
-    double pos = this->noises[ALTIMETER_POSITION_NOISE_METERS].Apply(
-      this0-altPose.pos.z - refPos);
-    double vel = this->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S].Apply(
-      altVel.z);
-
-    // Set the IMU orientation
-    this->altMsg.mutable_vertical_position() = altPose.pos.z - refAlt;
-    this->altMsg.mutable_vertical_velocity() = altVel.z;
+    this->altMsg.mutable_vertical_position() = 
+      this->noises[ALTIMETER_POSITION_NOISE_METERS].Apply(
+        altPose.pos.z - this->altMsg.vertical_reference());
+    this->altMsg.mutable_vertical_velocity() = 
+      this->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S].Apply(altVel.z);
   }
 
   // Save the time of the measurement
@@ -146,11 +143,16 @@ double AltimeterSensor::GetVerticalVelocity()
 //////////////////////////////////////////////////
 double AltimeterSensor::GetReferenceAltitude()
 {
-  return _refAlt;
+  return this->altMsg.vertical_reference();
 }
 
 //////////////////////////////////////////////////
 void AltimeterSensor::SetReferenceAltitude(double _refAlt)
 {
-  this->refAlt = _refAlt;
+  // Recompute the last altitude
+  return this->altMsg.mutable_vertical_position() -= _refAlt 
+    - this->altMsg.vertical_reference();
+
+  // Save the new reference height
+  this->altMsg.mutable_vertical_reference() = _refAlt;
 }

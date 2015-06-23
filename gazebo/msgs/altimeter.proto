@@ -11,4 +11,5 @@ message Altimeter
   required Time stamp                = 1;
   required double vertical_position  = 2;
   required double vertical_velocity  = 3;
+  required double vertical_reference = 4;
 }
