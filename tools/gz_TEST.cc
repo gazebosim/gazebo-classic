@@ -653,7 +653,7 @@ TEST_F(gzTest, SDF)
 
 
   path = TEST_PATH;
-  path /= "worlds/empty_different_name.world";
+  path /= "worlds/box_plane_low_friction_test.world";
 
   {
     // Check empty.world
@@ -670,7 +670,7 @@ TEST_F(gzTest, SDF)
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "7591115673a2f1d525ea3674ce42707db67b8fcb");
+    EXPECT_EQ(shasum, "ea127f9858a5e07c40ef6d949ef6113236adddfa");
   }
 
   path = PROJECT_BINARY_PATH;
