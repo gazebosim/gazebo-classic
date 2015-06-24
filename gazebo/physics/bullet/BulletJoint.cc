@@ -48,7 +48,9 @@ BulletJoint::BulletJoint(BasePtr _parent)
 BulletJoint::~BulletJoint()
 {
   delete this->constraint;
+  this->constraint = NULL;
   delete this->feedback;
+  this->feedback = NULL;
   this->bulletWorld = NULL;
 }
 
@@ -144,6 +146,7 @@ void BulletJoint::Detach()
   if (this->constraint && this->bulletWorld)
     this->bulletWorld->removeConstraint(this->constraint);
   delete this->constraint;
+  this->constraint = NULL;
 }
 
 void BulletJoint::SetProvideFeedback(bool _enable)
