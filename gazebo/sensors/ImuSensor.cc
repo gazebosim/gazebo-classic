@@ -37,6 +37,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
@@ -102,11 +103,11 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         rateElem->AddAttribute("type","string","gaussian",true);
 
         // Create the noise streams
-        this->noises[IMU_ANGVEL_X_NOISE_RAD_PER_S] = 
+        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] = 
           NoiseFactory::NewNoiseModel(rateElem);
-        this->noises[IMU_ANGVEL_Y_NOISE_RAD_PER_S] = 
+        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S] = 
           NoiseFactory::NewNoiseModel(rateElem);
-        this->noises[IMU_ANGVEL_Z_NOISE_RAD_PER_S] = 
+        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S] = 
           NoiseFactory::NewNoiseModel(rateElem);
 
         // Rename noise -> rate to enforce forward compatibility
@@ -142,31 +143,31 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   {
 
     // If a linear acceleration noise model has been specified, create it 
-    if (imuElem->HasElement("linear_acceleration"))
+    if (imuElem->HasElement("angular_velocity"))
     {
-      sdf::ElementPtr rE = noiseElem->GetElement("linear_acceleration");
-      if (accelElem->HasElement("x"))
-        this->noises[IMU_ANGVEL_X_NOISE_RAD_PER_S] = 
+      sdf::ElementPtr rE = imuElem->GetElement("linear_acceleration");
+      if (rE->HasElement("x"))
+        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] = 
           NoiseFactory::NewNoiseModel(rE->GetElement("x")->GetElement("noise"));
-      if (accelElem->HasElement("y"))
-        this->noises[IMU_ANGVEL_Y_NOISE_RAD_PER_S] = 
+      if (rE->HasElement("y"))
+        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S] = 
           NoiseFactory::NewNoiseModel(rE->GetElement("y")->GetElement("noise"));
-      if (accelElem->HasElement("z"))
-        this->noises[IMU_ANGVEL_Z_NOISE_RAD_PER_S] = 
+      if (rE->HasElement("z"))
+        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S] = 
           NoiseFactory::NewNoiseModel(rE->GetElement("z")->GetElement("noise"));
     }
 
     // If a linear acceleration noise model has been specified, create it 
     if (imuElem->HasElement("linear_acceleration"))
     {
-      sdf::ElementPtr aE = noiseElem->GetElement("linear_acceleration");
-      if (accelElem->HasElement("x"))
+      sdf::ElementPtr aE = imuElem->GetElement("linear_acceleration");
+      if (aE->HasElement("x"))
         this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR] = 
           NoiseFactory::NewNoiseModel(aE->GetElement("x")->GetElement("noise"));
-      if (accelElem->HasElement("y"))
+      if (aE->HasElement("y"))
         this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR] = 
           NoiseFactory::NewNoiseModel(aE->GetElement("y")->GetElement("noise"));
-      if (accelElem->HasElement("z"))
+      if (aE->HasElement("z"))
         this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR] = 
           NoiseFactory::NewNoiseModel(aE->GetElement("z")->GetElement("noise"));
     }
@@ -318,18 +319,17 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     // Set the IMU orientation
     msgs::Set(this->imuMsg.mutable_orientation(),
               (imuPose - this->referencePose).rot);
-
     this->lastLinearVel = imuWorldLinearVel;
 
     // Perturb the angular velocity
     this->imuMsg.mutable_angular_velocity()->set_x(
-      this->noises[IMU_ANGVEL_X_NOISE_RAD_PER_S]->Apply(
+      this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S]->Apply(
         this->imuMsg.angular_velocity().x()));
     this->imuMsg.mutable_angular_velocity()->set_y(
-      this->noises[IMU_ANGVEL_Y_NOISE_RAD_PER_S]->Apply(
+      this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S]->Apply(
         this->imuMsg.angular_velocity().y()));
     this->imuMsg.mutable_angular_velocity()->set_z(
-      this->noises[IMU_ANGVEL_Z_NOISE_RAD_PER_S]->Apply(
+      this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S]->Apply(
         this->imuMsg.angular_velocity().z()));
 
     // Perturb the linear acceleration
