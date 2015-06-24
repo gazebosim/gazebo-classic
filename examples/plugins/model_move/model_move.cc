@@ -143,7 +143,8 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       // Ready to start the move. Store the initial pose of the model
       // and call initiateMove
       ignition::math::Vector3d sdf_pose =
-        _sdf->GetParent()->GetElement("pose")->Get<ignition::math::Pose3d>().Pos();
+        _sdf->GetParent()->GetElement("pose")
+            ->Get<ignition::math::Pose3d>().Pos();
       this->start_position =
         math::Vector3(sdf_pose.X(), sdf_pose.Y(), sdf_pose.Z());
 
