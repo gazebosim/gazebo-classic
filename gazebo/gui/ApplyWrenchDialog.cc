@@ -416,9 +416,13 @@ void ApplyWrenchDialog::Init(const std::string &_modelName,
   }
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
-  connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
-  connect(g_translateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
-  connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+
+  if (g_rotateAct)
+    connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  if (g_translateAct)
+    connect(g_translateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  if (g_scaleAct)
+    connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
 
   this->move(QCursor::pos());
   this->show();
@@ -763,7 +767,7 @@ void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
-    bool _rotatedByMouse)
+    const bool _rotatedByMouse)
 {
   // This can be called from the dialog or the mouse
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -801,7 +805,7 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
-    bool _rotatedByMouse)
+    const bool _rotatedByMouse)
 {
   // This can be called from the dialog or the mouse
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -926,7 +930,7 @@ void ApplyWrenchDialog::AttachVisuals()
 }
 
 /////////////////////////////////////////////////
-bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent & _event)
+bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera || !this->dataPtr->applyWrenchVisual)
@@ -1164,7 +1168,8 @@ void ApplyWrenchDialog::SetActive(bool _active)
     event::Events::setSelectedEntity(this->dataPtr->linkName, "normal");
 
     // Set arrow mode
-    g_arrowAct->trigger();
+    if (g_arrowAct)
+      g_arrowAct->trigger();
 
     MouseEventHandler::Instance()->AddPressFilter(
         "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),

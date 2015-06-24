@@ -157,13 +157,13 @@ namespace gazebo
       /// \param[in] _force New force.
       /// \param[in] _rotatedByMouse Rot tool has been rotated by the mouse.
       private: void SetForce(const math::Vector3 &_force,
-          bool _rotatedByMouse = false);
+          const bool _rotatedByMouse = false);
 
       /// \brief Set torque vector, send it to visuals and update spins.
       /// \param[in] _torque New torque.
       /// \param[in] _rotatedByMouse Rot tool has been rotated by the mouse.
       private: void SetTorque(const math::Vector3 &_torque,
-          bool _rotatedByMouse = false);
+          const bool _rotatedByMouse = false);
 
       /// \brief Callback on prerender to check if target link hasn't been
       /// deleted.

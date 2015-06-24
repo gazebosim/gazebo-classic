@@ -273,7 +273,7 @@ void ApplyWrenchVisual::SetForcePos(const math::Vector3 &_forcePosVector)
 
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector,
-    bool _rotatedByMouse)
+    const bool _rotatedByMouse)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -296,7 +296,7 @@ void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector,
 
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::SetTorque(const math::Vector3 &_torqueVector,
-    bool _rotatedByMouse)
+    const bool _rotatedByMouse)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);

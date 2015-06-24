@@ -74,14 +74,14 @@ namespace gazebo
       /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
       /// or not.
       public: void SetForce(const math::Vector3 &_forceVector,
-          bool _rotatedByMouse);
+          const bool _rotatedByMouse);
 
       /// \brief Update torque vector, torque text and mode.
       /// \param[in] _torqueVector New vector.
       /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
       /// or not.
       public: void SetTorque(const math::Vector3 &_torqueVector,
-          bool _rotatedByMouse);
+          const bool _rotatedByMouse);
 
       /// \brief Update the force visual according to the force and force
       /// position vectors.
