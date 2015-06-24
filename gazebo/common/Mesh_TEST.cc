@@ -256,7 +256,7 @@ TEST_F(MeshTest, MeshMove)
   common::Mesh *mesh = loader.Load(
       std::string(PROJECT_SOURCE_PATH) + "/test/data/box_offset.dae");
 
-  // The default location of the box_offest is not centered
+  // The default location of the box_offset is not centered
   EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->Max());
   EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->Min());
 

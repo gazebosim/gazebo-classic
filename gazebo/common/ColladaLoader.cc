@@ -305,7 +305,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
       iss >> axis.X() >> axis.Y() >> axis.Z();
       iss >> angle;
       mat.Axis(axis, IGN_DTOR(angle));
-      ignition::math::Matrix4d mat4;
+      ignition::math::Matrix4d mat4(ignition::math::Matrix4d::Identity);
       mat4 = mat;
 
       transform = transform * mat4;
