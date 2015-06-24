@@ -20,6 +20,8 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -45,11 +47,11 @@ void ModelMove::move(const math::Vector3 &start, const math::Vector3 &end,
   for (int i = 1; i <= duration; i++)
   {
     gazebo::common::PoseKeyFrame * key = anim->CreateKeyFrame(i+curr_frame);
-    key->SetTranslation(math::Vector3(
+    key->Translation(ignition::math::Vector3d(
          translation.x + x_step * i,
          translation.y + y_step * i,
          translation.z + z_step * i));
-    key->SetRotation(math::Quaternion(0, 0, 0));
+    key->Rotation(ignition::math::Quaterniond(0, 0, 0));
   }
 
   translation.Set(translation.x + x_step*duration,
@@ -75,8 +77,8 @@ void ModelMove::initiateMove()
 
   // set starting location of the box
   key = anim->CreateKeyFrame(0);
-  key->SetTranslation(math::Vector3(0, 0, 0));
-  key->SetRotation(math::Quaternion(0, 0, 0));
+  key->Translation(ignition::math::Vector3d(0, 0, 0));
+  key->Rotation(ignition::math::Quaterniond(0, 0, 0));
 
   math::Vector3 translation = math::Vector3(0, 0, 0);
 
@@ -140,10 +142,10 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       // Ready to start the move. Store the initial pose of the model
       // and call initiateMove
-      sdf::Vector3 sdf_pose =
-        _sdf->GetParent()->GetElement("pose")->Get<sdf::Pose>().pos;
+      ignition::math::Vector3d sdf_pose =
+        _sdf->GetParent()->GetElement("pose")->Get<ignition::math::Pose3d>().Pos();
       this->start_position =
-        math::Vector3(sdf_pose.x, sdf_pose.y, sdf_pose.z);
+        math::Vector3(sdf_pose.X(), sdf_pose.Y(), sdf_pose.Z());
 
       initiateMove();
     }

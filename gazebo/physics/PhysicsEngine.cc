@@ -225,12 +225,16 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     else if (_key == "gravity")
     {
       boost::any copy = _value;
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       if (_value.type() == typeid(sdf::Vector3))
       {
         copy = boost::lexical_cast<math::Vector3>
             (boost::any_cast<sdf::Vector3>(_value));
       }
-      this->SetGravity(boost::any_cast<math::Vector3>(copy));
+      this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else if (_key == "magnetic_field")
     {
@@ -240,8 +244,11 @@ bool PhysicsEngine::SetParam(const std::string &_key,
         copy = boost::lexical_cast<math::Vector3>
             (boost::any_cast<sdf::Vector3>(_value));
       }
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
       this->sdf->GetElement("magnetic_field")->
-          Set(boost::any_cast<math::Vector3>(copy));
+          Set(boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else
     {
