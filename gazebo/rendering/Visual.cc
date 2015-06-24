@@ -2013,7 +2013,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
 
       // Recenter the vertices if requested.
       if (_centerSubmesh)
-        subMesh.Center();
+        subMesh.Center(ignition::math::Vector3d::Zero);
 
       ogreSubMesh = ogreMesh->createSubMesh();
       ogreSubMesh->useSharedVertices = false;
