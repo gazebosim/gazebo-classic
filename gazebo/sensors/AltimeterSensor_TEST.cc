@@ -39,7 +39,6 @@ static std::string altSensorString =
 "    <always_on>1</always_on>"
 "    <update_rate>10.0</update_rate>"
 "    <altimeter>"
-"      <topic>/test_altimeter</topic>"
 "    </altimeter>"
 "  </sensor>"
 "</sdf>";

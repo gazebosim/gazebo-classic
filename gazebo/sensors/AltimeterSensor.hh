@@ -78,6 +78,9 @@ namespace gazebo
       /// \param[in] _refAlt reference altitude
       public: void SetReferenceAltitude(double _refAlt);
 
+      /// \brief Mutex to protect reads and writes.
+      private: mutable boost::mutex mutex;
+      
       /// \brief GPS data publisher.
       private: transport::PublisherPtr altPub;
 

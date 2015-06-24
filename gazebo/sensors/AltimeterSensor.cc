@@ -85,6 +85,7 @@ void AltimeterSensor::Load(const std::string &_worldName)
   }
 
   // Initialise reference altitude
+  boost::mutex::scoped_lock lock(this->mutex);
   this->altMsg.set_vertical_reference(
      (this->pose + this->parentLink->GetWorldPose()).pos.z);
 }
@@ -105,6 +106,8 @@ void AltimeterSensor::Init()
 //////////////////////////////////////////////////
 bool AltimeterSensor::UpdateImpl(bool /*_force*/)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   // Get latest pose information
   if (this->parentLink)
   {
@@ -133,24 +136,29 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 double AltimeterSensor::GetVerticalPosition()
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   return this->altMsg.vertical_position(); 
 }
 
 //////////////////////////////////////////////////
 double AltimeterSensor::GetVerticalVelocity()
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   return this->altMsg.vertical_velocity();
 }
 
 //////////////////////////////////////////////////
 double AltimeterSensor::GetReferenceAltitude()
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   return this->altMsg.vertical_reference();
 }
 
 //////////////////////////////////////////////////
 void AltimeterSensor::SetReferenceAltitude(double _refAlt)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   // Recompute the last altitude with the new vertical reference height
   this->altMsg.set_vertical_position(this->altMsg.vertical_position() 
     - (_refAlt - this->altMsg.vertical_reference()));
