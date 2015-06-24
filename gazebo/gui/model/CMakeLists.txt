@@ -10,6 +10,7 @@ set (sources
   CollisionConfig.cc
   ExtrudeDialog.cc
   ImportDialog.cc
+  JointCreationDialog.cc
   JointInspector.cc
   JointMaker.cc
   LinkConfig.cc
@@ -26,6 +27,7 @@ set (qt_headers
   CollisionConfig.hh
   ExtrudeDialog.hh
   ImportDialog.hh
+  JointCreationDialog.hh
   JointInspector.hh
   JointMaker.hh
   LinkConfig.hh

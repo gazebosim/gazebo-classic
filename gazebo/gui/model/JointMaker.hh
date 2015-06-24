@@ -48,6 +48,7 @@ namespace gazebo
   namespace gui
   {
     class JointData;
+    class JointCreationDialog;
     class JointInspector;
 
     /// \addtogroup gazebo_gui
@@ -326,6 +327,9 @@ namespace gazebo
 
       /// \brief A map of joint type to its string value.
       private: static std::map<JointMaker::JointType, std::string> jointTypes;
+
+      /// \brief Inspector for configuring joint properties.
+      public: JointCreationDialog *jointCreationDialog;
     };
     /// \}
 
