@@ -208,13 +208,16 @@ void Scene::Clear()
   delete this->dataPtr->terrain;
   this->dataPtr->terrain = NULL;
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
-
   while (!this->dataPtr->visuals.empty())
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
 
   this->dataPtr->visuals.clear();
+
+  if (this->dataPtr->originVisual)
+  {
+    this->dataPtr->originVisual->Fini();
+    this->dataPtr->originVisual.reset();
+  }
 
   if (this->dataPtr->worldVisual)
   {
@@ -238,6 +241,9 @@ void Scene::Clear()
   for (unsigned int i = 0; i < this->dataPtr->userCameras.size(); ++i)
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
+
+  delete this->dataPtr->skyx;
+  this->dataPtr->skyx = NULL;
 
   RTShaderSystem::Instance()->RemoveScene(this->GetName());
   RTShaderSystem::Instance()->Clear();
@@ -1517,7 +1523,6 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
   }
-
   return true;
 }
 
@@ -1527,11 +1532,11 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
   std::string modelName, linkName;
 
   modelName = _msg.name() + "::";
-  for (int j = 0; j < _msg.visual_size(); j++)
+  for (int j = 0; j < _msg.visual_size(); ++j)
   {
     boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
           _msg.visual(j)));
-    this->dataPtr->visualMsgs.push_back(vm);
+    this->dataPtr->modelVisualMsgs.push_back(vm);
   }
 
   // Set the scale of the model visual
@@ -1546,16 +1551,16 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     vm->mutable_scale()->set_x(_msg.scale().x());
     vm->mutable_scale()->set_y(_msg.scale().y());
     vm->mutable_scale()->set_z(_msg.scale().z());
-    this->dataPtr->visualMsgs.push_back(vm);
+    this->dataPtr->modelVisualMsgs.push_back(vm);
   }
 
-  for (int j = 0; j < _msg.joint_size(); j++)
+  for (int j = 0; j < _msg.joint_size(); ++j)
   {
     boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(
           _msg.joint(j)));
     this->dataPtr->jointMsgs.push_back(jm);
 
-    for (int k = 0; k < _msg.joint(j).sensor_size(); k++)
+    for (int k = 0; k < _msg.joint(j).sensor_size(); ++k)
     {
       boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
             _msg.joint(j).sensor(k)));
@@ -1563,7 +1568,7 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     }
   }
 
-  for (int j = 0; j < _msg.link_size(); j++)
+  for (int j = 0; j < _msg.link_size(); ++j)
   {
     linkName = modelName + _msg.link(j).name();
 
@@ -1590,25 +1595,33 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
       this->dataPtr->linkMsgs.push_back(lm);
     }
 
-    for (int k = 0; k < _msg.link(j).visual_size(); k++)
+    if (_msg.link(j).visual_size() > 0)
+    {
+      // note: the first visual in the link is the link visual
+      msgs::VisualPtr vm(new msgs::Visual(
+            _msg.link(j).visual(0)));
+      this->dataPtr->linkVisualMsgs.push_back(vm);
+    }
+
+    for (int k = 1; k < _msg.link(j).visual_size(); ++k)
     {
       boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
             _msg.link(j).visual(k)));
       this->dataPtr->visualMsgs.push_back(vm);
     }
 
-    for (int k = 0; k < _msg.link(j).collision_size(); k++)
+    for (int k = 0; k < _msg.link(j).collision_size(); ++k)
     {
       for (int l = 0;
           l < _msg.link(j).collision(k).visual_size(); l++)
       {
         boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
               _msg.link(j).collision(k).visual(l)));
-        this->dataPtr->visualMsgs.push_back(vm);
+        this->dataPtr->collisionVisualMsgs.push_back(vm);
       }
     }
 
-    for (int k = 0; k < _msg.link(j).sensor_size(); k++)
+    for (int k = 0; k < _msg.link(j).sensor_size(); ++k)
     {
       boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
             _msg.link(j).sensor(k)));
@@ -1696,7 +1709,10 @@ void Scene::PreRender()
   ModelMsgs_L modelMsgsCopy;
   SensorMsgs_L sensorMsgsCopy;
   LightMsgs_L lightMsgsCopy;
+  VisualMsgs_L modelVisualMsgsCopy;
+  VisualMsgs_L linkVisualMsgsCopy;
   VisualMsgs_L visualMsgsCopy;
+  VisualMsgs_L collisionVisualMsgsCopy;
   JointMsgs_L jointMsgsCopy;
   LinkMsgs_L linkMsgsCopy;
 
@@ -1720,11 +1736,26 @@ void Scene::PreRender()
               std::back_inserter(lightMsgsCopy));
     this->dataPtr->lightMsgs.clear();
 
+    std::copy(this->dataPtr->modelVisualMsgs.begin(),
+              this->dataPtr->modelVisualMsgs.end(),
+              std::back_inserter(modelVisualMsgsCopy));
+    this->dataPtr->modelVisualMsgs.clear();
+
+    std::copy(this->dataPtr->linkVisualMsgs.begin(),
+              this->dataPtr->linkVisualMsgs.end(),
+              std::back_inserter(linkVisualMsgsCopy));
+    this->dataPtr->linkVisualMsgs.clear();
+
     this->dataPtr->visualMsgs.sort(VisualMessageLessOp);
     std::copy(this->dataPtr->visualMsgs.begin(),
               this->dataPtr->visualMsgs.end(),
               std::back_inserter(visualMsgsCopy));
     this->dataPtr->visualMsgs.clear();
+
+    std::copy(this->dataPtr->collisionVisualMsgs.begin(),
+              this->dataPtr->collisionVisualMsgs.end(),
+              std::back_inserter(collisionVisualMsgsCopy));
+    this->dataPtr->collisionVisualMsgs.clear();
 
     std::copy(this->dataPtr->jointMsgs.begin(), this->dataPtr->jointMsgs.end(),
               std::back_inserter(jointMsgsCopy));
@@ -1776,11 +1807,45 @@ void Scene::PreRender()
       ++lightIter;
   }
 
+  // Process the model visual messages.
+  for (visualIter = modelVisualMsgsCopy.begin();
+      visualIter != modelVisualMsgsCopy.end();)
+  {
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_MODEL))
+      modelVisualMsgsCopy.erase(visualIter++);
+    else
+      ++visualIter;
+  }
+
+  // Process the link visual messages.
+  for (visualIter = linkVisualMsgsCopy.begin();
+      visualIter != linkVisualMsgsCopy.end();)
+  {
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_LINK))
+      linkVisualMsgsCopy.erase(visualIter++);
+    else
+      ++visualIter;
+  }
+
   // Process the visual messages.
   for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter))
+    Visual::VisualType visualType = Visual::VT_VISUAL;
+    if ((*visualIter)->has_type())
+      visualType = Visual::ConvertVisualType((*visualIter)->type());
+
+    if (this->ProcessVisualMsg(*visualIter, visualType))
       visualMsgsCopy.erase(visualIter++);
+    else
+      ++visualIter;
+  }
+
+  // Process the collision visual messages.
+  for (visualIter = collisionVisualMsgsCopy.begin();
+      visualIter != collisionVisualMsgsCopy.end();)
+  {
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_COLLISION))
+      collisionVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
   }
@@ -1826,8 +1891,17 @@ void Scene::PreRender()
     std::copy(lightMsgsCopy.begin(), lightMsgsCopy.end(),
         std::front_inserter(this->dataPtr->lightMsgs));
 
+    std::copy(modelVisualMsgsCopy.begin(), modelVisualMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->modelVisualMsgs));
+
+    std::copy(linkVisualMsgsCopy.begin(), linkVisualMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->linkVisualMsgs));
+
     std::copy(visualMsgsCopy.begin(), visualMsgsCopy.end(),
         std::front_inserter(this->dataPtr->visualMsgs));
+
+    std::copy(collisionVisualMsgsCopy.begin(), collisionVisualMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->collisionVisualMsgs));
 
     std::copy(jointMsgsCopy.begin(), jointMsgsCopy.end(),
         std::front_inserter(this->dataPtr->jointMsgs));
@@ -2144,6 +2218,8 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->sceneMsgs.push_back(sm);
   this->dataPtr->requestMsg = NULL;
 }
@@ -2368,7 +2444,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
+bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 {
   bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
@@ -2461,6 +2537,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     {
       result = true;
       visual->LoadFromMsg(_msg);
+      visual->SetType(_type);
 
       this->dataPtr->visuals[visual->GetId()] = visual;
       if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
@@ -2570,6 +2647,9 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
   if (!this->dataPtr->skyx)
     return;
+
+  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
+  this->dataPtr->skyx->update(0);
 
   this->dataPtr->skyx->setVisible(true);
 
@@ -2708,9 +2788,6 @@ void Scene::SetSky()
   // vclouds->getLightningManager()->setLightningTimeMultiplier(
   //    preset.vcLightningsTM);
 
-  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
-
-  this->dataPtr->skyx->update(0);
   this->dataPtr->skyx->setVisible(false);
 }
 
@@ -2819,6 +2896,8 @@ void Scene::RemoveVisual(uint32_t _id)
       else
         ++piter;
     }
+
+    this->RemoveVisualizations(vis);
 
     vis->Fini();
     this->dataPtr->visuals.erase(iter);
@@ -2949,10 +3028,27 @@ void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 {
   InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
-      "_Inertia_VISUAL__", _linkVisual));
+      "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_elem);
   inertiaVis->SetVisible(false);
   this->dataPtr->visuals[inertiaVis->GetId()] = inertiaVis;
+}
+
+/////////////////////////////////////////////////
+void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
+{
+  std::vector<VisualPtr> toRemove;
+  for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr childVis = _vis->GetChild(i);
+    Visual::VisualType visType = childVis->GetType();
+    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
+    {
+      toRemove.push_back(childVis);
+    }
+  }
+  for (auto vis : toRemove)
+    this->RemoveVisual(vis);
 }
 
 /////////////////////////////////////////////////

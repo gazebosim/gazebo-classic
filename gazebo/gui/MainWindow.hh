@@ -22,8 +22,11 @@
 #include <vector>
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/DataLogger.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -210,6 +213,9 @@ namespace gazebo
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
 
+      /// \brief QT callback when the data logger is shut down.
+      private slots: void OnDataLoggerClosed();
+
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
@@ -350,6 +356,9 @@ namespace gazebo
 
       /// \brief Splitter for the main window.
       private: QSplitter *splitter;
+
+      /// \brief Data logger dialog.
+      private: gui::DataLogger *dataLogger;
     };
   }
 }

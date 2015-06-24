@@ -20,9 +20,8 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/test/ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "gazebo/gazebo_config.h"
-
 using namespace gazebo;
 
 const double g_friction_tolerance = 1e-3;
