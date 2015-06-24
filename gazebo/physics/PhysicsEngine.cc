@@ -231,7 +231,7 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 #endif
       if (_value.type() == typeid(sdf::Vector3))
       {
-        copy = boost::lexical_cast<math::Vector3>
+        copy = boost::lexical_cast<ignition::math::Vector3d>
             (boost::any_cast<sdf::Vector3>(_value));
       }
       this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
@@ -273,9 +273,11 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
+boost::any PhysicsEngine::GetParam(const std::string &_key) const
 {
-  return 0;
+  boost::any value;
+  this->PhysicsEngine::GetParam(_key, value);
+  return value;
 }
 
 //////////////////////////////////////////////////

@@ -119,25 +119,31 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
       double maxStepSize = 0.02;
       double realTimeUpdateRate = 0.03;
       double realTimeFactor = 0.04;
-      gazebo::math::Vector3 gravity(0, 0, 0);
-      gazebo::math::Vector3 magneticField(0.1, 0.1, 0.1);
+      ignition::math::Vector3d gravity(0, 0, 0);
+      ignition::math::Vector3d magneticField(0.1, 0.1, 0.1);
+      gzdbg << "Set and Get max_step_size" << std::endl;
       EXPECT_TRUE(physics->SetParam("max_step_size", maxStepSize));
       EXPECT_TRUE(physics->GetParam("max_step_size", value));
       EXPECT_NEAR(boost::any_cast<double>(value), maxStepSize, 1e-6);
+      gzdbg << "Set and Get real_time_update_rate" << std::endl;
       EXPECT_TRUE(physics->SetParam("real_time_update_rate",
           realTimeUpdateRate));
       EXPECT_TRUE(physics->GetParam("real_time_update_rate", value));
       EXPECT_NEAR(boost::any_cast<double>(value), realTimeUpdateRate, 1e-6);
+      gzdbg << "Set and Get real_time_factor" << std::endl;
       EXPECT_TRUE(physics->SetParam("real_time_factor",
           realTimeFactor));
       EXPECT_TRUE(physics->GetParam("real_time_factor", value));
       EXPECT_NEAR(boost::any_cast<double>(value), realTimeFactor, 1e-6);
+      gzdbg << "Set and Get gravity" << std::endl;
       EXPECT_TRUE(physics->SetParam("gravity", gravity));
       EXPECT_TRUE(physics->GetParam("gravity", value));
-      EXPECT_EQ(boost::any_cast<gazebo::math::Vector3>(value), gravity);
+      EXPECT_EQ(boost::any_cast<math::Vector3>(value), math::Vector3(gravity));
+      gzdbg << "Set and Get magnetic_field" << std::endl;
       EXPECT_TRUE(physics->SetParam("magnetic_field", magneticField));
       EXPECT_TRUE(physics->GetParam("magnetic_field", value));
-      EXPECT_EQ(boost::any_cast<gazebo::math::Vector3>(value), magneticField);
+      EXPECT_EQ(boost::any_cast<math::Vector3>(value),
+                math::Vector3(magneticField));
     }
     catch(boost::bad_any_cast &_e)
     {
