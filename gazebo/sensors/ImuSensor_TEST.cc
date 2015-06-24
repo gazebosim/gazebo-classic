@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
 #define TOL 1e-4
