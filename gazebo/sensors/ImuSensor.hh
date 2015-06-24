@@ -119,42 +119,6 @@ namespace gazebo
 
       /// \brief True if new link data is received
       private: bool dataDirty;
-
-      /// \brief Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-
-      /// \brief If true, apply the noise model specified by other noise
-      /// parameters
-      private: bool noiseActive;
-
-      /// \brief Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
-
-      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
-      /// from which we sample when adding noise to accelerations
-      private: double accelNoiseMean;
-
-      /// \brief If accelNoiseType==GAUSSIAN, the standard devation of the
-      /// distibution from which we sample when adding noise to accelerations
-      private: double accelNoiseStdDev;
-
-      /// \brief If noiseType==GAUSSIAN, the bias we'll add to acceleratations
-      private: double accelBias;
-
-      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
-      /// from which we sample when adding noise to rates
-      private: double rateNoiseMean;
-
-      /// \brief If noiseType==GAUSSIAN, the standard devation of the
-      /// distibution from which we sample when adding noise to rates
-      private: double rateNoiseStdDev;
-
-      /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
-      private: double rateBias;
     };
     /// \}
   }

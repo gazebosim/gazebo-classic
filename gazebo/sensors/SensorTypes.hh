@@ -220,7 +220,32 @@ namespace gazebo
 
       /// \brief Noise streams for the ray sensor
       /// \sa RaySensor
-      RAY_NOISE = 9
+      RAY_NOISE = 9,
+
+      /// \brief IMU angular velocity X noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_X_NOISE_RADIANS_PER_S = 10,
+
+      /// \brief IMU angular velocity Y noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_Y_NOISE_RADIANS_PER_S = 11,
+
+      /// \brief IMU angular velocity Z noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_Z_NOISE_RADIANS_PER_S = 12,
+
+      /// \brief IMU linear acceleration X noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_X_NOISE_METERS_PER_S_SQR = 10,
+
+      /// \brief IMU linear acceleration Y noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_Y_NOISE_METERS_PER_S_SQR = 11,
+
+      /// \brief IMU linear acceleration Z noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 12
+
     };
     /// \}
   }
