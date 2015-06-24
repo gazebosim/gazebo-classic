@@ -1108,20 +1108,40 @@ size_t Model::GetGripperCount() const
 }
 
 /////////////////////////////////////////////////
+math::Vector3 Model::GetWorldAngularMomentum(const math::Vector3 &_point) const
+{
+  math::Vector3 momentum;
+  for (auto const &link : this->links)
+  {
+    momentum += link->GetWorldAngularMomentum(_point);
+  }
+  return momentum;
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Model::GetWorldLinearMomentum() const
+{
+  math::Vector3 momentum;
+  for (auto const &link : this->links)
+  {
+    momentum += link->GetWorldLinearMomentum();
+  }
+  return momentum;
+}
+
+/////////////////////////////////////////////////
 double Model::GetWorldEnergyPotential() const
 {
   double e = 0;
-  for (Link_V::const_iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
+  for (auto const &link : this->links)
   {
-    e += (*iter)->GetWorldEnergyPotential();
+    e += link->GetWorldEnergyPotential();
   }
-  for (Joint_V::const_iterator iter = this->joints.begin();
-    iter != this->joints.end(); ++iter)
+  for (auto const &joint : this->joints)
   {
-    for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
+    for (unsigned int j = 0; j < joint->GetAngleCount(); ++j)
     {
-      e += (*iter)->GetWorldEnergyPotentialSpring(j);
+      e += joint->GetWorldEnergyPotentialSpring(j);
     }
   }
   return e;
@@ -1131,10 +1151,9 @@ double Model::GetWorldEnergyPotential() const
 double Model::GetWorldEnergyKinetic() const
 {
   double e = 0;
-  for (Link_V::const_iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
+  for (auto const &link : this->links)
   {
-    e += (*iter)->GetWorldEnergyKinetic();
+    e += link->GetWorldEnergyKinetic();
   }
   return e;
 }

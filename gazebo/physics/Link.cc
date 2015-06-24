@@ -619,9 +619,26 @@ math::Vector3 Link::GetWorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearMomentum() const
+{
+  math::Vector3 result;
+  if (this->inertial)
+    result = this->inertial->GetMass() * this->GetWorldCoGLinearVel();
+  return result;
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularMomentum() const
 {
   return this->GetWorldInertiaMatrix() * this->GetWorldAngularVel();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Link::GetWorldAngularMomentum(const math::Vector3 &_point) const
+{
+  math::Vector3 cogOffset = this->GetWorldCoGPose().pos - _point;
+  return this->GetWorldAngularMomentum() +
+    cogOffset.Cross(this->GetWorldLinearMomentum());
 }
 
 //////////////////////////////////////////////////

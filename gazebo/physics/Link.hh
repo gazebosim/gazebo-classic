@@ -256,12 +256,31 @@ namespace gazebo
       /// \return Angular acceleration of the body.
       public: math::Vector3 GetRelativeAngularAccel() const;
 
+      /// \brief Get the linear momentum of the body CoG in the world frame,
+      /// which is computed as (m * v), where
+      /// m: mass
+      /// v: linear velocity of CoG in world frame
+      /// \return Linear momentum of the body.
+      public: math::Vector3 GetWorldLinearMomentum() const;
+
       /// \brief Get the angular momentum of the body CoG in the world frame,
       /// which is computed as (I * w), where
       /// I: inertia matrix in world frame
       /// w: angular velocity in world frame
       /// \return Angular momentum of the body.
       public: math::Vector3 GetWorldAngularMomentum() const;
+
+      /// \brief Get the angular momentum of the link with respect to a specific
+      /// point, with all quantities expressed in the world frame.
+      /// This is computed as (I * w + r x p), where
+      /// I: inertia matrix in world frame
+      /// w: angular velocity in world frame
+      /// r: position vector from _point to body CoG in world frame
+      /// p: linear momentum in world frame
+      /// \param[in] _point Reference point for angular momentum.
+      /// \return Angular momentum of the body about _point.
+      public: math::Vector3 GetWorldAngularMomentum(const math::Vector3 &_point)
+                const;
 
       /// \brief Get the angular acceleration of the body in the world
       /// frame.

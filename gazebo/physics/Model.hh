@@ -311,6 +311,17 @@ namespace gazebo
       /// \sa Model::GetGripper()
       public: size_t GetGripperCount() const;
 
+      /// \brief Get the sum of linear momenta for all links in the model.
+      /// \return Total linear momentum of the model.
+      public: math::Vector3 GetWorldLinearMomentum() const;
+
+      /// \brief Get the sum of angular momenta for all links in the model
+      /// with respect to _point.
+      /// \param[in] _point Reference point for angular momentum.
+      /// \return Total angular momentum of the model about _point.
+      public: math::Vector3 GetWorldAngularMomentum(const math::Vector3 &_point)
+                const;
+
       /// \brief Returns the potential energy of all links
       /// and joint springs in the model.
       /// \return this link's potential energy,
