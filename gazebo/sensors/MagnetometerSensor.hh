@@ -62,10 +62,13 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
-      /// \brief Accessor for current amagnetic field in Tesla
+      /// \brief Accessor for current magnetic field in Tesla
       /// \return Current magnetic field
-      public: math::Vector3 MagnetometerSensor::GetMagneticField()  const;
+      public: math::Vector3 GetMagneticField()  const;
 
+      /// \brief Mutex to protect reads and writes.
+      private: mutable boost::mutex mutex;
+      
       /// \brief GPS data publisher.
       private: transport::PublisherPtr magPub;
 
@@ -76,7 +79,7 @@ namespace gazebo
       private: physics::LinkPtr parentLink;
 
       /// \brief Stores most recent magnetometer sensor data.
-      private: msgs::Magnetometer lastMagMsg;
+      private: msgs::Magnetometer magMsg;
     };
     /// \}
   }

@@ -27,7 +27,7 @@
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
-#include "gazebo/sensors/noise/Noise.hh"
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/MagnetometerSensor.hh"
 
 using namespace gazebo;
@@ -60,8 +60,6 @@ void MagnetometerSensor::Load(const std::string &_worldName)
   physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
   this->parentLink = boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
-  this->lastMagnetometerMsg.set_link_name(this->parentName);
-
   this->topicName = "~/" + this->parentName + '/' + this->GetName();
   if (this->sdf->HasElement("topic"))
     this->topicName += '/' + this->sdf->Get<std::string>("topic");
@@ -74,13 +72,12 @@ void MagnetometerSensor::Load(const std::string &_worldName)
 
   // Load magnetic field noise parameters
   {
-    sdf::ElementPtr fieldElem = magElem->GetElement("field");
     this->noises[MAGNETOMETER_X_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-      fieldElem->GetElement("x")->GetElement("noise"));
-    this->noises[MAGNETOMETER_Y_NOISE_TESLA] =  NoiseFactory::NewNoiseModel(
-      fieldElem->GetElement("y")->GetElement("noise"));
+      magElem->GetElement("x")->GetElement("noise"));
+    this->noises[MAGNETOMETER_Y_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
+      magElem->GetElement("y")->GetElement("noise"));
     this->noises[MAGNETOMETER_Z_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-      fieldElem->GetElement("z")->GetElement("noise"));
+      magElem->GetElement("z")->GetElement("noise"));
   }
 }
 
@@ -100,6 +97,8 @@ void MagnetometerSensor::Init()
 //////////////////////////////////////////////////
 bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+  
   // Get latest pose information
   if (this->parentLink)
   {
@@ -118,16 +117,15 @@ bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
     M.z = this->noises[MAGNETOMETER_Z_NOISE_TESLA]->Apply(M.z);
 
     // Set the IMU orientation
-    msgs::Set(this->lastMagMsg.mutable_field_tesla(),M);
+    msgs::Set(this->magMsg.mutable_field_tesla(),M);
   }
 
   // Save the time of the measurement
-  this->lastMeasurementTime = this->world->GetSimTime();
-  msgs::Set(this->lastMagMsg.mutable_time(), this->lastMeasurementTime);
+  msgs::Set(this->magMsg.mutable_time(), this->world->GetSimTime());
 
   // Publish the message if needed
   if (this->magPub)
-    this->magPub->Publish(this->lastMagMsg);
+    this->magPub->Publish(this->magMsg);
 
   return true;
 }

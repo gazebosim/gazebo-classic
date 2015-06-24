@@ -9,7 +9,7 @@ import "vector3d.proto";
 
 message Magnetometer
 {
-  required Time stamp                = 1;
+  required Time time                 = 1;
   required string entity_name        = 2;
   required Vector3d field_tesla      = 3;
 }

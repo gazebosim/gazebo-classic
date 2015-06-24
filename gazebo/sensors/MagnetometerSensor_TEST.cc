@@ -38,9 +38,8 @@ static std::string magSensorString =
 "  <sensor name='magnetometer' type='magnetometer'>"
 "    <always_on>1</always_on>"
 "    <update_rate>10.0</update_rate>"
-"    <imu>"
-"      <topic>/test_magnetometer</topic>"
-"    </imu>"
+"    <magnetometer>"
+"    </magnetometer>"
 "  </sensor>"
 "</sdf>";
 
@@ -55,7 +54,7 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
   physics::WorldPtr world = physics::get_world("default");
 
   sdf::ElementPtr sdf(new sdf::Element);
-  sdf::initFile("magnetometer.sdf", sdf);
+  sdf::initFile("sensor.sdf", sdf);
   sdf::readString(magSensorString, sdf);
 
   // Create the IMU sensor
@@ -79,7 +78,7 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
 
   // At pose [0,0,0,0,0,0] the body frame magnetic field should be default
   EXPECT_EQ(sensor->GetMagneticField(), 
-      world->GetPhysicsEngine()->GetMagnetic());
+      world->GetPhysicsEngine()->GetMagneticField());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,7 +117,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   M = modelPose.rot.GetInverse().RotateVector(M);
 
   // Check for match
-  EXPECT_EQ(magSensor->GetAngularVelocity(),M);
+  EXPECT_EQ(magSensor->GetMagneticField(),M);
 }
 
 /////////////////////////////////////////////////
@@ -128,7 +127,7 @@ TEST_P(MagnetometerSensor_TEST, BasicMagnetometerSensorCheck)
 }
 
 /////////////////////////////////////////////////
-TEST_P(ImuSensor_TEST, RotateMagnetometerSensorCheck)
+TEST_P(MagnetometerSensor_TEST, RotateMagnetometerSensorCheck)
 {
   RotateMagnetometerSensorCheck(GetParam());
 }
