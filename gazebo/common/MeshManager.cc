@@ -16,6 +16,7 @@
  */
 #include <sys/stat.h>
 #include <string>
+#include <map>
 
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Matrix3.hh"
@@ -483,8 +484,32 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 
 //////////////////////////////////////////////////
 void MeshManager::CreateExtrudedPolyline(const std::string &_name,
-    const std::vector<std::vector<math::Vector2d> > &_path, double _height)
+    const std::vector<std::vector<math::Vector2d> > &_polys, double _height)
 {
+  // distance tolerence between 2 points. This is used when creating a list
+  // of distinct points in the polylines.
+  double tol = 1e-4;
+  #if !HAVE_GTS
+    gzerr << "GTS library not found. Can not extrude polyline" << std::endl;
+    return;
+  #endif
+  auto polys = _polys;
+  // close all the loops
+  for (auto &poly : polys)
+  {
+    // does the poly ends with the first point?
+    auto first = poly[0];
+    auto last = poly[poly.size()-1];
+    double d = (first.x - last.x) * (first.x - last.x);
+    d += (first.y - last.y) * (first.y - last.y);
+    // within range
+    if (d >  tol * tol )
+    {
+      // add the first point at the end
+      poly.push_back(first);
+    }
+  }
+
   if (this->HasMesh(_name))
   {
     return;
@@ -497,64 +522,31 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
-  // sanity check to make sure we have at least 3 points in the path
-  // Remove last vertices if it's the same as the first one - the
-  // delaunay triangluation algorithm should already assume the paths are closed
-  auto path = _path;
-  for (auto it = path.begin(); it != path.end();)
-  {
-    unsigned int pathSize = (*it).size();
-    if (pathSize < 3)
-      it = path.erase(it);
-    else
-    {
-      if ((*it)[0] == (*it)[pathSize-1])
-        (*it).pop_back();
-      ++it;
-    }
-  }
-
+  std::vector<math::Vector2d> vertices;
+  std::vector<math::Vector2i> edges;
+  MeshManager::ConvertPolylinesToVerticesAndEdges(polys,
+                                                  tol,
+                                                  vertices,
+                                                  edges);
   #if HAVE_GTS
+  if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, subMesh))
   {
-    if (!GTSMeshUtils::DelaunayTriangulation(path, subMesh))
-    {
-      gzerr << "Unable to triangulate polyline." << std::endl;
-      delete mesh;
-      return;
-    }
-  }
-  #else
-  {
-    gzerr << "GTS library not found. Can not extrude polyline" << std::endl;
+    gzerr << "Unable to triangulate polyline." << std::endl;
+    delete mesh;
+    return;
   }
   #endif
-
-  // create a list of all exterior edges.
-  std::vector<std::vector<math::Vector2d> > edges;
-  for (unsigned int i = 0; i < path.size(); ++i)
-  {
-    for (unsigned int j = 1; j < path[i].size(); ++j)
-    {
-      std::vector<math::Vector2d> edge;
-      edge.resize(2);
-      edge[0] = path[i][j-1];
-      edge[1] = path[i][j];
-      edges.push_back(edge);
-    }
-    std::vector<math::Vector2d> edge;
-    edge.resize(2);
-    edge[0] = path[i][path[i].size()-1];
-    edge[1] = path[i][0];
-    edges.push_back(edge);
-  }
-
-  std::vector<math::Vector2i> edgeIndices;
 
   std::vector<math::Vector3> normals;
   for (unsigned int i  = 0; i < edges.size(); ++i)
   {
-    std::vector<math::Vector2d> edge = edges[i];
+    // we retrieve each edge's coordinates
+    int i0 = edges[i][0];
+    int i1 = edges[i][1];
+    math::Vector2d edgeV0 = vertices[i0];
+    math::Vector2d edgeV1 = vertices[i1];
 
+    // we look for those points in the subMesh (where indices may have changed)
     for (unsigned int j = 0; j < subMesh->GetIndexCount(); j+=3)
     {
       math::Vector3 v0 = subMesh->GetVertex(subMesh->GetIndex(j));
@@ -569,7 +561,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
       int ev0 = -1;
       for (unsigned int k = 0; k < triangle.size(); ++k)
       {
-        if (math::Vector2d(triangle[k].x, triangle[k].y) == edge[0])
+        if (math::Vector2d(triangle[k].x, triangle[k].y) == edgeV0)
         {
           // found a vertex in triangle that matches the vertex of the edge
           ev0 = k;
@@ -584,7 +576,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
         {
           int index = (ev0 + k + 1) % triangle.size();
           math::Vector3 triV = triangle[index];
-          if (math::Vector2d(triV.x, triV.y) == edge[1])
+          if (math::Vector2d(triV.x, triV.y) == edgeV1)
           {
             // found another vertex in triangle that matches the vertex of the
             // other edge.
@@ -619,7 +611,6 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
             if (angle1 >= 0)
               normals.push_back(-normal);
           }
-          edgeIndices.push_back(math::Vector2i(j+ev1, j+ev0));
         }
       }
     }
@@ -660,8 +651,12 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   // create the side faces
   for (unsigned int i = 0; i < edges.size(); ++i)
   {
-    math::Vector2d v0 = edges[i][0];
-    math::Vector2d v1 = edges[i][1];
+    // we retrieve each edge's coordinates
+    int i0 = edges[i][0];
+    int i1 = edges[i][1];
+    math::Vector2d v0 = vertices[i0];
+    math::Vector2d v1 = vertices[i1];
+
     math::Vector2d edge2d = v1 - v0;
     math::Vector3 edge = math::Vector3(edge2d.x, edge2d.y, 0);
     math::Vector3 cross = edge.Cross(normals[i]);
@@ -1269,3 +1264,57 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   this->meshes.insert(std::make_pair(_name, mesh));
 }
 #endif
+
+//////////////////////////////////////////////////
+size_t MeshManager::AddUniquePointToVerticesTable(
+                     std::vector<math::Vector2d> &_vertices,
+                     const math::Vector2d &_p,
+                     double _tol)
+{
+  double sqrTol = _tol * _tol;
+  for (auto i = 0u; i != _vertices.size(); ++i)
+  {
+    auto v = _vertices[i] - _p;
+    double d = (v.x * v.x + v.y * v.y);
+    if ( d < sqrTol)
+    {
+      return i;
+    }
+  }
+  _vertices.push_back(_p);
+  size_t r =  _vertices.size() -1;
+  return r;
+}
+
+//////////////////////////////////////////////////
+void MeshManager::ConvertPolylinesToVerticesAndEdges(
+                      const std::vector<std::vector<math::Vector2d> > &_polys,
+                      double _tol,
+                      std::vector<math::Vector2d> &_vertices,
+                      std::vector<math::Vector2i> &edges)
+{
+  for (auto poly : _polys)
+  {
+    math::Vector2d previous = poly[0];
+    for (auto i = 1u; i != poly.size(); ++i)
+    {
+      auto p = poly[i];
+      auto startPointIndex = AddUniquePointToVerticesTable(_vertices,
+                                                              previous, _tol);
+      auto endPointIndex = AddUniquePointToVerticesTable(_vertices,
+                                                              p, _tol);
+      // current end point is now the starting point for the next edge
+      previous = p;
+      if (startPointIndex == endPointIndex)
+      {
+        gzwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
+        continue;
+      }
+      // add the new edge
+      math::Vector2i e(startPointIndex, endPointIndex);
+      edges.push_back(e);
+    }
+  }
+}
+
+

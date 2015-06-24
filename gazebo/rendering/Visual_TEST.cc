@@ -691,6 +691,46 @@ TEST_F(Visual_TEST, GetAncestors)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, ConvertVisualType)
+{
+  // convert from msgs::Visual::Type to Visual::VisualType
+  EXPECT_EQ(msgs::Visual::ENTITY,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_ENTITY));
+  EXPECT_EQ(msgs::Visual::MODEL,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_MODEL));
+  EXPECT_EQ(msgs::Visual::LINK,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_LINK));
+  EXPECT_EQ(msgs::Visual::VISUAL,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_VISUAL));
+  EXPECT_EQ(msgs::Visual::COLLISION,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_COLLISION));
+  EXPECT_EQ(msgs::Visual::SENSOR,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_SENSOR));
+  EXPECT_EQ(msgs::Visual::GUI,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_GUI));
+  EXPECT_EQ(msgs::Visual::PHYSICS,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_PHYSICS));
+
+  // convert from Visual::VisualType to msgs::Visual::Type
+  EXPECT_EQ(rendering::Visual::VT_ENTITY,
+      rendering::Visual::ConvertVisualType(msgs::Visual::ENTITY));
+  EXPECT_EQ(rendering::Visual::VT_MODEL,
+      rendering::Visual::ConvertVisualType(msgs::Visual::MODEL));
+  EXPECT_EQ(rendering::Visual::VT_LINK,
+      rendering::Visual::ConvertVisualType(msgs::Visual::LINK));
+  EXPECT_EQ(rendering::Visual::VT_VISUAL,
+      rendering::Visual::ConvertVisualType(msgs::Visual::VISUAL));
+  EXPECT_EQ(rendering::Visual::VT_COLLISION,
+      rendering::Visual::ConvertVisualType(msgs::Visual::COLLISION));
+  EXPECT_EQ(rendering::Visual::VT_SENSOR,
+      rendering::Visual::ConvertVisualType(msgs::Visual::SENSOR));
+  EXPECT_EQ(rendering::Visual::VT_GUI,
+      rendering::Visual::ConvertVisualType(msgs::Visual::GUI));
+  EXPECT_EQ(rendering::Visual::VT_PHYSICS,
+      rendering::Visual::ConvertVisualType(msgs::Visual::PHYSICS));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

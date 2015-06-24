@@ -2,6 +2,10 @@
 
 ### Modifications
 
+1. **gazebo/msgs/world_stats.proto**
+    + ***Removed:*** optional bool log_playback = 8;
+    + ***Replacement:*** optional LogPlaybackStatistics log_playback_stats = 8;
+
 1. **gazebo/physics/JointState.hh**
     + ***Removed:*** public: JointState(JointPtr _joint, const common::Time
     &_realTime, const common::Time &_simTime)
@@ -86,6 +90,12 @@
     + The ShowEditor(bool _show)
 
 ### Additions
+
+1. **gazebo/msgs/log_playback_control.proto**
+    + New message to control the playback from a log file.
+
+1. **gazebo/util/LogPlay.hh**
+    + public: bool Rewind()
 
 1. **gazebo/physics/LinkState.hh**
     + public: virtual void SetIterations(const uint64_t _iterations)
