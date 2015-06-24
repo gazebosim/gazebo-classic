@@ -131,6 +131,13 @@ void Entity::Load(sdf::ElementPtr _sdf)
   }
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
 
+  if (this->HasType(Base::MODEL))
+    this->visualMsg->set_type(msgs::Visual::MODEL);
+  if (this->HasType(Base::LINK))
+    this->visualMsg->set_type(msgs::Visual::LINK);
+  if (this->HasType(Base::COLLISION))
+    this->visualMsg->set_type(msgs::Visual::COLLISION);
+
   this->visPub->Publish(*this->visualMsg);
 
   if (this->HasType(Base::MODEL))
@@ -594,8 +601,8 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
-  offset.pos = kf.GetTranslation();
-  offset.rot = kf.GetRotation();
+  offset.pos = kf.Translation();
+  offset.rot = kf.Rotation();
 
   this->SetWorldPose(offset);
   this->prevAnimationTime = _info.simTime;

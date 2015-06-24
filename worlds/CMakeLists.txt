@@ -3,6 +3,7 @@ set (files
   blank.world
   camera.world
   cart_demo.world
+  cessna_demo.world
   contact.world
   depth_camera.world
   elevator.world
@@ -58,6 +59,7 @@ set (files
   sonar_demo.world
   sphere_atlas_demo.world
   stacks.world
+  transporter.world
   trigger.world
   twin_rotor_demo.world
   underwater.world
