@@ -883,112 +883,10 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
           if (newWidget)
           {
-            // Button label
-            QLabel *buttonLabel = new QLabel(
-                tr(this->GetHumanReadableKey(name).c_str()));
-            buttonLabel->setToolTip(tr(name.c_str()));
-
-            // Button icon
-            QCheckBox *buttonIcon = new QCheckBox();
-            buttonIcon->setChecked(true);
-            buttonIcon->setStyleSheet(
-                "QCheckBox::indicator::unchecked {\
-                  image: url(:/images/right_arrow.png);\
-                }\
-                QCheckBox::indicator::checked {\
-                  image: url(:/images/down_arrow.png);\
-                }");
-
-            // Button layout
-            QHBoxLayout *buttonLayout = new QHBoxLayout();
-            buttonLayout->addItem(new QSpacerItem(20*_level, 1,
-                QSizePolicy::Fixed, QSizePolicy::Fixed));
-            buttonLayout->addWidget(buttonLabel);
-            buttonLayout->addWidget(buttonIcon);
-            buttonLayout->setAlignment(buttonIcon, Qt::AlignRight);
-
-            // Button frame
-            QFrame *buttonFrame = new QFrame();
-            buttonFrame->setFrameStyle(QFrame::Box);
-            buttonFrame->setLayout(buttonLayout);
-
-            // Set color for top level button
-            if (_level == 0)
-            {
-              buttonFrame->setStyleSheet(
-                  "QWidget\
-                  {\
-                    background-color: " + this->level0BgColor +
-                  "}");
-            }
-
-            // Child widgets are contained in a group box which can be collapsed
-            GroupWidget *groupWidget = new GroupWidget;
-            groupWidget->setStyleSheet(
-                "QGroupBox {\
-                  border : 0;\
-                  margin : 0;\
-                  padding : 0;\
-                }");
-
-            connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget,
-                SLOT(Toggle(bool)));
-
-            // Set the child widget
-            groupWidget->childWidget = newFieldWidget;
-            qobject_cast<ConfigChildWidget *>(newFieldWidget)->groupWidget
-                = groupWidget;
-            newFieldWidget->setContentsMargins(0, 0, 0, 0);
-
-            // Set color for children
-            if (_level == 0)
-            {
-              newFieldWidget->setStyleSheet(
-                  "QWidget\
-                  {\
-                    background-color: " + this->level1BgColor +
-                  "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-                  {\
-                    background-color: " + this->level1WidgetColor +
-                  "}");
-            }
-            else if (_level == 1)
-            {
-              newFieldWidget->setStyleSheet(
-                  "QWidget\
-                  {\
-                    background-color: " + this->level2BgColor +
-                  "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-                  {\
-                    background-color: " + this->level2WidgetColor +
-                  "}");
-            }
-            else if (_level == 2)
-            {
-              newFieldWidget->setStyleSheet(
-                  "QWidget\
-                  {\
-                    background-color: " + this->level2BgColor +
-                  "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-                  {\
-                    background-color: " + this->level2WidgetColor +
-                  "}");
-            }
-
-            // Group Layout
-            QGridLayout *configGroupLayout = new QGridLayout;
-            configGroupLayout->setContentsMargins(0, 0, 0, 0);
-            configGroupLayout->setSpacing(0);
-            configGroupLayout->addWidget(buttonFrame, 0, 0);
-            configGroupLayout->addWidget(newFieldWidget, 1, 0);
-            groupWidget->setLayout(configGroupLayout);
-
             // reset new field widget pointer in order for it to be added
             // to the parent widget
-            newFieldWidget = groupWidget;
+            newFieldWidget = this->CreateGroupWidget(name, newFieldWidget,
+                _level);
           }
 
           break;
@@ -1098,6 +996,116 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
     return widget;
   }
   return NULL;
+}
+
+/////////////////////////////////////////////////
+GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
+    QWidget *_newFieldWidget, const int _level)
+{
+  // Button label
+  QLabel *buttonLabel = new QLabel(
+      tr(this->GetHumanReadableKey(_name).c_str()));
+  buttonLabel->setToolTip(tr(_name.c_str()));
+
+  // Button icon
+  QCheckBox *buttonIcon = new QCheckBox();
+  buttonIcon->setChecked(true);
+  buttonIcon->setStyleSheet(
+      "QCheckBox::indicator::unchecked {\
+	image: url(:/images/right_arrow.png);\
+      }\
+      QCheckBox::indicator::checked {\
+	image: url(:/images/down_arrow.png);\
+      }");
+
+  // Button layout
+  QHBoxLayout *buttonLayout = new QHBoxLayout();
+  buttonLayout->addItem(new QSpacerItem(20*_level, 1,
+      QSizePolicy::Fixed, QSizePolicy::Fixed));
+  buttonLayout->addWidget(buttonLabel);
+  buttonLayout->addWidget(buttonIcon);
+  buttonLayout->setAlignment(buttonIcon, Qt::AlignRight);
+
+  // Button frame
+  QFrame *buttonFrame = new QFrame();
+  buttonFrame->setFrameStyle(QFrame::Box);
+  buttonFrame->setLayout(buttonLayout);
+
+  // Set color for top level button
+  if (_level == 0)
+  {
+    buttonFrame->setStyleSheet(
+	"QWidget\
+	{\
+	  background-color: " + this->level0BgColor +
+	"}");
+  }
+
+  // Child widgets are contained in a group box which can be collapsed
+  GroupWidget *groupWidget = new GroupWidget;
+  groupWidget->setStyleSheet(
+      "QGroupBox {\
+	border : 0;\
+	margin : 0;\
+	padding : 0;\
+      }");
+
+  connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget,
+      SLOT(Toggle(bool)));
+
+  // Set the child widget
+  groupWidget->childWidget = _newFieldWidget;
+  qobject_cast<ConfigChildWidget *>(_newFieldWidget)->groupWidget
+      = groupWidget;
+  _newFieldWidget->setContentsMargins(0, 0, 0, 0);
+
+  // Set color for children
+  if (_level == 0)
+  {
+    _newFieldWidget->setStyleSheet(
+	"QWidget\
+	{\
+	  background-color: " + this->level1BgColor +
+	"}\
+	QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+	{\
+	  background-color: " + this->level1WidgetColor +
+	"}");
+  }
+  else if (_level == 1)
+  {
+    _newFieldWidget->setStyleSheet(
+	"QWidget\
+	{\
+	  background-color: " + this->level2BgColor +
+	"}\
+	QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+	{\
+	  background-color: " + this->level2WidgetColor +
+	"}");
+  }
+  else if (_level == 2)
+  {
+    _newFieldWidget->setStyleSheet(
+	"QWidget\
+	{\
+	  background-color: " + this->level2BgColor +
+	"}\
+	QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+	{\
+	  background-color: " + this->level2WidgetColor +
+	"}");
+  }
+
+  // Group Layout
+  QGridLayout *configGroupLayout = new QGridLayout;
+  configGroupLayout->setContentsMargins(0, 0, 0, 0);
+  configGroupLayout->setSpacing(0);
+  configGroupLayout->addWidget(buttonFrame, 0, 0);
+  configGroupLayout->addWidget(_newFieldWidget, 1, 0);
+  groupWidget->setLayout(configGroupLayout);
+
+  return groupWidget;
 }
 
 /////////////////////////////////////////////////

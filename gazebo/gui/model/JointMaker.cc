@@ -76,7 +76,7 @@ JointMaker::JointMaker()
   jointTypes[JOINT_BALL]      = "ball";
   jointTypes[JOINT_NONE]      = "none";
 
-  this->jointCreationDialog = new JointCreationDialog();
+  this->jointCreationDialog = new JointCreationDialog(this);
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -533,7 +533,7 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
   this->jointType = _type;
   if (_type != JointMaker::JOINT_NONE)
   {
-    this->jointCreationDialog->open();
+    this->jointCreationDialog->Open(_type);
 
 
 

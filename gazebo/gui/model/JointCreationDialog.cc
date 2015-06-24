@@ -18,105 +18,126 @@
 //#include "gazebo/common/Console.hh"
 //#include "gazebo/common/Assert.hh"
 
-//#include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointCreationDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-JointCreationDialog::JointCreationDialog(QWidget *_parent) : QDialog(_parent)
+JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
+    QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("JointCreationDialogDialog");
-  this->setWindowTitle(tr("Joint CreationDialog"));
+  this->setWindowTitle(tr("Create a joint"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-  QVBoxLayout *generalLayout = new QVBoxLayout;
-/*
-  this->configWidget = new ConfigWidget;
-  msgs::Joint jointMsg;
-  configWidget->Load(&jointMsg);
+  this->jointMaker = _jointMaker;
+
+  this->configWidget = new ConfigWidget();
+
+  // Joint types
+  QRadioButton *fixedJointRadio = new QRadioButton(tr("Fixed"));
+  QRadioButton *prismaticJointRadio = new QRadioButton(tr("Prismatic"));
+  QRadioButton *revoluteJointRadio = new QRadioButton(tr("Revolute"));
+  QRadioButton *revolute2JointRadio = new QRadioButton(tr("Revolute2"));
+  QRadioButton *screwJointRadio = new QRadioButton(tr("Screw"));
+  QRadioButton *universalJointRadio = new QRadioButton(tr("Universal"));
+  QRadioButton *ballJointRadio = new QRadioButton(tr("Ball"));
+
+  this->typeButtons = new QButtonGroup();
+  this->typeButtons->addButton(fixedJointRadio, 1);
+  this->typeButtons->addButton(prismaticJointRadio, 2);
+  this->typeButtons->addButton(revoluteJointRadio, 3);
+  this->typeButtons->addButton(revolute2JointRadio, 4);
+  this->typeButtons->addButton(screwJointRadio, 5);
+  this->typeButtons->addButton(universalJointRadio, 6);
+  this->typeButtons->addButton(ballJointRadio, 7);
+  connect(this->typeButtons, SIGNAL(buttonClicked(int)),
+      this, SLOT(OnTypeFromDialog(int)));
+
+  QVBoxLayout *typesLayout = new QVBoxLayout();
+  typesLayout->addWidget(fixedJointRadio);
+  typesLayout->addWidget(revoluteJointRadio);
+  typesLayout->addWidget(revolute2JointRadio);
+  typesLayout->addWidget(prismaticJointRadio);
+  typesLayout->addWidget(screwJointRadio);
+  typesLayout->addWidget(universalJointRadio);
+  typesLayout->addWidget(ballJointRadio);
+
+  ConfigChildWidget *typesWidget = new ConfigChildWidget();
+  typesWidget->setLayout(typesLayout);
+
+  QWidget *typesGroupWidget =
+      this->configWidget->CreateGroupWidget("Joint types", typesWidget, 0);
+
+  // Link selections
+  QLabel *selectionsText = new QLabel(tr(
+      "Click a link in the scene "
+       "to select parent. Click "
+       "again to select child."));
+
+  std::vector<std::string> links
+  {
+    "Link 1",
+    "Link 2",
+    "Link 3"
+  };
+
+  ConfigChildWidget *parentComboBox =
+      this->configWidget->CreateEnumWidget("Parent: ", links, 0);
+
+  ConfigChildWidget *childComboBox =
+      this->configWidget->CreateEnumWidget("Child: ", links, 0);
+
+
+  QVBoxLayout *linksLayout = new QVBoxLayout();
+  linksLayout->addWidget(selectionsText);
+  linksLayout->addWidget(parentComboBox);
+  linksLayout->addWidget(childComboBox);
+
+  ConfigChildWidget *linksWidget = new ConfigChildWidget();
+  linksWidget->setLayout(linksLayout);
+
+  QWidget *linksGroupWidget = this->configWidget->CreateGroupWidget(
+      "Link Selections", linksWidget, 0);
+
+
+
+  QVBoxLayout *configLayout = new QVBoxLayout();
+  configLayout->addWidget(typesGroupWidget);
+  configLayout->addWidget(linksGroupWidget);
+
+  this->configWidget->setLayout(configLayout);
+
+
+
+
+
 
   QScrollArea *scrollArea = new QScrollArea;
   scrollArea->setWidget(configWidget);
   scrollArea->setWidgetResizable(true);
 
+
+  QVBoxLayout *generalLayout = new QVBoxLayout;
   generalLayout->setContentsMargins(0, 0, 0, 0);
   generalLayout->addWidget(scrollArea);
 
-  // fill them with SDF default values
-  sdf::ElementPtr jointElem = msgs::JointToSDF(jointMsg);
-  sdf::ElementPtr axisElem = jointElem->GetElement("axis");
-  sdf::ElementPtr axisLimitElem = axisElem->GetElement("limit");
-  sdf::ElementPtr odeElem = jointElem->GetElement("physics")->GetElement("ode");
-  for (unsigned int i = 0; i < 2u; ++i)
-  {
-    std::stringstream axis;
-    axis << "axis" << i+1;
-    std::string axisStr = axis.str();
-    this->configWidget->SetVector3WidgetValue(axisStr + "::xyz",
-        axisElem->Get<math::Vector3>("xyz"));
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower",
-        axisLimitElem->Get<double>("lower"));
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_upper",
-        axisLimitElem->Get<double>("upper"));
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_effort",
-        axisLimitElem->Get<double>("effort"));
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_velocity",
-        axisLimitElem->Get<double>("velocity"));
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::damping",
-        axisElem->GetElement("dynamics")->Get<double>("damping"));
-    this->configWidget->SetDoubleWidgetValue(axisStr + "::friction",
-        axisElem->GetElement("dynamics")->Get<double>("friction"));
-    this->configWidget->SetBoolWidgetValue(axisStr + "::parent_model_frame",
-        axisElem->Get<bool>("use_parent_model_frame"));
-  }
 
-  this->configWidget->SetDoubleWidgetValue("cfm",
-      odeElem->Get<double>("cfm"));
-  this->configWidget->SetDoubleWidgetValue("bounce",
-      odeElem->Get<double>("bounce"));
-  this->configWidget->SetDoubleWidgetValue("velocity",
-      odeElem->Get<double>("velocity"));
-  this->configWidget->SetDoubleWidgetValue("fudge_factor",
-      odeElem->Get<double>("fudge_factor"));
-  this->configWidget->SetDoubleWidgetValue("limit_cfm",
-      odeElem->GetElement("limit")->Get<double>("cfm"));
-  this->configWidget->SetDoubleWidgetValue("limit_erp",
-      odeElem->GetElement("limit")->Get<double>("erp"));
-  this->configWidget->SetDoubleWidgetValue("suspension_cfm",
-      odeElem->GetElement("suspension")->Get<double>("cfm"));
-  this->configWidget->SetDoubleWidgetValue("suspension_erp",
-      odeElem->GetElement("suspension")->Get<double>("erp"));
 
-  this->configWidget->SetWidgetVisible("id", false);
-  this->configWidget->SetWidgetVisible("parent_id", false);
-  this->configWidget->SetWidgetVisible("child_id", false);
-
-  this->configWidget->SetWidgetReadOnly("id", true);
-  this->configWidget->SetWidgetReadOnly("parent_id", true);
-  this->configWidget->SetWidgetReadOnly("child_id", true);
-  this->configWidget->SetWidgetReadOnly("parent", true);
-  this->configWidget->SetWidgetReadOnly("child", true);
-
-  QObject::connect(this->configWidget,
-      SIGNAL(EnumValueChanged(const QString &, const QString &)), this,
-      SLOT(OnJointTypeChanged(const QString &, const QString &)));
-
-  this->OnJointTypeChanged("type",
-      tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
-*/
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
+
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  QPushButton *applyButton = new QPushButton(tr("Apply"));
-  connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-  QPushButton *OKButton = new QPushButton(tr("OK"));
-  OKButton->setDefault(true);
-  connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
+
+  QPushButton *createButton = new QPushButton(tr("Create"));
+  createButton->setDefault(true);
+  connect(createButton, SIGNAL(clicked()), this, SLOT(OnCreate()));
+
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(applyButton);
-  buttonsLayout->addWidget(OKButton);
+  buttonsLayout->addWidget(createButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -130,44 +151,38 @@ JointCreationDialog::JointCreationDialog(QWidget *_parent) : QDialog(_parent)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::Update(ConstJointPtr _jointMsg)
+void JointCreationDialog::Open(JointMaker::JointType _type)
 {
-//  this->configWidget->UpdateFromMsg(_jointMsg.get());
+  this->typeButtons->button(static_cast<int>(_type))->setChecked(true);
+
+  this->open();
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::SetPose(const math::Pose &_pose)
+void JointCreationDialog::OnTypeFromDialog(int _type)
 {
-//  this->configWidget->SetPoseWidgetValue("pose", _pose);
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnJointTypeChanged(const QString &/*_name*/,
-    const QString &_value)
+void JointCreationDialog::OnParentFromDialog(const std::string &_linkName)
 {
-/*  std::string valueStr = _value.toLower().toStdString();
-  unsigned int axisCount = JointMaker::GetJointAxisCount(
-      JointMaker::ConvertJointType(valueStr));
+}
 
-  for (unsigned int i = 0; i < axisCount; ++i)
-  {
-    std::stringstream axis;
-    axis << "axis" << i+1;
-    std::string axisStr = axis.str();
-    this->configWidget->SetWidgetVisible(axisStr, true);
-    this->configWidget->SetWidgetReadOnly(axisStr, false);
-    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
-  }
+/////////////////////////////////////////////////
+void JointCreationDialog::OnChildFromDialog(
+    const std::string &_linkName)
+{
+}
 
-  for (unsigned int i = axisCount; i < 2u; ++i)
-  {
-    std::stringstream axis;
-    axis << "axis" << i+1;
-    std::string axisStr = axis.str();
-    this->configWidget->SetWidgetVisible(axisStr, false);
-    this->configWidget->SetWidgetReadOnly(axisStr, true);
-    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
-  }*/
+/////////////////////////////////////////////////
+void JointCreationDialog::OnParentFrom3D(
+    const std::string &_linkName)
+{
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
+{
 }
 
 /////////////////////////////////////////////////
@@ -177,15 +192,8 @@ void JointCreationDialog::OnCancel()
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnApply()
+void JointCreationDialog::OnCreate()
 {
-  emit Applied();
-}
-
-/////////////////////////////////////////////////
-void JointCreationDialog::OnOK()
-{
-  emit Applied();
   this->accept();
 }
 
