@@ -45,3 +45,7 @@ event::EventT<void (std::string)> model::Events::showLinkContextMenu;
 event::EventT<void (std::string)> model::Events::showJointContextMenu;
 event::EventT<void (std::string, bool)> model::Events::setSelectedLink;
 event::EventT<void (std::string, bool)> model::Events::setSelectedJoint;
+event::EventT<void (std::string)> model::Events::jointParentChosen3D;
+event::EventT<void (std::string)> model::Events::jointChildChosen3D;
+event::EventT<void (std::string)> model::Events::jointParentChosenDialog;
+event::EventT<void (std::string)> model::Events::jointChildChosenDialog;

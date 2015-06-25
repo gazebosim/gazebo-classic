@@ -359,6 +359,8 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           // the child will be set on the second mouse release.
           this->mouseJoint = this->CreateJointLine("JOINT_LINE",
               this->selectedVis);
+
+          gui::model::Events::jointParentChosen3D(this->selectedVis->GetName());
         }
         // Pressed child link
         else if (this->selectedVis != this->hoverVis)
@@ -374,6 +376,8 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           this->Stop();
           this->mouseJoint = newJoint;
           this->newJointCreated = true;
+
+          gui::model::Events::jointChildChosen3D(this->hoverVis->GetName());
           gui::model::Events::modelChanged();
         }
       }

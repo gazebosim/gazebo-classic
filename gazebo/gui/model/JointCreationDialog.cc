@@ -15,10 +15,10 @@
  *
 */
 
-//#include "gazebo/common/Console.hh"
-//#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointCreationDialog.hh"
 
@@ -30,7 +30,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
     QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("JointCreationDialogDialog");
-  this->setWindowTitle(tr("Create a joint"));
+  this->setWindowTitle(tr("Create Joint"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   this->jointMaker = _jointMaker;
@@ -78,30 +78,34 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
        "to select parent. Click "
        "again to select child."));
 
-  std::vector<std::string> links
-  {
-    "Link 1",
-    "Link 2",
-    "Link 3"
-  };
+  QLabel *parentLabel = new QLabel("Parent: ");
+  this->parentComboBox = new QComboBox();
+  this->parentComboBox->setInsertPolicy(QComboBox::InsertAlphabetically);
+  this->parentComboBox->addItem("", "");
+  connect(this->parentComboBox, SIGNAL(currentIndexChanged(int)), this,
+      SLOT(OnParentFromDialog(int)));
 
-  ConfigChildWidget *parentComboBox =
-      this->configWidget->CreateEnumWidget("Parent: ", links, 0);
+  QLabel *childLabel = new QLabel("Child: ");
+  this->childComboBox = new QComboBox();
+  this->childComboBox->setInsertPolicy(QComboBox::InsertAlphabetically);
+  this->childComboBox->addItem("", "");
+  this->childComboBox->setEnabled(false);
+  connect(this->childComboBox, SIGNAL(currentIndexChanged(int)), this,
+      SLOT(OnChildFromDialog(int)));
 
-  ConfigChildWidget *childComboBox =
-      this->configWidget->CreateEnumWidget("Child: ", links, 0);
-
-
-  QVBoxLayout *linksLayout = new QVBoxLayout();
-  linksLayout->addWidget(selectionsText);
-  linksLayout->addWidget(parentComboBox);
-  linksLayout->addWidget(childComboBox);
+  QGridLayout *linksLayout = new QGridLayout();
+  linksLayout->addWidget(selectionsText, 0, 0, 1, 2);
+  linksLayout->addWidget(parentLabel, 1, 0);
+  linksLayout->addWidget(this->parentComboBox, 1, 1);
+  linksLayout->addWidget(childLabel, 2, 0);
+  linksLayout->addWidget(this->childComboBox, 2, 1);
 
   ConfigChildWidget *linksWidget = new ConfigChildWidget();
   linksWidget->setLayout(linksLayout);
 
   QWidget *linksGroupWidget = this->configWidget->CreateGroupWidget(
       "Link Selections", linksWidget, 0);
+
 
 
 
@@ -132,9 +136,9 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  QPushButton *createButton = new QPushButton(tr("Create"));
-  createButton->setDefault(true);
-  connect(createButton, SIGNAL(clicked()), this, SLOT(OnCreate()));
+  this->createButton = new QPushButton(tr("Create"));
+  this->createButton->setEnabled(false);
+  connect(this->createButton, SIGNAL(clicked()), this, SLOT(OnCreate()));
 
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(createButton);
@@ -148,12 +152,38 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setMinimumHeight(300);
 
   this->setLayout(mainLayout);
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkInserted(
+      boost::bind(&JointCreationDialog::OnLinkInserted, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkRemoved(
+      boost::bind(&JointCreationDialog::OnLinkRemoved, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointParentChosen3D(
+      boost::bind(&JointCreationDialog::OnParentFrom3D, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointChildChosen3D(
+      boost::bind(&JointCreationDialog::OnChildFrom3D, this, _1)));
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::Open(JointMaker::JointType _type)
 {
+  if (!this->jointMaker)
+  {
+    gzerr << "Joint maker not found, can't open joint creation dialog."
+        << std::endl;
+    this->OnCancel();
+  }
+
+  // Check joint type
   this->typeButtons->button(static_cast<int>(_type))->setChecked(true);
+
+  // Fill link combo boxes
 
   this->open();
 }
@@ -164,25 +194,110 @@ void JointCreationDialog::OnTypeFromDialog(int _type)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnParentFromDialog(const std::string &_linkName)
+void JointCreationDialog::OnParentFromDialog(int _index)
 {
+  QString linkName = this->parentComboBox->itemData(_index).toString();
+
+  if (linkName.isEmpty())
+    return;
+
+  this->childComboBox->setEnabled(true);
+
+  gui::model::Events::jointParentChosenDialog(linkName.toStdString());
+
+  // Remove empty option
+  int index = this->parentComboBox->findData("");
+  this->parentComboBox->removeItem(index);
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnChildFromDialog(
-    const std::string &_linkName)
+void JointCreationDialog::OnChildFromDialog(int _index)
 {
+  QString linkName = this->parentComboBox->itemData(_index).toString();
+
+  if (linkName.isEmpty())
+    return;
+
+  this->createButton->setEnabled(true);
+
+  gui::model::Events::jointChildChosenDialog(linkName.toStdString());
+
+  // Remove empty option
+  int index = this->parentComboBox->findData("");
+  this->parentComboBox->removeItem(index);
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnParentFrom3D(
-    const std::string &_linkName)
+void JointCreationDialog::OnParentFrom3D(const std::string &_linkName)
 {
+  if (_linkName.empty())
+    return;
+
+  int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
+
+  if (index == -1)
+  {
+    gzerr << "Requested link [" << _linkName << "] not found" << std::endl;
+    return;
+  }
+
+  this->parentComboBox->setCurrentIndex(index);
+
+  this->childComboBox->setEnabled(true);
+
+  // Remove empty option
+  index = this->parentComboBox->findData("");
+  this->parentComboBox->removeItem(index);
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
 {
+  if (_linkName.empty())
+    return;
+
+  if (!this->childComboBox->isEnabled())
+  {
+    gzerr << "Shouldn't set child link before setting parent." << std::endl;
+    return;
+  }
+
+  int index = this->childComboBox->findData(QString::fromStdString(_linkName));
+
+  if (index == -1)
+  {
+    gzerr << "Requested link [" << _linkName << "] not found" << std::endl;
+    return;
+  }
+
+  this->childComboBox->setCurrentIndex(index);
+  this->createButton->setEnabled(true);
+
+  // Remove empty option
+  index = this->parentComboBox->findData("");
+  this->parentComboBox->removeItem(index);
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnLinkInserted(const std::string &_linkName)
+{
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  this->parentComboBox->addItem(
+          QString::fromStdString(leafName), QString::fromStdString(_linkName));
+  this->childComboBox->addItem(
+          QString::fromStdString(leafName), QString::fromStdString(_linkName));
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnLinkRemoved(const std::string &_linkName)
+{
+  int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
+  this->parentComboBox->removeItem(index);
+  this->childComboBox->removeItem(index);
 }
 
 /////////////////////////////////////////////////

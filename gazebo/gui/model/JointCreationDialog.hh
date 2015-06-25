@@ -54,8 +54,8 @@ namespace gazebo
       protected: virtual void enterEvent(QEvent *_event);
 
       private slots: void OnTypeFromDialog(int _type);
-      private slots: void OnParentFromDialog(const std::string &_linkName);
-      private slots: void OnChildFromDialog(const std::string &_linkName);
+      private slots: void OnParentFromDialog(int _index);
+      private slots: void OnChildFromDialog(int _index);
       private slots: void OnParentFrom3D(const std::string &_linkName);
       private slots: void OnChildFrom3D(const std::string &_linkName);
 
@@ -65,6 +65,14 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnCreate();
 
+      /// \brief Add a link to the tree.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkInserted(const std::string &_linkName);
+
+      /// \brief Remove a link from the tree.
+      /// \param[in] _linkId Unique link identifying name.
+      private: void OnLinkRemoved(const std::string &_linkId);
+
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;
 
@@ -72,6 +80,14 @@ namespace gazebo
       private: JointMaker *jointMaker;
 
       private: QButtonGroup *typeButtons;
+
+      /// \brief A list of gui editor events connected to this palette.
+      private: std::vector<event::ConnectionPtr> connections;
+
+
+      private: QComboBox *parentComboBox;
+      private: QComboBox *childComboBox;
+      private: QPushButton *createButton;
     };
     /// \}
   }
