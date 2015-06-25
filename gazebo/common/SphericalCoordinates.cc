@@ -197,7 +197,11 @@ math::Vector3 SphericalCoordinates::CoordinateTransform(const math::Vector3 &_po
   double sinHea = sin(this->dataPtr->headingOffset.Radian());
 
   // Radius of planet curvature (meters) 
-  double N = this->ell_a/sqrt(1.0-this->ell_e*this->ell_e*sinLat*sinLat);
+  double N = 1.0-this->ell_e*this->ell_e*sinLat*sinLat;
+  if (N < 0)
+    N = this->ell_a;
+  else
+    N = this->ell_a/sqrt(N);
 
   // Convert whatever arrives to a more flexible ECEF coordinate
   switch (_in)
@@ -209,9 +213,9 @@ math::Vector3 SphericalCoordinates::CoordinateTransform(const math::Vector3 &_po
     ecef = this->origin  + this->Recef2enu.Inverse() * tmp;
     break;
   case SPHERICAL: // -> ECEF
-    ecef.x = (tmp.z + N) * cosLat * cosLon;
-    ecef.y = (tmp.z + N) * cosLat * sinLon;
-    ecef.z = ((this->ell_b*this->ell_b)/(this->ell_a*this->ell_a)*N+tmp.z) 
+    ecef.x = (_pos.z + N) * cosLat * cosLon;
+    ecef.y = (_pos.z + N) * cosLat * sinLon;
+    ecef.z = ((this->ell_b*this->ell_b)/(this->ell_a*this->ell_a)*N+_pos.z) 
              * sinLat;
     break;
   case ECEF: default:  // Do nothing
@@ -225,13 +229,13 @@ math::Vector3 SphericalCoordinates::CoordinateTransform(const math::Vector3 &_po
 
   // Convert from ECEF to spherical coordinates
   double p = sqrt(ecef.x*ecef.x + ecef.y*ecef.y);
-  double T = atan2(ecef.z * this->ell_a, p * this->ell_b);
+  double T = atan((ecef.z*this->ell_a)/(p*this->ell_b));
   double sinT = sin(T);
   double cosT = cos(T);
-  tmp.x = atan2(ecef.z+this->ell_p*this->ell_p*this->ell_b*sinT*sinT*sinT,
-    p - this->ell_e*this->ell_e*this->ell_a*cosT*cosT*cosT);
+  tmp.x = atan((ecef.z + this->ell_p*this->ell_p*this->ell_b*sinT*sinT*sinT)/
+    (p - this->ell_e*this->ell_e*this->ell_a*cosT*cosT*cosT));
   tmp.y = atan2(ecef.y,ecef.x);
-  tmp.z = p/cos(tmp.y) - N;
+  tmp.z = p/cos(tmp.x) - N;
 
   // CASE 2 : Return SPHERICAL
   if (_out==SPHERICAL)

@@ -117,100 +117,35 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
   // Default surface type
   common::SphericalCoordinates::SurfaceType st =
     common::SphericalCoordinates::EARTH_WGS84;
-
   {
-    // Parameters
-    math::Angle lat(0.3), lon(-1.2), heading(math::Angle::HalfPi);
-    double elev = 354.1;
-    common::SphericalCoordinates sc(st, lat, lon, elev, heading);
+    // Some Mountain View landmarks
+    math::Vector3 tmp;
+    math::Vector3 osrf_s(37.3877349,-122.0651166,32.0);
+    math::Vector3 osrf_e(-2693701.91, -4299942.15, 3851691.04);
+    math::Vector3 goog_s(37.4216719,-122.0821853,30.0);
+    math::Vector3 goog_e(-2693766.72, -4297199.60, 3854681.82);
 
-    // Check GlobalFromLocal with heading offset of 90 degrees
-    {
-      // local frame
-      math::Vector3 xyz;
-      // east, north, up
-      math::Vector3 enu;
-      // local frame inverse
-      math::Vector3 loc;
+    // Convert degrees to radians
+    osrf_s.x *= 0.0174532925;
+    osrf_s.y *= 0.0174532925;
+    goog_s.x *= 0.0174532925;
+    goog_s.y *= 0.0174532925;
 
-      xyz.Set(1, 0, 0);
-      enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
-      loc = sc.LocalFromGlobal(enu);
-      EXPECT_NEAR(loc.y, xyz.x, 1e-6);
-      EXPECT_NEAR(loc.x, xyz.y, 1e-6);
+    // Set an origin
+    common::SphericalCoordinates sc(st, math::Angle(osrf_s.x), 
+      math::Angle(osrf_s.y), osrf_s.z, math::Angle::HalfPi);
 
-      xyz.Set(0, 1, 0);
-      enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
-      loc = sc.LocalFromGlobal(enu);
-      EXPECT_NEAR(loc.y, xyz.x, 1e-6);
-      EXPECT_NEAR(loc.x, xyz.y, 1e-6);
-
-      xyz.Set(1, -1, 0);
-      enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
-      loc = sc.LocalFromGlobal(enu);
-      EXPECT_NEAR(loc.y, xyz.x, 1e-6);
-      EXPECT_NEAR(loc.x, xyz.y, 1e-6);
-
-      xyz.Set(2243.52334, 556.35, 435.6553);
-      enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
-      loc = sc.LocalFromGlobal(enu);
-      EXPECT_NEAR(loc.y, xyz.x, 1e-6);
-      EXPECT_NEAR(loc.x, xyz.y, 1e-6);
-
-    }
-
-    // Check SphericalFromLocal
-    {
-      // local frame
-      math::Vector3 xyz;
-      // spherical coordinates
-      math::Vector3 sph;
-      // local frame inverse
-      math::Vector3 loc;
-
-      // No offset
-      xyz.Set(0, 0, 0);
-      sph = sc.SphericalFromLocal(xyz);
-      // latitude
-      EXPECT_NEAR(sph.x, lat.Degree(), 1e-6);
-      // longitude
-      EXPECT_NEAR(sph.y, lon.Degree(), 1e-6);
-      // elevation
-      EXPECT_NEAR(sph.z, elev, 1e-6);
-      loc = sc.LocalFromSpherical(sph);
-      // X
-      EXPECT_NEAR(sph.x, xyz.x, 1e-6);
-      // Y
-      EXPECT_NEAR(sph.y, xyz.y, 1e-6);
-      // Z
-      EXPECT_NEAR(sph.z, xyz.z, 1e-6);
-
-      // 200 km offset in x (pi/2 heading offset means North)
-      xyz.Set(2e5, 0, 0);
-      sph = sc.SphericalFromLocal(xyz);
-      // increase in latitude about 1.8 degrees
-      EXPECT_NEAR(sph.x, lat.Degree() + 1.8, 0.008);
-      // no change in longitude
-      EXPECT_NEAR(sph.y, lon.Degree(), 1e-6);
-      // no change in elevation
-      EXPECT_NEAR(sph.z, elev, 1e-6);
-      loc = sc.LocalFromSpherical(sph);
-      // X
-      EXPECT_NEAR(sph.x, xyz.x, 1e-6);
-      // Y
-      EXPECT_NEAR(sph.y, xyz.y, 1e-6);
-      // Z
-      EXPECT_NEAR(sph.z, xyz.z, 1e-6);
-
-    }
+    // Spherical to ECEF
+    tmp = sc.CoordinateTransform(osrf_s,common::SphericalCoordinates::SPHERICAL,
+      common::SphericalCoordinates::ECEF);
+    EXPECT_NEAR(tmp.x, osrf_e.x, 1e-6);
+    EXPECT_NEAR(tmp.y, osrf_e.y, 1e-6);
+    EXPECT_NEAR(tmp.z, osrf_e.z, 1e-6);
+    tmp = sc.CoordinateTransform(tmp,common::SphericalCoordinates::ECEF,
+      common::SphericalCoordinates::SPHERICAL);
+    EXPECT_NEAR(tmp.x, osrf_s.x, 1e-6);
+    EXPECT_NEAR(tmp.y, osrf_s.y, 1e-6);
+    EXPECT_NEAR(tmp.z, osrf_s.z, 1e-6);
   }
 }
 
@@ -224,7 +159,6 @@ TEST_F(SphericalCoordinatesTest, Distance)
   latB.SetFromDegree(46.124953);
   longB.SetFromDegree(-122.251683);
   double d = common::SphericalCoordinates::Distance(latA, longA, latB, longB);
-
   EXPECT_NEAR(14002, d, 20);
 }
 
