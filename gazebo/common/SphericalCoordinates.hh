@@ -22,6 +22,7 @@
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -44,6 +45,23 @@ namespace gazebo
                 /// \brief Model of reference ellipsoid for earth, based on
                 /// WGS 84 standard. see wikipedia: World_Geodetic_System
                 EARTH_WGS84 = 1
+              };
+
+      /// \enum CoordinateType
+      /// \brief Unique identifiers for planetary surface models.
+      public: enum CoordinateType
+              {
+                /// \brief Latitude, Longitude and Altitude by SurfaceType
+                SPHERICAL = 1,
+                
+                /// \brief Earth centered, earth fixed Cartesian
+                ECEF = 2,
+
+                /// \brief Local tangent plane (East, North, Up)
+                GLOBAL = 3,
+
+                /// \brief Heading-adjusted tangent plane (Z, Y, Z)
+                LOCAL = 4
               };
 
       /// \brief Constructor.
@@ -70,15 +88,26 @@ namespace gazebo
 
       /// \brief Convert a Cartesian position vector to geodetic coordinates.
       /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
-      /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
+      /// \return Coordinates: geodetic latitude (deg), longitude (deg),
       ///         altitude above sea level (m).
       public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz) const;
+
+      /// \brief Convert a geodetic position vector to Cartesian coordinates.
+      /// \param[in] _xyz Geodetic position int the planetary frame of reference
+      /// \return Coordinates: Cartesian position vector in gazebo's world frame
+      public: math::Vector3 LocalFromSpherical(const math::Vector3 &_xyz) const;
 
       /// \brief Convert a Cartesian velocity vector in the local gazebo frame
       ///        to a global Cartesian frame with components East, North, Up.
       /// \param[in] _xyz Cartesian vector in gazebo's world frame.
       /// \return Rotated vector with components (x,y,z): (East, North, Up).
       public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz) const;
+
+      /// \brief Convert a Cartesian velocity vector with components East, 
+      /// North, Up to a global Gazebo cartesian frame vector XYZ
+      /// \param[in] _xyz Cartesian vector in gazebo's world frame.
+      /// \return Rotated vector with components (x,y,z): (East, North, Up).
+      public: math::Vector3 LocalFromGlobal(const math::Vector3 &_xyz) const;
 
       /// \brief Convert a string to a SurfaceType.
       /// \param[in] _str String to convert.
@@ -141,9 +170,32 @@ namespace gazebo
       /// \param[in] _angle Heading offset for gazebo frame.
       public: void SetHeadingOffset(const math::Angle &_angle);
 
+      /// \brief Update coordinate transformation matrix with reference location
+      public: void UpdateTransformationMatrix();
+
+      /// \brief Convert to and from Spherical/ECEF/LLA/ENU/GAZEBO
+      /// \param[in] _pos Cartesian vector in gazebo's world frame.
+      /// \param[in] _in  CoordinateType for input position
+      /// \param[in] _out CoordinateType for returned position
+      /// \return Transformed coordinate using cached orgin
+      public: math::Vector3 CoordinateTransform(const math::Vector3 &_pos,
+        const CoordinateType &_in, const CoordinateType &_out) const;
+
       /// internal
       /// \brief Pointer to the private data
       private: SphericalCoordinatesPrivate *dataPtr;
+
+      /// internal (ellipse parameters)
+      private: double ell_a;  // Semi-major axis
+      private: double ell_b;  // Semi-minor axis
+      private: double ell_f;  // Flattening
+      private: double ell_e;  // First eccentricity
+      private: double ell_p;  // Second eccentricity
+
+      // Cahce the ECEF position of the the origin 
+      private: math::Vector3 origin;
+      private: math::Matrix3 Recef2enu;
+
     };
     /// \}
   }

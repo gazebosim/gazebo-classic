@@ -26,17 +26,6 @@
 using namespace gazebo;
 using namespace common;
 
-// Parameters for EARTH_WGS84 model
-// a: Semi-major equatorial axis (meters)
-// b: Semi-minor polar axis (meters)
-// if: inverse flattening (no units)
-// wikipedia: World_Geodetic_System#A_new_World_Geodetic_System:_WGS_84
-const double g_EarthWGS84AxisEquatorial = 6378137.0;
-const double g_EarthWGS84AxisPolar = 6356752.314245;
-
-const double g_EarthSphere = 6371000.0;
-// const double g_EarthWGS84Flattening = 1/298.257223563;
-
 //////////////////////////////////////////////////
 SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(
   const std::string &_str)
@@ -73,11 +62,17 @@ SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
                                            const math::Angle &_heading)
   : dataPtr(new SphericalCoordinatesPrivate)
 {
+  // Set the reference and calculate ellipse parameters
   this->SetSurfaceType(_type);
-  this->SetLatitudeReference(_latitude);
-  this->SetLongitudeReference(_longitude);
-  this->SetElevationReference(_elevation);
-  this->SetHeadingOffset(_heading);
+
+  // Set the coordinate transform parameters
+  this->dataPtr->latitudeReference.SetFromRadian(_latitude.Radian());
+  this->dataPtr->longitudeReference.SetFromRadian(_longitude.Radian());
+  this->dataPtr->elevationReference = _elevation;
+  this->dataPtr->headingOffset.SetFromRadian(_heading.Radian());
+
+  // Generate transformation matrix
+  this->UpdateTransformationMatrix();
 }
 
 //////////////////////////////////////////////////
@@ -121,93 +116,175 @@ math::Angle SphericalCoordinates::GetHeadingOffset() const
 void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 {
   this->dataPtr->surfaceType = _type;
+  switch (this->dataPtr->surfaceType)
+  {
+  case EARTH_WGS84: default:
+    ell_a = 6378137.0;
+    ell_b = 6356752.31424518;
+    ell_f = (ell_a - ell_b) / ell_a;
+    ell_e = sqrt((ell_a*ell_a-ell_b*ell_b)/(ell_a*ell_a));
+    ell_p = sqrt((ell_a*ell_a-ell_b*ell_b)/(ell_b*ell_b));
+    break;
+  }
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetLatitudeReference(const math::Angle &_angle)
 {
   this->dataPtr->latitudeReference.SetFromRadian(_angle.Radian());
+  this->UpdateTransformationMatrix();
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetLongitudeReference(const math::Angle &_angle)
 {
   this->dataPtr->longitudeReference.SetFromRadian(_angle.Radian());
+  this->UpdateTransformationMatrix();
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetElevationReference(double _elevation)
 {
   this->dataPtr->elevationReference = _elevation;
+  this->UpdateTransformationMatrix();
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetHeadingOffset(const math::Angle &_angle)
 {
   this->dataPtr->headingOffset.SetFromRadian(_angle.Radian());
+  this->UpdateTransformationMatrix();
+}
+
+//////////////////////////////////////////////////
+void SphericalCoordinates::UpdateTransformationMatrix()
+{
+  // Cache trig results
+  double cosLat = cos(this->dataPtr->latitudeReference.Radian());
+  double sinLat = sin(this->dataPtr->latitudeReference.Radian());
+  double cosLon = cos(this->dataPtr->longitudeReference.Radian());
+  double sinLon = sin(this->dataPtr->longitudeReference.Radian());
+
+  // Create a rotation matrix that moves ECEF-r to ENU
+  this->Recef2enu = math::Matrix3(
+                      -sinLon,           cosLon,          0.0,
+                      -cosLon * sinLat, -sinLat * sinLon, cosLat,
+                       cosLat * cosLon,  cosLat * sinLon, sinLat
+                    );
+
+  // Cache the ECEF coordinate of the origin
+  this->origin = math::Vector3(
+    this->dataPtr->latitudeReference.Radian(),
+    this->dataPtr->longitudeReference.Radian(),
+    this->dataPtr->elevationReference);
+  this->origin = this->CoordinateTransform(this->origin,SPHERICAL,ECEF);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SphericalCoordinates::CoordinateTransform(const math::Vector3 &_pos,
+  const CoordinateType &_in, const CoordinateType &_out) const
+{
+  // Output value
+  math::Vector3 tmp = _pos;  // Cache input value locally
+  math::Vector3 ecef;        // The ecef coordinate of the input position
+
+  // Cache trig results
+  double cosLat = cos(_pos.x);
+  double sinLat = sin(_pos.x);
+  double cosLon = cos(_pos.y);
+  double sinLon = sin(_pos.y);
+  double cosHea = cos(this->dataPtr->headingOffset.Radian());
+  double sinHea = sin(this->dataPtr->headingOffset.Radian());
+
+  // Radius of planet curvature (meters) 
+  double N = this->ell_a/sqrt(1.0-this->ell_e*this->ell_e*sinLat*sinLat);
+
+  // Convert whatever arrives to a more flexible ECEF coordinate
+  switch (_in)
+  {
+  case LOCAL: // -> ENU (note no break at end of case)
+    tmp.x = - _pos.x * cosHea + _pos.y * sinHea;
+    tmp.y = - _pos.x * sinHea - _pos.y * cosHea;
+  case GLOBAL: // -> spherical
+    ecef = this->origin  + this->Recef2enu.Inverse() * tmp;
+    break;
+  case SPHERICAL: // -> ECEF
+    ecef.x = (tmp.z + N) * cosLat * cosLon;
+    ecef.y = (tmp.z + N) * cosLat * sinLon;
+    ecef.z = ((this->ell_b*this->ell_b)/(this->ell_a*this->ell_a)*N+tmp.z) 
+             * sinLat;
+    break;
+  case ECEF: default:  // Do nothing
+    ecef = _pos; 
+    break;
+  }
+
+  // CASE 1 : Return ECEF
+  if (_out==ECEF) 
+    return ecef;
+
+  // Convert from ECEF to spherical coordinates
+  double p = sqrt(ecef.x*ecef.x + ecef.y*ecef.y);
+  double T = atan2(ecef.z * this->ell_a, p * this->ell_b);
+  double sinT = sin(T);
+  double cosT = cos(T);
+  tmp.x = atan2(ecef.z+this->ell_p*this->ell_p*this->ell_b*sinT*sinT*sinT,
+    p - this->ell_e*this->ell_e*this->ell_a*cosT*cosT*cosT);
+  tmp.y = atan2(ecef.y,ecef.x);
+  tmp.z = p/cos(tmp.y) - N;
+
+  // CASE 2 : Return SPHERICAL
+  if (_out==SPHERICAL)
+    return tmp;
+
+  // Convert from spherical to ENU
+  tmp = this->Recef2enu * (ecef - this->origin);
+
+  // CASE 2 : Return ENU
+  if (_out==GLOBAL)
+    return tmp;
+
+  // CASE 4 : Convert from ENU to LOCAL
+  ecef = tmp;
+  tmp.x = ecef.x * cosHea - ecef.y * sinHea;
+  tmp.y = ecef.x * sinHea + ecef.y * cosHea;
+
+  // Return!
+  return tmp;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::SphericalFromLocal(
     const math::Vector3 &_xyz) const
 {
-  double radiusMeridional = 1.0;
-  double radiusNormal = 1.0;
-  double headingSine = sin(this->dataPtr->headingOffset.Radian());
-  double headingCosine = cos(this->dataPtr->headingOffset.Radian());
+  return this->CoordinateTransform(_xyz,LOCAL,SPHERICAL);
+}
 
-  switch (this->dataPtr->surfaceType)
-  {
-    case EARTH_WGS84:
-      // Currently uses radius of curvature equations from wikipedia
-      // http://en.wikipedia.org/wiki/Earth_radius#Radius_of_curvature
-      {
-        double a = g_EarthWGS84AxisEquatorial;
-        double b = g_EarthWGS84AxisPolar;
-        double ab = a*b;
-        double cosLat = cos(this->dataPtr->latitudeReference.Radian());
-        double sinLat = sin(this->dataPtr->latitudeReference.Radian());
-        double denom = (a*cosLat)*(a*cosLat) + (b*sinLat)*(b*sinLat);
-        radiusMeridional = ab*ab / denom / sqrt(denom);
-        radiusNormal = a*a / sqrt(denom);
-      }
-      break;
-
-    default:
-      break;
-  }
-
-  math::Vector3 spherical;
-  double east  = _xyz.x * headingCosine - _xyz.y * headingSine;
-  double north = _xyz.x * headingSine   + _xyz.y * headingCosine;
-  // Assumes small changes in latitude / longitude.
-  // May not work well near the north / south poles.
-  math::Angle deltaLatitude(north / radiusMeridional);
-  math::Angle deltaLongitude(east / radiusNormal);
-  // geodetic latitude in degrees
-  spherical.x = this->dataPtr->latitudeReference.Degree() +
-                deltaLatitude.Degree();
-  // geodetic longitude in degrees
-  spherical.y = this->dataPtr->longitudeReference.Degree() +
-                deltaLongitude.Degree();
-  // altitude relative to sea level
-  spherical.z = this->dataPtr->elevationReference + _xyz.z;
-  return spherical;
+//////////////////////////////////////////////////
+math::Vector3 SphericalCoordinates::LocalFromSpherical(
+    const math::Vector3 &_xyz) const
+{
+  return this->CoordinateTransform(_xyz,SPHERICAL,LOCAL);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::GlobalFromLocal(const math::Vector3 &_xyz)
     const
 {
-  double headingSine = sin(this->dataPtr->headingOffset.Radian());
-  double headingCosine = cos(this->dataPtr->headingOffset.Radian());
-  double east  = _xyz.x * headingCosine - _xyz.y * headingSine;
-  double north = _xyz.x * headingSine   + _xyz.y * headingCosine;
-  return math::Vector3(east, north, _xyz.z);
+  return this->CoordinateTransform(_xyz,LOCAL,GLOBAL);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 SphericalCoordinates::LocalFromGlobal(const math::Vector3 &_xyz)
+    const
+{
+  return this->CoordinateTransform(_xyz,GLOBAL,LOCAL);
 }
 
 //////////////////////////////////////////////////
 /// Based on Haversine formula (http://en.wikipedia.org/wiki/Haversine_formula).
+/// This makes the assumption that we are dealing with the earth's surface,
+/// and therefore has parameters hard-coded for EARTH only!
 double SphericalCoordinates::Distance(const math::Angle &_latA,
                                       const math::Angle &_lonA,
                                       const math::Angle &_latB,
@@ -219,6 +296,5 @@ double SphericalCoordinates::Distance(const math::Angle &_latA,
              sin(dLon.Radian() / 2) * sin(dLon.Radian() / 2) *
              cos(_latA.Radian()) * cos(_latB.Radian());
   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  double d = g_EarthSphere * c;
-  return d;
+  return 6371000.0 * c;
 }
