@@ -118,12 +118,16 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
   common::SphericalCoordinates::SurfaceType st =
     common::SphericalCoordinates::EARTH_WGS84;
   {
-    // Some Mountain View landmarks
+    //  GROUND TRUTH TEST POINTS //////////////////////////////////////////////
+    // WGS84 coordinate obtained from online mapping software
+    // > gdaltransform -s_srs WGS84 -t_srs EPSG:4978
+    // > latitude longitude altitude
+    // > X Y Z
     math::Vector3 tmp;
     math::Vector3 osrf_s(37.3877349,-122.0651166,32.0);
-    math::Vector3 osrf_e(-2693701.91, -4299942.15, 3851691.04);
+    math::Vector3 osrf_e(-2693701.91434394,-4299942.14687992,3851691.0393571);
     math::Vector3 goog_s(37.4216719,-122.0821853,30.0);
-    math::Vector3 goog_e(-2693766.72, -4297199.60, 3854681.82);
+    math::Vector3 goog_e(-2693766.71906146,-4297199.59926038,3854681.81878812);
 
     // Convert degrees to radians
     osrf_s.x *= 0.0174532925;
@@ -136,12 +140,12 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       math::Angle(osrf_s.y), osrf_s.z, math::Angle::HalfPi);
 
     // Spherical to ECEF
-    tmp = sc.CoordinateTransform(osrf_s,common::SphericalCoordinates::SPHERICAL,
+    tmp = sc.PositionTransform(osrf_s,common::SphericalCoordinates::SPHERICAL,
       common::SphericalCoordinates::ECEF);
-    EXPECT_NEAR(tmp.x, osrf_e.x, 1e-6);
-    EXPECT_NEAR(tmp.y, osrf_e.y, 1e-6);
-    EXPECT_NEAR(tmp.z, osrf_e.z, 1e-6);
-    tmp = sc.CoordinateTransform(tmp,common::SphericalCoordinates::ECEF,
+    EXPECT_NEAR(tmp.x, osrf_e.x, 1e-2);
+    EXPECT_NEAR(tmp.y, osrf_e.y, 1e-2);
+    EXPECT_NEAR(tmp.z, osrf_e.z, 1e-2);
+    tmp = sc.PositionTransform(tmp,common::SphericalCoordinates::ECEF,
       common::SphericalCoordinates::SPHERICAL);
     EXPECT_NEAR(tmp.x, osrf_s.x, 1e-6);
     EXPECT_NEAR(tmp.y, osrf_s.y, 1e-6);

@@ -190,7 +190,6 @@ math::Vector3 SphericalCoordinates::PositionTransform(const math::Vector3 &_pos,
 {
   // Output value
   math::Vector3 tmp = _pos;  // Cache input value locally
-  math::Vector3 ecef;        // The ecef coordinate of the input position
 
   // Cache trig results
   double cosLat = cos(_pos.x);
@@ -230,15 +229,15 @@ math::Vector3 SphericalCoordinates::PositionTransform(const math::Vector3 &_pos,
     return tmp;
 
   // Convert from ECEF to SPHERICAL
-  double p = sqrt(ecef.x*ecef.x + ecef.y*ecef.y);
-  double T = atan((ecef.z*this->ell_a)/(p*this->ell_b));
+  double p = sqrt(tmp.x*tmp.x + tmp.y*tmp.y);
+  double T = atan((tmp.z*this->ell_a)/(p*this->ell_b));
   double sinT = sin(T);
   double cosT = cos(T);
 
   // Calculate latitude and longitude
-  double lat = atan((ecef.z + this->ell_p*this->ell_p*this->ell_b*sinT*sinT*sinT)/
+  double lat = atan((tmp.z + this->ell_p*this->ell_p*this->ell_b*sinT*sinT*sinT)/
     (p - this->ell_e*this->ell_e*this->ell_a*cosT*cosT*cosT));
-  double lon = atan2(ecef.y,ecef.x);
+  double lon = atan2(tmp.y,tmp.x);
 
   // Recalculate radius of planet curvature
   double n_sinLat = sin(lat);
@@ -259,7 +258,7 @@ math::Vector3 SphericalCoordinates::PositionTransform(const math::Vector3 &_pos,
     return tmp;
 
   // Convert from SPHERICAL TO GLOBAL
-  tmp = this->Recef2enu * (ecef - this->origin);
+  tmp = this->Recef2enu * (tmp - this->origin);
 
   // CASE 2 : Return GLOBAL
   if (_out == GLOBAL)
