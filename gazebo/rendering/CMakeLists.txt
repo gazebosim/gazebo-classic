@@ -41,6 +41,7 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LinkOriginVisual.cc
   SonarVisual.cc
   Light.cc
   Material.cc
@@ -98,6 +99,7 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LinkOriginVisual.hh
   SonarVisual.hh
   Light.hh
   Material.hh

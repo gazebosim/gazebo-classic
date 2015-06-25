@@ -36,6 +36,7 @@
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
 #include "gazebo/rendering/AxisVisual.hh"
+#include "gazebo/rendering/LinkOriginVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -3069,14 +3070,9 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateLinkOriginVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  AxisVisualPtr linkOriginVis(new AxisVisual(_msg->name() +
+  LinkOriginVisualPtr linkOriginVis(new LinkOriginVisual(_msg->name() +
       "_LINK_ORIGIN_VISUAL__", _linkVisual));
   linkOriginVis->Load(_msg);
-
-  linkOriginVis->ShowAxisHead(0, false);
-  linkOriginVis->ShowAxisHead(1, false);
-  linkOriginVis->ShowAxisHead(2, false);
-
   linkOriginVis->SetVisible(this->dataPtr->showLinkOrigins);
   this->dataPtr->visuals[linkOriginVis->GetId()] = linkOriginVis;
 }
