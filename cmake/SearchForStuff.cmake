@@ -602,13 +602,16 @@ else ()
 endif ()
 
 ########################################
-# Find ignition math
-find_package(ignition-math2 QUIET)
-if (NOT ignition-math2_FOUND)
-  message(STATUS "Looking for ignition-math2-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math2 library.")
-else()
-  message(STATUS "Looking for ignition-math2-config.cmake - found")
+# Find ignition math in unix platforms
+# In Windows we expect a call from configure.bat script with the paths
+if (NOT WIN32)
+  find_package(ignition-math2 QUIET)
+  if (NOT ignition-math2_FOUND)
+    message(STATUS "Looking for ignition-math2-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math2 library.")
+  else()
+    message(STATUS "Looking for ignition-math2-config.cmake - found")
+  endif()
 endif()
 
 ########################################

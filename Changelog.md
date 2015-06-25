@@ -3,6 +3,10 @@
 1. Added Gazebo splash screen
     * [Pull request #1745](https://bitbucket.org/osrf/gazebo/pull-request/1745)
 
+1. Added a transporter plugin which allows models to move from one location
+   to another based on their location and the location of transporter pads.
+    * [Pull request #1738](https://bitbucket.org/osrf/gazebo/pull-request/1738)
+   
 1. Implement forward/backwards multi-step for log playback. Now, the semantics
 of a multi-step while playing back a log session are different from a multi-step
 during a live simulation. While playback, a multi-step simulates all the
@@ -315,6 +319,9 @@ compilation on Windows.
         * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
         * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
 
+    1. Add measurement unit to building inspectors.
+        * [Pull request #1741](https://bitbucket.org/osrf/gazebo/pull-request/1741)
+        * [Issue #1363](https://bitbucket.org/osrf/gazebo/issue/1363)
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
