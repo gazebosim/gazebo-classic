@@ -1731,8 +1731,11 @@ void MainWindow::AddMenu(QMenu *_menu)
     // _menu does not show up in the menu bar.
     // So workaround is to use addMenu(QString)
     QMenu *newMenu = menuBars[0]->addMenu(_menu->title());
+
     for (auto &menuAct : _menu->actions())
       newMenu->addAction(menuAct);
+
+
   }
 }
 
