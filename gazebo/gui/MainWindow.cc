@@ -1446,6 +1446,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
     this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     this->setMenuBar(this->menuBar);
 
+    // populate main window's menu bar with menus from normal simulation mode
     this->CreateMenuBar();
   }
 
@@ -1458,12 +1459,20 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
     // Note: for some reason we can not call menuBar() again,
     // so manually retrieving the menubar from the mainwindow.
     QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
-    newMenuBar = menuBars[0];
+    if (!menuBars.empty())
+      newMenuBar = menuBars[0];
   }
   else
   {
     newMenuBar = _bar;
   }
+
+  if (!newMenuBar)
+  {
+    gzerr << "Unable to set NULL menu bar" << std::endl;
+    return;
+  }
+
   QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
   for (int i = 0; i < menus.size(); ++i)
   {
@@ -1707,7 +1716,24 @@ void MainWindow::CreateMenuBar()
 /////////////////////////////////////////////////
 void MainWindow::AddMenu(QMenu *_menu)
 {
-  this->menuBar->addMenu(_menu);
+  if (!_menu)
+    return;
+
+  // Get the main window's menubar
+  // Note: for some reason we can not call menuBar() again,
+  // so manually retrieving the menubar from the mainwindow.
+  QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
+  if (!menuBars.empty())
+  {
+    // Note: addMenu(QMenu *) works the first time but when
+    // ShowMenuBar() is called more than once which results in menus being
+    // re-added, (e.g. when switching between model editor and simulation modes)
+    // _menu does not show up in the menu bar.
+    // So workaround is to use addMenu(QString)
+    QMenu *newMenu = menuBars[0]->addMenu(_menu->title());
+    for (auto &menuAct : _menu->actions())
+      newMenu->addAction(menuAct);
+  }
 }
 
 /////////////////////////////////////////////////
