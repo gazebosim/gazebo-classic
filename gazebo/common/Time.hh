@@ -41,6 +41,10 @@ namespace gazebo
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;
 
+      /// \brief A static time variable set to a millisecond:
+      /// common::Time(0, 1000000).
+      public: static const Time Millisecond;
+
       /// \brief A static time variable set to a second: common::Time(1, 0).
       public: static const Time Second;
 
