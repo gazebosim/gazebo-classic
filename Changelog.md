@@ -3,7 +3,7 @@
 1. Added a transporter plugin which allows models to move from one location
    to another based on their location and the location of transporter pads.
     * [Pull request #1738](https://bitbucket.org/osrf/gazebo/pull-request/1738)
-   
+
 1. Implement forward/backwards multi-step for log playback. Now, the semantics
 of a multi-step while playing back a log session are different from a multi-step
 during a live simulation. While playback, a multi-step simulates all the
@@ -42,6 +42,9 @@ world with the Cessna model and the two previous plugins loaded
 
 1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
     * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+
+1. Added Layers tab and meta information for visuals.
+    * [Pull request #1674](https://bitbucket.org/osrf/gazebo/pull-request/1674)
 
 1. Added countdown behavior for common::Timer and exposed the feature in TimerGUIPlugin.
     * [Pull request #1690](https://bitbucket.org/osrf/gazebo/pull-request/1690)
