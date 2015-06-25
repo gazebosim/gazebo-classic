@@ -73,7 +73,7 @@ namespace gazebo
       /// \brief Step simulation forward.
       public slots: void OnStepForward();
 
-      /// \brief Play simulation.
+      /// \brief Step simulation back.
       public slots: void OnStepBack();
 
       /// \brief Play simulation.

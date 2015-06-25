@@ -96,6 +96,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   jumpStartButton->setIconSize(smallIconSize);
   jumpStartButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
+  connect(jumpStartButton, SIGNAL(clicked()), this, SLOT(OnJumpStart()));
 
   // Jump end
   QToolButton *jumpEndButton = new QToolButton(this);
@@ -105,6 +106,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   jumpEndButton->setIconSize(smallIconSize);
   jumpEndButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
+  connect(jumpEndButton, SIGNAL(clicked()), this, SLOT(OnJumpEnd()));
 
   // Step size
   QLabel *stepLabel = new QLabel("Step: ");
@@ -251,7 +253,7 @@ void LogPlayWidget::OnStepForward()
   else
   {
     this->OnPause();
-    this->dataPtr->pendingStep = this->dataPtr->stepSpin->value();
+    this->dataPtr->pendingStep += this->dataPtr->stepSpin->value();
   }
 }
 
@@ -266,7 +268,7 @@ void LogPlayWidget::OnStepBack()
   else
   {
     this->OnPause();
-    this->dataPtr->pendingStep = -this->dataPtr->stepSpin->value();
+    this->dataPtr->pendingStep += -this->dataPtr->stepSpin->value();
   }
 }
 

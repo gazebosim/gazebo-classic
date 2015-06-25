@@ -54,7 +54,7 @@ namespace gazebo
       /// \brief Used to start, stop, and step simulation.
       public: transport::PublisherPtr logPlaybackControlPub;
 
-      /// \brief Used to start, stop, and step simulation.
+      /// \brief Spin box which holds the step size.
       public: QSpinBox *stepSpin;
 
       /// \brief Number of steps pending to be published once the simulation
