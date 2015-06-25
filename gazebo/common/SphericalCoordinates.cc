@@ -165,23 +165,27 @@ void SphericalCoordinates::UpdateTransformationMatrix()
   double cosLon = cos(this->dataPtr->longitudeReference.Radian());
   double sinLon = sin(this->dataPtr->longitudeReference.Radian());
 
-  // Create a rotation matrix that moves ECEF-r to ENU
+  // Create a rotation matrix that moves ECEF to GLOBAL
   this->Recef2enu = math::Matrix3(
                       -sinLon,           cosLon,          0.0,
                       -cosLon * sinLat, -sinLat * sinLon, cosLat,
                        cosLat * cosLon,  cosLat * sinLon, sinLat
                     );
 
+  // Cache heading transforms
+  this->cosHea = cos(this->dataPtr->headingOffset.Radian());
+  this->sinHea = sin(this->dataPtr->headingOffset.Radian());
+
   // Cache the ECEF coordinate of the origin
   this->origin = math::Vector3(
     this->dataPtr->latitudeReference.Radian(),
     this->dataPtr->longitudeReference.Radian(),
     this->dataPtr->elevationReference);
-  this->origin = this->CoordinateTransform(this->origin,SPHERICAL,ECEF);
+  this->origin = this->PositionTransform(this->origin,SPHERICAL,ECEF);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SphericalCoordinates::CoordinateTransform(const math::Vector3 &_pos,
+math::Vector3 SphericalCoordinates::PositionTransform(const math::Vector3 &_pos,
   const CoordinateType &_in, const CoordinateType &_out) const
 {
   // Output value
@@ -193,8 +197,6 @@ math::Vector3 SphericalCoordinates::CoordinateTransform(const math::Vector3 &_po
   double sinLat = sin(_pos.x);
   double cosLon = cos(_pos.y);
   double sinLon = sin(_pos.y);
-  double cosHea = cos(this->dataPtr->headingOffset.Radian());
-  double sinHea = sin(this->dataPtr->headingOffset.Radian());
 
   // Radius of planet curvature (meters) 
   double N = 1.0-this->ell_e*this->ell_e*sinLat*sinLat;
@@ -210,85 +212,142 @@ math::Vector3 SphericalCoordinates::CoordinateTransform(const math::Vector3 &_po
     tmp.x = - _pos.x * cosHea + _pos.y * sinHea;
     tmp.y = - _pos.x * sinHea - _pos.y * cosHea;
   case GLOBAL: // -> spherical
-    ecef = this->origin  + this->Recef2enu.Inverse() * tmp;
+    tmp = this->origin  + this->Recef2enu.Inverse() * tmp;
     break;
   case SPHERICAL: // -> ECEF
-    ecef.x = (_pos.z + N) * cosLat * cosLon;
-    ecef.y = (_pos.z + N) * cosLat * sinLon;
-    ecef.z = ((this->ell_b*this->ell_b)/(this->ell_a*this->ell_a)*N+_pos.z) 
+    tmp.x = (_pos.z + N) * cosLat * cosLon;
+    tmp.y = (_pos.z + N) * cosLat * sinLon;
+    tmp.z = ((this->ell_b*this->ell_b)/(this->ell_a*this->ell_a)*N+_pos.z) 
              * sinLat;
     break;
   case ECEF: default:  // Do nothing
-    ecef = _pos; 
+    tmp = _pos; 
     break;
   }
 
   // CASE 1 : Return ECEF
-  if (_out==ECEF) 
-    return ecef;
+  if (_out == ECEF) 
+    return tmp;
 
-  // Convert from ECEF to spherical coordinates
+  // Convert from ECEF to SPHERICAL
   double p = sqrt(ecef.x*ecef.x + ecef.y*ecef.y);
   double T = atan((ecef.z*this->ell_a)/(p*this->ell_b));
   double sinT = sin(T);
   double cosT = cos(T);
-  tmp.x = atan((ecef.z + this->ell_p*this->ell_p*this->ell_b*sinT*sinT*sinT)/
+
+  // Calculate latitude and longitude
+  double lat = atan((ecef.z + this->ell_p*this->ell_p*this->ell_b*sinT*sinT*sinT)/
     (p - this->ell_e*this->ell_e*this->ell_a*cosT*cosT*cosT));
-  tmp.y = atan2(ecef.y,ecef.x);
-  tmp.z = p/cos(tmp.x) - N;
+  double lon = atan2(ecef.y,ecef.x);
+
+  // Recalculate radius of planet curvature
+  double n_sinLat = sin(lat);
+  double n_cosLat = cos(lat);
+  double n_N = 1.0-this->ell_e*this->ell_e*n_sinLat*n_sinLat;
+  if (n_N < 0)
+    n_N = this->ell_a;
+  else
+    n_N = this->ell_a/sqrt(n_N);  
+
+  // Now calculate Z
+  tmp.x = lat;
+  tmp.y = lon;
+  tmp.z = p/n_cosLat - n_N;
 
   // CASE 2 : Return SPHERICAL
-  if (_out==SPHERICAL)
+  if (_out == SPHERICAL)
     return tmp;
 
-  // Convert from spherical to ENU
+  // Convert from SPHERICAL TO GLOBAL
   tmp = this->Recef2enu * (ecef - this->origin);
 
-  // CASE 2 : Return ENU
-  if (_out==GLOBAL)
+  // CASE 2 : Return GLOBAL
+  if (_out == GLOBAL)
     return tmp;
 
-  // CASE 4 : Convert from ENU to LOCAL
-  ecef = tmp;
-  tmp.x = ecef.x * cosHea - ecef.y * sinHea;
-  tmp.y = ecef.x * sinHea + ecef.y * cosHea;
+  // CASE 4 : Convert from GLOBAL to LOCAL
+  return math::Vector3(
+    tmp.x * cosHea - tmp.y * sinHea,
+    tmp.x * sinHea + tmp.y * cosHea,
+    tmp.z
+  );
+}
 
-  // Return!
-  return tmp;
+//////////////////////////////////////////////////
+math::Vector3 SphericalCoordinates::VelocityTransform(const math::Vector3 &_vel,
+  const CoordinateType &_in, const CoordinateType &_out) const
+{
+  // Sanity check -- velocity should not be expressed in spherical coordinates
+  if (_in == SPHERICAL || _out == SPHERICAL)
+  {
+    gzwarn << "Spherical velocities are not supported";
+    return _vel;
+  }
+
+  // Intermediate data type
+  math::Vector3 tmp = _vel;
+
+  // Convert whatever arrives to an ECEF vector
+  switch (_in)
+  {
+  case LOCAL: // -> ENU (note no break at end of case)
+    tmp.x = - _vel.x * cosHea + _vel.y * sinHea;
+    tmp.y = - _vel.x * sinHea - _vel.y * cosHea;
+  case GLOBAL: // -> spherical
+    tmp = this->Recef2enu.Inverse() * tmp;
+    break;
+  case ECEF: default:  // Do nothing
+    tmp = _vel; 
+    break;
+  }
+
+  // CASE 1: Return the ECEF vector
+  if (_out == ECEF)
+    return tmp;
+
+  // CASE 2: Convert from ECEF to GLOBAL
+  tmp = this->Recef2enu * tmp;
+  if (_out == GLOBAL)
+    return tmp;
+
+  // CASE 3 : Convert from GLOBAL TO LOCAL
+  return math::Vector3(
+    tmp.x * cosHea - tmp.y * sinHea,
+    tmp.x * sinHea + tmp.y * cosHea,
+    tmp.z
+  );
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::SphericalFromLocal(
     const math::Vector3 &_xyz) const
 {
-  return this->CoordinateTransform(_xyz,LOCAL,SPHERICAL);
+  return this->PositionTransform(_xyz,LOCAL,SPHERICAL);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::LocalFromSpherical(
     const math::Vector3 &_xyz) const
 {
-  return this->CoordinateTransform(_xyz,SPHERICAL,LOCAL);
+  return this->PositionTransform(_xyz,SPHERICAL,LOCAL);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::GlobalFromLocal(const math::Vector3 &_xyz)
     const
 {
-  return this->CoordinateTransform(_xyz,LOCAL,GLOBAL);
+  return this->VelocityTransform(_xyz,LOCAL,GLOBAL);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SphericalCoordinates::LocalFromGlobal(const math::Vector3 &_xyz)
     const
 {
-  return this->CoordinateTransform(_xyz,GLOBAL,LOCAL);
+  return this->VelocityTransform(_xyz,GLOBAL,LOCAL);
 }
 
 //////////////////////////////////////////////////
 /// Based on Haversine formula (http://en.wikipedia.org/wiki/Haversine_formula).
-/// This makes the assumption that we are dealing with the earth's surface,
-/// and therefore has parameters hard-coded for EARTH only!
 double SphericalCoordinates::Distance(const math::Angle &_latA,
                                       const math::Angle &_lonA,
                                       const math::Angle &_latB,

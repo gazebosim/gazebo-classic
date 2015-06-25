@@ -173,12 +173,20 @@ namespace gazebo
       /// \brief Update coordinate transformation matrix with reference location
       public: void UpdateTransformationMatrix();
 
-      /// \brief Convert to and from Spherical/ECEF/LLA/ENU/GAZEBO
-      /// \param[in] _pos Cartesian vector in gazebo's world frame.
-      /// \param[in] _in  CoordinateType for input position
-      /// \param[in] _out CoordinateType for returned position
+      /// \brief Convert between positions in SPHERICAL/ECEF/LOCAL/GLOBAL frame
+      /// \param[in] _pos Position vectot in frame defined by parameter _in
+      /// \param[in] _in  CoordinateType for input
+      /// \param[in] _out CoordinateType for output
       /// \return Transformed coordinate using cached orgin
-      public: math::Vector3 CoordinateTransform(const math::Vector3 &_pos,
+      public: math::Vector3 PositionTransform(const math::Vector3 &_pos,
+        const CoordinateType &_in, const CoordinateType &_out) const;
+
+      /// \brief Convert between velocity in SPHERICAL/ECEF/LOCAL/GLOBAL frame
+      /// \param[in] _pos Velocity vector in frame defined by parameter _in
+      /// \param[in] _in  CoordinateType for input
+      /// \param[in] _out CoordinateType for output
+      /// \return Transformed velocity vector
+      public: math::Vector3 VelocityTransform(const math::Vector3 &_vel,
         const CoordinateType &_in, const CoordinateType &_out) const;
 
       /// internal
@@ -195,6 +203,8 @@ namespace gazebo
       // Cahce the ECEF position of the the origin 
       private: math::Vector3 origin;
       private: math::Matrix3 Recef2enu;
+      private: double cosHea;
+      private: double sinHea;
 
     };
     /// \}
