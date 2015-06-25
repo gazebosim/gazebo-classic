@@ -251,7 +251,7 @@ bool PhysicsEngine::SetParam(const std::string &_key,
       }
       else if (_value.type() == typeid(sdf::Vector3))
       {
-        copy = boost::lexical_cast<math::Vector3>
+        copy = boost::lexical_cast<ignition::math::Vector3d>
             (boost::any_cast<sdf::Vector3>(_value));
       }
 #ifndef _WIN32
