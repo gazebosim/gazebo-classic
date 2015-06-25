@@ -18,16 +18,16 @@
 #include <gtest/gtest.h>
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/AxisVisual.hh"
+#include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class AxisVisual_TEST : public ServerFixture
+class LinkFrameVisual_TEST : public ServerFixture
 {
 };
 
 /////////////////////////////////////////////////
-TEST_F(AxisVisual_TEST, LinkOriginTest)
+TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
 {
   Load("worlds/empty.world");
 
@@ -47,35 +47,33 @@ TEST_F(AxisVisual_TEST, LinkOriginTest)
   linkDefaultVis.reset(
       new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
 
-  // create origin visual for the link using msg Load
-  gazebo::rendering::AxisVisualPtr axisVisual(
-      new gazebo::rendering::AxisVisual("_LINK_ORIGIN_VISUAL_",
+  // create frame visual for the link using msg Load
+  gazebo::rendering::LinkFrameVisualPtr linkFrameVisual(
+      new gazebo::rendering::LinkFrameVisual("_LINK_FRAME_VISUAL_",
       linkDefaultVis));
-  axisVisual->Load(linkDefaultMsg);
+  linkFrameVisual->Load(linkDefaultMsg);
 
   // Check that it was added to the scene (by Load)
-  EXPECT_EQ(scene->GetVisual("_LINK_ORIGIN_VISUAL_"), axisVisual);
+  EXPECT_EQ(scene->GetVisual("_LINK_FRAME_VISUAL_"), linkFrameVisual);
 
-   /* public: void ShowAxisRotation(unsigned int _axis, bool _show);
-      public: void ShowAxisShaft(unsigned int _axis, bool _show);
-      public: void ShowAxisHead(unsigned int _axis, bool _show);
-      public: void ScaleXAxis(const math::Vector3 &_scale);
-      public: void ScaleYAxis(const math::Vector3 &_scale);
-      public: void ScaleZAxis(const math::Vector3 &_scale);
-      public: void SetAxisMaterial(unsigned int _axis,
-                                   const std::string &_material);
-      public: void SetAxisVisible(unsigned int _axis, bool _visible);
-*/
+  // Check that it has type physics
+  EXPECT_EQ(linkFrameVisual->GetType(), gazebo::rendering::Visual::VT_PHYSICS);
+
+  // Check that the link visual is the parent
+  EXPECT_EQ(linkFrameVisual->GetParent(), linkDefaultVis);
+
+  // Check that the pose within the link visual (local pose) is zero
+  EXPECT_EQ(linkFrameVisual->GetPose(), gazebo::math::Pose::Zero);
 
   // Remove it from the scene (Fini is called)
-  scene->RemoveVisual(axisVisual);
+  scene->RemoveVisual(linkFrameVisual);
 
   // Check that it was removed
-  EXPECT_TRUE(scene->GetVisual("_LINK_ORIGIN_VISUAL_") == NULL);
+  EXPECT_TRUE(scene->GetVisual("_LINK_FRAME_VISUAL_") == NULL);
 
   // Reset pointer
-  axisVisual.reset();
-  EXPECT_TRUE(axisVisual == NULL);
+  linkFrameVisual.reset();
+  EXPECT_TRUE(linkFrameVisual == NULL);
 }
 
 /////////////////////////////////////////////////

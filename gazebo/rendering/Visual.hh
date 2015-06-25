@@ -508,9 +508,9 @@ namespace gazebo
       /// \param[in] _show True to show inertia visualizations.
       public: void ShowInertia(bool _show);
 
-      /// \brief Display link origin visuals.
-      /// \param[in] _show True to show link origin visualizations.
-      public: void ShowLinkOrigin(bool _show);
+      /// \brief Display link frame visuals.
+      /// \param[in] _show True to show link frame visualizations.
+      public: void ShowLinkFrame(bool _show);
 
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message

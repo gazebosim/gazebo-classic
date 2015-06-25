@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_LINK_ORIGIN_VISUAL_PRIVATE_HH_
-#define _GAZEBO_LINK_ORIGIN_VISUAL_PRIVATE_HH_
+#ifndef _GAZEBO_LINK_FRAME_VISUAL_PRIVATE_HH_
+#define _GAZEBO_LINK_FRAME_VISUAL_PRIVATE_HH_
 
 #include "gazebo/rendering/AxisVisualPrivate.hh"
 
@@ -24,9 +24,14 @@ namespace gazebo
 {
   namespace rendering
   {
-    /// \brief Private data for the LinkOrigin Visual class.
-    class LinkOriginVisualPrivate : public AxisVisualPrivate
+    /// \brief Private data for the LinkFrame Visual class.
+    class LinkFrameVisualPrivate : public AxisVisualPrivate
     {
+      /// \brief Parent link name.
+      public: std::string linkName;
+
+      /// \brief Scale based on the size of the parent link.
+      public: math::Vector3 scaleToLink;
     };
   }
 }

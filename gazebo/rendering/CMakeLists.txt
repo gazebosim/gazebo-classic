@@ -41,7 +41,7 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
-  LinkOriginVisual.cc
+  LinkFrameVisual.cc
   SonarVisual.cc
   Light.cc
   Material.cc
@@ -99,7 +99,7 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
-  LinkOriginVisual.hh
+  LinkFrameVisual.hh
   SonarVisual.hh
   Light.hh
   Material.hh
@@ -144,11 +144,11 @@ set (gtest_sources)
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
-  AxisVisual_TEST.cc
   COMVisual_TEST.cc
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
+  LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc

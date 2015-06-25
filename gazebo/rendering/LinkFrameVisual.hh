@@ -15,13 +15,13 @@
  *
 */
 
-#ifndef _GAZEBO_LINK_ORIGIN_VISUAL_HH_
-#define _GAZEBO_LINK_ORIGIN_VISUAL_HH_
+#ifndef _GAZEBO_LINK_FRAME_VISUAL_HH_
+#define _GAZEBO_LINK_FRAME_VISUAL_HH_
 
 #include <string>
 
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/AxisVisual.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -31,17 +31,17 @@ namespace gazebo
     /// \addtogroup gazebo_rendering Rendering
     /// \{
 
-    /// \class LinkOriginVisual LinkOriginVisual.hh rendering/rendering.hh
-    /// \brief Visualization for link origins.
-    class GZ_RENDERING_VISIBLE LinkOriginVisual : public AxisVisual
+    /// \class LinkFrameVisual LinkFrameVisual.hh rendering/rendering.hh
+    /// \brief Visualization for link frames.
+    class GZ_RENDERING_VISIBLE LinkFrameVisual : public AxisVisual
     {
       /// \brief Constructor
-      /// \param[in] _name Name of the LinkOriginVisual
+      /// \param[in] _name Name of the LinkFrameVisual
       /// \param[in] _parent Parent visual
-      public: LinkOriginVisual(const std::string &_name, VisualPtr _parent);
+      public: LinkFrameVisual(const std::string &_name, VisualPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~LinkOriginVisual();
+      public: virtual ~LinkFrameVisual() = default;
 
       // Documentation inherited
       public: virtual void Load(ConstLinkPtr &_msg);

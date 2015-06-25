@@ -1498,16 +1498,16 @@ void Visual::SetHighlighted(bool _highlighted)
 
     if (this->GetType() == VT_LINK)
     {
-      VisualPtr linkOriginVis;
+      VisualPtr linkFrameVis;
       for (auto child : this->dataPtr->children)
       {
         if (child->GetName().find("LINK_ORIGIN_VISUAL__") != std::string::npos)
-          linkOriginVis = child;
+          linkFrameVis = child;
       }
-      if (linkOriginVis)
+      if (linkFrameVis)
       {
-        std::cout << linkOriginVis->GetName() << std::endl;
-        linkOriginVis->SetEmissive(common::Color::Red);
+        std::cout << linkFrameVis->GetName() << std::endl;
+        linkFrameVis->SetEmissive(common::Color::Red);
       }
     }
   }
@@ -2834,14 +2834,14 @@ void Visual::ShowInertia(bool _show)
 }
 
 //////////////////////////////////////////////////
-void Visual::ShowLinkOrigin(bool _show)
+void Visual::ShowLinkFrame(bool _show)
 {
-  if (this->GetName().find("LINK_ORIGIN_VISUAL__") != std::string::npos)
+  if (this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   for (auto &child : this->dataPtr->children)
   {
-    child->ShowLinkOrigin(_show);
+    child->ShowLinkFrame(_show);
   }
 }
 

@@ -62,30 +62,12 @@ AxisVisual::~AxisVisual()
 }
 
 /////////////////////////////////////////////////
-void AxisVisual::Load(ConstLinkPtr &_msg)
-{
-  Visual::Load();
-
-  AxisVisualPrivate *dPtr =
-      reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
-
-  dPtr->elementName = _msg->name();
-
-  double elementSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
-  elementSize = std::min(elementSize, 1.0);
-  dPtr->scaleToElement = math::Vector3(elementSize * 0.7,
-                                       elementSize * 0.7,
-                                       elementSize * 0.7);
-
-  this->Load();
-}
-
-/////////////////////////////////////////////////
 void AxisVisual::Load()
 {
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
+
+  Visual::Load();
 
   dPtr->xAxis.reset(new ArrowVisual(this->GetName() +
       "_X_AXIS", shared_from_this()));
@@ -107,14 +89,6 @@ void AxisVisual::Load()
 
   dPtr->yAxis->SetRotation(
       math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
-
-  // Scale according to the element it is attached to
-  if (dPtr->scaleToElement != math::Vector3::Zero)
-    this->SetScale(dPtr->scaleToElement);
-
-  // Don't scale with link
-  if (dPtr->parent && dPtr->parent->GetType() == VT_LINK)
-    this->GetSceneNode()->setInheritScale(false);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

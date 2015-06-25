@@ -115,9 +115,9 @@ ModelRightMenu::ModelRightMenu()
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
 
-  state = new ViewState(this, "show_link_origin", "hide_link_origin");
-  state->action = new QAction(tr("Link Origin"), this);
-  state->action->setStatusTip(tr("Show link origins"));
+  state = new ViewState(this, "show_link_frame", "hide_link_frame");
+  state->action = new QAction(tr("Link Frames"), this);
+  state->action->setStatusTip(tr("Show link frames"));
   state->action->setCheckable(true);
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);

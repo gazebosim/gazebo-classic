@@ -904,14 +904,18 @@ void MainWindow::ShowInertia()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::ShowLinkOrigin()
+void MainWindow::ShowLinkFrame()
 {
-  if (g_showLinkOriginAct->isChecked())
+  if (g_showLinkFrameAct->isChecked())
+  {
     transport::requestNoReply(this->node->GetTopicNamespace(),
-        "show_link_origin", "all");
+        "show_link_frame", "all");
+  }
   else
+  {
     transport::requestNoReply(this->node->GetTopicNamespace(),
-        "hide_link_origin", "all");
+        "hide_link_frame", "all");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1256,12 +1260,12 @@ void MainWindow::CreateActions()
   connect(g_showInertiaAct, SIGNAL(triggered()), this,
       SLOT(ShowInertia()));
 
-  g_showLinkOriginAct = new QAction(tr("Link Origins"), this);
-  g_showLinkOriginAct->setStatusTip(tr("Show link origins"));
-  g_showLinkOriginAct->setCheckable(true);
-  g_showLinkOriginAct->setChecked(false);
-  connect(g_showLinkOriginAct, SIGNAL(triggered()), this,
-      SLOT(ShowLinkOrigin()));
+  g_showLinkFrameAct = new QAction(tr("Link Frames"), this);
+  g_showLinkFrameAct->setStatusTip(tr("Show link frames"));
+  g_showLinkFrameAct->setCheckable(true);
+  g_showLinkFrameAct->setChecked(false);
+  connect(g_showLinkFrameAct, SIGNAL(triggered()), this,
+      SLOT(ShowLinkFrame()));
 
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
@@ -1602,8 +1606,8 @@ void MainWindow::DeleteActions()
   delete g_showInertiaAct;
   g_showInertiaAct = 0;
 
-  delete g_showLinkOriginAct;
-  g_showLinkOriginAct = 0;
+  delete g_showLinkFrameAct;
+  g_showLinkFrameAct = 0;
 
   delete g_showContactsAct;
   g_showContactsAct = 0;
@@ -1704,8 +1708,8 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showJointsAct);
   viewMenu->addAction(g_showCOMAct);
   viewMenu->addAction(g_showInertiaAct);
-  viewMenu->addAction(g_showLinkOriginAct);
   viewMenu->addAction(g_showContactsAct);
+  viewMenu->addAction(g_showLinkFrameAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
