@@ -31,24 +31,24 @@ SplashScreen::SplashScreen()
 {
   this->setObjectName("SplashScreen");
   QPixmap pixmap(":/images/splash.svg");
-  QTextEdit *edit = new QTextEdit(
-      "<br><br>Welcome to Gazebo!<br><br>"
-      "Please prepare for some 3D robot awesomeness.<br><br>"
-      "Gazebo is now downloading models to prepare to start the simulation."
-      "Depending on your internet connection, this can take an arbitrarily "
-      "long amount of time. If you have read this far, we apologize. "
-      "Have a nice day.");
-  edit->setAcceptRichText(true);
-  edit->setContentsMargins(0, 0, 0, 0);
-  edit->setFrameStyle(QFrame::NoFrame);
+  std::string statusText;
+  statusText = "Downloading models...sit tight!";
+  std::string versionText;
+  versionText = "Version " + std::string(GAZEBO_VERSION);
+  std::string splashText = statusText + "<br>" +  versionText;
+  QTextEdit *textEdit = new QTextEdit(tr(splashText.c_str()));
+  textEdit->setAcceptRichText(true);
+  textEdit->setContentsMargins(0, 0, 0, 0);
+  textEdit->setFrameStyle(QFrame::NoFrame);
+  textEdit->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
   this->dataPtr->splashScreen = new QSplashScreen(pixmap);
-  QHBoxLayout *box = new QHBoxLayout();
-  box->setContentsMargins(0, 0, 0, 0);
-  this->dataPtr->splashScreen->setLayout(box);
-  box->addItem(new QSpacerItem(350, 1));
-  box->addWidget(edit);
+  QVBoxLayout *textLayout = new QVBoxLayout();
+  textLayout->addItem(new QSpacerItem(1, pixmap.size().height() * 0.8));
+  textLayout->addWidget(textEdit);
+  this->dataPtr->splashScreen->setLayout(textLayout);
+
   this->dataPtr->splashScreen->show();
-  ShowMessage("");
+  this->ShowMessage("");
   QTimer::singleShot(10, this, SLOT(Update()));
 }
 
@@ -66,8 +66,8 @@ SplashScreen::~SplashScreen()
 void SplashScreen::ShowMessage(const std::string &_message)
 {
   this->dataPtr->splashScreen->showMessage(tr(_message.c_str()),
-                                           Qt::AlignBottom,
-                                           Qt::white);
+                                           Qt::AlignBottom | Qt::AlignHCenter,
+                                           Qt::black);
 }
 
 /////////////////////////////////////////////////

@@ -1,4 +1,8 @@
 ## Gazebo 6.0
+
+1. Added Gazebo splash screen
+    * [Pull request #1745](https://bitbucket.org/osrf/gazebo/pull-request/1745)
+
 1. Implement forward/backwards multi-step for log playback. Now, the semantics
 of a multi-step while playing back a log session are different from a multi-step
 during a live simulation. While playback, a multi-step simulates all the
