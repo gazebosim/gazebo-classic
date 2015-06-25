@@ -101,7 +101,7 @@ double DARTFixedJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0.0;
 
-  gzerr << "called invalid method SetVelocity in a fixed joint\n";
+  gzerr << "called invalid method GetVelocity in a fixed joint\n";
 
   return result;
 }

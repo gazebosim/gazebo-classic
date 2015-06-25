@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SIMBODY_FIXEDJOINT_HH_
-#define _SIMBODY_FIXEDJOINT_HH_
+#ifndef _GAZEBO_SIMBODY_FIXEDJOINT_HH_
+#define _GAZEBO_SIMBODY_FIXEDJOINT_HH_
 
 #include <vector>
 
@@ -39,6 +39,8 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyFixedJoint : public FixedJoint<SimbodyJoint>
     {
       ///  Constructor
+      /// \param[in] world pointer to the simbody world
+      /// \param[in] _parent pointer to the parent Model
       public: SimbodyFixedJoint(SimTK::MultibodySystem *world, BasePtr _parent);
 
       /// Destructor
@@ -67,18 +69,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
-
-      /// \brief save simbody state for spawning
-      public: virtual void SaveSimbodyState(const SimTK::State &_state);
-
-      /// \brief restore  simbody state for spawning
-      public: virtual void RestoreSimbodyState(SimTK::State &_state);
-
-      /// \brief save simbody state for reconstructing simbody model graph
-      private: std::vector<double> simbodyQ;
-
-      /// \brief save simbody state for reconstructing simbody model graph
-      private: std::vector<double> simbodyU;
     };
     /// \}
   }

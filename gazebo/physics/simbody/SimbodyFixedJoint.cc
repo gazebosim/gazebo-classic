@@ -28,7 +28,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyFixedJoint::SimbodyFixedJoint(SimTK::MultibodySystem * /*_world*/,
+SimbodyFixedJoint::SimbodyFixedJoint(SimTK::MultibodySystem */*_world*/,
                                      BasePtr _parent)
     : FixedJoint<SimbodyJoint>(_parent)
 {
@@ -99,45 +99,4 @@ math::Angle SimbodyFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
     gzdbg << "SimbodyFixedJoint::GetAngleImpl: "
           << "doesn't make sense in fixed joints...\n";
     return math::Angle();
-}
-
-//////////////////////////////////////////////////
-void SimbodyFixedJoint::SaveSimbodyState(const SimTK::State &_state)
-{
-  if (!this->mobod.isEmptyHandle())
-  {
-    if (this->simbodyQ.empty())
-      this->simbodyQ.resize(this->mobod.getNumQ(_state));
-
-    if (this->simbodyU.empty())
-      this->simbodyU.resize(this->mobod.getNumU(_state));
-
-    for (unsigned int i = 0; i < this->simbodyQ.size(); ++i)
-      this->simbodyQ[i] = this->mobod.getOneQ(_state, i);
-
-    for (unsigned int i = 0; i < this->simbodyU.size(); ++i)
-      this->simbodyU[i] = this->mobod.getOneU(_state, i);
-  }
-  else
-  {
-    // gzerr << "debug: joint name: " << this->GetScopedName() << "\n";
-  }
-}
-
-//////////////////////////////////////////////////
-void SimbodyFixedJoint::RestoreSimbodyState(SimTK::State &_state)
-{
-  if (!this->mobod.isEmptyHandle())
-  {
-    for (unsigned int i = 0; i < this->simbodyQ.size(); ++i)
-      this->mobod.setOneQ(_state, i, this->simbodyQ[i]);
-
-    for (unsigned int i = 0; i < this->simbodyU.size(); ++i)
-      this->mobod.setOneU(_state, i, this->simbodyU[i]);
-  }
-  else
-  {
-    // gzerr << "restoring model [" << this->GetScopedName()
-    //       << "] failed due to uninitialized mobod\n";
-  }
 }

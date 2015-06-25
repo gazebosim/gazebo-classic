@@ -158,14 +158,6 @@ void BulletJoint::SetProvideFeedback(bool _enable)
   this->SetupJointFeedback();
 }
 
-void BulletJoint::SetProvideFeedback(bool _enable)
-{
-  Joint::SetProvideFeedback(_enable);
-
-  this->SetupJointFeedback();
-}
-
-
 //////////////////////////////////////////////////
 void BulletJoint::CacheForceTorque()
 {

@@ -37,6 +37,8 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletFixedJoint : public FixedJoint<BulletJoint>
     {
       ///  Constructor
+      /// \param[in] world pointer to the bullet world
+      /// \param[in] _parent pointer to the parent Model
       public: BulletFixedJoint(btDynamicsWorld *world, BasePtr _parent);
 
       /// Destructor
