@@ -168,13 +168,17 @@ void SphericalCoordinates::UpdateTransformationMatrix()
   // Create a rotation matrix that moves ECEF to GLOBAL
   this->Recef2enu = math::Matrix3(
                       -sinLon,           cosLon,          0.0,
-                      -cosLon * sinLat, -sinLat * sinLon, cosLat,
-                       cosLat * cosLon,  cosLat * sinLon, sinLat
+                      -cosLon * sinLat, -sinLon * sinLat, cosLat,
+                       cosLon * cosLat,  sinLon * cosLat, sinLat
                     );
 
-  // Cache heading transforms
-  this->cosHea = cos(this->dataPtr->headingOffset.Radian());
-  this->sinHea = sin(this->dataPtr->headingOffset.Radian());
+  // Cache heading transforms -- note that we have to negate the heading in 
+  // order to preserve backward compatibility. ie. Gazebo has traditionally 
+  // expressed positive angle as a COCKWISE rotation that takes the GLOBAL frame
+  // to the LOCAL frame. However, right hand coordinate systems require this
+  // to be expressed as an ANTI-CLOCKWISE roation. So, we negate the rotation.
+  this->cosHea = cos(-this->dataPtr->headingOffset.Radian());
+  this->sinHea = sin(-this->dataPtr->headingOffset.Radian());
 
   // Cache the ECEF coordinate of the origin
   this->origin = math::Vector3(
@@ -208,8 +212,8 @@ math::Vector3 SphericalCoordinates::PositionTransform(const math::Vector3 &_pos,
   switch (_in)
   {
   case LOCAL: // -> ENU (note no break at end of case)
-    tmp.x = - _pos.x * cosHea + _pos.y * sinHea;
-    tmp.y = - _pos.x * sinHea - _pos.y * cosHea;
+    tmp.x = -_pos.x * cosHea + _pos.y * sinHea;
+    tmp.y = -_pos.x * sinHea - _pos.y * cosHea;
   case GLOBAL: // -> spherical
     tmp = this->origin  + this->Recef2enu.Inverse() * tmp;
     break;
@@ -228,36 +232,37 @@ math::Vector3 SphericalCoordinates::PositionTransform(const math::Vector3 &_pos,
   if (_out == ECEF) 
     return tmp;
 
-  // Convert from ECEF to SPHERICAL
-  double p = sqrt(tmp.x*tmp.x + tmp.y*tmp.y);
-  double T = atan((tmp.z*this->ell_a)/(p*this->ell_b));
-  double sinT = sin(T);
-  double cosT = cos(T);
-
-  // Calculate latitude and longitude
-  double lat = atan((tmp.z + this->ell_p*this->ell_p*this->ell_b*sinT*sinT*sinT)/
-    (p - this->ell_e*this->ell_e*this->ell_a*cosT*cosT*cosT));
-  double lon = atan2(tmp.y,tmp.x);
-
-  // Recalculate radius of planet curvature
-  double n_sinLat = sin(lat);
-  double n_cosLat = cos(lat);
-  double n_N = 1.0-this->ell_e*this->ell_e*n_sinLat*n_sinLat;
-  if (n_N < 0)
-    n_N = this->ell_a;
-  else
-    n_N = this->ell_a/sqrt(n_N);  
-
-  // Now calculate Z
-  tmp.x = lat;
-  tmp.y = lon;
-  tmp.z = p/n_cosLat - n_N;
-
   // CASE 2 : Return SPHERICAL
   if (_out == SPHERICAL)
-    return tmp;
+  {
+    // Convert from ECEF to SPHERICAL
+    double p = sqrt(tmp.x*tmp.x + tmp.y*tmp.y);
+    double T = atan((tmp.z*this->ell_a)/(p*this->ell_b));
+    double sinT = sin(T);
+    double cosT = cos(T);
 
-  // Convert from SPHERICAL TO GLOBAL
+    // Calculate latitude and longitude
+    double lat = atan((tmp.z + this->ell_p*this->ell_p*this->ell_b*sinT*sinT*sinT)/
+      (p - this->ell_e*this->ell_e*this->ell_a*cosT*cosT*cosT));
+    double lon = atan2(tmp.y,tmp.x);
+
+    // Recalculate radius of planet curvature
+    double n_sinLat = sin(lat);
+    double n_cosLat = cos(lat);
+    double n_N = 1.0-this->ell_e*this->ell_e*n_sinLat*n_sinLat;
+    if (n_N < 0)
+      n_N = this->ell_a;
+    else
+      n_N = this->ell_a/sqrt(n_N);  
+
+    // Now calculate Z
+    tmp.x = lat;
+    tmp.y = lon;
+    tmp.z = p/n_cosLat - n_N;
+    return tmp;
+  }
+
+  // Convert from ECEF TO GLOBAL
   tmp = this->Recef2enu * (tmp - this->origin);
 
   // CASE 2 : Return GLOBAL
@@ -290,8 +295,8 @@ math::Vector3 SphericalCoordinates::VelocityTransform(const math::Vector3 &_vel,
   switch (_in)
   {
   case LOCAL: // -> ENU (note no break at end of case)
-    tmp.x = - _vel.x * cosHea + _vel.y * sinHea;
-    tmp.y = - _vel.x * sinHea - _vel.y * cosHea;
+    tmp.x = -_vel.x * cosHea + _vel.y * sinHea;
+    tmp.y = -_vel.x * sinHea - _vel.y * cosHea;
   case GLOBAL: // -> spherical
     tmp = this->Recef2enu.Inverse() * tmp;
     break;

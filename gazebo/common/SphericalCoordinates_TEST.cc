@@ -117,8 +117,41 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
   // Default surface type
   common::SphericalCoordinates::SurfaceType st =
     common::SphericalCoordinates::EARTH_WGS84;
+
+  // Check velocity projection
   {
-    //  GROUND TRUTH TEST POINTS //////////////////////////////////////////////
+    // Parameters
+    math::Angle lat(0.3), lon(-1.2), heading(math::Angle::HalfPi);
+    double elev = 354.1;
+    common::SphericalCoordinates sc(st, lat, lon, elev, heading);
+
+    math::Vector3 xyz;
+    math::Vector3 enu;
+
+    xyz.Set(1, 0, 0);
+    enu = sc.GlobalFromLocal(xyz);
+    EXPECT_NEAR(enu.y, xyz.x, 1e-6);
+    EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+
+    xyz.Set(0, 1, 0);
+    enu = sc.GlobalFromLocal(xyz);
+    EXPECT_NEAR(enu.y, xyz.x, 1e-6);
+    EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+
+    xyz.Set(1, -1, 0);
+    enu = sc.GlobalFromLocal(xyz);
+    EXPECT_NEAR(enu.y, xyz.x, 1e-6);
+    EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+
+    xyz.Set(2243.52334, 556.35, 435.6553);
+    enu = sc.GlobalFromLocal(xyz);
+    EXPECT_NEAR(enu.y, xyz.x, 1e-6);
+    EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+  }
+
+  // Check position projection
+  {
+    // GROUND TRUTH TEST POINTS ///////////////////////////////////////////////
     // WGS84 coordinate obtained from online mapping software
     // > gdaltransform -s_srs WGS84 -t_srs EPSG:4978
     // > latitude longitude altitude
@@ -129,27 +162,48 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
     math::Vector3 goog_s(37.4216719,-122.0821853,30.0);
     math::Vector3 goog_e(-2693766.71906146,-4297199.59926038,3854681.81878812);
 
+    // Local tangent plane coordinates (ENU = GLOBAL) coordinates of Google when
+    // OSRF is taken as the origin:
+    // > proj +ellps=WGS84  +proj=tmerc +lat_0=37.3877349 +lon_0=-122.0651166 +k=1 +x_0=0 +y_0=0
+    // > -122.0821853 37.4216719 (LON,LAT)
+    // > -1510.88 3766.64 (EAST,NORTH)
+    math::Vector3 vec(-1510.88,3766.64,-3.29);
+
     // Convert degrees to radians
     osrf_s.x *= 0.0174532925;
     osrf_s.y *= 0.0174532925;
     goog_s.x *= 0.0174532925;
     goog_s.y *= 0.0174532925;
 
-    // Set an origin
+    // Set the ORIGIN to be the Open Source Robotics Foundation
     common::SphericalCoordinates sc(st, math::Angle(osrf_s.x), 
-      math::Angle(osrf_s.y), osrf_s.z, math::Angle::HalfPi);
+      math::Angle(osrf_s.y), osrf_s.z, 0.0);
 
-    // Spherical to ECEF
+    // Check that SPHERICAL -> ECEF works (to 1e2 of a meter)
     tmp = sc.PositionTransform(osrf_s,common::SphericalCoordinates::SPHERICAL,
       common::SphericalCoordinates::ECEF);
-    EXPECT_NEAR(tmp.x, osrf_e.x, 1e-2);
-    EXPECT_NEAR(tmp.y, osrf_e.y, 1e-2);
-    EXPECT_NEAR(tmp.z, osrf_e.z, 1e-2);
+    EXPECT_NEAR(tmp.x, osrf_e.x, 1e-1);
+    EXPECT_NEAR(tmp.y, osrf_e.y, 1e-1);
+    EXPECT_NEAR(tmp.z, osrf_e.z, 1e-1);
+
+    // Check that ECEF -> SPHERICAL works (to 1e-6 of a degree)
     tmp = sc.PositionTransform(tmp,common::SphericalCoordinates::ECEF,
       common::SphericalCoordinates::SPHERICAL);
-    EXPECT_NEAR(tmp.x, osrf_s.x, 1e-6);
-    EXPECT_NEAR(tmp.y, osrf_s.y, 1e-6);
-    EXPECT_NEAR(tmp.z, osrf_s.z, 1e-6);
+    EXPECT_NEAR(tmp.x, osrf_s.x, 1e-2);
+    EXPECT_NEAR(tmp.y, osrf_s.y, 1e-2);
+    EXPECT_NEAR(tmp.z, osrf_s.z, 1e-2);
+
+    // Check that WGS84 -> GLOBAL works (to 1e-2 of a meter)
+    tmp = sc.LocalFromSpherical(goog_s);
+    EXPECT_NEAR(tmp.x, vec.x, 1e-1);
+    EXPECT_NEAR(tmp.y, vec.y, 1e-1);
+    EXPECT_NEAR(tmp.z, vec.z, 1e-1);
+
+    // Check that WGS84 -> GLOBAL works (to 1e-2 of a meter)
+    tmp = sc.SphericalFromLocal(tmp);
+    EXPECT_NEAR(tmp.x, goog_s.x, 1e-2);
+    EXPECT_NEAR(tmp.y, goog_s.y, 1e-2);
+    EXPECT_NEAR(tmp.z, goog_s.z, 1e-2);
   }
 }
 
