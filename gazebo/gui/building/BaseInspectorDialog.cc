@@ -91,14 +91,6 @@ QString BaseInspectorDialog::GetTexture() const
 }
 
 /////////////////////////////////////////////////
-/*
-void BaseInspectorDialog::SetName(const std::string &_name)
-{
-  this->itemNameLabel->setText(tr(_name.c_str()));
-}
-*/
-
-/////////////////////////////////////////////////
 void BaseInspectorDialog::SetColor(const QColor _color)
 {
   int index = -1;

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _BASE_INSPECTOR_DIALOG_HH_
-#define _BASE_INSPECTOR_DIALOG_HH_
+#ifndef _GAZEBO_BASE_INSPECTOR_DIALOG_HH_
+#define _GAZEBO_BASE_INSPECTOR_DIALOG_HH_
 
 #include <string>
 #include <vector>
@@ -42,10 +42,10 @@ namespace gazebo
       /// \brief Destructor
       public: ~BaseInspectorDialog();
 
-      /// \brief initiate color layout.
+      /// \brief initiate color combo box.
       public: void InitColorComboBox();
 
-      /// \brief initiate texture layout.
+      /// \brief initiate texture combo box.
       public: void InitTextureComboBox();
 
       /// \brief get the color.
@@ -55,11 +55,6 @@ namespace gazebo
       /// \brief get the texture.
       /// \return texture.
       public: QString GetTexture() const;
-
-      /// \brief set the name.
-      // TODO: make SetName as a function for base
-      /// \param[in] _name name to set.
-      // public: void SetName(const std::string &_name);
 
       /// \brief set the color of the wall.
       /// \param[in] _color color.
@@ -80,10 +75,6 @@ namespace gazebo
 
       /// \brief Vector of texture options.
       public: std::vector<QString> textureList;
-
-      /// TODO: use itemNameLabel as a generic name
-      /// \brief Label that displays the name of the item.
-      //  public: QLabel* itemNameLabel;
     };
     /// \}
   }
