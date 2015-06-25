@@ -34,7 +34,6 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
-      /// \param[in] _parent Parent widget.
       public: SplashScreen();
 
       /// \brief Destructor
