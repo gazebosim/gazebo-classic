@@ -28,6 +28,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo_client.hh"
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
@@ -63,6 +64,10 @@ QApplication *g_app;
 gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
+
+// This makes it possible to use common::Time in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(common::Time)
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -247,6 +252,10 @@ bool gui::load()
 
   g_app = new QApplication(g_argc, g_argv);
   set_style();
+
+  // Register common::Time as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<common::Time>();
 
   g_main_win = new gui::MainWindow();
 

@@ -15,7 +15,6 @@
  *
 */
 
-#include <curl/curl.h>
 #include <QMessageBox>
 #include "RestUiWidget.hh"
 
@@ -42,11 +41,9 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
       "/gazebo/rest/rest_login");
   this->logoutPub = node->Advertise<gazebo::msgs::RestLogout>(
       "/gazebo/rest/rest_logout");
-  // this for a problem where the server cannot subscribe to the topic
-//  this->loginPub->WaitForConnection();
   this->errorSub = node->Subscribe("/gazebo/rest/rest_error",
-                              &RestUiWidget::OnResponse,
-                              this);
+                                   &RestUiWidget::OnResponse,
+                                   this);
 }
 
 /////////////////////////////////////////////////
@@ -57,7 +54,7 @@ void RestUiWidget::Logout()
     gazebo::msgs::RestLogout msg;
     std::string url = this->loginDialog.GetUrl();
     msg.set_url(url);
-    gzmsg << "Loging out from: " << url << std::endl;
+    gzmsg << "Logging out from: " << url << std::endl;
     this->logoutPub->Publish(msg);
     this->loginMenuAction.setEnabled(true);
     this->logoutMenuAction.setEnabled(false);
@@ -103,8 +100,8 @@ void RestUiWidget::Update()
     // look for login error, and reenable the login menu if necessary
     if (msgStr.find("There was a problem trying to login to the server") == 0)
     {
-      loginMenuAction.setEnabled(true);
-      logoutMenuAction.setEnabled(false);
+      this->loginMenuAction.setEnabled(true);
+      this->logoutMenuAction.setEnabled(false);
     }
 
     if (msg->type() == "Error")

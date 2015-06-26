@@ -15,11 +15,8 @@
  *
 */
 
-#ifndef _REST_UI_LOGIN_DIALOG_HH_
-#define _REST_UI_LOGIN_DIALOG_HH_
-
-#include <iostream>
-#include <curl/curl.h>
+#ifndef _GAZEBO_REST_UI_LOGIN_DIALOG_HH_
+#define _GAZEBO_REST_UI_LOGIN_DIALOG_HH_
 
 #include "RestUiLogoutDialog.hh"
 #include "RestUiWidget.hh"
@@ -27,15 +24,19 @@
 using namespace gazebo;
 using namespace gui;
 
-
 /////////////////////////////////////////////////
 RestUiLogoutDialog::RestUiLogoutDialog(QWidget *_parent,
-                                     const std::string &_defaultUrl)
-    :QDialog(_parent), url(_defaultUrl.c_str())
+                                       const std::string &_defaultUrl)
+  : QDialog(_parent)
 {
-  setWindowTitle(tr("Logout"));
-  setModal(true);
+  this->setWindowTitle(tr("Logout"));
+  this->setModal(true);
 
+  /// A label for the url component that appears on the
+  /// logout dialog
+  QLabel *labelUrl;
+  /// The standard dialog buttons
+  QDialogButtonBox *buttons;
   labelUrl = new QLabel(this);
   labelUrl->setText(tr(_defaultUrl.c_str()));
 
@@ -51,14 +52,14 @@ RestUiLogoutDialog::RestUiLogoutDialog(QWidget *_parent,
   formGridLayout->addWidget(labelUrl, 0, 0, 1, 2);
   formGridLayout->addWidget(buttons, 5, 0, 1, 2);
 
-  setLayout(formGridLayout);
+  this->setLayout(formGridLayout);
 
-  connect(buttons->button(QDialogButtonBox::Cancel),
+  this->connect(buttons->button(QDialogButtonBox::Cancel),
           SIGNAL(clicked()),
           this,
           SLOT(close()));
 
-  connect(buttons->button(QDialogButtonBox::Ok),
+  this->connect(buttons->button(QDialogButtonBox::Ok),
           SIGNAL(clicked()),
           this,
           SLOT(SlotAcceptLogout()));

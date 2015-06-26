@@ -22,6 +22,8 @@
 #include <utility>
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/rendering/RenderTypes.hh"
 

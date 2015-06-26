@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _REST_LOGOUT_DIALOG_HH_
-#define _REST_LOGOUT_DIALOG_HH_
+#ifndef _GAZEBO_REST_LOGOUT_DIALOG_HH_
+#define _GAZEBO_REST_LOGOUT_DIALOG_HH_
 
 #include <string>
 
@@ -27,34 +27,19 @@ namespace gazebo
 {
   namespace gui
   {
-    class RestUiWidget;
-
-    /// \class RestUiLoginDialog RestUiLoginDialog.hh RestUiLoginDialog.hh
-    /// \brief Provides a means to login to a webservice
+    /// \brief Provides a means to logout from a webservice
     class GAZEBO_VISIBLE RestUiLogoutDialog : public QDialog
     {
       Q_OBJECT
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget
-      /// \param[in] _title The dialog window title bar text
-      /// \param[in] _url Label the title of the url (ex: super webservice url)
       /// \param[in] _defaultUrl Url text for the url (ex: https://superweb.com)
       public: RestUiLogoutDialog(QWidget *_parent,
-                              const std::string &_defautlUrl);
+                                 const std::string &_defautlUrl);
 
       /// \brief Slot for the AcceptLogin event
       public slots: void SlotAcceptLogout();
-
-      /// \brief A label for the url component that appears on the
-      /// logout dialog
-      private: QLabel *labelUrl;
-
-      /// \brief The standard dialog buttons
-      private: QDialogButtonBox *buttons;
-
-      /// \brief The web server url
-      private: std::string url;
     };
   }
 }

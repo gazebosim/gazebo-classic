@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   axis.proto
@@ -46,6 +47,8 @@ set (msgs
   link.proto
   link_data.proto
   log_control.proto
+  log_playback_control.proto
+  log_playback_stats.proto
   log_status.proto
   material.proto
   meshgeom.proto

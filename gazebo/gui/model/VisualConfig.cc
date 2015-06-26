@@ -32,6 +32,7 @@ VisualConfig::VisualConfig()
   // Layout for list
   this->listLayout = new QVBoxLayout();
   this->listLayout->setContentsMargins(0, 0, 0, 0);
+  this->listLayout->setAlignment(Qt::AlignTop);
 
   // Widget for list, which will be scrollable
   QWidget *listWidget = new QWidget();
@@ -133,6 +134,7 @@ void VisualConfig::AddVisual(const std::string &_name,
 
   // Header Layout
   QHBoxLayout *headerLayout = new QHBoxLayout;
+  headerLayout->setContentsMargins(0, 0, 0, 0);
   headerLayout->addWidget(headerButton);
   headerLayout->addWidget(removeVisualButton);
 
@@ -164,6 +166,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetVisible("visible", false);
   configWidget->SetWidgetVisible("scale", false);
   configWidget->SetWidgetVisible("plugin", false);
+  configWidget->SetWidgetVisible("type", false);
   configWidget->SetWidgetReadOnly("id", true);
   configWidget->SetWidgetReadOnly("name", true);
   configWidget->SetWidgetReadOnly("parent_name", true);
@@ -173,6 +176,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetReadOnly("visible", true);
   configWidget->SetWidgetReadOnly("scale", true);
   configWidget->SetWidgetReadOnly("plugin", true);
+  configWidget->SetWidgetReadOnly("type", true);
 
   // Item layout
   QVBoxLayout *itemLayout = new QVBoxLayout();
@@ -185,7 +189,6 @@ void VisualConfig::AddVisual(const std::string &_name,
 
   // Add to the list
   this->listLayout->addWidget(item);
-  this->listLayout->setAlignment(item, Qt::AlignTop);
 
   // Fill ConfigData
   VisualConfigData *configData = new VisualConfigData;

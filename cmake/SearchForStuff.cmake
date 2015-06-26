@@ -229,8 +229,10 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find TBB
   pkg_check_modules(TBB tbb)
+  set (TBB_PKG_CONFIG "tbb")
   if (NOT TBB_FOUND)
     message(STATUS "TBB not found, attempting to detect manually")
+    set (TBB_PKG_CONFIG "")
 
     find_library(tbb_library tbb ENV LD_LIBRARY_PATH)
     if (tbb_library)
@@ -474,7 +476,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 3.0.4)
+set (SDFormat_MIN_VERSION 3.0.5)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
@@ -570,6 +572,35 @@ else ()
 endif ()
 
 ########################################
+# Find uuid-dev Library
+#pkg_check_modules(uuid uuid)
+#if (uuid_FOUND)
+#  message (STATUS "Looking for uuid - found")
+#  set (HAVE_UUID TRUE)
+#else ()
+#  set (HAVE_UUID FALSE)
+#  BUILD_WARNING ("uuid-dev library not found - Gazebo will not have uuid support.")
+#endif ()
+
+########################################
+# Find uuid
+#  - In UNIX we use uuid library.
+#  - In Windows the native RPC call, no dependency needed.
+if (UNIX)
+  pkg_check_modules(uuid uuid)
+  if (uuid_FOUND)
+    message (STATUS "Looking for uuid - found")
+    set (HAVE_UUID TRUE)
+  else ()
+    set (HAVE_UUID FALSE)
+    BUILD_WARNING ("uuid-dev library not found - Gazebo will not have uuid support.")
+  endif ()
+else()
+  message (STATUS "Using Windows RPC UuidCreate function")
+  set (HAVE_UUID TRUE)
+endif()
+
+########################################
 # Find graphviz
 include (${gazebo_cmake_dir}/FindGraphviz.cmake)
 if (NOT GRAPHVIZ_FOUND)
@@ -580,6 +611,19 @@ else ()
   message (STATUS "Looking for libgraphviz-dev - found")
   set (HAVE_GRAPHVIZ ON CACHE BOOL "HAVE GRAPHVIZ" FORCE)
 endif ()
+
+########################################
+# Find ignition math in unix platforms
+# In Windows we expect a call from configure.bat script with the paths
+if (NOT WIN32)
+  find_package(ignition-math2 QUIET)
+  if (NOT ignition-math2_FOUND)
+    message(STATUS "Looking for ignition-math2-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math2 library.")
+  else()
+    message(STATUS "Looking for ignition-math2-config.cmake - found")
+  endif()
+endif()
 
 ########################################
 # Find QWT (QT graphing library)

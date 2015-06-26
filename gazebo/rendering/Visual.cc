@@ -210,19 +210,7 @@ void Visual::Fini()
   if (this->dataPtr->parent)
     this->dataPtr->parent->DetachVisual(this->GetName());
 
-  // Detach all children
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
-  {
-    this->dataPtr->sceneNode->removeChild((*iter)->GetSceneNode());
-    (*iter)->dataPtr->parent.reset();
-    (*iter).reset();
-  }
-
-  this->dataPtr->children.clear();
-
-  if (this->dataPtr->sceneNode != NULL)
+  if (this->dataPtr->sceneNode)
   {
     this->dataPtr->sceneNode->detachAllObjects();
     this->dataPtr->scene->GetManager()->destroySceneNode(
@@ -291,6 +279,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 //////////////////////////////////////////////////
 void Visual::Init()
 {
+  this->dataPtr->type = VT_ENTITY;
   this->dataPtr->transparency = 0.0;
   this->dataPtr->isStatic = false;
   this->dataPtr->visible = true;
@@ -580,7 +569,8 @@ void Visual::DetachVisual(const std::string &_name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
-      this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
+      if (this->dataPtr->sceneNode)
+        this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
       childVis->GetParent().reset();
       break;
     }
@@ -658,7 +648,8 @@ unsigned int Visual::GetAttachedObjectCount() const
 //////////////////////////////////////////////////
 void Visual::DetachObjects()
 {
-  this->dataPtr->sceneNode->detachAllObjects();
+  if (this->dataPtr->sceneNode)
+    this->dataPtr->sceneNode->detachAllObjects();
   this->dataPtr->meshName = "";
   this->dataPtr->subMeshName = "";
   this->dataPtr->myMaterialName = "";
@@ -1663,16 +1654,19 @@ math::Pose Visual::GetWorldPose() const
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
 
-  vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-  pose.pos.x = vpos.x;
-  pose.pos.y = vpos.y;
-  pose.pos.z = vpos.z;
+  if (this->dataPtr->sceneNode)
+  {
+    vpos = this->dataPtr->sceneNode->_getDerivedPosition();
+    pose.pos.x = vpos.x;
+    pose.pos.y = vpos.y;
+    pose.pos.z = vpos.z;
 
-  vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-  pose.rot.w = vquatern.w;
-  pose.rot.x = vquatern.x;
-  pose.rot.y = vquatern.y;
-  pose.rot.z = vquatern.z;
+    vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
+    pose.rot.w = vquatern.w;
+    pose.rot.x = vquatern.x;
+    pose.rot.y = vquatern.y;
+    pose.rot.z = vquatern.z;
+  }
 
   return pose;
 }
@@ -2677,8 +2671,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
   if (!this->dataPtr->preRenderConnection)
   {
     this->dataPtr->preRenderConnection =
-      event::Events::ConnectPreRender(boost::bind(&Visual::Update,
-      shared_from_this()));
+      event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
   }
 }
 
@@ -2717,8 +2710,7 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
   this->dataPtr->prevAnimTime = common::Time::GetWallTime();
 
   this->dataPtr->preRenderConnection =
-    event::Events::ConnectPreRender(boost::bind(&Visual::Update,
-    shared_from_this()));
+    event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
 }
 
 //////////////////////////////////////////////////
@@ -2960,6 +2952,18 @@ sdf::ElementPtr Visual::GetSDF() const
 }
 
 //////////////////////////////////////////////////
+Visual::VisualType Visual::GetType() const
+{
+  return this->dataPtr->type;
+}
+
+//////////////////////////////////////////////////
+void Visual::SetType(const Visual::VisualType _type)
+{
+  this->dataPtr->type = _type;
+}
+
+//////////////////////////////////////////////////
 void Visual::ToggleLayer(const int32_t _layer)
 {
   // Visuals with negative layers are always visible
@@ -2970,6 +2974,84 @@ void Visual::ToggleLayer(const int32_t _layer)
   {
     this->ToggleVisible();
   }
+}
+
+//////////////////////////////////////////////////
+Visual::VisualType Visual::ConvertVisualType(const msgs::Visual::Type &_type)
+{
+  Visual::VisualType visualType = Visual::VT_ENTITY;
+
+  switch (_type)
+  {
+    case msgs::Visual::ENTITY:
+      visualType = Visual::VT_ENTITY;
+      break;
+    case msgs::Visual::MODEL:
+      visualType = Visual::VT_MODEL;
+      break;
+    case msgs::Visual::LINK:
+      visualType = Visual::VT_LINK;
+      break;
+    case msgs::Visual::VISUAL:
+      visualType = Visual::VT_VISUAL;
+      break;
+    case msgs::Visual::COLLISION:
+      visualType = Visual::VT_COLLISION;
+      break;
+    case msgs::Visual::SENSOR:
+      visualType = Visual::VT_SENSOR;
+      break;
+    case msgs::Visual::GUI:
+      visualType = Visual::VT_GUI;
+      break;
+    case msgs::Visual::PHYSICS:
+      visualType = Visual::VT_PHYSICS;
+      break;
+    default:
+      gzerr << "Cannot convert visual type. Defaults to 'VT_ENTITY'"
+          << std::endl;
+      break;
+  }
+  return visualType;
+}
+
+//////////////////////////////////////////////////
+msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
+{
+  msgs::Visual::Type visualType = msgs::Visual::ENTITY;
+
+  switch (_type)
+  {
+    case Visual::VT_ENTITY:
+      visualType = msgs::Visual::ENTITY;
+      break;
+    case Visual::VT_MODEL:
+      visualType = msgs::Visual::MODEL;
+      break;
+    case Visual::VT_LINK:
+      visualType = msgs::Visual::LINK;
+      break;
+    case Visual::VT_VISUAL:
+      visualType = msgs::Visual::VISUAL;
+      break;
+    case Visual::VT_COLLISION:
+      visualType = msgs::Visual::COLLISION;
+      break;
+    case Visual::VT_SENSOR:
+      visualType = msgs::Visual::SENSOR;
+      break;
+    case Visual::VT_GUI:
+      visualType = msgs::Visual::GUI;
+      break;
+    case Visual::VT_PHYSICS:
+      visualType = msgs::Visual::PHYSICS;
+      break;
+    default:
+      gzerr << "Cannot convert visual type. Defaults to 'msgs::Visual::ENTITY'"
+          << std::endl;
+      break;
+  }
+  return visualType;
 }
 
 /////////////////////////////////////////////////
@@ -2987,4 +3069,3 @@ bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
   }
 
   return false;
-}

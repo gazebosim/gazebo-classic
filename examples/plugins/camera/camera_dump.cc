@@ -15,7 +15,7 @@
  *
 */
 #include "gazebo/gazebo.hh"
-#include "plugins/CameraPlugin.hh"
+#include "gazebo/plugins/CameraPlugin.hh"
 
 namespace gazebo
 {
