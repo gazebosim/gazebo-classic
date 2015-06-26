@@ -17,6 +17,7 @@
 
 #ifndef _WALL_INSPECTOR_DIALOG_HH_
 #define _WALL_INSPECTOR_DIALOG_HH_
+
 #include <string>
 #include <vector>
 #include "gazebo/gui/qt.h"

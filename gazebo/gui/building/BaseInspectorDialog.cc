@@ -31,6 +31,7 @@ BaseInspectorDialog::~BaseInspectorDialog()
 {
 }
 
+/////////////////////////////////////////////////
 void BaseInspectorDialog::InitColorComboBox()
 {
   this->colorComboBox = new QComboBox;

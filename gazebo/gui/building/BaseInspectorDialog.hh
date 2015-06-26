@@ -37,34 +37,35 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
+      /// \param[in] _parent Parent QWidget
       public: BaseInspectorDialog(QWidget *_parent);
 
       /// \brief Destructor
       public: ~BaseInspectorDialog();
 
-      /// \brief initiate color combo box.
+      /// \brief Initiate color combo box.
       public: void InitColorComboBox();
 
-      /// \brief initiate texture combo box.
+      /// \brief Initiate texture combo box.
       public: void InitTextureComboBox();
 
-      /// \brief get the color.
-      /// \return color.
+      /// \brief Get the color.
+      /// \return Color.
       public: QColor GetColor() const;
 
-      /// \brief get the texture.
-      /// \return texture.
+      /// \brief Get the texture.
+      /// \return Texture.
       public: QString GetTexture() const;
 
-      /// \brief set the color of the wall.
-      /// \param[in] _color color.
+      /// \brief Set the color.
+      /// \param[in] _color Color.
       public: void SetColor(const QColor _color);
 
-      /// \brief set the texture of the wall.
-      /// \param[in] _texture texture.
+      /// \brief Set the texture.
+      /// \param[in] _texture Texture.
       public: void SetTexture(const QString _texture);
 
-      /// \brief combo box for selecting the color.
+      /// \brief Combo box for selecting the color.
       public: QComboBox *colorComboBox;
 
       /// \brief Vector of color options.
