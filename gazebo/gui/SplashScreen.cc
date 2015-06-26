@@ -41,10 +41,11 @@ SplashScreen::SplashScreen()
   textEdit->setContentsMargins(0, 0, 0, 0);
   textEdit->setFrameStyle(QFrame::NoFrame);
   textEdit->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
-  this->dataPtr->splashScreen = new QSplashScreen(pixmap);
   QVBoxLayout *textLayout = new QVBoxLayout();
   textLayout->addItem(new QSpacerItem(1, pixmap.size().height() * 0.8));
   textLayout->addWidget(textEdit);
+  this->dataPtr->splashScreen = new QSplashScreen(pixmap);
+  this->dataPtr->splashScreen->setMask(pixmap.mask());
   this->dataPtr->splashScreen->setLayout(textLayout);
 
   this->dataPtr->splashScreen->show();
