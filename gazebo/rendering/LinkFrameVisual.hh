@@ -46,6 +46,11 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Load(ConstLinkPtr &_msg);
 
+      // Documentation inherited
+      public: virtual void SetHighlighted(bool _highlighted);
+
+      // Documentation inherited
+      public: bool GetHighlighted() const;
     };
     /// \}
   }

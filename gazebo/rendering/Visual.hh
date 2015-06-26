@@ -241,16 +241,13 @@ namespace gazebo
       /// \return Emissive color.
       public: common::Color GetEmissive() const;
 
-      /// \brief Attach visualization axes
-      public: void AttachAxes();
-
       /// \brief Enable or disable wireframe for this visual.
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);
 
       /// \brief Set the transparency of a single visual without calling
       /// UpdateShaders.
-      private: void SetTransparencyInnerLoop();
+      private: void SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode);
 
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
@@ -264,7 +261,7 @@ namespace gazebo
       /// \brief Set the visual to be visually highlighted. This is most
       /// often used when an object is selected by a user via the GUI.
       /// \param[in] _highlighted True to enable the highlighting.
-      public: void SetHighlighted(bool _highlighted);
+      public: virtual void SetHighlighted(bool _highlighted);
 
       /// \brief Get whether or not the visual is visually highlighted. This is
       /// most often means that an object is selected by a user via the GUI.

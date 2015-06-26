@@ -35,7 +35,6 @@
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
-#include "gazebo/rendering/AxisVisual.hh"
 #include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"

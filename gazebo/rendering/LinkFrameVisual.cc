@@ -62,3 +62,23 @@ void LinkFrameVisual::Load(ConstLinkPtr &_msg)
   this->ShowAxisHead(1, false);
   this->ShowAxisHead(2, false);
 }
+
+//////////////////////////////////////////////////
+void LinkFrameVisual::SetHighlighted(bool _highlighted)
+{
+  if (_highlighted)
+  {
+    this->SetTransparency(1.0);
+  }
+  else
+  {
+    this->SetTransparency(0.4);
+  }
+}
+
+//////////////////////////////////////////////////
+bool LinkFrameVisual::GetHighlighted() const
+{
+  return this->GetTransparency() == 1.0;
+}
+

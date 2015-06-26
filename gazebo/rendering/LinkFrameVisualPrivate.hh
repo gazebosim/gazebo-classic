@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_LINK_FRAME_VISUAL_PRIVATE_HH_
 #define _GAZEBO_LINK_FRAME_VISUAL_PRIVATE_HH_
 
+#include <string>
+
 #include "gazebo/rendering/AxisVisualPrivate.hh"
 
 namespace gazebo
