@@ -242,6 +242,10 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
+  // Custom gravity vector for this demo world.
+  EXPECT_DOUBLE_EQ(g.x, 0);
+  EXPECT_DOUBLE_EQ(g.y, -1.0);
+  EXPECT_DOUBLE_EQ(g.z, -1.0);
 
   if (_physicsEngine == "ode")
   {
@@ -251,11 +255,6 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
     // Set world step solver type
     physics->SetParam("world_step_solver", _worldSolverType);
   }
-
-  // Custom gravity vector for this demo world.
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, -1.0);
-  EXPECT_DOUBLE_EQ(g.z, -1.0);
 
   std::vector<PhysicsFrictionTest::FrictionDemoBox> boxes;
   std::vector<PhysicsFrictionTest::FrictionDemoBox>::iterator box;
