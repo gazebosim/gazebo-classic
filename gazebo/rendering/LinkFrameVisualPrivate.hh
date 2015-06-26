@@ -29,11 +29,14 @@ namespace gazebo
     /// \brief Private data for the LinkFrame Visual class.
     class LinkFrameVisualPrivate : public AxisVisualPrivate
     {
-      /// \brief Parent link name.
-      public: std::string linkName;
-
       /// \brief Scale based on the size of the parent link.
       public: math::Vector3 scaleToLink;
+
+      /// \brief Transparency when highlighted.
+      public: float highlightedTransp;
+
+      /// \brief Transparency when not highlighted.
+      public: float nonHighlightedTransp;
     };
   }
 }

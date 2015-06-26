@@ -1400,12 +1400,14 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           this->dataPtr->diffuse = Conversions::Convert(dc);
 
 
-          for (unitStateCount = 0; unitStateCount < pass->getNumTextureUnitStates(); ++unitStateCount)
+          for (unitStateCount = 0; unitStateCount <
+              pass->getNumTextureUnitStates(); ++unitStateCount)
           {
             auto textureUnitState = pass->getTextureUnitState(unitStateCount);
 
             textureUnitState->setAlphaOperation(
-                Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, this->dataPtr->transparency);
+                Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
+                1.0 - this->dataPtr->transparency);
           }
         }
       }
@@ -1424,7 +1426,14 @@ void Visual::SetTransparency(float _trans)
 
   for (auto child : this->dataPtr->children)
   {
-    child->SetTransparency(_trans);
+    // Don't change some visualizations when link changes
+    if (!(this->GetType() == VT_LINK &&
+        (child->GetType() == VT_GUI ||
+         child->GetType() == VT_PHYSICS ||
+         child->GetType() == VT_SENSOR)))
+    {
+      child->SetTransparency(_trans);
+    }
   }
 
   this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);

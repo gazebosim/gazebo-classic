@@ -44,13 +44,13 @@ namespace gazebo
       public: virtual ~LinkFrameVisual() = default;
 
       // Documentation inherited
-      public: virtual void Load(ConstLinkPtr &_msg);
+      public: virtual void Load();
 
       // Documentation inherited
       public: virtual void SetHighlighted(bool _highlighted);
 
       // Documentation inherited
-      public: bool GetHighlighted() const;
+      public: bool GetHighlighted();
     };
     /// \}
   }

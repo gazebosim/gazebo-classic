@@ -3071,7 +3071,7 @@ void Scene::CreateLinkFrameVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
   LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_msg->name() +
       "_LINK_FRAME_VISUAL__", _linkVisual));
-  linkFrameVis->Load(_msg);
+  linkFrameVis->Load();
   linkFrameVis->SetVisible(this->dataPtr->showLinkFrames);
   this->dataPtr->visuals[linkFrameVis->GetId()] = linkFrameVis;
 }
@@ -3112,7 +3112,12 @@ void Scene::SetTransparent(bool _show)
   this->dataPtr->transparent = _show;
   for (auto visual : this->dataPtr->visuals)
   {
-    visual.second->SetTransparency(_show ? 0.5 : 0.0);
+    if (visual.second->GetType() != Visual::VT_GUI &&
+        visual.second->GetType() != Visual::VT_PHYSICS &&
+        visual.second->GetType() != Visual::VT_SENSOR)
+    {
+      visual.second->SetTransparency(_show ? 0.5 : 0.0);
+    }
   }
 }
 

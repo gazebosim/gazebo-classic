@@ -38,42 +38,47 @@ TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
 
   EXPECT_TRUE(scene != NULL);
 
-  // create a default link message
-  gazebo::msgs::LinkPtr linkDefaultMsg;
-  linkDefaultMsg.reset(new gazebo::msgs::Link);
-
   // create a link visual
-  gazebo::rendering::VisualPtr linkDefaultVis;
-  linkDefaultVis.reset(
+  gazebo::rendering::VisualPtr linkVis;
+  linkVis.reset(
       new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
 
-  // create frame visual for the link using msg Load
-  gazebo::rendering::LinkFrameVisualPtr linkFrameVisual(
+  // create frame visual for the link
+  gazebo::rendering::LinkFrameVisualPtr linkFrameVis(
       new gazebo::rendering::LinkFrameVisual("_LINK_FRAME_VISUAL_",
-      linkDefaultVis));
-  linkFrameVisual->Load(linkDefaultMsg);
+      linkVis));
+  linkFrameVis->Load();
 
   // Check that it was added to the scene (by Load)
-  EXPECT_EQ(scene->GetVisual("_LINK_FRAME_VISUAL_"), linkFrameVisual);
+  EXPECT_EQ(scene->GetVisual("_LINK_FRAME_VISUAL_"), linkFrameVis);
 
   // Check that it has type physics
-  EXPECT_EQ(linkFrameVisual->GetType(), gazebo::rendering::Visual::VT_PHYSICS);
+  EXPECT_EQ(linkFrameVis->GetType(), gazebo::rendering::Visual::VT_PHYSICS);
 
   // Check that the link visual is the parent
-  EXPECT_EQ(linkFrameVisual->GetParent(), linkDefaultVis);
+  EXPECT_EQ(linkFrameVis->GetParent(), linkVis);
 
   // Check that the pose within the link visual (local pose) is zero
-  EXPECT_EQ(linkFrameVisual->GetPose(), gazebo::math::Pose::Zero);
+  EXPECT_EQ(linkFrameVis->GetPose(), gazebo::math::Pose::Zero);
+
+  // Check that frame is not highlighted
+  EXPECT_FALSE(linkFrameVis->GetHighlighted());
+
+  // Set  highlighted
+  linkFrameVis->SetHighlighted(true);
+
+  // Check that frame is highlighted
+  EXPECT_TRUE(linkFrameVis->GetHighlighted());
 
   // Remove it from the scene (Fini is called)
-  scene->RemoveVisual(linkFrameVisual);
+  scene->RemoveVisual(linkFrameVis);
 
   // Check that it was removed
   EXPECT_TRUE(scene->GetVisual("_LINK_FRAME_VISUAL_") == NULL);
 
   // Reset pointer
-  linkFrameVisual.reset();
-  EXPECT_TRUE(linkFrameVisual == NULL);
+  linkFrameVis.reset();
+  EXPECT_TRUE(linkFrameVis == NULL);
 }
 
 /////////////////////////////////////////////////

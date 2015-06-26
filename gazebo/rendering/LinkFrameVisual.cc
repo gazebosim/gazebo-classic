@@ -31,25 +31,24 @@ LinkFrameVisual::LinkFrameVisual(const std::string &_name, VisualPtr _parent)
       reinterpret_cast<LinkFrameVisualPrivate *>(this->dataPtr);
 
   dPtr->type = VT_PHYSICS;
+  dPtr->highlightedTransp = 0.01;
+  dPtr->nonHighlightedTransp = 0.8;
 }
 
 /////////////////////////////////////////////////
-void LinkFrameVisual::Load(ConstLinkPtr &_msg)
+void LinkFrameVisual::Load()
 {
   LinkFrameVisualPrivate *dPtr =
       reinterpret_cast<LinkFrameVisualPrivate *>(this->dataPtr);
 
   AxisVisual::Load();
 
-  dPtr->linkName = _msg->name();
-
   double linkSize = std::max(0.1,
       dPtr->parent->GetBoundingBox().GetSize().GetLength());
   linkSize = std::min(linkSize, 1.0);
   dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
-                                       linkSize * 0.7,
-                                       linkSize * 0.7);
-
+                                    linkSize * 0.7,
+                                    linkSize * 0.7);
 
   // Scale according to the link it is attached to
   if (dPtr->scaleToLink != math::Vector3::Zero)
@@ -61,24 +60,32 @@ void LinkFrameVisual::Load(ConstLinkPtr &_msg)
   this->ShowAxisHead(0, false);
   this->ShowAxisHead(1, false);
   this->ShowAxisHead(2, false);
+  this->SetTransparency(dPtr->nonHighlightedTransp);
+  this->SetCastShadows(false);
 }
 
 //////////////////////////////////////////////////
 void LinkFrameVisual::SetHighlighted(bool _highlighted)
 {
+  LinkFrameVisualPrivate *dPtr =
+      reinterpret_cast<LinkFrameVisualPrivate *>(this->dataPtr);
+
   if (_highlighted)
   {
-    this->SetTransparency(1.0);
+    this->SetTransparency(dPtr->highlightedTransp);
   }
   else
   {
-    this->SetTransparency(0.4);
+    this->SetTransparency(dPtr->nonHighlightedTransp);
   }
 }
 
 //////////////////////////////////////////////////
-bool LinkFrameVisual::GetHighlighted() const
+bool LinkFrameVisual::GetHighlighted()
 {
-  return this->GetTransparency() == 1.0;
+  LinkFrameVisualPrivate *dPtr =
+      reinterpret_cast<LinkFrameVisualPrivate *>(this->dataPtr);
+
+  return fabs(this->GetTransparency() - dPtr->highlightedTransp) < 0.0001;
 }
 
