@@ -51,7 +51,7 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
       ++iter)
   {
     this->modelStates.insert(std::make_pair((*iter)->GetName(),
-          ModelState(*iter, _realTime, _simTime)));
+          ModelState(*iter, _realTime, _simTime, _iterations)));
   }
 
   // Copy all the joints
@@ -145,7 +145,8 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
   for (Model_V::const_iterator iter = models.begin(); iter != models.end();
       ++iter)
   {
-    this->modelStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime);
+    this->modelStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime,
+        _iterations);
   }
 
   // Remove models that no longer exist. We determine this by checking the time

@@ -70,8 +70,6 @@ RestWebPlugin::RestWebPlugin()
 
 #endif
 
-#endif
-
   gzmsg << "REST web Session : " << this->session << endl;
 }
 

@@ -3069,3 +3069,4 @@ bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
   }
 
   return false;
+}
