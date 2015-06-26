@@ -46,6 +46,8 @@ SplashScreen::SplashScreen()
   textLayout->addWidget(textEdit);
   this->dataPtr->splashScreen = new QSplashScreen(pixmap);
   this->dataPtr->splashScreen->setMask(pixmap.mask());
+  this->dataPtr->splashScreen->setWindowFlags(
+      this->dataPtr->splashScreen->windowFlags() | Qt::WindowStaysOnTopHint);
   this->dataPtr->splashScreen->setLayout(textLayout);
 
   this->dataPtr->splashScreen->show();
