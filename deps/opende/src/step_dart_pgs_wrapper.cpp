@@ -32,17 +32,15 @@
 #include "dart/constraint/PGSLCPSolver.h"
 #include "step_dart_pgs_wrapper.h"
 
-bool dSolveLCP_dart_pgs(int m, int mskip, dReal *A, dReal *x, dReal *b,
+void dSolveLCP_dart_pgs(int m, int mskip, dReal *A, dReal *x, dReal *b,
         int nub, dReal *lo, dReal *hi, int *findex)
 {
     // For the case m = 0, return true;
-    bool DART_PGS = true;
     if(m>0)
     {
       dart::constraint::PGSOption option;
       option.setDefault();
-      DART_PGS = dart::constraint::solvePGS(m, mskip, nub, A, x, b, lo, hi, findex, &option);
+      dart::constraint::solvePGS(m, mskip, nub, A, x, b, lo, hi, findex, &option);
     }
-    return DART_PGS;
 }
 #endif
