@@ -65,8 +65,8 @@ void dSolveLCP_bullet_lemke(int _m, dReal *_A, dReal *_x, dReal *_b,
   }
 
   btLemkeSolver* btlemke_solver = new btLemkeSolver();
-  lemkeRes = btlemke_solver->solveMLCP(A, b, x, lo, hi,
-      limitDependency, numIterations, true);
+  btlemke_solver->solveMLCP(A, b, x, lo, hi,
+    limitDependency, numIterations, useSparsity);
 
   // convert x to dReal format
   for(i=0; i<_m; i++)
