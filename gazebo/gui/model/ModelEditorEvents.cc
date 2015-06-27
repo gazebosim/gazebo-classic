@@ -49,3 +49,4 @@ event::EventT<void (std::string)> model::Events::jointParentChosen3D;
 event::EventT<void (std::string)> model::Events::jointChildChosen3D;
 event::EventT<void (std::string)> model::Events::jointParentChosenDialog;
 event::EventT<void (std::string)> model::Events::jointChildChosenDialog;
+event::EventT<void ()> model::Events::jointCreateDialog;

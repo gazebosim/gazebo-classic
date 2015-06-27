@@ -189,7 +189,7 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnTypeFromDialog(int _type)
+void JointCreationDialog::OnTypeFromDialog(int /*_type*/)
 {
 }
 
@@ -199,7 +199,10 @@ void JointCreationDialog::OnParentFromDialog(int _index)
   QString linkName = this->parentComboBox->itemData(_index).toString();
 
   if (linkName.isEmpty())
+  {
+    gzerr << "Empty link name for parent" << std::endl;
     return;
+  }
 
   this->childComboBox->setEnabled(true);
 
@@ -208,15 +211,25 @@ void JointCreationDialog::OnParentFromDialog(int _index)
   // Remove empty option
   int index = this->parentComboBox->findData("");
   this->parentComboBox->removeItem(index);
+
+  // Check if child list matches parent list
+
+
+  // Remove chosen parent from child list
+  // index = this->childComboBox->findData(linkName);
+  // this->childComboBox->removeItem(index);
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::OnChildFromDialog(int _index)
 {
-  QString linkName = this->parentComboBox->itemData(_index).toString();
+  QString linkName = this->childComboBox->itemData(_index).toString();
 
   if (linkName.isEmpty())
+  {
+    gzerr << "Empty link name for child" << std::endl;
     return;
+  }
 
   this->createButton->setEnabled(true);
 
@@ -225,6 +238,13 @@ void JointCreationDialog::OnChildFromDialog(int _index)
   // Remove empty option
   int index = this->parentComboBox->findData("");
   this->parentComboBox->removeItem(index);
+
+  // Check if parent list matches child list
+
+
+  // Remove chosen child from parent list
+  // index = this->parentComboBox->findData(linkName);
+  // this->parentComboBox->removeItem(index);
 }
 
 /////////////////////////////////////////////////
@@ -258,7 +278,8 @@ void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
 
   if (!this->childComboBox->isEnabled())
   {
-    gzerr << "Shouldn't set child link before setting parent." << std::endl;
+    gzerr << "It shouldn't be possible to set child before parent."
+        << std::endl;
     return;
   }
 
@@ -297,6 +318,8 @@ void JointCreationDialog::OnLinkRemoved(const std::string &_linkName)
 {
   int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
   this->parentComboBox->removeItem(index);
+
+  index = this->childComboBox->findData(QString::fromStdString(_linkName));
   this->childComboBox->removeItem(index);
 }
 
@@ -310,6 +333,8 @@ void JointCreationDialog::OnCancel()
 void JointCreationDialog::OnCreate()
 {
   this->accept();
+
+  gui::model::Events::jointCreateDialog();
 }
 
 /////////////////////////////////////////////////
