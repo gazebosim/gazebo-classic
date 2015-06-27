@@ -37,6 +37,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
@@ -65,6 +66,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
+  // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
   if (this->sdf->HasElement("imu") &&
       this->sdf->GetElement("imu")->HasElement("topic") &&
       this->sdf->GetElement("imu")->Get<std::string>("topic")
@@ -73,77 +75,106 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     this->pub = this->node->Advertise<msgs::IMU>(
         this->sdf->GetElement("imu")->Get<std::string>("topic"), 500);
   }
+  // CASE 2 : Topic is specified in parent sensor definition
   else
   {
     std::string topicName = "~/";
     topicName += this->parentName + "/" + this->GetName() + "/imu";
     boost::replace_all(topicName, "::", "/");
-
     this->pub = this->node->Advertise<msgs::IMU>(topicName, 500);
   }
 
-  // Handle noise model settings.
-  this->noiseActive = false;
+  // Get the imu element pointer
   sdf::ElementPtr imuElem = this->sdf->GetElement("imu");
+
+  // CASE 1 : Noise is defined within the sensor (should be deprecated)
   if (imuElem->HasElement("noise"))
   {
     sdf::ElementPtr noiseElem = imuElem->GetElement("noise");
     std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
-      this->noiseActive = true;
-      this->noiseType = GAUSSIAN;
-      this->rateNoiseMean = 0.0;
-      this->rateNoiseStdDev = 0.0;
-      this->rateBias = 0.0;
-      this->accelNoiseMean = 0.0;
-      this->accelNoiseStdDev = 0.0;
-      this->accelBias = 0.0;
       if (noiseElem->HasElement("rate"))
       {
         sdf::ElementPtr rateElem = noiseElem->GetElement("rate");
-        this->rateNoiseMean = rateElem->Get<double>("mean");
-        this->rateNoiseStdDev = rateElem->Get<double>("stddev");
-        double rateBiasMean = rateElem->Get<double>("bias_mean");
-        double rateBiasStddev = rateElem->Get<double>("bias_stddev");
-        // Sample the bias that we'll use later
-        this->rateBias = math::Rand::GetDblNormal(rateBiasMean, rateBiasStddev);
-        // With equal probability, we pick a negative bias (by convention,
-        // rateBiasMean should be positive, though it would work fine if
-        // negative).
-        if (math::Rand::GetDblUniform() < 0.5)
-          this->rateBias = -this->rateBias;
-        gzlog << "applying Gaussian noise model to rate with mean " <<
-          this->rateNoiseMean << " and stddev " << this->rateNoiseStdDev <<
-          ", bias " << this->rateBias << std::endl;
+
+        // Rename rate -> noise to enforce forward compatibility
+        rateElem->SetName("noise");
+        rateElem->AddAttribute("type","string","gaussian",true);
+
+        // Create the noise streams
+        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] = 
+          NoiseFactory::NewNoiseModel(rateElem);
+        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S] = 
+          NoiseFactory::NewNoiseModel(rateElem);
+        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S] = 
+          NoiseFactory::NewNoiseModel(rateElem);
+
+        // Rename noise -> rate to enforce forward compatibility
+        rateElem->SetName("rate");
       }
+
       if (noiseElem->HasElement("accel"))
       {
         sdf::ElementPtr accelElem = noiseElem->GetElement("accel");
-        this->accelNoiseMean = accelElem->Get<double>("mean");
-        this->accelNoiseStdDev = accelElem->Get<double>("stddev");
-        double accelBiasMean = accelElem->Get<double>("bias_mean");
-        double accelBiasStddev = accelElem->Get<double>("bias_stddev");
-        // Sample the bias that we'll use later
-        this->accelBias = math::Rand::GetDblNormal(accelBiasMean,
-                                                   accelBiasStddev);
-        // With equal probability, we pick a negative bias (by convention,
-        // accelBiasMean should be positive, though it would work fine if
-        // negative).
-        if (math::Rand::GetDblUniform() < 0.5)
-          this->accelBias = -this->accelBias;
-        gzlog << "applying Gaussian noise model to accel with mean " <<
-          this->accelNoiseMean << " and stddev " << this->accelNoiseStdDev <<
-          ", bias " << this->accelBias << std::endl;
+
+        // Rename accel -> noise to enforce forward compatibility
+        accelElem->SetName("noise");
+        accelElem->AddAttribute("type","string","gaussian",true);
+
+        // Create the noise streams
+        this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR] = 
+          NoiseFactory::NewNoiseModel(accelElem);
+        this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR] = 
+          NoiseFactory::NewNoiseModel(accelElem);
+        this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR] = 
+          NoiseFactory::NewNoiseModel(accelElem);
+
+        // Rename noise -> accel to enforce forward compatibility
+        accelElem->SetName("accel");
       }
     }
     else
       gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
         std::endl;
   }
+  // CASE 2: noise specified in using newer generic SDF
+  else
+  {
 
+    // If a linear acceleration noise model has been specified, create it 
+    if (imuElem->HasElement("angular_velocity"))
+    {
+      sdf::ElementPtr rE = imuElem->GetElement("linear_acceleration");
+      if (rE->HasElement("x"))
+        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] = 
+          NoiseFactory::NewNoiseModel(rE->GetElement("x")->GetElement("noise"));
+      if (rE->HasElement("y"))
+        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S] = 
+          NoiseFactory::NewNoiseModel(rE->GetElement("y")->GetElement("noise"));
+      if (rE->HasElement("z"))
+        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S] = 
+          NoiseFactory::NewNoiseModel(rE->GetElement("z")->GetElement("noise"));
+    }
+
+    // If a linear acceleration noise model has been specified, create it 
+    if (imuElem->HasElement("linear_acceleration"))
+    {
+      sdf::ElementPtr aE = imuElem->GetElement("linear_acceleration");
+      if (aE->HasElement("x"))
+        this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR] = 
+          NoiseFactory::NewNoiseModel(aE->GetElement("x")->GetElement("noise"));
+      if (aE->HasElement("y"))
+        this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR] = 
+          NoiseFactory::NewNoiseModel(aE->GetElement("y")->GetElement("noise"));
+      if (aE->HasElement("z"))
+        this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR] = 
+          NoiseFactory::NewNoiseModel(aE->GetElement("z")->GetElement("noise"));
+    }
+  }
+
+  // Start publishing data on the topic
   this->parentEntity->SetPublishData(true);
-
   std::string topic = "~/" + this->parentEntity->GetScopedName();
   this->linkDataSub = this->node->Subscribe(topic,
     &ImuSensor::OnLinkData, this);
@@ -288,49 +319,31 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     // Set the IMU orientation
     msgs::Set(this->imuMsg.mutable_orientation(),
               (imuPose - this->referencePose).rot);
-
     this->lastLinearVel = imuWorldLinearVel;
 
-    if (this->noiseActive)
-    {
-      switch (this->noiseType)
-      {
-        case GAUSSIAN:
-          // Add Gaussian noise + fixed bias to each rate
-          this->imuMsg.mutable_angular_velocity()->set_x(
-            this->imuMsg.angular_velocity().x() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean,
-              this->rateNoiseStdDev));
-          this->imuMsg.mutable_angular_velocity()->set_y(
-            this->imuMsg.angular_velocity().y() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean,
-              this->rateNoiseStdDev));
-          this->imuMsg.mutable_angular_velocity()->set_z(
-            this->imuMsg.angular_velocity().z() + this->rateBias +
-            math::Rand::GetDblNormal(this->rateNoiseMean,
-              this->rateNoiseStdDev));
+    // Perturb the angular velocity
+    this->imuMsg.mutable_angular_velocity()->set_x(
+      this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S]->Apply(
+        this->imuMsg.angular_velocity().x()));
+    this->imuMsg.mutable_angular_velocity()->set_y(
+      this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S]->Apply(
+        this->imuMsg.angular_velocity().y()));
+    this->imuMsg.mutable_angular_velocity()->set_z(
+      this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S]->Apply(
+        this->imuMsg.angular_velocity().z()));
 
-          // Add Gaussian noise + fixed bias to each acceleration
-          this->imuMsg.mutable_linear_acceleration()->set_x(
-            this->imuMsg.linear_acceleration().x() + this->accelBias +
-            math::Rand::GetDblNormal(this->accelNoiseMean,
-                                     this->accelNoiseStdDev));
-          this->imuMsg.mutable_linear_acceleration()->set_y(
-            this->imuMsg.linear_acceleration().y() + this->accelBias +
-            math::Rand::GetDblNormal(this->accelNoiseMean,
-                                     this->accelNoiseStdDev));
-          this->imuMsg.mutable_linear_acceleration()->set_z(
-            this->imuMsg.linear_acceleration().z() + this->accelBias +
-            math::Rand::GetDblNormal(this->accelNoiseMean,
-                                     this->accelNoiseStdDev));
+    // Perturb the linear acceleration
+    this->imuMsg.mutable_linear_acceleration()->set_x(
+      this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR]->Apply(
+        this->imuMsg.linear_acceleration().x()));
+    this->imuMsg.mutable_linear_acceleration()->set_y(
+      this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR]->Apply(
+        this->imuMsg.linear_acceleration().y()));
+    this->imuMsg.mutable_linear_acceleration()->set_z(
+      this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR]->Apply(
+        this->imuMsg.linear_acceleration().z()));
 
-          // TODO: add noise to orientation
-          break;
-        default:
-          GZ_ASSERT(false, "Invalid noise model type");
-      }
-    }
-
+    // Publish the message
     if (this->pub)
       this->pub->Publish(this->imuMsg);
   }

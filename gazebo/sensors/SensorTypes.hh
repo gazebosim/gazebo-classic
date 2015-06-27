@@ -60,17 +60,9 @@ namespace gazebo
     /// \brief Shared pointer to RaySensor
     typedef boost::shared_ptr<RaySensor> RaySensorPtr;
 
-    /// \def AltimeterSensorPtr
-    /// \brief Shared pointer to AltimeterSensor
-    typedef boost::shared_ptr<AltimeterSensor> AltimeterSensorPtr;
-
     /// \def CameraSensorPtr
     /// \brief Shared pointer to CameraSensor
     typedef boost::shared_ptr<CameraSensor> CameraSensorPtr;
-
-    /// \def MagnetometerSensorPtr
-    /// \brief Shared pointer to MagnetometerSensor
-    typedef boost::shared_ptr<MagnetometerSensor> MagnetometerSensorPtr;
 
     /// \def MultiCameraSensorPtr
     /// \brief Shared pointer to MultiCameraSensor
@@ -254,7 +246,32 @@ namespace gazebo
 
       /// \brief Magnetometer body-frame Z axis noise in Tesla
       /// \sa MagnetometerSensor
-      MAGNETOMETER_Z_NOISE_TESLA = 14
+      MAGNETOMETER_Z_NOISE_TESLA = 14,
+
+      /// \brief IMU angular velocity X noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_X_NOISE_RADIANS_PER_S = 15,
+
+      /// \brief IMU angular velocity Y noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_Y_NOISE_RADIANS_PER_S = 16,
+
+      /// \brief IMU angular velocity Z noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_Z_NOISE_RADIANS_PER_S = 17,
+
+      /// \brief IMU linear acceleration X noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_X_NOISE_METERS_PER_S_SQR = 18,
+
+      /// \brief IMU linear acceleration Y noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_Y_NOISE_METERS_PER_S_SQR = 19,
+
+      /// \brief IMU linear acceleration Z noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20
+
     };
     /// \}
   }
