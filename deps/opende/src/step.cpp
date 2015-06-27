@@ -816,7 +816,9 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       else if (solver_type == BULLET_LEMKE)
       {
 #ifdef HAVE_BULLET
+#ifdef LIBBULLET_VERSION_GT_282
         dSolveLCP_bullet_lemke(m, A, lambda, rhs, lo, hi);
+#endif
 #else
         dMessage(d_ERR_LCP, "HAVE_BULLET is NOT defined");
 #endif
