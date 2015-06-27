@@ -1734,8 +1734,6 @@ void MainWindow::AddMenu(QMenu *_menu)
 
     for (auto &menuAct : _menu->actions())
       newMenu->addAction(menuAct);
-
-
   }
 }
 
