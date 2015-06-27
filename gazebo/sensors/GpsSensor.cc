@@ -26,7 +26,7 @@
 #include "gazebo/common/common.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/Noise.hh"
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/sensors/GpsSensor.hh"

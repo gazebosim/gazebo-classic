@@ -41,7 +41,6 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
-#include "gazebo/sensors/Noise.hh"
 
 
 using namespace gazebo;

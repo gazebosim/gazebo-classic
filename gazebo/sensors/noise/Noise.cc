@@ -24,8 +24,13 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 
-#include "gazebo/sensors/GaussianNoiseModel.hh"
-#include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/noise/Noise.hh"
+#include "gazebo/sensors/noise/ConstantNoiseModel.hh"
+#include "gazebo/sensors/noise/ExponentialNoiseModel.hh"
+#include "gazebo/sensors/noise/GaussianNoiseModel.hh"
+#include "gazebo/sensors/noise/OrnsteinUhlenbeckNoiseModel.hh"
+#include "gazebo/sensors/noise/UniformNoiseModel.hh"
+#include "gazebo/sensors/noise/WienerNoiseModel.hh"
 
 using namespace gazebo;
 using namespace sensors;

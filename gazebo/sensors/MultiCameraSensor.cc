@@ -34,7 +34,6 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 
-#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
 

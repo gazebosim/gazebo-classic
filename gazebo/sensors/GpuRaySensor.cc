@@ -41,7 +41,6 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 
-#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/GpuRaySensor.hh"
 

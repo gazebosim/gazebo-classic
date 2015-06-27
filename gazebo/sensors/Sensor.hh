@@ -28,6 +28,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/sensors/noise/Noise.hh"
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"

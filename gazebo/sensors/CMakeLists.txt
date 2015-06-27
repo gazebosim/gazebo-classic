@@ -4,17 +4,17 @@ if (WIN32)
   include_directories(${libdl_include_dir})
 endif()
 
+include_directories(noise)
+
 set (sources
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
   ForceTorqueSensor.cc
-  GaussianNoiseModel.cc
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
   MultiCameraSensor.cc
-  Noise.cc
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
@@ -33,12 +33,10 @@ set (headers
   ContactSensor.hh
   DepthCameraSensor.hh
   ForceTorqueSensor.hh
-  GaussianNoiseModel.hh
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
   MultiCameraSensor.hh
-  Noise.hh
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh
@@ -57,7 +55,6 @@ set (gtest_sources
   ForceTorqueSensor_TEST.cc
   GpsSensor_TEST.cc
   ImuSensor_TEST.cc
-  Noise_TEST.cc
   RaySensor_TEST.cc
   Sensor_TEST.cc
   SonarSensor_TEST.cc
@@ -88,6 +85,7 @@ target_link_libraries(gazebo_sensors
   gazebo_common
   gazebo_rendering
   gazebo_physics
+  gazebo_noise
   ${libtool_library}
   ${Boost_LIBRARIES}
   ${ogre_ldflags}
