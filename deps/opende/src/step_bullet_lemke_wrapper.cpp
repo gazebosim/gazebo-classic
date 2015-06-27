@@ -29,6 +29,7 @@
 #include "step_bullet_lemke_wrapper.h"
 
 #ifdef HAVE_BULLET
+#ifdef LIBBULLET_VERSION_GT_282
 #include "LinearMath/btMatrixX.h"
 #include "LinearMath/btAlignedObjectArray.h"
 #include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
@@ -72,4 +73,5 @@ void dSolveLCP_bullet_lemke(int _m, dReal *_A, dReal *_x, dReal *_b,
   for(i=0; i<_m; i++)
     _x[i] = x[i];
 }
+#endif
 #endif

@@ -107,10 +107,12 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
 }
 
 #ifdef HAVE_BULLET
+#ifdef LIBBULLET_VERSION_GT_282
 TEST_F(PhysicsTest, DropMixBulletLemke)
 {
   DropTest("ode", "world", "BULLET_LEMKE");
 }
+#endif
 
 TEST_F(PhysicsTest, DropMixBulletPGS)
 {
