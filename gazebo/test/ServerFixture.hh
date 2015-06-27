@@ -366,7 +366,7 @@ namespace gazebo
     /// \param[in] _name Model name
     /// \param[in] _sensorName Sensor name
     /// \param[in] _collisionType Type of collision, box or cylinder
-    /// \param[in] _topic Topic to publish IMU data to
+    /// \param[in] _topic Topic to publish magnetometer data to
     /// \param[in] _pos World position
     /// \param[in] _rpy World rotation in Euler angles
     /// \param[in] _static True to make the model static

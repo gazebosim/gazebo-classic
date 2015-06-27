@@ -9,7 +9,9 @@ import "vector3d.proto";
 
 message Magnetometer
 {
+  /// \brief Global time at which the magnetic field strength was sampled
   required Time time                 = 1;
-  required string entity_name        = 2;
-  required Vector3d field_tesla      = 3;
+  
+  /// \brief Magnetic field strength (in Tesla) along body-frame axis
+  required Vector3d field_tesla      = 2;
 }

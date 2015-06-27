@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
     M.y = this->noises[MAGNETOMETER_Y_NOISE_TESLA]->Apply(M.y);
     M.z = this->noises[MAGNETOMETER_Z_NOISE_TESLA]->Apply(M.z);
 
-    // Set the IMU orientation
+    // Set the body-frame magnetic field strength
     msgs::Set(this->magMsg.mutable_field_tesla(),M);
   }
 

@@ -140,8 +140,8 @@ namespace gazebo
       /// \return The gravity vector.
       public: virtual math::Vector3 GetGravity() const;
 
-      /// \brief Set the magnetic vector.
-      /// \param[in] _gravity New magnetic vector.
+      /// \brief Set the gravity vector.
+      /// \param[in] _gravity New gravity vector.
       public: virtual void SetGravity(
                   const gazebo::math::Vector3 &_gravity) = 0;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _MAGNETOMETER_SENSOR_HH_
-#define _MAGNETOMETER_SENSOR_HH_
+#ifndef __GAZEBO_MAGNETOMETER_SENSOR_HH_
+#define __GAZEBO_MAGNETOMETER_SENSOR_HH_
 
 #include <string>
 
@@ -37,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \class MagnetometerSensor MagnetometerSensor.hh sensors/sensors.hh
-    /// \brief MagnetometerSensor to provide position measurement.
+    /// \brief MagnetometerSensor to provide magnetic field measurement.
     class GAZEBO_VISIBLE MagnetometerSensor: public Sensor
     {
       /// \brief Constructor.
@@ -64,15 +64,15 @@ namespace gazebo
 
       /// \brief Accessor for current magnetic field in Tesla
       /// \return Current magnetic field
-      public: math::Vector3 GetMagneticField()  const;
+      public: math::Vector3 GetMagneticField() const;
 
       /// \brief Mutex to protect reads and writes.
       private: mutable boost::mutex mutex;
       
-      /// \brief GPS data publisher.
+      /// \brief Magnetometer data publisher.
       private: transport::PublisherPtr magPub;
 
-      /// \brief Topic name for GPS data publisher.
+      /// \brief Topic name for magnetometer data publisher.
       private: std::string topicName;
 
       /// \brief Parent link of this sensor.
