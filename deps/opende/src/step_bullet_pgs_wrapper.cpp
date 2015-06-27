@@ -63,8 +63,7 @@ void dSolveLCP_bullet_pgs(int _m, dReal *_A, dReal *_x, dReal *_b,
   }
 
   btSolveProjectedGaussSeidel* btPGS_solver = new btSolveProjectedGaussSeidel();
-  pgsReturn = btPGS_solver->solveMLCP(A, b, x, lo,
-      hi, limitDependency, numIterations, true);
+  btPGS_solver->solveMLCP(A, b, x, lo, hi, limitDependency, numIterations, useSparsity);
 
   // convert x to dReal format
   for(i=0; i<_m; i++)
