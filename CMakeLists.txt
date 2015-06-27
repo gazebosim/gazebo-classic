@@ -222,7 +222,7 @@ endif()
 if (MSVC)
   # Unable to be filtered flags (failing due to limitations in filter_valid_compiler_warnings)
   # Handling exceptions rightly
-  set(UNFILTERED_FLAGS "/EHsc")
+  set(UNFILTERED_FLAGS "/EHsc /w")
 endif()
 
 # Visual Studio enables c++11 support by default
