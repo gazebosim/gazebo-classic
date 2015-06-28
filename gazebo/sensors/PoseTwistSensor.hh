@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef __GAZEBO_ORIENTATION_SENSOR_HH_
-#define __GAZEBO_ORIENTATION_SENSOR_HH_
+#ifndef _GAZEBO_POSE_TWIST_SENSOR_HH_
+#define _GAZEBO_POSE_TWIST_SENSOR_HH_
 
 #include <string>
 
@@ -36,15 +36,15 @@ namespace gazebo
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \class OrientationSensor OrientationSensor.hh sensors/sensors.hh
-    /// \brief OrientationSensor to provide orientation measurement
-    class GAZEBO_VISIBLE OrientationSensor: public Sensor
+    /// \class PoseTwistSensor PoseTwistSensor.hh sensors/sensors.hh
+    /// \brief PoseTwistSensor to provide orientation measurement
+    class GAZEBO_VISIBLE PoseTwistSensor: public Sensor
     {
       /// \brief Constructor.
-      public: OrientationSensor();
+      public: PoseTwistSensor();
 
       /// \brief Destructor.
-      public: virtual ~OrientationSensor();
+      public: virtual ~PoseTwistSensor();
 
       // Documentation inherited
       public: virtual void Load(const std::string & _worldName,
@@ -68,7 +68,7 @@ namespace gazebo
 
       /// \brief Accessor for current orientation as a quaternion
       /// \return Current quaternion orientation
-      public: math::Quaternion GetQuaternionOrientation() const
+      public: math::Quaternion GetQuaternionOrientation() const;
 
       /// \brief Mutex to protect reads and writes.
       private: mutable boost::mutex mutex;

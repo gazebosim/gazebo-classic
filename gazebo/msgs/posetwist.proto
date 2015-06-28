@@ -1,0 +1,29 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PoseTwist
+/// \brief Data from a pose/twist sensor
+
+import "time.proto";
+import "vector3d.proto";
+
+message PoseTwist
+{
+  /// \brief Global time at which the PoseTwist sensor was sampled
+  required Time time                 = 1;
+
+  /// \brief Reference pose that describes local with respect to global frame
+  required Pose reference_pos        = 2;
+
+  /// \brief Current position with respect to local coordinate frame
+  required Vector3d position         = 3;
+
+  /// \brief Current Euler orientation with respect to local coordinate frame
+  required Vector3d orientation      = 4;
+
+  /// \brief Current linear velocity with respect to local coordinate frame
+  required Vector3d linear_velocity  = 5;
+
+  /// \brief Current angular velocity with respect to local coordinate frame
+  required Vector3d angular_velocity = 6;
+}

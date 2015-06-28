@@ -38,6 +38,7 @@ namespace gazebo
     class ContactSensor;
     class ImuSensor;
     class GpuRaySensor;
+    class PoseTwistSensor;
     class RFIDSensor;
     class RFIDTag;
     class SonarSensor;
@@ -81,6 +82,10 @@ namespace gazebo
     /// \def GpuRaySensorPtr
     /// \brief Shared pointer to GpuRaySensor
     typedef boost::shared_ptr<GpuRaySensor> GpuRaySensorPtr;
+
+    /// \def PoseTwistSensorPtr
+    /// \brief Shared pointer to PoseTwistSensor
+    typedef boost::shared_ptr<PoseTwistSensor> PoseTwistSensorPtr;
 
     /// \def RFIDSensorPtr
     /// \brief Shared pointer to RFIDSensor
@@ -154,6 +159,10 @@ namespace gazebo
     /// \brief Vector of ImuSensor shared pointers
     typedef std::vector<ImuSensorPtr> ImuSensor_V;
 
+    /// \def PoseTwistSensor_V
+    /// \brief Vector of PoseTwistSensor shared pointers
+    typedef std::vector<PoseTwistSensorPtr> PoseTwistSensor_V;
+
     /// \def GpuRaySensor_V
     /// \brief Vector of GpuRaySensor shared pointers
     typedef std::vector<GpuRaySensorPtr> GpuRaySensor_V;
@@ -220,7 +229,56 @@ namespace gazebo
 
       /// \brief Noise streams for the ray sensor
       /// \sa RaySensor
-      RAY_NOISE = 9
+      RAY_NOISE = 9,
+
+      /// \brief PoseTwist position error along the X axis in meters per second 
+      /// \sa PoseTwistSensor
+      POSETWIST_POSITION_X_NOISE_METERS = 10,
+
+      /// \brief PoseTwist position error along the Y axis in meters per second 
+      /// \sa PoseTwistSensor
+      POSETWIST_POSITION_Y_NOISE_METERS = 11,
+
+      /// \brief PoseTwist position error along the Z axis in meters per second 
+      /// \sa PoseTwistSensor
+      POSETWIST_POSITION_Z_NOISE_METERS = 12,
+
+      /// \brief PoseTwist velocity error along the X axis in meters per second 
+      /// \sa PoseTwistSensor
+      POSETWIST_VELOCITY_X_NOISE_METERS_PER_SEC = 13,
+
+      /// \brief PoseTwist velocity error along the Y axis in meters per second 
+      /// \sa PoseTwistSensor
+      POSETWIST_VELOCITY_Y_NOISE_METERS_PER_SEC = 14,
+      
+      /// \brief PoseTwist velocity error along the Z axis in meters per second 
+      /// \sa PoseTwistSensor
+      POSETWIST_VELOCITY_Z_NOISE_METERS_PER_SEC = 15,
+      
+      /// \brief PoseTwist Euler orientation around the X axis in radians
+      /// \sa PoseTwistSensor
+      POSETWIST_ORIENTATION_X_NOISE_RADIANS_ = 16,
+
+      /// \brief PoseTwist Euler orientation around the Y axis in radians
+      /// \sa PoseTwistSensor
+      POSETWIST_ORIENTATION_Y_NOISE_RADIANS = 17,
+
+      /// \brief PoseTwist Euler orientation around the Z axis in radians
+      /// \sa PoseTwistSensor
+      POSETWIST_ORIENTATION_Z_NOISE_RADIANS = 18,
+      
+      /// \brief PoseTwist angular velocity noise around the X axis in radians
+      /// \sa PoseTwistSensor
+      POSETWIST_ANGULAR_VELOCITY_X_NOISE_RADIANS_PER_SEC = 19,
+
+      /// \brief PoseTwist angular velocity noise around the Y axis in radians
+      /// \sa PoseTwistSensor
+      POSETWIST_ANGULAR_VELOCITY_Y_NOISE_RADIANS_PER_SEC = 20,
+
+      /// \brief PoseTwist angular velocity noise around the Z axis in radians
+      /// \sa PoseTwistSensor
+      POSETWIST_ANGULAR_VELOCITY_Z_NOISE_RADIANS_PER_SEC = 21
+
     };
     /// \}
   }

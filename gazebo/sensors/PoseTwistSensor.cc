@@ -28,32 +28,32 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/Noise.hh"
-#include "gazebo/sensors/OrientationSensor.hh"
+#include "gazebo/sensors/PoseTwistSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("orientation", OrientationSensor)
+GZ_REGISTER_STATIC_SENSOR("posetwist", PoseTwistSensor)
 
 /////////////////////////////////////////////////
-OrientationSensor::OrientationSensor()
+PoseTwistSensor::PoseTwistSensor()
 : Sensor(sensors::OTHER)
 {
 }
 
 /////////////////////////////////////////////////
-OrientationSensor::~OrientationSensor()
+PoseTwistSensor::~PoseTwistSensor()
 {
 }
 
 /////////////////////////////////////////////////
-void OrientationSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
+void PoseTwistSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 }
 
 /////////////////////////////////////////////////
-void OrientationSensor::Load(const std::string &_worldName)
+void PoseTwistSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
@@ -83,20 +83,20 @@ void OrientationSensor::Load(const std::string &_worldName)
 }
 
 /////////////////////////////////////////////////
-void OrientationSensor::Fini()
+void PoseTwistSensor::Fini()
 {
   Sensor::Fini();
   this->parentLink.reset();
 }
 
 //////////////////////////////////////////////////
-void OrientationSensor::Init()
+void PoseTwistSensor::Init()
 {
   Sensor::Init();
 }
 
 //////////////////////////////////////////////////
-bool OrientationSensor::UpdateImpl(bool /*_force*/)
+bool PoseTwistSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
   
@@ -131,14 +131,14 @@ bool OrientationSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 OrientationSensor::GetEulerOrientation() const
+math::Vector3 PoseTwistSensor::GetEulerOrientation() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
   return msgs::Convert(this->orientMsg.euler());
 }
 
 //////////////////////////////////////////////////
-math::Quaternion OrientationSensor::GetQuaternionOrientation() const
+math::Quaternion PoseTwistSensor::GetQuaternionOrientation() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
   return msgs::Convert(this->orientMsg.quaternion());

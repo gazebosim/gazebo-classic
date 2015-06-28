@@ -15,6 +15,7 @@ set (sources
   ImuSensor.cc
   MultiCameraSensor.cc
   Noise.cc
+  PoseTwistSensor.cc
   RaySensor.cc
   RFIDSensor.cc
   RFIDTag.cc
@@ -39,6 +40,7 @@ set (headers
   ImuSensor.hh
   MultiCameraSensor.hh
   Noise.hh
+  PoseTwistSensor.hh
   RaySensor.hh
   RFIDSensor.hh
   RFIDTag.hh
@@ -58,6 +60,7 @@ set (gtest_sources
   GpsSensor_TEST.cc
   ImuSensor_TEST.cc
   Noise_TEST.cc
+  PoseTwistSensor_TEST.cc
   RaySensor_TEST.cc
   Sensor_TEST.cc
   SonarSensor_TEST.cc

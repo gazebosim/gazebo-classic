@@ -55,7 +55,6 @@ set (msgs
   model.proto
   model_configuration.proto
   model_v.proto
-  orientation.proto
   packet.proto
   physics.proto
   planegeom.proto
@@ -69,6 +68,7 @@ set (msgs
   pose_trajectory.proto
   pose_v.proto
   poses_stamped.proto
+  posetwist.proto
   projector.proto
   propagation_particle.proto
   propagation_grid.proto
