@@ -37,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \class OrientationSensor OrientationSensor.hh sensors/sensors.hh
-    /// \brief OrientationSensor to provide tri-axial orientation measurement
+    /// \brief OrientationSensor to provide orientation measurement
     class GAZEBO_VISIBLE OrientationSensor: public Sensor
     {
       /// \brief Constructor.
@@ -62,23 +62,27 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
-      /// \brief Accessor for current magnetic field in Tesla
-      /// \return Current magnetic field
+      /// \brief Accessor for current orientation as an Euler angle
+      /// \return Current Euler orientation
       public: math::Vector3 GetEulerOrientation() const;
+
+      /// \brief Accessor for current orientation as a quaternion
+      /// \return Current quaternion orientation
+      public: math::Quaternion GetQuaternionOrientation() const
 
       /// \brief Mutex to protect reads and writes.
       private: mutable boost::mutex mutex;
       
-      /// \brief Magnetometer data publisher.
+      /// \brief Sensor data publisher.
       private: transport::PublisherPtr orientPub;
 
-      /// \brief Topic name for magnetometer data publisher.
+      /// \brief Topic name for data publisher.
       private: std::string topicName;
 
       /// \brief Parent link of this sensor.
       private: physics::LinkPtr parentLink;
 
-      /// \brief Stores most recent magnetometer sensor data.
+      /// \brief Stores most recent orientation
       private: msgs::Magnetometer orientMsg;
     };
     /// \}

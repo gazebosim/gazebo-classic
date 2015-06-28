@@ -65,7 +65,8 @@ void OrientationSensor::Load(const std::string &_worldName)
     this->topicName += '/' + this->sdf->Get<std::string>("topic");
   boost::replace_all(this->topicName, "::", "/");
 
-  this->orientPub = this->node->Advertise<msgs::Magnetometer>(this->topicName, 50);
+  this->orientPub = this->node->Advertise<msgs::Orientation>(
+    this->topicName, 50);
 
   // Parse sdf noise parameters
   sdf::ElementPtr orientElem = this->sdf->GetElement("orientation");
@@ -105,16 +106,18 @@ bool OrientationSensor::UpdateImpl(bool /*_force*/)
     // Get pose in gazebo reference frame
     math::Pose pose = this->pose + this->parentLink->GetWorldPose();
 
-    // Rotate the magnetic field into the body frame
+    // Extract just the rotation as an euler angle
     math::Vector3 rot = pose.rot.GetAsEuler();
 
-    // Apply position noise before converting to global frame
+    // Apply orientation noise to each axis independently
     rot.x = this->noises[ORIENTATION_X_NOISE_RADIANS]->Apply(rot.x);
     rot.y = this->noises[ORIENTATION_Y_NOISE_RADIANS]->Apply(rot.y);
     rot.z = this->noises[ORIENTATION_Z_NOISE_RADIANS]->Apply(rot.z);
 
-    // Set the body-frame magnetic field strength
+    // Set the euler and quaternion values for the orientation
     msgs::Set(this->orientMsg.mutable_euler(),rot);
+    msgs::Set(this->orientMsg.mutable_quaternion(),
+      math::Quaternion::EulerToQuaternion(rot));
   }
 
   // Save the time of the measurement
@@ -132,4 +135,11 @@ math::Vector3 OrientationSensor::GetEulerOrientation() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
   return msgs::Convert(this->orientMsg.euler());
+}
+
+//////////////////////////////////////////////////
+math::Quaternion OrientationSensor::GetQuaternionOrientation() const
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  return msgs::Convert(this->orientMsg.quaternion());
 }
