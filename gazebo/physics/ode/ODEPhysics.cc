@@ -751,6 +751,7 @@ void ODEPhysics::SetWorldStepSolverType(const std::string &_worldSolverType)
     dWorldSetWorldStepSolverType(this->dataPtr->worldId,
     ConvertWorldStepSolverType(_worldSolverType));
 }
+
 //////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSPreconIters()
 {
