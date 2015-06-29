@@ -64,14 +64,21 @@ namespace gazebo
 
       /// \brief Accessor for current orientation as an Euler angle
       /// \return Current Euler orientation
-      public: math::Vector3 GetEulerOrientation() const;
-
-      /// \brief Accessor for current orientation as a quaternion
-      /// \return Current quaternion orientation
-      public: math::Quaternion GetQuaternionOrientation() const;
+      public: math::Vector3 GetPosition() const;
+      public: math::Vector3 GetOrientation() const;
+      public: math::Vector3 GetLinearVelocity() const;
+      public: math::Vector3 GetAngularVelocity() const;
+      public: math::Vector3 GetLinearAcceleration() const;
+      public: math::Vector3 GetAngularAcceleration() const;
 
       /// \brief Mutex to protect reads and writes.
       private: mutable boost::mutex mutex;
+
+      /// \brief Sets the current pose as the IMU reference pose
+      public: void SetReferencePose();
+
+      /// \brief Imu reference pose
+      private: math::Pose referencePose;
       
       /// \brief Sensor data publisher.
       private: transport::PublisherPtr orientPub;
