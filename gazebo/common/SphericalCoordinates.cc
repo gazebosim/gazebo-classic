@@ -174,9 +174,9 @@ void SphericalCoordinates::UpdateTransformationMatrix()
 
   // Cache heading transforms -- note that we have to negate the heading in 
   // order to preserve backward compatibility. ie. Gazebo has traditionally 
-  // expressed positive angle as a COCKWISE rotation that takes the GLOBAL frame
-  // to the LOCAL frame. However, right hand coordinate systems require this
-  // to be expressed as an ANTI-CLOCKWISE roation. So, we negate the rotation.
+  // expressed positive angle as a CLOCKWISE rotation that takes the GLOBAL 
+  // frame to the LOCAL frame. However, right hand coordinate systems require 
+  // this to be expressed as an ANTI-CLOCKWISE rotation. So, we negate it.
   this->cosHea = cos(-this->dataPtr->headingOffset.Radian());
   this->sinHea = sin(-this->dataPtr->headingOffset.Radian());
 
