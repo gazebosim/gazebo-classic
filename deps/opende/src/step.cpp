@@ -826,7 +826,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       else if (solver_type == BULLET_PGS)
       {
 #ifdef HAVE_BULLET
-        dSolveLCP_bullet_pgs(m, A, lambda, rhs, nub, lo, hi, findex);
+        dSolveLCP_bullet_pgs(m, A, lambda, rhs, lo, hi, findex);
 #else
         dMessage(d_ERR_LCP, "HAVE_DART is NOT defined");
 #endif

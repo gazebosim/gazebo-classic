@@ -19,5 +19,5 @@
 
 #include <ode/common.h>
 void dSolveLCP_bullet_pgs(int _m, dReal *_A, dReal *_x, dReal *_b,
-  int _nub, dReal *_lo, dReal *_hi, int *findex);
+  dReal *_lo, dReal *_hi, int *findex);
 #endif
