@@ -2388,7 +2388,6 @@ void dWorldSetQuickStepFrictionModel (dWorldID w, Friction_Model fricmodel)
 }
 
 
-
 void dWorldSetWorldStepSolverType(dWorldID w, World_Solver_Type solvertype)
 {
   dAASSERT(w);

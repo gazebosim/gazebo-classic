@@ -45,6 +45,7 @@ enum World_Solver_Type{
   DART_PGS,
   BULLET_PGS
 };
+
 /**
  *  @defgroup world World
  *
