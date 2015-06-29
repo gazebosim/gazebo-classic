@@ -243,6 +243,7 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
+
   // Custom gravity vector for this demo world.
   EXPECT_DOUBLE_EQ(g.x, 0);
   EXPECT_DOUBLE_EQ(g.y, -1.0);
