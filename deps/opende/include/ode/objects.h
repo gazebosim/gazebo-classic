@@ -46,6 +46,7 @@ enum World_Solver_Type{
   BULLET_LEMKE,
   BULLET_PGS
 };
+
 /**
  *  @defgroup world World
  *

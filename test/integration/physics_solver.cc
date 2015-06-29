@@ -59,7 +59,6 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
   {
     // Set solver type
     physics->SetParam("solver_type", _solverType);
-
     // Set world step solver type
     physics->SetParam("world_step_solver", _worldSolverType);
   }
@@ -80,7 +79,6 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
   int dynamic_steps = dynamic_duration/dt;
   for (int i = 0; i < steps; ++i)
   {
-    // integrate here to see when the collision should happen
     v += dt * g;
     z += dt * v;
 
@@ -102,8 +100,8 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
         EXPECT_LT(fabs(vel.z), PHYSICS_TOL);
         EXPECT_LT(fabs(pose.pos.z - 0.5), PHYSICS_TOL);
       }
-    } //if(sphere_model)
-  } //for
+    }
+  }
 }
 
 #ifdef HAVE_BULLET
