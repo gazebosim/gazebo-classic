@@ -38,6 +38,7 @@ enum Friction_Model {
   cone_friction,
   box_friction
 };
+
 /// \brief  Enum for World_Solver_Type
 /// Enum of world stepper LCP solver choices
 enum World_Solver_Type{
@@ -47,7 +48,7 @@ enum World_Solver_Type{
 };
 
 /**
- *  @defgroup world World
+ * @defgroup world World
  *
  * The world object is a container for rigid bodies and joints. Objects in
  * different worlds can not interact, for example rigid bodies from two
