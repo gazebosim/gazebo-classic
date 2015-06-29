@@ -247,6 +247,7 @@ namespace gazebo
 
       /// \brief Set the transparency of a single visual without calling
       /// UpdateShaders.
+      /// \param[in] _sceneNode The target scene node.
       private: void SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode);
 
       /// \brief Set the transparency.

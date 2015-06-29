@@ -2161,7 +2161,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     this->CreateInertiaVisual(_msg, linkVis);
   }
 
-  if (!this->GetVisual(_msg->name() + "_LINK_ORIGIN_VISUAL__"))
+  if (!this->GetVisual(_msg->name() + "_LINK_FRAME_VISUAL__"))
   {
     this->CreateLinkFrameVisual(_msg, linkVis);
   }
