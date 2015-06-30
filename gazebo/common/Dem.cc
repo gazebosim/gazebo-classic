@@ -253,7 +253,8 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
                         const math::Vector3 &_size, const math::Vector3 &_scale,
                         bool _flipY, std::vector<float> &_heights)
 {
-  this->FillHeightMap(_subSampling, _vertSize, _size, _scale, _flipY, _heights);
+  this->FillHeightMap(_subSampling, _vertSize, _size.Ign(), _scale.Ign(),
+      _flipY, _heights);
 }
 
 //////////////////////////////////////////////////
