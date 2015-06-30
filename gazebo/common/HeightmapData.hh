@@ -53,7 +53,7 @@ namespace gazebo
       public: virtual void FillHeightMap(int _subSampling,
           unsigned int _vertSize, const math::Vector3 &_size,
           const math::Vector3 &_scale, bool _flipY,
-          std::vector<float> &_heights) = 0 GAZEBO_DEPRECATED(6.0);
+          std::vector<float> &_heights) GAZEBO_DEPRECATED(6.0) = 0;
 
       /// \brief Create a lookup table of the terrain's height.
       /// \param[in] _subsampling Multiplier used to increase the resolution.

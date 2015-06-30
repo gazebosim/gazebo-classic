@@ -65,8 +65,8 @@ int Dem::Load(const std::string &_filename)
   unsigned int height;
   int xSize, ySize;
   double upLeftX, upLeftY, upRightX, upRightY, lowLeftX, lowLeftY;
-  ignition::math::Angled upLeftLat, upLeftLong, upRightLat, upRightLong;
-  ignition::math::Angled lowLeftLat, lowLeftLong;
+  ignition::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
+  ignition::math::Angle lowLeftLat, lowLeftLong;
 
   // Sanity check
   std::string fullName = _filename;
@@ -179,17 +179,7 @@ float Dem::GetMaxElevation() const
 
 //////////////////////////////////////////////////
 void Dem::GetGeoReference(double _x, double _y,
-                          math::Angle &_latitude, math::Angle &_longitude)
-{
-  ignition::math::Angled lat, lon;
-  return this->GetGeoReference(_x, _y, lat, lon);
-  _latitude = lat;
-  _longitude = lon;
-}
-
-//////////////////////////////////////////////////
-void Dem::GetGeoReference(double _x, double _y,
-    ignition::math::Angled &_latitude, ignition::math::Angled &_longitude)
+    ignition::math::Angle &_latitude, ignition::math::Angle &_longitude) const
 {
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
@@ -221,15 +211,15 @@ void Dem::GetGeoReference(double _x, double _y,
 //////////////////////////////////////////////////
 void Dem::GetGeoReferenceOrigin(math::Angle &_latitude, math::Angle &_longitude)
 {
-  ignition::math::Angled lat, lon;
+  ignition::math::Angle lat, lon;
   this->GetGeoReferenceOrigin(lat, lon);
   _latitude = lat;
   _longitude = lon;
 }
 
 //////////////////////////////////////////////////
-void Dem::GetGeoReferenceOrigin(ignition::math::Angled &_latitude,
-    ignition::math::Angled &_longitude)
+void Dem::GetGeoReferenceOrigin(ignition::math::Angle &_latitude,
+    ignition::math::Angle &_longitude) const
 {
   return this->GetGeoReference(0, 0, _latitude, _longitude);
 }

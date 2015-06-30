@@ -74,7 +74,7 @@ namespace gazebo
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       /// \deprecated See GetGeoReferenceOrigin() that accepts
-      /// ignition::math::Angled objects.
+      /// ignition::math::Angle objects.
       public: void GetGeoReferenceOrigin(math::Angle &_latitude,
                   math::Angle &_longitude) GAZEBO_DEPRECATED(6.0);
 
@@ -82,8 +82,8 @@ namespace gazebo
       /// origin in WGS84.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
-      public: void GetGeoReferenceOrigin(ignition::math::Angled &_latitude,
-                  ignition::math::Angled &_longitude) const;
+      public: void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,
+                  ignition::math::Angle &_longitude) const;
 
       /// \brief Get the terrain's height. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
@@ -151,8 +151,8 @@ namespace gazebo
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       private: void GetGeoReference(double _x, double _y,
-                                    ignition::math::Angled &_latitude,
-                                    ignition::math::Angled &_longitude);
+                                    ignition::math::Angle &_latitude,
+                                    ignition::math::Angle &_longitude) const;
 
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing
