@@ -1536,25 +1536,6 @@ void dJointSetScrewThreadPitch (dxJoint *joint, dReal thread_pitch)
   }
 }
 
-void dJointSetDamping (dxJoint *joint, dReal damping)
-{
-  dAASSERT (joint);
-
-  if (joint->type() == dJointTypeHinge || joint->type() == dJointTypeSlider ||
-      joint->type() == dJointTypeScrew)
-  {
-    if (!_dequal(damping, 0.0))
-    {
-      if (damping < 0.0) printf("bad to have negative viscous joint damping, make sure you know what's going on.\n");
-      // set use_damping to true
-      joint->use_damping = true;
-      // damping coefficient is in jicurr->info.damping_coefficient);
-      joint->damping_coefficient = damping;
-      // FIXME: only hinge, slider, screw(rotational) are implemented at this time, extend?
-    }
-  }
-}
-
 dJointFeedback *dJointGetFeedback (dxJoint *joint)
 {
   dAASSERT (joint);

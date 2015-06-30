@@ -2022,12 +2022,6 @@ ODE_API void dJointSetData (dJointID, void *data);
 ODE_API void dJointSetScrewThreadPitch (dJointID, dReal thread_pitch);
 
 /**
- * @brief Set joint viscous damping coefficient
- * @ingroup joints
- */
-ODE_API void dJointSetDamping (dJointID, dReal damping);
-
-/**
  * @brief Get the user-data pointer
  * @ingroup joints
  */
