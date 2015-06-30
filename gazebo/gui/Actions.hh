@@ -103,6 +103,9 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_alignButtonAct;
     extern GZ_GUI_VISIBLE QAction *g_snapAct;
 
+    extern GZ_GUI_VISIBLE QWidgetAction *g_viewAngleAct;
+    extern GZ_GUI_VISIBLE QAction *g_viewAngleButtonAct;
+
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
     class GAZEBO_VISIBLE DeleteAction : public QAction

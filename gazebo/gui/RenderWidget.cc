@@ -135,6 +135,27 @@ RenderWidget::RenderWidget(QWidget *_parent)
     this->toolbar->addAction(g_snapAct);
   }
 
+  this->toolbar->addSeparator();
+
+  // View angle
+  if (g_viewAngleAct)
+  {
+    QToolButton *viewAngleButton = new QToolButton;
+    viewAngleButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    viewAngleButton->setIcon(QIcon(":/images/view_angle_front.png"));
+    viewAngleButton->setToolTip(tr("Change the view angle"));
+    viewAngleButton->setArrowType(Qt::NoArrow);
+
+    QMenu *viewAngleMenu = new QMenu(viewAngleButton);
+    viewAngleMenu->addAction(g_viewAngleAct);
+
+    viewAngleButton->setMenu(viewAngleMenu);
+    viewAngleButton->setPopupMode(QToolButton::InstantPopup);
+    g_viewAngleButtonAct = this->toolbar->addWidget(viewAngleButton);
+    connect(viewAngleButton, SIGNAL(pressed()), g_viewAngleAct,
+        SLOT(trigger()));
+  }
+
   // Empty space to push whatever comes next to the right
   QWidget *spacer = new QWidget();
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

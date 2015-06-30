@@ -143,3 +143,9 @@ QWidgetAction *gazebo::gui::g_alignAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_alignButtonAct = 0;
+
+GZ_GUI_VISIBLE
+QWidgetAction *gazebo::gui::g_viewAngleAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_viewAngleButtonAct = 0;

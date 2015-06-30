@@ -56,6 +56,7 @@
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/AlignWidget.hh"
+#include "gazebo/gui/ViewAngleWidget.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -1426,6 +1427,36 @@ void MainWindow::CreateActions()
   g_alignAct->setDefaultWidget(alignWidget);
   g_alignAct->setEnabled(false);
   connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
+
+  // set up view angle actions and widget
+  QAction *viewAngleTop = new QAction(QIcon(":/images/view_angle_top.png"),
+      tr("View from the top"), this);
+  QAction *viewAngleBottom = new QAction(
+      QIcon(":/images/view_angle_bottom.png"),
+      tr("View from the bottom"), this);
+  QAction *viewAngleFront = new QAction(QIcon(":/images/view_angle_front.png"),
+      tr("View from the front"), this);
+  QAction *viewAngleBack = new QAction(QIcon(":/images/view_angle_back.png"),
+      tr("View from the back"), this);
+  QAction *viewAngleLeft = new QAction(QIcon(":/images/view_angle_left.png"),
+      tr("View from the left"), this);
+  QAction *viewAngleRight = new QAction(QIcon(":/images/view_angle_right.png"),
+      tr("View from the right"), this);
+  QAction *viewAngleReset = new QAction(QIcon(":/images/view_angle_home.png"),
+      tr("Reset view angle"), this);
+  connect(viewAngleReset, SIGNAL(triggered()), this, SLOT(Reset()));
+
+  ViewAngleWidget *viewAngleWidget = new ViewAngleWidget(this);
+  viewAngleWidget->Add(ViewAngleWidget::TOP, viewAngleTop);
+  viewAngleWidget->Add(ViewAngleWidget::BOTTOM, viewAngleBottom);
+  viewAngleWidget->Add(ViewAngleWidget::FRONT, viewAngleFront);
+  viewAngleWidget->Add(ViewAngleWidget::BACK, viewAngleBack);
+  viewAngleWidget->Add(ViewAngleWidget::LEFT, viewAngleLeft);
+  viewAngleWidget->Add(ViewAngleWidget::RIGHT, viewAngleRight);
+  viewAngleWidget->Add(ViewAngleWidget::RESET, viewAngleReset);
+
+  g_viewAngleAct = new QWidgetAction(this);
+  g_viewAngleAct->setDefaultWidget(viewAngleWidget);
 }
 
 /////////////////////////////////////////////////
