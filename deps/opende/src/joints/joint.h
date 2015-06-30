@@ -145,7 +145,7 @@ struct dxJoint : public dObject
     virtual void getInfo1( Info1* info ) = 0;
     virtual void getInfo2( Info2* info ) = 0;
     // This call quickly!!! estimates maximum value of "m" that could be returned by getInfo1()
-	// See comments at definition of SureMaxInfo for defails.
+    // See comments at definition of SureMaxInfo for defails.
     virtual void getSureMaxInfo( SureMaxInfo* info ) = 0;
     virtual dJointType type() const = 0;
     virtual size_t size() const = 0;
