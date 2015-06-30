@@ -18,6 +18,7 @@
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
+  #define snprintf _snprintf
 #endif
 
 #include <signal.h>
@@ -27,6 +28,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo_client.hh"
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
@@ -62,6 +64,10 @@ QApplication *g_app;
 gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
+
+// This makes it possible to use common::Time in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(common::Time)
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -167,7 +173,6 @@ namespace gazebo
 void gui::init()
 {
   g_modelRightMenu->Init();
-  g_main_win->show();
   g_main_win->Init();
 }
 
@@ -234,6 +239,7 @@ bool gui::load()
 
   g_modelRightMenu = new gui::ModelRightMenu();
 
+  // Load the rendering engine.
   rendering::load();
   rendering::init();
 
@@ -247,10 +253,13 @@ bool gui::load()
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
+  // Register common::Time as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<common::Time>();
+
   g_main_win = new gui::MainWindow();
 
   g_main_win->Load();
-  g_main_win->resize(1024, 768);
 
   return true;
 }

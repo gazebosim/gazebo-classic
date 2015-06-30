@@ -85,6 +85,9 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Extract the start/end log times from the log.
   this->ReadLogTimes();
+
+  // Extract the initial "iterations" value from the log.
+  this->iterationsFound = this->ReadIterations();
 }
 
 /////////////////////////////////////////////////
@@ -103,6 +106,19 @@ std::string LogPlay::GetHeader() const
 
   return stream.str();
 }
+
+/////////////////////////////////////////////////
+uint64_t LogPlay::GetInitialIterations() const
+{
+  return this->initialIterations;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::HasIterations() const
+{
+  return this->iterationsFound;
+}
+
 
 /////////////////////////////////////////////////
 void LogPlay::ReadHeader()
@@ -208,6 +224,44 @@ void LogPlay::ReadLogTimes()
 }
 
 /////////////////////////////////////////////////
+bool LogPlay::ReadIterations()
+{
+  if (this->GetChunkCount() < 2u)
+  {
+    gzwarn << "Unable to extract iteration information. No chunks available "
+           << "with <iterations> information. Assuming that the first "
+           << "<iterations> value is 0." << std::endl;
+    return false;
+  }
+
+  const std::string kStartDelim = "<iterations>";
+  const std::string kEndDelim = "</iterations>";
+  std::string chunk;
+
+  // Read the first "iterations" value of the log from the first chunk.
+  this->GetChunk(1, chunk);
+
+  // Find the first <iterations> of the log.
+  auto from = chunk.find(kStartDelim);
+  auto to = chunk.find(kEndDelim, from + kStartDelim.size());
+  if (from != std::string::npos && to != std::string::npos)
+  {
+    auto length = to - from - kStartDelim.size();
+    std::string iterations = chunk.substr(from + kStartDelim.size(), length);
+    std::stringstream ss(iterations);
+    ss >> this->initialIterations;
+    return true;
+  }
+  else
+  {
+    gzwarn << "Unable to find <iterations>...</iterations> tags in the first "
+           << "chunk. Assuming that the first <iterations> value is 0."
+           << std::endl;
+    return false;
+  }
+}
+
+/////////////////////////////////////////////////
 bool LogPlay::IsOpen() const
 {
   return this->logStartXml != NULL;
@@ -301,6 +355,20 @@ bool LogPlay::Step(std::string &_data)
   _data = this->currentChunk.substr(start, end+endMarker.size()-start);
 
   this->currentChunk.erase(0, end + endMarker.size());
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::Rewind()
+{
+  this->currentChunk.clear();
+  this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+  if (!logCurrXml)
+  {
+    gzerr << "Unable to jump to the beginning of the log file\n";
+    return false;
+  }
 
   return true;
 }

@@ -100,12 +100,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
     gzwarn << "No shape has been specified. Error!!!\n";
-
-  if (!this->shape->HasType(Base::MULTIRAY_SHAPE) &&
-      !this->shape->HasType(Base::RAY_SHAPE))
-  {
-    this->visPub->Publish(this->CreateCollisionVisual());
-  }
 }
 
 //////////////////////////////////////////////////
@@ -285,6 +279,8 @@ void Collision::FillMsg(msgs::Collision &_msg)
   if (!this->HasType(physics::Base::SENSOR_COLLISION))
   {
     _msg.add_visual()->CopyFrom(*this->visualMsg);
+    // TODO remove the need to create the special collision visual msg and
+    // let the gui handle this.
     _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
   }
 }
@@ -333,6 +329,7 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
+  msg.set_type(msgs::Visual::COLLISION);
   msgs::Set(msg.mutable_pose(), this->GetRelativePose());
   msg.mutable_material()->mutable_script()->add_uri(
       "file://media/materials/scripts/gazebo.material");

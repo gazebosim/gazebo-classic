@@ -17,6 +17,7 @@
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/GLWidget.hh"
 
 #include "gazebo/gui/ApplyWrenchDialog.hh"
 #include "gazebo/gui/ApplyWrenchDialog_TEST.hh"
@@ -287,6 +288,159 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
 
   delete applyWrenchDialog;
 
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog_TEST::MouseInteractions()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  // World with one model which has 2 links, no ground plane and gravity is off
+  this->Load("worlds/multilink_shape.world", false, false, false);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  // Get GLWidget
+  gazebo::gui::GLWidget *glWidget =
+    mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != NULL);
+
+  // Get the model
+  gazebo::rendering::VisualPtr modelVis = scene->GetVisual("multilink");
+  QVERIFY(modelVis != NULL);
+
+  // Get the box link
+  gazebo::rendering::VisualPtr boxLinkVis =
+      scene->GetVisual("multilink::box_link");
+  QVERIFY(boxLinkVis != NULL);
+  gazebo::math::Pose boxLinkPose = boxLinkVis->GetWorldPose();
+  QVERIFY(boxLinkPose == boxLinkVis->GetWorldPose());
+
+  // Get the sphere link
+  gazebo::rendering::VisualPtr sphereLinkVis =
+      scene->GetVisual("multilink::sphere_link");
+  QVERIFY(sphereLinkVis != NULL);
+  gazebo::math::Pose sphereLinkPose = sphereLinkVis->GetWorldPose();
+  QVERIFY(sphereLinkPose == sphereLinkVis->GetWorldPose());
+
+  // Initialize dialog for the box link
+  gazebo::gui::ApplyWrenchDialog *applyWrenchDialogBox =
+      new gazebo::gui::ApplyWrenchDialog();
+  applyWrenchDialogBox->Init("multilink", "multilink::box_link");
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that box dialog has focus
+  QVERIFY(applyWrenchDialogBox->isActiveWindow());
+
+  // Initialize dialog for the sphere link
+  gazebo::gui::ApplyWrenchDialog *applyWrenchDialogSphere =
+      new gazebo::gui::ApplyWrenchDialog();
+  applyWrenchDialogSphere->Init("multilink", "multilink::sphere_link");
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that sphere dialog has focus
+  QVERIFY(!applyWrenchDialogBox->isActiveWindow());
+  QVERIFY(applyWrenchDialogSphere->isActiveWindow());
+
+  // Give focus to main window
+  mainWindow->activateWindow();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that main window has focus
+  QVERIFY(mainWindow->isActiveWindow());
+  QVERIFY(!applyWrenchDialogBox->isActiveWindow());
+  QVERIFY(!applyWrenchDialogSphere->isActiveWindow());
+
+  // Find the box's torque visual
+  bool found = false;
+  gazebo::math::Vector2i mousePoint(glWidget->width()/2, glWidget->height()/2);
+  while (mousePoint.x < glWidget->width())
+  {
+    gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint);
+    if (vis && vis->GetName().find("TORQUE") != std::string::npos &&
+        vis->GetNthAncestor(2) &&
+        vis->GetNthAncestor(2)->GetName() == "multilink::box_link")
+    {
+      found = true;
+      break;
+    }
+    mousePoint.x += 5;
+  }
+
+  if (found)
+  {
+    // Click on the box's torque visual
+    QPoint clickPoint(mousePoint.x, mousePoint.y);
+    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, clickPoint,
+        100);
+    QCoreApplication::processEvents();
+
+    // Process some events and draw the screen
+    for (size_t i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+
+    // Check that box dialog has focus
+    QVERIFY(applyWrenchDialogBox->isActiveWindow());
+    QVERIFY(!applyWrenchDialogSphere->isActiveWindow());
+  }
+  else
+  {
+    std::cout << "Couldn't find torque visual, not testing click." << std::endl;
+  }
+
+  // Clean up
+  delete applyWrenchDialogBox;
+  delete applyWrenchDialogSphere;
+
+  cam->Fini();
   mainWindow->close();
   delete mainWindow;
 }

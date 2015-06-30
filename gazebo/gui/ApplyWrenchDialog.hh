@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -141,6 +142,14 @@ namespace gazebo
       /// \brief Set CoM vector and send it to visuals.
       /// \param[in] _com CoM position in link frame.
       private: void SetCoM(const math::Vector3 &_com);
+
+      /// \brief Callback for a mouse release event.
+      /// \param[in] _event The mouse release event
+      /// \return True if handled by this function.
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Set this dialog window to be active.
+      private: void ActivateWindow();
 
       /// \internal
       /// \brief Pointer to private data.

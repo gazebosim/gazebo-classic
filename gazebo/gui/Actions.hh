@@ -60,6 +60,10 @@ namespace gazebo
 
     extern GZ_GUI_VISIBLE QAction *g_showCollisionsAct;
     extern GZ_GUI_VISIBLE QAction *g_showGridAct;
+
+    /// \brief Action to show/hide the world origin indicator.
+    extern GZ_GUI_VISIBLE QAction *g_showOriginAct;
+
     extern GZ_GUI_VISIBLE QAction *g_showContactsAct;
     extern GZ_GUI_VISIBLE QAction *g_showJointsAct;
     extern GZ_GUI_VISIBLE QAction *g_showCOMAct;

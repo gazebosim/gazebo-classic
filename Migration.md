@@ -2,6 +2,58 @@
 
 ### Modifications
 
+1. **gazebo/msgs/world_stats.proto**
+    + ***Removed:*** optional bool log_playback = 8;
+    + ***Replacement:*** optional LogPlaybackStatistics log_playback_stats = 8;
+
+1. **gazebo/physics/JointState.hh**
+    + ***Removed:*** public: JointState(JointPtr _joint, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: JointState(JointPtr _joint, const common::Time
+    &_realTime, const common::Time &_simTime, const uint64_t _iterations)
+
+1. **gazebo/physics/LinkState.hh**
+    + ***Removed:*** public: LinkState(const LinkPtr _link, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: LinkState(const LinkPtr _link,
+    const common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+    + ***Removed:*** public: void Load(const LinkPtr _link, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: void Load(const LinkPtr _link, const
+    common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+
+1. **gazebo/physics/ModelState.hh**
+    + ***Removed:*** public: ModelState(const ModelPtr _model, const
+    common::Time &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: ModelState(const ModelPtr _model, const
+    common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+    + ***Removed:*** public: void Load(const ModelPtr _model, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: void Load(const ModelPtr _model, const
+    common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+
+1. **gazebo/physics/State.hh**
+    + ***Removed:*** public: State(const std::string &_name, const
+    common::Time &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: State(const std::string &_name,
+    const common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+
+1. **gazebo/physics/ModelState.hh**
+    + ***Removed:*** public: void Load(const ModelPtr _model, const common::Time
+    &_realTime, const common::Time &_simTime)
+    + ***Replacement:*** public: void Load(const ModelPtr _model, const
+    common::Time &_realTime, const common::Time &_simTime, const uint64_t
+    _iterations)
+
+1. ignition-math is now a dependency.
+    + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
+    + [Gazebo migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
+
 1. Gazebo client's should now use `gazebo/gazebo_client.hh` and `libgazebo_client.so` instead of `gazebo/gazebo.hh` and `libgazebo.so`. This separates running a Gazebo server from a Gazebo client.
 
 1. **gazebo/rendering/GpuLaser.hh**
@@ -11,6 +63,10 @@
 1. **gazebo/rendering/GpuLaser.hh**
     + ***Removed:*** protected: double far
     + ***Replacement:*** protected: double farClip
+
+1. **gazebo/rendering/Visual.hh**
+    + ***Removed:*** public: void Fini();
+    + ***Replacement:*** public: virtual void Fini();
 
 1. **gazebo/common/MeshManager.hh**
     + ***Removed:*** void CreateExtrudedPolyline(const std::string &_name, const std::vector<math::Vector2d> &_vertices, const double &_height, const math::Vector2d &_uvCoords)
@@ -33,6 +89,30 @@
 1. **gazebo/gui/RenderWidget.hh**
     + The ShowEditor(bool _show)
 
+### Additions
+
+1. **gazebo/msgs/log_playback_control.proto**
+    + New message to control the playback from a log file.
+
+1. **gazebo/util/LogPlay.hh**
+    + public: bool Rewind()
+
+1. **gazebo/physics/LinkState.hh**
+    + public: virtual void SetIterations(const uint64_t _iterations)
+
+1. **gazebo/physics/ModelState.hh**
+    + public: virtual void SetIterations(const uint64_t _iterations)
+
+1. **gazebo/physics/State.hh**
+    + public: uint64_t GetIterations() const
+    + public: virtual void SetIterations(const uint64_t _iterations)
+
+1. **gazebo/physics/WorldState.hh**
+    + public: virtual void SetIterations(const uint64_t _iterations)
+
+1. **gazebo/util/LogPlay.hh**
+    + public: uint64_t GetInitialIterations() const
+    + public: bool HasIterations() const
 
 ## Gazebo 4.X to 5.X
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,33 +34,41 @@ boost::filesystem::path createTempBuildFolder(const std::string &_prefix)
 
 ///////////////////////////////////////////////////////////////////
 // Get path to source folder with specified suffix
-boost::filesystem::path getSourcePath(const std::string &_suffix)
+boost::filesystem::path getSourcePath(const std::string &_folder,
+                                      const std::string &_suffix)
 {
   boost::filesystem::path path = CMAKE_SOURCE_DIR;
   path /= std::string("examples");
-  path /= std::string("stand_alone");
+  path /= _folder;
   path /= _suffix;
   gzdbg << "source " << path.string() << std::endl;
   return path;
 }
 
-class ExampleStandAlone : public ::testing::TestWithParam<const char*>
+///////////////////////////////////////////////////////////////////
+class ExamplesBuild : public ::testing::TestWithParam<const char*>
 {
-  /// \brief Build stand alone app in subfolder _name in a temporary
-  /// build folder
+  /// \brief Build code in subfolder _type/_name in a temporary build folder
+  /// \param[in] _type Type of example to build (plugins, stand_alone).
   /// \param[in] _name Subfolder to build.
-  public: void Build(const std::string &_name);
+  public: void Build(const std::string &_type, const std::string &_name);
 };
 
+// Fixture for building example plugins
+class ExamplesBuild_Plugins: public ExamplesBuild {};
+
+// Fixture for building example stand_alone applications
+class ExamplesBuild_Standalone: public ExamplesBuild {};
+
 ///////////////////////////////////////////////////////////////////
-// Build plugin in subfolder _name in a temporary build folder
-void ExampleStandAlone::Build(const std::string &_name)
+// Build code in subfolder _type/_name in a temporary build folder
+void ExamplesBuild::Build(const std::string &_type, const std::string &_name)
 {
   // get a unique temporary build folder name
   boost::filesystem::path build = createTempBuildFolder(_name);
 
   // construct path of source folder
-  boost::filesystem::path source = getSourcePath(_name);
+  boost::filesystem::path source = getSourcePath(_type, _name);
 
   char cmd[1024];
 
@@ -74,13 +82,45 @@ void ExampleStandAlone::Build(const std::string &_name)
   boost::filesystem::remove_all(build);
 }
 
-TEST_P(ExampleStandAlone, Build)
+///////////////////////////////////////////////////////////////////
+TEST_P(ExamplesBuild_Plugins, Plugins)
 {
-  Build(GetParam());
+  Build("plugins", GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(ExampleStandAlone, ExampleStandAlone, ::testing::Values(
-  "test_fixture"
+///////////////////////////////////////////////////////////////////
+INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
+  "animate_joints"
+  , "animate_pose"
+  , "factory"
+  , "gui_overlay_plugin_spawn"
+  , "gui_overlay_plugin_time"
+  , "hello_world"
+  , "model_push"
+  , "model_move"
+  , "parameters"
+  , "projector"
+  , "system_gui_plugin"
+  , "world_edit"
+));
+
+///////////////////////////////////////////////////////////////////
+TEST_P(ExamplesBuild_Standalone, Standalone)
+{
+  Build("stand_alone", GetParam());
+}
+
+///////////////////////////////////////////////////////////////////
+INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
+  "actuator"
+  // , "animated_box"
+  // , "arrange"
+  , "clone_simulation"
+  , "custom_main"
+  , "custom_main_pkgconfig"
+  // , "listener"
+  // , "publisher"
+  , "test_fixture"
 ));
 
 int main(int argc, char **argv)
