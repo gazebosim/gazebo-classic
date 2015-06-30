@@ -134,7 +134,7 @@ namespace gazebo
       private slots: void OnManipulation();
 
       /// \brief Filter events from other Qt objects.
-      /// param[in] _obj Qt object watched by the event filter
+      /// param[in] _object Qt object watched by the event filter
       /// param[in] _event Qt event to be filtered.
       /// \return True to stop event propagation.
       private slots: bool eventFilter(QObject *_object, QEvent *_event);
