@@ -68,7 +68,7 @@ namespace gazebo
 
       /// \brief Move the camera to the given position, facing the world origin.
       /// \param[in] _pos Camera position.
-      private: void SetCameraPos(math::Vector3 _pos);
+      private: void MoveCamera(math::Vector3 _pos);
 
       /// \brief Qt callback when the top view is triggered.
       private slots: void OnTopView();
@@ -87,6 +87,9 @@ namespace gazebo
 
       /// \brief Qt callback when the right view is triggered.
       private slots: void OnRightView();
+
+      /// \brief Qt callback when the reset view is triggered.
+      private slots: void OnResetView();
 
       /// \internal
       /// \brief Pointer to private data.

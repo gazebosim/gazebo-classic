@@ -42,6 +42,9 @@ ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
   // Main layout
   this->dataPtr->mainLayout = new QGridLayout();
 
+  // Distance from world origin (zoom)
+  this->dataPtr->dist = 40;
+
   this->setLayout(this->dataPtr->mainLayout);
 }
 
@@ -95,19 +98,18 @@ void ViewAngleWidget::Add(Angle _angle, QAction *_action)
   {
     this->dataPtr->resetButton->setDefaultAction(_action);
     this->dataPtr->mainLayout->addWidget(this->dataPtr->resetButton, 0, 3);
-    // connection made at main window
+    connect(_action, SIGNAL(triggered()), this, SLOT(OnResetView()));
   }
 }
 
 /////////////////////////////////////////////////
-void ViewAngleWidget::SetCameraPos(math::Vector3 _pos)
+void ViewAngleWidget::MoveCamera(math::Vector3 _pos)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
 
   if (!cam)
     return;
 
-  math::Vector3 camPos = _pos * 40;
   math::Vector3 lookAt = math::Vector3::Zero;
   math::Vector3 dir = lookAt - _pos;
 
@@ -117,42 +119,48 @@ void ViewAngleWidget::SetCameraPos(math::Vector3 _pos)
 
   math::Quaternion quat =  math::Quaternion(roll, pitch, yaw);
 
-  cam->SetWorldPose(math::Pose(camPos, quat));
+  cam->MoveToPosition(math::Pose(_pos, quat), 1);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnTopView()
 {
-  this->SetCameraPos(math::Vector3::UnitZ);
+  this->MoveCamera(math::Vector3::UnitZ * this->dataPtr->dist);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnBottomView()
 {
-  this->SetCameraPos(-math::Vector3::UnitZ);
+  this->MoveCamera(-math::Vector3::UnitZ * this->dataPtr->dist);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnFrontView()
 {
-  this->SetCameraPos(math::Vector3::UnitX);
+  this->MoveCamera(math::Vector3::UnitX * this->dataPtr->dist);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnBackView()
 {
-  this->SetCameraPos(-math::Vector3::UnitX);
+  this->MoveCamera(-math::Vector3::UnitX * this->dataPtr->dist);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnLeftView()
 {
-  this->SetCameraPos(math::Vector3::UnitY);
+  this->MoveCamera(math::Vector3::UnitY * this->dataPtr->dist);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnRightView()
 {
-  this->SetCameraPos(-math::Vector3::UnitY);
+  this->MoveCamera(-math::Vector3::UnitY * this->dataPtr->dist);
+}
+
+/////////////////////////////////////////////////
+void ViewAngleWidget::OnResetView()
+{
+  this->MoveCamera(math::Vector3(5, -5, 2));
 }
 

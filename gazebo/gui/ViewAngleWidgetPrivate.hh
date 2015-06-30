@@ -34,6 +34,7 @@ namespace gazebo
       public: QToolButton *rightButton;
       public: QToolButton *resetButton;
       public: QGridLayout *mainLayout;
+      public: double dist;
     };
   }
 }

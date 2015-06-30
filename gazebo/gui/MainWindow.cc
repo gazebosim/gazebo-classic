@@ -801,20 +801,6 @@ void MainWindow::OnShowToolbars(bool _value)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Reset()
-{
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = camPos - lookAt;
-
-  double yaw = atan2(delta.x, delta.y);
-  double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  cam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
-}
-
-/////////////////////////////////////////////////
 void MainWindow::ShowCollisions()
 {
   if (g_showCollisionsAct->isChecked())
@@ -1192,11 +1178,6 @@ void MainWindow::CreateActions()
       SLOT(CreateDirectionalLight()));
   this->CreateDisabledIcon(":/images/directionallight.png", g_dirLghtCreateAct);
 
-  g_resetAct = new QAction(tr("Reset Camera"), this);
-  g_resetAct->setStatusTip(tr("Move camera to pose"));
-  connect(g_resetAct, SIGNAL(triggered()), this,
-      SLOT(Reset()));
-
   g_showCollisionsAct = new QAction(tr("Collisions"), this);
   g_showCollisionsAct->setStatusTip(tr("Show Collisions"));
   g_showCollisionsAct->setCheckable(true);
@@ -1442,9 +1423,11 @@ void MainWindow::CreateActions()
       tr("View from the left"), this);
   QAction *viewAngleRight = new QAction(QIcon(":/images/view_angle_right.png"),
       tr("View from the right"), this);
-  QAction *viewAngleReset = new QAction(QIcon(":/images/view_angle_home.png"),
+  g_resetAct = new QAction(QIcon(":/images/view_angle_home.png"),
       tr("Reset view angle"), this);
-  connect(viewAngleReset, SIGNAL(triggered()), this, SLOT(Reset()));
+
+  // g_resetAct = new QAction(tr("Reset Camera"), this);
+  // g_resetAct->setStatusTip(tr("Move camera to pose"));
 
   ViewAngleWidget *viewAngleWidget = new ViewAngleWidget(this);
   viewAngleWidget->Add(ViewAngleWidget::TOP, viewAngleTop);
@@ -1453,7 +1436,7 @@ void MainWindow::CreateActions()
   viewAngleWidget->Add(ViewAngleWidget::BACK, viewAngleBack);
   viewAngleWidget->Add(ViewAngleWidget::LEFT, viewAngleLeft);
   viewAngleWidget->Add(ViewAngleWidget::RIGHT, viewAngleRight);
-  viewAngleWidget->Add(ViewAngleWidget::RESET, viewAngleReset);
+  viewAngleWidget->Add(ViewAngleWidget::RESET, g_resetAct);
 
   g_viewAngleAct = new QWidgetAction(this);
   g_viewAngleAct->setDefaultWidget(viewAngleWidget);
