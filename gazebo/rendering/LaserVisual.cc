@@ -41,6 +41,8 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VT_SENSOR;
+
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
@@ -103,20 +105,13 @@ void LaserVisual::Update()
 
   dPtr->receivedMsg = false;
 
-  double angle = dPtr->laserMsg->scan().angle_min();
   double verticalAngle = dPtr->laserMsg->scan().vertical_angle_min();
-  double r;
-  double noHitRange;
-  math::Vector3 pt;
-  math::Vector3 noHitPt;
   math::Pose offset = msgs::Convert(dPtr->laserMsg->scan().world_pose()) -
                       this->GetWorldPose();
 
   unsigned int vertCount = dPtr->laserMsg->scan().has_vertical_count() ?
       dPtr->laserMsg->scan().vertical_count() : 1u;
 
-  math::Quaternion ray;
-  math::Vector3 axis;
   for (unsigned int j = 0; j < vertCount; ++j)
   {
     if (j+1 > dPtr->rayFans.size())
@@ -137,17 +132,20 @@ void LaserVisual::Update()
     dPtr->rayFans[j]->SetPoint(0, offset.pos);
     dPtr->noHitRayFans[j]->SetPoint(0, offset.pos);
 
-    angle = dPtr->laserMsg->scan().angle_min();
+    double angle = dPtr->laserMsg->scan().angle_min();
     unsigned int count = dPtr->laserMsg->scan().count();
     for (unsigned int i = 0; i < count; ++i)
     {
-      r = dPtr->laserMsg->scan().ranges(j*count + i);
-      ray.SetFromEuler(math::Vector3(0.0, -verticalAngle, angle));
-      axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
-      pt = (axis * r) + offset.pos;
+      double r = dPtr->laserMsg->scan().ranges(j*count + i);
+      math::Quaternion ray(math::Vector3(0.0, -verticalAngle, angle));
+      math::Vector3 axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
 
-      noHitRange = std::isinf(r) ? dPtr->laserMsg->scan().range_max() : 0;
-      noHitPt = (axis * noHitRange) + offset.pos;
+      double hitRange = std::isinf(r) ? 0 : r;
+      math::Vector3 pt = (axis * hitRange) + offset.pos;
+
+      double noHitRange =
+        std::isinf(r) ? dPtr->laserMsg->scan().range_max() : 0;
+      math::Vector3 noHitPt = (axis * noHitRange) + offset.pos;
 
       if (i+1 >= dPtr->rayFans[j]->GetPointCount())
       {

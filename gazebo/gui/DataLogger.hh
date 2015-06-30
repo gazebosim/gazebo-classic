@@ -50,10 +50,6 @@ namespace gazebo
       /// \param[in] _string String representation of size.
       signals: void SetSize(QString _string);
 
-      /// \brief A signal used to set the filename.
-      /// \param[in] _string The log filename
-      signals: void SetFilename(QString _string);
-
       /// \brief A signal used to set the destination path label.
       /// \param[in] _string The log destination directory
       signals: void SetDestinationPath(QString _string);
@@ -82,6 +78,15 @@ namespace gazebo
       /// state.
       private slots: void OnToggleSettings(bool _checked);
 
+      /// \brief QT callback for blinking the status message.
+      private slots: void OnBlinkStatus();
+
+      /// \brief QT callback for timing out the confirmation message.
+      private slots: void OnConfirmationTimeout();
+
+      /// \brief QT callback when the dialog is closed.
+      private slots: void OnCancel();
+
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
       private: void OnStatus(ConstLogStatusPtr &_msg);
@@ -98,16 +103,13 @@ namespace gazebo
       /// \brief The button used to start and pause logging.
       private: QToolButton *recordButton;
 
-      /// \brief The button used to show/hide the settings frame.
-      private: QPushButton *settingExpandButton;
-
-      /// \brief The button used to stop logging.
-      private: QToolButton *stopButton;
-
       /// \brief Label to display the log time.
       private: QLabel *timeLabel;
 
-      /// \brief Label to display the log destination path.
+      /// \brief Log base path.
+      private: QString basePath;
+
+      /// \brief Line edit to display the log destination path.
       private: QLineEdit *destPath;
 
       /// \brief Label to display the log destination uri.
@@ -119,17 +121,26 @@ namespace gazebo
       /// \brief Label to display status information.
       private: QLabel *statusLabel;
 
+      /// \brief Timer used to blink the status label.
+      private: QTimer *statusTimer;
+
+      /// \brief Keep track of the time the status label blinks.
+      private: double statusTime;
+
       /// \brief Name of the log file path
       private: QLineEdit *filenameEdit;
 
       /// \brief Frame that holds settings.
       private: QFrame *settingsFrame;
 
-      /// \brief Button to browse for a log recording directory
-      private: QPushButton *browseButton;
-
       // private: QListWidget *logList;
       private: QTextBrowser *logList;
+
+      /// \brief Dialog that displays confirmation after saving.
+      private: QDialog *confirmationDialog;
+
+      /// \brief Timer used to timeout confirmation dialog.
+      private: QTimer *confirmationTimer;
     };
     /// \}
   }

@@ -108,6 +108,9 @@ namespace gazebo
       /// \brief Subscriber to world control messages.
       public: transport::SubscriberPtr controlSub;
 
+      /// \brief Subscriber to log playback control messages.
+      public: transport::SubscriberPtr playbackControlSub;
+
       /// \brief Subscriber to factory messages.
       public: transport::SubscriberPtr factorySub;
 

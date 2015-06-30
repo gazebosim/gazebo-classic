@@ -560,6 +560,12 @@ ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
 ODE_API dReal dWorldGetQuickStepContactResidualSmoothing (dWorldID);
 
 /**
+ * @brief Get option to turn on experimental threaded position correction.
+ * @ingroup world
+ */
+ODE_API bool dWorldGetQuickStepThreadPositionCorrection (dWorldID);
+
+/**
  * @brief Get option to turn on experimental row reordering.
  * see dWorldGetQuickStepExperimentalRowReordering for details.
  * @ingroup world
@@ -597,6 +603,14 @@ ODE_API void dWorldSetQuickStepInertiaRatioReduction (dWorldID, bool irr);
  * @param smooth smoothing coefficent (0: no smothing ~ 1: full smoothing)
  */
 ODE_API void dWorldSetQuickStepContactResidualSmoothing (dWorldID, dReal smoo);
+
+/**
+ * @brief Set threaded projected position correction computations
+ * for potential solver speedup.
+ * @ingroup world
+ * @param thread (false: no threading ~ true: threaded parallel update)
+ */
+ODE_API void dWorldSetQuickStepThreadPositionCorrection (dWorldID, bool thread);
 
 /**
  * @brief Turn on experimental row reordering, so within one sweep,
@@ -2020,12 +2034,6 @@ ODE_API void dJointSetData (dJointID, void *data);
  * @ingroup joints
  */
 ODE_API void dJointSetScrewThreadPitch (dJointID, dReal thread_pitch);
-
-/**
- * @brief Set joint viscous damping coefficient
- * @ingroup joints
- */
-ODE_API void dJointSetDamping (dJointID, dReal damping);
 
 /**
  * @brief Get the user-data pointer
