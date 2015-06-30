@@ -154,9 +154,9 @@ struct dxJoint : public dObject
     /// Each dxJoint should redefine it if needed.
     virtual void setRelativeValues() {};
 
-    // Test if this joint should be used in the simulation step
-    // (has the enabled flag set, and is attached to at least one dynamic body)
-    bool isEnabled() const;
+	// Test if this joint should be used in the simulation step
+	// (has the enabled flag set, and is attached to at least one dynamic body)
+	bool isEnabled() const;
 
     // Moved from ball.h and fixed.h by OSRF
     dReal erp;          // error reduction
