@@ -578,6 +578,7 @@ int dxJointLimitMotor::addLimot( dxJoint *joint,
 
   // if the joint is powered, or has joint limits, add in the extra row
   int powered = fmax > 0;
+  printf("debug2 : %d %d\n", powered, limit);
   if ( powered || limit )
   {
     dReal *J1 = rotational ? info->J1a : info->J1l;

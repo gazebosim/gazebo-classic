@@ -79,6 +79,7 @@ dxJointHinge::getInfo1( dxJoint::Info1 *info )
         if ( limot.testRotationalLimit( cumulative_angle ) )
             info->m = 6;
     }
+    printf("debug1 : %d\n", info->m);
 }
 
 
