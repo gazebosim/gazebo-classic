@@ -140,7 +140,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   {
     QToolButton *viewAngleButton = new QToolButton;
     viewAngleButton->setObjectName("viewAngleToolBarButton");
-    viewAngleButton->setStyleSheet("#viewAngleToolBarButton{padding-right:10px}");
+    viewAngleButton->setStyleSheet(
+        "#viewAngleToolBarButton{padding-right:10px}");
     viewAngleButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     viewAngleButton->setIcon(QIcon(":/images/view_angle_front.png"));
     viewAngleButton->setToolTip(tr("Change the view angle"));

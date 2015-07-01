@@ -52,6 +52,7 @@ ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
 
   // Zoom
   this->dataPtr->zoomSlider = new QSlider(Qt::Horizontal, this);
+  this->dataPtr->zoomSlider->setFocusPolicy(Qt::NoFocus);
   this->dataPtr->zoomSlider->setRange(1, 100);
   this->dataPtr->zoomSlider->setSliderPosition(40);
 
@@ -198,7 +199,7 @@ void ViewAngleWidget::OnRightView()
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnResetView()
 {
-  math::Vector3 vec (5, -5, 2);
+  math::Vector3 vec(5, -5, 2);
   double length = vec.GetLength();
   this->MoveCamera(vec.Normalize(), length);
 }

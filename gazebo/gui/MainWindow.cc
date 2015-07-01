@@ -1178,6 +1178,9 @@ void MainWindow::CreateActions()
       SLOT(CreateDirectionalLight()));
   this->CreateDisabledIcon(":/images/directionallight.png", g_dirLghtCreateAct);
 
+  g_resetAct = new QAction(tr("Reset View Angle"), this);
+  g_resetAct->setStatusTip(tr("Move camera to initial pose"));
+
   g_showCollisionsAct = new QAction(tr("Collisions"), this);
   g_showCollisionsAct->setStatusTip(tr("Show Collisions"));
   g_showCollisionsAct->setCheckable(true);
@@ -1423,8 +1426,12 @@ void MainWindow::CreateActions()
       tr("View from the left"), this);
   QAction *viewAngleRight = new QAction(QIcon(":/images/view_angle_right.png"),
       tr("View from the right"), this);
-  g_resetAct = new QAction(QIcon(":/images/view_angle_home.png"),
+
+  // Create another action instead of using g_resetAct here directly because
+  // we don't want the icon on the menu.
+  QAction *viewAngleReset = new QAction(QIcon(":/images/view_angle_home.png"),
       tr("Reset View Angle"), this);
+  connect(g_resetAct, SIGNAL(triggered()), viewAngleReset, SLOT(trigger()));
 
   ViewAngleWidget *viewAngleWidget = new ViewAngleWidget(this);
   viewAngleWidget->Add(ViewAngleWidget::TOP, viewAngleTop);
@@ -1433,7 +1440,7 @@ void MainWindow::CreateActions()
   viewAngleWidget->Add(ViewAngleWidget::BACK, viewAngleBack);
   viewAngleWidget->Add(ViewAngleWidget::LEFT, viewAngleLeft);
   viewAngleWidget->Add(ViewAngleWidget::RIGHT, viewAngleRight);
-  viewAngleWidget->Add(ViewAngleWidget::RESET, g_resetAct);
+  viewAngleWidget->Add(ViewAngleWidget::RESET, viewAngleReset);
 
   g_viewAngleAct = new QWidgetAction(this);
   g_viewAngleAct->setDefaultWidget(viewAngleWidget);
