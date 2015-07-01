@@ -311,9 +311,9 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         info->J1l[s3+2] = t3[2];
 
         // Angular, body 1
-        info->J1a[s3+0] = t3[0];
-        info->J1a[s3+1] = t3[1];
-        info->J1a[s3+2] = 1;
+        info->J1a[s3+0] = normal[0];
+        info->J1a[s3+1] = normal[1];
+        info->J1a[s3+2] = normal[2];
         if ( node[1].body )
         {
             // Linear, body 2
@@ -322,9 +322,9 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             info->J2l[s3+2] = -t3[2];
 
             // Angular, body 2
-            info->J2a[s3+0] = -t3[0];
-            info->J2a[s3+1] = -t3[1];
-            info->J2a[s3+2] = -1;
+            info->J2a[s3+0] = -normal[0];
+            info->J2a[s3+1] = -normal[1];
+            info->J2a[s3+2] = -normal[2];
         }
         // set right hand side
         if ( contact.surface.mode & dContactMotion2 )
@@ -333,10 +333,26 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         }
         // set LCP bounds and friction index. this depends on the approximation
         // mode
-        if ( contact.surface.mode & dContactMu3 )
+        if ( contact.surface.mode & dContactMu2 )
         {
-            info->lo[3] = -contact.surface.mu3;
-            info->hi[3] = contact.surface.mu3;
+            // Use user defined torsional patch radius
+            //
+            // M = torsional moment
+            // F = normal force
+            // a = patch radius
+            // mu = torsional friction coefficient
+            //
+            // M = (3 * pi * a * mu)/16 * F
+
+            if (fabs(contact.surface.torsional_patch_radius) < 0.00001)
+            {
+              contact.surface.torsional_patch_radius = 2.0;
+            }
+
+            double rhs = (3 * M_PI * contact.surface.torsional_patch_radius * contact.surface.mu3)/16;
+
+            info->lo[3] = -rhs;
+            info->hi[3] = rhs;
         }
         else
         {

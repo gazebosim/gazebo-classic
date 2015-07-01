@@ -90,6 +90,8 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
             frictionOdeElem->Get<double>("mu2"));
           this->frictionPyramid->SetMuTorsion(
             frictionOdeElem->Get<double>("mu3"));
+          this->frictionPyramid->SetTorsionalPatchRadius(
+            frictionOdeElem->Get<double>("torsional_patch_radius"));
           this->frictionPyramid->direction1 =
             frictionOdeElem->Get<math::Vector3>("fdir1");
 
@@ -130,6 +132,8 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
   _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
   _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
   _msg.mutable_friction()->set_mu3(this->frictionPyramid->GetMuTorsion());
+  _msg.mutable_friction()->set_torsional_patch_radius(
+      this->frictionPyramid->GetTorsionalPatchRadius());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
@@ -159,6 +163,9 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
       this->frictionPyramid->SetMuSecondary(_msg.friction().mu2());
     if (_msg.friction().has_mu3())
       this->frictionPyramid->SetMuTorsion(_msg.friction().mu3());
+    if (_msg.friction().has_torsional_patch_radius())
+      this->frictionPyramid->SetTorsionalPatchRadius(
+          _msg.friction().torsional_patch_radius());
     if (_msg.friction().has_slip1())
       this->slip1 = _msg.friction().slip1();
     if (_msg.friction().has_slip2())

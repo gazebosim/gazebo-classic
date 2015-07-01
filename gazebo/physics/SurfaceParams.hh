@@ -53,6 +53,10 @@ namespace gazebo
       /// \return Torsional friction coefficient.
       public: double GetMuTorsion();
 
+      /// \brief Get the torsional friction coefficient.
+      /// \return Torsional friction coefficient.
+      public: double GetTorsionalPatchRadius();
+
       /// \brief Set the friction coefficient in the primary direction.
       /// \param[in] _mu Friction coefficient.
       public: void SetMuPrimary(double _mu);
@@ -64,6 +68,10 @@ namespace gazebo
       /// \brief Set the torsional friction coefficient.
       /// \param[in] _mu Torsional friction coefficient.
       public: void SetMuTorsion(double _mu);
+
+      /// \brief Set the torsional patch radius.
+      /// \param[in] _radius Torsional patch radius.
+      public: void SetTorsionalPatchRadius(double _radius);
 
       /// \brief Get the friction coefficient in a single direction.
       /// \param[in] _index Index of friction direction, 0 for primary,
@@ -94,6 +102,10 @@ namespace gazebo
       /// mu[1] is in the second direction.
       /// mu[2] is in the torsional friction.
       private: double mu[3];
+
+      /// \brief Radius of the contact patch used to calculate torsional
+      /// friction.
+      private: double torsionalPatchRadius;
     };
 
     /// \class SurfaceParams SurfaceParams.hh physics/physics.hh

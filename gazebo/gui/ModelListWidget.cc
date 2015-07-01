@@ -1918,6 +1918,12 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
   item->setValue(_msg.friction().mu3());
   topItem->addSubProperty(item);
 
+  // Torsional patch radius
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("torsional_patch_radius"));
+  item->setValue(_msg.friction().torsional_patch_radius());
+  topItem->addSubProperty(item);
+
   // slip1
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("slip1"));

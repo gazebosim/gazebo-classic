@@ -29,6 +29,7 @@ FrictionPyramid::FrictionPyramid()
   this->mu[0] = 1.0;
   this->mu[1] = 1.0;
   this->mu[2] = 1.0;
+  this->torsionalPatchRadius = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -55,6 +56,12 @@ double FrictionPyramid::GetMuTorsion()
 }
 
 //////////////////////////////////////////////////
+double FrictionPyramid::GetTorsionalPatchRadius()
+{
+  return this->torsionalPatchRadius;
+}
+
+//////////////////////////////////////////////////
 void FrictionPyramid::SetMuPrimary(double _mu)
 {
   this->SetMu(0, _mu);
@@ -70,6 +77,12 @@ void FrictionPyramid::SetMuSecondary(double _mu)
 void FrictionPyramid::SetMuTorsion(double _mu)
 {
   this->SetMu(2, _mu);
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetTorsionalPatchRadius(double _radius)
+{
+  this->torsionalPatchRadius = _radius;
 }
 
 //////////////////////////////////////////////////

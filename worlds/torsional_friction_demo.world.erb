@@ -40,9 +40,11 @@
 
   # initial velocity and friction
   spin0 = 2*Math::PI
-  sphere_friction = [0.0, 0.01, 0.05, 0.1, 1.0]
-  box_friction = [0.0, 0.01, 0.05, 0.1, 1.0]
+  sphere_friction = [0.0, 0.001, 0.005, 0.01, 1.0]
+  box_friction = [0.0, 0.001, 0.005, 0.01, 1.0]
+  pinch_friction = [0.0, 0.001, 0.005, 0.006, 1.0]
   pinch_trans_friction = 1000.0
+  patch = 2.0
 %>
 <sdf version="1.5">
   <world name="default">
@@ -89,6 +91,7 @@
                 <mu><%= f %></mu>
                 <mu2><%= f %></mu2>
                 <mu3><%= f %></mu3>
+                <torsional_patch_radius><%= patch %></torsional_patch_radius>
               </ode>
             </friction>
           </surface>
@@ -102,7 +105,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
+              <name>Gazebo/CoM</name>
             </script>
           </material>
         </visual>
@@ -145,6 +148,7 @@
                 <mu><%= f %></mu>
                 <mu2><%= f %></mu2>
                 <mu3><%= f %></mu3>
+                <torsional_patch_radius><%= patch %></torsional_patch_radius>
               </ode>
             </friction>
           </surface>
@@ -196,6 +200,7 @@
                 <mu><%= f %></mu>
                 <mu2><%= f %></mu2>
                 <mu3><%= f %></mu3>
+                <torsional_patch_radius><%= patch %></torsional_patch_radius>
               </ode>
             </friction>
           </surface>
@@ -216,7 +221,7 @@
 <%  end %>
 <%  # Pinch
     i = 0
-    box_friction.each do |f|
+    pinch_friction.each do |f|
       i = i + 1
       name = 'pinch_' + i.to_s
 %>
@@ -249,6 +254,7 @@
                 <mu><%= pinch_trans_friction %></mu>
                 <mu2><%= pinch_trans_friction %></mu2>
                 <mu3><%= f %></mu3>
+                <torsional_patch_radius><%= patch %></torsional_patch_radius>
               </ode>
             </friction>
           </surface>
@@ -275,6 +281,7 @@
                 <mu><%= pinch_trans_friction %></mu>
                 <mu2><%= pinch_trans_friction %></mu2>
                 <mu3><%= f %></mu3>
+                <torsional_patch_radius><%= patch %></torsional_patch_radius>
               </ode>
             </friction>
           </surface>
@@ -301,6 +308,7 @@
                 <mu><%= pinch_trans_friction %></mu>
                 <mu2><%= pinch_trans_friction %></mu2>
                 <mu3><%= f %></mu3>
+                <torsional_patch_radius><%= patch %></torsional_patch_radius>
               </ode>
             </friction>
           </surface>

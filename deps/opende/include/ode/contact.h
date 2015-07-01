@@ -64,6 +64,7 @@ typedef struct dSurfaceParameters {
   dReal soft_cfm;
   dReal motion1,motion2,motion3,motionN;
   dReal slip1,slip2,slip3;
+  dReal torsional_patch_radius;
 } dSurfaceParameters;
 
 

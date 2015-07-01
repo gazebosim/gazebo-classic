@@ -1647,6 +1647,11 @@ namespace gazebo
           physicsEngElem->GetElement("mu2")->Set(friction.mu2());
         if (friction.has_mu3())
           physicsEngElem->GetElement("mu3")->Set(friction.mu3());
+        if (friction.has_torsional_patch_radius())
+        {
+          physicsEngElem->GetElement("torsional_patch_radius")->Set(
+              friction.torsional_patch_radius());
+        }
         if (friction.has_fdir1())
         {
           physicsEngElem->GetElement("fdir1")->Set(
