@@ -27,10 +27,22 @@
   iyy[:box] = 1.0 / 12 * mass[:box] * (dz*dz + dx*dx)
   izz[:box] = 1.0 / 12 * mass[:box] * (dx*dx + dy*dy)
 
+  # Geometry and inertial parameters: pinch
+  density_p = 2000.0
+  dx_p = 0.5 * radius
+  dy_p = 0.1 * radius
+  dz_p = 6 * radius
+  dd_p = Math.sqrt(dx_p**2 + dy_p**2 + dz_p**2)
+  mass[:box_p] = density_p * dx * dy * dz
+  ixx[:box_p] = 1.0 / 12 * mass[:box_p] * (dy_p*dy_p + dz_p*dz_p)
+  iyy[:box_p] = 1.0 / 12 * mass[:box_p] * (dz_p*dz_p + dx_p*dx_p)
+  izz[:box_p] = 1.0 / 12 * mass[:box_p] * (dx_p*dx_p + dy_p*dy_p)
+
   # initial velocity and friction
   spin0 = 2*Math::PI
   sphere_friction = [0.0, 0.01, 0.05, 0.1, 1.0]
   box_friction = [0.0, 0.01, 0.05, 0.1, 1.0]
+  pinch_trans_friction = 1000.0
 %>
 <sdf version="1.5">
   <world name="default">
@@ -200,6 +212,131 @@
         <linear>0 0 0</linear>
         <angular>0 0 <%= spin0 %></angular>
       </plugin>
+    </model>
+<%  end %>
+<%  # Pinch
+    i = 0
+    box_friction.each do |f|
+      i = i + 1
+      name = 'pinch_' + i.to_s
+%>
+    <%= "<model name='" + name + "'>" %>
+      <pose><%= dd_p*2*i %> 6 <%= dd_p %> 0 0 0</pose>
+      <link name="box">
+        <self_collide>true</self_collide>
+        <pose><%= - dz_p * 0.4 %> 0 0 0 <%= Math::PI/2 %> 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass><%= mass[:box_p] %></mass>
+          <inertia>
+            <ixx><%= ixx[:box_p] %></ixx>
+            <iyy><%= iyy[:box_p] %></iyy>
+            <izz><%= izz[:box_p] %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx_p %> <%= dy_p %> <%= dz_p %></size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= pinch_trans_friction %></mu>
+                <mu2><%= pinch_trans_friction %></mu2>
+                <mu3><%= f %></mu3>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx_p %> <%= dy_p %> <%= dz_p %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_1">
+        <pose>0 <%= dy_p * 1.5 %> 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius><%= dy_p %></radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= pinch_trans_friction %></mu>
+                <mu2><%= pinch_trans_friction %></mu2>
+                <mu3><%= f %></mu3>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius><%= dy_p %></radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_2">
+        <pose>0 <%= -dy_p * 1.5 %> 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius><%= dy_p %></radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= pinch_trans_friction %></mu>
+                <mu2><%= pinch_trans_friction %></mu2>
+                <mu3><%= f %></mu3>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius><%= dy_p %></radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <joint name = "joint_1" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_1</child>
+        <axis>
+          <xyz>0 -1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+      <joint name = "joint_2" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_2</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
     </model>
 <%  end %>
   </world>
