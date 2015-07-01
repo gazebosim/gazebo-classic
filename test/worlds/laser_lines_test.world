@@ -5,7 +5,6 @@
       <ambient>1 1 1 1</ambient>
       <background>1 1 1 1</background>
       <grid>false</grid>
-      <origin_visual>false</origin_visual>
     </scene>
     <gui>
       <camera name="user_camera">
