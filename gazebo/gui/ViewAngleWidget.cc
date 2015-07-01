@@ -17,6 +17,7 @@
 
 #include "gazebo/rendering/UserCamera.hh"
 
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ViewAngleWidgetPrivate.hh"
 #include "gazebo/gui/ViewAngleWidget.hh"
@@ -39,13 +40,45 @@ ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
   // Reset / home button
   this->dataPtr->resetButton = new QToolButton(this);
 
+  // Button size
+  QSize iconSize(30, 30);
+  this->dataPtr->topButton->setIconSize(iconSize);
+  this->dataPtr->bottomButton->setIconSize(iconSize);
+  this->dataPtr->frontButton->setIconSize(iconSize);
+  this->dataPtr->backButton->setIconSize(iconSize);
+  this->dataPtr->leftButton->setIconSize(iconSize);
+  this->dataPtr->rightButton->setIconSize(iconSize);
+  this->dataPtr->resetButton->setIconSize(iconSize);
+
+  // Zoom
+  this->dataPtr->zoomSlider = new QSlider(Qt::Horizontal, this);
+  this->dataPtr->zoomSlider->setRange(1, 100);
+  this->dataPtr->zoomSlider->setSliderPosition(40);
+
+  // Dropdown
+  this->dataPtr->projectionComboBox = new QComboBox(this);
+  this->dataPtr->projectionComboBox->setMinimumWidth(150);
+  this->dataPtr->projectionComboBox->addItem("Perspective", 0);
+  this->dataPtr->projectionComboBox->addItem("Orthographic", 1);
+  connect(this->dataPtr->projectionComboBox, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(OnProjection(int)));
+
   // Main layout
   this->dataPtr->mainLayout = new QGridLayout();
-
-  // Distance from world origin (zoom)
-  this->dataPtr->dist = 40;
-
+  this->dataPtr->mainLayout->addWidget(this->dataPtr->zoomSlider, 3, 0, 1, 4);
+  this->dataPtr->mainLayout->addWidget(this->dataPtr->projectionComboBox,
+      4, 0, 1, 4);
   this->setLayout(this->dataPtr->mainLayout);
+
+  // Connect the ortho action
+  connect(g_cameraOrthoAct, SIGNAL(triggered()), this, SLOT(OnOrtho()));
+
+  // connect the perspective action
+  connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
+      SLOT(OnPerspective()));
+
+  // not triggering, why?
+  connect(g_viewAngleButtonAct, SIGNAL(triggered()), this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
@@ -103,13 +136,17 @@ void ViewAngleWidget::Add(Angle _angle, QAction *_action)
 }
 
 /////////////////////////////////////////////////
-void ViewAngleWidget::MoveCamera(math::Vector3 _pos)
+void ViewAngleWidget::MoveCamera(math::Vector3 _pos, double _zoom)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
 
   if (!cam)
     return;
 
+  double zoom = math::equal(_zoom, 0.0) ?
+      this->dataPtr->zoomSlider->sliderPosition() : _zoom;
+
+  math::Vector3 camPos = _pos * zoom;
   math::Vector3 lookAt = math::Vector3::Zero;
   math::Vector3 dir = lookAt - _pos;
 
@@ -119,48 +156,89 @@ void ViewAngleWidget::MoveCamera(math::Vector3 _pos)
 
   math::Quaternion quat =  math::Quaternion(roll, pitch, yaw);
 
-  cam->MoveToPosition(math::Pose(_pos, quat), 1);
+  cam->MoveToPosition(math::Pose(camPos, quat), 1);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnTopView()
 {
-  this->MoveCamera(math::Vector3::UnitZ * this->dataPtr->dist);
+  this->MoveCamera(math::Vector3::UnitZ);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnBottomView()
 {
-  this->MoveCamera(-math::Vector3::UnitZ * this->dataPtr->dist);
+  this->MoveCamera(-math::Vector3::UnitZ);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnFrontView()
 {
-  this->MoveCamera(math::Vector3::UnitX * this->dataPtr->dist);
+  this->MoveCamera(math::Vector3::UnitX);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnBackView()
 {
-  this->MoveCamera(-math::Vector3::UnitX * this->dataPtr->dist);
+  this->MoveCamera(-math::Vector3::UnitX);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnLeftView()
 {
-  this->MoveCamera(math::Vector3::UnitY * this->dataPtr->dist);
+  this->MoveCamera(math::Vector3::UnitY);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnRightView()
 {
-  this->MoveCamera(-math::Vector3::UnitY * this->dataPtr->dist);
+  this->MoveCamera(-math::Vector3::UnitY);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnResetView()
 {
-  this->MoveCamera(math::Vector3(5, -5, 2));
+  math::Vector3 vec (5, -5, 2);
+  double length = vec.GetLength();
+  this->MoveCamera(vec.Normalize(), length);
+}
+
+/////////////////////////////////////////////////
+void ViewAngleWidget::OnPerspective()
+{
+  this->dataPtr->projectionComboBox->blockSignals(true);
+  this->dataPtr->projectionComboBox->setCurrentIndex(0);
+  this->dataPtr->projectionComboBox->blockSignals(false);
+}
+
+/////////////////////////////////////////////////
+void ViewAngleWidget::OnOrtho()
+{
+  this->dataPtr->projectionComboBox->blockSignals(true);
+  this->dataPtr->projectionComboBox->setCurrentIndex(1);
+  this->dataPtr->projectionComboBox->blockSignals(false);
+}
+
+/////////////////////////////////////////////////
+void ViewAngleWidget::OnProjection(int _index)
+{
+  if (_index == 0)
+    g_cameraPerspectiveAct->trigger();
+  else if (_index == 1)
+    g_cameraOrthoAct->trigger();
+}
+
+/////////////////////////////////////////////////
+void ViewAngleWidget::Update()
+{
+std::cout << "Up" << std::endl;
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+
+  if (!cam)
+    return;
+
+  double camDist = cam->GetWorldPosition().GetLength();
+
+  this->dataPtr->zoomSlider->setSliderPosition(camDist);
 }
 

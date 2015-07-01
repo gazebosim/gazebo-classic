@@ -68,7 +68,10 @@ namespace gazebo
 
       /// \brief Move the camera to the given position, facing the world origin.
       /// \param[in] _pos Camera position.
-      private: void MoveCamera(math::Vector3 _pos);
+      /// \param[in] _zoom Zoom level.
+      private: void MoveCamera(math::Vector3 _pos, double _zoom = 0);
+
+      private slots: void Update();
 
       /// \brief Qt callback when the top view is triggered.
       private slots: void OnTopView();
@@ -90,6 +93,15 @@ namespace gazebo
 
       /// \brief Qt callback when the reset view is triggered.
       private slots: void OnResetView();
+
+      /// \brief QT Callback that turns on orthographic projection
+      private slots: void OnOrtho();
+
+      /// \brief QT Callback that turns on perspective projection
+      private slots: void OnPerspective();
+
+      /// \brief Qt callback when the reset view is triggered.
+      private slots: void OnProjection(int _index);
 
       /// \internal
       /// \brief Pointer to private data.

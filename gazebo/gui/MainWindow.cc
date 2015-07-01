@@ -1424,10 +1424,7 @@ void MainWindow::CreateActions()
   QAction *viewAngleRight = new QAction(QIcon(":/images/view_angle_right.png"),
       tr("View from the right"), this);
   g_resetAct = new QAction(QIcon(":/images/view_angle_home.png"),
-      tr("Reset view angle"), this);
-
-  // g_resetAct = new QAction(tr("Reset Camera"), this);
-  // g_resetAct->setStatusTip(tr("Move camera to pose"));
+      tr("Reset View Angle"), this);
 
   ViewAngleWidget *viewAngleWidget = new ViewAngleWidget(this);
   viewAngleWidget->Add(ViewAngleWidget::TOP, viewAngleTop);
@@ -1651,6 +1648,8 @@ void MainWindow::DeleteActions()
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
+  QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
+
   // main window's menu bar
   QMenuBar *bar = QMainWindow::menuBar();
 

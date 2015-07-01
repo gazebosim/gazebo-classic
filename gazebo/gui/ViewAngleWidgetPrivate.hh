@@ -26,15 +26,35 @@ namespace gazebo
     /// \brief Private data for the ViewAngleWidget class
     class ViewAngleWidgetPrivate
     {
+      /// \brief Button for top view.
       public: QToolButton *topButton;
+
+      /// \brief Button for bottom view.
       public: QToolButton *bottomButton;
+
+      /// \brief Button for front view.
       public: QToolButton *frontButton;
+
+      /// \brief Button for back view.
       public: QToolButton *backButton;
+
+      /// \brief Button for left view.
       public: QToolButton *leftButton;
+
+      /// \brief Button for right view.
       public: QToolButton *rightButton;
+
+      /// \brief Button for reset view.
       public: QToolButton *resetButton;
+
+      /// \brief Slider to control zoom level.
+      public: QSlider *zoomSlider;
+
+      /// \brief Dropdown menu for projection types.
+      public: QComboBox *projectionComboBox;
+
+      /// \brief Main layout.
       public: QGridLayout *mainLayout;
-      public: double dist;
     };
   }
 }

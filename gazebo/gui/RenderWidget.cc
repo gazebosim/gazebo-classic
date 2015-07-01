@@ -126,8 +126,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
     connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
   }
 
-  this->toolbar->addSeparator();
-
   // Snap
   if (g_snapAct)
   {
@@ -141,6 +139,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   if (g_viewAngleAct)
   {
     QToolButton *viewAngleButton = new QToolButton;
+    viewAngleButton->setObjectName("viewAngleToolBarButton");
+    viewAngleButton->setStyleSheet("#viewAngleToolBarButton{padding-right:10px}");
     viewAngleButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     viewAngleButton->setIcon(QIcon(":/images/view_angle_front.png"));
     viewAngleButton->setToolTip(tr("Change the view angle"));
