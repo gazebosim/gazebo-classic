@@ -81,7 +81,7 @@ namespace gazebo
       /// \brief Holds the iteration of the current chunk, which might differ
       /// from the current playback iteration. This happens because the log
       /// file might skip iterations.
-      public: unsigned int logNextIteration = true;
+      public: unsigned int logNextIteration;
 
       /// \brief Whether the currently loaded log chunk should be processed.
       /// We don't want to process it before the playback iteration matches
