@@ -154,13 +154,13 @@ void LaserVisual::Update()
       math::Vector3 noHitPt = (axis * noHitRange) + offset.pos;
 
       // Draw the lines that represent each simulated ray
-      if (i >= dPtr->rayLines[j]->GetPointCount()/2)
+      if (i >= dPtr->rayLines[j]->GetPointCount() * 0.5)
       {
         dPtr->rayLines[j]->AddPoint(offset.pos);
         if (std::isinf(r))
           dPtr->rayLines[j]->AddPoint(noHitPt);
         else
-          dPtr->rayLines[j]->SetPoint(i*2+1, pt);
+          dPtr->rayLines[j]->AddPoint(pt);
       }
       else
       {
