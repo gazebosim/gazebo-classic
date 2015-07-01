@@ -1289,14 +1289,14 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     this->dataPtr->seekPending = true;
   }
 
-  if (_data->has_rewind() && data->rewind())
+  if (_data->has_rewind() && _data->rewind())
   {
     boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = 1;
   }
 
-  if (_data->has_forward() && data->forward())
+  if (_data->has_forward() && _data->forward())
   {
     boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->stepInc = INT_MAX;
