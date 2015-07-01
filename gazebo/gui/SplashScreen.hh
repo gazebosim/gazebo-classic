@@ -39,10 +39,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SplashScreen();
 
-      /// \brief Show message in splash screen
-      /// \param[in] _message Message to be displayed in the splash screen.
-      public: virtual void ShowMessage(const std::string &_message);
-
       /// \brief Qt callback to update the splash screen
       private slots: void Update();
 

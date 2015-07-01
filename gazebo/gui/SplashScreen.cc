@@ -32,27 +32,45 @@ SplashScreen::SplashScreen()
   this->setObjectName("SplashScreen");
   QPixmap pixmap(":/images/splash.svg");
   std::string statusText;
-  statusText = "Downloading models...sit tight!";
+  statusText = "Preparing your world";
+
   std::string versionText;
   versionText = "Version " + std::string(GAZEBO_VERSION);
-  std::string splashText = statusText + "<br>" +  versionText;
-  QTextEdit *textEdit = new QTextEdit(tr(splashText.c_str()));
-  textEdit->setAcceptRichText(true);
-  textEdit->setContentsMargins(0, 0, 0, 0);
-  textEdit->setFrameStyle(QFrame::NoFrame);
-  textEdit->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
+
+  QTextEdit *statusEdit = new QTextEdit(tr(statusText.c_str()));
+  statusEdit->setAcceptRichText(true);
+  statusEdit->setContentsMargins(0, 0, 0, 0);
+  statusEdit->setFrameStyle(QFrame::NoFrame);
+  statusEdit->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
+  statusEdit->setObjectName("splashStatusTextEdit");
+
+  QTextEdit *versionEdit = new QTextEdit(tr(versionText.c_str()));
+  versionEdit->setAcceptRichText(true);
+  versionEdit->setContentsMargins(0, 0, 0, 0);
+  versionEdit->setFrameStyle(QFrame::NoFrame);
+  versionEdit->setAlignment(Qt::AlignBottom | Qt::AlignRight);
+  versionEdit->setObjectName("splashVersionTextEdit");
+  versionEdit->setFixedHeight(20);
+
+  QHBoxLayout *versionLayout = new QHBoxLayout();
+  versionLayout->addWidget(versionEdit);
+
   QVBoxLayout *textLayout = new QVBoxLayout();
-  textLayout->addItem(new QSpacerItem(1, pixmap.size().height() * 0.8));
-  textLayout->addWidget(textEdit);
+  textLayout->addSpacerItem(new QSpacerItem(1, pixmap.size().height(),
+        QSizePolicy::Expanding, QSizePolicy::MinimumExpanding));
+  textLayout->addWidget(statusEdit);
+  textLayout->addLayout(versionLayout);
+
   this->dataPtr->splashScreen = new QSplashScreen(pixmap);
   this->dataPtr->splashScreen->setMask(pixmap.mask());
   this->dataPtr->splashScreen->setWindowFlags(
       this->dataPtr->splashScreen->windowFlags() | Qt::WindowStaysOnTopHint);
   this->dataPtr->splashScreen->setLayout(textLayout);
+  this->dataPtr->splashScreen->setFixedSize(pixmap.size());
 
   this->dataPtr->splashScreen->show();
-  this->ShowMessage("");
-  QTimer::singleShot(10, this, SLOT(Update()));
+
+  QTimer::singleShot(2000, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
@@ -63,14 +81,6 @@ SplashScreen::~SplashScreen()
 
   delete this->dataPtr;
   this->dataPtr = NULL;
-}
-
-/////////////////////////////////////////////////
-void SplashScreen::ShowMessage(const std::string &_message)
-{
-  this->dataPtr->splashScreen->showMessage(tr(_message.c_str()),
-                                           Qt::AlignBottom | Qt::AlignHCenter,
-                                           Qt::black);
 }
 
 /////////////////////////////////////////////////

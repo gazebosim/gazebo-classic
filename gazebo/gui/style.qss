@@ -759,3 +759,15 @@ QLineEdit#logPlayCurrentTime:focus
 {
   background-color: #707070;
 }
+
+QTextEdit#splashStatusTextEdit
+{
+  color: white;
+  font-size: 12px;
+}
+
+QTextEdit#splashVersionTextEdit
+{
+  color: white;
+  font-size: 10px;
+}
