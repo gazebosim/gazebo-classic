@@ -135,32 +135,27 @@ void ViewAngleWidget::Add(Angle _angle, QAction *_action)
 }
 
 /////////////////////////////////////////////////
-void ViewAngleWidget::MoveCamera(math::Vector3 _dir, double _dist,
-    bool _lookAtOrigin)
+void ViewAngleWidget::MoveCamera(math::Vector3 _dir)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
 
   if (!cam)
     return;
 
-  // If distance is not defined, use slider
-  double dist = math::equal(_dist, 0.0) ?
-      this->dataPtr->zoomSlider->sliderPosition() : _dist;
+  // Distance from look at point
+  double dist = this->dataPtr->zoomSlider->sliderPosition();
 
   // Look at world origin
   math::Vector3 lookAt = math::Vector3::Zero;
 
   // Look at first contact point in the middle of the screen unless it's on
   // a plane
-  if (!_lookAtOrigin)
-  {
-    math::Vector2i midScreen2D(cam->GetImageWidth()/2, cam->GetImageHeight()/2);
+  math::Vector2i midScreen2D(cam->GetImageWidth()/2, cam->GetImageHeight()/2);
 
-    rendering::VisualPtr vis = cam->GetScene()->GetVisualAt(cam, midScreen2D);
+  rendering::VisualPtr vis = cam->GetScene()->GetVisualAt(cam, midScreen2D);
 
-    if (vis && !vis->IsPlane())
-      cam->GetScene()->GetFirstContact(cam, midScreen2D, lookAt);
-  }
+  if (vis && !vis->IsPlane())
+    cam->GetScene()->GetFirstContact(cam, midScreen2D, lookAt);
 
   // Camera will be positioned with respect to that point
   math::Vector3 camPos = lookAt + _dir * dist;
@@ -216,9 +211,12 @@ void ViewAngleWidget::OnRightView()
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnResetView()
 {
-  math::Vector3 vec(5, -5, 2);
-  double dist = vec.GetLength();
-  this->MoveCamera(vec.Normalize(), dist, true);
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+
+  if (!cam)
+    return;
+
+  cam->MoveToPosition(cam->GetDefaultPose(), 1);
 }
 
 /////////////////////////////////////////////////

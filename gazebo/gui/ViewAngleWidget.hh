@@ -66,11 +66,13 @@ namespace gazebo
       /// \param[in] _action The Qt action to add.
       public: void Add(Angle _angle, QAction *_action);
 
-      /// \brief Move the camera to the given position, facing the world origin.
-      /// \param[in] _pos Camera position.
-      /// \param[in] _zoom Zoom level.
-      private: void MoveCamera(math::Vector3 _dir, double _dist = 0,
-          bool _lookAtOrigin = false);
+      /// \brief Move the camera to face the given direction. In case there's
+      /// an object immediately in front of the camera, the camera will
+      /// continue facing the object, with about the same distance (zoom). If
+      /// there's no object, the camera will face the world origin. The movement
+      /// takes 1 second.
+      /// \param[in] _dir Direction for the camera to face.
+      private: void MoveCamera(math::Vector3 _dir);
 
       private: void showEvent(QShowEvent *_event);
 
