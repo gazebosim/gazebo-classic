@@ -69,9 +69,10 @@ namespace gazebo
       /// \brief Move the camera to the given position, facing the world origin.
       /// \param[in] _pos Camera position.
       /// \param[in] _zoom Zoom level.
-      private: void MoveCamera(math::Vector3 _pos, double _zoom = 0);
+      private: void MoveCamera(math::Vector3 _dir, double _dist = 0,
+          bool _lookAtOrigin = false);
 
-      private slots: void Update();
+      private: void showEvent(QShowEvent *_event);
 
       /// \brief Qt callback when the top view is triggered.
       private slots: void OnTopView();

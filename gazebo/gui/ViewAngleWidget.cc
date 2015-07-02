@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -134,26 +135,45 @@ void ViewAngleWidget::Add(Angle _angle, QAction *_action)
 }
 
 /////////////////////////////////////////////////
-void ViewAngleWidget::MoveCamera(math::Vector3 _pos, double _zoom)
+void ViewAngleWidget::MoveCamera(math::Vector3 _dir, double _dist,
+    bool _lookAtOrigin)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
 
   if (!cam)
     return;
 
-  double zoom = math::equal(_zoom, 0.0) ?
-      this->dataPtr->zoomSlider->sliderPosition() : _zoom;
+  // If distance is not defined, use slider
+  double dist = math::equal(_dist, 0.0) ?
+      this->dataPtr->zoomSlider->sliderPosition() : _dist;
 
-  math::Vector3 camPos = _pos * zoom;
+  // Look at world origin
   math::Vector3 lookAt = math::Vector3::Zero;
-  math::Vector3 dir = lookAt - _pos;
 
+  // Look at first contact point in the middle of the screen unless it's on
+  // a plane
+  if (!_lookAtOrigin)
+  {
+    math::Vector2i midScreen2D(cam->GetImageWidth()/2, cam->GetImageHeight()/2);
+
+    rendering::VisualPtr vis = cam->GetScene()->GetVisualAt(cam, midScreen2D);
+
+    if (vis && !vis->IsPlane())
+      cam->GetScene()->GetFirstContact(cam, midScreen2D, lookAt);
+  }
+
+  // Camera will be positioned with respect to that point
+  math::Vector3 camPos = lookAt + _dir * dist;
+
+  // Calculate camera orientation
+  math::Vector3 negDir = -_dir;
   double roll = 0;
-  double pitch = -atan2(dir.z, sqrt(pow(dir.x, 2) + pow(dir.y, 2)));
-  double yaw = atan2(dir.y, dir.x);
+  double pitch = -atan2(negDir.z, sqrt(pow(negDir.x, 2) + pow(negDir.y, 2)));
+  double yaw = atan2(negDir.y, negDir.x);
 
   math::Quaternion quat =  math::Quaternion(roll, pitch, yaw);
 
+  // Move camera to that pose in 1s
   cam->MoveToPosition(math::Pose(camPos, quat), 1);
 }
 
@@ -197,8 +217,8 @@ void ViewAngleWidget::OnRightView()
 void ViewAngleWidget::OnResetView()
 {
   math::Vector3 vec(5, -5, 2);
-  double length = vec.GetLength();
-  this->MoveCamera(vec.Normalize(), length);
+  double dist = vec.GetLength();
+  this->MoveCamera(vec.Normalize(), dist, true);
 }
 
 /////////////////////////////////////////////////
@@ -227,15 +247,20 @@ void ViewAngleWidget::OnProjection(int _index)
 }
 
 /////////////////////////////////////////////////
-void ViewAngleWidget::Update()
+void ViewAngleWidget::showEvent(QShowEvent */*_event*/)
 {
-std::cout << "Up" << std::endl;
+  // Update slider with current zoom level the moment the widget is opened
   rendering::UserCameraPtr cam = gui::get_active_camera();
 
   if (!cam)
     return;
 
-  double camDist = cam->GetWorldPosition().GetLength();
+  math::Vector2i midScreen2D(cam->GetImageWidth()/2, cam->GetImageHeight()/2);
+
+  math::Vector3 midScreen3D;
+  cam->GetScene()->GetFirstContact(cam, midScreen2D, midScreen3D);
+
+  double camDist  = fabs((cam->GetWorldPosition() - midScreen3D).GetLength());
 
   this->dataPtr->zoomSlider->setSliderPosition(camDist);
 }

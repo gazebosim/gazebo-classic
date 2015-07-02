@@ -152,8 +152,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
     viewAngleButton->setMenu(viewAngleMenu);
     viewAngleButton->setPopupMode(QToolButton::InstantPopup);
     g_viewAngleButtonAct = this->toolbar->addWidget(viewAngleButton);
-    connect(viewAngleButton, SIGNAL(pressed()), g_viewAngleAct,
-        SLOT(trigger()));
   }
 
   // Empty space to push whatever comes next to the right
