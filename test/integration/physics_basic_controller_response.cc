@@ -24,6 +24,7 @@
 #include "gazebo/common/PID.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define TOL 5e-5
 using namespace gazebo;
@@ -43,17 +44,6 @@ class PhysicsTest : public ServerFixture,
 void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
                                       const std::string &_worldFileName)
 {
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "bullet dynamics not working as expected, issue #1144.\n";
-    return;
-  }
-  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
-  {
-    gzerr << "simbody and dart axis intepretation is wrong, see issue #1143.\n";
-    return;
-  }
-
   // Random seed is set to prevent brittle failures (gazebo issue #479)
   math::Rand::SetSeed(18420503);
   Load(_worldFileName, true, _physicsEngine);
@@ -134,15 +124,17 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
   }
 }
 
-TEST_F(PhysicsTest, TrikeyWheelResponse)
+TEST_P(PhysicsTest, TrikeyWheelResponse)
 {
-  TrikeyWheelResponse("ode", "worlds/inertia_ratio_reduction_test.world");
+  TrikeyWheelResponse(GetParam(), "worlds/inertia_ratio_reduction_test.world");
 }
 
-TEST_F(PhysicsTest, TrikeyWheelResponse2)
+TEST_P(PhysicsTest, TrikeyWheelResponse2)
 {
-  TrikeyWheelResponse("ode", "worlds/inertia_ratio_reduction_test2.world");
+  TrikeyWheelResponse(GetParam(), "worlds/inertia_ratio_reduction_test2.world");
 }
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
