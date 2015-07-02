@@ -1444,6 +1444,7 @@ void MainWindow::CreateActions()
 
   g_viewAngleAct = new QWidgetAction(this);
   g_viewAngleAct->setDefaultWidget(viewAngleWidget);
+  connect(g_viewAngleAct, SIGNAL(triggered()), viewAngleWidget, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
@@ -1655,8 +1656,6 @@ void MainWindow::DeleteActions()
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
-  QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
-
   // main window's menu bar
   QMenuBar *bar = QMainWindow::menuBar();
 

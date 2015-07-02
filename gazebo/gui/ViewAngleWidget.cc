@@ -77,9 +77,6 @@ ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
   // connect the perspective action
   connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
       SLOT(OnPerspective()));
-
-  // not triggering, why?
-  connect(g_viewAngleButtonAct, SIGNAL(triggered()), this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////

@@ -145,7 +145,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
     viewAngleButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     viewAngleButton->setIcon(QIcon(":/images/view_angle_front.png"));
     viewAngleButton->setToolTip(tr("Change the view angle"));
-    viewAngleButton->setArrowType(Qt::NoArrow);
 
     QMenu *viewAngleMenu = new QMenu(viewAngleButton);
     viewAngleMenu->addAction(g_viewAngleAct);

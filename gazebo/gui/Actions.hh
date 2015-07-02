@@ -103,7 +103,10 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_alignButtonAct;
     extern GZ_GUI_VISIBLE QAction *g_snapAct;
 
+    /// \brief Action to ?
     extern GZ_GUI_VISIBLE QWidgetAction *g_viewAngleAct;
+
+    /// \brief Action to ?
     extern GZ_GUI_VISIBLE QAction *g_viewAngleButtonAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
