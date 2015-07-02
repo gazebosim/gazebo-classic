@@ -762,12 +762,12 @@ QLineEdit#logPlayCurrentTime:focus
 
 QTextEdit#splashStatusTextEdit
 {
-  color: white;
+  color: #f58113;
   font-size: 12px;
 }
 
 QTextEdit#splashVersionTextEdit
 {
-  color: white;
+  color: #f58113;
   font-size: 10px;
 }

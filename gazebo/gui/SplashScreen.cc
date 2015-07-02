@@ -31,18 +31,9 @@ SplashScreen::SplashScreen()
 {
   this->setObjectName("SplashScreen");
   QPixmap pixmap(":/images/splash.svg");
-  std::string statusText;
-  statusText = "Preparing your world";
 
   std::string versionText;
   versionText = "Version " + std::string(GAZEBO_VERSION);
-
-  QTextEdit *statusEdit = new QTextEdit(tr(statusText.c_str()));
-  statusEdit->setAcceptRichText(true);
-  statusEdit->setContentsMargins(0, 0, 0, 0);
-  statusEdit->setFrameStyle(QFrame::NoFrame);
-  statusEdit->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
-  statusEdit->setObjectName("splashStatusTextEdit");
 
   QTextEdit *versionEdit = new QTextEdit(tr(versionText.c_str()));
   versionEdit->setAcceptRichText(true);
@@ -58,7 +49,6 @@ SplashScreen::SplashScreen()
   QVBoxLayout *textLayout = new QVBoxLayout();
   textLayout->addSpacerItem(new QSpacerItem(1, pixmap.size().height(),
         QSizePolicy::Expanding, QSizePolicy::MinimumExpanding));
-  textLayout->addWidget(statusEdit);
   textLayout->addLayout(versionLayout);
 
   this->dataPtr->splashScreen = new QSplashScreen(pixmap);
