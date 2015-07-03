@@ -326,6 +326,10 @@ compilation on Windows.
     1. Add measurement unit to building inspectors.
         * [Pull request #1741](https://bitbucket.org/osrf/gazebo/pull-request/1741)
         * [Issue #1363](https://bitbucket.org/osrf/gazebo/issue/1363)
+
+    1. Add `BaseInspectorDialog` as a base class for inspectors.
+        * [Pull request #1749](https://bitbucket.org/osrf/gazebo/pull-request/1749)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
