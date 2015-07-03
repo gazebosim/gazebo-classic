@@ -56,6 +56,7 @@ ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
   this->dataPtr->zoomSlider->setFocusPolicy(Qt::NoFocus);
   this->dataPtr->zoomSlider->setRange(1, 100);
   this->dataPtr->zoomSlider->setSliderPosition(40);
+  this->dataPtr->zoomSlider->setEnabled(true);
 
   // Dropdown
   this->dataPtr->projectionComboBox = new QComboBox(this);
@@ -88,45 +89,45 @@ ViewAngleWidget::~ViewAngleWidget()
 }
 
 /////////////////////////////////////////////////
-void ViewAngleWidget::Add(Angle _angle, QAction *_action)
+void ViewAngleWidget::Add(const Mode _mode, QAction *_action)
 {
-  if (_angle == TOP)
+  if (_mode == TOP)
   {
     this->dataPtr->topButton->setDefaultAction(_action);
     this->dataPtr->mainLayout->addWidget(this->dataPtr->topButton, 0, 1);
     connect(_action, SIGNAL(triggered()), this, SLOT(OnTopView()));
   }
-  else if (_angle == BOTTOM)
+  else if (_mode == BOTTOM)
   {
     this->dataPtr->bottomButton->setDefaultAction(_action);
     this->dataPtr->mainLayout->addWidget(this->dataPtr->bottomButton, 2, 1);
     connect(_action, SIGNAL(triggered()), this, SLOT(OnBottomView()));
   }
-  else if (_angle == FRONT)
+  else if (_mode == FRONT)
   {
     this->dataPtr->frontButton->setDefaultAction(_action);
     this->dataPtr->mainLayout->addWidget(this->dataPtr->frontButton, 1, 1);
     connect(_action, SIGNAL(triggered()), this, SLOT(OnFrontView()));
   }
-  else if (_angle == BACK)
+  else if (_mode == BACK)
   {
     this->dataPtr->backButton->setDefaultAction(_action);
     this->dataPtr->mainLayout->addWidget(this->dataPtr->backButton, 1, 3);
     connect(_action, SIGNAL(triggered()), this, SLOT(OnBackView()));
   }
-  else if (_angle == LEFT)
+  else if (_mode == LEFT)
   {
     this->dataPtr->leftButton->setDefaultAction(_action);
     this->dataPtr->mainLayout->addWidget(this->dataPtr->leftButton, 1, 0);
     connect(_action, SIGNAL(triggered()), this, SLOT(OnLeftView()));
   }
-  else if (_angle == RIGHT)
+  else if (_mode == RIGHT)
   {
     this->dataPtr->rightButton->setDefaultAction(_action);
     this->dataPtr->mainLayout->addWidget(this->dataPtr->rightButton, 1, 2);
     connect(_action, SIGNAL(triggered()), this, SLOT(OnRightView()));
   }
-  else if (_angle == RESET)
+  else if (_mode == RESET)
   {
     this->dataPtr->resetButton->setDefaultAction(_action);
     this->dataPtr->mainLayout->addWidget(this->dataPtr->resetButton, 0, 3);
@@ -135,7 +136,7 @@ void ViewAngleWidget::Add(Angle _angle, QAction *_action)
 }
 
 /////////////////////////////////////////////////
-void ViewAngleWidget::MoveCamera(math::Vector3 _dir)
+void ViewAngleWidget::LookDirection(const math::Vector3 &_dir)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
 
@@ -155,13 +156,12 @@ void ViewAngleWidget::MoveCamera(math::Vector3 _dir)
     lookAt = vis->GetWorldPose().pos;
 
   // Camera will be positioned with respect to that point
-  math::Vector3 camPos = lookAt + _dir * dist;
+  math::Vector3 camPos = lookAt - _dir * dist;
 
   // Calculate camera orientation
-  math::Vector3 negDir = -_dir;
   double roll = 0;
-  double pitch = -atan2(negDir.z, sqrt(pow(negDir.x, 2) + pow(negDir.y, 2)));
-  double yaw = atan2(negDir.y, negDir.x);
+  double pitch = -atan2(_dir.z, sqrt(pow(_dir.x, 2) + pow(_dir.y, 2)));
+  double yaw = atan2(_dir.y, _dir.x);
 
   math::Quaternion quat =  math::Quaternion(roll, pitch, yaw);
 
@@ -172,37 +172,37 @@ void ViewAngleWidget::MoveCamera(math::Vector3 _dir)
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnTopView()
 {
-  this->MoveCamera(math::Vector3::UnitZ);
+  this->LookDirection(-math::Vector3::UnitZ);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnBottomView()
 {
-  this->MoveCamera(-math::Vector3::UnitZ);
+  this->LookDirection(math::Vector3::UnitZ);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnFrontView()
 {
-  this->MoveCamera(math::Vector3::UnitX);
+  this->LookDirection(-math::Vector3::UnitX);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnBackView()
 {
-  this->MoveCamera(-math::Vector3::UnitX);
+  this->LookDirection(math::Vector3::UnitX);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnLeftView()
 {
-  this->MoveCamera(math::Vector3::UnitY);
+  this->LookDirection(-math::Vector3::UnitY);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnRightView()
 {
-  this->MoveCamera(-math::Vector3::UnitY);
+  this->LookDirection(math::Vector3::UnitY);
 }
 
 /////////////////////////////////////////////////
@@ -222,6 +222,8 @@ void ViewAngleWidget::OnPerspective()
   this->dataPtr->projectionComboBox->blockSignals(true);
   this->dataPtr->projectionComboBox->setCurrentIndex(0);
   this->dataPtr->projectionComboBox->blockSignals(false);
+
+  this->dataPtr->zoomSlider->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
@@ -230,6 +232,9 @@ void ViewAngleWidget::OnOrtho()
   this->dataPtr->projectionComboBox->blockSignals(true);
   this->dataPtr->projectionComboBox->setCurrentIndex(1);
   this->dataPtr->projectionComboBox->blockSignals(false);
+
+  // Disable slider because zoom is not working for ortho
+  this->dataPtr->zoomSlider->setEnabled(false);
 }
 
 /////////////////////////////////////////////////

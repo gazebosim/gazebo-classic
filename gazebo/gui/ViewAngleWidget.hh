@@ -36,7 +36,7 @@ namespace gazebo
     {
       Q_OBJECT
 
-      public: enum Angle
+      public: enum Mode
       {
         /// Top
         TOP,
@@ -62,9 +62,39 @@ namespace gazebo
       public: virtual ~ViewAngleWidget();
 
       /// \brief Add an action to the widget.
-      /// \param[in] _angle View angle.
+      /// \param[in] _mode View mode
       /// \param[in] _action The Qt action to add.
-      public: void Add(Angle _angle, QAction *_action);
+      public: void Add(const Mode _mode, QAction *_action);
+
+      /// \brief Qt callback when the top view has been triggered.
+      private slots: void OnTopView();
+
+      /// \brief Qt callback when the bottom view has been triggered.
+      private slots: void OnBottomView();
+
+      /// \brief Qt callback when the front view has been triggered.
+      private slots: void OnFrontView();
+
+      /// \brief Qt callback when the back view has been triggered.
+      private slots: void OnBackView();
+
+      /// \brief Qt callback when the left view has been triggered.
+      private slots: void OnLeftView();
+
+      /// \brief Qt callback when the right view has been triggered.
+      private slots: void OnRightView();
+
+      /// \brief Qt callback when reset view has been triggered.
+      private slots: void OnResetView();
+
+      /// \brief Qt callback when the reset view has been triggered.
+      private slots: void OnProjection(int _index);
+
+      /// \brief QT Callback that turns on orthographic projection.
+      private slots: void OnOrtho();
+
+      /// \brief QT Callback that turns on perspective projection.
+      private slots: void OnPerspective();
 
       /// \brief Move the camera to face the given direction. In case there's
       /// an object immediately in front of the camera, the camera will
@@ -72,39 +102,11 @@ namespace gazebo
       /// there's no object, the camera will face the world origin. The movement
       /// takes 1 second.
       /// \param[in] _dir Direction for the camera to face.
-      private: void MoveCamera(math::Vector3 _dir);
+      private: void LookDirection(const math::Vector3 &_dir);
 
+      /// \brief Override Qt showEvent to update slider with current zoom.
+      /// \param[in] _event Show event.
       private: void showEvent(QShowEvent *_event);
-
-      /// \brief Qt callback when the top view is triggered.
-      private slots: void OnTopView();
-
-      /// \brief Qt callback when the bottom view is triggered.
-      private slots: void OnBottomView();
-
-      /// \brief Qt callback when the front view is triggered.
-      private slots: void OnFrontView();
-
-      /// \brief Qt callback when the back view is triggered.
-      private slots: void OnBackView();
-
-      /// \brief Qt callback when the left view is triggered.
-      private slots: void OnLeftView();
-
-      /// \brief Qt callback when the right view is triggered.
-      private slots: void OnRightView();
-
-      /// \brief Qt callback when the reset view is triggered.
-      private slots: void OnResetView();
-
-      /// \brief QT Callback that turns on orthographic projection
-      private slots: void OnOrtho();
-
-      /// \brief QT Callback that turns on perspective projection
-      private slots: void OnPerspective();
-
-      /// \brief Qt callback when the reset view is triggered.
-      private slots: void OnProjection(int _index);
 
       /// \internal
       /// \brief Pointer to private data.
