@@ -1434,6 +1434,7 @@ void MainWindow::CreateActions()
   connect(g_resetAct, SIGNAL(triggered()), viewAngleReset, SLOT(trigger()));
 
   ViewAngleWidget *viewAngleWidget = new ViewAngleWidget(this);
+  viewAngleWidget->setObjectName("viewAngleWidget");
   viewAngleWidget->Add(ViewAngleWidget::TOP, viewAngleTop);
   viewAngleWidget->Add(ViewAngleWidget::BOTTOM, viewAngleBottom);
   viewAngleWidget->Add(ViewAngleWidget::FRONT, viewAngleFront);

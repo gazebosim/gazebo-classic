@@ -148,14 +148,11 @@ void ViewAngleWidget::MoveCamera(math::Vector3 _dir)
   // Look at world origin
   math::Vector3 lookAt = math::Vector3::Zero;
 
-  // Look at first contact point in the middle of the screen unless it's on
-  // a plane
+  // Look at origin of visual in the middle of screen
   math::Vector2i midScreen2D(cam->GetImageWidth()/2, cam->GetImageHeight()/2);
-
   rendering::VisualPtr vis = cam->GetScene()->GetVisualAt(cam, midScreen2D);
-
   if (vis && !vis->IsPlane())
-    cam->GetScene()->GetFirstContact(cam, midScreen2D, lookAt);
+    lookAt = vis->GetWorldPose().pos;
 
   // Camera will be positioned with respect to that point
   math::Vector3 camPos = lookAt + _dir * dist;
