@@ -17,6 +17,7 @@
 
 #include "gazebo/math/Helpers.hh"
 
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
 
@@ -60,8 +61,9 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Get the view angle widget
   gazebo::gui::ViewAngleWidget *viewAngleWidget =
       mainWindow->findChild<gazebo::gui::ViewAngleWidget *>("viewAngleWidget");
+  QVERIFY(viewAngleWidget != NULL);
 
-  QApplication::postEvent( viewAngleWidget, new QShowEvent() );
+  QApplication::postEvent(viewAngleWidget, new QShowEvent());
 
   // Process some events and draw the screen
   for (size_t i = 0; i < 10; ++i)
@@ -190,6 +192,118 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Check the camera position
   pose = cam->GetWorldPose();
   QVERIFY((pose.pos - defaultPose.pos).GetLength() < tol);
+
+  // Clean up
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void ViewAngleWidget_TEST::Projections()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get camera
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  // Get the view angle widget
+  gazebo::gui::ViewAngleWidget *viewAngleWidget =
+      mainWindow->findChild<gazebo::gui::ViewAngleWidget *>("viewAngleWidget");
+  QVERIFY(viewAngleWidget != NULL);
+
+  // Get the combobox
+  QList<QComboBox *> comboBoxes =
+      viewAngleWidget->findChildren<QComboBox *>();
+  QVERIFY(comboBoxes.size() == 1u);
+
+  // Check that it is in perspective projection
+  QVERIFY(gazebo::gui::g_cameraPerspectiveAct->isChecked());
+  QVERIFY(!gazebo::gui::g_cameraOrthoAct->isChecked());
+  QVERIFY(comboBoxes[0]->currentText() == "Perspective");
+
+  // Trigger ortho and see it changed
+  gazebo::gui::g_cameraOrthoAct->trigger();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that it is in orthographic projection
+  QVERIFY(!gazebo::gui::g_cameraPerspectiveAct->isChecked());
+  QVERIFY(gazebo::gui::g_cameraOrthoAct->isChecked());
+  QVERIFY(comboBoxes[0]->currentText() == "Orthographic");
+
+  // Trigger perpective and see it changed
+  gazebo::gui::g_cameraPerspectiveAct->trigger();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that it is in perspective projection
+  QVERIFY(gazebo::gui::g_cameraPerspectiveAct->isChecked());
+  QVERIFY(!gazebo::gui::g_cameraOrthoAct->isChecked());
+  QVERIFY(comboBoxes[0]->currentText() == "Perspective");
+
+  // Change combobox
+  comboBoxes[0]->setCurrentIndex(1);
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that it is in orthographic projection
+  QVERIFY(!gazebo::gui::g_cameraPerspectiveAct->isChecked());
+  QVERIFY(gazebo::gui::g_cameraOrthoAct->isChecked());
+  QVERIFY(comboBoxes[0]->currentText() == "Orthographic");
+
+  // Change combobox
+  comboBoxes[0]->setCurrentIndex(0);
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that it is in perspective projection
+  QVERIFY(gazebo::gui::g_cameraPerspectiveAct->isChecked());
+  QVERIFY(!gazebo::gui::g_cameraOrthoAct->isChecked());
+  QVERIFY(comboBoxes[0]->currentText() == "Perspective");
 
   // Clean up
   cam->Fini();

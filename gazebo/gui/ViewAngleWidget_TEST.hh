@@ -27,6 +27,9 @@ class ViewAngleWidget_TEST : public QTestFixture
 
   /// \brief Test the different view angles on an empty world.
   private slots: void EmptyWorld();
+
+  /// \brief Test triggering the different projections.
+  private slots: void Projections();
 };
 
 #endif

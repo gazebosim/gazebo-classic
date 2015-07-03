@@ -54,6 +54,7 @@ ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
   // Zoom
   this->dataPtr->zoomSlider = new QSlider(Qt::Horizontal, this);
   this->dataPtr->zoomSlider->setFocusPolicy(Qt::NoFocus);
+  this->dataPtr->zoomSlider->setToolTip("Choose zoom distance");
   this->dataPtr->zoomSlider->setRange(1, 100);
   this->dataPtr->zoomSlider->setSliderPosition(40);
   this->dataPtr->zoomSlider->setEnabled(true);

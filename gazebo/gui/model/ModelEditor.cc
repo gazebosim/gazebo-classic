@@ -406,6 +406,7 @@ void ModelEditor::ToggleToolbar()
         actions[i] == g_copyAct ||
         actions[i] == g_pasteAct ||
         actions[i] == g_alignButtonAct ||
+        actions[i] == g_viewAngleButtonAct ||
         actions[i] == g_snapAct ||
         actions[i]->objectName() == "toolbarSpacerAction")
     {

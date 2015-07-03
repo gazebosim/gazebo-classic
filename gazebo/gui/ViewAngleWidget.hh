@@ -87,7 +87,8 @@ namespace gazebo
       /// \brief Qt callback when reset view has been triggered.
       private slots: void OnResetView();
 
-      /// \brief Qt callback when the reset view has been triggered.
+      /// \brief Qt callback when the index of the QComboBox has been changed.
+      /// \param[in] _index Index: 0 for perpective, 1 for orthographic.
       private slots: void OnProjection(int _index);
 
       /// \brief QT Callback that turns on orthographic projection.
