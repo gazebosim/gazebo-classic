@@ -1650,6 +1650,9 @@ void MainWindow::DeleteActions()
 
   delete g_cameraPerspectiveAct;
   g_cameraPerspectiveAct = 0;
+
+  delete g_viewAngleAct;
+  g_viewAngleAct = 0;
 }
 
 

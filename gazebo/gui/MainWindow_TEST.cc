@@ -818,6 +818,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_alignAct);
 
+  QVERIFY(gazebo::gui::g_viewAngleAct);
+
   QVERIFY(gazebo::gui::g_cameraOrthoAct);
 
   QVERIFY(gazebo::gui::g_cameraPerspectiveAct);
@@ -922,6 +924,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_snapAct);
 
   QVERIFY(!gazebo::gui::g_alignAct);
+
+  QVERIFY(!gazebo::gui::g_viewAngleAct);
 
   QVERIFY(!gazebo::gui::g_cameraOrthoAct);
 
