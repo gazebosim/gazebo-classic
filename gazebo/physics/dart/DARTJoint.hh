@@ -31,6 +31,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTJointPrivate;
+
     /// \brief DART joint interface
     class GZ_PHYSICS_VISIBLE DARTJoint : public Joint
     {
@@ -145,25 +148,17 @@ namespace gazebo
       /// \return A pointer to the DART joint.
       public: dart::dynamics::Joint *GetDARTJoint();
 
-      /// \brief Save force applied by user
-      /// This plus the joint feedback (joint contstraint forces) is the
-      /// equivalent of simulated force torque sensor reading
-      /// Allocate a 2 vector in case hinge2 joint is used.
-      /// This is used by DART to store external force applied by the user.
-      private: double forceApplied[MAX_JOINT_AXIS];
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTJointPrivate* dataPtr;
 
-      /// \brief Save time at which force is applied by user
-      /// This will let us know if it's time to clean up forceApplied.
-      private: common::Time forceAppliedTime;
-
-      /// \brief DARTPhysics engine pointer
-      protected: DARTPhysicsPtr dartPhysicsEngine;
-
-      /// \brief DART joint pointer
-      protected: dart::dynamics::Joint *dtJoint;
-
-      /// \brief DART child body node pointer
-      protected: dart::dynamics::BodyNode *dtChildBodyNode;
+      /// Friend DART[~]Joint so that it has access to dataPtr
+      private: friend class DARTBallJoint;
+      private: friend class DARTHingeJoint;
+      private: friend class DARTHinge2Joint;
+      private: friend class DARTScrewJoint;
+      private: friend class DARTSliderJoint;
+      private: friend class DARTUniversalJoint;
     };
   }
 }
