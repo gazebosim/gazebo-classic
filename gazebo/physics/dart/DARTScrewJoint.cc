@@ -196,35 +196,25 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
-  if (dtScrewJoint)
+  if (_index == 0)
   {
-    if (_index == 0)
-    {
-      dart::dynamics::ScrewJoint *dtScrewJoint =
-          reinterpret_cast<dart::dynamics::ScrewJoint *>(
-            this->dataPtr->dtJoint);
+    // angular position
+    const double radianAngle = this->dataPtr->dtJoint->getPosition(0);
+    result.SetFromRadian(radianAngle);
+  }
+  else if (_index == 1)
+  {
+    dart::dynamics::ScrewJoint *dtScrewJoint =
+        reinterpret_cast<dart::dynamics::ScrewJoint *>(
+          this->dataPtr->dtJoint);
 
-      // angular position
-      result.SetFromRadian(dtScrewJoint->getPosition(0));
-    }
-    else if (_index == 1)
-    {
-      dart::dynamics::ScrewJoint *dtScrewJoint =
-          reinterpret_cast<dart::dynamics::ScrewJoint *>(
-            this->dataPtr->dtJoint);
-
-      // linear position
-      double angPos = dtScrewJoint->getPosition(0);
-      result = dtScrewJoint->getPitch() * angPos * 0.5 / M_PI;
-    }
-    else
-    {
-      gzerr << "Invalid index[" << _index << "]\n";
-    }
+    // linear position
+    const double radianAngle = this->dataPtr->dtJoint->getPosition(0);
+    result = dtScrewJoint->getPitch() * radianAngle * 0.5 / M_PI;
   }
   else
   {
-    gzerr << "dartScrewJoint not created yet\n";
+    gzerr << "Invalid index[" << _index << "]\n";
   }
 
   return result;
