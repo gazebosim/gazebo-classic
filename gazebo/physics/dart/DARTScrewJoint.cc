@@ -196,13 +196,14 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
-  dart::dynamics::ScrewJoint *dtScrewJoint =
-      reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
-
   if (dtScrewJoint)
   {
     if (_index == 0)
     {
+      dart::dynamics::ScrewJoint *dtScrewJoint =
+          reinterpret_cast<dart::dynamics::ScrewJoint *>(
+            this->dataPtr->dtJoint);
+
       // angular position
       result.SetFromRadian(dtScrewJoint->getPosition(0));
     }

@@ -66,7 +66,7 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
 
   if (_index == 0)
-  {    
+  {
     dart::dynamics::UniversalJoint *dtUniveralJoint =
         reinterpret_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);

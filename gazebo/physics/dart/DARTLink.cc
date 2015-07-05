@@ -373,7 +373,6 @@ void DARTLink::SetLinearVel(const math::Vector3 &_vel)
     // linear and angular velocities
     if (dtBodyNode->getParentBodyNode())
     {
-
       // Local transformation from the parent link frame to this link frame
       Eigen::Isometry3d T = freeJoint->getLocalTransform();
 
