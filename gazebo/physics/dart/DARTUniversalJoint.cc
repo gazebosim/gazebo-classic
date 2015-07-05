@@ -28,7 +28,7 @@ using namespace physics;
 DARTUniversalJoint::DARTUniversalJoint(BasePtr _parent)
   : UniversalJoint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::RevoluteJoint();
+  this->dataPtr->dtJoint = new dart::dynamics::UniversalJoint();
 }
 
 //////////////////////////////////////////////////
