@@ -72,10 +72,10 @@ SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
 : dataPtr(new SphericalCoordinatesPrivate)
 {
   this->SetSurfaceType(_type);
-  this->SetLatitudeReference(_latitude);
-  this->SetLongitudeReference(_longitude);
+  this->SetLatitudeReference(ignition::math::Angle(_latitude.Radian()));
+  this->SetLongitudeReference(ignition::math::Angle(_longitude.Radian()));
   this->SetElevationReference(_elevation);
-  this->SetHeadingOffset(_heading);
+  this->SetHeadingOffset(ignition::math::Angle(_heading.Radian()));
 }
 
 //////////////////////////////////////////////////
@@ -158,7 +158,7 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 void SphericalCoordinates::SetLatitudeReference(
     const math::Angle &_angle)
 {
-  this->SetLatitudeReference(ignition:math::Angle(_angle.Radian()));
+  this->SetLatitudeReference(ignition::math::Angle(_angle.Radian()));
 }
 
 //////////////////////////////////////////////////
@@ -208,8 +208,8 @@ math::Vector3 SphericalCoordinates::SphericalFromLocal(
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3 SphericalCoordinates::SphericalFromLocal(
-    const ignition::math::Vector3 &_xyz) const
+ignition::math::Vector3d SphericalCoordinates::SphericalFromLocal(
+    const ignition::math::Vector3d &_xyz) const
 {
   double radiusMeridional = 1.0;
   double radiusNormal = 1.0;
@@ -259,7 +259,7 @@ ignition::math::Vector3 SphericalCoordinates::SphericalFromLocal(
 math::Vector3 SphericalCoordinates::GlobalFromLocal(
     const math::Vector3 &_xyz) const
 {
-  return this->GlobalFromLocal(_xyz);
+  return this->GlobalFromLocal(_xyz.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -280,10 +280,10 @@ double SphericalCoordinates::Distance(const math::Angle &_latA,
                                       const math::Angle &_latB,
                                       const math::Angle &_lonB)
 {
-  return this->Distance(ignition::math::Angle(_latA.Radian()),
-                        ignition::math::Angle(_lonA.Radian()),
-                        ignition::math::Angle(_latB.Radian()),
-                        ignition::math::Angle(_lonB.Radian()));
+  return Distance(ignition::math::Angle(_latA.Radian()),
+                  ignition::math::Angle(_lonA.Radian()),
+                  ignition::math::Angle(_latB.Radian()),
+                  ignition::math::Angle(_lonB.Radian()));
 }
 
 //////////////////////////////////////////////////

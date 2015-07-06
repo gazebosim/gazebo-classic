@@ -22,6 +22,7 @@
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
