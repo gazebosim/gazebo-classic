@@ -207,8 +207,9 @@ TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
 
 TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 {
-  msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
-        math::Vector2d(123, 456), 1.0));
+  msgs::PlaneGeom msg = msgs::Convert(
+      ignition::math::Planed(ignition::math::Vector3d(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
 
   EXPECT_DOUBLE_EQ(0, msg.normal().x());
   EXPECT_DOUBLE_EQ(0, msg.normal().y());
@@ -220,8 +221,9 @@ TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
 {
-  msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
-        math::Vector2d(123, 456), 1.0));
+  msgs::PlaneGeom msg = msgs::Convert(
+      ignition::math::Planed(ignition::math::Vector3d(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
   math::Plane v = msgs::Convert(msg);
 
   EXPECT_DOUBLE_EQ(0, v.normal.x);

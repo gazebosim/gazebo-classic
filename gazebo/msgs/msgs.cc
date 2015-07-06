@@ -41,6 +41,7 @@ namespace gazebo
     /// \param[in] _sdf sdf::ElementPtr to fill with data.
     void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
 
+    /////////////////////////////////////////////
     /// Create a request message
     msgs::Request *CreateRequest(const std::string &_request,
         const std::string &_data)
@@ -49,17 +50,19 @@ namespace gazebo
 
       request->set_request(_request);
       request->set_data(_data);
-      request->set_id(math::Rand::GetIntUniform(1, 10000));
+      request->set_id(ignition::math::Rand::IntUniform(1, 10000));
 
       return request;
     }
 
+    /////////////////////////////////////////////
     const google::protobuf::FieldDescriptor *GetFD(
         google::protobuf::Message &message, const std::string &name)
     {
       return message.GetDescriptor()->FindFieldByName(name);
     }
 
+    /////////////////////////////////////////////
     msgs::Header *GetHeader(google::protobuf::Message &message)
     {
       google::protobuf::Message *msg = NULL;
@@ -78,6 +81,7 @@ namespace gazebo
       return (msgs::Header*)msg;
     }
 
+    /////////////////////////////////////////////
     void Init(google::protobuf::Message &_message, const std::string &_id)
     {
       msgs::Header *header = GetHeader(_message);
@@ -90,11 +94,13 @@ namespace gazebo
       }
     }
 
+    /////////////////////////////////////////////
     void Stamp(msgs::Header *_hdr)
     {
       Stamp(_hdr->mutable_stamp());
     }
 
+    /////////////////////////////////////////////
     void Stamp(msgs::Time *_time)
     {
       common::Time tm = common::Time::GetWallTime();
@@ -103,6 +109,7 @@ namespace gazebo
       _time->set_nsec(tm.nsec);
     }
 
+    /////////////////////////////////////////////
     std::string Package(const std::string &type,
         const google::protobuf::Message &message)
     {
@@ -126,19 +133,38 @@ namespace gazebo
       return data;
     }
 
+    /////////////////////////////////////////////
     void Set(msgs::Vector3d *_pt, const math::Vector3 &_v)
     {
       _pt->set_x(_v.x);
       _pt->set_y(_v.y);
       _pt->set_z(_v.z);
+
     }
 
+    /////////////////////////////////////////////
+    void Set(msgs::Vector3d *_pt, const ignition::math::Vector3d &_v)
+    {
+      _pt->set_x(_v.X());
+      _pt->set_y(_v.Y());
+      _pt->set_z(_v.Z());
+    }
+
+    /////////////////////////////////////////////
     void Set(msgs::Vector2d *_pt, const math::Vector2d &_v)
     {
       _pt->set_x(_v.x);
       _pt->set_y(_v.y);
     }
 
+    /////////////////////////////////////////////
+    void Set(msgs::Vector2d *_pt, const ignition::math::Vector2d &_v)
+    {
+      _pt->set_x(_v.X());
+      _pt->set_y(_v.Y());
+    }
+
+    /////////////////////////////////////////////
     void Set(msgs::Quaternion *_q, const math::Quaternion &_v)
     {
       _q->set_x(_v.x);
@@ -147,12 +173,30 @@ namespace gazebo
       _q->set_w(_v.w);
     }
 
+    /////////////////////////////////////////////
+    void Set(msgs::Quaternion *_q, const ignition::math::Quaterniond &_v)
+    {
+      _q->set_x(_v.X());
+      _q->set_y(_v.Y());
+      _q->set_z(_v.Z());
+      _q->set_w(_v.W());
+    }
+
+    /////////////////////////////////////////////
     void Set(msgs::Pose *_p, const math::Pose &_v)
     {
       Set(_p->mutable_position(), _v.pos);
       Set(_p->mutable_orientation(), _v.rot);
     }
 
+    /////////////////////////////////////////////
+    void Set(msgs::Pose *_p, const ignition::math::Pose3d &_v)
+    {
+      Set(_p->mutable_position(), _v.Pos());
+      Set(_p->mutable_orientation(), _v.Rot());
+    }
+
+    /////////////////////////////////////////////
     void Set(msgs::Color *_c, const common::Color &_v)
     {
       _c->set_r(_v.r);
@@ -161,6 +205,7 @@ namespace gazebo
       _c->set_a(_v.a);
     }
 
+    /////////////////////////////////////////////
     void Set(msgs::Time *_t, const common::Time &_v)
     {
       _t->set_sec(_v.sec);
@@ -199,6 +244,15 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v)
+    {
+      Set(_p->mutable_normal(), _v.Normal());
+      _p->mutable_size()->set_x(_v.Size().X());
+      _p->mutable_size()->set_y(_v.Size().Y());
+      _p->set_d(_v.Offset());
+    }
+
+    /////////////////////////////////////////////////
     void Set(common::Image &_img, const msgs::Image &_msg)
     {
       _img.SetFromData(
@@ -229,40 +283,67 @@ namespace gazebo
     /////////////////////////////////////////////////
     msgs::Vector3d Convert(const math::Vector3 &_v)
     {
+      return Convert(_v.Ign());
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Vector3d Convert(const ignition::math::Vector3d &_v)
+    {
       msgs::Vector3d result;
-      result.set_x(_v.x);
-      result.set_y(_v.y);
-      result.set_z(_v.z);
+      result.set_x(_v.X());
+      result.set_y(_v.Y());
+      result.set_z(_v.Z());
       return result;
     }
 
     /////////////////////////////////////////////////
     msgs::Vector2d Convert(const math::Vector2d &_v)
     {
+      return Convert(_v.Ign());
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Vector2d Convert(const ignition::math::Vector2d &_v)
+    {
       msgs::Vector2d result;
-      result.set_x(_v.x);
-      result.set_y(_v.y);
+      result.set_x(_v.X());
+      result.set_y(_v.Y());
       return result;
     }
 
+    /////////////////////////////////////////////
     msgs::Quaternion Convert(const math::Quaternion &_q)
     {
+      return Convert(_q.Ign());
+    }
+
+    /////////////////////////////////////////////
+    msgs::Quaternion Convert(const ignition::math::Quaterniond &_q)
+    {
       msgs::Quaternion result;
-      result.set_x(_q.x);
-      result.set_y(_q.y);
-      result.set_z(_q.z);
-      result.set_w(_q.w);
+      result.set_x(_q.X());
+      result.set_y(_q.Y());
+      result.set_z(_q.Z());
+      result.set_w(_q.W());
       return result;
     }
 
+    /////////////////////////////////////////////
     msgs::Pose Convert(const math::Pose &_p)
     {
+      return Convert(_p.Ign());
+    }
+
+    /////////////////////////////////////////////
+    msgs::Pose Convert(const ignition::math::Pose3d &_p)
+    {
       msgs::Pose result;
-      result.mutable_position()->CopyFrom(Convert(_p.pos));
-      result.mutable_orientation()->CopyFrom(Convert(_p.rot));
+      result.mutable_position()->CopyFrom(Convert(_p.Pos()));
+      result.mutable_orientation()->CopyFrom(Convert(_p.Rot()));
       return result;
     }
 
+    /////////////////////////////////////////////
     msgs::Color Convert(const common::Color &_c)
     {
       msgs::Color result;
@@ -273,6 +354,7 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////
     msgs::Time Convert(const common::Time &_t)
     {
       msgs::Time result;
@@ -281,16 +363,18 @@ namespace gazebo
       return result;
     }
 
-    msgs::PlaneGeom Convert(const math::Plane &_p)
+    /////////////////////////////////////////////
+    msgs::PlaneGeom Convert(const ignition::math::Planed &_p)
     {
       msgs::PlaneGeom result;
-      result.mutable_normal()->CopyFrom(Convert(_p.normal));
-      result.mutable_size()->set_x(_p.size.x);
-      result.mutable_size()->set_y(_p.size.y);
-      result.set_d(_p.d);
+      result.mutable_normal()->CopyFrom(Convert(_p.Normal()));
+      result.mutable_size()->set_x(_p.Size().X());
+      result.mutable_size()->set_y(_p.Size().Y());
+      result.set_d(_p.Offset());
       return result;
     }
 
+    /////////////////////////////////////////////
     msgs::Joint::Type ConvertJointType(const std::string &_str)
     {
       msgs::Joint::Type result = msgs::Joint::REVOLUTE;
@@ -332,6 +416,7 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////
     std::string ConvertJointType(const msgs::Joint::Type &_type)
     {
       std::string result;
@@ -483,41 +568,80 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////
     math::Vector3 Convert(const msgs::Vector3d &_v)
     {
       return math::Vector3(_v.x(), _v.y(), _v.z());
     }
 
+    /////////////////////////////////////////////
+    ignition::math::Vector3d ConvertIgn(const msgs::Vector3d &_v)
+    {
+      return ignition::math::Vector3d(_v.x(), _v.y(), _v.z());
+    }
+
+    /////////////////////////////////////////////
     math::Vector2d Convert(const msgs::Vector2d &_v)
     {
       return math::Vector2d(_v.x(), _v.y());
     }
 
+    /////////////////////////////////////////////
+    ignition::math::Vector2d ConvertIgn(const msgs::Vector2d &_v)
+    {
+      return ignition::math::Vector2d(_v.x(), _v.y());
+    }
+
+    /////////////////////////////////////////////
     math::Quaternion Convert(const msgs::Quaternion &_q)
     {
       return math::Quaternion(_q.w(), _q.x(), _q.y(), _q.z());
     }
 
-    math::Pose Convert(const msgs::Pose &_p)
+    /////////////////////////////////////////////
+    ignition::math::Quaterniond ConvertIgn(const msgs::Quaternion &_q)
     {
-      return math::Pose(Convert(_p.position()),
-          Convert(_p.orientation()));
+      return ignition::math::Quaterniond(_q.w(), _q.x(), _q.y(), _q.z());
     }
 
+    /////////////////////////////////////////////
+    math::Pose Convert(const msgs::Pose &_p)
+    {
+      return math::Pose(Convert(_p.position()), Convert(_p.orientation()));
+    }
+
+    /////////////////////////////////////////////
+    ignition::math::Pose3d ConvertIgn(const msgs::Pose &_p)
+    {
+      return ignition::math::Pose3d(ConvertIgn(_p.position()),
+                                    ConvertIgn(_p.orientation()));
+    }
+
+    /////////////////////////////////////////////
     common::Color Convert(const msgs::Color &_c)
     {
       return common::Color(_c.r(), _c.g(), _c.b(), _c.a());
     }
 
+    /////////////////////////////////////////////
     common::Time Convert(const msgs::Time &_t)
     {
       return common::Time(_t.sec(), _t.nsec());
     }
 
+    /////////////////////////////////////////////
     math::Plane Convert(const msgs::PlaneGeom &_p)
     {
       return math::Plane(Convert(_p.normal()),
-          math::Vector2d(_p.size().x(), _p.size().y()),
+          ignition::math::Vector2d(_p.size().x(), _p.size().y()),
+          _p.d());
+    }
+
+    /////////////////////////////////////////////
+    ignition::math::Planed ConvertIgn(const msgs::PlaneGeom &_p)
+    {
+      return ignition::math::Planed(ConvertIgn(_p.normal()),
+          ignition::math::Vector2d(_p.size().x(), _p.size().y()),
           _p.d());
     }
 
@@ -558,7 +682,8 @@ namespace gazebo
 
         if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_pose(), camSDF->Get<math::Pose>("pose"));
+          msgs::Set(guiCam->mutable_pose(),
+              camSDF->Get<ignition::math::Pose3d>("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
@@ -621,7 +746,8 @@ namespace gazebo
 
       if (_sdf->HasElement("pose"))
       {
-        result.mutable_pose()->CopyFrom(Convert(_sdf->Get<math::Pose>("pose")));
+        result.mutable_pose()->CopyFrom(
+            Convert(_sdf->Get<ignition::math::Pose3d>("pose")));
       }
 
       if (_sdf->HasElement("diffuse"))
@@ -648,7 +774,7 @@ namespace gazebo
       if (_sdf->HasElement("direction"))
       {
         result.mutable_direction()->CopyFrom(
-            Convert(_sdf->Get<math::Vector3>("direction")));
+            Convert(_sdf->Get<ignition::math::Vector3d>("direction")));
       }
 
       if (_sdf->HasElement("spot"))
@@ -674,7 +800,8 @@ namespace gazebo
         return result;
       }
 
-        msgs::Set(result.mutable_scale(), _sdf->Get<math::Vector3>("scale"));
+        msgs::Set(result.mutable_scale(),
+            _sdf->Get<ignition::math::Vector3d>("scale"));
 
         result.set_filename(_sdf->Get<std::string>("uri"));
 
@@ -715,7 +842,7 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::BOX);
         msgs::Set(result.mutable_box()->mutable_size(),
-            geomElem->Get<math::Vector3>("size"));
+            geomElem->Get<ignition::math::Vector3d>("size"));
       }
       else if (geomElem->GetName() == "cylinder")
       {
@@ -735,9 +862,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::PLANE);
         msgs::Set(result.mutable_plane()->mutable_normal(),
-            geomElem->Get<math::Vector3>("normal"));
+            geomElem->Get<ignition::math::Vector3d>("normal"));
         msgs::Set(result.mutable_plane()->mutable_size(),
-            geomElem->Get<math::Vector2d>("size"));
+            geomElem->Get<ignition::math::Vector2d>("size"));
       }
       else if (geomElem->GetName() == "polyline")
       {
@@ -750,7 +877,8 @@ namespace gazebo
           sdf::ElementPtr pointElem = polylineElem->GetElement("point");
           while (pointElem)
           {
-             math::Vector2d point = pointElem->Get<math::Vector2d>();
+             ignition::math::Vector2d point =
+               pointElem->Get<ignition::math::Vector2d>();
              pointElem = pointElem->GetNextElement("point");
              msgs::Vector2d *ptMsg = polylineMsg->add_point();
              msgs::Set(ptMsg, point);
@@ -772,9 +900,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::HEIGHTMAP);
         msgs::Set(result.mutable_heightmap()->mutable_size(),
-            geomElem->Get<math::Vector3>("size"));
+            geomElem->Get<ignition::math::Vector3d>("size"));
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
-            geomElem->Get<math::Vector3>("pos"));
+            geomElem->Get<ignition::math::Vector3d>("pos"));
 
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
         while (textureElem)
@@ -915,7 +1043,8 @@ namespace gazebo
       // Set the origin of the visual
       if (_sdf->HasElement("pose"))
       {
-        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
       }
 
       // Set plugins of the visual
@@ -959,7 +1088,8 @@ namespace gazebo
       result.set_damping(dynamicsElem->Get<double>("damping"));
       result.set_friction(dynamicsElem->Get<double>("friction"));
 
-      msgs::Set(result.mutable_xyz(), _sdf->Get<math::Vector3>("xyz"));
+      msgs::Set(result.mutable_xyz(),
+          _sdf->Get<ignition::math::Vector3d>("xyz"));
 
       return result;
     }
@@ -981,9 +1111,12 @@ namespace gazebo
          result.set_child(_sdf->Get<std::string>("child"));
 
       // Pose
-      math::Pose jointPose;
+      ignition::math::Pose3d jointPose;
       if (_sdf->HasElement("pose"))
-        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
+      {
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
+      }
 
       // Type
       std::string type = _sdf->Get<std::string>("type");
@@ -1269,6 +1402,7 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////////
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::Scene result;
@@ -1969,6 +2103,13 @@ namespace gazebo
     void AddBoxLink(Model &_model, const double _mass,
                     const math::Vector3 &_size)
     {
+      AddBoxLink(_model, _mass, _size.Ign());
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddBoxLink(Model &_model, const double _mass,
+                    const ignition::math::Vector3d &_size)
+    {
       Geometry geometry;
       geometry.set_type(Geometry_Type_BOX);
       Set(geometry.mutable_box()->mutable_size(), _size);
@@ -1980,9 +2121,9 @@ namespace gazebo
       auto inertial = link->mutable_inertial();
       inertial->set_mass(_mass);
       {
-        double dx = _size.x;
-        double dy = _size.y;
-        double dz = _size.z;
+        double dx = _size.X();
+        double dy = _size.Y();
+        double dz = _size.Z();
         double ixx = _mass/12.0 * (dy*dy + dz*dz);
         double iyy = _mass/12.0 * (dz*dz + dx*dx);
         double izz = _mass/12.0 * (dx*dx + dy*dy);
