@@ -47,9 +47,6 @@ namespace gazebo
       /// \brief Button for reset view.
       public: QToolButton *resetButton;
 
-      /// \brief Slider to control zoom level.
-      public: QSlider *zoomSlider;
-
       /// \brief Dropdown menu for projection types.
       public: QComboBox *projectionComboBox;
 

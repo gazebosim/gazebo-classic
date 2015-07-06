@@ -16,10 +16,12 @@
 */
 
 #include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Visual.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ViewAngleWidgetPrivate.hh"
 #include "gazebo/gui/ViewAngleWidget.hh"
 
@@ -51,14 +53,6 @@ ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
   this->dataPtr->rightButton->setIconSize(iconSize);
   this->dataPtr->resetButton->setIconSize(iconSize);
 
-  // Zoom
-  this->dataPtr->zoomSlider = new QSlider(Qt::Horizontal, this);
-  this->dataPtr->zoomSlider->setFocusPolicy(Qt::NoFocus);
-  this->dataPtr->zoomSlider->setToolTip("Choose zoom distance");
-  this->dataPtr->zoomSlider->setRange(1, 100);
-  this->dataPtr->zoomSlider->setSliderPosition(40);
-  this->dataPtr->zoomSlider->setEnabled(true);
-
   // Dropdown
   this->dataPtr->projectionComboBox = new QComboBox(this);
   this->dataPtr->projectionComboBox->setMinimumWidth(150);
@@ -69,9 +63,8 @@ ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
 
   // Main layout
   this->dataPtr->mainLayout = new QGridLayout();
-  this->dataPtr->mainLayout->addWidget(this->dataPtr->zoomSlider, 3, 0, 1, 4);
   this->dataPtr->mainLayout->addWidget(this->dataPtr->projectionComboBox,
-      4, 0, 1, 4);
+      3, 0, 1, 4);
   this->setLayout(this->dataPtr->mainLayout);
 
   // Connect the ortho action
@@ -140,24 +133,38 @@ void ViewAngleWidget::Add(const Mode _mode, QAction *_action)
 void ViewAngleWidget::LookDirection(const math::Vector3 &_dir)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-
   if (!cam)
     return;
 
-  // Distance from look at point
-  double dist = this->dataPtr->zoomSlider->sliderPosition();
+  MainWindow *mainWindow = gui::get_main_window();
+  if (!mainWindow)
+    return;
 
-  // Look at world origin
+  GLWidget *glWidget = mainWindow->findChild<GLWidget *>("GLWidget");
+  if (!glWidget)
+    return;
+
+  // Look at world origin unless there are visuals selected
   math::Vector3 lookAt = math::Vector3::Zero;
 
-  // Look at origin of visual in the middle of screen
-  math::Vector2i midScreen2D(cam->GetImageWidth()/2, cam->GetImageHeight()/2);
-  rendering::VisualPtr vis = cam->GetScene()->GetVisualAt(cam, midScreen2D);
-  if (vis && !vis->IsPlane())
-    lookAt = vis->GetWorldPose().pos;
+  // If there are selected visuals, look at their center
+  std::vector<rendering::VisualPtr> selectedVisuals =
+      glWidget->GetSelectedVisuals();
 
-  // Camera will be positioned with respect to that point
-  math::Vector3 camPos = lookAt - _dir * dist;
+  if (!selectedVisuals.empty())
+  {
+    for (auto &vis : selectedVisuals)
+    {
+      lookAt += vis->GetWorldPose().pos;
+    }
+    lookAt /= selectedVisuals.size();
+  }
+
+  // Keep current distance to look target
+  double distance = fabs((cam->GetWorldPose().pos - lookAt).GetLength());
+
+  // Calculate camera position
+  math::Vector3 camPos = lookAt - _dir * distance;
 
   // Calculate camera orientation
   double roll = 0;
@@ -223,8 +230,6 @@ void ViewAngleWidget::OnPerspective()
   this->dataPtr->projectionComboBox->blockSignals(true);
   this->dataPtr->projectionComboBox->setCurrentIndex(0);
   this->dataPtr->projectionComboBox->blockSignals(false);
-
-  this->dataPtr->zoomSlider->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
@@ -233,9 +238,6 @@ void ViewAngleWidget::OnOrtho()
   this->dataPtr->projectionComboBox->blockSignals(true);
   this->dataPtr->projectionComboBox->setCurrentIndex(1);
   this->dataPtr->projectionComboBox->blockSignals(false);
-
-  // Disable slider because zoom is not working for ortho
-  this->dataPtr->zoomSlider->setEnabled(false);
 }
 
 /////////////////////////////////////////////////
@@ -245,24 +247,5 @@ void ViewAngleWidget::OnProjection(int _index)
     g_cameraPerspectiveAct->trigger();
   else if (_index == 1)
     g_cameraOrthoAct->trigger();
-}
-
-/////////////////////////////////////////////////
-void ViewAngleWidget::showEvent(QShowEvent */*_event*/)
-{
-  // Update slider with current zoom level the moment the widget is opened
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-
-  if (!cam)
-    return;
-
-  math::Vector2i midScreen2D(cam->GetImageWidth()/2, cam->GetImageHeight()/2);
-
-  math::Vector3 midScreen3D;
-  cam->GetScene()->GetFirstContact(cam, midScreen2D, midScreen3D);
-
-  double camDist  = fabs((cam->GetWorldPosition() - midScreen3D).GetLength());
-
-  this->dataPtr->zoomSlider->setSliderPosition(camDist);
 }
 

@@ -1026,6 +1026,12 @@ void GLWidget::OnOrbit()
 }
 
 /////////////////////////////////////////////////
+std::vector<rendering::VisualPtr> GLWidget::GetSelectedVisuals() const
+{
+  return this->selectedVisuals;
+}
+
+/////////////////////////////////////////////////
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
   // deselect all if not in multi-selection mode.

@@ -64,7 +64,7 @@ to corrected for position projection errors.
     * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
     * [Issue #1595](https://bitbucket.org/osrf/gazebo/issue/1595)
 
-1. Added ViewAngleWidget, removed hard-coded reset view and removed MainWindow::Reset().
+1. Added ViewAngleWidget, removed hard-coded reset view and removed MainWindow::Reset(). Also added GLWidget::GetSelectedVisuals().
     * [Pull request #1768](https://bitbucket.org/osrf/gazebo/pull-request/1768)
     * [Issue #1507](https://bitbucket.org/osrf/gazebo/issue/1507)
 

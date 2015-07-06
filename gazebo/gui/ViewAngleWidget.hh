@@ -105,10 +105,6 @@ namespace gazebo
       /// \param[in] _dir Direction for the camera to face.
       private: void LookDirection(const math::Vector3 &_dir);
 
-      /// \brief Override Qt showEvent to update slider with current zoom.
-      /// \param[in] _event Show event.
-      private: void showEvent(QShowEvent *_event);
-
       /// \internal
       /// \brief Pointer to private data.
       private: ViewAngleWidgetPrivate *dataPtr;
