@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _LOGPLAY_HH_
-#define _LOGPLAY_HH_
+#ifndef _GAZEBO_LOGPLAY_HH_
+#define _GAZEBO_LOGPLAY_HH_
 
 #include <tinyxml.h>
 
@@ -77,7 +76,7 @@ namespace gazebo
 
       /// \brief Get the random number seed of the open log file.
       /// \return The random number seed the open log file. The current
-      /// random number seed, as defined in math::Rand::GetSeed.
+      /// random number seed, as defined in ignition::math::Rand::Seed.
       public: uint32_t GetRandSeed() const;
 
       /// \brief Get the log start time of the open log file.

@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -33,10 +32,11 @@
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Base64.hh"
-#include "gazebo/math/Rand.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 
@@ -123,7 +123,7 @@ bool LogPlay::HasIterations() const
 /////////////////////////////////////////////////
 void LogPlay::ReadHeader()
 {
-  this->randSeed = math::Rand::GetSeed();
+  this->randSeed = ignition::math::Rand::Seed();
   TiXmlElement *headerXml, *childXml;
 
   this->logVersion.clear();
@@ -165,7 +165,7 @@ void LogPlay::ReadHeader()
     this->randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
 
   /// Set the random number seed for simulation
-  math::Rand::SetSeed(this->randSeed);
+  ignition::math::Rand::Seed(this->randSeed);
 }
 
 /////////////////////////////////////////////////
