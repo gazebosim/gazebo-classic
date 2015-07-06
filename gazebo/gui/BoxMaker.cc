@@ -124,7 +124,7 @@ void BoxMaker::OnMouseMove(const common::MouseEvent &_event)
   math::Vector3 p = msgs::Convert(this->visualMsg->pose().position());
   math::Vector3 scale = msgs::Convert(this->visualMsg->geometry().box().size());
 
-  scale.z = (this->mouseReleasePos.y - _event.pos.y)*0.01;
+  scale.z = (this->mouseReleasePos.y - _event.pos.Y())*0.01;
   if (!_event.shift)
     scale.z = rint(scale.z);
   p.z = scale.z/2.0;
@@ -156,7 +156,7 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1 = this->GetSnappedPoint(p1);
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y , math::Plane(norm), p2))
+        _event.pos.X(), _event.pos.Y() , math::Plane(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;

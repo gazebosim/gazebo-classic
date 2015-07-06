@@ -627,7 +627,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     {
       // Set end point to mouse plane intersection
       math::Vector3 pt;
-      camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
+      camera->GetWorldPointOnPlane(_event.pos.X(), _event.pos.Y(),
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
       {

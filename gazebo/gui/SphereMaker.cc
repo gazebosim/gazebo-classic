@@ -141,7 +141,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1 = this->GetSnappedPoint(p1);
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y, math::Plane(norm), p2))
+        _event.pos.X(), _event.pos.Y(), math::Plane(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;

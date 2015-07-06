@@ -126,7 +126,7 @@ void CylinderMaker::OnMouseMove(const common::MouseEvent &_event)
                   this->visualMsg->pose().position().y(),
                   this->visualMsg->pose().position().z());
 
-  double size = (this->mouseReleasePos.y - _event.pos.y) * 0.01;
+  double size = (this->mouseReleasePos.y - _event.pos.Y()) * 0.01;
   if (!_event.shift)
     size = rint(size);
 
@@ -160,7 +160,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1.Round();
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y, math::Plane(norm), p2))
+        _event.pos.X(), _event.pos.Y(), math::Plane(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;

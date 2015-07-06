@@ -192,7 +192,7 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
     // get the triangle being hovered so that it can be highlighted
     math::Vector3 intersect;
     std::vector<math::Vector3> hoverTriangle;
-    this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
+    this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.X(), _event.pos.Y(),
         vis->GetRootVisual(), intersect, hoverTriangle);
 
     if (!hoverTriangle.empty())
@@ -256,7 +256,8 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     if (!this->dataPtr->selectedVis || (currentParent  == previousParent))
     {
       math::Vector3 intersect;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
+      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.X(),
+          _event.pos.Y(),
           currentParent, intersect, this->dataPtr->selectedTriangle);
 
       if (!this->dataPtr->selectedTriangle.empty())
@@ -275,8 +276,8 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       // select triangle on the target
       math::Vector3 intersect;
       std::vector<math::Vector3> vertices;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          currentParent, intersect, vertices);
+      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.X(),
+          _event.pos.Y(), currentParent, intersect, vertices);
 
       if (!vertices.empty())
       {

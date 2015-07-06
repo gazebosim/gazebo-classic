@@ -113,7 +113,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     {
       math::Vector3 origin, dir;
       this->camera->GetCameraToViewportRay(
-          _event.pressPos.x, _event.pressPos.y, origin, dir);
+          _event.pressPos.X(), _event.pressPos.Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }
 
@@ -201,7 +201,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     {
       math::Vector3 origin, dir;
       this->camera->GetCameraToViewportRay(
-          _event.pos.x, _event.pos.y, origin, dir);
+          _event.pos.X(), _event.pos.Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }
 
@@ -216,7 +216,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
     // This assumes that _event.scroll.y is -1 or +1
     double zoomFactor = 10;
-    double amount = 1.0 + _event.scroll.y * factor * _event.moveScale
+    double amount = 1.0 + _event.scroll.Y() * factor * _event.moveScale
         * zoomFactor;
     this->Zoom(amount, _event.pos);
   }

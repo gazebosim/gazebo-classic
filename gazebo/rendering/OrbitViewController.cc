@@ -165,7 +165,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     {
       math::Vector3 origin, dir;
       this->camera->GetCameraToViewportRay(
-          _event.pressPos.x, _event.pressPos.y, origin, dir);
+          _event.pressPos.X(), _event.pressPos.Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }
 
@@ -264,7 +264,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     {
       math::Vector3 origin, dir;
       this->camera->GetCameraToViewportRay(
-          _event.pos.x, _event.pos.y, origin, dir);
+          _event.pos.X(), _event.pos.Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }
 
@@ -278,7 +278,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
       factor *= 2;
 
     // This assumes that _event.scroll.y is -1 or +1
-    this->Zoom(-(_event.scroll.y * factor) * _event.moveScale *
+    this->Zoom(-(_event.scroll.Y() * factor) * _event.moveScale *
                (this->distance / 5.0));
   }
   else

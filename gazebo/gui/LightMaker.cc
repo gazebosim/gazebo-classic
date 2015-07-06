@@ -182,7 +182,7 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
   math::Vector3 origin1, dir1, p1;
 
   // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+  this->camera->GetCameraToViewportRay(_event.pos.X(), _event.pos.Y(),
                                        origin1, dir1);
 
   // Compute the distance from the camera to plane of translation

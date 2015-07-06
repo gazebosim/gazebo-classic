@@ -616,7 +616,7 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.scroll.y = _event->delta() > 0 ? -1 : 1;
+  this->mouseEvent.scroll.Y() = _event->delta() > 0 ? -1 : 1;
   this->mouseEvent.type = common::MouseEvent::SCROLL;
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
     common::MouseEvent::LEFT : 0x0;

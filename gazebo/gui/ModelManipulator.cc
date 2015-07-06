@@ -135,14 +135,14 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 
   math::Vector3 pressPoint;
   this->dataPtr->userCamera->GetWorldPointOnPlane(
-      this->dataPtr->mouseEvent.pressPos.x,
-      this->dataPtr->mouseEvent.pressPos.y,
+      this->dataPtr->mouseEvent.pressPos.X(),
+      this->dataPtr->mouseEvent.pressPos.Y(),
       math::Plane(normal, offset), pressPoint);
 
   math::Vector3 newPoint;
   this->dataPtr->userCamera->GetWorldPointOnPlane(
-      this->dataPtr->mouseEvent.pos.x,
-      this->dataPtr->mouseEvent.pos.y,
+      this->dataPtr->mouseEvent.pos.X(),
+      this->dataPtr->mouseEvent.pos.Y(),
       math::Plane(normal, offset), newPoint);
 
   math::Vector3 v1 = pressPoint - this->dataPtr->mouseMoveVisStartPose.pos;
@@ -178,7 +178,7 @@ math::Vector3 ModelManipulator::GetMousePositionOnPlane(
   math::Vector3 origin1, dir1, p1;
 
   // Cast ray from the camera into the world
-  _camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+  _camera->GetCameraToViewportRay(_event.pos.X(), _event.pos.Y(),
       origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
@@ -324,8 +324,9 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
     const math::Vector3 &_axis, bool _local) const
 {
   return GetMouseMoveDistance(this->dataPtr->userCamera,
-      this->dataPtr->mouseStart, math::Vector2i(this->dataPtr->mouseEvent.pos.x,
-      this->dataPtr->mouseEvent.pos.y), _pose, _axis, _local);
+      this->dataPtr->mouseStart,
+      math::Vector2i(this->dataPtr->mouseEvent.pos.X(),
+      this->dataPtr->mouseEvent.pos.Y()), _pose, _axis, _local);
 }
 
 /////////////////////////////////////////////////
