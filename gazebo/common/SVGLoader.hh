@@ -47,13 +47,19 @@ namespace gazebo
     };
 
     /// \brief SVG command data structure
-    struct GZ_COMMON_VISIBLE SVGCommand
+    class GZ_COMMON_VISIBLE SVGCommand
     {
+      /// \brief Constructor
+      public: SVGCommand() : cmd(' ') {}
+
+      /// \brief Destructor
+      public: virtual ~SVGCommand() = default;
+
       /// \brief A letter that describe the segment
-      char cmd;  // cppcheck style error is a false positive
+      public: char cmd;
 
       /// \brief Coordinates for the command
-      std::vector<double> numbers;
+      public: std::vector<double> numbers;
     };
 
     /// \brief An SVG path element data structure

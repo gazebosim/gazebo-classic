@@ -895,10 +895,10 @@ void SVGLoader::PathsToClosedPolylines(
     std::vector<ignition::math::Vector2d> vecs;
     for (auto const &v : open)
       vecs.push_back(v.Ign());
-    open.push_back(vecs);
+    openPolys.push_back(vecs);
   }
 
-  this->PathsToClosedPolylines(_paths, _tol, _closedPolys, _openPolys);
+  PathsToClosedPolylines(_paths, _tol, closedPolys, openPolys);
 }
 
 /////////////////////////////////////////////////
