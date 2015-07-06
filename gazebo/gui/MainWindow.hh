@@ -288,7 +288,7 @@ namespace gazebo
       private: ModelListWidget *modelListWidget;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr worldControlPub;
+      private: transport::PublisherPtr worldControlPub, logPlaybackPub;
       private: transport::PublisherPtr serverControlPub;
       private: transport::PublisherPtr requestPub;
       private: transport::PublisherPtr scenePub;

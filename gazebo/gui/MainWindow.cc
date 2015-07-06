@@ -287,6 +287,8 @@ void MainWindow::Init()
 
   this->worldControlPub =
     this->node->Advertise<msgs::WorldControl>("~/world_control");
+  this->logPlaybackPub =
+    this->node->Advertise<msgs::LogPlaybackControl>("~/playback_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
   this->scenePub =
@@ -609,10 +611,20 @@ void MainWindow::Pause()
 /////////////////////////////////////////////////
 void MainWindow::Step()
 {
-  msgs::WorldControl msg;
-  msg.set_multi_step(this->inputStepSize);
+  msgs::LogPlaybackControl msg;
 
-  this->worldControlPub->Publish(msg);
+  int steps;
+  std::cout << "Number of steps: ";
+  std::cin >> steps;
+  std::cout << std::endl;
+  std::cout << "\t(sending " << steps << " steps)" << std::endl;
+
+  //msg.set_multi_step(steps);
+  msg.mutable_seek()->set_sec(30);
+  msg.mutable_seek()->set_nsec(0);
+  //msg.set_rewind(true);
+
+  this->logPlaybackPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
