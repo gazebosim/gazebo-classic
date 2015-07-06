@@ -3,6 +3,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   axis.proto
+  battery.proto
   boxgeom.proto
   camerasensor.proto
   camera_cmd.proto

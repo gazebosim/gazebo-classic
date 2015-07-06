@@ -46,6 +46,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Battery.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -221,6 +222,13 @@ void Link::Load(sdf::ElementPtr _sdf)
   }
 #endif
 
+  if (this->sdf->HasElement("battery"))
+  {
+    this->battery.reset(new Battery(
+        boost::static_pointer_cast<Link>(shared_from_this())));
+    this->battery->Load(_sdf->GetElement("battery"));
+  }
+
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Link::Update, this, _1)));
 
@@ -253,6 +261,9 @@ void Link::Init()
     }
   }
 
+  if (this->battery)
+    this->battery->Init();
+
   this->initialized = true;
 }
 
@@ -263,6 +274,7 @@ void Link::Fini()
   this->childJoints.clear();
   this->collisions.clear();
   this->inertial.reset();
+  this->battery.reset();
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
        iter != this->sensors.end(); ++iter)
@@ -372,6 +384,23 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
         collision->UpdateParameters(collisionElem);
       collisionElem = collisionElem->GetNextElement("collision");
     }
+  }
+
+  if (this->sdf->HasElement("battery"))
+  {
+    sdf::ElementPtr batteryElem = this->sdf->GetElement("battery");
+    if (this->battery)
+      this->battery->UpdateParameters(batteryElem);
+    else
+    {
+      this->battery.reset(new Battery(
+          boost::static_pointer_cast<Link>(shared_from_this())));
+      this->battery->Load(batteryElem);
+    }
+  }
+  else if (this->battery)
+  {
+    this->battery.reset();
   }
 }
 
@@ -846,6 +875,11 @@ void Link::FillMsg(msgs::Link &_msg)
 
   if (this->IsCanonicalLink())
     _msg.set_canonical(true);
+
+  if (this->battery)
+  {
+    _msg.mutable_battery()->set_voltage(this->battery->GetVoltage());
+  }
 }
 
 //////////////////////////////////////////////////

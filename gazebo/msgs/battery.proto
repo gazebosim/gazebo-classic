@@ -1,0 +1,10 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Battery
+/// \brief Message for a battery
+
+message Battery
+{
+  required double voltage = 1;
+}

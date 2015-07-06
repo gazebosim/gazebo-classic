@@ -56,6 +56,7 @@ namespace gazebo
   {
     class Model;
     class Collision;
+    class Battery;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -554,6 +555,10 @@ namespace gazebo
         const LinkPtr &_originalParentLink,
         Link_V &_connectedLinks, bool _fistLink = false);
 
+      /// \brief Get the battery of the link.
+      /// \return Battery of the link.
+      public: BatteryPtr GetBattery() const {return this->battery;}
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 
@@ -660,6 +665,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the wrenchMsgs variable.
       private: boost::mutex wrenchMsgMutex;
+
+      /// \brief Battery properties of the link.
+      private: BatteryPtr battery;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
