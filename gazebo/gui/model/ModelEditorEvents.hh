@@ -350,7 +350,7 @@ namespace gazebo
         /// third is the parent link's name, the fourth is the child link's
         /// name. All names scoped.
         public: static event::EventT<void (std::string, std::string,
-            std::string, std::string)> jointInserted;
+            std::string, std::string, std::string)> jointInserted;
 
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
