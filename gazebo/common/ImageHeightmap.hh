@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _IMAGE_HEIGHTMAP_DATA_HH_
-#define _IMAGE_HEIGHTMAP_DATA_HH_
+#ifndef _GAZEBO_IMAGE_HEIGHTMAP_DATA_HH_
+#define _GAZEBO_IMAGE_HEIGHTMAP_DATA_HH_
 
 #include <string>
 #include <vector>
