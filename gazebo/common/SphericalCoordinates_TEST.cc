@@ -120,7 +120,8 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
 
   {
     // Parameters
-    ignition::math::Angle lat(0.3), lon(-1.2), heading(ignition::math::Angle::HalfPi);
+    ignition::math::Angle lat(0.3), lon(-1.2),
+      heading(ignition::math::Angle::HalfPi);
     double elev = 354.1;
     common::SphericalCoordinates sc(st, lat, lon, elev, heading);
 
