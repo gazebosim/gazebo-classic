@@ -66,10 +66,12 @@ namespace gazebo
       /// \brief Add an edge to the scene in the widget
       /// \param[in] _id Unique id of edge.
       /// \param[in] _name Name of edge.
+      /// \param[in] _name Type of edge.
       /// \param[in] _parent Name of parent node.
       /// \param[in] _child Name of child node.
       public: void AddEdge(const std::string &_id, const std::string &_name,
-          const std::string &_parent, const std::string &_child);
+          const std::string &_type, const std::string &_parent,
+          const std::string &_child);
 
       /// \brief Remove an edge from the scene in the widget
       /// \param[in] _id Unique id of edge.

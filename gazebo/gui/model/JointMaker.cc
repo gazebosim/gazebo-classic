@@ -43,6 +43,7 @@ using namespace gazebo;
 using namespace gui;
 
 std::map<JointMaker::JointType, std::string> JointMaker::jointTypes;
+std::map<JointMaker::JointType, std::string> JointMaker::jointMaterials;
 
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
@@ -65,7 +66,6 @@ JointMaker::JointMaker()
   this->jointMaterials[JOINT_SCREW]     = "Gazebo/Black";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
-
 
   jointTypes[JOINT_FIXED]     = "fixed";
   jointTypes[JOINT_HINGE]     = "revolute";
@@ -540,6 +540,16 @@ JointMaker::JointType JointMaker::ConvertJointType(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
+std::string JointMaker::GetJointMaterial(const std::string &_type)
+{
+  auto it = jointMaterials.find(ConvertJointType(_type));
+  if (it != jointMaterials.end())
+    return it->second;
+  else
+    return "";
+}
+
+/////////////////////////////////////////////////
 void JointMaker::AddJoint(const std::string &_type)
 {
   this->AddJoint(this->ConvertJointType(_type));
@@ -791,8 +801,8 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   std::string parentName = _joint->parent->GetName();
   std::string childName = _joint->child->GetName();
 
-  gui::model::Events::jointInserted(jointId, _joint->name, parentName,
-      childName);
+  gui::model::Events::jointInserted(jointId, _joint->name,
+      jointTypes[_joint->type], parentName, childName);
 
   /// for nested model
   bool nested = false;
@@ -810,7 +820,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   if (nested)
   {
     gui::model::Events::jointInserted(jointId +"_nested", _joint->name,
-        parentName, childName);
+        jointTypes[_joint->type], parentName, childName);
   }
 }
 
