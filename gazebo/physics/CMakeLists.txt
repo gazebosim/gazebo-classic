@@ -1,9 +1,17 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
+
+link_directories(
+  ${CCD_LIBRARY_DIRS}
+  ${Boost_LIBRARY_DIRS}
+)
+
 add_subdirectory(ode)
 
 if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
+
 if (HAVE_DART)
   add_subdirectory(dart)
 endif()
@@ -26,7 +34,7 @@ if (WIN32)
 endif()
 
 
-set (sources
+set (sources ${sources}
   Actor.cc
   Base.cc
   BoxShape.cc
@@ -66,7 +74,7 @@ set (sources
   WorldState.cc
 )
 
-set (headers
+set (headers ${headers}
   Actor.hh
   BallJoint.hh
   Base.hh
@@ -127,20 +135,9 @@ gz_add_library(gazebo_physics ${sources})
 target_link_libraries(gazebo_physics
   gazebo_common
   gazebo_util
-  gazebo_physics_ode
+  gazebo_ode
+  gazebo_opcode
 )
-
-if (HAVE_BULLET)
-  target_link_libraries(gazebo_physics gazebo_physics_bullet)
-endif()
-
-if (HAVE_DART)
-  target_link_libraries(gazebo_physics gazebo_physics_dart)
-endif()
-
-if (HAVE_SIMBODY)
-  target_link_libraries(gazebo_physics gazebo_physics_simbody)
-endif()
 
 if (HAVE_GDAL)
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
@@ -150,7 +147,7 @@ gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
 # unit tests
-set (gtest_sources
+set (gtest_sources ${gtest_sources}
   BoxShape_TEST.cc
   ContactManager_TEST.cc
   CylinderShape_TEST.cc

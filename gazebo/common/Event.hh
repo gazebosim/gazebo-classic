@@ -134,7 +134,7 @@ namespace gazebo
     /// \internal
     // Private data members for EventT<T> class.
     template< typename T>
-    class GZ_COMMON_VISIBLE EventTPrivate : public EventPrivate
+    class EventTPrivate : public EventPrivate
     {
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
@@ -151,7 +151,7 @@ namespace gazebo
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.
     template< typename T>
-    class GZ_COMMON_VISIBLE EventT : public Event
+    class EventT : public Event
     {
       /// \brief Constructor.
       public: EventT();

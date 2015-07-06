@@ -30,7 +30,7 @@
 /// \class SingletonT SingletonT.hh common/common.hh
 /// \brief Singleton template class
 template <class T>
-class GZ_COMMON_VISIBLE SingletonT
+class SingletonT
 {
   /// \brief Get an instance of the singleton
   public: static T *Instance()
@@ -57,7 +57,6 @@ class GZ_COMMON_VISIBLE SingletonT
 
 /// \brief Initialization of the singleton instance.
 template <class T>
-GZ_COMMON_VISIBLE
 T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
 /// \}
 

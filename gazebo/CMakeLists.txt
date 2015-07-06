@@ -8,11 +8,13 @@ include_directories(SYSTEM
   ${TBB_INCLUDEDIR}
   ${tinyxml_INCLUDE_DIRS}
 )
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
 
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
+  ${IGNITION-MATH_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
   ${TBB_LIBRARY_DIR}
   ${CURL_LIBDIR}
@@ -42,7 +44,6 @@ add_subdirectory(util)
 add_subdirectory(test)
 
 add_dependencies(gazebo_physics gazebo_msgs)
-add_dependencies(gazebo_physics_ode gazebo_msgs)
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gazebo_rendering gazebo_msgs)
 add_dependencies(gazebo_sensors gazebo_rendering)
@@ -156,3 +157,5 @@ set(headers
   Server.hh
 )
 gz_install_includes("" ${headers})
+
+message (STATUS "\n\n PROTO: ${PROTOBUF_LIBRARY}\n\n")

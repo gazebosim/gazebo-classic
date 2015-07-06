@@ -29,7 +29,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief ODE joint interface
-    class GZ_PHYSICS_ODE_VISIBLE ODEJoint : public Joint
+    class GZ_PHYSICS_VISIBLE ODEJoint : public Joint
     {
       /// \brief internal variables used for implicit damping
       public:  enum CFMMode

@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
+
 set (msgs
   axis.proto
   boxgeom.proto
@@ -121,11 +122,15 @@ gz_build_tests(${msgs_tests_sources})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MSGS -DPROTOBUF_USE_DLLS")
+
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
 target_link_libraries(gazebomsgs_out ${GZ_PROTOBUF_LIBRARY} ${GZ_PROTOBUF_PROTOC_LIBRARY})
 if (UNIX)
   target_link_libraries(gazebomsgs_out pthread)
 endif()
+
+set_target_properties(gazebomsgs_out PROPERTIES COMPILE_DEFINITIONS "PROTOBUF_USE_DLLS")
 
 set (sources msgs.cc MsgFactory.cc)
 set (headers msgs.hh MsgFactory.hh)
@@ -164,6 +169,7 @@ foreach(FIL ${msgs})
     OUTPUT
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
+    COMMAND set "PATH=;${PROTOBUF_SRC_ROOT_FOLDER}/vsprojects/${CMAKE_BUILD_TYPE};%PATH%"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
     ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/${gazebomsgs_out_binary} --cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
     DEPENDS ${ABS_FIL} gazebomsgs_out
@@ -171,7 +177,8 @@ foreach(FIL ${msgs})
     VERBATIM )
 endforeach()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MSGS")
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MSGS -DPROTOBUF_USE_DLLS")
 
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
@@ -192,6 +199,7 @@ target_link_libraries(gazebo_msgs
 )
 
 add_dependencies(gazebo_msgs gazebomsgs_out)
+
 
 set (message_headers "" CACHE INTERNAL "Include dirs description")
 

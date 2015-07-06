@@ -135,8 +135,12 @@ macro (gz_setup_windows)
     set(BUILD_SHARED_LIBS TRUE)
     add_definitions(-DWIN32_LEAN_AND_MEAN)
 
+    set (CMAKE_FIND_LIBRARY_PREFIXES "")
+    set (CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll")
+
     # Need for M_PI constant
     add_definitions(-D_USE_MATH_DEFINES) 
+    # add_definitions(-DPROTOBUF_USE_DLLS) 
 
     # Don't pull in the Windows min/max macros
     add_definitions(-DNOMINMAX) 
