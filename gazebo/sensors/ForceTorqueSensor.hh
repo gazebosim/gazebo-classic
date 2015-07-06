@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _FORCETORQUESENSOR_HH_
-#define _FORCETORQUESENSOR_HH_
+#ifndef _GAZEBO_FORCETORQUESENSOR_HH_
+#define _GAZEBO_FORCETORQUESENSOR_HH_
 
 #include <string>
 
@@ -57,11 +56,23 @@ namespace gazebo
 
       /// \brief Get the current joint torque.
       /// \return The latested measured torque.
-      public: math::Vector3 GetTorque() const;
+      /// \deprecated See Torque() function that returns an
+      /// ignition::math::Vector3d object.
+      public: math::Vector3 GetTorque() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the current joint torque.
+      /// \return The latested measured torque.
+      public: ignition::math::Vector3d Torque() const;
 
       /// \brief Get the current joint force.
       /// \return The latested measured force.
-      public: math::Vector3 GetForce() const;
+      /// \deprecated See Force() function that returns an
+      /// ignition::math::Vector3d object.
+      public: math::Vector3 GetForce() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the current joint force.
+      /// \return The latested measured force.
+      public: ignition::math::Vector3d Force() const;
 
       /// \brief Get Parent Joint
       /// \return Pointer to the joint containing this sensor
@@ -122,7 +133,7 @@ namespace gazebo
       /// \brief Rotation matrix than transforms a vector expressed in child
       ///        orientation in a vector expressed in joint orientation.
       ///        Necessary is the measure is specified in joint frame.
-      private: math::Matrix3 rotationSensorChild;
+      private: ignition::math::Matrix3d rotationSensorChild;
     };
     /// \}
   }

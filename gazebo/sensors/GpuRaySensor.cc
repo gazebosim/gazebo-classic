@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Ray proximity sensor
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
-*/
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -31,8 +26,6 @@
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
-
-#include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/transport.hh"
 
@@ -385,6 +378,12 @@ double GpuRaySensor::GetRangeCountRatio() const
 //////////////////////////////////////////////////
 math::Angle GpuRaySensor::GetAngleMin() const
 {
+  return this->AngleMin();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle GpuRaySensor::AngleMin() const
+{
   return this->horzElem->Get<double>("min_angle");
 }
 
@@ -396,6 +395,12 @@ void GpuRaySensor::SetAngleMin(double _angle)
 
 //////////////////////////////////////////////////
 math::Angle GpuRaySensor::GetAngleMax() const
+{
+  return this->AngleMax();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle GpuRaySensor::AngleMax() const
 {
   return this->horzElem->Get<double>("max_angle");
 }
@@ -472,10 +477,16 @@ int GpuRaySensor::GetVerticalRangeCount() const
 //////////////////////////////////////////////////
 math::Angle GpuRaySensor::GetVerticalAngleMin() const
 {
+  return this->VerticalAngleMin();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle GpuRaySensor::VerticalAngleMin() const
+{
   if (this->scanElem->HasElement("vertical"))
     return this->vertElem->Get<double>("min_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
@@ -488,10 +499,16 @@ void GpuRaySensor::SetVerticalAngleMin(double _angle)
 //////////////////////////////////////////////////
 math::Angle GpuRaySensor::GetVerticalAngleMax() const
 {
+  return this->VerticalAngleMax();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle GpuRaySensor::VerticalAngleMax() const
+{
   if (this->scanElem->HasElement("vertical"))
     return this->vertElem->Get<double>("max_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
@@ -576,7 +593,7 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-      this->pose + this->parentEntity->GetWorldPose());
+      this->pose + this->parentEntity->GetWorldPose().Ign());
   scan->set_angle_min(this->GetAngleMin().Radian());
   scan->set_angle_max(this->GetAngleMax().Radian());
   scan->set_angle_step(this->GetAngleResolution());
@@ -612,10 +629,11 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       else if (this->noises.find(GPU_RAY_NOISE) != this->noises.end())
       {
         range = this->noises[GPU_RAY_NOISE]->Apply(range);
-        range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+        range = ignition::math::clamp(range,
+            this->GetRangeMin(), this->GetRangeMax());
       }
 
-      range = math::isnan(range) ? this->GetRangeMax() : range;
+      range = ignition::math::isnan(range) ? this->GetRangeMax() : range;
 
       if (add)
       {

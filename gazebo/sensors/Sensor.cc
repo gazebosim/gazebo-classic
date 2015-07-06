@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all sensors
- * Author: Nathan Koenig
- * Date: 25 May 2007
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -101,7 +96,7 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->Get<math::Pose>("pose");
+    this->pose = this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
   if (this->sdf->Get<bool>("always_on"))
@@ -292,6 +287,12 @@ bool Sensor::IsActive()
 
 //////////////////////////////////////////////////
 math::Pose Sensor::GetPose() const
+{
+  return this->Pose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Sensor::Pose() const
 {
   return this->pose;
 }

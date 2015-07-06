@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _SENSORTYPES_HH_
-#define _SENSORTYPES_HH_
+#ifndef _GAZEBO_SENSORTYPES_HH_
+#define _GAZEBO_SENSORTYPES_HH_
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
