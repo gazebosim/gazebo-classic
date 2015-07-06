@@ -1,28 +1,9 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-
 link_directories(
   ${CCD_LIBRARY_DIRS}
   ${Boost_LIBRARY_DIRS}
 )
-
-add_subdirectory(ode)
-
-if (HAVE_BULLET)
-  add_subdirectory(bullet)
-endif()
-
-if (HAVE_DART)
-  add_subdirectory(dart)
-endif()
-
-if (HAVE_SIMBODY)
-  add_subdirectory(simbody)
-endif()
-
-if (HAVE_GDAL)
-  include_directories(${GDAL_INCLUDE_DIR})
-endif()
 
 include_directories(${TBB_INCLUDEDIR})
 
@@ -32,7 +13,6 @@ if (WIN32)
   add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
   include_directories(${libdl_include_dir})
 endif()
-
 
 set (sources ${sources}
   Actor.cc
@@ -74,7 +54,7 @@ set (sources ${sources}
   WorldState.cc
 )
 
-set (headers ${headers}
+set (headers
   Actor.hh
   BallJoint.hh
   Base.hh
@@ -139,9 +119,46 @@ target_link_libraries(gazebo_physics
   gazebo_opcode
 )
 
+# Build in ODE by default
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
+add_subdirectory(ode)
+
+# Add Bullet support if present
+if (HAVE_BULLET)
+  add_subdirectory(bullet)
+
+  include_directories(${BULLET_INCLUDE_DIRS})
+  link_directories(${BULLET_LIBRARY_DIRS})
+  add_definitions(${BULLET_CFLAGS})
+  target_link_libraries(gazebo_physics ${BULLET_LIBRARIES})
+endif()
+
+# Add DART support if present
+if (HAVE_DART)
+  add_subdirectory(dart)
+
+  include_directories(${DARTCore_INCLUDE_DIRS})
+  link_directories(${DARTCore_LIBRARY_DIRS})
+  target_link_libraries(gazebo_physics ${DARTCore_LIBRARIES})
+endif()
+
+# Add Simbody support if present
+if (HAVE_SIMBODY)
+  add_subdirectory(simbody)
+
+  include_directories(SYSTEM ${Simbody_INCLUDE_DIR})
+  link_directories(${Simbody_LIB_DIR})
+  add_definitions(${Simbody_CFLAGS})
+
+  target_link_libraries(gazebo_physics ${Simbody_LIBRARIES})
+endif()
+
 if (HAVE_GDAL)
+  include_directories(${GDAL_INCLUDE_DIR})
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
+
+
 
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
