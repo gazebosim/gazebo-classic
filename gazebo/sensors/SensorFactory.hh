@@ -14,14 +14,9 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Factory for creating sensors
- * Author: Andrew Howard
- * Date: 18 May 2003
- */
 
-#ifndef _SENSORFACTORY_HH_
-#define _SENSORFACTORY_HH_
+#ifndef _GAZEBO_SENSORFACTORY_HH_
+#define _GAZEBO_SENSORFACTORY_HH_
 
 #include <string>
 #include <map>
@@ -50,6 +45,7 @@ namespace gazebo
     ///  \li sensors::CameraSensor
     ///  \li sensors::DepthCameraSensor
     ///  \li sensors::GpuRaySensor
+    ///  \li sensors::LogicalCamera
     ///  \li sensors::RaySensor
     ///  \li sensors::ContactSensor
     ///  \li sensors::RFIDSensor
@@ -98,7 +94,4 @@ namespace gazebo
   /// \}
   }
 }
-
 #endif
-
-

@@ -46,6 +46,7 @@ set (msgs
   light.proto
   link.proto
   link_data.proto
+  logical_camera_image.proto
   log_control.proto
   log_playback_control.proto
   log_playback_stats.proto

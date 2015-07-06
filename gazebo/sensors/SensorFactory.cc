@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Factory for creating sensor
- * Author: Andrew Howard
- * Date: 18 May 2003
- */
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -37,6 +32,7 @@ void RegisterMultiCameraSensor();
 void RegisterGpsSensor();
 void RegisterGpuRaySensor();
 void RegisterImuSensor();
+void RegisterLogicalCameraSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
@@ -60,6 +56,7 @@ void SensorFactory::RegisterAll()
   RegisterGpsSensor();
   RegisterGpuRaySensor();
   RegisterImuSensor();
+  RegisterLogicalCameraSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();

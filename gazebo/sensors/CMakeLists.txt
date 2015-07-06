@@ -13,6 +13,7 @@ set (sources
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
+  LogicalCameraSensor.cc
   MultiCameraSensor.cc
   Noise.cc
   RaySensor.cc
@@ -37,6 +38,7 @@ set (headers
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
+  LogicalCameraSensor.hh
   MultiCameraSensor.hh
   Noise.hh
   RaySensor.hh
