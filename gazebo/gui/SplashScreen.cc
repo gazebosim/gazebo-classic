@@ -59,6 +59,7 @@ SplashScreen::SplashScreen()
   this->dataPtr->splashScreen->setFixedSize(pixmap.size());
 
   this->dataPtr->splashScreen->show();
+  this->dataPtr->splashScreen->repaint();
 
   QTimer::singleShot(2000, this, SLOT(Update()));
 }
