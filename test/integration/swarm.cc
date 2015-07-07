@@ -15,9 +15,7 @@
  *
 */
 
-#include <map>
 #include <string>
-#include <vector>
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
@@ -56,12 +54,12 @@ void SwarmTest::FlockingWorld(const std::string &_physicsEngine)
   EXPECT_EQ(world->GetModels().size(), 1002);
 }
 
-TEST_P(PhysicsTest, FlockingWorld)
+TEST_P(SwarmTest, FlockingWorld)
 {
   FlockingWorld(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, SwarmTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
