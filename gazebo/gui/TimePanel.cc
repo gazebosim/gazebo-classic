@@ -80,7 +80,7 @@ TimePanel::TimePanel(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-void TimePanel::OnFullScreen(bool & /*_value*/)
+void TimePanel::OnFullScreen(bool /*_value*/)
 {
   /*if (_value)
     this->hide();
