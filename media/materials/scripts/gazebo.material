@@ -1340,6 +1340,39 @@ material Gazebo/CameraDistortionMap
   }
 }
 
+vertex_program Gazebo/WideLensMapVS glsl
+{
+  source wide_lens_map_vs.glsl
+}
+
+fragment_program Gazebo/WideLensMapFS glsl
+{
+  source wide_lens_map_fp.glsl
+  default_params
+  {
+    param_named RT int 0
+  }
+}
+
+material Gazebo/WideLensMap
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/WideLensMapVS { }
+      fragment_program_ref Gazebo/WideLensMapFS { }
+
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode border
+        filtering linear linear linear
+      }
+    }
+  }
+}
+
 material Gazebo/PointCloud
 {
    technique
