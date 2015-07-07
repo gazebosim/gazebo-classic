@@ -32,6 +32,9 @@ using namespace gui;
 ViewAngleWidget::ViewAngleWidget(QWidget *_parent)
   : QWidget(_parent), dataPtr(new ViewAngleWidgetPrivate)
 {
+  // Keep pointer to main window
+  this->dataPtr->mainWindow = qobject_cast<MainWindow *>(_parent);
+
   // Lateral buttons
   this->dataPtr->topButton = new QToolButton(this);
   this->dataPtr->bottomButton = new QToolButton(this);
@@ -136,11 +139,8 @@ void ViewAngleWidget::LookDirection(const math::Vector3 &_dir)
   if (!cam)
     return;
 
-  MainWindow *mainWindow = gui::get_main_window();
-  if (!mainWindow)
-    return;
-
-  GLWidget *glWidget = mainWindow->findChild<GLWidget *>("GLWidget");
+  GLWidget *glWidget =
+      this->dataPtr->mainWindow->findChild<GLWidget *>("GLWidget");
   if (!glWidget)
     return;
 

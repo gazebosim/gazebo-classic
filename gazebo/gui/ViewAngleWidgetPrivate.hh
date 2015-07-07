@@ -52,6 +52,9 @@ namespace gazebo
 
       /// \brief Main layout.
       public: QGridLayout *mainLayout;
+
+      /// \brief Pointer to the main window.
+      public: MainWindow *mainWindow;
     };
   }
 }

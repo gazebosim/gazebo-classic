@@ -78,20 +78,11 @@ void ViewAngleWidget_TEST::EmptyWorld()
       viewAngleWidget->findChildren<QToolButton *>();
   QVERIFY(buttons.size() == 7u);
 
-  // Get slider
-  QList<QSlider *> sliders =
-      viewAngleWidget->findChildren<QSlider *>();
-  QVERIFY(sliders.size() == 1u);
-
-  // Check that the slider matches the distance
-  QVERIFY(gazebo::math::equal(sliders[0]->sliderPosition(),
-      static_cast<int>(dist)));
-
   // Trigger the top view button
   buttons[0]->click();
 
   // Process some events and draw the screen
-  for (size_t i = 0; i < 100; ++i)
+  for (size_t i = 0; i < 50; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
@@ -107,7 +98,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   buttons[1]->click();
 
   // Process some events and draw the screen
-  for (size_t i = 0; i < 100; ++i)
+  for (size_t i = 0; i < 50; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
@@ -122,7 +113,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   buttons[2]->click();
 
   // Process some events and draw the screen
-  for (size_t i = 0; i < 100; ++i)
+  for (size_t i = 0; i < 50; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
@@ -137,7 +128,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   buttons[3]->click();
 
   // Process some events and draw the screen
-  for (size_t i = 0; i < 100; ++i)
+  for (size_t i = 0; i < 50; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
@@ -152,7 +143,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   buttons[4]->click();
 
   // Process some events and draw the screen
-  for (size_t i = 0; i < 100; ++i)
+  for (size_t i = 0; i < 50; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
@@ -167,7 +158,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   buttons[5]->click();
 
   // Process some events and draw the screen
-  for (size_t i = 0; i < 100; ++i)
+  for (size_t i = 0; i < 50; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
@@ -182,7 +173,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   buttons[6]->click();
 
   // Process some events and draw the screen
-  for (size_t i = 0; i < 100; ++i)
+  for (size_t i = 0; i < 50; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
