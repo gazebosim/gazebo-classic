@@ -145,10 +145,6 @@ dxJointSlider::getInfo1 ( dxJoint::Info1 *info )
             info->m = 6;
         }
     }
-
-    // joint damping
-    if ( use_damping )
-      info->m = 6;
 }
 
 
@@ -247,22 +243,6 @@ dxJointSlider::getInfo2 ( dxJoint::Info2 *info )
 
     // if the slider is powered, or has joint limits, add in the extra row
     limot.addLimot ( this, info, 5, ax1, 0 );
-
-    // joint damping
-    if (this->use_damping)
-    {
-      // added J1ld and J2ld for damping, only 1 row
-      info->J1ld[0] = ax1[0];
-      info->J1ld[1] = ax1[1];
-      info->J1ld[2] = ax1[2];
-      if ( this->node[1].body )
-      {
-        info->J2ld[0] = -ax1[0];
-        info->J2ld[1] = -ax1[1];
-        info->J2ld[2] = -ax1[2];
-      }
-      // there's no rhs for damping setup, all we want to use is the jacobian information above
-    }
 }
 
 
