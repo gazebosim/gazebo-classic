@@ -865,7 +865,7 @@ bool dxReallocateWorldProcessContext (dxWorld *world,
     dxJoint *const *joint;
     context->RetrievePreallocations(islandcount, islandsizes, body, joint, islandreqs);
 
-    if (islandcount > world->island_wmems.size())
+    if (static_cast<size_t>(islandcount) > world->island_wmems.size())
       world->island_wmems.resize(islandcount);
 
     for (int jj = 0; jj < islandcount; jj++)
