@@ -53,6 +53,7 @@ set (sources
   VideoVisual.cc
   ViewController.cc
   Visual.cc
+  WideAngleCamera.cc
   WireBox.cc
   WindowManager.cc
   WrenchVisual.cc
@@ -99,6 +100,7 @@ set (headers
   VideoVisual.hh
   ViewController.hh
   Visual.hh
+  WideAngleCamera.hh
   WireBox.hh
   WindowManager.hh
   WrenchVisual.hh
