@@ -904,6 +904,21 @@ void MainWindow::ShowInertia()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowLinkFrame()
+{
+  if (g_showLinkFrameAct->isChecked())
+  {
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_link_frame", "all");
+  }
+  else
+  {
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_link_frame", "all");
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowContacts()
 {
   if (g_showContactsAct->isChecked())
@@ -1245,6 +1260,13 @@ void MainWindow::CreateActions()
   connect(g_showInertiaAct, SIGNAL(triggered()), this,
       SLOT(ShowInertia()));
 
+  g_showLinkFrameAct = new QAction(tr("Link Frames"), this);
+  g_showLinkFrameAct->setStatusTip(tr("Show link frames"));
+  g_showLinkFrameAct->setCheckable(true);
+  g_showLinkFrameAct->setChecked(false);
+  connect(g_showLinkFrameAct, SIGNAL(triggered()), this,
+      SLOT(ShowLinkFrame()));
+
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
   g_showContactsAct->setCheckable(true);
@@ -1584,6 +1606,9 @@ void MainWindow::DeleteActions()
   delete g_showInertiaAct;
   g_showInertiaAct = 0;
 
+  delete g_showLinkFrameAct;
+  g_showLinkFrameAct = 0;
+
   delete g_showContactsAct;
   g_showContactsAct = 0;
 
@@ -1684,6 +1709,7 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCOMAct);
   viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
+  viewMenu->addAction(g_showLinkFrameAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
