@@ -225,8 +225,8 @@ TEST_F(OpenAL, SourceVelPose)
   EXPECT_TRUE(source != NULL);
 
   EXPECT_FALSE(source->GetOnContact());
-  EXPECT_TRUE(source->SetVelocity(math::Vector3(1, 1, 1)));
-  EXPECT_TRUE(source->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
+  EXPECT_TRUE(source->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
+  EXPECT_TRUE(source->SetPose(ignition::math::Pose3d(1, 1, 1, 0, 0, 0)));
 }
 
 /////////////////////////////////////////////////
@@ -304,12 +304,12 @@ TEST_F(OpenAL, SinkVelPose)
   sink = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
   EXPECT_TRUE(sink != NULL);
 
-  EXPECT_FALSE(sink->SetVelocity(math::Vector3(1, 1, 1)));
-  EXPECT_FALSE(sink->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
+  EXPECT_FALSE(sink->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
+  EXPECT_FALSE(sink->SetPose(ignition::math::Pose3d(1, 1, 1, 0, 0, 0)));
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
-  EXPECT_TRUE(sink->SetVelocity(math::Vector3(1, 1, 1)));
-  EXPECT_TRUE(sink->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
+  EXPECT_TRUE(sink->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
+  EXPECT_TRUE(sink->SetPose(ignition::math::Pose3d(1, 1, 1, 0, 0, 0)));
 }
 #endif
 
