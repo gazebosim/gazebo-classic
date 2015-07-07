@@ -29,7 +29,7 @@ FrictionPyramid::FrictionPyramid()
   this->mu[0] = 1.0;
   this->mu[1] = 1.0;
   this->mu[2] = 1.0;
-  this->torsionalPatchRadius = 0.0;
+  this->patchRadius = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -56,9 +56,21 @@ double FrictionPyramid::GetMuTorsion()
 }
 
 //////////////////////////////////////////////////
-double FrictionPyramid::GetTorsionalPatchRadius()
+double FrictionPyramid::GetPatchRadius()
 {
-  return this->torsionalPatchRadius;
+  return this->patchRadius;
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::GetCurvatureRadius()
+{
+  return this->curvatureRadius;
+}
+
+//////////////////////////////////////////////////
+bool FrictionPyramid::GetUseCurvature()
+{
+  return this->useCurvature;
 }
 
 //////////////////////////////////////////////////
@@ -80,9 +92,21 @@ void FrictionPyramid::SetMuTorsion(double _mu)
 }
 
 //////////////////////////////////////////////////
-void FrictionPyramid::SetTorsionalPatchRadius(double _radius)
+void FrictionPyramid::SetPatchRadius(double _radius)
 {
-  this->torsionalPatchRadius = _radius;
+  this->patchRadius = _radius;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetCurvatureRadius(double _radius)
+{
+  this->curvatureRadius = _radius;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetUseCurvature(bool _use)
+{
+  this->useCurvature = _use;
 }
 
 //////////////////////////////////////////////////

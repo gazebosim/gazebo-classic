@@ -62,9 +62,10 @@ typedef struct dSurfaceParameters {
   dReal bounce_vel;
   dReal soft_erp;
   dReal soft_cfm;
-  dReal motion1,motion2,motion3,motionN;
+  dReal motion1,motion2,motionN;
   dReal slip1,slip2,slip3;
-  dReal torsional_patch_radius;
+  dReal patch_radius, curvature_radius;
+  bool  use_curvature;
 } dSurfaceParameters;
 
 

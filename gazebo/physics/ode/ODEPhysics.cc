@@ -1058,9 +1058,15 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                  surf2->GetFrictionPyramid()->GetMuSecondary());
   contact.surface.mu3 = std::min(surf1->GetFrictionPyramid()->GetMuTorsion(),
                                  surf2->GetFrictionPyramid()->GetMuTorsion());
-  contact.surface.torsional_patch_radius =
-      std::max(surf1->GetFrictionPyramid()->GetTorsionalPatchRadius(),
-               surf2->GetFrictionPyramid()->GetTorsionalPatchRadius());
+  contact.surface.patch_radius =
+      std::max(surf1->GetFrictionPyramid()->GetPatchRadius(),
+               surf2->GetFrictionPyramid()->GetPatchRadius());
+  contact.surface.curvature_radius =
+      std::max(surf1->GetFrictionPyramid()->GetCurvatureRadius(),
+               surf2->GetFrictionPyramid()->GetCurvatureRadius());
+  contact.surface.use_curvature =
+      surf1->GetFrictionPyramid()->GetUseCurvature() &&
+      surf2->GetFrictionPyramid()->GetUseCurvature();
 
   // Set the slip values
   contact.surface.slip1 = std::min(surf1->slip1,

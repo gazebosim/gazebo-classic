@@ -16,6 +16,8 @@ message Friction
   optional double   slip2  = 5;
   optional double   mu3    = 6;
   optional double   slip3  = 7;
-  optional double   torsional_patch_radius  = 8;
+  optional double   patch_radius     = 8;
+  optional double   curvature_radius = 9;
+  optional bool     use_curvature    = 10;
 }
 
