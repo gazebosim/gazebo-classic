@@ -32,7 +32,6 @@
 
 #include <sdf/sdf.hh>
 
-#include <climits>
 #include <deque>
 #include <list>
 #include <set>
@@ -126,7 +125,6 @@ World::World(const std::string &_name)
   this->dataPtr->logThread = NULL;
   this->dataPtr->stop = false;
   this->dataPtr->seekPending = false;
-  this->dataPtr->forwardPending = false;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
@@ -552,7 +550,6 @@ void World::LogStep()
     {
       // There are no more chunks, time to exit.
       this->SetPaused(true);
-      this->dataPtr->forwardPending = false;
       this->dataPtr->stepInc = 0;
       break;
     }
@@ -628,11 +625,8 @@ void World::LogStep()
 
     // We only run one step if we are in play mode and we don't have
     // other pending commands.
-    if (!this->IsPaused() && !this->dataPtr->seekPending &&
-        !this->dataPtr->forwardPending)
-    {
+    if (!this->IsPaused() && !this->dataPtr->seekPending)
       break;
-    }
   }
 
   this->PublishWorldStats();
@@ -1105,7 +1099,7 @@ void World::Reset()
   this->SetPaused(true);
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     math::Rand::SetSeed(math::Rand::GetSeed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
@@ -1196,7 +1190,7 @@ void World::SetPaused(bool _p)
     return;
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->pause = _p;
   }
 
@@ -1271,10 +1265,10 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
-  boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
 
   // Ignore this command if there's another one pending.
-  if (this->dataPtr->seekPending || this->dataPtr->forwardPending)
+  if (this->dataPtr->seekPending)
     return;
 
   if (_data->has_pause())
@@ -1304,9 +1298,10 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 
   if (_data->has_forward() && _data->forward())
   {
-    this->SetPaused(true);
-    this->dataPtr->stepInc = INT_MAX;
-    this->dataPtr->forwardPending = true;
+    this->dataPtr->targetSimTime = util::LogPlay::Instance()->GetLogEndTime();
+    if (this->GetSimTime() > this->dataPtr->targetSimTime)
+      util::LogPlay::Instance()->Rewind();
+    this->dataPtr->seekPending = true;
   }
 }
 
