@@ -124,6 +124,7 @@ World::World(const std::string &_name)
   this->dataPtr->thread = NULL;
   this->dataPtr->logThread = NULL;
   this->dataPtr->stop = false;
+  this->dataPtr->seekPending = false;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
@@ -495,11 +496,10 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
+  bool stay;
+
   if (this->dataPtr->stepInc < 0)
   {
-    this->dataPtr->logNextIteration =
-        util::LogPlay::Instance()->GetInitialIterations();
-
     // Step back: This is implemented by going to the beginning of the log file,
     // and then, step forward up to the target frame.
     // ToDo: Use keyframes in the log file to speed up this process.
@@ -519,7 +519,7 @@ void World::LogStep()
     if (util::LogPlay::Instance()->HasIterations())
     {
       this->dataPtr->stepInc +=
-        1 - util::LogPlay::Instance()->GetInitialIterations();
+        2 - util::LogPlay::Instance()->GetInitialIterations();
     }
 
     if (this->dataPtr->stepInc < 1)
@@ -527,62 +527,47 @@ void World::LogStep()
     this->dataPtr->iterations = 0;
   }
 
-  // If less than initial, set it to right before initial so the step goes there
-  if (this->dataPtr->iterations <
-      util::LogPlay::Instance()->GetInitialIterations())
   {
-    this->dataPtr->iterations =
-        util::LogPlay::Instance()->GetInitialIterations() - 1;
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+    // There are two main reasons to keep iterating in the following loop:
+    //   1. If "stepInc" is positive: This means that a client requested to
+    //      advanced the simulation some steps.
+    //   2. If "seekPending" is true: This means that a client requested to
+    //      advance the simulation to a given simulation time ("seek"). We will
+    //      have to check at the end of each iteration if we reached the target
+    //      simulation time.
+    //   Note that if the simulation is not paused (play mode) we will enter
+    //   the loop. However, the code will only execute one iteration (one step).
+    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
+           this->dataPtr->seekPending;
   }
-
-  while (!this->IsPaused() || this->dataPtr->stepInc > 0)
+  while (stay)
   {
-    // Step log when previous iteration has already been processed
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+
     std::string data;
-    if (this->dataPtr->stepToNextChunk)
+    if (!util::LogPlay::Instance()->Step(data))
     {
-      if (!util::LogPlay::Instance()->Step(data))
-      {
-        // There are no more chunks, time to exit.
-        this->SetPaused(true);
-        this->dataPtr->stepInc = 0;
-        break;
-      }
-      else
-      {
-        // Update state with next chunk
-        this->dataPtr->logPlayStateSDF->ClearElements();
-        sdf::readString(data, this->dataPtr->logPlayStateSDF);
-
-        this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
-        this->dataPtr->logNextIteration =
-            this->dataPtr->logPlayState.GetIterations();
-
-        // If the log file does not contain iterations we have to manually
-        // increase the iteration counter in logPlayState.
-        if (!util::LogPlay::Instance()->HasIterations())
-        {
-          this->dataPtr->logPlayState.SetIterations(
-            this->dataPtr->iterations + 1);
-        }
-      }
+      // There are no more chunks, time to exit.
+      this->SetPaused(true);
+      this->dataPtr->stepInc = 0;
+      break;
     }
-
-    // Process current chunk if we match the following iteration
-    this->dataPtr->processCurrentChunk = this->dataPtr->logNextIteration ==
-        this->dataPtr->iterations + 1;
-
-    // If next step is too far, don't use it yet and increase state by 1 iter
-    if (!this->dataPtr->processCurrentChunk || !this->dataPtr->stepToNextChunk)
+    else
     {
-      this->dataPtr->logPlayState.SetIterations(this->dataPtr->iterations + 1);
-      // TODO: Record step size on log and use it here
-      this->dataPtr->logPlayState.SetSimTime(this->dataPtr->simTime +
-          common::Time::Millisecond);
-    }
+      this->dataPtr->logPlayStateSDF->ClearElements();
+      sdf::readString(data, this->dataPtr->logPlayStateSDF);
 
-    if (this->dataPtr->processCurrentChunk)
-    {
+      this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
+
+      // If the log file does not contain iterations we have to manually
+      // increase the iteration counter in logPlayState.
+      if (!util::LogPlay::Instance()->HasIterations())
+      {
+        this->dataPtr->logPlayState.SetIterations(
+          this->dataPtr->iterations + 1);
+      }
+
       // Process insertions
       if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
       {
@@ -617,21 +602,30 @@ void World::LogStep()
           nameElem = nameElem->GetNextElement("name");
         }
       }
+
+      this->SetState(this->dataPtr->logPlayState);
+      this->Update();
     }
-
-    // If next available step is too far, don't go to the next chunk yet
-    this->dataPtr->stepToNextChunk = !(this->dataPtr->logNextIteration >
-          this->dataPtr->iterations + 1);
-
-    this->SetState(this->dataPtr->logPlayState);
-    this->Update();
-
 
     if (this->dataPtr->stepInc > 0)
       this->dataPtr->stepInc--;
 
-    // We only run one step if we are in play mode.
-    if (!this->IsPaused())
+    // We may have entered into the loop because a "seek" command was
+    // requested. At this point we have executed one more step. Now, it's time
+    // to check if we have reached the target simulation time specified in the
+    // "seek" command.
+    if (this->dataPtr->seekPending)
+    {
+      this->dataPtr->seekPending =
+        this->GetSimTime() < this->dataPtr->targetSimTime;
+    }
+
+    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
+           this->dataPtr->seekPending;
+
+    // We only run one step if we are in play mode and we don't have
+    // other pending commands.
+    if (!this->IsPaused() && !this->dataPtr->seekPending)
       break;
   }
 
@@ -1105,7 +1099,7 @@ void World::Reset()
   this->SetPaused(true);
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     math::Rand::SetSeed(math::Rand::GetSeed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
@@ -1196,7 +1190,7 @@ void World::SetPaused(bool _p)
     return;
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->pause = _p;
   }
 
@@ -1271,6 +1265,12 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
+
+  // Ignore this command if there's another one pending.
+  if (this->dataPtr->seekPending)
+    return;
+
   if (_data->has_pause())
     this->SetPaused(_data->pause());
 
@@ -1279,8 +1279,29 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     // stepWorld is a blocking call so set stepInc directly so that world stats
     // will still be published
     this->SetPaused(true);
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->stepInc += _data->multi_step();
+  }
+
+  if (_data->has_seek())
+  {
+    this->dataPtr->targetSimTime = msgs::Convert(_data->seek());
+    if (this->GetSimTime() > this->dataPtr->targetSimTime)
+      util::LogPlay::Instance()->Rewind();
+    this->dataPtr->seekPending = true;
+  }
+
+  if (_data->has_rewind() && _data->rewind())
+  {
+    util::LogPlay::Instance()->Rewind();
+    this->dataPtr->stepInc = 1;
+  }
+
+  if (_data->has_forward() && _data->forward())
+  {
+    this->dataPtr->targetSimTime = util::LogPlay::Instance()->GetLogEndTime();
+    if (this->GetSimTime() > this->dataPtr->targetSimTime)
+      util::LogPlay::Instance()->Rewind();
+    this->dataPtr->seekPending = true;
   }
 }
 
