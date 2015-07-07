@@ -491,30 +491,6 @@ bool MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 bool MeshManager::CreateExtrudedPolyline(const std::string &_name,
     const std::vector<std::vector<math::Vector2d> > &_polys, double _height)
 {
-  // distance tolerence between 2 points. This is used when creating a list
-  // of distinct points in the polylines.
-  double tol = 1e-4;
-  #if !HAVE_GTS
-    gzerr << "GTS library not found. Can not extrude polyline" << std::endl;
-    return;
-  #endif
-  auto polys = _polys;
-  // close all the loops
-  for (auto &poly : polys)
-  {
-    // does the poly ends with the first point?
-    auto first = poly[0];
-    auto last = poly[poly.size()-1];
-    double d = (first.x - last.x) * (first.x - last.x);
-    d += (first.y - last.y) * (first.y - last.y);
-    // within range
-    if (d >  tol * tol )
-    {
-      // add the first point at the end
-      poly.push_back(first);
-    }
-  }
-
   if (this->HasMesh(_name))
   {
     return false;
@@ -525,7 +501,7 @@ bool MeshManager::CreateExtrudedPolyline(const std::string &_name,
   double tol = 1e-4;
   #if !HAVE_GTS
     gzerr << "GTS library not found. Can not extrude polyline" << std::endl;
-    return;
+    return false;
   #endif
   auto polys = _polys;
   // close all the loops
@@ -537,7 +513,7 @@ bool MeshManager::CreateExtrudedPolyline(const std::string &_name,
     double d = (first.x - last.x) * (first.x - last.x);
     d += (first.y - last.y) * (first.y - last.y);
     // within range
-    if (d >  tol * tol )
+    if (d >  tol * tol)
     {
       // add the first point at the end
       poly.push_back(first);
@@ -1352,5 +1328,3 @@ void MeshManager::ConvertPolylinesToVerticesAndEdges(
     }
   }
 }
-
-

@@ -27,6 +27,32 @@ using namespace gazebo;
 
 class MeshManager : public gazebo::testing::AutoLogFixture { };
 
+/////////////////////////////////////////////////
+TEST_F(MeshManager, CreateShapes)
+{
+  // test various Create functions
+  EXPECT_TRUE(common::MeshManager::Instance()->CreatePlane("test_unit_plane",
+      math::Plane(math::Vector3(0, 0, 1), math::Vector2d(1, 1), 0),
+      math::Vector2d(1, 1), math::Vector2d(1, 1)));
+
+  EXPECT_TRUE(common::MeshManager::Instance()->CreateSphere("test_unit_sphere",
+      0.5, 32, 32));
+  EXPECT_TRUE(common::MeshManager::Instance()->CreateBox("test_unit_box",
+      math::Vector3(1, 1, 1), math::Vector2d(1, 1)));
+  EXPECT_TRUE(common::MeshManager::Instance()->CreateCylinder(
+      "test_unit_cylinder", 0.5, 1.0, 1, 32));
+  EXPECT_TRUE(common::MeshManager::Instance()->CreateCone("test_unit_cone",
+      0.5, 1.0, 5, 32));
+  EXPECT_TRUE(common::MeshManager::Instance()->CreateCamera("test_unit_camera",
+      0.5));
+  EXPECT_TRUE(common::MeshManager::Instance()->CreateTube("test_tube",
+      1.0, 1.2, 0.01, 1, 64));
+
+  std::vector<math::Vector2d> path;
+  EXPECT_FALSE(common::MeshManager::Instance()->CreateExtrudedPolyline(
+      "invalid_path", path, 1.0));
+}
+
 #ifdef HAVE_GTS
 /////////////////////////////////////////////////
 TEST_F(MeshManager, CreateExtrudedPolyline)
@@ -54,8 +80,8 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
 
   std::string meshName = "extruded_path";
   double height = 10.0;
-  common::MeshManager::Instance()->CreateExtrudedPolyline(
-      meshName, path, height);
+  EXPECT_TRUE(common::MeshManager::Instance()->CreateExtrudedPolyline(
+      meshName, path, height));
 
   // check mesh
   EXPECT_TRUE(common::MeshManager::Instance()->HasMesh(meshName));
@@ -152,8 +178,8 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
 
   std::string meshName = "extruded_path_closed";
   double height = 2.0;
-  common::MeshManager::Instance()->CreateExtrudedPolyline(
-      meshName, path2, height);
+  EXPECT_TRUE(common::MeshManager::Instance()->CreateExtrudedPolyline(
+      meshName, path2, height));
 
   // check mesh
   EXPECT_TRUE(common::MeshManager::Instance()->HasMesh(meshName));
