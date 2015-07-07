@@ -104,6 +104,7 @@ VisualPtr ReferenceGeometry::CreateAxis()
   cylinderVis->Load();
   cylinderVis->AttachMesh("unit_cylinder");
   cylinderVis->SetScale(math::Vector3(0.1, 0.1, 1.0));
+  cylinderVis->SetMaterial("Gazebo/DottedLine");
 //  cylinderVis->SetVisibilityFlags(GZ_VISIBILITY_SELECTABLE);
 
   return cylinderVis;

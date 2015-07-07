@@ -1448,3 +1448,18 @@ material Gazebo/Grass
   }
 }
 
+
+material Gazebo/DottedLine
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture dotted_line.png
+        filtering trilinear
+      }
+    }
+  }
+}

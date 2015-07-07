@@ -7,6 +7,7 @@ set (files
   com.png
   dirt_diffusespecular.png
   dirt_normal.png
+  dotted_line.png
   flat_normal.png
   fungus_diffusespecular.png
   fungus_normal.png
