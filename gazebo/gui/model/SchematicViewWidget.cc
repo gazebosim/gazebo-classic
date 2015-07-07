@@ -78,6 +78,9 @@ void SchematicViewWidget::Init()
 
   this->connections.push_back(gui::model::Events::ConnectJointRemoved(
       boost::bind(&SchematicViewWidget::RemoveEdge, this, _1)));
+
+  this->connections.push_back(gui::model::Events::ConnectJointChanged(
+      boost::bind(&SchematicViewWidget::UpdateEdge, this, _1, _2, _3, _4, _5)));
 }
 
 /////////////////////////////////////////////////
@@ -190,6 +193,21 @@ void SchematicViewWidget::RemoveEdge(const std::string &_id)
     this->FitInView();
 
     this->edges.erase(it);
+  }
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::UpdateEdge(const std::string &_id,
+    const std::string &_name, const std::string &_type,
+    const std::string &_parent, const std::string &_child)
+{
+  auto it = this->edges.find(_id);
+  if (it != this->edges.end())
+  {
+    this->scene->RemoveEdge(_id);
+    this->edges.erase(it);
+
+    this->AddEdge(_id, _name, _type, _parent, _child);
   }
 }
 

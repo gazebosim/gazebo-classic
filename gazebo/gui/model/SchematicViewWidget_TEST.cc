@@ -75,6 +75,11 @@ void SchematicViewWidget_TEST::AddRemove()
   QCOMPARE(svWidget->GetNodeCount(), 3u);
   QCOMPARE(svWidget->GetEdgeCount(), 1u);
 
+  // update edge
+  svWidget->UpdateEdge("id_2", "edge_2_update", "screw", "node_c", "node_a");
+  QCOMPARE(svWidget->GetNodeCount(), 3u);
+  QCOMPARE(svWidget->GetEdgeCount(), 1u);
+
   delete svWidget;
 }
 

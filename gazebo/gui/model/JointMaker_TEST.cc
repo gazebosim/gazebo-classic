@@ -464,6 +464,7 @@ void JointMaker_TEST::JointMaterial()
   jointTypes.push_back("ball");
   jointTypes.push_back("universal");
   jointTypes.push_back("screw");
+  jointTypes.push_back("gearbox");
 
   // verify joint materials are not empty and they are all unique
   std::set<std::string> jointMaterials;

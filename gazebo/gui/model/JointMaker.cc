@@ -60,11 +60,12 @@ JointMaker::JointMaker()
 
   this->jointMaterials[JOINT_FIXED]     = "Gazebo/Red";
   this->jointMaterials[JOINT_HINGE]     = "Gazebo/Orange";
-  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/Yellow";
+  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/DarkYellow";
   this->jointMaterials[JOINT_SLIDER]    = "Gazebo/Green";
   this->jointMaterials[JOINT_SCREW]     = "Gazebo/DarkGrey";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
+  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/Turquoise";
 
   this->jointTypes[JOINT_FIXED]     = "fixed";
   this->jointTypes[JOINT_HINGE]     = "revolute";
@@ -73,6 +74,7 @@ JointMaker::JointMaker()
   this->jointTypes[JOINT_SCREW]     = "screw";
   this->jointTypes[JOINT_UNIVERSAL] = "universal";
   this->jointTypes[JOINT_BALL]      = "ball";
+  this->jointTypes[JOINT_GEARBOX]   = "gearbox";
   this->jointTypes[JOINT_NONE]      = "none";
 
   this->connections.push_back(
@@ -856,6 +858,12 @@ void JointMaker::Update()
                 mat->getTechnique(0)->getPass(0)->getDiffuse();
             color.a = 0.5;
             joint->handles->getBillboard(0)->setColour(color);
+
+            // notify joint changes
+            std::string parentName = joint->parent->GetName();
+            std::string childName = joint->child->GetName();
+            gui::model::Events::jointChanged(it.first, joint->name,
+                jointTypes[joint->type], parentName, childName);
           }
 
           // set pos of joint handle
@@ -1024,6 +1032,10 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   else if (_type == JOINT_BALL)
   {
     return 0;
+  }
+  else if (_type == JOINT_GEARBOX)
+  {
+    return 2;
   }
 
   return 0;
