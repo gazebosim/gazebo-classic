@@ -20,8 +20,8 @@
 #include <tinyxml.h>
 
 #include <list>
+#include <mutex>
 #include <string>
-#include <fstream>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Time.hh"
@@ -105,7 +105,7 @@ namespace gazebo
 
       /// \brief Jump to the beginning of the log file. The next step() call
       /// will return the first data "chunk".
-       /// \return True If the function succeed or false otherwise.
+      /// \return True If the function succeed or false otherwise.
       public: bool Rewind();
 
       /// \brief Get the number of chunks (steps) in the open log file.
@@ -195,6 +195,9 @@ namespace gazebo
       /// \brief True if <iterations> is found in the log file. Old log versions
       /// may not include this tag in the log files.
       private: bool iterationsFound;
+
+      /// \brief A mutex to avoid race conditions.
+      private: std::mutex mutex;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;
