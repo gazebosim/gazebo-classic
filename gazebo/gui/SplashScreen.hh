@@ -39,6 +39,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SplashScreen();
 
+      /// \brief Returns whether the splash screen is visible.
+      /// \return True if the splash screen is visible, false otherwise.
+      public: bool Visible() const;
+
       /// \brief Qt callback to update the splash screen
       private slots: void Update();
 

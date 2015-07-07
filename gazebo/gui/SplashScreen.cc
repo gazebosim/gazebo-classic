@@ -52,6 +52,7 @@ SplashScreen::SplashScreen()
   textLayout->addLayout(versionLayout);
 
   this->dataPtr->splashScreen = new QSplashScreen(pixmap);
+  this->dataPtr->splashScreen->setObjectName("splashScreenWidget");
   this->dataPtr->splashScreen->setMask(pixmap.mask());
   this->dataPtr->splashScreen->setWindowFlags(
       this->dataPtr->splashScreen->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -85,4 +86,10 @@ void SplashScreen::Update()
   }
 
   QTimer::singleShot(100, this, SLOT(Update()));
+}
+
+/////////////////////////////////////////////////
+bool SplashScreen::Visible() const
+{
+  return this->dataPtr->splashScreen->isVisible();
 }
