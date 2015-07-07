@@ -55,6 +55,7 @@
     + [Gazebo migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
     * [Pull request #1766](https://bitbucket.org/osrf/gazebo/pull-request/1766)
     * [Pull request #1767](https://bitbucket.org/osrf/gazebo/pull-request/1767)
+    * [Pull request #1771](https://bitbucket.org/osrf/gazebo/pull-request/1771)
 
 1. Gazebo client's should now use `gazebo/gazebo_client.hh` and `libgazebo_client.so` instead of `gazebo/gazebo.hh` and `libgazebo.so`. This separates running a Gazebo server from a Gazebo client.
 
