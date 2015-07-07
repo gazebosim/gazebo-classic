@@ -211,7 +211,7 @@ void UserCamera::SetDefaultPose(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-math::Pose UserCamera::GetDefaultPose() const
+math::Pose UserCamera::DefaultPose() const
 {
   return this->dataPtr->defaultPose;
 }

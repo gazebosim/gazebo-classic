@@ -52,7 +52,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   QVERIFY(cam != NULL);
 
   // Get camera default pose and check that's the current pose
-  gazebo::math::Pose defaultPose = cam->GetDefaultPose();
+  gazebo::math::Pose defaultPose = cam->DefaultPose();
   QVERIFY(defaultPose == cam->GetWorldPose());
 
   // Get the camera distance from the world origin (zoom level)

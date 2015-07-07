@@ -23,6 +23,7 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \internal
     /// \brief Private data for the ViewAngleWidget class
     class ViewAngleWidgetPrivate
     {

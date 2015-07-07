@@ -81,7 +81,7 @@ void GLWidget_TEST::SelectObject()
 
   // Check the selected visuals list
   std::vector<gazebo::rendering::VisualPtr> selectedVisuals =
-      glWidget->GetSelectedVisuals();
+      glWidget->SelectedVisuals();
 
   QVERIFY(selectedVisuals.size() == 1u);
   QVERIFY(selectedVisuals[0]->GetName() == "box");

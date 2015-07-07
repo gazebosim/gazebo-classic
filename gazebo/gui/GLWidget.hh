@@ -78,7 +78,7 @@ namespace gazebo
 
       /// \brief Returns the list of selected visuals.
       /// \return List with pointers to selected visuals.
-      public: std::vector<rendering::VisualPtr> GetSelectedVisuals() const;
+      public: std::vector<rendering::VisualPtr> SelectedVisuals() const;
 
       signals: void clicked();
 

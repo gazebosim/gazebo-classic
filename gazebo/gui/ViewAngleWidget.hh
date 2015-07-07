@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -36,21 +36,22 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief View angle modes
       public: enum Mode
       {
-        /// Top
+        /// \brief Top
         TOP,
-        /// Bottom
+        /// \brief Bottom
         BOTTOM,
-        /// Front
+        /// \brief Front
         FRONT,
-        /// Back
+        /// \brief Back
         BACK,
-        /// Left
+        /// \brief Left
         LEFT,
-        /// Right
+        /// \brief Right
         RIGHT,
-        /// Reset view
+        /// \brief Reset view
         RESET
       };
 
@@ -103,7 +104,7 @@ namespace gazebo
       /// there's no object, the camera will face the world origin. The movement
       /// takes 1 second.
       /// \param[in] _dir Direction for the camera to face.
-      private: void LookDirection(const math::Vector3 &_dir);
+      private: void LookDirection(const ignition::math::Vector3d &_dir);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -82,7 +82,7 @@ namespace gazebo
 
       /// \brief Get the default pose in the world coordinate frame.
       /// \return Default pose of the camera.
-      public: math::Pose GetDefaultPose() const;
+      public: math::Pose DefaultPose() const;
 
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.

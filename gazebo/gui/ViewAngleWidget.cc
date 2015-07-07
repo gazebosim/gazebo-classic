@@ -133,7 +133,7 @@ void ViewAngleWidget::Add(const Mode _mode, QAction *_action)
 }
 
 /////////////////////////////////////////////////
-void ViewAngleWidget::LookDirection(const math::Vector3 &_dir)
+void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (!cam)
@@ -142,75 +142,84 @@ void ViewAngleWidget::LookDirection(const math::Vector3 &_dir)
   GLWidget *glWidget =
       this->dataPtr->mainWindow->findChild<GLWidget *>("GLWidget");
   if (!glWidget)
+  {
+    gzerr << "GLWidget not found, this should never happen. " <<
+              "Camera pose won't be changed." << std::endl;
     return;
+  }
 
   // Look at world origin unless there are visuals selected
-  math::Vector3 lookAt = math::Vector3::Zero;
+  ignition::math::Vector3d lookAt = ignition::math::Vector3d::Zero;
 
   // If there are selected visuals, look at their center
   std::vector<rendering::VisualPtr> selectedVisuals =
-      glWidget->GetSelectedVisuals();
+      glWidget->SelectedVisuals();
 
   if (!selectedVisuals.empty())
   {
-    for (auto &vis : selectedVisuals)
+    for (auto const &vis : selectedVisuals)
     {
-      lookAt += vis->GetWorldPose().pos;
+      ignition::math::Vector3d visPos = vis->GetWorldPose().pos.Ign();
+      lookAt += visPos;
     }
     lookAt /= selectedVisuals.size();
   }
 
   // Keep current distance to look target
-  double distance = fabs((cam->GetWorldPose().pos - lookAt).GetLength());
+  ignition::math::Vector3d camPos = cam->GetWorldPose().pos.Ign();
+  double distance = std::fabs((camPos - lookAt).Length());
 
   // Calculate camera position
-  math::Vector3 camPos = lookAt - _dir * distance;
+  ignition::math::Vector3d newCamPos = lookAt - _dir * distance;
 
   // Calculate camera orientation
   double roll = 0;
-  double pitch = -atan2(_dir.z, sqrt(pow(_dir.x, 2) + pow(_dir.y, 2)));
-  double yaw = atan2(_dir.y, _dir.x);
+  double pitch = -std::atan2(_dir.Z(),
+      std::sqrt(std::pow(_dir.X(), 2) + std::pow(_dir.Y(), 2)));
+  double yaw = std::atan2(_dir.Y(), _dir.X());
 
-  math::Quaternion quat =  math::Quaternion(roll, pitch, yaw);
+  ignition::math::Quaterniond quat =
+      ignition::math::Quaterniond(roll, pitch, yaw);
 
   // Move camera to that pose in 1s
-  cam->MoveToPosition(math::Pose(camPos, quat), 1);
+  cam->MoveToPosition(math::Pose(math::Vector3(newCamPos),
+      math::Quaternion(quat)), 1);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnTopView()
 {
-  this->LookDirection(-math::Vector3::UnitZ);
+  this->LookDirection(-ignition::math::Vector3d::UnitZ);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnBottomView()
 {
-  this->LookDirection(math::Vector3::UnitZ);
+  this->LookDirection(ignition::math::Vector3d::UnitZ);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnFrontView()
 {
-  this->LookDirection(-math::Vector3::UnitX);
+  this->LookDirection(-ignition::math::Vector3d::UnitX);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnBackView()
 {
-  this->LookDirection(math::Vector3::UnitX);
+  this->LookDirection(ignition::math::Vector3d::UnitX);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnLeftView()
 {
-  this->LookDirection(-math::Vector3::UnitY);
+  this->LookDirection(-ignition::math::Vector3d::UnitY);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnRightView()
 {
-  this->LookDirection(math::Vector3::UnitY);
+  this->LookDirection(ignition::math::Vector3d::UnitY);
 }
 
 /////////////////////////////////////////////////
@@ -221,7 +230,7 @@ void ViewAngleWidget::OnResetView()
   if (!cam)
     return;
 
-  cam->MoveToPosition(cam->GetDefaultPose(), 1);
+  cam->MoveToPosition(cam->DefaultPose(), 1);
 }
 
 /////////////////////////////////////////////////
@@ -247,5 +256,7 @@ void ViewAngleWidget::OnProjection(int _index)
     g_cameraPerspectiveAct->trigger();
   else if (_index == 1)
     g_cameraOrthoAct->trigger();
+  else
+    gzwarn << "Projection index [" << _index << "] not recognized" << std::endl;
 }
 
