@@ -81,14 +81,12 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QLabel *parentLabel = new QLabel("Parent: ");
   this->parentComboBox = new QComboBox();
   this->parentComboBox->setInsertPolicy(QComboBox::InsertAlphabetically);
-  this->parentComboBox->addItem("", "");
   connect(this->parentComboBox, SIGNAL(currentIndexChanged(int)), this,
       SLOT(OnParentFromDialog(int)));
 
   QLabel *childLabel = new QLabel("Child: ");
   this->childComboBox = new QComboBox();
   this->childComboBox->setInsertPolicy(QComboBox::InsertAlphabetically);
-  this->childComboBox->addItem("", "");
   this->childComboBox->setEnabled(false);
   connect(this->childComboBox, SIGNAL(currentIndexChanged(int)), this,
       SLOT(OnChildFromDialog(int)));
@@ -184,7 +182,29 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   this->typeButtons->button(static_cast<int>(_type))->setChecked(true);
 
   // Fill link combo boxes
+  this->parentComboBox->blockSignals(true);
+  this->childComboBox->blockSignals(true);
 
+  this->parentComboBox->clear();
+  this->childComboBox->clear();
+
+  this->parentComboBox->addItem("", "");
+  this->childComboBox->addItem("", "");
+  for (auto link : this->linkList)
+  {
+    this->parentComboBox->addItem(
+        QString::fromStdString(link.second),
+        QString::fromStdString(link.first));
+    this->childComboBox->addItem(
+        QString::fromStdString(link.second),
+        QString::fromStdString(link.first));
+  }
+  this->parentComboBox->blockSignals(false);
+  this->childComboBox->blockSignals(false);
+
+  // Start combo boxes empty
+
+  this->move(0, 0);
   this->open();
 }
 
@@ -210,7 +230,10 @@ void JointCreationDialog::OnParentFromDialog(int _index)
 
   // Remove empty option
   int index = this->parentComboBox->findData("");
+
+  this->parentComboBox->blockSignals(true);
   this->parentComboBox->removeItem(index);
+  this->parentComboBox->blockSignals(false);
 
   // Check if child list matches parent list
 
@@ -237,7 +260,10 @@ void JointCreationDialog::OnChildFromDialog(int _index)
 
   // Remove empty option
   int index = this->parentComboBox->findData("");
-  this->parentComboBox->removeItem(index);
+
+  this->childComboBox->blockSignals(true);
+  this->childComboBox->removeItem(index);
+  this->childComboBox->blockSignals(false);
 
   // Check if parent list matches child list
 
@@ -261,13 +287,17 @@ void JointCreationDialog::OnParentFrom3D(const std::string &_linkName)
     return;
   }
 
+  this->parentComboBox->blockSignals(true);
   this->parentComboBox->setCurrentIndex(index);
-
-  this->childComboBox->setEnabled(true);
 
   // Remove empty option
   index = this->parentComboBox->findData("");
+
   this->parentComboBox->removeItem(index);
+  this->parentComboBox->blockSignals(false);
+
+  // Enable child
+  this->childComboBox->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
@@ -291,12 +321,14 @@ void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
     return;
   }
 
+  this->childComboBox->blockSignals(true);
   this->childComboBox->setCurrentIndex(index);
   this->createButton->setEnabled(true);
 
   // Remove empty option
-  index = this->parentComboBox->findData("");
-  this->parentComboBox->removeItem(index);
+  index = this->childComboBox->findData("");
+  this->childComboBox->removeItem(index);
+  this->childComboBox->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
@@ -307,15 +339,14 @@ void JointCreationDialog::OnLinkInserted(const std::string &_linkName)
   if (idx != std::string::npos)
     leafName = _linkName.substr(idx+1);
 
-  this->parentComboBox->addItem(
-          QString::fromStdString(leafName), QString::fromStdString(_linkName));
-  this->childComboBox->addItem(
-          QString::fromStdString(leafName), QString::fromStdString(_linkName));
+  this->linkList[_linkName] = leafName;
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::OnLinkRemoved(const std::string &_linkName)
 {
+  this->linkList.erase(_linkName);
+
   int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
   this->parentComboBox->removeItem(index);
 

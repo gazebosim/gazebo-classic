@@ -223,7 +223,7 @@ void ModelCreator::OnEdit(bool _checked)
     MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
     this->jointMaker->DisableEventHandlers();
-    this->jointMaker->Stop();
+    this->jointMaker->Reset();
 
     this->DeselectAll();
   }

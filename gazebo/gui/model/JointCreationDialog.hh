@@ -88,6 +88,8 @@ namespace gazebo
       private: QComboBox *parentComboBox;
       private: QComboBox *childComboBox;
       private: QPushButton *createButton;
+
+      private: std::map<std::string, std::string> linkList;
     };
     /// \}
   }

@@ -339,6 +339,9 @@ namespace gazebo
 
       /// \brief Inspector for configuring joint properties.
       public: JointCreationDialog *jointCreationDialog;
+
+      private: bool mouseMoveEnabled = false;
+      private: bool creatingJoint = false;
     };
     /// \}
 
