@@ -515,6 +515,7 @@ namespace gazebo
 
       /// \brief Return true if this submesh has the vertex
       /// \param[in] _v
+      /// \return Return true if this submesh has the vertex
       /// \deprecated See HasVertex function that accepts
       /// ignition::math::Vector3d.
       public: bool HasVertex(const math::Vector3 &_v) const
@@ -522,6 +523,7 @@ namespace gazebo
 
       /// \brief Return true if this submesh has the vertex
       /// \param[in] _v
+      /// \return Return true if this submesh has the vertex
       public: bool HasVertex(const ignition::math::Vector3d &_v) const;
 
       /// \brief Get the index of the vertex
@@ -544,17 +546,6 @@ namespace gazebo
 
       /// \brief Recalculate all the normals.
       public: void RecalculateNormals();
-
-      /// \brief Reset mesh center to geometric center
-      /// \param[in] _center
-      /// \deprecated See SetSubMeshCenter function that accepts
-      /// ignition::math::Vector3d.
-      public: void SetSubMeshCenter(math::Vector3 _center)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Reset mesh center to geometric center
-      /// \param[in] _center Center vector
-      public: void SetSubMeshCenter(ignition::math::Vector3d _center);
 
       /// \brief Generate texture coordinates using spherical projection
       /// from center

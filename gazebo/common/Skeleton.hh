@@ -113,7 +113,7 @@ namespace gazebo
       /// \return a matrix
       /// \deprecated See BindShapeTransform that return
       /// ignition::math::Matrix4d.
-      public: math::Matrix4 GetBindShapeTransform();
+      public: math::Matrix4 GetBindShapeTransform() GAZEBO_DEPRECATED(6.0);
 
       /// \brief Return bind pose skeletal transform
       /// \return a matrix
@@ -248,7 +248,7 @@ namespace gazebo
       /// \param[in] _trans the transformation
       /// \param[in] _updateChildren when true the UpdateChildrenTransforms
       /// operation is performed
-      /// \deprecated See SetModelTransorm that accepts
+      /// \deprecated See SetModelTransform that accepts
       /// ignition::math::Matrix4d.
       public: void SetModelTransform(math::Matrix4 _trans,
                   bool _updateChildren = true) GAZEBO_DEPRECATED(6.0);
@@ -283,7 +283,7 @@ namespace gazebo
       /// \return Transform relative to parent
       /// \deprecated See Transform function that return
       /// ignition::math::Matrix4d.
-      public: math::Matrix4 GetTransform();
+      public: math::Matrix4 GetTransform() GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get transform relative to parent
       /// \return Transform relative to parent
@@ -472,7 +472,7 @@ namespace gazebo
       /// \return the matrix
       /// \deprecated Seet GetTransform function that returns
       /// ignition::math::Matrix4d.
-      public: math::Matrix4 Get();
+      public: math::Matrix4 Get() GAZEBO_DEPRECATED(6.0);
 
       /// \brief Returns the transformation matrix
       /// \return The transform matrix

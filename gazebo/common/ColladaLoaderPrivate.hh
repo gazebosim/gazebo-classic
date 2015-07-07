@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _COLLADALOADER_PRIVATE_HH_
-#define _COLLADALOADER_PRIVATE_HH_
+#ifndef _GAZEBO_COLLADALOADER_PRIVATE_HH_
+#define _GAZEBO_COLLADALOADER_PRIVATE_HH_
 
 #include <map>
 #include <string>

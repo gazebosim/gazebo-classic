@@ -68,7 +68,7 @@ Plane &Plane::operator =(const Plane & _p)
 }
 
 //////////////////////////////////////////////////
-Plane &Plane::operator=(const ignition::math::Planed & _p)
+Plane &Plane::operator=(const ignition::math::Planed &_p)
 {
   this->normal = _p.Normal();
   this->size = _p.Size();
