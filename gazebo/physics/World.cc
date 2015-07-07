@@ -126,6 +126,7 @@ World::World(const std::string &_name)
   this->dataPtr->logThread = NULL;
   this->dataPtr->stop = false;
   this->dataPtr->seekPending = false;
+  this->dataPtr->forwardPending = false;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
@@ -544,13 +545,14 @@ void World::LogStep()
   }
   while (stay)
   {
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+
     std::string data;
     if (!util::LogPlay::Instance()->Step(data))
     {
-      boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
-
       // There are no more chunks, time to exit.
       this->SetPaused(true);
+      this->dataPtr->forwardPending = false;
       this->dataPtr->stepInc = 0;
       break;
     }
@@ -608,28 +610,29 @@ void World::LogStep()
       this->Update();
     }
 
+    if (this->dataPtr->stepInc > 0)
+      this->dataPtr->stepInc--;
+
+    // We may have entered into the loop because a "seek" command was
+    // requested. At this point we have executed one more step. Now, it's time
+    // to check if we have reached the target simulation time specified in the
+    // "seek" command.
+    if (this->dataPtr->seekPending)
     {
-      boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
-      if (this->dataPtr->stepInc > 0)
-        this->dataPtr->stepInc--;
-
-      // We may have entered into the loop because a "seek" command was
-      // requested. At this point we have executed one more step. Now, it's time
-      // to check if we have reached the target simulation time specified in the
-      // "seek" command.
-      if (this->dataPtr->seekPending)
-      {
-        this->dataPtr->seekPending =
-          this->GetSimTime() < this->dataPtr->targetSimTime;
-      }
-
-      stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
-             this->dataPtr->seekPending;
+      this->dataPtr->seekPending =
+        this->GetSimTime() < this->dataPtr->targetSimTime;
     }
 
-    // We only run one step if we are in play mode.
-    if (!this->IsPaused())
+    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
+           this->dataPtr->seekPending;
+
+    // We only run one step if we are in play mode and we don't have
+    // other pending commands.
+    if (!this->IsPaused() && !this->dataPtr->seekPending &&
+        !this->dataPtr->forwardPending)
+    {
       break;
+    }
   }
 
   this->PublishWorldStats();
@@ -1268,6 +1271,12 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
+  boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+
+  // Ignore this command if there's another one pending.
+  if (this->dataPtr->seekPending || this->dataPtr->forwardPending)
+    return;
+
   if (_data->has_pause())
     this->SetPaused(_data->pause());
 
@@ -1276,13 +1285,11 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     // stepWorld is a blocking call so set stepInc directly so that world stats
     // will still be published
     this->SetPaused(true);
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->stepInc += _data->multi_step();
   }
 
   if (_data->has_seek())
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->targetSimTime = msgs::Convert(_data->seek());
     if (this->GetSimTime() > this->dataPtr->targetSimTime)
       util::LogPlay::Instance()->Rewind();
@@ -1291,15 +1298,15 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 
   if (_data->has_rewind() && _data->rewind())
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = 1;
   }
 
   if (_data->has_forward() && _data->forward())
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    this->SetPaused(true);
     this->dataPtr->stepInc = INT_MAX;
+    this->dataPtr->forwardPending = true;
   }
 }
 

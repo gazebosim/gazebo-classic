@@ -85,6 +85,10 @@ namespace gazebo
       /// playback this member variable should be true.
       public: bool seekPending;
 
+      /// \brief When there is a 'forward' command pending during a log file
+      /// playback this member variable should be true.
+      public: bool forwardPending;
+
       /// \brief All the event connections.
       public: event::Connection_V connections;
 
