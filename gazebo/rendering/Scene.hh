@@ -426,6 +426,10 @@ namespace gazebo
       /// \param[in] _show True to enable inertia visualization.
       public: void ShowInertias(bool _show);
 
+      /// \brief Enable or disable link frame visualization.
+      /// \param[in] _show True to enable link frame visualization.
+      public: void ShowLinkFrames(bool _show);
+
       /// \brief Enable or disable joint visualization.
       /// \param[in] _show True to enable joint visualization.
       public: void ShowJoints(bool _show);
@@ -622,6 +626,12 @@ namespace gazebo
       /// \param[in] _elem SDF element data.
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateInertiaVisual(sdf::ElementPtr _elem,
+          VisualPtr _linkVisual);
+
+      /// \brief Create a new link frame visual.
+      /// \param[in] _msg Message containing the link data.
+      /// \param[in] _linkVisual Pointer to the link's visual.
+      private: void CreateLinkFrameVisual(ConstLinkPtr &_msg,
           VisualPtr _linkVisual);
 
       /// \brief Helper function to remove all visualizations attached to a

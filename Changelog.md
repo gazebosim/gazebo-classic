@@ -216,6 +216,10 @@ compilation on Windows.
 1. Added View Inertia and InertiaVisual, changed COMVisual to sphere proportional to mass.
     * [Pull request #1445](https://bitbucket.org/osrf/gazebo/pull-request/1445)
 
+1. Added View Link Frame and LinkFrameVisual. Visual::SetTransparency goes into texture_unit.
+    * [Pull request #1762](https://bitbucket.org/osrf/gazebo/pull-request/1762)
+    * [Issue #853](https://bitbucket.org/osrf/gazebo/issue/853)
+
 1. Changed the position of Save and Cancel buttons on editor dialogs
     * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
     * [Issue #1377](https://bitbucket.org/osrf/gazebo/issue/1377)
