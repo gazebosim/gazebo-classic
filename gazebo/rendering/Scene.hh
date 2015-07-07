@@ -151,6 +151,9 @@ namespace gazebo
       public: CameraPtr CreateCamera(const std::string &_name,
                                      bool _autoRender = true);
 
+      public: WideAngleCameraPtr CreateWideAngleCamera(const std::string &_name,
+                                                       bool _autoRender = true);
+
 #ifdef HAVE_OCULUS
       /// \brief Create an oculus rift camera
       /// \param[in] _name Name of the new camera.
