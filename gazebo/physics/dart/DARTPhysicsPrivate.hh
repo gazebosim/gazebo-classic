@@ -27,6 +27,18 @@ namespace gazebo
     /// \brief Private data class for DARTPhysics
     class DARTPhysicsPrivate
     {
+      /// \brief Constructor
+      public: DARTPhysicsPrivate()
+        : dtWorld(new dart::simulation::World())
+      {
+      }
+
+      /// \brief Default destructor
+      public: ~DARTPhysicsPrivate()
+      {
+        delete dtWorld;
+      }
+
       /// \brief Pointer to DART World associated with this DART Physics.
       public: dart::simulation::World *dtWorld;
     };

@@ -18,9 +18,6 @@
 #ifndef _GAZEBO_DARTJOINT_PRIVATE_HH_
 #define _GAZEBO_DARTJOINT_PRIVATE_HH_
 
-#include <boost/any.hpp>
-#include <string>
-
 #include "gazebo/common/Time.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/dart/dart_inc.h"
@@ -33,6 +30,19 @@ namespace gazebo
     /// \brief Private data class for DARTJoint
     class DARTJointPrivate
     {
+      /// \brief Constructor
+      public: DARTJointPrivate(const DARTPhysicsPtr& _dartPhysicsEngine)
+        : forceApplied{0.0, 0.0},
+          forceAppliedTime(),
+          dartPhysicsEngine(_dartPhysicsEngine),
+          dtJoint(NULL),
+          dtChildBodyNode(NULL)
+      {
+      }
+
+      /// \brief Default destructor
+      public: ~DARTJointPrivate() = default;
+
       /// \brief Save force applied by user
       /// This plus the joint feedback (joint contstraint forces) is the
       /// equivalent of simulated force torque sensor reading

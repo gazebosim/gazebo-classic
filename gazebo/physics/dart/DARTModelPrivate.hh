@@ -27,6 +27,21 @@ namespace gazebo
     /// \brief Private data class for DARTModel
     class DARTModelPrivate
     {
+      /// \brief Constructor
+      public: DARTModelPrivate()
+        : dtSkeleton(NULL),
+          dtConfig(),
+          dtVelocity()
+      {
+      }
+
+      /// \brief Default destructor
+      public: ~DARTModelPrivate()
+      {
+        // We don't need to delete dtSkeleton because world will delete
+        // dtSkeleton if it is registered to the world.
+      }
+
       /// \brief Pointer to DART Skeleton
       public: dart::dynamics::Skeleton *dtSkeleton;
 

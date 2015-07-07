@@ -63,19 +63,14 @@ GZ_REGISTER_PHYSICS_ENGINE("dart", DARTPhysics)
 
 //////////////////////////////////////////////////
 DARTPhysics::DARTPhysics(WorldPtr _world)
-    : PhysicsEngine(_world), dataPtr(new DARTPhysicsPrivate)
+    : PhysicsEngine(_world), dataPtr(new DARTPhysicsPrivate())
 {
-  this->dataPtr->dtWorld = new dart::simulation::World;
 }
 
 //////////////////////////////////////////////////
 DARTPhysics::~DARTPhysics()
 {
-  delete this->dataPtr->dtWorld;
-  this->dataPtr->dtWorld = NULL;
-
   delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////

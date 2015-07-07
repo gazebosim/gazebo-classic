@@ -27,6 +27,18 @@ namespace gazebo
     /// \brief Private data class for DARTCollision
     class DARTCollisionPrivate
     {
+      /// \brief Constructor
+      public: DARTCollisionPrivate(dart::dynamics::BodyNode *_dtBodyNode)
+        : dtBodyNode(_dtBodyNode),
+          dtCollisionShape(NULL),
+          categoryBits(0),
+          collideBits(0)
+      {
+      }
+
+      /// \brief Default destructor
+      public: ~DARTCollisionPrivate() = default;
+
       /// \brief DART body node associated with this collision.
       public: dart::dynamics::BodyNode *dtBodyNode;
 

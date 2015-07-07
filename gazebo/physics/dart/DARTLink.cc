@@ -39,24 +39,12 @@ using namespace physics;
 DARTLink::DARTLink(EntityPtr _parent)
   : Link(_parent), dataPtr(new DARTLinkPrivate())
 {
-  this->dataPtr->dartPhysics = NULL;
-  this->dataPtr->dtBodyNode = NULL;
-  this->dataPtr->dartParentJoint = NULL;
-  this->dataPtr->staticLink = false;
-  this->dataPtr->weldJointConst = NULL;
 }
 
 //////////////////////////////////////////////////
 DARTLink::~DARTLink()
 {
-  // We don't need to delete dtBodyNode because skeletone will delete
-  // dtBodyNode if it is registered to the skeletone.
-
-  delete this->dataPtr->weldJointConst;
-  this->dataPtr->weldJointConst = NULL;
-
   delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -779,16 +767,18 @@ void DARTLink::SetLinkStatic(bool _static)
   if (_static == true)
   {
     // Add weld joint constraint to DART
-    this->dataPtr->weldJointConst =
+    this->dataPtr->dtWeldJointConst =
         new dart::constraint::WeldJointConstraint(this->dataPtr->dtBodyNode);
     GetDARTWorld()->getConstraintSolver()->addConstraint(
-        this->dataPtr->weldJointConst);
+        this->dataPtr->dtWeldJointConst);
   }
   else
   {
     // Remove ball and revolute joint constraints from DART
     GetDARTWorld()->getConstraintSolver()->removeConstraint(
-        this->dataPtr->weldJointConst);
+        this->dataPtr->dtWeldJointConst);
+    delete this->dataPtr->dtWeldJointConst;
+    this->dataPtr->dtWeldJointConst = NULL;
   }
 
   this->dataPtr->staticLink = _static;

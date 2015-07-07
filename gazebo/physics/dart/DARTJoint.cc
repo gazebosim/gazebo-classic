@@ -34,15 +34,10 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTJoint::DARTJoint(BasePtr _parent)
-  : Joint(_parent), dataPtr(new DARTJointPrivate())
+  : Joint(_parent),
+    dataPtr(new DARTJointPrivate(boost::dynamic_pointer_cast<DARTPhysics>(
+      this->GetWorld()->GetPhysicsEngine())))
 {
-  this->dataPtr->forceApplied[0] = 0.0;
-  this->dataPtr->forceApplied[1] = 0.0;
-
-  this->dataPtr->dartPhysicsEngine = boost::dynamic_pointer_cast<DARTPhysics>(
-        this->GetWorld()->GetPhysicsEngine());
-  this->dataPtr->dtJoint = NULL;
-  this->dataPtr->dtChildBodyNode = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -51,7 +46,6 @@ DARTJoint::~DARTJoint()
   this->Detach();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////

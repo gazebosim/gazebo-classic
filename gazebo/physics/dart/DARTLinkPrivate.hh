@@ -30,6 +30,26 @@ namespace gazebo
     /// \brief Private data class for DARTLink
     class DARTLinkPrivate
     {
+      /// \brief Constructor
+      public: DARTLinkPrivate()
+        : dartPhysics(NULL),
+          dtBodyNode(NULL),
+          dartParentJoint(NULL),
+          dartChildJoints{},
+          staticLink(false),
+          dtWeldJointConst(NULL)
+      {
+      }
+
+      /// \brief Default destructor
+      public: ~DARTLinkPrivate()
+      {
+        // We don't need to delete dtBodyNode because skeletone will delete
+        // dtBodyNode if it is registered to the skeletone.
+
+        delete dtWeldJointConst;
+      }
+
       /// \brief Pointer to the DART physics engine.
       public: DARTPhysicsPtr dartPhysics;
 
@@ -46,7 +66,7 @@ namespace gazebo
       public: bool staticLink;
 
       /// \brief Weld joint constraint for SetLinkStatic()
-      public: dart::constraint::WeldJointConstraint *weldJointConst;
+      public: dart::constraint::WeldJointConstraint *dtWeldJointConst;
     };
   }
 }

@@ -32,17 +32,12 @@ using namespace physics;
 DARTModel::DARTModel(BasePtr _parent)
   : Model(_parent), dataPtr(new DARTModelPrivate())
 {
-  this->dataPtr->dtSkeleton = NULL;
 }
 
 //////////////////////////////////////////////////
 DARTModel::~DARTModel()
 {
-  // We don't need to delete dtSkeleton because world will delete
-  // dtSkeleton if it is registered to the world.
-
   delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
