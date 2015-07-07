@@ -663,7 +663,6 @@ void dxProcessIslands (dxWorld *world, dReal stepsize, dstepper_fn_t stepper)
   printf("<<<<<<<<<<<< all island threads stopped at time %f with duration %f\n",end_time,end_time - cur_time);
 #endif
 
-  std::cout << world->island_wmems.size() << std::endl;
   for (auto &m : world->island_wmems)
   {
     m->GetWorldProcessingContext()->CleanupContext();
