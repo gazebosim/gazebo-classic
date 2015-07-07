@@ -169,7 +169,7 @@ namespace gazebo
 
       /// \brief Get reference longitude.
       /// \return Reference longitude.
-      /// \deprecated See LatitudeReference function that returns an
+      /// \deprecated See LongitudeReference function that returns an
       /// ignition::math::Angle object.
       public: math::Angle GetLongitudeReference() const GAZEBO_DEPRECATED(6.0);
 
