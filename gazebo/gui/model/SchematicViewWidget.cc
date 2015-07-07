@@ -168,7 +168,6 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
     edgeColor = matDiffuse;
   }
 
-
   this->scene->SetEdgeColor(_id, edgeColor);
 
   this->scene->applyLayout();
