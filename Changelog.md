@@ -1,4 +1,9 @@
 ## Gazebo 6.0
+
+1. Added a transporter plugin which allows models to move from one location
+   to another based on their location and the location of transporter pads.
+    * [Pull request #1738](https://bitbucket.org/osrf/gazebo/pull-request/1738)
+
 1. Implement forward/backwards multi-step for log playback. Now, the semantics
 of a multi-step while playing back a log session are different from a multi-step
 during a live simulation. While playback, a multi-step simulates all the
@@ -37,6 +42,9 @@ world with the Cessna model and the two previous plugins loaded
 
 1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
     * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+
+1. Added Layers tab and meta information for visuals.
+    * [Pull request #1674](https://bitbucket.org/osrf/gazebo/pull-request/1674)
 
 1. Added countdown behavior for common::Timer and exposed the feature in TimerGUIPlugin.
     * [Pull request #1690](https://bitbucket.org/osrf/gazebo/pull-request/1690)
@@ -158,6 +166,9 @@ compilation on Windows.
 
 1. Display confirmation message after log is saved
     * [Pull request #1646](https://bitbucket.org/osrf/gazebo/pull-request/1646)
+
+1. Added LogPlayView to display timeline and LogPlaybackStatistics message type.
+    * [Pull request #1724](https://bitbucket.org/osrf/gazebo/pull-request/1724)
 
 1. Added Time::FormattedString and removed all other FormatTime functions.
     * [Pull request #1710](https://bitbucket.org/osrf/gazebo/pull-request/1710)
@@ -307,6 +318,13 @@ compilation on Windows.
     1. Make palette tips tooltip clickable to open.
         * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
         * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
+
+    1. Add measurement unit to building inspectors.
+        * [Pull request #1741](https://bitbucket.org/osrf/gazebo/pull-request/1741)
+        * [Issue #1363](https://bitbucket.org/osrf/gazebo/issue/1363)
+
+    1. Add `BaseInspectorDialog` as a base class for inspectors.
+        * [Pull request #1749](https://bitbucket.org/osrf/gazebo/pull-request/1749)
 
 ## Gazebo 5.0
 

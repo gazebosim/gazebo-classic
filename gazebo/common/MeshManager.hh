@@ -268,6 +268,31 @@ namespace gazebo
                       const math::Vector2d &_p,
                       double _tol);
 
+      /// \brief Converts a vector of polylines into a table of vertices and
+      /// a list of edges (each made of 2 points from the table of vertices.
+      /// \param[in] _polys the polylines
+      /// \param[in] _tol tolerence for 2 vertices to be considered the same
+      /// \param[out] _vertices a table of unique vertices
+      /// \param[out] _edges a list of edges (made of start/end point indices
+      /// from the vertex table)
+      private: static void ConvertPolylinesToVerticesAndEdges(
+                      const std::vector<std::vector<math::Vector2d> > &_polys,
+                      double _tol,
+                      std::vector<math::Vector2d> &_vertices,
+                      std::vector<math::Vector2i> &_edges);
+
+      /// \brief Check a point againts a list, and only adds it to the list
+      /// if it is not there already.
+      /// \param[in] _vertices the vertex table where points are stored
+      /// \param[in] _p the point coordinates
+      /// \param[in] _tol the maximum distance under which 2 points are
+      /// considered to be the same point.
+      /// \return the index of the point.
+      private: static size_t AddUniquePointToVerticesTable(
+                      std::vector<math::Vector2d> &_vertices,
+                      const math::Vector2d &_p,
+                      double _tol);
+
       /// \brief 3D mesh loader for COLLADA files
       private: ColladaLoader *colladaLoader;
 

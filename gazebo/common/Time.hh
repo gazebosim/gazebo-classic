@@ -41,6 +41,12 @@ namespace gazebo
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;
 
+      /// \brief A static time variable set to a second: common::Time(1, 0).
+      public: static const Time Second;
+
+      /// \brief A static time variable set to an hour: common::Time(3600, 0).
+      public: static const Time Hour;
+
       /// \enum Format options
       /// \brief Options for formatting time as a string.
       public: enum FormatOption

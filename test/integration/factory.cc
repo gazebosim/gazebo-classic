@@ -25,7 +25,7 @@
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "images_cmp.h"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 class FactoryTest : public ServerFixture,
