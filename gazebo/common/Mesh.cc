@@ -323,7 +323,7 @@ void Mesh::FillArrays(float **_vertArr, int **_indArr) const
 
     memcpy(vPtr, vertTmp, sizeof(vertTmp[0])*(*iter)->GetVertexCount()*3);
 
-    for (unsigned int i = 0; i < (*iter)->GetIndexCount(); i++)
+    for (unsigned int i = 0; i < (*iter)->GetIndexCount(); ++i)
     {
       (*_indArr)[index++] = (*iter)->GetIndex(i) + offset;
     }
@@ -526,7 +526,7 @@ void SubMesh::CopyNormals(const std::vector<ignition::math::Vector3d> &_norms)
 {
   this->normals.clear();
   this->normals.resize(_norms.size());
-  for (unsigned int i = 0; i < _norms.size(); i++)
+  for (unsigned int i = 0; i < _norms.size(); ++i)
   {
     this->normals[i] = _norms[i];
     this->normals[i].Normalize();
@@ -913,7 +913,7 @@ void SubMesh::RecalculateNormals()
     return;
 
   // Reset all the normals
-  for (i = 0; i < this->normals.size(); i++)
+  for (i = 0; i < this->normals.size(); ++i)
     this->normals[i].Set(0, 0, 0);
 
   if (this->normals.size() != this->vertices.size())
@@ -939,7 +939,7 @@ void SubMesh::RecalculateNormals()
   }
 
   // Normalize the results
-  for (i = 0; i < this->normals.size(); i++)
+  for (i = 0; i < this->normals.size(); ++i)
   {
     this->normals[i].Normalize();
   }

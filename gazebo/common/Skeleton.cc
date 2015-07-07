@@ -119,7 +119,7 @@ void Skeleton::Scale(double _scale)
   this->root->UpdateChildrenTransforms();
 
   //  scale the animation data
-  for (unsigned int i = 0; i < this->anims.size(); i++)
+  for (unsigned int i = 0; i < this->anims.size(); ++i)
     this->anims[i]->Scale(_scale);
 }
 
@@ -178,7 +178,7 @@ void Skeleton::PrintTransforms()
     SkeletonNode *node = iter->second;
     std::cerr << "---------------\n" << node->GetName() << "\n";
 
-    for (unsigned int i = 0; i < node->GetNumRawTrans(); i++)
+    for (unsigned int i = 0; i < node->GetNumRawTrans(); ++i)
     {
       NodeTransform nt = node->GetRawTransform(i);
       std::cerr << "\t" << nt.GetSID();
@@ -369,7 +369,7 @@ void SkeletonNode::Reset(bool resetChildren)
   this->SetTransform(this->initialTransform);
 
   if (resetChildren)
-    for (unsigned int i = 0; i < this->GetChildCount(); i++)
+    for (unsigned int i = 0; i < this->GetChildCount(); ++i)
       this->GetChild(i)->Reset(true);
 }
 
@@ -377,7 +377,7 @@ void SkeletonNode::Reset(bool resetChildren)
 void SkeletonNode::UpdateChildrenTransforms()
 {
   std::list<SkeletonNode*> toVisit;
-  for (unsigned int i = 0; i < this->children.size(); i++)
+  for (unsigned int i = 0; i < this->children.size(); ++i)
     toVisit.push_back(this->children[i]);
 
   while (!toVisit.empty())
@@ -485,7 +485,7 @@ SkeletonNode* SkeletonNode::GetChild(unsigned int _index)
 //////////////////////////////////////////////////
 SkeletonNode* SkeletonNode::GetChildByName(std::string _name)
 {
-  for (unsigned int i = 0; i < this->children.size(); i++)
+  for (unsigned int i = 0; i < this->children.size(); ++i)
     if (this->children[i]->GetName() == _name)
       return this->children[i];
 
@@ -495,7 +495,7 @@ SkeletonNode* SkeletonNode::GetChildByName(std::string _name)
 //////////////////////////////////////////////////
 SkeletonNode* SkeletonNode::GetChildById(std::string _id)
 {
-  for (unsigned int i = 0; i < this->children.size(); i++)
+  for (unsigned int i = 0; i < this->children.size(); ++i)
     if (this->children[i]->GetId() == _id)
       return this->children[i];
 

@@ -188,7 +188,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
     }
 
     unsigned int cursor = 0;
-    for (unsigned int i = 0; i < nodes.size(); i++)
+    for (unsigned int i = 0; i < nodes.size(); ++i)
     {
       SkeletonNode *node = nodes[i];
       std::vector<std::string> channels = nodeChannels[i];
@@ -202,7 +202,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
       ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
       std::vector<ignition::math::Matrix4d> mats;
       unsigned int chanCount = ignition::math::parseInt(channels[1]);
-      for (unsigned int j = 2; j < (2 + chanCount); j++)
+      for (unsigned int j = 2; j < (2 + chanCount); ++j)
       {
         double value = ignition::math::parseFloat(words[cursor]);
         cursor++;

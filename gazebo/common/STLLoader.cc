@@ -188,7 +188,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
   SubMesh *subMesh = new SubMesh();
 
   // 80 byte Header.
-  for (i = 0; i < 80; i++)
+  for (i = 0; i < 80; ++i)
     static_cast<char>(fgetc(_filein));
 
   // Number of faces.
@@ -267,20 +267,20 @@ bool STLLoader::Leqi(char* _string1, char* _string2)
     nchar = nchar2;
 
   // The strings are not equal if they differ over their common length.
-  for (i = 0; i < nchar; i++)
+  for (i = 0; i < nchar; ++i)
     if (toupper (_string1[i]) != toupper (_string2[i]))
       return false;
 
   // The strings are not equal if the longer one includes nonblanks in the tail.
   if (nchar1 > nchar)
   {
-    for (i = nchar; i < nchar1; i++)
+    for (i = nchar; i < nchar1; ++i)
       if (_string1[i] != ' ')
         return false;
   }
   else if (nchar2 > nchar)
   {
-    for (i = nchar; i < nchar2; i++)
+    for (i = nchar; i < nchar2; ++i)
       if (_string2[i] != ' ')
         return false;
   }
@@ -297,9 +297,9 @@ int STLLoader::RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[])
 
   icol = -1;
 
-  for (j = 0; j < _n; j++)
+  for (j = 0; j < _n; ++j)
   {
-    for (i = 0; i < _m; i++)
+    for (i = 0; i < _m; ++i)
     {
       if (!ignition::math::equal(_a[i][j], _r[i]))
         break;

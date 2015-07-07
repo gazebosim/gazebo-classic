@@ -53,7 +53,7 @@ void MeshCSG::MergeVertices(GPtrArray * _vertices, double _epsilon)
 
   // for each vertex, do a bbox kdtree search to find nearby vertices within
   // _epsilon, merge vertices if they are within the bbox
-  for (unsigned int i = 0; i < _vertices->len; i++)
+  for (unsigned int i = 0; i < _vertices->len; ++i)
   {
     GtsVertex *v = reinterpret_cast<GtsVertex *>(verticesData[i]);
 

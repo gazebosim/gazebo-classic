@@ -832,7 +832,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   };
 
   // Compute the vertices
-  for (i = 0; i < 8; i++)
+  for (i = 0; i < 8; ++i)
   {
     v[i][0] *= _scale * 0.5;
     v[i][1] *= _scale * 0.5;
@@ -840,7 +840,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   }
 
   // For each face
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 6; ++i)
   {
     // For each vertex in the face
     for (k = 0; k < 4; k++)
@@ -854,7 +854,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   }
 
   // Set the indices
-  for (i = 0; i < 36; i++)
+  for (i = 0; i < 36; ++i)
     subMesh->AddIndex(ind[i]);
 
   mesh->RecalculateNormals();
@@ -1074,13 +1074,13 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   {
     norm.Set();
 
-    for (j = 0; j < 3; j++)
+    for (j = 0; j < 3; ++j)
       norm += subMesh->Normal(subMesh->GetIndex(i+j));
 
     norm /= 3;
     norm.Normalize();
 
-    for (j = 0; j < 3; j++)
+    for (j = 0; j < 3; ++j)
       subMesh->SetNormal(subMesh->GetIndex(i+j), norm);
   }
 

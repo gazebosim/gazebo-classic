@@ -182,7 +182,7 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
     // algorithm
     bool pointInPolygon = false;
     for (unsigned int j = 0, k = subpath03.size()-1; j < subpath03.size();
-        k = j++)
+        k = ++j)
     {
       if (((subpath03[j].Y() > v.Y()) != (subpath03[k].Y() > v.Y())) &&
           (v.X() < (subpath03[k].X()-subpath03[j].X()) *
