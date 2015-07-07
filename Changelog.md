@@ -1,4 +1,10 @@
 ## Gazebo 6.0
+1. Implement more control options for log playback:
+  1. Rewind: The simulation starts from the beginning.
+  1. Forward: The simulation jumps to the end of the log file.
+  1. Seek: The simulation jumps to a specific point specified by its simulation
+  time.
+      * [Pull request #1737](https://bitbucket.org/osrf/gazebo/pull-request/1737)
 
 1. Added a transporter plugin which allows models to move from one location
    to another based on their location and the location of transporter pads.
