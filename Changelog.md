@@ -1,9 +1,15 @@
 ## Gazebo 6.0
+1. Implement more control options for log playback:
+  1. Rewind: The simulation starts from the beginning.
+  1. Forward: The simulation jumps to the end of the log file.
+  1. Seek: The simulation jumps to a specific point specified by its simulation
+  time.
+      * [Pull request #1737](https://bitbucket.org/osrf/gazebo/pull-request/1737)
 
 1. Added a transporter plugin which allows models to move from one location
    to another based on their location and the location of transporter pads.
     * [Pull request #1738](https://bitbucket.org/osrf/gazebo/pull-request/1738)
-   
+
 1. Implement forward/backwards multi-step for log playback. Now, the semantics
 of a multi-step while playing back a log session are different from a multi-step
 during a live simulation. While playback, a multi-step simulates all the
@@ -42,6 +48,10 @@ world with the Cessna model and the two previous plugins loaded
 
 1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
     * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+    * [Pull request #1775](https://bitbucket.org/osrf/gazebo/pull-request/1775)
+
+1. Added Layers tab and meta information for visuals.
+    * [Pull request #1674](https://bitbucket.org/osrf/gazebo/pull-request/1674)
 
 1. Added countdown behavior for common::Timer and exposed the feature in TimerGUIPlugin.
     * [Pull request #1690](https://bitbucket.org/osrf/gazebo/pull-request/1690)
@@ -213,6 +223,10 @@ compilation on Windows.
 1. Added View Inertia and InertiaVisual, changed COMVisual to sphere proportional to mass.
     * [Pull request #1445](https://bitbucket.org/osrf/gazebo/pull-request/1445)
 
+1. Added View Link Frame and LinkFrameVisual. Visual::SetTransparency goes into texture_unit.
+    * [Pull request #1762](https://bitbucket.org/osrf/gazebo/pull-request/1762)
+    * [Issue #853](https://bitbucket.org/osrf/gazebo/issue/853)
+
 1. Changed the position of Save and Cancel buttons on editor dialogs
     * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
     * [Issue #1377](https://bitbucket.org/osrf/gazebo/issue/1377)
@@ -244,6 +258,9 @@ compilation on Windows.
 
 1. Added Apply Force/Torque OnMouseRelease and ActivateWindow
     * [Pull request #1699](https://bitbucket.org/osrf/gazebo/pull-request/1699)
+
+1. Added Apply Force/Torque mouse interactions, modes, activation
+    * [Pull request #1731](https://bitbucket.org/osrf/gazebo/pull-request/1731)
 
 1. Added inertia pose getter for COMVisual and COMVisual_TEST
     * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)
@@ -315,6 +332,13 @@ compilation on Windows.
     1. Make palette tips tooltip clickable to open.
         * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
         * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
+
+    1. Add measurement unit to building inspectors.
+        * [Pull request #1741](https://bitbucket.org/osrf/gazebo/pull-request/1741)
+        * [Issue #1363](https://bitbucket.org/osrf/gazebo/issue/1363)
+
+    1. Add `BaseInspectorDialog` as a base class for inspectors.
+        * [Pull request #1749](https://bitbucket.org/osrf/gazebo/pull-request/1749)
 
 ## Gazebo 5.0
 

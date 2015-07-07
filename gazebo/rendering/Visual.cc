@@ -1001,7 +1001,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
 
   // Re-apply the transparency filter for the last known transparency value
-  this->SetTransparencyInnerLoop();
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
 
   // Apply material to all child visuals
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
@@ -1288,57 +1288,6 @@ common::Color Visual::GetEmissive() const
   return this->dataPtr->emissive;
 }
 
-/////////////////////////////////////////////////
-void Visual::AttachAxes()
-{
-  std::ostringstream nodeName;
-
-  nodeName << this->dataPtr->sceneNode->getName() << "_AXES_NODE";
-
-  if (!this->dataPtr->sceneNode->getCreator()->hasEntity("axis_cylinder"))
-    this->InsertMesh(common::MeshManager::Instance()->GetMesh("axis_cylinder"));
-
-  Ogre::SceneNode *node = this->dataPtr->sceneNode->createChildSceneNode(
-      nodeName.str());
-  Ogre::SceneNode *x, *y, *z;
-
-  x = node->createChildSceneNode(nodeName.str() + "_axisX");
-  x->setInheritScale(true);
-  x->translate(.25, 0, 0);
-  x->yaw(Ogre::Radian(M_PI/2.0));
-
-  y = node->createChildSceneNode(nodeName.str() + "_axisY");
-  y->setInheritScale(true);
-  y->translate(0, .25, 0);
-  y->pitch(Ogre::Radian(M_PI/2.0));
-
-  z = node->createChildSceneNode(nodeName.str() + "_axisZ");
-  z->translate(0, 0, .25);
-  z->setInheritScale(true);
-
-  Ogre::MovableObject *xobj, *yobj, *zobj;
-
-  xobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(
-        nodeName.str()+"X_AXIS", "axis_cylinder"));
-  xobj->setCastShadows(false);
-  ((Ogre::Entity*)xobj)->setMaterialName("Gazebo/Red");
-
-  yobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(
-        nodeName.str()+"Y_AXIS", "axis_cylinder"));
-  yobj->setCastShadows(false);
-  ((Ogre::Entity*)yobj)->setMaterialName("Gazebo/Green");
-
-  zobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(
-        nodeName.str()+"Z_AXIS", "axis_cylinder"));
-  zobj->setCastShadows(false);
-  ((Ogre::Entity*)zobj)->setMaterialName("Gazebo/Blue");
-
-  x->attachObject(xobj);
-  y->attachObject(yobj);
-  z->attachObject(zobj);
-}
-
-
 //////////////////////////////////////////////////
 void Visual::SetWireframe(bool _show)
 {
@@ -1391,13 +1340,13 @@ void Visual::SetWireframe(bool _show)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetTransparencyInnerLoop()
+void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 {
-  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
+  for (unsigned int i = 0; i < _sceneNode->numAttachedObjects();
       i++)
   {
     Ogre::Entity *entity = NULL;
-    Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
+    Ogre::MovableObject *obj = _sceneNode->getAttachedObject(i);
 
     entity = dynamic_cast<Ogre::Entity*>(obj);
 
@@ -1413,19 +1362,20 @@ void Visual::SetTransparencyInnerLoop()
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
 
-      unsigned int techniqueCount, passCount;
+      unsigned int techniqueCount, passCount, unitStateCount;
       Ogre::Technique *technique;
       Ogre::Pass *pass;
       Ogre::ColourValue dc;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-           techniqueCount++)
+           ++techniqueCount)
       {
         technique = material->getTechnique(techniqueCount);
 
-        for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+        for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
         {
           pass = technique->getPass(passCount);
+
           // Need to fix transparency
           if (!pass->isProgrammable() &&
               pass->getPolygonMode() == Ogre::PM_SOLID)
@@ -1448,6 +1398,17 @@ void Visual::SetTransparencyInnerLoop()
           dc.a = (1.0f - this->dataPtr->transparency);
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
+
+
+          for (unitStateCount = 0; unitStateCount <
+              pass->getNumTextureUnitStates(); ++unitStateCount)
+          {
+            auto textureUnitState = pass->getTextureUnitState(unitStateCount);
+
+            textureUnitState->setAlphaOperation(
+                Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
+                1.0 - this->dataPtr->transparency);
+          }
         }
       }
     }
@@ -1463,14 +1424,28 @@ void Visual::SetTransparency(float _trans)
   this->dataPtr->transparency = std::min(
       std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
 
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  for (auto child : this->dataPtr->children)
   {
-    (*iter)->SetTransparency(_trans);
+    // Don't change some visualizations when link changes
+    if (!(this->GetType() == VT_LINK &&
+        (child->GetType() == VT_GUI ||
+         child->GetType() == VT_PHYSICS ||
+         child->GetType() == VT_SENSOR)))
+    {
+      child->SetTransparency(_trans);
+    }
   }
 
-  this->SetTransparencyInnerLoop();
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
+
+  // For child nodes' scene nodes
+  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
+  {
+    Ogre::SceneNode *childSceneNode = dynamic_cast<Ogre::SceneNode*>(
+        this->dataPtr->sceneNode->getChild(i));
+
+    this->SetTransparencyInnerLoop(childSceneNode);
+  }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
@@ -1499,6 +1474,17 @@ void Visual::SetHighlighted(bool _highlighted)
   else if (this->dataPtr->boundingBox)
   {
     this->dataPtr->boundingBox->SetVisible(false);
+  }
+
+  // If this is a link, highlight frame visual
+  if (this->GetType() == VT_LINK)
+  {
+    VisualPtr linkFrameVis;
+    for (auto child : this->dataPtr->children)
+    {
+      if (child->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+        child->SetHighlighted(_highlighted);
+    }
   }
 }
 
@@ -2815,6 +2801,18 @@ void Visual::ShowInertia(bool _show)
   for (auto &child : this->dataPtr->children)
   {
     child->ShowInertia(_show);
+  }
+}
+
+//////////////////////////////////////////////////
+void Visual::ShowLinkFrame(bool _show)
+{
+  if (this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  for (auto &child : this->dataPtr->children)
+  {
+    child->ShowLinkFrame(_show);
   }
 }
 
