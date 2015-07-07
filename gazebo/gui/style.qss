@@ -760,12 +760,6 @@ QLineEdit#logPlayCurrentTime:focus
   background-color: #707070;
 }
 
-QTextEdit#splashStatusTextEdit
-{
-  color: #f58113;
-  font-size: 12px;
-}
-
 QTextEdit#splashVersionTextEdit
 {
   color: #f58113;
