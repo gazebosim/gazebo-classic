@@ -84,6 +84,9 @@ namespace gazebo
       /// \brief QT callback for timing out the confirmation message.
       private slots: void OnConfirmationTimeout();
 
+      /// \brief QT callback when the dialog is closed.
+      private slots: void OnCancel();
+
       /// \brief Callback for log status messages.
       /// \param[in] _msg Log status message.
       private: void OnStatus(ConstLogStatusPtr &_msg);
