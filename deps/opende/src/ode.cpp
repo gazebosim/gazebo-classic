@@ -1640,10 +1640,6 @@ dxWorld * dWorldCreate()
   w->body_flags = 0; // everything disabled
 
   w->wmem = 0;
-  /*w->island_wmems.resize(1000);
-  for (auto &m : w->island_wmems)
-    m = 0;
-    */
 
   w->adis.idle_steps = 10;
   w->adis.idle_time = 0;
