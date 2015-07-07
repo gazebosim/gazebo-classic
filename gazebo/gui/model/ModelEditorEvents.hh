@@ -363,7 +363,7 @@ namespace gazebo
 
         /// \brief Notify that a joint has been inserted. The parameters are:
         /// joint's unique id, joint name, joint type, parent link's name, and
-        ///child link's name. All names are scoped.
+        /// child link's name. All names are scoped.
         public: static event::EventT<void (std::string, std::string,
             std::string, std::string, std::string)> jointInserted;
 
@@ -372,7 +372,7 @@ namespace gazebo
 
         /// \brief Notify that a joint has been changed. The parameters are:
         /// joint's unique id, joint name, joint type, parent link's name, and
-        ///child link's name. All names are scoped.
+        /// child link's name. All names are scoped.
         public: static event::EventT<void (std::string, std::string,
             std::string, std::string, std::string)> jointChanged;
 
