@@ -48,6 +48,7 @@ world with the Cessna model and the two previous plugins loaded
 
 1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
     * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+    * [Pull request #1775](https://bitbucket.org/osrf/gazebo/pull-request/1775)
 
 1. Added Layers tab and meta information for visuals.
     * [Pull request #1674](https://bitbucket.org/osrf/gazebo/pull-request/1674)
