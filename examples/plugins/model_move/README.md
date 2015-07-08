@@ -40,9 +40,15 @@ the SDF file.
 1. Publish the path publisher
 
     ```
-... open a new terminal ...
-$ cd build
-$ ./path_publisher
+    open a new terminal
+    ```
+    
+    ```
+    $ cd build
+    ```
+    
+    ```
+    $ ./path_publisher
     ```
     
 ### Use predefined animation from the SDF file
