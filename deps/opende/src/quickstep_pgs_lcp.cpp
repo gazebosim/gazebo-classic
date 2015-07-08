@@ -1366,7 +1366,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     {
       // skip threadpool if less than 2 threads allocated
       // printf("threading out for params\n");
-      row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&(params[thread_id]))));
+      row_threadpool->schedule(boost::bind(*ComputeRows,
+        (void*)(&(params[thread_id]))));
     }
     else
       ComputeRows((void*)(&(params[thread_id])));
@@ -1386,7 +1387,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   // check time for scheduling, this is usually very quick
   //gettimeofday(&tv,NULL);
   //double wait_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  //printf("      quickstep done scheduling start time %f stopped time %f duration %f\n",
+  //printf("      quickstep done scheduling"
+  //       " start time %f stopped time %f duration %f\n",
   //       cur_time,wait_time,wait_time - cur_time);
 
 #ifdef USE_TPROW
@@ -1497,14 +1499,18 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
   {
     // body1 was always the 1st body in the body pair
     dRealPtr J_next_ptr =  J_orig + index*12 + 12;
-    v_f1 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
-    v_f2 = quickstep::dot6(J_next_ptr, body1_vel) + quickstep::dot6(J_next_ptr+6, body2_vel);
+    v_f1 = quickstep::dot6(J_orig_ptr, body1_vel)
+      + quickstep::dot6(J_orig_ptr+6, body2_vel);
+    v_f2 = quickstep::dot6(J_next_ptr, body1_vel)
+      + quickstep::dot6(J_next_ptr+6, body2_vel);
   }
   else if (constraint_index == prev_constraint_index)
   {
     dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
-    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr, body2_vel);
-    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr, body2_vel);
+    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel)
+      + quickstep::dot6(J_prev_ptr, body2_vel);
+    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel)
+      + quickstep::dot6(J_orig_ptr, body2_vel);
   }
   else
   {
