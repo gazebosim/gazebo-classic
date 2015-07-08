@@ -77,9 +77,9 @@ set(tests
   speed.cc
   speed_thread_pr2.cc
   stress_spawn_models.cc
-  swarm.cc
   #state_log.cc
   surface_properties.cc
+  swarm.cc
   transceiver.cc
   transport.cc
   transporter.cc
