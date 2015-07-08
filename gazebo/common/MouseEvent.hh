@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MOUSEEVENT_HH_
-#define _MOUSEEVENT_HH_
+#ifndef _GAZEBO_MOUSEEVENT_HH_
+#define _GAZEBO_MOUSEEVENT_HH_
 
 #include <ignition/math/Vector2.hh>
 #include "gazebo/util/system.hh"

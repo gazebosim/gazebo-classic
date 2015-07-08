@@ -43,7 +43,7 @@ namespace gazebo
       /// \param[in] _y value along y
       public: Vector2i(const int &_x, const int &_y);
 
-      /// \brief Copy onstructor
+      /// \brief Copy constructor
       /// \param[in] _pt a point
       public: Vector2i(const Vector2i &_pt);
 
