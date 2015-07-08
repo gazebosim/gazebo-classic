@@ -415,7 +415,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
           dxBody *b_ptr = *bodycurr;
           dReal body_invMass = b_ptr->invMass;
           for (int j=0; j<3; j++)
-            tmp1curr[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
+            tmp1curr[j] = b_ptr->facc[j]*body_invMass
+              + b_ptr->lvel[j]*stepsize1;
           dMultiply0_331 (tmp1curr + 3,invMOIrow,b_ptr->tacc);
           for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->avel[k] * stepsize1;
         }
@@ -445,7 +446,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
     } END_STATE_SAVE(context, cstate);
 
 #ifdef PENETRATION_JVERROR_CORRECTION
-    // allocate and populate vnew with v(n+1) due to non-constraint forces as the starting value
+    // allocate and populate vnew with v(n+1) due to non-constraint
+    // forces as the starting value
     vnew = context->AllocateArray<dReal> (nb*6);
     {
       dRealMutablePtr vnewcurr = vnew;
@@ -459,7 +461,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
         // add stepsize * invM * fe to the body velocity
         dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
         for (int j=0; j<3; j++) {
-          vnewcurr[j]   = b_ptr->lvel[j] + body_invMass_mul_stepsize * b_ptr->facc[j];
+          vnewcurr[j]   = b_ptr->lvel[j]
+            + body_invMass_mul_stepsize * b_ptr->facc[j];
           vnewcurr[j+3] = b_ptr->avel[j];
           tmp_tacc[j]   = b_ptr->tacc[j]*stepsize;
         }
@@ -479,9 +482,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
       const dJointWithInfo1 *const jiend = jicurr + nj;
       for (; jicurr != jiend; jicurr++) {
         int infom = jicurr->info.m;
-        memcpy (lambdacurr, jicurr->joint->lambda, infom * sizeof(dReal));
+        memcpy(lambdacurr, jicurr->joint->lambda, infom*sizeof(dReal));
         lambdacurr += infom;
-        memcpy (lambda_erpcurr, jicurr->joint->lambda_erp, infom * sizeof(dReal));
+        memcpy(lambda_erpcurr, jicurr->joint->lambda_erp, infom*sizeof(dReal));
         lambda_erpcurr += infom;
       }
 
@@ -607,7 +610,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
       {
         size_t sub2_res1 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for c
         {
-          size_t sub3_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for tmp1
+          size_t sub3_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // tmp1
 
           size_t sub3_res2 = 0;
 
@@ -618,9 +621,9 @@ size_t dxEstimateQuickStepMemoryRequirements (
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for lambda_erp
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for cforce
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel
-        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel_erp
+        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // caccel_erp
 #ifdef POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
-        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel_corr
+        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // caccel_corr
         sub2_res2 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for vel
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for tmp
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
