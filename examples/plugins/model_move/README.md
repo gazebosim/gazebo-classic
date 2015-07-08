@@ -29,9 +29,10 @@ the SDF file.
 
 1. Go to the build directory and run gazebo with the example world
    
+    ```
     $ cd build
     $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
-   
+    ```
 1. Publish the path publisher
 
     ... open a new terminal ...
