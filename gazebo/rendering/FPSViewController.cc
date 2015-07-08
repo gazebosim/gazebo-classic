@@ -79,16 +79,16 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
   if (!this->enabled)
     return;
 
-  ignition::math::Vector2i drag = _event.pos - _event.prevPos;
+  ignition::math::Vector2i drag = _event.Pos() - _event.PrevPos();
 
-  if (_event.buttons & common::MouseEvent::LEFT)
+  if (_event.Buttons() & common::MouseEvent::LEFT)
   {
     this->camera->Yaw(GZ_DTOR(-drag.X()*0.1));
     this->camera->Pitch(GZ_DTOR(drag.Y()*0.1));
   }
-  else if (_event.type == common::MouseEvent::SCROLL)
+  else if (_event.Type() == common::MouseEvent::SCROLL)
   {
-    if (_event.scroll.Y() < 0)
+    if (_event.Scroll().Y() < 0)
     {
       this->xVelocityFactor *= 1.05;
       this->yVelocityFactor *= 1.05;

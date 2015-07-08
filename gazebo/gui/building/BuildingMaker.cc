@@ -1697,7 +1697,7 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
-  if (_event.dragging)
+  if (_event.Dragging())
   {
     userCamera->HandleMouseEvent(_event);
     return true;
@@ -1710,7 +1710,7 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
   // Highlight visual on hover
   if (vis)
   {
@@ -1793,13 +1793,13 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
 
-  if (_event.dragging)
+  if (_event.Dragging())
   {
     userCamera->HandleMouseEvent(_event);
     return true;
   }
 
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.Button() != common::MouseEvent::LEFT)
   {
     this->StopMaterialModes();
     return true;

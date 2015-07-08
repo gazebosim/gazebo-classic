@@ -211,6 +211,20 @@ namespace gazebo
       /// \brief QT Callback that turns on perspective projection
       private slots: void OnPerspective();
 
+      /// \brief Set this->mouseEvent's Buttons property to the value of
+      /// _event->buttons(). Note that this is different from the
+      /// SetMouseEventButtons, plural, function.
+      /// \sa SetMouseEventButtons
+      /// \param[in] _event The QT mouse event
+      private: void SetMouseEventButton(const Qt::MouseButton &_button);
+
+      /// \brief Set this->mouseEvent's Button property to the value of
+      /// _event->button(). Note that this is different from the
+      /// SetMouseEventButton, singular, function.
+      /// \sa SetMouseEventButton
+      /// \param[in] _event The QT mouse event
+      private: void SetMouseEventButtons(const Qt::MouseButtons &_buttons);
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
