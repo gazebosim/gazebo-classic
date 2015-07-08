@@ -27,20 +27,20 @@ the SDF file.
 
 ### Run the standalone publisher
 
-1. Go to the build directory and run gazebo with the example world
+ 1. Go to the build directory and run gazebo with the example world
 
-  ```
-  $ cd build
-  $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
-  ```
+   ```
+   $ cd build
+   $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
+   ```
 
-1. Publish the path publisher
+ 1. Publish the path publisher
 
-  ```
-  ... open a new terminal ...
-  $ cd build
-  $ ./path_publisher
-  ```
+   ```
+   ... open a new terminal ...
+   $ cd build
+   $ ./path_publisher
+   ```
 
 ### Use predefined animation from the SDF file
 
@@ -58,7 +58,7 @@ To change the input parameters, you can modify the world file sdf:
 <pose> 6 floats (position, orientation) to be threated as goals
 ```
 
-    Example (in sdf file):
+Example (in sdf file):
 
 ```    
 <plugin name="model_move" filename="libmodel_move.so">
