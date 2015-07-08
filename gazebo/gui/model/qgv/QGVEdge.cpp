@@ -175,7 +175,6 @@ void QGVEdge::updateLayout()
 
     _pen.setWidth(1);
 
-//    _pen.setColor(QGVCore::toColor(getAttribute("color")));
     _pen.setColor(this->edgeColor);
     _pen.setStyle(QGVCore::toPenStyle(getAttribute("style")));
 
