@@ -49,7 +49,7 @@ namespace gazebo
 
     /// \brief Callback to run when recieve a path message.
     /// \param[in] _msg path message received to animate.
-    public: void GetPathMsg(ConstPoseAnimationPtr &_msg);
+    public: void OnPathMsg(ConstPoseAnimationPtr &_msg);
 
     /// \brief Plugin Load function
     /// \param[in] _parent Model pointer to the model defining this plugin

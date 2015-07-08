@@ -98,7 +98,7 @@ void ModelMove::InitiateMove()
 }
 
 /////////////////////////////////////////////////
-void ModelMove::GetPathMsg(ConstPoseAnimationPtr &_msg)
+void ModelMove::OnPathMsg(ConstPoseAnimationPtr &_msg)
 {
   gzmsg << "[model_move] Received path message" << std::endl;
 
@@ -169,7 +169,7 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   std::string pathTopicName = std::string("~/") + _parent->GetName()
     + "/model_move";
   this->pathSubscriber = node->Subscribe(
-      pathTopicName, &ModelMove::GetPathMsg, this);
+      pathTopicName, &ModelMove::OnPathMsg, this);
   gzmsg << "[model_move] Subscribed to receive paths in: "<< pathTopicName
         << std::endl;
 }

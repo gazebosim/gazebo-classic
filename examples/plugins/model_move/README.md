@@ -29,18 +29,18 @@ the SDF file.
 
 1. Go to the build directory and run gazebo with the example world
 
-```
-$ cd build
-$ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
-```
+  ```
+  $ cd build
+  $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
+  ```
 
 1. Publish the path publisher
 
-```
-... open a new terminal ...
-$ cd build
-$ ./path_publisher
-```
+  ```
+  ... open a new terminal ...
+  $ cd build
+  $ ./path_publisher
+  ```
 
 ### Use predefined animation from the SDF file
 
@@ -53,15 +53,19 @@ $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move_with_move
 
 To change the input parameters, you can modify the world file sdf:
 
-    <goals> container of the list of poses to be reached by the model
-    <pose> 6 floats (position, orientation) to be threated as goals
+```
+<goals> container of the list of poses to be reached by the model
+<pose> 6 floats (position, orientation) to be threated as goals
+```
 
     Example (in sdf file):
-    
-    <plugin name="model_move" filename="libmodel_move.so">
-      <goals>
-        <pose>5 5 0 0 0 0</pose>
-        <pose>5 -5 0 0 0 0</pose>
-        <pose>0 0 0 0 0 0</pose>
-      </goals>
-    </plugin>
+
+```    
+<plugin name="model_move" filename="libmodel_move.so">
+  <goals>
+    <pose>5 5 0 0 0 0</pose>
+    <pose>5 -5 0 0 0 0</pose>
+    <pose>0 0 0 0 0 0</pose>
+  </goals>
+</plugin>
+```
