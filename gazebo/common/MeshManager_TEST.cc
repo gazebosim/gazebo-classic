@@ -48,7 +48,7 @@ TEST_F(MeshManager, CreateShapes)
   EXPECT_TRUE(common::MeshManager::Instance()->CreateTube("test_tube",
       1.0, 1.2, 0.01, 1, 64));
 
-  std::vector<math::Vector2d> path;
+  std::vector<std::vector<math::Vector2d> > path;
   EXPECT_FALSE(common::MeshManager::Instance()->CreateExtrudedPolyline(
       "invalid_path", path, 1.0));
 }
