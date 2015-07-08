@@ -185,7 +185,7 @@ namespace gazebo
       ///        angle from East to gazebo x-axis, or equivalently
       ///        from North to gazebo y-axis.
       /// \return Heading offset of gazebo reference frame.
-      /// \deprecated See HeadingOffest() function that returns an
+      /// \deprecated See HeadingOffset() function that returns an
       /// ignition::math::Angle object.
       public: math::Angle GetHeadingOffset() const GAZEBO_DEPRECATED(6.0);
 
