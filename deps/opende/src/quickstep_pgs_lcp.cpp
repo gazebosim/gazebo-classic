@@ -915,7 +915,8 @@ static void* ComputeRows(void *p)
   #ifdef REPORT_THREAD_TIMING
   gettimeofday(&tv,NULL);
   double end_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  printf("      quickstep row thread %d start time %f ended time %f duration %f\n",thread_id,cur_time,end_time,end_time - cur_time);
+  printf("      quickstep row thread %d start time %f ended time %f"
+         " duration %f\n", thread_id, cur_time, end_time, end_time - cur_time);
   #endif
 
   if (position_correction_thread)
@@ -1039,7 +1040,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     /* which is a mX1 column vector */
     /********************************/
     // compute Adcfm_precon for the preconditioned case
-    //   do this first before J gets altered (J's diagonals gets premultiplied by Ad)
+    //   do this first before J gets altered (J's diagonals gets
+    //   premultiplied by Ad)
     //   and save a copy of J into J_orig
     //   as J becomes J * Ad, J_precon becomes J * Ad_precon
     Adcfm_precon = context->AllocateArray<dReal> (m);
@@ -1053,9 +1055,10 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       dRealMutablePtr J_ptr = J;
       dRealMutablePtr J_orig_ptr = J_orig;
       dRealMutablePtr J_precon_ptr = J_precon;
-      for (int i=0; i<m; J_ptr += 12, J_precon_ptr += 12, J_orig_ptr += 12, i++) {
+      for (int i=0; i<m; J_ptr += 12, J_precon_ptr += 12, J_orig_ptr += 12, ++i)
+      {
         dReal Ad_precon_i = Ad_precon[i];
-        for (int j=0; j<12; j++) {
+        for (int j=0; j<12; ++j) {
           J_precon_ptr[j] = J_ptr[j] * Ad_precon_i;
           J_orig_ptr[j] = J_ptr[j]; //copy J
         }
@@ -1245,7 +1248,9 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp[thread_id].position_correction_thread = true;
 #ifdef PENETRATION_JVERROR_CORRECTION
       params_erp[thread_id].stepsize = stepsize;
-      params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
+      /// \TODO need to fix PENETRATION_JVERROR_CORRECTION
+      /// and allocate vnew_erp before using below:
+      /// params_erp[thread_id].vnew  = vnew_erp;
 #endif
       params_erp[thread_id].qs  = qs;
       // if every one reorders constraints, this might just work
@@ -1257,7 +1262,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp[thread_id].nb = nb;
       params_erp[thread_id].jb = jb;
       params_erp[thread_id].findex = findex;
-      params_erp[thread_id].skip_friction = false;  // might be a save, but need to test more
+      params_erp[thread_id].skip_friction = false;  /// \TODO need to test more
       params_erp[thread_id].hi = hi;
       params_erp[thread_id].lo = lo;
       params_erp[thread_id].invMOI = invMOI;
@@ -1290,7 +1295,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       {
         // skip threadpool if less than 2 threads allocated
         // printf("threading out for params_erp\n");
-        row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&params_erp[thread_id])));
+        row_threadpool->schedule(boost::bind(*ComputeRows,
+          (void*)(&params_erp[thread_id])));
       }
       else
       {
@@ -1309,7 +1315,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     params[thread_id].order     = order;
     params[thread_id].body      = body;
     params[thread_id].mutex     = mutex;
-    params[thread_id].inline_position_correction = !qs->thread_position_correction;
+    params[thread_id].inline_position_correction =
+      !qs->thread_position_correction;
     params[thread_id].position_correction_thread = false;
 #ifdef PENETRATION_JVERROR_CORRECTION
     params[thread_id].stepsize = stepsize;
@@ -1407,10 +1414,14 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   #endif
 }
 
-void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_erp, dReal& hi_act_erp,
-    int *jb, dRealPtr J_orig, int index, int constraint_index, int startRow, int nRows,
-    const int nb, dxBody * const *body, int i, const IndexError *order, const int *findex,
-    dRealPtr /*lo*/, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp)
+void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act,
+    dReal& lo_act_erp, dReal& hi_act_erp,
+    int *jb, dRealPtr J_orig, int index, int constraint_index,
+    int startRow, int nRows,
+    const int nb, dxBody * const *body, int i,
+    const IndexError *order, const int *findex,
+    dRealPtr /*lo*/, dRealPtr hi, dRealMutablePtr lambda,
+    dRealMutablePtr lambda_erp)
 {
   // This computes the corresponding hi_act and lo_act for friction constraints.
   // For each contact, we have lambda_n, lambda_f1, and lambda_f2.
@@ -1448,7 +1459,8 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
   dSetZero(body1_vel, 6);
   dSetZero(body2_vel, 6);
   dxBody *const *const bodyend = body + nb;
-  for (dxBody *const *bodycurr = body; bodycurr != bodyend; bodycurr++, bodycounter++)
+  for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+    ++bodycurr, ++bodycounter)
   {
     dxBody *b_ptr = *bodycurr;
     // first direction
