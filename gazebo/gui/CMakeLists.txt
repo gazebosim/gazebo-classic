@@ -139,7 +139,6 @@ endif ()
 #endif()
 
 set (qt_tests
-  ApplyWrenchDialog_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc
@@ -154,6 +153,7 @@ set (qt_tests
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
+      ApplyWrenchDialog_TEST.cc
       BuildingEditor_TEST.cc
       ConfigWidget_TEST.cc
       GLWidget_TEST.cc

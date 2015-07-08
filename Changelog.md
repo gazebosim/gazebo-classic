@@ -48,6 +48,7 @@ world with the Cessna model and the two previous plugins loaded
 
 1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
     * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+    * [Pull request #1775](https://bitbucket.org/osrf/gazebo/pull-request/1775)
 
 1. Added Layers tab and meta information for visuals.
     * [Pull request #1674](https://bitbucket.org/osrf/gazebo/pull-request/1674)
@@ -261,6 +262,9 @@ compilation on Windows.
 
 1. Added Apply Force/Torque OnMouseRelease and ActivateWindow
     * [Pull request #1699](https://bitbucket.org/osrf/gazebo/pull-request/1699)
+
+1. Added Apply Force/Torque mouse interactions, modes, activation
+    * [Pull request #1731](https://bitbucket.org/osrf/gazebo/pull-request/1731)
 
 1. Added inertia pose getter for COMVisual and COMVisual_TEST
     * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)
