@@ -31,6 +31,9 @@ the SDF file.
    
     ```
     $ cd build
+    ```
+    
+    ```
     $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
     ```
     
