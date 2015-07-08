@@ -111,9 +111,11 @@ static void* ComputeRows(void *p)
   dRealMutablePtr last_lambda  = params->last_lambda;
 #endif
 
-  //printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
-  //for (int i=startRow; i<startRow+nRows; i++) // swap within boundary of our own segment
-  //  printf("wwwwwwwwwwwww>id %d start %d n %d  order[%d].index=%d\n",thread_id,startRow,nRows,i,order[i].index);
+  // printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
+  // // swap within boundary of our own segment
+  // for (int i=startRow; i<startRow+nRows; i++)
+  //   printf("wwwwwwwwwwwww>id %d start %d n %d  order[%d].index=%d\n",
+  //     thread_id, startRow, nRows, i, order[i].index);
 
   /*  DEBUG PRINTOUTS
   // print J_orig
@@ -126,7 +128,8 @@ static void* ComputeRows(void *p)
   }
   printf("\n");
 
-  // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
+  // print J, J_precon (already premultiplied by inverse of diagonal of LHS)
+  // and rhs_precon and rhs
   printf("J_precon\n");
   for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
@@ -244,7 +247,8 @@ static void* ComputeRows(void *p)
         dReal v2 = dFabs (last_lambda[i]);
         dReal max = (v1 > v2) ? v1 : v2;
         if (max > 0) {
-          //@@@ relative error: order[i].error = dFabs(lambda[i]-last_lambda[i])/max;
+          //@@@ relative error: order[i].error =
+          //  dFabs(lambda[i]-last_lambda[i])/max;
           order[i].error = dFabs(lambda[i]-last_lambda[i]);
         }
         else {
@@ -255,7 +259,10 @@ static void* ComputeRows(void *p)
       }
     }
 
-    //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("=====> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
+    // if (thread_id == 0)
+    //   for (int i=startRow; i<startRow+nRows; ++i)
+    //     printf("=====> %d %d %d %f %d\n",
+    //       thread_id, iteration, i, order[i].error, order[i].index);
 
     qsort (order+startRow,nRows,sizeof(IndexError),&compare_index_error);
 
@@ -264,18 +271,26 @@ static void* ComputeRows(void *p)
     //    returned to the caller
     memcpy (last_lambda+startRow,lambda+startRow,nRows*sizeof(dReal));
 
-    //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("-----> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
+    // if (thread_id == 0)
+    //   for (int i=startRow; i<startRow+nRows; ++i)
+    //     printf("-----> %d %d %d %f %d\n", thread_id, iteration,
+    //       i, order[i].error, order[i].index);
 
 #endif
 #ifdef RANDOMLY_REORDER_CONSTRAINTS
     if ((iteration & 7) == 0) {
       #ifdef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
-        boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every swap
+        // lock for every swap
+        boost::recursive_mutex::scoped_lock lock(*mutex);
       #endif
       //  int swapi = dRandInt(i+1); // swap across engire matrix
-      for (int i=startRow+1; i<startRow+nRows; i++) { // swap within boundary of our own segment
-        int swapi = dRandInt(i+1-startRow)+startRow; // swap within boundary of our own segment
-        //printf("xxxxxxxx>id %d swaping order[%d].index=%d order[%d].index=%d\n",thread_id,i,order[i].index,swapi,order[swapi].index);
+      for (int i=startRow+1; i<startRow+nRows; ++i)
+      {
+        // swap within boundary of our own segment
+        int swapi = dRandInt(i+1-startRow)+startRow;
+        // printf("xxxxxxxx>id %d swaping order[%d].index=%d"
+        //        " order[%d].index=%d\n", thread_id, i,
+        //        order[i].index, swapi, order[swapi].index);
         IndexError tmp = order[i];
         order[i] = order[swapi];
         order[swapi] = tmp;
@@ -283,7 +298,7 @@ static void* ComputeRows(void *p)
 
       // {
       //   // verify
-      //   boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
+      //   boost::recursive_mutex::scoped_lock lock(*mutex);
       //   printf("  random id %d iter %d\n",thread_id,iteration);
       //   for (int i=startRow+1; i<startRow+nRows; i++)
       //     printf(" %5d,",i);
@@ -566,8 +581,10 @@ static void* ComputeRows(void *p)
           }
           else if (friction_model == cone_friction)
           {
-            quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
-                constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
+            quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp,
+                hi_act_erp, jb, J_orig, index,
+                constraint_index, startRow, nRows, nb, body, i,
+                order, findex, NULL, hi, lambda, lambda_erp);
           }
           else if(friction_model == box_friction)
           {
@@ -583,7 +600,8 @@ static void* ComputeRows(void *p)
               lo_act = -dInfinity;
               hi_act_erp = dInfinity;
               lo_act_erp = -dInfinity;
-              dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
+              dMessage(d_ERR_UASSERT,
+                "internal error, undefined friction model");
           }
         } else {
               // FOR erp throttled by info.c_v_max or info.c
@@ -650,7 +668,8 @@ static void* ComputeRows(void *p)
           if (!position_correction_thread)
           {
             // smooth delta lambda
-            // equivalent to first order artificial dissipation on lambda update.
+            // equivalent to first order artificial dissipation
+            // on lambda update.
 
             // debug smoothing
             // if (i == 0)
@@ -661,10 +680,11 @@ static void* ComputeRows(void *p)
             // if (i == startRow + nRows - 1)
             //   printf("\n");
 
-            // extra residual smoothing for contact constraints
-            // was smoothing both contact normal and friction constraints for VRC
-            // if (constraint_index != -1)
-            // smooth only lambda for friction directions fails friction_demo.world
+            // extra residual smoothing options for contact constraints:
+            // 1 smoothing both contact normal and friction constraints for VRC
+            //    used below: if (constraint_index != -1)
+            // 2 smooth only lambda for friction directions
+            //    fails friction_demo.world
             if (constraint_index != -1)
             {
               lambda[index] = (1.0 - smooth_contacts)*lambda[index]
@@ -789,7 +809,8 @@ static void* ComputeRows(void *p)
 
 #ifdef PENETRATION_JVERROR_CORRECTION
     Jvnew_final = Jvnew*stepsize1;
-    Jvnew_final = Jvnew_final > 1.0 ? 1.0 : ( Jvnew_final < -1.0 ? -1.0 : Jvnew_final );
+    Jvnew_final = Jvnew_final > 1.0 ? 1.0 :
+      (Jvnew_final < -1.0 ? -1.0 : Jvnew_final);
 #endif
 
     // DO WE NEED TO COMPUTE NORM ACROSS ENTIRE SOLUTION SPACE (0,m)?
