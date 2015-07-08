@@ -70,7 +70,7 @@ namespace gazebo
                   const ignition::math::Matrix4d &_trans);
 
       /// \brief Adds a key fram at a specific time
-      /// \param[in] _time the tiem of the key frame
+      /// \param[in] _time the time of the key frame
       /// \param[in] _pose the pose
       /// \deprecated See AddKeyFrame function that accepts
       /// ignition::math::Pose3d
@@ -78,7 +78,7 @@ namespace gazebo
                   const math::Pose &_pose) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Adds a key fram at a specific time
-      /// \param[in] _time the tiem of the key frame
+      /// \param[in] _time the time of the key frame
       /// \param[in] _pose the pose
       public: void AddKeyFrame(const double _time,
                   const ignition::math::Pose3d &_pose);
