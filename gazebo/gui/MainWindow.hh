@@ -191,6 +191,9 @@ namespace gazebo
       /// \brief Qt callback when the show inertia action is triggered.
       private slots: void ShowInertia();
 
+      /// \brief Qt callback when the show link frame action is triggered.
+      private slots: void ShowLinkFrame();
+
       private slots: void Reset();
 
       /// \brief Qt callback when the full screen action is triggered.
