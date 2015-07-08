@@ -69,7 +69,7 @@ namespace gazebo
       public: void AddKeyFrame(const double _time,
                   const ignition::math::Matrix4d &_trans);
 
-      /// \brief Adds a key fram at a specific time
+      /// \brief Adds a key frame at a specific time
       /// \param[in] _time the time of the key frame
       /// \param[in] _pose the pose
       /// \deprecated See AddKeyFrame function that accepts
@@ -77,7 +77,7 @@ namespace gazebo
       public: void AddKeyFrame(const double _time,
                   const math::Pose &_pose) GAZEBO_DEPRECATED(6.0);
 
-      /// \brief Adds a key fram at a specific time
+      /// \brief Adds a key frame at a specific time
       /// \param[in] _time the time of the key frame
       /// \param[in] _pose the pose
       public: void AddKeyFrame(const double _time,
@@ -204,7 +204,7 @@ namespace gazebo
       /// \param[in] _node the name of the new or existing node
       /// \param[in] _time the time
       /// \param[in] _mat the key frame transformation
-      /// \depreacted See AddKeyFrame function that accepts
+      /// \deprecated See AddKeyFrame function that accepts
       /// ignition::math::Matrix4d.
       public: void AddKeyFrame(const std::string& _node, const double _time,
                       const math::Matrix4 &_mat) GAZEBO_DEPRECATED(6.0);

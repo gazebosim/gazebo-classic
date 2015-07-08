@@ -347,7 +347,7 @@ std::map<std::string, ignition::math::Matrix4d> SkeletonAnimation::PoseAt(
 {
   ///  TODO need to make sure that all nodes have keyframes at the same
   ///  points in time and create the missing keyframes. if the animation
-  ///  comes from bvh this is guaranteed, but if it's comming from collada
+  ///  comes from bvh this is guaranteed, but if it's coming from collada
   ///  it's not guaranteed. fixing this will help not having to find the
   ///  prev and next keyframe for each node at each time step, but rather
   ///  doing it only once per time step.
