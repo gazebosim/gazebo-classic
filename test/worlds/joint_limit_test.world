@@ -345,7 +345,7 @@
           </limit>
           <dynamics>
             <damping>0.000000</damping>
-            <friction>0.000001</friction>
+            <friction>0.000000</friction>
           </dynamics>
           <xyz>0.000000 0.000000 1.000000</xyz>
         </axis>
