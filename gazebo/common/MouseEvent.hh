@@ -35,11 +35,39 @@ namespace gazebo
     class GZ_COMMON_VISIBLE MouseEvent
     {
       /// \brief Standard mouse buttons enumeration.
-      public: enum MouseButton {NO_BUTTON = 0x0, LEFT = 0x1, MIDDLE = 0x2,
-                                RIGHT = 0x4};
+      public: enum MouseButton
+              {
+                /// \brief No button
+                NO_BUTTON = 0x0,
+
+                /// \brief Left button
+                LEFT = 0x1,
+
+                /// \brief Middle button
+                MIDDLE = 0x2,
+
+                /// \brief Right button
+                RIGHT = 0x4
+              };
 
       /// \brief Mouse event types enumeration.
-      public: enum EventType {NO_EVENT, MOVE, PRESS, RELEASE, SCROLL};
+      public: enum EventType
+              {
+                /// \brief No event
+                NO_EVENT,
+
+                /// \brief Move event
+                MOVE,
+
+                /// \brief Press event
+                PRESS,
+
+                /// \brief Release event
+                RELEASE,
+
+                /// \brief Scroll event
+                SCROLL
+              };
 
       /// \brief Constructor.
       public: MouseEvent();

@@ -215,14 +215,14 @@ namespace gazebo
       /// _event->buttons(). Note that this is different from the
       /// SetMouseEventButtons, plural, function.
       /// \sa SetMouseEventButtons
-      /// \param[in] _event The QT mouse event
+      /// \param[in] _button The QT mouse button
       private: void SetMouseEventButton(const Qt::MouseButton &_button);
 
       /// \brief Set this->mouseEvent's Button property to the value of
       /// _event->button(). Note that this is different from the
       /// SetMouseEventButton, singular, function.
       /// \sa SetMouseEventButton
-      /// \param[in] _event The QT mouse event
+      /// \param[in] _button The QT mouse buttons
       private: void SetMouseEventButtons(const Qt::MouseButtons &_buttons);
 
       private: int windowId;

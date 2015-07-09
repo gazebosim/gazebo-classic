@@ -1301,7 +1301,7 @@ QPaintEngine *GLWidget::paintEngine() const
 /////////////////////////////////////////////////
 void GLWidget::SetMouseEventButtons(const Qt::MouseButtons &_buttons)
 {
-  if (_buttons& Qt::LeftButton)
+  if (_buttons & Qt::LeftButton)
   {
     this->mouseEvent.SetButtons(
         this->mouseEvent.Buttons() | common::MouseEvent::LEFT);
