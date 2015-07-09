@@ -15,12 +15,12 @@
  *
 */
 
-#ifndef _SPLASHSCREEN_TEST_HH_
-#define _SPLASHSCREEN_TEST_HH_
+#ifndef _GAZEBO_SPLASHSCREEN_TEST_HH_
+#define _GAZEBO_SPLASHSCREEN_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the DataLogger widget.
+/// \brief A test class for the SplashScreen.
 class SplashScreen_TEST : public QTestFixture
 {
   Q_OBJECT
