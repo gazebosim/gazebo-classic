@@ -55,6 +55,9 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test Set user camera pose via SDF
   private slots: void SetUserCameraPoseSDF();
+
+  /// \brief Test that menus are created in the main window menu bar.
+  private slots: void MenuBar();
 };
 
 #endif
