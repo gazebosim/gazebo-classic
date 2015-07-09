@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "gazebo/common/Time.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/rendering/RenderEvents.hh"
@@ -58,25 +59,34 @@ void LaserVisualization_TEST::Lines()
 
   // Make sure there are darker lines in the laser rendering
   int lightBlueCount = 0;
-  int darkBlueCount = 0;
+  int darkBlueTransition = 0;
+
+  int rPrev = 0;
+  int gPrev = 0;
+  int bPrev = 0;
 
   // Read a horizontal line in the middle of the screen
   unsigned int y = height / 2;
-  for (unsigned int x = 0; x < width; x += depth)
+  for (unsigned int x = 0; x < width*depth; x += depth)
   {
     int r = data[y*(width*depth) + x];
     int g = data[y*(width*depth) + x+1];
     int b = data[y*(width*depth) + x+2];
 
-    if (r < 189 && g < 189 && b == 255)
-      ++darkBlueCount;
+    if (r < 189 && g < 189 && b == 255 &&
+        rPrev >= 204 && gPrev >= 204 && bPrev >= 255)
+      ++darkBlueTransition;
 
     if (r >= 204 && g >= 204 && b == 255)
       ++lightBlueCount;
+
+    rPrev = r;
+    bPrev = b;
+    gPrev = g;
   }
 
-  // Make sure there are 2 dark blue lines
-  QVERIFY(darkBlueCount == 2);
+  // Make sure there are 2 dark blue lines.
+  QVERIFY(darkBlueTransition == 2);
 
   // Make sure there is a bunch of light blue pixels
   QVERIFY(lightBlueCount > 500);
