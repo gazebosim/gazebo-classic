@@ -22,7 +22,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
-  QWidget *_parent) : QDialog(_parent)
+  QWidget *_parent) : BaseInspectorDialog(_parent)
 {
   this->setObjectName("windowDoorInspectorDialog");
 
