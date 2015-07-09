@@ -94,21 +94,6 @@ void ViewAngleWidget_TEST::EmptyWorld()
   gazebo::math::Pose pose = cam->GetWorldPose();
   QVERIFY((pose.pos - gazebo::math::Vector3(0, 0, dist)).GetLength() < tol);
 
-  // Trigger the bottom view button
-  buttons[1]->click();
-
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
-
-  // Check the camera position
-  pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(0, 0, -dist)).GetLength() < tol);
-
   // Trigger the front view button
   buttons[2]->click();
 
@@ -123,6 +108,36 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Check the camera position
   pose = cam->GetWorldPose();
   QVERIFY((pose.pos - gazebo::math::Vector3(dist, 0, 0)).GetLength() < tol);
+
+  // Trigger the left view button
+  buttons[5]->click();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 50; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check the camera position
+  pose = cam->GetWorldPose();
+  QVERIFY((pose.pos - gazebo::math::Vector3(0, -dist, 0)).GetLength() < tol);
+
+  // Trigger the bottom view button
+  buttons[1]->click();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 50; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check the camera position
+  pose = cam->GetWorldPose();
+  QVERIFY((pose.pos - gazebo::math::Vector3(0, 0, -dist)).GetLength() < tol);
 
   // Trigger the back view button
   buttons[3]->click();
@@ -153,21 +168,6 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Check the camera position
   pose = cam->GetWorldPose();
   QVERIFY((pose.pos - gazebo::math::Vector3(0, dist, 0)).GetLength() < tol);
-
-  // Trigger the left view button
-  buttons[5]->click();
-
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
-
-  // Check the camera position
-  pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(0, -dist, 0)).GetLength() < tol);
 
   // Trigger the reset view button
   buttons[6]->click();
