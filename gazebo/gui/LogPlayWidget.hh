@@ -76,11 +76,15 @@ namespace gazebo
       /// \brief Step simulation back.
       public slots: void OnStepBack();
 
-      /// \brief Play simulation.
-      public slots: void OnJumpStart();
+      /// \brief Jump to the start of the log file.
+      public slots: void OnRewind();
 
-      /// \brief Play simulation.
-      public slots: void OnJumpEnd();
+      /// \brief Jump to the end of the log file.
+      public slots: void OnForward();
+
+      /// \brief Jump to a given time in the log file
+      /// \param[in] _time Desired time
+      public slots: void OnSeek(const common::Time &_time);
 
       /// \brief Qt signal to show the play button.
       signals: void ShowPlay();
@@ -147,6 +151,10 @@ namespace gazebo
 
       /// \brief Draw the timeline.
       public slots: void DrawTimeline();
+
+      /// \brief Qt signal used to seek.
+      /// \param[in] _time Time to jump to.
+      signals: void Seek(const common::Time &_time);
 
       /// \brief Qt mouse release event.
       /// \param[in] _event Qt mouse event.

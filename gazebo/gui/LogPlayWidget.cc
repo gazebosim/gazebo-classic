@@ -88,25 +88,25 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
   connect(stepBackButton, SIGNAL(clicked()), this, SLOT(OnStepBack()));
 
-  // Jump start
-  QToolButton *jumpStartButton = new QToolButton(this);
-  jumpStartButton->setFixedSize(smallSize);
-  jumpStartButton->setCheckable(false);
-  jumpStartButton->setIcon(QPixmap(":/images/log_jump_start.png"));
-  jumpStartButton->setIconSize(smallIconSize);
-  jumpStartButton->setStyleSheet(
+  // Rewind
+  QToolButton *rewindButton = new QToolButton(this);
+  rewindButton->setFixedSize(smallSize);
+  rewindButton->setCheckable(false);
+  rewindButton->setIcon(QPixmap(":/images/log_rewind.png"));
+  rewindButton->setIconSize(smallIconSize);
+  rewindButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
-  connect(jumpStartButton, SIGNAL(clicked()), this, SLOT(OnJumpStart()));
+  connect(rewindButton, SIGNAL(clicked()), this, SLOT(OnRewind()));
 
-  // Jump end
-  QToolButton *jumpEndButton = new QToolButton(this);
-  jumpEndButton->setFixedSize(smallSize);
-  jumpEndButton->setCheckable(false);
-  jumpEndButton->setIcon(QPixmap(":/images/log_jump_end.png"));
-  jumpEndButton->setIconSize(smallIconSize);
-  jumpEndButton->setStyleSheet(
+  // Forward
+  QToolButton *forwardButton = new QToolButton(this);
+  forwardButton->setFixedSize(smallSize);
+  forwardButton->setCheckable(false);
+  forwardButton->setIcon(QPixmap(":/images/log_forward.png"));
+  forwardButton->setIconSize(smallIconSize);
+  forwardButton->setStyleSheet(
       QString("border-radius: %1px").arg(smallSize.width()/2-2));
-  connect(jumpEndButton, SIGNAL(clicked()), this, SLOT(OnJumpEnd()));
+  connect(forwardButton, SIGNAL(clicked()), this, SLOT(OnForward()));
 
   // Step size
   QLabel *stepLabel = new QLabel("Step: ");
@@ -125,12 +125,12 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
 
   // Play layout
   QHBoxLayout *playLayout = new QHBoxLayout();
-  playLayout->addWidget(jumpStartButton);
+  playLayout->addWidget(rewindButton);
   playLayout->addWidget(stepBackButton);
   playLayout->addWidget(playButton);
   playLayout->addWidget(pauseButton);
   playLayout->addWidget(stepForwardButton);
-  playLayout->addWidget(jumpEndButton);
+  playLayout->addWidget(forwardButton);
 
   // Controls layout
   QVBoxLayout *controlsLayout = new QVBoxLayout();
@@ -273,23 +273,27 @@ void LogPlayWidget::OnStepBack()
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::OnJumpStart()
+void LogPlayWidget::OnRewind()
 {
-  // msgs::LogPlaybackControl msg;
-  // msg.set_rewind(true);
-  // this->dataPtr->logPlaybackControlPub->Publish(msg);
-
-  gzdbg << "send Jump Start msg" << std::endl;
+  msgs::LogPlaybackControl msg;
+  msg.set_rewind(true);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::OnJumpEnd()
+void LogPlayWidget::OnForward()
 {
-  // msgs::LogPlaybackControl msg;
-  // msg.set_forward(true);
-  // this->dataPtr->logPlaybackControlPub->Publish(msg);
+  msgs::LogPlaybackControl msg;
+  msg.set_forward(true);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
+}
 
-  gzdbg << "send Jump End msg" << std::endl;
+/////////////////////////////////////////////////
+void LogPlayWidget::OnSeek(const common::Time &_time)
+{
+  msgs::LogPlaybackControl msg;
+  msgs::Set(msg.mutable_seek(), _time);
+  this->dataPtr->logPlaybackControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -421,6 +425,12 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
 
   this->dataPtr->startTimeSet = false;
   this->dataPtr->endTimeSet = false;
+
+  // Send controls to parent
+  LogPlayWidget *widget = qobject_cast<LogPlayWidget *>(_parent);
+
+  connect(this, SIGNAL(Seek(const common::Time &)), widget,
+      SLOT(OnSeek(const common::Time &)));
 }
 
 /////////////////////////////////////////////////
@@ -561,23 +571,25 @@ void LogPlayView::mousePressEvent(QMouseEvent *_event)
     QApplication::setOverrideCursor(QCursor(Qt::ClosedHandCursor));
     mouseItem->setSelected(true);
   }
-  // QGraphicsView::mousePressEvent(_event);
 }
 
 /////////////////////////////////////////////////
 void LogPlayView::mouseMoveEvent(QMouseEvent *_event)
 {
+  // If nothing is selected
   if (this->scene()->selectedItems().isEmpty())
   {
     QGraphicsItem *mouseItem =
         this->scene()->itemAt(this->mapToScene(_event->pos()));
 
+    // Change cursor when hovering over current time item
     if (mouseItem == this->dataPtr->currentTimeItem)
       QApplication::setOverrideCursor(QCursor(Qt::OpenHandCursor));
     else
       QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
   }
 
+  // If dragging current time item, keep it within bounds
   if (this->dataPtr->currentTimeItem->isSelected())
   {
     QPointF newPos(this->mapToScene(_event->pos()));
@@ -589,19 +601,28 @@ void LogPlayView::mouseMoveEvent(QMouseEvent *_event)
 
     newPos.setY(this->dataPtr->sceneHeight/2);
     this->dataPtr->currentTimeItem->setPos(newPos);
-
-    gzdbg << "send specific time msg" << std::endl;
   }
-  // QGraphicsView::mouseMoveEvent(_event);
 }
 
 /////////////////////////////////////////////////
 void LogPlayView::mouseReleaseEvent(QMouseEvent */*_event*/)
 {
+  // Send time seek if releasing current time item
+  if (this->dataPtr->currentTimeItem->isSelected())
+  {
+    double relPos =
+        (this->dataPtr->currentTimeItem->pos().x() - this->dataPtr->margin) /
+        (this->dataPtr->sceneWidth - 2 * this->dataPtr->margin);
+
+    common::Time totalTime = this->dataPtr->endTime - this->dataPtr->startTime;
+
+    common::Time seekTime = (totalTime * relPos) + this->dataPtr->startTime;
+
+    this->Seek(seekTime);
+  }
+
   this->scene()->clearSelection();
   QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-
-  // QGraphicsView::mouseReleaseEvent(_event);
 }
 
 /////////////////////////////////////////////////
@@ -667,3 +688,4 @@ QRectF CurrentTimeItem::boundingRect() const
 {
   return QRectF(-8, -25, 16, 50);
 }
+
