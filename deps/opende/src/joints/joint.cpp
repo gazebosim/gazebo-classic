@@ -42,7 +42,6 @@ extern void addObjectToList( dObject *obj, dObject **first );
 dxJoint::dxJoint( dxWorld *w ) :
         dObject( w )
 {
-    //printf("constructing %p\n", this);
     dIASSERT( w );
     flags = 0;
     node[0].joint = this;
