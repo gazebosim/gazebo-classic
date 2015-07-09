@@ -81,6 +81,9 @@ namespace gazebo
 
       /// \brief True if stereo rendering should be enabled.
       public: bool stereoEnabled;
+
+      /// \brief Default camera pose.
+      public: math::Pose defaultPose;
     };
   }
 }

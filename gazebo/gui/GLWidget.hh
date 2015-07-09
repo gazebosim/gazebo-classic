@@ -76,6 +76,10 @@ namespace gazebo
 
       public: void Clear();
 
+      /// \brief Returns the list of selected visuals.
+      /// \return List with pointers to selected visuals.
+      public: std::vector<rendering::VisualPtr> SelectedVisuals() const;
+
       signals: void clicked();
 
       /// \brief QT signal to notify when we received a selection msg.

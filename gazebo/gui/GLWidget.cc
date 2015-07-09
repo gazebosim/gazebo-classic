@@ -841,7 +841,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   double yaw = atan2(delta.y, delta.x);
 
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->userCamera->SetWorldPose(math::Pose(camPos,
+  this->userCamera->SetDefaultPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
 }
 
@@ -992,6 +992,12 @@ void GLWidget::OnOrbit()
 {
   this->userCamera->SetViewController(
       rendering::OrbitViewController::GetTypeString());
+}
+
+/////////////////////////////////////////////////
+std::vector<rendering::VisualPtr> GLWidget::SelectedVisuals() const
+{
+  return this->selectedVisuals;
 }
 
 /////////////////////////////////////////////////

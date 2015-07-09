@@ -52,6 +52,7 @@ set (sources
   ModelMaker.cc
   ModelRightMenu.cc
   MouseEventHandler.cc
+  ViewAngleWidget.cc
   SaveDialog.cc
   SpaceNav.cc
   SphereMaker.cc
@@ -87,6 +88,7 @@ set (qt_headers
   ModelListWidget.hh
   ModelEditWidget.hh
   ModelRightMenu.hh
+  ViewAngleWidget.hh
   RenderWidget.hh
   SaveDialog.hh
   TimePanel.hh
@@ -144,6 +146,7 @@ set (qt_tests
   SaveDialog_TEST.cc
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
+  ViewAngleWidget_TEST.cc
 )
 
 # MainWindow is using screen rendering
