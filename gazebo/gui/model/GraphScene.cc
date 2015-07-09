@@ -16,6 +16,10 @@
 */
 
 #include <iostream>
+
+#include "gazebo/gui/model/qgv/QGVNode.h"
+#include "gazebo/gui/model/qgv/QGVEdge.h"
+
 #include "gazebo/gui/model/GraphScene.hh"
 
 using namespace gazebo;
@@ -43,7 +47,6 @@ GraphScene::GraphScene(QWidget *_parent)
 QGVNode *GraphScene::AddNode(const std::string &_name)
 {
   QGVNode *node = this->addNode(tr(_name.c_str()));
-
   return node;
 }
 

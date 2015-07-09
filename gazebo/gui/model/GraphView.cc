@@ -15,7 +15,11 @@
  *
 */
 
+#include <iostream>
 #include <cstdlib>
+
+#include "gazebo/common/Events.hh"
+
 #include "gazebo/gui/model/GraphView.hh"
 
 using namespace gazebo;
@@ -48,6 +52,13 @@ void GraphView::contextMenuEvent(QContextMenuEvent *_event)
   QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
   if (item)
   {
+    QString itemData = item->data(0).toString();
+    if (!itemData.isEmpty())
+    {
+      emit customContextMenuRequested(itemData);
+      _event->accept();
+      return;
+    }
     _event->ignore();
     QGraphicsView::contextMenuEvent(_event);
     return;
@@ -92,13 +103,39 @@ void GraphView::mousePressEvent(QMouseEvent *_event)
 {
   if (_event->button() != Qt::RightButton)
   {
-    QGraphicsItem *mouseItem =
+    QGraphicsItem *item =
         this->scene()->itemAt(this->mapToScene(_event->pos()));
-    if (mouseItem && !mouseItem->isSelected())
+    if (item)
     {
-      this->scene()->clearSelection();
-      mouseItem->setSelected(true);
+      // multi-selection
+      if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+      {
+        if (!item->isSelected())
+        {
+          QList<QGraphicsItem *> selectedItems = this->scene()->selectedItems();
+          if (!selectedItems.empty())
+          {
+            // select on links or joints but not both types
+            std::string selectedType =
+                selectedItems[0]->data(1).toString().toStdString();
+            std::string type = item->data(1).toString().toStdString();
+            if (selectedType != type)
+              this->scene()->clearSelection();
+          }
+        }
+        item->setSelected(!item->isSelected());
+      }
+      else
+      {
+        // select single item
+        this->scene()->clearSelection();
+        item->setSelected(true);
+      }
+      _event->accept();
     }
+  }
+  else
+  {
     QGraphicsView::mousePressEvent(_event);
   }
 }
@@ -106,7 +143,14 @@ void GraphView::mousePressEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void GraphView::mouseReleaseEvent(QMouseEvent *_event)
 {
-  QGraphicsView::mouseReleaseEvent(_event);
+  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  if (!item)
+  {
+    this->scene()->clearSelection();
+    event::Events::setSelectedEntity("", "normal");
+    return;
+  }
+  _event->accept();
 }
 
 /////////////////////////////////////////////////
@@ -124,5 +168,17 @@ void GraphView::keyPressEvent(QKeyEvent *_event)
 /////////////////////////////////////////////////
 void GraphView::mouseDoubleClickEvent(QMouseEvent *_event)
 {
+  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  if (item)
+  {
+    QString itemData = item->data(0).toString();
+    if (!itemData.isEmpty())
+    {
+      emit itemDoubleClicked(itemData);
+      _event->accept();
+      return;
+    }
+  }
+  _event->ignore();
   QGraphicsView::mouseDoubleClickEvent(_event);
 }

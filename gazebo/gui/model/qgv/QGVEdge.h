@@ -19,9 +19,10 @@ License along with this library.
 #ifndef QGVEDGE_H
 #define QGVEDGE_H
 
-#include <qgv.h>
 #include <QGraphicsItem>
 #include <QPen>
+
+#include "qgv.h"
 
 class QGVNode;
 class QGVScene;
