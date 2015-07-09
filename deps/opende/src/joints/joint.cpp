@@ -42,7 +42,6 @@ extern void addObjectToList( dObject *obj, dObject **first );
 dxJoint::dxJoint( dxWorld *w ) :
         dObject( w )
 {
-    //printf("constructing %p\n", this);
     dIASSERT( w );
     flags = 0;
     node[0].joint = this;
@@ -578,7 +577,6 @@ int dxJointLimitMotor::addLimot( dxJoint *joint,
 
   // if the joint is powered, or has joint limits, add in the extra row
   int powered = fmax > 0;
-  printf("debug2 : %d %d\n", powered, limit);
   if ( powered || limit )
   {
     dReal *J1 = rotational ? info->J1a : info->J1l;
@@ -611,9 +609,12 @@ int dxJointLimitMotor::addLimot( dxJoint *joint,
     if ( !rotational && joint->node[1].body )
     {
       dVector3 c;
-      c[0] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[0] - joint->node[0].body->posr.pos[0] );
-      c[1] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[1] - joint->node[0].body->posr.pos[1] );
-      c[2] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[2] - joint->node[0].body->posr.pos[2] );
+      c[0] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[0]
+                           - joint->node[0].body->posr.pos[0] );
+      c[1] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[1]
+                           - joint->node[0].body->posr.pos[1] );
+      c[2] = REAL( 0.5 ) * ( joint->node[1].body->posr.pos[2]
+                           - joint->node[0].body->posr.pos[2] );
       dCalcVectorCross3( ltd, c, ax1 );
       info->J1a[srow+0] = ltd[0];
       info->J1a[srow+1] = ltd[1];
@@ -651,7 +652,8 @@ int dxJointLimitMotor::addLimot( dxJoint *joint,
         if (( vel > 0 ) || (_dequal(vel, 0.0) && limit == 2 ) ) fm = -fm;
 
         // if we're powering away from the limit, apply the fudge factor
-        if (( limit == 1 && vel > 0 ) || ( limit == 2 && vel < 0 ) ) fm *= fudge_factor;
+        if (( limit == 1 && vel > 0 ) || ( limit == 2 && vel < 0 ) )
+          fm *= fudge_factor;
 
         if ( rotational )
         {

@@ -56,10 +56,6 @@ dxJointHinge::getInfo1( dxJoint::Info1 *info )
     info->nub = 5;
 
     // see if joint is powered
-    // this seems dangerous... i.e. that
-    // the final m has to match the result of addLimot call later
-    // which is not guaranteed explicitly. Maybe one should check
-    // m in the addLimot call?
     if ( limot.fmax > 0 )
         info->m = 6; // powered hinge needs an extra constraint row
     else info->m = 5;
@@ -79,7 +75,6 @@ dxJointHinge::getInfo1( dxJoint::Info1 *info )
         if ( limot.testRotationalLimit( cumulative_angle ) )
             info->m = 6;
     }
-    printf("debug1 : %d\n", info->m);
 }
 
 
