@@ -140,7 +140,6 @@ set (qt_tests
   ApplyWrenchDialog_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
-  LaserVisualization_TEST.cc
   ModelAlign_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
@@ -156,6 +155,7 @@ if (ENABLE_SCREEN_TESTS)
       ConfigWidget_TEST.cc
       GLWidget_TEST.cc
       GLWidget_TEST2.cc
+      LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
