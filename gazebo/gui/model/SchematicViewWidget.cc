@@ -17,6 +17,9 @@
 
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/gui/model/qgv/QGVNode.h"
+#include "gazebo/gui/model/qgv/QGVEdge.h"
+
 #include "gazebo/gui/model/GraphScene.hh"
 #include "gazebo/gui/model/GraphView.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
@@ -50,6 +53,9 @@ SchematicViewWidget::SchematicViewWidget(QWidget *_parent)
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   canvasLayout->setSpacing(0);
   this->setLayout(canvasLayout);
+
+  connect(this->view, SIGNAL(customContextMenuRequested(const QString &)),
+      this, SLOT(OnCustomContextMenu(const QString &)));
 }
 
 /////////////////////////////////////////////////
@@ -92,15 +98,17 @@ std::string SchematicViewWidget::GetLeafName(const std::string &_scopedName)
 /////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
-  std::string node = this->GetLeafName(_node);
+  std::string name = this->GetLeafName(_node);
 
-  if (this->scene->HasNode(node))
+  if (this->scene->HasNode(name))
     return;
 
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 
-  this->scene->AddNode(node);
+  QGVNode *node = this->scene->AddNode(name);
+  node->setData(0, tr(_node.c_str()));
+
   this->scene->applyLayout();
 
   this->FitInView();
@@ -147,7 +155,9 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 
-  this->scene->AddEdge(_id, parentNode, childNode);
+  QGVEdge *edge = this->scene->AddEdge(_id, parentNode, childNode);
+  edge->setData(0, tr(_id.c_str()));
+
   this->scene->applyLayout();
 
   this->FitInView();
@@ -205,4 +215,17 @@ void SchematicViewWidget::FitInView()
   this->view->fitInView(newRect, Qt::KeepAspectRatio);
   this->view->centerOn(sceneCenterX, sceneCenterY);
   this->scene->setSceneRect(newRect);
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::OnCustomContextMenu(const QString &_id)
+{
+  std::string itemId = _id.toStdString();
+  if (this->edges.find(itemId) != this->edges.end())
+    gui::model::Events::showJointContextMenu(itemId);
+  else if (this->scene->HasNode(this->GetLeafName(itemId)))
+  {
+    gui::model::Events::showLinkContextMenu(itemId);
+  }
+
 }

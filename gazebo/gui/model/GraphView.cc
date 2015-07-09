@@ -48,6 +48,13 @@ void GraphView::contextMenuEvent(QContextMenuEvent *_event)
   QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
   if (item)
   {
+    QString itemData = item->data(0).toString();
+    if (!itemData.isEmpty())
+    {
+      emit customContextMenuRequested(itemData);
+      _event->accept();
+      return;
+    }
     _event->ignore();
     QGraphicsView::contextMenuEvent(_event);
     return;
