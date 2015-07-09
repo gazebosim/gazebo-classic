@@ -52,14 +52,15 @@ set (sources
   ModelMaker.cc
   ModelRightMenu.cc
   MouseEventHandler.cc
-  ViewAngleWidget.cc
   SaveDialog.cc
   SpaceNav.cc
   SphereMaker.cc
+  SplashScreen.cc
   TimePanel.cc
   TimeWidget.cc
   ToolsWidget.cc
   TopicSelector.cc
+  ViewAngleWidget.cc
 )
 
 if (NOT USE_EXTERNAL_TINYXML)
@@ -88,13 +89,14 @@ set (qt_headers
   ModelListWidget.hh
   ModelEditWidget.hh
   ModelRightMenu.hh
-  ViewAngleWidget.hh
   RenderWidget.hh
   SaveDialog.hh
+  SplashScreen.hh
   TimePanel.hh
   TimeWidget.hh
   ToolsWidget.hh
   TopicSelector.hh
+  ViewAngleWidget.hh
 )
 
 set (headers
@@ -144,6 +146,7 @@ set (qt_tests
   ModelAlign_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
+  SplashScreen_TEST.cc
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
   ViewAngleWidget_TEST.cc

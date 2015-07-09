@@ -6,6 +6,9 @@
   time.
       * [Pull request #1737](https://bitbucket.org/osrf/gazebo/pull-request/1737)
 
+1. Added Gazebo splash screen
+    * [Pull request #1745](https://bitbucket.org/osrf/gazebo/pull-request/1745)
+
 1. Added a transporter plugin which allows models to move from one location
    to another based on their location and the location of transporter pads.
     * [Pull request #1738](https://bitbucket.org/osrf/gazebo/pull-request/1738)
