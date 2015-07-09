@@ -2,6 +2,10 @@
 
 ### Modifications
 
+1. **gazebo/common/MouseEvent.hh**
+    * Replaced all member variables with functions that use Ignition Math.
+    * [Pull request #1777](https://bitbucket.org/osrf/gazebo/pull-request/1777)
+ 
 1. **gazebo/msgs/world_stats.proto**
     + ***Removed:*** optional bool log_playback = 8;
     + ***Replacement:*** optional LogPlaybackStatistics log_playback_stats = 8;
