@@ -71,7 +71,7 @@ void ModelMove::InitiateMove()
   float pathLength = this->startPosition.Distance(this->pathGoals[0].pos);
 
   // to calculate the full distance, add the distance between goals
-  for (int i = 0; i < this->pathGoals.size()-1; ++i)
+  for (unsigned int i = 0; i < this->pathGoals.size()-1; ++i)
     pathLength += this->pathGoals[i].pos.Distance(this->pathGoals[i+1].pos);
 
   // create the animation
@@ -90,7 +90,7 @@ void ModelMove::InitiateMove()
   // Move to the start_position to first goal
   this->Move(this->startPosition, this->pathGoals[0].pos, translation);
 
-  for (int i = 0; i < this->pathGoals.size()-1; ++i)
+  for (unsigned int i = 0; i < this->pathGoals.size()-1; ++i)
     this->Move(this->pathGoals[i].pos, this->pathGoals[i+1].pos, translation);
 
   // set the animation
@@ -103,7 +103,7 @@ void ModelMove::OnPathMsg(ConstPoseAnimationPtr &_msg)
   gzmsg << "[model_move] Received path message" << std::endl;
 
   // Store message poses into the pathGoals and launch movement
-  for (int i = 0; i < _msg->pose_size(); ++i)
+  for (unsigned int i = 0; i < _msg->pose_size(); ++i)
     this->pathGoals.push_back(gazebo::msgs::Convert(_msg->pose(i)));
 
   this->InitiateMove();
