@@ -44,7 +44,6 @@ namespace gazebo
       /// \brief Stores most recent magnetometer sensor data.
       public: msgs::Magnetometer magMsg;
     };
-    /// \}
   }
 }
 #endif
