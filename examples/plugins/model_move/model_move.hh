@@ -15,28 +15,27 @@
  *
 */
 
-#ifndef MODEL_MOVE_HH
-#define MODEL_MOVE_HH 1
+#ifndef _GAZEBO_MODEL_MOVE_HH_
+#define _GAZEBO_MODEL_MOVE_HH_
 
 #include <gazebo/msgs/pose_animation.pb.h>
 #include <vector>
 
 namespace gazebo
 {
-  /// \class model_move.hh model_move.cc
   /// \brief A plugin to transport a model from point to point using
   /// pose animation.
   class ModelMove : public ModelPlugin
   {
-    /// \brief constructor
+    /// \brief Constructor
     public: ModelMove();
 
     /// \brief Perform movement of the model
-    /// \param[in] start starting point
-    /// \param[in] end goal point
-    /// \param[in,out] translation translation done before start
-    private: void move(const math::Vector3 &start, const math::Vector3 &end,
-                       math::Vector3 &translation);
+    /// \param[in] _start starting point
+    /// \param[in] _end goal point
+    /// \param[in, out] _translation translation done before start
+    private: void Move(const math::Vector3 &_start, const math::Vector3 &_end,
+                       math::Vector3 &_translation);
 
     /// \brief Parse goals defined in the SDF
     /// \param[in] _sdf sdf pointer corresponding to goals element
@@ -44,14 +43,13 @@ namespace gazebo
     private: bool LoadGoalsFromSDF(const sdf::ElementPtr _sdf);
 
     /// \brief prepare the movement of the model.
-    ///
     /// Initialize the animation and related variables, call the
     /// move method between each goal
-    public: void initiateMove();
+    public: void InitiateMove();
 
-    /// \brief callback to run when recieve a path message
-    /// \param [in] msg path message received to animate
-    public: void getPathMsg(ConstPoseAnimationPtr &msg);
+    /// \brief Callback to run when recieve a path message.
+    /// \param[in] _msg path message received to animate.
+    public: void OnPathMsg(ConstPoseAnimationPtr &_msg);
 
     /// \brief Plugin Load function
     /// \param[in] _parent Model pointer to the model defining this plugin
@@ -71,13 +69,10 @@ namespace gazebo
     private: transport::SubscriberPtr pathSubscriber;
 
     /// \brief Starting point of the path to follow
-    private: math::Vector3 start_position;
+    private: math::Vector3 startPosition;
 
     /// \brief Path to follow
-    private: std::vector<math::Pose> path_goals;
+    private: std::vector<math::Pose> pathGoals;
   };
-
-  // Register this plugin with the simulator
-  GZ_REGISTER_MODEL_PLUGIN(ModelMove);
 }
 #endif
