@@ -167,7 +167,7 @@ void LightMaker::CreateTheEntity()
 /////////////////////////////////////////////////
 void LightMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
+  if (_event.Button() == common::MouseEvent::LEFT && !_event.Dragging())
   {
     this->CreateTheEntity();
     this->Stop();
@@ -182,7 +182,7 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
   math::Vector3 origin1, dir1, p1;
 
   // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+  this->camera->GetCameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
                                        origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
@@ -194,7 +194,7 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
   p1 = origin1 + dir1 * dist1;
 
   // Get snap point
-  if (!_event.shift)
+  if (!_event.Shift())
     p1 = this->GetSnappedPoint(p1);
 
   p1.z = this->light->GetPosition().z;
