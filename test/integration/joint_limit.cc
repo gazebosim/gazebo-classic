@@ -33,6 +33,7 @@ class JointLimitTest : public ServerFixture,
   /// Measure / verify joint limit enforcement
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void HingeJointLimit(const std::string &_physicsEngine);
+  private: double last_error;
 };
 
 /////////////////////////////////////////////////
@@ -88,19 +89,40 @@ void JointLimitTest::HingeJointLimit(const std::string &_physicsEngine)
   joint_01->SetParam("stop_cfm", 0, 10);
   for (unsigned int i = 0; i < 50000; ++i)
   {
+    // What we are doing here:
+    // drive joint_01 to it's limit, watch it's dynamic behavior.
     joint_01->SetForce(0, 100);
     world->Step(1);
-    if (joint_01->GetAngle(0) >= joint_01->GetUpperLimit(0))
+    // see issue #1658, we should always do comparison of math::Angle values
+    // by converting them to Radian() (double) first to prevent
+    // inconsistency.
+    if (joint_01->GetAngle(0).Radian() >= joint_01->GetUpperLimit(0).Radian())
     {
+      double error = joint_01->GetAngle(0).Radian()
+                   - joint_01->GetUpperLimit(0).Radian();
       gzdbg << "t: [" << world->GetSimTime().Double()
             << "] pos: [" << joint_01->GetAngle(0)
             << "] >= lim: [" << joint_01->GetUpperLimit(0)
-            << "] err: [" << joint_01->GetAngle(0)-joint_01->GetUpperLimit(0)
-            << "] >=?: [" << (joint_01->GetAngle(0)>=joint_01->GetUpperLimit(0))
+            << "] err: [" << error
+            << "] >=: [" << (joint_01->GetAngle(0).Radian()
+                           >= joint_01->GetUpperLimit(0).Radian())
             << "]\n";
       // getchar();
-      ASSERT_TRUE(joint_01->GetAngle(0)-joint_01->GetUpperLimit(0) > 0);
+      ASSERT_TRUE(
+        (joint_01->GetAngle(0)-joint_01->GetUpperLimit(0)).Radian() >= 0);
+
+      // expect error to decrease, try to detect if new error is
+      // 1 order of magnitude larger than last error
+      EXPECT_LT(error / this->last_error, 10.0);
+      this->last_error = error;
     }
+    else
+    {
+      gzdbg << "\n\nLimit constraint removed\n\n";
+      // no limit violation, preset error to something large
+      this->last_error = 1e16;
+    }
+
   }
   // getchar();
   gzdbg << "\n";
