@@ -52,14 +52,16 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
 {
   Load("worlds/empty.world", false, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+  ASSERT_TRUE(mgr != NULL);
 
   physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
 
   sdf::ElementPtr sdf(new sdf::Element);
   sdf::initFile("sensor.sdf", sdf);
   sdf::readString(magSensorString, sdf);
 
-  // Create the IMU sensor
+  // Create the magnetometer sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
       "ground_plane::link", 0);
 
@@ -70,7 +72,7 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
   // Update the sensor manager so that it can process new sensors.
   mgr->Update();
 
-  // Get a pointer to the IMU sensor
+  // Get a pointer to the magnetometer sensor
   sensors::MagnetometerSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::MagnetometerSensor>
       (mgr->GetSensor(sensorName));
@@ -99,7 +101,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   // Spawn a magnetometer sensor with a PI/2 aniclockwise rotation about Z axis
   std::string modelName = "magModel";
   std::string magSensorName = "magSensor";
-  ignition::math::Pose3d modelPose(0, 0, 0, 0, 0, 1.57079632679);
+  ignition::math::Pose3d modelPose(0, 0, 0, 0, 0, IGN_PI_2);
   std::string topic = "~/" + magSensorName + "_" + _physicsEngine;
   SpawnUnitMagnetometerSensor(modelName, magSensorName,
       "box", topic, modelPose.Pos(), modelPose.Rot().Euler());

@@ -32,13 +32,12 @@ namespace gazebo
 {
   namespace sensors
   {
-    /// Forward declare private data
+    // Forward declare private data
     class MagnetometerSensorPrivate;
 
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \class MagnetometerSensor MagnetometerSensor.hh sensors/sensors.hh
     /// \brief MagnetometerSensor to provide magnetic field measurement.
     class GAZEBO_VISIBLE MagnetometerSensor: public Sensor
     {
