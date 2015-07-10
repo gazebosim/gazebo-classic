@@ -428,6 +428,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
     this->Reset();
   }
 
+  // Link visual
   std::ostringstream linkNameStream;
   linkNameStream << "Stairs_" << this->stairsCounter++;
   std::string linkName = linkNameStream.str();
@@ -436,44 +437,40 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
       "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
+  // Get stairs size
+  math::Vector3 totalSize = BuildingMaker::ConvertSize(_size);
+
+  // Visual which will contain other visuals for each step
   std::ostringstream visualName;
   visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
+  visVisual->Load();
+  visVisual->SetPosition(math::Vector3(0, 0, totalSize.z/2.0));
+  visVisual->SetScale(totalSize);
 
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visVisual->Load(visualElem);
-  visVisual->DetachObjects();
-
-  BuildingModelManip *stairsManip = new BuildingModelManip();
-  stairsManip->SetMaker(this);
-  stairsManip->SetName(linkName);
-  stairsManip->SetVisual(visVisual);
-  stairsManip->SetLevel(this->currentLevel);
-  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
-  visVisual->SetScale(scaledSize);
-  double dSteps = static_cast<double>(_steps);
-  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
-  stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
-  this->allItems[linkName] = stairsManip;
-
+  // First step, next steps will clone it
   std::stringstream visualStepName;
   visualStepName << visualName.str() << "step" << 0;
   rendering::VisualPtr baseStepVisual(new rendering::Visual(
       visualStepName.str(), visVisual));
+
+  // Visual SDF template (unit box)
+  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
       ->Set(gazebo::common::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   baseStepVisual->Load(visualElem);
 
+  // Size of each step within the parent visual
+  double dSteps = static_cast<double>(_steps);
   double rise = 1.0 / dSteps;
   double run = 1.0 / dSteps;
   baseStepVisual->SetScale(math::Vector3(1, run, rise));
 
-  math::Vector3 baseOffset(0, 0.5 - run/2.0,
-      -0.5 + rise/2.0);
+  math::Vector3 baseOffset(0, 0.5 - run/2.0, -0.5 + rise/2.0);
   baseStepVisual->SetPosition(baseOffset);
 
   for (int i = 1; i < _steps; ++i)
@@ -485,7 +482,17 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
     stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
         baseOffset.z + rise*i));
     stepVisual->SetRotation(baseStepVisual->GetRotation());
+    stepVisual->SetScale(math::Vector3(1, 1.05*run, rise));
   }
+
+  // Stairs manip
+  BuildingModelManip *stairsManip = new BuildingModelManip();
+  stairsManip->SetMaker(this);
+  stairsManip->SetName(linkName);
+  stairsManip->SetVisual(visVisual);
+  stairsManip->SetLevel(this->currentLevel);
+  stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  this->allItems[linkName] = stairsManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
