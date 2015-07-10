@@ -5,7 +5,7 @@ goal points.
 
 The movement is not kinematic aware as it uses Pose Animation
 described in this
-[tutorial](http://gazebosim.org/tutorials?tut=animated_box):
+[tutorial](http://gazebosim.org/tutorials?tut=animated_box).
 
 ## Build Instructions
 
