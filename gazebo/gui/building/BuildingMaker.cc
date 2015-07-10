@@ -428,6 +428,12 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
     this->Reset();
   }
 
+  if (_steps == 0)
+  {
+    gzerr << "Can't make stairs with 0 steps" << std::endl;
+    return "";
+  }
+
   // Link visual
   std::ostringstream linkNameStream;
   linkNameStream << "Stairs_" << this->stairsCounter++;
@@ -465,7 +471,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   for (int i = 0; i < _steps; ++i)
   {
     std::stringstream visualStepName;
-    visualStepName << visualName.str() << "step" << 0;
+    visualStepName << visualName.str() << "step" << i;
     rendering::VisualPtr stepVisual(new rendering::Visual(
         visualStepName.str(), visVisual));
     stepVisual->Load(visualElem);
