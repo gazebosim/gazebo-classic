@@ -1,10 +1,10 @@
 # Model Movement Plugin
 
-This is a simple plugin example for moving a model to a specified set of
+This plugin example demonstates moving a model to a specified set of
 goal points.
 
-The displacement is not kinematic aware, it uses the Pose Animation as
-described in the
+The movement is not kinematic aware as it uses Pose Animation
+described in this
 [tutorial](http://gazebosim.org/tutorials?tut=animated_box):
 
 ## Build Instructions
@@ -34,7 +34,7 @@ the SDF file.
     ```
     
     ```
-    $ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move.world
+    $ gazebo ../model_move.world
     ```
     
 1. Publish the path publisher
@@ -57,7 +57,7 @@ Go to the build directory and run gazebo with the example world
 
 ```
 $ cd build
-$ GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}/${PWD} gazebo ../model_move_with_movement.world
+$ gazebo ../model_move_with_movement.world
 ```
 
 To change the input parameters, you can modify the world file sdf:
