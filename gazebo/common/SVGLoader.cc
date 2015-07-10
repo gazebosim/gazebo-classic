@@ -847,7 +847,7 @@ function draw(showCtrlPoints)
       _out << psep <<  "[" << std::endl;
       psep = ',';
       char sep = ' ';
-      for ( ignition::math::Vector2d p : poly)
+      for (ignition::math::Vector2d p : poly)
       {
         _out << " " << sep << " [" <<  p.X() << ", "
              << p.Y() << "]" <<std::endl;
