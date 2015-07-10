@@ -437,10 +437,10 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
       "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
-  // Get stairs size
+  // Size for the whole staircase as one thing
   math::Vector3 totalSize = BuildingMaker::ConvertSize(_size);
 
-  // Visual which will contain other visuals for each step
+  // Parent visual which will act as a container for the all the steps
   std::ostringstream visualName;
   visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
@@ -449,12 +449,6 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   visVisual->SetPosition(math::Vector3(0, 0, totalSize.z/2.0));
   visVisual->SetScale(totalSize);
 
-  // First step, next steps will clone it
-  std::stringstream visualStepName;
-  visualStepName << visualName.str() << "step" << 0;
-  rendering::VisualPtr baseStepVisual(new rendering::Visual(
-      visualStepName.str(), visVisual));
-
   // Visual SDF template (unit box)
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
@@ -462,27 +456,23 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   visualElem->GetElement("material")->AddElement("ambient")
       ->Set(gazebo::common::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
-  baseStepVisual->Load(visualElem);
 
-  // Size of each step within the parent visual
+  // Relative size of each step within the parent visual
   double dSteps = static_cast<double>(_steps);
   double rise = 1.0 / dSteps;
   double run = 1.0 / dSteps;
-  baseStepVisual->SetScale(math::Vector3(1, run, rise));
 
-  math::Vector3 baseOffset(0, 0.5 - run/2.0, -0.5 + rise/2.0);
-  baseStepVisual->SetPosition(baseOffset);
-
-  for (int i = 1; i < _steps; ++i)
+  for (int i = 0; i < _steps; ++i)
   {
-    visualStepName.str("");
-    visualStepName << visualName.str() << "step" << i;
-    rendering::VisualPtr stepVisual = baseStepVisual->Clone(
-        visualStepName.str(), visVisual);
-    stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
-        baseOffset.z + rise*i));
-    stepVisual->SetRotation(baseStepVisual->GetRotation());
-    stepVisual->SetScale(math::Vector3(1, 1.05*run, rise));
+    std::stringstream visualStepName;
+    visualStepName << visualName.str() << "step" << 0;
+    rendering::VisualPtr stepVisual(new rendering::Visual(
+        visualStepName.str(), visVisual));
+    stepVisual->Load(visualElem);
+
+    stepVisual->SetPosition(math::Vector3(0, 0.5-run*(0.5+i),
+        -0.5 + rise*(0.5+i)));
+    stepVisual->SetScale(math::Vector3(1, run, rise));
   }
 
   // Stairs manip
