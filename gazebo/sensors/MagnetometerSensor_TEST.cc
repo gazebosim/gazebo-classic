@@ -99,10 +99,10 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   // Spawn a magnetometer sensor with a PI/2 aniclockwise rotation about Z axis
   std::string modelName = "magModel";
   std::string magSensorName = "magSensor";
-  ignition::math::Pose modelPose(0, 0, 0, 0, 0, 1.57079632679);
+  ignition::math::Pose3d modelPose(0, 0, 0, 0, 0, 1.57079632679);
   std::string topic = "~/" + magSensorName + "_" + _physicsEngine;
   SpawnUnitMagnetometerSensor(modelName, magSensorName,
-      "box", topic, modelPose.pos, modelPose.rot.GetAsEuler());
+      "box", topic, modelPose.Pos(), modelPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(magSensorName);
   sensors::MagnetometerSensorPtr magSensor =
@@ -114,7 +114,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   magSensor->SetActive(true);
 
   // Determine the magnetic field in the body frame
-  ignition::math::Vector3d field = modelPose.rot.GetInverse().RotateVector(
+  ignition::math::Vector3d field = modelPose.Rot().Inverse().RotateVector(
         world->GetPhysicsEngine()->MagneticField());
 
   // Check for match
