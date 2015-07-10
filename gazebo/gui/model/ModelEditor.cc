@@ -108,6 +108,10 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       this->mainWindow->CloneAction(g_showToolbarsAct, this);
   this->dataPtr->fullScreenAct =
       this->mainWindow->CloneAction(g_fullScreenAct, this);
+  this->dataPtr->cameraOrthoAct =
+      this->mainWindow->CloneAction(g_cameraOrthoAct, this);
+  this->dataPtr->cameraPerspectiveAct =
+      this->mainWindow->CloneAction(g_cameraPerspectiveAct, this);
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
@@ -298,6 +302,10 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->dataPtr->saveAsAct);
   fileMenu->addAction(this->dataPtr->exitAct);
 
+  QMenu *cameraMenu = this->dataPtr->menuBar->addMenu(tr("&Camera"));
+  cameraMenu->addAction(this->dataPtr->cameraOrthoAct);
+  cameraMenu->addAction(this->dataPtr->cameraPerspectiveAct);
+
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(this->dataPtr->showJointsAct);
 
@@ -406,6 +414,7 @@ void ModelEditor::ToggleToolbar()
         actions[i] == g_copyAct ||
         actions[i] == g_pasteAct ||
         actions[i] == g_alignButtonAct ||
+        actions[i] == g_viewAngleButtonAct ||
         actions[i] == g_snapAct ||
         actions[i]->objectName() == "toolbarSpacerAction")
     {
