@@ -470,7 +470,7 @@ namespace gazebo
 
       /// \brief Returns the transformation matrix
       /// \return the matrix
-      /// \deprecated Seet GetTransform function that returns
+      /// \deprecated See GetTransform function that returns
       /// ignition::math::Matrix4d.
       public: math::Matrix4 Get() GAZEBO_DEPRECATED(6.0);
 

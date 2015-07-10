@@ -474,16 +474,16 @@ namespace gazebo
       /// \deprecated See Max function that returns ignition::math::Vector3d.
       public: math::Vector3 GetMax() const GAZEBO_DEPRECATED(6.0);
 
-      /// \brief Get the maximum X, Y, Z values from all all the vertices
+      /// \brief Get the maximum X, Y, Z values from all the vertices
       /// \return Max X,Y,Z values from all vertices in submesh
       public: ignition::math::Vector3d Max() const;
 
-      /// \brief Get the minimum X, Y, Z values from all all the vertices
+      /// \brief Get the minimum X, Y, Z values from all the vertices
       /// \return Min X,Y,Z values from all vertices in submesh
       /// \deprecated See Min function that returns ignition::math::Vector3d.
       public: math::Vector3 GetMin() const GAZEBO_DEPRECATED(6.0);
 
-      /// \brief Get the minimum X, Y, Z values from all all the vertices
+      /// \brief Get the minimum X, Y, Z values from all the vertices
       /// \return Min X,Y,Z values from all vertices in submesh
       public: ignition::math::Vector3d Min() const;
 

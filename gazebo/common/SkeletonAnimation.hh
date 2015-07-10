@@ -42,14 +42,14 @@ namespace gazebo
     {
       /// \brief constructor
       /// \param[in] _name the name of the node
-      public: NodeAnimation(const std::string& _name);
+      public: NodeAnimation(const std::string &_name);
 
       /// \brief Destructor. It empties the key frames list
       public: ~NodeAnimation();
 
       /// \brief Changes the name of the animation
       /// \param[in] the new name
-      public: void SetName(const std::string& _name);
+      public: void SetName(const std::string &_name);
 
       /// \brief Returns the name
       /// \return the name
@@ -177,7 +177,7 @@ namespace gazebo
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation
-      public: SkeletonAnimation(const std::string& _name);
+      public: SkeletonAnimation(const std::string &_name);
 
       /// \brief The destructor. Clears the list without destroying
       /// the animations
@@ -185,7 +185,7 @@ namespace gazebo
 
       /// \brief Changes the name
       /// \param[in] _name the new name
-      public: void SetName(const std::string& _name);
+      public: void SetName(const std::string &_name);
 
       /// \brief Returns the name
       /// \return the name
@@ -198,7 +198,7 @@ namespace gazebo
       /// \brief Looks for a node with a specific name in the animations
       /// \param[in] _node the name of the node
       /// \return true if the node exits
-      public: bool HasNode(const std::string& _node) const;
+      public: bool HasNode(const std::string &_node) const;
 
       /// \brief Adds or replaces a named key frame at a specific time
       /// \param[in] _node the name of the new or existing node
@@ -206,14 +206,14 @@ namespace gazebo
       /// \param[in] _mat the key frame transformation
       /// \deprecated See AddKeyFrame function that accepts
       /// ignition::math::Matrix4d.
-      public: void AddKeyFrame(const std::string& _node, const double _time,
+      public: void AddKeyFrame(const std::string &_node, const double _time,
                       const math::Matrix4 &_mat) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Adds or replaces a named key frame at a specific time
       /// \param[in] _node the name of the new or existing node
       /// \param[in] _time the time
       /// \param[in] _mat the key frame transformation
-      public: void AddKeyFrame(const std::string& _node, const double _time,
+      public: void AddKeyFrame(const std::string &_node, const double _time,
                       const ignition::math::Matrix4d &_mat);
 
       /// \brief Adds or replaces a named key frame at a specific time
@@ -222,7 +222,7 @@ namespace gazebo
       /// \param[in] _pose the key frame transformation as a math::Pose
       /// \deprecated See AddKeyFrame function that accepts
       /// ignition::math::Pose3d.
-      public: void AddKeyFrame(const std::string& _node, const double _time,
+      public: void AddKeyFrame(const std::string &_node, const double _time,
                       const math::Pose &_pose) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Adds or replaces a named key frame at a specific time
@@ -230,7 +230,7 @@ namespace gazebo
       /// \param[in] _time the time
       /// \param[in] _pose the key frame transformation as a
       /// ignition::math::Pose3d
-      public: void AddKeyFrame(const std::string& _node, const double _time,
+      public: void AddKeyFrame(const std::string &_node, const double _time,
                       const ignition::math::Pose3d &_pose);
 
       /// \brief Returns the key frame transformation for a named animation at
@@ -244,7 +244,7 @@ namespace gazebo
       /// \return the transformation
       /// \deprecated See NodePoseAt function that return
       /// ignition::math::Matrix4d.
-      public: math::Matrix4 GetNodePoseAt(const std::string& _node,
+      public: math::Matrix4 GetNodePoseAt(const std::string &_node,
                   const double _time, const bool _loop = true)
               GAZEBO_DEPRECATED(6.0);
 
@@ -296,7 +296,7 @@ namespace gazebo
       /// \deprecated See PoseAtX function that returns
       /// ignition::math::Matrix4d.
       public: std::map<std::string, math::Matrix4> GetPoseAtX(const double _x,
-                      const std::string& _node, const bool _loop = true) const
+                      const std::string &_node, const bool _loop = true) const
               GAZEBO_DEPRECATED(6.0);
 
       /// \brief Returns a dictionary of transformations indexed by name where
@@ -308,7 +308,7 @@ namespace gazebo
       /// \param[in] _loop when true, the time is divided by the duration
       /// (see GetLength)
       public: std::map<std::string, ignition::math::Matrix4d> PoseAtX(
-                  const double _x, const std::string& _node,
+                  const double _x, const std::string &_node,
                   const bool _loop = true) const;
 
 
