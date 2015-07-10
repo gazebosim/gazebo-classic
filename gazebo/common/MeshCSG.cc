@@ -53,7 +53,7 @@ void MeshCSG::MergeVertices(GPtrArray * _vertices, double _epsilon)
 
   // for each vertex, do a bbox kdtree search to find nearby vertices within
   // _epsilon, merge vertices if they are within the bbox
-  for (unsigned int i = 0; i < _vertices->len; i++)
+  for (unsigned int i = 0; i < _vertices->len; ++i)
   {
     GtsVertex *v = reinterpret_cast<GtsVertex *>(verticesData[i]);
 
@@ -139,6 +139,13 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
 Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
     const math::Pose &_offset)
 {
+  return this->CreateBoolean(_m1, _m2, _operation, _offset.Ign());
+}
+
+//////////////////////////////////////////////////
+Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
+    const ignition::math::Pose3d &_offset)
+{
   GtsSurface *s1, *s2, *s3;
   GtsSurfaceInter *si;
   GNode *tree1, *tree2;
@@ -156,7 +163,7 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
 
   this->ConvertMeshToGTS(_m1, s1);
 
-  if (_offset != math::Pose::Zero)
+  if (_offset != ignition::math::Pose3d::Zero)
   {
     Mesh *m2 = new Mesh();
     for (unsigned int i = 0; i < _m2->GetSubMeshCount(); ++i)
@@ -169,7 +176,8 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
         continue;
       for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
       {
-        m2SubMesh->AddVertex(_offset.pos + _offset.rot*subMesh->GetVertex(j));
+        m2SubMesh->AddVertex(_offset.Pos() +
+            _offset.Rot()*subMesh->Vertex(j));
       }
       for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
       {
@@ -287,9 +295,9 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
 
     for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
     {
-      math::Vector3 vertex = subMesh->GetVertex(j);
-      g_ptr_array_add(vertices, gts_vertex_new(gts_vertex_class(), vertex.x,
-          vertex.y, vertex.z));
+      ignition::math::Vector3d vertex = subMesh->Vertex(j);
+      g_ptr_array_add(vertices, gts_vertex_new(gts_vertex_class(), vertex.X(),
+          vertex.Y(), vertex.Z()));
     }
 
     // merge duplicate vertices, otherwise gts produces undesirable results
