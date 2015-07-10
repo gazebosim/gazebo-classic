@@ -138,17 +138,17 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
         this->noises[GPS_POSITION_ALTITUDE_NOISE_METERS]->Apply(gpsPose.pos.z);
 
       // Convert to global frames
-      math::Vector3 spherical = this->sphericalCoordinates->
-        SphericalFromLocal(gpsPose.pos);
-      this->lastGpsMsg.set_latitude_deg(spherical.x);
-      this->lastGpsMsg.set_longitude_deg(spherical.y);
-      this->lastGpsMsg.set_altitude(spherical.z);
+      ignition::math::Vector3d spherical = this->sphericalCoordinates->
+        SphericalFromLocal(gpsPose.pos.Ign());
+      this->lastGpsMsg.set_latitude_deg(spherical.X());
+      this->lastGpsMsg.set_longitude_deg(spherical.Y());
+      this->lastGpsMsg.set_altitude(spherical.Z());
     }
 
     // Measure velocity and apply noise
     {
-      math::Vector3 gpsVelocity =
-        this->parentLink->GetWorldLinearVel(this->pose.pos);
+      ignition::math::Vector3d gpsVelocity =
+        this->parentLink->GetWorldLinearVel(this->pose.pos).Ign();
 
       // Convert to global frame
       gpsVelocity = this->sphericalCoordinates->GlobalFromLocal(gpsVelocity);
