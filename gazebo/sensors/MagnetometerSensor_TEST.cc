@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <sys/time.h>
 #include <gtest/gtest.h>
 #include <ignition/math/Vector3d.hh>
 
@@ -27,7 +26,7 @@
 using namespace gazebo;
 
 class MagnetometerSensor_TEST : public ServerFixture,
-  public testing::WithParamInterface<const char*>
+                                public testing::WithParamInterface<const char*>
 {
   /// \brief Check that a model at (0,0,0,0,0,0) has mag field equal to global
   public: void BasicMagnetometerSensorCheck(const std::string &_physicsEngine);
@@ -84,6 +83,7 @@ void MagnetometerSensor_TEST::BasicMagnetometerSensorCheck(
       world->GetPhysicsEngine()->MagneticField());
 }
 
+/////////////////////////////////////////////////
 void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   const std::string &_physicsEngine)
 {
@@ -96,7 +96,7 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // Spawna  magnetometer sensor with a PI/2 aniclockwise rotation about U axis
+  // Spawn a magnetometer sensor with a PI/2 aniclockwise rotation about Z axis
   std::string modelName = "magModel";
   std::string magSensorName = "magSensor";
   ignition::math::Pose modelPose(0, 0, 0, 0, 0, 1.57079632679);
@@ -114,8 +114,8 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   magSensor->SetActive(true);
 
   // Determine the magnetic field in the body frame
-  ignition::math::Vector3d field = world->GetPhysicsEngine()->MagneticField();
-  field = modelPose.rot.GetInverse().RotateVector(M);
+  ignition::math::Vector3d field = modelPose.rot.GetInverse().RotateVector(
+        world->GetPhysicsEngine()->MagneticField());
 
   // Check for match
   EXPECT_EQ(magSensor->MagneticField(), field);
