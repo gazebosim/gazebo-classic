@@ -170,7 +170,8 @@ namespace gazebo
       /// \param[in] _center the center of the projection
       /// \deprecated See GenSphericalTexCoord that accepts
       /// ignition::math::Vector3d.
-      public: void GenSphericalTexCoord(const math::Vector3 &_center);
+      public: void GenSphericalTexCoord(const math::Vector3 &_center)
+              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Generate texture coordinates using spherical projection
       /// from center
