@@ -1,12 +1,13 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Magnetometer
+/// \interface Magnetometer sensor data
 /// \brief Data from a magnetic field strength sensor
 
 import "time.proto";
 import "vector3d.proto";
 
+/// \brief Message that encapsulates sensor data from a magnetometer.
 message Magnetometer
 {
   /// \brief Global time at which the magnetic field strength was sampled
