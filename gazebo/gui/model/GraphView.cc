@@ -15,7 +15,6 @@
  *
 */
 
-#include <iostream>
 #include <cstdlib>
 
 #include "gazebo/common/Events.hh"

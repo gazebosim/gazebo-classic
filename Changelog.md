@@ -1,3 +1,9 @@
+## Gazebo 7.0
+
+1. Model editor updates
+    1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
+        * [Pull request #1787](https://bitbucket.org/osrf/gazebo/pull-request/1787)
+
 ## Gazebo 6.0
 
 1. Added a transporter plugin which allows models to move from one location
