@@ -31,7 +31,7 @@
           <contact_surface_layer>0.00000</contact_surface_layer>
         </constraints>
       </bullet>
-      <real_time_update_rate>0.000000</real_time_update_rate>
+      <real_time_update_rate>100.000000</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
     <include>
@@ -173,7 +173,7 @@
         </collision>
       </link>
 
-      <joint name="joint_01" type="revolute">
+      <joint name="joint_01" type="ball">
         <parent>world</parent>
         <child>link_1</child>
         <!-- joint at origin of link_1 inertial frame -->
@@ -181,8 +181,8 @@
         <pose>0 0 0.0 0 0 0</pose>
         <axis>
           <limit>
-            <lower>-1.57079</lower>
-            <upper>3.1416</upper>
+            <lower>-100.57079</lower>
+            <upper>100.57079</upper>
             <effort>1000.000000</effort>
             <velocity>-1.000000</velocity>
             <!-- below is only for simbody. For ode, it's under
@@ -222,7 +222,7 @@
         </physics>
       </joint>
 
-      <joint name="joint_12" type="revolute">
+      <joint name="joint_12" type="ball">
         <parent>link_1</parent>
         <child>link_2</child>
         <!-- joint_1 at origin of link_2 link frame -->
@@ -231,8 +231,8 @@
         <pose>0 0 0 0 0 0</pose>
         <axis>
           <limit>
-            <lower>-4.0</lower>
-            <upper>4.0</upper>
+            <lower>-400.0</lower>
+            <upper>400.0</upper>
             <effort>10000.000000</effort>
             <velocity>-1.000000</velocity>
             <!-- below is only for simbody. For ode, it's under
@@ -272,7 +272,7 @@
         </physics>
       </joint>
 
-      <joint name="joint_23" type="revolute">
+      <joint name="joint_23" type="ball">
         <parent>link_2</parent>
         <child>link_3</child>
         <!-- joint_1 at origin of link_2 link frame -->
@@ -281,8 +281,8 @@
         <pose>0 0 0 0 0 0</pose>
         <axis>
           <limit>
-            <lower>-1.3</lower>
-            <upper>1.0</upper>
+            <lower>-100.0</lower>
+            <upper>100.0</upper>
             <effort>10000.000000</effort>
             <velocity>-1.000000</velocity>
             <!-- below is only for simbody. For ode, it's under
@@ -322,7 +322,7 @@
         </physics>
       </joint>
 
-      <joint name="joint_34" type="revolute">
+      <joint name="joint_34" type="ball">
         <parent>link_3</parent>
         <child>link_4</child>
         <!-- joint_1 at origin of link_2 link frame -->
@@ -331,8 +331,8 @@
         <pose>0 0 0 0 0 0</pose>
         <axis>
           <limit>
-            <lower>-1.0</lower>
-            <upper>1.2</upper>
+            <lower>-1000.0</lower>
+            <upper>1000.0</upper>
             <effort>10000.000000</effort>
             <velocity>-1.000000</velocity>
             <!-- below is only for simbody. For ode, it's under
