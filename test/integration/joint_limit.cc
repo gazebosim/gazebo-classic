@@ -83,7 +83,7 @@ void JointLimitTest::HingeJointLimit(const std::string &_physicsEngine)
 
   gzdbg << "Test: drive joint_01 to positive limit with constant force.\n";
   gzdbg << "-----------------------------------------------------------\n";
-  getchar();
+  // getchar();
   joint_01->SetParam("stop_erp", 0, 0);
   joint_01->SetParam("stop_cfm", 0, 10);
   for (unsigned int i = 0; i < 50000; ++i)
@@ -96,12 +96,13 @@ void JointLimitTest::HingeJointLimit(const std::string &_physicsEngine)
             << "] pos: [" << joint_01->GetAngle(0)
             << "] >= lim: [" << joint_01->GetUpperLimit(0)
             << "] err: [" << joint_01->GetAngle(0)-joint_01->GetUpperLimit(0)
-            << "] >=?: [" << (joint_01->GetAngle(0) >= joint_01->GetUpperLimit(0))
+            << "] >=?: [" << (joint_01->GetAngle(0)>=joint_01->GetUpperLimit(0))
             << "]\n";
-      getchar();
+      // getchar();
+      ASSERT_TRUE(joint_01->GetAngle(0)-joint_01->GetUpperLimit(0) > 0);
     }
   }
-  getchar();
+  // getchar();
   gzdbg << "\n";
 
   for (unsigned int i = 0; i < 10; ++i)
