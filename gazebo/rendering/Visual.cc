@@ -968,7 +968,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     // Apply material to all child scene nodes
     for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
     {
-      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode*>(
+      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode *>(
           this->dataPtr->sceneNode->getChild(i));
       for (int j = 0; j < sn->numAttachedObjects(); ++j)
       {
@@ -988,11 +988,11 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
           }
           continue;
         }
-        else if (dynamic_cast<Ogre::Entity*>(obj))
-          ((Ogre::Entity*)obj)->setMaterialName(this->dataPtr->myMaterialName);
+        else if (dynamic_cast<Ogre::Entity *>(obj))
+          ((Ogre::Entity *)obj)->setMaterialName(this->dataPtr->myMaterialName);
         else
         {
-          ((Ogre::SimpleRenderable*)obj)->setMaterial(
+          ((Ogre::SimpleRenderable *)obj)->setMaterial(
               this->dataPtr->myMaterialName);
         }
       }
