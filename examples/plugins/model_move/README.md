@@ -28,29 +28,29 @@ the SDF file.
 ### Run the standalone publisher
 
 1. Go to the build directory and run gazebo with the example world
-   
+
     ```
     $ cd build
     ```
-    
+
     ```
     $ gazebo ../model_move.world
     ```
-    
+
 1. Publish the path publisher
 
     ```
     open a new terminal
     ```
-    
+
     ```
     $ cd build
     ```
-    
+
     ```
     $ ./path_publisher
     ```
-    
+
 ### Use predefined animation from the SDF file
 
 Go to the build directory and run gazebo with the example world
@@ -64,12 +64,12 @@ To change the input parameters, you can modify the world file sdf:
 
 ```
 <goals> container of the list of poses to be reached by the model
-<pose> 6 floats (position, orientation) to be threated as goals
+<pose> 6 floats (position, orientation) to be treated as goals
 ```
 
 Example (in sdf file):
 
-```    
+```
 <plugin name="model_move" filename="libmodel_move.so">
   <goals>
     <pose>5 5 0 0 0 0</pose>
