@@ -278,20 +278,20 @@ std::vector<JointData *> JointMaker::GetJointDataByLink(
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  if (_event.button == common::MouseEvent::MIDDLE)
+  if (_event.Button() == common::MouseEvent::MIDDLE)
   {
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     camera->HandleMouseEvent(_event);
     return true;
   }
-  else if (_event.button != common::MouseEvent::LEFT)
+  else if (_event.Button() != common::MouseEvent::LEFT)
     return false;
 
 //  if (!this->mouseMoveEnabled)
   //  return false;
 
   // intercept mouse press events when user clicks on the joint hotspot visual
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
   if (vis)
   {
     if (this->joints.find(vis->GetName()) != this->joints.end())
@@ -312,19 +312,19 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   // Not in the process of creating a joint
   if (!this->mouseMoveEnabled)
   {
-    rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+    rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
     if (vis)
     {
       if (this->joints.find(vis->GetName()) != this->joints.end())
       {
         // trigger joint inspector on right click
-        if (_event.button == common::MouseEvent::RIGHT)
+        if (_event.Button() == common::MouseEvent::RIGHT)
         {
           this->inspectName = vis->GetName();
           this->ShowContextMenu(this->inspectName);
           return true;
         }
-        else if (_event.button == common::MouseEvent::LEFT)
+        else if (_event.Button() == common::MouseEvent::LEFT)
         {
           // Not in multi-selection mode.
           if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
@@ -351,7 +351,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   // In the process of creating a joint
   else
   {
-    if (_event.button == common::MouseEvent::LEFT)
+    if (_event.Button() == common::MouseEvent::LEFT)
     {
       if (this->hoverVis)
       {
@@ -598,7 +598,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   // Get the active camera.
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
-  if (_event.dragging)
+  if (_event.Dragging())
   {
     // this enables the joint maker to pan while connecting joints
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
@@ -606,7 +606,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   // Highlight visual on hover
   if (vis)
@@ -650,7 +650,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     {
       // Set end point to mouse plane intersection
       math::Vector3 pt;
-      camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
+      camera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->jointBeingCreated->parent)
       {
@@ -690,7 +690,7 @@ void JointMaker::OpenInspector(const std::string &_jointId)
 bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   if (vis)
   {
