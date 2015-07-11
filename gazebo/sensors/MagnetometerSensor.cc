@@ -83,14 +83,34 @@ void MagnetometerSensor::Load(const std::string &_worldName)
   // Parse sdf noise parameters
   sdf::ElementPtr magElem = this->sdf->GetElement("magnetometer");
 
+  if (!magElem)
+  {
+    gzerr << "Missing <magnetometer> element in sensor["
+      << this->GetName() << "]\n";
+  }
+  else
   // Load magnetic field noise parameters
   {
-    this->noises[MAGNETOMETER_X_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-        magElem->GetElement("x")->GetElement("noise"));
-    this->noises[MAGNETOMETER_Y_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-        magElem->GetElement("y")->GetElement("noise"));
-    this->noises[MAGNETOMETER_Z_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-        magElem->GetElement("z")->GetElement("noise"));
+    if (magElem->HasElement("x") &&
+        magElem->GetElement("x")->HasElement("noise"))
+    {
+      this->noises[MAGNETOMETER_X_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
+          magElem->GetElement("x")->GetElement("noise"));
+    }
+
+    if (magElem->HasElement("y") &&
+        magElem->GetElement("y")->HasElement("noise"))
+    {
+      this->noises[MAGNETOMETER_Y_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
+          magElem->GetElement("y")->GetElement("noise"));
+    }
+
+    if (magElem->HasElement("z") &&
+        magElem->GetElement("z")->HasElement("noise"))
+    {
+      this->noises[MAGNETOMETER_Z_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
+          magElem->GetElement("z")->GetElement("noise"));
+    }
   }
 }
 
@@ -127,9 +147,12 @@ bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
     field = magPose.Rot().Inverse().RotateVector(field);
 
     // Apply position noise before converting to global frame
-    field.X(this->noises[MAGNETOMETER_X_NOISE_TESLA]->Apply(field.X()));
-    field.Y(this->noises[MAGNETOMETER_Y_NOISE_TESLA]->Apply(field.Y()));
-    field.Z(this->noises[MAGNETOMETER_Z_NOISE_TESLA]->Apply(field.Z()));
+    if (this->noises.find(MAGNETOMETER_X_NOISE_TESLA) != this->noises.end())
+      field.X(this->noises[MAGNETOMETER_X_NOISE_TESLA]->Apply(field.X()));
+    if (this->noises.find(MAGNETOMETER_Y_NOISE_TESLA) != this->noises.end())
+      field.Y(this->noises[MAGNETOMETER_Y_NOISE_TESLA]->Apply(field.Y()));
+    if (this->noises.find(MAGNETOMETER_Z_NOISE_TESLA) != this->noises.end())
+      field.Z(this->noises[MAGNETOMETER_Z_NOISE_TESLA]->Apply(field.Z()));
 
     // Set the body-frame magnetic field strength
     msgs::Set(this->dataPtr->magMsg.mutable_field_tesla(), field);
