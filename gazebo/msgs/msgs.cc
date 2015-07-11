@@ -362,6 +362,16 @@ namespace gazebo
       return result;
     }
 
+    msgs::PlaneGeom Convert(const math::Plane &_p)
+    {
+      msgs::PlaneGeom result;
+      result.mutable_normal()->CopyFrom(Convert(_p.normal));
+      result.mutable_size()->set_x(_p.size.x);
+      result.mutable_size()->set_y(_p.size.y);
+      result.set_d(_p.d);
+      return result;
+    }
+
     /////////////////////////////////////////////
     msgs::PlaneGeom Convert(const ignition::math::Planed &_p)
     {
