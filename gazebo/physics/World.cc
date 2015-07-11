@@ -271,9 +271,9 @@ void World::Load(sdf::ElementPtr _sdf)
         spherical->Get<std::string>("surface_model"));
     ignition::math::Angle latitude, longitude, heading;
     double elevation = spherical->Get<double>("elevation");
-    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
-    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
-    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+    latitude.Degree(spherical->Get<double>("latitude_deg"));
+    longitude.Degree(spherical->Get<double>("longitude_deg"));
+    heading.Degree(spherical->Get<double>("heading_deg"));
 
     this->dataPtr->sphericalCoordinates.reset(new common::SphericalCoordinates(
       surfaceType, latitude, longitude, elevation, heading));
