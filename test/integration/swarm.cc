@@ -51,7 +51,7 @@ void SwarmTest::FlockingWorld(const std::string &_physicsEngine)
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
-  EXPECT_EQ(world->GetModels().size(), 1003);
+  EXPECT_EQ(world->GetModels().size(), 1003u);
 }
 
 TEST_P(SwarmTest, FlockingWorld)
