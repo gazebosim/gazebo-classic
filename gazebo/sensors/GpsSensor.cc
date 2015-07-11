@@ -154,12 +154,12 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
       gpsVelocity = this->sphericalCoordinates->GlobalFromLocal(gpsVelocity);
 
       // Apply noise after converting to global frame
-      gpsVelocity.X() =
-        this->noises[GPS_VELOCITY_LATITUDE_NOISE_METERS]->Apply(gpsVelocity.X());
-      gpsVelocity.Y() =
-        this->noises[GPS_VELOCITY_LONGITUDE_NOISE_METERS]->Apply(gpsVelocity.Y());
-      gpsVelocity.Z() =
-        this->noises[GPS_VELOCITY_ALTITUDE_NOISE_METERS]->Apply(gpsVelocity.Z());
+      gpsVelocity.X() = this->noises[
+          GPS_VELOCITY_LATITUDE_NOISE_METERS]->Apply(gpsVelocity.X());
+      gpsVelocity.Y() = this->noises[
+          GPS_VELOCITY_LONGITUDE_NOISE_METERS]->Apply(gpsVelocity.Y());
+      gpsVelocity.Z() = this->noises[
+          GPS_VELOCITY_ALTITUDE_NOISE_METERS]->Apply(gpsVelocity.Z());
 
       this->lastGpsMsg.set_velocity_east(gpsVelocity.X());
       this->lastGpsMsg.set_velocity_north(gpsVelocity.Y());
