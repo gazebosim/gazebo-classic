@@ -80,8 +80,8 @@ namespace gazebo
       /// \param[in] _id Unique id of edge.
       public: void RemoveEdge(const std::string &_id);
 
-      /// \brief Check if a node exists in the scene in the widget.
-      /// \param[in] _name Joint Id.
+      /// \brief Check if an edge exists in the scene in the widget.
+      /// \param[in] _id Joint Id.
       /// \return True if the edge exists.
       public: bool HasEdge(const std::string &_id) const;
 

@@ -100,56 +100,53 @@ void GraphView::wheelEvent(QWheelEvent *_event)
 /////////////////////////////////////////////////
 void GraphView::mousePressEvent(QMouseEvent *_event)
 {
-  if (_event->button() != Qt::RightButton)
-  {
-    QGraphicsItem *item =
-        this->scene()->itemAt(this->mapToScene(_event->pos()));
-    if (item)
-    {
-      // multi-selection
-      if (QApplication::keyboardModifiers() & Qt::ControlModifier)
-      {
-        if (!item->isSelected())
-        {
-          QList<QGraphicsItem *> selectedItems = this->scene()->selectedItems();
-          if (!selectedItems.empty())
-          {
-            // select on links or joints but not both types
-            std::string selectedType =
-                selectedItems[0]->data(1).toString().toStdString();
-            std::string type = item->data(1).toString().toStdString();
-            if (selectedType != type)
-              this->scene()->clearSelection();
-          }
-        }
-        item->setSelected(!item->isSelected());
-      }
-      else
-      {
-        // select single item
-        this->scene()->clearSelection();
-        item->setSelected(true);
-      }
-      _event->accept();
-    }
-  }
-  else
-  {
-    QGraphicsView::mousePressEvent(_event);
-  }
+  _event->accept();
 }
 
 /////////////////////////////////////////////////
 void GraphView::mouseReleaseEvent(QMouseEvent *_event)
 {
+  if (_event->button() != Qt::LeftButton)
+  {
+    QGraphicsView::mouseReleaseEvent(_event);
+    return;
+  }
+
   QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
-  if (!item)
+  if (item)
+  {
+    // multi-selection
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+    {
+      if (!item->isSelected())
+      {
+        QList<QGraphicsItem *> selectedItems = this->scene()->selectedItems();
+        if (!selectedItems.empty())
+        {
+          // select on links or joints but not both types
+          std::string selectedType =
+              selectedItems[0]->data(1).toString().toStdString();
+          std::string type = item->data(1).toString().toStdString();
+          if (selectedType != type)
+            this->scene()->clearSelection();
+        }
+      }
+      item->setSelected(!item->isSelected());
+    }
+    else
+    {
+      // select single item
+      this->scene()->clearSelection();
+      item->setSelected(true);
+      this->repaint();
+    }
+    _event->accept();
+  }
+  else
   {
     this->scene()->clearSelection();
     event::Events::setSelectedEntity("", "normal");
-    return;
   }
-  _event->accept();
 }
 
 /////////////////////////////////////////////////
