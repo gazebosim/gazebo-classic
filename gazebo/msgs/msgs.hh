@@ -23,6 +23,7 @@
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
+#include "gazebo/math/Quaternion.hh"
 #include <ignition/math/Plane.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
@@ -82,28 +83,28 @@ namespace gazebo
     /// \return A msgs::Vector3d object
     /// \deprecated See function that accepts an ignition::math object.
     GAZEBO_VISIBLE
-    msgs::Vector3d Convert(const math::Vector3 &_v) GAZBO_DEPRECATED(6.0);
+    msgs::Vector3d Convert(const math::Vector3 &_v) GAZEBO_DEPRECATED(6.0);
 
     /// \brief Convert a math::Vector2d to a msgs::Vector2d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector2d object
     /// \deprecated See function that accepts an ignition::math object.
     GAZEBO_VISIBLE
-    msgs::Vector2d Convert(const math::Vector2d &_v) GAZBO_DEPRECATED(6.0);
+    msgs::Vector2d Convert(const math::Vector2d &_v) GAZEBO_DEPRECATED(6.0);
 
     /// \brief Convert a math::Quaternion to a msgs::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A msgs::Quaternion object
     /// \deprecated See function that accepts an ignition::math object.
     GAZEBO_VISIBLE
-    msgs::Quaternion Convert(const math::Quaternion &_q) GAZBO_DEPRECATED(6.0);
+    msgs::Quaternion Convert(const math::Quaternion &_q) GAZEBO_DEPRECATED(6.0);
 
     /// \brief Convert a math::Pose to a msgs::Pose
     /// \param[in] _p The pose to convert
     /// \return A msgs::Pose object
     /// \deprecated See function that accepts an ignition::math object.
     GAZEBO_VISIBLE
-    msgs::Pose Convert(const math::Pose &_p) GAZBO_DEPRECATED(6.0);
+    msgs::Pose Convert(const math::Pose &_p) GAZEBO_DEPRECATED(6.0);
 
     /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
@@ -146,7 +147,7 @@ namespace gazebo
     /// \return A msgs::PlaneGeom object
     /// \deprecated See function that accepts an ignition::math object.
     GAZEBO_VISIBLE
-    msgs::PlaneGeom Convert(const math::Plane &_p) GAZBO_DEPRECATED(6.0);
+    msgs::PlaneGeom Convert(const math::Plane &_p) GAZEBO_DEPRECATED(6.0);
 
     /// \brief Convert a ignition::math::Planed to a msgs::PlaneGeom
     /// \param[in] _p The plane to convert

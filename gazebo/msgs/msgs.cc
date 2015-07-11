@@ -17,12 +17,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Image.hh"
