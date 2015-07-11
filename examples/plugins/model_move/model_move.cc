@@ -89,7 +89,7 @@ void ModelMove::InitiateMove()
 
   math::Vector3 translation = math::Vector3(0, 0, 0);
 
-  // Move to the start_position to first goal
+  // Move to the startPosition to first goal
   this->Move(this->startPosition, this->pathGoals[0].pos, translation);
 
   for (unsigned int i = 0; i < this->pathGoals.size()-1; ++i)
@@ -153,11 +153,11 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       // Ready to start the move. Store the initial pose of the model
       // and call initiateMove
-      ignition::math::Vector3d sdf_pose =
+      ignition::math::Vector3d sdfPose =
         _sdf->GetParent()->GetElement("pose")
             ->Get<ignition::math::Pose3d>().Pos();
-      this->start_position =
-        math::Vector3(sdf_pose.X(), sdf_pose.Y(), sdf_pose.Z());
+      this->startPosition =
+        math::Vector3(sdfPose.X(), sdfPose.Y(), sdfPose.Z());
 
       this->InitiateMove();
     }
