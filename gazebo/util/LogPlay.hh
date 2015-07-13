@@ -14,15 +14,14 @@
  * limitations under the License.
  *
 */
-
-#ifndef _LOGPLAY_HH_
-#define _LOGPLAY_HH_
+#ifndef _GAZEBO_LOGPLAY_HH_
+#define _GAZEBO_LOGPLAY_HH_
 
 #include <tinyxml.h>
 
 #include <list>
+#include <mutex>
 #include <string>
-#include <fstream>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Time.hh"
@@ -77,7 +76,7 @@ namespace gazebo
 
       /// \brief Get the random number seed of the open log file.
       /// \return The random number seed the open log file. The current
-      /// random number seed, as defined in math::Rand::GetSeed.
+      /// random number seed, as defined in ignition::math::Rand::Seed.
       public: uint32_t GetRandSeed() const;
 
       /// \brief Get the log start time of the open log file.
@@ -106,7 +105,7 @@ namespace gazebo
 
       /// \brief Jump to the beginning of the log file. The next step() call
       /// will return the first data "chunk".
-       /// \return True If the function succeed or false otherwise.
+      /// \return True If the function succeed or false otherwise.
       public: bool Rewind();
 
       /// \brief Get the number of chunks (steps) in the open log file.
@@ -196,6 +195,9 @@ namespace gazebo
       /// \brief True if <iterations> is found in the log file. Old log versions
       /// may not include this tag in the log files.
       private: bool iterationsFound;
+
+      /// \brief A mutex to avoid race conditions.
+      private: std::mutex mutex;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;
