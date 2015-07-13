@@ -101,6 +101,8 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
   // for (int j = 0; j < 1000; ++j) //  for debug
   for (int i = 0; i < steps; ++i)
   {
+    gzerr << i << "\n";
+    if (i > 890) getchar();
     double pos1 = joint1->GetAngle(0).Radian();
     double pos2 = joint2->GetAngle(0).Radian();
     double pos3 = joint3->GetAngle(0).Radian();

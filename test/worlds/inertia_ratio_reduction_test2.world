@@ -172,7 +172,7 @@
         </axis>
       </joint>
       <link name='ow_transform_1_l'>
-        <pose>0.207846 0.12 0.1 0 -0 2.0944</pose>
+        <pose>0.207846 0.12 0.1 0 -0 2.09439510239</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
           <mass>0.66725</mass>
@@ -228,7 +228,7 @@
         <child>ow_transform_1_l</child>
         <parent>trikey_base</parent>
         <axis>
-          <xyz>0.866025 0.5 0</xyz>
+          <xyz>0.86602540378 0.5 0</xyz>
           <limit>
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
@@ -237,10 +237,10 @@
         </axis>
       </joint>
       <link name='ow_transform_2_l'>
-        <pose>-0.207846 0.12 0.1 0 0 -2.0944</pose>
+        <pose>-0.207846 0.12 0.1 0 0 -2.09439510239</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
-          <mass>0.66725</mass>
+          <mass>0.66722.44839e-135</mass>
           <inertia>
             <ixx>0.00160418</ixx>
             <ixy>-3.598e-06</ixy>
@@ -293,7 +293,7 @@
         <child>ow_transform_2_l</child>
         <parent>trikey_base</parent>
         <axis>
-          <xyz>-0.866025 0.5 0</xyz>
+          <xyz>-0.86602540378 0.5 0</xyz>
           <limit>
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
