@@ -21,7 +21,7 @@
 // include this for ODE implicit spring flag
 #include "gazebo/physics/ode/ODEJoint.hh"
 #include "gazebo/test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 

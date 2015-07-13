@@ -782,6 +782,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_showOriginAct);
 
+  QVERIFY(gazebo::gui::g_showLinkFrameAct);
+
   QVERIFY(gazebo::gui::g_transparentAct);
 
   QVERIFY(gazebo::gui::g_viewWireframeAct);
@@ -817,6 +819,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(gazebo::gui::g_snapAct);
 
   QVERIFY(gazebo::gui::g_alignAct);
+
+  QVERIFY(gazebo::gui::g_viewAngleAct);
 
   QVERIFY(gazebo::gui::g_cameraOrthoAct);
 
@@ -887,6 +891,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(!gazebo::gui::g_showOriginAct);
 
+  QVERIFY(!gazebo::gui::g_showLinkFrameAct);
+
   QVERIFY(!gazebo::gui::g_transparentAct);
 
   QVERIFY(!gazebo::gui::g_viewWireframeAct);
@@ -922,6 +928,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_snapAct);
 
   QVERIFY(!gazebo::gui::g_alignAct);
+
+  QVERIFY(!gazebo::gui::g_viewAngleAct);
 
   QVERIFY(!gazebo::gui::g_cameraOrthoAct);
 
@@ -981,6 +989,82 @@ void MainWindow_TEST::SetUserCameraPoseSDF()
     // Make sure the black count is zero. This means the camera is
     // positioned correctly
     QVERIFY(blackCount == 0);
+  }
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::MenuBar()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  QList<QMenuBar *> menuBars  = mainWindow->findChildren<QMenuBar *>();
+  QVERIFY(!menuBars.empty());
+
+  std::set<std::string> mainMenus;
+  mainMenus.insert("&File");
+  mainMenus.insert("&Edit");
+  mainMenus.insert("&Camera");
+  mainMenus.insert("&View");
+  mainMenus.insert("&Window");
+  mainMenus.insert("&Help");
+
+  // verify all menus are created in the menu bar.
+  std::set<std::string> mainMenusCopy = mainMenus;
+  QMenuBar *menuBar = menuBars[0];
+  QList<QMenu *> menus  = menuBar->findChildren<QMenu *>();
+  for (auto &m : menus)
+  {
+    auto it = mainMenusCopy.find(m->title().toStdString());
+    QVERIFY(it != mainMenus.end());
+    mainMenusCopy.erase(it);
+  }
+
+  // test adding a new menu to the menu bar
+  QMenu newMenu(tr("&TEST"));
+  mainWindow->AddMenu(&newMenu);
+
+  QList<QMenu *> newMenus  = menuBar->findChildren<QMenu *>();
+  mainMenusCopy = mainMenus;
+  mainMenusCopy.insert("&TEST");
+  for (auto &m : menus)
+  {
+    std::string title = m->title().toStdString();
+    auto it = mainMenusCopy.find(title);
+    QVERIFY(it != mainMenus.end());
+    mainMenusCopy.erase(it);
+  }
+
+  // test calling ShowMenuBar and verify all menus remain the same
+  mainWindow->ShowMenuBar();
+
+  menus  = menuBar->findChildren<QMenu *>();
+  mainMenusCopy = mainMenus;
+  mainMenusCopy.insert("TEST");
+  for (auto &m : menus)
+  {
+    std::string title = m->title().toStdString();
+    auto it = mainMenusCopy.find(title);
+    QVERIFY(it != mainMenus.end());
+    mainMenusCopy.erase(title);
   }
 
   cam->Fini();
