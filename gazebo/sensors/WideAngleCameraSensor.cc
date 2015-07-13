@@ -79,6 +79,7 @@ void WideAngleCameraSensor::Init()
     }
 
     this->camera->Init();
+    boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera)->CreateEnvRenderTexture(this->GetName() + "_envRttTex");
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
