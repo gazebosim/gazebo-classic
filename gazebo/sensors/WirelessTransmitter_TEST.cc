@@ -152,7 +152,7 @@ void WirelessTransmitter_TEST::TestSignalStrength()
   for (int i = 0; i < samples; ++i)
   {
     this->tx->Update(true);
-    signStrengthAvg += tx->GetSignalStrength(txPose, tx->GetGain());
+    signStrengthAvg += this->tx->SignalStrength(txPose, tx->GetGain());
   }
   signStrengthAvg /= samples;
 
