@@ -142,7 +142,7 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
 
       // Convert to global frames
       ignition::math::Vector3d spherical = this->sphericalCoordinates->
-        SphericalFromLocal(gpsPose.Pos()).Ign();
+        SphericalFromLocal(gpsPose.Pos());
       this->lastGpsMsg.set_latitude_deg(spherical.X());
       this->lastGpsMsg.set_longitude_deg(spherical.Y());
       this->lastGpsMsg.set_altitude(spherical.Z());
@@ -155,7 +155,7 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
 
       // Convert to global frame
       gpsVelocity =
-        this->sphericalCoordinates->GlobalFromLocal(gpsVelocity).Ign();
+        this->sphericalCoordinates->GlobalFromLocal(gpsVelocity);
 
       // Apply noise after converting to global frame
       gpsVelocity.X(

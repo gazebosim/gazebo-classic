@@ -117,7 +117,7 @@ bool WirelessReceiver::UpdateImpl(bool /*_force*/)
           boost::static_pointer_cast<WirelessTransmitter>(*it);
 
       txFreq = transmitter->GetFreq();
-      rxPower = transmitter->GetSignalStrength(myPos, this->GetGain());
+      rxPower = transmitter->SignalStrength(myPos, this->GetGain());
 
       // Discard if the frequency received is out of our frequency range,
       // or if the received signal strengh is lower than the sensivity

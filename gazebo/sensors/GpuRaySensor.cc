@@ -159,16 +159,15 @@ void GpuRaySensor::Init()
     this->laserCam->SetNearClip(this->GetRangeMin());
     this->laserCam->SetFarClip(this->GetRangeMax());
 
-    this->laserCam->SetHorzFOV(
-      (this->GetAngleMax() - this->GetAngleMin()).Radian());
-    this->laserCam->SetVertFOV((this->GetVerticalAngleMax()
-            - this->GetVerticalAngleMin()).Radian());
+    this->laserCam->SetHorzFOV((this->AngleMax() - this->AngleMin()).Radian());
+    this->laserCam->SetVertFOV(
+        (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian());
 
     this->laserCam->SetHorzHalfAngle(
-      (this->GetAngleMax() + this->GetAngleMin()).Radian() / 2.0);
+      (this->AngleMax() + this->AngleMin()).Radian() / 2.0);
 
-    this->laserCam->SetVertHalfAngle((this->GetVerticalAngleMax()
-            + this->GetVerticalAngleMin()).Radian() / 2.0);
+    this->laserCam->SetVertHalfAngle((this->VerticalAngleMax()
+            + this->VerticalAngleMin()).Radian() / 2.0);
 
     if (this->GetHorzFOV() > 2 * M_PI)
       this->laserCam->SetHorzFOV(2*M_PI);
@@ -426,7 +425,7 @@ double GpuRaySensor::GetRangeMax() const
 /////////////////////////////////////////////////
 double GpuRaySensor::GetAngleResolution() const
 {
-  return (this->GetAngleMax() - this->GetAngleMin()).Radian() /
+  return (this->AngleMax() - this->AngleMin()).Radian() /
     (this->GetRangeCount()-1);
 }
 
@@ -514,7 +513,7 @@ ignition::math::Angle GpuRaySensor::VerticalAngleMax() const
 //////////////////////////////////////////////////
 double GpuRaySensor::GetVerticalAngleResolution() const
 {
-  return (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).Radian() /
+  return (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian() /
     (this->GetVerticalRangeCount()-1);
 }
 
@@ -594,13 +593,13 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
       this->pose + this->parentEntity->GetWorldPose().Ign());
-  scan->set_angle_min(this->GetAngleMin().Radian());
-  scan->set_angle_max(this->GetAngleMax().Radian());
+  scan->set_angle_min(this->AngleMin().Radian());
+  scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->GetAngleResolution());
   scan->set_count(this->GetRayCount());
 
-  scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
-  scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
+  scan->set_vertical_angle_min(this->VerticalAngleMin().Radian());
+  scan->set_vertical_angle_max(this->VerticalAngleMax().Radian());
   scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
   scan->set_vertical_count(this->GetVerticalRayCount());
 

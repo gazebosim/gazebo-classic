@@ -194,7 +194,7 @@ double RaySensor::GetRangeMax() const
 //////////////////////////////////////////////////
 double RaySensor::GetAngleResolution() const
 {
-  return (this->GetAngleMax() - this->GetAngleMin()).Radian() /
+  return (this->AngleMax() - this->AngleMin()).Radian() /
     (this->GetRangeCount()-1);
 }
 
@@ -286,7 +286,7 @@ ignition::math::Angle RaySensor::VerticalAngleMax() const
 //////////////////////////////////////////////////
 double RaySensor::GetVerticalAngleResolution() const
 {
-  return (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).Radian() /
+  return (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian() /
     (this->GetVerticalRangeCount()-1);
 }
 
@@ -381,13 +381,13 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
             this->pose + this->parentEntity->GetWorldPose().Ign());
-  scan->set_angle_min(this->GetAngleMin().Radian());
-  scan->set_angle_max(this->GetAngleMax().Radian());
+  scan->set_angle_min(this->AngleMin().Radian());
+  scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->GetAngleResolution());
   scan->set_count(this->GetRangeCount());
 
-  scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
-  scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
+  scan->set_vertical_angle_min(this->VerticalAngleMin().Radian());
+  scan->set_vertical_angle_max(this->VerticalAngleMax().Radian());
   scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
   scan->set_vertical_count(this->GetVerticalRangeCount());
 

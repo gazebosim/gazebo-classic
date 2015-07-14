@@ -357,7 +357,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   _msg.set_type(this->GetType());
   _msg.set_parent(this->GetParentName());
   _msg.set_parent_id(this->GetParentId());
-  msgs::Set(_msg.mutable_pose(), this->GetPose());
+  msgs::Set(_msg.mutable_pose(), this->Pose());
 
   _msg.set_visualize(this->GetVisualize());
   _msg.set_topic(this->GetTopic());

@@ -129,8 +129,8 @@ void Issue940Test::ExpectForceTorqueMeasure(const std::string &_sensorName,
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  Vector3 mesForce = sensor->GetForce();
-  Vector3 mesTorque = sensor->GetTorque();
+  ignition::math::Vector3d mesForce = sensor->Force();
+  ignition::math::Vector3d mesTorque = sensor->Torque();
 
   gzdbg << "sensorName: " << _sensorName << std::endl;
   gzdbg << "mesForce :  " << mesForce << std::endl;
@@ -138,13 +138,13 @@ void Issue940Test::ExpectForceTorqueMeasure(const std::string &_sensorName,
   gzdbg << "mesTorque : " << mesTorque << std::endl;
   gzdbg << "expTorque : " << _expTorque << std::endl;
 
-  EXPECT_NEAR(_expForce.x, mesForce.x, TOL_FORCES);
-  EXPECT_NEAR(_expForce.y, mesForce.y, TOL_FORCES);
-  EXPECT_NEAR(_expForce.z, mesForce.z, TOL_FORCES);
+  EXPECT_NEAR(_expForce.x, mesForce.X(), TOL_FORCES);
+  EXPECT_NEAR(_expForce.y, mesForce.Y(), TOL_FORCES);
+  EXPECT_NEAR(_expForce.z, mesForce.Z(), TOL_FORCES);
 
-  EXPECT_NEAR(_expTorque.x, mesTorque.x, TOL_TORQUES);
-  EXPECT_NEAR(_expTorque.y, mesTorque.y, TOL_TORQUES);
-  EXPECT_NEAR(_expTorque.z, mesTorque.z, TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.x, mesTorque.X(), TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.y, mesTorque.Y(), TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.z, mesTorque.Z(), TOL_TORQUES);
 
   EXPECT_TRUE(sensor->IsActive());
 }

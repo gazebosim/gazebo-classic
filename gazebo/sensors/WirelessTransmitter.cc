@@ -121,7 +121,7 @@ bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
         {
           // For the propagation model assume the receiver antenna has the same
           // gain as the transmitter
-          strength = this->GetSignalStrength(worldPose, this->GetGain());
+          strength = this->SignalStrength(worldPose, this->GetGain());
 
           // Add a new particle to the grid
           p = msg.add_particle();
