@@ -23,6 +23,7 @@
 #include <list>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <ignition/transport.hh>
 #include <string>
 
 #include "gazebo/transport/Node.hh"
@@ -41,6 +42,8 @@ bool g_minimalComms = false;
 
 std::list<msgs::Request *> g_requests;
 std::list<boost::shared_ptr<msgs::Response> > g_responses;
+
+ignition::transport::Node ignNode;
 
 /////////////////////////////////////////////////
 void dummy_callback_fn(uint32_t)

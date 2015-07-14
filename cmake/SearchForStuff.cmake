@@ -615,6 +615,16 @@ if (NOT WIN32)
 endif()
 
 ########################################
+# Find the Ignition_Transport library
+find_package(ignition-transport QUIET REQUIRED)
+if (NOT ignition-transport_FOUND)
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
+endif()
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
+include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
+link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
+
+########################################
 # Find QWT (QT graphing library)
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include

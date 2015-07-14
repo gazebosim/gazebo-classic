@@ -33,4 +33,6 @@
 %deps_path%\zlib-1.2.8-vc12-x64-release-debug\contrib\vstudio\vc11\x64\ZlibDll%build_type%;^
 %deps_path%\bzip2-1.0.6-vc12-x64-release-debug\%build_type%;^
 C:\Qt\4.8.6\x64\msvc2013\bin;^
+%deps_path%\ZeroMQ-3.2.4\lib;^
+%deps_path%\ign-transport\build\install\%build_type%\lib;^
 %PATH%
