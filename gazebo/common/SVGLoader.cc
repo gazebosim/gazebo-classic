@@ -257,7 +257,7 @@ void arcPath(const math::Vector2d &_p0,
   if (da < 0.0)
     kappa = -kappa;
 
-  for (size_t i = 0; i <= ndivs; i++)
+  for (size_t i = 0; i <= ndivs; ++i)
   {
     double x, y, tanx, tany, a;
     a = a1 + da * (1.0 * i /ndivs);
@@ -725,7 +725,7 @@ function drawPath(ctx, path, style, x0, y0, scale, showCtrlPoints )
   console.log('drawPath ' + path.name);
 
   ctx.beginPath();
-  for (var j = 0; j <  path.subpaths.length; j++)
+  for (var j = 0; j <  path.subpaths.length; ++j)
   {
     var points = path.subpaths[j];
     console.log(points.length + ' points in subpath, (' + style + ')');
