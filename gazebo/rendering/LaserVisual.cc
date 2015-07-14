@@ -150,7 +150,7 @@ void LaserVisual::Update()
       math::Vector3 pt = (axis * hitRange) + offset.pos;
 
       double noHitRange =
-        std::isinf(r) ? dPtr->laserMsg->scan().range_max() : 0;
+        std::isinf(r) ? dPtr->laserMsg->scan().range_max() : hitRange;
       math::Vector3 noHitPt = (axis * noHitRange) + offset.pos;
 
       // Draw the lines that represent each simulated ray
