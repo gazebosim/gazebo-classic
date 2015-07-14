@@ -158,11 +158,6 @@ namespace gazebo
     template< typename T>
     class GZ_COMMON_VISIBLE EventT : public Event
     {
-      /// \def EvtConnectionMap.
-      /// \brief Event Connection map typedef.
-      typedef std::map<int,
-              std::shared_ptr<boost::function<T> > > EvtConnectionMap;
-
       /// \brief Constructor.
       public: EventT();
 
@@ -541,7 +536,7 @@ namespace gazebo
       }
 
       /// \internal
-      /// \brief Removes queued connection.
+      /// \brief Removes queued connections.
       /// We assume that this function is called from a Signal function
       /// after the this->myDataPtr->mutex is locked.
       private: void Cleanup();
