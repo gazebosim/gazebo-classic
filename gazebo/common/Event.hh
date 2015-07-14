@@ -636,7 +636,6 @@ namespace gazebo
       this->myDataPtr->connectionsToRemove.clear();
     }
 
-
     /// \}
   }
 }
