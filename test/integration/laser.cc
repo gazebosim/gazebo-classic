@@ -75,8 +75,8 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
   EXPECT_EQ(640, laser->GetRayCount());
   EXPECT_EQ(640, laser->GetRangeCount());
-  EXPECT_NEAR(laser->GetAngleMin().Radian(), -2.27, DOUBLE_TOL);
-  EXPECT_NEAR(laser->GetAngleMax().Radian(), 2.27, DOUBLE_TOL);
+  EXPECT_NEAR(laser->AngleMin().Radian(), -2.27, DOUBLE_TOL);
+  EXPECT_NEAR(laser->AngleMax().Radian(), 2.27, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeMin(), 0, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeMax(), 10, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeResolution(), 0.01, DOUBLE_TOL);

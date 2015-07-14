@@ -118,8 +118,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 
   EXPECT_EQ(imuSensor->AngularVelocity(), ignition::math::Vector3d::Zero);
   EXPECT_EQ(imuSensor->LinearAcceleration(), ignition::math::Vector3d::Zero);
-  EXPECT_EQ(imuSensor->GetOrientation(),
-      ignition::math::Quaterniond(0, 0, 0, 0));
+  EXPECT_EQ(imuSensor->Orientation(), ignition::math::Quaterniond(0, 0, 0, 0));
 
   // step world and verify imu's linear acceleration is zero on free fall
   world->Step(200);
@@ -140,9 +139,9 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_GT(steps, 0);
   world->Step(steps);
 
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, -gravityZ, 0.4);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().X(), 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().Y(), 0, TOL);
+  EXPECT_NEAR(imuSensor->LinearAcceleration().Z(), -gravityZ, 0.4);
 }
 
 /////////////////////////////////////////////////
