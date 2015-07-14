@@ -39,6 +39,8 @@ namespace gazebo
       private: Ogre::Texture *envCubeMapTexture;
 
       private: int envTextureSize;
+
+      private: Ogre::MaterialPtr compMat;
     };
   }
 }

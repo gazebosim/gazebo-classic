@@ -53,11 +53,12 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     if(this->envCubeMapTexture)
     {
-      Ogre::MaterialPtr compMat = 
-          Ogre::MaterialManager::getSingleton().getByName("Gazebo/WideLensMap");
+      this->compMat = Ogre::MaterialManager::getSingleton().getByName("Gazebo/WideLensMap");
 
-      compMat->getTechnique(0)->getPass(0)->createTextureUnitState(
-          envCubeMapTexture->getName(),0);
+      if(compMat->getTechnique(0)->getPass(0)->getNumTextureUnitStates() == 0)
+      {
+        compMat->getTechnique(0)->getPass(0)->createTextureUnitState();
+      }
 
       gzdbg << "Compositor cubemap texture bound OK " << envCubeMapTexture->getName() << "\n";
     }
@@ -78,9 +79,11 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
   //   delete this->envCubeMapTexture;   // XXX
   //   this->envCubeMapTexture = NULL;
   // }
+  gzdbg << "Creating cubemap texture: " << this->scopedUniqueName << "::" << _textureName << "\n";
+  gzdbg << "Camera instance name: " << this->GetName() << "\n";
 
   this->envCubeMapTexture = Ogre::TextureManager::getSingleton().createManual(
-      _textureName,
+      this->scopedUniqueName+"::"+_textureName,
       "General",
       Ogre::TEX_TYPE_CUBE_MAP,
       this->envTextureSize,
@@ -156,6 +159,9 @@ void WideAngleCamera::RenderImpl()
 
   for(int i=0;i<6;i++)
     this->envRenderTargets[i]->update();
+
+  compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
+    this->envCubeMapTexture->getName());
 
   this->renderTarget->update();
 }
