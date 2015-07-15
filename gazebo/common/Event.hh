@@ -334,7 +334,6 @@ namespace gazebo
       /// \brief Signal the event for all subscribers.
       public: void Signal()
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -347,7 +346,6 @@ namespace gazebo
       public: template< typename P >
               void Signal(const P &_p)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -361,7 +359,6 @@ namespace gazebo
       public: template< typename P1, typename P2 >
               void Signal(const P1 &_p1, const P2 &_p2)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -376,7 +373,6 @@ namespace gazebo
       public: template< typename P1, typename P2, typename P3 >
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -393,7 +389,6 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -412,7 +407,6 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                           const P4 &_p4, const P5 &_p5)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -432,7 +426,6 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -453,7 +446,6 @@ namespace gazebo
               void Signal(const P1 &_p1, const P2 &_p2, const P3 &_p3,
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -476,7 +468,6 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -501,7 +492,6 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -527,7 +517,6 @@ namespace gazebo
                   const P4 &_p4, const P5 &_p5, const P6 &_p6, const P7 &_p7,
                   const P8 &_p8, const P9 &_p9, const P10 &_p10)
       {
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
         this->Cleanup();
 
         this->myDataPtr->signaled = true;
@@ -537,8 +526,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Removes queued connections.
-      /// We assume that this function is called from a Signal function
-      /// after the this->myDataPtr->mutex is locked.
+      /// We assume that this function is called from a Signal function.
       private: void Cleanup();
 
       /// \brief Private data pointer.
@@ -607,17 +595,21 @@ namespace gazebo
 
       if (it != this->myDataPtr->connections.end())
       {
+        // Add connection to list for removal later
+        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
+        this->myDataPtr->connectionsToRemove.push_back(it);
+
         // Make sure we can get a lock
-        if (this->myDataPtr->mutex.try_lock())
+        /*if (this->myDataPtr->mutex.try_lock())
         {
           this->myDataPtr->connections.erase(it);
           this->myDataPtr->mutex.unlock();
         }
-        // Otherwise add to list for removal later
         else
         {
+          std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
           this->myDataPtr->connectionsToRemove.push_back(it);
-        }
+        }*/
       }
     }
 
@@ -625,6 +617,7 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Cleanup()
     {
+      std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
       // Remove all queue connections.
       for (auto &conn : this->myDataPtr->connectionsToRemove)
         this->myDataPtr->connections.erase(conn);
