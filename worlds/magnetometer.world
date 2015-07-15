@@ -1,6 +1,12 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+
+    <!-- Physics -->
+    <physics type="ode">
+      <magnetic_field>1 0 0</magnetic_field>
+    </physics>
+
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
