@@ -186,14 +186,14 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
   this->dataPtr->mouseEvent = _event;
 
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
-      this->dataPtr->mouseEvent.pos);
+      this->dataPtr->mouseEvent.Pos());
   if (vis && !vis->IsPlane())
   {
     // get the triangle being hovered so that it can be highlighted
     math::Vector3 intersect;
     std::vector<math::Vector3> hoverTriangle;
-    this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-        vis->GetRootVisual(), intersect, hoverTriangle);
+    this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+        _event.Pos().Y(), vis->GetRootVisual(), intersect, hoverTriangle);
 
     if (!hoverTriangle.empty())
     {
@@ -227,10 +227,10 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
   this->dataPtr->mouseEvent = _event;
 
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
-      this->dataPtr->mouseEvent.pos);
+      this->dataPtr->mouseEvent.Pos());
 
   if (vis && !vis->IsPlane() &&
-      this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+      this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
   {
     // Parent model or parent link
     rendering::VisualPtr currentParent = vis->GetRootVisual();
@@ -256,8 +256,9 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     if (!this->dataPtr->selectedVis || (currentParent  == previousParent))
     {
       math::Vector3 intersect;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          currentParent, intersect, this->dataPtr->selectedTriangle);
+      this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+          _event.Pos().Y(), currentParent, intersect,
+          this->dataPtr->selectedTriangle);
 
       if (!this->dataPtr->selectedTriangle.empty())
       {
@@ -275,8 +276,8 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       // select triangle on the target
       math::Vector3 intersect;
       std::vector<math::Vector3> vertices;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          currentParent, intersect, vertices);
+      this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+          _event.Pos().Y(), currentParent, intersect, vertices);
 
       if (!vertices.empty())
       {
