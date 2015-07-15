@@ -23,8 +23,9 @@
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
-#include "gazebo/math/Quaternion.hh"
 #include <ignition/math/Plane.hh>
+
+#include "gazebo/math/Quaternion.hh"
 
 #include "gazebo/msgs/MessageTypes.hh"
 
