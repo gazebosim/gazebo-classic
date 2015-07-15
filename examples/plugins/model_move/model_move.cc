@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Pose3d.h>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
@@ -106,7 +107,7 @@ void ModelMove::OnPathMsg(ConstPoseAnimationPtr &_msg)
 
   // Store message poses into the pathGoals and launch movement
   for (unsigned int i = 0; i < _msg->pose_size(); ++i)
-    this->pathGoals.push_back(gazebo::msgs::Convert(_msg->pose(i)));
+    this->pathGoals.push_back(gazebo::msgs::ConvertIgn(_msg->pose(i)));
 
   this->InitiateMove();
 }
