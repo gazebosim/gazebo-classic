@@ -31,7 +31,7 @@ class MagnetometerSensor_TEST : public ServerFixture,
   /// \brief Check that a model at (0,0,0,0,0,0) has mag field equal to global
   public: void BasicMagnetometerSensorCheck(const std::string &_physicsEngine);
 
-  /// \brief Drop a model with imu sensor and measure its linear acceleration
+  /// \brief Rotate sensor and check magnetic field.
   public: void RotateMagnetometerSensorCheck(const std::string &_physicsEngine);
 };
 
