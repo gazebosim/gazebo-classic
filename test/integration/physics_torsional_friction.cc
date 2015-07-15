@@ -77,7 +77,31 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
   /// different contact depths.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DepthTest(const std::string &_physicsEngine);
+
+  /// \brief Callback for contact subscribers in depth test.
+  /// \param[in] _msg Contact message
+  private: void Callback(const ConstContactsPtr &_msg);
 };
+
+////////////////////////////////////////////////////////////////////////
+void PhysicsTorsionalFrictionTest::Callback(const ConstContactsPtr &_msg)
+{
+  for (auto contact : _msg->contact())
+  {
+    if (contact.has_collision1() &&
+        contact.collision1().find("sphere") == 0)
+    {
+      std::string collision1 = contact.collision1();
+      double depth = contact.depth(0);
+      math::Vector3 normal = msgs::Convert(contact.normal(0));
+
+      // TODO: compare depth value with expected value using sphere Kp
+      // Normal force = Kp * depth ...?
+
+      std::cout << collision1 << "   " << depth << "  " << normal << std::endl;
+    }
+  }
+}
 
 /////////////////////////////////////////////////
 // Coefficient test:
@@ -174,6 +198,9 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
+  // Step so contacts begin
+  world->Step(1);
+
   // check the gravity vector
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
@@ -183,56 +210,22 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   EXPECT_DOUBLE_EQ(g.y, 0);
   EXPECT_DOUBLE_EQ(g.z, -9.8);
 
-  // Get contact manager
-  physics::ContactManager *mgr = physics->GetContactManager();
-  ASSERT_TRUE(mgr != NULL);
+  // Sleep to ensure transport topics are all advertised
+  common::Time::MSleep(100);
+  std::list<std::string> topics =
+    transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  topics.sort();
+  EXPECT_FALSE(topics.empty());
+  EXPECT_EQ(topics.size(), 1u);
 
-  // Load the spheres
-  std::vector<PhysicsTorsionalFrictionTest::SphereData>
-      spheres;
-  spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_1"));
-  spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_2"));
-  spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_3"));
-  spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_4"));
-  spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_5"));
+  auto topic = topics.front();
 
-  // Verify sphere data structure
-  for (auto sphere : spheres)
-  {
-    ASSERT_TRUE(sphere.model != NULL);
-  }
+  gzdbg << "Listening to " << topic << std::endl;
+  transport::SubscriberPtr sub = this->node->Subscribe(topic,
+      &PhysicsTorsionalFrictionTest::Callback, this);
 
-  // Get contacts
-  std::vector<physics::Contact *> contacts;
-
-  int maxTries = 100;
-  while (contacts.size() == 0 && maxTries > 0)
-  {
-    world->Step(1);
-    contacts = mgr->GetContacts();
-
-    std::cout << "Contacts: " << contacts.size()  << std::endl;
-    maxTries--;
-  }
-
-  // Check depth
-  for (auto sphere : spheres)
-  {
-    bool contactFound = false;
-    for (auto contact : contacts)
-    {
-      if (contact->collision1->GetLink()->GetModel() != sphere.model)
-        continue;
-      contactFound = true;
-
-      std::cout << "Depth: " << contact->depths[0] << std::endl;
-    }
-  }
+  // Step to get the contact info on Callback
+  world->Step(1);
 }
 
 /////////////////////////////////////////////////
