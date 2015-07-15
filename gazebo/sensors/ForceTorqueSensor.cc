@@ -184,13 +184,15 @@ physics::JointPtr ForceTorqueSensor::GetJoint() const
 //////////////////////////////////////////////////
 math::Vector3 ForceTorqueSensor::GetForce() const
 {
-  return msgs::Convert(this->wrenchMsg.wrench().force());
+  return ignition::math::Vector3d(
+      msgs::ConvertIgn(this->wrenchMsg.wrench().force()));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ForceTorqueSensor::GetTorque() const
 {
-  return msgs::Convert(this->wrenchMsg.wrench().torque());
+  return ignition::math::Vector3d(
+      msgs::ConvertIgn(this->wrenchMsg.wrench().torque()));
 }
 
 //////////////////////////////////////////////////
@@ -204,33 +206,33 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
   physics::JointWrench wrench = this->parentJoint->GetForceTorque(0u);
 
   // Get the force and torque in the appropriate frame.
-  math::Vector3 measuredForce;
-  math::Vector3 measuredTorque;
+  ignition::math::Vector3d measuredForce;
+  ignition::math::Vector3d measuredTorque;
 
   if (this->measureFrame == PARENT_LINK)
   {
     if (this->parentToChild)
     {
-      measuredForce = wrench.body1Force;
-      measuredTorque = wrench.body1Torque;
+      measuredForce = wrench.body1Force.Ign();
+      measuredTorque = wrench.body1Torque.Ign();
     }
     else
     {
-      measuredForce = -1*wrench.body1Force;
-      measuredTorque = -1*wrench.body1Torque;
+      measuredForce = -1*wrench.body1Force.Ign();
+      measuredTorque = -1*wrench.body1Torque.Ign();
     }
   }
   else if (this->measureFrame == CHILD_LINK)
   {
     if (!this->parentToChild)
     {
-      measuredForce = wrench.body2Force;
-      measuredTorque = wrench.body2Torque;
+      measuredForce = wrench.body2Force.Ign();
+      measuredTorque = wrench.body2Torque.Ign();
     }
     else
     {
-      measuredForce = -1*wrench.body2Force;
-      measuredTorque = -1*wrench.body2Torque;
+      measuredForce = -1*wrench.body2Force.Ign();
+      measuredTorque = -1*wrench.body2Torque.Ign();
     }
   }
   else
@@ -239,13 +241,13 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
               "measureFrame must be PARENT_LINK, CHILD_LINK or SENSOR");
     if (!this->parentToChild)
     {
-      measuredForce = rotationSensorChild*wrench.body2Force;
-      measuredTorque = rotationSensorChild*wrench.body2Torque;
+      measuredForce = (rotationSensorChild*wrench.body2Force).Ign();
+      measuredTorque = (rotationSensorChild*wrench.body2Torque).Ign();
     }
     else
     {
-      measuredForce = rotationSensorChild*(-1*wrench.body2Force);
-      measuredTorque = rotationSensorChild*(-1*wrench.body2Torque);
+      measuredForce = (rotationSensorChild*(-1*wrench.body2Force)).Ign();
+      measuredTorque = (rotationSensorChild*(-1*wrench.body2Torque)).Ign();
     }
   }
 

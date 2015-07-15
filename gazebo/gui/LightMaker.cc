@@ -157,9 +157,9 @@ void LightMaker::OnMousePush(const common::MouseEvent &/*_event*/)
 void LightMaker::CreateTheEntity()
 {
   msgs::Set(this->msg.mutable_pose()->mutable_position(),
-            this->light->GetPosition());
+            this->light->GetPosition().Ign());
   msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            ignition::math::Quaterniond());
   this->lightPub->Publish(this->msg);
   this->camera.reset();
 }

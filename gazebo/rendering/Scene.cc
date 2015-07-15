@@ -1929,7 +1929,7 @@ void Scene::PreRender()
             || this->dataPtr->selectionMode != "move" ||
             iter->first != this->dataPtr->selectedVis->GetId())
         {
-          math::Pose pose = msgs::Convert(pIter->second);
+          ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
           iter->second->SetPose(pose);
           PoseMsgs_M::iterator prev = pIter++;
@@ -1961,7 +1961,7 @@ void Scene::PreRender()
                 this->dataPtr->selectionMode != "move" ||
                 iter->first != this->dataPtr->selectedVis->GetId())
             {
-              math::Pose pose = msgs::Convert(pose_msg);
+              ignition::math::Pose3d pose = msgs::ConvertIgn(pose_msg);
               iter2->second->SetPose(pose);
             }
           }
@@ -2075,7 +2075,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         // parentVis' children list so that it can be properly deleted.
         parentVis->AttachVisual(cameraVis);
 
-        cameraVis->SetPose(msgs::Convert(_msg->pose()));
+        cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
         cameraVis->SetId(_msg->id());
         cameraVis->Load(_msg->camera());
         this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;

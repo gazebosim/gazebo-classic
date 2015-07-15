@@ -201,21 +201,23 @@ void ImuSensor::OnLinkData(ConstLinkDataPtr &_msg)
 math::Vector3 ImuSensor::GetAngularVelocity() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return msgs::Convert(this->imuMsg.angular_velocity());
+  return ignition::math::Vector3d(
+      msgs::ConvertIgn(this->imuMsg.angular_velocity()));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ImuSensor::GetLinearAcceleration() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return msgs::Convert(this->imuMsg.linear_acceleration());
+  return ignition::math::Vector3d(
+      msgs::ConvertIgn(this->imuMsg.linear_acceleration()));
 }
 
 //////////////////////////////////////////////////
 math::Quaternion ImuSensor::GetOrientation() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return msgs::Convert(this->imuMsg.orientation());
+  return msgs::ConvertIgn(this->imuMsg.orientation());
 }
 
 //////////////////////////////////////////////////
@@ -265,29 +267,31 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     math::Pose imuPose = this->pose + parentEntityPose;
 
     // Set the IMU angular velocity
-    math::Vector3 imuWorldAngularVel
-        = msgs::Convert(msg.angular_velocity());
+    ignition::math::Vector3d imuWorldAngularVel
+        = msgs::ConvertIgn(msg.angular_velocity());
 
     msgs::Set(this->imuMsg.mutable_angular_velocity(),
               imuPose.rot.GetInverse().RotateVector(
-              imuWorldAngularVel));
+              imuWorldAngularVel).Ign());
 
     // Compute and set the IMU linear acceleration
-    math::Vector3 imuWorldLinearVel
-        = msgs::Convert(msg.linear_velocity());
+    ignition::math::Vector3d imuWorldLinearVel
+        = msgs::ConvertIgn(msg.linear_velocity());
     // Get the correct vel for imu's that are at an offset from parent link
     imuWorldLinearVel +=
-        imuWorldAngularVel.Cross(parentEntityPose.pos - imuPose.pos);
+        imuWorldAngularVel.Cross(
+            parentEntityPose.pos.Ign() - imuPose.pos.Ign());
     this->linearAcc = imuPose.rot.GetInverse().RotateVector(
-      (imuWorldLinearVel - this->lastLinearVel) / dt);
+      (imuWorldLinearVel - this->lastLinearVel.Ign()) / dt);
 
     // Add contribution from gravity
     this->linearAcc -= imuPose.rot.GetInverse().RotateVector(this->gravity);
-    msgs::Set(this->imuMsg.mutable_linear_acceleration(), this->linearAcc);
+    msgs::Set(this->imuMsg.mutable_linear_acceleration(),
+        this->linearAcc.Ign());
 
     // Set the IMU orientation
     msgs::Set(this->imuMsg.mutable_orientation(),
-              (imuPose - this->referencePose).rot);
+              (imuPose - this->referencePose).rot.Ign());
 
     this->lastLinearVel = imuWorldLinearVel;
 

@@ -179,8 +179,8 @@ namespace gazebo
     /////////////////////////////////////////////
     void Set(msgs::Pose *_p, const math::Pose &_v)
     {
-      Set(_p->mutable_position(), _v.pos);
-      Set(_p->mutable_orientation(), _v.rot);
+      Set(_p->mutable_position(), _v.pos.Ign());
+      Set(_p->mutable_orientation(), _v.rot.Ign());
     }
 
     /////////////////////////////////////////////
@@ -231,7 +231,7 @@ namespace gazebo
     /////////////////////////////////////////////////
     void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
     {
-      Set(_p->mutable_normal(), _v.normal);
+      Set(_p->mutable_normal(), _v.normal.Ign());
       _p->mutable_size()->set_x(_v.size.x);
       _p->mutable_size()->set_y(_v.size.y);
       _p->set_d(_v.d);
@@ -360,7 +360,7 @@ namespace gazebo
     msgs::PlaneGeom Convert(const math::Plane &_p)
     {
       msgs::PlaneGeom result;
-      result.mutable_normal()->CopyFrom(Convert(_p.normal));
+      result.mutable_normal()->CopyFrom(Convert(_p.normal.Ign()));
       result.mutable_size()->set_x(_p.size.x);
       result.mutable_size()->set_y(_p.size.y);
       result.set_d(_p.d);
@@ -611,7 +611,8 @@ namespace gazebo
     /////////////////////////////////////////////
     math::Pose Convert(const msgs::Pose &_p)
     {
-      return math::Pose(Convert(_p.position()), Convert(_p.orientation()));
+      return math::Pose(
+          ConvertIgn(_p.position()), ConvertIgn(_p.orientation()));
     }
 
     /////////////////////////////////////////////
@@ -636,7 +637,7 @@ namespace gazebo
     /////////////////////////////////////////////
     math::Plane Convert(const msgs::PlaneGeom &_p)
     {
-      return math::Plane(Convert(_p.normal()),
+      return math::Plane(ConvertIgn(_p.normal()),
           ignition::math::Vector2d(_p.size().x(), _p.size().y()),
           _p.d());
     }
@@ -1225,7 +1226,7 @@ namespace gazebo
         visualSDF->GetElement("laser_retro")->Set(_msg.laser_retro());
 
       if (_msg.has_pose())
-        visualSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+        visualSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
 
       // Load the geometry
       if (_msg.has_geometry())
@@ -1488,7 +1489,7 @@ namespace gazebo
 
       if (_msg.has_pose())
       {
-        lightSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+        lightSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
       }
 
       if (_msg.has_diffuse())
@@ -1503,7 +1504,7 @@ namespace gazebo
 
       if (_msg.has_direction())
       {
-        lightSDF->GetElement("direction")->Set(msgs::Convert(_msg.direction()));
+        lightSDF->GetElement("direction")->Set(ConvertIgn(_msg.direction()));
       }
 
       if (_msg.has_attenuation_constant())
@@ -1602,7 +1603,7 @@ namespace gazebo
         if (distortionMsg.has_center())
         {
           distortionElem->GetElement("center")->Set(
-              msgs::Convert(distortionMsg.center()));
+              ConvertIgn(distortionMsg.center()));
         }
         if (distortionMsg.has_k1())
         {
@@ -1652,7 +1653,7 @@ namespace gazebo
       if (_msg.has_max_contacts())
         collisionSDF->GetElement("max_contacts")->Set(_msg.max_contacts());
       if (_msg.has_pose())
-        collisionSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+        collisionSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
       if (_msg.has_geometry())
       {
         sdf::ElementPtr geomElem = collisionSDF->GetElement("geometry");
@@ -1692,7 +1693,7 @@ namespace gazebo
       if (_msg.has_kinematic())
         linkSDF->GetElement("kinematic")->Set(_msg.kinematic());
       if (_msg.has_pose())
-        linkSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+        linkSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
       if (_msg.has_inertial())
       {
         sdf::ElementPtr inertialElem = linkSDF->GetElement("inertial");
@@ -1739,7 +1740,7 @@ namespace gazebo
       if (_msg.has_mass())
         inertialSDF->GetElement("mass")->Set(_msg.mass());
       if (_msg.has_pose())
-        inertialSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+        inertialSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
 
       sdf::ElementPtr inertiaSDF = inertialSDF->GetElement("inertia");
       if (_msg.has_ixx())
@@ -1786,7 +1787,7 @@ namespace gazebo
         if (friction.has_fdir1())
         {
           physicsEngElem->GetElement("fdir1")->Set(
-              msgs::Convert(friction.fdir1()));
+              ConvertIgn(friction.fdir1()));
         }
         if (friction.has_slip1())
           physicsEngElem->GetElement("slip1")->Set(friction.slip1());
@@ -1882,7 +1883,7 @@ namespace gazebo
         sdf::ElementPtr geom = geometrySDF->GetElement("box");
         msgs::BoxGeom boxGeom = _msg.box();
         if (boxGeom.has_size())
-          geom->GetElement("size")->Set(msgs::Convert(boxGeom.size()));
+          geom->GetElement("size")->Set(ConvertIgn(boxGeom.size()));
       }
       else if (_msg.type() == msgs::Geometry::CYLINDER &&
           _msg.has_cylinder())
@@ -1909,11 +1910,10 @@ namespace gazebo
         msgs::PlaneGeom planeGeom = _msg.plane();
         if (planeGeom.has_normal())
         {
-          geom->GetElement("normal")->Set(
-              msgs::Convert(planeGeom.normal()));
+          geom->GetElement("normal")->Set(ConvertIgn(planeGeom.normal()));
         }
         if (planeGeom.has_size())
-          geom->GetElement("size")->Set(msgs::Convert(planeGeom.size()));
+          geom->GetElement("size")->Set(ConvertIgn(planeGeom.size()));
         if (planeGeom.has_d())
           gzerr << "sdformat doesn't have Plane.d variable" << std::endl;
       }
@@ -1940,13 +1940,11 @@ namespace gazebo
         msgs::HeightmapGeom heightmapGeom = _msg.heightmap();
         if (heightmapGeom.has_size())
         {
-          geom->GetElement("size")->Set(
-              msgs::Convert(heightmapGeom.size()));
+          geom->GetElement("size")->Set(ConvertIgn(heightmapGeom.size()));
         }
         if (heightmapGeom.has_origin())
         {
-          geom->GetElement("pos")->Set(
-              msgs::Convert(heightmapGeom.origin()));
+          geom->GetElement("pos")->Set(ConvertIgn(heightmapGeom.origin()));
         }
         if (heightmapGeom.has_use_terrain_paging())
         {
@@ -2001,7 +1999,7 @@ namespace gazebo
           for (int i = 0; i < _msg.polyline(j).point_size(); ++i)
           {
             sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-            pointElem->Set(msgs::Convert(_msg.polyline(j).point(i)));
+            pointElem->Set(ConvertIgn(_msg.polyline(j).point(i)));
           }
         }
       }
@@ -2038,7 +2036,7 @@ namespace gazebo
           submeshElem->GetElement("center")->Set(_msg.center_submesh());
         if (_msg.has_scale())
         {
-          meshSDF->GetElement("scale")->Set(msgs::Convert(_msg.scale()));
+          meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
         }
       }
       return meshSDF;
@@ -2212,7 +2210,7 @@ namespace gazebo
       if (_msg.has_is_static())
         modelSDF->GetElement("static")->Set(_msg.is_static());
       if (_msg.has_pose())
-        modelSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+        modelSDF->GetElement("pose")->Set(msgs::ConvertIgn(_msg.pose()));
 
       if (_msg.joint_size() > 0)
         while (modelSDF->HasElement("joint"))
@@ -2272,7 +2270,7 @@ namespace gazebo
       if (_msg.has_child())
         jointSDF->GetElement("child")->Set(_msg.child());
       if (_msg.has_pose())
-        jointSDF->GetElement("pose")->Set(Convert(_msg.pose()));
+        jointSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
       if (_msg.has_axis1())
         AxisToSDF(_msg.axis1(), jointSDF->GetElement("axis"));
       if (_msg.has_axis2())
@@ -2312,7 +2310,7 @@ namespace gazebo
     void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf)
     {
       if (_msg.has_xyz())
-        _sdf->GetElement("xyz")->Set(Convert(_msg.xyz()));
+        _sdf->GetElement("xyz")->Set(ConvertIgn(_msg.xyz()));
       if (_msg.has_use_parent_model_frame())
       {
         _sdf->GetElement("use_parent_model_frame")->Set(

@@ -189,7 +189,7 @@ void SonarSensor::Load(const std::string &_worldName)
   this->sonarMsg.mutable_sonar()->set_radius(this->radius);
 
   msgs::Set(this->sonarMsg.mutable_sonar()->mutable_world_pose(),
-      this->sonarMidPose);
+      this->sonarMidPose.Ign());
   this->sonarMsg.mutable_sonar()->set_range(0);
 }
 
@@ -272,7 +272,7 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
 
       for (int j = 0; j < (*iter)->contact(i).position_size(); ++j)
       {
-        pos = msgs::Convert((*iter)->contact(i).position(j));
+        pos = msgs::ConvertIgn((*iter)->contact(i).position(j));
         math::Vector3 relPos = pos - referencePose.pos;
         double len = pos.Distance(referencePose.pos);
 

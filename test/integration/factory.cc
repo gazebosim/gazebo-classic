@@ -168,8 +168,9 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   // clone the pr2
   std::string name = "pr2";
   msgs::Factory msg;
-  math::Pose clonePose;
-  clonePose.Set(math::Vector3(2, 3, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d clonePose;
+  clonePose.Set(ignition::math::Vector3d(2, 3, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
   msgs::Set(msg.mutable_pose(), clonePose);
   msg.set_clone_model_name(name);
   this->factoryPub->Publish(msg);
@@ -180,9 +181,9 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
 
   EXPECT_TRUE(this->HasEntity(cloneName));
   testPose = GetEntityPose(cloneName);
-  EXPECT_TRUE(math::equal(testPose.pos.x, clonePose.pos.x, 0.1));
-  EXPECT_TRUE(math::equal(testPose.pos.y, clonePose.pos.y, 0.1));
-  EXPECT_TRUE(math::equal(testPose.pos.z, clonePose.pos.z, 0.1));
+  EXPECT_TRUE(math::equal(testPose.pos.x, clonePose.Pos().X(), 0.1));
+  EXPECT_TRUE(math::equal(testPose.pos.y, clonePose.Pos().Y(), 0.1));
+  EXPECT_TRUE(math::equal(testPose.pos.z, clonePose.Pos().Z(), 0.1));
 
   // Verify properties of the pr2 clone with the original model.
   physics::WorldPtr world = physics::get_world("default");

@@ -52,8 +52,8 @@ void BreakableJointPlugin::OnUpdate(msgs::WrenchStamped _msg)
 {
   if (this->parentJoint)
   {
-    math::Vector3 force = msgs::Convert(_msg.wrench().force());
-    if (force.GetLength() > this->breakingForce)
+    ignition::math::Vector3d force = msgs::ConvertIgn(_msg.wrench().force());
+    if (force.Length() > this->breakingForce)
     {
       this->worldConnection = event::Events::ConnectWorldUpdateBegin(
         boost::bind(&BreakableJointPlugin::OnWorldUpdate, this));
