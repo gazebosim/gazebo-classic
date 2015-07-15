@@ -80,6 +80,7 @@ set(tests
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
+  swarm.cc
   transceiver.cc
   transport.cc
   transporter.cc
