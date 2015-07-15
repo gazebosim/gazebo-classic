@@ -291,6 +291,8 @@ int Publication::Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb,
     endIter = this->nodes.end();
     while (iter != endIter)
     {
+    	std::cerr << "Publication::Publish(): node=" << (*iter)->GetId() << " (" << *iter << ") " << std::endl << std::flush;
+
       if ((*iter)->HandleMessage(this->topic, _msg))
         ++iter;
       else

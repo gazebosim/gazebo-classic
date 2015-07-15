@@ -177,6 +177,8 @@ namespace gazebo
           void(T::*_fp)(const boost::shared_ptr<M const> &), T *_obj,
           bool _latching = false)
       {
+      	std::cerr << "Node::Subscribe(): topic=" << _topic << std::endl << std::flush;
+
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(_topic);
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);

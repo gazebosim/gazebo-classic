@@ -39,7 +39,6 @@ namespace gazebo
 			std::cerr << "RegionEventBoxPlugin::OnModelMsg()..." << std::endl << std::flush;
   	}
 
-    // Called by the world update start event
     public: void OnUpdate(const common::UpdateInfo & /*_info*/)
     {
     		for (unsigned int i = 0; i < this->world->GetModelCount(); i++) {
@@ -48,32 +47,81 @@ namespace gazebo
 
     			if (this->modelName == m->GetName()) {
 
-//    				math::Vector3 pos = m->GetWorldPose().pos;
-//    				math::Box bbox = m->GetBoundingBox();
-//    				math::Pose pose = m->GetWorldPose();
-
-						sdf::ElementPtr modelSdf = m->GetSDF();
-
-						sdf::ElementPtr linkEl = modelSdf->GetElement("link");
-						if (linkEl) {
-							sdf::ElementPtr visualEl = linkEl->GetElement("visual");
-							if (visualEl) {
-								sdf::ElementPtr geometryEl = visualEl->GetElement("geometry");
-								if (geometryEl) {
-									sdf::ElementPtr boxEl = geometryEl->GetElement("box");
-									if (boxEl) {
-										if (boxEl->HasElement("size")) {
-											std::string size = boxEl->Get<std::string>("size");
-//											std::cerr << "  size=" << size << std::endl << std::flush;
-										}
-									}
-								}
-							}
+						if (!this->UpdateSizeAndPose(m->GetSDF(), m->GetWorldPose()))
+						{
+							std::cerr << "Failed to update size and position for model " << m->GetName() << std::endl << std::flush;
+							return;
 						}
-
+						std::cout << "size=" << this->size << std::endl << std::flush;
+						std::cout << "pose=" << this->pose << std::endl << std::flush;
     			}
 
     		}
+
+    }
+
+    private: bool UpdateSizeAndPose(sdf::ElementPtr _sdf, const math::Pose& _pose)
+    {
+    	bool result = false;
+
+			sdf::ElementPtr linkEl = _sdf->GetElement("link");
+			if (linkEl)
+			{
+				sdf::ElementPtr visualEl = linkEl->GetElement("visual");
+				if (visualEl)
+				{
+					sdf::ElementPtr geometryEl = visualEl->GetElement("geometry");
+					if (geometryEl)
+					{
+						sdf::ElementPtr boxEl = geometryEl->GetElement("box");
+						if (boxEl)
+						{
+							if (boxEl->HasElement("size"))
+							{
+								std::string ssize = boxEl->Get<std::string>("size");
+								this->size = this->ParseVector3(ssize);
+					    	this->pose = _pose;
+								result = true;
+							}
+						}
+					}
+				}
+			}
+			return result;
+    }
+
+    private: math::Vector3 ParseVector3(const std::string &_str, double _scale = 1.0)
+    {
+      std::vector<std::string> pieces;
+      std::vector<double> vals;
+
+      boost::split(pieces, _str, boost::is_any_of(" "));
+      for (unsigned int i = 0; i < pieces.size(); ++i)
+      {
+        if (pieces[i] != "")
+        {
+          try
+          {
+            vals.push_back(_scale * boost::lexical_cast<double>(pieces[i].c_str()));
+          }
+          catch(boost::bad_lexical_cast &)
+          {
+            sdferr << "xml key [" << _str
+              << "][" << i << "] value [" << pieces[i]
+              << "] is not a valid double from a 3-tuple\n";
+            return math::Vector3(0, 0, 0);
+          }
+        }
+      }
+
+      if (vals.size() == 3)
+      {
+        return math::Vector3(vals[0], vals[1], vals[2]);
+      }
+      else
+      {
+        return math::Vector3(0, 0, 0);
+      }
 
     }
 
@@ -90,6 +138,9 @@ namespace gazebo
     public: transport::NodePtr node;
 
     public: boost::mutex *receiveMutex;
+
+    private: math::Vector3 size;
+    private: math::Pose pose;
 
   };
 
