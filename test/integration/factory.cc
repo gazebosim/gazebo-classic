@@ -140,7 +140,7 @@ TEST_P(FactoryTest, Sphere)
 /////////////////////////////////////////////////
 void FactoryTest::Cylinder(const std::string &_physicsEngine)
 {
-  igntion::math::Pose3d setPose, testPose;
+  ignition::math::Pose3d setPose, testPose;
   Load("worlds/empty.world", true, _physicsEngine);
 
   for (unsigned int i = 0; i < 100; i++)
@@ -152,9 +152,9 @@ void FactoryTest::Cylinder(const std::string &_physicsEngine)
         ignition::math::Quaterniond(0, 0, 0));
     SpawnCylinder(name.str(), setPose.Pos(), setPose.Rot().Euler());
     testPose = GetEntityPose(name.str()).Ign();
-    EXPECT_TRUE(math::equal(testPose.Pos.X(), setPose.Pos().X(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos.Y(), setPose.Pos().Y(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos.Z(), setPose.Pos().Z(), 0.1));
+    EXPECT_TRUE(math::equal(testPose.Pos().X(), setPose.Pos().X(), 0.1));
+    EXPECT_TRUE(math::equal(testPose.Pos().Y(), setPose.Pos().Y(), 0.1));
+    EXPECT_TRUE(math::equal(testPose.Pos().Z(), setPose.Pos().Z(), 0.1));
   }
 }
 
