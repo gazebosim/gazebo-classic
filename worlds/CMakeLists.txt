@@ -12,6 +12,7 @@ set (files
   empty_sky.world
   empty.world
   everything.world
+  flocking.world
   force_torque_demo.world
   friction_demo.world
   gripper.world
