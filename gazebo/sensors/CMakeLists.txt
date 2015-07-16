@@ -52,7 +52,8 @@ set (headers
   SonarSensor.hh
   WirelessReceiver.hh
   WirelessTransceiver.hh
-  WirelessTransmitter.hh)
+  WirelessTransmitter.hh
+)
 
 set (gtest_sources
   AltimeterSensor_TEST.cc

@@ -15,6 +15,7 @@
  *
 */
 #include <gtest/gtest.h>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
@@ -33,7 +34,7 @@ class AltimeterSensor_TEST : public ServerFixture,
   /// \param[in] _physicsEngine The type of physics engine to use.
   public: void BasicAltimeterSensorCheck(const std::string &_physicsEngine);
 
-  /// \brief Check that an alimeter at a non-zero altitude works.
+  /// \brief Check that an altimeter at a non-zero altitude works.
   /// \param[in] _physicsEngine The type of physics engine to use.
   public: void NonzeroAltimeterSensorCheck(const std::string &_physicsEngine);
 };
@@ -103,10 +104,10 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   // Spawn an altimeter sensor at a height of 10m
   std::string modelName = "altModel";
   std::string altSensorName = "altSensor";
-  math::Pose modelPose(0, 0, 10, 0, 0, 0);
+  ignition::math::Pose3d modelPose(0, 0, 10, 0, 0, 0);
   std::string topic = "~/" + altSensorName + "_" + _physicsEngine;
   SpawnUnitAltimeterSensor(modelName, altSensorName,
-      "box", topic, modelPose.pos, modelPose.rot.GetAsEuler());
+      "box", topic, modelPose.Pos(), modelPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(altSensorName);
   sensors::AltimeterSensorPtr altSensor =

@@ -373,8 +373,10 @@ namespace gazebo
     protected: void SpawnUnitAltimeterSensor(const std::string &_name,
                    const std::string &_sensorName,
                    const std::string &_collisionType,
-                   const std::string &_topic, const math::Vector3 &_pos,
-                   const math::Vector3 &_rpy, bool _static = false);
+                   const std::string &_topic,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   bool _static = false);
 
     /// \brief generate a gtest failure from a timeout error and display a
     /// log message about the problem.
