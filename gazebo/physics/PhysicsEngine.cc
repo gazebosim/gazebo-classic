@@ -225,20 +225,20 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     else if (_key == "gravity")
     {
       boost::any copy = _value;
-      if (_value.type() == typeid(sdf::Vector3))
+      if (_value.type() == typeid(ignition::math::Vector3d))
       {
         copy = boost::lexical_cast<math::Vector3>
-            (boost::any_cast<sdf::Vector3>(_value));
+            (boost::any_cast<ignition::math::Vector3d>(_value));
       }
       this->SetGravity(boost::any_cast<math::Vector3>(copy));
     }
     else if (_key == "magnetic_field")
     {
       boost::any copy = _value;
-      if (_value.type() == typeid(sdf::Vector3))
+      if (_value.type() == typeid(ignition::math::Vector3d))
       {
         copy = boost::lexical_cast<math::Vector3>
-            (boost::any_cast<sdf::Vector3>(_value));
+            (boost::any_cast<ignition::math::Vector3d>(_value));
       }
       this->sdf->GetElement("magnetic_field")->
           Set(boost::any_cast<math::Vector3>(copy));

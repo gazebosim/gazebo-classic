@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-
-#include <sys/time.h>
 #include <gtest/gtest.h>
 
 #include "gazebo/test/ServerFixture.hh"
@@ -25,14 +23,22 @@
 #define TOL 1e-4
 
 using namespace gazebo;
+
+/// \brief Test class for the altimeter sensor
 class AltimeterSensor_TEST : public ServerFixture,
   public testing::WithParamInterface<const char*>
 {
+  /// \brief Check that a simple altimeter works correctly
+  /// The default should be inserted with altitude = 0 and velocity =  0
+  /// \param[in] _physicsEngine The type of physics engine to use.
   public: void BasicAltimeterSensorCheck(const std::string &_physicsEngine);
+
+  /// \brief Check that an alimeter at a non-zero altitude works.
+  /// \param[in] _physicsEngine The type of physics engine to use.
   public: void NonzeroAltimeterSensorCheck(const std::string &_physicsEngine);
 };
 
-// A noise-free magnetic field strength sensor
+// An altitude sensor
 static std::string altSensorString =
 "<sdf version='1.5'>"
 "  <sensor name='altimeter' type='altimeter'>"
@@ -43,8 +49,7 @@ static std::string altSensorString =
 "  </sensor>"
 "</sdf>";
 
-///////////////////////////////////////////////////////////////////////////////
-// The default should be inserted with altitude = 0 and velocity =  0
+/////////////////////////////////////////////////
 void AltimeterSensor_TEST::BasicAltimeterSensorCheck(
   const std::string &_physicsEngine)
 {
@@ -57,19 +62,19 @@ void AltimeterSensor_TEST::BasicAltimeterSensorCheck(
   sdf::initFile("sensor.sdf", sdf);
   sdf::readString(altSensorString, sdf);
 
-  // Create the IMU sensor
+  // Create the altimeter sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
       "ground_plane::link", 0);
 
   // Make sure the returned sensor name is correct
-  EXPECT_EQ(sensorName, 
+  EXPECT_EQ(sensorName,
     std::string("default::ground_plane::link::altimeter"));
 
   // Update the sensor manager so that it can process new sensors.
   mgr->Update();
 
-  // Get a pointer to the IMU sensor
-  sensors::AltimeterSensorPtr sensor = 
+  // Get a pointer to the altimeter sensor
+  sensors::AltimeterSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::AltimeterSensor>
       (mgr->GetSensor(sensorName));
 
@@ -77,12 +82,12 @@ void AltimeterSensor_TEST::BasicAltimeterSensorCheck(
   EXPECT_TRUE(sensor != NULL);
 
   // By default the altitude of the sensor should be zero
-  EXPECT_EQ(sensor->GetVerticalPosition(),0.0);
-  EXPECT_EQ(sensor->GetVerticalVelocity(),0.0);
+  EXPECT_DOUBLE_EQ(sensor->VerticalPosition(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->VerticalVelocity(), 0.0);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// If inserted at X=0,Y=0,Z=10m 
+/////////////////////////////////////////////////
+// If inserted at X=0,Y=0,Z=10m
 void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   const std::string &_physicsEngine)
 {
@@ -95,7 +100,7 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // Spawna  magnetometer sensor with a PI/2 aniclockwise rotation about U axis
+  // Spawn an altimeter sensor at a height of 10m
   std::string modelName = "altModel";
   std::string altSensorName = "altSensor";
   math::Pose modelPose(0, 0, 10, 0, 0, 0);
@@ -113,8 +118,8 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   altSensor->SetActive(true);
 
   // Check for match
-  EXPECT_EQ(altSensor->GetVerticalPosition(),10.0);
-  EXPECT_EQ(altSensor->GetVerticalVelocity(),0.0);
+  EXPECT_DOUBLE_EQ(altSensor->VerticalPosition(), 10.0);
+  EXPECT_DOUBLE_EQ(altSensor->VerticalVelocity(), 0.0);
 }
 
 /////////////////////////////////////////////////

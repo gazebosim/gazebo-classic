@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _ALTIMETER_SENSOR_HH_
-#define _ALTIMETER_SENSOR_HH_
+#ifndef _GAZEBO_ALTIMETER_SENSOR_HH_
+#define _GAZEBO_ALTIMETER_SENSOR_HH_
 
 #include <string>
 
@@ -33,10 +33,12 @@ namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data class
+    class AltimeterSensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
-    /// \class AltimeterSensor AltimeterSensor.hh sensors/sensors.hh
     /// \brief AltimeterSensor to provide vertical position and velocity
     class GAZEBO_VISIBLE AltimeterSensor: public Sensor
     {
@@ -47,14 +49,17 @@ namespace gazebo
       public: virtual ~AltimeterSensor();
 
       // Documentation inherited
-      public: virtual void Load(const std::string & _worldName,
+      public: virtual void Load(const std::string &_worldName,
                                 sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual void Load(const std::string & _worldName);
+      public: virtual void Load(const std::string &_worldName);
 
       // Documentation inherited
       public: virtual void Init();
+
+      // Documentation inherited
+      public: virtual std::string GetTopic() const;
 
       // Documentation inherited
       protected: virtual bool UpdateImpl(bool _force);
@@ -64,34 +69,23 @@ namespace gazebo
 
       /// \brief Accessor for current vertical position
       /// \return Current vertical position
-      public: double GetVerticalPosition();
+      public: double VerticalPosition();
 
       /// \brief Accessor for current vertical velocity
       /// \return Current vertical velocity
-      public: double GetVerticalVelocity();
+      public: double VerticalVelocity();
 
       /// \brief Accessor for the reference altitude
       /// \return Current reference altitude
-      public: double GetReferenceAltitude();
+      public: double ReferenceAltitude();
 
       /// \brief Accessor for current vertical velocity
       /// \param[in] _refAlt reference altitude
-      public: void SetReferenceAltitude(double _refAlt);
+      public: void SetReferenceAltitude(const double _refAlt);
 
-      /// \brief Mutex to protect reads and writes.
-      private: mutable boost::mutex mutex;
-      
-      /// \brief GPS data publisher.
-      private: transport::PublisherPtr altPub;
-
-      /// \brief Topic name for GPS data publisher.
-      private: std::string topicName;
-
-      /// \brief Parent link of this sensor.
-      private: physics::LinkPtr parentLink;
-
-      /// \brief Stores most recent altimeter sensor data.
-      private: msgs::Altimeter altMsg;
+      /// \internal
+      /// \brief Private data pointer
+      private: AltimeterSensorPrivate *dataPtr;
     };
     /// \}
   }

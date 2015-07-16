@@ -229,7 +229,7 @@ namespace gazebo
 
       /// \brief Noise streams for the ray sensor
       /// \sa RaySensor
-      RAY_NOISE = 9
+      RAY_NOISE = 9,
 
       /// \brief Vertical noise stream for the altimeter sensor
       /// \sa AltimeterSensor
