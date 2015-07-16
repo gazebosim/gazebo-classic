@@ -912,14 +912,18 @@ void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
   msgs::Factory msg;
   std::ostringstream newModelStr;
   std::ostringstream shapeStr;
+
   if (_collisionType == "box")
+  {
     shapeStr << " <box><size>1 1 1</size></box>";
+  }
   else if (_collisionType == "cylinder")
   {
     shapeStr << "<cylinder>"
              << "  <radius>.5</radius><length>1.0</length>"
              << "</cylinder>";
   }
+
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     << "<model name ='" << _name << "'>"
     << "<static>" << _static << "</static>"
@@ -929,20 +933,13 @@ void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
     << "    <geometry>"
     << shapeStr.str()
     << "    </geometry>"
-    << "    <surface>"
-    << "      <contact>"
-    << "        <ode>"
-    << "          <min_depth>0.01</min_depth>"
-    << "        </ode>"
-    << "      </contact>"
-    << "    </surface>"
     << "  </collision>"
     << "  <visual name ='visual'>"
     << "    <geometry>"
     << shapeStr.str()
     << "    </geometry>"
     << "  </visual>"
-    << "  <sensor name='" << _sensorName << "' type='imu'>"
+    << "  <sensor name='" << _sensorName << "' type='altimeter'>"
     << "    <altimeter>"
     << "      <topic>" << _topic << "</topic>"
     << "    </altimeter>"
