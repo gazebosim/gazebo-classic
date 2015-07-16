@@ -27,6 +27,7 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \internal
     /// \brief Private data class for DARTLink
     class DARTLinkPrivate
     {

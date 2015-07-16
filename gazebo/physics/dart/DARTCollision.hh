@@ -82,7 +82,7 @@ namespace gazebo
                                          bool _placeable = true);
 
       /// \brief Get DART collision shape.
-      public: dart::dynamics::Shape* GetDARTCollisionShape() const;
+      public: dart::dynamics::Shape *GetDARTCollisionShape() const;
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
       ///        casted pointer to DARTSurfaceParams.
@@ -91,7 +91,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data
-      private: DARTCollisionPrivate* dataPtr;
+      private: DARTCollisionPrivate *dataPtr;
     };
   }
 }

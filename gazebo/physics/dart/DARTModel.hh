@@ -75,7 +75,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data
-      private: DARTModelPrivate* dataPtr;
+      private: DARTModelPrivate *dataPtr;
     };
     /// \}
   }

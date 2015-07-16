@@ -24,6 +24,7 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \internal
     /// \brief Private data class for DARTCollision
     class DARTCollisionPrivate
     {

@@ -103,7 +103,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   if (dartElem != NULL)
   {
     // Create DART SoftBodyNode
-    dart::dynamics::SoftBodyNode* dtSoftBodyNode
+    dart::dynamics::SoftBodyNode *dtSoftBodyNode
         = new dart::dynamics::SoftBodyNode();
 
     // Mass
@@ -266,14 +266,14 @@ void DARTLink::OnPoseChange()
   Link::OnPoseChange();
 
   // DART body node always have its parent joint.
-  dart::dynamics::Joint* joint = this->dataPtr->dtBodyNode->getParentJoint();
+  dart::dynamics::Joint *joint = this->dataPtr->dtBodyNode->getParentJoint();
 
   // This is for the case this function called before DARTModel::Init() is
   // called.
   if (joint == NULL)
     return;
 
-  dart::dynamics::FreeJoint* freeJoint =
+  dart::dynamics::FreeJoint *freeJoint =
       dynamic_cast<dart::dynamics::FreeJoint*>(joint);
   if (freeJoint)
   {
@@ -334,7 +334,7 @@ bool DARTLink::GetEnabled() const
 void DARTLink::SetLinearVel(const math::Vector3 &_vel)
 {
   // DART body node always have its parent joint.
-  dart::dynamics::Joint* joint = this->dataPtr->dtBodyNode->getParentJoint();
+  dart::dynamics::Joint *joint = this->dataPtr->dtBodyNode->getParentJoint();
 
   // This is for the case this function called before DARTModel::Init() is
   // called.
@@ -355,7 +355,7 @@ void DARTLink::SetLinearVel(const math::Vector3 &_vel)
     // Generalized velocities
     Eigen::Vector3d genVel = DARTTypes::ConvVec3(_vel);
 
-    dart::dynamics::BodyNode* dtBodyNode = this->dataPtr->dtBodyNode;
+    dart::dynamics::BodyNode *dtBodyNode = this->dataPtr->dtBodyNode;
 
     // If this link has parent link then subtract the effect of parent link's
     // linear and angular velocities
@@ -425,7 +425,7 @@ void DARTLink::SetAngularVel(const math::Vector3 &_vel)
     // Generalized velocities
     Eigen::Vector3d genVel = DARTTypes::ConvVec3(_vel);
 
-    dart::dynamics::BodyNode* dtBodyNode = this->dataPtr->dtBodyNode;
+    dart::dynamics::BodyNode *dtBodyNode = this->dataPtr->dtBodyNode;
 
     // If this link has parent link then subtract the effect of parent link's
     // linear and angular velocities
@@ -617,7 +617,7 @@ void DARTLink::SetSelfCollide(bool _collide)
 {
   this->sdf->GetElement("self_collide")->Set(_collide);
 
-  dart::dynamics::BodyNode* dtBodyNode = this->dataPtr->dtBodyNode;
+  dart::dynamics::BodyNode *dtBodyNode = this->dataPtr->dtBodyNode;
 
   // If this function is called before the body node is not added to a skeleton,
   // the body node does not have parent skeleton. So we just return here. Self

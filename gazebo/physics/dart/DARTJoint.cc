@@ -91,7 +91,7 @@ void DARTJoint::Init()
   {
     dtTransformParentBodyNode =
         DARTTypes::ConvPose(dartParentLink->GetWorldPose());
-    dart::dynamics::BodyNode* dtParentBodyNode =
+    dart::dynamics::BodyNode *dtParentBodyNode =
       dartParentLink->GetDARTBodyNode();
     dtParentBodyNode->addChildBodyNode(this->dataPtr->dtChildBodyNode);
   }

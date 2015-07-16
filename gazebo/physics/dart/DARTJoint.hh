@@ -150,15 +150,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data
-      private: DARTJointPrivate* dataPtr;
-
-      /// Friend DART[~]Joint so that it has access to dataPtr
-      private: friend class DARTBallJoint;
-      private: friend class DARTHingeJoint;
-      private: friend class DARTHinge2Joint;
-      private: friend class DARTScrewJoint;
-      private: friend class DARTSliderJoint;
-      private: friend class DARTUniversalJoint;
+      protected: DARTJointPrivate* dataPtr;
     };
   }
 }

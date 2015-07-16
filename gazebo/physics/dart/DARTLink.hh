@@ -181,7 +181,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data
-      private: DARTLinkPrivate* dataPtr;
+      private: DARTLinkPrivate *dataPtr;
     };
     /// \}
   }
