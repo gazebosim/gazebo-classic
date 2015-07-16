@@ -53,7 +53,7 @@ namespace gazebo
 
     /// \def AltimeterSensorPtr
     /// \brief Shared pointer to AltimeterSensor
-    typedef std::shared_ptr<AltimeterSensor> AltimeterSensorPtr;
+    typedef boost::shared_ptr<AltimeterSensor> AltimeterSensorPtr;
 
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
