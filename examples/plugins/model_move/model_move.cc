@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <ignition/math/Pose3.hh>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
