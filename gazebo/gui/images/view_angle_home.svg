@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.4, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="107.5px"
+	 height="107.5px" viewBox="18 18.5 107.5 107.5" enable-background="new 18 18.5 107.5 107.5" xml:space="preserve">
+<g id="template" display="none">
+	<g id="horz_left">
+		<g display="inline">
+			<rect x="15.641" y="13.931" fill="#D1D1D1" width="12.656" height="116.139"/>
+			<g>
+				<rect x="31.255" y="27.25" fill="#D1D1D1" width="67.657" height="36.627"/>
+				<g>
+					<path fill="#D1D1D1" d="M124.18,84.302v28.269H35.436V84.302H124.18 M128.359,80.121H31.255v36.629h97.104V80.121
+						L128.359,80.121z"/>
+				</g>
+			</g>
+		</g>
+	</g>
+	<g id="horz_center">
+		<g display="inline">
+			<rect x="65.672" y="13.931" fill="#D1D1D1" width="12.656" height="116.139"/>
+			<rect x="38.172" y="27.25" fill="#D1D1D1" width="67.656" height="36.627"/>
+			<g>
+				<rect x="25.539" y="82.211" fill="#FFFFFF" width="92.923" height="32.449"/>
+				<path fill="#D1D1D1" d="M116.371,84.302v28.269H27.629V84.302H116.371 M120.552,80.121H23.448v36.629h97.104V80.121
+					L120.552,80.121z"/>
+			</g>
+		</g>
+	</g>
+	<g id="vert_top">
+		<g display="inline">
+			<rect x="13.931" y="14.81" fill="#D1D1D1" width="116.139" height="12.656"/>
+			<g>
+				<rect x="80.122" y="32.086" fill="#D1D1D1" width="36.628" height="67.656"/>
+				<g>
+					<path fill="#D1D1D1" d="M59.698,36.267v88.742H31.431V36.267H59.698 M63.879,32.086H27.25v97.104h36.629V32.086L63.879,32.086z
+						"/>
+				</g>
+			</g>
+		</g>
+	</g>
+	<g id="vert_center">
+		<g display="inline">
+			<rect x="13.931" y="65.671" fill="#D1D1D1" width="116.139" height="12.657"/>
+			<rect x="80.122" y="38.171" fill="#D1D1D1" width="36.628" height="67.657"/>
+			<g>
+				<rect x="29.34" y="25.539" fill="#FFFFFF" width="32.448" height="92.923"/>
+				<path fill="#D1D1D1" d="M59.698,27.629v88.742H31.431V27.629H59.698 M63.879,23.448H27.25v97.104h36.629V23.448L63.879,23.448z"
+					/>
+			</g>
+		</g>
+	</g>
+	<g id="vert_bottom">
+		<g display="inline">
+			<rect x="13.931" y="116.533" fill="#D1D1D1" width="116.139" height="12.656"/>
+			<g>
+				<rect x="80.122" y="44.258" fill="#D1D1D1" width="36.628" height="67.656"/>
+				<g>
+					<path fill="#D1D1D1" d="M59.698,18.991v88.741H31.431V18.991H59.698 M63.879,14.811H27.25v97.104h36.629V14.811L63.879,14.811z
+						"/>
+				</g>
+			</g>
+		</g>
+	</g>
+	<polygon display="inline" fill="#D1D1D1" points="213.762,62.668 213.762,38.464 199.429,38.464 199.429,48.046 181,29.25 
+		129.81,81.465 142.095,81.465 142.095,115.25 173.833,115.25 173.833,87.607 188.167,87.607 188.167,115.25 219.905,115.25 
+		219.905,81.465 232.19,81.465 	"/>
+	
+		<image display="inline" overflow="visible" width="94" height="76" xlink:href="../../../Desktop/Screen Shot 2015-06-26 at 2.59.15 PM.png"  transform="matrix(0.9707 0 0 0.9707 26.125 35.3618)">
+	</image>
+</g>
+<g id="home" display="none">
+	<polygon display="inline" fill="#D1D1D1" points="99.125,16.625 99.125,44.125 141.375,44.125 141.375,16.625 145.875,18.125 
+		150.625,10.875 121.375,-9.875 109.625,-2.625 108.875,-9.875 99.125,-9.875 99.125,5.375 88.875,10.625 94.375,19.625 	"/>
+	<rect x="49.75" y="45.625" display="inline" fill="#D1D1D1" width="10" height="11.625"/>
+	
+		<rect x="39.216" y="54.42" transform="matrix(0.8282 -0.5604 0.5604 0.8282 -23.7792 41.9269)" display="inline" fill="#D1D1D1" width="34.576" height="10.667"/>
+	
+		<rect x="66.966" y="54.42" transform="matrix(-0.8282 -0.5604 0.5604 -0.8282 120.5506 156.4568)" display="inline" fill="#D1D1D1" width="34.576" height="10.667"/>
+	<polygon display="inline" fill="#D1D1D1" points="49.75,71 49.75,98 77.5,98 77.5,86.5 85.875,86.5 85.875,98 92,98 92,71 	"/>
+</g>
+<g id="Layer_3">
+	<polygon fill="#D1D1D1" points="88.764,113.925 88.764,93.813 75.807,93.813 75.807,113.925 39.062,113.925 39.062,72.153 
+		31.982,76.575 22.734,62.907 39.062,51.86 39.062,32.896 54.533,32.896 54.533,41.599 70.971,30.575 120.766,62.907 
+		111.002,77.349 105.201,72.927 104.428,113.925 	"/>
+</g>
+</svg>
