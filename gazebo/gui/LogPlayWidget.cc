@@ -683,9 +683,4 @@ void CurrentTimeItem::paint(QPainter *_painter,
   _painter->drawPolygon(triangle);
 }
 
-/////////////////////////////////////////////////
-QRectF CurrentTimeItem::boundingRect() const
-{
-  return QRectF(-8, -25, 16, 50);
-}
 

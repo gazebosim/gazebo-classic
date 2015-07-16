@@ -186,9 +186,6 @@ namespace gazebo
       // Documentation inherited
       private: virtual void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
-
-      // Documentation inherited
-      protected: virtual QRectF boundingRect() const;
     };
   }
 }

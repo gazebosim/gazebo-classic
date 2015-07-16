@@ -1,3 +1,8 @@
+## Gazebo 7.0
+1. Log playback GUI for multistep, rewind, forward and seek
+    * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
+
+
 ## Gazebo 6.0
 1. Implement more control options for log playback:
   1. Rewind: The simulation starts from the beginning.
@@ -351,7 +356,7 @@ compilation on Windows.
 
 ### Gazebo 5.x.x
 
-1. Added lines to laser sensor visualization 
+1. Added lines to laser sensor visualization
     * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
     * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
 
