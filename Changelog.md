@@ -6,6 +6,9 @@
   time.
       * [Pull request #1737](https://bitbucket.org/osrf/gazebo/pull-request/1737)
 
+1. Added Gazebo splash screen
+    * [Pull request #1745](https://bitbucket.org/osrf/gazebo/pull-request/1745)
+
 1. Added a transporter plugin which allows models to move from one location
    to another based on their location and the location of transporter pads.
     * [Pull request #1738](https://bitbucket.org/osrf/gazebo/pull-request/1738)
@@ -70,6 +73,10 @@ to corrected for position projection errors.
 1. Get/Set user camera pose in GUI.
     * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
     * [Issue #1595](https://bitbucket.org/osrf/gazebo/issue/1595)
+
+1. Added ViewAngleWidget, removed hard-coded reset view and removed MainWindow::Reset(). Also added GLWidget::GetSelectedVisuals().
+    * [Pull request #1768](https://bitbucket.org/osrf/gazebo/pull-request/1768)
+    * [Issue #1507](https://bitbucket.org/osrf/gazebo/issue/1507)
 
 1. Windows support. This consists mostly of numerous small changes to support
 compilation on Windows.
@@ -343,6 +350,10 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Added lines to laser sensor visualization 
+    * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
+    * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
 
 1. Fix BulletSliderJoint friction for bullet 2.83
     * [Pull request #1686](https://bitbucket.org/osrf/gazebo/pull-request/1686)

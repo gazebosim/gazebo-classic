@@ -61,16 +61,18 @@ LaserVisual::~LaserVisual()
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
-  for (unsigned int i = 0; i < dPtr->rayFans.size(); ++i)
-  {
-    this->DeleteDynamicLine(dPtr->rayFans[i]);
-    dPtr->rayFans[i] = NULL;
+  for (auto ray : dPtr->rayFans)
+    this->DeleteDynamicLine(ray);
 
-    this->DeleteDynamicLine(dPtr->noHitRayFans[i]);
-    dPtr->noHitRayFans[i] = NULL;
-  }
+  for (auto ray : dPtr->noHitRayFans)
+    this->DeleteDynamicLine(ray);
+
+  for (auto ray : dPtr->rayLines)
+    this->DeleteDynamicLine(ray);
+
   dPtr->rayFans.clear();
   dPtr->noHitRayFans.clear();
+  dPtr->rayLines.clear();
 }
 
 /////////////////////////////////////////////////
@@ -127,6 +129,10 @@ void LaserVisual::Update()
       dPtr->noHitRayFans[j]->setMaterial("Gazebo/LightBlueLaser");
       dPtr->noHitRayFans[j]->AddPoint(math::Vector3(0, 0, 0));
 
+      dPtr->rayLines.push_back(
+          this->CreateDynamicLine(rendering::RENDERING_LINE_LIST));
+      dPtr->rayLines[j]->setMaterial("Gazebo/BlueLaser");
+
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
     dPtr->rayFans[j]->SetPoint(0, offset.pos);
@@ -144,9 +150,28 @@ void LaserVisual::Update()
       math::Vector3 pt = (axis * hitRange) + offset.pos;
 
       double noHitRange =
-        std::isinf(r) ? dPtr->laserMsg->scan().range_max() : 0;
+        std::isinf(r) ? dPtr->laserMsg->scan().range_max() : hitRange;
       math::Vector3 noHitPt = (axis * noHitRange) + offset.pos;
 
+      // Draw the lines that represent each simulated ray
+      if (i >= dPtr->rayLines[j]->GetPointCount()/2)
+      {
+        dPtr->rayLines[j]->AddPoint(offset.pos);
+        if (std::isinf(r))
+          dPtr->rayLines[j]->AddPoint(noHitPt);
+        else
+          dPtr->rayLines[j]->AddPoint(pt);
+      }
+      else
+      {
+        dPtr->rayLines[j]->SetPoint(i*2, offset.pos);
+        if (std::isinf(r))
+          dPtr->rayLines[j]->SetPoint(i*2+1, noHitPt);
+        else
+          dPtr->rayLines[j]->SetPoint(i*2+1, pt);
+      }
+
+      // Draw the triangle fan that fill in the gaps for the laser rays
       if (i+1 >= dPtr->rayFans[j]->GetPointCount())
       {
         dPtr->rayFans[j]->AddPoint(pt);

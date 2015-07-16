@@ -449,16 +449,16 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 #ifdef HAVE_OPENAL
   if (this->audioSink)
   {
-    this->audioSink->SetPose(this->GetWorldPose());
-    this->audioSink->SetVelocity(this->GetWorldLinearVel());
+    this->audioSink->SetPose(this->GetWorldPose().Ign());
+    this->audioSink->SetVelocity(this->GetWorldLinearVel().Ign());
   }
 
   // Update all the audio sources
   for (std::vector<util::OpenALSourcePtr>::iterator iter =
       this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
   {
-    (*iter)->SetPose(this->GetWorldPose());
-    (*iter)->SetVelocity(this->GetWorldLinearVel());
+    (*iter)->SetPose(this->GetWorldPose().Ign());
+    (*iter)->SetVelocity(this->GetWorldLinearVel().Ign());
   }
 #endif
 
