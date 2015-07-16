@@ -150,7 +150,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data
-      protected: DARTJointPrivate* dataPtr;
+      protected: DARTJointPrivate *dataPtr;
     };
   }
 }

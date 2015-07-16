@@ -22,20 +22,22 @@
 #include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTPolylineShape.hh"
 
+#include "gazebo/physics/dart/DARTPolylineShapePrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 DARTPolylineShape::DARTPolylineShape(CollisionPtr _parent)
-: PolylineShape(_parent)
+  : PolylineShape(_parent),
+    dataPtr(new DARTPolylineShapePrivate())
 {
-  this->dartMesh = new DARTMesh();
 }
 
 //////////////////////////////////////////////////
 DARTPolylineShape::~DARTPolylineShape()
 {
-  delete this->dartMesh;
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
@@ -54,7 +56,7 @@ void DARTPolylineShape::Init()
     return;
   }
 
-  this->dartMesh->Init(this->mesh,
+  this->dataPtr->dartMesh->Init(this->mesh,
       boost::static_pointer_cast<DARTCollision>(this->collisionParent),
       math::Vector3(1, 1, 1));
 }
