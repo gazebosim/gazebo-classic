@@ -1522,7 +1522,6 @@ void World::ProcessModelMsgs()
       //   }
       // }
 
-      std::cerr << "World::ProcessModelMsgs(): model=" << modelMsg.name() << std::endl << std::flush;
       this->dataPtr->modelPub->Publish(modelMsg);
     }
   }

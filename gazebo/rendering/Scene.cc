@@ -104,7 +104,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->requestMsg = NULL;
   this->dataPtr->enableVisualizations = _enableVisualizations;
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  std::cerr << "Scene::Scene(): subscribing in space \"" << _name << "\"" << std::endl << std::flush;
   this->dataPtr->node->Init(_name);
   this->dataPtr->id = ScenePrivate::idCounter++;
   this->dataPtr->idString = boost::lexical_cast<std::string>(this->dataPtr->id);
@@ -1635,7 +1634,6 @@ void Scene::OnSensorMsg(ConstSensorPtr &_msg)
 void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  std::cerr << "Scene::OnVisualMsg():...." << std::endl << std::flush;
   this->dataPtr->visualMsgs.push_back(_msg);
 }
 
@@ -1921,8 +1919,6 @@ void Scene::OnJointMsg(ConstJointPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->jointMsgs.push_back(_msg);
-  std::cerr << "Scene::OnJointMsg():...." << std::endl << std::flush;
-
 }
 
 /////////////////////////////////////////////////
@@ -2508,8 +2504,6 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
   this->dataPtr->sceneSimTimePosesReceived =
     common::Time(_msg->time().sec(), _msg->time().nsec());
 
-  std::cerr << "Scene::OnPoseMsg():...." << std::endl << std::flush;
-
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
     PoseMsgs_M::iterator iter =
@@ -2527,8 +2521,6 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   SkeletonPoseMsgs_L::iterator iter;
-
-  std::cerr << "Scene::OnSkeletonPoseMsg():...." << std::endl << std::flush;
 
   // Find an old model message, and remove them
   for (iter = this->dataPtr->skeletonPoseMsgs.begin();
@@ -2579,7 +2571,6 @@ void Scene::OnModelMsg(ConstModelPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->modelMsgs.push_back(_msg);
-  std::cerr << "Scene::OnModelMsg(): node=" << this->dataPtr->node->GetId() << std::endl << std::flush;
 
 //  std::cerr << "model msg " << _msg->DebugString() << std::endl;
 }
