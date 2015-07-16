@@ -33,6 +33,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/gui/SplashScreen.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -61,6 +62,7 @@ gui::ModelRightMenu *g_modelRightMenu = NULL;
 std::string g_worldname = "default";
 
 QApplication *g_app;
+gui::SplashScreen *g_splashScreen = NULL;
 gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
@@ -257,6 +259,8 @@ bool gui::load()
   // Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType<common::Time>();
 
+  g_splashScreen = new gui::SplashScreen();
+
   g_main_win = new gui::MainWindow();
 
   g_main_win->Load();
@@ -310,6 +314,7 @@ bool gui::run(int _argc, char **_argv)
   gazebo::gui::fini();
   gazebo::client::shutdown();
 
+  delete g_splashScreen;
   delete g_main_win;
   return true;
 }

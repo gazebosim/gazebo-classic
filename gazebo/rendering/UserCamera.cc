@@ -204,6 +204,19 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
+void UserCamera::SetDefaultPose(const math::Pose &_pose)
+{
+  this->dataPtr->defaultPose = _pose;
+  this->SetWorldPose(_pose);
+}
+
+//////////////////////////////////////////////////
+math::Pose UserCamera::DefaultPose() const
+{
+  return this->dataPtr->defaultPose;
+}
+
+//////////////////////////////////////////////////
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);

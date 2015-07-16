@@ -126,13 +126,32 @@ RenderWidget::RenderWidget(QWidget *_parent)
     connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
   }
 
-  this->toolbar->addSeparator();
-
   // Snap
   if (g_snapAct)
   {
     actionGroup->addAction(g_snapAct);
     this->toolbar->addAction(g_snapAct);
+  }
+
+  this->toolbar->addSeparator();
+
+  // View angle
+  if (g_viewAngleAct)
+  {
+    QToolButton *viewAngleButton = new QToolButton;
+    viewAngleButton->setObjectName("viewAngleToolBarButton");
+    viewAngleButton->setStyleSheet(
+        "#viewAngleToolBarButton{padding-right:10px}");
+    viewAngleButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    viewAngleButton->setIcon(QIcon(":/images/view_angle_front.png"));
+    viewAngleButton->setToolTip(tr("Change the view angle"));
+
+    QMenu *viewAngleMenu = new QMenu(viewAngleButton);
+    viewAngleMenu->addAction(g_viewAngleAct);
+
+    viewAngleButton->setMenu(viewAngleMenu);
+    viewAngleButton->setPopupMode(QToolButton::InstantPopup);
+    g_viewAngleButtonAct = this->toolbar->addWidget(viewAngleButton);
   }
 
   // Empty space to push whatever comes next to the right

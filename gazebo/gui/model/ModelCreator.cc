@@ -1588,7 +1588,7 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
   if (vis)
   {
     if (!vis->IsPlane() && gui::get_entity_id(vis->GetRootVisual()->GetName()))
@@ -1617,7 +1617,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
   if (this->mouseVisual)
   {
-    if (_event.button == common::MouseEvent::RIGHT)
+    if (_event.Button() == common::MouseEvent::RIGHT)
       return true;
 
     // set the link data pose
@@ -1644,7 +1644,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
   if (vis)
   {
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
@@ -1662,7 +1662,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         return false;
 
       // trigger link inspector on right click
-      if (_event.button == common::MouseEvent::RIGHT)
+      if (_event.Button() == common::MouseEvent::RIGHT)
       {
         this->inspectName = topLevelVis->GetName();
 
@@ -1768,7 +1768,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 
   if (!this->mouseVisual)
   {
-    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+    rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
     if (vis && !vis->IsPlane())
     {
       rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
@@ -1791,7 +1791,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
           userCamera->HandleMouseEvent(_event);
         }
         // Allow ModelManipulator to work while dragging handle over this
-        else if (_event.dragging)
+        else if (_event.Dragging())
         {
           ModelManipulator::Instance()->OnMouseMoveEvent(_event);
         }
@@ -1805,7 +1805,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   pose.pos = ModelManipulator::GetMousePositionOnPlane(
       userCamera, _event);
 
-  if (!_event.shift)
+  if (!_event.Shift())
   {
     pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
@@ -1820,7 +1820,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   // open the link inspector on double click
-  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.Pos());
   if (!vis)
     return false;
 

@@ -782,6 +782,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_showOriginAct);
 
+  QVERIFY(gazebo::gui::g_showLinkFrameAct);
+
   QVERIFY(gazebo::gui::g_transparentAct);
 
   QVERIFY(gazebo::gui::g_viewWireframeAct);
@@ -817,6 +819,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(gazebo::gui::g_snapAct);
 
   QVERIFY(gazebo::gui::g_alignAct);
+
+  QVERIFY(gazebo::gui::g_viewAngleAct);
 
   QVERIFY(gazebo::gui::g_cameraOrthoAct);
 
@@ -887,6 +891,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(!gazebo::gui::g_showOriginAct);
 
+  QVERIFY(!gazebo::gui::g_showLinkFrameAct);
+
   QVERIFY(!gazebo::gui::g_transparentAct);
 
   QVERIFY(!gazebo::gui::g_viewWireframeAct);
@@ -922,6 +928,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_snapAct);
 
   QVERIFY(!gazebo::gui::g_alignAct);
+
+  QVERIFY(!gazebo::gui::g_viewAngleAct);
 
   QVERIFY(!gazebo::gui::g_cameraOrthoAct);
 
