@@ -96,7 +96,7 @@ void MeshShape::Init()
         if (submeshElem->HasElement("center") &&
             submeshElem->Get<bool>("center"))
         {
-          this->submesh->Center();
+          this->submesh->Center(ignition::math::Vector3d::Zero);
         }
       }
     }

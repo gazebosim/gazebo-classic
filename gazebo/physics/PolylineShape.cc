@@ -39,15 +39,14 @@ PolylineShape::~PolylineShape()
 //////////////////////////////////////////////////
 void PolylineShape::Init()
 {
-  this->SetPolylineShape(this->GetHeight(),
-      this->GetVertices());
+  this->SetPolylineShape(this->GetHeight(), this->Vertices());
 
   std::string meshName =
       boost::lexical_cast<std::string>(physics::getUniqueId()) +
       "_extruded_polyline";
 
   common::MeshManager::Instance()->CreateExtrudedPolyline(
-      meshName, this->GetVertices(), this->GetHeight());
+      meshName, this->Vertices(), this->GetHeight());
 
   this->mesh = common::MeshManager::Instance()->GetMesh(meshName);
 
@@ -68,6 +67,30 @@ std::vector<std::vector<math::Vector2d> > PolylineShape::GetVertices() const
     while (pointElem)
     {
       math::Vector2d point = pointElem->Get<math::Vector2d>();
+      pointElem = pointElem->GetNextElement("point");
+      vertices.push_back(point);
+    }
+    polylineElem = polylineElem->GetNextElement("polyline");
+    paths.push_back(vertices);
+  }
+  return paths;
+}
+
+//////////////////////////////////////////////////
+std::vector<std::vector<ignition::math::Vector2d> >
+PolylineShape::Vertices() const
+{
+  std::vector<std::vector<ignition::math::Vector2d> > paths;
+
+  sdf::ElementPtr polylineElem = this->sdf;
+  while (polylineElem)
+  {
+    sdf::ElementPtr pointElem = polylineElem->GetElement("point");
+    std::vector<ignition::math::Vector2d> vertices;
+    while (pointElem)
+    {
+      ignition::math::Vector2d point =
+        pointElem->Get<ignition::math::Vector2d>();
       pointElem = pointElem->GetNextElement("point");
       vertices.push_back(point);
     }
@@ -115,6 +138,25 @@ void PolylineShape::SetVertices(const msgs::Geometry &_msg)
 
 ////////////////////////////////////////////////////
 void PolylineShape::SetVertices(
+    const std::vector<std::vector<ignition::math::Vector2d> > &_vertices)
+{
+  sdf::ElementPtr polylineElem = this->sdf;
+  for (unsigned int i = 0; i < _vertices.size(); ++i)
+  {
+    std::vector<ignition::math::Vector2d> v = _vertices[i];
+
+    sdf::ElementPtr pointElem = polylineElem->GetElement("point");
+    for (unsigned int j = 0; j < v.size(); ++j)
+    {
+      pointElem->Set(v[j]);
+      pointElem = pointElem->GetNextElement("point");
+    }
+    polylineElem = polylineElem->GetNextElement("polyline");
+  }
+}
+
+////////////////////////////////////////////////////
+void PolylineShape::SetVertices(
     const std::vector<std::vector<math::Vector2d> > &_vertices)
 {
   sdf::ElementPtr polylineElem = this->sdf;
@@ -134,10 +176,30 @@ void PolylineShape::SetVertices(
 
 //////////////////////////////////////////////////
 void PolylineShape::SetPolylineShape(const double &_height,
-    const std::vector<std::vector<math::Vector2d> > &_vertices)
+    const std::vector<std::vector<ignition::math::Vector2d> > &_vertices)
 {
   this->SetHeight(_height);
   this->SetVertices(_vertices);
+}
+
+//////////////////////////////////////////////////
+void PolylineShape::SetPolylineShape(const double &_height,
+    const std::vector<std::vector<math::Vector2d> > &_vertices)
+{
+  this->SetHeight(_height);
+
+  std::vector<std::vector<ignition::math::Vector2d> > vertices;
+  for (auto const &v : _vertices)
+  {
+    std::vector<ignition::math::Vector2d> vIgn;
+    for (auto const &v1 : v)
+    {
+      vIgn.push_back(v1.Ign());
+    }
+    vertices.push_back(vIgn);
+  }
+
+  this->SetVertices(vertices);
 }
 
 //////////////////////////////////////////////////
