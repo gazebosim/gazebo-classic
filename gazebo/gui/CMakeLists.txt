@@ -161,6 +161,7 @@ if (ENABLE_SCREEN_TESTS)
       ConfigWidget_TEST.cc
       GLWidget_TEST.cc
       GLWidget_TEST2.cc
+      LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
