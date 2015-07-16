@@ -59,10 +59,10 @@ std::vector<std::string> &split(const std::string &_s,
 
 /////////////////////////////////////////////////
 ignition::math::Vector2d bezierInterpolate(double _t,
-    const ignition::math::Vector2d &_p0,
-    const ignition::math::Vector2d &_p1,
-    const ignition::math::Vector2d &_p2,
-    const ignition::math::Vector2d &_p3)
+                                           const ignition::math::Vector2d &_p0,
+                                           const ignition::math::Vector2d &_p1,
+                                           const ignition::math::Vector2d &_p2,
+                                           const ignition::math::Vector2d &_p3)
 {
   double t_1 = 1.0 - _t;
   double t_1_2 = t_1 * t_1;
