@@ -71,12 +71,14 @@ class JointGetForceTorqueTest : public ServerFixture,
     /// \brief Joint axis
     public: math::Vector3 jointAxis;
 
-    /// \brief If true the parent is a world, otherwise is a dummy link
+    /// \brief If true the parent of the joint is the world
+    ///        otherwise the parent of the tested joint is a dummy link
+    ///        that is itself connect to the world
     public: bool parentIsWorld;
   };
 
-  /// \brief Spawn a box with friction coefficients and direction.
-  /// \param[in] _opt Options for friction box.
+  /// \brief Spawn a box rigidly attached to the world
+  /// \param[in] _opt Options for bot attached to the world.
   public: physics::ModelPtr SpawnBox(const SpawnGetFTBoxOptions &_opt)
           {
             msgs::Model msg;
@@ -117,6 +119,12 @@ class JointGetForceTorqueTest : public ServerFixture,
 
             *(link->mutable_inertial()) = inertial;
 
+            // Depending on the parentIsWorld option, we test
+            // two different cases: a joint that is connecting
+            // a link to the world (parentIsWorld true) and
+            // a joint connecting two different links (and the
+            // parent one is itself connected to the world for
+            // convenience)
             if ( !_opt.parentIsWorld )
             {
               msg.add_joint();
@@ -143,7 +151,7 @@ class JointGetForceTorqueTest : public ServerFixture,
             }
             joint->set_child("link");
 
-            if( _opt.jointType != "fixed" )
+            if ( _opt.jointType != "fixed" )
             {
               auto axis = joint->mutable_axis1();
               msgs::Set(axis->mutable_xyz(), _opt.jointAxis);
@@ -190,11 +198,13 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   physics::ModelPtr model = SpawnBox(opt);
   physics::LinkPtr  link  = model->GetLink("link");
   physics::JointPtr joint = model->GetJoint("joint");
-  math::Vector3 com = link->GetWorldCoGPose().pos;
-  math::Vector3 jointOrigin = joint->GetWorldPose().pos;
 
   ASSERT_TRUE(model != NULL);
   ASSERT_TRUE(link != NULL);
+  ASSERT_TRUE(joint != NULL);
+
+  math::Vector3 com = link->GetWorldCoGPose().pos;
+  math::Vector3 jointOrigin = joint->GetWorldPose().pos;
 
   // do a simulation step to get a meaningful measure
   _world->Step(1);
@@ -206,7 +216,7 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   }
 
   // bullet need some additional steps
-  // probably related to
+  // probably related to Gazebo issue 1196
   if ( _physicsEngine == "bullet" )
   {
       _world->Step(99);
@@ -220,8 +230,6 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   {
       ASSERT_EQ(model->GetJointCount(), 2);
   }
-
-  ASSERT_TRUE(joint != NULL);
 
   physics::JointWrench W = joint->GetForceTorque(0u);
 
@@ -279,7 +287,6 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  // check the gravity vector
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physEng);
@@ -300,7 +307,7 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
 
   if ( _physEng == "bullet" )
   {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; ++i)
     {
         opt.jointType = "revolute";
         switch ( i )
@@ -327,8 +334,8 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   // see gazebo issues 1639 and 1640
   if ( _physEng != "bullet" &&
        _physEng != "simbody" )
-  {
-    for (int i = 0; i < 3; i++)
+  {+
+    for (int i = 0; i < 3; ++i)
     {
       opt.jointType = "prismatic";
       switch ( i )
