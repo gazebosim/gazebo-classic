@@ -314,8 +314,12 @@ void DataLogger::OnRecord(bool _toggle)
 
     // Change the status
     this->statusLabel->setText("Ready");
-    this->statusLabel->setStyleSheet("QLabel{color: #aeaeae;\
-        padding-left: 14px; padding-top: 9px}");
+    this->statusLabel->setStyleSheet(
+        "QLabel {\
+           color: #aeaeae;\
+           padding-left: 14px;\
+           padding-top: 9px;\
+         }");
     this->statusTimer->stop();
 
     // Change the Save to box
