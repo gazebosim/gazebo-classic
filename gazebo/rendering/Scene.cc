@@ -35,6 +35,7 @@
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
+#include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -96,6 +97,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->initialized = false;
   this->dataPtr->showCOMs = false;
   this->dataPtr->showInertias = false;
+  this->dataPtr->showLinkFrames = false;
   this->dataPtr->showCollisions = false;
   this->dataPtr->showJoints = false;
   this->dataPtr->transparent = false;
@@ -208,9 +210,6 @@ void Scene::Clear()
   delete this->dataPtr->terrain;
   this->dataPtr->terrain = NULL;
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
-
   while (!this->dataPtr->visuals.empty())
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
 
@@ -244,6 +243,9 @@ void Scene::Clear()
   for (unsigned int i = 0; i < this->dataPtr->userCameras.size(); ++i)
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
+
+  delete this->dataPtr->skyx;
+  this->dataPtr->skyx = NULL;
 
   RTShaderSystem::Instance()->RemoveScene(this->GetName());
   RTShaderSystem::Instance()->Clear();
@@ -1523,7 +1525,6 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
   }
-
   return true;
 }
 
@@ -1812,7 +1813,7 @@ void Scene::PreRender()
   for (visualIter = modelVisualMsgsCopy.begin();
       visualIter != modelVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_MODEL))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_MODEL))
       modelVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1822,7 +1823,7 @@ void Scene::PreRender()
   for (visualIter = linkVisualMsgsCopy.begin();
       visualIter != linkVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_LINK))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_LINK))
       linkVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1831,7 +1832,11 @@ void Scene::PreRender()
   // Process the visual messages.
   for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_VISUAL))
+    Visual::VisualType visualType = Visual::VT_VISUAL;
+    if ((*visualIter)->has_type())
+      visualType = Visual::ConvertVisualType((*visualIter)->type());
+
+    if (this->ProcessVisualMsg(*visualIter, visualType))
       visualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1841,7 +1846,7 @@ void Scene::PreRender()
   for (visualIter = collisionVisualMsgsCopy.begin();
       visualIter != collisionVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_COLLISION))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_COLLISION))
       collisionVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -2156,6 +2161,11 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     this->CreateInertiaVisual(_msg, linkVis);
   }
 
+  if (!this->GetVisual(_msg->name() + "_LINK_FRAME_VISUAL__"))
+  {
+    this->CreateLinkFrameVisual(_msg, linkVis);
+  }
+
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
@@ -2215,6 +2225,8 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->sceneMsgs.push_back(sm);
   this->dataPtr->requestMsg = NULL;
 }
@@ -2385,6 +2397,30 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
         vis->ShowInertia(false);
     }
   }
+  else if (_msg->request() == "show_link_frame")
+  {
+    if (_msg->data() == "all")
+      this->ShowLinkFrames(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowLinkFrame(true);
+      else
+        gzerr << "Unable to find link frame visual[" << _msg->data() << "]\n";
+    }
+  }
+  else if (_msg->request() == "hide_link_frame")
+  {
+    if (_msg->data() == "all")
+      this->ShowLinkFrames(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowLinkFrame(false);
+    }
+  }
   else if (_msg->request() == "set_transparent")
   {
     if (_msg->data() == "all")
@@ -2439,7 +2475,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
+bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 {
   bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
@@ -2544,6 +2580,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
 
       visual->ShowCOM(this->dataPtr->showCOMs);
       visual->ShowInertia(this->dataPtr->showInertias);
+      visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
       visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
@@ -2642,6 +2679,9 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
   if (!this->dataPtr->skyx)
     return;
+
+  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
+  this->dataPtr->skyx->update(0);
 
   this->dataPtr->skyx->setVisible(true);
 
@@ -2780,9 +2820,6 @@ void Scene::SetSky()
   // vclouds->getLightningManager()->setLightningTimeMultiplier(
   //    preset.vcLightningsTM);
 
-  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
-
-  this->dataPtr->skyx->update(0);
   this->dataPtr->skyx->setVisible(false);
 }
 
@@ -3030,14 +3067,24 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
+void Scene::CreateLinkFrameVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+{
+  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_msg->name() +
+      "_LINK_FRAME_VISUAL__", _linkVisual));
+  linkFrameVis->Load();
+  linkFrameVis->SetVisible(this->dataPtr->showLinkFrames);
+  this->dataPtr->visuals[linkFrameVis->GetId()] = linkFrameVis;
+}
+
+/////////////////////////////////////////////////
 void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
 {
   std::vector<VisualPtr> toRemove;
   for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
-    rendering::VisualType visType = childVis->GetType();
-    if (visType == VT_PHYSICS || visType == VT_SENSOR)
+    Visual::VisualType visType = childVis->GetType();
+    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
     {
       toRemove.push_back(childVis);
     }
@@ -3065,7 +3112,12 @@ void Scene::SetTransparent(bool _show)
   this->dataPtr->transparent = _show;
   for (auto visual : this->dataPtr->visuals)
   {
-    visual.second->SetTransparency(_show ? 0.5 : 0.0);
+    if (visual.second->GetType() != Visual::VT_GUI &&
+        visual.second->GetType() != Visual::VT_PHYSICS &&
+        visual.second->GetType() != Visual::VT_SENSOR)
+    {
+      visual.second->SetTransparency(_show ? 0.5 : 0.0);
+    }
   }
 }
 
@@ -3086,6 +3138,16 @@ void Scene::ShowInertias(bool _show)
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ShowInertia(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowLinkFrames(bool _show)
+{
+  this->dataPtr->showLinkFrames = _show;
+  for (auto visual : this->dataPtr->visuals)
+  {
+    visual.second->ShowLinkFrame(_show);
   }
 }
 

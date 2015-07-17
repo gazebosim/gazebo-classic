@@ -217,12 +217,17 @@ void ImportImageDialog::OnBack()
 /////////////////////////////////////////////////
 void ImportImageDialog::OnSelectFile()
 {
-  std::string filename = QFileDialog::getOpenFileName(this,
-      tr("Open Image"), "",
-      tr("Image Files (*.png *.jpg *.jpeg)")).toStdString();
+  QFileDialog fileDialog(this, tr("Open Image"), QDir::homePath(),
+      tr("Image Files (*.png *.jpg *.jpeg)"));
 
-  if (!filename.empty())
+  if (fileDialog.exec() == QDialog::Accepted)
   {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
+
+    std::string filename = selected[0].toStdString();
+
     this->SetFileName(QString::fromStdString(filename));
     this->importImageView->SetImage(filename);
 

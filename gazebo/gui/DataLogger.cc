@@ -44,8 +44,8 @@ DataLogger::DataLogger(QWidget *_parent)
   this->setObjectName("dataLogger");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Data Logger"));
-  // Popup doesn't have a MenuBar
-  this->setWindowFlags(this->windowFlags() & Qt::Popup);
+  // Tool stays on top of parent window
+  this->setWindowFlags(this->windowFlags() & Qt::Tool);
 
   // The record button allows the user to start and pause data recording
   this->recordButton = new QToolButton(this);
@@ -197,9 +197,12 @@ DataLogger::DataLogger(QWidget *_parent)
   connect(this, SIGNAL(SetDestinationURI(QString)),
           this, SLOT(OnSetDestinationURI(QString)), Qt::QueuedConnection);
 
+  connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
+
   // Timer used to blink the status label
   this->statusTimer = new QTimer();
   connect(this->statusTimer, SIGNAL(timeout()), this, SLOT(OnBlinkStatus()));
+  this->statusTime = 0;
 
   // Timer used to hide the confirmation dialog
   this->confirmationDialog = NULL;
@@ -504,4 +507,11 @@ void DataLogger::OnConfirmationTimeout()
 {
   this->confirmationDialog->close();
   this->confirmationTimer->stop();
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnCancel()
+{
+  if (this->recordButton->isChecked())
+    this->recordButton->click();
 }

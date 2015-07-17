@@ -20,7 +20,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/test/ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -160,7 +160,8 @@ class PhysicsFrictionTest : public ServerFixture,
               << "      </geometry>"
               << "    </visual>"
               << "  </link>"
-              << "</model>";
+              << "</model>"
+              << "</sdf>";
 
             physics::WorldPtr world = physics::get_world("default");
             world->InsertModelString(modelStr.str());

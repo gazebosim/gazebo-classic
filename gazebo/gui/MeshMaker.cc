@@ -122,7 +122,7 @@ void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
   math::Vector3 origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+  this->camera->GetCameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
                                        origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
@@ -135,7 +135,7 @@ void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
   p1 = origin1 + dir1 * dist1;
   pose.pos = p1;
 
-  if (!_event.shift)
+  if (!_event.Shift())
   {
     if (ceil(pose.pos.x) - pose.pos.x <= .4)
       pose.pos.x = ceil(pose.pos.x);

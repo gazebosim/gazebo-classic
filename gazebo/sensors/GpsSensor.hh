@@ -74,18 +74,6 @@ namespace gazebo
       /// \return Current altitude above sea level.
       public: double GetAltitude() const;
 
-      /// \brief Noise attributes for horizontal position measurement.
-      private: NoisePtr horizontalPositionNoise;
-
-      /// \brief Noise attributes for vertical position measurement.
-      private: NoisePtr verticalPositionNoise;
-
-      /// \brief Noise attributes for horizontal velocity measurement.
-      private: NoisePtr horizontalVelocityNoise;
-
-      /// \brief Noise attributes for vertical velocity measurement.
-      private: NoisePtr verticalVelocityNoise;
-
       /// \brief GPS data publisher.
       private: transport::PublisherPtr gpsPub;
 
