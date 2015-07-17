@@ -37,6 +37,21 @@ class AltimeterSensor_TEST : public ServerFixture,
   /// \brief Check that an altimeter at a non-zero altitude works.
   /// \param[in] _physicsEngine The type of physics engine to use.
   public: void NonzeroAltimeterSensorCheck(const std::string &_physicsEngine);
+
+  /// \brief Check that a falling altimeter has the correct velocity.
+  /// \param[in] _physicsEngine The type of physics engine to use.
+  public: void LinearAltimeterSensorCheck(const std::string &_physicsEngine);
+
+  /// \brief Check that a rotating altimeter has the correct velocity.
+  /// \param[in] _physicsEngine The type of physics engine to use.
+  public: void AngularAltimeterSensorCheck(const std::string &_physicsEngine);
+
+  /// \brief Check that a rotating and falling altimeter has the correct
+  /// velocity.
+  /// \param[in] _physicsEngine The type of physics engine to use.
+  public: void LinearAngularAltimeterSensorCheck(
+              const std::string &_physicsEngine);
+
 };
 
 // An altitude sensor
@@ -83,8 +98,143 @@ void AltimeterSensor_TEST::BasicAltimeterSensorCheck(
   EXPECT_TRUE(sensor != NULL);
 
   // By default the altitude of the sensor should be zero
-  EXPECT_DOUBLE_EQ(sensor->VerticalPosition(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->Altitude(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->VerticalVelocity(), 0.0);
+}
+
+/////////////////////////////////////////////////
+// Check linear velocity is correct
+void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
+  const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Spawn an alimeter
+  std::string modelName = "altModel";
+  std::string altSensorName = "altSensor";
+  ignition::math::Pose3d modelPose(0, 0, 10, 0, 0, 0);
+  std::string topic = "~/" + altSensorName + "_" + _physicsEngine;
+  SpawnUnitAltimeterSensor(modelName, altSensorName,
+      "box", topic, modelPose.Pos(), modelPose.Rot().Euler());
+
+  // Get the altimeter
+  sensors::SensorPtr sensor = sensors::get_sensor("altSensor");
+  sensors::AltimeterSensorPtr altSensor =
+      boost::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
+  ASSERT_TRUE(altSensor != NULL);
+
+  sensors::SensorManager::Instance()->Init();
+  altSensor->SetActive(true);
+
+  int steps = 10;
+  world->Step(steps);
+  altSensor->Update(true);
+
+  // The altimeter should have a velocity of v = g * dt
+  EXPECT_DOUBLE_EQ(altSensor->VerticalVelocity(),
+      physics->GetGravity().z * (physics->GetMaxStepSize()*steps));
+}
+
+/////////////////////////////////////////////////
+// Check rotational velocity is correct
+void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
+  const std::string &_physicsEngine)
+{
+  Load("worlds/test_altimeter_rotation.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics::ModelPtr model = world->GetModel("model");
+  ASSERT_TRUE(model != NULL);
+
+  physics::JointPtr joint = model->GetJoint("joint");
+  ASSERT_TRUE(joint != NULL);
+
+  sensors::SensorPtr sensor = sensors::get_sensor("altimeter");
+  sensors::AltimeterSensorPtr altSensor =
+      boost::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
+
+  ASSERT_TRUE(altSensor != NULL);
+
+  sensors::SensorManager::Instance()->Init();
+  altSensor->SetActive(true);
+
+  int steps = 1;
+  world->Step(steps);
+  altSensor->Update(true);
+
+  // Get the link's angular velocity
+  ignition::math::Vector3d avel =
+    model->GetLink("link")->GetRelativeAngularVel().Ign();
+
+  // Get the link's linear velocity
+  ignition::math::Vector3d lvel =
+    model->GetLink("link")->GetWorldLinearVel(math::Vector3(0, 5, 0)).Ign();
+
+  // Expect the altimeter's velocity to equal the angular velocity at the
+  // end of the rod.
+  EXPECT_NEAR(altSensor->VerticalVelocity(), avel.Sum() * 10, 1e-3);
+}
+
+/////////////////////////////////////////////////
+// Check angular and linear velocity is correct
+void AltimeterSensor_TEST::LinearAngularAltimeterSensorCheck(
+  const std::string &_physicsEngine)
+{
+  Load("worlds/test_altimeter_linear_angular.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  physics::ModelPtr model = world->GetModel("model");
+  ASSERT_TRUE(model != NULL);
+
+  physics::JointPtr joint = model->GetJoint("joint");
+  ASSERT_TRUE(joint != NULL);
+
+  sensors::SensorPtr sensor = sensors::get_sensor("altimeter");
+  sensors::AltimeterSensorPtr altSensor =
+      boost::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
+
+  ASSERT_TRUE(altSensor != NULL);
+
+  sensors::SensorManager::Instance()->Init();
+  altSensor->SetActive(true);
+
+  int steps = 10;
+  world->Step(steps);
+  altSensor->Update(true);
+
+  // Angular velocity of the rod
+  ignition::math::Vector3d avel =
+    model->GetLink("link")->GetRelativeAngularVel().Ign();
+
+  // Linear velocity of the rod at the location that is attached to
+  // the prismatic joint.
+  ignition::math::Vector3d lvel =
+    model->GetLink("link")->GetWorldLinearVel(
+        ignition::math::Vector3d(0, -5, 0)).Ign();
+
+  // Expect the altimeter's velocity to equal the angular velocity at the
+  // end of the rod + the rod's linear velocity.
+  EXPECT_NEAR(altSensor->VerticalVelocity(),
+      avel.Sum() * 10 + lvel.Z(), 1e-4);
 }
 
 /////////////////////////////////////////////////
@@ -119,7 +269,8 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   altSensor->SetActive(true);
 
   // Check for match
-  EXPECT_DOUBLE_EQ(altSensor->VerticalPosition(), 10.0);
+  EXPECT_DOUBLE_EQ(altSensor->ReferenceAltitude(), 10.0);
+  EXPECT_DOUBLE_EQ(altSensor->Altitude(), 0.0);
   EXPECT_DOUBLE_EQ(altSensor->VerticalVelocity(), 0.0);
 }
 
@@ -127,6 +278,23 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
 TEST_P(AltimeterSensor_TEST, BasicAltimeterSensorCheck)
 {
   BasicAltimeterSensorCheck(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(AltimeterSensor_TEST, LinearAltimeterSensorCheck)
+{
+  LinearAltimeterSensorCheck(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(AltimeterSensor_TEST, AngularAltimeterSensorCheck)
+{
+  AngularAltimeterSensorCheck(GetParam());
+}
+
+TEST_P(AltimeterSensor_TEST, LinearAngularAltimeterSensorCheck)
+{
+  LinearAngularAltimeterSensorCheck(GetParam());
 }
 
 /////////////////////////////////////////////////

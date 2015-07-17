@@ -69,7 +69,7 @@ namespace gazebo
 
       /// \brief Accessor for current vertical position
       /// \return Current vertical position
-      public: double VerticalPosition();
+      public: double Altitude();
 
       /// \brief Accessor for current vertical velocity
       /// \return Current vertical velocity

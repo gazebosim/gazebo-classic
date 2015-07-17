@@ -142,11 +142,30 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
       this->dataPtr->parentLink->GetWorldLinearVel(this->pose.pos).Ign();
 
     // Apply noise to the position and velocity
-    this->dataPtr->altMsg.set_vertical_position(
-      this->noises[ALTIMETER_POSITION_NOISE_METERS]->Apply(
-        altPose.Pos().Z() - this->dataPtr->altMsg.vertical_reference()));
-    this->dataPtr->altMsg.set_vertical_velocity(
-      this->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S]->Apply(altVel.Z()));
+    if (this->noises.find(ALTIMETER_POSITION_NOISE_METERS) !=
+        this->noises.end())
+    {
+      this->dataPtr->altMsg.set_vertical_position(
+          this->noises[ALTIMETER_POSITION_NOISE_METERS]->Apply(
+            altPose.Pos().Z() - this->dataPtr->altMsg.vertical_reference()));
+    }
+    else
+    {
+      this->dataPtr->altMsg.set_vertical_position(
+          altPose.Pos().Z() - this->dataPtr->altMsg.vertical_reference());
+    }
+
+    if (this->noises.find(ALTIMETER_VELOCITY_NOISE_METERS_PER_S) !=
+        this->noises.end())
+    {
+      this->dataPtr->altMsg.set_vertical_velocity(
+          this->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S]->Apply(
+            altVel.Z()));
+    }
+    else
+    {
+      this->dataPtr->altMsg.set_vertical_velocity(altVel.Z());
+    }
   }
 
   // Save the time of the measurement
@@ -160,7 +179,7 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-double AltimeterSensor::VerticalPosition()
+double AltimeterSensor::Altitude()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->altMsg.vertical_position();
