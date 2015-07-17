@@ -588,7 +588,10 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   // _obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_SKIES_EARLY+1);
 
   if (!_obj)
+  {
+    gzerr << "Cannot attach NULL object to visual" << std::endl;
     return;
+  }
 
   if (!this->HasAttachedObject(_obj->getName()))
   {
