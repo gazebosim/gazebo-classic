@@ -165,6 +165,15 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     std::stringstream axis;
     axis << "axis" << i+1;
     std::string axisStr = axis.str();
+
+    // workaround for fixed joint - use revolute with zero limits
+    // remove when fixed joint is properly supported in gazebo
+    if (valueStr == "fixed")
+    {
+      this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower", 0);
+      this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_upper", 0);
+    }
+
     this->configWidget->SetWidgetVisible(axisStr, true);
     this->configWidget->SetWidgetReadOnly(axisStr, false);
     this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
@@ -175,6 +184,7 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     std::stringstream axis;
     axis << "axis" << i+1;
     std::string axisStr = axis.str();
+
     this->configWidget->SetWidgetVisible(axisStr, false);
     this->configWidget->SetWidgetReadOnly(axisStr, true);
     this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());

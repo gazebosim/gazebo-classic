@@ -259,6 +259,100 @@ void JointMaker_TEST::JointDefaultProperties()
   qFuzzyCompare(prisAxis1Msg.friction(), 0.0);
   QCOMPARE(prisAxis1Msg.use_parent_model_frame(), false);
 
+  // Add a gearbox joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_GEARBOX);
+  gui::JointData *gearboxJointData =
+      jointMaker->CreateJoint(boxLink, cylinderLink);
+  jointMaker->CreateHotSpot(gearboxJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 3u);
+
+  // verify connected joints
+  boxJointData =
+      jointMaker->GetJointDataByLink("box::link");
+  QCOMPARE(static_cast<unsigned int>(boxJointData.size()), 2u);
+
+  cylinderJointData =
+      jointMaker->GetJointDataByLink("cylinder::link");
+  QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 2u);
+
+  gui::JointData *gearboxJoint = cylinderJointData[0];
+  QVERIFY(gearboxJoint != NULL);
+  QVERIFY(gearboxJoint->inspector != NULL);
+
+  // verify default values
+  QVERIFY(msgs::ConvertJointType(gearboxJoint->jointMsg->type()) == "gearbox");
+  QCOMPARE(msgs::Convert(gearboxJoint->jointMsg->pose()), math::Pose::Zero);
+  qFuzzyCompare(gearboxJoint->jointMsg->cfm(), 0.0);
+  qFuzzyCompare(gearboxJoint->jointMsg->bounce(), 0.0);
+  qFuzzyCompare(gearboxJoint->jointMsg->fudge_factor(), 0.0);
+  qFuzzyCompare(gearboxJoint->jointMsg->limit_cfm(), 0.0);
+  qFuzzyCompare(gearboxJoint->jointMsg->limit_erp(), 0.2);
+  qFuzzyCompare(gearboxJoint->jointMsg->suspension_cfm(), 0.0);
+  qFuzzyCompare(gearboxJoint->jointMsg->suspension_erp(), 0.2);
+
+  msgs::Axis gearboxAxis1Msg = gearboxJoint->jointMsg->axis1();
+  QCOMPARE(msgs::Convert(gearboxAxis1Msg.xyz()), math::Vector3(1, 0, 0));
+  qFuzzyCompare(gearboxAxis1Msg.limit_lower(), -GZ_DBL_MAX);
+  qFuzzyCompare(gearboxAxis1Msg.limit_upper(), GZ_DBL_MAX);
+  qFuzzyCompare(gearboxAxis1Msg.limit_effort(), -1);
+  qFuzzyCompare(gearboxAxis1Msg.limit_velocity(), -1);
+  qFuzzyCompare(gearboxAxis1Msg.damping(), 0.0);
+  qFuzzyCompare(gearboxAxis1Msg.friction(), 0.0);
+  QCOMPARE(gearboxAxis1Msg.use_parent_model_frame(), false);
+
+  msgs::Axis gearboxAxis2Msg = gearboxJoint->jointMsg->axis2();
+  QCOMPARE(msgs::Convert(gearboxAxis2Msg.xyz()), math::Vector3(0, 1, 0));
+  qFuzzyCompare(gearboxAxis2Msg.limit_lower(), -GZ_DBL_MAX);
+  qFuzzyCompare(gearboxAxis2Msg.limit_upper(), GZ_DBL_MAX);
+  qFuzzyCompare(gearboxAxis2Msg.limit_effort(), -1);
+  qFuzzyCompare(gearboxAxis2Msg.limit_velocity(), -1);
+  qFuzzyCompare(gearboxAxis2Msg.damping(), 0.0);
+  qFuzzyCompare(gearboxAxis2Msg.friction(), 0.0);
+  QCOMPARE(gearboxAxis2Msg.use_parent_model_frame(), false);
+
+  // Add a fixed joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_FIXED);
+  gui::JointData *fixedJointData =
+      jointMaker->CreateJoint(boxLink, cylinderLink);
+  jointMaker->CreateHotSpot(fixedJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 4u);
+
+  // verify connected joints
+  boxJointData =
+      jointMaker->GetJointDataByLink("box::link");
+  QCOMPARE(static_cast<unsigned int>(boxJointData.size()), 3u);
+
+  cylinderJointData =
+      jointMaker->GetJointDataByLink("cylinder::link");
+  QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 3u);
+
+  gui::JointData *fixedJoint = cylinderJointData[1];
+  QVERIFY(fixedJoint != NULL);
+  QVERIFY(fixedJoint->inspector != NULL);
+
+  // verify default values
+  QVERIFY(msgs::ConvertJointType(fixedJoint->jointMsg->type()) == "fixed");
+  QCOMPARE(msgs::Convert(fixedJoint->jointMsg->pose()), math::Pose::Zero);
+  qFuzzyCompare(fixedJoint->jointMsg->cfm(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->bounce(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->fudge_factor(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->limit_cfm(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->limit_erp(), 0.2);
+  qFuzzyCompare(fixedJoint->jointMsg->suspension_cfm(), 0.0);
+  qFuzzyCompare(fixedJoint->jointMsg->suspension_erp(), 0.2);
+
+  // fixed joint created using revolute joint with zero limits so it
+  // has one axis
+  msgs::Axis fixedAxis1Msg = fixedJoint->jointMsg->axis1();
+  QCOMPARE(msgs::Convert(fixedAxis1Msg.xyz()), math::Vector3(1, 0, 0));
+  qFuzzyCompare(fixedAxis1Msg.limit_lower(), 0);
+  qFuzzyCompare(fixedAxis1Msg.limit_upper(), 0);
+  qFuzzyCompare(fixedAxis1Msg.limit_effort(), -1);
+  qFuzzyCompare(fixedAxis1Msg.limit_velocity(), -1);
+  qFuzzyCompare(fixedAxis1Msg.damping(), 0.0);
+  qFuzzyCompare(fixedAxis1Msg.friction(), 0.0);
+  QCOMPARE(fixedAxis1Msg.use_parent_model_frame(), false);
+
   delete jointMaker;
   mainWindow->close();
   delete mainWindow;

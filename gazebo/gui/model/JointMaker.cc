@@ -64,7 +64,7 @@ JointMaker::JointMaker()
   this->jointMaterials[JOINT_SCREW]     = "Gazebo/Black";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
-
+  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/SkyBlue";
 
   jointTypes[JOINT_FIXED]     = "fixed";
   jointTypes[JOINT_HINGE]     = "revolute";
@@ -73,6 +73,7 @@ JointMaker::JointMaker()
   jointTypes[JOINT_SCREW]     = "screw";
   jointTypes[JOINT_UNIVERSAL] = "universal";
   jointTypes[JOINT_BALL]      = "ball";
+  jointTypes[JOINT_GEARBOX]   = "gearbox";
   jointTypes[JOINT_NONE]      = "none";
 
   this->connections.push_back(
@@ -492,8 +493,18 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     msgs::Set(axisMsg->mutable_xyz(),
         this->UnitVectors[i%this->UnitVectors.size()]);
     axisMsg->set_use_parent_model_frame(false);
-    axisMsg->set_limit_lower(-GZ_DBL_MAX);
-    axisMsg->set_limit_upper(GZ_DBL_MAX);
+    // workaround for fixed joint - use revolute with zero limits
+    // remove when fixed joint is properly supported in gazebo
+    if (jointData->type == JointMaker::JOINT_FIXED)
+    {
+      axisMsg->set_limit_lower(0);
+      axisMsg->set_limit_upper(0);
+    }
+    else
+    {
+      axisMsg->set_limit_lower(-GZ_DBL_MAX);
+      axisMsg->set_limit_upper(GZ_DBL_MAX);
+    }
     axisMsg->set_limit_effort(-1);
     axisMsg->set_limit_velocity(-1);
     axisMsg->set_damping(0);
@@ -985,7 +996,9 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
 {
   if (_type == JOINT_FIXED)
   {
-    return 0;
+    // use revolute joint with zero limits to simulate fixed joint
+    // remove when fixed joint is supported in gazebo.
+    return 1;
   }
   else if (_type == JOINT_HINGE)
   {
@@ -1010,6 +1023,10 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   else if (_type == JOINT_BALL)
   {
     return 0;
+  }
+  else if (_type == JOINT_GEARBOX)
+  {
+    return 2;
   }
 
   return 0;
