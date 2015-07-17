@@ -144,7 +144,13 @@ namespace gazebo
 
       /// \brief Get pointer to DART World associated with this DART Physics.
       /// \return The pointer to DART World.
-      public: dart::simulation::World *GetDARTWorld();
+      public: dart::simulation::World *GetDARTWorld()
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get pointer to DART World associated with this DART Physics.
+      /// \return The pointer to DART World.
+      public: dart::simulation::WorldPtr GetDARTWorldPtr();
+      // TODO: Rename to GetDARTWorld() in Gazebo 7.0.
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);

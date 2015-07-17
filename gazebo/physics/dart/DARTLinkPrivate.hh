@@ -31,12 +31,17 @@ namespace gazebo
     /// \brief Private data class for DARTLink
     class DARTLinkPrivate
     {
+      using DARTBodyNodePropPtr =
+        std::shared_ptr<dart::dynamics::BodyNode::Properties>;
+
       /// \brief Constructor
       public: DARTLinkPrivate()
         : dartPhysics(NULL),
+          dtProperties(NULL),
           dtBodyNode(NULL),
           dartParentJoint(NULL),
           dartChildJoints{},
+          isSoftBody(false),
           staticLink(false),
           dtWeldJointConst(NULL)
       {
@@ -54,6 +59,9 @@ namespace gazebo
       /// \brief Pointer to the DART physics engine.
       public: DARTPhysicsPtr dartPhysics;
 
+      /// \brief Pointer to the DART BodyNode properties.
+      public: DARTBodyNodePropPtr dtProperties;
+
       /// \brief Pointer to the DART BodyNode.
       public: dart::dynamics::BodyNode *dtBodyNode;
 
@@ -62,6 +70,9 @@ namespace gazebo
 
       /// \brief List of pointers to the child joints.
       public: std::vector<DARTJointPtr> dartChildJoints;
+
+      /// \brief True if this link is soft body.
+      public: bool isSoftBody;
 
       /// \brief If true, freeze link to world (inertial) frame.
       public: bool staticLink;

@@ -37,7 +37,11 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.
-      public: DARTHeightmapShape(CollisionPtr _parent);
+      public: DARTHeightmapShape(CollisionPtr _parent) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Constructor.
+      /// \param[in] _parent Collision parent.
+      public: DARTHeightmapShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~DARTHeightmapShape();

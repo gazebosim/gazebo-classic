@@ -167,6 +167,13 @@ namespace gazebo
       /// \return Pointer to the DART Model.
       public: DARTModelPtr GetDARTModel() const;
 
+      /// \brief Get DART BodyNode properties
+      public: DARTBodyNodePropPtr GetDARTProperties() const;
+
+      /// \brief Set pointer to DART BodyNode associated with this link.
+      /// \param[in] Pointer to DART BodyNode.
+      public: void SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+
       /// \brief Get pointer to DART BodyNode associated with this link.
       /// \return Pointer to DART BodyNode.
       public: dart::dynamics::BodyNode *GetDARTBodyNode() const;
@@ -178,6 +185,10 @@ namespace gazebo
       /// \brief Set child joint of this link.
       /// \param[in] _dartChildJoint Pointer to the child joint.
       public: void AddDARTChildJoint(DARTJointPtr _dartChildJoint);
+
+      /// \brief Get whether this link is soft body.
+      /// \brief True if this link is soft body.
+      public: bool IsSoftBody() const;
 
       /// \internal
       /// \brief Pointer to private data

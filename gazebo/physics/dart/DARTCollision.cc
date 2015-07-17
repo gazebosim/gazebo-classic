@@ -70,25 +70,13 @@ void DARTCollision::Init()
   // Offset
   if (this->dataPtr->dtCollisionShape)
   {
-    // TODO: Don't change offset of shape until dart supports plane shape.
-    boost::shared_ptr<DARTPlaneShape> planeShape =
-        boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape);
-
-    if (!planeShape)
+    // TODO: Remove type check once DART completely supports plane shape.
+    // Please see: https://github.com/dartsim/dart/issues/114
+    if (this->dataPtr->dtCollisionShape->getShapeType() !=
+        dart::dynamics::Shape::PLANE)
     {
-      math::Pose relativePose = this->GetRelativePose();
       this->dataPtr->dtCollisionShape->setOffset(
-            DARTTypes::ConvVec3(relativePose.pos));
-    }
-    else
-    {
-      // change ground plane to be near semi-infinite.
-      dart::dynamics::BoxShape *dtBoxShape =
-          dynamic_cast<dart::dynamics::BoxShape *>(
-            this->dataPtr->dtCollisionShape);
-      dtBoxShape->setSize(Eigen::Vector3d(2100, 2100, 2100.0));
-      dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100.0/2.0));
-      // gzerr << "plane box modified\n";
+            DARTTypes::ConvVec3(this->GetRelativePose().pos));
     }
   }
 }
@@ -146,7 +134,16 @@ dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape *_shape,
+void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape */*_shape*/,
+                                          bool _placeable)
+{
+  dterr << "Deprecated. Use SetDARTCollisionShape(ShapePtr, bool) instead.\n";
+
+  Collision::SetCollision(_placeable);
+}
+
+//////////////////////////////////////////////////
+void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
                                           bool _placeable)
 {
   Collision::SetCollision(_placeable);
@@ -155,6 +152,12 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape *_shape,
 
 //////////////////////////////////////////////////
 dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
+{
+  return this->dataPtr->dtCollisionShape.get();
+}
+
+//////////////////////////////////////////////////
+dart::dynamics::ShapePtr DARTCollision::GetDARTCollisionShapePtr() const
 {
   return this->dataPtr->dtCollisionShape;
 }

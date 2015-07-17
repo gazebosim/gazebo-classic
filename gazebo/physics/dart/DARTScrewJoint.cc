@@ -31,13 +31,11 @@ using namespace physics;
 DARTScrewJoint::DARTScrewJoint(BasePtr _parent)
   : ScrewJoint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::ScrewJoint();
 }
 
 //////////////////////////////////////////////////
 DARTScrewJoint::~DARTScrewJoint()
 {
-  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////

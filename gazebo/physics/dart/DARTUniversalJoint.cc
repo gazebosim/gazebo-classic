@@ -28,13 +28,11 @@ using namespace physics;
 DARTUniversalJoint::DARTUniversalJoint(BasePtr _parent)
   : UniversalJoint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::UniversalJoint();
 }
 
 //////////////////////////////////////////////////
 DARTUniversalJoint::~DARTUniversalJoint()
 {
-  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////
@@ -169,11 +167,7 @@ double DARTUniversalJoint::GetVelocity(unsigned int _index) const
 void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index < this->GetAngleCount())
-  {
     this->dataPtr->dtJoint->setVelocity(_index, _vel);
-    this->dataPtr->dtJoint->getSkeleton()->computeForwardKinematics(
-          false, true, false);
-  }
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

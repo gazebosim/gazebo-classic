@@ -21,12 +21,6 @@
 // This disables warning messages for ODE
 #pragma GCC system_header
 
-#include <dart/common/common.h>
-#include <dart/math/math.h>
-#include <dart/collision/collision.h>
-#include <dart/integration/integration.h>
-#include <dart/dynamics/dynamics.h>
-#include <dart/constraint/constraint.h>
-#include <dart/simulation/simulation.h>
+#include <dart/dart-core.h>
 
 #endif

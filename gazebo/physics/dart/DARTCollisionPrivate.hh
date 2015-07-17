@@ -44,7 +44,7 @@ namespace gazebo
       public: dart::dynamics::BodyNode *dtBodyNode;
 
       /// \brief DART collision shape associated with this collision.
-      public: dart::dynamics::Shape *dtCollisionShape;
+      public: dart::dynamics::ShapePtr dtCollisionShape;
 
       /// \brief Category bits for collision detection
       public: unsigned int categoryBits;

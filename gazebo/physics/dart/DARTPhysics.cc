@@ -84,20 +84,11 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
-
-  // Time step
-  // double timeStep = this->sdf->GetValueDouble("time_step");
-  // this->dartWorld->setTimeStep(timeStep);
-
-  // TODO: Elements for dart settings
-  // sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  // this->stepTimeDouble = dartElem->GetElement("dt")->GetValueDouble();
 }
 
 //////////////////////////////////////////////////
 void DARTPhysics::Init()
 {
-  // this->dartWorld->initialize();
 }
 
 //////////////////////////////////////////////////
@@ -145,8 +136,8 @@ void DARTPhysics::UpdateCollision()
   {
     const dart::collision::Contact &dtContact =
         dtCollisionDetector->getContact(i);
-    dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1;
-    dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2;
+    dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1.lock().get();
+    dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2.lock().get();
 
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
@@ -443,6 +434,12 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 
 //////////////////////////////////////////////////
 dart::simulation::World *DARTPhysics::GetDARTWorld()
+{
+  return this->dataPtr->dtWorld.get();
+}
+
+//////////////////////////////////////////////////
+dart::simulation::WorldPtr DARTPhysics::GetDARTWorldPtr()
 {
   return this->dataPtr->dtWorld;
 }

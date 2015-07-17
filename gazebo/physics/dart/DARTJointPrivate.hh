@@ -36,6 +36,7 @@ namespace gazebo
         : forceApplied{0.0, 0.0},
           forceAppliedTime(),
           dartPhysicsEngine(_dartPhysicsEngine),
+          dtProperties(NULL),
           dtJoint(NULL),
           dtChildBodyNode(NULL)
       {
@@ -57,6 +58,9 @@ namespace gazebo
 
       /// \brief DARTPhysics engine pointer
       public: DARTPhysicsPtr dartPhysicsEngine;
+
+      /// \brief DART Joint properties
+      public: DARTJointPropPtr dtProperties;
 
       /// \brief DART joint pointer
       public: dart::dynamics::Joint *dtJoint;

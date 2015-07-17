@@ -37,11 +37,10 @@ namespace gazebo
       /// \brief Default destructor
       public: ~DARTPhysicsPrivate()
       {
-        delete dtWorld;
       }
 
       /// \brief Pointer to DART World associated with this DART Physics.
-      public: dart::simulation::World *dtWorld;
+      public: dart::simulation::WorldPtr dtWorld;
     };
   }
 }

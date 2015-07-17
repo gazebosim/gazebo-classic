@@ -144,6 +144,13 @@ namespace gazebo
       /// \return A pointer to the DART model.
       public: DARTModelPtr GetDARTModel() const;
 
+      /// \brief Get DART Joint properties
+      public: DARTJointPropPtr GetDARTProperties() const;
+
+      /// \brief Set DART joint pointer.
+      /// \param[in] A pointer to the DART joint.
+      public: void SetDARTJoint(dart::dynamics::Joint *_dtJoint);
+
       /// \brief Get DART joint pointer.
       /// \return A pointer to the DART joint.
       public: dart::dynamics::Joint *GetDARTJoint();

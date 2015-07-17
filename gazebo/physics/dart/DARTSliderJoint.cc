@@ -30,13 +30,11 @@ using namespace physics;
 DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
   : SliderJoint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::PrismaticJoint();
 }
 
 //////////////////////////////////////////////////
 DARTSliderJoint::~DARTSliderJoint()
 {
-  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////
@@ -130,11 +128,7 @@ math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
 void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
-  {
     this->dataPtr->dtJoint->setVelocity(0, _vel);
-    this->dataPtr->dtJoint->getSkeleton()->computeForwardKinematics(
-          false, true, false);
-  }
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

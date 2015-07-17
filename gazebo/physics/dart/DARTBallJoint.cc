@@ -28,13 +28,11 @@ using namespace physics;
 DARTBallJoint::DARTBallJoint(BasePtr _parent)
   : BallJoint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::BallJoint();
 }
 
 //////////////////////////////////////////////////
 DARTBallJoint::~DARTBallJoint()
 {
-  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////

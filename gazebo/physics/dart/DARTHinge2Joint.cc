@@ -29,13 +29,11 @@ using namespace physics;
 DARTHinge2Joint::DARTHinge2Joint(BasePtr _parent)
   : Hinge2Joint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::UniversalJoint();
 }
 
 //////////////////////////////////////////////////
 DARTHinge2Joint::~DARTHinge2Joint()
 {
-  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////

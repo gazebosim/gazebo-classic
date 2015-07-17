@@ -61,6 +61,9 @@ void DARTJoint::Init()
 {
   Joint::Init();
 
+  // DARTModel::Load() should be called first
+  GZ_ASSERT(this->dataPtr->dtJoint != NULL, "DART Joint is not initialized.");
+
   // Name
   std::string jointName = this->GetName();
   this->dataPtr->dtJoint->setName(jointName.c_str());
@@ -77,13 +80,11 @@ void DARTJoint::Init()
   Eigen::Isometry3d dtTransformParentBodyNode = Eigen::Isometry3d::Identity();
   Eigen::Isometry3d dtTransformChildBodyNode = Eigen::Isometry3d::Identity();
 
-  // if (theChildLink != NULL)
   GZ_ASSERT(dartChildLink.get() != NULL, "dartChildLink pointer is NULL");
   {
     dtTransformChildBodyNode =
         DARTTypes::ConvPose(dartChildLink->GetWorldPose());
     this->dataPtr->dtChildBodyNode = dartChildLink->GetDARTBodyNode();
-    this->dataPtr->dtChildBodyNode->setParentJoint(this->dataPtr->dtJoint);
   }
   dtTransformChildLinkToJoint = DARTTypes::ConvPose(this->anchorPose);
 
@@ -91,9 +92,6 @@ void DARTJoint::Init()
   {
     dtTransformParentBodyNode =
         DARTTypes::ConvPose(dartParentLink->GetWorldPose());
-    dart::dynamics::BodyNode *dtParentBodyNode =
-      dartParentLink->GetDARTBodyNode();
-    dtParentBodyNode->addChildBodyNode(this->dataPtr->dtChildBodyNode);
   }
 
   dtTransformParentLinkToJoint = dtTransformParentBodyNode.inverse() *
@@ -574,6 +572,18 @@ void DARTJoint::ApplyDamping()
 DARTModelPtr DARTJoint::GetDARTModel() const
 {
   return boost::dynamic_pointer_cast<DARTModel>(this->model);
+}
+
+/////////////////////////////////////////////////
+DARTJointPropPtr DARTJoint::GetDARTProperties() const
+{
+  return this->dataPtr->dtProperties;
+}
+
+/////////////////////////////////////////////////
+void DARTJoint::SetDARTJoint(dart::dynamics::Joint *_dtJoint)
+{
+  this->dataPtr->dtJoint = _dtJoint;
 }
 
 /////////////////////////////////////////////////

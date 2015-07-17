@@ -30,13 +30,11 @@ using namespace physics;
 DARTHingeJoint::DARTHingeJoint(BasePtr _parent)
   : HingeJoint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::RevoluteJoint();
 }
 
 //////////////////////////////////////////////////
 DARTHingeJoint::~DARTHingeJoint()
 {
-  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////
@@ -131,11 +129,7 @@ math::Angle DARTHingeJoint::GetAngleImpl(unsigned int _index) const
 void DARTHingeJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
-  {
     this->dataPtr->dtJoint->setVelocity(0, _vel);
-    this->dataPtr->dtJoint->getSkeleton()->computeForwardKinematics(
-          false, true, false);
-  }
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
