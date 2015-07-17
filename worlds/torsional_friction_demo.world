@@ -1,0 +1,1366 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>7 -3 2.5 0 0.27 2.35</pose>
+      </camera>
+    </gui>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name='sphere_1'>
+      <pose>0.4 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.0</mu>
+                <mu2>0.0</mu2>
+                <mu3>0.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_1' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_2'>
+      <pose>0.8 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.001</mu>
+                <mu2>0.001</mu2>
+                <mu3>0.001</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_2' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_3'>
+      <pose>1.2000000000000002 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.005</mu>
+                <mu2>0.005</mu2>
+                <mu3>0.005</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_3' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_4'>
+      <pose>1.6 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.01</mu>
+                <mu2>0.01</mu2>
+                <mu3>0.01</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_4' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='sphere_5'>
+      <pose>2.0 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+                <mu3>1.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='sphere_5' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+
+    <model name='box_1'>
+      <pose>0.692820323027551 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.0</mu>
+                <mu2>0.0</mu2>
+                <mu3>0.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_1' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='box_2'>
+      <pose>1.385640646055102 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.001</mu>
+                <mu2>0.001</mu2>
+                <mu3>0.001</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_2' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='box_3'>
+      <pose>2.078460969082653 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.005</mu>
+                <mu2>0.005</mu2>
+                <mu3>0.005</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_3' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='box_4'>
+      <pose>2.771281292110204 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.01</mu>
+                <mu2>0.01</mu2>
+                <mu3>0.01</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_4' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='box_5'>
+      <pose>3.4641016151377553 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+                <mu3>1.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_5' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+
+    <model name='box_low_cog_1'>
+      <pose>0.692820323027551 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>1 -1 -1  0 0 0</pose>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.0</mu>
+                <mu2>0.0</mu2>
+                <mu3>0.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_low_cog_1' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='box_low_cog_2'>
+      <pose>1.385640646055102 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>1 -1 -1  0 0 0</pose>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.001</mu>
+                <mu2>0.001</mu2>
+                <mu3>0.001</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_low_cog_2' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='box_low_cog_3'>
+      <pose>2.078460969082653 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>1 -1 -1  0 0 0</pose>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.005</mu>
+                <mu2>0.005</mu2>
+                <mu3>0.005</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_low_cog_3' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='box_low_cog_4'>
+      <pose>2.771281292110204 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>1 -1 -1  0 0 0</pose>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.01</mu>
+                <mu2>0.01</mu2>
+                <mu3>0.01</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_low_cog_4' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+    <model name='box_low_cog_5'>
+      <pose>3.4641016151377553 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>1 -1 -1  0 0 0</pose>
+          <mass>21.6</mass>
+          <inertia>
+            <ixx>0.14400000000000004</ixx>
+            <iyy>0.14400000000000004</iyy>
+            <izz>0.14400000000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+                <mu3>1.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <plugin name='box_low_cog_5' filename='libInitialVelocityPlugin.so'>
+        <linear>0 0 0</linear>
+        <angular>0 0 6.283185307179586</angular>
+      </plugin>
+    </model>
+
+
+    <model name='pinch_1'>
+      <pose>1.2043255373859678 6 0.6021627686929839 0 0 0</pose>
+      <link name="box">
+        <self_collide>true</self_collide>
+        <pose>-0.24000000000000005 0 0 0 1.5707963267948966 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>16.0</mass>
+          <inertia>
+            <ixx>0.4801333333333334</ixx>
+            <iyy>0.48333333333333345</iyy>
+            <izz>0.0034666666666666674</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_1">
+        <pose>0 0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_2">
+        <pose>0 -0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <joint name = "joint_1" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_1</child>
+        <axis>
+          <xyz>0 -1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+      <joint name = "joint_2" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_2</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+    </model>
+
+    <model name='pinch_2'>
+      <pose>2.4086510747719356 6 0.6021627686929839 0 0 0</pose>
+      <link name="box">
+        <self_collide>true</self_collide>
+        <pose>-0.24000000000000005 0 0 0 1.5707963267948966 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>16.0</mass>
+          <inertia>
+            <ixx>0.4801333333333334</ixx>
+            <iyy>0.48333333333333345</iyy>
+            <izz>0.0034666666666666674</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.001</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_1">
+        <pose>0 0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.001</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_2">
+        <pose>0 -0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.001</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <joint name = "joint_1" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_1</child>
+        <axis>
+          <xyz>0 -1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+      <joint name = "joint_2" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_2</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+    </model>
+
+    <model name='pinch_3'>
+      <pose>3.6129766121579037 6 0.6021627686929839 0 0 0</pose>
+      <link name="box">
+        <self_collide>true</self_collide>
+        <pose>-0.24000000000000005 0 0 0 1.5707963267948966 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>16.0</mass>
+          <inertia>
+            <ixx>0.4801333333333334</ixx>
+            <iyy>0.48333333333333345</iyy>
+            <izz>0.0034666666666666674</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.005</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_1">
+        <pose>0 0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.005</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_2">
+        <pose>0 -0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.005</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <joint name = "joint_1" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_1</child>
+        <axis>
+          <xyz>0 -1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+      <joint name = "joint_2" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_2</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+    </model>
+
+    <model name='pinch_4'>
+      <pose>4.817302149543871 6 0.6021627686929839 0 0 0</pose>
+      <link name="box">
+        <self_collide>true</self_collide>
+        <pose>-0.24000000000000005 0 0 0 1.5707963267948966 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>16.0</mass>
+          <inertia>
+            <ixx>0.4801333333333334</ixx>
+            <iyy>0.48333333333333345</iyy>
+            <izz>0.0034666666666666674</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.006</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_1">
+        <pose>0 0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.006</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_2">
+        <pose>0 -0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>0.006</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <joint name = "joint_1" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_1</child>
+        <axis>
+          <xyz>0 -1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+      <joint name = "joint_2" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_2</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+    </model>
+
+    <model name='pinch_5'>
+      <pose>6.021627686929839 6 0.6021627686929839 0 0 0</pose>
+      <link name="box">
+        <self_collide>true</self_collide>
+        <pose>-0.24000000000000005 0 0 0 1.5707963267948966 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>16.0</mass>
+          <inertia>
+            <ixx>0.4801333333333334</ixx>
+            <iyy>0.48333333333333345</iyy>
+            <izz>0.0034666666666666674</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>1.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.010000000000000002 0.6000000000000001</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_1">
+        <pose>0 0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>1.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_2">
+        <pose>0 -0.015000000000000003 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1000.0</mu>
+                <mu2>1000.0</mu2>
+                <mu3>1.0</mu3>
+                <patch_radius>2.0</patch_radius>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.010000000000000002</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <joint name = "joint_1" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_1</child>
+        <axis>
+          <xyz>0 -1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+      <joint name = "joint_2" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_2</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+    </model>
+
+  </world>
+</sdf>
