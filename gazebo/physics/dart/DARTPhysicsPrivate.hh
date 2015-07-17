@@ -40,6 +40,9 @@ namespace gazebo
         delete dtWorld;
       }
 
+      /// \brief Disabled copy constructor
+      public: DARTPhysicsPrivate(const DARTPhysicsPrivate&) = delete;
+
       /// \brief Pointer to DART World associated with this DART Physics.
       public: dart::simulation::World *dtWorld;
     };

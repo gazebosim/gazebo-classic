@@ -42,6 +42,9 @@ namespace gazebo
         delete this->dartMesh;
       }
 
+      /// \brief Disabled copy constructor
+      public: DARTMeshShapePrivate(const DARTMeshShapePrivate&) = delete;
+
       /// \brief DART collision mesh helper class
       public: DARTMesh *dartMesh;
     };
