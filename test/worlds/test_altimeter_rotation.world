@@ -20,11 +20,11 @@
           <geometry>
             <box><size>0.1 10 0.1</size></box>
           </geometry>
-        </collision>"
+        </collision>
         <visual name='visual'>
           <geometry>
             <box><size>0.1 10 0.1</size></box>
-          </geometry>"
+          </geometry>
         </visual>
         <sensor name='altimeter' type='altimeter'>
           <pose>0 5 0 0 0 0</pose>
