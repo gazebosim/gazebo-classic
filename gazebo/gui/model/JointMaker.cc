@@ -64,7 +64,7 @@ JointMaker::JointMaker()
   this->jointMaterials[JOINT_SCREW]     = "Gazebo/Black";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
-  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/SkyBlue";
+  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/Indigo";
 
   jointTypes[JOINT_FIXED]     = "fixed";
   jointTypes[JOINT_HINGE]     = "revolute";

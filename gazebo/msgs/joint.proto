@@ -44,5 +44,14 @@ message Joint
   optional double suspension_cfm = 18;
   optional double suspension_erp = 19;
 
-  repeated Sensor sensor         = 20;
+  /// \brief Gearbox joint reference body link
+  optional string gearbox_reference_body = 20;
+
+  /// \brief Gearbox ratio.
+  optional double gearbox_ratio = 21;
+
+  /// \brief Screw joint thread pitch.
+  optional double thread_pitch = 22;
+
+  repeated Sensor sensor         = 23;
 }

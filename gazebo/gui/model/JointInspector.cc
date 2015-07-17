@@ -189,6 +189,16 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     this->configWidget->SetWidgetReadOnly(axisStr, true);
     this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
   }
+
+  // toggle field visibility according to joint type.
+  bool isGearbox = valueStr == "gearbox";
+  bool isScrew = valueStr == "screw";
+  this->configWidget->SetWidgetVisible("gearbox_reference_body", isGearbox);
+  this->configWidget->SetWidgetReadOnly("gearbox_reference_body", !isGearbox);
+  this->configWidget->SetWidgetVisible("gearbox_ratio", isGearbox);
+  this->configWidget->SetWidgetReadOnly("gearbox_ratio", !isGearbox);
+  this->configWidget->SetWidgetVisible("thread_pitch", isScrew);
+  this->configWidget->SetWidgetReadOnly("thread_pitch", !isScrew);
 }
 
 /////////////////////////////////////////////////
