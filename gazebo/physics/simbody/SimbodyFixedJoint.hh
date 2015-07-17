@@ -38,12 +38,12 @@ namespace gazebo
     /// \brief A fixed joint rigidly connecting two bodies
     class GZ_PHYSICS_VISIBLE SimbodyFixedJoint : public FixedJoint<SimbodyJoint>
     {
-      ///  Constructor
+      /// \brief Constructor
       /// \param[in] world pointer to the simbody world
       /// \param[in] _parent pointer to the parent Model
       public: SimbodyFixedJoint(SimTK::MultibodySystem *world, BasePtr _parent);
 
-      /// Destructor
+      /// \brief Destructor
       public: virtual ~SimbodyFixedJoint();
 
       // Documentation inherited.

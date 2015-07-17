@@ -78,7 +78,7 @@ class JointGetForceTorqueTest : public ServerFixture,
   };
 
   /// \brief Spawn a box rigidly attached to the world
-  /// \param[in] _opt Options for bot attached to the world.
+  /// \param[in] _opt Options for box attached to the world.
   public: physics::ModelPtr SpawnBox(const SpawnGetFTBoxOptions &_opt)
           {
             msgs::Model msg;
@@ -334,7 +334,7 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   // see gazebo issues 1639 and 1640
   if ( _physEng != "bullet" &&
        _physEng != "simbody" )
-  {+
+  {
     for (int i = 0; i < 3; ++i)
     {
       opt.jointType = "prismatic";
