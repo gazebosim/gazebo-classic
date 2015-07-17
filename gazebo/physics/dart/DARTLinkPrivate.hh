@@ -36,7 +36,7 @@ namespace gazebo
         : dartPhysics(NULL),
           dtBodyNode(NULL),
           dartParentJoint(NULL),
-          dartChildJoints{},
+          dartChildJoints {},
           staticLink(false),
           dtWeldJointConst(NULL)
       {

@@ -33,7 +33,7 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTJointPrivate(const DARTPhysicsPtr &_dartPhysicsEngine)
-        : forceApplied{0.0, 0.0},
+        : forceApplied {0.0, 0.0},
           forceAppliedTime(),
           dartPhysicsEngine(_dartPhysicsEngine),
           dtJoint(NULL),
