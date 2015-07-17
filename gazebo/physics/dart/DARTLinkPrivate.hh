@@ -40,7 +40,7 @@ namespace gazebo
           dtProperties(NULL),
           dtBodyNode(NULL),
           dartParentJoint(NULL),
-          dartChildJoints{},
+          dartChildJoints {},
           isSoftBody(false),
           staticLink(false),
           dtWeldJointConst(NULL)
