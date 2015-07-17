@@ -166,8 +166,8 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     axis << "axis" << i+1;
     std::string axisStr = axis.str();
 
-    // workaround for fixed joint - use revolute with zero limits
-    // remove when fixed joint is properly supported in gazebo
+    // use revolute joint with zero limits to simulate fixed joint
+    // TODO: remove when fixed joint is supported in gazebo.
     if (valueStr == "fixed")
     {
       this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower", 0);

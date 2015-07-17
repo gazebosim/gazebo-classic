@@ -952,6 +952,11 @@ void JointMaker::GenerateSDF()
     }
     jointElem = msgs::JointToSDF(*jointMsg.get(), jointElem);
 
+    // use revolute joint with zero limits to simulate fixed joint
+    // TODO: remove when fixed joint is supported in gazebo.
+    if (jointElem->Get<std::string>("type") == "fixed")
+      jointElem->GetAttribute("type")->Set("revolute");
+
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     std::string parentName = joint->parent->GetName();
     std::string parentLeafName = parentName;
@@ -997,7 +1002,7 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   if (_type == JOINT_FIXED)
   {
     // use revolute joint with zero limits to simulate fixed joint
-    // remove when fixed joint is supported in gazebo.
+    // TODO: remove when fixed joint is supported in gazebo.
     return 1;
   }
   else if (_type == JOINT_HINGE)
