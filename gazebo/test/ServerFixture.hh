@@ -48,6 +48,9 @@
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/math/SignalStats.hh"
+#include "gazebo/math/Vector3Stats.hh"
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
 #include "gazebo/util/system.hh"
