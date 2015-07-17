@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
@@ -35,6 +35,8 @@ TEST_F(Issue1208Test, Reset)
 
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
+
+  world->Step(1);
 
   // There is a WorldPlugin attached to this world.
   // It has a counter that increments with each call of Init.

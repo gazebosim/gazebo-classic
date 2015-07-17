@@ -15,8 +15,10 @@
  *
 */
 
-#ifndef _USERCAMERA_PRIVATE_HH_
-#define _USERCAMERA_PRIVATE_HH_
+#ifndef _GAZEBO_USERCAMERA_PRIVATE_HH_
+#define _GAZEBO_USERCAMERA_PRIVATE_HH_
+
+#include <string>
 
 namespace gazebo
 {
@@ -37,8 +39,14 @@ namespace gazebo
       /// \brief The currently active view controller.
       public: ViewController *viewController;
 
+      /// \brief The previously used view controller.
+      public: std::string prevViewControllerName;
+
       /// \brief An orbit view controller.
       public: OrbitViewController *orbitViewController;
+
+      /// \brief An orthographic view controller.
+      public: OrthoViewController *orthoViewController;
 
       /// \brief A FPS view controller.
       public: FPSViewController *fpsViewController;
@@ -73,6 +81,9 @@ namespace gazebo
 
       /// \brief True if stereo rendering should be enabled.
       public: bool stereoEnabled;
+
+      /// \brief Default camera pose.
+      public: math::Pose defaultPose;
     };
   }
 }

@@ -30,24 +30,29 @@ macro (gz_build_tests)
 
 
     target_link_libraries(${BINARY_NAME}
-      gtest
-      gtest_main
-      gazebo_test_fixture
-      gazebo_common
-      gazebo_math
+      # This two libraries are need to workaround on bug 
+      # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
+      # libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
-      pthread
+      gazebo_test_fixture
+      gtest
+      gtest_main
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
-    set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
+    set(_env_vars)
+    list(APPEND _env_vars "CMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}:${CMAKE_PREFIX_PATH}")
+    list(APPEND _env_vars "GAZEBO_PLUGIN_PATH=${CMAKE_BINARY_DIR}/plugins:${CMAKE_BINARY_DIR}/plugins/events:${CMAKE_BINARY_DIR}/plugins/rest_web")
+    list(APPEND _env_vars "GAZEBO_RESOURCE_PATH=${CMAKE_SOURCE_DIR}")
+    list(APPEND _env_vars "PATH=${CMAKE_BINARY_DIR}/gazebo:${CMAKE_BINARY_DIR}/tools:$ENV{PATH}")
+    list(APPEND _env_vars "PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/cmake/pkgconfig:$PKG_CONFIG_PATH")
+    set_tests_properties(${BINARY_NAME} PROPERTIES
+      TIMEOUT 240
+      ENVIRONMENT "${_env_vars}")
 
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
@@ -88,16 +93,13 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      gazebo_gui
-      gazebo_common
-      gazebo_math
+      # This two libraries are need to workaround on bug 
+      # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
+      # gazebo_gui and libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
-      pthread
+      gazebo_gui
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )

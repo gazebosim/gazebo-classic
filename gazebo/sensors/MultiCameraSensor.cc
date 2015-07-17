@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
 
@@ -110,6 +116,9 @@ void MultiCameraSensor::Init()
     }
   }
 
+  // Each camera has its own noise pointer
+  int noiseIndex = 0;
+
   // Create and initialize all the cameras
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
@@ -140,19 +149,20 @@ void MultiCameraSensor::Init()
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentId, true);
 
-    // Handle noise model settings.
     if (cameraSdf->HasElement("noise"))
     {
-      NoisePtr noise =
-          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
-          this->GetType());
-      this->noises.push_back(noise);
-      noise->SetCamera(camera);
+      // Create a noise model and attach the camera
+      this->noises[noiseIndex] = NoiseFactory::NewNoiseModel(
+        cameraSdf->GetElement("noise"), this->GetType());
+      this->noises[noiseIndex]->SetCamera(camera);
     }
     else
     {
-      this->noises.push_back(NoisePtr(new Noise(Noise::NONE)));
+      this->noises[noiseIndex] = NoisePtr(new Noise(Noise::NONE));
     }
+
+    // Increment the noise index -- one for each camera in the setup
+    noiseIndex++;
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);

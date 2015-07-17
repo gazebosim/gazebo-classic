@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class UserCamera UserCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
-    class GAZEBO_VISIBLE UserCamera : public Camera
+    class GZ_RENDERING_VISIBLE UserCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
@@ -74,6 +74,15 @@ namespace gazebo
       /// \brief Set the pose in the world coordinate frame.
       /// \param[in] _pose New pose of the camera.
       public: virtual void SetWorldPose(const math::Pose &_pose);
+
+      /// \brief Set the default pose in the world coordinate frame and set
+      /// that as the current camera world pose.
+      /// \param[in] _pose New default pose of the camera.
+      public: void SetDefaultPose(const math::Pose &_pose);
+
+      /// \brief Get the default pose in the world coordinate frame.
+      /// \return Default pose of the camera.
+      public: math::Pose DefaultPose() const;
 
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.
@@ -193,6 +202,9 @@ namespace gazebo
       ///
       /// \param[in] _enable True to turn on stereo, false to turn off.
       public: void EnableStereo(bool _enable);
+
+      // Documentation inherited.
+      public: virtual bool SetProjectionType(const std::string &_type);
 
       /// \brief Set the camera to be attached to a visual.
       ///

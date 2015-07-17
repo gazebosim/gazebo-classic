@@ -2,6 +2,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (${QT_USE_FILE})
 
 set (sources
+  BaseInspectorDialog.cc
   BuildingEditor.cc
   BuildingEditorEvents.cc
   BuildingEditorPalette.cc
@@ -33,6 +34,7 @@ set (sources
 )
 
 set (qt_headers
+  BaseInspectorDialog.hh
   BuildingEditor.hh
   BuildingEditorPalette.hh
   BuildingModelManip.hh
@@ -72,13 +74,20 @@ QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-gz_add_library(gazebo_gui_building ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI_BUILDING")
+
+if (WIN32)
+  add_library(gazebo_gui_building STATIC ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+  target_link_libraries(gazebo_gui_building ${general_libraries})
+else()
+  gz_add_library(gazebo_gui_building ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+endif()
 
 target_link_libraries(gazebo_gui_building
-  gazebo_common
-  gazebo_transport
   gazebo_rendering
+  gazebo_transport
   gazebo_msgs
+  gazebo_common
   ${QT_LIBRARIES})
 
 gz_install_library(gazebo_gui_building)

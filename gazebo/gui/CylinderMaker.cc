@@ -14,6 +14,13 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
 #include "gazebo/msgs/msgs.hh"
@@ -86,7 +93,7 @@ void CylinderMaker::OnMousePush(const common::MouseEvent &_event)
   if (this->state == 0)
     return;
 
-  this->mousePushPos = _event.pressPos;
+  this->mousePushPos = _event.PressPos();
 }
 
 void CylinderMaker::OnMouseRelease(const common::MouseEvent &_event)
@@ -95,7 +102,7 @@ void CylinderMaker::OnMouseRelease(const common::MouseEvent &_event)
     return;
 
   this->state++;
-  this->mouseReleasePos = _event.pos;
+  this->mouseReleasePos = _event.Pos();
 
   if (this->state == 3)
   {
@@ -119,8 +126,8 @@ void CylinderMaker::OnMouseMove(const common::MouseEvent &_event)
                   this->visualMsg->pose().position().y(),
                   this->visualMsg->pose().position().z());
 
-  double size = (this->mouseReleasePos.y - _event.pos.y) * 0.01;
-  if (!_event.shift)
+  double size = (this->mouseReleasePos.y - _event.Pos().Y()) * 0.01;
+  if (!_event.Shift())
     size = rint(size);
 
   this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(size);
@@ -153,7 +160,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1.Round();
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y, math::Plane(norm), p2))
+        _event.Pos().X(), _event.Pos().Y(), math::Plane(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;

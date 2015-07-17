@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/common/MeshManager.hh"
 
 #include "gazebo/gui/GuiIface.hh"
@@ -35,6 +41,8 @@ SelectionObj::SelectionObj(const std::string &_name, VisualPtr _vis)
 {
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_GUI;
 
   dPtr->state = SELECTION_NONE;
   dPtr->mode = SELECTION_NONE;
@@ -75,6 +83,54 @@ void SelectionObj::Load()
   this->SetHandleVisible(SCALE, false);
 
   this->GetSceneNode()->setInheritScale(false);
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::Fini()
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  // Destroy objects and nodes created by this visual
+  if (!dPtr->scene)
+    return;
+  Ogre::SceneManager *manager = dPtr->scene->GetManager();
+  if (!manager)
+    return;
+
+  // transVisual / rotVisual / scaleVisual
+  for (unsigned int i = 0; i < this->GetChildCount(); ++i)
+  {
+    if (!this->GetChild(i))
+      continue;
+
+    // transXVisual / transYVisual / transZVisual
+    for (unsigned int j = 0; j < this->GetChild(i)->GetChildCount(); ++j)
+    {
+      if (!this->GetChild(i)->GetChild(j) ||
+          !this->GetChild(i)->GetChild(j)->GetSceneNode())
+      {
+        continue;
+      }
+
+      // transShaftXNode / transHeadXNode
+      for (auto k = this->GetChild(i)->GetChild(j)->GetSceneNode()->
+          numChildren()-1; k >= 0; --k)
+      {
+        Ogre::SceneNode *toDestroy =
+            reinterpret_cast<Ogre::SceneNode *>(
+            this->GetChild(i)->
+            GetChild(j)->
+            GetSceneNode()->
+            getChild(k));
+
+        manager->destroyMovableObject(toDestroy->getAttachedObject(0));
+        manager->destroySceneNode(toDestroy);
+      }
+    }
+  }
+
+  Visual::Fini();
 }
 
 /////////////////////////////////////////////////

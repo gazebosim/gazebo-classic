@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <time.h>
 
 #include <tbb/parallel_for.h>
@@ -26,7 +32,6 @@
 
 #include <sdf/sdf.hh>
 
-#include <climits>
 #include <deque>
 #include <list>
 #include <set>
@@ -264,11 +269,11 @@ void World::Load(sdf::ElementPtr _sdf)
     common::SphericalCoordinates::SurfaceType surfaceType =
       common::SphericalCoordinates::Convert(
         spherical->Get<std::string>("surface_model"));
-    math::Angle latitude, longitude, heading;
+    ignition::math::Angle latitude, longitude, heading;
     double elevation = spherical->Get<double>("elevation");
-    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
-    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
-    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+    latitude.Degree(spherical->Get<double>("latitude_deg"));
+    longitude.Degree(spherical->Get<double>("longitude_deg"));
+    heading.Degree(spherical->Get<double>("heading_deg"));
 
     this->dataPtr->sphericalCoordinates.reset(new common::SphericalCoordinates(
       surfaceType, latitude, longitude, elevation, heading));
@@ -498,8 +503,25 @@ void World::LogStep()
     // Step back: This is implemented by going to the beginning of the log file,
     // and then, step forward up to the target frame.
     // ToDo: Use keyframes in the log file to speed up this process.
-    util::LogPlay::Instance()->Rewind();
+    if (!util::LogPlay::Instance()->Rewind())
+    {
+      gzerr << "Error processing a negative multi-step" << std::endl;
+      this->dataPtr->stepInc = 0;
+      return;
+    }
+
     this->dataPtr->stepInc = this->dataPtr->iterations + this->dataPtr->stepInc;
+
+    // For some reason, the first two chunks contains the same <iterations>
+    // value. If the log file contains <iterations> we will load the same
+    // iterations value twice and this will affect the way we're stepping back.
+    // ToDo: Fix the source of the problem for avoiding this extra step.
+    if (util::LogPlay::Instance()->HasIterations())
+    {
+      this->dataPtr->stepInc +=
+        2 - util::LogPlay::Instance()->GetInitialIterations();
+    }
+
     if (this->dataPtr->stepInc < 1)
       this->dataPtr->stepInc = 1;
     this->dataPtr->iterations = 0;
@@ -507,16 +529,25 @@ void World::LogStep()
 
   {
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+    // There are two main reasons to keep iterating in the following loop:
+    //   1. If "stepInc" is positive: This means that a client requested to
+    //      advanced the simulation some steps.
+    //   2. If "seekPending" is true: This means that a client requested to
+    //      advance the simulation to a given simulation time ("seek"). We will
+    //      have to check at the end of each iteration if we reached the target
+    //      simulation time.
+    //   Note that if the simulation is not paused (play mode) we will enter
+    //   the loop. However, the code will only execute one iteration (one step).
     stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
            this->dataPtr->seekPending;
   }
   while (stay)
   {
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+
     std::string data;
     if (!util::LogPlay::Instance()->Step(data))
     {
-      boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
-
       // There are no more chunks, time to exit.
       this->SetPaused(true);
       this->dataPtr->stepInc = 0;
@@ -528,6 +559,14 @@ void World::LogStep()
       sdf::readString(data, this->dataPtr->logPlayStateSDF);
 
       this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
+
+      // If the log file does not contain iterations we have to manually
+      // increase the iteration counter in logPlayState.
+      if (!util::LogPlay::Instance()->HasIterations())
+      {
+        this->dataPtr->logPlayState.SetIterations(
+          this->dataPtr->iterations + 1);
+      }
 
       // Process insertions
       if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
@@ -566,26 +605,27 @@ void World::LogStep()
 
       this->SetState(this->dataPtr->logPlayState);
       this->Update();
-      this->dataPtr->iterations++;
     }
 
+    if (this->dataPtr->stepInc > 0)
+      this->dataPtr->stepInc--;
+
+    // We may have entered into the loop because a "seek" command was
+    // requested. At this point we have executed one more step. Now, it's time
+    // to check if we have reached the target simulation time specified in the
+    // "seek" command.
+    if (this->dataPtr->seekPending)
     {
-      boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
-      if (this->dataPtr->stepInc > 0)
-        this->dataPtr->stepInc--;
-
-      if (this->dataPtr->seekPending)
-      {
-        this->dataPtr->seekPending =
-          this->GetSimTime() < this->dataPtr->targetSimTime;
-      }
-
-      stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
-             this->dataPtr->seekPending;
+      this->dataPtr->seekPending =
+        this->GetSimTime() < this->dataPtr->targetSimTime;
     }
 
-    // We only run one step if we are in play mode.
-    if (!this->IsPaused())
+    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
+           this->dataPtr->seekPending;
+
+    // We only run one step if we are in play mode and we don't have
+    // other pending commands.
+    if (!this->IsPaused() && !this->dataPtr->seekPending)
       break;
   }
 
@@ -1059,7 +1099,7 @@ void World::Reset()
   this->SetPaused(true);
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     math::Rand::SetSeed(math::Rand::GetSeed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
@@ -1150,7 +1190,7 @@ void World::SetPaused(bool _p)
     return;
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->pause = _p;
   }
 
@@ -1225,6 +1265,12 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
+
+  // Ignore this command if there's another one pending.
+  if (this->dataPtr->seekPending)
+    return;
+
   if (_data->has_pause())
     this->SetPaused(_data->pause());
 
@@ -1233,30 +1279,29 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     // stepWorld is a blocking call so set stepInc directly so that world stats
     // will still be published
     this->SetPaused(true);
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
-    this->dataPtr->stepInc = _data->multi_step();
+    this->dataPtr->stepInc += _data->multi_step();
   }
 
   if (_data->has_seek())
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->targetSimTime = msgs::Convert(_data->seek());
     if (this->GetSimTime() > this->dataPtr->targetSimTime)
       util::LogPlay::Instance()->Rewind();
     this->dataPtr->seekPending = true;
   }
 
-  if (_data->has_rewind())
+  if (_data->has_rewind() && _data->rewind())
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = 1;
   }
 
-  if (_data->has_forward())
+  if (_data->has_forward() && _data->forward())
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
-    this->dataPtr->stepInc = INT_MAX;
+    this->dataPtr->targetSimTime = util::LogPlay::Instance()->GetLogEndTime();
+    if (this->GetSimTime() > this->dataPtr->targetSimTime)
+      util::LogPlay::Instance()->Rewind();
+    this->dataPtr->seekPending = true;
   }
 }
 
@@ -1808,6 +1853,7 @@ void World::SetState(const WorldState &_state)
 {
   this->SetSimTime(_state.GetSimTime());
   this->dataPtr->logRealTime = _state.GetRealTime();
+  this->dataPtr->iterations = _state.GetIterations();
 
   const ModelState_M modelStates = _state.GetModelStates();
   for (auto const &modelState : modelStates)
@@ -2017,6 +2063,8 @@ void World::ProcessMessages()
 //////////////////////////////////////////////////
 void World::PublishWorldStats()
 {
+  this->dataPtr->worldStatsMsg.Clear();
+
   msgs::Set(this->dataPtr->worldStatsMsg.mutable_sim_time(),
       this->GetSimTime());
   msgs::Set(this->dataPtr->worldStatsMsg.mutable_real_time(),
@@ -2026,8 +2074,18 @@ void World::PublishWorldStats()
 
   this->dataPtr->worldStatsMsg.set_iterations(this->dataPtr->iterations);
   this->dataPtr->worldStatsMsg.set_paused(this->IsPaused());
-  this->dataPtr->worldStatsMsg.set_log_playback(
-      util::LogPlay::Instance()->IsOpen());
+
+  if (util::LogPlay::Instance()->IsOpen())
+  {
+    msgs::LogPlaybackStatistics logStats;
+    msgs::Set(logStats.mutable_start_time(),
+        util::LogPlay::Instance()->GetLogStartTime());
+    msgs::Set(logStats.mutable_end_time(),
+        util::LogPlay::Instance()->GetLogEndTime());
+
+    this->dataPtr->worldStatsMsg.mutable_log_playback_stats()->CopyFrom(
+        logStats);
+  }
 
   if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())
     this->dataPtr->statPub->Publish(this->dataPtr->worldStatsMsg);
@@ -2243,4 +2301,11 @@ bool World::GetEnablePhysicsEngine()
 void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
+}
+
+/////////////////////////////////////////////////
+void World::_AddDirty(Entity *_entity)
+{
+  GZ_ASSERT(_entity != NULL, "_entity is NULL");
+  this->dataPtr->dirtyPoses.push_back(_entity);
 }

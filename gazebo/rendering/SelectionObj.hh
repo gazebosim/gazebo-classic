@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class SelectionObj SelectionObj.hh
     /// \brief Interactive selection object for models and links
-    class GAZEBO_VISIBLE SelectionObj : public Visual
+    class GZ_RENDERING_VISIBLE SelectionObj : public Visual
     {
       /// \enum Manipulation modes
       /// \brief Unique identifiers for manipulation modes.
@@ -76,6 +76,9 @@ namespace gazebo
 
       /// \brief Load
       public: void Load();
+
+      // Documentation inherited.
+      public: virtual void Fini();
 
       /// \brief Attach the selection object to the given visual
       /// \param[in] _vis Pointer to visual to which the selection object

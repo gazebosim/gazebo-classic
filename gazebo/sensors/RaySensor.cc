@@ -19,6 +19,12 @@
  * Date: 23 february 2004
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -104,9 +110,9 @@ void RaySensor::Load(const std::string &_worldName)
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    this->noises.push_back(
+    this->noises[RAY_NOISE] =
         NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
-        this->GetType()));
+        this->GetType());
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -472,10 +478,10 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
       {
         range = -GZ_DBL_INF;
       }
-      else if (!this->noises.empty())
+      else if (this->noises.find(RAY_NOISE) != this->noises.end())
       {
         // currently supports only one noise model per laser sensor
-        range = this->noises[0]->Apply(range);
+        range = this->noises[RAY_NOISE]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
 

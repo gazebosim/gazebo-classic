@@ -183,9 +183,9 @@ namespace gazebo
           break;
       };
 
-      _s->set_latitude_deg(_v.GetLatitudeReference().Degree());
-      _s->set_longitude_deg(_v.GetLongitudeReference().Degree());
-      _s->set_heading_deg(_v.GetHeadingOffset().Degree());
+      _s->set_latitude_deg(_v.LatitudeReference().Degree());
+      _s->set_longitude_deg(_v.LongitudeReference().Degree());
+      _s->set_heading_deg(_v.HeadingOffset().Degree());
       _s->set_elevation(_v.GetElevationReference());
     }
 
@@ -332,7 +332,7 @@ namespace gazebo
       return result;
     }
 
-    std::string ConvertJointType(const msgs::Joint::Type _type)
+    std::string ConvertJointType(const msgs::Joint::Type &_type)
     {
       std::string result;
       switch (_type)
@@ -565,6 +565,12 @@ namespace gazebo
         {
           guiCam->set_view_controller(
               camSDF->Get<std::string>("view_controller"));
+        }
+
+        if (camSDF->HasElement("projection_type"))
+        {
+          guiCam->set_projection_type(
+              camSDF->Get<std::string>("projection_type"));
         }
 
         if (camSDF->HasElement("track_visual"))
@@ -828,6 +834,15 @@ namespace gazebo
       if (_sdf->HasElement("laser_retro"))
         result.set_laser_retro(_sdf->Get<double>("laser_retro"));
 
+      // Set the meta information
+      if (_sdf->HasElement("meta"))
+      {
+        auto metaElem = _sdf->GetElement("meta");
+        auto meta = result.mutable_meta();
+        if (metaElem->HasElement("layer"))
+          meta->set_layer(metaElem->Get<int32_t>("layer"));
+      }
+
       // Load the geometry
       if (_sdf->HasElement("geometry"))
       {
@@ -1050,6 +1065,16 @@ namespace gazebo
         sdf::initFile("visual.sdf", visualSDF);
       }
 
+      // Set the meta information
+      if (_msg.has_meta())
+      {
+        if (_msg.meta().has_layer())
+        {
+          visualSDF->GetElement("meta")->GetElement("layer")->Set(
+              _msg.meta().layer());
+        }
+      }
+
       if (_msg.has_name())
         visualSDF->GetAttribute("name")->Set(_msg.name());
 
@@ -1182,7 +1207,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    std::string ConvertShaderType(const msgs::Material::ShaderType _type)
+    std::string ConvertShaderType(const msgs::Material::ShaderType &_type)
     {
       std::string result;
       switch (_type)
@@ -1254,6 +1279,11 @@ namespace gazebo
         result.set_grid(_sdf->Get<bool>("grid"));
       else
         result.set_grid(true);
+
+      if (_sdf->HasElement("origin_visual"))
+        result.set_origin_visual(_sdf->Get<bool>("origin_visual"));
+      else
+        result.set_origin_visual(true);
 
       if (_sdf->HasElement("ambient"))
         result.mutable_ambient()->CopyFrom(
@@ -1403,8 +1433,7 @@ namespace gazebo
 
       if (_msg.has_horizontal_fov())
       {
-        cameraSDF->GetElement("horizontal_fov")->Set(
-            _msg.horizontal_fov());
+        cameraSDF->GetElement("horizontal_fov")->Set(_msg.horizontal_fov());
       }
       if (_msg.has_image_size())
       {

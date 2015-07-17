@@ -30,7 +30,8 @@ namespace gazebo
   namespace physics
   {
     /// \brief A universal joint.
-    class GAZEBO_VISIBLE ODEUniversalJoint : public UniversalJoint<ODEJoint>
+    class GZ_PHYSICS_ODE_VISIBLE ODEUniversalJoint :
+      public UniversalJoint<ODEJoint>
     {
       /// \brief Constructor.
       /// \param[in] _worldId ODE world id.

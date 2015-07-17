@@ -18,8 +18,8 @@
 #include <sys/time.h>
 #include <gtest/gtest.h>
 
-#include "test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
 #define TOL 1e-4
@@ -87,6 +87,12 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  if (_physicsEngine == "simbody")
+  {
+    // default accuracy flunks this test, increase accuracy setting
+    physics->SetParam("accuracy", 0.0001);
+  }
 
   double z = 3;
   double gravityZ = physics->GetGravity().z;

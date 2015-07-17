@@ -48,7 +48,7 @@ void GLWidget_TEST::SelectObject()
   gazebo::transport::SubscriberPtr sub;
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init();
-  sub = node->Subscribe("~/selection", &OnSelection, this);
+  sub = node->Subscribe("~/selection", &OnSelection, true);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -78,6 +78,13 @@ void GLWidget_TEST::SelectObject()
 
   // Verify the box was selected
   QVERIFY(g_gotBoxSelection);
+
+  // Check the selected visuals list
+  std::vector<gazebo::rendering::VisualPtr> selectedVisuals =
+      glWidget->SelectedVisuals();
+
+  QVERIFY(selectedVisuals.size() == 1u);
+  QVERIFY(selectedVisuals[0]->GetName() == "box");
 
   mainWindow->close();
   delete mainWindow;

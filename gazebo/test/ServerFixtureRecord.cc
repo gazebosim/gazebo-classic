@@ -19,14 +19,16 @@
 
 #include "gazebo/math/SignalStats.hh"
 #include "gazebo/math/Vector3Stats.hh"
-#include "test/ServerFixture.hh"
+#include "ServerFixture.hh"
 
 using namespace gazebo;
 
 /////////////////////////////////////////////////
 void ServerFixture::Record(const std::string &_name, const double _data)
 {
-  RecordProperty(_name, std::to_string(_data));
+  std::ostringstream stream;
+  stream << _data;
+  RecordProperty(_name, stream.str());
 }
 
 /////////////////////////////////////////////////

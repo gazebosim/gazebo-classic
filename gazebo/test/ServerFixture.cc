@@ -427,15 +427,15 @@ void ServerFixture::ImageCompare(unsigned char *_imageA,
   {
     for (unsigned int x = 0; x < _width*_depth; ++x)
     {
-      unsigned int a = _imageA[(y*_width*_depth)+x];
-      unsigned int b = _imageB[(y*_width*_depth)+x];
+      int a = _imageA[(y*_width*_depth)+x];
+      int b = _imageB[(y*_width*_depth)+x];
 
-      unsigned int diff = (unsigned int)(abs(a - b));
+      unsigned int absDiff = abs(a - b);
 
-      if (diff > _diffMax)
-        _diffMax = diff;
+      if (absDiff > _diffMax)
+        _diffMax = absDiff;
 
-      _diffSum += diff;
+      _diffSum += absDiff;
     }
   }
   _diffAvg = _diffSum / (_height*_width*_depth);

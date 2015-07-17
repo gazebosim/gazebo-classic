@@ -14,15 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef _SKELETON_HH_
-#define _SKELETON_HH_
+#ifndef _GAZEBO_SKELETON_HH_
+#define _GAZEBO_SKELETON_HH_
 
 #include <vector>
 #include <string>
 #include <map>
 #include <utility>
 
+#include <ignition/math/Matrix4.hh>
+
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -47,7 +50,7 @@ namespace gazebo
 
     /// \class Skeleton Skeleton.hh common/common.hh
     /// \brief A skeleton
-    class GAZEBO_VISIBLE Skeleton
+    class GZ_COMMON_VISIBLE Skeleton
     {
       /// \brief Constructor
       public: Skeleton();
@@ -96,11 +99,25 @@ namespace gazebo
 
       /// \brief Set the bind pose skeletal transform
       /// \param[in] _trans the transform
-      public: void SetBindShapeTransform(math::Matrix4 _trans);
+      /// \deprecated See SetBindShapeTransform that accepts
+      /// ignition::math::Matrix4d
+      public: void SetBindShapeTransform(math::Matrix4 _trans)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set the bind pose skeletal transform
+      /// \param[in] _trans the transform
+      public: void SetBindShapeTransform(
+                  const ignition::math::Matrix4d &_trans);
 
       /// \brief Return bind pose skeletal transform
       /// \return a matrix
-      public: math::Matrix4 GetBindShapeTransform();
+      /// \deprecated See BindShapeTransform that return
+      /// ignition::math::Matrix4d.
+      public: math::Matrix4 GetBindShapeTransform() GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Return bind pose skeletal transform
+      /// \return a matrix
+      public: ignition::math::Matrix4d BindShapeTransform();
 
       /// \brief Outputs the transforms to std::err stream
       public: void PrintTransforms();
@@ -156,7 +173,7 @@ namespace gazebo
       protected: NodeMap nodes;
 
       /// \brief the bind pose skeletal transform
-      protected: math::Matrix4 bindShapeTransform;
+      protected: ignition::math::Matrix4d bindShapeTransform;
 
       /// \brief the node weight table
       protected: RawNodeWeights rawNW;
@@ -167,7 +184,7 @@ namespace gazebo
 
     /// \class SkeletonNode Skeleton.hh common/common.hh
     /// \brief A skeleton node
-    class GAZEBO_VISIBLE SkeletonNode
+    class GZ_COMMON_VISIBLE SkeletonNode
     {
       /// \brief enumeration of node types
       public: enum SkeletonNodeType {NODE, JOINT};
@@ -215,22 +232,47 @@ namespace gazebo
       /// \param[in] _trans the transformation
       /// \param[in] _updateChildren when true the UpdateChildrenTransforms
       /// operation is performed
+      /// \deprecated See SetTransform function that accepts
+      /// ignition::math::Matrix4d.
       public: void SetTransform(math::Matrix4 _trans,
-                                  bool _updateChildren = true);
+                  bool _updateChildren = true) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set a transformation
+      /// \param[in] _trans the transformation
+      /// \param[in] _updateChildren when true the UpdateChildrenTransforms
+      /// operation is performed
+      public: void SetTransform(const ignition::math::Matrix4d &_trans,
+                                bool _updateChildren = true);
 
       /// \brief Set the model transformation
       /// \param[in] _trans the transformation
       /// \param[in] _updateChildren when true the UpdateChildrenTransforms
       /// operation is performed
+      /// \deprecated See SetModelTransform that accepts
+      /// ignition::math::Matrix4d.
       public: void SetModelTransform(math::Matrix4 _trans,
-                                  bool _updateChildren = true);
+                  bool _updateChildren = true) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set the model transformation
+      /// \param[in] _trans the transformation
+      /// \param[in] _updateChildren when true the UpdateChildrenTransforms
+      /// operation is performed
+      public: void SetModelTransform(const ignition::math::Matrix4d &_trans,
+                                     bool _updateChildren = true);
 
       /// \brief Apply model transformations in order for each node in the tree
       public: void UpdateChildrenTransforms();
 
       /// \brief Sets the initial transformation
       /// \param[in] _tras the transfromation matrix
-      public: void SetInitialTransform(math::Matrix4 _tras);
+      /// \deprecated See SetInitialTransform that accepts
+      /// ignition::math::Matrix4d.
+      public: void SetInitialTransform(math::Matrix4 _tras)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Sets the initial transformation
+      /// \param[in] _tras the transfromation matrix
+      public: void SetInitialTransform(const ignition::math::Matrix4d &_tras);
 
       /// \brief Reset the transformation to the initial transformation
       /// \param[in] _resetChildren when true, performs the operation for every
@@ -238,7 +280,14 @@ namespace gazebo
       public: void Reset(bool _resetChildren);
 
       /// \brief Get transform relative to parent
-      public: math::Matrix4 GetTransform();
+      /// \return Transform relative to parent
+      /// \deprecated See Transform function that return
+      /// ignition::math::Matrix4d.
+      public: math::Matrix4 GetTransform() GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get transform relative to parent
+      /// \return Transform relative to parent
+      public: ignition::math::Matrix4d Transform();
 
       /// \brief Set the parent node
       /// \param[in] _parent the new parent
@@ -285,15 +334,35 @@ namespace gazebo
 
       /// \brief Assign the inverse of the bind pose skeletal transform
       /// \param[in] _invBM the transform
-      public: void SetInverseBindTransform(math::Matrix4 _invBM);
+      /// \deprecated See SetInverseBindTransform that accepts
+      /// ignition::math::Matrix4d.
+      public: void SetInverseBindTransform(math::Matrix4 _invBM)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Assign the inverse of the bind pose skeletal transform
+      /// \param[in] _invBM the transform
+      public: void SetInverseBindTransform(
+                  const ignition::math::Matrix4d &_invBM);
 
       /// \brief Retrieve the inverse of the bind pose skeletal transform
       /// \return the transform
-      public: math::Matrix4 GetInverseBindTransform();
+      /// \deprecated See InverseBindTransform function that returns
+      /// ignition::math::Matrix4d.
+      public: math::Matrix4 GetInverseBindTransform() GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Retrieve the inverse of the bind pose skeletal transform
+      /// \return the transform
+      public: ignition::math::Matrix4d InverseBindTransform();
 
       /// \brief Retrieve the model transform
       /// \return the transform
-      public: math::Matrix4 GetModelTransform();
+      /// \deprecated See ModelTransform function that returns
+      /// ignition::math::Matrix4d.
+      public: math::Matrix4 GetModelTransform() GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Retrieve the model transform
+      /// \return the transform
+      public: ignition::math::Matrix4d ModelTransform() const;
 
       /// \brief Retrieve the raw transformations
       /// \return an array of transformations
@@ -326,16 +395,16 @@ namespace gazebo
       protected: SkeletonNodeType type;
 
       /// \brief the transform
-      protected: math::Matrix4 transform;
+      protected: ignition::math::Matrix4d transform;
 
       /// \brief the initial transformation
-      protected: math::Matrix4 initialTransform;
+      protected: ignition::math::Matrix4d initialTransform;
 
       /// \brief the model transformation
-      protected: math::Matrix4 modelTransform;
+      protected: ignition::math::Matrix4d modelTransform;
 
       /// \brief the inverse of the bind pose skeletal transform
-      protected: math::Matrix4 invBindTransform;
+      protected: ignition::math::Matrix4d invBindTransform;
 
       /// \brief the parent node
       protected: SkeletonNode *parent;
@@ -352,7 +421,7 @@ namespace gazebo
 
     /// \clas NodeTransform Skeleton.hh common/common.hh
     /// \brief A transformation node
-    class GAZEBO_VISIBLE NodeTransform
+    class GZ_COMMON_VISIBLE NodeTransform
     {
       /// \brief Enumeration of the transform types
       public: enum TransformType {TRANSLATE, ROTATE, SCALE, MATRIX};
@@ -365,15 +434,31 @@ namespace gazebo
       /// \param[in] _mat the matrix
       /// \param[in] _sid identifier
       /// \param[in] _type the type of transform
+      /// \deprecated See NodeTransform constructor that accepts
+      /// ignition::math::Matrix4d.
       public: NodeTransform(math::Matrix4 _mat, std::string _sid = "_default_",
-                                                TransformType _type = MATRIX);
+                  TransformType _type = MATRIX) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Constructor
+      /// \param[in] _mat the matrix
+      /// \param[in] _sid identifier
+      /// \param[in] _type the type of transform
+      public: NodeTransform(const ignition::math::Matrix4d &_mat,
+                  const std::string &_sid = "_default_",
+                  TransformType _type = MATRIX);
 
       /// \brief Destructor. It does nothing.
       public: ~NodeTransform();
 
       /// \brief Assign a transformation
       /// \param[in] _mat the transform
-      public: void Set(math::Matrix4 _mat);
+      /// \deprecated See Set function that accepts
+      /// ignition::math::Matrix4d.
+      public: void Set(math::Matrix4 _mat) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Assign a transformation
+      /// \param[in] _mat the transform
+      public: void Set(const ignition::math::Matrix4d &_mat);
 
       /// \brief Set transform type
       /// \param[in] _type the type
@@ -383,9 +468,15 @@ namespace gazebo
       /// \param[in] _sid the sid
       public: void SetSID(std::string _sid);
 
-      /// Returns the transformation matrix
+      /// \brief Returns the transformation matrix
       /// \return the matrix
-      public: math::Matrix4 Get();
+      /// \deprecated See GetTransform function that returns
+      /// ignition::math::Matrix4d.
+      public: math::Matrix4 Get() GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Returns the transformation matrix
+      /// \return The transform matrix
+      public: ignition::math::Matrix4d GetTransform() const;
 
       /// \brief Returns the transformation type
       /// \return the type
@@ -400,17 +491,39 @@ namespace gazebo
       /// \param[in] _value the value
       public: void SetComponent(unsigned int _idx, double _value);
 
-      /// \brief Set source data values _
+      /// \brief Set source data values
       /// param[in] _mat the values
-      public: void SetSourceValues(math::Matrix4 _mat);
+      /// \deprecated See SetSourceValues function that accepts
+      /// ignition::math::Matrix4d.
+      public: void SetSourceValues(math::Matrix4 _mat) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Set source data values
-      public: void SetSourceValues(math::Vector3 _vec);
+      /// param[in] _mat the values
+      public: void SetSourceValues(const ignition::math::Matrix4d &_mat);
+
+      /// \brief Set source data values
+      /// \param[in] _vec Vector to set source data values from.
+      /// \deprecated See SetSourceValues function that accepts
+      /// ignition::math::Vector3d.
+      public: void SetSourceValues(math::Vector3 _vec) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set source data values
+      /// \param[in] _vec Vector to set source data values from.
+      public: void SetSourceValues(const ignition::math::Vector3d &_vec);
 
       /// \brief Sets source matrix values from roation
       /// \param[in] _axis of rotation
       /// \param[in] _angle of rotation
-      public: void SetSourceValues(math::Vector3 _axis, double _angle);
+      /// \deprecated See SetSourceValues function that accepts
+      /// ignition::math::Vector3d.
+      public: void SetSourceValues(math::Vector3 _axis, double _angle)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Sets source matrix values from roation
+      /// \param[in] _axis of rotation
+      /// \param[in] _angle of rotation
+      public: void SetSourceValues(const ignition::math::Vector3d &_axis,
+                 const double _angle);
 
       /// \brief Sets the transform matrix from the source according to the type
       public: void RecalculateMatrix();
@@ -420,17 +533,24 @@ namespace gazebo
 
       /// \brief Matrix cast operator
       /// \return the transform
-      public: math::Matrix4 operator() ();
+      public: ignition::math::Matrix4d operator()();
 
       /// \brief Node transform multiplication operator
       /// \param[in] _t a transform
       /// \return transform matrix multiplied by _t's transform
-      public: math::Matrix4 operator* (NodeTransform _t);
+      public: ignition::math::Matrix4d operator*(NodeTransform _t);
 
       /// \brief Matrix multiplication operator
       /// \param[in] _m a matrix
       /// \return transform matrix multiplied by _m
-      public: math::Matrix4 operator* (math::Matrix4 _m);
+      /// \deprecated See operator* that accepts ignition::math::Matrix4d.
+      public: math::Matrix4 operator* (math::Matrix4 _m) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Matrix multiplication operator
+      /// \param[in] _m a matrix
+      /// \return transform matrix multiplied by _m
+      public: ignition::math::Matrix4d operator*(
+                  const ignition::math::Matrix4d &_m);
 
       /// \brief the sid
       protected: std::string sid;
@@ -439,7 +559,7 @@ namespace gazebo
       protected: TransformType type;
 
       /// \brief transform
-      protected: math::Matrix4 transform;
+      protected: ignition::math::Matrix4d transform;
 
       /// \brief source data values (can be a matrix, a position or rotation)
       protected: std::vector<double> source;

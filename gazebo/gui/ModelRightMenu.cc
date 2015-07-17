@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -105,6 +111,13 @@ ModelRightMenu::ModelRightMenu()
   state = new ViewState(this, "show_inertia", "hide_inertia");
   state->action = new QAction(tr("Inertia"), this);
   state->action->setStatusTip(tr("Show moments of inertia"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
+  state = new ViewState(this, "show_link_frame", "hide_link_frame");
+  state->action = new QAction(tr("Link Frames"), this);
+  state->action->setStatusTip(tr("Show link frames"));
   state->action->setCheckable(true);
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);

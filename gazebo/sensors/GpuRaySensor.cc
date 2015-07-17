@@ -19,6 +19,12 @@
  * Date: 29 March 2012
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
@@ -106,9 +112,9 @@ void GpuRaySensor::Load(const std::string &_worldName)
   // Handle noise model settings.
   if (rayElem->HasElement("noise"))
   {
-    this->noises.push_back(
+    this->noises[GPU_RAY_NOISE] =
         NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
-        this->GetType()));
+        this->GetType());
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -603,9 +609,9 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       {
         range = -GZ_DBL_INF;
       }
-      else if (!this->noises.empty())
+      else if (this->noises.find(GPU_RAY_NOISE) != this->noises.end())
       {
-        range = this->noises[0]->Apply(range);
+        range = this->noises[GPU_RAY_NOISE]->Apply(range);
         range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
 

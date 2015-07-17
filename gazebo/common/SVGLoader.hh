@@ -24,6 +24,7 @@
 
 #include <gazebo/common/Console.hh>
 #include <gazebo/math/Vector2d.hh>
+#include <gazebo/math/Matrix3.hh>
 
 class TiXmlElement;
 class TiXmlNode;
@@ -35,7 +36,7 @@ namespace gazebo
     class SVGLoaderPrivate;
 
     /// \brief Handles errors during SVG parsing
-    class GAZEBO_VISIBLE SvgError: public std::runtime_error
+    class GZ_COMMON_VISIBLE SvgError: public std::runtime_error
     {
       /// \brief constructor
       /// \param[in] _what The error description
@@ -43,7 +44,7 @@ namespace gazebo
     };
 
     /// \brief SVG command data structure
-    struct GAZEBO_VISIBLE SVGCommand
+    struct GZ_COMMON_VISIBLE SVGCommand
     {
       /// \brief A letter that describe the segment
       char cmd;  // cppcheck style error is a false positive
@@ -53,7 +54,7 @@ namespace gazebo
     };
 
     /// \brief An SVG path element data structure
-    struct GAZEBO_VISIBLE SVGPath
+    struct GZ_COMMON_VISIBLE SVGPath
     {
       /// \brief An id or name
       std::string id;
@@ -72,7 +73,7 @@ namespace gazebo
     };
 
     /// \brief A loader for SVG files
-    class GAZEBO_VISIBLE SVGLoader
+    class GZ_COMMON_VISIBLE SVGLoader
     {
       /// \brief Constructor
       /// \param[in] _samples The number of points for cubic spline segments
@@ -87,6 +88,17 @@ namespace gazebo
       /// \return false when the file cannot be processed
       public: bool Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
+
+      /// \brief Reads in paths and outputs closed polylines and open polylines
+      /// \param[in] _paths The input paths
+      /// \param[in] _tol Tolerence when comparing distance between 2 points.
+      /// \param[out] _closedPolys A vector to collect new closed loops
+      /// \param[out] _openPolys A vector to collect non closed paths
+      public: static void PathsToClosedPolylines(
+                    const std::vector<common::SVGPath> &_paths,
+                    double _tol,
+                    std::vector< std::vector<math::Vector2d> > &_closedPolys,
+                    std::vector< std::vector<math::Vector2d> > &_openPolys);
 
       /// \brief Outputs the content of the paths to file (or console)
       /// \param[in] _paths The paths

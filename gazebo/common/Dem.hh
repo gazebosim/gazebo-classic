@@ -18,6 +18,9 @@
 #ifndef _GAZEBO_DEM_HH_
 #define _GAZEBO_DEM_HH_
 
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Angle.hh>
+
 #include <gazebo/gazebo_config.h>
 #include <gazebo/util/system.hh>
 
@@ -39,7 +42,7 @@ namespace gazebo
 
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
-    class GAZEBO_VISIBLE Dem : public HeightmapData
+    class GZ_COMMON_VISIBLE Dem : public HeightmapData
     {
       /// \brief Constructor.
       public: Dem();
@@ -70,8 +73,17 @@ namespace gazebo
       /// origin in WGS84.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
+      /// \deprecated See GetGeoReferenceOrigin() that accepts
+      /// ignition::math::Angle objects.
       public: void GetGeoReferenceOrigin(math::Angle &_latitude,
-                                         math::Angle &_longitude);
+                  math::Angle &_longitude) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the georeferenced coordinates (lat, long) of the terrain's
+      /// origin in WGS84.
+      /// \param[out] _latitude Georeferenced latitude.
+      /// \param[out] _longitude Georeferenced longitude.
+      public: void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,
+                  ignition::math::Angle &_longitude) const;
 
       /// \brief Get the terrain's height. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
@@ -109,9 +121,28 @@ namespace gazebo
       /// \param[in] _flipY If true, it inverts the order in which the vector
       /// is filled.
       /// \param[out] _heights Vector containing the terrain heights.
+      /// \deprecated See FillHeightMap() function that accepts
+      /// ignition::math objects.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
           const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
-          std::vector<float> &_heights);
+          std::vector<float> &_heights) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Create a lookup table of the terrain's height.
+      /// \param[in] _subsampling Multiplier used to increase the resolution.
+      /// Ex: A subsampling of 2 in a terrain of 129x129 means that the height
+      /// vector will be 257 * 257.
+      /// \param[in] _vertSize Number of points per row.
+      /// \param[in] _size Real dimmensions of the terrain in meters.
+      /// \param[in] _scale Vector3 used to scale the height.
+      /// \param[in] _flipY If true, it inverts the order in which the vector
+      /// is filled.
+      /// \param[out] _heights Vector containing the terrain heights.
+      public: void FillHeightMap(const int _subSampling,
+                  const unsigned int _vertSize,
+                  const ignition::math::Vector3d &_size,
+                  const ignition::math::Vector3d &_scale,
+                  const bool _flipY,
+                  std::vector<float> &_heights);
 
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
       /// pixel in WGS84.
@@ -120,8 +151,8 @@ namespace gazebo
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       private: void GetGeoReference(double _x, double _y,
-                                    math::Angle &_latitude,
-                                    math::Angle &_longitude);
+                                    ignition::math::Angle &_latitude,
+                                    ignition::math::Angle &_longitude) const;
 
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing

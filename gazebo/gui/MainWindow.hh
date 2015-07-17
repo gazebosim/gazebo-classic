@@ -22,8 +22,11 @@
 #include <vector>
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/DataLogger.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -90,6 +93,22 @@ namespace gazebo
       /// \param[in] _menu Menu to be added.
       public: void AddMenu(QMenu *_menu);
 
+      /// \brief Show a custom menubar. If NULL is used, the default menubar
+      /// is shown.
+      /// \param[in] _bar The menubar to show. NULL will show the default
+      /// menubar.
+      public: void ShowMenuBar(QMenuBar *_bar = NULL);
+
+      /// \brief Create a new action with information from the given action,
+      /// such as text and tooltip. The new action triggers the original action
+      /// and follows its checked state. This is used for example to have the
+      /// "same" action on the main window menu and the model editor menu,
+      /// since an action can't be added to 2 different menus.
+      /// \param[in] _action Action to be cloned.
+      /// \param[in] _parent Parent for the new action.
+      /// \return The new action.
+      public: QAction *CloneAction(QAction *_action, QObject *_parent);
+
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.
       /// \return Pointer to the editor.
@@ -154,6 +173,9 @@ namespace gazebo
       /// \brief Qt callback when the show grid action is triggered.
       private slots: void ShowGrid();
 
+      /// \brief Qt callback when the show origin action is triggered.
+      private slots: void ShowOrigin();
+
       /// \brief Qt callback when the show collisions action is triggered.
       private slots: void ShowCollisions();
 
@@ -169,8 +191,15 @@ namespace gazebo
       /// \brief Qt callback when the show inertia action is triggered.
       private slots: void ShowInertia();
 
-      private slots: void Reset();
+      /// \brief Qt callback when the show link frame action is triggered.
+      private slots: void ShowLinkFrame();
+
+      /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
+
+      /// \brief Qt callback when the show toolbars action is triggered.
+      private slots: void ShowToolbars();
+
       private slots: void FPS();
       private slots: void Orbit();
       private slots: void ViewOculus();
@@ -178,11 +207,15 @@ namespace gazebo
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
       private slots: void SetWireframe();
+
       /// \brief Qt callback when the show GUI overlays action is triggered.
       private slots: void ShowGUIOverlays();
 
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
+
+      /// \brief QT callback when the data logger is shut down.
+      private slots: void OnDataLoggerClosed();
 
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
@@ -200,6 +233,11 @@ namespace gazebo
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
+
+      /// \brief Toggle toolbars display.
+      /// \param[in] _value True to display toolbars.
+      private: void OnShowToolbars(bool _value);
+
       private: void OnMoveMode(bool _mode);
 
       /// \brief Create most of the actions.
@@ -216,12 +254,6 @@ namespace gazebo
 
       /// \brief Create all the editors.
       private: void CreateEditors();
-
-      /// \brief Show a custom menubar. If NULL is used, the default menubar
-      /// is shown.
-      /// \param[in] _bar The menubar to show. NULL will show the default
-      /// menubar.
-      public: void ShowMenuBar(QMenuBar *_bar = NULL);
 
       private: void OnModel(ConstModelPtr &_msg);
 
@@ -325,6 +357,9 @@ namespace gazebo
 
       /// \brief Splitter for the main window.
       private: QSplitter *splitter;
+
+      /// \brief Data logger dialog.
+      private: gui::DataLogger *dataLogger;
     };
   }
 }

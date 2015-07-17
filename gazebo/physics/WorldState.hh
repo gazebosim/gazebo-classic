@@ -43,7 +43,7 @@ namespace gazebo
     /// Instances of this class contain the state of a World at a specific
     /// time. World state includes the state of all models, and their
     /// children.
-    class GAZEBO_VISIBLE WorldState : public State
+    class GZ_PHYSICS_VISIBLE WorldState : public State
     {
       /// \brief Default constructor
       public: WorldState();
@@ -130,6 +130,11 @@ namespace gazebo
       /// \param[in] _time Simulation time when the data was recorded.
       public: virtual void SetSimTime(const common::Time &_time);
 
+      /// \brief Set the simulation interations when this state was generated
+      /// \param[in] _iterations Simulation iterations when the data was
+      /// recorded.
+      public: virtual void SetIterations(const uint64_t _iterations);
+
       /// \brief Assignment operator
       /// \param[in] _state State value
       /// \return Reference to this
@@ -155,7 +160,8 @@ namespace gazebo
         _out << "<state world_name='" << _state.name << "'>"
           << "<sim_time>" << _state.simTime << "</sim_time>"
           << "<wall_time>" << _state.wallTime << "</wall_time>"
-          << "<real_time>" << _state.realTime << "</real_time>";
+          << "<real_time>" << _state.realTime << "</real_time>"
+          << "<iterations>" << _state.iterations << "</iterations>";
 
         // List all of the inserted models
         if (_state.insertions.size() > 0)
