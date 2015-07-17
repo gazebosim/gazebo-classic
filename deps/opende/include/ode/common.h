@@ -312,6 +312,7 @@ enum {
   dParamCFM, \
   dParamStopERP, \
   dParamStopCFM, \
+  dParamStopMinDepth, \
   /* parameters for suspension */ \
   dParamSuspensionERP, \
   dParamSuspensionCFM, \

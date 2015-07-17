@@ -182,6 +182,7 @@ struct dxJointLimitMotor
     dReal fudge_factor;     // when powering away from joint limits
     dReal normal_cfm;       // cfm to use when not at a stop
     dReal stop_erp, stop_cfm; // erp and cfm for when at joint limit
+    dReal stop_min_depth; // surface contact layer for joint stops
     dReal bounce;           // restitution factor
     // variables used between getInfo1() and getInfo2()
     int limit;          // 0=free, 1=at lo limit, 2=at hi limit
