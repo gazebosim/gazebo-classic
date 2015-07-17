@@ -766,13 +766,13 @@ void DARTLink::SetLinkStatic(bool _static)
     // Add weld joint constraint to DART
     this->dataPtr->dtWeldJointConst =
         new dart::constraint::WeldJointConstraint(this->dataPtr->dtBodyNode);
-    GetDARTWorld()->getConstraintSolver()->addConstraint(
+    GetDARTWorldPtr()->getConstraintSolver()->addConstraint(
         this->dataPtr->dtWeldJointConst);
   }
   else
   {
     // Remove ball and revolute joint constraints from DART
-    GetDARTWorld()->getConstraintSolver()->removeConstraint(
+    GetDARTWorldPtr()->getConstraintSolver()->removeConstraint(
         this->dataPtr->dtWeldJointConst);
     delete this->dataPtr->dtWeldJointConst;
     this->dataPtr->dtWeldJointConst = NULL;
@@ -808,6 +808,12 @@ DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 dart::simulation::World *DARTLink::GetDARTWorld(void) const
 {
   return GetDARTPhysics()->GetDARTWorld();
+}
+
+//////////////////////////////////////////////////
+dart::simulation::WorldPtr DARTLink::GetDARTWorldPtr(void) const
+{
+  return GetDARTPhysics()->GetDARTWorldPtr();
 }
 
 //////////////////////////////////////////////////

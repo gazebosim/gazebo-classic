@@ -193,7 +193,8 @@ void DARTModel::Init()
   {
     this->dataPtr->dtSkeleton->enableSelfCollision();
 
-    dart::simulation::World *dtWorld = this->GetDARTPhysics()->GetDARTWorld();
+    dart::simulation::WorldPtr dtWorld =
+        this->GetDARTPhysics()->GetDARTWorldPtr();
     dart::collision::CollisionDetector *dtCollDet =
         dtWorld->getConstraintSolver()->getCollisionDetector();
 
@@ -228,7 +229,7 @@ void DARTModel::Init()
   this->BackupState();
 
   // Add the skeleton to the world
-  this->GetDARTWorld()->addSkeleton(this->dataPtr->dtSkeleton);
+  this->GetDARTWorldPtr()->addSkeleton(this->dataPtr->dtSkeleton);
 }
 
 
@@ -272,6 +273,12 @@ dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
 }
 
 //////////////////////////////////////////////////
+dart::dynamics::SkeletonPtr DARTModel::GetDARTSkeletonPtr()
+{
+  return this->dataPtr->dtSkeleton;
+}
+
+//////////////////////////////////////////////////
 DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 {
   return boost::dynamic_pointer_cast<DARTPhysics>(
@@ -282,4 +289,10 @@ DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 dart::simulation::World *DARTModel::GetDARTWorld(void) const
 {
   return GetDARTPhysics()->GetDARTWorld();
+}
+
+//////////////////////////////////////////////////
+dart::simulation::WorldPtr DARTModel::GetDARTWorldPtr(void) const
+{
+  return GetDARTPhysics()->GetDARTWorldPtr();
 }
