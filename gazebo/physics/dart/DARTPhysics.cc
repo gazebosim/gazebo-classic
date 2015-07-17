@@ -469,6 +469,8 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::DART);
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+        msgs::Convert(this->MagneticField()));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);

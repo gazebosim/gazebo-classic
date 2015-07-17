@@ -716,6 +716,8 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
   {
     if ((*iter)->propertyName().toStdString() == "gravity")
       this->FillVector3Msg((*iter), msg.mutable_gravity());
+    else if ((*iter)->propertyName().toStdString() == "magnetic field")
+      this->FillVector3Msg((*iter), msg.mutable_magnetic_field());
     else if ((*iter)->propertyName().toStdString() == "enable physics")
       msg.set_enable_physics(this->variantManager->value((*iter)).toBool());
     else if ((*iter)->propertyName().toStdString() == "solver")
@@ -2588,6 +2590,20 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     xyz.set_y(0);
     xyz.set_z(-9.8);
     this->FillVector3dProperty(xyz, gravityItem);
+  }
+
+  QtProperty *magneticFieldItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("magnetic field"));
+  this->propTreeBrowser->addProperty(magneticFieldItem);
+  if (_msg.has_magnetic_field())
+    this->FillVector3dProperty(_msg.magnetic_field(), magneticFieldItem);
+  else
+  {
+    msgs::Vector3d xyz;
+    xyz.set_x(0.0);
+    xyz.set_y(0.0);
+    xyz.set_z(0.0);
+    this->FillVector3dProperty(xyz, magneticFieldItem);
   }
 
   QtProperty *solverItem = this->variantManager->addProperty(
