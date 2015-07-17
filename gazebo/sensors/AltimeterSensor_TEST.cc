@@ -51,7 +51,6 @@ class AltimeterSensor_TEST : public ServerFixture,
   /// \param[in] _physicsEngine The type of physics engine to use.
   public: void LinearAngularAltimeterSensorCheck(
               const std::string &_physicsEngine);
-
 };
 
 // An altitude sensor
@@ -292,6 +291,7 @@ TEST_P(AltimeterSensor_TEST, AngularAltimeterSensorCheck)
   AngularAltimeterSensorCheck(GetParam());
 }
 
+/////////////////////////////////////////////////
 TEST_P(AltimeterSensor_TEST, LinearAngularAltimeterSensorCheck)
 {
   LinearAngularAltimeterSensorCheck(GetParam());
