@@ -1351,6 +1351,8 @@ fragment_program Gazebo/WideLensMapFS glsl
   default_params
   {
     param_named envMap int 0
+    param_named projectionType int 0
+    param_named HFOV float 90
   }
 }
 

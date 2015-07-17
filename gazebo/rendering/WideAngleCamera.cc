@@ -39,6 +39,22 @@ void WideAngleCamera::Init()
   this->CreateEnvCameras();
 }
 
+void WideAngleCamera::Load()
+{
+  Camera::Load();
+
+  if(this->sdf->HasElement("projection"))
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("projection");
+
+    this->projectionType = elem->Get<int>("type");
+  }
+  else
+  {
+    this->projectionType = 0;
+  }
+}
+
 void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
@@ -163,5 +179,33 @@ void WideAngleCamera::RenderImpl()
   compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
     this->envCubeMapTexture->getName());
 
+  Ogre::GpuProgramParametersSharedPtr uniforms =
+    compMat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+
+  uniforms->setNamedConstant("HFOV",(Ogre::Real)Camera::GetHFOV().Radian());
+  uniforms->setNamedConstant("projectionType",this->projectionType);
+
   this->renderTarget->update();
+}
+
+void WideAngleCamera::SetClipDist()
+{
+  sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
+  if (!clipElem)
+    gzthrow("Camera has no <clip> tag.");
+
+  for(int i=0;i<6;i++)
+  {
+    if(this->envCameras[i])
+    {
+      this->envCameras[i]->setNearClipDistance(clipElem->Get<double>("near"));
+      this->envCameras[i]->setFarClipDistance(clipElem->Get<double>("far"));
+      this->envCameras[i]->setRenderingDistance(clipElem->Get<double>("far"));
+    }
+    else
+    {
+      gzerr << "Setting clip distances failed -- no camera yet\n";
+      break;
+    }
+  }
 }

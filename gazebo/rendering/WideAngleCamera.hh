@@ -26,9 +26,13 @@ namespace gazebo
 
       private: void CreateEnvCameras();
 
+      public: virtual void SetClipDist();
+
       protected: virtual void RenderImpl();
 
       public: virtual void Init();
+
+      public: virtual void Load();
 
       protected: Ogre::CompositorInstance *wamapInstance;
 
@@ -41,6 +45,8 @@ namespace gazebo
       private: int envTextureSize;
 
       private: Ogre::MaterialPtr compMat;
+
+      private: int projectionType;
     };
   }
 }
