@@ -94,11 +94,10 @@ void WideAngleCameraSensor::Init()
 
     if (cameraSdf->HasElement("noise"))
     {
-      NoisePtr noise =
-          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
+      this->noises[CAMERA_NOISE] =
+        NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
         this->GetType());
-      this->noises.push_back(noise);
-      noise->SetCamera(this->camera);
+      this->noises[CAMERA_NOISE]->SetCamera(this->camera);
     }
   }
   else
