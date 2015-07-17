@@ -64,7 +64,8 @@ math::Vector3 DARTFixedJoint::GetAnchor(unsigned int /*index*/) const
 //////////////////////////////////////////////////
 math::Vector3 DARTFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  gzerr << "called invalid method GetGlobalAxis in a fixed joint\n";
+  gzwarn << "DARTFixedJoint: called method "
+         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
 
   return math::Vector3();
 }
@@ -73,61 +74,53 @@ math::Vector3 DARTFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
 void DARTFixedJoint::SetAxis(unsigned int /*_index*/,
                              const math::Vector3& /*_axis*/)
 {
-  gzerr << "called invalid method SetAxis in a fixed joint\n";
-
+  gzwarn << "DARTFixedJoint: called method "
+         << "SetAxis that is not valid for joints of type fixed.\n";
   return;
 }
 
 //////////////////////////////////////////////////
 math::Angle DARTFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
-  math::Angle result;
-
-  gzerr << "called invalid method GetAngleImpl in a fixed joint\n";
-
-  return result;
+  gzwarn << "DARTFixedJoint: called method "
+         << "GetAngleImpl that is not valid for joints of type fixed.\n";
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
 void DARTFixedJoint::SetVelocity(unsigned int /*_index*/, double /*_vel*/)
 {
-  gzerr << "called invalid method SetVelocity in a fixed joint\n";
-
+  gzwarn << "DARTFixedJoint: called method "
+         << "SetVelocity that is not valid for joints of type fixed.\n";
   return;
 }
 
 //////////////////////////////////////////////////
 double DARTFixedJoint::GetVelocity(unsigned int /*_index*/) const
 {
-  double result = 0.0;
-
-  gzerr << "called invalid method GetVelocity in a fixed joint\n";
-
-  return result;
+  gzwarn << "DARTFixedJoint: called method "
+         << "GetVelocity that is not valid for joints of type fixed.\n";
+  return 0.0;
 }
 
 //////////////////////////////////////////////////
 void DARTFixedJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
 {
-  gzerr << "called invalid method SetMaxForce in a fixed joint\n";
-
-  return;
+  gzwarn << "DARTFixedJoint: called method "
+         << "SetMaxForce that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 double DARTFixedJoint::GetMaxForce(unsigned int /*_index*/)
 {
-  double result = 0.0;
-
-  gzerr << "called invalid method GetMaxForce in a fixed joint\n";
-
-  return result;
+  gzwarn << "DARTFixedJoint: called method "
+         << "GetMaxForce that is not valid for joints of type fixed.\n";
+  return 0.0;
 }
 
 //////////////////////////////////////////////////
 void DARTFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 {
-  gzerr << "called invalid method SetForceImpl in a fixed joint\n";
-
-  return;
+  gzwarn << "DARTFixedJoint: called method "
+         << "SetForceImpl that is not valid for joints of type fixed.\n";
 }

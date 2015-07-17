@@ -159,41 +159,38 @@ void BulletFixedJoint::Init()
 void BulletFixedJoint::SetAxis(unsigned int /*_index*/,
     const math::Vector3 &/*_axis*/)
 {
-  gzerr << "called invalid method SetAxis in a fixed joint\n";
-
-  return;
+  gzwarn << "BulletFixedJoint: called method "
+         << "SetAxis that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
-  math::Angle result;
-
-  gzerr << "called invalid method GetAngleImpl in a fixed joint\n";
-
-  return result;
+  gzwarn << "BulletFixedJoint: called method "
+         << "GetAngleImpl that is not valid for joints of type fixed.\n";
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
 void BulletFixedJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
-  gzerr << "called invalid method SetVelocity in a fixed joint\n";
+  gzwarn << "BulletFixedJoint: called method "
+         << "SetVelocity that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 double BulletFixedJoint::GetVelocity(unsigned int /*_index*/) const
 {
-  gzerr << "called invalid method GetVelocity in a fixed joint\n";
-
+  gzwarn << "BulletFixedJoint: called method "
+         << "GetVelocity that is not valid for joints of type fixed.\n";
   return 0.0;
 }
 
 //////////////////////////////////////////////////
 void BulletFixedJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
-  gzerr << "called invalid method SetMaxForce in a fixed joint\n";
-
-  return;
+  gzwarn << "BulletFixedJoint: called method "
+         << "SetMaxForce that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////

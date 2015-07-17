@@ -48,11 +48,9 @@ void ODEFixedJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 math::Vector3 ODEFixedJoint::GetAnchor(unsigned int /*index*/) const
 {
-  dVector3 result;
-
-  gzerr << "invalid method GetAnchor for fixed joints\n";
-
-  return math::Vector3(result[0], result[1], result[2]);
+  gzwarn << "SimbodyFixedJoint: called method "
+         << "GetAnchor that is not valid for joints of type fixed.\n";;
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
@@ -68,63 +66,62 @@ void ODEFixedJoint::SetAnchor(unsigned int /*index*/,
 //////////////////////////////////////////////////
 math::Vector3 ODEFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  dVector3 result;
-
-  gzerr << "called invalid method GetGlobalAxis in a fixed joint\n";
-
-  return math::Vector3(result[0], result[1], result[2]);
+  gzwarn << "SimbodyFixedJoint: called method "
+         << "GetGlobalAxis that is not valid for joints of type fixed.\n";;
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 void ODEFixedJoint::SetAxis(unsigned int /*_index*/,
                             const math::Vector3 &/*_axis*/)
 {
-  gzerr << "called invalid method SetAxis in a fixed joint\n";
+  gzwarn << "ODEFixedJoint: called method "
+         << "SetAxis that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 math::Angle ODEFixedJoint::GetAngleImpl(unsigned int /*index*/) const
 {
-  math::Angle result;
-
-  gzerr << "called invalid method GetAngleImpl in a fixed joint\n";
-
-  return result;
+  gzwarn << "ODEFixedJoint: called method "
+         << "GetAngleImpl that is not valid for joints of type fixed.\n";
+  return math::Angle();
 }
 
 //////////////////////////////////////////////////
 double ODEFixedJoint::GetVelocity(unsigned int /*index*/) const
 {
-  double result = 0;
-
-  gzerr << "called invalid method GetVelocity in a fixed joint\n";
-
-  return result;
+  gzwarn << "ODEFixedJoint: called method "
+         << "GetVelocity that is not valid for joints of type fixed.\n";
+  return 0.0;
 }
 
 //////////////////////////////////////////////////
 void ODEFixedJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
-  gzerr << "called invalid method SetVelocity in a fixed joint\n";
+  gzwarn << "ODEFixedJoint: called method "
+         << "SetVelocity that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 void ODEFixedJoint::SetMaxForce(unsigned int /*index*/, double /*_t*/)
 {
-  gzerr << "called invalid method SetMaxForce in a fixed joint\n";
+  gzwarn << "ODEFixedJoint: called method "
+         << "SetMaxForce that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 double ODEFixedJoint::GetMaxForce(unsigned int /*index*/)
 {
-  gzerr << "called invalid method GetMaxForce in a fixed joint\n";
-  return 0;
+  gzwarn << "ODEFixedJoint: called method "
+         << "GetMaxForce that is not valid for joints of type fixed.\n";
+  return 0.0;
 }
 
 //////////////////////////////////////////////////
 void ODEFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 {
-  gzerr << "called invalid method SetForceImpl in a fixed joint\n";
+  gzwarn << "ODEFixedJoint: called method "
+         << "SetForceImpl that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////

@@ -49,54 +49,54 @@ void SimbodyFixedJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void SimbodyFixedJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
-  gzdbg << "SimbodyFixedJoint::SetVelocity: "
-        << "doesn't make sense in fixed joints...\n";
+  gzwarn << "SimbodyFixedJoint: called method "
+         << "SetVelocity that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyFixedJoint::GetVelocity(unsigned int /*index*/) const
 {
-  gzdbg << "SimbodyFixedJoint::GetVelocity: "
-        << "doesn't make sense in fixed joints...\n";
-  return 0;
+  gzwarn << "SimbodyFixedJoint: called method "
+         << "GetVelocity that is not valid for joints of type fixed.\n";
+  return 0.0;
 }
 
 //////////////////////////////////////////////////
 void SimbodyFixedJoint::SetMaxForce(unsigned int /*_index*/,
                                     double /*_force*/)
 {
-  gzdbg << "SimbodyFixedJoint::SetMaxForce: "
-        << "doesn't make sense in simbody...\n";
+  gzwarn << "SimbodyFixedJoint: called method "
+         << "SetMaxForce that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyFixedJoint::GetMaxForce(unsigned int /*index*/)
 {
-  gzdbg << "SimbodyFixedJoint::GetMaxForce: "
-        << "doesn't make sense in simbody...\n";
-  return 0;
+  gzwarn << "SimbodyFixedJoint: called method "
+         << "GetMaxForce that is not valid for joints of type fixed.\n";
+  return 0.0;
 }
 
 //////////////////////////////////////////////////
 void SimbodyFixedJoint::SetForceImpl(unsigned int /*_index*/,
                                      double /*_torque*/)
 {
-    gzdbg << "SimbodyFixedJoint::SetForceImpl: "
-          << "doesn't make sense in fixed joints...\n";
+  gzwarn << "SimbodyFixedJoint: called method "
+         << "SetForceImpl that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyFixedJoint::GetGlobalAxis(unsigned int /*index*/) const
 {
-  gzdbg << "SimbodyFixedJoint::GetGlobalAxis: "
-        << "doesn't make sense in fixed joints...\n";
+  gzwarn << "SimbodyFixedJoint: called method "
+         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 math::Angle SimbodyFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
-    gzdbg << "SimbodyFixedJoint::GetAngleImpl: "
-          << "doesn't make sense in fixed joints...\n";
-    return math::Angle();
+  gzwarn << "SimbodyFixedJoint: called method "
+         << "GetAngleImpl that is not valid for joints of type fixed.\n";
+  return math::Angle();
 }
