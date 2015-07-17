@@ -59,8 +59,7 @@ void BulletFixedJoint::Init()
       boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
-  math::Vector3 axis;
-  axis.Set(0, 0, 1);
+  math::Vector3 axis = math::Vector3::UnitZ;
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
@@ -196,16 +195,16 @@ void BulletFixedJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 //////////////////////////////////////////////////
 double BulletFixedJoint::GetMaxForce(unsigned int /*_index*/)
 {
-  gzerr << "called invalid method GetMaxForce in a fixed joint\n";
-
+  gzwarn << "BulletFixedJoint: called method "
+         << "GetMaxForce that is not valid for joints of type fixed.\n";
   return 0.0;
 }
 
 //////////////////////////////////////////////////
 void BulletFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 {
-  gzerr << "called invalid method SetForceImpl in a fixed joint\n";
-
+  gzwarn << "BulletFixedJoint: called method "
+         << "SetForceImpl that is not valid for joints of type fixed.\n";
   return;
 }
 
@@ -213,8 +212,8 @@ void BulletFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 bool BulletFixedJoint::SetHighStop(unsigned int /*_index*/,
                       const math::Angle &/*_angle*/)
 {
-  gzerr << "called invalid method SetHighStop in a fixed joint\n";
-
+  gzwarn << "BulletFixedJoint: called method "
+         << "SetHighStop that is not valid for joints of type fixed.\n";
   return false;
 }
 
@@ -222,15 +221,15 @@ bool BulletFixedJoint::SetHighStop(unsigned int /*_index*/,
 bool BulletFixedJoint::SetLowStop(unsigned int /*_index*/,
                      const math::Angle &/*_angle*/)
 {
-  gzerr << "called invalid method SetLowStop in a fixed joint\n";
-
+  gzwarn << "BulletFixedJoint: called method "
+         << "SetLowStop that is not valid for joints of type fixed.\n";
   return false;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  gzerr << "called invalid method GetGlobalAxis in a fixed joint\n";
-
+  gzwarn << "BulletFixedJoint: called method "
+         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
   return math::Vector3();
 }
