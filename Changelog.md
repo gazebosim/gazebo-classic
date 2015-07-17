@@ -1,4 +1,8 @@
 ## Gazebo 6.0
+
+1. Added altimeter sensor. A contribution from Andrew Symington.
+    * [Pull request #1792](https://bitbucket.org/osrf/gazebo/pull-request/1792)
+
 1. Implement more control options for log playback:
   1. Rewind: The simulation starts from the beginning.
   1. Forward: The simulation jumps to the end of the log file.
@@ -350,6 +354,10 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Added lines to laser sensor visualization 
+    * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
+    * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
 
 1. Fix BulletSliderJoint friction for bullet 2.83
     * [Pull request #1686](https://bitbucket.org/osrf/gazebo/pull-request/1686)

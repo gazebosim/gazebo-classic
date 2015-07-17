@@ -63,6 +63,7 @@
     * [Pull request #1771](https://bitbucket.org/osrf/gazebo/pull-request/1771)
     * [Pull request #1776](https://bitbucket.org/osrf/gazebo/pull-request/1776)
     * [Pull request #1777](https://bitbucket.org/osrf/gazebo/pull-request/1777)
+    * [Pull request #1772](https://bitbucket.org/osrf/gazebo/pull-request/1772)
     * [Pull request #1773](https://bitbucket.org/osrf/gazebo/pull-request/1773)
 
 1. Gazebo client's should now use `gazebo/gazebo_client.hh` and `libgazebo_client.so` instead of `gazebo/gazebo.hh` and `libgazebo.so`. This separates running a Gazebo server from a Gazebo client.

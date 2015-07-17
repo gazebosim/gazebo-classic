@@ -30,6 +30,7 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    class AltimeterSensor;
     class Sensor;
     class RaySensor;
     class CameraSensor;
@@ -49,6 +50,10 @@ namespace gazebo
     class WirelessTransceiver;
     class WirelessTransmitter;
     class WirelessReceiver;
+
+    /// \def AltimeterSensorPtr
+    /// \brief Shared pointer to AltimeterSensor
+    typedef boost::shared_ptr<AltimeterSensor> AltimeterSensorPtr;
 
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
@@ -125,6 +130,10 @@ namespace gazebo
     /// \def WirelessReceiverPtr
     /// \brief Shared pointer to WirelessReceiver
     typedef boost::shared_ptr<WirelessReceiver> WirelessReceiverPtr;
+
+    /// \def AltimeterSensor_V
+    /// \brief Vector of AltimeterSensor shared pointers
+    typedef std::vector<AltimeterSensor> AltimeterSensor_V;
 
     /// \def Sensor_V
     /// \brief Vector of Sensor shared pointers
@@ -220,7 +229,15 @@ namespace gazebo
 
       /// \brief Noise streams for the ray sensor
       /// \sa RaySensor
-      RAY_NOISE = 9
+      RAY_NOISE = 9,
+
+      /// \brief Vertical noise stream for the altimeter sensor
+      /// \sa AltimeterSensor
+      ALTIMETER_POSITION_NOISE_METERS = 10,
+
+      /// \brief Velocity noise streams for the altimeter sensor
+      /// \sa AltimeterSensor
+      ALTIMETER_VELOCITY_NOISE_METERS_PER_S = 11
     };
     /// \}
   }
