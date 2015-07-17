@@ -115,7 +115,7 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // Spawn an alimeter
+  // Spawn an altimeter
   std::string modelName = "altModel";
   std::string altSensorName = "altSensor";
   ignition::math::Pose3d modelPose(0, 0, 10, 0, 0, 0);

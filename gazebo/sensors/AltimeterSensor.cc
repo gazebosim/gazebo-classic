@@ -179,21 +179,21 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-double AltimeterSensor::Altitude()
+double AltimeterSensor::Altitude() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->altMsg.vertical_position();
 }
 
 //////////////////////////////////////////////////
-double AltimeterSensor::VerticalVelocity()
+double AltimeterSensor::VerticalVelocity() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->altMsg.vertical_velocity();
 }
 
 //////////////////////////////////////////////////
-double AltimeterSensor::ReferenceAltitude()
+double AltimeterSensor::ReferenceAltitude() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->altMsg.vertical_reference();

@@ -35,7 +35,7 @@ namespace gazebo
       /// \brief Mutex to protect reads and writes.
       public: mutable std::mutex mutex;
 
-      /// \brief GPS data publisher.
+      /// \brief Altimeter data publisher.
       public: transport::PublisherPtr altPub;
 
       /// \brief Parent link of this sensor.

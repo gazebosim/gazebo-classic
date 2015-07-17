@@ -69,15 +69,15 @@ namespace gazebo
 
       /// \brief Accessor for current vertical position
       /// \return Current vertical position
-      public: double Altitude();
+      public: double Altitude() const;
 
       /// \brief Accessor for current vertical velocity
       /// \return Current vertical velocity
-      public: double VerticalVelocity();
+      public: double VerticalVelocity() const;
 
       /// \brief Accessor for the reference altitude
       /// \return Current reference altitude
-      public: double ReferenceAltitude();
+      public: double ReferenceAltitude() const;
 
       /// \brief Accessor for current vertical velocity
       /// \param[in] _refAlt reference altitude
