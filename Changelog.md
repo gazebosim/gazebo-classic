@@ -1,6 +1,6 @@
 ## Gazebo 6.0
 
-1. Added alimeter sensor. A contribution from Andrew Symington.
+1. Added altimeter sensor. A contribution from Andrew Symington.
     * [Pull request #1792](https://bitbucket.org/osrf/gazebo/pull-request/1792)
 
 1. Implement more control options for log playback:
