@@ -178,10 +178,6 @@ void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
   ignition::math::Vector3d avel =
     model->GetLink("link")->GetRelativeAngularVel().Ign();
 
-  // Get the link's linear velocity
-  ignition::math::Vector3d lvel =
-    model->GetLink("link")->GetWorldLinearVel(math::Vector3(0, 5, 0)).Ign();
-
   // Expect the altimeter's velocity to equal the angular velocity at the
   // end of the rod.
   EXPECT_NEAR(altSensor->VerticalVelocity(), avel.Sum() * 10, 1e-3);
