@@ -29,7 +29,7 @@ void SaveDialogTestHelper::CheckFileDialog()
   QVERIFY(fileDialog);
 
   // set default path to home dir.
-  fileDialog->selectFile(QDir::homePath());
+  fileDialog->setDirectory(QDir::homePath());
 
   // hit enter to close dialog
   QTest::keyClick(fileDialog, Qt::Key_Enter);
