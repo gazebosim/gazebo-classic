@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _EVENT_HH_
-#define _EVENT_HH_
+#ifndef _GAZEBO_EVENT_HH_
+#define _GAZEBO_EVENT_HH_
 
+#include <atomic>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -133,14 +134,32 @@ namespace gazebo
     };
 
     /// \internal
+    template<typename T>
+    class EventConnection
+    {
+      /// \brief Constructor
+      public: EventConnection(const bool _on,
+                  boost::function<T> *_cb)
+              : on(_on), callback(_cb)
+      {
+      }
+
+      /// \brief On/off value for the event callback
+      public: std::atomic_bool on;
+
+      /// \brief Callback function
+      public: std::shared_ptr<boost::function<T> > callback;
+    };
+
+    /// \internal
     // Private data members for EventT<T> class.
     template< typename T>
     class GZ_COMMON_VISIBLE EventTPrivate : public EventPrivate
     {
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
-      typedef std::map<int,
-              std::shared_ptr<boost::function<T> > > EvtConnectionMap;
+      typedef std::map<int, std::shared_ptr<EventConnection<T> > >
+        EvtConnectionMap;
 
       /// \brief Array of connection callbacks.
       public: EvtConnectionMap connections;
@@ -338,7 +357,10 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)();
+        {
+          if (iter.second->on)
+            (*iter.second->callback)();
+        }
       }
 
       /// \brief Signal the event with one parameter.
@@ -350,7 +372,10 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p);
+        }
       }
 
       /// \brief Signal the event with two parameter.
@@ -363,7 +388,10 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2);
+        }
       }
 
       /// \brief Signal the event with three parameter.
@@ -377,7 +405,10 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3);
+        }
       }
 
       /// \brief Signal the event with four parameter.
@@ -393,7 +424,10 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3, _p4);
+        }
       }
 
       /// \brief Signal the event with five parameter.
@@ -411,7 +445,10 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5);
+        }
       }
 
       /// \brief Signal the event with six parameter.
@@ -430,7 +467,10 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6);
+        }
       }
 
       /// \brief Signal the event with seven parameter.
@@ -450,7 +490,10 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections.begin())
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+        {
+          if (iter.second->on)
+            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+        }
       }
 
       /// \brief Signal the event with eight parameter.
@@ -472,7 +515,12 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+        {
+          if (iter.second->on)
+          {
+            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+          }
+        }
       }
 
       /// \brief Signal the event with nine parameter.
@@ -496,7 +544,13 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+        {
+          if (iter.second->on)
+          {
+            (*iter.second->callback)(
+                _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
+          }
+        }
       }
 
       /// \brief Signal the event with ten parameter.
@@ -521,7 +575,13 @@ namespace gazebo
 
         this->myDataPtr->signaled = true;
         for (auto iter: this->myDataPtr->connections)
-          (*iter.second)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
+        {
+          if (iter.second->on)
+          {
+            (*iter.second->callback)(
+                _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
+          }
+        }
       }
 
       /// \internal
@@ -559,8 +619,8 @@ namespace gazebo
         auto const &iter = this->myDataPtr->connections.rbegin();
         index = iter->first + 1;
       }
-      this->myDataPtr->connections[index].reset(
-          new boost::function<T>(_subscriber));
+      this->myDataPtr->connections[index].reset(new EventConnection<T>(true,
+          new boost::function<T>(_subscriber)));
       return ConnectionPtr(new Connection(this, index));
     }
 
@@ -595,21 +655,8 @@ namespace gazebo
 
       if (it != this->myDataPtr->connections.end())
       {
-        // Add connection to list for removal later
-        std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
+        it->second->on = false;
         this->myDataPtr->connectionsToRemove.push_back(it);
-
-        // Make sure we can get a lock
-        /*if (this->myDataPtr->mutex.try_lock())
-        {
-          this->myDataPtr->connections.erase(it);
-          this->myDataPtr->mutex.unlock();
-        }
-        else
-        {
-          std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
-          this->myDataPtr->connectionsToRemove.push_back(it);
-        }*/
       }
     }
 

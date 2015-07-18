@@ -204,6 +204,7 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
+  std::cout << "Visual::Fini\n";
   this->dataPtr->plugins.clear();
 
   // Detach from the parent
