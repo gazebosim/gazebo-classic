@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -128,4 +123,16 @@ bool RFIDTag::UpdateImpl(bool /*_force*/)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+math::Pose RFIDTag::GetTagPose() const
+{
+  return this->TagPose();
+}
+
+/////////////////////////////////////////////////
+ignition::math::Pose3d RFIDTag::TagPose() const
+{
+  return entity->GetWorldPose().Ign();
 }
