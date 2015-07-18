@@ -200,14 +200,14 @@ void ExtrudeDialog::UpdateView()
     {
       for (const auto &pt : poly)
       {
-        if (pt.x < min.x)
-          min.x = pt.x;
-        if (pt.y < min.y)
-          min.y = pt.y;
-        if (pt.x > max.x)
-          max.x = pt.x;
-        if (pt.y > max.y)
-          max.y = pt.y;
+        if (pt.X() < min.x)
+          min.x = pt.X();
+        if (pt.Y() < min.y)
+          min.y = pt.Y();
+        if (pt.X() > max.x)
+          max.x = pt.X();
+        if (pt.Y() > max.y)
+          max.y = pt.Y();
       }
     }
   }
@@ -257,34 +257,36 @@ void ExtrudeDialog::UpdateView()
   // Draw polygons
   for (common::SVGPath path : paths)
   {
-    for (std::vector<math::Vector2d> poly : path.polylines)
+    for (std::vector<ignition::math::Vector2d> poly : path.polylines)
     {
       QPainterPath painterPath;
       bool firstPoint = true;
-      for (math::Vector2d pt : poly)
+      for (ignition::math::Vector2d pt : poly)
       {
         // Centroid at SVG 0,0
-        pt = pt - min - (max-min)*0.5;
+        pt = pt - min.Ign() - (max-min).Ign()*0.5;
         // Scale to view while keeping aspect ratio
-        pt = math::Vector2d(pt.x * resolutionView, pt.y * resolutionView);
+        pt = ignition::math::Vector2d(
+            pt.X() * resolutionView, pt.Y() * resolutionView);
         // Translate to view center
-        pt.x += this->dataPtr->viewWidth/2.0;
-        pt.y += viewHeight/2.0;
+        pt.X() += this->dataPtr->viewWidth/2.0;
+        pt.Y() += viewHeight/2.0;
 
         // Draw point
         double pointSize = 5;
         QGraphicsEllipseItem *ptItem = new QGraphicsEllipseItem(
-             pt.x - pointSize/2.0, pt.y - pointSize/2.0, pointSize, pointSize);
+             pt.X() - pointSize/2.0, pt.Y() - pointSize/2.0,
+             pointSize, pointSize);
         ptItem->setBrush(Qt::red);
         ptItem->setZValue(5);
         scene->addItem(ptItem);
         if (firstPoint)
         {
           firstPoint = false;
-          painterPath.moveTo(pt.x, pt.y);
+          painterPath.moveTo(pt.X(), pt.Y());
         }
         else
-        painterPath.lineTo(pt.x, pt.y);
+        painterPath.lineTo(pt.X(), pt.Y());
       }
 
       QGraphicsPathItem *pathItem = new QGraphicsPathItem(painterPath);

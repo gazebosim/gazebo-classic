@@ -5,6 +5,7 @@ if (WIN32)
 endif()
 
 set (sources
+  AltimeterSensor.cc
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
@@ -30,6 +31,7 @@ set (sources
 )
 
 set (headers
+  AltimeterSensor.hh
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
@@ -56,6 +58,7 @@ set (headers
 )
 
 set (gtest_sources
+  AltimeterSensor_TEST.cc
   ForceTorqueSensor_TEST.cc
   GpsSensor_TEST.cc
   ImuSensor_TEST.cc

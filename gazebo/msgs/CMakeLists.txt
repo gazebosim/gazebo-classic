@@ -2,6 +2,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
+  altimeter.proto
   axis.proto
   boxgeom.proto
   camerasensor.proto

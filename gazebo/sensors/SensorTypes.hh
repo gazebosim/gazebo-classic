@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _SENSORTYPES_HH_
-#define _SENSORTYPES_HH_
+#ifndef _GAZEBO_SENSORTYPES_HH_
+#define _GAZEBO_SENSORTYPES_HH_
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -30,6 +30,7 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    class AltimeterSensor;
     class Sensor;
     class RaySensor;
     class CameraSensor;
@@ -50,6 +51,10 @@ namespace gazebo
     class WirelessTransceiver;
     class WirelessTransmitter;
     class WirelessReceiver;
+
+    /// \def AltimeterSensorPtr
+    /// \brief Shared pointer to AltimeterSensor
+    typedef boost::shared_ptr<AltimeterSensor> AltimeterSensorPtr;
 
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
@@ -130,6 +135,10 @@ namespace gazebo
     /// \def WirelessReceiverPtr
     /// \brief Shared pointer to WirelessReceiver
     typedef boost::shared_ptr<WirelessReceiver> WirelessReceiverPtr;
+
+    /// \def AltimeterSensor_V
+    /// \brief Vector of AltimeterSensor shared pointers
+    typedef std::vector<AltimeterSensor> AltimeterSensor_V;
 
     /// \def Sensor_V
     /// \brief Vector of Sensor shared pointers
@@ -237,7 +246,15 @@ namespace gazebo
 
       /// \brief Magnetometer body-frame Z axis noise in Tesla
       /// \sa MagnetometerSensor
-      MAGNETOMETER_Z_NOISE_TESLA = 12
+      MAGNETOMETER_Z_NOISE_TESLA = 12,
+
+      /// \brief Vertical noise stream for the altimeter sensor
+      /// \sa AltimeterSensor
+      ALTIMETER_POSITION_NOISE_METERS = 13,
+
+      /// \brief Velocity noise streams for the altimeter sensor
+      /// \sa AltimeterSensor
+      ALTIMETER_VELOCITY_NOISE_METERS_PER_S = 14
     };
     /// \}
   }
