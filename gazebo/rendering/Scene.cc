@@ -1744,12 +1744,27 @@ void Scene::PreRender()
   }
 
   // Process the model messages.
-  for (modelIter = modelMsgsCopy.begin(); modelIter != modelMsgsCopy.end();)
+  if (modelMsgsCopy.size() > 0)
   {
-    if (this->ProcessModelMsg(**modelIter))
-      modelMsgsCopy.erase(modelIter++);
-    else
-      ++modelIter;
+      for (modelIter = modelMsgsCopy.begin(); modelIter != modelMsgsCopy.end();)
+      {
+        if (this->ProcessModelMsg(**modelIter))
+        {
+          const msgs::Model& modelMsg = **modelIter;
+          if (modelMsg.visual_size() > 0)
+          {
+            for (int k = 0; k < modelMsg.visual_size(); k++)
+            {
+              boost::shared_ptr<msgs::Visual> msgCopy;
+              msgCopy.reset(new msgs::Visual(modelMsg.visual(k)));
+              visualMsgsCopy.push_back(msgCopy);
+            }
+          }
+          modelMsgsCopy.erase(modelIter++);
+        }
+        else
+          ++modelIter;
+      }
   }
 
   // Process the sensor messages.
@@ -1771,12 +1786,15 @@ void Scene::PreRender()
   }
 
   // Process the visual messages.
-  for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
+  if (visualMsgsCopy.size() > 0)
   {
-    if (this->ProcessVisualMsg(*visualIter))
-      visualMsgsCopy.erase(visualIter++);
-    else
-      ++visualIter;
+      for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
+      {
+        if (this->ProcessVisualMsg(*visualIter))
+          visualMsgsCopy.erase(visualIter++);
+        else
+          ++visualIter;
+      }
   }
 
   // Process the joint messages.
