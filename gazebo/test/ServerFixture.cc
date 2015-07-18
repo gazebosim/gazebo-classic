@@ -906,7 +906,6 @@ void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
 void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
     const std::string &_sensorName,
     const std::string &_collisionType,
-    const std::string &_topic,
     const ignition::math::Vector3d &_pos,
     const ignition::math::Vector3d &_rpy,
     bool _static)
@@ -943,7 +942,6 @@ void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
     << "  </visual>"
     << "  <sensor name='" << _sensorName << "' type='altimeter'>"
     << "    <altimeter>"
-    << "      <topic>" << _topic << "</topic>"
     << "    </altimeter>"
     << "  </sensor>"
     << "</link>"
@@ -961,7 +959,6 @@ void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
 void ServerFixture::SpawnUnitMagnetometerSensor(const std::string &_name,
     const std::string &_sensorName,
     const std::string &_collisionType,
-    const std::string &_topic,
     const ignition::math::Vector3d &_pos,
     const ignition::math::Vector3d &_rpy, bool _static)
 {
@@ -993,9 +990,8 @@ void ServerFixture::SpawnUnitMagnetometerSensor(const std::string &_name,
     << shapeStr.str()
     << "    </geometry>"
     << "  </visual>"
-    << "  <sensor name='" << _sensorName << "' type='imu'>"
+    << "  <sensor name='" << _sensorName << "' type='magnetometer'>"
     << "    <magnetometer>"
-    << "      <topic>" << _topic << "</topic>"
     << "    </magnetometer>"
     << "  </sensor>"
     << "</link>"

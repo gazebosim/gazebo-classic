@@ -369,14 +369,12 @@ namespace gazebo
     /// \param[in] _name Model name
     /// \param[in] _sensorName Sensor name
     /// \param[in] _collisionType Type of collision, box or cylinder
-    /// \param[in] _topic Topic to publish altimeter data to
     /// \param[in] _pos World position
     /// \param[in] _rpy World rotation in Euler angles
     /// \param[in] _static True to make the model static
     protected: void SpawnUnitAltimeterSensor(const std::string &_name,
                    const std::string &_sensorName,
                    const std::string &_collisionType,
-                   const std::string &_topic,
                    const ignition::math::Vector3d &_pos,
                    const ignition::math::Vector3d &_rpy,
                    bool _static = false);
@@ -385,14 +383,12 @@ namespace gazebo
     /// \param[in] _name Model name
     /// \param[in] _sensorName Sensor name
     /// \param[in] _collisionType Type of collision, box or cylinder
-    /// \param[in] _topic Topic to publish magnetometer data to
     /// \param[in] _pos World position
     /// \param[in] _rpy World rotation in Euler angles
     /// \param[in] _static True to make the model static
     protected: void SpawnUnitMagnetometerSensor(const std::string &_name,
                    const std::string &_sensorName,
                    const std::string &_collisionType,
-                   const std::string &_topic,
                    const ignition::math::Vector3d &_pos,
                    const ignition::math::Vector3d &_rpy,
                    bool _static = false);

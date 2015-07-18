@@ -102,9 +102,8 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   std::string modelName = "magModel";
   std::string magSensorName = "magSensor";
   ignition::math::Pose3d modelPose(0, 0, 0, 0, 0, IGN_PI_2);
-  std::string topic = "~/" + magSensorName + "_" + _physicsEngine;
   SpawnUnitMagnetometerSensor(modelName, magSensorName,
-      "box", topic, modelPose.Pos(), modelPose.Rot().Euler());
+      "box", modelPose.Pos(), modelPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(magSensorName);
   sensors::MagnetometerSensorPtr magSensor =
