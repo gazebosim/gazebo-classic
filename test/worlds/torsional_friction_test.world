@@ -78,7 +78,7 @@
             </friction>
             <contact>
               <ode>
-                <kp>500000</kp>
+                <kp>500</kp>
                 <kd>100</kd>
                 <min_depth>0</min_depth>
                 <max_vel>10000</max_vel>
@@ -135,7 +135,7 @@
             </friction>
             <contact>
               <ode>
-                <kp>500000</kp>
+                <kp>5000</kp>
                 <kd>100</kd>
                 <min_depth>0</min_depth>
                 <max_vel>10000</max_vel>
@@ -192,7 +192,7 @@
             </friction>
             <contact>
               <ode>
-                <kp>500000</kp>
+                <kp>2120</kp>
                 <kd>100</kd>
                 <min_depth>0</min_depth>
                 <max_vel>10000</max_vel>
@@ -249,7 +249,7 @@
             </friction>
             <contact>
               <ode>
-                <kp>500000</kp>
+                <kp>1000</kp>
                 <kd>100</kd>
                 <min_depth>0</min_depth>
                 <max_vel>10000</max_vel>

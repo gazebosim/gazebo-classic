@@ -199,13 +199,19 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     // Check that contact depth is:
     // normal force = kp * depth
     double expectedDepth = sphere.mass * -g.z / sphere.kp;
+    double relativeError =
+      std::abs(contact.depth(0) - expectedDepth)/expectedDepth;
 
     std::cout << " MASS: [" << sphere.mass
               << "] KP: [" << sphere.kp
               << "] X: [" << 0.1 - sphere.model->GetWorldPose().pos.z
+              << "] depth expected: [" << expectedDepth
+              << "] depth actual: [" << contact.depth(0)
+              << "] rel err: [" << relativeError
               << "]\n";
 
-    EXPECT_EQ(expectedDepth, contact.depth(0));
+    // less than 1% error
+    EXPECT_LT(relativeError, 0.01);
   }
 }
 /*
