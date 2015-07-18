@@ -156,16 +156,13 @@ namespace gazebo
       /// \param[in] _time Time to jump to.
       signals: void Seek(const common::Time &_time);
 
-      /// \brief Qt mouse release event.
-      /// \param[in] _event Qt mouse event.
+      // Documentation inherited
       protected: void mousePressEvent(QMouseEvent *_event);
 
-      /// \brief Qt mouse release event.
-      /// \param[in] _event Qt mouse event.
+      // Documentation inherited
       protected: void mouseReleaseEvent(QMouseEvent *_event);
 
-      /// \brief Qt mouse release event.
-      /// \param[in] _event Qt mouse event.
+      // Documentation inherited
       protected: void mouseMoveEvent(QMouseEvent *_event);
 
       /// \internal

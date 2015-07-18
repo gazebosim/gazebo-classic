@@ -249,7 +249,7 @@ void LogPlayWidget::OnStepForward()
   {
     this->PublishMultistep(this->dataPtr->stepSpin->value());
   }
-  // If currently playing, first pause and only then step, to sync with server
+  // Only step after it's paused, to sync with server
   else
   {
     this->OnPause();
@@ -264,7 +264,7 @@ void LogPlayWidget::OnStepBack()
   {
     this->PublishMultistep(-this->dataPtr->stepSpin->value());
   }
-  // If currently playing, first pause and only then step, to sync with server
+  // Only step after it's paused, to sync with server
   else
   {
     this->OnPause();
@@ -428,6 +428,8 @@ LogPlayView::LogPlayView(LogPlayWidget *_parent)
 
   // Send controls to parent
   LogPlayWidget *widget = qobject_cast<LogPlayWidget *>(_parent);
+  if (!widget)
+    return;
 
   connect(this, SIGNAL(Seek(const common::Time &)), widget,
       SLOT(OnSeek(const common::Time &)));
@@ -682,5 +684,4 @@ void CurrentTimeItem::paint(QPainter *_painter,
 
   _painter->drawPolygon(triangle);
 }
-
 
