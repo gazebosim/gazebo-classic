@@ -1788,7 +1788,8 @@ void Scene::PreRender()
   // Process the visual messages.
   if (visualMsgsCopy.size() > 0)
   {
-      for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
+      for (visualIter = visualMsgsCopy.begin();
+           visualIter != visualMsgsCopy.end();)
       {
         if (this->ProcessVisualMsg(*visualIter))
           visualMsgsCopy.erase(visualIter++);
