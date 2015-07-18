@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -106,10 +105,9 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
   // is expressed in joint orientation
   GZ_ASSERT(this->parentJoint,
             "parentJoint should be defined by single argument Load()");
-  math::Quaternion rotationChildSensor =
-    (this->pose + this->parentJoint->GetInitialAnchorPose()).rot;
-  this->rotationSensorChild =
-    rotationChildSensor.GetInverse().GetAsMatrix3();
+  ignition::math::Quaterniond rotationChildSensor =
+    (this->pose + this->parentJoint->GetInitialAnchorPose().Ign()).Rot();
+  this->rotationSensorChild = rotationChildSensor.Inverse();
 
   // Handle measure direction
   bool defaultDirectionIsParentToChild = false;
@@ -184,13 +182,25 @@ physics::JointPtr ForceTorqueSensor::GetJoint() const
 //////////////////////////////////////////////////
 math::Vector3 ForceTorqueSensor::GetForce() const
 {
-  return msgs::Convert(this->wrenchMsg.wrench().force());
+  return this->Force();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d ForceTorqueSensor::Force() const
+{
+  return msgs::Convert(this->wrenchMsg.wrench().force()).Ign();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ForceTorqueSensor::GetTorque() const
 {
-  return msgs::Convert(this->wrenchMsg.wrench().torque());
+  return this->Torque();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d ForceTorqueSensor::Torque() const
+{
+  return msgs::Convert(this->wrenchMsg.wrench().torque()).Ign();
 }
 
 //////////////////////////////////////////////////
@@ -204,33 +214,33 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
   physics::JointWrench wrench = this->parentJoint->GetForceTorque(0u);
 
   // Get the force and torque in the appropriate frame.
-  math::Vector3 measuredForce;
-  math::Vector3 measuredTorque;
+  ignition::math::Vector3d measuredForce;
+  ignition::math::Vector3d measuredTorque;
 
   if (this->measureFrame == PARENT_LINK)
   {
     if (this->parentToChild)
     {
-      measuredForce = wrench.body1Force;
-      measuredTorque = wrench.body1Torque;
+      measuredForce = wrench.body1Force.Ign();
+      measuredTorque = wrench.body1Torque.Ign();
     }
     else
     {
-      measuredForce = -1*wrench.body1Force;
-      measuredTorque = -1*wrench.body1Torque;
+      measuredForce = -1*wrench.body1Force.Ign();
+      measuredTorque = -1*wrench.body1Torque.Ign();
     }
   }
   else if (this->measureFrame == CHILD_LINK)
   {
     if (!this->parentToChild)
     {
-      measuredForce = wrench.body2Force;
-      measuredTorque = wrench.body2Torque;
+      measuredForce = wrench.body2Force.Ign();
+      measuredTorque = wrench.body2Torque.Ign();
     }
     else
     {
-      measuredForce = -1*wrench.body2Force;
-      measuredTorque = -1*wrench.body2Torque;
+      measuredForce = -1*wrench.body2Force.Ign();
+      measuredTorque = -1*wrench.body2Torque.Ign();
     }
   }
   else
@@ -239,20 +249,20 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
               "measureFrame must be PARENT_LINK, CHILD_LINK or SENSOR");
     if (!this->parentToChild)
     {
-      measuredForce = rotationSensorChild*wrench.body2Force;
-      measuredTorque = rotationSensorChild*wrench.body2Torque;
+      measuredForce = rotationSensorChild*wrench.body2Force.Ign();
+      measuredTorque = rotationSensorChild*wrench.body2Torque.Ign();
     }
     else
     {
-      measuredForce = rotationSensorChild*(-1*wrench.body2Force);
-      measuredTorque = rotationSensorChild*(-1*wrench.body2Torque);
+      measuredForce = rotationSensorChild*(-1*wrench.body2Force.Ign());
+      measuredTorque = rotationSensorChild*(-1*wrench.body2Torque.Ign());
     }
   }
 
   msgs::Set(this->wrenchMsg.mutable_wrench()->mutable_force(),
-      measuredForce);
+      math::Vector3(measuredForce));
   msgs::Set(this->wrenchMsg.mutable_wrench()->mutable_torque(),
-      measuredTorque);
+      math::Vector3(measuredTorque));
 
   this->update(this->wrenchMsg);
 
