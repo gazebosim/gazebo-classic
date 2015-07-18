@@ -17,88 +17,34 @@
 #ifndef _GAZEBO_DARTBOXSHAPE_HH_
 #define _GAZEBO_DARTBOXSHAPE_HH_
 
-#include "gazebo/common/Console.hh"
-
 #include "gazebo/math/Vector3.hh"
-
-#include "gazebo/physics/dart/DARTPhysics.hh"
-#include "gazebo/physics/dart/DARTTypes.hh"
-#include "gazebo/physics/dart/DARTCollision.hh"
-
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/BoxShape.hh"
+#include "gazebo/physics/dart/DARTTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTBoxShapePrivate;
+
     /// \brief DART Box shape
     class GZ_PHYSICS_VISIBLE DARTBoxShape : public BoxShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit DARTBoxShape(DARTCollisionPtr _parent)
-              : BoxShape(_parent) {}
+      public: explicit DARTBoxShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~DARTBoxShape() {}
+      public: virtual ~DARTBoxShape();
 
       // Documentation inherited.
-      public: virtual void SetSize(const math::Vector3 &_size)
-      {
-        if (_size.x < 0 || _size.y < 0 || _size.z < 0)
-        {
-          gzerr << "Box shape does not support negative size\n";
-          return;
-        }
-        math::Vector3 size = _size;
-        if (math::equal(size.x, 0.0))
-        {
-          // Warn user, but still create shape with very small value
-          // otherwise later resize operations using setLocalScaling
-          // will not be possible
-          gzwarn << "Setting box shape's x to zero is not supported in DART, "
-                 << "using 1e-4.\n";
-          size.x = 1e-4;
-        }
+      public: virtual void SetSize(const math::Vector3 &_size);
 
-        if (math::equal(size.y, 0.0))
-        {
-          gzwarn << "Setting box shape's y to zero is not supported in DART, "
-                 << "using 1e-4.\n";
-          size.y = 1e-4;
-        }
-
-        if (math::equal(size.z, 0.0))
-        {
-          gzwarn << "Setting box shape's z to zero is not supported in DART "
-                 << "using 1e-4.\n";
-          size.z = 1e-4;
-        }
-
-        BoxShape::SetSize(size);
-
-        DARTCollisionPtr dartCollisionParent =
-            boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
-
-        if (dartCollisionParent->GetDARTCollisionShape() == NULL)
-        {
-          dart::dynamics::BodyNode *dtBodyNode =
-              dartCollisionParent->GetDARTBodyNode();
-          dart::dynamics::BoxShape *dtBoxShape =
-              new dart::dynamics::BoxShape(DARTTypes::ConvVec3(size));
-          dtBodyNode->addCollisionShape(dtBoxShape);
-          dartCollisionParent->SetDARTCollisionShape(dtBoxShape);
-        }
-        else
-        {
-          dart::dynamics::BoxShape *dtBoxShape =
-              dynamic_cast<dart::dynamics::BoxShape*>(
-                dartCollisionParent->GetDARTCollisionShape());
-          dtBoxShape->setSize(DARTTypes::ConvVec3(size));
-        }
-      }
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTBoxShapePrivate *dataPtr;
     };
   }
 }
