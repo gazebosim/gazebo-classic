@@ -106,7 +106,7 @@ void AltimeterSensor::Load(const std::string &_worldName)
 
     // Initialise reference altitude
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-    this->dataPtr->altMsg.set_vertical_reference((this->pose.Ign() +
+    this->dataPtr->altMsg.set_vertical_reference((this->pose +
          this->dataPtr->parentLink->GetWorldPose().Ign()).Pos().Z());
   }
 }
@@ -136,10 +136,10 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
       this->dataPtr->parentLink->GetWorldPose().Ign();
 
     // Get pose in gazebo reference frame
-    ignition::math::Pose3d altPose = this->pose.Ign() + parentPose;
+    ignition::math::Pose3d altPose = this->pose + parentPose;
 
     ignition::math::Vector3d altVel =
-      this->dataPtr->parentLink->GetWorldLinearVel(this->pose.pos).Ign();
+      this->dataPtr->parentLink->GetWorldLinearVel(this->pose.Pos()).Ign();
 
     // Apply noise to the position and velocity
     if (this->noises.find(ALTIMETER_POSITION_NOISE_METERS) !=
