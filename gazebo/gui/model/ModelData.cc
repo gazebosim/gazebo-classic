@@ -168,6 +168,28 @@ void LinkData::SetScale(const math::Vector3 &_scale)
     collisionConfig->SetGeometry(leafName,  it->first->GetScale());
   }
 
+  if (this->scale == _scale)
+    return;
+
+  // update link inertial values
+  LinkConfig *linkConfig = this->inspector->GetLinkConfig();
+  sdf::ElementPtr inertialElem = this->linkSDF->GetElement("inertial");
+  double volScale = _scale.GetLength() / this->scale.GetLength();
+
+  sdf::ElementPtr massElem = inertialElem->GetElement("mass");
+  double newMass = massElem->Get<double>() * volScale;
+  massElem->Set(newMass);
+  linkConfig->SetMass(newMass);
+
+  // sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+
+  sdf::ElementPtr inertialPoseElem = inertialElem->GetElement("pose");
+  math::Pose newPose = inertialPoseElem->Get<math::Pose>();
+  newPose.pos *= volScale;
+
+  inertialPoseElem->Set(newPose);
+  linkConfig->SetInertialPose(newPose);
+
   this->scale = _scale;
 }
 

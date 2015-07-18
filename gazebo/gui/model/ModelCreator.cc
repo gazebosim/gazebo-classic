@@ -702,6 +702,7 @@ std::string ModelCreator::AddShape(LinkType _type,
       gzwarn << "Unknown link type '" << _type << "'. " <<
           "Adding a box" << std::endl;
     }
+
     ((geomElem->AddElement("box"))->GetElement("size"))->Set(_size);
   }
 
@@ -729,6 +730,20 @@ std::string ModelCreator::AddShape(LinkType _type,
 void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 {
   LinkData *link = new LinkData();
+
+  msgs::Model model;
+  double mass = 1.0;
+
+  // set reasonable inertial values based on geometry
+  std::string geomType = _visual->GetGeometryType();
+  if (geomType == "cylinder")
+    msgs::AddCylinderLink(model, mass, 0.5, 1.0);
+  else if (geomType == "sphere")
+    msgs::AddSphereLink(model, mass, 0.5);
+  else
+    msgs::AddBoxLink(model, mass, math::Vector3::One);
+  link->Load(msgs::LinkToSDF(model.link(0)));
+
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
   {

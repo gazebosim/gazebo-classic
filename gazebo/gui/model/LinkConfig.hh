@@ -58,6 +58,24 @@ namespace gazebo
       /// \param[in] _pose Pose to set the link to.
       public: void SetPose(const math::Pose &_pose);
 
+      /// \brief Set the mass of the link.
+      /// \param[in] _mass Mass to set the link to.
+      public: void SetMass(double _mass);
+
+      /// \brief Set the mass of the link.
+      /// \param[in] _ixx X second moment of inertia (MOI) about x axis.
+      /// \param[in] _iyy Y second moment of inertia about y axis.
+      /// \param[in] _izz Z second moment of inertia about z axis.
+      /// \param[in] _ixy XY inertia.
+      /// \param[in] _ixz XZ inertia.
+      /// \param[in] _iyz YZ inertia.
+      public: void SetInertiaMatrix(double _ixx, double _iyy, double _izz,
+          double _ixy, double _ixz, double _iyz);
+
+      /// \brief Set the mass of the link.
+      /// \param[in] _pose Inertial pose to set the link to.
+      public: void SetInertialPose(const math::Pose &_pose);
+
       /// \brief config widget for configuring link properties.
       private: ConfigWidget *configWidget;
     };
