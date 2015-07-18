@@ -146,7 +146,7 @@ bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
     // Rotate the magnetic field into the body frame
     field = magPose.Rot().Inverse().RotateVector(field);
 
-    // Apply position noise before converting to global frame
+    // Apply magnetometer noise after converting to body frame
     if (this->noises.find(MAGNETOMETER_X_NOISE_TESLA) != this->noises.end())
       field.X(this->noises[MAGNETOMETER_X_NOISE_TESLA]->Apply(field.X()));
     if (this->noises.find(MAGNETOMETER_Y_NOISE_TESLA) != this->noises.end())
