@@ -119,8 +119,9 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
   std::string modelName = "altModel";
   std::string altSensorName = "altSensor";
   ignition::math::Pose3d modelPose(0, 0, 10, 0, 0, 0);
+  std::string topic = "~/" + altSensorName + "_" + _physicsEngine;
   SpawnUnitAltimeterSensor(modelName, altSensorName,
-      "box", modelPose.Pos(), modelPose.Rot().Euler());
+      "box", topic, modelPose.Pos(), modelPose.Rot().Euler());
 
   // Get the altimeter
   sensors::SensorPtr sensor = sensors::get_sensor("altSensor");
@@ -249,8 +250,9 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   std::string modelName = "altModel";
   std::string altSensorName = "altSensor";
   ignition::math::Pose3d modelPose(0, 0, 10, 0, 0, 0);
+  std::string topic = "~/" + altSensorName + "_" + _physicsEngine;
   SpawnUnitAltimeterSensor(modelName, altSensorName,
-      "box", modelPose.Pos(), modelPose.Rot().Euler());
+      "box", topic, modelPose.Pos(), modelPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(altSensorName);
   sensors::AltimeterSensorPtr altSensor =
