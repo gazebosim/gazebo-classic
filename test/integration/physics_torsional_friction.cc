@@ -104,7 +104,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTorsionalFrictionTest::Callback(const ConstContactsPtr &_msg)
 {
-  this->contactsMsg = *_msg.get();
+  this->contactsMsg = *_msg;
 }
 
 /////////////////////////////////////////////////
@@ -152,11 +152,10 @@ void PhysicsTorsionalFrictionTest::DepthTest(
       &PhysicsTorsionalFrictionTest::Callback, this);
 
   // Step to get the contact info on Callback
-  world->Step(1);
+  world->Step(5000);
 
-  // Wait for callback to fill contacts msg
-  while (this->contactsMsg.contact_size() == 0)
-    common::Time::MSleep(10);
+  gzdbg << "number of contacts: " << this->contactsMsg.contact().size() << "\n";
+  EXPECT_GT(this->contactsMsg.contact().size(), 0);
 
   // Load the spheres
   std::vector<PhysicsTorsionalFrictionTest::SphereData>
@@ -181,6 +180,9 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   // Check relevant contacts from message
   for (auto contact : this->contactsMsg.contact())
   {
+    EXPECT_TRUE(contact.has_collision1());
+    EXPECT_TRUE(contact.has_collision2());
+
     if (!(contact.has_collision1() &&
         contact.collision1().find("sphere_mass") == 0))
         continue;
@@ -198,7 +200,10 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     // normal force = kp * depth
     double expectedDepth = sphere.mass * -g.z / sphere.kp;
 
-std::cout << "  MASS: " << sphere.mass << " KP: " << sphere.kp << "  POSE: " << 0.1 - sphere.model->GetWorldPose().pos.z << std::endl;
+    std::cout << " MASS: [" << sphere.mass
+              << "] KP: [" << sphere.kp
+              << "] X: [" << 0.1 - sphere.model->GetWorldPose().pos.z
+              << "]\n";
 
     EXPECT_EQ(expectedDepth, contact.depth(0));
   }
