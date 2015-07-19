@@ -134,10 +134,13 @@ dxJointHinge2::getInfo2( dxJoint::Info2 *info )
       info->erp = erp;
     if (this->cfm >= 0)
     {
-      info->cfm[0] = cfm;
-      info->cfm[1] = cfm;
-      info->cfm[2] = cfm;
-      info->cfm[3] = cfm;
+      dxJoint::Info1 *info1 = new Info1();
+      getInfo1(info1);
+
+      for(int i=0; i<info1->m; i++)
+      {
+        info->cfm[i] = cfm;
+      }
     }
 
     // get information we need to set the hinge row
