@@ -319,7 +319,7 @@ dxJointUniversal::getInfo2( dxJoint::Info2 *info )
     {
       dxJoint::Info1 *info1 = new Info1();
       getInfo1(info1);
-      for (int i=0; i<info1->m; i++)
+      for (int i=0; i<info1->m; ++i)
       {
         info->cfm[i] = cfm;
       }

@@ -58,7 +58,7 @@ dReal dJointGetSliderPosition ( dJointID j )
     {
         // get body2 + offset point in global coordinates
         dMultiply0_331 ( q, joint->node[1].body->posr.R, joint->offset );
-        for ( int i = 0; i < 3; i++ )
+        for ( int i = 0; i < 3; ++i)
             q[i] = joint->node[0].body->posr.pos[i]
                    - q[i]
                    - joint->node[1].body->posr.pos[i];
@@ -164,7 +164,7 @@ dxJointSlider::getInfo2 ( dxJoint::Info2 *info )
     {
       dxJoint::Info1 *info1 = new Info1();
       getInfo1(info1);
-      for (int i=0; i<info1->m; i++)
+      for (int i=0; i<info1->m; ++i)
       {
         info->cfm[i] = cfm;
       }
