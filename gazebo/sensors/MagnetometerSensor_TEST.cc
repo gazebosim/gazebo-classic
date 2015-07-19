@@ -29,9 +29,11 @@ class MagnetometerSensor_TEST : public ServerFixture,
                                 public testing::WithParamInterface<const char*>
 {
   /// \brief Check that a model at (0,0,0,0,0,0) has mag field equal to global
+  /// \param[in] _physicsEngine The type of physics engine to use.
   public: void BasicMagnetometerSensorCheck(const std::string &_physicsEngine);
 
   /// \brief Rotate sensor and check magnetic field.
+  /// \param[in] _physicsEngine The type of physics engine to use.
   public: void RotateMagnetometerSensorCheck(const std::string &_physicsEngine);
 };
 
