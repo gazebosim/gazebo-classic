@@ -115,6 +115,8 @@ void MagnetometerSensor_TEST::RotateMagnetometerSensorCheck(
   sensors::SensorManager::Instance()->Init();
   magSensor->SetActive(true);
 
+  world->Step(10);
+
   // Determine the magnetic field in the body frame
   ignition::math::Vector3d field = modelPose.Rot().Inverse().RotateVector(
         world->GetPhysicsEngine()->MagneticField());
