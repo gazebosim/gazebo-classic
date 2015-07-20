@@ -120,6 +120,8 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
   // negative).
   if (ignition::math::Rand::DblUniform() < 0.5)
     this->bias = -this->bias;
+
+  /// \todo Remove this, and use Noise::Print. See ImuSensor for an example
   gzlog << "applying Gaussian noise model with mean " << this->mean
     << ", stddev " << this->stdDev
     << ", bias " << this->bias << std::endl;

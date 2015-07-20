@@ -96,56 +96,61 @@
           <imu>
             <angular_velocity>
               <x>
-                <type>gaussian</type>
-                <mean>0</mean>
-                <stddev>0.0002</stddev>
-                <bias_mean>7.5e-06</bias_mean>
-                <bias_stddev>8e-07</bias_stddev>
+                <noise type="gaussian">
+                 <mean>0</mean>
+                 <stddev>0.0002</stddev>
+                 <bias_mean>7.5e-06</bias_mean>
+                 <bias_stddev>8e-07</bias_stddev>
+                </noise>
               </x>
               <y>
-                <type>gaussian</type>
-                <mean>0</mean>
-                <stddev>0.0002</stddev>
-                <bias_mean>7.5e-06</bias_mean>
-                <bias_stddev>8e-07</bias_stddev>
+                <noise type="gaussian">
+                 <mean>0</mean>
+                 <stddev>0.0002</stddev>
+                 <bias_mean>7.5e-06</bias_mean>
+                 <bias_stddev>8e-07</bias_stddev>
+                </noise>
               </y>
               <z>
-                <type>gaussian</type>
-                <mean>0</mean>
-                <stddev>0.0002</stddev>
-                <bias_mean>7.5e-06</bias_mean>
-                <bias_stddev>8e-07</bias_stddev>
+                <noise type="gaussian">
+                 <mean>0</mean>
+                 <stddev>0.0002</stddev>
+                 <bias_mean>7.5e-06</bias_mean>
+                 <bias_stddev>8e-07</bias_stddev>
+                </noise>
               </z>
             </angular_velocity>
 
             <linear_acceleration>
               <x>
-                <type>gaussian</type>
-                <mean>0</mean>
-                <stddev>0.017</stddev>
-                <bias_mean>0.1</bias_mean>
-                <bias_stddev>0.001</bias_stddev>
+                <noise type="gaussian">
+                  <mean>0</mean>
+                  <stddev>0.017</stddev>
+                  <bias_mean>0.1</bias_mean>
+                  <bias_stddev>0.001</bias_stddev>
+                </noise>
               </x>
               <y>
-                <type>gaussian</type>
-                <mean>0</mean>
-                <stddev>0.017</stddev>
-                <bias_mean>0.1</bias_mean>
-                <bias_stddev>0.001</bias_stddev>
+                <noise type="gaussian">
+                  <mean>0</mean>
+                  <stddev>0.017</stddev>
+                  <bias_mean>0.1</bias_mean>
+                  <bias_stddev>0.001</bias_stddev>
+                </noise>
               </y>
               <z>
-                <type>gaussian</type>
-                <mean>0</mean>
-                <stddev>0.017</stddev>
-                <bias_mean>0.1</bias_mean>
-                <bias_stddev>0.001</bias_stddev>
+                <noise type="gaussian">
+                  <mean>0</mean>
+                  <stddev>0.017</stddev>
+                  <bias_mean>0.1</bias_mean>
+                  <bias_stddev>0.001</bias_stddev>
+                </noise>
               </z>
             </linear_acceleration>
           </imu>
         </sensor>
       </link>
     </model>
-
 
   </world>
 </sdf>
