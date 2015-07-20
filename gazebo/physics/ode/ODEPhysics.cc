@@ -62,6 +62,7 @@
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
 #include "gazebo/physics/ode/ODEUniversalJoint.hh"
+#include "gazebo/physics/ode/ODEFixedJoint.hh"
 
 #include "gazebo/physics/ode/ODERayShape.hh"
 #include "gazebo/physics/ode/ODEBoxShape.hh"
@@ -797,6 +798,8 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new ODEBallJoint(this->dataPtr->worldId, _parent));
   else if (_type == "universal")
     joint.reset(new ODEUniversalJoint(this->dataPtr->worldId, _parent));
+  else if (_type == "fixed")
+    joint.reset(new ODEFixedJoint(this->dataPtr->worldId, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
