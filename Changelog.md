@@ -1,3 +1,8 @@
+## Gazebo 7.0
+
+1. Tweaks to Data Logger, such as multiline text edit for path
+    * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
+
 ## Gazebo 6.0
 
 1. Added altimeter sensor. A contribution from Andrew Symington.
@@ -355,7 +360,7 @@ compilation on Windows.
 
 ### Gazebo 5.x.x
 
-1. Added lines to laser sensor visualization 
+1. Added lines to laser sensor visualization
     * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
     * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
 
