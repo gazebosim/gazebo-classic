@@ -33,6 +33,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
@@ -61,6 +62,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
+  // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
   if (this->sdf->HasElement("imu") &&
       this->sdf->GetElement("imu")->HasElement("topic") &&
       this->sdf->GetElement("imu")->Get<std::string>("topic")
@@ -69,6 +71,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     this->pub = this->node->Advertise<msgs::IMU>(
         this->sdf->GetElement("imu")->Get<std::string>("topic"), 500);
   }
+  // CASE 2 : Topic is specified in parent sensor definition
   else
   {
     std::string topicName = "~/";
@@ -78,25 +81,39 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     this->pub = this->node->Advertise<msgs::IMU>(topicName, 500);
   }
 
-  // Handle noise model settings.
-  this->noiseActive = false;
+  // Get the imu element pointer
   sdf::ElementPtr imuElem = this->sdf->GetElement("imu");
+
+  // CASE 1 : Noise is defined within the sensor (should be deprecated)
   if (imuElem->HasElement("noise"))
   {
     sdf::ElementPtr noiseElem = imuElem->GetElement("noise");
     std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
-      this->noiseActive = true;
-      this->noiseType = GAUSSIAN;
-      this->rateNoiseMean = 0.0;
-      this->rateNoiseStdDev = 0.0;
-      this->rateBias = 0.0;
-      this->accelNoiseMean = 0.0;
-      this->accelNoiseStdDev = 0.0;
-      this->accelBias = 0.0;
       if (noiseElem->HasElement("rate"))
       {
+
+        // Rename rate -> noise to enforce forward compatibility
+        rateElem->SetName("noise");
+        rateElem->AddAttribute("type","string","gaussian",true);
+
+        // Create the noise streams
+        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] =
+          NoiseFactory::NewNoiseModel(rateElem);
+        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S] =
+          NoiseFactory::NewNoiseModel(rateElem);
+        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S] =
+          NoiseFactory::NewNoiseModel(rateElem);
+
+        // Rename noise -> rate to enforce forward compatibility
+        rateElem->SetName("rate");
+
+        /*gzlog << "applying Gaussian noise model to rate with mean " <<
+          this->rateNoiseMean << " and stddev " << this->rateNoiseStdDev <<
+          ", bias " << this->rateBias << std::endl;
+
+
         sdf::ElementPtr rateElem = noiseElem->GetElement("rate");
         this->rateNoiseMean = rateElem->Get<double>("mean");
         this->rateNoiseStdDev = rateElem->Get<double>("stddev");
@@ -112,13 +129,28 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         // negative).
         if (ignition::math::Rand::DblUniform() < 0.5)
           this->rateBias = -this->rateBias;
-        gzlog << "applying Gaussian noise model to rate with mean " <<
-          this->rateNoiseMean << " and stddev " << this->rateNoiseStdDev <<
-          ", bias " << this->rateBias << std::endl;
+          */
       }
       if (noiseElem->HasElement("accel"))
       {
-        sdf::ElementPtr accelElem = noiseElem->GetElement("accel");
+        // Rename accel -> noise to enforce forward compatibility
+        accelElem->SetName("noise");
+        accelElem->AddAttribute("type","string","gaussian",true);
+
+        // Create the noise streams
+        this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR] =
+          NoiseFactory::NewNoiseModel(accelElem);
+        this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR] =
+          NoiseFactory::NewNoiseModel(accelElem);
+        this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR] =
+          NoiseFactory::NewNoiseModel(accelElem);
+
+        // Rename noise -> accel to enforce forward compatibility
+        accelElem->SetName("accel");
+
+
+
+        /*sdf::ElementPtr accelElem = noiseElem->GetElement("accel");
         this->accelNoiseMean = accelElem->Get<double>("mean");
         this->accelNoiseStdDev = accelElem->Get<double>("stddev");
         double accelBiasMean = accelElem->Get<double>("bias_mean");
@@ -134,13 +166,79 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         gzlog << "applying Gaussian noise model to accel with mean " <<
           this->accelNoiseMean << " and stddev " << this->accelNoiseStdDev <<
           ", bias " << this->accelBias << std::endl;
+          */
       }
     }
     else
+    {
       gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
         std::endl;
+    }
+  }
+  // CASE 2: noise specified using newer generic SDF noise models
+  else
+  {
+    // If an angular velocity noise models have been specified, create them
+    if (imuElem->HasElement("angular_velocity"))
+    {
+      sdf::ElementPtr angularElem = imuElem->GetElement("angular_velocity");
+
+      if (angular->HasElement("x") &&
+          angularElem->GetElement("x")->HasElement("noise"))
+      {
+        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] =
+          NoiseFactory::NewNoiseModel(
+              angularElem->GetElement("x")->GetElement("noise"));
+      }
+
+      if (angularElem->HasElement("y") &&
+          angularElem->GetElement("y")->HasElement("noise"))
+      {
+        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S] =
+          NoiseFactory::NewNoiseModel(
+              angularElem->GetElement("y")->GetElement("noise"));
+      }
+
+      if (angularElem->HasElement("z") &&
+          angularElem->GetElement("z")->HasElement("noise"))
+      {
+        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S] =
+          NoiseFactory::NewNoiseModel(
+              angularElem->GetElement("z")->GetElement("noise"));
+      }
+    }
+
+    // If linear acceleration noise models have been specified, create them
+    if (imuElem->HasElement("linear_acceleration"))
+    {
+      sdf::ElementPtr linearElem = imuElem->GetElement("linear_acceleration");
+      if (linearElem->HasElement("x") &&
+          linearElem->GetElement("x")->HasElement("noise"))
+      {
+        this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR] =
+          NoiseFactory::NewNoiseModel(
+              linearElem->GetElement("x")->GetElement("noise"));
+      }
+
+      if (linearElem->HasElement("y") &&
+          linearElem->GetElement("y")->HasElement("noise"))
+      {
+        this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR] =
+          NoiseFactory::NewNoiseModel(
+              linearElem->GetElement("y")->GetElement("noise"));
+      }
+
+      if (linearElem->HasElement("z") &&
+          linearElem->GetElement("z")->HasElement("noise"))
+      {
+        this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR] =
+          NoiseFactory::NewNoiseModel(
+              linearElem->GetElement("z")->GetElement("noise"));
+      }
+    }
   }
 
+  // Start publishing measurements on the topic.
   this->parentEntity->SetPublishData(true);
 
   std::string topic = "~/" + this->parentEntity->GetScopedName();
@@ -203,9 +301,11 @@ math::Vector3 ImuSensor::GetAngularVelocity() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ImuSensor::AngularVelocity() const
+ignition::math::Vector3d ImuSensor::AngularVelocity(const bool _noiseFree) const
 {
   boost::mutex::scoped_lock lock(this->mutex);
+  if (_noiseFree)
+    return this->angularVel;
   return msgs::Convert(this->imuMsg.angular_velocity()).Ign();
 }
 
@@ -216,9 +316,12 @@ math::Vector3 ImuSensor::GetLinearAcceleration() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ImuSensor::LinearAcceleration() const
+ignition::math::Vector3d ImuSensor::LinearAcceleration(
+    const bool _noiseFree) const
 {
   boost::mutex::scoped_lock lock(this->mutex);
+  if (_noiseFree)
+    return this->linearAcc;
   return msgs::Convert(this->imuMsg.linear_acceleration()).Ign();
 }
 
@@ -282,12 +385,14 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
       this->parentEntity->GetWorldPose().Ign();
     ignition::math::Pose3d imuPose = this->pose + parentEntityPose;
 
-    // Set the IMU angular velocity
-    ignition::math::Vector3d imuWorldAngularVel
-        = msgs::Convert(msg.angular_velocity()).Ign();
+    // Get the angular velocity
+    ignition::math::Vector3d imuWorldAngularVel = msgs::ConvertIgn(
+        msg.angular_velocity());
 
-    msgs::Set(this->imuMsg.mutable_angular_velocity(),
-              imuPose.Rot().Inverse().RotateVector(imuWorldAngularVel));
+    // Set the IMU angular velocity
+    this->angularVel = imuPose.Rot().Inverse().RotateVector(
+        imuWorldAngularVel);
+    msgs::Set(this->imuMsg.mutable_angular_velocity(), this->angularVel);
 
     // Compute and set the IMU linear acceleration
     ignition::math::Vector3d imuWorldLinearVel
@@ -308,46 +413,29 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
     this->lastLinearVel = imuWorldLinearVel;
 
-    if (this->noiseActive)
-    {
-      switch (this->noiseType)
-      {
-        case GAUSSIAN:
-          // Add Gaussian noise + fixed bias to each rate
-          this->imuMsg.mutable_angular_velocity()->set_x(
-            this->imuMsg.angular_velocity().x() + this->rateBias +
-            ignition::math::Rand::DblNormal(this->rateNoiseMean,
-              this->rateNoiseStdDev));
-          this->imuMsg.mutable_angular_velocity()->set_y(
-            this->imuMsg.angular_velocity().y() + this->rateBias +
-            ignition::math::Rand::DblNormal(this->rateNoiseMean,
-              this->rateNoiseStdDev));
-          this->imuMsg.mutable_angular_velocity()->set_z(
-            this->imuMsg.angular_velocity().z() + this->rateBias +
-            ignition::math::Rand::DblNormal(this->rateNoiseMean,
-              this->rateNoiseStdDev));
+    // Perturb the angular velocity
+    this->imuMsg.mutable_angular_velocity()->set_x(
+        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S]->Apply(
+          this->imuMsg.angular_velocity().x()));
+    this->imuMsg.mutable_angular_velocity()->set_y(
+        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S]->Apply(
+          this->imuMsg.angular_velocity().y()));
+    this->imuMsg.mutable_angular_velocity()->set_z(
+        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S]->Apply(
+          this->imuMsg.angular_velocity().z()));
 
-          // Add Gaussian noise + fixed bias to each acceleration
-          this->imuMsg.mutable_linear_acceleration()->set_x(
-            this->imuMsg.linear_acceleration().x() + this->accelBias +
-            ignition::math::Rand::DblNormal(this->accelNoiseMean,
-                                     this->accelNoiseStdDev));
-          this->imuMsg.mutable_linear_acceleration()->set_y(
-            this->imuMsg.linear_acceleration().y() + this->accelBias +
-            ignition::math::Rand::DblNormal(this->accelNoiseMean,
-                                     this->accelNoiseStdDev));
-          this->imuMsg.mutable_linear_acceleration()->set_z(
-            this->imuMsg.linear_acceleration().z() + this->accelBias +
-            ignition::math::Rand::DblNormal(this->accelNoiseMean,
-                                     this->accelNoiseStdDev));
+    // Perturb the linear acceleration
+    this->imuMsg.mutable_linear_acceleration()->set_x(
+        this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR]->Apply(
+          this->imuMsg.linear_acceleration().x()));
+    this->imuMsg.mutable_linear_acceleration()->set_y(
+        this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR]->Apply(
+          this->imuMsg.linear_acceleration().y()));
+    this->imuMsg.mutable_linear_acceleration()->set_z(
+        this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR]->Apply(
+          this->imuMsg.linear_acceleration().z()));
 
-          // TODO: add noise to orientation
-          break;
-        default:
-          GZ_ASSERT(false, "Invalid noise model type");
-      }
-    }
-
+    // Publish the message
     if (this->pub)
       this->pub->Publish(this->imuMsg);
   }
