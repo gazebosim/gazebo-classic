@@ -37,7 +37,7 @@ SkidSteerDrivePlugin::SkidSteerDrivePlugin()
 int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
 {
   // Bounds checking on index
-  if (_index < 0 or _index >= NUMBER_OF_WHEELS)
+  if (_index < 0 || _index >= NUMBER_OF_WHEELS)
   {
     gzerr << "Joint index " << _index <<  " out of bounds [0, "
           << NUMBER_OF_WHEELS << "] in model " << this->model->GetName()
