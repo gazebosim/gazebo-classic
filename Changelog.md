@@ -1,5 +1,8 @@
 ## Gazebo 6.0
 
+1. Added magnetometer sensor. A contribution from Andrew Symington.
+    * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)
+
 1. Added altimeter sensor. A contribution from Andrew Symington.
     * [Pull request #1792](https://bitbucket.org/osrf/gazebo/pull-request/1792)
 
@@ -355,7 +358,7 @@ compilation on Windows.
 
 ### Gazebo 5.x.x
 
-1. Added lines to laser sensor visualization 
+1. Added lines to laser sensor visualization
     * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
     * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
 

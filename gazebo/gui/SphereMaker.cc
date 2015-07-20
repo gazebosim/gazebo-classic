@@ -52,7 +52,7 @@ SphereMaker::SphereMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-      math::Quaternion());
+      ignition::math::Quaterniond());
 }
 
 /////////////////////////////////////////////////
@@ -93,7 +93,7 @@ std::string SphereMaker::GetSDFString()
     modelName << "unit_sphere_" << counter;
     model.set_name(modelName.str());
   }
-  msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
   msgs::AddSphereLink(model, 1.0, 0.5);
   model.mutable_link(0)->set_name("link");
 

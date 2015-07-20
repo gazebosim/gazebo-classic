@@ -1229,7 +1229,7 @@ void GLWidget::PopHistory()
     msg.set_id(gui::get_entity_id(this->moveHistory.back().first));
     msg.set_name(this->moveHistory.back().first);
 
-    msgs::Set(msg.mutable_pose(), this->moveHistory.back().second);
+    msgs::Set(msg.mutable_pose(), this->moveHistory.back().second.Ign());
     this->scene->GetVisual(this->moveHistory.back().first)->SetWorldPose(
         this->moveHistory.back().second);
 

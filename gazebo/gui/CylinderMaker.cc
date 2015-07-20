@@ -51,7 +51,7 @@ CylinderMaker::CylinderMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            ignition::math::Quaterniond());
 }
 
 CylinderMaker::~CylinderMaker()
@@ -90,7 +90,7 @@ std::string CylinderMaker::GetSDFString()
     modelName << "unit_cylinder_" << counter;
     model.set_name(modelName.str());
   }
-  msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
   msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   model.mutable_link(0)->set_name("link");
 

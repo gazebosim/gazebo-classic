@@ -52,7 +52,7 @@ BoxMaker::BoxMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            ignition::math::Quaterniond());
 }
 
 /////////////////////////////////////////////////
@@ -93,8 +93,8 @@ std::string BoxMaker::GetSDFString()
     modelName << "unit_box_" << counter;
     model.set_name(modelName.str());
   }
-  msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
-  msgs::AddBoxLink(model, 1.0, math::Vector3::One);
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+  msgs::AddBoxLink(model, 1.0, ignition::math::Vector3d::One);
   model.mutable_link(0)->set_name("link");
 
   return "<sdf version='" + std::string(SDF_VERSION) + "'>"
