@@ -38,6 +38,7 @@
 #include "gazebo/physics/dart/DARTSliderJoint.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
 #include "gazebo/physics/dart/DARTUniversalJoint.hh"
+#include "gazebo/physics/dart/DARTFixedJoint.hh"
 
 #include "gazebo/physics/dart/DARTRayShape.hh"
 #include "gazebo/physics/dart/DARTBoxShape.hh"
@@ -350,6 +351,8 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new DARTBallJoint(_parent));
   else if (_type == "universal")
     joint.reset(new DARTUniversalJoint(_parent));
+  else if (_type == "fixed")
+    joint.reset(new DARTFixedJoint(_parent));
   else
     gzerr << "Unable to create joint of type[" << _type << "]";
 
@@ -461,6 +464,8 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::DART);
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+        msgs::Convert(this->MagneticField()));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);

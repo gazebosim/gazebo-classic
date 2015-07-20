@@ -9,11 +9,12 @@ set (sources
     DARTBoxShape.cc
     DARTCollision.cc
     DARTCylinderShape.cc
-    DARTLink.cc
+    DARTFixedJoint.cc
     DARTHeightmapShape.cc
     DARTHingeJoint.cc
     DARTHinge2Joint.cc
     DARTJoint.cc
+    DARTLink.cc
     DARTMesh.cc
     DARTMeshShape.cc
     DARTModel.cc
@@ -34,6 +35,7 @@ SET (headers
     DARTBoxShape.hh
     DARTCollision.hh
     DARTCylinderShape.hh
+    DARTFixedJoint.hh
     DARTHeightmapShape.hh
     DARTHingeJoint.hh
     DARTHinge2Joint.hh
