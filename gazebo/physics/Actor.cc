@@ -585,9 +585,10 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
 
     if (!parentBone)
     {
-      bone_pose->mutable_position()->CopyFrom(msgs::Convert(math::Vector3()));
+      bone_pose->mutable_position()->CopyFrom(
+          msgs::Convert(ignition::math::Vector3d()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(
-                                                    math::Quaternion()));
+            ignition::math::Quaterniond()));
       mainLinkPose = bonePose;
     }
     else
@@ -661,15 +662,18 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 
     if (!parentBone)
     {
-      bone_pose->mutable_position()->CopyFrom(msgs::Convert(math::Vector3()));
+      bone_pose->mutable_position()->CopyFrom(
+          msgs::Convert(ignition::math::Vector3d()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(
-                                                    math::Quaternion()));
+            ignition::math::Quaterniond()));
       mainLinkPose = bonePose;
     }
     else
     {
-      bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
-      bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
+      bone_pose->mutable_position()->CopyFrom(
+          msgs::Convert(bonePose.pos.Ign()));
+      bone_pose->mutable_orientation()->CopyFrom(
+          msgs::Convert(bonePose.rot.Ign()));
       LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
       math::Pose parentPose = parentLink->GetWorldPose();
       math::Matrix4 parentTrans(parentPose.rot.GetAsMatrix4());
@@ -681,8 +685,10 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
     link_pose->set_name(currentLink->GetScopedName());
     link_pose->set_id(currentLink->GetId());
     math::Pose linkPose = transform.GetAsPose() - mainLinkPose;
-    link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.pos));
-    link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.rot));
+    link_pose->mutable_position()->CopyFrom(
+        msgs::Convert(linkPose.pos.Ign()));
+    link_pose->mutable_orientation()->CopyFrom(
+        msgs::Convert(linkPose.rot.Ign()));
     currentLink->SetWorldPose(transform.GetAsPose(), true, false);
   }
 
@@ -692,8 +698,10 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
   msgs::Pose *model_pose = msg.add_pose();
   model_pose->set_name(this->GetScopedName());
   model_pose->set_id(this->GetId());
-  model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.pos));
-  model_pose->mutable_orientation()->CopyFrom(msgs::Convert(mainLinkPose.rot));
+  model_pose->mutable_position()->CopyFrom(
+      msgs::Convert(mainLinkPose.pos.Ign()));
+  model_pose->mutable_orientation()->CopyFrom(
+      msgs::Convert(mainLinkPose.rot.Ign()));
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())
     this->bonePosePub->Publish(msg);

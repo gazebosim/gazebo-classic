@@ -188,7 +188,7 @@ math::Vector3 ForceTorqueSensor::GetForce() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d ForceTorqueSensor::Force() const
 {
-  return msgs::Convert(this->wrenchMsg.wrench().force()).Ign();
+  return msgs::ConvertIgn(this->wrenchMsg.wrench().force());
 }
 
 //////////////////////////////////////////////////
@@ -200,7 +200,7 @@ math::Vector3 ForceTorqueSensor::GetTorque() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d ForceTorqueSensor::Torque() const
 {
-  return msgs::Convert(this->wrenchMsg.wrench().torque()).Ign();
+  return msgs::ConvertIgn(this->wrenchMsg.wrench().torque());
 }
 
 //////////////////////////////////////////////////
@@ -260,9 +260,9 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
   }
 
   msgs::Set(this->wrenchMsg.mutable_wrench()->mutable_force(),
-      math::Vector3(measuredForce));
+      measuredForce);
   msgs::Set(this->wrenchMsg.mutable_wrench()->mutable_torque(),
-      math::Vector3(measuredTorque));
+      measuredTorque);
 
   this->update(this->wrenchMsg);
 

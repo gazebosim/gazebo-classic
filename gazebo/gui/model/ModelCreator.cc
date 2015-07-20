@@ -662,21 +662,21 @@ std::string ModelCreator::AddShape(LinkType _type,
         << "They will be ignored." << std::endl;
     }
     // Find extreme values to center the polylines
-    math::Vector2d min(paths[0].polylines[0][0]);
-    math::Vector2d max(min);
+    ignition::math::Vector2d min(paths[0].polylines[0][0]);
+    ignition::math::Vector2d max(min);
 
     for (auto const &poly : closedPolys)
     {
       for (auto const &pt : poly)
       {
-        if (pt.X() < min.x)
-          min.x = pt.X();
-        if (pt.Y() < min.y)
-          min.y = pt.Y();
-        if (pt.X() > max.x)
-          max.x = pt.X();
-        if (pt.Y() > max.y)
-          max.y = pt.Y();
+        if (pt.X() < min.X())
+          min.X() = pt.X();
+        if (pt.Y() < min.Y())
+          min.Y() = pt.Y();
+        if (pt.X() > max.X())
+          max.X() = pt.X();
+        if (pt.Y() > max.Y())
+          max.Y() = pt.Y();
       }
     }
     for (auto const &poly : closedPolys)
@@ -687,11 +687,11 @@ std::string ModelCreator::AddShape(LinkType _type,
       for (auto const &p : poly)
       {
         // Translate to center
-        math::Vector2d pt = math::Vector2d(p) - min - (max-min)*0.5;
+        ignition::math::Vector2d pt = p - min - (max-min)*0.5;
         // Swap X and Y so Z will point up
         // (in 2D it points into the screen)
         sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-        pointElem->Set(math::Vector2d(pt.y*_size.y, pt.x*_size.x));
+        pointElem->Set(math::Vector2d(pt.Y()*_size.y, pt.X()*_size.x));
       }
     }
   }
@@ -1169,7 +1169,7 @@ void ModelCreator::CreateTheEntity()
   }
 
   msg.set_sdf(this->modelSDF->ToString());
-  msgs::Set(msg.mutable_pose(), this->modelPose);
+  msgs::Set(msg.mutable_pose(), this->modelPose.Ign());
   this->makerPub->Publish(msg);
 }
 
