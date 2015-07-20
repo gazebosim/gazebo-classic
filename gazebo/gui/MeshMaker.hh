@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MESHMAKER_HH_
-#define _MESHMAKER_HH_
+#ifndef _GAZEBO_MESHMAKER_HH_
+#define _GAZEBO_MESHMAKER_HH_
 
 #include <string>
 #include "gazebo/gui/EntityMaker.hh"
@@ -32,24 +32,29 @@ namespace gazebo
   {
     class GAZEBO_VISIBLE MeshMaker : public EntityMaker
     {
+      /// \brief Cosntructor
       public: MeshMaker();
+
+      /// \brief Destructor
       public: virtual ~MeshMaker();
 
+      // Documentation inherited
       public: void Init(const std::string &_filename);
+
+      // Documentation inherited
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
+      // Documentation inherited
       public: virtual void Stop();
-      public: virtual bool IsActive() const;
 
-      public: virtual void OnMousePush(const common::MouseEvent &_event);
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+      // Documentation inherited
+      public: virtual bool IsActive() const;
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
+      // Documentation inherited
       private: virtual void CreateTheEntity();
+
       private: int state;
-      private: bool leftMousePressed;
-      private: math::Vector2i mousePushPos, mouseReleasePos;
       private: msgs::Visual *visualMsg;
 
       private: static unsigned int counter;

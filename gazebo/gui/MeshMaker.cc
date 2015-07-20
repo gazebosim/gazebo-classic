@@ -46,7 +46,6 @@ MeshMaker::MeshMaker()
 : EntityMaker()
 {
   this->state = 0;
-  this->leftMousePressed = false;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::MESH);
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
@@ -102,18 +101,6 @@ bool MeshMaker::IsActive() const
 }
 
 /////////////////////////////////////////////////
-void MeshMaker::OnMousePush(const common::MouseEvent &/*_event*/)
-{
-}
-
-/////////////////////////////////////////////////
-void MeshMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
-{
-  this->CreateTheEntity();
-  this->Stop();
-}
-
-/////////////////////////////////////////////////
 void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
 {
   math::Pose pose = msgs::Convert(this->visualMsg->pose());
@@ -157,11 +144,6 @@ void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
   this->visPub->Publish(*this->visualMsg);
 }
 
-/////////////////////////////////////////////////
-void MeshMaker::OnMouseDrag(const common::MouseEvent &/*_event*/)
-{
-  this->visPub->Publish(*this->visualMsg);
-}
 
 /////////////////////////////////////////////////
 void MeshMaker::CreateTheEntity()

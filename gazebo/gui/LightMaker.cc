@@ -149,11 +149,6 @@ bool LightMaker::IsActive() const
 }
 
 /////////////////////////////////////////////////
-void LightMaker::OnMousePush(const common::MouseEvent &/*_event*/)
-{
-}
-
-/////////////////////////////////////////////////
 void LightMaker::CreateTheEntity()
 {
   msgs::Set(this->msg.mutable_pose()->mutable_position(),
@@ -162,16 +157,6 @@ void LightMaker::CreateTheEntity()
             math::Quaternion());
   this->lightPub->Publish(this->msg);
   this->camera.reset();
-}
-
-/////////////////////////////////////////////////
-void LightMaker::OnMouseRelease(const common::MouseEvent &_event)
-{
-  if (_event.Button() == common::MouseEvent::LEFT && !_event.Dragging())
-  {
-    this->CreateTheEntity();
-    this->Stop();
-  }
 }
 
 /////////////////////////////////////////////////
@@ -194,7 +179,7 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
   p1 = origin1 + dir1 * dist1;
 
   // Get snap point
-  if (!_event.Shift())
+  if (_event.Control())
     p1 = this->GetSnappedPoint(p1);
 
   p1.z = this->light->GetPosition().z;

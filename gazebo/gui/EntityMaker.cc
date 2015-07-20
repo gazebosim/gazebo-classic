@@ -23,6 +23,7 @@
 
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
+#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;
@@ -58,20 +59,18 @@ void EntityMaker::SetSnapToGrid(bool _snap)
   snapToGrid = _snap;
 }
 
-
 //////////////////////////////////////////////////
-void EntityMaker::OnMousePush(const common::MouseEvent &/*event*/)
+void EntityMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-}
-
-//////////////////////////////////////////////////
-void EntityMaker::OnMouseRelease(const common::MouseEvent &/*event*/)
-{
-}
-
-//////////////////////////////////////////////////
-void EntityMaker::OnMouseDrag(const common::MouseEvent &/*event*/)
-{
+  // Place if not dragging, or if dragged for less than 50 pixels.
+  // The 50 pixels is used to account for accidental mouse movement
+  // when placing an object.
+  if (_event.Button() == common::MouseEvent::LEFT &&
+      (!_event.Dragging() || _event.PressPos().Distance(_event.Pos()) < 50))
+  {
+    this->CreateTheEntity();
+    this->Stop();
+  }
 }
 
 //////////////////////////////////////////////////

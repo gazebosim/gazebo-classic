@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _SPHEREMAKER_HH_
-#define _SPHEREMAKER_HH_
+#ifndef _GAZEBO_SPHEREMAKER_HH_
+#define _GAZEBO_SPHEREMAKER_HH_
 
 #include <string>
 
@@ -34,26 +34,29 @@ namespace gazebo
   {
     class GAZEBO_VISIBLE SphereMaker : public EntityMaker
     {
+      /// \brief Constructor
       public: SphereMaker();
+
+      /// \brief Destructor
       public: virtual ~SphereMaker();
 
+      // Documentation inherited
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
+      // Documentation inherited
       public: virtual void Stop();
-      public: virtual bool IsActive() const;
 
-      public: virtual void OnMousePush(const common::MouseEvent &_event);
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+      // Documentation inherited
+      public: virtual bool IsActive() const;
 
       /// \brief Get the SDF information for the sphere.
       /// \return The SDF as a string.
       public: std::string GetSDFString();
 
+      // Documentation inherited
       protected: virtual void CreateTheEntity();
 
       private: int state;
-      private: bool leftMousePressed;
       private: math::Vector2i mousePushPos;
       private: msgs::Visual *visualMsg;
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ENTITYMAKER_HH_
-#define _ENTITYMAKER_HH_
+#ifndef _GAZEBO_ENTITYMAKER_HH_
+#define _GAZEBO_ENTITYMAKER_HH_
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -54,34 +54,28 @@ namespace gazebo
       /// \brief Set whether to snap to grid
       public: static void SetSnapToGrid(bool _snap);
 
-      /// \brief
+      /// \brief Start the maker.
       /// \param[in] _camera Pointer to the user camera
       public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
-      /// \brief
+
+      /// \brief Stop the maker.
       public: virtual void Stop() = 0;
 
-      /// \brief Checks if entity is active
+      /// \brief Checks if maker is active
+      /// \return True if is active,
       public: virtual bool IsActive() const = 0;
 
-      /// \brief Callback for pushing entity with mouse
-      /// \param[in] _event MouseEvent object
-      public: virtual void OnMousePush(const common::MouseEvent &_event);
-
-      /// \brief Callback for releasing mouse button
+      /// \brief Callback when mouse button is released
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-
-      /// \brief Callback for dragging with mouse
-      /// \param[in] _event MouseEvent object
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
 
       /// \brief Callback when moving mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
-      /// \brief Get a point snapped to a grid
-      /// \param[in] _p input point to be snapped
-      /// \return math::Vector3 with the point on the grid
+      /// \brief Get a point snapped to a 1m x 1m x 1m grid.
+      /// \param[in] _p Point to be snapped
+      /// \return Point on the grid
       protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
 
       /// \brief Creates the entity

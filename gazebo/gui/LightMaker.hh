@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _LIGHTMAKER_HH_
-#define _LIGHTMAKER_HH_
+
+#ifndef _GAZEBO_LIGHTMAKER_HH_
+#define _GAZEBO_LIGHTMAKER_HH_
 
 #include <string>
 
@@ -34,27 +35,31 @@ namespace gazebo
   {
     class GAZEBO_VISIBLE LightMaker : public EntityMaker
     {
+      /// \brief Constructor
       public: LightMaker();
 
+      // Documentation inherited
       public: void Start(const rendering::UserCameraPtr _camera);
+
+      // Documentation inherited
       public: void Stop();
+
+      // Documentation inherited
       public: virtual bool IsActive() const;
 
-      public: void OnMousePush(const common::MouseEvent &_event);
-
+      // Documentation inherited
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-      public: virtual void OnMouseDrag(const common::MouseEvent &) {}
 
       /// \brief Initialize the light maker from an existing light in the scene.
       /// \param[in] _lightName Name of existing light in the scene.
       /// \return True if initialization is successful.
-      public: bool InitFromLight(const std::string & _lightName);
+      public: bool InitFromLight(const std::string &_lightName);
 
       /// \brief Initialize the light maker.
       /// \return True if the light maker is initialized successfully.
       protected: virtual bool Init();
 
+      // Documentation inherited
       protected: virtual void CreateTheEntity();
 
       protected: int state;

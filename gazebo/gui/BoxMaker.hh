@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _BOXMAKER_HH_
-#define _BOXMAKER_HH_
+#ifndef _GAZEBO_BOXMAKER_HH_
+#define _GAZEBO_BOXMAKER_HH_
 
 #include <string>
 #include "gazebo/math/Vector2i.hh"

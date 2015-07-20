@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_MAKER_HH_
-#define _MODEL_MAKER_HH_
+#ifndef _GAZEBO_MODEL_MAKER_HH_
+#define _GAZEBO_MODEL_MAKER_HH_
 
 #include <list>
 #include <string>
@@ -33,9 +33,13 @@ namespace gazebo
 
   namespace gui
   {
+    /// \brief
     class GAZEBO_VISIBLE ModelMaker : public EntityMaker
     {
+      /// \brief Constructor
       public: ModelMaker();
+
+      /// \brief Destructor
       public: virtual ~ModelMaker();
 
       /// \brief Initialize the model maker with an existing model
@@ -51,9 +55,6 @@ namespace gazebo
       public: virtual void Stop();
       public: virtual bool IsActive() const;
 
-      public: virtual void OnMousePush(const common::MouseEvent &_event);
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
       /// \brief Internal init function.

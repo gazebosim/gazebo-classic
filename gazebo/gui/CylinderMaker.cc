@@ -27,7 +27,6 @@
 #include "gazebo/gui/GuiEvents.hh"
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/math/Quaternion.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -41,11 +40,11 @@ using namespace gui;
 
 unsigned int CylinderMaker::counter = 0;
 
+/////////////////////////////////////////////////
 CylinderMaker::CylinderMaker()
   : EntityMaker()
 {
   this->state = 0;
-  this->leftMousePressed = false;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
   this->visualMsg->mutable_material()->mutable_script()->add_uri(
@@ -62,6 +61,7 @@ CylinderMaker::~CylinderMaker()
   delete this->visualMsg;
 }
 
+/////////////////////////////////////////////////
 void CylinderMaker::Start(const rendering::UserCameraPtr _camera)
 {
   this->camera = _camera;
@@ -71,6 +71,7 @@ void CylinderMaker::Start(const rendering::UserCameraPtr _camera)
   this->state = 1;
 }
 
+/////////////////////////////////////////////////
 void CylinderMaker::Stop()
 {
   msgs::Request *msg = msgs::CreateRequest("entity_delete",
@@ -83,111 +84,10 @@ void CylinderMaker::Stop()
   gui::Events::moveMode(true);
 }
 
+/////////////////////////////////////////////////
 bool CylinderMaker::IsActive() const
 {
   return this->state > 0;
-}
-
-void CylinderMaker::OnMousePush(const common::MouseEvent &_event)
-{
-  if (this->state == 0)
-    return;
-
-  this->mousePushPos = _event.PressPos();
-}
-
-void CylinderMaker::OnMouseRelease(const common::MouseEvent &_event)
-{
-  if (this->state == 0)
-    return;
-
-  this->state++;
-  this->mouseReleasePos = _event.Pos();
-
-  if (this->state == 3)
-  {
-    this->CreateTheEntity();
-    this->Stop();
-  }
-}
-
-/////////////////////////////////////////////////
-void CylinderMaker::OnMouseMove(const common::MouseEvent &_event)
-{
-  if (this->state < 2)
-    return;
-
-  math::Vector3 norm;
-  math::Vector3 p1, p2;
-
-  norm.Set(1, 0, 0);
-
-  math::Vector3 p(this->visualMsg->pose().position().x(),
-                  this->visualMsg->pose().position().y(),
-                  this->visualMsg->pose().position().z());
-
-  double size = (this->mouseReleasePos.y - _event.Pos().Y()) * 0.01;
-  if (!_event.Shift())
-    size = rint(size);
-
-  this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(size);
-
-  p.z = size / 2.0;
-
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
-  this->visPub->Publish(*this->visualMsg);
-}
-
-/////////////////////////////////////////////////
-void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
-{
-  if (this->state == 0)
-    return;
-
-  math::Vector3 norm;
-  math::Vector3 p1, p2;
-
-  norm.Set(0, 0, 1);
-
-  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
-                                          this->mousePushPos.y,
-                                          math::Plane(norm), p1))
-  {
-    gzerr << "Invalid mouse point\n";
-    return;
-  }
-
-  p1.Round();
-
-  if (!this->camera->GetWorldPointOnPlane(
-        _event.Pos().X(), _event.Pos().Y(), math::Plane(norm), p2))
-  {
-    gzerr << "Invalid mouse point\n";
-    return;
-  }
-
-  p2 = this->GetSnappedPoint(p2);
-
-  if (this->state == 1)
-    msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
-
-  math::Vector3 p(this->visualMsg->pose().position().x(),
-                  this->visualMsg->pose().position().y(),
-                  this->visualMsg->pose().position().z());
-
-  if (this->state == 1)
-  {
-    double dist = p1.Distance(p2);
-    double rounded = rint(dist);
-    if (fabs(dist - rounded) < 0.2)
-      dist = rounded;
-
-    this->visualMsg->mutable_geometry()->mutable_cylinder()->set_radius(dist);
-    this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(0.01);
-  }
-
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
-  this->visPub->Publish(*this->visualMsg);
 }
 
 /////////////////////////////////////////////////

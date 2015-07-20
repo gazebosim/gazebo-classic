@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _CYLINDERMAKER_HH_
-#define _CYLINDERMAKER_HH_
+#ifndef _GAZEBO_CYLINDERMAKER_HH_
+#define _GAZEBO_CYLINDERMAKER_HH_
 
 #include <string>
 
@@ -40,24 +40,18 @@ namespace gazebo
     {
       /// \brief Constructor
       public: CylinderMaker();
+
       /// \brief Deconstructor
       public: virtual ~CylinderMaker();
 
       /// Documentation inherited
       public: virtual void Start(const rendering::UserCameraPtr _camera);
-      /// Documentation inherited
-      public: virtual void Stop();
-      /// Documentation inherited
-      public: virtual bool IsActive() const;
 
       /// Documentation inherited
-      public: virtual void OnMousePush(const common::MouseEvent &_event);
+      public: virtual void Stop();
+
       /// Documentation inherited
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-      /// Documentation inherited
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
-      /// Documentation inherited
-      public: virtual void OnMouseMove(const common::MouseEvent &_event);
+      public: virtual bool IsActive() const;
 
       /// \brief Get the SDF information for the cylinder.
       /// \return The SDF as a string.
@@ -65,8 +59,8 @@ namespace gazebo
 
       /// Documentation inherited
       private: virtual void CreateTheEntity();
+
       private: int state;
-      private: bool leftMousePressed;
       private: math::Vector2i mousePushPos, mouseReleasePos;
       private: msgs::Visual *visualMsg;
 

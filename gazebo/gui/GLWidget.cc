@@ -589,8 +589,11 @@ void GLWidget::OnMousePressNormal()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressMakeEntity()
 {
-  if (this->entityMaker)
-    this->entityMaker->OnMousePush(this->mouseEvent);
+  if (!this->userCamera)
+    return;
+
+  // Allow camera orbiting while making an entity
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 /////////////////////////////////////////////////
@@ -638,10 +641,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::OnMouseMoveMakeEntity()
 {
+  if (!this->userCamera)
+    return;
+
   if (this->entityMaker)
   {
+    // Allow camera orbiting while inserting a new model
     if (this->mouseEvent.Dragging())
-      this->entityMaker->OnMouseDrag(this->mouseEvent);
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
     else
       this->entityMaker->OnMouseMove(this->mouseEvent);
   }

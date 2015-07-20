@@ -273,44 +273,18 @@ bool ModelMaker::IsActive() const
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
-{
-}
-
-/////////////////////////////////////////////////
-void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
-{
-  if (_event.Button() == common::MouseEvent::LEFT)
-  {
-    // Place if not dragging, or if dragged for less than 50 pixels.
-    // The 50 pixels is used to account for accidental mouse movement
-    // when placing an object.
-    if (!_event.Dragging() || _event.PressPos().Distance(_event.Pos()) < 50)
-    {
-      this->CreateTheEntity();
-      this->Stop();
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
 {
   math::Pose pose = this->modelVisual->GetWorldPose();
   pose.pos = ModelManipulator::GetMousePositionOnPlane(this->camera, _event);
 
-  if (!_event.Shift())
+  if (_event.Control())
   {
     pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
   pose.pos.z = this->modelVisual->GetWorldPose().pos.z;
 
   this->modelVisual->SetWorldPose(pose);
-}
-
-/////////////////////////////////////////////////
-void ModelMaker::OnMouseDrag(const common::MouseEvent &/*_event*/)
-{
 }
 
 /////////////////////////////////////////////////
