@@ -97,7 +97,7 @@ bool RFIDTag::UpdateImpl(bool /*_force*/)
   if (this->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, entity->GetWorldPose());
+    msgs::Set(&msg, entity->GetWorldPose().Ign());
 
     // msg.set_position(link->GetWorldPose().pos);
     // msg.set_orientation(link->GetWorldPose().rot);

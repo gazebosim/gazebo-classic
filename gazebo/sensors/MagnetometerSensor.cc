@@ -172,5 +172,5 @@ bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
 ignition::math::Vector3d MagnetometerSensor::MagneticField() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  return msgs::Convert(this->dataPtr->magMsg.field_tesla()).Ign();
+  return msgs::ConvertIgn(this->dataPtr->magMsg.field_tesla());
 }

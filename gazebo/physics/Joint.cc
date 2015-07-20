@@ -536,7 +536,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_id(this->GetId());
 
-  msgs::Set(_msg.mutable_pose(), this->anchorPose);
+  msgs::Set(_msg.mutable_pose(), this->anchorPose.Ign());
   _msg.set_type(this->GetMsgType());
 
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
@@ -550,7 +550,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     else
       break;
 
-    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i));
+    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i).Ign());
     axis->set_limit_lower(this->GetLowStop(i).Radian());
     axis->set_limit_upper(this->GetHighStop(i).Radian());
     axis->set_limit_effort(this->GetEffortLimit(i));
