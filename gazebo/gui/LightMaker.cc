@@ -43,8 +43,6 @@ LightMaker::LightMaker() : EntityMaker()
 {
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
-  this->state = 0;
-
   msgs::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
   msgs::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
 
@@ -125,7 +123,6 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
     this->Init();
 
   this->camera = _camera;
-  this->state = 1;
 }
 
 /////////////////////////////////////////////////
@@ -137,14 +134,7 @@ void LightMaker::Stop()
     scene->RemoveLight(this->light);
     this->light.reset();
   }
-  this->state = 0;
   gui::Events::moveMode(true);
-}
-
-/////////////////////////////////////////////////
-bool LightMaker::IsActive() const
-{
-  return this->state > 0;
 }
 
 /////////////////////////////////////////////////

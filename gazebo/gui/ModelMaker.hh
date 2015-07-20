@@ -53,7 +53,6 @@ namespace gazebo
       public: virtual void Start(const rendering::UserCameraPtr _camera);
 
       public: virtual void Stop();
-      public: virtual bool IsActive() const;
 
       /// \brief Internal init function.
       private: bool Init();

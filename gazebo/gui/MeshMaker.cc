@@ -45,7 +45,6 @@ unsigned int MeshMaker::counter = 0;
 MeshMaker::MeshMaker()
 : EntityMaker()
 {
-  this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::MESH);
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
@@ -77,8 +76,6 @@ void MeshMaker::Start(const rendering::UserCameraPtr _camera)
   this->visualMsg->set_name(stream.str());
   this->visualMsg->set_name(stream.str());
   this->visPub->Publish(*this->visualMsg);
-
-  this->state = 1;
 }
 
 /////////////////////////////////////////////////
@@ -90,14 +87,7 @@ void MeshMaker::Stop()
   this->requestPub->Publish(*msg);
   delete msg;
 
-  this->state = 0;
   gui::Events::moveMode(true);
-}
-
-/////////////////////////////////////////////////
-bool MeshMaker::IsActive() const
-{
-  return this->state > 0;
 }
 
 /////////////////////////////////////////////////

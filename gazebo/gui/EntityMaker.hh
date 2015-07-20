@@ -58,10 +58,6 @@ namespace gazebo
       /// \brief Stop the maker.
       public: virtual void Stop() = 0;
 
-      /// \brief Checks if maker is active
-      /// \return True if is active,
-      public: virtual bool IsActive() const = 0;
-
       /// \brief Callback when mouse button is released
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
@@ -89,10 +85,7 @@ namespace gazebo
       protected: transport::PublisherPtr makerPub;
       protected: transport::PublisherPtr requestPub;
 
-
       private: static bool snapToGrid;
-      private: static double snapDistance;
-      private: static double snapGridSize;
     };
   }
 }

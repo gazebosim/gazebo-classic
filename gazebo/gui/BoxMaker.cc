@@ -45,7 +45,6 @@ unsigned int BoxMaker::counter = 0;
 BoxMaker::BoxMaker()
 : EntityMaker()
 {
-  this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::BOX);
   this->visualMsg->mutable_material()->mutable_script()->add_uri(
@@ -71,8 +70,6 @@ void BoxMaker::Start(const rendering::UserCameraPtr _camera)
   std::ostringstream stream;
   stream << "__GZ_USER_box_" << counter++;
   this->visualMsg->set_name(stream.str());
-
-  this->state = 1;
 }
 
 /////////////////////////////////////////////////
@@ -84,14 +81,7 @@ void BoxMaker::Stop()
   this->requestPub->Publish(*msg);
   delete msg;
 
-  this->state = 0;
   gui::Events::moveMode(true);
-}
-
-/////////////////////////////////////////////////
-bool BoxMaker::IsActive() const
-{
-  return this->state > 0;
 }
 
 /////////////////////////////////////////////////

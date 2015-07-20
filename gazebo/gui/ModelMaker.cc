@@ -49,7 +49,6 @@ using namespace gui;
   ModelMaker::ModelMaker()
 : EntityMaker()
 {
-  this->state = 0;
   this->clone = false;
 }
 
@@ -246,7 +245,6 @@ bool ModelMaker::Init()
 void ModelMaker::Start(const rendering::UserCameraPtr _camera)
 {
   this->camera = _camera;
-  this->state = 1;
 }
 
 /////////////////////////////////////////////////
@@ -260,14 +258,7 @@ void ModelMaker::Stop()
   this->visuals.clear();
   this->modelSDF.reset();
 
-  this->state = 0;
   gui::Events::moveMode(true);
-}
-
-/////////////////////////////////////////////////
-bool ModelMaker::IsActive() const
-{
-  return this->state > 0;
 }
 
 /////////////////////////////////////////////////

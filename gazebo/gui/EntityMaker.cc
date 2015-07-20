@@ -34,9 +34,7 @@
 using namespace gazebo;
 using namespace gui;
 
-bool EntityMaker::snapToGrid = true;
-double EntityMaker::snapDistance = 0.4;
-double EntityMaker::snapGridSize = 1.0;
+bool EntityMaker::snapToGrid = false;
 
 //////////////////////////////////////////////////
 EntityMaker::EntityMaker()
@@ -84,7 +82,7 @@ void EntityMaker::OnMouseMove(const common::MouseEvent &_event)
   ignition::math::Vector3d pos =
       (ModelManipulator::GetMousePositionOnPlane(this->camera, _event)).Ign();
 
-  if (_event.Control())
+  if (_event.Control() || this->snapToGrid)
   {
     pos = ModelManipulator::SnapPoint(math::Vector3(pos)).Ign();
   }
@@ -103,3 +101,4 @@ ignition::math::Vector3d EntityMaker::EntityPosition() const
 void EntityMaker::SetEntityPosition(const ignition::math::Vector3d &/*_pos*/)
 {
 }
+

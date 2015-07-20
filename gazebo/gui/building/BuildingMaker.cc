@@ -621,12 +621,6 @@ void BuildingMaker::Reset()
 }
 
 /////////////////////////////////////////////////
-bool BuildingMaker::IsActive() const
-{
-  return true;
-}
-
-/////////////////////////////////////////////////
 void BuildingMaker::SetModelName(const std::string &_modelName)
 {
   this->modelName = _modelName;

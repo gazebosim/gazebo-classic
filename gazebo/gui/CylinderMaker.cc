@@ -44,7 +44,6 @@ unsigned int CylinderMaker::counter = 0;
 CylinderMaker::CylinderMaker()
   : EntityMaker()
 {
-  this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
   this->visualMsg->mutable_material()->mutable_script()->add_uri(
@@ -68,7 +67,6 @@ void CylinderMaker::Start(const rendering::UserCameraPtr _camera)
   std::ostringstream stream;
   stream << "__GZ_USER_cylinder_" << counter++;
   this->visualMsg->set_name(stream.str());
-  this->state = 1;
 }
 
 /////////////////////////////////////////////////
@@ -80,14 +78,7 @@ void CylinderMaker::Stop()
   this->requestPub->Publish(*msg);
   delete msg;
 
-  this->state = 0;
   gui::Events::moveMode(true);
-}
-
-/////////////////////////////////////////////////
-bool CylinderMaker::IsActive() const
-{
-  return this->state > 0;
 }
 
 /////////////////////////////////////////////////

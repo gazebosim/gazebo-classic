@@ -48,9 +48,6 @@ namespace gazebo
       public: virtual void Stop();
 
       // Documentation inherited
-      public: virtual bool IsActive() const;
-
-      // Documentation inherited
       private: virtual void CreateTheEntity();
 
       private: int state;

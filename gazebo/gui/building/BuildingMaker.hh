@@ -220,9 +220,6 @@ namespace gazebo
       /// \brief Generate the SDF from building part visuals.
       public: void GenerateSDF();
 
-      // Documentation inherited
-      public: virtual bool IsActive() const;
-
       /// \brief Set save state upon a change to the building.
       public: void BuildingChanged();
 

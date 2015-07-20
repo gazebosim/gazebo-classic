@@ -44,7 +44,6 @@ unsigned int SphereMaker::counter = 0;
 SphereMaker::SphereMaker()
   : EntityMaker()
 {
-  this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::SPHERE);
 
@@ -71,7 +70,6 @@ void SphereMaker::Start(const rendering::UserCameraPtr _camera)
   std::ostringstream stream;
   stream << "__GZ_USER_sphere_" << counter++;
   this->visualMsg->set_name(stream.str());
-  this->state = 1;
 }
 
 /////////////////////////////////////////////////
@@ -83,14 +81,7 @@ void SphereMaker::Stop()
   this->requestPub->Publish(*msg);
   delete msg;
 
-  this->state = 0;
   gui::Events::moveMode(true);
-}
-
-/////////////////////////////////////////////////
-bool SphereMaker::IsActive() const
-{
-  return this->state > 0;
 }
 
 /////////////////////////////////////////////////

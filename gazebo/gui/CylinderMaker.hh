@@ -49,9 +49,6 @@ namespace gazebo
       /// Documentation inherited
       public: virtual void Stop();
 
-      /// Documentation inherited
-      public: virtual bool IsActive() const;
-
       /// \brief Get the SDF information for the cylinder.
       /// \return The SDF as a string.
       public: std::string GetSDFString();
