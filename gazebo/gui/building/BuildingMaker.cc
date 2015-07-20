@@ -1052,14 +1052,14 @@ void BuildingMaker::GenerateSDFWithCSG()
           continue;
         for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
         {
-          m1SubMesh->AddVertex(subMesh->GetVertex(j));
+          m1SubMesh->AddVertex(subMesh->Vertex(j));
         }
         for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
         {
           m1SubMesh->AddIndex(subMesh->GetIndex(j));
         }
       }
-      m1->SetScale(math::Vector3(wallVis->GetScale()));
+      m1->SetScale(wallVis->GetScale().Ign());
 
       std::string booleanMeshName = buildingModelManip->GetName() + "_Boolean";
       common::Mesh *booleanMesh = NULL;
@@ -1093,18 +1093,18 @@ void BuildingMaker::GenerateSDFWithCSG()
               continue;
             for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
             {
-              m2SubMesh->AddVertex(subMesh->GetVertex(j));
+              m2SubMesh->AddVertex(subMesh->Vertex(j));
             }
             for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
             {
               m2SubMesh->AddIndex(subMesh->GetIndex(j));
             }
           }
-          m2->SetScale(math::Vector3(attachedVis->GetScale()));
+          m2->SetScale(attachedVis->GetScale().Ign());
           // create csg but don't add to mesh manager just yet
           common::MeshCSG csg;
           booleanMesh = csg.CreateBoolean(m1, m2, common::MeshCSG::DIFFERENCE,
-              offset);
+              offset.Ign());
         }
       }
       // add to mesh manager after all boolean operations are done

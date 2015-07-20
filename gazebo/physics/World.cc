@@ -269,11 +269,11 @@ void World::Load(sdf::ElementPtr _sdf)
     common::SphericalCoordinates::SurfaceType surfaceType =
       common::SphericalCoordinates::Convert(
         spherical->Get<std::string>("surface_model"));
-    math::Angle latitude, longitude, heading;
+    ignition::math::Angle latitude, longitude, heading;
     double elevation = spherical->Get<double>("elevation");
-    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
-    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
-    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+    latitude.Degree(spherical->Get<double>("latitude_deg"));
+    longitude.Degree(spherical->Get<double>("longitude_deg"));
+    heading.Degree(spherical->Get<double>("heading_deg"));
 
     this->dataPtr->sphericalCoordinates.reset(new common::SphericalCoordinates(
       surfaceType, latitude, longitude, elevation, heading));
@@ -1776,7 +1776,9 @@ void World::ProcessFactoryMsgs()
         elem->SetParent(this->dataPtr->sdf);
         elem->GetParent()->InsertElement(elem);
         if (factoryMsg.has_pose())
-          elem->GetElement("pose")->Set(msgs::Convert(factoryMsg.pose()));
+        {
+          elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
+        }
 
         if (isActor)
         {
@@ -2021,7 +2023,7 @@ void World::ProcessMessages()
           // Publish the model's relative pose
           poseMsg->set_name(model->GetScopedName());
           poseMsg->set_id(model->GetId());
-          msgs::Set(poseMsg, model->GetRelativePose());
+          msgs::Set(poseMsg, model->GetRelativePose().Ign());
 
           // Publish each of the model's children relative poses
           Link_V links = model->GetLinks();
@@ -2030,7 +2032,7 @@ void World::ProcessMessages()
             poseMsg = msg.add_pose();
             poseMsg->set_name(link->GetScopedName());
             poseMsg->set_id(link->GetId());
-            msgs::Set(poseMsg, link->GetRelativePose());
+            msgs::Set(poseMsg, link->GetRelativePose().Ign());
           }
         }
 
