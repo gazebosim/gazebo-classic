@@ -455,35 +455,36 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     // Apply noise models
     for (auto &keyNoise : this->noises)
     {
-      if (keyNoise.first == IMU_ANGVEL_X_NOISE_RADIANS_PER_S)
+      switch (keyNoise.first)
       {
-        this->imuMsg.mutable_angular_velocity()->set_x(
+        case IMU_ANGVEL_X_NOISE_RADIANS_PER_S:
+          this->imuMsg.mutable_angular_velocity()->set_x(
             keyNoise.second->Apply(this->imuMsg.angular_velocity().x()));
-      }
-      else if (keyNoise.first == IMU_ANGVEL_Y_NOISE_RADIANS_PER_S)
-      {
-        this->imuMsg.mutable_angular_velocity()->set_y(
+          break;
+        case IMU_ANGVEL_Y_NOISE_RADIANS_PER_S:
+          this->imuMsg.mutable_angular_velocity()->set_y(
             keyNoise.second->Apply(this->imuMsg.angular_velocity().y()));
-      }
-      else if (keyNoise.first == IMU_ANGVEL_Z_NOISE_RADIANS_PER_S)
-      {
-        this->imuMsg.mutable_angular_velocity()->set_z(
+          break;
+        case IMU_ANGVEL_Z_NOISE_RADIANS_PER_S:
+          this->imuMsg.mutable_angular_velocity()->set_z(
             keyNoise.second->Apply(this->imuMsg.angular_velocity().z()));
-      }
-      else if (keyNoise.first == IMU_LINACC_X_NOISE_METERS_PER_S_SQR)
-      {
-        this->imuMsg.mutable_linear_acceleration()->set_x(
+          break;
+        case IMU_LINACC_X_NOISE_METERS_PER_S_SQR:
+          this->imuMsg.mutable_linear_acceleration()->set_x(
             keyNoise.second->Apply(this->imuMsg.linear_acceleration().x()));
-      }
-      else if (keyNoise.first == IMU_LINACC_Y_NOISE_METERS_PER_S_SQR)
-      {
-        this->imuMsg.mutable_linear_acceleration()->set_y(
+          break;
+        case IMU_LINACC_Y_NOISE_METERS_PER_S_SQR:
+          this->imuMsg.mutable_linear_acceleration()->set_y(
             keyNoise.second->Apply(this->imuMsg.linear_acceleration().y()));
-      }
-      else if (keyNoise.first == IMU_LINACC_Z_NOISE_METERS_PER_S_SQR)
-      {
-        this->imuMsg.mutable_linear_acceleration()->set_z(
+          break;
+        case IMU_LINACC_Z_NOISE_METERS_PER_S_SQR:
+          this->imuMsg.mutable_linear_acceleration()->set_z(
             keyNoise.second->Apply(this->imuMsg.linear_acceleration().z()));
+          break;
+        default:
+          // Unrecognized noise model found
+          // Should we throw an exception?
+          break;
       }
     }
 
