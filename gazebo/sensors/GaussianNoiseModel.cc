@@ -180,6 +180,16 @@ double GaussianNoiseModel::GetBias() const
 }
 
 //////////////////////////////////////////////////
+void GaussianNoiseModel::Print(std::ostream &_out) const
+{
+  _out << "Gaussian noise, mean[" << this->mean << "], "
+    << "stdDev[" << this->stdDev << "] "
+    << "bias[" << this->bias << "] "
+    << "precision[" << this->precision << "] "
+    << "quantized[" << this->quantized << "]";
+}
+
+//////////////////////////////////////////////////
 ImageGaussianNoiseModel::ImageGaussianNoiseModel()
   : GaussianNoiseModel()
 {
@@ -221,4 +231,14 @@ void ImageGaussianNoiseModel::Fini()
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
   }
+}
+
+//////////////////////////////////////////////////
+void ImageGaussianNoiseModel::Print(std::ostream &_out) const
+{
+  _out << "Image Gaussian noise, mean[" << this->mean << "], "
+    << "stdDev[" << this->stdDev << "] "
+    << "bias[" << this->bias << "] "
+    << "precision[" << this->precision << "] "
+    << "quantized[" << this->quantized << "]";
 }

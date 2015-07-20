@@ -146,3 +146,12 @@ void Noise::Fini()
 {
   this->customNoiseCallback = NULL;
 }
+
+//////////////////////////////////////////////////
+void Noise::Print(std::ostream &_out) const
+{
+  _out << "Noise with type[" << this->type << "] "
+    << "does not have an overloaded output operator. "
+    << "No more information is available.";
+}
+

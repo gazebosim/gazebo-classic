@@ -84,19 +84,24 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   // Get the imu element pointer
   sdf::ElementPtr imuElem = this->sdf->GetElement("imu");
 
-  // CASE 1 : Noise is defined within the sensor (should be deprecated)
+  // CASE 1 : Noise is defined within the sensor
+  // Deprecated in Gazebo 6.0
   if (imuElem->HasElement("noise"))
   {
+    gzwarn << "Deprecation: IMU noise SDF value have changed. Please refer to"
+     << "http://sdformat.org/spec?ver=1.5&elem=sensor#sensor_imu\n";
+
     sdf::ElementPtr noiseElem = imuElem->GetElement("noise");
     std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
       if (noiseElem->HasElement("rate"))
       {
+        sdf::ElementPtr rateElem = noiseElem->GetElement("rate");
 
         // Rename rate -> noise to enforce forward compatibility
         rateElem->SetName("noise");
-        rateElem->AddAttribute("type","string","gaussian",true);
+        rateElem->AddAttribute("type", "string", "gaussian", true);
 
         // Create the noise streams
         this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] =
@@ -109,33 +114,29 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         // Rename noise -> rate to enforce forward compatibility
         rateElem->SetName("rate");
 
-        /*gzlog << "applying Gaussian noise model to rate with mean " <<
-          this->rateNoiseMean << " and stddev " << this->rateNoiseStdDev <<
-          ", bias " << this->rateBias << std::endl;
+        gzlog << "Applying angular velocity noise to IMU["
+          << this->GetName() << "]. ";
 
+        gzlog << "  X: ";
+        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S]->Print(gzlog);
+        gzlog << std::endl;
 
-        sdf::ElementPtr rateElem = noiseElem->GetElement("rate");
-        this->rateNoiseMean = rateElem->Get<double>("mean");
-        this->rateNoiseStdDev = rateElem->Get<double>("stddev");
-        double rateBiasMean = rateElem->Get<double>("bias_mean");
-        double rateBiasStddev = rateElem->Get<double>("bias_stddev");
+        gzlog << "  Y: ";
+        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S]->Print(gzlog);
+        gzlog << std::endl;
 
-        // Sample the bias that we'll use later
-        this->rateBias = ignition::math::Rand::DblNormal(rateBiasMean,
-            rateBiasStddev);
-
-        // With equal probability, we pick a negative bias (by convention,
-        // rateBiasMean should be positive, though it would work fine if
-        // negative).
-        if (ignition::math::Rand::DblUniform() < 0.5)
-          this->rateBias = -this->rateBias;
-          */
+        gzlog << "  Z: ";
+        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S]->Print(gzlog);
+        gzlog << std::endl;
       }
+
       if (noiseElem->HasElement("accel"))
       {
+        sdf::ElementPtr accelElem = noiseElem->GetElement("accel");
+
         // Rename accel -> noise to enforce forward compatibility
         accelElem->SetName("noise");
-        accelElem->AddAttribute("type","string","gaussian",true);
+        accelElem->AddAttribute("type", "string", "gaussian", true);
 
         // Create the noise streams
         this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR] =
@@ -148,25 +149,20 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         // Rename noise -> accel to enforce forward compatibility
         accelElem->SetName("accel");
 
+        gzlog << "Applying linear acceleration noise to IMU["
+          << this->GetName() << "]. ";
 
+        gzlog << "  X: ";
+        this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR]->Print(gzlog);
+        gzlog << std::endl;
 
-        /*sdf::ElementPtr accelElem = noiseElem->GetElement("accel");
-        this->accelNoiseMean = accelElem->Get<double>("mean");
-        this->accelNoiseStdDev = accelElem->Get<double>("stddev");
-        double accelBiasMean = accelElem->Get<double>("bias_mean");
-        double accelBiasStddev = accelElem->Get<double>("bias_stddev");
-        // Sample the bias that we'll use later
-        this->accelBias = ignition::math::Rand::DblNormal(accelBiasMean,
-                                                          accelBiasStddev);
-        // With equal probability, we pick a negative bias (by convention,
-        // accelBiasMean should be positive, though it would work fine if
-        // negative).
-        if (ignition::math::Rand::DblUniform() < 0.5)
-          this->accelBias = -this->accelBias;
-        gzlog << "applying Gaussian noise model to accel with mean " <<
-          this->accelNoiseMean << " and stddev " << this->accelNoiseStdDev <<
-          ", bias " << this->accelBias << std::endl;
-          */
+        gzlog << "  Y: ";
+        this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR]->Print(gzlog);
+        gzlog << std::endl;
+
+        gzlog << "  Z: ";
+        this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR]->Print(gzlog);
+        gzlog << std::endl;
       }
     }
     else
@@ -181,14 +177,21 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     // If an angular velocity noise models have been specified, create them
     if (imuElem->HasElement("angular_velocity"))
     {
+      gzlog << "Applying angular velocity noise to IMU["
+            << this->GetName() << "]. ";
+
       sdf::ElementPtr angularElem = imuElem->GetElement("angular_velocity");
 
-      if (angular->HasElement("x") &&
+      if (angularElem->HasElement("x") &&
           angularElem->GetElement("x")->HasElement("noise"))
       {
         this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] =
           NoiseFactory::NewNoiseModel(
               angularElem->GetElement("x")->GetElement("noise"));
+
+        gzlog << "  X: ";
+        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S]->Print(gzlog);
+        gzlog << std::endl;
       }
 
       if (angularElem->HasElement("y") &&
@@ -197,6 +200,10 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S] =
           NoiseFactory::NewNoiseModel(
               angularElem->GetElement("y")->GetElement("noise"));
+
+        gzlog << "  Y: ";
+        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S]->Print(gzlog);
+        gzlog << std::endl;
       }
 
       if (angularElem->HasElement("z") &&
@@ -205,12 +212,19 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S] =
           NoiseFactory::NewNoiseModel(
               angularElem->GetElement("z")->GetElement("noise"));
+
+        gzlog << "  Z: ";
+        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S]->Print(gzlog);
+        gzlog << std::endl;
       }
     }
 
     // If linear acceleration noise models have been specified, create them
     if (imuElem->HasElement("linear_acceleration"))
     {
+      gzlog << "Applying linear acceleration noise to IMU["
+            << this->GetName() << "]. ";
+
       sdf::ElementPtr linearElem = imuElem->GetElement("linear_acceleration");
       if (linearElem->HasElement("x") &&
           linearElem->GetElement("x")->HasElement("noise"))
@@ -218,6 +232,10 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR] =
           NoiseFactory::NewNoiseModel(
               linearElem->GetElement("x")->GetElement("noise"));
+
+        gzlog << "  X: ";
+        this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR]->Print(gzlog);
+        gzlog << std::endl;
       }
 
       if (linearElem->HasElement("y") &&
@@ -226,6 +244,10 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR] =
           NoiseFactory::NewNoiseModel(
               linearElem->GetElement("y")->GetElement("noise"));
+
+        gzlog << "  Y: ";
+        this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR]->Print(gzlog);
+        gzlog << std::endl;
       }
 
       if (linearElem->HasElement("z") &&
@@ -234,6 +256,10 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
         this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR] =
           NoiseFactory::NewNoiseModel(
               linearElem->GetElement("z")->GetElement("noise"));
+
+        gzlog << "  Z: ";
+        this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR]->Print(gzlog);
+        gzlog << std::endl;
       }
     }
   }
@@ -386,8 +412,8 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     ignition::math::Pose3d imuPose = this->pose + parentEntityPose;
 
     // Get the angular velocity
-    ignition::math::Vector3d imuWorldAngularVel = msgs::ConvertIgn(
-        msg.angular_velocity());
+    ignition::math::Vector3d imuWorldAngularVel = msgs::Convert(
+        msg.angular_velocity()).Ign();
 
     // Set the IMU angular velocity
     this->angularVel = imuPose.Rot().Inverse().RotateVector(

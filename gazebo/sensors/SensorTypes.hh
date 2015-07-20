@@ -237,7 +237,7 @@ namespace gazebo
 
       /// \brief Velocity noise streams for the altimeter sensor
       /// \sa AltimeterSensor
-      ALTIMETER_VELOCITY_NOISE_METERS_PER_S = 11
+      ALTIMETER_VELOCITY_NOISE_METERS_PER_S = 11,
 
       /// \brief IMU angular velocity X noise stream
       /// \sa ImuSensor
