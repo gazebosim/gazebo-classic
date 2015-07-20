@@ -1170,7 +1170,7 @@ void ModelCreator::CreateTheEntity()
   }
 
   msg.set_sdf(this->modelSDF->ToString());
-  msgs::Set(msg.mutable_pose(), this->modelPose);
+  msgs::Set(msg.mutable_pose(), this->modelPose.Ign());
   this->makerPub->Publish(msg);
 }
 

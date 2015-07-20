@@ -289,7 +289,7 @@ TEST_F(gzTest, Model)
     gazebo::msgs::Model msg;
     msg.set_name("simple_arm");
     gazebo::msgs::Set(msg.mutable_pose(),
-        gazebo::math::Pose(1.1, 2.3, 4.5, 0.1, 1.2, 3.4));
+        ignition::math::Pose3d(1.1, 2.3, 4.5, 0.1, 1.2, 3.4));
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
 
@@ -308,7 +308,8 @@ TEST_F(gzTest, Model)
 
     gazebo::msgs::Factory msg;
     msg.set_sdf(sdf->ToString());
-    gazebo::msgs::Set(msg.mutable_pose(), gazebo::math::Pose(0, 0, 0, 0, 0, 0));
+    gazebo::msgs::Set(msg.mutable_pose(),
+        ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -330,7 +331,8 @@ TEST_F(gzTest, Model)
 
     gazebo::msgs::Factory msg;
     msg.set_sdf(sdf->ToString());
-    gazebo::msgs::Set(msg.mutable_pose(), gazebo::math::Pose(0, 0, 0, 0, 0, 0));
+    gazebo::msgs::Set(msg.mutable_pose(),
+        ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
