@@ -425,8 +425,8 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     ignition::math::Pose3d imuPose = this->pose + parentEntityPose;
 
     // Get the angular velocity
-    ignition::math::Vector3d imuWorldAngularVel = msgs::Convert(
-        msg.angular_velocity()).Ign();
+    ignition::math::Vector3d imuWorldAngularVel = msgs::ConvertIgn(
+        msg.angular_velocity());
 
     // Set the IMU angular velocity
     this->angularVel = imuPose.Rot().Inverse().RotateVector(
