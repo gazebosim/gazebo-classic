@@ -482,8 +482,12 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
             keyNoise.second->Apply(this->imuMsg.linear_acceleration().z()));
           break;
         default:
-          // Unrecognized noise model found
-          // Should we throw an exception?
+          std::ostringstream out;
+          out << "Removing unrecognized noise model: ";
+          keyNoise.second->Print(out);
+          out << std::endl;
+          gzwarn << out.str() << std::endl;
+          this->noises.erase(keyNoise.first);
           break;
       }
     }
