@@ -48,13 +48,6 @@ add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gazebo_rendering gazebo_msgs)
 add_dependencies(gazebo_sensors gazebo_rendering)
 
-if (HAVE_SIMBODY)
-  add_dependencies(gazebo_physics_simbody gazebo_msgs)
-endif()
-if(HAVE_DART)
-  add_dependencies(gazebo_physics_dart gazebo_msgs)
-endif()
-
 gz_add_executable(gzserver server_main.cc)
 
 target_link_libraries(gzserver
@@ -69,14 +62,6 @@ target_link_libraries(gzserver
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
 )
-
-if (HAVE_SIMBODY)
-  target_link_libraries(gzserver gazebo_physics_simbody)
-endif()
-
-if (HAVE_DART)
-  target_link_libraries(gzserver gazebo_physics_dart)
-endif()
 
 if (UNIX)
   target_link_libraries(gzserver pthread)

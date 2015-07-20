@@ -7,6 +7,10 @@ include_directories(SYSTEM
   skyx/include
 )
 
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
+  add_subdirectory(deferred_shading)
+endif()
+
 add_subdirectory(skyx)
 add_subdirectory(selection_buffer)
 
@@ -123,39 +127,6 @@ set (headers
   WrenchVisual.hh
   ogre_gazebo.h
 )
-
-if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
-  list(APPEND sources 
-    deferred_shading/DeferredLight.cc
-    deferred_shading/GBufferMaterialGenerator.cc
-    deferred_shading/GBufferSchemeHandler.cc
-    deferred_shading/GeomUtils.cc
-    deferred_shading/MaterialGenerator.cc
-    deferred_shading/MergeMaterialGenerator.cc
-    deferred_shading/MergeSchemeHandler.cc
-    deferred_shading/SSAOLogic.cc
-  )
-
-  list(APPEND headers 
-    deferred_shading/AmbientLight.hh
-    deferred_shading/DeferredLight.hh
-    deferred_shading/DeferredLightCP.hh
-    deferred_shading/GBufferMaterialGenerator.hh
-    deferred_shading/GBufferSchemeHandler.hh
-    deferred_shading/GeomUtils.hh
-    deferred_shading/LightMaterialGenerator.hh
-    deferred_shading/ListenerFactoryLogic.hh
-    deferred_shading/MaterialGenerator.hh
-    deferred_shading/MergeCP.hh
-    deferred_shading/MergeMaterialGenerator.hh
-    deferred_shading/MergeSchemeHandler.hh
-    deferred_shading/NullSchemeHandler.hh
-    deferred_shading/SSAOLogic.hh
-    deferred_shading/TechniqueDefinitions.hh
-  )
-
-endif()
-
 
 if (HAVE_OCULUS)
   set (sources ${sources}
