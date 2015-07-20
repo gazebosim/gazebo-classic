@@ -151,7 +151,6 @@ void Noise::Fini()
 void Noise::Print(std::ostream &_out) const
 {
   _out << "Noise with type[" << this->type << "] "
-    << "does not have an overloaded output operator. "
+    << "does not have an overloaded Print function. "
     << "No more information is available.";
 }
-
