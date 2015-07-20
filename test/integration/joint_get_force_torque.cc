@@ -24,8 +24,6 @@
 
 using namespace gazebo;
 
-const double g_friction_tolerance = 1e-3;
-
 class JointGetForceTorqueTest : public ServerFixture,
                                 public testing::WithParamInterface<const char *>
 {
