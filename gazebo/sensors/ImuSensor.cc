@@ -180,7 +180,6 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   // CASE 2: noise specified using newer generic SDF noise models
   else
   {
-
     // If an angular velocity noise models have been specified, create them
     if (imuElem->HasElement("angular_velocity"))
     {
