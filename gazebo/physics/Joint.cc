@@ -427,7 +427,10 @@ void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Joint::Reset()
 {
-  this->SetVelocity(0, 0);
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    this->SetVelocity(i, 0.0);
+  }
   this->staticAngle.SetFromRadian(0);
 }
 
@@ -514,6 +517,10 @@ msgs::Joint::Type Joint::GetMsgType() const
   else if (this->HasType(Base::UNIVERSAL_JOINT))
   {
     return msgs::Joint::UNIVERSAL;
+  }
+  else if (this->HasType(Base::FIXED_JOINT))
+  {
+    return msgs::Joint::FIXED;
   }
 
   gzerr << "No joint recognized in type ["
@@ -852,9 +859,11 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
 //////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
-  this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
+  {
+    this->SetVelocity(i, 0.0);
     this->SetPosition(i, _state.GetAngle(i).Radian());
+  }
 }
 
 //////////////////////////////////////////////////
