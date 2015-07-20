@@ -345,7 +345,7 @@ ignition::math::Vector3d ImuSensor::AngularVelocity(const bool _noiseFree) const
   boost::mutex::scoped_lock lock(this->mutex);
   if (_noiseFree)
     return this->angularVel;
-  return msgs::Convert(this->imuMsg.angular_velocity()).Ign();
+  return msgs::ConvertIgn(this->imuMsg.angular_velocity());
 }
 
 //////////////////////////////////////////////////
@@ -361,7 +361,7 @@ ignition::math::Vector3d ImuSensor::LinearAcceleration(
   boost::mutex::scoped_lock lock(this->mutex);
   if (_noiseFree)
     return this->linearAcc;
-  return msgs::Convert(this->imuMsg.linear_acceleration()).Ign();
+  return msgs::ConvertIgn(this->imuMsg.linear_acceleration());
 }
 
 //////////////////////////////////////////////////
@@ -374,7 +374,7 @@ math::Quaternion ImuSensor::GetOrientation() const
 ignition::math::Quaterniond ImuSensor::Orientation() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return msgs::Convert(this->imuMsg.orientation()).Ign();
+  return msgs::ConvertIgn(this->imuMsg.orientation());
 }
 
 //////////////////////////////////////////////////
@@ -435,7 +435,7 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
     // Compute and set the IMU linear acceleration
     ignition::math::Vector3d imuWorldLinearVel
-        = msgs::Convert(msg.linear_velocity()).Ign();
+        = msgs::ConvertIgn(msg.linear_velocity());
     // Get the correct vel for imu's that are at an offset from parent link
     imuWorldLinearVel +=
         imuWorldAngularVel.Cross(parentEntityPose.Pos() - imuPose.Pos());

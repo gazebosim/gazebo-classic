@@ -292,9 +292,10 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
       this->GetContactMaxCorrectingVel());
     physicsMsg.set_contact_surface_layer(
       this->GetContactSurfaceLayer());
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->GetGravity().Ign()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-        msgs::Convert(this->MagneticField()));
+      msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -344,7 +345,7 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetContactSurfaceLayer(_msg->contact_surface_layer());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
@@ -567,6 +568,7 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
       odeMass->I[0*4+2], odeMass->I[1*4+2]);
 }
 
+//////////////////////////////////////////////////
 Friction_Model ODEPhysics::ConvertFrictionModel(const std::string &_fricModel)
 {
   Friction_Model result = pyramid_friction;
@@ -584,6 +586,7 @@ Friction_Model ODEPhysics::ConvertFrictionModel(const std::string &_fricModel)
   return result;
 }
 
+//////////////////////////////////////////////////
 std::string ODEPhysics::ConvertFrictionModel(const Friction_Model _fricModel)
 {
   std::string result;
@@ -613,6 +616,60 @@ std::string ODEPhysics::ConvertFrictionModel(const Friction_Model _fricModel)
   }
   return result;
 }
+
+//////////////////////////////////////////////////
+World_Solver_Type
+ODEPhysics::ConvertWorldStepSolverType(const std::string &_solverType)
+{
+  World_Solver_Type result = ODE_DEFAULT;
+  if (_solverType.compare("ODE_DANTZIG") == 0)
+    result = ODE_DEFAULT;
+  else if (_solverType.compare("DART_PGS") == 0)
+    result = DART_PGS;
+  else if (_solverType.compare("BULLET_PGS") == 0)
+    result = BULLET_PGS;
+  else
+  {
+    gzerr << "Unrecognized world step solver ["
+          << _solverType
+          << "], returning ODE_DANTZIG"
+          << std::endl;
+  }
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string
+ODEPhysics::ConvertWorldStepSolverType(const World_Solver_Type _solverType)
+{
+  std::string result;
+  switch (_solverType)
+  {
+    case ODE_DEFAULT:
+    {
+      result = "ODE_DANTZIG";
+      break;
+    }
+    case DART_PGS:
+    {
+      result = "DART_PGS";
+      break;
+    }
+    case BULLET_PGS:
+    {
+      result = "BULLET_PGS";
+      break;
+    }
+    default:
+    {
+      result = "unknown";
+      gzerr << "Unrecognized world step solver [" << _solverType << "]"
+            << std::endl;
+    }
+  }
+  return result;
+}
+
 //////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
@@ -693,6 +750,13 @@ void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 }
 
 //////////////////////////////////////////////////
+void ODEPhysics::SetWorldStepSolverType(const std::string &_worldSolverType)
+{
+    dWorldSetWorldStepSolverType(this->dataPtr->worldId,
+    ConvertWorldStepSolverType(_worldSolverType));
+}
+
+//////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSPreconIters()
 {
   return this->sdf->GetElement("ode")->GetElement(
@@ -717,6 +781,13 @@ std::string ODEPhysics::GetFrictionModel() const
 {
   return ConvertFrictionModel(
     dWorldGetQuickStepFrictionModel(this->dataPtr->worldId));
+}
+
+//////////////////////////////////////////////////
+std::string ODEPhysics::GetWorldStepSolverType() const
+{
+  return ConvertWorldStepSolverType(
+    dWorldGetWorldStepSolverType(this->dataPtr->worldId));
 }
 
 //////////////////////////////////////////////////
@@ -1277,6 +1348,8 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     else if (_key == "friction_model")
       this->SetFrictionModel(boost::any_cast<std::string>(_value));
+    else if (_key == "world_step_solver")
+      this->SetWorldStepSolverType(boost::any_cast<std::string>(_value));
     else if (_key == "contact_max_correcting_vel")
     {
       double value = boost::any_cast<double>(_value);
@@ -1435,6 +1508,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else if (_key == "friction_model")
     _value = this->GetFrictionModel();
+  else if (_key == "world_step_solver")
+    _value = this->GetWorldStepSolverType();
   else
   {
     return PhysicsEngine::GetParam(_key, _value);

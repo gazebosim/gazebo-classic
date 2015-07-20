@@ -104,7 +104,7 @@ TEST_F(MsgsTest, BadPackage)
 
 TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 {
-  msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
+  msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3d(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
   EXPECT_DOUBLE_EQ(3, msg.z());
@@ -112,17 +112,17 @@ TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsVector3dToMath)
 {
-  msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
-  math::Vector3 v    = msgs::Convert(msg);
-  EXPECT_DOUBLE_EQ(1, v.x);
-  EXPECT_DOUBLE_EQ(2, v.y);
-  EXPECT_DOUBLE_EQ(3, v.z);
+  msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3d(1, 2, 3));
+  ignition::math::Vector3d v = msgs::ConvertIgn(msg);
+  EXPECT_DOUBLE_EQ(1, v.X());
+  EXPECT_DOUBLE_EQ(2, v.Y());
+  EXPECT_DOUBLE_EQ(3, v.Z());
 }
 
 TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 {
   msgs::Quaternion msg =
-    msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
+    msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
 
   EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
   EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
@@ -133,20 +133,21 @@ TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
 {
   msgs::Quaternion msg =
-    msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
-  math::Quaternion v = msgs::Convert(msg);
+    msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
+  ignition::math::Quaterniond v = msgs::ConvertIgn(msg);
 
   // TODO: to real unit test move math::equal to EXPECT_DOUBLE_EQ
-  EXPECT_TRUE(math::equal(v.x, -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.y, 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.z, 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.w, 0.27059805007309851));
+  EXPECT_TRUE(math::equal(v.X(), -0.65328148243818818));
+  EXPECT_TRUE(math::equal(v.Y(), 0.27059805007309856));
+  EXPECT_TRUE(math::equal(v.Z(), 0.65328148243818829));
+  EXPECT_TRUE(math::equal(v.W(), 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 {
-  msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+  msgs::Pose msg = msgs::Convert(ignition::math::Pose3d(
+        ignition::math::Vector3d(1, 2, 3),
+        ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
   EXPECT_DOUBLE_EQ(2, msg.position().y());
@@ -160,17 +161,18 @@ TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgPoseToMath)
 {
-  msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
-  math::Pose v = msgs::Convert(msg);
+  msgs::Pose msg = msgs::Convert(
+      ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
+        ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
+  ignition::math::Pose3d v = msgs::ConvertIgn(msg);
 
-  EXPECT_DOUBLE_EQ(1, v.pos.x);
-  EXPECT_DOUBLE_EQ(2, v.pos.y);
-  EXPECT_DOUBLE_EQ(3, v.pos.z);
-  EXPECT_TRUE(math::equal(v.rot.x, -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.rot.y, 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.rot.z, 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.rot.w, 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(1, v.Pos().X());
+  EXPECT_DOUBLE_EQ(2, v.Pos().Y());
+  EXPECT_DOUBLE_EQ(3, v.Pos().Z());
+  EXPECT_TRUE(math::equal(v.Rot().X(), -0.65328148243818818));
+  EXPECT_TRUE(math::equal(v.Rot().Y(), 0.27059805007309856));
+  EXPECT_TRUE(math::equal(v.Rot().Z(), 0.65328148243818829));
+  EXPECT_TRUE(math::equal(v.Rot().W(), 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, ConvertCommonColorToMsgs)
@@ -207,8 +209,9 @@ TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
 
 TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 {
-  msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
-        math::Vector2d(123, 456), 1.0));
+  msgs::PlaneGeom msg = msgs::Convert(
+      ignition::math::Planed(ignition::math::Vector3d(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
 
   EXPECT_DOUBLE_EQ(0, msg.normal().x());
   EXPECT_DOUBLE_EQ(0, msg.normal().y());
@@ -220,18 +223,19 @@ TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
 {
-  msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
-        math::Vector2d(123, 456), 1.0));
-  math::Plane v = msgs::Convert(msg);
+  msgs::PlaneGeom msg = msgs::Convert(
+      ignition::math::Planed(ignition::math::Vector3d(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
+  ignition::math::Planed v = msgs::ConvertIgn(msg);
 
-  EXPECT_DOUBLE_EQ(0, v.normal.x);
-  EXPECT_DOUBLE_EQ(0, v.normal.y);
-  EXPECT_DOUBLE_EQ(1, v.normal.z);
+  EXPECT_DOUBLE_EQ(0, v.Normal().X());
+  EXPECT_DOUBLE_EQ(0, v.Normal().Y());
+  EXPECT_DOUBLE_EQ(1, v.Normal().Z());
 
-  EXPECT_DOUBLE_EQ(123, v.size.x);
-  EXPECT_DOUBLE_EQ(456, v.size.y);
+  EXPECT_DOUBLE_EQ(123, v.Size().X());
+  EXPECT_DOUBLE_EQ(456, v.Size().Y());
 
-  EXPECT_TRUE(math::equal(1.0, v.d));
+  EXPECT_TRUE(math::equal(1.0, v.Offset()));
 }
 
 //////////////////////////////////////////////////
@@ -308,7 +312,7 @@ TEST_F(MsgsTest, ConvertMsgsGeometryTypeToString)
 TEST_F(MsgsTest, SetVector3)
 {
   msgs::Vector3d msg;
-  msgs::Set(&msg, math::Vector3(1, 2, 3));
+  msgs::Set(&msg, ignition::math::Vector3d(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
   EXPECT_DOUBLE_EQ(3, msg.z());
@@ -317,7 +321,7 @@ TEST_F(MsgsTest, SetVector3)
 TEST_F(MsgsTest, SetVector2d)
 {
   msgs::Vector2d msg;
-  msgs::Set(&msg, math::Vector2d(1, 2));
+  msgs::Set(&msg, ignition::math::Vector2d(1, 2));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
 }
@@ -325,7 +329,7 @@ TEST_F(MsgsTest, SetVector2d)
 TEST_F(MsgsTest, SetQuaternion)
 {
   msgs::Quaternion msg;
-  msgs::Set(&msg, math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
+  msgs::Set(&msg, ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
   EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
   EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
   EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
@@ -335,8 +339,8 @@ TEST_F(MsgsTest, SetQuaternion)
 TEST_F(MsgsTest, SetPose)
 {
   msgs::Pose msg;
-  msgs::Set(&msg, math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+  msgs::Set(&msg, ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
+        ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
   EXPECT_DOUBLE_EQ(2, msg.position().y());
@@ -369,8 +373,9 @@ TEST_F(MsgsTest, SetTime)
 TEST_F(MsgsTest, SetPlane)
 {
   msgs::PlaneGeom msg;
-  msgs::Set(&msg, math::Plane(math::Vector3(0, 0, 1),
-                              math::Vector2d(123, 456), 1.0));
+  msgs::Set(&msg, ignition::math::Planed(
+        ignition::math::Vector3d(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
 
   EXPECT_DOUBLE_EQ(0, msg.normal().x());
   EXPECT_DOUBLE_EQ(0, msg.normal().y());
@@ -971,7 +976,7 @@ TEST_F(MsgsTest, AxisFromSDF)
   msgs::Axis msg = msgs::AxisFromSDF(sdf->GetElement("axis"));
 
   EXPECT_TRUE(msg.has_xyz());
-  EXPECT_EQ(msgs::Convert(msg.xyz()), math::Vector3(0, 0, 1));
+  EXPECT_EQ(msgs::ConvertIgn(msg.xyz()), ignition::math::Vector3d(0, 0, 1));
   EXPECT_TRUE(msg.has_limit_lower());
   EXPECT_NEAR(msg.limit_lower(), 0.01, 1e-6);
   EXPECT_TRUE(msg.has_limit_upper());
@@ -1038,7 +1043,8 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(msg.has_type());
   EXPECT_EQ(msgs::ConvertJointType(msg.type()), "revolute");
   EXPECT_TRUE(msg.has_pose());
-  EXPECT_EQ(msgs::Convert(msg.pose()), math::Pose(1, 2, 3, 0, 1.57, 0));
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0, 1.57, 0));
   EXPECT_TRUE(msg.has_parent());
   EXPECT_EQ(msg.parent(), "arm_base");
   EXPECT_TRUE(msg.has_child());
@@ -1064,7 +1070,7 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(!msg.has_axis2());
   const msgs::Axis axisMsg = msg.axis1();
   EXPECT_TRUE(axisMsg.has_xyz());
-  EXPECT_EQ(msgs::Convert(axisMsg.xyz()), math::Vector3(1, 0, 0));
+  EXPECT_EQ(msgs::ConvertIgn(axisMsg.xyz()), ignition::math::Vector3d(1, 0, 0));
   EXPECT_TRUE(axisMsg.has_limit_lower());
   EXPECT_NEAR(axisMsg.limit_lower(), 0.1, 1e-6);
   EXPECT_TRUE(axisMsg.has_limit_upper());
@@ -1093,7 +1099,7 @@ TEST_F(MsgsTest, LinkToSDF)
   linkMsg.set_self_collide(false);
   linkMsg.set_gravity(true);
   linkMsg.set_kinematic(false);
-  msgs::Set(linkMsg.mutable_pose(), pose);
+  msgs::Set(linkMsg.mutable_pose(), pose.Ign());
 
   const double laserRetro1 = 0.4;
   const double laserRetro2 = 0.5;
@@ -1152,8 +1158,9 @@ TEST_F(MsgsTest, CollisionToSDF)
   collisionMsg.set_name(name);
   collisionMsg.set_laser_retro(0.2);
   collisionMsg.set_max_contacts(5);
-  msgs::Set(collisionMsg.mutable_pose(),  math::Pose(math::Vector3(1, 2, 3),
-      math::Quaternion(0, 0, 1, 0)));
+  msgs::Set(collisionMsg.mutable_pose(),
+      ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
+      ignition::math::Quaterniond(0, 0, 1, 0)));
 
   // geometry - see GeometryToSDF for a more detailed test
   msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
@@ -1202,7 +1209,7 @@ TEST_F(MsgsTest, VisualToSDF)
   msgs::Visual visualMsg;
   visualMsg.set_name(name);
   visualMsg.set_laser_retro(laserRetro);
-  msgs::Set(visualMsg.mutable_pose(), pose);
+  msgs::Set(visualMsg.mutable_pose(), pose.Ign());
 
   // geometry - see GeometryToSDF for a more detailed test
   auto geomMsg = visualMsg.mutable_geometry();
@@ -1265,7 +1272,7 @@ TEST_F(MsgsTest, GeometryToSDF)
   msgs::Geometry boxMsg;
   boxMsg.set_type(msgs::Geometry::BOX);
   msgs::BoxGeom *boxGeom = boxMsg.mutable_box();
-  msgs::Set(boxGeom->mutable_size(), math::Vector3(0.5, 0.75, 1.0));
+  msgs::Set(boxGeom->mutable_size(), ignition::math::Vector3d(0.5, 0.75, 1.0));
 
   sdf::ElementPtr boxSDF = msgs::GeometryToSDF(boxMsg);
   sdf::ElementPtr boxElem = boxSDF->GetElement("box");
@@ -1298,8 +1305,8 @@ TEST_F(MsgsTest, GeometryToSDF)
   msgs::Geometry planeMsg;
   planeMsg.set_type(msgs::Geometry::PLANE);
   msgs::PlaneGeom *planeGeom = planeMsg.mutable_plane();
-  msgs::Set(planeGeom->mutable_normal(), math::Vector3(0, 0, 1.0));
-  msgs::Set(planeGeom->mutable_size(), math::Vector2d(0.5, 0.8));
+  msgs::Set(planeGeom->mutable_normal(), ignition::math::Vector3d(0, 0, 1.0));
+  msgs::Set(planeGeom->mutable_size(), ignition::math::Vector2d(0.5, 0.8));
 
   sdf::ElementPtr planeSDF = msgs::GeometryToSDF(planeMsg);
   sdf::ElementPtr planeElem = planeSDF->GetElement("plane");
@@ -1331,8 +1338,10 @@ TEST_F(MsgsTest, GeometryToSDF)
   heightmapMsg.set_type(msgs::Geometry::HEIGHTMAP);
   msgs::HeightmapGeom *heightmapGeom = heightmapMsg.mutable_heightmap();
   heightmapGeom->set_filename("test_heightmap_filename");
-  msgs::Set(heightmapGeom->mutable_size(), math::Vector3(100, 200, 30));
-  msgs::Set(heightmapGeom->mutable_origin(), math::Vector3(50, 100, 15));
+  msgs::Set(heightmapGeom->mutable_size(),
+      ignition::math::Vector3d(100, 200, 30));
+  msgs::Set(heightmapGeom->mutable_origin(),
+      ignition::math::Vector3d(50, 100, 15));
   heightmapGeom->set_use_terrain_paging(true);
 
   msgs::HeightmapGeom_Texture *texture1 = heightmapGeom->add_texture();
@@ -1381,7 +1390,7 @@ TEST_F(MsgsTest, GeometryToSDF)
   meshMsg.set_type(msgs::Geometry::MESH);
   msgs::MeshGeom *meshGeom = meshMsg.mutable_mesh();
   meshGeom->set_filename("test_mesh_filename");
-  msgs::Set(meshGeom->mutable_scale(), math::Vector3(2.3, 1.2, 2.9));
+  msgs::Set(meshGeom->mutable_scale(), ignition::math::Vector3d(2.3, 1.2, 2.9));
   meshGeom->set_submesh("test_mesh_submesh");
   meshGeom->set_center_submesh(false);
 
@@ -1401,9 +1410,9 @@ TEST_F(MsgsTest, GeometryToSDF)
   polylineMsg.set_type(msgs::Geometry::POLYLINE);
   msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
   polylineGeom->set_height(2.33);
-  msgs::Set(polylineGeom->add_point(), math::Vector2d(0.5, 0.7));
-  msgs::Set(polylineGeom->add_point(), math::Vector2d(3.5, 4.7));
-  msgs::Set(polylineGeom->add_point(), math::Vector2d(1000, 2000));
+  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(0.5, 0.7));
+  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(3.5, 4.7));
+  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(1000, 2000));
 
   sdf::ElementPtr polylineSDF = msgs::GeometryToSDF(polylineMsg);
   sdf::ElementPtr polylineElem = polylineSDF->GetElement("polyline");
@@ -1422,7 +1431,7 @@ TEST_F(MsgsTest, MeshToSDF)
 {
   msgs::MeshGeom msg;
   msg.set_filename("test_filename");
-  msgs::Set(msg.mutable_scale(), math::Vector3(0.1, 0.2, 0.3));
+  msgs::Set(msg.mutable_scale(), ignition::math::Vector3d(0.1, 0.2, 0.3));
   msg.set_submesh("test_submesh");
   msg.set_center_submesh(true);
 
@@ -1454,7 +1463,7 @@ TEST_F(MsgsTest, InertialToSDF)
 
   msgs::Inertial msg;
   msg.set_mass(mass);
-  msgs::Set(msg.mutable_pose(), pose);
+  msgs::Set(msg.mutable_pose(), pose.Ign());
   msg.set_ixx(ixx);
   msg.set_ixy(ixy);
   msg.set_ixz(ixz);
@@ -1566,7 +1575,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msgs::Friction *friction = msg.mutable_friction();
   friction->set_mu(mu);
   friction->set_mu2(mu2);
-  msgs::Set(friction->mutable_fdir1(), fdir1);
+  msgs::Set(friction->mutable_fdir1(), fdir1.Ign());
   friction->set_slip1(slip1);
   friction->set_slip2(slip2);
 
@@ -1654,7 +1663,7 @@ TEST_F(MsgsTest, JointToSDF)
   jointMsg.set_type(type);
   jointMsg.set_parent(parent);
   jointMsg.set_child(child);
-  msgs::Set(jointMsg.mutable_pose(), pose);
+  msgs::Set(jointMsg.mutable_pose(), pose.Ign());
   jointMsg.set_cfm(cfm);
   jointMsg.set_bounce(bounce);
   jointMsg.set_velocity(velocity);
@@ -1665,7 +1674,7 @@ TEST_F(MsgsTest, JointToSDF)
   jointMsg.set_suspension_erp(suspension_erp);
   {
     auto axis1 = jointMsg.mutable_axis1();
-    msgs::Set(axis1->mutable_xyz(), xyz1);
+    msgs::Set(axis1->mutable_xyz(), xyz1.Ign());
     axis1->set_limit_lower(limit_lower1);
     axis1->set_limit_upper(limit_upper1);
     axis1->set_limit_effort(limit_effort1);
@@ -1676,7 +1685,7 @@ TEST_F(MsgsTest, JointToSDF)
   }
   {
     auto axis2 = jointMsg.mutable_axis2();
-    msgs::Set(axis2->mutable_xyz(), xyz2);
+    msgs::Set(axis2->mutable_xyz(), xyz2.Ign());
     axis2->set_limit_lower(limit_lower2);
     axis2->set_limit_upper(limit_upper2);
     axis2->set_limit_effort(limit_effort2);
@@ -1791,7 +1800,7 @@ TEST_F(MsgsTest, AddBoxLink)
 
   const double mass = 1.0;
   const math::Vector3 size(1, 1, 1);
-  msgs::AddBoxLink(model, mass, size);
+  msgs::AddBoxLink(model, mass, size.Ign());
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
@@ -1821,7 +1830,7 @@ TEST_F(MsgsTest, AddBoxLink)
       auto collision = link.collision(0);
       auto geometry = collision.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::Convert(geometry.box().size()), size);
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
     }
 
     EXPECT_EQ(link.visual_size(), 1);
@@ -1829,12 +1838,12 @@ TEST_F(MsgsTest, AddBoxLink)
       auto visual = link.visual(0);
       auto geometry = visual.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::Convert(geometry.box().size()), size);
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
     }
   }
 
   const double massRatio = 2.0;
-  msgs::AddBoxLink(model, mass*massRatio, size);
+  msgs::AddBoxLink(model, mass*massRatio, size.Ign());
   EXPECT_EQ(model.link_size(), 2);
   {
     auto link1 = model.link(0);
@@ -2000,7 +2009,7 @@ TEST_F(MsgsTest, ModelToSDF)
   msgs::Model model;
   model.set_name(name);
   model.set_is_static(false);
-  msgs::Set(model.mutable_pose(), pose);
+  msgs::Set(model.mutable_pose(), pose.Ign());
   EXPECT_EQ(model.link_size(), 0);
   EXPECT_EQ(model.joint_size(), 0);
 
@@ -2009,7 +2018,7 @@ TEST_F(MsgsTest, ModelToSDF)
   const double length = 1.5;
   const double height = 0.9;
   const double width = 0.1;
-  const math::Vector3 boxSize(length, width, height);
+  const ignition::math::Vector3d boxSize(length, width, height);
   const double boxMass = 4.0;
   AddBoxLink(model, boxMass, boxSize);
   ASSERT_EQ(model.link_size(), 1);
@@ -2024,7 +2033,7 @@ TEST_F(MsgsTest, ModelToSDF)
   const math::Pose cylinderPose(-length/2, 0, -height/2, M_PI/2, 0, 0);
   {
     auto link = model.mutable_link(1);
-    msgs::Set(link->mutable_pose(), cylinderPose);
+    msgs::Set(link->mutable_pose(), cylinderPose.Ign());
     link->set_name("rear_wheel");
   }
 
@@ -2035,7 +2044,7 @@ TEST_F(MsgsTest, ModelToSDF)
   const math::Pose spherePose(length/2, 0, -height/2, 0, 0, 0);
   {
     auto link = model.mutable_link(2);
-    msgs::Set(link->mutable_pose(), spherePose);
+    msgs::Set(link->mutable_pose(), spherePose.Ign());
     link->set_name("front_wheel");
   }
 
@@ -2048,7 +2057,7 @@ TEST_F(MsgsTest, ModelToSDF)
   frontJoint->set_type(msgs::ConvertJointType("revolute"));
   frontJoint->set_parent("frame");
   frontJoint->set_child("front_wheel");
-  const math::Vector3 frontAxis(0, 1, 0);
+  const ignition::math::Vector3d frontAxis(0, 1, 0);
   msgs::Set(frontJoint->mutable_axis1()->mutable_xyz(), frontAxis);
 
   // Rear wheel joint
@@ -2059,7 +2068,7 @@ TEST_F(MsgsTest, ModelToSDF)
   rearJoint->set_type(msgs::ConvertJointType("revolute"));
   rearJoint->set_parent("frame");
   rearJoint->set_child("rear_wheel");
-  const math::Vector3 rearAxis(0, 0, 1);
+  const ignition::math::Vector3d rearAxis(0, 0, 1);
   msgs::Set(rearJoint->mutable_axis1()->mutable_xyz(), rearAxis);
 
   sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
