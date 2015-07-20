@@ -452,27 +452,40 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
     this->lastLinearVel = imuWorldLinearVel;
 
-    // Perturb the angular velocity
-    this->imuMsg.mutable_angular_velocity()->set_x(
-        this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S]->Apply(
-          this->imuMsg.angular_velocity().x()));
-    this->imuMsg.mutable_angular_velocity()->set_y(
-        this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S]->Apply(
-          this->imuMsg.angular_velocity().y()));
-    this->imuMsg.mutable_angular_velocity()->set_z(
-        this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S]->Apply(
-          this->imuMsg.angular_velocity().z()));
-
-    // Perturb the linear acceleration
-    this->imuMsg.mutable_linear_acceleration()->set_x(
-        this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR]->Apply(
-          this->imuMsg.linear_acceleration().x()));
-    this->imuMsg.mutable_linear_acceleration()->set_y(
-        this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR]->Apply(
-          this->imuMsg.linear_acceleration().y()));
-    this->imuMsg.mutable_linear_acceleration()->set_z(
-        this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR]->Apply(
-          this->imuMsg.linear_acceleration().z()));
+    // Apply noise models
+    for (auto &keyNoise : this->noises)
+    {
+      if (keyNoise.first == IMU_ANGVEL_X_NOISE_RADIANS_PER_S)
+      {
+        this->imuMsg.mutable_angular_velocity()->set_x(
+            keyNoise.second->Apply(this->imuMsg.angular_velocity().x()));
+      }
+      else if (keyNoise.first == IMU_ANGVEL_Y_NOISE_RADIANS_PER_S)
+      {
+        this->imuMsg.mutable_angular_velocity()->set_y(
+            keyNoise.second->Apply(this->imuMsg.angular_velocity().y()));
+      }
+      else if (keyNoise.first == IMU_ANGVEL_Z_NOISE_RADIANS_PER_S)
+      {
+        this->imuMsg.mutable_angular_velocity()->set_z(
+            keyNoise.second->Apply(this->imuMsg.angular_velocity().z()));
+      }
+      else if (keyNoise.first == IMU_LINACC_X_NOISE_METERS_PER_S_SQR)
+      {
+        this->imuMsg.mutable_linear_acceleration()->set_x(
+            keyNoise.second->Apply(this->imuMsg.linear_acceleration().x()));
+      }
+      else if (keyNoise.first == IMU_LINACC_Y_NOISE_METERS_PER_S_SQR)
+      {
+        this->imuMsg.mutable_linear_acceleration()->set_y(
+            keyNoise.second->Apply(this->imuMsg.linear_acceleration().y()));
+      }
+      else if (keyNoise.first == IMU_LINACC_Z_NOISE_METERS_PER_S_SQR)
+      {
+        this->imuMsg.mutable_linear_acceleration()->set_z(
+            keyNoise.second->Apply(this->imuMsg.linear_acceleration().z()));
+      }
+    }
 
     // Publish the message
     if (this->pub)
