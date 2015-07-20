@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -106,10 +105,9 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
   // is expressed in joint orientation
   GZ_ASSERT(this->parentJoint,
             "parentJoint should be defined by single argument Load()");
-  math::Quaternion rotationChildSensor =
-    (this->pose + this->parentJoint->GetInitialAnchorPose()).rot;
-  this->rotationSensorChild =
-    rotationChildSensor.GetInverse().GetAsMatrix3();
+  ignition::math::Quaterniond rotationChildSensor =
+    (this->pose + this->parentJoint->GetInitialAnchorPose().Ign()).Rot();
+  this->rotationSensorChild = rotationChildSensor.Inverse();
 
   // Handle measure direction
   bool defaultDirectionIsParentToChild = false;
@@ -184,15 +182,25 @@ physics::JointPtr ForceTorqueSensor::GetJoint() const
 //////////////////////////////////////////////////
 math::Vector3 ForceTorqueSensor::GetForce() const
 {
-  return ignition::math::Vector3d(
-      msgs::ConvertIgn(this->wrenchMsg.wrench().force()));
+  return this->Force();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d ForceTorqueSensor::Force() const
+{
+  return msgs::ConvertIgn(this->wrenchMsg.wrench().force());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ForceTorqueSensor::GetTorque() const
 {
-  return ignition::math::Vector3d(
-      msgs::ConvertIgn(this->wrenchMsg.wrench().torque()));
+  return this->Torque();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d ForceTorqueSensor::Torque() const
+{
+  return msgs::ConvertIgn(this->wrenchMsg.wrench().torque());
 }
 
 //////////////////////////////////////////////////
@@ -241,13 +249,13 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
               "measureFrame must be PARENT_LINK, CHILD_LINK or SENSOR");
     if (!this->parentToChild)
     {
-      measuredForce = (rotationSensorChild*wrench.body2Force).Ign();
-      measuredTorque = (rotationSensorChild*wrench.body2Torque).Ign();
+      measuredForce = rotationSensorChild*wrench.body2Force.Ign();
+      measuredTorque = rotationSensorChild*wrench.body2Torque.Ign();
     }
     else
     {
-      measuredForce = (rotationSensorChild*(-1*wrench.body2Force)).Ign();
-      measuredTorque = (rotationSensorChild*(-1*wrench.body2Torque)).Ign();
+      measuredForce = rotationSensorChild*(-1*wrench.body2Force.Ign());
+      measuredTorque = rotationSensorChild*(-1*wrench.body2Torque.Ign());
     }
   }
 

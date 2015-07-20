@@ -647,8 +647,8 @@ std::string ModelCreator::AddShape(LinkType _type,
     // to be made of multiple svg disjoint paths.
     // For this reason, we compute the closed polylines that can be extruded
     // in this step
-    std::vector< std::vector<math::Vector2d> > closedPolys;
-    std::vector< std::vector<math::Vector2d> > openPolys;
+    std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+    std::vector< std::vector<ignition::math::Vector2d> > openPolys;
     svgLoader.PathsToClosedPolylines(paths, 0.05, closedPolys, openPolys);
     if (closedPolys.empty())
     {
@@ -662,36 +662,36 @@ std::string ModelCreator::AddShape(LinkType _type,
         << "They will be ignored." << std::endl;
     }
     // Find extreme values to center the polylines
-    math::Vector2d min(paths[0].polylines[0][0]);
-    math::Vector2d max(min);
+    ignition::math::Vector2d min(paths[0].polylines[0][0]);
+    ignition::math::Vector2d max(min);
 
-    for (const std::vector<math::Vector2d> &poly : closedPolys)
+    for (auto const &poly : closedPolys)
     {
-      for (const math::Vector2d &pt : poly)
+      for (auto const &pt : poly)
       {
-        if (pt.x < min.x)
-          min.x = pt.x;
-        if (pt.y < min.y)
-          min.y = pt.y;
-        if (pt.x > max.x)
-          max.x = pt.x;
-        if (pt.y > max.y)
-          max.y = pt.y;
+        if (pt.X() < min.X())
+          min.X() = pt.X();
+        if (pt.Y() < min.Y())
+          min.Y() = pt.Y();
+        if (pt.X() > max.X())
+          max.X() = pt.X();
+        if (pt.Y() > max.Y())
+          max.Y() = pt.Y();
       }
     }
-    for (const std::vector<math::Vector2d> &poly : closedPolys)
+    for (auto const &poly : closedPolys)
     {
       sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
       polylineElem->GetElement("height")->Set(_size.z);
 
-      for (const math::Vector2d &p : poly)
+      for (auto const &p : poly)
       {
         // Translate to center
-        math::Vector2d pt = p - min - (max-min)*0.5;
+        ignition::math::Vector2d pt = p - min - (max-min)*0.5;
         // Swap X and Y so Z will point up
         // (in 2D it points into the screen)
         sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-        pointElem->Set(math::Vector2d(pt.y*_size.y, pt.x*_size.x));
+        pointElem->Set(math::Vector2d(pt.Y()*_size.y, pt.X()*_size.x));
       }
     }
   }
