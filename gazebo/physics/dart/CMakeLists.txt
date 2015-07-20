@@ -6,7 +6,9 @@ link_directories(${DARTCore_LIBRARY_DIRS})
 
 set (sources
     DARTBallJoint.cc
+    DARTBoxShape.cc
     DARTCollision.cc
+    DARTCylinderShape.cc
     DARTLink.cc
     DARTHeightmapShape.cc
     DARTHingeJoint.cc
@@ -17,10 +19,12 @@ set (sources
     DARTModel.cc
     DARTMultiRayShape.cc
     DARTPhysics.cc
+    DARTPlaneShape.cc
     DARTPolylineShape.cc
     DARTRayShape.cc
     DARTScrewJoint.cc
     DARTSliderJoint.cc
+    DARTSphereShape.cc
     DARTSurfaceParams.cc
     DARTUniversalJoint.cc
 )
