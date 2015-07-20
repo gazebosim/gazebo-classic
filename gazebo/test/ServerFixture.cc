@@ -903,6 +903,60 @@ void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
+    const std::string &_sensorName,
+    const std::string &_collisionType,
+    const std::string &_topic,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
+    bool _static)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+  std::ostringstream shapeStr;
+
+  if (_collisionType == "box")
+  {
+    shapeStr << " <box><size>1 1 1</size></box>";
+  }
+  else if (_collisionType == "cylinder")
+  {
+    shapeStr << "<cylinder>"
+             << "  <radius>.5</radius><length>1.0</length>"
+             << "</cylinder>";
+  }
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _name << "'>"
+    << "<static>" << _static << "</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <collision name ='contact_collision'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </visual>"
+    << "  <sensor name='" << _sensorName << "' type='altimeter'>"
+    << "    <altimeter>"
+    << "      <topic>" << _topic << "</topic>"
+    << "    </altimeter>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_name, 20, 50);
+  WaitUntilSensorSpawn(_sensorName, 100, 100);
+}
+/////////////////////////////////////////////////
 void ServerFixture::launchTimeoutFailure(const char *_logMsg,
                                          const int _timeoutCS)
 {

@@ -38,6 +38,7 @@
 #include "gazebo/physics/dart/DARTSliderJoint.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
 #include "gazebo/physics/dart/DARTUniversalJoint.hh"
+#include "gazebo/physics/dart/DARTFixedJoint.hh"
 
 #include "gazebo/physics/dart/DARTRayShape.hh"
 #include "gazebo/physics/dart/DARTBoxShape.hh"
@@ -54,6 +55,8 @@
 
 #include "gazebo/physics/dart/DARTPhysics.hh"
 
+#include "gazebo/physics/dart/DARTPhysicsPrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -61,24 +64,14 @@ GZ_REGISTER_PHYSICS_ENGINE("dart", DARTPhysics)
 
 //////////////////////////////////////////////////
 DARTPhysics::DARTPhysics(WorldPtr _world)
-    : PhysicsEngine(_world)
+    : PhysicsEngine(_world), dataPtr(new DARTPhysicsPrivate())
 {
-  this->dtWorld = new dart::simulation::World;
-//  this->dtWorld->getConstraintSolver()->setCollisionDetector(
-//        new dart::collision::DARTCollisionDetector());
-//  this->dtWorld->getConstraintHandler()->setAllowablePenetration(1e-6);
-//  this->dtWorld->getConstraintHandler()->setMaxReducingPenetrationVelocity(
-//        0.01);
-//  this->dtWorld->getConstraintHandler()->setAllowableJointViolation(
-//        DART_TO_RADIAN*1e-1);
-//  this->dtWorld->getConstraintHandler()->setMaxReducingJointViolationVelocity(
-//        DART_TO_RADIAN*1e-0);
 }
 
 //////////////////////////////////////////////////
 DARTPhysics::~DARTPhysics()
 {
-  delete this->dtWorld;
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
@@ -91,7 +84,7 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   // ODEPhysics checks this, so we will too.
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
-  this->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
+  this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
 
   // Time step
   // double timeStep = this->sdf->GetValueDouble("time_step");
@@ -144,7 +137,7 @@ void DARTPhysics::UpdateCollision()
   this->contactManager->ResetCount();
 
   dart::constraint::ConstraintSolver *dtConstraintSolver =
-      this->dtWorld->getConstraintSolver();
+      this->dataPtr->dtWorld->getConstraintSolver();
   dart::collision::CollisionDetector *dtCollisionDetector =
       dtConstraintSolver->getCollisionDetector();
   int numContacts = dtCollisionDetector->getNumContacts();
@@ -231,8 +224,8 @@ void DARTPhysics::UpdatePhysics()
 
   // common::Time currTime =  this->world->GetRealTime();
 
-  this->dtWorld->setTimeStep(this->maxStepSize);
-  this->dtWorld->step();
+  this->dataPtr->dtWorld->setTimeStep(this->maxStepSize);
+  this->dataPtr->dtWorld->step();
 
   // Update all the transformation of DART's links to gazebo's links
   // TODO: How to visit all the links in the world?
@@ -358,6 +351,8 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new DARTBallJoint(_parent));
   else if (_type == "universal")
     joint.reset(new DARTUniversalJoint(_parent));
+  else if (_type == "fixed")
+    joint.reset(new DARTFixedJoint(_parent));
   else
     gzerr << "Unable to create joint of type[" << _type << "]";
 
@@ -368,7 +363,7 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  this->dtWorld->setGravity(
+  this->dataPtr->dtWorld->setGravity(
     Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
 }
 
@@ -435,7 +430,7 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     {
       if (_key == "max_step_size")
       {
-        this->dtWorld->setTimeStep(boost::any_cast<double>(_value));
+        this->dataPtr->dtWorld->setTimeStep(boost::any_cast<double>(_value));
       }
       return PhysicsEngine::SetParam(_key, _value);
     }
@@ -452,7 +447,7 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 dart::simulation::World *DARTPhysics::GetDARTWorld()
 {
-  return this->dtWorld;
+  return this->dataPtr->dtWorld;
 }
 
 //////////////////////////////////////////////////
