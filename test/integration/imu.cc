@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/sensors/sensors.hh"
@@ -60,9 +61,9 @@ class ImuTest : public ServerFixture,
   /// \param[out] _orientation orientation of the imu at the end of sample
   /// period
   private: void GetImuData(sensors::ImuSensorPtr _imu, unsigned int _cnt,
-                           math::Vector3 &_rateMean,
-                           math::Vector3 &_accelMean,
-                           math::Quaternion &_orientation);
+               ignition::math::Vector3d &_rateMean,
+               ignition::math::Vector3d &_accelMean,
+               ignition::math::Quaterniond &_orientation);
 };
 
 void ImuTest::GetGravity(const math::Quaternion &_rot, math::Vector3 &_g)
@@ -77,14 +78,14 @@ void ImuTest::GetGravity(const math::Quaternion &_rot, math::Vector3 &_g)
 
 void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
                          unsigned int _cnt,
-                         math::Vector3 &_rateMean,
-                         math::Vector3 &_accelMean,
-                         math::Quaternion& _orientation)
+                         ignition::math::Vector3d &_rateMean,
+                         ignition::math::Vector3d &_accelMean,
+                         ignition::math::Quaterniond &_orientation)
 {
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
   // Collect a number of samples and return the average rate and accel values
-  math::Vector3 rateSum, accelSum;
+  ignition::math::Vector3d rateSum, accelSum;
   for (unsigned int i = 0; i < _cnt; ++i)
   {
     world->Step(1);
@@ -100,12 +101,12 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
 
     EXPECT_LT(j, 100);
 
-    rateSum += _imu->GetAngularVelocity();
-    accelSum += _imu->GetLinearAcceleration();
+    rateSum += _imu->AngularVelocity();
+    accelSum += _imu->LinearAcceleration();
   }
   _rateMean = rateSum / _cnt;
   _accelMean = accelSum / _cnt;
-  _orientation = _imu->GetOrientation();
+  _orientation = _imu->Orientation();
 }
 
 void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
@@ -183,7 +184,8 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
     //   Link::GetWorldLinearAccel() [-0 0.055649 19.6158]
     {
       // get states from imu sensor
-      math::Vector3 imuLinearAccel = pendulumImu->GetLinearAcceleration();
+      ignition::math::Vector3d imuLinearAccel =
+        pendulumImu->LinearAcceleration();
       // get states from link
       math::Vector3 relativeLinearAccel =
         pendulumModel->GetRelativeLinearAccel();
@@ -193,9 +195,9 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       if (world->GetSimTime().Double() == 1.872)
       {
         // initial values
-        EXPECT_NEAR(imuLinearAccel.x, 0, IMU_TOL);
-        EXPECT_NEAR(imuLinearAccel.y, -0.041216, IMU_TOL);
-        EXPECT_NEAR(imuLinearAccel.z, 29.42581726, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.Y(), -0.041216, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.Z(), 29.42581726, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.y, -0.036397, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.z, 19.6158848, IMU_TOL);
@@ -206,7 +208,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       else
       {
         // initial values
-        EXPECT_LE(imuLinearAccel.z, 29.4259);
+        EXPECT_LE(imuLinearAccel.Z(), 29.4259);
         EXPECT_LE(relativeLinearAccel.z, 19.616);
         EXPECT_LE(worldLinearAccel.z, 19.616);
       }
@@ -229,7 +231,8 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
     //   Link::GetWorldLinearAccel() [0 0 0]
     {
       // get states from imu sensor
-      math::Vector3 imuLinearAccel = ballFrictionImu->GetLinearAcceleration();
+      ignition::math::Vector3d imuLinearAccel =
+        ballFrictionImu->LinearAcceleration();
       // get states from link
       math::Vector3 relativeLinearAccel =
         ballFrictionModel->GetRelativeLinearAccel();
@@ -239,9 +242,9 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       if (world->GetSimTime().Double() <= 1.0)
       {
         // freefall
-        EXPECT_NEAR(imuLinearAccel.x, 0, IMU_TOL);
-        EXPECT_NEAR(imuLinearAccel.y, 0, IMU_TOL);
-        EXPECT_NEAR(imuLinearAccel.z, 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.Y(), 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.Z(), 0, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.x, g.x, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.y, g.y, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.z, g.z, IMU_TOL);
@@ -259,7 +262,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       else if (world->GetSimTime().Double() >= 1.85)
       {
         // on the ground
-        double imuMag = imuLinearAccel.GetLength();
+        double imuMag = imuLinearAccel.Length();
         double gMag = g.GetLength();
         EXPECT_NEAR(imuMag, gMag, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
@@ -286,8 +289,8 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
     //   Link::GetWorldLinearAccel() [0 0 0]
     {
       // get states from imu sensor
-      math::Vector3 imuLinearAccel =
-        ballNoFrictionImu->GetLinearAcceleration();
+      ignition::math::Vector3d imuLinearAccel =
+        ballNoFrictionImu->LinearAcceleration();
       // get states from link
       math::Vector3 relativeLinearAccel =
         ballNoFrictionModel->GetRelativeLinearAccel();
@@ -297,9 +300,9 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       if (world->GetSimTime().Double() <= 1.0)
       {
         // freefall
-        EXPECT_NEAR(imuLinearAccel.x, 0, IMU_TOL);
-        EXPECT_NEAR(imuLinearAccel.y, 0, IMU_TOL);
-        EXPECT_NEAR(imuLinearAccel.z, 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.Y(), 0, IMU_TOL);
+        EXPECT_NEAR(imuLinearAccel.Z(), 0, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.x, g.x, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.y, g.y, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.z, g.z, IMU_TOL);
@@ -313,7 +316,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         // on the ramp
         const double rampAngle = 0.5;
         double gMag = g.GetLength();
-        double imuMag = imuLinearAccel.GetLength();
+        double imuMag = imuLinearAccel.Length();
         EXPECT_NEAR(imuMag, gMag*cos(rampAngle), IMU_TOL);
 
         double relMag = relativeLinearAccel.GetLength();
@@ -324,7 +327,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       else if (world->GetSimTime().Double() >= 1.8)
       {
         // on the ground
-        double imuMag = imuLinearAccel.GetLength();
+        double imuMag = imuLinearAccel.Length();
         double gMag = g.GetLength();
         EXPECT_NEAR(imuMag, gMag, IMU_TOL);
         EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
@@ -368,26 +371,26 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
   ASSERT_TRUE(imu != NULL);
   imu->Init();
-  math::Vector3 rateMean, accelMean;
-  math::Quaternion orientation;
+  ignition::math::Vector3d rateMean, accelMean;
+  ignition::math::Quaterniond orientation;
   this->GetImuData(imu, 1, rateMean, accelMean, orientation);
 
-  EXPECT_NEAR(rateMean.x, 0.0, IMU_TOL);
-  EXPECT_NEAR(rateMean.y, 0.0, IMU_TOL);
-  EXPECT_NEAR(rateMean.z, 0.0, IMU_TOL);
+  EXPECT_NEAR(rateMean.X(), 0.0, IMU_TOL);
+  EXPECT_NEAR(rateMean.Y(), 0.0, IMU_TOL);
+  EXPECT_NEAR(rateMean.Z(), 0.0, IMU_TOL);
 
   math::Vector3 g;
   this->GetGravity(testPose.rot, g);
-  EXPECT_NEAR(accelMean.x, -g.x, IMU_TOL);
-  EXPECT_NEAR(accelMean.y, -g.y, IMU_TOL);
-  EXPECT_NEAR(accelMean.z, -g.z, IMU_TOL);
+  EXPECT_NEAR(accelMean.X(), -g.x, IMU_TOL);
+  EXPECT_NEAR(accelMean.Y(), -g.y, IMU_TOL);
+  EXPECT_NEAR(accelMean.Z(), -g.z, IMU_TOL);
 
   // Orientation should be identity, since it is reported relative
   // to reference pose.
-  EXPECT_NEAR(orientation.x, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.y, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.z, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.w, 1, IMU_TOL);
+  EXPECT_NEAR(orientation.X(), 0, IMU_TOL);
+  EXPECT_NEAR(orientation.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(orientation.Z(), 0, IMU_TOL);
+  EXPECT_NEAR(orientation.W(), 1, IMU_TOL);
 }
 
 TEST_P(ImuTest, EmptyWorld)
@@ -432,23 +435,23 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
 
   ASSERT_TRUE(imu != NULL);
   imu->Init();
-  math::Vector3 rateMean, accelMean;
-  math::Quaternion orientation;
+  ignition::math::Vector3d rateMean, accelMean;
+  ignition::math::Quaterniond orientation;
   this->GetImuData(imu, 1000, rateMean, accelMean, orientation);
 
   double d1, d2;
   // Have to account for the fact that the bias might be sampled as positive
   // or negative
-  d1 = fabs(rateMean.x - (rateNoiseMean + rateBiasMean));
-  d2 = fabs(rateMean.x - (rateNoiseMean - rateBiasMean));
+  d1 = fabs(rateMean.X() - (rateNoiseMean + rateBiasMean));
+  d2 = fabs(rateMean.X() - (rateNoiseMean - rateBiasMean));
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
-  d1 = fabs(rateMean.y - (rateNoiseMean + rateBiasMean));
-  d2 = fabs(rateMean.y - (rateNoiseMean - rateBiasMean));
+  d1 = fabs(rateMean.Y() - (rateNoiseMean + rateBiasMean));
+  d2 = fabs(rateMean.Y() - (rateNoiseMean - rateBiasMean));
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
-  d1 = fabs(rateMean.z - (rateNoiseMean + rateBiasMean));
-  d2 = fabs(rateMean.z - (rateNoiseMean - rateBiasMean));
+  d1 = fabs(rateMean.Z() - (rateNoiseMean + rateBiasMean));
+  d2 = fabs(rateMean.Z() - (rateNoiseMean - rateBiasMean));
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
 
@@ -456,25 +459,25 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
   this->GetGravity(testPose.rot, g);
   // Have to account for the fact that the bias might be sampled as positive
   // or negative
-  d1 = fabs(accelMean.x - (accelNoiseMean + accelBiasMean) + g.x);
-  d2 = fabs(accelMean.x - (accelNoiseMean - accelBiasMean) + g.x);
+  d1 = fabs(accelMean.X() - (accelNoiseMean + accelBiasMean) + g.x);
+  d2 = fabs(accelMean.X() - (accelNoiseMean - accelBiasMean) + g.x);
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
-  d1 = fabs(accelMean.y - (accelNoiseMean + accelBiasMean) + g.y);
-  d2 = fabs(accelMean.y - (accelNoiseMean - accelBiasMean) + g.y);
+  d1 = fabs(accelMean.Y() - (accelNoiseMean + accelBiasMean) + g.y);
+  d2 = fabs(accelMean.Y() - (accelNoiseMean - accelBiasMean) + g.y);
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
-  d1 = fabs(accelMean.z - (accelNoiseMean + accelBiasMean) + g.z);
-  d2 = fabs(accelMean.z - (accelNoiseMean - accelBiasMean) + g.z);
+  d1 = fabs(accelMean.Z() - (accelNoiseMean + accelBiasMean) + g.z);
+  d2 = fabs(accelMean.Z() - (accelNoiseMean - accelBiasMean) + g.z);
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
 
   // Orientation should be identity, since it is reported relative
   // to reference pose.
-  EXPECT_NEAR(orientation.x, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.y, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.z, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.w, 1, IMU_TOL);
+  EXPECT_NEAR(orientation.X(), 0, IMU_TOL);
+  EXPECT_NEAR(orientation.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(orientation.Z(), 0, IMU_TOL);
+  EXPECT_NEAR(orientation.W(), 1, IMU_TOL);
 }
 
 TEST_P(ImuTest, EmptyWorldNoise)
@@ -519,23 +522,23 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 
   ASSERT_TRUE(imu != NULL);
   imu->Init();
-  math::Vector3 rateMean, accelMean;
-  math::Quaternion orientation;
+  ignition::math::Vector3d rateMean, accelMean;
+  ignition::math::Quaterniond orientation;
   this->GetImuData(imu, 1000, rateMean, accelMean, orientation);
 
   double d1, d2;
   // Have to account for the fact that the bias might be sampled as positive
   // or negative
-  d1 = fabs(rateMean.x - (rateNoiseMean + rateBiasMean));
-  d2 = fabs(rateMean.x - (rateNoiseMean - rateBiasMean));
+  d1 = fabs(rateMean.X() - (rateNoiseMean + rateBiasMean));
+  d2 = fabs(rateMean.X() - (rateNoiseMean - rateBiasMean));
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
-  d1 = fabs(rateMean.y - (rateNoiseMean + rateBiasMean));
-  d2 = fabs(rateMean.y - (rateNoiseMean - rateBiasMean));
+  d1 = fabs(rateMean.Y() - (rateNoiseMean + rateBiasMean));
+  d2 = fabs(rateMean.Y() - (rateNoiseMean - rateBiasMean));
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
-  d1 = fabs(rateMean.z - (rateNoiseMean + rateBiasMean));
-  d2 = fabs(rateMean.z - (rateNoiseMean - rateBiasMean));
+  d1 = fabs(rateMean.Z() - (rateNoiseMean + rateBiasMean));
+  d2 = fabs(rateMean.Z() - (rateNoiseMean - rateBiasMean));
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
 
@@ -543,25 +546,25 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
   this->GetGravity(testPose.rot, g);
   // Have to account for the fact that the bias might be sampled as positive
   // or negative
-  d1 = fabs(accelMean.x - (accelNoiseMean + accelBiasMean) + g.x);
-  d2 = fabs(accelMean.x - (accelNoiseMean - accelBiasMean) + g.x);
+  d1 = fabs(accelMean.X() - (accelNoiseMean + accelBiasMean) + g.x);
+  d2 = fabs(accelMean.X() - (accelNoiseMean - accelBiasMean) + g.x);
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
-  d1 = fabs(accelMean.y - (accelNoiseMean + accelBiasMean) + g.y);
-  d2 = fabs(accelMean.y - (accelNoiseMean - accelBiasMean) + g.y);
+  d1 = fabs(accelMean.Y() - (accelNoiseMean + accelBiasMean) + g.y);
+  d2 = fabs(accelMean.Y() - (accelNoiseMean - accelBiasMean) + g.y);
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
-  d1 = fabs(accelMean.z - (accelNoiseMean + accelBiasMean) + g.z);
-  d2 = fabs(accelMean.z - (accelNoiseMean - accelBiasMean) + g.z);
+  d1 = fabs(accelMean.Z() - (accelNoiseMean + accelBiasMean) + g.z);
+  d2 = fabs(accelMean.Z() - (accelNoiseMean - accelBiasMean) + g.z);
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*accelNoiseStddev + 3*accelBiasStddev);
 
   // Orientation should be identity, since it is reported relative
   // to reference pose.
-  EXPECT_NEAR(orientation.x, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.y, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.z, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.w, 1, IMU_TOL);
+  EXPECT_NEAR(orientation.X(), 0, IMU_TOL);
+  EXPECT_NEAR(orientation.Y(), 0, IMU_TOL);
+  EXPECT_NEAR(orientation.Z(), 0, IMU_TOL);
+  EXPECT_NEAR(orientation.W(), 1, IMU_TOL);
 }
 
 TEST_P(ImuTest, EmptyWorldBias)
@@ -575,7 +578,7 @@ int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to
   // statistically unlikely, but possible results.
-  math::Rand::SetSeed(42);
+  ignition::math::Rand::Seed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
