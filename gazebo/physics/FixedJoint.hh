@@ -18,8 +18,6 @@
 #ifndef _GAZEBO_FIXEDJOINT_HH_
 #define _GAZEBO_FIXEDJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

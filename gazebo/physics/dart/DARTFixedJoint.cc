@@ -20,6 +20,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/dart/DARTJointPrivate.hh"
 #include "gazebo/physics/dart/DARTFixedJoint.hh"
 
 using namespace gazebo;
@@ -27,16 +28,15 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTFixedJoint::DARTFixedJoint(BasePtr _parent)
-  : FixedJoint<DARTJoint>(_parent),
-    dtWeldJoint(new dart::dynamics::WeldJoint())
+  : FixedJoint<DARTJoint>(_parent)
 {
-  this->dtJoint = this->dtWeldJoint;
+  this->dataPtr->dtJoint = new dart::dynamics::WeldJoint();
 }
 
 //////////////////////////////////////////////////
 DARTFixedJoint::~DARTFixedJoint()
 {
-  delete dtWeldJoint;
+  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////
@@ -54,8 +54,8 @@ void DARTFixedJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTFixedJoint::GetAnchor(unsigned int /*index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
-                        this->dtJoint->getTransformFromChildBodyNode();
+  Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
+                        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);

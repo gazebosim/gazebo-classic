@@ -49,7 +49,7 @@ void ODEFixedJoint::Load(sdf::ElementPtr _sdf)
 math::Vector3 ODEFixedJoint::GetAnchor(unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
-         << "GetAnchor that is not valid for joints of type fixed.\n";;
+         << "GetAnchor that is not valid for joints of type fixed.\n";
   return math::Vector3();
 }
 
@@ -67,7 +67,7 @@ void ODEFixedJoint::SetAnchor(unsigned int /*index*/,
 math::Vector3 ODEFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
-         << "GetGlobalAxis that is not valid for joints of type fixed.\n";;
+         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
   return math::Vector3();
 }
 

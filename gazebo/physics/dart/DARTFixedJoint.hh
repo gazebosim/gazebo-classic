@@ -72,9 +72,6 @@ namespace gazebo
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
-
-      /// \brief Weld joint of DART
-      protected: dart::dynamics::WeldJoint *dtWeldJoint;
     };
   }
 }
