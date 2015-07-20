@@ -678,6 +678,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
         this->GetForce(0u) * this->GetLocalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
     }
+    else if (this->HasType(physics::Base::FIXED_JOINT))
+    {
+      // no correction are necessary for fixed joint
+    }
     else
     {
       /// \TODO: fix for multi-axis joints
@@ -864,13 +868,13 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
   double dt = this->GetWorld()->GetPhysicsEngine()->GetMaxStepSize();
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
   {
+    /// \brief Turn on the joint limit constraints if
+    ///   - there is no joint damping/stiffness specified, or
+    ///   - a joint is at its limit.
+    bool stiffnessDampingOff = math::equal(this->dissipationCoefficient[i], 0.0)
+                            && math::equal(this->stiffnessCoefficient[i], 0.0);
     double angle = this->GetAngle(i).Radian();
-    double dAngle = 2.0 * this->GetVelocity(i) * dt;
-    angle += dAngle;
-
-    if ((math::equal(this->dissipationCoefficient[i], 0.0) &&
-         math::equal(this->stiffnessCoefficient[i], 0.0)) ||
-        angle >= this->upperLimit[i].Radian() ||
+    if (stiffnessDampingOff || angle >= this->upperLimit[i].Radian() ||
         angle <= this->lowerLimit[i].Radian())
     {
       if (this->implicitDampingState[i] != ODEJoint::JOINT_LIMIT)
@@ -898,8 +902,19 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
       }
       */
     }
-    else if (!math::equal(this->dissipationCoefficient[i], 0.0) ||
-             !math::equal(this->stiffnessCoefficient[i], 0.0))
+    /// \TODO Remove existing hack below, which re-uses joint limit
+    /// constraints for simulating joint stiffness/damping by either:
+    ///   - implement implicit damping directly in ODE and refrain from
+    ///     re-using joint limit constraints, and/or
+    ///   - fixing issue #619 (which is effectively above for Bullet).
+    ///
+    /// \brief For now, do the joint stiffness/damping by re-using
+    ///  its limit constraints if
+    ///   - non-zero joint damping/stiffness specified, and
+    ///   - a joint is not at its limit
+    /// \brief Below checks that the joint is not at its limit and uses
+    /// the joint limit constraint to enforce joint damping.
+    else if (!stiffnessDampingOff)
     {
       double kd = fabs(this->dissipationCoefficient[i]);
       double kp = this->stiffnessCoefficient[i];
