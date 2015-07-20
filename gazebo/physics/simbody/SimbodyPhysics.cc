@@ -191,9 +191,10 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
 
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->GetGravity().Ign()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-        msgs::Convert(this->MagneticField()));
+      msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -216,7 +217,7 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
