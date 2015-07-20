@@ -71,7 +71,7 @@ namespace gazebo
 
       /// \brief Returns the imu linear acceleration
       /// \return Linear acceleration.
-      /// \deprecated See LinearVelocity() function that returns an
+      /// \deprecated See LinearAcceleration() function that returns an
       /// ignition::math::Vector3d object.
       public: math::Vector3 GetLinearAcceleration() const
               GAZEBO_DEPRECATED(6.0);
