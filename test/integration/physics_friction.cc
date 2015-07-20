@@ -216,6 +216,10 @@ class PhysicsFrictionTest : public ServerFixture,
   private: unsigned int spawnCount;
 };
 
+class WorldStepFrictionTest : public PhysicsFrictionTest
+{
+};
+
 /////////////////////////////////////////////////
 // FrictionDemo test:
 // Uses the test_friction world, which has a bunch of boxes on the ground
@@ -281,24 +285,33 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
     world->Step(500);
     t = world->GetSimTime();
 
+    double yTolerance = g_friction_tolerance;
+    if (_solverType == "world")
+    {
+      if (_worldSolverType == "DART_PGS")
+        yTolerance *= 2;
+      else if (_worldSolverType == "ODE_DANTZIG")
+        yTolerance = 0.84;
+    }
+
     for (box = boxes.begin(); box != boxes.end(); ++box)
     {
       math::Vector3 vel = box->model->GetWorldLinearVel();
       EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(vel.z, 0, 2*g_friction_tolerance);
+      EXPECT_NEAR(vel.z, 0, yTolerance);
 
       // Coulomb friction model
       if (box->friction >= 1.0)
       {
         // Friction is large enough to prevent motion
-        EXPECT_NEAR(vel.y, 0, 2*g_friction_tolerance);
+        EXPECT_NEAR(vel.y, 0, yTolerance);
       }
       else
       {
         // Friction is small enough to allow motion
         // Expect velocity = acceleration * time
         EXPECT_NEAR(vel.y, (g.y + box->friction) * t.Double(),
-                    g_friction_tolerance);
+                    yTolerance);
       }
     }
   }
@@ -571,12 +584,11 @@ TEST_P(PhysicsFrictionTest, FrictionDemo)
   FrictionDemo(GetParam());
 }
 
-#ifdef HAVE_DART
-TEST_F(PhysicsFrictionTest, FrictionDemoWorldStep)
+/////////////////////////////////////////////////
+TEST_P(WorldStepFrictionTest, FrictionDemoWorldStep)
 {
-  FrictionDemo("ode", "world", "DART_PGS");
+  FrictionDemo("ode", "world", GetParam());
 }
-#endif
 
 /////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, MaximumDissipation)
@@ -607,6 +619,9 @@ TEST_P(PhysicsFrictionTest, DirectionNaN)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsFrictionTest,
                         PHYSICS_ENGINE_VALUES);
+
+INSTANTIATE_TEST_CASE_P(WorldStepSolvers, WorldStepFrictionTest,
+                        WORLD_STEP_SOLVERS);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
