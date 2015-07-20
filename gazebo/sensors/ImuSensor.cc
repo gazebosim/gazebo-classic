@@ -89,7 +89,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   if (imuElem->HasElement("noise"))
   {
     gzwarn << "Deprecation: IMU noise SDF value have changed. Please refer to"
-     << "http://sdformat.org/spec?ver=1.5&elem=sensor#sensor_imu\n";
+     << " http://sdformat.org/spec?ver=1.5&elem=sensor#sensor_imu\n";
 
     sdf::ElementPtr noiseElem = imuElem->GetElement("noise");
     std::string type = noiseElem->Get<std::string>("type");
