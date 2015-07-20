@@ -62,6 +62,7 @@
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
 #include "gazebo/physics/ode/ODEUniversalJoint.hh"
+#include "gazebo/physics/ode/ODEFixedJoint.hh"
 
 #include "gazebo/physics/ode/ODERayShape.hh"
 #include "gazebo/physics/ode/ODEBoxShape.hh"
@@ -292,6 +293,8 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
       this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+        msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -865,6 +868,8 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new ODEBallJoint(this->dataPtr->worldId, _parent));
   else if (_type == "universal")
     joint.reset(new ODEUniversalJoint(this->dataPtr->worldId, _parent));
+  else if (_type == "fixed")
+    joint.reset(new ODEFixedJoint(this->dataPtr->worldId, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
