@@ -269,6 +269,7 @@ TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
   CompareMsgsJointTypeToString(msgs::Joint::BALL);
   CompareMsgsJointTypeToString(msgs::Joint::SCREW);
   CompareMsgsJointTypeToString(msgs::Joint::GEARBOX);
+  CompareMsgsJointTypeToString(msgs::Joint::FIXED);
 }
 
 //////////////////////////////////////////////////
