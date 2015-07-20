@@ -19,7 +19,6 @@
 
 #include <string>
 
-#include "gazebo/math/Vector2i.hh"
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/util/system.hh"
 
@@ -57,7 +56,6 @@ namespace gazebo
       protected: virtual void CreateTheEntity();
 
       private: int state;
-      private: math::Vector2i mousePushPos;
       private: msgs::Visual *visualMsg;
 
       private: static unsigned int counter;

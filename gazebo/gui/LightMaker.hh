@@ -47,9 +47,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual bool IsActive() const;
 
-      // Documentation inherited
-      public: virtual void OnMouseMove(const common::MouseEvent &_event);
-
       /// \brief Initialize the light maker from an existing light in the scene.
       /// \param[in] _lightName Name of existing light in the scene.
       /// \return True if initialization is successful.
@@ -61,6 +58,13 @@ namespace gazebo
 
       // Documentation inherited
       protected: virtual void CreateTheEntity();
+
+      // Documentation inherited
+      protected: virtual ignition::math::Vector3d EntityPosition() const;
+
+      // Documentation inherited
+      protected: virtual void SetEntityPosition(
+          const ignition::math::Vector3d &_pos);
 
       protected: int state;
       protected: msgs::Light msg;

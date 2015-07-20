@@ -101,51 +101,6 @@ bool MeshMaker::IsActive() const
 }
 
 /////////////////////////////////////////////////
-void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
-{
-  math::Pose pose = msgs::Convert(this->visualMsg->pose());
-
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
-
-  // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
-                                       origin1, dir1);
-
-  // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
-
-  double dist1 = plane.Distance(origin1, dir1);
-
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  p1 = origin1 + dir1 * dist1;
-  pose.pos = p1;
-
-  if (!_event.Shift())
-  {
-    if (ceil(pose.pos.x) - pose.pos.x <= .4)
-      pose.pos.x = ceil(pose.pos.x);
-    else if (pose.pos.x - floor(pose.pos.x) <= .4)
-      pose.pos.x = floor(pose.pos.x);
-
-    if (ceil(pose.pos.y) - pose.pos.y <= .4)
-      pose.pos.y = ceil(pose.pos.y);
-    else if (pose.pos.y - floor(pose.pos.y) <= .4)
-      pose.pos.y = floor(pose.pos.y);
-
-    if (ceil(pose.pos.z) - pose.pos.z <= .4)
-      pose.pos.z = ceil(pose.pos.z);
-    else if (pose.pos.z - floor(pose.pos.z) <= .4)
-      pose.pos.z = floor(pose.pos.z);
-  }
-
-  msgs::Set(this->visualMsg->mutable_pose(), pose);
-  this->visPub->Publish(*this->visualMsg);
-}
-
-
-/////////////////////////////////////////////////
 void MeshMaker::CreateTheEntity()
 {
   msgs::Factory msg;

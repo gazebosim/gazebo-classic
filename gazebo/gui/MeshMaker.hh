@@ -49,7 +49,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual bool IsActive() const;
-      public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
       // Documentation inherited
       private: virtual void CreateTheEntity();

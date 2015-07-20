@@ -23,7 +23,12 @@
 
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
+
 #include "gazebo/common/MouseEvent.hh"
+
+#include "gazebo/rendering/UserCamera.hh"
+
+#include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;
@@ -74,24 +79,27 @@ void EntityMaker::OnMouseRelease(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void EntityMaker::OnMouseMove(const common::MouseEvent &/*_event*/)
+void EntityMaker::OnMouseMove(const common::MouseEvent &_event)
 {
+  ignition::math::Vector3d pos =
+      (ModelManipulator::GetMousePositionOnPlane(this->camera, _event)).Ign();
+
+  if (_event.Control())
+  {
+    pos = ModelManipulator::SnapPoint(math::Vector3(pos)).Ign();
+  }
+ pos.Z(this->EntityPosition().Z());
+
+  this->SetEntityPosition(pos);
 }
 
-//////////////////////////////////////////////////
-math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 _p)
+/////////////////////////////////////////////////
+ignition::math::Vector3d EntityMaker::EntityPosition() const
 {
-  math::Vector3 result = _p;
+  return ignition::math::Vector3d();
+}
 
-  if (this->snapToGrid)
-  {
-    math::Vector3 rounded = (_p / this->snapGridSize).GetRounded() *
-      this->snapGridSize;
-    if (fabs(_p.x - rounded.x) < this->snapDistance)
-      result.x = rounded.x;
-    if (fabs(_p.y - rounded.y) < this->snapDistance)
-      result.y = rounded.y;
-  }
-
-  return result;
+/////////////////////////////////////////////////
+void EntityMaker::SetEntityPosition(const ignition::math::Vector3d &/*_pos*/)
+{
 }

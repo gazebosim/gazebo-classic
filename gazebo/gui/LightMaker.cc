@@ -26,7 +26,6 @@
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -160,29 +159,14 @@ void LightMaker::CreateTheEntity()
 }
 
 /////////////////////////////////////////////////
-// \TODO: This was copied from ModelMaker. Figure out a better way to
-// prevent code duplication.
-void LightMaker::OnMouseMove(const common::MouseEvent &_event)
+ignition::math::Vector3d LightMaker::EntityPosition() const
 {
-  math::Vector3 origin1, dir1, p1;
-
-  // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
-                                       origin1, dir1);
-
-  // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
-
-  double dist1 = plane.Distance(origin1, dir1);
-
-  // Calculate position
-  p1 = origin1 + dir1 * dist1;
-
-  // Get snap point
-  if (_event.Control())
-    p1 = this->GetSnappedPoint(p1);
-
-  p1.z = this->light->GetPosition().z;
-
-  this->light->SetPosition(p1);
+  return this->light->GetPosition().Ign();
 }
+
+/////////////////////////////////////////////////
+void LightMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
+{
+  this->light->SetPosition(_pos);
+}
+
