@@ -38,6 +38,7 @@
 #include "gazebo/physics/dart/DARTSliderJoint.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
 #include "gazebo/physics/dart/DARTUniversalJoint.hh"
+#include "gazebo/physics/dart/DARTFixedJoint.hh"
 
 #include "gazebo/physics/dart/DARTRayShape.hh"
 #include "gazebo/physics/dart/DARTBoxShape.hh"
@@ -350,6 +351,8 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new DARTBallJoint(_parent));
   else if (_type == "universal")
     joint.reset(new DARTUniversalJoint(_parent));
+  else if (_type == "fixed")
+    joint.reset(new DARTFixedJoint(_parent));
   else
     gzerr << "Unable to create joint of type[" << _type << "]";
 
