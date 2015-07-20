@@ -118,7 +118,7 @@ namespace gazebo
       /// \brief Save previous imu linear velocity for computing acceleration.
       private: ignition::math::Vector3d lastLinearVel;
 
-      /// \brief Imu linear acceleration
+      /// \brief Noise free linear acceleration
       private: ignition::math::Vector3d linearAcc;
 
       /// \brief store gravity vector to be added to the imu output.
@@ -155,7 +155,7 @@ namespace gazebo
         GAUSSIAN
       };
 
-      /// \brief Noise free imu angular velocity.
+      /// \brief Noise free angular velocity.
       private: ignition::math::Vector3d angularVel;
     };
     /// \}
