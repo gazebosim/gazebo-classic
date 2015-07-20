@@ -58,11 +58,11 @@ std::vector<std::string> &split(const std::string &_s,
 }
 
 /////////////////////////////////////////////////
-math::Vector2d bezierInterpolate(double _t,
-                                 const math::Vector2d &_p0,
-                                 const math::Vector2d &_p1,
-                                 const math::Vector2d &_p2,
-                                 const math::Vector2d &_p3)
+ignition::math::Vector2d bezierInterpolate(double _t,
+                                           const ignition::math::Vector2d &_p0,
+                                           const ignition::math::Vector2d &_p1,
+                                           const ignition::math::Vector2d &_p2,
+                                           const ignition::math::Vector2d &_p3)
 {
   double t_1 = 1.0 - _t;
   double t_1_2 = t_1 * t_1;
@@ -70,21 +70,21 @@ math::Vector2d bezierInterpolate(double _t,
   double t2 = _t * _t;
   double t3 = t2 * _t;
 
-  math::Vector2d p;
-  p.x = t_1_3 * _p0.x + 3 * _t *  t_1_2 * _p1.x + 3 * t2 * t_1 * _p2.x +
-        t3 * _p3.x;
-  p.y = t_1_3 * _p0.y + 3 * _t *  t_1_2 * _p1.y + 3 * t2 * t_1 * _p2.y +
-        t3 * _p3.y;
+  ignition::math::Vector2d p;
+  p.X(t_1_3 * _p0.X() + 3 * _t *  t_1_2 * _p1.X() + 3 * t2 * t_1 * _p2.X() +
+      t3 * _p3.X());
+  p.Y(t_1_3 * _p0.Y() + 3 * _t *  t_1_2 * _p1.Y() + 3 * t2 * t_1 * _p2.Y() +
+      t3 * _p3.Y());
   return p;
 }
 
 /////////////////////////////////////////////////
-void cubicBezier(const math::Vector2d &_p0,
-                 const math::Vector2d &_p1,
-                 const math::Vector2d &_p2,
-                 const math::Vector2d &_p3,
+void cubicBezier(const ignition::math::Vector2d &_p0,
+                 const ignition::math::Vector2d &_p1,
+                 const ignition::math::Vector2d &_p2,
+                 const ignition::math::Vector2d &_p3,
                  double _step,
-                 std::vector<math::Vector2d> &_points)
+                 std::vector<ignition::math::Vector2d> &_points)
 {
   // we don't start at t = 0, but t = step...
   // so we assume that the first point is there (from the last move)
@@ -95,6 +95,7 @@ void cubicBezier(const math::Vector2d &_p0,
     _points.push_back(p);
     t += _step;
   }
+
   // however we close the loop with the last point (t = 1)
   _points.push_back(_p3);
 }
@@ -139,15 +140,15 @@ static float VecAng(float _ux, float _uy, float _vx, float _vy)
 }
 
 /////////////////////////////////////////////////
-void arcPath(const math::Vector2d &_p0,
+void arcPath(const ignition::math::Vector2d &_p0,
              const double _rx,
              const double _ry,
              const double _rotxDeg,
              const size_t _largeArc,
              const size_t _sweepDirection,
-             const math::Vector2d &_pEnd,
+             const ignition::math::Vector2d &_pEnd,
              const double _step,
-             std::vector<math::Vector2d> &_points)
+             std::vector<ignition::math::Vector2d> &_points)
 {
   // Ported from canvg (https://code.google.com/p/canvg/)
   double rx = _rx;
@@ -161,10 +162,10 @@ void arcPath(const math::Vector2d &_p0,
   double sinrx, cosrx;
   double hda, kappa;
 
-  x1 = _p0.x;
-  y1 = _p0.y;
-  x2 = _pEnd.x;
-  y2 = _pEnd.y;
+  x1 = _p0.X();
+  y1 = _p0.Y();
+  x2 = _pEnd.X();
+  y2 = _pEnd.Y();
 
   dx = x1 - x2;
   dy = y1 - y2;
@@ -257,7 +258,7 @@ void arcPath(const math::Vector2d &_p0,
   if (da < 0.0)
     kappa = -kappa;
 
-  for (size_t i = 0; i <= ndivs; i++)
+  for (size_t i = 0; i <= ndivs; ++i)
   {
     double x, y, tanx, tany, a;
     a = a1 + da * (1.0 * i /ndivs);
@@ -276,10 +277,10 @@ void arcPath(const math::Vector2d &_p0,
 
     if (i > 0)
     {
-      math::Vector2d p0(px, py);
-      math::Vector2d p1(px + ptanx, py + ptany);
-      math::Vector2d p2(x - tanx, y - tany);
-      math::Vector2d p3(x, y);
+      ignition::math::Vector2d p0(px, py);
+      ignition::math::Vector2d p1(px + ptanx, py + ptany);
+      ignition::math::Vector2d p2(x - tanx, y - tany);
+      ignition::math::Vector2d p3(x, y);
       cubicBezier(p0, p1, p2, p3, _step, _points);
     }
     px = x;
@@ -296,10 +297,10 @@ SvgError::SvgError(const std::string &_what)
 }
 
 /////////////////////////////////////////////////
-math::Vector2d SVGLoader::SubpathToPolyline(
+ignition::math::Vector2d SVGLoader::SubpathToPolyline(
                             const std::vector<SVGCommand> &_subpath,
-                            math::Vector2d _last,
-                            std::vector<math::Vector2d> &_polyline)
+                            ignition::math::Vector2d _last,
+                            std::vector<ignition::math::Vector2d> &_polyline)
 {
   GZ_ASSERT(_polyline.size() == 0, "polyline not empty");
   for (SVGCommand cmd: _subpath)
@@ -313,12 +314,12 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       case 'l':
         while (i < count)
         {
-          math::Vector2d p;
-          p.x = cmd.numbers[i+0];
-          p.y = cmd.numbers[i+1];
+          ignition::math::Vector2d p;
+          p.X(cmd.numbers[i+0]);
+          p.Y(cmd.numbers[i+1]);
           // m and l cmds are relative to the last point
-          p.x += _last.x;
-          p.y += _last.y;
+          p.X() += _last.X();
+          p.Y() += _last.Y();
           _polyline.push_back(p);
           _last = p;
           i += 2;
@@ -328,9 +329,9 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       case 'L':
         while (i < count)
         {
-          math::Vector2d p;
-          p.x = cmd.numbers[i+0];
-          p.y = cmd.numbers[i+1];
+          ignition::math::Vector2d p;
+          p.X(cmd.numbers[i+0]);
+          p.Y(cmd.numbers[i+1]);
           _polyline.push_back(p);
           _last = p;
           i += 2;
@@ -339,14 +340,14 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       case 'C':
         while (i < count)
         {
-          math::Vector2d p0 = _last;
-          math::Vector2d p1, p2, p3;
-          p1.x = cmd.numbers[i+0];
-          p1.y = cmd.numbers[i+1];
-          p2.x = cmd.numbers[i+2];
-          p2.y = cmd.numbers[i+3];
-          p3.x = cmd.numbers[i+4];
-          p3.y = cmd.numbers[i+5];
+          ignition::math::Vector2d p0 = _last;
+          ignition::math::Vector2d p1, p2, p3;
+          p1.X(cmd.numbers[i+0]);
+          p1.Y(cmd.numbers[i+1]);
+          p2.X(cmd.numbers[i+2]);
+          p2.Y(cmd.numbers[i+3]);
+          p3.X(cmd.numbers[i+4]);
+          p3.Y(cmd.numbers[i+5]);
           cubicBezier(p0, p1, p2, p3, this->dataPtr->resolution, _polyline);
           _last = p3;
           i += 6;
@@ -355,14 +356,14 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       case 'c':
         while (i < count)
         {
-          math::Vector2d p0 = _last;
-          math::Vector2d p1, p2, p3;
-          p1.x = cmd.numbers[i+0] + _last.x;
-          p1.y = cmd.numbers[i+1] + _last.y;
-          p2.x = cmd.numbers[i+2] + _last.x;
-          p2.y = cmd.numbers[i+3] + _last.y;
-          p3.x = cmd.numbers[i+4] + _last.x;
-          p3.y = cmd.numbers[i+5] + _last.y;
+          ignition::math::Vector2d p0 = _last;
+          ignition::math::Vector2d p1, p2, p3;
+          p1.X(cmd.numbers[i+0] + _last.X());
+          p1.Y(cmd.numbers[i+1] + _last.Y());
+          p2.X(cmd.numbers[i+2] + _last.X());
+          p2.Y(cmd.numbers[i+3] + _last.Y());
+          p3.X(cmd.numbers[i+4] + _last.X());
+          p3.Y(cmd.numbers[i+5] + _last.Y());
           cubicBezier(p0, p1, p2, p3, this->dataPtr->resolution, _polyline);
           _last = p3;
           i += 6;
@@ -371,15 +372,15 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       case 'A':
         while (i < count)
         {
-          math::Vector2d p0 = _last;
+          ignition::math::Vector2d p0 = _last;
           double rx = cmd.numbers[i+0];
           double ry = cmd.numbers[i+1];
           double xRot = cmd.numbers[i+2];
           unsigned int arc(cmd.numbers[i+3]);
           unsigned int sweep(cmd.numbers[i+4]);
-          math::Vector2d pEnd;
-          pEnd.x = cmd.numbers[i+5];
-          pEnd.y = cmd.numbers[i+6];
+          ignition::math::Vector2d pEnd;
+          pEnd.X(cmd.numbers[i+5]);
+          pEnd.Y(cmd.numbers[i+6]);
           arcPath(p0, rx, ry, xRot, arc, sweep, pEnd,
                   this->dataPtr->resolution, _polyline);
           _last = pEnd;
@@ -389,15 +390,15 @@ math::Vector2d SVGLoader::SubpathToPolyline(
       case 'a':
         while (i < count)
         {
-          math::Vector2d p0 = _last;
+          ignition::math::Vector2d p0 = _last;
           double rx = cmd.numbers[i+0];
           double ry = cmd.numbers[i+1];
           double xRot = cmd.numbers[i+2];
           unsigned int arc(cmd.numbers[i+3]);
           unsigned int sweep(cmd.numbers[i+4]);
-          math::Vector2d pEnd;
-          pEnd.x = cmd.numbers[i+5] + _last.x;
-          pEnd.y = cmd.numbers[i+6] + _last.y;
+          ignition::math::Vector2d pEnd;
+          pEnd.X(cmd.numbers[i+5] + _last.X());
+          pEnd.Y(cmd.numbers[i+6] + _last.Y());
           arcPath(p0, rx, ry, xRot, arc, sweep, pEnd,
                   this->dataPtr->resolution, _polyline);
           _last = pEnd;
@@ -568,13 +569,11 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
   this->ExpandCommands(subpaths, _path);
   // the starting point for the subpath
   // it is the end point of the previous one
-  math::Vector2d p;
-  p.x = 0;
-  p.y = 0;
+  ignition::math::Vector2d p;
   for (std::vector<SVGCommand> subpath : subpaths)
   {
-    _path.polylines.push_back(std::vector<math::Vector2d>());
-    std::vector<math::Vector2d> &polyline = _path.polylines.back();
+    _path.polylines.push_back(std::vector<ignition::math::Vector2d>());
+    std::vector<ignition::math::Vector2d> &polyline = _path.polylines.back();
     p = this->SubpathToPolyline(subpath, p, polyline);
   }
 }
@@ -725,7 +724,7 @@ function drawPath(ctx, path, style, x0, y0, scale, showCtrlPoints )
   console.log('drawPath ' + path.name);
 
   ctx.beginPath();
-  for (var j = 0; j <  path.subpaths.length; j++)
+  for (var j = 0; j <  path.subpaths.length; ++j)
   {
     var points = path.subpaths[j];
     console.log(points.length + ' points in subpath, (' + style + ')');
@@ -844,13 +843,14 @@ function draw(showCtrlPoints)
 
     for (unsigned int i = 0; i < path.polylines.size(); ++i)
     {
-      std::vector<math::Vector2d> poly = path.polylines[i];
+      std::vector<ignition::math::Vector2d> poly = path.polylines[i];
       _out << psep <<  "[" << std::endl;
       psep = ',';
       char sep = ' ';
-      for ( math::Vector2d p : poly)
+      for (ignition::math::Vector2d p : poly)
       {
-        _out << " " << sep << " [" <<  p.x << ", " << p.y << "]" <<std::endl;
+        _out << " " << sep << " [" <<  p.X() << ", "
+             << p.Y() << "]" <<std::endl;
         sep = ',';
       }
       _out << " ] " << std::endl;
@@ -862,32 +862,64 @@ function draw(showCtrlPoints)
 }
 
 /////////////////////////////////////////////////
-bool Vector2dCompare(const math::Vector2d &_a, const math::Vector2d &_b,
+bool Vector2dCompare(const ignition::math::Vector2d &_a,
+                     const ignition::math::Vector2d &_b,
                      double _tol)
 {
-  double x = _a.x - _b.x;
-  double y = _a.y - _b.y;
+  double x = _a.X() - _b.X();
+  double y = _a.Y() - _b.Y();
   // is squared distance smaller than squared tolerance?
   return (x*x + y*y < _tol * _tol);
 }
 
 /////////////////////////////////////////////////
 void SVGLoader::PathsToClosedPolylines(
-                      const std::vector<common::SVGPath> &_paths,
-                      double _tol,
-                      std::vector< std::vector<math::Vector2d> > &_closedPolys,
-                      std::vector< std::vector<math::Vector2d> > &_openPolys)
+    const std::vector<common::SVGPath> &_paths,
+    double _tol,
+    std::vector< std::vector<math::Vector2d> > &_closedPolys,
+    std::vector< std::vector<math::Vector2d> > &_openPolys)
+{
+  std::vector<std::vector<ignition::math::Vector2d>> closedPolys;
+  std::vector<std::vector<ignition::math::Vector2d>> openPolys;
+
+  for (auto const &closed : _closedPolys)
+  {
+    std::vector<ignition::math::Vector2d> vecs;
+    for (auto const &v : closed)
+      vecs.push_back(v.Ign());
+    closedPolys.push_back(vecs);
+  }
+
+  for (auto const &open : _openPolys)
+  {
+    std::vector<ignition::math::Vector2d> vecs;
+    for (auto const &v : open)
+      vecs.push_back(v.Ign());
+    openPolys.push_back(vecs);
+  }
+
+  PathsToClosedPolylines(_paths, _tol, closedPolys, openPolys);
+}
+
+/////////////////////////////////////////////////
+void SVGLoader::PathsToClosedPolylines(
+    const std::vector<common::SVGPath> &_paths,
+    double _tol,
+    std::vector< std::vector<ignition::math::Vector2d> > &_closedPolys,
+    std::vector< std::vector<ignition::math::Vector2d> > &_openPolys)
 {
   // first we extract all polyline into a vector of line segments
-  std::list<std::pair<math::Vector2d, math::Vector2d> > segments;
-  for (auto &path : _paths)
+  std::list<std::pair<ignition::math::Vector2d,
+    ignition::math::Vector2d> > segments;
+
+  for (auto const &path : _paths)
   {
-    for (auto &poly : path.polylines)
+    for (auto const &poly : path.polylines)
     {
-      math::Vector2d startPoint = poly[0];
+      ignition::math::Vector2d startPoint = poly[0];
       for (unsigned int i =1; i < poly.size(); ++i)
       {
-        const math::Vector2d &endPoint = poly[i];
+        const ignition::math::Vector2d &endPoint = poly[i];
         double length = endPoint.Distance(startPoint);
         if (length < _tol)
         {
@@ -902,12 +934,13 @@ void SVGLoader::PathsToClosedPolylines(
       }
     }
   }
+
   // then we remove segments until there are none left
   while (!segments.empty())
   {
     // start a new polyline, made from the 2 points of
     // the next available segment.
-    std::vector<math::Vector2d> polyline;
+    std::vector<ignition::math::Vector2d> polyline;
     auto &s = segments.front();
     polyline.push_back(s.first);
     polyline.push_back(s.second);
@@ -925,7 +958,7 @@ void SVGLoader::PathsToClosedPolylines(
       for (auto it = segments.begin(); it != segments.end(); ++it)
       {
         auto seg = *it;
-        math::Vector2d nextPoint;
+        ignition::math::Vector2d nextPoint;
         if (Vector2dCompare(polyline.back(), seg.first, _tol))
         {
           nextPoint = seg.second;

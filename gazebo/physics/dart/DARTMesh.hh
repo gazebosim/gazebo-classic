@@ -29,6 +29,9 @@ namespace gazebo
     /// \addtogroup gazebo_physics_dart Dart Physics
     /// \{
 
+    /// Forward declare private data class
+    class DARTMeshPrivate;
+
     /// \brief Triangle mesh collision helper class
     class GZ_PHYSICS_VISIBLE DARTMesh
     {
@@ -64,6 +67,10 @@ namespace gazebo
                    unsigned int _numVertices, unsigned int _numIndices,
                    DARTCollisionPtr _collision,
                    const math::Vector3 &_scale);
+
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTMeshPrivate *dataPtr;
     };
     /// \}
   }

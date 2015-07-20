@@ -16,6 +16,7 @@
 */
 
 #include <string.h>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/RenderingIface.hh"
@@ -71,8 +72,8 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == math::Vector3(129, 129, 10));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
 
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
   common::Image testImage = shape->GetImage();
@@ -274,8 +275,8 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == math::Vector3(129, 129, 10));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
 
   std::vector<float> physicsTest;
   std::vector<float> renderTest;

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _STLLOADER_HH_
-#define _STLLOADER_HH_
+#ifndef _GAZEBO_STLLOADER_HH_
+#define _GAZEBO_STLLOADER_HH_
 
 #include <stdint.h>
 #include <string>

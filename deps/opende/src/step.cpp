@@ -45,10 +45,7 @@
 //****************************************************************************
 // misc defines
 
-#define USE_JOINT_DAMPING
-
 //#define TIMING
-
 
 #ifdef TIMING
 #define IFTIMING(x) x
@@ -439,24 +436,6 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     m = mcurr;
   }
 
-
-#ifdef USE_JOINT_DAMPING
-  /************************************************************************/
-  /* for joint damping, get the total number of rows for damping jacobian */
-  /************************************************************************/
-  int m_damp; // number of rows for damped joint jacobian
-  {
-    int mcurr = 0;
-    const dJointWithInfo1 *jicurr = jointiinfos; // info1 stored in jointiinfos
-    const dJointWithInfo1 *const jiend = jicurr + nj;
-    for (; jicurr != jiend; jicurr++)
-      if (jicurr->joint->use_damping)
-        mcurr ++;
-
-    m_damp = mcurr;
-  }
-#endif
-
   // this will be set to the force due to the constraints
   dReal *cforce = context->AllocateArray<dReal> (nb*8);
   dSetZero (cforce,nb*8);
@@ -499,23 +478,6 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       dSetZero (rhs,mlocal);
     }
 
-#ifdef USE_JOINT_DAMPING
-    dReal *J_damp = NULL;
-    dReal *coeff_damp = NULL;
-    {
-      int mlocal = m_damp;
-
-      const unsigned jelements = mlocal*12;
-      J_damp = context->AllocateArray<dReal> (jelements);
-      dSetZero (J_damp,jelements);
-
-      const unsigned coeffelements = mlocal;
-      coeff_damp = context->AllocateArray<dReal> (coeffelements);
-      dSetZero (coeff_damp,coeffelements);
-    }
-#endif
-
-
     // Put 'c' in the same memory as 'rhs' as they transit into each other
     dReal *c = rhs; rhs = NULL; // erase rhs pointer for now as it is not to be used yet
 
@@ -552,9 +514,6 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
         Jinfo.erp = world->global_erp;
 
         unsigned ofsi = 0;
-#ifdef USE_JOINT_DAMPING
-        unsigned ofsi_damp = 0;
-#endif
         const dJointWithInfo1 *jicurr = jointiinfos;
         const dJointWithInfo1 *const jiend = jicurr + nj;
         for (; jicurr != jiend; ++jicurr) {
@@ -572,27 +531,6 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
           Jinfo.findex = findex + ofsi;
           Jinfo.c_v_max = c_v_max + ofsi;
             
-
-#ifdef USE_JOINT_DAMPING
-          /*******************************************************/
-          /*  allocate space for damped joint Jacobians          */
-          /*******************************************************/
-          if (jicurr->joint->use_damping)
-          {
-            // damping coefficient is in jicurr->info.damping_coefficient);
-            coeff_damp[ofsi_damp] = jicurr->joint->damping_coefficient;
-
-            // setup joint damping pointers so getinfo2 will fill in J_damp
-            dReal *const Jrow_damp = J_damp + ofsi_damp * 12;
-            Jinfo.J1ld = Jrow_damp;
-            Jinfo.J1ad = Jrow_damp + 3;
-            Jinfo.J2ld = Jrow_damp + 6;
-            Jinfo.J2ad = Jrow_damp + 9;
-            // one row of constraint per joint
-            ofsi_damp ++;
-          }
-#endif
- 
           dxJoint *joint = jicurr->joint;
           joint->getInfo2 (&Jinfo);
           
@@ -963,24 +901,6 @@ size_t dxEstimateStepMemoryRequirements (dxBody * const * /*body*/, int nb, dxJo
     nj = njcurr; m = mcurr;
   }
 
-#ifdef USE_JOINT_DAMPING
-  int m_damp;
-  {
-    int m_dampcurr = 0;
-    //dxJoint::SureMaxInfo info;
-    dxJoint *const *const _jend = _joint + _nj;
-    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {
-      dxJoint *j = *_jcurr;
-      /***************************/
-      /* size for damping joints */
-      /***************************/
-      if (j->use_damping)
-        m_dampcurr ++;
-    }
-    m_damp = m_dampcurr;
-  }
-#endif
-
   size_t res = 0;
 
   res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invI
@@ -998,10 +918,6 @@ size_t dxEstimateStepMemoryRequirements (dxBody * const * /*body*/, int nb, dxJo
       sub1_res2 += 3 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for lo, hi, rhs
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for findex
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for c_v_max
-#ifdef USE_JOINT_DAMPING
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m_damp); // for J_damp
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m_damp); // for coeff_damp
-#endif
       {
         size_t sub2_res1 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for cfm
         sub2_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 2 * 8 * m); // for JinvM

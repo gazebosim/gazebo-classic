@@ -32,7 +32,6 @@
 #include "gazebo/common/DemPrivate.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -66,8 +65,8 @@ int Dem::Load(const std::string &_filename)
   unsigned int height;
   int xSize, ySize;
   double upLeftX, upLeftY, upRightX, upRightY, lowLeftX, lowLeftY;
-  math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
-  math::Angle lowLeftLat, lowLeftLong;
+  ignition::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
+  ignition::math::Angle lowLeftLat, lowLeftLong;
 
   // Sanity check
   std::string fullName = _filename;
@@ -128,15 +127,15 @@ int Dem::Load(const std::string &_filename)
                                             lowLeftLat, lowLeftLong);
 
   // Set the terrain's side (the terrain will be squared after the padding)
-  if (math::isPowerOfTwo(ySize - 1))
+  if (ignition::math::isPowerOfTwo(ySize - 1))
     height = ySize;
   else
-    height = math::roundUpPowerOfTwo(ySize) + 1;
+    height = ignition::math::roundUpPowerOfTwo(ySize) + 1;
 
-  if (math::isPowerOfTwo(xSize - 1))
+  if (ignition::math::isPowerOfTwo(xSize - 1))
     width = xSize;
   else
-    width = math::roundUpPowerOfTwo(xSize) + 1;
+    width = ignition::math::roundUpPowerOfTwo(xSize) + 1;
 
   this->dataPtr->side = std::max(width, height);
 
@@ -180,7 +179,7 @@ float Dem::GetMaxElevation() const
 
 //////////////////////////////////////////////////
 void Dem::GetGeoReference(double _x, double _y,
-                          math::Angle &_latitude, math::Angle &_longitude)
+    ignition::math::Angle &_latitude, ignition::math::Angle &_longitude) const
 {
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
@@ -201,8 +200,8 @@ void Dem::GetGeoReference(double _x, double _y,
 
     cT->Transform(1, &xGeoDeg, &yGeoDeg);
 
-    _latitude.SetFromDegree(yGeoDeg);
-    _longitude.SetFromDegree(xGeoDeg);
+    _latitude.Degree(yGeoDeg);
+    _longitude.Degree(xGeoDeg);
   }
   else
     gzthrow("Unable to obtain the georeferenced values for coordinates ("
@@ -211,6 +210,16 @@ void Dem::GetGeoReference(double _x, double _y,
 
 //////////////////////////////////////////////////
 void Dem::GetGeoReferenceOrigin(math::Angle &_latitude, math::Angle &_longitude)
+{
+  ignition::math::Angle lat, lon;
+  this->GetGeoReferenceOrigin(lat, lon);
+  _latitude = lat;
+  _longitude = lon;
+}
+
+//////////////////////////////////////////////////
+void Dem::GetGeoReferenceOrigin(ignition::math::Angle &_latitude,
+    ignition::math::Angle &_longitude) const
 {
   return this->GetGeoReference(0, 0, _latitude, _longitude);
 }
@@ -243,6 +252,16 @@ double Dem::GetWorldHeight() const
 void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
                         const math::Vector3 &_size, const math::Vector3 &_scale,
                         bool _flipY, std::vector<float> &_heights)
+{
+  this->FillHeightMap(_subSampling, _vertSize, _size.Ign(), _scale.Ign(),
+      _flipY, _heights);
+}
+
+//////////////////////////////////////////////////
+void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
+    const ignition::math::Vector3d &_size,
+    const ignition::math::Vector3d &_scale,
+    bool _flipY, std::vector<float> &_heights)
 {
   if (_subSampling <= 0)
   {
@@ -281,16 +300,16 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       float h2 = (px3 - ((px3 - px4) * dx));
 
       float h = (h1 - ((h1 - h2) * dy) - std::max(0.0f,
-          this->GetMinElevation())) * _scale.z;
+          this->GetMinElevation())) * _scale.Z();
 
       // Invert pixel definition so 1=ground, 0=full height,
       // if the terrain size has a negative z component
       // this is mainly for backward compatibility
-      if (_size.z < 0)
+      if (_size.Z() < 0)
         h *= -1;
 
       // Convert to 0 if a NODATA value is found
-      if (_size.z >= 0 && h < 0)
+      if (_size.Z() >= 0 && h < 0)
         h = 0;
 
       // Store the height for future use

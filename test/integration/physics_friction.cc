@@ -161,7 +161,8 @@ class PhysicsFrictionTest : public ServerFixture,
               << "      </geometry>"
               << "    </visual>"
               << "  </link>"
-              << "</model>";
+              << "</model>"
+              << "</sdf>";
 
             physics::WorldPtr world = physics::get_world("default");
             world->InsertModelString(modelStr.str());
