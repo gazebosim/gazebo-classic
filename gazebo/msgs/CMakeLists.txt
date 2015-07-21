@@ -51,6 +51,7 @@ set (msgs
   log_playback_control.proto
   log_playback_stats.proto
   log_status.proto
+  magnetometer.proto
   material.proto
   meshgeom.proto
   model.proto

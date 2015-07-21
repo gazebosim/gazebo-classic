@@ -47,9 +47,9 @@ std::map<JointMaker::JointType, std::string> JointMaker::jointTypes;
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
 {
-  this->UnitVectors.push_back(math::Vector3::UnitX);
-  this->UnitVectors.push_back(math::Vector3::UnitY);
-  this->UnitVectors.push_back(math::Vector3::UnitZ);
+  this->unitVectors.push_back(ignition::math::Vector3d::UnitX);
+  this->unitVectors.push_back(ignition::math::Vector3d::UnitY);
+  this->unitVectors.push_back(ignition::math::Vector3d::UnitZ);
 
   this->newJointCreated = false;
   this->mouseJoint = NULL;
@@ -464,7 +464,8 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     jointData->jointMsg->set_child(leafName);
     jointData->jointMsg->set_child_id(jointData->child->GetId());
   }
-  msgs::Set(jointData->jointMsg->mutable_pose(), math::Pose::Zero);
+  msgs::Set(jointData->jointMsg->mutable_pose(),
+      ignition::math::Pose3d::Zero);
 
   jointData->jointMsg->set_type(
       msgs::ConvertJointType(this->GetTypeAsString(jointData->type)));
@@ -490,7 +491,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
       continue;
     }
     msgs::Set(axisMsg->mutable_xyz(),
-        this->UnitVectors[i%this->UnitVectors.size()]);
+        this->unitVectors[i%this->unitVectors.size()]);
     axisMsg->set_use_parent_model_frame(false);
     axisMsg->set_limit_lower(-GZ_DBL_MAX);
     axisMsg->set_limit_upper(GZ_DBL_MAX);

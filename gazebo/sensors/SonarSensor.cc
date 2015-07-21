@@ -272,7 +272,7 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
 
       for (int j = 0; j < (*iter)->contact(i).position_size(); ++j)
       {
-        pos = msgs::Convert((*iter)->contact(i).position(j)).Ign();
+        pos = msgs::ConvertIgn((*iter)->contact(i).position(j));
         ignition::math::Vector3d relPos = pos - referencePose.Pos();
         double len = pos.Distance(referencePose.Pos());
 

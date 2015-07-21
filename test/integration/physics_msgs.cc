@@ -76,7 +76,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   for (std::vector<math::Vector3>::iterator iter = gravity.begin();
        iter != gravity.end(); ++iter)
   {
-    msgs::Set(msg.mutable_gravity(), *iter);
+    msgs::Set(msg.mutable_gravity(), (*iter).Ign());
     physicsPub->Publish(msg);
 
     while (*iter != physics->GetGravity())
@@ -141,7 +141,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     for (std::vector<math::Pose>::iterator iter = poses.begin();
          iter != poses.end(); ++iter)
     {
-      msgs::Set(msg.mutable_pose(), *iter);
+      msgs::Set(msg.mutable_pose(), (*iter).Ign());
       modelPub->Publish(msg);
 
       while (*iter != model->GetWorldPose())
@@ -356,7 +356,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         linkMsg->set_id(link->GetId());
         linkMsg->set_name(link->GetScopedName());
 
-        msgs::Set(linkMsg->mutable_pose(), *iter);
+        msgs::Set(linkMsg->mutable_pose(), (*iter).Ign());
         modelPub->Publish(msg);
 
         int sleep = 0;
@@ -490,7 +490,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       msgs::Model msg;
       msg.set_name(name);
       msg.set_id(model->GetId());
-      msgs::Set(msg.mutable_scale(), scaleFactor * math::Vector3::One);
+      msgs::Set(msg.mutable_scale(),
+          scaleFactor * ignition::math::Vector3d::One);
       modelPub->Publish(msg);
     }
     else
@@ -551,7 +552,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     msgs::Model modelMsg;
     model->FillMsg(modelMsg);
 
-    EXPECT_EQ(msgs::Convert(modelMsg.scale()), scaleFactor*math::Vector3::One);
+    EXPECT_EQ(msgs::ConvertIgn(modelMsg.scale()),
+        scaleFactor * ignition::math::Vector3d::One);
     for (int i = 0; i < modelMsg.link_size(); ++i)
     {
       msgs::Link linkMsg = modelMsg.link(i);
@@ -563,8 +565,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         msgs::Geometry geomMsg = visualMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
-              modelSize[name] * scaleFactor);
+          EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
+              modelSize[name].Ign() * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
@@ -587,8 +589,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         msgs::Geometry geomMsg = collisionMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
-              modelSize[name] * scaleFactor);
+          EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
+              modelSize[name].Ign() * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
@@ -755,7 +757,7 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
     EXPECT_EQ(visualMsg.type(), msgs::Visual::VISUAL);
     msgs::Geometry geomMsg = visualMsg.geometry();
     EXPECT_TRUE(geomMsg.has_box());
-    EXPECT_EQ(msgs::Convert(geomMsg.box().size()), boxSize);
+    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize.Ign());
   }
 }
 
