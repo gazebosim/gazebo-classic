@@ -25,7 +25,6 @@
 #include <sstream>
 
 #include "gazebo/transport/Node.hh"
-#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -119,10 +118,10 @@ bool LightMaker::Init()
 /////////////////////////////////////////////////
 void LightMaker::Start(const rendering::UserCameraPtr _camera)
 {
+  EntityMaker::Start(_camera);
+
   if (!this->light)
     this->Init();
-
-  this->camera = _camera;
 }
 
 /////////////////////////////////////////////////
@@ -134,7 +133,7 @@ void LightMaker::Stop()
     scene->RemoveLight(this->light);
     this->light.reset();
   }
-  gui::Events::moveMode(true);
+  EntityMaker::Stop();
 }
 
 /////////////////////////////////////////////////

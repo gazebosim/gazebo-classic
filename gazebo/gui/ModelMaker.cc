@@ -32,22 +32,18 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/math/Quaternion.hh"
-
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/ModelMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-  ModelMaker::ModelMaker()
-: EntityMaker()
+ModelMaker::ModelMaker() : EntityMaker()
 {
   this->clone = false;
 }
@@ -66,7 +62,6 @@ bool ModelMaker::InitFromModel(const std::string & _modelName)
   {
     scene->RemoveVisual(this->modelVisual);
     this->modelVisual.reset();
-    this->visuals.clear();
   }
 
   rendering::VisualPtr vis = scene->GetVisual(_modelName);
@@ -98,7 +93,6 @@ bool ModelMaker::InitFromSDFString(const std::string &_data)
   {
     scene->RemoveVisual(this->modelVisual);
     this->modelVisual.reset();
-    this->visuals.clear();
   }
 
   this->modelSDF.reset(new sdf::SDF);
@@ -125,7 +119,6 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
   {
     scene->RemoveVisual(this->modelVisual);
     this->modelVisual.reset();
-    this->visuals.clear();
   }
 
   this->modelSDF.reset(new sdf::SDF);
@@ -141,13 +134,73 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
+bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
+{
+  this->clone = false;
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+
+  if (this->modelVisual)
+  {
+    scene->RemoveVisual(this->modelVisual);
+    this->modelVisual.reset();
+  }
+
+  // Unique name
+  std::string prefix;
+  if (_shape == BOX)
+    prefix = "unit_box_";
+  else if (_shape == SPHERE)
+    prefix = "unit_sphere_";
+  else if (_shape == CYLINDER)
+    prefix = "unit_cylinder_";
+
+  int counter = 0;
+
+  std::ostringstream modelName;
+  modelName << prefix << counter;
+  while (scene->GetVisual(modelName.str()))
+  {
+    modelName.clear();
+    modelName << prefix << counter;
+    counter++;
+  }
+
+  // Model message
+  msgs::Model model;
+  model.set_name(modelName.str());
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+  if (_shape == BOX)
+    msgs::AddBoxLink(model, 1.0, ignition::math::Vector3d::One);
+  else if (_shape == SPHERE)
+    msgs::AddSphereLink(model, 1.0, 0.5);
+  else if (_shape == CYLINDER)
+    msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
+  model.mutable_link(0)->set_name("link");
+
+  // Model SDF
+  std::string modelString = "<sdf version='" + std::string(SDF_VERSION) + "'>"
+       + msgs::ModelToSDF(model)->ToString("") + "</sdf>";
+
+  this->modelSDF.reset(new sdf::SDF);
+  sdf::initFile("root.sdf", this->modelSDF);
+
+  if (!sdf::readString(modelString, this->modelSDF))
+  {
+    gzerr << "Unable to load SDF [" << modelString << "]" << std::endl;
+    return false;
+  }
+
+  return this->Init();
+}
+
+/////////////////////////////////////////////////
 bool ModelMaker::Init()
 {
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
   // Load the world file
   std::string modelName;
-  math::Pose modelPose, linkPose, visualPose;
+  ignition::math::Pose3d modelPose, linkPose, visualPose;
   sdf::ElementPtr modelElem;
 
   if (this->modelSDF->Root()->HasElement("model"))
@@ -161,7 +214,7 @@ bool ModelMaker::Init()
   }
 
   if (modelElem->HasElement("pose"))
-    modelPose = modelElem->Get<math::Pose>("pose");
+    modelPose = modelElem->Get<ignition::math::Pose3d>("pose");
 
   modelName = this->node->GetTopicNamespace() + "::" +
     modelElem->Get<std::string>("name");
@@ -184,7 +237,7 @@ bool ModelMaker::Init()
       {
         std::string linkName = linkElem->Get<std::string>("name");
         if (linkElem->HasElement("pose"))
-          linkPose = linkElem->Get<math::Pose>("pose");
+          linkPose = linkElem->Get<ignition::math::Pose3d>("pose");
         else
           linkPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -192,7 +245,6 @@ bool ModelMaker::Init()
               linkName, this->modelVisual));
         linkVisual->Load();
         linkVisual->SetPose(linkPose);
-        this->visuals.push_back(linkVisual);
 
         int visualIndex = 0;
         sdf::ElementPtr visualElem;
@@ -203,7 +255,7 @@ bool ModelMaker::Init()
         while (visualElem)
         {
           if (visualElem->HasElement("pose"))
-            visualPose = visualElem->Get<math::Pose>("pose");
+            visualPose = visualElem->Get<ignition::math::Pose3d>("pose");
           else
             visualPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -215,7 +267,6 @@ bool ModelMaker::Init()
 
           visVisual->Load(visualElem);
           visVisual->SetPose(visualPose);
-          this->visuals.push_back(visVisual);
 
           visualElem = visualElem->GetNextElement("visual");
         }
@@ -225,7 +276,6 @@ bool ModelMaker::Init()
     }
     catch(common::Exception &_e)
     {
-      this->visuals.clear();
       return false;
     }
   }
@@ -242,23 +292,14 @@ bool ModelMaker::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::Start(const rendering::UserCameraPtr _camera)
-{
-  this->camera = _camera;
-}
-
-/////////////////////////////////////////////////
 void ModelMaker::Stop()
 {
   // Remove the temporary visual from the scene
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  for (auto vis : this->visuals)
-    scene->RemoveVisual(vis);
   this->modelVisual.reset();
-  this->visuals.clear();
   this->modelSDF.reset();
 
-  gui::Events::moveMode(true);
+  EntityMaker::Stop();
 }
 
 /////////////////////////////////////////////////
@@ -326,3 +367,4 @@ void ModelMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
 {
   this->modelVisual->SetWorldPosition(_pos);
 }
+

@@ -1161,14 +1161,6 @@ void MainWindow::CreateActions()
       SLOT(CreateCylinder()));
   this->CreateDisabledIcon(":/images/cylinder.png", g_cylinderCreateAct);
 
-  g_meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
-      tr("Mesh"), this);
-  g_meshCreateAct->setStatusTip(tr("Create a mesh"));
-  g_meshCreateAct->setCheckable(true);
-  connect(g_meshCreateAct, SIGNAL(triggered()), this,
-      SLOT(CreateMesh()));
-  this->CreateDisabledIcon(":/images/cylinder.png", g_meshCreateAct);
-
   g_pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
   g_pointLghtCreateAct->setStatusTip(tr("Create a point light"));
@@ -1598,9 +1590,6 @@ void MainWindow::DeleteActions()
   delete g_cylinderCreateAct;
   g_cylinderCreateAct = 0;
 
-  delete g_meshCreateAct;
-  g_meshCreateAct = 0;
-
   delete g_pointLghtCreateAct;
   g_pointLghtCreateAct = 0;
 
@@ -1805,7 +1794,6 @@ void MainWindow::OnMoveMode(bool _mode)
     g_boxCreateAct->setChecked(false);
     g_sphereCreateAct->setChecked(false);
     g_cylinderCreateAct->setChecked(false);
-    g_meshCreateAct->setChecked(false);
     g_pointLghtCreateAct->setChecked(false);
     g_spotLghtCreateAct->setChecked(false);
     g_dirLghtCreateAct->setChecked(false);

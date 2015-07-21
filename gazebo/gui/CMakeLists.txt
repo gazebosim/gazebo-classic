@@ -25,10 +25,8 @@ set (sources
   Actions.cc
   AlignWidget.cc
   ApplyWrenchDialog.cc
-  BoxMaker.cc
   CloneWindow.cc
   ConfigWidget.cc
-  CylinderMaker.cc
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
@@ -46,7 +44,6 @@ set (sources
   ModelAlign.cc
   ModelManipulator.cc
   ModelSnap.cc
-  MeshMaker.cc
   ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
@@ -54,7 +51,6 @@ set (sources
   MouseEventHandler.cc
   SaveDialog.cc
   SpaceNav.cc
-  SphereMaker.cc
   SplashScreen.cc
   TimePanel.cc
   TimeWidget.cc
@@ -102,8 +98,6 @@ set (qt_headers
 set (headers
   qt.h
   qt_test.h
-  BoxMaker.hh
-  CylinderMaker.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
@@ -113,11 +107,9 @@ set (headers
   ModelAlign.hh
   ModelManipulator.hh
   ModelSnap.hh
-  MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
   SpaceNav.hh
-  SphereMaker.hh
 )
 
 if (HAVE_OCULUS)

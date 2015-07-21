@@ -29,6 +29,7 @@
 #include "gazebo/rendering/UserCamera.hh"
 
 #include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;
@@ -54,6 +55,18 @@ EntityMaker::~EntityMaker()
   this->node.reset();
   this->visPub.reset();
   this->requestPub.reset();
+}
+
+/////////////////////////////////////////////////
+void EntityMaker::Start(const rendering::UserCameraPtr _camera)
+{
+  this->camera = _camera;
+}
+
+/////////////////////////////////////////////////
+void EntityMaker::Stop()
+{
+  gui::Events::moveMode(true);
 }
 
 //////////////////////////////////////////////////

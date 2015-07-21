@@ -26,16 +26,22 @@
 
 namespace gazebo
 {
-  namespace msgs
-  {
-    class Visual;
-  }
-
   namespace gui
   {
-    /// \brief
+    /// \brief Used to insert new models into the scene.
     class GAZEBO_VISIBLE ModelMaker : public EntityMaker
     {
+      /// \enum SimpleShapes
+      /// \brief Unique identifiers for each simple shape supported.
+      public: enum SimpleShapes {
+                  /// \brief Box
+                  BOX,
+                  /// \brief Sphere
+                  SPHERE,
+                  /// \brief Cylinder
+                  CYLINDER
+                };
+
       /// \brief Constructor
       public: ModelMaker();
 
@@ -47,17 +53,24 @@ namespace gazebo
       /// \return True if initialization is successful.
       public: bool InitFromModel(const std::string &_modelName);
 
+      /// \brief Initialize the model maker from an SDF string.
+      /// \param[in] _data String containing SDF for a model.
+      /// \return True if initialization is successful.
       public: bool InitFromSDFString(const std::string &_data);
+
+      /// \brief Initialize the model maker from a file.
+      /// \param[in] _filename Path to the file.
+      /// \return True if initialization is successful.
       public: bool InitFromFile(const std::string &_filename);
 
-      public: virtual void Start(const rendering::UserCameraPtr _camera);
+      /// \brief Initialize the model maker to make one of the supported simple
+      /// shapes.
+      /// \param[in] _shape The desired shape.
+      /// \return True if initialization is successful.
+      public: bool InitSimpleShape(SimpleShapes _shape);
 
+      // Documentation inherited
       public: virtual void Stop();
-
-      /// \brief Internal init function.
-      private: bool Init();
-
-      private: virtual void CreateTheEntity();
 
       // Documentation inherited
       protected: virtual ignition::math::Vector3d EntityPosition() const;
@@ -66,12 +79,20 @@ namespace gazebo
       protected: virtual void SetEntityPosition(
           const ignition::math::Vector3d &_pos);
 
-      private: int state;
+      /// \brief Internal init function.
+      private: bool Init();
 
+      /// \brief Publish a factory message to create the entity.
+      private: virtual void CreateTheEntity();
+
+      /// \brief The model visual being created.
       private: rendering::VisualPtr modelVisual;
-      private: std::list<rendering::VisualPtr> visuals;
+
+      /// \brief The SDF representation of the model.
       private: sdf::SDFPtr modelSDF;
 
+      /// \brief True if the model is being created as a clone of an existing
+      /// model.
       private: bool clone;
     };
   }

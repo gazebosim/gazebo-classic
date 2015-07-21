@@ -37,10 +37,6 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/gui/BoxMaker.hh"
-#include "gazebo/gui/SphereMaker.hh"
-#include "gazebo/gui/CylinderMaker.hh"
-#include "gazebo/gui/MeshMaker.hh"
 #include "gazebo/gui/ModelMaker.hh"
 #include "gazebo/gui/LightMaker.hh"
 #include "gazebo/util/system.hh"
@@ -242,10 +238,6 @@ namespace gazebo
       private: std::vector<event::ConnectionPtr> connections;
 
       private: EntityMaker *entityMaker;
-      private: BoxMaker boxMaker;
-      private: SphereMaker sphereMaker;
-      private: CylinderMaker cylinderMaker;
-      private: MeshMaker meshMaker;
       private: ModelMaker modelMaker;
       private: PointLightMaker pointLightMaker;
       private: SpotLightMaker spotLightMaker;

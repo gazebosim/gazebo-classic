@@ -53,10 +53,10 @@ namespace gazebo
 
       /// \brief Start the maker.
       /// \param[in] _camera Pointer to the user camera
-      public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
+      public: virtual void Start(const rendering::UserCameraPtr _camera);
 
       /// \brief Stop the maker.
-      public: virtual void Stop() = 0;
+      public: virtual void Stop();
 
       /// \brief Callback when mouse button is released
       /// \param[in] _event MouseEvent object
