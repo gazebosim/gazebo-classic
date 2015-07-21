@@ -295,7 +295,7 @@ void Scene::Load()
   this->dataPtr->manager->setAmbientLight(
       Ogre::ColourValue(0.1, 0.1, 0.1, 0.1));
 
-#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
   this->dataPtr->manager->addRenderQueueListener(
       RenderEngine::Instance()->GetOverlaySystem());
 #endif
