@@ -5,6 +5,7 @@ link_directories(
 
 set (src
   RegionEventBoxPlugin.cc
+  ../events/EventSource.cc
 )
 
 set (inc
@@ -12,6 +13,7 @@ set (inc
 
 include_directories(
   ${GAZEBO_INCLUDE_DIRS}
+  ../events
 )
 
 add_library(RegionEventBoxPlugin SHARED ${src} )

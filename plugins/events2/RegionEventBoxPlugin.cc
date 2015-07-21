@@ -2,7 +2,9 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
+#include <EventSource.hh>
 #include <stdio.h>
+#include <map>
 
 namespace gazebo
 {
@@ -12,15 +14,12 @@ namespace gazebo
   		: ModelPlugin()
   	{
   	  this->receiveMutex = new boost::mutex();
-  	  this->staleSizeAndPose = true;
+  	  this->hasStaleSizeAndPose = true;
   	}
 
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
-      std::cout << "RegionEventBoxPlugin::Load(): model=" << _parent->GetName() << std::endl << std::flush;
-
-      this->model = _parent;
-    	this->sdf = _sdf;
+      std::cout << "RegionEventBoxPlugin::Load(): model=\"" << _parent->GetName() << "\"" << std::endl << std::flush;
 
     	this->modelName = _parent->GetName();
     	this->world = _parent->GetWorld();
@@ -31,6 +30,12 @@ namespace gazebo
       this->modelSub = this->node->Subscribe("~/model/info", &RegionEventBoxPlugin::OnModelMsg, this);
       this->poseSub = this->node->Subscribe("~/pose/info", &RegionEventBoxPlugin::OnPoseMsg, this);
 
+      this->eventPub = this->node->Advertise<gazebo::msgs::SimEvent>("/gazebo/sim_events");
+      this->eventSource = gazebo::EventSourcePtr(new EventSource(eventPub, "inclusion", this->world));
+
+      if (_sdf->HasElement("event")) {
+      	this->eventSource->Load(_sdf->GetElement("event"));
+      }
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&RegionEventBoxPlugin::OnUpdate, this, _1));
 
@@ -41,11 +46,11 @@ namespace gazebo
   		std::string modelMsgName = _msg->name();
 
   	  boost::mutex::scoped_lock lock(*this->receiveMutex);
-			std::cerr << "RegionEventBoxPlugin::OnModelMsg(): name=" << modelMsgName << std::endl << std::flush;
+//			std::cerr << "RegionEventBoxPlugin::OnModelMsg(): name=" << modelMsgName << std::endl << std::flush;
 
 			if (_msg->has_name() && _msg->name() == this->modelName)
 			{
-				this->staleSizeAndPose = true;
+				this->hasStaleSizeAndPose = true;
 			}
 
   	}
@@ -53,7 +58,7 @@ namespace gazebo
   	public:void OnPoseMsg(ConstPosesStampedPtr &_msg)
   	{
   	  boost::mutex::scoped_lock lock(*this->receiveMutex);
-			std::cout << "RegionEventBoxPlugin::OnPoseMsg()..." << std::endl << std::flush;
+//			std::cout << "RegionEventBoxPlugin::OnPoseMsg()..." << std::endl << std::flush;
 
 			for (int i = 0; i < _msg->pose_size(); i++)
 			{
@@ -61,53 +66,54 @@ namespace gazebo
 
 				if (p.name() == this->modelName)
 				{
-					this->staleSizeAndPose = true;
+					this->hasStaleSizeAndPose = true;
 				}
 			}
 
   	}
 
-    public: void OnUpdate(const common::UpdateInfo & /*_info*/)
+    public: void OnUpdate(const common::UpdateInfo & _info)
     {
+    	std::map<std::string, common::Time>::iterator it;
+
 			for (unsigned int i = 0; i < this->world->GetModelCount(); i++)
 			{
-				physics::ModelPtr m = this->world->GetModel(i);
-				std::string name = m->GetName();
+				physics::ModelPtr model = this->world->GetModel(i);
+				std::string name = model->GetName();
 
 				if (name == "ground_plane")
-				{
 					continue;
-				}
 
 				if (name == this->modelName)
 				{
-					if (this->staleSizeAndPose)
+					if (this->hasStaleSizeAndPose)
 					{
-						std::cout << "RegionEventPlugin::OnUpdate(): updating size and pose for model \"" << name << "\"" << std::endl << std::flush;
-
-						if (!this->UpdateSizeAndPose(m->GetSDF(), m->GetWorldPose()))
+						if (!this->UpdateSizeAndPose(model->GetSDF(), model->GetWorldPose()))
 						{
 							std::cerr << "RegionEventPlugin::OnUpdate(): failed to update size and pose for model \"" << name << "\"" << std::endl << std::flush;
 							return;
 						}
-						this->staleSizeAndPose = false;
+						this->hasStaleSizeAndPose = false;
 					}
 					continue;
 				}
 
-				std::cout << "RegionEventPlugin::OnUpdate(): another model \"" << m->GetName() << "\"" << std::endl << std::flush;
-				std::cout << "   pose=" << m->GetWorldPose().pos << std::endl << std::flush;
-				std::cout << "   bbox=" << this->box << std::endl << std::flush;
+				it = this->insiders.find(model->GetName());
 
-				if (this->box.Contains(m->GetWorldPose().pos))
+				if (this->box.Contains(model->GetWorldPose().pos))
 				{
-					std::cout << "   INSIDE!!!!!" << std::endl << std::flush;
+					if (it == this->insiders.end()) {
+						this->insiders[model->GetName()] = _info.realTime;
+						this->SendEnteringRegionEvent(model);
+					}
 				}
 				else
 				{
-					std::cout << "   outside" << std::endl << std::flush;
+					if (it != this->insiders.end()) {
+						this->SendExitingRegionEvent(model);
+						this->insiders.erase(model->GetName());
+					}
 				}
-
 
 			}	//	if (this->modelName == m->GetName())
 
@@ -115,6 +121,8 @@ namespace gazebo
 
     private: bool UpdateSizeAndPose(sdf::ElementPtr _sdf, const math::Pose& _pose)
     {
+			std::cout << "RegionEventPlugin::UpdateSizeAndPose(): model=\"" << this->modelName << "\"" << std::endl << std::flush;
+
 			sdf::ElementPtr linkEl = _sdf->GetElement("link");
 			if (linkEl)
 			{
@@ -183,13 +191,37 @@ namespace gazebo
 
     }
 
+    private: void SendEnteringRegionEvent(physics::ModelPtr model)
+    {
+			std::cout << "RegionEventBoxPlugin::SendEnteringRegionEvent(): model=\"" << model->GetName() << "\""
+					" region=\"" << this->modelName << "\"" << std::endl << std::flush;
+
+			std::string json = "{";
+	    json += "\"state\":\"inside\",";
+	    json += "\"region\":\"" + this->modelName + "\", ";
+	    json += "\"model\":\"" + model->GetName() + "\"";
+	    json += "}";
+
+	    eventSource->Emit(json);
+    }
+
+    private: void SendExitingRegionEvent(physics::ModelPtr model)
+    {
+			std::cout << "RegionEventBoxPlugin::SendExitingRegionEvent(): model=\"" << model->GetName() << "\""
+					" region=\"" << this->modelName << "\"" << std::endl << std::flush;
+
+			std::string json = "{";
+	    json += "\"state\":\"outside\",";
+	    json += "\"region\":\"" + this->modelName + "\", ";
+	    json += "\"model\":\"" + model->GetName() + "\"";
+	    json += "}";
+
+	    eventSource->Emit(json);
+    }
+
     private: physics::WorldPtr world;
 
-    private: physics::ModelPtr model;
-
     private: event::ConnectionPtr updateConnection;
-
-    private: sdf::ElementPtr sdf;
 
     private: std::string modelName;
 
@@ -204,7 +236,11 @@ namespace gazebo
     private: transport::SubscriberPtr modelSub;
     private: transport::SubscriberPtr poseSub;
 
-    private: bool staleSizeAndPose;
+    private: bool hasStaleSizeAndPose;
+    private: std::map<std::string, common::Time> insiders;
+
+    private: transport::PublisherPtr eventPub;
+    private: gazebo::EventSourcePtr eventSource;
 
   };
 
