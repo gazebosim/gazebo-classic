@@ -116,9 +116,9 @@ bool LightMaker::Init()
 }
 
 /////////////////////////////////////////////////
-void LightMaker::Start(const rendering::UserCameraPtr _camera)
+void LightMaker::Start()
 {
-  EntityMaker::Start(_camera);
+  EntityMaker::Start();
 
   if (!this->light)
     this->Init();
@@ -144,7 +144,6 @@ void LightMaker::CreateTheEntity()
   msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
             ignition::math::Quaterniond());
   this->lightPub->Publish(this->msg);
-  this->camera.reset();
 }
 
 /////////////////////////////////////////////////
@@ -157,5 +156,38 @@ ignition::math::Vector3d LightMaker::EntityPosition() const
 void LightMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
 {
   this->light->SetPosition(_pos);
+}
+
+/////////////////////////////////////////////////
+PointLightMaker::PointLightMaker() : LightMaker()
+{
+  this->msg.set_type(msgs::Light::POINT);
+  this->msg.set_cast_shadows(false);
+  this->lightTypename = "point";
+}
+
+/////////////////////////////////////////////////
+SpotLightMaker::SpotLightMaker() : LightMaker()
+{
+  this->msg.set_type(msgs::Light::SPOT);
+  msgs::Set(this->msg.mutable_direction(),
+            ignition::math::Vector3d(0, 0, -1));
+  this->msg.set_cast_shadows(false);
+
+  this->msg.set_spot_inner_angle(0.6);
+  this->msg.set_spot_outer_angle(1.0);
+  this->msg.set_spot_falloff(1.0);
+  this->lightTypename  = "spot";
+}
+
+/////////////////////////////////////////////////
+DirectionalLightMaker::DirectionalLightMaker() : LightMaker()
+{
+  this->msg.set_type(msgs::Light::DIRECTIONAL);
+  msgs::Set(this->msg.mutable_direction(),
+            ignition::math::Vector3d(.1, .1, -0.9));
+  this->msg.set_cast_shadows(true);
+
+  this->lightTypename  = "directional";
 }
 

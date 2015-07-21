@@ -45,8 +45,8 @@ namespace gazebo
       /// \brief Constructor
       public: ModelMaker();
 
-      /// \brief Destructor
-      public: virtual ~ModelMaker();
+      // Documentation inherited
+      public: virtual void Stop();
 
       /// \brief Initialize the model maker with an existing model
       /// \param[in] _modelName Name of existing model in the scene.
@@ -68,9 +68,6 @@ namespace gazebo
       /// \param[in] _shape The desired shape.
       /// \return True if initialization is successful.
       public: bool InitSimpleShape(SimpleShapes _shape);
-
-      // Documentation inherited
-      public: virtual void Stop();
 
       // Documentation inherited
       protected: virtual ignition::math::Vector3d EntityPosition() const;

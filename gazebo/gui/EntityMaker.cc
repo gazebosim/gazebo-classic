@@ -30,6 +30,7 @@
 
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;
@@ -42,25 +43,20 @@ EntityMaker::EntityMaker()
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
   this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 }
 
 //////////////////////////////////////////////////
 EntityMaker::~EntityMaker()
 {
-  this->camera.reset();
   this->node->Fini();
   this->node.reset();
-  this->visPub.reset();
-  this->requestPub.reset();
+  this->makerPub.reset();
 }
 
 /////////////////////////////////////////////////
-void EntityMaker::Start(const rendering::UserCameraPtr _camera)
+void EntityMaker::Start()
 {
-  this->camera = _camera;
 }
 
 /////////////////////////////////////////////////
@@ -92,8 +88,10 @@ void EntityMaker::OnMouseRelease(const common::MouseEvent &_event)
 //////////////////////////////////////////////////
 void EntityMaker::OnMouseMove(const common::MouseEvent &_event)
 {
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+
   ignition::math::Vector3d pos =
-      (ModelManipulator::GetMousePositionOnPlane(this->camera, _event)).Ign();
+      (ModelManipulator::GetMousePositionOnPlane(camera, _event)).Ign();
 
   if (_event.Control() || this->snapToGrid)
   {

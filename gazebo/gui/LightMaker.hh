@@ -22,24 +22,19 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/EntityMaker.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  namespace rendering
-  {
-    class Light;
-  }
-
   namespace gui
   {
+    /// \brief Used to insert a new light into the scene.
     class GAZEBO_VISIBLE LightMaker : public EntityMaker
     {
       /// \brief Constructor
       public: LightMaker();
 
       // Documentation inherited
-      public: void Start(const rendering::UserCameraPtr _camera);
+      public: void Start();
 
       // Documentation inherited
       public: void Stop();
@@ -63,53 +58,41 @@ namespace gazebo
       protected: virtual void SetEntityPosition(
           const ignition::math::Vector3d &_pos);
 
-      protected: int state;
+      /// \brief Message that holds all the light information.
       protected: msgs::Light msg;
+
+      /// \brief Publisher used to spawn a new light.
       protected: transport::PublisherPtr lightPub;
+
+      /// \brief Keep track of the number of lights inserted by the user.
       private: static unsigned int counter;
+
+      /// \brief Type of the light being spawned.
       protected: std::string lightTypename;
 
       /// \brief Pointer to the light being spawned.
       private: rendering::LightPtr light;
     };
 
+    /// \brief Used to insert a new point light into the scene.
     class GAZEBO_VISIBLE PointLightMaker : public LightMaker
     {
-      public: PointLightMaker() : LightMaker()
-              {
-                this->msg.set_type(msgs::Light::POINT);
-                this->msg.set_cast_shadows(false);
-                this->lightTypename = "point";
-              }
+      /// \brief Constructor
+      public: PointLightMaker();
     };
 
+    /// \brief Used to insert a new spot light into the scene.
     class GAZEBO_VISIBLE SpotLightMaker : public LightMaker
     {
-      public: SpotLightMaker() : LightMaker()
-              {
-                this->msg.set_type(msgs::Light::SPOT);
-                msgs::Set(this->msg.mutable_direction(),
-                          ignition::math::Vector3d(0, 0, -1));
-                this->msg.set_cast_shadows(false);
-
-                this->msg.set_spot_inner_angle(0.6);
-                this->msg.set_spot_outer_angle(1.0);
-                this->msg.set_spot_falloff(1.0);
-                this->lightTypename  = "spot";
-              }
+      /// \brief Constructor
+      public: SpotLightMaker();
     };
 
+    /// \brief Used to insert a new directional light into the scene.
     class GAZEBO_VISIBLE DirectionalLightMaker : public LightMaker
     {
-      public: DirectionalLightMaker() : LightMaker()
-              {
-                this->msg.set_type(msgs::Light::DIRECTIONAL);
-                msgs::Set(this->msg.mutable_direction(),
-                          ignition::math::Vector3d(.1, .1, -0.9));
-                this->msg.set_cast_shadows(true);
-
-                this->lightTypename  = "directional";
-              }
+      /// \brief Constructor
+      public: DirectionalLightMaker();
     };
   }
 }

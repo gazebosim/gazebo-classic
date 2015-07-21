@@ -19,18 +19,10 @@
 
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class MouseEvent;
-  }
-
   /// \ingroup gazebo_gui
   /// \brief gui namespace
   namespace gui
@@ -38,7 +30,6 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class EntityMaker EntityMaker.hh gui/gui.hh
     /// \brief to make an entity base class
     class GAZEBO_VISIBLE EntityMaker
     {
@@ -53,7 +44,7 @@ namespace gazebo
 
       /// \brief Start the maker.
       /// \param[in] _camera Pointer to the user camera
-      public: virtual void Start(const rendering::UserCameraPtr _camera);
+      public: virtual void Start();
 
       /// \brief Stop the maker.
       public: virtual void Stop();
@@ -78,13 +69,13 @@ namespace gazebo
       protected: virtual void SetEntityPosition(
           const ignition::math::Vector3d &_pos);
 
-      protected: rendering::UserCameraPtr camera;
-
+      /// \brief Node used to publish messages.
       protected: transport::NodePtr node;
-      protected: transport::PublisherPtr visPub;
-      protected: transport::PublisherPtr makerPub;
-      protected: transport::PublisherPtr requestPub;
 
+      /// \brief Publisher for factory messages.
+      protected: transport::PublisherPtr makerPub;
+
+      /// \brief True to snap to grid while moving.
       private: static bool snapToGrid;
     };
   }

@@ -114,7 +114,6 @@ BuildingMaker::BuildingMaker() : EntityMaker()
 /////////////////////////////////////////////////
 BuildingMaker::~BuildingMaker()
 {
-//  this->camera.reset();
   if (this->saveDialog)
     delete this->saveDialog;
 }
@@ -572,18 +571,6 @@ void BuildingMaker::RemovePart(const std::string &_partName)
 void BuildingMaker::RemoveWall(const std::string &_wallName)
 {
   this->RemovePart(_wallName);
-}
-
-
-/////////////////////////////////////////////////
-void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
-{
-  this->camera = _camera;
-}
-
-/////////////////////////////////////////////////
-void BuildingMaker::Stop()
-{
 }
 
 /////////////////////////////////////////////////

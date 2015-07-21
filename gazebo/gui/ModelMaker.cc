@@ -49,12 +49,6 @@ ModelMaker::ModelMaker() : EntityMaker()
 }
 
 /////////////////////////////////////////////////
-ModelMaker::~ModelMaker()
-{
-  this->camera.reset();
-}
-
-/////////////////////////////////////////////////
 bool ModelMaker::InitFromModel(const std::string & _modelName)
 {
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();

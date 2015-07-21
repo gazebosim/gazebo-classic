@@ -971,7 +971,7 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   {
     gui::Events::manipMode("make_entity");
     // TODO: change the cursor to a cross
-    this->entityMaker->Start(this->userCamera);
+    this->entityMaker->Start();
   }
   else
   {
@@ -1147,7 +1147,7 @@ void GLWidget::Paste(const std::string &_name)
       if (isLight && this->lightMaker.InitFromLight(_name))
       {
         this->entityMaker = &this->lightMaker;
-        this->entityMaker->Start(this->userCamera);
+        this->entityMaker->Start();
         // this makes the entity appear at the mouse cursor
         this->entityMaker->OnMouseMove(this->mouseEvent);
         gui::Events::manipMode("make_entity");
@@ -1155,7 +1155,7 @@ void GLWidget::Paste(const std::string &_name)
       else if (isModel && this->modelMaker.InitFromModel(_name))
       {
         this->entityMaker = &this->modelMaker;
-        this->entityMaker->Start(this->userCamera);
+        this->entityMaker->Start();
         // this makes the entity appear at the mouse cursor
         this->entityMaker->OnMouseMove(this->mouseEvent);
         gui::Events::manipMode("make_entity");
