@@ -137,6 +137,7 @@ namespace gazebo
       /// \brief Clone a simulation.
       private slots: void Clone();
 
+      private slots: void HotkeysChart();
       private slots: void About();
       private slots: void Step();
       private slots: void Arrow();

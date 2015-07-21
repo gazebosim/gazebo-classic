@@ -590,6 +590,79 @@ void MainWindow::About()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::HotkeysChart()
+{
+  std::string chartTxt =
+    "<div>\
+       <img src=':images/gazebo_neg_60x71.png' style='float: left'/>\
+       <p>Gazebo Keyboard Shortcuts</p>\
+     </div>\
+     <div>\
+<table cellspacing='0' style='float:left'>\
+	<tr><th>Action</th><th>Operation</th><th>Instruction</th></tr>\
+        <tr><th colspan='3'><b>MODE</b></th></tr>\
+<tr><td>Enter Selection mode (default mode)</td><td>Esc</td><td>press Esc for mode to select models and right-click for context menu</td></tr>\
+	<tr><td>Enter Rotate mode</td><td>r</td><td>press &quot;r&quot; for Rotate (model) mode</td></tr>\
+	<tr><td>Enter Translate mode</td><td>t</td><td>press &quot;t&quot; for Translate (model) mode</td></tr>\
+	<tr><td>Enter Scale mode</td><td>s</td><td>press &quot;s&quot; for Scale (model) mode</td></tr>\
+    <tr><td>Enter Snap mode</td><td>n</td><td>press &quot;n&quot; for Snap (model) mode</td></tr>\
+    <tr><th colspan='3'><b>MODELS</b></th></tr>\
+	<tr><td>Delete model</td><td>Delete</td><td>press Delete when a model is selected to delete from scene</td></tr>\
+	<tr><td>Copy model</td><td>Ctrl + c</td><td>press Ctrl + &quot;c&quot; when model is selected to copy</td></tr>\
+    <tr><td>Paste model</td><td>Ctrl + v</td><td>press Ctrl + &quot;v&quot; to paste copied model</td></tr>\
+    <tr><th><b>MANIPULATING MODELS</b></th></tr>\
+    <tr><td>Rotate model</td><td>r</td><td>press &quot;r&quot; for Rotate mode; click model &amp; rotate using markers</td></tr>\
+	<tr><td>Translate model</td><td>t</td><td>press &quot;t&quot; for Translate mode; click model &amp; translate using markers</td></tr>\
+    <tr><td>Scale model</td><td>s</td><td>press &quot;s&quot; for Scale mode; click model &amp; scale using markers</td></tr>\
+    <tr><td>Constrain along axis</td><td>x/y/z</td><td>hold key while manipulating model to constrain movement along that axis</td></tr>\
+    <tr><td>Snap to 45° when rotating</td><td>Ctrl + drag</td><td>hold Ctrl while rotating model to rotate in 45° increments</td></tr>\
+    <tr><td>Snap to grid when translating</td><td>Ctrl + drag</td><td>hold Ctrl while translating model to snap to grid</td></tr>\
+    <tr><td>Snap to 1 m when scaling</td><td>Ctrl + drag</td><td>hold Ctrl while scaling mode to scale in 1 m increments</td></tr>\
+    <tr><td>Snap when inserting</td><td>Ctrl + drag</td><td>hold Ctrl while inserting model to enable snap to grid</td></tr>\
+    <tr><td>Snap models together</td><td>n</td><td>press &quot;n&quot; for Snap mode; click one link, then a second to snap first link to second</td></tr>\
+    <tr><th><b>WORLD</b></th></tr>\
+    <tr><td>Save world</td><td>Ctrl + s</td><td>press Ctrl + &quot;s&quot; to save world for later use</td></tr>\
+	<tr><td>Save as</td><td>Ctrl + Shift + s</td><td>press Ctrl + Shift + &quot;s&quot; to save world for later use &amp; give it a name</td></tr>\
+    <tr><td>Reset world</td><td>Ctrl + r</td><td>press Ctrl + &quot;r&quot; to reset world to its original state</td></tr>\
+    <tr><td>Reset model poses</td><td>Ctrl + Shift + r</td><td>press Ctrl + Shift + &quot;r&quot; to reset models to their original poses</td></tr>\
+ </table>   \
+<table cellspacing='0' style='float:left'> \
+	<tr><th>Action</th><th>Operation</th><th>Instruction</th></tr>\
+    <tr><th><b>EDITORS</b></th><th></th><th></th></tr>\
+    <tr><td>Open Model Editor</td><td>Ctrl + m</td><td>open Model Editor to construct or edit models</td></tr>\
+	<tr><td>Open Schematic View (Model Editor)</td><td>Ctrl + e</td><td>open Schematic View in Model Editor</td></tr>\
+    <tr><td>Open Building Editor</td><td>Ctrl + b</td><td>open Building Editor to construct buildings</td></tr>\
+    <tr><td>Show floor plan (Building Editor)</td><td>f</td><td>show/hide floor plan in Building Editor 2D View</td></tr>\
+    <tr><td>Show building features (Building Editor)</td><td>g</td><td>show/hide building features in Building Editor 2D View</td></tr>\
+    <tr><td>New canvas (both Editors)</td><td>Ctrl + n</td><td>create new canvas</td></tr>\
+    <tr><td>Save model (both Editors)</td><td>Ctrl + s</td><td>save model for later use</td></tr>\
+    <tr><td>Save as (both Editors)</td><td>Ctrl + Shift + s</td><td>save model for later use &amp; give it a name</td></tr>\
+    <tr><td>Exit (both Editors)</td><td>Ctrl + x</td><td>exit Editor</td></tr>\
+    <tr><th><b>GUI LAYOUT</b></th><th></th><th></th></tr>\
+    <tr><td>Hide toolbars</td><td>Ctrl + h</td><td>hide/show top toolbar and bottom time panel</td></tr>\
+	<tr><td>Enter fullscreen</td><td>F11</td><td>enter/exit fullscreen</td></tr>\
+    <tr><th><b>DATA</b></th><th></th><th></th></tr>\
+    <tr><td>Visualize topics</td><td>Ctrl + t</td><td>open dialog with list of topics currently advertized</td></tr>\
+	<tr><td>Log data</td><td>Ctrl + d</td><td>open dialog to record log files</td></tr>\
+    <tr><th><b>MISCELLANEOUS</b></th><th></th><th></th></tr>\
+    <tr><td>Quit Gazebo</td><td>Ctrl + q</td><td>press Ctrl + &quot;q&quot; to quit Gazebo</td></tr>\
+</table>\
+  </div>";
+
+  //QPixmap icon(":images/gazebo_neg_60x71.png");
+/*  QMessageBox chartBox(this);
+  chartBox.setWindowTitle("About Gazebo");
+  chartBox.setTextFormat(Qt::RichText);
+  chartBox.setText(QString::fromStdString(chartTxt));
+  chartBox.setMinimumWidth(2000);
+  chartBox.exec();*/
+
+    QWebView *view = new QWebView(parent);
+    view->load(QUrl("http://qt-project.org"));
+    view->show();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Play()
 {
   msgs::WorldControl msg;
@@ -1043,6 +1116,10 @@ void MainWindow::CreateActions()
   g_cloneAct = new QAction(tr("Clone World"), this);
   g_cloneAct->setStatusTip(tr("Clone the world"));
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
+
+  g_hotkeysChartAct = new QAction(tr("&Hotkeys Chart"), this);
+  g_hotkeysChartAct->setStatusTip(tr("Show the hotkeys chart"));
+  connect(g_hotkeysChartAct, SIGNAL(triggered()), this, SLOT(HotkeysChart()));
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
@@ -1547,6 +1624,9 @@ void MainWindow::DeleteActions()
   delete g_cloneAct;
   g_cloneAct = 0;
 
+  delete g_hotkeysChartAct;
+  g_hotkeysChartAct = 0;
+
   delete g_aboutAct;
   g_aboutAct = 0;
 
@@ -1758,6 +1838,7 @@ void MainWindow::CreateMenuBar()
   bar->addSeparator();
 
   QMenu *helpMenu = bar->addMenu(tr("&Help"));
+  helpMenu->addAction(g_hotkeysChartAct);
   helpMenu->addAction(g_aboutAct);
 }
 

@@ -33,6 +33,7 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_saveAsAct;
     extern GZ_GUI_VISIBLE QAction *g_saveCfgAct;
     extern GZ_GUI_VISIBLE QAction *g_cloneAct;
+    extern GZ_GUI_VISIBLE QAction *g_hotkeysChartAct;
     extern GZ_GUI_VISIBLE QAction *g_aboutAct;
     extern GZ_GUI_VISIBLE QAction *g_quitAct;
 
