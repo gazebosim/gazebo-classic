@@ -986,7 +986,6 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
           {
             text->SetColor(ambient);
           }
-          continue;
         }
         else if (dynamic_cast<Ogre::Entity *>(obj))
           ((Ogre::Entity *)obj)->setMaterialName(this->dataPtr->myMaterialName);
