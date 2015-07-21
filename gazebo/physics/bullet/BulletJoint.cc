@@ -21,6 +21,7 @@
 
 #include <string>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
@@ -48,6 +49,9 @@ BulletJoint::BulletJoint(BasePtr _parent)
 BulletJoint::~BulletJoint()
 {
   delete this->constraint;
+  this->constraint = NULL;
+  delete this->feedback;
+  this->feedback = NULL;
   this->bulletWorld = NULL;
 }
 
@@ -143,6 +147,15 @@ void BulletJoint::Detach()
   if (this->constraint && this->bulletWorld)
     this->bulletWorld->removeConstraint(this->constraint);
   delete this->constraint;
+  this->constraint = NULL;
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetProvideFeedback(bool _enable)
+{
+  Joint::SetProvideFeedback(_enable);
+
+  this->SetupJointFeedback();
 }
 
 //////////////////////////////////////////////////
@@ -194,6 +207,7 @@ void BulletJoint::CacheForceTorque()
   else
   {
     /// \TODO: implement for other joint types
+    // note that for fixed joint no further modification is needed
     // gzerr << "force torque for joint type [" << this->GetType()
     //       << "] not implemented, returns false results!!\n";
   }
@@ -332,6 +346,7 @@ void BulletJoint::CacheForceTorque()
 //////////////////////////////////////////////////
 JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
+  GZ_ASSERT(this->constraint != NULL, "constraint should be valid");
   return this->wrench;
 }
 
@@ -340,19 +355,19 @@ void BulletJoint::SetupJointFeedback()
 {
   if (this->provideFeedback)
   {
-    this->feedback = new btJointFeedback;
-    this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
-    this->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
-    this->feedback->m_appliedTorqueBodyA = btVector3(0, 0, 0);
-    this->feedback->m_appliedTorqueBodyB = btVector3(0, 0, 0);
+    if (this->feedback == NULL)
+    {
+      this->feedback = new btJointFeedback;
+      this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
+      this->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
+      this->feedback->m_appliedTorqueBodyA = btVector3(0, 0, 0);
+      this->feedback->m_appliedTorqueBodyB = btVector3(0, 0, 0);
+    }
 
     if (this->constraint)
       this->constraint->setJointFeedback(this->feedback);
     else
-    {
       gzerr << "Bullet Joint [" << this->GetName() << "] ID is invalid\n";
-      getchar();
-    }
   }
 }
 

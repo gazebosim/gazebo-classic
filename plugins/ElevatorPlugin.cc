@@ -36,6 +36,7 @@ ElevatorPlugin::ElevatorPlugin()
 {
   this->dataPtr->doorController = NULL;
   this->dataPtr->liftController = NULL;
+  this->dataPtr->doorWaitTime = common::Time(5, 0);
 }
 
 /////////////////////////////////////////////////
@@ -60,6 +61,13 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   GZ_ASSERT(_sdf, "ElevatorPlugin sdf pointer is NULL");
   this->dataPtr->model = _model;
   this->dataPtr->sdf = _sdf;
+
+  // Get the time to hold the door open.
+  if (this->dataPtr->sdf->HasElement("door_wait_time"))
+  {
+    this->dataPtr->doorWaitTime.Set(
+      this->dataPtr->sdf->Get<double>("door_wait_time"));
+  }
 
   // Get the elevator topic.
   std::string elevatorTopic = "~/elevator";
@@ -122,41 +130,46 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->stateMutex);
-
-  // Ignore messages when the elevator is currently busy.
-  if (!this->dataPtr->states.empty())
-    return;
-
   // Currently we only expect the message to contain a floor to move to.
   try
   {
-    int floor = std::stoi(_msg->data());
-
-    // Step 1: close the door.
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
-          this->dataPtr->doorController));
-
-    // Step 2: Move to the correct floor.
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::MoveState(
-          floor, this->dataPtr->liftController));
-
-    // Step 3: Open the door
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::OpenState(
-          this->dataPtr->doorController));
-
-    // Step 4: Wait
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::WaitState());
-
-    // Step 5: Close the door
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
-          this->dataPtr->doorController));
+    this->MoveToFloor(std::stoi(_msg->data()));
   }
   catch(...)
   {
     gzerr << "Unable to process elevator message["
           << _msg->data() << "]\n";
   }
+}
+
+/////////////////////////////////////////////////
+void ElevatorPlugin::MoveToFloor(const int _floor)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->stateMutex);
+
+  // Ignore messages when the elevator is currently busy.
+  if (!this->dataPtr->states.empty())
+    return;
+
+  // Step 1: close the door.
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
+        this->dataPtr->doorController));
+
+  // Step 2: Move to the correct floor.
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::MoveState(
+        _floor, this->dataPtr->liftController));
+
+  // Step 3: Open the door
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::OpenState(
+        this->dataPtr->doorController));
+
+  // Step 4: Wait
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::WaitState(
+        this->dataPtr->doorWaitTime));
+
+  // Step 5: Close the door
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
+        this->dataPtr->doorController));
 }
 
 /////////////////////////////////////////////////
@@ -309,15 +322,16 @@ bool ElevatorPluginPrivate::MoveState::Update()
 // WaitState Class
 
 /////////////////////////////////////////////////
-ElevatorPluginPrivate::WaitState::WaitState()
-  : State()
+ElevatorPluginPrivate::WaitState::WaitState(const common::Time &_waitTime)
+  : State(), waitTimer(_waitTime, true)
 {
 }
 
 /////////////////////////////////////////////////
 void ElevatorPluginPrivate::WaitState::Start()
 {
-  this->start = common::Time::GetWallTime();
+  this->waitTimer.Reset();
+  this->waitTimer.Start();
   this->started = true;
 }
 
@@ -331,7 +345,7 @@ bool ElevatorPluginPrivate::WaitState::Update()
   }
   else
   {
-    if (common::Time::GetWallTime() - this->start > common::Time(5, 0))
+    if (this->waitTimer.GetElapsed() == common::Time::Zero)
       return true;
     else
       return false;

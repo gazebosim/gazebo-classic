@@ -678,6 +678,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
         this->GetForce(0u) * this->GetLocalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
     }
+    else if (this->HasType(physics::Base::FIXED_JOINT))
+    {
+      // no correction are necessary for fixed joint
+    }
     else
     {
       /// \TODO: fix for multi-axis joints
@@ -1084,19 +1088,22 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 
   if (this->provideFeedback)
   {
-    this->feedback = new dJointFeedback;
-    this->feedback->f1[0] = 0;
-    this->feedback->f1[1] = 0;
-    this->feedback->f1[2] = 0;
-    this->feedback->t1[0] = 0;
-    this->feedback->t1[1] = 0;
-    this->feedback->t1[2] = 0;
-    this->feedback->f2[0] = 0;
-    this->feedback->f2[1] = 0;
-    this->feedback->f2[2] = 0;
-    this->feedback->t2[0] = 0;
-    this->feedback->t2[1] = 0;
-    this->feedback->t2[2] = 0;
+    if (this->feedback == NULL)
+    {
+      this->feedback = new dJointFeedback;
+      this->feedback->f1[0] = 0;
+      this->feedback->f1[1] = 0;
+      this->feedback->f1[2] = 0;
+      this->feedback->t1[0] = 0;
+      this->feedback->t1[1] = 0;
+      this->feedback->t1[2] = 0;
+      this->feedback->f2[0] = 0;
+      this->feedback->f2[1] = 0;
+      this->feedback->f2[2] = 0;
+      this->feedback->t2[0] = 0;
+      this->feedback->t2[1] = 0;
+      this->feedback->t2[2] = 0;
+    }
 
     if (this->jointId)
       dJointSetFeedback(this->jointId, this->feedback);

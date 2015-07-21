@@ -483,6 +483,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_All,
                   , "prismatic"
                   , "screw"
                   , "universal"
+                  , "fixed"
                   , "ball"
                   , "revolute2"
                   , "gearbox")));
@@ -492,6 +493,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "universal"
+                  , "fixed"
                   , "ball")));
 
 // Skip prismatic, screw, and revolute2 because they allow translation
@@ -499,6 +501,7 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_RotationalWorld,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
                   , "universal"
+                  , "fixed"
                   , "ball")));
 
 int main(int argc, char **argv)
