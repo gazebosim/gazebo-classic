@@ -137,7 +137,6 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       info->cfm[2] = cfm;
       info->cfm[3] = cfm;
       info->cfm[4] = cfm;
-      info->cfm[5] = cfm;
     }
 
     // constraint rows 1 to 3
@@ -481,6 +480,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       // rotational joint damping
       if (this->use_damping)
       {
+        info->cfm[5] = cfm;
         // added J1ad and J2ad for damping, only 1 row
         info->J1ad[0] = ax1[0];
         info->J1ad[1] = ax1[1];
