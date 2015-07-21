@@ -80,7 +80,7 @@ namespace gazebo
       /// \brief Update an edge in the scene
       /// \param[in] _id Unique id of edge.
       /// \param[in] _name Name of edge.
-      /// \param[in] _name Type of edge.
+      /// \param[in] _type Type of edge.
       /// \param[in] _parent Name of parent node.
       /// \param[in] _child Name of child node.
       public: void UpdateEdge(const std::string &_id, const std::string &_name,
