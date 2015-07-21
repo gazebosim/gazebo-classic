@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -38,6 +34,8 @@ BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world, BasePtr _parent)
   GZ_ASSERT(_world, "bullet world pointer is NULL");
   this->bulletWorld = _world;
   this->bulletHinge2 = NULL;
+  this->angleOffset[0] = 0.0;
+  this->angleOffset[1] = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -211,8 +209,12 @@ math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
     return math::Angle();
   }
 
-  btRotationalLimitMotor2 *motor =
-    this->bulletHinge2->getRotationalLimitMotor(_index);
+#ifndef LIBBULLET_VERSION_GT_282
+  btRotationalLimitMotor *motor;
+#else
+  btRotationalLimitMotor2 *motor;
+#endif
+  motor = this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_hiLimit;
 
@@ -229,8 +231,12 @@ math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
     return math::Angle(0.0);
   }
 
-  btRotationalLimitMotor2 *motor =
-    this->bulletHinge2->getRotationalLimitMotor(_index);
+#ifndef LIBBULLET_VERSION_GT_282
+  btRotationalLimitMotor *motor;
+#else
+  btRotationalLimitMotor2 *motor;
+#endif
+  motor = this->bulletHinge2->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_loLimit;
 
