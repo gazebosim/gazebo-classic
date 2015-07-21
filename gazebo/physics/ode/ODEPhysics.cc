@@ -1065,7 +1065,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       std::max(surf1->GetFrictionPyramid()->GetCurvatureRadius(),
                surf2->GetFrictionPyramid()->GetCurvatureRadius());
   contact.surface.use_curvature =
-      surf1->GetFrictionPyramid()->GetUseCurvature() &&
+      surf1->GetFrictionPyramid()->GetUseCurvature() ||
       surf2->GetFrictionPyramid()->GetUseCurvature();
 
   // Set the slip values

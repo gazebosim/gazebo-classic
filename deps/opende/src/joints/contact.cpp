@@ -347,22 +347,24 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             // d = depth
             // mu = torsional friction coefficient
             //
-            // M = (3 * pi * a * mu)/16 * F
+            // M = (3 * pi * a * mu3)/16 * F
             //
             // When using curvature:
             //
-            // a = R * d
+            // a = sqrt (R * d)
             //
-            // M = (3 * pi * R * d * mu)/16 * F
+            // M = (3 * pi * mu3 * sqrt (R * d))/16 * F
 
-            dReal patch = contact.surface.patch_radius;
+            // Zero by default
+            dReal patch = 0.0;
 
             if (contact.surface.use_curvature)
-              patch = contact.surface.curvature_radius * depth;
-
-            if (fabs(patch) < 0.00001)
             {
-              contact.surface.patch_radius = 2.0;
+              patch = sqrt(contact.surface.curvature_radius * depth);
+            }
+            else
+            {
+              patch = contact.surface.patch_radius;
             }
 
             double rhs = (3 * M_PI * patch * contact.surface.mu3)/16;

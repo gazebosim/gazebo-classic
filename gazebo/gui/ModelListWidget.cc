@@ -1922,6 +1922,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
   item = this->variantManager->addProperty(QVariant::Bool,
                                            tr("use_curvature"));
   item->setValue(_msg.friction().use_curvature());
+  topItem->addSubProperty(item);
 
   // Patch radius
   item = this->variantManager->addProperty(QVariant::Double,
@@ -1933,8 +1934,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("curvature_radius"));
   item->setValue(_msg.friction().curvature_radius());
-  topItem->addSubProperty(item);
-
   topItem->addSubProperty(item);
 
   // slip1

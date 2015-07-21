@@ -43,7 +43,6 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
     /// \param[in] _name Model name.
     public: SphereData(physics::WorldPtr _world,
         const std::string &_name)
-        : mu3(0.0)
     {
       // Get the model pointer
       this->model = _world->GetModel(_name);
@@ -57,9 +56,12 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       auto surf = (*iter)->GetSurface();
       EXPECT_TRUE(surf != NULL);
 
-      auto surfODE = boost::static_pointer_cast<physics::ODESurfaceParams>(surf);
+      auto surfODE =
+          boost::static_pointer_cast<physics::ODESurfaceParams>(surf);
 
       this->mu3 = surf->GetFrictionPyramid()->GetMuTorsion();
+      this->patch = surf->GetFrictionPyramid()->GetPatchRadius();
+      this->radius = surf->GetFrictionPyramid()->GetCurvatureRadius();
       this->kp = surfODE->kp;
 
       auto inertial = link->GetInertial();
@@ -82,35 +84,50 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 
     /// \brief Mass
     public: double mass;
+
+    /// \brief Patch
+    public: double patch;
+
+    /// \brief Radius
+    public: double radius;
   };
 
-  /// \brief Use the torsional_friction_demo world to test spheres with
-  /// different coefficients of friction.
+  /// \brief Use the torsional_friction_test world to test spheres with
+  /// different coefficients of torsional friction.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void CoefficientTest(const std::string &_physicsEngine);
 
-  /// \brief Use the torsional_friction_demo world to test spheres with
-  /// different contact depths.
+  /// \brief Use the torsional_friction_test world to test spheres with
+  /// different curvatures.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void CurvatureTest(const std::string &_physicsEngine);
+
+  /// \brief Use the torsional_friction_test world to test spheres with
+  /// different contact depths. It checks if the contact depth is correct for
+  /// those spheres.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DepthTest(const std::string &_physicsEngine);
+
+  /// \brief Use the torsional_friction_test world to test spheres with
+  /// different patch radii.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void PatchTest(const std::string &_physicsEngine);
 
   /// \brief Callback for contact subscribers in depth test.
   /// \param[in] _msg Contact message
   private: void Callback(const ConstContactsPtr &_msg);
 
+  /// \brief Message to be filled with the latest contacts message.
   private: msgs::Contacts contactsMsg;
 };
 
-////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
 void PhysicsTorsionalFrictionTest::Callback(const ConstContactsPtr &_msg)
 {
   this->contactsMsg = *_msg;
 }
 
 /////////////////////////////////////////////////
-// Depth test:
-// Uses the torsional_friction_demo world, which has several spheres. It checks
-// if the contact depth is correct for those spheres.
 void PhysicsTorsionalFrictionTest::DepthTest(
     const std::string &_physicsEngine)
 {
@@ -202,12 +219,8 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     EXPECT_LT(relativeError, 0.01);
   }
 }
-/*
+
 /////////////////////////////////////////////////
-// Coefficient test:
-// Uses the torsional_friction_demo world, which has several models rotating.
-// Some of these models are spheres rotating about the Z axis, each one with a
-// different coefficient of torsional friction.
 void PhysicsTorsionalFrictionTest::CoefficientTest(
     const std::string &_physicsEngine)
 {
@@ -218,7 +231,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
     return;
   }
 
-  Load("worlds/torsional_friction_demo.world", true, _physicsEngine);
+  Load("worlds/torsional_friction_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -235,15 +248,15 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
   std::vector<PhysicsTorsionalFrictionTest::SphereData>
       spheres;
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_1"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_1"));
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_2"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_2"));
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_3"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_3"));
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_4"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_4"));
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_5"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_5"));
 
   // Verify sphere data structure
   for (auto sphere : spheres)
@@ -263,7 +276,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
       EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
 
-      // Coulomb friction model
+      // Does this make sense for mu3?
       if (sphere.mu3 >= 1.0)
       {
         // Friction is large enough to prevent motion
@@ -272,10 +285,137 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       else
       {
         // Friction is small enough to allow motion
+        // Expect something in function of mu3...?
         // Expect velocity = acceleration * time
-//        EXPECT_NEAR(vel.z, (g.z + sphere.mu3) * t.Double(),
-  //                  g_friction_tolerance);
+        // EXPECT_NEAR(vel.z, (g.z + sphere.mu3) * t.Double(),
+        //            g_friction_tolerance);
       }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void PhysicsTorsionalFrictionTest::PatchTest(
+    const std::string &_physicsEngine)
+{
+  if (_physicsEngine != "ode")
+  {
+    gzerr << "Torsional friction only works with ODE (#ISSUE)"
+          << std::endl;
+    return;
+  }
+
+  Load("worlds/torsional_friction_test.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  math::Vector3 g = physics->GetGravity();
+  EXPECT_DOUBLE_EQ(g.x, 0);
+  EXPECT_DOUBLE_EQ(g.y, 0);
+  EXPECT_DOUBLE_EQ(g.z, -9.8);
+
+  // Load the spheres
+  std::vector<PhysicsTorsionalFrictionTest::SphereData>
+      spheres;
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_patch_1"));
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_patch_2"));
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_patch_3"));
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_patch_4"));
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_patch_5"));
+
+  // Verify sphere data structure
+  for (auto sphere : spheres)
+  {
+    ASSERT_TRUE(sphere.model != NULL);
+  }
+
+  common::Time t = world->GetSimTime();
+  while (t.sec < 1)
+  {
+    world->Step(500);
+    t = world->GetSimTime();
+
+    for (auto sphere : spheres)
+    {
+      math::Vector3 vel = sphere.model->GetWorldAngularVel();
+      EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
+      EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
+
+      // Expect something in function of patch...?
+      // EXPECT_NEAR(vel.z, (g.z + sphere.patch) * t.Double(),
+      //            g_friction_tolerance);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void PhysicsTorsionalFrictionTest::CurvatureTest(
+    const std::string &_physicsEngine)
+{
+  if (_physicsEngine != "ode")
+  {
+    gzerr << "Torsional friction only works with ODE (#ISSUE)"
+          << std::endl;
+    return;
+  }
+
+  Load("worlds/torsional_friction_test.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  math::Vector3 g = physics->GetGravity();
+  EXPECT_DOUBLE_EQ(g.x, 0);
+  EXPECT_DOUBLE_EQ(g.y, 0);
+  EXPECT_DOUBLE_EQ(g.z, -9.8);
+
+  // Load the spheres
+  std::vector<PhysicsTorsionalFrictionTest::SphereData>
+      spheres;
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_radius_1"));
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_radius_2"));
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_radius_3"));
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_radius_4"));
+  spheres.push_back(
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_radius_5"));
+
+  // Verify sphere data structure
+  for (auto sphere : spheres)
+  {
+    ASSERT_TRUE(sphere.model != NULL);
+  }
+
+  common::Time t = world->GetSimTime();
+  while (t.sec < 1)
+  {
+    world->Step(500);
+    t = world->GetSimTime();
+
+    for (auto sphere : spheres)
+    {
+      math::Vector3 vel = sphere.model->GetWorldAngularVel();
+      EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
+      EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
+
+      // Expect something in function of radius...?
+      // EXPECT_NEAR(vel.z, (g.z + sphere.radius) * t.Double(),
+      //            g_friction_tolerance);
     }
   }
 }
@@ -285,11 +425,23 @@ TEST_P(PhysicsTorsionalFrictionTest, CoefficientTest)
 {
   CoefficientTest(GetParam());
 }
-*/
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsTorsionalFrictionTest, CurvatureTest)
+{
+  CurvatureTest(GetParam());
+}
+
 /////////////////////////////////////////////////
 TEST_P(PhysicsTorsionalFrictionTest, DepthTest)
 {
   DepthTest(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsTorsionalFrictionTest, PatchTest)
+{
+  PatchTest(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTorsionalFrictionTest,

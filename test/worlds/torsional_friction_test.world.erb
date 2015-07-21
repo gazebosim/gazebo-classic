@@ -48,7 +48,7 @@
     </physics>
     <gui>
       <camera name="user_camera">
-        <pose>7 -3 2.5 0 0.27 2.35</pose>
+        <pose>-4 1.5 1.9 0 0.17 -0.014</pose>
       </camera>
     </gui>
     <include>
@@ -69,7 +69,7 @@
       mass = density * 4.0 * Math::PI / 3.0 * radius **3
       ixx = mass * 0.4 * radius**2
       iyy = ixx
-      izz = izz
+      izz = ixx
 %>
     <%= "<model name='#{name}'>" %>
       <allow_auto_disable>0</allow_auto_disable>
@@ -134,7 +134,7 @@
     mass = density * 4.0 * Math::PI / 3.0 * radius **3
     ixx = mass * 0.4 * radius**2
     iyy = ixx
-    izz = izz
+    izz = ixx
 
     i = 0
     mu3s.each do |mu3|
@@ -204,7 +204,7 @@
     mass = density * 4.0 * Math::PI / 3.0 * radius **3
     ixx = mass * 0.4 * radius**2
     iyy = ixx
-    izz = izz
+    izz = ixx
 
     i = 0
     patch_radii.each do |patch_radius|
@@ -275,7 +275,7 @@
     mass = density * 4.0 * Math::PI / 3.0 * radius **3
     ixx = mass * 0.4 * radius**2
     iyy = ixx
-    izz = izz
+    izz = ixx
 
     i = 0
     radii.each do |radius|
