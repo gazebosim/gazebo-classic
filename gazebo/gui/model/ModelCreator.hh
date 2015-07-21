@@ -213,7 +213,8 @@ namespace gazebo
       /// \brief Set the select state of a link.
       /// \param[in] _name Name of the link.
       /// \param[in] _selected True to select the link.
-      public: void SetSelected(const std::string &_name, const bool selected);
+      public: void SetSelectedLink(const std::string &_name,
+          const bool selected);
 
       /// \brief Set the select state of a link visual.
       /// \param[in] _linkVis Pointer to the link visual.
@@ -321,8 +322,8 @@ namespace gazebo
       /// \param[in] _name Name of entity.
       /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
-      private: void OnSetSelected(const std::string &_name, const bool _selected);
-
+      private: void OnSetSelectedLink(const std::string &_name,
+          const bool _selected);
 
       /// \brief Create link with default properties from a visual. This
       /// function creates a link that will become the parent of the

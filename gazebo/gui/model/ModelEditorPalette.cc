@@ -302,8 +302,8 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
      boost::bind(&ModelEditorPalette::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
-     gui::model::Events::ConnectSetSelected(
-     boost::bind(&ModelEditorPalette::OnSetSelected, this, _1, _2)));
+     gui::model::Events::ConnectSetSelectedLink(
+     boost::bind(&ModelEditorPalette::OnSetSelectedLink, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
@@ -492,7 +492,7 @@ void ModelEditorPalette::OnItemSelectionChanged()
 
     if (type == "Link" || type == "Nested Model")
     {
-      gui::model::Events::setSelected(name, true);
+      gui::model::Events::setSelectedLink(name, true);
     }
     else if (type == "Joint")
     {
@@ -509,7 +509,7 @@ void ModelEditorPalette::OnItemSelectionChanged()
       std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
       if (type == "Link" || type == "Nested Model")
-        gui::model::Events::setSelected(name, false);
+        gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
     }
@@ -609,7 +609,7 @@ void ModelEditorPalette::DeselectType(const std::string &_type)
       (*it)->setSelected(false);
       it = this->selected.erase(it);
       if (type == "Link" || type == "Nested Model")
-        gui::model::Events::setSelected(name, false);
+        gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
     }
@@ -792,7 +792,7 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSetSelected(const std::string &_name,
+void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
     bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);

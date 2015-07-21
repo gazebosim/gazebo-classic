@@ -216,7 +216,7 @@ namespace gazebo
         public: static void DisconnectJointChanged(
             event::ConnectionPtr _subscriber)
           { jointChanged.Disconnect(_subscriber); }
-          
+
         /// \brief Connect a Gazebo event to the nestedModel removed signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -357,18 +357,18 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { showJointContextMenu.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the set selected signal.
+        /// \brief Connect a Gazebo event to the set selected link signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
-            ConnectSetSelected(T _subscriber)
-          { return setSelected.Connect(_subscriber); }
+            ConnectSetSelectedLink(T _subscriber)
+          { return setSelectedLink.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the set selected signal.
+        /// \brief Disconnect a Gazebo event from the set selected link signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSetSelected(
+        public: static void DisconnectSetSelectedLink(
             event::ConnectionPtr _subscriber)
-          { setSelected.Disconnect(_subscriber); }
+          { setSelectedLink.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the set selected joint signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -482,7 +482,7 @@ namespace gazebo
         public: static event::EventT<void (std::string)> showJointContextMenu;
 
         /// \brief Request to select or deselect an entity.
-        public: static event::EventT<void (std::string, bool)> setSelected;
+        public: static event::EventT<void (std::string, bool)> setSelectedLink;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string, bool)> setSelectedJoint;

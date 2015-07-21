@@ -85,7 +85,7 @@ namespace gazebo
       /// \param[in] _name Name of entity.
       /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
-      private: void OnSetSelected(const std::string &_name, bool _selected);
+      private: void OnSetSelectedLink(const std::string &_name, bool _selected);
 
       /// \brief Callback when a joint is selected.
       /// \param[in] _name Name of joint.
