@@ -427,7 +427,10 @@ void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Joint::Reset()
 {
-  this->SetVelocity(0, 0);
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    this->SetVelocity(i, 0.0);
+  }
   this->staticAngle.SetFromRadian(0);
 }
 
@@ -515,6 +518,10 @@ msgs::Joint::Type Joint::GetMsgType() const
   {
     return msgs::Joint::UNIVERSAL;
   }
+  else if (this->HasType(Base::FIXED_JOINT))
+  {
+    return msgs::Joint::FIXED;
+  }
 
   gzerr << "No joint recognized in type ["
         << this->GetType()
@@ -529,7 +536,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_id(this->GetId());
 
-  msgs::Set(_msg.mutable_pose(), this->anchorPose);
+  msgs::Set(_msg.mutable_pose(), this->anchorPose.Ign());
   _msg.set_type(this->GetMsgType());
 
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
@@ -543,7 +550,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     else
       break;
 
-    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i));
+    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i).Ign());
     axis->set_limit_lower(this->GetLowStop(i).Radian());
     axis->set_limit_upper(this->GetHighStop(i).Radian());
     axis->set_limit_effort(this->GetEffortLimit(i));
@@ -852,9 +859,11 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
 //////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
-  this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
+  {
+    this->SetVelocity(i, 0.0);
     this->SetPosition(i, _state.GetAngle(i).Radian());
+  }
 }
 
 //////////////////////////////////////////////////

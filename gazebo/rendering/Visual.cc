@@ -2200,13 +2200,13 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   }
 
   if (_msg->has_pose())
-    this->SetPose(msgs::Convert(_msg->pose()));
+    this->SetPose(msgs::ConvertIgn(_msg->pose()));
 
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());
 
   if (_msg->has_scale())
-    this->SetScale(msgs::Convert(_msg->scale()));
+    this->SetScale(msgs::ConvertIgn(_msg->scale()));
 
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
@@ -2279,7 +2279,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
-      geomScale = msgs::Convert(_msg->geometry().box().size());
+      geomScale = msgs::ConvertIgn(_msg->geometry().box().size());
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
@@ -2306,11 +2306,15 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           = _msg->geometry().image().scale();
     }
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-      geomScale = msgs::Convert(_msg->geometry().heightmap().size());
+    {
+      geomScale = msgs::ConvertIgn(_msg->geometry().heightmap().size());
+    }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       if (_msg->geometry().mesh().has_scale())
-        geomScale = msgs::Convert(_msg->geometry().mesh().scale());
+      {
+        geomScale = msgs::ConvertIgn(_msg->geometry().mesh().scale());
+      }
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY ||
         _msg->geometry().type() == msgs::Geometry::POLYLINE)

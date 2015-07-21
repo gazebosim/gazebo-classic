@@ -4,6 +4,13 @@
     * [Pull request #1789](https://bitbucket.org/osrf/gazebo/pull-request/1789)
 
 ## Gazebo 6.0
+
+1. Added magnetometer sensor. A contribution from Andrew Symington.
+    * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)
+
+1. Added altimeter sensor. A contribution from Andrew Symington.
+    * [Pull request #1792](https://bitbucket.org/osrf/gazebo/pull-request/1792)
+
 1. Implement more control options for log playback:
   1. Rewind: The simulation starts from the beginning.
   1. Forward: The simulation jumps to the end of the log file.
@@ -356,7 +363,7 @@ compilation on Windows.
 
 ### Gazebo 5.x.x
 
-1. Added lines to laser sensor visualization 
+1. Added lines to laser sensor visualization
     * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
     * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
 
