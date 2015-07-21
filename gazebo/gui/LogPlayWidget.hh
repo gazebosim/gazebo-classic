@@ -120,7 +120,7 @@ namespace gazebo
 
       /// \brief Publish a multistep message.
       /// \param[in] _step Number of steps.
-      private: void PublishMultistep(int _step);
+      private: void PublishMultistep(const int _step);
 
       /// \brief Helper function to prepare each of the four small buttons.
       /// \param[in] _button Pointer to the button.

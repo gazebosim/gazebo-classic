@@ -399,7 +399,7 @@ void LogPlayWidget::EmitSetEndTime(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::PublishMultistep(int _step)
+void LogPlayWidget::PublishMultistep(const int _step)
 {
   msgs::LogPlaybackControl msg;
   msg.set_multi_step(_step);
