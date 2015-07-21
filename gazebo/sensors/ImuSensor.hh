@@ -148,13 +148,6 @@ namespace gazebo
       /// \brief True if new link data is received
       private: bool dataDirty;
 
-      /// \brief Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-
       /// \brief Noise free angular velocity.
       private: ignition::math::Vector3d angularVel;
     };
