@@ -93,6 +93,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
   physics::JointPtr joint_12 = model_1->GetJoint("joint_12");
 
   gzlog << "-------------------Test 1-------------------\n";
+  gzlog << " lock step with physics (call world::Step)  \n";
   for (unsigned int i = 0; i < 10; ++i)
   {
     world->Step(1);
@@ -161,6 +162,168 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
           << "] torque2 [" << wrench_12.body2Torque
           << " / 0 0 0"
           << "]\n";
+  }
+
+  // let physics thread loose, and try to get values on the fly
+  world->SetPaused(false);
+  gzlog << "-------------------Test 2-------------------\n";
+  gzlog << " physics thread updating in background      \n";
+  for (unsigned int i = 0; i < 1000; ++i)
+  {
+    // test joint_01 wrench
+    physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Force.x,    0.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Force.y,    0.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Force.z, 1000.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Torque.x,   0.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Torque.y,   0.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Torque.z,   0.0);
+
+    EXPECT_DOUBLE_EQ(wrench_01.body2Force.x,  -wrench_01.body1Force.x);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Force.y,  -wrench_01.body1Force.y);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Force.z,  -wrench_01.body1Force.z);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.x, -wrench_01.body1Torque.x);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.y, -wrench_01.body1Torque.y);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.z, -wrench_01.body1Torque.z);
+
+    gzlog << "link_1 pose [" << link_1->GetWorldPose()
+          << "] velocity [" << link_1->GetWorldLinearVel()
+          << "]\n";
+    gzlog << "link_2 pose [" << link_2->GetWorldPose()
+          << "] velocity [" << link_2->GetWorldLinearVel()
+          << "]\n";
+    gzlog << "joint_01 force torque : "
+          << "force1 [" << wrench_01.body1Force
+          << " / 0 0 1000"
+          << "] torque1 [" << wrench_01.body1Torque
+          << " / 0 0 0"
+          << "] force2 [" << wrench_01.body2Force
+          << " / 0 0 -1000"
+          << "] torque2 [" << wrench_01.body2Torque
+          << " / 0 0 0"
+          << "]\n";
+
+    // test joint_12 wrench
+    physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Force.x,    0.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Force.y,    0.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Force.z,  500.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Torque.x,   0.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Torque.y,   0.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Torque.z,   0.0);
+
+    EXPECT_DOUBLE_EQ(wrench_12.body2Force.x,  -wrench_12.body1Force.x);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Force.y,  -wrench_12.body1Force.y);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Force.z,  -wrench_12.body1Force.z);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.x, -wrench_12.body1Torque.x);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.y, -wrench_12.body1Torque.y);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.z, -wrench_12.body1Torque.z);
+
+    gzlog << "link_1 pose [" << link_1->GetWorldPose()
+          << "] velocity [" << link_1->GetWorldLinearVel()
+          << "]\n";
+    gzlog << "link_2 pose [" << link_2->GetWorldPose()
+          << "] velocity [" << link_2->GetWorldLinearVel()
+          << "]\n";
+    gzlog << "joint_12 force torque : "
+          << "force1 [" << wrench_12.body1Force
+          << " / 0 0 500"
+          << "] torque1 [" << wrench_12.body1Torque
+          << " / 0 0 0"
+          << "] force2 [" << wrench_12.body2Force
+          << " / 0 0 -500"
+          << "] torque2 [" << wrench_12.body2Torque
+          << " / 0 0 0"
+          << "]\n";
+  }
+
+  // now try to get force torque from the sensors
+  gzlog << "-------------------Test 3-------------------\n";
+  gzlog << " physics thread updating in background      \n";
+  gzlog << " try to read force torque values from       \n";
+  gzlog << " force torque sensor                        \n";
+  sensors::ForceTorqueSensorPtr sensor_01 =
+    boost::static_pointer_cast<sensors::ForceTorqueSensor>(
+    sensors::SensorManager::Instance()->GetSensor("joint_01::force_torque"));
+  sensors::ForceTorqueSensorPtr sensor_12 =
+    boost::static_pointer_cast<sensors::ForceTorqueSensor>(
+    sensors::SensorManager::Instance()->GetSensor("joint_12::force_torque")); =
+
+  for (unsigned int i = 0; i < 100000; ++i)
+  {
+    // test joint_01 wrench
+    math::Vector3 force_01 = sensor_01->GetForce();
+    math::Vector3 torque_01 = sensor_01->GetTorque();
+
+    EXPECT_DOUBLE_EQ(force_01.x,    0.0);
+    EXPECT_DOUBLE_EQ(force_01.y,    0.0);
+    EXPECT_DOUBLE_EQ(force_01.z, 1000.0);
+    EXPECT_DOUBLE_EQ(torque_01.x,   0.0);
+    EXPECT_DOUBLE_EQ(torque_01.y,   0.0);
+    EXPECT_DOUBLE_EQ(torque_01.z,   0.0);
+
+    /*
+    EXPECT_DOUBLE_EQ(wrench_01.body2Force.x,  -wrench_01.body1Force.x);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Force.y,  -wrench_01.body1Force.y);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Force.z,  -wrench_01.body1Force.z);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.x, -wrench_01.body1Torque.x);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.y, -wrench_01.body1Torque.y);
+    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.z, -wrench_01.body1Torque.z);
+
+    gzlog << "link_1 pose [" << link_1->GetWorldPose()
+          << "] velocity [" << link_1->GetWorldLinearVel()
+          << "]\n";
+    gzlog << "link_2 pose [" << link_2->GetWorldPose()
+          << "] velocity [" << link_2->GetWorldLinearVel()
+          << "]\n";
+    gzlog << "joint_01 force torque : "
+          << "force1 [" << wrench_01.body1Force
+          << " / 0 0 1000"
+          << "] torque1 [" << wrench_01.body1Torque
+          << " / 0 0 0"
+          << "] force2 [" << wrench_01.body2Force
+          << " / 0 0 -1000"
+          << "] torque2 [" << wrench_01.body2Torque
+          << " / 0 0 0"
+          << "]\n";
+    */
+
+    // test joint_12 wrench
+    math::Vector3 force_12 = sensor_12->GetForce();
+    math::Vector3 torque_12 = sensor_12->GetTorque();
+
+    EXPECT_DOUBLE_EQ(force_12.x,    0.0);
+    EXPECT_DOUBLE_EQ(force_12.y,    0.0);
+    EXPECT_DOUBLE_EQ(force_12.z,  500.0);
+    EXPECT_DOUBLE_EQ(torque_12.x,   0.0);
+    EXPECT_DOUBLE_EQ(torque_12.y,   0.0);
+    EXPECT_DOUBLE_EQ(torque_12.z,   0.0);
+
+    /*
+    EXPECT_DOUBLE_EQ(wrench_12.body2Force.x,  -wrench_12.body1Force.x);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Force.y,  -wrench_12.body1Force.y);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Force.z,  -wrench_12.body1Force.z);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.x, -wrench_12.body1Torque.x);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.y, -wrench_12.body1Torque.y);
+    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.z, -wrench_12.body1Torque.z);
+
+    gzlog << "link_1 pose [" << link_1->GetWorldPose()
+          << "] velocity [" << link_1->GetWorldLinearVel()
+          << "]\n";
+    gzlog << "link_2 pose [" << link_2->GetWorldPose()
+          << "] velocity [" << link_2->GetWorldLinearVel()
+          << "]\n";
+    gzlog << "joint_12 force torque : "
+          << "force1 [" << wrench_12.body1Force
+          << " / 0 0 500"
+          << "] torque1 [" << wrench_12.body1Torque
+          << " / 0 0 0"
+          << "] force2 [" << wrench_12.body2Force
+          << " / 0 0 -500"
+          << "] torque2 [" << wrench_12.body2Torque
+          << " / 0 0 0"
+          << "]\n";
+    */
   }
 }
 
