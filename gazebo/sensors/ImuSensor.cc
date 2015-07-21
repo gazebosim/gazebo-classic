@@ -453,7 +453,7 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     this->lastLinearVel = imuWorldLinearVel;
 
     // Apply noise models
-    for (auto &keyNoise : this->noises)
+    for (auto const &keyNoise : this->noises)
     {
       switch (keyNoise.first)
       {
