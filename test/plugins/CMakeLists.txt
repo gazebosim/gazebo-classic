@@ -1,3 +1,7 @@
+if (WIN32)
+    add_definitions(-DBUILDING_DLL)
+endif()
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}

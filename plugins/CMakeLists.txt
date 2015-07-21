@@ -1,3 +1,7 @@
+if (WIN32)
+  add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN)
+endif()
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
@@ -98,4 +102,7 @@ foreach (src ${GUIplugins})
 endforeach (src ${GUIplugins})
 
 add_subdirectory(events)
-add_subdirectory(rest_web)
+
+if (NOT WIN32)
+  add_subdirectory(rest_web)
+endif()

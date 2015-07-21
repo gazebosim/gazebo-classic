@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-
-#ifndef _WIRELESS_TRANSCEIVER_HH_
-#define _WIRELESS_TRANSCEIVER_HH_
+#ifndef _GAZEBO_WIRELESS_TRANSCEIVER_HH_
+#define _GAZEBO_WIRELESS_TRANSCEIVER_HH_
 
 #include <string>
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -74,7 +75,7 @@ namespace gazebo
       protected: boost::weak_ptr<physics::Link> parentEntity;
 
       /// \brief Sensor reference pose
-      protected: math::Pose referencePose;
+      protected: ignition::math::Pose3d referencePose;
     };
     /// \}
   }

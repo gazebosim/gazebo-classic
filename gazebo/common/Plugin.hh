@@ -17,6 +17,15 @@
 #ifndef _GZ_PLUGIN_HH_
 #define _GZ_PLUGIN_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  // This was put here because all the plugins are going to use it
+  // This doesn't guarantee something else won't cause it,
+  // but this saves putting this in every plugin
+#include <Winsock2.h>
+#endif
+
 #ifndef _WIN32
   #include <unistd.h>
 #endif

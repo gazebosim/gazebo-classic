@@ -3,6 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 set (sources ${sources}
   ode/ODEBallJoint.cc
   ode/ODECollision.cc
+  ode/ODEFixedJoint.cc
   ode/ODEGearboxJoint.cc
   ode/ODEHeightmapShape.cc
   ode/ODEHinge2Joint.cc
@@ -28,6 +29,7 @@ set (headers
   ODEBoxShape.hh
   ODECollision.hh
   ODECylinderShape.hh
+  ODEFixedJoint.hh
   ODEGearboxJoint.hh
   ODEHeightmapShape.hh
   ODEHinge2Joint.hh

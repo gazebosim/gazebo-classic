@@ -26,6 +26,7 @@
 %gz_build_path%\deps\opende;^
 %deps_path%\ogre_src_v1-8-1-vc12-x64-release-debug\build\install\%build_type%\bin\%build_type%;^
 %deps_path%\sdformat\build\install\%build_type%\lib;^
+%deps_path%\ign-math\build\install\%build_type%\lib;^
 %deps_path%\tbb43_20141023oss\bin\intel64\vc12;^
 %deps_path%\protobuf-2.6.1\vsprojects\Release;^
 %gz_build_path%\deps\libccd;^

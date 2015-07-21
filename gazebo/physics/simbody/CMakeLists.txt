@@ -3,6 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 set (sources ${sources}
 simbody/SimbodyBallJoint.cc
 simbody/SimbodyCollision.cc
+simbody/SimbodyFixedJoint.cc
 simbody/SimbodyHeightmapShape.cc
 simbody/SimbodyHinge2Joint.cc
 simbody/SimbodyHingeJoint.cc
@@ -26,6 +27,7 @@ set (headers
 SimbodyBallJoint.hh
 SimbodyBoxShape.hh
 SimbodyCollision.hh
+SimbodyFixedJoint.hh
 SimbodyCylinderShape.hh
 SimbodyHeightmapShape.hh
 SimbodyHinge2Joint.hh

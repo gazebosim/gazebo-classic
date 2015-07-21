@@ -2,21 +2,26 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources ${sources}
     dart/DARTBallJoint.cc
+    dart/DARTBoxShape.cc
     dart/DARTCollision.cc
-    dart/DARTLink.cc
+    dart/DARTCylinderShape.cc
+    dart/DARTFixedJoint.cc
     dart/DARTHeightmapShape.cc
     dart/DARTHingeJoint.cc
     dart/DARTHinge2Joint.cc
     dart/DARTJoint.cc
+    dart/DARTLink.cc
     dart/DARTMesh.cc
     dart/DARTMeshShape.cc
     dart/DARTModel.cc
     dart/DARTMultiRayShape.cc
     dart/DARTPhysics.cc
+    dart/DARTPlaneShape.cc
     dart/DARTPolylineShape.cc
     dart/DARTRayShape.cc
     dart/DARTScrewJoint.cc
     dart/DARTSliderJoint.cc
+    dart/DARTSphereShape.cc
     dart/DARTSurfaceParams.cc
     dart/DARTUniversalJoint.cc
     PARENT_SCOPE
@@ -27,6 +32,7 @@ SET (headers
     DARTBoxShape.hh
     DARTCollision.hh
     DARTCylinderShape.hh
+    DARTFixedJoint.hh
     DARTHeightmapShape.hh
     DARTHingeJoint.hh
     DARTHinge2Joint.hh

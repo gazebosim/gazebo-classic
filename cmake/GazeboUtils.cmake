@@ -145,6 +145,9 @@ macro (gz_setup_windows)
     # Don't pull in the Windows min/max macros
     add_definitions(-DNOMINMAX) 
 
+    #use static libraries for FREEIMAGE
+    add_definitions(-DFREEIMAGE_LIB)
+
     # Use dynamic linking for boost
     add_definitions(-DBOOST_ALL_DYN_LINK)
 

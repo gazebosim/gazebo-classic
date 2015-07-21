@@ -3,6 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 set (sources ${sources}
   bullet/BulletBallJoint.cc
   bullet/BulletCollision.cc
+  bullet/BulletFixedJoint.cc
   bullet/BulletHeightmapShape.cc
   bullet/BulletHinge2Joint.cc
   bullet/BulletHingeJoint.cc
@@ -30,6 +31,7 @@ set (headers
   BulletBoxShape.hh
   BulletCollision.hh
   BulletCylinderShape.hh
+  BulletFixedJoint.hh
   BulletHeightmapShape.hh
   BulletHinge2Joint.hh
   BulletHingeJoint.hh
