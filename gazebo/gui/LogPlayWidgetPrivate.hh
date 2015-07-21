@@ -57,6 +57,18 @@ namespace gazebo
       /// \brief Spin box which holds the step size.
       public: QSpinBox *stepSpin;
 
+      /// \brief Button to step back.
+      public: QToolButton *stepBackButton;
+
+      /// \brief Button to step forward.
+      public: QToolButton *stepForwardButton;
+
+      /// \brief Button to rewind.
+      public: QToolButton *rewindButton;
+
+      /// \brief Button to jump forward.
+      public: QToolButton *forwardButton;
+
       /// \brief Number of steps pending to be published once the simulation
       /// is paused.
       public: int pendingStep = 0;
