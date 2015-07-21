@@ -2,6 +2,22 @@
 
 <sdf version="1.5">
   <world name="default">
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>1000</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>1000.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
     <gui>
       <camera name="user_camera">
         <pose>7 -3 2.5 0 0.27 2.35</pose>
@@ -16,6 +32,7 @@
 
 
     <model name='sphere_mass_1'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.4 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -69,6 +86,7 @@
     </model>
 
     <model name='sphere_mass_2'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.8 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -122,6 +140,7 @@
     </model>
 
     <model name='sphere_mass_3'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.2000000000000002 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -175,6 +194,7 @@
     </model>
 
     <model name='sphere_mass_4'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.6 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -228,6 +248,7 @@
     </model>
 
     <model name='sphere_mass_5'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>2.0 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -283,6 +304,7 @@
 
 
     <model name='sphere_mu3_1'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.4 1 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -336,6 +358,7 @@
     </model>
 
     <model name='sphere_mu3_2'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.8 1 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -389,6 +412,7 @@
     </model>
 
     <model name='sphere_mu3_3'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.2000000000000002 1 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -442,6 +466,7 @@
     </model>
 
     <model name='sphere_mu3_4'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.6 1 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -495,6 +520,7 @@
     </model>
 
     <model name='sphere_mu3_5'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>2.0 1 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -550,6 +576,7 @@
 
 
     <model name='sphere_patch_1'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.4 2 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -605,6 +632,7 @@
     </model>
 
     <model name='sphere_patch_2'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.8 2 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -660,6 +688,7 @@
     </model>
 
     <model name='sphere_patch_3'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.2000000000000002 2 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -715,6 +744,7 @@
     </model>
 
     <model name='sphere_patch_4'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.6 2 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -770,6 +800,7 @@
     </model>
 
     <model name='sphere_patch_5'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>2.0 2 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -827,6 +858,7 @@
 
 
     <model name='sphere_radius_1'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.04 3 0.01  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -882,6 +914,7 @@
     </model>
 
     <model name='sphere_radius_2'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.8 3 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -937,6 +970,7 @@
     </model>
 
     <model name='sphere_radius_3'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>9.600000000000001 3 0.8  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -992,6 +1026,7 @@
     </model>
 
     <model name='sphere_radius_4'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>32.0 3 2.0  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -1047,6 +1082,7 @@
     </model>
 
     <model name='sphere_radius_5'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>200.0 3 10.0  0 0 0</pose>
       <link name="link">
         <inertial>

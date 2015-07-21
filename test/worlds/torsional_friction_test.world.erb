@@ -30,6 +30,22 @@
 %>
 <sdf version="1.5">
   <world name="default">
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>1000</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>1000.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
     <gui>
       <camera name="user_camera">
         <pose>7 -3 2.5 0 0.27 2.35</pose>
@@ -56,6 +72,7 @@
       izz = izz
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= radius*4*i %> 0 <%= radius %>  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -125,6 +142,7 @@
       name = 'sphere_mu3_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= radius*4*i %> 1 <%= radius %>  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -194,6 +212,7 @@
       name = 'sphere_patch_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= radius*4*i %> 2 <%= radius %>  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -264,6 +283,7 @@
       name = 'sphere_radius_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= radius*4*i %> 3 <%= radius %>  0 0 0</pose>
       <link name="link">
         <inertial>
