@@ -37,7 +37,7 @@ const double g_friction_tolerance = 1e-3;
 class PhysicsFrictionTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
-  protected: PhysicsFrictionTest() : ServerFixture(), spawnCount(0)
+  protected: PhysicsFrictionTest() : ServerFixture()
              {
              }
 
@@ -135,85 +135,30 @@ class PhysicsFrictionTest : public ServerFixture,
   /// \param[in] _opt Options for friction box.
   public: physics::ModelPtr SpawnBox(const SpawnFrictionBoxOptions &_opt)
           {
-            msgs::Factory msg;
-            std::ostringstream modelStr;
-            std::ostringstream modelName;
-            modelName << "box_model" << this->spawnCount++;
+            std::string modelName = this->GetUniqueString("box_model");
 
-            double dx = _opt.size.x;
-            double dy = _opt.size.y;
-            double dz = _opt.size.z;
-            double ixx = _opt.mass/12.0 * (dy*dy + dz*dz);
-            double iyy = _opt.mass/12.0 * (dz*dz + dx*dx);
-            double izz = _opt.mass/12.0 * (dx*dx + dy*dy);
+            msgs::Model model;
+            model.set_name(modelName);
+            msgs::Set(model.mutable_pose(), _opt.modelPose);
 
-            modelStr
-              << "<sdf version='" << SDF_VERSION << "'>"
-              << "<model name ='" << modelName.str() << "'>"
-              << "  <pose>" << _opt.modelPose << "</pose>"
-              << "  <link name='link'>"
-              << "    <pose>" << _opt.linkPose << "</pose>"
-              << "    <inertial>"
-              << "      <pose>" << _opt.inertialPose << "</pose>"
-              << "      <mass>" << _opt.mass << "</mass>"
-              << "      <inertia>"
-              << "        <ixx>" << ixx << "</ixx>"
-              << "        <iyy>" << iyy << "</iyy>"
-              << "        <izz>" << izz << "</izz>"
-              << "        <ixy>" << 0.0 << "</ixy>"
-              << "        <ixz>" << 0.0 << "</ixz>"
-              << "        <iyz>" << 0.0 << "</iyz>"
-              << "      </inertia>"
-              << "    </inertial>"
-              << "    <collision name='collision'>"
-              << "      <pose>" << _opt.collisionPose << "</pose>"
-              << "      <geometry>"
-              << "        <box><size>" << _opt.size << "</size></box>"
-              << "      </geometry>"
-              << "      <surface>"
-              << "        <friction>"
-              << "          <ode>"
-              << "            <mu>" << _opt.friction1 << "</mu>"
-              << "            <mu2>" << _opt.friction2 << "</mu2>"
-              << "            <fdir1>" << _opt.direction1 << "</fdir1>"
-              << "          </ode>"
-              << "        </friction>"
-              << "      </surface>"
-              << "    </collision>"
-              << "    <visual name='visual'>"
-              << "      <pose>" << _opt.collisionPose << "</pose>"
-              << "      <geometry>"
-              << "        <box><size>" << _opt.size << "</size></box>"
-              << "      </geometry>"
-              << "    </visual>"
-              << "  </link>"
-              << "</model>";
+            msgs::AddBoxLink(model, _opt.mass, _opt.size);
+            auto link = model.mutable_link(0);
+            msgs::Set(link->mutable_pose(), _opt.linkPose);
 
-            physics::WorldPtr world = physics::get_world("default");
-            world->InsertModelString(modelStr.str());
-
-            physics::ModelPtr model;
-            common::Time wait(100, 0);
-
-            common::Time wallStart = common::Time::GetWallTime();
-            unsigned int waitCount = 0;
-            while (wait > (common::Time::GetWallTime() - wallStart) &&
-                   !this->HasEntity(modelName.str()))
             {
-              common::Time::MSleep(10);
-              if (++waitCount % 100 == 0)
-              {
-                gzwarn << "Waiting " << waitCount / 100 << " seconds for "
-                       << "box to spawn." << std::endl;
-              }
+              auto inertial = link->mutable_inertial();
+              msgs::Set(inertial->mutable_pose(), _opt.inertialPose);
             }
-            if (this->HasEntity(modelName.str()) && waitCount >= 100)
-              gzwarn << "box has spawned." << std::endl;
 
-            if (world != NULL)
-              model = world->GetModel(modelName.str());
+            auto collision = link->mutable_collision(0);
+            msgs::Set(collision->mutable_pose(), _opt.collisionPose);
 
-            return model;
+            auto friction = collision->mutable_surface()->mutable_friction();
+            friction->set_mu(_opt.friction1);
+            friction->set_mu2(_opt.friction2);
+            msgs::Set(friction->mutable_fdir1(), _opt.direction1);
+
+            return ServerFixture::SpawnModel(model);
           }
 
   /// \brief Use the friction_demo world.
@@ -228,9 +173,6 @@ class PhysicsFrictionTest : public ServerFixture,
   /// no NaN's are generated.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DirectionNaN(const std::string &_physicsEngine);
-
-  /// \brief Count of spawned models, used to ensure unique model names.
-  private: unsigned int spawnCount;
 };
 
 /////////////////////////////////////////////////
