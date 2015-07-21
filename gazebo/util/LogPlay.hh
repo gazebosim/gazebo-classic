@@ -14,17 +14,17 @@
  * limitations under the License.
  *
 */
-
-#ifndef _LOGPLAY_HH_
-#define _LOGPLAY_HH_
+#ifndef _GAZEBO_LOGPLAY_HH_
+#define _GAZEBO_LOGPLAY_HH_
 
 #include <tinyxml.h>
 
 #include <list>
+#include <mutex>
 #include <string>
-#include <fstream>
 
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -44,7 +44,7 @@ namespace gazebo
     /// state information to a World.
     ///
     /// \sa LogRecord, State
-    class GAZEBO_VISIBLE LogPlay : public SingletonT<LogPlay>
+    class GZ_UTIL_VISIBLE LogPlay : public SingletonT<LogPlay>
     {
       /// \brief Constructor
       private: LogPlay();
@@ -56,7 +56,8 @@ namespace gazebo
       ///
       /// Open a log file that was previously recorded.
       /// \param[in] _logFile The file to load
-      /// \throws Exception
+      /// \throws Exception When the log file does not exist, is a directory
+      /// instead of a regular file, or Gazebo was unable to parse it.
       public: void Open(const std::string &_logFile);
 
       /// \brief Return true if a file is open.
@@ -75,12 +76,37 @@ namespace gazebo
 
       /// \brief Get the random number seed of the open log file.
       /// \return The random number seed the open log file. The current
-      /// random number seed, as defined in math::Rand::GetSeed.
+      /// random number seed, as defined in ignition::math::Rand::Seed.
       public: uint32_t GetRandSeed() const;
+
+      /// \brief Get the log start time of the open log file.
+      /// \return Start time of the log.
+      public: common::Time GetLogStartTime() const;
+
+      /// \brief Get the log end time of the open log file.
+      /// \return End time of the log.
+      public: common::Time GetLogEndTime() const;
+
+      /// \brief Get the name of the log file.
+      /// \return The filename.
+      public: std::string GetFilename() const;
+
+      /// \brief Get the full path of the log file.
+      /// \return The full path of the log file.
+      public: std::string GetFullPathFilename() const;
+
+      /// \brief Get the size of the log file.
+      /// \return The size of the file in bytes.
+      public: uintmax_t GetFileSize() const;
 
       /// \brief Step through the open log file.
       /// \param[out] _data Data from next entry in the log file.
       public: bool Step(std::string &_data);
+
+      /// \brief Jump to the beginning of the log file. The next step() call
+      /// will return the first data "chunk".
+      /// \return True If the function succeed or false otherwise.
+      public: bool Rewind();
 
       /// \brief Get the number of chunks (steps) in the open log file.
       /// \return The number of recorded states in the log file.
@@ -103,6 +129,16 @@ namespace gazebo
       /// \return Header of the open log file.
       public: std::string GetHeader() const;
 
+      /// \brief Get the initial simulation iterations from a log file.
+      /// \return Initial simulation iteration contained in the log file.
+      public: uint64_t GetInitialIterations() const;
+
+      /// \brief Return if the log file contains the <iterations> tag. Old log
+      /// files may not have the <iterations> tag.
+      /// \return True if <iterations> was found in the log file or
+      /// false otherwise.
+      public: bool HasIterations() const;
+
       /// \brief Helper function to get chunk data from XML.
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.
@@ -111,6 +147,14 @@ namespace gazebo
 
       /// \brief Read the header from the log file.
       private: void ReadHeader();
+
+      /// \brief Update the internal variables that keep track of the times
+      /// where the log started and finished (simulation time).
+      private: void ReadLogTimes();
+
+      /// \brief Update the internal variable that keeps track of the initial
+      /// "iterations" value.
+      private: bool ReadIterations();
 
       /// \brief The XML document of the log file.
       private: TiXmlDocument xmlDoc;
@@ -134,10 +178,26 @@ namespace gazebo
       /// \brief The random number seed recorded in the open log file.
       private: uint32_t randSeed;
 
+      /// \brief Log start time (simulation time).
+      private: common::Time logStartTime;
+
+      /// \brief Log end time (simulation time).
+      private: common::Time logEndTime;
+
       /// \brief The encoding for the current chunk in the log file.
       private: std::string encoding;
 
       private: std::string currentChunk;
+
+      /// \brief Initial simulation iteration contained in the log file.
+      private: uint64_t initialIterations;
+
+      /// \brief True if <iterations> is found in the log file. Old log versions
+      /// may not include this tag in the log files.
+      private: bool iterationsFound;
+
+      /// \brief A mutex to avoid race conditions.
+      private: std::mutex mutex;
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogPlay>;

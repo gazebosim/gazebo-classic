@@ -126,22 +126,30 @@ public:
     { return dWorldGetQuickStepInertiaRatioReduction (get_id()); }
   dReal getQuickStepContactResidualSmoothing() const
     { return dWorldGetQuickStepContactResidualSmoothing (get_id()); }
+  bool getQuickStepThreadPositionCorrection() const
+    { return dWorldGetQuickStepThreadPositionCorrection (get_id()); }
   bool getQuickStepExperimentalRowReordering() const
     { return dWorldGetQuickStepExperimentalRowReordering (get_id()); }
   dReal getQuickStepWarmStartFactor() const
     { return dWorldGetQuickStepWarmStartFactor (get_id()); }
   int getQuickStepExtraFrictionIterations() const
     { return dWorldGetQuickStepExtraFrictionIterations (get_id()); }
+  int getQuickStepFrictionModel() const
+    { return dWorldGetQuickStepFrictionModel(get_id()); }
   void setQuickStepInertiaRatioReduction(bool irr)
     { dWorldSetQuickStepInertiaRatioReduction (get_id(), irr); }
   void setQuickStepContactResidualSmoothing(dReal smoo)
     { dWorldSetQuickStepContactResidualSmoothing (get_id(), smoo); }
+  void setQuickStepThreadPositionCorrection(bool thread)
+    { dWorldSetQuickStepThreadPositionCorrection (get_id(), thread); }
   void setQuickStepExperimentalRowReordering(bool order)
     { dWorldSetQuickStepExperimentalRowReordering (get_id(), order); }
   void setQuickStepWarmStartFactor(dReal warm)
     { dWorldSetQuickStepWarmStartFactor (get_id(), warm); }
   void setQuickStepExtraFrictionIterations(int iters)
     { dWorldSetQuickStepExtraFrictionIterations (get_id(), iters); }
+  void setQuickStepFrictionModel(int fricmodel)
+    { dWorldSetQuickStepFrictionModel(get_id(), fricmodel); }
 
   void  setAutoDisableLinearThreshold (dReal threshold)
     { dWorldSetAutoDisableLinearThreshold (get_id(), threshold); }

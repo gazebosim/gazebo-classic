@@ -19,8 +19,8 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
-#include "ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
@@ -33,6 +33,7 @@ class PhysicsMsgsTest : public ServerFixture,
   public: void LinkProperties(const std::string &_physicsEngine);
   public: void LinkPose(const std::string &_physicsEngine);
   public: void SimpleShapeResize(const std::string &_physicsEngine);
+  public: void LinkVisualMsg(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
@@ -75,7 +76,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   for (std::vector<math::Vector3>::iterator iter = gravity.begin();
        iter != gravity.end(); ++iter)
   {
-    msgs::Set(msg.mutable_gravity(), *iter);
+    msgs::Set(msg.mutable_gravity(), (*iter).Ign());
     physicsPub->Publish(msg);
 
     while (*iter != physics->GetGravity())
@@ -140,7 +141,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     for (std::vector<math::Pose>::iterator iter = poses.begin();
          iter != poses.end(); ++iter)
     {
-      msgs::Set(msg.mutable_pose(), *iter);
+      msgs::Set(msg.mutable_pose(), (*iter).Ign());
       modelPub->Publish(msg);
 
       while (*iter != model->GetWorldPose())
@@ -355,7 +356,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         linkMsg->set_id(link->GetId());
         linkMsg->set_name(link->GetScopedName());
 
-        msgs::Set(linkMsg->mutable_pose(), *iter);
+        msgs::Set(linkMsg->mutable_pose(), (*iter).Ign());
         modelPub->Publish(msg);
 
         int sleep = 0;
@@ -416,17 +417,30 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   modelPos["test_box"] = math::Vector3(0, 0, z0);
   modelPos["test_sphere"] = math::Vector3(4, 0, z0);
   modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
+  modelPos["test_non_unit_box"] = math::Vector3(16, 0, z0);
+
+  std::map<std::string, math::Vector3> modelSize;
+  modelSize["test_box"] = math::Vector3::One;
+  modelSize["test_sphere"] = math::Vector3::One;
+  modelSize["test_cylinder"] = math::Vector3::One;
+  modelSize["test_non_unit_box"] = math::Vector3(3, 8, 1.0);
 
   SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
       math::Vector3::Zero);
   SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       math::Vector3::Zero);
+  SpawnBox("test_non_unit_box", modelSize["test_non_unit_box"],
+      modelPos["test_non_unit_box"], math::Vector3::Zero);
 
   // spawn another set of shapes and use messages to resize these
   modelPos["test_box2"] = math::Vector3(0, 9, z0);
   modelPos["test_sphere2"] = math::Vector3(4, 9, z0);
   modelPos["test_cylinder2"] = math::Vector3(8, 9, z0);
+
+  modelSize["test_box2"] = math::Vector3::One;
+  modelSize["test_sphere2"] = math::Vector3::One;
+  modelSize["test_cylinder2"] = math::Vector3::One;
 
   SpawnBox("test_box2", math::Vector3(1, 1, 1), modelPos["test_box2"],
       math::Vector3::Zero);
@@ -448,10 +462,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   world->Step(100);
 
   // Verify the initial model pose is where we set it to be.
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     // Make sure the model is loaded
     model = world->GetModel(name);
     EXPECT_TRUE(model != NULL);
@@ -467,10 +480,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   // resize model to half of it's size
   double scaleFactor = 0.5;
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     model = world->GetModel(name);
     if (*(name.rbegin()) == '2')
     {
@@ -478,7 +490,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       msgs::Model msg;
       msg.set_name(name);
       msg.set_id(model->GetId());
-      msgs::Set(msg.mutable_scale(), scaleFactor * math::Vector3::One);
+      msgs::Set(msg.mutable_scale(),
+          scaleFactor * ignition::math::Vector3d::One);
       modelPub->Publish(msg);
     }
     else
@@ -508,10 +521,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The pose is expected to be
   // underneath the initial pose.
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (auto const &iter : modelPos)
   {
-    std::string name = iter->first;
+    std::string name = iter.first;
     // Make sure the model is loaded
     model = world->GetModel(name);
     if (model != NULL)
@@ -531,8 +543,223 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       EXPECT_TRUE(model != NULL);
     }
   }
-}
 
+  // verify geom msgs contain resized values.
+  for (auto const &iter : modelPos)
+  {
+    std::string name = iter.first;
+    model = world->GetModel(name);
+    msgs::Model modelMsg;
+    model->FillMsg(modelMsg);
+
+    EXPECT_EQ(msgs::ConvertIgn(modelMsg.scale()),
+        scaleFactor * ignition::math::Vector3d::One);
+    for (int i = 0; i < modelMsg.link_size(); ++i)
+    {
+      msgs::Link linkMsg = modelMsg.link(i);
+
+      // verify visual geom msgs
+      for (int j = 0; j < linkMsg.visual_size(); ++j)
+      {
+        msgs::Visual visualMsg = linkMsg.visual(j);
+        msgs::Geometry geomMsg = visualMsg.geometry();
+        if (geomMsg.has_box())
+        {
+          EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
+              modelSize[name].Ign() * scaleFactor);
+        }
+        else if (geomMsg.has_sphere())
+        {
+          EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
+              modelSize[name].x * 0.5 * scaleFactor);
+        }
+        else if (geomMsg.has_cylinder())
+        {
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
+              modelSize[name].x * 0.5 * scaleFactor);
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
+              modelSize[name].z * scaleFactor);
+        }
+      }
+
+      // verify collision geom msgs
+      for (int j = 0; j < linkMsg.collision_size(); ++j)
+      {
+        msgs::Collision collisionMsg = linkMsg.collision(j);
+        msgs::Geometry geomMsg = collisionMsg.geometry();
+        if (geomMsg.has_box())
+        {
+          EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
+              modelSize[name].Ign() * scaleFactor);
+        }
+        else if (geomMsg.has_sphere())
+        {
+          EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
+              modelSize[name].x * 0.5 * scaleFactor);
+        }
+        else if (geomMsg.has_cylinder())
+        {
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
+              modelSize[name].x * 0.5 * scaleFactor);
+          EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
+              modelSize[name].z * scaleFactor);
+        }
+      }
+    }
+  }
+
+  // verify geom sdfs contain resized values.
+  for (auto const &iter : modelPos)
+  {
+    std::string name = iter.first;
+    model = world->GetModel(name);
+    sdf::ElementPtr modelElem = model->GetSDF();
+
+    EXPECT_TRUE(modelElem->HasElement("link"));
+    sdf::ElementPtr linkElem = modelElem->GetElement("link");
+    while (linkElem)
+    {
+      // verify visual geom sdf
+      EXPECT_TRUE(linkElem->HasElement("visual"));
+      sdf::ElementPtr visualElem = linkElem->GetElement("visual");
+
+      EXPECT_TRUE(visualElem->HasElement("geometry"));
+      sdf::ElementPtr visualGeomElem = visualElem->GetElement("geometry");
+      if (visualGeomElem->HasElement("box"))
+      {
+        sdf::ElementPtr boxElem = visualGeomElem->GetElement("box");
+        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        EXPECT_EQ(size, modelSize[name] * scaleFactor);
+      }
+      else if (visualGeomElem->HasElement("sphere"))
+      {
+        sdf::ElementPtr sphereElem = visualGeomElem->GetElement("sphere");
+        double radius = sphereElem->Get<double>("radius");
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+      }
+      else if (visualGeomElem->HasElement("cylinder"))
+      {
+        sdf::ElementPtr cylinderElem = visualGeomElem->GetElement("cylinder");
+        double radius = cylinderElem->Get<double>("radius");
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        double length = cylinderElem->Get<double>("length");
+        EXPECT_EQ(length, modelSize[name].z * scaleFactor);
+      }
+
+      // verify collision geom sdf
+      EXPECT_TRUE(linkElem->HasElement("collision"));
+      sdf::ElementPtr collisionElem = linkElem->GetElement("collision");
+
+      EXPECT_TRUE(collisionElem->HasElement("geometry"));
+      sdf::ElementPtr collisionGeomElem = collisionElem->GetElement("geometry");
+      if (collisionGeomElem->HasElement("box"))
+      {
+        sdf::ElementPtr boxElem = collisionGeomElem->GetElement("box");
+        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        EXPECT_EQ(size, modelSize[name] * scaleFactor);
+      }
+      else if (collisionGeomElem->HasElement("sphere"))
+      {
+        sdf::ElementPtr sphereElem = collisionGeomElem->GetElement("sphere");
+        double radius = sphereElem->Get<double>("radius");
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+      }
+      else if (collisionGeomElem->HasElement("cylinder"))
+      {
+        sdf::ElementPtr cylinderElem =
+            collisionGeomElem->GetElement("cylinder");
+        double radius = cylinderElem->Get<double>("radius");
+        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        double length = cylinderElem->Get<double>("length");
+        EXPECT_EQ(length, modelSize[name].z * scaleFactor);
+      }
+      linkElem = linkElem->GetNextElement("link");
+    }
+  }
+}
+////////////////////////////////////////////////////////////////////////
+void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
+{
+  // load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::ostringstream sdfStream;
+  math::Pose pose(0, 0, 0, 0, 0, 0);
+  math::Vector3 boxSize(1, 1, 1);
+  sdfStream << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='box_test'>"
+    << "<allow_auto_disable>false</allow_auto_disable>"
+    << "<link name ='body'>"
+    << "  <pose>" << pose << "</pose>"
+    << "  <inertial>"
+    << "    <mass>4.0</mass>"
+    << "    <inertia>"
+    << "      <ixx>0.1667</ixx> <ixy>0.0</ixy> <ixz>0.0</ixz>"
+    << "      <iyy>0.1667</iyy> <iyz>0.0</iyz>"
+    << "      <izz>0.1667</izz>"
+    << "    </inertia>"
+    << "  </inertial>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <box><size>" << boxSize << "</size></box>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <box><size>" << boxSize << "</size></box>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "  <visual name ='visual2'>"
+    << "    <geometry>"
+    << "      <box><size>" << boxSize << "</size></box>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+  SpawnSDF(sdfStream.str());
+
+  physics::ModelPtr model;
+  model = world->GetModel("box_test");
+  EXPECT_TRUE(model != NULL);
+  msgs::Model msg;
+  model->FillMsg(msg);
+
+  EXPECT_EQ(msg.link_size(), 1);
+  msgs::Link linkMsg = msg.link(0);
+
+  // 3 visuals to be created: 1 link body + 2 visuals
+  EXPECT_EQ(linkMsg.visual_size(), 3);
+
+  // verify link body visual
+  msgs::Visual visualMsg = linkMsg.visual(0);
+  EXPECT_EQ(visualMsg.name(), "box_test::body");
+  EXPECT_TRUE(visualMsg.has_type());
+  EXPECT_EQ(visualMsg.type(), msgs::Visual::LINK);
+  EXPECT_FALSE(visualMsg.has_geometry());
+
+  // verify remaining visual msgs
+  for (int i = 1; i < linkMsg.visual_size(); ++i)
+  {
+    msgs::Visual visualMsg = linkMsg.visual(i);
+    std::stringstream visName;
+    visName << "box_test::body::visual";
+    if (i > 1)
+      visName << i;
+    EXPECT_EQ(visualMsg.name(), visName.str());
+    EXPECT_TRUE(visualMsg.has_type());
+    EXPECT_EQ(visualMsg.type(), msgs::Visual::VISUAL);
+    msgs::Geometry geomMsg = visualMsg.geometry();
+    EXPECT_TRUE(geomMsg.has_box());
+    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize.Ign());
+  }
+}
 
 /////////////////////////////////////////////////
 TEST_P(PhysicsMsgsTest, SetGravity)
@@ -562,6 +789,12 @@ TEST_P(PhysicsMsgsTest, LinkPose)
 TEST_P(PhysicsMsgsTest, SimpleShapeResize)
 {
   SimpleShapeResize(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsMsgsTest, LinkVisualMsg)
+{
+  LinkVisualMsg(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsMsgsTest,

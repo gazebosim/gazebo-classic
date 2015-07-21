@@ -47,6 +47,7 @@ set(tests
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
+  joint_get_force_torque.cc
   joint_revolute.cc
   joint_screw.cc
   joint_set_position_test.cc
@@ -65,26 +66,37 @@ set(tests
   physics_inertia_ratio.cc
   physics_link.cc
   physics_msgs.cc
+  physics_presets.cc
   physics_thread_safe.cc
   pioneer2dx.cc
   plugin.cc
-  polyline.cc
+  rest_web.cc
   road.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_pr2.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
+  swarm.cc
   transceiver.cc
   transport.cc
+  transporter.cc
   world.cc
   world_clone.cc
   world_entity_below_point.cc
   world_population.cc
   worlds_installed.cc
   )
+
+if (HAVE_GTS)
+  set(tests
+    ${tests}
+    polyline.cc
+  )
+endif()
 
 if (MANPAGES_SUPPORT)
   set (tests ${tests}
@@ -95,6 +107,7 @@ gz_build_tests(${tests})
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
+  set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
@@ -138,4 +151,3 @@ if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
 endif()
-

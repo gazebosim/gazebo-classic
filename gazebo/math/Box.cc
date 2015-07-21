@@ -41,6 +41,12 @@ Box::Box(const Vector3 &_vec1, const Vector3 &_vec2)
 }
 
 //////////////////////////////////////////////////
+Box::Box(const ignition::math::Box &_box)
+  : min(_box.Min()), max(_box.Max())
+{
+}
+
+//////////////////////////////////////////////////
 Box::Box(const Box &_b)
   : min(_b.min), max(_b.max), extent(_b.extent)
 {
@@ -159,4 +165,26 @@ bool Box::operator==(const Box &_b) const
 Box Box::operator-(const Vector3 &_v)
 {
   return Box(this->min - _v, this->max - _v);
+}
+
+//////////////////////////////////////////////////
+bool Box::Contains(const Vector3 &_p) const
+{
+  return _p.x >= this->min.x && _p.x <= this->max.x &&
+         _p.y >= this->min.y && _p.y <= this->max.y &&
+         _p.z >= this->min.z && _p.z <= this->max.z;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box Box::Ign() const
+{
+  return ignition::math::Box(this->min.Ign(), this->max.Ign());
+}
+
+//////////////////////////////////////////////////
+Box &Box::operator=(const ignition::math::Box &_b)
+{
+  this->min = _b.Min();
+  this->max = _b.Max();
+  return *this;
 }

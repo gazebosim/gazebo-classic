@@ -20,10 +20,17 @@
  * Date: 18 May 2003
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/Sensor.hh"
 
+void RegisterAltimeterSensor();
 void RegisterCameraSensor();
 void RegisterContactSensor();
 void RegisterDepthCameraSensor();
@@ -31,6 +38,7 @@ void RegisterMultiCameraSensor();
 void RegisterGpsSensor();
 void RegisterGpuRaySensor();
 void RegisterImuSensor();
+void RegisterMagnetometerSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
@@ -47,6 +55,7 @@ std::map<std::string, SensorFactoryFn> SensorFactory::sensorMap;
 /////////////////////////////////////////////////
 void SensorFactory::RegisterAll()
 {
+  RegisterAltimeterSensor();
   RegisterCameraSensor();
   RegisterContactSensor();
   RegisterDepthCameraSensor();
@@ -54,6 +63,7 @@ void SensorFactory::RegisterAll()
   RegisterGpsSensor();
   RegisterGpuRaySensor();
   RegisterImuSensor();
+  RegisterMagnetometerSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();

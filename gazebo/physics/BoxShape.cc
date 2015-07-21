@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 
@@ -68,11 +74,18 @@ void BoxShape::SetScale(const math::Vector3 &_scale)
 void BoxShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::BOX);
-  msgs::Set(_msg.mutable_box()->mutable_size(), this->GetSize());
+  msgs::Set(_msg.mutable_box()->mutable_size(), this->GetSize().Ign());
 }
 
 //////////////////////////////////////////////////
 void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
 {
-  this->SetSize(msgs::Convert(_msg.box().size()));
+  this->SetSize(msgs::ConvertIgn(_msg.box().size()));
+}
+
+//////////////////////////////////////////////////
+double BoxShape::ComputeVolume() const
+{
+  math::Vector3 size = this->GetSize();
+  return size.x * size.y * size.z;
 }

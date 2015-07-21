@@ -41,7 +41,8 @@ TEST(PkgConfig, Config)
   ASSERT_EQ(system(cmd), 0);
 
   // Make
-  snprintf(cmd, sizeof(cmd), "make");
+  snprintf(cmd, sizeof(cmd), "cd %s/test/pkgconfig/plugin; make",
+           PROJECT_BINARY_PATH);
   ASSERT_EQ(system(cmd), 0);
 }
 

@@ -21,7 +21,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -64,14 +64,16 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   double contactSurfaceLayer = 0.02;
 
   // test setting/getting physics engine params
-  odePhysics->SetParam("solver_type", type);
-  odePhysics->SetParam("precon_iters", preconIters);
-  odePhysics->SetParam("iters", iters);
-  odePhysics->SetParam("sor", sor);
-  odePhysics->SetParam("cfm", cfm);
-  odePhysics->SetParam("erp", erp);
-  odePhysics->SetParam("contact_max_correcting_vel", contactMaxCorrectingVel);
-  odePhysics->SetParam("contact_surface_layer", contactSurfaceLayer);
+  EXPECT_TRUE(odePhysics->SetParam("solver_type", type));
+  EXPECT_TRUE(odePhysics->SetParam("precon_iters", preconIters));
+  EXPECT_TRUE(odePhysics->SetParam("iters", iters));
+  EXPECT_TRUE(odePhysics->SetParam("sor", sor));
+  EXPECT_TRUE(odePhysics->SetParam("cfm", cfm));
+  EXPECT_TRUE(odePhysics->SetParam("erp", erp));
+  EXPECT_TRUE(odePhysics->SetParam("contact_max_correcting_vel",
+                                    contactMaxCorrectingVel));
+  EXPECT_TRUE(odePhysics->SetParam("contact_surface_layer",
+                                    contactSurfaceLayer));
 
   boost::any value;
   value = odePhysics->GetParam("solver_type");
@@ -121,16 +123,16 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   contactMaxCorrectingVel = 40;
   contactSurfaceLayer = 0.03;
 
-  odePhysics->SetParam("solver_type", type);
-  odePhysics->SetParam("precon_iters", preconIters);
-  odePhysics->SetParam("iters", iters);
-  odePhysics->SetParam("sor", sor);
-  odePhysics->SetParam("cfm", cfm);
-  odePhysics->SetParam("erp", erp);
-  odePhysics->SetParam("contact_max_correcting_vel",
-      contactMaxCorrectingVel);
-  odePhysics->SetParam("contact_surface_layer",
-      contactSurfaceLayer);
+  EXPECT_TRUE(odePhysics->SetParam("solver_type", type));
+  EXPECT_TRUE(odePhysics->SetParam("precon_iters", preconIters));
+  EXPECT_TRUE(odePhysics->SetParam("iters", iters));
+  EXPECT_TRUE(odePhysics->SetParam("sor", sor));
+  EXPECT_TRUE(odePhysics->SetParam("cfm", cfm));
+  EXPECT_TRUE(odePhysics->SetParam("erp", erp));
+  EXPECT_TRUE(odePhysics->SetParam("contact_max_correcting_vel",
+                                    contactMaxCorrectingVel));
+  EXPECT_TRUE(odePhysics->SetParam("contact_surface_layer",
+                                    contactSurfaceLayer));
 
   value = odePhysics->GetParam("solver_type");
   typeRet = boost::any_cast<std::string>(value);
@@ -166,6 +168,99 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   EXPECT_DOUBLE_EQ(contactMaxCorrectingVel,
       odePhysics->GetContactMaxCorrectingVel());
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, odePhysics->GetContactSurfaceLayer());
+
+  // Test dynamic MOI modification flag
+  {
+    std::vector<std::string> keys;
+    const std::string key1 = "inertia_ratio_reduction";
+    const std::string key2 = "use_dynamic_moi_rescaling";
+    keys.push_back(key1);
+    keys.push_back(key2);
+
+    std::vector<bool> bools;
+    bools.push_back(true);
+    bools.push_back(false);
+
+    // Set each keys with each flag value
+    for (auto const &key : keys)
+    {
+      for (const bool &flag : bools)
+      {
+        gzdbg << "SetParam(" << key << ", " << flag << ")" << std::endl;
+        EXPECT_TRUE(odePhysics->SetParam(key, flag));
+
+        // Check both keys
+        EXPECT_EQ(flag, boost::any_cast<bool>(odePhysics->GetParam(key1)));
+        EXPECT_EQ(flag, boost::any_cast<bool>(odePhysics->GetParam(key2)));
+      }
+    }
+  }
+
+  // Test friction model
+  {
+    // Default value "pyramid_model"
+    const std::string frictionModel = "pyramid_model";
+    EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("friction_model")));
+    EXPECT_EQ(param, frictionModel);
+  }
+
+  {
+    // Switch to "cone_model" using SetFrictionModel
+    const std::string frictionModel = "cone_model";
+    odePhysics->SetFrictionModel(frictionModel);
+    EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("friction_model")));
+    EXPECT_EQ(param, frictionModel);
+  }
+
+  {
+    // Switch to "box_model" using SetParam
+    const std::string frictionModel = "box_model";
+    odePhysics->SetParam("friction_model", frictionModel);
+    EXPECT_EQ(odePhysics->GetFrictionModel(), frictionModel);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("friction_model")));
+    EXPECT_EQ(param, frictionModel);
+  }
+
+  // Test world step solvers
+  {
+    // Default value "ODE_DANTZIG"
+    const std::string worldSolverType = "ODE_DANTZIG";
+    EXPECT_EQ(odePhysics->GetWorldStepSolverType(), worldSolverType);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("world_step_solver")));
+    EXPECT_EQ(param, worldSolverType);
+  }
+
+  {
+    // Switch to "DART_PGS" using SetWorldStepSolverType
+    const std::string worldSolverType = "DART_PGS";
+    odePhysics->SetWorldStepSolverType(worldSolverType);
+    EXPECT_EQ(odePhysics->GetWorldStepSolverType(), worldSolverType);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("world_step_solver")));
+    EXPECT_EQ(param, worldSolverType);
+  }
+
+  {
+    // Switch to "BULLET_PGS" using SetParam
+    const std::string worldSolverType = "BULLET_PGS";
+    odePhysics->SetParam("world_step_solver", worldSolverType);
+    EXPECT_EQ(odePhysics->GetWorldStepSolverType(), worldSolverType);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("world_step_solver")));
+    EXPECT_EQ(param, worldSolverType);
+  }
 }
 
 /////////////////////////////////////////////////

@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Rand.hh>
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/math/SignalStats.hh"
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"
 
 using namespace gazebo;
@@ -161,7 +162,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
                                       const std::string &_solverType)
 {
-  math::Rand::SetSeed(0);
+  ignition::math::Rand::Seed(0);
   // Load world
   Load("worlds/revolute_joint_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -677,7 +678,8 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     // test with global contact_max_correcting_vel at 100
     // here we expect much lower energy loss
     world->Reset();
-    physicsEngine->SetContactMaxCorrectingVel(100);
+    if (_physicsEngine == "ode")
+      EXPECT_TRUE(physicsEngine->SetParam("contact_max_correcting_vel", 100.0));
 
     int steps = 10;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)

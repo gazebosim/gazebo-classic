@@ -78,6 +78,13 @@ namespace gazebo
       /// \brief Number of steps in increment by.
       public: int stepInc;
 
+      /// \brief Stores the simulation time target during a 'seek' operation.
+      public: common::Time targetSimTime;
+
+      /// \brief When there is a 'seek' command pending during a log file
+      /// playback this member variable should be true.
+      public: bool seekPending;
+
       /// \brief All the event connections.
       public: event::Connection_V connections;
 
@@ -107,6 +114,9 @@ namespace gazebo
 
       /// \brief Subscriber to world control messages.
       public: transport::SubscriberPtr controlSub;
+
+      /// \brief Subscriber to log playback control messages.
+      public: transport::SubscriberPtr playbackControlSub;
 
       /// \brief Subscriber to factory messages.
       public: transport::SubscriberPtr factorySub;
@@ -285,6 +295,9 @@ namespace gazebo
       /// this flag is set to trigger Entity::SetWorldPose on the
       /// physics::Link in World::Update.
       public: std::list<Entity*> dirtyPoses;
+
+      /// \brief Class to manage preset simulation parameter profiles.
+      public: PresetManagerPtr presetManager;
     };
   }
 }

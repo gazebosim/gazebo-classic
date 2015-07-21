@@ -75,7 +75,8 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
+    class GZ_RENDERING_VISIBLE Camera :
+      public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -212,7 +213,7 @@ namespace gazebo
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters
       /// \param[in] _far Far clip distance in meters
-      public: void SetClipDist(float _near, float _far);
+      public: virtual void SetClipDist(float _near, float _far);
 
       /// \brief Set the camera FOV (horizontal)
       /// \param[in] _radians Horizontal field of view
@@ -334,11 +335,11 @@ namespace gazebo
 
       /// \brief Get the average FPS
       /// \return The average frames per second
-      public: virtual float GetAvgFPS() const {return 0;}
+      public: virtual float GetAvgFPS() const;
 
       /// \brief Get the triangle count
       /// \return The current triangle count
-      public: virtual unsigned int GetTriangleCount() const {return 0;}
+      public: virtual unsigned int GetTriangleCount() const;
 
       /// \brief Set the aspect ratio
       /// \param[in] _ratio The aspect ratio (width / height) in pixels
@@ -529,6 +530,18 @@ namespace gazebo
       /// \return Distortion model.
       public: DistortionPtr GetDistortion() const;
 
+      /// \brief Set the type of projection used by the camera.
+      /// \param[in] _type The type of projection: "perspective" or
+      /// "orthographic".
+      /// \return True if successful.
+      /// \sa GetProjectionType()
+      public: virtual bool SetProjectionType(const std::string &_type);
+
+      /// \brief Return the projection type as a string.
+      /// \return "perspective" or "orthographic"
+      /// \sa SetProjectionType(const std::string &_type)
+      public: std::string GetProjectionType() const;
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
@@ -591,6 +604,9 @@ namespace gazebo
       /// \brief Internal function used to indicate that an animation has
       /// completed.
       protected: virtual void AnimationComplete();
+
+      /// \brief Update the camera's field of view.
+      protected: virtual void UpdateFOV();
 
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats

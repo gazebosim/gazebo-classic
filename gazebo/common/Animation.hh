@@ -21,14 +21,17 @@
 #include <vector>
 #include "gazebo/util/system.hh"
 
-namespace gazebo
+namespace ignition
 {
   namespace math
   {
     class Spline;
     class RotationSpline;
   }
+}
 
+namespace gazebo
+{
   /// \ingroup gazebo_common
   /// \brief Common namespace
 
@@ -44,7 +47,7 @@ namespace gazebo
     /// \class Animation Animation.hh common/common.hh
     /// \brief Manages an animation, which is a collection of keyframes and
     /// the ability to interpolate between the keyframes
-    class GAZEBO_VISIBLE Animation
+    class GZ_COMMON_VISIBLE Animation
     {
       /// \brief Constructor
       /// \param[in] _name Name of the animation, should be unique
@@ -122,7 +125,7 @@ namespace gazebo
     /// \{
 
     /// \brief A pose animation.
-    class GAZEBO_VISIBLE PoseAnimation : public Animation
+    class GZ_COMMON_VISIBLE PoseAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.
@@ -153,10 +156,10 @@ namespace gazebo
       protected: void BuildInterpolationSplines() const;
 
       /// \brief smooth interpolation for position
-      private: mutable math::Spline *positionSpline;
+      private: mutable ignition::math::Spline *positionSpline;
 
       /// \brief smooth interpolation for rotation
-      private: mutable math::RotationSpline *rotationSpline;
+      private: mutable ignition::math::RotationSpline *rotationSpline;
     };
     /// \}
 
@@ -164,7 +167,7 @@ namespace gazebo
     /// \{
 
     /// \brief A numeric animation.
-    class GAZEBO_VISIBLE NumericAnimation : public Animation
+    class GZ_COMMON_VISIBLE NumericAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.

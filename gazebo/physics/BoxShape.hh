@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class BoxShape BoxShape.hh physics/physcs.hh
     /// \brief Box geometry primitive.
-    class GAZEBO_VISIBLE BoxShape : public Shape
+    class GZ_PHYSICS_VISIBLE BoxShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
@@ -65,6 +65,9 @@ namespace gazebo
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
     };
     /// \}
   }

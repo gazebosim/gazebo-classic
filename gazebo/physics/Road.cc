@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -89,7 +95,7 @@ void Road::Init()
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   while (pointElem)
   {
-    math::Vector3 point = pointElem->Get<math::Vector3>();
+    ignition::math::Vector3d point = pointElem->Get<ignition::math::Vector3d>();
     pointElem = pointElem->GetNextElement("point");
 
     msgs::Vector3d *ptMsg = msg.add_point();

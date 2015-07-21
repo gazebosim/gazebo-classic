@@ -31,7 +31,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief ODE Link class.
-    class GAZEBO_VISIBLE ODELink : public Link
+    class GZ_PHYSICS_ODE_VISIBLE ODELink : public Link
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent model.
@@ -90,6 +90,10 @@ namespace gazebo
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force,
                   const math::Vector3 &_relpos);
+
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
 
       // Documentation inherited
       public: virtual void AddTorque(const math::Vector3 &_torque);

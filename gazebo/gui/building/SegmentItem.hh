@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class SegmentItem SegmentItem.hh
     /// \brief 2D line segment.
-    class GAZEBO_VISIBLE SegmentItem
+    class GZ_GUI_BUILDING_VISIBLE SegmentItem
       : public EditorItem, public QGraphicsLineItem
     {
       /// \brief Constructor

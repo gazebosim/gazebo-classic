@@ -14,14 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef BVHLOADER_HH
-#define BVHLOADER_HH
+#ifndef _GAZEBO_BVHLOADER_HH_
+#define _GAZEBO_BVHLOADER_HH_
 
-#include <vector>
-#include <map>
 #include <string>
 
-#include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 
 #define X_POSITION 0
@@ -42,7 +39,7 @@ namespace gazebo
 
     /// \class BVHLoader BVHLoader.hh common/common.hh
     /// \brief Handles loading BVH animation files
-    class GAZEBO_VISIBLE BVHLoader
+    class GZ_COMMON_VISIBLE BVHLoader
     {
       /// \brief Constructor
       public: BVHLoader();

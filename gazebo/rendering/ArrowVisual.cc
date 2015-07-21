@@ -35,6 +35,7 @@ ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VT_GUI;
   dPtr->headNode = NULL;
   dPtr->shaftNode = NULL;
   dPtr->rotationNode = NULL;
@@ -101,13 +102,10 @@ void ArrowVisual::ShowShaft(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
+  dPtr->sceneNode->removeChild(dPtr->shaftNode);
   if (_show)
   {
     dPtr->sceneNode->addChild(dPtr->shaftNode);
-  }
-  else
-  {
-    dPtr->sceneNode->removeChild(dPtr->shaftNode);
   }
 }
 
@@ -117,13 +115,10 @@ void ArrowVisual::ShowHead(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
+  dPtr->sceneNode->removeChild(dPtr->headNode);
   if (_show)
   {
     dPtr->sceneNode->addChild(dPtr->headNode);
-  }
-  else
-  {
-    dPtr->sceneNode->removeChild(dPtr->headNode);
   }
 }
 
@@ -133,6 +128,7 @@ void ArrowVisual::ShowRotation(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
+  dPtr->sceneNode->removeChild(dPtr->rotationNode);
   if (_show)
   {
     Ogre::MovableObject *rotationObj = dPtr->rotationNode->getAttachedObject(0);
@@ -144,9 +140,5 @@ void ArrowVisual::ShowRotation(bool _show)
     }
     dPtr->rotationNode->setVisible(this->GetVisible());
     dPtr->sceneNode->addChild(dPtr->rotationNode);
-  }
-  else
-  {
-    dPtr->sceneNode->removeChild(dPtr->rotationNode);
   }
 }

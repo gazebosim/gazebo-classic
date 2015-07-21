@@ -27,7 +27,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A slider joint
-    class GAZEBO_VISIBLE DARTSliderJoint : public SliderJoint<DARTJoint>
+    class GZ_PHYSICS_VISIBLE DARTSliderJoint : public SliderJoint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Pointer to the Link that is the joint' parent
@@ -69,9 +69,6 @@ namespace gazebo
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
-
-      /// \brief Prismatic joint of DART
-      protected: dart::dynamics::PrismaticJoint *dtPrismaticJoint;
     };
   }
 }

@@ -15,6 +15,14 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/MeshShape.hh"
@@ -27,9 +35,6 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SonarSensor.hh"
@@ -139,14 +144,14 @@ void SonarSensor::Load(const std::string &_worldName)
 
   // Use a scaled cone mesh for the sonar collision shape.
   this->sonarShape->SetMesh("unit_cone");
-  this->sonarShape->SetScale(math::Vector3(this->radius*2.0,
+  this->sonarShape->SetScale(ignition::math::Vector3d(this->radius*2.0,
         this->radius*2.0, range));
 
   // Position the collision shape properly. Without this, the shape will be
   // centered at the start of the sonar.
-  math::Vector3 offset(0, 0, range * 0.5);
-  offset = this->pose.rot.RotateVector(offset);
-  this->sonarMidPose.Set(this->pose.pos - offset, this->pose.rot);
+  ignition::math::Vector3d offset(0, 0, range * 0.5);
+  offset = this->pose.Rot().RotateVector(offset);
+  this->sonarMidPose.Set(this->pose.Pos() - offset, this->pose.Rot());
 
   this->sonarCollision->SetRelativePose(this->sonarMidPose);
   this->sonarCollision->SetInitialRelativePose(this->sonarMidPose);
@@ -247,8 +252,9 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
   this->lastMeasurementTime = this->world->GetSimTime();
   msgs::Set(this->sonarMsg.mutable_time(), this->lastMeasurementTime);
 
-  math::Pose referencePose = this->pose + this->parentEntity->GetWorldPose();
-  math::Vector3 pos;
+  ignition::math::Pose3d referencePose =
+    this->pose + this->parentEntity->GetWorldPose().Ign();
+  ignition::math::Vector3d pos;
 
   if (!this->incomingContacts.empty())
     this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
@@ -266,9 +272,9 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
 
       for (int j = 0; j < (*iter)->contact(i).position_size(); ++j)
       {
-        pos = msgs::Convert((*iter)->contact(i).position(j));
-        math::Vector3 relPos = pos - referencePose.pos;
-        double len = pos.Distance(referencePose.pos);
+        pos = msgs::ConvertIgn((*iter)->contact(i).position(j));
+        ignition::math::Vector3d relPos = pos - referencePose.Pos();
+        double len = pos.Distance(referencePose.Pos());
 
         // Debug output:
         // std::cout << "  SP[" << this->pose.pos << "]  P[" << pos

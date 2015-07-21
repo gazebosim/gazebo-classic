@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Class to manager all sensors
- * Author: Nate Koenig
- * Date: 18 Dec 2009
- */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 

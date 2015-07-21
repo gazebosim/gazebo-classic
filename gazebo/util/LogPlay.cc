@@ -14,6 +14,11 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
@@ -27,7 +32,7 @@
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -54,7 +59,10 @@ void LogPlay::Open(const std::string &_logFile)
 {
   boost::filesystem::path path(_logFile);
   if (!boost::filesystem::exists(path))
-    gzthrow("Invalid logfile[" + _logFile + "]. Does not exist.");
+    gzthrow("Invalid logfile [" + _logFile + "]. Does not exist.");
+
+  if (boost::filesystem::is_directory(path))
+    gzthrow("Invalid logfile [" + _logFile + "]. This is a directory.");
 
   // Parse the log file
   if (!this->xmlDoc.LoadFile(_logFile))
@@ -74,6 +82,12 @@ void LogPlay::Open(const std::string &_logFile)
 
   this->logCurrXml = this->logStartXml;
   this->encoding.clear();
+
+  // Extract the start/end log times from the log.
+  this->ReadLogTimes();
+
+  // Extract the initial "iterations" value from the log.
+  this->iterationsFound = this->ReadIterations();
 }
 
 /////////////////////////////////////////////////
@@ -86,15 +100,30 @@ std::string LogPlay::GetHeader() const
          << "<log_version>" << this->logVersion << "</log_version>\n"
          << "<gazebo_version>" << this->gazeboVersion << "</gazebo_version>\n"
          << "<rand_seed>" << this->randSeed << "</rand_seed>\n"
+         << "<log_start>" << this->logStartTime << "</log_start>\n"
+         << "<log_end>" << this->logEndTime << "</log_end>\n"
          << "</header>\n";
 
   return stream.str();
 }
 
 /////////////////////////////////////////////////
+uint64_t LogPlay::GetInitialIterations() const
+{
+  return this->initialIterations;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::HasIterations() const
+{
+  return this->iterationsFound;
+}
+
+
+/////////////////////////////////////////////////
 void LogPlay::ReadHeader()
 {
-  this->randSeed = math::Rand::GetSeed();
+  this->randSeed = ignition::math::Rand::Seed();
   TiXmlElement *headerXml, *childXml;
 
   this->logVersion.clear();
@@ -112,6 +141,15 @@ void LogPlay::ReadHeader()
   else
     this->logVersion = childXml->GetText();
 
+  if (this->logVersion != GZ_LOG_VERSION)
+  {
+    gzwarn << "Log version[" << this->logVersion << "] in file["
+           << this->filename
+           << "] does not match Gazebo's log version["
+           << GZ_LOG_VERSION << "]\n";
+    return;
+  }
+
   // Get the gazebo version
   childXml = headerXml->FirstChildElement("gazebo_version");
   if (!childXml)
@@ -126,14 +164,101 @@ void LogPlay::ReadHeader()
   else
     this->randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
 
-  if (this->logVersion != GZ_LOG_VERSION)
-    gzwarn << "Log version[" << this->logVersion << "] in file["
-           << this->filename
-           << "] does not match Gazebo's log version["
-           << GZ_LOG_VERSION << "]\n";
-
   /// Set the random number seed for simulation
-  math::Rand::SetSeed(this->randSeed);
+  ignition::math::Rand::Seed(this->randSeed);
+}
+
+/////////////////////////////////////////////////
+void LogPlay::ReadLogTimes()
+{
+  if (this->GetChunkCount() < 2u)
+  {
+    gzwarn << "Unable to extract log timing information. No chunks available "
+           << "with <sim_time> information." << std::endl;
+    return;
+  }
+
+  const std::string kStartDelim = "<sim_time>";
+  const std::string kEndDelim = "</sim_time>";
+  std::string chunk;
+
+  // Read the start time of the log from the first chunk.
+  this->GetChunk(1, chunk);
+
+  // Find the first <sim_time> of the log.
+  auto from = chunk.find(kStartDelim);
+  auto to = chunk.find(kEndDelim, from + kStartDelim.size());
+  if (from != std::string::npos && to != std::string::npos)
+  {
+    auto length = to - from - kStartDelim.size();
+    std::string startTime = chunk.substr(from + kStartDelim.size(), length);
+    std::stringstream ss(startTime);
+    ss >> this->logStartTime;
+  }
+  else
+  {
+    gzwarn << "Unable to find <sim_time>...</sim_time> tags in the first chunk."
+           << std::endl;
+    return;
+  }
+
+  this->GetChunk(this->GetChunkCount() - 1, chunk);
+
+  // Update the last <sim_time> of the log.
+  to = chunk.rfind(kEndDelim);
+  from = chunk.rfind(kStartDelim, to - 1);
+
+  if (from != std::string::npos && to != std::string::npos)
+  {
+    auto length = to - from - kStartDelim.size();
+    std::string endTime = chunk.substr(from + kStartDelim.size(), length);
+    std::stringstream ss(endTime);
+    ss >> this->logEndTime;
+  }
+  else
+  {
+    gzwarn << "Unable to find <sim_time>...</sim_time> tags in the last chunk."
+           << std::endl;
+    return;
+  }
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::ReadIterations()
+{
+  if (this->GetChunkCount() < 2u)
+  {
+    gzwarn << "Unable to extract iteration information. No chunks available "
+           << "with <iterations> information. Assuming that the first "
+           << "<iterations> value is 0." << std::endl;
+    return false;
+  }
+
+  const std::string kStartDelim = "<iterations>";
+  const std::string kEndDelim = "</iterations>";
+  std::string chunk;
+
+  // Read the first "iterations" value of the log from the first chunk.
+  this->GetChunk(1, chunk);
+
+  // Find the first <iterations> of the log.
+  auto from = chunk.find(kStartDelim);
+  auto to = chunk.find(kEndDelim, from + kStartDelim.size());
+  if (from != std::string::npos && to != std::string::npos)
+  {
+    auto length = to - from - kStartDelim.size();
+    std::string iterations = chunk.substr(from + kStartDelim.size(), length);
+    std::stringstream ss(iterations);
+    ss >> this->initialIterations;
+    return true;
+  }
+  else
+  {
+    gzwarn << "Unable to find <iterations>...</iterations> tags in the first "
+           << "chunk. Assuming that the first <iterations> value is 0."
+           << std::endl;
+    return false;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -161,8 +286,42 @@ uint32_t LogPlay::GetRandSeed() const
 }
 
 /////////////////////////////////////////////////
+common::Time LogPlay::GetLogStartTime() const
+{
+  return this->logStartTime;
+}
+
+/////////////////////////////////////////////////
+common::Time LogPlay::GetLogEndTime() const
+{
+  return this->logEndTime;
+}
+
+/////////////////////////////////////////////////
+std::string LogPlay::GetFilename() const
+{
+  return boost::filesystem::basename(this->filename) +
+    boost::filesystem::extension(this->filename);
+}
+
+/////////////////////////////////////////////////
+std::string LogPlay::GetFullPathFilename() const
+{
+  const boost::filesystem::path logFilename(this->filename);
+  return boost::filesystem::canonical(logFilename).string();
+}
+
+/////////////////////////////////////////////////
+uintmax_t LogPlay::GetFileSize() const
+{
+  return boost::filesystem::file_size(this->filename);
+}
+
+/////////////////////////////////////////////////
 bool LogPlay::Step(std::string &_data)
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   std::string startMarker = "<sdf ";
   std::string endMarker = "</sdf>";
   size_t start = this->currentChunk.find(startMarker);
@@ -198,6 +357,22 @@ bool LogPlay::Step(std::string &_data)
   _data = this->currentChunk.substr(start, end+endMarker.size()-start);
 
   this->currentChunk.erase(0, end + endMarker.size());
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::Rewind()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  this->currentChunk.clear();
+  this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+  if (!logCurrXml)
+  {
+    gzerr << "Unable to jump to the beginning of the log file\n";
+    return false;
+  }
 
   return true;
 }

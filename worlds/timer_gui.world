@@ -4,9 +4,33 @@
 
     <gui>
       <plugin name="timer_gui" filename="libTimerGUIPlugin.so">
-        <topic>~/timer_control</topic>
+        <topic>~/timer_control_1</topic>
         <pos>10 10</pos>
-        <size>150 30</size>
+        <size>1 1</size>
+      </plugin>
+
+      <plugin name="timer_start_reset_buttons" filename="libTimerGUIPlugin.so">
+        <topic>~/timer_control_2</topic>
+        <pos>210 10</pos>
+        <size>200 180</size>
+        <start_stop_button>1</start_stop_button>
+        <reset_button>1</reset_button>
+      </plugin>
+
+      <plugin name="timer_start_button" filename="libTimerGUIPlugin.so">
+        <topic>~/timer_control_3</topic>
+        <pos>-20 -20</pos>
+        <start_stop_button>1</start_stop_button>
+        <reset_button>0</reset_button>
+      </plugin>
+
+      <!-- Countdown timer -->
+      <plugin name="timer_countdown" filename="libTimerGUIPlugin.so">
+        <topic>~/timer_control_4</topic>
+        <pos>460 10</pos>
+        <start_stop_button>1</start_stop_button>
+        <reset_button>1</reset_button>
+        <countdown_time>5 5000</countdown_time>
       </plugin>
     </gui>
 

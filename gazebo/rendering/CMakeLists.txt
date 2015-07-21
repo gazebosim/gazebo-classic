@@ -2,17 +2,27 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
+  ${TBB_INCLUDEDIR}
   skyx
   skyx/include
 )
 
-if (${OGRE_VERSION} GREATER 1.7.4)
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   add_subdirectory(deferred_shading)
 endif()
+
 add_subdirectory(skyx)
 add_subdirectory(selection_buffer)
 
+if (WIN32)
+  include_directories(${libdl_include_dir})
+endif()
+
+include_directories(${tinyxml_INCLUDE_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS})
+
 set (sources
+  ApplyWrenchVisual.cc
   ArrowVisual.cc
   AxisVisual.cc
   Camera.cc
@@ -28,13 +38,17 @@ set (sources
   GpuLaser.cc
   Grid.cc
   Heightmap.cc
+  InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LinkFrameVisual.cc
   SonarVisual.cc
   Light.cc
   Material.cc
   MovableText.cc
   OrbitViewController.cc
+  OriginVisual.cc
+  OrthoViewController.cc
   Projector.cc
   RayQuery.cc
   RenderEngine.cc
@@ -56,7 +70,17 @@ set (sources
   WrenchVisual.cc
 )
 
+if (NOT USE_EXTERNAL_TINYXML)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+endif()
+
 set (headers
+  ApplyWrenchVisual.hh
   ArrowVisual.hh
   AxisVisual.hh
   Camera.hh
@@ -72,13 +96,17 @@ set (headers
   GpuLaser.hh
   Grid.hh
   Heightmap.hh
+  InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LinkFrameVisual.hh
   SonarVisual.hh
   Light.hh
   Material.hh
   MovableText.hh
   OrbitViewController.hh
+  OriginVisual.hh
+  OrthoViewController.hh
   Projector.hh
   RayQuery.hh
   RenderEngine.hh
@@ -111,15 +139,19 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-set (gtest_sources
-)
+set (gtest_sources)
 
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
+  COMVisual_TEST.cc
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
+  LinkFrameVisual_TEST.cc
+  OriginVisual_TEST.cc
+  Scene_TEST.cc
+  SelectionObj_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
   Visual_TEST.cc
@@ -139,6 +171,11 @@ link_directories(
   ${ogre_library_dirs}
 )
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_RENDERING")
+if (WIN32)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
+endif()
+
 gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries(gazebo_rendering
@@ -149,19 +186,18 @@ target_link_libraries(gazebo_rendering
   gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
+  ${tinyxml_LIBRARIES}
 )
 
 if (HAVE_OCULUS)
-  target_link_libraries(gazebo_rendering
-    OculusVR
-  )
+  target_link_libraries(gazebo_rendering ${OculusVR_LIBRARIES})
 endif()
 
-if (NOT APPLE)
+if (NOT APPLE AND NOT WIN32)
   target_link_libraries(gazebo_rendering X11)
 endif()
 
-if (${OGRE_VERSION} GREATER 1.7.4)
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
 endif()
 

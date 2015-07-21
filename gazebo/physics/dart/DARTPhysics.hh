@@ -35,12 +35,15 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class.
+    class DARTPhysicsPrivate;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_dart DART Physics
     /// \{
 
     /// \brief DART physics engine
-    class GAZEBO_VISIBLE DARTPhysics : public PhysicsEngine
+    class GZ_PHYSICS_VISIBLE DARTPhysics : public PhysicsEngine
     {
       /// \enum DARTParam
       /// \brief DART physics parameter types.
@@ -132,6 +135,10 @@ namespace gazebo
       public: virtual boost::any GetParam(const std::string &_key) const;
 
       // Documentation inherited
+      public: virtual bool GetParam(const std::string &_key,
+                  boost::any &_value) const;
+
+      // Documentation inherited
       public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
@@ -151,8 +158,9 @@ namespace gazebo
       private: DARTLinkPtr FindDARTLink(
           const dart::dynamics::BodyNode *_dtBodyNode);
 
-      /// \brief Pointer to DART World associated with this DART Physics.
-      private: dart::simulation::World *dtWorld;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: DARTPhysicsPrivate *dataPtr;
     };
 
   /// \}

@@ -14,6 +14,7 @@ add_definitions(${Simbody_CFLAGS})
 set (sources
 SimbodyBallJoint.cc
 SimbodyCollision.cc
+SimbodyFixedJoint.cc
 SimbodyHeightmapShape.cc
 SimbodyHinge2Joint.cc
 SimbodyHingeJoint.cc
@@ -36,6 +37,7 @@ set (headers
 SimbodyBallJoint.hh
 SimbodyBoxShape.hh
 SimbodyCollision.hh
+SimbodyFixedJoint.hh
 SimbodyCylinderShape.hh
 SimbodyHeightmapShape.hh
 SimbodyHinge2Joint.hh
@@ -59,7 +61,8 @@ SimbodyUniversalJoint.hh
 )
 
 gz_add_library(gazebo_physics_simbody ${sources})
-target_link_libraries(gazebo_physics_simbody ${Simbody_LIBRARIES})
+target_link_libraries(gazebo_physics_simbody
+    ${Simbody_LIBRARIES})
 
 gz_install_library(gazebo_physics_simbody)
 gz_install_includes("physics/simbody" ${headers})

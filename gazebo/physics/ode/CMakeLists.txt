@@ -4,11 +4,17 @@ include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
 
 link_directories(
   ${CCD_LIBRARY_DIRS}
+  ${Boost_LIBRARY_DIRS}
 )
+
+if (WIN32)
+  add_definitions(-DBUILDING_DLL_GZ_PHYSICS_ODE)
+endif()
 
 set (sources
   ODEBallJoint.cc
   ODECollision.cc
+  ODEFixedJoint.cc
   ODEGearboxJoint.cc
   ODEHeightmapShape.cc
   ODEHinge2Joint.cc
@@ -33,6 +39,7 @@ SET (headers
   ODEBoxShape.hh
   ODECollision.hh
   ODECylinderShape.hh
+  ODEFixedJoint.hh
   ODEGearboxJoint.hh
   ODEHeightmapShape.hh
   ODEHinge2Joint.hh
@@ -64,8 +71,8 @@ gz_add_library(gazebo_physics_ode ${headers} ${sources})
 target_link_libraries(gazebo_physics_ode
   gazebo_ode
   gazebo_opcode
-  gazebo_math
   gazebo_common
+  gazebo_math
   ${TBB_LIBRARIES}
 )
 
