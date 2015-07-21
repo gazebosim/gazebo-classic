@@ -32,14 +32,6 @@
       </volume>
     </region>
 
-<!--   this only works in Mentor2 
-    <event>
-      <name>connect</name>
-      <type>topic</type>
-      <topic_name>~/simple/connection</topic_name>
-    </event>
--->
-
     <event>
       <name>NewBeer</name>
       <type>existence</type>
@@ -68,7 +60,7 @@
       <name>Sim</name>
       <type>sim_state</type>
     </event>
-    
+
     <!-- bounding box intersection event-->
     <event>
       <name>Can1_in_0_0</name>
@@ -84,9 +76,21 @@
       <model>can1</model>
       <region>end</region>
     </event>
+
+    <!-- Joint trigger events  -->
+    <event>
+      <name>upper_joint_up</name>
+      <type>joint_position</type>
+      <model>pendulum</model>
+      <joint>upper_joint</joint>
+      <min>0.3</min>
+      <max>0.5</max>
+    </event>
+    <!-- Close the plugin element  -->
     </plugin>
-    
-    <!-- 
+
+
+    <!--
     spawn a few beers in the world (not coke cans, they have
     meshes that can't be loaded with all engines yet
     -->
@@ -114,6 +118,11 @@
       <uri>model://beer</uri>
     </include>
 
+    <include>
+      <pose>1 1 0 0 0 0</pose>
+      <name>pendulum</name>
+      <uri>model:://double_pendulum_with_base</uri>
+    </include>
 
   </world>
 </sdf>
