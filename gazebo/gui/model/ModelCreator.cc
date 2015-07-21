@@ -691,7 +691,8 @@ std::string ModelCreator::AddShape(LinkType _type,
         // Swap X and Y so Z will point up
         // (in 2D it points into the screen)
         sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-        pointElem->Set(math::Vector2d(pt.Y()*_size.y, pt.X()*_size.x));
+        pointElem->Set(
+            ignition::math::Vector2d(pt.Y()*_size.y, pt.X()*_size.x));
       }
     }
   }

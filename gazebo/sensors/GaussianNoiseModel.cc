@@ -120,6 +120,8 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
   // negative).
   if (ignition::math::Rand::DblUniform() < 0.5)
     this->bias = -this->bias;
+
+  /// \todo Remove this, and use Noise::Print. See ImuSensor for an example
   gzlog << "applying Gaussian noise model with mean " << this->mean
     << ", stddev " << this->stdDev
     << ", bias " << this->bias << std::endl;
@@ -180,6 +182,16 @@ double GaussianNoiseModel::GetBias() const
 }
 
 //////////////////////////////////////////////////
+void GaussianNoiseModel::Print(std::ostream &_out) const
+{
+  _out << "Gaussian noise, mean[" << this->mean << "], "
+    << "stdDev[" << this->stdDev << "] "
+    << "bias[" << this->bias << "] "
+    << "precision[" << this->precision << "] "
+    << "quantized[" << this->quantized << "]";
+}
+
+//////////////////////////////////////////////////
 ImageGaussianNoiseModel::ImageGaussianNoiseModel()
   : GaussianNoiseModel()
 {
@@ -221,4 +233,14 @@ void ImageGaussianNoiseModel::Fini()
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
   }
+}
+
+//////////////////////////////////////////////////
+void ImageGaussianNoiseModel::Print(std::ostream &_out) const
+{
+  _out << "Image Gaussian noise, mean[" << this->mean << "], "
+    << "stdDev[" << this->stdDev << "] "
+    << "bias[" << this->bias << "] "
+    << "precision[" << this->precision << "] "
+    << "quantized[" << this->quantized << "]";
 }
