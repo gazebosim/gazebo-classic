@@ -11,7 +11,7 @@ namespace gazebo
   class RegionEventBoxPlugin : public ModelPlugin
   {
   	public: RegionEventBoxPlugin()
-  		: ModelPlugin()
+  		: ModelPlugin(), eventPub(0)
   	{
   	  this->receiveMutex = new boost::mutex();
   	  this->hasStaleSizeAndPose = true;
@@ -30,23 +30,25 @@ namespace gazebo
       this->modelSub = this->node->Subscribe("~/model/info", &RegionEventBoxPlugin::OnModelMsg, this);
       this->poseSub = this->node->Subscribe("~/pose/info", &RegionEventBoxPlugin::OnPoseMsg, this);
 
-      this->eventPub = this->node->Advertise<gazebo::msgs::SimEvent>("/gazebo/sim_events");
-      this->eventSource = gazebo::EventSourcePtr(new EventSource(eventPub, "inclusion", this->world));
-
       if (_sdf->HasElement("event")) {
-      	this->eventSource->Load(_sdf->GetElement("event"));
+
+      	sdf::ElementPtr event = _sdf->GetElement("event");
+      	std::string eventType = event->Get<std::string>("type");
+
+      	if (eventType == "inclusion") {
+          this->eventPub = this->node->Advertise<gazebo::msgs::SimEvent>("/gazebo/sim_events");
+          this->eventSource = gazebo::EventSourcePtr(new EventSource(eventPub, eventType, this->world));
+      		this->eventSource->Load(event);
+      	}
+
       }
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&RegionEventBoxPlugin::OnUpdate, this, _1));
-
     }
 
   	public: void OnModelMsg(ConstModelPtr & _msg)
   	{
-  		std::string modelMsgName = _msg->name();
-
   	  boost::mutex::scoped_lock lock(*this->receiveMutex);
-//			std::cerr << "RegionEventBoxPlugin::OnModelMsg(): name=" << modelMsgName << std::endl << std::flush;
 
 			if (_msg->has_name() && _msg->name() == this->modelName)
 			{
@@ -58,7 +60,6 @@ namespace gazebo
   	public:void OnPoseMsg(ConstPosesStampedPtr &_msg)
   	{
   	  boost::mutex::scoped_lock lock(*this->receiveMutex);
-//			std::cout << "RegionEventBoxPlugin::OnPoseMsg()..." << std::endl << std::flush;
 
 			for (int i = 0; i < _msg->pose_size(); i++)
 			{
@@ -104,13 +105,17 @@ namespace gazebo
 				{
 					if (it == this->insiders.end()) {
 						this->insiders[model->GetName()] = _info.realTime;
-						this->SendEnteringRegionEvent(model);
+						if (this->eventPub) {
+							this->SendEnteringRegionEvent(model);
+						}
 					}
 				}
 				else
 				{
 					if (it != this->insiders.end()) {
-						this->SendExitingRegionEvent(model);
+						if (this->eventPub) {
+							this->SendExitingRegionEvent(model);
+						}
 						this->insiders.erase(model->GetName());
 					}
 				}
