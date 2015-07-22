@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_WORLD_PRIVATE_HH_
 #define _GAZEBO_WORLD_PRIVATE_HH_
 
+#include <atomic>
 #include <deque>
 #include <vector>
 #include <list>
@@ -298,6 +299,10 @@ namespace gazebo
 
       /// \brief Class to manage preset simulation parameter profiles.
       public: PresetManagerPtr presetManager;
+
+      /// \brief True if sensors have been initialized. This should be set
+      /// by the SensorManager.
+      public: std::atomic_bool sensorsInitialized;
     };
   }
 }

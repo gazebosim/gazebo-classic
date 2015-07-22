@@ -1,32 +1,31 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(${BULLET_INCLUDE_DIRS})
-
 link_directories(${BULLET_LIBRARY_DIRS})
-
 add_definitions(${BULLET_CFLAGS})
 
-set (sources
-  BulletBallJoint.cc
-  BulletCollision.cc
-  BulletFixedJoint.cc
-  BulletHeightmapShape.cc
-  BulletHinge2Joint.cc
-  BulletHingeJoint.cc
-  BulletJoint.cc
-  BulletLink.cc
-  BulletMesh.cc
-  BulletMeshShape.cc
-  BulletMotionState.cc
-  BulletMultiRayShape.cc
-  BulletPhysics.cc
-  BulletPolylineShape.cc
-  BulletRayShape.cc
-  BulletScrewJoint.cc
-  BulletSliderJoint.cc
-  BulletSurfaceParams.cc
-  BulletUniversalJoint.cc
-  gzBtUniversalConstraint.cc
+set (sources ${sources}
+  bullet/BulletBallJoint.cc
+  bullet/BulletCollision.cc
+  bullet/BulletFixedJoint.cc
+  bullet/BulletHeightmapShape.cc
+  bullet/BulletHinge2Joint.cc
+  bullet/BulletHingeJoint.cc
+  bullet/BulletJoint.cc
+  bullet/BulletLink.cc
+  bullet/BulletMesh.cc
+  bullet/BulletMeshShape.cc
+  bullet/BulletMotionState.cc
+  bullet/BulletMultiRayShape.cc
+  bullet/BulletPhysics.cc
+  bullet/BulletPolylineShape.cc
+  bullet/BulletRayShape.cc
+  bullet/BulletScrewJoint.cc
+  bullet/BulletSliderJoint.cc
+  bullet/BulletSurfaceParams.cc
+  bullet/BulletUniversalJoint.cc
+  bullet/gzBtUniversalConstraint.cc
+  PARENT_SCOPE
 )
 
 set (headers
@@ -49,7 +48,6 @@ set (headers
   BulletPhysics.hh
   BulletPlaneShape.hh
   BulletPolylineShape.hh
-  BulletRaySensor.hh
   BulletRayShape.hh
   BulletScrewJoint.hh
   BulletSliderJoint.hh
@@ -66,9 +64,4 @@ set (gtest_sources
 )
 gz_build_tests(${gtest_sources})
 
-gz_add_library(gazebo_physics_bullet ${sources})
-#add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
-target_link_libraries(gazebo_physics_bullet ${BULLET_LIBRARIES})
-
-gz_install_library(gazebo_physics_bullet)
 gz_install_includes("physics/bullet" ${headers})
