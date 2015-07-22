@@ -57,6 +57,12 @@ namespace gazebo
       /// \brief Spin box which holds the step size.
       public: QSpinBox *stepSpin;
 
+      /// \brief Button to play.
+      public: QToolButton *playButton;
+
+      /// \brief Button to pause.
+      public: QToolButton *pauseButton;
+
       /// \brief Button to step back.
       public: QToolButton *stepBackButton;
 

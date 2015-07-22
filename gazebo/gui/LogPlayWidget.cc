@@ -43,54 +43,46 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   leftSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   // Play
-  QToolButton *playButton = new QToolButton(this);
-  playButton->setFixedSize(bigSize);
-  playButton->setCheckable(false);
-  playButton->setIcon(QPixmap(":/images/log_play.png"));
-  playButton->setIconSize(bigIconSize);
-  playButton->setStyleSheet(
-      QString("border-radius: %1px").arg(bigSize.width()/2-2));
-  connect(playButton, SIGNAL(clicked()), this, SLOT(OnPlay()));
-  connect(this, SIGNAL(ShowPlay()), playButton, SLOT(show()));
-  connect(this, SIGNAL(HidePlay()), playButton, SLOT(hide()));
+  this->dataPtr->playButton = new QToolButton(this);
+  this->SetupButton(this->dataPtr->playButton,
+      ":/images/log_play.png", false);
+  connect(this->dataPtr->playButton, SIGNAL(clicked()), this, SLOT(OnPlay()));
+  connect(this, SIGNAL(ShowPlay()), this->dataPtr->playButton, SLOT(show()));
+  connect(this, SIGNAL(HidePlay()), this->dataPtr->playButton, SLOT(hide()));
 
   // Pause
-  QToolButton *pauseButton = new QToolButton(this);
-  pauseButton->setFixedSize(bigSize);
-  pauseButton->setCheckable(false);
-  pauseButton->setIcon(QPixmap(":/images/log_pause.png"));
-  pauseButton->setIconSize(bigIconSize);
-  pauseButton->setStyleSheet(
-      QString("border-radius: %1px").arg(bigSize.width()/2-2));
-  connect(pauseButton, SIGNAL(clicked()), this, SLOT(OnPause()));
-  connect(this, SIGNAL(ShowPause()), pauseButton, SLOT(show()));
-  connect(this, SIGNAL(HidePause()), pauseButton, SLOT(hide()));
+  this->dataPtr->pauseButton = new QToolButton(this);
+  this->SetupButton(this->dataPtr->pauseButton,
+      ":/images/log_pause.png", false);
+  connect(this->dataPtr->pauseButton, SIGNAL(clicked()), this, SLOT(OnPause()));
+  connect(this, SIGNAL(ShowPause()), this->dataPtr->pauseButton, SLOT(show()));
+  connect(this, SIGNAL(HidePause()), this->dataPtr->pauseButton, SLOT(hide()));
 
   // Step forward
   this->dataPtr->stepForwardButton = new QToolButton(this);
-  this->SetupSmallButton(this->dataPtr->stepForwardButton,
-      ":/images/log_step_forward.png");
+  this->SetupButton(this->dataPtr->stepForwardButton,
+      ":/images/log_step_forward.png", true);
   connect(this->dataPtr->stepForwardButton, SIGNAL(clicked()), this,
       SLOT(OnStepForward()));
 
   // Step back
   this->dataPtr->stepBackButton = new QToolButton(this);
-  this->SetupSmallButton(this->dataPtr->stepBackButton,
-      ":/images/log_step_back.png");
+  this->SetupButton(this->dataPtr->stepBackButton,
+      ":/images/log_step_back.png", true);
   connect(this->dataPtr->stepBackButton, SIGNAL(clicked()), this,
       SLOT(OnStepBack()));
 
   // Rewind
   this->dataPtr->rewindButton = new QToolButton(this);
-  this->SetupSmallButton(this->dataPtr->rewindButton,
-      ":/images/log_rewind.png");
+  this->SetupButton(this->dataPtr->rewindButton,
+      ":/images/log_rewind.png", true);
   connect(this->dataPtr->rewindButton, SIGNAL(clicked()), this,
       SLOT(OnRewind()));
 
   // Forward
   this->dataPtr->forwardButton = new QToolButton(this);
-  this->SetupSmallButton(this->dataPtr->forwardButton,
-      ":/images/log_forward.png");
+  this->SetupButton(this->dataPtr->forwardButton,
+      ":/images/log_forward.png", true);
   connect(this->dataPtr->forwardButton, SIGNAL(clicked()), this,
       SLOT(OnForward()));
 
@@ -113,8 +105,8 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   QHBoxLayout *playLayout = new QHBoxLayout();
   playLayout->addWidget(this->dataPtr->rewindButton);
   playLayout->addWidget(this->dataPtr->stepBackButton);
-  playLayout->addWidget(playButton);
-  playLayout->addWidget(pauseButton);
+  playLayout->addWidget(this->dataPtr->playButton);
+  playLayout->addWidget(this->dataPtr->pauseButton);
   playLayout->addWidget(this->dataPtr->stepForwardButton);
   playLayout->addWidget(this->dataPtr->forwardButton);
 
@@ -183,7 +175,8 @@ LogPlayWidget::~LogPlayWidget()
 }
 
 /////////////////////////////////////////////////
-void LogPlayWidget::SetupSmallButton(QToolButton *_button, QString _icon)
+void LogPlayWidget::SetupButton(QToolButton *_button, QString _icon,
+    bool _isSmall)
 {
   QPixmap pixmap(_icon);
   QPixmap disabledPixmap(pixmap.size());
@@ -195,16 +188,27 @@ void LogPlayWidget::SetupSmallButton(QToolButton *_button, QString _icon)
   QIcon icon(pixmap);
   icon.addPixmap(disabledPixmap, QIcon::Disabled);
 
-  QSize smallSize(50, 50);
-  QSize smallIconSize(30, 30);
+  QSize buttonSize;
+  QSize iconSize;
 
-  _button->setFixedSize(smallSize);
+  if (_isSmall)
+  {
+    buttonSize = QSize(50, 50);
+    iconSize = QSize(30, 30);
+  }
+  else
+  {
+    buttonSize = QSize(70, 70);
+    iconSize = QSize(40, 40);
+  }
+
+  _button->setFixedSize(buttonSize);
   _button->setCheckable(false);
   _button->setEnabled(false);
   _button->setIcon(icon);
-  _button->setIconSize(smallIconSize);
+  _button->setIconSize(iconSize);
   _button->setStyleSheet(
-      QString("border-radius: %1px").arg(smallSize.width()/2-2));
+      QString("border-radius: %1px").arg(buttonSize.width()/2-2));
 }
 
 /////////////////////////////////////////////////
@@ -322,6 +326,8 @@ void LogPlayWidget::EmitSetCurrentTime(const common::Time &_time)
   this->dataPtr->rewindButton->setEnabled(time != this->dataPtr->startTime);
   this->dataPtr->stepForwardButton->setEnabled(time != this->dataPtr->endTime);
   this->dataPtr->forwardButton->setEnabled(time != this->dataPtr->endTime);
+  this->dataPtr->pauseButton->setEnabled(time != this->dataPtr->endTime);
+  this->dataPtr->playButton->setEnabled(time != this->dataPtr->endTime);
 
   // Update current time line edit
   if (this->dataPtr->lessThan1h)

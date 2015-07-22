@@ -122,10 +122,12 @@ namespace gazebo
       /// \param[in] _step Number of steps.
       private: void PublishMultistep(const int _step);
 
-      /// \brief Helper function to prepare each of the four small buttons.
+      /// \brief Helper function to prepare each of the buttons.
       /// \param[in] _button Pointer to the button.
       /// \param[in] _icon Icon uri.
-      private: void SetupSmallButton(QToolButton *_button, QString _icon);
+      /// \param[in] _isSmall True if the button is small.
+      private: void SetupButton(QToolButton *_button, QString _icon,
+          bool _isSmall);
 
       /// \internal
       /// \brief Pointer to private data.
