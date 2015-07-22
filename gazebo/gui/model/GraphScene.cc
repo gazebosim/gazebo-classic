@@ -15,8 +15,6 @@
  *
 */
 
-#include "gazebo/gui/model/qgv/QGVEdge.h"
-
 #include "gazebo/gui/model/qgv/QGVNode.h"
 #include "gazebo/gui/model/qgv/QGVEdge.h"
 
