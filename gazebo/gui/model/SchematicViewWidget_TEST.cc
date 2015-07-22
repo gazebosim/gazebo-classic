@@ -150,7 +150,7 @@ void SchematicViewWidget_TEST::Selection()
   QCOMPARE(view->scene()->selectedItems().size(), 0);
 
   // add edge 0
-  svWidget->AddEdge("id_0", "edge_0", "node_a", "node_b");
+  svWidget->AddEdge("id_0", "edge_0", "prismatic",  "node_a", "node_b");
   items = view->scene()->items();
   QCOMPARE(items.size(), 3);
   // items are returned in descending order and edges hav lower z value than
