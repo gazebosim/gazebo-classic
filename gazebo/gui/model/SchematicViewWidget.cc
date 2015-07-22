@@ -95,7 +95,7 @@ void SchematicViewWidget::Init()
 
   this->connections.push_back(gui::model::Events::ConnectJointChanged(
       boost::bind(&SchematicViewWidget::UpdateEdge, this, _1, _2, _3, _4, _5)));
-      
+
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
@@ -364,7 +364,7 @@ void SchematicViewWidget::OnSelectionChanged()
   }
 
   // deselect
-  for (auto const item : this->selectedItems)
+  for (auto const &item : this->selectedItems)
   {
     if (item)
     {
