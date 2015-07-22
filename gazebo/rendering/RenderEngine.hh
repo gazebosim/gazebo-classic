@@ -197,7 +197,7 @@ namespace gazebo
       /// \brief Pointer to the window manager.
       private: WindowManagerPtr windowManager;
 
-      /// \brief Ogre overlay sytem used only by Ogre versions > 1.9
+      /// \brief Ogre overlay sytem used only by Ogre versions >= 1.9
       private: Ogre::OverlaySystem *overlaySystem;
 
       /// \brief Makes this class a singleton.
