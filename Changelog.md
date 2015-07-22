@@ -2,6 +2,9 @@
 1. Log playback GUI for multistep, rewind, forward and seek
     * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
 
+1. Model editor updates
+    1. Color-coded edges in Schematic View to match joint color.
+        * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
 
 ## Gazebo 6.0
 

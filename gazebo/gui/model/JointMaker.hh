@@ -78,7 +78,9 @@ namespace gazebo
         /// \brief Universal joint
         JOINT_UNIVERSAL,
         /// \brief Revolute joint
-        JOINT_BALL
+        JOINT_BALL,
+        /// \brief Gearbox joint
+        JOINT_GEARBOX
       };
 
       /// \brief Constructor
@@ -153,6 +155,11 @@ namespace gazebo
       /// \param[in] _type Joint type in string.
       /// \return Joint type enum.
       public: static JointType ConvertJointType(const std::string &_type);
+
+      /// \brief Get the material for the joint type.
+      /// \param[in] _type Type of joint.
+      /// \return Name of material.
+      public: static std::string GetJointMaterial(const std::string &_type);
 
       /// \brief Get state
       /// \return State of JointType if joint creation is in process, otherwise
@@ -302,10 +309,6 @@ namespace gazebo
       /// \brief Flag set to true when a joint has been connected.
       private: bool newJointCreated;
 
-      /// \brief A map of joint type to its corresponding material.
-      private: std::map<JointMaker::JointType, std::string>
-          jointMaterials;
-
       /// \brief The SDF element pointer to the model that contains the joints.
       private: sdf::ElementPtr modelSDF;
 
@@ -326,6 +329,10 @@ namespace gazebo
 
       /// \brief A map of joint type to its string value.
       private: static std::map<JointMaker::JointType, std::string> jointTypes;
+
+      /// \brief A map of joint type to its corresponding material.
+      private: static std::map<JointMaker::JointType, std::string>
+          jointMaterials;
     };
     /// \}
 
