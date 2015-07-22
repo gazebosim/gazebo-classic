@@ -38,6 +38,7 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -634,18 +635,6 @@ void World::LogStep()
 }
 
 //////////////////////////////////////////////////
-void World::SensorsInitialized(const bool _init)
-{
-  this->dataPtr->sensorsInitialized = _init;
-}
-
-//////////////////////////////////////////////////
-bool World::SensorsInitialized() const
-{
-  return this->dataPtr->sensorsInitialized;
-}
-
-//////////////////////////////////////////////////
 void World::Step()
 {
   DIAG_TIMER_START("World::Step");
@@ -654,7 +643,8 @@ void World::Step()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
   /// one iteration of the physics engine. Do not remove this.
-  if (!this->dataPtr->pluginsLoaded && this->SensorsInitialized())
+  if (!this->dataPtr->pluginsLoaded &&
+      sensors::SensorManager::Instance()->SensorsInitialized())
   {
     this->LoadPlugins();
     this->dataPtr->pluginsLoaded = true;
@@ -1093,10 +1083,7 @@ void World::ResetTime()
   this->dataPtr->startTime = common::Time::GetWallTime();
   this->dataPtr->realTimeOffset = common::Time(0);
   this->dataPtr->iterations = 0;
-
-  // Signal a reset has occurred. The SensorManager listens to this event
-  // to reset each sensor's last update time.
-  event::Events::worldReset();
+  sensors::SensorManager::Instance()->ResetLastUpdateTimes();
 }
 
 //////////////////////////////////////////////////

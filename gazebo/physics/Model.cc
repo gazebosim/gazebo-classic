@@ -46,6 +46,8 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Contact.hh"
 
+#include "gazebo/sensors/SensorManager.hh"
+
 #include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
@@ -682,8 +684,9 @@ void Model::LoadPlugins()
 
     // Wait for the sensors to be initialized before loading
     // plugins, if there are any sensors
-    while (this->GetSensorCount() > 0 && !this->world->SensorsInitialized() &&
-           iterations < 50)
+    while (this->GetSensorCount() > 0 &&
+        !sensors::SensorManager::Instance()->SensorsInitialized() &&
+        iterations < 50)
     {
       common::Time::MSleep(100);
       iterations++;

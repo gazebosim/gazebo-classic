@@ -172,7 +172,7 @@ gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
 # unit tests
-set (gtest_sources ${gtest_sources}
+set (gtest_sources
   BoxShape_TEST.cc
   ContactManager_TEST.cc
   CylinderShape_TEST.cc
