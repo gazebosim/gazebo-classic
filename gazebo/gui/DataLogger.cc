@@ -40,6 +40,9 @@ using namespace gui;
 DataLogger::DataLogger(QWidget *_parent)
   : QDialog(_parent)
 {
+  this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
   // This name is used in the qt style sheet
   this->setObjectName("dataLogger");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
