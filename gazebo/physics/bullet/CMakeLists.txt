@@ -1,5 +1,9 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+include_directories(${BULLET_INCLUDE_DIRS})
+link_directories(${BULLET_LIBRARY_DIRS})
+add_definitions(${BULLET_CFLAGS})
+
 set (sources ${sources}
   bullet/BulletBallJoint.cc
   bullet/BulletCollision.cc
@@ -54,10 +58,10 @@ set (headers
   gzBtUniversalConstraint.hh
 )
 
-set (gtest_sources ${gtest_sources}
-  bullet/BulletTypes_TEST.cc
-  bullet/BulletPhysics_TEST.cc
-  PARENT_SCOPE
+set (gtest_sources
+  BulletTypes_TEST.cc
+  BulletPhysics_TEST.cc
 )
+gz_build_tests(${gtest_sources})
 
 gz_install_includes("physics/bullet" ${headers})

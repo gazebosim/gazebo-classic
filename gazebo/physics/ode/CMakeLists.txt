@@ -51,10 +51,10 @@ set (headers
   ODEUniversalJoint.hh
 )
 
-set (gtest_sources ${gtest_sources}
-  ode/ODEJoint_TEST.cc
-  ode/ODEPhysics_TEST.cc
-  PARENT_SCOPE
+set (gtest_sources
+  ODEJoint_TEST.cc
+  ODEPhysics_TEST.cc
 )
+gz_build_tests(${gtest_sources})
 
 gz_install_includes("physics/ode" ${headers})
