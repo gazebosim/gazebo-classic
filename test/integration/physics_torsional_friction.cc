@@ -48,8 +48,8 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       this->model = _world->GetModel(_name);
 
       // Get the surface params
-      physics::LinkPtr link = this->model->GetLink();
-      physics::Collision_V collisions = link->GetCollisions();
+      this->link = this->model->GetLink();
+      physics::Collision_V collisions = this->link->GetCollisions();
       auto iter = collisions.begin();
       EXPECT_TRUE(iter != collisions.end());
 
@@ -68,6 +68,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       EXPECT_TRUE(inertial != NULL);
 
       this->mass = inertial->GetMass();
+      this->izz = inertial->GetIZZ();
     }
 
     /// \brief Destructor
@@ -75,6 +76,9 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 
     /// \brief Pointer to the model
     public: physics::ModelPtr model;
+
+    /// \brief Pointer to the link
+    public: physics::LinkPtr link;
 
     /// \brief Torsional friction
     public: double mu3;
@@ -84,6 +88,9 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 
     /// \brief Mass
     public: double mass;
+
+    /// \brief Inertia Izz component
+    public: double izz;
 
     /// \brief Patch
     public: double patch;
@@ -107,11 +114,6 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
   /// those spheres.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DepthTest(const std::string &_physicsEngine);
-
-  /// \brief Use the torsional_friction_test world to test spheres with
-  /// different patch radii.
-  /// \param[in] _physicsEngine Physics engine to use.
-  public: void PatchTest(const std::string &_physicsEngine);
 
   /// \brief Callback for contact subscribers in depth test.
   /// \param[in] _msg Contact message
@@ -257,78 +259,6 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_4"));
   spheres.push_back(
       PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_5"));
-
-  // Verify sphere data structure
-  for (auto sphere : spheres)
-  {
-    ASSERT_TRUE(sphere.model != NULL);
-  }
-
-  common::Time t = world->GetSimTime();
-  while (t.sec < 1)
-  {
-    world->Step(500);
-    t = world->GetSimTime();
-
-    for (auto sphere : spheres)
-    {
-      math::Vector3 vel = sphere.model->GetWorldAngularVel();
-      EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
-
-      double rhs = 3 * M_PI * sphere.patch * sphere.mu3 / 16;
-      double normalMag = -sphere.mass * g.z;
-
-std::cout << sphere.model->GetName()
-          << "  t[" << t.Double() << "]"
-          << "  vel.z[" << vel.z << "]"
-          << "  rhs[" << rhs << "]"
-          << "  normal[" << normalMag << "]" << std::endl;
-
-      // Does this make sense for mu3?
-      if (sphere.mu3 >= 1.0)
-      {
-        // Friction is large enough to prevent motion
-        EXPECT_NEAR(vel.z, 0, g_friction_tolerance);
-      }
-      else
-      {
-        // Friction is small enough to allow motion
-        // Expect velocity = acceleration * time
-        // EXPECT_NEAR(vel.z, (g.z + sphere.mu3) * t.Double(),
-        //            g_friction_tolerance);
-      }
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void PhysicsTorsionalFrictionTest::PatchTest(
-    const std::string &_physicsEngine)
-{
-  if (_physicsEngine != "ode")
-  {
-    gzerr << "Torsional friction only works with ODE (#ISSUE)"
-          << std::endl;
-    return;
-  }
-
-  Load("worlds/torsional_friction_test.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, 0);
-  EXPECT_DOUBLE_EQ(g.z, -9.8);
-
-  // Load the spheres
-  std::vector<PhysicsTorsionalFrictionTest::SphereData>
-      spheres;
   spheres.push_back(
       PhysicsTorsionalFrictionTest::SphereData(world, "sphere_patch_1"));
   spheres.push_back(
@@ -344,32 +274,48 @@ void PhysicsTorsionalFrictionTest::PatchTest(
   for (auto sphere : spheres)
   {
     ASSERT_TRUE(sphere.model != NULL);
+    ASSERT_TRUE(sphere.link != NULL);
   }
 
-  common::Time t = world->GetSimTime();
-  while (t.sec < 1)
+  // Step so spheres settle in the equilibrium depth
+  world->Step(1000);
+
+  int maxSteps = 10;
+  int step = 0;
+  while (step < maxSteps)
   {
-    world->Step(500);
-    t = world->GetSimTime();
+    // Apply a torque about the vertical axis
+    double appliedTorque = 1000;
+    for (auto sphere : spheres)
+    {
+      sphere.link->AddRelativeTorque(math::Vector3(0, 0, appliedTorque));
+    }
+
+    world->Step(1);
+    step++;
 
     for (auto sphere : spheres)
     {
-      math::Vector3 vel = sphere.model->GetWorldAngularVel();
-      EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
+      // Get angular acceleration
+      math::Vector3 acc = sphere.model->GetWorldAngularAccel();
+      EXPECT_NEAR(acc.x, 0, g_friction_tolerance);
+      EXPECT_NEAR(acc.y, 0, g_friction_tolerance);
 
-      double rhs = 3 * M_PI * sphere.patch * sphere.mu3 / 16;
-      double normalMag = -sphere.mass * g.z;
+      // Calculate torque due to friction
+      double normalZ = -sphere.mass * g.z;
+      double frictionTorque = normalZ * sphere.mu3 * 3 * M_PI * sphere.patch/ 16;
 
-std::cout << sphere.model->GetName()
-          << "  t[" << t.Double() << "]"
-          << "  vel.z[" << vel.z << "]"
-          << "  rhs[" << rhs << "]"
-          << "  normal[" << normalMag << "]" << std::endl;
-
-      // Expect something in function of patch...?
-      // EXPECT_NEAR(vel.z, (g.z + sphere.patch) * t.Double(),
-      //            g_friction_tolerance);
+      // Friction is large enough to prevent motion
+      if (appliedTorque <= frictionTorque)
+      {
+        EXPECT_NEAR(acc.z, 0, g_friction_tolerance);
+      }
+      else
+      {
+        // acc.z = (appliedTorque - frictionTorque) / Izz
+        EXPECT_NEAR(acc.z, (appliedTorque - frictionTorque) / sphere.izz,
+            g_friction_tolerance);
+      }
     }
   }
 }
@@ -416,36 +362,52 @@ void PhysicsTorsionalFrictionTest::CurvatureTest(
   for (auto sphere : spheres)
   {
     ASSERT_TRUE(sphere.model != NULL);
+    ASSERT_TRUE(sphere.link != NULL);
   }
 
-  common::Time t = world->GetSimTime();
-  while (t.sec < 1)
+  // Step so spheres settle in the equilibrium depth
+  world->Step(1000);
+
+  int maxSteps = 10;
+  int step = 0;
+  while (step < maxSteps)
   {
-    world->Step(500);
-    t = world->GetSimTime();
+    // Apply a torque about the vertical axis
+    double appliedTorque = 1000;
+    for (auto sphere : spheres)
+    {
+      sphere.link->AddRelativeTorque(math::Vector3(0, 0, appliedTorque));
+    }
+
+    world->Step(1);
+    step++;
 
     for (auto sphere : spheres)
     {
-      math::Vector3 vel = sphere.model->GetWorldAngularVel();
-      EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
+      // Get angular acceleration
+      math::Vector3 acc = sphere.model->GetWorldAngularAccel();
+      EXPECT_NEAR(acc.x, 0, g_friction_tolerance);
+      EXPECT_NEAR(acc.y, 0, g_friction_tolerance);
 
+      // Calculate torque due to friction
       double depthAtEquilibrium = sphere.mass * -g.z / sphere.kp;
       double patch = sqrt(sphere.radius * depthAtEquilibrium);
-      double rhs = 3 * M_PI * patch * sphere.mu3 / 16;
-      double normalMag = -sphere.mass * g.z;
+      double normalZ = -sphere.mass * g.z;
+      double frictionTorque = normalZ * sphere.mu3 * 3 * M_PI * patch/ 16;
 
-std::cout << sphere.model->GetName()
-          << "  t[" << t.Double() << "]"
-          << "  vel.z[" << vel.z << "]"
-          << "  depth[" << depthAtEquilibrium << "]"
-          << "  patch[" << patch << "]"
-          << "  rhs[" << rhs << "]"
-          << "  normal[" << normalMag << "]" << std::endl;
+      // Friction is large enough to prevent motion
+      if (appliedTorque <= frictionTorque)
+      {
+        EXPECT_NEAR(acc.z, 0, g_friction_tolerance);
+      }
+      else
+      {
+        double expectedAcc = (appliedTorque - frictionTorque) / sphere.izz;
+        double relativeError = std::abs(acc.z - expectedAcc) / expectedAcc;
 
-      // Expect something in function of radius...?
-      // EXPECT_NEAR(vel.z, (g.z + sphere.radius) * t.Double(),
-      //            g_friction_tolerance);
+        // Less than 1% error
+        EXPECT_LT(relativeError, 0.01);
+      }
     }
   }
 }
@@ -466,12 +428,6 @@ TEST_P(PhysicsTorsionalFrictionTest, CurvatureTest)
 TEST_P(PhysicsTorsionalFrictionTest, DepthTest)
 {
   DepthTest(GetParam());
-}
-
-/////////////////////////////////////////////////
-TEST_P(PhysicsTorsionalFrictionTest, PatchTest)
-{
-  PatchTest(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTorsionalFrictionTest,
