@@ -45,7 +45,7 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->modelSub = this->node->Subscribe("~/model/info",
       &RegionEventBoxPlugin::OnModelMsg, this);
 
-  sdf::ElementPtr linkEl = _sdf->GetElement("link");
+  sdf::ElementPtr linkEl = this->model->GetSDF()->GetElement("link");
   sdf::ElementPtr visualEl = linkEl->GetElement("visual");
   sdf::ElementPtr geometryEl = visualEl->GetElement("geometry");
   sdf::ElementPtr boxEl = geometryEl->GetElement("box");
@@ -78,22 +78,35 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr & _msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-
   if (_msg->has_name() && _msg->name() == this->modelName && _msg->has_scale())
   {
     this->boxScale = msgs::Convert(_msg->scale());
     this->hasStaleSizeAndPose = true;
   }
-
 }
 
 //////////////////////////////////////////////////
 void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo & _info)
 {
-  if (this->boxPose != this->model->GetWorldPose())
   {
-    this->boxPose = this->model->GetWorldPose();
-    this->hasStaleSizeAndPose = true;
+    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    if (this->boxPose != this->model->GetWorldPose())
+    {
+      this->boxPose = this->model->GetWorldPose();
+      this->hasStaleSizeAndPose = true;
+    }
+
+    if (this->hasStaleSizeAndPose)
+    {
+      if (!this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose))
+      {
+        std::cerr << "RegionEventPlugin::OnUpdate(): "
+            << "failed to update size and pose for model '" << this->modelName
+            << "'" << std::endl << std::flush;
+        return;
+      }
+      this->hasStaleSizeAndPose = false;
+    }
   }
 
   for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
@@ -101,28 +114,12 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo & _info)
     physics::ModelPtr m = this->world->GetModel(i);
     std::string name = m->GetName();
 
-    if (name == "ground_plane")
+    if (name == "ground_plane" || name == this->modelName)
       continue;
-
-    if (name == this->modelName)
-    {
-      if (this->hasStaleSizeAndPose)
-      {
-        if (!this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose))
-        {
-          std::cerr << "RegionEventPlugin::OnUpdate(): "
-              << "failed to update size and pose for model '" << name << "'"
-              << std::endl << std::flush;
-          return;
-        }
-        this->hasStaleSizeAndPose = false;
-      }
-      continue;
-    }
 
     auto it = this->insiders.find(m->GetName());
 
-    if (this->box.Contains(m->GetWorldPose().pos))
+    if (this->PointInRegion(m->GetWorldPose().pos, this->box, this->boxPose))
     {
       if (it == this->insiders.end())
       {
@@ -144,6 +141,20 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo & _info)
   }
 }
 
+//////////////////////////////////////////////////
+bool RegionEventBoxPlugin::PointInRegion(const math::Vector3 &_point,
+    const math::Box &_box, const math::Pose &_pose)
+{
+  // transfrom box extents into local space
+  // box extents are already axis-aligned (see UpdateRegion) so no need to
+  // apply inverse rotation.
+  math::Box localBox(_box.min - _pose.pos, _box.max - _pose.pos);
+
+  // transform point into box space
+  math::Vector3 p = _pose.rot.GetInverse() * (_point - _pose.pos);
+
+  return localBox.Contains(p);
+}
 
 //////////////////////////////////////////////////
 bool RegionEventBoxPlugin::UpdateRegion(const math::Vector3 &_size,
@@ -152,10 +163,10 @@ bool RegionEventBoxPlugin::UpdateRegion(const math::Vector3 &_size,
   std::cout << "RegionEventBoxPlugin::UpdateSizeAndPose(): model='"
       << this->modelName << "'" << std::endl << std::flush;
 
-  math::Vector3 vmin(_pose.pos.x - (_size.x / 2), _pose.pos.y - (_size.y / 2),
-      0.0 /*this->pose.pos.z*/);
-  math::Vector3 vmax(_pose.pos.x + (_size.x / 2), _pose.pos.y + (_size.y / 2),
-      _pose.pos.z + _size.z);
+  math::Vector3 vmin(_pose.pos.x - (_size.x * 0.5),
+      _pose.pos.y - (_size.y * 0.5), _pose.pos.z - (_size.z * 0.5));
+  math::Vector3 vmax(_pose.pos.x + (_size.x * 0.5),
+      _pose.pos.y + (_size.y * 0.5), _pose.pos.z + (_size.z * 0.5));
 
   this->box = math::Box(vmin, vmax);
 

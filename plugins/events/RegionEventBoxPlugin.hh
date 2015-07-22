@@ -49,6 +49,13 @@ namespace gazebo
     /// \param[in] _info Update info
     public: void OnUpdate(const common::UpdateInfo &_info);
 
+    /// \brief Check if point is contained within a 3D box region.
+    /// \param[in] _point 3D Point in world space.
+    /// \param[in] _box World axis-aligned box.
+    /// \param[in] _pose Pose of the model representing the box region.
+    private: bool PointInRegion(const math::Vector3 &_point,
+        const math::Box &_box, const math::Pose &_pose);
+
     /// \brief Update box region dimensions and pose.
     /// \param[in] _scale New scale
     /// \param[in] _pose New pose
