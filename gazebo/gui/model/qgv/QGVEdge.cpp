@@ -27,7 +27,7 @@ License along with this library.
 QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *qgvscene)
     :  _scene(qgvscene), _edge(edge)
 {
-//    setFlag(QGraphicsItem::ItemIsSelectable, true);
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
   this->edgeColor = QGVCore::toColor(getAttribute("color"));
 }
 

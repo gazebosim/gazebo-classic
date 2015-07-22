@@ -20,6 +20,9 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
 
+#include "gazebo/gui/model/qgv/QGVNode.h"
+#include "gazebo/gui/model/qgv/QGVEdge.h"
+
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/GraphScene.hh"
 #include "gazebo/gui/model/GraphView.hh"
@@ -54,13 +57,24 @@ SchematicViewWidget::SchematicViewWidget(QWidget *_parent)
   canvasLayout->setContentsMargins(0, 0, 0, 0);
   canvasLayout->setSpacing(0);
   this->setLayout(canvasLayout);
+
+  connect(this->view, SIGNAL(customContextMenuRequested(const QString &)),
+      this, SLOT(OnCustomContextMenu(const QString &)));
+
+  connect(this->view, SIGNAL(itemDoubleClicked(const QString &)),
+      this, SLOT(OnItemDoubleClicked(const QString &)));
+
+  connect(this->scene, SIGNAL(selectionChanged()),
+      this, SLOT(OnSelectionChanged()));
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::Reset()
 {
+  this->nodes.clear();
   this->edges.clear();
   this->scene->clear();
+  this->selectedItems.clear();
   this->FitInView();
 }
 
@@ -81,6 +95,18 @@ void SchematicViewWidget::Init()
 
   this->connections.push_back(gui::model::Events::ConnectJointChanged(
       boost::bind(&SchematicViewWidget::UpdateEdge, this, _1, _2, _3, _4, _5)));
+
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
+
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedLink(
+       boost::bind(&SchematicViewWidget::OnSetSelectedLink, this, _1, _2)));
+
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedJoint(
+       boost::bind(&SchematicViewWidget::OnSetSelectedJoint, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
@@ -99,15 +125,19 @@ std::string SchematicViewWidget::GetLeafName(const std::string &_scopedName)
 /////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
-  std::string node = this->GetLeafName(_node);
+  std::string name = this->GetLeafName(_node);
 
-  if (this->scene->HasNode(node))
+  if (this->scene->HasNode(name))
     return;
 
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 
-  this->scene->AddNode(node);
+  QGVNode *node = this->scene->AddNode(name);
+  node->setData(0, tr(_node.c_str()));
+  node->setData(1, tr("Link"));
+  this->nodes[_node] = node;
+
   this->scene->applyLayout();
 
   this->FitInView();
@@ -122,23 +152,29 @@ unsigned int SchematicViewWidget::GetNodeCount() const
 /////////////////////////////////////////////////
 void SchematicViewWidget::RemoveNode(const std::string &_node)
 {
-  std::string node = this->GetLeafName(_node);
+  auto it = this->nodes.find(_node);
+  if (it != this->nodes.end())
+  {
+    std::string node = this->GetLeafName(_node);
 
-  if (!this->scene->HasNode(node))
-    return;
+    if (!this->scene->HasNode(node))
+      return;
 
-  // this must be called before making changes to the graph
-  this->scene->clearLayout();
-  this->scene->RemoveNode(node);
+    // this must be called before making changes to the graph
+    this->scene->clearLayout();
+    this->scene->RemoveNode(node);
 
-  this->scene->applyLayout();
-  this->FitInView();
+    this->scene->applyLayout();
+    this->FitInView();
+
+    this->nodes.erase(it);
+  }
 }
 
 /////////////////////////////////////////////////
 bool SchematicViewWidget::HasNode(const std::string &_name) const
 {
-  return this->scene->HasNode(_name);
+  return this->nodes.find(_name) != this->nodes.end();
 }
 
 /////////////////////////////////////////////////
@@ -149,12 +185,13 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   std::string parentNode = this->GetLeafName(_parent);
   std::string childNode = this->GetLeafName(_child);
 
-  this->edges[_id] = std::make_pair(parentNode, childNode);
-
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 
-  this->scene->AddEdge(_id, parentNode, childNode);
+  QGVEdge *edge = this->scene->AddEdge(_id, parentNode, childNode);
+  edge->setData(0, tr(_id.c_str()));
+  edge->setData(1, tr("Joint"));
+  this->edges[_id] = edge;
 
   std::string materialName = JointMaker::GetJointMaterial(_type);
 
@@ -218,6 +255,12 @@ unsigned int SchematicViewWidget::GetEdgeCount() const
 }
 
 /////////////////////////////////////////////////
+bool SchematicViewWidget::HasEdge(const std::string &_id) const
+{
+  return this->edges.find(_id) != this->edges.end();
+}
+
+/////////////////////////////////////////////////
 void SchematicViewWidget::resizeEvent(QResizeEvent */*_event*/)
 {
   this->FitInView();
@@ -245,4 +288,95 @@ void SchematicViewWidget::FitInView()
   this->view->fitInView(newRect, Qt::KeepAspectRatio);
   this->view->centerOn(sceneCenterX, sceneCenterY);
   this->scene->setSceneRect(newRect);
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::OnCustomContextMenu(const QString &_id)
+{
+  std::string itemId = _id.toStdString();
+  if (this->edges.find(itemId) != this->edges.end())
+    gui::model::Events::showJointContextMenu(itemId);
+  else if (this->scene->HasNode(this->GetLeafName(itemId)))
+    gui::model::Events::showLinkContextMenu(itemId);
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::OnItemDoubleClicked(const QString &_id)
+{
+  std::string itemId = _id.toStdString();
+  if (this->HasEdge(itemId))
+    gui::model::Events::openJointInspector(itemId);
+  else if (this->HasNode(itemId))
+    gui::model::Events::openLinkInspector(itemId);
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::OnSetSelectedLink(const std::string &_name,
+    bool _selected)
+{
+  auto it = this->nodes.find(_name);
+  if (it != this->nodes.end())
+    it->second->setSelected(_selected);
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::OnSetSelectedJoint(const std::string &_id,
+    bool _selected)
+{
+  auto it = this->edges.find(_id);
+  if (it != this->edges.end())
+    it->second->setSelected(_selected);
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
+{
+  // deselect all
+  for (auto &node : this->nodes)
+    node.second->setSelected(false);
+
+  for (auto &edge : this->edges)
+    edge.second->setSelected(false);
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::OnSelectionChanged()
+{
+  QList<QGraphicsItem *> items = this->scene->selectedItems();
+
+  // update and signal new selection
+  for (auto const item : items)
+  {
+    int idx = this->selectedItems.indexOf(item);
+    if (idx >= 0)
+    {
+      this->selectedItems.removeAt(idx);
+      continue;
+    }
+    std::string id = item->data(0).toString().toStdString();
+    std::string type = item->data(1).toString().toStdString();
+
+    if (type == "Link")
+      gui::model::Events::setSelectedLink(id, true);
+    else if (type == "Joint")
+      gui::model::Events::setSelectedJoint(id, true);
+  }
+
+  // deselect
+  for (auto const &item : this->selectedItems)
+  {
+    if (item)
+    {
+      std::string id = item->data(0).toString().toStdString();
+      std::string type = item->data(1).toString().toStdString();
+
+      if (type == "Link")
+        gui::model::Events::setSelectedLink(id, false);
+      else if (type == "Joint")
+        gui::model::Events::setSelectedJoint(id, false);
+    }
+  }
+
+  this->selectedItems = items;
 }
