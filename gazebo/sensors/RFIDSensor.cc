@@ -137,7 +137,7 @@ bool RFIDSensor::UpdateImpl(bool /*_force*/)
   if (this->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, this->entity->GetWorldPose());
+    msgs::Set(&msg, this->entity->GetWorldPose().Ign());
     this->scanPub->Publish(msg);
   }
 

@@ -38,6 +38,7 @@ void RegisterMultiCameraSensor();
 void RegisterGpsSensor();
 void RegisterGpuRaySensor();
 void RegisterImuSensor();
+void RegisterMagnetometerSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
@@ -62,6 +63,7 @@ void SensorFactory::RegisterAll()
   RegisterGpsSensor();
   RegisterGpuRaySensor();
   RegisterImuSensor();
+  RegisterMagnetometerSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();

@@ -53,7 +53,7 @@ BoxMaker::BoxMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            ignition::math::Quaterniond());
 }
 
 BoxMaker::~BoxMaker()
@@ -121,13 +121,15 @@ void BoxMaker::OnMouseMove(const common::MouseEvent &_event)
   if (this->state != 2)
     return;
 
-  math::Vector3 p = msgs::Convert(this->visualMsg->pose().position());
-  math::Vector3 scale = msgs::Convert(this->visualMsg->geometry().box().size());
+  ignition::math::Vector3d p =
+    msgs::ConvertIgn(this->visualMsg->pose().position());
+  ignition::math::Vector3d scale =
+    msgs::ConvertIgn(this->visualMsg->geometry().box().size());
 
-  scale.z = (this->mouseReleasePos.y - _event.Pos().Y())*0.01;
+  scale.Z((this->mouseReleasePos.y - _event.Pos().Y())*0.01);
   if (!_event.Shift())
-    scale.z = rint(scale.z);
-  p.z = scale.z/2.0;
+    scale.Z(rint(scale.Z()));
+  p.Z(scale.Z()/2.0);
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   msgs::Set(this->visualMsg->mutable_geometry()->mutable_box()->mutable_size(),
@@ -164,19 +166,19 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 
   p2 = this->GetSnappedPoint(p2);
 
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1.Ign());
 
   math::Vector3 scale = p1-p2;
-  math::Vector3 p = msgs::Convert(this->visualMsg->pose().position());
+  math::Vector3 p = msgs::ConvertIgn(this->visualMsg->pose().position());
 
   scale.z = 0.01;
   p.x = p1.x - scale.x/2.0;
   p.y = p1.y - scale.y/2.0;
 
 
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p.Ign());
   msgs::Set(this->visualMsg->mutable_geometry()->mutable_box()->mutable_size(),
-      scale.GetAbs());
+      scale.GetAbs().Ign());
 
   this->visPub->Publish(*this->visualMsg);
 }
@@ -190,8 +192,8 @@ std::string BoxMaker::GetSDFString()
     modelName << "unit_box_" << counter;
     model.set_name(modelName.str());
   }
-  msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
-  msgs::AddBoxLink(model, 1.0, math::Vector3::One);
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+  msgs::AddBoxLink(model, 1.0, ignition::math::Vector3d::One);
   model.mutable_link(0)->set_name("link");
 
   return "<sdf version='" + std::string(SDF_VERSION) + "'>"
@@ -203,9 +205,6 @@ std::string BoxMaker::GetSDFString()
 void BoxMaker::CreateTheEntity()
 {
   msgs::Factory msg;
-
-  math::Vector3 p = msgs::Convert(this->visualMsg->pose().position());
-  math::Vector3 size = msgs::Convert(this->visualMsg->geometry().box().size());
 
   msg.set_sdf(this->GetSDFString());
 

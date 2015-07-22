@@ -108,8 +108,9 @@ void LaserVisual::Update()
   dPtr->receivedMsg = false;
 
   double verticalAngle = dPtr->laserMsg->scan().vertical_angle_min();
-  math::Pose offset = msgs::Convert(dPtr->laserMsg->scan().world_pose()) -
-                      this->GetWorldPose();
+  ignition::math::Pose3d offset =
+    msgs::ConvertIgn(dPtr->laserMsg->scan().world_pose()) -
+    this->GetWorldPose().Ign();
 
   unsigned int vertCount = dPtr->laserMsg->scan().has_vertical_count() ?
       dPtr->laserMsg->scan().vertical_count() : 1u;
@@ -135,28 +136,30 @@ void LaserVisual::Update()
 
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
-    dPtr->rayFans[j]->SetPoint(0, offset.pos);
-    dPtr->noHitRayFans[j]->SetPoint(0, offset.pos);
+    dPtr->rayFans[j]->SetPoint(0, offset.Pos());
+    dPtr->noHitRayFans[j]->SetPoint(0, offset.Pos());
 
     double angle = dPtr->laserMsg->scan().angle_min();
     unsigned int count = dPtr->laserMsg->scan().count();
     for (unsigned int i = 0; i < count; ++i)
     {
       double r = dPtr->laserMsg->scan().ranges(j*count + i);
-      math::Quaternion ray(math::Vector3(0.0, -verticalAngle, angle));
-      math::Vector3 axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
+      ignition::math::Quaterniond ray(
+          ignition::math::Vector3d(0.0, -verticalAngle, angle));
+      ignition::math::Vector3d axis = offset.Rot() * ray *
+        ignition::math::Vector3d(1.0, 0.0, 0.0);
 
       double hitRange = std::isinf(r) ? 0 : r;
-      math::Vector3 pt = (axis * hitRange) + offset.pos;
+      ignition::math::Vector3d pt = (axis * hitRange) + offset.Pos();
 
       double noHitRange =
         std::isinf(r) ? dPtr->laserMsg->scan().range_max() : hitRange;
-      math::Vector3 noHitPt = (axis * noHitRange) + offset.pos;
+      ignition::math::Vector3d noHitPt = (axis * noHitRange) + offset.Pos();
 
       // Draw the lines that represent each simulated ray
       if (i >= dPtr->rayLines[j]->GetPointCount()/2)
       {
-        dPtr->rayLines[j]->AddPoint(offset.pos);
+        dPtr->rayLines[j]->AddPoint(offset.Pos());
         if (std::isinf(r))
           dPtr->rayLines[j]->AddPoint(noHitPt);
         else
@@ -164,7 +167,7 @@ void LaserVisual::Update()
       }
       else
       {
-        dPtr->rayLines[j]->SetPoint(i*2, offset.pos);
+        dPtr->rayLines[j]->SetPoint(i*2, offset.Pos());
         if (std::isinf(r))
           dPtr->rayLines[j]->SetPoint(i*2+1, noHitPt);
         else
