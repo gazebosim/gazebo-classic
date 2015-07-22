@@ -48,11 +48,72 @@ void WideAngleCamera::Load()
     sdf::ElementPtr elem = this->sdf->GetElement("projection");
 
     this->projectionType = elem->Get<int>("type");
+
+    if(projectionType == -1)
+    {
+      if(this->sdf->HasElement("custom_function"))
+      {
+        sdf::ElementPtr cust_func = elem->GetElement("custom_function");
+
+        this->c1 = cust_func->Get<double>("c1");
+        this->c2 = cust_func->Get<double>("c2");
+        this->c3 = 0;
+        this->f = cust_func->Get<double>("f");
+        this->fun = cust_func->Get<std::string>("fun");
+
+        this->fun_b = math::Vector2i(1,1);
+
+        if(fun == "tan")
+        {
+          fun_b.x = 0;
+          c3 = 0;
+        } else
+        if(fun == "sin")
+        {
+          fun_b.y = 0;
+          c3 = 0;
+        } else
+        if(fun == "ctan")
+        {
+          fun_b.x = 0;
+          c3 = M_PI/2;
+        } else
+        if(fun == "cos")
+        {
+          fun_b.y = 0;
+          c3 = M_PI/2;
+        } else
+          {
+            gzthrow("Invalid mapping function");
+          }
+      }
+        gzthrow("You need to specify custom mapping function")
+    }
   }
   else
   {
     this->projectionType = 0;
   }
+}
+
+void WideAngleCamera::Fini()
+{
+  for(int i=0;i<6;i++)
+  {
+    RTShaderSystem::DetachViewport(this->envViewports[i], this->GetScene());
+
+    this->envRenderTargets[i]->removeAllViewports();
+    this->envRenderTargets[i] = NULL;
+
+    this->GetScene()->GetManager()->destroyCamera(envCameras[i]->getName());
+    envCameras[i] = NULL;
+  }
+
+  if(this->envCubeMapTexture)
+    Ogre::TextureManager::getSingleton().remove(this->envCubeMapTexture->getName());
+  this->envCubeMapTexture = NULL;
+
+  Camera::Fini();
 }
 
 void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
@@ -127,6 +188,8 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
       Conversions::Convert(this->scene->GetBackgroundColor()));
     vp->setVisibilityMask(GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
+    this->envViewports[i] = vp;
+
     //FIXME: problem with Skyx include
     // if (this->GetScene()->GetSkyX())
     //   rtt->addListener(this->GetScene()->GetSkyX());
@@ -184,6 +247,13 @@ void WideAngleCamera::RenderImpl()
 
   uniforms->setNamedConstant("HFOV",(Ogre::Real)Camera::GetHFOV().Radian());
   uniforms->setNamedConstant("projectionType",this->projectionType);
+
+  uniforms->setNamedConstant("c1",(Ogre::Real)this->c1);
+  uniforms->setNamedConstant("c2",(Ogre::Real)this->c2);
+  uniforms->setNamedConstant("c3",(Ogre::Real)this->c3);
+
+  uniforms->setNamedConstant("f",(Ogre::Real)this->f);
+  uniforms->setNamedConstant("fun",Ogre::Vector2(this->fun_b.x,this->fun_b.y)); 
 
   this->renderTarget->update();
 }

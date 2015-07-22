@@ -1415,6 +1415,11 @@ fragment_program Gazebo/WideLensMapFS glsl
   {
     param_named envMap int 0
     param_named projectionType int 0
+    param_named c1 float 1
+    param_named c2 float 1
+    param_named c3 float 0
+    param_named f float 1
+    param_named fun float2 0 1
     param_named HFOV float 90
   }
 }

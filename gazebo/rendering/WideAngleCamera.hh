@@ -34,11 +34,15 @@ namespace gazebo
 
       public: virtual void Load();
 
+      public: virtual void Fini();
+
       protected: Ogre::CompositorInstance *wamapInstance;
 
       private: Ogre::Camera *envCameras[6];
 
       private: Ogre::RenderTarget *envRenderTargets[6];
+
+      private: Ogre::Viewport *envViewports[6];
 
       private: Ogre::Texture *envCubeMapTexture;
 
@@ -47,6 +51,14 @@ namespace gazebo
       private: Ogre::MaterialPtr compMat;
 
       private: int projectionType;
+
+      private: double c1;
+      private: double c2;
+      private: double c3;
+      private: double f;
+
+      private: std::string fun;
+      private: math::Vector2i fun_b;
     };
   }
 }
