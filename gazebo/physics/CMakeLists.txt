@@ -11,10 +11,10 @@ add_subdirectory(ode)
 
 # Add Bullet support if present
 if (HAVE_BULLET)
-  add_subdirectory(bullet)
   include_directories(${BULLET_INCLUDE_DIRS})
   link_directories(${BULLET_LIBRARY_DIRS})
   add_definitions(${BULLET_CFLAGS})
+  add_subdirectory(bullet)
 endif()
 
 # Add DART support if present
