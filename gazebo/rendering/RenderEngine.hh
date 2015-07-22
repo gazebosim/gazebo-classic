@@ -197,9 +197,8 @@ namespace gazebo
       /// \brief Pointer to the window manager.
       private: WindowManagerPtr windowManager;
 
-#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      /// \brief Ogre overlay sytem used only by Ogre versions > 1.9
       private: Ogre::OverlaySystem *overlaySystem;
-#endif
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;
