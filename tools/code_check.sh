@@ -64,8 +64,8 @@ echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
-echo "*:gazebo/common/SVGLoader.hh:49" >> $SUPPRESS
-echo "*:gazebo/common/SVGLoader.cc:439" >> $SUPPRESS
+# (warning) Redundant code: Found a statement that begins with string constant.
+echo "*:gazebo/common/SVGLoader.cc:687" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
 
@@ -132,7 +132,7 @@ elif [ $QUICK_CHECK -eq 1 ]; then
       DO_CPPCHECK=1
     elif [ $CPPCHECK_LT_157 -eq 0 ]; then
       DO_CPPCHECK=1
-    fi 
+    fi
 
     if [ $DO_CPPCHECK -eq 1 ]; then
       $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \

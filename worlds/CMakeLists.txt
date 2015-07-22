@@ -12,6 +12,7 @@ set (files
   empty_sky.world
   empty.world
   everything.world
+  flocking.world
   force_torque_demo.world
   friction_demo.world
   gripper.world
@@ -59,6 +60,7 @@ set (files
   sonar_demo.world
   sphere_atlas_demo.world
   stacks.world
+  transporter.world
   trigger.world
   twin_rotor_demo.world
   underwater.world
