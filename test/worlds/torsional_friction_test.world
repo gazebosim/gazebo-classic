@@ -328,6 +328,7 @@
             <friction>
               <ode>
                 <mu3>0.0</mu3>
+                <patch_radius>2.0</patch_radius>
               </ode>
             </friction>
             <contact>
@@ -382,6 +383,7 @@
             <friction>
               <ode>
                 <mu3>0.001</mu3>
+                <patch_radius>2.0</patch_radius>
               </ode>
             </friction>
             <contact>
@@ -436,6 +438,7 @@
             <friction>
               <ode>
                 <mu3>0.005</mu3>
+                <patch_radius>2.0</patch_radius>
               </ode>
             </friction>
             <contact>
@@ -490,6 +493,7 @@
             <friction>
               <ode>
                 <mu3>0.01</mu3>
+                <patch_radius>2.0</patch_radius>
               </ode>
             </friction>
             <contact>
@@ -544,6 +548,7 @@
             <friction>
               <ode>
                 <mu3>1.0</mu3>
+                <patch_radius>2.0</patch_radius>
               </ode>
             </friction>
             <contact>
