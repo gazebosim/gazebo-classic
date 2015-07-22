@@ -276,6 +276,15 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
       EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
 
+      double rhs = 3 * M_PI * sphere.patch * sphere.mu3 / 16;
+      double normalMag = -sphere.mass * g.z;
+
+std::cout << sphere.model->GetName()
+          << "  t[" << t.Double() << "]"
+          << "  vel.z[" << vel.z << "]"
+          << "  rhs[" << rhs << "]"
+          << "  normal[" << normalMag << "]" << std::endl;
+
       // Does this make sense for mu3?
       if (sphere.mu3 >= 1.0)
       {
@@ -285,7 +294,6 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       else
       {
         // Friction is small enough to allow motion
-        // Expect something in function of mu3...?
         // Expect velocity = acceleration * time
         // EXPECT_NEAR(vel.z, (g.z + sphere.mu3) * t.Double(),
         //            g_friction_tolerance);
@@ -350,6 +358,15 @@ void PhysicsTorsionalFrictionTest::PatchTest(
       EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
       EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
 
+      double rhs = 3 * M_PI * sphere.patch * sphere.mu3 / 16;
+      double normalMag = -sphere.mass * g.z;
+
+std::cout << sphere.model->GetName()
+          << "  t[" << t.Double() << "]"
+          << "  vel.z[" << vel.z << "]"
+          << "  rhs[" << rhs << "]"
+          << "  normal[" << normalMag << "]" << std::endl;
+
       // Expect something in function of patch...?
       // EXPECT_NEAR(vel.z, (g.z + sphere.patch) * t.Double(),
       //            g_friction_tolerance);
@@ -412,6 +429,19 @@ void PhysicsTorsionalFrictionTest::CurvatureTest(
       math::Vector3 vel = sphere.model->GetWorldAngularVel();
       EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
       EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
+
+      double depthAtEquilibrium = sphere.mass * -g.z / sphere.kp;
+      double patch = sqrt(sphere.radius * depthAtEquilibrium);
+      double rhs = 3 * M_PI * patch * sphere.mu3 / 16;
+      double normalMag = -sphere.mass * g.z;
+
+std::cout << sphere.model->GetName()
+          << "  t[" << t.Double() << "]"
+          << "  vel.z[" << vel.z << "]"
+          << "  depth[" << depthAtEquilibrium << "]"
+          << "  patch[" << patch << "]"
+          << "  rhs[" << rhs << "]"
+          << "  normal[" << normalMag << "]" << std::endl;
 
       // Expect something in function of radius...?
       // EXPECT_NEAR(vel.z, (g.z + sphere.radius) * t.Double(),
