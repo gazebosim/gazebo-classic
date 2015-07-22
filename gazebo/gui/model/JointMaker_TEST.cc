@@ -286,7 +286,7 @@ void JointMaker_TEST::JointDefaultProperties()
 
   // verify default values
   QVERIFY(msgs::ConvertJointType(gearboxJoint->jointMsg->type()) == "gearbox");
-  QCOMPARE(msgs::Convert(gearboxJoint->jointMsg->pose()),
+  QCOMPARE(msgs::ConvertIgn(gearboxJoint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
   qFuzzyCompare(gearboxJoint->jointMsg->cfm(), 0.0);
   qFuzzyCompare(gearboxJoint->jointMsg->bounce(), 0.0);
@@ -297,7 +297,7 @@ void JointMaker_TEST::JointDefaultProperties()
   qFuzzyCompare(gearboxJoint->jointMsg->suspension_erp(), 0.2);
 
   msgs::Axis gearboxAxis1Msg = gearboxJoint->jointMsg->axis1();
-  QCOMPARE(msgs::Convert(gearboxAxis1Msg.xyz()),
+  QCOMPARE(msgs::ConvertIgn(gearboxAxis1Msg.xyz()),
       ignition::math::Vector3d(1, 0, 0));
   qFuzzyCompare(gearboxAxis1Msg.limit_lower(), -IGN_DBL_MAX);
   qFuzzyCompare(gearboxAxis1Msg.limit_upper(), IGN_DBL_MAX);
@@ -308,7 +308,7 @@ void JointMaker_TEST::JointDefaultProperties()
   QCOMPARE(gearboxAxis1Msg.use_parent_model_frame(), false);
 
   msgs::Axis gearboxAxis2Msg = gearboxJoint->jointMsg->axis2();
-  QCOMPARE(msgs::Convert(gearboxAxis2Msg.xyz()),
+  QCOMPARE(msgs::ConvertIgn(gearboxAxis2Msg.xyz()),
       ignition::math::Vector3d(0, 1, 0));
   qFuzzyCompare(gearboxAxis2Msg.limit_lower(), -IGN_DBL_MAX);
   qFuzzyCompare(gearboxAxis2Msg.limit_upper(), IGN_DBL_MAX);
@@ -340,7 +340,7 @@ void JointMaker_TEST::JointDefaultProperties()
 
   // verify default values
   QVERIFY(msgs::ConvertJointType(fixedJoint->jointMsg->type()) == "fixed");
-  QCOMPARE(msgs::Convert(fixedJoint->jointMsg->pose()),
+  QCOMPARE(msgs::ConvertIgn(fixedJoint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
   qFuzzyCompare(fixedJoint->jointMsg->cfm(), 0.0);
   qFuzzyCompare(fixedJoint->jointMsg->bounce(), 0.0);
@@ -353,7 +353,7 @@ void JointMaker_TEST::JointDefaultProperties()
   // fixed joint created using revolute joint with zero limits so it
   // has one axis
   msgs::Axis fixedAxis1Msg = fixedJoint->jointMsg->axis1();
-  QCOMPARE(msgs::Convert(fixedAxis1Msg.xyz()),
+  QCOMPARE(msgs::ConvertIgn(fixedAxis1Msg.xyz()),
       ignition::math::Vector3d(1, 0, 0));
   qFuzzyCompare(fixedAxis1Msg.limit_lower(), 0);
   qFuzzyCompare(fixedAxis1Msg.limit_upper(), 0);
