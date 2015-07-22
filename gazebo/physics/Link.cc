@@ -787,9 +787,9 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
-  msgs::Set(_msg.mutable_pose(), relPose);
+  msgs::Set(_msg.mutable_pose(), relPose.Ign());
 
-  msgs::Set(this->visualMsg->mutable_pose(), relPose);
+  msgs::Set(this->visualMsg->mutable_pose(), relPose.Ign());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
@@ -799,7 +799,8 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.mutable_inertial()->set_iyy(this->inertial->GetIYY());
   _msg.mutable_inertial()->set_iyz(this->inertial->GetIYZ());
   _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
-  msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
+  msgs::Set(_msg.mutable_inertial()->mutable_pose(),
+      this->inertial->GetPose().Ign());
 
   for (auto &child : this->children)
   {
@@ -841,7 +842,7 @@ void Link::FillMsg(msgs::Link &_msg)
     proj->set_fov(elem->Get<double>("fov"));
     proj->set_near_clip(elem->Get<double>("near_clip"));
     proj->set_far_clip(elem->Get<double>("far_clip"));
-    msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
+    msgs::Set(proj->mutable_pose(), elem->Get<ignition::math::Pose3d>("pose"));
   }
 
   if (this->IsCanonicalLink())
@@ -880,7 +881,7 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   if (_msg.has_pose())
   {
     this->SetEnabled(true);
-    this->SetRelativePose(msgs::Convert(_msg.pose()));
+    this->SetRelativePose(msgs::ConvertIgn(_msg.pose()));
   }
 
   for (int i = 0; i < _msg.collision_size(); i++)
@@ -1029,9 +1030,9 @@ void Link::PublishData()
     msgs::Set(this->linkDataMsg.mutable_time(), this->world->GetSimTime());
     linkDataMsg.set_name(this->GetScopedName());
     msgs::Set(this->linkDataMsg.mutable_linear_velocity(),
-        this->GetWorldLinearVel());
+        this->GetWorldLinearVel().Ign());
     msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
-        this->GetWorldAngularVel());
+        this->GetWorldAngularVel().Ign());
     this->dataPub->Publish(this->linkDataMsg);
   }
 }
@@ -1425,12 +1426,12 @@ void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
   math::Vector3 pos = math::Vector3::Zero;
   if (_msg.has_force_offset())
   {
-    pos = msgs::Convert(_msg.force_offset());
+    pos = msgs::ConvertIgn(_msg.force_offset());
   }
 
-  const math::Vector3 force = msgs::Convert(_msg.force());
+  const ignition::math::Vector3d force = msgs::ConvertIgn(_msg.force());
   this->AddLinkForce(force, pos);
 
-  const math::Vector3 torque = msgs::Convert(_msg.torque());
+  const ignition::math::Vector3d torque = msgs::ConvertIgn(_msg.torque());
   this->AddRelativeTorque(torque);
 }

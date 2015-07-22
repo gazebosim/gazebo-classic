@@ -526,7 +526,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
       msg.set_id(gui::get_entity_id(_vis->GetName()));
       msg.set_name(_vis->GetName());
 
-      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
       this->dataPtr->modelPub->Publish(msg);
     }
     // Otherwise, check to see if the visual is a light
@@ -534,7 +534,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     {
       msgs::Light msg;
       msg.set_name(_vis->GetName());
-      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
       this->dataPtr->lightPub->Publish(msg);
     }
   }
@@ -552,7 +552,7 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
       msg.set_id(gui::get_entity_id(_vis->GetName()));
       msg.set_name(_vis->GetName());
 
-      msgs::Set(msg.mutable_scale(), _vis->GetScale());
+      msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
       this->dataPtr->modelPub->Publish(msg);
       _vis->SetScale(this->dataPtr->mouseVisualScale);
     }

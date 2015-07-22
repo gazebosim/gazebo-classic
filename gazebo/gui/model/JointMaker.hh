@@ -156,6 +156,11 @@ namespace gazebo
       /// \return Joint type enum.
       public: static JointType ConvertJointType(const std::string &_type);
 
+      /// \brief Get the material for the joint type.
+      /// \param[in] _type Type of joint.
+      /// \return Name of material.
+      public: static std::string GetJointMaterial(const std::string &_type);
+
       /// \brief Get state
       /// \return State of JointType if joint creation is in process, otherwise
       /// JOINT_NONE
@@ -275,7 +280,7 @@ namespace gazebo
       private slots: void OnDelete();
 
       /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
-      private: std::vector<math::Vector3> UnitVectors;
+      private: std::vector<ignition::math::Vector3d> unitVectors;
 
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
@@ -304,10 +309,6 @@ namespace gazebo
       /// \brief Flag set to true when a joint has been connected.
       private: bool newJointCreated;
 
-      /// \brief A map of joint type to its corresponding material.
-      private: std::map<JointMaker::JointType, std::string>
-          jointMaterials;
-
       /// \brief The SDF element pointer to the model that contains the joints.
       private: sdf::ElementPtr modelSDF;
 
@@ -328,6 +329,10 @@ namespace gazebo
 
       /// \brief A map of joint type to its string value.
       private: static std::map<JointMaker::JointType, std::string> jointTypes;
+
+      /// \brief A map of joint type to its corresponding material.
+      private: static std::map<JointMaker::JointType, std::string>
+          jointMaterials;
     };
     /// \}
 

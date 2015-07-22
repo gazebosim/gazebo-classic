@@ -39,6 +39,9 @@ class JointMaker_TEST : public QTestFixture
 
   /// \brief Tests selecting joints in the model editor
   private slots: void Selection();
+
+  /// \brief Test getting joint material.
+  private slots: void JointMaterial();
 };
 
 #endif

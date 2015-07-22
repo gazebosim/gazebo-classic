@@ -287,6 +287,20 @@ material Gazebo/ZincYellow
   }
 }
 
+material Gazebo/DarkYellow
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.7 0.7 0 1
+      diffuse 0.7 0.7 0 1
+      specular 0 0 0 0 0
+    }
+  }
+}
+
+
 material Gazebo/Purple
 {
   technique

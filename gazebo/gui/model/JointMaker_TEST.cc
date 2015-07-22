@@ -189,7 +189,8 @@ void JointMaker_TEST::JointDefaultProperties()
 
   // verify default values
   QVERIFY(msgs::ConvertJointType(rev2joint->jointMsg->type()) == "revolute2");
-  QCOMPARE(msgs::Convert(rev2joint->jointMsg->pose()), math::Pose::Zero);
+  QCOMPARE(msgs::ConvertIgn(rev2joint->jointMsg->pose()),
+      ignition::math::Pose3d::Zero);
   qFuzzyCompare(rev2joint->jointMsg->cfm(), 0.0);
   qFuzzyCompare(rev2joint->jointMsg->bounce(), 0.0);
   qFuzzyCompare(rev2joint->jointMsg->fudge_factor(), 0.0);
@@ -199,7 +200,8 @@ void JointMaker_TEST::JointDefaultProperties()
   qFuzzyCompare(rev2joint->jointMsg->suspension_erp(), 0.2);
 
   msgs::Axis rev2Axis1Msg = rev2joint->jointMsg->axis1();
-  QCOMPARE(msgs::Convert(rev2Axis1Msg.xyz()), math::Vector3(1, 0, 0));
+  QCOMPARE(msgs::ConvertIgn(rev2Axis1Msg.xyz()),
+      ignition::math::Vector3d(1, 0, 0));
   qFuzzyCompare(rev2Axis1Msg.limit_lower(), -GZ_DBL_MAX);
   qFuzzyCompare(rev2Axis1Msg.limit_upper(), GZ_DBL_MAX);
   qFuzzyCompare(rev2Axis1Msg.limit_effort(), -1);
@@ -209,7 +211,8 @@ void JointMaker_TEST::JointDefaultProperties()
   QCOMPARE(rev2Axis1Msg.use_parent_model_frame(), false);
 
   msgs::Axis rev2Axis2Msg = rev2joint->jointMsg->axis2();
-  QCOMPARE(msgs::Convert(rev2Axis2Msg.xyz()), math::Vector3(0, 1, 0));
+  QCOMPARE(msgs::ConvertIgn(rev2Axis2Msg.xyz()),
+      ignition::math::Vector3d(0, 1, 0));
   qFuzzyCompare(rev2Axis2Msg.limit_lower(), -GZ_DBL_MAX);
   qFuzzyCompare(rev2Axis2Msg.limit_upper(), GZ_DBL_MAX);
   qFuzzyCompare(rev2Axis2Msg.limit_effort(), -1);
@@ -240,7 +243,8 @@ void JointMaker_TEST::JointDefaultProperties()
 
   // verify default values
   QVERIFY(msgs::ConvertJointType(prisJoint->jointMsg->type()) == "prismatic");
-  QCOMPARE(msgs::Convert(prisJoint->jointMsg->pose()), math::Pose::Zero);
+  QCOMPARE(msgs::ConvertIgn(prisJoint->jointMsg->pose()),
+      ignition::math::Pose3d::Zero);
   qFuzzyCompare(prisJoint->jointMsg->cfm(), 0.0);
   qFuzzyCompare(prisJoint->jointMsg->bounce(), 0.0);
   qFuzzyCompare(prisJoint->jointMsg->fudge_factor(), 0.0);
@@ -250,7 +254,8 @@ void JointMaker_TEST::JointDefaultProperties()
   qFuzzyCompare(prisJoint->jointMsg->suspension_erp(), 0.2);
 
   msgs::Axis prisAxis1Msg = prisJoint->jointMsg->axis1();
-  QCOMPARE(msgs::Convert(prisAxis1Msg.xyz()), math::Vector3(1, 0, 0));
+  QCOMPARE(msgs::ConvertIgn(prisAxis1Msg.xyz()),
+      ignition::math::Vector3d(1, 0, 0));
   qFuzzyCompare(prisAxis1Msg.limit_lower(), -GZ_DBL_MAX);
   qFuzzyCompare(prisAxis1Msg.limit_upper(), GZ_DBL_MAX);
   qFuzzyCompare(prisAxis1Msg.limit_effort(), -1);
@@ -541,6 +546,35 @@ void JointMaker_TEST::Selection()
   delete jointMaker;
   mainWindow->close();
   delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void JointMaker_TEST::JointMaterial()
+{
+  this->Load("worlds/empty.world");
+
+  gui::JointMaker *jointMaker = new gui::JointMaker();
+
+  // all currently supported joint types.
+  std::vector<std::string> jointTypes;
+  jointTypes.push_back("revolute");
+  jointTypes.push_back("revolute2");
+  jointTypes.push_back("prismatic");
+  jointTypes.push_back("ball");
+  jointTypes.push_back("universal");
+  jointTypes.push_back("screw");
+  jointTypes.push_back("gearbox");
+
+  // verify joint materials are not empty and they are all unique
+  std::set<std::string> jointMaterials;
+  for (auto &j : jointTypes)
+  {
+    std::string mat = jointMaker->GetJointMaterial(j);
+    QVERIFY(mat != "");
+    QVERIFY(jointMaterials.find(mat) == jointMaterials.end());
+    jointMaterials.insert(mat);
+  }
+  delete jointMaker;
 }
 
 // Generate a main function for the test
