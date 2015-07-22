@@ -354,6 +354,7 @@ else (build_errors)
   # The list should have at the very end the libraries
   # without internal interdependencies
   set(PKG_LIBRARIES
+    gazebo_test_fixture
     gazebo
     gazebo_client
     gazebo_gui_building
