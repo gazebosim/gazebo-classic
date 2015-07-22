@@ -19,9 +19,10 @@ License along with this library.
 #ifndef QGVEDGE_H
 #define QGVEDGE_H
 
-#include <qgv.h>
 #include <QGraphicsItem>
 #include <QPen>
+
+#include "qgv.h"
 
 class QGVNode;
 class QGVScene;
@@ -47,6 +48,9 @@ class QGVCORE_EXPORT QGVEdge : public QGraphicsItem
 
     void setSource(const QString &_source);
     void setTarget(const QString &_target);
+
+    void setColor(const QColor &_color);
+    QColor color() const;
 
     void paint(QPainter * painter, const QStyleOptionGraphicsItem * option,
         QWidget * widget = 0);
@@ -84,6 +88,8 @@ class QGVCORE_EXPORT QGVEdge : public QGraphicsItem
 
     QString sourceNode;
     QString targetNode;
+
+    QColor edgeColor;
 };
 
 #endif

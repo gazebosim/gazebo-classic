@@ -15,8 +15,12 @@
  *
 */
 
-#include "gazebo/common/Events.hh"
+#include "gazebo/rendering/Material.hh"
 
+#include "gazebo/common/Events.hh"
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/GraphScene.hh"
 #include "gazebo/gui/model/GraphView.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
@@ -70,10 +74,13 @@ void SchematicViewWidget::Init()
       boost::bind(&SchematicViewWidget::RemoveNode, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectJointInserted(
-      boost::bind(&SchematicViewWidget::AddEdge, this, _1, _2, _3, _4)));
+      boost::bind(&SchematicViewWidget::AddEdge, this, _1, _2, _3, _4, _5)));
 
   this->connections.push_back(gui::model::Events::ConnectJointRemoved(
       boost::bind(&SchematicViewWidget::RemoveEdge, this, _1)));
+
+  this->connections.push_back(gui::model::Events::ConnectJointChanged(
+      boost::bind(&SchematicViewWidget::UpdateEdge, this, _1, _2, _3, _4, _5)));
 }
 
 /////////////////////////////////////////////////
@@ -136,8 +143,8 @@ bool SchematicViewWidget::HasNode(const std::string &_name) const
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::AddEdge(const std::string &_id,
-    const std::string &/*_name*/, const std::string &_parent,
-    const std::string &_child)
+    const std::string &/*_name*/, const std::string &_type,
+    const std::string &_parent, const std::string &_child)
 {
   std::string parentNode = this->GetLeafName(_parent);
   std::string childNode = this->GetLeafName(_child);
@@ -148,6 +155,24 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   this->scene->clearLayout();
 
   this->scene->AddEdge(_id, parentNode, childNode);
+
+  std::string materialName = JointMaker::GetJointMaterial(_type);
+
+  common::Color edgeColor = common::Color::Black;
+  if (!materialName.empty())
+  {
+    common::Color emptyColor;
+    common::Color matAmbient;
+    common::Color matDiffuse;
+    common::Color matSpecular;
+    common::Color matEmissive;
+    rendering::Material::GetMaterialAsColor(materialName, matAmbient,
+        matDiffuse, matSpecular, matEmissive);
+    edgeColor = matDiffuse;
+  }
+
+  this->scene->SetEdgeColor(_id, edgeColor);
+
   this->scene->applyLayout();
 
   this->FitInView();
@@ -168,6 +193,21 @@ void SchematicViewWidget::RemoveEdge(const std::string &_id)
     this->FitInView();
 
     this->edges.erase(it);
+  }
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::UpdateEdge(const std::string &_id,
+    const std::string &_name, const std::string &_type,
+    const std::string &_parent, const std::string &_child)
+{
+  auto it = this->edges.find(_id);
+  if (it != this->edges.end())
+  {
+    this->scene->RemoveEdge(_id);
+    this->edges.erase(it);
+
+    this->AddEdge(_id, _name, _type, _parent, _child);
   }
 }
 

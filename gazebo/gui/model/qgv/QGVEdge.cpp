@@ -28,6 +28,7 @@ QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *qgvscene)
     :  _scene(qgvscene), _edge(edge)
 {
 //    setFlag(QGraphicsItem::ItemIsSelectable, true);
+  this->edgeColor = QGVCore::toColor(getAttribute("color"));
 }
 
 QGVEdge::~QGVEdge()
@@ -79,6 +80,16 @@ QString QGVEdge::source() const
 QString QGVEdge::target() const
 {
   return targetNode;
+}
+
+void QGVEdge::setColor(const QColor &_color)
+{
+  this->edgeColor = _color;
+}
+
+QColor QGVEdge::color() const
+{
+  return this->edgeColor;
 }
 
 void QGVEdge::paint(QPainter * painter,
@@ -163,7 +174,8 @@ void QGVEdge::updateLayout()
     }
 
     _pen.setWidth(1);
-    _pen.setColor(QGVCore::toColor(getAttribute("color")));
+
+    _pen.setColor(this->edgeColor);
     _pen.setStyle(QGVCore::toPenStyle(getAttribute("style")));
 
     // Edge label
