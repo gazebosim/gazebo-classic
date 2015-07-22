@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -29,78 +30,88 @@
 
 using namespace gazebo;
 
+// Register this plugin with the simulator
+GZ_REGISTER_MODEL_PLUGIN(ModelMove);
+
+/////////////////////////////////////////////////
 ModelMove::ModelMove()
-{ }
-
-void ModelMove::move(const math::Vector3 &start, const math::Vector3 &end,
-                     math::Vector3 &translation)
 {
-  int duration = floor(start.Distance(end.x, end.y, end.z));
-  math::Vector3 diff = end - start;
-  float x_step = diff.x / duration;
-  float y_step = diff.y / duration;
-  float z_step = diff.z / duration;
-  int curr_frame = anim->GetKeyFrameCount();
-
-  for (int i = 1; i <= duration; i++)
-  {
-    gazebo::common::PoseKeyFrame * key = anim->CreateKeyFrame(i+curr_frame);
-    key->SetTranslation(math::Vector3(
-         translation.x + x_step * i,
-         translation.y + y_step * i,
-         translation.z + z_step * i));
-    key->SetRotation(math::Quaternion(0, 0, 0));
-  }
-
-  translation.Set(translation.x + x_step*duration,
-                  translation.y + y_step*duration,
-                  translation.z + z_step*duration);
 }
 
-void ModelMove::initiateMove()
+/////////////////////////////////////////////////
+void ModelMove::Move(const math::Vector3 &_start, const math::Vector3 &_end,
+                     math::Vector3 &_translation)
+{
+  int duration = floor(_start.Distance(_end.x, _end.y, _end.z));
+  math::Vector3 diff = _end - _start;
+  float xStep = diff.x / duration;
+  float yStep = diff.y / duration;
+  float zStep = diff.z / duration;
+  int currFrame = this->anim->GetKeyFrameCount();
+
+  for (int i = 1; i <= duration; ++i)
+  {
+    gazebo::common::PoseKeyFrame *key = this->anim->CreateKeyFrame(
+        i + currFrame);
+
+    key->Translation(ignition::math::Vector3d(
+         _translation.x + xStep * i,
+         _translation.y + yStep * i,
+         _translation.z + zStep * i));
+    key->Rotation(ignition::math::Quaterniond(0, 0, 0));
+  }
+
+  _translation.Set(_translation.x + xStep * duration,
+                   _translation.y + yStep * duration,
+                   _translation.z + zStep * duration);
+}
+
+/////////////////////////////////////////////////
+void ModelMove::InitiateMove()
 {
   // get distance from starting point to the first of the goals
-  float path_length = start_position.Distance(this->path_goals[0].pos);
+  float pathLength = this->startPosition.Distance(this->pathGoals[0].pos);
 
   // to calculate the full distance, add the distance between goals
-  for (int i = 0; i < this->path_goals.size()-1; i++)
-    path_length += path_goals[i].pos.Distance(path_goals[i+1].pos);
+  for (unsigned int i = 0; i < this->pathGoals.size()-1; ++i)
+    pathLength += this->pathGoals[i].pos.Distance(this->pathGoals[i+1].pos);
 
   // create the animation
-  this->anim =
-    gazebo::common::PoseAnimationPtr(
-        new gazebo::common::PoseAnimation("test", path_length+1, false));
+  this->anim = gazebo::common::PoseAnimationPtr(
+        new gazebo::common::PoseAnimation("test", pathLength + 1, false));
 
   gazebo::common::PoseKeyFrame *key;
 
   // set starting location of the box
-  key = anim->CreateKeyFrame(0);
-  key->SetTranslation(math::Vector3(0, 0, 0));
-  key->SetRotation(math::Quaternion(0, 0, 0));
+  key = this->anim->CreateKeyFrame(0);
+  key->Translation(ignition::math::Vector3d(0, 0, 0));
+  key->Rotation(ignition::math::Quaterniond(0, 0, 0));
 
   math::Vector3 translation = math::Vector3(0, 0, 0);
 
-  // Move to the start_position to first goal
-  move(start_position, path_goals[0].pos, translation);
+  // Move to the startPosition to first goal
+  this->Move(this->startPosition, this->pathGoals[0].pos, translation);
 
-  for (int i = 0; i < this->path_goals.size()-1; i++)
-    move(path_goals[i].pos, path_goals[i+1].pos, translation);
+  for (unsigned int i = 0; i < this->pathGoals.size()-1; ++i)
+    this->Move(this->pathGoals[i].pos, this->pathGoals[i+1].pos, translation);
 
   // set the animation
-  this->model->SetAnimation(anim);
+  this->model->SetAnimation(this->anim);
 }
 
-void ModelMove::getPathMsg(ConstPoseAnimationPtr &msg)
+/////////////////////////////////////////////////
+void ModelMove::OnPathMsg(ConstPoseAnimationPtr &_msg)
 {
   gzmsg << "[model_move] Received path message" << std::endl;
 
-  // Store message poses into the path_goals and launch movement
-  for (int i = 0; i < msg->pose_size(); i++)
-    this->path_goals.push_back(gazebo::msgs::Convert(msg->pose(i)));
+  // Store message poses into the pathGoals and launch movement
+  for (unsigned int i = 0; i < _msg->pose_size(); ++i)
+    this->pathGoals.push_back(gazebo::msgs::ConvertIgn(_msg->pose(i)));
 
-  initiateMove();
+  this->InitiateMove();
 }
 
+/////////////////////////////////////////////////
 bool ModelMove::LoadGoalsFromSDF(const sdf::ElementPtr _sdf)
 {
   gzmsg << "[model_move] Processing path goals defined in the SDF file"
@@ -118,14 +129,16 @@ bool ModelMove::LoadGoalsFromSDF(const sdf::ElementPtr _sdf)
 
   while (poseElem)
   {
-    this->path_goals.push_back(poseElem->Get<math::Pose>());
+    this->pathGoals.push_back(poseElem->Get<math::Pose>());
     poseElem = poseElem->GetNextElement("pose");
   }
 
-  GZ_ASSERT(this->path_goals.size() > 0, "path_goals should not be zero");
+  GZ_ASSERT(this->pathGoals.size() > 0, "pathGoals should not be zero");
+
   return true;
 }
 
+/////////////////////////////////////////////////
 void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Store the pointer to the model
@@ -140,12 +153,13 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       // Ready to start the move. Store the initial pose of the model
       // and call initiateMove
-      sdf::Vector3 sdf_pose =
-        _sdf->GetParent()->GetElement("pose")->Get<sdf::Pose>().pos;
-      this->start_position =
-        math::Vector3(sdf_pose.x, sdf_pose.y, sdf_pose.z);
+      ignition::math::Vector3d sdfPose =
+        _sdf->GetParent()->GetElement("pose")
+            ->Get<ignition::math::Pose3d>().Pos();
+      this->startPosition =
+        math::Vector3(sdfPose.X(), sdfPose.Y(), sdfPose.Z());
 
-      initiateMove();
+      this->InitiateMove();
     }
     else
     {
@@ -155,10 +169,10 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   }
 
   // Create the subscriber
-  std::string path_topic_name = std::string("~/") + _parent->GetName()
-                                + "/model_move";
-  pathSubscriber = node->Subscribe(path_topic_name, &ModelMove::getPathMsg,
-                                   this);
-  gzmsg << "[model_move] Subscribed to receive paths in: "<< path_topic_name
+  std::string pathTopicName = std::string("~/") + _parent->GetName()
+    + "/model_move";
+  this->pathSubscriber = node->Subscribe(
+      pathTopicName, &ModelMove::OnPathMsg, this);
+  gzmsg << "[model_move] Subscribed to receive paths in: "<< pathTopicName
         << std::endl;
 }

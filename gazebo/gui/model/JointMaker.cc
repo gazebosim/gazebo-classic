@@ -43,13 +43,14 @@ using namespace gazebo;
 using namespace gui;
 
 std::map<JointMaker::JointType, std::string> JointMaker::jointTypes;
+std::map<JointMaker::JointType, std::string> JointMaker::jointMaterials;
 
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
 {
-  this->UnitVectors.push_back(math::Vector3::UnitX);
-  this->UnitVectors.push_back(math::Vector3::UnitY);
-  this->UnitVectors.push_back(math::Vector3::UnitZ);
+  this->unitVectors.push_back(ignition::math::Vector3d::UnitX);
+  this->unitVectors.push_back(ignition::math::Vector3d::UnitY);
+  this->unitVectors.push_back(ignition::math::Vector3d::UnitZ);
 
   this->newJointCreated = false;
   this->mouseJoint = NULL;
@@ -59,21 +60,22 @@ JointMaker::JointMaker()
 
   this->jointMaterials[JOINT_FIXED]     = "Gazebo/Red";
   this->jointMaterials[JOINT_HINGE]     = "Gazebo/Orange";
-  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/Yellow";
+  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/DarkYellow";
   this->jointMaterials[JOINT_SLIDER]    = "Gazebo/Green";
-  this->jointMaterials[JOINT_SCREW]     = "Gazebo/Black";
+  this->jointMaterials[JOINT_SCREW]     = "Gazebo/DarkGrey";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
+  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/Turquoise";
 
-
-  jointTypes[JOINT_FIXED]     = "fixed";
-  jointTypes[JOINT_HINGE]     = "revolute";
-  jointTypes[JOINT_HINGE2]    = "revolute2";
-  jointTypes[JOINT_SLIDER]    = "prismatic";
-  jointTypes[JOINT_SCREW]     = "screw";
-  jointTypes[JOINT_UNIVERSAL] = "universal";
-  jointTypes[JOINT_BALL]      = "ball";
-  jointTypes[JOINT_NONE]      = "none";
+  this->jointTypes[JOINT_FIXED]     = "fixed";
+  this->jointTypes[JOINT_HINGE]     = "revolute";
+  this->jointTypes[JOINT_HINGE2]    = "revolute2";
+  this->jointTypes[JOINT_SLIDER]    = "prismatic";
+  this->jointTypes[JOINT_SCREW]     = "screw";
+  this->jointTypes[JOINT_UNIVERSAL] = "universal";
+  this->jointTypes[JOINT_BALL]      = "ball";
+  this->jointTypes[JOINT_GEARBOX]   = "gearbox";
+  this->jointTypes[JOINT_NONE]      = "none";
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -261,20 +263,20 @@ std::vector<JointData *> JointMaker::GetJointDataByLink(
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  if (_event.button == common::MouseEvent::MIDDLE)
+  if (_event.Button() == common::MouseEvent::MIDDLE)
   {
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     camera->HandleMouseEvent(_event);
     return true;
   }
-  else if (_event.button != common::MouseEvent::LEFT)
+  else if (_event.Button() != common::MouseEvent::LEFT)
     return false;
 
   if (this->jointType != JointMaker::JOINT_NONE)
     return false;
 
   // intercept mouse press events when user clicks on the joint hotspot visual
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
   if (vis)
   {
     if (this->joints.find(vis->GetName()) != this->joints.end())
@@ -293,19 +295,19 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   rendering::UserCameraPtr camera = gui::get_active_camera();
   if (this->jointType == JointMaker::JOINT_NONE)
   {
-    rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+    rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
     if (vis)
     {
       if (this->joints.find(vis->GetName()) != this->joints.end())
       {
         // trigger joint inspector on right click
-        if (_event.button == common::MouseEvent::RIGHT)
+        if (_event.Button() == common::MouseEvent::RIGHT)
         {
           this->inspectName = vis->GetName();
           this->ShowContextMenu(this->inspectName);
           return true;
         }
-        else if (_event.button == common::MouseEvent::LEFT)
+        else if (_event.Button() == common::MouseEvent::LEFT)
         {
           // Not in multi-selection mode.
           if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
@@ -331,7 +333,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   }
   else
   {
-    if (_event.button == common::MouseEvent::LEFT)
+    if (_event.Button() == common::MouseEvent::LEFT)
     {
       if (this->hoverVis)
       {
@@ -464,7 +466,8 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     jointData->jointMsg->set_child(leafName);
     jointData->jointMsg->set_child_id(jointData->child->GetId());
   }
-  msgs::Set(jointData->jointMsg->mutable_pose(), math::Pose::Zero);
+  msgs::Set(jointData->jointMsg->mutable_pose(),
+      ignition::math::Pose3d::Zero);
 
   jointData->jointMsg->set_type(
       msgs::ConvertJointType(this->GetTypeAsString(jointData->type)));
@@ -490,7 +493,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
       continue;
     }
     msgs::Set(axisMsg->mutable_xyz(),
-        this->UnitVectors[i%this->UnitVectors.size()]);
+        this->unitVectors[i%this->unitVectors.size()]);
     axisMsg->set_use_parent_model_frame(false);
     axisMsg->set_limit_lower(-GZ_DBL_MAX);
     axisMsg->set_limit_upper(GZ_DBL_MAX);
@@ -516,6 +519,16 @@ JointMaker::JointType JointMaker::ConvertJointType(const std::string &_type)
       return iter.first;
 
   return JOINT_NONE;
+}
+
+/////////////////////////////////////////////////
+std::string JointMaker::GetJointMaterial(const std::string &_type)
+{
+  auto it = jointMaterials.find(ConvertJointType(_type));
+  if (it != jointMaterials.end())
+    return it->second;
+  else
+    return "";
 }
 
 /////////////////////////////////////////////////
@@ -575,7 +588,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
-  if (_event.dragging)
+  if (_event.Dragging())
   {
     // this enables the joint maker to pan while connecting joints
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
@@ -583,7 +596,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   // Highlight visual on hover
   if (vis)
@@ -627,7 +640,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     {
       // Set end point to mouse plane intersection
       math::Vector3 pt;
-      camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
+      camera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
       {
@@ -667,7 +680,7 @@ void JointMaker::OpenInspector(const std::string &_jointId)
 bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   if (vis)
   {
@@ -767,8 +780,12 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
+
+  std::string parentName = _joint->parent->GetName();
+  std::string childName = _joint->child->GetName();
+
   gui::model::Events::jointInserted(jointId, _joint->name,
-      _joint->parent->GetName(), _joint->child->GetName());
+      jointTypes[_joint->type], parentName, childName);
 }
 
 /////////////////////////////////////////////////
@@ -842,6 +859,12 @@ void JointMaker::Update()
                 mat->getTechnique(0)->getPass(0)->getDiffuse();
             color.a = 0.5;
             joint->handles->getBillboard(0)->setColour(color);
+
+            // notify joint changes
+            std::string parentName = joint->parent->GetName();
+            std::string childName = joint->child->GetName();
+            gui::model::Events::jointChanged(it.first, joint->name,
+                jointTypes[joint->type], parentName, childName);
           }
 
           // set pos of joint handle
@@ -1010,6 +1033,10 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   else if (_type == JOINT_BALL)
   {
     return 0;
+  }
+  else if (_type == JOINT_GEARBOX)
+  {
+    return 2;
   }
 
   return 0;

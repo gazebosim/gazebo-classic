@@ -21,6 +21,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 
@@ -160,7 +161,8 @@ class PhysicsFrictionTest : public ServerFixture,
               << "      </geometry>"
               << "    </visual>"
               << "  </link>"
-              << "</model>";
+              << "</model>"
+              << "</sdf>";
 
             physics::WorldPtr world = physics::get_world("default");
             world->InsertModelString(modelStr.str());
@@ -191,7 +193,9 @@ class PhysicsFrictionTest : public ServerFixture,
 
   /// \brief Use the friction_demo world.
   /// \param[in] _physicsEngine Physics engine to use.
-  public: void FrictionDemo(const std::string &_physicsEngine);
+  public: void FrictionDemo(const std::string &_physicsEngine,
+                            const std::string &_solverType="quick",
+                            const std::string &_worldSolverType="ODE_DANTZIG");
 
   /// \brief Friction test of maximum dissipation principle.
   /// Basically test that friction force vector is aligned with
@@ -212,6 +216,10 @@ class PhysicsFrictionTest : public ServerFixture,
   private: unsigned int spawnCount;
 };
 
+class WorldStepFrictionTest : public PhysicsFrictionTest
+{
+};
+
 /////////////////////////////////////////////////
 // FrictionDemo test:
 // Uses the test_friction world, which has a bunch of boxes on the ground
@@ -219,7 +227,9 @@ class PhysicsFrictionTest : public ServerFixture,
 // box has a different coefficient of friction. These friction coefficients
 // are chosen to be close to the value that would prevent sliding according
 // to the Coulomb model.
-void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
+void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
+                                       const std::string &_solverType,
+                                       const std::string &_worldSolverType)
 {
   if (_physicsEngine == "simbody")
   {
@@ -244,6 +254,15 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(g.y, -1.0);
   EXPECT_DOUBLE_EQ(g.z, -1.0);
 
+  if (_physicsEngine == "ode")
+  {
+    // Set solver type
+    physics->SetParam("solver_type", _solverType);
+
+    // Set world step solver type
+    physics->SetParam("world_step_solver", _worldSolverType);
+  }
+
   std::vector<PhysicsFrictionTest::FrictionDemoBox> boxes;
   std::vector<PhysicsFrictionTest::FrictionDemoBox>::iterator box;
   boxes.push_back(PhysicsFrictionTest::FrictionDemoBox(world, "box_01_model"));
@@ -266,24 +285,33 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
     world->Step(500);
     t = world->GetSimTime();
 
+    double yTolerance = g_friction_tolerance;
+    if (_solverType == "world")
+    {
+      if (_worldSolverType == "DART_PGS")
+        yTolerance *= 2;
+      else if (_worldSolverType == "ODE_DANTZIG")
+        yTolerance = 0.84;
+    }
+
     for (box = boxes.begin(); box != boxes.end(); ++box)
     {
       math::Vector3 vel = box->model->GetWorldLinearVel();
       EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(vel.z, 0, g_friction_tolerance);
+      EXPECT_NEAR(vel.z, 0, yTolerance);
 
       // Coulomb friction model
       if (box->friction >= 1.0)
       {
         // Friction is large enough to prevent motion
-        EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
+        EXPECT_NEAR(vel.y, 0, yTolerance);
       }
       else
       {
         // Friction is small enough to allow motion
         // Expect velocity = acceleration * time
         EXPECT_NEAR(vel.y, (g.y + box->friction) * t.Double(),
-                    g_friction_tolerance);
+                    yTolerance);
       }
     }
   }
@@ -557,6 +585,12 @@ TEST_P(PhysicsFrictionTest, FrictionDemo)
 }
 
 /////////////////////////////////////////////////
+TEST_P(WorldStepFrictionTest, FrictionDemoWorldStep)
+{
+  FrictionDemo("ode", "world", GetParam());
+}
+
+/////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, MaximumDissipation)
 {
   if (std::string("ode").compare(GetParam()) == 0)
@@ -585,6 +619,9 @@ TEST_P(PhysicsFrictionTest, DirectionNaN)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsFrictionTest,
                         PHYSICS_ENGINE_VALUES);
+
+INSTANTIATE_TEST_CASE_P(WorldStepSolvers, WorldStepFrictionTest,
+                        WORLD_STEP_SOLVERS);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

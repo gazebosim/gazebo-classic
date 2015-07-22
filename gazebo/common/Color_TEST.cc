@@ -44,7 +44,7 @@ TEST_F(Color, Color)
   EXPECT_FLOAT_EQ(0.5f, clr.b);
   EXPECT_FLOAT_EQ(0.0f, clr.a);
 
-  EXPECT_TRUE(clr.GetAsHSV() == math::Vector3(6, 0.5, 1));
+  EXPECT_TRUE(clr.HSV() == ignition::math::Vector3d(6, 0.5, 1));
 
   clr.SetFromHSV(60, 0.0, 1.0);
   EXPECT_FLOAT_EQ(1.0f, clr.r);
@@ -123,30 +123,31 @@ TEST_F(Color, Color)
 
 
   clr.SetFromYUV(0.5, 0.2, 0.8);
-  EXPECT_TRUE(math::equal(0.00553f, clr.r, 1e-3f));
-  EXPECT_TRUE(math::equal(0.0f, clr.g));
-  EXPECT_TRUE(math::equal(0.9064f, clr.b, 1e-3f));
-  EXPECT_TRUE(math::equal(0.04f, clr.a));
+  EXPECT_TRUE(ignition::math::equal(0.00553f, clr.r, 1e-3f));
+  EXPECT_TRUE(ignition::math::equal(0.0f, clr.g));
+  EXPECT_TRUE(ignition::math::equal(0.9064f, clr.b, 1e-3f));
+  EXPECT_TRUE(ignition::math::equal(0.04f, clr.a));
 
-  EXPECT_TRUE(clr.GetAsYUV() == math::Vector3(0.104985, 0.95227, 0.429305));
+  EXPECT_TRUE(clr.YUV() ==
+      ignition::math::Vector3d(0.104985, 0.95227, 0.429305));
 
   clr = common::Color(1.0, 0.0, 0.5, 1.0) + common::Color(0.1, 0.3, 0.4, 1.0);
-  EXPECT_TRUE(math::equal(0.00431373f, clr.r));
-  EXPECT_TRUE(math::equal(0.3f, clr.g));
-  EXPECT_TRUE(math::equal(0.9f, clr.b));
-  EXPECT_TRUE(math::equal(2.0f, clr.a));
+  EXPECT_TRUE(ignition::math::equal(0.00431373f, clr.r));
+  EXPECT_TRUE(ignition::math::equal(0.3f, clr.g));
+  EXPECT_TRUE(ignition::math::equal(0.9f, clr.b));
+  EXPECT_TRUE(ignition::math::equal(2.0f, clr.a));
 
   clr = common::Color(1.0, 0.0, 0.5, 1.0) - common::Color(0.1, 0.3, 0.4, 1.0);
-  EXPECT_TRUE(math::equal(0.9f, clr.r));
-  EXPECT_TRUE(math::equal(0.0f, clr.g));
-  EXPECT_TRUE(math::equal(0.1f, clr.b));
-  EXPECT_TRUE(math::equal(0.0f, clr.a));
+  EXPECT_TRUE(ignition::math::equal(0.9f, clr.r));
+  EXPECT_TRUE(ignition::math::equal(0.0f, clr.g));
+  EXPECT_TRUE(ignition::math::equal(0.1f, clr.b));
+  EXPECT_TRUE(ignition::math::equal(0.0f, clr.a));
 
   clr = common::Color(0.5, 0.2, 0.4, 0.6) / 2.0;
-  EXPECT_TRUE(math::equal(0.25f, clr.r));
-  EXPECT_TRUE(math::equal(0.1f, clr.g));
-  EXPECT_TRUE(math::equal(0.2f, clr.b));
-  EXPECT_TRUE(math::equal(0.3f, clr.a));
+  EXPECT_TRUE(ignition::math::equal(0.25f, clr.r));
+  EXPECT_TRUE(ignition::math::equal(0.1f, clr.g));
+  EXPECT_TRUE(ignition::math::equal(0.2f, clr.b));
+  EXPECT_TRUE(ignition::math::equal(0.3f, clr.a));
 }
 
 

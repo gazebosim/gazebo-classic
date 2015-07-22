@@ -130,7 +130,6 @@ namespace gazebo
     /// \param[in] _topic The topic to advertise
     /// \param[in] _message Message to be published
     template<typename M>
-    GZ_TRANSPORT_VISIBLE
     void publish(const std::string &_topic,
                  const google::protobuf::Message &_message)
     {

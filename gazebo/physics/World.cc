@@ -124,6 +124,7 @@ World::World(const std::string &_name)
   this->dataPtr->thread = NULL;
   this->dataPtr->logThread = NULL;
   this->dataPtr->stop = false;
+  this->dataPtr->seekPending = false;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
@@ -268,11 +269,11 @@ void World::Load(sdf::ElementPtr _sdf)
     common::SphericalCoordinates::SurfaceType surfaceType =
       common::SphericalCoordinates::Convert(
         spherical->Get<std::string>("surface_model"));
-    math::Angle latitude, longitude, heading;
+    ignition::math::Angle latitude, longitude, heading;
     double elevation = spherical->Get<double>("elevation");
-    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
-    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
-    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+    latitude.Degree(spherical->Get<double>("latitude_deg"));
+    longitude.Degree(spherical->Get<double>("longitude_deg"));
+    heading.Degree(spherical->Get<double>("heading_deg"));
 
     this->dataPtr->sphericalCoordinates.reset(new common::SphericalCoordinates(
       surfaceType, latitude, longitude, elevation, heading));
@@ -495,6 +496,8 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
+  bool stay;
+
   if (this->dataPtr->stepInc < 0)
   {
     // Step back: This is implemented by going to the beginning of the log file,
@@ -524,8 +527,24 @@ void World::LogStep()
     this->dataPtr->iterations = 0;
   }
 
-  while (!this->IsPaused() || this->dataPtr->stepInc > 0)
   {
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+    // There are two main reasons to keep iterating in the following loop:
+    //   1. If "stepInc" is positive: This means that a client requested to
+    //      advanced the simulation some steps.
+    //   2. If "seekPending" is true: This means that a client requested to
+    //      advance the simulation to a given simulation time ("seek"). We will
+    //      have to check at the end of each iteration if we reached the target
+    //      simulation time.
+    //   Note that if the simulation is not paused (play mode) we will enter
+    //   the loop. However, the code will only execute one iteration (one step).
+    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
+           this->dataPtr->seekPending;
+  }
+  while (stay)
+  {
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+
     std::string data;
     if (!util::LogPlay::Instance()->Step(data))
     {
@@ -591,8 +610,22 @@ void World::LogStep()
     if (this->dataPtr->stepInc > 0)
       this->dataPtr->stepInc--;
 
-    // We only run one step if we are in play mode.
-    if (!this->IsPaused())
+    // We may have entered into the loop because a "seek" command was
+    // requested. At this point we have executed one more step. Now, it's time
+    // to check if we have reached the target simulation time specified in the
+    // "seek" command.
+    if (this->dataPtr->seekPending)
+    {
+      this->dataPtr->seekPending =
+        this->GetSimTime() < this->dataPtr->targetSimTime;
+    }
+
+    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
+           this->dataPtr->seekPending;
+
+    // We only run one step if we are in play mode and we don't have
+    // other pending commands.
+    if (!this->IsPaused() && !this->dataPtr->seekPending)
       break;
   }
 
@@ -1066,7 +1099,7 @@ void World::Reset()
   this->SetPaused(true);
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     math::Rand::SetSeed(math::Rand::GetSeed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
@@ -1157,7 +1190,7 @@ void World::SetPaused(bool _p)
     return;
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->pause = _p;
   }
 
@@ -1232,6 +1265,12 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
+
+  // Ignore this command if there's another one pending.
+  if (this->dataPtr->seekPending)
+    return;
+
   if (_data->has_pause())
     this->SetPaused(_data->pause());
 
@@ -1240,8 +1279,29 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     // stepWorld is a blocking call so set stepInc directly so that world stats
     // will still be published
     this->SetPaused(true);
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->stepInc += _data->multi_step();
+  }
+
+  if (_data->has_seek())
+  {
+    this->dataPtr->targetSimTime = msgs::Convert(_data->seek());
+    if (this->GetSimTime() > this->dataPtr->targetSimTime)
+      util::LogPlay::Instance()->Rewind();
+    this->dataPtr->seekPending = true;
+  }
+
+  if (_data->has_rewind() && _data->rewind())
+  {
+    util::LogPlay::Instance()->Rewind();
+    this->dataPtr->stepInc = 1;
+  }
+
+  if (_data->has_forward() && _data->forward())
+  {
+    this->dataPtr->targetSimTime = util::LogPlay::Instance()->GetLogEndTime();
+    if (this->GetSimTime() > this->dataPtr->targetSimTime)
+      util::LogPlay::Instance()->Rewind();
+    this->dataPtr->seekPending = true;
   }
 }
 
@@ -1716,7 +1776,9 @@ void World::ProcessFactoryMsgs()
         elem->SetParent(this->dataPtr->sdf);
         elem->GetParent()->InsertElement(elem);
         if (factoryMsg.has_pose())
-          elem->GetElement("pose")->Set(msgs::Convert(factoryMsg.pose()));
+        {
+          elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
+        }
 
         if (isActor)
         {
@@ -1961,7 +2023,7 @@ void World::ProcessMessages()
           // Publish the model's relative pose
           poseMsg->set_name(model->GetScopedName());
           poseMsg->set_id(model->GetId());
-          msgs::Set(poseMsg, model->GetRelativePose());
+          msgs::Set(poseMsg, model->GetRelativePose().Ign());
 
           // Publish each of the model's children relative poses
           Link_V links = model->GetLinks();
@@ -1970,7 +2032,7 @@ void World::ProcessMessages()
             poseMsg = msg.add_pose();
             poseMsg->set_name(link->GetScopedName());
             poseMsg->set_id(link->GetId());
-            msgs::Set(poseMsg, link->GetRelativePose());
+            msgs::Set(poseMsg, link->GetRelativePose().Ign());
           }
         }
 

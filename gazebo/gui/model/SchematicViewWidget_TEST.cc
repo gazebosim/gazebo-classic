@@ -56,11 +56,11 @@ void SchematicViewWidget_TEST::AddRemove()
 
   // add edges
   QCOMPARE(svWidget->GetEdgeCount(), 0u);
-  svWidget->AddEdge("id_0", "edge_0", "node_a", "node_b");
+  svWidget->AddEdge("id_0", "edge_0", "revolute", "node_a", "node_b");
   QCOMPARE(svWidget->GetEdgeCount(), 1u);
-  svWidget->AddEdge("id_1", "edge_1", "node_b", "node_c");
+  svWidget->AddEdge("id_1", "edge_1", "revolute2", "node_b", "node_c");
   QCOMPARE(svWidget->GetEdgeCount(), 2u);
-  svWidget->AddEdge("id_2", "edge_2", "node_a", "node_c");
+  svWidget->AddEdge("id_2", "edge_2", "ball", "node_a", "node_c");
   QCOMPARE(svWidget->GetEdgeCount(), 3u);
   // remove edge
   svWidget->RemoveEdge("id_2");
@@ -69,11 +69,16 @@ void SchematicViewWidget_TEST::AddRemove()
   svWidget->RemoveEdge("id_2");
   QCOMPARE(svWidget->GetEdgeCount(), 2u);
   // add it back
-  svWidget->AddEdge("id_2", "edge_2", "node_a", "node_c");
+  svWidget->AddEdge("id_2", "edge_2", "prismatic", "node_a", "node_c");
   QCOMPARE(svWidget->GetEdgeCount(), 3u);
 
   // remove node and its edges
   svWidget->RemoveNode("node_b");
+  QCOMPARE(svWidget->GetNodeCount(), 3u);
+  QCOMPARE(svWidget->GetEdgeCount(), 1u);
+
+  // update edge
+  svWidget->UpdateEdge("id_2", "edge_2_update", "screw", "node_c", "node_a");
   QCOMPARE(svWidget->GetNodeCount(), 3u);
   QCOMPARE(svWidget->GetEdgeCount(), 1u);
 

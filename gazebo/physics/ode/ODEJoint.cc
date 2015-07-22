@@ -678,6 +678,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
         this->GetForce(0u) * this->GetLocalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
     }
+    else if (this->HasType(physics::Base::FIXED_JOINT))
+    {
+      // no correction are necessary for fixed joint
+    }
     else
     {
       /// \TODO: fix for multi-axis joints

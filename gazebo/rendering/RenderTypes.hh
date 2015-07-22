@@ -63,6 +63,7 @@ namespace gazebo
     class RFIDTagVisual;
     class ApplyWrenchVisual;
     class OriginVisual;
+    class LinkFrameVisual;
     class WindowManager;
     class SelectionObj;
     class RayQuery;
@@ -159,6 +160,10 @@ namespace gazebo
     /// \def OriginVisualPtr
     /// \brief Shared pointer to OriginVisual
     typedef boost::shared_ptr<OriginVisual> OriginVisualPtr;
+
+    /// \def LinkFrameVisualPtr
+    /// \brief Shared pointer to LinkFrameVisual
+    typedef boost::shared_ptr<LinkFrameVisual> LinkFrameVisualPtr;
 
     /// \def WindowManager
     /// \brief Shared pointer to WindowManager
