@@ -40,6 +40,8 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
 {
   this->setObjectName("saveDialog");
   this->setWindowTitle(tr("Save Model"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   this->dataPtr->messageLabel = new QLabel;
   this->dataPtr->messageLabel->setText(
@@ -123,6 +125,7 @@ SaveDialog::SaveDialog(int _mode, QWidget *_parent)
   locationLayout->addWidget(browseButton);
 
   QRadioButton *advancedOptionsCollapser = new QRadioButton();
+  advancedOptionsCollapser->setFocusPolicy(Qt::NoFocus);
   advancedOptionsCollapser->setChecked(false);
   advancedOptionsCollapser->setText("Advanced Options");
   advancedOptionsCollapser->setStyleSheet(

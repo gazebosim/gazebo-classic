@@ -27,6 +27,8 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("ImportDialog");
   this->setWindowTitle("Import Link");
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   this->messageLabel = new QLabel;
   this->messageLabel->setText(
@@ -69,6 +71,7 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////
