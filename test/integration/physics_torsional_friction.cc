@@ -208,8 +208,8 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     auto sphere = spheres[number-1];
 
     // Check that contact normal is in the positive Z direction
-    math::Vector3 normal = msgs::Convert(contact.normal(0));
-    EXPECT_EQ(normal, math::Vector3::UnitZ);
+    ignition::math::Vector3d normal = msgs::ConvertIgn(contact.normal(0));
+    EXPECT_EQ(normal, ignition::math::Vector3d::UnitZ);
 
     // Check that contact depth is:
     // normal force = kp * depth
