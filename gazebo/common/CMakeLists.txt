@@ -53,6 +53,7 @@ set (sources
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
+  MouseEvent.cc
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
