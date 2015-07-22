@@ -1,4 +1,6 @@
 ## Gazebo 7.0
+1. Log playback GUI for multistep, rewind, forward and seek
+    * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
 
 1. Model editor updates
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
