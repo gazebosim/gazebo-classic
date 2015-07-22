@@ -24,6 +24,7 @@
 
 #include <vector>
 #include <string>
+#include <OGRE/OgrePrerequisites.h>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
