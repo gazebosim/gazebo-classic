@@ -24,8 +24,6 @@
 
 using namespace gazebo;
 
-const double g_friction_tolerance = 1e-3;
-
 class JointGetForceTorqueTest : public ServerFixture,
                                 public testing::WithParamInterface<const char *>
 {
@@ -224,11 +222,11 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
 
   if (opt.parentIsWorld)
   {
-    ASSERT_EQ(model->GetJointCount(), 1);
+    ASSERT_EQ(model->GetJointCount(), 1u);
   }
   else
   {
-    ASSERT_EQ(model->GetJointCount(), 2);
+    ASSERT_EQ(model->GetJointCount(), 2u);
   }
 
   physics::JointWrench W = joint->GetForceTorque(0u);

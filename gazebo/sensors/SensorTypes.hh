@@ -254,7 +254,31 @@ namespace gazebo
 
       /// \brief Velocity noise streams for the altimeter sensor
       /// \sa AltimeterSensor
-      ALTIMETER_VELOCITY_NOISE_METERS_PER_S = 14
+      ALTIMETER_VELOCITY_NOISE_METERS_PER_S = 14,
+
+      /// \brief IMU angular velocity X noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_X_NOISE_RADIANS_PER_S = 15,
+
+      /// \brief IMU angular velocity Y noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_Y_NOISE_RADIANS_PER_S = 16,
+
+      /// \brief IMU angular velocity Z noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_Z_NOISE_RADIANS_PER_S = 17,
+
+      /// \brief IMU linear acceleration X noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_X_NOISE_METERS_PER_S_SQR = 18,
+
+      /// \brief IMU linear acceleration Y noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_Y_NOISE_METERS_PER_S_SQR = 19,
+
+      /// \brief IMU linear acceleration Z noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20
     };
     /// \}
   }

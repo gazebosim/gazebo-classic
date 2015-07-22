@@ -168,14 +168,30 @@ void QGVScene::removeEdge(const QString &_label)
   }
 }
 
-bool QGVScene::hasNode(const QString &name)
+bool QGVScene::hasNode(const QString &_name)
 {
-  return _nodes.contains(name);
+  return _nodes.contains(_name);
 }
 
-QGVNode *QGVScene::getNode(const QString &name)
+QGVNode *QGVScene::getNode(const QString &_name)
 {
-  return _nodes[name];
+  if (this->hasNode(_name))
+    return _nodes[_name];
+  else
+    return NULL;
+}
+
+bool QGVScene::hasEdge(const QString &_label)
+{
+  return _edges.contains(_label);
+}
+
+QGVEdge *QGVScene::getEdge(const QString &_label)
+{
+  if (this->hasEdge(_label))
+    return _edges[_label];
+  else
+    return NULL;
 }
 
 int QGVScene::nodeCount() const

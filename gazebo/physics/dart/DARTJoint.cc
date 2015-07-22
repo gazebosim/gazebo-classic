@@ -475,6 +475,12 @@ double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
 }
 
 //////////////////////////////////////////////////
+void DARTJoint::CacheForceTorque()
+{
+  // Does nothing for now, will add when recovering pull request #1721
+}
+
+//////////////////////////////////////////////////
 JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 {
   JointWrench jointWrench;
