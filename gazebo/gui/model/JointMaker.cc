@@ -43,6 +43,7 @@ using namespace gazebo;
 using namespace gui;
 
 std::map<JointMaker::JointType, std::string> JointMaker::jointTypes;
+std::map<JointMaker::JointType, std::string> JointMaker::jointMaterials;
 
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
@@ -59,21 +60,22 @@ JointMaker::JointMaker()
 
   this->jointMaterials[JOINT_FIXED]     = "Gazebo/Red";
   this->jointMaterials[JOINT_HINGE]     = "Gazebo/Orange";
-  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/Yellow";
+  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/DarkYellow";
   this->jointMaterials[JOINT_SLIDER]    = "Gazebo/Green";
-  this->jointMaterials[JOINT_SCREW]     = "Gazebo/Black";
+  this->jointMaterials[JOINT_SCREW]     = "Gazebo/DarkGrey";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
+  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/Turquoise";
 
-
-  jointTypes[JOINT_FIXED]     = "fixed";
-  jointTypes[JOINT_HINGE]     = "revolute";
-  jointTypes[JOINT_HINGE2]    = "revolute2";
-  jointTypes[JOINT_SLIDER]    = "prismatic";
-  jointTypes[JOINT_SCREW]     = "screw";
-  jointTypes[JOINT_UNIVERSAL] = "universal";
-  jointTypes[JOINT_BALL]      = "ball";
-  jointTypes[JOINT_NONE]      = "none";
+  this->jointTypes[JOINT_FIXED]     = "fixed";
+  this->jointTypes[JOINT_HINGE]     = "revolute";
+  this->jointTypes[JOINT_HINGE2]    = "revolute2";
+  this->jointTypes[JOINT_SLIDER]    = "prismatic";
+  this->jointTypes[JOINT_SCREW]     = "screw";
+  this->jointTypes[JOINT_UNIVERSAL] = "universal";
+  this->jointTypes[JOINT_BALL]      = "ball";
+  this->jointTypes[JOINT_GEARBOX]   = "gearbox";
+  this->jointTypes[JOINT_NONE]      = "none";
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -520,6 +522,16 @@ JointMaker::JointType JointMaker::ConvertJointType(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
+std::string JointMaker::GetJointMaterial(const std::string &_type)
+{
+  auto it = jointMaterials.find(ConvertJointType(_type));
+  if (it != jointMaterials.end())
+    return it->second;
+  else
+    return "";
+}
+
+/////////////////////////////////////////////////
 void JointMaker::AddJoint(const std::string &_type)
 {
   this->AddJoint(this->ConvertJointType(_type));
@@ -768,8 +780,12 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
+
+  std::string parentName = _joint->parent->GetName();
+  std::string childName = _joint->child->GetName();
+
   gui::model::Events::jointInserted(jointId, _joint->name,
-      _joint->parent->GetName(), _joint->child->GetName());
+      jointTypes[_joint->type], parentName, childName);
 }
 
 /////////////////////////////////////////////////
@@ -843,6 +859,12 @@ void JointMaker::Update()
                 mat->getTechnique(0)->getPass(0)->getDiffuse();
             color.a = 0.5;
             joint->handles->getBillboard(0)->setColour(color);
+
+            // notify joint changes
+            std::string parentName = joint->parent->GetName();
+            std::string childName = joint->child->GetName();
+            gui::model::Events::jointChanged(it.first, joint->name,
+                jointTypes[joint->type], parentName, childName);
           }
 
           // set pos of joint handle
@@ -1011,6 +1033,10 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   else if (_type == JOINT_BALL)
   {
     return 0;
+  }
+  else if (_type == JOINT_GEARBOX)
+  {
+    return 2;
   }
 
   return 0;
