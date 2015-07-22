@@ -1151,8 +1151,8 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(gearboxMsg.has_type());
   EXPECT_EQ(msgs::ConvertJointType(gearboxMsg.type()), "gearbox");
   EXPECT_TRUE(gearboxMsg.has_pose());
-  EXPECT_EQ(msgs::Convert(gearboxMsg.pose()),
-      math::Pose(5, 2, 1, 1.57, 0, 0));
+  EXPECT_EQ(msgs::ConvertIgn(gearboxMsg.pose()),
+      ignition::math::Pose3d(5, 2, 1, 1.57, 0, 0));
   EXPECT_TRUE(gearboxMsg.has_parent());
   EXPECT_EQ(gearboxMsg.parent(), "axle");
   EXPECT_TRUE(gearboxMsg.has_child());
@@ -1177,7 +1177,8 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(gearboxMsg.has_axis1());
   const msgs::Axis axisGearboxMsg = gearboxMsg.axis1();
   EXPECT_TRUE(axisGearboxMsg.has_xyz());
-  EXPECT_EQ(msgs::Convert(axisGearboxMsg.xyz()), math::Vector3(0, 0, 1));
+  EXPECT_EQ(msgs::ConvertIgn(axisGearboxMsg.xyz()),
+      ignition::math::Vector3d(0, 0, 1));
   EXPECT_TRUE(axisGearboxMsg.has_limit_lower());
   EXPECT_NEAR(axisGearboxMsg.limit_lower(), 0.01, 1e-6);
   EXPECT_TRUE(axisGearboxMsg.has_limit_upper());
@@ -1196,7 +1197,8 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(gearboxMsg.has_axis2());
   const msgs::Axis axisGearboxMsg2 = gearboxMsg.axis2();
   EXPECT_TRUE(axisGearboxMsg2.has_xyz());
-  EXPECT_EQ(msgs::Convert(axisGearboxMsg2.xyz()), math::Vector3(0, 0, 1));
+  EXPECT_EQ(msgs::ConvertIgn(axisGearboxMsg2.xyz()),
+      ignition::math::Vector3d(0, 0, 1));
   EXPECT_TRUE(axisGearboxMsg2.has_limit_lower());
   EXPECT_NEAR(axisGearboxMsg2.limit_lower(), 0.02, 1e-6);
   EXPECT_TRUE(axisGearboxMsg2.has_limit_upper());
@@ -1264,8 +1266,8 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(screwMsg.has_type());
   EXPECT_EQ(msgs::ConvertJointType(screwMsg.type()), "screw");
   EXPECT_TRUE(screwMsg.has_pose());
-  EXPECT_EQ(msgs::Convert(screwMsg.pose()),
-      math::Pose(1, 1, 0, 0, 0, 1.57));
+  EXPECT_EQ(msgs::ConvertIgn(screwMsg.pose()),
+      ignition::math::Pose3d(1, 1, 0, 0, 0, 1.57));
   EXPECT_TRUE(screwMsg.has_parent());
   EXPECT_EQ(screwMsg.parent(), "box");
   EXPECT_TRUE(screwMsg.has_child());
@@ -1291,7 +1293,8 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(!screwMsg.has_axis2());
   const msgs::Axis axisScrewMsg = screwMsg.axis1();
   EXPECT_TRUE(axisScrewMsg.has_xyz());
-  EXPECT_EQ(msgs::Convert(axisScrewMsg.xyz()), math::Vector3(0, 1, 0));
+  EXPECT_EQ(msgs::ConvertIgn(axisScrewMsg.xyz()),
+      ignition::math::Vector3d(0, 1, 0));
   EXPECT_TRUE(axisScrewMsg.has_limit_lower());
   EXPECT_NEAR(axisScrewMsg.limit_lower(), 0.0, 1e-6);
   EXPECT_TRUE(axisScrewMsg.has_limit_upper());
@@ -1851,7 +1854,9 @@ TEST_F(MsgsTest, JointToSDF)
   {
     const std::string name("test_joint");
     const msgs::Joint::Type type = msgs::Joint::UNIVERSAL;
-    const math::Pose pose(math::Vector3(9, 1, 1), math::Quaternion(0, 1, 0, 0));
+    const ignition::math::Pose3d pose(
+        ignition::math::Vector3d(9, 1, 1),
+        ignition::math::Quaterniond(0, 1, 0, 0));
     const std::string parent("parent_link");
     const std::string child("child_link");
 
@@ -1863,8 +1868,8 @@ TEST_F(MsgsTest, JointToSDF)
     const double limit_erp = 0.4;
     const double suspension_cfm = 0.8;
     const double suspension_erp = 0.9;
-    const math::Vector3 xyz1(0.6, 0.8, 0.0);
-    const math::Vector3 xyz2(0.0, 0.0, 1.0);
+    const ignition::math::Vector3d xyz1(0.6, 0.8, 0.0);
+    const ignition::math::Vector3d xyz2(0.0, 0.0, 1.0);
     const double limit_lower1 = -2.0;
     const double limit_lower2 = -4.0;
     const double limit_upper1 = 12.0;
@@ -1927,13 +1932,13 @@ TEST_F(MsgsTest, JointToSDF)
     EXPECT_TRUE(jointSDF->HasElement("child"));
     EXPECT_EQ(jointSDF->Get<std::string>("child"), child);
     EXPECT_TRUE(jointSDF->HasElement("pose"));
-    EXPECT_EQ(pose, jointSDF->Get<math::Pose>("pose"));
+    EXPECT_EQ(pose, jointSDF->Get<ignition::math::Pose3d>("pose"));
 
     EXPECT_TRUE(jointSDF->HasElement("axis"));
     {
       auto axisElem = jointSDF->GetElement("axis");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
-      EXPECT_EQ(xyz1, axisElem->Get<math::Vector3>("xyz"));
+      EXPECT_EQ(xyz1, axisElem->Get<ignition::math::Vector3d>("xyz"));
       EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
       EXPECT_EQ(useParentModelFrame1,
                 axisElem->Get<bool>("use_parent_model_frame"));
@@ -1961,7 +1966,7 @@ TEST_F(MsgsTest, JointToSDF)
     {
       auto axisElem = jointSDF->GetElement("axis2");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
-      EXPECT_EQ(xyz2, axisElem->Get<math::Vector3>("xyz"));
+      EXPECT_EQ(xyz2, axisElem->Get<ignition::math::Vector3d>("xyz"));
       // use_parent_model_frame is required in axis.proto
       // so expect to to exist even if we don't set it
       EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
@@ -2019,7 +2024,9 @@ TEST_F(MsgsTest, JointToSDF)
   {
     const std::string name("test_gearbox_joint");
     const msgs::Joint::Type type = msgs::Joint::GEARBOX;
-    const math::Pose pose(math::Vector3(2, 1, 3), math::Quaternion(0, 0, 1, 0));
+    const ignition::math::Pose3d pose(
+        ignition::math::Vector3d(2, 1, 3),
+        ignition::math::Quaterniond(0, 0, 1, 0));
     const std::string parent("parent_gearbox_link");
     const std::string child("child_gearbox_link");
 
@@ -2031,8 +2038,8 @@ TEST_F(MsgsTest, JointToSDF)
     const double limit_erp = 0.6;
     const double suspension_cfm = 0.7;
     const double suspension_erp = 0.4;
-    const math::Vector3 xyz1(0.0, 1.0, 0.0);
-    const math::Vector3 xyz2(0.0, 1.0, 0.0);
+    const ignition::math::Vector3d xyz1(0.0, 1.0, 0.0);
+    const ignition::math::Vector3d xyz2(0.0, 1.0, 0.0);
     const double limit_lower1 = -1.0;
     const double limit_lower2 = -2.0;
     const double limit_upper1 = 2.0;
@@ -2099,13 +2106,13 @@ TEST_F(MsgsTest, JointToSDF)
     EXPECT_TRUE(jointSDF->HasElement("child"));
     EXPECT_EQ(jointSDF->Get<std::string>("child"), child);
     EXPECT_TRUE(jointSDF->HasElement("pose"));
-    EXPECT_EQ(pose, jointSDF->Get<math::Pose>("pose"));
+    EXPECT_EQ(pose, jointSDF->Get<ignition::math::Pose3d>("pose"));
 
     EXPECT_TRUE(jointSDF->HasElement("axis"));
     {
       auto axisElem = jointSDF->GetElement("axis");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
-      EXPECT_EQ(xyz1, axisElem->Get<math::Vector3>("xyz"));
+      EXPECT_EQ(xyz1, axisElem->Get<ignition::math::Vector3d>("xyz"));
       EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
       EXPECT_EQ(useParentModelFrame1,
                 axisElem->Get<bool>("use_parent_model_frame"));
@@ -2133,7 +2140,7 @@ TEST_F(MsgsTest, JointToSDF)
     {
       auto axisElem = jointSDF->GetElement("axis2");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
-      EXPECT_EQ(xyz2, axisElem->Get<math::Vector3>("xyz"));
+      EXPECT_EQ(xyz2, axisElem->Get<ignition::math::Vector3d>("xyz"));
       // use_parent_model_frame is required in axis.proto
       // so expect to to exist even if we don't set it
       EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
@@ -2197,7 +2204,9 @@ TEST_F(MsgsTest, JointToSDF)
   {
     const std::string name("test_screw_joint");
     const msgs::Joint::Type type = msgs::Joint::SCREW;
-    const math::Pose pose(math::Vector3(2, 1, 3), math::Quaternion(0, 0, 0, 1));
+    const ignition::math::Pose3d pose(
+        ignition::math::Vector3d(2, 1, 3),
+        ignition::math::Quaterniond(0, 0, 0, 1));
     const std::string parent("parent_screw_link");
     const std::string child("child_screw_link");
 
@@ -2209,7 +2218,7 @@ TEST_F(MsgsTest, JointToSDF)
     const double limit_erp = 0.65;
     const double suspension_cfm = 0.76;
     const double suspension_erp = 0.46;
-    const math::Vector3 xyz1(0.0, 1.0, 1.0);
+    const ignition::math::Vector3d xyz1(0.0, 1.0, 1.0);
     const double limit_lower1 = -1.2;
     const double limit_upper1 = 2.2;
     const double limit_effort1 = 1.2e2;
@@ -2256,13 +2265,13 @@ TEST_F(MsgsTest, JointToSDF)
     EXPECT_TRUE(jointSDF->HasElement("child"));
     EXPECT_EQ(jointSDF->Get<std::string>("child"), child);
     EXPECT_TRUE(jointSDF->HasElement("pose"));
-    EXPECT_EQ(pose, jointSDF->Get<math::Pose>("pose"));
+    EXPECT_EQ(pose, jointSDF->Get<ignition::math::Pose3d>("pose"));
 
     EXPECT_TRUE(jointSDF->HasElement("axis"));
     {
       auto axisElem = jointSDF->GetElement("axis");
       EXPECT_TRUE(axisElem->HasElement("xyz"));
-      EXPECT_EQ(xyz1, axisElem->Get<math::Vector3>("xyz"));
+      EXPECT_EQ(xyz1, axisElem->Get<ignition::math::Vector3d>("xyz"));
       EXPECT_TRUE(axisElem->HasElement("use_parent_model_frame"));
       EXPECT_EQ(useParentModelFrame1,
                 axisElem->Get<bool>("use_parent_model_frame"));
@@ -2556,10 +2565,11 @@ TEST_F(MsgsTest, ModelToSDF)
   AddCylinderLink(model, 0.5, radius, radius);
   ASSERT_EQ(model.link_size(), 2);
   EXPECT_EQ(model.joint_size(), 0);
-  const math::Pose cylinderPose(-length/2, 0, -height/2, M_PI/2, 0, 0);
+  const ignition::math::Pose3d cylinderPose(
+      -length/2, 0, -height/2, M_PI/2, 0, 0);
   {
     auto link = model.mutable_link(1);
-    msgs::Set(link->mutable_pose(), cylinderPose.Ign());
+    msgs::Set(link->mutable_pose(), cylinderPose);
     link->set_name("rear_wheel");
   }
 
@@ -2567,10 +2577,10 @@ TEST_F(MsgsTest, ModelToSDF)
   AddSphereLink(model, 0.5, radius);
   ASSERT_EQ(model.link_size(), 3);
   EXPECT_EQ(model.joint_size(), 0);
-  const math::Pose spherePose(length/2, 0, -height/2, 0, 0, 0);
+  const ignition::math::Pose3d spherePose(length/2, 0, -height/2, 0, 0, 0);
   {
     auto link = model.mutable_link(2);
-    msgs::Set(link->mutable_pose(), spherePose.Ign());
+    msgs::Set(link->mutable_pose(), spherePose);
     link->set_name("front_wheel");
   }
 
@@ -2600,27 +2610,30 @@ TEST_F(MsgsTest, ModelToSDF)
   sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
   EXPECT_EQ(modelSDF->Get<std::string>("name"), name);
   EXPECT_FALSE(modelSDF->Get<bool>("static"));
-  EXPECT_EQ(pose, modelSDF->Get<math::Pose>("pose"));
+  EXPECT_EQ(pose, modelSDF->Get<ignition::math::Pose3d>("pose"));
 
   sdf::ElementPtr linkElem1 = modelSDF->GetElement("link");
   EXPECT_EQ(linkElem1->Get<std::string>("name"), "frame");
-  EXPECT_EQ(linkElem1->Get<math::Pose>("pose"), math::Pose());
+  EXPECT_EQ(linkElem1->Get<ignition::math::Pose3d>("pose"),
+      ignition::math::Pose3d());
 
   sdf::ElementPtr linkElem2 = linkElem1->GetNextElement("link");
   EXPECT_EQ(linkElem2->Get<std::string>("name"), "rear_wheel");
-  EXPECT_EQ(linkElem2->Get<math::Pose>("pose"), cylinderPose);
+  EXPECT_EQ(linkElem2->Get<ignition::math::Pose3d>("pose"), cylinderPose);
 
   sdf::ElementPtr linkElem3 = linkElem2->GetNextElement("link");
   EXPECT_EQ(linkElem3->Get<std::string>("name"), "front_wheel");
-  EXPECT_EQ(linkElem3->Get<math::Pose>("pose"), spherePose);
+  EXPECT_EQ(linkElem3->Get<ignition::math::Pose3d>("pose"), spherePose);
 
   sdf::ElementPtr jointElem1 = modelSDF->GetElement("joint");
   EXPECT_EQ(jointElem1->Get<std::string>("name"), "front_hinge");
   EXPECT_EQ(jointElem1->Get<std::string>("type"), "revolute");
-  EXPECT_EQ(jointElem1->Get<math::Pose>("pose"), math::Pose());
+  EXPECT_EQ(jointElem1->Get<ignition::math::Pose3d>("pose"),
+      ignition::math::Pose3d());
 
   sdf::ElementPtr jointElem2 = jointElem1->GetNextElement("joint");
   EXPECT_EQ(jointElem2->Get<std::string>("name"), "rear_hinge");
   EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
-  EXPECT_EQ(jointElem2->Get<math::Pose>("pose"), math::Pose());
+  EXPECT_EQ(jointElem2->Get<ignition::math::Pose3d>("pose"),
+      ignition::math::Pose3d());
 }
