@@ -30,7 +30,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \brief to make an entity base class
+    /// \brief To make an entity, base class
     class GAZEBO_VISIBLE EntityMaker
     {
       /// \brief Constructor
@@ -39,11 +39,11 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~EntityMaker();
 
-      /// \brief Set whether to snap to grid
+      /// \brief Set whether to snap to increments.
+      /// \param[in] _snap True to snap.
       public: static void SetSnapToGrid(bool _snap);
 
       /// \brief Start the maker.
-      /// \param[in] _camera Pointer to the user camera
       public: virtual void Start();
 
       /// \brief Stop the maker.
@@ -69,11 +69,9 @@ namespace gazebo
       protected: virtual void SetEntityPosition(
           const ignition::math::Vector3d &_pos);
 
-      /// \brief Node used to publish messages.
+      /// \brief Node to publish messages and spawn the entity. Each derived
+      /// class must create its own publisher to the appropriate topic.
       protected: transport::NodePtr node;
-
-      /// \brief Publisher for factory messages.
-      protected: transport::PublisherPtr makerPub;
 
       /// \brief True to snap to grid while moving.
       private: static bool snapToGrid;

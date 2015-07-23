@@ -21,9 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/transport/TransportIface.hh"
-#include "gazebo/transport/Node.hh"
-
 #include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -43,7 +40,6 @@ EntityMaker::EntityMaker()
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
 }
 
 //////////////////////////////////////////////////
@@ -51,7 +47,6 @@ EntityMaker::~EntityMaker()
 {
   this->node->Fini();
   this->node.reset();
-  this->makerPub.reset();
 }
 
 /////////////////////////////////////////////////

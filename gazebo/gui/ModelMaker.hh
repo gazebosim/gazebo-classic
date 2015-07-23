@@ -45,6 +45,9 @@ namespace gazebo
       /// \brief Constructor
       public: ModelMaker();
 
+      /// \brief Destructor
+      public: ~ModelMaker();
+
       // Documentation inherited
       public: virtual void Stop();
 
@@ -91,6 +94,9 @@ namespace gazebo
       /// \brief True if the model is being created as a clone of an existing
       /// model.
       private: bool clone;
+
+      /// \brief Publisher for factory messages.
+      protected: transport::PublisherPtr makerPub;
     };
   }
 }

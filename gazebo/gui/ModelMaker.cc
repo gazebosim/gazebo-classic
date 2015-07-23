@@ -46,6 +46,13 @@ using namespace gui;
 ModelMaker::ModelMaker() : EntityMaker()
 {
   this->clone = false;
+  this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
+}
+
+/////////////////////////////////////////////////
+ModelMaker::~ModelMaker()
+{
+  this->makerPub.reset();
 }
 
 /////////////////////////////////////////////////

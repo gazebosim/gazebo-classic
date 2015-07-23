@@ -32,11 +32,11 @@
 
 #include "gazebo/math/Quaternion.hh"
 
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 
@@ -61,7 +61,7 @@ const std::string BuildingMaker::buildingDefaultName = "Untitled";
 const std::string BuildingMaker::previewName = "BuildingPreview";
 
 /////////////////////////////////////////////////
-BuildingMaker::BuildingMaker() : EntityMaker()
+BuildingMaker::BuildingMaker()
 {
   this->conversionScale = 0.01;
 
@@ -108,6 +108,11 @@ BuildingMaker::BuildingMaker() : EntityMaker()
 
   this->saveDialog = new SaveDialog(SaveDialog::BUILDING);
 
+  // Transport
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
+
   this->Reset();
 }
 
@@ -116,6 +121,10 @@ BuildingMaker::~BuildingMaker()
 {
   if (this->saveDialog)
     delete this->saveDialog;
+
+  this->node->Fini();
+  this->node.reset();
+  this->makerPub.reset();
 }
 
 /////////////////////////////////////////////////
