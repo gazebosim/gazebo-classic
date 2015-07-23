@@ -229,6 +229,8 @@ namespace gazebo
           return "screw";
         else if (_dartJoint->HasType(Base::UNIVERSAL_JOINT))
           return "universal";
+        else if (_dartJoint->HasType(Base::FIXED_JOINT))
+          return "weld";
         else
         {
           GZ_ASSERT(false, "Unsupported joint type.");

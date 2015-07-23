@@ -288,7 +288,7 @@ DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 //////////////////////////////////////////////////
 dart::simulation::World *DARTModel::GetDARTWorld(void) const
 {
-  return GetDARTPhysics()->GetDARTWorld();
+  return GetDARTPhysics()->GetDARTWorldPtr().get();
 }
 
 //////////////////////////////////////////////////

@@ -56,8 +56,8 @@ math::Vector3 DARTBallJoint::GetAnchor(unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>("Anchor"
-                                                   + std::to_string(_index));
+    return this->dataPtr->GetCached<math::Vector3>(
+          "Anchor" + std::to_string(_index));
   }
 
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
