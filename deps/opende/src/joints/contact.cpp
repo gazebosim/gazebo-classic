@@ -371,14 +371,17 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
 
             info->lo[3] = -rhs;
             info->hi[3] = rhs;
+
+            // findex[3] must be zero in order for torsional friction moment
+            // to be proportional to normal force
+            if ( contact.surface.mode & dContactApprox3 )
+                info->findex[3] = 0;
         }
         else
         {
             info->lo[3] = -contact.surface.mu;
             info->hi[3] = contact.surface.mu;
         }
-        if ( contact.surface.mode & dContactApprox1_2 )
-            info->findex[3] = 0;
 
         // set slip (constraint force mixing)
         if ( contact.surface.mode & dContactSlip3 )

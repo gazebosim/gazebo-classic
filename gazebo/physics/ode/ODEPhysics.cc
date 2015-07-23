@@ -1065,6 +1065,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactSoftERP |
                          dContactSoftCFM |
                          dContactApprox1 |
+                         dContactApprox3 |
                          dContactSlip1 |
                          dContactSlip2 |
                          dContactSlip3;
