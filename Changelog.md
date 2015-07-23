@@ -2,6 +2,9 @@
 
 ### Gazebo 5.x.x
 
+1. Initialize sigact struct fields that valgrind said were being used uninitialized
+    * [Pull request #1809](https://bitbucket.org/osrf/gazebo/pull-request/1809)
+
 1. Add Add missing ogre includes to ensure macros are properly defined
     * [Pull request #1813](https://bitbucket.org/osrf/gazebo/pull-request/1813)
 

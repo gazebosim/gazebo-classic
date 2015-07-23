@@ -433,7 +433,10 @@ void Server::Run()
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
+  sigact.sa_flags = 0;
   sigact.sa_handler = Server::SigInt;
+  if (sigemptyset(&sigact.sa_mask) != 0)
+    std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
 
