@@ -189,12 +189,6 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
   this->configWidget->SetWidgetReadOnly("gearbox", !isGearbox);
   this->configWidget->SetWidgetVisible("screw", isScrew);
   this->configWidget->SetWidgetReadOnly("screw", !isScrew);
-/*  this->configWidget->SetWidgetVisible("gearbox_reference_body", isGearbox);
-  this->configWidget->SetWidgetReadOnly("gearbox_reference_body", !isGearbox);
-  this->configWidget->SetWidgetVisible("gearbox_ratio", isGearbox);
-  this->configWidget->SetWidgetReadOnly("gearbox_ratio", !isGearbox);
-  this->configWidget->SetWidgetVisible("thread_pitch", isScrew);
-  this->configWidget->SetWidgetReadOnly("thread_pitch", !isScrew);*/
 }
 
 /////////////////////////////////////////////////
