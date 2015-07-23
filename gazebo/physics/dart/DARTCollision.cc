@@ -36,9 +36,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTCollision::DARTCollision(LinkPtr _link)
   : Collision(_link),
-    dataPtr(new DARTCollisionPrivate(
-      boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode()))
-
+    dataPtr(new DARTCollisionPrivate())
 {
   this->SetName("DART_Collision");
   this->surface.reset(new DARTSurfaceParams());
@@ -133,7 +131,7 @@ gazebo::math::Box DARTCollision::GetBoundingBox() const
 //////////////////////////////////////////////////
 dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
 {
-  return this->dataPtr->dtBodyNode;
+  return boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
 }
 
 //////////////////////////////////////////////////
