@@ -85,10 +85,6 @@ void RandomVelocityPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     this->dataPtr->velocity =
       _sdf->Get<ignition::math::Vector3d>("initial_velocity");
   }
-  else
-  {
-    this->dataPtr->velocity.Set(1, 0, 0);
-  }
 
   // Set the velocity factor
   if (_sdf->HasElement("velocity_factor"))
@@ -108,7 +104,7 @@ void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
 {
   GZ_ASSERT(this->dataPtr->link, "<link> in RandomVelocity plugin is null");
 
-  // Shortcircuit in case the link is invalid.
+  // Short-circuit in case the link is invalid.
   if (!this->dataPtr->link)
     return;
 
