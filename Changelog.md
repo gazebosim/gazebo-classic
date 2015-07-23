@@ -5,6 +5,12 @@
 1. Initialize sigact struct fields that valgrind said were being used uninitialized
     * [Pull request #1809](https://bitbucket.org/osrf/gazebo/pull-request/1809)
 
+1. Add Add missing ogre includes to ensure macros are properly defined
+    * [Pull request #1813](https://bitbucket.org/osrf/gazebo/pull-request/1813)
+
+1. Use ToSDF functions to simplify physics_friction test
+    * [Pull request #1808](https://bitbucket.org/osrf/gazebo/pull-request/1808)
+
 1. Added lines to laser sensor visualization 
     * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
     * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
