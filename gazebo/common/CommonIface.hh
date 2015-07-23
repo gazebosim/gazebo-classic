@@ -68,7 +68,6 @@ namespace gazebo
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
     template<typename T>
-    GZ_COMMON_VISIBLE
     std::string get_sha1(const T &_buffer);
 
     /// \brief Cross platform retrieval of an environment variable.
@@ -82,7 +81,6 @@ namespace gazebo
   ///////////////////////////////////////////////
   // Implementation of get_sha1
   template<typename T>
-  GZ_COMMON_VISIBLE
   std::string common::get_sha1(const T &_buffer)
   {
     boost::uuids::detail::sha1 sha1;
