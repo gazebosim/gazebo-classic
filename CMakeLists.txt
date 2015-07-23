@@ -393,7 +393,6 @@ else (build_errors)
 
   # No other internal dependencies:
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
-    gazebo_skyx
     gazebo_gimpact
     gazebo_opcode
     gazebo_opende_ou
