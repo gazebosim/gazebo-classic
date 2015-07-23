@@ -1,4 +1,4 @@
 #!/bin/bash
 
-gzserver --verbose  -s libRestWebPlugin.so
+gzserver --verbose  -s libRestWebPlugin.so $@
 

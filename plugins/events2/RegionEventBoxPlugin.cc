@@ -75,7 +75,7 @@ namespace gazebo
 
     public: void OnUpdate(const common::UpdateInfo & _info)
     {
-    	std::map<std::string, common::Time>::iterator it;
+    	//std::cout << "RegionEventBoxPlugin::OnUpdate()..." << std::endl << std::flush;
 
 			for (unsigned int i = 0; i < this->world->GetModelCount(); i++)
 			{
@@ -99,7 +99,7 @@ namespace gazebo
 					continue;
 				}
 
-				it = this->insiders.find(model->GetName());
+	    	std::map<std::string, common::Time>::iterator it = this->insiders.find(model->GetName());
 
 				if (this->box.Contains(model->GetWorldPose().pos))
 				{
