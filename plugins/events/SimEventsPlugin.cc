@@ -18,6 +18,7 @@
 #include "InRegionEventSource.hh"
 #include "ExistenceEventSource.hh"
 #include "OccupiedEventSource.hh"
+#include "JointEventSource.hh"
 
 #include "SimEventsPlugin.hh"
 
@@ -125,11 +126,15 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     {
       event.reset(new ExistenceEventSource(this->pub, this->world) );
     }
+    else if (eventType == "joint")
+    {
+      event.reset(new JointEventSource(this->pub, this->world));
+    }
     else
     {
       std::string m;
-      m = "Unknown event name: \"" + eventName;
-      m += "\" of type: \"" + eventType + "\" in SimEvents plugin";
+      m = "Event \"" + eventName;
+      m += "\" is of unknown type: \"" + eventType + "\" in SimEvents plugin";
       throw SimEventsException(m.c_str());
     }
 

@@ -77,18 +77,24 @@
       <region>end</region>
     </event>
 
-    <!-- Joint trigger events  -->
+    <!-- Joint trigger events -->
     <event>
-      <name>upper_joint_up</name>
-      <type>joint_position</type>
-      <model>pendulum</model>
-      <joint>upper_joint</joint>
-      <min>0.3</min>
-      <max>0.5</max>
+      <name>joint_at_pi</name>
+      <type>joint</type>
+      <model>revoluter</model>
+      <joint>joint</joint>
+        <min_position>3</min_position>
+        <max_position>3.2</max_position>
+        <min_reference_angle>3</min_reference_angle>
+        <max_reference_angle>3.5</max_reference_angle>
+        <min_velocity>2</min_velocity>
+        <max_velocity>3</max_velocity>
+        <min_force>2</min_force>
+        <max_force>3</max_force>
     </event>
+
     <!-- Close the plugin element  -->
     </plugin>
-
 
     <!--
     spawn a few beers in the world (not coke cans, they have
@@ -117,12 +123,87 @@
       <name>can4</name>
       <uri>model://beer</uri>
     </include>
-
+<!--
     <include>
       <pose>1 1 0 0 0 0</pose>
       <name>pendulum</name>
-      <uri>model:://double_pendulum_with_base</uri>
+      <uri>model://double_pendulum_with_base</uri>
     </include>
+-->
+
+<!--
+Model with a revolute joint
+-->
+    <model name='revoluter'>
+        <pose>0.5 0.5 0.5 0 0 0</pose>
+        <link name='base'>
+        <pose>0 0 0 0 -0 0</pose>
+        <inertial>
+            <mass>10</mass>
+            <inertia>
+              <ixx>1</ixx>
+              <ixy>0</ixy>
+              <ixz>0</ixz>
+              <iyy>1</iyy>
+              <iyz>0</iyz>
+              <izz>1</izz>
+            </inertia>
+          </inertial>
+          <visual name='visual'>
+            <geometry>
+              <box>
+                <size>0.5 1 1</size>
+              </box>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Orange</name>
+              </script>
+            </material>
+          </visual>
+          <collision name='collision'>
+            <geometry>
+              <box>
+                <size>0.5 1 1</size>
+              </box>
+            </geometry>
+          </collision>
+        </link>
+
+        <link name='needle'>
+          <pose>0.25 0 0.2 0 -0 0</pose>
+            <visual name='visual'>
+              <geometry>
+                <cylinder>
+                  <radius>0.05</radius>
+                  <length>0.5</length>
+                </cylinder>
+              </geometry>
+            </visual>
+
+          <collision name='collision'>
+            <geometry>
+              <cylinder>
+                <radius>0.05</radius>
+                <length>0.5</length>
+              </cylinder>
+            </geometry>
+           </collision>
+        </link>
+
+        <joint name='joint' type='revolute'>
+          <parent>needle</parent>
+          <child>base</child>
+
+          <pose>0 0 0 0 0 0</pose>
+          <axis>
+            <xyz>1 0 0</xyz>
+          </axis>
+        </joint>
+
+    </model>
+
 
   </world>
 </sdf>
