@@ -113,9 +113,13 @@ void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
   {
     // Get a random velocity value.
     this->dataPtr->velocity.Set(
-        ignition::math::Rand::DblUniform(-1,1),
-        ignition::math::Rand::DblUniform(-1,1),
-        ignition::math::Rand::DblUniform(-1,1));
+        ignition::math::Rand::DblUniform(-1, 1),
+        ignition::math::Rand::DblUniform(-1, 1),
+        ignition::math::Rand::DblUniform(-1, 1));
+
+    // Apply scaling factor
+    this->dataPtr->velocity.Normalize();
+    this->dataPtr->velocity *= this->dataPtr->velocityFactor;
 
     // Clamp X value
     this->dataPtr->velocity.X(ignition::math::clamp(this->dataPtr->velocity.X(),
@@ -128,10 +132,6 @@ void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
     // Clamp Z value
     this->dataPtr->velocity.Z(ignition::math::clamp(this->dataPtr->velocity.Z(),
         this->dataPtr->zRange.X(), this->dataPtr->zRange.Y()));
-
-    // Apply scaling factor
-    this->dataPtr->velocity.Normalize();
-    this->dataPtr->velocity *= this->dataPtr->velocityFactor;
 
     this->dataPtr->prevUpdate = _info.simTime;
   }

@@ -47,9 +47,15 @@ namespace gazebo
   ///      <!-- Time, in seconds, between new velocities -->
   ///      <update_period>5</update_period>
   ///
-  ///      <!-- Clamp the Z velocity value to zero. You can also clamp x and
-  ///           y values. Clamping is performed before application of
-  ///           velocity_factor-->
+  ///      <!-- Clamp the X velocity value to between -1 and 1.-->
+  ///      <min_x>-1</min_x>
+  ///      <max_x>1</max_x>
+  ///
+  ///      <!-- Clamp the Y velocity value to between 0 and 1.-->
+  ///      <min_y>0</min_y>
+  ///      <max_y>1</max_y>
+  ///
+  ///      <!-- Clamp the Z velocity value to zero.-->
   ///      <min_z>0</min_z>
   ///      <max_z>0</max_z>
   ///    </plugin>
