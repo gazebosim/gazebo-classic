@@ -362,7 +362,6 @@ else (build_errors)
     gazebo_gui
     gazebo_sensors
     gazebo_rendering
-    gazebo_selection_buffer
   )
 
   # "Second level" deps. Depends on a variety of first level deps
