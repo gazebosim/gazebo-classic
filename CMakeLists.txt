@@ -14,7 +14,7 @@ set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 6)
+set (GAZEBO_PATCH_VERSION 8)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -200,7 +200,7 @@ if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
 endif()
 
 # Will use predefined gazebo developers cflags
-# this needs to be called after HostCFlags 
+# this needs to be called after HostCFlags
 if(USE_UPSTREAM_CFLAGS)
   # use gazebo own set of flags
   unset (CMAKE_CXX_FLAGS CACHE)
@@ -351,7 +351,7 @@ else (build_errors)
   set(PKG_NAME ${PROJECT_NAME_UPPER})
 
   # Order is important, if A depends on B, please add B after A.
-  # The list should have at the very end the libraries 
+  # The list should have at the very end the libraries
   # without internal interdependencies
   set(PKG_LIBRARIES
     gazebo
