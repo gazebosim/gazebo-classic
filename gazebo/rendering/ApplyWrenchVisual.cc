@@ -164,18 +164,17 @@ void ApplyWrenchVisual::Load()
   common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
   rendering::Material::GetMaterialAsColor(dPtr->unselectedMaterial,
       matAmbient, matDiffuse, matSpecular, matEmissive);
-  dPtr->forceText = new MovableText();
-  dPtr->forceText->Load(this->GetName()+"__FORCE_TEXT__",
+  dPtr->forceText.Load(this->GetName()+"__FORCE_TEXT__",
       "0N", "Arial", 0.03, matAmbient);
-  dPtr->forceText->SetShowOnTop(true);
+  dPtr->forceText.SetShowOnTop(true);
 
-  dPtr->forceText->MovableObject::getUserObjectBindings().setUserAny(
+  dPtr->forceText.MovableObject::getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
 
   Ogre::SceneNode *forceTextNode =
       dPtr->forceVisual->GetSceneNode()->createChildSceneNode(
       this->GetName() + "__FORCE_TEXT_NODE__");
-  forceTextNode->attachObject(dPtr->forceText);
+  forceTextNode->attachObject(&(dPtr->forceText));
   forceTextNode->setInheritScale(false);
 
   // Torque visual
@@ -229,18 +228,17 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
 
   // Torque text
-  dPtr->torqueText = new MovableText();
-  dPtr->torqueText->Load(this->GetName()+"__TORQUE_TEXT__",
-      "0N", "Arial", 0.03, matAmbient);
-  dPtr->torqueText->SetShowOnTop(true);
+  dPtr->torqueText.Load(this->GetName()+"__TORQUE_TEXT__",
+      "0Nm", "Arial", 0.03, matAmbient);
+  dPtr->torqueText.SetShowOnTop(true);
 
-  dPtr->torqueText->MovableObject::getUserObjectBindings().setUserAny(
+  dPtr->torqueText.MovableObject::getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
 
   Ogre::SceneNode *torqueTextNode =
       dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
       this->GetName() + "__TORQUE_TEXT_NODE__");
-  torqueTextNode->attachObject(dPtr->torqueText);
+  torqueTextNode->attachObject(&(dPtr->torqueText));
   torqueTextNode->setInheritScale(false);
 
   // Rotation manipulator
@@ -315,12 +313,9 @@ void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector,
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (dPtr->forceText)
-  {
-    std::ostringstream mag;
-    mag << std::fixed << std::setprecision(3) << _forceVector.GetLength();
-    dPtr->forceText->SetText(mag.str() + "N");
-  }
+  std::ostringstream mag;
+  mag << std::fixed << std::setprecision(3) << _forceVector.GetLength();
+  dPtr->forceText.SetText(mag.str() + "N");
 
   dPtr->forceVector = _forceVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
@@ -345,12 +340,9 @@ void ApplyWrenchVisual::SetTorque(const math::Vector3 &_torqueVector,
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (dPtr->torqueText)
-  {
-    std::ostringstream mag;
-    mag << std::fixed << std::setprecision(3) << _torqueVector.GetLength();
-    dPtr->torqueText->SetText(mag.str() + "Nm");
-  }
+  std::ostringstream mag;
+  mag << std::fixed << std::setprecision(3) << _torqueVector.GetLength();
+  dPtr->torqueText.SetText(mag.str() + "Nm");
 
   dPtr->torqueVector = _torqueVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
@@ -473,13 +465,10 @@ void ApplyWrenchVisual::Resize()
                                         0.75*linkSize));
 
   // Texts
-  if (dPtr->forceText && dPtr->torqueText)
-  {
-    double fontSize = 0.1*linkSize;
-    dPtr->forceText->SetCharHeight(fontSize);
-    dPtr->torqueText->SetCharHeight(fontSize);
-    dPtr->forceText->SetBaseline(0.12*linkSize);
-  }
+  double fontSize = 0.1*linkSize;
+  dPtr->forceText.SetCharHeight(fontSize);
+  dPtr->torqueText.SetCharHeight(fontSize);
+  dPtr->forceText.SetBaseline(0.12*linkSize);
 }
 
 ///////////////////////////////////////////////////

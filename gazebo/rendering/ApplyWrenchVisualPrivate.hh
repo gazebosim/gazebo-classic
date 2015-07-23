@@ -68,10 +68,10 @@ namespace gazebo
       public: bool rotatedByMouse;
 
       /// \brief Text displaying the force magnitude.
-      public: MovableText *forceText;
+      public: MovableText forceText;
 
       /// \brief Text displaying the torque magnitude.
-      public: MovableText *torqueText;
+      public: MovableText torqueText;
     };
   }
 }
