@@ -138,12 +138,12 @@ TEST_P(JointTestScrew, WrapAngle)
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Screw Joint will not work with Link::SetWorldPose."
-          << " See issue #1096.\n";
-    return;
-  }
+//  if (_physicsEngine == "dart")
+//  {
+//    gzerr << "DART Screw Joint will not work with Link::SetWorldPose."
+//          << " See issue #1096.\n";
+//    return;
+//  }
 
   if (_physicsEngine == "simbody")
   {
@@ -272,12 +272,6 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   {
     /// \TODO skipping bullet, see issue #1081
     gzerr << "BulletScrewJoint::GetAngle() is one step behind (issue #1081).\n";
-    return;
-  }
-
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issues #1096.\n";
     return;
   }
 
@@ -483,6 +477,16 @@ TEST_P(JointTestScrew, ScrewJointForce)
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << _physicsEngine
+          << " is broken for this test,"
+          << " because of the pr2 gripper's closed kinematic chain,"
+          << " see issue #1435."
+          << std::endl;
+    return;
+  }
+
   // Load pr2 world
   ServerFixture::Load("worlds/pr2.world", true, _physicsEngine);
 
@@ -503,16 +507,6 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   // get model, joints and get links
   physics::ModelPtr model = world->GetModel("pr2");
   physics::LinkPtr link_00 = model->GetLink("torso_lift_link");
-
-  if (_physicsEngine == "dart")
-  {
-    gzerr << _physicsEngine
-          << " is broken for this test,"
-          << " because of the pr2 gripper's closed kinematic chain,"
-          << " see issue #1435."
-          << std::endl;
-    return;
-  }
 
   // drop from some height
   model->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));

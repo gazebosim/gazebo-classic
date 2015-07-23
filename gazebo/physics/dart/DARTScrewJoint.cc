@@ -46,7 +46,8 @@ void DARTScrewJoint::Load(sdf::ElementPtr _sdf)
   this->SetThreadPitch(0, this->threadPitch);
 
   this->dataPtr->dtProperties.reset(
-        new dart::dynamics::ScrewJoint::Properties());
+        new dart::dynamics::ScrewJoint::Properties(
+          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -187,6 +188,7 @@ void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 {
   if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
+
   this->SetThreadPitch(_threadPitch);
 }
 
@@ -206,7 +208,7 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
   dart::dynamics::ScrewJoint *dtScrewJoint =
       reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
 
-  dtScrewJoint->setPitch(_threadPitch * 2.0 * M_PI);
+  dtScrewJoint->setPitch(DARTTypes::ConvPitch(_threadPitch));
 }
 
 //////////////////////////////////////////////////
@@ -214,6 +216,7 @@ double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
+
   return this->GetThreadPitch();
 }
 
@@ -223,9 +226,9 @@ double DARTScrewJoint::GetThreadPitch()
   GZ_ASSERT(
     !this->dataPtr->IsInitialized() ||
     (std::abs(reinterpret_cast<dart::dynamics::ScrewJoint *>(
-                this->dataPtr->dtJoint)->getPitch() * 0.5 / M_PI -
-              this->threadPitch) < 1e-6),
-    "Gazebo and DART disagree in gravity mode of the link.");
+      this->dataPtr->dtJoint)->getPitch() -
+      DARTTypes::ConvPitch(this->threadPitch)) < 1e-6),
+    "Gazebo and DART disagree in thread pitch.");
 
   return this->threadPitch;
 }
@@ -277,6 +280,14 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return false;
+  }
+
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          _key + std::to_string(_index),
+          boost::bind(&DARTScrewJoint::SetParam, this, _key, _index, _value));
+    return true;
   }
 
   // try because boost::any_cast can throw
@@ -341,7 +352,8 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 
     // linear position
     const double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result = dtScrewJoint->getPitch() * radianAngle * 0.5 / M_PI;
+    result.SetFromRadian(-radianAngle /
+                         DARTTypes::ConvPitch(dtScrewJoint->getPitch()));
   }
   else
   {
