@@ -78,22 +78,22 @@ class PhysicsFrictionTest : public ServerFixture,
             }
 
     /// \brief Size of box to spawn.
-    public: math::Vector3 size;
+    public: ignition::math::Vector3d size;
 
     /// \brief Mass of box to spawn (inertia computed automatically).
     public: double mass;
 
     /// \brief Model pose.
-    public: math::Pose modelPose;
+    public: ignition::math::Pose3d modelPose;
 
     /// \brief Link pose.
-    public: math::Pose linkPose;
+    public: ignition::math::Pose3d linkPose;
 
     /// \brief Inertial pose.
-    public: math::Pose inertialPose;
+    public: ignition::math::Pose3d inertialPose;
 
     /// \brief Collision pose.
-    public: math::Pose collisionPose;
+    public: ignition::math::Pose3d collisionPose;
 
     /// \brief Friction coefficient in primary direction.
     public: double friction1;
@@ -102,7 +102,7 @@ class PhysicsFrictionTest : public ServerFixture,
     public: double friction2;
 
     /// \brief Primary friction direction.
-    public: math::Vector3 direction1;
+    public: ignition::math::Vector3d direction1;
   };
 
   /// \brief Spawn a box with friction coefficients and direction.
@@ -310,28 +310,29 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
       // Compute angle for each box
       double radius = 9.0 + ring;
       double angle = 2*M_PI*static_cast<double>(i) / static_cast<double>(boxes);
-      opt.modelPose.pos.Set(radius*cos(angle), radius*sin(angle), dz/2);
+      opt.modelPose.Pos().Set(radius*cos(angle), radius*sin(angle), dz/2);
 
       if (ring == 0)
-        opt.direction1 = math::Vector3(-sin(angle), cos(angle), 0);
+        opt.direction1 = ignition::math::Vector3d(-sin(angle), cos(angle), 0);
       else if (ring < 4)
-        opt.direction1 = math::Vector3(0.0, 1.0, 0.0);
+        opt.direction1 = ignition::math::Vector3d(0.0, 1.0, 0.0);
 
       if (ring == 1)
-        opt.collisionPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.collisionPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 2)
-        opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.linkPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 3)
-        opt.modelPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.modelPose.Rot().Euler(0.0, 0.0, angle);
 
       physics::ModelPtr model = SpawnBox(opt);
       ASSERT_TRUE(model != NULL);
       modelAngles[model] = angle;
 
       // Set velocity, larger for outer rings.
-      model->SetLinearVel(radius * math::Vector3(cos(angle), sin(angle), 0));
+      model->SetLinearVel(
+          radius * ignition::math::Vector3d(cos(angle), sin(angle), 0));
     }
   }
 
@@ -413,21 +414,21 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
       // Compute angle for each box
       double radius = 5.0 + ring;
       double angle = M_PI*static_cast<double>(i) / static_cast<double>(boxes);
-      opt.modelPose.pos.Set(radius*cos(angle), radius*sin(angle), dz/2);
+      opt.modelPose.Pos().Set(radius*cos(angle), radius*sin(angle), dz/2);
 
       if (ring == 0)
-        opt.direction1 = math::Vector3(-sin(angle), cos(angle), 0);
+        opt.direction1 = ignition::math::Vector3d(-sin(angle), cos(angle), 0);
       else
-        opt.direction1 = math::Vector3(0.0, 1.0, 0.0);
+        opt.direction1 = ignition::math::Vector3d(0.0, 1.0, 0.0);
 
       if (ring == 1)
-        opt.collisionPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.collisionPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 2)
-        opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.linkPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 3)
-        opt.modelPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.modelPose.Rot().Euler(0.0, 0.0, angle);
 
       physics::ModelPtr model = SpawnBox(opt);
       ASSERT_TRUE(model != NULL);
@@ -502,8 +503,8 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   // Set box size and anisotropic friction
   SpawnFrictionBoxOptions opt;
   opt.size.Set(dx, dy, dz);
-  opt.direction1 = math::Vector3(0.0, 0.0, 1.0);
-  opt.modelPose.pos.z = dz/2;
+  opt.direction1 = ignition::math::Vector3d(0.0, 0.0, 1.0);
+  opt.modelPose.Pos().Z(dz/2);
 
   physics::ModelPtr model = SpawnBox(opt);
   ASSERT_TRUE(model != NULL);
