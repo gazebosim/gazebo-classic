@@ -57,7 +57,7 @@ set (plugins
   ModelPropShop
   MudPlugin
   PressurePlugin
-  RandomVelocity
+  RandomVelocityPlugin
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
