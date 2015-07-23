@@ -109,8 +109,8 @@ namespace gazebo
       /// \brief Log base path.
       private: QString basePath;
 
-      /// \brief Line edit to display the log destination path.
-      private: QLineEdit *destPath;
+      /// \brief Text edit to display the log destination path.
+      private: QPlainTextEdit *destPath;
 
       /// \brief Label to display the log destination uri.
       private: QLineEdit *destURI;
