@@ -138,12 +138,12 @@ TEST_P(JointTestScrew, WrapAngle)
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 {
-//  if (_physicsEngine == "dart")
-//  {
-//    gzerr << "DART Screw Joint will not work with Link::SetWorldPose."
-//          << " See issue #1096.\n";
-//    return;
-//  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "DART Screw Joint will not work with Link::SetWorldPose."
+          << " See issue #1096.\n";
+    return;
+  }
 
   if (_physicsEngine == "simbody")
   {
