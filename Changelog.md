@@ -2,6 +2,9 @@
 
 ### Gazebo 5.x.x
 
+1. Use ToSDF functions to simplify physics_friction test
+    * [Pull request #1808](https://bitbucket.org/osrf/gazebo/pull-request/1808)
+
 1. Added lines to laser sensor visualization 
     * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
     * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
