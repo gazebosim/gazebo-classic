@@ -60,19 +60,14 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
     }
     else
     {
-        if ( contact.surface.mu > 0 ) m++;
-        if (_dequal(contact.surface.mu, dInfinity)) nub++;
+        if ( contact.surface.mu > 0 ) m += 2;
+        if (_dequal(contact.surface.mu, dInfinity)) nub += 2;
     }
     if ( contact.surface.mode & dContactMu3 )
     {
         if ( contact.surface.mu3 < 0 ) contact.surface.mu3 = 0;
         if ( contact.surface.mu3 > 0 ) m++;
         if (_dequal(contact.surface.mu3, dInfinity)) nub ++;
-    }
-    else
-    {
-        if ( contact.surface.mu > 0 ) m++;
-        if (_dequal(contact.surface.mu, dInfinity)) nub++;
     }
 
     the_m = m;
@@ -311,6 +306,8 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     dVector3 t3 = {0, 0, 0};
 
     // third friction direction (torsional)
+    // note that this will only be reachable if mu and mu2
+    // have positive values
     if ( the_m >= 4 )
     {
         // Linear, body 1
@@ -377,8 +374,8 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         }
         else
         {
-            info->lo[3] = -contact.surface.mu;
-            info->hi[3] = contact.surface.mu;
+            info->lo[3] = 0.0;
+            info->hi[3] = 0.0;
         }
 
         // set slip (constraint force mixing)
