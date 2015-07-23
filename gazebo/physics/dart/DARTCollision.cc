@@ -60,25 +60,28 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
-}
-
-//////////////////////////////////////////////////
-void DARTCollision::Init()
-{
-  Collision::Init();
 
   // Offset
   if (this->dataPtr->dtCollisionShape)
   {
     // TODO: Remove type check once DART completely supports plane shape.
     // Please see: https://github.com/dartsim/dart/issues/114
-    if (this->dataPtr->dtCollisionShape->getShapeType() !=
-        dart::dynamics::Shape::PLANE)
+
+    const bool isPlaneShape =
+        (boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape) != NULL);
+
+    if (!isPlaneShape)
     {
       this->dataPtr->dtCollisionShape->setOffset(
             DARTTypes::ConvVec3(this->GetRelativePose().pos));
     }
   }
+}
+
+//////////////////////////////////////////////////
+void DARTCollision::Init()
+{
+  Collision::Init();
 }
 
 //////////////////////////////////////////////////

@@ -141,6 +141,10 @@ namespace gazebo
           return skeleton->createJointAndBodyNodePair<dart::dynamics::RevoluteJoint, BodyTypeT>(parent,
             static_cast<const dart::dynamics::RevoluteJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
 
+        else if(std::string("screw") == jointBuildData.type)
+          return skeleton->createJointAndBodyNodePair<dart::dynamics::ScrewJoint, BodyTypeT>(parent,
+            static_cast<const dart::dynamics::ScrewJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
+
         else if(std::string("universal") == jointBuildData.type)
           return skeleton->createJointAndBodyNodePair<dart::dynamics::UniversalJoint, BodyTypeT>(parent,
             static_cast<const dart::dynamics::UniversalJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);

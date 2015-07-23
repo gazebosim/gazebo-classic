@@ -119,9 +119,6 @@ namespace gazebo
       public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const;
-
-      // Documentation inherited.
       public: virtual void ApplyDamping();
 
       /// \brief Set the force applied to this physics::Joint.

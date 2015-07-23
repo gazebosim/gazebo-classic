@@ -73,7 +73,12 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetParam(const std::string &_key,
-                  unsigned int _index);
+                                      unsigned int _index);
+
+      // Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value);
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;

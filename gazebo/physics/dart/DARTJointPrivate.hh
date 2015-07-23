@@ -18,6 +18,9 @@
 #ifndef _GAZEBO_DARTJOINT_PRIVATE_HH_
 #define _GAZEBO_DARTJOINT_PRIVATE_HH_
 
+#include <boost/function.hpp>
+
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/dart/dart_inc.h"
@@ -40,10 +43,103 @@ namespace gazebo
           dtJoint(NULL),
           dtChildBodyNode(NULL)
       {
+        mDefaultValues["Axis0"] = math::Vector3::UnitX;
+        mDefaultValues["Axis1"] = math::Vector3::UnitY;
       }
 
       /// \brief Default destructor
       public: ~DARTJointPrivate() = default;
+
+      /// \brief Call all the cached setter functions and clear them
+      public: void Initialize()
+      {
+        GZ_ASSERT(dtJoint != NULL, "dtJoint is null pointer.\n");
+
+        for (auto func : mFuncs)
+          func();
+
+        dtJoint->setPositionLimited(true);
+      }
+
+      /// \brief Return true if DART Joint is initialized
+      public: bool IsInitialized() const
+      {
+        return dtJoint != NULL;
+      }
+
+      /// \brief Cache a setter function. The cached functions will be called in
+      /// Initialize().
+      public: void Cache(const std::string &_key,
+                         boost::function<void()> _func)
+      {
+        gzlog << "Attempting to set "<< _key << " to DART Joint when "
+              << "it's not "
+              << "initialized yet. "
+              << "Please dont't call this function during Model::Load() is "
+              << "being processed. "
+              << "Caching this function to be called in DARTJoint::Init().\n";
+
+        mFuncs.push_back(_func);
+      }
+
+      /// \brief Cache a setter function and a value. The cached functions will
+      /// be called in Initialize(). The cached value can be obtained through
+      /// GetCached().
+      public: void Cache(const std::string &_key,
+                         boost::function<void()> _func,
+                         const boost::any &_value)
+      {
+        Cache(_key, _func);
+
+        mCachedValues[_key] = _value;
+      }
+
+      /// \brief Get cached value.
+      public: template <typename T>
+              T GetCached(const std::string &_key) const
+      {
+        // Try to find cached value
+        auto cachedValResult = mCachedValues.find(_key);
+        if (cachedValResult != mCachedValues.end())
+        {
+          try
+          {
+            return boost::any_cast<T>(cachedValResult->second);
+          }
+          catch(const boost::bad_any_cast &_e)
+          {
+            gzerr << "GetCached(" << _key << ") error:" << _e.what() << "\n";
+            return T();
+          }
+        }
+
+        // Try to find predefined default value
+        auto defValResult = mDefaultValues.find(_key);
+        if (defValResult != mDefaultValues.end())
+        {
+          try
+          {
+            return boost::any_cast<T>(defValResult->second);
+          }
+          catch(const boost::bad_any_cast &_e)
+          {
+            gzerr << "GetCached(" << _key << ") error:" << _e.what() << "\n";
+            return T();
+          }
+        }
+
+        // Return the default value of the object itself
+        return T();
+      }
+
+      /// \brief Cached setter functions.
+      public: std::vector<boost::function<void()>> mFuncs;
+
+      /// \brief Cached values.
+      public: std::map<std::string, boost::any> mDefaultValues;
+
+      /// \brief Default values that will be used when there is no cached value.
+      public: std::map<std::string, boost::any> mCachedValues;
 
       /// \brief Save force applied by user
       /// This plus the joint feedback (joint contstraint forces) is the

@@ -41,6 +41,10 @@ DARTHingeJoint::~DARTHingeJoint()
 void DARTHingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<DARTJoint>::Load(_sdf);
+
+  this->dataPtr->dtProperties.reset(
+        new dart::dynamics::RevoluteJoint::Properties(
+          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -50,8 +54,14 @@ void DARTHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHingeJoint::GetAnchor(unsigned int /*index*/) const
+math::Vector3 DARTHingeJoint::GetAnchor(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<math::Vector3>(
+          "Anchor" + std::to_string(_index));
+  }
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
@@ -62,6 +72,12 @@ math::Vector3 DARTHingeJoint::GetAnchor(unsigned int /*index*/) const
 //////////////////////////////////////////////////
 math::Vector3 DARTHingeJoint::GetGlobalAxis(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<math::Vector3>(
+          "Axis" + std::to_string(_index));
+  }
+
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
   if (_index == 0)
@@ -86,6 +102,14 @@ math::Vector3 DARTHingeJoint::GetGlobalAxis(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetAxis(unsigned int _index, const math::Vector3& _axis)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+        "Axis" + std::to_string(_index),
+        boost::bind(&DARTHingeJoint::SetAxis, this, _index, _axis));
+    return;
+  }
+
   if (_index == 0)
   {
     dart::dynamics::RevoluteJoint *dtRevoluteJoint =
@@ -110,6 +134,12 @@ void DARTHingeJoint::SetAxis(unsigned int _index, const math::Vector3& _axis)
 //////////////////////////////////////////////////
 math::Angle DARTHingeJoint::GetAngleImpl(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<math::Angle>(
+          "Angle" + std::to_string(_index));
+  }
+
   math::Angle result;
 
   if (_index == 0)
@@ -128,6 +158,14 @@ math::Angle DARTHingeJoint::GetAngleImpl(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetVelocity(unsigned int _index, double _vel)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+        "Velocity" + std::to_string(_index),
+        boost::bind(&DARTHingeJoint::SetVelocity, this, _index, _vel));
+    return;
+  }
+
   if (_index == 0)
     this->dataPtr->dtJoint->setVelocity(0, _vel);
   else
@@ -137,6 +175,12 @@ void DARTHingeJoint::SetVelocity(unsigned int _index, double _vel)
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetVelocity(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "Velocity" + std::to_string(_index));
+  }
+
   double result = 0.0;
 
   if (_index == 0)
@@ -150,6 +194,14 @@ double DARTHingeJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetMaxForce(unsigned int _index, double _force)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+        "MaxForce" + std::to_string(_index),
+        boost::bind(&DARTHingeJoint::SetMaxForce, this, _index, _force));
+    return;
+  }
+
   if (_index == 0)
   {
     this->dataPtr->dtJoint->setForceLowerLimit(0, -_force);
@@ -164,6 +216,12 @@ void DARTHingeJoint::SetMaxForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 double DARTHingeJoint::GetMaxForce(unsigned int _index)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "MaxForce" + std::to_string(_index));
+  }
+
   double result = 0.0;
 
   if (_index == 0)
@@ -183,6 +241,14 @@ double DARTHingeJoint::GetMaxForce(unsigned int _index)
 //////////////////////////////////////////////////
 void DARTHingeJoint::SetForceImpl(unsigned int _index, double _effort)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+        "Force" + std::to_string(_index),
+        boost::bind(&DARTHingeJoint::SetForceImpl, this, _index, _effort));
+    return;
+  }
+
   if (_index == 0)
     this->dataPtr->dtJoint->setForce(0, _effort);
   else

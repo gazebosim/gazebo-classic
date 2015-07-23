@@ -41,6 +41,10 @@ DARTSliderJoint::~DARTSliderJoint()
 void DARTSliderJoint::Load(sdf::ElementPtr _sdf)
 {
   SliderJoint<DARTJoint>::Load(_sdf);
+
+  this->dataPtr->dtProperties.reset(
+        new dart::dynamics::PrismaticJoint::Properties(
+          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -50,8 +54,14 @@ void DARTSliderJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTSliderJoint::GetAnchor(unsigned int /*_index*/) const
+math::Vector3 DARTSliderJoint::GetAnchor(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<math::Vector3>("Anchor"
+                                                   + std::to_string(_index));
+  }
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
       this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
@@ -62,6 +72,12 @@ math::Vector3 DARTSliderJoint::GetAnchor(unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 math::Vector3 DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<math::Vector3>(
+          "Axis" + std::to_string(_index));
+  }
+
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
   if (_index == 0)
@@ -86,6 +102,14 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "Axis" + std::to_string(_index),
+          boost::bind(&DARTSliderJoint::SetAxis, this, _index, _axis));
+    return;
+  }
+
   if (_index == 0)
   {
     dart::dynamics::PrismaticJoint *dtPrismaticJoint =
@@ -109,6 +133,12 @@ void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 //////////////////////////////////////////////////
 math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<math::Angle>(
+          "Angle" + std::to_string(_index));
+  }
+
   math::Angle result;
 
   if (_index == 0)
@@ -127,6 +157,14 @@ math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->Cache(
+          "Velocity" + std::to_string(_index),
+          boost::bind(&DARTSliderJoint::SetVelocity, this, _index, _vel),
+          _vel);
+  }
+
   if (_index == 0)
     this->dataPtr->dtJoint->setVelocity(0, _vel);
   else
@@ -136,6 +174,12 @@ void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
 //////////////////////////////////////////////////
 double DARTSliderJoint::GetVelocity(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "Velocity" + std::to_string(_index));
+  }
+
   double result = 0.0;
 
   if (_index == 0)
@@ -149,6 +193,14 @@ double DARTSliderJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetMaxForce(unsigned int _index, double _force)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+        "MaxForce" + std::to_string(_index),
+        boost::bind(&DARTSliderJoint::SetMaxForce, this, _index, _force));
+    return;
+  }
+
   if (_index == 0)
   {
     this->dataPtr->dtJoint->setForceLowerLimit(0, -_force);
@@ -163,6 +215,12 @@ void DARTSliderJoint::SetMaxForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 double DARTSliderJoint::GetMaxForce(unsigned int _index)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "MaxForce" + std::to_string(_index));
+  }
+
   double result = 0.0;
 
   if (_index == 0)
@@ -182,6 +240,14 @@ double DARTSliderJoint::GetMaxForce(unsigned int _index)
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetForceImpl(unsigned int _index, double _effort)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+        "Force" + std::to_string(_index),
+        boost::bind(&DARTSliderJoint::SetForceImpl, this, _index, _effort));
+    return;
+  }
+
   if (_index == 0)
     this->dataPtr->dtJoint->setForce(0, _effort);
   else

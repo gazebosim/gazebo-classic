@@ -34,7 +34,7 @@ namespace gazebo
         : dtBoxShape(new dart::dynamics::BoxShape(
                        Eigen::Vector3d(2100, 2100, 2100)))
       {
-        dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
+        this->dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
       }
 
       /// \brief Default destructor
