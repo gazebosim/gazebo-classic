@@ -1214,8 +1214,9 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_TRUE(axisGearboxMsg2.has_friction());
   EXPECT_NEAR(axisGearboxMsg2.friction(), 0.1, 1e-6);
 
-  EXPECT_EQ(gearboxMsg.gearbox_reference_body(), "axle");
-  EXPECT_NEAR(gearboxMsg.gearbox_ratio(), 0.2, 1e-6);
+  EXPECT_TRUE(gearboxMsg.has_gearbox());
+  EXPECT_EQ(gearboxMsg.mutable_gearbox()->gearbox_reference_body(), "axle");
+  EXPECT_NEAR(gearboxMsg.mutable_gearbox()->gearbox_ratio(), 0.2, 1e-6);
 
   // screw
   sdf::ElementPtr screwSdf(new sdf::Element());
@@ -1309,6 +1310,9 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_NEAR(axisScrewMsg.damping(), 0.5, 1e-6);
   EXPECT_TRUE(axisScrewMsg.has_friction());
   EXPECT_NEAR(axisScrewMsg.friction(), 0.12, 1e-6);
+
+  EXPECT_TRUE(screwMsg.has_screw());
+  EXPECT_NEAR(screwMsg.mutable_screw()->thread_pitch(), 0.2, 1e-6);
 }
 
 /////////////////////////////////////////////////
@@ -2093,8 +2097,9 @@ TEST_F(MsgsTest, JointToSDF)
       axis2->set_damping(damping2);
       axis2->set_friction(friction2);
     }
-    jointMsg.set_gearbox_reference_body(gearbox_reference_body);
-    jointMsg.set_gearbox_ratio(gearbox_ratio);
+    msgs::Joint::Gearbox *gearboxMsg = jointMsg.mutable_gearbox();
+    gearboxMsg->set_gearbox_reference_body(gearbox_reference_body);
+    gearboxMsg->set_gearbox_ratio(gearbox_ratio);
 
     sdf::ElementPtr jointSDF = msgs::JointToSDF(jointMsg);
     EXPECT_TRUE(jointSDF->HasAttribute("name"));
@@ -2253,7 +2258,9 @@ TEST_F(MsgsTest, JointToSDF)
       axis1->set_friction(friction1);
       axis1->set_use_parent_model_frame(useParentModelFrame1);
     }
-    jointMsg.set_thread_pitch(thread_pitch);
+
+    msgs::Joint::Screw *screwMsg = jointMsg.mutable_screw();
+    screwMsg->set_thread_pitch(thread_pitch);
 
     sdf::ElementPtr jointSDF = msgs::JointToSDF(jointMsg);
     EXPECT_TRUE(jointSDF->HasAttribute("name"));

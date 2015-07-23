@@ -350,18 +350,9 @@ void JointMaker_TEST::JointDefaultProperties()
   qFuzzyCompare(fixedJoint->jointMsg->suspension_cfm(), 0.0);
   qFuzzyCompare(fixedJoint->jointMsg->suspension_erp(), 0.2);
 
-  // fixed joint created using revolute joint with zero limits so it
-  // has one axis
-  msgs::Axis fixedAxis1Msg = fixedJoint->jointMsg->axis1();
-  QCOMPARE(msgs::ConvertIgn(fixedAxis1Msg.xyz()),
-      ignition::math::Vector3d(1, 0, 0));
-  qFuzzyCompare(fixedAxis1Msg.limit_lower(), 0);
-  qFuzzyCompare(fixedAxis1Msg.limit_upper(), 0);
-  qFuzzyCompare(fixedAxis1Msg.limit_effort(), -1);
-  qFuzzyCompare(fixedAxis1Msg.limit_velocity(), -1);
-  qFuzzyCompare(fixedAxis1Msg.damping(), 0.0);
-  qFuzzyCompare(fixedAxis1Msg.friction(), 0.0);
-  QCOMPARE(fixedAxis1Msg.use_parent_model_frame(), false);
+  // fixed joint has no axes.
+  QVERIFY(!fixedJoint->jointMsg->has_axis1());
+  QVERIFY(!fixedJoint->jointMsg->has_axis2());
 
   delete jointMaker;
   mainWindow->close();

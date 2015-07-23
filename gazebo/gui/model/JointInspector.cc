@@ -166,14 +166,6 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     axis << "axis" << i+1;
     std::string axisStr = axis.str();
 
-    // use revolute joint with zero limits to simulate fixed joint
-    // TODO: remove when fixed joint is supported in gazebo.
-    if (valueStr == "fixed")
-    {
-      this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower", 0);
-      this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_upper", 0);
-    }
-
     this->configWidget->SetWidgetVisible(axisStr, true);
     this->configWidget->SetWidgetReadOnly(axisStr, false);
     this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
@@ -193,12 +185,16 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
   // toggle field visibility according to joint type.
   bool isGearbox = valueStr == "gearbox";
   bool isScrew = valueStr == "screw";
-  this->configWidget->SetWidgetVisible("gearbox_reference_body", isGearbox);
+  this->configWidget->SetWidgetVisible("gearbox", isGearbox);
+  this->configWidget->SetWidgetReadOnly("gearbox", !isGearbox);
+  this->configWidget->SetWidgetVisible("screw", isScrew);
+  this->configWidget->SetWidgetReadOnly("screw", !isScrew);
+/*  this->configWidget->SetWidgetVisible("gearbox_reference_body", isGearbox);
   this->configWidget->SetWidgetReadOnly("gearbox_reference_body", !isGearbox);
   this->configWidget->SetWidgetVisible("gearbox_ratio", isGearbox);
   this->configWidget->SetWidgetReadOnly("gearbox_ratio", !isGearbox);
   this->configWidget->SetWidgetVisible("thread_pitch", isScrew);
-  this->configWidget->SetWidgetReadOnly("thread_pitch", !isScrew);
+  this->configWidget->SetWidgetReadOnly("thread_pitch", !isScrew);*/
 }
 
 /////////////////////////////////////////////////
