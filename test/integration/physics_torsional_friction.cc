@@ -69,6 +69,8 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 
       this->mass = inertial->GetMass();
       this->izz = inertial->GetIZZ();
+
+      this->error.InsertStatistic("maxAbs");
     }
 
     /// \brief Destructor
@@ -97,6 +99,9 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 
     /// \brief Radius
     public: double radius;
+
+    /// \brief Computing signal stats error
+    public: ignition::math::SignalStats error;
   };
 
   /// \brief Use the torsional_friction_test world to test spheres with
@@ -313,10 +318,18 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       else
       {
         // acc.z = (appliedTorque - frictionTorque) / Izz
-        EXPECT_NEAR(acc.z, (appliedTorque - frictionTorque) / sphere.izz,
-            g_friction_tolerance);
+        sphere.error.InsertData(
+            acc.z - (appliedTorque - frictionTorque) / sphere.izz);
       }
     }
+  }
+
+  // Check error separately to reduce console spam
+  for (auto sphere : spheres)
+  {
+    gzdbg << "Model " << sphere.model->GetName()
+          << std::endl;
+    EXPECT_NEAR(sphere.error.Map()["maxAbs"], 0.0, g_friction_tolerance);
   }
 }
 
