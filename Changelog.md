@@ -1,3 +1,17 @@
+## Gazebo 7.0
+1. Log playback GUI for multistep, rewind, forward and seek
+    * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
+
+1. Tweaks to Data Logger, such as multiline text edit for path
+    * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
+
+1. Model editor updates
+    1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
+        * [Pull request #1787](https://bitbucket.org/osrf/gazebo/pull-request/1787)
+        
+    1. Color-coded edges in Schematic View to match joint color.
+        * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
+
 ## Gazebo 6.0
 
 1. Added magnetometer sensor. A contribution from Andrew Symington.
