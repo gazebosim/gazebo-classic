@@ -355,19 +355,17 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             //
             // M = (3 * pi * mu3 * sqrt (R * d))/16 * F
 
-            // Zero by default
-            dReal patch = 0.0;
-
+            dReal patch_radius;
             if (contact.surface.use_curvature)
             {
-              patch = sqrt(contact.surface.curvature_radius * depth);
+              patch_radius = sqrt(contact.surface.curvature_radius * depth);
             }
             else
             {
-              patch = contact.surface.patch_radius;
+              patch_radius = contact.surface.patch_radius;
             }
 
-            double rhs = (3 * M_PI * patch * contact.surface.mu3)/16;
+            double rhs = (3 * M_PI * patch_radius * contact.surface.mu3)/16;
 
             info->lo[3] = -rhs;
             info->hi[3] = rhs;
