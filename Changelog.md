@@ -2,6 +2,9 @@
 
 ### Gazebo 5.x.x
 
+1. Add Add missing ogre includes to ensure macros are properly defined
+    * [Pull request #1813](https://bitbucket.org/osrf/gazebo/pull-request/1813)
+
 1. Use ToSDF functions to simplify physics_friction test
     * [Pull request #1808](https://bitbucket.org/osrf/gazebo/pull-request/1808)
 
