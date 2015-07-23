@@ -25,11 +25,13 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 FrictionPyramid::FrictionPyramid()
+  : patchRadius(0.0)
+  , curvatureRadius(0.0)
+  , useCurvature(0)
 {
   this->mu[0] = 1.0;
   this->mu[1] = 1.0;
   this->mu[2] = 1.0;
-  this->patchRadius = 0.0;
 }
 
 //////////////////////////////////////////////////

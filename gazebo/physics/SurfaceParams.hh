@@ -127,8 +127,10 @@ namespace gazebo
       /// friction.
       private: double curvatureRadius;
 
-      /// \brief True to use the curvature * contact depth, false to use the
-      /// patch radius.
+      /// \brief Flag for choosing the method for computing the contact
+      /// patch radius in torsional friction.
+      /// True to use the product of curvature and contact depth,
+      /// false to use the constant patchRadius parameter.
       private: bool useCurvature;
     };
 
