@@ -385,11 +385,6 @@ else (build_errors)
     gazebo_ode
   )
 
-  # "First level" deps, mostly depends on math and/or common
-  if (${OGRE_VERSION} GREATER 1.7.4)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
-  endif()
-
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_transport
     gazebo_msgs
