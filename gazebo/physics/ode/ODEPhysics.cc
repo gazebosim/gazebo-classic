@@ -1138,9 +1138,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   contact.surface.patch_radius =
       std::max(surf1->GetFrictionPyramid()->GetPatchRadius(),
                surf2->GetFrictionPyramid()->GetPatchRadius());
+  // the curvature can be combined using 1/R = 1/R1 + 1/R2
+  // we can consider doing the same for the patch radius
   contact.surface.curvature_radius =
       std::max(surf1->GetFrictionPyramid()->GetCurvatureRadius(),
                surf2->GetFrictionPyramid()->GetCurvatureRadius());
+  // not sure how to combine these logic flags
   contact.surface.use_curvature =
       surf1->GetFrictionPyramid()->GetUseCurvature() ||
       surf2->GetFrictionPyramid()->GetUseCurvature();
