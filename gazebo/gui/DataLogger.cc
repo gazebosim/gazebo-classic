@@ -40,6 +40,9 @@ using namespace gui;
 DataLogger::DataLogger(QWidget *_parent)
   : QDialog(_parent)
 {
+  this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
   // This name is used in the qt style sheet
   this->setObjectName("dataLogger");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
@@ -61,7 +64,8 @@ DataLogger::DataLogger(QWidget *_parent)
   // Textual status information
   this->statusLabel = new QLabel("Ready");
   this->statusLabel->setObjectName("dataLoggerStatusLabel");
-  this->statusLabel->setFixedWidth(80);
+  this->statusLabel->setStyleSheet(
+      "QLabel{padding-left: 14px; padding-top: 9px}");
 
   // Duration of logging
   this->timeLabel = new QLabel("00:00:00.000");
@@ -93,15 +97,28 @@ DataLogger::DataLogger(QWidget *_parent)
   // "Save to" label
   QLabel *pathLabel = new QLabel("Save to: ");
   pathLabel->setStyleSheet(
-      "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
+      "QLabel {\
+         color: #aeaeae;\
+         font-size: 11px;\
+         background: transparent;\
+         padding-top: 4px;\
+       }");
 
-  // Destination path Line Edit
-  this->destPath = new QLineEdit();
+  // Destination path Text Edit
+  this->destPath = new QPlainTextEdit();
   this->destPath->setObjectName("dataLoggerDestnationPathLabel");
-  this->destPath->setMinimumWidth(300);
+  this->destPath->setMinimumWidth(200);
+  this->destPath->setMaximumHeight(50);
   this->destPath->setReadOnly(true);
+  this->destPath->setFrameStyle(QFrame::NoFrame);
+  this->destPath->setLineWrapMode(QPlainTextEdit::WidgetWidth);
+  this->destPath->setWordWrapMode(QTextOption::WrapAnywhere);
   this->destPath->setStyleSheet(
-      "QLineEdit {color: #aeaeae; font-size: 11px; background: transparent}");
+      "QPlainTextEdit {\
+         color: #aeaeae;\
+         font-size: 11px;\
+         background: transparent;\
+       }");
 
   // Browser button
   QPushButton *browseButton = new QPushButton("Browse");
@@ -142,11 +159,12 @@ DataLogger::DataLogger(QWidget *_parent)
   topLayout->addWidget(recordingsButton, 5, 0, 1, 4);
 
   // Align widgets within layout
-  topLayout->setAlignment(this->statusLabel, Qt::AlignCenter);
+  topLayout->setAlignment(pathLabel, Qt::AlignTop | Qt::AlignRight);
+  topLayout->setAlignment(browseButton, Qt::AlignTop);
+  topLayout->setAlignment(this->statusLabel, Qt::AlignLeft);
   topLayout->setAlignment(this->timeLabel, Qt::AlignRight);
   topLayout->setAlignment(this->sizeLabel, Qt::AlignRight | Qt::AlignTop);
   topLayout->setAlignment(uriLabel, Qt::AlignRight);
-  topLayout->setAlignment(pathLabel, Qt::AlignRight);
 
   // Put the layout in a widget to be able to control size
   QWidget *topWidget = new QWidget();
@@ -278,7 +296,7 @@ void DataLogger::OnRecord(bool _toggle)
     // Display confirmation
     this->confirmationTimer->start(2000);
     QLabel *confirmationLabel = new QLabel("Saved to \n" +
-        this->destPath->text());
+        this->destPath->toPlainText());
     confirmationLabel->setObjectName("dataLoggerConfirmationLabel");
     QHBoxLayout *confirmationLayout = new QHBoxLayout();
     confirmationLayout->addWidget(confirmationLabel);
@@ -299,7 +317,12 @@ void DataLogger::OnRecord(bool _toggle)
 
     // Change the status
     this->statusLabel->setText("Ready");
-    this->statusLabel->setStyleSheet("QLabel{color: #aeaeae}");
+    this->statusLabel->setStyleSheet(
+        "QLabel {\
+           color: #aeaeae;\
+           padding-left: 14px;\
+           padding-top: 9px;\
+         }");
     this->statusTimer->stop();
 
     // Change the Save to box
@@ -310,7 +333,7 @@ void DataLogger::OnRecord(bool _toggle)
     msg.set_stop(true);
     this->pub->Publish(msg);
 
-    this->logList->append(this->destPath->text());
+    this->logList->append(this->destPath->toPlainText());
   }
 }
 
@@ -397,7 +420,7 @@ void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 void DataLogger::OnSetDestinationPath(QString _filename)
 {
   if (!_filename.isEmpty())
-    this->destPath->setText(_filename);
+    this->destPath->setPlainText(_filename);
 }
 
 /////////////////////////////////////////////////
@@ -499,7 +522,8 @@ void DataLogger::OnBlinkStatus()
           std::to_string(255+(128*(this->statusTime-1)))+", "+
           std::to_string(255+(128*(this->statusTime-1)))+", "+
           std::to_string(255+(128*(this->statusTime-1)))+
-      ")}"));
+      "); "+
+      "padding-left: 15px; padding-top: 9px}"));
 }
 
 /////////////////////////////////////////////////
