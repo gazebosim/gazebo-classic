@@ -114,6 +114,8 @@ void ImportDialog::OnBrowse()
 {
   QFileDialog fd(this, tr("Import Link"), QDir::homePath(),
       tr("Files (*.svg *.dae *.stl)"));
+  fd.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
   fd.setFilter(QDir::AllDirs | QDir::Hidden);
   fd.setFileMode(QFileDialog::ExistingFile);
   if (fd.exec())

@@ -221,6 +221,8 @@ void ImportImageDialog::OnSelectFile()
 {
   QFileDialog fileDialog(this, tr("Open Image"), QDir::homePath(),
       tr("Image Files (*.png *.jpg *.jpeg)"));
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   if (fileDialog.exec() == QDialog::Accepted)
   {

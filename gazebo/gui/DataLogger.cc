@@ -449,6 +449,8 @@ void DataLogger::OnBrowse()
   fileDialog.setFilter(QDir::AllDirs | QDir::Hidden);
   fileDialog.setOptions(QFileDialog::ShowDirsOnly
       | QFileDialog::DontResolveSymlinks);
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   if (fileDialog.exec() != QDialog::Accepted)
     return;

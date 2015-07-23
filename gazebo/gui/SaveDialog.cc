@@ -239,6 +239,8 @@ void SaveDialog::OnBrowse()
   fileDialog.setFileMode(QFileDialog::Directory);
   fileDialog.setOptions(QFileDialog::ShowDirsOnly
       | QFileDialog::DontResolveSymlinks);
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   if (fileDialog.exec() == QDialog::Accepted)
   {
