@@ -20,6 +20,7 @@
 
 #include <map>
 #include <vector>
+#include <string>
 #include <boost/any.hpp>
 #include <boost/function.hpp>
 

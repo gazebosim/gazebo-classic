@@ -18,6 +18,9 @@
 #ifndef _GAZEBO_DARTJOINT_PRIVATE_HH_
 #define _GAZEBO_DARTJOINT_PRIVATE_HH_
 
+#include <map>
+#include <string>
+#include <vector>
 #include <boost/function.hpp>
 
 #include "gazebo/common/Assert.hh"

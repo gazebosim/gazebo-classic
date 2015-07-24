@@ -319,7 +319,7 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
       }
     }
   }
-  catch (const boost::bad_any_cast &_e)
+  catch(const boost::bad_any_cast &_e)
   {
     gzerr << "SetParam(" << _key << ")"
           << " boost any_cast error:" << _e.what()

@@ -102,7 +102,8 @@ void DARTModel::Init()
 
   // Iterate through the collected properties and construct the Skeleton from
   // the root nodes downward the root nodes downward.
-  DARTModelPrivate::BodyNodeMap::const_iterator bodyNodeItr = bodyNodeMap.begin();
+  DARTModelPrivate::BodyNodeMap::const_iterator bodyNodeItr =
+      bodyNodeMap.begin();
   DARTModelPrivate::JointMap::const_iterator parentJointItr;
   dart::dynamics::BodyNode* dtParentBodyNode;
 

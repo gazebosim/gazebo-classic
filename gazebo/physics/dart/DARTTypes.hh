@@ -112,8 +112,8 @@ namespace gazebo
       /// DART.
       ///
       /// Gazebo and DART use different definitions of pitch: Gazebo version
-      /// means NEGATIVE angular motion per linear motion while DART version means linear
-      /// motion per single rotation.
+      /// means NEGATIVE angular motion per linear motion while DART version
+      /// means linear motion per single rotation.
       public: static double ConvPitch(double _pitch)
       {
         return -2.0 * M_PI / _pitch;

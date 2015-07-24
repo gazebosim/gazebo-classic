@@ -18,6 +18,10 @@
 #ifndef _GAZEBO_DARTMODEL_PRIVATE_HH_
 #define _GAZEBO_DARTMODEL_PRIVATE_HH_
 
+#include <map>
+#include <string>
+#include <utility>
+
 #include "gazebo/physics/dart/dart_inc.h"
 
 namespace gazebo
@@ -32,8 +36,10 @@ namespace gazebo
       // cleand-up DART implements SkeletonBuilder which would play a role
       // similiar to Simbody's MultibodyGraphMaker.
 
-      public: using BodyPropPtr = std::shared_ptr<dart::dynamics::BodyNode::Properties>;
-      public: using JointPropPtr = std::shared_ptr<dart::dynamics::Joint::Properties>;
+      public: using BodyPropPtr =
+        std::shared_ptr<dart::dynamics::BodyNode::Properties>;
+      public: using JointPropPtr =
+        std::shared_ptr<dart::dynamics::Joint::Properties>;
 
       public: enum NextResult
       {
@@ -62,16 +68,21 @@ namespace gazebo
       };
 
       /// \brief first: BodyNode name | second: BodyNode information
-      public: using BodyNodeMap = Eigen::aligned_map<std::string, BodyNodeBuildData>;
+      public: using BodyNodeMap =
+        Eigen::aligned_map<std::string, BodyNodeBuildData>;
 
       /// \brief first: Child BodyNode name | second: Joint information
       public: using JointMap = std::map<std::string, JointBuildData>;
 
-      /// \brief first: Order that Joint appears in file | second: Child BodyNode name
-      public: using IndexToChildBodyNodeName = std::map<std::size_t, std::string>;
+      /// \brief first: Order that Joint appears in file | second: Child
+      /// BodyNode name
+      public: using IndexToChildBodyNodeName =
+        std::map<std::size_t, std::string>;
 
-      /// \brief first: Child BodyNode name | second: Order that Joint appears in file
-      public: using ChildBodyNodeNameToIndex = std::map<std::string, std::size_t>;
+      /// \brief first: Child BodyNode name | second: Order that Joint appears
+      /// in file
+      public: using ChildBodyNodeNameToIndex =
+        std::map<std::string, std::size_t>;
 
       public: static NextResult getNextJointAndNodePair(
           BodyNodeMap::const_iterator& bodyNodeItr,
@@ -96,8 +107,8 @@ namespace gazebo
             && parentBodyName != "world"
             && !parentBodyName.empty())
         {
-          // Find the properties of the parent Joint of the current Joint, because it
-          // does not seem to be created yet.
+          // Find the properties of the parent Joint of the current Joint,
+          // because it does not seem to be created yet.
           BodyNodeMap::const_iterator check_parent_body =
               bodyNodeMap.find(parentBodyName);
 
@@ -113,7 +124,9 @@ namespace gazebo
           else
           {
             bodyNodeItr = check_parent_body;
-            return CONTINUE; // Create the parent before creating the current Joint
+
+            // Create the parent before creating the current Joint
+            return CONTINUE;
           }
         }
 
@@ -128,52 +141,85 @@ namespace gazebo
           const JointBuildData& jointBuildData,
           const typename BodyTypeT::Properties& bodyNodeProperties)
       {
-        if(std::string("weld") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::WeldJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::WeldJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
-        else if(std::string("prismatic") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::PrismaticJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::PrismaticJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
-        else if(std::string("revolute") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::RevoluteJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::RevoluteJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
-        else if(std::string("screw") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::ScrewJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::ScrewJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
-        else if(std::string("universal") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::UniversalJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::UniversalJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
-        else if(std::string("ball") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::BallJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::BallJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
-        else if(std::string("euler") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::EulerJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::EulerJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
-        else if(std::string("translational") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::TranslationalJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::TranslationalJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
-        else if(std::string("planar") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::PlanarJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::PlanarJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
-        else if(std::string("free") == jointBuildData.type)
-          return skeleton->createJointAndBodyNodePair<dart::dynamics::FreeJoint, BodyTypeT>(parent,
-            static_cast<const dart::dynamics::FreeJoint::Properties&>(*jointBuildData.properties), bodyNodeProperties);
-
+        if (std::string("weld") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::WeldJoint, BodyTypeT>(parent,
+              static_cast<const dart::dynamics::WeldJoint::Properties&>(
+                *jointBuildData.properties), bodyNodeProperties);
+        }
+        else if (std::string("prismatic") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::PrismaticJoint, BodyTypeT>(parent,
+              static_cast<const dart::dynamics::PrismaticJoint::Properties&>(
+                *jointBuildData.properties), bodyNodeProperties);
+        }
+        else if (std::string("revolute") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::RevoluteJoint, BodyTypeT>(parent,
+              static_cast<const dart::dynamics::RevoluteJoint::Properties&>(
+                *jointBuildData.properties), bodyNodeProperties);
+        }
+        else if (std::string("screw") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::ScrewJoint, BodyTypeT>(parent,
+              static_cast<const dart::dynamics::ScrewJoint::Properties&>(
+                *jointBuildData.properties), bodyNodeProperties);
+        }
+        else if (std::string("universal") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::UniversalJoint, BodyTypeT>(parent,
+              static_cast<const dart::dynamics::UniversalJoint::Properties&>(
+                *jointBuildData.properties), bodyNodeProperties);
+        }
+        else if (std::string("ball") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::BallJoint, BodyTypeT>(parent,
+              static_cast<const dart::dynamics::BallJoint::Properties&>(
+                *jointBuildData.properties), bodyNodeProperties);
+        }
+        else if (std::string("euler") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::EulerJoint, BodyTypeT>(parent,
+              static_cast<const dart::dynamics::EulerJoint::Properties&>(
+                *jointBuildData.properties), bodyNodeProperties);
+        }
+        else if (std::string("translational") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::TranslationalJoint, BodyTypeT>(parent,
+              static_cast<
+                const dart::dynamics::TranslationalJoint::Properties&>(
+                  *jointBuildData.properties), bodyNodeProperties);
+        }
+        else if (std::string("planar") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::PlanarJoint, BodyTypeT>(parent,
+              static_cast<const dart::dynamics::PlanarJoint::Properties&>(
+                *jointBuildData.properties), bodyNodeProperties);
+        }
+        else if (std::string("free") == jointBuildData.type)
+        {
+          return skeleton->createJointAndBodyNodePair<
+            dart::dynamics::FreeJoint, BodyTypeT>(parent,
+              static_cast<const dart::dynamics::FreeJoint::Properties&>(
+                *jointBuildData.properties), bodyNodeProperties);
+        }
         else
         {
-          gzerr << "[SkelParser::createJointAndNodePair] Unsupported Joint type ("
-                << jointBuildData.type << ") for Joint named [" << jointBuildData.properties->mName
+          gzerr << "[SkelParser::createJointAndNodePair] Unsupported Joint "
+                << "type (" << jointBuildData.type << ") for Joint named ["
+                << jointBuildData.properties->mName
                 << "]! It will be discarded.\n";
-          return std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*>(NULL, NULL);
+          return std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*>(
+            NULL, NULL);
         }
       }
 
@@ -185,19 +231,28 @@ namespace gazebo
       {
         std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*> pair;
         if (bodyNodeBuildData.type.empty())
-          pair = createJointAndNodePair<dart::dynamics::BodyNode>(skeleton, parent, jointBuildData,
-            static_cast<const dart::dynamics::BodyNode::Properties&>(*bodyNodeBuildData.properties));
-        else if(std::string("soft") == bodyNodeBuildData.type)
-          pair = createJointAndNodePair<dart::dynamics::SoftBodyNode>(skeleton, parent, jointBuildData,
-            static_cast<const dart::dynamics::SoftBodyNode::Properties&>(*bodyNodeBuildData.properties));
+        {
+          pair = createJointAndNodePair<dart::dynamics::BodyNode>(
+            skeleton, parent, jointBuildData,
+              static_cast<const dart::dynamics::BodyNode::Properties&>(
+                *bodyNodeBuildData.properties));
+        }
+        else if (std::string("soft") == bodyNodeBuildData.type)
+        {
+          pair = createJointAndNodePair<dart::dynamics::SoftBodyNode>(
+            skeleton, parent, jointBuildData,
+              static_cast<const dart::dynamics::SoftBodyNode::Properties&>(
+                *bodyNodeBuildData.properties));
+        }
         else
         {
-          gzerr << "[SkelParser::createJointAndNodePair] Invalid type (" << bodyNodeBuildData.type
-                << ") for BodyNode named [" << bodyNodeBuildData.properties->mName << "]\n";
+          gzerr << "[SkelParser::createJointAndNodePair] Invalid type ("
+                << bodyNodeBuildData.type << ") for BodyNode named ["
+                << bodyNodeBuildData.properties->mName << "]\n";
           return false;
         }
 
-        if(pair.first == NULL || pair.second == NULL)
+        if (pair.first == NULL || pair.second == NULL)
           return false;
 
         dart::dynamics::BodyNode* newBodyNode = pair.second;
