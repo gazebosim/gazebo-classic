@@ -28,7 +28,7 @@ namespace gazebo
   {
     /// The simple types of compositor logics will all do the same thing -
     /// Attach a listener to the created compositor
-    class GZ_RENDERING_DEFERRED_VISIBLE ListenerFactoryLogic :
+    class GZ_RENDERING_VISIBLE ListenerFactoryLogic :
       public Ogre::CompositorLogic
     {
       //// @copydoc CompositorLogic::compositorInstanceCreated

@@ -47,8 +47,8 @@ DataLogger::DataLogger(QWidget *_parent)
   this->setObjectName("dataLogger");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Data Logger"));
-  // Tool stays on top of parent window
-  this->setWindowFlags(this->windowFlags() & Qt::Tool);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   // The record button allows the user to start and pause data recording
   this->recordButton = new QToolButton(this);
@@ -449,6 +449,8 @@ void DataLogger::OnBrowse()
   fileDialog.setFilter(QDir::AllDirs | QDir::Hidden);
   fileDialog.setOptions(QFileDialog::ShowDirsOnly
       | QFileDialog::DontResolveSymlinks);
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   if (fileDialog.exec() != QDialog::Accepted)
     return;
