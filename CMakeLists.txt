@@ -362,7 +362,6 @@ else (build_errors)
     gazebo_gui
     gazebo_sensors
     gazebo_rendering
-    gazebo_selection_buffer
   )
 
   if (INCLUDE_PLAYER)
@@ -374,11 +373,6 @@ else (build_errors)
     gazebo_ode
   )
 
-  # "First level" deps, mostly depends on math and/or common
-  if (${OGRE_VERSION} GREATER 1.7.4)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
-  endif()
-
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_transport
     gazebo_msgs
@@ -387,7 +381,6 @@ else (build_errors)
 
   # No other internal dependencies:
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
-    gazebo_skyx
     gazebo_gimpact
     gazebo_opcode
     gazebo_opende_ou
