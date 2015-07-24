@@ -35,7 +35,6 @@
   #define GZ_PLUGIN_VISIBLE
   #define GZ_RENDERING_DEFERRED_VISIBLE
   #define GZ_PHYSICS_VISIBLE
-  #define GZ_PHYSICS_ODE_VISIBLE
   #define GZ_GUI_VISIBLE
   #define GZ_GUI_BUILDING_VISIBLE
   #define GZ_GUI_MODEL_VISIBLE
@@ -317,31 +316,6 @@
     #else
       #define GZ_PHYSICS_VISIBLE
       #define GZ_PHYSICS_HIDDEN
-    #endif
-  #endif
-
-  #if defined _WIN32 || defined __CYGWIN__
-    #ifdef BUILDING_DLL_GZ_PHYSICS_ODE
-      #ifdef __GNUC__
-        #define GZ_PHYSICS_ODE_VISIBLE __attribute__ ((dllexport))
-      #else
-        #define GZ_PHYSICS_ODE_VISIBLE __declspec(dllexport)
-      #endif
-    #else
-      #ifdef __GNUC__
-        #define GZ_PHYSICS_ODE_VISIBLE __attribute__ ((dllimport))
-      #else
-        #define GZ_PHYSICS_ODE_VISIBLE __declspec(dllimport)
-      #endif
-    #endif
-    #define GZ_PHYSICS_ODE_HIDDEN
-  #else
-    #if __GNUC__ >= 4
-      #define GZ_PHYSICS_ODE_VISIBLE __attribute__ ((visibility ("default")))
-      #define GZ_PHYSICS_ODE_HIDDEN  __attribute__ ((visibility ("hidden")))
-    #else
-      #define GZ_PHYSICS_ODE_VISIBLE
-      #define GZ_PHYSICS_ODE_HIDDEN
     #endif
   #endif
 

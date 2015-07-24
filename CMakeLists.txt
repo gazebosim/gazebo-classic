@@ -365,23 +365,11 @@ else (build_errors)
     gazebo_selection_buffer
   )
 
-  # "Second level" deps. Depends on a variety of first level deps
-  if (HAVE_DART)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_dart)
-  endif()
-  if (HAVE_BULLET)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
-  endif()
-  if (HAVE_SIMBODY)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_simbody)
-  endif()
-
   if (INCLUDE_PLAYER)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
   endif()
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
-    gazebo_physics_ode
     gazebo_physics
     gazebo_ode
   )
