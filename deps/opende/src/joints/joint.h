@@ -75,7 +75,7 @@ struct dxJoint : public dObject
 
     struct Info1
     {
-        // Structure size should not exceed sizeof(pointer) bytes to have 
+        // Structure size should not exceed sizeof(pointer) bytes to have
         // to have good memory pattern in dxQuickStepper()
         int8 m, nub;
     };
@@ -113,19 +113,19 @@ struct dxJoint : public dObject
         int *findex;
     };
 
-    // info returned by getSureMaxInfo function. 
+    // info returned by getSureMaxInfo function.
     // The information is used for memory reservation in calculations.
 
     struct SureMaxInfo
     {
       // The value of `max_m' must ALWAYS be not less than the value of `m'
-      // the getInfo1 call can generate in current joint state. Another 
-      // requirement is that the value should be provided very quickly, 
+      // the getInfo1 call can generate in current joint state. Another
+      // requirement is that the value should be provided very quickly,
       // without the excessive calculations.
       // If it is hard/impossible to quickly predict the maximal value of `m'
-      // (which is the case for most joint types) the maximum for current 
+      // (which is the case for most joint types) the maximum for current
       // joint type in general should be returned. If it can be known the `m'
-      // will be smaller, it can save a bit of memory from being reserved 
+      // will be smaller, it can save a bit of memory from being reserved
       // for calculations if that smaller value is returned.
 
       int8 max_m; // Estimate of maximal `m' in Info1
@@ -145,7 +145,7 @@ struct dxJoint : public dObject
     virtual void getInfo1( Info1* info ) = 0;
     virtual void getInfo2( Info2* info ) = 0;
     // This call quickly!!! estimates maximum value of "m" that could be returned by getInfo1()
-    // See comments at definition of SureMaxInfo for defails.
+	// See comments at definition of SureMaxInfo for defails.
     virtual void getSureMaxInfo( SureMaxInfo* info ) = 0;
     virtual dJointType type() const = 0;
     virtual size_t size() const = 0;
@@ -154,8 +154,8 @@ struct dxJoint : public dObject
     /// Each dxJoint should redefine it if needed.
     virtual void setRelativeValues() {};
 
-    // Test if this joint should be used in the simulation step
-    // (has the enabled flag set, and is attached to at least one dynamic body)
+	// Test if this joint should be used in the simulation step
+	// (has the enabled flag set, and is attached to at least one dynamic body)
     bool isEnabled() const;
 
     // Moved from ball.h and fixed.h by OSRF

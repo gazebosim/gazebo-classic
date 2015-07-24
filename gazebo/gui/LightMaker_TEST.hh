@@ -15,21 +15,18 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_MAKER_TEST_HH_
-#define _GAZEBO_MODEL_MAKER_TEST_HH_
+#ifndef _GAZEBO_LIGHT_MAKER_TEST_HH_
+#define _GAZEBO_LIGHT_MAKER_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelMaker class.
-class ModelMaker_TEST : public QTestFixture
+/// \brief A test class for the LightMaker class.
+class LightMaker_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test creating a simple shape.
-  private slots: void SimpleShape();
-
-  /// \brief Test creating a model from a file.
-  private slots: void FromFile();
+  /// \brief Test creating a point light.
+  private slots: void PointLight();
 };
 
 #endif

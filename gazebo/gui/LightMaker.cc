@@ -60,6 +60,8 @@ bool LightMaker::InitFromLight(const std::string &_lightName)
       reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
 
   if (dPtr->light)
   {
@@ -106,6 +108,8 @@ bool LightMaker::Init()
       reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
 
   dPtr->light.reset(new rendering::Light(scene));
   dPtr->light->Load();
@@ -152,7 +156,8 @@ void LightMaker::Stop()
   if (dPtr->light)
   {
     rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-    scene->RemoveLight(dPtr->light);
+    if (scene)
+      scene->RemoveLight(dPtr->light);
     dPtr->light.reset();
   }
   EntityMaker::Stop();
