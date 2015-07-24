@@ -27,21 +27,16 @@ namespace gazebo
   /// \brief gui namespace
   namespace gui
   {
+    class EntityMakerPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \brief To make an entity, base class
     class GAZEBO_VISIBLE EntityMaker
     {
-      /// \brief Constructor
-      public: EntityMaker();
-
       /// \brief Destructor
       public: virtual ~EntityMaker();
-
-      /// \brief Set whether to snap to increments.
-      /// \param[in] _snap True to snap.
-      public: static void SetSnapToGrid(bool _snap);
 
       /// \brief Start the maker.
       public: virtual void Start();
@@ -57,6 +52,10 @@ namespace gazebo
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      protected: EntityMaker(EntityMakerPrivate &_dataPtr);
+
       /// \brief Creates the entity
       protected: virtual void CreateTheEntity() = 0;
 
@@ -69,12 +68,9 @@ namespace gazebo
       protected: virtual void SetEntityPosition(
           const ignition::math::Vector3d &_pos);
 
-      /// \brief Node to publish messages and spawn the entity. Each derived
-      /// class must create its own publisher to the appropriate topic.
-      protected: transport::NodePtr node;
-
-      /// \brief True to snap to increments while moving.
-      private: static bool snapToGrid;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: EntityMakerPrivate *dataPtr;
     };
   }
 }

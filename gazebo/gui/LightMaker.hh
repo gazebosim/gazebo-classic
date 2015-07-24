@@ -27,6 +27,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class LightMakerPrivate;
+
     /// \brief Used to insert a new light into the scene.
     class GAZEBO_VISIBLE LightMaker : public EntityMaker
     {
@@ -59,18 +61,6 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void SetEntityPosition(
           const ignition::math::Vector3d &_pos);
-
-      /// \brief Message that holds all the light information.
-      protected: msgs::Light msg;
-
-      /// \brief Publisher used to spawn a new light.
-      protected: transport::PublisherPtr lightPub;
-
-      /// \brief Type of the light being spawned.
-      protected: std::string lightTypename;
-
-      /// \brief Pointer to the light being spawned.
-      private: rendering::LightPtr light;
     };
 
     /// \brief Used to insert a new point light into the scene.

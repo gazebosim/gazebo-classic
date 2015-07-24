@@ -30,34 +30,41 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/LightMakerPrivate.hh"
 #include "gazebo/gui/LightMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-LightMaker::LightMaker() : EntityMaker()
+LightMaker::LightMaker() : EntityMaker(*new LightMakerPrivate)
 {
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
 
-  msgs::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
-  msgs::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
+  dPtr->lightPub = dPtr->node->Advertise<msgs::Light>("~/light");
 
-  this->msg.set_attenuation_constant(0.5);
-  this->msg.set_attenuation_linear(0.01);
-  this->msg.set_attenuation_quadratic(0.001);
-  this->msg.set_range(20);
+  msgs::Set(dPtr->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
+  msgs::Set(dPtr->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
+
+  dPtr->msg.set_attenuation_constant(0.5);
+  dPtr->msg.set_attenuation_linear(0.01);
+  dPtr->msg.set_attenuation_quadratic(0.001);
+  dPtr->msg.set_range(20);
 }
 
 /////////////////////////////////////////////////
-bool LightMaker::InitFromLight(const std::string & _lightName)
+bool LightMaker::InitFromLight(const std::string &_lightName)
 {
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
+
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
-  if (this->light)
+  if (dPtr->light)
   {
-    scene->RemoveLight(this->light);
-    this->light.reset();
+    scene->RemoveLight(dPtr->light);
+    dPtr->light.reset();
   }
 
   rendering::LightPtr sceneLight = scene->GetLight(_lightName);
@@ -67,16 +74,16 @@ bool LightMaker::InitFromLight(const std::string & _lightName)
     return false;
   }
 
-  this->light = sceneLight->Clone(_lightName + "_clone_tmp", scene);
+  dPtr->light = sceneLight->Clone(_lightName + "_clone_tmp", scene);
 
-  if (!this->light)
+  if (!dPtr->light)
   {
     gzerr << "Unable to clone\n";
     return false;
   }
 
-  this->lightTypename =  this->light->GetType();
-  this->light->FillMsg(this->msg);
+  dPtr->lightTypename =  dPtr->light->GetType();
+  dPtr->light->FillMsg(dPtr->msg);
 
   std::string newName = _lightName + "_clone";
   int i = 0;
@@ -87,7 +94,7 @@ bool LightMaker::InitFromLight(const std::string & _lightName)
     i++;
   }
 
-  this->msg.set_name(newName);
+  dPtr->msg.set_name(newName);
 
   return true;
 }
@@ -95,28 +102,31 @@ bool LightMaker::InitFromLight(const std::string & _lightName)
 /////////////////////////////////////////////////
 bool LightMaker::Init()
 {
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
+
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
-  this->light.reset(new rendering::Light(scene));
-  this->light->Load();
-  scene->AddLight(this->light);
+  dPtr->light.reset(new rendering::Light(scene));
+  dPtr->light->Load();
+  scene->AddLight(dPtr->light);
 
-  this->light->SetLightType(this->lightTypename);
-  this->light->SetPosition(math::Vector3(0, 0, 1));
-  if (this->lightTypename == "directional")
-    this->light->SetDirection(math::Vector3(.1, .1, -0.9));
+  dPtr->light->SetLightType(dPtr->lightTypename);
+  dPtr->light->SetPosition(math::Vector3(0, 0, 1));
+  if (dPtr->lightTypename == "directional")
+    dPtr->light->SetDirection(math::Vector3(.1, .1, -0.9));
 
   // Unique name
   int counter = 0;
   std::ostringstream lightName;
-  lightName << "user_" << this->lightTypename << "_light_" << counter;
+  lightName << "user_" << dPtr->lightTypename << "_light_" << counter;
   while (scene->GetLight(lightName.str()))
   {
     lightName.str("");
-    lightName << "user_" << this->lightTypename << "_light_" << counter;
+    lightName << "user_" << dPtr->lightTypename << "_light_" << counter;
     counter++;
   }
-  this->msg.set_name(lightName.str());
+  dPtr->msg.set_name(lightName.str());
 
   return true;
 }
@@ -124,20 +134,26 @@ bool LightMaker::Init()
 /////////////////////////////////////////////////
 void LightMaker::Start()
 {
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
+
   EntityMaker::Start();
 
-  if (!this->light)
+  if (!dPtr->light)
     this->Init();
 }
 
 /////////////////////////////////////////////////
 void LightMaker::Stop()
 {
-  if (this->light)
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
+
+  if (dPtr->light)
   {
     rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-    scene->RemoveLight(this->light);
-    this->light.reset();
+    scene->RemoveLight(dPtr->light);
+    dPtr->light.reset();
   }
   EntityMaker::Stop();
 }
@@ -145,55 +161,73 @@ void LightMaker::Stop()
 /////////////////////////////////////////////////
 void LightMaker::CreateTheEntity()
 {
-  msgs::Set(this->msg.mutable_pose()->mutable_position(),
-            this->light->GetPosition().Ign());
-  msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
+
+  msgs::Set(dPtr->msg.mutable_pose()->mutable_position(),
+            dPtr->light->GetPosition().Ign());
+  msgs::Set(dPtr->msg.mutable_pose()->mutable_orientation(),
             ignition::math::Quaterniond());
-  this->lightPub->Publish(this->msg);
+  dPtr->lightPub->Publish(dPtr->msg);
 }
 
 /////////////////////////////////////////////////
 ignition::math::Vector3d LightMaker::EntityPosition() const
 {
-  return this->light->GetPosition().Ign();
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
+
+  return dPtr->light->GetPosition().Ign();
 }
 
 /////////////////////////////////////////////////
 void LightMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
 {
-  this->light->SetPosition(_pos);
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
+
+  dPtr->light->SetPosition(_pos);
 }
 
 /////////////////////////////////////////////////
 PointLightMaker::PointLightMaker() : LightMaker()
 {
-  this->msg.set_type(msgs::Light::POINT);
-  this->msg.set_cast_shadows(false);
-  this->lightTypename = "point";
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
+
+  dPtr->msg.set_type(msgs::Light::POINT);
+  dPtr->msg.set_cast_shadows(false);
+  dPtr->lightTypename = "point";
 }
 
 /////////////////////////////////////////////////
 SpotLightMaker::SpotLightMaker() : LightMaker()
 {
-  this->msg.set_type(msgs::Light::SPOT);
-  msgs::Set(this->msg.mutable_direction(),
-            ignition::math::Vector3d(0, 0, -1));
-  this->msg.set_cast_shadows(false);
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
 
-  this->msg.set_spot_inner_angle(0.6);
-  this->msg.set_spot_outer_angle(1.0);
-  this->msg.set_spot_falloff(1.0);
-  this->lightTypename  = "spot";
+  dPtr->msg.set_type(msgs::Light::SPOT);
+  msgs::Set(dPtr->msg.mutable_direction(),
+            ignition::math::Vector3d(0, 0, -1));
+  dPtr->msg.set_cast_shadows(false);
+
+  dPtr->msg.set_spot_inner_angle(0.6);
+  dPtr->msg.set_spot_outer_angle(1.0);
+  dPtr->msg.set_spot_falloff(1.0);
+  dPtr->lightTypename  = "spot";
 }
 
 /////////////////////////////////////////////////
 DirectionalLightMaker::DirectionalLightMaker() : LightMaker()
 {
-  this->msg.set_type(msgs::Light::DIRECTIONAL);
-  msgs::Set(this->msg.mutable_direction(),
-            ignition::math::Vector3d(.1, .1, -0.9));
-  this->msg.set_cast_shadows(true);
+  LightMakerPrivate *dPtr =
+      reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
 
-  this->lightTypename  = "directional";
+  dPtr->msg.set_type(msgs::Light::DIRECTIONAL);
+  msgs::Set(dPtr->msg.mutable_direction(),
+            ignition::math::Vector3d(.1, .1, -0.9));
+  dPtr->msg.set_cast_shadows(true);
+
+  dPtr->lightTypename  = "directional";
 }
 

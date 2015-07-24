@@ -28,25 +28,28 @@
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/EntityMakerPrivate.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
 
-bool EntityMaker::snapToGrid = false;
-
 //////////////////////////////////////////////////
-EntityMaker::EntityMaker()
+EntityMaker::EntityMaker(EntityMakerPrivate &_dataPtr)
+  : dataPtr(&_dataPtr)
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
 }
 
 //////////////////////////////////////////////////
 EntityMaker::~EntityMaker()
 {
-  this->node->Fini();
-  this->node.reset();
+  this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -58,12 +61,6 @@ void EntityMaker::Start()
 void EntityMaker::Stop()
 {
   gui::Events::moveMode(true);
-}
-
-//////////////////////////////////////////////////
-void EntityMaker::SetSnapToGrid(bool _snap)
-{
-  snapToGrid = _snap;
 }
 
 //////////////////////////////////////////////////
@@ -88,7 +85,7 @@ void EntityMaker::OnMouseMove(const common::MouseEvent &_event)
   ignition::math::Vector3d pos =
       (ModelManipulator::GetMousePositionOnPlane(camera, _event)).Ign();
 
-  if (_event.Control() || this->snapToGrid)
+  if (_event.Control())
   {
     pos = ModelManipulator::SnapPoint(math::Vector3(pos)).Ign();
   }

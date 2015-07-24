@@ -28,6 +28,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class ModelMakerPrivate;
+
     /// \brief Used to insert new models into the scene.
     class GAZEBO_VISIBLE ModelMaker : public EntityMaker
     {
@@ -85,19 +87,6 @@ namespace gazebo
 
       /// \brief Publish a factory message to create the entity.
       private: virtual void CreateTheEntity();
-
-      /// \brief The model visual being created.
-      private: rendering::VisualPtr modelVisual;
-
-      /// \brief The SDF representation of the model.
-      private: sdf::SDFPtr modelSDF;
-
-      /// \brief True if the model is being created as a clone of an existing
-      /// model.
-      private: bool clone;
-
-      /// \brief Publisher for factory messages.
-      protected: transport::PublisherPtr makerPub;
     };
   }
 }
