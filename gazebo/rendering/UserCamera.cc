@@ -355,8 +355,11 @@ bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &_type)
 {
-  if (this->dataPtr->viewController->GetTypeString() == _type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
   std::string vc = this->dataPtr->viewController->GetTypeString();
 
@@ -393,8 +396,11 @@ void UserCamera::SetViewController(const std::string &_type)
 void UserCamera::SetViewController(const std::string &_type,
                                    const math::Vector3 &_pos)
 {
-  if (this->dataPtr->viewController->GetTypeString() == _type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
   std::string vc = this->dataPtr->viewController->GetTypeString();
 
@@ -835,7 +841,7 @@ bool UserCamera::SetProjectionType(const std::string &_type)
 {
   if (_type == "orthographic")
     this->SetViewController("ortho");
-  else
+  else if (!this->dataPtr->prevViewControllerName.empty())
     this->SetViewController(this->dataPtr->prevViewControllerName);
 
   return Camera::SetProjectionType(_type);
