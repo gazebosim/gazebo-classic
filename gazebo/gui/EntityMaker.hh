@@ -52,21 +52,21 @@ namespace gazebo
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
+      /// \brief Returns the entity world position.
+      /// \return Entity's position in the world frame.
+      public: virtual ignition::math::Vector3d EntityPosition() const;
+
+      /// \brief Sets the entity world position.
+      /// \param[in] _pos New position in the world frame.
+      protected: virtual void SetEntityPosition(
+          const ignition::math::Vector3d &_pos);
+
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to private data.
       protected: EntityMaker(EntityMakerPrivate &_dataPtr);
 
       /// \brief Creates the entity
       protected: virtual void CreateTheEntity() = 0;
-
-      /// \brief Returns the entity world position.
-      /// \return Entity's position in the world frame.
-      protected: virtual ignition::math::Vector3d EntityPosition() const;
-
-      /// \brief Sets the entity world position.
-      /// \param[in] _pos New position in the world frame.
-      protected: virtual void SetEntityPosition(
-          const ignition::math::Vector3d &_pos);
 
       /// \internal
       /// \brief Pointer to private data.

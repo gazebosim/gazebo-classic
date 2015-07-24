@@ -48,19 +48,19 @@ namespace gazebo
       /// \return True if initialization is successful.
       public: bool InitFromLight(const std::string &_lightName);
 
+      // Documentation inherited
+      public: virtual ignition::math::Vector3d EntityPosition() const;
+
+      // Documentation inherited
+      protected: virtual void SetEntityPosition(
+          const ignition::math::Vector3d &_pos);
+
       /// \brief Initialize the light maker.
       /// \return True if the light maker is initialized successfully.
       protected: virtual bool Init();
 
       // Documentation inherited
       protected: virtual void CreateTheEntity();
-
-      // Documentation inherited
-      protected: virtual ignition::math::Vector3d EntityPosition() const;
-
-      // Documentation inherited
-      protected: virtual void SetEntityPosition(
-          const ignition::math::Vector3d &_pos);
     };
 
     /// \brief Used to insert a new point light into the scene.

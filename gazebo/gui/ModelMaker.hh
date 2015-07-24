@@ -76,7 +76,7 @@ namespace gazebo
       public: bool InitSimpleShape(SimpleShapes _shape);
 
       // Documentation inherited
-      protected: virtual ignition::math::Vector3d EntityPosition() const;
+      public: virtual ignition::math::Vector3d EntityPosition() const;
 
       // Documentation inherited
       protected: virtual void SetEntityPosition(

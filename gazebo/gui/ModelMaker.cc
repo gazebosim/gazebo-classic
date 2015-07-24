@@ -37,6 +37,7 @@
 
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelMakerPrivate.hh"
 #include "gazebo/gui/ModelMaker.hh"
 
@@ -337,6 +338,8 @@ void ModelMaker::CreateTheEntity()
   if (!dPtr->clone)
   {
     rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+    gui::MainWindow *mainWindow = gui::get_main_window();
+
     sdf::ElementPtr modelElem;
     bool isModel = false;
     bool isLight = false;
@@ -355,7 +358,7 @@ void ModelMaker::CreateTheEntity()
 
     // Automatically create a new name if the model exists
     int i = 0;
-    while ((isModel && has_entity_name(modelName)) ||
+    while ((isModel && mainWindow->HasEntityName(modelName)) ||
         (isLight && scene->GetLight(modelName)))
     {
       modelName = modelElem->Get<std::string>("name") + "_" +

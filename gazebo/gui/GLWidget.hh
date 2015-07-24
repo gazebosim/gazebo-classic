@@ -76,6 +76,10 @@ namespace gazebo
       /// \return List with pointers to selected visuals.
       public: std::vector<rendering::VisualPtr> SelectedVisuals() const;
 
+      /// \brief Returns the current entity maker.
+      /// \return The entity maker.
+      public: EntityMaker *GetEntityMaker() const;
+
       signals: void clicked();
 
       /// \brief QT signal to notify when we received a selection msg.
@@ -237,10 +241,19 @@ namespace gazebo
 
       private: std::vector<event::ConnectionPtr> connections;
 
+      /// \brief Pointer to the current maker.
       private: EntityMaker *entityMaker;
+
+      /// \brief Model maker.
       private: ModelMaker modelMaker;
+
+      /// \brief Point light maker
       private: PointLightMaker pointLightMaker;
+
+      /// \brief Spot light maker
       private: SpotLightMaker spotLightMaker;
+
+      /// \brief Directional light maker
       private: DirectionalLightMaker directionalLightMaker;
 
       /// \brief Light maker

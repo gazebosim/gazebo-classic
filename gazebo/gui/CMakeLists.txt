@@ -136,6 +136,7 @@ set (qt_tests
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc
+  ModelMaker_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   SplashScreen_TEST.cc
