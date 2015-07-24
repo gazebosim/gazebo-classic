@@ -47,7 +47,7 @@ void RandomVelocityPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (!_sdf->HasElement("link"))
   {
     gzerr << "<link> element missing from RandomVelocity plugin. "
-      << "The plugin will not fuction.\n";
+      << "The plugin will not function.\n";
     return;
   }
 
