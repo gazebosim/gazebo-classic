@@ -141,6 +141,7 @@ void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 {
   if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
+
   this->SetThreadPitch(_threadPitch);
 }
 
@@ -148,7 +149,8 @@ void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 void DARTScrewJoint::SetThreadPitch(double _threadPitch)
 {
   this->threadPitch = _threadPitch;
-  this->dartScrewJoint->setPitch(_threadPitch * 2.0 * M_PI);
+
+  this->dartScrewJoint->setPitch(DARTTypes::ConvPitch(_threadPitch));
 }
 
 //////////////////////////////////////////////////
@@ -156,6 +158,7 @@ double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
+
   return this->GetThreadPitch();
 }
 
@@ -163,10 +166,12 @@ double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 double DARTScrewJoint::GetThreadPitch()
 {
   double result = this->threadPitch;
+
   if (this->dartScrewJoint)
-    result = this->dartScrewJoint->getPitch() * 0.5 / M_PI;
+    result = DARTTypes::ConvPitch(this->dartScrewJoint->getPitch());
   else
     gzwarn << "dartScrewJoint not created yet, returning cached threadPitch.\n";
+
   return result;
 }
 
@@ -194,8 +199,9 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
     else if (_index == 1)
     {
       // linear position
-      double angPos = this->dartScrewJoint->getPosition(0);
-      result = dartScrewJoint->getPitch() * angPos * 0.5 / M_PI;
+      const double radianAngle = this->dartScrewJoint->getPosition(0);
+      result.SetFromRadian(-radianAngle /
+                           DARTTypes::ConvPitch(dartScrewJoint->getPitch()));
     }
     else
     {
