@@ -70,7 +70,7 @@ QMenuBar
 {
   background-color: #303030;
   border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 10px;
+  border-bottom-right-radius: 2px;
   border: 0px solid #404040;
 }
 
@@ -143,7 +143,7 @@ QToolButton
   margin: 2px;
   width: 20px;
   height: 24px;
-  border-radius: 8px;
+  border-radius: 2px;
   border: 0px solid #808080;
 }
 
@@ -222,13 +222,16 @@ QListView
   show-decoration-selected: 0;
 
   border: 1px solid #737373;
-  border-radius: 4;
+  border-radius: 2px;
 }
 
 QListView::item
 {
   color: #ffffff;
-  border-radius: 4px;
+  border: 0px;
+  border-radius: 0px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 
 QTreeView
@@ -236,7 +239,10 @@ QTreeView
   color: #d0d0d0;
   selection-background-color: transparent;
   alternate-background-color: #606060;
-  border-radius: 4;
+  border: 0px;
+  border-radius: 0px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
   show-decoration-selected: 0;
 }
 
@@ -290,7 +296,7 @@ QLineEdit
 {
   color: #353535;
   background: #737373;
-  border-radius: 4;
+  border-radius: 2px;
 }
 
 QLineEdit:disabled
@@ -300,12 +306,6 @@ QLineEdit:disabled
 
 QPushButton
 {
-  /*
-  border: 2px outset #727272;
-  border-radius: 4px;
-  background: #737373;
-  */
-
   color: #d0d0d0;
   border: 2px solid #737373;
   border-radius: 0px;
@@ -337,14 +337,12 @@ QPushButton:!enabled
   margin: 2px;
   color: #909090;
   background: #707070;
-  /* border: 2px solid #707070; */
-  /* border-radius: 4px; */
 }
 
 QScrollBar:vertical
 {
   border: 1px solid #808080;
-  border-radius: 5px;
+  border-radius: 2px;
   background: #808080;
   width: 10px;
   margin: 22px 0 22px 0;
@@ -353,7 +351,7 @@ QScrollBar:vertical
 QScrollBar:horizontal
 {
   border: 1px solid #808080;
-  border-radius: 5px;
+  border-radius: 2px;
   background: #808080;
   height: 10px;
   margin: 0 22px 0 22px;
@@ -363,14 +361,14 @@ QScrollBar::handle:vertical
 {
   background: #505050;
   min-height: 10px;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 QScrollBar::handle:horizontal
 {
   background: #505050;
   min-width: 10px;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 QScrollBar::add-line:vertical
@@ -443,9 +441,9 @@ QTabWidget#embeddedTab::pane
   top: -1px;
 
   border-top-left-radius: 0px;
-  border-bottom-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
 
   background-color: #808080;
   padding: 2px;
@@ -457,25 +455,18 @@ QTabWidget#embeddedTab::pane
 QTabBar::tab
 {
   color: #d0d0d0;
-  background-color: #808080;
-  border-top: 1px solid  #101010;
-  border-left: 1px solid  #101010;
-  border-right: 1px solid  #101010;
-  border-bottom: 1px solid  #101010;
-
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+  background-color: #303030;
+  border-bottom: 1px solid  #4d4d4d;
 
   padding: 4px;
+  margin-right: 4px;
   min-width: 8ex;
 }
 
 QTabBar::tab:selected
 {
-  background-color: #808080;
-  margin-left: -4px;
-  margin-right: -4px;
-  border-bottom-style: none;
+  background-color: #303030;
+  border-bottom: 1px solid  #f58113;
 }
 
 QTabBar::tab:first:selected
@@ -494,12 +485,6 @@ QTabBar::tab::only-one
   margin-right: 0;
 }
 
-QTabBar::tab:!selected
-{
-  background-color: #707070;
-  margin-top: 2px;
-}
-
 QTabWidget#mainTab::pane,
 QTabWidget#buildingEditorTab::pane,
 QTabWidget#modelEditorTab::pane,
@@ -510,10 +495,10 @@ QTabWidget#linkInspectorTab::pane
   border-bottom: 1px solid #101010;
   border-top: 1px solid #101010;
 
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
   top: -1px;
 
   background-color: #808080;
@@ -557,10 +542,10 @@ QWidget#renderWidget > QWidget
   padding: 0px;
   margin: 0px;
   border: 1px solid #101010;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
 
   background-color: #808080;
   margin-right: 0px;
@@ -572,32 +557,32 @@ QWidget#terrainEditorWidget > QWidget
 {
   padding: 2px;
   background-color: #808080;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
 }
 
 QWidget#toolFrame
 {
   border-bottom: 1px solid #101010;
   background-color: #808080;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
 }
 
 QWidget#renderBottomFrame
 {
   border-top: 1px solid #101010;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
   background-color: #808080;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 
 QScrollArea
 {
   background-color: #808080;
-  border-radius: 10px;
+  border-radius: 2px;
   padding: 2px;
 }
 
@@ -611,7 +596,7 @@ QFrame#pidControl
 QListWidget#topicTextList::item
 {
   border-bottom: 1px solid black;
-  border-radius: 4px;
+  border-radius: 2px;
   color: #101010;
   background-color: #808080;
   margin: 4px;
@@ -630,7 +615,7 @@ QComboBox
   border: 1px solid #101010;
   background-color: #808080;
   color: #d0d0d0;
-  border-radius: 4px;
+  border-radius: 2px;
 
   selection-color: #f58113;
   selection-background-color: #808080;
@@ -652,8 +637,8 @@ QComboBox::drop-down
    border-left-width: 0px;
    border-left-color: #000000;
    border-left-style: solid;
-   border-top-right-radius: 3px;
-   border-bottom-right-radius: 3px;
+   border-top-right-radius: 2px;
+   border-bottom-right-radius: 2px;
 }
 
 QComboBox::down-arrow
@@ -702,7 +687,7 @@ QAbstractSpinBox
   selection-color: #ffffff;
   selection-background-color: #434343;
 
-  border-radius: 3px;
+  border-radius: 2px;
   min-width: 75px;
 }
 
