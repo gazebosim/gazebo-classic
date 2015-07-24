@@ -193,7 +193,6 @@ void DARTLink::Init()
 {
   Link::Init();
 
-  // TODO(JS): comment
   this->dataPtr->Initialize();
 
   // DARTModel::Load() should be called first

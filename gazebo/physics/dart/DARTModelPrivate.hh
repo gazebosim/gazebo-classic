@@ -28,8 +28,9 @@ namespace gazebo
     /// \brief Private data class for DARTModel
     class DARTModelPrivate
     {
-      // The following untidy type definitions and static functions will be
-      // cleaned-up by the next DART version.
+      // NOTE: Below untidy type definitions and static functions will be
+      // cleand-up DART implements SkeletonBuilder which would play a role
+      // similiar to Simbody's MultibodyGraphMaker.
 
       public: using BodyPropPtr = std::shared_ptr<dart::dynamics::BodyNode::Properties>;
       public: using JointPropPtr = std::shared_ptr<dart::dynamics::Joint::Properties>;
@@ -60,19 +61,18 @@ namespace gazebo
         std::string type;
       };
 
-      // first: BodyNode name | second: BodyNode information
+      /// \brief first: BodyNode name | second: BodyNode information
       public: using BodyNodeMap = Eigen::aligned_map<std::string, BodyNodeBuildData>;
 
-      // first: Child BodyNode name | second: Joint information
+      /// \brief first: Child BodyNode name | second: Joint information
       public: using JointMap = std::map<std::string, JointBuildData>;
 
-      // first: Order that Joint appears in file | second: Child BodyNode name
+      /// \brief first: Order that Joint appears in file | second: Child BodyNode name
       public: using IndexToChildBodyNodeName = std::map<std::size_t, std::string>;
 
-      // first: Child BodyNode name | second: Order that Joint appears in file
+      /// \brief first: Child BodyNode name | second: Order that Joint appears in file
       public: using ChildBodyNodeNameToIndex = std::map<std::string, std::size_t>;
 
-      //////////////////////////////////////////////////
       public: static NextResult getNextJointAndNodePair(
           BodyNodeMap::const_iterator& bodyNodeItr,
           JointMap::const_iterator& parentJointItr,
@@ -120,7 +120,6 @@ namespace gazebo
         return VALID;
       }
 
-      //////////////////////////////////////////////////
       public: template <typename BodyTypeT>
       static std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*>
       createJointAndNodePair(
@@ -171,14 +170,13 @@ namespace gazebo
 
         else
         {
-          dterr << "[SkelParser::createJointAndNodePair] Unsupported Joint type ("
+          gzerr << "[SkelParser::createJointAndNodePair] Unsupported Joint type ("
                 << jointBuildData.type << ") for Joint named [" << jointBuildData.properties->mName
                 << "]! It will be discarded.\n";
           return std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*>(NULL, NULL);
         }
       }
 
-      //////////////////////////////////////////////////
       public: static bool createJointAndNodePair(
           dart::dynamics::SkeletonPtr skeleton,
           dart::dynamics::BodyNode* parent,

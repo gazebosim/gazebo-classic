@@ -31,8 +31,7 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTCylinderShapePrivate()
-        : dtCylinderShape(
-            new dart::dynamics::CylinderShape(1, 1))
+        : dtCylinderShape(new dart::dynamics::CylinderShape(1, 1))
       {
       }
 

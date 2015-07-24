@@ -159,10 +159,11 @@ void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->Cache(
+    this->dataPtr->Cache(
           "Velocity" + std::to_string(_index),
           boost::bind(&DARTSliderJoint::SetVelocity, this, _index, _vel),
           _vel);
+    return;
   }
 
   if (_index == 0)

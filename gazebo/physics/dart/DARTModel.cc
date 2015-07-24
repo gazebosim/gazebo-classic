@@ -49,9 +49,13 @@ void DARTModel::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void DARTModel::Init()
 {
-  //----------------------------------------------
-  // Build DART Skeleton
-  //----------------------------------------------
+  //----------------------------------------------------------------
+  // Build DART Skeleton from the list of links and joints
+  //
+  // NOTE: Below code block will be simplified once DART implements
+  // SkeletonBuilder which would play a role similiar to Simbody's
+  // MultibodyGraphMaker.
+  //----------------------------------------------------------------
 
   DARTModelPrivate::BodyNodeMap bodyNodeMap;
   DARTModelPrivate::JointMap jointMap;
@@ -269,7 +273,7 @@ void DARTModel::RestoreState()
 //////////////////////////////////////////////////
 dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
 {
-  return this->dataPtr->dtSkeleton.get();
+  return this->GetDARTSkeletonPtr().get();
 }
 
 //////////////////////////////////////////////////

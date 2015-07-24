@@ -204,10 +204,11 @@ void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->Cache(
+    this->dataPtr->Cache(
           "Velocity" + std::to_string(_index),
           boost::bind(&DARTUniversalJoint::SetVelocity, this, _index, _vel),
           _vel);
+    return;
   }
 
   if (_index < this->GetAngleCount())
