@@ -57,7 +57,7 @@ void RandomVelocityPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   {
     gzerr << "Unable to find link[" << _sdf->Get<std::string>("link") << "] "
       << "in model[" << _model->GetName() << "]. The RandomVelocity plugin "
-      << "will not fuction.\n";
+      << "will not function.\n";
     return;
   }
 
