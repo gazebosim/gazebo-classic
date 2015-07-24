@@ -33,7 +33,7 @@ namespace gazebo
     /// \{
 
     /// \brief ODE surface parameters.
-    class GZ_PHYSICS_ODE_VISIBLE ODESurfaceParams : public SurfaceParams
+    class GZ_PHYSICS_VISIBLE ODESurfaceParams : public SurfaceParams
     {
       /// \brief Constructor.
       public: ODESurfaceParams();
