@@ -48,7 +48,7 @@ void ModelMaker_TEST::SimpleShape()
     mainWindow->repaint();
   }
 
-  // Check there's no box in the panel yet
+  // Check there's no box in the left panel yet
   bool hasBox = mainWindow->HasEntityName("unit_box_0");
   QVERIFY(!hasBox);
 
@@ -60,38 +60,15 @@ void ModelMaker_TEST::SimpleShape()
   gazebo::rendering::VisualPtr vis = scene->GetVisual("unit_box_0");
   QVERIFY(vis == NULL);
 
-  // Calls to gui::get_main_window don't seem to work during tests, from the
-  // test or from other functions, even after a window has been created.
-  // In order to have a model creator which is connected to this main window, we
-  // have to get the maker which belongs to MainWindow->GLWidget. If we create
-  // a new one, it won't be related to this window.
-
-  // Get GLWidget
-  gazebo::gui::GLWidget *glWidget =
-      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
-
-  // Trigger model making
-  gazebo::gui::Events::createEntity("box", "");
-
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
-
-  // Get the entity maker
-  gazebo::gui::EntityMaker *entityMaker = glWidget->GetEntityMaker();
-  QVERIFY(entityMaker != NULL);
-
-  // Check that it's a model maker
-  gazebo::gui::ModelMaker *modelMaker =
-      dynamic_cast<gazebo::gui::ModelMaker *>(entityMaker);
+  // Create a model maker
+  gazebo::gui::ModelMaker *modelMaker = new gazebo::gui::ModelMaker();
   QVERIFY(modelMaker != NULL);
 
-  // Check there's still no box in the panel
+  // Start the maker to make a box
+  modelMaker->InitSimpleShape(gazebo::gui::ModelMaker::SimpleShapes::BOX);
+  modelMaker->Start();
+
+  // Check there's still no box in the left panel
   hasBox = mainWindow->HasEntityName("unit_box_0");
   QVERIFY(!hasBox);
 
@@ -138,7 +115,7 @@ void ModelMaker_TEST::SimpleShape()
   vis = scene->GetVisual("unit_box_0");
   QVERIFY(vis != NULL);
 
-  // Check the box is in the panel
+  // Check the box is in the left panel
   hasBox = mainWindow->HasEntityName("unit_box_0");
   QVERIFY(hasBox);
 }

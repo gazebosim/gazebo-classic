@@ -1348,8 +1348,3 @@ void GLWidget::SetMouseEventButton(const Qt::MouseButton &_button)
     this->mouseEvent.SetButton(common::MouseEvent::MIDDLE);
 }
 
-/////////////////////////////////////////////////
-EntityMaker *GLWidget::GetEntityMaker() const
-{
-  return this->entityMaker;
-}

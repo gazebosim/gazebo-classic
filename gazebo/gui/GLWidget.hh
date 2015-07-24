@@ -76,10 +76,6 @@ namespace gazebo
       /// \return List with pointers to selected visuals.
       public: std::vector<rendering::VisualPtr> SelectedVisuals() const;
 
-      /// \brief Returns the current entity maker.
-      /// \return The entity maker.
-      public: EntityMaker *GetEntityMaker() const;
-
       signals: void clicked();
 
       /// \brief QT signal to notify when we received a selection msg.

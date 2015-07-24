@@ -70,6 +70,9 @@ bool ModelMaker::InitFromModel(const std::string & _modelName)
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
+
   if (dPtr->modelVisual)
   {
     scene->RemoveVisual(dPtr->modelVisual);
@@ -103,6 +106,8 @@ bool ModelMaker::InitFromSDFString(const std::string &_data)
 
   dPtr->clone = false;
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
 
   if (dPtr->modelVisual)
   {
@@ -158,6 +163,8 @@ bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
 
   dPtr->clone = false;
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
 
   if (dPtr->modelVisual)
   {
@@ -219,6 +226,8 @@ bool ModelMaker::Init()
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
 
   // Load the world file
   std::string modelName;
@@ -321,7 +330,8 @@ void ModelMaker::Stop()
 
   // Remove the temporary visual from the scene
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  scene->RemoveVisual(dPtr->modelVisual);
+  if (scene)
+    scene->RemoveVisual(dPtr->modelVisual);
   dPtr->modelVisual.reset();
   dPtr->modelSDF.reset();
 
@@ -337,9 +347,6 @@ void ModelMaker::CreateTheEntity()
   msgs::Factory msg;
   if (!dPtr->clone)
   {
-    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-    gui::MainWindow *mainWindow = gui::get_main_window();
-
     sdf::ElementPtr modelElem;
     bool isModel = false;
     bool isLight = false;
@@ -357,12 +364,17 @@ void ModelMaker::CreateTheEntity()
     std::string modelName = modelElem->Get<std::string>("name");
 
     // Automatically create a new name if the model exists
-    int i = 0;
-    while ((isModel && mainWindow->HasEntityName(modelName)) ||
-        (isLight && scene->GetLight(modelName)))
+    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+    gui::MainWindow *mainWindow = gui::get_main_window();
+    if (scene && mainWindow)
     {
-      modelName = modelElem->Get<std::string>("name") + "_" +
-        boost::lexical_cast<std::string>(i++);
+      int i = 0;
+      while ((isModel && mainWindow->HasEntityName(modelName)) ||
+          (isLight && scene->GetLight(modelName)))
+      {
+        modelName = modelElem->Get<std::string>("name") + "_" +
+            boost::lexical_cast<std::string>(i++);
+      }
     }
 
     // Remove the topic namespace from the model name. This will get re-inserted
@@ -372,7 +384,7 @@ void ModelMaker::CreateTheEntity()
     // The the SDF model's name
     modelElem->GetAttribute("name")->Set(modelName);
     modelElem->GetElement("pose")->Set(
-        dPtr->modelVisual->GetWorldPose());
+        dPtr->modelVisual->GetWorldPose().Ign());
 
     // Spawn the model in the physics server
     msg.set_sdf(dPtr->modelSDF->ToString());
