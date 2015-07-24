@@ -78,19 +78,49 @@
     </event>
 
     <!-- Joint trigger events -->
+    <!-- position (linear or angular) -->
+
     <event>
-      <name>joint_at_pi</name>
+      <name>joint_position</name>
       <type>joint</type>
       <model>revoluter</model>
       <joint>joint</joint>
-        <min_position>3</min_position>
-        <max_position>3.2</max_position>
-        <min_reference_angle>3</min_reference_angle>
-        <max_reference_angle>3.5</max_reference_angle>
-        <min_velocity>2</min_velocity>
-        <max_velocity>3</max_velocity>
-        <min_force>2</min_force>
-        <max_force>3</max_force>
+      <range>position</range>
+      <min>5</min>
+      <max>10</max>
+    </event>
+
+
+    <!-- Angle: must be in range -PI to PI  -->
+    <event>
+      <name>joint_angle</name>
+      <type>joint</type>
+      <model>revoluter</model>
+      <joint>joint</joint>
+      <range>angle</range>
+      <min>3</min>
+      <max>3.3</max>
+    </event>
+    <!-- Velocity -->
+    <event>
+      <name>joint_angle</name>
+      <type>joint</type>
+      <model>revoluter</model>
+      <joint>joint</joint>
+      <range>angle</range>
+      <min>3</min>
+      <max>3.3</max>
+    </event>
+
+    <!-- Applied Force -->
+    <event>
+      <name>joint_angle</name>
+      <type>joint</type>
+      <model>revoluter</model>
+      <joint>joint</joint>
+      <range>force</range>
+      <min>3</min>
+      <max>3.3</max>
     </event>
 
     <!-- Close the plugin element  -->
@@ -123,13 +153,6 @@
       <name>can4</name>
       <uri>model://beer</uri>
     </include>
-<!--
-    <include>
-      <pose>1 1 0 0 0 0</pose>
-      <name>pendulum</name>
-      <uri>model://double_pendulum_with_base</uri>
-    </include>
--->
 
 <!--
 Model with a revolute joint
@@ -138,17 +161,6 @@ Model with a revolute joint
         <pose>0.5 0.5 0.5 0 0 0</pose>
         <link name='base'>
         <pose>0 0 0 0 -0 0</pose>
-        <inertial>
-            <mass>10</mass>
-            <inertia>
-              <ixx>1</ixx>
-              <ixy>0</ixy>
-              <ixz>0</ixz>
-              <iyy>1</iyy>
-              <iyz>0</iyz>
-              <izz>1</izz>
-            </inertia>
-          </inertial>
           <visual name='visual'>
             <geometry>
               <box>
@@ -202,8 +214,13 @@ Model with a revolute joint
           </axis>
         </joint>
 
-    </model>
+        <!-- this joint keeps the model from moving around -->
+        <joint name ='fix' type='fixed'>
+          <parent>world</parent>
+          <child>base</child>
+        </joint>
 
+    </model>
 
   </world>
 </sdf>

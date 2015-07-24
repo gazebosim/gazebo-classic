@@ -30,6 +30,23 @@ namespace gazebo
   /// the simulation. Triggers cannot overlap.
   class JointEventSource: public EventSource
   {
+
+    /// \enum Range
+    /// \brief The type of data range measured
+    public: enum Range {
+                /// \brief Absolute position (or angle, for revolute joints)
+                POSITION,
+                /// \brief Normalized angle (between -PI and PI)
+                ANGLE,
+                /// \brief Velocity or angular velocity
+                VELOCITY,
+                /// \brief Applied force (or torque, for revolute joints)
+                FORCE,
+                /// \brief invalid
+                INVALID
+              };
+
+
     /// \brief Constructor
     /// \param[in] _pub the publisher for the SimEvents
     /// \param[in] _world Pointer to the world.
@@ -54,6 +71,13 @@ namespace gazebo
     /// \return true if found
     private: bool LookupJoint();
 
+    /// \brief Utility range to string conversion
+    /// returns The current range as a string
+    private: std::string GetRangeAsString() const;
+
+    /// \brief Sets the range type from a string
+    private: void SetRangeFromString(std::string &_rangeStr);
+
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
 
@@ -69,44 +93,18 @@ namespace gazebo
     /// \brief A pointer to the Joint
     private: physics::JointPtr joint;
 
-    /// \brief flag  that enables position range events
-    private: bool positionRange;
+    /// \brief Minimum joint value (the type is determined by range member)
+    private: double min;
 
-    /// \brief minimum joint position.
-    private: double minPosition;
+    /// \brief Maximum joint value
+    private: double max;
 
-    /// \brief maximum joint position
-    private: double maxPosition;
+    /// \brief The type of data in the range (see Range enum)
+    private: Range range;
 
-    /// \brief true if the joint is currently inside the trigger condition
-    private: bool isPositionTriggered;
+    /// \brief True when the joint is currently inside the trigger condition
+    private: bool isTriggered;
 
-    /// \brief flag  that enables reference angle range events
-    private: bool referenceAngleRange;
-
-    /// \brief minimum joint position.
-    private: double minReferenceAngle;
-
-    /// \brief maximum joint position
-    private: double maxReferenceAngle;
-
-    /// \brief true if the joint is currently inside the trigger condition
-    private: bool isReferenceAngleTriggered;
-
-
-/*
-    /// \brief flag that enables velocity range events
-    private: bool velocityRange;
-
-    /// \brief minimum joint velocity trigger
-    private: double minVelocity;
-
-    /// \brief max joint velocity trigger
-    private: double maxVelocity;
-
-    /// \brief true when velocity is in the range
-    private: bool isVelocityTriggered;
-*/
   };
 }
 #endif
