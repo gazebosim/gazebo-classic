@@ -362,34 +362,16 @@ else (build_errors)
     gazebo_gui
     gazebo_sensors
     gazebo_rendering
-    gazebo_selection_buffer
   )
-
-  # "Second level" deps. Depends on a variety of first level deps
-  if (HAVE_DART)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_dart)
-  endif()
-  if (HAVE_BULLET)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
-  endif()
-  if (HAVE_SIMBODY)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_simbody)
-  endif()
 
   if (INCLUDE_PLAYER)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
   endif()
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
-    gazebo_physics_ode
     gazebo_physics
     gazebo_ode
   )
-
-  # "First level" deps, mostly depends on math and/or common
-  if (${OGRE_VERSION} GREATER 1.7.4)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
-  endif()
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_transport
@@ -399,7 +381,6 @@ else (build_errors)
 
   # No other internal dependencies:
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
-    gazebo_skyx
     gazebo_gimpact
     gazebo_opcode
     gazebo_opende_ou

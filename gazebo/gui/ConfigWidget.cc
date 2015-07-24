@@ -2672,6 +2672,8 @@ void GeometryConfigWidget::OnSelectFile()
       tr("Mesh files (*.dae *.stl)"));
     fd.setFilter(QDir::AllDirs | QDir::Hidden);
     fd.setFileMode(QFileDialog::ExistingFile);
+    fd.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
     if (fd.exec())
     {
       if (!fd.selectedFiles().isEmpty())

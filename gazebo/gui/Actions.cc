@@ -31,8 +31,6 @@ QAction *gazebo::gui::g_newAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_openAct = 0;
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_importAct = 0;
-GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveAsAct = 0;

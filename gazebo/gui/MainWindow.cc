@@ -377,6 +377,7 @@ void MainWindow::SelectTopic()
 /////////////////////////////////////////////////
 void MainWindow::Open()
 {
+  // Note that file dialog static functions seem to be broken (issue #1514)
   std::string filename = QFileDialog::getOpenFileName(this,
       tr("Open World"), "",
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
@@ -386,24 +387,6 @@ void MainWindow::Open()
     msgs::ServerControl msg;
     msg.set_open_filename(filename);
     this->serverControlPub->Publish(msg);
-  }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::Import()
-{
-  std::string filename = QFileDialog::getOpenFileName(this,
-      tr("Import Collada Mesh"), "",
-      tr("SDF Files (*.dae *.zip)")).toStdString();
-
-  if (!filename.empty())
-  {
-    if (filename.find(".dae") != std::string::npos)
-    {
-      gui::Events::createEntity("mesh", filename);
-    }
-    else
-      gzerr << "Unable to import mesh[" << filename << "]\n";
   }
 }
 
@@ -437,6 +420,8 @@ void MainWindow::SaveAs()
 {
   QFileDialog fileDialog(this, tr("Save World"), QDir::homePath(),
       tr("SDF Files (*.xml *.sdf *.world)"));
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
   fileDialog.setAcceptMode(QFileDialog::AcceptSave);
 
   if (fileDialog.exec() == QDialog::Accepted)
@@ -1018,12 +1003,6 @@ void MainWindow::CreateActions()
   g_openAct->setShortcut(tr("Ctrl+O"));
   g_openAct->setStatusTip(tr("Open an world file"));
   connect(g_openAct, SIGNAL(triggered()), this, SLOT(Open()));
-
-  /*g_importAct = new QAction(tr("&Import Mesh"), this);
-  g_importAct->setShortcut(tr("Ctrl+I"));
-  g_importAct->setStatusTip(tr("Import a Collada mesh"));
-  connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
-  */
 
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
@@ -1687,7 +1666,6 @@ void MainWindow::CreateMenuBar()
 
   QMenu *fileMenu = bar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
-  // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);
   fileMenu->addAction(g_saveAct);
   fileMenu->addAction(g_saveAsAct);

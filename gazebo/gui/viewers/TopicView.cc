@@ -45,6 +45,7 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Topic View"));
   this->setObjectName("cameraSensor");
+  this->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
 
   // Create the topic label and combo box
   // {
@@ -99,8 +100,6 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
   displayTimer->start(_displayPeriod);
-
-  this->setWindowFlags(Qt::Window);
 }
 
 /////////////////////////////////////////////////

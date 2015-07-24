@@ -29,6 +29,8 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   this->view = static_cast<EditorView*>(_parent);
 
   this->setWindowTitle(tr("Import Image"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   // Title
   QLabel *titleLabel = new QLabel(tr(
@@ -219,6 +221,8 @@ void ImportImageDialog::OnSelectFile()
 {
   QFileDialog fileDialog(this, tr("Open Image"), QDir::homePath(),
       tr("Image Files (*.png *.jpg *.jpeg)"));
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   if (fileDialog.exec() == QDialog::Accepted)
   {

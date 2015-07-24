@@ -31,7 +31,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief An ODEBallJoint
-    class GZ_PHYSICS_ODE_VISIBLE ODEBallJoint : public BallJoint<ODEJoint>
+    class GZ_PHYSICS_VISIBLE ODEBallJoint : public BallJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.
