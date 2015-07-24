@@ -58,6 +58,9 @@
   <file>images/log_play.png</file>
   <file>images/log_pause.png</file>
   <file>images/log_step_forward.png</file>
+  <file>images/log_step_back.png</file>
+  <file>images/log_rewind.png</file>
+  <file>images/log_forward.png</file>
   <file>images/trashcan.png</file>
   <file>images/log_record.png</file>
   <file>images/view_angle_top.png</file>
