@@ -35,9 +35,11 @@ namespace gazebo
 
       // Documentation inherited
       public: void Start();
+      using EntityMaker::Start;
 
       // Documentation inherited
       public: void Stop();
+      using EntityMaker::Stop;
 
       /// \brief Initialize the light maker from an existing light in the scene.
       /// \param[in] _lightName Name of existing light in the scene.
@@ -63,9 +65,6 @@ namespace gazebo
 
       /// \brief Publisher used to spawn a new light.
       protected: transport::PublisherPtr lightPub;
-
-      /// \brief Keep track of the number of lights inserted by the user.
-      private: static unsigned int counter;
 
       /// \brief Type of the light being spawned.
       protected: std::string lightTypename;

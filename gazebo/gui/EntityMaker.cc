@@ -92,7 +92,7 @@ void EntityMaker::OnMouseMove(const common::MouseEvent &_event)
   {
     pos = ModelManipulator::SnapPoint(math::Vector3(pos)).Ign();
   }
- pos.Z(this->EntityPosition().Z());
+  pos.Z(this->EntityPosition().Z());
 
   this->SetEntityPosition(pos);
 }

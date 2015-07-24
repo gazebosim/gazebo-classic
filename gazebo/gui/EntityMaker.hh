@@ -73,7 +73,7 @@ namespace gazebo
       /// class must create its own publisher to the appropriate topic.
       protected: transport::NodePtr node;
 
-      /// \brief True to snap to grid while moving.
+      /// \brief True to snap to increments while moving.
       private: static bool snapToGrid;
     };
   }

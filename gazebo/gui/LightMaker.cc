@@ -35,8 +35,6 @@
 using namespace gazebo;
 using namespace gui;
 
-unsigned int LightMaker::counter = 0;
-
 /////////////////////////////////////////////////
 LightMaker::LightMaker() : EntityMaker()
 {
@@ -108,9 +106,17 @@ bool LightMaker::Init()
   if (this->lightTypename == "directional")
     this->light->SetDirection(math::Vector3(.1, .1, -0.9));
 
-  std::ostringstream stream;
-  stream << "user_" << this->lightTypename << "_light_" << counter++;
-  this->msg.set_name(stream.str());
+  // Unique name
+  int counter = 0;
+  std::ostringstream lightName;
+  lightName << "user_" << this->lightTypename << "_light_" << counter;
+  while (scene->GetLight(lightName.str()))
+  {
+    lightName.str("");
+    lightName << "user_" << this->lightTypename << "_light_" << counter;
+    counter++;
+  }
+  this->msg.set_name(lightName.str());
 
   return true;
 }

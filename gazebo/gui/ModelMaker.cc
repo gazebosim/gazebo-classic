@@ -156,12 +156,11 @@ bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
     prefix = "unit_cylinder_";
 
   int counter = 0;
-
   std::ostringstream modelName;
   modelName << prefix << counter;
   while (scene->GetVisual(modelName.str()))
   {
-    modelName.clear();
+    modelName.str("");
     modelName << prefix << counter;
     counter++;
   }
@@ -297,6 +296,7 @@ void ModelMaker::Stop()
 {
   // Remove the temporary visual from the scene
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  scene->RemoveVisual(this->modelVisual);
   this->modelVisual.reset();
   this->modelSDF.reset();
 
