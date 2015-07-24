@@ -60,7 +60,7 @@ void JointEventSource::Load(const sdf::ElementPtr _sdf)
   {
     std::string rangeStr = _sdf->Get<std::string>("range");
     this->SetRangeFromString(rangeStr);
-    if(this->range == INVALID)
+    if (this->range == INVALID)
     {
       gzerr << this->name << " has an invalid \"" << range << " \" range. "
            " It should be \"position\", \"angle\" or \"force\"" << std::endl;
@@ -88,19 +88,17 @@ void JointEventSource::Load(const sdf::ElementPtr _sdf)
 ////////////////////////////////////////////////////////////////////////////////
 void JointEventSource::Init()
 {
-
   this->Info();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void JointEventSource::SetRangeFromString(std::string &_rangeStr)
 {
-
-  if(_rangeStr == "position")
+  if (_rangeStr == "position")
     this->range = POSITION;
-  else if(_rangeStr == "angle")
+  else if (_rangeStr == "angle")
     this->range = ANGLE;
-  else if(_rangeStr == "force")
+  else if (_rangeStr == "force")
     this->range = FORCE;
   else
     this->range = INVALID;
@@ -110,7 +108,7 @@ void JointEventSource::SetRangeFromString(std::string &_rangeStr)
 std::string JointEventSource::GetRangeAsString() const
 {
   std:: string rangeStr;
-  switch(this->range)
+  switch (this->range)
   {
     case POSITION: rangeStr = "position"; break;
     case VELOCITY: rangeStr = "velocity"; break;
@@ -124,7 +122,6 @@ std::string JointEventSource::GetRangeAsString() const
 ////////////////////////////////////////////////////////////////////////////////
 void JointEventSource::Info() const
 {
-
   std::stringstream ss;
   ss << "JointEventSource: " << this->name
       << " model: " << this->modelName
@@ -140,11 +137,11 @@ void JointEventSource::Info() const
 ////////////////////////////////////////////////////////////////////////////////
 bool JointEventSource::LookupJoint()
 {
-  if(!this->model)
+  if (!this->model)
   {
     this->model = this->world->GetModel(this->modelName);
     // if the model name is not found
-    if(!this->model)
+    if (!this->model)
     {
       // look for a model with a name that starts with our model name
       for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
@@ -160,12 +157,12 @@ bool JointEventSource::LookupJoint()
     }
   }
   // if we have a model, let's look for the joint (full joint name only)
-  if(this->model && !this->joint)
+  if (this->model && !this->joint)
   {
     this->joint = this->model->GetJoint(this->jointName);
   }
 
-  if(!this->model || !this->joint)
+  if (!this->model || !this->joint)
   {
     return false;
   }
@@ -181,24 +178,28 @@ void JointEventSource::Update()
   bool oldState = this->isTriggered;
   double value = 0;
 
-  switch(this->range)
+  switch (this->range)
   {
-    case POSITION: {
+    case POSITION:
+    {
       value = this->joint->GetAngle(0).Radian();
       break;
     }
-    case VELOCITY: {
+    case VELOCITY:
+    {
       value = this->joint->GetVelocity(0);
       break;
     }
-    case ANGLE: {
+    case ANGLE:
+    {
       math::Angle a = this->joint->GetAngle(0);
       // get a value between -PI and PI
       a.Normalize();
       value = a.Radian();
       break;
     }
-    case FORCE: {
+    case FORCE:
+    {
       value = this->joint->GetForce(0);
       break;
     }
@@ -212,7 +213,6 @@ void JointEventSource::Update()
   bool currentState = value > this->min && value < this->max;
   if (oldState != currentState)
   {
-
     this->isTriggered = currentState;
     std::string json = "{";
     if (currentState)

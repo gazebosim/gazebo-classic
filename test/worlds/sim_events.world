@@ -101,20 +101,21 @@
       <min>3</min>
       <max>3.3</max>
     </event>
+
     <!-- Velocity -->
     <event>
-      <name>joint_angle</name>
+      <name>joint_velocity</name>
       <type>joint</type>
       <model>revoluter</model>
       <joint>joint</joint>
-      <range>angle</range>
+      <range>velocity</range>
       <min>3</min>
       <max>3.3</max>
     </event>
 
     <!-- Applied Force -->
     <event>
-      <name>joint_angle</name>
+      <name>joint_force</name>
       <type>joint</type>
       <model>revoluter</model>
       <joint>joint</joint>
