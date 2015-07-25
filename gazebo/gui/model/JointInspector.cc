@@ -89,6 +89,15 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
   this->configWidget->SetDoubleWidgetValue("suspension_erp",
       odeElem->GetElement("suspension")->Get<double>("erp"));
 
+  // joint type specific properties.
+  this->configWidget->SetStringWidgetValue("gearbox::gearbox_reference_body",
+      jointElem->HasElement("gearbox_reference_body") ?
+      jointElem->Get<std::string>("gearbox_reference_body") : "");
+  this->configWidget->SetDoubleWidgetValue("gearbox::gearbox_ratio",
+      jointElem->Get<double>("gearbox_ratio"));
+  this->configWidget->SetDoubleWidgetValue("screw::thread_pitch",
+      jointElem->Get<double>("thread_pitch"));
+
   this->configWidget->SetWidgetVisible("id", false);
   this->configWidget->SetWidgetVisible("parent_id", false);
   this->configWidget->SetWidgetVisible("child_id", false);

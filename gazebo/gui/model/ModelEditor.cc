@@ -156,6 +156,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   ballJointAct->setCheckable(true);
   universalJointAct->setCheckable(true);
   screwJointAct->setCheckable(true);
+  gearboxJointAct->setCheckable(true);
+  fixedJointAct->setCheckable(true);
 
   jointMenu->addAction(revoluteJointAct);
   jointMenu->addAction(revolute2JointAct);
