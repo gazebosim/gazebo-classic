@@ -40,7 +40,7 @@ namespace gazebo
   {
     class LinkInspector;
 
-    class ModelData
+    class GZ_GUI_MODEL_VISIBLE ModelData
     {
       /// \brief Get a template SDF string of a simple model.
       /// \return Template SDF string of a simple model.
@@ -53,7 +53,7 @@ namespace gazebo
 
     /// \class LinkData LinkData.hh
     /// \brief Helper class to store link data
-    class LinkData : public QObject
+    class GZ_GUI_MODEL_VISIBLE LinkData : public QObject
     {
       Q_OBJECT
 

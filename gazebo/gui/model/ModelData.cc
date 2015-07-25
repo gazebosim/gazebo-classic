@@ -149,43 +149,195 @@ void LinkData::SetPose(const math::Pose &_pose)
 void LinkData::SetScale(const math::Vector3 &_scale)
 {
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
-  for (auto it = this->visuals.begin(); it != this->visuals.end(); ++it)
+
+  for (auto const &it : this->visuals)
   {
-    std::string name = it->first->GetName();
+    std::string name = it.first->GetName();
     std::string linkName = this->linkVisual->GetName();
     std::string leafName =
         name.substr(name.find(linkName)+linkName.size()+2);
-    visualConfig->SetGeometry(leafName, it->first->GetScale());
+    visualConfig->SetGeometry(leafName, it.first->GetScale());
   }
 
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
-  for (auto it = this->collisions.begin(); it != this->collisions.end(); ++it)
+  for (auto const &it : this->collisions)
   {
-    std::string name = it->first->GetName();
+    std::string name = it.first->GetName();
     std::string linkName = this->linkVisual->GetName();
     std::string leafName =
         name.substr(name.find(linkName)+linkName.size()+2);
-    collisionConfig->SetGeometry(leafName,  it->first->GetScale());
+    collisionConfig->SetGeometry(leafName,  it.first->GetScale());
   }
 
   if (this->scale == _scale)
     return;
 
-  // update link inertial values
+  if (this->collisions.empty())
+    return;
+
+  // update link inertial values - assume uniform density
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
   sdf::ElementPtr inertialElem = this->linkSDF->GetElement("inertial");
-  double volScale = _scale.GetLength() / this->scale.GetLength();
 
+  // update mass
+  // density = mass / volume
+  // assume fixed density and scale mass based on volume changes.
+  double massScale = 1;
+  double newVol = 0;
+  double oldVol = 0;
+  for (auto const &it : this->collisions)
+  {
+    std::string geomStr = it.first->GetGeometryType();
+    if (geomStr == "sphere")
+    {
+      double r = _scale.x;
+      double r3 = r*r*r;
+      double newR = this->scale.x;
+      double newR3 = newR*newR*newR;
+      newVol += 4/3 * M_PI * newR3;
+      oldVol += 4/3 * M_PI * r3;
+    }
+    else if (geomStr == "cylinder")
+    {
+      double newR = this->scale.x;
+      double newR2 = newR*newR;
+      double r = (_scale.x*0.5);
+      double r2 = r*r;
+      newVol += M_PI * newR2 * _scale.z;
+      oldVol += M_PI * r2 * this->scale.z;
+    }
+    else
+    {
+      // box, mesh, and other geometry types - use bounding box
+      newVol += _scale.x * _scale.y * _scale.z;
+      oldVol += this->scale.x * this->scale.y * this->scale.z;
+    }
+  }
+  if (!math::equal(oldVol, 0.0, 1e-6))
+    massScale = newVol / oldVol;
+
+  // set new mass
   sdf::ElementPtr massElem = inertialElem->GetElement("mass");
-  double newMass = massElem->Get<double>() * volScale;
+  double mass = massElem->Get<double>();
+  double newMass = mass * massScale;
   massElem->Set(newMass);
   linkConfig->SetMass(newMass);
 
+  // scale the inertia values
+  // 1) compute inertia size based on current inertia matrix and geometry
+  // 2) apply scale to inertia size
+  // 3) compute new inertia values based on new size
+
+  // get current inertia values
+  sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+  sdf::ElementPtr ixxElem = inertiaElem->GetElement("ixx");
+  sdf::ElementPtr iyyElem = inertiaElem->GetElement("iyy");
+  sdf::ElementPtr izzElem = inertiaElem->GetElement("izz");
+  double ixx = ixxElem->Get<double>();
+  double iyy = iyyElem->Get<double>();
+  double izz = izzElem->Get<double>();
+
+//  std::cerr << "mass " << mass << std::endl;
+//  std::cerr << "inertia " << ixx << ", " << iyy << ", " << izz << std::endl;
+
+  double newIxx = ixx;
+  double newIyy = iyy;
+  double newIzz = izz;
+
+  math::Vector3 dScale = _scale / this->scale;
+
+  // we can compute better estimates of inertia values if the link only has
+  // one collision made up of a simple shape
+  // otherwise assume box geom
+  bool boxInertia = false;
+  if (this->collisions.size() == 1u)
+  {
+    auto const &it = this->collisions.begin();
+    std::string geomStr = it->first->GetGeometryType();
+    if (geomStr == "sphere")
+    {
+      // solve for r^2
+      double r2 = (ixx / mass * 0.4);
+
+      std::cerr << "sphere r2: " << r2 << std::endl;
+
+      // compute new inertia values based on new mass and radius
+      newIxx = newMass * 0.4 * (dScale.x * dScale.x) * r2;
+      newIyy = newIxx;
+      newIzz = newIxx;
+    }
+    else if (geomStr == "cylinder")
+    {
+
+      // solve for r^2 and l^2
+      double r2 = izz / (mass * 0.5);
+      double l2 = (ixx / mass - 0.25 * r2) * 12.0;
+
+      std::cerr << "cylinder r2: " << r2 << std::endl;
+      std::cerr << "l2: " << l2 << std::endl;
+
+      // compute new inertia values based on new mass, radius and length
+      newIxx = newMass * (0.25 * (dScale.x * dScale.x * r2) +
+          (dScale.z * dScale.z * l2) / 12.0);
+      newIyy = newIxx;
+      newIzz = newMass * 0.5 * (dScale.x * dScale.x * r2);
+    }
+    else
+    {
+      boxInertia = true;
+    }
+  }
+  else
+  {
+    boxInertia = true;
+  }
+
+  if (boxInertia)
+  {
+    // solve for box inertia size: dx^2, dy^2, dz^2,
+    // assuming solid box with uniform density
+    double mc = 12.0 / mass;
+    double ixxMc = ixx*mc;
+    double iyyMc = iyy*mc;
+    double izzMc = izz*mc;
+    double dz2 = (iyyMc - izzMc + ixxMc) * 0.5;
+    double dx2 = izzMc - (ixxMc - dz2);
+    double dy2 = ixxMc - dz2;
+
+    std::cerr << "d2: " << dx2 << ", " << dy2 << ", " <<  dz2 << std::endl;
+
+    // scale inertia size
+    double newDx2 = dScale.x * dScale.x * dx2;
+    double newDy2 = dScale.y * dScale.y * dy2;
+    double newDz2 = dScale.z * dScale.z * dz2;
+
+    // compute new inertia values based on new inertia size
+    newIxx = newMass/12.0 * (newDy2 + newDz2);
+    newIyy = newMass/12.0 * (newDx2 + newDz2);
+    newIzz = newMass/12.0 * (newDx2 + newDy2);
+  }
+
+  linkConfig->SetInertiaMatrix(newIxx, newIyy, newIzz, 0, 0, 0);
+
+  std::cerr << "new inertia " << newIxx << ", " << newIyy << ", " << newIzz << std::endl;
+  ixxElem->Set(newIxx);
+  iyyElem->Set(newIyy);
+  izzElem->Set(newIzz);
+
+/*  math::Vector3 dScale = _scale / this->scale;
+  double ixxScale = massScale * ((dScale.y * dScale.y) + (dScale.z * dScale.z));
+  double iyyScale = massScale * ((dScale.z * dScale.z) + (dScale.x * dScale.x));
+  double izzScale = massScale * ((dScale.x * dScale.x) + (dScale.y * dScale.y));
+  double newIxx = ixxScale * ixx;
+  double newIyy = iyyScale * iyy;
+  double newIzz = izzScale * izz;*/
+
   // sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+
 
   sdf::ElementPtr inertialPoseElem = inertialElem->GetElement("pose");
   math::Pose newPose = inertialPoseElem->Get<math::Pose>();
-  newPose.pos *= volScale;
+  newPose.pos *= dScale;
 
   inertialPoseElem->Set(newPose);
   linkConfig->SetInertialPose(newPose);

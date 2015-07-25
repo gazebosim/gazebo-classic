@@ -744,6 +744,12 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
     msgs::AddBoxLink(model, mass, math::Vector3::One);
   link->Load(msgs::LinkToSDF(model.link(0)));
 
+   msgs::AddBoxLink(model, 2, math::Vector3(2, 1, 1));
+   std::cerr << " box 1 " << model.link(1).DebugString() << std::endl;
+    msgs::AddBoxLink(model, 4, math::Vector3(2, 2, 1));
+   std::cerr << " box 4 " << model.link(2).DebugString() << std::endl;
+
+
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
   {
