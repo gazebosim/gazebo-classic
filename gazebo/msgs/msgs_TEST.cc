@@ -1124,7 +1124,7 @@ TEST_F(MsgsTest, JointFromSDF)
                <friction>0.1</friction>\
              </dynamics>\
            </axis2>\
-           <gearbox_reference_body>axle</gearbox_reference_body>\
+           <gearbox_reference_body>chassis</gearbox_reference_body>\
            <gearbox_ratio>0.2</gearbox_ratio>\
            <physics>\
              <ode>\
@@ -1215,7 +1215,7 @@ TEST_F(MsgsTest, JointFromSDF)
   EXPECT_NEAR(axisGearboxMsg2.friction(), 0.1, 1e-6);
 
   EXPECT_TRUE(gearboxMsg.has_gearbox());
-  EXPECT_EQ(gearboxMsg.mutable_gearbox()->gearbox_reference_body(), "axle");
+  EXPECT_EQ(gearboxMsg.mutable_gearbox()->gearbox_reference_body(), "chassis");
   EXPECT_NEAR(gearboxMsg.mutable_gearbox()->gearbox_ratio(), 0.2, 1e-6);
 
   // screw
