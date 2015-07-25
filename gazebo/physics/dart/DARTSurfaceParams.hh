@@ -32,6 +32,9 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// Forward declare private data class
+    class DARTSurfaceParamsPrivate;
+
     /// \brief DART surface parameters.
     class GZ_PHYSICS_VISIBLE DARTSurfaceParams : public SurfaceParams
     {
@@ -54,8 +57,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
 
-      /// \brief Friction pyramid parameters (mu1, mu2).
-      private: FrictionPyramidPtr frictionPyramid;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTSurfaceParamsPrivate *dataPtr;
     };
     /// \}
   }

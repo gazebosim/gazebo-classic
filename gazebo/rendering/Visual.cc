@@ -36,6 +36,7 @@
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 #include "gazebo/rendering/Visual.hh"
 
@@ -967,17 +968,30 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     // Apply material to all child scene nodes
     for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
     {
-      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode*>(
+      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode *>(
           this->dataPtr->sceneNode->getChild(i));
-      for (int j = 0; j < sn->numAttachedObjects(); j++)
+      for (int j = 0; j < sn->numAttachedObjects(); ++j)
       {
         Ogre::MovableObject *obj = sn->getAttachedObject(j);
 
-        if (dynamic_cast<Ogre::Entity*>(obj))
-          ((Ogre::Entity*)obj)->setMaterialName(this->dataPtr->myMaterialName);
+        MovableText *text = dynamic_cast<MovableText *>(obj);
+        if (text)
+        {
+          common::Color ambient, diffuse, specular, emissive;
+          bool matFound = rendering::Material::GetMaterialAsColor(
+              this->dataPtr->myMaterialName, ambient, diffuse, specular,
+              emissive);
+
+          if (matFound)
+          {
+            text->SetColor(ambient);
+          }
+        }
+        else if (dynamic_cast<Ogre::Entity *>(obj))
+          ((Ogre::Entity *)obj)->setMaterialName(this->dataPtr->myMaterialName);
         else
         {
-          ((Ogre::SimpleRenderable*)obj)->setMaterial(
+          ((Ogre::SimpleRenderable *)obj)->setMaterial(
               this->dataPtr->myMaterialName);
         }
       }
@@ -2185,13 +2199,13 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   }
 
   if (_msg->has_pose())
-    this->SetPose(msgs::Convert(_msg->pose()));
+    this->SetPose(msgs::ConvertIgn(_msg->pose()));
 
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());
 
   if (_msg->has_scale())
-    this->SetScale(msgs::Convert(_msg->scale()));
+    this->SetScale(msgs::ConvertIgn(_msg->scale()));
 
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
@@ -2264,7 +2278,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
-      geomScale = msgs::Convert(_msg->geometry().box().size());
+      geomScale = msgs::ConvertIgn(_msg->geometry().box().size());
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
@@ -2291,11 +2305,15 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           = _msg->geometry().image().scale();
     }
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-      geomScale = msgs::Convert(_msg->geometry().heightmap().size());
+    {
+      geomScale = msgs::ConvertIgn(_msg->geometry().heightmap().size());
+    }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       if (_msg->geometry().mesh().has_scale())
-        geomScale = msgs::Convert(_msg->geometry().mesh().scale());
+      {
+        geomScale = msgs::ConvertIgn(_msg->geometry().mesh().scale());
+      }
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY ||
         _msg->geometry().type() == msgs::Geometry::POLYLINE)

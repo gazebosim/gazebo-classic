@@ -375,7 +375,8 @@ void LinkData::Load(sdf::ElementPtr _sdf)
 
     if (inertialElem->HasElement("pose"))
     {
-      math::Pose inertialPose = inertialElem->Get<math::Pose>("pose");
+      ignition::math::Pose3d inertialPose =
+        inertialElem->Get<ignition::math::Pose3d>("pose");
       msgs::Set(inertialMsg->mutable_pose(), inertialPose);
     }
 

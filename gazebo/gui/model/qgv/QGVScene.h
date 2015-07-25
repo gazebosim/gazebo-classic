@@ -63,6 +63,9 @@ class QGVCORE_EXPORT QGVScene : public QGraphicsScene
     bool hasNode(const QString &name);
     QGVNode *getNode(const QString &name);
 
+    bool hasEdge(const QString &_label);
+    QGVEdge *getEdge(const QString &_label);
+
     void setRootNode(QGVNode *node);
 
     int nodeCount() const;

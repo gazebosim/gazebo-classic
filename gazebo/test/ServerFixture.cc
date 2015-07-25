@@ -14,6 +14,11 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+#include <Winsock2.h>
+#endif
 
 #include <stdio.h>
 #include <string>
@@ -28,7 +33,12 @@ using namespace gazebo;
 std::string gazebo::custom_exec(std::string _cmd)
 {
   _cmd += " 2>/dev/null";
-  FILE* pipe = popen(_cmd.c_str(), "r");
+
+#ifdef _WIN32
+  FILE *pipe = _popen(_cmd.c_str(), "r");
+#else
+  FILE *pipe = popen(_cmd.c_str(), "r");
+#endif
 
   if (!pipe)
     return "ERROR";
@@ -42,7 +52,12 @@ std::string gazebo::custom_exec(std::string _cmd)
       result += buffer;
   }
 
+#ifdef _WIN32
+  _pclose(pipe);
+#else
   pclose(pipe);
+#endif
+
   return result;
 }
 
@@ -295,8 +310,7 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
   boost::mutex::scoped_lock lock(this->receiveMutex);
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    this->poses[_msg->pose(i).name()] =
-      msgs::Convert(_msg->pose(i));
+    this->poses[_msg->pose(i).name()] = msgs::ConvertIgn(_msg->pose(i));
   }
 }
 
@@ -903,6 +917,113 @@ void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
+    const std::string &_sensorName,
+    const std::string &_collisionType,
+    const std::string &_topic,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
+    bool _static)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+  std::ostringstream shapeStr;
+
+  if (_collisionType == "box")
+  {
+    shapeStr << " <box><size>1 1 1</size></box>";
+  }
+  else if (_collisionType == "cylinder")
+  {
+    shapeStr << "<cylinder>"
+             << "  <radius>.5</radius><length>1.0</length>"
+             << "</cylinder>";
+  }
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _name << "'>"
+    << "<static>" << _static << "</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <collision name ='contact_collision'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </visual>"
+    << "  <sensor name='" << _sensorName << "' type='altimeter'>"
+    << "    <topic>" << _topic << "</topic>"
+    << "    <altimeter>"
+    << "    </altimeter>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_name, 20, 50);
+  WaitUntilSensorSpawn(_sensorName, 100, 100);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnUnitMagnetometerSensor(const std::string &_name,
+    const std::string &_sensorName,
+    const std::string &_collisionType,
+    const std::string &_topic,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy, bool _static)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+  std::ostringstream shapeStr;
+  if (_collisionType == "box")
+  {
+    shapeStr << " <box><size>1 1 1</size></box>";
+  }
+  else if (_collisionType == "cylinder")
+  {
+    shapeStr << "<cylinder>"
+             << "  <radius>.5</radius><length>1.0</length>"
+             << "</cylinder>";
+  }
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _name << "'>"
+    << "<static>" << _static << "</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <collision name ='contact_collision'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </visual>"
+    << "  <sensor name='" << _sensorName << "' type='magnetometer'>"
+    << "    <topic>" << _topic << "</topic>"
+    << "    <magnetometer>"
+    << "    </magnetometer>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_name, 20, 50);
+  WaitUntilSensorSpawn(_sensorName, 100, 100);
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::launchTimeoutFailure(const char *_logMsg,
                                          const int _timeoutCS)
 {
@@ -1110,7 +1231,8 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
   msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1174,13 +1296,15 @@ void ServerFixture::SpawnSphere(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
   msgs::AddSphereLink(model, 1.0, _radius);
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
   msgs::Set(link->mutable_inertial()->mutable_pose(),
-            math::Pose(_cog, math::Quaternion()));
+            ignition::math::Pose3d(_cog.Ign(),
+              ignition::math::Quaterniond()));
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     << msgs::ModelToSDF(model)->ToString("")
@@ -1204,8 +1328,9 @@ void ServerFixture::SpawnBox(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
-  msgs::AddBoxLink(model, 1.0, _size);
+  msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::AddBoxLink(model, 1.0, _size.Ign());
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
@@ -1271,7 +1396,8 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
   model.add_link();
   model.mutable_link(0)->set_name("body");
 
