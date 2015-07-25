@@ -159,6 +159,7 @@ void ModelData_TEST::LinkScale()
       double newMass = density * (newSize.x * newSize.y * newSize.z) * mass;
       qFuzzyCompare(massElem->Get<double>(), newMass);
 
+      std::cerr << " == box mass " << mass << ", " << newMass << ", " << massElem->Get<double>() << std::endl;
       // verify new inertia values
       // use msgs::AddBoxLink to help us compute the expected inertia values.
       msgs::AddBoxLink(model, newMass, newScale);
@@ -247,10 +248,17 @@ void ModelData_TEST::LinkScale()
       double newRadius = radius * dScale.x;
       double newLength = length * dScale.z;
       double newMass = density * (M_PI*newRadius*newRadius*newLength);
+
+      std::cerr << " cylinder mass radius length" << mass << ", " << radius << ", " << length << std::endl;
+      std::cerr << " cylinder density " << density << std::endl;
+      std::cerr << " cylinder scale " << scale << std::endl;
+      std::cerr << " cylinder mass " << mass << ", " << newMass << ", " << massElem->Get<double>() << std::endl;
+
       qFuzzyCompare(massElem->Get<double>(), newMass);
 
       // verify new inertia values
-      // use msgs::AddCylinderLink to help us compute the expected inertia values.
+      // use msgs::AddCylinderLink to help us compute the
+      // expected inertia values.
       msgs::AddCylinderLink(model, newMass, newRadius, newLength);
       msgs::Inertial newInertialMsg = model.link(1).inertial();
       double newIxx = newInertialMsg.ixx();
@@ -293,7 +301,8 @@ void ModelData_TEST::LinkScale()
       qFuzzyCompare(massElem->Get<double>(), newMass);
 
       // verify new inertia values
-      // use msgs::AddCylinderLink to help us compute the expected inertia values.
+      // use msgs::AddCylinderLink to help us compute
+      // the expected inertia values.
       msgs::AddCylinderLink(model, newMass, newRadius, newLength);
       msgs::Inertial newInertialMsg = model.link(2).inertial();
       double newIxx = newInertialMsg.ixx();

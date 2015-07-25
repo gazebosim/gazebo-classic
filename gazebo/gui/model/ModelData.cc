@@ -190,19 +190,19 @@ void LinkData::SetScale(const math::Vector3 &_scale)
     std::string geomStr = it.first->GetGeometryType();
     if (geomStr == "sphere")
     {
-      double r = _scale.x;
+      double r = this->scale.x;
       double r3 = r*r*r;
-      double newR = this->scale.x;
+      double newR = _scale.x;
       double newR3 = newR*newR*newR;
       newVol += 4/3 * M_PI * newR3;
       oldVol += 4/3 * M_PI * r3;
     }
     else if (geomStr == "cylinder")
     {
-      double newR = this->scale.x;
-      double newR2 = newR*newR;
-      double r = (_scale.x*0.5);
+      double r = this->scale.x;
       double r2 = r*r;
+      double newR = _scale.x;
+      double newR2 = newR*newR;
       newVol += M_PI * newR2 * _scale.z;
       oldVol += M_PI * r2 * this->scale.z;
     }
@@ -213,6 +213,8 @@ void LinkData::SetScale(const math::Vector3 &_scale)
       oldVol += this->scale.x * this->scale.y * this->scale.z;
     }
   }
+
+  std::cerr << " new old vol " << newVol << " " << oldVol << std::endl;
   if (!math::equal(oldVol, 0.0, 1e-6))
     massScale = newVol / oldVol;
 
@@ -237,7 +239,7 @@ void LinkData::SetScale(const math::Vector3 &_scale)
   double iyy = iyyElem->Get<double>();
   double izz = izzElem->Get<double>();
 
-//  std::cerr << "mass " << mass << std::endl;
+  std::cerr << "new mass " << newMass << std::endl;
 //  std::cerr << "inertia " << ixx << ", " << iyy << ", " << izz << std::endl;
 
   double newIxx = ixx;

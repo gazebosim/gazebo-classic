@@ -15,12 +15,12 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_CREATOR_TEST_HH_
-#define _GAZEBO_MODEL_CREATOR_TEST_HH_
+#ifndef _GAZEBO_MODEL_DATA_TEST_HH_
+#define _GAZEBO_MODEL_DATA_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelCreator class.
+/// \brief A test class for the ModelData class.
 class ModelData_TEST : public QTestFixture
 {
   Q_OBJECT
