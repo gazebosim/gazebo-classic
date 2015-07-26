@@ -51,7 +51,7 @@ void WideAngleCamera::Load()
 
     if(projectionType == -1)
     {
-      if(this->sdf->HasElement("custom_function"))
+      if(elem->HasElement("custom_function"))
       {
         sdf::ElementPtr cust_func = elem->GetElement("custom_function");
 
@@ -87,6 +87,7 @@ void WideAngleCamera::Load()
             gzthrow("Invalid mapping function");
           }
       }
+      else
         gzthrow("You need to specify custom mapping function")
     }
   }
