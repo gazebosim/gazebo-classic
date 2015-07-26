@@ -477,6 +477,9 @@ void ModelData_TEST::LinkScale()
     }
     delete link;
   }
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 

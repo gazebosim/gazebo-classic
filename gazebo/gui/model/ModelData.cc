@@ -114,7 +114,9 @@ LinkData::LinkData()
 LinkData::~LinkData()
 {
   event::Events::DisconnectPreRender(this->connections[0]);
+  this->connections.clear();
   delete this->inspector;
+  delete this->updateMutex;
 }
 
 /////////////////////////////////////////////////
@@ -195,9 +197,8 @@ void LinkData::SetScale(const math::Vector3 &_scale)
       double newR = _scale.x;
       double newR3 = newR*newR*newR;
       // sphere volume: 4/3 * PI * r^3
-      // (4/3 * PI) gets canceled out on volume ratio calculation
-      newVol += newR3;
-      oldVol += r3;
+      newVol += 4.0 / 3.0 * M_PI * newR3;
+      oldVol += 4.0 / 3.0 * M_PI * r3;
     }
     else if (geomStr == "cylinder")
     {
@@ -206,9 +207,8 @@ void LinkData::SetScale(const math::Vector3 &_scale)
       double newR = _scale.x;
       double newR2 = newR*newR;
       // cylinder volume: PI * r^2 * height
-      // PI gets canceled out on volume ratio calculation
-      newVol += newR2 * _scale.z;
-      oldVol += r2 * this->scale.z;
+      newVol += M_PI * newR2 * _scale.z;
+      oldVol += M_PI * r2 * this->scale.z;
     }
     else
     {

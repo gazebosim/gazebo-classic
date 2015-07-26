@@ -69,6 +69,7 @@ VisualConfig::~VisualConfig()
   while (!this->configs.empty())
   {
     auto config = this->configs.begin();
+    delete config->second;
     this->configs.erase(config);
   }
 }
