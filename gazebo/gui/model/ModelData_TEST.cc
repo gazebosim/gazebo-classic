@@ -25,6 +25,9 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 void ModelData_TEST::LinkScale()
 {
+  // test fuzzy compare
+//  qFuzzyCompare(1.0, 2.0);
+
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -116,7 +119,7 @@ void ModelData_TEST::LinkScale()
       // verify new mass
       double density = mass / (size.x * size.y * size.z);
       math::Vector3 newSize = dScale * size;
-      double newMass = density * (newSize.x * newSize.y * newSize.z) * mass;
+      double newMass = density * (newSize.x * newSize.y * newSize.z);
       qFuzzyCompare(massElem->Get<double>(), newMass);
 
       // verify new inertia values
@@ -156,7 +159,7 @@ void ModelData_TEST::LinkScale()
       // verify new mass
       double density = mass / (size.x * size.y * size.z);
       math::Vector3 newSize = dScale * size;
-      double newMass = density * (newSize.x * newSize.y * newSize.z) * mass;
+      double newMass = density * (newSize.x * newSize.y * newSize.z);
       qFuzzyCompare(massElem->Get<double>(), newMass);
 
       std::cerr << " == box mass " << mass << ", " << newMass << ", " << massElem->Get<double>() << std::endl;
@@ -176,6 +179,11 @@ void ModelData_TEST::LinkScale()
       qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
       qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
       qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
+
+      std::cerr << inertialElem->ToString("") << std::endl;
+      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
+
+
     }
     delete link;
   }
@@ -249,9 +257,6 @@ void ModelData_TEST::LinkScale()
       double newLength = length * dScale.z;
       double newMass = density * (M_PI*newRadius*newRadius*newLength);
 
-      std::cerr << " cylinder mass radius length" << mass << ", " << radius << ", " << length << std::endl;
-      std::cerr << " cylinder density " << density << std::endl;
-      std::cerr << " cylinder scale " << scale << std::endl;
       std::cerr << " cylinder mass " << mass << ", " << newMass << ", " << massElem->Get<double>() << std::endl;
 
       qFuzzyCompare(massElem->Get<double>(), newMass);
@@ -273,6 +278,10 @@ void ModelData_TEST::LinkScale()
       qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
       qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
       qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
+
+      std::cerr << inertialElem->ToString("") << std::endl;
+      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
+
 
       // update variables for next scale operation
       scale = newScale;
@@ -300,6 +309,8 @@ void ModelData_TEST::LinkScale()
       double newMass = density * (M_PI*newRadius*newRadius*newLength);
       qFuzzyCompare(massElem->Get<double>(), newMass);
 
+      std::cerr << " cylinder mass " << newMass << " " << massElem->Get<double>() << std::endl;
+
       // verify new inertia values
       // use msgs::AddCylinderLink to help us compute
       // the expected inertia values.
@@ -317,6 +328,11 @@ void ModelData_TEST::LinkScale()
       qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
       qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
       qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
+
+      std::cerr << inertialElem->ToString("") << std::endl;
+      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
+
+
     }
     delete link;
   }
@@ -389,6 +405,8 @@ void ModelData_TEST::LinkScale()
       double newMass = density * (4/3*M_PI*newRadius*newRadius*newRadius);
       qFuzzyCompare(massElem->Get<double>(), newMass);
 
+      std::cerr << " sphere mass " << massElem->Get<double>() << " " << newMass << std::endl;
+
       // verify new inertia values
       // use msgs::AddSphereLink to help us compute the expected inertia values.
       msgs::AddSphereLink(model, newMass, newRadius);
@@ -406,6 +424,9 @@ void ModelData_TEST::LinkScale()
       qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
       qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
 
+      std::cerr << inertialElem->ToString("") << std::endl;
+      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
+
       // update variables for next scale operation
       scale = newScale;
       mass = newMass;
@@ -415,7 +436,7 @@ void ModelData_TEST::LinkScale()
     // set another scale and verify inertial values
     {
       // set scale
-      math::Vector3 newScale = math::Vector3(2.5, 2.5, 2.5);
+      math::Vector3 newScale = math::Vector3(3.1, 3.1, 3.1);
       link->SetScale(newScale);
 
       // verify new scale
@@ -429,6 +450,8 @@ void ModelData_TEST::LinkScale()
       double newRadius = radius * dScale.x;
       double newMass = density * (4/3*M_PI*newRadius*newRadius*newRadius);
       qFuzzyCompare(massElem->Get<double>(), newMass);
+
+      std::cerr << " sphere mass " << massElem->Get<double>() << " " << newMass << std::endl;
 
       // verify new inertia values
       // use msgs::AddSphereLink to help us compute the expected inertia values.
@@ -446,6 +469,11 @@ void ModelData_TEST::LinkScale()
       qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
       qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
       qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
+
+      std::cerr << inertialElem->ToString("") << std::endl;
+      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
+
+
     }
     delete link;
   }
