@@ -25,9 +25,6 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 void ModelData_TEST::LinkScale()
 {
-  // test fuzzy compare
-//  qFuzzyCompare(1.0, 2.0);
-
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -87,7 +84,7 @@ void ModelData_TEST::LinkScale()
     sdf::ElementPtr massElem = inertialElem->GetElement("mass");
 
     // verify mass
-    qFuzzyCompare(massElem->Get<double>(), mass);
+    QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
 
     // verify inertia values
     msgs::Inertial inertialMsg = model.link(0).inertial();
@@ -97,12 +94,13 @@ void ModelData_TEST::LinkScale()
     double ixy = inertialMsg.ixy();
     double ixz = inertialMsg.ixz();
     double iyz = inertialMsg.iyz();
-    qFuzzyCompare(inertiaElem->Get<double>("ixx"), ixx);
-    qFuzzyCompare(inertiaElem->Get<double>("iyy"), iyy);
-    qFuzzyCompare(inertiaElem->Get<double>("izz"), izz);
-    qFuzzyCompare(inertiaElem->Get<double>("ixy"), ixy);
-    qFuzzyCompare(inertiaElem->Get<double>("ixz"), ixz);
-    qFuzzyCompare(inertiaElem->Get<double>("iyz"), iyz);
+
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz, 1e-3));
 
     // set new scale and verify inertial values
     {
@@ -120,7 +118,7 @@ void ModelData_TEST::LinkScale()
       double density = mass / (size.x * size.y * size.z);
       math::Vector3 newSize = dScale * size;
       double newMass = density * (newSize.x * newSize.y * newSize.z);
-      qFuzzyCompare(massElem->Get<double>(), newMass);
+      QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
       // use msgs::AddBoxLink to help us compute the expected inertia values.
@@ -132,12 +130,23 @@ void ModelData_TEST::LinkScale()
       double newIxy = newInertialMsg.ixy();
       double newIxz = newInertialMsg.ixz();
       double newIyz = newInertialMsg.iyz();
-      qFuzzyCompare(inertiaElem->Get<double>("ixx"), newIxx);
-      qFuzzyCompare(inertiaElem->Get<double>("iyy"), newIyy);
-      qFuzzyCompare(inertiaElem->Get<double>("izz"), newIzz);
-      qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
-      qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
-      qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
+      std::cerr << inertialElem->ToString("") << std::endl;
+      std::cerr << "!!! " <<  newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
+
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixx"), newIxx, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyy"), newIyy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("izz"), newIzz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixy"), newIxy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
+
+
 
       scale = newScale;
       mass = newMass;
@@ -160,7 +169,7 @@ void ModelData_TEST::LinkScale()
       double density = mass / (size.x * size.y * size.z);
       math::Vector3 newSize = dScale * size;
       double newMass = density * (newSize.x * newSize.y * newSize.z);
-      qFuzzyCompare(massElem->Get<double>(), newMass);
+      QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       std::cerr << " == box mass " << mass << ", " << newMass << ", " << massElem->Get<double>() << std::endl;
       // verify new inertia values
@@ -173,17 +182,23 @@ void ModelData_TEST::LinkScale()
       double newIxy = newInertialMsg.ixy();
       double newIxz = newInertialMsg.ixz();
       double newIyz = newInertialMsg.iyz();
-      qFuzzyCompare(inertiaElem->Get<double>("ixx"), newIxx);
-      qFuzzyCompare(inertiaElem->Get<double>("iyy"), newIyy);
-      qFuzzyCompare(inertiaElem->Get<double>("izz"), newIzz);
-      qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
-      qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
-      qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
 
       std::cerr << inertialElem->ToString("") << std::endl;
-      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
+      std::cerr << "!!!@@ " << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
 
 
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixx"), newIxx, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyy"), newIyy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("izz"), newIzz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixy"), newIxy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
     }
     delete link;
   }
@@ -222,7 +237,7 @@ void ModelData_TEST::LinkScale()
     sdf::ElementPtr massElem = inertialElem->GetElement("mass");
 
     // verify mass
-    qFuzzyCompare(massElem->Get<double>(), mass);
+    QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
 
     // verify inertia values
     msgs::Inertial inertialMsg = model.link(0).inertial();
@@ -232,12 +247,13 @@ void ModelData_TEST::LinkScale()
     double ixy = inertialMsg.ixy();
     double ixz = inertialMsg.ixz();
     double iyz = inertialMsg.iyz();
-    qFuzzyCompare(inertiaElem->Get<double>("ixx"), ixx);
-    qFuzzyCompare(inertiaElem->Get<double>("iyy"), iyy);
-    qFuzzyCompare(inertiaElem->Get<double>("izz"), izz);
-    qFuzzyCompare(inertiaElem->Get<double>("ixy"), ixy);
-    qFuzzyCompare(inertiaElem->Get<double>("ixz"), ixz);
-    qFuzzyCompare(inertiaElem->Get<double>("iyz"), iyz);
+
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz, 1e-3));
 
     // set new scale and verify inertial values
     {
@@ -259,7 +275,7 @@ void ModelData_TEST::LinkScale()
 
       std::cerr << " cylinder mass " << mass << ", " << newMass << ", " << massElem->Get<double>() << std::endl;
 
-      qFuzzyCompare(massElem->Get<double>(), newMass);
+      QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
       // use msgs::AddCylinderLink to help us compute the
@@ -272,12 +288,19 @@ void ModelData_TEST::LinkScale()
       double newIxy = newInertialMsg.ixy();
       double newIxz = newInertialMsg.ixz();
       double newIyz = newInertialMsg.iyz();
-      qFuzzyCompare(inertiaElem->Get<double>("ixx"), newIxx);
-      qFuzzyCompare(inertiaElem->Get<double>("iyy"), newIyy);
-      qFuzzyCompare(inertiaElem->Get<double>("izz"), newIzz);
-      qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
-      qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
-      qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
+
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixx"), newIxx, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyy"), newIyy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("izz"), newIzz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixy"), newIxy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
 
       std::cerr << inertialElem->ToString("") << std::endl;
       std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
@@ -307,7 +330,7 @@ void ModelData_TEST::LinkScale()
       double newRadius = radius * dScale.x;
       double newLength = length * dScale.z;
       double newMass = density * (M_PI*newRadius*newRadius*newLength);
-      qFuzzyCompare(massElem->Get<double>(), newMass);
+      QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       std::cerr << " cylinder mass " << newMass << " " << massElem->Get<double>() << std::endl;
 
@@ -322,12 +345,19 @@ void ModelData_TEST::LinkScale()
       double newIxy = newInertialMsg.ixy();
       double newIxz = newInertialMsg.ixz();
       double newIyz = newInertialMsg.iyz();
-      qFuzzyCompare(inertiaElem->Get<double>("ixx"), newIxx);
-      qFuzzyCompare(inertiaElem->Get<double>("iyy"), newIyy);
-      qFuzzyCompare(inertiaElem->Get<double>("izz"), newIzz);
-      qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
-      qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
-      qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
+
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixx"), newIxx, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyy"), newIyy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("izz"), newIzz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixy"), newIxy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
 
       std::cerr << inertialElem->ToString("") << std::endl;
       std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
@@ -370,7 +400,7 @@ void ModelData_TEST::LinkScale()
     sdf::ElementPtr massElem = inertialElem->GetElement("mass");
 
     // verify mass
-    qFuzzyCompare(massElem->Get<double>(), mass);
+    QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
 
     // verify inertia values
     msgs::Inertial inertialMsg = model.link(0).inertial();
@@ -380,12 +410,13 @@ void ModelData_TEST::LinkScale()
     double ixy = inertialMsg.ixy();
     double ixz = inertialMsg.ixz();
     double iyz = inertialMsg.iyz();
-    qFuzzyCompare(inertiaElem->Get<double>("ixx"), ixx);
-    qFuzzyCompare(inertiaElem->Get<double>("iyy"), iyy);
-    qFuzzyCompare(inertiaElem->Get<double>("izz"), izz);
-    qFuzzyCompare(inertiaElem->Get<double>("ixy"), ixy);
-    qFuzzyCompare(inertiaElem->Get<double>("ixz"), ixz);
-    qFuzzyCompare(inertiaElem->Get<double>("iyz"), iyz);
+
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz, 1e-3));
 
     // set new scale and verify inertial values
     {
@@ -403,7 +434,7 @@ void ModelData_TEST::LinkScale()
       double density = mass / (4/3*M_PI*radius*radius*radius);
       double newRadius = radius * dScale.x;
       double newMass = density * (4/3*M_PI*newRadius*newRadius*newRadius);
-      qFuzzyCompare(massElem->Get<double>(), newMass);
+      QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       std::cerr << " sphere mass " << massElem->Get<double>() << " " << newMass << std::endl;
 
@@ -417,12 +448,19 @@ void ModelData_TEST::LinkScale()
       double newIxy = newInertialMsg.ixy();
       double newIxz = newInertialMsg.ixz();
       double newIyz = newInertialMsg.iyz();
-      qFuzzyCompare(inertiaElem->Get<double>("ixx"), newIxx);
-      qFuzzyCompare(inertiaElem->Get<double>("iyy"), newIyy);
-      qFuzzyCompare(inertiaElem->Get<double>("izz"), newIzz);
-      qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
-      qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
-      qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
+
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixx"), newIxx, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyy"), newIyy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("izz"), newIzz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixy"), newIxy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
 
       std::cerr << inertialElem->ToString("") << std::endl;
       std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
@@ -449,7 +487,7 @@ void ModelData_TEST::LinkScale()
       double density = mass / (4/3*M_PI*radius*radius*radius);
       double newRadius = radius * dScale.x;
       double newMass = density * (4/3*M_PI*newRadius*newRadius*newRadius);
-      qFuzzyCompare(massElem->Get<double>(), newMass);
+      QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       std::cerr << " sphere mass " << massElem->Get<double>() << " " << newMass << std::endl;
 
@@ -463,12 +501,19 @@ void ModelData_TEST::LinkScale()
       double newIxy = newInertialMsg.ixy();
       double newIxz = newInertialMsg.ixz();
       double newIyz = newInertialMsg.iyz();
-      qFuzzyCompare(inertiaElem->Get<double>("ixx"), newIxx);
-      qFuzzyCompare(inertiaElem->Get<double>("iyy"), newIyy);
-      qFuzzyCompare(inertiaElem->Get<double>("izz"), newIzz);
-      qFuzzyCompare(inertiaElem->Get<double>("ixy"), newIxy);
-      qFuzzyCompare(inertiaElem->Get<double>("ixz"), newIxz);
-      qFuzzyCompare(inertiaElem->Get<double>("iyz"), newIyz);
+
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixx"), newIxx, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyy"), newIyy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("izz"), newIzz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixy"), newIxy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
 
       std::cerr << inertialElem->ToString("") << std::endl;
       std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;

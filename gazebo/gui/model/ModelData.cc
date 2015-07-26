@@ -218,7 +218,7 @@ void LinkData::SetScale(const math::Vector3 &_scale)
     }
   }
 
-  if (!math::equal(oldVol, 0.0, 1e-6))
+  if (!ignition::math::equal(oldVol, 0.0, 1e-6))
     volumeRatio = newVol / oldVol;
 
   // set new mass
