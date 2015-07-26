@@ -345,13 +345,23 @@ void JointCreationDialog::OnLinkInserted(const std::string &_linkName)
 /////////////////////////////////////////////////
 void JointCreationDialog::OnLinkRemoved(const std::string &_linkName)
 {
-  this->linkList.erase(_linkName);
+  this->EmitLinkRemoved(_linkName);
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnLinkRemovedSlot(const std::string &_linkName)
+{
+  auto it = this->linkList.find(_linkName);
+  if (it != this->linkList.end())
+    this->linkList.erase(_linkName);
 
   int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
-  this->parentComboBox->removeItem(index);
+  if (index >= 0)
+    this->parentComboBox->removeItem(index);
 
   index = this->childComboBox->findData(QString::fromStdString(_linkName));
-  this->childComboBox->removeItem(index);
+  if (index >= 0)
+    this->childComboBox->removeItem(index);
 }
 
 /////////////////////////////////////////////////
