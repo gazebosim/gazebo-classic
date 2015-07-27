@@ -747,10 +747,10 @@ void JointMaker::OnDelete()
 }
 
 /////////////////////////////////////////////////
-void JointMaker::CreateHotSpot(JointData *_joint)
+std::string JointMaker::CreateHotSpot(JointData *_joint)
 {
   if (!_joint)
-    return;
+    return "";
 
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
@@ -804,11 +804,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
 
   _joint->hotspot = hotspotVisual;
 
-  // std::string parentName = _joint->parent->GetName();
-  // std::string childName = _joint->child->GetName();
-
-  // gui::model::Events::jointInserted(jointId, _joint->name,
-  //     jointTypes[_joint->type], parentName, childName);
+  return jointId;
 }
 
 /////////////////////////////////////////////////
@@ -1263,7 +1259,15 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->line = jointLine;
   joint->dirty = true;
 
-  this->CreateHotSpot(joint);
+  std::string jointId = this->CreateHotSpot(joint);
+
+  // Notify other widgets
+  if (!jointId.empty())
+  {
+    gui::model::Events::jointInserted(jointId, joint->name,
+	jointTypes[joint->type], joint->parent->GetName(),
+	joint->child->GetName());
+  }
 }
 
 /////////////////////////////////////////////////

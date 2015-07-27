@@ -18,8 +18,9 @@
 #ifndef _GAZEBO_JOINT_CREATION_DIALOG_HH_
 #define _GAZEBO_JOINT_CREATION_DIALOG_HH_
 
-//#include <string>
-//#include <vector>
+#include <map>
+#include <string>
+#include <vector>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
