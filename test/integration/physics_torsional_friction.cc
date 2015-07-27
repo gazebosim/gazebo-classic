@@ -47,8 +47,10 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       // Get the model pointer
       this->model = _world->GetModel(_name);
 
-      // Get the surface params
+      // Get the link pointer
       this->link = this->model->GetLink();
+
+      // Get surface params
       physics::Collision_V collisions = this->link->GetCollisions();
       auto iter = collisions.begin();
       EXPECT_TRUE(iter != collisions.end());
@@ -64,6 +66,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       this->radius = surf->GetFrictionPyramid()->GetCurvatureRadius();
       this->kp = surfODE->kp;
 
+      // Get inertial params
       auto inertial = link->GetInertial();
       EXPECT_TRUE(inertial != NULL);
 
@@ -72,9 +75,6 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 
       this->error.InsertStatistic("maxAbs");
     }
-
-    /// \brief Destructor
-    public: ~SphereData() = default;
 
     /// \brief Pointer to the model
     public: physics::ModelPtr model;
@@ -97,7 +97,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
     /// \brief Patch
     public: double patch;
 
-    /// \brief Radius
+    /// \brief Sphere radius
     public: double radius;
 
     /// \brief Computing signal stats error
@@ -105,7 +105,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
   };
 
   /// \brief Use the torsional_friction_test world to test spheres with
-  /// different coefficients of torsional friction.
+  /// different coefficients of torsional friction and different patch radii.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void CoefficientTest(const std::string &_physicsEngine);
 
@@ -140,7 +140,7 @@ void PhysicsTorsionalFrictionTest::DepthTest(
 {
   if (_physicsEngine != "ode")
   {
-    gzerr << "Torsional friction only works with ODE (#ISSUE)"
+    gzerr << "Torsional friction only works with ODE (issues #1681 #1682 #1683)"
           << std::endl;
     return;
   }
@@ -233,7 +233,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
 {
   if (_physicsEngine != "ode")
   {
-    gzerr << "Torsional friction only works with ODE (#ISSUE)"
+    gzerr << "Torsional friction only works with ODE (issues #1681 #1682 #1683)"
           << std::endl;
     return;
   }
@@ -327,8 +327,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
   // Check error separately to reduce console spam
   for (auto sphere : spheres)
   {
-    gzdbg << "Model " << sphere.model->GetName()
-          << std::endl;
+    gzdbg << "Model " << sphere.model->GetName() << std::endl;
     EXPECT_NEAR(sphere.error.Map()["maxAbs"], 0.0, g_friction_tolerance);
   }
 }
@@ -339,7 +338,7 @@ void PhysicsTorsionalFrictionTest::CurvatureTest(
 {
   if (_physicsEngine != "ode")
   {
-    gzerr << "Torsional friction only works with ODE (#ISSUE)"
+    gzerr << "Torsional friction only works with ODE (issues #1681 #1682 #1683)"
           << std::endl;
     return;
   }

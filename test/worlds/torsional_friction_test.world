@@ -79,10 +79,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mass_1' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_mass_2'>
@@ -133,10 +129,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mass_2' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_mass_3'>
@@ -187,10 +179,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mass_3' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_mass_4'>
@@ -241,10 +229,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mass_4' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_mass_5'>
@@ -295,10 +279,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mass_5' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
 
@@ -352,10 +332,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mu3_1' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_mu3_2'>
@@ -407,10 +383,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mu3_2' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_mu3_3'>
@@ -462,10 +434,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mu3_3' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_mu3_4'>
@@ -517,10 +485,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mu3_4' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_mu3_5'>
@@ -572,10 +536,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_mu3_5' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
 
@@ -630,10 +590,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_patch_1' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_patch_2'>
@@ -686,10 +642,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_patch_2' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_patch_3'>
@@ -742,10 +694,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_patch_3' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_patch_4'>
@@ -798,10 +746,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_patch_4' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
     <model name='sphere_patch_5'>
@@ -854,10 +798,6 @@
           </material>
         </visual>
       </link>
-      <!-- <plugin name='sphere_patch_5' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>-->
     </model>
 
 
@@ -912,10 +852,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_1' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_radius_2'>
@@ -968,10 +904,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_2' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_radius_3'>
@@ -1024,10 +956,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_3' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_radius_4'>
@@ -1080,10 +1008,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_4' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_radius_5'>
@@ -1136,10 +1060,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_5' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
 

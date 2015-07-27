@@ -303,13 +303,14 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     }
 
     // now do jacobian for rotational forces
-    dVector3 t3 = {0, 0, 0};
 
     // third friction direction (torsional)
     // note that this will only be reachable if mu and mu2
     // have positive values
     if ( the_m >= 4 )
     {
+        dVector3 t3 = {0, 0, 0};
+
         // Linear, body 1
         info->J1l[s3+0] = t3[0];
         info->J1l[s3+1] = t3[1];

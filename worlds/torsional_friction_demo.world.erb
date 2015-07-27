@@ -66,6 +66,7 @@
       name = 'sphere_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= radius*4*i %> 0 <%= radius %>  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -128,6 +129,7 @@
       name = 'box_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= dd*2*i %> 2 <%= dd/2 %>  <%= Math::PI/4 %> <%= Math.atan(1.0/Math.sqrt(2)) %> 0</pose>
       <link name="link">
         <inertial>
@@ -179,6 +181,7 @@
       name = 'box_low_cog_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= dd*2*i %> 4 <%= dd/2 %>  <%= Math::PI/4 %> <%= Math.atan(1.0/Math.sqrt(2)) %> 0</pose>
       <link name="link">
         <inertial>
@@ -231,6 +234,7 @@
       name = 'pinch_' + i.to_s
 %>
     <%= "<model name='" + name + "'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= dd_p*2*i %> 6 <%= dd_p %> 0 0 0</pose>
       <link name="box">
         <self_collide>true</self_collide>

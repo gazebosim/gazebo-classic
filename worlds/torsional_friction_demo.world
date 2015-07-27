@@ -15,6 +15,7 @@
     </include>
 
     <model name='sphere_1'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.4 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -71,6 +72,7 @@
     </model>
 
     <model name='sphere_2'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.8 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -127,6 +129,7 @@
     </model>
 
     <model name='sphere_3'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.2000000000000002 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -183,6 +186,7 @@
     </model>
 
     <model name='sphere_4'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.6 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -239,6 +243,7 @@
     </model>
 
     <model name='sphere_5'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>2.0 0 0.1  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -296,6 +301,7 @@
 
 
     <model name='box_1'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.692820323027551 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -341,6 +347,7 @@
     </model>
 
     <model name='box_2'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.385640646055102 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -386,6 +393,7 @@
     </model>
 
     <model name='box_3'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>2.078460969082653 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -431,6 +439,7 @@
     </model>
 
     <model name='box_4'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>2.771281292110204 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -476,6 +485,7 @@
     </model>
 
     <model name='box_5'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>3.4641016151377553 2 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -522,6 +532,7 @@
 
 
     <model name='box_low_cog_1'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0.692820323027551 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -568,6 +579,7 @@
     </model>
 
     <model name='box_low_cog_2'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.385640646055102 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -614,6 +626,7 @@
     </model>
 
     <model name='box_low_cog_3'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>2.078460969082653 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -660,6 +673,7 @@
     </model>
 
     <model name='box_low_cog_4'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>2.771281292110204 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -706,6 +720,7 @@
     </model>
 
     <model name='box_low_cog_5'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>3.4641016151377553 4 0.17320508075688776  0.7853981633974483 0.6154797086703873 0</pose>
       <link name="link">
         <inertial>
@@ -753,6 +768,7 @@
 
 
     <model name='pinch_1'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>1.2043255373859678 6 0.6021627686929839 0 0 0</pose>
       <link name="box">
         <self_collide>true</self_collide>
@@ -875,6 +891,7 @@
     </model>
 
     <model name='pinch_2'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>2.4086510747719356 6 0.6021627686929839 0 0 0</pose>
       <link name="box">
         <self_collide>true</self_collide>
@@ -997,6 +1014,7 @@
     </model>
 
     <model name='pinch_3'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>3.6129766121579037 6 0.6021627686929839 0 0 0</pose>
       <link name="box">
         <self_collide>true</self_collide>
@@ -1119,6 +1137,7 @@
     </model>
 
     <model name='pinch_4'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>4.817302149543871 6 0.6021627686929839 0 0 0</pose>
       <link name="box">
         <self_collide>true</self_collide>
@@ -1241,6 +1260,7 @@
     </model>
 
     <model name='pinch_5'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>6.021627686929839 6 0.6021627686929839 0 0 0</pose>
       <link name="box">
         <self_collide>true</self_collide>

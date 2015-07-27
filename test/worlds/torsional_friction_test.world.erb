@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <%
   # Torsional friction test world
-  # Rotating spheres with single points of contact and initial velocity
-  # They should decelerate if friction is nonzero
+  # Spheres with single points of contact. Torque about the vertical axis
+  # will be applied and the torsional friction should resist motion.
   # There are 4 rows of spheres:
   # 1st: different masses, resulting in different contact depths.
   # 2nd: different Mu3
@@ -21,9 +21,6 @@
   default_mu3 = 0.005
   default_radius = 0.1
   default_patch_radius = 2.0
-
-  # initial velocity
-  spin0 = 2*Math::PI
 
   # Kp to make spheres soft
   kp = 500000
@@ -119,10 +116,6 @@
           </material>
         </visual>
       </link>
-      <!-- <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
-        <linear>0 0 0</linear>
-        <angular>0 0 <%= spin0 %></angular>
-      </plugin>-->
     </model>
 <%  end %>
 
@@ -190,10 +183,6 @@
           </material>
         </visual>
       </link>
-      <!-- <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
-        <linear>0 0 0</linear>
-        <angular>0 0 <%= spin0 %></angular>
-      </plugin>-->
     </model>
 <%  end %>
 
@@ -262,10 +251,6 @@
           </material>
         </visual>
       </link>
-      <!-- <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
-        <linear>0 0 0</linear>
-        <angular>0 0 <%= spin0 %></angular>
-      </plugin>-->
     </model>
 <%  end %>
 
@@ -333,10 +318,6 @@
           </material>
         </visual>
       </link>
-      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
-        <linear>0 0 0</linear>
-        <angular>0 0 <%= spin0 %></angular>
-      </plugin>
     </model>
 <%  end %>
 

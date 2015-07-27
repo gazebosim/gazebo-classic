@@ -53,16 +53,16 @@ namespace gazebo
       /// \return Torsional friction coefficient.
       public: double GetMuTorsion();
 
-      /// \brief Get the torsional friction coefficient.
-      /// \return Torsional friction coefficient.
+      /// \brief Get the torsional patch radius.
+      /// \return Torsional patch radius.
       public: double GetPatchRadius();
 
-      /// \brief Get the torsional friction coefficient.
-      /// \return Torsional friction coefficient.
+      /// \brief Get the torsional curvature radius.
+      /// \return Torsional curvature radius.
       public: double GetCurvatureRadius();
 
-      /// \brief Get the torsional friction coefficient.
-      /// \return Torsional friction coefficient.
+      /// \brief Get the torsional "use curvature" flag.
+      /// \return Torsional "use curvature" flag.
       public: bool GetUseCurvature();
 
       /// \brief Set the friction coefficient in the primary direction.
@@ -81,8 +81,8 @@ namespace gazebo
       /// \param[in] _radius Torsional patch radius.
       public: void SetPatchRadius(double _radius);
 
-      /// \brief Set the surface.
-      /// \param[in] _radius Curvature radius.
+      /// \brief Set the torsional curvature radius.
+      /// \param[in] _radius Torsional curvature radius.
       public: void SetCurvatureRadius(double _radius);
 
       /// \brief Set whether to use the curvature radius.
@@ -116,21 +116,27 @@ namespace gazebo
       /// \brief Array of dry friction coefficients. mu[0] is in the
       /// primary direction as defined by the friction pyramid.
       /// mu[1] is in the second direction.
-      /// mu[2] is in the torsional friction.
+      /// mu[2] is in the torsional direction.
       private: double mu[3];
 
       /// \brief Radius of the contact patch used to calculate torsional
-      /// friction.
+      /// friction. The same patch is used by all contact points in this
+      /// surface.
+      /// The patch is equal to the square root of the surface radius times the
+      /// contact depth: a = srqt(R * d).
       private: double patchRadius;
 
       /// \brief Radius of the surface to be used to calculate torsional
-      /// friction.
+      /// friction. The same radius is used for all contacts points in this
+      /// surface. Note that this is not the inverse of the radius, as a common
+      /// definition of curvature. Instead, it is the radius itself. So for a
+      /// spherical surface with 2m diameter, the curvature radius would be 1m.
       private: double curvatureRadius;
 
       /// \brief Flag for choosing the method for computing the contact
       /// patch radius in torsional friction.
       /// True to use the product of curvature and contact depth,
-      /// false to use the constant patchRadius parameter.
+      /// false to use the constant patch radius parameter.
       private: bool useCurvature;
     };
 
