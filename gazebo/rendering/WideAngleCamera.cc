@@ -45,56 +45,15 @@ void WideAngleCamera::Load()
 
   if(this->sdf->HasElement("projection"))
   {
-    sdf::ElementPtr elem = this->sdf->GetElement("projection");
+    sdf::ElementPtr sdf_projection = this->sdf->GetElement("projection");
 
-    this->projectionType = elem->Get<int>("type");
+    this->projection.Load(sdf_projection);
 
-    if(projectionType == -1)
-    {
-      if(elem->HasElement("custom_function"))
-      {
-        sdf::ElementPtr cust_func = elem->GetElement("custom_function");
-
-        this->c1 = cust_func->Get<double>("c1");
-        this->c2 = cust_func->Get<double>("c2");
-        this->c3 = 0;
-        this->f = cust_func->Get<double>("f");
-        this->fun = cust_func->Get<std::string>("fun");
-
-        this->fun_b = math::Vector2i(1,1);
-
-        if(fun == "tan")
-        {
-          fun_b.x = 0;
-          c3 = 0;
-        } else
-        if(fun == "sin")
-        {
-          fun_b.y = 0;
-          c3 = 0;
-        } else
-        if(fun == "ctan")
-        {
-          fun_b.x = 0;
-          c3 = M_PI/2;
-        } else
-        if(fun == "cos")
-        {
-          fun_b.y = 0;
-          c3 = M_PI/2;
-        } else
-          {
-            gzthrow("Invalid mapping function");
-          }
-      }
-      else
-        gzthrow("You need to specify custom mapping function")
-    }
+    if(sdf_projection->HasElement("cube_tex_resolution"))
+      this->envTextureSize = sdf_projection->Get<int>("cube_tex_resolution");
   }
   else
-  {
-    this->projectionType = 0;
-  }
+    this->projection.Load();
 }
 
 void WideAngleCamera::Fini()
@@ -138,7 +97,9 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
         compMat->getTechnique(0)->getPass(0)->createTextureUnitState();
       }
 
-      gzdbg << "Compositor cubemap texture bound OK " << envCubeMapTexture->getName() << "\n";
+      this->projection.SetCompositorMaterial(this->compMat);
+
+      gzdbg << "Compositor cubemap texture present " << envCubeMapTexture->getName() << "\n";
     }
     else
       gzerr << "Compositor texture MISSING";
@@ -199,6 +160,14 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
   }
 }
 
+void WideAngleCamera::SetEnvTextureSize(int size)
+{
+  if(this->sdf->HasElement("cube_tex_resolution"))
+    this->sdf->AddElement("cube_tex_resolution")->Set(size);
+
+  this->sdf->GetElement("cube_tex_resolution")->Set(size);
+}
+
 void WideAngleCamera::CreateEnvCameras()
 {
   for(int i=0;i<6;i++)
@@ -243,18 +212,7 @@ void WideAngleCamera::RenderImpl()
   compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
     this->envCubeMapTexture->getName());
 
-  Ogre::GpuProgramParametersSharedPtr uniforms =
-    compMat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-
-  uniforms->setNamedConstant("HFOV",(Ogre::Real)Camera::GetHFOV().Radian());
-  uniforms->setNamedConstant("projectionType",this->projectionType);
-
-  uniforms->setNamedConstant("c1",(Ogre::Real)this->c1);
-  uniforms->setNamedConstant("c2",(Ogre::Real)this->c2);
-  uniforms->setNamedConstant("c3",(Ogre::Real)this->c3);
-
-  uniforms->setNamedConstant("f",(Ogre::Real)this->f);
-  uniforms->setNamedConstant("fun",Ogre::Vector2(this->fun_b.x,this->fun_b.y)); 
+  this->projection.SetMaterialVariables();
 
   this->renderTarget->update();
 }
@@ -279,4 +237,234 @@ void WideAngleCamera::SetClipDist()
       break;
     }
   }
+}
+
+void CameraProjection::Init(float c1,float c2,std::string fun,float f,float c3)
+{
+  this->c1 = c1;
+  this->c2 = c2;
+  this->c3 = c3;
+  this->f  = f;
+
+  if(fun == "tan")
+    this->fun = TAN;
+  else if(fun == "sin")
+    this->fun = SIN;
+  else if(fun == "id")
+    this->fun = ID;
+  else if(fun == "cos")
+  {
+    gzthrow("Cosine is not supported for custom mapping functions");
+  }
+  else if(fun == "cot")
+  {
+    gzthrow("Cotangent is not supported for custom mapping functions");
+  }
+  else
+  {
+    std::stringstream sstr;
+    sstr << "Failed to create custom mapping with function [" << fun << "]";
+
+    gzthrow(sstr.str());
+  }
+}
+
+void CameraProjection::Init(std::string name)
+{
+  std::map<std::string,std::tuple<float,float,float,float,std::string> > fun_types;
+
+  // c1,c2,c3,f,fun
+  fun_types.emplace("gnomonical",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan"));
+  fun_types.emplace("stereographic",  std::make_tuple(2.0f,0.5f,0.0f,5.0f,"tan"));
+  fun_types.emplace("equidistant",  std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id"));
+  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,0.5f,0.0f,1.0f,"sin"));
+  fun_types.emplace("orthographic", std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin"));
+
+  std::tuple<float,float,float,float,std::string> params;
+  try
+  {
+    params = fun_types.at(name);
+  }
+  catch(...)
+  {
+    std::stringstream sstr;
+    sstr << "Unknown mapping function [" << name << "]";
+
+    gzthrow(sstr.str());
+  }
+
+  this->Init(
+    std::get<0>(params),
+    std::get<1>(params),
+    std::get<4>(params),
+    std::get<3>(params),
+    std::get<2>(params));
+}
+
+void CameraProjection::Load(sdf::ElementPtr sdf)
+{
+  this->sdf = sdf;
+
+  Load();
+}
+
+void CameraProjection::Load()
+{
+  if(!this->sdf->HasElement("type"))
+    gzthrow("You should specify projection type using <type> element");
+
+  if(this->IsCustom())
+  {
+    if(this->sdf->HasElement("custom_function"))
+    {
+      sdf::ElementPtr cf = this->sdf->GetElement("custom_function");
+
+      this->Init(
+        cf->Get<double>("c1"),
+        cf->Get<double>("c1"),
+        cf->Get<std::string>("fun"),
+        cf->Get<double>("f"));
+    }
+    else
+      gzthrow("You need a <custom_function> element to use this projection type");
+  }
+  else
+    this->Init(this->GetType());
+}
+
+float CameraProjection::GetC1()
+{
+  return this->c1;
+}
+
+float CameraProjection::GetC2()
+{
+  return this->c2;
+}
+
+float CameraProjection::GetC3()
+{
+  return this->c3;
+}
+
+float CameraProjection::GetF()
+{
+  return this->f;
+}
+
+std::string CameraProjection::GetFun()
+{
+  return this->sdf->GetElement("custom_function")->Get<std::string>("fun");
+}
+
+void CameraProjection::SetC1(float c)
+{
+  this->c1 = c;
+
+  if(!this->IsCustom())
+    this->ConvertToCustom();
+
+  this->sdf->GetElement("custom_function")->GetElement("c1")->Set((double)c);
+}
+
+void CameraProjection::SetC2(float c)
+{
+  this->c2 = c;
+
+  if(!this->IsCustom())
+    this->ConvertToCustom();
+
+  this->sdf->GetElement("custom_function")->GetElement("c2")->Set((double)c);
+}
+
+void CameraProjection::SetC3(float c)
+{
+  this->c3 = c;
+
+  if(!this->IsCustom())
+    this->ConvertToCustom();
+
+  // this->sdf->GetElement("custom_function")->GetElement("c3")->Set((double)c);
+}
+
+void CameraProjection::SetF(float f)
+{
+  this->f = f;
+
+  if(!this->IsCustom())
+    this->ConvertToCustom();
+
+  this->sdf->GetElement("custom_function")->GetElement("f")->Set((double)f);
+}
+
+void CameraProjection::SetFun(std::string fun)
+{
+  if(!this->IsCustom())
+    this->ConvertToCustom();
+
+  this->sdf->GetElement("custom_function")->GetElement("fun")->Set(fun);
+
+  this->Load();
+}
+
+void CameraProjection::ConvertToCustom()
+{
+  sdf::ElementPtr cf = this->sdf->AddElement("custom_function");
+
+  cf->AddElement("c1")->Set((double)this->c1);
+  cf->AddElement("c2")->Set((double)this->c2);
+  cf->AddElement("f")->Set((double)this->f);
+  cf->AddElement("fun")->Set(std::string("tan"));  //FIXME: choose appropriate string
+
+  this->SetType("custom");
+}
+
+std::string CameraProjection::GetType()
+{
+  return this->sdf->Get<std::string>("type");
+}
+
+void CameraProjection::SetType(std::string type)
+{
+  this->sdf->GetElement("type")->Set(type);
+}
+
+bool CameraProjection::IsCustom()
+{
+  return GetType() == "custom";
+}
+
+bool CameraProjection::IsFullFrame()
+{
+  return this->sdf->Get<bool>("full_frame");
+}
+
+void CameraProjection::SetCompositorMaterial(Ogre::MaterialPtr material)
+{
+  this->compositorMaterial = material;
+}
+
+void CameraProjection::SetMaterialVariables()
+{
+  Ogre::GpuProgramParametersSharedPtr uniforms =
+    this->compositorMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+
+  // uniforms->setNamedConstant("HFOV",(Ogre::Real)Camera::GetHFOV().Radian());
+  // uniforms->setNamedConstant("projectionType",this->projectionType);
+
+  math::Vector3 fun_m[] = {
+    math::Vector3(1,0,0),
+    math::Vector3(0,1,0),
+    math::Vector3(0,0,1)
+  };
+
+  uniforms->setNamedConstant("c1",(Ogre::Real)this->c1);
+  uniforms->setNamedConstant("c2",(Ogre::Real)this->c2);
+  uniforms->setNamedConstant("c3",(Ogre::Real)this->c3);
+
+  uniforms->setNamedConstant("f",(Ogre::Real)this->f);
+  uniforms->setNamedConstant("fun",Ogre::Vector3(
+      fun_m[this->fun].x,
+      fun_m[this->fun].y,
+      fun_m[this->fun].z));
 }
