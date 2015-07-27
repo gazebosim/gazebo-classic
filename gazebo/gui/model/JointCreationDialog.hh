@@ -68,13 +68,13 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnCreate();
 
-      /// \brief Add a link to the tree.
+      /// \brief Add a link to the list.
       /// \param[in] _linkName Scoped link name.
       private: void OnLinkInserted(const std::string &_linkName);
 
-      /// \brief Remove a link from the tree.
+      /// \brief Remove a link from the list.
       /// \param[in] _linkId Unique link identifying name.
-      private: void OnLinkRemoved(const std::string &_linkId);
+      private: void OnLinkRemoved(const std::string &_linkName);
 
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;

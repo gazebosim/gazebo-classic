@@ -338,10 +338,10 @@ namespace gazebo
       private: std::vector<std::string> scopedLinkedNames;
 
       /// \brief A map of joint type to its string value.
-      private: static std::map<JointMaker::JointType, std::string> jointTypes;
+      public: static std::map<JointMaker::JointType, std::string> jointTypes;
 
       /// \brief A map of joint type to its corresponding material.
-      private: static std::map<JointMaker::JointType, std::string>
+      public: static std::map<JointMaker::JointType, std::string>
           jointMaterials;
 
       /// \brief Inspector for configuring joint properties.
@@ -358,6 +358,15 @@ namespace gazebo
     class GZ_GUI_MODEL_VISIBLE JointData : public QObject
     {
       Q_OBJECT
+
+      /// \brief Open the joint inspector.
+      public: void OpenInspector();
+
+      /// \brief Update joint.
+      public: void Update();
+
+      public: void SetChild(rendering::VisualPtr _vis);
+      public: void SetParent(rendering::VisualPtr _vis);
 
       /// \brief Name of the joint.
       public: std::string name;
@@ -406,9 +415,6 @@ namespace gazebo
 
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;
-
-      /// \brief Open the joint inspector.
-      public: void OpenInspector();
 
       /// \brief Qt Callback when joint inspector is to be opened.
       private slots: void OnOpenInspector();
