@@ -37,8 +37,6 @@ void InRegionEventSource::Load(const sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("region"))
     this->regionName = _sdf->Get<std::string>("region");
-  else
-    gzerr << this->name << " is missing a region element" << std::endl;
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.

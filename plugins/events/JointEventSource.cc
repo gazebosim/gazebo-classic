@@ -15,6 +15,8 @@
  *
 */
 
+#include <string>
+
 #include "JointEventSource.hh"
 
 using namespace gazebo;
@@ -62,14 +64,14 @@ void JointEventSource::Load(const sdf::ElementPtr _sdf)
     this->SetRangeFromString(rangeStr);
     if (this->range == INVALID)
     {
-      gzerr << this->name << " has an invalid \"" << range << " \" range. "
-           " It should be \"position\", \"angle\" or \"force\"" << std::endl;
+      gzerr << this->name << " has an invalid \"" << rangeStr << " \" range. "
+           " It should be \"position\", \"angle\", \"velocity\"  or \"force\"" << std::endl;
     }
   }
   else
   {
     gzerr << this->name << " is missing a range (with a value of "
-          << "\"position\", \"angle\" or \"force\")"
+          << "\"position\", \"angle\", \"velocity\" or \"force\")"
           << std::endl;
   }
 
@@ -99,6 +101,8 @@ void JointEventSource::SetRangeFromString(std::string &_rangeStr)
   else if (_rangeStr == "angle")
     this->range = ANGLE;
   else if (_rangeStr == "force")
+    this->range = FORCE;
+  else if (_rangeStr == "velocity")
     this->range = FORCE;
   else
     this->range = INVALID;
@@ -178,29 +182,34 @@ void JointEventSource::Update()
   bool oldState = this->isTriggered;
   double value = 0;
 
+  double position = this->joint->GetAngle(0).Radian();
+  math::Angle a = this->joint->GetAngle(0);
+  // get a value between -PI and PI
+  a.Normalize();
+  double angle = a.Radian();
+  double force = this->joint->GetForce(0);
+  double velocity = this->joint->GetVelocity(0);
+
   switch (this->range)
   {
     case POSITION:
     {
-      value = this->joint->GetAngle(0).Radian();
+      value = position;
       break;
     }
     case VELOCITY:
     {
-      value = this->joint->GetVelocity(0);
+      value = velocity;
       break;
     }
     case ANGLE:
     {
-      math::Angle a = this->joint->GetAngle(0);
-      // get a value between -PI and PI
-      a.Normalize();
-      value = a.Radian();
+      value = angle;
       break;
     }
     case FORCE:
     {
-      value = this->joint->GetForce(0);
+      value = force;
       break;
     }
     default:
@@ -224,6 +233,11 @@ void JointEventSource::Update()
       json += "\"state\":\"out_of_range\",";
     }
     json += "\"joint\":\"" + this->jointName + "\", ";
+    json += "\"position\":\"" + std::to_string(position) + "\", ";
+    json += "\"velocity\":\"" + std::to_string(velocity) + "\", ";
+    json += "\"force\":\"" + std::to_string(force) + "\", ";
+    if (this->range == ANGLE)
+      json += "\"angle\":\"" + std::to_string(angle) + "\", ";
     json += "\"model\":\"" + this->modelName + "\"";
     json += "}";
     this->Emit(json);

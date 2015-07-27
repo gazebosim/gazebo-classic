@@ -35,6 +35,7 @@ class SimEventsTest : public ServerFixture,
   public: void SpawnAndDeleteModel(const std::string &_physicsEngine);
   public: void ModelInAndOutOfRegion(const std::string &_physicsEngine);
   public: void OccupiedEventSource(const std::string &_physicsEngine);
+  public: void JointEventSource(const std::string &_physicsEngine);
 };
 
 // globals to exchange data between threads
@@ -227,8 +228,67 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.05);
 }
 
+////////////////////////////////////////////////////////////////////////
+// JointEventSource:
+// Load test world, rotate joint and verify that events are generated
+////////////////////////////////////////////////////////////////////////
+void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
+{
+  // simbody stepTo() failure
+  if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
+
+  this->Load("test/worlds/sim_events.world", false, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+
+  // Get the elevator model
+  physics::ModelPtr model = world->GetModel("revoluter");
+  physics::JointPtr joint = model->GetJoint("joint");
+
+
+  // check that after pause, we have received a new event
+  unsigned int count_before = GetEventCount();
+  // rotate joint
+
+  joint->SetAngle(0, math::Angle::Pi);
+  // check for event
+  unsigned int count_after = WaitForNewEvent(count_before);
+  EXPECT_GT(count_after, count_before);
+
+
+/*
+  gzdbg << "Elevator Pose1["
+        << elevatorModel->GetWorldPose().pos << "]\n";
+
+  // Make sure the elevator is on the ground level
+  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 0.08);
+  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 0.07);
+
+  // Spawn a box on the second floor, which should call the elevator up.
+  this->SpawnBox("_my_test_box_", math::Vector3(0.5, 0.5, 0.5),
+      math::Vector3(2, 0, 3.65), math::Vector3(0, 0, 0));
+
+  // Wait for elevator to move. 10 seconds is more than long enough.
+  common::Time::Sleep(10);
+
+  gzdbg << "Elevator Pose2["
+        << elevatorModel->GetWorldPose().pos << "]\n";
+
+  // Make sure the elevator has moved up to the second floor.
+  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 3.08);
+  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.05);
+*/
+}
+
+
+
+
 // Run all test cases
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, SimEventsTest, PHYSICS_ENGINE_VALUES);
+
+TEST_P(SimEventsTest, JointEventSource)
+{
+  JointEventSource(GetParam());
+}
 
 TEST_P(SimEventsTest, SimPauseRun)
 {
