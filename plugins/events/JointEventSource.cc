@@ -103,7 +103,7 @@ void JointEventSource::SetRangeFromString(std::string &_rangeStr)
   else if (_rangeStr == "force")
     this->range = FORCE;
   else if (_rangeStr == "velocity")
-    this->range = FORCE;
+    this->range = VELOCITY;
   else
     this->range = INVALID;
 }
@@ -238,6 +238,9 @@ void JointEventSource::Update()
     json += "\"force\":\"" + std::to_string(force) + "\", ";
     if (this->range == ANGLE)
       json += "\"angle\":\"" + std::to_string(angle) + "\", ";
+
+    json += "\"range\":\"" + this->GetRangeAsString() + "\", ";
+    json += "\"value\":\"" + std::to_string(value) + "\", ";
     json += "\"model\":\"" + this->modelName + "\"";
     json += "}";
     this->Emit(json);
