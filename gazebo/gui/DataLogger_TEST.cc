@@ -38,7 +38,7 @@ void DataLogger_TEST::RecordButton()
         "dataLoggerRecordButton");
 
     // Get the destination label
-    QLineEdit *destPathLabel = dataLogger->findChild<QLineEdit *>(
+    QPlainTextEdit *destPathLabel = dataLogger->findChild<QPlainTextEdit *>(
         "dataLoggerDestnationPathLabel");
 
     // Get the time label
@@ -71,7 +71,7 @@ void DataLogger_TEST::RecordButton()
     recordButton->toggle();
 
     // Wait for a log status return message
-    while (destPathLabel->text().toStdString().find(".log") ==
+    while (destPathLabel->toPlainText().toStdString().find(".log") ==
         std::string::npos)
     {
       // The following line tell QT to process its events. This is vital for
@@ -81,7 +81,7 @@ void DataLogger_TEST::RecordButton()
     }
 
     // Make sure the destination log file is correct.
-    txt = destPathLabel->text().toStdString();
+    txt = destPathLabel->toPlainText().toStdString();
     QVERIFY(txt.find("state.log") != std::string::npos);
 
     // Make sure the status label says "Recording"
@@ -92,7 +92,7 @@ void DataLogger_TEST::RecordButton()
     recordButton->toggle();
 
     // Wait for a log status return message
-    while (destPathLabel->text().toStdString().find(".log") !=
+    while (destPathLabel->toPlainText().toStdString().find(".log") !=
         std::string::npos)
     {
       QCoreApplication::processEvents();
@@ -100,7 +100,7 @@ void DataLogger_TEST::RecordButton()
     }
 
     // Make sure there's no log file (only path)
-    txt = destPathLabel->text().toStdString();
+    txt = destPathLabel->toPlainText().toStdString();
     QVERIFY(txt.find(".log") == std::string::npos);
 
     // Make sure size is back to zero

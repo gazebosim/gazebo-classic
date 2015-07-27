@@ -1,43 +1,35 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
-
-link_directories(
-  ${CCD_LIBRARY_DIRS}
-  ${Boost_LIBRARY_DIRS}
+set (sources ${sources}
+  ode/ODEBallJoint.cc
+  ode/ODECollision.cc
+  ode/ODEFixedJoint.cc
+  ode/ODEGearboxJoint.cc
+  ode/ODEHeightmapShape.cc
+  ode/ODEHinge2Joint.cc
+  ode/ODEHingeJoint.cc
+  ode/ODEJoint.cc
+  ode/ODELink.cc
+  ode/ODEMesh.cc
+  ode/ODEMeshShape.cc
+  ode/ODEMultiRayShape.cc
+  ode/ODEPhysics.cc
+  ode/ODEPolylineShape.cc
+  ode/ODERayShape.cc
+  ode/ODEScrewJoint.cc
+  ode/ODESliderJoint.cc
+  ode/ODESurfaceParams.cc
+  ode/ODEUniversalJoint.cc
+  PARENT_SCOPE
 )
 
-if (WIN32)
-  add_definitions(-DBUILDING_DLL_GZ_PHYSICS_ODE)
-endif()
-
-set (sources
-  ODEBallJoint.cc
-  ODECollision.cc
-  ODEGearboxJoint.cc
-  ODEHeightmapShape.cc
-  ODEHinge2Joint.cc
-  ODEHingeJoint.cc
-  ODEJoint.cc
-  ODELink.cc
-  ODEMesh.cc
-  ODEMeshShape.cc
-  ODEMultiRayShape.cc
-  ODEPhysics.cc
-  ODEPolylineShape.cc
-  ODERayShape.cc
-  ODEScrewJoint.cc
-  ODESliderJoint.cc
-  ODESurfaceParams.cc
-  ODEUniversalJoint.cc
-)
-
-SET (headers
+set (headers
   ode_inc.h
   ODEBallJoint.hh
   ODEBoxShape.hh
   ODECollision.hh
   ODECylinderShape.hh
+  ODEFixedJoint.hh
   ODEGearboxJoint.hh
   ODEHeightmapShape.hh
   ODEHinge2Joint.hh
@@ -65,19 +57,4 @@ set (gtest_sources
 )
 gz_build_tests(${gtest_sources})
 
-gz_add_library(gazebo_physics_ode ${headers} ${sources})
-target_link_libraries(gazebo_physics_ode
-  gazebo_ode
-  gazebo_opcode
-  gazebo_common
-  gazebo_math
-  ${TBB_LIBRARIES}
-)
-
-gz_install_library(gazebo_physics_ode)
 gz_install_includes("physics/ode" ${headers})
-
-# unit tests
-set (gtest_sources
-)
-gz_build_tests(${gtest_sources})

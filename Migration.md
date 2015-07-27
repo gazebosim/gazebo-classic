@@ -1,3 +1,13 @@
+## Gazebo 6.X to 7.X
+
+1. **gazebo rendering libraries**
+    * The following libraries have been removed: `libgazebo_skyx`, `libgazebo_selection_buffer`, `libgazebo_rendering_deferred`. Gazebo now combines all the different rendering libraries into `libgazebo_rendering.so`.
+    * [Pull request #1817](https://bitbucket.org/osrf/gazebo/pull-request/1817)
+
+1. **gazebo physics libraries**
+    * The following libraries have been removed: `libgazebo_ode_physics`, `libgazebo_simbody_physics`, `libgazebo_dart_physics`, and `libgazebo_bullet_physics`. Gazebo now combines all the different physics engine libraries into `libgazebo_physics.so`.
+    * [Pull request #1814](https://bitbucket.org/osrf/gazebo/pull-request/1814)
+    
 ## Gazebo 5.X to 6.X
 
 ### Modifications
@@ -63,6 +73,9 @@
     * [Pull request #1771](https://bitbucket.org/osrf/gazebo/pull-request/1771)
     * [Pull request #1776](https://bitbucket.org/osrf/gazebo/pull-request/1776)
     * [Pull request #1777](https://bitbucket.org/osrf/gazebo/pull-request/1777)
+    * [Pull request #1772](https://bitbucket.org/osrf/gazebo/pull-request/1772)
+    * [Pull request #1773](https://bitbucket.org/osrf/gazebo/pull-request/1773)
+    * [Pull request #1778](https://bitbucket.org/osrf/gazebo/pull-request/1778)
 
 1. Gazebo client's should now use `gazebo/gazebo_client.hh` and `libgazebo_client.so` instead of `gazebo/gazebo.hh` and `libgazebo.so`. This separates running a Gazebo server from a Gazebo client.
 

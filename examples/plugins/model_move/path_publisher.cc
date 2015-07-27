@@ -16,6 +16,7 @@
  */
 #include <iostream>
 #include <math.h>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/common/common.hh"
@@ -32,11 +33,11 @@ int main(int _argc, char *_argv[])
 
   msg.set_model_name("box");
   msgs::Pose *p = msg.add_pose();
-  msgs::Set(p, math::Pose(5, 5, 0, 0, 0, 0));
+  msgs::Set(p, ignition::math::Pose3d(5, 5, 0, 0, 0, 0));
   p = msg.add_pose();
-  msgs::Set(p, math::Pose(5, -5, 0, 0, 0, 0));
+  msgs::Set(p, ignition::math::Pose3d(5, -5, 0, 0, 0, 0));
   p = msg.add_pose();
-  msgs::Set(p, math::Pose(0, 0, 0, 0, 0, 0));
+  msgs::Set(p, ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
   transport::init();
   transport::run();
