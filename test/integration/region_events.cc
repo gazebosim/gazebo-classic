@@ -28,10 +28,11 @@ using namespace gazebo;
 bool SKIP_FAILING_TESTS = true;
 
 // this is the test fixture
-class RegionEventTest : public ServerFixture, public testing::WithParamInterface<const char*>
+class RegionEventTest
+    : public ServerFixture, public testing::WithParamInterface<const char*>
 {
-	public: void ModelEnteringRegion(const std::string &_physicsEngine);
-	public: void ModelLeavingRegion(const std::string &_physicsEngine);
+  public: void ModelEnteringRegion(const std::string &_physicsEngine);
+  public: void ModelLeavingRegion(const std::string &_physicsEngine);
 };
 
 // globals to exchange data between threads
@@ -47,10 +48,10 @@ void ReceiveSimEvent(ConstSimEventPtr &_msg)
 {
   boost::mutex::scoped_lock lock(g_mutex);
   {
-  	g_event_count += 1;
-  	g_event_type = _msg->type();
-  	g_event_name = _msg->name();
-  	g_event_data = _msg->data();
+    g_event_count += 1;
+    g_event_type = _msg->type();
+    g_event_name = _msg->name();
+    g_event_data = _msg->data();
   }
 }
 
@@ -58,7 +59,7 @@ unsigned int GetEventCount()
 {
   boost::mutex::scoped_lock lock(g_mutex);
   {
-  	return g_event_count;
+    return g_event_count;
   }
 }
 
@@ -66,7 +67,7 @@ std::string GetEventType()
 {
   boost::mutex::scoped_lock lock(g_mutex);
   {
-  	return g_event_type;
+    return g_event_type;
   }
 }
 
@@ -74,7 +75,7 @@ std::string GetEventName()
 {
   boost::mutex::scoped_lock lock(g_mutex);
   {
-  	return g_event_name;
+    return g_event_name;
   }
 }
 
@@ -82,7 +83,7 @@ std::string GetEventData()
 {
   boost::mutex::scoped_lock lock(g_mutex);
   {
-  	return g_event_data;
+    return g_event_data;
   }
 }
 
@@ -118,8 +119,8 @@ void RegionEventTest::ModelEnteringRegion(const std::string &_physicsEngine)
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
 
-  transport::SubscriberPtr sceneSub =
-  		node->Subscribe("/gazebo/sim_events", &ReceiveSimEvent);
+  transport::SubscriberPtr sceneSub = node->Subscribe("/gazebo/sim_events",
+      &ReceiveSimEvent);
 
   physics::ModelPtr regionEventBox = world->GetModel("RegionEventBox");
   ASSERT_TRUE(regionEventBox != NULL);
@@ -129,14 +130,13 @@ void RegionEventTest::ModelEnteringRegion(const std::string &_physicsEngine)
 
   unsigned int startingCount = GetEventCount();
   {
-  	iRobotCreate->SetWorldPose(regionEventBox->GetWorldPose());
+    iRobotCreate->SetWorldPose(regionEventBox->GetWorldPose());
   }
   unsigned int endingCount = WaitForNewEvent(startingCount, 10, 100);
 
   ASSERT_GT(endingCount, startingCount);
   ASSERT_STREQ("inclusion", GetEventType().c_str());
   ASSERT_STREQ("model_in_region_event_box", GetEventName().c_str());
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -153,8 +153,8 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
 
-  transport::SubscriberPtr sceneSub =
-  		node->Subscribe("/gazebo/sim_events", &ReceiveSimEvent);
+  transport::SubscriberPtr sceneSub = node->Subscribe("/gazebo/sim_events",
+      &ReceiveSimEvent);
 
   physics::ModelPtr regionEventBox = world->GetModel("RegionEventBox");
   ASSERT_TRUE(regionEventBox != NULL);
@@ -162,25 +162,24 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
   physics::ModelPtr iRobotCreate = world->GetModel("create");
   ASSERT_TRUE(iRobotCreate != NULL);
 
-  math::Pose regionEventBoxPos = regionEventBox ->GetWorldPose();
+  math::Pose regionEventBoxPos = regionEventBox->GetWorldPose();
   math::Pose iRobotCreatePose = iRobotCreate->GetWorldPose();
 
-	iRobotCreate->SetWorldPose(regionEventBox->GetWorldPose());
-	(void)WaitForNewEvent(GetEventCount(), 10, 100);
+  iRobotCreate->SetWorldPose(regionEventBox->GetWorldPose());
+  (void) WaitForNewEvent(GetEventCount(), 10, 100);
 
   unsigned int startingCount = GetEventCount();
   {
-  	math::Pose newPose = regionEventBox->GetWorldPose();
-  	newPose.pos.x += 5.0;
-  	newPose.pos.y += 5.0;
-  	iRobotCreate->SetWorldPose(newPose);
+    math::Pose newPose = regionEventBox->GetWorldPose();
+    newPose.pos.x += 5.0;
+    newPose.pos.y += 5.0;
+    iRobotCreate->SetWorldPose(newPose);
   }
   unsigned int endingCount = WaitForNewEvent(startingCount, 10, 100);
 
   EXPECT_GT(endingCount, startingCount);
   EXPECT_STREQ("inclusion", GetEventType().c_str());
   EXPECT_STREQ("model_in_region_event_box", GetEventName().c_str());
-
 }
 
 // Run all test cases
