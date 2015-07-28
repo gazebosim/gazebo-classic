@@ -17,7 +17,6 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
@@ -26,8 +25,8 @@ using namespace physics;
 //////////////////////////////////////////////////
 FrictionPyramid::FrictionPyramid()
   : patchRadius(0.0)
-  , curvatureRadius(0.0)
-  , useCurvature(0)
+  , surfaceRadius(IGN_DBL_MAX)
+  , usePatchRadius(1)
 {
   this->mu[0] = 1.0;
   this->mu[1] = 1.0;
@@ -64,15 +63,15 @@ double FrictionPyramid::GetPatchRadius()
 }
 
 //////////////////////////////////////////////////
-double FrictionPyramid::GetCurvatureRadius()
+double FrictionPyramid::GetSurfaceRadius()
 {
-  return this->curvatureRadius;
+  return this->surfaceRadius;
 }
 
 //////////////////////////////////////////////////
-bool FrictionPyramid::GetUseCurvature()
+bool FrictionPyramid::GetUsePatchRadius()
 {
-  return this->useCurvature;
+  return this->usePatchRadius;
 }
 
 //////////////////////////////////////////////////
@@ -100,15 +99,15 @@ void FrictionPyramid::SetPatchRadius(double _radius)
 }
 
 //////////////////////////////////////////////////
-void FrictionPyramid::SetCurvatureRadius(double _radius)
+void FrictionPyramid::SetSurfaceRadius(double _radius)
 {
-  this->curvatureRadius = _radius;
+  this->surfaceRadius = _radius;
 }
 
 //////////////////////////////////////////////////
-void FrictionPyramid::SetUseCurvature(bool _use)
+void FrictionPyramid::SetUsePatchRadius(bool _use)
 {
-  this->useCurvature = _use;
+  this->usePatchRadius = _use;
 }
 
 //////////////////////////////////////////////////

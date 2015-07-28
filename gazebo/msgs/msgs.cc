@@ -1800,15 +1800,15 @@ namespace gazebo
           physicsEngElem->GetElement("patch_radius")->Set(
               friction.patch_radius());
         }
-        if (friction.has_curvature_radius())
+        if (friction.has_surface_radius())
         {
-          physicsEngElem->GetElement("curvature_radius")->Set(
-              friction.curvature_radius());
+          physicsEngElem->GetElement("surface_radius")->Set(
+              friction.surface_radius());
         }
-        if (friction.has_use_curvature())
+        if (friction.has_use_patch_radius())
         {
-          physicsEngElem->GetElement("use_curvature")->Set(
-              friction.use_curvature());
+          physicsEngElem->GetElement("use_patch_radius")->Set(
+              friction.use_patch_radius());
         }
         if (friction.has_fdir1())
         {

@@ -354,9 +354,9 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             // M = (3 * pi * mu3 * sqrt (R * d))/16 * F
 
             dReal patch_radius;
-            if (contact.surface.use_curvature)
+            if (!contact.surface.use_patch_radius)
             {
-              patch_radius = sqrt(contact.surface.curvature_radius * depth);
+              patch_radius = sqrt(contact.surface.surface_radius * depth);
             }
             else
             {

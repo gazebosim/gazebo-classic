@@ -63,7 +63,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 
       this->mu3 = surf->GetFrictionPyramid()->GetMuTorsion();
       this->patch = surf->GetFrictionPyramid()->GetPatchRadius();
-      this->radius = surf->GetFrictionPyramid()->GetCurvatureRadius();
+      this->radius = surf->GetFrictionPyramid()->GetSurfaceRadius();
       this->kp = surfODE->kp;
 
       // Get inertial params

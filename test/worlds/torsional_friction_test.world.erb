@@ -227,7 +227,7 @@
               <ode>
                 <mu3><%= mu3 %></mu3>
                 <patch_radius><%= patch_radius %></patch_radius>
-                <use_curvature>false</use_curvature>
+                <use_patch_radius>true</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -293,8 +293,8 @@
             <friction>
               <ode>
                 <mu3><%= mu3 %></mu3>
-                <curvature_radius><%= radius %></curvature_radius>
-                <use_curvature>true</use_curvature>
+                <surface_radius><%= radius %></surface_radius>
+                <use_patch_radius>false</use_patch_radius>
               </ode>
             </friction>
             <contact>

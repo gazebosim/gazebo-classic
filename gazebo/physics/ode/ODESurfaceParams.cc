@@ -92,10 +92,10 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
             frictionOdeElem->Get<double>("mu3"));
           this->frictionPyramid->SetPatchRadius(
             frictionOdeElem->Get<double>("patch_radius"));
-          this->frictionPyramid->SetCurvatureRadius(
-            frictionOdeElem->Get<double>("curvature_radius"));
-          this->frictionPyramid->SetUseCurvature(
-            frictionOdeElem->Get<bool>("use_curvature"));
+          this->frictionPyramid->SetSurfaceRadius(
+            frictionOdeElem->Get<double>("surface_radius"));
+          this->frictionPyramid->SetUsePatchRadius(
+            frictionOdeElem->Get<bool>("use_patch_radius"));
           this->frictionPyramid->direction1 =
             frictionOdeElem->Get<math::Vector3>("fdir1");
 
@@ -138,10 +138,10 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
   _msg.mutable_friction()->set_mu3(this->frictionPyramid->GetMuTorsion());
   _msg.mutable_friction()->set_patch_radius(
       this->frictionPyramid->GetPatchRadius());
-  _msg.mutable_friction()->set_curvature_radius(
-      this->frictionPyramid->GetCurvatureRadius());
-  _msg.mutable_friction()->set_use_curvature(
-      this->frictionPyramid->GetUseCurvature());
+  _msg.mutable_friction()->set_surface_radius(
+      this->frictionPyramid->GetSurfaceRadius());
+  _msg.mutable_friction()->set_use_patch_radius(
+      this->frictionPyramid->GetUsePatchRadius());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
@@ -176,15 +176,15 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
       this->frictionPyramid->SetPatchRadius(
           _msg.friction().patch_radius());
     }
-    if (_msg.friction().has_curvature_radius())
+    if (_msg.friction().has_surface_radius())
     {
-      this->frictionPyramid->SetCurvatureRadius(
-          _msg.friction().curvature_radius());
+      this->frictionPyramid->SetSurfaceRadius(
+          _msg.friction().surface_radius());
     }
-    if (_msg.friction().has_use_curvature())
+    if (_msg.friction().has_use_patch_radius())
     {
-      this->frictionPyramid->SetUseCurvature(
-          _msg.friction().use_curvature());
+      this->frictionPyramid->SetUsePatchRadius(
+          _msg.friction().use_patch_radius());
     }
     if (_msg.friction().has_slip1())
       this->slip1 = _msg.friction().slip1();

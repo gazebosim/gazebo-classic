@@ -1920,10 +1920,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
   item->setValue(_msg.friction().mu3());
   topItem->addSubProperty(item);
 
-  // Use curvature
+  // Use patch radius
   item = this->variantManager->addProperty(QVariant::Bool,
-                                           tr("use_curvature"));
-  item->setValue(_msg.friction().use_curvature());
+                                           tr("use_patch_radius"));
+  item->setValue(_msg.friction().use_patch_radius());
   topItem->addSubProperty(item);
 
   // Patch radius
@@ -1932,10 +1932,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
   item->setValue(_msg.friction().patch_radius());
   topItem->addSubProperty(item);
 
-  // Curvature radius
+  // Surface radius
   item = this->variantManager->addProperty(QVariant::Double,
-                                           tr("curvature_radius"));
-  item->setValue(_msg.friction().curvature_radius());
+                                           tr("surface_radius"));
+  item->setValue(_msg.friction().surface_radius());
   topItem->addSubProperty(item);
 
   // slip1

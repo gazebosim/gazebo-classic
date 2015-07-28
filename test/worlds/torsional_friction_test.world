@@ -566,7 +566,7 @@
               <ode>
                 <mu3>0.005</mu3>
                 <patch_radius>0.0</patch_radius>
-                <use_curvature>false</use_curvature>
+                <use_patch_radius>true</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -618,7 +618,7 @@
               <ode>
                 <mu3>0.005</mu3>
                 <patch_radius>0.1</patch_radius>
-                <use_curvature>false</use_curvature>
+                <use_patch_radius>true</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -670,7 +670,7 @@
               <ode>
                 <mu3>0.005</mu3>
                 <patch_radius>2.0</patch_radius>
-                <use_curvature>false</use_curvature>
+                <use_patch_radius>true</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -722,7 +722,7 @@
               <ode>
                 <mu3>0.005</mu3>
                 <patch_radius>5.0</patch_radius>
-                <use_curvature>false</use_curvature>
+                <use_patch_radius>true</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -774,7 +774,7 @@
               <ode>
                 <mu3>0.005</mu3>
                 <patch_radius>10.0</patch_radius>
-                <use_curvature>false</use_curvature>
+                <use_patch_radius>true</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -827,8 +827,8 @@
             <friction>
               <ode>
                 <mu3>0.005</mu3>
-                <curvature_radius>0.01</curvature_radius>
-                <use_curvature>true</use_curvature>
+                <surface_radius>0.01</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -879,8 +879,8 @@
             <friction>
               <ode>
                 <mu3>0.005</mu3>
-                <curvature_radius>0.1</curvature_radius>
-                <use_curvature>true</use_curvature>
+                <surface_radius>0.1</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -931,8 +931,8 @@
             <friction>
               <ode>
                 <mu3>0.005</mu3>
-                <curvature_radius>0.8</curvature_radius>
-                <use_curvature>true</use_curvature>
+                <surface_radius>0.8</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -983,8 +983,8 @@
             <friction>
               <ode>
                 <mu3>0.005</mu3>
-                <curvature_radius>2.0</curvature_radius>
-                <use_curvature>true</use_curvature>
+                <surface_radius>2.0</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
               </ode>
             </friction>
             <contact>
@@ -1035,8 +1035,8 @@
             <friction>
               <ode>
                 <mu3>0.005</mu3>
-                <curvature_radius>10.0</curvature_radius>
-                <use_curvature>true</use_curvature>
+                <surface_radius>10.0</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
               </ode>
             </friction>
             <contact>
