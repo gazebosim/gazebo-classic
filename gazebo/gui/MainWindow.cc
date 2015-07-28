@@ -634,17 +634,16 @@ void MainWindow::HotkeysChart()
 </table>\
   </div>";
 
-  //QPixmap icon(":images/gazebo_neg_60x71.png");
-/*  QMessageBox chartBox(this);
-  chartBox.setWindowTitle("About Gazebo");
-  chartBox.setTextFormat(Qt::RichText);
-  chartBox.setText(QString::fromStdString(chartTxt));
-  chartBox.setMinimumWidth(2000);
-  chartBox.exec();*/
+  QWebView *view = new QWebView(this);
+  view->setHtml(QString::fromStdString(chartTxt));
 
-    QWebView *view = new QWebView(parent);
-    view->load(QUrl("http://qt-project.org"));
-    view->show();
+  QHBoxLayout *mainLayout = new QHBoxLayout();
+  mainLayout->addWidget(view);
+
+  QDialog *dialog = new QDialog();
+  dialog->setLayout(mainLayout);
+
+  dialog->exec();
 }
 
 /////////////////////////////////////////////////
