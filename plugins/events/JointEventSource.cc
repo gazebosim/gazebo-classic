@@ -88,9 +88,11 @@ void JointEventSource::Load(const sdf::ElementPtr _sdf)
       this->SetRangeFromString(typeStr);
       if (this->range == INVALID)
       {
-        gzerr << this->name << " has an invalid \"" << typeStr << " \" range type. "
+        gzerr << this->name << " has an invalid \"" << typeStr
+            << " \" range type. "
             << " It should be one of: \"position\","
-            << " \"normalized_angle\", \"velocity\"  or \"applied_force\"" << std::endl;
+            << " \"normalized_angle\", \"velocity\"  or \"applied_force\""
+            << std::endl;
       }
     }
     else
@@ -102,7 +104,6 @@ void JointEventSource::Load(const sdf::ElementPtr _sdf)
   {
     gzerr << this->name << " is missing a range element" << std::endl;
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

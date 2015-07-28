@@ -83,7 +83,7 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
       &SimEventsPlugin::OnRequest, this);
 
   // read regions, if any
-  if( this->sdf->HasElement("region"))
+  if (this->sdf->HasElement("region"))
   {
     // regions are defined outside of events, so that they can be shared
     // between events....

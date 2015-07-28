@@ -30,7 +30,6 @@ namespace gazebo
   /// the simulation. Triggers cannot overlap.
   class JointEventSource: public EventSource
   {
-
     /// \enum Range
     /// \brief The type of data range measured
     public: enum Range {
@@ -104,7 +103,7 @@ namespace gazebo
 
     /// \brief True when the joint is currently inside the trigger condition
     private: bool isTriggered;
-
   };
 }
+
 #endif
