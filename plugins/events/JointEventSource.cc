@@ -60,31 +60,49 @@ void JointEventSource::Load(const sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("range"))
   {
-    std::string rangeStr = _sdf->Get<std::string>("range");
-    this->SetRangeFromString(rangeStr);
-    if (this->range == INVALID)
+    sdf::ElementPtr rangeElem =  _sdf->GetElement("range");
+
+    if (rangeElem->HasElement("min"))
     {
-      gzerr << this->name << " has an invalid \"" << rangeStr << " \" range. "
-           " It should be \"position\", \"angle\", \"velocity\"  or \"force\"" << std::endl;
+      this->min = rangeElem->Get<double>("min");
+    }
+    else
+    {
+      gzerr << this->name << ": <range>"
+          << " should have a min element." << std::endl;
+    }
+
+    if (rangeElem->HasElement("max"))
+    {
+      this->max = rangeElem->Get<double>("max");
+    }
+    else
+    {
+      gzerr << this->name << ": <range>"
+          << " should have a max element." << std::endl;
+    }
+
+    if (rangeElem->HasElement("type"))
+    {
+      std::string typeStr = rangeElem->Get<std::string>("type");
+      this->SetRangeFromString(typeStr);
+      if (this->range == INVALID)
+      {
+        gzerr << this->name << " has an invalid \"" << typeStr << " \" range type. "
+            << " It should be one of: \"position\","
+            << " \"normalized_angle\", \"velocity\"  or \"applied_force\"" << std::endl;
+      }
+    }
+    else
+    {
+      gzerr << this->name << ": range is missing a type element" << std::endl;
     }
   }
   else
   {
-    gzerr << this->name << " is missing a range (with a value of "
-          << "\"position\", \"angle\", \"velocity\" or \"force\")"
-          << std::endl;
+    gzerr << this->name << " is missing a range element" << std::endl;
   }
 
-  if (_sdf->HasElement("min") && _sdf->HasElement("max"))
-  {
-    this->min = _sdf->Get<double>("min");
-    this->max = _sdf->Get<double>("max");
-  }
-  else
-  {
-    gzerr << this->name << " should have a <min> and <max> element."
-          << std::endl;
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,9 +116,9 @@ void JointEventSource::SetRangeFromString(std::string &_rangeStr)
 {
   if (_rangeStr == "position")
     this->range = POSITION;
-  else if (_rangeStr == "angle")
+  else if (_rangeStr == "normalized_angle")
     this->range = ANGLE;
-  else if (_rangeStr == "force")
+  else if (_rangeStr == "applied_force")
     this->range = FORCE;
   else if (_rangeStr == "velocity")
     this->range = VELOCITY;
@@ -116,8 +134,8 @@ std::string JointEventSource::GetRangeAsString() const
   {
     case POSITION: rangeStr = "position"; break;
     case VELOCITY: rangeStr = "velocity"; break;
-    case ANGLE: rangeStr = "angle"; break;
-    case FORCE: rangeStr = "force"; break;
+    case ANGLE: rangeStr = "normalized_angle"; break;
+    case FORCE: rangeStr = "applied_force"; break;
     default: rangeStr = "invalid"; break;
   }
   return rangeStr;

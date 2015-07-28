@@ -54,6 +54,7 @@ void ReceiveSimEvent(ConstSimEventPtr &_msg)
   g_event_type = _msg->type();
   g_event_name = _msg->name();
   g_event_data = _msg->data();
+  gzdbg << "ReceiveSimEvent " << g_event_type << std::endl;
 }
 
 // get the count in a thread safe way
@@ -101,7 +102,7 @@ unsigned int WaitForNewEvent(unsigned int current,
 ////////////////////////////////////////////////////////////////////////
 void SimEventsTest::SimPauseRun(const std::string &_physicsEngine)
 {
-  Load("test/worlds/sim_events.world", false, _physicsEngine);
+  Load("worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
 
   // setup the callback that increments the counter everytime a
@@ -132,7 +133,7 @@ void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
 {
   if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
 
-  Load("test/worlds/sim_events.world", false, _physicsEngine);
+  Load("worlds/sim_events.world", false, _physicsEngine);
   // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
   transport::NodePtr node = transport::NodePtr(new transport::Node());
@@ -166,7 +167,7 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   // simbody stepTo() failure
   if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
 
-  Load("test/worlds/sim_events.world", false, _physicsEngine);
+  Load("worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
@@ -237,15 +238,21 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
   // simbody stepTo() failure
   if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
 
-  this->Load("test/worlds/sim_events.world", false, _physicsEngine);
+  this->Load("worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
 
   // Get the elevator model
   physics::ModelPtr model = world->GetModel("revoluter");
   physics::JointPtr joint = model->GetJoint("joint");
 
+  // setup the callback that increments the counter everytime a
+  // SimEvent is emitted.
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
+  transport::SubscriberPtr sceneSub = node->Subscribe("/gazebo/sim_events",
+      &ReceiveSimEvent);
 
-  // check that after pause, we have received a new event
+  // check that after position, we have received a new event
   unsigned int count_before = GetEventCount();
   // rotate joint
 
@@ -253,33 +260,7 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
   // check for event
   unsigned int count_after = WaitForNewEvent(count_before);
   EXPECT_GT(count_after, count_before);
-
-
-/*
-  gzdbg << "Elevator Pose1["
-        << elevatorModel->GetWorldPose().pos << "]\n";
-
-  // Make sure the elevator is on the ground level
-  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 0.08);
-  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 0.07);
-
-  // Spawn a box on the second floor, which should call the elevator up.
-  this->SpawnBox("_my_test_box_", math::Vector3(0.5, 0.5, 0.5),
-      math::Vector3(2, 0, 3.65), math::Vector3(0, 0, 0));
-
-  // Wait for elevator to move. 10 seconds is more than long enough.
-  common::Time::Sleep(10);
-
-  gzdbg << "Elevator Pose2["
-        << elevatorModel->GetWorldPose().pos << "]\n";
-
-  // Make sure the elevator has moved up to the second floor.
-  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 3.08);
-  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.05);
-*/
 }
-
-
 
 
 // Run all test cases

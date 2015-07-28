@@ -82,22 +82,26 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   this->requestSub = this->node->Subscribe("~/request",
       &SimEventsPlugin::OnRequest, this);
 
-  // regions are defined outside of events, so that they can be shared
-  // between events....
-  // and we read them first
-  sdf::ElementPtr child = this->sdf->GetElement("region");
-  while (child)
+  // read regions, if any
+  if( this->sdf->HasElement("region"))
   {
-    Region *r = new Region;
-    r->Load(child);
-    RegionPtr region;
-    region.reset(r);
-    this->regions[region->name] = region;
-    child = child->GetNextElement("region");
+    // regions are defined outside of events, so that they can be shared
+    // between events....
+    // and we read them first
+    sdf::ElementPtr child = this->sdf->GetElement("region");
+    while (child)
+    {
+      Region *r = new Region;
+      r->Load(child);
+      RegionPtr region;
+      region.reset(r);
+      this->regions[region->name] = region;
+      child = child->GetNextElement("region");
+    }
   }
 
   // Reading events
-  child = this->sdf->GetElement("event");
+  sdf::ElementPtr child = this->sdf->GetElement("event");
   while (child)
   {
     // get name and type of each event

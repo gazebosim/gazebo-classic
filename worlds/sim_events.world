@@ -79,15 +79,16 @@
 
     <!-- Joint trigger events -->
     <!-- position (linear or angular) -->
-
     <event>
       <name>joint_position</name>
       <type>joint</type>
       <model>revoluter</model>
       <joint>joint</joint>
-      <range>position</range>
-      <min>5</min>
-      <max>10</max>
+      <range>
+        <type>position</type>
+        <min>5</min>
+        <max>10</max>
+      </range>
     </event>
 
 
@@ -97,9 +98,11 @@
       <type>joint</type>
       <model>revoluter</model>
       <joint>joint</joint>
-      <range>angle</range>
-      <min>3</min>
-      <max>3.3</max>
+      <range>
+        <type>normalized_angle</type>
+        <min>3</min>
+        <max>3.3</max>
+      </range>
     </event>
 
     <!-- Velocity -->
@@ -108,9 +111,11 @@
       <type>joint</type>
       <model>revoluter</model>
       <joint>joint</joint>
-      <range>velocity</range>
-      <min>3</min>
-      <max>3.3</max>
+      <range>
+        <type>velocity</type>
+        <min>3</min>
+        <max>3.3</max>
+      </range>
     </event>
 
 
@@ -120,9 +125,12 @@
       <type>joint</type>
       <model>revoluter</model>
       <joint>joint</joint>
-      <range>force</range>
-      <min>3</min>
-      <max>3.3</max>
+        <type>applied_force</type>
+        <range>
+          <type>applied_force</type>
+          <min>3</min>
+          <max>3.3</max>
+        </range>
     </event>
 
     <!-- Close the plugin element  -->
@@ -186,7 +194,7 @@ Model with a revolute joint
         </link>
 
         <link name='needle'>
-          <pose>0.25 0 0.2 0 -0 0</pose>
+          <pose>0.25 0 -0.2 0 -0 0</pose>
             <visual name='visual'>
               <geometry>
                 <cylinder>
