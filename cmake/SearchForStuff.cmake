@@ -476,7 +476,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 3.0.5)
+set (SDFormat_MIN_VERSION 3.0.0)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
