@@ -17,6 +17,8 @@
 
 #include "gazebo/common/MeshManager.hh"
 
+#include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -60,8 +62,10 @@ void ApplyWrenchVisual::Fini()
   std::vector<std::string> suffixes = {
       "_FORCE_SHAFT_",
       "_FORCE_HEAD_",
+      "_FORCE_TEXT_",
       "_TORQUE_TUBE_",
-      "_TORQUE_HEAD_"};
+      "_TORQUE_HEAD_",
+      "_TORQUE_TEXT_"};
 
   for (auto suffix : suffixes)
   {
@@ -156,6 +160,23 @@ void ApplyWrenchVisual::Load()
   dPtr->forceVisual->SetMaterial(dPtr->unselectedMaterial);
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
 
+  // Force text
+  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::GetMaterialAsColor(dPtr->unselectedMaterial,
+      matAmbient, matDiffuse, matSpecular, matEmissive);
+  dPtr->forceText.Load(this->GetName()+"__FORCE_TEXT__",
+      "0N", "Arial", 0.03, matAmbient);
+  dPtr->forceText.SetShowOnTop(true);
+
+  dPtr->forceText.MovableObject::getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string(dPtr->forceVisual->GetName())));
+
+  Ogre::SceneNode *forceTextNode =
+      dPtr->forceVisual->GetSceneNode()->createChildSceneNode(
+      this->GetName() + "__FORCE_TEXT_NODE__");
+  forceTextNode->attachObject(&(dPtr->forceText));
+  forceTextNode->setInheritScale(false);
+
   // Torque visual
   dPtr->torqueVisual.reset(new rendering::Visual(
       this->GetName() + "_TORQUE_VISUAL_", shared_from_this()));
@@ -205,6 +226,20 @@ void ApplyWrenchVisual::Load()
   dPtr->torqueLine->setMaterial(dPtr->unselectedMaterial);
   dPtr->torqueLine->AddPoint(0, 0, 0);
   dPtr->torqueLine->AddPoint(0, 0, 0.1);
+
+  // Torque text
+  dPtr->torqueText.Load(this->GetName()+"__TORQUE_TEXT__",
+      "0Nm", "Arial", 0.03, matAmbient);
+  dPtr->torqueText.SetShowOnTop(true);
+
+  dPtr->torqueText.MovableObject::getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
+
+  Ogre::SceneNode *torqueTextNode =
+      dPtr->torqueVisual->GetSceneNode()->createChildSceneNode(
+      this->GetName() + "__TORQUE_TEXT_NODE__");
+  torqueTextNode->attachObject(&(dPtr->torqueText));
+  torqueTextNode->setInheritScale(false);
 
   // Rotation manipulator
   dPtr->rotTool.reset(new rendering::SelectionObj(
@@ -278,6 +313,10 @@ void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector,
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
+  std::ostringstream mag;
+  mag << std::fixed << std::setprecision(3) << _forceVector.GetLength();
+  dPtr->forceText.SetText(mag.str() + "N");
+
   dPtr->forceVector = _forceVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
 
@@ -300,6 +339,10 @@ void ApplyWrenchVisual::SetTorque(const math::Vector3 &_torqueVector,
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  std::ostringstream mag;
+  mag << std::fixed << std::setprecision(3) << _torqueVector.GetLength();
+  dPtr->torqueText.SetText(mag.str() + "Nm");
 
   dPtr->torqueVector = _torqueVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
@@ -420,6 +463,12 @@ void ApplyWrenchVisual::Resize()
   dPtr->rotTool->SetScale(math::Vector3(0.75*linkSize,
                                         0.75*linkSize,
                                         0.75*linkSize));
+
+  // Texts
+  double fontSize = 0.1*linkSize;
+  dPtr->forceText.SetCharHeight(fontSize);
+  dPtr->torqueText.SetCharHeight(fontSize);
+  dPtr->forceText.SetBaseline(0.12*linkSize);
 }
 
 ///////////////////////////////////////////////////
