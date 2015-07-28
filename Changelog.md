@@ -361,7 +361,7 @@ compilation on Windows.
 1. Initialize sigact struct fields that valgrind said were being used uninitialized
     * [Pull request #1809](https://bitbucket.org/osrf/gazebo/pull-request/1809)
 
-1. Add Add missing ogre includes to ensure macros are properly defined
+1. Add missing ogre includes to ensure macros are properly defined
     * [Pull request #1813](https://bitbucket.org/osrf/gazebo/pull-request/1813)
 
 1. Use ToSDF functions to simplify physics_friction test
