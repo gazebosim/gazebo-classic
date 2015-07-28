@@ -2,6 +2,9 @@
 1. Set window flags for dialogs and file dialogs
     * [Pull request #1816](https://bitbucket.org/osrf/gazebo/pull-request/1816)
 
+1. Sim events for joint position, velocity and applied force
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+
 1. Log playback GUI for multistep, rewind, forward and seek
     * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
 
@@ -14,7 +17,7 @@
 1. Model editor updates
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
         * [Pull request #1787](https://bitbucket.org/osrf/gazebo/pull-request/1787)
-        
+
     1. Color-coded edges in Schematic View to match joint color.
         * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
 
