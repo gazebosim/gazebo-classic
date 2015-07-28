@@ -142,7 +142,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 5.0.0 QUIET)
+  find_package(DARTCore 5.0.1 QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - ${DARTCore_VERSION} found")
     set (HAVE_DART TRUE)
