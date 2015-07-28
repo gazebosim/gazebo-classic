@@ -109,6 +109,10 @@ void LightMaker_TEST::PointLight()
   // Check there's a light in the scene -- this is the final pointLight
   light = scene->GetLight("user_point_light_0");
   QVERIFY(light != NULL);
+
+  // Terminate
+  mainWindow->close();
+  delete mainWindow;
 }
 
 // Generate a main function for the test

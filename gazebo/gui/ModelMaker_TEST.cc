@@ -117,6 +117,10 @@ void ModelMaker_TEST::SimpleShape()
   // Check the box is in the left panel
   hasBox = mainWindow->HasEntityName("unit_box_0");
   QVERIFY(hasBox);
+
+  // Terminate
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -216,6 +220,10 @@ void ModelMaker_TEST::FromFile()
   // Check the box is in the left panel
   hasBox = mainWindow->HasEntityName("box");
   QVERIFY(hasBox);
+
+  // Terminate
+  mainWindow->close();
+  delete mainWindow;
 }
 
 // Generate a main function for the test
