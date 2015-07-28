@@ -341,13 +341,13 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             // M = torsional moment
             // F = normal force
             // a = patch radius
-            // R = curvature radius
+            // R = surface radius
             // d = depth
             // mu = torsional friction coefficient
             //
             // M = (3 * pi * a * mu3)/16 * F
             //
-            // When using curvature:
+            // When using radius:
             //
             // a = sqrt (R * d)
             //

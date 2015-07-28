@@ -61,6 +61,7 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -111,6 +112,7 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -161,6 +163,7 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -211,6 +214,7 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -261,6 +265,7 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>

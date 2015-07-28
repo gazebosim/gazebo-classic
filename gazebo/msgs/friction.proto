@@ -4,20 +4,46 @@ package gazebo.msgs;
 /// \interface Friction
 /// \brief Information about friction
 
-
 import "vector3d.proto";
 
 message Friction
 {
+  /// \brief Coefficient of friction in the range of [0..1].
   optional double   mu               = 1;
+
+  /// \brief Second coefficient of friction in the range of [0..1].
   optional double   mu2              = 2;
-  optional Vector3d fdir1            = 3;
-  optional double   slip1            = 4;
-  optional double   slip2            = 5;
-  optional double   mu3              = 6;
+
+  /// \brief Torsional coefficient of friction in the range of [0..1].
+  optional double   mu3              = 3;
+
+  /// \brief Direction of mu1 in the collision local reference frame.
+  optional Vector3d fdir1            = 4;
+
+  /// \brief Force dependent slip direction 1 in collision local frame, between
+  /// the range of [0..1].
+  optional double   slip1            = 5;
+
+  /// \brief Force dependent slip direction 2 in collision local frame, between
+  /// the range of [0..1].
+  optional double   slip2            = 6;
+
+  /// \brief Force dependent slip for torsional friction, between the range of
+  /// [0..1].
   optional double   slip3            = 7;
+
+  /// \brief Radius of contact patch surface, used for torsional friction.
   optional double   patch_radius     = 8;
+
+  /// \brief Surface radius on the point of contact, used for torsional
+  /// friction.
   optional double   surface_radius   = 9;
+
+  /// \brief By default, torsional friction is calculated using the
+  /// "patch_radius", which is sqrt(R*d), where "R" is the radius of the
+  /// collision at the contact point (surface_radius) and "d" is the contact
+  /// depth. If this flag is set to true, surface_radius and contact depth
+  /// will be used instead of patch radius.
   optional bool     use_patch_radius = 10;
 }
 

@@ -110,9 +110,9 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
   public: void CoefficientTest(const std::string &_physicsEngine);
 
   /// \brief Use the torsional_friction_test world to test spheres with
-  /// different curvatures.
+  /// different surface radii.
   /// \param[in] _physicsEngine Physics engine to use.
-  public: void CurvatureTest(const std::string &_physicsEngine);
+  public: void RadiusTest(const std::string &_physicsEngine);
 
   /// \brief Use the torsional_friction_test world to test spheres with
   /// different contact depths. It checks if the contact depth is correct for
@@ -176,7 +176,7 @@ void PhysicsTorsionalFrictionTest::DepthTest(
       &PhysicsTorsionalFrictionTest::Callback, this);
 
   // Step for spheres to sink and rest at the final depth
-  world->Step(5000);
+  world->Step(1000);
 
   EXPECT_GT(this->contactsMsg.contact().size(), 0);
 
@@ -203,6 +203,9 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   // Check relevant contacts from message
   for (auto contact : this->contactsMsg.contact())
   {
+    EXPECT_TRUE(contact.has_collision1());
+    EXPECT_TRUE(contact.has_collision2());
+
     if (!(contact.has_collision1() &&
         contact.collision1().find("sphere_mass") == 0))
       continue;
@@ -333,7 +336,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
 }
 
 /////////////////////////////////////////////////
-void PhysicsTorsionalFrictionTest::CurvatureTest(
+void PhysicsTorsionalFrictionTest::RadiusTest(
     const std::string &_physicsEngine)
 {
   if (_physicsEngine != "ode")
@@ -431,9 +434,9 @@ TEST_P(PhysicsTorsionalFrictionTest, CoefficientTest)
 }
 
 /////////////////////////////////////////////////
-TEST_P(PhysicsTorsionalFrictionTest, CurvatureTest)
+TEST_P(PhysicsTorsionalFrictionTest, RadiusTest)
 {
-  CurvatureTest(GetParam());
+  RadiusTest(GetParam());
 }
 
 /////////////////////////////////////////////////
