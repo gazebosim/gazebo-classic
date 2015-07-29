@@ -200,8 +200,7 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
     {
       // linear position
       const double radianAngle = this->dartScrewJoint->getPosition(0);
-      result.SetFromRadian(-radianAngle /
-                           DARTTypes::InvertThreadPitch(dartScrewJoint->getPitch()));
+      result.SetFromRadian(-radianAngle / this->GetThreadPitch());
     }
     else
     {
