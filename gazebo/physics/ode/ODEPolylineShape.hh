@@ -27,7 +27,7 @@ namespace gazebo
     class ODEMesh;
 
     /// \brief ODE polyline shape
-    class GZ_PHYSICS_ODE_VISIBLE ODEPolylineShape : public PolylineShape
+    class GZ_PHYSICS_VISIBLE ODEPolylineShape : public PolylineShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.

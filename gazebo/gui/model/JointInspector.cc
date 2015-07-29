@@ -29,7 +29,8 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("JointInspectorDialog");
   this->setWindowTitle(tr("Joint Inspector"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QVBoxLayout *generalLayout = new QVBoxLayout;
 
