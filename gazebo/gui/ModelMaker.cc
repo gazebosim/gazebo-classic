@@ -64,7 +64,7 @@ ModelMaker::~ModelMaker()
 }
 
 /////////////////////////////////////////////////
-bool ModelMaker::InitFromModel(const std::string & _modelName)
+bool ModelMaker::InitFromModel(const std::string &_modelName)
 {
   ModelMakerPrivate *dPtr =
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
@@ -96,36 +96,6 @@ bool ModelMaker::InitFromModel(const std::string & _modelName)
   }
   dPtr->clone = true;
   return true;
-}
-
-/////////////////////////////////////////////////
-bool ModelMaker::InitFromSDFString(const std::string &_data)
-{
-  ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
-
-  dPtr->clone = false;
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  if (!scene)
-    return false;
-
-  if (dPtr->modelVisual)
-  {
-    scene->RemoveVisual(dPtr->modelVisual);
-    dPtr->modelVisual.reset();
-  }
-
-  dPtr->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("root.sdf", dPtr->modelSDF);
-  sdf::readString(_data, dPtr->modelSDF);
-
-  if (!sdf::readString(_data, dPtr->modelSDF))
-  {
-    gzerr << "Unable to load SDF from data\n";
-    return false;
-  }
-
-  return this->Init();
 }
 
 /////////////////////////////////////////////////

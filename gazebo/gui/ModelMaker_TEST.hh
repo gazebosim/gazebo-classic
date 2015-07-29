@@ -30,6 +30,9 @@ class ModelMaker_TEST : public QTestFixture
 
   /// \brief Test creating a model from a file.
   private slots: void FromFile();
+
+  /// \brief Test creating a model copying another model.
+  private slots: void FromModel();
 };
 
 #endif

@@ -17,6 +17,8 @@
 
 #include "gazebo/common/MouseEvent.hh"
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -220,6 +222,109 @@ void ModelMaker_TEST::FromFile()
   // Check the box is in the left panel
   hasBox = mainWindow->HasEntityName("box");
   QVERIFY(hasBox);
+
+  // Terminate
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void ModelMaker_TEST::FromModel()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/box.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check there's a model but not its copy
+  bool hasModel = mainWindow->HasEntityName("box");
+  bool hasModelClone = mainWindow->HasEntityName("box_clone");
+  QVERIFY(hasModel);
+  QVERIFY(!hasModelClone);
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  QVERIFY(scene != NULL);
+
+  // Check there's a model but no clone in the scene yet
+  gazebo::rendering::VisualPtr vis = scene->GetVisual("box");
+  gazebo::rendering::VisualPtr visClone = scene->GetVisual("box_clone");
+  QVERIFY(vis != NULL);
+  QVERIFY(visClone == NULL);
+
+  // Create a model maker
+  gazebo::gui::ModelMaker *modelMaker = new gazebo::gui::ModelMaker();
+  QVERIFY(modelMaker != NULL);
+
+  // Start the maker to copy the model
+  modelMaker->InitFromModel("box");
+  modelMaker->Start();
+
+  // Check there's still no clone in the left panel
+  hasModelClone = mainWindow->HasEntityName("box_clone");
+  QVERIFY(!hasModelClone);
+
+  // Check there's a clone in the scene -- this is the preview
+  visClone = scene->GetVisual("box_clone_tmp");
+  QVERIFY(visClone != NULL);
+
+  // Check that the clone appeared in the center of the screen
+  ignition::math::Vector3d startPos = modelMaker->EntityPosition();
+  QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
+  QVERIFY(visClone->GetWorldPose().pos == startPos);
+
+  // Mouse move
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+  modelMaker->OnMouseMove(mouseEvent);
+
+  // Check that entity moved
+  ignition::math::Vector3d pos = modelMaker->EntityPosition();
+  QVERIFY(pos != startPos);
+  QVERIFY(visClone->GetWorldPose().pos == pos);
+
+  // Mouse release
+  mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetDragging(false);
+  mouseEvent.SetPressPos(0, 0);
+  mouseEvent.SetPos(0, 0);
+  modelMaker->OnMouseRelease(mouseEvent);
+
+  // Check there's no clone in the scene -- the preview is gone
+  visClone = scene->GetVisual("box_clone_tmp");
+  QVERIFY(visClone == NULL);
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check there's a clone in the scene -- this is the final model
+  visClone = scene->GetVisual("box_clone");
+  QVERIFY(visClone != NULL);
+
+  // Check the clone is in the left panel
+  hasModel = mainWindow->HasEntityName("box_clone");
+  QVERIFY(hasModel);
 
   // Terminate
   mainWindow->close();

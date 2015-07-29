@@ -59,11 +59,6 @@ namespace gazebo
       /// \return True if initialization is successful.
       public: bool InitFromModel(const std::string &_modelName);
 
-      /// \brief Initialize the model maker from an SDF string.
-      /// \param[in] _data String containing SDF for a model.
-      /// \return True if initialization is successful.
-      public: bool InitFromSDFString(const std::string &_data);
-
       /// \brief Initialize the model maker from a file.
       /// \param[in] _filename Path to the file.
       /// \return True if initialization is successful.
