@@ -22,12 +22,12 @@ namespace gazebo
       public: void Load(sdf::ElementPtr sdf);
       public: void Load();
 
-      public: float GetC1();
-      public: float GetC2();
-      public: float GetC3();
-      public: float GetF();
-      public: std::string GetFun();
-      public: float GetCutOffAngle();
+      public: float GetC1() const;
+      public: float GetC2() const;
+      public: float GetC3() const;
+      public: float GetF() const;
+      public: std::string GetFun() const;
+      public: float GetCutOffAngle() const;
 
       public: void SetC1(float c);
       public: void SetC2(float c);
@@ -38,13 +38,13 @@ namespace gazebo
 
       private: void ConvertToCustom();
 
-      public: std::string GetType();
+      public: std::string GetType() const;
 
       public: void SetType(std::string type);
 
-      public: bool IsCustom();
+      public: bool IsCustom() const;
 
-      public: bool IsFullFrame();
+      public: bool IsFullFrame() const;
 
       public: void SetCompositorMaterial(Ogre::MaterialPtr material);
 

@@ -138,11 +138,13 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
   {
     msgs::CameraProjectionCmd msg;
 
-    const CameraProjection *proj = boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
-      this->camera)->GetProjection();
+    rendering::WideAngleCameraPtr wcamera = 
+      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
+
+    const rendering::CameraProjection *proj = wcamera->GetProjection();
 
     msg.set_name(this->GetName());
-    msg.set_direction(msgs::CameraProjectionCmd_CmdDestiny_INFO);
+    msg.set_destiny(msgs::CameraProjectionCmd_CmdDestiny_INFO);
     msg.set_type(proj->GetType());
 
     msg.set_c1(proj->GetC1());
@@ -154,7 +156,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     msg.set_full_frame(proj->IsFullFrame());
     msg.set_cutoff_angle(proj->GetCutOffAngle());
 
-    msg.set_env_texture_size(proj->GetEnvTextureSize());
+    msg.set_env_texture_size(wcamera->GetEnvTextureSize());
 
     this->projPub->Publish(msg);
   }

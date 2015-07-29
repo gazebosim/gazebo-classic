@@ -246,7 +246,7 @@ void WideAngleCamera::SetClipDist()
 
 const CameraProjection *WideAngleCamera::GetProjection()
 {
-  return *this->projection;
+  return &this->projection;
 }
 
 void CameraProjection::Init(float c1,float c2,std::string fun,float f,float c3)
@@ -342,32 +342,32 @@ void CameraProjection::Load()
     this->Init(this->GetType());
 }
 
-float CameraProjection::GetC1()
+float CameraProjection::GetC1() const
 {
   return this->c1;
 }
 
-float CameraProjection::GetC2()
+float CameraProjection::GetC2() const
 {
   return this->c2;
 }
 
-float CameraProjection::GetC3()
+float CameraProjection::GetC3() const
 {
   return this->c3;
 }
 
-float CameraProjection::GetF()
+float CameraProjection::GetF() const
 {
   return this->f;
 }
 
-float CameraProjection::GetCutOffAngle()
+float CameraProjection::GetCutOffAngle() const
 {
   return this->cutOffAngle;
 }
 
-std::string CameraProjection::GetFun()
+std::string CameraProjection::GetFun() const
 {
   return this->sdf->GetElement("custom_function")->Get<std::string>("fun");
 }
@@ -441,7 +441,7 @@ void CameraProjection::ConvertToCustom()
   this->SetType("custom");
 }
 
-std::string CameraProjection::GetType()
+std::string CameraProjection::GetType() const
 {
   return this->sdf->Get<std::string>("type");
 }
@@ -451,12 +451,12 @@ void CameraProjection::SetType(std::string type)
   this->sdf->GetElement("type")->Set(type);
 }
 
-bool CameraProjection::IsCustom()
+bool CameraProjection::IsCustom() const
 {
   return GetType() == "custom";
 }
 
-bool CameraProjection::IsFullFrame()
+bool CameraProjection::IsFullFrame() const
 {
   return this->sdf->Get<bool>("full_frame");
 }
