@@ -110,7 +110,8 @@ namespace gazebo
       /// DART  : linear motion per single rotation.
       public: static double InvertThreadPitch(double _pitch)
       {
-        GZ_ASSERT(_pitch != 0.0, "Zero thread pitch is not allowed.\n");
+        GZ_ASSERT(std::abs(_pitch) > 0.0,
+                  "Zero thread pitch is not allowed.\n");
 
         return -2.0 * M_PI / _pitch;
       }
