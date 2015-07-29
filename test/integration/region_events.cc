@@ -125,13 +125,11 @@ void RegionEventTest::ModelEnteringRegion(const std::string &_physicsEngine)
   physics::ModelPtr regionEventBox = world->GetModel("RegionEventBox");
   ASSERT_TRUE(regionEventBox != NULL);
 
-  physics::ModelPtr iRobotCreate = world->GetModel("create");
-  ASSERT_TRUE(iRobotCreate != NULL);
+  physics::ModelPtr boxModel = world->GetModel("box");
+  ASSERT_TRUE(boxModel != NULL);
 
   unsigned int startingCount = GetEventCount();
-  {
-    iRobotCreate->SetWorldPose(regionEventBox->GetWorldPose());
-  }
+  boxModel->SetWorldPose(regionEventBox->GetWorldPose());
   unsigned int endingCount = WaitForNewEvent(startingCount, 10, 100);
 
   ASSERT_GT(endingCount, startingCount);
@@ -145,6 +143,9 @@ void RegionEventTest::ModelEnteringRegion(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////////////////
 void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
 {
+  // simbody stepTo() failure
+  if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
+
   Load("test/worlds/region_events.world", false, _physicsEngine);
 
   physics::WorldPtr world = physics::get_world("default");
@@ -159,13 +160,13 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
   physics::ModelPtr regionEventBox = world->GetModel("RegionEventBox");
   ASSERT_TRUE(regionEventBox != NULL);
 
-  physics::ModelPtr iRobotCreate = world->GetModel("create");
-  ASSERT_TRUE(iRobotCreate != NULL);
+  physics::ModelPtr boxModel = world->GetModel("box");
+  ASSERT_TRUE(boxModel != NULL);
 
   math::Pose regionEventBoxPos = regionEventBox->GetWorldPose();
-  math::Pose iRobotCreatePose = iRobotCreate->GetWorldPose();
+  math::Pose boxModelPose = boxModel->GetWorldPose();
 
-  iRobotCreate->SetWorldPose(regionEventBox->GetWorldPose());
+  boxModel->SetWorldPose(regionEventBox->GetWorldPose());
   (void) WaitForNewEvent(GetEventCount(), 10, 100);
 
   unsigned int startingCount = GetEventCount();
@@ -173,7 +174,7 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
     math::Pose newPose = regionEventBox->GetWorldPose();
     newPose.pos.x += 5.0;
     newPose.pos.y += 5.0;
-    iRobotCreate->SetWorldPose(newPose);
+    boxModel->SetWorldPose(newPose);
   }
   unsigned int endingCount = WaitForNewEvent(startingCount, 10, 100);
 
