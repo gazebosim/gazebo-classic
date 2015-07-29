@@ -742,7 +742,7 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   else if (geomType == "sphere")
     msgs::AddSphereLink(model, mass, 0.5);
   else
-    msgs::AddBoxLink(model, mass, math::Vector3::One);
+    msgs::AddBoxLink(model, mass, ignition::math::Vector3d::One);
   link->Load(msgs::LinkToSDF(model.link(0)));
 
   MainWindow *mainWindow = gui::get_main_window();
