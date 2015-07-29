@@ -22,7 +22,6 @@
 #include <curl/curl.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <iostream>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>

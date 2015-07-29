@@ -19,7 +19,6 @@
 #define _GAZEBO_MATH_QUATERNION_HH_
 
 #include <math.h>
-#include <iostream>
 #include <cmath>
 #include <ignition/math/Quaternion.hh>
 

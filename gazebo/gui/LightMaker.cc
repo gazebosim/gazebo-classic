@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <iostream>
 #include <sstream>
 
 #include "gazebo/transport/Node.hh"

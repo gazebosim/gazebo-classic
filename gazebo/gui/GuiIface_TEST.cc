@@ -15,7 +15,6 @@
  *
 */
 
-#include <iostream>
 
 #include "gazebo/gui/GuiIface_TEST.hh"
 #include "gazebo/gui/GuiIface.hh"

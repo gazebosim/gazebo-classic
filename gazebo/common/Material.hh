@@ -18,7 +18,6 @@
 #define _MATERIAL_HH_
 
 #include <string>
-#include <iostream>
 #include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 

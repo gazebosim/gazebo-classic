@@ -20,7 +20,6 @@
 #include <ignition/math/Vector2.hh>
 
 #include <math.h>
-#include <iostream>
 #include <fstream>
 #include "gazebo/util/system.hh"
 

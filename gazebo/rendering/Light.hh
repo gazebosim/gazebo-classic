@@ -18,7 +18,6 @@
 #define _LIGHT_HH_
 
 #include <string>
-#include <iostream>
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"

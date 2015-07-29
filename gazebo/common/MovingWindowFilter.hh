@@ -18,7 +18,6 @@
 #ifndef _GAZEBO_MOVING_WINDOW_FILTER_HH_
 #define _GAZEBO_MOVING_WINDOW_FILTER_HH_
 
-#include <iostream>
 #include <vector>
 #include <map>
 

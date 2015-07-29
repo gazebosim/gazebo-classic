@@ -24,7 +24,6 @@
 
 #include <vector>
 #include <utility>
-#include <iostream>
 
 #include "gazebo/msgs/generator/GazeboGenerator.hh"
 

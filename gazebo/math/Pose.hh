@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_POSE_HH_
 #define _GAZEBO_POSE_HH_
 
-#include <iostream>
 
 #include <ignition/math/Pose3.hh>
 

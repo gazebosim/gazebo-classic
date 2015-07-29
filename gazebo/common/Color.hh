@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_COLOR_HH_
 #define _GAZEBO_COLOR_HH_
 
-#include <iostream>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/CommonTypes.hh"

@@ -22,7 +22,6 @@
 #ifndef _BULLETPLANESHAPE_HH_
 #define _BULLETPLANESHAPE_HH_
 
-#include <iostream>
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/PlaneShape.hh"

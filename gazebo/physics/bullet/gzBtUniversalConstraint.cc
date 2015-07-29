@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <iostream>
 #include "gazebo/physics/bullet/gzBtUniversalConstraint.hh"
 
 #define UNIV_EPS btScalar(0.01f)

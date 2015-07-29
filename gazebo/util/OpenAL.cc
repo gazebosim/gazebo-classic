@@ -17,7 +17,6 @@
 #ifndef _WIN32
   #include <stdio.h>
   #include <unistd.h>
-  #include <iostream>
 #endif
 
 #include <gazebo/gazebo_config.h>

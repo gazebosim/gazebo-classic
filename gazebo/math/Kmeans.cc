@@ -16,7 +16,6 @@
 */
 
 #include <algorithm>
-#include <iostream>
 #include <vector>
 #include "gazebo/math/Kmeans.hh"
 #include "gazebo/math/Rand.hh"

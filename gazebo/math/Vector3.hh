@@ -18,7 +18,6 @@
 #define _GAZEBO_VECTOR3_HH_
 
 #include <math.h>
-#include <iostream>
 #include <fstream>
 #include <ignition/math/Vector3.hh>
 

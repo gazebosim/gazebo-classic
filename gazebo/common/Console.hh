@@ -18,7 +18,6 @@
 #ifndef _GAZEBO_CONSOLE_HH_
 #define _GAZEBO_CONSOLE_HH_
 
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>

@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_BOX_HH_
 #define _GAZEBO_BOX_HH_
 
-#include <iostream>
 #include <ignition/math/Box.hh>
 
 #include "gazebo/math/Vector3.hh"

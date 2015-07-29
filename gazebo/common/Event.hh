@@ -19,7 +19,6 @@
 #define _GAZEBO_EVENT_HH_
 
 #include <atomic>
-#include <iostream>
 #include <vector>
 #include <map>
 #include <memory>

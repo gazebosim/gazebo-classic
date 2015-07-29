@@ -22,7 +22,6 @@
 #ifndef _GAZEBO_EXCEPTION_HH_
 #define _GAZEBO_EXCEPTION_HH_
 
-#include <iostream>
 #include <sstream>
 #include <string>
 #include "gazebo/util/system.hh"

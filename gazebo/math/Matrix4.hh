@@ -18,7 +18,6 @@
 #define _GAZEBO_MATRIX4_HH_
 
 #include <assert.h>
-#include <iostream>
 #include <ignition/math/Matrix4.hh>
 
 #include "gazebo/math/Vector3.hh"

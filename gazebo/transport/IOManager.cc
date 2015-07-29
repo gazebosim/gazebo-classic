@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <iostream>
 #include "gazebo/transport/IOManager.hh"
 
 using namespace gazebo;

@@ -23,7 +23,6 @@
 #include <cmath>
 #include <limits>
 #include <string>
-#include <iostream>
 #include <vector>
 
 /// \brief Double maximum value

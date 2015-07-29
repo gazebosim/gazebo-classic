@@ -22,7 +22,6 @@
 #ifndef _VECTOR4_HH_
 #define _VECTOR4_HH_
 
-#include <iostream>
 #include <fstream>
 #include "gazebo/math/Matrix4.hh"
 #include "gazebo/util/system.hh"

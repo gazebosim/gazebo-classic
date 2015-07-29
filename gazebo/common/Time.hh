@@ -21,7 +21,6 @@
 #include <string>
 #include <stdlib.h>
 #include <time.h>
-#include <iostream>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
