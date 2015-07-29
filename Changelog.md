@@ -11,10 +11,13 @@
 1. Tweaks to Data Logger, such as multiline text edit for path
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
 
+1. Added hotkeys chart dialog
+    * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
+
 1. Model editor updates
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
         * [Pull request #1787](https://bitbucket.org/osrf/gazebo/pull-request/1787)
-        
+
     1. Color-coded edges in Schematic View to match joint color.
         * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
 
