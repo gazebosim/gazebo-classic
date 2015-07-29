@@ -259,6 +259,8 @@ void JointEventSource::Update()
       json += "\"angle\":\"" + std::to_string(angle) + "\", ";
 
     json += "\"range\":\"" + this->GetRangeAsString() + "\", ";
+    json += "\"min\":\"" + std::to_string(this->min) + "\", ";
+    json += "\"max\":\"" + std::to_string(this->max) + "\", ";
     json += "\"value\":\"" + std::to_string(value) + "\", ";
     json += "\"model\":\"" + this->modelName + "\"";
     json += "}";
