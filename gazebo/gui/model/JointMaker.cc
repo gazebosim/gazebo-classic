@@ -65,7 +65,7 @@ JointMaker::JointMaker()
   this->jointMaterials[JOINT_SCREW]     = "Gazebo/DarkGrey";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
-  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/Turquoise";
+  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/Indigo";
 
   this->jointTypes[JOINT_FIXED]     = "fixed";
   this->jointTypes[JOINT_HINGE]     = "revolute";
@@ -492,8 +492,15 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
             << std::endl;
       continue;
     }
-    msgs::Set(axisMsg->mutable_xyz(),
-        this->unitVectors[i%this->unitVectors.size()]);
+    if (jointData->type == JointMaker::JOINT_GEARBOX)
+      msgs::Set(axisMsg->mutable_xyz(), ignition::math::Vector3d::UnitZ);
+
+    else
+    {
+      msgs::Set(axisMsg->mutable_xyz(),
+          this->unitVectors[i%this->unitVectors.size()]);
+    }
+
     axisMsg->set_use_parent_model_frame(false);
     axisMsg->set_limit_lower(-GZ_DBL_MAX);
     axisMsg->set_limit_upper(GZ_DBL_MAX);
