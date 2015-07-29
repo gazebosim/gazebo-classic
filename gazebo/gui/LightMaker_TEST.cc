@@ -115,5 +115,96 @@ void LightMaker_TEST::PointLight()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void LightMaker_TEST::CopyLight()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/spotlight.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  QVERIFY(scene != NULL);
+
+  // Check there's a light but no clone in the scene yet
+  gazebo::rendering::LightPtr light = scene->GetLight("spotlight");
+  QVERIFY(light != NULL);
+  light = scene->GetLight("spotlight_clone_tmp");
+  QVERIFY(light == NULL);
+  light = scene->GetLight("spotlight_clone");
+  QVERIFY(light == NULL);
+
+  // Create a generic light maker
+  gazebo::gui::LightMaker *lightMaker = new gazebo::gui::LightMaker();
+  QVERIFY(lightMaker != NULL);
+
+  // Start the maker to copy the light
+  lightMaker->InitFromLight("spotlight");
+  lightMaker->Start();
+
+  // Check there's a light in the scene -- this is the preview
+  light = scene->GetLight("spotlight_clone_tmp");
+  QVERIFY(light != NULL);
+
+  // Check that the light appeared in the center of the screen
+  ignition::math::Vector3d startPos = lightMaker->EntityPosition();
+  QVERIFY(startPos == ignition::math::Vector3d::UnitZ);
+  QVERIFY(light->GetPosition() == startPos);
+
+  // Mouse move
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+  lightMaker->OnMouseMove(mouseEvent);
+
+  // Check that entity moved
+  ignition::math::Vector3d pos = lightMaker->EntityPosition();
+  QVERIFY(pos != startPos);
+  QVERIFY(light->GetPosition() == pos);
+
+  // Mouse release
+  mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetDragging(false);
+  mouseEvent.SetPressPos(0, 0);
+  mouseEvent.SetPos(0, 0);
+  lightMaker->OnMouseRelease(mouseEvent);
+
+  // Check there's no light in the scene -- the preview is gone
+  light = scene->GetLight("spotlight_clone_tmp");
+  QVERIFY(light == NULL);
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check there's a light in the scene -- this is the final light
+  light = scene->GetLight("spotlight_clone");
+  QVERIFY(light != NULL);
+
+  // Terminate
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(LightMaker_TEST)

@@ -253,9 +253,9 @@ void ModelMaker_TEST::FromModel()
 
   // Check there's a model but not its copy
   bool hasModel = mainWindow->HasEntityName("box");
-  bool hasModelClone = mainWindow->HasEntityName("box_clone");
   QVERIFY(hasModel);
-  QVERIFY(!hasModelClone);
+  hasModel = mainWindow->HasEntityName("box_clone");
+  QVERIFY(!hasModel);
 
   // Get scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -263,9 +263,11 @@ void ModelMaker_TEST::FromModel()
 
   // Check there's a model but no clone in the scene yet
   gazebo::rendering::VisualPtr vis = scene->GetVisual("box");
-  gazebo::rendering::VisualPtr visClone = scene->GetVisual("box_clone");
   QVERIFY(vis != NULL);
-  QVERIFY(visClone == NULL);
+  vis = scene->GetVisual("box_clone_tmp");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("box_clone");
+  QVERIFY(vis == NULL);
 
   // Create a model maker
   gazebo::gui::ModelMaker *modelMaker = new gazebo::gui::ModelMaker();
@@ -276,17 +278,21 @@ void ModelMaker_TEST::FromModel()
   modelMaker->Start();
 
   // Check there's still no clone in the left panel
-  hasModelClone = mainWindow->HasEntityName("box_clone");
-  QVERIFY(!hasModelClone);
+  hasModel = mainWindow->HasEntityName("box_clone_tmp");
+  QVERIFY(!hasModel);
+  hasModel = mainWindow->HasEntityName("box_clone");
+  QVERIFY(!hasModel);
 
   // Check there's a clone in the scene -- this is the preview
-  visClone = scene->GetVisual("box_clone_tmp");
-  QVERIFY(visClone != NULL);
+  vis = scene->GetVisual("box_clone");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("box_clone_tmp");
+  QVERIFY(vis != NULL);
 
   // Check that the clone appeared in the center of the screen
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
-  QVERIFY(visClone->GetWorldPose().pos == startPos);
+  QVERIFY(vis->GetWorldPose().pos == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -296,7 +302,7 @@ void ModelMaker_TEST::FromModel()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(visClone->GetWorldPose().pos == pos);
+  QVERIFY(vis->GetWorldPose().pos == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -307,8 +313,8 @@ void ModelMaker_TEST::FromModel()
   modelMaker->OnMouseRelease(mouseEvent);
 
   // Check there's no clone in the scene -- the preview is gone
-  visClone = scene->GetVisual("box_clone_tmp");
-  QVERIFY(visClone == NULL);
+  vis = scene->GetVisual("box_clone_tmp");
+  QVERIFY(vis == NULL);
 
   // Process some events and draw the screen
   for (size_t i = 0; i < 10; ++i)
@@ -319,8 +325,8 @@ void ModelMaker_TEST::FromModel()
   }
 
   // Check there's a clone in the scene -- this is the final model
-  visClone = scene->GetVisual("box_clone");
-  QVERIFY(visClone != NULL);
+  vis = scene->GetVisual("box_clone");
+  QVERIFY(vis != NULL);
 
   // Check the clone is in the left panel
   hasModel = mainWindow->HasEntityName("box_clone");
