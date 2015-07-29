@@ -81,7 +81,7 @@ LinkData::LinkData()
   this->linkSDF.reset(new sdf::Element);
   sdf::initFile("link.sdf", this->linkSDF);
 
-  this->scale = math::Vector3::One;
+  this->scale = ignition::math::Vector3d::One;
 
   this->inspector = new LinkInspector();
   this->inspector->setModal(false);
@@ -133,22 +133,22 @@ void LinkData::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-math::Pose LinkData::GetPose() const
+ignition::math::Pose3d LinkData::GetPose() const
 {
-  return this->linkSDF->Get<math::Pose>("pose");
+  return this->linkSDF->Get<ignition::math::Pose3d>("pose");
 }
 
 /////////////////////////////////////////////////
-void LinkData::SetPose(const math::Pose &_pose)
+void LinkData::SetPose(const ignition::math::Pose3d &_pose)
 {
   this->linkSDF->GetElement("pose")->Set(_pose);
 
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
-  linkConfig->SetPose(_pose);
+  linkConfig->SetPose(math::Pose(_pose));
 }
 
 /////////////////////////////////////////////////
-void LinkData::SetScale(const math::Vector3 &_scale)
+void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 {
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
@@ -192,9 +192,9 @@ void LinkData::SetScale(const math::Vector3 &_scale)
     std::string geomStr = it.first->GetGeometryType();
     if (geomStr == "sphere")
     {
-      double r = this->scale.x;
+      double r = this->scale.X();
       double r3 = r*r*r;
-      double newR = _scale.x;
+      double newR = _scale.X();
       double newR3 = newR*newR*newR;
       // sphere volume: 4/3 * PI * r^3
       newVol += 4.0 / 3.0 * M_PI * newR3;
@@ -202,19 +202,19 @@ void LinkData::SetScale(const math::Vector3 &_scale)
     }
     else if (geomStr == "cylinder")
     {
-      double r = this->scale.x;
+      double r = this->scale.X();
       double r2 = r*r;
-      double newR = _scale.x;
+      double newR = _scale.X();
       double newR2 = newR*newR;
       // cylinder volume: PI * r^2 * height
-      newVol += M_PI * newR2 * _scale.z;
-      oldVol += M_PI * r2 * this->scale.z;
+      newVol += M_PI * newR2 * _scale.Z();
+      oldVol += M_PI * r2 * this->scale.Z();
     }
     else
     {
       // box, mesh, and other geometry types - use bounding box
-      newVol += _scale.x * _scale.y * _scale.z;
-      oldVol += this->scale.x * this->scale.y * this->scale.z;
+      newVol += _scale.X() * _scale.Y() * _scale.Z();
+      oldVol += this->scale.X() * this->scale.Y() * this->scale.Z();
     }
   }
 
@@ -246,7 +246,7 @@ void LinkData::SetScale(const math::Vector3 &_scale)
   double newIyy = iyy;
   double newIzz = izz;
 
-  math::Vector3 dScale = _scale / this->scale;
+  ignition::math::Vector3d dScale = _scale / this->scale;
 
   // we can compute better estimates of inertia values if the link only has
   // one collision made up of a simple shape
@@ -262,7 +262,7 @@ void LinkData::SetScale(const math::Vector3 &_scale)
       double r2 = ixx / (mass * 0.4);
 
       // compute new inertia values based on new mass and radius
-      newIxx = newMass * 0.4 * (dScale.x * dScale.x) * r2;
+      newIxx = newMass * 0.4 * (dScale.X() * dScale.X()) * r2;
       newIyy = newIxx;
       newIzz = newIxx;
     }
@@ -273,10 +273,10 @@ void LinkData::SetScale(const math::Vector3 &_scale)
       double l2 = (ixx / mass - 0.25 * r2) * 12.0;
 
       // compute new inertia values based on new mass, radius and length
-      newIxx = newMass * (0.25 * (dScale.x * dScale.x * r2) +
-          (dScale.z * dScale.z * l2) / 12.0);
+      newIxx = newMass * (0.25 * (dScale.X() * dScale.X() * r2) +
+          (dScale.Z() * dScale.Z() * l2) / 12.0);
       newIyy = newIxx;
-      newIzz = newMass * 0.5 * (dScale.x * dScale.x * r2);
+      newIzz = newMass * 0.5 * (dScale.X() * dScale.X() * r2);
     }
     else
     {
@@ -301,9 +301,9 @@ void LinkData::SetScale(const math::Vector3 &_scale)
     double dy2 = ixxMc - dz2;
 
     // scale inertia size
-    double newDx2 = dScale.x * dScale.x * dx2;
-    double newDy2 = dScale.y * dScale.y * dy2;
-    double newDz2 = dScale.z * dScale.z * dz2;
+    double newDx2 = dScale.X() * dScale.X() * dx2;
+    double newDy2 = dScale.Y() * dScale.Y() * dy2;
+    double newDz2 = dScale.Z() * dScale.Z() * dz2;
 
     // compute new inertia values based on new inertia size
     double newMassConstant = newMass / 12.0;
@@ -319,8 +319,9 @@ void LinkData::SetScale(const math::Vector3 &_scale)
   izzElem->Set(newIzz);
 
   sdf::ElementPtr inertialPoseElem = inertialElem->GetElement("pose");
-  math::Pose newPose = inertialPoseElem->Get<math::Pose>();
-  newPose.pos *= dScale;
+  ignition::math::Pose3d newPose =
+      inertialPoseElem->Get<ignition::math::Pose3d>();
+  newPose.Pos() *= dScale;
 
   inertialPoseElem->Set(newPose);
   linkConfig->SetInertialPose(newPose);
@@ -329,7 +330,7 @@ void LinkData::SetScale(const math::Vector3 &_scale)
 }
 
 /////////////////////////////////////////////////
-math::Vector3 LinkData::GetScale() const
+ignition::math::Vector3d LinkData::GetScale() const
 {
   return this->scale;
 }
@@ -340,7 +341,7 @@ void LinkData::Load(sdf::ElementPtr _sdf)
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
   this->SetName(_sdf->Get<std::string>("name"));
-  this->SetPose(_sdf->Get<math::Pose>("pose"));
+  this->SetPose(_sdf->Get<ignition::math::Pose3d>("pose"));
 
   msgs::LinkPtr linkMsgPtr(new msgs::Link);
   if (_sdf->HasElement("inertial"))
@@ -562,7 +563,7 @@ LinkData* LinkData::Clone(const std::string &_newName)
     rendering::VisualPtr collisionVis = colIt.first->Clone(newColName,
         cloneLink->linkVisual);
     collisionVis->SetTransparency(
-       math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
+       ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
     // fix for transparency alpha compositing
     Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
         getAttachedObject(0);
@@ -917,7 +918,7 @@ void LinkData::OnAddCollision(const std::string &_name)
   this->collisions[collisionVis] = collisionMsg;
 
   collisionVis->SetTransparency(
-      math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
+      ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
 
   // fix for transparency alpha compositing
   Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->

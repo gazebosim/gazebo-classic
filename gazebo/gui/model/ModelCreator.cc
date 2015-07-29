@@ -745,12 +745,6 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
     msgs::AddBoxLink(model, mass, math::Vector3::One);
   link->Load(msgs::LinkToSDF(model.link(0)));
 
-   msgs::AddBoxLink(model, 2, math::Vector3(2, 1, 1));
-   std::cerr << " box 1 " << model.link(1).DebugString() << std::endl;
-    msgs::AddBoxLink(model, 4, math::Vector3(2, 2, 1));
-   std::cerr << " box 4 " << model.link(2).DebugString() << std::endl;
-
-
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
   {
@@ -1359,7 +1353,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->allLinks.end())
     {
       LinkData *link = this->allLinks[this->mouseVisual->GetName()];
-      link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+      link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
     }
 
@@ -1567,7 +1561,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
     gzerr << "Link [" << _name << "] not found." << std::endl;
     return;
   }
-  link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
+  link->SetPose((link->linkVisual->GetWorldPose()-this->modelPose).Ign());
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
   link->inspector->show();
@@ -1664,7 +1658,7 @@ void ModelCreator::GenerateSDF()
     for (auto &linksIt : this->allLinks)
     {
       LinkData *link = linksIt.second;
-      mid += link->GetPose().pos;
+      mid += link->GetPose().Pos();
     }
     if (!this->allLinks.empty())
       mid /= this->allLinks.size();
@@ -1676,7 +1670,7 @@ void ModelCreator::GenerateSDF()
   {
     this->previewVisual->SetWorldPose(this->modelPose);
     LinkData *link = linksIt.second;
-    link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
+    link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
     link->linkVisual->SetPose(link->GetPose());
   }
 
@@ -1891,15 +1885,15 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    if (link->GetPose() != link->linkVisual->GetPose())
+    if (link->GetPose() != link->linkVisual->GetPose().Ign())
     {
-      link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
+      link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
       this->ModelChanged();
     }
     for (auto &scaleIt : this->linkScaleUpdate)
     {
       if (link->linkVisual->GetName() == scaleIt.first)
-        link->SetScale(scaleIt.second);
+        link->SetScale(scaleIt.second.Ign());
     }
     if (!this->linkScaleUpdate.empty())
       this->ModelChanged();

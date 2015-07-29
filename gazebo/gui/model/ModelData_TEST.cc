@@ -56,7 +56,7 @@ void ModelData_TEST::LinkScale()
     gui::LinkData *link = new gui::LinkData();
 
     double mass = 1.0;
-    math::Vector3 size = math::Vector3::One;
+    ignition::math::Vector3d size = ignition::math::Vector3d::One;
 
     // create a link
     msgs::Model model;
@@ -72,7 +72,7 @@ void ModelData_TEST::LinkScale()
     link->AddCollision(collisionVis);
 
     // verify scale
-    math::Vector3 scale = math::Vector3::One;
+    ignition::math::Vector3d scale = ignition::math::Vector3d::One;
     QVERIFY(link->GetScale() == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
@@ -105,19 +105,20 @@ void ModelData_TEST::LinkScale()
     // set new scale and verify inertial values
     {
       // set scale
-      math::Vector3 newScale = math::Vector3(3.0, 2.0, 1.0);
+      ignition::math::Vector3d newScale =
+          ignition::math::Vector3d(3.0, 2.0, 1.0);
       link->SetScale(newScale);
 
       // verify new scale
       QVERIFY(link->GetScale() == newScale);
 
       // change in scale
-      math::Vector3 dScale = newScale / scale;
+      ignition::math::Vector3d dScale = newScale / scale;
 
       // verify new mass
-      double density = mass / (size.x * size.y * size.z);
-      math::Vector3 newSize = dScale * size;
-      double newMass = density * (newSize.x * newSize.y * newSize.z);
+      double density = mass / (size.X() * size.Y() * size.Z());
+      ignition::math::Vector3d newSize = dScale * size;
+      double newMass = density * (newSize.X() * newSize.Y() * newSize.Z());
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
@@ -130,8 +131,6 @@ void ModelData_TEST::LinkScale()
       double newIxy = newInertialMsg.ixy();
       double newIxz = newInertialMsg.ixz();
       double newIyz = newInertialMsg.iyz();
-      std::cerr << inertialElem->ToString("") << std::endl;
-      std::cerr << "!!! " <<  newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
 
       QVERIFY(ignition::math::equal(
           inertiaElem->Get<double>("ixx"), newIxx, 1e-3));
@@ -146,8 +145,6 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(
           inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
 
-
-
       scale = newScale;
       mass = newMass;
       size = newSize;
@@ -156,22 +153,22 @@ void ModelData_TEST::LinkScale()
     // set another scale and verify inertial values
     {
       // set scale
-      math::Vector3 newScale = math::Vector3(1.2, 3.8, 2.5);
+      ignition::math::Vector3d newScale =
+          ignition::math::Vector3d(1.2, 3.8, 2.5);
       link->SetScale(newScale);
 
       // verify new scale
       QVERIFY(link->GetScale() == newScale);
 
       // change in scale
-      math::Vector3 dScale = newScale / scale;
+      ignition::math::Vector3d dScale = newScale / scale;
 
       // verify new mass
-      double density = mass / (size.x * size.y * size.z);
-      math::Vector3 newSize = dScale * size;
-      double newMass = density * (newSize.x * newSize.y * newSize.z);
+      double density = mass / (size.X() * size.Y() * size.Z());
+      ignition::math::Vector3d newSize = dScale * size;
+      double newMass = density * (newSize.X() * newSize.Y() * newSize.Z());
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
-      std::cerr << " == box mass " << mass << ", " << newMass << ", " << massElem->Get<double>() << std::endl;
       // verify new inertia values
       // use msgs::AddBoxLink to help us compute the expected inertia values.
       msgs::AddBoxLink(model, newMass, newScale);
@@ -182,10 +179,6 @@ void ModelData_TEST::LinkScale()
       double newIxy = newInertialMsg.ixy();
       double newIxz = newInertialMsg.ixz();
       double newIyz = newInertialMsg.iyz();
-
-      std::cerr << inertialElem->ToString("") << std::endl;
-      std::cerr << "!!!@@ " << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
-
 
       QVERIFY(ignition::math::equal(
           inertiaElem->Get<double>("ixx"), newIxx, 1e-3));
@@ -225,7 +218,7 @@ void ModelData_TEST::LinkScale()
     link->AddCollision(collisionVis);
 
     // verify scale
-    math::Vector3 scale = math::Vector3::One;
+    ignition::math::Vector3d scale = ignition::math::Vector3d::One;
     QVERIFY(link->GetScale() == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
@@ -258,22 +251,21 @@ void ModelData_TEST::LinkScale()
     // set new scale and verify inertial values
     {
       // set scale
-      math::Vector3 newScale = math::Vector3(8.5, 8.5, 1.5);
+      ignition::math::Vector3d newScale =
+          ignition::math::Vector3d(8.5, 8.5, 1.5);
       link->SetScale(newScale);
 
       // verify new scale
       QVERIFY(link->GetScale() == newScale);
 
       // change in scale
-      math::Vector3 dScale = newScale / scale;
+      ignition::math::Vector3d dScale = newScale / scale;
 
       // verify new mass
       double density = mass / (M_PI*radius*radius*length);
-      double newRadius = radius * dScale.x;
-      double newLength = length * dScale.z;
+      double newRadius = radius * dScale.X();
+      double newLength = length * dScale.Z();
       double newMass = density * (M_PI*newRadius*newRadius*newLength);
-
-      std::cerr << " cylinder mass " << mass << ", " << newMass << ", " << massElem->Get<double>() << std::endl;
 
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
@@ -302,10 +294,6 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(
           inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
 
-      std::cerr << inertialElem->ToString("") << std::endl;
-      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
-
-
       // update variables for next scale operation
       scale = newScale;
       mass = newMass;
@@ -316,23 +304,22 @@ void ModelData_TEST::LinkScale()
     // set another scale and verify inertial values
     {
       // set scale
-      math::Vector3 newScale = math::Vector3(1.2, 1.2, 3.4);
+      ignition::math::Vector3d newScale =
+          ignition::math::Vector3d(1.2, 1.2, 3.4);
       link->SetScale(newScale);
 
       // verify new scale
       QVERIFY(link->GetScale() == newScale);
 
       // change in scale
-      math::Vector3 dScale = newScale / scale;
+      ignition::math::Vector3d dScale = newScale / scale;
 
       // verify new mass
       double density = mass / (M_PI*radius*radius*length);
-      double newRadius = radius * dScale.x;
-      double newLength = length * dScale.z;
+      double newRadius = radius * dScale.X();
+      double newLength = length * dScale.Z();
       double newMass = density * (M_PI*newRadius*newRadius*newLength);
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
-
-      std::cerr << " cylinder mass " << newMass << " " << massElem->Get<double>() << std::endl;
 
       // verify new inertia values
       // use msgs::AddCylinderLink to help us compute
@@ -358,11 +345,6 @@ void ModelData_TEST::LinkScale()
           inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
       QVERIFY(ignition::math::equal(
           inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
-
-      std::cerr << inertialElem->ToString("") << std::endl;
-      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
-
-
     }
     delete link;
   }
@@ -388,7 +370,7 @@ void ModelData_TEST::LinkScale()
     link->AddCollision(collisionVis);
 
     // verify scale
-    math::Vector3 scale = math::Vector3::One;
+    ignition::math::Vector3d scale = ignition::math::Vector3d::One;
     QVERIFY(link->GetScale() == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
@@ -421,22 +403,21 @@ void ModelData_TEST::LinkScale()
     // set new scale and verify inertial values
     {
       // set scale
-      math::Vector3 newScale = math::Vector3(2.5, 2.5, 2.5);
+      ignition::math::Vector3d newScale =
+          ignition::math::Vector3d(2.5, 2.5, 2.5);
       link->SetScale(newScale);
 
       // verify new scale
       QVERIFY(link->GetScale() == newScale);
 
       // change in scale
-      math::Vector3 dScale = newScale / scale;
+      ignition::math::Vector3d dScale = newScale / scale;
 
       // verify new mass
       double density = mass / (4/3*M_PI*radius*radius*radius);
-      double newRadius = radius * dScale.x;
+      double newRadius = radius * dScale.X();
       double newMass = density * (4/3*M_PI*newRadius*newRadius*newRadius);
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
-
-      std::cerr << " sphere mass " << massElem->Get<double>() << " " << newMass << std::endl;
 
       // verify new inertia values
       // use msgs::AddSphereLink to help us compute the expected inertia values.
@@ -462,9 +443,6 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(
           inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
 
-      std::cerr << inertialElem->ToString("") << std::endl;
-      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
-
       // update variables for next scale operation
       scale = newScale;
       mass = newMass;
@@ -474,22 +452,21 @@ void ModelData_TEST::LinkScale()
     // set another scale and verify inertial values
     {
       // set scale
-      math::Vector3 newScale = math::Vector3(3.1, 3.1, 3.1);
+      ignition::math::Vector3d newScale =
+          ignition::math::Vector3d(3.1, 3.1, 3.1);
       link->SetScale(newScale);
 
       // verify new scale
       QVERIFY(link->GetScale() == newScale);
 
       // change in scale
-      math::Vector3 dScale = newScale / scale;
+      ignition::math::Vector3d dScale = newScale / scale;
 
       // verify new mass
       double density = mass / (4/3*M_PI*radius*radius*radius);
-      double newRadius = radius * dScale.x;
+      double newRadius = radius * dScale.X();
       double newMass = density * (4/3*M_PI*newRadius*newRadius*newRadius);
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
-
-      std::cerr << " sphere mass " << massElem->Get<double>() << " " << newMass << std::endl;
 
       // verify new inertia values
       // use msgs::AddSphereLink to help us compute the expected inertia values.
@@ -514,11 +491,6 @@ void ModelData_TEST::LinkScale()
           inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
       QVERIFY(ignition::math::equal(
           inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
-
-      std::cerr << inertialElem->ToString("") << std::endl;
-      std::cerr << newIxx << " " << newIyy << " " << newIzz << " " << newIxy << " " << newIxz << " " << newIyz << std::endl;
-
-
     }
     delete link;
   }
@@ -526,7 +498,6 @@ void ModelData_TEST::LinkScale()
   delete mainWindow;
   mainWindow = NULL;
 }
-
 
 // Generate a main function for the test
 QTEST_MAIN(ModelData_TEST)
