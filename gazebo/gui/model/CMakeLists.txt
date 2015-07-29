@@ -52,7 +52,6 @@ if (ENABLE_SCREEN_TESTS)
     ModelCreator_TEST.cc
     ModelEditor_TEST.cc
     ModelEditorPalette_TEST.cc
-    SchematicViewWidget_TEST.cc
   )
 endif()
 
@@ -76,6 +75,12 @@ if (HAVE_GRAPHVIZ)
     GraphView.cc
     SchematicViewWidget.cc
   )
+
+  if (ENABLE_SCREEN_TESTS)
+    set (qt_tests ${qt_tests}
+      SchematicViewWidget_TEST.cc
+    )
+  endif()
 
   set (libraries_to_link
     ${libraries_to_link}
