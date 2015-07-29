@@ -734,6 +734,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_aboutAct);
 
+  QVERIFY(gazebo::gui::g_hotkeyChartAct);
+
   QVERIFY(gazebo::gui::g_quitAct);
 
   QVERIFY(gazebo::gui::g_resetModelsAct);
@@ -842,6 +844,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_cloneAct);
 
   QVERIFY(!gazebo::gui::g_aboutAct);
+
+  QVERIFY(!gazebo::gui::g_hotkeyChartAct);
 
   QVERIFY(!gazebo::gui::g_quitAct);
 
@@ -1068,6 +1072,51 @@ void MainWindow_TEST::MenuBar()
   }
 
   cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::HotkeyChart()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Check there is no hotkey dialog
+  QDialog *hotkeyChart = mainWindow->findChild<QDialog *>("hotkeyChart");
+  QVERIFY(hotkeyChart == NULL);
+
+  // Trigger hotkey chart action
+  gazebo::gui::g_hotkeyChartAct->trigger();
+
+  // Check that dialog was created and is visible
+  hotkeyChart = mainWindow->findChild<QDialog *>("hotkeyChart");
+  QVERIFY(hotkeyChart != NULL);
+  QVERIFY(hotkeyChart->isVisible());
+
+  // Press Esc to close it
+  QTest::keyClick(hotkeyChart, Qt::Key_Escape);
+
+  // Check the dialog is hidden
+  QVERIFY(!hotkeyChart->isVisible());
+
+  // Trigger hotkey chart action again
+  gazebo::gui::g_hotkeyChartAct->trigger();
+
+  // Check that dialog is open
+  QVERIFY(hotkeyChart->isVisible());
+
+  // Terminate
   mainWindow->close();
   delete mainWindow;
 }

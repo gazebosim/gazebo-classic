@@ -136,9 +136,15 @@ namespace gazebo
       /// \brief Clone a simulation.
       private slots: void Clone();
 
-      private slots: void HotkeysChart();
+      /// \brief Qt callback when the hotkey chart is triggered,
+      private slots: void HotkeyChart();
+
+      /// \brief Qt callback when about is triggered,
       private slots: void About();
+
       private slots: void Step();
+
+      /// \brief Qt callback when the arrow mode is triggered.
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -360,6 +366,9 @@ namespace gazebo
 
       /// \brief Data logger dialog.
       private: gui::DataLogger *dataLogger;
+
+      /// \brief Hotkey chart dialog.
+      private: QDialog *hotkeyDialog;
     };
   }
 }

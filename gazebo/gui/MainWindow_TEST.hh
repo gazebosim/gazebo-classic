@@ -58,6 +58,9 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test that menus are created in the main window menu bar.
   private slots: void MenuBar();
+
+  /// \brief Test opening and closing the hotkey chart
+  private slots: void HotkeyChart();
 };
 
 #endif

@@ -227,6 +227,9 @@ MainWindow::MainWindow()
   this->dataLogger = new gui::DataLogger(this);
   connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
 
+  // Hotkey dialog
+  this->hotkeyDialog = NULL;
+
   this->show();
 }
 
@@ -575,28 +578,50 @@ void MainWindow::About()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::HotkeysChart()
+void MainWindow::HotkeyChart()
 {
-  // Load the html file into the web view
-  QWebView *view = new QWebView(this);
-  view->load(QUrl("qrc:///hotkeyTable.html"));
-  view->setMinimumWidth(1850);
-  view->setMinimumHeight(980);
+  // Opening for the first time
+  if (!this->hotkeyDialog)
+  {
+    // Load the html file into the web view
+    QWebView *view = new QWebView(this);
+    view->load(QUrl("qrc:///hotkeyTable.html"));
 
-  // Layout for the dialog
-  QHBoxLayout *mainLayout = new QHBoxLayout();
-  mainLayout->addWidget(view);
-  mainLayout->setSizeConstraint(QLayout::SetFixedSize);
+    // Can't be higher than main window
+    int desiredHeight = 980;
+    int minHeight = std::min(desiredHeight, (this->height() - 100));
 
-  // The dialog
-  QDialog *dialog = new QDialog();
-  dialog->setLayout(mainLayout);
-  dialog->setWindowTitle("Gazebo Keyboard Reference Chart");
-  dialog->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
-      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
-  dialog->setWindowModality(Qt::NonModal);
+    // Can't be wider than main window
+    int desired2ColumnWidth = 1850;
+    int minWidth = std::min(desired2ColumnWidth, (this->width() - 100));
 
-  dialog->exec();
+    // If too small to fit 2 columns, decrease white space by tightening to
+    // 1 column
+    if (minWidth < desired2ColumnWidth)
+    {
+      int desired1ColumnWidth = 900;
+      minWidth = std::min(desired1ColumnWidth, minWidth);
+    }
+
+    view->setMinimumWidth(minWidth);
+    view->setMinimumHeight(minHeight);
+
+    // Layout for the dialog
+    QHBoxLayout *mainLayout = new QHBoxLayout();
+    mainLayout->addWidget(view);
+    mainLayout->setSizeConstraint(QLayout::SetFixedSize);
+
+    // The dialog
+    this->hotkeyDialog = new QDialog(this);
+    this->hotkeyDialog->setObjectName("hotkeyChart");
+    this->hotkeyDialog->setLayout(mainLayout);
+    this->hotkeyDialog->setWindowTitle("Gazebo Keyboard Shortcuts");
+    this->hotkeyDialog->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+    this->hotkeyDialog->setWindowModality(Qt::NonModal);
+  }
+
+  this->hotkeyDialog->show();
 }
 
 /////////////////////////////////////////////////
@@ -1048,9 +1073,9 @@ void MainWindow::CreateActions()
   g_cloneAct->setStatusTip(tr("Clone the world"));
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
 
-  g_hotkeysChartAct = new QAction(tr("&Hotkeys Chart"), this);
-  g_hotkeysChartAct->setStatusTip(tr("Show the hotkeys chart"));
-  connect(g_hotkeysChartAct, SIGNAL(triggered()), this, SLOT(HotkeysChart()));
+  g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
+  g_hotkeyChartAct->setStatusTip(tr("Show the hotkey chart"));
+  connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
@@ -1555,8 +1580,8 @@ void MainWindow::DeleteActions()
   delete g_cloneAct;
   g_cloneAct = 0;
 
-  delete g_hotkeysChartAct;
-  g_hotkeysChartAct = 0;
+  delete g_hotkeyChartAct;
+  g_hotkeyChartAct = 0;
 
   delete g_aboutAct;
   g_aboutAct = 0;
@@ -1768,7 +1793,7 @@ void MainWindow::CreateMenuBar()
   bar->addSeparator();
 
   QMenu *helpMenu = bar->addMenu(tr("&Help"));
-  helpMenu->addAction(g_hotkeysChartAct);
+  helpMenu->addAction(g_hotkeyChartAct);
   helpMenu->addAction(g_aboutAct);
 }
 
