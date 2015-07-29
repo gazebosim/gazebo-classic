@@ -72,7 +72,7 @@ namespace gazebo
       /// motion or rad / m in metric.
       /// This must be implemented in a child class
       /// \return _threadPitch Thread pitch value.
-      public: virtual double GetThreadPitch() = 0;
+      public: virtual double GetThreadPitch() const = 0;
 
       /// \brief Pitch of the thread.
       protected: double threadPitch;

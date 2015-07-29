@@ -168,7 +168,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint viscous damping coefficient for this joint.
-      public: double GetDamping(unsigned int _index);
+      public: double GetDamping(unsigned int _index) const;
 
       /// \brief Callback to apply spring stiffness and viscous damping
       /// effects to joint.
@@ -197,7 +197,7 @@ namespace gazebo
       ///                   implemented.
       /// \return Joint spring stiffness coefficient for this joint.
       /// \TODO: rename to GetSpringStiffness()
-      public: double GetStiffness(unsigned int _index);
+      public: double GetStiffness(unsigned int _index) const;
 
       /// \brief Get joint spring reference position.
       /// \param[in] _index Index of the axis to get.
@@ -257,7 +257,7 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
-      public: virtual math::Angle GetHighStop(unsigned int _index) = 0;
+      public: virtual math::Angle GetHighStop(unsigned int _index) = 0 const;
 
       /// \brief Get the low stop of an axis(index).
       /// This function is replaced by GetLowerLimit(unsigned int).
@@ -265,12 +265,12 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
-      public: virtual math::Angle GetLowStop(unsigned int _index) = 0;
+      public: virtual math::Angle GetLowStop(unsigned int _index) = 0 const;
 
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
       /// \return Effort limit specified in SDF
-      public: virtual double GetEffortLimit(unsigned int _index);
+      public: virtual double GetEffortLimit(unsigned int _index) const;
 
       /// \brief Set the effort limit on a joint axis.
       /// \param[in] _index Index of the axis to set.
@@ -280,7 +280,7 @@ namespace gazebo
       /// \brief Get the velocity limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
       /// \return Velocity limit specified in SDF
-      public: virtual double GetVelocityLimit(unsigned int _index);
+      public: virtual double GetVelocityLimit(unsigned int _index) const;
 
       /// \brief Set the velocity limit on a joint axis.
       /// \param[in] _index Index of the axis to set.
@@ -325,7 +325,7 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The force applied to an axis.
-      public: virtual double GetForce(unsigned int _index);
+      public: virtual double GetForce(unsigned int _index) const;
 
       /// \brief get internal force and torque values at a joint.
       ///
@@ -349,7 +349,7 @@ namespace gazebo
       /// \param[in] _index Not used right now
       /// \return The force and torque at the joint, see above for details
       /// on conventions.
-      public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
+      public: virtual JointWrench GetForceTorque(unsigned int _index) const = 0;
 
       /// \brief Set the max allowed force of an axis(index) when using
       /// Joint::SetVelocity.

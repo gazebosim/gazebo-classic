@@ -75,7 +75,7 @@ namespace gazebo
 
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
-      public: double GetUpdatePeriod();
+      public: double GetUpdatePeriod() const;
 
       /// \brief Get target real time factor
       /// \return Target real time factor
@@ -205,7 +205,7 @@ namespace gazebo
       /// property map
       /// \brief access functions to set ODE parameters..
       /// \return Auto disable flag.
-      public: virtual bool GetAutoDisableFlag() {return 0;}
+      public: virtual bool GetAutoDisableFlag() const {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
@@ -225,7 +225,7 @@ namespace gazebo
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Maximum number of allows contacts.
-      public: virtual unsigned int GetMaxContacts() {return 0;}
+      public: virtual unsigned int GetMaxContacts() const {return 0;}
 
       /// \brief Set a parameter of the physics engine.
       /// See SetParam documentation for descriptions of duplicate parameters.

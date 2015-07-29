@@ -283,7 +283,7 @@ namespace gazebo
 
       /// \brief check if physics engine is enabled/disabled.
       /// \param True if the physics engine is enabled.
-      public: bool GetEnablePhysicsEngine();
+      public: bool GetEnablePhysicsEngine() const;
 
       /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.

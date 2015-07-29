@@ -155,7 +155,7 @@ namespace gazebo
 
       /// \brief Get the collision state.
       /// \return The collision state.
-      public: CollisionState GetState();
+      public: CollisionState GetState() const;
 
       /// \brief Set the current collision state.
       /// \param[in] The collision state.
@@ -182,7 +182,7 @@ namespace gazebo
       /// \brief returns number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \return max num contacts allowed for this collision.
-      public: virtual unsigned int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts() const;
 
       /// \brief Indicate that the world pose should be recalculated.
       /// The recalculation will be done when Collision::GetWorldPose is

@@ -43,11 +43,11 @@ namespace gazebo
 
       /// \brief Get the friction coefficient in the primary direction.
       /// \return Friction coefficient in primary direction.
-      public: double GetMuPrimary();
+      public: double GetMuPrimary() const;
 
       /// \brief Get the friction coefficient in the secondary direction.
       /// \return Friction coefficient in secondary direction.
-      public: double GetMuSecondary();
+      public: double GetMuSecondary() const;
 
       /// \brief Set the friction coefficient in the primary direction.
       /// \param[in] _mu Friction coefficient.
@@ -62,7 +62,7 @@ namespace gazebo
       /// 1 for secondary direction.
       /// \return Friction coefficient, or negative value if invalid
       /// _index is supplied.
-      private: double GetMu(unsigned int _index);
+      private: double GetMu(unsigned int _index) const;
 
       /// \brief Set the friction coefficient in a single direction.
       /// If a negative value is supplied, use an astronomically high

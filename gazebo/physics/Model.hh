@@ -314,7 +314,7 @@ namespace gazebo
 
       /// \brief Get a handle to the Controller for the joints in this model.
       /// \return A handle to the Controller for the joints in this model.
-      public: JointControllerPtr GetJointController();
+      public: JointControllerPtr GetJointController() const;
 
       /// \brief Get a gripper based on an index.
       /// \return A pointer to a Gripper. Null if the _index is invalid.
