@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,15 +37,12 @@ Battery::Battery(LinkPtr _link)
 
   this->dataPtr->initVoltage = 0.0;
 
-  this->dataPtr->initPowerLoad = 0.0;
-
   this->SetUpdateFunc(boost::bind(&Battery::UpdateDefault, this, _1, _2));
 }
 
 /////////////////////////////////////////////////
 Battery::~Battery()
 {
-  this->dataPtr->link.reset();
   event::Events::DisconnectWorldUpdateEnd(this->dataPtr->connection);
 
   delete this->dataPtr;
@@ -55,6 +52,8 @@ Battery::~Battery()
 /////////////////////////////////////////////////
 void Battery::Load(sdf::ElementPtr _sdf)
 {
+  this->dataPtr->name = _sdf->Get<std::string>("name");
+
   this->UpdateParameters(_sdf);
 
   this->dataPtr->connection = event::Events::ConnectWorldUpdateEnd(
@@ -72,33 +71,30 @@ void Battery::Init()
 void Battery::UpdateParameters(sdf::ElementPtr _sdf)
 {
   this->dataPtr->initVoltage = _sdf->Get<double>("voltage");
-  this->dataPtr->initPowerLoad = _sdf->Get<double>("initial_power_load");
 }
 
 //////////////////////////////////////////////////
-LinkPtr Battery::GetLink() const
+LinkPtr Battery::Link() const
 {
   return this->dataPtr->link;
+}
+
+//////////////////////////////////////////////////
+std::string Battery::Name() const
+{
+  return this->dataPtr->name;
 }
 
 //////////////////////////////////////////////////
 void Battery::InitConsumers()
 {
   this->dataPtr->powerLoads.clear();
-  uint32_t consumerId = this->AddConsumer();
-  this->SetPowerLoad(consumerId, this->dataPtr->initPowerLoad);
 }
 
 /////////////////////////////////////////////////
 uint32_t Battery::AddConsumer()
 {
-  uint32_t consumerId = 0;
-  std::map<uint32_t, double>::const_reverse_iterator it =
-    this->dataPtr->powerLoads.rbegin();
-  if (it != this->dataPtr->powerLoads.rend())
-  {
-    consumerId = it->first + 1;
-  }
+  uint32_t consumerId = this->dataPtr->powerLoads.size();
   this->dataPtr->powerLoads[consumerId] = 0.0;
   return consumerId;
 }
@@ -110,36 +106,43 @@ void Battery::RemoveConsumer(uint32_t _consumerId)
 }
 
 /////////////////////////////////////////////////
-void Battery::SetPowerLoad(uint32_t _consumerId, double _powerLoad)
+bool Battery::SetPowerLoad(uint32_t _consumerId, double _powerLoad)
 {
-  std::map<uint32_t, double>::iterator it =
+  auto iter =
     this->dataPtr->powerLoads.find(_consumerId);
-  if (it != this->dataPtr->powerLoads.end())
-    it->second = _powerLoad;
-  else
+  if (iter == this->dataPtr->powerLoads.end())
+  {
     gzerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
+    return false;
+  }
+
+  iter->second = _powerLoad;
+  return true;
 }
 
 /////////////////////////////////////////////////
-double Battery::GetPowerLoad(uint32_t _consumerId) const
+bool Battery::PowerLoad(uint32_t _consumerId, double &_powerLoad) const
 {
-  std::map<uint32_t, double>::const_iterator it =
+  auto iter =
     this->dataPtr->powerLoads.find(_consumerId);
-  if (it != this->dataPtr->powerLoads.end())
-    return it->second;
-  else
+  if (iter == this->dataPtr->powerLoads.end())
+  {
     gzerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
-  return 0.0;
+    return false;
+  }
+
+  _powerLoad = iter->second;
+  return true;
 }
 
 /////////////////////////////////////////////////
-const std::map<uint32_t, double>& Battery::GetPowerLoads() const
+const std::map<uint32_t, double>& Battery::PowerLoads() const
 {
   return this->dataPtr->powerLoads;
 }
 
 /////////////////////////////////////////////////
-double Battery::GetVoltage() const
+double Battery::Voltage() const
 {
   return this->dataPtr->curVoltage;
 }

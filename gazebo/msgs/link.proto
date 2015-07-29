@@ -28,5 +28,5 @@ message Link
   repeated Sensor sensor        = 11;
   repeated Projector projector  = 12;
   optional bool canonical       = 13;
-  optional Battery battery      = 14;
+  repeated Battery battery      = 14;
 }

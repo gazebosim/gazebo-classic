@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ TEST_F(BatteryTest, Construction)
   physics::BatteryPtr battery(new physics::Battery(physics::LinkPtr()));
   EXPECT_TRUE(battery != NULL);
 
-  EXPECT_DOUBLE_EQ(battery->GetVoltage(), 0.0);
-  EXPECT_EQ(battery->GetPowerLoads().size(), (size_t)0);
+  EXPECT_DOUBLE_EQ(battery->Voltage(), 0.0);
+  EXPECT_EQ(battery->PowerLoads().size(), (size_t)0);
 }
 
 /////////////////////////////////////////////////
@@ -47,11 +47,13 @@ TEST_F(BatteryTest, AddConsumer)
 
   uint32_t consumerId = battery->AddConsumer();
   EXPECT_EQ(consumerId, (uint32_t)0);
-  EXPECT_EQ(battery->GetPowerLoads().size(), (size_t)1);
+  EXPECT_EQ(battery->PowerLoads().size(), (size_t)1);
 
   battery->SetPowerLoad(consumerId, 5.0);
 
-  EXPECT_DOUBLE_EQ(battery->GetPowerLoad(consumerId), 5.0);
+  double powerLoad = 0;
+  EXPECT_EQ(battery->PowerLoad(consumerId, powerLoad), true);
+  EXPECT_DOUBLE_EQ(powerLoad, 5.0);
 }
 
 /////////////////////////////////////////////////
@@ -63,13 +65,15 @@ TEST_F(BatteryTest, RemoveConsumer)
 
   uint32_t consumerId = battery->AddConsumer();
   EXPECT_EQ(consumerId, (uint32_t)0);
-  EXPECT_EQ(battery->GetPowerLoads().size(), (size_t)1);
+  EXPECT_EQ(battery->PowerLoads().size(), (size_t)1);
 
-  battery->SetPowerLoad(consumerId, 1.0);
-  EXPECT_DOUBLE_EQ(battery->GetPowerLoad(consumerId), 1.0);
+  double powerLoad = 1.0;
+  EXPECT_EQ(battery->SetPowerLoad(consumerId, powerLoad), true);
+  EXPECT_EQ(battery->PowerLoad(consumerId, powerLoad), true);
+  EXPECT_DOUBLE_EQ(powerLoad, 1.0);
 
   battery->RemoveConsumer(consumerId);
-  EXPECT_EQ(battery->GetPowerLoads().size(), (size_t)0);
+  EXPECT_EQ(battery->PowerLoads().size(), (size_t)0);
 }
 
 /////////////////////////////////////////////////
@@ -82,15 +86,19 @@ TEST_F(BatteryTest, SetPowerLoad)
   // Add two consumers
   uint32_t consumerId1 = battery->AddConsumer();
   uint32_t consumerId2 = battery->AddConsumer();
-  EXPECT_EQ(battery->GetPowerLoads().size(), (size_t)2);
+  EXPECT_EQ(battery->PowerLoads().size(), (size_t)2);
 
   // Set consumers power load
-  battery->SetPowerLoad(consumerId1, 1.0);
-  battery->SetPowerLoad(consumerId2, 2.0);
+  double powerLoad1 = 1.0;
+  double powerLoad2 = 2.0;
+  EXPECT_EQ(battery->SetPowerLoad(consumerId1, powerLoad1), true);
+  EXPECT_EQ(battery->SetPowerLoad(consumerId2, powerLoad2), true);
 
   // Check consumers power load
-  EXPECT_DOUBLE_EQ(battery->GetPowerLoad(consumerId1), 1.0);
-  EXPECT_DOUBLE_EQ(battery->GetPowerLoad(consumerId2), 2.0);
+  EXPECT_EQ(battery->PowerLoad(consumerId1, powerLoad1), true);
+  EXPECT_DOUBLE_EQ(powerLoad1, 1.0);
+  EXPECT_EQ(battery->PowerLoad(consumerId2, powerLoad2), true);
+  EXPECT_DOUBLE_EQ(powerLoad1, 2.0);
 }
 
 class BatteryUpdateFixture
@@ -106,7 +114,6 @@ TEST_F(BatteryTest, SetUpdateFunc)
 {
   int N = 10;
   const double initVoltage = 12.0;
-  const double initPowerLoad = 3.0;
 
   std::ostringstream batteryStr;
   batteryStr << "<sdf version ='" << SDF_VERSION << "'>"
@@ -114,7 +121,6 @@ TEST_F(BatteryTest, SetUpdateFunc)
     << "<link name ='link'>"
     <<   "<battery>"
     <<     "<voltage>" << initVoltage << "</voltage>"
-    <<     "<initial_power_load>" << initPowerLoad << "</initial_power_load>"
     <<   "</battery>"
     << "</link>"
     << "</model>"
@@ -138,6 +144,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
   battery->Load(elem);
 
   battery->Init();
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage);
 
   BatteryUpdateFixture fixture;
   fixture.step = -0.1;
@@ -147,7 +154,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
   for (int i = 0; i < N; ++i)
     gazebo::event::Events::worldUpdateEnd();
 
-  EXPECT_DOUBLE_EQ(battery->GetVoltage(), initVoltage + N * fixture.step);
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage + N * fixture.step);
 
   // Reinitialize the battery, and expect the same result
   battery->Init();
@@ -155,7 +162,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
   for (int i = 0; i < N; ++i)
     gazebo::event::Events::worldUpdateEnd();
 
-  EXPECT_DOUBLE_EQ(battery->GetVoltage(), initVoltage + N * fixture.step);
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage + N * fixture.step);
 }
 
 int main(int argc, char **argv)

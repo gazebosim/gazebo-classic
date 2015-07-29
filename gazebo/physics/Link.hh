@@ -555,9 +555,19 @@ namespace gazebo
         const LinkPtr &_originalParentLink,
         Link_V &_connectedLinks, bool _fistLink = false);
 
-      /// \brief Get the battery of the link.
-      /// \return Battery of the link.
-      public: BatteryPtr GetBattery() const {return this->battery;}
+      /// \brief Get a battery by name.
+      /// \param[in] _name Name of the battery to get.
+      /// \return Pointer to the battery, NULL if the name is invalid.
+      public: BatteryPtr GetBattery(const std::string &_name) const;
+
+      /// \brief Get a battery based on an index.
+      /// \return A pointer to a Battery. Null if the _index is invalid.
+      public: BatteryPtr GetBattery(size_t _index) const;
+
+      /// \brief Get the number of batteries in this link.
+      /// \return Size of this->batteries array.
+      /// \sa Link::GetBattery()
+      public: size_t GetBatteryCount() const;
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
@@ -598,6 +608,10 @@ namespace gazebo
       /// \brief Process the message and add force and torque.
       /// \param[in] _msg The message to set the wrench from.
       private: void ProcessWrenchMsg(const msgs::Wrench &_msg);
+
+      /// \brief Load a battery.
+      /// \param[in] _sdf SDF parameter.
+      private: void LoadBattery(sdf::ElementPtr _sdf);
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
@@ -668,6 +682,9 @@ namespace gazebo
 
       /// \brief Battery properties of the link.
       private: BatteryPtr battery;
+
+      /// \brief All the attached batteries.
+      private: std::vector<BatteryPtr> batteries;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
