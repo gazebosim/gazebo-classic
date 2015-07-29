@@ -150,7 +150,7 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
 {
   this->threadPitch = _threadPitch;
 
-  this->dartScrewJoint->setPitch(DARTTypes::ConvPitch(_threadPitch));
+  this->dartScrewJoint->setPitch(DARTTypes::InvertThreadPitch(_threadPitch));
 }
 
 //////////////////////////////////////////////////
@@ -168,7 +168,7 @@ double DARTScrewJoint::GetThreadPitch()
   double result = this->threadPitch;
 
   if (this->dartScrewJoint)
-    result = DARTTypes::ConvPitch(this->dartScrewJoint->getPitch());
+    result = DARTTypes::InvertThreadPitch(this->dartScrewJoint->getPitch());
   else
     gzwarn << "dartScrewJoint not created yet, returning cached threadPitch.\n";
 
@@ -201,7 +201,7 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
       // linear position
       const double radianAngle = this->dartScrewJoint->getPosition(0);
       result.SetFromRadian(-radianAngle /
-                           DARTTypes::ConvPitch(dartScrewJoint->getPitch()));
+                           DARTTypes::InvertThreadPitch(dartScrewJoint->getPitch()));
     }
     else
     {
