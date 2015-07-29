@@ -355,8 +355,11 @@ bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &_type)
 {
-  if (this->dataPtr->viewController->GetTypeString() == _type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
   std::string vc = this->dataPtr->viewController->GetTypeString();
 
@@ -364,6 +367,8 @@ void UserCamera::SetViewController(const std::string &_type)
   {
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
     this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
   }
   else if (_type == OrthoViewController::GetTypeString())
   {
@@ -377,24 +382,32 @@ void UserCamera::SetViewController(const std::string &_type)
     }
     else
       this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
   }
   else if (_type == FPSViewController::GetTypeString())
   {
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
     this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
   }
   else
-    gzthrow("Invalid view controller type: " + _type);
-
-  this->dataPtr->prevViewControllerName = vc;
+  {
+    gzerr << "Invalid view controller type[" << _type << "]. "
+      << "The view controller is not changed.\n";
+  }
 }
 
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &_type,
                                    const math::Vector3 &_pos)
 {
-  if (this->dataPtr->viewController->GetTypeString() == _type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
   std::string vc = this->dataPtr->viewController->GetTypeString();
 
@@ -835,7 +848,7 @@ bool UserCamera::SetProjectionType(const std::string &_type)
 {
   if (_type == "orthographic")
     this->SetViewController("ortho");
-  else
+  else if (!this->dataPtr->prevViewControllerName.empty())
     this->SetViewController(this->dataPtr->prevViewControllerName);
 
   return Camera::SetProjectionType(_type);
