@@ -27,8 +27,11 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/ApplyWrenchVisual.hh"
 
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ApplyWrenchDialogPrivate.hh"
@@ -42,6 +45,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   : QDialog(_parent), dataPtr(new ApplyWrenchDialogPrivate)
 {
   this->setObjectName("ApplyWrenchDialog");
+  this->dataPtr->mainWindow = gui::get_main_window();
 
   this->setWindowTitle(tr("Apply Force and Torque"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
@@ -413,6 +417,13 @@ void ApplyWrenchDialog::Init(const std::string &_modelName,
 
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
 
+  if (g_rotateAct)
+    connect(g_rotateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  if (g_translateAct)
+    connect(g_translateAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+  if (g_scaleAct)
+    connect(g_scaleAct, SIGNAL(triggered()), this, SLOT(OnManipulation()));
+
   this->move(QCursor::pos());
   this->show();
   this->ActivateWindow();
@@ -421,6 +432,9 @@ void ApplyWrenchDialog::Init(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::Fini()
 {
+  if (this->dataPtr->mainWindow)
+    this->dataPtr->mainWindow->removeEventFilter(this);
+
   this->dataPtr->wrenchPub.reset();
   this->dataPtr->node->Fini();
   this->dataPtr->connections.clear();
@@ -428,6 +442,10 @@ void ApplyWrenchDialog::Fini()
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+    MouseEventHandler::Instance()->RemovePressFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+    MouseEventHandler::Instance()->RemoveMoveFilter(
         "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
 
     this->dataPtr->applyWrenchVisual->Fini();
@@ -563,6 +581,10 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   this->dataPtr->wrenchPub =
       this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
 
+  // Filter main window activate events
+  if (this->dataPtr->mainWindow)
+    this->dataPtr->mainWindow->installEventFilter(this);
+
   // MouseRelease filter to gain focus
   if (this->dataPtr->applyWrenchVisual)
   {
@@ -577,6 +599,13 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::SetLink(const QString _linkName)
 {
+  // Remove previous link's filter
+  if (this->dataPtr->applyWrenchVisual)
+  {
+    MouseEventHandler::Instance()->RemoveReleaseFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+  }
+
   if (!this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString()))
     this->Fini();
 }
@@ -585,9 +614,9 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
 void ApplyWrenchDialog::OnApplyAll()
 {
   msgs::Wrench msg;
-  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
-  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
-  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector);
+  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector.Ign());
+  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
+  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
 
   this->dataPtr->wrenchPub->Publish(msg);
 }
@@ -596,9 +625,9 @@ void ApplyWrenchDialog::OnApplyAll()
 void ApplyWrenchDialog::OnApplyForce()
 {
   msgs::Wrench msg;
-  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
-  msgs::Set(msg.mutable_torque(), math::Vector3::Zero);
-  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector);
+  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector.Ign());
+  msgs::Set(msg.mutable_torque(), ignition::math::Vector3d::Zero);
+  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
 
   this->dataPtr->wrenchPub->Publish(msg);
 }
@@ -607,8 +636,8 @@ void ApplyWrenchDialog::OnApplyForce()
 void ApplyWrenchDialog::OnApplyTorque()
 {
   msgs::Wrench msg;
-  msgs::Set(msg.mutable_force(), math::Vector3::Zero);
-  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
+  msgs::Set(msg.mutable_force(), ignition::math::Vector3d::Zero);
+  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
 
   this->dataPtr->wrenchPub->Publish(msg);
 }
@@ -737,8 +766,12 @@ void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetForce(const math::Vector3 &_force)
+void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
+    const bool _rotatedByMouse)
 {
+  // This can be called from the dialog or the mouse
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   this->dataPtr->forceVector = _force;
 
   // Spins
@@ -747,6 +780,19 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force)
   this->SetSpinValue(this->dataPtr->forceZSpin, _force.z);
   this->SetSpinValue(this->dataPtr->forceMagSpin, _force.GetLength());
 
+  // Mode
+  if (_force == math::Vector3::Zero)
+  {
+    if (this->dataPtr->torqueVector == math::Vector3::Zero)
+      this->SetMode(Mode::NONE);
+    else
+      this->SetMode(Mode::TORQUE);
+  }
+  else
+  {
+    this->SetMode(Mode::FORCE);
+  }
+
   // Visuals
   if (!this->dataPtr->applyWrenchVisual)
   {
@@ -754,12 +800,16 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force)
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetForce(_force);
+  this->dataPtr->applyWrenchVisual->SetForce(_force, _rotatedByMouse);
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque)
+void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
+    const bool _rotatedByMouse)
 {
+  // This can be called from the dialog or the mouse
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   this->dataPtr->torqueVector = _torque;
 
   // Spins
@@ -768,6 +818,19 @@ void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque)
   this->SetSpinValue(this->dataPtr->torqueZSpin, _torque.z);
   this->SetSpinValue(this->dataPtr->torqueMagSpin, _torque.GetLength());
 
+  // Mode
+  if (_torque == math::Vector3::Zero)
+  {
+    if (this->dataPtr->forceVector == math::Vector3::Zero)
+      this->SetMode(Mode::NONE);
+    else
+      this->SetMode(Mode::FORCE);
+  }
+  else
+  {
+    this->SetMode(Mode::TORQUE);
+  }
+
   // Visuals
   if (!this->dataPtr->applyWrenchVisual)
   {
@@ -775,7 +838,7 @@ void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque)
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetTorque(_torque);
+  this->dataPtr->applyWrenchVisual->SetTorque(_torque, _rotatedByMouse);
 }
 
 /////////////////////////////////////////////////
@@ -867,31 +930,272 @@ void ApplyWrenchDialog::AttachVisuals()
 }
 
 /////////////////////////////////////////////////
+bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera || !this->dataPtr->applyWrenchVisual)
+    return false;
+
+  this->dataPtr->draggingTool = false;
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
+      this->dataPtr->manipState);
+
+  if (vis)
+    return false;
+
+  // If on top of a circle handle
+  if (this->dataPtr->manipState == "rot_z" ||
+      this->dataPtr->manipState == "rot_y")
+  {
+    this->dataPtr->draggingTool = true;
+
+    // Highlight dragged circle
+    this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
+        this->dataPtr->manipState);
+
+    // Register rotTool pose at drag start
+    this->dataPtr->dragStartPose =
+        this->dataPtr->applyWrenchVisual->GetRotTool()->GetWorldPose();
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
 bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
+      this->dataPtr->manipState);
 
-  if (!vis || _event.dragging)
+  if (!vis || _event.Dragging())
     return false;
 
   // Force/torque clicked: activate dialog and prevent event propagation
-  if (vis == this->dataPtr->applyWrenchVisual->GetForceVisual() ||
-      vis == this->dataPtr->applyWrenchVisual->GetTorqueVisual())
+  if (vis == this->dataPtr->applyWrenchVisual->GetForceVisual())
   {
     this->ActivateWindow();
+
+    // Activate visual, can't attach rot tool with zero vector, UnitX by default
+    if (this->dataPtr->forceVector == math::Vector3::Zero)
+      this->SetForce(math::Vector3::UnitX);
+    else
+      this->SetForce(this->dataPtr->forceVector);
+
     return true;
   }
-  // Link clicked: activate dialog and propagate event
-  else if (vis->GetNthAncestor(2) ==
-      this->dataPtr->applyWrenchVisual->GetNthAncestor(2))
+  else if (vis == this->dataPtr->applyWrenchVisual->GetTorqueVisual())
   {
     this->ActivateWindow();
+
+    // Activate visual, can't attach rot tool with zero vector, UnitX by default
+    if (this->dataPtr->torqueVector == math::Vector3::Zero)
+      this->SetTorque(math::Vector3::UnitX);
+    else
+      this->SetTorque(this->dataPtr->torqueVector);
+
+    return true;
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera || !this->dataPtr->applyWrenchVisual)
+    return false;
+
+  // Must make a Qt check as well because Gazebo event is not working with test
+  bool isDragging = _event.Dragging() ||
+      QApplication::mouseButtons() != Qt::NoButton;
+  bool isLeftButton = _event.Button() == common::MouseEvent::LEFT ||
+      QApplication::mouseButtons() == Qt::LeftButton;
+
+  // Dragging tool, adapted from ModelManipulator::RotateEntity
+  if (isDragging && isLeftButton && this->dataPtr->draggingTool)
+  {
+    math::Vector3 normal;
+    math::Vector3 axis;
+    if (this->dataPtr->manipState == "rot_z")
+    {
+      normal = this->dataPtr->dragStartPose.rot.GetZAxis();
+      axis = math::Vector3::UnitZ;
+    }
+    else if (this->dataPtr->manipState == "rot_y")
+    {
+      normal = this->dataPtr->dragStartPose.rot.GetYAxis();
+      axis = math::Vector3::UnitY;
+    }
+    else
+    {
+      gzerr << "Dragging tool on wrong manip state, this shouldn't happen" <<
+          std::endl;
+      return false;
+    }
+
+    double offset = this->dataPtr->dragStartPose.pos.Dot(normal);
+
+    math::Vector3 pressPoint;
+    userCamera->GetWorldPointOnPlane(_event.PressPos().X(),
+        _event.PressPos().Y(),
+        math::Plane(normal, offset), pressPoint);
+
+    math::Vector3 newPoint;
+    userCamera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
+        math::Plane(normal, offset), newPoint);
+
+    math::Vector3 v1 = pressPoint - this->dataPtr->dragStartPose.pos;
+    math::Vector3 v2 = newPoint - this->dataPtr->dragStartPose.pos;
+    v1 = v1.Normalize();
+    v2 = v2.Normalize();
+    double signTest = v1.Cross(v2).Dot(normal);
+    double angle = atan2((v1.Cross(v2)).GetLength(), v1.Dot(v2));
+
+    if (signTest < 0)
+      angle *= -1;
+
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+      angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
+
+    math::Quaternion rot(axis, angle);
+    rot = this->dataPtr->dragStartPose.rot * rot;
+
+    // Must rotate the tool here to make sure we have proper roll,
+    // once the rotation gets transformed into a vector we lose a DOF
+    this->dataPtr->applyWrenchVisual->GetRotTool()->SetWorldRotation(rot);
+
+    // Get direction from tool orientation
+    math::Vector3 vec;
+    math::Vector3 rotEuler;
+    rotEuler = rot.GetAsEuler();
+    vec.x = cos(rotEuler.z)*cos(rotEuler.y);
+    vec.y = sin(rotEuler.z)*cos(rotEuler.y);
+    vec.z = -sin(rotEuler.y);
+
+    // To local frame
+    vec = this->dataPtr->linkVisual->GetWorldPose().rot.RotateVectorReverse(
+        vec);
+
+    if (this->GetMode() == Mode::FORCE)
+    {
+      this->NewForceDirection(vec);
+    }
+    else if (this->GetMode() == Mode::TORQUE)
+    {
+      this->NewTorqueDirection(vec);
+    }
+    return true;
+  }
+  // Highlight hovered tools
+  else
+  {
+    userCamera->GetVisual(_event.Pos(), this->dataPtr->manipState);
+
+    if (this->dataPtr->manipState == "rot_z" ||
+        this->dataPtr->manipState == "rot_y")
+    {
+      this->dataPtr->applyWrenchVisual->GetRotTool()->SetState(
+          this->dataPtr->manipState);
+    }
+    else
+    {
+      this->dataPtr->applyWrenchVisual->GetRotTool()->SetState("");
+    }
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::SetMode(Mode _mode)
+{
+  this->dataPtr->mode = _mode;
+}
+
+/////////////////////////////////////////////////
+ApplyWrenchDialog::Mode ApplyWrenchDialog::GetMode() const
+{
+  return this->dataPtr->mode;
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::NewForceDirection(const math::Vector3 &_dir)
+{
+  // Normalize direction
+  math::Vector3 v = _dir;
+  if (v == math::Vector3::Zero)
+    v = math::Vector3::UnitX;
+  else
+    v.Normalize();
+
+  // Multiply by magnitude
+  this->SetForce(v * this->dataPtr->forceMagSpin->value(), true);
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::NewTorqueDirection(const math::Vector3 &_dir)
+{
+  // Normalize direction
+  math::Vector3 v = _dir;
+  if (v == math::Vector3::Zero)
+    v = math::Vector3::UnitX;
+  else
+    v.Normalize();
+
+  // Multiply by magnitude
+  this->SetTorque(v * this->dataPtr->torqueMagSpin->value(), true);
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::SetActive(bool _active)
+{
+  if (!this->dataPtr->applyWrenchVisual)
+  {
+    gzerr << "No apply wrench visual." << std::endl;
+    this->Fini();
+    return;
+  }
+  if (_active)
+  {
+    // Set visible
+    this->dataPtr->applyWrenchVisual->SetMode(
+        static_cast<rendering::ApplyWrenchVisual::Mode>(this->GetMode()));
+
+    // Set selected
+    event::Events::setSelectedEntity(this->dataPtr->linkName, "normal");
+
+    // Set arrow mode
+    if (g_arrowAct)
+      g_arrowAct->trigger();
+
+    MouseEventHandler::Instance()->AddPressFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        boost::bind(&ApplyWrenchDialog::OnMousePress, this, _1));
+
+    MouseEventHandler::Instance()->AddMoveFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
+        boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
+  }
+  else
+  {
+    this->dataPtr->applyWrenchVisual->SetMode(
+        rendering::ApplyWrenchVisual::Mode::NONE);
+
+    MouseEventHandler::Instance()->RemovePressFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+    MouseEventHandler::Instance()->RemoveMoveFilter(
+        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+  }
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::OnManipulation()
+{
+  this->SetActive(false);
 }
 
 /////////////////////////////////////////////////
@@ -907,3 +1211,75 @@ void ApplyWrenchDialog::ActivateWindow()
     this->activateWindow();
   }
 }
+
+/////////////////////////////////////////////////
+bool ApplyWrenchDialog::eventFilter(QObject *_object, QEvent *_event)
+{
+  // Attach rotation tool to focused mode
+  if (_event->type() == QEvent::FocusIn)
+  {
+    if (_object == this->dataPtr->forceMagSpin ||
+        _object == this->dataPtr->forceXSpin ||
+        _object == this->dataPtr->forceYSpin ||
+        _object == this->dataPtr->forceZSpin ||
+        _object == this->dataPtr->forcePosXSpin ||
+        _object == this->dataPtr->forcePosYSpin ||
+        _object == this->dataPtr->forcePosZSpin ||
+       (_object == this->dataPtr->linksComboBox &&
+        this->dataPtr->mode != Mode::TORQUE))
+    {
+      this->SetForce(this->dataPtr->forceVector);
+    }
+    else if (_object == this->dataPtr->torqueMagSpin ||
+             _object == this->dataPtr->torqueXSpin ||
+             _object == this->dataPtr->torqueYSpin ||
+             _object == this->dataPtr->torqueZSpin ||
+            (_object == this->dataPtr->linksComboBox &&
+             this->dataPtr->mode == Mode::TORQUE))
+    {
+      this->SetTorque(this->dataPtr->torqueVector);
+    }
+  }
+  // Deactivate this when another dialog is focused
+  else if (_event->type() == QEvent::ActivationChange)
+  {
+    if (!this->dataPtr->mainWindow)
+      return false;
+
+    if (_object == this->dataPtr->mainWindow)
+    {
+      if (!this->isActiveWindow() &&
+          !this->dataPtr->mainWindow->isActiveWindow())
+      {
+        this->SetActive(false);
+      }
+    }
+  }
+  // Activate when changing spinboxes with mousewheel
+  else if (_event->type() == QEvent::Wheel)
+  {
+    this->ActivateWindow();
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+void ApplyWrenchDialog::changeEvent(QEvent *_event)
+{
+  // Focus in this dialog
+  if (_event->type() == QEvent::ActivationChange)
+  {
+    // During tests it seems not to find main window, so this is true by default
+    bool mainWindowActive = true;
+
+    if (!this->dataPtr->mainWindow || (this->dataPtr->mainWindow &&
+        !this->dataPtr->mainWindow->isActiveWindow()))
+    {
+      mainWindowActive = false;
+    }
+
+    this->SetActive(this->isActiveWindow() || mainWindowActive);
+  }
+}
+

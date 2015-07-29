@@ -38,6 +38,7 @@
 #include "gazebo/physics/bullet/BulletSliderJoint.hh"
 #include "gazebo/physics/bullet/BulletHinge2Joint.hh"
 #include "gazebo/physics/bullet/BulletScrewJoint.hh"
+#include "gazebo/physics/bullet/BulletFixedJoint.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -399,7 +400,10 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.mutable_bullet()->set_contact_surface_layer(
       boost::any_cast<double>(this->GetParam("contact_surface_layer")));
 
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->GetGravity().Ign()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+        msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -423,10 +427,29 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
   }
 
+  // Check if below is already in PhysicsEngine::OnPhysicsMsg(_msg)
   if (_msg->has_min_step_size())
   {
     this->SetParam("min_step_size", _msg->min_step_size());
   }
+
+  /* Check if below is already in PhysicsEngine::OnPhysicsMsg(_msg)
+  if (_msg->has_gravity())
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
+
+  if (_msg->has_real_time_factor())
+    this->SetTargetRealTimeFactor(_msg->real_time_factor());
+
+  if (_msg->has_real_time_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+  }
+
+  if (_msg->has_max_step_size())
+  {
+    this->SetMaxStepSize(_msg->max_step_size());
+  }
+  */
 
   if (_msg->has_bullet())
   {
@@ -743,6 +766,8 @@ JointPtr BulletPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new BulletHinge2Joint(this->dynamicsWorld, _parent));
   else if (_type == "screw")
     joint.reset(new BulletScrewJoint(this->dynamicsWorld, _parent));
+  else if (_type == "fixed")
+    joint.reset(new BulletFixedJoint(this->dynamicsWorld, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 

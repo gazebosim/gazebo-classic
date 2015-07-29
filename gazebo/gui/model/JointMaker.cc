@@ -47,9 +47,9 @@ std::map<JointMaker::JointType, std::string> JointMaker::jointTypes;
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
 {
-  this->UnitVectors.push_back(math::Vector3::UnitX);
-  this->UnitVectors.push_back(math::Vector3::UnitY);
-  this->UnitVectors.push_back(math::Vector3::UnitZ);
+  this->unitVectors.push_back(ignition::math::Vector3d::UnitX);
+  this->unitVectors.push_back(ignition::math::Vector3d::UnitY);
+  this->unitVectors.push_back(ignition::math::Vector3d::UnitZ);
 
   this->newJointCreated = false;
   this->mouseJoint = NULL;
@@ -261,20 +261,20 @@ std::vector<JointData *> JointMaker::GetJointDataByLink(
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  if (_event.button == common::MouseEvent::MIDDLE)
+  if (_event.Button() == common::MouseEvent::MIDDLE)
   {
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     camera->HandleMouseEvent(_event);
     return true;
   }
-  else if (_event.button != common::MouseEvent::LEFT)
+  else if (_event.Button() != common::MouseEvent::LEFT)
     return false;
 
   if (this->jointType != JointMaker::JOINT_NONE)
     return false;
 
   // intercept mouse press events when user clicks on the joint hotspot visual
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
   if (vis)
   {
     if (this->joints.find(vis->GetName()) != this->joints.end())
@@ -293,19 +293,19 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   rendering::UserCameraPtr camera = gui::get_active_camera();
   if (this->jointType == JointMaker::JOINT_NONE)
   {
-    rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+    rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
     if (vis)
     {
       if (this->joints.find(vis->GetName()) != this->joints.end())
       {
         // trigger joint inspector on right click
-        if (_event.button == common::MouseEvent::RIGHT)
+        if (_event.Button() == common::MouseEvent::RIGHT)
         {
           this->inspectName = vis->GetName();
           this->ShowContextMenu(this->inspectName);
           return true;
         }
-        else if (_event.button == common::MouseEvent::LEFT)
+        else if (_event.Button() == common::MouseEvent::LEFT)
         {
           // Not in multi-selection mode.
           if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
@@ -331,7 +331,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   }
   else
   {
-    if (_event.button == common::MouseEvent::LEFT)
+    if (_event.Button() == common::MouseEvent::LEFT)
     {
       if (this->hoverVis)
       {
@@ -464,7 +464,8 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
     jointData->jointMsg->set_child(leafName);
     jointData->jointMsg->set_child_id(jointData->child->GetId());
   }
-  msgs::Set(jointData->jointMsg->mutable_pose(), math::Pose::Zero);
+  msgs::Set(jointData->jointMsg->mutable_pose(),
+      ignition::math::Pose3d::Zero);
 
   jointData->jointMsg->set_type(
       msgs::ConvertJointType(this->GetTypeAsString(jointData->type)));
@@ -490,7 +491,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
       continue;
     }
     msgs::Set(axisMsg->mutable_xyz(),
-        this->UnitVectors[i%this->UnitVectors.size()]);
+        this->unitVectors[i%this->unitVectors.size()]);
     axisMsg->set_use_parent_model_frame(false);
     axisMsg->set_limit_lower(-GZ_DBL_MAX);
     axisMsg->set_limit_upper(GZ_DBL_MAX);
@@ -575,7 +576,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
-  if (_event.dragging)
+  if (_event.Dragging())
   {
     // this enables the joint maker to pan while connecting joints
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
@@ -583,7 +584,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   // Highlight visual on hover
   if (vis)
@@ -627,7 +628,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     {
       // Set end point to mouse plane intersection
       math::Vector3 pt;
-      camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
+      camera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
       {
@@ -667,7 +668,7 @@ void JointMaker::OpenInspector(const std::string &_jointId)
 bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
 
   if (vis)
   {

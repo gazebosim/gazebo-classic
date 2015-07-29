@@ -47,6 +47,7 @@ set(tests
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
+  joint_get_force_torque.cc
   joint_revolute.cc
   joint_screw.cc
   joint_set_position_test.cc
@@ -79,6 +80,7 @@ set(tests
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
+  swarm.cc
   transceiver.cc
   transport.cc
   transporter.cc

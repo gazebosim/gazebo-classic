@@ -17,12 +17,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Image.hh"
@@ -41,6 +36,7 @@ namespace gazebo
     /// \param[in] _sdf sdf::ElementPtr to fill with data.
     void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf);
 
+    /////////////////////////////////////////////
     /// Create a request message
     msgs::Request *CreateRequest(const std::string &_request,
         const std::string &_data)
@@ -49,17 +45,19 @@ namespace gazebo
 
       request->set_request(_request);
       request->set_data(_data);
-      request->set_id(math::Rand::GetIntUniform(1, 10000));
+      request->set_id(ignition::math::Rand::IntUniform(1, 10000));
 
       return request;
     }
 
+    /////////////////////////////////////////////
     const google::protobuf::FieldDescriptor *GetFD(
         google::protobuf::Message &message, const std::string &name)
     {
       return message.GetDescriptor()->FindFieldByName(name);
     }
 
+    /////////////////////////////////////////////
     msgs::Header *GetHeader(google::protobuf::Message &message)
     {
       google::protobuf::Message *msg = NULL;
@@ -78,6 +76,7 @@ namespace gazebo
       return (msgs::Header*)msg;
     }
 
+    /////////////////////////////////////////////
     void Init(google::protobuf::Message &_message, const std::string &_id)
     {
       msgs::Header *header = GetHeader(_message);
@@ -90,11 +89,13 @@ namespace gazebo
       }
     }
 
+    /////////////////////////////////////////////
     void Stamp(msgs::Header *_hdr)
     {
       Stamp(_hdr->mutable_stamp());
     }
 
+    /////////////////////////////////////////////
     void Stamp(msgs::Time *_time)
     {
       common::Time tm = common::Time::GetWallTime();
@@ -103,6 +104,7 @@ namespace gazebo
       _time->set_nsec(tm.nsec);
     }
 
+    /////////////////////////////////////////////
     std::string Package(const std::string &type,
         const google::protobuf::Message &message)
     {
@@ -126,6 +128,7 @@ namespace gazebo
       return data;
     }
 
+    /////////////////////////////////////////////
     void Set(msgs::Vector3d *_pt, const math::Vector3 &_v)
     {
       _pt->set_x(_v.x);
@@ -133,12 +136,29 @@ namespace gazebo
       _pt->set_z(_v.z);
     }
 
+    /////////////////////////////////////////////
+    void Set(msgs::Vector3d *_pt, const ignition::math::Vector3d &_v)
+    {
+      _pt->set_x(_v.X());
+      _pt->set_y(_v.Y());
+      _pt->set_z(_v.Z());
+    }
+
+    /////////////////////////////////////////////
     void Set(msgs::Vector2d *_pt, const math::Vector2d &_v)
     {
       _pt->set_x(_v.x);
       _pt->set_y(_v.y);
     }
 
+    /////////////////////////////////////////////
+    void Set(msgs::Vector2d *_pt, const ignition::math::Vector2d &_v)
+    {
+      _pt->set_x(_v.X());
+      _pt->set_y(_v.Y());
+    }
+
+    /////////////////////////////////////////////
     void Set(msgs::Quaternion *_q, const math::Quaternion &_v)
     {
       _q->set_x(_v.x);
@@ -147,12 +167,30 @@ namespace gazebo
       _q->set_w(_v.w);
     }
 
-    void Set(msgs::Pose *_p, const math::Pose &_v)
+    /////////////////////////////////////////////
+    void Set(msgs::Quaternion *_q, const ignition::math::Quaterniond &_v)
     {
-      Set(_p->mutable_position(), _v.pos);
-      Set(_p->mutable_orientation(), _v.rot);
+      _q->set_x(_v.X());
+      _q->set_y(_v.Y());
+      _q->set_z(_v.Z());
+      _q->set_w(_v.W());
     }
 
+    /////////////////////////////////////////////
+    void Set(msgs::Pose *_p, const math::Pose &_v)
+    {
+      Set(_p->mutable_position(), _v.pos.Ign());
+      Set(_p->mutable_orientation(), _v.rot.Ign());
+    }
+
+    /////////////////////////////////////////////
+    void Set(msgs::Pose *_p, const ignition::math::Pose3d &_v)
+    {
+      Set(_p->mutable_position(), _v.Pos());
+      Set(_p->mutable_orientation(), _v.Rot());
+    }
+
+    /////////////////////////////////////////////
     void Set(msgs::Color *_c, const common::Color &_v)
     {
       _c->set_r(_v.r);
@@ -161,6 +199,7 @@ namespace gazebo
       _c->set_a(_v.a);
     }
 
+    /////////////////////////////////////////////
     void Set(msgs::Time *_t, const common::Time &_v)
     {
       _t->set_sec(_v.sec);
@@ -183,19 +222,28 @@ namespace gazebo
           break;
       };
 
-      _s->set_latitude_deg(_v.GetLatitudeReference().Degree());
-      _s->set_longitude_deg(_v.GetLongitudeReference().Degree());
-      _s->set_heading_deg(_v.GetHeadingOffset().Degree());
+      _s->set_latitude_deg(_v.LatitudeReference().Degree());
+      _s->set_longitude_deg(_v.LongitudeReference().Degree());
+      _s->set_heading_deg(_v.HeadingOffset().Degree());
       _s->set_elevation(_v.GetElevationReference());
     }
 
     /////////////////////////////////////////////////
     void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
     {
-      Set(_p->mutable_normal(), _v.normal);
+      Set(_p->mutable_normal(), _v.normal.Ign());
       _p->mutable_size()->set_x(_v.size.x);
       _p->mutable_size()->set_y(_v.size.y);
       _p->set_d(_v.d);
+    }
+
+    /////////////////////////////////////////////////
+    void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v)
+    {
+      Set(_p->mutable_normal(), _v.Normal());
+      _p->mutable_size()->set_x(_v.Size().X());
+      _p->mutable_size()->set_y(_v.Size().Y());
+      _p->set_d(_v.Offset());
     }
 
     /////////////////////////////////////////////////
@@ -227,42 +275,69 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Vector2d Convert(const math::Vector2d &_v)
+    msgs::Vector3d Convert(const math::Vector3 &_v)
     {
-      msgs::Vector2d result;
-      result.set_x(_v.x);
-      result.set_y(_v.y);
+      return Convert(_v.Ign());
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Vector3d Convert(const ignition::math::Vector3d &_v)
+    {
+      msgs::Vector3d result;
+      result.set_x(_v.X());
+      result.set_y(_v.Y());
+      result.set_z(_v.Z());
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Vector3d Convert(const math::Vector3 &_v)
+    msgs::Vector2d Convert(const math::Vector2d &_v)
     {
-      msgs::Vector3d result;
-      result.set_x(_v.x);
-      result.set_y(_v.y);
-      result.set_z(_v.z);
+      return Convert(_v.Ign());
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Vector2d Convert(const ignition::math::Vector2d &_v)
+    {
+      msgs::Vector2d result;
+      result.set_x(_v.X());
+      result.set_y(_v.Y());
       return result;
     }
 
+    /////////////////////////////////////////////
     msgs::Quaternion Convert(const math::Quaternion &_q)
     {
+      return Convert(_q.Ign());
+    }
+
+    /////////////////////////////////////////////
+    msgs::Quaternion Convert(const ignition::math::Quaterniond &_q)
+    {
       msgs::Quaternion result;
-      result.set_x(_q.x);
-      result.set_y(_q.y);
-      result.set_z(_q.z);
-      result.set_w(_q.w);
+      result.set_x(_q.X());
+      result.set_y(_q.Y());
+      result.set_z(_q.Z());
+      result.set_w(_q.W());
       return result;
     }
 
+    /////////////////////////////////////////////
     msgs::Pose Convert(const math::Pose &_p)
     {
+      return Convert(_p.Ign());
+    }
+
+    /////////////////////////////////////////////
+    msgs::Pose Convert(const ignition::math::Pose3d &_p)
+    {
       msgs::Pose result;
-      result.mutable_position()->CopyFrom(Convert(_p.pos));
-      result.mutable_orientation()->CopyFrom(Convert(_p.rot));
+      result.mutable_position()->CopyFrom(Convert(_p.Pos()));
+      result.mutable_orientation()->CopyFrom(Convert(_p.Rot()));
       return result;
     }
 
+    /////////////////////////////////////////////
     msgs::Color Convert(const common::Color &_c)
     {
       msgs::Color result;
@@ -273,6 +348,7 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////
     msgs::Time Convert(const common::Time &_t)
     {
       msgs::Time result;
@@ -284,13 +360,25 @@ namespace gazebo
     msgs::PlaneGeom Convert(const math::Plane &_p)
     {
       msgs::PlaneGeom result;
-      result.mutable_normal()->CopyFrom(Convert(_p.normal));
+      result.mutable_normal()->CopyFrom(Convert(_p.normal.Ign()));
       result.mutable_size()->set_x(_p.size.x);
       result.mutable_size()->set_y(_p.size.y);
       result.set_d(_p.d);
       return result;
     }
 
+    /////////////////////////////////////////////
+    msgs::PlaneGeom Convert(const ignition::math::Planed &_p)
+    {
+      msgs::PlaneGeom result;
+      result.mutable_normal()->CopyFrom(Convert(_p.Normal()));
+      result.mutable_size()->set_x(_p.Size().X());
+      result.mutable_size()->set_y(_p.Size().Y());
+      result.set_d(_p.Offset());
+      return result;
+    }
+
+    /////////////////////////////////////////////
     msgs::Joint::Type ConvertJointType(const std::string &_str)
     {
       msgs::Joint::Type result = msgs::Joint::REVOLUTE;
@@ -322,6 +410,10 @@ namespace gazebo
       {
         result = msgs::Joint::GEARBOX;
       }
+      else if (_str == "fixed")
+      {
+        result = msgs::Joint::FIXED;
+      }
       else
       {
         gzerr << "Unrecognized JointType ["
@@ -332,6 +424,7 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////
     std::string ConvertJointType(const msgs::Joint::Type &_type)
     {
       std::string result;
@@ -370,6 +463,11 @@ namespace gazebo
         case msgs::Joint::GEARBOX:
         {
           result = "gearbox";
+          break;
+        }
+        case msgs::Joint::FIXED:
+        {
+          result = "fixed";
           break;
         }
         default:
@@ -483,50 +581,111 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////
     math::Vector3 Convert(const msgs::Vector3d &_v)
     {
       return math::Vector3(_v.x(), _v.y(), _v.z());
     }
 
+    /////////////////////////////////////////////
+    ignition::math::Vector3d ConvertIgn(const msgs::Vector3d &_v)
+    {
+      return ignition::math::Vector3d(_v.x(), _v.y(), _v.z());
+    }
+
+    /////////////////////////////////////////////
     math::Vector2d Convert(const msgs::Vector2d &_v)
     {
       return math::Vector2d(_v.x(), _v.y());
     }
 
+    /////////////////////////////////////////////
+    ignition::math::Vector2d ConvertIgn(const msgs::Vector2d &_v)
+    {
+      return ignition::math::Vector2d(_v.x(), _v.y());
+    }
+
+    /////////////////////////////////////////////
     math::Quaternion Convert(const msgs::Quaternion &_q)
     {
       return math::Quaternion(_q.w(), _q.x(), _q.y(), _q.z());
     }
 
-    math::Pose Convert(const msgs::Pose &_p)
+    /////////////////////////////////////////////
+    ignition::math::Quaterniond ConvertIgn(const msgs::Quaternion &_q)
     {
-      return math::Pose(Convert(_p.position()),
-          Convert(_p.orientation()));
+      return ignition::math::Quaterniond(_q.w(), _q.x(), _q.y(), _q.z());
     }
 
+    /////////////////////////////////////////////
+    math::Pose Convert(const msgs::Pose &_p)
+    {
+      return math::Pose(
+          ConvertIgn(_p.position()), ConvertIgn(_p.orientation()));
+    }
+
+    /////////////////////////////////////////////
+    ignition::math::Pose3d ConvertIgn(const msgs::Pose &_p)
+    {
+      return ignition::math::Pose3d(ConvertIgn(_p.position()),
+                                    ConvertIgn(_p.orientation()));
+    }
+
+    /////////////////////////////////////////////
     common::Color Convert(const msgs::Color &_c)
     {
       return common::Color(_c.r(), _c.g(), _c.b(), _c.a());
     }
 
+    /////////////////////////////////////////////
     common::Time Convert(const msgs::Time &_t)
     {
       return common::Time(_t.sec(), _t.nsec());
     }
 
+    /////////////////////////////////////////////
     math::Plane Convert(const msgs::PlaneGeom &_p)
     {
-      return math::Plane(Convert(_p.normal()),
-          math::Vector2d(_p.size().x(), _p.size().y()),
+      return math::Plane(ConvertIgn(_p.normal()),
+          ignition::math::Vector2d(_p.size().x(), _p.size().y()),
           _p.d());
     }
 
+    /////////////////////////////////////////////
+    ignition::math::Planed ConvertIgn(const msgs::PlaneGeom &_p)
+    {
+      return ignition::math::Planed(ConvertIgn(_p.normal()),
+          ignition::math::Vector2d(_p.size().x(), _p.size().y()),
+          _p.d());
+    }
+
+    /////////////////////////////////////////////
     msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::GUI result;
 
       result.set_fullscreen(_sdf->Get<bool>("fullscreen"));
 
+      // Set gui plugins
+      if (_sdf->HasElement("plugin"))
+      {
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
+        {
+          msgs::Plugin *plgnMsg = result.add_plugin();
+          plgnMsg->set_name(pluginElem->Get<std::string>("name"));
+          plgnMsg->set_filename(pluginElem->Get<std::string>("filename"));
+
+          std::stringstream ss;
+          for (sdf::ElementPtr innerElem = pluginElem->GetFirstElement();
+              innerElem; innerElem = innerElem->GetNextElement(""))
+          {
+            ss << innerElem->ToString("");
+          }
+          plgnMsg->set_innerxml(ss.str());
+          pluginElem = pluginElem->GetNextElement("plugin");
+        }
+      }
 
       if (_sdf->HasElement("camera"))
       {
@@ -537,7 +696,8 @@ namespace gazebo
 
         if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_pose(), camSDF->Get<math::Pose>("pose"));
+          msgs::Set(guiCam->mutable_pose(),
+              camSDF->Get<ignition::math::Pose3d>("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
@@ -600,7 +760,8 @@ namespace gazebo
 
       if (_sdf->HasElement("pose"))
       {
-        result.mutable_pose()->CopyFrom(Convert(_sdf->Get<math::Pose>("pose")));
+        result.mutable_pose()->CopyFrom(
+            Convert(_sdf->Get<ignition::math::Pose3d>("pose")));
       }
 
       if (_sdf->HasElement("diffuse"))
@@ -627,7 +788,7 @@ namespace gazebo
       if (_sdf->HasElement("direction"))
       {
         result.mutable_direction()->CopyFrom(
-            Convert(_sdf->Get<math::Vector3>("direction")));
+            Convert(_sdf->Get<ignition::math::Vector3d>("direction")));
       }
 
       if (_sdf->HasElement("spot"))
@@ -653,7 +814,8 @@ namespace gazebo
         return result;
       }
 
-        msgs::Set(result.mutable_scale(), _sdf->Get<math::Vector3>("scale"));
+        msgs::Set(result.mutable_scale(),
+            _sdf->Get<ignition::math::Vector3d>("scale"));
 
         result.set_filename(_sdf->Get<std::string>("uri"));
 
@@ -694,7 +856,7 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::BOX);
         msgs::Set(result.mutable_box()->mutable_size(),
-            geomElem->Get<math::Vector3>("size"));
+            geomElem->Get<ignition::math::Vector3d>("size"));
       }
       else if (geomElem->GetName() == "cylinder")
       {
@@ -714,9 +876,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::PLANE);
         msgs::Set(result.mutable_plane()->mutable_normal(),
-            geomElem->Get<math::Vector3>("normal"));
+            geomElem->Get<ignition::math::Vector3d>("normal"));
         msgs::Set(result.mutable_plane()->mutable_size(),
-            geomElem->Get<math::Vector2d>("size"));
+            geomElem->Get<ignition::math::Vector2d>("size"));
       }
       else if (geomElem->GetName() == "polyline")
       {
@@ -729,7 +891,8 @@ namespace gazebo
           sdf::ElementPtr pointElem = polylineElem->GetElement("point");
           while (pointElem)
           {
-             math::Vector2d point = pointElem->Get<math::Vector2d>();
+             ignition::math::Vector2d point =
+               pointElem->Get<ignition::math::Vector2d>();
              pointElem = pointElem->GetNextElement("point");
              msgs::Vector2d *ptMsg = polylineMsg->add_point();
              msgs::Set(ptMsg, point);
@@ -751,9 +914,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::HEIGHTMAP);
         msgs::Set(result.mutable_heightmap()->mutable_size(),
-            geomElem->Get<math::Vector3>("size"));
+            geomElem->Get<ignition::math::Vector3d>("size"));
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
-            geomElem->Get<math::Vector3>("pos"));
+            geomElem->Get<ignition::math::Vector3d>("pos"));
 
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
         while (textureElem)
@@ -894,7 +1057,8 @@ namespace gazebo
       // Set the origin of the visual
       if (_sdf->HasElement("pose"))
       {
-        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
       }
 
       // Set plugins of the visual
@@ -938,7 +1102,8 @@ namespace gazebo
       result.set_damping(dynamicsElem->Get<double>("damping"));
       result.set_friction(dynamicsElem->Get<double>("friction"));
 
-      msgs::Set(result.mutable_xyz(), _sdf->Get<math::Vector3>("xyz"));
+      msgs::Set(result.mutable_xyz(),
+          _sdf->Get<ignition::math::Vector3d>("xyz"));
 
       return result;
     }
@@ -960,9 +1125,12 @@ namespace gazebo
          result.set_child(_sdf->Get<std::string>("child"));
 
       // Pose
-      math::Pose jointPose;
+      ignition::math::Pose3d jointPose;
       if (_sdf->HasElement("pose"))
-        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
+      {
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
+      }
 
       // Type
       std::string type = _sdf->Get<std::string>("type");
@@ -1067,7 +1235,7 @@ namespace gazebo
         visualSDF->GetElement("laser_retro")->Set(_msg.laser_retro());
 
       if (_msg.has_pose())
-        visualSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+        visualSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
 
       // Load the geometry
       if (_msg.has_geometry())
@@ -1248,6 +1416,7 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////////
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::Scene result;
@@ -1329,7 +1498,7 @@ namespace gazebo
 
       if (_msg.has_pose())
       {
-        lightSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+        lightSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
       }
 
       if (_msg.has_diffuse())
@@ -1344,7 +1513,7 @@ namespace gazebo
 
       if (_msg.has_direction())
       {
-        lightSDF->GetElement("direction")->Set(msgs::Convert(_msg.direction()));
+        lightSDF->GetElement("direction")->Set(ConvertIgn(_msg.direction()));
       }
 
       if (_msg.has_attenuation_constant())
@@ -1392,6 +1561,790 @@ namespace gazebo
         elem->GetElement("falloff")->Set(_msg.spot_falloff());
       }
       return lightSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr cameraSDF;
+
+      if (_sdf)
+      {
+        cameraSDF = _sdf;
+      }
+      else
+      {
+        cameraSDF.reset(new sdf::Element);
+        sdf::initFile("camera.sdf", cameraSDF);
+      }
+
+      if (_msg.has_horizontal_fov())
+      {
+        cameraSDF->GetElement("horizontal_fov")->Set(_msg.horizontal_fov());
+      }
+      if (_msg.has_image_size())
+      {
+        sdf::ElementPtr imageElem = cameraSDF->GetElement("image");
+        imageElem->GetElement("width")->Set(_msg.image_size().x());
+        imageElem->GetElement("height")->Set(_msg.image_size().y());
+      }
+      if (_msg.has_image_format())
+      {
+        sdf::ElementPtr imageElem = cameraSDF->GetElement("image");
+        imageElem->GetElement("format")->Set(_msg.image_format());
+      }
+      if (_msg.has_near_clip() || _msg.has_far_clip())
+      {
+        sdf::ElementPtr clipElem = cameraSDF->GetElement("clip");
+        if (_msg.has_near_clip())
+          clipElem->GetElement("near")->Set(_msg.near_clip());
+        if (_msg.has_far_clip())
+          clipElem->GetElement("far")->Set(_msg.far_clip());
+      }
+
+      if (_msg.has_distortion())
+      {
+        msgs::Distortion distortionMsg = _msg.distortion();
+        sdf::ElementPtr distortionElem =
+            cameraSDF->GetElement("distortion");
+
+        if (distortionMsg.has_center())
+        {
+          distortionElem->GetElement("center")->Set(
+              ConvertIgn(distortionMsg.center()));
+        }
+        if (distortionMsg.has_k1())
+        {
+          distortionElem->GetElement("k1")->Set(distortionMsg.k1());
+        }
+        if (distortionMsg.has_k2())
+        {
+          distortionElem->GetElement("k2")->Set(distortionMsg.k2());
+        }
+        if (distortionMsg.has_k3())
+        {
+          distortionElem->GetElement("k3")->Set(distortionMsg.k3());
+        }
+        if (distortionMsg.has_p1())
+        {
+          distortionElem->GetElement("p1")->Set(distortionMsg.p1());
+        }
+        if (distortionMsg.has_p2())
+        {
+          distortionElem->GetElement("p2")->Set(distortionMsg.p2());
+        }
+      }
+      return cameraSDF;
+    }
+
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr CollisionToSDF(const msgs::Collision &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr collisionSDF;
+
+      if (_sdf)
+      {
+        collisionSDF = _sdf;
+      }
+      else
+      {
+        collisionSDF.reset(new sdf::Element);
+        sdf::initFile("collision.sdf", collisionSDF);
+      }
+
+      if (_msg.has_name())
+        collisionSDF->GetAttribute("name")->Set(_msg.name());
+      if (_msg.has_laser_retro())
+        collisionSDF->GetElement("laser_retro")->Set(_msg.laser_retro());
+      if (_msg.has_max_contacts())
+        collisionSDF->GetElement("max_contacts")->Set(_msg.max_contacts());
+      if (_msg.has_pose())
+        collisionSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
+      if (_msg.has_geometry())
+      {
+        sdf::ElementPtr geomElem = collisionSDF->GetElement("geometry");
+        geomElem = GeometryToSDF(_msg.geometry(), geomElem);
+      }
+      if (_msg.has_surface())
+      {
+        sdf::ElementPtr surfaceElem = collisionSDF->GetElement("surface");
+        surfaceElem = SurfaceToSDF(_msg.surface(), surfaceElem);
+      }
+
+      return collisionSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr LinkToSDF(const msgs::Link &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr linkSDF;
+
+      if (_sdf)
+      {
+        linkSDF = _sdf;
+      }
+      else
+      {
+        linkSDF.reset(new sdf::Element);
+        sdf::initFile("link.sdf", linkSDF);
+      }
+
+      if (_msg.has_name())
+        linkSDF->GetAttribute("name")->Set(_msg.name());
+      if (_msg.has_gravity())
+        linkSDF->GetElement("gravity")->Set(_msg.gravity());
+      if (_msg.has_self_collide())
+        linkSDF->GetElement("self_collide")->Set(_msg.self_collide());
+      if (_msg.has_kinematic())
+        linkSDF->GetElement("kinematic")->Set(_msg.kinematic());
+      if (_msg.has_pose())
+        linkSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
+      if (_msg.has_inertial())
+      {
+        sdf::ElementPtr inertialElem = linkSDF->GetElement("inertial");
+        inertialElem = InertialToSDF(_msg.inertial(), inertialElem);
+      }
+      if (_msg.collision_size() > 0)
+        while (linkSDF->HasElement("collision"))
+          linkSDF->GetElement("collision")->RemoveFromParent();
+      for (int i = 0; i < _msg.collision_size(); ++i)
+      {
+        sdf::ElementPtr collisionElem = linkSDF->AddElement("collision");
+        collisionElem = CollisionToSDF(_msg.collision(i), collisionElem);
+      }
+      if (_msg.visual_size() > 0)
+        while (linkSDF->HasElement("visual"))
+          linkSDF->GetElement("visual")->RemoveFromParent();
+      for (int i = 0; i < _msg.visual_size(); ++i)
+      {
+        sdf::ElementPtr visualElem = linkSDF->AddElement("visual");
+        visualElem = VisualToSDF(_msg.visual(i), visualElem);
+      }
+
+      /// \todo LinkToSDF currently does not convert sensor and projector data
+
+      return linkSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr InertialToSDF(const msgs::Inertial &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr inertialSDF;
+
+      if (_sdf)
+      {
+        inertialSDF = _sdf;
+      }
+      else
+      {
+        inertialSDF.reset(new sdf::Element);
+        sdf::initFile("inertial.sdf", inertialSDF);
+      }
+
+      if (_msg.has_mass())
+        inertialSDF->GetElement("mass")->Set(_msg.mass());
+      if (_msg.has_pose())
+        inertialSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
+
+      sdf::ElementPtr inertiaSDF = inertialSDF->GetElement("inertia");
+      if (_msg.has_ixx())
+        inertiaSDF->GetElement("ixx")->Set(_msg.ixx());
+      if (_msg.has_ixy())
+        inertiaSDF->GetElement("ixy")->Set(_msg.ixy());
+      if (_msg.has_ixz())
+        inertiaSDF->GetElement("ixz")->Set(_msg.ixz());
+      if (_msg.has_iyy())
+        inertiaSDF->GetElement("iyy")->Set(_msg.iyy());
+      if (_msg.has_iyz())
+        inertiaSDF->GetElement("iyz")->Set(_msg.iyz());
+      if (_msg.has_izz())
+        inertiaSDF->GetElement("izz")->Set(_msg.izz());
+
+      return inertialSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr SurfaceToSDF(const msgs::Surface &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr surfaceSDF;
+
+      if (_sdf)
+      {
+        surfaceSDF = _sdf;
+      }
+      else
+      {
+        surfaceSDF.reset(new sdf::Element);
+        sdf::initFile("surface.sdf", surfaceSDF);
+      }
+
+      if (_msg.has_friction())
+      {
+        msgs::Friction friction = _msg.friction();
+        sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
+        sdf::ElementPtr physicsEngElem = frictionElem->GetElement("ode");
+        if (friction.has_mu())
+          physicsEngElem->GetElement("mu")->Set(friction.mu());
+        if (friction.has_mu2())
+          physicsEngElem->GetElement("mu2")->Set(friction.mu2());
+        if (friction.has_fdir1())
+        {
+          physicsEngElem->GetElement("fdir1")->Set(
+              ConvertIgn(friction.fdir1()));
+        }
+        if (friction.has_slip1())
+          physicsEngElem->GetElement("slip1")->Set(friction.slip1());
+        if (friction.has_slip2())
+          physicsEngElem->GetElement("slip2")->Set(friction.slip2());
+      }
+      sdf::ElementPtr bounceElem = surfaceSDF->GetElement("bounce");
+      if (_msg.has_restitution_coefficient())
+      {
+        bounceElem->GetElement("restitution_coefficient")->Set(
+            _msg.restitution_coefficient());
+      }
+      if (_msg.has_bounce_threshold())
+      {
+        bounceElem->GetElement("threshold")->Set(
+            _msg.bounce_threshold());
+      }
+
+      sdf::ElementPtr contactElem = surfaceSDF->GetElement("contact");
+
+      if (_msg.has_collide_without_contact())
+      {
+        contactElem->GetElement("collide_without_contact")->Set(
+            _msg.collide_without_contact());
+      }
+      if (_msg.has_collide_without_contact_bitmask())
+      {
+        contactElem->GetElement("collide_without_contact_bitmask")->Set(
+            _msg.collide_without_contact_bitmask());
+      }
+      if (_msg.has_collide_bitmask())
+      {
+        contactElem->GetElement("collide_bitmask")->Set(
+            _msg.collide_bitmask());
+      }
+
+      sdf::ElementPtr odeElem = contactElem->GetElement("ode");
+      sdf::ElementPtr bulletElem = contactElem->GetElement("bullet");
+      if (_msg.has_soft_cfm())
+      {
+        odeElem->GetElement("soft_cfm")->Set(_msg.soft_cfm());
+        bulletElem->GetElement("soft_cfm")->Set(_msg.soft_cfm());
+      }
+      if (_msg.has_soft_erp())
+      {
+        odeElem->GetElement("soft_erp")->Set(_msg.soft_erp());
+        bulletElem->GetElement("soft_erp")->Set(_msg.soft_erp());
+      }
+      if (_msg.has_kp())
+      {
+        odeElem->GetElement("kp")->Set(_msg.kp());
+        bulletElem->GetElement("kp")->Set(_msg.kp());
+      }
+      if (_msg.has_kd())
+      {
+        odeElem->GetElement("kd")->Set(_msg.kd());
+        bulletElem->GetElement("kd")->Set(_msg.kd());
+      }
+      if (_msg.has_max_vel())
+      {
+        odeElem->GetElement("max_vel")->Set(_msg.max_vel());
+      }
+      if (_msg.has_min_depth())
+      {
+        odeElem->GetElement("min_depth")->Set(_msg.min_depth());
+      }
+
+      return surfaceSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr GeometryToSDF(const msgs::Geometry &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr geometrySDF;
+
+      if (_sdf)
+      {
+        geometrySDF = _sdf;
+      }
+      else
+      {
+        geometrySDF.reset(new sdf::Element);
+        sdf::initFile("geometry.sdf", geometrySDF);
+      }
+
+      if (!_msg.has_type())
+        return geometrySDF;
+
+      if (_msg.type() == msgs::Geometry::BOX &&
+          _msg.has_box())
+      {
+        sdf::ElementPtr geom = geometrySDF->GetElement("box");
+        msgs::BoxGeom boxGeom = _msg.box();
+        if (boxGeom.has_size())
+          geom->GetElement("size")->Set(ConvertIgn(boxGeom.size()));
+      }
+      else if (_msg.type() == msgs::Geometry::CYLINDER &&
+          _msg.has_cylinder())
+      {
+        sdf::ElementPtr geom = geometrySDF->GetElement("cylinder");
+        msgs::CylinderGeom cylinderGeom = _msg.cylinder();
+        if (cylinderGeom.has_radius())
+          geom->GetElement("radius")->Set(cylinderGeom.radius());
+        if (cylinderGeom.has_length())
+          geom->GetElement("length")->Set(cylinderGeom.length());
+      }
+      else if (_msg.type() == msgs::Geometry::SPHERE &&
+          _msg.has_sphere())
+      {
+        sdf::ElementPtr geom = geometrySDF->GetElement("sphere");
+        msgs::SphereGeom sphereGeom = _msg.sphere();
+        if (sphereGeom.has_radius())
+          geom->GetElement("radius")->Set(sphereGeom.radius());
+      }
+      else if (_msg.type() == msgs::Geometry::PLANE &&
+          _msg.has_plane())
+      {
+        sdf::ElementPtr geom = geometrySDF->GetElement("plane");
+        msgs::PlaneGeom planeGeom = _msg.plane();
+        if (planeGeom.has_normal())
+        {
+          geom->GetElement("normal")->Set(ConvertIgn(planeGeom.normal()));
+        }
+        if (planeGeom.has_size())
+          geom->GetElement("size")->Set(ConvertIgn(planeGeom.size()));
+        if (planeGeom.has_d())
+          gzerr << "sdformat doesn't have Plane.d variable" << std::endl;
+      }
+      else if (_msg.type() == msgs::Geometry::IMAGE &&
+          _msg.has_image())
+      {
+        sdf::ElementPtr geom = geometrySDF->GetElement("image");
+        msgs::ImageGeom imageGeom = _msg.image();
+        if (imageGeom.has_scale())
+          geom->GetElement("scale")->Set(imageGeom.scale());
+        if (imageGeom.has_height())
+          geom->GetElement("height")->Set(imageGeom.height());
+        if (imageGeom.has_uri())
+          geom->GetElement("uri")->Set(imageGeom.uri());
+        if (imageGeom.has_threshold())
+          geom->GetElement("threshold")->Set(imageGeom.threshold());
+        if (imageGeom.has_granularity())
+          geom->GetElement("granularity")->Set(imageGeom.granularity());
+      }
+      else if (_msg.type() == msgs::Geometry::HEIGHTMAP &&
+          _msg.has_heightmap())
+      {
+        sdf::ElementPtr geom = geometrySDF->GetElement("heightmap");
+        msgs::HeightmapGeom heightmapGeom = _msg.heightmap();
+        if (heightmapGeom.has_size())
+        {
+          geom->GetElement("size")->Set(ConvertIgn(heightmapGeom.size()));
+        }
+        if (heightmapGeom.has_origin())
+        {
+          geom->GetElement("pos")->Set(ConvertIgn(heightmapGeom.origin()));
+        }
+        if (heightmapGeom.has_use_terrain_paging())
+        {
+          geom->GetElement("use_terrain_paging")->Set(
+              heightmapGeom.use_terrain_paging());
+        }
+        if (heightmapGeom.texture_size() > 0)
+          while (geom->HasElement("texture"))
+            geom->GetElement("texture")->RemoveFromParent();
+        for (int i = 0; i < heightmapGeom.texture_size(); ++i)
+        {
+          gazebo::msgs::HeightmapGeom_Texture textureMsg =
+              heightmapGeom.texture(i);
+          sdf::ElementPtr textureElem = geom->AddElement("texture");
+          textureElem->GetElement("diffuse")->Set(textureMsg.diffuse());
+          textureElem->GetElement("normal")->Set(textureMsg.normal());
+          textureElem->GetElement("size")->Set(textureMsg.size());
+        }
+        if (heightmapGeom.blend_size() > 0)
+          while (geom->HasElement("blend"))
+            geom->GetElement("blend")->RemoveFromParent();
+        for (int i = 0; i < heightmapGeom.blend_size(); ++i)
+        {
+          gazebo::msgs::HeightmapGeom_Blend blendMsg =
+              heightmapGeom.blend(i);
+          sdf::ElementPtr blendElem = geom->AddElement("blend");
+          blendElem->GetElement("min_height")->Set(blendMsg.min_height());
+          blendElem->GetElement("fade_dist")->Set(blendMsg.fade_dist());
+        }
+        if (heightmapGeom.has_filename())
+          geom->GetElement("uri")->Set(heightmapGeom.filename());
+      }
+      else if (_msg.type() == msgs::Geometry::MESH &&
+          _msg.has_mesh())
+      {
+        sdf::ElementPtr geom = geometrySDF->GetElement("mesh");
+        msgs::MeshGeom meshGeom = _msg.mesh();
+        geom = msgs::MeshToSDF(meshGeom, geom);
+      }
+      else if (_msg.type() == msgs::Geometry::POLYLINE &&
+          _msg.polyline_size() > 0)
+      {
+        if (_msg.polyline_size() > 0)
+          while (geometrySDF->HasElement("polyline"))
+            geometrySDF->GetElement("polyline")->RemoveFromParent();
+
+        for (int j = 0; j < _msg.polyline_size(); ++j)
+        {
+          sdf::ElementPtr polylineElem = geometrySDF->AddElement("polyline");
+          if (_msg.polyline(j).has_height())
+            polylineElem->GetElement("height")->Set(_msg.polyline(j).height());
+          for (int i = 0; i < _msg.polyline(j).point_size(); ++i)
+          {
+            sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+            pointElem->Set(ConvertIgn(_msg.polyline(j).point(i)));
+          }
+        }
+      }
+      else
+      {
+        gzerr << "Unrecognized geometry type" << std::endl;
+      }
+      return geometrySDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr MeshToSDF(const msgs::MeshGeom &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr meshSDF;
+
+      if (_sdf)
+      {
+        meshSDF = _sdf;
+      }
+      else
+      {
+        meshSDF.reset(new sdf::Element);
+        sdf::initFile("mesh_shape.sdf", meshSDF);
+      }
+
+      if (_msg.has_filename())
+        meshSDF->GetElement("uri")->Set(_msg.filename());
+
+      if (_msg.has_submesh())
+      {
+        sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
+        submeshElem->GetElement("name")->Set(_msg.submesh());
+        if (_msg.has_center_submesh())
+          submeshElem->GetElement("center")->Set(_msg.center_submesh());
+        if (_msg.has_scale())
+        {
+          meshSDF->GetElement("scale")->Set(ConvertIgn(_msg.scale()));
+        }
+      }
+      return meshSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr pluginSDF;
+
+      if (_sdf)
+      {
+        pluginSDF = _sdf;
+      }
+      else
+      {
+        pluginSDF.reset(new sdf::Element);
+        sdf::initFile("plugin.sdf", pluginSDF);
+      }
+
+      // Use the SDF parser to read all the inner xml.
+      std::string tmp = "<sdf version='1.5'>";
+      tmp += "<plugin name='" + _msg.name() + "' filename='" +
+        _msg.filename() + "'>";
+      tmp += _msg.innerxml();
+      tmp += "</plugin></sdf>";
+
+      sdf::readString(tmp, pluginSDF);
+
+      return pluginSDF;
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddLinkGeom(Model &_model, const Geometry &_geom)
+    {
+      _model.add_link();
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+      {
+        std::ostringstream linkName;
+        linkName << "link_" << linkCount;
+        link->set_name(linkName.str());
+      }
+
+      {
+        link->add_collision();
+        auto collision = link->mutable_collision(0);
+        collision->set_name("collision");
+        *(collision->mutable_geometry()) = _geom;
+      }
+
+      {
+        link->add_visual();
+        auto visual = link->mutable_visual(0);
+        visual->set_name("visual");
+        *(visual->mutable_geometry()) = _geom;
+
+        auto script = visual->mutable_material()->mutable_script();
+        script->add_uri();
+        script->set_uri(0, "file://media/materials/scripts/gazebo.material");
+        script->set_name("Gazebo/Grey");
+      }
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddBoxLink(Model &_model, const double _mass,
+                    const math::Vector3 &_size)
+    {
+      AddBoxLink(_model, _mass, _size.Ign());
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddBoxLink(Model &_model, const double _mass,
+                    const ignition::math::Vector3d &_size)
+    {
+      Geometry geometry;
+      geometry.set_type(Geometry_Type_BOX);
+      Set(geometry.mutable_box()->mutable_size(), _size);
+
+      AddLinkGeom(_model, geometry);
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+
+      auto inertial = link->mutable_inertial();
+      inertial->set_mass(_mass);
+      {
+        double dx = _size.X();
+        double dy = _size.Y();
+        double dz = _size.Z();
+        double ixx = _mass/12.0 * (dy*dy + dz*dz);
+        double iyy = _mass/12.0 * (dz*dz + dx*dx);
+        double izz = _mass/12.0 * (dx*dx + dy*dy);
+        inertial->set_ixx(ixx);
+        inertial->set_iyy(iyy);
+        inertial->set_izz(izz);
+        inertial->set_ixy(0.0);
+        inertial->set_ixz(0.0);
+        inertial->set_iyz(0.0);
+      }
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddCylinderLink(Model &_model,
+                         const double _mass,
+                         const double _radius,
+                         const double _length)
+    {
+      Geometry geometry;
+      geometry.set_type(Geometry_Type_CYLINDER);
+      geometry.mutable_cylinder()->set_radius(_radius);
+      geometry.mutable_cylinder()->set_length(_length);
+
+      AddLinkGeom(_model, geometry);
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+
+      auto inertial = link->mutable_inertial();
+      inertial->set_mass(_mass);
+      const double r2 = _radius * _radius;
+      const double ixx = _mass * (0.25 * r2 + _length*_length / 12.0);
+      const double izz = _mass * 0.5 * r2;
+      inertial->set_ixx(ixx);
+      inertial->set_iyy(ixx);
+      inertial->set_izz(izz);
+      inertial->set_ixy(0.0);
+      inertial->set_ixz(0.0);
+      inertial->set_iyz(0.0);
+    }
+
+    ////////////////////////////////////////////////////////
+    void AddSphereLink(Model &_model, const double _mass,
+                       const double _radius)
+    {
+      Geometry geometry;
+      geometry.set_type(Geometry_Type_SPHERE);
+      geometry.mutable_sphere()->set_radius(_radius);
+
+      AddLinkGeom(_model, geometry);
+      int linkCount = _model.link_size();
+      auto link = _model.mutable_link(linkCount-1);
+
+      auto inertial = link->mutable_inertial();
+      inertial->set_mass(_mass);
+      const double ixx = _mass * 0.4 * _radius * _radius;
+      inertial->set_ixx(ixx);
+      inertial->set_iyy(ixx);
+      inertial->set_izz(ixx);
+      inertial->set_ixy(0.0);
+      inertial->set_ixz(0.0);
+      inertial->set_iyz(0.0);
+    }
+
+    ////////////////////////////////////////////////////////
+    sdf::ElementPtr ModelToSDF(const msgs::Model &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr modelSDF;
+
+      if (_sdf)
+      {
+        modelSDF = _sdf;
+      }
+      else
+      {
+        modelSDF.reset(new sdf::Element);
+        sdf::initFile("model.sdf", modelSDF);
+      }
+
+      if (_msg.has_name())
+        modelSDF->GetAttribute("name")->Set(_msg.name());
+      // ignore the id field, since it's not used in sdformat
+      if (_msg.has_is_static())
+        modelSDF->GetElement("static")->Set(_msg.is_static());
+      if (_msg.has_pose())
+        modelSDF->GetElement("pose")->Set(msgs::ConvertIgn(_msg.pose()));
+
+      if (_msg.joint_size() > 0)
+        while (modelSDF->HasElement("joint"))
+          modelSDF->GetElement("joint")->RemoveFromParent();
+      for (int i = 0; i < _msg.joint_size(); ++i)
+      {
+        sdf::ElementPtr jointElem = modelSDF->AddElement("joint");
+        jointElem = JointToSDF(_msg.joint(i), jointElem);
+      }
+
+      if (_msg.link_size())
+        while (modelSDF->HasElement("link"))
+          modelSDF->GetElement("link")->RemoveFromParent();
+      for (int i = 0; i < _msg.link_size(); ++i)
+      {
+        sdf::ElementPtr linkElem = modelSDF->AddElement("link");
+        linkElem = LinkToSDF(_msg.link(i), linkElem);
+      }
+
+      // ignore the deleted field, since it's not used in sdformat
+      if (_msg.visual_size() > 0)
+      {
+        // model element in SDF cannot store visuals,
+        // so ignore them for now
+        gzerr << "Model visuals not yet parsed" << std::endl;
+      }
+      // ignore the scale field, since it's not used in sdformat
+
+      return modelSDF;
+    }
+
+    ////////////////////////////////////////////////////////
+    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr jointSDF;
+
+      if (_sdf)
+      {
+        jointSDF = _sdf;
+      }
+      else
+      {
+        jointSDF.reset(new sdf::Element);
+        sdf::initFile("joint.sdf", jointSDF);
+      }
+
+      if (_msg.has_name())
+        jointSDF->GetAttribute("name")->Set(_msg.name());
+      if (_msg.has_type())
+        jointSDF->GetAttribute("type")->Set(ConvertJointType(_msg.type()));
+      // ignore the id field, since it's not used in sdformat
+      // ignore the parent_id field, since it's not used in sdformat
+      // ignore the child_id field, since it's not used in sdformat
+      // ignore the angle field, since it's not used in sdformat
+      if (_msg.has_parent())
+        jointSDF->GetElement("parent")->Set(_msg.parent());
+      if (_msg.has_child())
+        jointSDF->GetElement("child")->Set(_msg.child());
+      if (_msg.has_pose())
+        jointSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
+      if (_msg.has_axis1())
+        AxisToSDF(_msg.axis1(), jointSDF->GetElement("axis"));
+      if (_msg.has_axis2())
+        AxisToSDF(_msg.axis2(), jointSDF->GetElement("axis2"));
+
+      auto odePhysicsElem = jointSDF->GetElement("physics")->GetElement("ode");
+      if (_msg.has_cfm())
+        odePhysicsElem->GetElement("cfm")->Set(_msg.cfm());
+      if (_msg.has_bounce())
+        odePhysicsElem->GetElement("bounce")->Set(_msg.bounce());
+      if (_msg.has_velocity())
+        odePhysicsElem->GetElement("velocity")->Set(_msg.velocity());
+      if (_msg.has_fudge_factor())
+        odePhysicsElem->GetElement("fudge_factor")->Set(_msg.fudge_factor());
+
+      {
+        auto limitElem = odePhysicsElem->GetElement("limit");
+        if (_msg.has_limit_cfm())
+          limitElem->GetElement("cfm")->Set(_msg.limit_cfm());
+        if (_msg.has_limit_erp())
+          limitElem->GetElement("erp")->Set(_msg.limit_erp());
+      }
+
+      {
+        auto suspensionElem = odePhysicsElem->GetElement("suspension");
+        if (_msg.has_suspension_cfm())
+          suspensionElem->GetElement("cfm")->Set(_msg.suspension_cfm());
+        if (_msg.has_suspension_erp())
+          suspensionElem->GetElement("erp")->Set(_msg.suspension_erp());
+      }
+      /// \todo JointToSDF currently does not convert sensor data
+
+      return jointSDF;
+    }
+
+    ////////////////////////////////////////////////////////
+    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf)
+    {
+      if (_msg.has_xyz())
+        _sdf->GetElement("xyz")->Set(ConvertIgn(_msg.xyz()));
+      if (_msg.has_use_parent_model_frame())
+      {
+        _sdf->GetElement("use_parent_model_frame")->Set(
+          _msg.use_parent_model_frame());
+      }
+
+      {
+        auto dynamicsElem = _sdf->GetElement("dynamics");
+        if (_msg.has_damping())
+          dynamicsElem->GetElement("damping")->Set(_msg.damping());
+        if (_msg.has_friction())
+          dynamicsElem->GetElement("friction")->Set(_msg.friction());
+      }
+
+      {
+        auto limitElem = _sdf->GetElement("limit");
+        if (_msg.has_limit_lower())
+          limitElem->GetElement("lower")->Set(_msg.limit_lower());
+        if (_msg.has_limit_upper())
+          limitElem->GetElement("upper")->Set(_msg.limit_upper());
+        if (_msg.has_limit_effort())
+          limitElem->GetElement("effort")->Set(_msg.limit_effort());
+        if (_msg.has_limit_velocity())
+          limitElem->GetElement("velocity")->Set(_msg.limit_velocity());
+      }
     }
 
     ////////////////////////////////////////////////////////
@@ -2003,786 +2956,6 @@ namespace gazebo
         << "</ode>"
         << "</friction>";
       return stream.str();
-    }
-
-    /////////////////////////////////////////////////
-    sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
-        sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr cameraSDF;
-
-      if (_sdf)
-      {
-        cameraSDF = _sdf;
-      }
-      else
-      {
-        cameraSDF.reset(new sdf::Element);
-        sdf::initFile("camera.sdf", cameraSDF);
-      }
-
-      if (_msg.has_horizontal_fov())
-      {
-        cameraSDF->GetElement("horizontal_fov")->Set(_msg.horizontal_fov());
-      }
-      if (_msg.has_image_size())
-      {
-        sdf::ElementPtr imageElem = cameraSDF->GetElement("image");
-        imageElem->GetElement("width")->Set(_msg.image_size().x());
-        imageElem->GetElement("height")->Set(_msg.image_size().y());
-      }
-      if (_msg.has_image_format())
-      {
-        sdf::ElementPtr imageElem = cameraSDF->GetElement("image");
-        imageElem->GetElement("format")->Set(_msg.image_format());
-      }
-      if (_msg.has_near_clip() || _msg.has_far_clip())
-      {
-        sdf::ElementPtr clipElem = cameraSDF->GetElement("clip");
-        if (_msg.has_near_clip())
-          clipElem->GetElement("near")->Set(_msg.near_clip());
-        if (_msg.has_far_clip())
-          clipElem->GetElement("far")->Set(_msg.far_clip());
-      }
-
-      if (_msg.has_distortion())
-      {
-        msgs::Distortion distortionMsg = _msg.distortion();
-        sdf::ElementPtr distortionElem =
-            cameraSDF->GetElement("distortion");
-
-        if (distortionMsg.has_center())
-        {
-          distortionElem->GetElement("center")->Set(
-              msgs::Convert(distortionMsg.center()));
-        }
-        if (distortionMsg.has_k1())
-        {
-          distortionElem->GetElement("k1")->Set(distortionMsg.k1());
-        }
-        if (distortionMsg.has_k2())
-        {
-          distortionElem->GetElement("k2")->Set(distortionMsg.k2());
-        }
-        if (distortionMsg.has_k3())
-        {
-          distortionElem->GetElement("k3")->Set(distortionMsg.k3());
-        }
-        if (distortionMsg.has_p1())
-        {
-          distortionElem->GetElement("p1")->Set(distortionMsg.p1());
-        }
-        if (distortionMsg.has_p2())
-        {
-          distortionElem->GetElement("p2")->Set(distortionMsg.p2());
-        }
-      }
-      return cameraSDF;
-    }
-
-
-    /////////////////////////////////////////////////
-    sdf::ElementPtr CollisionToSDF(const msgs::Collision &_msg,
-        sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr collisionSDF;
-
-      if (_sdf)
-      {
-        collisionSDF = _sdf;
-      }
-      else
-      {
-        collisionSDF.reset(new sdf::Element);
-        sdf::initFile("collision.sdf", collisionSDF);
-      }
-
-      if (_msg.has_name())
-        collisionSDF->GetAttribute("name")->Set(_msg.name());
-      if (_msg.has_laser_retro())
-        collisionSDF->GetElement("laser_retro")->Set(_msg.laser_retro());
-      if (_msg.has_max_contacts())
-        collisionSDF->GetElement("max_contacts")->Set(_msg.max_contacts());
-      if (_msg.has_pose())
-        collisionSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
-      if (_msg.has_geometry())
-      {
-        sdf::ElementPtr geomElem = collisionSDF->GetElement("geometry");
-        geomElem = GeometryToSDF(_msg.geometry(), geomElem);
-      }
-      if (_msg.has_surface())
-      {
-        sdf::ElementPtr surfaceElem = collisionSDF->GetElement("surface");
-        surfaceElem = SurfaceToSDF(_msg.surface(), surfaceElem);
-      }
-
-      return collisionSDF;
-    }
-
-    /////////////////////////////////////////////////
-    sdf::ElementPtr LinkToSDF(const msgs::Link &_msg,
-        sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr linkSDF;
-
-      if (_sdf)
-      {
-        linkSDF = _sdf;
-      }
-      else
-      {
-        linkSDF.reset(new sdf::Element);
-        sdf::initFile("link.sdf", linkSDF);
-      }
-
-      if (_msg.has_name())
-        linkSDF->GetAttribute("name")->Set(_msg.name());
-      if (_msg.has_gravity())
-        linkSDF->GetElement("gravity")->Set(_msg.gravity());
-      if (_msg.has_self_collide())
-        linkSDF->GetElement("self_collide")->Set(_msg.self_collide());
-      if (_msg.has_kinematic())
-        linkSDF->GetElement("kinematic")->Set(_msg.kinematic());
-      if (_msg.has_pose())
-        linkSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
-      if (_msg.has_inertial())
-      {
-        sdf::ElementPtr inertialElem = linkSDF->GetElement("inertial");
-        inertialElem = InertialToSDF(_msg.inertial(), inertialElem);
-      }
-      if (_msg.collision_size() > 0)
-        while (linkSDF->HasElement("collision"))
-          linkSDF->GetElement("collision")->RemoveFromParent();
-      for (int i = 0; i < _msg.collision_size(); ++i)
-      {
-        sdf::ElementPtr collisionElem = linkSDF->AddElement("collision");
-        collisionElem = CollisionToSDF(_msg.collision(i), collisionElem);
-      }
-      if (_msg.visual_size() > 0)
-        while (linkSDF->HasElement("visual"))
-          linkSDF->GetElement("visual")->RemoveFromParent();
-      for (int i = 0; i < _msg.visual_size(); ++i)
-      {
-        sdf::ElementPtr visualElem = linkSDF->AddElement("visual");
-        visualElem = VisualToSDF(_msg.visual(i), visualElem);
-      }
-
-      /// \todo LinkToSDF currently does not convert sensor and projector data
-
-      return linkSDF;
-    }
-
-    /////////////////////////////////////////////////
-    sdf::ElementPtr InertialToSDF(const msgs::Inertial &_msg,
-        sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr inertialSDF;
-
-      if (_sdf)
-      {
-        inertialSDF = _sdf;
-      }
-      else
-      {
-        inertialSDF.reset(new sdf::Element);
-        sdf::initFile("inertial.sdf", inertialSDF);
-      }
-
-      if (_msg.has_mass())
-        inertialSDF->GetElement("mass")->Set(_msg.mass());
-      if (_msg.has_pose())
-        inertialSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
-
-      sdf::ElementPtr inertiaSDF = inertialSDF->GetElement("inertia");
-      if (_msg.has_ixx())
-        inertiaSDF->GetElement("ixx")->Set(_msg.ixx());
-      if (_msg.has_ixy())
-        inertiaSDF->GetElement("ixy")->Set(_msg.ixy());
-      if (_msg.has_ixz())
-        inertiaSDF->GetElement("ixz")->Set(_msg.ixz());
-      if (_msg.has_iyy())
-        inertiaSDF->GetElement("iyy")->Set(_msg.iyy());
-      if (_msg.has_iyz())
-        inertiaSDF->GetElement("iyz")->Set(_msg.iyz());
-      if (_msg.has_izz())
-        inertiaSDF->GetElement("izz")->Set(_msg.izz());
-
-      return inertialSDF;
-    }
-
-    /////////////////////////////////////////////////
-    sdf::ElementPtr SurfaceToSDF(const msgs::Surface &_msg,
-        sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr surfaceSDF;
-
-      if (_sdf)
-      {
-        surfaceSDF = _sdf;
-      }
-      else
-      {
-        surfaceSDF.reset(new sdf::Element);
-        sdf::initFile("surface.sdf", surfaceSDF);
-      }
-
-      if (_msg.has_friction())
-      {
-        msgs::Friction friction = _msg.friction();
-        sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
-        sdf::ElementPtr physicsEngElem = frictionElem->GetElement("ode");
-        if (friction.has_mu())
-          physicsEngElem->GetElement("mu")->Set(friction.mu());
-        if (friction.has_mu2())
-          physicsEngElem->GetElement("mu2")->Set(friction.mu2());
-        if (friction.has_fdir1())
-        {
-          physicsEngElem->GetElement("fdir1")->Set(
-              msgs::Convert(friction.fdir1()));
-        }
-        if (friction.has_slip1())
-          physicsEngElem->GetElement("slip1")->Set(friction.slip1());
-        if (friction.has_slip2())
-          physicsEngElem->GetElement("slip2")->Set(friction.slip2());
-      }
-      sdf::ElementPtr bounceElem = surfaceSDF->GetElement("bounce");
-      if (_msg.has_restitution_coefficient())
-      {
-        bounceElem->GetElement("restitution_coefficient")->Set(
-            _msg.restitution_coefficient());
-      }
-      if (_msg.has_bounce_threshold())
-      {
-        bounceElem->GetElement("threshold")->Set(
-            _msg.bounce_threshold());
-      }
-
-      sdf::ElementPtr contactElem = surfaceSDF->GetElement("contact");
-
-      if (_msg.has_collide_without_contact())
-      {
-        contactElem->GetElement("collide_without_contact")->Set(
-            _msg.collide_without_contact());
-      }
-      if (_msg.has_collide_without_contact_bitmask())
-      {
-        contactElem->GetElement("collide_without_contact_bitmask")->Set(
-            _msg.collide_without_contact_bitmask());
-      }
-      if (_msg.has_collide_bitmask())
-      {
-        contactElem->GetElement("collide_bitmask")->Set(
-            _msg.collide_bitmask());
-      }
-
-      sdf::ElementPtr odeElem = contactElem->GetElement("ode");
-      sdf::ElementPtr bulletElem = contactElem->GetElement("bullet");
-      if (_msg.has_soft_cfm())
-      {
-        odeElem->GetElement("soft_cfm")->Set(_msg.soft_cfm());
-        bulletElem->GetElement("soft_cfm")->Set(_msg.soft_cfm());
-      }
-      if (_msg.has_soft_erp())
-      {
-        odeElem->GetElement("soft_erp")->Set(_msg.soft_erp());
-        bulletElem->GetElement("soft_erp")->Set(_msg.soft_erp());
-      }
-      if (_msg.has_kp())
-      {
-        odeElem->GetElement("kp")->Set(_msg.kp());
-        bulletElem->GetElement("kp")->Set(_msg.kp());
-      }
-      if (_msg.has_kd())
-      {
-        odeElem->GetElement("kd")->Set(_msg.kd());
-        bulletElem->GetElement("kd")->Set(_msg.kd());
-      }
-      if (_msg.has_max_vel())
-      {
-        odeElem->GetElement("max_vel")->Set(_msg.max_vel());
-      }
-      if (_msg.has_min_depth())
-      {
-        odeElem->GetElement("min_depth")->Set(_msg.min_depth());
-      }
-
-      return surfaceSDF;
-    }
-
-    /////////////////////////////////////////////////
-    sdf::ElementPtr GeometryToSDF(const msgs::Geometry &_msg,
-        sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr geometrySDF;
-
-      if (_sdf)
-      {
-        geometrySDF = _sdf;
-      }
-      else
-      {
-        geometrySDF.reset(new sdf::Element);
-        sdf::initFile("geometry.sdf", geometrySDF);
-      }
-
-      if (!_msg.has_type())
-        return geometrySDF;
-
-      if (_msg.type() == msgs::Geometry::BOX &&
-          _msg.has_box())
-      {
-        sdf::ElementPtr geom = geometrySDF->GetElement("box");
-        msgs::BoxGeom boxGeom = _msg.box();
-        if (boxGeom.has_size())
-          geom->GetElement("size")->Set(msgs::Convert(boxGeom.size()));
-      }
-      else if (_msg.type() == msgs::Geometry::CYLINDER &&
-          _msg.has_cylinder())
-      {
-        sdf::ElementPtr geom = geometrySDF->GetElement("cylinder");
-        msgs::CylinderGeom cylinderGeom = _msg.cylinder();
-        if (cylinderGeom.has_radius())
-          geom->GetElement("radius")->Set(cylinderGeom.radius());
-        if (cylinderGeom.has_length())
-          geom->GetElement("length")->Set(cylinderGeom.length());
-      }
-      else if (_msg.type() == msgs::Geometry::SPHERE &&
-          _msg.has_sphere())
-      {
-        sdf::ElementPtr geom = geometrySDF->GetElement("sphere");
-        msgs::SphereGeom sphereGeom = _msg.sphere();
-        if (sphereGeom.has_radius())
-          geom->GetElement("radius")->Set(sphereGeom.radius());
-      }
-      else if (_msg.type() == msgs::Geometry::PLANE &&
-          _msg.has_plane())
-      {
-        sdf::ElementPtr geom = geometrySDF->GetElement("plane");
-        msgs::PlaneGeom planeGeom = _msg.plane();
-        if (planeGeom.has_normal())
-        {
-          geom->GetElement("normal")->Set(
-              msgs::Convert(planeGeom.normal()));
-        }
-        if (planeGeom.has_size())
-          geom->GetElement("size")->Set(msgs::Convert(planeGeom.size()));
-        if (planeGeom.has_d())
-          gzerr << "sdformat doesn't have Plane.d variable" << std::endl;
-      }
-      else if (_msg.type() == msgs::Geometry::IMAGE &&
-          _msg.has_image())
-      {
-        sdf::ElementPtr geom = geometrySDF->GetElement("image");
-        msgs::ImageGeom imageGeom = _msg.image();
-        if (imageGeom.has_scale())
-          geom->GetElement("scale")->Set(imageGeom.scale());
-        if (imageGeom.has_height())
-          geom->GetElement("height")->Set(imageGeom.height());
-        if (imageGeom.has_uri())
-          geom->GetElement("uri")->Set(imageGeom.uri());
-        if (imageGeom.has_threshold())
-          geom->GetElement("threshold")->Set(imageGeom.threshold());
-        if (imageGeom.has_granularity())
-          geom->GetElement("granularity")->Set(imageGeom.granularity());
-      }
-      else if (_msg.type() == msgs::Geometry::HEIGHTMAP &&
-          _msg.has_heightmap())
-      {
-        sdf::ElementPtr geom = geometrySDF->GetElement("heightmap");
-        msgs::HeightmapGeom heightmapGeom = _msg.heightmap();
-        if (heightmapGeom.has_size())
-        {
-          geom->GetElement("size")->Set(
-              msgs::Convert(heightmapGeom.size()));
-        }
-        if (heightmapGeom.has_origin())
-        {
-          geom->GetElement("pos")->Set(
-              msgs::Convert(heightmapGeom.origin()));
-        }
-        if (heightmapGeom.has_use_terrain_paging())
-        {
-          geom->GetElement("use_terrain_paging")->Set(
-              heightmapGeom.use_terrain_paging());
-        }
-        if (heightmapGeom.texture_size() > 0)
-          while (geom->HasElement("texture"))
-            geom->GetElement("texture")->RemoveFromParent();
-        for (int i = 0; i < heightmapGeom.texture_size(); ++i)
-        {
-          gazebo::msgs::HeightmapGeom_Texture textureMsg =
-              heightmapGeom.texture(i);
-          sdf::ElementPtr textureElem = geom->AddElement("texture");
-          textureElem->GetElement("diffuse")->Set(textureMsg.diffuse());
-          textureElem->GetElement("normal")->Set(textureMsg.normal());
-          textureElem->GetElement("size")->Set(textureMsg.size());
-        }
-        if (heightmapGeom.blend_size() > 0)
-          while (geom->HasElement("blend"))
-            geom->GetElement("blend")->RemoveFromParent();
-        for (int i = 0; i < heightmapGeom.blend_size(); ++i)
-        {
-          gazebo::msgs::HeightmapGeom_Blend blendMsg =
-              heightmapGeom.blend(i);
-          sdf::ElementPtr blendElem = geom->AddElement("blend");
-          blendElem->GetElement("min_height")->Set(blendMsg.min_height());
-          blendElem->GetElement("fade_dist")->Set(blendMsg.fade_dist());
-        }
-        if (heightmapGeom.has_filename())
-          geom->GetElement("uri")->Set(heightmapGeom.filename());
-      }
-      else if (_msg.type() == msgs::Geometry::MESH &&
-          _msg.has_mesh())
-      {
-        sdf::ElementPtr geom = geometrySDF->GetElement("mesh");
-        msgs::MeshGeom meshGeom = _msg.mesh();
-        geom = msgs::MeshToSDF(meshGeom, geom);
-      }
-      else if (_msg.type() == msgs::Geometry::POLYLINE &&
-          _msg.polyline_size() > 0)
-      {
-        if (_msg.polyline_size() > 0)
-          while (geometrySDF->HasElement("polyline"))
-            geometrySDF->GetElement("polyline")->RemoveFromParent();
-
-        for (int j = 0; j < _msg.polyline_size(); ++j)
-        {
-          sdf::ElementPtr polylineElem = geometrySDF->AddElement("polyline");
-          if (_msg.polyline(j).has_height())
-            polylineElem->GetElement("height")->Set(_msg.polyline(j).height());
-          for (int i = 0; i < _msg.polyline(j).point_size(); ++i)
-          {
-            sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-            pointElem->Set(msgs::Convert(_msg.polyline(j).point(i)));
-          }
-        }
-      }
-      else
-      {
-        gzerr << "Unrecognized geometry type" << std::endl;
-      }
-      return geometrySDF;
-    }
-
-    /////////////////////////////////////////////////
-    sdf::ElementPtr MeshToSDF(const msgs::MeshGeom &_msg, sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr meshSDF;
-
-      if (_sdf)
-      {
-        meshSDF = _sdf;
-      }
-      else
-      {
-        meshSDF.reset(new sdf::Element);
-        sdf::initFile("mesh_shape.sdf", meshSDF);
-      }
-
-      if (_msg.has_filename())
-        meshSDF->GetElement("uri")->Set(_msg.filename());
-
-      if (_msg.has_submesh())
-      {
-        sdf::ElementPtr submeshElem = meshSDF->GetElement("submesh");
-        submeshElem->GetElement("name")->Set(_msg.submesh());
-        if (_msg.has_center_submesh())
-          submeshElem->GetElement("center")->Set(_msg.center_submesh());
-        if (_msg.has_scale())
-        {
-          meshSDF->GetElement("scale")->Set(msgs::Convert(_msg.scale()));
-        }
-      }
-      return meshSDF;
-    }
-
-    /////////////////////////////////////////////////
-    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_msg, sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr pluginSDF;
-
-      if (_sdf)
-      {
-        pluginSDF = _sdf;
-      }
-      else
-      {
-        pluginSDF.reset(new sdf::Element);
-        sdf::initFile("plugin.sdf", pluginSDF);
-      }
-
-      // Use the SDF parser to read all the inner xml.
-      std::string tmp = "<sdf version='1.5'>";
-      tmp += "<plugin name='" + _msg.name() + "' filename='" +
-        _msg.filename() + "'>";
-      tmp += _msg.innerxml();
-      tmp += "</plugin></sdf>";
-
-      sdf::readString(tmp, pluginSDF);
-
-      return pluginSDF;
-    }
-
-    ////////////////////////////////////////////////////////
-    void AddLinkGeom(Model &_model, const Geometry &_geom)
-    {
-      _model.add_link();
-      int linkCount = _model.link_size();
-      auto link = _model.mutable_link(linkCount-1);
-      {
-        std::ostringstream linkName;
-        linkName << "link_" << linkCount;
-        link->set_name(linkName.str());
-      }
-
-      {
-        link->add_collision();
-        auto collision = link->mutable_collision(0);
-        collision->set_name("collision");
-        *(collision->mutable_geometry()) = _geom;
-      }
-
-      {
-        link->add_visual();
-        auto visual = link->mutable_visual(0);
-        visual->set_name("visual");
-        *(visual->mutable_geometry()) = _geom;
-
-        auto script = visual->mutable_material()->mutable_script();
-        script->add_uri();
-        script->set_uri(0, "file://media/materials/scripts/gazebo.material");
-        script->set_name("Gazebo/Grey");
-      }
-    }
-
-    ////////////////////////////////////////////////////////
-    void AddBoxLink(Model &_model, const double _mass,
-                    const math::Vector3 &_size)
-    {
-      Geometry geometry;
-      geometry.set_type(Geometry_Type_BOX);
-      Set(geometry.mutable_box()->mutable_size(), _size);
-
-      AddLinkGeom(_model, geometry);
-      int linkCount = _model.link_size();
-      auto link = _model.mutable_link(linkCount-1);
-
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
-      {
-        double dx = _size.x;
-        double dy = _size.y;
-        double dz = _size.z;
-        double ixx = _mass/12.0 * (dy*dy + dz*dz);
-        double iyy = _mass/12.0 * (dz*dz + dx*dx);
-        double izz = _mass/12.0 * (dx*dx + dy*dy);
-        inertial->set_ixx(ixx);
-        inertial->set_iyy(iyy);
-        inertial->set_izz(izz);
-        inertial->set_ixy(0.0);
-        inertial->set_ixz(0.0);
-        inertial->set_iyz(0.0);
-      }
-    }
-
-    ////////////////////////////////////////////////////////
-    void AddCylinderLink(Model &_model,
-                         const double _mass,
-                         const double _radius,
-                         const double _length)
-    {
-      Geometry geometry;
-      geometry.set_type(Geometry_Type_CYLINDER);
-      geometry.mutable_cylinder()->set_radius(_radius);
-      geometry.mutable_cylinder()->set_length(_length);
-
-      AddLinkGeom(_model, geometry);
-      int linkCount = _model.link_size();
-      auto link = _model.mutable_link(linkCount-1);
-
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
-      const double r2 = _radius * _radius;
-      const double ixx = _mass * (0.25 * r2 + _length*_length / 12.0);
-      const double izz = _mass * 0.5 * r2;
-      inertial->set_ixx(ixx);
-      inertial->set_iyy(ixx);
-      inertial->set_izz(izz);
-      inertial->set_ixy(0.0);
-      inertial->set_ixz(0.0);
-      inertial->set_iyz(0.0);
-    }
-
-    ////////////////////////////////////////////////////////
-    void AddSphereLink(Model &_model, const double _mass,
-                       const double _radius)
-    {
-      Geometry geometry;
-      geometry.set_type(Geometry_Type_SPHERE);
-      geometry.mutable_sphere()->set_radius(_radius);
-
-      AddLinkGeom(_model, geometry);
-      int linkCount = _model.link_size();
-      auto link = _model.mutable_link(linkCount-1);
-
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
-      const double ixx = _mass * 0.4 * _radius * _radius;
-      inertial->set_ixx(ixx);
-      inertial->set_iyy(ixx);
-      inertial->set_izz(ixx);
-      inertial->set_ixy(0.0);
-      inertial->set_ixz(0.0);
-      inertial->set_iyz(0.0);
-    }
-
-    ////////////////////////////////////////////////////////
-    sdf::ElementPtr ModelToSDF(const msgs::Model &_msg, sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr modelSDF;
-
-      if (_sdf)
-      {
-        modelSDF = _sdf;
-      }
-      else
-      {
-        modelSDF.reset(new sdf::Element);
-        sdf::initFile("model.sdf", modelSDF);
-      }
-
-      if (_msg.has_name())
-        modelSDF->GetAttribute("name")->Set(_msg.name());
-      // ignore the id field, since it's not used in sdformat
-      if (_msg.has_is_static())
-        modelSDF->GetElement("static")->Set(_msg.is_static());
-      if (_msg.has_pose())
-        modelSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
-
-      if (_msg.joint_size() > 0)
-        while (modelSDF->HasElement("joint"))
-          modelSDF->GetElement("joint")->RemoveFromParent();
-      for (int i = 0; i < _msg.joint_size(); ++i)
-      {
-        sdf::ElementPtr jointElem = modelSDF->AddElement("joint");
-        jointElem = JointToSDF(_msg.joint(i), jointElem);
-      }
-
-      if (_msg.link_size())
-        while (modelSDF->HasElement("link"))
-          modelSDF->GetElement("link")->RemoveFromParent();
-      for (int i = 0; i < _msg.link_size(); ++i)
-      {
-        sdf::ElementPtr linkElem = modelSDF->AddElement("link");
-        linkElem = LinkToSDF(_msg.link(i), linkElem);
-      }
-
-      // ignore the deleted field, since it's not used in sdformat
-      if (_msg.visual_size() > 0)
-      {
-        // model element in SDF cannot store visuals,
-        // so ignore them for now
-        gzerr << "Model visuals not yet parsed" << std::endl;
-      }
-      // ignore the scale field, since it's not used in sdformat
-
-      return modelSDF;
-    }
-
-    ////////////////////////////////////////////////////////
-    sdf::ElementPtr JointToSDF(const msgs::Joint &_msg, sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr jointSDF;
-
-      if (_sdf)
-      {
-        jointSDF = _sdf;
-      }
-      else
-      {
-        jointSDF.reset(new sdf::Element);
-        sdf::initFile("joint.sdf", jointSDF);
-      }
-
-      if (_msg.has_name())
-        jointSDF->GetAttribute("name")->Set(_msg.name());
-      if (_msg.has_type())
-        jointSDF->GetAttribute("type")->Set(ConvertJointType(_msg.type()));
-      // ignore the id field, since it's not used in sdformat
-      // ignore the parent_id field, since it's not used in sdformat
-      // ignore the child_id field, since it's not used in sdformat
-      // ignore the angle field, since it's not used in sdformat
-      if (_msg.has_parent())
-        jointSDF->GetElement("parent")->Set(_msg.parent());
-      if (_msg.has_child())
-        jointSDF->GetElement("child")->Set(_msg.child());
-      if (_msg.has_pose())
-        jointSDF->GetElement("pose")->Set(Convert(_msg.pose()));
-      if (_msg.has_axis1())
-        AxisToSDF(_msg.axis1(), jointSDF->GetElement("axis"));
-      if (_msg.has_axis2())
-        AxisToSDF(_msg.axis2(), jointSDF->GetElement("axis2"));
-
-      auto odePhysicsElem = jointSDF->GetElement("physics")->GetElement("ode");
-      if (_msg.has_cfm())
-        odePhysicsElem->GetElement("cfm")->Set(_msg.cfm());
-      if (_msg.has_bounce())
-        odePhysicsElem->GetElement("bounce")->Set(_msg.bounce());
-      if (_msg.has_velocity())
-        odePhysicsElem->GetElement("velocity")->Set(_msg.velocity());
-      if (_msg.has_fudge_factor())
-        odePhysicsElem->GetElement("fudge_factor")->Set(_msg.fudge_factor());
-
-      {
-        auto limitElem = odePhysicsElem->GetElement("limit");
-        if (_msg.has_limit_cfm())
-          limitElem->GetElement("cfm")->Set(_msg.limit_cfm());
-        if (_msg.has_limit_erp())
-          limitElem->GetElement("erp")->Set(_msg.limit_erp());
-      }
-
-      {
-        auto suspensionElem = odePhysicsElem->GetElement("suspension");
-        if (_msg.has_suspension_cfm())
-          suspensionElem->GetElement("cfm")->Set(_msg.suspension_cfm());
-        if (_msg.has_suspension_erp())
-          suspensionElem->GetElement("erp")->Set(_msg.suspension_erp());
-      }
-      /// \todo JointToSDF currently does not convert sensor data
-
-      return jointSDF;
-    }
-
-    ////////////////////////////////////////////////////////
-    void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf)
-    {
-      if (_msg.has_xyz())
-        _sdf->GetElement("xyz")->Set(Convert(_msg.xyz()));
-      if (_msg.has_use_parent_model_frame())
-      {
-        _sdf->GetElement("use_parent_model_frame")->Set(
-          _msg.use_parent_model_frame());
-      }
-
-      {
-        auto dynamicsElem = _sdf->GetElement("dynamics");
-        if (_msg.has_damping())
-          dynamicsElem->GetElement("damping")->Set(_msg.damping());
-        if (_msg.has_friction())
-          dynamicsElem->GetElement("friction")->Set(_msg.friction());
-      }
-
-      {
-        auto limitElem = _sdf->GetElement("limit");
-        if (_msg.has_limit_lower())
-          limitElem->GetElement("lower")->Set(_msg.limit_lower());
-        if (_msg.has_limit_upper())
-          limitElem->GetElement("upper")->Set(_msg.limit_upper());
-        if (_msg.has_limit_effort())
-          limitElem->GetElement("effort")->Set(_msg.limit_effort());
-        if (_msg.has_limit_velocity())
-          limitElem->GetElement("velocity")->Set(_msg.limit_velocity());
-      }
     }
   }
 }

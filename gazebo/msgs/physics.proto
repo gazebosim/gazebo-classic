@@ -42,6 +42,9 @@ message Physics
   // The name of this physics profile (not to be confused with type)
   optional string profile_name               = 16;
 
+  /// \brief Magnetic field
+  optional Vector3d magnetic_field           = 17;
+
   optional PhysicsBullet bullet              = 39;
   optional PhysicsDART dart                  = 40;
   optional PhysicsODE ode                    = 41;
