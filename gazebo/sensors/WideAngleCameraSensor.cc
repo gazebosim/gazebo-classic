@@ -118,4 +118,46 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(
       this->GetTopic(), 50);
+
+  std::string projTopicName = "~/";
+  projTopicName += this->parentName + "/" + this->GetName() + "/projection";
+  boost::replace_all(projTopicName, "::", "/");
+
+  sdf::ElementPtr projSdf = this->sdf->GetElement("camera")->GetElement("projection");
+  if(projSdf->HasElement("advertise") && projSdf->Get<bool>("advertise"))
+    this->projPub = this->node->Advertise<msgs::CameraProjectionCmd>(
+      projTopicName, 50);
+}
+
+bool WideAngleCameraSensor::UpdateImpl(bool _force)
+{
+  if(!CameraSensor::UpdateImpl(_force))
+    return false;
+
+  if(this->projPub && this->projPub->HasConnections())
+  {
+    msgs::CameraProjectionCmd msg;
+
+    const CameraProjection *proj = boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
+      this->camera)->GetProjection();
+
+    msg.set_name(this->GetName());
+    msg.set_direction(msgs::CameraProjectionCmd_CmdDestiny_INFO);
+    msg.set_type(proj->GetType());
+
+    msg.set_c1(proj->GetC1());
+    msg.set_c2(proj->GetC2());
+    msg.set_c3(proj->GetC3());
+    msg.set_f(proj->GetF());
+
+    msg.set_fun(proj->GetFun());
+    msg.set_full_frame(proj->IsFullFrame());
+    msg.set_cutoff_angle(proj->GetCutOffAngle());
+
+    msg.set_env_texture_size(proj->GetEnvTextureSize());
+
+    this->projPub->Publish(msg);
+  }
+
+  return true;
 }

@@ -160,6 +160,11 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
   }
 }
 
+int WideAngleCamera::GetEnvTextureSize()
+{
+  return this->envTextureSize;
+}
+
 void WideAngleCamera::SetEnvTextureSize(int size)
 {
   if(this->sdf->HasElement("cube_tex_resolution"))
@@ -237,6 +242,11 @@ void WideAngleCamera::SetClipDist()
       break;
     }
   }
+}
+
+const CameraProjection *WideAngleCamera::GetProjection()
+{
+  return *this->projection;
 }
 
 void CameraProjection::Init(float c1,float c2,std::string fun,float f,float c3)
@@ -352,6 +362,11 @@ float CameraProjection::GetF()
   return this->f;
 }
 
+float CameraProjection::GetCutOffAngle()
+{
+  return this->cutOffAngle;
+}
+
 std::string CameraProjection::GetFun()
 {
   return this->sdf->GetElement("custom_function")->Get<std::string>("fun");
@@ -407,6 +422,13 @@ void CameraProjection::SetFun(std::string fun)
   this->Load();
 }
 
+void CameraProjection::SetCutOffAngle(float _angle)
+{
+  this->cutOffAngle = _angle;
+
+  this->sdf->GetElement("cutoff_angle")->Set((double)_angle);
+}
+
 void CameraProjection::ConvertToCustom()
 {
   sdf::ElementPtr cf = this->sdf->AddElement("custom_function");
@@ -449,9 +471,6 @@ void CameraProjection::SetMaterialVariables()
   Ogre::GpuProgramParametersSharedPtr uniforms =
     this->compositorMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
 
-  // uniforms->setNamedConstant("HFOV",(Ogre::Real)Camera::GetHFOV().Radian());
-  // uniforms->setNamedConstant("projectionType",this->projectionType);
-
   math::Vector3 fun_m[] = {
     math::Vector3(1,0,0),
     math::Vector3(0,1,0),
@@ -467,4 +486,6 @@ void CameraProjection::SetMaterialVariables()
       fun_m[this->fun].x,
       fun_m[this->fun].y,
       fun_m[this->fun].z));
+
+  uniforms->setNamedConstant("cutOffAngle",(Ogre::Real)this->cutOffAngle);
 }

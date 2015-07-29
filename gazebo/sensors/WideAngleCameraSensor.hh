@@ -16,6 +16,10 @@ namespace gazebo
       public: virtual void Init();
 
       public: virtual void Load(const std::string &_worldName);
+
+      protected: virtual bool UpdateImpl(bool _force) override;
+
+      protected: transport::PublisherPtr projPub;
     };
   }
 }

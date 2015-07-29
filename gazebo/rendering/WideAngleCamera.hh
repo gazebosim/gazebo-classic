@@ -27,12 +27,14 @@ namespace gazebo
       public: float GetC3();
       public: float GetF();
       public: std::string GetFun();
+      public: float GetCutOffAngle();
 
       public: void SetC1(float c);
       public: void SetC2(float c);
       public: void SetC3(float c);
       public: void SetF(float f);
       public: void SetFun(std::string fun);
+      public: void SetCutOffAngle(float _angle);
 
       private: void ConvertToCustom();
 
@@ -54,6 +56,7 @@ namespace gazebo
       private: float c2;
       private: float c3;
       private: float f;
+      private: float cutOffAngle;
 
       private: ProjFunction fun;
 
@@ -73,6 +76,8 @@ namespace gazebo
 
       public: void CreateEnvRenderTexture(const std::string &_textureName);
 
+      public: int GetEnvTextureSize();
+
       public: void SetEnvTextureSize(int size);
 
       private: void CreateEnvCameras();
@@ -86,6 +91,8 @@ namespace gazebo
       public: virtual void Load();
 
       public: virtual void Fini();
+
+      public: const CameraProjection *GetProjection();
 
       protected: Ogre::CompositorInstance *wamapInstance;
 

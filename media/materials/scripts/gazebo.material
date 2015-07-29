@@ -1419,7 +1419,7 @@ fragment_program Gazebo/WideLensMapFS glsl
     param_named c3 float 0
     param_named f float 1
     param_named fun float3 0 1
-    param_named HFOV float 90
+    param_named cutOffAngle float 3.14
   }
 }
 

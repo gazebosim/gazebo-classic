@@ -1,7 +1,7 @@
 
 uniform samplerCube envMap;
 
-uniform float HFOV;
+uniform float cutOffAngle;
 
 uniform float f;
 uniform float c1;
@@ -12,7 +12,6 @@ uniform vec3 fun;
 varying vec2 frag_pos;
 
 float pi = 3.141592653;
-
 float r = length(frag_pos);
 
 vec3 map(float th)
@@ -34,19 +33,16 @@ vec3 map(float th)
 // 	return tc;
 // }
 
-vec3 custom()
-{
-	float param = r/(c1*f);
-
-	float phi_1 = fun.x*asin(param)+fun.y*atan(param)+fun.z*param;
-
-	return map((phi_1-c3)/c2);
-}
-
 void main()
 {
-	vec3 tc;
-	tc = custom();
+	float param = r/(c1*f);
+	float theta = fun.x*asin(param)+fun.y*atan(param)+fun.z*param;
 
-	gl_FragColor = vec4(textureCube(envMap,tc).rgb,1);
+	if(abs(theta) < cutOffAngle)
+	{
+		vec3 tc = map((theta-c3)/c2);
+		gl_FragColor = vec4(textureCube(envMap,tc).rgb,1);
+	}
+	else
+		gl_FragColor = vec4(0,0,0,1.0)
 }

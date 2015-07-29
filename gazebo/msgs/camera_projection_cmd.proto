@@ -1,0 +1,28 @@
+package gazebo.msgs;
+
+
+message CameraProjectionCmd
+{
+  enum CmdDestiny
+  {
+    INFO = 1;
+    SET = 2;
+  }
+
+  required string name          = 1;
+  required CmdDestiny destiny   = 2;
+
+  // custom, equdistant, etc.
+  required string type          = 3;
+
+  optional double c1            = 4;
+  optional double c2            = 5;
+  optional double c3            = 6;
+  optional double f             = 7;
+  // tan or sin
+  optional string fun           = 8;
+  optional bool full_frame      = 9 [default = false];
+  optional double cutoff_angle  = 10;
+
+  optional int32 env_texture_size = 11;
+}
