@@ -19,7 +19,7 @@
         * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
 
     1. Scale link mass and inertia when a link is scaled
-        * [Pull request #1836 ](https://bitbucket.org/osrf/gazebo/pull-request/1836 )
+        * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
 ## Gazebo 6.0
 
