@@ -1,0 +1,21 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LogicalCameraImage
+/// \brief Information about models seen by a LogicalCameraSensor
+
+import "pose.proto";
+
+message LogicalCameraImage
+{
+  /// \brief Information about a model that is reported by the
+  /// LogicalCameraSensor
+  message Model
+  {
+    required string name = 1;
+    required Pose pose   = 2;
+  }
+
+  /// \brief All the models seen by the LogicalCamera
+  repeated Model model = 1;
+}
