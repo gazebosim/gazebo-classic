@@ -111,6 +111,9 @@ unsigned int WaitForNewEvent(unsigned int current,
 ////////////////////////////////////////////////////////////////////////
 void RegionEventTest::ModelEnteringRegion(const std::string &_physicsEngine)
 {
+  // simbody stepTo() failure
+  if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
+
   Load("test/worlds/region_events.world", false, _physicsEngine);
 
   physics::WorldPtr world = physics::get_world("default");
