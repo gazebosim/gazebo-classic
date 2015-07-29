@@ -256,7 +256,7 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
   unsigned int count_before = GetEventCount();
   // rotate joint
 
-  joint->SetAngle(0, math::Angle::Pi);
+  joint->SetPosition(0, IGN_PI);
   // check for event
   unsigned int count_after = WaitForNewEvent(count_before);
   EXPECT_GT(count_after, count_before);
