@@ -38,6 +38,11 @@
 #include "step_dart_pgs_wrapper.h"
 #endif
 
+#ifdef HAVE_BULLET
+#include "step_bullet_lemke_wrapper.h"
+#include "step_bullet_pgs_wrapper.h"
+#endif
+
 #ifdef HDF5_INSTRUMENT
 #include <ode/h5dump.h>
 #endif
@@ -742,6 +747,24 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
 #ifdef HAVE_DART
         const int mskip = dPAD(m);
         dSolveLCP_dart_pgs(m, mskip, A, lambda, rhs, nub, lo, hi, findex);
+#else
+        dMessage(d_ERR_LCP, "HAVE_DART is NOT defined");
+#endif
+      }
+      else if (solver_type == BULLET_LEMKE)
+      {
+#ifdef HAVE_BULLET
+#ifdef LIBBULLET_VERSION_GT_282
+        dSolveLCP_bullet_lemke(m, A, lambda, rhs, lo, hi);
+#endif
+#else
+        dMessage(d_ERR_LCP, "HAVE_BULLET is NOT defined");
+#endif
+      }
+      else if (solver_type == BULLET_PGS)
+      {
+#ifdef HAVE_BULLET
+        dSolveLCP_bullet_pgs(m, A, lambda, rhs, lo, hi, findex);
 #else
         dMessage(d_ERR_LCP, "HAVE_DART is NOT defined");
 #endif
