@@ -1,3 +1,164 @@
+QFrame
+{
+  border: 0px;
+  margin: 0px;
+  padding: 0px;
+}
+
+QMainWindow
+{
+  border: 0px;
+  margin: 0px;
+  padding: 0px;
+  background-color: #202020;
+}
+
+QWidget#renderWidget > QWidget
+{
+  padding: 0px;
+  margin: 0px;
+}
+
+/*---------------------------------------------*/
+/* Tab */
+/*---------------------------------------------*/
+
+QTabBar::tab
+{
+  color: #d0d0d0;
+  background-color: #303030;
+  padding: 4px;
+  margin-right: 4px;
+  min-width: 8ex;
+}
+
+QTabBar::tab:selected
+{
+  color: #f58113;
+  background-color: #303030;
+  border-bottom: 1px solid  #f58113;
+}
+
+QTabBar::tab:first:selected
+{
+  margin-left: 0;
+}
+
+QTabBar::tab:last:selected
+{
+  margin-right: 0;
+}
+
+QTabBar::tab::only-one
+{
+  margin-left: 0;
+  margin-right: 0;
+}
+
+QTabBar
+{
+  background-color: rgba(0,0,0,0);
+}
+
+QTabWidget::tab
+{
+  border: 0px;
+}
+
+QTabWidget#mainTab::pane,
+QTabWidget#buildingEditorTab::pane,
+QTabWidget#modelEditorTab::pane,
+QTabWidget#terrainEditorTab::pane,
+QTabWidget#linkInspectorTab::pane,
+QTabWidget#embeddedTab::pane
+{
+  /*background-color: #777777;*/
+  background-color: #00ff00;
+  padding: 2px;
+  margin: 0px;
+  border: 0px;
+  color: #fafafa;
+}
+
+QTabWidget::tab-bar
+{
+  background-color: rgba(0, 0, 0, 0);
+  alignment: left;
+}
+
+/* End tab */
+/*=============================================*/
+
+
+/*---------------------------------------------*/
+/* Tree */
+/*---------------------------------------------*/
+
+
+QTreeView
+{
+  color: #d0d0d0;
+  selection-background-color: transparent;
+  alternate-background-color: #606060;
+  border: 0px;
+  border-radius: 0px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  show-decoration-selected: 0;
+}
+
+QTreeView::item:hover
+{
+  background: #808080;
+  color: #ffffff;
+}
+
+QTreeView::item:selected
+{
+  color: #f58113;
+  background: #808080;
+}
+
+QTreeView::branch:selected
+{
+  background-color: #808080;
+}
+
+QTreeView::branch:selected:active
+{
+  background-color: #808080;
+}
+
+QTreeView::branch:selected:!active
+{
+  background-color: #808080;
+}
+
+QTreeView::branch:!open:has-children
+{
+  image: url(:/images/right_arrow.png);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings
+{
+  image: url(:/images/down_arrow.png);
+}
+
+QTreeView QHeaderView:section
+{
+  color: #d0d0d0;
+  font-weight: bold;
+  background: #404040;
+  border: 0px;
+}
+
+/* End tree */
+/*=============================================*/
+
+
+
+/*
 QGroupBox::title
 {
   color: #f0f0f0;
@@ -55,15 +216,6 @@ QMessageBox
 {
   color: #d0d0d0;
   background-color: #303030;
-}
-
-QMainWindow#mainWindow
-{
-  margin: 0px;
-  padding: 0px;
-  background-color: #303030;
-  /*background-image: url(:/images/mainwindow_bg.png);*/
-  /*background-repeat: repeat-xy;*/
 }
 
 QMenuBar
@@ -234,63 +386,7 @@ QListView::item
   border-bottom-right-radius: 2px;
 }
 
-QTreeView
-{
-  color: #d0d0d0;
-  selection-background-color: transparent;
-  alternate-background-color: #606060;
-  border: 0px;
-  border-radius: 0px;
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-  show-decoration-selected: 0;
-}
 
-QTreeView::item:hover
-{
-  background: #808080;
-  color: #ffffff;
-}
-
-QTreeView::item:selected
-{
-  color: #f58113;
-  background: #808080;
-}
-
-QTreeView::branch:selected
-{
-  background-color: #808080;
-}
-
-QTreeView::branch:selected:active
-{
-  background-color: #808080;
-}
-
-QTreeView::branch:selected:!active
-{
-  background-color: #808080;
-}
-
-QTreeView::branch:!open:has-children
-{
-  image: url(:/images/right_arrow.png);
-}
-
-QTreeView::branch:open:has-children:!has-siblings,
-QTreeView::branch:open:has-children:has-siblings
-{
-  image: url(:/images/down_arrow.png);
-}
-
-QTreeView QHeaderView:section
-{
-  color: #d0d0d0;
-  font-weight: bold;
-  background: #404040;
-  border: 0px;
-}
 
 QLineEdit
 {
@@ -427,98 +523,6 @@ QTextEdit#tipsTextEdit
   background-color: #808080;
 }
 
-QTabBar
-{
-  /*background-color: #808080;*/
-}
-
-QTabWidget#embeddedTab::pane
-{
-  border-top: 1px solid #101010;
-  border-left: 1px solid #101010;
-  border-bottom: 1px solid #101010;
-  border-right: 1px solid #101010;
-  top: -1px;
-
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 2px;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
-
-  background-color: #808080;
-  padding: 2px;
-
-  margin: 0px;
-  color: #f0f0f0;
-}
-
-QTabBar::tab
-{
-  color: #d0d0d0;
-  background-color: #303030;
-  border-bottom: 1px solid  #4d4d4d;
-
-  padding: 4px;
-  margin-right: 4px;
-  min-width: 8ex;
-}
-
-QTabBar::tab:selected
-{
-  background-color: #303030;
-  border-bottom: 1px solid  #f58113;
-}
-
-QTabBar::tab:first:selected
-{
-  margin-left: 0;
-}
-
-QTabBar::tab:last:selected
-{
-  margin-right: 0;
-}
-
-QTabBar::tab::only-one
-{
-  margin-left: 0;
-  margin-right: 0;
-}
-
-QTabWidget#mainTab::pane,
-QTabWidget#buildingEditorTab::pane,
-QTabWidget#modelEditorTab::pane,
-QTabWidget#terrainEditorTab::pane,
-QTabWidget#linkInspectorTab::pane
-{
-  border-left: 1px solid #101010;
-  border-bottom: 1px solid #101010;
-  border-top: 1px solid #101010;
-
-  border-top-left-radius: 2px;
-  border-bottom-left-radius: 2px;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
-  top: -1px;
-
-  background-color: #808080;
-  padding: 2px;
-
-  margin: 0px;
-  color: #f0f0f0;
-}
-
-QTabWidget::tab
-{
-  border-top: 1px solid #101010;
-  background-color: #808080;
-}
-
-QTabWidget::tab-bar
-{
-  alignment: left;
-}
-
 QWidget#modelList,
 QWidget#jointControl,
 QWidget#toolsWidget
@@ -535,20 +539,6 @@ QWidget#toolsWidget > QFrame
 {
   padding: 4px;
   background-color: #808080;
-}
-
-QWidget#renderWidget > QWidget
-{
-  padding: 0px;
-  margin: 0px;
-  border: 1px solid #101010;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
-  border-top-left-radius: 2px;
-  border-bottom-left-radius: 2px;
-
-  background-color: #808080;
-  margin-right: 0px;
 }
 
 QWidget#buildingEditorWidget > QWidget,
@@ -749,4 +739,4 @@ QTextEdit#splashVersionTextEdit
 {
   color: #f58113;
   font-size: 10px;
-}
+}*/

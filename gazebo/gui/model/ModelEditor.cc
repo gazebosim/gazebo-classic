@@ -45,6 +45,7 @@ using namespace gui;
 ModelEditor::ModelEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow), dataPtr(new ModelEditorPrivate)
 {
+  return;
   this->dataPtr->active = false;
   // Create the model editor tab
   this->dataPtr->modelPalette = new ModelEditorPalette(_mainWindow);

@@ -44,13 +44,36 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->setObjectName("renderWidget");
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->setSpacing(0);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
+
   this->mainFrame = new QFrame;
   this->mainFrame->setFrameShape(QFrame::NoFrame);
+  this->mainFrame->setContentsMargins(0, 0, 0, 0);
   this->mainFrame->show();
+  mainLayout->addWidget(this->mainFrame);
+  this->setLayout(mainLayout);
 
-  QVBoxLayout *frameLayout = new QVBoxLayout;
+  this->glWidget = new GLWidget(this->mainFrame);
 
-  this->toolFrame = new QFrame;
+  QFrame *render3DFrame = new QFrame;
+  render3DFrame->setObjectName("myrenderframe");
+  render3DFrame->setFrameShape(QFrame::NoFrame);
+  render3DFrame->setContentsMargins(0, 0, 0, 0);
+
+  QVBoxLayout *render3DLayout = new QVBoxLayout;
+  render3DLayout->setSpacing(0);
+  render3DLayout->setContentsMargins(0, 0, 0, 0);
+
+  // render3DLayout->addWidget(this->toolFrame);
+  render3DLayout->addWidget(this->glWidget);
+  render3DFrame->setLayout(render3DLayout);
+  mainLayout->addWidget(render3DFrame);
+  //render3DLayout->setContentsMargins(0, 0, 0, 0);
+
+  //QVBoxLayout *frameLayout = new QVBoxLayout;
+
+  /*this->toolFrame = new QFrame;
   this->toolFrame->setObjectName("toolFrame");
   this->toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -170,8 +193,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolLayout->addWidget(this->toolbar);
   toolLayout->addSpacing(10);
   this->toolFrame->setLayout(toolLayout);
-
-  this->glWidget = new GLWidget(this->mainFrame);
+  */
+/*
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(
@@ -188,20 +211,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
       QSizePolicy::Minimum);
 
   bottomPanelLayout->addWidget(this->timePanel, 0);
-  bottomPanelLayout->setSpacing(0);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   this->bottomFrame->setLayout(bottomPanelLayout);
+  */
 
-  QFrame *render3DFrame = new QFrame;
-  render3DFrame->setObjectName("render3DFrame");
-  QVBoxLayout *render3DLayout = new QVBoxLayout;
-  render3DLayout->addWidget(this->toolFrame);
-  render3DLayout->addWidget(this->glWidget);
-  render3DLayout->setContentsMargins(0, 0, 0, 0);
-  render3DLayout->setSpacing(0);
-  render3DFrame->setLayout(render3DLayout);
 
-  this->splitter = new QSplitter(this);
+  /*this->splitter = new QSplitter(this);
   this->splitter->addWidget(render3DFrame);
   QList<int> sizes;
   sizes.push_back(300);
@@ -212,16 +227,11 @@ RenderWidget::RenderWidget(QWidget *_parent)
   frameLayout->addWidget(this->splitter);
   frameLayout->addWidget(this->bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
-  frameLayout->setSpacing(0);
+  */
+  //this->mainFrame->setLayout(frameLayout);
+  //this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->mainFrame->setLayout(frameLayout);
-  this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);
-
-  mainLayout->addWidget(this->mainFrame);
-
-  this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(0, 0, 0, 0);
-
+/*
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));
@@ -259,6 +269,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
       }
     }
   }
+*/
 }
 
 /////////////////////////////////////////////////
@@ -362,6 +373,7 @@ std::string RenderWidget::GetOverlayMsg() const
 /////////////////////////////////////////////////
 void RenderWidget::ShowToolbar(const bool _show)
 {
+  return;
   if (this->toolbar)
   {
     if (_show)
@@ -378,6 +390,7 @@ void RenderWidget::ShowToolbar(const bool _show)
 /////////////////////////////////////////////////
 QToolBar *RenderWidget::GetToolbar() const
 {
+  return NULL;
   return this->toolbar;
 }
 
