@@ -407,6 +407,185 @@ TEST_F(MsgsTest, Initialization)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, CameraSensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <sensor name='camera' type='camera'>\
+           <always_on>true</always_on>\
+           <update_rate>15</update_rate>\
+           <pose>1 2 3 0.1 0.2 0.3</pose>\
+           <visualize>true</visualize>\
+           <topic>/gazebo/test</topic>\
+           <camera>\
+             <horizontal_fov>0.123</horizontal_fov>\
+             <image>\
+               <width>320</width>\
+               <height>240</height>\
+               <format>R8G8B8</format>\
+             </image>\
+             <clip>\
+               <near>0.1</near>\
+               <far>10.5</far>\
+             </clip>\
+             <save enabled='true'>\
+               <path>/tmp</path>\
+             </save>\
+             <distortion>\
+               <k1>0.1</k1>\
+               <k2>0.2</k2>\
+               <k3>0.3</k3>\
+               <p1>0.4</p1>\
+               <p2>0.5</p2>\
+               <center>10 20</center>\
+             </distortion>\
+           </camera>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "camera");
+  EXPECT_EQ(msg.type(), "camera");
+  EXPECT_EQ(msg.topic(), "/gazebo/test");
+  EXPECT_TRUE(msg.always_on());
+  EXPECT_TRUE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 15.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_TRUE(msg.has_camera());
+  EXPECT_FALSE(msg.has_ray());
+  EXPECT_FALSE(msg.has_contact());
+
+  EXPECT_NEAR(msg.camera().horizontal_fov(), 0.123, 1e-4);
+  EXPECT_NEAR(msg.camera().image_size().x(), 320, 1e-4);
+  EXPECT_NEAR(msg.camera().image_size().y(), 240, 1e-4);
+  EXPECT_NEAR(msg.camera().near_clip(), 0.1, 1e-4);
+  EXPECT_NEAR(msg.camera().far_clip(), 10.5, 1e-4);
+  EXPECT_TRUE(msg.camera().save_enabled());
+  EXPECT_EQ(msg.camera().save_path(), "/tmp");
+
+  EXPECT_NEAR(msg.camera().distortion().k1(), 0.1, 1e-4);
+  EXPECT_NEAR(msg.camera().distortion().k2(), 0.2, 1e-4);
+  EXPECT_NEAR(msg.camera().distortion().k3(), 0.3, 1e-4);
+  EXPECT_NEAR(msg.camera().distortion().p1(), 0.4, 1e-4);
+  EXPECT_NEAR(msg.camera().distortion().p2(), 0.5, 1e-4);
+  EXPECT_NEAR(msg.camera().distortion().center().x(), 10, 1e-4);
+  EXPECT_NEAR(msg.camera().distortion().center().y(), 20, 1e-4);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, ContactSensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <sensor name='contact' type='contact'>\
+           <always_on>false</always_on>\
+           <update_rate>5</update_rate>\
+           <pose>1 2 3 0.1 0.2 0.3</pose>\
+           <visualize>false</visualize>\
+           <topic>/test</topic>\
+           <contact>\
+             <collision>my_collision</collision>\
+           </contact>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "contact");
+  EXPECT_EQ(msg.type(), "contact");
+  EXPECT_EQ(msg.topic(), "/test");
+  EXPECT_FALSE(msg.always_on());
+  EXPECT_FALSE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 5.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_FALSE(msg.has_camera());
+  EXPECT_FALSE(msg.has_ray());
+  EXPECT_TRUE(msg.has_contact());
+
+  EXPECT_EQ(msg.contact().collision_name(), "my_collision");
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, RaySensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <sensor name='ray' type='ray'>\
+           <always_on>false</always_on>\
+           <update_rate>5</update_rate>\
+           <pose>1 2 3 0.1 0.2 0.3</pose>\
+           <visualize>false</visualize>\
+           <topic>/test</topic>\
+           <ray>\
+             <scan>\
+               <horizontal>\
+                 <samples>10</samples>\
+                 <resolution>0.2</resolution>\
+                 <min_angle>0</min_angle>\
+                 <max_angle>1</max_angle>\
+               </horizontal>\
+               <vertical>\
+                 <samples>20</samples>\
+                 <resolution>0.4</resolution>\
+                 <min_angle>-1</min_angle>\
+                 <max_angle>0</max_angle>\
+               </vertical>\
+             </scan>\
+             <range>\
+               <min>0</min>\
+               <max>10</max>\
+               <resolution>0.1</resolution>\
+             </range>\
+           </ray>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "ray");
+  EXPECT_EQ(msg.type(), "ray");
+  EXPECT_EQ(msg.topic(), "/test");
+  EXPECT_FALSE(msg.always_on());
+  EXPECT_FALSE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 5.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_FALSE(msg.has_camera());
+  EXPECT_TRUE(msg.has_ray());
+  EXPECT_FALSE(msg.has_contact());
+
+  EXPECT_EQ(msg.ray().horizontal_samples(), 10);
+  EXPECT_NEAR(msg.ray().horizontal_resolution(), 0.2, 1e-4);
+  EXPECT_NEAR(msg.ray().horizontal_min_angle(), 0, 1e-4);
+  EXPECT_NEAR(msg.ray().horizontal_max_angle(), 1, 1e-4);
+
+  EXPECT_EQ(msg.ray().vertical_samples(), 20);
+  EXPECT_NEAR(msg.ray().vertical_resolution(), 0.4, 1e-4);
+  EXPECT_NEAR(msg.ray().vertical_min_angle(), -1, 1e-4);
+  EXPECT_NEAR(msg.ray().vertical_max_angle(), 0, 1e-4);
+
+  EXPECT_NEAR(msg.ray().range_min(), 0, 1e-4);
+  EXPECT_NEAR(msg.ray().range_max(), 11, 1e-4);
+  EXPECT_NEAR(msg.ray().range_resolution(), 0.1, 1e-4);
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, GUIFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());
