@@ -23,6 +23,7 @@
 #define BULLETRAYSENSOR_HH
 
 #include <vector>
+#include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
