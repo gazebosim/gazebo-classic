@@ -127,7 +127,6 @@ namespace gazebo
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
-      private slots: void Import();
       private slots: void Save();
       private slots: void SaveAs();
 

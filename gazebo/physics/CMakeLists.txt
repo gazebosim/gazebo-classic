@@ -11,6 +11,9 @@ add_subdirectory(ode)
 
 # Add Bullet support if present
 if (HAVE_BULLET)
+  include_directories(${BULLET_INCLUDE_DIRS})
+  link_directories(${BULLET_LIBRARY_DIRS})
+  add_definitions(${BULLET_CFLAGS})
   add_subdirectory(bullet)
   include_directories(${BULLET_INCLUDE_DIRS})
   link_directories(${BULLET_LIBRARY_DIRS})
@@ -94,6 +97,7 @@ set (headers
   ContactManager.hh
   CylinderShape.hh
   Entity.hh
+  FixedJoint.hh
   HeightmapShape.hh
   Hinge2Joint.hh
   HingeJoint.hh

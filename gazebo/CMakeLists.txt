@@ -8,7 +8,7 @@ include_directories(SYSTEM
   ${TBB_INCLUDEDIR}
   ${tinyxml_INCLUDE_DIRS}
 )
-include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
+# include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
 
 link_directories(
   ${ogre_library_dirs}
@@ -59,6 +59,7 @@ target_link_libraries(gzserver
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
+  # Extra libs needed when linking statically (e.g., on WIN32)
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
 )
@@ -134,5 +135,3 @@ set(headers
   Server.hh
 )
 gz_install_includes("" ${headers})
-
-message (STATUS "\n\n PROTO: ${PROTOBUF_LIBRARY}\n\n")

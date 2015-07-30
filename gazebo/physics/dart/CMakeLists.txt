@@ -55,10 +55,4 @@ SET (headers
     dart_inc.h
 )
 
-set (gtest_sources
-  # DARTPhysics_TEST.cc
-  # DARTJoint_TEST.cc
-)
-# gz_build_tests(${gtest_sources})
-
 gz_install_includes("physics/dart" ${headers})
