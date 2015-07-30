@@ -200,7 +200,10 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
     {
       // linear position
       const double radianAngle = this->dartScrewJoint->getPosition(0);
-      result.SetFromRadian(-radianAngle / this->GetThreadPitch());
+      result.SetFromRadian(-radianAngle /
+                           const_cast<DARTScrewJoint*>(this)->GetThreadPitch());
+      // TODO: The ScrewJoint::GetThreadPitch() function is not const. As an
+      // workaround, we use const_cast here until #1686 is resolved.
     }
     else
     {
