@@ -30,7 +30,7 @@
         <sensor name="logical_camera" type="logical_camera">
 
           <logical_camera>
-            <near>0.55</near>
+            <near>0.1</near>
             <far>5</far>
             <fov>1.04719755</fov>
             <aspect_ratio>1.778</aspect_ratio>

@@ -44,6 +44,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the msg.
       public: std::mutex mutex;
+
+      /// \brief Name of the parent model.
+      public: std::string modelName;
     };
   }
 }

@@ -57,6 +57,9 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
   physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
+
+  // Store parent model's name for use in the UpdateImpl function.
+  this->dataPtr->modelName = this->dataPtr->parentLink->GetModel()->GetName();
 }
 
 //////////////////////////////////////////////////
@@ -127,8 +130,10 @@ bool LogicalCameraSensor::UpdateImpl(bool _force)
     // Check all models for inclusion in the frustum.
     for (auto const &model : this->world->GetModels())
     {
-      // Add the the model to the output if it is in the frustum.
-      if (this->dataPtr->frustum.Contains(model->GetBoundingBox().Ign()))
+      // Add the the model to the output if it is in the frustum, and
+      // we are not detecting ourselves.
+      if (this->dataPtr->modelName != model->GetName() &&
+          this->dataPtr->frustum.Contains(model->GetBoundingBox().Ign()))
       {
         // Add new model msg
         msgs::LogicalCameraImage::Model *modelMsg =
