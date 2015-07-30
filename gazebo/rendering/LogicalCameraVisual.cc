@@ -54,6 +54,7 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
 
   DynamicLines *line = this->CreateDynamicLine(RENDERING_LINE_LIST);
 
+  // Draw the near clipping plane as a white rectangle
   line->AddPoint(math::Vector3(_msg.near(), nearWidth, nearHeight));
   line->AddPoint(math::Vector3(_msg.near(), nearWidth, -nearHeight));
 
@@ -66,6 +67,7 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
   line->AddPoint(math::Vector3(_msg.near(), -nearWidth, nearHeight));
   line->AddPoint(math::Vector3(_msg.near(), nearWidth, nearHeight));
 
+  // Draw the far clipping plane as a white rectangle
   line->AddPoint(math::Vector3(_msg.far(), farWidth, farHeight));
   line->AddPoint(math::Vector3(_msg.far(), farWidth, -farHeight));
 
@@ -78,6 +80,7 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
   line->AddPoint(math::Vector3(_msg.far(), -farWidth, farHeight));
   line->AddPoint(math::Vector3(_msg.far(), farWidth, farHeight));
 
+  // Connect the near and far clipping planes with lines
   line->AddPoint(math::Vector3(_msg.near(), nearWidth, nearHeight));
   line->AddPoint(math::Vector3(_msg.far(), farWidth, farHeight));
 
@@ -93,6 +96,7 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
+  // Draw green lines from the near clipping plane to the origin
   DynamicLines *sourceLine = this->CreateDynamicLine(RENDERING_LINE_LIST);
   sourceLine->AddPoint(math::Vector3::Zero);
   sourceLine->AddPoint(math::Vector3(_msg.near(), nearWidth, nearHeight));

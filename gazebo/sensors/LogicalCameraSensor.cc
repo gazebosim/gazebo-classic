@@ -52,6 +52,8 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
 {
   Sensor::Load(_worldName, _sdf);
 
+  // Get a pointer to the parent link. This will be used to adjust the
+  // orientation of the logical camera.
   physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
@@ -71,6 +73,8 @@ std::string LogicalCameraSensor::GetTopic() const
 void LogicalCameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
+
+  // Create publisher of the logical camera images
   this->dataPtr->pub = this->node->Advertise<msgs::LogicalCameraImage>(
       this->GetTopic(), 50);
 }
@@ -78,23 +82,19 @@ void LogicalCameraSensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void LogicalCameraSensor::Init()
 {
-  std::string worldName = this->world->GetName();
-
-  if (!worldName.empty())
+  // Read configuration values
+  if (this->sdf->HasElement("logical_camera"))
   {
-    if (this->sdf->HasElement("logical_camera"))
-    {
-      sdf::ElementPtr cameraSdf = this->sdf->GetElement("logical_camera");
+    sdf::ElementPtr cameraSdf = this->sdf->GetElement("logical_camera");
 
-      this->dataPtr->frustum.SetNear(cameraSdf->Get<double>("near"));
-      this->dataPtr->frustum.SetFar(cameraSdf->Get<double>("far"));
-      this->dataPtr->frustum.SetFOV(cameraSdf->Get<double>("fov"));
-      this->dataPtr->frustum.SetAspectRatio(
-          cameraSdf->Get<double>("aspect_ratio"));
-    }
+    // These values are required in SDF, so no need to check for their
+    // existance.
+    this->dataPtr->frustum.SetNear(cameraSdf->Get<double>("near"));
+    this->dataPtr->frustum.SetFar(cameraSdf->Get<double>("far"));
+    this->dataPtr->frustum.SetFOV(cameraSdf->Get<double>("fov"));
+    this->dataPtr->frustum.SetAspectRatio(
+        cameraSdf->Get<double>("aspect_ratio"));
   }
-  else
-    gzerr << "No world name\n";
 
   Sensor::Init();
 }
@@ -108,20 +108,26 @@ void LogicalCameraSensor::Fini()
 //////////////////////////////////////////////////
 bool LogicalCameraSensor::UpdateImpl(bool _force)
 {
-  // Only compute if there are connections
-  if (_force || (this->dataPtr->pub && this->dataPtr->pub->HasConnections()))
+  // Only compute if active, or the update is forced
+  if (_force || this->IsActive())
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     this->dataPtr->msg.clear_model();
 
-    // Update the pose of the frustum
-    this->dataPtr->frustum.SetPose(
-        this->dataPtr->parentLink->GetWorldPose().Ign());
+    // Get the pose of the camera's parent.
+    ignition::math::Pose3d pose =
+      this->dataPtr->parentLink->GetWorldPose().Ign();
 
-    // Check all models for inclusion in the frustum
+    // Update the pose of the frustum.
+    this->dataPtr->frustum.SetPose(pose);
+
+    // Set the camera's pose in the message.
+    msgs::Set(this->dataPtr->msg.mutable_pose(), pose);
+
+    // Check all models for inclusion in the frustum.
     for (auto const &model : this->world->GetModels())
     {
-      // Add the the model the output if it is in the frustum.
+      // Add the the model to the output if it is in the frustum.
       if (this->dataPtr->frustum.Contains(model->GetBoundingBox().Ign()))
       {
         // Add new model msg
@@ -130,10 +136,12 @@ bool LogicalCameraSensor::UpdateImpl(bool _force)
 
         // Set the name and pose reported by the sensor.
         modelMsg->set_name(model->GetScopedName());
-        msgs::Set(modelMsg->mutable_pose(), model->GetWorldPose().Ign());
+        msgs::Set(modelMsg->mutable_pose(),
+            model->GetWorldPose().Ign() - pose);
       }
     }
 
+    // Send the message.
     this->dataPtr->pub->Publish(this->dataPtr->msg);
   }
 
