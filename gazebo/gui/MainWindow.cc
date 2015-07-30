@@ -22,7 +22,6 @@
 
 #include <sdf/sdf.hh>
 #include <boost/scoped_ptr.hpp>
-#include <QWebView>
 
 #include "gazebo/gazebo_config.h"
 
@@ -584,42 +583,7 @@ void MainWindow::HotkeyChart()
   // Opening for the first time
   if (!this->hotkeyDialog)
   {
-    // Load the html file into the web view
-    QWebView *view = new QWebView(this);
-    view->load(QUrl("qrc:///hotkeyTable.html"));
-
-    // Can't be higher than main window
-    int desiredHeight = 980;
-    int minHeight = std::min(desiredHeight, (this->height() - 100));
-
-    // Can't be wider than main window
-    int desired2ColumnWidth = 1850;
-    int minWidth = std::min(desired2ColumnWidth, (this->width() - 100));
-
-    // If too small to fit 2 columns, decrease white space by tightening to
-    // 1 column
-    if (minWidth < desired2ColumnWidth)
-    {
-      int desired1ColumnWidth = 900;
-      minWidth = std::min(desired1ColumnWidth, minWidth);
-    }
-
-    view->setMinimumWidth(minWidth);
-    view->setMinimumHeight(minHeight);
-
-    // Layout for the dialog
-    QHBoxLayout *mainLayout = new QHBoxLayout();
-    mainLayout->addWidget(view);
-    mainLayout->setSizeConstraint(QLayout::SetFixedSize);
-
-    // The dialog
-    this->hotkeyDialog = new QDialog(this);
-    this->hotkeyDialog->setObjectName("hotkeyChart");
-    this->hotkeyDialog->setLayout(mainLayout);
-    this->hotkeyDialog->setWindowTitle("Gazebo Keyboard Shortcuts");
-    this->hotkeyDialog->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
-        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
-    this->hotkeyDialog->setWindowModality(Qt::NonModal);
+    this->hotkeyDialog = new HotkeyDialog(this);
   }
 
   this->hotkeyDialog->show();

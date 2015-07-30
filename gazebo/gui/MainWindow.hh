@@ -27,6 +27,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -368,7 +369,7 @@ namespace gazebo
       private: gui::DataLogger *dataLogger;
 
       /// \brief Hotkey chart dialog.
-      private: QDialog *hotkeyDialog;
+      private: gui::HotkeyDialog *hotkeyDialog;
     };
   }
 }
