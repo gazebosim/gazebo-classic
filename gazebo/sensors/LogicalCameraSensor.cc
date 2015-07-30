@@ -118,14 +118,14 @@ bool LogicalCameraSensor::UpdateImpl(bool _force)
     this->dataPtr->msg.clear_model();
 
     // Get the pose of the camera's parent.
-    ignition::math::Pose3d pose =
+    ignition::math::Pose3d myPose =
       this->dataPtr->parentLink->GetWorldPose().Ign();
 
     // Update the pose of the frustum.
-    this->dataPtr->frustum.SetPose(pose);
+    this->dataPtr->frustum.SetPose(myPose);
 
     // Set the camera's pose in the message.
-    msgs::Set(this->dataPtr->msg.mutable_pose(), pose);
+    msgs::Set(this->dataPtr->msg.mutable_pose(), myPose);
 
     // Check all models for inclusion in the frustum.
     for (auto const &model : this->world->GetModels())
@@ -142,7 +142,7 @@ bool LogicalCameraSensor::UpdateImpl(bool _force)
         // Set the name and pose reported by the sensor.
         modelMsg->set_name(model->GetScopedName());
         msgs::Set(modelMsg->mutable_pose(),
-            model->GetWorldPose().Ign() - pose);
+            model->GetWorldPose().Ign() - myPose);
       }
     }
 
