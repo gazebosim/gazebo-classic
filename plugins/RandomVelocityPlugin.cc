@@ -167,9 +167,6 @@ void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
     this->dataPtr->velocity.Z(ignition::math::clamp(this->dataPtr->velocity.Z(),
         this->dataPtr->zRange.X(), this->dataPtr->zRange.Y()));
 
-    this->dataPtr->velocity.Normalize();
-    this->dataPtr->velocity *= this->dataPtr->velocityFactor;
-
     this->dataPtr->prevUpdate = _info.simTime;
   }
 
