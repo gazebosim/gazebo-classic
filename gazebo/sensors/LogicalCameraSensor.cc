@@ -88,7 +88,7 @@ void LogicalCameraSensor::Init()
     sdf::ElementPtr cameraSdf = this->sdf->GetElement("logical_camera");
 
     // These values are required in SDF, so no need to check for their
-    // existance.
+    // existence.
     this->dataPtr->frustum.SetNear(cameraSdf->Get<double>("near"));
     this->dataPtr->frustum.SetFar(cameraSdf->Get<double>("far"));
     this->dataPtr->frustum.SetFOV(cameraSdf->Get<double>("fov"));

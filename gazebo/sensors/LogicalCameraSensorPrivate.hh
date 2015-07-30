@@ -30,7 +30,7 @@ namespace gazebo
     /// \brief Logical camera sensor private data.
     class LogicalCameraSensorPrivate
     {
-      /// \brief Publisher of logicalcamera messages.
+      /// \brief Publisher of msgs::LogicalCameraImage messages.
       public: transport::PublisherPtr pub;
 
       /// \brief Camera frustum.
