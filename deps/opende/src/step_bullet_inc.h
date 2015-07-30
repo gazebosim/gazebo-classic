@@ -23,7 +23,9 @@
 #include "LinearMath/btMatrixX.h"
 #include "LinearMath/btAlignedObjectArray.h"
 #include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
+#ifdef LIBBULLET_VERSION_GT_282
 #include "BulletDynamics/MLCPSolvers/btLemkeSolver.h"
+#endif
 #include "BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h"
 #endif
 #endif
