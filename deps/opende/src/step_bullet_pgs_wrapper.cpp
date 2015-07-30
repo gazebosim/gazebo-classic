@@ -30,15 +30,7 @@
 #include "step_bullet_pgs_wrapper.h"
 
 #ifdef HAVE_BULLET
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wfloat-equal"
-# pragma GCC diagnostic ignored "-Wshadow"
-# pragma GCC diagnostic ignored "-Wunused-variable"
-# include "LinearMath/btMatrixX.h"
-# include "LinearMath/btAlignedObjectArray.h"
-# include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
-# include "BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h"
-# pragma GCC diagnostic pop
+#include "step_bullet_inc.h"
 
 //////////////////////////////////////////////////////////
 void dSolveLCP_bullet_pgs(int _m, dReal *_A, dReal *_x, dReal *_b,

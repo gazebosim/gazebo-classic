@@ -30,15 +30,7 @@
 
 #ifdef HAVE_BULLET
 #ifdef LIBBULLET_VERSION_GT_282
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wfloat-equal"
-# pragma GCC diagnostic ignored "-Wshadow"
-# pragma GCC diagnostic ignored "-Wunused-variable"
-# include "LinearMath/btMatrixX.h"
-# include "LinearMath/btAlignedObjectArray.h"
-# include "BulletDynamics/MLCPSolvers/btMLCPSolver.h"
-# include "BulletDynamics/MLCPSolvers/btLemkeSolver.h"
-# pragma GCC diagnostic pop
+#include "step_bullet_inc.h"
 
 //////////////////////////////////////////////////////////
 void dSolveLCP_bullet_lemke(int _m, dReal *_A, dReal *_x, dReal *_b,
