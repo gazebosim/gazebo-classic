@@ -134,6 +134,12 @@ void RandomVelocityPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
+void RandomVelocityPlugin::Reset()
+{
+  this->dataPtr->prevUpdate.Set(0, 0);
+}
+
+/////////////////////////////////////////////////
 void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
 {
   GZ_ASSERT(this->dataPtr->link, "<link> in RandomVelocity plugin is null");
