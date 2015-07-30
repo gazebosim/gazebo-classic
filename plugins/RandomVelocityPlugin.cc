@@ -109,7 +109,7 @@ void RandomVelocityPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     this->dataPtr->zRange.Y(_sdf->Get<double>("max_z"));
 
   // Make sure min <= max
-  tmp = this->dataPtr->yRange;
+  tmp = this->dataPtr->zRange;
   this->dataPtr->zRange.X(std::min(tmp.X(), tmp.Y()));
   this->dataPtr->zRange.Y(std::max(tmp.X(), tmp.Y()));
 
