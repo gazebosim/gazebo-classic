@@ -80,6 +80,7 @@ TEST_F(LogicalCameraSensor, Box)
   // Insert box
   SpawnBox("spawn_box", math::Vector3(1, 1, 1), math::Vector3(2, 0, 0.5),
       math::Vector3::Zero);
+  common::Time::MSleep(1000);
   cam->Update(true);
 
   ASSERT_EQ(cam->Image().model_size(), 2);
@@ -87,6 +88,7 @@ TEST_F(LogicalCameraSensor, Box)
 
   // Rotate the model, which should move "spawn_box" out of the frustum
   cameraModel->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 1.5707));
+  common::Time::MSleep(1000);
   cam->Update(true);
   ASSERT_EQ(cam->Image().model_size(), 1);
 }
