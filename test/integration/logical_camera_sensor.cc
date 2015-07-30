@@ -34,8 +34,8 @@ TEST_F(LogicalCameraSensor, GroundPlane)
   ASSERT_TRUE(cam != NULL);
 
   // Check that the camera parameters are correct
-  EXPECT_DOUBLE_EQ(cam->Near(), 0.51);
-  EXPECT_DOUBLE_EQ(cam->Far(), 5.0);
+  EXPECT_NEAR(cam->Near(), 0.55, 1e-4);
+  EXPECT_NEAR(cam->Far(), 5.0, 1e-4);
   EXPECT_NEAR(cam->FOV().Radian(), 1.04719755, 1e-4);
   EXPECT_NEAR(cam->AspectRatio(), 1.778, 1e-4);
   EXPECT_TRUE(cam->IsActive());

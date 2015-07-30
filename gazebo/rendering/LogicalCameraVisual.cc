@@ -110,7 +110,7 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
   sourceLine->AddPoint(math::Vector3::Zero);
   sourceLine->AddPoint(math::Vector3(_msg.near(), nearWidth, -nearHeight));
 
-  sourceLine->setMaterial("Gazebo/GreenGlow");
+  sourceLine->setMaterial("Gazebo/PurpleGlow");
   sourceLine->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
