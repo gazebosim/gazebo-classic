@@ -12,6 +12,8 @@
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
 
 1. Model editor updates
+    1. Added support for more joint types (gearbox and fixed joints).
+        * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
         * [Pull request #1787](https://bitbucket.org/osrf/gazebo/pull-request/1787)
         
