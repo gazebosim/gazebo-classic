@@ -970,7 +970,7 @@ void Model::SetLaserRetro(const float _retro)
 //////////////////////////////////////////////////
 void Model::FillMsg(msgs::Model &_msg)
 {
-  math::Pose relPose = this->GetRelativePose();
+  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
 
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
@@ -978,7 +978,7 @@ void Model::FillMsg(msgs::Model &_msg)
 //  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
   msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
-  msgs::Set(_msg.mutable_scale(), this->scale);
+  msgs::Set(_msg.mutable_scale(), this->scale.Ign());
 
 //  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   msgs::Set(this->visualMsg->mutable_pose(), relPose);
@@ -1020,7 +1020,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
-    this->SetWorldPose(msgs::Convert(_msg.pose()));
+    this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)
   {
     LinkPtr link = this->GetLinkById(_msg.link(i).id());
@@ -1032,7 +1032,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     this->SetStatic(_msg.is_static());
 
   if (_msg.has_scale())
-    this->SetScale(msgs::Convert(_msg.scale()));
+    this->SetScale(msgs::ConvertIgn(_msg.scale()));
 }
 
 //////////////////////////////////////////////////

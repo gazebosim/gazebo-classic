@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _WIRELESS_TRANSMITTER_HH_
-#define _WIRELESS_TRANSMITTER_HH_
+#ifndef _GAZEBO_WIRELESS_TRANSMITTER_HH_
+#define _GAZEBO_WIRELESS_TRANSMITTER_HH_
 
 #include <string>
 #include "gazebo/physics/physics.hh"
@@ -71,9 +70,20 @@ namespace gazebo
       public: double GetFreq() const;
 
       /// \brief Returns the signal strength in a given world's point (dBm).
+      /// \param[in] _receiver Pose of the receiver
+      /// \param[in] _rxGain Receiver gain value
       /// \return Signal strength in a world's point (dBm).
+      /// \deprecated See SignalStrength() function that accepts an
+      /// ignition::math::Pose3d object.
       public: double GetSignalStrength(const math::Pose &_receiver,
-          const double rxGain);
+          const double _rxGain) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Returns the signal strength in a given world's point (dBm).
+      /// \param[in] _receiver Pose of the receiver
+      /// \param[in] _rxGain Receiver gain value
+      /// \return Signal strength in a world's point (dBm).
+      public: double SignalStrength(const ignition::math::Pose3d &_receiver,
+          const double _rxGain);
 
       /// \brief Size of the grid used for visualization.
       private: static const double Step;

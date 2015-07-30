@@ -434,7 +434,6 @@ namespace gazebo
         /// \brief Notify that a link has been inserted.
         public: static event::EventT<void (std::string)> linkInserted;
 
-
         /// \brief Notify that a nested model has been removed.
         public: static event::EventT<void (std::string)> nestedModelRemoved;
         /// \brief Notify that a link has been removed.

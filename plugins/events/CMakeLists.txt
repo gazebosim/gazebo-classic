@@ -11,6 +11,7 @@ set (sim_event_src
   EventSource.cc
   ExistenceEventSource.cc
   InRegionEventSource.cc
+  JointEventSource.cc
   OccupiedEventSource.cc
   Region.cc
   SimEventsPlugin.cc
@@ -21,6 +22,7 @@ set (sim_event_include
   EventSource.hh
   ExistenceEventSource.hh
   InRegionEventSource.hh
+  JointEventSource.hh
   OccupiedEventSource.hh
   Region.hh
   SimEventsException.hh

@@ -24,6 +24,10 @@
 #include "gazebo/gui/model/qgv/QGVNode.h"
 #include "gazebo/gui/model/qgv/QGVEdge.h"
 
+#include "gazebo/gui/model/qgv/QGVNode.h"
+#include "gazebo/gui/model/qgv/QGVEdge.h"
+
+#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/GraphScene.hh"
 #include "gazebo/gui/model/GraphView.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
@@ -101,7 +105,7 @@ void SchematicViewWidget::Init()
 
   this->connections.push_back(gui::model::Events::ConnectJointChanged(
       boost::bind(&SchematicViewWidget::UpdateEdge, this, _1, _2, _3, _4, _5)));
-      
+
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
@@ -209,7 +213,6 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   std::string childNode = this->GetScopedName(_child);
 
   std::cerr << " add edge " << parentNode << " VS " << childNode << std::endl;
-
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 
@@ -389,7 +392,7 @@ void SchematicViewWidget::OnSelectionChanged()
   }
 
   // deselect
-  for (auto const item : this->selectedItems)
+  for (auto const &item : this->selectedItems)
   {
     if (item)
     {

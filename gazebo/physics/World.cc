@@ -1776,7 +1776,9 @@ void World::ProcessFactoryMsgs()
         elem->SetParent(this->dataPtr->sdf);
         elem->GetParent()->InsertElement(elem);
         if (factoryMsg.has_pose())
-          elem->GetElement("pose")->Set(msgs::Convert(factoryMsg.pose()));
+        {
+          elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
+        }
 
         if (isActor)
         {
@@ -2049,7 +2051,7 @@ void World::ProcessMessages()
           // Publish the model's relative pose
           poseMsg->set_name(model->GetScopedName());
           poseMsg->set_id(model->GetId());
-          msgs::Set(poseMsg, model->GetRelativePose());
+          msgs::Set(poseMsg, model->GetRelativePose().Ign());
 
           // Publish each of the model's children relative poses
           Link_V links = model->GetLinks();
@@ -2058,7 +2060,7 @@ void World::ProcessMessages()
             poseMsg = msg.add_pose();
             poseMsg->set_name(link->GetScopedName());
             poseMsg->set_id(link->GetId());
-            msgs::Set(poseMsg, link->GetRelativePose());
+            msgs::Set(poseMsg, link->GetRelativePose().Ign());
           }*/
         }
 
