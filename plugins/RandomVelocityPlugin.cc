@@ -67,17 +67,51 @@ void RandomVelocityPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("max_x"))
     this->dataPtr->xRange.Y(_sdf->Get<double>("max_x"));
 
+  // Make sure min <= max
+  //
+  // Analysis:
+  //     min_x   max_x  | result_X  result_Y
+  //    ----------------------------------
+  // 0:   0       0     |   0         0
+  // 1:   1       0     |   0         1
+  // 2:   0       1     |   0         1
+  //
+  // Line 1 above is the error case, and can be handled different ways:
+  //   a: Throw an exception
+  //   b: Set both min and max values to the same value (either min_x or
+  //   max_x)
+  //   c: Fix it by swapping the values
+  //   d: Do nothing, which would:
+  //        i. First clamp the value to <= max_x
+  //        ii. Second clamp the value to >= min_x
+  //        iii. The result would always be the value of min_x
+  //
+  // We've opted for option c, which seems the most resonable.
+  ignition::math::Vector2d tmp = this->dataPtr->xRange;
+  this->dataPtr->xRange.X(std::min(tmp.X(), tmp.Y()));
+  this->dataPtr->xRange.Y(std::max(tmp.X(), tmp.Y()));
+
   // Get y clamping values
   if (_sdf->HasElement("min_y"))
     this->dataPtr->yRange.X(_sdf->Get<double>("min_y"));
   if (_sdf->HasElement("max_y"))
     this->dataPtr->yRange.Y(_sdf->Get<double>("max_y"));
 
+  // Make sure min <= max
+  tmp = this->dataPtr->yRange;
+  this->dataPtr->yRange.X(std::min(tmp.X(), tmp.Y()));
+  this->dataPtr->yRange.Y(std::max(tmp.X(), tmp.Y()));
+
   // Get z clamping values
   if (_sdf->HasElement("min_z"))
     this->dataPtr->zRange.X(_sdf->Get<double>("min_z"));
   if (_sdf->HasElement("max_z"))
     this->dataPtr->zRange.Y(_sdf->Get<double>("max_z"));
+
+  // Make sure min <= max
+  tmp = this->dataPtr->yRange;
+  this->dataPtr->zRange.X(std::min(tmp.X(), tmp.Y()));
+  this->dataPtr->zRange.Y(std::max(tmp.X(), tmp.Y()));
 
   // Set the initial velocity, if present
   if (_sdf->HasElement("initial_velocity"))
@@ -132,6 +166,9 @@ void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
     // Clamp Z value
     this->dataPtr->velocity.Z(ignition::math::clamp(this->dataPtr->velocity.Z(),
         this->dataPtr->zRange.X(), this->dataPtr->zRange.Y()));
+
+    this->dataPtr->velocity.Normalize();
+    this->dataPtr->velocity *= this->dataPtr->velocityFactor;
 
     this->dataPtr->prevUpdate = _info.simTime;
   }
