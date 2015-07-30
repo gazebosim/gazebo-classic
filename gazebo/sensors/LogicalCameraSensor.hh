@@ -59,6 +59,32 @@ namespace gazebo
       // Documentation inherited
       public: virtual std::string GetTopic() const;
 
+      /// \brief Get the near distance. This is the distance from the
+      /// frustum's vertex to the closest plane.
+      /// \return Near distance.
+      public: double Near() const;
+
+      /// \brief Get the far distance. This is the distance from the
+      /// frustum's vertex to the farthest plane.
+      /// \return Far distance.
+      public: double Far() const;
+
+      /// \brief Get the horizontal field of view. The field of view is the
+      /// angle between the frustum's vertex and the edges of the near or far
+      /// plane. This value represents the horizontal angle.
+      /// \return The field of view.
+      public: ignition::math::Angle FOV() const;
+
+      /// \brief Get the aspect ratio, which is the width divided by height
+      /// of the near or far planes.
+      /// \return The frustum's aspect ratio.
+      public: double AspectRatio() const;
+
+      /// \brief Get the latest image. An image is an instance of
+      /// msgs::LogicalCameraImage, which contains a list of detected models.
+      /// \return List of detected models.
+      public: msgs::LogicalCameraImage Image() const;
+
       // Documentation inherited
       protected: virtual bool UpdateImpl(bool _force);
 

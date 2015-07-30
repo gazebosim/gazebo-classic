@@ -19,6 +19,8 @@
 
 #include <ignition/math/Frustum.hh>
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/Link.hh"
 
 namespace gazebo
 {
@@ -33,6 +35,15 @@ namespace gazebo
 
       /// \brief Camera frustum.
       public: ignition::math::Frustum frustum;
+
+      /// \brief Pointer to the parent link.
+      public: physics::LinkPtr parentLink;
+
+      /// \brief Used to store and report the detected models.
+      public: msgs::LogicalCameraImage msg;
+
+      /// \brief Mutex to protect the msg.
+      public: std::mutex mutex;
     };
   }
 }

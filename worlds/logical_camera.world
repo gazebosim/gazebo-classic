@@ -4,6 +4,7 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
+
     <include>
       <uri>model://sun</uri>
     </include>
@@ -24,15 +25,20 @@
               <size>1 1 1</size>
             </box>
           </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
         </visual>
 
-        <sensor name="camera" type="logical_camera">
-          <camera>
-          </camera>
+        <sensor name="logical_camera" type="logical_camera">
+
+          <logical_camera>
+            <near>0.51</near>
+            <far>5</far>
+            <fov>1.04719755</fov>
+            <aspect_ratio>1.778</aspect_ratio>
+          </logical_camera>
+
+          <visualize>true</visualize>
           <always_on>true</always_on>
+          <update_rate>10</update_rate>
         </sensor>
       </link>
     </model>

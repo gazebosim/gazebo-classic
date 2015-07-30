@@ -52,6 +52,7 @@ set (msgs
   log_playback_stats.proto
   log_status.proto
   logical_camera_image.proto
+  logical_camera_sensor.proto
   magnetometer.proto
   material.proto
   meshgeom.proto

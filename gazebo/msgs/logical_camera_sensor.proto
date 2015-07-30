@@ -1,0 +1,13 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LogicalCameraSensor
+/// \brief Information about a logical camera sensor element
+
+message LogicalCameraSensor
+{
+  required double near         = 1;
+  required double far          = 2;
+  required double fov          = 3;
+  required double aspect_ratio = 4;
+}
