@@ -1,4 +1,8 @@
 ## Gazebo 7.0
+
+1. Display gearbox and screw joint properties in property tree
+    * [Pull request #1838](https://bitbucket.org/osrf/gazebo/pull-request/1838)
+
 1. Set window flags for dialogs and file dialogs
     * [Pull request #1816](https://bitbucket.org/osrf/gazebo/pull-request/1816)
 
@@ -16,7 +20,7 @@
         * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
         * [Pull request #1787](https://bitbucket.org/osrf/gazebo/pull-request/1787)
-        
+
     1. Color-coded edges in Schematic View to match joint color.
         * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
 
