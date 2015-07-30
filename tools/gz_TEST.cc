@@ -641,7 +641,7 @@ TEST_F(gzTest, SDF)
   docSums["1.2"] = "27f9d91080ce8aa18eac27c9d899fde2d4b78785";
   docSums["1.3"] = "ad80986d42eae97baf277118f52d7e8b951d8ea1";
   docSums["1.4"] = "153ddd6ba6797c37c7fcddb2be5362c9969d97a1";
-  docSums["1.5"] = "1ccc4861895a2eb331de76a2aa92da5a98b45273";
+  docSums["1.5"] = "73b73f2735debfb86ca8361009ca32e3e0712ed4";
 
   // Test each docSum
   for (std::map<std::string, std::string>::iterator iter = docSums.begin();
