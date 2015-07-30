@@ -1494,6 +1494,145 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Sensor SensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Sensor result;
+      std::string type = _sdf->Get<std::string>("type");
+      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_type(type);
+
+      if (_sdf->HasElement("always_on"))
+        result.set_always_on(_sdf->Get<bool>("always_on"));
+
+      if (_sdf->HasElement("update_rate"))
+        result.set_update_rate(_sdf->Get<double>("update_rate"));
+
+      if (_sdf->HasElement("pose"))
+      {
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
+      }
+
+      if (_sdf->HasElement("visualize"))
+        result.set_visualize(_sdf->Get<bool>("visualize"));
+
+      if (_sdf->HasElement("topic"))
+        result.set_topic(_sdf->Get<std::string>("topic"));
+
+      if (type == "camera")
+      {
+        result.mutable_camera()->CopyFrom(
+            msgs::CameraSensorFromSDF(_sdf->GetElement("camera")));
+      }
+      else if (type == "ray")
+      {
+        result.mutable_ray()->CopyFrom(msgs::RaySensorFromSDF(
+            _sdf->GetElement("ray")));
+      }
+      else if (type == "contact")
+      {
+        result.mutable_contact()->CopyFrom(
+          msgs::ContactSensorFromSDF(_sdf->GetElement("contact")));
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::CameraSensor CameraSensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::CameraSensor result;
+
+      result.set_horizontal_fov(_sdf->Get<double>("horizontal_fov"));
+
+      result.mutable_image_size()->set_x(
+          _sdf->GetElement("image")->Get<int>("width"));
+      result.mutable_image_size()->set_y(
+          _sdf->GetElement("image")->Get<int>("height"));
+
+      if (_sdf->GetElement("image")->HasElement("format"))
+      {
+        result.set_image_format(
+            _sdf->GetElement("image")->Get<std::string>("format"));
+      }
+
+      result.set_near_clip(_sdf->GetElement("clip")->Get<double>("near"));
+      result.set_far_clip(_sdf->GetElement("clip")->Get<double>("far"));
+
+      if (_sdf->HasElement("save"))
+      {
+        result.set_save_enabled(_sdf->GetElement("save")->Get<bool>("enabled"));
+        result.set_save_path(
+            _sdf->GetElement("save")->Get<std::string>("path"));
+      }
+
+      if (_sdf->HasElement("distortion"))
+      {
+        sdf::ElementPtr distElem = _sdf->GetElement("distortion");
+        msgs::Distortion *distortionMsg = result.mutable_distortion();
+
+        if (distElem->HasElement("k1"))
+          distortionMsg->set_k1(distElem->Get<double>("k1"));
+
+        if (distElem->HasElement("k2"))
+          distortionMsg->set_k2(distElem->Get<double>("k2"));
+
+        if (distElem->HasElement("k3"))
+          distortionMsg->set_k3(distElem->Get<double>("k3"));
+
+        if (distElem->HasElement("p1"))
+          distortionMsg->set_p1(distElem->Get<double>("p1"));
+
+        if (distElem->HasElement("p2"))
+          distortionMsg->set_p2(distElem->Get<double>("p2"));
+
+        if (distElem->HasElement("center"))
+        {
+          distortionMsg->mutable_center()->set_x(
+              distElem->Get<math::Vector2d>("center").x);
+          distortionMsg->mutable_center()->set_y(
+              distElem->Get<math::Vector2d>("center").y);
+        }
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::RaySensor RaySensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::RaySensor result;
+      sdf::ElementPtr rangeElem = _sdf->GetElement("range");
+      sdf::ElementPtr scanElem = _sdf->GetElement("scan");
+      sdf::ElementPtr hscanElem = scanElem->GetElement("horizontal");
+      sdf::ElementPtr vscanElem = scanElem->GetElement("vertical");
+
+      result.set_horizontal_samples(hscanElem->Get<int>("samples"));
+      result.set_horizontal_resolution(hscanElem->Get<double>("resolution"));
+      result.set_horizontal_min_angle(hscanElem->Get<double>("min_angle"));
+      result.set_horizontal_max_angle(hscanElem->Get<double>("max_angle"));
+
+      result.set_vertical_samples(vscanElem->Get<int>("samples"));
+      result.set_vertical_resolution(vscanElem->Get<double>("resolution"));
+      result.set_vertical_min_angle(vscanElem->Get<double>("min_angle"));
+      result.set_vertical_max_angle(vscanElem->Get<double>("max_angle"));
+
+      result.set_range_min(rangeElem->Get<double>("min"));
+      result.set_range_max(rangeElem->Get<double>("max"));
+      result.set_range_resolution(rangeElem->Get<double>("resolution"));
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::ContactSensor ContactSensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::ContactSensor result;
+      result.set_collision_name(_sdf->Get<std::string>("collision"));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr lightSDF;

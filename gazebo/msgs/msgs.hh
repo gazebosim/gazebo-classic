@@ -463,6 +463,30 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::Sensor from a sensor SDF element
+    /// \param[in] _sdf The sensor sdf element
+    /// \return The new msgs::Sensor object
+    GAZEBO_VISIBLE
+    msgs::Sensor SensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::CameraSensor from a camera sensor SDF element
+    /// \param[in] _sdf The camera sensor sdf element
+    /// \return The new msgs::CameraSensor object
+    GAZEBO_VISIBLE
+    msgs::CameraSensor CameraSensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::RaySensor from a ray sensor SDF element
+    /// \param[in] _sdf The ray sensor sdf element
+    /// \return The new msgs::RaySensor object
+    GAZEBO_VISIBLE
+    msgs::RaySensor RaySensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::ContactSensor from a contact sensor SDF element
+    /// \param[in] _sdf The contact sensor sdf element
+    /// \return The new msgs::ContactSensor object
+    GAZEBO_VISIBLE
+    msgs::ContactSensor ContactSensorFromSDF(sdf::ElementPtr _sdf);
+
     /// \brief Create or update an SDF element from a msgs::Light
     /// \param[in] _msg Light messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
