@@ -94,9 +94,6 @@ TEST_F(LogicalCameraSensor, Box)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  // Set a specific seed to avoid occasional test failures due to
-  // statistically unlikely, but possible results.
-  ignition::math::Rand::Seed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
