@@ -1534,6 +1534,11 @@ namespace gazebo
         result.mutable_contact()->CopyFrom(
           msgs::ContactSensorFromSDF(_sdf->GetElement("contact")));
       }
+      else
+      {
+        gzwarn << "Conversion of sensor type[" << type << "] not suppported."
+          << std::endl;
+      }
 
       return result;
     }
