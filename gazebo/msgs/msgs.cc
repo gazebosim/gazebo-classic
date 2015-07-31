@@ -1193,6 +1193,27 @@ namespace gazebo
           }
         }
       }
+
+      // gearbox
+      if (_sdf->HasElement("gearbox_reference_body"))
+      {
+        msgs::Joint::Gearbox *gearboxMsg = result.mutable_gearbox();
+        gearboxMsg->set_gearbox_reference_body(
+            _sdf->Get<std::string>("gearbox_reference_body"));
+      }
+      if (_sdf->HasElement("gearbox_ratio"))
+      {
+        msgs::Joint::Gearbox *gearboxMsg = result.mutable_gearbox();
+        gearboxMsg->set_gearbox_ratio(_sdf->Get<double>("gearbox_ratio"));
+      }
+
+      // screw
+      if (_sdf->HasElement("thread_pitch"))
+      {
+        msgs::Joint::Screw *screwMsg = result.mutable_screw();
+        screwMsg->set_thread_pitch(_sdf->Get<double>("thread_pitch"));
+      }
+
       return result;
     }
 
@@ -2345,6 +2366,31 @@ namespace gazebo
         if (_msg.has_suspension_erp())
           suspensionElem->GetElement("erp")->Set(_msg.suspension_erp());
       }
+
+      // gearbox joint message fields
+      if (_msg.has_gearbox())
+      {
+        msgs::Joint::Gearbox gearboxMsg = _msg.gearbox();
+        if (gearboxMsg.has_gearbox_reference_body())
+        {
+          jointSDF->GetElement("gearbox_reference_body")->Set(
+              gearboxMsg.gearbox_reference_body());
+        }
+        if (gearboxMsg.has_gearbox_ratio())
+        {
+          jointSDF->GetElement("gearbox_ratio")->Set(
+              gearboxMsg.gearbox_ratio());
+        }
+      }
+
+      // screw joint message field
+      if (_msg.has_screw())
+      {
+        msgs::Joint::Screw screwMsg = _msg.screw();
+        if (screwMsg.has_thread_pitch())
+          jointSDF->GetElement("thread_pitch")->Set(screwMsg.thread_pitch());
+      }
+
       /// \todo JointToSDF currently does not convert sensor data
 
       return jointSDF;

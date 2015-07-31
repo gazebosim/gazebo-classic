@@ -1577,6 +1577,42 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
       item->setEnabled(false);
     }
   }
+
+  // gearbox
+  if (_msg.has_gearbox())
+  {
+    msgs::Joint::Gearbox gearboxMsg = _msg.gearbox();
+    if (gearboxMsg.has_gearbox_reference_body())
+    {
+      item = this->variantManager->addProperty(QVariant::String,
+          tr("gearbox_reference_body"));
+      item->setValue(gearboxMsg.gearbox_reference_body().c_str());
+      this->propTreeBrowser->addProperty(item);
+      item->setEnabled(false);
+    }
+    if (gearboxMsg.has_gearbox_ratio())
+    {
+      item = this->variantManager->addProperty(QVariant::Double,
+          tr("gearbox_ratio"));
+      item->setValue(gearboxMsg.gearbox_ratio());
+      this->propTreeBrowser->addProperty(item);
+      item->setEnabled(false);
+    }
+  }
+
+  // screw
+  if (_msg.has_screw())
+  {
+    msgs::Joint::Screw screwMsg = _msg.screw();
+    if (screwMsg.has_thread_pitch())
+    {
+      item = this->variantManager->addProperty(QVariant::Double,
+          tr("thread_pitch"));
+      item->setValue(screwMsg.thread_pitch());
+      this->propTreeBrowser->addProperty(item);
+      item->setEnabled(false);
+    }
+  }
 }
 
 /////////////////////////////////////////////////

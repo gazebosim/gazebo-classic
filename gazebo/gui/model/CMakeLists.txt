@@ -76,10 +76,11 @@ if (HAVE_GRAPHVIZ)
     SchematicViewWidget.cc
   )
 
-  set (qt_tests
-    ${qt_tests}
-    SchematicViewWidget_TEST.cc
-  )
+  if (ENABLE_SCREEN_TESTS)
+    set (qt_tests ${qt_tests}
+      SchematicViewWidget_TEST.cc
+    )
+  endif()
 
   set (libraries_to_link
     ${libraries_to_link}
