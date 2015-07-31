@@ -209,8 +209,10 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnTypeFromDialog(int /*_type*/)
+void JointCreationDialog::OnTypeFromDialog(int _type)
 {
+  JointMaker::JointType type = static_cast<JointMaker::JointType>(_type);
+  gui::model::Events::jointTypeChosenDialog(type);
 }
 
 /////////////////////////////////////////////////

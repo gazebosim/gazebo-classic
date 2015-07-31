@@ -21,6 +21,7 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/gui/model/JointMaker.hh"
 
 namespace gazebo
 {
@@ -351,6 +352,20 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointChildChosen3D.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the joint type chosen 3d signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectJointTypeChosenDialog(T _subscriber)
+          { return jointTypeChosenDialog.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the joint type chosen 3d
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectJointTypeChosenDialog(
+            event::ConnectionPtr _subscriber)
+          { jointTypeChosenDialog.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the joint parent chosen 3d signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -475,6 +490,10 @@ namespace gazebo
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string)> jointChildChosen3D;
+
+        /// \brief Request to select or deselect a joint.
+        public: static event::EventT<void (JointMaker::JointType)>
+            jointTypeChosenDialog;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string)>

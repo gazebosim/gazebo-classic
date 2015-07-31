@@ -265,6 +265,7 @@ namespace gazebo
 
       private: void ParentLinkChosen(rendering::VisualPtr _parentLink);
       private: void ChildLinkChosen(rendering::VisualPtr _childLink);
+      private: void OnJointTypeChosenDialog(JointType _type);
       private: void OnJointParentChosenDialog(const std::string &_name);
       private: void OnJointChildChosenDialog(const std::string &_name);
       private: void OnJointCreateDialog();
@@ -365,8 +366,9 @@ namespace gazebo
       /// \brief Update joint.
       public: void Update();
 
-      public: void SetChild(rendering::VisualPtr _vis);
+      public: void SetType(JointMaker::JointType _type);
       public: void SetParent(rendering::VisualPtr _vis);
+      public: void SetChild(rendering::VisualPtr _vis);
 
       /// \brief Name of the joint.
       public: std::string name;

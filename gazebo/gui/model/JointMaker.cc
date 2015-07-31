@@ -98,6 +98,10 @@ JointMaker::JointMaker()
       boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectJointTypeChosenDialog(
+      boost::bind(&JointMaker::OnJointTypeChosenDialog, this, _1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectJointParentChosenDialog(
       boost::bind(&JointMaker::OnJointParentChosenDialog, this, _1)));
 
@@ -1013,6 +1017,15 @@ void JointData::OpenInspector()
 }
 
 /////////////////////////////////////////////////
+void JointData::SetType(JointMaker::JointType _type)
+{
+  this->type = _type;
+  this->jointMsg->set_type(
+      msgs::ConvertJointType(JointMaker::GetTypeAsString(_type)));
+  this->dirty = true;
+}
+
+/////////////////////////////////////////////////
 void JointData::SetChild(rendering::VisualPtr _vis)
 {
   this->child = _vis;
@@ -1394,6 +1407,13 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
   this->childLinkVis = _childLink;
 
   this->mouseMoveEnabled = false;
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnJointTypeChosenDialog(JointType _type)
+{
+  this->jointBeingCreated->SetType(_type);
+  this->jointBeingCreated->Update();
 }
 
 /////////////////////////////////////////////////
