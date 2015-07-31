@@ -27,7 +27,7 @@ License along with this library.
 QGVNode::QGVNode(QGVNodePrivate *node, QGVScene *qgvscene): _scene(qgvscene),
     _node(node)
 {
-//  this->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 //  this->setFlag(QGraphicsItem::ItemIsMovable, true);
 }
 

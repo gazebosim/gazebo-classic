@@ -249,7 +249,8 @@ void CollisionConfig::OnRemoveCollision(int _id)
 
   QMessageBox msgBox(QMessageBox::Warning, QString("Remove collision?"),
       QString(msg.c_str()));
-  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QPushButton *cancelButton =
       msgBox.addButton("Cancel", QMessageBox::RejectRole);
