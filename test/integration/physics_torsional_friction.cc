@@ -308,7 +308,8 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
 
       // Calculate torque due to friction
       double normalZ = -sphere.mass * g.z;
-      double frictionTorque = normalZ * sphere.coefficient * 3*M_PI/16 * sphere.patch;
+      double frictionTorque = normalZ * sphere.coefficient * 3*M_PI/16 *
+          sphere.patch;
 
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)
@@ -405,7 +406,8 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
       double depthAtEquilibrium = sphere.mass * -g.z / sphere.kp;
       double patch = sqrt(sphere.radius * depthAtEquilibrium);
       double normalZ = -sphere.mass * g.z;
-      double frictionTorque = normalZ * sphere.coefficient * 3 * M_PI * patch/ 16;
+      double frictionTorque =
+          normalZ * sphere.coefficient * 3 * M_PI * patch / 16;
 
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)
