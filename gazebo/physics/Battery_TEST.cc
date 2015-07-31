@@ -98,7 +98,7 @@ TEST_F(BatteryTest, SetPowerLoad)
   EXPECT_EQ(battery->PowerLoad(consumerId1, powerLoad1), true);
   EXPECT_DOUBLE_EQ(powerLoad1, 1.0);
   EXPECT_EQ(battery->PowerLoad(consumerId2, powerLoad2), true);
-  EXPECT_DOUBLE_EQ(powerLoad1, 2.0);
+  EXPECT_DOUBLE_EQ(powerLoad2, 2.0);
 }
 
 class BatteryUpdateFixture
@@ -119,7 +119,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
   batteryStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='model'>"
     << "<link name ='link'>"
-    <<   "<battery>"
+    <<   "<battery name='battery'>"
     <<     "<voltage>" << initVoltage << "</voltage>"
     <<   "</battery>"
     << "</link>"
