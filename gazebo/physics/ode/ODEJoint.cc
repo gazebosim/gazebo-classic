@@ -1125,7 +1125,6 @@ void ODEJoint::SetProvideFeedback(bool _enable)
     else
       gzerr << "ODE Joint ID is invalid\n";
   }
-
 }
 
 //////////////////////////////////////////////////

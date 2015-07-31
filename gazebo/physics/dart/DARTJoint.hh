@@ -21,6 +21,7 @@
 #include <boost/any.hpp>
 #include <string>
 
+#include "gazebo/common/Event.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/dart/dart_inc.h"
@@ -127,6 +128,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void ApplyDamping();
 
+      // Documentation inherited
+      public: virtual void SetProvideFeedback(bool _enable);
+
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.
@@ -154,6 +158,9 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data
       protected: DARTJointPrivate *dataPtr;
+
+      /// \brief Connection used to cache joint force and torque values.
+      private: event::ConnectionPtr jointFeedbackConnection;
     };
   }
 }

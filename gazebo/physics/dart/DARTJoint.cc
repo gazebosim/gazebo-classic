@@ -19,6 +19,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/physics/PhysicsEvents.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
@@ -604,4 +605,21 @@ void DARTJoint::SaveForce(unsigned int _index, double _force)
     gzerr << "Something's wrong, joint [" << this->GetName()
           << "] index [" << _index
           << "] out of range.\n";
+}
+
+//////////////////////////////////////////////////
+void DARTJoint::SetProvideFeedback(bool _enable)
+{
+  Joint::SetProvideFeedback(_enable);
+
+  // Disconnect feedback connection if it exists.
+  if (this->jointFeedbackConnection)
+    physics::Events::DisconnectUpdatePhysicsEnd(this->jointFeedbackConnection);
+
+  if (_enable)
+  {
+    // Create feedback connection
+    this->jointFeedbackConnection = physics::Events::ConnectUpdatePhysicsEnd(
+        std::bind(&Joint::CacheForceTorque, this));
+  }
 }
