@@ -94,7 +94,7 @@ void LogicalCameraSensor::Init()
     // existence.
     this->dataPtr->frustum.SetNear(cameraSdf->Get<double>("near"));
     this->dataPtr->frustum.SetFar(cameraSdf->Get<double>("far"));
-    this->dataPtr->frustum.SetFOV(cameraSdf->Get<double>("fov"));
+    this->dataPtr->frustum.SetFOV(cameraSdf->Get<double>("horizontal_fov"));
     this->dataPtr->frustum.SetAspectRatio(
         cameraSdf->Get<double>("aspect_ratio"));
   }
