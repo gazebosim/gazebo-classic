@@ -581,7 +581,7 @@ TEST_F(MsgsTest, RaySensorFromSDF)
   EXPECT_NEAR(msg.ray().vertical_max_angle(), 0, 1e-4);
 
   EXPECT_NEAR(msg.ray().range_min(), 0, 1e-4);
-  EXPECT_NEAR(msg.ray().range_max(), 11, 1e-4);
+  EXPECT_NEAR(msg.ray().range_max(), 10, 1e-4);
   EXPECT_NEAR(msg.ray().range_resolution(), 0.1, 1e-4);
 }
 
