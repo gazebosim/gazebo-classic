@@ -804,25 +804,29 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   std::string parentName = _joint->parent->GetName();
   std::string childName = _joint->child->GetName();
 
-  gui::model::Events::jointInserted(jointId, _joint->name,
-      jointTypes[_joint->type], parentName, childName);
-
-  /// for nested model
+  // for nested model
   bool nested = false;
+  std::string nestedParentName = parentName;
+  std::string nestedChildName = childName;
   if (_joint->parent->GetParent() != _joint->parent->GetRootVisual())
   {
-    parentName = _joint->parent->GetParent()->GetName();
+    nestedParentName = _joint->parent->GetParent()->GetName();
     nested = true;
   }
   if (_joint->child->GetParent() != _joint->child->GetRootVisual())
   {
-    childName = _joint->child->GetParent()->GetName();
+    nestedChildName = _joint->child->GetParent()->GetName();
     nested = true;
   }
 
   if (nested)
   {
     gui::model::Events::jointInserted(jointId +"_nested", _joint->name,
+        jointTypes[_joint->type], nestedParentName, nestedChildName);
+  }
+  else
+  {
+    gui::model::Events::jointInserted(jointId, _joint->name,
         jointTypes[_joint->type], parentName, childName);
   }
 }
