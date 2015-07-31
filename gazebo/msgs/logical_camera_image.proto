@@ -20,7 +20,7 @@ message LogicalCameraImage
     required Pose pose   = 2;
   }
 
-  /// \brief Pose the logical camera.
+  /// \brief Pose of the logical camera.
   required Pose pose   = 1;
 
   /// \brief All the models seen by the LogicalCamera
