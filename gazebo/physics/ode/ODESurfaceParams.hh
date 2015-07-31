@@ -112,6 +112,10 @@ namespace gazebo
       ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double slip2;
 
+      public: double elasticModulus;
+
+      public: double elasticModulusReferenceLength;
+
       /// \brief Friction pyramid parameters (mu1, mu2).
       /// Note that the primary friction pyramid direction can be specified
       /// by fdir1, otherwise a vector constrained to be perpendicular to the

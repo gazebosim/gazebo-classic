@@ -29,7 +29,8 @@ ODESurfaceParams::ODESurfaceParams()
     kp(1000000000000), kd(1), cfm(0), erp(0.2),
     maxVel(0.01), minDepth(0),
     slip1(0), slip2(0),
-    frictionPyramid(new FrictionPyramid())
+    frictionPyramid(new FrictionPyramid(),
+    elasticModulus(0), elasticModulusReferenceLength(0))
 {
 }
 
@@ -111,6 +112,9 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
           this->kd = contactOdeElem->Get<double>("kd");
           this->cfm = contactOdeElem->Get<double>("soft_cfm");
           this->erp = contactOdeElem->Get<double>("soft_erp");
+          this->elasticModulus = contactOdeElem->Get<double>("elastic_modulus");
+          this->elasticModulusReferenceLength =
+            contactOdeElem->Get<double>("elastic_modulus_reference_length");
           this->maxVel = contactOdeElem->Get<double>("max_vel");
           this->minDepth = contactOdeElem->Get<double>("min_depth");
         }
@@ -136,6 +140,9 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 
   _msg.set_soft_cfm(this->cfm);
   _msg.set_soft_erp(this->erp);
+  _msg.set_elastic_modulus(this->elasticModulus);
+  _msg.set_elastic_modulus_reference_length(
+    this->elasticModulusReferenceLength);
   _msg.set_kp(this->kp);
   _msg.set_kd(this->kd);
   _msg.set_max_vel(this->maxVel);
@@ -170,6 +177,11 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     this->cfm = _msg.soft_cfm();
   if (_msg.has_soft_erp())
     this->erp = _msg.soft_erp();
+  if (_msg.has_elastic_modulus())
+    this->elasticModulus = _msg.elastic_modulus();
+  if (_msg.has_elastic_modulus_reference_length())
+    this->elasticModulusReferenceLength =
+      _msg.elastic_modulus_reference_length();
   if (_msg.has_kp())
     this->kp = _msg.kp();
   if (_msg.has_kd())
