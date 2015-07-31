@@ -1851,12 +1851,12 @@ void ModelCreator::OnOpenInspector()
 void ModelCreator::OpenInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  LinkData *link = this->allLinks[_name];
-  if (!link)
+  if (this->allLinks.find(_name) == this->allLinks.end())
   {
     gzerr << "Link [" << _name << "] not found." << std::endl;
     return;
   }
+  LinkData *link = this->allLinks[_name];
   link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
