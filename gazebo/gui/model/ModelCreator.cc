@@ -416,6 +416,9 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
      nestedModelElem = _modelElem->GetElement("model");
   while (nestedModelElem)
   {
+    if (this->canonicalModel.empty())
+      this->canonicalModel = nestedModelName;
+
     NestedModelData *nestedModelData =
         this->CreateModelFromSDF(nestedModelElem, modelVisual);
     rendering::VisualPtr nestedModelVis = nestedModelData->modelVisual;
@@ -455,9 +458,6 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allNestedModels[nestedModelName] = modelData;
-
-    if (this->canonicalModel.empty())
-      this->canonicalModel = nestedModelName;
 
     if (!_attachedToMouse)
       gui::model::Events::nestedModelInserted(nestedModelName);
@@ -1435,6 +1435,7 @@ void ModelCreator::AddEntity(sdf::ElementPtr _sdf)
     // Create a top-level nested model
     NestedModelData *modelData =
         this->CreateModelFromSDF(_sdf, this->previewVisual, true);
+
     rendering::VisualPtr entityVisual = modelData->modelVisual;
 
     this->addLinkType = NESTED_MODEL;
@@ -1971,22 +1972,34 @@ void ModelCreator::UpdateNestedModelSDF(sdf::ElementPtr _modelElem)
     {
       sdf::ElementPtr parentElem = jointElem->GetElement("parent");
       std::string parentName = parentElem->Get<std::string>();
-      size_t pos = parentName.find("::");
-      if (pos != std::string::npos &&
-          parentName.substr(0, pos) == this->serverModelName)
-      {
-        parentName = this->modelName + parentName.substr(pos);
-        parentElem->Set(parentName);
-      }
-
       sdf::ElementPtr childElem = jointElem->GetElement("child");
       std::string childName = childElem->Get<std::string>();
-      pos = childName.find("::");
-      if (pos != std::string::npos &&
-          childName.substr(0, pos) == this->serverModelName)
+
+      if (this->serverModelName.empty())
       {
-        childName = this->modelName + childName.substr(pos);
+        parentName = this->modelName + "::" + parentName;
+        childName = this->modelName + "::" + childName;
+        parentElem->Set(parentName);
         childElem->Set(childName);
+      }
+      else
+      {
+        size_t pos = parentName.find("::");
+        if (pos != std::string::npos &&
+            parentName.substr(0, pos) == this->serverModelName)
+        {
+          parentName = this->modelName + parentName.substr(pos);
+          parentElem->Set(parentName);
+        }
+
+
+        pos = childName.find("::");
+        if (pos != std::string::npos &&
+            parentName.substr(0, pos) == this->serverModelName)
+        {
+          childName = this->modelName + childName.substr(pos);
+          childElem->Set(childName);
+        }
       }
 
       jointElem = jointElem->GetNextElement("joint");
@@ -2097,7 +2110,9 @@ void ModelCreator::GenerateSDF()
   // loop through rest of all nested models and add sdf
   for (auto &nestedModelsIt : this->allNestedModels)
   {
-    if (nestedModelsIt.first == this->canonicalModel)
+    if (nestedModelsIt.first == this->canonicalModel ||
+        (nestedModelsIt.second->modelVisual &&
+        nestedModelsIt.second->modelVisual->GetParent() != this->previewVisual))
       continue;
 
     NestedModelData *nestedModelData = nestedModelsIt.second;

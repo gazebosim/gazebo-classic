@@ -1283,7 +1283,6 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
         _modelName + "::" + unscopedName);
   }
 
-
   if (!parentVis || !childVis)
   {
     gzerr << "Unable to load joint. Joint child [" << childName <<

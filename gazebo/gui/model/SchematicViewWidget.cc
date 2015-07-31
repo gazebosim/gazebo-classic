@@ -148,7 +148,7 @@ std::string SchematicViewWidget::GetScopedName(const std::string &_scopedName)
 /////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
-//  std::string name = this->GetLeafName(_node);
+  //  std::string name = this->GetLeafName(_node);
   std::string name = this->GetScopedName(_node);
   std::cerr << " add node " << name << std::endl;
 
