@@ -687,12 +687,13 @@ void JointMaker::OnOpenInspector()
 /////////////////////////////////////////////////
 void JointMaker::OpenInspector(const std::string &_jointId)
 {
-  JointData *joint = this->joints[_jointId];
-  if (!joint)
+  if (this->joints.find(_jointId) == this->joints.end())
   {
     gzerr << "Joint [" << _jointId << "] not found." << std::endl;
     return;
   }
+
+  JointData *joint = this->joints[_jointId];
   joint->OpenInspector();
 }
 
