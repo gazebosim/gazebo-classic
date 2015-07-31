@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_LOGICAL_CAMERASENSOR_PRIVATE_HH_
 #define _GAZEBO_LOGICAL_CAMERASENSOR_PRIVATE_HH_
 
+#include <string>
 #include <ignition/math/Frustum.hh>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
