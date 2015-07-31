@@ -62,24 +62,14 @@ namespace gazebo
     /// \class Battery Battery.hh physics/physics.hh
     /// \brief A battery abstraction
     ///
-    /// A battery is a link that acts as a battery.
+    /// The default battery model is ideal: It just takes the initial voltage
+    /// value as its constant voltage value. This behavior can be changed by
+    /// specifying a custom update function.
     ///
-    /// A plugin can access a battery with Link::GetBattery(). The default
-    /// battery model is ideal: It just takes the initial voltage value as its
-    /// constant voltage value. This behavior can be changed by specifying a
-    /// custom Update function with Battery::SetUpdateFunc(T _updateFunc).
-    /// The current voltage value can be requested at any time with
-    /// Battery::GetVoltage().
-    ///
-    /// The battery handles a list of consumers. The function
-    /// Battery::AddConsumer() creates a new consumer and returns a unique
-    /// consumer identifier. The power load for a consumer can then be specified
-    /// by calling
-    /// Battery::SetPowerLoad(uint32_t _consumerId, double _powerLoad).
-    ///
-    /// The battery updates itself after each simulation iteration. It takes the
-    /// power loads for each consumer and current voltage value as inputs and
-    /// returns a new voltage value.
+    /// The battery handles a list of consumers. It updates itself after each
+    /// simulation iteration. The update function takes the power loads for each
+    /// consumer and current voltage value as inputs and returns a new voltage
+    /// value.
     class GZ_PHYSICS_VISIBLE Battery
     {
       /// \brief Constructor
