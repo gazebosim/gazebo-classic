@@ -284,6 +284,9 @@ namespace gazebo
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
       private: common::Time forceAppliedTime;
+
+      /// \brief Connection used to cache joint force and torque values.
+      private: event::ConnectionPtr jointFeedbackConnection;
     };
   }
 }

@@ -18,6 +18,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
 
+#include "gazebo/physics/PhysicsEvents.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -1090,6 +1091,10 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 {
   Joint::SetProvideFeedback(_enable);
 
+  // Disconnect feedback connection if it exists.
+  if (this->jointFeedbackConnection)
+    physics::Events::DisconnectUpdatePhysicsEnd(this->jointFeedbackConnection);
+
   if (this->provideFeedback)
   {
     if (this->feedback == NULL)
@@ -1110,10 +1115,17 @@ void ODEJoint::SetProvideFeedback(bool _enable)
     }
 
     if (this->jointId)
+    {
       dJointSetFeedback(this->jointId, this->feedback);
+
+      // Create feedback connection
+      this->jointFeedbackConnection = physics::Events::ConnectUpdatePhysicsEnd(
+          std::bind(&Joint::CacheForceTorque, this));
+    }
     else
       gzerr << "ODE Joint ID is invalid\n";
   }
+
 }
 
 //////////////////////////////////////////////////

@@ -43,6 +43,7 @@
 
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/physics/PhysicsEvents.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/World.hh"
@@ -463,18 +464,7 @@ void ODEPhysics::UpdatePhysics()
       }
     }
 
-    // cache force torques
-    for (auto model : this->world->GetModels())
-    {
-      for (auto joint : model->GetJoints())
-      {
-        ODEJointPtr odeJoint =
-          boost::dynamic_pointer_cast<physics::ODEJoint>(joint);
-        dJointFeedback *fb = odeJoint->GetFeedback();
-        if (fb)
-          odeJoint->CacheForceTorque();
-      }
-    }
+    physics::Events::updatePhysicsEnd();
   }
 
   DIAG_TIMER_STOP("ODEPhysics::UpdatePhysics");
