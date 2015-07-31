@@ -1713,12 +1713,11 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       g_alignAct->setEnabled(false);
       g_copyAct->setEnabled(!this->selectedLinks.empty());
 
-      //if (!vis->IsPlane())
-        //return true;
+      if (!vis->IsPlane())
+        return true;
     }
   }
-  // We don't want GLWidget handling these events unless we know what's going on
-  return true;
+  return false;
 }
 
 /////////////////////////////////////////////////
