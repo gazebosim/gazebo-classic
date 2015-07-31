@@ -42,7 +42,6 @@ HotkeyDialog::HotkeyDialog(QWidget *_parent)
   // Dialog size
   int desiredHeight = 980;
   int desired2ColumnWidth = 1850;
-  int desired1ColumnWidth = 900;
   int minHeight = desiredHeight;
   int minWidth = desired2ColumnWidth;
 
@@ -59,6 +58,7 @@ HotkeyDialog::HotkeyDialog(QWidget *_parent)
     // 1 column
     if (minWidth < desired2ColumnWidth)
     {
+      int desired1ColumnWidth = 900;
       minWidth = std::min(desired1ColumnWidth, minWidth);
     }
   }
