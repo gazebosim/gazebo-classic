@@ -203,9 +203,6 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   // Check relevant contacts from message
   for (auto contact : this->contactsMsg.contact())
   {
-    EXPECT_TRUE(contact.has_collision1());
-    EXPECT_TRUE(contact.has_collision2());
-
     if (!(contact.has_collision1() &&
         contact.collision1().find("sphere_mass") == 0))
       continue;
