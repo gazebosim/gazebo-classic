@@ -118,7 +118,7 @@ bool LogicalCameraSensor::UpdateImpl(bool _force)
     this->dataPtr->msg.clear_model();
 
     // Get the pose of the camera's parent.
-    ignition::math::Pose3d myPose =
+    ignition::math::Pose3d myPose = this->pose +
       this->dataPtr->parentLink->GetWorldPose().Ign();
 
     // Update the pose of the frustum.
