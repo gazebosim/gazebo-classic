@@ -1831,7 +1831,8 @@ namespace gazebo
 
           if (torsional.has_coefficient())
           {
-            torsionalElem->GetElement("coefficient")->Set(torsional.coefficient());
+            torsionalElem->GetElement("coefficient")->Set(
+                torsional.coefficient());
           }
           if (torsional.has_patch_radius())
           {
