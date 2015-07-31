@@ -1153,8 +1153,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                    surf2->slip1);
   contact.surface.slip2 = std::min(surf1->slip2,
                                    surf2->slip2);
-  contact.surface.slip3 = std::min(surf1->slip3,
-                                   surf2->slip3);
+  contact.surface.slip3 = std::min(surf1->slipTorsion,
+                                   surf2->slipTorsion);
 
   // Set the bounce values
   contact.surface.bounce = std::min(surf1->bounce,

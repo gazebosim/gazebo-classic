@@ -61,7 +61,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       auto surfODE =
           boost::static_pointer_cast<physics::ODESurfaceParams>(surf);
 
-      this->mu3 = surf->GetFrictionPyramid()->GetMuTorsion();
+      this->coefficient = surf->GetFrictionPyramid()->GetMuTorsion();
       this->patch = surf->GetFrictionPyramid()->GetPatchRadius();
       this->radius = surf->GetFrictionPyramid()->GetSurfaceRadius();
       this->kp = surfODE->kp;
@@ -83,7 +83,7 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
     public: physics::LinkPtr link;
 
     /// \brief Torsional friction
-    public: double mu3;
+    public: double coefficient;
 
     /// \brief Spring constant equivalents of a contact.
     public: double kp;
@@ -258,15 +258,15 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
   std::vector<PhysicsTorsionalFrictionTest::SphereData>
       spheres;
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_1"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_coefficient_1"));
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_2"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_coefficient_2"));
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_3"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_coefficient_3"));
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_4"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_coefficient_4"));
   spheres.push_back(
-      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_mu3_5"));
+      PhysicsTorsionalFrictionTest::SphereData(world, "sphere_coefficient_5"));
   spheres.push_back(
       PhysicsTorsionalFrictionTest::SphereData(world, "sphere_patch_1"));
   spheres.push_back(
@@ -311,7 +311,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
 
       // Calculate torque due to friction
       double normalZ = -sphere.mass * g.z;
-      double frictionTorque = normalZ * sphere.mu3 * 3*M_PI/16 * sphere.patch;
+      double frictionTorque = normalZ * sphere.coefficient * 3*M_PI/16 * sphere.patch;
 
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)
@@ -408,7 +408,7 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
       double depthAtEquilibrium = sphere.mass * -g.z / sphere.kp;
       double patch = sqrt(sphere.radius * depthAtEquilibrium);
       double normalZ = -sphere.mass * g.z;
-      double frictionTorque = normalZ * sphere.mu3 * 3 * M_PI * patch/ 16;
+      double frictionTorque = normalZ * sphere.coefficient * 3 * M_PI * patch/ 16;
 
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)

@@ -113,7 +113,7 @@ namespace gazebo
       public: double slip2;
 
       /// \brief Artificial contact slip in torsional dirction.
-      public: double slip3;
+      public: double slipTorsion;
 
       /// \brief Friction pyramid parameters (mu1, mu2).
       /// Note that the primary friction pyramid direction can be specified

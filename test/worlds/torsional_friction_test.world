@@ -54,9 +54,9 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -105,9 +105,9 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -156,9 +156,9 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -207,9 +207,9 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -258,9 +258,9 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -288,7 +288,7 @@
 
 
 
-    <model name='sphere_mu3_1'>
+    <model name='sphere_coefficient_1'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>0.4 1 0.1  0 0 0</pose>
       <link name="link">
@@ -311,10 +311,10 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.0</mu3>
+              <torsional>
+                <coefficient>0.0</coefficient>
                 <patch_radius>2.0</patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -339,7 +339,7 @@
       </link>
     </model>
 
-    <model name='sphere_mu3_2'>
+    <model name='sphere_coefficient_2'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>0.8 1 0.1  0 0 0</pose>
       <link name="link">
@@ -362,10 +362,10 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.001</mu3>
+              <torsional>
+                <coefficient>0.001</coefficient>
                 <patch_radius>2.0</patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -390,7 +390,7 @@
       </link>
     </model>
 
-    <model name='sphere_mu3_3'>
+    <model name='sphere_coefficient_3'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>1.2000000000000002 1 0.1  0 0 0</pose>
       <link name="link">
@@ -413,10 +413,10 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>2.0</patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -441,7 +441,7 @@
       </link>
     </model>
 
-    <model name='sphere_mu3_4'>
+    <model name='sphere_coefficient_4'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>1.6 1 0.1  0 0 0</pose>
       <link name="link">
@@ -464,10 +464,10 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.01</mu3>
+              <torsional>
+                <coefficient>0.01</coefficient>
                 <patch_radius>2.0</patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -492,7 +492,7 @@
       </link>
     </model>
 
-    <model name='sphere_mu3_5'>
+    <model name='sphere_coefficient_5'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>2.0 1 0.1  0 0 0</pose>
       <link name="link">
@@ -515,10 +515,10 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>1.0</mu3>
+              <torsional>
+                <coefficient>1.0</coefficient>
                 <patch_radius>2.0</patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -568,11 +568,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>0.0</patch_radius>
                 <use_patch_radius>true</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -620,11 +620,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>0.1</patch_radius>
                 <use_patch_radius>true</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -672,11 +672,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>2.0</patch_radius>
                 <use_patch_radius>true</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -724,11 +724,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>5.0</patch_radius>
                 <use_patch_radius>true</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -776,11 +776,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>10.0</patch_radius>
                 <use_patch_radius>true</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -830,11 +830,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <surface_radius>0.01</surface_radius>
                 <use_patch_radius>false</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -882,11 +882,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <surface_radius>0.1</surface_radius>
                 <use_patch_radius>false</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -934,11 +934,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <surface_radius>0.8</surface_radius>
                 <use_patch_radius>false</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -986,11 +986,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <surface_radius>2.0</surface_radius>
                 <use_patch_radius>false</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -1038,11 +1038,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <surface_radius>10.0</surface_radius>
                 <use_patch_radius>false</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>

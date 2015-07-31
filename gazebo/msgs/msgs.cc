@@ -1793,23 +1793,6 @@ namespace gazebo
           physicsEngElem->GetElement("mu")->Set(friction.mu());
         if (friction.has_mu2())
           physicsEngElem->GetElement("mu2")->Set(friction.mu2());
-        if (friction.has_mu3())
-          physicsEngElem->GetElement("mu3")->Set(friction.mu3());
-        if (friction.has_patch_radius())
-        {
-          physicsEngElem->GetElement("patch_radius")->Set(
-              friction.patch_radius());
-        }
-        if (friction.has_surface_radius())
-        {
-          physicsEngElem->GetElement("surface_radius")->Set(
-              friction.surface_radius());
-        }
-        if (friction.has_use_patch_radius())
-        {
-          physicsEngElem->GetElement("use_patch_radius")->Set(
-              friction.use_patch_radius());
-        }
         if (friction.has_fdir1())
         {
           physicsEngElem->GetElement("fdir1")->Set(
@@ -1819,8 +1802,41 @@ namespace gazebo
           physicsEngElem->GetElement("slip1")->Set(friction.slip1());
         if (friction.has_slip2())
           physicsEngElem->GetElement("slip2")->Set(friction.slip2());
-        if (friction.has_slip3())
-          physicsEngElem->GetElement("slip3")->Set(friction.slip3());
+
+        if (friction.has_torsional())
+        {
+          msgs::Friction::Torsional torsional = friction.torsional();
+          sdf::ElementPtr torsionalElem = frictionElem->GetElement("torsional");
+
+          if (torsional.has_coefficient())
+          {
+            torsionalElem->GetElement("coefficient")->Set(torsional.coefficient());
+          }
+          if (torsional.has_patch_radius())
+          {
+            torsionalElem->GetElement("patch_radius")->Set(
+                torsional.patch_radius());
+          }
+          if (torsional.has_surface_radius())
+          {
+            torsionalElem->GetElement("surface_radius")->Set(
+                torsional.surface_radius());
+          }
+          if (torsional.has_use_patch_radius())
+          {
+            torsionalElem->GetElement("use_patch_radius")->Set(
+                torsional.use_patch_radius());
+          }
+          if (torsional.has_ode())
+          {
+            msgs::Friction::Torsional::ODE ode = torsional.ode();
+            sdf::ElementPtr odeElem = torsionalElem->GetElement("ode");
+            if (ode.has_slip())
+            {
+              odeElem->GetElement("slip")->Set(ode.slip());
+            }
+          }
+        }
       }
       sdf::ElementPtr bounceElem = surfaceSDF->GetElement("bounce");
       if (_msg.has_restitution_coefficient())

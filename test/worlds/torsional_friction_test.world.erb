@@ -5,20 +5,20 @@
   # will be applied and the torsional friction should resist motion.
   # There are 4 rows of spheres:
   # 1st: different masses, resulting in different contact depths.
-  # 2nd: different Mu3
+  # 2nd: different coefficient
   # 3rd: different patch_radius
   # 4th: different surface radius
 
   # Varying parameters
   densities = [100.0, 1000.0, 2700.0, 5000.0, 10000.0]
-  mu3s = [0.0, 0.001, 0.005, 0.01, 1.0]
+  coefficients = [0.0, 0.001, 0.005, 0.01, 1.0]
   patch_radii = [0.0, 0.1, 2.0, 5.0, 10.0]
   radii = [0.01, 0.1, 0.8, 2.0, 10.0]
 
   # Default parameters
   # Aluminum 2700 kg/m^3
   default_density = 2700.0
-  default_mu3 = 0.005
+  default_coefficient = 0.005
   default_radius = 0.1
   default_patch_radius = 2.0
 
@@ -57,7 +57,7 @@
 
 <%  # Different masses / contact depth
     radius = default_radius
-    mu3 = default_mu3
+    coefficient = default_coefficient
 
     i = 0
     densities.each do |density|
@@ -91,9 +91,9 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3><%= mu3 %></mu3>
-              </ode>
+              <torsional>
+                <coefficient><%= coefficient %></coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -131,9 +131,9 @@
     izz = ixx
 
     i = 0
-    mu3s.each do |mu3|
+    coefficients.each do |coefficient|
       i = i + 1
-      name = 'sphere_mu3_' + i.to_s
+      name = 'sphere_coefficient_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
       <allow_auto_disable>0</allow_auto_disable>
@@ -158,10 +158,10 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3><%= mu3 %></mu3>
+              <torsional>
+                <coefficient><%= coefficient %></coefficient>
                 <patch_radius><%= patch_radius %></patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -190,7 +190,7 @@
 <%  # Different patch radii
     radius = default_radius
     density = default_density
-    mu3 = default_mu3
+    coefficient = default_coefficient
 
     mass = density * 4.0 * Math::PI / 3.0 * radius **3
     ixx = mass * 0.4 * radius**2
@@ -225,11 +225,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3><%= mu3 %></mu3>
+              <torsional>
+                <coefficient><%= coefficient %></coefficient>
                 <patch_radius><%= patch_radius %></patch_radius>
                 <use_patch_radius>true</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -257,7 +257,7 @@
 
 <%  # Different surface radius
     density = default_density
-    mu3 = default_mu3
+    coefficient = default_coefficient
 
     mass = density * 4.0 * Math::PI / 3.0 * radius **3
     ixx = mass * 0.4 * radius**2
@@ -292,11 +292,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3><%= mu3 %></mu3>
+              <torsional>
+                <coefficient><%= coefficient %></coefficient>
                 <surface_radius><%= radius %></surface_radius>
                 <use_patch_radius>false</use_patch_radius>
-              </ode>
+              </torsional>
             </friction>
             <contact>
               <ode>

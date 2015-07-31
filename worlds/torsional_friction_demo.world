@@ -40,9 +40,11 @@
               <ode>
                 <mu>0.0</mu>
                 <mu2>0.0</mu2>
-                <mu3>0.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -97,9 +99,11 @@
               <ode>
                 <mu>0.001</mu>
                 <mu2>0.001</mu2>
-                <mu3>0.001</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.001</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -154,9 +158,11 @@
               <ode>
                 <mu>0.005</mu>
                 <mu2>0.005</mu2>
-                <mu3>0.005</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -211,9 +217,11 @@
               <ode>
                 <mu>0.01</mu>
                 <mu2>0.01</mu2>
-                <mu3>0.01</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.01</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -268,9 +276,11 @@
               <ode>
                 <mu>1.0</mu>
                 <mu2>1.0</mu2>
-                <mu3>1.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>1.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -326,9 +336,11 @@
               <ode>
                 <mu>0.0</mu>
                 <mu2>0.0</mu2>
-                <mu3>0.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -372,9 +384,11 @@
               <ode>
                 <mu>0.001</mu>
                 <mu2>0.001</mu2>
-                <mu3>0.001</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.001</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -418,9 +432,11 @@
               <ode>
                 <mu>0.005</mu>
                 <mu2>0.005</mu2>
-                <mu3>0.005</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -464,9 +480,11 @@
               <ode>
                 <mu>0.01</mu>
                 <mu2>0.01</mu2>
-                <mu3>0.01</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.01</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -510,9 +528,11 @@
               <ode>
                 <mu>1.0</mu>
                 <mu2>1.0</mu2>
-                <mu3>1.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>1.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -558,9 +578,11 @@
               <ode>
                 <mu>0.0</mu>
                 <mu2>0.0</mu2>
-                <mu3>0.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -605,9 +627,11 @@
               <ode>
                 <mu>0.001</mu>
                 <mu2>0.001</mu2>
-                <mu3>0.001</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.001</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -652,9 +676,11 @@
               <ode>
                 <mu>0.005</mu>
                 <mu2>0.005</mu2>
-                <mu3>0.005</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -699,9 +725,11 @@
               <ode>
                 <mu>0.01</mu>
                 <mu2>0.01</mu2>
-                <mu3>0.01</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.01</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -746,9 +774,11 @@
               <ode>
                 <mu>1.0</mu>
                 <mu2>1.0</mu2>
-                <mu3>1.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>1.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -796,9 +826,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -823,9 +855,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -850,9 +884,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -919,9 +955,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.001</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.001</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -946,9 +984,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.001</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.001</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -973,9 +1013,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.001</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.001</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -1042,9 +1084,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.005</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -1069,9 +1113,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.005</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -1096,9 +1142,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.005</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -1165,9 +1213,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.006</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.006</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -1192,9 +1242,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.006</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.006</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -1219,9 +1271,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>0.006</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>0.006</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -1288,9 +1342,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>1.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>1.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -1315,9 +1371,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>1.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>1.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
@@ -1342,9 +1400,11 @@
               <ode>
                 <mu>1000.0</mu>
                 <mu2>1000.0</mu2>
-                <mu3>1.0</mu3>
-                <patch_radius>2.0</patch_radius>
               </ode>
+              <torsional>
+                <coefficient>1.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
           </surface>
         </collision>
