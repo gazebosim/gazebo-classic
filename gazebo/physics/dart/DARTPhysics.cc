@@ -247,7 +247,6 @@ void DARTPhysics::UpdatePhysics()
           = boost::dynamic_pointer_cast<DARTLink>(links.at(j));
       dartLinkItr->updateDirtyPoseFromDARTTransformation();
     }
-
   }
 
   physics::Events::updatePhysicsEnd();
