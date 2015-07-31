@@ -29,6 +29,11 @@ class LogicalCameraSensor : public ServerFixture
 TEST_F(LogicalCameraSensor, GroundPlane)
 {
   Load("worlds/logical_camera.world");
+
+  /// \brief Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
   sensors::LogicalCameraSensorPtr cam = boost::dynamic_pointer_cast<
     sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
   ASSERT_TRUE(cam != NULL);
@@ -57,6 +62,10 @@ TEST_F(LogicalCameraSensor, Box)
 {
   Load("worlds/logical_camera.world");
 
+  /// \brief Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
   // Get the world
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
@@ -80,7 +89,6 @@ TEST_F(LogicalCameraSensor, Box)
   // Insert box
   SpawnBox("spawn_box", math::Vector3(1, 1, 1), math::Vector3(2, 0, 0.5),
       math::Vector3::Zero);
-  common::Time::MSleep(1000);
   cam->Update(true);
 
   ASSERT_EQ(cam->Image().model_size(), 2);
@@ -88,7 +96,6 @@ TEST_F(LogicalCameraSensor, Box)
 
   // Rotate the model, which should move "spawn_box" out of the frustum
   cameraModel->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 1.5707));
-  common::Time::MSleep(1000);
   cam->Update(true);
   ASSERT_EQ(cam->Image().model_size(), 1);
 }
