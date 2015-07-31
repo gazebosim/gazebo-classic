@@ -1881,7 +1881,9 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
     return;
   }
 
-  QtProperty *topItem = NULL;
+  QtProperty *frictionItem = NULL;
+  QtProperty *torsionalItem = NULL;
+  QtProperty *odeItem = NULL;
   QtVariantProperty *item = NULL;
 
   // Restituion Coefficient
@@ -1933,41 +1935,83 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
   _parent->addSubProperty(item);
 
   // Friction
-  topItem = this->variantManager->addProperty(
+  frictionItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
       tr("friction"));
-  _parent->addSubProperty(topItem);
+  _parent->addSubProperty(frictionItem);
 
   // Mu
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("mu"));
   item->setValue(_msg.friction().mu());
-  topItem->addSubProperty(item);
+  frictionItem->addSubProperty(item);
 
   // Mu2
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("mu2"));
   item->setValue(_msg.friction().mu2());
-  topItem->addSubProperty(item);
+  frictionItem->addSubProperty(item);
 
   // slip1
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("slip1"));
   item->setValue(_msg.friction().slip1());
-  topItem->addSubProperty(item);
+  frictionItem->addSubProperty(item);
 
   // slip2
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("slip2"));
   item->setValue(_msg.friction().slip2());
-  topItem->addSubProperty(item);
+  frictionItem->addSubProperty(item);
 
   // Fdir1
   QtProperty *fdirItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
       tr("fdir1"));
-    topItem->addSubProperty(fdirItem);
+    frictionItem->addSubProperty(fdirItem);
     this->FillVector3dProperty(_msg.friction().fdir1(), fdirItem);
+
+  // Torsional
+  torsionalItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(),
+      tr("torsional"));
+  frictionItem->addSubProperty(torsionalItem);
+
+  // Coefficient
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("coefficient"));
+  item->setValue(_msg.friction().torsional().coefficient());
+  torsionalItem->addSubProperty(item);
+
+  // Use patch radius
+  item = this->variantManager->addProperty(QVariant::Bool,
+                                           tr("use_patch_radius"));
+  item->setValue(_msg.friction().torsional().use_patch_radius());
+  torsionalItem->addSubProperty(item);
+
+  // Patch radius
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("patch_radius"));
+  item->setValue(_msg.friction().torsional().patch_radius());
+  torsionalItem->addSubProperty(item);
+
+  // Surface radius
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("surface_radius"));
+  item->setValue(_msg.friction().torsional().surface_radius());
+  torsionalItem->addSubProperty(item);
+
+  // ODE
+  odeItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(),
+      tr("ode"));
+  torsionalItem->addSubProperty(odeItem);
+
+  // slip torsional
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("slip"));
+  item->setValue(_msg.friction().torsional().ode().slip());
+  odeItem->addSubProperty(item);
 }
 
 /////////////////////////////////////////////////

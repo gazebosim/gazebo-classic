@@ -41,11 +41,14 @@ enum {
   dContactMotionN	= 0x080,
   dContactSlip1		= 0x100,
   dContactSlip2		= 0x200,
+  dContactSlip3		= 0x400,
+  dContactMu3		  = 0x800,
 
   dContactApprox0	= 0x0000,
   dContactApprox1_1	= 0x1000,
   dContactApprox1_2	= 0x2000,
-  dContactApprox1	= 0x3000
+  dContactApprox1	= 0x3000,
+  dContactApprox3	= 0x4000
 };
 
 
@@ -55,26 +58,28 @@ typedef struct dSurfaceParameters {
   dReal mu;
 
   /* only defined if the corresponding flag is set in mode */
-  dReal mu2;
+  dReal mu2, mu3;
   dReal bounce;
   dReal bounce_vel;
   dReal soft_erp;
   dReal soft_cfm;
   dReal motion1,motion2,motionN;
-  dReal slip1,slip2;
+  dReal slip1,slip2,slip3;
+  dReal patch_radius, surface_radius;
+  bool  use_patch_radius;
 } dSurfaceParameters;
 
 
 /**
  * @brief Describe the contact point between two geoms.
  *
- * If two bodies touch, or if a body touches a static feature in its 
- * environment, the contact is represented by one or more "contact 
+ * If two bodies touch, or if a body touches a static feature in its
+ * environment, the contact is represented by one or more "contact
  * points", described by dContactGeom.
  *
- * The convention is that if body 1 is moved along the normal vector by 
- * a distance depth (or equivalently if body 2 is moved the same distance 
- * in the opposite direction) then the contact depth will be reduced to 
+ * The convention is that if body 1 is moved along the normal vector by
+ * a distance depth (or equivalently if body 2 is moved the same distance
+ * in the opposite direction) then the contact depth will be reduced to
  * zero. This means that the normal vector points "in" to body 1.
  *
  * @ingroup collide

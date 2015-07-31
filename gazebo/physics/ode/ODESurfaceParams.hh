@@ -112,8 +112,13 @@ namespace gazebo
       ///        http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
       public: double slip2;
 
+      /// \brief Artificial contact slip in torsional dirction.
+      public: double slipTorsion;
+
+      /// \brief Elastic modulus.
       public: double elasticModulus;
 
+      /// \brief Reference length for the elastic modulus.
       public: double elasticModulusReferenceLength;
 
       /// \brief Friction pyramid parameters (mu1, mu2).

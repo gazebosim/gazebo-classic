@@ -1,0 +1,1072 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+  <world name="default">
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>1000</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>1000.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
+    <gui>
+      <camera name="user_camera">
+        <pose>-4 1.5 1.9 0 0.17 -0.014</pose>
+      </camera>
+    </gui>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+
+    <model name='sphere_mass_1'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.4 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>0.41887902047863923</mass>
+          <inertia>
+            <ixx>0.0016755160819145573</ixx>
+            <iyy>0.0016755160819145573</iyy>
+            <izz>0.0016755160819145573</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+                <max_vel>10000</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_mass_2'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.8 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>4.188790204786391</mass>
+          <inertia>
+            <ixx>0.01675516081914557</ixx>
+            <iyy>0.01675516081914557</iyy>
+            <izz>0.01675516081914557</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+                <max_vel>10000</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_mass_3'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>1.2000000000000002 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+                <max_vel>10000</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_mass_4'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>1.6 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>20.94395102393196</mass>
+          <inertia>
+            <ixx>0.08377580409572787</ixx>
+            <iyy>0.08377580409572787</iyy>
+            <izz>0.08377580409572787</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+                <max_vel>10000</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_mass_5'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>2.0 0 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>41.88790204786392</mass>
+          <inertia>
+            <ixx>0.16755160819145573</ixx>
+            <iyy>0.16755160819145573</iyy>
+            <izz>0.16755160819145573</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+                <max_vel>10000</max_vel>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+
+    <model name='sphere_coefficient_1'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.4 1 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_coefficient_2'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.8 1 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.001</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_coefficient_3'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>1.2000000000000002 1 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_coefficient_4'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>1.6 1 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.01</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_coefficient_5'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>2.0 1 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>1.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+
+    <model name='sphere_patch_1'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.4 2 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>0.0</patch_radius>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_patch_2'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.8 2 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>0.1</patch_radius>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_patch_3'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>1.2000000000000002 2 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>2.0</patch_radius>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_patch_4'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>1.6 2 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>5.0</patch_radius>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_patch_5'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>2.0 2 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>10.0</patch_radius>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+
+    <model name='sphere_radius_1'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.04 3 0.01  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.01</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>0.01</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.01</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_radius_2'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0.8 3 0.1  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>0.1</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_radius_3'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>9.600000000000001 3 0.8  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.8</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>0.8</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.8</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_radius_4'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>32.0 3 2.0  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>2.0</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>2.0</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>2.0</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='sphere_radius_5'>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>200.0 3 10.0  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>11.309733552923259</mass>
+          <inertia>
+            <ixx>0.045238934211693047</ixx>
+            <iyy>0.045238934211693047</iyy>
+            <izz>0.045238934211693047</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>10.0</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>10.0</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>10.0</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+  </world>
+</sdf>

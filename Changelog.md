@@ -1,4 +1,6 @@
 ## Gazebo 7.0
+1. Added torsional friction
+    * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
 
 1. Display gearbox and screw joint properties in property tree
     * [Pull request #1838](https://bitbucket.org/osrf/gazebo/pull-request/1838)

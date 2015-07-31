@@ -1823,6 +1823,42 @@ namespace gazebo
           physicsEngElem->GetElement("slip1")->Set(friction.slip1());
         if (friction.has_slip2())
           physicsEngElem->GetElement("slip2")->Set(friction.slip2());
+
+        if (friction.has_torsional())
+        {
+          msgs::Friction::Torsional torsional = friction.torsional();
+          sdf::ElementPtr torsionalElem = frictionElem->GetElement("torsional");
+
+          if (torsional.has_coefficient())
+          {
+            torsionalElem->GetElement("coefficient")->Set(
+                torsional.coefficient());
+          }
+          if (torsional.has_patch_radius())
+          {
+            torsionalElem->GetElement("patch_radius")->Set(
+                torsional.patch_radius());
+          }
+          if (torsional.has_surface_radius())
+          {
+            torsionalElem->GetElement("surface_radius")->Set(
+                torsional.surface_radius());
+          }
+          if (torsional.has_use_patch_radius())
+          {
+            torsionalElem->GetElement("use_patch_radius")->Set(
+                torsional.use_patch_radius());
+          }
+          if (torsional.has_ode())
+          {
+            msgs::Friction::Torsional::ODE ode = torsional.ode();
+            sdf::ElementPtr odeElem = torsionalElem->GetElement("ode");
+            if (ode.has_slip())
+            {
+              odeElem->GetElement("slip")->Set(ode.slip());
+            }
+          }
+        }
       }
       sdf::ElementPtr bounceElem = surfaceSDF->GetElement("bounce");
       if (_msg.has_restitution_coefficient())

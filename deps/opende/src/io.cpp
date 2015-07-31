@@ -348,6 +348,14 @@ void h5dump::pack_contacts()
           mu_k[2 * k]     = surf.mu;
           mu_k[2 * k + 1] = surf.mu;
         }
+        if ( surf.mode&dContactMu3 ) {
+          mu_k[3*k] = surf.mu3;
+          mu_k[3*k + 1] = surf.mu3;
+        }
+        else {
+          mu_k[3 * k]     = surf.mu;
+          mu_k[3 * k + 1] = surf.mu;
+        }
 
         // find out which bodies we have
         for (int i = 1; i > -1 ; --i )

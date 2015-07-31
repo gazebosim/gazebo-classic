@@ -17,7 +17,6 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
@@ -25,9 +24,13 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 FrictionPyramid::FrictionPyramid()
+  : patchRadius(0.0)
+  , surfaceRadius(IGN_DBL_MAX)
+  , usePatchRadius(1)
 {
   this->mu[0] = 1.0;
   this->mu[1] = 1.0;
+  this->mu[2] = 1.0;
 }
 
 //////////////////////////////////////////////////
@@ -48,6 +51,30 @@ double FrictionPyramid::GetMuSecondary()
 }
 
 //////////////////////////////////////////////////
+double FrictionPyramid::GetMuTorsion()
+{
+  return this->GetMu(2);
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::GetPatchRadius()
+{
+  return this->patchRadius;
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::GetSurfaceRadius()
+{
+  return this->surfaceRadius;
+}
+
+//////////////////////////////////////////////////
+bool FrictionPyramid::GetUsePatchRadius()
+{
+  return this->usePatchRadius;
+}
+
+//////////////////////////////////////////////////
 void FrictionPyramid::SetMuPrimary(double _mu)
 {
   this->SetMu(0, _mu);
@@ -60,16 +87,40 @@ void FrictionPyramid::SetMuSecondary(double _mu)
 }
 
 //////////////////////////////////////////////////
+void FrictionPyramid::SetMuTorsion(double _mu)
+{
+  this->SetMu(2, _mu);
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetPatchRadius(double _radius)
+{
+  this->patchRadius = _radius;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetSurfaceRadius(double _radius)
+{
+  this->surfaceRadius = _radius;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetUsePatchRadius(bool _use)
+{
+  this->usePatchRadius = _use;
+}
+
+//////////////////////////////////////////////////
 double FrictionPyramid::GetMu(unsigned int _index)
 {
-  GZ_ASSERT(_index < 2, "Invalid _index to GetMu");
+  GZ_ASSERT(_index < 3, "Invalid _index to GetMu");
   return this->mu[_index];
 }
 
 //////////////////////////////////////////////////
 void FrictionPyramid::SetMu(unsigned int _index, double _mu)
 {
-  GZ_ASSERT(_index < 2, "Invalid _index to SetMu");
+  GZ_ASSERT(_index < 3, "Invalid _index to SetMu");
   if (_mu < 0)
   {
     this->mu[_index] = GZ_FLT_MAX;
