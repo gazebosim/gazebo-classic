@@ -464,16 +464,12 @@ void ODEPhysics::UpdatePhysics()
     }
 
     // cache force torques
-    physics::Model_V models = this->world->GetModels();
-    for (physics::Model_V::iterator mi = models.begin();
-         mi != models.end(); ++mi)
+    for (auto model : this->world->GetModels())
     {
-      physics::Joint_V joints = (*mi)->GetJoints();
-      for (physics::Joint_V::iterator jx = joints.begin();
-           jx != joints.end(); ++jx)
+      for (auto joint : model->GetJoints())
       {
         ODEJointPtr odeJoint =
-          boost::dynamic_pointer_cast<physics::ODEJoint>(*jx);
+          boost::dynamic_pointer_cast<physics::ODEJoint>(joint);
         dJointFeedback *fb = odeJoint->GetFeedback();
         if (fb)
           odeJoint->CacheForceTorque();
