@@ -1,6 +1,7 @@
 ## Gazebo 7.0
-1. Refactored makers
-    * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
+
+1. Display gearbox and screw joint properties in property tree
+    * [Pull request #1838](https://bitbucket.org/osrf/gazebo/pull-request/1838)
 
 1. Set window flags for dialogs and file dialogs
     * [Pull request #1816](https://bitbucket.org/osrf/gazebo/pull-request/1816)
@@ -14,7 +15,12 @@
 1. Tweaks to Data Logger, such as multiline text edit for path
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
 
+1. Refactored makers
+    * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
+
 1. Model editor updates
+    1. Added support for more joint types (gearbox and fixed joints).
+        * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
         * [Pull request #1787](https://bitbucket.org/osrf/gazebo/pull-request/1787)
 
@@ -380,6 +386,15 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Initialize sigact struct fields that valgrind said were being used uninitialized
+    * [Pull request #1809](https://bitbucket.org/osrf/gazebo/pull-request/1809)
+
+1. Add missing ogre includes to ensure macros are properly defined
+    * [Pull request #1813](https://bitbucket.org/osrf/gazebo/pull-request/1813)
+
+1. Use ToSDF functions to simplify physics_friction test
+    * [Pull request #1808](https://bitbucket.org/osrf/gazebo/pull-request/1808)
 
 1. Added lines to laser sensor visualization
     * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)

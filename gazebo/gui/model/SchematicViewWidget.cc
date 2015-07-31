@@ -189,8 +189,12 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   this->scene->clearLayout();
 
   QGVEdge *edge = this->scene->AddEdge(_id, parentNode, childNode);
+  if (!edge)
+    return;
+
   edge->setData(0, tr(_id.c_str()));
   edge->setData(1, tr("Joint"));
+
   this->edges[_id] = edge;
 
   std::string materialName = JointMaker::GetJointMaterial(_type);
