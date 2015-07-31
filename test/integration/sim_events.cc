@@ -81,7 +81,7 @@ std::string GetEventData()
 // waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewEvent(unsigned int current,
-                             unsigned int max_tries = 10,
+                             unsigned int max_tries = 50,
                              unsigned int ms = 10)
 {
   for (unsigned int i = 0; i < max_tries; i++)
