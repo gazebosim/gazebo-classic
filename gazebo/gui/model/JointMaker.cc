@@ -203,44 +203,78 @@ void JointMaker::DisableEventHandlers()
 }
 
 /////////////////////////////////////////////////
+void JointMaker::RemoveJointBeingCreated()
+{
+  if (this->jointBeingCreated->hotspot)
+    this->RemoveJoint(this->jointBeingCreated->hotspot->GetName());
+  else
+    this->RemoveJoint("");
+}
+
+/////////////////////////////////////////////////
 void JointMaker::RemoveJoint(const std::string &_jointId)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  auto jointIt = this->joints.find(_jointId);
-  if (jointIt != this->joints.end())
+
+  JointData *joint = NULL;
+  if (this->joints.find(_jointId) != this->joints.end())
   {
-    JointData *joint = jointIt->second;
-    rendering::ScenePtr scene = joint->hotspot->GetScene();
+    joint = this->joints[_jointId];
+  }
+  else if (this->jointBeingCreated)
+  {
+    joint = this->jointBeingCreated;
+  }
+
+  if (!joint)
+  {
+    gzerr << "Requested to remove inexistent joint [" << _jointId << "]"
+        << std::endl;
+    return;
+  }
+
+  rendering::ScenePtr scene = rendering::get_scene();
+
+  if (joint->handles)
     scene->GetManager()->destroyBillboardSet(joint->handles);
+
+  if (joint->hotspot)
     scene->RemoveVisual(joint->hotspot);
+
+  if (joint->visual)
+  {
     scene->RemoveVisual(joint->visual);
     joint->visual->Fini();
-    if (joint->jointVisual)
+  }
+
+  if (joint->jointVisual)
+  {
+    rendering::JointVisualPtr parentAxisVis = joint->jointVisual
+        ->GetParentAxisVisual();
+    if (parentAxisVis)
     {
-      rendering::JointVisualPtr parentAxisVis = joint->jointVisual
-          ->GetParentAxisVisual();
-      if (parentAxisVis)
-      {
-        parentAxisVis->GetParent()->DetachVisual(
-            parentAxisVis->GetName());
-        scene->RemoveVisual(parentAxisVis);
-      }
-      joint->jointVisual->GetParent()->DetachVisual(
-          joint->jointVisual->GetName());
-      scene->RemoveVisual(joint->jointVisual);
+      parentAxisVis->GetParent()->DetachVisual(
+          parentAxisVis->GetName());
+      scene->RemoveVisual(parentAxisVis);
     }
-    joint->hotspot.reset();
-    joint->visual.reset();
-    joint->jointVisual.reset();
-    joint->parent.reset();
-    joint->child.reset();
+    joint->jointVisual->GetParent()->DetachVisual(
+        joint->jointVisual->GetName());
+    scene->RemoveVisual(joint->jointVisual);
+  }
+  if (joint->inspector)
+  {
     joint->inspector->hide();
     delete joint->inspector;
-    delete joint;
-    this->joints.erase(jointIt);
-    gui::model::Events::modelChanged();
-    gui::model::Events::jointRemoved(_jointId);
   }
+  joint->hotspot.reset();
+  joint->visual.reset();
+  joint->jointVisual.reset();
+  joint->parent.reset();
+  joint->child.reset();
+  delete joint;
+  this->joints.erase(_jointId);
+  gui::model::Events::modelChanged();
+  gui::model::Events::jointRemoved(_jointId);
 }
 
 /////////////////////////////////////////////////
@@ -568,18 +602,20 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
 /////////////////////////////////////////////////
 void JointMaker::Stop()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
  // if (this->jointType != JointMaker::JOINT_NONE)
   {
     this->creatingJoint = false;
+    // Cancel joint creation
     if (this->jointBeingCreated)
     {
-      this->jointBeingCreated->visual->DeleteDynamicLine(
-          this->jointBeingCreated->line);
-      rendering::ScenePtr scene = this->jointBeingCreated->visual->GetScene();
-      scene->RemoveVisual(this->jointBeingCreated->visual);
-      this->jointBeingCreated->visual.reset();
-      delete this->jointBeingCreated;
+      this->RemoveJointBeingCreated();
       this->jointBeingCreated = NULL;
+      this->creatingJoint = false;
+      this->jointType == JointMaker::JOINT_NONE;
+
+      // Notify ModelEditor to uncheck tool button
+      this->JointAdded();
     }
   //  this->AddJoint(JointMaker::JOINT_NONE);
     this->mouseMoveEnabled = false;
@@ -683,12 +719,12 @@ void JointMaker::OnOpenInspector()
 /////////////////////////////////////////////////
 void JointMaker::OpenInspector(const std::string &_jointId)
 {
-  JointData *joint = this->joints[_jointId];
-  if (!joint)
+  if (this->joints.find(_jointId) == this->joints.end())
   {
     gzerr << "Joint [" << _jointId << "] not found." << std::endl;
     return;
   }
+  JointData *joint = this->joints[_jointId];
   joint->OpenInspector();
 }
 
@@ -1412,6 +1448,7 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
 /////////////////////////////////////////////////
 void JointMaker::OnJointTypeChosenDialog(JointType _type)
 {
+  this->jointType = _type;
   this->jointBeingCreated->SetType(_type);
   this->jointBeingCreated->Update();
 }
@@ -1448,7 +1485,7 @@ void JointMaker::OnJointChildChosenDialog(const std::string &_linkName)
 void JointMaker::OnJointCreateDialog()
 {
   gui::model::Events::modelChanged();
-  this->jointType == JointMaker::JOINT_NONE;
+  this->jointType = JointMaker::JOINT_NONE;
 
   // Notify schematic view and palette list
   if (this->jointBeingCreated &&

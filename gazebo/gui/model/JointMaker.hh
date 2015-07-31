@@ -125,6 +125,9 @@ namespace gazebo
       /// \param[in] _jointName Name of joint to be removed.
       public: void RemoveJoint(const std::string &_jointName);
 
+      /// \brief Remove joint being created
+      public: void RemoveJointBeingCreated();
+
       /// \brief Remove all joints connected to link.
       /// \param[in] _linkName Name of the link.
       public: void RemoveJointsByLink(const std::string &_linkName);

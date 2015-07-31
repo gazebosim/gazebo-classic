@@ -370,6 +370,7 @@ void JointCreationDialog::OnLinkRemovedSlot(const std::string &_linkName)
 void JointCreationDialog::OnCancel()
 {
   this->close();
+  this->jointMaker->Stop();
 }
 
 /////////////////////////////////////////////////
