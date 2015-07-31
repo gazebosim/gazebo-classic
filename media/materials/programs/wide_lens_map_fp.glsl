@@ -38,11 +38,14 @@ void main()
 	float param = r/(c1*f);
 	float theta = fun.x*asin(param)+fun.y*atan(param)+fun.z*param;
 
-	if(abs(theta) < cutOffAngle)
+	theta = (theta-c3)*c2;
+
+	if(theta < cutOffAngle)
 	{
-		vec3 tc = map((theta-c3)/c2);
+		vec3 tc ;
+		tc = map(theta);
 		gl_FragColor = vec4(textureCube(envMap,tc).rgb,1);
 	}
 	else
-		gl_FragColor = vec4(0,0,0,1.0)
+		gl_FragColor = vec4(0,0,0,1.0);
 }

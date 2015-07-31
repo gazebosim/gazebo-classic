@@ -35,6 +35,7 @@ namespace gazebo
       public: void SetF(float f);
       public: void SetFun(std::string fun);
       public: void SetCutOffAngle(float _angle);
+      public: void SetFullFrame(bool _full_frame);
 
       private: void ConvertToCustom();
 
@@ -48,9 +49,9 @@ namespace gazebo
 
       public: void SetCompositorMaterial(Ogre::MaterialPtr material);
 
-      public: void SetMaterialVariables();
+      public: void SetMaterialVariables(float _ratio);
 
-      // r = c1*f*fun(c2*theta+c3)
+      // r = c1*f*fun(theta/c2+c3)
 
       private: float c1;
       private: float c2;

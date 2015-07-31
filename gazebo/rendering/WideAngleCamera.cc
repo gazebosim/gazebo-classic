@@ -217,7 +217,7 @@ void WideAngleCamera::RenderImpl()
   compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
     this->envCubeMapTexture->getName());
 
-  this->projection.SetMaterialVariables();
+  this->projection.SetMaterialVariables(this->imageWidth/(float)this->imageHeight);
 
   this->renderTarget->update();
 }
@@ -285,9 +285,9 @@ void CameraProjection::Init(std::string name)
 
   // c1,c2,c3,f,fun
   fun_types.emplace("gnomonical",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan"));
-  fun_types.emplace("stereographic",  std::make_tuple(2.0f,0.5f,0.0f,5.0f,"tan"));
+  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,5.0f,"tan"));
   fun_types.emplace("equidistant",  std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id"));
-  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,0.5f,0.0f,1.0f,"sin"));
+  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,"sin"));
   fun_types.emplace("orthographic", std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin"));
 
   std::tuple<float,float,float,float,std::string> params;
@@ -331,7 +331,7 @@ void CameraProjection::Load()
 
       this->Init(
         cf->Get<double>("c1"),
-        cf->Get<double>("c1"),
+        cf->Get<double>("c2"),
         cf->Get<std::string>("fun"),
         cf->Get<double>("f"));
     }
@@ -340,6 +340,8 @@ void CameraProjection::Load()
   }
   else
     this->Init(this->GetType());
+
+  this->SetCutOffAngle(this->sdf->Get<double>("cutoff_angle"));
 }
 
 float CameraProjection::GetC1() const
@@ -429,6 +431,11 @@ void CameraProjection::SetCutOffAngle(float _angle)
   this->sdf->GetElement("cutoff_angle")->Set((double)_angle);
 }
 
+void CameraProjection::SetFullFrame(bool _full_frame)
+{
+  this->sdf->GetElement("full_frame")->Set(_full_frame);
+}
+
 void CameraProjection::ConvertToCustom()
 {
   sdf::ElementPtr cf = this->sdf->AddElement("custom_function");
@@ -466,7 +473,7 @@ void CameraProjection::SetCompositorMaterial(Ogre::MaterialPtr material)
   this->compositorMaterial = material;
 }
 
-void CameraProjection::SetMaterialVariables()
+void CameraProjection::SetMaterialVariables(float _ratio)
 {
   Ogre::GpuProgramParametersSharedPtr uniforms =
     this->compositorMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
@@ -476,6 +483,8 @@ void CameraProjection::SetMaterialVariables()
     math::Vector3(0,1,0),
     math::Vector3(0,0,1)
   };
+
+
 
   uniforms->setNamedConstant("c1",(Ogre::Real)this->c1);
   uniforms->setNamedConstant("c2",(Ogre::Real)this->c2);
@@ -488,4 +497,9 @@ void CameraProjection::SetMaterialVariables()
       fun_m[this->fun].z));
 
   uniforms->setNamedConstant("cutOffAngle",(Ogre::Real)this->cutOffAngle);
+
+  Ogre::GpuProgramParametersSharedPtr uniforms_vs =
+    this->compositorMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+
+  uniforms_vs->setNamedConstant("ratio",(Ogre::Real)_ratio);
 }

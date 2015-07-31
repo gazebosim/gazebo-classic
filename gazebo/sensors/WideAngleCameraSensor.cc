@@ -120,13 +120,15 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
       this->GetTopic(), 50);
 
   std::string projTopicName = "~/";
-  projTopicName += this->parentName + "/" + this->GetName() + "/projection";
+  projTopicName += this->parentName + "/" + this->GetName() + "/projection_";
   boost::replace_all(projTopicName, "::", "/");
 
   sdf::ElementPtr projSdf = this->sdf->GetElement("camera")->GetElement("projection");
   if(projSdf->HasElement("advertise") && projSdf->Get<bool>("advertise"))
     this->projPub = this->node->Advertise<msgs::CameraProjectionCmd>(
-      projTopicName, 50);
+      projTopicName+"info", 50);
+
+  this->node->Subscribe(projTopicName+"control",&WideAngleCameraSensor::OnCtrlMessage,this);
 }
 
 bool WideAngleCameraSensor::UpdateImpl(bool _force)
@@ -162,4 +164,37 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
   }
 
   return true;
+}
+
+void WideAngleCameraSensor::OnCtrlMessage(ConstCameraProjectionCmdPtr &_msg)
+{
+  if(_msg->destiny() != msgs::CameraProjectionCmd_CmdDestiny_SET);
+    return;
+
+  rendering::WideAngleCameraPtr wcamera =
+      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
+
+  rendering::CameraProjection *proj =
+      const_cast<rendering::CameraProjection*>(wcamera->GetProjection());
+
+  if(_msg->has_type())
+    proj->SetType(_msg->type());
+
+  if(_msg->has_c1())
+    proj->SetC1(_msg->c1());
+
+  if(_msg->has_c2())
+    proj->SetC2(_msg->c2());
+
+  if(_msg->has_c3())
+    proj->SetC3(_msg->c3());
+
+  if(_msg->has_f())
+    proj->SetF(_msg->f());
+
+  if(_msg->has_cutoff_angle())
+    proj->SetCutOffAngle(_msg->cutoff_angle());
+
+  if(_msg->has_fun())
+    proj->SetFun(_msg->fun());
 }

@@ -19,7 +19,10 @@ namespace gazebo
 
       protected: virtual bool UpdateImpl(bool _force) override;
 
+      protected: void OnCtrlMessage(ConstCameraProjectionCmdPtr &_msg);
+
       protected: transport::PublisherPtr projPub;
+      protected: transport::SubscriberPtr projSub;
     };
   }
 }

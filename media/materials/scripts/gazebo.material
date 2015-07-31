@@ -1406,6 +1406,10 @@ material Gazebo/CameraDistortionMap
 vertex_program Gazebo/WideLensMapVS glsl
 {
   source wide_lens_map_vs.glsl
+  default_params
+  {
+    param_named ratio float 1
+  }
 }
 
 fragment_program Gazebo/WideLensMapFS glsl
