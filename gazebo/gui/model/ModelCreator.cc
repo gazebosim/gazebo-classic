@@ -404,7 +404,8 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     std::string leafName = nestedModelName;
     leafName = leafName.substr(leafName.rfind("::")+2);
 
-    modelData->modelSDF = _modelElem->Clone();
+//    modelData->modelSDF = _modelElem->Clone();
+    modelData->modelSDF = _modelElem;
     modelData->modelVisual = modelVisual;
     modelData->SetName(leafName);
     modelData->SetPose(_modelElem->Get<math::Pose>("pose"));
