@@ -811,6 +811,7 @@ std::string ModelCreator::AddShape(LinkType _type,
       gzwarn << "Unknown link type '" << _type << "'. " <<
           "Adding a box" << std::endl;
     }
+
     ((geomElem->AddElement("box"))->GetElement("size"))->Set(_size);
   }
 
@@ -838,6 +839,20 @@ std::string ModelCreator::AddShape(LinkType _type,
 void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 {
   LinkData *link = new LinkData();
+
+  msgs::Model model;
+  double mass = 1.0;
+
+  // set reasonable inertial values based on geometry
+  std::string geomType = _visual->GetGeometryType();
+  if (geomType == "cylinder")
+    msgs::AddCylinderLink(model, mass, 0.5, 1.0);
+  else if (geomType == "sphere")
+    msgs::AddSphereLink(model, mass, 0.5);
+  else
+    msgs::AddBoxLink(model, mass, ignition::math::Vector3d::One);
+  link->Load(msgs::LinkToSDF(model.link(0)));
+
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
   {
@@ -1628,7 +1643,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->allLinks.end())
     {
       LinkData *link = this->allLinks[this->mouseVisual->GetName()];
-      link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+      link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
     }
     else if (this->allNestedModels.find(this->mouseVisual->GetName()) !=
@@ -1859,7 +1874,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
     return;
   }
   LinkData *link = this->allLinks[_name];
-  link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
+  link->SetPose((link->linkVisual->GetWorldPose()-this->modelPose).Ign());
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
   link->inspector->show();
@@ -2041,7 +2056,7 @@ void ModelCreator::GenerateSDF()
     for (auto &linksIt : this->allLinks)
     {
       LinkData *link = linksIt.second;
-      mid += link->GetPose().pos;
+      mid += link->GetPose().Pos();
       entityCount++;
     }
     for (auto &nestedModelsIt : this->allNestedModels)
@@ -2068,7 +2083,7 @@ void ModelCreator::GenerateSDF()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
+    link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
     link->linkVisual->SetPose(link->GetPose());
   }
   for (auto &nestedModelsIt : this->allNestedModels)
@@ -2377,20 +2392,20 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    if (link->GetPose() != link->linkVisual->GetPose())
+    if (link->GetPose() != link->linkVisual->GetPose().Ign())
     {
-      link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
+      link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
       this->ModelChanged();
     }
     for (auto &scaleIt : this->linkScaleUpdate)
     {
       if (link->linkVisual->GetName() == scaleIt.first)
-        link->SetScale(scaleIt.second);
+        link->SetScale(scaleIt.second.Ign());
     }
-    if (!this->linkScaleUpdate.empty())
-      this->ModelChanged();
-    this->linkScaleUpdate.clear();
   }
+  if (!this->linkScaleUpdate.empty())
+    this->ModelChanged();
+  this->linkScaleUpdate.clear();
 }
 
 /////////////////////////////////////////////////

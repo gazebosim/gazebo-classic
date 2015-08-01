@@ -40,7 +40,7 @@ namespace gazebo
   {
     class LinkInspector;
 
-    class ModelData
+    class GZ_GUI_MODEL_VISIBLE ModelData
     {
       /// \brief Get a template SDF string of a simple model.
       /// \return Template SDF string of a simple model.
@@ -86,7 +86,7 @@ namespace gazebo
 
     /// \class LinkData LinkData.hh
     /// \brief Helper class to store link data
-    class LinkData : public QObject
+    class GZ_GUI_MODEL_VISIBLE LinkData : public QObject
     {
       Q_OBJECT
 
@@ -106,11 +106,11 @@ namespace gazebo
 
       /// \brief Get the pose of the link.
       /// \return Pose of link.
-      public: math::Pose GetPose() const;
+      public: ignition::math::Pose3d GetPose() const;
 
       /// \brief Set the pose of the link.
       /// \param[in] _pose Pose of link.
-      public: void SetPose(const math::Pose &_pose);
+      public: void SetPose(const ignition::math::Pose3d &_pose3d);
 
       /// \brief Load the link with data from SDF.
       /// \param[in] _sdf Link SDF element.
@@ -118,11 +118,11 @@ namespace gazebo
 
       /// \brief Get the scale of the link.
       /// \return Scale of link.
-      public: math::Vector3 GetScale() const;
+      public: ignition::math::Vector3d GetScale() const;
 
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale of link.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Add a visual to the link.
       /// \param[in] _visual Visual to be added.
@@ -181,7 +181,7 @@ namespace gazebo
       public: sdf::ElementPtr linkSDF;
 
       /// \brief Scale of link.
-      public: math::Vector3 scale;
+      public: ignition::math::Vector3d scale;
 
       /// \brief Visual representing this link.
       public: rendering::VisualPtr linkVisual;

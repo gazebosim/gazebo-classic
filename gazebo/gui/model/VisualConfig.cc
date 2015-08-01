@@ -69,6 +69,7 @@ VisualConfig::~VisualConfig()
   while (!this->configs.empty())
   {
     auto config = this->configs.begin();
+    delete config->second;
     this->configs.erase(config);
   }
 }
@@ -294,6 +295,23 @@ void VisualConfig::SetGeometry(const std::string &_name,
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
           _size, _uri);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::GetGeometry(const std::string &_name,
+    ignition::math::Vector3d &_size, std::string &_uri)
+{
+  for (auto &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      math::Vector3 dimensions;
+      it.second->configWidget->GetGeometryWidgetValue("geometry",
+          dimensions, _uri);
+      _size = dimensions.Ign();
       break;
     }
   }

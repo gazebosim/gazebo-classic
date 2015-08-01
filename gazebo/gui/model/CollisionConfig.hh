@@ -101,7 +101,14 @@ namespace gazebo
       /// \param[in] _size Size to set the geometry to.
       /// \param[in] _uri URI of the geometry.
       public: void SetGeometry(const std::string &_name,
-          const math::Vector3 &_size, const std::string &_uri = "");
+          const ignition::math::Vector3d &_size, const std::string &_uri = "");
+
+      /// \brief Get the geometry data of a collision
+      /// \param[in] _name Name of collision.
+      /// \param[in] _size Size of the geometry.
+      /// \param[in] _uri URI of the geometry.
+      public: void GetGeometry(const std::string &_name,
+          ignition::math::Vector3d &_size, std::string &_uri);
 
       /// \brief Qt signal emitted when a collision is removed.
       /// \param[in] _name Name of collision removed.

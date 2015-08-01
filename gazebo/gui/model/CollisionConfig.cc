@@ -67,6 +67,7 @@ CollisionConfig::~CollisionConfig()
   while (!this->configs.empty())
   {
     auto config = this->configs.begin();
+    delete config->second;
     this->configs.erase(config);
   }
 }
@@ -286,7 +287,7 @@ msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
 
 /////////////////////////////////////////////////
 void CollisionConfig::SetGeometry(const std::string &_name,
-    const math::Vector3 &_size, const std::string &_uri)
+    const ignition::math::Vector3d &_size, const std::string &_uri)
 {
   for (auto &it : this->configs)
   {
@@ -298,6 +299,23 @@ void CollisionConfig::SetGeometry(const std::string &_name,
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
           _size, _uri);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::GetGeometry(const std::string &_name,
+    ignition::math::Vector3d &_size, std::string &_uri)
+{
+  for (auto &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      math::Vector3 dimensions;
+      it.second->configWidget->GetGeometryWidgetValue("geometry",
+          dimensions, _uri);
+      _size = dimensions.Ign();
       break;
     }
   }

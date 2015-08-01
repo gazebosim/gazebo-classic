@@ -536,6 +536,10 @@ namespace gazebo
       /// \return Type of geometry in string.
       public: std::string GetGeometryType() const;
 
+      /// \brief Get the geometry size.
+      /// \return Size of geometry.
+      public: ignition::math::Vector3d GetGeometrySize() const;
+
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
       public: std::string GetMeshName() const;
