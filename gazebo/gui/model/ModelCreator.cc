@@ -2035,20 +2035,30 @@ void ModelCreator::GenerateSDF()
   if (this->serverModelName.empty())
   {
     // set center of all links and nested models to be origin
-    // TODO set a better origin other than the centroid
     math::Vector3 mid;
+    int entityCount = 0;
     for (auto &linksIt : this->allLinks)
     {
       LinkData *link = linksIt.second;
       mid += link->GetPose().pos;
+      entityCount++;
     }
     for (auto &nestedModelsIt : this->allNestedModels)
     {
       NestedModelData *modelData = nestedModelsIt.second;
       mid += modelData->GetPose().pos;
+      entityCount++;
     }
-    if (!(this->allLinks.empty() && this-allNestedModels.empty()))
-      mid /= (this->allLinks.size() + this->allNestedModels.size());
+    if (!(this->allLinks.empty() && this->allNestedModels.empty()))
+    {
+      mid /= entityCount;
+    }
+
+    // Put the origin in the ground so when the model is inserted it is fully
+    // above ground.
+    // TODO set a better origin other than the centroid
+    mid.z = 0;
+
     this->modelPose.pos = mid;
   }
 
