@@ -35,7 +35,7 @@ namespace gazebo
       public: void SetF(float f);
       public: void SetFun(std::string fun);
       public: void SetCutOffAngle(float _angle);
-      public: void SetFullFrame(bool _full_frame);
+      public: void SetCircular(bool _circular);
 
       private: void ConvertToCustom();
 
@@ -45,11 +45,11 @@ namespace gazebo
 
       public: bool IsCustom() const;
 
-      public: bool IsFullFrame() const;
+      public: bool IsCircular() const;
 
       public: void SetCompositorMaterial(Ogre::MaterialPtr material);
 
-      public: void SetMaterialVariables(float _ratio);
+      public: void SetMaterialVariables(float _ratio,float _hfov);
 
       // r = c1*f*fun(theta/c2+c3)
 
@@ -81,7 +81,7 @@ namespace gazebo
 
       public: void SetEnvTextureSize(int size);
 
-      private: void CreateEnvCameras();
+      protected: void CreateEnvCameras();
 
       public: virtual void SetClipDist();
 
@@ -97,19 +97,19 @@ namespace gazebo
 
       protected: Ogre::CompositorInstance *wamapInstance;
 
-      private: Ogre::Camera *envCameras[6];
+      protected: Ogre::Camera *envCameras[6];
 
-      private: Ogre::RenderTarget *envRenderTargets[6];
+      protected: Ogre::RenderTarget *envRenderTargets[6];
 
-      private: Ogre::Viewport *envViewports[6];
+      protected: Ogre::Viewport *envViewports[6];
 
-      private: Ogre::Texture *envCubeMapTexture;
+      protected: Ogre::Texture *envCubeMapTexture;
 
-      private: int envTextureSize;
+      protected: int envTextureSize;
 
-      private: Ogre::MaterialPtr compMat;
+      protected: Ogre::MaterialPtr compMat;
 
-      private: CameraProjection projection;
+      protected: CameraProjection lens;
     };
   }
 }

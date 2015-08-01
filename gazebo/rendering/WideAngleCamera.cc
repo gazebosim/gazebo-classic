@@ -37,23 +37,24 @@ void WideAngleCamera::Init()
   Camera::Init();
 
   this->CreateEnvCameras();
+  this->CreateEnvRenderTexture(this->scopedUniqueName + "_envRttTex");
 }
 
 void WideAngleCamera::Load()
 {
   Camera::Load();
 
-  if(this->sdf->HasElement("projection"))
+  if(this->sdf->HasElement("lens"))
   {
-    sdf::ElementPtr sdf_projection = this->sdf->GetElement("projection");
+    sdf::ElementPtr sdf_lens = this->sdf->GetElement("lens");
 
-    this->projection.Load(sdf_projection);
+    this->lens.Load(sdf_lens);
 
-    if(sdf_projection->HasElement("cube_tex_resolution"))
-      this->envTextureSize = sdf_projection->Get<int>("cube_tex_resolution");
+    if(sdf_lens->HasElement("env_texture_size"))
+      this->envTextureSize = sdf_lens->Get<int>("env_texture_size");
   }
   else
-    this->projection.Load();
+    this->lens.Load();
 }
 
 void WideAngleCamera::Fini()
@@ -97,7 +98,7 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
         compMat->getTechnique(0)->getPass(0)->createTextureUnitState();
       }
 
-      this->projection.SetCompositorMaterial(this->compMat);
+      this->lens.SetCompositorMaterial(this->compMat);
 
       gzdbg << "Compositor cubemap texture present " << envCubeMapTexture->getName() << "\n";
     }
@@ -167,10 +168,10 @@ int WideAngleCamera::GetEnvTextureSize()
 
 void WideAngleCamera::SetEnvTextureSize(int size)
 {
-  if(this->sdf->HasElement("cube_tex_resolution"))
-    this->sdf->AddElement("cube_tex_resolution")->Set(size);
+  if(this->sdf->HasElement("env_texture_size"))
+    this->sdf->AddElement("env_texture_size")->Set(size);
 
-  this->sdf->GetElement("cube_tex_resolution")->Set(size);
+  this->sdf->GetElement("env_texture_size")->Set(size);
 }
 
 void WideAngleCamera::CreateEnvCameras()
@@ -217,7 +218,7 @@ void WideAngleCamera::RenderImpl()
   compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
     this->envCubeMapTexture->getName());
 
-  this->projection.SetMaterialVariables(this->imageWidth/(float)this->imageHeight);
+  this->lens.SetMaterialVariables(this->GetAspectRatio(),this->GetHFOV().Radian());
 
   this->renderTarget->update();
 }
@@ -246,7 +247,7 @@ void WideAngleCamera::SetClipDist()
 
 const CameraProjection *WideAngleCamera::GetProjection()
 {
-  return &this->projection;
+  return &this->lens;
 }
 
 void CameraProjection::Init(float c1,float c2,std::string fun,float f,float c3)
@@ -285,7 +286,8 @@ void CameraProjection::Init(std::string name)
 
   // c1,c2,c3,f,fun
   fun_types.emplace("gnomonical",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan"));
-  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,5.0f,"tan"));
+  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,"tan"));
+  fun_types.emplace("stereographic_",  std::make_tuple(2.0f,2.0f,0.0f,0.5f,"tan"));
   fun_types.emplace("equidistant",  std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id"));
   fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,"sin"));
   fun_types.emplace("orthographic", std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin"));
@@ -321,7 +323,7 @@ void CameraProjection::Load(sdf::ElementPtr sdf)
 void CameraProjection::Load()
 {
   if(!this->sdf->HasElement("type"))
-    gzthrow("You should specify projection type using <type> element");
+    gzthrow("You should specify lens type using <type> element");
 
   if(this->IsCustom())
   {
@@ -333,10 +335,11 @@ void CameraProjection::Load()
         cf->Get<double>("c1"),
         cf->Get<double>("c2"),
         cf->Get<std::string>("fun"),
-        cf->Get<double>("f"));
+        cf->Get<double>("f"),
+        cf->Get<double>("c3"));
     }
     else
-      gzthrow("You need a <custom_function> element to use this projection type");
+      gzthrow("You need a <custom_function> element to use this lens type");
   }
   else
     this->Init(this->GetType());
@@ -401,7 +404,7 @@ void CameraProjection::SetC3(float c)
   if(!this->IsCustom())
     this->ConvertToCustom();
 
-  // this->sdf->GetElement("custom_function")->GetElement("c3")->Set((double)c);
+  this->sdf->GetElement("custom_function")->GetElement("c3")->Set((double)c);
 }
 
 void CameraProjection::SetF(float f)
@@ -431,9 +434,9 @@ void CameraProjection::SetCutOffAngle(float _angle)
   this->sdf->GetElement("cutoff_angle")->Set((double)_angle);
 }
 
-void CameraProjection::SetFullFrame(bool _full_frame)
+void CameraProjection::SetCircular(bool _circular)
 {
-  this->sdf->GetElement("full_frame")->Set(_full_frame);
+  this->sdf->GetElement("circular")->Set(_circular);
 }
 
 void CameraProjection::ConvertToCustom()
@@ -442,8 +445,11 @@ void CameraProjection::ConvertToCustom()
 
   cf->AddElement("c1")->Set((double)this->c1);
   cf->AddElement("c2")->Set((double)this->c2);
+  cf->AddElement("c3")->Set((double)this->c3);
   cf->AddElement("f")->Set((double)this->f);
-  cf->AddElement("fun")->Set(std::string("tan"));  //FIXME: choose appropriate string
+
+  std::string funs[] = {"sin","tan","id"};
+  cf->AddElement("fun")->Set(funs[(int)this->fun]);
 
   this->SetType("custom");
 }
@@ -463,9 +469,9 @@ bool CameraProjection::IsCustom() const
   return GetType() == "custom";
 }
 
-bool CameraProjection::IsFullFrame() const
+bool CameraProjection::IsCircular() const
 {
-  return this->sdf->Get<bool>("full_frame");
+  return this->sdf->Get<bool>("circular");
 }
 
 void CameraProjection::SetCompositorMaterial(Ogre::MaterialPtr material)
@@ -473,7 +479,7 @@ void CameraProjection::SetCompositorMaterial(Ogre::MaterialPtr material)
   this->compositorMaterial = material;
 }
 
-void CameraProjection::SetMaterialVariables(float _ratio)
+void CameraProjection::SetMaterialVariables(float _ratio,float _hfov)
 {
   Ogre::GpuProgramParametersSharedPtr uniforms =
     this->compositorMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
@@ -484,13 +490,34 @@ void CameraProjection::SetMaterialVariables(float _ratio)
     math::Vector3(0,0,1)
   };
 
-
-
   uniforms->setNamedConstant("c1",(Ogre::Real)this->c1);
   uniforms->setNamedConstant("c2",(Ogre::Real)this->c2);
   uniforms->setNamedConstant("c3",(Ogre::Real)this->c3);
 
-  uniforms->setNamedConstant("f",(Ogre::Real)this->f);
+  if(!this->IsCircular())
+  {
+    float fun_res = 1;
+    float param = _hfov*0.5/this->c2+this->c3;
+
+    switch(this->fun)
+    {
+      case SIN:
+        fun_res = sin(param);
+        break;
+      case TAN:
+        fun_res = tan(param);
+        break;
+      case ID:
+        fun_res = param;
+    }
+
+    float new_f = 1.0f/(this->c1*fun_res);
+
+    uniforms->setNamedConstant("f",(Ogre::Real)new_f);
+  }
+  else
+    uniforms->setNamedConstant("f",(Ogre::Real)this->f);
+
   uniforms->setNamedConstant("fun",Ogre::Vector3(
       fun_m[this->fun].x,
       fun_m[this->fun].y,

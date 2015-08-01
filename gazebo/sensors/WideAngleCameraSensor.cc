@@ -79,11 +79,7 @@ void WideAngleCameraSensor::Init()
     }
 
     this->camera->Init();
-    boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera)->CreateEnvRenderTexture(this->GetName() + "_envRttTex");
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-
-    gzdbg << "Sensor instance name: " << this->GetName() << "\n";
-    gzdbg << "Sensor sdf name: " << this->sdf->Get<std::string>("name") << "\n";
 
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
@@ -120,10 +116,10 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
       this->GetTopic(), 50);
 
   std::string projTopicName = "~/";
-  projTopicName += this->parentName + "/" + this->GetName() + "/projection_";
+  projTopicName += this->parentName + "/" + this->GetName() + "/lens_";
   boost::replace_all(projTopicName, "::", "/");
 
-  sdf::ElementPtr projSdf = this->sdf->GetElement("camera")->GetElement("projection");
+  sdf::ElementPtr projSdf = this->sdf->GetElement("camera")->GetElement("lens");
   if(projSdf->HasElement("advertise") && projSdf->Get<bool>("advertise"))
     this->projPub = this->node->Advertise<msgs::CameraProjectionCmd>(
       projTopicName+"info", 50);
@@ -155,7 +151,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     msg.set_f(proj->GetF());
 
     msg.set_fun(proj->GetFun());
-    msg.set_full_frame(proj->IsFullFrame());
+    msg.set_circular(proj->IsCircular());
     msg.set_cutoff_angle(proj->GetCutOffAngle());
 
     msg.set_env_texture_size(wcamera->GetEnvTextureSize());
@@ -197,4 +193,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraProjectionCmdPtr &_msg)
 
   if(_msg->has_fun())
     proj->SetFun(_msg->fun());
+
+  if(_msg->has_circular())
+    proj->SetCircular(_msg->circular());
 }
