@@ -413,9 +413,9 @@ void ModelEditorPalette::AddItem(QWidget *_item,
   else
     catLayout = iter->second;
 
-  int rowWidth = 3;
-  int row = catLayout->count() / rowWidth;
-  int col = catLayout->count() % rowWidth;
+  int numCol = 1;
+  int row = catLayout->count() / numCol;
+  int col = catLayout->count() % numCol;
   catLayout->addWidget(_item, row, col);
 }
 
