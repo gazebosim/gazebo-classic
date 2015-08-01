@@ -157,6 +157,7 @@ set (gtest_sources_dri
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
   Visual_TEST.cc
+  WideAngleCamera_TEST.cc
 )
 
 gz_build_dri_tests(${gtest_sources_dri})
