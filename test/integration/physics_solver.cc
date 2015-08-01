@@ -104,19 +104,14 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
   }
 }
 
-#ifdef HAVE_BULLET
-#ifdef LIBBULLET_VERSION_GT_282
-TEST_F(PhysicsTest, DropMixBulletLemke)
+TEST_P(PhysicsTest, DropTest)
 {
-  DropTest("ode", "world", "BULLET_LEMKE");
+  gzdbg << "DropTest(ode, world, " << GetParam() << ')' << std::endl;
+  DropTest("ode", "world", GetParam());
 }
-#endif
 
-TEST_F(PhysicsTest, DropMixBulletPGS)
-{
-  DropTest("ode", "world", "BULLET_PGS");
-}
-#endif
+INSTANTIATE_TEST_CASE_P(WorldStepSolvers, PhysicsTest,
+                        WORLD_STEP_SOLVERS);
 
 int main(int argc, char **argv)
 {
