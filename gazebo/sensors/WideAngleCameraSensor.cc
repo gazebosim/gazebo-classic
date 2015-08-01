@@ -29,7 +29,6 @@ GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
 WideAngleCameraSensor::WideAngleCameraSensor()
 {
-  gzerr << "wideanglecamera::__init__" << std::endl;
 }
 
 void WideAngleCameraSensor::Init()
@@ -115,16 +114,25 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(
       this->GetTopic(), 50);
 
-  std::string projTopicName = "~/";
-  projTopicName += this->parentName + "/" + this->GetName() + "/lens_";
-  boost::replace_all(projTopicName, "::", "/");
+  std::string lensTopicName = "~/";
+  lensTopicName += this->parentName + "/" + this->GetName() + "/lens_";
+  boost::replace_all(lensTopicName, "::", "/");
 
-  sdf::ElementPtr projSdf = this->sdf->GetElement("camera")->GetElement("lens");
-  if(projSdf->HasElement("advertise") && projSdf->Get<bool>("advertise"))
-    this->projPub = this->node->Advertise<msgs::CameraProjectionCmd>(
-      projTopicName+"info", 50);
+  sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
+  if(lensSdf->HasElement("advertise") && lensSdf->Get<bool>("advertise"))
+    this->lensPub = this->node->Advertise<msgs::CameraLensCmd>(
+      lensTopicName+"info", 50);
 
-  this->node->Subscribe(projTopicName+"control",&WideAngleCameraSensor::OnCtrlMessage,this);
+  this->lensSub = this->node->Subscribe(lensTopicName+"control",
+      &WideAngleCameraSensor::OnCtrlMessage,this);
+}
+
+void WideAngleCameraSensor::Fini()
+{
+  this->lensPub.reset();
+  this->lensSub.reset();
+
+  CameraSensor::Fini();
 }
 
 bool WideAngleCameraSensor::UpdateImpl(bool _force)
@@ -132,68 +140,68 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
   if(!CameraSensor::UpdateImpl(_force))
     return false;
 
-  if(this->projPub && this->projPub->HasConnections())
+  if(this->lensPub && this->lensPub->HasConnections())
   {
-    msgs::CameraProjectionCmd msg;
+    msgs::CameraLensCmd msg;
 
     rendering::WideAngleCameraPtr wcamera = 
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
 
-    const rendering::CameraProjection *proj = wcamera->GetProjection();
+    const rendering::CameraLens *lens = wcamera->GetLens();
 
     msg.set_name(this->GetName());
-    msg.set_destiny(msgs::CameraProjectionCmd_CmdDestiny_INFO);
-    msg.set_type(proj->GetType());
+    msg.set_destiny(msgs::CameraLensCmd_CmdDestiny_INFO);
+    msg.set_type(lens->GetType());
 
-    msg.set_c1(proj->GetC1());
-    msg.set_c2(proj->GetC2());
-    msg.set_c3(proj->GetC3());
-    msg.set_f(proj->GetF());
+    msg.set_c1(lens->GetC1());
+    msg.set_c2(lens->GetC2());
+    msg.set_c3(lens->GetC3());
+    msg.set_f(lens->GetF());
 
-    msg.set_fun(proj->GetFun());
-    msg.set_circular(proj->IsCircular());
-    msg.set_cutoff_angle(proj->GetCutOffAngle());
+    msg.set_fun(lens->GetFun());
+    msg.set_circular(lens->IsCircular());
+    msg.set_cutoff_angle(lens->GetCutOffAngle());
 
     msg.set_env_texture_size(wcamera->GetEnvTextureSize());
 
-    this->projPub->Publish(msg);
+    this->lensPub->Publish(msg);
   }
 
   return true;
 }
 
-void WideAngleCameraSensor::OnCtrlMessage(ConstCameraProjectionCmdPtr &_msg)
+void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 {
-  if(_msg->destiny() != msgs::CameraProjectionCmd_CmdDestiny_SET);
+  if(_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET);
     return;
 
   rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
 
-  rendering::CameraProjection *proj =
-      const_cast<rendering::CameraProjection*>(wcamera->GetProjection());
+  rendering::CameraLens *lens =
+      const_cast<rendering::CameraLens*>(wcamera->GetLens());
 
   if(_msg->has_type())
-    proj->SetType(_msg->type());
+    lens->SetType(_msg->type());
 
   if(_msg->has_c1())
-    proj->SetC1(_msg->c1());
+    lens->SetC1(_msg->c1());
 
   if(_msg->has_c2())
-    proj->SetC2(_msg->c2());
+    lens->SetC2(_msg->c2());
 
   if(_msg->has_c3())
-    proj->SetC3(_msg->c3());
+    lens->SetC3(_msg->c3());
 
   if(_msg->has_f())
-    proj->SetF(_msg->f());
+    lens->SetF(_msg->f());
 
   if(_msg->has_cutoff_angle())
-    proj->SetCutOffAngle(_msg->cutoff_angle());
+    lens->SetCutOffAngle(_msg->cutoff_angle());
 
   if(_msg->has_fun())
-    proj->SetFun(_msg->fun());
+    lens->SetFun(_msg->fun());
 
   if(_msg->has_circular())
-    proj->SetCircular(_msg->circular());
+    lens->SetCircular(_msg->circular());
 }

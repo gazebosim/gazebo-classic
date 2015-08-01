@@ -12,7 +12,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE CameraProjection
+    class GAZEBO_VISIBLE CameraLens
     {
       private: enum ProjFunction {SIN=0,TAN,ID};
 
@@ -93,7 +93,7 @@ namespace gazebo
 
       public: virtual void Fini();
 
-      public: const CameraProjection *GetProjection();
+      public: const CameraLens *GetLens();
 
       protected: Ogre::CompositorInstance *wamapInstance;
 
@@ -109,7 +109,7 @@ namespace gazebo
 
       protected: Ogre::MaterialPtr compMat;
 
-      protected: CameraProjection lens;
+      protected: CameraLens lens;
     };
   }
 }

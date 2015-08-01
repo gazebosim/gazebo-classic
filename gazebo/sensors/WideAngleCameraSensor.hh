@@ -13,16 +13,18 @@ namespace gazebo
     {
       public: WideAngleCameraSensor();
 
-      public: virtual void Init();
+      public: virtual void Init() override;
 
-      public: virtual void Load(const std::string &_worldName);
+      public: virtual void Load(const std::string &_worldName) override;
+
+      protected: virtual void Fini() override;
 
       protected: virtual bool UpdateImpl(bool _force) override;
 
-      protected: void OnCtrlMessage(ConstCameraProjectionCmdPtr &_msg);
+      protected: void OnCtrlMessage(ConstCameraLensCmdPtr &_msg);
 
-      protected: transport::PublisherPtr projPub;
-      protected: transport::SubscriberPtr projSub;
+      protected: transport::PublisherPtr lensPub;
+      protected: transport::SubscriberPtr lensSub;
     };
   }
 }

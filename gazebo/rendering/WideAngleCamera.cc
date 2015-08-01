@@ -114,13 +114,9 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 {
   int fsaa = 4;
 
-  // if(this->envCubeMapTexture)
-  // {
-  //   delete this->envCubeMapTexture;   // XXX
-  //   this->envCubeMapTexture = NULL;
-  // }
-  gzdbg << "Creating cubemap texture: " << this->scopedUniqueName << "::" << _textureName << "\n";
-  gzdbg << "Camera instance name: " << this->GetName() << "\n";
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
+  fsaa = 0;
+#endif
 
   this->envCubeMapTexture = Ogre::TextureManager::getSingleton().createManual(
       this->scopedUniqueName+"::"+_textureName,
@@ -245,12 +241,12 @@ void WideAngleCamera::SetClipDist()
   }
 }
 
-const CameraProjection *WideAngleCamera::GetProjection()
+const CameraLens *WideAngleCamera::GetLens()
 {
   return &this->lens;
 }
 
-void CameraProjection::Init(float c1,float c2,std::string fun,float f,float c3)
+void CameraLens::Init(float c1,float c2,std::string fun,float f,float c3)
 {
   this->c1 = c1;
   this->c2 = c2;
@@ -280,7 +276,7 @@ void CameraProjection::Init(float c1,float c2,std::string fun,float f,float c3)
   }
 }
 
-void CameraProjection::Init(std::string name)
+void CameraLens::Init(std::string name)
 {
   std::map<std::string,std::tuple<float,float,float,float,std::string> > fun_types;
 
@@ -313,14 +309,14 @@ void CameraProjection::Init(std::string name)
     std::get<2>(params));
 }
 
-void CameraProjection::Load(sdf::ElementPtr sdf)
+void CameraLens::Load(sdf::ElementPtr sdf)
 {
   this->sdf = sdf;
 
   Load();
 }
 
-void CameraProjection::Load()
+void CameraLens::Load()
 {
   if(!this->sdf->HasElement("type"))
     gzthrow("You should specify lens type using <type> element");
@@ -347,37 +343,37 @@ void CameraProjection::Load()
   this->SetCutOffAngle(this->sdf->Get<double>("cutoff_angle"));
 }
 
-float CameraProjection::GetC1() const
+float CameraLens::GetC1() const
 {
   return this->c1;
 }
 
-float CameraProjection::GetC2() const
+float CameraLens::GetC2() const
 {
   return this->c2;
 }
 
-float CameraProjection::GetC3() const
+float CameraLens::GetC3() const
 {
   return this->c3;
 }
 
-float CameraProjection::GetF() const
+float CameraLens::GetF() const
 {
   return this->f;
 }
 
-float CameraProjection::GetCutOffAngle() const
+float CameraLens::GetCutOffAngle() const
 {
   return this->cutOffAngle;
 }
 
-std::string CameraProjection::GetFun() const
+std::string CameraLens::GetFun() const
 {
   return this->sdf->GetElement("custom_function")->Get<std::string>("fun");
 }
 
-void CameraProjection::SetC1(float c)
+void CameraLens::SetC1(float c)
 {
   this->c1 = c;
 
@@ -387,7 +383,7 @@ void CameraProjection::SetC1(float c)
   this->sdf->GetElement("custom_function")->GetElement("c1")->Set((double)c);
 }
 
-void CameraProjection::SetC2(float c)
+void CameraLens::SetC2(float c)
 {
   this->c2 = c;
 
@@ -397,7 +393,7 @@ void CameraProjection::SetC2(float c)
   this->sdf->GetElement("custom_function")->GetElement("c2")->Set((double)c);
 }
 
-void CameraProjection::SetC3(float c)
+void CameraLens::SetC3(float c)
 {
   this->c3 = c;
 
@@ -407,7 +403,7 @@ void CameraProjection::SetC3(float c)
   this->sdf->GetElement("custom_function")->GetElement("c3")->Set((double)c);
 }
 
-void CameraProjection::SetF(float f)
+void CameraLens::SetF(float f)
 {
   this->f = f;
 
@@ -417,7 +413,7 @@ void CameraProjection::SetF(float f)
   this->sdf->GetElement("custom_function")->GetElement("f")->Set((double)f);
 }
 
-void CameraProjection::SetFun(std::string fun)
+void CameraLens::SetFun(std::string fun)
 {
   if(!this->IsCustom())
     this->ConvertToCustom();
@@ -427,19 +423,19 @@ void CameraProjection::SetFun(std::string fun)
   this->Load();
 }
 
-void CameraProjection::SetCutOffAngle(float _angle)
+void CameraLens::SetCutOffAngle(float _angle)
 {
   this->cutOffAngle = _angle;
 
   this->sdf->GetElement("cutoff_angle")->Set((double)_angle);
 }
 
-void CameraProjection::SetCircular(bool _circular)
+void CameraLens::SetCircular(bool _circular)
 {
   this->sdf->GetElement("circular")->Set(_circular);
 }
 
-void CameraProjection::ConvertToCustom()
+void CameraLens::ConvertToCustom()
 {
   sdf::ElementPtr cf = this->sdf->AddElement("custom_function");
 
@@ -454,32 +450,32 @@ void CameraProjection::ConvertToCustom()
   this->SetType("custom");
 }
 
-std::string CameraProjection::GetType() const
+std::string CameraLens::GetType() const
 {
   return this->sdf->Get<std::string>("type");
 }
 
-void CameraProjection::SetType(std::string type)
+void CameraLens::SetType(std::string type)
 {
   this->sdf->GetElement("type")->Set(type);
 }
 
-bool CameraProjection::IsCustom() const
+bool CameraLens::IsCustom() const
 {
   return GetType() == "custom";
 }
 
-bool CameraProjection::IsCircular() const
+bool CameraLens::IsCircular() const
 {
   return this->sdf->Get<bool>("circular");
 }
 
-void CameraProjection::SetCompositorMaterial(Ogre::MaterialPtr material)
+void CameraLens::SetCompositorMaterial(Ogre::MaterialPtr material)
 {
   this->compositorMaterial = material;
 }
 
-void CameraProjection::SetMaterialVariables(float _ratio,float _hfov)
+void CameraLens::SetMaterialVariables(float _ratio,float _hfov)
 {
   Ogre::GpuProgramParametersSharedPtr uniforms =
     this->compositorMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
