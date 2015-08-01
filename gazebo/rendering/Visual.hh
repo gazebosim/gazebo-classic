@@ -58,6 +58,27 @@ namespace gazebo
     class GZ_RENDERING_VISIBLE Visual :
       public boost::enable_shared_from_this<Visual>
     {
+      /// \brief Type of visual
+      public: enum VisualType
+      {
+        /// \brief Entity visual
+        VT_ENTITY,
+        /// \brief Model visual
+        VT_MODEL,
+        /// \brief Link visual
+        VT_LINK,
+        /// \brief Visual visual
+        VT_VISUAL,
+        /// \brief Collision visual
+        VT_COLLISION,
+        /// \brief Sensor visual
+        VT_SENSOR,
+        /// \brief GUI visual
+        VT_GUI,
+        /// \brief Physics data visual
+        VT_PHYSICS
+      };
+
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
       /// \param[in] _parent Parent of the visual.
@@ -220,16 +241,14 @@ namespace gazebo
       /// \return Emissive color.
       public: common::Color GetEmissive() const;
 
-      /// \brief Attach visualization axes
-      public: void AttachAxes();
-
       /// \brief Enable or disable wireframe for this visual.
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);
 
       /// \brief Set the transparency of a single visual without calling
       /// UpdateShaders.
-      private: void SetTransparencyInnerLoop();
+      /// \param[in] _sceneNode The target scene node.
+      private: void SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode);
 
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
@@ -243,7 +262,7 @@ namespace gazebo
       /// \brief Set the visual to be visually highlighted. This is most
       /// often used when an object is selected by a user via the GUI.
       /// \param[in] _highlighted True to enable the highlighting.
-      public: void SetHighlighted(bool _highlighted);
+      public: virtual void SetHighlighted(bool _highlighted);
 
       /// \brief Get whether or not the visual is visually highlighted. This is
       /// most often means that an object is selected by a user via the GUI.
@@ -487,6 +506,10 @@ namespace gazebo
       /// \param[in] _show True to show inertia visualizations.
       public: void ShowInertia(bool _show);
 
+      /// \brief Display link frame visuals.
+      /// \param[in] _show True to show link frame visualizations.
+      public: void ShowLinkFrame(bool _show);
+
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message
       public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
@@ -532,11 +555,23 @@ namespace gazebo
 
       /// \brief Get type of visual.
       /// \return Visual type.
-      public: VisualType GetType() const;
+      public: Visual::VisualType GetType() const;
 
       /// \brief Set type of visual.
       /// \param[in] _type Visual type.
-      public: void SetType(const VisualType _type);
+      public: void SetType(const Visual::VisualType _type);
+
+      /// \brief Convert from msgs::Visual::Type to VisualType.
+      /// \param[in] _type A msgs::Visual::Type enum.
+      /// \return VisualType enum.
+      public: static Visual::VisualType ConvertVisualType(
+          const msgs::Visual::Type &_type);
+
+      /// \brief Convert from msgs::Visual::Type to VisualType.
+      /// \param[in] _type VisualType enum.
+      /// \return A msgs::Visual::Type enum.
+      public: static msgs::Visual::Type ConvertVisualType(
+          const Visual::VisualType &_type);
 
       /// \internal
       /// \brief Constructor used by inherited classes

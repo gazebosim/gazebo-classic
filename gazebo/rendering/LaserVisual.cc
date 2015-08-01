@@ -61,16 +61,18 @@ LaserVisual::~LaserVisual()
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
-  for (unsigned int i = 0; i < dPtr->rayFans.size(); ++i)
-  {
-    this->DeleteDynamicLine(dPtr->rayFans[i]);
-    dPtr->rayFans[i] = NULL;
+  for (auto ray : dPtr->rayFans)
+    this->DeleteDynamicLine(ray);
 
-    this->DeleteDynamicLine(dPtr->noHitRayFans[i]);
-    dPtr->noHitRayFans[i] = NULL;
-  }
+  for (auto ray : dPtr->noHitRayFans)
+    this->DeleteDynamicLine(ray);
+
+  for (auto ray : dPtr->rayLines)
+    this->DeleteDynamicLine(ray);
+
   dPtr->rayFans.clear();
   dPtr->noHitRayFans.clear();
+  dPtr->rayLines.clear();
 }
 
 /////////////////////////////////////////////////
@@ -106,8 +108,9 @@ void LaserVisual::Update()
   dPtr->receivedMsg = false;
 
   double verticalAngle = dPtr->laserMsg->scan().vertical_angle_min();
-  math::Pose offset = msgs::Convert(dPtr->laserMsg->scan().world_pose()) -
-                      this->GetWorldPose();
+  ignition::math::Pose3d offset =
+    msgs::ConvertIgn(dPtr->laserMsg->scan().world_pose()) -
+    this->GetWorldPose().Ign();
 
   unsigned int vertCount = dPtr->laserMsg->scan().has_vertical_count() ?
       dPtr->laserMsg->scan().vertical_count() : 1u;
@@ -127,26 +130,51 @@ void LaserVisual::Update()
       dPtr->noHitRayFans[j]->setMaterial("Gazebo/LightBlueLaser");
       dPtr->noHitRayFans[j]->AddPoint(math::Vector3(0, 0, 0));
 
+      dPtr->rayLines.push_back(
+          this->CreateDynamicLine(rendering::RENDERING_LINE_LIST));
+      dPtr->rayLines[j]->setMaterial("Gazebo/BlueLaser");
+
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
-    dPtr->rayFans[j]->SetPoint(0, offset.pos);
-    dPtr->noHitRayFans[j]->SetPoint(0, offset.pos);
+    dPtr->rayFans[j]->SetPoint(0, offset.Pos());
+    dPtr->noHitRayFans[j]->SetPoint(0, offset.Pos());
 
     double angle = dPtr->laserMsg->scan().angle_min();
     unsigned int count = dPtr->laserMsg->scan().count();
     for (unsigned int i = 0; i < count; ++i)
     {
       double r = dPtr->laserMsg->scan().ranges(j*count + i);
-      math::Quaternion ray(math::Vector3(0.0, -verticalAngle, angle));
-      math::Vector3 axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
+      ignition::math::Quaterniond ray(
+          ignition::math::Vector3d(0.0, -verticalAngle, angle));
+      ignition::math::Vector3d axis = offset.Rot() * ray *
+        ignition::math::Vector3d(1.0, 0.0, 0.0);
 
       double hitRange = std::isinf(r) ? 0 : r;
-      math::Vector3 pt = (axis * hitRange) + offset.pos;
+      ignition::math::Vector3d pt = (axis * hitRange) + offset.Pos();
 
       double noHitRange =
-        std::isinf(r) ? dPtr->laserMsg->scan().range_max() : 0;
-      math::Vector3 noHitPt = (axis * noHitRange) + offset.pos;
+        std::isinf(r) ? dPtr->laserMsg->scan().range_max() : hitRange;
+      ignition::math::Vector3d noHitPt = (axis * noHitRange) + offset.Pos();
 
+      // Draw the lines that represent each simulated ray
+      if (i >= dPtr->rayLines[j]->GetPointCount()/2)
+      {
+        dPtr->rayLines[j]->AddPoint(offset.Pos());
+        if (std::isinf(r))
+          dPtr->rayLines[j]->AddPoint(noHitPt);
+        else
+          dPtr->rayLines[j]->AddPoint(pt);
+      }
+      else
+      {
+        dPtr->rayLines[j]->SetPoint(i*2, offset.Pos());
+        if (std::isinf(r))
+          dPtr->rayLines[j]->SetPoint(i*2+1, noHitPt);
+        else
+          dPtr->rayLines[j]->SetPoint(i*2+1, pt);
+      }
+
+      // Draw the triangle fan that fill in the gaps for the laser rays
       if (i+1 >= dPtr->rayFans[j]->GetPointCount())
       {
         dPtr->rayFans[j]->AddPoint(pt);

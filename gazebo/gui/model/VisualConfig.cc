@@ -166,6 +166,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetVisible("visible", false);
   configWidget->SetWidgetVisible("scale", false);
   configWidget->SetWidgetVisible("plugin", false);
+  configWidget->SetWidgetVisible("type", false);
   configWidget->SetWidgetReadOnly("id", true);
   configWidget->SetWidgetReadOnly("name", true);
   configWidget->SetWidgetReadOnly("parent_name", true);
@@ -175,6 +176,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetReadOnly("visible", true);
   configWidget->SetWidgetReadOnly("scale", true);
   configWidget->SetWidgetReadOnly("plugin", true);
+  configWidget->SetWidgetReadOnly("type", true);
 
   // Item layout
   QVBoxLayout *itemLayout = new QVBoxLayout();
@@ -246,7 +248,8 @@ void VisualConfig::OnRemoveVisual(int _id)
 
   QMessageBox msgBox(QMessageBox::Warning, QString("Remove visual?"),
       QString(msg.c_str()));
-  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QPushButton *cancelButton =
       msgBox.addButton("Cancel", QMessageBox::RejectRole);

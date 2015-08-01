@@ -20,6 +20,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Assert.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
@@ -107,6 +108,10 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       this->mainWindow->CloneAction(g_showToolbarsAct, this);
   this->dataPtr->fullScreenAct =
       this->mainWindow->CloneAction(g_fullScreenAct, this);
+  this->dataPtr->cameraOrthoAct =
+      this->mainWindow->CloneAction(g_cameraOrthoAct, this);
+  this->dataPtr->cameraPerspectiveAct =
+      this->mainWindow->CloneAction(g_cameraPerspectiveAct, this);
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
@@ -142,6 +147,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   QAction *ballJointAct = new QAction(tr("Ball"), this);
   QAction *universalJointAct = new QAction(tr("Universal"), this);
   QAction *screwJointAct = new QAction(tr("Screw"), this);
+  QAction *gearboxJointAct = new QAction(tr("Gearbox"), this);
+  QAction *fixedJointAct = new QAction(tr("Fixed"), this);
 
   revoluteJointAct->setCheckable(true);
   revolute2JointAct->setCheckable(true);
@@ -149,6 +156,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   ballJointAct->setCheckable(true);
   universalJointAct->setCheckable(true);
   screwJointAct->setCheckable(true);
+  gearboxJointAct->setCheckable(true);
+  fixedJointAct->setCheckable(true);
 
   jointMenu->addAction(revoluteJointAct);
   jointMenu->addAction(revolute2JointAct);
@@ -156,6 +165,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointMenu->addAction(ballJointAct);
   jointMenu->addAction(universalJointAct);
   jointMenu->addAction(screwJointAct);
+  jointMenu->addAction(gearboxJointAct);
+  jointMenu->addAction(fixedJointAct);
 
   QActionGroup *jointActionGroup = new QActionGroup(this);
   jointActionGroup->addAction(revoluteJointAct);
@@ -164,11 +175,18 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointActionGroup->addAction(ballJointAct);
   jointActionGroup->addAction(universalJointAct);
   jointActionGroup->addAction(screwJointAct);
+  jointActionGroup->addAction(gearboxJointAct);
+  jointActionGroup->addAction(fixedJointAct);
   jointActionGroup->setExclusive(true);
 
-  this->dataPtr->jointSeparatorAct = toolbar->addSeparator();
-  toolbar->addAction(this->dataPtr->jointAct);
-  this->dataPtr->jointTypeAct = toolbar->addWidget(this->dataPtr->jointButton);
+  QAction *toolbarSpacer = toolbar->findChild<QAction *>(
+      "toolbarSpacerAction");
+  GZ_ASSERT(toolbarSpacer, "Toolbar spacer not found");
+
+  this->dataPtr->jointSeparatorAct = toolbar->insertSeparator(toolbarSpacer);
+  toolbar->insertAction(toolbarSpacer, this->dataPtr->jointAct);
+  this->dataPtr->jointTypeAct = toolbar->insertWidget(toolbarSpacer,
+      this->dataPtr->jointButton);
   this->dataPtr->jointAct->setVisible(false);
   this->dataPtr->jointSeparatorAct->setVisible(false);
   this->dataPtr->jointTypeAct->setVisible(false);
@@ -201,6 +219,14 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       SLOT(map()));
   this->dataPtr->signalMapper->setMapping(screwJointAct,
       screwJointAct->text().toLower());
+  connect(gearboxJointAct, SIGNAL(triggered()), this->dataPtr->signalMapper,
+      SLOT(map()));
+  this->dataPtr->signalMapper->setMapping(gearboxJointAct,
+      gearboxJointAct->text().toLower());
+  connect(fixedJointAct, SIGNAL(triggered()), this->dataPtr->signalMapper,
+      SLOT(map()));
+  this->dataPtr->signalMapper->setMapping(fixedJointAct,
+      fixedJointAct->text().toLower());
 
   // set default joint type.
   revoluteJointAct->setChecked(true);
@@ -291,6 +317,10 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->dataPtr->saveAct);
   fileMenu->addAction(this->dataPtr->saveAsAct);
   fileMenu->addAction(this->dataPtr->exitAct);
+
+  QMenu *cameraMenu = this->dataPtr->menuBar->addMenu(tr("&Camera"));
+  cameraMenu->addAction(this->dataPtr->cameraOrthoAct);
+  cameraMenu->addAction(this->dataPtr->cameraPerspectiveAct);
 
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(this->dataPtr->showJointsAct);
@@ -400,7 +430,9 @@ void ModelEditor::ToggleToolbar()
         actions[i] == g_copyAct ||
         actions[i] == g_pasteAct ||
         actions[i] == g_alignButtonAct ||
-        actions[i] == g_snapAct)
+        actions[i] == g_viewAngleButtonAct ||
+        actions[i] == g_snapAct ||
+        actions[i]->objectName() == "toolbarSpacerAction")
     {
       actions[i]->setVisible(true);
       if (i > 0 && actions[i-1]->isSeparator())

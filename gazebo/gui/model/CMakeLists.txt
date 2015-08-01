@@ -66,6 +66,7 @@ if (HAVE_GRAPHVIZ)
     ${qt_headers}
     GraphScene.hh
     GraphView.hh
+    SchematicViewWidget.hh
   )
 
   set (sources
@@ -75,15 +76,11 @@ if (HAVE_GRAPHVIZ)
     SchematicViewWidget.cc
   )
 
-  set (headers
-    ${headers}
-    SchematicViewWidget.hh
-  )
-
-  set (qt_tests
-    ${qt_tests}
-    SchematicViewWidget_TEST.cc
-  )
+  if (ENABLE_SCREEN_TESTS)
+    set (qt_tests ${qt_tests}
+      SchematicViewWidget_TEST.cc
+    )
+  endif()
 
   set (libraries_to_link
     ${libraries_to_link}

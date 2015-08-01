@@ -40,7 +40,7 @@ namespace gazebo
     class ODEPhysicsPrivate;
 
     /// \brief ODE physics engine.
-    class GZ_PHYSICS_ODE_VISIBLE ODEPhysics : public PhysicsEngine
+    class GZ_PHYSICS_VISIBLE ODEPhysics : public PhysicsEngine
     {
       /// \enum ODEParam
       /// \brief ODE Physics parameter types.
@@ -81,7 +81,10 @@ namespace gazebo
         INERTIA_RATIO_REDUCTION,
 
         /// \brief friction model
-        FRICTION_MODEL
+        FRICTION_MODEL,
+
+        /// \brief LCP Solver
+        WORLD_SOLVER_TYPE
       };
 
       /// \brief Constructor.
@@ -155,8 +158,14 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetContactSurfaceLayer(double layer_depth);
 
-      // Documentation inherited
+      /// \brief Set friction model type.
+      /// \param[in] _fricModel Type of friction model.
       public: virtual void SetFrictionModel(const std::string &_fricModel);
+
+      /// \brief Set world step solver type.
+      /// \param[in] _worldSolverType Type of solver used by world step.
+      public: virtual void
+              SetWorldStepSolverType(const std::string &_worldSolverType);
 
       // Documentation inherited
       public: virtual void SetMaxContacts(unsigned int max_contacts);
@@ -179,10 +188,13 @@ namespace gazebo
       // Documentation inherited
       public: virtual double GetContactMaxCorrectingVel();
 
-      // Documentation inherited
-      /// \brief get friction model
-      /// \return a friction model string
+      /// \brief Get friction model.
+      /// \return Friction model type.
       public: virtual std::string GetFrictionModel() const;
+
+      /// \brief Get solver type for world step.
+      /// \return Type of solver used by world step.
+      public: virtual std::string GetWorldStepSolverType() const;
 
       // Documentation inherited
       public: virtual double GetContactSurfaceLayer();
@@ -239,6 +251,20 @@ namespace gazebo
       /// _fricModel is unrecognized.
       public: static std::string
               ConvertFrictionModel(const Friction_Model _fricModel);
+
+      /// \brief Convert a World_Solver_Type enum to a string.
+      /// \param[in] _solverType World_Solver_Type enum.
+      /// \return world solver type string. Returns "unknown" if
+      /// _solverType is unrecognized.
+      public: static std::string
+              ConvertWorldStepSolverType(const World_Solver_Type _solverType);
+
+      /// \brief Convert a string to a World_Solver_Type enum.
+      /// \param[in] _solverType world solver type string.
+      /// \return A World_Solver_Type enum. Defaults to ODE_DEFAULT
+      /// if _solverType is unrecognized.
+      public: static World_Solver_Type
+              ConvertWorldStepSolverType(const std::string &_solverType);
 
       /// \brief Get the step type (quick, world).
       /// \return The step type.

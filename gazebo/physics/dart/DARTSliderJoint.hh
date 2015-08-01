@@ -69,9 +69,6 @@ namespace gazebo
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
-
-      /// \brief Prismatic joint of DART
-      protected: dart::dynamics::PrismaticJoint *dtPrismaticJoint;
     };
   }
 }

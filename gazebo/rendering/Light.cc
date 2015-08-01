@@ -151,8 +151,8 @@ void Light::UpdateFromMsg(ConstLightPtr &_msg)
 
   if (_msg->has_pose())
   {
-    this->SetPosition(msgs::Convert(_msg->pose().position()));
-    this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+    this->SetPosition(msgs::ConvertIgn(_msg->pose().position()));
+    this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
   }
 }
 
@@ -165,8 +165,8 @@ void Light::LoadFromMsg(const msgs::Light &_msg)
 
   if (_msg.has_pose())
   {
-    this->SetPosition(msgs::Convert(_msg.pose().position()));
-    this->SetRotation(msgs::Convert(_msg.pose().orientation()));
+    this->SetPosition(msgs::ConvertIgn(_msg.pose().position()));
+    this->SetRotation(msgs::ConvertIgn(_msg.pose().orientation()));
   }
 }
 
@@ -590,11 +590,12 @@ void Light::FillMsg(msgs::Light &_msg) const
   else if (lightType == "directional")
     _msg.set_type(msgs::Light::DIRECTIONAL);
 
-  msgs::Set(_msg.mutable_pose()->mutable_position(), this->GetPosition());
-  msgs::Set(_msg.mutable_pose()->mutable_orientation(), this->GetRotation());
+  msgs::Set(_msg.mutable_pose()->mutable_position(), this->GetPosition().Ign());
+  msgs::Set(_msg.mutable_pose()->mutable_orientation(),
+      this->GetRotation().Ign());
   msgs::Set(_msg.mutable_diffuse(), this->GetDiffuseColor());
   msgs::Set(_msg.mutable_specular(), this->GetSpecularColor());
-  msgs::Set(_msg.mutable_direction(), this->GetDirection());
+  msgs::Set(_msg.mutable_direction(), this->GetDirection().Ign());
 
   _msg.set_cast_shadows(this->light->getCastShadows());
 

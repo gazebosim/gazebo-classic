@@ -31,8 +31,6 @@ QAction *gazebo::gui::g_newAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_openAct = 0;
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_importAct = 0;
-GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveAsAct = 0;
@@ -98,6 +96,8 @@ QAction *gazebo::gui::g_showCOMAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showInertiaAct = 0;
 GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_showLinkFrameAct = 0;
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_viewWireframeAct = 0;
@@ -143,3 +143,9 @@ QWidgetAction *gazebo::gui::g_alignAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_alignButtonAct = 0;
+
+GZ_GUI_VISIBLE
+QWidgetAction *gazebo::gui::g_viewAngleAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_viewAngleButtonAct = 0;

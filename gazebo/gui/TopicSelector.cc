@@ -35,6 +35,8 @@ TopicSelector::TopicSelector(QWidget *_parent)
   this->setObjectName("topicSelector");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Topic Selector"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   // Create the main layout for this widget
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -87,6 +89,7 @@ TopicSelector::TopicSelector(QWidget *_parent)
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////

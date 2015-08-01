@@ -643,43 +643,56 @@ std::string ModelCreator::AddShape(LinkType _type,
       return std::string();
     }
 
-    // Find extreme values to center the polylines
-    math::Vector2d min(paths[0].polylines[0][0]);
-    math::Vector2d max(min);
-    for (common::SVGPath p : paths)
+    // SVG paths do not map to sdf polylines, because we now allow a contour
+    // to be made of multiple svg disjoint paths.
+    // For this reason, we compute the closed polylines that can be extruded
+    // in this step
+    std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+    std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+    svgLoader.PathsToClosedPolylines(paths, 0.05, closedPolys, openPolys);
+    if (closedPolys.empty())
     {
-      for (std::vector<math::Vector2d> poly : p.polylines)
+      gzerr << "No closed polylines found on file [" << _uri << "]"
+        << std::endl;
+      return std::string();
+    }
+    if (!openPolys.empty())
+    {
+      gzmsg << "There are " << openPolys.size() << "open polylines. "
+        << "They will be ignored." << std::endl;
+    }
+    // Find extreme values to center the polylines
+    ignition::math::Vector2d min(paths[0].polylines[0][0]);
+    ignition::math::Vector2d max(min);
+
+    for (auto const &poly : closedPolys)
+    {
+      for (auto const &pt : poly)
       {
-        for (math::Vector2d pt : poly)
-        {
-          if (pt.x < min.x)
-            min.x = pt.x;
-          if (pt.y < min.y)
-            min.y = pt.y;
-          if (pt.x > max.x)
-            max.x = pt.x;
-          if (pt.y > max.y)
-            max.y = pt.y;
-        }
+        if (pt.X() < min.X())
+          min.X() = pt.X();
+        if (pt.Y() < min.Y())
+          min.Y() = pt.Y();
+        if (pt.X() > max.X())
+          max.X() = pt.X();
+        if (pt.Y() > max.Y())
+          max.Y() = pt.Y();
       }
     }
-
-    for (common::SVGPath p : paths)
+    for (auto const &poly : closedPolys)
     {
-      for (std::vector<math::Vector2d> poly : p.polylines)
-      {
-        sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
-        polylineElem->GetElement("height")->Set(_size.z);
+      sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
+      polylineElem->GetElement("height")->Set(_size.z);
 
-        for (math::Vector2d pt : poly)
-        {
-          // Translate to center
-          pt = pt - min - (max-min)*0.5;
-          // Swap X and Y so Z will point up
-          // (in 2D it points into the screen)
-          sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-          pointElem->Set(math::Vector2d(pt.y*_size.y, pt.x*_size.x));
-        }
+      for (auto const &p : poly)
+      {
+        // Translate to center
+        ignition::math::Vector2d pt = p - min - (max-min)*0.5;
+        // Swap X and Y so Z will point up
+        // (in 2D it points into the screen)
+        sdf::ElementPtr pointElem = polylineElem->AddElement("point");
+        pointElem->Set(
+            ignition::math::Vector2d(pt.Y()*_size.y, pt.X()*_size.x));
       }
     }
   }
@@ -1157,7 +1170,7 @@ void ModelCreator::CreateTheEntity()
   }
 
   msg.set_sdf(this->modelSDF->ToString());
-  msgs::Set(msg.mutable_pose(), this->modelPose);
+  msgs::Set(msg.mutable_pose(), this->modelPose.Ign());
   this->makerPub->Publish(msg);
 }
 
@@ -1288,7 +1301,7 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
   if (vis)
   {
     if (!vis->IsPlane() && gui::get_entity_id(vis->GetRootVisual()->GetName()))
@@ -1317,7 +1330,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
   if (this->mouseVisual)
   {
-    if (_event.button == common::MouseEvent::RIGHT)
+    if (_event.Button() == common::MouseEvent::RIGHT)
       return true;
 
     // set the link data pose
@@ -1336,7 +1349,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
   if (vis)
   {
     rendering::VisualPtr linkVis = vis->GetParent();
@@ -1349,7 +1362,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         return false;
 
       // trigger link inspector on right click
-      if (_event.button == common::MouseEvent::RIGHT)
+      if (_event.Button() == common::MouseEvent::RIGHT)
       {
         this->inspectName = vis->GetParent()->GetName();
 
@@ -1452,7 +1465,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 
   if (!this->mouseVisual)
   {
-    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+    rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
     if (vis && !vis->IsPlane())
     {
       // Main window models always handled here
@@ -1468,7 +1481,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
           userCamera->HandleMouseEvent(_event);
         }
         // Allow ModelManipulator to work while dragging handle over this
-        else if (_event.dragging)
+        else if (_event.Dragging())
         {
           ModelManipulator::Instance()->OnMouseMoveEvent(_event);
         }
@@ -1482,7 +1495,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   pose.pos = ModelManipulator::GetMousePositionOnPlane(
       userCamera, _event);
 
-  if (!_event.shift)
+  if (!_event.Shift())
   {
     pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
@@ -1497,7 +1510,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   // open the link inspector on double click
-  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.Pos());
   if (!vis)
     return false;
 
