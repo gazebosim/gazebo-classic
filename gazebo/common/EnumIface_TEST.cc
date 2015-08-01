@@ -51,6 +51,8 @@ TEST_F(EnumIfaceTest, StringCoversion)
   // Convert value to string
   std::string typeStr = common::EnumIface<MyType>::Str(type);
   EXPECT_EQ(typeStr, "TYPE1");
+
+  EXPECT_TRUE(common::EnumIface<MyType>::Str(static_cast<MyType>(4)).empty());
 }
 
 /////////////////////////////////////////////////
@@ -103,7 +105,8 @@ TEST_F(EnumIfaceTest, Iterator)
 
   // Postfix -- operator
   i = MY_TYPE_END - 1;
-  for (common::EnumIterator<MyType> typeIter = --end;
+  common::EnumIterator<MyType> end2;
+  for (common::EnumIterator<MyType> typeIter = --end2;
        typeIter != begin; typeIter--, --i)
   {
     EXPECT_EQ(*typeIter, i);
