@@ -369,7 +369,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     msgs::LogicalCameraSensor *camMsg = _msg.mutable_logical_camera();
     camMsg->set_near(camSensor->Near());
     camMsg->set_far(camSensor->Far());
-    camMsg->set_fov(camSensor->FOV().Radian());
+    camMsg->set_horizontal_fov(camSensor->HorizontalFOV().Radian());
     camMsg->set_aspect_ratio(camSensor->AspectRatio());
   }
   else if (this->GetType() == "camera")

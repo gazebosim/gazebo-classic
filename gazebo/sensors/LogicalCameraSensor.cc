@@ -173,7 +173,7 @@ double LogicalCameraSensor::Far() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Angle LogicalCameraSensor::FOV() const
+ignition::math::Angle LogicalCameraSensor::HorizontalFOV() const
 {
   return this->dataPtr->frustum.FOV();
 }

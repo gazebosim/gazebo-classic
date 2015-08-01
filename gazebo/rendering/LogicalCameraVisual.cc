@@ -46,10 +46,10 @@ LogicalCameraVisual::~LogicalCameraVisual()
 /////////////////////////////////////////////////
 void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
 {
-  double nearWidth = (tan(_msg.fov()*0.5) * _msg.near());
+  double nearWidth = (tan(_msg.horizontal_fov()*0.5) * _msg.near());
   double nearHeight = nearWidth / _msg.aspect_ratio();
 
-  double farWidth = (tan(_msg.fov()*0.5) * _msg.far());
+  double farWidth = (tan(_msg.horizontal_fov()*0.5) * _msg.far());
   double farHeight = farWidth / _msg.aspect_ratio();
 
   DynamicLines *line = this->CreateDynamicLine(RENDERING_LINE_LIST);

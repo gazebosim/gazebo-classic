@@ -73,7 +73,7 @@ namespace gazebo
       /// angle between the frustum's vertex and the edges of the near or far
       /// plane. This value represents the horizontal angle.
       /// \return The field of view.
-      public: ignition::math::Angle FOV() const;
+      public: ignition::math::Angle HorizontalFOV() const;
 
       /// \brief Get the aspect ratio, which is the width divided by height
       /// of the near or far planes.

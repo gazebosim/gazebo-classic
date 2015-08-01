@@ -32,7 +32,7 @@
           <logical_camera>
             <near>0.55</near>
             <far>5</far>
-            <fov>1.04719755</fov>
+            <horizontal_fov>1.04719755</horizontal_fov>
             <aspect_ratio>1.778</aspect_ratio>
           </logical_camera>
 
