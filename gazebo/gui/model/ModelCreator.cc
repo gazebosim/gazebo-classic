@@ -1895,10 +1895,10 @@ void ModelCreator::Update()
       if (link->linkVisual->GetName() == scaleIt.first)
         link->SetScale(scaleIt.second.Ign());
     }
-    if (!this->linkScaleUpdate.empty())
-      this->ModelChanged();
-    this->linkScaleUpdate.clear();
   }
+  if (!this->linkScaleUpdate.empty())
+    this->ModelChanged();
+  this->linkScaleUpdate.clear();
 }
 
 /////////////////////////////////////////////////

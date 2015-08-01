@@ -56,13 +56,13 @@ namespace gazebo
 
       /// \brief Set the pose of the link.
       /// \param[in] _pose Pose to set the link to.
-      public: void SetPose(const math::Pose &_pose);
+      public: void SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the mass of the link.
       /// \param[in] _mass Mass to set the link to.
       public: void SetMass(double _mass);
 
-      /// \brief Set the mass of the link.
+      /// \brief Set the inertia matrix of the link.
       /// \param[in] _ixx X second moment of inertia (MOI) about x axis.
       /// \param[in] _iyy Y second moment of inertia about y axis.
       /// \param[in] _izz Z second moment of inertia about z axis.
@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Set the mass of the link.
       /// \param[in] _pose Inertial pose to set the link to.
-      public: void SetInertialPose(const math::Pose &_pose);
+      public: void SetInertialPose(const ignition::math::Pose3d &_pose);
 
       /// \brief config widget for configuring link properties.
       private: ConfigWidget *configWidget;
