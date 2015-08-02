@@ -470,7 +470,7 @@ namespace gazebo
       /// \brief Type of link being added.
       private: LinkType addLinkType;
 
-      /// \brief A map of model link names and their visuals.
+      /// \brief A map of top level model link names and their visuals.
       private: std::map<std::string, LinkData *> allLinks;
 
       /// \brief A map of nested model link names and their visuals.

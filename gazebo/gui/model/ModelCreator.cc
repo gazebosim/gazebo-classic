@@ -2062,6 +2062,13 @@ void ModelCreator::GenerateSDF()
     for (auto &nestedModelsIt : this->allNestedModels)
     {
       NestedModelData *modelData = nestedModelsIt.second;
+
+      // get only top level nested models
+      if (nestedModelsIt.second->modelVisual &&
+        nestedModelsIt.second->modelVisual->GetParent()
+        != this->previewVisual)
+      continue;
+
       mid += modelData->GetPose().pos;
       entityCount++;
     }
@@ -2089,6 +2096,13 @@ void ModelCreator::GenerateSDF()
   for (auto &nestedModelsIt : this->allNestedModels)
   {
     NestedModelData *modelData = nestedModelsIt.second;
+
+    // get only top level nested models
+    if (nestedModelsIt.second->modelVisual &&
+      nestedModelsIt.second->modelVisual->GetParent()
+      != this->previewVisual)
+    continue;
+
     modelData->SetPose(modelData->modelVisual->GetWorldPose()-this->modelPose);
     modelData->modelVisual->SetPose(modelData->GetPose());
   }
@@ -2138,7 +2152,8 @@ void ModelCreator::GenerateSDF()
   {
     if (nestedModelsIt.first == this->canonicalModel ||
         (nestedModelsIt.second->modelVisual &&
-        nestedModelsIt.second->modelVisual->GetParent() != this->previewVisual))
+        nestedModelsIt.second->modelVisual->GetParent()
+        != this->previewVisual))
       continue;
 
     NestedModelData *nestedModelData = nestedModelsIt.second;
