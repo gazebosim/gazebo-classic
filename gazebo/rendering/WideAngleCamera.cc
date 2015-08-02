@@ -31,9 +31,9 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-WideAngleCamera::WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene, bool _autoRender, int textureSize):
+WideAngleCamera::WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene, bool _autoRender, int _textureSize):
   Camera(_namePrefix,_scene,_autoRender),
-  envTextureSize(textureSize)
+  envTextureSize(_textureSize)
 {
   envCubeMapTexture = NULL;
   for(int i=0;i<6;i++)
@@ -178,18 +178,18 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 }
 
 //////////////////////////////////////////////////
-int WideAngleCamera::GetEnvTextureSize()
+int WideAngleCamera::GetEnvTextureSize() const
 {
   return this->envTextureSize;
 }
 
 //////////////////////////////////////////////////
-void WideAngleCamera::SetEnvTextureSize(int size)
+void WideAngleCamera::SetEnvTextureSize(int _size)
 {
   if(this->sdf->HasElement("env_texture_size"))
-    this->sdf->AddElement("env_texture_size")->Set(size);
+    this->sdf->AddElement("env_texture_size")->Set(_size);
 
-  this->sdf->GetElement("env_texture_size")->Set(size);
+  this->sdf->GetElement("env_texture_size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
@@ -281,38 +281,38 @@ CameraLens::~CameraLens()
 }
 
 //////////////////////////////////////////////////
-void CameraLens::Init(float c1,float c2,std::string fun,float f,float c3)
+void CameraLens::Init(float _c1,float _c2,std::string _fun,float _f,float _c3)
 {
-  this->dataPtr->c1 = c1;
-  this->dataPtr->c2 = c2;
-  this->dataPtr->c3 = c3;
-  this->dataPtr->f = f;
+  this->dataPtr->c1 = _c1;
+  this->dataPtr->c2 = _c2;
+  this->dataPtr->c3 = _c3;
+  this->dataPtr->f = _f;
 
-  if(fun == "tan")
+  if(_fun == "tan")
     this->dataPtr->fun = CameraLensPrivate::TAN;
-  else if(fun == "sin")
+  else if(_fun == "sin")
     this->dataPtr->fun = CameraLensPrivate::SIN;
-  else if(fun == "id")
+  else if(_fun == "id")
     this->dataPtr->fun = CameraLensPrivate::ID;
-  else if(fun == "cos")
+  else if(_fun == "cos")
   {
     gzthrow("Cosine is not supported for custom mapping functions");
   }
-  else if(fun == "cot")
+  else if(_fun == "cot")
   {
     gzthrow("Cotangent is not supported for custom mapping functions");
   }
   else
   {
     std::stringstream sstr;
-    sstr << "Failed to create custom mapping with function [" << fun << "]";
+    sstr << "Failed to create custom mapping with function [" << _fun << "]";
 
     gzthrow(sstr.str());
   }
 }
 
 //////////////////////////////////////////////////
-void CameraLens::Init(std::string name)
+void CameraLens::Init(std::string _name)
 {
   std::map<std::string,std::tuple<float,float,float,float,std::string> > fun_types;
 
@@ -327,12 +327,12 @@ void CameraLens::Init(std::string name)
   std::tuple<float,float,float,float,std::string> params;
   try
   {
-    params = fun_types.at(name);
+    params = fun_types.at(_name);
   }
   catch(...)
   {
     std::stringstream sstr;
-    sstr << "Unknown mapping function [" << name << "]";
+    sstr << "Unknown mapping function [" << _name << "]";
 
     gzthrow(sstr.str());
   }
@@ -346,9 +346,9 @@ void CameraLens::Init(std::string name)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::Load(sdf::ElementPtr sdf)
+void CameraLens::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = sdf;
+  this->sdf = _sdf;
 
   Load();
 }
@@ -418,55 +418,55 @@ std::string CameraLens::GetFun() const
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetC1(float c)
+void CameraLens::SetC1(float _c)
 {
-  this->dataPtr->c1 = c;
+  this->dataPtr->c1 = _c;
 
   if(!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("c1")->Set((double)c);
+  this->sdf->GetElement("custom_function")->GetElement("c1")->Set((double)_c);
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetC2(float c)
+void CameraLens::SetC2(float _c)
 {
-  this->dataPtr->c2 = c;
+  this->dataPtr->c2 = _c;
 
   if(!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("c2")->Set((double)c);
+  this->sdf->GetElement("custom_function")->GetElement("c2")->Set((double)_c);
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetC3(float c)
+void CameraLens::SetC3(float _c)
 {
-  this->dataPtr->c3 = c;
+  this->dataPtr->c3 = _c;
 
   if(!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("c3")->Set((double)c);
+  this->sdf->GetElement("custom_function")->GetElement("c3")->Set((double)_c);
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetF(float f)
+void CameraLens::SetF(float _f)
 {
-  this->dataPtr->f = f;
+  this->dataPtr->f = _f;
 
   if(!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("f")->Set((double)f);
+  this->sdf->GetElement("custom_function")->GetElement("f")->Set((double)_f);
 }
 
-void CameraLens::SetFun(std::string fun)
+void CameraLens::SetFun(std::string _fun)
 {
   if(!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("fun")->Set(fun);
+  this->sdf->GetElement("custom_function")->GetElement("fun")->Set(_fun);
 
   this->Load();
 }
@@ -508,9 +508,9 @@ std::string CameraLens::GetType() const
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetType(std::string type)
+void CameraLens::SetType(std::string _type)
 {
-  this->sdf->GetElement("type")->Set(type);
+  this->sdf->GetElement("type")->Set(_type);
 }
 
 //////////////////////////////////////////////////
@@ -526,9 +526,9 @@ bool CameraLens::IsCircular() const
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetCompositorMaterial(Ogre::MaterialPtr material)
+void CameraLens::SetCompositorMaterial(Ogre::MaterialPtr _material)
 {
-  this->compositorMaterial = material;
+  this->compositorMaterial = _material;
 }
 
 //////////////////////////////////////////////////

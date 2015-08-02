@@ -619,7 +619,7 @@ namespace gazebo
                    std::string _format, int _width, int _height);
 
       /// \brief Set the clip distance based on stored SDF values
-      private: void SetClipDist();
+      private: virtual void SetClipDist();
 
       /// \brief Get the OGRE image pixel format in
       /// \param[in] _format The Gazebo image format

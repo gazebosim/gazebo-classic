@@ -37,48 +37,118 @@ namespace gazebo
     /// \brief Describes a lens of a camera as amapping function of type r = c1*f*fun(theta/c2+c3)
     class GAZEBO_VISIBLE CameraLens
     {
+      /// \brief Constructor
       public: CameraLens();
+
+      /// \brief Destructor
       public: ~CameraLens();
 
-      public: void Init(float c1,float c2,std::string fun,float f=1.0f,float c3=0.0f);
-      public: void Init(std::string name);
+      /// \brief Init custom camera lens with specified parameters
+      /// \param[in] _c1 Image scaling constant
+      /// \param[in] _c2 Angle scaling constant
+      /// \param[in] _fun Angle transform function
+      /// \param[in] _fun Focal length of the optical system, default value is 1
+      /// \param[in] _c3 Angle shift constant, default value is 0, you probably don't wont to change it
+      public: void Init(float _c1,float _c2,std::string _fun,float _f=1.0f,float _c3=0.0f);
 
-      public: void Load(sdf::ElementPtr sdf);
+      /// \brief Init camera lens with standard mapping function
+      /// \param[in] _name Mapping function name
+      public: void Init(std::string _name);
+
+      /// \brief Load camera lens from SDF file
+      /// \param[in] _sdf SDF lens element
+      public: void Load(sdf::ElementPtr _sdf);
+
+      /// \brief Load camera lens with default parameters
       public: void Load();
 
+      /// \brief Get c1 constant
+      /// \return c1 constant
       public: float GetC1() const;
+
+      /// \brief Get c2 constant
+      /// \return c2 constant
       public: float GetC2() const;
+
+      /// \brief Get c3 constant
+      /// \return c3 constant
       public: float GetC3() const;
+
+      /// \brief Get f constant
+      /// \return f constant
       public: float GetF() const;
+
+      /// \brief Get angle transform function
+      /// \return angle transform function string
       public: std::string GetFun() const;
+
+      /// \brief Get cut off angle
+      /// \return Cut off angle
       public: float GetCutOffAngle() const;
 
-      public: void SetC1(float c);
-      public: void SetC2(float c);
-      public: void SetC3(float c);
-      public: void SetF(float f);
-      public: void SetFun(std::string fun);
+      /// \brief Set c1 constant
+      /// \param[in] _c c1 constant
+      public: void SetC1(float _c);
+
+      /// \brief Set c2 constant
+      /// \param[in] _c c2 constant
+      public: void SetC2(float _c);
+
+      /// \brief Set c3 constant
+      /// \param[in] _c c3 constant
+      public: void SetC3(float _c);
+
+      /// \brief Set f constant
+      /// \param[in] _f f constant
+      public: void SetF(float _f);
+
+      /// \brief Set angle transform function
+      /// \param[in] _fun angle transform function string
+      public: void SetFun(std::string _fun);
+
+      /// \brief Set cut-off angle
+      /// \param[in] _angle cut-off angle
       public: void SetCutOffAngle(float _angle);
+
+      /// \brief Set whether the lens is circular
+      /// \param[in] _circular Whether the lens should be circular
       public: void SetCircular(bool _circular);
 
+      /// \brief Convert standard projection to custom
       private: void ConvertToCustom();
 
+      /// \brief Get lens projection type
+      /// \return Lens projection type string
       public: std::string GetType() const;
 
-      public: void SetType(std::string type);
+      /// \brief Set lens projection type
+      /// \param[in] _type Lens projection type string
+      public: void SetType(std::string _type);
 
+      /// \brief Check if lens type is custom
+      /// \return True if this->GetType() == "custom"
       public: bool IsCustom() const;
 
+      /// \brief Check if lens is circular
+      /// \return True if the lens is circular
       public: bool IsCircular() const;
 
-      public: void SetCompositorMaterial(Ogre::MaterialPtr material);
+      /// \brief Set material that is used for mapping environment on the frame
+      /// \param[in] _material Ogre::MaterialPtr
+      public: void SetCompositorMaterial(Ogre::MaterialPtr _material);
 
+      /// \brief Set uniform variables of shader for the provided material
+      /// \param[in] _ratio Frame aspect ratio
+      /// \param[in] _hfov Horisontal field of view
       public: void SetMaterialVariables(float _ratio,float _hfov);
 
+      /// \brief SDF element of the lens
       protected: sdf::ElementPtr sdf;
 
+      /// \brief Pointer to ogre material used for mapping
       private: Ogre::MaterialPtr compositorMaterial;
 
+      /// \brief Private data pointer
       private: CameraLensPrivate *dataPtr;
     };
 
@@ -92,7 +162,7 @@ namespace gazebo
       /// \param[in] _autoRender Almost everyone should leave this as true.
       /// \param[in] _textureSize Size of cube map texture used for rendering, may be overriten in sdf
       public: WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene,
-                              bool _autoRender = true, int textureSize = 256);
+                              bool _autoRender = true, int _textureSize = 256);
 
       /// \brief Destructor
       public: virtual ~WideAngleCamera();
