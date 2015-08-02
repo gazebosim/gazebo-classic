@@ -1,6 +1,19 @@
-//
-// Created by klokik on 02.07.15.
-//
+/*
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 
 #ifndef _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
 #define _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
@@ -10,11 +23,22 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_rendering
+  /// \brief Rendering namespace
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering Rendering
+    /// \{
+
+    // forward declarations
+    class CameraLensPrivate;
+
+    /// \class CameraLens WideAngleCamera.hh rendering/rendering.hh
+    /// \brief Describes a lens of a camera as amapping function of type r = c1*f*fun(theta/c2+c3)
     class GAZEBO_VISIBLE CameraLens
     {
-      private: enum ProjFunction {SIN=0,TAN,ID};
+      public: CameraLens();
+      public: ~CameraLens();
 
       public: void Init(float c1,float c2,std::string fun,float f=1.0f,float c3=0.0f);
       public: void Init(std::string name);
@@ -51,66 +75,93 @@ namespace gazebo
 
       public: void SetMaterialVariables(float _ratio,float _hfov);
 
-      // r = c1*f*fun(theta/c2+c3)
-
-      private: float c1;
-      private: float c2;
-      private: float c3;
-      private: float f;
-      private: float cutOffAngle;
-
-      private: ProjFunction fun;
-
-      private: sdf::ElementPtr sdf;
+      protected: sdf::ElementPtr sdf;
 
       private: Ogre::MaterialPtr compositorMaterial;
+
+      private: CameraLensPrivate *dataPtr;
     };
 
+    /// \class WideAngleCamera WideAngleCamera.hh rendering/rendering.hh
+    /// \brief Camera with agile mapping function
     class GAZEBO_VISIBLE WideAngleCamera : public Camera
     {
+      /// \brief Constructor
+      /// \param[in] _namePrefix Unique prefix name for the camera.
+      /// \param[in] _scene Scene that will contain the camera
+      /// \param[in] _autoRender Almost everyone should leave this as true.
+      /// \param[in] _textureSize Size of cube map texture used for rendering, may be overriten in sdf
       public: WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene,
                               bool _autoRender = true, int textureSize = 256);
 
-      public: ~WideAngleCamera();
+      /// \brief Destructor
+      public: virtual ~WideAngleCamera();
 
+      /// \brief Set the camera's render target
+      /// \param[in] _target Pointer to the render target
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target) override;
 
-      public: void CreateEnvRenderTexture(const std::string &_textureName);
+      /// \brief Set the camera's render target
+      /// \param[in] _textureName Name used as a base for environment texture
+      protected: void CreateEnvRenderTexture(const std::string &_textureName);
 
-      public: int GetEnvTextureSize();
+      /// \brief Get the environment texture size
+      /// \return Texture size
+      public: int GetEnvTextureSize() const;
 
-      public: void SetEnvTextureSize(int size);
+      /// \brief Set environment texture size
+      /// \param[in] _size Texture size
+      public: void SetEnvTextureSize(int _size);
 
+      /// \brief Create a set of 6 cameras pointing in different directions
       protected: void CreateEnvCameras();
 
-      public: virtual void SetClipDist();
+      /// \brief Set the clip distance based on stored SDF values
+      public: virtual void SetClipDist() override;
 
-      protected: virtual void RenderImpl();
+      /// \brief Implementation of the render call
+      protected: virtual void RenderImpl() override;
 
-      public: virtual void Init();
+      /// \brief Initialize the camera
+      public: virtual void Init() override;
 
-      public: virtual void Load();
+      /// \brief Load the camera with default parmeters
+      public: virtual void Load() override;
 
-      public: virtual void Fini();
+      /// \brief Finalize the camera.
+      ///
+      /// This function is called before the camera is destructed
+      public: virtual void Fini() override;
 
+      /// \brief Get this camera lens description
+      /// \return Camera lens description
       public: const CameraLens *GetLens();
 
+      /// \brief Compositor used to render rectangle with attached cube map texture
       protected: Ogre::CompositorInstance *wamapInstance;
 
+      /// \brief Set of 6 cameras, each pointing in different direction with FOV of 90deg
       protected: Ogre::Camera *envCameras[6];
 
+      /// \brief Render targets for envCameras
       protected: Ogre::RenderTarget *envRenderTargets[6];
 
+      /// \brief Viewports for the render targets
       protected: Ogre::Viewport *envViewports[6];
 
+      /// \brief A single cube map texture
       protected: Ogre::Texture *envCubeMapTexture;
 
+      /// \brief Environment texture size
       protected: int envTextureSize;
 
+      /// \brief Pointer to material, that is assigned to 'wamapInstance' compositor
       protected: Ogre::MaterialPtr compMat;
 
+      /// \brief Camera lens description
       protected: CameraLens lens;
     };
+    /// \}
   }
 }
 

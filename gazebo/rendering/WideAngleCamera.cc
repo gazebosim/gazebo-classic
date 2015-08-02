@@ -1,11 +1,25 @@
-//
-// Created by klokik on 02.07.15.
-//
+/*
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 
 #include "WideAngleCamera.hh"
 
 // #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/CameraLensPrivate.hh"
 
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -15,6 +29,8 @@
 using namespace gazebo;
 using namespace rendering;
 
+
+//////////////////////////////////////////////////
 WideAngleCamera::WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene, bool _autoRender, int textureSize):
   Camera(_namePrefix,_scene,_autoRender),
   envTextureSize(textureSize)
@@ -27,11 +43,13 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene
   }
 }
 
+//////////////////////////////////////////////////
 WideAngleCamera::~WideAngleCamera()
 {
   //TODO
 }
 
+//////////////////////////////////////////////////
 void WideAngleCamera::Init()
 {
   Camera::Init();
@@ -40,6 +58,7 @@ void WideAngleCamera::Init()
   this->CreateEnvRenderTexture(this->scopedUniqueName + "_envRttTex");
 }
 
+//////////////////////////////////////////////////
 void WideAngleCamera::Load()
 {
   Camera::Load();
@@ -57,6 +76,7 @@ void WideAngleCamera::Load()
     this->lens.Load();
 }
 
+//////////////////////////////////////////////////
 void WideAngleCamera::Fini()
 {
   for(int i=0;i<6;i++)
@@ -77,6 +97,7 @@ void WideAngleCamera::Fini()
   Camera::Fini();
 }
 
+//////////////////////////////////////////////////
 void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
@@ -99,8 +120,6 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
       }
 
       this->lens.SetCompositorMaterial(this->compMat);
-
-      gzdbg << "Compositor cubemap texture present " << envCubeMapTexture->getName() << "\n";
     }
     else
       gzerr << "Compositor texture MISSING";
@@ -110,6 +129,7 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   }
 }
 
+//////////////////////////////////////////////////
 void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 {
   int fsaa = 4;
@@ -157,11 +177,13 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
   }
 }
 
+//////////////////////////////////////////////////
 int WideAngleCamera::GetEnvTextureSize()
 {
   return this->envTextureSize;
 }
 
+//////////////////////////////////////////////////
 void WideAngleCamera::SetEnvTextureSize(int size)
 {
   if(this->sdf->HasElement("env_texture_size"))
@@ -170,6 +192,7 @@ void WideAngleCamera::SetEnvTextureSize(int size)
   this->sdf->GetElement("env_texture_size")->Set(size);
 }
 
+//////////////////////////////////////////////////
 void WideAngleCamera::CreateEnvCameras()
 {
   for(int i=0;i<6;i++)
@@ -180,8 +203,6 @@ void WideAngleCamera::CreateEnvCameras()
 
     envCameras[i] = this->GetScene()->GetManager()->createCamera(name_str.str());
 
-    gzdbg << "creating camera "<< name_str.str() << "\n";
-
     envCameras[i]->setFixedYawAxis(false);
     envCameras[i]->setFOVy(Ogre::Degree(90));
     envCameras[i]->setAspectRatio(1);
@@ -191,6 +212,7 @@ void WideAngleCamera::CreateEnvCameras()
   }
 }
 
+//////////////////////////////////////////////////
 void WideAngleCamera::RenderImpl()
 {
   math::Quaternion orient = this->GetWorldRotation();
@@ -219,6 +241,7 @@ void WideAngleCamera::RenderImpl()
   this->renderTarget->update();
 }
 
+//////////////////////////////////////////////////
 void WideAngleCamera::SetClipDist()
 {
   sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
@@ -241,24 +264,36 @@ void WideAngleCamera::SetClipDist()
   }
 }
 
+//////////////////////////////////////////////////
 const CameraLens *WideAngleCamera::GetLens()
 {
   return &this->lens;
 }
 
+CameraLens::CameraLens()
+{
+  this->dataPtr = new CameraLensPrivate;
+}
+
+CameraLens::~CameraLens()
+{
+  delete this->dataPtr;
+}
+
+//////////////////////////////////////////////////
 void CameraLens::Init(float c1,float c2,std::string fun,float f,float c3)
 {
-  this->c1 = c1;
-  this->c2 = c2;
-  this->c3 = c3;
-  this->f  = f;
+  this->dataPtr->c1 = c1;
+  this->dataPtr->c2 = c2;
+  this->dataPtr->c3 = c3;
+  this->dataPtr->f = f;
 
   if(fun == "tan")
-    this->fun = TAN;
+    this->dataPtr->fun = CameraLensPrivate::TAN;
   else if(fun == "sin")
-    this->fun = SIN;
+    this->dataPtr->fun = CameraLensPrivate::SIN;
   else if(fun == "id")
-    this->fun = ID;
+    this->dataPtr->fun = CameraLensPrivate::ID;
   else if(fun == "cos")
   {
     gzthrow("Cosine is not supported for custom mapping functions");
@@ -276,6 +311,7 @@ void CameraLens::Init(float c1,float c2,std::string fun,float f,float c3)
   }
 }
 
+//////////////////////////////////////////////////
 void CameraLens::Init(std::string name)
 {
   std::map<std::string,std::tuple<float,float,float,float,std::string> > fun_types;
@@ -309,6 +345,7 @@ void CameraLens::Init(std::string name)
     std::get<2>(params));
 }
 
+//////////////////////////////////////////////////
 void CameraLens::Load(sdf::ElementPtr sdf)
 {
   this->sdf = sdf;
@@ -316,6 +353,7 @@ void CameraLens::Load(sdf::ElementPtr sdf)
   Load();
 }
 
+//////////////////////////////////////////////////
 void CameraLens::Load()
 {
   if(!this->sdf->HasElement("type"))
@@ -343,39 +381,46 @@ void CameraLens::Load()
   this->SetCutOffAngle(this->sdf->Get<double>("cutoff_angle"));
 }
 
+//////////////////////////////////////////////////
 float CameraLens::GetC1() const
 {
-  return this->c1;
+  return this->dataPtr->c1;
 }
 
+//////////////////////////////////////////////////
 float CameraLens::GetC2() const
 {
-  return this->c2;
+  return this->dataPtr->c2;
 }
 
+//////////////////////////////////////////////////
 float CameraLens::GetC3() const
 {
-  return this->c3;
+  return this->dataPtr->c3;
 }
 
+//////////////////////////////////////////////////
 float CameraLens::GetF() const
 {
-  return this->f;
+  return this->dataPtr->f;
 }
 
+//////////////////////////////////////////////////
 float CameraLens::GetCutOffAngle() const
 {
-  return this->cutOffAngle;
+  return this->dataPtr->cutOffAngle;
 }
 
+//////////////////////////////////////////////////
 std::string CameraLens::GetFun() const
 {
   return this->sdf->GetElement("custom_function")->Get<std::string>("fun");
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetC1(float c)
 {
-  this->c1 = c;
+  this->dataPtr->c1 = c;
 
   if(!this->IsCustom())
     this->ConvertToCustom();
@@ -383,9 +428,10 @@ void CameraLens::SetC1(float c)
   this->sdf->GetElement("custom_function")->GetElement("c1")->Set((double)c);
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetC2(float c)
 {
-  this->c2 = c;
+  this->dataPtr->c2 = c;
 
   if(!this->IsCustom())
     this->ConvertToCustom();
@@ -393,9 +439,10 @@ void CameraLens::SetC2(float c)
   this->sdf->GetElement("custom_function")->GetElement("c2")->Set((double)c);
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetC3(float c)
 {
-  this->c3 = c;
+  this->dataPtr->c3 = c;
 
   if(!this->IsCustom())
     this->ConvertToCustom();
@@ -403,9 +450,10 @@ void CameraLens::SetC3(float c)
   this->sdf->GetElement("custom_function")->GetElement("c3")->Set((double)c);
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetF(float f)
 {
-  this->f = f;
+  this->dataPtr->f = f;
 
   if(!this->IsCustom())
     this->ConvertToCustom();
@@ -423,58 +471,67 @@ void CameraLens::SetFun(std::string fun)
   this->Load();
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetCutOffAngle(float _angle)
 {
-  this->cutOffAngle = _angle;
+  this->dataPtr->cutOffAngle = _angle;
 
   this->sdf->GetElement("cutoff_angle")->Set((double)_angle);
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetCircular(bool _circular)
 {
   this->sdf->GetElement("circular")->Set(_circular);
 }
 
+//////////////////////////////////////////////////
 void CameraLens::ConvertToCustom()
 {
   sdf::ElementPtr cf = this->sdf->AddElement("custom_function");
 
-  cf->AddElement("c1")->Set((double)this->c1);
-  cf->AddElement("c2")->Set((double)this->c2);
-  cf->AddElement("c3")->Set((double)this->c3);
-  cf->AddElement("f")->Set((double)this->f);
+  cf->AddElement("c1")->Set((double)this->dataPtr->c1);
+  cf->AddElement("c2")->Set((double)this->dataPtr->c2);
+  cf->AddElement("c3")->Set((double)this->dataPtr->c3);
+  cf->AddElement("f")->Set((double)this->dataPtr->f);
 
   std::string funs[] = {"sin","tan","id"};
-  cf->AddElement("fun")->Set(funs[(int)this->fun]);
+  cf->AddElement("fun")->Set(funs[(int)this->dataPtr->fun]);
 
   this->SetType("custom");
 }
 
+//////////////////////////////////////////////////
 std::string CameraLens::GetType() const
 {
   return this->sdf->Get<std::string>("type");
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetType(std::string type)
 {
   this->sdf->GetElement("type")->Set(type);
 }
 
+//////////////////////////////////////////////////
 bool CameraLens::IsCustom() const
 {
   return GetType() == "custom";
 }
 
+//////////////////////////////////////////////////
 bool CameraLens::IsCircular() const
 {
   return this->sdf->Get<bool>("circular");
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetCompositorMaterial(Ogre::MaterialPtr material)
 {
   this->compositorMaterial = material;
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetMaterialVariables(float _ratio,float _hfov)
 {
   Ogre::GpuProgramParametersSharedPtr uniforms =
@@ -486,40 +543,40 @@ void CameraLens::SetMaterialVariables(float _ratio,float _hfov)
     math::Vector3(0,0,1)
   };
 
-  uniforms->setNamedConstant("c1",(Ogre::Real)this->c1);
-  uniforms->setNamedConstant("c2",(Ogre::Real)this->c2);
-  uniforms->setNamedConstant("c3",(Ogre::Real)this->c3);
+  uniforms->setNamedConstant("c1",(Ogre::Real)this->dataPtr->c1);
+  uniforms->setNamedConstant("c2",(Ogre::Real)this->dataPtr->c2);
+  uniforms->setNamedConstant("c3",(Ogre::Real)this->dataPtr->c3);
 
   if(!this->IsCircular())
   {
     float fun_res = 1;
-    float param = _hfov*0.5/this->c2+this->c3;
+    float param = _hfov*0.5/this->dataPtr->c2+this->dataPtr->c3;
 
-    switch(this->fun)
+    switch(this->dataPtr->fun)
     {
-      case SIN:
+      case CameraLensPrivate::SIN:
         fun_res = sin(param);
         break;
-      case TAN:
+      case CameraLensPrivate::TAN:
         fun_res = tan(param);
         break;
-      case ID:
+      case CameraLensPrivate::ID:
         fun_res = param;
     }
 
-    float new_f = 1.0f/(this->c1*fun_res);
+    float new_f = 1.0f/(this->dataPtr->c1*fun_res);
 
     uniforms->setNamedConstant("f",(Ogre::Real)new_f);
   }
   else
-    uniforms->setNamedConstant("f",(Ogre::Real)this->f);
+    uniforms->setNamedConstant("f",(Ogre::Real)this->dataPtr->f);
 
   uniforms->setNamedConstant("fun",Ogre::Vector3(
-      fun_m[this->fun].x,
-      fun_m[this->fun].y,
-      fun_m[this->fun].z));
+      fun_m[this->dataPtr->fun].x,
+      fun_m[this->dataPtr->fun].y,
+      fun_m[this->dataPtr->fun].z));
 
-  uniforms->setNamedConstant("cutOffAngle",(Ogre::Real)this->cutOffAngle);
+  uniforms->setNamedConstant("cutOffAngle",(Ogre::Real)this->dataPtr->cutOffAngle);
 
   Ogre::GpuProgramParametersSharedPtr uniforms_vs =
     this->compositorMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();

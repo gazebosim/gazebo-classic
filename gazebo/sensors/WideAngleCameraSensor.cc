@@ -1,4 +1,19 @@
-
+/*
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 
 #include "WideAngleCameraSensor.hh"
 
@@ -27,10 +42,18 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
+//////////////////////////////////////////////////
 WideAngleCameraSensor::WideAngleCameraSensor()
 {
 }
 
+//////////////////////////////////////////////////
+WideAngleCameraSensor::~WideAngleCameraSensor()
+{
+  //TODO
+}
+
+//////////////////////////////////////////////////
 void WideAngleCameraSensor::Init()
 {
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -107,6 +130,7 @@ void WideAngleCameraSensor::Init()
   Sensor::Init();
 }
 
+//////////////////////////////////////////////////
 void WideAngleCameraSensor::Load(const std::string &_worldName)
 {
   gzerr << "wideanglecamera::Load" << std::endl;
@@ -127,6 +151,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
       &WideAngleCameraSensor::OnCtrlMessage,this);
 }
 
+//////////////////////////////////////////////////
 void WideAngleCameraSensor::Fini()
 {
   this->lensPub.reset();
@@ -135,6 +160,7 @@ void WideAngleCameraSensor::Fini()
   CameraSensor::Fini();
 }
 
+//////////////////////////////////////////////////
 bool WideAngleCameraSensor::UpdateImpl(bool _force)
 {
   if(!CameraSensor::UpdateImpl(_force))
@@ -170,6 +196,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
   return true;
 }
 
+//////////////////////////////////////////////////
 void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 {
   if(_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET);
