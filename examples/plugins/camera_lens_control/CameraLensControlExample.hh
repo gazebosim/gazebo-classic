@@ -21,78 +21,83 @@
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/gui/gui.hh>
-#include "ImageFrame.hh"
 
 namespace gazebo
 {
-    class GAZEBO_VISIBLE CameraLensControlExample : public GUIPlugin
-    {
-      Q_OBJECT
 
-      /// \brief Constructor
-      /// \param[in] _parent Parent widget
-      public: CameraLensControlExample();
+  namespace gui
+  {
+    class ImageFrame;
+  }
 
-      /// \brief Destructor
-      public: virtual ~CameraLensControlExample();
+  class GAZEBO_VISIBLE CameraLensControlExample : public GUIPlugin
+  {
+    Q_OBJECT
 
-      protected: virtual void LoadGUIComponents(QWidget *_parent);
+    /// \brief Constructor
+    /// \param[in] _parent Parent widget
+    public: CameraLensControlExample();
 
-      /// \brief Callbacks trigged when the buttons are pressed.
-      protected slots: void OnButtonSpawn();
-      protected slots: void OnButtonCalibrate();
+    /// \brief Destructor
+    public: virtual ~CameraLensControlExample();
 
-      protected slots: void OnCbTypeChange();
-      protected slots: void OnCbFunChange();  
+    protected: virtual void LoadGUIComponents(QWidget *_parent);
 
-      protected slots: void OnSbChange();
+    /// \brief Callbacks trigged when the buttons are pressed.
+    protected slots: void OnButtonSpawn();
+    protected slots: void OnButtonCalibrate();
 
-      protected slots: void OnValueChanged();
+    protected slots: void OnCbTypeChange();
+    protected slots: void OnCbFunChange();  
 
-      protected: void OnSelect(ConstSelectionPtr &_msg);
+    protected slots: void OnSbChange();
 
-      protected: void OnImageUpdate(ConstImageStampedPtr &_msg);
+    protected slots: void OnValueChanged();
 
-      protected: void OnCameraProjectionCmd(ConstCameraLensCmdPtr &_msg);
+    protected: void OnSelect(ConstSelectionPtr &_msg);
 
-      /// \brief Counter used to create unique model names
-      private: unsigned int counter;
+    protected: void OnImageUpdate(ConstImageStampedPtr &_msg);
 
-      // \brief 
-      protected: std::string selectedElementName;
+    protected: void OnCameraProjectionCmd(ConstCameraLensCmdPtr &_msg);
 
-      /// \brief Node used to establish communication with gzserver.
-      private: transport::NodePtr node;
+    /// \brief Counter used to create unique model names.
+    private: unsigned int counter;
 
-      /// \brief Publisher of factory messages.
-      private: transport::PublisherPtr factoryPub;
+    // \brief Name of current element selected in gazebo.
+    protected: std::string selectedElementName;
 
-      /// \brief Publisher of camera control messages.
-      private: transport::PublisherPtr cameraControlPub;
+    /// \brief Node used to establish communication with gzserver.
+    private: transport::NodePtr node;
 
-      /// \brief Subscriber to selection messages.
-      private: transport::SubscriberPtr selectionSub;
+    /// \brief Publisher of factory messages.
+    private: transport::PublisherPtr factoryPub;
 
-      /// \brief Subscriber to camera image messages.
-      private: transport::SubscriberPtr imageSub;
+    /// \brief Publisher of camera control messages.
+    private: transport::PublisherPtr cameraControlPub;
 
-      /// \brief Subscriber to camera image messages.
-      private: transport::SubscriberPtr infoSub;
+    /// \brief Subscriber to selection messages.
+    private: transport::SubscriberPtr selectionSub;
 
-      private: QPushButton *pbSpawn;
-      private: QPushButton *pbCalibrate;
-      private: QLabel *lbName;
-      private: QComboBox *cbType;
-      private: QComboBox *cbFun;
-      private: QDoubleSpinBox *sbC1;
-      private: QDoubleSpinBox *sbC2;
-      private: QDoubleSpinBox *sbC3;
-      private: QDoubleSpinBox *sbF;
-      private: QDoubleSpinBox *sbCA;
-      private: QCheckBox *cbCircular;
+    /// \brief Subscriber to camera image messages.
+    private: transport::SubscriberPtr imageSub;
 
-      /// \brief Image output frame.
-      private: gui::ImageFrame *imgFrame;
-    };
+    /// \brief Subscriber to camera image messages.
+    private: transport::SubscriberPtr infoSub;
+
+    private: QPushButton *pbSpawn;
+    private: QPushButton *pbCalibrate;
+    private: QLabel *lbName;
+    private: QComboBox *cbType;
+    private: QComboBox *cbFun;
+    private: QDoubleSpinBox *sbC1;
+    private: QDoubleSpinBox *sbC2;
+    private: QDoubleSpinBox *sbC3;
+    private: QDoubleSpinBox *sbF;
+    private: QDoubleSpinBox *sbCA;
+    private: QCheckBox *cbCircular;
+
+    /// \brief Image output frame.
+    // private: gui::ImageFrame *imgFrame;
+  };
 }
 #endif

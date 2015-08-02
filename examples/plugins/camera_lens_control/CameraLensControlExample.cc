@@ -18,6 +18,8 @@
 #include <gazebo/msgs/msgs.hh>
 #include "CameraLensControlExample.hh"
 
+#include "ImageFrame.hh"
+
 #include <QtUiTools/QUiLoader>
 
 using namespace gazebo;
@@ -114,10 +116,10 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
 
   QWidget *wImagePlace = _parent->findChild<QWidget*>("wImagePlace");
 
-  this->imgFrame = new gui::ImageFrame(wImagePlace);
-  this->imgFrame->setMinimumSize(201,201);
-  this->imgFrame->setMaximumSize(201,201);
-  this->imgFrame->setVisible(true);
+  // this->imgFrame = new gui::ImageFrame(wImagePlace);
+  // this->imgFrame->setMinimumSize(201,201);
+  // this->imgFrame->setMaximumSize(201,201);
+  // this->imgFrame->setVisible(true);
 
   // fill combo boxes with values
   this->cbType->addItem("gnomonical");
@@ -224,8 +226,8 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
     if(this->imageSub)
       this->imageSub->Unsubscribe();
 
-    this->imageSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/image",
-        &CameraLensControlExample::OnImageUpdate,this);
+    // this->imageSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/image",
+    //     &CameraLensControlExample::OnImageUpdate,this);
 
     // subscribe for the info messages
     this->infoSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/lens_info",
@@ -268,7 +270,7 @@ void CameraLensControlExample::OnCameraProjectionCmd(ConstCameraLensCmdPtr &_msg
     this->cbCircular->setChecked(_msg->circular());
 
   // Information got, runtime update is not needed
-  this->infoSub->Unsubscribe();
+  // this->infoSub->Unsubscribe();
 }
 
 /////////////////////////////////////////////////
