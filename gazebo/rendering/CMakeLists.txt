@@ -44,6 +44,7 @@ set (sources
   LinkFrameVisual.cc
   SonarVisual.cc
   Light.cc
+  LogicalCameraVisual.cc
   Material.cc
   MovableText.cc
   OrbitViewController.cc
@@ -100,6 +101,7 @@ set (headers
   JointVisual.hh
   LaserVisual.hh
   LinkFrameVisual.hh
+  LogicalCameraVisual.hh
   SonarVisual.hh
   Light.hh
   Material.hh
