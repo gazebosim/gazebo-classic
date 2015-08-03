@@ -62,12 +62,12 @@ void ModelData_TEST::LinkScale()
     msgs::Model model;
     msgs::AddBoxLink(model, mass, size);
     link->Load(msgs::LinkToSDF(model.link(0)));
-    rendering::VisualPtr linkVis(new rendering::Visual("link", scene));
+    rendering::VisualPtr linkVis(new rendering::Visual("box_link", scene));
     link->linkVisual = linkVis;
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
-        new rendering::Visual("collision", linkVis));
+        new rendering::Visual("box_link::collision", linkVis));
     collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
@@ -107,6 +107,7 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(3.0, 2.0, 1.0);
+      collisionVis->SetScale(newScale);
       link->SetScale(newScale);
 
       // verify new scale
@@ -155,6 +156,7 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(1.2, 3.8, 2.5);
+      collisionVis->SetScale(newScale);
       link->SetScale(newScale);
 
       // verify new scale
@@ -167,6 +169,7 @@ void ModelData_TEST::LinkScale()
       double density = mass / (size.X() * size.Y() * size.Z());
       ignition::math::Vector3d newSize = dScale * size;
       double newMass = density * (newSize.X() * newSize.Y() * newSize.Z());
+
       QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
 
       // verify new inertia values
@@ -208,12 +211,12 @@ void ModelData_TEST::LinkScale()
     // set reasonable inertial values based on geometry
     msgs::AddCylinderLink(model, mass, radius, length);
     link->Load(msgs::LinkToSDF(model.link(0)));
-    rendering::VisualPtr linkVis(new rendering::Visual("link", scene));
+    rendering::VisualPtr linkVis(new rendering::Visual("cylinder_link", scene));
     link->linkVisual = linkVis;
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
-        new rendering::Visual("collision", linkVis));
+        new rendering::Visual("cylinder_link::collision", linkVis));
     collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
@@ -253,6 +256,7 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(8.5, 8.5, 1.5);
+      collisionVis->SetScale(newScale);
       link->SetScale(newScale);
 
       // verify new scale
@@ -306,6 +310,7 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(1.2, 1.2, 3.4);
+      collisionVis->SetScale(newScale);
       link->SetScale(newScale);
 
       // verify new scale
@@ -360,12 +365,12 @@ void ModelData_TEST::LinkScale()
     // set reasonable inertial values based on geometry
     msgs::AddSphereLink(model, mass, radius);
     link->Load(msgs::LinkToSDF(model.link(0)));
-    rendering::VisualPtr linkVis(new rendering::Visual("link", scene));
+    rendering::VisualPtr linkVis(new rendering::Visual("sphere_link", scene));
     link->linkVisual = linkVis;
 
     // add a collision visual
     rendering::VisualPtr collisionVis(
-        new rendering::Visual("collision", linkVis));
+        new rendering::Visual("sphere_link::collision", linkVis));
     collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
     link->AddCollision(collisionVis);
 
@@ -405,6 +410,7 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(2.5, 2.5, 2.5);
+      collisionVis->SetScale(newScale);
       link->SetScale(newScale);
 
       // verify new scale
@@ -454,6 +460,7 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(3.1, 3.1, 3.1);
+      collisionVis->SetScale(newScale);
       link->SetScale(newScale);
 
       // verify new scale
@@ -494,6 +501,106 @@ void ModelData_TEST::LinkScale()
     }
     delete link;
   }
+
+  // non-unit sphere
+  {
+    gui::LinkData *link = new gui::LinkData();
+
+    double mass = 2.8;
+    double radius = 1.2;
+
+    msgs::Model model;
+    // set reasonable inertial values based on geometry
+    msgs::AddSphereLink(model, mass, radius);
+    link->Load(msgs::LinkToSDF(model.link(0)));
+    rendering::VisualPtr linkVis(new rendering::Visual("sphere_link2", scene));
+    link->linkVisual = linkVis;
+
+    // add a collision visual
+    rendering::VisualPtr collisionVis(
+        new rendering::Visual("sphere_link2::collision", linkVis));
+    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    link->AddCollision(collisionVis);
+
+    // verify scale
+    ignition::math::Vector3d scale = ignition::math::Vector3d::One;
+    QVERIFY(link->GetScale() == scale);
+
+    sdf::ElementPtr linkSDF = link->linkSDF;
+    QVERIFY(linkSDF->HasElement("inertial"));
+    sdf::ElementPtr inertialElem = linkSDF->GetElement("inertial");
+    QVERIFY(inertialElem->HasElement("inertia"));
+    sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+    QVERIFY(inertialElem->HasElement("mass"));
+    sdf::ElementPtr massElem = inertialElem->GetElement("mass");
+
+    // verify mass
+    QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
+
+    // verify inertia values
+    msgs::Inertial inertialMsg = model.link(0).inertial();
+    double ixx = inertialMsg.ixx();
+    double iyy = inertialMsg.iyy();
+    double izz = inertialMsg.izz();
+    double ixy = inertialMsg.ixy();
+    double ixz = inertialMsg.ixz();
+    double iyz = inertialMsg.iyz();
+
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz, 1e-3));
+
+    // set new scale and verify inertial values
+    {
+      // set scale
+      ignition::math::Vector3d newScale =
+          ignition::math::Vector3d(2.0, 2.0, 2.0);
+      collisionVis->SetScale(newScale);
+      link->SetScale(newScale);
+
+      // verify new scale
+      QVERIFY(link->GetScale() == newScale);
+
+      // change in scale
+      ignition::math::Vector3d dScale = newScale / scale;
+
+      // verify new mass
+      double density = mass / (4/3*M_PI*radius*radius*radius);
+      double newRadius = radius * dScale.X();
+      double newMass = density * (4/3*M_PI*newRadius*newRadius*newRadius);
+
+      QVERIFY(ignition::math::equal(massElem->Get<double>(), newMass));
+
+      // verify new inertia values
+      // use msgs::AddSphereLink to help us compute the expected inertia values.
+      msgs::AddSphereLink(model, newMass, newRadius);
+      msgs::Inertial newInertialMsg = model.link(1).inertial();
+      double newIxx = newInertialMsg.ixx();
+      double newIyy = newInertialMsg.iyy();
+      double newIzz = newInertialMsg.izz();
+      double newIxy = newInertialMsg.ixy();
+      double newIxz = newInertialMsg.ixz();
+      double newIyz = newInertialMsg.iyz();
+
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixx"), newIxx, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyy"), newIyy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("izz"), newIzz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixy"), newIxy, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
+      QVERIFY(ignition::math::equal(
+          inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
+    }
+    delete link;
+  }
+
   mainWindow->close();
   delete mainWindow;
   mainWindow = NULL;

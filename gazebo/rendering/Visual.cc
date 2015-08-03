@@ -732,10 +732,10 @@ void Visual::SetScale(const math::Vector3 &_scale)
   if (this->dataPtr->scale == _scale)
     return;
 
-  this->dataPtr->scale = _scale;
-
   // update geom size based on scale.
-  this->UpdateGeomSize(this->dataPtr->scale);
+  this->UpdateGeomSize(_scale);
+
+  this->dataPtr->scale = _scale;
 
   this->dataPtr->sceneNode->setScale(
       Conversions::Convert(this->dataPtr->scale));
@@ -750,32 +750,79 @@ void Visual::UpdateGeomSize(const math::Vector3 &_scale)
     (*iter)->UpdateGeomSize(_scale);
   }
 
-  math::Vector3 derivedScale = math::Vector3::One;
-  VisualPtr parentVis = this->GetParent();
-  if (parentVis)
-  {
-     derivedScale = Conversions::Convert(
-        parentVis->GetSceneNode()->_getDerivedScale());
-  }
+  // update the same way as server - see Link::UpdateVisualGeomSDF()
+  if (!this->dataPtr->sdf->HasElement("geometry"))
+    return;
 
   sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
   if (geomElem->HasElement("box"))
   {
-    geomElem->GetElement("box")->GetElement("size")->Set(_scale);
+    math::Vector3 size =
+        geomElem->GetElement("box")->Get<math::Vector3>("size");
+    geomElem->GetElement("box")->GetElement("size")->Set(
+        _scale/this->dataPtr->scale*size);
   }
   else if (geomElem->HasElement("sphere"))
   {
+    // update radius the same way as collision shapes
+    double radius = geomElem->GetElement("sphere")->Get<double>("radius");
+    double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
+    double oldRadius = std::max(this->dataPtr->scale.z,
+        std::max(this->dataPtr->scale.x, this->dataPtr->scale.y));
     geomElem->GetElement("sphere")->GetElement("radius")->Set(
-        _scale.x*0.5);
+        newRadius/oldRadius*radius);
   }
   else if (geomElem->HasElement("cylinder"))
   {
-    geomElem->GetElement("cylinder")->GetElement("radius")
-        ->Set(_scale.x*0.5);
-    geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z);
+    // update radius the same way as collision shapes
+    double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
+    double newRadius = std::max(_scale.x, _scale.y);
+    double oldRadius = std::max(this->dataPtr->scale.x, this->dataPtr->scale.y);
+
+    double length = geomElem->GetElement("cylinder")->Get<double>("length");
+    geomElem->GetElement("cylinder")->GetElement("radius")->Set(
+        newRadius/oldRadius*radius);
+    geomElem->GetElement("cylinder")->GetElement("length")->Set(
+        _scale.z/this->dataPtr->scale.z*length);
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Visual::GetGeometrySize() const
+{
+  ignition::math::Vector3d size;
+
+  if (!this->dataPtr->sdf->HasElement("geometry"))
+    return size;
+
+  sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
+  if (geomElem->HasElement("sphere"))
+  {
+    sdf::ElementPtr sphereElem = geomElem->GetElement("sphere");
+    double radius = sphereElem->Get<double>("radius");
+    size = ignition::math::Vector3d(radius*2.0, radius*2.0, radius*2.0);
+  }
+  else if (geomElem->HasElement("box"))
+  {
+    sdf::ElementPtr boxElem = geomElem->GetElement("box");
+    size = boxElem->Get<ignition::math::Vector3d>("size");
+  }
+  else if (geomElem->HasElement("cylinder"))
+  {
+    sdf::ElementPtr cylinderElem = geomElem->GetElement("cylinder");
+    double radius = cylinderElem->Get<double>("radius");
+    double length = cylinderElem->Get<double>("length");
+    size = ignition::math::Vector3d(radius*2.0, radius*2.0, length);
+  }
+  else if (geomElem->HasElement("mesh"))
+  {
+    sdf::ElementPtr meshElem = geomElem->GetElement("mesh");
+    size = meshElem->Get<ignition::math::Vector3d>("scale");
+  }
+
+  return size;
 }
 
 //////////////////////////////////////////////////

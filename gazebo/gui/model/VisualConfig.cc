@@ -301,6 +301,23 @@ void VisualConfig::SetGeometry(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void VisualConfig::GetGeometry(const std::string &_name,
+    ignition::math::Vector3d &_size, std::string &_uri)
+{
+  for (auto &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      math::Vector3 dimensions;
+      it.second->configWidget->GetGeometryWidgetValue("geometry",
+          dimensions, _uri);
+      _size = dimensions.Ign();
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void VisualConfig::SetMaterial(const std::string &_name,
   const std::string &_materialName, const common::Color &_ambient,
   const common::Color &_diffuse, const common::Color &_specular,
