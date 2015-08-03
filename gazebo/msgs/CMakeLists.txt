@@ -1,7 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
-
 set (msgs
   altimeter.proto
   axis.proto
@@ -201,7 +200,6 @@ target_link_libraries(gazebo_msgs
 )
 
 add_dependencies(gazebo_msgs gazebomsgs_out)
-
 
 set (message_headers "" CACHE INTERNAL "Include dirs description")
 

@@ -20,7 +20,6 @@
 #include <google/protobuf/compiler/code_generator.h>
 #include <string>
 
-
 namespace google {
 namespace protobuf {
 namespace compiler {

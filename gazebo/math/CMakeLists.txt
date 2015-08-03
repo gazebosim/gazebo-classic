@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
 set (sources
   Angle.cc
   Box.cc
