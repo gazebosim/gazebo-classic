@@ -49,9 +49,10 @@ set (sources
   Model.cc
   ModelState.cc
   MultiRayShape.cc
-  PhysicsIface.cc
   PhysicsEngine.cc
+  PhysicsEvents.cc
   PhysicsFactory.cc
+  PhysicsIface.cc
   PlaneShape.cc
   PolylineShape.cc
   Population.cc
@@ -95,9 +96,10 @@ set (headers
   Model.hh
   ModelState.hh
   MultiRayShape.hh
-  PhysicsIface.hh
   PhysicsEngine.hh
+  PhysicsEvents.hh
   PhysicsFactory.hh
+  PhysicsIface.hh
   PhysicsTypes.hh
   PlaneShape.hh
   PolylineShape.hh

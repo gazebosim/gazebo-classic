@@ -22,6 +22,7 @@
 
 #include "gazebo/transport/Publisher.hh"
 
+#include "gazebo/physics/PhysicsEvents.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Entity.hh"
@@ -246,15 +247,9 @@ void DARTPhysics::UpdatePhysics()
           = boost::dynamic_pointer_cast<DARTLink>(links.at(j));
       dartLinkItr->updateDirtyPoseFromDARTTransformation();
     }
-
-    for (auto joint : modelItr->GetJoints())
-    {
-      DARTJointPtr dartJoint =
-        boost::dynamic_pointer_cast<physics::DARTJoint>(joint);
-      dartJoint->CacheForceTorque();
-    }
   }
 
+  physics::Events::updatePhysicsEnd();
   // this->lastUpdateTime = currTime;
 }
 
