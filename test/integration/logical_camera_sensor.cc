@@ -101,6 +101,61 @@ TEST_F(LogicalCameraSensor, Box)
 }
 
 /////////////////////////////////////////////////
+TEST_F(LogicalCameraSensor, OffsetBox)
+{
+  Load("worlds/logical_camera.world");
+
+  /// \brief Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  // Get the world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Get the model that has the logical camera
+  physics::ModelPtr cameraModel = world->GetModel("box");
+  ASSERT_TRUE(cameraModel != NULL);
+
+  // Change the pose of the model
+  cameraModel->SetWorldPose(math::Pose(-5, -5, 0.5, 0, 0, M_PI*0.25));
+
+  // Get the logical camera sensor
+  sensors::LogicalCameraSensorPtr cam = boost::dynamic_pointer_cast<
+    sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
+  ASSERT_TRUE(cam != NULL);
+
+  // Force the update
+  cam->Update(true);
+
+  // We should now detect the ground plane
+  ASSERT_EQ(cam->Image().model_size(), 1);
+  EXPECT_EQ(cam->Image().model(0).name(), "ground_plane");
+
+  // Insert box
+  SpawnBox("spawn_box", math::Vector3(1, 1, 1), math::Vector3(0, 0, 0.5),
+      math::Vector3::Zero);
+  cam->Update(true);
+
+  // The box should not be detected
+  ASSERT_EQ(cam->Image().model_size(), 1);
+
+  // Insert anoth box, this time within the camera's frustum
+  SpawnBox("spawn_box2", math::Vector3(1, 1, 1), math::Vector3(-1, -1, 0.5),
+      math::Vector3::Zero);
+  cam->Update(true);
+
+  // The second box should be detected
+  ASSERT_EQ(cam->Image().model_size(), 2);
+  EXPECT_EQ(cam->Image().model(1).name(), "spawn_box2");
+
+  // Rotate the model, which should move "spawn_box" out of the frustum
+  cameraModel->SetWorldPose(math::Pose(-5, -5, 0, 0, 0, 1.5707));
+  cam->Update(true);
+  ASSERT_EQ(cam->Image().model_size(), 1);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
