@@ -416,8 +416,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       newScale.y = std::max(1e-4, newScale.y);
       newScale.z = std::max(1e-4, newScale.z);
     }
-        std::cerr << " b4 after " << _vis->GetScale() << ", " <<
-            newScale << std::endl;
     _vis->SetScale(newScale);
     Events::scaleEntity(_vis->GetName(), newScale);
   }

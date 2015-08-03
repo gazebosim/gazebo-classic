@@ -159,11 +159,10 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     std::string linkName = this->linkVisual->GetName();
     std::string leafName =
         name.substr(name.find(linkName)+linkName.size()+2);
-//    visualConfig->SetGeometry(leafName, it.first->GetGeometrySize());
     ignition::math::Vector3d visOldSize;
     std::string uri;
     visualConfig->GetGeometry(leafName,  visOldSize, uri);
-    ignition::math::Vector3d visNewSize = dScale * visOldSize;
+    ignition::math::Vector3d visNewSize = it.first->GetGeometrySize();
     visualConfig->SetGeometry(leafName, visNewSize);
   }
 
@@ -177,17 +176,14 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     std::string leafName =
         name.substr(name.find(linkName)+linkName.size()+2);
 
-//    ignition::math::Vector3d colNewSize = it.first->GetGeometrySize();
     ignition::math::Vector3d colOldSize;
     std::string uri;
     collisionConfig->GetGeometry(leafName,  colOldSize, uri);
-    ignition::math::Vector3d colNewSize = dScale * colOldSize;
+    ignition::math::Vector3d colNewSize = it.first->GetGeometrySize();
     collisionConfig->SetGeometry(leafName, colNewSize);
     colOldSizes[name] = colOldSize;
     colNewSizes[name] = colNewSize;
   }
-  if (this->scale == _scale)
-    return;
 
   if (this->collisions.empty())
     return;

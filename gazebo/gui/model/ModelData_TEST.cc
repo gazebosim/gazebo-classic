@@ -558,7 +558,8 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(2.0, 2.0, 2.0);
-      collisionVis->SetScale(newScale);
+      collisionVis->SetScale(newScale *
+          ignition::math::Vector3d(radius*2, radius*2, radius*2));
       link->SetScale(newScale);
 
       // verify new scale
