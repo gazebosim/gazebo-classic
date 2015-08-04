@@ -558,7 +558,8 @@ void ModelData_TEST::LinkScale()
       // set scale
       ignition::math::Vector3d newScale =
           ignition::math::Vector3d(2.0, 2.0, 2.0);
-      collisionVis->SetScale(newScale);
+      collisionVis->SetScale(newScale *
+          ignition::math::Vector3d(radius*2, radius*2, radius*2));
       link->SetScale(newScale);
 
       // verify new scale
@@ -597,11 +598,6 @@ void ModelData_TEST::LinkScale()
           inertiaElem->Get<double>("ixz"), newIxz, 1e-3));
       QVERIFY(ignition::math::equal(
           inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
-
-      // update variables for next scale operation
-      scale = newScale;
-      mass = newMass;
-      radius = newRadius;
     }
     delete link;
   }

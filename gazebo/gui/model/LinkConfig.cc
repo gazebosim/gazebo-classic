@@ -83,14 +83,14 @@ void LinkConfig::SetPose(const ignition::math::Pose3d &_pose)
 }
 
 /////////////////////////////////////////////////
-void LinkConfig::SetMass(double _mass)
+void LinkConfig::SetMass(const double _mass)
 {
   this->configWidget->SetDoubleWidgetValue("inertial::mass", _mass);
 }
 
 /////////////////////////////////////////////////
-void LinkConfig::SetInertiaMatrix(double _ixx, double _iyy, double _izz,
-    double _ixy, double _ixz, double _iyz)
+void LinkConfig::SetInertiaMatrix(const double _ixx, const double _iyy,
+    const double _izz, const double _ixy, const double _ixz, const double _iyz)
 {
   this->configWidget->SetDoubleWidgetValue("inertial::ixx", _ixx);
   this->configWidget->SetDoubleWidgetValue("inertial::iyy", _iyy);
