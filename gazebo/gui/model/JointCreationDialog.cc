@@ -166,6 +166,9 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->connections.push_back(
       gui::model::Events::ConnectJointChildChosen3D(
       boost::bind(&JointCreationDialog::OnChildFrom3D, this, _1)));
+
+  connect(this, SIGNAL(EmitLinkRemoved(std::string)),
+      this, SLOT(OnLinkRemovedSlot(std::string)));
 }
 
 /////////////////////////////////////////////////
@@ -237,12 +240,25 @@ void JointCreationDialog::OnParentFromDialog(int _index)
   this->parentComboBox->removeItem(index);
   this->parentComboBox->blockSignals(false);
 
-  // Check if child list matches parent list
+  // Reset child combo box leaving parent out
+  QString currentChild = this->childComboBox->itemData(
+      this->childComboBox->currentIndex()).toString();
 
+  this->childComboBox->blockSignals(true);
+  this->childComboBox->clear();
+  if (currentChild == "")
+    this->childComboBox->addItem("", "");
+  for (auto link : this->linkList)
+  {
+    QString leafName = QString::fromStdString(link.first);
+    if (leafName == linkName)
+      continue;
 
-  // Remove chosen parent from child list
-  // index = this->childComboBox->findData(linkName);
-  // this->childComboBox->removeItem(index);
+    this->childComboBox->addItem(QString::fromStdString(link.second), leafName);
+  }
+  index = this->childComboBox->findData(currentChild);
+  this->childComboBox->setCurrentIndex(index);
+  this->childComboBox->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
@@ -267,12 +283,26 @@ void JointCreationDialog::OnChildFromDialog(int _index)
   this->childComboBox->removeItem(index);
   this->childComboBox->blockSignals(false);
 
-  // Check if parent list matches child list
+  // Reset parent combo box leaving child out
+  QString currentParent = this->parentComboBox->itemData(
+      this->parentComboBox->currentIndex()).toString();
 
+  this->parentComboBox->blockSignals(true);
+  this->parentComboBox->clear();
+  if (currentParent == "")
+    this->parentComboBox->addItem("", "");
+  for (auto link : this->linkList)
+  {
+    QString leafName = QString::fromStdString(link.first);
+    if (leafName == linkName)
+      continue;
 
-  // Remove chosen child from parent list
-  // index = this->parentComboBox->findData(linkName);
-  // this->parentComboBox->removeItem(index);
+    this->parentComboBox->addItem(QString::fromStdString(link.second),
+        leafName);
+  }
+  index = this->parentComboBox->findData(currentParent);
+  this->parentComboBox->setCurrentIndex(index);
+  this->parentComboBox->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
@@ -359,11 +389,19 @@ void JointCreationDialog::OnLinkRemovedSlot(const std::string &_linkName)
 
   int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
   if (index >= 0)
+  {
+    this->parentComboBox->blockSignals(true);
     this->parentComboBox->removeItem(index);
+    this->parentComboBox->blockSignals(false);
+  }
 
   index = this->childComboBox->findData(QString::fromStdString(_linkName));
   if (index >= 0)
+  {
+    this->childComboBox->blockSignals(true);
     this->childComboBox->removeItem(index);
+    this->childComboBox->blockSignals(false);
+  }
 }
 
 /////////////////////////////////////////////////
