@@ -435,12 +435,12 @@ namespace gazebo
       /// \brief Check if this visual is an ancestor of another visual.
       /// \param[in] _visual The other visual.
       /// \return True if this visual is an ancestor.
-      public: bool IsAncestorOf(rendering::VisualPtr _visual);
+      public: bool IsAncestorOf(rendering::VisualPtr _visual) const;
 
       /// \brief Check if this visual is a descendant of another visual.
       /// \param[in] _visual The other visual.
       /// \return True if this visual is a descendant.
-      public: bool IsDescendantOf(rendering::VisualPtr _visual);
+      public: bool IsDescendantOf(rendering::VisualPtr _visual) const;
 
       /// \brief Get the depth of this visual, where 0 is the depth of the
       /// world visual.

@@ -780,6 +780,12 @@ TEST_F(Visual_TEST, GetAncestors)
   EXPECT_TRUE(vis4->IsDescendantOf(vis3_1));
   EXPECT_FALSE(vis4->IsDescendantOf(vis3_2));
   EXPECT_FALSE(vis4->IsDescendantOf(vis4));
+
+  // NULL
+  EXPECT_FALSE(world->IsAncestorOf(NULL));
+  EXPECT_FALSE(world->IsDescendantOf(NULL));
+  EXPECT_FALSE(vis4->IsAncestorOf(NULL));
+  EXPECT_FALSE(vis4->IsDescendantOf(NULL));
 }
 
 /////////////////////////////////////////////////

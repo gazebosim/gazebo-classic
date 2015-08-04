@@ -2445,7 +2445,7 @@ VisualPtr Visual::GetNthAncestor(unsigned int _n)
 }
 
 /////////////////////////////////////////////////
-bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
+bool Visual::IsAncestorOf(rendering::VisualPtr _visual) const
 {
   if (!_visual || !this->dataPtr->scene)
     return false;
@@ -2463,7 +2463,7 @@ bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
 }
 
 /////////////////////////////////////////////////
-bool Visual::IsDescendantOf(rendering::VisualPtr _visual)
+bool Visual::IsDescendantOf(rendering::VisualPtr _visual) const
 {
   if (!_visual || !this->dataPtr->scene)
     return false;
