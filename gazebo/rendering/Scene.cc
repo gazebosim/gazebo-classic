@@ -32,6 +32,7 @@
 #include "gazebo/rendering/SonarVisual.hh"
 #include "gazebo/rendering/WrenchVisual.hh"
 #include "gazebo/rendering/CameraVisual.hh"
+#include "gazebo/rendering/LogicalCameraVisual.hh"
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
@@ -2080,6 +2081,28 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         cameraVis->Load(_msg->camera());
         this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
       }
+    }
+  }
+  else if (_msg->type() == "logical_camera" && _msg->visualize())
+  {
+    VisualPtr parentVis = this->GetVisual(_msg->parent_id());
+    if (!parentVis)
+      return false;
+
+    Visual_M::iterator iter = this->dataPtr->visuals.find(_msg->id());
+    if (iter == this->dataPtr->visuals.end())
+    {
+      LogicalCameraVisualPtr cameraVis(new LogicalCameraVisual(
+            _msg->name()+"_GUIONLY_logical_camera_vis", parentVis));
+
+      // need to call AttachVisual in order for cameraVis to be added to
+      // parentVis' children list so that it can be properly deleted.
+      parentVis->AttachVisual(cameraVis);
+
+      cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
+      cameraVis->SetId(_msg->id());
+      cameraVis->Load(_msg->logical_camera());
+      this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&

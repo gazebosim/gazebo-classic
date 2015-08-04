@@ -30,6 +30,7 @@ set (sources
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
+  HotkeyDialog.cc
   RenderWidget.cc
   GLWidget.cc
   GuiIface.cc
@@ -77,6 +78,7 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
+  HotkeyDialog.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   LayersWidget.hh
@@ -135,6 +137,7 @@ endif ()
 set (qt_tests
   DataLogger_TEST.cc
   GuiIface_TEST.cc
+  HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
   ModelMaker_TEST.cc

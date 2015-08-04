@@ -15,6 +15,9 @@
 1. Tweaks to Data Logger, such as multiline text edit for path
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
 
+1. Added hotkeys chart dialog
+    * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
+
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
@@ -28,6 +31,12 @@
         * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
 
 ## Gazebo 6.0
+
+1. Added logical_camera sensor.
+    * [Pull request #1845](https://bitbucket.org/osrf/gazebo/pull-request/1845)
+
+1. Added RandomVelocityPlugin, which applies a random velocity to a model's link.
+    * [Pull request #1839](https://bitbucket.org/osrf/gazebo/pull-request/1839)
 
 1. Added magnetometer sensor. A contribution from Andrew Symington.
     * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)

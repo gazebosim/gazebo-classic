@@ -39,6 +39,8 @@ QAction *gazebo::gui::g_saveCfgAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_cloneAct = 0;
 GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_hotkeyChartAct = 0;
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_aboutAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_quitAct = 0;
