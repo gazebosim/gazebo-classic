@@ -34,7 +34,7 @@
 #include "util.h"
 
 #ifndef _WIN32
-  #include <sys/time.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 #endif

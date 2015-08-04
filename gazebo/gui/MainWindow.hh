@@ -32,6 +32,10 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
+#ifdef HAVE_OCULUS
+#include "gazebo/gui/OculusWindow.hh"
+#endif
+
 namespace gazebo
 {
   namespace gui
@@ -41,7 +45,6 @@ namespace gazebo
     class ModelListWidget;
     class Editor;
     class SpaceNav;
-    class OculusWindow;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {

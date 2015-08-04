@@ -119,8 +119,6 @@ void RestUiPlugin::OnMainWindowReady()
 
   menu->addAction(logoutAct);
 
-  menu->addAction(logoutAct);
-
   mainWindow->AddMenu(menu);
 }
 

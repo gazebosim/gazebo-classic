@@ -17,8 +17,6 @@
 #ifndef _ENTITYMAKER_HH_
 #define _ENTITYMAKER_HH_
 
-#include <boost/function.hpp>
-
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/math/Vector3.hh"
@@ -105,3 +103,5 @@ namespace gazebo
   }
 }
 #endif
+
+
