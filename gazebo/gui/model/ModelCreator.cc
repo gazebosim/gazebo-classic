@@ -1491,7 +1491,7 @@ void ModelCreator::Stop()
 {
   if (this->addLinkType != LINK_NONE && this->mouseVisual)
   {
-    this->RemoveLinkImpl(this->mouseVisual->GetName());
+    this->RemoveEntity(this->mouseVisual->GetName());
     this->mouseVisual.reset();
     emit LinkAdded();
   }
