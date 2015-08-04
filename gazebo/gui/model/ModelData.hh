@@ -147,6 +147,18 @@ namespace gazebo
       /// \brief SDF representing the link data.
       public: sdf::ElementPtr linkSDF;
 
+      /// \brief mass.
+      private: double mass;
+
+      /// \brief Inertia ixx.
+      private: double inertiaIxx;
+
+      /// \brief Inertia iyy.
+      private: double inertiaIyy;
+
+      /// \brief Inertia izz.
+      private: double inertiaIzz;
+
       /// \brief Scale of link.
       public: ignition::math::Vector3d scale;
 

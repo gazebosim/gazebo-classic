@@ -82,6 +82,10 @@ LinkData::LinkData()
   sdf::initFile("link.sdf", this->linkSDF);
 
   this->scale = ignition::math::Vector3d::One;
+  this->inertiaIxx = 0;
+  this->inertiaIyy = 0;
+  this->inertiaIzz = 0;
+  this->mass = 0;
 
   this->inspector = new LinkInspector();
   this->inspector->setModal(false);
@@ -235,10 +239,9 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     volumeRatio = newVol / oldVol;
 
   // set new mass
-  sdf::ElementPtr massElem = inertialElem->GetElement("mass");
-  double mass = massElem->Get<double>();
-  double newMass = mass * volumeRatio;
-  massElem->Set(newMass);
+  double oldMass = this->mass;
+  double newMass = this->mass * volumeRatio;
+  this->mass = newMass;
   linkConfig->SetMass(newMass);
 
   // scale the inertia values
@@ -247,13 +250,9 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   // 3) compute new inertia values based on new size
 
   // get current inertia values
-  sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
-  sdf::ElementPtr ixxElem = inertiaElem->GetElement("ixx");
-  sdf::ElementPtr iyyElem = inertiaElem->GetElement("iyy");
-  sdf::ElementPtr izzElem = inertiaElem->GetElement("izz");
-  double ixx = ixxElem->Get<double>();
-  double iyy = iyyElem->Get<double>();
-  double izz = izzElem->Get<double>();
+  double ixx = this->inertiaIxx;
+  double iyy = this->inertiaIyy;
+  double izz = this->inertiaIzz;
 
   double newIxx = ixx;
   double newIyy = iyy;
@@ -274,7 +273,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     if (geomStr == "sphere")
     {
       // solve for r^2
-      double r2 = ixx / (mass * 0.4);
+      double r2 = ixx / (oldMass * 0.4);
 
       // compute new inertia values based on new mass and radius
       newIxx = newMass * 0.4 * (dInertiaScale.X() * dInertiaScale.X()) * r2;
@@ -284,8 +283,8 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     else if (geomStr == "cylinder")
     {
       // solve for r^2 and l^2
-      double r2 = izz / (mass * 0.5);
-      double l2 = (ixx / mass - 0.25 * r2) * 12.0;
+      double r2 = izz / (oldMass * 0.5);
+      double l2 = (ixx / oldMass - 0.25 * r2) * 12.0;
 
       // compute new inertia values based on new mass, radius and length
       newIxx = newMass * (0.25 * (dInertiaScale.X() * dInertiaScale.X() * r2) +
@@ -308,7 +307,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   {
     // solve for box inertia size: dx^2, dy^2, dz^2,
     // assuming solid box with uniform density
-    double mc = 12.0 / mass;
+    double mc = 12.0 / oldMass;
     double ixxMc = ixx * mc;
     double iyyMc = iyy * mc;
     double izzMc = izz * mc;
@@ -328,11 +327,25 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     newIzz = newMassConstant * (newDx2 + newDy2);
   }
 
+  // update inspector inertia
   linkConfig->SetInertiaMatrix(newIxx, newIyy, newIzz, 0, 0, 0);
 
+  // update local inertal variables
+  this->inertiaIxx = newIxx;
+  this->inertiaIyy = newIyy;
+  this->inertiaIzz = newIzz;
+
+  // update sdf
+  sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+  sdf::ElementPtr ixxElem = inertiaElem->GetElement("ixx");
+  sdf::ElementPtr iyyElem = inertiaElem->GetElement("iyy");
+  sdf::ElementPtr izzElem = inertiaElem->GetElement("izz");
   ixxElem->Set(newIxx);
   iyyElem->Set(newIyy);
   izzElem->Set(newIzz);
+
+  sdf::ElementPtr massElem = inertialElem->GetElement("mass");
+  massElem->Set(newMass);
 
   sdf::ElementPtr inertialPoseElem = inertialElem->GetElement("pose");
   ignition::math::Pose3d newPose =
@@ -369,8 +382,8 @@ void LinkData::Load(sdf::ElementPtr _sdf)
 
     if (inertialElem->HasElement("mass"))
     {
-      double mass = inertialElem->Get<double>("mass");
-      inertialMsg->set_mass(mass);
+      this->mass = inertialElem->Get<double>("mass");
+      inertialMsg->set_mass(this->mass);
     }
 
     if (inertialElem->HasElement("pose"))
@@ -383,12 +396,15 @@ void LinkData::Load(sdf::ElementPtr _sdf)
     if (inertialElem->HasElement("inertia"))
     {
       sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
-      inertialMsg->set_ixx(inertiaElem->Get<double>("ixx"));
+      this->inertiaIxx = inertiaElem->Get<double>("ixx");
+      this->inertiaIyy = inertiaElem->Get<double>("iyy");
+      this->inertiaIzz = inertiaElem->Get<double>("izz");
+      inertialMsg->set_ixx(this->inertiaIxx);
+      inertialMsg->set_iyy(this->inertiaIyy);
+      inertialMsg->set_izz(this->inertiaIzz);
       inertialMsg->set_ixy(inertiaElem->Get<double>("ixy"));
       inertialMsg->set_ixz(inertiaElem->Get<double>("ixz"));
-      inertialMsg->set_iyy(inertiaElem->Get<double>("iyy"));
       inertialMsg->set_iyz(inertiaElem->Get<double>("iyz"));
-      inertialMsg->set_izz(inertiaElem->Get<double>("izz"));
     }
   }
   if (_sdf->HasElement("self_collide"))
@@ -608,7 +624,19 @@ bool LinkData::Apply()
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
-  this->linkSDF = msgs::LinkToSDF(*linkConfig->GetData(), this->linkSDF);
+  msgs::Link *linkMsg = linkConfig->GetData();
+
+  // update link sdf
+  this->linkSDF = msgs::LinkToSDF(*linkMsg, this->linkSDF);
+
+  // update internal variables
+  msgs::Inertial *inertialMsg = linkMsg->mutable_inertial();
+  this->mass = inertialMsg->mass();
+  this->inertiaIxx = inertialMsg->izz();
+  this->inertiaIyy = inertialMsg->iyy();
+  this->inertiaIzz = inertialMsg->izz();
+
+  // update link visual pose
   this->linkVisual->SetPose(this->GetPose());
 
   std::vector<msgs::Visual *> visualUpdateMsgsTemp;

@@ -1201,7 +1201,7 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
   valueSpinBox->setRange(min, max);
   valueSpinBox->setSingleStep(0.01);
-  valueSpinBox->setDecimals(6);
+  valueSpinBox->setDecimals(8);
   valueSpinBox->setAlignment(Qt::AlignRight);
 
   // Unit
