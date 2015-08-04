@@ -2452,7 +2452,7 @@ bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
 
   rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
   rendering::VisualPtr vis = _visual->GetParent();
-  while (vis && vis != world)
+  while (vis)
   {
     if (vis->GetName() == this->GetName())
       return true;
@@ -2470,11 +2470,11 @@ bool Visual::IsDescendantOf(rendering::VisualPtr _visual)
 
   rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
   rendering::VisualPtr vis = this->GetParent();
-  while (vis && vis != world)
+  while (vis)
   {
     if (vis->GetName() == _visual->GetName())
       return true;
-    vis = this->GetParent();
+    vis = vis->GetParent();
   }
 
   return false;
