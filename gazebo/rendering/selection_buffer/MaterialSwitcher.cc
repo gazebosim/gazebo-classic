@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -68,7 +69,9 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
               Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
         // OGRE 1.9 changes the shared pointer definition
-        #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+        // But the 1.9 RC, which we're using on Windows, doesn't have the
+        // staticCast change.  It will be in the final release.
+        #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
         // Make sure we keep the same depth properties so that
         // certain overlay objects can be picked by the mouse.
         Ogre::Technique *newTechnique =

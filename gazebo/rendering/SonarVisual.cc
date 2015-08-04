@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
@@ -35,6 +41,8 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   SonarVisualPrivate *dPtr =
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VT_SENSOR;
+
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
@@ -43,22 +51,7 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   dPtr->sonarSub = dPtr->node->Subscribe(_topicName,
       &SonarVisual::OnMsg, this, true);
 
-  dPtr->sonarRay = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  dPtr->sonarRay->setMaterial("Gazebo/RedGlow");
-  dPtr->sonarRay->AddPoint(0, 0, 0);
-  dPtr->sonarRay->AddPoint(0, 0, 0);
-
-  // Make sure the meshes are in Ogre
-  this->InsertMesh("unit_cone");
-  Ogre::MovableObject *coneObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__SONAR_CONE__", "unit_cone"));
-  ((Ogre::Entity*)coneObj)->setMaterialName("Gazebo/BlueLaser");
-
-  dPtr->coneNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SONAR_CONE");
-  dPtr->coneNode->attachObject(coneObj);
-  dPtr->coneNode->setPosition(0, 0, 0);
+  dPtr->sonarRay = NULL;
 
   dPtr->connections.push_back(
       event::Events::ConnectPreRender(
@@ -79,6 +72,27 @@ SonarVisual::~SonarVisual()
 void SonarVisual::Load()
 {
   Visual::Load();
+
+  SonarVisualPrivate *dPtr =
+      reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
+
+  dPtr->sonarRay = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  dPtr->sonarRay->setMaterial("Gazebo/RedGlow");
+  dPtr->sonarRay->AddPoint(0, 0, 0);
+  dPtr->sonarRay->AddPoint(0, 0, 0);
+
+  // Make sure the meshes are in Ogre
+  this->InsertMesh("unit_cone");
+  Ogre::MovableObject *coneObj =
+    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+          this->GetName()+"__SONAR_CONE__", "unit_cone"));
+  ((Ogre::Entity*)coneObj)->setMaterialName("Gazebo/BlueLaser");
+
+  dPtr->coneNode =
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SONAR_CONE");
+  dPtr->coneNode->attachObject(coneObj);
+  dPtr->coneNode->setPosition(0, 0, 0);
+
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   this->SetCastShadows(false);
 }
@@ -124,12 +138,14 @@ void SonarVisual::Update()
     dPtr->sonarRay->SetPoint(0, math::Vector3(0, 0, rangeDelta * 0.5));
   }
 
-  math::Pose pose = msgs::Convert(dPtr->sonarMsg->sonar().world_pose());
+  ignition::math::Pose3d pose =
+    msgs::ConvertIgn(dPtr->sonarMsg->sonar().world_pose());
   this->SetPose(pose);
 
   if (dPtr->sonarMsg->sonar().has_contact())
   {
-    math::Vector3 pos = msgs::Convert(dPtr->sonarMsg->sonar().contact());
+    ignition::math::Vector3d pos =
+      msgs::ConvertIgn(dPtr->sonarMsg->sonar().contact());
     dPtr->sonarRay->SetPoint(1, pos);
   }
   else

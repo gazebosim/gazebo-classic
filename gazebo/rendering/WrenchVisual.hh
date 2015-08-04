@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class WrenchVisual WrenchVisual.hh rendering/rendering.hh
     /// \brief Visualization for sonar data.
-    class GAZEBO_VISIBLE WrenchVisual : public Visual
+    class GZ_RENDERING_VISIBLE WrenchVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.

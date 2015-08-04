@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics_dart Dart Physics
     /// \{
 
+    /// Forward declare private data class
+    class DARTMeshPrivate;
+
     /// \brief Triangle mesh collision helper class
-    class GAZEBO_VISIBLE DARTMesh
+    class GZ_PHYSICS_VISIBLE DARTMesh
     {
       /// \brief Constructor
       public: DARTMesh();
@@ -64,6 +67,10 @@ namespace gazebo
                    unsigned int _numVertices, unsigned int _numIndices,
                    DARTCollisionPtr _collision,
                    const math::Vector3 &_scale);
+
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTMeshPrivate *dataPtr;
     };
     /// \}
   }

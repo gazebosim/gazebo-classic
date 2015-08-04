@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace gazebo
     /// calls of the spheres (point lights), cones (spotlights) and quads
     /// (directional lights) after the GBuffer has been constructed
     template<typename techniquePolicy>
-    class GAZEBO_VISIBLE DeferredLightRenderOperation
+    class GZ_RENDERING_VISIBLE DeferredLightRenderOperation
       : public Ogre::CompositorInstance::RenderSystemOperation,
         public techniquePolicy
     {
@@ -233,7 +233,7 @@ namespace gazebo
     /// \brief The custom composition pass that is used for rendering the light
     /// geometry. This class needs to be registered with the CompositorManager
     template<typename techniquePolicy>
-    class GAZEBO_VISIBLE DeferredLightCompositionPass
+    class GZ_RENDERING_VISIBLE DeferredLightCompositionPass
       : public Ogre::CustomCompositionPass, public techniquePolicy
     {
       /// @copydoc CustomCompositionPass::createOperation

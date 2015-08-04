@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#include "ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"
 
 using namespace gazebo;

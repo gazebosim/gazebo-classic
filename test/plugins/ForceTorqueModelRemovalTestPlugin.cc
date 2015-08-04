@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,24 +63,24 @@ void ForceTorqueModelRemovalTestPlugin::Load(sensors::SensorPtr _sensor,
 void ForceTorqueModelRemovalTestPlugin::onUpdate(
     const gazebo::common::UpdateInfo & /*_info*/)
 {
-  gazebo::math::Vector3 force;
-  gazebo::math::Vector3 torque;
+  ignition::math::Vector3d force;
+  ignition::math::Vector3d torque;
 
   if ( parentSensor )
   {
-    force = this->parentSensor->GetForce();
-    torque = this->parentSensor->GetTorque();
+    force = this->parentSensor->Force();
+    torque = this->parentSensor->Torque();
 
     int i = 0;
 
     for (i = 0; i < 3; ++i)
     {
-      forcetorque_data[0+i] = force[i];
+      this->forcetorque_data[0+i] = force[i];
     }
 
     for (i = 0; i < 3; ++i)
     {
-      forcetorque_data[3+i] = torque[i];
+      this->forcetorque_data[3+i] = torque[i];
     }
   }
 

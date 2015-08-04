@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -47,6 +53,8 @@ std::ostringstream &FilterBase::Out(std::ostringstream &_stream,
       _stream << _state.GetRealTime().Double() << " ";
     else if (this->stamp == "wall")
       _stream << _state.GetWallTime().Double() << " ";
+    else if (this->stamp == "iterations")
+      _stream << _state.GetIterations() << " ";
     _stream.setf(flags);
   }
 
@@ -547,13 +555,14 @@ std::string StateFilter::Filter(const std::string &_stateString)
       << "<state world_name='" << state.GetName() << "'>\n"
       << "<sim_time>" << state.GetSimTime() << "</sim_time>\n"
       << "<real_time>" << state.GetRealTime() << "</real_time>\n"
-      << "<wall_time>" << state.GetWallTime() << "</wall_time>\n";
+      << "<wall_time>" << state.GetWallTime() << "</wall_time>\n"
+      << "<iterations>" << state.GetIterations() << "</iterations>\n";
   }
 
   result << this->filter.Filter(state);
 
   if (this->xmlOutput)
-    result << "</sdf></state>\n";
+    result << "</state></sdf>\n";
 
   this->prevTime = state.GetSimTime();
   return result.str();
@@ -908,16 +917,18 @@ std::string LogCommand::GetFileSizeStr(const std::string &_filename)
 /////////////////////////////////////////////////
 int LogCommand::GetChar()
 {
+# ifndef _WIN32
   struct termios oldt, newt;
-  int ch;
   tcgetattr(STDIN_FILENO, &oldt);
   newt = oldt;
   newt.c_lflag &= ~(ICANON | ECHO);
   tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  ch = getchar();
+  int ch = getchar();
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-
   return ch;
+# else
+  return 'q';
+# endif
 }
 
 /////////////////////////////////////////////////

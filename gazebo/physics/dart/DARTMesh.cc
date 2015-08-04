@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,17 @@
 #include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTMesh.hh"
 
+#include "gazebo/physics/dart/DARTMeshPrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Constructor of aiScene is missing so we define it here.
+// Constructor of aiScene is missing so we define it here. This is temporary
+// workaround. For further discussion, please see:
+// https://github.com/dartsim/dart/issues/451
+// https://github.com/dartsim/dart/issues/452
+// https://github.com/dartsim/dart/issues/453
 aiScene::aiScene()
 {
   mFlags = 0;
@@ -46,13 +52,14 @@ aiScene::aiScene()
 }
 
 //////////////////////////////////////////////////
-DARTMesh::DARTMesh()
+DARTMesh::DARTMesh() : dataPtr(new DARTMeshPrivate())
 {
 }
 
 //////////////////////////////////////////////////
 DARTMesh::~DARTMesh()
 {
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////

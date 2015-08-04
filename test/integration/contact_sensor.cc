@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define TOL 1e-4
 
@@ -28,19 +28,146 @@ using namespace gazebo;
 class ContactSensor : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
-  public: void EmptyWorld(const std::string &_physicsEngine);
+  /// \brief Test moving a model while in contact.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MoveTool(const std::string &_physicsEngine);
+
+  /// \brief Test multiple contact sensors on a single link.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MultipleSensors(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
+
+  /// \brief Callback for sensor subscribers in MultipleSensors test.
+  private: void Callback(const ConstContactsPtr &_msg);
 };
 
-void ContactSensor::EmptyWorld(const std::string &_physicsEngine)
+unsigned int g_messageCount = 0;
+
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::Callback(const ConstContactsPtr &/*_msg*/)
 {
-  Load("worlds/empty.world", false, _physicsEngine);
+  g_messageCount++;
 }
 
-TEST_P(ContactSensor, EmptyWorld)
+////////////////////////////////////////////////////////////////////////
+// Test moving a model while in contact
+// addresses a failure in pull request #1610 for simbody
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::MoveTool(const std::string &_physicsEngine)
 {
-  EmptyWorld(GetParam());
+  Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
+
+  const std::string modelName("sphere");
+  const math::Vector3 pos(0, 0, 1.8);
+  const math::Vector3 v30;
+  const double radius = 0.5;
+  SpawnSphere(modelName, pos, v30, v30, radius);
+
+  // advertise on "~/model/modify"
+  // so that we can move the sphere
+  transport::PublisherPtr modelPub =
+    this->node->Advertise<msgs::Model>("~/model/modify");
+
+  // Step forward to allow the sphere to fall
+  world->Step(200);
+
+  // Try moving the model
+  auto model = world->GetModel(modelName);
+  ASSERT_TRUE(model != NULL);
+
+  auto pose = model->GetWorldPose();
+  pose.pos.x += 0.2;
+  pose.pos.y += 0.2;
+
+  msgs::Model msg;
+  msg.set_name(modelName);
+  msg.set_id(model->GetId());
+  msgs::Set(msg.mutable_pose(), pose.Ign());
+  modelPub->Publish(msg);
+
+  while (pose != model->GetWorldPose())
+  {
+    world->Step(1);
+    common::Time::MSleep(1);
+  }
+
+  world->Step(10);
+
+  // it just needs to exit successfully in order to pass.
+}
+
+TEST_P(ContactSensor, MoveTool)
+{
+  MoveTool(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+// Test having multiple contact sensors under a single link.
+// https://bitbucket.org/osrf/gazebo/issue/960
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
+{
+  Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
+
+  const std::string contactSensorName1("box_contact");
+  const std::string contactSensorName2("box_contact2");
+
+  {
+    sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
+    sensors::ContactSensorPtr contactSensor1 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
+    ASSERT_TRUE(contactSensor1 != NULL);
+  }
+
+  {
+    sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
+    sensors::ContactSensorPtr contactSensor2 =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
+    ASSERT_TRUE(contactSensor2 != NULL);
+  }
+
+  // There should be 5 topics advertising Contacts messages
+  std::list<std::string> topicsExpected;
+  std::string prefix = "/gazebo/default/";
+  topicsExpected.push_back(prefix+"physics/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact2/contacts");
+  topicsExpected.push_back(prefix+"sensor_box/link/box_contact2");
+  topicsExpected.sort();
+
+  // Sleep to ensure transport topics are all advertised
+  common::Time::MSleep(100);
+  std::list<std::string> topics =
+    transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  topics.sort();
+  EXPECT_FALSE(topics.empty());
+  EXPECT_EQ(topics.size(), topicsExpected.size());
+  EXPECT_EQ(topics, topicsExpected);
+
+  // We should expect them all to publish.
+  for (auto const &topic : topics)
+  {
+    gzdbg << "Listening to " << topic << std::endl;
+    g_messageCount = 0;
+    transport::SubscriberPtr sub = this->node->Subscribe(topic,
+      &ContactSensor::Callback, this);
+
+    const unsigned int steps = 50;
+    world->Step(steps);
+    common::Time::MSleep(steps);
+    EXPECT_GT(g_messageCount, steps / 2);
+  }
+}
+
+TEST_P(ContactSensor, MultipleSensors)
+{
+  MultipleSensors(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,12 +180,6 @@ TEST_P(ContactSensor, EmptyWorld)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::StackTest(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Aborting test for Simbody, see issue #865.\n";
-    return;
-  }
-
   if (_physicsEngine == "dart")
   {
     gzerr << "Aborting test for DART, see issue #1173.\n";
@@ -103,13 +224,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   sensors::ContactSensorPtr contactSensor01 =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
 
-  ASSERT_TRUE(contactSensor01);
+  ASSERT_TRUE(contactSensor01 != NULL);
 
   sensors::SensorPtr sensor02 = sensors::get_sensor(contactSensorName02);
   sensors::ContactSensorPtr contactSensor02 =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
 
-  ASSERT_TRUE(contactSensor02);
+  ASSERT_TRUE(contactSensor02 != NULL);
 
   sensors::SensorManager::Instance()->Init();
   sensors::SensorManager::Instance()->RunThreads();
@@ -130,8 +251,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   physics::ModelPtr contactModel01 = world->GetModel(modelName01);
   physics::ModelPtr contactModel02 = world->GetModel(modelName02);
-  ASSERT_TRUE(contactModel01);
-  ASSERT_TRUE(contactModel02);
+  ASSERT_TRUE(contactModel01 != NULL);
+  ASSERT_TRUE(contactModel02 != NULL);
 
   std::vector<physics::ModelPtr> models;
   models.push_back(contactModel01);
@@ -153,6 +274,10 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     world->Step(1);
     contacts01 = contactSensor01->GetContacts();
     contacts02 = contactSensor02->GetContacts();
+    // gzdbg << "steps[" << steps
+    //       << "] contacts01[" << contacts01.contact_size()
+    //       << "] contacts02[" << contacts02.contact_size()
+    //       << "] to be > 0\n";
   }
   EXPECT_GT(steps, 0);
 
@@ -177,7 +302,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
     unsigned int ColInd = 0;
     physics::CollisionPtr col = models[k]->GetLink()->GetCollision(ColInd);
-    ASSERT_TRUE(col);
+    ASSERT_TRUE(col != NULL);
 
     // calculate tolerance based on magnitude of force
     // Uncomment lines below once we are able to accurately determine the
@@ -297,12 +422,6 @@ TEST_P(ContactSensor, StackTest)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Aborting test for Simbody, see issue #865.\n";
-    return;
-  }
-
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -329,7 +448,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   sensors::ContactSensorPtr contactSensor =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
 
-  ASSERT_TRUE(contactSensor);
+  ASSERT_TRUE(contactSensor != NULL);
 
   sensors::SensorManager::Instance()->Init();
   sensors::SensorManager::Instance()->RunThreads();
@@ -344,15 +463,19 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   EXPECT_TRUE(contactSensor->IsActive());
 
   physics::ModelPtr contactModel = world->GetModel(modelName);
-  ASSERT_TRUE(contactModel);
+  ASSERT_TRUE(contactModel != NULL);
 
   double gravityZ = -9.8;
   physics->SetGravity(math::Vector3(0, 0, gravityZ));
 
   msgs::Contacts contacts;
 
-  physics->SetContactMaxCorrectingVel(0);
-  physics->SetParam("iters", 100);
+  if (_physicsEngine == "_ode" || _physicsEngine == "bullet")
+  {
+    EXPECT_TRUE(physics->SetParam("iters", 100));
+    if (_physicsEngine == "ode")
+      EXPECT_TRUE(physics->SetParam("contact_max_correcting_vel", 0));
+  }
 
   world->Step(1);
 
@@ -370,7 +493,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   unsigned int ColInd = 0;
   physics::CollisionPtr col = contactModel->GetLink()->GetCollision(ColInd);
-  ASSERT_TRUE(col);
+  ASSERT_TRUE(col != NULL);
 
   // double tol = 2e-1;
   // loop through contact collision pairs

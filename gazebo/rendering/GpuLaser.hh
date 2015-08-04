@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A laser sensor using OpenGL
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
- */
-
-#ifndef _GPULASER_HH_
-#define _GPULASER_HH_
+#ifndef _GAZEBO_RENDERING_GPULASER_HH_
+#define _GAZEBO_RENDERING_GPULASER_HH_
 
 #include <string>
 #include <vector>
@@ -65,7 +60,7 @@ namespace gazebo
 
     /// \class GpuLaser GpuLaser.hh rendering/rendering.hh
     /// \brief GPU based laser distance sensor
-    class GAZEBO_VISIBLE GpuLaser
+    class GZ_RENDERING_VISIBLE GpuLaser
       : public Camera, public Ogre::RenderObjectListener
     {
       /// \brief Constructor
@@ -279,10 +274,10 @@ namespace gazebo
       protected: double cvfov;
 
       /// \brief Near clip plane.
-      protected: double near;
+      protected: double nearClip;
 
       /// \brief Far clip plane.
-      protected: double far;
+      protected: double farClip;
 
       /// \brief True if the sensor is horizontal only.
       protected: bool isHorizontal;

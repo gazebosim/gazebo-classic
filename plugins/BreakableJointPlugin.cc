@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,11 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "BreakableJointPlugin.hh"
@@ -52,8 +57,8 @@ void BreakableJointPlugin::OnUpdate(msgs::WrenchStamped _msg)
 {
   if (this->parentJoint)
   {
-    math::Vector3 force = msgs::Convert(_msg.wrench().force());
-    if (force.GetLength() > this->breakingForce)
+    ignition::math::Vector3d force = msgs::ConvertIgn(_msg.wrench().force());
+    if (force.Length() > this->breakingForce)
     {
       this->worldConnection = event::Events::ConnectWorldUpdateBegin(
         boost::bind(&BreakableJointPlugin::OnWorldUpdate, this));

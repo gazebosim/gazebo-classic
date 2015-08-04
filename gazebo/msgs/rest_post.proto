@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestPost
+/// \brief A message to POST data on a REST service. The route (ex /news) and
+/// the content of the message in JSON format are specified.
+
+message RestPost
+{
+  required string route = 1;
+  required string json  = 2;
+}

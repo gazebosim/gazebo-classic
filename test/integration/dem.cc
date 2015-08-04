@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  *
 */
 
+#include <ignition/math/Angle.hh>
 #include "gazebo/common/Dem.hh"
-#include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/GpsSensor.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 #define DOUBLE_TOL 1e-3
 
@@ -32,7 +32,7 @@ class Dem_TEST : public ServerFixture
 /// \brief Test the integration between GPS and a DEM terrain.
 TEST_F(Dem_TEST, GPS)
 {
-  math::Angle latitude, longitude;
+  ignition::math::Angle latitude, longitude;
   double elevation;
   common::Dem dem;
   boost::filesystem::path path = "file://media/dem/volcano.tif";
@@ -59,8 +59,8 @@ TEST_F(Dem_TEST, GPS)
   dem.GetGeoReferenceOrigin(latitude, longitude);
   elevation = dem.GetElevation(0.0, 0.0);
 
-  EXPECT_NEAR(sensor->GetLatitude().Degree(), latitude.Degree(), DOUBLE_TOL);
-  EXPECT_NEAR(sensor->GetLongitude().Degree(), longitude.Degree(), DOUBLE_TOL);
+  EXPECT_NEAR(sensor->Latitude().Degree(), latitude.Degree(), DOUBLE_TOL);
+  EXPECT_NEAR(sensor->Longitude().Degree(), longitude.Degree(), DOUBLE_TOL);
   EXPECT_NEAR(sensor->GetAltitude(), elevation, 1);
 }
 #endif

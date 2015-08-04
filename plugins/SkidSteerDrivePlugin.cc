@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,11 +37,12 @@ SkidSteerDrivePlugin::SkidSteerDrivePlugin()
 int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
 {
   // Bounds checking on index
-  if (_index < 0 or _index >= NUMBER_OF_WHEELS)
+  if (_index < 0 || _index >= NUMBER_OF_WHEELS)
   {
     gzerr << "Joint index " << _index <<  " out of bounds [0, "
           << NUMBER_OF_WHEELS << "] in model " << this->model->GetName()
           << "." << std::endl;
+    return 1;
   }
 
   // Find the specified joint and add it to out list
@@ -77,7 +78,12 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
     return;
 
   if (_sdf->HasElement("max_force"))
+  {
     this->maxForce = _sdf->GetElement("max_force")->Get<double>();
+    gzwarn << "The MaxForce API is deprecated in Gazebo, "
+           << "and the max_force tag is no longer used in this plugin."
+           << std::endl;
+  }
   else
     gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";
 
@@ -123,11 +129,8 @@ void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
   // gzmsg << "cmd_vel: " << msg->position().x() << ", "
   //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
 
-  for (int i = 0; i < NUMBER_OF_WHEELS; i++)
-    this->joints[i]->SetMaxForce(0, this->maxForce);
-
   double vel_lin = _msg->position().x() / this->wheelRadius;
-  double vel_rot = -1 * msgs::Convert(_msg->orientation()).GetAsEuler().z
+  double vel_rot = -1 * msgs::ConvertIgn(_msg->orientation()).Euler().Z()
                    * (this->wheelSeparation / this->wheelRadius);
 
   this->joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);

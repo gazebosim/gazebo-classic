@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace gazebo
     /// all these out is a tedious job. Of course it is possible to always use
     /// the material with all features, but that might result in large, slow
     /// shader programs. This class provides an efficient solution to that.
-    class GAZEBO_VISIBLE MaterialGenerator
+    class GZ_RENDERING_VISIBLE MaterialGenerator
     {
       /// Bitfield used to signify a material permutations
       public: typedef uint32_t Perm;
@@ -56,7 +56,7 @@ namespace gazebo
       /// fragment shader and vertex shader). These methods are only called
       /// once for every permutation, after which the result is stored and
       /// re-used.
-      public: class Impl
+      public: class GZ_RENDERING_VISIBLE Impl
               {
                 public: virtual ~Impl();
                 public: virtual Ogre::GpuProgramPtr GenerateVertexShader(

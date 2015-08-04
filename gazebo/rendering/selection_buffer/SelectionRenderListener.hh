@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace gazebo
     // the compositor MaterialManager.Listener should NOT be running all the
     // time - rather only when we're specifically rendering the target that
     // needs it
-    class GAZEBO_VISIBLE SelectionRenderListener :
+    class GZ_RENDERING_VISIBLE SelectionRenderListener :
       public Ogre::RenderTargetListener
     {
       /// \brief Constructor

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
@@ -31,10 +31,12 @@ TEST_F(Issue1208Test, Reset)
 {
   Load("worlds/issue_1208.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics);
+  ASSERT_TRUE(physics != NULL);
+
+  world->Step(1);
 
   // There is a WorldPlugin attached to this world.
   // It has a counter that increments with each call of Init.

@@ -1,22 +1,49 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
+link_directories(
+  ${CCD_LIBRARY_DIRS}
+  ${Boost_LIBRARY_DIRS}
+)
+
+# Build in ODE by default
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
 add_subdirectory(ode)
 
+# Add Bullet support if present
 if (HAVE_BULLET)
+  include_directories(${BULLET_INCLUDE_DIRS})
+  link_directories(${BULLET_LIBRARY_DIRS})
+  add_definitions(${BULLET_CFLAGS})
   add_subdirectory(bullet)
 endif()
+
+# Add DART support if present
 if (HAVE_DART)
   add_subdirectory(dart)
+
+  include_directories(${DARTCore_INCLUDE_DIRS})
+  link_directories(${DARTCore_LIBRARY_DIRS})
 endif()
 
+# Add Simbody support if present
 if (HAVE_SIMBODY)
   add_subdirectory(simbody)
+
+  include_directories(SYSTEM ${Simbody_INCLUDE_DIR})
+  link_directories(${Simbody_LIB_DIR})
+  add_definitions(${Simbody_CFLAGS})
 endif()
 
-if (HAVE_GDAL)
-  include_directories(${GDAL_INCLUDE_DIR})
+include_directories(${TBB_INCLUDEDIR})
+
+# Be sure to locate this definition *after* add_subdirectories
+# in order to get the proper visibility when building libs
+if (WIN32)
+  add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
+  include_directories(${libdl_include_dir})
 endif()
 
-set (sources
+set (sources ${sources}
   Actor.cc
   Base.cc
   BoxShape.cc
@@ -44,6 +71,8 @@ set (sources
   PhysicsFactory.cc
   PlaneShape.cc
   PolylineShape.cc
+  Population.cc
+  PresetManager.cc
   RayShape.cc
   Road.cc
   Shape.cc
@@ -65,6 +94,7 @@ set (headers
   ContactManager.hh
   CylinderShape.hh
   Entity.hh
+  FixedJoint.hh
   HeightmapShape.hh
   Hinge2Joint.hh
   HingeJoint.hh
@@ -89,6 +119,8 @@ set (headers
   PhysicsTypes.hh
   PlaneShape.hh
   PolylineShape.hh
+  Population.hh
+  PresetManager.hh
   RayShape.hh
   Road.hh
   Shape.hh
@@ -114,21 +146,27 @@ gz_add_library(gazebo_physics ${sources})
 target_link_libraries(gazebo_physics
   gazebo_common
   gazebo_util
-  gazebo_physics_ode
+  gazebo_ode
+  gazebo_opcode
 )
 
+# Link in Bullet support if present
 if (HAVE_BULLET)
-  target_link_libraries(gazebo_physics gazebo_physics_bullet)
-endif()
-if (HAVE_DART)
-  target_link_libraries(gazebo_physics gazebo_physics_dart)
+  target_link_libraries(gazebo_physics ${BULLET_LIBRARIES})
 endif()
 
+# Link in DART support if present
+if (HAVE_DART)
+  target_link_libraries(gazebo_physics ${DARTCore_LIBRARIES})
+endif()
+
+# Link in Simbody support if present
 if (HAVE_SIMBODY)
-  target_link_libraries(gazebo_physics gazebo_physics_simbody)
+  target_link_libraries(gazebo_physics ${Simbody_LIBRARIES})
 endif()
 
 if (HAVE_GDAL)
+  include_directories(${GDAL_INCLUDE_DIR})
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
 
@@ -145,6 +183,7 @@ set (gtest_sources
   Inertial_TEST.cc
   JointController_TEST.cc
   PhysicsEngine_TEST.cc
+  PresetManager_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
 )

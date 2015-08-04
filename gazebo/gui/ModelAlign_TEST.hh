@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,12 @@ class ModelAlign_TEST : public QTestFixture
 
   /// \brief Test aligning models at max z.
   private slots: void AlignZMax();
+
+  /// \brief Test aligning models with non unit scale.
+  private slots: void AlignScale();
+
+  /// \brief Test if the highlighting is properly reset for nested visuals.
+  private slots: void SetHighlighted();
 };
 
 #endif

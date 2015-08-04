@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GPSSENSOR_HH_
-#define _GPSSENSOR_HH_
+#ifndef _GAZEBO_GPSSENSOR_HH_
+#define _GAZEBO_GPSSENSOR_HH_
 
 #include <string>
 
@@ -64,27 +63,27 @@ namespace gazebo
 
       /// \brief Accessor for current longitude angle
       /// \return Current longitude angle.
-      public: math::Angle GetLongitude() const;
+      /// \deprecated See Longitude() function that return an
+      /// ignition::math::Angle object.
+      public: math::Angle GetLongitude() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Accessor for current longitude angle
+      /// \return Current longitude angle.
+      public: ignition::math::Angle Longitude() const;
 
       /// \brief Accessor for current latitude angle
       /// \return Current latitude angle.
-      public: math::Angle GetLatitude() const;
+      /// \deprecated See Latitude() function that return an
+      /// ignition::math::Angle object.
+      public: math::Angle GetLatitude() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Accessor for current latitude angle
+      /// \return Current latitude angle.
+      public: ignition::math::Angle Latitude() const;
 
       /// \brief Accessor for current altitude
       /// \return Current altitude above sea level.
       public: double GetAltitude() const;
-
-      /// \brief Noise attributes for horizontal position measurement.
-      private: NoisePtr horizontalPositionNoise;
-
-      /// \brief Noise attributes for vertical position measurement.
-      private: NoisePtr verticalPositionNoise;
-
-      /// \brief Noise attributes for horizontal velocity measurement.
-      private: NoisePtr horizontalVelocityNoise;
-
-      /// \brief Noise attributes for vertical velocity measurement.
-      private: NoisePtr verticalVelocityNoise;
 
       /// \brief GPS data publisher.
       private: transport::PublisherPtr gpsPub;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,20 @@
  * Date: 8 May 2003
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_GDAL
-# include <gdal/gdalwarper.h>
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wfloat-equal"
+# include <gdalwarper.h>
+# include <gdal_priv.h>
+# pragma GCC diagnostic pop
 #endif
 
 #include <algorithm>
@@ -123,7 +133,7 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 
   if (sphericalCoordinates)
   {
-    math::Angle latitude, longitude;
+    ignition::math::Angle latitude, longitude;
     double elevation;
 
     this->dem.GetGeoReferenceOrigin(latitude, longitude);
@@ -239,7 +249,7 @@ void HeightmapShape::Init()
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
-      this->GetSize(), this->scale, this->flipY, this->heights);
+      this->GetSize().Ign(), this->scale.Ign(), this->flipY, this->heights);
 }
 
 //////////////////////////////////////////////////
@@ -286,8 +296,8 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
     }
   }
 
-  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
+  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize().Ign());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos().Ign());
   _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
 }
 
@@ -382,4 +392,10 @@ common::Image HeightmapShape::GetImage() const
 
   delete [] imageData;
   return result;
+}
+
+//////////////////////////////////////////////////
+double HeightmapShape::ComputeVolume() const
+{
+  return 0;
 }

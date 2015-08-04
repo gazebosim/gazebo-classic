@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@
 #define _WALL_INSPECTOR_DIALOG_HH_
 
 #include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+#include "gazebo/gui/building/BaseInspectorDialog.hh"
 
 namespace gazebo
 {
@@ -31,7 +33,8 @@ namespace gazebo
 
     /// \class WallInspectorDialog WallInspectorDialog.hh
     /// \brief Dialog for configuring a wall item.
-    class GAZEBO_VISIBLE WallInspectorDialog : public QDialog
+    class GZ_GUI_BUILDING_VISIBLE WallInspectorDialog
+      : public BaseInspectorDialog
     {
       Q_OBJECT
 
@@ -62,10 +65,6 @@ namespace gazebo
       /// \return Wall thickness in pixels.
       public: double GetThickness() const;
 
-      /// \brief Get the material of the wall.
-      /// \return Wall material.
-      public: std::string GetMaterial() const;
-
       /// \brief Set the name of the wall.
       /// \param[in] _name Name to set the wall to.
       public: void SetName(const std::string &_name);
@@ -90,10 +89,6 @@ namespace gazebo
       /// \brief Set the thickness of the wall.
       /// \param[in] _thickness Thickness of wall in pixels.
       public: void SetThickness(double _thickness);
-
-      /// \brief Set the material of the wall.
-      /// \param[in] _material New wall material to use.
-      public: void SetMaterial(const std::string &_material);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -131,9 +126,6 @@ namespace gazebo
 
       /// \brief Spin box for configuring the length of the wall segment.
       private: QDoubleSpinBox *lengthSpinBox;
-
-      /// \brief Combo box for selecting the material of the wall to use.
-      private: QComboBox *materialComboBox;
 
       /// \brief Label that holds the name of the wall.
       private: QLabel* wallNameLabel;

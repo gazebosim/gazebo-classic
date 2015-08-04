@@ -4,25 +4,28 @@ package gazebo.msgs;
 /// \interface Sensor 
 /// \brief Information about a sensor element
 
-
 import "pose.proto";
 import "camerasensor.proto";
 import "raysensor.proto";
 import "contactsensor.proto";
+import "logical_camera_sensor.proto";
 
 message Sensor
 {
-  required string name             = 1;
-  optional uint32 id               = 2;
-  required string parent           = 3;
-  required uint32 parent_id        = 4;
-  required string type             = 5;
-  optional bool always_on          = 6;
-  optional double update_rate      = 7;
-  optional Pose pose               = 8;
-  optional CameraSensor camera     = 9;
-  optional RaySensor ray           = 10;
-  optional ContactSensor contact   = 11;
-  optional bool visualize          = 12;
-  optional string topic            = 13;
+  required string name            = 1;
+  optional uint32 id              = 2;
+  required string parent          = 3;
+  required uint32 parent_id       = 4;
+  required string type            = 5;
+  optional bool always_on         = 6;
+  optional double update_rate     = 7;
+  optional Pose pose              = 8;
+  optional CameraSensor camera    = 9;
+  optional RaySensor ray          = 10;
+  optional ContactSensor contact  = 11;
+  optional bool visualize         = 12;
+  optional string topic           = 13;
+
+  /// \brief Description of a logical camera sensor
+  optional LogicalCameraSensor logical_camera = 14;
 }

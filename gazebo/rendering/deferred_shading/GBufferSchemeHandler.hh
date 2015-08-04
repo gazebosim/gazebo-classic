@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace gazebo
     /// @note This does not support all the possible rendering techniques
     /// out there. in order to support more, either expand this class or
     /// specify the techniques in the materials.
-    class GAZEBO_VISIBLE GBufferSchemeHandler :
+    class GZ_RENDERING_VISIBLE GBufferSchemeHandler :
       public Ogre::MaterialManager::Listener
     {
       public: GBufferSchemeHandler(GBufferMaterialGenerator::GBufferType _type)

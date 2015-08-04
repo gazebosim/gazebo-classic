@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace gazebo
     // XXX Could make this a singleton/make it private to the
     // DeferredShadingSystem e.g.
     template<class techniquePolicy>
-    class GAZEBO_VISIBLE AmbientLight
+    class GZ_RENDERING_VISIBLE AmbientLight
       : public Ogre::SimpleRenderable, public techniquePolicy
     {
       /// \brief Constructor

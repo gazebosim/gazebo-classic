@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace gazebo
   {
     /// Class for handling materials who did not specify techniques for the
     /// merging step of deferred/inferred lighting.
-    class GAZEBO_VISIBLE MergeSchemeHandler :
+    class GZ_RENDERING_VISIBLE MergeSchemeHandler :
       public Ogre::MaterialManager::Listener
     {
       public: MergeSchemeHandler(bool _useDSF) : useDSF(_useDSF)

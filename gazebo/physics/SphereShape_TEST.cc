@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,18 +44,18 @@ TEST_F(SphereShapeTest, Scale)
 
   physics::SphereShapePtr sphere(
       new physics::SphereShape(physics::CollisionPtr()));
-  sdf::ElementPtr elem = sphereSDF->root;
-  ASSERT_TRUE(elem);
+  sdf::ElementPtr elem = sphereSDF->Root();
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("sphere");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   sphere->Load(elem);
 
   // Test scaling with unit size
@@ -109,6 +109,53 @@ TEST_F(SphereShapeTest, Scale)
   sphere->SetScale(math::Vector3(-1.0, -2.0, -3.0));
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 1.25);
+}
+
+TEST_F(SphereShapeTest, Volume)
+{
+  std::ostringstream sphereStr;
+  sphereStr << "<sdf version ='" << SDF_VERSION << "'>"
+    << "<model name='model'>"
+    << "<link name ='link'>"
+    <<   "<collision name ='collision'>"
+    <<     "<geometry>"
+    <<       "<sphere>"
+    <<         "<radius>1.0</radius>"
+    <<       "</sphere>"
+    <<     "</geometry>"
+    <<   "</collision>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  sdf::SDFPtr sphereSDF(new sdf::SDF);
+  sphereSDF->SetFromString(sphereStr.str());
+
+  physics::SphereShapePtr sphere(
+      new physics::SphereShape(physics::CollisionPtr()));
+  sdf::ElementPtr elem = sphereSDF->Root();
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("model");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("link");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("collision");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("geometry");
+  ASSERT_TRUE(elem != NULL);
+  elem = elem->GetElement("sphere");
+  ASSERT_TRUE(elem != NULL);
+  sphere->Load(elem);
+
+  EXPECT_DOUBLE_EQ(sphere->ComputeVolume(), 4*M_PI/3);
+
+  sphere->SetRadius(2);
+
+  EXPECT_DOUBLE_EQ(sphere->ComputeVolume(), 4*M_PI*8/3);
+
+  // The bounding box approximation should be 0 because the Shape has no
+  // Collision parent
+  EXPECT_DOUBLE_EQ(sphere->Shape::ComputeVolume(), 0);
 }
 
 int main(int argc, char **argv)

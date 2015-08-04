@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@
 #define _STAIRS_INSPECTOR_DIALOG_HH_
 
 #include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+#include "gazebo/gui/building/BaseInspectorDialog.hh"
 
 namespace gazebo
 {
@@ -31,7 +33,8 @@ namespace gazebo
 
     /// \class StairsInspectorDialog StairsInspectorDialog.hh
     /// \brief Dialog for configuring a staircase item.
-    class GAZEBO_VISIBLE StairsInspectorDialog : public QDialog
+    class GZ_GUI_BUILDING_VISIBLE StairsInspectorDialog
+      : public BaseInspectorDialog
     {
       Q_OBJECT
 

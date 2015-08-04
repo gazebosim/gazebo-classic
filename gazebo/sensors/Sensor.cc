@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all sensors
- * Author: Nathan Koenig
- * Date: 25 May 2007
- */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <sdf/sdf.hh>
 
@@ -31,10 +32,13 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/Distortion.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/LogicalCameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -78,9 +82,7 @@ Sensor::~Sensor()
     this->sdf->Reset();
   this->sdf.reset();
   this->connections.clear();
-
-  for (unsigned int i = 0; i < this->noises.size(); ++i)
-    this->noises[i].reset();
+  this->noises.clear();
 }
 
 //////////////////////////////////////////////////
@@ -95,7 +97,7 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->Get<math::Pose>("pose");
+    this->pose = this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
   if (this->sdf->Get<bool>("always_on"))
@@ -228,8 +230,8 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
-  for (unsigned int i= 0; i < this->noises.size(); ++i)
-    this->noises[i]->Fini();
+  for (auto &it : this->noises)
+    it.second->Fini();
 
   this->active = false;
   this->plugins.clear();
@@ -286,6 +288,12 @@ bool Sensor::IsActive()
 
 //////////////////////////////////////////////////
 math::Pose Sensor::GetPose() const
+{
+  return this->Pose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Sensor::Pose() const
 {
   return this->pose;
 }
@@ -350,17 +358,39 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   _msg.set_type(this->GetType());
   _msg.set_parent(this->GetParentName());
   _msg.set_parent_id(this->GetParentId());
-  msgs::Set(_msg.mutable_pose(), this->GetPose());
+  msgs::Set(_msg.mutable_pose(), this->Pose());
 
   _msg.set_visualize(this->GetVisualize());
   _msg.set_topic(this->GetTopic());
 
-  if (this->GetType() == "camera")
+  if (this->GetType() == "logical_camera")
+  {
+    LogicalCameraSensor *camSensor = static_cast<LogicalCameraSensor*>(this);
+    msgs::LogicalCameraSensor *camMsg = _msg.mutable_logical_camera();
+    camMsg->set_near(camSensor->Near());
+    camMsg->set_far(camSensor->Far());
+    camMsg->set_horizontal_fov(camSensor->HorizontalFOV().Radian());
+    camMsg->set_aspect_ratio(camSensor->AspectRatio());
+  }
+  else if (this->GetType() == "camera")
   {
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
     camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
+    rendering::DistortionPtr distortion =
+        camSensor->GetCamera()->GetDistortion();
+    if (distortion)
+    {
+      msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
+      distortionMsg->set_k1(distortion->GetK1());
+      distortionMsg->set_k2(distortion->GetK2());
+      distortionMsg->set_k3(distortion->GetK3());
+      distortionMsg->set_p1(distortion->GetP1());
+      distortionMsg->set_p2(distortion->GetP2());
+      distortionMsg->mutable_center()->set_x(distortion->GetCenter().x);
+      distortionMsg->mutable_center()->set_y(distortion->GetCenter().y);
+    }
   }
 }
 
@@ -379,12 +409,71 @@ SensorCategory Sensor::GetCategory() const
 //////////////////////////////////////////////////
 NoisePtr Sensor::GetNoise(unsigned int _index) const
 {
-  if (_index >= this->noises.size())
+  // By default, there is no noise
+  SensorNoiseType noiseType = NO_NOISE;
+
+  // Camera mapping
+  if (this->GetType().compare("camera") == 0)
   {
-    gzerr << "Get noise index out of range" << std::endl;
+    noiseType = CAMERA_NOISE;
+  }
+  // GpuRay mapping
+  else if (this->GetType().compare("gpu_ray") == 0)
+  {
+    noiseType = GPU_RAY_NOISE;
+  }
+  // RaySensor mapping
+  else if (this->GetType().compare("ray") == 0)
+  {
+    noiseType = RAY_NOISE;
+  }
+  // GpsSensor mapping
+  else if (this->GetType().compare("gps") == 0)
+  {
+    switch (_index)
+    {
+      case 0:
+        noiseType = GPS_POSITION_LATITUDE_NOISE_METERS;
+        break;
+      case 1:
+        noiseType = GPS_POSITION_LONGITUDE_NOISE_METERS;
+        break;
+      case 2:
+        noiseType = GPS_POSITION_ALTITUDE_NOISE_METERS;
+        break;
+      case 3:
+        noiseType = GPS_VELOCITY_LATITUDE_NOISE_METERS;
+        break;
+      case 4:
+        noiseType = GPS_VELOCITY_LONGITUDE_NOISE_METERS;
+        break;
+      case 5:
+        noiseType = GPS_VELOCITY_ALTITUDE_NOISE_METERS;
+        break;
+      default:
+        noiseType = NO_NOISE;
+        break;
+    }
+  }
+  // Special case: unlimited number of multi-camera noise streams
+  else if (this->GetType().compare("multicamera") == 0)
+  {
+    if (this->noises.find(_index) != this->noises.end())
+      return this->noises.at(_index);
+  }
+
+  return this->GetNoise(noiseType);
+}
+
+//////////////////////////////////////////////////
+NoisePtr Sensor::GetNoise(const SensorNoiseType _type) const
+{
+  if (this->noises.find(_type) == this->noises.end())
+  {
+    gzerr << "Get noise index not valid" << std::endl;
     return NoisePtr();
   }
-  return this->noises[_index];
+  return this->noises.at(_type);
 }
 
 //////////////////////////////////////////////////

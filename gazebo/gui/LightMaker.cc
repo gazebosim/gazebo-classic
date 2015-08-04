@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <iostream>
 #include <sstream>
@@ -99,6 +105,7 @@ bool LightMaker::Init()
 
   this->light.reset(new rendering::Light(scene));
   this->light->Load();
+  scene->AddLight(this->light);
 
   this->light->SetLightType(this->lightTypename);
   this->light->SetPosition(math::Vector3(0, 0, 1));
@@ -150,9 +157,9 @@ void LightMaker::OnMousePush(const common::MouseEvent &/*_event*/)
 void LightMaker::CreateTheEntity()
 {
   msgs::Set(this->msg.mutable_pose()->mutable_position(),
-            this->light->GetPosition());
+            this->light->GetPosition().Ign());
   msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            ignition::math::Quaterniond());
   this->lightPub->Publish(this->msg);
   this->camera.reset();
 }
@@ -160,7 +167,7 @@ void LightMaker::CreateTheEntity()
 /////////////////////////////////////////////////
 void LightMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
+  if (_event.Button() == common::MouseEvent::LEFT && !_event.Dragging())
   {
     this->CreateTheEntity();
     this->Stop();
@@ -175,7 +182,7 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
   math::Vector3 origin1, dir1, p1;
 
   // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+  this->camera->GetCameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
                                        origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
@@ -183,22 +190,13 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
 
   double dist1 = plane.Distance(origin1, dir1);
 
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
+  // Calculate position
   p1 = origin1 + dir1 * dist1;
 
-  if (!_event.shift)
-  {
-    if (ceil(p1.x) - p1.x <= .4)
-      p1.x = ceil(p1.x);
-    else if (p1.x - floor(p1.x) <= .4)
-      p1.x = floor(p1.x);
+  // Get snap point
+  if (!_event.Shift())
+    p1 = this->GetSnappedPoint(p1);
 
-    if (ceil(p1.y) - p1.y <= .4)
-      p1.y = ceil(p1.y);
-    else if (p1.y - floor(p1.y) <= .4)
-      p1.y = floor(p1.y);
-  }
   p1.z = this->light->GetPosition().z;
 
   this->light->SetPosition(p1);

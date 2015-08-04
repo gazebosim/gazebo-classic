@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,43 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/gui/building/LevelInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
+LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent)
+  : BaseInspectorDialog(_parent)
 {
   this->setObjectName("levelInspectorDialog");
   this->setWindowTitle(tr("Level Inspector"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QLabel *levelLabel = new QLabel(tr("Level Name: "));
   this->levelNameLineEdit = new QLineEdit;
   this->levelNameLineEdit->setPlaceholderText(tr("Level X"));
+
+  this->InitColorComboBox();
+  QHBoxLayout *colorLayout = new QHBoxLayout;
+  QLabel *colorLabel = new QLabel(tr("Floor Color: "));
+  colorLayout->addWidget(colorLabel);
+  colorLayout->addWidget(this->colorComboBox);
+
+  this->InitTextureComboBox();
+  QHBoxLayout *textureLayout = new QHBoxLayout;
+  QLabel *textureLabel = new QLabel(tr("Floor Texture: "));
+  textureLayout->addWidget(textureLabel);
+  textureLayout->addWidget(this->textureComboBox);
+
+  QVBoxLayout *floorLayout = new QVBoxLayout;
+  floorLayout->addLayout(colorLayout);
+  floorLayout->addLayout(textureLayout);
+
+  this->floorWidget = new QWidget;
+  this->floorWidget->setLayout(floorLayout);
 
   /// TODO add the widgets back in after the functions is implemented
 /*  QLabel *floorThicknessLabel = new QLabel(tr("Floor Thickness: "));
@@ -43,11 +66,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->heightSpinBox->setRange(-1000, 1000);
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
-  this->heightSpinBox->setValue(0.000);
-
-  QLabel *materialLabel = new QLabel(tr("Floor Material: "));
-  this->materialComboBox = new QComboBox;
-  this->materialComboBox->addItem(QString("Hardwood"));*/
+  this->heightSpinBox->setValue(0.000);*/
 
   QGridLayout *levelLayout = new QGridLayout;
   levelLayout->addWidget(levelLabel, 0, 0);
@@ -55,9 +74,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 /*  levelLayout->addWidget(floorThicknessLabel, 1, 0);
   levelLayout->addWidget(this->floorThicknessSpinBox, 1, 1);
   levelLayout->addWidget(heightLabel, 2, 0);
-  levelLayout->addWidget(this->heightSpinBox, 2, 1);
-  levelLayout->addWidget(materialLabel, 3, 0);
-  levelLayout->addWidget(this->materialComboBox, 3, 1);*/
+  levelLayout->addWidget(this->heightSpinBox, 2, 1);*/
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -74,9 +91,11 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(levelLayout);
+  mainLayout->addWidget(this->floorWidget);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////

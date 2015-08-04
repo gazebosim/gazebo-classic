@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace gazebo
     /// will intelligently generate fixed joints between the gripper and an
     /// object within the gripper. This allows the object to be manipulated
     /// without falling or behaving poorly.
-    class GAZEBO_VISIBLE Gripper
+    class GZ_PHYSICS_VISIBLE Gripper
     {
       /// \brief Constructor
       /// \param[in] _model The model which contains the Gripper.

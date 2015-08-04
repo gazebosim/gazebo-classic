@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define _BULLETCYLINDERSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/util/system.hh"
 
@@ -35,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief Cylinder collision
-    class GAZEBO_VISIBLE BulletCylinderShape : public CylinderShape
+    class GZ_PHYSICS_VISIBLE BulletCylinderShape : public CylinderShape
     {
       /// \brief Constructor
       public: BulletCylinderShape(CollisionPtr _parent)

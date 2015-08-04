@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,15 +47,6 @@ namespace gazebo
 
       /// \brief Pointer to the scene where models are in.
       public: rendering::ScenePtr scene;
-
-      /// \brief Ray query for selecting a surface of an entity.
-      public: rendering::RayQueryPtr rayQuery;
-
-      /// \brief Current mouse event.
-      public: common::MouseEvent mouseEvent;
-
-      /// \brief Current key event.
-      public: common::KeyEvent keyEvent;
 
       /// \brief The last selected visual which will be used for alignment.
       public: rendering::VisualPtr targetVis;

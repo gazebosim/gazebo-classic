@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@
 #include <string>
 #include <vector>
 
-#include "ServerFixture.hh"
+#include <ignition/math/Rand.hh>
+
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/PID.hh"
 #include "SimplePendulumIntegrator.hh"
@@ -55,7 +57,7 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
   }
 
   // Random seed is set to prevent brittle failures (gazebo issue #479)
-  math::Rand::SetSeed(18420503);
+  ignition::math::Rand::Seed(18420503);
   Load(_worldFileName, true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);

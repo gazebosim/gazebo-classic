@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class CallbackHelper CallbackHelper.hh transport/transport.hh
     /// \brief A helper class to handle callbacks when messages arrive
-    class GAZEBO_VISIBLE CallbackHelper
+    class GZ_TRANSPORT_VISIBLE CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _latching Set to true to make the callback helper
@@ -104,7 +104,7 @@ namespace gazebo
     /// \class CallbackHelperT CallbackHelper.hh transport/transport.hh
     /// \brief Callback helper Template
     template<class M>
-    class GAZEBO_VISIBLE CallbackHelperT : public CallbackHelper
+    class CallbackHelperT : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages
@@ -168,7 +168,7 @@ namespace gazebo
     /// \brief Used to connect publishers to subscribers, where the
     /// subscriber wants the raw data from the publisher. Raw means that the
     /// data has not been converted into a protobuf message.
-    class GAZEBO_VISIBLE RawCallbackHelper : public CallbackHelper
+    class GZ_TRANSPORT_VISIBLE RawCallbackHelper : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
 #include "gazebo/msgs/msgs.hh"
@@ -48,7 +55,7 @@ SphereMaker::SphereMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-      math::Quaternion());
+      ignition::math::Quaterniond());
 }
 
 /////////////////////////////////////////////////
@@ -94,7 +101,7 @@ void SphereMaker::OnMousePush(const common::MouseEvent &_event)
   if (this->state == 0)
     return;
 
-  this->mousePushPos = _event.pressPos;
+  this->mousePushPos = _event.PressPos();
 }
 
 /////////////////////////////////////////////////
@@ -134,7 +141,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1 = this->GetSnappedPoint(p1);
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y, math::Plane(norm), p2))
+        _event.Pos().X(), _event.Pos().Y(), math::Plane(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -142,7 +149,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
 
   p2 = this->GetSnappedPoint(p2);
 
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1.Ign());
 
   double scale = p1.Distance(p2);
   math::Vector3 p(this->visualMsg->pose().position().x(),
@@ -151,7 +158,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
 
   p.z = scale;
 
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p.Ign());
   this->visualMsg->mutable_geometry()->mutable_sphere()->set_radius(scale);
   this->visPub->Publish(*this->visualMsg);
 }
@@ -159,33 +166,19 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 std::string SphereMaker::GetSDFString()
 {
-  std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
-    << "<model name='unit_sphere_" << counter << "'>"
-    << "  <pose>0 0 0.5 0 0 0</pose>"
-    << "  <link name='link'>"
-    << "    <inertial><mass>1.0</mass></inertial>"
-    << "    <collision name='collision'>"
-    << "      <geometry>"
-    << "        <sphere><radius>0.5</radius></sphere>"
-    << "      </geometry>"
-    << "    </collision>"
-    << "    <visual name ='visual'>"
-    << "      <geometry>"
-    << "        <sphere><radius>0.5</radius></sphere>"
-    << "      </geometry>"
-    << "      <material>"
-    << "        <script>"
-    << "          <uri>file://media/materials/scripts/gazebo.material</uri>"
-    << "          <name>Gazebo/Grey</name>"
-    << "        </script>"
-    << "      </material>"
-    << "    </visual>"
-    << "  </link>"
-    << "  </model>"
-    << "</sdf>";
+  msgs::Model model;
+  {
+    std::ostringstream modelName;
+    modelName << "unit_sphere_" << counter;
+    model.set_name(modelName.str());
+  }
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+  msgs::AddSphereLink(model, 1.0, 0.5);
+  model.mutable_link(0)->set_name("link");
 
-  return newModelStr.str();
+  return "<sdf version='" + std::string(SDF_VERSION) + "'>"
+         + msgs::ModelToSDF(model)->ToString("")
+         + "</sdf>";
 }
 
 

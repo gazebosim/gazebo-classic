@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,33 @@
  */
 #include <gtest/gtest.h>
 #include <stdio.h>
+#include "test_config.h"
 
 TEST(PkgConfig, Config)
 {
   char cmd[1024];
 
-  snprintf(cmd, sizeof(cmd), "cmake %s", SOURCE_DIR);
+  // Delete previous build directory to not reuse previous CMakeCache
+  snprintf(cmd, sizeof(cmd), "rm -fr %s/test/pkgconfig/plugin",
+           PROJECT_BINARY_PATH);
   ASSERT_EQ(system(cmd), 0);
-  snprintf(cmd, sizeof(cmd), "make");
+
+  // Create a build directory in the project binary directory so that we
+  // don't pollute the source tree
+  snprintf(cmd, sizeof(cmd), "mkdir %s/test/pkgconfig/plugin",
+           PROJECT_BINARY_PATH);
+  ASSERT_EQ(system(cmd), 0);
+
+  // Run cmake
+  snprintf(
+    cmd, sizeof(cmd),
+    "cd %s/test/pkgconfig/plugin; cmake %s -DGAZEBO_EXPECTED_VERSION=%s",
+    PROJECT_BINARY_PATH, SOURCE_DIR, GAZEBO_EXPECTED_VERSION);
+  ASSERT_EQ(system(cmd), 0);
+
+  // Make
+  snprintf(cmd, sizeof(cmd), "cd %s/test/pkgconfig/plugin; make",
+           PROJECT_BINARY_PATH);
   ASSERT_EQ(system(cmd), 0);
 }
 

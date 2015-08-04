@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,12 @@ Vector2d::Vector2d(const Vector2d &_pt)
 }
 
 //////////////////////////////////////////////////
+Vector2d::Vector2d(const ignition::math::Vector2d &_v)
+  : x(_v.X()), y(_v.Y())
+{
+}
+
+//////////////////////////////////////////////////
 Vector2d::~Vector2d()
 {
 }
@@ -77,6 +83,15 @@ Vector2d &Vector2d::operator =(const Vector2d &_pt)
 {
   this->x = _pt.x;
   this->y = _pt.y;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Vector2d &Vector2d::operator=(const ignition::math::Vector2d &_pt)
+{
+  this->x = _pt.X();
+  this->y = _pt.Y();
 
   return *this;
 }
@@ -208,4 +223,10 @@ double Vector2d::operator[](unsigned int index) const
 double Vector2d::Dot(const Vector2d &_v) const
 {
   return (this->x * _v.x) + (this->y * _v.y);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector2d Vector2d::Ign() const
+{
+  return ignition::math::Vector2d(this->x, this->y);
 }

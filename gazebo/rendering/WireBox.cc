@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ WireBox::~WireBox()
 /////////////////////////////////////////////////
 void WireBox::Init(const math::Box &_box)
 {
+  this->dataPtr->box = _box;
   math::Vector3 max = _box.max;
   math::Vector3 min = _box.min;
 
@@ -114,4 +115,10 @@ void WireBox::SetVisible(bool _visible)
 bool WireBox::GetVisible() const
 {
   return this->dataPtr->lines->isVisible();
+}
+
+/////////////////////////////////////////////////
+math::Box WireBox::GetBox() const
+{
+  return this->dataPtr->box;
 }

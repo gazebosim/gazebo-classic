@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _PLANE_HH_
-#define _PLANE_HH_
+#ifndef _GAZEBO_PLANE_HH_
+#define _GAZEBO_PLANE_HH_
+
+#include <ignition/math/Plane.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
@@ -30,7 +32,7 @@ namespace gazebo
 
     /// \class Plane Plane.hh math/gzmath.hh
     /// \brief A plane and related functions.
-    class GAZEBO_VISIBLE Plane
+    class GZ_MATH_VISIBLE Plane
     {
       /// \brief Constructor
       public: Plane();
@@ -46,6 +48,10 @@ namespace gazebo
       /// \param[in] _offset Offset along the normal
       public: Plane(const Vector3 &_normal, const Vector2d &_size,
                     double _offset);
+
+      /// \brief Copy constructor for ignition::math::Plane
+      /// \param[in] _plane Plane to copy
+      public: Plane(const ignition::math::Planed &_plane);
 
       /// \brief Destructor
       public: virtual ~Plane();
@@ -68,6 +74,15 @@ namespace gazebo
       /// \param _p another plane
       /// \return itself
       public: Plane &operator =(const Plane &_p);
+
+      /// \brief Equal operator for ignition::math::Plane
+      /// \param _p Ignition math plane
+      /// \return itself
+      public: Plane &operator =(const ignition::math::Planed &_p);
+
+      /// \brief Convert this to igntion::math::Planed
+      /// \return This plane converted to ignition::math::Planed.
+      public: ignition::math::Planed Ign() const;
 
       /// \brief Plane normal
       public: Vector3 normal;

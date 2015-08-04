@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ namespace gazebo
     class DynamicLines;
     class Visual;
     class LaserVisual;
+    class LogicalCameraVisual;
     class SonarVisual;
     class WrenchVisual;
     class CameraVisual;
@@ -58,11 +59,16 @@ namespace gazebo
     class ArrowVisual;
     class ContactVisual;
     class COMVisual;
+    class InertiaVisual;
     class RFIDVisual;
     class RFIDTagVisual;
+    class ApplyWrenchVisual;
+    class OriginVisual;
+    class LinkFrameVisual;
     class WindowManager;
     class SelectionObj;
     class RayQuery;
+    class Distortion;
 
 #ifdef HAVE_OCULUS
     class OculusCamera;
@@ -116,6 +122,10 @@ namespace gazebo
     /// \brief Shared pointer to CameraVisual
     typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
 
+    /// \def LogicalCameraVisualPtr
+    /// \brief Shared pointer to LogicalCameraVisual
+    typedef boost::shared_ptr<LogicalCameraVisual> LogicalCameraVisualPtr;
+
     /// \def JointVisualPtr
     /// \brief Shared pointer to JointVisual
     typedef boost::shared_ptr<JointVisual> JointVisualPtr;
@@ -136,6 +146,10 @@ namespace gazebo
     /// \brief Shared pointer to COMVisual
     typedef boost::shared_ptr<COMVisual> COMVisualPtr;
 
+    /// \def InertiaVisualPtr
+    /// \brief Shared pointer to InertiaVisual
+    typedef boost::shared_ptr<InertiaVisual> InertiaVisualPtr;
+
     /// \def RFIDVisual
     /// \brief Shared pointer to RFIDVisual
     typedef boost::shared_ptr<RFIDVisual> RFIDVisualPtr;
@@ -143,6 +157,18 @@ namespace gazebo
     /// \def RFIDTagVisual
     /// \brief Shared pointer to RFIDTagVisual
     typedef boost::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
+
+    /// \def ApplyWrenchVisualPtr
+    /// \brief Shared pointer to ApplyWrenchVisual
+    typedef boost::shared_ptr<ApplyWrenchVisual> ApplyWrenchVisualPtr;
+
+    /// \def OriginVisualPtr
+    /// \brief Shared pointer to OriginVisual
+    typedef boost::shared_ptr<OriginVisual> OriginVisualPtr;
+
+    /// \def LinkFrameVisualPtr
+    /// \brief Shared pointer to LinkFrameVisual
+    typedef boost::shared_ptr<LinkFrameVisual> LinkFrameVisualPtr;
 
     /// \def WindowManager
     /// \brief Shared pointer to WindowManager
@@ -155,6 +181,10 @@ namespace gazebo
     /// \def RayQueryPtr
     /// \brief Shared pointer to RayQuery
     typedef boost::shared_ptr<RayQuery> RayQueryPtr;
+
+    /// \def DistortionPtr
+    /// \brief Shared pointer to Distortion
+    typedef boost::shared_ptr<Distortion> DistortionPtr;
 
 #ifdef HAVE_OCULUS
     /// \def OculusCameraPtr

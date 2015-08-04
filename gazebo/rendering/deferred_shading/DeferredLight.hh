@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ namespace gazebo
     /// Deferred light geometry. Each instance matches a normal light.
     /// Should not be created by the user.
     /// XXX support other types of light other than point lights.
-    class GAZEBO_VISIBLE DeferredLight: public Ogre::SimpleRenderable
+    class GZ_RENDERING_VISIBLE DeferredLight :
+      public Ogre::SimpleRenderable
     {
       /// \brief Constructor
       public: DeferredLight(MaterialGenerator *_gen, Ogre::Light *_parentLight,

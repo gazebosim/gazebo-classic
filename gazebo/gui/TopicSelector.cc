@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,12 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/TopicSelector.hh"
 
@@ -29,6 +35,8 @@ TopicSelector::TopicSelector(QWidget *_parent)
   this->setObjectName("topicSelector");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Topic Selector"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   // Create the main layout for this widget
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -81,6 +89,7 @@ TopicSelector::TopicSelector(QWidget *_parent)
 
   // Assign the mainlayout to this widget
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////

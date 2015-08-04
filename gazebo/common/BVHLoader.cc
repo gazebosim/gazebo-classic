@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <sstream>
 
 #include <boost/algorithm/string.hpp>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Matrix4.hh>
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/BVHLoader.hh"
@@ -26,8 +28,6 @@
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Matrix3.hh"
-#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -92,26 +92,27 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
             file.close();
             return NULL;
           }
-          math::Vector3 offset = math::Vector3(
-              math::parseFloat(words[1]) * _scale,
-              math::parseFloat(words[2]) * _scale,
-              math::parseFloat(words[3]) * _scale);
-          math::Matrix4 transform(math::Matrix4::IDENTITY);
-          transform.SetTranslate(offset);
+          ignition::math::Vector3d offset = ignition::math::Vector3d(
+              ignition::math::parseFloat(words[1]) * _scale,
+              ignition::math::parseFloat(words[2]) * _scale,
+              ignition::math::parseFloat(words[3]) * _scale);
+          ignition::math::Matrix4d transform(
+              ignition::math::Matrix4d::Identity);
+          transform.Translate(offset);
           node->SetTransform(transform);
         }
         else
           if (words[0] == "CHANNELS")
           {
             if (words.size() < 3 ||
-                static_cast<size_t>(math::parseInt(words[1]) + 2) >
+                static_cast<size_t>(ignition::math::parseInt(words[1]) + 2) >
                  words.size())
             {
               file.close();
               return NULL;
             }
             nodeChannels.push_back(words);
-            totalChannels += math::parseInt(words[1]);
+            totalChannels += ignition::math::parseInt(words[1]);
           }
           else
             if (words[0] == "{")
@@ -152,7 +153,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
     return NULL;
   }
   else
-    frameCount = math::parseInt(words[1]);
+    frameCount = ignition::math::parseInt(words[1]);
 
   getline(file, line);
   words.clear();
@@ -165,7 +166,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
     return NULL;
   }
   else
-    frameTime = math::parseFloat(words[2]);
+    frameTime = ignition::math::parseFloat(words[2]);
 
   double time = 0.0;
   unsigned int frameNo = 0;
@@ -187,63 +188,72 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
     }
 
     unsigned int cursor = 0;
-    for (unsigned int i = 0; i < nodes.size(); i++)
+    for (unsigned int i = 0; i < nodes.size(); ++i)
     {
       SkeletonNode *node = nodes[i];
       std::vector<std::string> channels = nodeChannels[i];
-      math::Vector3 translation = node->GetTransform().GetTranslation();
-      math::Vector3 xAxis(1, 0, 0);
-      math::Vector3 yAxis(0, 1, 0);
-      math::Vector3 zAxis(0, 0, 1);
+      ignition::math::Vector3d translation = node->Transform().Translation();
+      ignition::math::Vector3d xAxis(1, 0, 0);
+      ignition::math::Vector3d yAxis(0, 1, 0);
+      ignition::math::Vector3d zAxis(0, 0, 1);
       double xAngle = 0.0;
       double yAngle = 0.0;
       double zAngle = 0.0;
-      math::Matrix4 transform(math::Matrix4::IDENTITY);
-      std::vector<math::Matrix4> mats;
-      unsigned int chanCount = math::parseInt(channels[1]);
-      for (unsigned int j = 2; j < (2 + chanCount); j++)
+      ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
+      std::vector<ignition::math::Matrix4d> mats;
+      unsigned int chanCount = ignition::math::parseInt(channels[1]);
+      for (unsigned int j = 2; j < (2 + chanCount); ++j)
       {
-        double value = math::parseFloat(words[cursor]);
+        double value = ignition::math::parseFloat(words[cursor]);
         cursor++;
         std::string channel = channels[j];
         if (channel == "Xposition")
-          translation.x = value * _scale;
+          translation.X(value * _scale);
         else
           if (channel == "Yposition")
-            translation.y = value * _scale;
+            translation.Y(value * _scale);
           else
+          {
             if (channel == "Zposition")
             {
-              translation.z = value * _scale;
+              translation.Z(value * _scale);
             }
             else
+            {
               if (channel == "Zrotation")
               {
                 zAngle = GZ_DTOR(value);
-                mats.push_back(math::Quaternion(zAxis, zAngle).GetAsMatrix4());
+                mats.push_back(ignition::math::Matrix4d(
+                      ignition::math::Quaterniond(zAxis, zAngle)));
               }
               else
+              {
                 if (channel == "Xrotation")
                 {
                   xAngle = GZ_DTOR(value);
-                  mats.push_back(
-                    math::Quaternion(xAxis, xAngle).GetAsMatrix4());
+                  mats.push_back(ignition::math::Matrix4d(
+                    ignition::math::Quaterniond(xAxis, xAngle)));
                 }
                 else
+                {
                   if (channel == "Yrotation")
                   {
                     yAngle = GZ_DTOR(value);
-                    mats.push_back(
-                      math::Quaternion(yAxis, yAngle).GetAsMatrix4());
+                    mats.push_back(ignition::math::Matrix4d(
+                      ignition::math::Quaterniond(yAxis, yAngle)));
                   }
+                }
+              }
+            }
+          }
       }
       while (!mats.empty())
       {
         transform = mats.back() * transform;
         mats.pop_back();
       }
-      math::Matrix4 pos(math::Matrix4::IDENTITY);
-      pos.SetTranslate(translation);
+      ignition::math::Matrix4d pos(ignition::math::Matrix4d::Identity);
+      pos.Translate(translation);
       transform = pos * transform;
       animation->AddKeyFrame(node->GetName(), time, transform);
     }

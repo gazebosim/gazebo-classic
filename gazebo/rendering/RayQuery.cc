@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,9 +75,12 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
       const common::SubMesh *submesh = mesh->GetSubMesh(j);
       for (unsigned int k = 0; k < submesh->GetIndexCount(); k += 3)
       {
-        math::Vector3 vertexA = submesh->GetVertex(submesh->GetIndex(k));
-        math::Vector3 vertexB = submesh->GetVertex(submesh->GetIndex(k+1));
-        math::Vector3 vertexC = submesh->GetVertex(submesh->GetIndex(k+2));
+        ignition::math::Vector3d vertexA =
+          submesh->Vertex(submesh->GetIndex(k));
+        ignition::math::Vector3d vertexB =
+          submesh->Vertex(submesh->GetIndex(k+1));
+        ignition::math::Vector3d vertexC =
+          submesh->Vertex(submesh->GetIndex(k+2));
 
         Ogre::Vector3 worldVertexA = transform * Conversions::Convert(vertexA);
         Ogre::Vector3 worldVertexB = transform * Conversions::Convert(vertexB);

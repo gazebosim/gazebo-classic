@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ namespace gazebo
     /// \class MapShape MapShape.hh physics/physics.hh
     /// \brief Creates box extrusions based on an image.
     /// This function is not yet complete, to be implemented.
-    class GAZEBO_VISIBLE MapShape : public Shape
+    class GZ_PHYSICS_VISIBLE MapShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
@@ -149,7 +149,7 @@ namespace gazebo
 
     /// \class QuadNode MapShape.hh physics/physics.hh
     /// \cond
-    class GAZEBO_VISIBLE QuadNode
+    class GZ_PHYSICS_VISIBLE QuadNode
     {
       /// \brief Constructor
       /// \param[in] _parent Parent quad tree node.

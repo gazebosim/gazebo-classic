@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@
 #define _LEVEL_INSPECTOR_DIALOG_HH_
 
 #include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+#include "gazebo/gui/building/BaseInspectorDialog.hh"
 
 namespace gazebo
 {
@@ -31,7 +33,8 @@ namespace gazebo
 
     /// \class LevelInspectorDialog LevelInspectorDialog.hh
     /// \brief Dialog for configuring a building level
-    class GAZEBO_VISIBLE LevelInspectorDialog : public QDialog
+    class GZ_GUI_BUILDING_VISIBLE LevelInspectorDialog
+      : public BaseInspectorDialog
     {
       Q_OBJECT
 
@@ -70,6 +73,9 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
+      /// \brief Widget containing the floor specs.
+      public: QWidget *floorWidget;
+
       /// \brief Editable line that holds the the level name.
       private: QLineEdit *levelNameLineEdit;
 
@@ -78,9 +84,6 @@ namespace gazebo
 
       /// \brief Spin box for configuring the floor thickness.
       private: QDoubleSpinBox *floorThicknessSpinBox;
-
-      /// \brief Combo box for configuring the floor material.
-      private: QComboBox *materialComboBox;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,61 +27,25 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTSphereShapePrivate;
+
     /// \brief A DART sphere shape
-    class GAZEBO_VISIBLE DARTSphereShape : public SphereShape
+    class GZ_PHYSICS_VISIBLE DARTSphereShape : public SphereShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit DARTSphereShape(DARTCollisionPtr _parent)
-              : SphereShape(_parent) {}
+      public: explicit DARTSphereShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~DARTSphereShape() {}
+      public: virtual ~DARTSphereShape();
 
       // Documentation inherited.
-      public: virtual void SetRadius(double _radius)
-      {
-        if (_radius < 0)
-        {
-          gzerr << "Sphere shape does not support negative radius.\n";
-          return;
-        }
-        if (math::equal(_radius, 0.0))
-        {
-          // Warn user, but still create shape with very small value
-          // otherwise later resize operations using setLocalScaling
-          // will not be possible
-          gzwarn << "Setting sphere shape's radius to zero is not supported "
-                 << "in DART, using 1e-4.\n";
-          _radius = 1e-4;
-        }
+      public: virtual void SetRadius(double _radius);
 
-        SphereShape::SetRadius(_radius);
-
-        DARTCollisionPtr dartCollisionParent =
-            boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
-
-        if (dartCollisionParent->GetDARTCollisionShape() == NULL)
-        {
-          dart::dynamics::BodyNode *dtBodyNode =
-              dartCollisionParent->GetDARTBodyNode();
-          dart::dynamics::EllipsoidShape *dtEllisoidShape =
-              new dart::dynamics::EllipsoidShape(Eigen::Vector3d(_radius*2.0,
-                                                                 _radius*2.0,
-                                                                 _radius*2.0));
-          dtBodyNode->addCollisionShape(dtEllisoidShape);
-          dartCollisionParent->SetDARTCollisionShape(dtEllisoidShape);
-        }
-        else
-        {
-          dart::dynamics::EllipsoidShape *dtEllipsoidShape =
-              dynamic_cast<dart::dynamics::EllipsoidShape*>(
-                dartCollisionParent->GetDARTCollisionShape());
-          dtEllipsoidShape->setSize(Eigen::Vector3d(_radius*2.0,
-                                                    _radius*2.0,
-                                                    _radius*2.0));
-        }
-      }
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTSphereShapePrivate *dataPtr;
     };
   }
 }

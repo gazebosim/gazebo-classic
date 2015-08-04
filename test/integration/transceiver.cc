@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Rand.hh>
 
 #include <boost/foreach.hpp>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -78,18 +79,19 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
   Load("worlds/empty.world", true, _physicsEngine);
 
   // Generate a random number [1-10] of transmitters
-  int nTransmitters = math::Rand::GetIntUniform(1, 10);
+  int nTransmitters = ignition::math::Rand::IntUniform(1, 10);
 
   for (int i = 0; i < nTransmitters; ++i)
   {
-    double txFreq = math::Rand::GetDblUniform(this->MinFreq, this->MaxFreq);
+    double txFreq = ignition::math::Rand::DblUniform(this->MinFreq,
+        this->MaxFreq);
     std::ostringstream convert;
     convert << i;
     std::string txModelName = "tx" + convert.str();
     std::string txSensorName = "wirelessTransmitter" + convert.str();
     std::string txEssid = "osrf" + convert.str();
-    double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-    double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+    double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+    double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
     math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
 
     SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
@@ -102,7 +104,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     // Store the new transmitter sensor in the map
     transmitters[txEssid] = tx;
 
-    ASSERT_TRUE(tx);
+    ASSERT_TRUE(tx != NULL);
   }
 
   // Wireless Receiver - rx
@@ -120,7 +122,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
-  ASSERT_TRUE(rx);
+  ASSERT_TRUE(rx != NULL);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
@@ -178,8 +180,8 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
   std::string tx2ModelName = "tx2";
   std::string tx2SensorName = "wirelessTransmitter2";
   std::string txEssid = "osrf";
-  double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-  double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+  double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+  double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
   math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
 
   SpawnWirelessTransmitterSensor(tx1ModelName, tx1SensorName, txPose.pos,
@@ -189,7 +191,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx1SensorName));
 
-  ASSERT_TRUE(tx1);
+  ASSERT_TRUE(tx1 != NULL);
 
   txFreq = this->MaxFreq + 1.0;
   SpawnWirelessTransmitterSensor(tx2ModelName, tx2SensorName, txPose.pos,
@@ -199,7 +201,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx2SensorName));
 
-  ASSERT_TRUE(tx2);
+  ASSERT_TRUE(tx2 != NULL);
 
   // Wireless Receiver - rx
   std::string rxModelName = "rx";
@@ -216,7 +218,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
     boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
-  ASSERT_TRUE(rx);
+  ASSERT_TRUE(rx != NULL);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
@@ -265,7 +267,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
-  ASSERT_TRUE(tx);
+  ASSERT_TRUE(tx != NULL);
 
   // Wireless Receiver - rx1
   std::string rx1ModelName = "rx1";
@@ -282,7 +284,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx1SensorName));
 
-  ASSERT_TRUE(rx1);
+  ASSERT_TRUE(rx1 != NULL);
 
   // Wireless Receiver - rx2
   std::string rx2ModelName = "rx2";
@@ -298,7 +300,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx2SensorName));
 
-  ASSERT_TRUE(rx2);
+  ASSERT_TRUE(rx2 != NULL);
 
   // Spawn an obstacle between the transmitter and the receiver
   SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),

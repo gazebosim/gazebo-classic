@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ namespace gazebo
               {
                 this->msg.set_type(msgs::Light::SPOT);
                 msgs::Set(this->msg.mutable_direction(),
-                          math::Vector3(0, 0, -1));
+                          ignition::math::Vector3d(0, 0, -1));
                 this->msg.set_cast_shadows(false);
 
                 this->msg.set_spot_inner_angle(0.6);
@@ -99,7 +99,7 @@ namespace gazebo
               {
                 this->msg.set_type(msgs::Light::DIRECTIONAL);
                 msgs::Set(this->msg.mutable_direction(),
-                          math::Vector3(.1, .1, -0.9));
+                          ignition::math::Vector3d(.1, .1, -0.9));
                 this->msg.set_cast_shadows(true);
 
                 this->lightTypename  = "directional";

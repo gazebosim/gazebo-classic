@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/Time.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 class Pioneer2dx : public ServerFixture,
@@ -55,9 +55,9 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
-      gazebo::math::Vector3(0.2, 0, 0));
+      ignition::math::Vector3d(0.2, 0, 0));
   gazebo::msgs::Set(msg.mutable_orientation(),
-      gazebo::math::Quaternion(0, 0, 0));
+      ignition::math::Quaterniond(0, 0, 0));
   velPub->Publish(msg);
 
   math::Pose startPose, endPose;

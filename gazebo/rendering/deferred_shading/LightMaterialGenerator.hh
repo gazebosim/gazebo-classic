@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace gazebo
     class LightMaterialGeneratorGLSL;
 
     template<typename techniquePolicy>
-    class GAZEBO_VISIBLE LightMaterialGenerator :
+    class GZ_RENDERING_VISIBLE LightMaterialGenerator :
       public MaterialGenerator, techniquePolicy
     {
       /// Permutation of light materials
@@ -74,7 +74,7 @@ namespace gazebo
     };
 
     template<typename techniquePolicy>
-    class GAZEBO_VISIBLE LightMaterialGeneratorGLSL :
+    class GZ_RENDERING_VISIBLE LightMaterialGeneratorGLSL :
       public MaterialGenerator::Impl, public techniquePolicy
     {
       public: typedef MaterialGenerator::Perm Perm;

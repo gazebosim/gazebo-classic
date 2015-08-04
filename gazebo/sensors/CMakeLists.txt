@@ -1,6 +1,11 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+if (WIN32)
+  include_directories(${libdl_include_dir})
+endif()
+
 set (sources
+  AltimeterSensor.cc
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
@@ -9,6 +14,8 @@ set (sources
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
+  LogicalCameraSensor.cc
+  MagnetometerSensor.cc
   MultiCameraSensor.cc
   Noise.cc
   RaySensor.cc
@@ -25,6 +32,7 @@ set (sources
 )
 
 set (headers
+  AltimeterSensor.hh
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
@@ -33,6 +41,8 @@ set (headers
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
+  LogicalCameraSensor.hh
+  MagnetometerSensor.hh
   MultiCameraSensor.hh
   Noise.hh
   RaySensor.hh
@@ -50,9 +60,11 @@ set (headers
 )
 
 set (gtest_sources
+  AltimeterSensor_TEST.cc
   ForceTorqueSensor_TEST.cc
   GpsSensor_TEST.cc
   ImuSensor_TEST.cc
+  MagnetometerSensor_TEST.cc
   Noise_TEST.cc
   RaySensor_TEST.cc
   Sensor_TEST.cc
@@ -78,7 +90,7 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
 
 
-add_library(gazebo_sensors SHARED ${sources})
+gz_add_library(gazebo_sensors ${sources})
 
 target_link_libraries(gazebo_sensors
   gazebo_common

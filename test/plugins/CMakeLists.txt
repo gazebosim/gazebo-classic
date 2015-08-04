@@ -1,3 +1,7 @@
+if (WIN32)
+    add_definitions(-DBUILDING_DLL)
+endif()
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
@@ -14,6 +18,9 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
+  ExceptionModelPluginConstructor
+  ExceptionModelPluginInit
+  ExceptionModelPluginLoad
   ForceTorqueModelRemovalTestPlugin
   Issue1208Plugin
   ModelTrajectoryTestPlugin

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/PlaneShape.hh"
@@ -92,12 +98,18 @@ void PlaneShape::SetScale(const math::Vector3 &_scale)
 void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
-  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal());
-  msgs::Set(_msg.mutable_plane()->mutable_size(), this->GetSize());
+  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal().Ign());
+  msgs::Set(_msg.mutable_plane()->mutable_size(), this->GetSize().Ign());
 }
 
 //////////////////////////////////////////////////
 void PlaneShape::ProcessMsg(const msgs::Geometry &_msg)
 {
-  this->SetNormal(msgs::Convert(_msg.plane().normal()));
+  this->SetNormal(msgs::ConvertIgn(_msg.plane().normal()));
+}
+
+//////////////////////////////////////////////////
+double PlaneShape::ComputeVolume() const
+{
+  return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace gazebo
     // composition pass. This is the class that will send the actual render
     // calls of the spheres (point lights), cones (spotlights) and quads
     // (directional lights) after the GBuffer has been constructed
-    class GAZEBO_VISIBLE MergeRenderOperation :
+    class GZ_RENDERING_VISIBLE MergeRenderOperation :
       public Ogre::CompositorInstance::RenderSystemOperation
     {
       public: MergeRenderOperation(Ogre::CompositorInstance *_instance,
@@ -45,7 +45,7 @@ namespace gazebo
 
     /// The custom composition pass that is used for rendering the light
     /// geometry. This class needs to be registered with the CompositorManager
-    class GAZEBO_VISIBLE MergeCompositionPass :
+    class GZ_RENDERING_VISIBLE MergeCompositionPass :
       public Ogre::CustomCompositionPass
     {
       /// @copydoc CustomCompositionPass::createOperation

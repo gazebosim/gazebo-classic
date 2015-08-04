@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera Visualization Class
- * Author: Nate Koenig
- */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -32,32 +35,33 @@ using namespace rendering;
 CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 : Visual(*new CameraVisualPrivate, _name, _vis)
 {
+  CameraVisualPrivate *dPtr =
+      reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
+  dPtr->type = VT_SENSOR;
 }
 
 /////////////////////////////////////////////////
 CameraVisual::~CameraVisual()
 {
-  CameraVisualPrivate *dPtr =
-      reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
-
-  if (dPtr->scene)
-    dPtr->scene->RemoveCamera(dPtr->camera->GetName());
-
-  dPtr->camera.reset();
+  this->Fini();
 }
 
 /////////////////////////////////////////////////
-void CameraVisual::Load(unsigned int _width, unsigned int _height)
+void CameraVisual::Load(const msgs::CameraSensor &_msg)
 {
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
 
+  math::Vector2d imageSize = msgs::ConvertIgn(_msg.image_size());
+
   double dist = 2.0;
   double width = 1.0;
-  double height = _height / static_cast<double>(_width);
+  double height = imageSize.y / static_cast<double>(imageSize.x);
 
   dPtr->camera = dPtr->scene->CreateCamera(this->GetName(), false);
-  dPtr->camera->Load();
+
+  sdf::ElementPtr cameraElem = msgs::CameraSensorToSDF(_msg);
+  dPtr->camera->Load(cameraElem);
   dPtr->camera->Init();
   dPtr->camera->CreateRenderTexture(this->GetName() + "_RTT");
 
@@ -77,12 +81,16 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   plane.normal = Ogre::Vector3::NEGATIVE_UNIT_X;
   plane.d = dist;
 
-  Ogre::MeshManager::getSingleton().createPlane(this->GetName() + "__floor",
-      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-      plane, width, height, 1, 1, true, 1, 1.0f, 1.0f,
-      Ogre::Vector3::UNIT_Z);
+  if (!Ogre::MeshManager::getSingleton().resourceExists(
+        this->GetName() + "__floor"))
+  {
+    Ogre::MeshManager::getSingleton().createPlane(this->GetName() + "__floor",
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        plane, width, height, 1, 1, true, 1, 1.0f, 1.0f,
+        Ogre::Vector3::UNIT_Z);
+  }
 
-  Ogre::Entity* planeEnt =
+  Ogre::Entity *planeEnt =
     dPtr->scene->GetManager()->createEntity(this->GetName() + "__plane",
         this->GetName() + "__floor");
   planeEnt->setMaterialName(this->GetName()+"_RTT_material");
@@ -129,4 +137,25 @@ void CameraVisual::Update()
     return;
 
   dPtr->camera->Render();
+}
+
+/////////////////////////////////////////////////
+void CameraVisual::Fini()
+{
+  /*CameraVisualPrivate *dPtr =
+      reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
+  dPtr->connections.clear();
+
+  if (dPtr->scene && dPtr->camera)
+    dPtr->scene->RemoveCamera(dPtr->camera->GetName());
+
+  dPtr->camera.reset();
+
+      */
+  this->DetachObjects();
+  if (this->dataPtr->scene)
+  {
+    this->dataPtr->scene->GetManager()->destroyEntity(
+        this->GetName() + "__plane");
+  }
 }

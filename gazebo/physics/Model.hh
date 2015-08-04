@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ namespace gazebo
 
     /// \class Model Model.hh physics/physics.hh
     /// \brief A model is a collection of links, joints, and plugins.
-    class GAZEBO_VISIBLE Model : public Entity
+    class GZ_PHYSICS_VISIBLE Model : public Entity
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
@@ -89,6 +89,10 @@ namespace gazebo
 
       /// \brief Reset the model.
       public: void Reset();
+
+      /// \brief Reset the velocity, acceleration, force and torque of
+      /// all child links.
+      public: void ResetPhysicsStates();
 
       /// \brief Set the linear velocity of the model, and all its links.
       /// \param[in] _vel The new linear velocity.
@@ -173,6 +177,20 @@ namespace gazebo
       /// \param[in] _name Name of the link to get.
       /// \return Pointer to the link, NULL if the name is invalid.
       public: LinkPtr GetLink(const std::string &_name ="canonical") const;
+
+      /// \brief If true, all links within the model will collide by default.
+      /// Two links within the same model will not collide if both have
+      /// link.self_collide == false.
+      /// link 1 and link2 collide = link1.self_collide || link2.self_collide
+      /// Bodies connected by a joint are exempt from this, and will
+      /// never collide.
+      /// \return True if self-collide enabled for this model, false otherwise.
+      public: bool GetSelfCollide() const;
+
+      /// \brief Set this model's self_collide property
+      /// \sa GetSelfCollide
+      /// \param[in] _self_collide True if self-collisions enabled by default.
+      public: void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.

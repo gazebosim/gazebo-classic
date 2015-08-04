@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -38,6 +45,7 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Topic View"));
   this->setObjectName("cameraSensor");
+  this->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
 
   // Create the topic label and combo box
   // {
@@ -92,8 +100,6 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
   displayTimer->start(_displayPeriod);
-
-  this->setWindowFlags(Qt::Window);
 }
 
 /////////////////////////////////////////////////

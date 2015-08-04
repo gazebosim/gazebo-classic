@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ namespace gazebo
     ///
     /// State of a Link includes the state of itself all its child Collision
     /// entities.
-    class GAZEBO_VISIBLE LinkState : public State
+    class GZ_PHYSICS_VISIBLE LinkState : public State
     {
       /// \brief Default constructor
       public: LinkState();
@@ -58,8 +58,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp
+      /// \param[in] _iterations Simulation iterations.
       public: LinkState(const LinkPtr _link, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor
       ///
@@ -83,9 +84,10 @@ namespace gazebo
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
       /// \param[in] _realTime Real time stamp.
-      /// \param[in] _simTime Sim time stamp
+      /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: void Load(const LinkPtr _link, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Load state from SDF element.
       ///
@@ -158,6 +160,11 @@ namespace gazebo
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
       public: virtual void SetSimTime(const common::Time &_time);
+
+      /// \brief Set the simulation iterations when this state was generated
+      /// \param[in] _iterations Simulation iterations when the data was
+      /// recorded.
+      public: virtual void SetIterations(const uint64_t _iterations);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
-#include "test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define TOL 1e-6
 #define TOL_CONT 2.0

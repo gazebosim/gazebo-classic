@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #include <vector>
 
 #include "gazebo/common/MeshExporter.hh"
-#include "gazebo/math/MathTypes.hh"
 #include "gazebo/util/system.hh"
 
 class TiXmlElement;
@@ -40,7 +39,7 @@ namespace gazebo
 
     /// \class ColladaExporter ColladaExporter.hh common/common.hh
     /// \brief Class used to export Collada mesh files
-    class GAZEBO_VISIBLE ColladaExporter : public MeshExporter
+    class GZ_COMMON_VISIBLE ColladaExporter : public MeshExporter
     {
       /// \brief Geometry types
       public: enum GeometryType {POSITION, NORMAL, UVMAP};
