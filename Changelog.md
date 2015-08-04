@@ -6,6 +6,9 @@
 1. Added RandomVelocityPlugin, which applies a random velocity to a model's link.
     * [Pull request #1839](https://bitbucket.org/osrf/gazebo/pull-request/1839)
 
+1. Sim events for joint position, velocity and applied force
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/1843)
+
 1. Added magnetometer sensor. A contribution from Andrew Symington.
     * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)
 
