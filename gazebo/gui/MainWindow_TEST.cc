@@ -734,6 +734,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_aboutAct);
 
+  QVERIFY(gazebo::gui::g_hotkeyChartAct);
+
   QVERIFY(gazebo::gui::g_quitAct);
 
   QVERIFY(gazebo::gui::g_resetModelsAct);
@@ -842,6 +844,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_cloneAct);
 
   QVERIFY(!gazebo::gui::g_aboutAct);
+
+  QVERIFY(!gazebo::gui::g_hotkeyChartAct);
 
   QVERIFY(!gazebo::gui::g_quitAct);
 

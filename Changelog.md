@@ -18,6 +18,9 @@
 1. Added Visual::IsAncestorOf and Visual::IsDescendantOf
     * [Pull request #1850](https://bitbucket.org/osrf/gazebo/pull-request/1850)
 
+1. Added hotkeys chart dialog
+    * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
+
 1. Model editor updates
     1. Added support for more joint types (gearbox and fixed joints).
         * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
@@ -28,6 +31,12 @@
         * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
 
 ## Gazebo 6.0
+
+1. Added logical_camera sensor.
+    * [Pull request #1845](https://bitbucket.org/osrf/gazebo/pull-request/1845)
+
+1. Added RandomVelocityPlugin, which applies a random velocity to a model's link.
+    * [Pull request #1839](https://bitbucket.org/osrf/gazebo/pull-request/1839)
 
 1. Added magnetometer sensor. A contribution from Andrew Symington.
     * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)
