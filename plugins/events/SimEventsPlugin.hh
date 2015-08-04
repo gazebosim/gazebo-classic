@@ -28,7 +28,6 @@
 
 namespace gazebo
 {
-
   class SimEventsPlugin : public WorldPlugin
   {
     /// \brief Destrutor
