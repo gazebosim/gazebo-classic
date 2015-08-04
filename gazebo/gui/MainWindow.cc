@@ -241,6 +241,9 @@ MainWindow::MainWindow()
   this->dataLogger = new gui::DataLogger(this);
   connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
 
+  // Hotkey dialog
+  this->hotkeyDialog = NULL;
+
   this->show();
 }
 
@@ -587,6 +590,18 @@ void MainWindow::About()
   aboutBox.setTextFormat(Qt::RichText);
   aboutBox.setText(QString::fromStdString(helpTxt));
   aboutBox.exec();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::HotkeyChart()
+{
+  // Opening for the first time
+  if (!this->hotkeyDialog)
+  {
+    this->hotkeyDialog = new HotkeyDialog(this);
+  }
+
+  this->hotkeyDialog->show();
 }
 
 /////////////////////////////////////////////////
@@ -1037,6 +1052,10 @@ void MainWindow::CreateActions()
   g_cloneAct = new QAction(tr("Clone World"), this);
   g_cloneAct->setStatusTip(tr("Clone the world"));
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
+
+  g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
+  g_hotkeyChartAct->setStatusTip(tr("Show the hotkey chart"));
+  connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
@@ -1541,6 +1560,9 @@ void MainWindow::DeleteActions()
   delete g_cloneAct;
   g_cloneAct = 0;
 
+  delete g_hotkeyChartAct;
+  g_hotkeyChartAct = 0;
+
   delete g_aboutAct;
   g_aboutAct = 0;
 
@@ -1751,6 +1773,7 @@ void MainWindow::CreateMenuBar()
   bar->addSeparator();
 
   QMenu *helpMenu = bar->addMenu(tr("&Help"));
+  helpMenu->addAction(g_hotkeyChartAct);
   helpMenu->addAction(g_aboutAct);
 }
 

@@ -148,6 +148,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   QAction *ballJointAct = new QAction(tr("Ball"), this);
   QAction *universalJointAct = new QAction(tr("Universal"), this);
   QAction *screwJointAct = new QAction(tr("Screw"), this);
+  QAction *gearboxJointAct = new QAction(tr("Gearbox"), this);
+  QAction *fixedJointAct = new QAction(tr("Fixed"), this);
 
   revoluteJointAct->setCheckable(true);
   revolute2JointAct->setCheckable(true);
@@ -155,6 +157,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   ballJointAct->setCheckable(true);
   universalJointAct->setCheckable(true);
   screwJointAct->setCheckable(true);
+  gearboxJointAct->setCheckable(true);
+  fixedJointAct->setCheckable(true);
 
   jointMenu->addAction(revoluteJointAct);
   jointMenu->addAction(revolute2JointAct);
@@ -162,6 +166,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointMenu->addAction(ballJointAct);
   jointMenu->addAction(universalJointAct);
   jointMenu->addAction(screwJointAct);
+  jointMenu->addAction(gearboxJointAct);
+  jointMenu->addAction(fixedJointAct);
 
   QActionGroup *jointActionGroup = new QActionGroup(this);
   jointActionGroup->addAction(revoluteJointAct);
@@ -170,6 +176,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointActionGroup->addAction(ballJointAct);
   jointActionGroup->addAction(universalJointAct);
   jointActionGroup->addAction(screwJointAct);
+  jointActionGroup->addAction(gearboxJointAct);
+  jointActionGroup->addAction(fixedJointAct);
   jointActionGroup->setExclusive(true);
 
   QAction *toolbarSpacer = toolbar->findChild<QAction *>(
@@ -212,6 +220,14 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       SLOT(map()));
   this->dataPtr->signalMapper->setMapping(screwJointAct,
       screwJointAct->text().toLower());
+  connect(gearboxJointAct, SIGNAL(triggered()), this->dataPtr->signalMapper,
+      SLOT(map()));
+  this->dataPtr->signalMapper->setMapping(gearboxJointAct,
+      gearboxJointAct->text().toLower());
+  connect(fixedJointAct, SIGNAL(triggered()), this->dataPtr->signalMapper,
+      SLOT(map()));
+  this->dataPtr->signalMapper->setMapping(fixedJointAct,
+      fixedJointAct->text().toLower());
 
   // set default joint type.
   revoluteJointAct->setChecked(true);
