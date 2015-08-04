@@ -25,7 +25,9 @@
 namespace gazebo
 {
   /// \brief The event generator class. Events are generated when joint enters
-  /// or leaves a certain trigger state.
+  /// or leaves a certain trigger state. This type of event works with joints
+  /// that have a single axis (revolute or prismatic). These are the most
+  /// common for actuated joints.
   /// Triggers must be defined in the world, but models can be created during
   /// the simulation. Triggers cannot overlap.
   class JointEventSource: public EventSource

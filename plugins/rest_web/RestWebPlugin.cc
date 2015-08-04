@@ -20,6 +20,8 @@
   #pragma comment(lib, "Rpcrt4.lib")
 #else /* UNIX */
 
+#include <gazebo/gazebo.hh>
+
 #ifdef HAVE_UUID
   #include <uuid/uuid.h>
 #endif
@@ -38,6 +40,7 @@ RestWebPlugin::RestWebPlugin()
   stopMsgProcessing(false),
   requestQThread(NULL)
 {
+gzerr << "RestWebPlugin::RestWebPlugin" << std::endl;
   // generate a unique session ID
   // On Windows
 #ifdef _WIN32
@@ -64,6 +67,9 @@ RestWebPlugin::RestWebPlugin()
   char s[37];
   uuid_unparse(uuid, s);
   this->session = s;
+#else
+  // alternative to uuid
+  this->session = common::Time::GetWallTimeAsISOString();
 #endif
 
 #endif

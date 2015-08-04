@@ -60,7 +60,7 @@ void JointEventSource::Load(const sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("range"))
   {
-    sdf::ElementPtr rangeElem =  _sdf->GetElement("range");
+    sdf::ElementPtr rangeElem = _sdf->GetElement("range");
 
     if (rangeElem->HasElement("min"))
     {
@@ -133,11 +133,19 @@ std::string JointEventSource::GetRangeAsString() const
   std:: string rangeStr;
   switch (this->range)
   {
-    case POSITION: rangeStr = "position"; break;
-    case VELOCITY: rangeStr = "velocity"; break;
-    case ANGLE: rangeStr = "normalized_angle"; break;
-    case FORCE: rangeStr = "applied_force"; break;
-    default: rangeStr = "invalid"; break;
+    case POSITION:
+      rangeStr = "position";
+      break;
+    case VELOCITY:
+      rangeStr = "velocity";
+      break;
+    case ANGLE:
+      rangeStr = "normalized_angle";
+      break;
+    case FORCE: rangeStr = "applied_force";
+      break;
+    default: rangeStr = "invalid";
+      break;
   }
   return rangeStr;
 }

@@ -13,6 +13,9 @@
   time.
       * [Pull request #1737](https://bitbucket.org/osrf/gazebo/pull-request/1737)
 
+1. Sim events for joint position, velocity and applied force
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/1843)
+
 1. Added Gazebo splash screen
     * [Pull request #1745](https://bitbucket.org/osrf/gazebo/pull-request/1745)
 
