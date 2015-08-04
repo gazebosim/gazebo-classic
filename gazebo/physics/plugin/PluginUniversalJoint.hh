@@ -30,12 +30,13 @@ namespace gazebo
   namespace physics
   {
     /// \brief A universal joint.
-    class GAZEBO_VISIBLE PluginUniversalJoint : public UniversalJoint<PluginJoint>
+    class GAZEBO_VISIBLE PluginUniversalJoint :
+      public UniversalJoint<PluginJoint>
     {
       /// \brief Constructor.
       /// \param[in] _worldId Plugin world id.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
-      public: PluginUniversalJoint(dWorldID _worldId, BasePtr _parent);
+      public: PluginUniversalJoint(BasePtr _parent);
 
       /// \brief Destuctor.
       public: virtual ~PluginUniversalJoint();

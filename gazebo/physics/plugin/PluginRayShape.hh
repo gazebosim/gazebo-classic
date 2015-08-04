@@ -53,6 +53,7 @@ namespace gazebo
       /// \param[out] _dist Distance to the intersection.
       /// \param[out] _entity Name of the entity that was hit.
       public: virtual void GetIntersection(double &_dist, std::string &_entity);
+    };
   }
 }
 #endif

@@ -47,10 +47,7 @@ namespace gazebo
           boost::dynamic_pointer_cast<PluginCollision>(this->collisionParent);
 
         // Create the sphere geometry
-        if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreateSphere(0, _radius), true);
-        else
-          dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
+        gzerr << "not impelmented\n";
       }
     };
   }

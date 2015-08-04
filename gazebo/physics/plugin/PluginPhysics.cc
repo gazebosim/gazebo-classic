@@ -293,19 +293,19 @@ JointPtr PluginPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
   JointPtr joint;
 
   if (_type == "prismatic")
-    joint.reset(new PluginSliderJoint(this->worldId, _parent));
+    joint.reset(new PluginSliderJoint(_parent));
   else if (_type == "screw")
-    joint.reset(new PluginScrewJoint(this->worldId, _parent));
+    joint.reset(new PluginScrewJoint(_parent));
   else if (_type == "revolute")
-    joint.reset(new PluginHingeJoint(this->worldId, _parent));
+    joint.reset(new PluginHingeJoint(_parent));
   else if (_type == "gearbox")
-    joint.reset(new PluginGearboxJoint(this->worldId, _parent));
+    joint.reset(new PluginGearboxJoint(_parent));
   else if (_type == "revolute2")
-    joint.reset(new PluginHinge2Joint(this->worldId, _parent));
+    joint.reset(new PluginHinge2Joint(_parent));
   else if (_type == "ball")
-    joint.reset(new PluginBallJoint(this->worldId, _parent));
+    joint.reset(new PluginBallJoint(_parent));
   else if (_type == "universal")
-    joint.reset(new PluginUniversalJoint(this->worldId, _parent));
+    joint.reset(new PluginUniversalJoint(_parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
@@ -316,7 +316,7 @@ JointPtr PluginPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 void PluginPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  dWorldSetGravity(this->worldId, _gravity.x, _gravity.y, _gravity.z);
+  gzerr << "not implemented\n";
 }
 
 /////////////////////////////////////////////////

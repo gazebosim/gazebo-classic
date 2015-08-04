@@ -46,12 +46,9 @@ namespace gazebo
         math::Pose pose = oParent->GetWorldPose();
         double altitude = pose.pos.z;
         math::Vector3 n = this->GetNormal();
-        if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
-                n.x, n.y, n.z, altitude), false);
-        else
-          dGeomPlaneSetParams(oParent->GetCollisionId(),
-                              n.x, n.y, n.z, altitude);
+
+        // Create the plane geometry
+        gzerr << "not impelmented\n";
       }
 
       // Documentation inherited
@@ -62,15 +59,8 @@ namespace gazebo
         odeParent =
           boost::dynamic_pointer_cast<PluginCollision>(this->collisionParent);
 
-        dVector4 vec4;
-
-        dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
-
-        // Compute "altitude": scalar product of position and normal
-        vec4[3] = vec4[0] * _pos.x + vec4[1] * _pos.y + vec4[2] * _pos.z;
-
-        dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1],
-                            vec4[2], vec4[3]);
+        // Set ground plane altitude
+        gzerr << "not impelmented\n";
       }
     };
   }

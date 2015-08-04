@@ -21,7 +21,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/plugin/PluginPhysics.hh"
 #include "gazebo/physics/plugin/PluginTypes.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 using namespace physics;

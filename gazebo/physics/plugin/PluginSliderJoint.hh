@@ -36,7 +36,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _worldId Plugin world id.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
-      public: PluginSliderJoint(dWorldID _worldId, BasePtr _parent);
+      public: PluginSliderJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~PluginSliderJoint();

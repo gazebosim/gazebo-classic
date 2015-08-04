@@ -41,13 +41,11 @@ using namespace physics;
 PluginLink::PluginLink(EntityPtr _parent)
     : Link(_parent)
 {
-  this->linkId = NULL;
 }
 
 //////////////////////////////////////////////////
 PluginLink::~PluginLink()
 {
-  this->linkId = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -249,4 +247,29 @@ void PluginLink::SetAutoDisable(bool _disable)
 //////////////////////////////////////////////////
 void PluginLink::SetLinkStatic(bool /*_static*/)
 {
+}
+
+//////////////////////////////////////////////////
+void PluginLink::SetGravityMode(bool /*_gravity*/)
+{
+}
+
+//////////////////////////////////////////////////
+bool PluginLink::GetGravityMode() const
+{
+  gzerr << "not implemented\n";
+  return 0;
+}
+
+//////////////////////////////////////////////////
+void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero)
+{
+  gzerr << "not implemented\n";
+}
+
+//////////////////////////////////////////////////
+void SetSelfCollide(bool _collide)
+{
+  gzerr << "not implemented\n";
 }

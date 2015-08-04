@@ -32,7 +32,7 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _worldId Plugin world id.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
-      public: PluginScrewJoint(dWorldID _worldId, BasePtr _parent);
+      public: PluginScrewJoint(BasePtr _parent);
 
       /// \brief Destructor.
       public: virtual ~PluginScrewJoint();

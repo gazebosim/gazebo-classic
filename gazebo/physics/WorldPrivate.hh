@@ -34,6 +34,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
+#include "gazebo/physics/PhysicsPlugin.h"
 
 namespace gazebo
 {
@@ -300,7 +301,7 @@ namespace gazebo
       public: PresetManagerPtr presetManager;
 
       /// \brief Pointer to the physics plugin
-      private: PhysicsPlugin *physicsPlugin;
+      public: PhysicsPlugin *physicsPlugin;
     };
   }
 }
