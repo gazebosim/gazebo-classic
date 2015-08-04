@@ -229,9 +229,95 @@ void JointCreationDialog::OnParentFromDialog(int _index)
     return;
   }
 
-  this->childComboBox->setEnabled(true);
-
+  // Notify so 3D is updated
   gui::model::Events::jointParentChosenDialog(linkName.toStdString());
+
+  this->OnParentImpl(linkName);
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnChildFromDialog(int _index)
+{
+  QString linkName = this->childComboBox->itemData(_index).toString();
+
+  if (linkName.isEmpty())
+  {
+    gzerr << "Empty link name for child" << std::endl;
+    return;
+  }
+
+  // Notify so 3D is updated
+  gui::model::Events::jointChildChosenDialog(linkName.toStdString());
+
+  this->OnChildImpl(linkName);
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnParentFrom3D(const std::string &_linkName)
+{
+  if (_linkName.empty())
+  {
+    gzerr << "Empty link name for parent" << std::endl;
+    return;
+  }
+
+  // Update combo box
+  int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
+  if (index == -1)
+  {
+    gzerr << "Requested link [" << _linkName << "] not found" << std::endl;
+    return;
+  }
+
+  this->parentComboBox->blockSignals(true);
+  this->parentComboBox->setCurrentIndex(index);
+  this->parentComboBox->blockSignals(false);
+
+  this->OnParentImpl(QString::fromStdString(_linkName));
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
+{
+  if (_linkName.empty())
+  {
+    gzerr << "Empty link name for child" << std::endl;
+    return;
+  }
+
+  if (!this->childComboBox->isEnabled())
+  {
+    gzerr << "It shouldn't be possible to set child before parent."
+        << std::endl;
+    return;
+  }
+
+  // Upodate combo box
+  int index = this->childComboBox->findData(QString::fromStdString(_linkName));
+  if (index == -1)
+  {
+    gzerr << "Requested link [" << _linkName << "] not found" << std::endl;
+    return;
+  }
+
+  this->childComboBox->blockSignals(true);
+  this->childComboBox->setCurrentIndex(index);
+  this->childComboBox->blockSignals(false);
+
+  this->OnChildImpl(QString::fromStdString(_linkName));
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnParentImpl(const QString &_linkName)
+{
+  if (_linkName.isEmpty())
+  {
+    gzerr << "Empty link name for parent" << std::endl;
+    return;
+  }
+
+  // Enable child selection
+  this->childComboBox->setEnabled(true);
 
   // Remove empty option
   int index = this->parentComboBox->findData("");
@@ -251,7 +337,7 @@ void JointCreationDialog::OnParentFromDialog(int _index)
   for (auto link : this->linkList)
   {
     QString leafName = QString::fromStdString(link.first);
-    if (leafName == linkName)
+    if (leafName == _linkName)
       continue;
 
     this->childComboBox->addItem(QString::fromStdString(link.second), leafName);
@@ -262,19 +348,16 @@ void JointCreationDialog::OnParentFromDialog(int _index)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnChildFromDialog(int _index)
+void JointCreationDialog::OnChildImpl(const QString &_linkName)
 {
-  QString linkName = this->childComboBox->itemData(_index).toString();
-
-  if (linkName.isEmpty())
+  if (_linkName.isEmpty())
   {
     gzerr << "Empty link name for child" << std::endl;
     return;
   }
 
+  // Enable create
   this->createButton->setEnabled(true);
-
-  gui::model::Events::jointChildChosenDialog(linkName.toStdString());
 
   // Remove empty option
   int index = this->parentComboBox->findData("");
@@ -294,7 +377,7 @@ void JointCreationDialog::OnChildFromDialog(int _index)
   for (auto link : this->linkList)
   {
     QString leafName = QString::fromStdString(link.first);
-    if (leafName == linkName)
+    if (leafName == _linkName)
       continue;
 
     this->parentComboBox->addItem(QString::fromStdString(link.second),
@@ -303,64 +386,6 @@ void JointCreationDialog::OnChildFromDialog(int _index)
   index = this->parentComboBox->findData(currentParent);
   this->parentComboBox->setCurrentIndex(index);
   this->parentComboBox->blockSignals(false);
-}
-
-/////////////////////////////////////////////////
-void JointCreationDialog::OnParentFrom3D(const std::string &_linkName)
-{
-  if (_linkName.empty())
-    return;
-
-  int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
-
-  if (index == -1)
-  {
-    gzerr << "Requested link [" << _linkName << "] not found" << std::endl;
-    return;
-  }
-
-  this->parentComboBox->blockSignals(true);
-  this->parentComboBox->setCurrentIndex(index);
-
-  // Remove empty option
-  index = this->parentComboBox->findData("");
-
-  this->parentComboBox->removeItem(index);
-  this->parentComboBox->blockSignals(false);
-
-  // Enable child
-  this->childComboBox->setEnabled(true);
-}
-
-/////////////////////////////////////////////////
-void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
-{
-  if (_linkName.empty())
-    return;
-
-  if (!this->childComboBox->isEnabled())
-  {
-    gzerr << "It shouldn't be possible to set child before parent."
-        << std::endl;
-    return;
-  }
-
-  int index = this->childComboBox->findData(QString::fromStdString(_linkName));
-
-  if (index == -1)
-  {
-    gzerr << "Requested link [" << _linkName << "] not found" << std::endl;
-    return;
-  }
-
-  this->childComboBox->blockSignals(true);
-  this->childComboBox->setCurrentIndex(index);
-  this->createButton->setEnabled(true);
-
-  // Remove empty option
-  index = this->childComboBox->findData("");
-  this->childComboBox->removeItem(index);
-  this->childComboBox->blockSignals(false);
 }
 
 /////////////////////////////////////////////////

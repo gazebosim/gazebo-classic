@@ -59,6 +59,8 @@ namespace gazebo
       private slots: void OnChildFromDialog(int _index);
       private slots: void OnParentFrom3D(const std::string &_linkName);
       private slots: void OnChildFrom3D(const std::string &_linkName);
+      private: void OnParentImpl(const QString &_linkName);
+      private: void OnChildImpl(const QString &_linkName);
       Q_SIGNALS: void EmitLinkRemoved(const std::string &_linkId);
       private slots: void OnLinkRemovedSlot(const std::string &_linkId);
 
