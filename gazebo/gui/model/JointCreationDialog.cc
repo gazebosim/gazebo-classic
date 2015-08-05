@@ -194,6 +194,11 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   // Check joint type
   this->typeButtons->button(static_cast<int>(_type))->setChecked(true);
 
+  // Reset enabled states
+  this->createButton->setEnabled(false);
+  this->swapButton->setEnabled(false);
+  this->childComboBox->setEnabled(false);
+
   // Fill link combo boxes
   this->parentComboBox->blockSignals(true);
   this->childComboBox->blockSignals(true);
