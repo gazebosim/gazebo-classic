@@ -1081,14 +1081,18 @@ void JointData::SetChild(rendering::VisualPtr _vis)
 void JointData::SetParent(rendering::VisualPtr _vis)
 {
   this->parent = _vis;
-  std::string jointParentName = this->parent->GetName();
-  std::string leafName = jointParentName;
-  size_t pIdx = jointParentName.find_last_of("::");
-  if (pIdx != std::string::npos)
-    leafName = jointParentName.substr(pIdx+1);
 
-  this->jointMsg->set_parent(leafName);
-  this->jointMsg->set_parent_id(this->parent->GetId());
+  if (this->jointMsg)
+  {
+    std::string jointParentName = this->parent->GetName();
+    std::string leafName = jointParentName;
+    size_t pIdx = jointParentName.find_last_of("::");
+    if (pIdx != std::string::npos)
+      leafName = jointParentName.substr(pIdx+1);
+
+    this->jointMsg->set_parent(leafName);
+    this->jointMsg->set_parent_id(this->parent->GetId());
+  }
 
   this->dirty = true;
 }
@@ -1194,6 +1198,16 @@ void JointData::Update()
   this->dirty = false;
 }
 
+/////////////////////////////////////////////////
+void JointData::UpdateJointLine()
+{
+  if (!this->parent)
+    return;
+
+  math::Vector3 origin = this->parent->GetWorldPose().pos
+      - this->parent->GetParent()->GetWorldPose().pos;
+  this->line->SetPoint(0, origin);
+}
 
 /////////////////////////////////////////////////
 void JointMaker::ShowContextMenu(const std::string &_name)
@@ -1393,7 +1407,13 @@ void JointMaker::ParentLinkChosen(rendering::VisualPtr _parentLink)
   else
   {
     this->jointBeingCreated->SetParent(_parentLink);
-    this->jointBeingCreated->Update();
+
+    // If joint already has parent and child
+    if (this->jointBeingCreated->hotspot)
+      this->jointBeingCreated->Update();
+    // If joint has only parent
+    else
+      this->jointBeingCreated->UpdateJointLine();
   }
 }
 
@@ -1416,17 +1436,11 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
     // Reset current joint
     if (!this->childLinkVis)
     {
-      this->jointBeingCreated->visual->DeleteDynamicLine(
-          this->jointBeingCreated->line);
-      rendering::ScenePtr scene = this->jointBeingCreated->visual->GetScene();
-      scene->RemoveVisual(this->jointBeingCreated->visual);
-      this->jointBeingCreated->visual.reset();
-      delete this->jointBeingCreated;
-      this->jointBeingCreated = NULL;
+      this->RemoveJoint("");
 
       // Create new joint with parent and child
       this->jointBeingCreated = this->CreateJoint(
-	  this->parentLinkVis, _childLink);
+	        this->parentLinkVis, _childLink);
 
       // Create hotspot visual
       this->CreateHotSpot(this->jointBeingCreated);

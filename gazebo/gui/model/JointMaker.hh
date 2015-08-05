@@ -369,6 +369,9 @@ namespace gazebo
       /// \brief Update joint.
       public: void Update();
 
+      /// \brief Update joint.
+      public: void UpdateJointLine();
+
       public: void SetType(JointMaker::JointType _type);
       public: void SetParent(rendering::VisualPtr _vis);
       public: void SetChild(rendering::VisualPtr _vis);
