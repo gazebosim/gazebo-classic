@@ -46,7 +46,10 @@ set(CMAKE_MODULE_PATH
 
 foreach(dep @PKG_DEPENDS@)
   if(NOT ${dep}_FOUND)
-    find_package(${dep} REQUIRED)
+    if (${dep} MATCHES "Boost")
+      find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system filesystem program_options regex iostreams date_time)
+    else()
+      find_package(${dep} REQUIRED)
   endif()
   list(APPEND @PKG_NAME@_INCLUDE_DIRS ${${dep}_INCLUDE_DIRS})
 
