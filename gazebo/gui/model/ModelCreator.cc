@@ -1978,6 +1978,7 @@ JointMaker *ModelCreator::GetJointMaker() const
 /////////////////////////////////////////////////
 void ModelCreator::UpdateNestedModelSDF(sdf::ElementPtr _modelElem)
 {
+  return;
   if (this->modelName == this->serverModelName)
     return;
 

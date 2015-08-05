@@ -993,6 +993,9 @@ void JointMaker::SetModelName(const std::string &_modelName)
 /////////////////////////////////////////////////
 void JointMaker::GenerateSDF()
 {
+  // note this currently only generates top level model joints
+  // since nested model joints are not being loaded in the model creator
+
   this->modelSDF.reset(new sdf::Element);
   sdf::initFile("model.sdf", this->modelSDF);
   this->modelSDF->ClearElements();
@@ -1016,20 +1019,20 @@ void JointMaker::GenerateSDF()
 
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     std::string parentName = joint->parent->GetName();
-    size_t pIdx = parentName.find("::");
-    if (pIdx != std::string::npos)
-      parentName = parentName.substr(pIdx+2);
-    //parentLeafName = this->GetScopedLinkName(parentLeafName);
-    parentName = this->modelName + "::" + parentName;
+//    size_t pIdx = parentName.find("::");
+//    if (pIdx != std::string::npos)
+//      parentName = parentName.substr(pIdx+2);
+//    parentName = this->modelName + "::" + parentName;
+    // parentLeafName = this->GetScopedLinkName(parentLeafName);
     parentElem->Set(parentName);
 
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     std::string childName = joint->child->GetName();
-    size_t cIdx = childName.find("::");
-    if (cIdx != std::string::npos)
-      childName = childName.substr(cIdx+2);
-//    childLeafName = this->GetScopedLinkName(childLeafName);
-    childName = this->modelName + "::" + childName;
+//    size_t cIdx = childName.find("::");
+//    if (cIdx != std::string::npos)
+//      childName = childName.substr(cIdx+2);
+//    childName = this->modelName + "::" + childName;
+    // childLeafName = this->GetScopedLinkName(childLeafName);
     childElem->Set(childName);
 
 /*    sdf::ElementPtr parentElem = jointElem->GetElement("parent");
