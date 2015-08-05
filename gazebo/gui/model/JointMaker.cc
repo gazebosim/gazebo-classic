@@ -1056,8 +1056,12 @@ void JointData::OpenInspector()
 void JointData::SetType(JointMaker::JointType _type)
 {
   this->type = _type;
-  this->jointMsg->set_type(
-      msgs::ConvertJointType(JointMaker::GetTypeAsString(_type)));
+
+  if (this->jointMsg)
+  {
+    this->jointMsg->set_type(
+        msgs::ConvertJointType(JointMaker::GetTypeAsString(_type)));
+  }
   this->dirty = true;
 }
 
@@ -1132,13 +1136,13 @@ void JointData::Update()
     // seems to hang so detach before setting and re-attach later.
     Ogre::SceneNode *handleNode = this->handles->getParentSceneNode();
     this->handles->detachFromParent();
-    this->hotspot->SetMaterial(material);
-    this->hotspot->SetTransparency(0.7);
+    this->hotspot->SetMaterial(material, true, false);
+    this->hotspot->SetTransparency(0.7, false);
     handleNode->attachObject(this->handles);
     Ogre::MaterialPtr mat =
-	Ogre::MaterialManager::getSingleton().getByName(material);
+        Ogre::MaterialManager::getSingleton().getByName(material);
     Ogre::ColourValue color =
-	mat->getTechnique(0)->getPass(0)->getDiffuse();
+        mat->getTechnique(0)->getPass(0)->getDiffuse();
     color.a = 0.5;
     this->handles->getBillboard(0)->setColour(color);
 
@@ -1146,7 +1150,7 @@ void JointData::Update()
     std::string parentName = this->parent->GetName();
     std::string childName = this->child->GetName();
     gui::model::Events::jointChanged(this->hotspot->GetName(), this->name,
-	JointMaker::jointTypes[this->type], parentName, childName);
+        JointMaker::jointTypes[this->type], parentName, childName);
   }
 
   // set pos of joint handle
@@ -1179,7 +1183,7 @@ void JointData::Update()
       jointVisName = hotspotName.substr(0, idx+2);
     jointVisName += "_JOINT_VISUAL_";
     gazebo::rendering::JointVisualPtr jointVis(
-	new gazebo::rendering::JointVisual(jointVisName, this->hotspot));
+        new gazebo::rendering::JointVisual(jointVisName, this->hotspot));
 
     jointVis->Load(jointUpdateMsg);
 
@@ -1510,7 +1514,7 @@ void JointMaker::OnJointCreateDialog()
     gui::model::Events::jointInserted(
         this->jointBeingCreated->hotspot->GetName(),
         this->jointBeingCreated->name,
-        jointTypes[this->jointBeingCreated->type],
+        this->jointTypes[this->jointBeingCreated->type],
         this->jointBeingCreated->parent->GetName(),
         this->jointBeingCreated->child->GetName());
   }
