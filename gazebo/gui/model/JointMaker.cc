@@ -1019,18 +1019,18 @@ void JointMaker::GenerateSDF()
 
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     std::string parentName = joint->parent->GetName();
-//    size_t pIdx = parentName.find("::");
-//    if (pIdx != std::string::npos)
-//      parentName = parentName.substr(pIdx+2);
+    size_t pIdx = parentName.find("::");
+    if (pIdx != std::string::npos)
+      parentName = parentName.substr(pIdx+2);
 //    parentName = this->modelName + "::" + parentName;
     // parentLeafName = this->GetScopedLinkName(parentLeafName);
     parentElem->Set(parentName);
 
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     std::string childName = joint->child->GetName();
-//    size_t cIdx = childName.find("::");
-//    if (cIdx != std::string::npos)
-//      childName = childName.substr(cIdx+2);
+    size_t cIdx = childName.find("::");
+    if (cIdx != std::string::npos)
+      childName = childName.substr(cIdx+2);
 //    childName = this->modelName + "::" + childName;
     // childLeafName = this->GetScopedLinkName(childLeafName);
     childElem->Set(childName);
