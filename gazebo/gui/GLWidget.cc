@@ -1347,4 +1347,3 @@ void GLWidget::SetMouseEventButton(const Qt::MouseButton &_button)
   else if (_button == Qt::MidButton)
     this->mouseEvent.SetButton(common::MouseEvent::MIDDLE);
 }
-
