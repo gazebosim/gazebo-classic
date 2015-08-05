@@ -284,7 +284,6 @@ void RestWebPlugin::OnRestLogoutRequest(ConstRestLogoutPtr &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-//////////////////////////////////////////////////
 void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
 {
   // this is executed asynchronously
