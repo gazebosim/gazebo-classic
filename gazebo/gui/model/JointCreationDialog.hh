@@ -59,6 +59,7 @@ namespace gazebo
       private slots: void OnChildFromDialog(int _index);
       private slots: void OnParentFrom3D(const std::string &_linkName);
       private slots: void OnChildFrom3D(const std::string &_linkName);
+      private slots: void OnSwap();
       private: void OnParentImpl(const QString &_linkName);
       private: void OnChildImpl(const QString &_linkName);
       Q_SIGNALS: void EmitLinkRemoved(const std::string &_linkId);
@@ -93,6 +94,7 @@ namespace gazebo
       private: QComboBox *parentComboBox;
       private: QComboBox *childComboBox;
       private: QPushButton *createButton;
+      private: QToolButton *swapButton;
 
       private: std::map<std::string, std::string> linkList;
     };

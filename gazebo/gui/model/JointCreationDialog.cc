@@ -45,6 +45,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QRadioButton *screwJointRadio = new QRadioButton(tr("Screw"));
   QRadioButton *universalJointRadio = new QRadioButton(tr("Universal"));
   QRadioButton *ballJointRadio = new QRadioButton(tr("Ball"));
+  QRadioButton *gearboxJointRadio = new QRadioButton(tr("Gearbox"));
 
   this->typeButtons = new QButtonGroup();
   this->typeButtons->addButton(fixedJointRadio, 1);
@@ -54,17 +55,19 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->typeButtons->addButton(screwJointRadio, 5);
   this->typeButtons->addButton(universalJointRadio, 6);
   this->typeButtons->addButton(ballJointRadio, 7);
+  this->typeButtons->addButton(gearboxJointRadio, 7);
   connect(this->typeButtons, SIGNAL(buttonClicked(int)),
       this, SLOT(OnTypeFromDialog(int)));
 
-  QVBoxLayout *typesLayout = new QVBoxLayout();
-  typesLayout->addWidget(fixedJointRadio);
-  typesLayout->addWidget(revoluteJointRadio);
-  typesLayout->addWidget(revolute2JointRadio);
-  typesLayout->addWidget(prismaticJointRadio);
-  typesLayout->addWidget(screwJointRadio);
-  typesLayout->addWidget(universalJointRadio);
-  typesLayout->addWidget(ballJointRadio);
+  QGridLayout *typesLayout = new QGridLayout();
+  typesLayout->addWidget(fixedJointRadio, 0, 0);
+  typesLayout->addWidget(revoluteJointRadio, 1, 0);
+  typesLayout->addWidget(revolute2JointRadio, 2, 0);
+  typesLayout->addWidget(prismaticJointRadio, 3, 0);
+  typesLayout->addWidget(screwJointRadio, 0, 1);
+  typesLayout->addWidget(universalJointRadio, 1, 1);
+  typesLayout->addWidget(ballJointRadio, 2, 1);
+  typesLayout->addWidget(gearboxJointRadio, 3, 1);
 
   ConfigChildWidget *typesWidget = new ConfigChildWidget();
   typesWidget->setLayout(typesLayout);
@@ -91,12 +94,19 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   connect(this->childComboBox, SIGNAL(currentIndexChanged(int)), this,
       SLOT(OnChildFromDialog(int)));
 
+  this->swapButton = new QToolButton();
+  this->swapButton->setText("Swap");
+  this->swapButton->setMinimumWidth(100);
+  this->swapButton->setEnabled(false);
+  connect(this->swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
+
   QGridLayout *linksLayout = new QGridLayout();
-  linksLayout->addWidget(selectionsText, 0, 0, 1, 2);
+  linksLayout->addWidget(selectionsText, 0, 0, 1, 3);
   linksLayout->addWidget(parentLabel, 1, 0);
   linksLayout->addWidget(this->parentComboBox, 1, 1);
   linksLayout->addWidget(childLabel, 2, 0);
   linksLayout->addWidget(this->childComboBox, 2, 1);
+  linksLayout->addWidget(this->swapButton, 1, 2, 2, 1);
 
   ConfigChildWidget *linksWidget = new ConfigChildWidget();
   linksWidget->setLayout(linksLayout);
@@ -343,6 +353,12 @@ void JointCreationDialog::OnParentImpl(const QString &_linkName)
     this->childComboBox->addItem(QString::fromStdString(link.second), leafName);
   }
   index = this->childComboBox->findData(currentChild);
+  if (index == -1)
+  {
+    gzerr << "Requested link [" << currentChild.toStdString() << "] not found"
+          << std::endl;
+    return;
+  }
   this->childComboBox->setCurrentIndex(index);
   this->childComboBox->blockSignals(false);
 }
@@ -356,8 +372,9 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
     return;
   }
 
-  // Enable create
+  // Enable create and swap
   this->createButton->setEnabled(true);
+  this->swapButton->setEnabled(true);
 
   // Remove empty option
   int index = this->parentComboBox->findData("");
@@ -384,6 +401,12 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
         leafName);
   }
   index = this->parentComboBox->findData(currentParent);
+  if (index == -1)
+  {
+    gzerr << "Requested link [" << currentParent.toStdString() << "] not found"
+          << std::endl;
+    return;
+  }
   this->parentComboBox->setCurrentIndex(index);
   this->parentComboBox->blockSignals(false);
 }
@@ -448,4 +471,54 @@ void JointCreationDialog::OnCreate()
 void JointCreationDialog::enterEvent(QEvent */*_event*/)
 {
   QApplication::setOverrideCursor(Qt::ArrowCursor);
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnSwap()
+{
+  QString parentData = this->childComboBox->itemData(
+      this->childComboBox->currentIndex()).toString();
+  QString childData = this->parentComboBox->itemData(
+      this->parentComboBox->currentIndex()).toString();
+
+  if (childData.isEmpty() || parentData.isEmpty())
+  {
+    gzerr << "Can't swap with an empty link name" << std::endl;
+    return;
+  }
+
+  // Reset combo boxes to new allowed options
+  this->parentComboBox->blockSignals(true);
+  this->childComboBox->blockSignals(true);
+  this->parentComboBox->clear();
+  this->childComboBox->clear();
+  for (auto link : this->linkList)
+  {
+    QString leafName = QString::fromStdString(link.first);
+    if (leafName != childData)
+    {
+      this->parentComboBox->addItem(QString::fromStdString(link.second),
+          leafName);
+    }
+    if (leafName != parentData)
+    {
+      this->childComboBox->addItem(QString::fromStdString(link.second),
+          leafName);
+    }
+  }
+
+  // Choose new options
+  int indexParent = this->parentComboBox->findData(parentData);
+  int indexChild = this->childComboBox->findData(childData);
+  if (indexParent == -1 || indexChild == -1)
+    return;
+  this->parentComboBox->setCurrentIndex(indexParent);
+  this->childComboBox->setCurrentIndex(indexChild);
+
+  this->parentComboBox->blockSignals(false);
+  this->childComboBox->blockSignals(false);
+
+  // Signals were not being triggered even without blocking, so manually call
+  this->OnParentFromDialog(indexParent);
+  this->OnChildFromDialog(indexChild);
 }
