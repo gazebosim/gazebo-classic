@@ -2444,6 +2444,42 @@ VisualPtr Visual::GetNthAncestor(unsigned int _n)
   return p;
 }
 
+/////////////////////////////////////////////////
+bool Visual::IsAncestorOf(const rendering::VisualPtr _visual) const
+{
+  if (!_visual || !this->dataPtr->scene)
+    return false;
+
+  rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
+  rendering::VisualPtr vis = _visual->GetParent();
+  while (vis)
+  {
+    if (vis->GetName() == this->GetName())
+      return true;
+    vis = vis->GetParent();
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Visual::IsDescendantOf(const rendering::VisualPtr _visual) const
+{
+  if (!_visual || !this->dataPtr->scene)
+    return false;
+
+  rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
+  rendering::VisualPtr vis = this->GetParent();
+  while (vis)
+  {
+    if (vis->GetName() == _visual->GetName())
+      return true;
+    vis = vis->GetParent();
+  }
+
+  return false;
+}
+
 //////////////////////////////////////////////////
 unsigned int Visual::GetDepth() const
 {
