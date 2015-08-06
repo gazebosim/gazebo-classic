@@ -95,12 +95,12 @@ void ModelData_TEST::LinkScale()
     double ixz = inertialMsg.ixz();
     double iyz = inertialMsg.iyz();
 
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz));
 
     // set new scale and verify inertial values
     {
@@ -244,12 +244,12 @@ void ModelData_TEST::LinkScale()
     double ixz = inertialMsg.ixz();
     double iyz = inertialMsg.iyz();
 
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz));
 
     // set new scale and verify inertial values
     {
@@ -398,12 +398,12 @@ void ModelData_TEST::LinkScale()
     double ixz = inertialMsg.ixz();
     double iyz = inertialMsg.iyz();
 
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz));
 
     // set new scale and verify inertial values
     {
@@ -547,11 +547,11 @@ void ModelData_TEST::LinkScale()
     double iyz = inertialMsg.iyz();
 
     QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz, 1e-3));
-    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz, 1e-3));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz));
 
     // set new scale and verify inertial values
     {
@@ -599,6 +599,93 @@ void ModelData_TEST::LinkScale()
       QVERIFY(ignition::math::equal(
           inertiaElem->Get<double>("iyz"), newIyz, 1e-3));
     }
+    delete link;
+  }
+
+  // precision test: scale down and back up
+  {
+    gui::LinkData *link = new gui::LinkData();
+
+    double mass = 1.0;
+    double radius = 0.5;
+
+    msgs::Model model;
+    // set reasonable inertial values based on geometry
+    msgs::AddSphereLink(model, mass, radius);
+    link->Load(msgs::LinkToSDF(model.link(0)));
+    rendering::VisualPtr linkVis(new rendering::Visual("sphere_link3", scene));
+    link->linkVisual = linkVis;
+
+    // add a collision visual
+    rendering::VisualPtr collisionVis(
+        new rendering::Visual("sphere_link3::collision", linkVis));
+    collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+    link->AddCollision(collisionVis);
+
+    // verify scale
+    ignition::math::Vector3d scale = ignition::math::Vector3d::One;
+    QVERIFY(link->GetScale() == scale);
+
+    sdf::ElementPtr linkSDF = link->linkSDF;
+    QVERIFY(linkSDF->HasElement("inertial"));
+    sdf::ElementPtr inertialElem = linkSDF->GetElement("inertial");
+    QVERIFY(inertialElem->HasElement("inertia"));
+    sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+    QVERIFY(inertialElem->HasElement("mass"));
+    sdf::ElementPtr massElem = inertialElem->GetElement("mass");
+
+    // verify mass
+    QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
+
+    // verify inertia values
+    msgs::Inertial inertialMsg = model.link(0).inertial();
+    double ixx = inertialMsg.ixx();
+    double iyy = inertialMsg.iyy();
+    double izz = inertialMsg.izz();
+    double ixy = inertialMsg.ixy();
+    double ixz = inertialMsg.ixz();
+    double iyz = inertialMsg.iyz();
+
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz));
+
+    // scale down
+    double scaleFactor = 1;
+    for (unsigned int i = 10; i <= 1e6; i=i*10)
+    {
+      // set scale
+      scaleFactor =  1.0/static_cast<double>(i);
+      ignition::math::Vector3d newScale =
+          ignition::math::Vector3d(scaleFactor, scaleFactor, scaleFactor);
+      collisionVis->SetScale(newScale);
+      link->SetScale(newScale);
+      // verify new scale
+      QVERIFY(link->GetScale() == newScale);
+    }
+    // scale up
+    for (unsigned int i = 1e5; i >= 1; i=i/10)
+    {
+      // set scale
+      scaleFactor =  1.0/static_cast<double>(i);
+      ignition::math::Vector3d newScale =
+          ignition::math::Vector3d(scaleFactor, scaleFactor, scaleFactor);
+      collisionVis->SetScale(newScale);
+      link->SetScale(newScale);
+      // verify new scale
+      QVERIFY(link->GetScale() == newScale);
+    }
+    // verify against original mass and inertia values
+    QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz));
+    QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz));
     delete link;
   }
 

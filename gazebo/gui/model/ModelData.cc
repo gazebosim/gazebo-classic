@@ -214,8 +214,8 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
       double newR = newSize.X() * 0.5;
       double newR3 = newR*newR*newR;
       // sphere volume: 4/3 * PI * r^3
-      oldVol += 4.0 / 3.0 * M_PI * r3;
-      newVol += 4.0 / 3.0 * M_PI * newR3;
+      oldVol += 4.0 / 3.0 * IGN_PI * r3;
+      newVol += 4.0 / 3.0 * IGN_PI * newR3;
     }
     else if (geomStr == "cylinder")
     {
@@ -224,8 +224,8 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
       double newR = newSize.X() * 0.5;
       double newR2 = newR*newR;
       // cylinder volume: PI * r^2 * height
-      oldVol += M_PI * r2 * oldSize.Z();
-      newVol += M_PI * newR2 * newSize.Z();
+      oldVol += IGN_PI * r2 * oldSize.Z();
+      newVol += IGN_PI * newR2 * newSize.Z();
     }
     else
     {
@@ -235,8 +235,14 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     }
   }
 
-  if (!ignition::math::equal(oldVol, 0.0, 1e-6))
-    volumeRatio = newVol / oldVol;
+  if (oldVol < 1e-10)
+  {
+    gzerr << "Volume is too small to compute accurate inertial values"
+        << std::endl;
+    return;
+  }
+
+  volumeRatio = newVol / oldVol;
 
   // set new mass
   double oldMass = this->mass;
@@ -299,7 +305,6 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   }
   else
   {
-//    dInertiaScale = _scale / this->scale;
     boxInertia = true;
   }
 

@@ -642,7 +642,7 @@ namespace gazebo
       /// \brief Helper function to update the geometry object size based on
       /// the scale of the visual.
       /// \param[in] _scale Scale of visual
-      private: void UpdateGeomSize(const math::Vector3 &_scale);
+      private: void UpdateGeomSize(const ignition::math::Vector3d &_scale);
 
       /// \internal
       /// \brief Pointer to private data.
