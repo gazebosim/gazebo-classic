@@ -1021,9 +1021,9 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
   // Apply material to all child visuals
   if (_cascade)
   {
-    for (auto &iter : this->dataPtr->children)
+    for (auto &child : this->dataPtr->children)
     {
-      iter->SetMaterial(_materialName, _unique, _cascade);
+      child->SetMaterial(_materialName, _unique, _cascade);
     }
   }
 
@@ -1450,7 +1450,7 @@ void Visual::SetTransparency(float _trans, const bool _cascade)
 
   if (_cascade)
   {
-    for (auto child : this->dataPtr->children)
+    for (auto &child : this->dataPtr->children)
     {
       // Don't change some visualizations when link changes
       if (!(this->GetType() == VT_LINK &&
