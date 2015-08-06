@@ -1508,7 +1508,10 @@ namespace gazebo
         result.set_update_rate(_sdf->Get<double>("update_rate"));
 
       if (_sdf->HasElement("pose"))
-        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
+      {
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
+      }
 
       if (_sdf->HasElement("visualize"))
         result.set_visualize(_sdf->Get<bool>("visualize"));
