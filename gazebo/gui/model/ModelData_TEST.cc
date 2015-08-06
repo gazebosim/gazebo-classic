@@ -655,7 +655,7 @@ void ModelData_TEST::LinkScale()
 
     // scale down
     double scaleFactor = 1;
-    for (unsigned int i = 10; i <= 1e6; i=i*10)
+    for (unsigned int i = 10; i <= 1e6; i = i*10)
     {
       // set scale
       scaleFactor =  1.0/static_cast<double>(i);
@@ -667,7 +667,7 @@ void ModelData_TEST::LinkScale()
       QVERIFY(link->GetScale() == newScale);
     }
     // scale up
-    for (unsigned int i = 1e5; i >= 1; i=i/10)
+    for (unsigned int i = 1e5; i >= 1; i = i/10)
     {
       // set scale
       scaleFactor =  1.0/static_cast<double>(i);
