@@ -320,6 +320,56 @@ TEST_F(Visual_TEST, Material)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, ChildMaterial)
+{
+  Load("worlds/empty.world");
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Create a visual as child of the world visual
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+
+  // Create a visual as child of vis1
+  gazebo::rendering::VisualPtr vis2;
+  vis2.reset(new gazebo::rendering::Visual("vis2", vis1));
+  vis2->Load();
+
+  // Check material is empty
+  EXPECT_TRUE(vis1->GetMaterialName().empty());
+  EXPECT_TRUE(vis2->GetMaterialName().empty());
+
+  // Set vis1's material with default cascade
+  std::string defaultCascade = "default_cascade";
+  vis1->SetMaterial(defaultCascade);
+  EXPECT_TRUE(vis1->GetMaterialName().find(defaultCascade) !=
+      std::string::npos);
+  EXPECT_TRUE(vis2->GetMaterialName().find(defaultCascade) !=
+      std::string::npos);
+
+
+  // Set vis1's material with explicit cascade
+
+
+  // Set vis1's material with no cascade
+
+
+  // Set vis2's material
+
+
+
+
+
+  std::cout << "Vis1: " << vis1->GetMaterialName() << std::endl;
+  std::cout << "Vis2: " << vis1->GetMaterialName() << std::endl;
+
+
+}
+
+/////////////////////////////////////////////////
 TEST_F(Visual_TEST, Lighting)
 {
   Load("worlds/empty.world");

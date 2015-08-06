@@ -872,7 +872,8 @@ bool Visual::GetLighting() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetMaterial(const std::string &_materialName, bool _unique)
+void Visual::SetMaterial(const std::string &_materialName, bool _unique,
+    const bool _cascade)
 {
   if (_materialName.empty() || _materialName == "__default__")
     return;
@@ -1008,20 +1009,24 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   // check if material has color components, if so, set them.
   if (matColor)
   {
-    this->SetAmbient(matAmbient);
-    this->SetDiffuse(matDiffuse);
-    this->SetSpecular(matSpecular);
-    this->SetEmissive(matEmissive);
+    this->SetAmbient(matAmbient, _cascade);
+    this->SetDiffuse(matDiffuse, _cascade);
+    this->SetSpecular(matSpecular, _cascade);
+    this->SetEmissive(matEmissive, _cascade);
   }
 
   // Re-apply the transparency filter for the last known transparency value
   this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
 
   // Apply material to all child visuals
-  for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
-       iter != this->dataPtr->children.end(); ++iter)
+std::cout << "cascade: " << _cascade << std::endl;
+  if (_cascade)
   {
-    (*iter)->SetMaterial(_materialName, _unique);
+    for (auto &child : this->dataPtr->children)
+    {
+std::cout << "child: " << child->GetName() << "  " << _materialName << std::endl;
+      child->SetMaterial(_materialName, _unique, _cascade);
+    }
   }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized()
@@ -1036,7 +1041,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 }
 
 /////////////////////////////////////////////////
-void Visual::SetAmbient(const common::Color &_color)
+void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1046,11 +1051,6 @@ void Visual::SetAmbient(const common::Color &_color)
     std::string matName = this->GetName() + "_MATERIAL_";
     Ogre::MaterialManager::getSingleton().create(matName, "General");
     this->SetMaterial(matName);
-  }
-
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
-  {
-    this->dataPtr->children[i]->SetAmbient(_color);
   }
 
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
@@ -1090,9 +1090,12 @@ void Visual::SetAmbient(const common::Color &_color)
     }
   }
 
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  if (_cascade)
   {
-    this->dataPtr->children[i]->SetAmbient(_color);
+    for (auto &child : this->dataPtr->children)
+    {
+      child->SetAmbient(_color, _cascade);
+    }
   }
 
   this->dataPtr->ambient = _color;
@@ -1102,7 +1105,7 @@ void Visual::SetAmbient(const common::Color &_color)
 }
 
 /////////////////////////////////////////////////
-void Visual::SetDiffuse(const common::Color &_color)
+void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1155,9 +1158,12 @@ void Visual::SetDiffuse(const common::Color &_color)
     }
   }
 
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  if (_cascade)
   {
-    this->dataPtr->children[i]->SetDiffuse(_color);
+    for (auto &child : this->dataPtr->children)
+    {
+      child->SetDiffuse(_color, _cascade);
+    }
   }
 
   this->dataPtr->diffuse = _color;
@@ -1167,7 +1173,7 @@ void Visual::SetDiffuse(const common::Color &_color)
 }
 
 /////////////////////////////////////////////////
-void Visual::SetSpecular(const common::Color &_color)
+void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1216,9 +1222,12 @@ void Visual::SetSpecular(const common::Color &_color)
     }
   }
 
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  if (_cascade)
   {
-    this->dataPtr->children[i]->SetSpecular(_color);
+    for (auto &child : this->dataPtr->children)
+    {
+      child->SetSpecular(_color, _cascade);
+    }
   }
 
   this->dataPtr->specular = _color;
@@ -1228,7 +1237,7 @@ void Visual::SetSpecular(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetEmissive(const common::Color &_color)
+void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
 {
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
@@ -1267,9 +1276,12 @@ void Visual::SetEmissive(const common::Color &_color)
     }
   }
 
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  if (_cascade)
   {
-    this->dataPtr->children[i]->SetEmissive(_color);
+    for (auto &child : this->dataPtr->children)
+    {
+      child->SetEmissive(_color, _cascade);
+    }
   }
 
   this->dataPtr->emissive = _color;
@@ -1430,7 +1442,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetTransparency(float _trans)
+void Visual::SetTransparency(float _trans, const bool _cascade)
 {
   if (math::equal(this->dataPtr->transparency, _trans))
     return;
@@ -1438,15 +1450,18 @@ void Visual::SetTransparency(float _trans)
   this->dataPtr->transparency = std::min(
       std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
 
-  for (auto child : this->dataPtr->children)
+  if (_cascade)
   {
-    // Don't change some visualizations when link changes
-    if (!(this->GetType() == VT_LINK &&
-        (child->GetType() == VT_GUI ||
-         child->GetType() == VT_PHYSICS ||
-         child->GetType() == VT_SENSOR)))
+    for (auto &child : this->dataPtr->children)
     {
-      child->SetTransparency(_trans);
+      // Don't change some visualizations when link changes
+      if (!(this->GetType() == VT_LINK &&
+          (child->GetType() == VT_GUI ||
+           child->GetType() == VT_PHYSICS ||
+           child->GetType() == VT_SENSOR)))
+      {
+        child->SetTransparency(_trans);
+      }
     }
   }
 
