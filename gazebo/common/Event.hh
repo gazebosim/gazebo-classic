@@ -140,8 +140,11 @@ namespace gazebo
       /// \brief Constructor
       public: EventConnection(const bool _on,
                   boost::function<T> *_cb)
-              : on(_on), callback(_cb)
+              : callback(_cb)
       {
+        // Windows Visual Studio 2012 does not have atomic_bool constructor,
+	// so we have to set "on" using operator=
+        on = _on;
       }
 
       /// \brief On/off value for the event callback
