@@ -50,6 +50,7 @@ foreach(dep @PKG_DEPENDS@)
       find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system filesystem program_options regex iostreams date_time)
     else()
       find_package(${dep} REQUIRED)
+    endif()
   endif()
   list(APPEND @PKG_NAME@_INCLUDE_DIRS ${${dep}_INCLUDE_DIRS})
 
