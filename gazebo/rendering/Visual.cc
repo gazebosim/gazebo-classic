@@ -1019,12 +1019,10 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
   this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
 
   // Apply material to all child visuals
-std::cout << "cascade: " << _cascade << std::endl;
   if (_cascade)
   {
     for (auto &child : this->dataPtr->children)
     {
-std::cout << "child: " << child->GetName() << "  " << _materialName << std::endl;
       child->SetMaterial(_materialName, _unique, _cascade);
     }
   }
