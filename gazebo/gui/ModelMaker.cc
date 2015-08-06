@@ -152,18 +152,15 @@ bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
     prefix = "unit_cylinder_";
 
   int counter = 0;
-  std::ostringstream modelName;
-  modelName << prefix << counter;
-  while (scene->GetVisual(modelName.str()))
+  std::string modelName;
+  do
   {
-    modelName.str("");
-    modelName << prefix << counter;
-    counter++;
-  }
+    modelName = prefix + std::to_string(counter++);
+  } while (scene->GetVisual(modelName));
 
   // Model message
   msgs::Model model;
-  model.set_name(modelName.str());
+  model.set_name(modelName);
   msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
   if (_shape == BOX)
     msgs::AddBoxLink(model, 1.0, ignition::math::Vector3d::One);
@@ -343,7 +340,7 @@ void ModelMaker::CreateTheEntity()
           (isLight && scene->GetLight(modelName)))
       {
         modelName = modelElem->Get<std::string>("name") + "_" +
-            boost::lexical_cast<std::string>(i++);
+            std::to_string(i++);
       }
     }
 

@@ -37,11 +37,9 @@ namespace gazebo
 
       // Documentation inherited
       public: void Start();
-      using EntityMaker::Start;
 
       // Documentation inherited
       public: void Stop();
-      using EntityMaker::Stop;
 
       /// \brief Initialize the light maker from an existing light in the scene.
       /// \param[in] _lightName Name of existing light in the scene.

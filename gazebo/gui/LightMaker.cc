@@ -122,15 +122,13 @@ bool LightMaker::Init()
 
   // Unique name
   int counter = 0;
-  std::ostringstream lightName;
-  lightName << "user_" << dPtr->lightTypename << "_light_" << counter;
-  while (scene->GetLight(lightName.str()))
+  std::string lightName;
+  do
   {
-    lightName.str("");
-    lightName << "user_" << dPtr->lightTypename << "_light_" << counter;
-    counter++;
-  }
-  dPtr->msg.set_name(lightName.str());
+    lightName = "user_" + dPtr->lightTypename + "_light_" +
+        std::to_string(counter++);
+  } while (scene->GetLight(lightName));
+  dPtr->msg.set_name(lightName);
 
   return true;
 }

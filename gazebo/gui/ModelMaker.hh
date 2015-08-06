@@ -52,7 +52,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Stop();
-      using EntityMaker::Stop;
 
       /// \brief Initialize the model maker with an existing model
       /// \param[in] _modelName Name of existing model in the scene.
