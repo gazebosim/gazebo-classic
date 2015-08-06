@@ -28,11 +28,11 @@ namespace gazebo
   {
     extern GZ_GUI_VISIBLE QAction *g_newAct;
     extern GZ_GUI_VISIBLE QAction *g_openAct;
-    extern GZ_GUI_VISIBLE QAction *g_importAct;
     extern GZ_GUI_VISIBLE QAction *g_saveAct;
     extern GZ_GUI_VISIBLE QAction *g_saveAsAct;
     extern GZ_GUI_VISIBLE QAction *g_saveCfgAct;
     extern GZ_GUI_VISIBLE QAction *g_cloneAct;
+    extern GZ_GUI_VISIBLE QAction *g_hotkeyChartAct;
     extern GZ_GUI_VISIBLE QAction *g_aboutAct;
     extern GZ_GUI_VISIBLE QAction *g_quitAct;
 
