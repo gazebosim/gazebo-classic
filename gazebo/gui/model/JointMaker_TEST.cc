@@ -191,34 +191,34 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(msgs::ConvertJointType(rev2joint->jointMsg->type()) == "revolute2");
   QCOMPARE(msgs::ConvertIgn(rev2joint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
-  qFuzzyCompare(rev2joint->jointMsg->cfm(), 0.0);
-  qFuzzyCompare(rev2joint->jointMsg->bounce(), 0.0);
-  qFuzzyCompare(rev2joint->jointMsg->fudge_factor(), 0.0);
-  qFuzzyCompare(rev2joint->jointMsg->limit_cfm(), 0.0);
-  qFuzzyCompare(rev2joint->jointMsg->limit_erp(), 0.2);
-  qFuzzyCompare(rev2joint->jointMsg->suspension_cfm(), 0.0);
-  qFuzzyCompare(rev2joint->jointMsg->suspension_erp(), 0.2);
+  QVERIFY(ignition::math::equal(rev2joint->jointMsg->cfm(), 0.0));
+  QVERIFY(ignition::math::equal(rev2joint->jointMsg->bounce(), 0.0));
+  QVERIFY(ignition::math::equal(rev2joint->jointMsg->fudge_factor(), 0.0));
+  QVERIFY(ignition::math::equal(rev2joint->jointMsg->limit_cfm(), 0.0));
+  QVERIFY(ignition::math::equal(rev2joint->jointMsg->limit_erp(), 0.2));
+  QVERIFY(ignition::math::equal(rev2joint->jointMsg->suspension_cfm(), 0.0));
+  QVERIFY(ignition::math::equal(rev2joint->jointMsg->suspension_erp(), 0.2));
 
   msgs::Axis rev2Axis1Msg = rev2joint->jointMsg->axis1();
   QCOMPARE(msgs::ConvertIgn(rev2Axis1Msg.xyz()),
       ignition::math::Vector3d(1, 0, 0));
-  qFuzzyCompare(rev2Axis1Msg.limit_lower(), -IGN_DBL_MAX);
-  qFuzzyCompare(rev2Axis1Msg.limit_upper(), IGN_DBL_MAX);
-  qFuzzyCompare(rev2Axis1Msg.limit_effort(), -1);
-  qFuzzyCompare(rev2Axis1Msg.limit_velocity(), -1);
-  qFuzzyCompare(rev2Axis1Msg.damping(), 0.0);
-  qFuzzyCompare(rev2Axis1Msg.friction(), 0.0);
+  QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_lower(), -IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_effort(), -1.0));
+  QVERIFY(ignition::math::equal(rev2Axis1Msg.limit_velocity(), -1.0));
+  QVERIFY(ignition::math::equal(rev2Axis1Msg.damping(), 0.0));
+  QVERIFY(ignition::math::equal(rev2Axis1Msg.friction(), 0.0));
   QCOMPARE(rev2Axis1Msg.use_parent_model_frame(), false);
 
   msgs::Axis rev2Axis2Msg = rev2joint->jointMsg->axis2();
   QCOMPARE(msgs::ConvertIgn(rev2Axis2Msg.xyz()),
       ignition::math::Vector3d(0, 1, 0));
-  qFuzzyCompare(rev2Axis2Msg.limit_lower(), -IGN_DBL_MAX);
-  qFuzzyCompare(rev2Axis2Msg.limit_upper(), IGN_DBL_MAX);
-  qFuzzyCompare(rev2Axis2Msg.limit_effort(), -1);
-  qFuzzyCompare(rev2Axis2Msg.limit_velocity(), -1);
-  qFuzzyCompare(rev2Axis2Msg.damping(), 0.0);
-  qFuzzyCompare(rev2Axis2Msg.friction(), 0.0);
+  QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_lower(), -IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_effort(), -1.0));
+  QVERIFY(ignition::math::equal(rev2Axis2Msg.limit_velocity(), -1.0));
+  QVERIFY(ignition::math::equal(rev2Axis2Msg.damping(), 0.0));
+  QVERIFY(ignition::math::equal(rev2Axis2Msg.friction(), 0.0));
   QCOMPARE(rev2Axis2Msg.use_parent_model_frame(), false);
 
   // Add a prismatic joint
@@ -245,23 +245,23 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(msgs::ConvertJointType(prisJoint->jointMsg->type()) == "prismatic");
   QCOMPARE(msgs::ConvertIgn(prisJoint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
-  qFuzzyCompare(prisJoint->jointMsg->cfm(), 0.0);
-  qFuzzyCompare(prisJoint->jointMsg->bounce(), 0.0);
-  qFuzzyCompare(prisJoint->jointMsg->fudge_factor(), 0.0);
-  qFuzzyCompare(prisJoint->jointMsg->limit_cfm(), 0.0);
-  qFuzzyCompare(prisJoint->jointMsg->limit_erp(), 0.2);
-  qFuzzyCompare(prisJoint->jointMsg->suspension_cfm(), 0.0);
-  qFuzzyCompare(prisJoint->jointMsg->suspension_erp(), 0.2);
+  QVERIFY(ignition::math::equal(prisJoint->jointMsg->cfm(), 0.0));
+  QVERIFY(ignition::math::equal(prisJoint->jointMsg->bounce(), 0.0));
+  QVERIFY(ignition::math::equal(prisJoint->jointMsg->fudge_factor(), 0.0));
+  QVERIFY(ignition::math::equal(prisJoint->jointMsg->limit_cfm(), 0.0));
+  QVERIFY(ignition::math::equal(prisJoint->jointMsg->limit_erp(), 0.2));
+  QVERIFY(ignition::math::equal(prisJoint->jointMsg->suspension_cfm(), 0.0));
+  QVERIFY(ignition::math::equal(prisJoint->jointMsg->suspension_erp(), 0.2));
 
   msgs::Axis prisAxis1Msg = prisJoint->jointMsg->axis1();
   QCOMPARE(msgs::ConvertIgn(prisAxis1Msg.xyz()),
       ignition::math::Vector3d(1, 0, 0));
-  qFuzzyCompare(prisAxis1Msg.limit_lower(), -IGN_DBL_MAX);
-  qFuzzyCompare(prisAxis1Msg.limit_upper(), IGN_DBL_MAX);
-  qFuzzyCompare(prisAxis1Msg.limit_effort(), -1);
-  qFuzzyCompare(prisAxis1Msg.limit_velocity(), -1);
-  qFuzzyCompare(prisAxis1Msg.damping(), 0.0);
-  qFuzzyCompare(prisAxis1Msg.friction(), 0.0);
+  QVERIFY(ignition::math::equal(prisAxis1Msg.limit_lower(), -IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(prisAxis1Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(prisAxis1Msg.limit_effort(), -1.0));
+  QVERIFY(ignition::math::equal(prisAxis1Msg.limit_velocity(), -1.0));
+  QVERIFY(ignition::math::equal(prisAxis1Msg.damping(), 0.0));
+  QVERIFY(ignition::math::equal(prisAxis1Msg.friction(), 0.0));
   QCOMPARE(prisAxis1Msg.use_parent_model_frame(), false);
 
   // Add a gearbox joint
@@ -288,34 +288,34 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(msgs::ConvertJointType(gearboxJoint->jointMsg->type()) == "gearbox");
   QCOMPARE(msgs::ConvertIgn(gearboxJoint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
-  qFuzzyCompare(gearboxJoint->jointMsg->cfm(), 0.0);
-  qFuzzyCompare(gearboxJoint->jointMsg->bounce(), 0.0);
-  qFuzzyCompare(gearboxJoint->jointMsg->fudge_factor(), 0.0);
-  qFuzzyCompare(gearboxJoint->jointMsg->limit_cfm(), 0.0);
-  qFuzzyCompare(gearboxJoint->jointMsg->limit_erp(), 0.2);
-  qFuzzyCompare(gearboxJoint->jointMsg->suspension_cfm(), 0.0);
-  qFuzzyCompare(gearboxJoint->jointMsg->suspension_erp(), 0.2);
+  QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->cfm(), 0.0));
+  QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->bounce(), 0.0));
+  QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->fudge_factor(), 0.0));
+  QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->limit_cfm(), 0.0));
+  QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->limit_erp(), 0.2));
+  QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->suspension_cfm(), 0.0));
+  QVERIFY(ignition::math::equal(gearboxJoint->jointMsg->suspension_erp(), 0.2));
 
   msgs::Axis gearboxAxis1Msg = gearboxJoint->jointMsg->axis1();
   QCOMPARE(msgs::ConvertIgn(gearboxAxis1Msg.xyz()),
-      ignition::math::Vector3d(1, 0, 0));
-  qFuzzyCompare(gearboxAxis1Msg.limit_lower(), -IGN_DBL_MAX);
-  qFuzzyCompare(gearboxAxis1Msg.limit_upper(), IGN_DBL_MAX);
-  qFuzzyCompare(gearboxAxis1Msg.limit_effort(), -1);
-  qFuzzyCompare(gearboxAxis1Msg.limit_velocity(), -1);
-  qFuzzyCompare(gearboxAxis1Msg.damping(), 0.0);
-  qFuzzyCompare(gearboxAxis1Msg.friction(), 0.0);
+      ignition::math::Vector3d(0, 0, 1));
+  QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_lower(), -IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_effort(), -1.0));
+  QVERIFY(ignition::math::equal(gearboxAxis1Msg.limit_velocity(), -1.0));
+  QVERIFY(ignition::math::equal(gearboxAxis1Msg.damping(), 0.0));
+  QVERIFY(ignition::math::equal(gearboxAxis1Msg.friction(), 0.0));
   QCOMPARE(gearboxAxis1Msg.use_parent_model_frame(), false);
 
   msgs::Axis gearboxAxis2Msg = gearboxJoint->jointMsg->axis2();
   QCOMPARE(msgs::ConvertIgn(gearboxAxis2Msg.xyz()),
-      ignition::math::Vector3d(0, 1, 0));
-  qFuzzyCompare(gearboxAxis2Msg.limit_lower(), -IGN_DBL_MAX);
-  qFuzzyCompare(gearboxAxis2Msg.limit_upper(), IGN_DBL_MAX);
-  qFuzzyCompare(gearboxAxis2Msg.limit_effort(), -1);
-  qFuzzyCompare(gearboxAxis2Msg.limit_velocity(), -1);
-  qFuzzyCompare(gearboxAxis2Msg.damping(), 0.0);
-  qFuzzyCompare(gearboxAxis2Msg.friction(), 0.0);
+      ignition::math::Vector3d(0, 0, 1));
+  QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_lower(), -IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_upper(), IGN_DBL_MAX));
+  QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_effort(), -1.0));
+  QVERIFY(ignition::math::equal(gearboxAxis2Msg.limit_velocity(), -1.0));
+  QVERIFY(ignition::math::equal(gearboxAxis2Msg.damping(), 0.0));
+  QVERIFY(ignition::math::equal(gearboxAxis2Msg.friction(), 0.0));
   QCOMPARE(gearboxAxis2Msg.use_parent_model_frame(), false);
 
   // Add a fixed joint
@@ -342,13 +342,13 @@ void JointMaker_TEST::JointDefaultProperties()
   QVERIFY(msgs::ConvertJointType(fixedJoint->jointMsg->type()) == "fixed");
   QCOMPARE(msgs::ConvertIgn(fixedJoint->jointMsg->pose()),
       ignition::math::Pose3d::Zero);
-  qFuzzyCompare(fixedJoint->jointMsg->cfm(), 0.0);
-  qFuzzyCompare(fixedJoint->jointMsg->bounce(), 0.0);
-  qFuzzyCompare(fixedJoint->jointMsg->fudge_factor(), 0.0);
-  qFuzzyCompare(fixedJoint->jointMsg->limit_cfm(), 0.0);
-  qFuzzyCompare(fixedJoint->jointMsg->limit_erp(), 0.2);
-  qFuzzyCompare(fixedJoint->jointMsg->suspension_cfm(), 0.0);
-  qFuzzyCompare(fixedJoint->jointMsg->suspension_erp(), 0.2);
+  QVERIFY(ignition::math::equal(fixedJoint->jointMsg->cfm(), 0.0));
+  QVERIFY(ignition::math::equal(fixedJoint->jointMsg->bounce(), 0.0));
+  QVERIFY(ignition::math::equal(fixedJoint->jointMsg->fudge_factor(), 0.0));
+  QVERIFY(ignition::math::equal(fixedJoint->jointMsg->limit_cfm(), 0.0));
+  QVERIFY(ignition::math::equal(fixedJoint->jointMsg->limit_erp(), 0.2));
+  QVERIFY(ignition::math::equal(fixedJoint->jointMsg->suspension_cfm(), 0.0));
+  QVERIFY(ignition::math::equal(fixedJoint->jointMsg->suspension_erp(), 0.2));
 
   // fixed joint has no axes.
   QVERIFY(!fixedJoint->jointMsg->has_axis1());
