@@ -55,6 +55,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  logical_camera_sensor.cc
   model.cc
   model_database.cc
   noise.cc
@@ -70,6 +71,7 @@ set(tests
   physics_thread_safe.cc
   pioneer2dx.cc
   plugin.cc
+  region_events.cc
   rest_web.cc
   road.cc
   sensor.cc

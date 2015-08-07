@@ -39,11 +39,7 @@ namespace gazebo
 
     /// \brief Callback when a model message is received.
     /// \param[in] _msg model msg
-    public: void OnModelMsg(ConstModelPtr & _msg);
-
-    /// \brief Callback when timestamped poses message is received.
-    /// \param[in] _msg poses stamped msg
-    public:void OnPoseMsg(ConstPosesStampedPtr &_msg);
+    public: void OnModelMsg(ConstModelPtr &_msg);
 
     /// \brief Updates the box event plugin at every physics iteration
     /// \param[in] _info Update info
@@ -53,14 +49,14 @@ namespace gazebo
     /// \param[in] _point 3D Point in world space.
     /// \param[in] _box World axis-aligned box.
     /// \param[in] _pose Pose of the model representing the box region.
-    private: bool PointInRegion(const math::Vector3 &_point,
-        const math::Box &_box, const math::Pose &_pose);
+    private: bool PointInRegion(const ignition::math::Vector3d &_point,
+        const ignition::math::Box &_box, const ignition::math::Pose3d &_pose);
 
     /// \brief Update box region dimensions and pose.
     /// \param[in] _scale New scale
     /// \param[in] _pose New pose
-    private: bool UpdateRegion(const math::Vector3 &_scale,
-        const math::Pose& _pose);
+    private: bool UpdateRegion(const ignition::math::Vector3d &_scale,
+        const ignition::math::Pose3d &_pose);
 
     /// \brief Send event when model enters box region
     /// \param[in] _model Model that entered the box region.
@@ -89,16 +85,16 @@ namespace gazebo
     public: boost::mutex *receiveMutex;
 
     /// \brief Box region initial size
-    private: math::Vector3 boxSize;
+    private: ignition::math::Vector3d boxSize;
 
     /// \brief Box region scale
-    private: math::Vector3 boxScale;
+    private: ignition::math::Vector3d boxScale;
 
     /// \brief Box region pose.
-    private: math::Pose boxPose;
+    private: ignition::math::Pose3d boxPose;
 
     /// \brief Box region
-    private: math::Box box;
+    private: ignition::math::Box box;
 
     /// \brief Subscriber to model/info topic.
     private: transport::SubscriberPtr modelSub;
@@ -115,7 +111,6 @@ namespace gazebo
 
     /// \brief Pointer to event source object that emits sim events
     private: gazebo::EventSourcePtr eventSource;
-
   };
 }
 
