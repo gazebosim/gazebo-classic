@@ -50,7 +50,6 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->boxPose = this->model->GetWorldPose().Ign();
   this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose);
 
-
   if (_sdf->HasElement("event"))
   {
     sdf::ElementPtr event = _sdf->GetElement("event");
