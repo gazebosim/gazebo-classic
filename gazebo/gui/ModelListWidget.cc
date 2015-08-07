@@ -155,6 +155,8 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
         boost::bind(&ModelListWidget::OnSetSelectedEntity, this, _1, _2)));
 
   QTimer::singleShot(500, this, SLOT(Update()));
+
+  this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 }
 
 /////////////////////////////////////////////////

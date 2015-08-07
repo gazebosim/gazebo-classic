@@ -15,6 +15,9 @@
  *
  */
 
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/TimeWidget.hh"
 #include "gazebo/gui/TimeWidgetPrivate.hh"
@@ -28,17 +31,13 @@ TimeWidget::TimeWidget(QWidget *_parent)
 {
   this->setObjectName("timeWidget");
 
-  this->dataPtr->timePanel = dynamic_cast<TimePanel *>(_parent);
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
-  QHBoxLayout *mainLayout = new QHBoxLayout;
-
-  QScrollArea *scrollArea = new QScrollArea(this);
-  scrollArea->setLineWidth(1);
-  scrollArea->setFrameShape(QFrame::NoFrame);
-  scrollArea->setFrameShadow(QFrame::Plain);
-  scrollArea->setWidgetResizable(true);
-  scrollArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  QFrame *frame = new QFrame();
+  frame->setFrameShape(QFrame::NoFrame);
+  frame->setContentsMargins(0, 0, 0, 0);
+  // frame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
   // Play control (Play/Step/Pause)
   QSpinBox *stepSpinBox = new QSpinBox;
@@ -71,13 +70,9 @@ TimeWidget::TimeWidget(QWidget *_parent)
   connect(stepSpinBox, SIGNAL(editingFinished()), stepMenu,
       SLOT(hide()));
 
-  QFrame *frame = new QFrame(scrollArea);
-  frame->setFrameShape(QFrame::NoFrame);
-  scrollArea->setWidget(frame);
-
   QToolBar *playToolbar = new QToolBar;
   playToolbar->setObjectName("playToolBar");
-  playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  //playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
   if (g_playAct)
     playToolbar->addAction(g_playAct);
   if (g_pauseAct)
@@ -92,6 +87,7 @@ TimeWidget::TimeWidget(QWidget *_parent)
     playToolbar->addAction(g_stepAct);
     g_stepAct->setEnabled(this->dataPtr->paused);
   }
+
   this->dataPtr->stepToolBarLabelAction =
       playToolbar->addWidget(stepToolBarLabel);
   this->dataPtr->stepButtonAction =
@@ -102,7 +98,7 @@ TimeWidget::TimeWidget(QWidget *_parent)
   this->dataPtr->percentRealTimeEdit->setObjectName(
       "timeWidgetPercentRealTime");
   this->dataPtr->percentRealTimeEdit->setReadOnly(true);
-  this->dataPtr->percentRealTimeEdit->setFixedWidth(90);
+  this->dataPtr->percentRealTimeEdit->setFixedWidth(110);
 
   this->dataPtr->simTimeEdit = new QLineEdit;
   this->dataPtr->simTimeEdit->setObjectName("timeWidgetSimTime");
@@ -121,52 +117,49 @@ TimeWidget::TimeWidget(QWidget *_parent)
 
   this->dataPtr->fpsEdit = new QLineEdit;
   this->dataPtr->fpsEdit->setReadOnly(true);
-  this->dataPtr->fpsEdit->setFixedWidth(90);
+  this->dataPtr->fpsEdit->setFixedWidth(110);
   this->dataPtr->fpsEdit->setObjectName("timeWidgetFPS");
 
   QPushButton *timeResetButton = new QPushButton("Reset");
   timeResetButton->setFocusPolicy(Qt::NoFocus);
   connect(timeResetButton, SIGNAL(clicked()), this, SLOT(OnTimeReset()));
 
-  QHBoxLayout *frameLayout = new QHBoxLayout;
-  frameLayout->setContentsMargins(0, 0, 0, 0);
-  frameLayout->addItem(new QSpacerItem(5, -1, QSizePolicy::Expanding,
-      QSizePolicy::Minimum));
-  frameLayout->addWidget(playToolbar);
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+  frameLayout->setContentsMargins(4, 4, 4, 4);
 
+  QGridLayout *statsLayout = new QGridLayout();
+  statsLayout->setContentsMargins(0, 0, 0, 0);
   this->dataPtr->realTimeFactorLabel = new QLabel(tr("Real Time Factor:"));
-  frameLayout->addWidget(this->dataPtr->realTimeFactorLabel);
-  frameLayout->addWidget(this->dataPtr->percentRealTimeEdit);
+  statsLayout->addWidget(this->dataPtr->realTimeFactorLabel,0, 0);
+  statsLayout->addWidget(this->dataPtr->percentRealTimeEdit,0, 1);
 
   this->dataPtr->simTimeLabel = new QLabel(tr("Sim Time:"));
-  frameLayout->addWidget(this->dataPtr->simTimeLabel);
-  frameLayout->addWidget(this->dataPtr->simTimeEdit);
+  statsLayout->addWidget(this->dataPtr->simTimeLabel, 1, 0);
+  statsLayout->addWidget(this->dataPtr->simTimeEdit, 1, 1);
 
   this->dataPtr->realTimeLabel = new QLabel(tr("Real Time:"));
-  frameLayout->addWidget(this->dataPtr->realTimeLabel);
-  frameLayout->addWidget(this->dataPtr->realTimeEdit);
+  statsLayout->addWidget(this->dataPtr->realTimeLabel, 2, 0);
+  statsLayout->addWidget(this->dataPtr->realTimeEdit, 2, 1);
 
   this->dataPtr->iterationsLabel = new QLabel(tr("Iterations:"));
-  frameLayout->addWidget(this->dataPtr->iterationsLabel);
-  frameLayout->addWidget(this->dataPtr->iterationsEdit);
+  statsLayout->addWidget(this->dataPtr->iterationsLabel, 3, 0);
+  statsLayout->addWidget(this->dataPtr->iterationsEdit, 3, 1);
 
   this->dataPtr->fpsLabel = new QLabel(tr("FPS:"));
-  frameLayout->addWidget(this->dataPtr->fpsLabel);
-  frameLayout->addWidget(this->dataPtr->fpsEdit);
+  statsLayout->addWidget(this->dataPtr->fpsLabel, 4, 0);
+  statsLayout->addWidget(this->dataPtr->fpsEdit, 4, 1);
 
+  frameLayout->addWidget(playToolbar);
+  frameLayout->addLayout(statsLayout);
   frameLayout->addWidget(timeResetButton);
 
-  frameLayout->addItem(new QSpacerItem(15, -1, QSizePolicy::Expanding,
-      QSizePolicy::Minimum));
 
   frame->setLayout(frameLayout);
-  frame->layout()->setContentsMargins(0, 0, 0, 0);
 
-  mainLayout->addWidget(scrollArea);
+  mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
 
-  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  this->layout()->setContentsMargins(0, 0, 0, 0);
+  //this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
   // Create a QueuedConnection to set avg fps.
   // This is used for thread safety.
@@ -187,6 +180,20 @@ TimeWidget::TimeWidget(QWidget *_parent)
   // This is used for thread safety.
   connect(this, SIGNAL(SetRealTime(QString)), this->dataPtr->realTimeEdit,
       SLOT(setText(QString)), Qt::QueuedConnection);
+
+  // Transport
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
+      "~/world_stats", &TimeWidget::OnStats, this);
+  this->dataPtr->worldControlPub = this->dataPtr->node->
+      Advertise<msgs::WorldControl>("~/world_control");
+
+  // Timer
+  QTimer *timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(Update()));
+  timer->start(60);
 }
 
 /////////////////////////////////////////////////
@@ -258,12 +265,6 @@ void TimeWidget::ShowStepWidget(bool _show)
 }
 
 /////////////////////////////////////////////////
-void TimeWidget::OnTimeReset()
-{
-  this->dataPtr->timePanel->OnTimeReset();
-}
-
-/////////////////////////////////////////////////
 void TimeWidget::OnStepValueChanged(int _value)
 {
   // text formating and resizing for better presentation
@@ -273,8 +274,6 @@ void TimeWidget::OnStepValueChanged(int _value)
   this->dataPtr->stepButton->setFont(stepFont);
   numStr.insert(numStr.end(), 4 - numStr.size(), ' ');
   this->dataPtr->stepButton->setText(tr(numStr.c_str()));
-
-  this->dataPtr->timePanel->OnStepValueChanged(_value);
 }
 
 /////////////////////////////////////////////////
@@ -305,4 +304,106 @@ void TimeWidget::EmitSetFPS(QString _time)
 void TimeWidget::SetPercentRealTimeEdit(QString _text)
 {
   this->dataPtr->percentRealTimeEdit->setText(_text);
+}
+
+/////////////////////////////////////////////////
+void TimeWidget::OnStats(ConstWorldStatisticsPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  this->dataPtr->simTimes.push_back(msgs::Convert(_msg->sim_time()));
+  if (this->dataPtr->simTimes.size() > 20)
+    this->dataPtr->simTimes.pop_front();
+
+  this->dataPtr->realTimes.push_back(msgs::Convert(_msg->real_time()));
+  if (this->dataPtr->realTimes.size() > 20)
+    this->dataPtr->realTimes.pop_front();
+
+  /*if (_msg->has_log_playback_stats())
+  {
+    this->SetTimeWidgetVisible(false);
+    this->SetLogPlayWidgetVisible(true);
+  }
+  else
+  {
+    this->SetTimeWidgetVisible(true);
+    this->SetLogPlayWidgetVisible(false);
+  }*/
+
+  if (_msg->has_paused())
+  {
+    this->SetPaused(_msg->paused());
+  }
+
+  // Set simulation time
+  this->EmitSetSimTime(QString::fromStdString(
+        msgs::Convert(_msg->sim_time()).FormattedString()));
+
+  // Set real time
+  this->EmitSetRealTime(QString::fromStdString(
+        msgs::Convert(_msg->real_time()).FormattedString()));
+
+  // Set the iterations
+  this->EmitSetIterations(QString::fromStdString(
+        std::to_string(_msg->iterations())));
+}
+
+/////////////////////////////////////////////////
+void TimeWidget::Update()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  // Avoid apparent race condition on start, seen on Windows.
+  if (!this->dataPtr->simTimes.size() || !this->dataPtr->realTimes.size())
+    return;
+
+  std::ostringstream percent;
+
+  common::Time simAvg, realAvg;
+  std::list<common::Time>::iterator simIter, realIter;
+
+  simIter = ++(this->dataPtr->simTimes.begin());
+  realIter = ++(this->dataPtr->realTimes.begin());
+  while (simIter != this->dataPtr->simTimes.end() &&
+      realIter != this->dataPtr->realTimes.end())
+  {
+    simAvg += ((*simIter) - this->dataPtr->simTimes.front());
+    realAvg += ((*realIter) - this->dataPtr->realTimes.front());
+    ++simIter;
+    ++realIter;
+  }
+  if (realAvg == 0)
+    simAvg = 0;
+  else
+    simAvg = simAvg / realAvg;
+
+  if (simAvg > 0)
+    percent << std::fixed << std::setprecision(2) << simAvg.Double();
+  else
+    percent << "0";
+
+  if (this->isVisible())
+    this->SetPercentRealTimeEdit(percent.str().c_str());
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  if (cam)
+  {
+    std::ostringstream avgFPS;
+    avgFPS << cam->GetAvgFPS();
+
+    if (this->isVisible())
+    {
+      // Set the avg fps
+      this->EmitSetFPS(avgFPS.str().c_str());
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void TimeWidget::OnTimeReset()
+{
+  msgs::WorldControl msg;
+  msg.mutable_reset()->set_all(false);
+  msg.mutable_reset()->set_time_only(true);
+  this->dataPtr->worldControlPub->Publish(msg);
 }

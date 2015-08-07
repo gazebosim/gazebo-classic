@@ -18,6 +18,8 @@
 #define _GAZEBO_TIME_WIDGET_PRIVATE_HH_
 
 #include <vector>
+#include <list>
+#include <mutex>
 
 #include "gazebo/gui/qt.h"
 
@@ -74,8 +76,23 @@ namespace gazebo
       /// \brief Event based connections.
       public: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Paused state of the simulation.
-      public: TimePanel *timePanel;
+      /// \brief Node used for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Subscriber to the statistics topic.
+      public: transport::SubscriberPtr statsSub;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: transport::PublisherPtr worldControlPub;
+
+      /// \brief Mutex to protect the memeber variables.
+      public: std::mutex mutex;
+
+      /// \brief List of simulation times used to compute averages.
+      public: std::list<common::Time> simTimes;
+
+      /// \brief List of real times used to compute averages.
+      public: std::list<common::Time> realTimes;
     };
   }
 }

@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_TIME_WIDGET_HH_
 #define _GAZEBO_TIME_WIDGET_HH_
 
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/util/system.hh"
@@ -96,6 +97,9 @@ namespace gazebo
       /// \param[in] _value New step value.
       public slots: void OnStepValueChanged(int _value);
 
+      /// \brief Update the data output.
+      private slots: void Update();
+
       /// \brief QT callback when the reset time button is pressed.
       public slots: void OnTimeReset();
 
@@ -114,6 +118,10 @@ namespace gazebo
       /// \brief A signal used to set the avg fps line edit.
       /// \param[in] _string String representation of avg fps.
       signals: void SetFPS(QString _string);
+
+      /// \brief Called when a world stats message is received.
+      /// \param[in] _msg World statistics message.
+      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

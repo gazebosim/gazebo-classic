@@ -65,15 +65,9 @@ RenderWidget::RenderWidget(QWidget *_parent)
   render3DLayout->setSpacing(0);
   render3DLayout->setContentsMargins(0, 0, 0, 0);
 
-  // render3DLayout->addWidget(this->toolFrame);
-  render3DLayout->addWidget(this->glWidget);
-  render3DFrame->setLayout(render3DLayout);
-  mainLayout->addWidget(render3DFrame);
-  //render3DLayout->setContentsMargins(0, 0, 0, 0);
-
   //QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  /*this->toolFrame = new QFrame;
+  this->toolFrame = new QFrame;
   this->toolFrame->setObjectName("toolFrame");
   this->toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -193,7 +187,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolLayout->addWidget(this->toolbar);
   toolLayout->addSpacing(10);
   this->toolFrame->setLayout(toolLayout);
-  */
+
+  render3DLayout->addWidget(this->toolFrame);
+  render3DLayout->addWidget(this->glWidget);
+  render3DFrame->setLayout(render3DLayout);
+  mainLayout->addWidget(render3DFrame);
+
 /*
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
