@@ -768,8 +768,6 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_cylinderCreateAct);
 
-  QVERIFY(gazebo::gui::g_meshCreateAct);
-
   QVERIFY(gazebo::gui::g_pointLghtCreateAct);
 
   QVERIFY(gazebo::gui::g_spotLghtCreateAct);
@@ -878,8 +876,6 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_sphereCreateAct);
 
   QVERIFY(!gazebo::gui::g_cylinderCreateAct);
-
-  QVERIFY(!gazebo::gui::g_meshCreateAct);
 
   QVERIFY(!gazebo::gui::g_pointLghtCreateAct);
 

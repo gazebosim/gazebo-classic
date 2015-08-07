@@ -51,7 +51,6 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_boxCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_sphereCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_cylinderCreateAct;
-    extern GZ_GUI_VISIBLE QAction *g_meshCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_pointLghtCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_spotLghtCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_dirLghtCreateAct;
