@@ -28,7 +28,6 @@
 
 namespace gazebo
 {
-
   class RegionEventBoxPlugin : public ModelPlugin
   {
     /// \brief Constructor
@@ -82,7 +81,7 @@ namespace gazebo
     public: transport::NodePtr node;
 
     /// \brief Mutex to protect incoming messages
-    public: boost::mutex *receiveMutex;
+    public: boost::mutex receiveMutex;
 
     /// \brief Box region initial size
     private: ignition::math::Vector3d boxSize;

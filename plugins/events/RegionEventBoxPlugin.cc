@@ -25,7 +25,6 @@ GZ_REGISTER_MODEL_PLUGIN(RegionEventBoxPlugin)
 RegionEventBoxPlugin::RegionEventBoxPlugin()
   : ModelPlugin(), eventPub(0)
 {
-  this->receiveMutex = new boost::mutex();
   this->hasStaleSizeAndPose = true;
 }
 
@@ -74,7 +73,7 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr & _msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   if (_msg->has_name() && _msg->name() == this->modelName && _msg->has_scale())
   {
     this->boxScale = msgs::ConvertIgn(_msg->scale());
@@ -86,7 +85,7 @@ void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr & _msg)
 void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo & _info)
 {
   {
-    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    boost::mutex::scoped_lock lock(this->receiveMutex);
     if (this->boxPose != this->model->GetWorldPose().Ign())
     {
       this->boxPose = this->model->GetWorldPose().Ign();
