@@ -1750,6 +1750,13 @@ void ModelCreator::ShowContextMenu(const std::string &_link)
   {
     menu.addAction(this->inspectAct);
 
+    menu.addSeparator();
+
+    menu.addAction(g_copyAct);
+    menu.addAction(g_pasteAct);
+
+    menu.addSeparator();
+
     if (this->jointMaker)
     {
       std::vector<JointData *> joints = this->jointMaker->GetJointDataByLink(
