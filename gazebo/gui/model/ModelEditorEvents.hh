@@ -189,6 +189,19 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointInserted.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the joint changed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectJointChanged(T _subscriber)
+          { return jointChanged.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the joint changed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectJointChanged(
+            event::ConnectionPtr _subscriber)
+          { jointChanged.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the link removed signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -345,18 +358,23 @@ namespace gazebo
         /// \brief Notify that a link has been inserted.
         public: static event::EventT<void (std::string)> linkInserted;
 
-        /// \brief Notify that a joint has been inserted. The first string is
-        /// the joint's unique id, the second string is the joint name, the
-        /// third is the parent link's name, the fourth is the child link's
-        /// name. All names scoped.
-        public: static event::EventT<void (std::string, std::string,
-            std::string, std::string)> jointInserted;
-
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
 
+        /// \brief Notify that a joint has been inserted. The parameters are:
+        /// joint's unique id, joint name, joint type, parent link's name, and
+        /// child link's name. All names are scoped.
+        public: static event::EventT<void (std::string, std::string,
+            std::string, std::string, std::string)> jointInserted;
+
         /// \brief Notify that a joint has been removed.
         public: static event::EventT<void (std::string)> jointRemoved;
+
+        /// \brief Notify that a joint has been changed. The parameters are:
+        /// joint's unique id, joint name, joint type, parent link's name, and
+        /// child link's name. All names are scoped.
+        public: static event::EventT<void (std::string, std::string,
+            std::string, std::string, std::string)> jointChanged;
 
         /// \brief Request to open the link inspector.
         public: static event::EventT<void (std::string)> openLinkInspector;

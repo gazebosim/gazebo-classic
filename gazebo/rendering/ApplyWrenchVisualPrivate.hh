@@ -30,6 +30,9 @@ namespace gazebo
     /// \brief Private data for the Apply Wrench Visual class.
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
+      /// \brief Material for the current mode.
+      public: std::string selectedMaterial;
+
       /// \brief Material for the unselected mode.
       public: std::string unselectedMaterial;
 
@@ -56,6 +59,19 @@ namespace gazebo
 
       /// \brief Mutex to protect variables
       public: std::mutex mutex;
+
+      /// \brief Rotation tool composed of two circles.
+      public: rendering::SelectionObjPtr rotTool;
+
+      /// \brief If true, the rotation tool was rotated by the mouse and
+      /// shouldn't be oriented again according to the vector.
+      public: bool rotatedByMouse;
+
+      /// \brief Text displaying the force magnitude.
+      public: MovableText forceText;
+
+      /// \brief Text displaying the torque magnitude.
+      public: MovableText torqueText;
     };
   }
 }

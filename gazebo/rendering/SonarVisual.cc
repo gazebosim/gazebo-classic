@@ -41,6 +41,8 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   SonarVisualPrivate *dPtr =
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VT_SENSOR;
+
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
@@ -136,12 +138,14 @@ void SonarVisual::Update()
     dPtr->sonarRay->SetPoint(0, math::Vector3(0, 0, rangeDelta * 0.5));
   }
 
-  math::Pose pose = msgs::Convert(dPtr->sonarMsg->sonar().world_pose());
+  ignition::math::Pose3d pose =
+    msgs::ConvertIgn(dPtr->sonarMsg->sonar().world_pose());
   this->SetPose(pose);
 
   if (dPtr->sonarMsg->sonar().has_contact())
   {
-    math::Vector3 pos = msgs::Convert(dPtr->sonarMsg->sonar().contact());
+    ignition::math::Vector3d pos =
+      msgs::ConvertIgn(dPtr->sonarMsg->sonar().contact());
     dPtr->sonarRay->SetPoint(1, pos);
   }
   else

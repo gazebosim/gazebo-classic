@@ -1,3 +1,7 @@
+if (WIN32)
+  add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN)
+endif()
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
@@ -26,6 +30,12 @@ if (HAVE_DART)
   link_directories(${DARTCore_LIBRARY_DIRS})
 endif()
 
+if (HAVE_UUID)
+  include_directories(${uuid_INCLUDE_DIRS})
+  link_directories(${uuid_LIBRARY_DIRS})
+  add_definitions(${uuid_CFLAGS})
+endif()
+
 set (plugins
   ActuatorPlugin
   ArrangePlugin
@@ -47,12 +57,14 @@ set (plugins
   ModelPropShop
   MudPlugin
   PressurePlugin
+  RandomVelocityPlugin
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  TransporterPlugin
   VehiclePlugin)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
@@ -91,4 +103,7 @@ foreach (src ${GUIplugins})
 endforeach (src ${GUIplugins})
 
 add_subdirectory(events)
-add_subdirectory(rest_web)
+
+if (NOT WIN32)
+  add_subdirectory(rest_web)
+endif()

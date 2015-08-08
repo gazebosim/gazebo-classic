@@ -688,6 +688,144 @@ TEST_F(Visual_TEST, GetAncestors)
   EXPECT_TRUE(vis3_1->GetNthAncestor(4) == NULL);
   EXPECT_TRUE(vis3_2->GetNthAncestor(4) == NULL);
   EXPECT_EQ(vis4->GetNthAncestor(4), vis4);
+
+  // Check if it is ancestor / descendant
+
+  // world
+  EXPECT_FALSE(world->IsAncestorOf(world));
+  EXPECT_TRUE(world->IsAncestorOf(vis1));
+  EXPECT_TRUE(world->IsAncestorOf(vis2));
+  EXPECT_TRUE(world->IsAncestorOf(vis3_1));
+  EXPECT_TRUE(world->IsAncestorOf(vis3_2));
+  EXPECT_TRUE(world->IsAncestorOf(vis4));
+
+  EXPECT_FALSE(world->IsDescendantOf(world));
+  EXPECT_FALSE(world->IsDescendantOf(vis1));
+  EXPECT_FALSE(world->IsDescendantOf(vis2));
+  EXPECT_FALSE(world->IsDescendantOf(vis3_1));
+  EXPECT_FALSE(world->IsDescendantOf(vis3_2));
+  EXPECT_FALSE(world->IsDescendantOf(vis4));
+
+  // vis1
+  EXPECT_FALSE(vis1->IsAncestorOf(world));
+  EXPECT_FALSE(vis1->IsAncestorOf(vis1));
+  EXPECT_TRUE(vis1->IsAncestorOf(vis2));
+  EXPECT_TRUE(vis1->IsAncestorOf(vis3_1));
+  EXPECT_TRUE(vis1->IsAncestorOf(vis3_2));
+  EXPECT_TRUE(vis1->IsAncestorOf(vis4));
+
+  EXPECT_TRUE(vis1->IsDescendantOf(world));
+  EXPECT_FALSE(vis1->IsDescendantOf(vis1));
+  EXPECT_FALSE(vis1->IsDescendantOf(vis2));
+  EXPECT_FALSE(vis1->IsDescendantOf(vis3_1));
+  EXPECT_FALSE(vis1->IsDescendantOf(vis3_2));
+  EXPECT_FALSE(vis1->IsDescendantOf(vis4));
+
+  // vis2
+  EXPECT_FALSE(vis2->IsAncestorOf(world));
+  EXPECT_FALSE(vis2->IsAncestorOf(vis1));
+  EXPECT_FALSE(vis2->IsAncestorOf(vis2));
+  EXPECT_TRUE(vis2->IsAncestorOf(vis3_1));
+  EXPECT_TRUE(vis2->IsAncestorOf(vis3_2));
+  EXPECT_TRUE(vis2->IsAncestorOf(vis4));
+
+  EXPECT_TRUE(vis2->IsDescendantOf(world));
+  EXPECT_TRUE(vis2->IsDescendantOf(vis1));
+  EXPECT_FALSE(vis2->IsDescendantOf(vis2));
+  EXPECT_FALSE(vis2->IsDescendantOf(vis3_1));
+  EXPECT_FALSE(vis2->IsDescendantOf(vis3_2));
+  EXPECT_FALSE(vis2->IsDescendantOf(vis4));
+
+  // vis3_1
+  EXPECT_FALSE(vis3_1->IsAncestorOf(world));
+  EXPECT_FALSE(vis3_1->IsAncestorOf(vis1));
+  EXPECT_FALSE(vis3_1->IsAncestorOf(vis2));
+  EXPECT_FALSE(vis3_1->IsAncestorOf(vis3_1));
+  EXPECT_FALSE(vis3_1->IsAncestorOf(vis3_2));
+  EXPECT_TRUE(vis3_1->IsAncestorOf(vis4));
+
+  EXPECT_TRUE(vis3_1->IsDescendantOf(world));
+  EXPECT_TRUE(vis3_1->IsDescendantOf(vis1));
+  EXPECT_TRUE(vis3_1->IsDescendantOf(vis2));
+  EXPECT_FALSE(vis3_1->IsDescendantOf(vis3_1));
+  EXPECT_FALSE(vis3_1->IsDescendantOf(vis3_2));
+  EXPECT_FALSE(vis3_1->IsDescendantOf(vis4));
+
+  // vis3_2
+  EXPECT_FALSE(vis3_2->IsAncestorOf(world));
+  EXPECT_FALSE(vis3_2->IsAncestorOf(vis1));
+  EXPECT_FALSE(vis3_2->IsAncestorOf(vis2));
+  EXPECT_FALSE(vis3_2->IsAncestorOf(vis3_1));
+  EXPECT_FALSE(vis3_2->IsAncestorOf(vis3_2));
+  EXPECT_FALSE(vis3_2->IsAncestorOf(vis4));
+
+  EXPECT_TRUE(vis3_2->IsDescendantOf(world));
+  EXPECT_TRUE(vis3_2->IsDescendantOf(vis1));
+  EXPECT_TRUE(vis3_2->IsDescendantOf(vis2));
+  EXPECT_FALSE(vis3_2->IsDescendantOf(vis3_1));
+  EXPECT_FALSE(vis3_2->IsDescendantOf(vis3_2));
+  EXPECT_FALSE(vis3_2->IsDescendantOf(vis4));
+
+  // vis4
+  EXPECT_FALSE(vis4->IsAncestorOf(world));
+  EXPECT_FALSE(vis4->IsAncestorOf(vis1));
+  EXPECT_FALSE(vis4->IsAncestorOf(vis2));
+  EXPECT_FALSE(vis4->IsAncestorOf(vis3_1));
+  EXPECT_FALSE(vis4->IsAncestorOf(vis3_2));
+  EXPECT_FALSE(vis4->IsAncestorOf(vis4));
+
+  EXPECT_TRUE(vis4->IsDescendantOf(world));
+  EXPECT_TRUE(vis4->IsDescendantOf(vis1));
+  EXPECT_TRUE(vis4->IsDescendantOf(vis2));
+  EXPECT_TRUE(vis4->IsDescendantOf(vis3_1));
+  EXPECT_FALSE(vis4->IsDescendantOf(vis3_2));
+  EXPECT_FALSE(vis4->IsDescendantOf(vis4));
+
+  // NULL
+  EXPECT_FALSE(world->IsAncestorOf(NULL));
+  EXPECT_FALSE(world->IsDescendantOf(NULL));
+  EXPECT_FALSE(vis4->IsAncestorOf(NULL));
+  EXPECT_FALSE(vis4->IsDescendantOf(NULL));
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, ConvertVisualType)
+{
+  // convert from msgs::Visual::Type to Visual::VisualType
+  EXPECT_EQ(msgs::Visual::ENTITY,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_ENTITY));
+  EXPECT_EQ(msgs::Visual::MODEL,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_MODEL));
+  EXPECT_EQ(msgs::Visual::LINK,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_LINK));
+  EXPECT_EQ(msgs::Visual::VISUAL,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_VISUAL));
+  EXPECT_EQ(msgs::Visual::COLLISION,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_COLLISION));
+  EXPECT_EQ(msgs::Visual::SENSOR,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_SENSOR));
+  EXPECT_EQ(msgs::Visual::GUI,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_GUI));
+  EXPECT_EQ(msgs::Visual::PHYSICS,
+      rendering::Visual::ConvertVisualType(rendering::Visual::VT_PHYSICS));
+
+  // convert from Visual::VisualType to msgs::Visual::Type
+  EXPECT_EQ(rendering::Visual::VT_ENTITY,
+      rendering::Visual::ConvertVisualType(msgs::Visual::ENTITY));
+  EXPECT_EQ(rendering::Visual::VT_MODEL,
+      rendering::Visual::ConvertVisualType(msgs::Visual::MODEL));
+  EXPECT_EQ(rendering::Visual::VT_LINK,
+      rendering::Visual::ConvertVisualType(msgs::Visual::LINK));
+  EXPECT_EQ(rendering::Visual::VT_VISUAL,
+      rendering::Visual::ConvertVisualType(msgs::Visual::VISUAL));
+  EXPECT_EQ(rendering::Visual::VT_COLLISION,
+      rendering::Visual::ConvertVisualType(msgs::Visual::COLLISION));
+  EXPECT_EQ(rendering::Visual::VT_SENSOR,
+      rendering::Visual::ConvertVisualType(msgs::Visual::SENSOR));
+  EXPECT_EQ(rendering::Visual::VT_GUI,
+      rendering::Visual::ConvertVisualType(msgs::Visual::GUI));
+  EXPECT_EQ(rendering::Visual::VT_PHYSICS,
+      rendering::Visual::ConvertVisualType(msgs::Visual::PHYSICS));
 }
 
 /////////////////////////////////////////////////

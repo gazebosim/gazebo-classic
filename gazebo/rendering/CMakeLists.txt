@@ -7,12 +7,6 @@ include_directories(SYSTEM
   skyx/include
 )
 
-if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
-  add_subdirectory(deferred_shading)
-endif()
-
-add_subdirectory(skyx)
-add_subdirectory(selection_buffer)
 
 if (WIN32)
   include_directories(${libdl_include_dir})
@@ -41,8 +35,10 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LinkFrameVisual.cc
   SonarVisual.cc
   Light.cc
+  LogicalCameraVisual.cc
   Material.cc
   MovableText.cc
   OrbitViewController.cc
@@ -98,6 +94,8 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LinkFrameVisual.hh
+  LogicalCameraVisual.hh
   SonarVisual.hh
   Light.hh
   Material.hh
@@ -128,6 +126,13 @@ set (headers
   ogre_gazebo.h
 )
 
+if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
+  add_subdirectory(deferred_shading)
+endif()
+
+add_subdirectory(selection_buffer)
+add_subdirectory(skyx)
+
 if (HAVE_OCULUS)
   set (sources ${sources}
     OculusCamera.cc
@@ -146,7 +151,9 @@ set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
+  LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
+  Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
@@ -167,7 +174,8 @@ link_directories(
   ${ogre_library_dirs}
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_RENDERING")
+set (CMAKE_CXX_FLAGS
+  "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_RENDERING -DSKYX_LIB")
 if (WIN32)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
 endif()
@@ -177,8 +185,6 @@ gz_add_library(gazebo_rendering ${sources})
 target_link_libraries(gazebo_rendering
   gazebo_common
   gazebo_msgs
-  gazebo_skyx
-  gazebo_selection_buffer
   gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
@@ -191,10 +197,6 @@ endif()
 
 if (NOT APPLE AND NOT WIN32)
   target_link_libraries(gazebo_rendering X11)
-endif()
-
-if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
-  target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
 endif()
 
 gz_install_library(gazebo_rendering)

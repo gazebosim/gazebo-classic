@@ -30,20 +30,23 @@
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/Sensor.hh"
 
+void RegisterAltimeterSensor();
 void RegisterCameraSensor();
 void RegisterContactSensor();
 void RegisterDepthCameraSensor();
-void RegisterMultiCameraSensor();
+void RegisterForceTorqueSensor();
 void RegisterGpsSensor();
 void RegisterGpuRaySensor();
 void RegisterImuSensor();
+void RegisterLogicalCameraSensor();
+void RegisterMagnetometerSensor();
+void RegisterMultiCameraSensor();
 void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
 void RegisterSonarSensor();
-void RegisterForceTorqueSensor();
-void RegisterWirelessTransmitter();
 void RegisterWirelessReceiver();
+void RegisterWirelessTransmitter();
 
 using namespace gazebo;
 using namespace sensors;
@@ -53,20 +56,23 @@ std::map<std::string, SensorFactoryFn> SensorFactory::sensorMap;
 /////////////////////////////////////////////////
 void SensorFactory::RegisterAll()
 {
+  RegisterAltimeterSensor();
   RegisterCameraSensor();
   RegisterContactSensor();
   RegisterDepthCameraSensor();
-  RegisterMultiCameraSensor();
+  RegisterForceTorqueSensor();
+  RegisterImuSensor();
   RegisterGpsSensor();
   RegisterGpuRaySensor();
-  RegisterImuSensor();
+  RegisterLogicalCameraSensor();
+  RegisterMultiCameraSensor();
+  RegisterMagnetometerSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
   RegisterSonarSensor();
-  RegisterForceTorqueSensor();
-  RegisterWirelessTransmitter();
   RegisterWirelessReceiver();
+  RegisterWirelessTransmitter();
 }
 
 /////////////////////////////////////////////////

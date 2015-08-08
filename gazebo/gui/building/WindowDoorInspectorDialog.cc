@@ -22,7 +22,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
-  QWidget *_parent) : QDialog(_parent)
+  QWidget *_parent) : BaseInspectorDialog(_parent)
 {
   this->setObjectName("windowDoorInspectorDialog");
 
@@ -36,7 +36,8 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
 
   std::string titleStr = dialogModeStr + " Inspector";
   this->setWindowTitle(tr(titleStr.c_str()));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   std::string itemLabelStr = dialogModeStr + " Name:";
   QLabel *itemlLabel = new QLabel(tr(itemLabelStr.c_str()));
@@ -44,37 +45,45 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(itemlLabel);
-  nameLayout->addWidget(itemNameLabel);
+  nameLayout->addWidget(this->itemNameLabel);
 
   QLabel *widthLabel = new QLabel(tr("Width: "));
 //  QLabel *depthLabel = new QLabel(tr("Depth: "));
   QLabel *heightLabel = new QLabel(tr("Height: "));
 
   this->widthSpinBox = new QDoubleSpinBox;
-  this->widthSpinBox->setRange(-1000, 1000);
+  this->widthSpinBox->setRange(0, 1000);
   this->widthSpinBox->setSingleStep(0.001);
   this->widthSpinBox->setDecimals(3);
   this->widthSpinBox->setValue(0.000);
+  this->widthSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *widthUnitLabel = new QLabel(tr("m"));
+  widthUnitLabel->setMaximumWidth(40);
 
   this->depthSpinBox = new QDoubleSpinBox;
-  this->depthSpinBox->setRange(-1000, 1000);
+  this->depthSpinBox->setRange(0, 1000);
   this->depthSpinBox->setSingleStep(0.001);
   this->depthSpinBox->setDecimals(3);
   this->depthSpinBox->setValue(0.000);
 
   this->heightSpinBox = new QDoubleSpinBox;
-  this->heightSpinBox->setRange(-1000, 1000);
+  this->heightSpinBox->setRange(0, 1000);
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
   this->heightSpinBox->setValue(0.000);
+  this->heightSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *heightUnitLabel = new QLabel(tr("m"));
+  heightUnitLabel->setMaximumWidth(40);
 
   QGridLayout *sizeLayout = new QGridLayout;
   sizeLayout->addWidget(widthLabel, 0, 0);
-  sizeLayout->addWidget(widthSpinBox, 0, 1);
+  sizeLayout->addWidget(this->widthSpinBox, 0, 1);
+  sizeLayout->addWidget(widthUnitLabel, 0, 2);
 //  sizeLayout->addWidget(depthLabel, 1, 0);
-//  sizeLayout->addWidget(depthSpinBox, 1, 1);
+//  sizeLayout->addWidget(this->depthSpinBox, 1, 1);
   sizeLayout->addWidget(heightLabel, 2, 0);
-  sizeLayout->addWidget(heightSpinBox, 2, 1);
+  sizeLayout->addWidget(this->heightSpinBox, 2, 1);
+  sizeLayout->addWidget(heightUnitLabel, 2, 2);
 
   QGroupBox *sizeGroupBox = new QGroupBox(tr("Size"));
   sizeGroupBox->setLayout(sizeLayout);
@@ -88,26 +97,38 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
   this->positionXSpinBox->setSingleStep(0.001);
   this->positionXSpinBox->setDecimals(3);
   this->positionXSpinBox->setValue(0.000);
+  this->positionXSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *positionXUnitLabel = new QLabel(tr("m"));
+  positionXUnitLabel->setMaximumWidth(40);
 
   this->positionYSpinBox = new QDoubleSpinBox;
   this->positionYSpinBox->setRange(-1000, 1000);
   this->positionYSpinBox->setSingleStep(0.001);
   this->positionYSpinBox->setDecimals(3);
   this->positionYSpinBox->setValue(0.000);
+  this->positionYSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *positionYUnitLabel = new QLabel(tr("m"));
+  positionYUnitLabel->setMaximumWidth(40);
 
   this->elevationSpinBox = new QDoubleSpinBox;
-  this->elevationSpinBox->setRange(-1000, 1000);
+  this->elevationSpinBox->setRange(0, 1000);
   this->elevationSpinBox->setSingleStep(0.001);
   this->elevationSpinBox->setDecimals(3);
   this->elevationSpinBox->setValue(0.000);
+  this->elevationSpinBox->setAlignment(Qt::AlignRight);
+  QLabel *elevationUnitLabel = new QLabel(tr("m"));
+  elevationUnitLabel->setMaximumWidth(40);
 
   QGridLayout *positionLayout = new QGridLayout;
   positionLayout->addWidget(positionXLabel, 0, 0);
-  positionLayout->addWidget(positionXSpinBox, 0, 1);
+  positionLayout->addWidget(this->positionXSpinBox, 0, 1);
+  positionLayout->addWidget(positionXUnitLabel, 0, 2);
   positionLayout->addWidget(positionYLabel), 1, 0;
-  positionLayout->addWidget(positionYSpinBox, 1, 1);
-  positionLayout->addWidget(elevationLabel, 0, 2);
-  positionLayout->addWidget(elevationSpinBox, 0, 3);
+  positionLayout->addWidget(this->positionYSpinBox, 1, 1);
+  positionLayout->addWidget(positionYUnitLabel, 1, 2);
+  positionLayout->addWidget(elevationLabel, 0, 3);
+  positionLayout->addWidget(this->elevationSpinBox, 0, 4);
+  positionLayout->addWidget(elevationUnitLabel, 0, 5);
 
   QGroupBox *positionGroupBox = new QGroupBox(tr("Position"));
   positionGroupBox->setLayout(positionLayout);
@@ -118,7 +139,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
 
   QHBoxLayout *typeLayout = new QHBoxLayout;
   typeLayout->addWidget(typeLabel);
-  typeLayout->addWidget(typeComboBox);
+  typeLayout->addWidget(this->typeComboBox);
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));

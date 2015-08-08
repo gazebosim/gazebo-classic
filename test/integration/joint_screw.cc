@@ -20,7 +20,7 @@
 // #include "gazebo/physics/Joint.hh"
 // #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/test/ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"
 
 using namespace gazebo;
@@ -272,12 +272,6 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   {
     /// \TODO skipping bullet, see issue #1081
     gzerr << "BulletScrewJoint::GetAngle() is one step behind (issue #1081).\n";
-    return;
-  }
-
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issues #1096.\n";
     return;
   }
 

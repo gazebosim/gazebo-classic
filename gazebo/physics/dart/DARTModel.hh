@@ -27,6 +27,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTModelPrivate;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_dart DART Physics
     /// \brief dart physics engine wrapper
@@ -70,14 +73,9 @@ namespace gazebo
       /// \brief
       public: dart::simulation::World *GetDARTWorld(void) const;
 
-      /// \brief
-      protected: dart::dynamics::Skeleton *dtSkeleton;
-
-      /// \brief
-      protected: Eigen::VectorXd dtConfig;
-
-      /// \brief
-      protected: Eigen::VectorXd dtVelocity;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTModelPrivate *dataPtr;
     };
     /// \}
   }
