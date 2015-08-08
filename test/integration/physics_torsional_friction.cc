@@ -61,9 +61,9 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       auto surfODE =
           boost::static_pointer_cast<physics::ODESurfaceParams>(surf);
 
-      this->coefficient = surf->GetFrictionPyramid()->GetMuTorsion();
-      this->patch = surf->GetFrictionPyramid()->GetPatchRadius();
-      this->radius = surf->GetFrictionPyramid()->GetSurfaceRadius();
+      this->coefficient = surf->GetFrictionPyramid()->MuTorsion();
+      this->patch = surf->GetFrictionPyramid()->PatchRadius();
+      this->radius = surf->GetFrictionPyramid()->SurfaceRadius();
       this->kp = surfODE->kp;
 
       // Get inertial params

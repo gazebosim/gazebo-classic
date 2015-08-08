@@ -51,25 +51,25 @@ double FrictionPyramid::GetMuSecondary()
 }
 
 //////////////////////////////////////////////////
-double FrictionPyramid::GetMuTorsion()
+double FrictionPyramid::MuTorsion()
 {
   return this->GetMu(2);
 }
 
 //////////////////////////////////////////////////
-double FrictionPyramid::GetPatchRadius()
+double FrictionPyramid::PatchRadius() const
 {
   return this->patchRadius;
 }
 
 //////////////////////////////////////////////////
-double FrictionPyramid::GetSurfaceRadius()
+double FrictionPyramid::SurfaceRadius() const
 {
   return this->surfaceRadius;
 }
 
 //////////////////////////////////////////////////
-bool FrictionPyramid::GetUsePatchRadius()
+bool FrictionPyramid::UsePatchRadius() const
 {
   return this->usePatchRadius;
 }
@@ -87,25 +87,25 @@ void FrictionPyramid::SetMuSecondary(double _mu)
 }
 
 //////////////////////////////////////////////////
-void FrictionPyramid::SetMuTorsion(double _mu)
+void FrictionPyramid::SetMuTorsion(const double _mu)
 {
   this->SetMu(2, _mu);
 }
 
 //////////////////////////////////////////////////
-void FrictionPyramid::SetPatchRadius(double _radius)
+void FrictionPyramid::SetPatchRadius(const double _radius)
 {
   this->patchRadius = _radius;
 }
 
 //////////////////////////////////////////////////
-void FrictionPyramid::SetSurfaceRadius(double _radius)
+void FrictionPyramid::SetSurfaceRadius(const double _radius)
 {
   this->surfaceRadius = _radius;
 }
 
 //////////////////////////////////////////////////
-void FrictionPyramid::SetUsePatchRadius(bool _use)
+void FrictionPyramid::SetUsePatchRadius(const bool _use)
 {
   this->usePatchRadius = _use;
 }

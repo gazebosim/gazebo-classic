@@ -149,14 +149,14 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
             this->frictionPyramid->direction1.Ign());
 
   _msg.mutable_friction()->mutable_torsional()->set_coefficient(
-      this->frictionPyramid->GetMuTorsion());
+      this->frictionPyramid->MuTorsion());
 
   _msg.mutable_friction()->mutable_torsional()->set_patch_radius(
-      this->frictionPyramid->GetPatchRadius());
+      this->frictionPyramid->PatchRadius());
   _msg.mutable_friction()->mutable_torsional()->set_surface_radius(
-      this->frictionPyramid->GetSurfaceRadius());
+      this->frictionPyramid->SurfaceRadius());
   _msg.mutable_friction()->mutable_torsional()->set_use_patch_radius(
-      this->frictionPyramid->GetUsePatchRadius());
+      this->frictionPyramid->UsePatchRadius());
   _msg.mutable_friction()->mutable_torsional()->mutable_ode()->set_slip(
       this->slipTorsion);
 

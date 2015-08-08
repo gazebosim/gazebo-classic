@@ -1133,20 +1133,20 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                 surf2->GetFrictionPyramid()->GetMuPrimary());
   contact.surface.mu2 = std::min(surf1->GetFrictionPyramid()->GetMuSecondary(),
                                  surf2->GetFrictionPyramid()->GetMuSecondary());
-  contact.surface.mu3 = std::min(surf1->GetFrictionPyramid()->GetMuTorsion(),
-                                 surf2->GetFrictionPyramid()->GetMuTorsion());
+  contact.surface.mu3 = std::min(surf1->GetFrictionPyramid()->MuTorsion(),
+                                 surf2->GetFrictionPyramid()->MuTorsion());
   contact.surface.patch_radius =
-      std::max(surf1->GetFrictionPyramid()->GetPatchRadius(),
-               surf2->GetFrictionPyramid()->GetPatchRadius());
+      std::max(surf1->GetFrictionPyramid()->PatchRadius(),
+               surf2->GetFrictionPyramid()->PatchRadius());
   // the curvature is combined using 1/R = 1/R1 + 1/R2
   // we can consider doing the same for the patch radius
   contact.surface.surface_radius = 1/
-      (1/surf1->GetFrictionPyramid()->GetSurfaceRadius()+
-      1/surf2->GetFrictionPyramid()->GetSurfaceRadius());
+      (1/surf1->GetFrictionPyramid()->SurfaceRadius()+
+      1/surf2->GetFrictionPyramid()->SurfaceRadius());
   // not sure how to combine these logic flags
   contact.surface.use_patch_radius =
-      surf1->GetFrictionPyramid()->GetUsePatchRadius() &&
-      surf2->GetFrictionPyramid()->GetUsePatchRadius();
+      surf1->GetFrictionPyramid()->UsePatchRadius() &&
+      surf2->GetFrictionPyramid()->UsePatchRadius();
 
   // Set the slip values
   contact.surface.slip1 = std::min(surf1->slip1,
