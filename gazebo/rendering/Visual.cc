@@ -1009,10 +1009,10 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
   // check if material has color components, if so, set them.
   if (matColor)
   {
-    this->SetAmbient(matAmbient, _cascade);
-    this->SetDiffuse(matDiffuse, _cascade);
-    this->SetSpecular(matSpecular, _cascade);
-    this->SetEmissive(matEmissive, _cascade);
+    this->SetAmbient(matAmbient, false);
+    this->SetDiffuse(matDiffuse, false);
+    this->SetSpecular(matSpecular, false);
+    this->SetEmissive(matEmissive, false);
   }
 
   // Re-apply the transparency filter for the last known transparency value
