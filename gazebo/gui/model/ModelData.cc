@@ -137,7 +137,7 @@ void LinkData::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Pose3d LinkData::GetPose() const
+ignition::math::Pose3d LinkData::Pose() const
 {
   return this->linkSDF->Get<ignition::math::Pose3d>("pose");
 }
@@ -165,7 +165,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
         name.substr(name.find(linkName)+linkName.size()+2);
     ignition::math::Vector3d visOldSize;
     std::string uri;
-    visualConfig->GetGeometry(leafName,  visOldSize, uri);
+    visualConfig->Geometry(leafName,  visOldSize, uri);
     ignition::math::Vector3d visNewSize = it.first->GetGeometrySize();
     visualConfig->SetGeometry(leafName, visNewSize);
   }
@@ -182,7 +182,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 
     ignition::math::Vector3d colOldSize;
     std::string uri;
-    collisionConfig->GetGeometry(leafName,  colOldSize, uri);
+    collisionConfig->Geometry(leafName,  colOldSize, uri);
     ignition::math::Vector3d colNewSize = it.first->GetGeometrySize();
     collisionConfig->SetGeometry(leafName, colNewSize);
     colOldSizes[name] = colOldSize;
@@ -364,7 +364,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d LinkData::GetScale() const
+ignition::math::Vector3d LinkData::Scale() const
 {
   return this->scale;
 }
@@ -637,12 +637,12 @@ bool LinkData::Apply()
   // update internal variables
   msgs::Inertial *inertialMsg = linkMsg->mutable_inertial();
   this->mass = inertialMsg->mass();
-  this->inertiaIxx = inertialMsg->izz();
+  this->inertiaIxx = inertialMsg->ixx();
   this->inertiaIyy = inertialMsg->iyy();
   this->inertiaIzz = inertialMsg->izz();
 
   // update link visual pose
-  this->linkVisual->SetPose(this->GetPose());
+  this->linkVisual->SetPose(this->Pose());
 
   std::vector<msgs::Visual *> visualUpdateMsgsTemp;
   std::vector<msgs::Collision *> collisionUpdateMsgsTemp;

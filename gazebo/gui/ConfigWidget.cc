@@ -511,6 +511,17 @@ math::Pose ConfigWidget::GetPoseWidgetValue(const std::string &_name) const
 std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
     math::Vector3 &_dimensions, std::string &_uri) const
 {
+  ignition::math::Vector3d dimensions;
+  std::string type = this->GeometryWidgetValue(_name, dimensions, _uri);
+  _dimensions = dimensions;
+
+  return type;
+}
+
+/////////////////////////////////////////////////
+std::string ConfigWidget::GeometryWidgetValue(const std::string &_name,
+    ignition::math::Vector3d &_dimensions, std::string &_uri) const
+{
   std::string type;
   std::map <std::string, ConfigChildWidget *>::const_iterator iter =
       this->configWidgets.find(_name);
@@ -2484,7 +2495,7 @@ math::Pose ConfigWidget::GetPoseWidgetValue(ConfigChildWidget *_widget) const
 
 /////////////////////////////////////////////////
 std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
-    math::Vector3 &_dimensions, std::string &_uri) const
+    ignition::math::Vector3d &_dimensions, std::string &_uri) const
 {
   std::string value;
   if (_widget->widgets.size() != 8u)
@@ -2499,27 +2510,23 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
   bool isMesh = value == "mesh";
   if (value == "box" || isMesh)
   {
-    _dimensions.x =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->value();
-    _dimensions.y =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->value();
-    _dimensions.z =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->value();
+    _dimensions.X(qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->value());
+    _dimensions.Y(qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->value());
+    _dimensions.Z(qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->value());
   }
   else if (value == "cylinder")
   {
-    _dimensions.x =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0;
-    _dimensions.y = _dimensions.x;
-    _dimensions.z =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->value();
+    _dimensions.X(
+        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0);
+    _dimensions.Y(_dimensions.X());
+    _dimensions.Z(qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->value());
   }
   else if (value == "sphere")
   {
-    _dimensions.x =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0;
-    _dimensions.y = _dimensions.x;
-    _dimensions.z = _dimensions.x;
+    _dimensions.X(
+        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0);
+    _dimensions.Y(_dimensions.X());
+    _dimensions.Z(_dimensions.X());
   }
   else if (value == "polyline")
   {

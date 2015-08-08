@@ -73,7 +73,7 @@ namespace gazebo
 
       /// \brief Get the pose of the link.
       /// \return Pose of link.
-      public: ignition::math::Pose3d GetPose() const;
+      public: ignition::math::Pose3d Pose() const;
 
       /// \brief Set the pose of the link.
       /// \param[in] _pose Pose of link.
@@ -85,7 +85,7 @@ namespace gazebo
 
       /// \brief Get the scale of the link.
       /// \return Scale of link.
-      public: ignition::math::Vector3d GetScale() const;
+      public: ignition::math::Vector3d Scale() const;
 
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale of link.

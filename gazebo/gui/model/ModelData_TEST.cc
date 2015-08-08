@@ -73,7 +73,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->GetScale() == scale);
+    QVERIFY(link->Scale() == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -111,7 +111,7 @@ void ModelData_TEST::LinkScale()
       link->SetScale(newScale);
 
       // verify new scale
-      QVERIFY(link->GetScale() == newScale);
+      QVERIFY(link->Scale() == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -160,7 +160,7 @@ void ModelData_TEST::LinkScale()
       link->SetScale(newScale);
 
       // verify new scale
-      QVERIFY(link->GetScale() == newScale);
+      QVERIFY(link->Scale() == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -222,7 +222,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->GetScale() == scale);
+    QVERIFY(link->Scale() == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -260,7 +260,7 @@ void ModelData_TEST::LinkScale()
       link->SetScale(newScale);
 
       // verify new scale
-      QVERIFY(link->GetScale() == newScale);
+      QVERIFY(link->Scale() == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -314,7 +314,7 @@ void ModelData_TEST::LinkScale()
       link->SetScale(newScale);
 
       // verify new scale
-      QVERIFY(link->GetScale() == newScale);
+      QVERIFY(link->Scale() == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -376,7 +376,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->GetScale() == scale);
+    QVERIFY(link->Scale() == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -414,7 +414,7 @@ void ModelData_TEST::LinkScale()
       link->SetScale(newScale);
 
       // verify new scale
-      QVERIFY(link->GetScale() == newScale);
+      QVERIFY(link->Scale() == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -464,7 +464,7 @@ void ModelData_TEST::LinkScale()
       link->SetScale(newScale);
 
       // verify new scale
-      QVERIFY(link->GetScale() == newScale);
+      QVERIFY(link->Scale() == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -524,7 +524,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->GetScale() == scale);
+    QVERIFY(link->Scale() == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -563,7 +563,7 @@ void ModelData_TEST::LinkScale()
       link->SetScale(newScale);
 
       // verify new scale
-      QVERIFY(link->GetScale() == newScale);
+      QVERIFY(link->Scale() == newScale);
 
       // change in scale
       ignition::math::Vector3d dScale = newScale / scale;
@@ -624,7 +624,7 @@ void ModelData_TEST::LinkScale()
 
     // verify scale
     ignition::math::Vector3d scale = ignition::math::Vector3d::One;
-    QVERIFY(link->GetScale() == scale);
+    QVERIFY(link->Scale() == scale);
 
     sdf::ElementPtr linkSDF = link->linkSDF;
     QVERIFY(linkSDF->HasElement("inertial"));
@@ -664,7 +664,7 @@ void ModelData_TEST::LinkScale()
       collisionVis->SetScale(newScale);
       link->SetScale(newScale);
       // verify new scale
-      QVERIFY(link->GetScale() == newScale);
+      QVERIFY(link->Scale() == newScale);
     }
     // scale up
     for (unsigned int i = 1e5; i >= 1; i = i/10)
@@ -676,7 +676,7 @@ void ModelData_TEST::LinkScale()
       collisionVis->SetScale(newScale);
       link->SetScale(newScale);
       // verify new scale
-      QVERIFY(link->GetScale() == newScale);
+      QVERIFY(link->Scale() == newScale);
     }
     // verify against original mass and inertia values
     QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));

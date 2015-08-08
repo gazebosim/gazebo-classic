@@ -770,9 +770,8 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
   {
     // update radius the same way as collision shapes
     double radius = geomElem->GetElement("sphere")->Get<double>("radius");
-    double newRadius = std::max(_scale.Z(), std::max(_scale.X(), _scale.Y()));
-    double oldRadius = std::max(this->dataPtr->scale.Z(),
-        std::max(this->dataPtr->scale.X(), this->dataPtr->scale.Y()));
+    double newRadius = _scale.Max();
+    double oldRadius = this->dataPtr->scale.Max();
     double geomRadius = newRadius/oldRadius*radius;
     geomElem->GetElement("sphere")->GetElement("radius")->Set(geomRadius);
     this->dataPtr->geomSize = ignition::math::Vector3d(
