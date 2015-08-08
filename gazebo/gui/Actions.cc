@@ -72,8 +72,6 @@ QAction *gazebo::gui::g_sphereCreateAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_cylinderCreateAct = 0;
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_meshCreateAct = 0;
-GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_pointLghtCreateAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_spotLghtCreateAct = 0;

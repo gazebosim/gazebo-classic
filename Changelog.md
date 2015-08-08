@@ -18,8 +18,14 @@
 1. Tweaks to Data Logger, such as multiline text edit for path
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
 
+1. Added Visual::IsAncestorOf and Visual::IsDescendantOf
+    * [Pull request #1850](https://bitbucket.org/osrf/gazebo/pull-request/1850)
+
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
+
+1. Refactored makers
+    * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
 1. Model editor updates
     1. Added support for more joint types (gearbox and fixed joints).
