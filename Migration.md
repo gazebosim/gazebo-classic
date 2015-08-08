@@ -1,5 +1,21 @@
 ## Gazebo 6.X to 7.X
 
+### Modifications
+
+1. **gazebo/gui/building/BuildingMaker.hh**
+    * Doesn't inherit from gui::EntityMaker anymore
+    * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
+
+1. **gazebo/gui/EntityMaker.hh**
+    + ***Removed:*** EntityMaker();
+    + ***Replacement:*** EntityMaker(EntityMakerPrivate &_dataPtr);
+    + ***Removed:*** public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
+    + ***Replacement:*** public: virtual void Start();
+    + ***Removed:*** public: virtual void Stop() = 0;
+    + ***Replacement:*** public: virtual void Stop();
+
+### Deletions
+
 1. **gazebo rendering libraries**
     * The following libraries have been removed: `libgazebo_skyx`, `libgazebo_selection_buffer`, `libgazebo_rendering_deferred`. Gazebo now combines all the different rendering libraries into `libgazebo_rendering.so`.
     * [Pull request #1817](https://bitbucket.org/osrf/gazebo/pull-request/1817)
@@ -7,7 +23,25 @@
 1. **gazebo physics libraries**
     * The following libraries have been removed: `libgazebo_ode_physics`, `libgazebo_simbody_physics`, `libgazebo_dart_physics`, and `libgazebo_bullet_physics`. Gazebo now combines all the different physics engine libraries into `libgazebo_physics.so`.
     * [Pull request #1814](https://bitbucket.org/osrf/gazebo/pull-request/1814)
-    
+
+1. **gazebo/gui/BoxMaker.hh**
+
+1. **gazebo/gui/CylinderMaker.hh**
+
+1. **gazebo/gui/SphereMaker.hh**
+
+1. **gazebo/gui/MeshMaker.hh**
+
+1. **gazebo/gui/EntityMaker.hh**
+    + public: typedef boost::function<void(const math::Vector3 &pos,
+                  const math::Vector3 &scale)> CreateCallback;
+    + public: static void SetSnapToGrid(bool _snap);
+    + public: virtual bool IsActive() const = 0;
+    + public: virtual void OnMousePush(const common::MouseEvent &_event);
+    + public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+    + protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
+
+
 ## Gazebo 5.X to 6.X
 
 ### Modifications
@@ -15,7 +49,7 @@
 1. **gazebo/common/MouseEvent.hh**
     * Replaced all member variables with functions that use Ignition Math.
     * [Pull request #1777](https://bitbucket.org/osrf/gazebo/pull-request/1777)
- 
+
 1. **gazebo/msgs/world_stats.proto**
     + ***Removed:*** optional bool log_playback = 8;
     + ***Replacement:*** optional LogPlaybackStatistics log_playback_stats = 8;
