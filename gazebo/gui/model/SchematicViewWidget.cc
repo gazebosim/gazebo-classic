@@ -150,7 +150,6 @@ void SchematicViewWidget::AddNode(const std::string &_node)
 {
   //  std::string name = this->GetLeafName(_node);
   std::string name = this->GetScopedName(_node);
-  std::cerr << " add node " << name << std::endl;
 
   if (this->scene->HasNode(name))
     return;
@@ -212,7 +211,6 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   std::string parentNode = this->GetScopedName(_parent);
   std::string childNode = this->GetScopedName(_child);
 
-  std::cerr << " add edge " << parentNode << " VS " << childNode << std::endl;
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 

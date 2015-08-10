@@ -1946,8 +1946,14 @@ void ModelCreator::OnPaste()
       this->Reset();
     }
 
+    // Propagate copied entity's Z position and rotation
+    math::Pose copiedPose = copiedLink->GetPose();
+    clonePose.pos.z = copiedPose.pos.z;
+    clonePose.rot = copiedPose.rot;
+
     LinkData *clonedLink = this->CloneLink(it->first);
     clonedLink->linkVisual->SetWorldPose(clonePose);
+
     this->addLinkType = LINK_MESH;
     this->mouseVisual = clonedLink->linkVisual;
   }
