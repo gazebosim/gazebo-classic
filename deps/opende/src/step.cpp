@@ -854,7 +854,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
         for (unsigned int j = 0; j < 3; ++j)
         {
           b->facc[j] += cforcecurr[j];
-          b->tacc[j] += cforcecurr[3+j];
+          b->tacc[j] += cforcecurr[4+j];
         }
       }
       dxStepBody (b,stepsize);
