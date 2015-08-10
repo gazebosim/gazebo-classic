@@ -207,12 +207,15 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
     const std::string &/*_name*/, const std::string &_type,
     const std::string &_parent, const std::string &_child)
 {
+  if (this->HasEdge(_id))
+    return;
+
 //  std::string parentNode = this->GetLeafName(_parent);
 //  std::string childNode = this->GetLeafName(_child);
   std::string parentNode = this->GetScopedName(_parent);
   std::string childNode = this->GetScopedName(_child);
 
-  std::cerr << " add edge " << parentNode << " VS " << childNode << std::endl;
+
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 
@@ -285,7 +288,7 @@ unsigned int SchematicViewWidget::GetEdgeCount() const
 /////////////////////////////////////////////////
 bool SchematicViewWidget::HasEdge(const std::string &_id) const
 {
-  return this->edges.find(_id) != this->edges.end();
+  return (this->edges.find(_id) != this->edges.end());
 }
 
 /////////////////////////////////////////////////
