@@ -225,6 +225,10 @@ namespace gazebo
       /// \param[in] _type Type of link to be added
       public: void AddLink(LinkType _type);
 
+      /// \brief Add a model plugin to the model
+      /// \param[in] _pluginElem Pointer to plugin SDF element
+      public: void AddModelPlugin(sdf::ElementPtr _pluginElem);
+
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
 

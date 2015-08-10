@@ -197,6 +197,14 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->jointsItem->setFont(0, linksFont);
   this->modelTreeWidget->addTopLevelItem(this->jointsItem);
 
+  // Model Plugins
+  this->modelPluginsItem = new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("%1").arg(tr("Model Plugins"))));
+  this->modelPluginsItem->setData(0, Qt::UserRole,
+      QVariant(tr("Model Plugins")));
+  this->modelPluginsItem->setFont(0, linksFont);
+  this->modelTreeWidget->addTopLevelItem(this->modelPluginsItem);
+
   connect(this->modelTreeWidget,
       SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemDoubleClicked(QTreeWidgetItem *, int)));
@@ -266,6 +274,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
       gui::model::Events::ConnectJointInserted(
       boost::bind(&ModelEditorPalette::OnJointInserted, this, _1, _2, _3, _4)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectModelPluginInserted(
+      boost::bind(&ModelEditorPalette::OnModelPluginInserted, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
@@ -652,6 +664,21 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
   this->modelTreeWidget->addTopLevelItem(newJointItem);
 
   this->jointsItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnModelPluginInserted(
+    const std::string &_modelPluginName)
+{
+  QTreeWidgetItem *newModelPluginItem = new QTreeWidgetItem(
+      this->modelPluginsItem, QStringList(QString("%1").arg(
+      QString::fromStdString(_modelPluginName))));
+
+  newModelPluginItem->setData(0, Qt::UserRole, _modelPluginName.c_str());
+  newModelPluginItem->setData(1, Qt::UserRole, "Model Plugin");
+  this->modelTreeWidget->addTopLevelItem(newModelPluginItem);
+
+  this->modelPluginsItem->setExpanded(true);
 }
 
 /////////////////////////////////////////////////

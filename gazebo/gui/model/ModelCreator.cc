@@ -346,16 +346,26 @@ void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
   }
 
   // Joints
-  std::stringstream preivewModelName;
-  preivewModelName << this->previewName << "_" << this->modelCounter;
+  std::stringstream previewModelName;
+  previewModelName << this->previewName << "_" << this->modelCounter;
   sdf::ElementPtr jointElem;
   if (_modelElem->HasElement("joint"))
      jointElem = _modelElem->GetElement("joint");
 
   while (jointElem)
   {
-    this->jointMaker->CreateJointFromSDF(jointElem, preivewModelName.str());
+    this->jointMaker->CreateJointFromSDF(jointElem, previewModelName.str());
     jointElem = jointElem->GetNextElement("joint");
+  }
+
+  // Plugins
+  sdf::ElementPtr pluginElem;
+  if (_modelElem->HasElement("plugin"))
+    pluginElem = _modelElem->GetElement("plugin");
+  while (pluginElem)
+  {
+    this->AddModelPlugin(pluginElem);
+    pluginElem = pluginElem->GetNextElement("plugin");
   }
 }
 
@@ -1961,3 +1971,14 @@ ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
 {
   return this->currentSaveState;
 }
+
+/////////////////////////////////////////////////
+void ModelCreator::AddModelPlugin(sdf::ElementPtr _pluginElem)
+{
+  if (_pluginElem->HasAttribute("name"))
+  {
+    gui::model::Events::modelPluginInserted(
+        _pluginElem->Get<std::string>("name"));
+  }
+}
+
