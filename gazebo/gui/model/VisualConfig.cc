@@ -69,6 +69,7 @@ VisualConfig::~VisualConfig()
   while (!this->configs.empty())
   {
     auto config = this->configs.begin();
+    delete config->second;
     this->configs.erase(config);
   }
 }
@@ -248,7 +249,8 @@ void VisualConfig::OnRemoveVisual(int _id)
 
   QMessageBox msgBox(QMessageBox::Warning, QString("Remove visual?"),
       QString(msg.c_str()));
-  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QPushButton *cancelButton =
       msgBox.addButton("Cancel", QMessageBox::RejectRole);
@@ -287,12 +289,26 @@ void VisualConfig::SetGeometry(const std::string &_name,
   {
     if (it.second->name == _name)
     {
-      math::Vector3 dimensions;
+      ignition::math::Vector3d dimensions;
       std::string uri;
-      std::string type = it.second->configWidget->GetGeometryWidgetValue(
+      std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
           _size, _uri);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::Geometry(const std::string &_name,
+    ignition::math::Vector3d &_size, std::string &_uri)
+{
+  for (auto &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      it.second->configWidget->GeometryWidgetValue("geometry", _size, _uri);
       break;
     }
   }

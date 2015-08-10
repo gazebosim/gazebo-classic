@@ -227,6 +227,9 @@ MainWindow::MainWindow()
   this->dataLogger = new gui::DataLogger(this);
   connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
 
+  // Hotkey dialog
+  this->hotkeyDialog = NULL;
+
   this->show();
 }
 
@@ -377,6 +380,7 @@ void MainWindow::SelectTopic()
 /////////////////////////////////////////////////
 void MainWindow::Open()
 {
+  // Note that file dialog static functions seem to be broken (issue #1514)
   std::string filename = QFileDialog::getOpenFileName(this,
       tr("Open World"), "",
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
@@ -386,24 +390,6 @@ void MainWindow::Open()
     msgs::ServerControl msg;
     msg.set_open_filename(filename);
     this->serverControlPub->Publish(msg);
-  }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::Import()
-{
-  std::string filename = QFileDialog::getOpenFileName(this,
-      tr("Import Collada Mesh"), "",
-      tr("SDF Files (*.dae *.zip)")).toStdString();
-
-  if (!filename.empty())
-  {
-    if (filename.find(".dae") != std::string::npos)
-    {
-      gui::Events::createEntity("mesh", filename);
-    }
-    else
-      gzerr << "Unable to import mesh[" << filename << "]\n";
   }
 }
 
@@ -437,6 +423,8 @@ void MainWindow::SaveAs()
 {
   QFileDialog fileDialog(this, tr("Save World"), QDir::homePath(),
       tr("SDF Files (*.xml *.sdf *.world)"));
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
   fileDialog.setAcceptMode(QFileDialog::AcceptSave);
 
   if (fileDialog.exec() == QDialog::Accepted)
@@ -587,6 +575,18 @@ void MainWindow::About()
   aboutBox.setTextFormat(Qt::RichText);
   aboutBox.setText(QString::fromStdString(helpTxt));
   aboutBox.exec();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::HotkeyChart()
+{
+  // Opening for the first time
+  if (!this->hotkeyDialog)
+  {
+    this->hotkeyDialog = new HotkeyDialog(this);
+  }
+
+  this->hotkeyDialog->show();
 }
 
 /////////////////////////////////////////////////
@@ -1020,12 +1020,6 @@ void MainWindow::CreateActions()
   g_openAct->setStatusTip(tr("Open an world file"));
   connect(g_openAct, SIGNAL(triggered()), this, SLOT(Open()));
 
-  /*g_importAct = new QAction(tr("&Import Mesh"), this);
-  g_importAct->setShortcut(tr("Ctrl+I"));
-  g_importAct->setStatusTip(tr("Import a Collada mesh"));
-  connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
-  */
-
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
@@ -1044,6 +1038,10 @@ void MainWindow::CreateActions()
   g_cloneAct = new QAction(tr("Clone World"), this);
   g_cloneAct->setStatusTip(tr("Clone the world"));
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
+
+  g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
+  g_hotkeyChartAct->setStatusTip(tr("Show the hotkey chart"));
+  connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
@@ -1161,14 +1159,6 @@ void MainWindow::CreateActions()
   connect(g_cylinderCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateCylinder()));
   this->CreateDisabledIcon(":/images/cylinder.png", g_cylinderCreateAct);
-
-  g_meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
-      tr("Mesh"), this);
-  g_meshCreateAct->setStatusTip(tr("Create a mesh"));
-  g_meshCreateAct->setCheckable(true);
-  connect(g_meshCreateAct, SIGNAL(triggered()), this,
-      SLOT(CreateMesh()));
-  this->CreateDisabledIcon(":/images/cylinder.png", g_meshCreateAct);
 
   g_pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
@@ -1548,6 +1538,9 @@ void MainWindow::DeleteActions()
   delete g_cloneAct;
   g_cloneAct = 0;
 
+  delete g_hotkeyChartAct;
+  g_hotkeyChartAct = 0;
+
   delete g_aboutAct;
   g_aboutAct = 0;
 
@@ -1598,9 +1591,6 @@ void MainWindow::DeleteActions()
 
   delete g_cylinderCreateAct;
   g_cylinderCreateAct = 0;
-
-  delete g_meshCreateAct;
-  g_meshCreateAct = 0;
 
   delete g_pointLghtCreateAct;
   g_pointLghtCreateAct = 0;
@@ -1699,7 +1689,6 @@ void MainWindow::CreateMenuBar()
 
   QMenu *fileMenu = bar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
-  // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);
   fileMenu->addAction(g_saveAct);
   fileMenu->addAction(g_saveAsAct);
@@ -1763,6 +1752,7 @@ void MainWindow::CreateMenuBar()
   bar->addSeparator();
 
   QMenu *helpMenu = bar->addMenu(tr("&Help"));
+  helpMenu->addAction(g_hotkeyChartAct);
   helpMenu->addAction(g_aboutAct);
 }
 
@@ -1810,7 +1800,6 @@ void MainWindow::OnMoveMode(bool _mode)
     g_boxCreateAct->setChecked(false);
     g_sphereCreateAct->setChecked(false);
     g_cylinderCreateAct->setChecked(false);
-    g_meshCreateAct->setChecked(false);
     g_pointLghtCreateAct->setChecked(false);
     g_spotLghtCreateAct->setChecked(false);
     g_dirLghtCreateAct->setChecked(false);

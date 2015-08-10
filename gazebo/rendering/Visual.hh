@@ -432,6 +432,16 @@ namespace gazebo
       /// \return The nth ancestor counting from the world.
       public: VisualPtr GetNthAncestor(unsigned int _n);
 
+      /// \brief Check if this visual is an ancestor of another visual.
+      /// \param[in] _visual The other visual.
+      /// \return True if this visual is an ancestor.
+      public: bool IsAncestorOf(const rendering::VisualPtr _visual) const;
+
+      /// \brief Check if this visual is a descendant of another visual.
+      /// \param[in] _visual The other visual.
+      /// \return True if this visual is a descendant.
+      public: bool IsDescendantOf(const rendering::VisualPtr _visual) const;
+
       /// \brief Get the depth of this visual, where 0 is the depth of the
       /// world visual.
       /// \return This visual's depth.
@@ -536,6 +546,10 @@ namespace gazebo
       /// \return Type of geometry in string.
       public: std::string GetGeometryType() const;
 
+      /// \brief Get the geometry size.
+      /// \return Size of geometry.
+      public: ignition::math::Vector3d GetGeometrySize() const;
+
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
       public: std::string GetMeshName() const;
@@ -638,7 +652,7 @@ namespace gazebo
       /// \brief Helper function to update the geometry object size based on
       /// the scale of the visual.
       /// \param[in] _scale Scale of visual
-      private: void UpdateGeomSize(const math::Vector3 &_scale);
+      private: void UpdateGeomSize(const ignition::math::Vector3d &_scale);
 
       /// \internal
       /// \brief Pointer to private data.

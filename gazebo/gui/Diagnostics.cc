@@ -60,6 +60,8 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle("Gazebo: Diagnostics");
   this->setObjectName("diagnosticsPlot");
+  this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   this->plotLayout = new QVBoxLayout;
 

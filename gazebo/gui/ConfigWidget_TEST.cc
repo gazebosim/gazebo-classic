@@ -653,11 +653,11 @@ void ConfigWidget_TEST::VisualMsgWidget()
         gazebo::math::Pose(pos, quat));
 
     // geometry
-    gazebo::math::Vector3 dimensions;
+    ignition::math::Vector3d dimensions;
     std::string uri;
-    QVERIFY(visualConfigWidget->GetGeometryWidgetValue("geometry", dimensions,
+    QVERIFY(visualConfigWidget->GeometryWidgetValue("geometry", dimensions,
         uri) == "box");
-    QCOMPARE(dimensions, gazebo::math::Vector3(5.0, 3.0, 4.0));
+    QCOMPARE(dimensions, ignition::math::Vector3d(5.0, 3.0, 4.0));
 
     // material
     QVERIFY(visualConfigWidget->GetStringWidgetValue("material::normal_map") ==

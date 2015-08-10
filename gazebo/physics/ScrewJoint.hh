@@ -19,6 +19,7 @@
 
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -73,6 +74,14 @@ namespace gazebo
       /// This must be implemented in a child class
       /// \return _threadPitch Thread pitch value.
       public: virtual double GetThreadPitch() = 0;
+
+      // Documentation inherited
+      public: virtual void FillMsg(msgs::Joint &_msg)
+              {
+                Joint::FillMsg(_msg);
+                msgs::Joint::Screw *screwMsg = _msg.mutable_screw();
+                screwMsg->set_thread_pitch(this->threadPitch);
+              }
 
       /// \brief Pitch of the thread.
       protected: double threadPitch;
