@@ -45,7 +45,7 @@ using namespace gui;
 ModelEditor::ModelEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow), dataPtr(new ModelEditorPrivate)
 {
-	static QIcon noIcon;
+  static QIcon noIcon;
 
   this->dataPtr->active = false;
   // Create the model editor tab
