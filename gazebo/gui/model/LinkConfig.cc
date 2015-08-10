@@ -79,7 +79,7 @@ void LinkConfig::Update(ConstLinkPtr _linkMsg)
 /////////////////////////////////////////////////
 void LinkConfig::SetPose(const ignition::math::Pose3d &_pose)
 {
-  this->configWidget->SetPoseWidgetValue("pose", math::Pose(_pose));
+  this->configWidget->SetPoseWidgetValue("pose", _pose);
 }
 
 /////////////////////////////////////////////////

@@ -810,7 +810,7 @@ ignition::math::Vector3d Visual::GetGeometrySize() const
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
-  return math::Vector3(this->dataPtr->scale);
+  return this->dataPtr->scale;
 }
 
 //////////////////////////////////////////////////
