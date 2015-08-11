@@ -34,6 +34,9 @@ class ConfigWidget_TEST : public QTestFixture
   /// \brief Test creating a config widget from a visual message.
   private slots: void VisualMsgWidget();
 
+  /// \brief Test creating a config widget from a plugin message.
+  private slots: void PluginMsgWidget();
+
   /// \brief Test setting visibility of a field in config widget.
   private slots: void ConfigWidgetVisible();
 

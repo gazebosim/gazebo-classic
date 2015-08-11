@@ -959,7 +959,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                   {\
                     background-color: " + this->level1BgColor +
                   "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox,\
+                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, \
                   QPlainTextEdit\
                   {\
                     background-color: " + this->level1WidgetColor +
@@ -972,7 +972,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                   {\
                     background-color: " + this->level2BgColor +
                   "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox,\
+                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, \
                   QPlainTextEdit\
                   {\
                     background-color: " + this->level2WidgetColor +
@@ -985,7 +985,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                   {\
                     background-color: " + this->level2BgColor +
                   "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox,\
+                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, \
                   QPlainTextEdit\
                   {\
                     background-color: " + this->level2WidgetColor +

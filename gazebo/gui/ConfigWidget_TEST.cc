@@ -757,13 +757,79 @@ void ConfigWidget_TEST::VisualMsgWidget()
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget_TEST::PluginMsgWidget()
+{
+  // create a plugin message with test values
+
+  gazebo::gui::ConfigWidget *pluginConfigWidget =
+      new gazebo::gui::ConfigWidget;
+  gazebo::msgs::Plugin pluginMsg;
+
+  {
+    // plugin
+    pluginMsg.set_name("test_plugin");
+    pluginMsg.set_filename("test_plugin_filename");
+    pluginMsg.set_innerxml("<param>1</param>\n");
+  }
+  pluginConfigWidget->Load(&pluginMsg);
+
+  // retrieve the message from the config widget and
+  // verify that all values have not been changed.
+  {
+    gazebo::msgs::Plugin *retPluginMsg =
+        dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->GetMsg());
+    QVERIFY(retPluginMsg != NULL);
+
+    // plugin
+    QVERIFY(retPluginMsg->name() == "test_plugin");
+    QVERIFY(retPluginMsg->filename() == "test_plugin_filename");
+    QVERIFY(retPluginMsg->innerxml() == "<param>1</param>\n");
+  }
+
+  // update fields in the config widget and
+  // verify that the new message contains the updated values.
+  {
+    // plugin
+    pluginConfigWidget->SetStringWidgetValue("name", "test_plugin_updated");
+    pluginConfigWidget->SetStringWidgetValue("filename",
+        "test_plugin_filename_updated");
+    pluginConfigWidget->SetStringWidgetValue("innerxml",
+        "<param2>new_param</param2>\n");
+  }
+
+  // verify widget values
+  {
+    QVERIFY(pluginConfigWidget->GetStringWidgetValue("name") ==
+        "test_plugin_updated");
+    QVERIFY(pluginConfigWidget->GetStringWidgetValue("filename") ==
+        "test_plugin_filename_updated");
+    QVERIFY(pluginConfigWidget->GetStringWidgetValue("innerxml") ==
+        "<param2>new_param</param2>\n");
+  }
+
+  // verify updates in new msg
+  {
+    gazebo::msgs::Plugin *retPluginMsg =
+        dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->GetMsg());
+    QVERIFY(retPluginMsg != NULL);
+
+    // plugin
+    QVERIFY(retPluginMsg->name() == "test_plugin_updated");
+    QVERIFY(retPluginMsg->filename() == "test_plugin_filename_updated");
+    QVERIFY(retPluginMsg->innerxml() == "<param2>new_param</param2>\n");
+  }
+
+  delete pluginConfigWidget;
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget_TEST::ConfigWidgetVisible()
 {
   gazebo::gui::ConfigWidget *visualConfigWidget =
       new gazebo::gui::ConfigWidget;
   gazebo::msgs::Visual visualMsg;
 
-{
+  {
     // visual
     visualMsg.set_id(12345u);
 
@@ -847,7 +913,7 @@ void ConfigWidget_TEST::ConfigWidgetReadOnly()
       new gazebo::gui::ConfigWidget;
   gazebo::msgs::Visual visualMsg;
 
-{
+  {
     // visual
     visualMsg.set_id(12345u);
 
