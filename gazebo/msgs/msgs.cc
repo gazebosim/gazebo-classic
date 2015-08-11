@@ -728,7 +728,6 @@ namespace gazebo
         ss << innerElem->ToString("");
       }
       result.set_innerxml(ss.str());
-      _sdf = _sdf->GetNextElement("plugin");
 
       return result;
     }
