@@ -34,6 +34,7 @@ class PhysicsMsgsTest : public ServerFixture,
   public: void LinkPose(const std::string &_physicsEngine);
   public: void SimpleShapeResize(const std::string &_physicsEngine);
   public: void LinkVisualMsg(const std::string &_physicsEngine);
+  public: void JointMsg(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
@@ -76,7 +77,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   for (std::vector<math::Vector3>::iterator iter = gravity.begin();
        iter != gravity.end(); ++iter)
   {
-    msgs::Set(msg.mutable_gravity(), *iter);
+    msgs::Set(msg.mutable_gravity(), (*iter).Ign());
     physicsPub->Publish(msg);
 
     while (*iter != physics->GetGravity())
@@ -141,7 +142,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     for (std::vector<math::Pose>::iterator iter = poses.begin();
          iter != poses.end(); ++iter)
     {
-      msgs::Set(msg.mutable_pose(), *iter);
+      msgs::Set(msg.mutable_pose(), (*iter).Ign());
       modelPub->Publish(msg);
 
       while (*iter != model->GetWorldPose())
@@ -356,7 +357,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         linkMsg->set_id(link->GetId());
         linkMsg->set_name(link->GetScopedName());
 
-        msgs::Set(linkMsg->mutable_pose(), *iter);
+        msgs::Set(linkMsg->mutable_pose(), (*iter).Ign());
         modelPub->Publish(msg);
 
         int sleep = 0;
@@ -490,7 +491,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       msgs::Model msg;
       msg.set_name(name);
       msg.set_id(model->GetId());
-      msgs::Set(msg.mutable_scale(), scaleFactor * math::Vector3::One);
+      msgs::Set(msg.mutable_scale(),
+          scaleFactor * ignition::math::Vector3d::One);
       modelPub->Publish(msg);
     }
     else
@@ -551,7 +553,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     msgs::Model modelMsg;
     model->FillMsg(modelMsg);
 
-    EXPECT_EQ(msgs::Convert(modelMsg.scale()), scaleFactor*math::Vector3::One);
+    EXPECT_EQ(msgs::ConvertIgn(modelMsg.scale()),
+        scaleFactor * ignition::math::Vector3d::One);
     for (int i = 0; i < modelMsg.link_size(); ++i)
     {
       msgs::Link linkMsg = modelMsg.link(i);
@@ -563,8 +566,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         msgs::Geometry geomMsg = visualMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
-              modelSize[name] * scaleFactor);
+          EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
+              modelSize[name].Ign() * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
@@ -587,8 +590,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         msgs::Geometry geomMsg = collisionMsg.geometry();
         if (geomMsg.has_box())
         {
-          EXPECT_EQ(msgs::Convert(geomMsg.box().size()),
-              modelSize[name] * scaleFactor);
+          EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
+              modelSize[name].Ign() * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
@@ -675,6 +678,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     }
   }
 }
+
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
 {
@@ -755,7 +759,228 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
     EXPECT_EQ(visualMsg.type(), msgs::Visual::VISUAL);
     msgs::Geometry geomMsg = visualMsg.geometry();
     EXPECT_TRUE(geomMsg.has_box());
-    EXPECT_EQ(msgs::Convert(geomMsg.box().size()), boxSize);
+    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize.Ign());
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
+void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
+{
+  // load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  std::ostringstream sdfStream;
+  sdfStream << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='joint_msg_test'>"
+    << "<link name ='link1'>"
+    << "  <pose>0 0 0 0 0 0</pose>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <box><size>1 1 1</size></box>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "</link>"
+    << "<link name ='link2'>"
+    << "  <pose>0 1 0 0 0 0</pose>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <box><size>1 1 1</size></box>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "</link>"
+    << "<link name ='link3'>"
+    << "  <pose>0 0 1 0 0 0</pose>"
+    << "  <collision name ='geom'>"
+    << "    <geometry>"
+    << "      <box><size>1 1 1</size></box>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "</link>"
+    << "<joint name='revolute_joint' type='revolute'>"
+    << "  <parent>link1</parent>"
+    << "  <child>link2</child>"
+    << "  <pose>0 0 0 0 0 0</pose>"
+    << "  <axis>"
+    << "    <xyz>1 0 0</xyz>"
+    << "    <use_parent_model_frame>0</use_parent_model_frame>"
+    << "    <limit>"
+    << "      <lower>-1</lower>"
+    << "      <upper>1</upper>"
+    << "      <effort>-1</effort>"
+    << "      <velocity>-1</velocity>"
+    << "    </limit>"
+    << "    <dynamics>"
+    << "      <damping>0.2</damping>"
+    << "      <friction>0.1</friction>"
+    << "    </dynamics>"
+    << "  </axis>"
+    << "</joint>"
+    << "<joint name='screw_joint' type='screw'>"
+    << "  <parent>link2</parent>"
+    << "  <child>link3</child>"
+    << "  <pose>0 0.2 0 0 0 0</pose>"
+    << "  <axis>"
+    << "    <xyz>0 1 0</xyz>"
+    << "    <use_parent_model_frame>0</use_parent_model_frame>"
+    << "    <limit>"
+    << "      <lower>-2</lower>"
+    << "      <upper>2</upper>"
+    << "      <effort>-0.7</effort>"
+    << "      <velocity>-1</velocity>"
+    << "    </limit>"
+    << "    <dynamics>"
+    << "      <damping>0.3</damping>"
+    << "      <friction>0.2</friction>"
+    << "    </dynamics>"
+    << "  </axis>"
+    << "  <thread_pitch>2</thread_pitch>"
+    << "</joint>"
+    << "<joint name='gearbox_joint' type='gearbox'>"
+    << "  <parent>link3</parent>"
+    << "  <child>link1</child>"
+    << "  <pose>0 0 0.1 0 0 0</pose>"
+    << "  <axis>"
+    << "    <xyz>1 0 0</xyz>"
+    << "    <use_parent_model_frame>0</use_parent_model_frame>"
+    << "    <limit>"
+    << "      <lower>-1e6</lower>"
+    << "      <upper>1e6</upper>"
+    << "      <effort>-0.9</effort>"
+    << "      <velocity>-0.1</velocity>"
+    << "    </limit>"
+    << "    <dynamics>"
+    << "      <damping>0.4</damping>"
+    << "      <friction>0.11</friction>"
+    << "    </dynamics>"
+    << "  </axis>"
+    << "  <axis2>"
+    << "    <xyz>0 0 1</xyz>"
+    << "    <use_parent_model_frame>1</use_parent_model_frame>"
+    << "    <limit>"
+    << "      <lower>-1e3</lower>"
+    << "      <upper>1e3</upper>"
+    << "      <effort>-0.8</effort>"
+    << "      <velocity>-0.2</velocity>"
+    << "    </limit>"
+    << "    <dynamics>"
+    << "      <damping>0.23</damping>"
+    << "      <friction>0.32</friction>"
+    << "    </dynamics>"
+    << "  </axis2>"
+    << "  <gearbox_ratio>6.6</gearbox_ratio>"
+    << "  <gearbox_reference_body>link_2</gearbox_reference_body>"
+    << "</joint>"
+    << "</model>"
+    << "</sdf>";
+  SpawnSDF(sdfStream.str());
+
+  physics::ModelPtr model;
+  model = world->GetModel("joint_msg_test");
+  EXPECT_TRUE(model != NULL);
+  msgs::Model msg;
+  model->FillMsg(msg);
+
+  // only ode supports gearbox joint
+  int jointSize = 2;
+  if (_physicsEngine == "ode")
+    jointSize = 3;
+
+  EXPECT_EQ(msg.joint_size(), jointSize);
+
+  {
+    msgs::Joint jointMsg = msg.joint(0);
+    EXPECT_EQ(jointMsg.name(), "joint_msg_test::revolute_joint");
+    EXPECT_EQ(jointMsg.parent(), "joint_msg_test::link1");
+    EXPECT_EQ(jointMsg.child(), "joint_msg_test::link2");
+    EXPECT_EQ(msgs::ConvertIgn(jointMsg.pose()),
+        ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
+    EXPECT_TRUE(jointMsg.has_axis1());
+    EXPECT_TRUE(!jointMsg.has_axis2());
+    msgs::Axis axis1Msg = jointMsg.axis1();
+    EXPECT_EQ(msgs::ConvertIgn(axis1Msg.xyz()),
+        ignition::math::Vector3d(1, 0, 0));
+    EXPECT_EQ(axis1Msg.use_parent_model_frame(), false);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_lower(), -1);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_upper(), 1);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_effort(), -1);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_velocity(), -1);
+    EXPECT_DOUBLE_EQ(axis1Msg.damping(), 0.2);
+    // only ode and bullet return correct hinge friction param value
+    if (_physicsEngine == "ode" || _physicsEngine == "bullet")
+      EXPECT_DOUBLE_EQ(axis1Msg.friction(), 0.1);
+  }
+
+  {
+    msgs::Joint jointMsg = msg.joint(1);
+    EXPECT_EQ(jointMsg.name(), "joint_msg_test::screw_joint");
+    EXPECT_EQ(jointMsg.parent(), "joint_msg_test::link2");
+    EXPECT_EQ(jointMsg.child(), "joint_msg_test::link3");
+    EXPECT_EQ(msgs::ConvertIgn(jointMsg.pose()),
+        ignition::math::Pose3d(0, 0.2, 0, 0, 0, 0));
+    EXPECT_TRUE(jointMsg.has_axis1());
+    EXPECT_TRUE(jointMsg.has_axis2());
+    msgs::Axis axis1Msg = jointMsg.axis1();
+    EXPECT_EQ(msgs::ConvertIgn(axis1Msg.xyz()),
+        ignition::math::Vector3d(0, 1, 0));
+    EXPECT_EQ(axis1Msg.use_parent_model_frame(), false);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_lower(), -2);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_upper(), 2);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_effort(), -0.7);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_velocity(), -1);
+    EXPECT_DOUBLE_EQ(axis1Msg.damping(), 0.3);
+    // only ode returns correct screw friction param value
+    if (_physicsEngine == "ode")
+      EXPECT_DOUBLE_EQ(axis1Msg.friction(), 0.2);
+    msgs::Joint::Screw screwMsg = jointMsg.screw();
+    EXPECT_DOUBLE_EQ(screwMsg.thread_pitch(), 2);
+  }
+
+  // only ode supports gearbox joints
+  if (_physicsEngine == "bullet" || _physicsEngine == "simbody"
+      || _physicsEngine == "dart")
+    return;
+
+  {
+    msgs::Joint jointMsg = msg.joint(2);
+    EXPECT_EQ(jointMsg.name(), "joint_msg_test::gearbox_joint");
+    EXPECT_EQ(jointMsg.parent(), "joint_msg_test::link3");
+    EXPECT_EQ(jointMsg.child(), "joint_msg_test::link1");
+    EXPECT_EQ(msgs::ConvertIgn(jointMsg.pose()),
+        ignition::math::Pose3d(0, 0, 0.1, 0, 0, 0));
+    EXPECT_TRUE(jointMsg.has_axis1());
+    EXPECT_TRUE(jointMsg.has_axis2());
+    msgs::Axis axis1Msg = jointMsg.axis1();
+    EXPECT_EQ(msgs::ConvertIgn(axis1Msg.xyz()),
+        ignition::math::Vector3d(1, 0, 0));
+    EXPECT_EQ(axis1Msg.use_parent_model_frame(), false);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_lower(), -1e6);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_upper(), 1e6);
+    EXPECT_DOUBLE_EQ(axis1Msg.limit_effort(), -0.9);
+    EXPECT_EQ(axis1Msg.limit_velocity(), -0.1);
+    EXPECT_DOUBLE_EQ(axis1Msg.damping(), 0.4);
+    // gearbox friction param does not return correct value
+    // EXPECT_DOUBLE_EQ(axis1Msg.friction(), 0.11);
+    msgs::Axis axis2Msg = jointMsg.axis2();
+    EXPECT_EQ(msgs::ConvertIgn(axis2Msg.xyz()),
+        ignition::math::Vector3d(0, 0, 1));
+    EXPECT_EQ(axis2Msg.use_parent_model_frame(), true);
+    EXPECT_DOUBLE_EQ(axis2Msg.limit_lower(), -1e3);
+    EXPECT_DOUBLE_EQ(axis2Msg.limit_upper(), 1e3);
+    EXPECT_DOUBLE_EQ(axis2Msg.limit_effort(), -0.8);
+    EXPECT_DOUBLE_EQ(axis2Msg.limit_velocity(), -0.2);
+    EXPECT_DOUBLE_EQ(axis2Msg.damping(), 0.23);
+    // gearbox friction param does not return correct value
+    // EXPECT_DOUBLE_EQ(axis2Msg.friction(), 0.32);
+    msgs::Joint::Gearbox gearboxMsg = jointMsg.gearbox();
+    EXPECT_EQ(gearboxMsg.gearbox_reference_body(),
+         "link_2");
+    EXPECT_DOUBLE_EQ(gearboxMsg.gearbox_ratio(), 6.6);
   }
 }
 
@@ -793,6 +1018,12 @@ TEST_P(PhysicsMsgsTest, SimpleShapeResize)
 TEST_P(PhysicsMsgsTest, LinkVisualMsg)
 {
   LinkVisualMsg(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsMsgsTest, JointMsg)
+{
+  JointMsg(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsMsgsTest,

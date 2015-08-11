@@ -47,6 +47,7 @@ set(tests
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
+  joint_get_force_torque.cc
   joint_revolute.cc
   joint_screw.cc
   joint_set_position_test.cc
@@ -54,6 +55,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  logical_camera_sensor.cc
   model.cc
   model_database.cc
   noise.cc

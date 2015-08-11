@@ -36,6 +36,7 @@
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 #include "gazebo/rendering/Visual.hh"
 
@@ -121,7 +122,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->id = this->dataPtr->visualIdCount--;
   this->dataPtr->boundingBox = NULL;
   this->dataPtr->useRTShader = _useRTShader;
-  this->dataPtr->scale = math::Vector3::One;
+  this->dataPtr->scale = ignition::math::Vector3d::One;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->dataPtr->sdf);
@@ -373,7 +374,7 @@ void Visual::Load()
     if (geomElem->HasElement("box"))
     {
       this->dataPtr->scale =
-          geomElem->GetElement("box")->Get<math::Vector3>("size");
+          geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
@@ -395,7 +396,7 @@ void Visual::Load()
     else if (geomElem->HasElement("mesh"))
     {
       this->dataPtr->scale =
-          geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
+          geomElem->GetElement("mesh")->Get<ignition::math::Vector3d>("scale");
     }
     else
     {
@@ -408,8 +409,10 @@ void Visual::Load()
       // be mulitiply by the current scale to get to the geom size.
       math::Vector3 derivedScale = Conversions::Convert(
           this->dataPtr->sceneNode->_getDerivedScale());
-      math::Vector3 toScale = this->dataPtr->scale / derivedScale;
-      this->dataPtr->sceneNode->scale(toScale.x, toScale.y, toScale.z);
+      ignition::math::Vector3d toScale = this->dataPtr->scale /
+          derivedScale.Ign();
+      this->dataPtr->sceneNode->scale(toScale.X(), toScale.Y(), toScale.Z());
+      this->dataPtr->geomSize = this->dataPtr->scale;
     }
   }
 
@@ -728,20 +731,20 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
-  if (this->dataPtr->scale == _scale)
+  if (this->dataPtr->scale == _scale.Ign())
     return;
 
-  this->dataPtr->scale = _scale;
-
   // update geom size based on scale.
-  this->UpdateGeomSize(this->dataPtr->scale);
+  this->UpdateGeomSize(_scale.Ign());
+
+  this->dataPtr->scale = _scale.Ign();
 
   this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(this->dataPtr->scale));
+      Conversions::Convert(math::Vector3(this->dataPtr->scale)));
 }
 
 //////////////////////////////////////////////////
-void Visual::UpdateGeomSize(const math::Vector3 &_scale)
+void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
 {
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
        iter != this->dataPtr->children.end(); ++iter)
@@ -749,32 +752,59 @@ void Visual::UpdateGeomSize(const math::Vector3 &_scale)
     (*iter)->UpdateGeomSize(_scale);
   }
 
-  math::Vector3 derivedScale = math::Vector3::One;
-  VisualPtr parentVis = this->GetParent();
-  if (parentVis)
-  {
-     derivedScale = Conversions::Convert(
-        parentVis->GetSceneNode()->_getDerivedScale());
-  }
+  // update the same way as server - see Link::UpdateVisualGeomSDF()
+  if (!this->dataPtr->sdf->HasElement("geometry"))
+    return;
 
   sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
   if (geomElem->HasElement("box"))
   {
-    geomElem->GetElement("box")->GetElement("size")->Set(_scale);
+    ignition::math::Vector3d size =
+        geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
+    ignition::math::Vector3d geomBoxSize = _scale/this->dataPtr->scale*size;
+    geomElem->GetElement("box")->GetElement("size")->Set(
+        geomBoxSize);
+    this->dataPtr->geomSize = geomBoxSize;
   }
   else if (geomElem->HasElement("sphere"))
   {
-    geomElem->GetElement("sphere")->GetElement("radius")->Set(
-        _scale.x*0.5);
+    // update radius the same way as collision shapes
+    double radius = geomElem->GetElement("sphere")->Get<double>("radius");
+    double newRadius = _scale.Max();
+    double oldRadius = this->dataPtr->scale.Max();
+    double geomRadius = newRadius/oldRadius*radius;
+    geomElem->GetElement("sphere")->GetElement("radius")->Set(geomRadius);
+    this->dataPtr->geomSize = ignition::math::Vector3d(
+        geomRadius*2.0, geomRadius*2.0, geomRadius*2.0);
   }
   else if (geomElem->HasElement("cylinder"))
   {
-    geomElem->GetElement("cylinder")->GetElement("radius")
-        ->Set(_scale.x*0.5);
-    geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z);
+    // update radius the same way as collision shapes
+    double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
+    double newRadius = std::max(_scale.X(), _scale.Y());
+    double oldRadius = std::max(this->dataPtr->scale.X(),
+        this->dataPtr->scale.Y());
+    double length = geomElem->GetElement("cylinder")->Get<double>("length");
+    double geomRadius = newRadius/oldRadius*radius;
+    double geomLength = _scale.Z()/this->dataPtr->scale.Z()*length;
+    geomElem->GetElement("cylinder")->GetElement("radius")->Set(
+        geomRadius);
+    geomElem->GetElement("cylinder")->GetElement("length")->Set(
+        geomLength);
+    this->dataPtr->geomSize =
+        ignition::math::Vector3d(geomRadius*2.0, geomRadius*2.0, geomLength);
   }
   else if (geomElem->HasElement("mesh"))
+  {
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
+    this->dataPtr->geomSize = _scale;
+  }
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Visual::GetGeometrySize() const
+{
+  return this->dataPtr->geomSize;
 }
 
 //////////////////////////////////////////////////
@@ -967,17 +997,30 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     // Apply material to all child scene nodes
     for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
     {
-      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode*>(
+      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode *>(
           this->dataPtr->sceneNode->getChild(i));
-      for (int j = 0; j < sn->numAttachedObjects(); j++)
+      for (int j = 0; j < sn->numAttachedObjects(); ++j)
       {
         Ogre::MovableObject *obj = sn->getAttachedObject(j);
 
-        if (dynamic_cast<Ogre::Entity*>(obj))
-          ((Ogre::Entity*)obj)->setMaterialName(this->dataPtr->myMaterialName);
+        MovableText *text = dynamic_cast<MovableText *>(obj);
+        if (text)
+        {
+          common::Color ambient, diffuse, specular, emissive;
+          bool matFound = rendering::Material::GetMaterialAsColor(
+              this->dataPtr->myMaterialName, ambient, diffuse, specular,
+              emissive);
+
+          if (matFound)
+          {
+            text->SetColor(ambient);
+          }
+        }
+        else if (dynamic_cast<Ogre::Entity *>(obj))
+          ((Ogre::Entity *)obj)->setMaterialName(this->dataPtr->myMaterialName);
         else
         {
-          ((Ogre::SimpleRenderable*)obj)->setMaterial(
+          ((Ogre::SimpleRenderable *)obj)->setMaterial(
               this->dataPtr->myMaterialName);
         }
       }
@@ -2185,13 +2228,13 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   }
 
   if (_msg->has_pose())
-    this->SetPose(msgs::Convert(_msg->pose()));
+    this->SetPose(msgs::ConvertIgn(_msg->pose()));
 
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());
 
   if (_msg->has_scale())
-    this->SetScale(msgs::Convert(_msg->scale()));
+    this->SetScale(msgs::ConvertIgn(_msg->scale()));
 
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
@@ -2264,7 +2307,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
-      geomScale = msgs::Convert(_msg->geometry().box().size());
+      geomScale = msgs::ConvertIgn(_msg->geometry().box().size());
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
@@ -2291,11 +2334,15 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           = _msg->geometry().image().scale();
     }
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-      geomScale = msgs::Convert(_msg->geometry().heightmap().size());
+    {
+      geomScale = msgs::ConvertIgn(_msg->geometry().heightmap().size());
+    }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       if (_msg->geometry().mesh().has_scale())
-        geomScale = msgs::Convert(_msg->geometry().mesh().scale());
+      {
+        geomScale = msgs::ConvertIgn(_msg->geometry().mesh().scale());
+      }
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY ||
         _msg->geometry().type() == msgs::Geometry::POLYLINE)
@@ -2424,6 +2471,42 @@ VisualPtr Visual::GetNthAncestor(unsigned int _n)
   }
 
   return p;
+}
+
+/////////////////////////////////////////////////
+bool Visual::IsAncestorOf(const rendering::VisualPtr _visual) const
+{
+  if (!_visual || !this->dataPtr->scene)
+    return false;
+
+  rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
+  rendering::VisualPtr vis = _visual->GetParent();
+  while (vis)
+  {
+    if (vis->GetName() == this->GetName())
+      return true;
+    vis = vis->GetParent();
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Visual::IsDescendantOf(const rendering::VisualPtr _visual) const
+{
+  if (!_visual || !this->dataPtr->scene)
+    return false;
+
+  rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
+  rendering::VisualPtr vis = this->GetParent();
+  while (vis)
+  {
+    if (vis->GetName() == _visual->GetName())
+      return true;
+    vis = vis->GetParent();
+  }
+
+  return false;
 }
 
 //////////////////////////////////////////////////

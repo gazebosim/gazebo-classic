@@ -25,6 +25,7 @@
 #include <iostream>
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/util/system.hh"
 

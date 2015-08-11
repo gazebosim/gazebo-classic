@@ -232,7 +232,7 @@ void UserCamera::Update()
     this->dataPtr->viewController->Update();
 
   // publish camera pose
-  this->dataPtr->posePub->Publish(msgs::Convert(this->GetWorldPose()));
+  this->dataPtr->posePub->Publish(msgs::Convert(this->GetWorldPose().Ign()));
 }
 
 //////////////////////////////////////////////////
@@ -355,8 +355,11 @@ bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &_type)
 {
-  if (this->dataPtr->viewController->GetTypeString() == _type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
   std::string vc = this->dataPtr->viewController->GetTypeString();
 
@@ -364,6 +367,8 @@ void UserCamera::SetViewController(const std::string &_type)
   {
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
     this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
   }
   else if (_type == OrthoViewController::GetTypeString())
   {
@@ -377,24 +382,32 @@ void UserCamera::SetViewController(const std::string &_type)
     }
     else
       this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
   }
   else if (_type == FPSViewController::GetTypeString())
   {
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
     this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
   }
   else
-    gzthrow("Invalid view controller type: " + _type);
-
-  this->dataPtr->prevViewControllerName = vc;
+  {
+    gzerr << "Invalid view controller type[" << _type << "]. "
+      << "The view controller is not changed.\n";
+  }
 }
 
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &_type,
                                    const math::Vector3 &_pos)
 {
-  if (this->dataPtr->viewController->GetTypeString() == _type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
   std::string vc = this->dataPtr->viewController->GetTypeString();
 
@@ -711,7 +724,7 @@ std::string UserCamera::GetViewControllerTypeString()
 void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 {
   // Scaling factor applied to rotations.
-  static math::Vector3 rpyFactor(0, 0.01, 0.05);
+  static ignition::math::Vector3d rpyFactor(0, 0.01, 0.05);
 
   // toggle using joystick to move camera
   if (this->dataPtr->joystickButtonToggleLast == false &&
@@ -744,14 +757,16 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
     if (_msg->has_translation())
     {
       const double transRotRatio = 0.05;
-      math::Vector3 trans = msgs::Convert(_msg->translation()) * transRotRatio;
+      ignition::math::Vector3d trans =
+        msgs::ConvertIgn(_msg->translation()) * transRotRatio;
       pose.pos = pose.rot.RotateVector(trans) + pose.pos;
     }
 
     // Get the jostick RPY. We are disabling rotation around x.
     if (_msg->has_rotation())
     {
-      math::Vector3 rot = msgs::Convert(_msg->rotation()) * rpyFactor;
+      ignition::math::Vector3d rot =
+        msgs::ConvertIgn(_msg->rotation()) * rpyFactor;
       pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
     }
 
@@ -768,8 +783,8 @@ void UserCamera::OnJoyPose(ConstPosePtr &_msg)
   if (_msg->has_position() && _msg->has_orientation())
   {
     // Get the XYZ
-    math::Pose pose(msgs::Convert(_msg->position()),
-                    msgs::Convert(_msg->orientation()));
+    ignition::math::Pose3d pose(msgs::ConvertIgn(_msg->position()),
+                                msgs::ConvertIgn(_msg->orientation()));
     this->SetWorldPose(pose);
   }
 }
@@ -833,7 +848,7 @@ bool UserCamera::SetProjectionType(const std::string &_type)
 {
   if (_type == "orthographic")
     this->SetViewController("ortho");
-  else
+  else if (!this->dataPtr->prevViewControllerName.empty())
     this->SetViewController(this->dataPtr->prevViewControllerName);
 
   return Camera::SetProjectionType(_type);

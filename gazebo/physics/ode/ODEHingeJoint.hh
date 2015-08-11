@@ -34,7 +34,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A single axis hinge joint.
-    class GZ_PHYSICS_ODE_VISIBLE ODEHingeJoint : public HingeJoint<ODEJoint>
+    class GZ_PHYSICS_VISIBLE ODEHingeJoint : public HingeJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.

@@ -107,7 +107,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,
@@ -129,7 +129,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,

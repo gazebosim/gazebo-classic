@@ -26,50 +26,57 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/math/Quaternion.hh"
-
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/ModelMakerPrivate.hh"
 #include "gazebo/gui/ModelMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-  ModelMaker::ModelMaker()
-: EntityMaker()
+ModelMaker::ModelMaker() : EntityMaker(*new ModelMakerPrivate)
 {
-  this->state = 0;
-  this->leftMousePressed = false;
-  this->clone = false;
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
+  dPtr->clone = false;
+  dPtr->makerPub = dPtr->node->Advertise<msgs::Factory>("~/factory");
 }
 
 /////////////////////////////////////////////////
 ModelMaker::~ModelMaker()
 {
-  this->camera.reset();
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
+  dPtr->makerPub.reset();
 }
 
 /////////////////////////////////////////////////
-bool ModelMaker::InitFromModel(const std::string & _modelName)
+bool ModelMaker::InitFromModel(const std::string &_modelName)
 {
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  if (this->modelVisual)
+  if (!scene)
+    return false;
+
+  if (dPtr->modelVisual)
   {
-    scene->RemoveVisual(this->modelVisual);
-    this->modelVisual.reset();
-    this->visuals.clear();
+    scene->RemoveVisual(dPtr->modelVisual);
+    dPtr->modelVisual.reset();
   }
 
   rendering::VisualPtr vis = scene->GetVisual(_modelName);
@@ -79,62 +86,37 @@ bool ModelMaker::InitFromModel(const std::string & _modelName)
     return false;
   }
 
-  this->modelVisual = vis->Clone(
+  dPtr->modelVisual = vis->Clone(
       _modelName + "_clone_tmp", scene->GetWorldVisual());
 
-  if (!this->modelVisual)
+  if (!dPtr->modelVisual)
   {
     gzerr << "Unable to clone\n";
     return false;
   }
-  this->clone = true;
+  dPtr->clone = true;
   return true;
 }
 
 /////////////////////////////////////////////////
-bool ModelMaker::InitFromSDFString(const std::string &_data)
-{
-  this->clone = false;
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-
-  if (this->modelVisual)
-  {
-    scene->RemoveVisual(this->modelVisual);
-    this->modelVisual.reset();
-    this->visuals.clear();
-  }
-
-  this->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("root.sdf", this->modelSDF);
-  sdf::readString(_data, this->modelSDF);
-
-  if (!sdf::readString(_data, this->modelSDF))
-  {
-    gzerr << "Unable to load SDF from data\n";
-    return false;
-  }
-
-  return this->Init();
-}
-
-
-/////////////////////////////////////////////////
 bool ModelMaker::InitFromFile(const std::string &_filename)
 {
-  this->clone = false;
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
+  dPtr->clone = false;
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
-  if (this->modelVisual)
+  if (dPtr->modelVisual)
   {
-    scene->RemoveVisual(this->modelVisual);
-    this->modelVisual.reset();
-    this->visuals.clear();
+    scene->RemoveVisual(dPtr->modelVisual);
+    dPtr->modelVisual.reset();
   }
 
-  this->modelSDF.reset(new sdf::SDF);
-  sdf::initFile("root.sdf", this->modelSDF);
+  dPtr->modelSDF.reset(new sdf::SDF);
+  sdf::initFile("root.sdf", dPtr->modelSDF);
 
-  if (!sdf::readFile(_filename, this->modelSDF))
+  if (!sdf::readFile(_filename, dPtr->modelSDF))
   {
     gzerr << "Unable to load file[" << _filename << "]\n";
     return false;
@@ -144,19 +126,85 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
 }
 
 /////////////////////////////////////////////////
+bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
+{
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
+  dPtr->clone = false;
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
+
+  if (dPtr->modelVisual)
+  {
+    scene->RemoveVisual(dPtr->modelVisual);
+    dPtr->modelVisual.reset();
+  }
+
+  // Unique name
+  std::string prefix;
+  if (_shape == BOX)
+    prefix = "unit_box_";
+  else if (_shape == SPHERE)
+    prefix = "unit_sphere_";
+  else if (_shape == CYLINDER)
+    prefix = "unit_cylinder_";
+
+  int counter = 0;
+  std::string modelName;
+  do
+  {
+    modelName = prefix + std::to_string(counter++);
+  } while (scene->GetVisual(modelName));
+
+  // Model message
+  msgs::Model model;
+  model.set_name(modelName);
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+  if (_shape == BOX)
+    msgs::AddBoxLink(model, 1.0, ignition::math::Vector3d::One);
+  else if (_shape == SPHERE)
+    msgs::AddSphereLink(model, 1.0, 0.5);
+  else if (_shape == CYLINDER)
+    msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
+  model.mutable_link(0)->set_name("link");
+
+  // Model SDF
+  std::string modelString = "<sdf version='" + std::string(SDF_VERSION) + "'>"
+       + msgs::ModelToSDF(model)->ToString("") + "</sdf>";
+
+  dPtr->modelSDF.reset(new sdf::SDF);
+  sdf::initFile("root.sdf", dPtr->modelSDF);
+
+  if (!sdf::readString(modelString, dPtr->modelSDF))
+  {
+    gzerr << "Unable to load SDF [" << modelString << "]" << std::endl;
+    return false;
+  }
+
+  return this->Init();
+}
+
+/////////////////////////////////////////////////
 bool ModelMaker::Init()
 {
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return false;
 
   // Load the world file
   std::string modelName;
-  math::Pose modelPose, linkPose, visualPose;
+  ignition::math::Pose3d modelPose, linkPose, visualPose;
   sdf::ElementPtr modelElem;
 
-  if (this->modelSDF->Root()->HasElement("model"))
-    modelElem = this->modelSDF->Root()->GetElement("model");
-  else if (this->modelSDF->Root()->HasElement("light"))
-    modelElem = this->modelSDF->Root()->GetElement("light");
+  if (dPtr->modelSDF->Root()->HasElement("model"))
+    modelElem = dPtr->modelSDF->Root()->GetElement("model");
+  else if (dPtr->modelSDF->Root()->HasElement("light"))
+    modelElem = dPtr->modelSDF->Root()->GetElement("light");
   else
   {
     gzerr << "No model or light in SDF\n";
@@ -164,17 +212,17 @@ bool ModelMaker::Init()
   }
 
   if (modelElem->HasElement("pose"))
-    modelPose = modelElem->Get<math::Pose>("pose");
+    modelPose = modelElem->Get<ignition::math::Pose3d>("pose");
 
-  modelName = this->node->GetTopicNamespace() + "::" +
+  modelName = dPtr->node->GetTopicNamespace() + "::" +
     modelElem->Get<std::string>("name");
 
-  this->modelVisual.reset(new rendering::Visual(modelName,
+  dPtr->modelVisual.reset(new rendering::Visual(modelName,
                           scene->GetWorldVisual()));
-  this->modelVisual->Load();
-  this->modelVisual->SetPose(modelPose);
+  dPtr->modelVisual->Load();
+  dPtr->modelVisual->SetPose(modelPose);
 
-  modelName = this->modelVisual->GetName();
+  modelName = dPtr->modelVisual->GetName();
   modelElem->GetAttribute("name")->Set(modelName);
 
   if (modelElem->GetName() == "model")
@@ -187,15 +235,14 @@ bool ModelMaker::Init()
       {
         std::string linkName = linkElem->Get<std::string>("name");
         if (linkElem->HasElement("pose"))
-          linkPose = linkElem->Get<math::Pose>("pose");
+          linkPose = linkElem->Get<ignition::math::Pose3d>("pose");
         else
           linkPose.Set(0, 0, 0, 0, 0, 0);
 
         rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
-              linkName, this->modelVisual));
+              linkName, dPtr->modelVisual));
         linkVisual->Load();
         linkVisual->SetPose(linkPose);
-        this->visuals.push_back(linkVisual);
 
         int visualIndex = 0;
         sdf::ElementPtr visualElem;
@@ -206,7 +253,7 @@ bool ModelMaker::Init()
         while (visualElem)
         {
           if (visualElem->HasElement("pose"))
-            visualPose = visualElem->Get<math::Pose>("pose");
+            visualPose = visualElem->Get<ignition::math::Pose3d>("pose");
           else
             visualPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -218,7 +265,6 @@ bool ModelMaker::Init()
 
           visVisual->Load(visualElem);
           visVisual->SetPose(visualPose);
-          this->visuals.push_back(visVisual);
 
           visualElem = visualElem->GetNextElement("visual");
         }
@@ -228,13 +274,12 @@ bool ModelMaker::Init()
     }
     catch(common::Exception &_e)
     {
-      this->visuals.clear();
       return false;
     }
   }
   else if (modelElem->GetName() == "light")
   {
-    this->modelVisual->AttachMesh("unit_sphere");
+    dPtr->modelVisual->AttachMesh("unit_sphere");
   }
   else
   {
@@ -245,124 +290,97 @@ bool ModelMaker::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::Start(const rendering::UserCameraPtr _camera)
-{
-  this->camera = _camera;
-  this->state = 1;
-}
-
-/////////////////////////////////////////////////
 void ModelMaker::Stop()
 {
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
   // Remove the temporary visual from the scene
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  for (auto vis : this->visuals)
-    scene->RemoveVisual(vis);
-  this->modelVisual.reset();
-  this->visuals.clear();
-  this->modelSDF.reset();
+  if (scene)
+    scene->RemoveVisual(dPtr->modelVisual);
+  dPtr->modelVisual.reset();
+  dPtr->modelSDF.reset();
 
-  this->state = 0;
-  gui::Events::moveMode(true);
-}
-
-/////////////////////////////////////////////////
-bool ModelMaker::IsActive() const
-{
-  return this->state > 0;
-}
-
-/////////////////////////////////////////////////
-void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
-{
-}
-
-/////////////////////////////////////////////////
-void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
-{
-  if (_event.Button() == common::MouseEvent::LEFT)
-  {
-    // Place if not dragging, or if dragged for less than 50 pixels.
-    // The 50 pixels is used to account for accidental mouse movement
-    // when placing an object.
-    if (!_event.Dragging() || _event.PressPos().Distance(_event.Pos()) < 50)
-    {
-      this->CreateTheEntity();
-      this->Stop();
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
-{
-  math::Pose pose = this->modelVisual->GetWorldPose();
-  pose.pos = ModelManipulator::GetMousePositionOnPlane(this->camera, _event);
-
-  if (!_event.Shift())
-  {
-    pose.pos = ModelManipulator::SnapPoint(pose.pos);
-  }
-  pose.pos.z = this->modelVisual->GetWorldPose().pos.z;
-
-  this->modelVisual->SetWorldPose(pose);
-}
-
-/////////////////////////////////////////////////
-void ModelMaker::OnMouseDrag(const common::MouseEvent &/*_event*/)
-{
+  EntityMaker::Stop();
 }
 
 /////////////////////////////////////////////////
 void ModelMaker::CreateTheEntity()
 {
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
   msgs::Factory msg;
-  if (!this->clone)
+  if (!dPtr->clone)
   {
-    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
     sdf::ElementPtr modelElem;
     bool isModel = false;
     bool isLight = false;
-    if (this->modelSDF->Root()->HasElement("model"))
+    if (dPtr->modelSDF->Root()->HasElement("model"))
     {
-      modelElem = this->modelSDF->Root()->GetElement("model");
+      modelElem = dPtr->modelSDF->Root()->GetElement("model");
       isModel = true;
     }
-    else if (this->modelSDF->Root()->HasElement("light"))
+    else if (dPtr->modelSDF->Root()->HasElement("light"))
     {
-      modelElem = this->modelSDF->Root()->GetElement("light");
+      modelElem = dPtr->modelSDF->Root()->GetElement("light");
       isLight = true;
     }
 
     std::string modelName = modelElem->Get<std::string>("name");
 
     // Automatically create a new name if the model exists
-    int i = 0;
-    while ((isModel && has_entity_name(modelName)) ||
-        (isLight && scene->GetLight(modelName)))
+    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+    gui::MainWindow *mainWindow = gui::get_main_window();
+    if (scene && mainWindow)
     {
-      modelName = modelElem->Get<std::string>("name") + "_" +
-        boost::lexical_cast<std::string>(i++);
+      int i = 0;
+      while ((isModel && mainWindow->HasEntityName(modelName)) ||
+          (isLight && scene->GetLight(modelName)))
+      {
+        modelName = modelElem->Get<std::string>("name") + "_" +
+            std::to_string(i++);
+      }
     }
 
     // Remove the topic namespace from the model name. This will get re-inserted
     // by the World automatically
-    modelName.erase(0, this->node->GetTopicNamespace().size()+2);
+    modelName.erase(0, dPtr->node->GetTopicNamespace().size()+2);
 
     // The the SDF model's name
     modelElem->GetAttribute("name")->Set(modelName);
     modelElem->GetElement("pose")->Set(
-        this->modelVisual->GetWorldPose());
+        dPtr->modelVisual->GetWorldPose().Ign());
 
     // Spawn the model in the physics server
-    msg.set_sdf(this->modelSDF->ToString());
+    msg.set_sdf(dPtr->modelSDF->ToString());
   }
   else
   {
-    msgs::Set(msg.mutable_pose(), this->modelVisual->GetWorldPose());
-    msg.set_clone_model_name(this->modelVisual->GetName().substr(0,
-          this->modelVisual->GetName().find("_clone_tmp")));
+    msgs::Set(msg.mutable_pose(), dPtr->modelVisual->GetWorldPose().Ign());
+    msg.set_clone_model_name(dPtr->modelVisual->GetName().substr(0,
+          dPtr->modelVisual->GetName().find("_clone_tmp")));
   }
 
-  this->makerPub->Publish(msg);
+  dPtr->makerPub->Publish(msg);
 }
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d ModelMaker::EntityPosition() const
+{
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
+  return dPtr->modelVisual->GetWorldPose().pos.Ign();
+}
+
+/////////////////////////////////////////////////
+void ModelMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
+{
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
+  dPtr->modelVisual->SetWorldPosition(_pos);
+}
+
