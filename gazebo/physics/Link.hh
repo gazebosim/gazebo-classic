@@ -558,16 +558,16 @@ namespace gazebo
       /// \brief Get a battery by name.
       /// \param[in] _name Name of the battery to get.
       /// \return Pointer to the battery, NULL if the name is invalid.
-      public: BatteryPtr GetBattery(const std::string &_name) const;
+      public: BatteryPtr Battery(const std::string &_name) const;
 
       /// \brief Get a battery based on an index.
       /// \return A pointer to a Battery. Null if the _index is invalid.
-      public: BatteryPtr GetBattery(size_t _index) const;
+      public: BatteryPtr Battery(size_t _index) const;
 
       /// \brief Get the number of batteries in this link.
       /// \return Size of this->batteries array.
-      /// \sa Link::GetBattery()
-      public: size_t GetBatteryCount() const;
+      /// \sa Link::Battery()
+      public: size_t BatteryCount() const;
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
@@ -679,9 +679,6 @@ namespace gazebo
 
       /// \brief Mutex to protect the wrenchMsgs variable.
       private: boost::mutex wrenchMsgMutex;
-
-      /// \brief Battery properties of the link.
-      private: BatteryPtr battery;
 
       /// \brief All the attached batteries.
       private: std::vector<BatteryPtr> batteries;

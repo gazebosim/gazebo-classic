@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _BATTERY_HH_
-#define _BATTERY_HH_
+#ifndef _GAZEBO_BATTERY_HH_
+#define _GAZEBO_BATTERY_HH_
 
 #include <map>
 #include <string>
@@ -45,7 +45,7 @@ namespace gazebo
       public: double initVoltage;
 
       /// \brief Real voltage in volts.
-      public: double curVoltage;
+      public: double realVoltage;
 
       /// \brief Map of unique consumer ID to power loads in watts.
       public: std::map<uint32_t, double> powerLoads;
@@ -121,7 +121,7 @@ namespace gazebo
       /// \return List of power loads in watts.
       public: const std::map<uint32_t, double>& PowerLoads() const;
 
-      /// \brief Get the current voltage in volts.
+      /// \brief Get the real voltage in volts.
       /// \return Voltage.
       public: double Voltage() const;
 

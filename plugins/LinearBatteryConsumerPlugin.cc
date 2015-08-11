@@ -46,7 +46,7 @@ void LinearBatteryConsumerPlugin::Load(physics::ModelPtr _parent,
 
   elem = _sdf->GetElement("battery_name");
   GZ_ASSERT(elem, "Element battery_name doesn't exist!");
-  this->battery = link->GetBattery(elem->Get<std::string>());
+  this->battery = link->Battery(elem->Get<std::string>());
   GZ_ASSERT(this->battery, "Battery was NULL");
 
   if (_sdf->HasElement("power_load"))

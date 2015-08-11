@@ -397,7 +397,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr batteryElem = this->sdf->GetElement("battery");
     while (batteryElem)
     {
-      BatteryPtr battery = this->GetBattery(
+      BatteryPtr battery = this->Battery(
           batteryElem->Get<std::string>("name"));
 
       if (battery)
@@ -1075,7 +1075,7 @@ void Link::PublishData()
 }
 
 //////////////////////////////////////////////////
-BatteryPtr Link::GetBattery(const std::string &_name) const
+BatteryPtr Link::Battery(const std::string &_name) const
 {
   BatteryPtr result;
 
@@ -1092,7 +1092,7 @@ BatteryPtr Link::GetBattery(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-BatteryPtr Link::GetBattery(size_t _index) const
+BatteryPtr Link::Battery(size_t _index) const
 {
   if (_index < this->batteries.size())
     return this->batteries[_index];
@@ -1101,7 +1101,7 @@ BatteryPtr Link::GetBattery(size_t _index) const
 }
 
 /////////////////////////////////////////////////
-size_t Link::GetBatteryCount() const
+size_t Link::BatteryCount() const
 {
   return this->batteries.size();
 }
@@ -1508,7 +1508,7 @@ void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
 //////////////////////////////////////////////////
 void Link::LoadBattery(sdf::ElementPtr _sdf)
 {
-  BatteryPtr battery(new Battery(
+  BatteryPtr battery(new physics::Battery(
       boost::static_pointer_cast<Link>(shared_from_this())));
   battery->Load(_sdf);
   this->batteries.push_back(battery);

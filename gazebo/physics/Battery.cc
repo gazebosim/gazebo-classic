@@ -63,7 +63,7 @@ void Battery::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Battery::Init()
 {
-  this->dataPtr->curVoltage = this->dataPtr->initVoltage;
+  this->dataPtr->realVoltage = this->dataPtr->initVoltage;
   this->InitConsumers();
 }
 
@@ -108,8 +108,7 @@ void Battery::RemoveConsumer(uint32_t _consumerId)
 /////////////////////////////////////////////////
 bool Battery::SetPowerLoad(uint32_t _consumerId, double _powerLoad)
 {
-  auto iter =
-    this->dataPtr->powerLoads.find(_consumerId);
+  auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
   {
     gzerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
@@ -123,8 +122,7 @@ bool Battery::SetPowerLoad(uint32_t _consumerId, double _powerLoad)
 /////////////////////////////////////////////////
 bool Battery::PowerLoad(uint32_t _consumerId, double &_powerLoad) const
 {
-  auto iter =
-    this->dataPtr->powerLoads.find(_consumerId);
+  auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
   {
     gzerr << "Invalid param value[_consumerId] : " << _consumerId << "\n";
@@ -144,14 +142,14 @@ const std::map<uint32_t, double>& Battery::PowerLoads() const
 /////////////////////////////////////////////////
 double Battery::Voltage() const
 {
-  return this->dataPtr->curVoltage;
+  return this->dataPtr->realVoltage;
 }
 
 /////////////////////////////////////////////////
 void Battery::OnUpdate()
 {
-  this->dataPtr->curVoltage =
-      this->dataPtr->updateFunc(this->dataPtr->curVoltage,
+  this->dataPtr->realVoltage =
+      this->dataPtr->updateFunc(this->dataPtr->realVoltage,
                                 this->dataPtr->powerLoads);
 }
 

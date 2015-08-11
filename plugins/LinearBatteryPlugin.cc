@@ -45,11 +45,6 @@ LinearBatteryPlugin::LinearBatteryPlugin()
 }
 
 /////////////////////////////////////////////////
-LinearBatteryPlugin::~LinearBatteryPlugin()
-{
-}
-
-/////////////////////////////////////////////////
 void LinearBatteryPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Store the pointer to the model
@@ -79,8 +74,6 @@ void LinearBatteryPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("initial_charge"))
     this->q0 = _sdf->Get<double>("initial_charge");
 
-  this->q0 = _sdf->Get<double>("initial_charge");
-
   if (_sdf->HasElement("capacity"))
     this->c = _sdf->Get<double>("capacity");
 
@@ -95,7 +88,7 @@ void LinearBatteryPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     sdf::ElementPtr elem = _sdf->GetElement("battery_name");
     GZ_ASSERT(elem, "Element battery_name doesn't exist!");
     std::string batteryName = elem->Get<std::string>();
-    this->battery = this->link->GetBattery(batteryName);
+    this->battery = this->link->Battery(batteryName);
     GZ_ASSERT(this->battery, "Battery was NULL");
 
     if (!this->battery)
@@ -133,9 +126,11 @@ double LinearBatteryPlugin::OnUpdateVoltage(double _voltage,
   double totalpower = 0.0;
   double k = dt / this->tau;
 
-  for (std::map<uint32_t, double>::const_iterator it = _powerLoads.begin();
-       it != _powerLoads.end(); ++it)
-    totalpower += it->second;
+  if (fabs(_voltage) < 1e-3)
+    return 0.0;
+
+  for (auto powerLoad : _powerLoads)
+    totalpower += powerLoad.second;
 
   this->iraw = totalpower / _voltage;
 
@@ -145,12 +140,6 @@ double LinearBatteryPlugin::OnUpdateVoltage(double _voltage,
 
   _voltage = this->e0 + this->e1 * (1 - this->q / this->c)
       - this->r * this->ismooth;
-
-  // gzdbg << this->battery->Name() << " :\n"
-  //       << "  voltage [" << this->battery->Voltage()
-  //       << "]\n  capacity ["
-  //       << this->q
-  //       << "]\n";
 
   return _voltage;
 }

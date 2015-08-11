@@ -52,7 +52,7 @@ TEST_F(BatteryTest, AddConsumer)
   battery->SetPowerLoad(consumerId, 5.0);
 
   double powerLoad = 0;
-  EXPECT_EQ(battery->PowerLoad(consumerId, powerLoad), true);
+  EXPECT_TRUE(battery->PowerLoad(consumerId, powerLoad));
   EXPECT_DOUBLE_EQ(powerLoad, 5.0);
 }
 
@@ -68,8 +68,8 @@ TEST_F(BatteryTest, RemoveConsumer)
   EXPECT_EQ(battery->PowerLoads().size(), (size_t)1);
 
   double powerLoad = 1.0;
-  EXPECT_EQ(battery->SetPowerLoad(consumerId, powerLoad), true);
-  EXPECT_EQ(battery->PowerLoad(consumerId, powerLoad), true);
+  EXPECT_TRUE(battery->SetPowerLoad(consumerId, powerLoad));
+  EXPECT_TRUE(battery->PowerLoad(consumerId, powerLoad));
   EXPECT_DOUBLE_EQ(powerLoad, 1.0);
 
   battery->RemoveConsumer(consumerId);
@@ -91,21 +91,26 @@ TEST_F(BatteryTest, SetPowerLoad)
   // Set consumers power load
   double powerLoad1 = 1.0;
   double powerLoad2 = 2.0;
-  EXPECT_EQ(battery->SetPowerLoad(consumerId1, powerLoad1), true);
-  EXPECT_EQ(battery->SetPowerLoad(consumerId2, powerLoad2), true);
+  EXPECT_TRUE(battery->SetPowerLoad(consumerId1, powerLoad1));
+  EXPECT_TRUE(battery->SetPowerLoad(consumerId2, powerLoad2));
 
   // Check consumers power load
-  EXPECT_EQ(battery->PowerLoad(consumerId1, powerLoad1), true);
+  EXPECT_TRUE(battery->PowerLoad(consumerId1, powerLoad1));
   EXPECT_DOUBLE_EQ(powerLoad1, 1.0);
-  EXPECT_EQ(battery->PowerLoad(consumerId2, powerLoad2), true);
+  EXPECT_TRUE(battery->PowerLoad(consumerId2, powerLoad2));
   EXPECT_DOUBLE_EQ(powerLoad2, 2.0);
 }
 
+/// \brief A fixture class to help with updating the battery voltage.
 class BatteryUpdateFixture
 {
+  /// \brief Update voltage by incrementing it.
   public: double Update(double _voltage,
                         const std::map<uint32_t, double> &/*_powerLoads*/)
-          { return _voltage + this->step; }
+          {
+            return _voltage + this->step;
+          }
+  /// \brief Voltage amount to increment by.
   public: double step;
 };
 

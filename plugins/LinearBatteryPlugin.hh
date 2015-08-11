@@ -31,9 +31,6 @@ namespace gazebo
     /// \brief Constructor.
     public: LinearBatteryPlugin();
 
-    /// \brief Destructor.
-    public: ~LinearBatteryPlugin();
-
     // Documentation Inherited.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
