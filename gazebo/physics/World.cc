@@ -785,6 +785,12 @@ void World::Update()
 
   DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
 
+  if (this->dataPtr->physicsPlugin)
+  {
+    this->dataPtr->physicsPlugin->updatePhysics();
+  }
+  DIAG_TIMER_LAP("World::Update", "Events::PhysicsPlugin Update");
+
   // Update all the models
   (*this.*dataPtr->modelUpdateFunc)();
 

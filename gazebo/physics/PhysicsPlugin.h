@@ -52,6 +52,13 @@ typedef int (*InitPhysicsFnPtr)(void);
  */
 typedef int (*LoadModelFnPtr)(void);
 
+/* \brief InitModel function pointer.
+ * This function is called after the model has been loaded (LoadModel).
+ * Use this function to set the model configuration.
+ * \return 0 on success, -1 on error.
+ */
+typedef int (*InitModelFnPtr)(void);
+
 /* \brief SetState function pointer.
  * This function is called after the model has been loaded (LoadModel).
  * Use this function to instantiate or set the state for the model.
@@ -102,7 +109,12 @@ struct _PhysicsPlugin
   /*
    *
    */
-  LoadModelFnPtr initModel;
+  LoadModelFnPtr loadModel;
+
+  /*
+   *
+   */
+  InitModelFnPtr initModel;
 
   /*
    *

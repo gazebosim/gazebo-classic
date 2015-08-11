@@ -58,6 +58,7 @@ void help()
   << "  --iters arg                   Number of iterations to simulate.\n"
   << "  --minimal_comms               Reduce the TCP/IP traffic output by "
   <<                                  "gazebo.\n"
+  << "  -l [ --physics-plugin ] arg   Load a custom physics plugin.\n"
   << "  -g [ --gui-plugin ] arg       Load a GUI plugin.\n"
   << "  -s [ --server-plugin ] arg    Load a server plugin.\n"
   << "  -o [ --profile ] arg          Physics preset profile name from the "
