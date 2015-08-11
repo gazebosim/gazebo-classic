@@ -227,6 +227,9 @@ MainWindow::MainWindow()
   this->dataLogger = new gui::DataLogger(this);
   connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
 
+  // Hotkey dialog
+  this->hotkeyDialog = NULL;
+
   this->show();
 }
 
@@ -572,6 +575,18 @@ void MainWindow::About()
   aboutBox.setTextFormat(Qt::RichText);
   aboutBox.setText(QString::fromStdString(helpTxt));
   aboutBox.exec();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::HotkeyChart()
+{
+  // Opening for the first time
+  if (!this->hotkeyDialog)
+  {
+    this->hotkeyDialog = new HotkeyDialog(this);
+  }
+
+  this->hotkeyDialog->show();
 }
 
 /////////////////////////////////////////////////
@@ -1023,6 +1038,10 @@ void MainWindow::CreateActions()
   g_cloneAct->setStatusTip(tr("Clone the world"));
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
 
+  g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
+  g_hotkeyChartAct->setStatusTip(tr("Show the hotkey chart"));
+  connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
+
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
   connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
@@ -1139,14 +1158,6 @@ void MainWindow::CreateActions()
   connect(g_cylinderCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateCylinder()));
   this->CreateDisabledIcon(":/images/cylinder.png", g_cylinderCreateAct);
-
-  g_meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
-      tr("Mesh"), this);
-  g_meshCreateAct->setStatusTip(tr("Create a mesh"));
-  g_meshCreateAct->setCheckable(true);
-  connect(g_meshCreateAct, SIGNAL(triggered()), this,
-      SLOT(CreateMesh()));
-  this->CreateDisabledIcon(":/images/cylinder.png", g_meshCreateAct);
 
   g_pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
@@ -1526,6 +1537,9 @@ void MainWindow::DeleteActions()
   delete g_cloneAct;
   g_cloneAct = 0;
 
+  delete g_hotkeyChartAct;
+  g_hotkeyChartAct = 0;
+
   delete g_aboutAct;
   g_aboutAct = 0;
 
@@ -1576,9 +1590,6 @@ void MainWindow::DeleteActions()
 
   delete g_cylinderCreateAct;
   g_cylinderCreateAct = 0;
-
-  delete g_meshCreateAct;
-  g_meshCreateAct = 0;
 
   delete g_pointLghtCreateAct;
   g_pointLghtCreateAct = 0;
@@ -1736,6 +1747,7 @@ void MainWindow::CreateMenuBar()
   bar->addSeparator();
 
   QMenu *helpMenu = bar->addMenu(tr("&Help"));
+  helpMenu->addAction(g_hotkeyChartAct);
   helpMenu->addAction(g_aboutAct);
 }
 
@@ -1783,7 +1795,6 @@ void MainWindow::OnMoveMode(bool _mode)
     g_boxCreateAct->setChecked(false);
     g_sphereCreateAct->setChecked(false);
     g_cylinderCreateAct->setChecked(false);
-    g_meshCreateAct->setChecked(false);
     g_pointLghtCreateAct->setChecked(false);
     g_spotLghtCreateAct->setChecked(false);
     g_dirLghtCreateAct->setChecked(false);

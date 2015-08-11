@@ -23,6 +23,8 @@
 #define _BULLETSPHERESHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/SphereShape.hh"
 #include "gazebo/util/system.hh"

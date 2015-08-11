@@ -734,6 +734,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_aboutAct);
 
+  QVERIFY(gazebo::gui::g_hotkeyChartAct);
+
   QVERIFY(gazebo::gui::g_quitAct);
 
   QVERIFY(gazebo::gui::g_resetModelsAct);
@@ -765,8 +767,6 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(gazebo::gui::g_sphereCreateAct);
 
   QVERIFY(gazebo::gui::g_cylinderCreateAct);
-
-  QVERIFY(gazebo::gui::g_meshCreateAct);
 
   QVERIFY(gazebo::gui::g_pointLghtCreateAct);
 
@@ -843,6 +843,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(!gazebo::gui::g_aboutAct);
 
+  QVERIFY(!gazebo::gui::g_hotkeyChartAct);
+
   QVERIFY(!gazebo::gui::g_quitAct);
 
   QVERIFY(!gazebo::gui::g_resetModelsAct);
@@ -874,8 +876,6 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_sphereCreateAct);
 
   QVERIFY(!gazebo::gui::g_cylinderCreateAct);
-
-  QVERIFY(!gazebo::gui::g_meshCreateAct);
 
   QVERIFY(!gazebo::gui::g_pointLghtCreateAct);
 

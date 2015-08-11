@@ -55,6 +55,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  logical_camera_sensor.cc
   model.cc
   model_database.cc
   noise.cc
