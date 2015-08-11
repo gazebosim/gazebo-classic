@@ -40,7 +40,10 @@ void main()
 
 	theta = (theta-c3)*c2;
 
-	if(theta < cutOffAngle)
+	// gl_FragColor = vec4(vec3(c1,c2,c3),1.0);
+	// return;
+
+	if(true || theta < cutOffAngle)
 	{
 		vec3 tc ;
 		tc = map(theta);

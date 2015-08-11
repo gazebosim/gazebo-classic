@@ -20,6 +20,7 @@
 // #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CameraLensPrivate.hh"
+#include "gazebo/rendering/WideAngleCameraPrivate.hh"
 
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -35,6 +36,12 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene
   Camera(_namePrefix,_scene,_autoRender),
   envTextureSize(_textureSize)
 {
+  // this->sdf->Reset();
+  // sdf::initFile("wideanglecamera.sdf",this->sdf);
+
+  this->dataPtr = new WideAngleCameraPrivate;
+  this->lens = new CameraLens();
+
   envCubeMapTexture = NULL;
   for(int i=0;i<6;i++)
   {
@@ -47,6 +54,8 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene
 WideAngleCamera::~WideAngleCamera()
 {
   //TODO
+  delete this->dataPtr;
+  delete this->lens;
 }
 
 //////////////////////////////////////////////////
@@ -54,7 +63,6 @@ void WideAngleCamera::Init()
 {
   Camera::Init();
 
-  this->CreateEnvCameras();
   this->CreateEnvRenderTexture(this->scopedUniqueName + "_envRttTex");
 }
 
@@ -63,17 +71,19 @@ void WideAngleCamera::Load()
 {
   Camera::Load();
 
+  this->CreateEnvCameras();
+
   if(this->sdf->HasElement("lens"))
   {
     sdf::ElementPtr sdf_lens = this->sdf->GetElement("lens");
 
-    this->lens.Load(sdf_lens);
+    this->lens->Load(sdf_lens);
 
     if(sdf_lens->HasElement("env_texture_size"))
       this->envTextureSize = sdf_lens->Get<int>("env_texture_size");
   }
   else
-    this->lens.Load();
+    this->lens->Load();
 }
 
 //////////////////////////////////////////////////
@@ -104,22 +114,21 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   if(this->renderTarget)
   {
-    gzdbg << "Add Camera Compositor\n";
-
     this->wamapInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-          "WideCameraLensMap/PathThrough");
+          "WideCameraLensMap/ParametrisedMap");
 
     if(this->envCubeMapTexture)
     {
       this->compMat = Ogre::MaterialManager::getSingleton().getByName("Gazebo/WideLensMap");
 
-      if(compMat->getTechnique(0)->getPass(0)->getNumTextureUnitStates() == 0)
+      if(this->compMat->getTechnique(0)->getPass(0)->getNumTextureUnitStates() == 0)
       {
-        compMat->getTechnique(0)->getPass(0)->createTextureUnitState();
+        this->compMat->getTechnique(0)->getPass(0)->createTextureUnitState();
       }
 
-      this->lens.SetCompositorMaterial(this->compMat);
+      // this->lens->SetCompositorMaterial(this->compMat); //FIXME: remove
+      this->wamapInstance->addListener(this);
     }
     else
       gzerr << "Compositor texture MISSING";
@@ -215,6 +224,8 @@ void WideAngleCamera::CreateEnvCameras()
 //////////////////////////////////////////////////
 void WideAngleCamera::RenderImpl()
 {
+  // boost::mutex::scoped_lock lock(this->dataPtr->renderMutex);
+
   math::Quaternion orient = this->GetWorldRotation();
   math::Vector3 pos = this->GetWorldPosition();
 
@@ -236,7 +247,8 @@ void WideAngleCamera::RenderImpl()
   compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
     this->envCubeMapTexture->getName());
 
-  this->lens.SetMaterialVariables(this->GetAspectRatio(),this->GetHFOV().Radian());
+  //FIXME: remove
+  // this->lens->SetMaterialVariables(this->GetAspectRatio(),this->GetHFOV().Radian());
 
   this->renderTarget->update();
 }
@@ -265,9 +277,9 @@ void WideAngleCamera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
-const CameraLens *WideAngleCamera::GetLens()
+CameraLens *WideAngleCamera::GetLens()
 {
-  return &this->lens;
+  return this->lens;
 }
 
 CameraLens::CameraLens()
@@ -314,35 +326,7 @@ void CameraLens::Init(float _c1,float _c2,std::string _fun,float _f,float _c3)
 //////////////////////////////////////////////////
 void CameraLens::Init(std::string _name)
 {
-  std::map<std::string,std::tuple<float,float,float,float,std::string> > fun_types;
-
-  // c1,c2,c3,f,fun
-  fun_types.emplace("gnomonical",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan"));
-  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,"tan"));
-  fun_types.emplace("stereographic_",  std::make_tuple(2.0f,2.0f,0.0f,0.5f,"tan"));
-  fun_types.emplace("equidistant",  std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id"));
-  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,"sin"));
-  fun_types.emplace("orthographic", std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin"));
-
-  std::tuple<float,float,float,float,std::string> params;
-  try
-  {
-    params = fun_types.at(_name);
-  }
-  catch(...)
-  {
-    std::stringstream sstr;
-    sstr << "Unknown mapping function [" << _name << "]";
-
-    gzthrow(sstr.str());
-  }
-
-  this->Init(
-    std::get<0>(params),
-    std::get<1>(params),
-    std::get<4>(params),
-    std::get<3>(params),
-    std::get<2>(params));
+  this->SetType(_name);
 }
 
 //////////////////////////////////////////////////
@@ -510,6 +494,39 @@ std::string CameraLens::GetType() const
 //////////////////////////////////////////////////
 void CameraLens::SetType(std::string _type)
 {
+  std::map<std::string,std::tuple<float,float,float,float,std::string> > fun_types;
+
+  // c1,c2,c3,f,fun
+  fun_types.emplace("gnomonical",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan"));
+  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,"tan"));
+  fun_types.emplace("stereographic_",  std::make_tuple(2.0f,2.0f,0.0f,0.5f,"tan"));
+  fun_types.emplace("equidistant",  std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id"));
+  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,"sin"));
+  fun_types.emplace("orthographic", std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin"));
+
+  fun_types.emplace("custom",   std::make_tuple(this->GetC1(),this->GetC2(),this->GetC3()
+      ,this->GetF(),this->GetFun()));
+
+  std::tuple<float,float,float,float,std::string> params;
+  try
+  {
+    params = fun_types.at(_type);
+  }
+  catch(...)
+  {
+    std::stringstream sstr;
+    sstr << "Unknown mapping function [" << _type << "]";
+
+    gzthrow(sstr.str());
+  }
+
+  this->Init(
+    std::get<0>(params),
+    std::get<1>(params),
+    std::get<4>(params),
+    std::get<3>(params),
+    std::get<2>(params));
+
   this->sdf->GetElement("type")->Set(_type);
 }
 
@@ -526,22 +543,18 @@ bool CameraLens::IsCircular() const
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetCompositorMaterial(Ogre::MaterialPtr _material)
-{
-  this->compositorMaterial = _material;
-}
-
-//////////////////////////////////////////////////
-void CameraLens::SetMaterialVariables(float _ratio,float _hfov)
+void CameraLens::SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov)
 {
   Ogre::GpuProgramParametersSharedPtr uniforms =
-    this->compositorMaterial->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+    _pass->getFragmentProgramParameters();
 
   math::Vector3 fun_m[] = {
     math::Vector3(1,0,0),
     math::Vector3(0,1,0),
     math::Vector3(0,0,1)
   };
+
+  gzmsg << "1";
 
   uniforms->setNamedConstant("c1",(Ogre::Real)this->dataPtr->c1);
   uniforms->setNamedConstant("c2",(Ogre::Real)this->dataPtr->c2);
@@ -579,7 +592,36 @@ void CameraLens::SetMaterialVariables(float _ratio,float _hfov)
   uniforms->setNamedConstant("cutOffAngle",(Ogre::Real)this->dataPtr->cutOffAngle);
 
   Ogre::GpuProgramParametersSharedPtr uniforms_vs =
-    this->compositorMaterial->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+    _pass->getVertexProgramParameters();
 
   uniforms_vs->setNamedConstant("ratio",(Ogre::Real)_ratio);
+
+  gzmsg << "f\n";
+}
+
+//////////////////////////////////////////////////
+void WideAngleCamera::notifyMaterialRender(Ogre::uint32 _pass_id, Ogre::MaterialPtr &_material)
+{
+  gzmsg << "n";
+  if(_material.isNull())
+    return;
+
+  Ogre::Technique *pTechnique = _material->getBestTechnique();
+  if(!pTechnique)
+    return;
+
+  Ogre::Pass *pPass = pTechnique->getPass(0);
+  if(!pPass || !pPass->hasFragmentProgram())
+    return;
+
+  if(!this->GetLens())
+  {
+    gzerr << "No lens\n";
+    return;
+  }
+
+  gzmsg << "s";
+  this->GetLens()->SetUniformVariables(pPass,
+    this->GetAspectRatio(),
+    this->GetHFOV().Radian());
 }

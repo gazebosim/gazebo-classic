@@ -15,13 +15,16 @@
  *
 */
 
-#ifndef _GAZEBO_RENDERING_CAMERALENSPRIVATE_HH_
-#define _GAZEBO_RENDERING_CAMERALENSPRIVATE_HH_
+#ifndef _GAZEBO_RENDERING_CAMERA_LENS_PRIVATE_HH_
+#define _GAZEBO_RENDERING_CAMERA_LENS_PRIVATE_HH_
 
 namespace gazebo
 {
   namespace rendering
   {
+    // forward declaration
+    class WideAngleCamera;
+
     /// \brief Private fields of camera lens
     class CameraLensPrivate
     {
@@ -33,6 +36,8 @@ namespace gazebo
 
       public: enum MapFunction {SIN=0,TAN,ID};
       public: MapFunction fun;
+
+      public: WideAngleCamera *parent;
     };
   }
 }

@@ -31,7 +31,9 @@ namespace gazebo
     /// \{
 
     // forward declarations
+    class WideAngleCamera;
     class CameraLensPrivate;
+    class WideAngleCameraPrivate;
 
     /// \class CameraLens WideAngleCamera.hh rendering/rendering.hh
     /// \brief Describes a lens of a camera as amapping function of type r = c1*f*fun(theta/c2+c3)
@@ -133,20 +135,14 @@ namespace gazebo
       /// \return True if the lens is circular
       public: bool IsCircular() const;
 
-      /// \brief Set material that is used for mapping environment on the frame
-      /// \param[in] _material Ogre::MaterialPtr
-      public: void SetCompositorMaterial(Ogre::MaterialPtr _material);
-
-      /// \brief Set uniform variables of shader for the provided material
+      /// \brief Set uniform variables of shader for the provided material technique pass
+      /// \param[in] _pass Ogre::Pass used for rendering
       /// \param[in] _ratio Frame aspect ratio
       /// \param[in] _hfov Horisontal field of view
-      public: void SetMaterialVariables(float _ratio,float _hfov);
+      public: void SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov);
 
       /// \brief SDF element of the lens
       protected: sdf::ElementPtr sdf;
-
-      /// \brief Pointer to ogre material used for mapping
-      private: Ogre::MaterialPtr compositorMaterial;
 
       /// \brief Private data pointer
       private: CameraLensPrivate *dataPtr;
@@ -154,7 +150,7 @@ namespace gazebo
 
     /// \class WideAngleCamera WideAngleCamera.hh rendering/rendering.hh
     /// \brief Camera with agile mapping function
-    class GAZEBO_VISIBLE WideAngleCamera : public Camera
+    class GAZEBO_VISIBLE WideAngleCamera : public Camera, protected Ogre::CompositorInstance::Listener
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -205,7 +201,9 @@ namespace gazebo
 
       /// \brief Get this camera lens description
       /// \return Camera lens description
-      public: const CameraLens *GetLens();
+      public: CameraLens *GetLens();
+
+      protected: virtual void notifyMaterialRender(Ogre::uint32 _pass_id, Ogre::MaterialPtr &_material) override;
 
       /// \brief Compositor used to render rectangle with attached cube map texture
       protected: Ogre::CompositorInstance *wamapInstance;
@@ -229,7 +227,9 @@ namespace gazebo
       protected: Ogre::MaterialPtr compMat;
 
       /// \brief Camera lens description
-      protected: CameraLens lens;
+      protected: CameraLens *lens;
+
+      private: WideAngleCameraPrivate *dataPtr;
     };
     /// \}
   }

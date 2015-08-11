@@ -93,7 +93,7 @@ CameraLensControlExample::CameraLensControlExample()
 /////////////////////////////////////////////////
 CameraLensControlExample::~CameraLensControlExample()
 {
-  delete this->imgFrame;
+  // delete this->imgFrame;
 }
 
 /////////////////////////////////////////////////
@@ -138,7 +138,14 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
 
   // bind Events
   connect(this->cbType,SIGNAL(currentIndexChanged(int)),this,SLOT(OnValueChanged()));
+  connect(this->cbFun,SIGNAL(currentIndexChanged(int)),this,SLOT(OnValueChanged()));
   connect(this->cbCircular,SIGNAL(stateChanged(int)),this,SLOT(OnValueChanged()));
+
+  connect(this->sbC1,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbC2,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbC3,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbF,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbCA,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
 
   // Add listener for spawn button
   connect(pbSpawn, SIGNAL(clicked()), this, SLOT(OnButtonSpawn()));
@@ -235,6 +242,8 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
 
     this->cameraControlPub = this->node->Advertise<msgs::CameraLensCmd>(
       "~/"+_msg->name()+"/link/camera/lens_control",10);
+
+    this->ignoreInfoMessages = false;
   }
 
   gzmsg << std::endl;
@@ -244,12 +253,17 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
 void CameraLensControlExample::OnImageUpdate(ConstImageStampedPtr &_msg)
 {
   // Display received image
-  this->imgFrame->OnImage(_msg->image());
+  // this->imgFrame->OnImage(_msg->image());
 }
 
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnCameraProjectionCmd(ConstCameraLensCmdPtr &_msg)
 {
+  if(this->ignoreInfoMessages)
+    return;
+  else
+    this->ignoreInfoMessages = true;
+
   if(_msg->has_c1())
     this->sbC1->setValue(_msg->c1());
   if(_msg->has_c2())
@@ -285,16 +299,22 @@ void CameraLensControlExample::OnValueChanged()
     msg.set_destiny(msgs::CameraLensCmd_CmdDestiny_SET);
 
     msg.set_type(this->cbType->currentText().toUtf8().constData());
-    msg.set_fun(this->cbFun->currentText().toUtf8().constData());
 
-    msg.set_c1(this->sbC1->value());
-    msg.set_c2(this->sbC2->value());
-    msg.set_c3(this->sbC3->value());
-    msg.set_f(this->sbF->value());
+    if(this->cbType->currentText() == "custom")
+    {
+      msg.set_fun(this->cbFun->currentText().toUtf8().constData());
+
+      msg.set_c1(this->sbC1->value());
+      msg.set_c2(this->sbC2->value());
+      msg.set_c3(this->sbC3->value());
+      msg.set_f(this->sbF->value());
+    }
+
     msg.set_cutoff_angle(this->sbCA->value());
 
     msg.set_circular(this->cbCircular->isChecked());
 
     this->cameraControlPub->Publish(msg);
+    gzmsg << "Control message sent" << std::endl;
   }
 }

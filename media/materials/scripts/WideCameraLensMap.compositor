@@ -1,4 +1,4 @@
-compositor WideCameraLensMap/PathThrough
+compositor WideCameraLensMap/ParametrisedMap
 {
     technique
     {

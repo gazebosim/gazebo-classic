@@ -133,7 +133,6 @@ void WideAngleCameraSensor::Init()
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::Load(const std::string &_worldName)
 {
-  gzerr << "wideanglecamera::Load" << std::endl;
   Sensor::Load(_worldName);
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(
       this->GetTopic(), 50);
@@ -199,20 +198,33 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 {
-  if(_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET);
+  gzmsg << "control\n";
+
+  if(_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET)
+  {
+    gzerr << "control message is not of the set type " << (int)_msg->destiny() <<"\n";
+    gzdbg << _msg->DebugString() << "\n";
     return;
+  }
 
   rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
 
-  rendering::CameraLens *lens =
-      const_cast<rendering::CameraLens*>(wcamera->GetLens());
+  rendering::CameraLens *lens = (wcamera->GetLens());
+
+  gzmsg << "Still alive\n";
 
   if(_msg->has_type())
+  {
+    gzdbg << "has type:" << _msg->type() << "\n";
     lens->SetType(_msg->type());
+  }
 
   if(_msg->has_c1())
+  {
+    gzdbg << "has c1\n";
     lens->SetC1(_msg->c1());
+  }
 
   if(_msg->has_c2())
     lens->SetC2(_msg->c2());
@@ -224,11 +236,19 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
     lens->SetF(_msg->f());
 
   if(_msg->has_cutoff_angle())
+  {
     lens->SetCutOffAngle(_msg->cutoff_angle());
+    wcamera->SetHFOV(_msg->cutoff_angle());
+  }
 
   if(_msg->has_fun())
     lens->SetFun(_msg->fun());
 
   if(_msg->has_circular())
+  {
+    gzdbg << "has circular:"<< _msg->circular() <<"\n";
     lens->SetCircular(_msg->circular());
+  }
+
+  gzmsg << "Something set\n";
 }

@@ -98,6 +98,8 @@ namespace gazebo
 
     /// \brief Image output frame.
     // private: gui::ImageFrame *imgFrame;
+
+    private: bool ignoreInfoMessages = false;
   };
 }
 #endif
