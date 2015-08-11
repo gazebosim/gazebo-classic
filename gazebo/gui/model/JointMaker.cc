@@ -896,7 +896,7 @@ void JointMaker::Update()
                 joint->child->GetNthAncestor(2);
             if (parentTopLevelLink && childTopLevelLink)
             {
-              gui::model::Events::jointInserted(it.first, joint->name,
+              gui::model::Events::jointChanged(it.first, joint->name,
                   jointTypes[joint->type], parentTopLevelLink->GetName(),
                   childTopLevelLink->GetName());
             }

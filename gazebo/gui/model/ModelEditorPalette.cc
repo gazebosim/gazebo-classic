@@ -279,7 +279,8 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->connections.push_back(
       gui::model::Events::ConnectJointInserted(
-      boost::bind(&ModelEditorPalette::OnJointInserted, this, _1, _2, _3, _4)));
+      boost::bind(&ModelEditorPalette::OnJointInserted, this, _1, _2, _3, _4,
+          _5)));
 
   this->connections.push_back(
       gui::model::Events::ConnectNestedModelRemoved(
@@ -694,8 +695,8 @@ void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
-    const std::string &_jointName, const std::string &/*_parentName*/,
-    const std::string &/*_childName*/)
+    const std::string &_jointName, const std::string &/*_type*/,
+    const std::string &/*_parentName*/, const std::string &/*_childName*/)
 {
   std::string leafName = _jointName;
   size_t idx = _jointName.find("::");

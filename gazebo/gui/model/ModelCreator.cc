@@ -1272,11 +1272,11 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   }
   gui::model::Events::linkRemoved(linkName);
 
-  std::string leafName = linkName;
+/*  std::string leafName = linkName;
   size_t idx = linkName.find_last_of("::");
   if (idx != std::string::npos)
     leafName = linkName.substr(idx+1);
-  gui::model::Events::linkRemoved(leafName);
+  gui::model::Events::linkRemoved(leafName);*/
   this->ModelChanged();
 }
 

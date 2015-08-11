@@ -153,11 +153,12 @@ namespace gazebo
       /// \brief Add a joint to the tree.
       /// \param[in] _jointId Unique joint identifying name.
       /// \param[in] _jointName Scoped name which can be changed by the user.
-      /// \param[in] _jointName Scoped name of the parent link.
-      /// \param[in] _jointName Scoped name of the child link.
+      /// \param[in] _type Type of joint.
+      /// \param[in] _parentName Scoped name of the parent link.
+      /// \param[in] _childName Scoped name of the child link.
       private: void OnJointInserted(const std::string &_jointId,
-          const std::string &_jointName, const std::string &_parentName,
-          const std::string &_childName);
+          const std::string &_jointName, const std::string &_type,
+          const std::string &_parentName, const std::string &_childName);
 
       /// \brief Remove a nested model from the tree.
       /// \param[in] _linkId Unique nested model identifying name.
