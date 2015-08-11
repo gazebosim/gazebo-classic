@@ -594,7 +594,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             value = 0;
           if (newWidget)
           {
-            configChildWidget = CreateDoubleWidget(name, _level);
+            configChildWidget = this->CreateDoubleWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateDoubleWidget(configChildWidget, value);
@@ -607,7 +607,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             value = 0;
           if (newWidget)
           {
-            configChildWidget = CreateDoubleWidget(name, _level);
+            configChildWidget = this->CreateDoubleWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateDoubleWidget(configChildWidget, value);
@@ -618,7 +618,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           int64_t value = ref->GetInt64(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateIntWidget(name, _level);
+            configChildWidget = this->CreateIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateIntWidget(configChildWidget, value);
@@ -629,7 +629,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           uint64_t value = ref->GetUInt64(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateUIntWidget(name, _level);
+            configChildWidget = this->CreateUIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateUIntWidget(configChildWidget, value);
@@ -640,7 +640,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           int32_t value = ref->GetInt32(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateIntWidget(name, _level);
+            configChildWidget = this->CreateIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateIntWidget(configChildWidget, value);
@@ -651,7 +651,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           uint32_t value = ref->GetUInt32(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateUIntWidget(name, _level);
+            configChildWidget = this->CreateUIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateUIntWidget(configChildWidget, value);
@@ -662,7 +662,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           bool value = ref->GetBool(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateBoolWidget(name, _level);
+            configChildWidget = this->CreateBoolWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateBoolWidget(configChildWidget, value);
@@ -673,7 +673,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           std::string value = ref->GetString(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateStringWidget(name, _level);
+            configChildWidget = this->CreateStringWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateStringWidget(configChildWidget, value);
@@ -959,7 +959,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                   {\
                     background-color: " + this->level1BgColor +
                   "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox,\
+                  QPlainTextEdit\
                   {\
                     background-color: " + this->level1WidgetColor +
                   "}");
@@ -971,7 +972,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                   {\
                     background-color: " + this->level2BgColor +
                   "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox,\
+                  QPlainTextEdit\
                   {\
                     background-color: " + this->level2WidgetColor +
                   "}");
@@ -983,7 +985,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                   {\
                     background-color: " + this->level2BgColor +
                   "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox,\
+                  QPlainTextEdit\
                   {\
                     background-color: " + this->level2WidgetColor +
                   "}");
@@ -1063,7 +1066,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             {\
               background-color: " + this->level0BgColor +
             "}\
-            QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+            QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
             {\
               background-color: " + this->level0WidgetColor +
             "}");
@@ -1255,8 +1258,17 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
-  // LineEdit
-  QLineEdit *valueLineEdit = new QLineEdit;
+  // Line or Text Edit based on key
+  QWidget *valueEdit;
+  if (_key == "innerxml")
+  {
+    valueEdit = new QPlainTextEdit();
+    valueEdit->setMinimumHeight(50);
+  }
+  else
+  {
+    valueEdit = new QLineEdit;
+  }
 
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
@@ -1266,14 +1278,14 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
         QSizePolicy::Fixed, QSizePolicy::Fixed));
   }
   widgetLayout->addWidget(keyLabel);
-  widgetLayout->addWidget(valueLineEdit);
+  widgetLayout->addWidget(valueEdit);
 
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
-  widget->widgets.push_back(valueLineEdit);
+  widget->widgets.push_back(valueEdit);
 
   return widget;
 }
@@ -1849,9 +1861,19 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
         }
         case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
         {
-          QLineEdit *valueLineEdit =
+          if (qobject_cast<QLineEdit *>(childWidget->widgets[0]))
+          {
+            QLineEdit *valueLineEdit =
               qobject_cast<QLineEdit *>(childWidget->widgets[0]);
-          ref->SetString(_msg, field, valueLineEdit->text().toStdString());
+            ref->SetString(_msg, field, valueLineEdit->text().toStdString());
+          }
+          else if (qobject_cast<QPlainTextEdit *>(childWidget->widgets[0]))
+          {
+            QPlainTextEdit *valueTextEdit =
+                qobject_cast<QPlainTextEdit *>(childWidget->widgets[0]);
+            ref->SetString(_msg, field,
+                valueTextEdit->toPlainText().toStdString());
+          }
           break;
         }
         case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
@@ -2183,8 +2205,18 @@ bool ConfigWidget::UpdateStringWidget(ConfigChildWidget *_widget,
 {
   if (_widget->widgets.size() == 1u)
   {
-    qobject_cast<QLineEdit *>(_widget->widgets[0])->setText(tr(_value.c_str()));
-    return true;
+    if (qobject_cast<QLineEdit *>(_widget->widgets[0]))
+    {
+      qobject_cast<QLineEdit *>(_widget->widgets[0])
+          ->setText(tr(_value.c_str()));
+      return true;
+    }
+    else if (qobject_cast<QPlainTextEdit *>(_widget->widgets[0]))
+    {
+      qobject_cast<QPlainTextEdit *>(_widget->widgets[0])
+          ->setPlainText(tr(_value.c_str()));
+      return true;
+    }
   }
   else
   {
@@ -2408,8 +2440,16 @@ std::string ConfigWidget::GetStringWidgetValue(ConfigChildWidget *_widget) const
   std::string value;
   if (_widget->widgets.size() == 1u)
   {
-    value =
-        qobject_cast<QLineEdit *>(_widget->widgets[0])->text().toStdString();
+    if (qobject_cast<QLineEdit *>(_widget->widgets[0]))
+    {
+      value =
+          qobject_cast<QLineEdit *>(_widget->widgets[0])->text().toStdString();
+    }
+    else if (qobject_cast<QPlainTextEdit *>(_widget->widgets[0]))
+    {
+      value = qobject_cast<QPlainTextEdit *>(_widget->widgets[0])
+          ->toPlainText().toStdString();
+    }
   }
   else
   {

@@ -40,6 +40,14 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent) : QDialog(_parent)
   this->configWidget->SetWidgetReadOnly("filename", true);
   this->configWidget->SetWidgetReadOnly("innerxml", true);
 
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(this->configWidget);
+  scrollArea->setWidgetResizable(true);
+
+  QVBoxLayout *generalLayout = new QVBoxLayout;
+  generalLayout->setContentsMargins(0, 0, 0, 0);
+  generalLayout->addWidget(scrollArea);
+
   // Buttons
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
@@ -54,9 +62,12 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent) : QDialog(_parent)
 
   // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(configWidget);
+  mainLayout->addLayout(generalLayout);
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
+
+  this->setMinimumWidth(500);
+  this->setMinimumHeight(300);
 }
 
 /////////////////////////////////////////////////
