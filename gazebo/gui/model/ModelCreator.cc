@@ -182,6 +182,7 @@ ModelCreator::~ModelCreator()
     this->RemoveLinkImpl(this->allLinks.begin()->first);
 
   this->allLinks.clear();
+  this->allModelPlugins.clear();
   this->node->Fini();
   this->node.reset();
   this->modelTemplateSDF.reset();
@@ -1092,6 +1093,8 @@ void ModelCreator::Reset()
     this->RemoveLinkImpl(this->allLinks.begin()->first);
   this->allLinks.clear();
 
+  this->allModelPlugins.clear();
+
   if (!gui::get_active_camera() ||
     !gui::get_active_camera()->GetScene())
   return;
@@ -1733,20 +1736,9 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 
-  // If we're editing an existing model, copy the original plugin sdf elements
-  // since we are not generating them.
-  if (this->serverModelSDF)
-  {
-    if (this->serverModelSDF->HasElement("plugin"))
-    {
-      sdf::ElementPtr pluginElem = this->serverModelSDF->GetElement("plugin");
-      while (pluginElem)
-      {
-        modelElem->InsertElement(pluginElem->Clone());
-        pluginElem = pluginElem->GetNextElement("plugin");
-      }
-    }
-  }
+  // Add plugin elements
+  for (auto modelPlugin : this->allModelPlugins)
+    modelElem->InsertElement(modelPlugin.second->modelPluginSDF->Clone());
 }
 
 /////////////////////////////////////////////////
@@ -1989,12 +1981,8 @@ void ModelCreator::AddModelPlugin(sdf::ElementPtr _pluginElem)
       filename = _pluginElem->Get<std::string>("filename");
 
     // Create data
-    msgs::Plugin pluginMsg = msgs::PluginFromSDF(_pluginElem);
-    msgs::PluginPtr pluginPtr(new msgs::Plugin);
-    pluginPtr->CopyFrom(pluginMsg);
-
     ModelPluginData *modelPlugin = new ModelPluginData();
-    modelPlugin->inspector->Update(pluginPtr);
+    modelPlugin->Load(_pluginElem);
 
     // Add to map
     {

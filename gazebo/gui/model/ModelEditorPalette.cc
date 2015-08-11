@@ -729,6 +729,8 @@ void ModelEditorPalette::ClearModelTree()
   this->linksItem->takeChildren();
   // Remove all joints
   this->jointsItem->takeChildren();
+  // Remove all model plugins
+  this->modelPluginsItem->takeChildren();
 }
 
 /////////////////////////////////////////////////

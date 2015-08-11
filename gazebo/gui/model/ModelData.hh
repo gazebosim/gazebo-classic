@@ -192,30 +192,6 @@ namespace gazebo
       /// \param[in] _pluginElem SDF element.
       public: void Load(sdf::ElementPtr _pluginElem);
 
-      /// \brief Get the name of the model plugin.
-      /// \return Name of model plugin.
-      public: std::string Name() const;
-
-      /// \brief Set the name of the model plugin.
-      /// \param[in] _name Name of model plugin.
-      public: void SetName(const std::string &_name);
-
-      /// \brief Get the filename of the model plugin.
-      /// \return Filename of model plugin.
-      public: std::string Filename() const;
-
-      /// \brief Set the filename of the model plugin.
-      /// \param[in] _filename Filename of model plugin.
-      public: void SetFilename(const std::string &_filename);
-
-      /// \brief Get the parameters of the model plugin.
-      /// \return Parameters of model plugin.
-      public: std::string Params() const;
-
-      /// \brief Set the parameters of the model plugin.
-      /// \param[in] _params Parameters of model plugin.
-      public: void SetParams(const std::string &_params);
-
       /// \brief Qt Callback when model plugin inspector configurations are to
       /// be applied and inspector should be closed.
       private slots: void OnAccept();

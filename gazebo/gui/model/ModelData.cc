@@ -1099,51 +1099,19 @@ ModelPluginData::~ModelPluginData()
 void ModelPluginData::Load(sdf::ElementPtr _pluginElem)
 {
   this->modelPluginSDF = _pluginElem;
-  // this->inspector->SetParams(_pluginElem->ToString(""));
+
+  // Convert SDF to msg
+  msgs::Plugin pluginMsg = msgs::PluginFromSDF(_pluginElem);
+  msgs::PluginPtr pluginPtr(new msgs::Plugin);
+  pluginPtr->CopyFrom(pluginMsg);
+
+  // Update inspector
+  this->inspector->Update(pluginPtr);
 }
 
 /////////////////////////////////////////////////
 void ModelPluginData::OnAccept()
 {
   this->inspector->accept();
-}
-
-/////////////////////////////////////////////////
-std::string ModelPluginData::Name() const
-{
-  return this->modelPluginSDF->Get<std::string>("name");
-}
-
-/////////////////////////////////////////////////
-void ModelPluginData::SetName(const std::string &_name)
-{
-  this->modelPluginSDF->GetAttribute("name")->Set(_name);
-  // this->inspector->SetName(_name);
-}
-
-/////////////////////////////////////////////////
-std::string ModelPluginData::Filename() const
-{
-  return this->modelPluginSDF->Get<std::string>("filename");
-}
-
-/////////////////////////////////////////////////
-void ModelPluginData::SetFilename(const std::string &_filename)
-{
-  this->modelPluginSDF->GetAttribute("filename")->Set(_filename);
-  // this->inspector->SetFilename(_filename);
-}
-
-/////////////////////////////////////////////////
-std::string ModelPluginData::Params() const
-{
-  return this->modelPluginSDF->ToString("");
-}
-
-/////////////////////////////////////////////////
-void ModelPluginData::SetParams(const std::string &/*_params*/)
-{
-//  this->modelPluginSDF->SetFromString(_params);
-//  this->inspector->SetParams(_params);
 }
 
