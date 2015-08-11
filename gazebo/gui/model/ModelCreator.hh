@@ -49,6 +49,7 @@ namespace gazebo
   namespace gui
   {
     class LinkData;
+    class ModelPluginData;
     class SaveDialog;
     class JointMaker;
 
@@ -319,6 +320,10 @@ namespace gazebo
       /// \param[in] _name Name of link.
       private: void OpenInspector(const std::string &_name);
 
+      /// \brief Open the model plugin inspector.
+      /// \param[in] _name Name of model plugin.
+      private: void OpenModelPluginInspector(const std::string &_name);
+
       // Documentation inherited
       private: virtual void CreateTheEntity();
 
@@ -428,6 +433,9 @@ namespace gazebo
 
       /// \brief A map of model link names to and their visuals.
       private: std::map<std::string, LinkData *> allLinks;
+
+      /// \brief A map of model model plugin names to and their visuals.
+      private: std::map<std::string, ModelPluginData *> allModelPlugins;
 
       /// \brief Transport node
       private: transport::NodePtr node;

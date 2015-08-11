@@ -28,6 +28,7 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/gui/model/LinkInspector.hh"
+#include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/VisualConfig.hh"
 #include "gazebo/gui/model/LinkConfig.hh"
 #include "gazebo/gui/model/CollisionConfig.hh"
@@ -1076,3 +1077,73 @@ void LinkData::Update()
     }
   }
 }
+
+/////////////////////////////////////////////////
+ModelPluginData::ModelPluginData()
+{
+  this->modelPluginSDF.reset(new sdf::Element);
+  sdf::initFile("plugin.sdf", this->modelPluginSDF);
+
+  this->inspector = new ModelPluginInspector();
+  this->inspector->setModal(false);
+  connect(this->inspector, SIGNAL(Accepted()), this, SLOT(OnAccept()));
+}
+
+/////////////////////////////////////////////////
+ModelPluginData::~ModelPluginData()
+{
+  delete this->inspector;
+}
+
+/////////////////////////////////////////////////
+void ModelPluginData::Load(sdf::ElementPtr _pluginElem)
+{
+  this->modelPluginSDF = _pluginElem;
+  this->inspector->SetParams(_pluginElem->ToString(""));
+}
+
+/////////////////////////////////////////////////
+void ModelPluginData::OnAccept()
+{
+  this->inspector->accept();
+}
+
+/////////////////////////////////////////////////
+std::string ModelPluginData::Name() const
+{
+  return this->modelPluginSDF->Get<std::string>("name");
+}
+
+/////////////////////////////////////////////////
+void ModelPluginData::SetName(const std::string &_name)
+{
+  this->modelPluginSDF->GetAttribute("name")->Set(_name);
+  this->inspector->SetName(_name);
+}
+
+/////////////////////////////////////////////////
+std::string ModelPluginData::Filename() const
+{
+  return this->modelPluginSDF->Get<std::string>("filename");
+}
+
+/////////////////////////////////////////////////
+void ModelPluginData::SetFilename(const std::string &_filename)
+{
+  this->modelPluginSDF->GetAttribute("filename")->Set(_filename);
+  this->inspector->SetFilename(_filename);
+}
+
+/////////////////////////////////////////////////
+std::string ModelPluginData::Params() const
+{
+  return this->modelPluginSDF->ToString("");
+}
+
+/////////////////////////////////////////////////
+void ModelPluginData::SetParams(const std::string &_params)
+{
+//  this->modelPluginSDF->SetFromString(_params);
+  this->inspector->SetParams(_params);
+}
+

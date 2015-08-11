@@ -52,6 +52,7 @@
 
 #include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
+#include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -125,6 +126,10 @@ ModelCreator::ModelCreator()
   this->connections.push_back(
       gui::model::Events::ConnectOpenLinkInspector(
       boost::bind(&ModelCreator::OpenInspector, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectOpenModelPluginInspector(
+      boost::bind(&ModelCreator::OpenModelPluginInspector, this, _1)));
 
   this->connections.push_back(
       gui::Events::ConnectAlignMode(
@@ -1977,8 +1982,41 @@ void ModelCreator::AddModelPlugin(sdf::ElementPtr _pluginElem)
 {
   if (_pluginElem->HasAttribute("name"))
   {
-    gui::model::Events::modelPluginInserted(
-        _pluginElem->Get<std::string>("name"));
+    std::string name = _pluginElem->Get<std::string>("name");
+
+    std::string filename;
+    if (_pluginElem->HasAttribute("filename"))
+      filename = _pluginElem->Get<std::string>("filename");
+
+    // Create data and add to map
+    ModelPluginData *modelPlugin = new ModelPluginData();
+    modelPlugin->SetName(name);
+    modelPlugin->SetFilename(filename);
+    modelPlugin->Load(_pluginElem);
+    {
+      boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+      this->allModelPlugins[name] = modelPlugin;
+    }
+
+    // Notify addition
+    gui::model::Events::modelPluginInserted(name);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OpenModelPluginInspector(const std::string &_name)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
+  auto it = this->allModelPlugins.find(_name);
+  if (it == this->allModelPlugins.end())
+  {
+    gzerr << "Model plugin [" << _name << "] not found." << std::endl;
+    return;
+  }
+
+  ModelPluginData *modelPlugin = it->second;
+  modelPlugin->inspector->move(QCursor::pos());
+  modelPlugin->inspector->show();
 }
 

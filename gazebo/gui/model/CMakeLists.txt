@@ -19,6 +19,7 @@ set (sources
   ModelEditor.cc
   ModelEditorEvents.cc
   ModelEditorPalette.cc
+  ModelPluginInspector.cc
   VisualConfig.cc
 )
 
@@ -34,6 +35,7 @@ set (qt_headers
   ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
+  ModelPluginInspector.hh
   VisualConfig.hh
 )
 

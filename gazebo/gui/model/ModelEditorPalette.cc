@@ -559,6 +559,8 @@ void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
       gui::model::Events::openLinkInspector(name);
     else if (type == "Joint")
       gui::model::Events::openJointInspector(name);
+    else if (type == "Model Plugin")
+      gui::model::Events::openModelPluginInspector(name);
   }
 }
 
