@@ -14,16 +14,10 @@
  * limitations under the License.
  *
 */
-/*
-#include "gazebo/common/Console.hh"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/gui/ConfigWidget.hh"
 
-#include "gazebo/gui/model/LinkConfig.hh"
-#include "gazebo/gui/model/VisualConfig.hh"
-#include "gazebo/gui/model/CollisionConfig.hh"
-*/
+#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 
 using namespace gazebo;
@@ -37,35 +31,14 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent) : QDialog(_parent)
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
-  // Plugin name
-  QLabel *nameKeyLabel = new QLabel(tr("Name:"));
-  this->nameValueLabel = new QLabel(tr(""));
-  this->nameValueLabel->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Expanding);
+  // Config widget
+  msgs::Plugin pluginMsg;
+  this->configWidget = new ConfigWidget;
+  this->configWidget->Load(&pluginMsg);
 
-  // Plugin filename
-  QLabel *filenameKeyLabel = new QLabel(tr("Filename:"));
-  this->filenameValueLabel = new QLabel(tr(""));
-
-  // Plugin parameters
-  this->paramsText = new QTextEdit();
-  this->paramsText->setReadOnly(true);
-  this->paramsText->setMinimumWidth(600);
-  this->paramsText->setStyleSheet("\
-      QTextEdit\
-      {\
-        background-color: rgba(200, 200, 200, 255);\
-      }");
-
-  // Contents layout
-  QGridLayout *contentsLayout = new QGridLayout;
-  contentsLayout->addWidget(nameKeyLabel, 0, 0);
-  contentsLayout->addWidget(this->nameValueLabel, 0, 1);
-  contentsLayout->addWidget(filenameKeyLabel, 1, 0);
-  contentsLayout->addWidget(this->filenameValueLabel, 1, 1);
-  contentsLayout->addWidget(this->paramsText, 2, 0, 1, 2);
-  contentsLayout->setAlignment(this->nameValueLabel, Qt::AlignLeft);
-  contentsLayout->setAlignment(this->filenameValueLabel, Qt::AlignLeft);
+  this->configWidget->SetWidgetReadOnly("name", true);
+  this->configWidget->SetWidgetReadOnly("filename", true);
+  this->configWidget->SetWidgetReadOnly("innerxml", true);
 
   // Buttons
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
@@ -81,7 +54,7 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent) : QDialog(_parent)
 
   // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addLayout(contentsLayout);
+  mainLayout->addWidget(configWidget);
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
 }
@@ -89,42 +62,6 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent) : QDialog(_parent)
 /////////////////////////////////////////////////
 ModelPluginInspector::~ModelPluginInspector()
 {
-}
-
-/////////////////////////////////////////////////
-void ModelPluginInspector::SetName(const std::string &_name)
-{
-  this->nameValueLabel->setText(tr(_name.c_str()));
-}
-
-/////////////////////////////////////////////////
-std::string ModelPluginInspector::Name() const
-{
-  return this->nameValueLabel->text().toStdString();
-}
-
-/////////////////////////////////////////////////
-void ModelPluginInspector::SetFilename(const std::string &_filename)
-{
-  this->filenameValueLabel->setText(tr(_filename.c_str()));
-}
-
-/////////////////////////////////////////////////
-std::string ModelPluginInspector::Filename() const
-{
-  return this->filenameValueLabel->text().toStdString();
-}
-
-/////////////////////////////////////////////////
-void ModelPluginInspector::SetParams(const std::string &_params)
-{
-  this->paramsText->setPlainText(tr(_params.c_str()));
-}
-
-/////////////////////////////////////////////////
-std::string ModelPluginInspector::Params() const
-{
-  return this->paramsText->toPlainText().toStdString();
 }
 
 /////////////////////////////////////////////////
@@ -150,3 +87,10 @@ void ModelPluginInspector::enterEvent(QEvent */*_event*/)
 {
   QApplication::setOverrideCursor(Qt::ArrowCursor);
 }
+
+/////////////////////////////////////////////////
+void ModelPluginInspector::Update(ConstPluginPtr _pluginMsg)
+{
+  this->configWidget->UpdateFromMsg(_pluginMsg.get());
+}
+

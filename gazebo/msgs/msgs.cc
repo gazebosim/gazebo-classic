@@ -672,17 +672,8 @@ namespace gazebo
         sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
         while (pluginElem)
         {
-          msgs::Plugin *plgnMsg = result.add_plugin();
-          plgnMsg->set_name(pluginElem->Get<std::string>("name"));
-          plgnMsg->set_filename(pluginElem->Get<std::string>("filename"));
-
-          std::stringstream ss;
-          for (sdf::ElementPtr innerElem = pluginElem->GetFirstElement();
-              innerElem; innerElem = innerElem->GetNextElement(""))
-          {
-            ss << innerElem->ToString("");
-          }
-          plgnMsg->set_innerxml(ss.str());
+          msgs::Plugin *pluginMsg = result.add_plugin();
+          pluginMsg->CopyFrom(PluginFromSDF(pluginElem));
           pluginElem = pluginElem->GetNextElement("plugin");
         }
       }
@@ -718,6 +709,26 @@ namespace gazebo
               TrackVisualFromSDF(camSDF->GetElement("track_visual")));
         }
       }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    msgs::Plugin PluginFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Plugin result;
+
+      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_filename(_sdf->Get<std::string>("filename"));
+
+      std::stringstream ss;
+      for (sdf::ElementPtr innerElem = _sdf->GetFirstElement();
+          innerElem; innerElem = innerElem->GetNextElement(""))
+      {
+        ss << innerElem->ToString("");
+      }
+      result.set_innerxml(ss.str());
+      _sdf = _sdf->GetNextElement("plugin");
 
       return result;
     }

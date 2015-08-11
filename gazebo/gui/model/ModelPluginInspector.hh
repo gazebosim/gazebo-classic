@@ -20,7 +20,10 @@
 
 #include <string>
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/ConfigWidget.hh"
 
 namespace gazebo
 {
@@ -38,29 +41,9 @@ namespace gazebo
       /// \brief Destructor
       public: ~ModelPluginInspector();
 
-      /// \brief Set the name of the model plugin.
-      /// \param[in] New name.
-      public: void SetName(const std::string &_name);
-
-      /// \brief Get the name of the model plugin.
-      /// \return Name of the model plugin.
-      public: std::string Name() const;
-
-      /// \brief Set the filename of the model plugin.
-      /// \param[in] New filename.
-      public: void SetFilename(const std::string &_filename);
-
-      /// \brief Get the filename of the model plugin.
-      /// \return Filename of the model plugin.
-      public: std::string Filename() const;
-
-      /// \brief Set the contents of the model plugin.
-      /// \param[in] New SDF text with params.
-      public: void SetParams(const std::string &_params);
-
-      /// \brief Get the params of the model plugin.
-      /// \return SDF for the params of the model plugin.
-      public: std::string Params() const;
+      /// \brief Update the config widget with a msg.
+      /// \param[in] _pluginMsg Plugin message.
+      public: void Update(ConstPluginPtr _pluginMsg);
 
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
@@ -82,14 +65,8 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief Label that displays the name of the model plugin.
-      private: QLabel *nameValueLabel;
-
-      /// \brief Label that displays the filename of the model plugin.
-      private: QLabel *filenameValueLabel;
-
-      /// \brief Text area that displays the params of the model plugin.
-      private: QTextEdit *paramsText;
+      /// \brief Config widget for configuring properties.
+      private: ConfigWidget *configWidget;
     };
     /// \}
   }

@@ -1988,11 +1988,15 @@ void ModelCreator::AddModelPlugin(sdf::ElementPtr _pluginElem)
     if (_pluginElem->HasAttribute("filename"))
       filename = _pluginElem->Get<std::string>("filename");
 
-    // Create data and add to map
+    // Create data
+    msgs::Plugin pluginMsg = msgs::PluginFromSDF(_pluginElem);
+    msgs::PluginPtr pluginPtr(new msgs::Plugin);
+    pluginPtr->CopyFrom(pluginMsg);
+
     ModelPluginData *modelPlugin = new ModelPluginData();
-    modelPlugin->SetName(name);
-    modelPlugin->SetFilename(filename);
-    modelPlugin->Load(_pluginElem);
+    modelPlugin->inspector->Update(pluginPtr);
+
+    // Add to map
     {
       boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
       this->allModelPlugins[name] = modelPlugin;

@@ -1099,7 +1099,7 @@ ModelPluginData::~ModelPluginData()
 void ModelPluginData::Load(sdf::ElementPtr _pluginElem)
 {
   this->modelPluginSDF = _pluginElem;
-  this->inspector->SetParams(_pluginElem->ToString(""));
+  // this->inspector->SetParams(_pluginElem->ToString(""));
 }
 
 /////////////////////////////////////////////////
@@ -1118,7 +1118,7 @@ std::string ModelPluginData::Name() const
 void ModelPluginData::SetName(const std::string &_name)
 {
   this->modelPluginSDF->GetAttribute("name")->Set(_name);
-  this->inspector->SetName(_name);
+  // this->inspector->SetName(_name);
 }
 
 /////////////////////////////////////////////////
@@ -1131,7 +1131,7 @@ std::string ModelPluginData::Filename() const
 void ModelPluginData::SetFilename(const std::string &_filename)
 {
   this->modelPluginSDF->GetAttribute("filename")->Set(_filename);
-  this->inspector->SetFilename(_filename);
+  // this->inspector->SetFilename(_filename);
 }
 
 /////////////////////////////////////////////////
@@ -1141,9 +1141,9 @@ std::string ModelPluginData::Params() const
 }
 
 /////////////////////////////////////////////////
-void ModelPluginData::SetParams(const std::string &_params)
+void ModelPluginData::SetParams(const std::string &/*_params*/)
 {
 //  this->modelPluginSDF->SetFromString(_params);
-  this->inspector->SetParams(_params);
+//  this->inspector->SetParams(_params);
 }
 

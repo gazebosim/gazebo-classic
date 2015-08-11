@@ -475,6 +475,41 @@ TEST_F(MsgsTest, GUIFromSDF_WithoutCamera)
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
+TEST_F(MsgsTest, GUIFromSDF_WithPlugin)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("gui.sdf", sdf);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <gui fullscreen='true'>\
+           <plugin name='plugin_name' filename='plugin_filename'>\
+           </plugin>\
+         </gui>\
+       </sdf>", sdf));
+  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+}
+
+TEST_F(MsgsTest, PluginFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("plugin.sdf", sdf);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <plugin name='plugin_name' filename='plugin_filename'>\
+           <param1>1</param1>\
+           <param2>true</param2>\
+         </plugin>\
+       </sdf>", sdf));
+  msgs::Plugin msg = msgs::PluginFromSDF(sdf);
+
+  EXPECT_TRUE(msg.has_name());
+  EXPECT_EQ(msg.name(), "plugin_name");
+  EXPECT_TRUE(msg.has_filename());
+  EXPECT_EQ(msg.filename(), "plugin_filename");
+  EXPECT_TRUE(msg.has_innerxml());
+  EXPECT_EQ(msg.innerxml(), "<param1>1</param1>\n<param2>true</param2>\n");
+}
+
 TEST_F(MsgsTest, LightFromSDF_ListDirectional)
 {
   sdf::ElementPtr sdf(new sdf::Element());
