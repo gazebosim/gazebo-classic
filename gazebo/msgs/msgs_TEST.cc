@@ -475,6 +475,41 @@ TEST_F(MsgsTest, GUIFromSDF_WithoutCamera)
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
+TEST_F(MsgsTest, GUIFromSDF_WithPlugin)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("gui.sdf", sdf);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <gui fullscreen='true'>\
+           <plugin name='plugin_name' filename='plugin_filename'>\
+           </plugin>\
+         </gui>\
+       </sdf>", sdf));
+  msgs::GUI msg = msgs::GUIFromSDF(sdf);
+}
+
+TEST_F(MsgsTest, PluginFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("plugin.sdf", sdf);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <plugin name='plugin_name' filename='plugin_filename'>\
+           <param1>1</param1>\
+           <param2>true</param2>\
+         </plugin>\
+       </sdf>", sdf));
+  msgs::Plugin msg = msgs::PluginFromSDF(sdf);
+
+  EXPECT_TRUE(msg.has_name());
+  EXPECT_EQ(msg.name(), "plugin_name");
+  EXPECT_TRUE(msg.has_filename());
+  EXPECT_EQ(msg.filename(), "plugin_filename");
+  EXPECT_TRUE(msg.has_innerxml());
+  EXPECT_EQ(msg.innerxml(), "<param1>1</param1>\n<param2>true</param2>\n");
+}
+
 TEST_F(MsgsTest, LightFromSDF_ListDirectional)
 {
   sdf::ElementPtr sdf(new sdf::Element());
@@ -2643,4 +2678,62 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
   EXPECT_EQ(jointElem2->Get<ignition::math::Pose3d>("pose"),
       ignition::math::Pose3d());
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, PluginToSDF)
+{
+  std::string name = "plugin_name";
+  std::string filename = "plugin_filename";
+  std::string innerxml = "<plugin_param>param</plugin_param>";
+
+  msgs::Plugin msg;
+  msg.set_name(name);
+  msg.set_filename(filename);
+  msg.set_innerxml(innerxml);
+
+  sdf::ElementPtr pluginSDF = msgs::PluginToSDF(msg);
+
+  EXPECT_TRUE(pluginSDF->HasAttribute("name"));
+  EXPECT_EQ(pluginSDF->Get<std::string>("name"), name);
+
+  EXPECT_TRUE(pluginSDF->HasAttribute("filename"));
+  EXPECT_EQ(pluginSDF->Get<std::string>("filename"), filename);
+
+  EXPECT_TRUE(pluginSDF->HasElement("plugin_param"));
+  EXPECT_EQ(pluginSDF->Get<std::string>("plugin_param"), "param");
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, PluginToFromSDF)
+{
+  std::string name = "plugin_name";
+  std::string filename = "plugin_filename";
+  std::string innerxml = "<plugin_param>param</plugin_param>\n";
+
+  // Create message
+  msgs::Plugin msg1;
+  msg1.set_name(name);
+  msg1.set_filename(filename);
+  msg1.set_innerxml(innerxml);
+
+  // To SDF
+  sdf::ElementPtr sdf1 = msgs::PluginToSDF(msg1);
+
+  // Back to Msg
+  msgs::Plugin msg2 = msgs::PluginFromSDF(sdf1);
+  EXPECT_EQ(msg2.name(), name);
+  EXPECT_EQ(msg2.filename(), filename);
+  EXPECT_EQ(msg2.innerxml(), innerxml);
+
+  // Back to SDF
+  sdf::ElementPtr sdf2;
+  sdf2.reset(new sdf::Element);
+  sdf::initFile("plugin.sdf", sdf2);
+  msgs::PluginToSDF(msg2, sdf2);
+  EXPECT_TRUE(sdf2 != NULL);
+  EXPECT_EQ(sdf2->Get<std::string>("name"), name);
+  EXPECT_EQ(sdf2->Get<std::string>("filename"), filename);
+  EXPECT_TRUE(sdf2->HasElement("plugin_param"));
+  EXPECT_EQ(sdf2->Get<std::string>("plugin_param"), "param");
 }
