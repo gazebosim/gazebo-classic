@@ -50,6 +50,7 @@ if (ENABLE_SCREEN_TESTS)
     JointMaker_TEST.cc
     ExtrudeDialog_TEST.cc
     ModelCreator_TEST.cc
+    ModelData_TEST.cc
     ModelEditor_TEST.cc
     ModelEditorPalette_TEST.cc
   )
