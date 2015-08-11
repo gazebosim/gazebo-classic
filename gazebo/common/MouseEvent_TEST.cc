@@ -29,9 +29,9 @@ class MouseEvent : public gazebo::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(MouseEvent, CopyConstructor)
 {
-  ignition::math::Vector2i pos(1.5, 25);
-  ignition::math::Vector2i prevPos(1.6, 26);
-  ignition::math::Vector2i pressPos(2.5, 25);
+  ignition::math::Vector2i pos(1, 25);
+  ignition::math::Vector2i prevPos(2, 26);
+  ignition::math::Vector2i pressPos(3, 24);
   ignition::math::Vector2i scroll(2, 3);
   float moveScale = 0.3;
   bool dragging = true;
@@ -96,26 +96,27 @@ TEST_F(MouseEvent, CopyConstructor)
   EXPECT_EQ(otherEvent2.Control(), control);
 
   // update the original mouse event values
-  ignition::math::Vector2i newPos(3.4, 18);
-  ignition::math::Vector2i newPrevPos(3.2, 17);
-  ignition::math::Vector2i newPressPos(3.0, 16);
+  ignition::math::Vector2i newPos(3, 18);
+  ignition::math::Vector2i newPrevPos(2, 17);
+  ignition::math::Vector2i newPressPos(3, 16);
   ignition::math::Vector2i newScroll(1, 2);
   float newMoveScale = 0.4;
   bool newDragging = false;
   common::MouseEvent::EventType newType = common::MouseEvent::RELEASE;
   common::MouseEvent::MouseButton newButton = common::MouseEvent::LEFT;
+  common::MouseEvent::MouseButton newButton2 = common::MouseEvent::RIGHT;
   bool newShift = true;
   bool newAlt = false;
   bool newControl = false;
 
-  event.SetPos(newPos);
-  event.SetPrevPos(newPrevPos);
-  event.SetPressPos(newPressPos);
-  event.SetScroll(newScroll);
+  event.SetPos(newPos.X(), newPos.Y());
+  event.SetPrevPos(newPrevPos.X(), newPrevPos.Y());
+  event.SetPressPos(newPressPos.X(), newPressPos.Y());
+  event.SetScroll(newScroll.X(), newScroll.Y());
   event.SetMoveScale(newMoveScale);
   event.SetDragging(newDragging);
   event.SetType(newType);
-  event.SetButton(newButton);
+  event.SetButtons(newButton | newButton2);
   event.SetShift(newShift);
   event.SetAlt(newAlt);
   event.SetControl(newControl);
@@ -128,7 +129,7 @@ TEST_F(MouseEvent, CopyConstructor)
   EXPECT_DOUBLE_EQ(event.MoveScale(), newMoveScale);
   EXPECT_EQ(event.Dragging(), newDragging);
   EXPECT_EQ(event.Type(), newType);
-  EXPECT_EQ(event.Button(), newButton);
+  EXPECT_EQ(event.Buttons(), newButton | newButton2);
   EXPECT_EQ(event.Shift(), newShift);
   EXPECT_EQ(event.Alt(), newAlt);
   EXPECT_EQ(event.Control(), newControl);
@@ -162,9 +163,9 @@ TEST_F(MouseEvent, CopyConstructor)
 /////////////////////////////////////////////////
 TEST_F(MouseEvent, Assignment)
 {
-  ignition::math::Vector2i pos(1.5, 25);
-  ignition::math::Vector2i prevPos(1.6, 26);
-  ignition::math::Vector2i pressPos(2.5, 25);
+  ignition::math::Vector2i pos(1, 25);
+  ignition::math::Vector2i prevPos(2, 26);
+  ignition::math::Vector2i pressPos(3, 24);
   ignition::math::Vector2i scroll(2, 3);
   float moveScale = 0.3;
   bool dragging = true;
@@ -216,26 +217,27 @@ TEST_F(MouseEvent, Assignment)
   EXPECT_EQ(otherEvent.Control(), control);
 
   // update the original mouse event values
-  ignition::math::Vector2i newPos(3.4, 18);
-  ignition::math::Vector2i newPrevPos(3.2, 17);
-  ignition::math::Vector2i newPressPos(3.0, 16);
+  ignition::math::Vector2i newPos(3, 18);
+  ignition::math::Vector2i newPrevPos(2, 17);
+  ignition::math::Vector2i newPressPos(3, 16);
   ignition::math::Vector2i newScroll(1, 2);
   float newMoveScale = 0.4;
   bool newDragging = false;
   common::MouseEvent::EventType newType = common::MouseEvent::RELEASE;
   common::MouseEvent::MouseButton newButton = common::MouseEvent::LEFT;
+  common::MouseEvent::MouseButton newButton2 = common::MouseEvent::RIGHT;
   bool newShift = false;
   bool newAlt = true;
   bool newControl = false;
 
-  event.SetPos(newPos);
-  event.SetPrevPos(newPrevPos);
-  event.SetPressPos(newPressPos);
-  event.SetScroll(newScroll);
+  event.SetPos(newPos.X(), newPos.Y());
+  event.SetPrevPos(newPrevPos.X(), newPrevPos.Y());
+  event.SetPressPos(newPressPos.X(), newPressPos.Y());
+  event.SetScroll(newScroll.X(), newScroll.Y());
   event.SetMoveScale(newMoveScale);
   event.SetDragging(newDragging);
   event.SetType(newType);
-  event.SetButton(newButton);
+  event.SetButtons(newButton | newButton2);
   event.SetShift(newShift);
   event.SetAlt(newAlt);
   event.SetControl(newControl);
@@ -248,7 +250,7 @@ TEST_F(MouseEvent, Assignment)
   EXPECT_DOUBLE_EQ(event.MoveScale(), newMoveScale);
   EXPECT_EQ(event.Dragging(), newDragging);
   EXPECT_EQ(event.Type(), newType);
-  EXPECT_EQ(event.Button(), newButton);
+  EXPECT_EQ(event.Buttons(), newButton | newButton2);
   EXPECT_EQ(event.Shift(), newShift);
   EXPECT_EQ(event.Alt(), newAlt);
   EXPECT_EQ(event.Control(), newControl);
