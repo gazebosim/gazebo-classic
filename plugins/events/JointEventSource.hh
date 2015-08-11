@@ -65,7 +65,7 @@ namespace gazebo
 
     /// \brief Loads the full name of the model and the triggers from the world
     /// file.
-    /// \param[in] _sdf
+    /// \param[in] _sdf The root sdf element for this joint event
     public: virtual void Load(const sdf::ElementPtr _sdf);
 
     /// \brief Looks for the model and the joint
@@ -77,6 +77,8 @@ namespace gazebo
     private: std::string GetRangeAsString() const;
 
     /// \brief Sets the range type from a string
+    /// \param[in] _rangeStr the range. Possible values are: "velocity",
+    /// "position", "normalized_angle" or "applied_force"
     private: void SetRangeFromString(const std::string &_rangeStr);
 
     /// \brief Pointer to the update event connection
