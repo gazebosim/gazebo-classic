@@ -2679,3 +2679,61 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<ignition::math::Pose3d>("pose"),
       ignition::math::Pose3d());
 }
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, PluginToSDF)
+{
+  std::string name = "plugin_name";
+  std::string filename = "plugin_filename";
+  std::string innerxml = "<plugin_param>param</plugin_param>";
+
+  msgs::Plugin msg;
+  msg.set_name(name);
+  msg.set_filename(filename);
+  msg.set_innerxml(innerxml);
+
+  sdf::ElementPtr pluginSDF = msgs::PluginToSDF(msg);
+
+  EXPECT_TRUE(pluginSDF->HasAttribute("name"));
+  EXPECT_EQ(pluginSDF->Get<std::string>("name"), name);
+
+  EXPECT_TRUE(pluginSDF->HasAttribute("filename"));
+  EXPECT_EQ(pluginSDF->Get<std::string>("filename"), filename);
+
+  EXPECT_TRUE(pluginSDF->HasElement("plugin_param"));
+  EXPECT_EQ(pluginSDF->Get<std::string>("plugin_param"), "param");
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, PluginToFromSDF)
+{
+  std::string name = "plugin_name";
+  std::string filename = "plugin_filename";
+  std::string innerxml = "<plugin_param>param</plugin_param>\n";
+
+  // Create message
+  msgs::Plugin msg1;
+  msg1.set_name(name);
+  msg1.set_filename(filename);
+  msg1.set_innerxml(innerxml);
+
+  // To SDF
+  sdf::ElementPtr sdf1 = msgs::PluginToSDF(msg1);
+
+  // Back to Msg
+  msgs::Plugin msg2 = msgs::PluginFromSDF(sdf1);
+  EXPECT_EQ(msg2.name(), name);
+  EXPECT_EQ(msg2.filename(), filename);
+  EXPECT_EQ(msg2.innerxml(), innerxml);
+
+  // Back to SDF
+  sdf::ElementPtr sdf2;
+  sdf2.reset(new sdf::Element);
+  sdf::initFile("plugin.sdf", sdf2);
+  msgs::PluginToSDF(msg2, sdf2);
+  EXPECT_TRUE(sdf2 != NULL);
+  EXPECT_EQ(sdf2->Get<std::string>("name"), name);
+  EXPECT_EQ(sdf2->Get<std::string>("filename"), filename);
+  EXPECT_TRUE(sdf2->HasElement("plugin_param"));
+  EXPECT_EQ(sdf2->Get<std::string>("plugin_param"), "param");
+}
