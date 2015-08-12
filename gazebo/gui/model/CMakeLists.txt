@@ -55,6 +55,7 @@ if (ENABLE_SCREEN_TESTS)
     ModelData_TEST.cc
     ModelEditor_TEST.cc
     ModelEditorPalette_TEST.cc
+    ModelPluginInspector_TEST.cc
   )
 endif()
 

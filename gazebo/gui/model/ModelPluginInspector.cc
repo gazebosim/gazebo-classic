@@ -15,16 +15,16 @@
  *
 */
 
-#include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/model/ModelPluginInspectorPrivate.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ModelPluginInspector::ModelPluginInspector(QWidget *_parent) : QDialog(_parent)
+ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
+  : QDialog(_parent), dataPtr(new ModelPluginInspectorPrivate)
 {
   this->setObjectName("ModelPluginInspector");
   this->setWindowTitle(tr("Model Plugin Inspector"));
@@ -33,15 +33,15 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent) : QDialog(_parent)
 
   // Config widget
   msgs::Plugin pluginMsg;
-  this->configWidget = new ConfigWidget;
-  this->configWidget->Load(&pluginMsg);
+  this->dataPtr->configWidget = new ConfigWidget;
+  this->dataPtr->configWidget->Load(&pluginMsg);
 
-  this->configWidget->SetWidgetReadOnly("name", true);
-  this->configWidget->SetWidgetReadOnly("filename", true);
-  this->configWidget->SetWidgetReadOnly("innerxml", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("name", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("filename", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("innerxml", true);
 
   QScrollArea *scrollArea = new QScrollArea;
-  scrollArea->setWidget(this->configWidget);
+  scrollArea->setWidget(this->dataPtr->configWidget);
   scrollArea->setWidgetResizable(true);
 
   QVBoxLayout *generalLayout = new QVBoxLayout;
@@ -73,6 +73,8 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent) : QDialog(_parent)
 /////////////////////////////////////////////////
 ModelPluginInspector::~ModelPluginInspector()
 {
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -82,15 +84,9 @@ void ModelPluginInspector::OnCancel()
 }
 
 /////////////////////////////////////////////////
-void ModelPluginInspector::OnApply()
-{
-  emit Applied();
-}
-
-/////////////////////////////////////////////////
 void ModelPluginInspector::OnOK()
 {
-  emit Accepted();
+  this->Accepted();
 }
 
 /////////////////////////////////////////////////
@@ -102,6 +98,6 @@ void ModelPluginInspector::enterEvent(QEvent */*_event*/)
 /////////////////////////////////////////////////
 void ModelPluginInspector::Update(ConstPluginPtr _pluginMsg)
 {
-  this->configWidget->UpdateFromMsg(_pluginMsg.get());
+  this->dataPtr->configWidget->UpdateFromMsg(_pluginMsg.get());
 }
 

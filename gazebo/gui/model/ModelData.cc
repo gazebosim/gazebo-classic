@@ -1081,9 +1081,11 @@ void LinkData::Update()
 /////////////////////////////////////////////////
 ModelPluginData::ModelPluginData()
 {
+  // Initialize SDF
   this->modelPluginSDF.reset(new sdf::Element);
   sdf::initFile("plugin.sdf", this->modelPluginSDF);
 
+  // Inspector
   this->inspector = new ModelPluginInspector();
   this->inspector->setModal(false);
   connect(this->inspector, SIGNAL(Accepted()), this, SLOT(OnAccept()));
@@ -1112,6 +1114,6 @@ void ModelPluginData::Load(sdf::ElementPtr _pluginElem)
 /////////////////////////////////////////////////
 void ModelPluginData::OnAccept()
 {
-  this->inspector->accept();
+  // TODO: Apply changes when inspector is not read-only
 }
 

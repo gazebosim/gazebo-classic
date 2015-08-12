@@ -18,19 +18,21 @@
 #ifndef _GAZEBO_MODEL_PLUGIN_INSPECTOR_HH_
 #define _GAZEBO_MODEL_PLUGIN_INSPECTOR_HH_
 
-#include <string>
-
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/ConfigWidget.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class ModelPluginInspectorPrivate;
+
+    /// \addtogroup gazebo_gui
+    /// \{
+
     /// \brief Inspector for model plugin properties.
-    class ModelPluginInspector : public QDialog
+    class GZ_GUI_MODEL_VISIBLE ModelPluginInspector : public QDialog
     {
       Q_OBJECT
 
@@ -49,9 +51,6 @@ namespace gazebo
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied.
-      Q_SIGNALS: void Applied();
-
       /// \brief Qt signal emitted to indicate that changes should be applied
       /// and the inspector closed.
       Q_SIGNALS: void Accepted();
@@ -59,14 +58,12 @@ namespace gazebo
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief Config widget for configuring properties.
-      private: ConfigWidget *configWidget;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ModelPluginInspectorPrivate *dataPtr;
     };
     /// \}
   }

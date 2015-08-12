@@ -178,15 +178,23 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelTreeWidget->setVerticalScrollMode(
       QAbstractItemView::ScrollPerPixel);
 
+  // Model Plugins
+  this->modelPluginsItem = new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("%1").arg(tr("Model Plugins"))));
+  this->modelPluginsItem->setData(0, Qt::UserRole,
+      QVariant(tr("Model Plugins")));
+  QFont headerFont = this->modelPluginsItem->font(0);
+  headerFont.setBold(true);
+  headerFont.setPointSize(1.0 * headerFont.pointSize());
+  this->modelPluginsItem->setFont(0, headerFont);
+  this->modelTreeWidget->addTopLevelItem(this->modelPluginsItem);
+
   // Links
   this->linksItem = new QTreeWidgetItem(
       static_cast<QTreeWidgetItem *>(0),
       QStringList(QString("%1").arg(tr("Links"))));
   this->linksItem->setData(0, Qt::UserRole, QVariant(tr("Links")));
-  QFont linksFont = this->linksItem->font(0);
-  linksFont.setBold(true);
-  linksFont.setPointSize(1.1 * linksFont.pointSize());
-  this->linksItem->setFont(0, linksFont);
+  this->linksItem->setFont(0, headerFont);
   this->modelTreeWidget->addTopLevelItem(this->linksItem);
 
   // Joints
@@ -194,16 +202,8 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       static_cast<QTreeWidgetItem*>(0),
       QStringList(QString("%1").arg(tr("Joints"))));
   this->jointsItem->setData(0, Qt::UserRole, QVariant(tr("Joints")));
-  this->jointsItem->setFont(0, linksFont);
+  this->jointsItem->setFont(0, headerFont);
   this->modelTreeWidget->addTopLevelItem(this->jointsItem);
-
-  // Model Plugins
-  this->modelPluginsItem = new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-      QStringList(QString("%1").arg(tr("Model Plugins"))));
-  this->modelPluginsItem->setData(0, Qt::UserRole,
-      QVariant(tr("Model Plugins")));
-  this->modelPluginsItem->setFont(0, linksFont);
-  this->modelTreeWidget->addTopLevelItem(this->modelPluginsItem);
 
   connect(this->modelTreeWidget,
       SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),

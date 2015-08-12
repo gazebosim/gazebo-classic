@@ -1976,10 +1976,6 @@ void ModelCreator::AddModelPlugin(sdf::ElementPtr _pluginElem)
   {
     std::string name = _pluginElem->Get<std::string>("name");
 
-    std::string filename;
-    if (_pluginElem->HasAttribute("filename"))
-      filename = _pluginElem->Get<std::string>("filename");
-
     // Create data
     ModelPluginData *modelPlugin = new ModelPluginData();
     modelPlugin->Load(_pluginElem);
