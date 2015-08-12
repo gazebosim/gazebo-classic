@@ -205,9 +205,7 @@ void ConfigWidget::GetRangeFromKey(const std::string &_key, double &_min,
 /////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
 {
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -227,9 +225,7 @@ bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
 /////////////////////////////////////////////////
 void ConfigWidget::SetWidgetVisible(const std::string &_name, bool _visible)
 {
-  std::map <std::string, ConfigChildWidget *>::iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -249,9 +245,7 @@ void ConfigWidget::SetWidgetVisible(const std::string &_name, bool _visible)
 /////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetReadOnly(const std::string &_name) const
 {
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -271,9 +265,7 @@ bool ConfigWidget::GetWidgetReadOnly(const std::string &_name) const
 /////////////////////////////////////////////////
 void ConfigWidget::SetWidgetReadOnly(const std::string &_name, bool _readOnly)
 {
-  std::map <std::string, ConfigChildWidget *>::iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -982,12 +974,12 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               qobject_cast<GroupWidget *>(newFieldWidget);
           ConfigChildWidget *childWidget = qobject_cast<ConfigChildWidget *>(
               groupWidget->childWidget);
-          this->configWidgets[scopedName] = childWidget;
+          this->AddConfigChildWidget(scopedName, childWidget);
         }
         else if (qobject_cast<ConfigChildWidget *>(newFieldWidget))
         {
-          this->configWidgets[scopedName] =
-              qobject_cast<ConfigChildWidget *>(newFieldWidget);
+          this->AddConfigChildWidget(scopedName,
+              qobject_cast<ConfigChildWidget *>(newFieldWidget));
         }
       }
     }
@@ -2593,6 +2585,33 @@ void ConfigWidget::OnEnumValueChanged(const QString &_value)
       return;
     }
   }
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::AddConfigChildWidget(const std::string &_name,
+    ConfigChildWidget *_child)
+{
+  if (_name.empty() || _child == NULL)
+  {
+    gzerr << "Given name or child is invalid. Not adding child widget."
+          << std::endl;
+    return false;
+  }
+  if (this->configWidgets.find(_name) != this->configWidgets.end())
+  {
+    gzerr << "This config widget already has a child with that name. " <<
+       "Names must be unique. Not adding child." << std::endl;
+    return false;
+  }
+
+  this->configWidgets[_name] = _child;
+  return true;
+}
+
+/////////////////////////////////////////////////
+unsigned int ConfigWidget::ConfigChildWidgetCount() const
+{
+  return this->configWidgets.size();
 }
 
 /////////////////////////////////////////////////
