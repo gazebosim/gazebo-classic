@@ -148,9 +148,8 @@ void ODELink::Init()
           << " in ODELink::Init" << std::endl;
   }
 
-  // Only update the Center of Mass if object is dynamic
-  if (!this->GetKinematic())
-    this->UpdateMass();
+  // Update the Center of Mass.
+  this->UpdateMass();
 
   if (this->linkId)
   {
