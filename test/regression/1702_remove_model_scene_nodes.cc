@@ -25,10 +25,10 @@
 using namespace gazebo;
 
 const double g_tolerance = 1e-4;
-class Issue1706Test : public ServerFixture,
+class Issue1702Test : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
-  /// \brief Test for issue #1706, spawn a model,
+  /// \brief Test for issue #1702, spawn a model,
   /// delete it, and respawn with teh same name.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void SpawnDeleteSpawnAgain(const std::string &_physicsEngine);
@@ -36,7 +36,7 @@ class Issue1706Test : public ServerFixture,
 
 
 /////////////////////////////////////////////////
-void Issue1706Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
+void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 {
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
@@ -107,12 +107,12 @@ void Issue1706Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   EXPECT_TRUE(world->GetModel(name) != NULL);
 }
 
-TEST_P(Issue1706Test, SpawnDeleteSpawnAgain)
+TEST_P(Issue1702Test, SpawnDeleteSpawnAgain)
 {
   SpawnDeleteSpawnAgain(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue1706Test, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue1702Test, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 /// Main
