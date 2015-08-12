@@ -1385,8 +1385,7 @@ void Visual::SetWireframe(bool _show)
 //////////////////////////////////////////////////
 void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 {
-  for (unsigned int i = 0; i < _sceneNode->numAttachedObjects();
-      i++)
+  for (unsigned int i = 0; i < _sceneNode->numAttachedObjects(); ++i)
   {
     Ogre::Entity *entity = NULL;
     Ogre::MovableObject *obj = _sceneNode->getAttachedObject(i);
@@ -1400,7 +1399,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
       continue;
 
     // For each ogre::entity
-    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); ++j)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
@@ -1442,15 +1441,17 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
 
-
-          for (unitStateCount = 0; unitStateCount <
-              pass->getNumTextureUnitStates(); ++unitStateCount)
+          if (this->dataPtr->transparency > 0.0)
           {
-            auto textureUnitState = pass->getTextureUnitState(unitStateCount);
+            for (unitStateCount = 0; unitStateCount <
+                pass->getNumTextureUnitStates(); ++unitStateCount)
+            {
+              auto textureUnitState = pass->getTextureUnitState(unitStateCount);
 
-            textureUnitState->setAlphaOperation(
-                Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
-                1.0 - this->dataPtr->transparency);
+              textureUnitState->setAlphaOperation(
+                  Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
+                  1.0 - this->dataPtr->transparency);
+            }
           }
         }
       }
