@@ -35,6 +35,7 @@ Battery::Battery(LinkPtr _link)
 {
   this->dataPtr->link = _link;
 
+  this->dataPtr->realVoltage = 0.0;
   this->dataPtr->initVoltage = 0.0;
 
   this->SetUpdateFunc(boost::bind(&Battery::UpdateDefault, this, _1, _2));
