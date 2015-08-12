@@ -36,6 +36,9 @@
     1. Color-coded edges in Schematic View to match joint color.
         * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
 
+    1. Scale link mass and inertia when a link is scaled
+        * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
+
 ## Gazebo 6.0
 
 1. Added logical_camera sensor.
