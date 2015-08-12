@@ -129,7 +129,7 @@ TEST_F(MouseEvent, CopyConstructor)
   EXPECT_DOUBLE_EQ(event.MoveScale(), newMoveScale);
   EXPECT_EQ(event.Dragging(), newDragging);
   EXPECT_EQ(event.Type(), newType);
-  EXPECT_EQ(event.Buttons(), newButton | newButton2);
+  EXPECT_EQ(event.Buttons(), static_cast<unsigned int>(newButton | newButton2));
   EXPECT_EQ(event.Shift(), newShift);
   EXPECT_EQ(event.Alt(), newAlt);
   EXPECT_EQ(event.Control(), newControl);
@@ -192,6 +192,7 @@ TEST_F(MouseEvent, Assignment)
   // verify mouse event values
   EXPECT_EQ(event.Pos(), pos);
   EXPECT_EQ(event.PrevPos(), prevPos);
+  EXPECT_EQ(event.PressPos(), pressPos);
   EXPECT_EQ(event.Scroll(), scroll);
   EXPECT_DOUBLE_EQ(event.MoveScale(), moveScale);
   EXPECT_EQ(event.Dragging(), dragging);
@@ -250,7 +251,7 @@ TEST_F(MouseEvent, Assignment)
   EXPECT_DOUBLE_EQ(event.MoveScale(), newMoveScale);
   EXPECT_EQ(event.Dragging(), newDragging);
   EXPECT_EQ(event.Type(), newType);
-  EXPECT_EQ(event.Buttons(), newButton | newButton2);
+  EXPECT_EQ(event.Buttons(), static_cast<unsigned int>(newButton | newButton2));
   EXPECT_EQ(event.Shift(), newShift);
   EXPECT_EQ(event.Alt(), newAlt);
   EXPECT_EQ(event.Control(), newControl);
