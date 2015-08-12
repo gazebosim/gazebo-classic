@@ -923,5 +923,49 @@ void ConfigWidget_TEST::ConfigWidgetReadOnly()
   delete visualConfigWidget;
 }
 
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::CreatedExternally()
+{
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
+
+  // Create predefined child widgets
+  gazebo::gui::ConfigChildWidget *uintWidget =
+      configWidget->CreateUIntWidget("uint", 0);
+  gazebo::gui::ConfigChildWidget *intWidget =
+      configWidget->CreateIntWidget("int", 0);
+  gazebo::gui::ConfigChildWidget *doubleWidget =
+      configWidget->CreateDoubleWidget("double", 1);
+  gazebo::gui::ConfigChildWidget *stringWidget =
+      configWidget->CreateStringWidget("string", 1);
+  gazebo::gui::ConfigChildWidget *boolWidget =
+      configWidget->CreateBoolWidget("bool", 2);
+  gazebo::gui::ConfigChildWidget *vector3dWidget =
+      configWidget->CreateVector3dWidget("vector3d", 2);
+  gazebo::gui::ConfigChildWidget *colorWidget =
+      configWidget->CreateColorWidget("color", 3);
+  gazebo::gui::ConfigChildWidget *poseWidget =
+      configWidget->CreatePoseWidget("pose", 3);
+//  gazebo::gui::ConfigChildWidget *enumWidget =
+//      configWidget->CreateEnumWidget("enum", 4);
+
+  // Create a custom child widget
+  QLabel *customWidget = new QLabel("custom label");
+  QHBoxLayout *customLayout = new QHBoxLayout();
+  customLayout->addWidget(customWidget);
+  gazebo::gui::ConfigChildWidget *childWidget =
+      new gazebo::gui::ConfigChildWidget();
+  childWidget->setLayout(customLayout);
+
+  // Group some widgets
+
+  // Add child widgets to config widget
+
+  // Get widgets count
+
+  // Set widgets values
+
+  // Get widgets values
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ConfigWidget_TEST)

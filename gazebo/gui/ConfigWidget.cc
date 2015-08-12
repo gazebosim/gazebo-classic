@@ -895,8 +895,13 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           if (newWidget)
           {
             // Make it into a group widget
-            newFieldWidget = this->CreateGroupWidget(name, newFieldWidget,
-                _level);
+            ConfigChildWidget *childWidget =
+                qobject_cast<ConfigChildWidget *>(newFieldWidget);
+            if (childWidget)
+            {
+              newFieldWidget = this->CreateGroupWidget(name, childWidget,
+                  _level);
+            }
           }
 
           break;
@@ -1010,7 +1015,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
 /////////////////////////////////////////////////
 GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
-    QWidget *_fieldWidget, const int _level)
+    ConfigChildWidget *_childWidget, const int _level)
 {
   // Button label
   QLabel *buttonLabel = new QLabel(
@@ -1063,15 +1068,14 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
   connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget, SLOT(Toggle(bool)));
 
   // Set the child widget
-  groupWidget->childWidget = _fieldWidget;
-  qobject_cast<ConfigChildWidget *>(_fieldWidget)->groupWidget
-      = groupWidget;
-  newFieldWidget->setContentsMargins(0, 0, 0, 0);
+  groupWidget->childWidget = _childWidget;
+  _childWidget->groupWidget = groupWidget;
+  _childWidget->setContentsMargins(0, 0, 0, 0);
 
   // Set color for children
   if (_level == 0)
   {
-    _fieldWidget->setStyleSheet(
+    _childWidget->setStyleSheet(
         "QWidget\
         {\
           background-color: " + this->level1BgColor +
@@ -1083,7 +1087,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
   }
   else if (_level == 1)
   {
-    _fieldWidget->setStyleSheet(
+    _childWidget->setStyleSheet(
         "QWidget\
         {\
           background-color: " + this->level2BgColor +
@@ -1095,7 +1099,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
   }
   else if (_level == 2)
   {
-    _fieldWidget->setStyleSheet(
+    _childWidget->setStyleSheet(
         "QWidget\
         {\
           background-color: " + this->level2BgColor +
@@ -1111,7 +1115,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
   configGroupLayout->setContentsMargins(0, 0, 0, 0);
   configGroupLayout->setSpacing(0);
   configGroupLayout->addWidget(buttonFrame, 0, 0);
-  configGroupLayout->addWidget(_fieldWidget, 1, 0);
+  configGroupLayout->addWidget(_childWidget, 1, 0);
   groupWidget->setLayout(configGroupLayout);
 
   return groupWidget;

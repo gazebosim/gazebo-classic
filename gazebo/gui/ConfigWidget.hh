@@ -336,11 +336,11 @@ namespace gazebo
       /// \brief Create a widget which has a button header which collapses
       /// the field widget.
       /// \param[in] _name Header name.
-      /// \param[out] _fieldWidget Widget which will be collapsed.
+      /// \param[out] _childWidget Widget which will be collapsed.
       /// \param[in] _level Level of the widget in the tree.
       /// \return The group widget.
       public: GroupWidget *CreateGroupWidget(const std::string &_name,
-          QWidget *_fieldWidget, const int _level = 0);
+          ConfigChildWidget *_childWidget, const int _level = 0);
 
       /// \brief Create a widget for configuring an unsigned integer value.
       /// \param[in] _key A key that is used as a label for the widget.
