@@ -132,12 +132,14 @@ void InertiaVisual::Load(const math::Pose &_pose,
 
   Ogre::MovableObject *boxObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__BOX__", "unit_box"));
+          this->GetName()+"__BOX__"
+          + std::to_string(VisualPrivate::visualIdCount), "unit_box"));
   boxObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   ((Ogre::Entity*)boxObj)->setMaterialName("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
   dPtr->boxNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_BOX");
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_BOX_"
+      + std::to_string(VisualPrivate::visualIdCount));
 
   dPtr->boxNode->attachObject(boxObj);
   dPtr->boxNode->setScale(_scale.x, _scale.y, _scale.z);

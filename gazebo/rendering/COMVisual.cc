@@ -127,12 +127,14 @@ void COMVisual::Load()
 
   Ogre::MovableObject *sphereObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__SPHERE__", "unit_sphere"));
+          this->GetName()+"__SPHERE__"
+          + std::to_string(VisualPrivate::visualIdCount), "unit_sphere"));
   sphereObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   sphereObj->setCastShadows(false);
 
   dPtr->sphereNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE");
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE_"
+      + std::to_string(VisualPrivate::visualIdCount));
 
   dPtr->sphereNode->attachObject(sphereObj);
   dPtr->sphereNode->setScale(sphereRadius*2, sphereRadius*2, sphereRadius*2);
