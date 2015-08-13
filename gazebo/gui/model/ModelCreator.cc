@@ -1750,6 +1750,13 @@ void ModelCreator::ShowContextMenu(const std::string &_link)
   {
     menu.addAction(this->inspectAct);
 
+    menu.addSeparator();
+
+    menu.addAction(g_copyAct);
+    menu.addAction(g_pasteAct);
+
+    menu.addSeparator();
+
     if (this->jointMaker)
     {
       std::vector<JointData *> joints = this->jointMaker->GetJointDataByLink(
@@ -1939,8 +1946,14 @@ void ModelCreator::OnPaste()
       this->Reset();
     }
 
+    // Propagate copied entity's Z position and rotation
+    math::Pose copiedPose = copiedLink->GetPose();
+    clonePose.pos.z = copiedPose.pos.z;
+    clonePose.rot = copiedPose.rot;
+
     LinkData *clonedLink = this->CloneLink(it->first);
     clonedLink->linkVisual->SetWorldPose(clonePose);
+
     this->addLinkType = LINK_MESH;
     this->mouseVisual = clonedLink->linkVisual;
   }

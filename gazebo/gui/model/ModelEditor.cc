@@ -338,6 +338,11 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->dataPtr->saveAsAct);
   fileMenu->addAction(this->dataPtr->exitAct);
 
+  QMenu *editMenu = this->dataPtr->menuBar->addMenu(tr("&Edit"));
+
+  editMenu->addAction(g_copyAct);
+  editMenu->addAction(g_pasteAct);
+
   QMenu *cameraMenu = this->dataPtr->menuBar->addMenu(tr("&Camera"));
   cameraMenu->addAction(this->dataPtr->cameraOrthoAct);
   cameraMenu->addAction(this->dataPtr->cameraPerspectiveAct);
