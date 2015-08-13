@@ -210,20 +210,33 @@ namespace gazebo
       /// \param[in] _unique True to make the material unique, which
       /// allows the material to change without changing materials that
       /// originally had the same name.
+      /// \param[in] _cascade Whether to set this parameter in children too.
       public: void SetMaterial(const std::string &_materialName,
-                               bool _unique = true);
+                               bool _unique = true, const bool _cascade = true);
 
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
-      public: void SetAmbient(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetAmbient(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
-      public: void SetDiffuse(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetDiffuse(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
-      public: void SetSpecular(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetSpecular(const common::Color &_color,
+          const bool _cascade = true);
+
+      /// \brief Set the emissive value.
+      /// \param[in] _color The emissive color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: virtual void SetEmissive(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Get the ambient color of the visual.
       /// \return Ambient color.
@@ -253,7 +266,8 @@ namespace gazebo
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.
-      public: void SetTransparency(float _trans);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetTransparency(float _trans, const bool _cascade = true);
 
       /// \brief Get the transparency.
       /// \return The transparency.
@@ -268,10 +282,6 @@ namespace gazebo
       /// most often means that an object is selected by a user via the GUI.
       /// \return True if the visual is highlighted.
       public: bool GetHighlighted() const;
-
-      /// \brief Set the emissive value.
-      /// \param[in] _color The emissive color.
-      public: virtual void SetEmissive(const common::Color &_color);
 
       /// \brief Get whether the visual casts shadows.
       /// \return True if the visual casts shadows.

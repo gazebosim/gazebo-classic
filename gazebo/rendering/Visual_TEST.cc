@@ -286,6 +286,54 @@ TEST_F(Visual_TEST, Transparency)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, ChildTransparency)
+{
+  Load("worlds/empty.world");
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Create a visual as child of the world visual
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+
+  // Create a visual as child of vis1
+  gazebo::rendering::VisualPtr vis2;
+  vis2.reset(new gazebo::rendering::Visual("vis2", vis1));
+  vis2->Load();
+
+  // Check default transparency
+  EXPECT_NEAR(vis1->GetTransparency(), 0.0, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), 0.0, 1e-10);
+
+  // Set vis1's transparency with default cascade
+  float defaultCascade = 0.1;
+  vis1->SetTransparency(defaultCascade);
+  EXPECT_NEAR(vis1->GetTransparency(), defaultCascade, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), defaultCascade, 1e-10);
+
+  // Set vis1's transparency with explicit cascade
+  float explicitCascade = 0.2;
+  vis1->SetTransparency(explicitCascade, true);
+  EXPECT_NEAR(vis1->GetTransparency(), explicitCascade, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), explicitCascade, 1e-10);
+
+  // Set vis1's transparency with no cascade
+  float noCascade = 0.3;
+  vis1->SetTransparency(noCascade, false);
+  EXPECT_NEAR(vis1->GetTransparency(), noCascade, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), explicitCascade, 1e-10);
+
+  // Set vis2's transparency
+  float vis2Transparency = 0.4;
+  vis2->SetTransparency(vis2Transparency);
+  EXPECT_NEAR(vis1->GetTransparency(), noCascade, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), vis2Transparency, 1e-10);
+}
+
+/////////////////////////////////////////////////
 TEST_F(Visual_TEST, Material)
 {
   Load("worlds/empty.world");
@@ -320,6 +368,62 @@ TEST_F(Visual_TEST, Material)
   EXPECT_EQ(boxVis->GetMaterialName(), "Gazebo/Yellow");
   boxVis2->SetMaterial("Gazebo/OrangeTransparent", false);
   EXPECT_EQ(boxVis2->GetMaterialName(), "Gazebo/OrangeTransparent");
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, ChildMaterial)
+{
+  Load("worlds/empty.world");
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Create a visual as child of the world visual
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+
+  // Create a visual as child of vis1
+  gazebo::rendering::VisualPtr vis2;
+  vis2.reset(new gazebo::rendering::Visual("vis2", vis1));
+  vis2->Load();
+
+  // Check material is empty
+  EXPECT_TRUE(vis1->GetMaterialName().empty());
+  EXPECT_TRUE(vis2->GetMaterialName().empty());
+
+  // Set vis1's material with default cascade
+  std::string defaultCascade = "Gazebo/Grey";
+  vis1->SetMaterial(defaultCascade);
+  EXPECT_TRUE(vis1->GetMaterialName().find(defaultCascade) !=
+      std::string::npos);
+  EXPECT_TRUE(vis2->GetMaterialName().find(defaultCascade) !=
+      std::string::npos);
+
+  // Set vis1's material with explicit cascade
+  std::string explicitCascade = "Gazebo/Red";
+  vis1->SetMaterial(explicitCascade, true, true);
+  EXPECT_TRUE(vis1->GetMaterialName().find(explicitCascade) !=
+      std::string::npos);
+  EXPECT_TRUE(vis2->GetMaterialName().find(explicitCascade) !=
+      std::string::npos);
+
+  // Set vis1's material with no cascade
+  std::string noCascade = "Gazebo/Green";
+  vis1->SetMaterial(noCascade, true, false);
+  EXPECT_TRUE(vis1->GetMaterialName().find(noCascade) !=
+      std::string::npos);
+  EXPECT_TRUE(vis2->GetMaterialName().find(explicitCascade) !=
+      std::string::npos);
+
+  // Set vis2's material
+  std::string vis2Material = "Gazebo/Blue";
+  vis2->SetMaterial(vis2Material);
+  EXPECT_TRUE(vis1->GetMaterialName().find(noCascade) !=
+      std::string::npos);
+  EXPECT_TRUE(vis2->GetMaterialName().find(vis2Material) !=
+      std::string::npos);
 }
 
 /////////////////////////////////////////////////
@@ -435,6 +539,108 @@ TEST_F(Visual_TEST, Color)
     cylinderVis2->SetEmissive(color);
     EXPECT_EQ(cylinderVis2->GetEmissive(), color);
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, ChildColor)
+{
+  Load("worlds/empty.world");
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Create a visual as child of the world visual
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+
+  // Create a visual as child of vis1
+  gazebo::rendering::VisualPtr vis2;
+  vis2.reset(new gazebo::rendering::Visual("vis2", vis1));
+  vis2->Load();
+
+  // Check default colors
+  EXPECT_EQ(vis1->GetAmbient(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetEmissive(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetSpecular(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetDiffuse(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetAmbient(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetEmissive(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetSpecular(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetDiffuse(), gazebo::common::Color(0, 0, 0, 0));
+
+  // Set vis1's color with default cascade
+  gazebo::common::Color defaultCascadeAmbient(0.1, 0, 0, 1);
+  gazebo::common::Color defaultCascadeEmissive(0.2, 0, 0, 1);
+  gazebo::common::Color defaultCascadeSpecular(0.3, 0, 0, 1);
+  gazebo::common::Color defaultCascadeDiffuse(0.4, 0, 0, 1);
+  vis1->SetAmbient(defaultCascadeAmbient);
+  vis1->SetEmissive(defaultCascadeEmissive);
+  vis1->SetSpecular(defaultCascadeSpecular);
+  vis1->SetDiffuse(defaultCascadeDiffuse);
+  EXPECT_EQ(vis1->GetAmbient(), defaultCascadeAmbient);
+  EXPECT_EQ(vis1->GetEmissive(), defaultCascadeEmissive);
+  EXPECT_EQ(vis1->GetSpecular(), defaultCascadeSpecular);
+  EXPECT_EQ(vis1->GetDiffuse(), defaultCascadeDiffuse);
+  EXPECT_EQ(vis2->GetAmbient(), defaultCascadeAmbient);
+  EXPECT_EQ(vis2->GetEmissive(), defaultCascadeEmissive);
+  EXPECT_EQ(vis2->GetSpecular(), defaultCascadeSpecular);
+  EXPECT_EQ(vis2->GetDiffuse(), defaultCascadeDiffuse);
+
+  // Set vis1's color with explicit cascade
+  gazebo::common::Color explicitCascadeAmbient(0, 0.1, 0, 1);
+  gazebo::common::Color explicitCascadeEmissive(0, 0.2, 0, 1);
+  gazebo::common::Color explicitCascadeSpecular(0, 0.3, 0, 1);
+  gazebo::common::Color explicitCascadeDiffuse(0, 0.4, 0, 1);
+  vis1->SetAmbient(explicitCascadeAmbient, true);
+  vis1->SetEmissive(explicitCascadeEmissive, true);
+  vis1->SetSpecular(explicitCascadeSpecular, true);
+  vis1->SetDiffuse(explicitCascadeDiffuse, true);
+  EXPECT_EQ(vis1->GetAmbient(), explicitCascadeAmbient);
+  EXPECT_EQ(vis1->GetEmissive(), explicitCascadeEmissive);
+  EXPECT_EQ(vis1->GetSpecular(), explicitCascadeSpecular);
+  EXPECT_EQ(vis1->GetDiffuse(), explicitCascadeDiffuse);
+  EXPECT_EQ(vis2->GetAmbient(), explicitCascadeAmbient);
+  EXPECT_EQ(vis2->GetEmissive(), explicitCascadeEmissive);
+  EXPECT_EQ(vis2->GetSpecular(), explicitCascadeSpecular);
+  EXPECT_EQ(vis2->GetDiffuse(), explicitCascadeDiffuse);
+
+  // Set vis1's color with no cascade
+  gazebo::common::Color noCascadeAmbient(0, 0, 0.1, 1);
+  gazebo::common::Color noCascadeEmissive(0, 0, 0.2, 1);
+  gazebo::common::Color noCascadeSpecular(0, 0, 0.3, 1);
+  gazebo::common::Color noCascadeDiffuse(0, 0, 0.4, 1);
+  vis1->SetAmbient(noCascadeAmbient, false);
+  vis1->SetEmissive(noCascadeEmissive, false);
+  vis1->SetSpecular(noCascadeSpecular, false);
+  vis1->SetDiffuse(noCascadeDiffuse, false);
+  EXPECT_EQ(vis1->GetAmbient(), noCascadeAmbient);
+  EXPECT_EQ(vis1->GetEmissive(), noCascadeEmissive);
+  EXPECT_EQ(vis1->GetSpecular(), noCascadeSpecular);
+  EXPECT_EQ(vis1->GetDiffuse(), noCascadeDiffuse);
+  EXPECT_EQ(vis2->GetAmbient(), explicitCascadeAmbient);
+  EXPECT_EQ(vis2->GetEmissive(), explicitCascadeEmissive);
+  EXPECT_EQ(vis2->GetSpecular(), explicitCascadeSpecular);
+  EXPECT_EQ(vis2->GetDiffuse(), explicitCascadeDiffuse);
+
+  // Set vis2's color
+  gazebo::common::Color vis2Ambient(0.1, 0.1, 0.1, 1);
+  gazebo::common::Color vis2Emissive(0.1, 0.2, 0.2, 1);
+  gazebo::common::Color vis2Specular(0.1, 0.3, 0.3, 1);
+  gazebo::common::Color vis2Diffuse(0.1, 0.4, 0.4, 1);
+  vis2->SetAmbient(vis2Ambient);
+  vis2->SetEmissive(vis2Emissive);
+  vis2->SetSpecular(vis2Specular);
+  vis2->SetDiffuse(vis2Diffuse);
+  EXPECT_EQ(vis1->GetAmbient(), noCascadeAmbient);
+  EXPECT_EQ(vis1->GetEmissive(), noCascadeEmissive);
+  EXPECT_EQ(vis1->GetSpecular(), noCascadeSpecular);
+  EXPECT_EQ(vis1->GetDiffuse(), noCascadeDiffuse);
+  EXPECT_EQ(vis2->GetAmbient(), vis2Ambient);
+  EXPECT_EQ(vis2->GetEmissive(), vis2Emissive);
+  EXPECT_EQ(vis2->GetSpecular(), vis2Specular);
+  EXPECT_EQ(vis2->GetDiffuse(), vis2Diffuse);
 }
 
 /////////////////////////////////////////////////
