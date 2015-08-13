@@ -421,7 +421,7 @@ namespace gazebo
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Plugin object
     GAZEBO_VISIBLE
-    msgs::Plugin PluginFromSDF(sdf::ElementPtr _sdf);
+    msgs::Plugin PluginFromSDF(const sdf::ElementPtr _sdf);
 
     /// \brief Create or update an SDF element from a msgs::Visual
     /// \param[in] _msg Visual messsage
