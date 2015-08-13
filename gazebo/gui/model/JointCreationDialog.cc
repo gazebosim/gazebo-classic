@@ -33,6 +33,9 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setWindowTitle(tr("Create Joint"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
+  this->setMinimumWidth(300);
+  this->setMinimumHeight(700);
+
   this->jointMaker = _jointMaker;
 
   this->configWidget = new ConfigWidget();
@@ -59,6 +62,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   connect(this->typeButtons, SIGNAL(buttonClicked(int)),
       this, SLOT(OnTypeFromDialog(int)));
 
+  // Types layout
   QGridLayout *typesLayout = new QGridLayout();
   typesLayout->addWidget(fixedJointRadio, 0, 0);
   typesLayout->addWidget(revoluteJointRadio, 1, 0);
@@ -69,6 +73,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   typesLayout->addWidget(ballJointRadio, 2, 1);
   typesLayout->addWidget(gearboxJointRadio, 3, 1);
 
+  // Types group widget
   ConfigChildWidget *typesWidget = new ConfigChildWidget();
   typesWidget->setLayout(typesLayout);
 
@@ -77,16 +82,17 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Link selections
   QLabel *selectionsText = new QLabel(tr(
-      "Click a link in the scene "
-       "to select parent. Click "
-       "again to select child."));
+      "Click a link in the scene to select parent.\n"
+      "Click again to select child."));
 
+  // Parent
   QLabel *parentLabel = new QLabel("Parent: ");
   this->parentComboBox = new QComboBox();
   this->parentComboBox->setInsertPolicy(QComboBox::InsertAlphabetically);
   connect(this->parentComboBox, SIGNAL(currentIndexChanged(int)), this,
       SLOT(OnParentFromDialog(int)));
 
+  // Child
   QLabel *childLabel = new QLabel("Child: ");
   this->childComboBox = new QComboBox();
   this->childComboBox->setInsertPolicy(QComboBox::InsertAlphabetically);
@@ -94,12 +100,14 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   connect(this->childComboBox, SIGNAL(currentIndexChanged(int)), this,
       SLOT(OnChildFromDialog(int)));
 
+  // Swap button
   this->swapButton = new QToolButton();
   this->swapButton->setText("Swap");
   this->swapButton->setMinimumWidth(100);
   this->swapButton->setEnabled(false);
   connect(this->swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
 
+  // Links layout
   QGridLayout *linksLayout = new QGridLayout();
   linksLayout->addWidget(selectionsText, 0, 0, 1, 3);
   linksLayout->addWidget(parentLabel, 1, 0);
@@ -108,59 +116,63 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   linksLayout->addWidget(this->childComboBox, 2, 1);
   linksLayout->addWidget(this->swapButton, 1, 2, 2, 1);
 
+  // Links group widget
   ConfigChildWidget *linksWidget = new ConfigChildWidget();
   linksWidget->setLayout(linksLayout);
 
   QWidget *linksGroupWidget = this->configWidget->CreateGroupWidget(
       "Link Selections", linksWidget, 0);
 
+  // Pose widget
+  ConfigChildWidget *poseWidget = this->configWidget->CreatePoseWidget("pose",
+      0);
+  this->configWidget->AddConfigChildWidget("pose", poseWidget);
+  this->configWidget->SetWidgetReadOnly("pose", true);
 
+  QWidget *poseGroupWidget = this->configWidget->CreateGroupWidget(
+      "Relative Pose", poseWidget, 0);
 
-
+  // Config Widget layout
   QVBoxLayout *configLayout = new QVBoxLayout();
   configLayout->addWidget(typesGroupWidget);
   configLayout->addWidget(linksGroupWidget);
+  configLayout->addWidget(poseGroupWidget);
 
   this->configWidget->setLayout(configLayout);
 
-
-
-
-
-
+  // Scroll area
   QScrollArea *scrollArea = new QScrollArea;
   scrollArea->setWidget(configWidget);
   scrollArea->setWidgetResizable(true);
 
-
+  // General layout
   QVBoxLayout *generalLayout = new QVBoxLayout;
   generalLayout->setContentsMargins(0, 0, 0, 0);
   generalLayout->addWidget(scrollArea);
 
-
-
-  QHBoxLayout *buttonsLayout = new QHBoxLayout;
-
+  // Cancel button
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
+  // Create button
   this->createButton = new QPushButton(tr("Create"));
   this->createButton->setEnabled(false);
   connect(this->createButton, SIGNAL(clicked()), this, SLOT(OnCreate()));
 
+  // Buttons layout
+  QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(createButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
+  // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(generalLayout);
   mainLayout->addLayout(buttonsLayout);
 
-  this->setMinimumWidth(500);
-  this->setMinimumHeight(300);
-
   this->setLayout(mainLayout);
 
+  // Gazebo event connections
   this->connections.push_back(
       gui::model::Events::ConnectLinkInserted(
       boost::bind(&JointCreationDialog::OnLinkInserted, this, _1)));
@@ -177,6 +189,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       gui::model::Events::ConnectJointChildChosen3D(
       boost::bind(&JointCreationDialog::OnChildFrom3D, this, _1)));
 
+  // Qt signal-slot connections
   connect(this, SIGNAL(EmitLinkRemoved(std::string)),
       this, SLOT(OnLinkRemovedSlot(std::string)));
 }

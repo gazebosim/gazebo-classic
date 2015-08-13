@@ -352,7 +352,8 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
   // Not in the process of creating a joint
-  if (!this->mouseMoveEnabled)
+  // or already chose parent and child
+  if (!this->mouseMoveEnabled || (this->parentLinkVis && this->childLinkVis))
   {
     rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
     if (vis)
@@ -390,7 +391,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       return false;
     }
   }
-  // In the process of creating a joint
+  // In the process of creating a joint - still selecting parent/child
   else
   {
     if (_event.Button() == common::MouseEvent::LEFT)
@@ -665,15 +666,20 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
         vis->GetName().find("_UNIQUE_ID_") == std::string::npos)
     {
       this->hoverVis = vis->GetParent();
+      // Parent hasn't been defined yet
       if (!this->parentLinkVis ||
-           (this->parentLinkVis && this->hoverVis != this->parentLinkVis))
+         // Child hasn't been defined and hovered vis is different from parent
+          (!this->childLinkVis &&
+          this->parentLinkVis && this->hoverVis != this->parentLinkVis))
+      {
         this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
+      }
     }
   }
 
   // Case when a parent link is already selected and currently
   // extending the joint line to a child link
-  if (this->parentLinkVis && this->hoverVis
+  if (this->parentLinkVis && !this->childLinkVis && this->hoverVis
       && this->jointBeingCreated && this->jointBeingCreated->line)
   {
     math::Vector3 parentPos;
@@ -1460,7 +1466,7 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
 
   this->childLinkVis = _childLink;
 
-  this->mouseMoveEnabled = false;
+//  this->mouseMoveEnabled = false;
 }
 
 /////////////////////////////////////////////////
