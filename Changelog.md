@@ -15,6 +15,18 @@
 1. Tweaks to Data Logger, such as multiline text edit for path
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
 
+1. Added Visual::IsAncestorOf and Visual::IsDescendantOf
+    * [Pull request #1850](https://bitbucket.org/osrf/gazebo/pull-request/1850)
+
+1. Added msgs::PluginFromSDF and tests
+    * [Pull request #1858](https://bitbucket.org/osrf/gazebo/pull-request/1858)
+
+1. Added hotkeys chart dialog
+    * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
+
+1. Refactored makers
+    * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
+
 1. Model editor updates
     1. Added support for more joint types (gearbox and fixed joints).
         * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
@@ -24,7 +36,16 @@
     1. Color-coded edges in Schematic View to match joint color.
         * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
 
+    1. Scale link mass and inertia when a link is scaled
+        * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
+
 ## Gazebo 6.0
+
+1. Added logical_camera sensor.
+    * [Pull request #1845](https://bitbucket.org/osrf/gazebo/pull-request/1845)
+
+1. Added RandomVelocityPlugin, which applies a random velocity to a model's link.
+    * [Pull request #1839](https://bitbucket.org/osrf/gazebo/pull-request/1839)
 
 1. Added magnetometer sensor. A contribution from Andrew Symington.
     * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)

@@ -14,6 +14,7 @@ set (sources
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
+  LogicalCameraSensor.cc
   MagnetometerSensor.cc
   MultiCameraSensor.cc
   Noise.cc
@@ -41,6 +42,7 @@ set (headers
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
+  LogicalCameraSensor.hh
   MagnetometerSensor.hh
   MultiCameraSensor.hh
   Noise.hh

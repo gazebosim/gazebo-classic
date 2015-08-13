@@ -35,6 +35,7 @@ namespace gazebo
     class Sensor;
     class RaySensor;
     class CameraSensor;
+    class LogicalCameraSensor;
     class MagnetometerSensor;
     class MultiCameraSensor;
     class DepthCameraSensor;
@@ -192,6 +193,10 @@ namespace gazebo
     /// \def WirelessReceiver_V
     /// \brief Vector of WirelessReceiver
     typedef std::vector<WirelessReceiver> WirelessReceiver_V;
+
+    /// \def LogicalCameraSensorPtr
+    /// \brief Shared pointer to LogicalCameraSensor
+    typedef boost::shared_ptr<LogicalCameraSensor> LogicalCameraSensorPtr;
 
     /// \def SensorNoiseType
     /// \brief Eumeration of all sensor noise types
