@@ -72,6 +72,10 @@ namespace gazebo
       /// \brief Constructor.
       public: MouseEvent();
 
+      /// \brief Copy constructor.
+      /// \param[in] _other Other mouse event
+      public: MouseEvent(const MouseEvent &_other);
+
       /// \brief Destructor
       public: virtual ~MouseEvent();
 
@@ -193,6 +197,11 @@ namespace gazebo
       /// \brief Set the control key press flag.
       /// \param[in] _control The control key flag.
       public: void SetControl(const bool _control) const;
+
+      /// \brief Assignment operator
+      /// \param[in] _other Other mouse event
+      /// \return this
+      public: MouseEvent &operator=(const MouseEvent &_other);
 
       /// \internal
       /// \brief Private data pointer
