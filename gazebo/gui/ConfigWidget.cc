@@ -205,9 +205,7 @@ void ConfigWidget::GetRangeFromKey(const std::string &_key, double &_min,
 /////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
 {
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -227,9 +225,7 @@ bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
 /////////////////////////////////////////////////
 void ConfigWidget::SetWidgetVisible(const std::string &_name, bool _visible)
 {
-  std::map <std::string, ConfigChildWidget *>::iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -249,9 +245,7 @@ void ConfigWidget::SetWidgetVisible(const std::string &_name, bool _visible)
 /////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetReadOnly(const std::string &_name) const
 {
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -271,9 +265,7 @@ bool ConfigWidget::GetWidgetReadOnly(const std::string &_name) const
 /////////////////////////////////////////////////
 void ConfigWidget::SetWidgetReadOnly(const std::string &_name, bool _readOnly)
 {
-  std::map <std::string, ConfigChildWidget *>::iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -594,7 +586,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             value = 0;
           if (newWidget)
           {
-            configChildWidget = CreateDoubleWidget(name, _level);
+            configChildWidget = this->CreateDoubleWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateDoubleWidget(configChildWidget, value);
@@ -607,7 +599,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             value = 0;
           if (newWidget)
           {
-            configChildWidget = CreateDoubleWidget(name, _level);
+            configChildWidget = this->CreateDoubleWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateDoubleWidget(configChildWidget, value);
@@ -618,7 +610,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           int64_t value = ref->GetInt64(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateIntWidget(name, _level);
+            configChildWidget = this->CreateIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateIntWidget(configChildWidget, value);
@@ -629,7 +621,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           uint64_t value = ref->GetUInt64(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateUIntWidget(name, _level);
+            configChildWidget = this->CreateUIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateUIntWidget(configChildWidget, value);
@@ -640,7 +632,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           int32_t value = ref->GetInt32(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateIntWidget(name, _level);
+            configChildWidget = this->CreateIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateIntWidget(configChildWidget, value);
@@ -651,7 +643,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           uint32_t value = ref->GetUInt32(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateUIntWidget(name, _level);
+            configChildWidget = this->CreateUIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateUIntWidget(configChildWidget, value);
@@ -662,7 +654,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           bool value = ref->GetBool(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateBoolWidget(name, _level);
+            configChildWidget = this->CreateBoolWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateBoolWidget(configChildWidget, value);
@@ -673,7 +665,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           std::string value = ref->GetString(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateStringWidget(name, _level);
+            configChildWidget = this->CreateStringWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateStringWidget(configChildWidget, value);
@@ -894,10 +886,14 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
           if (newWidget)
           {
-            // reset new field widget pointer in order for it to be added
-            // to the parent widget
-            newFieldWidget = this->CreateGroupWidget(name, newFieldWidget,
-                _level);
+            // Make it into a group widget
+            ConfigChildWidget *childWidget =
+                qobject_cast<ConfigChildWidget *>(newFieldWidget);
+            if (childWidget)
+            {
+              newFieldWidget = this->CreateGroupWidget(name, childWidget,
+                  _level);
+            }
           }
 
           break;
@@ -978,12 +974,12 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               qobject_cast<GroupWidget *>(newFieldWidget);
           ConfigChildWidget *childWidget = qobject_cast<ConfigChildWidget *>(
               groupWidget->childWidget);
-          this->configWidgets[scopedName] = childWidget;
+          this->AddConfigChildWidget(scopedName, childWidget);
         }
         else if (qobject_cast<ConfigChildWidget *>(newFieldWidget))
         {
-          this->configWidgets[scopedName] =
-              qobject_cast<ConfigChildWidget *>(newFieldWidget);
+          this->AddConfigChildWidget(scopedName,
+              qobject_cast<ConfigChildWidget *>(newFieldWidget));
         }
       }
     }
@@ -1011,7 +1007,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
 /////////////////////////////////////////////////
 GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
-    QWidget *_newFieldWidget, const int _level)
+    ConfigChildWidget *_childWidget, const int _level)
 {
   // Button label
   QLabel *buttonLabel = new QLabel(
@@ -1023,10 +1019,10 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
   buttonIcon->setChecked(true);
   buttonIcon->setStyleSheet(
       "QCheckBox::indicator::unchecked {\
-	image: url(:/images/right_arrow.png);\
+        image: url(:/images/right_arrow.png);\
       }\
       QCheckBox::indicator::checked {\
-	image: url(:/images/down_arrow.png);\
+        image: url(:/images/down_arrow.png);\
       }");
 
   // Button layout
@@ -1046,66 +1042,64 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
   if (_level == 0)
   {
     buttonFrame->setStyleSheet(
-	"QWidget\
-	{\
-	  background-color: " + this->level0BgColor +
-	"}");
+        "QWidget\
+        {\
+          background-color: " + this->level0BgColor +
+        "}");
   }
 
   // Child widgets are contained in a group box which can be collapsed
   GroupWidget *groupWidget = new GroupWidget;
   groupWidget->setStyleSheet(
       "QGroupBox {\
-	border : 0;\
-	margin : 0;\
-	padding : 0;\
+        border : 0;\
+        margin : 0;\
+        padding : 0;\
       }");
 
-  connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget,
-      SLOT(Toggle(bool)));
+  connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget, SLOT(Toggle(bool)));
 
   // Set the child widget
-  groupWidget->childWidget = _newFieldWidget;
-  qobject_cast<ConfigChildWidget *>(_newFieldWidget)->groupWidget
-      = groupWidget;
-  _newFieldWidget->setContentsMargins(0, 0, 0, 0);
+  groupWidget->childWidget = _childWidget;
+  _childWidget->groupWidget = groupWidget;
+  _childWidget->setContentsMargins(0, 0, 0, 0);
 
   // Set color for children
   if (_level == 0)
   {
-    _newFieldWidget->setStyleSheet(
-	"QWidget\
-	{\
-	  background-color: " + this->level1BgColor +
-	"}\
-	QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-	{\
-	  background-color: " + this->level1WidgetColor +
-	"}");
+    _childWidget->setStyleSheet(
+        "QWidget\
+        {\
+          background-color: " + this->level1BgColor +
+        "}\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + this->level1WidgetColor +
+        "}");
   }
   else if (_level == 1)
   {
-    _newFieldWidget->setStyleSheet(
-	"QWidget\
-	{\
-	  background-color: " + this->level2BgColor +
-	"}\
-	QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-	{\
-	  background-color: " + this->level2WidgetColor +
-	"}");
+    _childWidget->setStyleSheet(
+        "QWidget\
+        {\
+          background-color: " + this->level2BgColor +
+        "}\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + this->level2WidgetColor +
+        "}");
   }
   else if (_level == 2)
   {
-    _newFieldWidget->setStyleSheet(
-	"QWidget\
-	{\
-	  background-color: " + this->level2BgColor +
-	"}\
-	QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-	{\
-	  background-color: " + this->level2WidgetColor +
-	"}");
+    _childWidget->setStyleSheet(
+        "QWidget\
+        {\
+          background-color: " + this->level2BgColor +
+        "}\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + this->level2WidgetColor +
+        "}");
   }
 
   // Group Layout
@@ -1113,7 +1107,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
   configGroupLayout->setContentsMargins(0, 0, 0, 0);
   configGroupLayout->setSpacing(0);
   configGroupLayout->addWidget(buttonFrame, 0, 0);
-  configGroupLayout->addWidget(_newFieldWidget, 1, 0);
+  configGroupLayout->addWidget(_childWidget, 1, 0);
   groupWidget->setLayout(configGroupLayout);
 
   return groupWidget;
@@ -2591,6 +2585,33 @@ void ConfigWidget::OnEnumValueChanged(const QString &_value)
       return;
     }
   }
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::AddConfigChildWidget(const std::string &_name,
+    ConfigChildWidget *_child)
+{
+  if (_name.empty() || _child == NULL)
+  {
+    gzerr << "Given name or child is invalid. Not adding child widget."
+          << std::endl;
+    return false;
+  }
+  if (this->configWidgets.find(_name) != this->configWidgets.end())
+  {
+    gzerr << "This config widget already has a child with that name. " <<
+       "Names must be unique. Not adding child." << std::endl;
+    return false;
+  }
+
+  this->configWidgets[_name] = _child;
+  return true;
+}
+
+/////////////////////////////////////////////////
+unsigned int ConfigWidget::ConfigChildWidgetCount() const
+{
+  return this->configWidgets.size();
 }
 
 /////////////////////////////////////////////////

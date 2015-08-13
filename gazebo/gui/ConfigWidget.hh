@@ -333,39 +333,14 @@ namespace gazebo
       /// \return Enum value.
       public: std::string GetEnumWidgetValue(const std::string &_name) const;
 
-      /// \brief Parse the input message and either create widgets for
-      /// configuring fields of the message, or update the widgets with values
-      /// from the message.
-      /// \param[in] _msg Message.
-      /// \param[in] _update True to parse only fields that are specified in
-      /// the message rather than all the available fields in the message
-      /// \param[in] _name Name used when creating new widgets.
+      /// \brief Create a widget which has a button header which collapses
+      /// the field widget.
+      /// \param[in] _name Header name.
+      /// \param[out] _childWidget Widget which will be collapsed.
       /// \param[in] _level Level of the widget in the tree.
-      /// return Updated widget.
-      private: QWidget *Parse(google::protobuf::Message *_msg,
-          bool _update = false, const std::string &_name = "",
-          const int _level = 0);
-
-      /// \brief Parse a vector3 message.
-      /// param[in] _msg Input vector3d message.
-      /// return Parsed vector.
-      private: math::Vector3 ParseVector3(
-          const google::protobuf::Message *_msg);
-
-      /// \brief Update the message field using values from the widgets.
-      /// \param[in] _msg Message to be updated.
-      /// \param[in] _name Name of parent widget.
-      private: void UpdateMsg(google::protobuf::Message *_msg,
-          const std::string &_name = "");
-
-      /// \brief Update a vector3d message.
-      /// \param[in] _msg Vector3d message to be updated.
-      /// \param[in] _value Vector3 used for updating the message.
-      private: void UpdateVector3Msg(google::protobuf::Message *_msg,
-          const math::Vector3 &_value);
-
+      /// \return The group widget.
       public: GroupWidget *CreateGroupWidget(const std::string &_name,
-          QWidget *_newFieldWidget, const int _level = 0);
+          ConfigChildWidget *_childWidget, const int _level = 0);
 
       /// \brief Create a widget for configuring an unsigned integer value.
       /// \param[in] _key A key that is used as a label for the widget.
@@ -437,6 +412,51 @@ namespace gazebo
       /// \return The newly created widget.
       public: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
           const std::vector<std::string> &_values, const int _level = 0);
+
+      /// \brief Register a child widget as a child of this widget, so it can
+      /// be updated. Note that the widget is not automatically added to a
+      /// layout.
+      /// \param[in] _name Unique name to indentify the child within this widget
+      /// \param[in] _child Child widget to be added. It doesn't need to be a
+      /// ConfigChildWidget.
+      /// \return True if child successfully added.
+      public: bool AddConfigChildWidget(const std::string &_name,
+          ConfigChildWidget *_child);
+
+      /// \brief Get the number of child widgets.
+      /// \return The number of child widgets.
+      public: unsigned int ConfigChildWidgetCount() const;
+
+      /// \brief Parse the input message and either create widgets for
+      /// configuring fields of the message, or update the widgets with values
+      /// from the message.
+      /// \param[in] _msg Message.
+      /// \param[in] _update True to parse only fields that are specified in
+      /// the message rather than all the available fields in the message
+      /// \param[in] _name Name used when creating new widgets.
+      /// \param[in] _level Level of the widget in the tree.
+      /// return Updated widget.
+      private: QWidget *Parse(google::protobuf::Message *_msg,
+          bool _update = false, const std::string &_name = "",
+          const int _level = 0);
+
+      /// \brief Parse a vector3 message.
+      /// param[in] _msg Input vector3d message.
+      /// return Parsed vector.
+      private: math::Vector3 ParseVector3(
+          const google::protobuf::Message *_msg);
+
+      /// \brief Update the message field using values from the widgets.
+      /// \param[in] _msg Message to be updated.
+      /// \param[in] _name Name of parent widget.
+      private: void UpdateMsg(google::protobuf::Message *_msg,
+          const std::string &_name = "");
+
+      /// \brief Update a vector3d message.
+      /// \param[in] _msg Vector3d message to be updated.
+      /// \param[in] _value Vector3 used for updating the message.
+      private: void UpdateVector3Msg(google::protobuf::Message *_msg,
+          const math::Vector3 &_value);
 
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
