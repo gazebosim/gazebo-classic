@@ -1970,7 +1970,7 @@ ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::AddModelPlugin(sdf::ElementPtr _pluginElem)
+void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
 {
   if (_pluginElem->HasAttribute("name"))
   {

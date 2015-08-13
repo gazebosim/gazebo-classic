@@ -23,6 +23,38 @@
 #include "test_config.h"
 
 /////////////////////////////////////////////////
+void ModelPluginInspector_TEST::Buttons()
+{
+  gazebo::gui::ModelPluginInspector *inspector =
+      new gazebo::gui::ModelPluginInspector();
+  QVERIFY(inspector != NULL);
+
+  // Check buttons
+  QList<QPushButton *> buttons = inspector->findChildren<QPushButton *>();
+  QCOMPARE(buttons.size(), 2);
+
+  QCOMPARE(buttons[0]->text(), QString::fromStdString("Cancel"));
+  QCOMPARE(buttons[1]->text(), QString::fromStdString("OK"));
+
+  // Check pressing Cancel button closes the inspector
+  inspector->show();
+  QCOMPARE(inspector->isVisible(), true);
+
+  buttons[0]->click();
+  QCOMPARE(inspector->isVisible(), false);
+
+  // Check pressing OK button closes the inspector
+  inspector->show();
+  QCOMPARE(inspector->isVisible(), true);
+
+  buttons[1]->click();
+  QCOMPARE(inspector->isVisible(), false);
+
+  // Destructor
+  delete inspector;
+}
+
+/////////////////////////////////////////////////
 void ModelPluginInspector_TEST::Update()
 {
   gazebo::gui::ModelPluginInspector *inspector =
@@ -33,12 +65,12 @@ void ModelPluginInspector_TEST::Update()
   QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();
   QList<QPlainTextEdit *> plainTextEdits =
       inspector->findChildren<QPlainTextEdit *>();
-  QVERIFY(lineEdits.size() == 2u);
-  QVERIFY(plainTextEdits.size() == 1u);
+  QCOMPARE(lineEdits.size(), 2);
+  QCOMPARE(plainTextEdits.size(), 1);
 
-  QVERIFY(lineEdits[0]->text() == "");
-  QVERIFY(lineEdits[1]->text() == "");
-  QVERIFY(plainTextEdits[0]->toPlainText() == "");
+  QCOMPARE(lineEdits[0]->text(), QString());
+  QCOMPARE(lineEdits[1]->text(), QString());
+  QCOMPARE(plainTextEdits[0]->toPlainText(), QString());
 
   // Create a message
   std::string name = "plugin_name";
@@ -56,9 +88,9 @@ void ModelPluginInspector_TEST::Update()
   inspector->Update(pluginPtr);
 
   // Check fields
-  QVERIFY(lineEdits[0]->text() == QString::fromStdString(name));
-  QVERIFY(lineEdits[1]->text() == QString::fromStdString(filename));
-  QVERIFY(plainTextEdits[0]->toPlainText() == QString::fromStdString(innerxml));
+  QCOMPARE(lineEdits[0]->text(), QString::fromStdString(name));
+  QCOMPARE(lineEdits[1]->text(), QString::fromStdString(filename));
+  QCOMPARE(plainTextEdits[0]->toPlainText(), QString::fromStdString(innerxml));
 
   // Destructor
   delete inspector;

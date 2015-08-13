@@ -228,7 +228,7 @@ namespace gazebo
 
       /// \brief Add a model plugin to the model
       /// \param[in] _pluginElem Pointer to plugin SDF element
-      public: void AddModelPlugin(sdf::ElementPtr _pluginElem);
+      public: void AddModelPlugin(const sdf::ElementPtr _pluginElem);
 
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
@@ -431,10 +431,10 @@ namespace gazebo
       /// \brief Type of link being added.
       private: LinkType addLinkType;
 
-      /// \brief A map of model link names to and their visuals.
+      /// \brief A map of model link names to and their data.
       private: std::map<std::string, LinkData *> allLinks;
 
-      /// \brief A map of model model plugin names to and their visuals.
+      /// \brief A map of model plugin names to and their data.
       private: std::map<std::string, ModelPluginData *> allModelPlugins;
 
       /// \brief Transport node

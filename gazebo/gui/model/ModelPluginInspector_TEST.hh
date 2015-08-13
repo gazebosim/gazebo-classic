@@ -25,6 +25,9 @@ class ModelPluginInspector_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test the inspector's buttons.
+  private slots: void Buttons();
+
   /// \brief Test updating the inspector.
   private slots: void Update();
 };

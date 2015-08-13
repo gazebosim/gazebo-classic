@@ -192,10 +192,6 @@ namespace gazebo
       /// \param[in] _pluginElem SDF element.
       public: void Load(sdf::ElementPtr _pluginElem);
 
-      /// \brief Qt Callback when model plugin inspector configurations are to
-      /// be applied and inspector should be closed.
-      private slots: void OnAccept();
-
       /// \brief Inspector for configuring model plugin properties.
       public: ModelPluginInspector *inspector;
 

@@ -1087,8 +1087,6 @@ ModelPluginData::ModelPluginData()
 
   // Inspector
   this->inspector = new ModelPluginInspector();
-  this->inspector->setModal(false);
-  connect(this->inspector, SIGNAL(Accepted()), this, SLOT(OnAccept()));
 }
 
 /////////////////////////////////////////////////
@@ -1109,11 +1107,5 @@ void ModelPluginData::Load(sdf::ElementPtr _pluginElem)
 
   // Update inspector
   this->inspector->Update(pluginPtr);
-}
-
-/////////////////////////////////////////////////
-void ModelPluginData::OnAccept()
-{
-  // TODO: Apply changes when inspector is not read-only
 }
 

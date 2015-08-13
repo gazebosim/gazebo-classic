@@ -15,7 +15,6 @@
  *
 */
 
-
 #include "gazebo/gui/model/ModelPluginInspectorPrivate.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 
@@ -30,6 +29,10 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
   this->setWindowTitle(tr("Model Plugin Inspector"));
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+  this->setModal(false);
+
+  this->setMinimumWidth(500);
+  this->setMinimumHeight(300);
 
   // Config widget
   msgs::Plugin pluginMsg;
@@ -40,10 +43,12 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
   this->dataPtr->configWidget->SetWidgetReadOnly("filename", true);
   this->dataPtr->configWidget->SetWidgetReadOnly("innerxml", true);
 
+  // Scroll area
   QScrollArea *scrollArea = new QScrollArea;
   scrollArea->setWidget(this->dataPtr->configWidget);
   scrollArea->setWidgetResizable(true);
 
+  // General layout
   QVBoxLayout *generalLayout = new QVBoxLayout;
   generalLayout->setContentsMargins(0, 0, 0, 0);
   generalLayout->addWidget(scrollArea);
@@ -65,9 +70,6 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
   mainLayout->addLayout(generalLayout);
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
-
-  this->setMinimumWidth(500);
-  this->setMinimumHeight(300);
 }
 
 /////////////////////////////////////////////////
@@ -86,7 +88,8 @@ void ModelPluginInspector::OnCancel()
 /////////////////////////////////////////////////
 void ModelPluginInspector::OnOK()
 {
-  this->Accepted();
+  /// \todo emit accepted signal this->Accepted();
+  this->close();
 }
 
 /////////////////////////////////////////////////
