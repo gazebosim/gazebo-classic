@@ -178,7 +178,7 @@ TEST_F(Visual_TEST, BoundingBox)
 }
 
 /////////////////////////////////////////////////
-TEST_F(Visual_TEST, GetGeometryType)
+TEST_F(Visual_TEST, Geometry)
 {
   Load("worlds/empty.world");
 
@@ -193,6 +193,7 @@ TEST_F(Visual_TEST, GetGeometryType)
       new gazebo::rendering::Visual("box_visual", scene));
   boxVis->Load(boxSDF);
   EXPECT_EQ(boxVis->GetGeometryType(), "box");
+  EXPECT_EQ(boxVis->GetGeometrySize(), ignition::math::Vector3d::One);
 
   // sphere geom
   sdf::ElementPtr sphereSDF(new sdf::Element);
@@ -202,6 +203,7 @@ TEST_F(Visual_TEST, GetGeometryType)
       new gazebo::rendering::Visual("sphere_visual", scene));
   sphereVis->Load(sphereSDF);
   EXPECT_EQ(sphereVis->GetGeometryType(), "sphere");
+  EXPECT_EQ(boxVis->GetGeometrySize(), ignition::math::Vector3d::One);
 
   // cylinder geom
   sdf::ElementPtr cylinderSDF(new sdf::Element);
@@ -212,6 +214,7 @@ TEST_F(Visual_TEST, GetGeometryType)
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
   EXPECT_EQ(cylinderVis->GetGeometryType(), "cylinder");
+  EXPECT_EQ(boxVis->GetGeometrySize(), ignition::math::Vector3d::One);
 }
 
 /////////////////////////////////////////////////
