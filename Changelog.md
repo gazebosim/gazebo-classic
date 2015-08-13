@@ -18,6 +18,9 @@
 1. Added Visual::IsAncestorOf and Visual::IsDescendantOf
     * [Pull request #1850](https://bitbucket.org/osrf/gazebo/pull-request/1850)
 
+1. Added msgs::PluginFromSDF and tests
+    * [Pull request #1858](https://bitbucket.org/osrf/gazebo/pull-request/1858)
+
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
 
