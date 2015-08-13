@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class JointInspector gui/JointInspector.hh
     /// \brief A class to inspect and modify joints.
-    class GZ_GUI_MODEL_VISIBLE JointInspector : public QDialog
+    class GAZEBO_VISIBLE JointInspector : public QDialog
     {
       Q_OBJECT
 

@@ -20,8 +20,8 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
 
-#include "gazebo/gui/model/qgv/QGVNode.h"
-#include "gazebo/gui/model/qgv/QGVEdge.h"
+#include "gazebo/gui/qgv/QGVNode.h"
+#include "gazebo/gui/qgv/QGVEdge.h"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/GraphScene.hh"
