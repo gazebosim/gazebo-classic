@@ -4,11 +4,11 @@ package gazebo.msgs;
 /// \interface Sensor 
 /// \brief Information about a sensor element
 
-
 import "pose.proto";
 import "camerasensor.proto";
 import "raysensor.proto";
 import "contactsensor.proto";
+import "logical_camera_sensor.proto";
 
 message Sensor
 {
@@ -25,4 +25,7 @@ message Sensor
   optional ContactSensor contact   = 11;
   optional bool visualize          = 12;
   optional string topic            = 13;
+
+  /// \brief Description of a logical camera sensor
+  optional LogicalCameraSensor logical_camera = 14;
 }

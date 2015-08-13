@@ -27,6 +27,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -136,8 +137,15 @@ namespace gazebo
       /// \brief Clone a simulation.
       private slots: void Clone();
 
+      /// \brief Qt callback when the hotkey chart is triggered,
+      private slots: void HotkeyChart();
+
+      /// \brief Qt callback when about is triggered,
       private slots: void About();
+
       private slots: void Step();
+
+      /// \brief Qt callback when the arrow mode is triggered.
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -359,6 +367,9 @@ namespace gazebo
 
       /// \brief Data logger dialog.
       private: gui::DataLogger *dataLogger;
+
+      /// \brief Hotkey chart dialog.
+      private: gui::HotkeyDialog *hotkeyDialog;
     };
   }
 }

@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/selection_buffer/SelectionRenderListener.hh"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"

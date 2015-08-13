@@ -102,6 +102,13 @@ namespace gazebo
       public: void SetGeometry(const std::string &_name,
           const math::Vector3 &_size, const std::string &_uri = "");
 
+      /// \brief Get the geometry data of a visual
+      /// \param[in] _name Name of visual.
+      /// \param[in] _size Size of the geometry.
+      /// \param[in] _uri URI of the geometry.
+      public: void Geometry(const std::string &_name,
+          ignition::math::Vector3d &_size, std::string &_uri);
+
       /// \brief Set the material of a visual
       /// \param[in] _name Name of visual.
       /// \param[in] _materialName Name of material.
