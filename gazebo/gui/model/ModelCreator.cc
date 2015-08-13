@@ -1974,6 +1974,11 @@ void ModelCreator::OnPaste()
         this->Reset();
       }
 
+      // Propagate copied entity's Z position and rotation
+      math::Pose copiedPose = copiedNestedModel->GetPose();
+      clonePose.pos.z = copiedPose.pos.z;
+      clonePose.rot = copiedPose.rot;
+
       NestedModelData *clonedNestedModel = this->CloneNestedModel(it2->first);
       clonedNestedModel->modelVisual->SetWorldPose(clonePose);
       this->addLinkType = NESTED_MODEL;
@@ -2435,6 +2440,18 @@ void ModelCreator::Update()
   if (!this->linkScaleUpdate.empty())
     this->ModelChanged();
   this->linkScaleUpdate.clear();
+
+  // Check if any nested models have been moved and trigger ModelChanged
+  for (auto &nestedModelIt : this->allNestedModels)
+  {
+    NestedModelData *nestedModel = nestedModelIt.second;
+    if (nestedModel->GetPose() != nestedModel->modelVisual->GetPose().Ign())
+    {
+      nestedModel->SetPose((
+          nestedModel->modelVisual->GetWorldPose() - this->modelPose).Ign());
+      this->ModelChanged();
+    }
+  }
 }
 
 /////////////////////////////////////////////////
