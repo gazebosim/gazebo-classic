@@ -45,8 +45,6 @@ using namespace gui;
 ModelEditor::ModelEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow), dataPtr(new ModelEditorPrivate)
 {
-  static QIcon noIcon;
-
   this->dataPtr->active = false;
   // Create the model editor tab
   this->dataPtr->modelPalette = new ModelEditorPalette(_mainWindow);
@@ -125,19 +123,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->jointAct  = new QAction(QIcon(":/images/draw_link.svg"),
       tr("Joint"), this);
   this->dataPtr->jointAct->setCheckable(true);
-
-  // Fix up copy and paste actions to get menu bar and context menus correct
-  g_copyAct->setText(tr("&Copy"));
-  g_copyAct->setStatusTip(tr("Copy"));
-  g_copyAct->setShortcut(tr("Ctrl+C"));
-  g_copyAct->setCheckable(false);
-  g_copyAct->setIcon(noIcon);
-
-  g_pasteAct->setText(tr("&Paste"));
-  g_pasteAct->setStatusTip(tr("Paste"));
-  g_pasteAct->setShortcut(tr("Ctrl+V"));
-  g_pasteAct->setCheckable(false);
-  g_pasteAct->setIcon(noIcon);
 
   // set up the action group so that only one action is active at one time.
   QActionGroup *actionGroup = g_arrowAct->actionGroup();
