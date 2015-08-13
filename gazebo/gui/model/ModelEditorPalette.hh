@@ -45,7 +45,7 @@ namespace gazebo
 
     /// \class ModelEditorPalette ModelEditorPalette.hh
     /// \brief A palette of model items which can be added to the editor.
-    class GZ_GUI_MODEL_VISIBLE ModelEditorPalette : public QWidget
+    class GAZEBO_VISIBLE ModelEditorPalette : public QWidget
     {
       Q_OBJECT
 

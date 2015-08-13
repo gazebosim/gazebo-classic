@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class ImportDialog gui/ImportDialog.hh
     /// \brief Dialog for saving to file.
-    class GZ_GUI_MODEL_VISIBLE ImportDialog : public QDialog
+    class GAZEBO_VISIBLE ImportDialog : public QDialog
     {
       Q_OBJECT
 
