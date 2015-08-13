@@ -714,7 +714,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    msgs::Plugin PluginFromSDF(sdf::ElementPtr _sdf)
+    msgs::Plugin PluginFromSDF(const sdf::ElementPtr _sdf)
     {
       msgs::Plugin result;
 
