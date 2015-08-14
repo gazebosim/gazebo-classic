@@ -1451,13 +1451,14 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
 
-          if (this->dataPtr->transparency > 0.0)
+          for (unitStateCount = 0; unitStateCount <
+              pass->getNumTextureUnitStates(); ++unitStateCount)
           {
-            for (unitStateCount = 0; unitStateCount <
-                pass->getNumTextureUnitStates(); ++unitStateCount)
-            {
-              auto textureUnitState = pass->getTextureUnitState(unitStateCount);
+            auto textureUnitState = pass->getTextureUnitState(unitStateCount);
 
+            if (textureUnitState->getColourBlendMode().operation ==
+                Ogre::LBX_SOURCE1)
+            {
               textureUnitState->setAlphaOperation(
                   Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
                   1.0 - this->dataPtr->transparency);
