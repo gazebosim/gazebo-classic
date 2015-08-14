@@ -116,10 +116,10 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
 
   QWidget *wImagePlace = _parent->findChild<QWidget*>("wImagePlace");
 
-  // this->imgFrame = new gui::ImageFrame(wImagePlace);
-  // this->imgFrame->setMinimumSize(201,201);
-  // this->imgFrame->setMaximumSize(201,201);
-  // this->imgFrame->setVisible(true);
+  this->imgFrame = new gui::ImageFrame(wImagePlace);
+  this->imgFrame->setMinimumSize(201,201);
+  this->imgFrame->setMaximumSize(201,201);
+  this->imgFrame->setVisible(true);
 
   // fill combo boxes with values
   this->cbType->addItem("gnomonical");
@@ -137,14 +137,14 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
   this->pbCalibrate->setVisible(false);
 
   // bind Events
-  connect(this->cbType,SIGNAL(currentIndexChanged(int)),this,SLOT(OnValueChanged()));
-  connect(this->cbFun,SIGNAL(currentIndexChanged(int)),this,SLOT(OnValueChanged()));
+  connect(this->cbType,SIGNAL(currentIndexChanged(int)),this,SLOT(OnTypeChanged()));
+  connect(this->cbFun,SIGNAL(currentIndexChanged(int)),this,SLOT(OnCustomRequested()));
   connect(this->cbCircular,SIGNAL(stateChanged(int)),this,SLOT(OnValueChanged()));
 
-  connect(this->sbC1,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
-  connect(this->sbC2,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
-  connect(this->sbC3,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
-  connect(this->sbF,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbC1,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
+  connect(this->sbC2,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
+  connect(this->sbC3,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
+  connect(this->sbF,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
   connect(this->sbCA,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
 
   // Add listener for spawn button
@@ -219,6 +219,8 @@ void CameraLensControlExample::OnButtonSpawn()
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
 {
+  boost::mutex::scoped_lock lock(this->recImgLock);
+
   lbName->setText(QString::fromStdString(_msg->name()));
 
   gzmsg << "selected: " << _msg->name();
@@ -233,8 +235,8 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
     if(this->imageSub)
       this->imageSub->Unsubscribe();
 
-    // this->imageSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/image",
-    //     &CameraLensControlExample::OnImageUpdate,this);
+    this->imageSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/image",
+        &CameraLensControlExample::OnImageUpdate,this);
 
     // subscribe for the info messages
     this->infoSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/lens_info",
@@ -252,6 +254,8 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnImageUpdate(ConstImageStampedPtr &_msg)
 {
+  boost::mutex::scoped_lock lock(this->recImgLock);
+
   // Display received image
   // this->imgFrame->OnImage(_msg->image());
 }
@@ -262,7 +266,7 @@ void CameraLensControlExample::OnCameraProjectionCmd(ConstCameraLensCmdPtr &_msg
   if(this->ignoreInfoMessages)
     return;
   else
-    this->ignoreInfoMessages = true;
+    this->ignoreInfoMessages = true;  // Information got, runtime update is not needed
 
   if(_msg->has_c1())
     this->sbC1->setValue(_msg->c1());
@@ -278,18 +282,21 @@ void CameraLensControlExample::OnCameraProjectionCmd(ConstCameraLensCmdPtr &_msg
   this->cbType->setCurrentIndex(this->cbType->findText(QString::fromStdString(_msg->type())));
 
   if(_msg->has_fun())
+  {
+    gzmsg << _msg->fun() << std::endl;
     this->cbFun->setCurrentIndex(this->cbFun->findText(QString::fromStdString(_msg->fun())));
+  }
 
   if(_msg->has_circular())
     this->cbCircular->setChecked(_msg->circular());
-
-  // Information got, runtime update is not needed
-  // this->infoSub->Unsubscribe();
 }
 
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnValueChanged()
 {
+  if(!ignoreInfoMessages)
+    return;
+
   if(this->selectedElementName != "")
   {
     msgs::CameraLensCmd msg;
@@ -317,4 +324,19 @@ void CameraLensControlExample::OnValueChanged()
     this->cameraControlPub->Publish(msg);
     gzmsg << "Control message sent" << std::endl;
   }
+}
+
+/////////////////////////////////////////////////
+void CameraLensControlExample::OnTypeChanged()
+{
+  this->OnValueChanged();
+
+  this->ignoreInfoMessages = false;
+}
+
+/////////////////////////////////////////////////
+void CameraLensControlExample::OnCustomRequested()
+{
+  if(this->ignoreInfoMessages)
+    this->cbType->setCurrentIndex(this->cbType->findText(QString("custom")));
 }

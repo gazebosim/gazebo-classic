@@ -54,6 +54,10 @@ namespace gazebo
 
     protected slots: void OnValueChanged();
 
+    protected slots: void OnCustomRequested();
+
+    protected slots: void OnTypeChanged();
+
     protected: void OnSelect(ConstSelectionPtr &_msg);
 
     protected: void OnImageUpdate(ConstImageStampedPtr &_msg);
@@ -97,9 +101,11 @@ namespace gazebo
     private: QCheckBox *cbCircular;
 
     /// \brief Image output frame.
-    // private: gui::ImageFrame *imgFrame;
+    private: gui::ImageFrame *imgFrame;
 
     private: bool ignoreInfoMessages = false;
+
+    private: boost::mutex recImgLock;
   };
 }
 #endif
