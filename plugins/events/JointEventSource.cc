@@ -15,6 +15,7 @@
  *
 */
 
+#include <limits>
 #include <string>
 
 #include "JointEventSource.hh"
@@ -25,9 +26,11 @@ using namespace gazebo;
 JointEventSource::JointEventSource(transport::PublisherPtr _pub,
     physics::WorldPtr _world)
   : EventSource(_pub, "joint", _world),
-    range(INVALID),
-    isTriggered(false)
+        range(INVALID),
+   isTriggered(false)
 {
+  this->min = std::numeric_limits<double>::min();
+  this->max = std::numeric_limits<double>::max();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,24 +65,21 @@ void JointEventSource::Load(const sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr rangeElem = _sdf->GetElement("range");
 
+    if (!rangeElem->HasElement("min") &&
+        !rangeElem->HasElement("max") )
+    {
+      gzerr << this->name << ": <range>"
+          << " should have a min and (or) a max element." << std::endl;
+    }
+
     if (rangeElem->HasElement("min"))
     {
       this->min = rangeElem->Get<double>("min");
-    }
-    else
-    {
-      gzerr << this->name << ": <range>"
-          << " should have a min element." << std::endl;
     }
 
     if (rangeElem->HasElement("max"))
     {
       this->max = rangeElem->Get<double>("max");
-    }
-    else
-    {
-      gzerr << this->name << ": <range>"
-          << " should have a max element." << std::endl;
     }
 
     if (rangeElem->HasElement("type"))
