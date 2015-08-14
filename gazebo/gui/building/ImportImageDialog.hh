@@ -30,7 +30,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    class GZ_GUI_BUILDING_VISIBLE ImportImageDialog : public QDialog
+    class GZ_GUI_VISIBLE ImportImageDialog : public QDialog
     {
       Q_OBJECT
 

@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class LogPlayWidget LogPlayWidget.hh
     /// \brief Widget which displays log playback options.
-    class GAZEBO_VISIBLE LogPlayWidget : public QWidget
+    class GZ_GUI_VISIBLE LogPlayWidget : public QWidget
     {
       Q_OBJECT
 
@@ -136,7 +136,7 @@ namespace gazebo
 
     /// \class LogPlayView LogPlayView.hh
     /// \brief View for the timeline.
-    class GAZEBO_VISIBLE LogPlayView: public QGraphicsView
+    class GZ_GUI_VISIBLE LogPlayView: public QGraphicsView
     {
       Q_OBJECT
 
@@ -179,7 +179,7 @@ namespace gazebo
 
     /// \class CurrentTimeItem CurrentTimeItem.hh
     /// \brief Item which represents the current time within the view.
-    class GAZEBO_VISIBLE CurrentTimeItem: public QObject,
+    class GZ_GUI_VISIBLE CurrentTimeItem: public QObject,
         public QGraphicsRectItem
     {
       Q_OBJECT

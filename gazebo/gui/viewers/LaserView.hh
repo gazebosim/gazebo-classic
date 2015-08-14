@@ -34,7 +34,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE LaserView : public TopicView
+    class GZ_GUI_VISIBLE LaserView : public TopicView
     {
       Q_OBJECT
 

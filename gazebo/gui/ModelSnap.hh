@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class ModelSnap ModelSnap.hh gui/Gui.hh
     /// \brief A gui tool for snapping one model to another.
-    class GAZEBO_VISIBLE ModelSnap : public SingletonT<ModelSnap>
+    class GZ_GUI_VISIBLE ModelSnap : public SingletonT<ModelSnap>
     {
       /// \brief Constructor
       private: ModelSnap();

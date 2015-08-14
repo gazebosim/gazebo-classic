@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class RotateHandle RotateHandle.hh
     /// \brief Handle for rotating an editor item
-    class GZ_GUI_BUILDING_VISIBLE RotateHandle : public QGraphicsItem
+    class GZ_GUI_VISIBLE RotateHandle : public QGraphicsItem
     {
       /// \brief Constructor
       /// param[in] _parent Parent graphics item.

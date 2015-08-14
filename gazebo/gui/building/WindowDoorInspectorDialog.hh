@@ -27,7 +27,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GZ_GUI_BUILDING_VISIBLE WindowDoorInspectorDialog
+    class GZ_GUI_VISIBLE WindowDoorInspectorDialog
       : public BaseInspectorDialog
     {
       Q_OBJECT

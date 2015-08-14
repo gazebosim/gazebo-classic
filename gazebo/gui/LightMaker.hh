@@ -30,7 +30,7 @@ namespace gazebo
     class LightMakerPrivate;
 
     /// \brief Used to insert a new light into the scene.
-    class GAZEBO_VISIBLE LightMaker : public EntityMaker
+    class GZ_GUI_VISIBLE LightMaker : public EntityMaker
     {
       /// \brief Constructor
       public: LightMaker();
@@ -62,21 +62,21 @@ namespace gazebo
     };
 
     /// \brief Used to insert a new point light into the scene.
-    class GAZEBO_VISIBLE PointLightMaker : public LightMaker
+    class GZ_GUI_VISIBLE PointLightMaker : public LightMaker
     {
       /// \brief Constructor
       public: PointLightMaker();
     };
 
     /// \brief Used to insert a new spot light into the scene.
-    class GAZEBO_VISIBLE SpotLightMaker : public LightMaker
+    class GZ_GUI_VISIBLE SpotLightMaker : public LightMaker
     {
       /// \brief Constructor
       public: SpotLightMaker();
     };
 
     /// \brief Used to insert a new directional light into the scene.
-    class GAZEBO_VISIBLE DirectionalLightMaker : public LightMaker
+    class GZ_GUI_VISIBLE DirectionalLightMaker : public LightMaker
     {
       /// \brief Constructor
       public: DirectionalLightMaker();

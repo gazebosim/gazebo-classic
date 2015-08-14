@@ -29,7 +29,7 @@ namespace gazebo
 
   namespace gui
   {
-    class GAZEBO_VISIBLE ModelBuilderWidget : public QWidget
+    class GZ_GUI_VISIBLE ModelBuilderWidget : public QWidget
     {
       Q_OBJECT
       public: ModelBuilderWidget(QWidget *_parent = 0);

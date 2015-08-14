@@ -47,7 +47,7 @@ namespace gazebo
     class Editor;
     class SpaceNav;
 
-    class GAZEBO_VISIBLE MainWindow : public QMainWindow
+    class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
 

@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class RectItem RectItem.hh
     /// \brief 2D rectangle.
-    class GZ_GUI_BUILDING_VISIBLE RectItem :
+    class GZ_GUI_VISIBLE RectItem :
       public EditorItem, public QGraphicsRectItem
     {
       Q_OBJECT

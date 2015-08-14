@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class WallInspectorDialog WallInspectorDialog.hh
     /// \brief Dialog for configuring a wall item.
-    class GZ_GUI_BUILDING_VISIBLE WallInspectorDialog
+    class GZ_GUI_VISIBLE WallInspectorDialog
       : public BaseInspectorDialog
     {
       Q_OBJECT

@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class BuildingEditorPalette BuildingEditorPalette.hh
     /// \brief A palette of building items which can be added to the editor.
-    class GZ_GUI_BUILDING_VISIBLE BuildingEditorPalette : public QWidget
+    class GZ_GUI_VISIBLE BuildingEditorPalette : public QWidget
     {
       Q_OBJECT
 

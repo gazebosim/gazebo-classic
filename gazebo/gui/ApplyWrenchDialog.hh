@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class ApplyWrenchDialog ApplyWrenchDialog.hh gui/gui.hh
     /// \brief Dialog for applying force and torque to a model.
-    class GAZEBO_VISIBLE ApplyWrenchDialog : public QDialog
+    class GZ_GUI_VISIBLE ApplyWrenchDialog : public QDialog
     {
       Q_OBJECT
 

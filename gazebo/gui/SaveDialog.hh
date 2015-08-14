@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class SaveDialog SaveDialog.hh gui/gui.hh
     /// \brief Dialog for saving to file.
-    class GAZEBO_VISIBLE SaveDialog : public QDialog
+    class GZ_GUI_VISIBLE SaveDialog : public QDialog
     {
       Q_OBJECT
 

@@ -41,7 +41,7 @@ namespace gazebo
     class TimeWidget;
     class LogPlayWidget;
 
-    class GAZEBO_VISIBLE TimePanel : public QWidget
+    class GZ_GUI_VISIBLE TimePanel : public QWidget
     {
       Q_OBJECT
 

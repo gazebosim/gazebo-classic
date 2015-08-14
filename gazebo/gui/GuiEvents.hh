@@ -26,7 +26,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE Events
+    class GZ_GUI_VISIBLE Events
     {
       /////////////////////////////////////////////////
       /// \brief Connect a signal the add entity signal

@@ -29,7 +29,7 @@ namespace gazebo
     /// \{
 
     /// \brief Dialog displaying the keyboard shortcuts.
-    class GAZEBO_VISIBLE HotkeyDialog : public QDialog
+    class GZ_GUI_VISIBLE HotkeyDialog : public QDialog
     {
       Q_OBJECT
 

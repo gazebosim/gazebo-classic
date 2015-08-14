@@ -28,7 +28,7 @@ namespace gazebo
   {
     namespace editor
     {
-      class GZ_GUI_BUILDING_VISIBLE Events
+      class GZ_GUI_VISIBLE Events
       {
         /// \brief Connect a Gazebo event to the toggle edit mode signal.
         /// \param[in] _subscriber the subscriber to this event
