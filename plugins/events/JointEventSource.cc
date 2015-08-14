@@ -26,7 +26,7 @@ using namespace gazebo;
 JointEventSource::JointEventSource(transport::PublisherPtr _pub,
     physics::WorldPtr _world)
   : EventSource(_pub, "joint", _world),
-        range(INVALID),
+   range(INVALID),
    isTriggered(false)
 {
   this->min = std::numeric_limits<double>::min();
