@@ -37,7 +37,7 @@ set (headers_install
 )
 
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests
+  set (qt_tests_local
     JointMaker_TEST.cc
     ExtrudeDialog_TEST.cc
     ModelCreator_TEST.cc
@@ -61,7 +61,7 @@ if (HAVE_GRAPHVIZ)
   )
  
   if (ENABLE_SCREEN_TESTS)
-    set (qt_tests ${qt_tests}
+    set (qt_tests_local ${qt_tests_local}
       SchematicViewWidget_TEST.cc
     )
   endif()
@@ -71,5 +71,5 @@ endif()
 set (sources ${sources} ${sources_local} PARENT_SCOPE)
 set (internal_qt_headers ${internal_qt_headers} ${qt_headers_local} PARENT_SCOPE)
 
-gz_build_qt_tests(${qt_tests})
+gz_build_qt_tests(${qt_tests_local})
 gz_install_includes("gui/model" ${headers_install})

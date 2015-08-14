@@ -25,9 +25,9 @@ set (headers_install
   ViewFactory.hh
 )
 
-set (qt_tests
+set (qt_tests_local
   ImagesView_TEST.cc
 )
 
-gz_build_qt_tests(${qt_tests})
+gz_build_qt_tests(${qt_tests_local})
 gz_install_includes("gui/viewers" ${headers_install})

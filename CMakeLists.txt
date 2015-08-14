@@ -356,9 +356,6 @@ else (build_errors)
   set(PKG_LIBRARIES
     gazebo
     gazebo_client
-    gazebo_gui_building
-    gazebo_gui_viewers
-    gazebo_gui_model
     gazebo_gui
     gazebo_sensors
     gazebo_rendering
