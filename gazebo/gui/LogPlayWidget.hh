@@ -73,6 +73,19 @@ namespace gazebo
       /// \brief Step simulation forward.
       public slots: void OnStepForward();
 
+      /// \brief Step simulation back.
+      public slots: void OnStepBack();
+
+      /// \brief Jump to the start of the log file.
+      public slots: void OnRewind();
+
+      /// \brief Jump to the end of the log file.
+      public slots: void OnForward();
+
+      /// \brief Jump to a given time in the log file
+      /// \param[in] _time Desired time
+      public slots: void OnSeek(const common::Time &_time);
+
       /// \brief Qt signal to show the play button.
       signals: void ShowPlay();
 
@@ -105,6 +118,17 @@ namespace gazebo
       /// \param[in] _time End time.
       signals: void SetEndTime(const common::Time &_time);
 
+      /// \brief Publish a multistep message.
+      /// \param[in] _step Number of steps.
+      private: void PublishMultistep(const int _step);
+
+      /// \brief Helper function to prepare each of the buttons.
+      /// \param[in] _button Pointer to the button.
+      /// \param[in] _icon Icon uri.
+      /// \param[in] _isSmall True if the button is small.
+      private: void SetupButton(QToolButton *_button, QString _icon,
+          bool _isSmall);
+
       /// \internal
       /// \brief Pointer to private data.
       private: LogPlayWidgetPrivate *dataPtr;
@@ -134,6 +158,19 @@ namespace gazebo
 
       /// \brief Draw the timeline.
       public slots: void DrawTimeline();
+
+      /// \brief Qt signal used to seek.
+      /// \param[in] _time Time to jump to.
+      signals: void Seek(const common::Time &_time);
+
+      // Documentation inherited
+      protected: void mousePressEvent(QMouseEvent *_event);
+
+      // Documentation inherited
+      protected: void mouseReleaseEvent(QMouseEvent *_event);
+
+      // Documentation inherited
+      protected: void mouseMoveEvent(QMouseEvent *_event);
 
       /// \internal
       /// \brief Pointer to private data.
