@@ -198,11 +198,9 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 {
-  gzmsg << "control\n";
-
   if(_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET)
   {
-    gzerr << "control message is not of the set type " << (int)_msg->destiny() <<"\n";
+    gzerr << "Control message is not of the set type " << (int)_msg->destiny() <<"\n";
     gzdbg << _msg->DebugString() << "\n";
     return;
   }
@@ -212,8 +210,6 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 
   rendering::CameraLens *lens = (wcamera->GetLens());
 
-  gzmsg << "Still alive\n";
-
   if(_msg->has_type())
   {
     gzdbg << "has type:" << _msg->type() << "\n";
@@ -221,10 +217,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
   }
 
   if(_msg->has_c1())
-  {
-    gzdbg << "has c1\n";
     lens->SetC1(_msg->c1());
-  }
 
   if(_msg->has_c2())
     lens->SetC2(_msg->c2());
@@ -238,17 +231,12 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
   if(_msg->has_cutoff_angle())
   {
     lens->SetCutOffAngle(_msg->cutoff_angle());
-    wcamera->SetHFOV(_msg->cutoff_angle());
+    // wcamera->SetHFOV(math::Angle(_msg->cutoff_angle()));
   }
 
   if(_msg->has_fun())
     lens->SetFun(_msg->fun());
 
   if(_msg->has_circular())
-  {
-    gzdbg << "has circular:"<< _msg->circular() <<"\n";
     lens->SetCircular(_msg->circular());
-  }
-
-  gzmsg << "Something set\n";
 }

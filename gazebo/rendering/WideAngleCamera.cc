@@ -295,10 +295,10 @@ CameraLens::~CameraLens()
 //////////////////////////////////////////////////
 void CameraLens::Init(float _c1,float _c2,std::string _fun,float _f,float _c3)
 {
-  this->dataPtr->c1 = _c1;
-  this->dataPtr->c2 = _c2;
-  this->dataPtr->c3 = _c3;
-  this->dataPtr->f = _f;
+  this->SetC1(_c1);
+  this->SetC2(_c2);
+  this->SetC3(_c3);
+  this->SetF(_f);
 
   if(_fun == "tan")
     this->dataPtr->fun = CameraLensPrivate::TAN;
@@ -321,6 +321,10 @@ void CameraLens::Init(float _c1,float _c2,std::string _fun,float _f,float _c3)
 
     gzthrow(sstr.str());
   }
+
+  // The fun is correct
+  if(this->IsCustom())
+    this->sdf->GetElement("custom_function")->GetElement("fun")->Set(_fun);
 }
 
 //////////////////////////////////////////////////
@@ -554,8 +558,6 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov)
     math::Vector3(0,0,1)
   };
 
-  gzmsg << "1";
-
   uniforms->setNamedConstant("c1",(Ogre::Real)this->dataPtr->c1);
   uniforms->setNamedConstant("c2",(Ogre::Real)this->dataPtr->c2);
   uniforms->setNamedConstant("c3",(Ogre::Real)this->dataPtr->c3);
@@ -563,7 +565,7 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov)
   if(!this->IsCircular())
   {
     float fun_res = 1;
-    float param = _hfov*0.5/this->dataPtr->c2+this->dataPtr->c3;
+    float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
 
     switch(this->dataPtr->fun)
     {
@@ -595,14 +597,11 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov)
     _pass->getVertexProgramParameters();
 
   uniforms_vs->setNamedConstant("ratio",(Ogre::Real)_ratio);
-
-  gzmsg << "f\n";
 }
 
 //////////////////////////////////////////////////
 void WideAngleCamera::notifyMaterialRender(Ogre::uint32 _pass_id, Ogre::MaterialPtr &_material)
 {
-  gzmsg << "n";
   if(_material.isNull())
     return;
 
@@ -620,8 +619,7 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 _pass_id, Ogre::Material
     return;
   }
 
-  gzmsg << "s";
   this->GetLens()->SetUniformVariables(pPass,
     this->GetAspectRatio(),
-    this->GetHFOV().Radian());
+    this->GetLens()->GetCutOffAngle()*2);
 }
