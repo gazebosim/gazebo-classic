@@ -409,8 +409,8 @@ void ModelEditor::OnFinish()
 /////////////////////////////////////////////////
 void ModelEditor::OnAction(QAction *_action)
 {
-  if (_action != this->dataPtr->jointAct)
-    this->dataPtr->modelPalette->CreateJoint("none");
+ // if (_action != this->dataPtr->jointAct)
+   // this->dataPtr->modelPalette->CreateJoint("none");
 }
 
 /////////////////////////////////////////////////

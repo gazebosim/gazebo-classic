@@ -611,6 +611,7 @@ void JointMaker::Stop()
     if (this->jointBeingCreated)
     {
       this->RemoveJointBeingCreated();
+      this->jointCreationDialog->close();
       this->jointBeingCreated = NULL;
       this->creatingJoint = false;
       this->jointType == JointMaker::JOINT_NONE;
