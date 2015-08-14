@@ -260,6 +260,13 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
   // check for event
   unsigned int count_after = WaitForNewEvent(count_before);
   EXPECT_GT(count_after, count_before);
+
+  count_before = GetEventCount();
+
+  joint->SetVelocity(0, 3.1);
+  // check for event
+  count_after = WaitForNewEvent(count_before);
+  EXPECT_GT(count_after, count_before);
 }
 
 
