@@ -1974,6 +1974,11 @@ void ModelCreator::OnPaste()
         this->Reset();
       }
 
+      // Propagate copied entity's Z position and rotation
+      math::Pose copiedPose = copiedNestedModel->GetPose();
+      clonePose.pos.z = copiedPose.pos.z;
+      clonePose.rot = copiedPose.rot;
+
       NestedModelData *clonedNestedModel = this->CloneNestedModel(it2->first);
       clonedNestedModel->modelVisual->SetWorldPose(clonePose);
       this->addLinkType = NESTED_MODEL;
