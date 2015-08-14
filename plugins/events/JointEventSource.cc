@@ -246,7 +246,7 @@ void JointEventSource::Update()
   }
 
   // check if the state has changed
-  bool currentState = value > this->min && value < this->max;
+  bool currentState = value >= this->min && value <= this->max;
   if (oldState != currentState)
   {
     this->isTriggered = currentState;

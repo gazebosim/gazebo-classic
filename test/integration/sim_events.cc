@@ -235,13 +235,13 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////////////////
 void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
 {
-  // simbody stepTo() failure
-  if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
+  if (SKIP_FAILING_TESTS && _physicsEngine != "ode")
+    return;
 
   this->Load("worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
 
-  // Get the elevator model
+  // Get the revoluter model
   physics::ModelPtr model = world->GetModel("revoluter");
   physics::JointPtr joint = model->GetJoint("joint");
 

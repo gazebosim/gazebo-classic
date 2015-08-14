@@ -101,7 +101,7 @@
       <range>
         <type>normalized_angle</type>
         <min>3</min>
-        <max>3.3</max>
+        <max>3.1416</max>
       </range>
     </event>
 
