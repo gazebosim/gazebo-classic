@@ -78,7 +78,7 @@
     </event>
 
     <!-- Joint trigger events -->
-    <!-- position (linear or angular)
+    <!-- position (linear or angular) -->
     <event>
       <name>joint_position</name>
       <type>joint</type>
@@ -91,9 +91,8 @@
       </range>
     </event>
 
--->
-    <!-- Angle: must be in range -PI to PI -->
 
+    <!-- Angle: must be in range -PI to PI  -->
     <event>
       <name>joint_angle</name>
       <type>joint</type>
@@ -102,11 +101,11 @@
       <range>
         <type>normalized_angle</type>
         <min>3</min>
-    <!--    <max>3.1416</max> -->
+        <max>3.1416</max>
       </range>
     </event>
 
-    <!-- Velocity
+    <!-- Velocity -->
     <event>
       <name>joint_velocity</name>
       <type>joint</type>
@@ -120,7 +119,7 @@
     </event>
 
 
-     Applied Force
+    <!-- Applied Force -->
     <event>
       <name>joint_force</name>
       <type>joint</type>
