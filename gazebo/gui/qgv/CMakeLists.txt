@@ -13,15 +13,7 @@ set(sources ${sources}
   PARENT_SCOPE
 )
 
-SET(qt_headers ${qt_headers}
+SET(internal_qt_headers ${internal_qt_headers}
   qgv/QGVScene.h
-  PARENT_SCOPE
-)
-
-SET(internal_headers ${internal_headers}
-  qgv/qgv.h
-  qgv/QGVEdge.h
-  qgv/QGVNode.h
-  qgv/QGVSubGraph.h
   PARENT_SCOPE
 )

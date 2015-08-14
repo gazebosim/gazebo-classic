@@ -6,7 +6,7 @@ set (sources ${sources}
   PARENT_SCOPE
 )
 
-set (qt_headers ${qt_headers}
+set (internal_qt_headers ${internal_qt_headers}
   terrain/TerrainEditor.hh
   terrain/TerrainEditorPalette.hh
   PARENT_SCOPE

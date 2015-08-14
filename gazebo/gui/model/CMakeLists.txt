@@ -31,17 +31,13 @@ set (qt_headers_local
   model/VisualConfig.hh
 )
 
-set (headers ${headers}
-  model/ModelEditorEvents.hh
-  PARENT_SCOPE
-)
-
-set (install_headers
+set (headers_install
+  ModelEditorEvents.hh
   ModelEditor.hh
 )
 
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests ${qt_tests}
+  set (qt_tests
     JointMaker_TEST.cc
     ExtrudeDialog_TEST.cc
     ModelCreator_TEST.cc
@@ -73,5 +69,7 @@ if (HAVE_GRAPHVIZ)
 endif()
 
 set (sources ${sources} ${sources_local} PARENT_SCOPE)
-set (qt_headers ${qt_headers} ${qt_headers_local} PARENT_SCOPE)
-gz_install_includes("gui/model" ${install_headers})
+set (internal_qt_headers ${internal_qt_headers} ${qt_headers_local} PARENT_SCOPE)
+
+gz_build_qt_tests(${qt_tests})
+gz_install_includes("gui/model" ${headers_install})

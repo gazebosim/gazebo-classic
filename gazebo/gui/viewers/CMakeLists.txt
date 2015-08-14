@@ -11,12 +11,7 @@ set (sources ${sources}
   PARENT_SCOPE
 )
 
-set (headers ${headers}
-  viewers/ViewFactory.hh
-  PARENT_SCOPE
-)
-
-set (qt_headers ${qt_headers}
+set (internal_qt_headers ${internal_qt_headers}
   viewers/ImageFrame.hh
   viewers/ImageView.hh
   viewers/ImagesView.hh
@@ -26,6 +21,13 @@ set (qt_headers ${qt_headers}
   PARENT_SCOPE
 )
 
+set (headers_install
+  ViewFactory.hh
+)
+
 set (qt_tests
   ImagesView_TEST.cc
 )
+
+gz_build_qt_tests(${qt_tests})
+gz_install_includes("gui/viewers" ${headers_install})
