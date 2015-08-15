@@ -50,7 +50,6 @@ WideAngleCameraSensor::WideAngleCameraSensor()
 //////////////////////////////////////////////////
 WideAngleCameraSensor::~WideAngleCameraSensor()
 {
-  //TODO
 }
 
 //////////////////////////////////////////////////
@@ -184,7 +183,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     msg.set_f(lens->GetF());
 
     msg.set_fun(lens->GetFun());
-    msg.set_circular(lens->IsCircular());
+    msg.set_scale_to_hfov(lens->GetScaleToHFOV());
     msg.set_cutoff_angle(lens->GetCutOffAngle());
 
     msg.set_env_texture_size(wcamera->GetEnvTextureSize());
@@ -237,6 +236,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
   if(_msg->has_fun())
     lens->SetFun(_msg->fun());
 
-  if(_msg->has_circular())
-    lens->SetCircular(_msg->circular());
+  if(_msg->has_scale_to_hfov())
+    lens->SetScaleToHFOV(_msg->scale_to_hfov());
+  gzdbg << "Stil alive\n";
 }

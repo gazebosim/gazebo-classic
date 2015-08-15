@@ -49,9 +49,9 @@ namespace gazebo
       /// \param[in] _c1 Image scaling constant
       /// \param[in] _c2 Angle scaling constant
       /// \param[in] _fun Angle transform function
-      /// \param[in] _fun Focal length of the optical system, default value is 1
-      /// \param[in] _c3 Angle shift constant, default value is 0, you probably don't wont to change it
-      public: void Init(float _c1,float _c2,std::string _fun,float _f=1.0f,float _c3=0.0f);
+      /// \param[in] _fun Focal length of the optical system
+      /// \param[in] _c3 Angle shift constant, should be 0 in most cases
+      public: void Init(float _c1,float _c2,std::string _fun,float _f,float _c3);
 
       /// \brief Init camera lens with standard mapping function
       /// \param[in] _name Mapping function name
@@ -64,59 +64,63 @@ namespace gazebo
       /// \brief Load camera lens with default parameters
       public: void Load();
 
-      /// \brief Get c1 constant
+      /// \brief Gets c1 constant
       /// \return c1 constant
       public: float GetC1() const;
 
-      /// \brief Get c2 constant
+      /// \brief Gets c2 constant
       /// \return c2 constant
       public: float GetC2() const;
 
-      /// \brief Get c3 constant
+      /// \brief Gets c3 constant
       /// \return c3 constant
       public: float GetC3() const;
 
-      /// \brief Get f constant
+      /// \brief Gets f constant
       /// \return f constant
       public: float GetF() const;
 
-      /// \brief Get angle transform function
-      /// \return angle transform function string
+      /// \brief Gets angle transform function
+      /// \return Angle transform function string
       public: std::string GetFun() const;
 
-      /// \brief Get cut off angle
+      /// \brief Gets cut off angle
       /// \return Cut off angle
       public: float GetCutOffAngle() const;
 
-      /// \brief Set c1 constant
+      /// \brief Checks if image should be scaled to fit horisontal FOV
+      /// \return True if the image will be scaled
+      public: bool GetScaleToHFOV() const;
+
+      /// \brief Sets c1 constant
       /// \param[in] _c c1 constant
       public: void SetC1(float _c);
 
-      /// \brief Set c2 constant
+      /// \brief Sets c2 constant
       /// \param[in] _c c2 constant
       public: void SetC2(float _c);
 
-      /// \brief Set c3 constant
+      /// \brief Sets c3 constant
       /// \param[in] _c c3 constant
       public: void SetC3(float _c);
 
-      /// \brief Set f constant
+      /// \brief Sets f constant
       /// \param[in] _f f constant
       public: void SetF(float _f);
 
-      /// \brief Set angle transform function
-      /// \param[in] _fun angle transform function string
+      /// \brief Sets angle transform function
+      /// \param[in] _fun Angle transform function string
       public: void SetFun(std::string _fun);
 
-      /// \brief Set cut-off angle
+      /// \brief Sets cut-off angle
       /// \param[in] _angle cut-off angle
       public: void SetCutOffAngle(float _angle);
 
-      /// \brief Set whether the lens is circular
-      /// \param[in] _circular Whether the lens should be circular
-      public: void SetCircular(bool _circular);
+      /// \brief Sets whether the image should be scaled to fit horisontal FOV
+      /// \param[in] _scale true if it should, note: c1 and f constants are ignored in this case
+      public: void SetScaleToHFOV(bool _scale);
 
-      /// \brief Convert standard projection to custom
+      /// \brief Converts projection type from one of the predefined projection typed to custom
       private: void ConvertToCustom();
 
       /// \brief Get lens projection type
@@ -127,13 +131,9 @@ namespace gazebo
       /// \param[in] _type Lens projection type string
       public: void SetType(std::string _type);
 
-      /// \brief Check if lens type is custom
+      /// \brief Checks if lens type is of the custom type
       /// \return True if this->GetType() == "custom"
       public: bool IsCustom() const;
-
-      /// \brief Check if lens is circular
-      /// \return True if the lens is circular
-      public: bool IsCircular() const;
 
       /// \brief Set uniform variables of shader for the provided material technique pass
       /// \param[in] _pass Ogre::Pass used for rendering

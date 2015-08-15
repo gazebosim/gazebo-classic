@@ -32,13 +32,11 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-WideAngleCamera::WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene, bool _autoRender, int _textureSize):
+WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
+    ScenePtr _scene, bool _autoRender, int _textureSize):
   Camera(_namePrefix,_scene,_autoRender),
   envTextureSize(_textureSize)
 {
-  // this->sdf->Reset();
-  // sdf::initFile("wideanglecamera.sdf",this->sdf);
-
   this->dataPtr = new WideAngleCameraPrivate;
   this->lens = new CameraLens();
 
@@ -53,7 +51,6 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene
 //////////////////////////////////////////////////
 WideAngleCamera::~WideAngleCamera()
 {
-  //TODO
   delete this->dataPtr;
   delete this->lens;
 }
@@ -247,9 +244,6 @@ void WideAngleCamera::RenderImpl()
   compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
     this->envCubeMapTexture->getName());
 
-  //FIXME: remove
-  // this->lens->SetMaterialVariables(this->GetAspectRatio(),this->GetHFOV().Radian());
-
   this->renderTarget->update();
 }
 
@@ -295,36 +289,12 @@ CameraLens::~CameraLens()
 //////////////////////////////////////////////////
 void CameraLens::Init(float _c1,float _c2,std::string _fun,float _f,float _c3)
 {
-  this->SetC1(_c1);
-  this->SetC2(_c2);
-  this->SetC3(_c3);
-  this->SetF(_f);
+  this->dataPtr->c1 = _c1;
+  this->dataPtr->c2 = _c2;
+  this->dataPtr->c3 = _c3;
+  this->dataPtr->f = _f;
 
-  if(_fun == "tan")
-    this->dataPtr->fun = CameraLensPrivate::TAN;
-  else if(_fun == "sin")
-    this->dataPtr->fun = CameraLensPrivate::SIN;
-  else if(_fun == "id")
-    this->dataPtr->fun = CameraLensPrivate::ID;
-  else if(_fun == "cos")
-  {
-    gzthrow("Cosine is not supported for custom mapping functions");
-  }
-  else if(_fun == "cot")
-  {
-    gzthrow("Cotangent is not supported for custom mapping functions");
-  }
-  else
-  {
-    std::stringstream sstr;
-    sstr << "Failed to create custom mapping with function [" << _fun << "]";
-
-    gzthrow(sstr.str());
-  }
-
-  // The fun is correct
-  if(this->IsCustom())
-    this->sdf->GetElement("custom_function")->GetElement("fun")->Set(_fun);
+  this->SetFun(_fun);
 }
 
 //////////////////////////////////////////////////
@@ -454,9 +424,29 @@ void CameraLens::SetFun(std::string _fun)
   if(!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("fun")->Set(_fun);
+  if(_fun == "tan")
+    this->dataPtr->fun = CameraLensPrivate::TAN;
+  else if(_fun == "sin")
+    this->dataPtr->fun = CameraLensPrivate::SIN;
+  else if(_fun == "id")
+    this->dataPtr->fun = CameraLensPrivate::ID;
+  else if(_fun == "cos")
+  {
+    gzthrow("Cosine is not supported for custom mapping functions");
+  }
+  else if(_fun == "cot")
+  {
+    gzthrow("Cotangent is not supported for custom mapping functions");
+  }
+  else
+  {
+    std::stringstream sstr;
+    sstr << "Failed to create custom mapping with function [" << _fun << "]";
 
-  this->Load();
+    gzthrow(sstr.str());
+  }
+
+  this->sdf->GetElement("custom_function")->GetElement("fun")->Set(_fun);
 }
 
 //////////////////////////////////////////////////
@@ -468,14 +458,16 @@ void CameraLens::SetCutOffAngle(float _angle)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetCircular(bool _circular)
+void CameraLens::SetScaleToHFOV(bool _scale)
 {
-  this->sdf->GetElement("circular")->Set(_circular);
+  this->sdf->GetElement("scale_to_hfov")->Set(_scale);
 }
 
 //////////////////////////////////////////////////
 void CameraLens::ConvertToCustom()
 {
+  this->SetType("custom");
+
   sdf::ElementPtr cf = this->sdf->AddElement("custom_function");
 
   cf->AddElement("c1")->Set((double)this->dataPtr->c1);
@@ -485,8 +477,6 @@ void CameraLens::ConvertToCustom()
 
   std::string funs[] = {"sin","tan","id"};
   cf->AddElement("fun")->Set(funs[(int)this->dataPtr->fun]);
-
-  this->SetType("custom");
 }
 
 //////////////////////////////////////////////////
@@ -498,18 +488,20 @@ std::string CameraLens::GetType() const
 //////////////////////////////////////////////////
 void CameraLens::SetType(std::string _type)
 {
-  std::map<std::string,std::tuple<float,float,float,float,std::string> > fun_types;
+  std::map< std::string,std::tuple<float,float,float,
+      float,CameraLensPrivate::MapFunction> > fun_types;
 
   // c1,c2,c3,f,fun
-  fun_types.emplace("gnomonical",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan"));
-  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,"tan"));
-  fun_types.emplace("stereographic_",  std::make_tuple(2.0f,2.0f,0.0f,0.5f,"tan"));
-  fun_types.emplace("equidistant",  std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id"));
-  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,"sin"));
-  fun_types.emplace("orthographic", std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin"));
+  fun_types.emplace("gnomonical",     std::make_tuple(1.0f,1.0f,0.0f,1.0f,TAN));
+  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,TAN));
+  fun_types.emplace("stereographic_", std::make_tuple(2.0f,2.0f,0.0f,0.5f,TAN));
+  fun_types.emplace("equidistant",    std::make_tuple(1.0f,1.0f,0.0f,1.0f,ID));
+  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,SIN));
+  fun_types.emplace("orthographic",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,SIN));
 
-  fun_types.emplace("custom",   std::make_tuple(this->GetC1(),this->GetC2(),this->GetC3()
-      ,this->GetF(),this->GetFun()));
+  fun_types.emplace("custom",
+      std::make_tuple(this->GetC1(),this->GetC2(),this->GetC3(),
+      this->GetF(),this->GetFun()));
 
   std::tuple<float,float,float,float,std::string> params;
   try
@@ -524,12 +516,23 @@ void CameraLens::SetType(std::string _type)
     gzthrow(sstr.str());
   }
 
-  this->Init(
-    std::get<0>(params),
-    std::get<1>(params),
-    std::get<4>(params),
-    std::get<3>(params),
-    std::get<2>(params));
+  if(_type == "custom")
+  {
+    this->SetC1(std::get<0>(params));
+    this->SetC2(std::get<1>(params));
+    this->SetC3(std::get<2>(params));
+    this->SetF(std::get<3>(params));
+    this->SetFun(std::get<4>(params));
+  }
+  else
+  {
+    // Do not write values to SDF
+    this->dataPtr->c1 = std::get<0>(params);
+    this->dataPtr->c2 = std::get<0>(params);
+    this->dataPtr->c3 = std::get<0>(params);
+    this->dataPtr->f = std::get<0>(params);
+    this->dataPtr->fun = std::get<0>(params);
+  }
 
   this->sdf->GetElement("type")->Set(_type);
 }
@@ -541,9 +544,9 @@ bool CameraLens::IsCustom() const
 }
 
 //////////////////////////////////////////////////
-bool CameraLens::IsCircular() const
+bool CameraLens::GetScaleToHFOV() const
 {
-  return this->sdf->Get<bool>("circular");
+  return this->sdf->Get<bool>("scale_to_hfov");
 }
 
 //////////////////////////////////////////////////
@@ -558,11 +561,11 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov)
     math::Vector3(0,0,1)
   };
 
-  uniforms->setNamedConstant("c1",(Ogre::Real)this->dataPtr->c1);
-  uniforms->setNamedConstant("c2",(Ogre::Real)this->dataPtr->c2);
-  uniforms->setNamedConstant("c3",(Ogre::Real)this->dataPtr->c3);
+  uniforms->setNamedConstant("c1",(Ogre::Real)(this->dataPtr->c1));
+  uniforms->setNamedConstant("c2",(Ogre::Real)(this->dataPtr->c2));
+  uniforms->setNamedConstant("c3",(Ogre::Real)(this->dataPtr->c3));
 
-  if(!this->IsCircular())
+  if(this->GetScaleToHFOV())
   {
     float fun_res = 1;
     float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
@@ -577,30 +580,34 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov)
         break;
       case CameraLensPrivate::ID:
         fun_res = param;
+      default:
+        GZ_ASSERT(false,"Invalid function");
     }
 
     float new_f = 1.0f/(this->dataPtr->c1*fun_res);
 
-    uniforms->setNamedConstant("f",(Ogre::Real)new_f);
+    uniforms->setNamedConstant("f",(Ogre::Real)(new_f));
   }
   else
-    uniforms->setNamedConstant("f",(Ogre::Real)this->dataPtr->f);
+    uniforms->setNamedConstant("f",(Ogre::Real)(this->dataPtr->f));
 
   uniforms->setNamedConstant("fun",Ogre::Vector3(
       fun_m[this->dataPtr->fun].x,
       fun_m[this->dataPtr->fun].y,
       fun_m[this->dataPtr->fun].z));
 
-  uniforms->setNamedConstant("cutOffAngle",(Ogre::Real)this->dataPtr->cutOffAngle);
+  uniforms->setNamedConstant("cutOffAngle",
+    (Ogre::Real)(this->dataPtr->cutOffAngle));
 
   Ogre::GpuProgramParametersSharedPtr uniforms_vs =
     _pass->getVertexProgramParameters();
 
-  uniforms_vs->setNamedConstant("ratio",(Ogre::Real)_ratio);
+  uniforms_vs->setNamedConstant("ratio",(Ogre::Real)(_ratio));
 }
 
 //////////////////////////////////////////////////
-void WideAngleCamera::notifyMaterialRender(Ogre::uint32 _pass_id, Ogre::MaterialPtr &_material)
+void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
+    Ogre::MaterialPtr &_material)
 {
   if(_material.isNull())
     return;
