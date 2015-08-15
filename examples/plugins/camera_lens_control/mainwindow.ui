@@ -142,7 +142,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="cbCircular">
+   <widget class="QCheckBox" name="cbScaleToHFOV">
     <property name="geometry">
      <rect>
       <x>220</x>
@@ -152,7 +152,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Circular</string>
+     <string>ScaleToHFOV</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pbSpawn">
