@@ -424,21 +424,11 @@ void CameraLens::SetFun(std::string _fun)
   if(!this->IsCustom())
     this->ConvertToCustom();
 
-  if(_fun == "tan")
-    this->dataPtr->fun = CameraLensPrivate::TAN;
-  else if(_fun == "sin")
-    this->dataPtr->fun = CameraLensPrivate::SIN;
-  else if(_fun == "id")
-    this->dataPtr->fun = CameraLensPrivate::ID;
-  else if(_fun == "cos")
+  try
   {
-    gzthrow("Cosine is not supported for custom mapping functions");
+    this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum(_fun);
   }
-  else if(_fun == "cot")
-  {
-    gzthrow("Cotangent is not supported for custom mapping functions");
-  }
-  else
+  catch(...)
   {
     std::stringstream sstr;
     sstr << "Failed to create custom mapping with function [" << _fun << "]";
@@ -475,8 +465,7 @@ void CameraLens::ConvertToCustom()
   cf->AddElement("c3")->Set((double)this->dataPtr->c3);
   cf->AddElement("f")->Set((double)this->dataPtr->f);
 
-  std::string funs[] = {"sin","tan","id"};
-  cf->AddElement("fun")->Set(funs[(int)this->dataPtr->fun]);
+  cf->AddElement("fun")->Set(this->dataPtr->fun.AsString());
 }
 
 //////////////////////////////////////////////////
@@ -489,19 +478,19 @@ std::string CameraLens::GetType() const
 void CameraLens::SetType(std::string _type)
 {
   std::map< std::string,std::tuple<float,float,float,
-      float,CameraLensPrivate::MapFunction> > fun_types;
+      float,std::string> > fun_types;
 
   // c1,c2,c3,f,fun
-  fun_types.emplace("gnomonical",     std::make_tuple(1.0f,1.0f,0.0f,1.0f,TAN));
-  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,TAN));
-  fun_types.emplace("stereographic_", std::make_tuple(2.0f,2.0f,0.0f,0.5f,TAN));
-  fun_types.emplace("equidistant",    std::make_tuple(1.0f,1.0f,0.0f,1.0f,ID));
-  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,SIN));
-  fun_types.emplace("orthographic",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,SIN));
+  fun_types.emplace("gnomonical",     std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan"));
+  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,"tan"));
+  fun_types.emplace("stereographic_", std::make_tuple(2.0f,2.0f,0.0f,0.5f,"tan"));
+  fun_types.emplace("equidistant",    std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id"));
+  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,"sin"));
+  fun_types.emplace("orthographic",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin"));
 
   fun_types.emplace("custom",
       std::make_tuple(this->GetC1(),this->GetC2(),this->GetC3(),
-      this->GetF(),this->GetFun()));
+      this->GetF(),CameraLensPrivate::MapFunctionEnum(this->GetFun()).AsString()));
 
   std::tuple<float,float,float,float,std::string> params;
   try
@@ -528,10 +517,10 @@ void CameraLens::SetType(std::string _type)
   {
     // Do not write values to SDF
     this->dataPtr->c1 = std::get<0>(params);
-    this->dataPtr->c2 = std::get<0>(params);
-    this->dataPtr->c3 = std::get<0>(params);
-    this->dataPtr->f = std::get<0>(params);
-    this->dataPtr->fun = std::get<0>(params);
+    this->dataPtr->c2 = std::get<1>(params);
+    this->dataPtr->c3 = std::get<2>(params);
+    this->dataPtr->f = std::get<3>(params);
+    this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
   }
 
   this->sdf->GetElement("type")->Set(_type);
@@ -567,22 +556,8 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov)
 
   if(this->GetScaleToHFOV())
   {
-    float fun_res = 1;
     float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
-
-    switch(this->dataPtr->fun)
-    {
-      case CameraLensPrivate::SIN:
-        fun_res = sin(param);
-        break;
-      case CameraLensPrivate::TAN:
-        fun_res = tan(param);
-        break;
-      case CameraLensPrivate::ID:
-        fun_res = param;
-      default:
-        GZ_ASSERT(false,"Invalid function");
-    }
+    float fun_res = this->dataPtr->fun.Apply(param);
 
     float new_f = 1.0f/(this->dataPtr->c1*fun_res);
 
@@ -591,10 +566,10 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov)
   else
     uniforms->setNamedConstant("f",(Ogre::Real)(this->dataPtr->f));
 
+  auto vec_fun = this->dataPtr->fun.AsVector3();
+
   uniforms->setNamedConstant("fun",Ogre::Vector3(
-      fun_m[this->dataPtr->fun].x,
-      fun_m[this->dataPtr->fun].y,
-      fun_m[this->dataPtr->fun].z));
+      vec_fun.x, vec_fun.y, vec_fun.z));
 
   uniforms->setNamedConstant("cutOffAngle",
     (Ogre::Real)(this->dataPtr->cutOffAngle));

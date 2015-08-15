@@ -28,16 +28,46 @@ namespace gazebo
     /// \brief Private fields of camera lens
     class CameraLensPrivate
     {
-      public: float c1;
-      public: float c2;
-      public: float c3;
-      public: float f;
-      public: float cutOffAngle;
+      public: float c1 = 1.0f;
+      public: float c2 = 1.0f;
+      public: float c3 = 0.0f;
+      public: float f = 1.0f;
+      public: float cutOffAngle = 1.5707f;
 
-      public: enum MapFunction {SIN=0,TAN,ID};
-      public: MapFunction fun;
+      public: class MapFunctionEnum
+              {
+                public: explicit MapFunctionEnum(std::string str)
+                {
+                  for(auto item : variants)
+                    if(std::get<0>(item) == str)
+                    {
+                      value = item;
+                      break;
+                    }
+                }
 
-      public: WideAngleCamera *parent;
+                public: math::Vector3 AsVector3() { return std::get<1>(value); }
+
+                public: std::string AsString() { return std::get<0>(value); }
+
+                public: float Apply(float _t) { return std::get<2>(value)(_t); }
+
+                public: MapFunctionEnum &operator=(const MapFunctionEnum &_fun)
+                {
+                  this->value = _fun.value;
+                  return *this;
+                }
+
+                private: const std::vector<
+                    std::tuple<std::string,math::Vector3,std::function<float(float)>>> variants = {
+                      std::make_tuple("sin", math::Vector3(1,0,0), std::function<float(float)>(static_cast<float(*)(float)>(&std::sin))),
+                      std::make_tuple("tan", math::Vector3(0,1,0), std::function<float(float)>(static_cast<float(*)(float)>(&std::tan))),
+                      std::make_tuple("id",  math::Vector3(0,0,1), std::function<float(float)>([](float t) -> float { return t; }))};
+
+                private: decltype(variants)::value_type value;
+              };
+
+      public: MapFunctionEnum fun = MapFunctionEnum("id");
     };
   }
 }

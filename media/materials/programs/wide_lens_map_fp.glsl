@@ -43,12 +43,12 @@ void main()
 	// gl_FragColor = vec4(vec3(c1,c2,c3),1.0);
 	// return;
 
-	if(true || theta < cutOffAngle)
 	{
-		vec3 tc ;
+		vec3 tc;
 		tc = map(theta);
 		gl_FragColor = vec4(textureCube(envMap,tc).rgb,1);
 	}
-	else
-		gl_FragColor = vec4(0,0,0,1.0);
+
+	if(theta > cutOffAngle)
+		gl_FragColor.rgb = gl_FragColor.rgb*0.2;
 }
