@@ -108,7 +108,6 @@ void Model::LoadLinks()
   if (this->sdf->HasElement("link"))
   {
     sdf::ElementPtr linkElem = this->sdf->GetElement("link");
-//    bool canonicalLinkInitialized = false;
     while (linkElem)
     {
       // Create a new link
@@ -118,12 +117,6 @@ void Model::LoadLinks()
       /// \TODO: canonical link is hardcoded to the first link.
       ///        warn users for now, need  to add parsing of
       ///        the canonical tag in sdf
-      /*if (!canonicalLinkInitialized)
-      {
-        link->SetCanonicalLink(true);
-        this->canonicalLink = link;
-        canonicalLinkInitialized = true;
-      }*/
 
       // find canonical link - there should only be one within a tree of models
       if (!this->canonicalLink)
@@ -177,7 +170,7 @@ void Model::LoadLinks()
 //////////////////////////////////////////////////
 void Model::LoadModels()
 {
-  // Load the bodies
+  // Load the models
   if (this->sdf->HasElement("model"))
   {
     sdf::ElementPtr modelElem = this->sdf->GetElement("model");

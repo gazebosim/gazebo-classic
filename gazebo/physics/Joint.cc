@@ -226,6 +226,64 @@ void Joint::Load(sdf::ElementPtr _sdf)
         this->GetWorld()->GetByName(parentName));
   }
 
+  // Link might not have been found because it is on another model
+  // or because the model name has been changed, e.g. spawning the same model
+  // twice will result in some suffix appended to the model name
+  // First try to find the link with different scopes.
+  if (!this->childLink)
+  {
+    BasePtr parentModel = this->model;
+
+    while (!this->childLink)
+    {
+      std::string scopedChildName =
+          parentModel->GetScopedName() + "::" + childName;
+      this->childLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(scopedChildName));
+
+      if (parentModel->GetParent() && parentModel->HasType(MODEL))
+        parentModel = parentModel->GetParent();
+      else
+        break;
+    }
+    if (!childLink)
+    {
+      std::string childNameThisModel = childName.substr(childName.find("::"));
+      childNameThisModel = parentModel->GetName() + childNameThisModel;
+
+      this->childLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(childNameThisModel));
+    }
+  }
+
+  if (!this->parentLink)
+  {
+    BasePtr parentModel = this->model;
+
+    while (!this->parentLink)
+    {
+      std::string scopedParentName =
+          parentModel->GetScopedName() + "::" + parentName;
+
+      this->parentLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(scopedParentName));
+
+      if (parentModel->GetParent() && parentModel->HasType(MODEL))
+        parentModel = parentModel->GetParent();
+      else
+        break;
+    }
+    if (!this->parentLink)
+    {
+      std::string parentNameThisModel =
+          parentName.substr(parentName.find("::"));
+      parentNameThisModel = parentModel->GetName() + parentNameThisModel;
+
+      this->parentLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(parentNameThisModel));
+    }
+  }
+
   if (!this->parentLink && parentName != std::string("world"))
     gzthrow("Couldn't Find Parent Link[" + parentName + "]");
 
