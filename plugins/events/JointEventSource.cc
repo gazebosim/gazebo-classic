@@ -29,7 +29,7 @@ JointEventSource::JointEventSource(transport::PublisherPtr _pub,
    range(INVALID),
    isTriggered(false)
 {
-  this->min = std::numeric_limits<double>::min();
+  this->min = std::numeric_limits<double>::lowest();
   this->max = std::numeric_limits<double>::max();
 }
 
