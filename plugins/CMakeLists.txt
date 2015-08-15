@@ -61,6 +61,7 @@ set (plugins
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
+  SinusoidalForcePlugin
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
