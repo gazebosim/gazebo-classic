@@ -43,11 +43,13 @@ namespace gazebo
 
     protected: virtual void LoadGUIComponents(QWidget *_parent);
 
-    /// \brief Callbacks trigged when the buttons are pressed.
+    /// \brief Callbacks for QUI events
     protected slots: void OnButtonSpawn();
+
     protected slots: void OnButtonCalibrate();
 
     protected slots: void OnCbTypeChange();
+
     protected slots: void OnCbFunChange();  
 
     protected slots: void OnSbChange();
@@ -58,11 +60,14 @@ namespace gazebo
 
     protected slots: void OnTypeChanged();
 
+    /// \brief Callback for "~/selection" topic
     protected: void OnSelect(ConstSelectionPtr &_msg);
 
+    /// \brief Callback for "~/*/wideanglecamera_*/link/image_stamped" topic
     protected: void OnImageUpdate(ConstImageStampedPtr &_msg);
 
-    protected: void OnCameraProjectionCmd(ConstCameraLensCmdPtr &_msg);
+    /// \brief Callback for "~/*/wideanglecamera_*/link/lens_info" topic
+    protected: void OnCameraLensCmd(ConstCameraLensCmdPtr &_msg);
 
     /// \brief Counter used to create unique model names.
     private: unsigned int counter;
@@ -88,6 +93,7 @@ namespace gazebo
     /// \brief Subscriber to camera image messages.
     private: transport::SubscriberPtr infoSub;
 
+    /// \brief QT Widgets, that will be loaded from .ui file
     private: QPushButton *pbSpawn;
     private: QPushButton *pbCalibrate;
     private: QLabel *lbName;
@@ -98,13 +104,15 @@ namespace gazebo
     private: QDoubleSpinBox *sbC3;
     private: QDoubleSpinBox *sbF;
     private: QDoubleSpinBox *sbCA;
-    private: QCheckBox *cbCircular;
+    private: QCheckBox *cbScaleToHFOV;
 
     /// \brief Image output frame.
     private: gui::ImageFrame *imgFrame;
 
+    /// \brief Ignore messages from topic provider if it is set to true
     private: bool ignoreInfoMessages = false;
 
+    /// \brief Lock this when receiving an image
     private: boost::mutex recImgLock;
   };
 }

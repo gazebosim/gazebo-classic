@@ -112,14 +112,14 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
   this->sbC3        = _parent->findChild<QDoubleSpinBox*>("sbC3");
   this->sbF         = _parent->findChild<QDoubleSpinBox*>("sbF");
   this->sbCA        = _parent->findChild<QDoubleSpinBox*>("sbCA");
-  this->cbCircular  = _parent->findChild<QCheckBox*>("cbCircular");
+  this->cbScaleToHFOV  = _parent->findChild<QCheckBox*>("cbScaleToHFOV");
 
-  QWidget *wImagePlace = _parent->findChild<QWidget*>("wImagePlace");
+  // QWidget *wImagePlace = _parent->findChild<QWidget*>("wImagePlace");
 
-  this->imgFrame = new gui::ImageFrame(wImagePlace);
-  this->imgFrame->setMinimumSize(201,201);
-  this->imgFrame->setMaximumSize(201,201);
-  this->imgFrame->setVisible(true);
+  // this->imgFrame = new gui::ImageFrame(wImagePlace);
+  // this->imgFrame->setMinimumSize(201,201);
+  // this->imgFrame->setMaximumSize(201,201);
+  // this->imgFrame->setVisible(true);
 
   // fill combo boxes with values
   this->cbType->addItem("gnomonical");
@@ -139,7 +139,7 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
   // bind Events
   connect(this->cbType,SIGNAL(currentIndexChanged(int)),this,SLOT(OnTypeChanged()));
   connect(this->cbFun,SIGNAL(currentIndexChanged(int)),this,SLOT(OnCustomRequested()));
-  connect(this->cbCircular,SIGNAL(stateChanged(int)),this,SLOT(OnValueChanged()));
+  connect(this->cbScaleToHFOV,SIGNAL(stateChanged(int)),this,SLOT(OnValueChanged()));
 
   connect(this->sbC1,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
   connect(this->sbC2,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
@@ -190,7 +190,7 @@ void CameraLensControlExample::OnButtonSpawn()
     << "          </clip>"
     << "          <lens>"
     << "            <type>equisolid_angle</type>"
-    << "            <circular>true</circular>"
+    << "            <scale_to_hfov>true</scale_to_hfov>"
     << "            <advertise>true</advertise>"
     << "            <custom_function>"
     << "              <c1>2</c1>"
@@ -235,12 +235,12 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
     if(this->imageSub)
       this->imageSub->Unsubscribe();
 
-    this->imageSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/image",
-        &CameraLensControlExample::OnImageUpdate,this);
+    // this->imageSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/image",
+    //     &CameraLensControlExample::OnImageUpdate,this);
 
     // subscribe for the info messages
     this->infoSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/lens_info",
-        &CameraLensControlExample::OnCameraProjectionCmd,this);
+        &CameraLensControlExample::OnCameraLensCmd,this);
 
     this->cameraControlPub = this->node->Advertise<msgs::CameraLensCmd>(
       "~/"+_msg->name()+"/link/camera/lens_control",10);
@@ -254,14 +254,14 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnImageUpdate(ConstImageStampedPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->recImgLock);
+  // boost::mutex::scoped_lock lock(this->recImgLock);
 
   // Display received image
   // this->imgFrame->OnImage(_msg->image());
 }
 
 /////////////////////////////////////////////////
-void CameraLensControlExample::OnCameraProjectionCmd(ConstCameraLensCmdPtr &_msg)
+void CameraLensControlExample::OnCameraLensCmd(ConstCameraLensCmdPtr &_msg)
 {
   if(this->ignoreInfoMessages)
     return;
@@ -287,8 +287,8 @@ void CameraLensControlExample::OnCameraProjectionCmd(ConstCameraLensCmdPtr &_msg
     this->cbFun->setCurrentIndex(this->cbFun->findText(QString::fromStdString(_msg->fun())));
   }
 
-  if(_msg->has_circular())
-    this->cbCircular->setChecked(_msg->circular());
+  if(_msg->has_scale_to_hfov())
+    this->cbScaleToHFOV->setChecked(_msg->scale_to_hfov());
 }
 
 /////////////////////////////////////////////////
@@ -319,7 +319,7 @@ void CameraLensControlExample::OnValueChanged()
 
     msg.set_cutoff_angle(this->sbCA->value());
 
-    msg.set_circular(this->cbCircular->isChecked());
+    msg.set_scale_to_hfov(this->cbScaleToHFOV->isChecked());
 
     this->cameraControlPub->Publish(msg);
     gzmsg << "Control message sent" << std::endl;
