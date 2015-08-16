@@ -398,8 +398,8 @@ namespace gazebo
       /// \brief The root visual of the model.
       private: rendering::VisualPtr previewVisual;
 
-      /// \brief The root visual of the model.
-      private: rendering::VisualPtr mouseVisual;
+      /// \brief Visual currently being inserted into the model.
+      private: rendering::VisualPtr visualBeingInserted;
 
       /// \brief The pose of the model.
       private: math::Pose modelPose;

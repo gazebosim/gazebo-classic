@@ -125,13 +125,13 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->jointAct->setCheckable(true);
 
   // set up the action group so that only one action is active at one time.
-  QActionGroup *actionGroup = g_arrowAct->actionGroup();
-  if (actionGroup)
-  {
-    this->dataPtr->jointAct->setActionGroup(actionGroup);
-    connect(actionGroup, SIGNAL(triggered(QAction *)),
-        this, SLOT(OnAction(QAction *)));
-  }
+//  QActionGroup *actionGroup = g_arrowAct->actionGroup();
+//  if (actionGroup)
+//  {
+//    this->dataPtr->jointAct->setActionGroup(actionGroup);
+//    connect(actionGroup, SIGNAL(triggered(QAction *)),
+//        this, SLOT(OnAction(QAction *)));
+//  }
 
   QToolBar *toolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
   this->dataPtr->jointButton = new QToolButton(toolbar);
@@ -338,6 +338,7 @@ void ModelEditor::CreateMenus()
 /////////////////////////////////////////////////
 void ModelEditor::OnAddSelectedJoint()
 {
+  g_arrowAct->trigger();
   this->OnAddJoint(tr(this->dataPtr->selectedJointType.c_str()));
 }
 
@@ -348,7 +349,7 @@ void ModelEditor::OnAddJoint(const QString &_type)
   this->dataPtr->modelPalette->CreateJoint(type);
   this->dataPtr->selectedJointType = type;
   this->dataPtr->jointAct->setChecked(true);
-  gui::Events::manipMode("joint");
+  //gui::Events::manipMode("joint");
 }
 
 /////////////////////////////////////////////////

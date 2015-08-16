@@ -645,9 +645,9 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   if (_event.Dragging())
   {
     // this enables the joint maker to pan while connecting joints
-    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-    camera->HandleMouseEvent(_event);
-    return true;
+  //  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    //camera->HandleMouseEvent(_event);
+    return false;
   }
 
   rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
@@ -1467,7 +1467,7 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
 
   this->childLinkVis = _childLink;
 
-//  this->mouseMoveEnabled = false;
+  this->mouseMoveEnabled = false;
 }
 
 /////////////////////////////////////////////////
