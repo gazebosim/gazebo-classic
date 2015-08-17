@@ -106,7 +106,7 @@ namespace gazebo
       /// \param[in] _name Name of visual.
       /// \param[in] _size Size of the geometry.
       /// \param[in] _uri URI of the geometry.
-      public: void GetGeometry(const std::string &_name,
+      public: void Geometry(const std::string &_name,
           ignition::math::Vector3d &_size, std::string &_uri);
 
       /// \brief Set the material of a visual

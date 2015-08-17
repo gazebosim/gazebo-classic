@@ -1019,7 +1019,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName, _parentVis));
   linkVisual->Load();
-  linkVisual->SetPose(link->GetPose());
+  linkVisual->SetPose(link->Pose());
   link->linkVisual = linkVisual;
 
   // Visuals
@@ -1947,7 +1947,7 @@ void ModelCreator::OnPaste()
     }
 
     // Propagate copied entity's Z position and rotation
-    math::Pose copiedPose = copiedLink->GetPose();
+    math::Pose copiedPose = copiedLink->Pose();
     clonePose.pos.z = copiedPose.pos.z;
     clonePose.rot = copiedPose.rot;
 
@@ -2075,7 +2075,7 @@ void ModelCreator::GenerateSDF()
     for (auto &linksIt : this->allLinks)
     {
       LinkData *link = linksIt.second;
-      mid += link->GetPose().Pos();
+      mid += link->Pose().Pos();
       entityCount++;
     }
     for (auto &nestedModelsIt : this->allNestedModels)
@@ -2110,7 +2110,7 @@ void ModelCreator::GenerateSDF()
   {
     LinkData *link = linksIt.second;
     link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
-    link->linkVisual->SetPose(link->GetPose());
+    link->linkVisual->SetPose(link->Pose());
   }
   for (auto &nestedModelsIt : this->allNestedModels)
   {
@@ -2426,7 +2426,7 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    if (link->GetPose() != link->linkVisual->GetPose().Ign())
+    if (link->Pose() != link->linkVisual->GetPose().Ign())
     {
       link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
       this->ModelChanged();
@@ -2461,8 +2461,11 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   for (auto linksIt : this->allLinks)
   {
-    if (_name == linksIt.first ||
-        _name.find(linksIt.first) != std::string::npos)
+    std::string linkName;
+    size_t pos = _name.find_last_of("::");
+    if (pos != std::string::npos)
+      linkName = _name.substr(0, pos-1);
+    if (_name == linksIt.first || linkName == linksIt.first)
     {
       this->linkScaleUpdate[linksIt.first] = _scale;
       break;

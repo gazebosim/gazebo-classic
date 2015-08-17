@@ -213,7 +213,7 @@ void LinkData::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Pose3d LinkData::GetPose() const
+ignition::math::Pose3d LinkData::Pose() const
 {
   return this->linkSDF->Get<ignition::math::Pose3d>("pose");
 }
@@ -241,7 +241,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
         name.substr(name.find(linkName)+linkName.size()+2);
     ignition::math::Vector3d visOldSize;
     std::string uri;
-    visualConfig->GetGeometry(leafName,  visOldSize, uri);
+    visualConfig->Geometry(leafName,  visOldSize, uri);
     ignition::math::Vector3d visNewSize = it.first->GetGeometrySize();
     visualConfig->SetGeometry(leafName, visNewSize);
   }
@@ -258,7 +258,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 
     ignition::math::Vector3d colOldSize;
     std::string uri;
-    collisionConfig->GetGeometry(leafName,  colOldSize, uri);
+    collisionConfig->Geometry(leafName,  colOldSize, uri);
     ignition::math::Vector3d colNewSize = it.first->GetGeometrySize();
     collisionConfig->SetGeometry(leafName, colNewSize);
     colOldSizes[name] = colOldSize;
@@ -290,8 +290,8 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
       double newR = newSize.X() * 0.5;
       double newR3 = newR*newR*newR;
       // sphere volume: 4/3 * PI * r^3
-      oldVol += 4.0 / 3.0 * M_PI * r3;
-      newVol += 4.0 / 3.0 * M_PI * newR3;
+      oldVol += 4.0 / 3.0 * IGN_PI * r3;
+      newVol += 4.0 / 3.0 * IGN_PI * newR3;
     }
     else if (geomStr == "cylinder")
     {
@@ -300,8 +300,8 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
       double newR = newSize.X() * 0.5;
       double newR2 = newR*newR;
       // cylinder volume: PI * r^2 * height
-      oldVol += M_PI * r2 * oldSize.Z();
-      newVol += M_PI * newR2 * newSize.Z();
+      oldVol += IGN_PI * r2 * oldSize.Z();
+      newVol += IGN_PI * newR2 * newSize.Z();
     }
     else
     {
@@ -311,8 +311,14 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     }
   }
 
-  if (!ignition::math::equal(oldVol, 0.0, 1e-6))
-    volumeRatio = newVol / oldVol;
+  if (oldVol < 1e-10)
+  {
+    gzerr << "Volume is too small to compute accurate inertial values"
+        << std::endl;
+    return;
+  }
+
+  volumeRatio = newVol / oldVol;
 
   // set new mass
   double oldMass = this->mass;
@@ -375,7 +381,6 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   }
   else
   {
-//    dInertiaScale = _scale / this->scale;
     boxInertia = true;
   }
 
@@ -435,7 +440,7 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d LinkData::GetScale() const
+ignition::math::Vector3d LinkData::Scale() const
 {
   return this->scale;
 }
@@ -708,12 +713,12 @@ bool LinkData::Apply()
   // update internal variables
   msgs::Inertial *inertialMsg = linkMsg->mutable_inertial();
   this->mass = inertialMsg->mass();
-  this->inertiaIxx = inertialMsg->izz();
+  this->inertiaIxx = inertialMsg->ixx();
   this->inertiaIyy = inertialMsg->iyy();
   this->inertiaIzz = inertialMsg->izz();
 
   // update link visual pose
-  this->linkVisual->SetPose(this->GetPose());
+  this->linkVisual->SetPose(this->Pose());
 
   std::vector<msgs::Visual *> visualUpdateMsgsTemp;
   std::vector<msgs::Collision *> collisionUpdateMsgsTemp;
