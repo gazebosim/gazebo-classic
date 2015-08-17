@@ -23,70 +23,71 @@
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/TopToolbarPrivate.hh"
 #include "gazebo/gui/TopToolbar.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-TopToolbar::TopToolbar(QWidget *_parent) : QFrame(_parent)
+TopToolbar::TopToolbar(QWidget *_parent)
+  : QFrame(_parent), dataPtr(new TopToolbarPrivate)
 {
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-  this->toolbar = new QToolBar;
-  QHBoxLayout *toolLayout = new QHBoxLayout;
-  toolLayout->setContentsMargins(0, 0, 0, 0);
+  this->dataPtr->toolbar = new QToolBar;
 
   // Manipulation modes
   QActionGroup *actionGroup = new QActionGroup(this);
   if (g_arrowAct)
   {
     actionGroup->addAction(g_arrowAct);
-    this->toolbar->addAction(g_arrowAct);
+    this->dataPtr->toolbar->addAction(g_arrowAct);
   }
   if (g_translateAct)
   {
     actionGroup->addAction(g_translateAct);
-    this->toolbar->addAction(g_translateAct);
+    this->dataPtr->toolbar->addAction(g_translateAct);
   }
   if (g_rotateAct)
   {
     actionGroup->addAction(g_rotateAct);
-    this->toolbar->addAction(g_rotateAct);
+    this->dataPtr->toolbar->addAction(g_rotateAct);
   }
   if (g_scaleAct)
   {
     actionGroup->addAction(g_scaleAct);
-    this->toolbar->addAction(g_scaleAct);
+    this->dataPtr->toolbar->addAction(g_scaleAct);
   }
 
-  this->toolbar->addSeparator();
+  this->dataPtr->toolbar->addSeparator();
 
   // Insert simple shapes
   if (g_boxCreateAct)
-    this->toolbar->addAction(g_boxCreateAct);
+    this->dataPtr->toolbar->addAction(g_boxCreateAct);
   if (g_sphereCreateAct)
-    this->toolbar->addAction(g_sphereCreateAct);
+    this->dataPtr->toolbar->addAction(g_sphereCreateAct);
   if (g_cylinderCreateAct)
-    this->toolbar->addAction(g_cylinderCreateAct);
-  this->toolbar->addSeparator();
+    this->dataPtr->toolbar->addAction(g_cylinderCreateAct);
+  this->dataPtr->toolbar->addSeparator();
 
   // Insert lights
   if (g_pointLghtCreateAct)
-    this->toolbar->addAction(g_pointLghtCreateAct);
+    this->dataPtr->toolbar->addAction(g_pointLghtCreateAct);
   if (g_spotLghtCreateAct)
-    this->toolbar->addAction(g_spotLghtCreateAct);
+    this->dataPtr->toolbar->addAction(g_spotLghtCreateAct);
   if (g_dirLghtCreateAct)
-    this->toolbar->addAction(g_dirLghtCreateAct);
-  this->toolbar->addSeparator();
+    this->dataPtr->toolbar->addAction(g_dirLghtCreateAct);
+  this->dataPtr->toolbar->addSeparator();
 
   // Copy & Paste
   if (g_copyAct)
-    this->toolbar->addAction(g_copyAct);
+    this->dataPtr->toolbar->addAction(g_copyAct);
   if (g_pasteAct)
-    this->toolbar->addAction(g_pasteAct);
+    this->dataPtr->toolbar->addAction(g_pasteAct);
 
-  this->toolbar->addSeparator();
+  this->dataPtr->toolbar->addSeparator();
 
   // Align
   if (g_alignAct)
@@ -101,7 +102,7 @@ TopToolbar::TopToolbar(QWidget *_parent) : QFrame(_parent)
     alignMenu->addAction(g_alignAct);
     alignButton->setMenu(alignMenu);
     alignButton->setPopupMode(QToolButton::InstantPopup);
-    g_alignButtonAct = this->toolbar->addWidget(alignButton);
+    g_alignButtonAct = this->dataPtr->toolbar->addWidget(alignButton);
     connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
   }
 
@@ -109,10 +110,10 @@ TopToolbar::TopToolbar(QWidget *_parent) : QFrame(_parent)
   if (g_snapAct)
   {
     actionGroup->addAction(g_snapAct);
-    this->toolbar->addAction(g_snapAct);
+    this->dataPtr->toolbar->addAction(g_snapAct);
   }
 
-  this->toolbar->addSeparator();
+  this->dataPtr->toolbar->addSeparator();
 
   // View angle
   if (g_viewAngleAct)
@@ -130,38 +131,46 @@ TopToolbar::TopToolbar(QWidget *_parent) : QFrame(_parent)
 
     viewAngleButton->setMenu(viewAngleMenu);
     viewAngleButton->setPopupMode(QToolButton::InstantPopup);
-    g_viewAngleButtonAct = this->toolbar->addWidget(viewAngleButton);
+    g_viewAngleButtonAct = this->dataPtr->toolbar->addWidget(viewAngleButton);
   }
 
   // Empty space to push whatever comes next to the right
   QWidget *spacer = new QWidget();
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  QAction *spacerAction = this->toolbar->addWidget(spacer);
+  QAction *spacerAction = this->dataPtr->toolbar->addWidget(spacer);
   spacerAction->setObjectName("toolbarSpacerAction");
 
   // Screenshot / logging
   if (g_screenshotAct)
-    this->toolbar->addAction(g_screenshotAct);
+    this->dataPtr->toolbar->addAction(g_screenshotAct);
   if (g_dataLoggerAct)
-    this->toolbar->addAction(g_dataLoggerAct);
+    this->dataPtr->toolbar->addAction(g_dataLoggerAct);
 
+  // Layout
+  QHBoxLayout *toolLayout = new QHBoxLayout;
+  toolLayout->setContentsMargins(0, 0, 0, 0);
   toolLayout->addSpacing(10);
-  toolLayout->addWidget(this->toolbar);
+  toolLayout->addWidget(this->dataPtr->toolbar);
   toolLayout->addSpacing(10);
   this->setLayout(toolLayout);
+
+  // Connections
+  this->dataPtr->connections.push_back(
+      gui::Events::ConnectWindowMode(
+      boost::bind(&TopToolbar::SetMode, this, _1)));
 }
 
 /////////////////////////////////////////////////
 TopToolbar::~TopToolbar()
 {
-  delete this->toolbar;
-  this->toolbar = NULL;
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 QToolBar *TopToolbar::GetToolbar() const
 {
-  return this->toolbar;
+  return this->dataPtr->toolbar;
 }
 
 /////////////////////////////////////////////////
@@ -171,35 +180,46 @@ void TopToolbar::SetMode(const std::string &_mode)
   bool simulation = _mode == "Simulation";
   bool logPlayback = _mode == "LogPlayback";
 
-  QList<QAction *> acts = this->toolbar->actions();
+  QList<QAction *> acts = this->dataPtr->toolbar->actions();
   for (int i = 0; i < acts.size(); ++i)
   {
-    // Visible in Simulation and ModelEditor
-    if (acts[i] == g_arrowAct ||
+    // Simulation / Model Editor / Log Playback
+    if (acts[i] == g_screenshotAct ||
+        acts[i] == g_viewAngleButtonAct ||
+        acts[i]->objectName() == "toolbarSpacerAction")
+    {
+      acts[i]->setVisible(modelEditor || simulation || logPlayback);
+    }
+    // Simulation / Model Editor
+    else if (acts[i] == g_arrowAct ||
         acts[i] == g_rotateAct ||
         acts[i] == g_translateAct ||
         acts[i] == g_scaleAct ||
-        acts[i] == g_screenshotAct ||
         acts[i] == g_copyAct ||
         acts[i] == g_pasteAct ||
         acts[i] == g_alignButtonAct ||
-        acts[i] == g_viewAngleButtonAct ||
-        acts[i] == g_snapAct ||
-        acts[i]->objectName() == "toolbarSpacerAction")
+        acts[i] == g_snapAct)
     {
       acts[i]->setVisible(modelEditor || simulation);
+
       // Change preceding separator as well
       if (i > 0 && acts[i-1]->isSeparator())
       {
         acts[i-1]->setVisible(modelEditor || simulation);
       }
     }
-    // Visible in Model Editor only
-    else if(acts[i]->objectName().toStdString().find("modelEditor") != -1)
+    // Simulation / Log Playback
+    else if (acts[i] == g_dataLoggerAct)
+    {
+      acts[i]->setVisible(simulation || logPlayback);
+    }
+    // Model Editor only
+    else if (acts[i]->objectName().toStdString().find("modelEditor") !=
+        std::string::npos)
     {
       acts[i]->setVisible(modelEditor);
     }
-    // Visible in Simulation only
+    // Simulation only
     else
     {
       acts[i]->setVisible(simulation);
@@ -210,7 +230,7 @@ void TopToolbar::SetMode(const std::string &_mode)
 /////////////////////////////////////////////////
 void TopToolbar::InsertAction(const QString &_before, QAction *_action)
 {
-  QAction *beforeAction = this->toolbar->findChild<QAction *>(_before);
+  QAction *beforeAction = this->dataPtr->toolbar->findChild<QAction *>(_before);
   if (!beforeAction)
   {
     gzerr << "Requested action [" << _before.toStdString() << "] not found"
@@ -218,13 +238,13 @@ void TopToolbar::InsertAction(const QString &_before, QAction *_action)
     return;
   }
 
-  this->toolbar->insertAction(beforeAction, _action);
+  this->dataPtr->toolbar->insertAction(beforeAction, _action);
 }
 
 /////////////////////////////////////////////////
 QAction *TopToolbar::InsertSeparator(const QString &_before)
 {
-  QAction *beforeAction = this->toolbar->findChild<QAction *>(_before);
+  QAction *beforeAction = this->dataPtr->toolbar->findChild<QAction *>(_before);
   if (!beforeAction)
   {
     gzerr << "Requested action [" << _before.toStdString() << "] not found"
@@ -232,13 +252,13 @@ QAction *TopToolbar::InsertSeparator(const QString &_before)
     return NULL;
   }
 
-  return this->toolbar->insertSeparator(beforeAction);
+  return this->dataPtr->toolbar->insertSeparator(beforeAction);
 }
 
 /////////////////////////////////////////////////
 QAction *TopToolbar::InsertWidget(const QString &_before, QWidget *_widget)
 {
-  QAction *beforeAction = this->toolbar->findChild<QAction *>(_before);
+  QAction *beforeAction = this->dataPtr->toolbar->findChild<QAction *>(_before);
   if (!beforeAction)
   {
     gzerr << "Requested action [" << _before.toStdString() << "] not found"
@@ -246,5 +266,5 @@ QAction *TopToolbar::InsertWidget(const QString &_before, QWidget *_widget)
     return NULL;
   }
 
-  return this->toolbar->insertWidget(beforeAction, _widget);
+  return this->dataPtr->toolbar->insertWidget(beforeAction, _widget);
 }

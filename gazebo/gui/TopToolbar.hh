@@ -17,23 +17,15 @@
 #ifndef _GAZEBO_TOP_TOOLBAR_HH_
 #define _GAZEBO_TOP_TOOLBAR_HH_
 
-// #include <string>
-// #include <vector>
-// #include <sdf/sdf.hh>
-//
 #include "gazebo/gui/qt.h"
-//#include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
-
-// class QLineEdit;
-// class QLabel;
-// class QFrame;
-// class QHBoxLayout;
 
 namespace gazebo
 {
   namespace gui
   {
+    class TopToolbarPrivate;
+
     /// \brief Toolbar on the top of the main window.
     class GAZEBO_VISIBLE TopToolbar : public QFrame
     {
@@ -60,8 +52,9 @@ namespace gazebo
       public: QAction *InsertWidget(const QString &_before,
           QWidget *_widget);
 
-      /// \brief Widget for the top toolbar
-      private: QToolBar *toolbar;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: TopToolbarPrivate *dataPtr;
     };
   }
 }

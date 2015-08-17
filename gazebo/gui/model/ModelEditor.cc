@@ -424,10 +424,8 @@ void ModelEditor::OnAction(QAction *_action)
 /////////////////////////////////////////////////
 void ModelEditor::ToggleToolbar()
 {
-  TopToolbar *topToolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
-
   if (this->dataPtr->active)
-    topToolbar->SetMode("ModelEditor");
+    gui::Events::windowMode("ModelEditor");
   else
-    topToolbar->SetMode("Simulation");
+    gui::Events::windowMode("Simulation");
 }
