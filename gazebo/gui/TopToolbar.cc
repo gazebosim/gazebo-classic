@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include "gazebo/common/Console.hh"
+
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/TopToolbar.hh"
 
@@ -160,4 +162,89 @@ TopToolbar::~TopToolbar()
 QToolBar *TopToolbar::GetToolbar() const
 {
   return this->toolbar;
+}
+
+/////////////////////////////////////////////////
+void TopToolbar::SetMode(const std::string &_mode)
+{
+  bool modelEditor = _mode == "ModelEditor";
+  bool simulation = _mode == "Simulation";
+  bool logPlayback = _mode == "LogPlayback";
+
+  QList<QAction *> acts = this->toolbar->actions();
+  for (int i = 0; i < acts.size(); ++i)
+  {
+    // Visible in Simulation and ModelEditor
+    if (acts[i] == g_arrowAct ||
+        acts[i] == g_rotateAct ||
+        acts[i] == g_translateAct ||
+        acts[i] == g_scaleAct ||
+        acts[i] == g_screenshotAct ||
+        acts[i] == g_copyAct ||
+        acts[i] == g_pasteAct ||
+        acts[i] == g_alignButtonAct ||
+        acts[i] == g_viewAngleButtonAct ||
+        acts[i] == g_snapAct ||
+        acts[i]->objectName() == "toolbarSpacerAction")
+    {
+      acts[i]->setVisible(modelEditor || simulation);
+      // Change preceding separator as well
+      if (i > 0 && acts[i-1]->isSeparator())
+      {
+        acts[i-1]->setVisible(modelEditor || simulation);
+      }
+    }
+    // Visible in Model Editor only
+    else if(acts[i]->objectName().toStdString().find("modelEditor") != -1)
+    {
+      acts[i]->setVisible(modelEditor);
+    }
+    // Visible in Simulation only
+    else
+    {
+      acts[i]->setVisible(simulation);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void TopToolbar::InsertAction(const QString &_before, QAction *_action)
+{
+  QAction *beforeAction = this->toolbar->findChild<QAction *>(_before);
+  if (!beforeAction)
+  {
+    gzerr << "Requested action [" << _before.toStdString() << "] not found"
+          << std::endl;
+    return;
+  }
+
+  this->toolbar->insertAction(beforeAction, _action);
+}
+
+/////////////////////////////////////////////////
+QAction *TopToolbar::InsertSeparator(const QString &_before)
+{
+  QAction *beforeAction = this->toolbar->findChild<QAction *>(_before);
+  if (!beforeAction)
+  {
+    gzerr << "Requested action [" << _before.toStdString() << "] not found"
+          << std::endl;
+    return NULL;
+  }
+
+  return this->toolbar->insertSeparator(beforeAction);
+}
+
+/////////////////////////////////////////////////
+QAction *TopToolbar::InsertWidget(const QString &_before, QWidget *_widget)
+{
+  QAction *beforeAction = this->toolbar->findChild<QAction *>(_before);
+  if (!beforeAction)
+  {
+    gzerr << "Requested action [" << _before.toStdString() << "] not found"
+          << std::endl;
+    return NULL;
+  }
+
+  return this->toolbar->insertWidget(beforeAction, _widget);
 }

@@ -259,9 +259,9 @@ void RenderWidget::ShowToolbar(const bool _show)
 }
 
 /////////////////////////////////////////////////
-QToolBar *RenderWidget::GetToolbar() const
+TopToolbar *RenderWidget::GetToolbar() const
 {
-  return this->topToolbar->GetToolbar();
+  return this->topToolbar;
 }
 
 /////////////////////////////////////////////////

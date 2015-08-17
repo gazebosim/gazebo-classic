@@ -50,6 +50,16 @@ namespace gazebo
       /// \return Toolbar
       public: QToolBar *GetToolbar() const;
 
+      public: void SetMode(const std::string &_mode);
+
+      public: void InsertAction(const QString &_before,
+          QAction *_action);
+
+      public: QAction *InsertSeparator(const QString &_before);
+
+      public: QAction *InsertWidget(const QString &_before,
+          QWidget *_widget);
+
       /// \brief Widget for the top toolbar
       private: QToolBar *toolbar;
     };
