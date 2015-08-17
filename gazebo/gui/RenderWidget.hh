@@ -14,21 +14,18 @@
  * limitations under the License.
  *
  */
-#ifndef _RENDER_WIDGET_HH_
-#define _RENDER_WIDGET_HH_
+#ifndef _GAZEBO_RENDER_WIDGET_HH_
+#define _GAZEBO_RENDER_WIDGET_HH_
 
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
 
-class QLineEdit;
-class QLabel;
-class QFrame;
-class QHBoxLayout;
 
 namespace gazebo
 {
@@ -96,9 +93,6 @@ namespace gazebo
       /// \param[in] _modelName Name of the model that is being followed.
       private: void OnFollow(const std::string &_modelName);
 
-      /// \brief Handle align model user event.
-      private: void OnAlign();
-
       /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
 
@@ -112,25 +106,7 @@ namespace gazebo
       private: QFrame *bottomFrame;
 
       /// \brief Frame which holds the top toolbar.
-      private: QFrame *toolFrame;
-
-      private: QLabel *xyzLabel;
-      private: QLineEdit *xPosEdit;
-      private: QLineEdit *yPosEdit;
-      private: QLineEdit *zPosEdit;
-
-      private: QLabel *rpyLabel;
-      private: QLineEdit *rollEdit;
-      private: QLineEdit *pitchEdit;
-      private: QLineEdit *yawEdit;
-      private: QLineEdit *fpsEdit;
-      private: QLineEdit *trianglesEdit;
-
-      /// \brief Widget for the top toolbar
-      private: QToolBar *toolbar;
-
-      private: QToolBar *mouseToolbar;
-      private: QToolBar *editToolbar;
+      private: TopToolbar *topToolbar;
 
       /// \brief An overlay label on the 3D render widget
       private: QLabel *msgOverlayLabel;

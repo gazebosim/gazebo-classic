@@ -576,7 +576,7 @@ QWidget#terrainEditorWidget > QWidget
   border-top-right-radius: 10px;
 }
 
-QWidget#toolFrame
+QWidget#topToolbar
 {
   border-bottom: 1px solid #101010;
   background-color: #808080;
