@@ -34,10 +34,6 @@
   #define GZ_PLUGIN_VISIBLE
   #define GZ_PHYSICS_VISIBLE
   #define GZ_GUI_VISIBLE
-  #define GZ_GUI_BUILDING_VISIBLE
-  #define GZ_GUI_MODEL_VISIBLE
-  #define GZ_GUI_TERRAIN_VISIBLE
-  #define GZ_GUI_VIEWERS_VISIBLE
   #define GAZEBO_HIDDEN
 #else
   #if defined _WIN32 || defined __CYGWIN__
@@ -290,105 +286,6 @@
     #endif
   #endif
 
-  #if defined _WIN32 || defined __CYGWIN__
-    #ifdef BUILDING_DLL_GZ_GUI_BUILDING
-      #ifdef __GNUC__
-        #define GZ_GUI_BUILDING_VISIBLE __attribute__ ((dllexport))
-      #else
-        #define GZ_GUI_BUILDING_VISIBLE __declspec(dllexport)
-      #endif
-    #else
-      #ifdef __GNUC__
-        #define GZ_GUI_BUILDING_VISIBLE __attribute__ ((dllimport))
-      #else
-        #define GZ_GUI_BUILDING_VISIBLE __declspec(dllimport)
-      #endif
-    #endif
-    #define GZ_GUI_BUILDING_HIDDEN
-  #else
-    #if __GNUC__ >= 4
-      #define GZ_GUI_BUILDING_VISIBLE __attribute__ ((visibility ("default")))
-      #define GZ_GUI_BUILDING_HIDDEN  __attribute__ ((visibility ("hidden")))
-    #else
-      #define GZ_GUI_BUILDING_VISIBLE
-      #define GZ_GUI_BUILDING_HIDDEN
-    #endif
-  #endif
-
-  #if defined _WIN32 || defined __CYGWIN__
-    #ifdef BUILDING_DLL_GZ_GUI_MODEL
-      #ifdef __GNUC__
-        #define GZ_GUI_MODEL_VISIBLE __attribute__ ((dllexport))
-      #else
-        #define GZ_GUI_MODEL_VISIBLE __declspec(dllexport)
-      #endif
-    #else
-      #ifdef __GNUC__
-        #define GZ_GUI_MODEL_VISIBLE __attribute__ ((dllimport))
-      #else
-        #define GZ_GUI_MODEL_VISIBLE __declspec(dllimport)
-      #endif
-    #endif
-    #define GZ_GUI_MODEL_HIDDEN
-  #else
-    #if __GNUC__ >= 4
-      #define GZ_GUI_MODEL_VISIBLE __attribute__ ((visibility ("default")))
-      #define GZ_GUI_MODEL_HIDDEN  __attribute__ ((visibility ("hidden")))
-    #else
-      #define GZ_GUI_MODEL_VISIBLE
-      #define GZ_GUI_MODEL_HIDDEN
-    #endif
-  #endif
-
-  #if defined _WIN32 || defined __CYGWIN__
-    #ifdef BUILDING_DLL_GZ_GUI_TERRAIN
-      #ifdef __GNUC__
-        #define GZ_GUI_TERRAIN_VISIBLE __attribute__ ((dllexport))
-      #else
-        #define GZ_GUI_TERRAIN_VISIBLE __declspec(dllexport)
-      #endif
-    #else
-      #ifdef __GNUC__
-        #define GZ_GUI_TERRAIN_VISIBLE __attribute__ ((dllimport))
-      #else
-        #define GZ_GUI_TERRAIN_VISIBLE __declspec(dllimport)
-      #endif
-    #endif
-    #define GZ_GUI_TERRAIN_HIDDEN
-  #else
-    #if __GNUC__ >= 4
-      #define GZ_GUI_TERRAIN_VISIBLE __attribute__ ((visibility ("default")))
-      #define GZ_GUI_TERRAIN_HIDDEN  __attribute__ ((visibility ("hidden")))
-    #else
-      #define GZ_GUI_TERRAIN_VISIBLE
-      #define GZ_GUI_TERRAIN_HIDDEN
-    #endif
-  #endif
-
-  #if defined _WIN32 || defined __CYGWIN__
-    #ifdef BUILDING_DLL_GZ_GUI_VIEWERS
-      #ifdef __GNUC__
-        #define GZ_GUI_VIEWERS_VISIBLE __attribute__ ((dllexport))
-      #else
-        #define GZ_GUI_VIEWERS_VISIBLE __declspec(dllexport)
-      #endif
-    #else
-      #ifdef __GNUC__
-        #define GZ_GUI_VIEWERS_VISIBLE __attribute__ ((dllimport))
-      #else
-        #define GZ_GUI_VIEWERS_VISIBLE __declspec(dllimport)
-      #endif
-    #endif
-    #define GZ_GUI_VIEWERS_HIDDEN
-  #else
-    #if __GNUC__ >= 4
-      #define GZ_GUI_VIEWERS_VISIBLE __attribute__ ((visibility ("default")))
-      #define GZ_GUI_VIEWERS_HIDDEN  __attribute__ ((visibility ("hidden")))
-    #else
-      #define GZ_GUI_VIEWERS_VISIBLE
-      #define GZ_GUI_VIEWERS_HIDDEN
-    #endif
-  #endif
 // BUILDING_STATIC_LIBS
 #endif
 
