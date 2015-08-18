@@ -30,7 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Plugin Link class.
-    class GAZEBO_VISIBLE PluginLink : public Link
+    class GZ_PHYSICS_VISIBLE PluginLink : public Link
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent model.

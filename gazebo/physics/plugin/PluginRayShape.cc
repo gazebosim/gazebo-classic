@@ -78,3 +78,8 @@ void PluginRayShape::Update()
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 }
+
+//////////////////////////////////////////////////
+void PluginRayShape::GetIntersection(double &_dist, std::string &_entity)
+{
+}

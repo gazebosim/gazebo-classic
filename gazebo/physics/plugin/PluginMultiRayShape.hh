@@ -25,7 +25,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Plugin specific version of MultiRayShape
-    class GAZEBO_VISIBLE PluginMultiRayShape : public MultiRayShape
+    class GZ_PHYSICS_VISIBLE PluginMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

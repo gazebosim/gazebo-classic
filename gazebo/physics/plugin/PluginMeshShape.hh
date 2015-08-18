@@ -28,7 +28,7 @@ namespace gazebo
     class PluginMesh;
 
     /// \brief Triangle mesh collision.
-    class GAZEBO_VISIBLE PluginMeshShape : public MeshShape
+    class GZ_PHYSICS_VISIBLE PluginMeshShape : public MeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.

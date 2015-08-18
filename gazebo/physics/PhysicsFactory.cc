@@ -30,6 +30,9 @@
 GZ_PHYSICS_VISIBLE
 void RegisterODEPhysics();
 
+GZ_PHYSICS_VISIBLE
+void RegisterPluginPhysics();
+
 #ifdef HAVE_SIMBODY
   GZ_PHYSICS_VISIBLE
   void RegisterSimbodyPhysics();
@@ -55,6 +58,8 @@ std::map<std::string, PhysicsFactoryFn> PhysicsFactory::engines;
 void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
+
+  RegisterPluginPhysics();
 
 #ifdef HAVE_SIMBODY
   RegisterSimbodyPhysics();

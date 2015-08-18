@@ -30,7 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A universal joint.
-    class GAZEBO_VISIBLE PluginUniversalJoint :
+    class GZ_PHYSICS_VISIBLE PluginUniversalJoint :
       public UniversalJoint<PluginJoint>
     {
       /// \brief Constructor.

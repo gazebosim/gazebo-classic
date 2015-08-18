@@ -31,7 +31,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A slider joint
-    class GAZEBO_VISIBLE PluginSliderJoint : public SliderJoint<PluginJoint>
+    class GZ_PHYSICS_VISIBLE PluginSliderJoint : public SliderJoint<PluginJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldId Plugin world id.

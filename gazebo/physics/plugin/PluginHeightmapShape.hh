@@ -34,7 +34,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Plugin Height map collision.
-    class GAZEBO_VISIBLE PluginHeightmapShape : public HeightmapShape
+    class GZ_PHYSICS_VISIBLE PluginHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.

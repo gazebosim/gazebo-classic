@@ -9,6 +9,8 @@ link_directories(
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
 add_subdirectory(ode)
 
+add_subdirectory(plugin)
+
 # Add Bullet support if present
 if (HAVE_BULLET)
   include_directories(${BULLET_INCLUDE_DIRS})
@@ -172,8 +174,6 @@ endif()
 
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
-
-add_subdirectory(plugin)
 
 # unit tests
 set (gtest_sources

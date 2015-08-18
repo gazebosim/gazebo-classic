@@ -262,14 +262,14 @@ bool PluginLink::GetGravityMode() const
 }
 
 //////////////////////////////////////////////////
-void AddLinkForce(const math::Vector3 &_force,
-          const math::Vector3 &_offset = math::Vector3::Zero)
+void PluginLink::AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset)
 {
   gzerr << "not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void SetSelfCollide(bool _collide)
+void PluginLink::SetSelfCollide(bool _collide)
 {
   gzerr << "not implemented\n";
 }

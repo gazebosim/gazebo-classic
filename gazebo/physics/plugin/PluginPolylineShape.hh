@@ -27,7 +27,7 @@ namespace gazebo
     class PluginMesh;
 
     /// \brief Plugin polyline shape
-    class GAZEBO_VISIBLE PluginPolylineShape : public PolylineShape
+    class GZ_PHYSICS_VISIBLE PluginPolylineShape : public PolylineShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.

@@ -26,7 +26,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief An Plugin Plane shape.
-    class GAZEBO_VISIBLE PluginPlaneShape : public PlaneShape
+    class GZ_PHYSICS_VISIBLE PluginPlaneShape : public PlaneShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

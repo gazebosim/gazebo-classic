@@ -33,7 +33,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Ray collision
-    class GAZEBO_VISIBLE PluginRayShape : public RayShape
+    class GZ_PHYSICS_VISIBLE PluginRayShape : public RayShape
     {
       /// \brief Constructor for a global ray.
       /// \param[in] _physicsEngine Pointer to the physics engine.

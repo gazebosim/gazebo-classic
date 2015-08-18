@@ -27,7 +27,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Triangle mesh helper class.
-    class GAZEBO_VISIBLE PluginMesh
+    class GZ_PHYSICS_VISIBLE PluginMesh
     {
       /// \brief Constructor.
       public: explicit PluginMesh();

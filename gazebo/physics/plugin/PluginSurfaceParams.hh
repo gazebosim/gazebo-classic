@@ -33,7 +33,7 @@ namespace gazebo
     /// \{
 
     /// \brief Plugin surface parameters.
-    class GAZEBO_VISIBLE PluginSurfaceParams : public SurfaceParams
+    class GZ_PHYSICS_VISIBLE PluginSurfaceParams : public SurfaceParams
     {
       /// \brief Constructor.
       public: PluginSurfaceParams();
