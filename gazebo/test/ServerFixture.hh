@@ -97,6 +97,10 @@ namespace gazebo
                                  bool _paused, const std::string &_physics,
                           const std::vector<std::string> &_systemPlugins = {});
 
+     /// \brief
+    protected: virtual void LoadArgs(const std::string &_args,
+                          const std::vector<std::string> &_systemPlugins = {});
+
     /// \brief Run the server.
     /// \param[in] _worldFilename Name of the world to run in simulation.
     protected: void RunServer(const std::string &_worldFilename);
@@ -109,6 +113,10 @@ namespace gazebo
     /// \param[in] _systemPlugins Array of system plugins to load.
     protected: void RunServer(const std::string &_worldFilename, bool _paused,
                               const std::string &_physics,
+                          const std::vector<std::string> &_systemPlugins = {});
+
+    /// \brief
+    protected: void RunServerArgs(const std::string &_args,
                           const std::vector<std::string> &_systemPlugins = {});
 
 

@@ -205,6 +205,61 @@ void ServerFixture::Load(const std::string &_worldFilename,
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::LoadArgs(const std::string &_args,
+                             const std::vector<std::string> &_systemPlugins)
+{
+  delete this->server;
+  this->server = NULL;
+
+  // Create, load, and run the server in its own thread
+  this->serverThread = new boost::thread(
+     boost::bind(&ServerFixture::RunServerArgs, this, _args, _systemPlugins));
+
+  // Wait for the server to come up
+  // Use a 60 second timeout.
+  int waitCount = 0, maxWaitCount = 6000;
+  while ((!this->server || !this->server->GetInitialized()) &&
+         ++waitCount < maxWaitCount)
+    common::Time::MSleep(100);
+  gzdbg << "ServerFixture load in "
+         << static_cast<double>(waitCount)/10.0
+         << " seconds, timeout after "
+         << static_cast<double>(maxWaitCount)/10.0
+         << " seconds\n";
+
+  if (waitCount >= maxWaitCount)
+    this->launchTimeoutFailure("while waiting for Load() function", waitCount);
+
+  this->node = transport::NodePtr(new transport::Node());
+  ASSERT_NO_THROW(this->node->Init());
+  this->poseSub = this->node->Subscribe("~/pose/local/info",
+      &ServerFixture::OnPose, this, true);
+  this->statsSub = this->node->Subscribe("~/world_stats",
+      &ServerFixture::OnStats, this);
+
+  this->factoryPub =
+    this->node->Advertise<msgs::Factory>("~/factory");
+
+  this->requestPub =
+    this->node->Advertise<msgs::Request>("~/request");
+
+  // Wait for the world to reach the correct pause state.
+  // This might not work properly with multiple worlds.
+  // Use a 30 second timeout.
+  waitCount = 0;
+  maxWaitCount = 3000;
+  while (!physics::get_world() && ++waitCount < maxWaitCount)
+  {
+    common::Time::MSleep(100);
+  }
+
+  ASSERT_LT(waitCount, maxWaitCount);
+
+  this->factoryPub->WaitForConnection();
+  this->requestPub->WaitForConnection();
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::RunServer(const std::string &_worldFilename)
 {
   this->RunServer(_worldFilename, false, "");
@@ -245,6 +300,64 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
 
   ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::RunServerArgs(const std::string &_args,
+                                 const std::vector<std::string> &_systemPlugins)
+{
+  // Split the string into a vector or parameters.
+  std::vector<std::string> params;
+  std::string args = _args;
+  boost::trim_if(args, boost::is_any_of("\t "));
+  boost::split(params, args, boost::is_any_of("\t "),
+    boost::token_compress_on);
+
+  // Make room for an extra parameter (gzserver.
+  int argc = params.size() + 1;
+  char **argv = new char* [argc];
+
+  // The first parameter is the name of the program.
+  const char *cmd = "gzserver";
+  argv[0] = strdup(cmd);
+
+  // Copy the command line parameters for gzserver.
+  for (size_t i = 0; i < params.size(); ++i)
+    argv[i + 1] = strdup(params.at(i).c_str());
+
+  ASSERT_NO_THROW(this->server = new Server());
+
+  if (!this->server->ParseArgs(argc, argv))
+  {
+    ASSERT_NO_THROW(delete this->server);
+    this->server = NULL;
+    return;
+  }
+
+  for (auto const &plugin : _systemPlugins)
+  {
+    gazebo::addPlugin(plugin);
+  }
+
+  if (!rendering::get_scene(
+        gazebo::physics::get_world()->GetName()))
+  {
+    ASSERT_NO_THROW(rendering::create_scene(
+        gazebo::physics::get_world()->GetName(), false, true));
+  }
+
+  ASSERT_NO_THROW(this->server->Run());
+
+  ASSERT_NO_THROW(this->server->Fini());
+
+  ASSERT_NO_THROW(delete this->server);
+  this->server = NULL;
+
+  // Deallocate memory for the command line arguments allocated with strdup.
+  for (int i = 0; i < argc; ++i)
+    free(argv[i]);
+
+  delete[] argv;
 }
 
 /////////////////////////////////////////////////
