@@ -671,7 +671,6 @@ const Model_V &Model::GetModels() const
 //////////////////////////////////////////////////
 ModelPtr Model::GetModel(const std::string &_name) const
 {
-  Model_V::const_iterator iter;
   ModelPtr result;
 
   for (auto &m : this->models)
