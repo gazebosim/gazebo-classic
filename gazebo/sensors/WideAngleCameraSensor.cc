@@ -143,7 +143,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
   if(lensSdf->HasElement("advertise") && lensSdf->Get<bool>("advertise"))
     this->lensPub = this->node->Advertise<msgs::CameraLensCmd>(
-      lensTopicName+"info", 50);
+      lensTopicName+"info", 1);
 
   this->lensSub = this->node->Subscribe(lensTopicName+"control",
       &WideAngleCameraSensor::OnCtrlMessage,this);
