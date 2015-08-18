@@ -26,6 +26,7 @@ message CameraLensCmd
   optional string fun           = 8;
   optional bool scale_to_hfov   = 9 [default = false];
   optional double cutoff_angle  = 10;
+  optional double hfov          = 11;
 
-  optional int32 env_texture_size = 11;
+  optional int32 env_texture_size = 12;
 }

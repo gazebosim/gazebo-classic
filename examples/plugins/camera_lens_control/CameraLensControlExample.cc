@@ -73,7 +73,7 @@ CameraLensControlExample::CameraLensControlExample()
 
   // Position and resize this widget
   this->move(10, 10);
-  this->resize(305, 244);
+  this->resize(305, 270);
 
   // Load child widgets and associated events
   this->LoadGUIComponents(contentWidget);
@@ -112,6 +112,7 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
   this->sbC3        = _parent->findChild<QDoubleSpinBox*>("sbC3");
   this->sbF         = _parent->findChild<QDoubleSpinBox*>("sbF");
   this->sbCA        = _parent->findChild<QDoubleSpinBox*>("sbCA");
+  this->sbHFOV      = _parent->findChild<QDoubleSpinBox*>("sbHFOV");
   this->cbScaleToHFOV  = _parent->findChild<QCheckBox*>("cbScaleToHFOV");
 
   // fill combo boxes with values
@@ -141,6 +142,7 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
   connect(this->sbC3,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
   connect(this->sbF,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
   connect(this->sbCA,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbHFOV,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
 
   // Add listener for spawn button
   connect(pbSpawn, SIGNAL(clicked()), this, SLOT(OnButtonSpawn()));
@@ -256,7 +258,11 @@ void CameraLensControlExample::OnCameraLensCmd(ConstCameraLensCmdPtr &_msg)
   if(_msg->has_f())
     this->sbF->setValue(_msg->f());
 
-  this->sbCA->setValue(_msg->cutoff_angle());
+  if(_msg->has_cutoff_angle())
+    this->sbCA->setValue(_msg->cutoff_angle());
+
+  if(_msg->has_hfov())
+    this->sbHFOV->setValue(_msg->hfov());
 
   this->cbType->setCurrentIndex(
     this->cbType->findText(QString::fromStdString(_msg->type())));
@@ -303,7 +309,8 @@ void CameraLensControlExample::OnValueChanged()
       msg.set_f(this->sbF->value());
     }
 
-    msg.set_cutoff_angle(this->sbCA->value());
+    msg.set_cutoff_angle(this->sbCA->value()) ;
+    msg.set_hfov(this->sbHFOV->value());
     msg.set_scale_to_hfov(this->cbScaleToHFOV->isChecked());
 
     this->cameraControlPub->Publish(msg);

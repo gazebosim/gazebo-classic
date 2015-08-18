@@ -18,7 +18,15 @@
 #ifndef _WIDEANGLECAMERASENSOR_HH_
 #define _WIDEANGLECAMERASENSOR_HH_
 
-#include "CameraSensor.hh"
+#include <queue>
+#include <string>
+
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/util/system.hh"
 
 
 namespace gazebo
@@ -64,6 +72,9 @@ namespace gazebo
 
       /// \brief Mutex to lock when receiving or sending lens control/info message
       protected: std::mutex lensCmdMutex;
+
+      /// \brief Horisontal FOV updates to be set in rendering thread
+      private: std::queue<double> hfovCmdQueue;
     };
     /// \}
   }

@@ -97,6 +97,7 @@ namespace gazebo
     private: QDoubleSpinBox *sbC2;
     private: QDoubleSpinBox *sbC3;
     private: QDoubleSpinBox *sbF;
+    private: QDoubleSpinBox *sbHFOV;
     private: QDoubleSpinBox *sbCA;
     private: QCheckBox *cbScaleToHFOV;
 

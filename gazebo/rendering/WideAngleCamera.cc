@@ -657,7 +657,7 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
 
   this->GetLens()->SetUniformVariables(pPass,
     this->GetAspectRatio(),
-    this->GetLens()->GetCutOffAngle()*2);
+    this->GetHFOV().Radian());
 
   //XXX: OGRE does not allow to enable cubemap filtering extention thru it's API,
   // suppose that this function was invoked in a thread that has OpenGL context

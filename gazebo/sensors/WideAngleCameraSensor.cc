@@ -170,6 +170,9 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
   {
     std::lock_guard<std::mutex> lock(this->lensCmdMutex);
 
+    for (; !this->hfovCmdQueue.empty(); this->hfovCmdQueue.pop())
+      this->camera->SetHFOV(math::Angle(this->hfovCmdQueue.front()));
+
     msgs::CameraLensCmd msg;
 
     rendering::WideAngleCameraPtr wcamera = 
@@ -189,6 +192,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     msg.set_fun(lens->GetFun());
     msg.set_scale_to_hfov(lens->GetScaleToHFOV());
     msg.set_cutoff_angle(lens->GetCutOffAngle());
+    msg.set_hfov(wcamera->GetHFOV().Radian());
 
     msg.set_env_texture_size(wcamera->GetEnvTextureSize());
 
@@ -205,7 +209,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 
   if(_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET)
   {
-    gzerr << "Control message is not of the set type " << (int)_msg->destiny() <<"\n";
+    gzerr << "Control message is not of the set type " << (int)_msg->destiny() << "\n";
     gzdbg << _msg->DebugString() << "\n";
     return;
   }
@@ -231,10 +235,10 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
     lens->SetF(_msg->f());
 
   if(_msg->has_cutoff_angle())
-  {
     lens->SetCutOffAngle(_msg->cutoff_angle());
-    // wcamera->SetHFOV(math::Angle(_msg->cutoff_angle()));
-  }
+
+  if(_msg->has_hfov())
+    this->hfovCmdQueue.push(_msg->hfov());
 
   if(_msg->has_fun())
     lens->SetFun(_msg->fun());
