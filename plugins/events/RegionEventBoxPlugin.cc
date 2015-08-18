@@ -70,7 +70,7 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr & _msg)
+void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->receiveMutex);
   if (_msg->has_name() && _msg->name() == this->modelName && _msg->has_scale())
@@ -81,7 +81,7 @@ void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr & _msg)
 }
 
 //////////////////////////////////////////////////
-void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo & _info)
+void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
   {
     boost::mutex::scoped_lock lock(this->receiveMutex);

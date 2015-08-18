@@ -34,12 +34,14 @@
 
 namespace gazebo
 {
+  /// \brief A plugin that fires an event when another model enters the region
+  /// defined by the size of this model's box visual.
   class RegionEventBoxPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: RegionEventBoxPlugin();
 
-    // \brief Documentation Inherited.
+    // Documentation Inherited.
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Callback when a model message is received.

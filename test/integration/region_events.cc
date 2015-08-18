@@ -22,7 +22,7 @@
 
 using namespace gazebo;
 
-// certain tests fail (with the symbody engine
+// certain tests fail (with the simbody engine
 // setting this to true skips those tests
 bool SKIP_FAILING_TESTS = true;
 
@@ -30,7 +30,10 @@ bool SKIP_FAILING_TESTS = true;
 class RegionEventTest
     : public ServerFixture, public testing::WithParamInterface<const char*>
 {
+  // test if event is triggered when a model enters the region
   public: void ModelEnteringRegion(const std::string &_physicsEngine);
+
+  // test if event is triggered when a model exits the region
   public: void ModelLeavingRegion(const std::string &_physicsEngine);
 };
 
