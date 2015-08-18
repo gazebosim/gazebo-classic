@@ -20,7 +20,7 @@ include_directories(SYSTEM ${GAZEBO_INCLUDE_DIRS} ${OGRE_INCLUDE_DIRS}
 link_directories(${GAZEBO_LIBRARY_DIRS} ${OGRE_LIBRARY_DIRS}
   ${OGRE-Terrain_LIBRARY_DIRS})
 
-QT4_WRAP_CPP(headers_MOC CameraLensControlExample.hh ImageFrame.hh)
+QT4_WRAP_CPP(headers_MOC CameraLensControlExample.hh)
 
 add_definitions(-std=c++11)
 
@@ -28,7 +28,7 @@ add_definitions(-std=c++11)
 #message("Found gazebo libraries " ${GAZEBO_LIBRARIES})
 
 add_library(camera_lens_control_example SHARED ${headers_MOC}
-		CameraLensControlExample.cc ImageFrame.cc)
+		CameraLensControlExample.cc)
 target_link_libraries(camera_lens_control_example ${GAZEBO_LIBRARIES}
     ${OGRE_LIBRARIES} 
     ${OGRE-Terrain_LIBRARIES}

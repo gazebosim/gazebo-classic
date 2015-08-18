@@ -24,12 +24,6 @@
 
 namespace gazebo
 {
-
-  namespace gui
-  {
-    class ImageFrame;
-  }
-
   class GAZEBO_VISIBLE CameraLensControlExample : public GUIPlugin
   {
     Q_OBJECT
@@ -106,14 +100,8 @@ namespace gazebo
     private: QDoubleSpinBox *sbCA;
     private: QCheckBox *cbScaleToHFOV;
 
-    /// \brief Image output frame.
-    private: gui::ImageFrame *imgFrame;
-
-    /// \brief Ignore messages from topic provider if it is set to true
-    private: bool ignoreInfoMessages = false;
-
-    /// \brief Lock this when receiving an image
-    private: boost::mutex recImgLock;
+    /// \brief Ignore messages from topic provider if it is set to false
+    private: bool acceptInfoMessages = true;
   };
 }
 #endif

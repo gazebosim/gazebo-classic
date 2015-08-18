@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
-#include <sstream>
-#include <gazebo/msgs/msgs.hh>
+
 #include "CameraLensControlExample.hh"
 
-#include "ImageFrame.hh"
+#include <sstream>
+#include <gazebo/msgs/msgs.hh>
 
 #include <QtUiTools/QUiLoader>
+
 
 using namespace gazebo;
 
@@ -72,7 +73,7 @@ CameraLensControlExample::CameraLensControlExample()
 
   // Position and resize this widget
   this->move(10, 10);
-  this->resize(342, 300);
+  this->resize(305, 244);
 
   // Load child widgets and associated events
   this->LoadGUIComponents(contentWidget);
@@ -85,7 +86,8 @@ CameraLensControlExample::CameraLensControlExample()
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
 
   // Listen for selected element in gazebo
-  this->selectionSub = this->node->Subscribe("~/selection",&CameraLensControlExample::OnSelect,this);
+  this->selectionSub = this->node->Subscribe("~/selection",
+      &CameraLensControlExample::OnSelect,this);
 
   this->imageSub.reset();
 }
@@ -93,7 +95,6 @@ CameraLensControlExample::CameraLensControlExample()
 /////////////////////////////////////////////////
 CameraLensControlExample::~CameraLensControlExample()
 {
-  // delete this->imgFrame;
 }
 
 /////////////////////////////////////////////////
@@ -101,7 +102,6 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
 {
   GZ_ASSERT(_parent != NULL, "Invalid widget loaded");
 
-  gzmsg << "OK\n";
   this->pbSpawn     = _parent->findChild<QPushButton*>("pbSpawn");
   this->pbCalibrate = _parent->findChild<QPushButton*>("pbCalibrate");
   this->lbName      = _parent->findChild<QLabel*>("lbName");
@@ -114,17 +114,9 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
   this->sbCA        = _parent->findChild<QDoubleSpinBox*>("sbCA");
   this->cbScaleToHFOV  = _parent->findChild<QCheckBox*>("cbScaleToHFOV");
 
-  // QWidget *wImagePlace = _parent->findChild<QWidget*>("wImagePlace");
-
-  // this->imgFrame = new gui::ImageFrame(wImagePlace);
-  // this->imgFrame->setMinimumSize(201,201);
-  // this->imgFrame->setMaximumSize(201,201);
-  // this->imgFrame->setVisible(true);
-
   // fill combo boxes with values
   this->cbType->addItem("gnomonical");
   this->cbType->addItem("stereographic");
-  this->cbType->addItem("stereographic_");
   this->cbType->addItem("equidistant");
   this->cbType->addItem("equisolid_angle");
   this->cbType->addItem("orthographic");
@@ -137,14 +129,17 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
   this->pbCalibrate->setVisible(false);
 
   // bind Events
-  connect(this->cbType,SIGNAL(currentIndexChanged(int)),this,SLOT(OnTypeChanged()));
-  connect(this->cbFun,SIGNAL(currentIndexChanged(int)),this,SLOT(OnCustomRequested()));
-  connect(this->cbScaleToHFOV,SIGNAL(stateChanged(int)),this,SLOT(OnValueChanged()));
+  connect(this->cbType,SIGNAL(currentIndexChanged(int)),
+      this,SLOT(OnTypeChanged()));
+  connect(this->cbFun,SIGNAL(currentIndexChanged(int)),
+      this,SLOT(OnValueChanged()));
+  connect(this->cbScaleToHFOV,SIGNAL(stateChanged(int)),
+      this,SLOT(OnValueChanged()));
 
-  connect(this->sbC1,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
-  connect(this->sbC2,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
-  connect(this->sbC3,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
-  connect(this->sbF,SIGNAL(valueChanged(double)),this,SLOT(OnCustomRequested()));
+  connect(this->sbC1,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbC2,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbC3,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbF,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
   connect(this->sbCA,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
 
   // Add listener for spawn button
@@ -210,7 +205,7 @@ void CameraLensControlExample::OnButtonSpawn()
     << "  </model>"
     << "</sdf>";
 
-// Send the model to the gazebo server
+  // Send the model to the gazebo server
   msgs::Factory msg;
   msg.set_sdf(newModelStr.str());
   this->factoryPub->Publish(msg);
@@ -219,54 +214,38 @@ void CameraLensControlExample::OnButtonSpawn()
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->recImgLock);
-
   lbName->setText(QString::fromStdString(_msg->name()));
-
-  gzmsg << "selected: " << _msg->name();
-  this->selectedElementName = _msg->name();
 
   std::string t("wideanglecamera");
   if(_msg->name().compare(0,t.length(),t) == 0)
   {
-    // Do the thing
+    gzmsg << "Selected: " << _msg->name();
+    this->selectedElementName = _msg->name();
+
     gzmsg << " [Appropriate element]";
 
-    if(this->imageSub)
-      this->imageSub->Unsubscribe();
-
-    // this->imageSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/image",
-    //     &CameraLensControlExample::OnImageUpdate,this);
+    if(this->infoSub)
+      this->infoSub->Unsubscribe();
 
     // subscribe for the info messages
-    this->infoSub = this->node->Subscribe("~/"+_msg->name()+"/link/camera/lens_info",
+    this->infoSub = this->node->Subscribe(
+        "~/"+_msg->name()+"/link/camera/lens_info",
         &CameraLensControlExample::OnCameraLensCmd,this);
 
     this->cameraControlPub = this->node->Advertise<msgs::CameraLensCmd>(
       "~/"+_msg->name()+"/link/camera/lens_control",10);
 
-    this->ignoreInfoMessages = false;
+    this->acceptInfoMessages = true;
   }
 
   gzmsg << std::endl;
 }
 
 /////////////////////////////////////////////////
-void CameraLensControlExample::OnImageUpdate(ConstImageStampedPtr &_msg)
-{
-  // boost::mutex::scoped_lock lock(this->recImgLock);
-
-  // Display received image
-  // this->imgFrame->OnImage(_msg->image());
-}
-
-/////////////////////////////////////////////////
 void CameraLensControlExample::OnCameraLensCmd(ConstCameraLensCmdPtr &_msg)
 {
-  if(this->ignoreInfoMessages)
+  if(!this->acceptInfoMessages)
     return;
-  else
-    this->ignoreInfoMessages = true;  // Information got, runtime update is not needed
 
   if(_msg->has_c1())
     this->sbC1->setValue(_msg->c1());
@@ -279,22 +258,31 @@ void CameraLensControlExample::OnCameraLensCmd(ConstCameraLensCmdPtr &_msg)
 
   this->sbCA->setValue(_msg->cutoff_angle());
 
-  this->cbType->setCurrentIndex(this->cbType->findText(QString::fromStdString(_msg->type())));
+  this->cbType->setCurrentIndex(
+    this->cbType->findText(QString::fromStdString(_msg->type())));
 
   if(_msg->has_fun())
-  {
-    gzmsg << _msg->fun() << std::endl;
-    this->cbFun->setCurrentIndex(this->cbFun->findText(QString::fromStdString(_msg->fun())));
-  }
+    this->cbFun->setCurrentIndex(
+      this->cbFun->findText(QString::fromStdString(_msg->fun())));
 
   if(_msg->has_scale_to_hfov())
     this->cbScaleToHFOV->setChecked(_msg->scale_to_hfov());
+
+  bool isCustom = (this->cbType->currentText() == "custom");
+
+  this->cbFun->setEnabled(isCustom);
+  this->sbC1->setEnabled(isCustom);
+  this->sbC2->setEnabled(isCustom);
+  this->sbC3->setEnabled(isCustom);
+  this->sbF->setEnabled(isCustom);
+
+  this->acceptInfoMessages = false;  // Information got, runtime update is not needed
 }
 
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnValueChanged()
 {
-  if(!ignoreInfoMessages)
+  if(acceptInfoMessages)
     return;
 
   if(this->selectedElementName != "")
@@ -302,9 +290,7 @@ void CameraLensControlExample::OnValueChanged()
     msgs::CameraLensCmd msg;
 
     msg.set_name(this->selectedElementName);
-
     msg.set_destiny(msgs::CameraLensCmd_CmdDestiny_SET);
-
     msg.set_type(this->cbType->currentText().toUtf8().constData());
 
     if(this->cbType->currentText() == "custom")
@@ -318,7 +304,6 @@ void CameraLensControlExample::OnValueChanged()
     }
 
     msg.set_cutoff_angle(this->sbCA->value());
-
     msg.set_scale_to_hfov(this->cbScaleToHFOV->isChecked());
 
     this->cameraControlPub->Publish(msg);
@@ -331,12 +316,13 @@ void CameraLensControlExample::OnTypeChanged()
 {
   this->OnValueChanged();
 
-  this->ignoreInfoMessages = false;
-}
+  this->acceptInfoMessages = true;
 
-/////////////////////////////////////////////////
-void CameraLensControlExample::OnCustomRequested()
-{
-  if(this->ignoreInfoMessages)
-    this->cbType->setCurrentIndex(this->cbType->findText(QString("custom")));
+  bool isCustom = (this->cbType->currentText() == "custom");
+
+  this->cbFun->setEnabled(isCustom);
+  this->sbC1->setEnabled(isCustom);
+  this->sbC2->setEnabled(isCustom);
+  this->sbC3->setEnabled(isCustom);
+  this->sbF->setEnabled(isCustom);
 }
