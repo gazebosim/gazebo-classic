@@ -15,9 +15,8 @@
  *
 */
 
-#include "WideAngleCamera.hh"
-
 // #include "gazebo/rendering/skyx/include/SkyX.h"
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CameraLensPrivate.hh"
 #include "gazebo/rendering/WideAngleCameraPrivate.hh"
@@ -25,6 +24,7 @@
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/WideAngleCamera.hh"
 
 
 using namespace gazebo;
@@ -107,6 +107,8 @@ void CameraLens::Load()
 //////////////////////////////////////////////////
 std::string CameraLens::GetType() const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   return this->sdf->Get<std::string>("type");
 }
 
@@ -119,48 +121,64 @@ bool CameraLens::IsCustom() const
 //////////////////////////////////////////////////
 float CameraLens::GetC1() const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   return this->dataPtr->c1;
 }
 
 //////////////////////////////////////////////////
 float CameraLens::GetC2() const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   return this->dataPtr->c2;
 }
 
 //////////////////////////////////////////////////
 float CameraLens::GetC3() const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   return this->dataPtr->c3;
 }
 
 //////////////////////////////////////////////////
 float CameraLens::GetF() const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   return this->dataPtr->f;
 }
 
 //////////////////////////////////////////////////
 std::string CameraLens::GetFun() const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   return this->dataPtr->fun.AsString();
 }
 
 //////////////////////////////////////////////////
 float CameraLens::GetCutOffAngle() const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   return this->dataPtr->cutOffAngle;
 }
 
 //////////////////////////////////////////////////
 bool CameraLens::GetScaleToHFOV() const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   return this->sdf->Get<bool>("scale_to_hfov");
 }
 
 //////////////////////////////////////////////////
 void CameraLens::SetType(std::string _type)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   // c1, c2, c3, f, fun
   std::map< std::string, std::tuple<float, float, float,
       float, std::string> > fun_types = {
@@ -212,6 +230,8 @@ void CameraLens::SetType(std::string _type)
 //////////////////////////////////////////////////
 void CameraLens::SetC1(float _c)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   this->dataPtr->c1 = _c;
 
   if(!this->IsCustom())
@@ -223,6 +243,8 @@ void CameraLens::SetC1(float _c)
 //////////////////////////////////////////////////
 void CameraLens::SetC2(float _c)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   this->dataPtr->c2 = _c;
 
   if(!this->IsCustom())
@@ -234,6 +256,8 @@ void CameraLens::SetC2(float _c)
 //////////////////////////////////////////////////
 void CameraLens::SetC3(float _c)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   this->dataPtr->c3 = _c;
 
   if(!this->IsCustom())
@@ -245,6 +269,8 @@ void CameraLens::SetC3(float _c)
 //////////////////////////////////////////////////
 void CameraLens::SetF(float _f)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   this->dataPtr->f = _f;
 
   if(!this->IsCustom())
@@ -255,6 +281,8 @@ void CameraLens::SetF(float _f)
 
 void CameraLens::SetFun(std::string _fun)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   if(!this->IsCustom())
     this->ConvertToCustom();
 
@@ -276,6 +304,8 @@ void CameraLens::SetFun(std::string _fun)
 //////////////////////////////////////////////////
 void CameraLens::SetCutOffAngle(float _angle)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   this->dataPtr->cutOffAngle = _angle;
 
   this->sdf->GetElement("cutoff_angle")->Set((double)_angle);
@@ -284,6 +314,8 @@ void CameraLens::SetCutOffAngle(float _angle)
 //////////////////////////////////////////////////
 void CameraLens::SetScaleToHFOV(bool _scale)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   this->sdf->GetElement("scale_to_hfov")->Set(_scale);
 }
 
@@ -333,6 +365,8 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,
 //////////////////////////////////////////////////
 void CameraLens::ConvertToCustom()
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
+
   this->SetType("custom");
 
   sdf::ElementPtr cf = this->sdf->AddElement("custom_function");
@@ -421,6 +455,8 @@ void WideAngleCamera::Fini()
 //////////////////////////////////////////////////
 int WideAngleCamera::GetEnvTextureSize() const
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->dataMutex);
+
   return this->envTextureSize;
 }
 
@@ -462,6 +498,8 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 //////////////////////////////////////////////////
 void WideAngleCamera::SetEnvTextureSize(int _size)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->dataMutex);
+
   if(this->sdf->HasElement("env_texture_size"))
     this->sdf->AddElement("env_texture_size")->Set(_size);
 
@@ -492,6 +530,8 @@ void WideAngleCamera::CreateEnvCameras()
 //////////////////////////////////////////////////
 void WideAngleCamera::SetClipDist()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->dataMutex);
+
   sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
   if (!clipElem)
     gzthrow("Camera has no <clip> tag.");
@@ -564,7 +604,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 //////////////////////////////////////////////////
 void WideAngleCamera::RenderImpl()
 {
-  // boost::mutex::scoped_lock lock(this->dataPtr->renderMutex);
+  // std::lock_guard<std::mutex> lock(this->dataPtr->renderMutex);
 
   math::Quaternion orient = this->GetWorldRotation();
   math::Vector3 pos = this->GetWorldPosition();

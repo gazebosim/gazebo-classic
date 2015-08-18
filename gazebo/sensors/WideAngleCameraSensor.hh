@@ -40,18 +40,17 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~WideAngleCameraSensor();
 
-      /// \brief Load the sensor with default parameters
-      /// \param[in] _worldName Name of world to load from
-      public: virtual void Load(const std::string &_worldName) override;
-
-      /// \brief Initialize the camera
-      public: virtual void Init() override;
-
-      /// \brief Finalize the camera
-      protected: virtual void Fini() override;
+      // Documentation inherited
+      public: void Load(const std::string &_worldName) override;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force) override;
+      public: void Init() override;
+
+      // Documentation inherited
+      protected: void Fini() override;
+
+      // Documentation inherited
+      protected: bool UpdateImpl(bool _force) override;
 
       /// \brief Handle incoming control message
       /// \param[in] _msg Message received from topic
@@ -62,6 +61,9 @@ namespace gazebo
 
       /// \brief Subscriber to lens control messages
       protected: transport::SubscriberPtr lensSub;
+
+      /// \brief Mutex to lock when receiving or sending lens control/info message
+      protected: std::mutex lensCmdMutex;
     };
     /// \}
   }

@@ -18,7 +18,25 @@
 #ifndef _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
 #define _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
 
-#include "Camera.hh"
+
+#include <string>
+#include <utility>
+#include <sdf/sdf.hh>
+
+#include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
+
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
+
+#include "gazebo/rendering/Camera.hh"
 
 
 namespace gazebo
@@ -163,18 +181,16 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~WideAngleCamera();
 
-      /// \brief Initializes the camera
+      // Documentation inherited
       public: void Init() override;
 
-      /// \brief Loads camera with default parmeters
+      // Documentation inherited
       public: void Load() override;
 
-      /// \brief Finalize the camera.
-      ///
-      /// This function is called before the camera is destructed
+      // Documentation inherited
       public: virtual void Fini() override;
 
-            /// \brief Gets the environment texture size
+      /// \brief Gets the environment texture size
       /// \return Texture size
       public: int GetEnvTextureSize() const;
 
@@ -182,8 +198,7 @@ namespace gazebo
       /// \return Camera's lens description
       public: CameraLens *GetLens();
 
-      /// \brief Set the camera's render target
-      /// \param[in] _target Pointer to the render target
+      // Documentation inherited
       public: void SetRenderTarget(Ogre::RenderTarget *_target) override;
 
       /// \brief Sets environment texture size
@@ -193,14 +208,14 @@ namespace gazebo
       /// \brief Creates a set of 6 cameras pointing in different directions
       protected: void CreateEnvCameras();
 
-      /// \brief Sets the clip distance based on stored SDF values
+      // Documentation inherited
       public: void SetClipDist() override;
 
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
       protected: void CreateEnvRenderTexture(const std::string &_textureName);
 
-      /// \brief Implementation of the render call
+      // Documentation inherited
       protected: void RenderImpl() override;
 
       /// \bried Callback that is used to set mapping material uniform values, implements Ogre::CompositorInstance::Listener interface

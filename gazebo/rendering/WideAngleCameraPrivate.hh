@@ -17,9 +17,7 @@
 #ifndef _GAZEBO_RENDERING_WIDE_ANGLE_CAMERA_CAMERA_PRIVATE_HH_
 #define _GAZEBO_RENDERING_WIDE_ANGLE_CAMERA_CAMERA_PRIVATE_HH_
 
-#include <deque>
-#include <utility>
-#include <list>
+#include <mutex>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
@@ -37,7 +35,10 @@ namespace gazebo
     class GZ_RENDERING_VISIBLE WideAngleCameraPrivate
     {
       /// \brief Mutex to lock while rendering the world
-      public: boost::mutex renderMutex;
+      public: std::mutex renderMutex;
+
+      /// \brief Mutex to lock while setting or reading camera properties
+      public: std::mutex dataMutex;
     };
   }
 }

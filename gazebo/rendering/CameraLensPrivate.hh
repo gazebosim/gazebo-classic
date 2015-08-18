@@ -18,6 +18,14 @@
 #ifndef _GAZEBO_RENDERING_CAMERA_LENS_PRIVATE_HH_
 #define _GAZEBO_RENDERING_CAMERA_LENS_PRIVATE_HH_
 
+#include <map>
+#include <utility>
+#include <string>
+#include <tuple>
+#include <mutex>
+
+#include "gazebo/math/Vector3.hh"
+
 namespace gazebo
 {
   namespace rendering
@@ -71,6 +79,8 @@ namespace gazebo
               };
 
       public: MapFunctionEnum fun = MapFunctionEnum("id");
+
+      public: std::recursive_mutex dataMutex;
     };
   }
 }

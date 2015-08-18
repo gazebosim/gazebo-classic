@@ -15,6 +15,8 @@
  *
 */
 
+#include <mutex>
+
 #include "WideAngleCameraSensor.hh"
 
 #include "gazebo/common/Events.hh"
@@ -166,6 +168,8 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 
   if(this->lensPub && this->lensPub->HasConnections())
   {
+    std::lock_guard<std::mutex> lock(this->lensCmdMutex);
+
     msgs::CameraLensCmd msg;
 
     rendering::WideAngleCameraPtr wcamera = 
@@ -197,6 +201,8 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 {
+  std::lock_guard<std::mutex> lock(this->lensCmdMutex);
+
   if(_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET)
   {
     gzerr << "Control message is not of the set type " << (int)_msg->destiny() <<"\n";
@@ -210,10 +216,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
   rendering::CameraLens *lens = (wcamera->GetLens());
 
   if(_msg->has_type())
-  {
-    gzdbg << "has type:" << _msg->type() << "\n";
     lens->SetType(_msg->type());
-  }
 
   if(_msg->has_c1())
     lens->SetC1(_msg->c1());
@@ -238,5 +241,4 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 
   if(_msg->has_scale_to_hfov())
     lens->SetScaleToHFOV(_msg->scale_to_hfov());
-  gzdbg << "Stil alive\n";
 }
