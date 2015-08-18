@@ -185,6 +185,7 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
         acts[i]->objectName() == "toolbarSpacerAction")
     {
       acts[i]->setVisible(modelEditor || simulation || logPlayback);
+      acts[i]->setEnabled(modelEditor || simulation || logPlayback);
     }
     // Simulation / Model Editor
     else if (acts[i] == g_arrowAct ||

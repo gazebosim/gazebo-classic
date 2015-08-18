@@ -2204,7 +2204,7 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_quitAct->setVisible(simulation || logPlayback);
 
   // Edit
-  this->editMenu->setVisible(simulation);
+  this->editMenu->menuAction()->setVisible(simulation);
   g_resetModelsAct->setVisible(simulation);
   g_resetWorldAct->setVisible(simulation);
   g_editBuildingAct->setVisible(simulation);
@@ -2242,5 +2242,8 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_aboutAct->setVisible(simulation || logPlayback);
 
   // Insert
-  this->insertModel->setVisible(simulation);
+  if (logPlayback)
+    this->tabWidget->removeTab(this->tabWidget->indexOf(this->insertModel));
+  else if (simulation && this->tabWidget->indexOf(this->insertModel) == -1)
+    this->tabWidget->insertTab(1, this->insertModel, "Insert");
 }
