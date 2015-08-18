@@ -3137,20 +3137,3 @@ msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
   }
   return visualType;
 }
-
-/////////////////////////////////////////////////
-bool Visual::IsAncestorOf(rendering::VisualPtr _visual)
-{
-  if (!_visual)
-    return false;
-
-  rendering::VisualPtr vis = _visual->GetParent();
-  while (vis)
-  {
-    if (vis->GetName() == this->GetName())
-      return true;
-    vis = vis->GetParent();
-  }
-
-  return false;
-}
