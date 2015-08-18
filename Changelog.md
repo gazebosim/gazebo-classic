@@ -14,6 +14,9 @@
 1. Added Apply Force/Torque movable text
     * [Pull request #1789](https://bitbucket.org/osrf/gazebo/pull-request/1789)
 
+1. Added cascade parameter (apply to children) for Visual SetMaterial, SetAmbient, SetEmissive, SetSpecular, SetDiffuse, SetTransparency
+    * [Pull request #1851](https://bitbucket.org/osrf/gazebo/pull-request/1851)
+
 1. Tweaks to Data Logger, such as multiline text edit for path
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
 
