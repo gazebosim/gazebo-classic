@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GUI_EXAMPLE_SPAWN_WIDGET_HH_
-#define _GUI_EXAMPLE_SPAWN_WIDGET_HH_
+#ifndef _CAMERA_LENS_CONTROL_EXAMPLE_HH_
+#define _CAMERA_LENS_CONTROL_EXAMPLE_HH_
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>

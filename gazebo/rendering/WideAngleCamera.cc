@@ -83,12 +83,12 @@ void CameraLens::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void CameraLens::Load()
 {
-  if(!this->sdf->HasElement("type"))
+  if (!this->sdf->HasElement("type"))
     gzthrow("You should specify lens type using <type> element");
 
-  if(this->IsCustom())
+  if (this->IsCustom())
   {
-    if(this->sdf->HasElement("custom_function"))
+    if (this->sdf->HasElement("custom_function"))
     {
       sdf::ElementPtr cf = this->sdf->GetElement("custom_function");
 
@@ -212,7 +212,7 @@ void CameraLens::SetType(std::string _type)
 
   this->sdf->GetElement("type")->Set(_type);
 
-  if(_type == "custom")
+  if (_type == "custom")
   {
     this->SetC1(std::get<0>(params));
     this->SetC2(std::get<1>(params));
@@ -238,7 +238,7 @@ void CameraLens::SetC1(float _c)
 
   this->dataPtr->c1 = _c;
 
-  if(!this->IsCustom())
+  if (!this->IsCustom())
     this->ConvertToCustom();
 
   this->sdf->GetElement("custom_function")->GetElement("c1")->Set((double)_c);
@@ -251,7 +251,7 @@ void CameraLens::SetC2(float _c)
 
   this->dataPtr->c2 = _c;
 
-  if(!this->IsCustom())
+  if (!this->IsCustom())
     this->ConvertToCustom();
 
   this->sdf->GetElement("custom_function")->GetElement("c2")->Set((double)_c);
@@ -264,7 +264,7 @@ void CameraLens::SetC3(float _c)
 
   this->dataPtr->c3 = _c;
 
-  if(!this->IsCustom())
+  if (!this->IsCustom())
     this->ConvertToCustom();
 
   this->sdf->GetElement("custom_function")->GetElement("c3")->Set((double)_c);
@@ -277,7 +277,7 @@ void CameraLens::SetF(float _f)
 
   this->dataPtr->f = _f;
 
-  if(!this->IsCustom())
+  if (!this->IsCustom())
     this->ConvertToCustom();
 
   this->sdf->GetElement("custom_function")->GetElement("f")->Set((double)_f);
@@ -287,7 +287,7 @@ void CameraLens::SetFun(std::string _fun)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
-  if(!this->IsCustom())
+  if (!this->IsCustom())
     this->ConvertToCustom();
 
   try
@@ -340,7 +340,7 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,
   uniforms->setNamedConstant("c2", static_cast<Ogre::Real>(this->dataPtr->c2));
   uniforms->setNamedConstant("c3", static_cast<Ogre::Real>(this->dataPtr->c3));
 
-  if(this->GetScaleToHFOV())
+  if (this->GetScaleToHFOV())
   {
     float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
     float fun_res = this->dataPtr->fun.Apply(param);
@@ -422,13 +422,13 @@ void WideAngleCamera::Load()
 
   this->CreateEnvCameras();
 
-  if(this->sdf->HasElement("lens"))
+  if (this->sdf->HasElement("lens"))
   {
     sdf::ElementPtr sdf_lens = this->sdf->GetElement("lens");
 
     this->lens->Load(sdf_lens);
 
-    if(sdf_lens->HasElement("env_texture_size"))
+    if (sdf_lens->HasElement("env_texture_size"))
       this->envTextureSize = sdf_lens->Get<int>("env_texture_size");
   }
   else
@@ -449,7 +449,7 @@ void WideAngleCamera::Fini()
     envCameras[i] = NULL;
   }
 
-  if(this->envCubeMapTexture)
+  if (this->envCubeMapTexture)
     Ogre::TextureManager::getSingleton().remove(this->envCubeMapTexture->getName());
   this->envCubeMapTexture = NULL;
 
@@ -475,18 +475,18 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
-  if(this->renderTarget)
+  if (this->renderTarget)
   {
     this->cubeMapCompInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
           "WideCameraLensMap/ParametrisedMap");
 
-    if(this->envCubeMapTexture)
+    if (this->envCubeMapTexture)
     {
       this->compMat =
           Ogre::MaterialManager::getSingleton().getByName("Gazebo/WideLensMap");
 
-      if(!this->compMat->getTechnique(0)->getPass(0)->getNumTextureUnitStates())
+      if (!this->compMat->getTechnique(0)->getPass(0)->getNumTextureUnitStates())
         this->compMat->getTechnique(0)->getPass(0)->createTextureUnitState();
 
       this->cubeMapCompInstance->addListener(this);
@@ -504,7 +504,7 @@ void WideAngleCamera::SetEnvTextureSize(int _size)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->dataMutex);
 
-  if(this->sdf->HasElement("env_texture_size"))
+  if (this->sdf->HasElement("env_texture_size"))
     this->sdf->AddElement("env_texture_size")->Set(_size);
 
   this->sdf->GetElement("env_texture_size")->Set(_size);
@@ -542,7 +542,7 @@ void WideAngleCamera::SetClipDist()
 
   for(int i=0;i<6;i++)
   {
-    if(this->envCameras[i])
+    if (this->envCameras[i])
     {
       this->envCameras[i]->setNearClipDistance(clipElem->Get<double>("near"));
       this->envCameras[i]->setFarClipDistance(clipElem->Get<double>("far"));
@@ -608,7 +608,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 //////////////////////////////////////////////////
 void WideAngleCamera::RenderImpl()
 {
-  // std::lock_guard<std::mutex> lock(this->dataPtr->renderMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->renderMutex);
 
   math::Quaternion orient = this->GetWorldRotation();
   math::Vector3 pos = this->GetWorldPosition();
@@ -638,18 +638,18 @@ void WideAngleCamera::RenderImpl()
 void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
     Ogre::MaterialPtr &_material)
 {
-  if(_material.isNull())
+  if (_material.isNull())
     return;
 
   Ogre::Technique *pTechnique = _material->getBestTechnique();
-  if(!pTechnique)
+  if (!pTechnique)
     return;
 
   Ogre::Pass *pPass = pTechnique->getPass(0);
-  if(!pPass || !pPass->hasFragmentProgram())
+  if (!pPass || !pPass->hasFragmentProgram())
     return;
 
-  if(!this->GetLens())
+  if (!this->GetLens())
   {
     gzerr << "No lens\n";
     return;

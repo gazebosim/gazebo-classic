@@ -143,7 +143,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   boost::replace_all(lensTopicName, "::", "/");
 
   sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
-  if(lensSdf->HasElement("advertise") && lensSdf->Get<bool>("advertise"))
+  if (lensSdf->HasElement("advertise") && lensSdf->Get<bool>("advertise"))
     this->lensPub = this->node->Advertise<msgs::CameraLensCmd>(
       lensTopicName+"info", 1);
 
@@ -163,10 +163,10 @@ void WideAngleCameraSensor::Fini()
 //////////////////////////////////////////////////
 bool WideAngleCameraSensor::UpdateImpl(bool _force)
 {
-  if(!CameraSensor::UpdateImpl(_force))
+  if (!CameraSensor::UpdateImpl(_force))
     return false;
 
-  if(this->lensPub && this->lensPub->HasConnections())
+  if (this->lensPub && this->lensPub->HasConnections())
   {
     std::lock_guard<std::mutex> lock(this->lensCmdMutex);
 
@@ -207,7 +207,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->lensCmdMutex);
 
-  if(_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET)
+  if (_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET)
   {
     gzerr << "Control message is not of the set type " << (int)_msg->destiny() << "\n";
     gzdbg << _msg->DebugString() << "\n";
@@ -219,30 +219,30 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 
   rendering::CameraLens *lens = (wcamera->GetLens());
 
-  if(_msg->has_type())
+  if (_msg->has_type())
     lens->SetType(_msg->type());
 
-  if(_msg->has_c1())
+  if (_msg->has_c1())
     lens->SetC1(_msg->c1());
 
-  if(_msg->has_c2())
+  if (_msg->has_c2())
     lens->SetC2(_msg->c2());
 
-  if(_msg->has_c3())
+  if (_msg->has_c3())
     lens->SetC3(_msg->c3());
 
-  if(_msg->has_f())
+  if (_msg->has_f())
     lens->SetF(_msg->f());
 
-  if(_msg->has_cutoff_angle())
+  if (_msg->has_cutoff_angle())
     lens->SetCutOffAngle(_msg->cutoff_angle());
 
-  if(_msg->has_hfov())
+  if (_msg->has_hfov())
     this->hfovCmdQueue.push(_msg->hfov());
 
-  if(_msg->has_fun())
+  if (_msg->has_fun())
     lens->SetFun(_msg->fun());
 
-  if(_msg->has_scale_to_hfov())
+  if (_msg->has_scale_to_hfov())
     lens->SetScaleToHFOV(_msg->scale_to_hfov());
 }

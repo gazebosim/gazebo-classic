@@ -6,5 +6,3 @@ build_*
 Ogre.log
 .DS_Store
 *.swp
-
-.idea

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  *
 */
 
-#include "CameraLensControlExample.hh"
-
 #include <sstream>
 #include <gazebo/msgs/msgs.hh>
 
 #include <QtUiTools/QUiLoader>
+
+#include "CameraLensControlExample.hh"
 
 
 using namespace gazebo;
@@ -178,8 +178,8 @@ void CameraLensControlExample::OnButtonSpawn()
     << "          <horizontal_fov>1.047</horizontal_fov>"
     << "          <save enabled='false'><path>/tmp/imgcache/</path></save>"
     << "          <image>"
-    << "            <width>400</width>"
-    << "            <height>400</height>"
+    << "            <width>320</width>"
+    << "            <height>240</height>"
     << "          </image>"
     << "          <clip>"
     << "            <near>0.1</near>"

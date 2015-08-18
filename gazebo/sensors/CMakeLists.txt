@@ -1,5 +1,9 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+if (WIN32)
+  include_directories(${libdl_include_dir})
+endif()
+
 set (sources
   AltimeterSensor.cc
   CameraSensor.cc
@@ -88,7 +92,7 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
 
 
-add_library(gazebo_sensors SHARED ${sources} ../rendering/WideAngleCamera.cc ../rendering/WideAngleCamera.hh)
+gz_add_library(gazebo_sensors ${sources})
 
 target_link_libraries(gazebo_sensors
   gazebo_common
