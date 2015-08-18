@@ -51,7 +51,7 @@ namespace gazebo
       /// \param[in] _fun Angle transform function
       /// \param[in] _fun Focal length of the optical system
       /// \param[in] _c3 Angle shift constant, should be 0 in most cases
-      public: void Init(float _c1,float _c2,std::string _fun,float _f,float _c3);
+      public: void Init(float _c1, float _c2, std::string _fun, float _f, float _c3);
 
       /// \brief Init camera lens with standard mapping function
       /// \param[in] _name Mapping function name
@@ -63,6 +63,14 @@ namespace gazebo
 
       /// \brief Load camera lens with default parameters
       public: void Load();
+
+      /// \brief Get lens projection type
+      /// \return Lens projection type string
+      public: std::string GetType() const;
+
+      /// \brief Checks if lens type is of the custom type
+      /// \return True if this->GetType() == "custom"
+      public: bool IsCustom() const;
 
       /// \brief Gets c1 constant
       /// \return c1 constant
@@ -92,6 +100,10 @@ namespace gazebo
       /// \return True if the image will be scaled
       public: bool GetScaleToHFOV() const;
 
+      /// \brief Set lens projection type
+      /// \param[in] _type Lens projection type string
+      public: void SetType(std::string _type);
+
       /// \brief Sets c1 constant
       /// \param[in] _c c1 constant
       public: void SetC1(float _c);
@@ -120,26 +132,14 @@ namespace gazebo
       /// \param[in] _scale true if it should, note: c1 and f constants are ignored in this case
       public: void SetScaleToHFOV(bool _scale);
 
-      /// \brief Converts projection type from one of the predefined projection typed to custom
-      private: void ConvertToCustom();
-
-      /// \brief Get lens projection type
-      /// \return Lens projection type string
-      public: std::string GetType() const;
-
-      /// \brief Set lens projection type
-      /// \param[in] _type Lens projection type string
-      public: void SetType(std::string _type);
-
-      /// \brief Checks if lens type is of the custom type
-      /// \return True if this->GetType() == "custom"
-      public: bool IsCustom() const;
-
       /// \brief Set uniform variables of shader for the provided material technique pass
       /// \param[in] _pass Ogre::Pass used for rendering
       /// \param[in] _ratio Frame aspect ratio
       /// \param[in] _hfov Horisontal field of view
-      public: void SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov);
+      public: void SetUniformVariables(Ogre::Pass *_pass, float _ratio, float _hfov);
+
+      /// \brief Converts projection type from one of the predefined projection typed to custom
+      private: void ConvertToCustom();
 
       /// \brief SDF element of the lens
       protected: sdf::ElementPtr sdf;
@@ -163,50 +163,53 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~WideAngleCamera();
 
-      /// \brief Set the camera's render target
-      /// \param[in] _target Pointer to the render target
-      public: virtual void SetRenderTarget(Ogre::RenderTarget *_target) override;
+      /// \brief Initializes the camera
+      public: void Init() override;
 
-      /// \brief Set the camera's render target
-      /// \param[in] _textureName Name used as a base for environment texture
-      protected: void CreateEnvRenderTexture(const std::string &_textureName);
-
-      /// \brief Get the environment texture size
-      /// \return Texture size
-      public: int GetEnvTextureSize() const;
-
-      /// \brief Set environment texture size
-      /// \param[in] _size Texture size
-      public: void SetEnvTextureSize(int _size);
-
-      /// \brief Create a set of 6 cameras pointing in different directions
-      protected: void CreateEnvCameras();
-
-      /// \brief Set the clip distance based on stored SDF values
-      public: virtual void SetClipDist() override;
-
-      /// \brief Implementation of the render call
-      protected: virtual void RenderImpl() override;
-
-      /// \brief Initialize the camera
-      public: virtual void Init() override;
-
-      /// \brief Load the camera with default parmeters
-      public: virtual void Load() override;
+      /// \brief Loads camera with default parmeters
+      public: void Load() override;
 
       /// \brief Finalize the camera.
       ///
       /// This function is called before the camera is destructed
       public: virtual void Fini() override;
 
-      /// \brief Get this camera lens description
-      /// \return Camera lens description
+            /// \brief Gets the environment texture size
+      /// \return Texture size
+      public: int GetEnvTextureSize() const;
+
+      /// \brief Gets camera's lens description
+      /// \return Camera's lens description
       public: CameraLens *GetLens();
 
-      protected: virtual void notifyMaterialRender(Ogre::uint32 _pass_id, Ogre::MaterialPtr &_material) override;
+      /// \brief Set the camera's render target
+      /// \param[in] _target Pointer to the render target
+      public: void SetRenderTarget(Ogre::RenderTarget *_target) override;
+
+      /// \brief Sets environment texture size
+      /// \param[in] _size Texture size
+      public: void SetEnvTextureSize(int _size);
+
+      /// \brief Creates a set of 6 cameras pointing in different directions
+      protected: void CreateEnvCameras();
+
+      /// \brief Sets the clip distance based on stored SDF values
+      public: void SetClipDist() override;
+
+      /// \brief Set the camera's render target
+      /// \param[in] _textureName Name used as a base for environment texture
+      protected: void CreateEnvRenderTexture(const std::string &_textureName);
+
+      /// \brief Implementation of the render call
+      protected: void RenderImpl() override;
+
+      /// \bried Callback that is used to set mapping material uniform values, implements Ogre::CompositorInstance::Listener interface
+      /// \param[in] _pass_id Pass identifier
+      /// \param[in] _pass_id Material whose parameters should be set
+      protected: void notifyMaterialRender(Ogre::uint32 _pass_id, Ogre::MaterialPtr &_material) override;
 
       /// \brief Compositor used to render rectangle with attached cube map texture
-      protected: Ogre::CompositorInstance *wamapInstance;
+      protected: Ogre::CompositorInstance *cubeMapCompInstance;
 
       /// \brief Set of 6 cameras, each pointing in different direction with FOV of 90deg
       protected: Ogre::Camera *envCameras[6];
@@ -229,6 +232,7 @@ namespace gazebo
       /// \brief Camera lens description
       protected: CameraLens *lens;
 
+      /// \brief Private data pointer
       private: WideAngleCameraPrivate *dataPtr;
     };
     /// \}

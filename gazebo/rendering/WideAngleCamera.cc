@@ -30,252 +30,6 @@
 using namespace gazebo;
 using namespace rendering;
 
-
-//////////////////////////////////////////////////
-WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
-    ScenePtr _scene, bool _autoRender, int _textureSize):
-  Camera(_namePrefix,_scene,_autoRender),
-  envTextureSize(_textureSize)
-{
-  this->dataPtr = new WideAngleCameraPrivate;
-  this->lens = new CameraLens();
-
-  envCubeMapTexture = NULL;
-  for(int i=0;i<6;i++)
-  {
-    envCameras[i] = NULL;
-    envRenderTargets[i] = NULL;
-  }
-}
-
-//////////////////////////////////////////////////
-WideAngleCamera::~WideAngleCamera()
-{
-  delete this->dataPtr;
-  delete this->lens;
-}
-
-//////////////////////////////////////////////////
-void WideAngleCamera::Init()
-{
-  Camera::Init();
-
-  this->CreateEnvRenderTexture(this->scopedUniqueName + "_envRttTex");
-}
-
-//////////////////////////////////////////////////
-void WideAngleCamera::Load()
-{
-  Camera::Load();
-
-  this->CreateEnvCameras();
-
-  if(this->sdf->HasElement("lens"))
-  {
-    sdf::ElementPtr sdf_lens = this->sdf->GetElement("lens");
-
-    this->lens->Load(sdf_lens);
-
-    if(sdf_lens->HasElement("env_texture_size"))
-      this->envTextureSize = sdf_lens->Get<int>("env_texture_size");
-  }
-  else
-    this->lens->Load();
-}
-
-//////////////////////////////////////////////////
-void WideAngleCamera::Fini()
-{
-  for(int i=0;i<6;i++)
-  {
-    RTShaderSystem::DetachViewport(this->envViewports[i], this->GetScene());
-
-    this->envRenderTargets[i]->removeAllViewports();
-    this->envRenderTargets[i] = NULL;
-
-    this->GetScene()->GetManager()->destroyCamera(envCameras[i]->getName());
-    envCameras[i] = NULL;
-  }
-
-  if(this->envCubeMapTexture)
-    Ogre::TextureManager::getSingleton().remove(this->envCubeMapTexture->getName());
-  this->envCubeMapTexture = NULL;
-
-  Camera::Fini();
-}
-
-//////////////////////////////////////////////////
-void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
-{
-  Camera::SetRenderTarget(_target);
-
-  if(this->renderTarget)
-  {
-    this->wamapInstance =
-      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-          "WideCameraLensMap/ParametrisedMap");
-
-    if(this->envCubeMapTexture)
-    {
-      this->compMat = Ogre::MaterialManager::getSingleton().getByName("Gazebo/WideLensMap");
-
-      if(this->compMat->getTechnique(0)->getPass(0)->getNumTextureUnitStates() == 0)
-      {
-        this->compMat->getTechnique(0)->getPass(0)->createTextureUnitState();
-      }
-
-      // this->lens->SetCompositorMaterial(this->compMat); //FIXME: remove
-      this->wamapInstance->addListener(this);
-    }
-    else
-      gzerr << "Compositor texture MISSING";
-
-
-    this->wamapInstance->setEnabled(true);
-  }
-}
-
-//////////////////////////////////////////////////
-void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
-{
-  int fsaa = 4;
-
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
-  fsaa = 0;
-#endif
-
-  this->envCubeMapTexture = Ogre::TextureManager::getSingleton().createManual(
-      this->scopedUniqueName+"::"+_textureName,
-      "General",
-      Ogre::TEX_TYPE_CUBE_MAP,
-      this->envTextureSize,
-      this->envTextureSize,
-      0,
-      Ogre::PF_A8R8G8B8,
-      Ogre::TU_RENDERTARGET,
-      0,
-      false,
-      fsaa).getPointer();
-
-  for(int i=0;i<6;i++)
-  {
-    Ogre::RenderTarget *rtt;
-    rtt = this->envCubeMapTexture->getBuffer(i)->getRenderTarget();
-
-    Ogre::Viewport *vp = rtt->addViewport(this->envCameras[i]);
-    vp->setClearEveryFrame(true);
-    vp->setShadowsEnabled(true);
-    vp->setOverlaysEnabled(false);
-
-    RTShaderSystem::AttachViewport(vp, this->GetScene());
-
-    vp->setBackgroundColour(
-      Conversions::Convert(this->scene->GetBackgroundColor()));
-    vp->setVisibilityMask(GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
-
-    this->envViewports[i] = vp;
-
-    //FIXME: problem with Skyx include
-    // if (this->GetScene()->GetSkyX())
-    //   rtt->addListener(this->GetScene()->GetSkyX());
-
-    this->envRenderTargets[i] = rtt;
-  }
-}
-
-//////////////////////////////////////////////////
-int WideAngleCamera::GetEnvTextureSize() const
-{
-  return this->envTextureSize;
-}
-
-//////////////////////////////////////////////////
-void WideAngleCamera::SetEnvTextureSize(int _size)
-{
-  if(this->sdf->HasElement("env_texture_size"))
-    this->sdf->AddElement("env_texture_size")->Set(_size);
-
-  this->sdf->GetElement("env_texture_size")->Set(_size);
-}
-
-//////////////////////////////////////////////////
-void WideAngleCamera::CreateEnvCameras()
-{
-  for(int i=0;i<6;i++)
-  {
-    std::stringstream name_str;
-
-    name_str << this->scopedUniqueName << "_env_" << i;
-
-    envCameras[i] = this->GetScene()->GetManager()->createCamera(name_str.str());
-
-    envCameras[i]->setFixedYawAxis(false);
-    envCameras[i]->setFOVy(Ogre::Degree(90));
-    envCameras[i]->setAspectRatio(1);
-
-    envCameras[i]->setNearClipDistance(0.01);
-    envCameras[i]->setFarClipDistance(1000);
-  }
-}
-
-//////////////////////////////////////////////////
-void WideAngleCamera::RenderImpl()
-{
-  // boost::mutex::scoped_lock lock(this->dataPtr->renderMutex);
-
-  math::Quaternion orient = this->GetWorldRotation();
-  math::Vector3 pos = this->GetWorldPosition();
-
-  for(int i=0;i<6;i++)
-  {
-    this->envCameras[i]->setPosition(this->camera->getRealPosition());
-    this->envCameras[i]->setOrientation(this->camera->getRealOrientation());
-  }
-
-  this->envCameras[0]->rotate(this->camera->getDerivedUp(),Ogre::Degree(-90));
-  this->envCameras[1]->rotate(this->camera->getDerivedUp(),Ogre::Degree(90));
-  this->envCameras[2]->pitch(Ogre::Degree(90));
-  this->envCameras[3]->pitch(Ogre::Degree(-90));
-  this->envCameras[5]->rotate(this->camera->getDerivedUp(),Ogre::Degree(180));
-
-  for(int i=0;i<6;i++)
-    this->envRenderTargets[i]->update();
-
-  compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
-    this->envCubeMapTexture->getName());
-
-  this->renderTarget->update();
-}
-
-//////////////////////////////////////////////////
-void WideAngleCamera::SetClipDist()
-{
-  sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
-  if (!clipElem)
-    gzthrow("Camera has no <clip> tag.");
-
-  for(int i=0;i<6;i++)
-  {
-    if(this->envCameras[i])
-    {
-      this->envCameras[i]->setNearClipDistance(clipElem->Get<double>("near"));
-      this->envCameras[i]->setFarClipDistance(clipElem->Get<double>("far"));
-      this->envCameras[i]->setRenderingDistance(clipElem->Get<double>("far"));
-    }
-    else
-    {
-      gzerr << "Setting clip distances failed -- no camera yet\n";
-      break;
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-CameraLens *WideAngleCamera::GetLens()
-{
-  return this->lens;
-}
-
 CameraLens::CameraLens()
 {
   this->dataPtr = new CameraLensPrivate;
@@ -287,7 +41,8 @@ CameraLens::~CameraLens()
 }
 
 //////////////////////////////////////////////////
-void CameraLens::Init(float _c1,float _c2,std::string _fun,float _f,float _c3)
+void CameraLens::Init(float _c1, float _c2,
+    std::string _fun, float _f, float _c3)
 {
   this->dataPtr->c1 = _c1;
   this->dataPtr->c2 = _c2;
@@ -350,6 +105,18 @@ void CameraLens::Load()
 }
 
 //////////////////////////////////////////////////
+std::string CameraLens::GetType() const
+{
+  return this->sdf->Get<std::string>("type");
+}
+
+//////////////////////////////////////////////////
+bool CameraLens::IsCustom() const
+{
+  return GetType() == "custom";
+}
+
+//////////////////////////////////////////////////
 float CameraLens::GetC1() const
 {
   return this->dataPtr->c1;
@@ -374,15 +141,72 @@ float CameraLens::GetF() const
 }
 
 //////////////////////////////////////////////////
+std::string CameraLens::GetFun() const
+{
+  return this->dataPtr->fun.AsString();
+}
+
+//////////////////////////////////////////////////
 float CameraLens::GetCutOffAngle() const
 {
   return this->dataPtr->cutOffAngle;
 }
 
 //////////////////////////////////////////////////
-std::string CameraLens::GetFun() const
+bool CameraLens::GetScaleToHFOV() const
 {
-  return this->dataPtr->fun.AsString();
+  return this->sdf->Get<bool>("scale_to_hfov");
+}
+
+//////////////////////////////////////////////////
+void CameraLens::SetType(std::string _type)
+{
+  // c1, c2, c3, f, fun
+  std::map< std::string, std::tuple<float, float, float,
+      float, std::string> > fun_types = {
+    {"gnomonical",     std::make_tuple(1.0f, 1.0f, 0.0f, 1.0f, "tan")},
+    {"stereographic",  std::make_tuple(2.0f, 2.0f, 0.0f, 1.0f, "tan")},
+    {"equidistant",    std::make_tuple(1.0f, 1.0f, 0.0f, 1.0f, "id")},
+    {"equisolid_angle",std::make_tuple(2.0f, 2.0f, 0.0f, 1.0f, "sin")},
+    {"orthographic",   std::make_tuple(1.0f, 1.0f, 0.0f, 1.0f, "sin")}};
+
+  fun_types.emplace("custom",
+      std::make_tuple(this->GetC1(), this->GetC2(), this->GetC3(), this->GetF(),
+        CameraLensPrivate::MapFunctionEnum(this->GetFun()).AsString()));
+
+  decltype(fun_types)::mapped_type params;
+
+  try
+  {
+    params = fun_types.at(_type);
+  }
+  catch(...)
+  {
+    std::stringstream sstr;
+    sstr << "Unknown mapping function [" << _type << "]";
+
+    gzthrow(sstr.str());
+  }
+
+  this->sdf->GetElement("type")->Set(_type);
+
+  if(_type == "custom")
+  {
+    this->SetC1(std::get<0>(params));
+    this->SetC2(std::get<1>(params));
+    this->SetC3(std::get<2>(params));
+    this->SetF(std::get<3>(params));
+    this->SetFun(std::get<4>(params));
+  }
+  else
+  {
+    // Do not write values to SDF
+    this->dataPtr->c1 = std::get<0>(params);
+    this->dataPtr->c2 = std::get<1>(params);
+    this->dataPtr->c3 = std::get<2>(params);
+    this->dataPtr->f = std::get<3>(params);
+    this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -464,6 +288,49 @@ void CameraLens::SetScaleToHFOV(bool _scale)
 }
 
 //////////////////////////////////////////////////
+void CameraLens::SetUniformVariables(Ogre::Pass *_pass,
+    float _ratio, float _hfov)
+{
+  Ogre::GpuProgramParametersSharedPtr uniforms =
+    _pass->getFragmentProgramParameters();
+
+  math::Vector3 fun_m[] = {
+    math::Vector3(1, 0, 0),
+    math::Vector3(0, 1, 0),
+    math::Vector3(0, 0, 1)
+  };
+
+  uniforms->setNamedConstant("c1", static_cast<Ogre::Real>(this->dataPtr->c1));
+  uniforms->setNamedConstant("c2", static_cast<Ogre::Real>(this->dataPtr->c2));
+  uniforms->setNamedConstant("c3", static_cast<Ogre::Real>(this->dataPtr->c3));
+
+  if(this->GetScaleToHFOV())
+  {
+    float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
+    float fun_res = this->dataPtr->fun.Apply(param);
+
+    float new_f = 1.0f/(this->dataPtr->c1*fun_res);
+
+    uniforms->setNamedConstant("f", static_cast<Ogre::Real>(new_f));
+  }
+  else
+    uniforms->setNamedConstant("f", static_cast<Ogre::Real>(this->dataPtr->f));
+
+  auto vec_fun = this->dataPtr->fun.AsVector3();
+
+  uniforms->setNamedConstant("fun", Ogre::Vector3(
+      vec_fun.x, vec_fun.y, vec_fun.z));
+
+  uniforms->setNamedConstant("cutOffAngle",
+    static_cast<Ogre::Real>(this->dataPtr->cutOffAngle));
+
+  Ogre::GpuProgramParametersSharedPtr uniforms_vs =
+    _pass->getVertexProgramParameters();
+
+  uniforms_vs->setNamedConstant("ratio", static_cast<Ogre::Real>(_ratio));
+}
+
+//////////////////////////////////////////////////
 void CameraLens::ConvertToCustom()
 {
   this->SetType("custom");
@@ -479,114 +346,248 @@ void CameraLens::ConvertToCustom()
 }
 
 //////////////////////////////////////////////////
-std::string CameraLens::GetType() const
+WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
+    ScenePtr _scene, bool _autoRender, int _textureSize):
+  Camera(_namePrefix, _scene, _autoRender),
+  envTextureSize(_textureSize)
 {
-  return this->sdf->Get<std::string>("type");
+  this->dataPtr = new WideAngleCameraPrivate;
+  this->lens = new CameraLens();
+
+  envCubeMapTexture = NULL;
+  for(int i=0;i<6;i++)
+  {
+    envCameras[i] = NULL;
+    envRenderTargets[i] = NULL;
+  }
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetType(std::string _type)
+WideAngleCamera::~WideAngleCamera()
 {
-  // c1,c2,c3,f,fun
-  std::map< std::string,std::tuple<float,float,float,
-      float,std::string> > fun_types = {
-    {"gnomonical",     std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan")},
-    {"stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,"tan")},
-    {"equidistant",    std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id")},
-    {"equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,"sin")},
-    {"orthographic",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin")}};
+  delete this->dataPtr;
+  delete this->lens;
+}
 
-  fun_types.emplace("custom",
-      std::make_tuple(this->GetC1(),this->GetC2(),this->GetC3(),
-      this->GetF(),CameraLensPrivate::MapFunctionEnum(this->GetFun()).AsString()));
+//////////////////////////////////////////////////
+void WideAngleCamera::Init()
+{
+  Camera::Init();
 
-  decltype(fun_types)::mapped_type params;
+  this->CreateEnvRenderTexture(this->scopedUniqueName + "_envRttTex");
+}
 
-  try
+//////////////////////////////////////////////////
+void WideAngleCamera::Load()
+{
+  Camera::Load();
+
+  this->CreateEnvCameras();
+
+  if(this->sdf->HasElement("lens"))
   {
-    params = fun_types.at(_type);
-  }
-  catch(...)
-  {
-    std::stringstream sstr;
-    sstr << "Unknown mapping function [" << _type << "]";
+    sdf::ElementPtr sdf_lens = this->sdf->GetElement("lens");
 
-    gzthrow(sstr.str());
-  }
+    this->lens->Load(sdf_lens);
 
-  this->sdf->GetElement("type")->Set(_type);
-
-  if(_type == "custom")
-  {
-    this->SetC1(std::get<0>(params));
-    this->SetC2(std::get<1>(params));
-    this->SetC3(std::get<2>(params));
-    this->SetF(std::get<3>(params));
-    this->SetFun(std::get<4>(params));
+    if(sdf_lens->HasElement("env_texture_size"))
+      this->envTextureSize = sdf_lens->Get<int>("env_texture_size");
   }
   else
+    this->lens->Load();
+}
+
+//////////////////////////////////////////////////
+void WideAngleCamera::Fini()
+{
+  for(int i=0;i<6;i++)
   {
-    // Do not write values to SDF
-    this->dataPtr->c1 = std::get<0>(params);
-    this->dataPtr->c2 = std::get<1>(params);
-    this->dataPtr->c3 = std::get<2>(params);
-    this->dataPtr->f = std::get<3>(params);
-    this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
+    RTShaderSystem::DetachViewport(this->envViewports[i], this->GetScene());
+
+    this->envRenderTargets[i]->removeAllViewports();
+    this->envRenderTargets[i] = NULL;
+
+    this->GetScene()->GetManager()->destroyCamera(envCameras[i]->getName());
+    envCameras[i] = NULL;
+  }
+
+  if(this->envCubeMapTexture)
+    Ogre::TextureManager::getSingleton().remove(this->envCubeMapTexture->getName());
+  this->envCubeMapTexture = NULL;
+
+  Camera::Fini();
+}
+
+//////////////////////////////////////////////////
+int WideAngleCamera::GetEnvTextureSize() const
+{
+  return this->envTextureSize;
+}
+
+//////////////////////////////////////////////////
+CameraLens *WideAngleCamera::GetLens()
+{
+  return this->lens;
+}
+
+//////////////////////////////////////////////////
+void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
+{
+  Camera::SetRenderTarget(_target);
+
+  if(this->renderTarget)
+  {
+    this->cubeMapCompInstance =
+      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+          "WideCameraLensMap/ParametrisedMap");
+
+    if(this->envCubeMapTexture)
+    {
+      this->compMat =
+          Ogre::MaterialManager::getSingleton().getByName("Gazebo/WideLensMap");
+
+      if(!this->compMat->getTechnique(0)->getPass(0)->getNumTextureUnitStates())
+        this->compMat->getTechnique(0)->getPass(0)->createTextureUnitState();
+
+      this->cubeMapCompInstance->addListener(this);
+    }
+    else
+      gzerr << "Compositor texture MISSING";
+
+
+    this->cubeMapCompInstance->setEnabled(true);
   }
 }
 
 //////////////////////////////////////////////////
-bool CameraLens::IsCustom() const
+void WideAngleCamera::SetEnvTextureSize(int _size)
 {
-  return GetType() == "custom";
+  if(this->sdf->HasElement("env_texture_size"))
+    this->sdf->AddElement("env_texture_size")->Set(_size);
+
+  this->sdf->GetElement("env_texture_size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
-bool CameraLens::GetScaleToHFOV() const
+void WideAngleCamera::CreateEnvCameras()
 {
-  return this->sdf->Get<bool>("scale_to_hfov");
-}
-
-//////////////////////////////////////////////////
-void CameraLens::SetUniformVariables(Ogre::Pass *_pass,float _ratio,float _hfov)
-{
-  Ogre::GpuProgramParametersSharedPtr uniforms =
-    _pass->getFragmentProgramParameters();
-
-  math::Vector3 fun_m[] = {
-    math::Vector3(1,0,0),
-    math::Vector3(0,1,0),
-    math::Vector3(0,0,1)
-  };
-
-  uniforms->setNamedConstant("c1",(Ogre::Real)(this->dataPtr->c1));
-  uniforms->setNamedConstant("c2",(Ogre::Real)(this->dataPtr->c2));
-  uniforms->setNamedConstant("c3",(Ogre::Real)(this->dataPtr->c3));
-
-  if(this->GetScaleToHFOV())
+  for(int i=0;i<6;i++)
   {
-    float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
-    float fun_res = this->dataPtr->fun.Apply(param);
+    std::stringstream name_str;
 
-    float new_f = 1.0f/(this->dataPtr->c1*fun_res);
+    name_str << this->scopedUniqueName << "_env_" << i;
 
-    uniforms->setNamedConstant("f",(Ogre::Real)(new_f));
+    envCameras[i] =
+        this->GetScene()->GetManager()->createCamera(name_str.str());
+
+    envCameras[i]->setFixedYawAxis(false);
+    envCameras[i]->setFOVy(Ogre::Degree(90));
+    envCameras[i]->setAspectRatio(1);
+
+    envCameras[i]->setNearClipDistance(0.01);
+    envCameras[i]->setFarClipDistance(1000);
   }
-  else
-    uniforms->setNamedConstant("f",(Ogre::Real)(this->dataPtr->f));
+}
 
-  auto vec_fun = this->dataPtr->fun.AsVector3();
+//////////////////////////////////////////////////
+void WideAngleCamera::SetClipDist()
+{
+  sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
+  if (!clipElem)
+    gzthrow("Camera has no <clip> tag.");
 
-  uniforms->setNamedConstant("fun",Ogre::Vector3(
-      vec_fun.x, vec_fun.y, vec_fun.z));
+  for(int i=0;i<6;i++)
+  {
+    if(this->envCameras[i])
+    {
+      this->envCameras[i]->setNearClipDistance(clipElem->Get<double>("near"));
+      this->envCameras[i]->setFarClipDistance(clipElem->Get<double>("far"));
+      this->envCameras[i]->setRenderingDistance(clipElem->Get<double>("far"));
+    }
+    else
+    {
+      gzerr << "Setting clip distances failed -- no camera yet\n";
+      break;
+    }
+  }
+}
 
-  uniforms->setNamedConstant("cutOffAngle",
-    (Ogre::Real)(this->dataPtr->cutOffAngle));
+//////////////////////////////////////////////////
+void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
+{
+  int fsaa = 4;
 
-  Ogre::GpuProgramParametersSharedPtr uniforms_vs =
-    _pass->getVertexProgramParameters();
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
+  fsaa = 0;
+#endif
 
-  uniforms_vs->setNamedConstant("ratio",(Ogre::Real)(_ratio));
+  this->envCubeMapTexture = Ogre::TextureManager::getSingleton().createManual(
+      this->scopedUniqueName+"::"+_textureName,
+      "General",
+      Ogre::TEX_TYPE_CUBE_MAP,
+      this->envTextureSize,
+      this->envTextureSize,
+      0,
+      Ogre::PF_A8R8G8B8,
+      Ogre::TU_RENDERTARGET,
+      0,
+      false,
+      fsaa).getPointer();
+
+  for(int i=0;i<6;i++)
+  {
+    Ogre::RenderTarget *rtt;
+    rtt = this->envCubeMapTexture->getBuffer(i)->getRenderTarget();
+
+    Ogre::Viewport *vp = rtt->addViewport(this->envCameras[i]);
+    vp->setClearEveryFrame(true);
+    vp->setShadowsEnabled(true);
+    vp->setOverlaysEnabled(false);
+
+    RTShaderSystem::AttachViewport(vp, this->GetScene());
+
+    vp->setBackgroundColour(
+      Conversions::Convert(this->scene->GetBackgroundColor()));
+    vp->setVisibilityMask(GZ_VISIBILITY_ALL &
+        ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
+
+    this->envViewports[i] = vp;
+
+    //FIXME: problem with Skyx include
+    // if (this->GetScene()->GetSkyX())
+    //   rtt->addListener(this->GetScene()->GetSkyX());
+
+    this->envRenderTargets[i] = rtt;
+  }
+}
+
+//////////////////////////////////////////////////
+void WideAngleCamera::RenderImpl()
+{
+  // boost::mutex::scoped_lock lock(this->dataPtr->renderMutex);
+
+  math::Quaternion orient = this->GetWorldRotation();
+  math::Vector3 pos = this->GetWorldPosition();
+
+  for(int i=0;i<6;i++)
+  {
+    this->envCameras[i]->setPosition(this->camera->getRealPosition());
+    this->envCameras[i]->setOrientation(this->camera->getRealOrientation());
+  }
+
+  this->envCameras[0]->rotate(this->camera->getDerivedUp(), Ogre::Degree(-90));
+  this->envCameras[1]->rotate(this->camera->getDerivedUp(), Ogre::Degree(90));
+  this->envCameras[2]->pitch(Ogre::Degree(90));
+  this->envCameras[3]->pitch(Ogre::Degree(-90));
+  this->envCameras[5]->rotate(this->camera->getDerivedUp(), Ogre::Degree(180));
+
+  for(int i=0;i<6;i++)
+    this->envRenderTargets[i]->update();
+
+  compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
+    this->envCubeMapTexture->getName());
+
+  this->renderTarget->update();
 }
 
 //////////////////////////////////////////////////
