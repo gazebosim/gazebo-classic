@@ -47,9 +47,9 @@ void SimbodyModel::Load(sdf::ElementPtr _sdf)
 void SimbodyModel::Init()
 {
   // Record the model's initial pose (for reseting)
-  math::Pose initPose = this->sdf->Get<math::Pose>("pose");
-  this->SetInitialRelativePose(initPose);
-  this->SetRelativePose(initPose);
+  this->SetInitialRelativePose(this->GetWorldPose());
+
+  this->SetRelativePose(this->GetWorldPose());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
