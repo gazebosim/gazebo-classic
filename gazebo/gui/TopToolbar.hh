@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_TOP_TOOLBAR_HH_
 #define _GAZEBO_TOP_TOOLBAR_HH_
 
+#include <string>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -38,19 +40,28 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~TopToolbar();
 
-      /// \brief Get the toolbar.
-      /// \return Toolbar
-      public: QToolBar *GetToolbar() const;
-
-      public: void SetMode(const std::string &_mode);
-
+      /// \brief Insert an action before a given action.
+      /// \param[in] _before Name of an action already on the toolbar. This
+      /// fails to insert the action if the name is not found.
+      /// \param[in] _action The action to be inserted.
       public: void InsertAction(const QString &_before,
           QAction *_action);
 
+      /// \brief Insert a separator before a given action.
+      /// \param[in] _before Name of an action already on the toolbar.
+      /// \return The action for the created separator, if successful.
       public: QAction *InsertSeparator(const QString &_before);
 
+      /// \brief Insert a widget before a given action.
+      /// \param[in] _before Name of an action already on the toolbar.
+      /// \param[in] _widget Widget to be inserted.
+      /// \return The new toolbar action for the widget, if successful.
       public: QAction *InsertWidget(const QString &_before,
           QWidget *_widget);
+
+      /// \brief Callback when window mode is changed.
+      /// \param[in] _mode New window mode.
+      private: void OnWindowMode(const std::string &_mode);
 
       /// \internal
       /// \brief Pointer to private data.

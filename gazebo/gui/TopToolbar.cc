@@ -35,8 +35,10 @@ TopToolbar::TopToolbar(QWidget *_parent)
   : QFrame(_parent), dataPtr(new TopToolbarPrivate)
 {
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  this->setObjectName("topToolbar");
 
   this->dataPtr->toolbar = new QToolBar;
+  this->dataPtr->toolbar->setObjectName("topToolbarToolbar");
 
   // Manipulation modes
   QActionGroup *actionGroup = new QActionGroup(this);
@@ -157,7 +159,7 @@ TopToolbar::TopToolbar(QWidget *_parent)
   // Connections
   this->dataPtr->connections.push_back(
       gui::Events::ConnectWindowMode(
-      boost::bind(&TopToolbar::SetMode, this, _1)));
+      boost::bind(&TopToolbar::OnWindowMode, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -168,13 +170,7 @@ TopToolbar::~TopToolbar()
 }
 
 /////////////////////////////////////////////////
-QToolBar *TopToolbar::GetToolbar() const
-{
-  return this->dataPtr->toolbar;
-}
-
-/////////////////////////////////////////////////
-void TopToolbar::SetMode(const std::string &_mode)
+void TopToolbar::OnWindowMode(const std::string &_mode)
 {
   bool modelEditor = _mode == "ModelEditor";
   bool simulation = _mode == "Simulation";

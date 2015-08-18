@@ -14,27 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TOP_TOOLBAR_PRIVATE_HH_
-#define _GAZEBO_TOP_TOOLBAR_PRIVATE_HH_
 
-#include <vector>
+#ifndef _GAZEBO_TOP_TOOLBAR_TEST_HH_
+#define _GAZEBO_TOP_TOOLBAR_TEST_HH_
 
-#include "gazebo/gui/qt.h"
+#include "gazebo/gui/QTestFixture.hh"
 
-namespace gazebo
+/// \brief A test class for the TopToolbar widget.
+class TopToolbar_TEST : public QTestFixture
 {
-  namespace gui
-  {
-    /// \internal
-    /// \brief Private data for the TopToolbar class
-    class TopToolbarPrivate
-    {
-      /// \brief Widget for the top toolbar
-      public: QToolBar *toolbar;
+  Q_OBJECT
 
-      /// \brief Event based connections.
-      public: std::vector<event::ConnectionPtr> connections;
-    };
-  }
-}
+  /// \brief Test different window modes.
+  private slots: void WindowModes();
+
+  /// \brief Test inserting actions, separators and widgets.
+  private slots: void Insert();
+};
+
 #endif
