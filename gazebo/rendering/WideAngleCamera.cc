@@ -294,7 +294,17 @@ void CameraLens::Init(float _c1,float _c2,std::string _fun,float _f,float _c3)
   this->dataPtr->c3 = _c3;
   this->dataPtr->f = _f;
 
-  this->SetFun(_fun);
+  try
+  {
+    this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum(_fun);
+  }
+  catch(...)
+  {
+    std::stringstream sstr;
+    sstr << "Failed to create custom mapping with function [" << _fun << "]";
+
+    gzthrow(sstr.str());
+  }
 }
 
 //////////////////////////////////////////////////
@@ -372,7 +382,7 @@ float CameraLens::GetCutOffAngle() const
 //////////////////////////////////////////////////
 std::string CameraLens::GetFun() const
 {
-  return this->sdf->GetElement("custom_function")->Get<std::string>("fun");
+  return this->dataPtr->fun.AsString();
 }
 
 //////////////////////////////////////////////////
@@ -477,22 +487,21 @@ std::string CameraLens::GetType() const
 //////////////////////////////////////////////////
 void CameraLens::SetType(std::string _type)
 {
-  std::map< std::string,std::tuple<float,float,float,
-      float,std::string> > fun_types;
-
   // c1,c2,c3,f,fun
-  fun_types.emplace("gnomonical",     std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan"));
-  fun_types.emplace("stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,"tan"));
-  fun_types.emplace("stereographic_", std::make_tuple(2.0f,2.0f,0.0f,0.5f,"tan"));
-  fun_types.emplace("equidistant",    std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id"));
-  fun_types.emplace("equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,"sin"));
-  fun_types.emplace("orthographic",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin"));
+  std::map< std::string,std::tuple<float,float,float,
+      float,std::string> > fun_types = {
+    {"gnomonical",     std::make_tuple(1.0f,1.0f,0.0f,1.0f,"tan")},
+    {"stereographic",  std::make_tuple(2.0f,2.0f,0.0f,1.0f,"tan")},
+    {"equidistant",    std::make_tuple(1.0f,1.0f,0.0f,1.0f,"id")},
+    {"equisolid_angle",std::make_tuple(2.0f,2.0f,0.0f,1.0f,"sin")},
+    {"orthographic",   std::make_tuple(1.0f,1.0f,0.0f,1.0f,"sin")}};
 
   fun_types.emplace("custom",
       std::make_tuple(this->GetC1(),this->GetC2(),this->GetC3(),
       this->GetF(),CameraLensPrivate::MapFunctionEnum(this->GetFun()).AsString()));
 
-  std::tuple<float,float,float,float,std::string> params;
+  decltype(fun_types)::mapped_type params;
+
   try
   {
     params = fun_types.at(_type);
@@ -504,6 +513,8 @@ void CameraLens::SetType(std::string _type)
 
     gzthrow(sstr.str());
   }
+
+  this->sdf->GetElement("type")->Set(_type);
 
   if(_type == "custom")
   {
@@ -522,8 +533,6 @@ void CameraLens::SetType(std::string _type)
     this->dataPtr->f = std::get<3>(params);
     this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
   }
-
-  this->sdf->GetElement("type")->Set(_type);
 }
 
 //////////////////////////////////////////////////

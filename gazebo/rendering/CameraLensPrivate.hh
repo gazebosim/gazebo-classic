@@ -42,13 +42,16 @@ namespace gazebo
                     if(std::get<0>(item) == str)
                     {
                       value = item;
-                      break;
+                      return;
                     }
+
+                  // function provided is not in array
+                  throw std::invalid_argument("Unknown function");
                 }
 
-                public: math::Vector3 AsVector3() { return std::get<1>(value); }
+                public: math::Vector3 AsVector3() const { return std::get<1>(value); }
 
-                public: std::string AsString() { return std::get<0>(value); }
+                public: std::string AsString() const { return std::get<0>(value); }
 
                 public: float Apply(float _t) { return std::get<2>(value)(_t); }
 
