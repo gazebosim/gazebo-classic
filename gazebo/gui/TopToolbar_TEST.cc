@@ -18,7 +18,6 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
-// #include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/TopToolbar_TEST.hh"

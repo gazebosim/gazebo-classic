@@ -197,6 +197,7 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
         acts[i] == g_snapAct)
     {
       acts[i]->setVisible(modelEditor || simulation);
+      acts[i]->setEnabled(modelEditor || simulation);
 
       // Change preceding separator as well
       if (i > 0 && acts[i-1]->isSeparator())
@@ -208,17 +209,20 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
     else if (acts[i] == g_dataLoggerAct)
     {
       acts[i]->setVisible(simulation || logPlayback);
+      acts[i]->setEnabled(simulation || logPlayback);
     }
     // Model Editor only
     else if (acts[i]->objectName().toStdString().find("modelEditor") !=
         std::string::npos)
     {
       acts[i]->setVisible(modelEditor);
+      acts[i]->setEnabled(modelEditor);
     }
     // Simulation only
     else
     {
       acts[i]->setVisible(simulation);
+      acts[i]->setEnabled(simulation);
     }
   }
 }

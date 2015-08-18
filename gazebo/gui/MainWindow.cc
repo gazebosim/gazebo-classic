@@ -111,7 +111,7 @@ MainWindow::MainWindow()
   this->leftColumn = new QStackedWidget(this);
 
   this->modelListWidget = new ModelListWidget(this);
-  InsertModelWidget *insertModel = new InsertModelWidget(this);
+  this->insertModel = new InsertModelWidget(this);
   LayersWidget *layersWidget = new LayersWidget(this);
 
   this->tabWidget = new QTabWidget();
@@ -207,6 +207,10 @@ MainWindow::MainWindow()
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&MainWindow::OnFollow, this, _1)));
+
+  this->connections.push_back(
+      gui::Events::ConnectWindowMode(
+      boost::bind(&MainWindow::OnWindowMode, this, _1)));
 
   gui::ViewFactory::RegisterAll();
 
@@ -2183,4 +2187,60 @@ QAction *MainWindow::CloneAction(QAction *_action, QObject *_parent)
   connect(_action, SIGNAL(toggled(bool)), actionClone, SLOT(setChecked(bool)));
 
   return actionClone;
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnWindowMode(const std::string &_mode)
+{
+  bool simulation = _mode == "Simulation";
+  bool logPlayback = _mode == "LogPlayback";
+
+  // File
+  // g_openAct->setVisible(simulation || logPlayback);
+  g_saveAct->setVisible(simulation || logPlayback);
+  g_saveAsAct->setVisible(simulation || logPlayback);
+  g_saveCfgAct->setVisible(simulation || logPlayback);
+  g_cloneAct->setVisible(simulation);
+  g_quitAct->setVisible(simulation || logPlayback);
+
+  // Edit
+  this->editMenu->setVisible(simulation);
+  g_resetModelsAct->setVisible(simulation);
+  g_resetWorldAct->setVisible(simulation);
+  g_editBuildingAct->setVisible(simulation);
+  // g_editTerrainAct->setVisible(simulation);
+  g_editModelAct->setVisible(simulation);
+
+  // Camera
+  g_cameraOrthoAct->setVisible(simulation || logPlayback);
+  g_cameraPerspectiveAct->setVisible(simulation || logPlayback);
+  g_fpsAct->setVisible(simulation || logPlayback);
+  g_orbitAct->setVisible(simulation || logPlayback);
+  g_resetAct->setVisible(simulation || logPlayback);
+
+  // View
+  g_showGridAct->setVisible(simulation || logPlayback);
+  g_showOriginAct->setVisible(simulation || logPlayback);
+  g_transparentAct->setVisible(simulation || logPlayback);
+  g_viewWireframeAct->setVisible(simulation || logPlayback);
+  g_showCollisionsAct->setVisible(simulation || logPlayback);
+  g_showCOMAct->setVisible(simulation || logPlayback);
+  g_showInertiaAct->setVisible(simulation || logPlayback);
+  g_showLinkFrameAct->setVisible(simulation || logPlayback);
+  g_showContactsAct->setVisible(simulation || logPlayback);
+  g_showJointsAct->setVisible(simulation || logPlayback);
+
+  // Window
+  g_topicVisAct->setVisible(simulation || logPlayback);
+  g_viewOculusAct->setVisible(simulation || logPlayback);
+  g_overlayAct->setVisible(simulation || logPlayback);
+  g_showToolbarsAct->setVisible(simulation || logPlayback);
+  g_fullScreenAct->setVisible(simulation || logPlayback);
+
+  // About
+  g_hotkeyChartAct->setVisible(simulation || logPlayback);
+  g_aboutAct->setVisible(simulation || logPlayback);
+
+  // Insert
+  this->insertModel->setVisible(simulation);
 }
