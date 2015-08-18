@@ -219,14 +219,14 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
   lbName->setText(QString::fromStdString(_msg->name()));
 
   std::string t("wideanglecamera");
-  if(_msg->name().compare(0,t.length(),t) == 0)
+  if (_msg->name().compare(0,t.length(),t) == 0)
   {
     gzmsg << "Selected: " << _msg->name();
     this->selectedElementName = _msg->name();
 
     gzmsg << " [Appropriate element]";
 
-    if(this->infoSub)
+    if (this->infoSub)
       this->infoSub->Unsubscribe();
 
     // subscribe for the info messages
@@ -246,32 +246,32 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnCameraLensCmd(ConstCameraLensCmdPtr &_msg)
 {
-  if(!this->acceptInfoMessages)
+  if (!this->acceptInfoMessages)
     return;
 
-  if(_msg->has_c1())
+  if (_msg->has_c1())
     this->sbC1->setValue(_msg->c1());
-  if(_msg->has_c2())
+  if (_msg->has_c2())
     this->sbC2->setValue(_msg->c2());
-  if(_msg->has_c3())
+  if (_msg->has_c3())
     this->sbC3->setValue(_msg->c3());
-  if(_msg->has_f())
+  if (_msg->has_f())
     this->sbF->setValue(_msg->f());
 
-  if(_msg->has_cutoff_angle())
+  if (_msg->has_cutoff_angle())
     this->sbCA->setValue(_msg->cutoff_angle());
 
-  if(_msg->has_hfov())
+  if (_msg->has_hfov())
     this->sbHFOV->setValue(_msg->hfov());
 
   this->cbType->setCurrentIndex(
     this->cbType->findText(QString::fromStdString(_msg->type())));
 
-  if(_msg->has_fun())
+  if (_msg->has_fun())
     this->cbFun->setCurrentIndex(
       this->cbFun->findText(QString::fromStdString(_msg->fun())));
 
-  if(_msg->has_scale_to_hfov())
+  if (_msg->has_scale_to_hfov())
     this->cbScaleToHFOV->setChecked(_msg->scale_to_hfov());
 
   bool isCustom = (this->cbType->currentText() == "custom");
@@ -288,10 +288,10 @@ void CameraLensControlExample::OnCameraLensCmd(ConstCameraLensCmdPtr &_msg)
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnValueChanged()
 {
-  if(acceptInfoMessages)
+  if (acceptInfoMessages)
     return;
 
-  if(this->selectedElementName != "")
+  if (this->selectedElementName != "")
   {
     msgs::CameraLensCmd msg;
 
@@ -299,7 +299,7 @@ void CameraLensControlExample::OnValueChanged()
     msg.set_destiny(msgs::CameraLensCmd_CmdDestiny_SET);
     msg.set_type(this->cbType->currentText().toUtf8().constData());
 
-    if(this->cbType->currentText() == "custom")
+    if (this->cbType->currentText() == "custom")
     {
       msg.set_fun(this->cbFun->currentText().toUtf8().constData());
 
