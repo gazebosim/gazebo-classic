@@ -245,11 +245,9 @@ TEST_F(WorldTest, RemoveModelUnPaused)
 /////////////////////////////////////////////////
 TEST_F(WorldTest, Playback)
 {
-  LoadArgs(" --verbose -p ../test/logs/state.log -u");
-  //physics::WorldPtr world = physics::get_world("default");
-  //ASSERT_TRUE(world != NULL);
-
-  getchar();
+  LoadArgs("--verbose -p ../test/logs/state.log -u");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
 }
 
 /////////////////////////////////////////////////

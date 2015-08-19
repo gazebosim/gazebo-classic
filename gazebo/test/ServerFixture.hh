@@ -116,7 +116,7 @@ namespace gazebo
                           const std::vector<std::string> &_systemPlugins = {});
 
     /// \brief
-    protected: void RunServerArgs(const std::string &_args,
+    protected: void RunServerImpl(const std::string &_args,
                           const std::vector<std::string> &_systemPlugins = {});
 
 
