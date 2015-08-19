@@ -18,6 +18,9 @@
 1. Tweaks to Data Logger, such as multiline text edit for path
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
 
+1. Added TopToolbar and hide / disable several widgets according to WindowMode
+    * [Pull request #1869](https://bitbucket.org/osrf/gazebo/pull-request/1869)
+
 1. Added Visual::IsAncestorOf and Visual::IsDescendantOf
     * [Pull request #1850](https://bitbucket.org/osrf/gazebo/pull-request/1850)
 
