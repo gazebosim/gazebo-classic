@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@
 
 using namespace gazebo;
 
-const double g_tolerance = 1e-4;
 class Issue1702Test : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
   /// \brief Test for issue #1702, spawn a model,
-  /// delete it, and respawn with teh same name.
+  /// delete it, and respawn with the same name.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void SpawnDeleteSpawnAgain(const std::string &_physicsEngine);
 };
@@ -39,7 +38,7 @@ class Issue1702Test : public ServerFixture,
 void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 {
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
+  Load("worlds/camera.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -81,8 +80,13 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 
   std::string name = box->GetName();
 
+  gzerr << "spawned"; getchar();
+
   // delete that model
   ServerFixture::RemoveModel(name);
+
+  // also test remvoal with below:
+  // world->RemoveModel(name);
 
   int count = 0;
   while(world->GetModel(name) != NULL && ++count < 1000)
@@ -92,6 +96,8 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   }
   EXPECT_TRUE(world->GetModel(name) == NULL);
   EXPECT_TRUE(count < 1000);
+
+  gzerr << "removed"; getchar();
 
   // spawn the exact same model
   // if this succeeds, we're OK.
@@ -103,8 +109,9 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
     world->Step(1);
   }
 
-  // EXPECT_TRUE(newBox != NULL);  /// \TODO: this fails, should it?
   EXPECT_TRUE(world->GetModel(name) != NULL);
+
+  gzerr << "spawned"; getchar();
 }
 
 TEST_P(Issue1702Test, SpawnDeleteSpawnAgain)
