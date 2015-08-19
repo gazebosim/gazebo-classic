@@ -485,58 +485,11 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
 
   JointData *jointData = this->CreateJointLine(ss.str(), _parent);
 
-  // setup the joint msg
   jointData->jointMsg.reset(new msgs::Joint);
+  jointData->jointMsg->CopyFrom(JointMaker::SetupDefaultJointMsg(
+      jointData->type));
   jointData->SetChild(_child);
   jointData->SetParent(_parent);
-  jointData->jointMsg->set_name(jointData->name);
-  msgs::Set(jointData->jointMsg->mutable_pose(),
-      ignition::math::Pose3d::Zero);
-
-  jointData->jointMsg->set_type(
-      msgs::ConvertJointType(this->GetTypeAsString(jointData->type)));
-
-  unsigned int axisCount = JointMaker::GetJointAxisCount(jointData->type);
-  for (unsigned int i = 0; i < axisCount; ++i)
-  {
-    msgs::Axis *axisMsg;
-    if (i == 0u)
-    {
-      axisMsg = jointData->jointMsg->mutable_axis1();
-    }
-    else if (i == 1u)
-    {
-      axisMsg = jointData->jointMsg->mutable_axis2();
-    }
-    else
-    {
-      gzerr << "Invalid axis index["
-            << i
-            << "]"
-            << std::endl;
-      continue;
-    }
-    if (jointData->type == JointMaker::JOINT_GEARBOX)
-      msgs::Set(axisMsg->mutable_xyz(), ignition::math::Vector3d::UnitZ);
-
-    else
-    {
-      msgs::Set(axisMsg->mutable_xyz(),
-          this->unitVectors[i%this->unitVectors.size()]);
-    }
-
-    axisMsg->set_use_parent_model_frame(false);
-    axisMsg->set_limit_lower(-GZ_DBL_MAX);
-    axisMsg->set_limit_upper(GZ_DBL_MAX);
-    axisMsg->set_limit_effort(-1);
-    axisMsg->set_limit_velocity(-1);
-    axisMsg->set_damping(0);
-
-    // Add angle field after we've checked that index i is valid
-    jointData->jointMsg->add_angle(0);
-  }
-  jointData->jointMsg->set_limit_erp(0.2);
-  jointData->jointMsg->set_suspension_erp(0.2);
 
   // Inspector
   jointData->inspector = new JointInspector();
@@ -553,6 +506,63 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointData->inspector->Update(jointData->jointMsg);
 
   return jointData;
+}
+
+/////////////////////////////////////////////////
+msgs::Joint JointMaker::SetupDefaultJointMsg(JointType _type)
+{
+  std::string type = JointMaker::GetTypeAsString(_type);
+
+  msgs::Joint msg;
+
+ // msg.reset(new msgs::Joint);
+  msgs::Set(msg.mutable_pose(),
+      ignition::math::Pose3d::Zero);
+
+  msg.set_type(msgs::ConvertJointType(type));
+
+  unsigned int axisCount = JointMaker::GetJointAxisCount(_type);
+  for (unsigned int i = 0; i < axisCount; ++i)
+  {
+    msgs::Axis *axisMsg;
+    if (i == 0u)
+    {
+      axisMsg = msg.mutable_axis1();
+    }
+    else if (i == 1u)
+    {
+      axisMsg = msg.mutable_axis2();
+    }
+    else
+    {
+      gzerr << "Invalid axis index["
+            << i
+            << "]"
+            << std::endl;
+      continue;
+    }
+  //  if (_type == JointMaker::JOINT_GEARBOX)
+      msgs::Set(axisMsg->mutable_xyz(), ignition::math::Vector3d::UnitZ);
+  //   else
+  //   {
+  //     msgs::Set(axisMsg->mutable_xyz(),
+  //         JointMaker::unitVectors[i%JointMaker::unitVectors.size()]);
+  //   }
+
+    axisMsg->set_use_parent_model_frame(false);
+    axisMsg->set_limit_lower(-GZ_DBL_MAX);
+    axisMsg->set_limit_upper(GZ_DBL_MAX);
+    axisMsg->set_limit_effort(-1);
+    axisMsg->set_limit_velocity(-1);
+    axisMsg->set_damping(0);
+
+    // Add angle field after we've checked that index i is valid
+    msg.add_angle(0);
+  }
+  msg.set_limit_erp(0.2);
+  msg.set_suspension_erp(0.2);
+
+  return msg;
 }
 
 /////////////////////////////////////////////////
@@ -604,7 +614,7 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
 void JointMaker::Stop()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
- // if (this->jointType != JointMaker::JOINT_NONE)
+  // if (this->jointType != JointMaker::JOINT_NONE)
   {
     this->creatingJoint = false;
     // Cancel joint creation
@@ -619,7 +629,7 @@ void JointMaker::Stop()
       // Notify ModelEditor to uncheck tool button
       this->JointAdded();
     }
-  //  this->AddJoint(JointMaker::JOINT_NONE);
+    // this->AddJoint(JointMaker::JOINT_NONE);
     this->mouseMoveEnabled = false;
     if (this->hoverVis)
       this->hoverVis->SetEmissive(common::Color(0, 0, 0));
@@ -645,8 +655,8 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   if (_event.Dragging())
   {
     // this enables the joint maker to pan while connecting joints
-  //  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-    //camera->HandleMouseEvent(_event);
+    // QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    // camera->HandleMouseEvent(_event);
     return false;
   }
 
@@ -1183,13 +1193,24 @@ void JointData::Update()
 
   // Update msg
   msgs::JointPtr jointUpdateMsg = this->jointMsg;
+  msgs::Joint defaultMsg = JointMaker::SetupDefaultJointMsg(this->type);
   unsigned int axisCount = JointMaker::GetJointAxisCount(this->type);
-  for (unsigned int i = axisCount; i < 2u; ++i)
+
+  // Remove axis2
+  if (axisCount < 2u && jointUpdateMsg->has_axis2())
+    jointUpdateMsg->clear_axis2();
+  // Remove axis1
+  if (axisCount < 1u && jointUpdateMsg->has_axis1())
+    jointUpdateMsg->clear_axis1();
+  // Add axis1
+  if (axisCount == 1u && !jointUpdateMsg->has_axis1())
   {
-    if (i == 0u)
-      jointUpdateMsg->clear_axis1();
-    else if (i == 1u)
-      jointUpdateMsg->clear_axis2();
+    jointUpdateMsg->mutable_axis1()->CopyFrom(*defaultMsg.mutable_axis1());
+  }
+  // Add axis2
+  if (axisCount == 2u && !jointUpdateMsg->has_axis2())
+  {
+    jointUpdateMsg->mutable_axis2()->CopyFrom(*defaultMsg.mutable_axis2());
   }
 
   if (this->jointVisual)
@@ -1384,8 +1405,8 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   if (!jointId.empty())
   {
     gui::model::Events::jointInserted(jointId, joint->name,
-	jointTypes[joint->type], joint->parent->GetName(),
-	joint->child->GetName());
+        jointTypes[joint->type], joint->parent->GetName(),
+        joint->child->GetName());
   }
 }
 
@@ -1465,8 +1486,8 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
       this->RemoveJoint("");
 
       // Create new joint with parent and child
-      this->jointBeingCreated = this->CreateJoint(
-	        this->parentLinkVis, _childLink);
+      this->jointBeingCreated = this->CreateJoint(this->parentLinkVis,
+          _childLink);
 
       // Create hotspot visual
       this->CreateHotSpot(this->jointBeingCreated);

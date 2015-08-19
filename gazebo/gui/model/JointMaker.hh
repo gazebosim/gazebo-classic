@@ -184,6 +184,8 @@ namespace gazebo
       public: void CreateJointFromSDF(sdf::ElementPtr _jointElem,
           const std::string &_modelName = "");
 
+      public: static msgs::Joint SetupDefaultJointMsg(JointType _type);
+
       /// \brief Add a scoped link name. Nested model's link names are scoped
       /// but the parent and child field in the joint SDF element may not be.
       /// So keep track of scoped link names in order to generate the correct
