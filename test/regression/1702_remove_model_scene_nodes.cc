@@ -24,7 +24,6 @@
 
 using namespace gazebo;
 
-const double g_tolerance = 1e-4;
 class Issue1702Test : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
