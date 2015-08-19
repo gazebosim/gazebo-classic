@@ -417,6 +417,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Joint JointFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::Plugin from a plugin SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Plugin object
+    GAZEBO_VISIBLE
+    msgs::Plugin PluginFromSDF(const sdf::ElementPtr _sdf);
+
     /// \brief Create or update an SDF element from a msgs::Visual
     /// \param[in] _msg Visual messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
