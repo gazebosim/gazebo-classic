@@ -24,10 +24,10 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 JointEventSource::JointEventSource(transport::PublisherPtr _pub,
-    physics::WorldPtr _world)
-  : EventSource(_pub, "joint", _world),
-   range(INVALID),
-   isTriggered(false)
+                                   physics::WorldPtr _world)
+  :EventSource(_pub, "joint", _world),
+  range(INVALID),
+  isTriggered(false)
 {
   this->min = std::numeric_limits<double>::lowest();
   this->max = std::numeric_limits<double>::max();
@@ -128,7 +128,7 @@ void JointEventSource::SetRangeFromString(const std::string &_rangeStr)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string JointEventSource::GetRangeAsString() const
+std::string JointEventSource::RangeAsString() const
 {
   std::string rangeStr;
   switch (this->range)
@@ -142,7 +142,8 @@ std::string JointEventSource::GetRangeAsString() const
     case ANGLE:
       rangeStr = "normalized_angle";
       break;
-    case FORCE: rangeStr = "applied_force";
+    case FORCE:
+      rangeStr = "applied_force";
       break;
     default: rangeStr = "invalid";
       break;
@@ -157,7 +158,7 @@ void JointEventSource::Info() const
   ss << "JointEventSource: " << this->name
       << " model: " << this->modelName
       << " joint: " << this->jointName
-      << " range: " << this->GetRangeAsString()
+      << " range: " << this->RangeAsString()
       << " min: " << this->min
       << " max: " << this->max
       << " triggered: " << this->isTriggered
@@ -266,7 +267,7 @@ void JointEventSource::Update()
     if (this->range == ANGLE)
       json += "\"angle\":\"" + std::to_string(angle) + "\", ";
 
-    json += "\"range\":\"" + this->GetRangeAsString() + "\", ";
+    json += "\"range\":\"" + this->RangeAsString() + "\", ";
     json += "\"min\":\"" + std::to_string(this->min) + "\", ";
     json += "\"max\":\"" + std::to_string(this->max) + "\", ";
     json += "\"value\":\"" + std::to_string(value) + "\", ";

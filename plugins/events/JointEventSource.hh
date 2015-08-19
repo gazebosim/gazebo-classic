@@ -30,6 +30,28 @@ namespace gazebo
   /// common for actuated joints.
   /// Triggers must be defined in the world, but models can be created during
   /// the simulation. Triggers cannot overlap.
+  ///
+  ///
+  /// \verbatim
+  ///
+  ///  This is an example joint event. It is triggered when the joint named
+  ///  "joint" in the model "revoluter" has an angle value that enters or
+  ///  leaves the range [3, 3.1416]. Triggers can also depend on the position,
+  ///  velocity or applied force.
+  ///
+  ///  <event>
+  ///    <name>joint_angle</name>
+  ///    <type>joint</type>
+  ///    <model>revoluter</model>
+  ///    <joint>joint</joint>
+  ///    <range>
+  ///      <type>normalized_angle</type>
+  ///      <min>3</min>
+  ///      <max>3.1416</max>
+  ///    </range>
+  ///  </event>
+  ///
+  /// \endverbatim
   class JointEventSource: public EventSource
   {
     /// \enum Range
@@ -74,7 +96,7 @@ namespace gazebo
 
     /// \brief Utility range to string conversion
     /// returns The current range as a string
-    private: std::string GetRangeAsString() const;
+    private: std::string RangeAsString() const;
 
     /// \brief Sets the range type from a string
     /// \param[in] _rangeStr the range. Possible values are: "velocity",
