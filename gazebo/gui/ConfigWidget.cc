@@ -673,7 +673,12 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           std::string value = ref->GetString(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = this->CreateStringWidget(name, _level);
+            // Choose either a one-line or a multi-line widget according to name
+            std::string type = "line";
+            if (name == "innerxml")
+              type = "plain";
+
+            configChildWidget = this->CreateStringWidget(name, _level, type);
             newFieldWidget = configChildWidget;
           }
           this->UpdateStringWidget(configChildWidget, value);
@@ -1252,7 +1257,7 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
-    const int _level)
+    const int _level, const std::string &_type)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
@@ -1260,14 +1265,20 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
 
   // Line or Text Edit based on key
   QWidget *valueEdit;
-  if (_key == "innerxml")
+  if (_type == "plain")
   {
     valueEdit = new QPlainTextEdit();
     valueEdit->setMinimumHeight(50);
   }
-  else
+  else if (_type == "line")
   {
     valueEdit = new QLineEdit;
+  }
+  else
+  {
+    gzerr << "Unknown type [" << _type << "]. Not creating string widget" <<
+        std::endl;
+    return NULL;
   }
 
   // Layout
