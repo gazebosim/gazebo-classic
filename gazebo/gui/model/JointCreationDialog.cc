@@ -34,7 +34,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   this->setMinimumWidth(300);
-  this->setMinimumHeight(700);
+  this->setMinimumHeight(550);
 
   this->jointMaker = _jointMaker;
 
@@ -539,4 +539,11 @@ void JointCreationDialog::OnSwap()
   // Signals were not being triggered even without blocking, so manually call
   this->OnParentFromDialog(indexParent);
   this->OnChildFromDialog(indexChild);
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::UpdateRelativePose(
+    const ignition::math::Pose3d &_pose)
+{
+  this->configWidget->SetPoseWidgetValue("pose", math::Pose(_pose));
 }

@@ -871,6 +871,21 @@ void JointMaker::Update()
         if (joint->dirty || poseUpdate)
         {
           joint->Update();
+
+          if (joint == this->jointBeingCreated)
+          {
+            if (!this->jointCreationDialog ||
+                !this->jointCreationDialog->isVisible())
+            {
+              gzerr << "Joint creation dialog not found" << std::endl;
+            }
+            else
+            {
+              this->jointCreationDialog->UpdateRelativePose(
+                  (joint->child->GetWorldPose() -
+                  joint->parent->GetWorldPose()).Ign());
+            }
+          }
         }
       }
     }

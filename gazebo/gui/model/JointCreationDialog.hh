@@ -50,6 +50,8 @@ namespace gazebo
 
       public: void Open(JointMaker::JointType _type);
 
+      public: void UpdateRelativePose(const ignition::math::Pose3d &_pose);
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
