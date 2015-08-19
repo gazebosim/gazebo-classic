@@ -15,15 +15,18 @@
  *
 */
 
-#ifndef _COLLADALOADER_HH_
-#define _COLLADALOADER_HH_
+#ifndef _GAZEBO_COLLADALOADER_HH_
+#define _GAZEBO_COLLADALOADER_HH_
 
 #include <string>
 #include <vector>
 #include <map>
 
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/common/MeshLoader.hh"
-#include "gazebo/math/MathTypes.hh"
 #include "gazebo/util/system.hh"
 
 class TiXmlElement;
@@ -59,7 +62,8 @@ namespace gazebo
       /// \param[in] _transform A tranform to apply
       /// \param[in,out] _mesh The mesh being loaded
       private: void LoadController(TiXmlElement *_contrXml,
-          TiXmlElement *_skelXml, const math::Matrix4 &_transform, Mesh *_mesh);
+          TiXmlElement *_skelXml,
+          const ignition::math::Matrix4d &_transform, Mesh *_mesh);
 
       /// \brief Load animations for a skeleton
       /// \param[in] _xml Animation XML instance
@@ -88,7 +92,7 @@ namespace gazebo
       /// \param[in] _tranform Transform to apply to the loaded geometry
       /// \param[in,out] _mesh Pointer to the mesh currently being loaded
       private: void LoadGeometry(TiXmlElement *_xml,
-                                 const math::Matrix4 &_transform, Mesh *_mesh);
+                   const ignition::math::Matrix4d &_transform, Mesh *_mesh);
 
       /// \brief Get an XML element by ID
       /// \param[in] _parent The parent element
@@ -109,13 +113,12 @@ namespace gazebo
       /// \param[in,out] _mesh Pointer to the current mesh
       /// \param[out] _transform Transform to apply to the node
       private: void LoadNode(TiXmlElement *_elem, Mesh *_mesh,
-                             const math::Matrix4 &_transform);
+                   const ignition::math::Matrix4d &_transform);
 
       /// \brief Load a transform
       /// \param[in] _elem Pointer to the transform XML instance
       /// \return A Matrix4 transform
-      private: math::Matrix4 LoadNodeTransform(TiXmlElement *_elem);
-
+      private: ignition::math::Matrix4d LoadNodeTransform(TiXmlElement *_elem);
 
       /// \brief Load vertices
       /// \param[in] _id String id of the vertices XML node
@@ -123,9 +126,9 @@ namespace gazebo
       /// \param[out] _verts Holds the resulting vertices
       /// \param[out] _norms Holds the resulting normals
       private: void LoadVertices(const std::string &_id,
-         const math::Matrix4 &_transform,
-         std::vector<math::Vector3> &_verts,
-         std::vector<math::Vector3> &_norms);
+         const ignition::math::Matrix4d &_transform,
+         std::vector<ignition::math::Vector3d> &_verts,
+         std::vector<ignition::math::Vector3d> &_norms);
 
       /// \brief Load vertices
       /// \param[in] _id String id of the vertices XML node
@@ -135,9 +138,9 @@ namespace gazebo
       /// \param[out] _vertDup Holds a map of duplicate position indices
       /// \param[out] _normDup Holds a map of duplicate normal indices
       private: void LoadVertices(const std::string &_id,
-         const math::Matrix4 &_transform,
-         std::vector<math::Vector3> &_verts,
-         std::vector<math::Vector3> &_norms,
+         const ignition::math::Matrix4d &_transform,
+         std::vector<ignition::math::Vector3d> &_verts,
+         std::vector<ignition::math::Vector3d> &_norms,
          std::map<unsigned int, unsigned int> &_vertDup,
          std::map<unsigned int, unsigned int> &_normDup);
 
@@ -147,8 +150,8 @@ namespace gazebo
       /// \param[out] _values Holds the resulting position values
       /// \param[out] _values Holds a map of duplicate position indices
       private: void LoadPositions(const std::string &_id,
-          const math::Matrix4 &_transform,
-          std::vector<math::Vector3> &_values,
+          const ignition::math::Matrix4d &_transform,
+          std::vector<ignition::math::Vector3d> &_values,
           std::map<unsigned int, unsigned int> &_duplicates);
 
       /// \brief Load normals
@@ -157,8 +160,8 @@ namespace gazebo
       /// \param[out] _values Holds the resulting normal values
       /// \param[out] _values Holds a map of duplicate normal indices
       private: void LoadNormals(const std::string &_id,
-          const math::Matrix4 &_transform,
-          std::vector<math::Vector3> &_values,
+          const ignition::math::Matrix4d &_transform,
+          std::vector<ignition::math::Vector3d> &_values,
           std::map<unsigned int, unsigned int> &_duplicates);
 
       /// \brief Load texture coordinates
@@ -166,7 +169,7 @@ namespace gazebo
       /// \param[out] _values Holds the resulting uv values
       /// \param[out] _values Holds a map of duplicate uv indices
       private: void LoadTexCoords(const std::string &_id,
-          std::vector<math::Vector2d> &_values,
+          std::vector<ignition::math::Vector2d> &_values,
           std::map<unsigned int, unsigned int> &_duplicates);
 
       /// \brief Load a material
@@ -187,7 +190,7 @@ namespace gazebo
       /// \param[in] _transform Transform to apply to all triangles
       /// \param[out] _mesh Mesh that is currently being loaded
       private: void LoadTriangles(TiXmlElement *_trianglesXml,
-                                   const math::Matrix4 &_transform,
+                                   const ignition::math::Matrix4d &_transform,
                                    Mesh *_mesh);
 
       /// \brief Load a polygon list
@@ -195,7 +198,7 @@ namespace gazebo
       /// \param[in] _transform Transform to apply to each polygon
       /// \param[out] _mesh Mesh that is currently being loaded
       private: void LoadPolylist(TiXmlElement *_polylistXml,
-                                   const math::Matrix4 &_transform,
+                                   const ignition::math::Matrix4d &_transform,
                                    Mesh *_mesh);
 
       /// \brief Load lines
@@ -203,7 +206,7 @@ namespace gazebo
       /// \param[in] _transform Transform to apply
       /// \param[out] _mesh Mesh that is currently being loaded
       private: void LoadLines(TiXmlElement *_xml,
-                               const math::Matrix4 &_transform,
+                               const ignition::math::Matrix4d &_transform,
                                Mesh *_mesh);
 
       /// \brief Load an entire scene

@@ -256,7 +256,8 @@ void ModelMaker::Stop()
 {
   // Remove the temporary visual from the scene
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  scene->RemoveVisual(this->modelVisual);
+  for (auto vis : this->visuals)
+    scene->RemoveVisual(vis);
   this->modelVisual.reset();
   this->visuals.clear();
   this->modelSDF.reset();
@@ -279,12 +280,12 @@ void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT)
+  if (_event.Button() == common::MouseEvent::LEFT)
   {
     // Place if not dragging, or if dragged for less than 50 pixels.
     // The 50 pixels is used to account for accidental mouse movement
     // when placing an object.
-    if (!_event.dragging || _event.pressPos.Distance(_event.pos) < 50)
+    if (!_event.Dragging() || _event.PressPos().Distance(_event.Pos()) < 50)
     {
       this->CreateTheEntity();
       this->Stop();
@@ -298,7 +299,7 @@ void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
   math::Pose pose = this->modelVisual->GetWorldPose();
   pose.pos = ModelManipulator::GetMousePositionOnPlane(this->camera, _event);
 
-  if (!_event.shift)
+  if (!_event.Shift())
   {
     pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
@@ -358,7 +359,7 @@ void ModelMaker::CreateTheEntity()
   }
   else
   {
-    msgs::Set(msg.mutable_pose(), this->modelVisual->GetWorldPose());
+    msgs::Set(msg.mutable_pose(), this->modelVisual->GetWorldPose().Ign());
     msg.set_clone_model_name(this->modelVisual->GetName().substr(0,
           this->modelVisual->GetName().find("_clone_tmp")));
   }

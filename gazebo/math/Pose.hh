@@ -14,15 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
-
-#ifndef _POSE_HH_
-#define _POSE_HH_
+#ifndef _GAZEBO_POSE_HH_
+#define _GAZEBO_POSE_HH_
 
 #include <iostream>
+
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
@@ -63,6 +60,10 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param[in] _pose Pose to copy
       public: Pose(const Pose &_pose);
+
+      /// \brief Copy constructor for ignition math
+      /// \param[in] _pose Pose to copy
+      public: Pose(const ignition::math::Pose3d &_pose);
 
       /// \brief Destructor
       public: virtual ~Pose();
@@ -159,6 +160,10 @@ namespace gazebo
       /// \param[in] _pose Pose to copy
       public: Pose &operator=(const Pose &_pose);
 
+      /// \brief Equal operator for ignition math
+      /// \param[in] _pose Pose to copy
+      public: Pose &operator=(const ignition::math::Pose3d &_pose);
+
       /// \brief Add one point to a vector: result = this + pos
       /// \param[in] _pos Position to add to this pose
       /// \return the resulting position
@@ -214,6 +219,10 @@ namespace gazebo
       /// \brief Round all values to _precision decimal places
       /// \param[in] _precision
       public: void Round(int _precision);
+
+      /// \brief Convert this pose to an ignition::math::Pose3d object.
+      /// \return This pose represented as an ignition::math::Pose3d.
+      public: ignition::math::Pose3d Ign() const;
 
       /// \brief Stream insertion operator
       /// \param[in] _out output stream

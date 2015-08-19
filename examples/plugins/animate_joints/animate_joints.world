@@ -85,7 +85,6 @@
         </axis>
       </joint>
       <plugin name="animate_joints" filename="libanimate_joints.so" />
-      <static>true</static>
     </model>
     <light type="directional" name="sun">
       <pose>0 0 10 0 0 0</pose>

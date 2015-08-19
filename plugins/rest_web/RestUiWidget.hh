@@ -27,6 +27,7 @@
 #endif
 #include <gazebo/util/system.hh>
 #include "RestUiLoginDialog.hh"
+#include "RestUiLogoutDialog.hh"
 
 namespace gazebo
 {
@@ -43,6 +44,8 @@ namespace gazebo
     /// \param[in] _urlLabel Url label.
     /// \param[in] _defaultUrl Default url.
     public: RestUiWidget(QWidget *_parent,
+                         QAction &_login,
+                         QAction &_logout,
                          const std::string &_menuTitle,
                          const std::string &_loginTitle,
                          const std::string &_urlLabel,
@@ -51,8 +54,11 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~RestUiWidget() = default;
 
-    /// \brief QT callback (from the login menu)
+    /// \brief QT callback (from the window menu)
     public slots: void Login();
+
+    /// \brief QT callback (from the window menu)
+    public slots: void Logout();
 
     /// \brief Called before rendering, from the GUI thread this is called from
     /// the plugin's update.
@@ -62,20 +68,32 @@ namespace gazebo
     /// \param[in] _msg Rest error message.
     private: void OnResponse(ConstRestErrorPtr &_msg);
 
+    /// \brief Login menu item
+    private: QAction &loginMenuAction;
+
+    /// \brief Logout menu item
+    private: QAction &logoutMenuAction;
+
     /// \brief The title to use when displaying dialog/message windows
     private: std::string title;
 
     /// \brief Pub/sub node to communicate with gzserver.
     private: gazebo::transport::NodePtr node;
 
+     /// \brief Login dialog.
+    private: gui::RestUiLogoutDialog logoutDialog;
+
     /// \brief Login dialog.
-    private: gui::RestUiLoginDialog dialog;
+    private: gui::RestUiLoginDialog loginDialog;
 
-    /// \brief Gazebo topics publisher
-    private: gazebo::transport::PublisherPtr pub;
+    /// \brief Gazebo login topic publisher
+    private: gazebo::transport::PublisherPtr loginPub;
 
-    /// \brief Gazebo topics subscriber.
-    private: gazebo::transport::SubscriberPtr sub;
+    /// \brief Gazebo logout topic publisher
+    private: gazebo::transport::PublisherPtr logoutPub;
+
+    /// \brief Gazebo error topic subscriber.
+    private: gazebo::transport::SubscriberPtr errorSub;
 
     /// \brief List of unprocessed error messages to be displayed from the gui
     /// thread.

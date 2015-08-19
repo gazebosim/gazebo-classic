@@ -28,10 +28,12 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo_client.hh"
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/gui/SplashScreen.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -60,9 +62,14 @@ gui::ModelRightMenu *g_modelRightMenu = NULL;
 std::string g_worldname = "default";
 
 QApplication *g_app;
+gui::SplashScreen *g_splashScreen = NULL;
 gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
+
+// This makes it possible to use common::Time in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(common::Time)
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -248,6 +255,12 @@ bool gui::load()
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
+  // Register common::Time as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<common::Time>();
+
+  g_splashScreen = new gui::SplashScreen();
+
   g_main_win = new gui::MainWindow();
 
   g_main_win->Load();
@@ -288,7 +301,10 @@ bool gui::run(int _argc, char **_argv)
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
+  sigact.sa_flags = 0;
   sigact.sa_handler = signal_handler;
+  if (sigemptyset(&sigact.sa_mask) != 0)
+    std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
@@ -301,6 +317,7 @@ bool gui::run(int _argc, char **_argv)
   gazebo::gui::fini();
   gazebo::client::shutdown();
 
+  delete g_splashScreen;
   delete g_main_win;
   return true;
 }

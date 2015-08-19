@@ -18,7 +18,6 @@
 #include <sys/time.h>
 #include <gtest/gtest.h>
 
-#include "gazebo/common/Timer.hh"
 #include "gazebo/common/Time.hh"
 #include "test/util.hh"
 
@@ -26,13 +25,9 @@ using namespace gazebo;
 
 class TimeTest : public gazebo::testing::AutoLogFixture { };
 
+/////////////////////////////////////////////////
 TEST_F(TimeTest, Time)
 {
-  common::Timer timer;
-  timer.Start();
-  common::Time::MSleep(100);
-  EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
-
   struct timeval tv;
   gettimeofday(&tv, NULL);
   common::Time time(tv);
@@ -136,6 +131,101 @@ TEST_F(TimeTest, Time)
   EXPECT_DOUBLE_EQ(nsec, common::Time::MicToNano(usec));
 }
 
+/////////////////////////////////////////////////
+TEST_F(TimeTest, String)
+{
+  common::Time time(0);
+
+  // Several combinations
+  EXPECT_EQ(time.FormattedString(), "00 00:00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS),
+                                 "00:00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MINUTES),
+                                 "00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::SECONDS),
+                                 "00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MILLISECONDS),
+                                 "000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::MILLISECONDS),
+                                 "00 00:00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::SECONDS),
+                                 "00 00:00:00");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::MINUTES),
+                                 "00 00:00");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::HOURS),
+                                 "00 00");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::DAYS),
+                                 "00");
+
+  // start > end: start pushes end
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MILLISECONDS,
+                                 common::Time::FormatOption::MINUTES),
+                                 "000");
+
+  // 1 second
+  time = common::Time(0, 1000000000);
+  EXPECT_EQ(time.FormattedString(), "00 00:00:01.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MILLISECONDS,
+                                 common::Time::FormatOption::MILLISECONDS),
+                                 "1000");
+
+  // 30.5 seconds
+  time = common::Time(30, 500000000);
+  EXPECT_EQ(time.FormattedString(), "00 00:00:30.500");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::SECONDS,
+                                 common::Time::FormatOption::SECONDS),
+                                 "30");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MILLISECONDS,
+                                 common::Time::FormatOption::MILLISECONDS),
+                                 "30500");
+
+  // 1 min
+  time = common::Time(60);
+  EXPECT_EQ(time.FormattedString(), "00 00:01:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::SECONDS,
+                                 common::Time::FormatOption::SECONDS),
+                                 "60");
+
+  // 2.5 hours
+  time = common::Time(9000);
+  EXPECT_EQ(time.FormattedString(), "00 02:30:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS,
+                                 common::Time::FormatOption::MINUTES),
+                                 "02:30");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::SECONDS,
+                                 common::Time::FormatOption::SECONDS),
+                                 "9000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MINUTES,
+                                 common::Time::FormatOption::MINUTES),
+                                 "150");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS,
+                                 common::Time::FormatOption::HOURS),
+                                 "02");
+
+  // 3 days
+  time = common::Time(259200);
+  EXPECT_EQ(time.FormattedString(), "03 00:00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::DAYS,
+                                 common::Time::FormatOption::DAYS),
+                                 "03");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS),
+                                 "72:00:00.000");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::HOURS,
+                                 common::Time::FormatOption::HOURS),
+                                 "72");
+  EXPECT_EQ(time.FormattedString(common::Time::FormatOption::MINUTES,
+                                 common::Time::FormatOption::MINUTES),
+                                 "4320");
+
+  // Large time
+  time = common::Time(1234567890, 123456789);
+  EXPECT_EQ(time.FormattedString(), "14288 23:31:30.123");
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

@@ -19,6 +19,11 @@ link_directories(
   ${Boost_LIBRARY_DIR}
 )
 
+if (HAVE_DART)
+  include_directories(${DARTCore_INCLUDE_DIRS})
+  link_directories(${DARTCore_LIBRARY_DIRS})
+endif()
+
 add_subdirectory(OPCODE)
 add_subdirectory(GIMPACT)
 add_subdirectory(ou)
@@ -190,6 +195,7 @@ src/robuststep.cpp
 src/rotation.cpp
 src/sphere.cpp
 src/step.cpp
+src/step_dart_pgs_wrapper.cpp
 src/symm.c
 src/timer.cpp
 src/util.cpp
@@ -249,7 +255,7 @@ include/ode/timer.h
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC")
 
 if (SSE2_FOUND OR SSE3_FOUND OR SSSE3_FOUND OR SSE4_1_FOUND OR SSE4_2_FOUND)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSE")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DODE_SSE")
 endif()
 
 if (WIN32)

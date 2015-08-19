@@ -77,6 +77,7 @@ set (headers
   ContactManager.hh
   CylinderShape.hh
   Entity.hh
+  FixedJoint.hh
   HeightmapShape.hh
   Hinge2Joint.hh
   HingeJoint.hh

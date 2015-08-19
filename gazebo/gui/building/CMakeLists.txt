@@ -2,6 +2,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (${QT_USE_FILE})
 
 set (sources
+  BaseInspectorDialog.cc
   BuildingEditor.cc
   BuildingEditorEvents.cc
   BuildingEditorPalette.cc
@@ -33,6 +34,7 @@ set (sources
 )
 
 set (qt_headers
+  BaseInspectorDialog.hh
   BuildingEditor.hh
   BuildingEditorPalette.hh
   BuildingModelManip.hh

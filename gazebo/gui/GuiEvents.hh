@@ -80,6 +80,17 @@ namespace gazebo
               { fullScreen.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the show toolbars signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectShowToolbars(T _subscriber)
+              { return showToolbars.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the show toolbars signal
+      public: static void DisconnectShowToolbars(event::ConnectionPtr
+          _subscriber)
+              { showToolbars.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to the view FPS signal
       public: template<typename T>
               static event::ConnectionPtr ConnectFPS(T _subscriber)
@@ -220,6 +231,9 @@ namespace gazebo
 
       /// \brief An event to trigger full screen mode.
       public: static event::EventT<void (bool)> fullScreen;
+
+      /// \brief An event to trigger show toolbars.
+      public: static event::EventT<void (bool)> showToolbars;
 
       /// \brief An event to enable first-person-shooter view control.
       public: static event::EventT<void ()> fps;

@@ -279,7 +279,7 @@ void TerrainEditorPalette::OnSave()
 /////////////////////////////////////////////////
 bool TerrainEditorPalette::OnMousePress(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.Button() != common::MouseEvent::LEFT)
     return false;
 
   bool handled = false;
@@ -293,7 +293,7 @@ bool TerrainEditorPalette::OnMousePress(const common::MouseEvent &_event)
 
   // Only try to modify if the heightmap exists, and the LEFT mouse button
   // was used.
-  if (heightmap && !_event.shift)
+  if (heightmap && !_event.Shift())
   {
     handled = this->Apply(_event, camera, heightmap);
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
@@ -307,7 +307,7 @@ bool TerrainEditorPalette::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool TerrainEditorPalette::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.Button() != common::MouseEvent::LEFT)
     return false;
 
   bool handled = false;
@@ -319,9 +319,9 @@ bool TerrainEditorPalette::OnMouseMove(const common::MouseEvent &_event)
   // Get a pointer to the heightmap, if the scen is valid.
   rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
 
-  if (heightmap && !_event.shift)
+  if (heightmap && !_event.Shift())
   {
-    if (_event.dragging)
+    if (_event.Dragging())
       handled = this->Apply(_event, camera, heightmap);
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
   }
@@ -343,17 +343,25 @@ bool TerrainEditorPalette::Apply(const common::MouseEvent &_event,
   double insideRadius = this->insideRadiusSpin->value() / 10.0;
 
   if (this->state == "lower")
-    handled = _heightmap->Lower(_camera, _event.pos, outsideRadius,
+  {
+    handled = _heightmap->Lower(_camera, _event.Pos(), outsideRadius,
         insideRadius, weight);
+  }
   else if (this->state == "raise")
-    handled = _heightmap->Raise(_camera, _event.pos, outsideRadius,
+  {
+    handled = _heightmap->Raise(_camera, _event.Pos(), outsideRadius,
         insideRadius, weight);
+  }
   else if (this->state == "flatten")
-    handled = _heightmap->Flatten(_camera, _event.pos, outsideRadius,
+  {
+    handled = _heightmap->Flatten(_camera, _event.Pos(), outsideRadius,
         insideRadius, weight);
+  }
   else if (this->state == "smooth")
-    handled = _heightmap->Smooth(_camera, _event.pos, outsideRadius,
+  {
+    handled = _heightmap->Smooth(_camera, _event.Pos(), outsideRadius,
         insideRadius, weight);
+  }
 
   return handled;
 }

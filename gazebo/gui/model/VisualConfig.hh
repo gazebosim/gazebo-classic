@@ -37,19 +37,25 @@ namespace gazebo
 
     /// \class VisualConfigData VisualConfig.hh
     /// \brief A class of widgets used for configuring visual properties.
-    class VisualConfigData
+    class VisualConfigData : public QWidget
     {
+      Q_OBJECT
+
+      /// \brief Qt callback when this item's button has been pressed.
+      /// \param[in] _checked Whether it was checked or unchecked.
+      private slots: void OnToggleItem(bool _checked);
+
       /// \brief Unique ID of this visual config.
       public: int id;
 
       /// \brief Name of the visual.
       public: std::string name;
 
-      /// \brief config widget for configuring visual properties.
+      /// \brief Config widget for configuring visual properties.
       public: ConfigWidget *configWidget;
 
-      /// \brief Tree item associated with the configWidget.
-      public: QTreeWidgetItem *treeItem;
+      /// \brief Widget associated with this data.
+      public: QWidget *widget;
     };
 
     /// \class VisualConfig VisualConfig.hh
@@ -123,16 +129,8 @@ namespace gazebo
       /// \param[in] _id Id of item to be removed.
       private slots: void OnRemoveVisual(int _id);
 
-      /// \brief Received item selection user input.
-      /// \param[in] _item Item selected.
-      /// \param[in] _column Column index.
-      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
-
       /// \brief Map of id to visual config widget.
       private: std::map<int, VisualConfigData *> configs;
-
-      /// \brief Widget that display visuals' properties.
-      private: QTreeWidget *visualsTreeWidget;
 
       /// \brief Counter for the number of visuals.
       private: int counter;
@@ -140,8 +138,8 @@ namespace gazebo
       /// \brief Qt signal mapper for mapping remove button signals.
       private:  QSignalMapper *signalMapper;
 
-      /// \brief A map of visual items to their id.
-      private: std::map<int, QTreeWidgetItem *> visualItems;
+      /// \brief Layout which holds all visual items.
+      private: QVBoxLayout *listLayout;
     };
     /// \}
   }

@@ -19,6 +19,8 @@
 * LICENSE.TXT and LICENSE-BSD.TXT for more details.                     *
 *                                                                       *
 *************************************************************************/
+#include <thread>
+
 #include <ode/common.h>
 #include <ode/odemath.h>
 #include <ode/rotation.h>
@@ -47,67 +49,71 @@ std::vector<dReal> errors;
 
 using namespace ode;
 
-static void ComputeRows(
-#ifdef SHOW_CONVERGENCE
-                int thread_id,
-#else
-                int /*thread_id*/,
-#endif
-                IndexError* order,
-                dxBody* const *body,
-                dxPGSLCPParameters params,
-                boost::recursive_mutex* /*mutex*/)
+static void* ComputeRows(void *p)
 {
+  dxPGSLCPParameters *params = (dxPGSLCPParameters *)p;
 
   #ifdef REPORT_THREAD_TIMING
+  int thread_id                 = params->thread_id;
   struct timeval tv;
   double cur_time;
   gettimeofday(&tv,NULL);
   cur_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  //printf("thread %d started at time %f\n",thread_id,cur_time);
+  // printf("thread %d started at time %f\n",thread_id,cur_time);
   #endif
 
-  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
-  dxQuickStepParameters *qs    = params.qs;
-  int startRow                 = params.nStart;   // 0
-  int nRows                    = params.nChunkSize; // m
+  IndexError* order             = params->order;
+  dxBody* const* body           = params->body;
+#ifdef RANDOMLY_REORDER_CONSTRAINTS
+#ifdef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
+  boost::recursive_mutex* mutex = params->mutex;
+#endif
+#endif
+  bool inline_position_correction = params->inline_position_correction;
+  bool position_correction_thread = params->position_correction_thread;
+
+  dxQuickStepParameters *qs    = params->qs;
+  int startRow                 = params->nStart;   // 0
+  int nRows                    = params->nChunkSize; // m
 #ifdef USE_1NORM
-  int m                        = params.m; // m used for rms error computation
+  int m                        = params->m; // m used for rms error computation
 #endif
-  int nb                       = params.nb;
+  int nb                       = params->nb;
 #ifdef PENETRATION_JVERROR_CORRECTION
-  dReal stepsize               = params.stepsize;
-  dRealMutablePtr vnew         = params.vnew;
+  dReal stepsize               = params->stepsize;
+  dRealMutablePtr vnew         = params->vnew;
 #endif
-  int* jb                      = params.jb;
-  const int* findex            = params.findex;
-  dRealPtr        hi           = params.hi;
-  dRealPtr        lo           = params.lo;
-  dRealPtr        Ad           = params.Ad;
-  dRealPtr        Adcfm        = params.Adcfm;
-  dRealPtr        Adcfm_precon = params.Adcfm_precon;
-  dRealMutablePtr rhs          = params.rhs;
-  dRealMutablePtr rhs_erp      = params.rhs_erp;
-  dRealMutablePtr J            = params.J;
-  dRealMutablePtr caccel       = params.caccel;
-  dRealMutablePtr caccel_erp   = params.caccel_erp;
-  dRealMutablePtr lambda       = params.lambda;
-  dRealMutablePtr lambda_erp   = params.lambda_erp;
-  dRealMutablePtr iMJ          = params.iMJ;
-  dRealMutablePtr rhs_precon   = params.rhs_precon;
-  dRealMutablePtr J_precon     = params.J_precon;
-  dRealMutablePtr J_orig       = params.J_orig;
-  dRealMutablePtr cforce       = params.cforce;
+  int* jb                      = params->jb;
+  const int* findex            = params->findex;
+  bool skip_friction           = params->skip_friction;
+  dRealPtr        hi           = params->hi;
+  dRealPtr        lo           = params->lo;
+  dRealPtr        Ad           = params->Ad;
+  dRealPtr        Adcfm        = params->Adcfm;
+  dRealPtr        Adcfm_precon = params->Adcfm_precon;
+  dRealPtr        J            = params->J;
+  dRealPtr        iMJ          = params->iMJ;
+  dRealPtr        rhs_precon   = params->rhs_precon;
+  dRealPtr        J_precon     = params->J_precon;
+  dRealPtr        J_orig       = params->J_orig;
+  dRealMutablePtr cforce       = params->cforce;
+
+  dRealPtr        rhs          = params->rhs;
+  dRealMutablePtr caccel       = params->caccel;
+  dRealMutablePtr lambda       = params->lambda;
+
+  /// THREAD_POSITION_CORRECTION
+  dRealPtr rhs_erp             = params->rhs_erp;
+  dRealMutablePtr caccel_erp   = params->caccel_erp;
+  dRealMutablePtr lambda_erp   = params->lambda_erp;
+
 #ifdef REORDER_CONSTRAINTS
-  dRealMutablePtr last_lambda  = params.last_lambda;
-  dRealMutablePtr last_lambda_erp  = params.last_lambda_erp;
+  dRealMutablePtr last_lambda  = params->last_lambda;
 #endif
 
   //printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
   //for (int i=startRow; i<startRow+nRows; i++) // swap within boundary of our own segment
   //  printf("wwwwwwwwwwwww>id %d start %d n %d  order[%d].index=%d\n",thread_id,startRow,nRows,i,order[i].index);
-
-
 
   /*  DEBUG PRINTOUTS
   // print J_orig
@@ -190,8 +196,11 @@ static void ComputeRows(
 #endif
   dRealMutablePtr caccel_ptr1;
   dRealMutablePtr caccel_ptr2;
+
+  /// THREAD_POSITION_CORRECTION
   dRealMutablePtr caccel_erp_ptr1;
   dRealMutablePtr caccel_erp_ptr2;
+
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
   int total_iterations = precon_iterations + num_iterations +
@@ -310,35 +319,70 @@ static void ComputeRows(
           constraint_index < 0)
         continue;
 
-      dReal delta,delta_erp;
-      dReal delta_precon;
 
+      dReal delta = 0;
+      dReal delta_precon = 0;
+
+      // THREAD_POSITION_CORRECTION
+      dReal delta_erp = 0;
+      // precon does not support split position correction right now.
+      // dReal delta_precon_erp = 0;
+
+      // setup pointers
+      int b1 = jb[index*2];
+      int b2 = jb[index*2+1];
+
+      // for precon
       {
-        int b1 = jb[index*2];
-        int b2 = jb[index*2+1];
-        caccel_ptr1 = caccel + 6*b1;
-        caccel_erp_ptr1 = caccel_erp + 6*b1;
         cforce_ptr1 = cforce + 6*b1;
         if (b2 >= 0)
         {
-          caccel_ptr2     = caccel + 6*b2;
-          caccel_erp_ptr2 = caccel_erp + 6*b2;
           cforce_ptr2     = cforce + 6*b2;
         }
         else
         {
-          caccel_ptr2     = NULL;
-          caccel_erp_ptr2 = NULL;
           cforce_ptr2     = NULL;
         }
-#ifdef PENETRATION_JVERROR_CORRECTION
-        vnew_ptr1 = vnew + 6*b1;
-        vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
-#endif
       }
 
+      // for non-precon
+      {
+        caccel_ptr1 = caccel + 6*b1;
+        if (b2 >= 0)
+        {
+          caccel_ptr2     = caccel + 6*b2;
+        }
+        else
+        {
+          caccel_ptr2     = NULL;
+        }
+
+        if (inline_position_correction)
+        {
+          caccel_erp_ptr1 = caccel_erp + 6*b1;
+          if (b2 >= 0)
+          {
+            caccel_erp_ptr2     = caccel_erp + 6*b2;
+          }
+          else
+          {
+            caccel_erp_ptr2     = NULL;
+          }
+        }
+      }
       dReal old_lambda        = lambda[index];
-      dReal old_lambda_erp    = lambda_erp[index];
+
+      /// THREAD_POSITION_CORRECTION
+      dReal old_lambda_erp;
+      if (inline_position_correction)
+        old_lambda_erp    = lambda_erp[index];
+
+#ifdef PENETRATION_JVERROR_CORRECTION
+      // 4/4 optional pointers for jverror correction
+      vnew_ptr1 = vnew + 6*b1;
+      vnew_ptr2 = (b2 >= 0) ? vnew + 6*b2 : NULL;
+#endif
+
 
       //
       // caccel is the constraint accel in the non-precon case
@@ -347,7 +391,6 @@ static void ComputeRows(
       //  Ad is derived from diagonal of J inv(M) J'
       //  Ad_precon is derived from diagonal of J J'
       //
-      // caccel_erp is from the non-precon case with erp turned on
       if (iteration < precon_iterations)
       {
         // preconditioning
@@ -380,8 +423,11 @@ static void ComputeRows(
         }
 
         // compute lambda and clamp it to [lo,hi].
-        // @@@ SSE not a win here
-#if 1
+        // @@@ SSE is used to speed up vector math
+        // operations with gcc compiler when defined
+        // but SSE is not a win here, #undef for now
+#undef SSE_CLAMP
+#ifndef SSE_CLAMP
         lambda[index] = old_lambda+ delta_precon;
         if (lambda[index] < lo_act) {
           delta_precon = lo_act-old_lambda;
@@ -458,35 +504,42 @@ static void ComputeRows(
           m_rms_dlambda[2]++;
         }
 
-        old_lambda_erp = old_lambda;
-        lambda_erp[index] = lambda[index];
+        // initialize position correction terms (_erp) with precon results
+        if (inline_position_correction)
+        {
+          old_lambda_erp = old_lambda;
+          lambda_erp[index] = lambda[index];
+        }
       }
       else
       {
-        // NOTE:
-        // for this update, we need not throw away J*v(n+1)/h term from rhs
-        //   ...so adding it back, but remember rhs has already been
-        //      scaled by Ad_i, so we need to do the same to J*v(n+1)/h
-        //      but given that J is already scaled by Ad_i, we don't have
-        //      to do it explicitly here
+        if (!skip_friction || constraint_index < 0)
+        {
+          // NOTE:
+          // for this update, we need not throw away J*v(n+1)/h term from rhs
+          //   ...so adding it back, but remember rhs has already been
+          //      scaled by Ad_i, so we need to do the same to J*v(n+1)/h
+          //      but given that J is already scaled by Ad_i, we don't have
+          //      to do it explicitly here
 
-        // delta: erp throttled by info.c_v_max or info.c
-        delta =
+          // delta: erp throttled by info.c_v_max or info.c
+          delta =
 #ifdef PENETRATION_JVERROR_CORRECTION
-               Jvnew_final +
+                 Jvnew_final +
 #endif
-              rhs[index] - old_lambda*Adcfm[index];
-        dRealPtr J_ptr = J + index*12;
-        delta -= quickstep::dot6(caccel_ptr1, J_ptr);
-        if (caccel_ptr2)
-          delta -= quickstep::dot6(caccel_ptr2, J_ptr + 6);
+                rhs[index] - old_lambda*Adcfm[index];
+          dRealPtr J_ptr = J + index*12;
+          delta -= quickstep::dot6(caccel_ptr1, J_ptr);
+          if (caccel_ptr2)
+            delta -= quickstep::dot6(caccel_ptr2, J_ptr + 6);
 
-        // delta_erp: unthrottled version compute for rhs with custom erp
-        // for rhs_erp  note: Adcfm does not have erp because it is on the lhs
-        delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
-        delta_erp -= quickstep::dot6(caccel_erp_ptr1, J_ptr);
-        if (caccel_erp_ptr2)
-          delta_erp -= quickstep::dot6(caccel_erp_ptr2, J_ptr + 6);
+          if (inline_position_correction)
+          {
+            delta_erp = rhs_erp[index] - old_lambda_erp*Adcfm[index];
+            delta_erp -= quickstep::dot6(caccel_erp_ptr1, J_ptr);
+            if (caccel_ptr2)
+              delta_erp -= quickstep::dot6(caccel_erp_ptr2, J_ptr + 6);
+          }
 
         // set the limits for this constraint.
         // this is the place where the QuickStep method differs from the
@@ -496,127 +549,158 @@ static void ComputeRows(
         // the constraints are ordered so that all lambda[] values needed have
         // already been computed.
         dReal hi_act, lo_act;
+        /// THREAD_POSITION_CORRECTION
         dReal hi_act_erp, lo_act_erp;
-        if (constraint_index >= 0) {
-            if(friction_model == pyramid_friction) {
-                // FOR erp throttled by info.c_v_max or info.c
-                hi_act = dFabs (hi[index] * lambda[constraint_index]);
-                lo_act = -hi_act;
-                // for the unthrottled _erp version
-                hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
-                lo_act_erp = -hi_act_erp;
-            }
-            else if(friction_model == cone_friction) {
-              quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
-                constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
-            }
-            else if(friction_model == box_friction) {
-                hi_act = hi[index];
-                lo_act = -hi_act;
-                hi_act_erp = hi[index];
-                lo_act_erp = -hi_act_erp;
-            }
-            else
+        if (constraint_index >= 0)
+        {
+          if (friction_model == pyramid_friction)
+          {
+            // FOR erp throttled by info.c_v_max or info.c
+            hi_act = dFabs (hi[index] * lambda[constraint_index]);
+            lo_act = -hi_act;
+            if (inline_position_correction)
             {
+              hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+              lo_act_erp = -hi_act_erp;
+            }
+          }
+          else if (friction_model == cone_friction)
+          {
+            quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
+                constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
+          }
+          else if(friction_model == box_friction)
+          {
+            hi_act = hi[index];
+            lo_act = -hi_act;
+            hi_act_erp = hi[index];
+            lo_act_erp = -hi_act_erp;
+          }
+          else
+          {
               // initialize the hi and lo to get rid of warnings
               hi_act = dInfinity;
               lo_act = -dInfinity;
               hi_act_erp = dInfinity;
               lo_act_erp = -dInfinity;
               dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
-            }
+          }
         } else {
-          // FOR erp throttled by info.c_v_max or info.c
-          hi_act = hi[index];
-          lo_act = lo[index];
-          // for the unthrottled _erp version
-          hi_act_erp = hi[index];
-          lo_act_erp = lo[index];
-        }
+              // FOR erp throttled by info.c_v_max or info.c
+            hi_act = hi[index];
+            lo_act = lo[index];
+            if (inline_position_correction)
+            {
+              hi_act_erp = hi[index];
+              lo_act_erp = lo[index];
+             }
+           }
         // compute lambda and clamp it to [lo,hi].
         // @@@ SSE not a win here
-#if 1
-        // FOR erp throttled by info.c_v_max or info.c
-        lambda[index] = old_lambda + delta;
-        if (lambda[index] < lo_act) {
-          delta = lo_act-old_lambda;
-          lambda[index] = lo_act;
-        }
-        else if (lambda[index] > hi_act) {
-          delta = hi_act-old_lambda;
-          lambda[index] = hi_act;
-        }
-
-        // for the unthrottled _erp version
-        lambda_erp[index] = old_lambda_erp + delta_erp;
-        if (lambda_erp[index] < lo_act_erp) {
-          delta_erp = lo_act_erp-old_lambda_erp;
-          lambda_erp[index] = lo_act_erp;
-        }
-        else if (lambda_erp[index] > hi_act_erp) {
-          delta_erp = hi_act_erp-old_lambda_erp;
-          lambda_erp[index] = hi_act_erp;
-        }
-#else
-        // FOR erp throttled by info.c_v_max or info.c
-        dReal nl = old_lambda + delta;
-        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-        lambda[index] = nl;
-        delta = nl - old_lambda;
-
-        // for the unthrottled _erp version
-        dReal nl = old_lambda_erp + delta_erp;
-        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-        lambda_erp[index] = nl;
-        delta_erp = nl - old_lambda_erp;
-#endif
-
-        // option to smooth lambda
-#ifdef SMOOTH_LAMBDA
-        {
-          // smooth delta lambda
-          // equivalent to first order artificial dissipation on lambda update.
-
-          // debug smoothing
-          // if (i == 0)
-          //   printf("rhs[%f] adcfm[%f]: ",rhs[index], Adcfm[index]);
-          // if (i == 0)
-          //   printf("dlambda iter[%d]: ",iteration);
-          // printf(" %f ", lambda[index]-old_lambda);
-          // if (i == startRow + nRows - 1)
-          //   printf("\n");
-
-          // extra residual smoothing for contact constraints
-          // was smoothing both contact normal and friction constraints for VRC
-          // if (constraint_index != -1)
-          // smooth only lambda for friction directions fails friction_demo.world
-          if (constraint_index != -1)
-          {
-            lambda[index] = (1.0 - smooth_contacts)*lambda[index]
-              + smooth_contacts*old_lambda;
-            // is filtering lambda_erp necessary?
-            // lambda_erp[index] = (1.0 - smooth_contacts)*lambda_erp[index]
-            //   + smooth_contacts*old_lambda_erp;
+#undef SSE_CLAMP
+#ifndef SSE_CLAMP
+          // FOR erp throttled by info.c_v_max or info.c
+          lambda[index] = old_lambda + delta;
+          if (lambda[index] < lo_act) {
+            delta = lo_act-old_lambda;
+            lambda[index] = lo_act;
           }
-        }
+          else if (lambda[index] > hi_act) {
+            delta = hi_act-old_lambda;
+            lambda[index] = hi_act;
+          }
+
+          if (inline_position_correction)
+          {
+            lambda_erp[index] = old_lambda_erp + delta_erp;
+            if (lambda_erp[index] < lo_act_erp) {
+              delta_erp = lo_act_erp-old_lambda_erp;
+              lambda_erp[index] = lo_act_erp;
+            }
+            else if (lambda_erp[index] > hi_act_erp) {
+              delta_erp = hi_act_erp-old_lambda_erp;
+              lambda_erp[index] = hi_act_erp;
+            }
+          }
+#else
+          // FOR erp throttled by info.c_v_max or info.c
+          dReal nl = old_lambda + delta;
+          _mm_store_sd(&nl,
+                       _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
+                       _mm_load_sd(&hi_act)),
+                       _mm_load_sd(&lo_act)));
+          lambda[index] = nl;
+          delta = nl - old_lambda;
+
+          if (inline_position_correction)
+          {
+            dReal nl_erp = old_lambda_erp + delta_erp;
+            _mm_store_sd(&nl_erp,
+                         _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl_erp),
+                         _mm_load_sd(&hi_act_erp)),
+                         _mm_load_sd(&lo_act_erp)));
+            lambda_erp[index] = nl_erp;
+            delta_erp = nl_erp - old_lambda_erp;
+          }
 #endif
 
-        // update caccel
+          // option to smooth lambda
+#ifdef SMOOTH_LAMBDA
+          // skip smoothing for the position correction thread
+          if (!position_correction_thread)
+          {
+            // smooth delta lambda
+            // equivalent to first order artificial dissipation on lambda update.
+
+            // debug smoothing
+            // if (i == 0)
+            //   printf("rhs[%f] adcfm[%f]: ",rhs[index], Adcfm[index]);
+            // if (i == 0)
+            //   printf("dlambda iter[%d]: ",iteration);
+            // printf(" %f ", lambda[index]-old_lambda);
+            // if (i == startRow + nRows - 1)
+            //   printf("\n");
+
+            // extra residual smoothing for contact constraints
+            // was smoothing both contact normal and friction constraints for VRC
+            // if (constraint_index != -1)
+            // smooth only lambda for friction directions fails friction_demo.world
+            if (constraint_index != -1)
+            {
+              lambda[index] = (1.0 - smooth_contacts)*lambda[index]
+                + smooth_contacts*old_lambda;
+            }
+
+            // if (inline_position_correction)
+            // {
+            //   /// not smoothing lambda_erp
+            // }
+          }
+#endif
+
+          // update caccel
+          {
+            // FOR erp throttled by info.c_v_max or info.c
+            dRealPtr iMJ_ptr = iMJ + index*12;
+
+            // update caccel.
+            quickstep::sum6(caccel_ptr1, delta, iMJ_ptr);
+            if (caccel_ptr2)
+              quickstep::sum6(caccel_ptr2, delta, iMJ_ptr + 6);
+
+            if (inline_position_correction)
+            {
+              quickstep::sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
+              if (caccel_erp_ptr2)
+                quickstep::sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
+            }
+          }
+        }  // end of skip friction check
+
+#ifdef PENETRATION_JVERROR_CORRECTION
         {
           // FOR erp throttled by info.c_v_max or info.c
           dRealPtr iMJ_ptr = iMJ + index*12;
-
-          // update caccel.
-          quickstep::sum6(caccel_ptr1, delta, iMJ_ptr);
-          if (caccel_ptr2)
-            quickstep::sum6(caccel_ptr2, delta, iMJ_ptr + 6);
-
-          // update caccel_erp.
-          quickstep::sum6(caccel_erp_ptr1, delta_erp, iMJ_ptr);
-          if (caccel_erp_ptr2)
-            quickstep::sum6(caccel_erp_ptr2, delta_erp, iMJ_ptr + 6);
-
-#ifdef PENETRATION_JVERROR_CORRECTION
           // update vnew incrementally
           //   add stepsize * delta_caccel to the body velocity
           //   vnew = vnew + dt * delta_caccel
@@ -643,10 +727,13 @@ static void ComputeRows(
           //       iteration,
           //       vnew_ptr1[0], vnew_ptr1[1], vnew_ptr1[2],
           //       vnew_ptr1[3], vnew_ptr1[4], vnew_ptr1[5],Jvnew);
-#endif
         }
+#endif
 
+
+        //////////////////////////////////////////////////////
         // record residual (error) (for the non-erp version)
+        //////////////////////////////////////////////////////
         // given
         //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
         // define scalar Ad:
@@ -692,7 +779,7 @@ static void ComputeRows(
           rms_error[2] += delta2*Ad2;
           m_rms_dlambda[2]++;
         }
-      }
+      } // end of non-precon
 
       //@@@ a trick that may or may not help
       //dReal ramp = (1-((dReal)(iteration+1)/(dReal)iterations));
@@ -830,9 +917,21 @@ static void ComputeRows(
   double end_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
   printf("      quickstep row thread %d start time %f ended time %f duration %f\n",thread_id,cur_time,end_time,end_time - cur_time);
   #endif
+
+  if (position_correction_thread)
+    IFTIMING (dTimerNow ("ComputeRows_erp ends"));
+  else
+    IFTIMING (dTimerNow ("ComputeRows ends"));
+
+  // doing below seems to slow things down
+  // if (position_correction_thread)
+  //   pthread_exit(NULL);
+
 #ifdef HDF5_INSTRUMENT
   IFDUMP(h5_write_errors(DATA_FILE, errors.data(), errors.size()));
 #endif
+
+  return NULL;
 }
 
 //***************************************************************************
@@ -845,16 +944,23 @@ static void ComputeRows(
 // rhs, lo and hi are modified on exit
 //
 void quickstep::PGS_LCP (dxWorldProcessContext *context,
-  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
-  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
+  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon,
+  dRealMutablePtr J_orig,
+#ifdef PENETRATION_JVERROR_CORRECTION
+  dRealMutablePtr vnew,
+  const dReal stepsize,
+#endif
+  int *jb, dxBody * const *body,
+  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
+  dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
-  dxQuickStepParameters *qs,
+  dxQuickStepParameters *qs
 #ifdef USE_TPROW
-  boost::threadpool::pool* row_threadpool,
+  , boost::threadpool::pool* row_threadpool
 #endif
-  const dReal stepsize)
+  )
 {
 
   // precompute iMJ = inv(M)*J'
@@ -1072,49 +1178,154 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   dReal *last_lambda_erp = context->AllocateArray<dReal> (m);
 #endif
 
-  boost::recursive_mutex* mutex = new boost::recursive_mutex();
+  boost::recursive_mutex* mutex =
+    context->AllocateArray<boost::recursive_mutex>(1);
 
   // number of chunks must be at least 1
   // (single iteration, through all the constraints)
   int num_chunks = qs->num_chunks > 0 ? qs->num_chunks : 1; // min is 1
-
-  // prepare pointers for threads
-  dxPGSLCPParameters *params = new dxPGSLCPParameters [num_chunks];
 
   // divide into chunks sequentially
   int chunk = m / num_chunks+1;
   chunk = chunk > 0 ? chunk : 1;
   int thread_id = 0;
 
+  // prepare pointers for threads
+  // params for solution with correction (_erp) term
+  dxPGSLCPParameters *params_erp = NULL;
+  if (qs->thread_position_correction)
+    params_erp = context->AllocateArray<dxPGSLCPParameters>(num_chunks);
 
-  #ifdef REPORT_THREAD_TIMING
+  // params for solution without correction (_erp) term
+  dxPGSLCPParameters *params =
+    context->AllocateArray<dxPGSLCPParameters>(num_chunks);
+
+#ifdef REPORT_THREAD_TIMING
   // timing
   struct timeval tv;
   double cur_time;
   gettimeofday(&tv,NULL);
   cur_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
   //printf("    quickstep start threads at time %f\n",cur_time);
-  #endif
+#endif
 
+  // this is the main computational loop for PGS
+  // here we iterate over each row and make progressive updates
+
+  // to do split impulse / position projection correction,
+  //   - solve lambda     and caccel     using rhs
+  //   - solve lambda_erp and caccel_erp using rhs_erp
+  // these two solves can be performed simultaneously.
 
   IFTIMING (dTimerNow ("start pgs rows"));
   for (int i=0; i<m; i+= chunk,thread_id++)
   {
-    //for (int ijk=0;ijk<m;ijk++) printf("thread_id> id:%d jb[%d]=%d\n",thread_id,ijk,jb[ijk]);
+    // for (int ijk=0;ijk<m;ijk++)
+    //   printf("thread_id> id:%d jb[%d]=%d\n",thread_id,ijk,jb[ijk]);
 
     int nStart = i - qs->num_overlap < 0 ? 0 : i - qs->num_overlap;
     int nEnd   = i + chunk + qs->num_overlap;
     if (nEnd > m) nEnd = m;
+
+    std::thread params_erp_thread;
+
+    if (qs->thread_position_correction && params_erp != NULL)
+    {
+      // setup params for ComputeRows
+      IFTIMING (dTimerNow ("start pgs_erp rows"));
+      //////////////////////////////////////////////////////
+      /// repeat for position projection
+      /// setup params_erp for ComputeRows
+      //////////////////////////////////////////////////////
+      params_erp[thread_id].thread_id = thread_id;
+      params_erp[thread_id].order     = order;
+      params_erp[thread_id].body      = body;
+      params_erp[thread_id].mutex     = mutex;
+      params_erp[thread_id].inline_position_correction = false;
+      params_erp[thread_id].position_correction_thread = true;
+#ifdef PENETRATION_JVERROR_CORRECTION
+      params_erp[thread_id].stepsize = stepsize;
+      params_erp[thread_id].vnew  = vnew_erp;  /// \TODO need to allocate vnew_erp
+#endif
+      params_erp[thread_id].qs  = qs;
+      // if every one reorders constraints, this might just work
+      // comment out below if using defaults (0 and m) so every
+      // thread runs through all joints
+      params_erp[thread_id].nStart = nStart;   // 0
+      params_erp[thread_id].nChunkSize = nEnd - nStart; // m
+      params_erp[thread_id].m = m; // m
+      params_erp[thread_id].nb = nb;
+      params_erp[thread_id].jb = jb;
+      params_erp[thread_id].findex = findex;
+      params_erp[thread_id].skip_friction = false;  // might be a save, but need to test more
+      params_erp[thread_id].hi = hi;
+      params_erp[thread_id].lo = lo;
+      params_erp[thread_id].invMOI = invMOI;
+      params_erp[thread_id].MOI= MOI;
+      params_erp[thread_id].Ad = Ad;
+      params_erp[thread_id].Adcfm = Adcfm;
+      params_erp[thread_id].Adcfm_precon = Adcfm_precon;
+      params_erp[thread_id].J = J;
+      params_erp[thread_id].iMJ = iMJ;
+      params_erp[thread_id].rhs_precon  = rhs_precon;
+      params_erp[thread_id].J_precon  = J_precon;
+      params_erp[thread_id].J_orig  = J_orig;
+      params_erp[thread_id].cforce  = cforce;
+
+      params_erp[thread_id].rhs = rhs_erp;
+      params_erp[thread_id].caccel = caccel_erp;
+      params_erp[thread_id].lambda = lambda_erp;
+
+#ifdef REORDER_CONSTRAINTS
+      params_erp[thread_id].last_lambda  = last_lambda_erp;
+#endif
+
+#ifdef DEBUG_CONVERGENCE_TOLERANCE
+      printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
+        thread_id,i,m,chunk,nStart,nEnd);
+#endif
+
+#ifdef USE_TPROW
+      if (row_threadpool && row_threadpool->size() > 1)
+      {
+        // skip threadpool if less than 2 threads allocated
+        // printf("threading out for params_erp\n");
+        row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&params_erp[thread_id])));
+      }
+      else
+      {
+        params_erp_thread = std::thread(*ComputeRows,
+          (void*)(&(params_erp[thread_id])));
+      }
+#else
+      params_erp_thread = std::thread(*ComputeRows,
+        (void*)(&(params_erp[thread_id])));
+#endif
+    }
+
+
+    // setup params for ComputeRows non_erp
+    params[thread_id].thread_id = thread_id;
+    params[thread_id].order     = order;
+    params[thread_id].body      = body;
+    params[thread_id].mutex     = mutex;
+    params[thread_id].inline_position_correction = !qs->thread_position_correction;
+    params[thread_id].position_correction_thread = false;
+#ifdef PENETRATION_JVERROR_CORRECTION
+    params[thread_id].stepsize = stepsize;
+    params[thread_id].vnew  = vnew;
+#endif
+    params[thread_id].qs  = qs;
     // if every one reorders constraints, this might just work
-    // comment out below if using defaults (0 and m) so every thread runs through all joints
-    params[thread_id].qs  = qs ;
+    // comment out below if using defaults (0 and m) so every
+    // thread runs through all joints
     params[thread_id].nStart = nStart;   // 0
     params[thread_id].nChunkSize = nEnd - nStart; // m
     params[thread_id].m = m; // m
     params[thread_id].nb = nb;
-    params[thread_id].stepsize = stepsize;
     params[thread_id].jb = jb;
     params[thread_id].findex = findex;
+    params[thread_id].skip_friction = false;
     params[thread_id].hi = hi;
     params[thread_id].lo = lo;
     params[thread_id].invMOI = invMOI;
@@ -1122,22 +1333,28 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     params[thread_id].Ad = Ad;
     params[thread_id].Adcfm = Adcfm;
     params[thread_id].Adcfm_precon = Adcfm_precon;
-    params[thread_id].rhs = rhs;
-    params[thread_id].rhs_erp = rhs_erp;
     params[thread_id].J = J;
-    params[thread_id].caccel = caccel;
-    params[thread_id].caccel_erp = caccel_erp;
-    params[thread_id].lambda = lambda;
-    params[thread_id].lambda_erp = lambda_erp;
     params[thread_id].iMJ = iMJ;
-    params[thread_id].rhs_precon  = rhs_precon ;
-    params[thread_id].J_precon  = J_precon ;
-    params[thread_id].J_orig  = J_orig ;
-    params[thread_id].cforce  = cforce ;
-    params[thread_id].vnew  = vnew ;
+    params[thread_id].rhs_precon  = rhs_precon;
+    params[thread_id].J_precon  = J_precon;
+    params[thread_id].J_orig  = J_orig;
+    params[thread_id].cforce  = cforce;
+
+    params[thread_id].rhs = rhs;
+    params[thread_id].caccel = caccel;
+    params[thread_id].lambda = lambda;
+
+    if (!qs->thread_position_correction)
+    {
+      /// if running without thread_position_correction, compute both in
+      /// the same loop
+      params[thread_id].rhs_erp = rhs_erp;
+      params[thread_id].caccel_erp = caccel_erp;
+      params[thread_id].lambda_erp = lambda_erp;
+    }
+
 #ifdef REORDER_CONSTRAINTS
-    params[thread_id].last_lambda  = last_lambda ;
-    params[thread_id].last_lambda_erp  = last_lambda_erp ;
+    params[thread_id].last_lambda  = last_lambda;
 #endif
 
 #ifdef DEBUG_CONVERGENCE_TOLERANCE
@@ -1146,19 +1363,31 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 #endif
 #ifdef USE_TPROW
     if (row_threadpool && row_threadpool->size() > 0)
-      row_threadpool->schedule(boost::bind(ComputeRows,thread_id,order, body, params[thread_id], mutex));
-    else //automatically skip threadpool if only 1 thread allocated
-      ComputeRows(thread_id,order, body, params[thread_id], mutex);
+    {
+      // skip threadpool if less than 2 threads allocated
+      // printf("threading out for params\n");
+      row_threadpool->schedule(boost::bind(*ComputeRows, (void*)(&(params[thread_id]))));
+    }
+    else
+      ComputeRows((void*)(&(params[thread_id])));
 #else
-    ComputeRows(thread_id,order, body, params[thread_id], mutex);
+    ComputeRows((void*)(&(params[thread_id])));
 #endif
+
+    if (qs->thread_position_correction && params_erp_thread.joinable())
+    {
+      IFTIMING (dTimerNow ("wait for params_erp threads"));
+      params_erp_thread.join();
+      IFTIMING (dTimerNow ("params_erp threads done"));
+    }
   }
 
 
   // check time for scheduling, this is usually very quick
   //gettimeofday(&tv,NULL);
   //double wait_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  //printf("      quickstep done scheduling start time %f stopped time %f duration %f\n",cur_time,wait_time,wait_time - cur_time);
+  //printf("      quickstep done scheduling start time %f stopped time %f duration %f\n",
+  //       cur_time,wait_time,wait_time - cur_time);
 
 #ifdef USE_TPROW
   IFTIMING (dTimerNow ("wait for threads"));
@@ -1168,19 +1397,16 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 #endif
 
 
-
   #ifdef REPORT_THREAD_TIMING
   gettimeofday(&tv,NULL);
   double end_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  printf("    quickstep threads start time %f stopped time %f duration %f\n",cur_time,end_time,end_time - cur_time);
+  printf("    quickstep threads start time %f stopped time %f duration %f\n",
+         cur_time,end_time,end_time - cur_time);
   #endif
-
-  delete [] params;
-  delete mutex;
 }
 
 void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_erp, dReal& hi_act_erp,
-    int *jb, const dRealMutablePtr J_orig, int index, int constraint_index, int startRow, int nRows,
+    int *jb, dRealPtr J_orig, int index, int constraint_index, int startRow, int nRows,
     const int nb, dxBody * const *body, int i, const IndexError *order, const int *findex,
     dRealPtr /*lo*/, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp)
 {
@@ -1329,6 +1555,9 @@ size_t quickstep::EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/)
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda
   res += dEFFICIENT_SIZE(sizeof(dReal) * m); // for last_lambda_erp
 #endif
+  res += dEFFICIENT_SIZE(sizeof(dxPGSLCPParameters) * m); // for params_erp
+  res += dEFFICIENT_SIZE(sizeof(dxPGSLCPParameters) * m); // for params
+  res += dEFFICIENT_SIZE(sizeof(boost::recursive_mutex)); // for mutex
   return res;
 }
 

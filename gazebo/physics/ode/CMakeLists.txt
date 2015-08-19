@@ -14,6 +14,7 @@ endif()
 set (sources
   ODEBallJoint.cc
   ODECollision.cc
+  ODEFixedJoint.cc
   ODEGearboxJoint.cc
   ODEHeightmapShape.cc
   ODEHinge2Joint.cc
@@ -38,6 +39,7 @@ SET (headers
   ODEBoxShape.hh
   ODECollision.hh
   ODECylinderShape.hh
+  ODEFixedJoint.hh
   ODEGearboxJoint.hh
   ODEHeightmapShape.hh
   ODEHinge2Joint.hh

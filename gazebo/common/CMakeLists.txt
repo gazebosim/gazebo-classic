@@ -53,6 +53,7 @@ set (sources
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
+  MouseEvent.cc
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
@@ -133,12 +134,22 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   MeshManager_TEST.cc
+  MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
 )
+
+# Timer test fails on OSX
+# See issue #1626
+if (NOT APPLE)
+  set (gtest_sources
+    ${gtest_sources}
+    Timer_TEST.cc
+  )
+endif()
 
 if (HAVE_GTS)
 set (sources
@@ -193,6 +204,7 @@ set_property(
 
 target_link_libraries(gazebo_common
   gazebo_math
+  ${IGNITION-MATH_LIBRARIES}
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}

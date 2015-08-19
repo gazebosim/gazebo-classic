@@ -26,25 +26,32 @@ using namespace gui;
 CollisionConfig::CollisionConfig()
 {
   this->setObjectName("CollisionConfig");
-  QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  this->collisionsTreeWidget = new QTreeWidget();
-  this->collisionsTreeWidget->setColumnCount(1);
-  this->collisionsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->collisionsTreeWidget->header()->hide();
-  this->collisionsTreeWidget->setIndentation(4);
+  // Layout for list
+  this->listLayout = new QVBoxLayout();
+  this->listLayout->setContentsMargins(0, 0, 0, 0);
+  this->listLayout->setAlignment(Qt::AlignTop);
 
-  this->collisionsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  connect(this->collisionsTreeWidget,
-      SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-      this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
+  // Widget for list, which will be scrollable
+  QWidget *listWidget = new QWidget();
+  listWidget->setLayout(this->listLayout);
+  listWidget->setStyleSheet("QWidget{background-color: #808080}");
 
+  // Scroll area for list
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(listWidget);
+  scrollArea->setWidgetResizable(true);
+
+  // Add Collision button
   QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
   addCollisionButton->setMaximumWidth(200);
   connect(addCollisionButton, SIGNAL(clicked()), this, SLOT(OnAddCollision()));
 
-  mainLayout->addWidget(this->collisionsTreeWidget);
+  // Main layout
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->addWidget(scrollArea);
   mainLayout->addWidget(addCollisionButton);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
   this->counter = 0;
@@ -83,10 +90,12 @@ unsigned int CollisionConfig::GetCollisionCount() const
 void CollisionConfig::Reset()
 {
   for (auto &it : this->configs)
+  {
+    this->listLayout->removeWidget(it.second->widget);
     delete it.second;
+  }
 
   this->configs.clear();
-  this->collisionsTreeWidget->clear();
 }
 
 /////////////////////////////////////////////////
@@ -108,8 +117,21 @@ void CollisionConfig::UpdateCollision(const std::string &_name,
 void CollisionConfig::AddCollision(const std::string &_name,
     const msgs::Collision *_collisionMsg)
 {
-  // Collision name label
-  QLabel *collisionLabel = new QLabel(QString(_name.c_str()));
+  // Header button
+  QRadioButton *headerButton = new QRadioButton();
+  headerButton->setChecked(false);
+  headerButton->setFocusPolicy(Qt::NoFocus);
+  headerButton->setText(QString(_name.c_str()));
+  headerButton->setStyleSheet(
+     "QRadioButton {\
+        color: #d0d0d0;\
+      }\
+      QRadioButton::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QRadioButton::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
 
   // Remove button
   QToolButton *removeCollisionButton = new QToolButton(this);
@@ -123,23 +145,15 @@ void CollisionConfig::AddCollision(const std::string &_name,
       SLOT(map()));
   this->signalMapper->setMapping(removeCollisionButton, this->counter);
 
-  // Item Layout
-  QHBoxLayout *collisionItemLayout = new QHBoxLayout;
-  collisionItemLayout->addWidget(collisionLabel);
-  collisionItemLayout->addWidget(removeCollisionButton);
-  collisionItemLayout->setContentsMargins(10, 0, 0, 0);
+  // Header Layout
+  QHBoxLayout *headerLayout = new QHBoxLayout;
+  headerLayout->setContentsMargins(0, 0, 0, 0);
+  headerLayout->addWidget(headerButton);
+  headerLayout->addWidget(removeCollisionButton);
 
-  // Item widget
-  QWidget *collisionItemWidget = new QWidget;
-  collisionItemWidget->setLayout(collisionItemLayout);
-
-  // Top-level tree item
-  QTreeWidgetItem *collisionItem =
-      new QTreeWidgetItem(static_cast<QTreeWidgetItem *>(0));
-  this->collisionsTreeWidget->addTopLevelItem(collisionItem);
-
-  this->collisionsTreeWidget->setItemWidget(collisionItem, 0,
-      collisionItemWidget);
+  // Header widget
+  QWidget *headerWidget = new QWidget;
+  headerWidget->setLayout(headerLayout);
 
   // ConfigWidget
   msgs::Collision msgToLoad;
@@ -173,54 +187,37 @@ void CollisionConfig::AddCollision(const std::string &_name,
 
   ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);
+  configWidget->hide();
 
   configWidget->SetWidgetVisible("id", false);
   configWidget->SetWidgetVisible("name", false);
   configWidget->SetWidgetReadOnly("id", true);
   configWidget->SetWidgetReadOnly("name", true);
 
+  // Item layout
+  QVBoxLayout *itemLayout = new QVBoxLayout();
+  itemLayout->addWidget(headerWidget);
+  itemLayout->addWidget(configWidget);
+
+  // Put the layout in a widget which can be added/deleted
+  QWidget *item = new QWidget();
+  item->setLayout(itemLayout);
+
+  // Add to the list
+  this->listLayout->addWidget(item);
+
+  // Fill ConfigData
   CollisionConfigData *configData = new CollisionConfigData;
   configData->configWidget = configWidget;
   configData->id =  this->counter;
-  configData->treeItem = collisionItem;
+  configData->widget = item;
   configData->name = _name;
+  connect(headerButton, SIGNAL(toggled(bool)), configData,
+           SLOT(OnToggleItem(bool)));
   this->configs[this->counter] = configData;
-
-  // Scroll area
-  QScrollArea *scrollArea = new QScrollArea;
-  scrollArea->setWidget(configWidget);
-  scrollArea->setWidgetResizable(true);
-
-  // Layout
-  QVBoxLayout *collisionLayout = new QVBoxLayout;
-  collisionLayout->setContentsMargins(0, 0, 0, 0);
-  collisionLayout->addWidget(scrollArea);
-
-  // Widget
-  QWidget *collisionWidget = new QWidget;
-  collisionWidget->setLayout(collisionLayout);
-  collisionWidget->setMinimumHeight(800);
-
-  // Child item
-  QTreeWidgetItem *collisionChildItem =
-      new QTreeWidgetItem(collisionItem);
-  this->collisionsTreeWidget->setItemWidget(collisionChildItem, 0,
-      collisionWidget);
-
-  collisionItem->setExpanded(false);
-  collisionChildItem->setExpanded(false);
 
   this->counter++;
 }
-
-/////////////////////////////////////////////////
-void CollisionConfig::OnItemSelection(QTreeWidgetItem *_item,
-                                         int /*_column*/)
-{
-  if (_item && _item->childCount() > 0)
-    _item->setExpanded(!_item->isExpanded());
-}
-
 
 /////////////////////////////////////////////////
 void CollisionConfig::OnRemoveCollision(int _id)
@@ -265,9 +262,8 @@ void CollisionConfig::OnRemoveCollision(int _id)
     return;
 
   // Remove
-  int index = this->collisionsTreeWidget->indexOfTopLevelItem(
-      configData->treeItem);
-  this->collisionsTreeWidget->takeTopLevelItem(index);
+  this->listLayout->removeWidget(configData->widget);
+  delete configData->widget;
 
   emit CollisionRemoved(configData->name);
   this->configs.erase(it);
@@ -304,4 +300,13 @@ void CollisionConfig::SetGeometry(const std::string &_name,
       break;
     }
   }
+}
+
+/////////////////////////////////////////////////
+void CollisionConfigData::OnToggleItem(bool _checked)
+{
+  if (_checked)
+    this->configWidget->show();
+  else
+    this->configWidget->hide();
 }

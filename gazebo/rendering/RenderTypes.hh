@@ -50,6 +50,7 @@ namespace gazebo
     class DynamicLines;
     class Visual;
     class LaserVisual;
+    class LogicalCameraVisual;
     class SonarVisual;
     class WrenchVisual;
     class CameraVisual;
@@ -62,6 +63,8 @@ namespace gazebo
     class RFIDVisual;
     class RFIDTagVisual;
     class ApplyWrenchVisual;
+    class OriginVisual;
+    class LinkFrameVisual;
     class WindowManager;
     class SelectionObj;
     class RayQuery;
@@ -119,6 +122,10 @@ namespace gazebo
     /// \brief Shared pointer to CameraVisual
     typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
 
+    /// \def LogicalCameraVisualPtr
+    /// \brief Shared pointer to LogicalCameraVisual
+    typedef boost::shared_ptr<LogicalCameraVisual> LogicalCameraVisualPtr;
+
     /// \def JointVisualPtr
     /// \brief Shared pointer to JointVisual
     typedef boost::shared_ptr<JointVisual> JointVisualPtr;
@@ -154,6 +161,14 @@ namespace gazebo
     /// \def ApplyWrenchVisualPtr
     /// \brief Shared pointer to ApplyWrenchVisual
     typedef boost::shared_ptr<ApplyWrenchVisual> ApplyWrenchVisualPtr;
+
+    /// \def OriginVisualPtr
+    /// \brief Shared pointer to OriginVisual
+    typedef boost::shared_ptr<OriginVisual> OriginVisualPtr;
+
+    /// \def LinkFrameVisualPtr
+    /// \brief Shared pointer to LinkFrameVisual
+    typedef boost::shared_ptr<LinkFrameVisual> LinkFrameVisualPtr;
 
     /// \def WindowManager
     /// \brief Shared pointer to WindowManager

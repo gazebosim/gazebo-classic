@@ -292,7 +292,8 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
     else
     {
       boost::mutex::scoped_lock lock2(this->dataPtr->callbacksMutex);
-
+      if (this->dataPtr->stop)
+        break;
       this->dataPtr->modelDBUpdated(this->dataPtr->modelCache);
     }
     this->dataPtr->updateCacheCompleteCondition.notify_all();

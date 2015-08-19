@@ -48,6 +48,10 @@ namespace gazebo
     /// \param[in] _msg The login message
     public: void OnRestLoginRequest(ConstRestLoginPtr &_msg);
 
+    /// \brief Called everytime a logout message is received.
+    /// \param[in] _msg The login message
+    public: void OnRestLogoutRequest(ConstRestLogoutPtr &_msg);
+
     /// \brief Called everytime a REST POST event message is received
     /// \param[in] _msg The post message
     public: void OnEventRestPost(ConstRestPostPtr &_msg);
@@ -70,7 +74,10 @@ namespace gazebo
     private: gazebo::transport::NodePtr node;
 
     /// \brief Gazebo subscriber for login requests
-    private: gazebo::transport::SubscriberPtr subRequest;
+    private: gazebo::transport::SubscriberPtr subLogin;
+
+    /// \brief Gazebo subscriber for logout requests
+    private: gazebo::transport::SubscriberPtr subLogout;
 
     /// \brief Gazebo subscriber for POST events
     private: gazebo::transport::SubscriberPtr subEvent;

@@ -22,8 +22,11 @@
 #include <vector>
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/DataLogger.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -170,6 +173,9 @@ namespace gazebo
       /// \brief Qt callback when the show grid action is triggered.
       private slots: void ShowGrid();
 
+      /// \brief Qt callback when the show origin action is triggered.
+      private slots: void ShowOrigin();
+
       /// \brief Qt callback when the show collisions action is triggered.
       private slots: void ShowCollisions();
 
@@ -185,7 +191,8 @@ namespace gazebo
       /// \brief Qt callback when the show inertia action is triggered.
       private slots: void ShowInertia();
 
-      private slots: void Reset();
+      /// \brief Qt callback when the show link frame action is triggered.
+      private slots: void ShowLinkFrame();
 
       /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
@@ -207,6 +214,9 @@ namespace gazebo
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
 
+      /// \brief QT callback when the data logger is shut down.
+      private slots: void OnDataLoggerClosed();
+
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
@@ -223,6 +233,10 @@ namespace gazebo
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
+
+      /// \brief Toggle toolbars display.
+      /// \param[in] _value True to display toolbars.
+      private: void OnShowToolbars(bool _value);
 
       private: void OnMoveMode(bool _mode);
 
@@ -343,6 +357,9 @@ namespace gazebo
 
       /// \brief Splitter for the main window.
       private: QSplitter *splitter;
+
+      /// \brief Data logger dialog.
+      private: gui::DataLogger *dataLogger;
     };
   }
 }

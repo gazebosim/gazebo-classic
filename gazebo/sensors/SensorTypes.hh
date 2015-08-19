@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _SENSORTYPES_HH_
-#define _SENSORTYPES_HH_
+#ifndef _GAZEBO_SENSORTYPES_HH_
+#define _GAZEBO_SENSORTYPES_HH_
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -30,9 +30,12 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    class AltimeterSensor;
     class Sensor;
     class RaySensor;
     class CameraSensor;
+    class LogicalCameraSensor;
+    class MagnetometerSensor;
     class MultiCameraSensor;
     class DepthCameraSensor;
     class ContactSensor;
@@ -50,6 +53,10 @@ namespace gazebo
     class WirelessTransmitter;
     class WirelessReceiver;
 
+    /// \def AltimeterSensorPtr
+    /// \brief Shared pointer to AltimeterSensor
+    typedef boost::shared_ptr<AltimeterSensor> AltimeterSensorPtr;
+
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
     typedef boost::shared_ptr<Sensor> SensorPtr;
@@ -61,6 +68,10 @@ namespace gazebo
     /// \def CameraSensorPtr
     /// \brief Shared pointer to CameraSensor
     typedef boost::shared_ptr<CameraSensor> CameraSensorPtr;
+
+    /// \def MagnetometerSensorPtr
+    /// \brief Shared pointer to MagnetometerSensor
+    typedef boost::shared_ptr<MagnetometerSensor> MagnetometerSensorPtr;
 
     /// \def MultiCameraSensorPtr
     /// \brief Shared pointer to MultiCameraSensor
@@ -126,6 +137,10 @@ namespace gazebo
     /// \brief Shared pointer to WirelessReceiver
     typedef boost::shared_ptr<WirelessReceiver> WirelessReceiverPtr;
 
+    /// \def AltimeterSensor_V
+    /// \brief Vector of AltimeterSensor shared pointers
+    typedef std::vector<AltimeterSensor> AltimeterSensor_V;
+
     /// \def Sensor_V
     /// \brief Vector of Sensor shared pointers
     typedef std::vector<SensorPtr> Sensor_V;
@@ -178,7 +193,98 @@ namespace gazebo
     /// \brief Vector of WirelessReceiver
     typedef std::vector<WirelessReceiver> WirelessReceiver_V;
 
+    /// \def LogicalCameraSensorPtr
+    /// \brief Shared pointer to LogicalCameraSensor
+    typedef boost::shared_ptr<LogicalCameraSensor> LogicalCameraSensorPtr;
 
+    /// \def SensorNoiseType
+    /// \brief Eumeration of all sensor noise types
+    enum SensorNoiseType
+    {
+      /// \brief Noise streams for the Camera sensor
+      /// \sa CameraSensor
+      NO_NOISE = 0,
+
+      /// \brief Noise streams for the Camera sensor
+      /// \sa CameraSensor
+      CAMERA_NOISE = 1,
+
+      /// \brief Noise streams for the GPU ray sensor
+      /// \sa GpuRaySensor
+      GPU_RAY_NOISE = 2,
+
+      /// \brief GPS position latitude noise streams
+      /// \sa GpsSensor
+      GPS_POSITION_LATITUDE_NOISE_METERS = 3,
+
+      /// \brief GPS position longitude noise streams
+      /// \sa GpsSensor
+      GPS_POSITION_LONGITUDE_NOISE_METERS = 4,
+
+      /// \brief GPS position altitude noise streams
+      /// \sa GpsSensor
+      GPS_POSITION_ALTITUDE_NOISE_METERS = 5,
+
+      /// \brief GPS velocity latitude noise streams
+      /// \sa GpsSensor
+      GPS_VELOCITY_LATITUDE_NOISE_METERS = 6,
+
+      /// \brief GPS velocity longitude noise streams
+      /// \sa GpsSensor
+      GPS_VELOCITY_LONGITUDE_NOISE_METERS = 7,
+
+      /// \brief GPS velocity altitude noise streams
+      /// \sa GpsSensor
+      GPS_VELOCITY_ALTITUDE_NOISE_METERS = 8,
+
+      /// \brief Noise streams for the ray sensor
+      /// \sa RaySensor
+      RAY_NOISE = 9,
+
+      /// \brief Magnetometer body-frame X axis noise in Tesla
+      /// \sa MagnetometerSensor
+      MAGNETOMETER_X_NOISE_TESLA = 10,
+
+      /// \brief Magnetometer body-frame Y axis noise in Tesla
+      /// \sa MagnetometerSensor
+      MAGNETOMETER_Y_NOISE_TESLA = 11,
+
+      /// \brief Magnetometer body-frame Z axis noise in Tesla
+      /// \sa MagnetometerSensor
+      MAGNETOMETER_Z_NOISE_TESLA = 12,
+
+      /// \brief Vertical noise stream for the altimeter sensor
+      /// \sa AltimeterSensor
+      ALTIMETER_POSITION_NOISE_METERS = 13,
+
+      /// \brief Velocity noise streams for the altimeter sensor
+      /// \sa AltimeterSensor
+      ALTIMETER_VELOCITY_NOISE_METERS_PER_S = 14,
+
+      /// \brief IMU angular velocity X noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_X_NOISE_RADIANS_PER_S = 15,
+
+      /// \brief IMU angular velocity Y noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_Y_NOISE_RADIANS_PER_S = 16,
+
+      /// \brief IMU angular velocity Z noise stream
+      /// \sa ImuSensor
+      IMU_ANGVEL_Z_NOISE_RADIANS_PER_S = 17,
+
+      /// \brief IMU linear acceleration X noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_X_NOISE_METERS_PER_S_SQR = 18,
+
+      /// \brief IMU linear acceleration Y noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_Y_NOISE_METERS_PER_S_SQR = 19,
+
+      /// \brief IMU linear acceleration Z noise stream
+      /// \sa ImuSensor
+      IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20
+    };
     /// \}
   }
 }

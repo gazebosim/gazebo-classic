@@ -146,7 +146,7 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_world->GetName());
 
-  sub = this->node->Subscribe(this->eventTopicName,
+  this->sub = this->node->Subscribe(this->eventTopicName,
                               &ArrangePlugin::ArrangementCallback, this);
 }
 

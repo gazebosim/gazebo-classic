@@ -129,7 +129,7 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
-            this->frictionPyramid->direction1);
+            this->frictionPyramid->direction1.Ign());
 
   _msg.set_restitution_coefficient(this->bounce);
   _msg.set_bounce_threshold(this->bounceThreshold);
@@ -159,7 +159,7 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
       this->slip2 = _msg.friction().slip2();
     if (_msg.friction().has_fdir1())
       this->frictionPyramid->direction1 =
-        msgs::Convert(_msg.friction().fdir1());
+        msgs::ConvertIgn(_msg.friction().fdir1());
   }
 
   if (_msg.has_restitution_coefficient())

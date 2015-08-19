@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define LASER_TOL 1e-5
 #define DOUBLE_TOL 1e-6
@@ -74,8 +75,8 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
   EXPECT_EQ(640, laser->GetRayCount());
   EXPECT_EQ(640, laser->GetRangeCount());
-  EXPECT_NEAR(laser->GetAngleMin().Radian(), -2.27, DOUBLE_TOL);
-  EXPECT_NEAR(laser->GetAngleMax().Radian(), 2.27, DOUBLE_TOL);
+  EXPECT_NEAR(laser->AngleMin().Radian(), -2.27, DOUBLE_TOL);
+  EXPECT_NEAR(laser->AngleMax().Radian(), 2.27, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeMin(), 0, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeMax(), 10, DOUBLE_TOL);
   EXPECT_NEAR(laser->GetRangeResolution(), 0.01, DOUBLE_TOL);
@@ -600,7 +601,7 @@ int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to
   // statistically unlikely, but possible results.
-  math::Rand::SetSeed(42);
+  ignition::math::Rand::Seed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

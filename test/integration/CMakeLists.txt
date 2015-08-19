@@ -47,6 +47,7 @@ set(tests
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
+  joint_get_force_torque.cc
   joint_revolute.cc
   joint_screw.cc
   joint_set_position_test.cc
@@ -54,6 +55,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  logical_camera_sensor.cc
   model.cc
   model_database.cc
   noise.cc
@@ -75,11 +77,14 @@ set(tests
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_pr2.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
+  swarm.cc
   transceiver.cc
   transport.cc
+  transporter.cc
   world.cc
   world_clone.cc
   world_entity_below_point.cc
@@ -105,6 +110,7 @@ if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+  set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)

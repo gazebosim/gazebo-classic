@@ -228,6 +228,39 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
       odePhysics->GetParam("friction_model")));
     EXPECT_EQ(param, frictionModel);
   }
+
+  // Test world step solvers
+  {
+    // Default value "ODE_DANTZIG"
+    const std::string worldSolverType = "ODE_DANTZIG";
+    EXPECT_EQ(odePhysics->GetWorldStepSolverType(), worldSolverType);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("world_step_solver")));
+    EXPECT_EQ(param, worldSolverType);
+  }
+
+  {
+    // Switch to "DART_PGS" using SetWorldStepSolverType
+    const std::string worldSolverType = "DART_PGS";
+    odePhysics->SetWorldStepSolverType(worldSolverType);
+    EXPECT_EQ(odePhysics->GetWorldStepSolverType(), worldSolverType);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("world_step_solver")));
+    EXPECT_EQ(param, worldSolverType);
+  }
+
+  {
+    // Switch to "BULLET_PGS" using SetParam
+    const std::string worldSolverType = "BULLET_PGS";
+    odePhysics->SetParam("world_step_solver", worldSolverType);
+    EXPECT_EQ(odePhysics->GetWorldStepSolverType(), worldSolverType);
+    std::string param;
+    EXPECT_NO_THROW(param = boost::any_cast<std::string>(
+      odePhysics->GetParam("world_step_solver")));
+    EXPECT_EQ(param, worldSolverType);
+  }
 }
 
 /////////////////////////////////////////////////

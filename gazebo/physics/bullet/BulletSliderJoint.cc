@@ -391,6 +391,8 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
       {
         this->bulletSlider->setPoweredLinMotor(true);
         this->bulletSlider->setTargetLinMotorVelocity(0.0);
+        double value = boost::any_cast<double>(_value);
+#ifndef LIBBULLET_VERSION_GT_282
         // there is an upstream bug in bullet 2.82 and earlier
         // the maxLinMotorForce parameter is inadvertently divided
         // by timestep when attempting to compute an impulse in
@@ -399,8 +401,9 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
         // As a workaround, multiply the desired friction
         // parameter by dt^2 when setting
         double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
-        this->bulletSlider->setMaxLinMotorForce(
-          dt*dt * boost::any_cast<double>(_value));
+        value *= dt*dt;
+#endif
+        this->bulletSlider->setMaxLinMotorForce(value);
       }
       else
       {
@@ -436,6 +439,8 @@ double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
   {
     if (this->bulletSlider)
     {
+      double value = this->bulletSlider->getMaxLinMotorForce();
+#ifndef LIBBULLET_VERSION_GT_282
       // there is an upstream bug in bullet 2.82 and earlier
       // the maxLinMotorForce parameter is inadvertently divided
       // by timestep when attempting to compute an impulse in
@@ -444,7 +449,9 @@ double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
       // As a workaround, divide the desired friction
       // parameter by dt^2 when getting
       double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
-      return this->bulletSlider->getMaxLinMotorForce() / (dt*dt);
+      value /= dt*dt;
+#endif
+      return value;
     }
     else
     {

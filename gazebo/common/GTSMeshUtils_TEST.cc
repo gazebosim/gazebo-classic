@@ -32,29 +32,37 @@ TEST_F(GTSMeshUtils, DelaunayTriangulation)
   // a smaller square inside a bigger square.
   // The smaller square should be treated as a hole inside the bigger square.
 
-  std::vector<std::vector<math::Vector2d> > path;
-  std::vector<math::Vector2d> subpath01;
-  subpath01.push_back(math::Vector2d(0, 0));
-  subpath01.push_back(math::Vector2d(1, 0));
-  subpath01.push_back(math::Vector2d(1, 1));
-  subpath01.push_back(math::Vector2d(0, 1));
+  std::vector<ignition::math::Vector2d> vertices;
+  // outside square
+  vertices.push_back(ignition::math::Vector2d(0, 0));
+  vertices.push_back(ignition::math::Vector2d(1, 0));
+  vertices.push_back(ignition::math::Vector2d(1, 1));
+  vertices.push_back(ignition::math::Vector2d(0, 1));
+  // inside square
+  vertices.push_back(ignition::math::Vector2d(0.25, 0.25));
+  vertices.push_back(ignition::math::Vector2d(0.25, 0.75));
+  vertices.push_back(ignition::math::Vector2d(0.75, 0.75));
+  vertices.push_back(ignition::math::Vector2d(0.75, 0.25));
 
-  std::vector<math::Vector2d> subpath02;
-  subpath02.push_back(math::Vector2d(0.25, 0.25));
-  subpath02.push_back(math::Vector2d(0.25, 0.75));
-  subpath02.push_back(math::Vector2d(0.75, 0.75));
-  subpath02.push_back(math::Vector2d(0.75, 0.25));
+  std::vector<ignition::math::Vector2i> edges;
+  edges.push_back(ignition::math::Vector2i(0, 1));
+  edges.push_back(ignition::math::Vector2i(1, 2));
+  edges.push_back(ignition::math::Vector2i(2, 3));
+  edges.push_back(ignition::math::Vector2i(3, 0));
 
-  path.push_back(subpath01);
-  path.push_back(subpath02);
+  edges.push_back(ignition::math::Vector2i(4, 5));
+  edges.push_back(ignition::math::Vector2i(5, 6));
+  edges.push_back(ignition::math::Vector2i(6, 7));
+  edges.push_back(ignition::math::Vector2i(7, 4));
 
   common::Mesh *mesh = new common::Mesh();
   mesh->SetName("extruded");
   common::SubMesh *subMesh = new common::SubMesh();
   mesh->AddSubMesh(subMesh);
 
-  bool result = common::GTSMeshUtils::DelaunayTriangulation(path, subMesh);
-
+  bool result = common::GTSMeshUtils::DelaunayTriangulation(vertices,
+                                                            edges,
+                                                            subMesh);
   EXPECT_TRUE(result);
 
   // same as number of vertices in the path

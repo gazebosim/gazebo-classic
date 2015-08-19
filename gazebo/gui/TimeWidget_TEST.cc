@@ -25,6 +25,9 @@
 /////////////////////////////////////////////////
 void TimeWidget_TEST::ValidTimes()
 {
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
   QBENCHMARK
   {
     this->Load("empty.world", false, false, false);

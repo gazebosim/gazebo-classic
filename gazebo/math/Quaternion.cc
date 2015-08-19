@@ -69,6 +69,15 @@ Quaternion::Quaternion(const Quaternion &_qt)
 }
 
 //////////////////////////////////////////////////
+Quaternion::Quaternion(const ignition::math::Quaterniond &_qt)
+{
+  this->w = _qt.W();
+  this->x = _qt.X();
+  this->y = _qt.Y();
+  this->z = _qt.Z();
+}
+
+//////////////////////////////////////////////////
 Quaternion::~Quaternion()
 {
 }
@@ -626,3 +635,19 @@ Quaternion Quaternion::Integrate(const Vector3 &_angularVelocity,
   return deltaQ * (*this);
 }
 
+
+//////////////////////////////////////////////////
+ignition::math::Quaterniond Quaternion::Ign() const
+{
+  return ignition::math::Quaterniond(this->w, this->x, this->y, this->z);
+}
+
+//////////////////////////////////////////////////
+Quaternion &Quaternion::operator=(const ignition::math::Quaterniond &_v)
+{
+  this->w = _v.W();
+  this->x = _v.X();
+  this->y = _v.Y();
+  this->z = _v.Z();
+  return *this;
+}

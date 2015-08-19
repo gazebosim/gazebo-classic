@@ -22,6 +22,7 @@
 #include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+#include "gazebo/gui/building/BaseInspectorDialog.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,8 @@ namespace gazebo
 
     /// \class StairsInspectorDialog StairsInspectorDialog.hh
     /// \brief Dialog for configuring a staircase item.
-    class GZ_GUI_BUILDING_VISIBLE StairsInspectorDialog : public QDialog
+    class GZ_GUI_BUILDING_VISIBLE StairsInspectorDialog
+      : public BaseInspectorDialog
     {
       Q_OBJECT
 
@@ -63,14 +65,6 @@ namespace gazebo
       /// \return Number of steps in the staircase.
       public: int GetSteps() const;
 
-      /// \brief Get the color of the staircase.
-      /// \return Stairs color.
-      public: QColor GetColor() const;
-
-      /// \brief Get the texture of the staircase.
-      /// \return Texture.
-      public: QString GetTexture() const;
-
       /// \brief Set the name of the staircase.
       /// \param[in] _name Name to set to.
       public: void SetName(const std::string &_name);
@@ -94,14 +88,6 @@ namespace gazebo
       /// \brief Set the number of steps in the staircase.
       /// \param[in] _steps Number of steps.
       public: void SetSteps(int _steps);
-
-      /// \brief Set the color of the staircase.
-      /// \param[in] _color Color.
-      public: void SetColor(const QColor _color);
-
-      /// \brief Set the texture of the staircase.
-      /// \param[in] _texture Texture.
-      public: void SetTexture(const QString _texture);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -137,18 +123,6 @@ namespace gazebo
 
       /// \brief Label that holds the name of the staircase.
       private: QLabel* stairsNameLabel;
-
-      /// \brief Combo box for selecting the color of the staircase.
-      private: QComboBox *colorComboBox;
-
-      /// \brief Vector of color options.
-      private: std::vector<QColor> colorList;
-
-      /// \brief Combo box for selecting the texture of the staircase.
-      private: QComboBox *textureComboBox;
-
-      /// \brief Vector of texture options.
-      private: std::vector<QString> textureList;
     };
     /// \}
   }

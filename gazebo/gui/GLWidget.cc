@@ -128,10 +128,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
 
-  // Subscribes to selection messages.
-  this->selectionSub = this->node->Subscribe("~/selection",
-      &GLWidget::OnSelectionMsg, this);
-
   // Publishes information about user selections.
   this->selectionPub =
     this->node->Advertise<msgs::Selection>("~/selection");
@@ -159,9 +155,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this,
       SLOT(OnModelEditor(bool)));
-
-  connect(this, SIGNAL(selectionMsgReceived(const QString &)), this,
-      SLOT(OnSelectionMsgEvent(const QString &)), Qt::QueuedConnection);
 
   // Connect the ortho action
   connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
@@ -203,7 +196,6 @@ GLWidget::~GLWidget()
   this->connections.clear();
   this->node.reset();
   this->modelPub.reset();
-  this->selectionSub.reset();
   this->selectionPub.reset();
 
   ModelManipulator::Instance()->Clear();
@@ -369,11 +361,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->keyEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
-  this->mouseEvent.control = this->keyEvent.control;
-  this->mouseEvent.shift = this->keyEvent.shift;
-  this->mouseEvent.alt = this->keyEvent.alt;
+  this->mouseEvent.SetControl(this->keyEvent.control);
+  this->mouseEvent.SetShift(this->keyEvent.shift);
+  this->mouseEvent.SetAlt(this->keyEvent.alt);
 
-  if (this->mouseEvent.control)
+  if (this->mouseEvent.Control())
   {
     if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty()
        && !this->modelEditorEnabled)
@@ -393,8 +385,8 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     // model editor exit pop-up message is modal so can block event propagation.
     // So using hotkeys to exit will leave the control variable in a bad state.
     // Manually override and reset the control value.
-    if (this->modelEditorEnabled && this->mouseEvent.control)
-      this->mouseEvent.control = false;
+    if (this->modelEditorEnabled && this->mouseEvent.Control())
+      this->mouseEvent.SetControl(false);
 
     ModelManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
     this->userCamera->HandleKeyPressEvent(this->keyText);
@@ -441,9 +433,9 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->keyEvent.alt =
     this->keyModifiers & Qt::AltModifier ? true : false;
 
-  this->mouseEvent.control = this->keyEvent.control;
-  this->mouseEvent.shift = this->keyEvent.shift;
-  this->mouseEvent.alt = this->keyEvent.alt;
+  this->mouseEvent.SetControl(this->keyEvent.control);
+  this->mouseEvent.SetShift(this->keyEvent.shift);
+  this->mouseEvent.SetAlt(this->keyEvent.alt);
 
   ModelManipulator::Instance()->OnKeyReleaseEvent(this->keyEvent);
   this->keyText = "";
@@ -460,28 +452,18 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
-  this->mouseEvent.prevPos = this->mouseEvent.pressPos;
+  this->mouseEvent.SetPressPos(_event->pos().x(), _event->pos().y());
+  this->mouseEvent.SetPrevPos(this->mouseEvent.PressPos());
 
   /// Set the button which cause the press event
-  if (_event->button() == Qt::LeftButton)
-    this->mouseEvent.button = common::MouseEvent::LEFT;
-  else if (_event->button() == Qt::RightButton)
-    this->mouseEvent.button = common::MouseEvent::RIGHT;
-  else if (_event->button() == Qt::MidButton)
-    this->mouseEvent.button = common::MouseEvent::MIDDLE;
+  this->SetMouseEventButton(_event->button());
 
-  this->mouseEvent.buttons = common::MouseEvent::NO_BUTTON;
-  this->mouseEvent.type = common::MouseEvent::PRESS;
+  this->mouseEvent.SetButtons(common::MouseEvent::NO_BUTTON);
+  this->mouseEvent.SetType(common::MouseEvent::PRESS);
 
-  this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+  this->SetMouseEventButtons(_event->buttons());
 
-  this->mouseEvent.dragging = false;
+  this->mouseEvent.SetDragging(false);
 
   // Process Mouse Events
   MouseEventHandler::Instance()->HandleDoubleClick(this->mouseEvent);
@@ -493,28 +475,18 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
-  this->mouseEvent.prevPos = this->mouseEvent.pressPos;
+  this->mouseEvent.SetPressPos(_event->pos().x(), _event->pos().y());
+  this->mouseEvent.SetPrevPos(this->mouseEvent.PressPos());
 
   /// Set the button which cause the press event
-  if (_event->button() == Qt::LeftButton)
-    this->mouseEvent.button = common::MouseEvent::LEFT;
-  else if (_event->button() == Qt::RightButton)
-    this->mouseEvent.button = common::MouseEvent::RIGHT;
-  else if (_event->button() == Qt::MidButton)
-    this->mouseEvent.button = common::MouseEvent::MIDDLE;
+  this->SetMouseEventButton(_event->button());
 
-  this->mouseEvent.buttons = common::MouseEvent::NO_BUTTON;
-  this->mouseEvent.type = common::MouseEvent::PRESS;
+  this->mouseEvent.SetButtons(common::MouseEvent::NO_BUTTON);
+  this->mouseEvent.SetType(common::MouseEvent::PRESS);
 
-  this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+  this->SetMouseEventButtons(_event->buttons());
 
-  this->mouseEvent.dragging = false;
+  this->mouseEvent.SetDragging(false);
 
   // Process Mouse Events
   MouseEventHandler::Instance()->HandlePress(this->mouseEvent);
@@ -572,7 +544,9 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 /////////////////////////////////////////////////
 bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
 {
-  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
+  rendering::VisualPtr vis =
+    this->userCamera->GetVisual(this->mouseEvent.Pos());
+
   if (vis && gui::get_entity_id(vis->GetRootVisual()->GetName()))
   {
     if (vis->IsPlane())
@@ -580,7 +554,7 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
       math::Pose pose, camPose;
       camPose = this->userCamera->GetWorldPose();
       if (this->scene->GetFirstContact(this->userCamera,
-                                   this->mouseEvent.pos, pose.pos))
+            this->mouseEvent.Pos(), pose.pos))
       {
         this->userCamera->SetFocalPoint(pose.pos);
         math::Vector3 dir = pose.pos - camPose.pos;
@@ -606,7 +580,8 @@ void GLWidget::OnMousePressNormal()
   if (!this->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
+  rendering::VisualPtr vis = this->userCamera->GetVisual(
+      this->mouseEvent.Pos());
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
@@ -624,14 +599,14 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.scroll.y = _event->delta() > 0 ? -1 : 1;
-  this->mouseEvent.type = common::MouseEvent::SCROLL;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+  if (_event->delta() > 0)
+    this->mouseEvent.SetScroll(this->mouseEvent.Scroll().X(), -1);
+  else
+    this->mouseEvent.SetScroll(this->mouseEvent.Scroll().X(), 1);
+
+  this->mouseEvent.SetType(common::MouseEvent::SCROLL);
+
+  this->SetMouseEventButtons(_event->buttons());
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
@@ -644,24 +619,20 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 
   this->setFocus(Qt::MouseFocusReason);
 
-  this->mouseEvent.pos.Set(_event->pos().x(), _event->pos().y());
-  this->mouseEvent.type = common::MouseEvent::MOVE;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
-  this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+  this->mouseEvent.SetPos(_event->pos().x(), _event->pos().y());
+  this->mouseEvent.SetType(common::MouseEvent::MOVE);
+
+  this->SetMouseEventButtons(_event->buttons());
 
   if (_event->buttons())
-    this->mouseEvent.dragging = true;
+    this->mouseEvent.SetDragging(true);
   else
-    this->mouseEvent.dragging = false;
+    this->mouseEvent.SetDragging(false);
 
   // Process Mouse Events
   MouseEventHandler::Instance()->HandleMove(this->mouseEvent);
 
-  this->mouseEvent.prevPos = this->mouseEvent.pos;
+  this->mouseEvent.SetPrevPos(this->mouseEvent.Pos());
 }
 
 /////////////////////////////////////////////////
@@ -669,7 +640,7 @@ void GLWidget::OnMouseMoveMakeEntity()
 {
   if (this->entityMaker)
   {
-    if (this->mouseEvent.dragging)
+    if (this->mouseEvent.Dragging())
       this->entityMaker->OnMouseDrag(this->mouseEvent);
     else
       this->entityMaker->OnMouseMove(this->mouseEvent);
@@ -682,7 +653,8 @@ void GLWidget::OnMouseMoveNormal()
   if (!this->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
+  rendering::VisualPtr vis = this->userCamera->GetVisual(
+      this->mouseEvent.Pos());
 
   if (vis && !vis->IsPlane())
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
@@ -698,27 +670,15 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pos.Set(_event->pos().x(), _event->pos().y());
-  this->mouseEvent.prevPos = this->mouseEvent.pos;
+  this->mouseEvent.SetPos(_event->pos().x(), _event->pos().y());
+  this->mouseEvent.SetPrevPos(this->mouseEvent.Pos());
 
-  if (_event->button() == Qt::LeftButton)
-    this->mouseEvent.button = common::MouseEvent::LEFT;
-  else if (_event->button() == Qt::RightButton)
-    this->mouseEvent.button = common::MouseEvent::RIGHT;
-  else if (_event->button() == Qt::MidButton)
-    this->mouseEvent.button = common::MouseEvent::MIDDLE;
+  this->SetMouseEventButton(_event->button());
 
-  this->mouseEvent.buttons = common::MouseEvent::NO_BUTTON;
-  this->mouseEvent.type = common::MouseEvent::RELEASE;
+  this->mouseEvent.SetButtons(common::MouseEvent::NO_BUTTON);
+  this->mouseEvent.SetType(common::MouseEvent::RELEASE);
 
-  this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
-
-  this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
-
-  this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+  this->SetMouseEventButtons(_event->buttons());
 
   // Process Mouse Events
   MouseEventHandler::Instance()->HandleRelease(this->mouseEvent);
@@ -739,10 +699,10 @@ void GLWidget::OnMouseReleaseNormal()
   if (!this->userCamera)
     return;
 
-  if (!this->mouseEvent.dragging)
+  if (!this->mouseEvent.Dragging())
   {
     rendering::VisualPtr vis =
-      this->userCamera->GetVisual(this->mouseEvent.pos);
+      this->userCamera->GetVisual(this->mouseEvent.Pos());
 
     if (vis)
     {
@@ -761,7 +721,8 @@ void GLWidget::OnMouseReleaseNormal()
       }
 
       // Flags to check if we should select a link or a model
-      bool rightButton = (this->mouseEvent.button == common::MouseEvent::RIGHT);
+      bool rightButton = (this->mouseEvent.Button() ==
+          common::MouseEvent::RIGHT);
       bool modelHighlighted = modelVis->GetHighlighted();
       int linkCount = 0;
       bool linkHighlighted = false;
@@ -783,7 +744,7 @@ void GLWidget::OnMouseReleaseNormal()
       }
 
       // Select link
-      if (linkCount > 1 && !this->mouseEvent.control &&
+      if (linkCount > 1 && !this->mouseEvent.Control() &&
           ((modelHighlighted && !rightButton) || linkHighlighted))
       {
         selectVis = linkVis;
@@ -880,7 +841,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   double yaw = atan2(delta.y, delta.x);
 
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->userCamera->SetWorldPose(math::Pose(camPos,
+  this->userCamera->SetDefaultPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
 }
 
@@ -897,7 +858,6 @@ void GLWidget::Clear()
   this->userCamera.reset();
   this->scene.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
-  this->hoverVis.reset();
   this->keyModifiers = 0;
 }
 
@@ -943,7 +903,6 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::OnCreateScene(const std::string &_name)
 {
-  this->hoverVis.reset();
   this->SetSelectedVisual(rendering::VisualPtr());
 
   this->ViewScene(rendering::get_scene(_name));
@@ -1036,25 +995,16 @@ void GLWidget::OnOrbit()
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
+std::vector<rendering::VisualPtr> GLWidget::SelectedVisuals() const
 {
-  if (_msg->has_selected() && _msg->selected())
-  {
-    this->selectionMsgReceived(QString(_msg->name().c_str()));
-  }
-}
-
-/////////////////////////////////////////////////
-void GLWidget::OnSelectionMsgEvent(const QString &_name)
-{
-  this->OnSetSelectedEntity(_name.toStdString(), "normal");
+  return this->selectedVisuals;
 }
 
 /////////////////////////////////////////////////
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
   // deselect all if not in multi-selection mode.
-  if (!this->mouseEvent.control)
+  if (!this->mouseEvent.Control())
   {
     this->DeselectAllVisuals();
   }
@@ -1073,7 +1023,7 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
     _vis->SetHighlighted(true);
 
     // enable multi-selection if control is pressed
-    if (this->selectedVisuals.empty() || this->mouseEvent.control)
+    if (this->selectedVisuals.empty() || this->mouseEvent.Control())
     {
       std::vector<rendering::VisualPtr>::iterator it =
         std::find(this->selectedVisuals.begin(),
@@ -1218,12 +1168,6 @@ void GLWidget::Paste(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::ClearSelection()
 {
-  if (this->hoverVis)
-  {
-    this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-    this->hoverVis.reset();
-  }
-
   this->SetSelectedVisual(rendering::VisualPtr());
 
   this->scene->SelectVisual("", "normal");
@@ -1256,8 +1200,6 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
     this->SetSelectedVisual(rendering::VisualPtr());
     this->scene->SelectVisual("", _mode);
   }
-
-  this->hoverVis.reset();
 }
 
 /////////////////////////////////////////////////
@@ -1280,7 +1222,7 @@ void GLWidget::PopHistory()
     msg.set_id(gui::get_entity_id(this->moveHistory.back().first));
     msg.set_name(this->moveHistory.back().first);
 
-    msgs::Set(msg.mutable_pose(), this->moveHistory.back().second);
+    msgs::Set(msg.mutable_pose(), this->moveHistory.back().second.Ign());
     this->scene->GetVisual(this->moveHistory.back().first)->SetWorldPose(
         this->moveHistory.back().second);
 
@@ -1360,4 +1302,49 @@ void GLWidget::OnPerspective()
 QPaintEngine *GLWidget::paintEngine() const
 {
   return NULL;
+}
+
+/////////////////////////////////////////////////
+void GLWidget::SetMouseEventButtons(const Qt::MouseButtons &_buttons)
+{
+  if (_buttons & Qt::LeftButton)
+  {
+    this->mouseEvent.SetButtons(
+        this->mouseEvent.Buttons() | common::MouseEvent::LEFT);
+  }
+  else
+  {
+    this->mouseEvent.SetButtons(this->mouseEvent.Buttons() | 0x0);
+  }
+
+  if (_buttons & Qt::RightButton)
+  {
+    this->mouseEvent.SetButtons(
+        this->mouseEvent.Buttons() | common::MouseEvent::RIGHT);
+  }
+  else
+  {
+    this->mouseEvent.SetButtons(this->mouseEvent.Buttons() | 0x0);
+  }
+
+  if (_buttons & Qt::MidButton)
+  {
+    this->mouseEvent.SetButtons(
+        this->mouseEvent.Buttons() | common::MouseEvent::MIDDLE);
+  }
+  else
+  {
+    this->mouseEvent.SetButtons(this->mouseEvent.Buttons() | 0x0);
+  }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::SetMouseEventButton(const Qt::MouseButton &_button)
+{
+  if (_button == Qt::LeftButton)
+    this->mouseEvent.SetButton(common::MouseEvent::LEFT);
+  else if (_button == Qt::RightButton)
+    this->mouseEvent.SetButton(common::MouseEvent::RIGHT);
+  else if (_button == Qt::MidButton)
+    this->mouseEvent.SetButton(common::MouseEvent::MIDDLE);
 }

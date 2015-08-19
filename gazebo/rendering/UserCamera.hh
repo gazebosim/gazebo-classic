@@ -75,6 +75,15 @@ namespace gazebo
       /// \param[in] _pose New pose of the camera.
       public: virtual void SetWorldPose(const math::Pose &_pose);
 
+      /// \brief Set the default pose in the world coordinate frame and set
+      /// that as the current camera world pose.
+      /// \param[in] _pose New default pose of the camera.
+      public: void SetDefaultPose(const math::Pose &_pose);
+
+      /// \brief Get the default pose in the world coordinate frame.
+      /// \return Default pose of the camera.
+      public: math::Pose DefaultPose() const;
+
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.
       public: void HandleMouseEvent(const common::MouseEvent &_evt);

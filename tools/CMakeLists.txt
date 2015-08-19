@@ -59,7 +59,12 @@ endif()
 
 gz_install_executable(gz)
 
-roffman(gz 1)
+if (NOT WIN32)
+  roffman(gz 1)
+endif()
 
 install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
-manpage(gzprop 1)
+
+if (NOT WIN32)
+  manpage(gzprop 1)
+endif()

@@ -69,13 +69,14 @@ void ConfigWidget_TEST::JointMsgWidget()
     jointMsg.set_type(gazebo::msgs::ConvertJointType("revolute"));
 
     // pose
-    gazebo::math::Vector3 pos(4.0, -1.0, 3.5);
-    gazebo::math::Quaternion quat(0.0, 1.57, 0.0);
-    gazebo::msgs::Set(jointMsg.mutable_pose(), gazebo::math::Pose(pos, quat));
+    ignition::math::Vector3d pos(4.0, -1.0, 3.5);
+    ignition::math::Quaterniond quat(0.0, 1.57, 0.0);
+    gazebo::msgs::Set(jointMsg.mutable_pose(),
+        ignition::math::Pose3d(pos, quat));
 
     // axis1
     gazebo::msgs::Axis *axisMsg = jointMsg.mutable_axis1();
-    gazebo::msgs::Set(axisMsg->mutable_xyz(), gazebo::math::Vector3::UnitX);
+    gazebo::msgs::Set(axisMsg->mutable_xyz(), ignition::math::Vector3d::UnitX);
     axisMsg->set_use_parent_model_frame(false);
     axisMsg->set_limit_lower(-999.0);
     axisMsg->set_limit_upper(999.0);
@@ -472,12 +473,13 @@ void ConfigWidget_TEST::VisualMsgWidget()
     visualMsg.set_delete_me(false);
     visualMsg.set_is_static(false);
     gazebo::msgs::Set(visualMsg.mutable_scale(),
-        gazebo::math::Vector3(1.0, 1.0, 1.0));
+        ignition::math::Vector3d(1.0, 1.0, 1.0));
 
     // pose
-    gazebo::math::Vector3 pos(2.0, 3.0, 4.0);
-    gazebo::math::Quaternion quat(1.57, 0.0, 0.0);
-    gazebo::msgs::Set(visualMsg.mutable_pose(), gazebo::math::Pose(pos, quat));
+    ignition::math::Vector3d pos(2.0, 3.0, 4.0);
+    ignition::math::Quaterniond quat(1.57, 0.0, 0.0);
+    gazebo::msgs::Set(visualMsg.mutable_pose(),
+        ignition::math::Pose3d(pos, quat));
 
     // geometry
     gazebo::msgs::Geometry *geometryMsg = visualMsg.mutable_geometry();
@@ -766,9 +768,10 @@ void ConfigWidget_TEST::ConfigWidgetVisible()
     visualMsg.set_id(12345u);
 
     // pose
-    gazebo::math::Vector3 pos(2.0, 3.0, 4.0);
-    gazebo::math::Quaternion quat(1.57, 0.0, 0.0);
-    gazebo::msgs::Set(visualMsg.mutable_pose(), gazebo::math::Pose(pos, quat));
+    ignition::math::Vector3d pos(2.0, 3.0, 4.0);
+    ignition::math::Quaterniond quat(1.57, 0.0, 0.0);
+    gazebo::msgs::Set(visualMsg.mutable_pose(),
+        ignition::math::Pose3d(pos, quat));
 
     // geometry
     gazebo::msgs::Geometry *geometryMsg = visualMsg.mutable_geometry();
@@ -849,9 +852,10 @@ void ConfigWidget_TEST::ConfigWidgetReadOnly()
     visualMsg.set_id(12345u);
 
     // pose
-    gazebo::math::Vector3 pos(2.0, 3.0, 4.0);
-    gazebo::math::Quaternion quat(1.57, 0.0, 0.0);
-    gazebo::msgs::Set(visualMsg.mutable_pose(), gazebo::math::Pose(pos, quat));
+    ignition::math::Vector3d pos(2.0, 3.0, 4.0);
+    ignition::math::Quaterniond quat(1.57, 0.0, 0.0);
+    gazebo::msgs::Set(visualMsg.mutable_pose(),
+        ignition::math::Pose3d(pos, quat));
 
     // geometry
     gazebo::msgs::Geometry *geometryMsg = visualMsg.mutable_geometry();

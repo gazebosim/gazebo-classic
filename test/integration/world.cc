@@ -165,7 +165,9 @@ TEST_F(WorldTest, ModifyLight)
     msgs::Light lightMsg;
     lightMsg.set_name("test_spot_light");
     msgs::Set(lightMsg.mutable_pose(),
-        math::Pose(math::Vector3(3, 2, 1), math::Quaternion(0, 1, 0, 0)));
+        ignition::math::Pose3d(
+          ignition::math::Vector3d(3, 2, 1),
+          ignition::math::Quaterniond(0, 1, 0, 0)));
     lightPub->Publish(lightMsg);
   }
 
