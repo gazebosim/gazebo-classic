@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,6 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   msgs::Set(visual->mutable_pose(), ignition::math::Pose3d());
 
   physics::ModelPtr box = ServerFixture::SpawnModel(model);
-
   EXPECT_TRUE(box != NULL);
 
   std::string name = box->GetName();
@@ -87,19 +86,19 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // world->RemoveModel(name);
 
   int count = 0;
-  while(world->GetModel(name) != NULL && ++count < 1000)
+  while (world->GetModel(name) != NULL && ++count < 1000)
   {
     common::Time::MSleep(1);
     world->Step(1);
   }
   EXPECT_TRUE(world->GetModel(name) == NULL);
-  EXPECT_TRUE(count < 1000);
+  EXPECT_LT(count, 1000);
 
   // spawn the exact same model
   // if this succeeds, we're OK.
   physics::ModelPtr newBox = ServerFixture::SpawnModel(model);
   count = 0;
-  while(world->GetModel(name) == NULL && ++count < 1000)
+  while (world->GetModel(name) == NULL && ++count < 1000)
   {
     common::Time::MSleep(1);
     world->Step(1);

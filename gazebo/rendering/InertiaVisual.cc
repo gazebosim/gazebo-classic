@@ -37,11 +37,6 @@ InertiaVisual::InertiaVisual(const std::string &_name, VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
-InertiaVisual::~InertiaVisual()
-{
-}
-
-/////////////////////////////////////////////////
 void InertiaVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();

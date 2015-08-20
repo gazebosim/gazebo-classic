@@ -40,11 +40,6 @@ COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
-COMVisual::~COMVisual()
-{
-}
-
-/////////////////////////////////////////////////
 void COMVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
