@@ -83,7 +83,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // delete that model
   ServerFixture::RemoveModel(name);
 
-  // also test remvoal with below:
+  // also test removal with below:
   // world->RemoveModel(name);
 
   int count = 0;
