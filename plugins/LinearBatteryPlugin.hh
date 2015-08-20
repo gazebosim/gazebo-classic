@@ -21,6 +21,7 @@
 #include <map>
 
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/physics.hh"
 
 namespace gazebo
@@ -42,7 +43,7 @@ namespace gazebo
 
     /// \brief Callback for Battery Update events.
     protected: virtual double OnUpdateVoltage(double _voltage,
-                               const std::map<uint32_t, double> &_powerLoads);
+                   const common::Battery::PowerLoad_M &_powerLoads);
 
     /// \brief Connection to World Update events.
     protected: event::ConnectionPtr updateConnection;
@@ -60,7 +61,7 @@ namespace gazebo
     protected: physics::LinkPtr link;
 
     /// \brief Pointer to battery contained in link.
-    protected: physics::BatteryPtr battery;
+    protected: common::BatteryPtr battery;
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;

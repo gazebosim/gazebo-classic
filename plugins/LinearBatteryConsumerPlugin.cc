@@ -17,6 +17,7 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/common/Battery.hh"
 #include "LinearBatteryConsumerPlugin.hh"
 
 using namespace gazebo;

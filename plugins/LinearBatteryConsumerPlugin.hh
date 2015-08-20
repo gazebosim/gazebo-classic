@@ -19,6 +19,7 @@
 #define _GAZEBO_LINEAR_BATTERY_CONSUMER_PLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     /// \brief Pointer to battery.
-    private: physics::BatteryPtr battery;
+    private: common::BatteryPtr battery;
 
     /// \brief Battery consumer identifier.
     private: int32_t consumerId;

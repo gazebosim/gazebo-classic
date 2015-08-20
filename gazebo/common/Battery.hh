@@ -45,6 +45,10 @@ namespace gazebo
     /// value.
     class GZ_COMMON_VISIBLE Battery
     {
+      /// \brief Typedef the powerload map.
+      /// \sa SetUpdateFunc
+      public: typedef std::map<uint32_t, double> PowerLoad_M;
+
       /// \brief Constructor
       public: explicit Battery();
 
@@ -89,7 +93,7 @@ namespace gazebo
 
       /// \brief Get list of power loads in watts.
       /// \return List of power loads in watts.
-      public: const std::map<uint32_t, double>& PowerLoads() const;
+      public: const PowerLoad_M& PowerLoads() const;
 
       /// \brief Get the real voltage in volts.
       /// \return Voltage.
@@ -107,9 +111,8 @@ namespace gazebo
       ///
       /// The update function must return the new battery voltage as
       /// a double.
-      public: void SetUpdateFunc(
-                  std::function<double (double,
-                    const std::map<uint32_t, double> &)> _updateFunc);
+      public: void SetUpdateFunc(std::function<double
+                  (double, const PowerLoad_M &)> _updateFunc);
 
       /// \brief Update the battery.
       public: void Update();
@@ -119,7 +122,7 @@ namespace gazebo
 
       /// \brief Update voltage using an ideal battery model.
       private: double UpdateDefault(const double _voltage,
-                 const std::map<uint32_t, double> &_powerLoads);
+                 const PowerLoad_M &_powerLoads);
 
       /// \internal
       /// \brief Private data pointer.

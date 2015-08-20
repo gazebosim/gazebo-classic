@@ -558,11 +558,11 @@ namespace gazebo
       /// \brief Get a battery by name.
       /// \param[in] _name Name of the battery to get.
       /// \return Pointer to the battery, NULL if the name is invalid.
-      public: BatteryPtr Battery(const std::string &_name) const;
+      public: common::BatteryPtr Battery(const std::string &_name) const;
 
       /// \brief Get a battery based on an index.
       /// \return A pointer to a Battery. Null if the _index is invalid.
-      public: BatteryPtr Battery(const size_t _index) const;
+      public: common::BatteryPtr Battery(const size_t _index) const;
 
       /// \brief Get the number of batteries in this link.
       /// \return Size of this->batteries array.
@@ -681,7 +681,7 @@ namespace gazebo
       private: boost::mutex wrenchMsgMutex;
 
       /// \brief All the attached batteries.
-      private: std::vector<BatteryPtr> batteries;
+      private: std::vector<common::BatteryPtr> batteries;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

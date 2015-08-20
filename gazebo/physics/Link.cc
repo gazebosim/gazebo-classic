@@ -398,7 +398,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr batteryElem = this->sdf->GetElement("battery");
     while (batteryElem)
     {
-      BatteryPtr battery = this->Battery(
+      common::BatteryPtr battery = this->Battery(
           batteryElem->Get<std::string>("name"));
 
       if (battery)
@@ -520,7 +520,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   // Update the batteries.
   for (auto &battery : this->batteries)
   {
-    bat->Update(battery->Voltage());
+    battery->Update();
   }
 }
 
@@ -1083,9 +1083,9 @@ void Link::PublishData()
 }
 
 //////////////////////////////////////////////////
-BatteryPtr Link::Battery(const std::string &_name) const
+common::BatteryPtr Link::Battery(const std::string &_name) const
 {
-  BatteryPtr result;
+  common::BatteryPtr result;
 
   for (auto &battery : this->batteries)
   {
@@ -1100,12 +1100,12 @@ BatteryPtr Link::Battery(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-BatteryPtr Link::Battery(const size_t _index) const
+common::BatteryPtr Link::Battery(const size_t _index) const
 {
   if (_index < this->batteries.size())
     return this->batteries[_index];
   else
-    return BatteryPtr();
+    return common::BatteryPtr();
 }
 
 /////////////////////////////////////////////////
@@ -1516,7 +1516,7 @@ void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
 //////////////////////////////////////////////////
 void Link::LoadBattery(sdf::ElementPtr _sdf)
 {
-  BatteryPtr battery(new physics::Battery());
+  common::BatteryPtr battery(new common::Battery());
   battery->Load(_sdf);
   this->batteries.push_back(battery);
 }

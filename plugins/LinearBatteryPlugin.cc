@@ -18,6 +18,7 @@
 #include <functional>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Battery.hh"
 #include "gazebo/physics/physics.hh"
 #include "plugins/LinearBatteryPlugin.hh"
 
@@ -99,7 +100,8 @@ void LinearBatteryPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     else
     {
       this->battery->SetUpdateFunc(
-        std::bind(&LinearBatteryPlugin::OnUpdateVoltage, this, _1, _2));
+        std::bind(&LinearBatteryPlugin::OnUpdateVoltage, this,
+          std::placeholders::_1, std::placeholders::_2));
     }
   }
 }
@@ -120,7 +122,7 @@ void LinearBatteryPlugin::Reset()
 
 /////////////////////////////////////////////////
 double LinearBatteryPlugin::OnUpdateVoltage(double _voltage,
-                               const std::map<uint32_t, double> &_powerLoads)
+    const common::Battery::PowerLoad_M &_powerLoads)
 {
   double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
   double totalpower = 0.0;

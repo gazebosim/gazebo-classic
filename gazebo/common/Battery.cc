@@ -120,7 +120,7 @@ bool Battery::PowerLoad(const uint32_t _consumerId, double &_powerLoad) const
 }
 
 /////////////////////////////////////////////////
-const std::map<uint32_t, double>& Battery::PowerLoads() const
+const Battery::PowerLoad_M& Battery::PowerLoads() const
 {
   return this->dataPtr->powerLoads;
 }
@@ -141,7 +141,7 @@ void Battery::Update()
 
 /////////////////////////////////////////////////
 double Battery::UpdateDefault(const double _voltage,
-    const std::map<uint32_t, double> &/*_powerLoads*/)
+                              const PowerLoad_M &/*_powerLoads*/)
 {
   // Ideal battery
   return _voltage;
@@ -149,7 +149,7 @@ double Battery::UpdateDefault(const double _voltage,
 
 /////////////////////////////////////////////////
 void Battery::SetUpdateFunc(
-    std::function<double (double, const std::map<uint32_t, double> &)>
+    std::function<double (double, const PowerLoad_M &)>
     _updateFunc)
 {
   this->dataPtr->updateFunc = _updateFunc;

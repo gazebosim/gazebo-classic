@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/physics/Model.hh"
-#include "gazebo/physics/Battery.hh"
+#include "gazebo/common/Battery.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "test/util.hh"
 
@@ -30,7 +30,7 @@ class BatteryTest : public ServerFixture
 TEST_F(BatteryTest, Construction)
 {
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery());
+  common::BatteryPtr battery(new common::Battery());
   EXPECT_TRUE(battery != NULL);
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), 0.0);
@@ -41,7 +41,7 @@ TEST_F(BatteryTest, Construction)
 TEST_F(BatteryTest, AddConsumer)
 {
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery());
+  common::BatteryPtr battery(new common::Battery());
   EXPECT_TRUE(battery != NULL);
 
   uint32_t consumerId = battery->AddConsumer();
@@ -59,7 +59,7 @@ TEST_F(BatteryTest, AddConsumer)
 TEST_F(BatteryTest, RemoveConsumer)
 {
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery());
+  common::BatteryPtr battery(new common::Battery());
   EXPECT_TRUE(battery != NULL);
 
   uint32_t consumerId = battery->AddConsumer();
@@ -79,7 +79,7 @@ TEST_F(BatteryTest, RemoveConsumer)
 TEST_F(BatteryTest, SetPowerLoad)
 {
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery());
+  common::BatteryPtr battery(new common::Battery());
   EXPECT_TRUE(battery != NULL);
 
   // Add two consumers
@@ -109,6 +109,7 @@ class BatteryUpdateFixture
           {
             return _voltage + this->step;
           }
+
   /// \brief Voltage amount to increment by.
   public: double step;
 };
@@ -134,7 +135,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
   batterySDF->SetFromString(batteryStr.str());
 
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery());
+  common::BatteryPtr battery(new common::Battery());
   EXPECT_TRUE(battery != NULL);
 
   sdf::ElementPtr elem = batterySDF->Root();
@@ -152,11 +153,11 @@ TEST_F(BatteryTest, SetUpdateFunc)
 
   BatteryUpdateFixture fixture;
   fixture.step = -0.1;
-  battery->SetUpdateFunc(boost::bind(&BatteryUpdateFixture::Update,
-                                     &fixture, _1, _2));
+  battery->SetUpdateFunc(std::bind(&BatteryUpdateFixture::Update,
+        &fixture, std::placeholders::_1, std::placeholders::_2));
 
   for (int i = 0; i < N; ++i)
-    gazebo::event::Events::worldUpdateEnd();
+    battery->Update();
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage + N * fixture.step);
 
@@ -164,7 +165,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
   battery->Init();
 
   for (int i = 0; i < N; ++i)
-    gazebo::event::Events::worldUpdateEnd();
+    battery->Update();
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage + N * fixture.step);
 }
