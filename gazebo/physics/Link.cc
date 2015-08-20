@@ -22,6 +22,7 @@
 #endif
 
 #include <sstream>
+#include <functional>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -136,7 +137,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     this->SetSelfCollide(this->GetModel()->GetSelfCollide());
   }
   this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
-      boost::bind(&Link::GetSelfCollide, this));
+      std::bind(&Link::GetSelfCollide, this));
 
   // Parse visuals from SDF
   this->ParseVisuals();

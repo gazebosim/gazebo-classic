@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-
 #include <string>
+#include <functional>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
@@ -99,7 +99,7 @@ void LinearBatteryPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     else
     {
       this->battery->SetUpdateFunc(
-        boost::bind(&LinearBatteryPlugin::OnUpdateVoltage, this, _1, _2));
+        std::bind(&LinearBatteryPlugin::OnUpdateVoltage, this, _1, _2));
     }
   }
 }

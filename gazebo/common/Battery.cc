@@ -146,3 +146,12 @@ double Battery::UpdateDefault(const double _voltage,
   // Ideal battery
   return _voltage;
 }
+
+/////////////////////////////////////////////////
+void Battery::SetUpdateFunc(
+    std::function<double (double, const std::map<uint32_t, double> &)>
+    _updateFunc)
+{
+  this->dataPtr->updateFunc = _updateFunc;
+}
+

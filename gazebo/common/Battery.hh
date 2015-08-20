@@ -96,8 +96,10 @@ namespace gazebo
       public: double Voltage() const;
 
       /// \brief Setup function to update voltage.
-      public: template<typename T>
-              void SetUpdateFunc(T _updateFunc);
+      //public: template<typename T>
+      public: void SetUpdateFunc(
+                  std::function<double (double,
+                    const std::map<uint32_t, double> &)> _updateFunc);
 
       /// \brief Update the battery.
       public: void Update();
@@ -114,11 +116,11 @@ namespace gazebo
       private: BatteryPrivate *dataPtr;
     };
 
-    template<typename T>
+    /*template<typename T>
     void Battery::SetUpdateFunc(T _updateFunc)
     {
       this->dataPtr->updateFunc = _updateFunc;
-    }
+    }*/
     /// \}
   }
 }
