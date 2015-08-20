@@ -20,11 +20,12 @@
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/common/Events.hh"
-#include "gazebo/physics/Battery.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/BatteryPrivate.hh"
+#include "gazebo/common/Battery.hh"
 
 using namespace gazebo;
-using namespace physics;
+using namespace common;
 
 /////////////////////////////////////////////////
 Battery::Battery()
@@ -39,8 +40,6 @@ Battery::Battery()
 /////////////////////////////////////////////////
 Battery::~Battery()
 {
-  event::Events::DisconnectWorldUpdateEnd(this->dataPtr->connection);
-
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -51,9 +50,6 @@ void Battery::Load(const sdf::ElementPtr _sdf)
   this->dataPtr->name = _sdf->Get<std::string>("name");
 
   this->UpdateParameters(_sdf);
-
-  this->dataPtr->connection = event::Events::ConnectWorldUpdateEnd(
-          boost::bind(&Battery::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
@@ -136,7 +132,7 @@ double Battery::Voltage() const
 }
 
 /////////////////////////////////////////////////
-void Battery::OnUpdate()
+void Battery::Update()
 {
   this->dataPtr->realVoltage =
       this->dataPtr->updateFunc(this->dataPtr->realVoltage,

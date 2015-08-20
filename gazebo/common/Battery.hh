@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 
+#include "sdf/sdf.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -98,11 +99,11 @@ namespace gazebo
       public: template<typename T>
               void SetUpdateFunc(T _updateFunc);
 
+      /// \brief Update the battery.
+      public: void Update();
+
       /// \brief Initialize the list of consumers.
       protected: void InitConsumers();
-
-      /// \brief Update the battery.
-      private: void OnUpdate();
 
       /// \brief Update voltage using an ideal battery model.
       private: double UpdateDefault(const double _voltage,

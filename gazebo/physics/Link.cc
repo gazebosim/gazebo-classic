@@ -515,6 +515,12 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
       this->ProcessWrenchMsg(it);
     }
   }
+
+  // Update the batteries.
+  for (auto &battery : this->batteries)
+  {
+    bat->Update(battery->Voltage());
+  }
 }
 
 /////////////////////////////////////////////////
