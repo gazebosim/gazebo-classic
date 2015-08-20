@@ -154,4 +154,3 @@ void Battery::SetUpdateFunc(
 {
   this->dataPtr->updateFunc = _updateFunc;
 }
-

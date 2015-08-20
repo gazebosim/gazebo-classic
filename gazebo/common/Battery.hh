@@ -96,7 +96,17 @@ namespace gazebo
       public: double Voltage() const;
 
       /// \brief Setup function to update voltage.
-      //public: template<typename T>
+      /// \param[in] _updateFunc The update function callback that is used
+      /// to modify the battery's voltage. The parameters to the update
+      /// function callback are:
+      ///
+      ///  1. The real voltage as a double.
+      ///
+      ///  2. A map of power loads, where keys=consumerId and
+      ///     values=powerLoad.
+      ///
+      /// The update function must return the new battery voltage as
+      /// a double.
       public: void SetUpdateFunc(
                   std::function<double (double,
                     const std::map<uint32_t, double> &)> _updateFunc);
@@ -116,11 +126,6 @@ namespace gazebo
       private: BatteryPrivate *dataPtr;
     };
 
-    /*template<typename T>
-    void Battery::SetUpdateFunc(T _updateFunc)
-    {
-      this->dataPtr->updateFunc = _updateFunc;
-    }*/
     /// \}
   }
 }
