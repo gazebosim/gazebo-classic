@@ -18,11 +18,10 @@
 #include <functional>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/common/Battery.hh"
 #include "gazebo/physics/physics.hh"
 #include "plugins/LinearBatteryPlugin.hh"
-
-static const double SECOND_TO_HOUR = 1.0/3600;
 
 using namespace gazebo;
 
@@ -138,7 +137,7 @@ double LinearBatteryPlugin::OnUpdateVoltage(double _voltage,
 
   this->ismooth = this->ismooth + k * (this->iraw - this->ismooth);
 
-  this->q = this->q - SECOND_TO_HOUR * dt * this->ismooth;
+  this->q = this->q - GZ_SEC_TO_HOUR(dt * this->ismooth);
 
   _voltage = this->e0 + this->e1 * (1 - this->q / this->c)
       - this->r * this->ismooth;

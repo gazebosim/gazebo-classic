@@ -30,7 +30,7 @@ namespace gazebo
     // Forward declare private data class.
     class BatteryPrivate;
 
-    /// \addtogroup gazebo_physics
+    /// \addtogroup gazebo_common
     /// \{
 
     /// \brief A battery abstraction
@@ -67,6 +67,7 @@ namespace gazebo
       public: virtual void UpdateParameters(const sdf::ElementPtr _sdf);
 
       /// \brief Return the name of the battery.
+      /// \return The name of the battery.
       public: std::string Name() const;
 
       /// \brief Create a unique consumer.
@@ -93,7 +94,7 @@ namespace gazebo
 
       /// \brief Get list of power loads in watts.
       /// \return List of power loads in watts.
-      public: const PowerLoad_M& PowerLoads() const;
+      public: const PowerLoad_M &PowerLoads() const;
 
       /// \brief Get the real voltage in volts.
       /// \return Voltage.
@@ -111,8 +112,9 @@ namespace gazebo
       ///
       /// The update function must return the new battery voltage as
       /// a double.
-      public: void SetUpdateFunc(std::function<double
-                  (double, const PowerLoad_M &)> _updateFunc);
+      public: void SetUpdateFunc(
+                  std::function<double (double, const PowerLoad_M &)>
+                  _updateFunc);
 
       /// \brief Update the battery.
       public: void Update();

@@ -28,5 +28,7 @@ message Link
   repeated Sensor sensor        = 11;
   repeated Projector projector  = 12;
   optional bool canonical       = 13;
+
+  /// \brief An optional vector of batteries that are attached to this link.
   repeated Battery battery      = 14;
 }
