@@ -100,7 +100,7 @@ TEST_P(RestWebTest, FirstTest)
 ////////////////////////////////////////////////////////////////////////
 void RestWebTest::FirstTest(const std::string &_physicsEngine)
 {
-  Load("test/worlds/rest_web.world",
+  Load("../test/worlds/rest_web.world",
        false,
        _physicsEngine,
        {"libRestWebPlugin.so"});

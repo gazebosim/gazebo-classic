@@ -97,34 +97,16 @@ namespace gazebo
                                  bool _paused, const std::string &_physics,
                           const std::vector<std::string> &_systemPlugins = {});
 
-     /// \brief
-    protected: virtual void LoadArgs(const std::string &_args,
-                          const std::vector<std::string> &_systemPlugins = {});
+     /// \brief ToDo
+    protected: virtual void LoadArgs(const std::string &_args);
 
-    /// \brief Run the server.
-    /// \param[in] _worldFilename Name of the world to run in simulation.
-    protected: void RunServer(const std::string &_worldFilename);
-
-    /// \brief Run the server, start paused/unpaused, and specify the physics
-    /// engine.
-    /// \param[in] _worldFilename Name of the world to load.
-    /// \param[in] _paused True to start the world paused.
-    /// \param[in] _physics Name of the physics engine.
-    /// \param[in] _systemPlugins Array of system plugins to load.
-    protected: void RunServer(const std::string &_worldFilename, bool _paused,
-                              const std::string &_physics,
-                          const std::vector<std::string> &_systemPlugins = {});
-
-    /// \brief
-    protected: void RunServerImpl(const std::string &_args,
-                          const std::vector<std::string> &_systemPlugins = {});
-
+    /// \brief ToDo
+    protected: void RunServer(const std::string &_args);
 
     /// \brief Get a pointer to the rendering scene.
     /// \param[in] _sceneName Name of the scene to get.
     protected: rendering::ScenePtr GetScene(
                    const std::string &_sceneName = "default");
-
 
     /// \brief Function that received world stastics messages.
     /// \param[in] _msg World statistics message.

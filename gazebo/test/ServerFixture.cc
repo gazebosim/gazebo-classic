@@ -157,20 +157,21 @@ void ServerFixture::Load(const std::string &_worldFilename,
     params += " -e " + _physics;
   if (_paused)
     params += " -u";
+  for (auto plugin : _systemPlugins)
+    params += " -s " + plugin;
 
-  this->LoadArgs(params, _systemPlugins);
+  this->LoadArgs(params);
 }
 
 /////////////////////////////////////////////////
-void ServerFixture::LoadArgs(const std::string &_args,
-                             const std::vector<std::string> &_systemPlugins)
+void ServerFixture::LoadArgs(const std::string &_args)
 {
   delete this->server;
   this->server = NULL;
 
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
-     boost::bind(&ServerFixture::RunServerImpl, this, _args, _systemPlugins));
+    boost::bind(&ServerFixture::RunServer, this, _args));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -217,28 +218,7 @@ void ServerFixture::LoadArgs(const std::string &_args,
 }
 
 /////////////////////////////////////////////////
-void ServerFixture::RunServer(const std::string &_worldFilename)
-{
-  this->RunServerImpl(_worldFilename);
-}
-
-/////////////////////////////////////////////////
-void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
-                              const std::string &_physics,
-                              const std::vector<std::string> &_systemPlugins)
-{
-  std::string params = _worldFilename;
-  if (!_physics.empty())
-    params += " -e " + _physics;
-  if (_paused)
-    params += " -u";
-
-  this->RunServerImpl(params, _systemPlugins);
-}
-
-/////////////////////////////////////////////////
-void ServerFixture::RunServerImpl(const std::string &_args,
-                                 const std::vector<std::string> &_systemPlugins)
+void ServerFixture::RunServer(const std::string &_args)
 {
   // Split the string into a vector or parameters.
   std::vector<std::string> params;
@@ -266,11 +246,6 @@ void ServerFixture::RunServerImpl(const std::string &_args,
     ASSERT_NO_THROW(delete this->server);
     this->server = NULL;
     return;
-  }
-
-  for (auto const &plugin : _systemPlugins)
-  {
-    gazebo::addPlugin(plugin);
   }
 
   if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
