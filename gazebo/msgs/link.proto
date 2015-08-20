@@ -11,6 +11,7 @@ import "visual.proto";
 import "sensor.proto";
 import "projector.proto";
 import "pose.proto";
+import "battery.proto";
 
 message Link
 {
@@ -27,4 +28,5 @@ message Link
   repeated Sensor sensor        = 11;
   repeated Projector projector  = 12;
   optional bool canonical       = 13;
+  repeated Battery battery      = 14;
 }
