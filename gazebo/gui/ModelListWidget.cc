@@ -1811,7 +1811,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   }
 
   // battery
-  for (int i = 0; i < _msg.battery_size(); i++)
+  for (int i = 0; i < _msg.battery_size(); ++i)
   {
     QtVariantProperty *batteryItem;
     batteryItem = this->variantManager->addProperty(

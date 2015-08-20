@@ -46,7 +46,6 @@ endif()
 set (sources ${sources}
   Actor.cc
   Base.cc
-  Battery.cc
   BoxShape.cc
   Collision.cc
   CollisionState.cc
@@ -88,7 +87,6 @@ set (headers
   Actor.hh
   BallJoint.hh
   Base.hh
-  Battery.hh
   BoxShape.hh
   Collision.hh
   CollisionState.hh
@@ -176,7 +174,6 @@ gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
 # unit tests
 set (gtest_sources
-  Battery_TEST.cc
   BoxShape_TEST.cc
   ContactManager_TEST.cc
   CylinderShape_TEST.cc

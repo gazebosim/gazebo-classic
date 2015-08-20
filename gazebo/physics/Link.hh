@@ -562,7 +562,7 @@ namespace gazebo
 
       /// \brief Get a battery based on an index.
       /// \return A pointer to a Battery. Null if the _index is invalid.
-      public: BatteryPtr Battery(size_t _index) const;
+      public: BatteryPtr Battery(const size_t _index) const;
 
       /// \brief Get the number of batteries in this link.
       /// \return Size of this->batteries array.
@@ -611,7 +611,7 @@ namespace gazebo
 
       /// \brief Load a battery.
       /// \param[in] _sdf SDF parameter.
-      private: void LoadBattery(sdf::ElementPtr _sdf);
+      private: void LoadBattery(const sdf::ElementPtr _sdf);
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;

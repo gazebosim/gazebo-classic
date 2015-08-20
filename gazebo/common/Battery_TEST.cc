@@ -16,7 +16,6 @@
 */
 
 #include "gazebo/physics/Model.hh"
-#include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Battery.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "test/util.hh"
@@ -31,7 +30,7 @@ class BatteryTest : public ServerFixture
 TEST_F(BatteryTest, Construction)
 {
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery(physics::LinkPtr()));
+  physics::BatteryPtr battery(new physics::Battery());
   EXPECT_TRUE(battery != NULL);
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), 0.0);
@@ -42,7 +41,7 @@ TEST_F(BatteryTest, Construction)
 TEST_F(BatteryTest, AddConsumer)
 {
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery(physics::LinkPtr()));
+  physics::BatteryPtr battery(new physics::Battery());
   EXPECT_TRUE(battery != NULL);
 
   uint32_t consumerId = battery->AddConsumer();
@@ -60,7 +59,7 @@ TEST_F(BatteryTest, AddConsumer)
 TEST_F(BatteryTest, RemoveConsumer)
 {
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery(physics::LinkPtr()));
+  physics::BatteryPtr battery(new physics::Battery());
   EXPECT_TRUE(battery != NULL);
 
   uint32_t consumerId = battery->AddConsumer();
@@ -80,7 +79,7 @@ TEST_F(BatteryTest, RemoveConsumer)
 TEST_F(BatteryTest, SetPowerLoad)
 {
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery(physics::LinkPtr()));
+  physics::BatteryPtr battery(new physics::Battery());
   EXPECT_TRUE(battery != NULL);
 
   // Add two consumers
@@ -135,7 +134,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
   batterySDF->SetFromString(batteryStr.str());
 
   // Create the battery
-  physics::BatteryPtr battery(new physics::Battery(physics::LinkPtr()));
+  physics::BatteryPtr battery(new physics::Battery());
   EXPECT_TRUE(battery != NULL);
 
   sdf::ElementPtr elem = batterySDF->Root();

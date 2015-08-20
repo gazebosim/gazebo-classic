@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -22,19 +21,15 @@
 #endif
 
 #include "gazebo/common/Events.hh"
-
-#include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Battery.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 /////////////////////////////////////////////////
-Battery::Battery(LinkPtr _link)
+Battery::Battery()
   : dataPtr(new BatteryPrivate)
 {
-  this->dataPtr->link = _link;
-
   this->dataPtr->realVoltage = 0.0;
   this->dataPtr->initVoltage = 0.0;
 
@@ -51,7 +46,7 @@ Battery::~Battery()
 }
 
 /////////////////////////////////////////////////
-void Battery::Load(sdf::ElementPtr _sdf)
+void Battery::Load(const sdf::ElementPtr _sdf)
 {
   this->dataPtr->name = _sdf->Get<std::string>("name");
 
@@ -72,12 +67,6 @@ void Battery::Init()
 void Battery::UpdateParameters(sdf::ElementPtr _sdf)
 {
   this->dataPtr->initVoltage = _sdf->Get<double>("voltage");
-}
-
-//////////////////////////////////////////////////
-LinkPtr Battery::Link() const
-{
-  return this->dataPtr->link;
 }
 
 //////////////////////////////////////////////////
@@ -107,7 +96,7 @@ void Battery::RemoveConsumer(uint32_t _consumerId)
 }
 
 /////////////////////////////////////////////////
-bool Battery::SetPowerLoad(uint32_t _consumerId, double _powerLoad)
+bool Battery::SetPowerLoad(const uint32_t _consumerId, const double _powerLoad)
 {
   auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
@@ -121,7 +110,7 @@ bool Battery::SetPowerLoad(uint32_t _consumerId, double _powerLoad)
 }
 
 /////////////////////////////////////////////////
-bool Battery::PowerLoad(uint32_t _consumerId, double &_powerLoad) const
+bool Battery::PowerLoad(const uint32_t _consumerId, double &_powerLoad) const
 {
   auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
@@ -155,7 +144,7 @@ void Battery::OnUpdate()
 }
 
 /////////////////////////////////////////////////
-double Battery::UpdateDefault(double _voltage,
+double Battery::UpdateDefault(const double _voltage,
     const std::map<uint32_t, double> &/*_powerLoads*/)
 {
   // Ideal battery
