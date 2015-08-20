@@ -36,6 +36,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Battery.hh"
 
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/Sensor.hh"
@@ -47,7 +48,6 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Link.hh"
-#include "gazebo/physics/Battery.hh"
 
 using namespace gazebo;
 using namespace physics;
