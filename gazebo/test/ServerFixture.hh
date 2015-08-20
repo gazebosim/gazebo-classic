@@ -97,10 +97,14 @@ namespace gazebo
                                  bool _paused, const std::string &_physics,
                           const std::vector<std::string> &_systemPlugins = {});
 
-     /// \brief ToDo
+    /// \brief Load a world in gzserver.
+    /// \param[in] _args Options for the server.
+    /// E.g.: "-v -u" will run gzserver paused and in verbose mode.
     protected: virtual void LoadArgs(const std::string &_args);
 
-    /// \brief ToDo
+    /// \brief Run the server.
+    /// \param[in] _args Options for the server.
+    /// E.g.: "-v -u" will run gzserver paused and in verbose mode.
     protected: void RunServer(const std::string &_args);
 
     /// \brief Get a pointer to the rendering scene.
