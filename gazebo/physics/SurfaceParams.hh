@@ -43,15 +43,25 @@ namespace gazebo
 
       /// \brief Get the friction coefficient in the primary direction.
       /// \return Friction coefficient in primary direction.
-      public: double GetMuPrimary();
+      /// \deprecated See const function MuPrimary
+      public: double GetMuPrimary() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the friction coefficient in the secondary direction.
       /// \return Friction coefficient in secondary direction.
-      public: double GetMuSecondary();
+      /// \deprecated See const function MuSecondary
+      public: double GetMuSecondary() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the friction coefficient in the primary direction.
+      /// \return Friction coefficient in primary direction.
+      public: double MuPrimary() const;
+
+      /// \brief Get the friction coefficient in the secondary direction.
+      /// \return Friction coefficient in secondary direction.
+      public: double MuSecondary() const;
 
       /// \brief Get the torsional friction coefficient.
       /// \return Torsional friction coefficient.
-      public: double MuTorsion();
+      public: double MuTorsion() const;
 
       /// \brief Get the torsional patch radius.
       /// \return Torsional patch radius.
@@ -94,7 +104,15 @@ namespace gazebo
       /// 1 for secondary direction.
       /// \return Friction coefficient, or negative value if invalid
       /// _index is supplied.
-      private: double GetMu(unsigned int _index);
+      /// \deprecated See const function Mu
+      private: double GetMu(unsigned int _index) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the friction coefficient in a single direction.
+      /// \param[in] _index Index of friction direction, 0 for primary,
+      /// 1 for secondary direction.
+      /// \return Friction coefficient, or negative value if invalid
+      /// _index is supplied.
+      private: double Mu(const unsigned int _index) const;
 
       /// \brief Set the friction coefficient in a single direction.
       /// If a negative value is supplied, use an astronomically high
@@ -165,7 +183,14 @@ namespace gazebo
       /// \brief Get access to FrictionPyramid data, if available.
       /// \return Pointer to FrictionPyramid data or NULL if class does
       /// not use FrictionPyramid data.
-      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+      /// \deprecated See function FrictionPyramid
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get access to FrictionPyramid data, if available.
+      /// \return Pointer to FrictionPyramid data or NULL if class does
+      /// not use FrictionPyramid data.
+      public: virtual FrictionPyramidPtr FrictionPyramid() const;
 
       /// \brief Allow collision checking without generating a contact joint.
       public: bool collideWithoutContact;

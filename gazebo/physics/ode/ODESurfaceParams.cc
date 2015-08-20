@@ -29,7 +29,7 @@ ODESurfaceParams::ODESurfaceParams()
     kp(1000000000000), kd(1), cfm(0), erp(0.2),
     maxVel(0.01), minDepth(0),
     slip1(0), slip2(0),
-    frictionPyramid(new FrictionPyramid())
+    frictionPyramid(new physics::FrictionPyramid())
 {
 }
 
@@ -141,8 +141,8 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
-  _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
+  _msg.mutable_friction()->set_mu(this->frictionPyramid->MuPrimary());
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid->MuSecondary());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
@@ -242,6 +242,12 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 
 /////////////////////////////////////////////////
 FrictionPyramidPtr ODESurfaceParams::GetFrictionPyramid() const
+{
+  return this->frictionPyramid;
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr ODESurfaceParams::FrictionPyramid() const
 {
   return this->frictionPyramid;
 }

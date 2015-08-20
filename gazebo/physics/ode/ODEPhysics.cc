@@ -1089,7 +1089,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd = surf1->GetFrictionPyramid()->direction1;
+  math::Vector3 fd = surf1->FrictionPyramid()->direction1;
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
@@ -1103,10 +1103,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// As a hack, we'll simply compare mu1 from
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
-  math::Vector3 fd2 = surf2->GetFrictionPyramid()->direction1;
+  math::Vector3 fd2 = surf2->FrictionPyramid()->direction1;
   if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
-        surf1->GetFrictionPyramid()->GetMuPrimary() >
-        surf2->GetFrictionPyramid()->GetMuPrimary()))
+        surf1->FrictionPyramid()->MuPrimary() >
+        surf2->FrictionPyramid()->MuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
     fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
@@ -1129,24 +1129,24 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Set the friction coefficients.
-  contact.surface.mu = std::min(surf1->GetFrictionPyramid()->GetMuPrimary(),
-                                surf2->GetFrictionPyramid()->GetMuPrimary());
-  contact.surface.mu2 = std::min(surf1->GetFrictionPyramid()->GetMuSecondary(),
-                                 surf2->GetFrictionPyramid()->GetMuSecondary());
-  contact.surface.mu3 = std::min(surf1->GetFrictionPyramid()->MuTorsion(),
-                                 surf2->GetFrictionPyramid()->MuTorsion());
+  contact.surface.mu = std::min(surf1->FrictionPyramid()->MuPrimary(),
+                                surf2->FrictionPyramid()->MuPrimary());
+  contact.surface.mu2 = std::min(surf1->FrictionPyramid()->MuSecondary(),
+                                 surf2->FrictionPyramid()->MuSecondary());
+  contact.surface.mu3 = std::min(surf1->FrictionPyramid()->MuTorsion(),
+                                 surf2->FrictionPyramid()->MuTorsion());
   contact.surface.patch_radius =
-      std::max(surf1->GetFrictionPyramid()->PatchRadius(),
-               surf2->GetFrictionPyramid()->PatchRadius());
+      std::max(surf1->FrictionPyramid()->PatchRadius(),
+               surf2->FrictionPyramid()->PatchRadius());
   // the curvature is combined using 1/R = 1/R1 + 1/R2
   // we can consider doing the same for the patch radius
   contact.surface.surface_radius = 1/
-      (1/surf1->GetFrictionPyramid()->SurfaceRadius()+
-      1/surf2->GetFrictionPyramid()->SurfaceRadius());
+      (1/surf1->FrictionPyramid()->SurfaceRadius()+
+      1/surf2->FrictionPyramid()->SurfaceRadius());
   // not sure how to combine these logic flags
   contact.surface.use_patch_radius =
-      surf1->GetFrictionPyramid()->UsePatchRadius() &&
-      surf2->GetFrictionPyramid()->UsePatchRadius();
+      surf1->FrictionPyramid()->UsePatchRadius() &&
+      surf2->FrictionPyramid()->UsePatchRadius();
 
   // Set the slip values
   contact.surface.slip1 = std::min(surf1->slip1,

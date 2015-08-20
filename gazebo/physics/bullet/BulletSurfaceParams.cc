@@ -24,7 +24,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 BulletSurfaceParams::BulletSurfaceParams()
   : SurfaceParams()
-  , frictionPyramid(new FrictionPyramid())
+  , frictionPyramid(new physics::FrictionPyramid())
 {
 }
 
@@ -70,8 +70,8 @@ void BulletSurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
-  _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
+  _msg.mutable_friction()->set_mu(this->frictionPyramid->MuPrimary());
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid->MuSecondary());
 }
 
 /////////////////////////////////////////////////
@@ -90,6 +90,12 @@ void BulletSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 
 /////////////////////////////////////////////////
 FrictionPyramidPtr BulletSurfaceParams::GetFrictionPyramid() const
+{
+  return this->frictionPyramid;
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr BulletSurfaceParams::FrictionPyramid() const
 {
   return this->frictionPyramid;
 }
