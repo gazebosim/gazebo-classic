@@ -34,9 +34,20 @@
     <model name="box_xy">
       <include>
         <uri>model://box</uri>
+        <pose>12 5 0  0 0 0</pose>
+      </include>
+      <plugin name="box_xy" filename="libInitialVelocityPlugin.so">
+        <linear>12 5 0</linear>
+        <angular>0 0 0</angular>
+      </plugin>
+    </model>
+
+    <model name="box_yx">
+      <include>
+        <uri>model://box</uri>
         <pose>5 12 0  0 0 0</pose>
       </include>
-      <plugin name="box_y" filename="libInitialVelocityPlugin.so">
+      <plugin name="box_yx" filename="libInitialVelocityPlugin.so">
         <linear>5 12 0</linear>
         <angular>0 0 0</angular>
       </plugin>
