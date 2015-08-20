@@ -78,21 +78,13 @@ void PluginSurfaceParams::Load(sdf::ElementPtr _sdf)
         gzerr << "Surface friction sdf member is NULL" << std::endl;
       else
       {
-        sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("plugin");
-        if (!frictionOdeElem)
-          gzerr << "Surface friction plugin sdf member is NULL" << std::endl;
-        else
-        {
-          this->frictionPyramid.SetMuPrimary(
-            frictionOdeElem->Get<double>("mu"));
-          this->frictionPyramid.SetMuSecondary(
-            frictionOdeElem->Get<double>("mu2"));
-          this->frictionPyramid.direction1 =
-            frictionOdeElem->Get<math::Vector3>("fdir1");
-
-          this->slip1 = frictionOdeElem->Get<double>("slip1");
-          this->slip2 = frictionOdeElem->Get<double>("slip2");
-        }
+        gzerr << "Surface friction plugin physics sdf member is"
+              << " not defined." << std::endl;
+        this->frictionPyramid.SetMuPrimary(1);
+        this->frictionPyramid.SetMuSecondary(1);
+        this->frictionPyramid.direction1 = math::Vector3(1, 0, 0);
+        this->slip1 = 0;
+        this->slip2 = 0;
       }
     }
 
@@ -102,17 +94,14 @@ void PluginSurfaceParams::Load(sdf::ElementPtr _sdf)
         gzerr << "Surface contact sdf member is NULL" << std::endl;
       else
       {
-        sdf::ElementPtr contactOdeElem = contactElem->GetElement("plugin");
-        if (!contactOdeElem)
-          gzerr << "Surface contact plugin sdf member is NULL" << std::endl;
-        {
-          this->kp = contactOdeElem->Get<double>("kp");
-          this->kd = contactOdeElem->Get<double>("kd");
-          this->cfm = contactOdeElem->Get<double>("soft_cfm");
-          this->erp = contactOdeElem->Get<double>("soft_erp");
-          this->maxVel = contactOdeElem->Get<double>("max_vel");
-          this->minDepth = contactOdeElem->Get<double>("min_depth");
-        }
+        gzerr << "Surface contact plugin physics sdf member is "
+              << "not defined." << std::endl;
+        this->kp = 1e6;
+        this->kd = 1.0;
+        this->cfm = 0.0;
+        this->erp = 0.2;
+        this->maxVel = 100.0;
+        this->minDepth = 0.0;
       }
     }
   }

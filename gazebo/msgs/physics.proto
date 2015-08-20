@@ -15,6 +15,7 @@ message Physics
     BULLET = 2;
     SIMBODY = 3;
     DART = 4;
+    PLUGIN = 5;
   }
   optional Type type                         = 1[default=ODE];
 
