@@ -43,8 +43,8 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
     return;
   }
 
-  // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
+  // Load a world with a rendering sensor to expose the bug
+  Load("worlds/camera.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
