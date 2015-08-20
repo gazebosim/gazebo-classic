@@ -80,8 +80,6 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 
   std::string name = box->GetName();
 
-  gzerr << "spawned"; getchar();
-
   // delete that model
   ServerFixture::RemoveModel(name);
 
@@ -97,8 +95,6 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   EXPECT_TRUE(world->GetModel(name) == NULL);
   EXPECT_TRUE(count < 1000);
 
-  gzerr << "removed"; getchar();
-
   // spawn the exact same model
   // if this succeeds, we're OK.
   physics::ModelPtr newBox = ServerFixture::SpawnModel(model);
@@ -110,8 +106,6 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   }
 
   EXPECT_TRUE(world->GetModel(name) != NULL);
-
-  gzerr << "spawned"; getchar();
 }
 
 TEST_P(Issue1702Test, SpawnDeleteSpawnAgain)
