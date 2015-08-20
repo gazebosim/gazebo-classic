@@ -180,10 +180,10 @@ void ServerFixture::LoadArgs(const std::string &_args)
          ++waitCount < maxWaitCount)
     common::Time::MSleep(100);
   gzdbg << "ServerFixture load in "
-         << static_cast<double>(waitCount)/10.0
-         << " seconds, timeout after "
-         << static_cast<double>(maxWaitCount)/10.0
-         << " seconds\n";
+        << static_cast<double>(waitCount)/10.0
+        << " seconds, timeout after "
+        << static_cast<double>(maxWaitCount)/10.0
+        << " seconds\n";
 
   if (waitCount >= maxWaitCount)
     this->launchTimeoutFailure("while waiting for Load() function", waitCount);
