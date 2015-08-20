@@ -43,7 +43,7 @@ namespace gazebo
     /// simulation iteration. The update function takes the power loads for each
     /// consumer and current voltage value as inputs and returns a new voltage
     /// value.
-    class GZ_PHYSICS_VISIBLE Battery
+    class GZ_COMMON_VISIBLE Battery
     {
       /// \brief Constructor
       public: explicit Battery();
@@ -125,7 +125,6 @@ namespace gazebo
       /// \brief Private data pointer.
       private: BatteryPrivate *dataPtr;
     };
-
     /// \}
   }
 }

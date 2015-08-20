@@ -90,6 +90,7 @@ namespace gazebo
   namespace common
   {
     class Animation;
+    class Battery;
     class Color;
     class DiagnosticTimer;
     class Image;
@@ -136,6 +137,10 @@ namespace gazebo
     /// \def SphericalCoordinatesPtr
     /// \brief Boost shared pointer to a SphericalCoordinates object
     typedef boost::shared_ptr<SphericalCoordinates> SphericalCoordinatesPtr;
+
+    /// \def BatteryPtr
+    /// \brief Boost shared pointer to a Battery object
+    typedef boost::shared_ptr<Battery> BatteryPtr;
   }
 
   namespace event

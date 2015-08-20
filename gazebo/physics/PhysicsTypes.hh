@@ -62,7 +62,6 @@ namespace gazebo
     class ModelState;
     class LinkState;
     class JointState;
-    class Battery;
 
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
@@ -171,10 +170,6 @@ namespace gazebo
     /// \def GripperPtr
     /// \brief Boost shared pointer to a Gripper object
     typedef boost::shared_ptr<Gripper> GripperPtr;
-
-    /// \def BatteryPtr
-    /// \brief Boost shared pointer to a Battery object
-    typedef boost::shared_ptr<Battery> BatteryPtr;
 
     /// \def Base_V
     /// \brief Vector of BasePtr
