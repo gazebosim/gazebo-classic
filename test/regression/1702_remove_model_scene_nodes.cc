@@ -76,13 +76,13 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   ServerFixture::RemoveModel(name);
 
   int count = 0;
-  while(world->GetModel(name) != NULL && ++count < 1000)
+  while (world->GetModel(name) != NULL && ++count < 1000)
   {
     common::Time::MSleep(1);
     world->Step(1);
   }
   EXPECT_TRUE(world->GetModel(name) == NULL);
-  EXPECT_TRUE(count < 1000);
+  EXPECT_LT(count, 1000);
 
   // spawn the exact same model
   // if this succeeds, we're OK.
@@ -90,7 +90,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // EXPECT_TRUE(newBox != NULL);  /// \TODO: this fails, should it?
 
   count = 0;
-  while(world->GetModel(name) == NULL && ++count < 1000)
+  while (world->GetModel(name) == NULL && ++count < 1000)
   {
     common::Time::MSleep(1);
     world->Step(1);
