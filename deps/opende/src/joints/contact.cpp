@@ -66,7 +66,7 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
     if ( contact.surface.mode & dContactMu3 )
     {
         if ( contact.surface.mu3 < 0 ) contact.surface.mu3 = 0;
-        if ( contact.surface.mu3 > 0 ) m++;
+        m++;  // do this even if mu3 is zero.
         if (_dequal(contact.surface.mu3, dInfinity)) nub ++;
     }
 
@@ -371,7 +371,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             // findex[3] must be zero in order for torsional friction moment
             // to be proportional to normal force
             if ( contact.surface.mode & dContactApprox3 )
-                info->findex[3] = 0;
+                info->findex[3] = -1;
         }
         else
         {
