@@ -100,7 +100,7 @@ void LinearBatteryPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       this->battery->SetUpdateFunc(
         std::bind(&LinearBatteryPlugin::OnUpdateVoltage, this,
-          std::placeholders::_1, std::placeholders::_2));
+          std::placeholders::_1));
     }
   }
 }
@@ -120,27 +120,24 @@ void LinearBatteryPlugin::Reset()
 }
 
 /////////////////////////////////////////////////
-double LinearBatteryPlugin::OnUpdateVoltage(double _voltage,
-    const common::Battery::PowerLoad_M &_powerLoads)
+double LinearBatteryPlugin::OnUpdateVoltage(const common::BatteryPtr &_battery)
 {
   double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
   double totalpower = 0.0;
   double k = dt / this->tau;
 
-  if (fabs(_voltage) < 1e-3)
+  if (fabs(_battery->Voltage()) < 1e-3)
     return 0.0;
 
-  for (auto powerLoad : _powerLoads)
+  for (auto powerLoad : _battery->PowerLoads())
     totalpower += powerLoad.second;
 
-  this->iraw = totalpower / _voltage;
+  this->iraw = totalpower / _battery->Voltage();
 
   this->ismooth = this->ismooth + k * (this->iraw - this->ismooth);
 
   this->q = this->q - GZ_SEC_TO_HOUR(dt * this->ismooth);
 
-  _voltage = this->e0 + this->e1 * (1 - this->q / this->c)
-      - this->r * this->ismooth;
-
-  return _voltage;
+  return this->e0 + this->e1 * (1 - this->q / this->c)
+    - this->r * this->ismooth;
 }

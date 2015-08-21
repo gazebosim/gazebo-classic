@@ -20,6 +20,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 #include <boost/shared_ptr.hpp>
 #include "gazebo/util/system.hh"
 
@@ -139,8 +140,8 @@ namespace gazebo
     typedef boost::shared_ptr<SphericalCoordinates> SphericalCoordinatesPtr;
 
     /// \def BatteryPtr
-    /// \brief Boost shared pointer to a Battery object
-    typedef boost::shared_ptr<Battery> BatteryPtr;
+    /// \brief Standrd shared pointer to a Battery object
+    typedef std::shared_ptr<Battery> BatteryPtr;
   }
 
   namespace event

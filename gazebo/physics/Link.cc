@@ -266,6 +266,7 @@ void Link::Init()
     }
   }
 
+  // Initialize all the batteries
   for (auto &battery : this->batteries)
   {
     battery->Init();
@@ -393,6 +394,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     }
   }
 
+  // Update the battery information
   if (this->sdf->HasElement("battery"))
   {
     sdf::ElementPtr batteryElem = this->sdf->GetElement("battery");
@@ -887,6 +889,7 @@ void Link::FillMsg(msgs::Link &_msg)
   if (this->IsCanonicalLink())
     _msg.set_canonical(true);
 
+  // Fill message with battery information
   for (auto &battery : this->batteries)
   {
     msgs::Battery *bat = _msg.add_battery();

@@ -20,12 +20,14 @@
 #include <string>
 #include <map>
 #include <functional>
+#include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
 {
   namespace common
   {
-    /// Forward declare private data
+    /// \internal
+    /// \brief Private data for the Battery class
     class BatteryPrivate
     {
       /// \brief Initial voltage in volts.
@@ -39,8 +41,7 @@ namespace gazebo
 
       /// \brief The function used to to update the real voltage.
       /// It takes as inputs current voltage and list of power loads.
-      public: std::function<
-              double (double, const std::map<uint32_t, double> &)> updateFunc;
+      public: std::function<double (const BatteryPtr)> updateFunc;
 
       /// \brief Name of the battery.
       public: std::string name;

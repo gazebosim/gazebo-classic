@@ -34,7 +34,8 @@ Battery::Battery()
   this->dataPtr->realVoltage = 0.0;
   this->dataPtr->initVoltage = 0.0;
 
-  this->SetUpdateFunc(boost::bind(&Battery::UpdateDefault, this, _1, _2));
+  this->SetUpdateFunc(std::bind(&Battery::UpdateDefault, this,
+        std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
@@ -120,7 +121,7 @@ bool Battery::PowerLoad(const uint32_t _consumerId, double &_powerLoad) const
 }
 
 /////////////////////////////////////////////////
-const Battery::PowerLoad_M& Battery::PowerLoads() const
+const Battery::PowerLoad_M &Battery::PowerLoads() const
 {
   return this->dataPtr->powerLoads;
 }
@@ -135,22 +136,19 @@ double Battery::Voltage() const
 void Battery::Update()
 {
   this->dataPtr->realVoltage =
-      this->dataPtr->updateFunc(this->dataPtr->realVoltage,
-                                this->dataPtr->powerLoads);
+      this->dataPtr->updateFunc(shared_from_this());
 }
 
 /////////////////////////////////////////////////
-double Battery::UpdateDefault(const double _voltage,
-                              const PowerLoad_M &/*_powerLoads*/)
+double Battery::UpdateDefault(const BatteryPtr _battery)
 {
   // Ideal battery
-  return _voltage;
+  return _battery->Voltage();
 }
 
 /////////////////////////////////////////////////
 void Battery::SetUpdateFunc(
-    std::function<double (double, const PowerLoad_M &)>
-    _updateFunc)
+    std::function<double (const BatteryPtr)> _updateFunc)
 {
   this->dataPtr->updateFunc = _updateFunc;
 }

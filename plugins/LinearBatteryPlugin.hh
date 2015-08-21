@@ -42,11 +42,9 @@ namespace gazebo
     public: virtual void Reset();
 
     /// \brief Callback for Battery Update events.
-    /// \param[in] _voltage. The current voltage.
-    /// \param[in] _powerLoads The map of power loads.
+    /// \param[in] _battery Pointer to the battery that is to be updated.
     /// \return The new voltage.
-    protected: virtual double OnUpdateVoltage(double _voltage,
-                   const common::Battery::PowerLoad_M &_powerLoads);
+    private: double OnUpdateVoltage(const common::BatteryPtr &_battery);
 
     /// \brief Connection to World Update events.
     protected: event::ConnectionPtr updateConnection;

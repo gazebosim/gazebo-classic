@@ -19,8 +19,11 @@
 
 #include <map>
 #include <string>
+#include <functional>
+#include <memory>
 
 #include "sdf/sdf.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -43,7 +46,8 @@ namespace gazebo
     /// simulation iteration. The update function takes the power loads for each
     /// consumer and current voltage value as inputs and returns a new voltage
     /// value.
-    class GZ_COMMON_VISIBLE Battery
+    class GZ_COMMON_VISIBLE Battery :
+      public std::enable_shared_from_this<Battery>
     {
       /// \brief Typedef the powerload map.
       /// \sa SetUpdateFunc
@@ -102,29 +106,26 @@ namespace gazebo
 
       /// \brief Setup function to update voltage.
       /// \param[in] _updateFunc The update function callback that is used
-      /// to modify the battery's voltage. The parameters to the update
-      /// function callback are:
-      ///
-      ///  1. The real voltage as a double.
-      ///
-      ///  2. A map of power loads, where keys=consumerId and
-      ///     values=powerLoad.
-      ///
-      /// The update function must return the new battery voltage as
-      /// a double.
+      /// to modify the battery's voltage. The parameter to the update
+      /// function callback is a reference to an instance of
+      /// Battery::UpdateData. The update function must return the new
+      /// battery voltage as a double.
+      /// \sa UpdateData
       public: void SetUpdateFunc(
-                  std::function<double (double, const PowerLoad_M &)>
-                  _updateFunc);
+                  std::function<double (const BatteryPtr)> _updateFunc);
 
-      /// \brief Update the battery.
+      /// \brief Update the battery. This will in turn trigger the function
+      /// set using the SetUpdateFunc function.
+      /// \sa SetUpdateFunc.
       public: void Update();
 
       /// \brief Initialize the list of consumers.
       protected: void InitConsumers();
 
       /// \brief Update voltage using an ideal battery model.
-      private: double UpdateDefault(const double _voltage,
-                 const PowerLoad_M &_powerLoads);
+      /// \param[in] _data Pointer to the battery.
+      /// \return New battery voltage.
+      private: double UpdateDefault(const BatteryPtr _battery);
 
       /// \internal
       /// \brief Private data pointer.

@@ -104,10 +104,9 @@ TEST_F(BatteryTest, SetPowerLoad)
 class BatteryUpdateFixture
 {
   /// \brief Update voltage by incrementing it.
-  public: double Update(double _voltage,
-                        const std::map<uint32_t, double> &/*_powerLoads*/)
+  public: double Update(const common::BatteryPtr _battery)
           {
-            return _voltage + this->step;
+            return _battery->Voltage() + this->step;
           }
 
   /// \brief Voltage amount to increment by.
@@ -154,7 +153,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
   BatteryUpdateFixture fixture;
   fixture.step = -0.1;
   battery->SetUpdateFunc(std::bind(&BatteryUpdateFixture::Update,
-        &fixture, std::placeholders::_1, std::placeholders::_2));
+        &fixture, std::placeholders::_1));
 
   for (int i = 0; i < N; ++i)
     battery->Update();
