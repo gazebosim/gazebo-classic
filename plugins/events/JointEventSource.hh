@@ -77,7 +77,7 @@ namespace gazebo
     private: std::string GetRangeAsString() const;
 
     /// \brief Sets the range type from a string
-    private: void SetRangeFromString(std::string &_rangeStr);
+    private: void SetRangeFromString(const std::string &_rangeStr);
 
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;

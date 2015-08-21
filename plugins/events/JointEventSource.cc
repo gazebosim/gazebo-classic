@@ -113,7 +113,7 @@ void JointEventSource::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JointEventSource::SetRangeFromString(std::string &_rangeStr)
+void JointEventSource::SetRangeFromString(const std::string &_rangeStr)
 {
   if (_rangeStr == "position")
     this->range = POSITION;
@@ -130,7 +130,7 @@ void JointEventSource::SetRangeFromString(std::string &_rangeStr)
 ////////////////////////////////////////////////////////////////////////////////
 std::string JointEventSource::GetRangeAsString() const
 {
-  std:: string rangeStr;
+  std::string rangeStr;
   switch (this->range)
   {
     case POSITION:
