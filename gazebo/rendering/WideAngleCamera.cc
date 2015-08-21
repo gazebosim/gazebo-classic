@@ -18,12 +18,10 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-// This file causes include error! WHY?
-// #include "gazebo/rendering/skyx/include/SkyX.h"
-
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CameraLensPrivate.hh"
 #include "gazebo/rendering/WideAngleCameraPrivate.hh"
+#include "gazebo/rendering/skyx/include/SkyX.h"
 
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -597,9 +595,8 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 
     this->envViewports[i] = vp;
 
-    // FIXME: problem with Skyx include
-    // if (this->GetScene()->GetSkyX())
-    //   rtt->addListener(this->GetScene()->GetSkyX());
+    if (this->GetScene()->GetSkyX())
+      rtt->addListener(this->GetScene()->GetSkyX());
 
     this->envRenderTargets[i] = rtt;
   }
