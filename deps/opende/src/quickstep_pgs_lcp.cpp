@@ -553,24 +553,10 @@ static void* ComputeRows(void *p)
         dReal hi_act_erp, lo_act_erp;
         if (constraint_index >= 0)
         {
-          if (friction_model == pyramid_friction)
+          bool this_is_torsional_friction;
+          if (this_is_torsional_friction)
           {
-            // FOR erp throttled by info.c_v_max or info.c
-            hi_act = dFabs (hi[index] * lambda[constraint_index]);
-            lo_act = -hi_act;
-            if (inline_position_correction)
-            {
-              hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
-              lo_act_erp = -hi_act_erp;
-            }
-          }
-          else if (friction_model == cone_friction)
-          {
-            quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
-                constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
-          }
-          else if(friction_model == box_friction)
-          {
+            // how do we know this constraint is for torsional friction?
             hi_act = hi[index];
             lo_act = -hi_act;
             hi_act_erp = hi[index];
@@ -578,12 +564,39 @@ static void* ComputeRows(void *p)
           }
           else
           {
-              // initialize the hi and lo to get rid of warnings
-              hi_act = dInfinity;
-              lo_act = -dInfinity;
-              hi_act_erp = dInfinity;
-              lo_act_erp = -dInfinity;
-              dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
+            // deal with non-torsional frictions
+            if (friction_model == pyramid_friction)
+            {
+              // FOR erp throttled by info.c_v_max or info.c
+              hi_act = dFabs (hi[index] * lambda[constraint_index]);
+              lo_act = -hi_act;
+              if (inline_position_correction)
+              {
+                hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+                lo_act_erp = -hi_act_erp;
+              }
+            }
+            else if (friction_model == cone_friction)
+            {
+              quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
+                  constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
+            }
+            else if(friction_model == box_friction)
+            {
+              hi_act = hi[index];
+              lo_act = -hi_act;
+              hi_act_erp = hi[index];
+              lo_act_erp = -hi_act_erp;
+            }
+            else
+            {
+                // initialize the hi and lo to get rid of warnings
+                hi_act = dInfinity;
+                lo_act = -dInfinity;
+                hi_act_erp = dInfinity;
+                lo_act_erp = -dInfinity;
+                dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
+            }
           }
         } else {
               // FOR erp throttled by info.c_v_max or info.c
@@ -1473,6 +1486,7 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
       }
     }
   }
+
   //startRow, nRows;
   int previndex, nextindex, prev_constraint_index, next_constraint_index;
   if (i == startRow)
@@ -1493,18 +1507,24 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
     next_constraint_index = findex[nextindex];
   }
 
-  if (constraint_index == next_constraint_index)
+  // use previndex and nextindex to see if this is part of the same
+  // contact constraint.  The problem is that with torsional friction,
+  // there are 3 consecutive constraints sharing the same constraint index.
+  // But we want to ignore anything to do with the third torsional
+  // friction constraint row here.
+  // So we need to check against previous constraint row first:
+  if (constraint_index == prev_constraint_index)
+  {
+    dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
+    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr, body2_vel);
+    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr, body2_vel);
+  }
+  else if (constraint_index == next_constraint_index)
   {
     // body1 was always the 1st body in the body pair
     dRealPtr J_next_ptr =  J_orig + index*12 + 12;
     v_f1 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
     v_f2 = quickstep::dot6(J_next_ptr, body1_vel) + quickstep::dot6(J_next_ptr+6, body2_vel);
-  }
-  else if (constraint_index == prev_constraint_index)
-  {
-    dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
-    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr, body2_vel);
-    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr, body2_vel);
   }
   else
   {
