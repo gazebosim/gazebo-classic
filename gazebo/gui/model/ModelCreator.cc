@@ -647,8 +647,8 @@ std::string ModelCreator::AddShape(LinkType _type,
     // to be made of multiple svg disjoint paths.
     // For this reason, we compute the closed polylines that can be extruded
     // in this step
-    std::vector< std::vector<math::Vector2d> > closedPolys;
-    std::vector< std::vector<math::Vector2d> > openPolys;
+    std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+    std::vector< std::vector<ignition::math::Vector2d> > openPolys;
     svgLoader.PathsToClosedPolylines(paths, 0.05, closedPolys, openPolys);
     if (closedPolys.empty())
     {
@@ -662,36 +662,37 @@ std::string ModelCreator::AddShape(LinkType _type,
         << "They will be ignored." << std::endl;
     }
     // Find extreme values to center the polylines
-    math::Vector2d min(paths[0].polylines[0][0]);
-    math::Vector2d max(min);
+    ignition::math::Vector2d min(paths[0].polylines[0][0]);
+    ignition::math::Vector2d max(min);
 
-    for (const std::vector<math::Vector2d> &poly : closedPolys)
+    for (auto const &poly : closedPolys)
     {
-      for (const math::Vector2d &pt : poly)
+      for (auto const &pt : poly)
       {
-        if (pt.x < min.x)
-          min.x = pt.x;
-        if (pt.y < min.y)
-          min.y = pt.y;
-        if (pt.x > max.x)
-          max.x = pt.x;
-        if (pt.y > max.y)
-          max.y = pt.y;
+        if (pt.X() < min.X())
+          min.X() = pt.X();
+        if (pt.Y() < min.Y())
+          min.Y() = pt.Y();
+        if (pt.X() > max.X())
+          max.X() = pt.X();
+        if (pt.Y() > max.Y())
+          max.Y() = pt.Y();
       }
     }
-    for (const std::vector<math::Vector2d> &poly : closedPolys)
+    for (auto const &poly : closedPolys)
     {
       sdf::ElementPtr polylineElem = geomElem->AddElement("polyline");
       polylineElem->GetElement("height")->Set(_size.z);
 
-      for (const math::Vector2d &p : poly)
+      for (auto const &p : poly)
       {
         // Translate to center
-        math::Vector2d pt = p - min - (max-min)*0.5;
+        ignition::math::Vector2d pt = p - min - (max-min)*0.5;
         // Swap X and Y so Z will point up
         // (in 2D it points into the screen)
         sdf::ElementPtr pointElem = polylineElem->AddElement("point");
-        pointElem->Set(math::Vector2d(pt.y*_size.y, pt.x*_size.x));
+        pointElem->Set(
+            ignition::math::Vector2d(pt.Y()*_size.y, pt.X()*_size.x));
       }
     }
   }
@@ -702,6 +703,7 @@ std::string ModelCreator::AddShape(LinkType _type,
       gzwarn << "Unknown link type '" << _type << "'. " <<
           "Adding a box" << std::endl;
     }
+
     ((geomElem->AddElement("box"))->GetElement("size"))->Set(_size);
   }
 
@@ -729,6 +731,20 @@ std::string ModelCreator::AddShape(LinkType _type,
 void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 {
   LinkData *link = new LinkData();
+
+  msgs::Model model;
+  double mass = 1.0;
+
+  // set reasonable inertial values based on geometry
+  std::string geomType = _visual->GetGeometryType();
+  if (geomType == "cylinder")
+    msgs::AddCylinderLink(model, mass, 0.5, 1.0);
+  else if (geomType == "sphere")
+    msgs::AddSphereLink(model, mass, 0.5);
+  else
+    msgs::AddBoxLink(model, mass, ignition::math::Vector3d::One);
+  link->Load(msgs::LinkToSDF(model.link(0)));
+
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
   {
@@ -852,7 +868,7 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
       this->previewVisual));
   linkVisual->Load();
-  linkVisual->SetPose(link->GetPose());
+  linkVisual->SetPose(link->Pose());
   link->linkVisual = linkVisual;
 
   // Visuals
@@ -1169,7 +1185,7 @@ void ModelCreator::CreateTheEntity()
   }
 
   msg.set_sdf(this->modelSDF->ToString());
-  msgs::Set(msg.mutable_pose(), this->modelPose);
+  msgs::Set(msg.mutable_pose(), this->modelPose.Ign());
   this->makerPub->Publish(msg);
 }
 
@@ -1337,7 +1353,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->allLinks.end())
     {
       LinkData *link = this->allLinks[this->mouseVisual->GetName()];
-      link->SetPose(this->mouseVisual->GetWorldPose()-this->modelPose);
+      link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
     }
 
@@ -1545,7 +1561,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
     gzerr << "Link [" << _name << "] not found." << std::endl;
     return;
   }
-  link->SetPose(link->linkVisual->GetWorldPose()-this->modelPose);
+  link->SetPose((link->linkVisual->GetWorldPose()-this->modelPose).Ign());
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
   link->inspector->show();
@@ -1642,7 +1658,7 @@ void ModelCreator::GenerateSDF()
     for (auto &linksIt : this->allLinks)
     {
       LinkData *link = linksIt.second;
-      mid += link->GetPose().pos;
+      mid += link->Pose().Pos();
     }
     if (!this->allLinks.empty())
       mid /= this->allLinks.size();
@@ -1654,8 +1670,8 @@ void ModelCreator::GenerateSDF()
   {
     this->previewVisual->SetWorldPose(this->modelPose);
     LinkData *link = linksIt.second;
-    link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
-    link->linkVisual->SetPose(link->GetPose());
+    link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
+    link->linkVisual->SetPose(link->Pose());
   }
 
   // generate canonical link sdf first.
@@ -1869,20 +1885,20 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    if (link->GetPose() != link->linkVisual->GetPose())
+    if (link->Pose() != link->linkVisual->GetPose().Ign())
     {
-      link->SetPose(link->linkVisual->GetWorldPose() - this->modelPose);
+      link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
       this->ModelChanged();
     }
     for (auto &scaleIt : this->linkScaleUpdate)
     {
       if (link->linkVisual->GetName() == scaleIt.first)
-        link->SetScale(scaleIt.second);
+        link->SetScale(scaleIt.second.Ign());
     }
-    if (!this->linkScaleUpdate.empty())
-      this->ModelChanged();
-    this->linkScaleUpdate.clear();
   }
+  if (!this->linkScaleUpdate.empty())
+    this->ModelChanged();
+  this->linkScaleUpdate.clear();
 }
 
 /////////////////////////////////////////////////

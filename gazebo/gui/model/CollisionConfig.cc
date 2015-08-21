@@ -67,6 +67,7 @@ CollisionConfig::~CollisionConfig()
   while (!this->configs.empty())
   {
     auto config = this->configs.begin();
+    delete config->second;
     this->configs.erase(config);
   }
 }
@@ -164,6 +165,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   // TODO: auto-fill them with SDF defaults
   if (!msgToLoad.has_max_contacts())
     msgToLoad.set_max_contacts(10);
+
   msgs::Surface *surfaceMsg = msgToLoad.mutable_surface();
   if (!surfaceMsg->has_bounce_threshold())
     surfaceMsg->set_bounce_threshold(10e5);
@@ -179,13 +181,23 @@ void CollisionConfig::AddCollision(const std::string &_name,
     surfaceMsg->set_collide_without_contact_bitmask(1);
   if (!surfaceMsg->has_collide_bitmask())
     surfaceMsg->set_collide_bitmask(1);
+
   msgs::Friction *frictionMsg = surfaceMsg->mutable_friction();
   if (!frictionMsg->has_mu())
     frictionMsg->set_mu(1.0);
   if (!frictionMsg->has_mu2())
     frictionMsg->set_mu2(1.0);
-  if (!frictionMsg->has_mu3())
-    frictionMsg->set_mu3(1.0);
+
+  msgs::Friction::Torsional *torsionalMsg =
+      frictionMsg->mutable_torsional();
+  if (!torsionalMsg->has_coefficient())
+    torsionalMsg->set_coefficient(1.0);
+  if (!torsionalMsg->has_use_patch_radius())
+    torsionalMsg->set_use_patch_radius(true);
+  if (!torsionalMsg->has_patch_radius())
+    torsionalMsg->set_patch_radius(0.0);
+  if (!torsionalMsg->has_surface_radius())
+    torsionalMsg->set_surface_radius(IGN_DBL_MAX);
 
   ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);
@@ -251,7 +263,8 @@ void CollisionConfig::OnRemoveCollision(int _id)
 
   QMessageBox msgBox(QMessageBox::Warning, QString("Remove collision?"),
       QString(msg.c_str()));
-  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QPushButton *cancelButton =
       msgBox.addButton("Cancel", QMessageBox::RejectRole);
@@ -287,18 +300,32 @@ msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
 
 /////////////////////////////////////////////////
 void CollisionConfig::SetGeometry(const std::string &_name,
-    const math::Vector3 &_size, const std::string &_uri)
+    const ignition::math::Vector3d &_size, const std::string &_uri)
 {
-  for (auto &it : this->configs)
+  for (auto const &it : this->configs)
   {
     if (it.second->name == _name)
     {
-      math::Vector3 dimensions;
+      ignition::math::Vector3d dimensions;
       std::string uri;
-      std::string type = it.second->configWidget->GetGeometryWidgetValue(
+      std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
           _size, _uri);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::Geometry(const std::string &_name,
+    ignition::math::Vector3d &_size, std::string &_uri) const
+{
+  for (auto const &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      it.second->configWidget->GeometryWidgetValue("geometry", _size, _uri);
       break;
     }
   }

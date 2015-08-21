@@ -47,7 +47,8 @@ enum {
   dContactApprox0	= 0x0000,
   dContactApprox1_1	= 0x1000,
   dContactApprox1_2	= 0x2000,
-  dContactApprox1	= 0x3000
+  dContactApprox1	= 0x3000,
+  dContactApprox3	= 0x4000
 };
 
 
@@ -64,8 +65,8 @@ typedef struct dSurfaceParameters {
   dReal soft_cfm;
   dReal motion1,motion2,motionN;
   dReal slip1,slip2,slip3;
-  dReal patch_radius, curvature_radius;
-  bool  use_curvature;
+  dReal patch_radius, surface_radius;
+  bool  use_patch_radius;
 } dSurfaceParameters;
 
 

@@ -29,6 +29,7 @@
 
 #define SIMBODY_SUPPORT
 #define DART_SUPPORT
+#define WORLD_STEP_DART_PGS
 
 #ifdef HAVE_SIMBODY
 # undef SIMBODY_SUPPORT
@@ -37,6 +38,8 @@
 #ifdef HAVE_DART
 # undef DART_SUPPORT
 # define DART_SUPPORT , "dart"
+# undef WORLD_STEP_DART_PGS
+# define WORLD_STEP_DART_PGS , "DART_PGS"
 #endif
 
 /// \brief Helper macro to instantiate gtest for different physics engines
@@ -44,6 +47,11 @@
   BULLET_SUPPORT \
   SIMBODY_SUPPORT \
   DART_SUPPORT \
+  )
+
+/// \brief Helper macro to instantiate gtest for different solvers
+#define WORLD_STEP_SOLVERS ::testing::Values("ODE_DANTZIG" \
+  WORLD_STEP_DART_PGS \
   )
 
 #endif

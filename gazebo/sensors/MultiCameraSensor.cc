@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
@@ -143,9 +144,9 @@ void MultiCameraSensor::Init()
     camera->Init();
     camera->CreateRenderTexture(camera->GetName() + "_RttTex");
 
-    math::Pose cameraPose = this->pose;
+    ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentId, true);
 

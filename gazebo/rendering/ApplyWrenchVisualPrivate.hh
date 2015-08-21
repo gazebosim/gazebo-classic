@@ -66,6 +66,12 @@ namespace gazebo
       /// \brief If true, the rotation tool was rotated by the mouse and
       /// shouldn't be oriented again according to the vector.
       public: bool rotatedByMouse;
+
+      /// \brief Text displaying the force magnitude.
+      public: MovableText forceText;
+
+      /// \brief Text displaying the torque magnitude.
+      public: MovableText torqueText;
     };
   }
 }

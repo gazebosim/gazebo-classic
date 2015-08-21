@@ -113,6 +113,15 @@ math::Vector3 PhysicsEngine::GetGravity() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d PhysicsEngine::MagneticField() const
+{
+  if (this->sdf->HasElement("magnetic_field"))
+    return this->sdf->Get<ignition::math::Vector3d>("magnetic_field");
+  else
+    return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
 CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
                                             const std::string &_linkName)
 {

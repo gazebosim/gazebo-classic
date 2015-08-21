@@ -357,7 +357,7 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
     msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
 
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
     this->dataPtr->modelPub->Publish(msg);
   }
 }

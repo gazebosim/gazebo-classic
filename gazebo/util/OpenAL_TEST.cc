@@ -51,7 +51,7 @@ TEST_F(OpenAL, DefaultDevice)
     "<world name='default'>"
     "<audio>"
     "<device>default</device>"
-    "</device>"
+    "</audio>"
     "</world>"
     "</sdf>";
 
@@ -73,7 +73,7 @@ TEST_F(OpenAL, NonDefaultDevice)
     "<world name='default'>"
     "<audio>"
     "<device>garbage</device>"
-    "</device>"
+    "</audio>"
     "</world>"
     "</sdf>";
 

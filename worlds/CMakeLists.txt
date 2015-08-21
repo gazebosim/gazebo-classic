@@ -44,6 +44,7 @@ set (files
   projector.world
   quad_rotor_demo.world
   quad_rotor_demo_2.world
+  random_velocity.world
   ray_cpu.world
   ray_noise_plugin.world
   road.world

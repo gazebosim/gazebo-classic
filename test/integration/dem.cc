@@ -59,8 +59,8 @@ TEST_F(Dem_TEST, GPS)
   dem.GetGeoReferenceOrigin(latitude, longitude);
   elevation = dem.GetElevation(0.0, 0.0);
 
-  EXPECT_NEAR(sensor->GetLatitude().Degree(), latitude.Degree(), DOUBLE_TOL);
-  EXPECT_NEAR(sensor->GetLongitude().Degree(), longitude.Degree(), DOUBLE_TOL);
+  EXPECT_NEAR(sensor->Latitude().Degree(), latitude.Degree(), DOUBLE_TOL);
+  EXPECT_NEAR(sensor->Longitude().Degree(), longitude.Degree(), DOUBLE_TOL);
   EXPECT_NEAR(sensor->GetAltitude(), elevation, 1);
 }
 #endif

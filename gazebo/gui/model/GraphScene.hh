@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include "gazebo/common/Color.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/qgv/QGVScene.h"
 
@@ -70,6 +72,12 @@ namespace gazebo
       /// \brief Remove an edge between two nodes.
       /// \param[in] _id Edge ID.
       public: void RemoveEdge(const std::string &_id);
+
+      /// \brief Set the color of an edge.
+      /// \param[in] _id Edge ID.
+      /// \param[in] _color Color to set the edge to.
+      public: void SetEdgeColor(const std::string &_id,
+          const common::Color &_color);
 
       /// \brief Overrides the default background with grid lines.
       /// \param[in] _painter Qt painter object.

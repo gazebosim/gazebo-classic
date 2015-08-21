@@ -1,38 +1,51 @@
 <?xml version="1.0" ?>
 <%
   # Torsional friction test world
-  # Rotating spheres with single points of contact and initial velocity
-  # They should decelerate if friction is nonzero
+  # Spheres with single points of contact. Torque about the vertical axis
+  # will be applied and the torsional friction should resist motion.
   # There are 4 rows of spheres:
   # 1st: different masses, resulting in different contact depths.
-  # 2nd: different Mu3
+  # 2nd: different coefficient
   # 3rd: different patch_radius
-  # 4th: different curvature
+  # 4th: different surface radius
 
   # Varying parameters
   densities = [100.0, 1000.0, 2700.0, 5000.0, 10000.0]
-  mu3s = [0.0, 0.001, 0.005, 0.01, 1.0]
+  coefficients = [0.0, 0.001, 0.005, 0.01, 1.0]
   patch_radii = [0.0, 0.1, 2.0, 5.0, 10.0]
   radii = [0.01, 0.1, 0.8, 2.0, 10.0]
 
   # Default parameters
   # Aluminum 2700 kg/m^3
   default_density = 2700.0
-  default_mu3 = 0.005
+  default_coefficient = 0.005
   default_radius = 0.1
   default_patch_radius = 2.0
-
-  # initial velocity
-  spin0 = 2*Math::PI
 
   # Kp to make spheres soft
   kp = 500000
 %>
 <sdf version="1.5">
   <world name="default">
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>1000</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>1000.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
     <gui>
       <camera name="user_camera">
-        <pose>7 -3 2.5 0 0.27 2.35</pose>
+        <pose>-4 1.5 1.9 0 0.17 -0.014</pose>
       </camera>
     </gui>
     <include>
@@ -44,7 +57,7 @@
 
 <%  # Different masses / contact depth
     radius = default_radius
-    mu3 = default_mu3
+    coefficient = default_coefficient
 
     i = 0
     densities.each do |density|
@@ -53,9 +66,10 @@
       mass = density * 4.0 * Math::PI / 3.0 * radius **3
       ixx = mass * 0.4 * radius**2
       iyy = ixx
-      izz = izz
+      izz = ixx
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= radius*4*i %> 0 <%= radius %>  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -77,13 +91,14 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3><%= mu3 %></mu3>
-              </ode>
+              <torsional>
+                <coefficient><%= coefficient %></coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp><%= kp %></kp>
+                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -102,10 +117,6 @@
           </material>
         </visual>
       </link>
-      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
-        <linear>0 0 0</linear>
-        <angular>0 0 <%= spin0 %></angular>
-      </plugin>
     </model>
 <%  end %>
 
@@ -117,14 +128,15 @@
     mass = density * 4.0 * Math::PI / 3.0 * radius **3
     ixx = mass * 0.4 * radius**2
     iyy = ixx
-    izz = izz
+    izz = ixx
 
     i = 0
-    mu3s.each do |mu3|
+    coefficients.each do |coefficient|
       i = i + 1
-      name = 'sphere_mu3_' + i.to_s
+      name = 'sphere_coefficient_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= radius*4*i %> 1 <%= radius %>  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -146,9 +158,10 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3><%= mu3 %></mu3>
-              </ode>
+              <torsional>
+                <coefficient><%= coefficient %></coefficient>
+                <patch_radius><%= patch_radius %></patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -171,22 +184,18 @@
           </material>
         </visual>
       </link>
-      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
-        <linear>0 0 0</linear>
-        <angular>0 0 <%= spin0 %></angular>
-      </plugin>
     </model>
 <%  end %>
 
 <%  # Different patch radii
     radius = default_radius
     density = default_density
-    mu3 = default_mu3
+    coefficient = default_coefficient
 
     mass = density * 4.0 * Math::PI / 3.0 * radius **3
     ixx = mass * 0.4 * radius**2
     iyy = ixx
-    izz = izz
+    izz = ixx
 
     i = 0
     patch_radii.each do |patch_radius|
@@ -194,6 +203,7 @@
       name = 'sphere_patch_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= radius*4*i %> 2 <%= radius %>  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -215,11 +225,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3><%= mu3 %></mu3>
+              <torsional>
+                <coefficient><%= coefficient %></coefficient>
                 <patch_radius><%= patch_radius %></patch_radius>
-                <use_curvature>false</use_curvature>
-              </ode>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -242,21 +252,17 @@
           </material>
         </visual>
       </link>
-      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
-        <linear>0 0 0</linear>
-        <angular>0 0 <%= spin0 %></angular>
-      </plugin>
     </model>
 <%  end %>
 
-<%  # Different curvatures (radius)
+<%  # Different surface radius
     density = default_density
-    mu3 = default_mu3
+    coefficient = default_coefficient
 
     mass = density * 4.0 * Math::PI / 3.0 * radius **3
     ixx = mass * 0.4 * radius**2
     iyy = ixx
-    izz = izz
+    izz = ixx
 
     i = 0
     radii.each do |radius|
@@ -264,6 +270,7 @@
       name = 'sphere_radius_' + i.to_s
 %>
     <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose><%= radius*4*i %> 3 <%= radius %>  0 0 0</pose>
       <link name="link">
         <inertial>
@@ -285,11 +292,11 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3><%= mu3 %></mu3>
-                <curvature_radius><%= radius %></curvature_radius>
-                <use_curvature>true</use_curvature>
-              </ode>
+              <torsional>
+                <coefficient><%= coefficient %></coefficient>
+                <surface_radius><%= radius %></surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
@@ -312,10 +319,6 @@
           </material>
         </visual>
       </link>
-      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
-        <linear>0 0 0</linear>
-        <angular>0 0 <%= spin0 %></angular>
-      </plugin>
     </model>
 <%  end %>
 

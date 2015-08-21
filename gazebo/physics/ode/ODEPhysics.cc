@@ -62,6 +62,7 @@
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
 #include "gazebo/physics/ode/ODEUniversalJoint.hh"
+#include "gazebo/physics/ode/ODEFixedJoint.hh"
 
 #include "gazebo/physics/ode/ODERayShape.hh"
 #include "gazebo/physics/ode/ODEBoxShape.hh"
@@ -291,7 +292,10 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
       this->GetContactMaxCorrectingVel());
     physicsMsg.set_contact_surface_layer(
       this->GetContactSurfaceLayer());
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->GetGravity().Ign()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+      msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -341,7 +345,7 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetContactSurfaceLayer(_msg->contact_surface_layer());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
@@ -564,6 +568,7 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
       odeMass->I[0*4+2], odeMass->I[1*4+2]);
 }
 
+//////////////////////////////////////////////////
 Friction_Model ODEPhysics::ConvertFrictionModel(const std::string &_fricModel)
 {
   Friction_Model result = pyramid_friction;
@@ -581,6 +586,7 @@ Friction_Model ODEPhysics::ConvertFrictionModel(const std::string &_fricModel)
   return result;
 }
 
+//////////////////////////////////////////////////
 std::string ODEPhysics::ConvertFrictionModel(const Friction_Model _fricModel)
 {
   std::string result;
@@ -610,6 +616,60 @@ std::string ODEPhysics::ConvertFrictionModel(const Friction_Model _fricModel)
   }
   return result;
 }
+
+//////////////////////////////////////////////////
+World_Solver_Type
+ODEPhysics::ConvertWorldStepSolverType(const std::string &_solverType)
+{
+  World_Solver_Type result = ODE_DEFAULT;
+  if (_solverType.compare("ODE_DANTZIG") == 0)
+    result = ODE_DEFAULT;
+  else if (_solverType.compare("DART_PGS") == 0)
+    result = DART_PGS;
+  else if (_solverType.compare("BULLET_PGS") == 0)
+    result = BULLET_PGS;
+  else
+  {
+    gzerr << "Unrecognized world step solver ["
+          << _solverType
+          << "], returning ODE_DANTZIG"
+          << std::endl;
+  }
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string
+ODEPhysics::ConvertWorldStepSolverType(const World_Solver_Type _solverType)
+{
+  std::string result;
+  switch (_solverType)
+  {
+    case ODE_DEFAULT:
+    {
+      result = "ODE_DANTZIG";
+      break;
+    }
+    case DART_PGS:
+    {
+      result = "DART_PGS";
+      break;
+    }
+    case BULLET_PGS:
+    {
+      result = "BULLET_PGS";
+      break;
+    }
+    default:
+    {
+      result = "unknown";
+      gzerr << "Unrecognized world step solver [" << _solverType << "]"
+            << std::endl;
+    }
+  }
+  return result;
+}
+
 //////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
@@ -690,6 +750,13 @@ void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 }
 
 //////////////////////////////////////////////////
+void ODEPhysics::SetWorldStepSolverType(const std::string &_worldSolverType)
+{
+    dWorldSetWorldStepSolverType(this->dataPtr->worldId,
+    ConvertWorldStepSolverType(_worldSolverType));
+}
+
+//////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSPreconIters()
 {
   return this->sdf->GetElement("ode")->GetElement(
@@ -714,6 +781,13 @@ std::string ODEPhysics::GetFrictionModel() const
 {
   return ConvertFrictionModel(
     dWorldGetQuickStepFrictionModel(this->dataPtr->worldId));
+}
+
+//////////////////////////////////////////////////
+std::string ODEPhysics::GetWorldStepSolverType() const
+{
+  return ConvertWorldStepSolverType(
+    dWorldGetWorldStepSolverType(this->dataPtr->worldId));
 }
 
 //////////////////////////////////////////////////
@@ -795,6 +869,8 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new ODEBallJoint(this->dataPtr->worldId, _parent));
   else if (_type == "universal")
     joint.reset(new ODEUniversalJoint(this->dataPtr->worldId, _parent));
+  else if (_type == "fixed")
+    joint.reset(new ODEFixedJoint(this->dataPtr->worldId, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
@@ -989,6 +1065,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactSoftERP |
                          dContactSoftCFM |
                          dContactApprox1 |
+                         dContactApprox3 |
                          dContactSlip1 |
                          dContactSlip2 |
                          dContactSlip3;
@@ -1012,7 +1089,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd = surf1->GetFrictionPyramid()->direction1;
+  math::Vector3 fd = surf1->FrictionPyramid()->direction1;
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
@@ -1026,10 +1103,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// As a hack, we'll simply compare mu1 from
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
-  math::Vector3 fd2 = surf2->GetFrictionPyramid()->direction1;
+  math::Vector3 fd2 = surf2->FrictionPyramid()->direction1;
   if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
-        surf1->GetFrictionPyramid()->GetMuPrimary() >
-        surf2->GetFrictionPyramid()->GetMuPrimary()))
+        surf1->FrictionPyramid()->MuPrimary() >
+        surf2->FrictionPyramid()->MuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
     fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
@@ -1052,29 +1129,32 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Set the friction coefficients.
-  contact.surface.mu = std::min(surf1->GetFrictionPyramid()->GetMuPrimary(),
-                                surf2->GetFrictionPyramid()->GetMuPrimary());
-  contact.surface.mu2 = std::min(surf1->GetFrictionPyramid()->GetMuSecondary(),
-                                 surf2->GetFrictionPyramid()->GetMuSecondary());
-  contact.surface.mu3 = std::min(surf1->GetFrictionPyramid()->GetMuTorsion(),
-                                 surf2->GetFrictionPyramid()->GetMuTorsion());
+  contact.surface.mu = std::min(surf1->FrictionPyramid()->MuPrimary(),
+                                surf2->FrictionPyramid()->MuPrimary());
+  contact.surface.mu2 = std::min(surf1->FrictionPyramid()->MuSecondary(),
+                                 surf2->FrictionPyramid()->MuSecondary());
+  contact.surface.mu3 = std::min(surf1->FrictionPyramid()->MuTorsion(),
+                                 surf2->FrictionPyramid()->MuTorsion());
   contact.surface.patch_radius =
-      std::max(surf1->GetFrictionPyramid()->GetPatchRadius(),
-               surf2->GetFrictionPyramid()->GetPatchRadius());
-  contact.surface.curvature_radius =
-      std::max(surf1->GetFrictionPyramid()->GetCurvatureRadius(),
-               surf2->GetFrictionPyramid()->GetCurvatureRadius());
-  contact.surface.use_curvature =
-      surf1->GetFrictionPyramid()->GetUseCurvature() &&
-      surf2->GetFrictionPyramid()->GetUseCurvature();
+      std::max(surf1->FrictionPyramid()->PatchRadius(),
+               surf2->FrictionPyramid()->PatchRadius());
+  // the curvature is combined using 1/R = 1/R1 + 1/R2
+  // we can consider doing the same for the patch radius
+  contact.surface.surface_radius = 1/
+      (1/surf1->FrictionPyramid()->SurfaceRadius()+
+      1/surf2->FrictionPyramid()->SurfaceRadius());
+  // not sure how to combine these logic flags
+  contact.surface.use_patch_radius =
+      surf1->FrictionPyramid()->UsePatchRadius() &&
+      surf2->FrictionPyramid()->UsePatchRadius();
 
   // Set the slip values
   contact.surface.slip1 = std::min(surf1->slip1,
                                    surf2->slip1);
   contact.surface.slip2 = std::min(surf1->slip2,
                                    surf2->slip2);
-  contact.surface.slip3 = std::min(surf1->slip3,
-                                   surf2->slip3);
+  contact.surface.slip3 = std::min(surf1->slipTorsion,
+                                   surf2->slipTorsion);
 
   // Set the bounce values
   contact.surface.bounce = std::min(surf1->bounce,
@@ -1286,6 +1366,8 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     else if (_key == "friction_model")
       this->SetFrictionModel(boost::any_cast<std::string>(_value));
+    else if (_key == "world_step_solver")
+      this->SetWorldStepSolverType(boost::any_cast<std::string>(_value));
     else if (_key == "contact_max_correcting_vel")
     {
       double value = boost::any_cast<double>(_value);
@@ -1444,6 +1526,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else if (_key == "friction_model")
     _value = this->GetFrictionModel();
+  else if (_key == "world_step_solver")
+    _value = this->GetWorldStepSolverType();
   else
   {
     return PhysicsEngine::GetParam(_key, _value);

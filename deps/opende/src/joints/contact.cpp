@@ -60,19 +60,14 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
     }
     else
     {
-        if ( contact.surface.mu > 0 ) m++;
-        if (_dequal(contact.surface.mu, dInfinity)) nub++;
+        if ( contact.surface.mu > 0 ) m += 2;
+        if (_dequal(contact.surface.mu, dInfinity)) nub += 2;
     }
     if ( contact.surface.mode & dContactMu3 )
     {
         if ( contact.surface.mu3 < 0 ) contact.surface.mu3 = 0;
         if ( contact.surface.mu3 > 0 ) m++;
         if (_dequal(contact.surface.mu3, dInfinity)) nub ++;
-    }
-    else
-    {
-        if ( contact.surface.mu > 0 ) m++;
-        if (_dequal(contact.surface.mu, dInfinity)) nub++;
     }
 
     the_m = m;
@@ -308,11 +303,14 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     }
 
     // now do jacobian for rotational forces
-    dVector3 t3 = {0, 0, 0};
 
     // third friction direction (torsional)
+    // note that this will only be reachable if mu and mu2
+    // have positive values
     if ( the_m >= 4 )
     {
+        dVector3 t3 = {0, 0, 0};
+
         // Linear, body 1
         info->J1l[s3+0] = t3[0];
         info->J1l[s3+1] = t3[1];
@@ -343,40 +341,43 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             // M = torsional moment
             // F = normal force
             // a = patch radius
-            // R = curvature radius
+            // R = surface radius
             // d = depth
             // mu = torsional friction coefficient
             //
-            // M = (3 * pi * a * mu)/16 * F
+            // M = (3 * pi * a * mu3)/16 * F
             //
-            // When using curvature:
+            // When using radius:
             //
-            // a = R * d
+            // a = sqrt (R * d)
             //
-            // M = (3 * pi * R * d * mu)/16 * F
+            // M = (3 * pi * mu3 * sqrt (R * d))/16 * F
 
-            dReal patch = contact.surface.patch_radius;
-
-            if (contact.surface.use_curvature)
-              patch = contact.surface.curvature_radius * depth;
-
-            if (fabs(patch) < 0.00001)
+            dReal patch_radius;
+            if (!contact.surface.use_patch_radius)
             {
-              contact.surface.patch_radius = 2.0;
+              patch_radius = sqrt(contact.surface.surface_radius * depth);
+            }
+            else
+            {
+              patch_radius = contact.surface.patch_radius;
             }
 
-            double rhs = (3 * M_PI * patch * contact.surface.mu3)/16;
+            double rhs = (3 * M_PI * patch_radius * contact.surface.mu3)/16;
 
             info->lo[3] = -rhs;
             info->hi[3] = rhs;
+
+            // findex[3] must be zero in order for torsional friction moment
+            // to be proportional to normal force
+            if ( contact.surface.mode & dContactApprox3 )
+                info->findex[3] = 0;
         }
         else
         {
-            info->lo[3] = -contact.surface.mu;
-            info->hi[3] = contact.surface.mu;
+            info->lo[3] = 0.0;
+            info->hi[3] = 0.0;
         }
-        if ( contact.surface.mode & dContactApprox1_2 )
-            info->findex[3] = 0;
 
         // set slip (constraint force mixing)
         if ( contact.surface.mode & dContactSlip3 )

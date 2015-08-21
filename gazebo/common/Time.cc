@@ -38,7 +38,6 @@
   #include <mach/mach.h>
 #endif
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 

@@ -315,8 +315,18 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[out] _dimensions Dimensions of geometry.
       /// \return Type of geometry.
+      /// \deprecated See GeometryWidgetValue() function that accepts an
+      /// ignition math object.
       public: std::string GetGeometryWidgetValue(const std::string &_name,
-          math::Vector3 &_dimensions, std::string &_uri) const;
+          math::Vector3 &_dimensions, std::string &_uri) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a geometry value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[out] _dimensions Dimensions of geometry.
+      /// \return Type of geometry.
+      public: std::string GeometryWidgetValue(const std::string &_name,
+          ignition::math::Vector3d &_dimensions, std::string &_uri) const;
 
       /// \brief Get an enum value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -546,7 +556,7 @@ namespace gazebo
       /// \param[out] _uri URI of the geometry mesh, if any.
       /// \return Type of geometry.
       private: std::string GetGeometryWidgetValue(ConfigChildWidget *_widget,
-          math::Vector3 &_dimensions, std::string &_uri) const;
+          ignition::math::Vector3d &_dimensions, std::string &_uri) const;
 
       /// \brief Get an enum value from a child widget.
       /// \param[in] _widget Pointer to the child widget.

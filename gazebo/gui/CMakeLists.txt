@@ -25,13 +25,12 @@ set (sources
   Actions.cc
   AlignWidget.cc
   ApplyWrenchDialog.cc
-  BoxMaker.cc
   CloneWindow.cc
   ConfigWidget.cc
-  CylinderMaker.cc
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
+  HotkeyDialog.cc
   RenderWidget.cc
   GLWidget.cc
   GuiIface.cc
@@ -46,7 +45,6 @@ set (sources
   ModelAlign.cc
   ModelManipulator.cc
   ModelSnap.cc
-  MeshMaker.cc
   ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
@@ -54,7 +52,6 @@ set (sources
   MouseEventHandler.cc
   SaveDialog.cc
   SpaceNav.cc
-  SphereMaker.cc
   SplashScreen.cc
   TimePanel.cc
   TimeWidget.cc
@@ -81,6 +78,7 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
+  HotkeyDialog.hh
   InsertModelWidget.hh
   JointControlWidget.hh
   LayersWidget.hh
@@ -102,8 +100,6 @@ set (qt_headers
 set (headers
   qt.h
   qt_test.h
-  BoxMaker.hh
-  CylinderMaker.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
@@ -113,11 +109,9 @@ set (headers
   ModelAlign.hh
   ModelManipulator.hh
   ModelSnap.hh
-  MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
   SpaceNav.hh
-  SphereMaker.hh
 )
 
 if (HAVE_OCULUS)
@@ -143,7 +137,10 @@ endif ()
 set (qt_tests
   DataLogger_TEST.cc
   GuiIface_TEST.cc
+  HotkeyDialog_TEST.cc
+  LightMaker_TEST.cc
   ModelAlign_TEST.cc
+  ModelMaker_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   SplashScreen_TEST.cc
@@ -229,4 +226,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR
 gz_install_library(gazebo_gui)
 gz_install_includes("gui" ${headers} ${qt_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
-manpage(gzclient 1)
+
+if (UNIX)
+  manpage(gzclient 1)
+endif()

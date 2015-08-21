@@ -296,8 +296,8 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
     }
   }
 
-  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos());
+  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize().Ign());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos().Ign());
   _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
 }
 

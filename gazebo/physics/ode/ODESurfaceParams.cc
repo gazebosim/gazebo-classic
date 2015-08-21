@@ -29,7 +29,7 @@ ODESurfaceParams::ODESurfaceParams()
     kp(1000000000000), kd(1), cfm(0), erp(0.2),
     maxVel(0.01), minDepth(0),
     slip1(0), slip2(0),
-    frictionPyramid(new FrictionPyramid())
+    frictionPyramid(new physics::FrictionPyramid())
 {
 }
 
@@ -79,6 +79,23 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
         gzerr << "Surface friction sdf member is NULL" << std::endl;
       else
       {
+        sdf::ElementPtr torsionalElem = frictionElem->GetElement("torsional");
+        if (torsionalElem)
+        {
+          this->frictionPyramid->SetMuTorsion(
+            torsionalElem->Get<double>("coefficient"));
+          this->frictionPyramid->SetPatchRadius(
+            torsionalElem->Get<double>("patch_radius"));
+          this->frictionPyramid->SetSurfaceRadius(
+            torsionalElem->Get<double>("surface_radius"));
+          this->frictionPyramid->SetUsePatchRadius(
+            torsionalElem->Get<bool>("use_patch_radius"));
+
+          sdf::ElementPtr torsionalOdeElem = torsionalElem->GetElement("ode");
+          if (torsionalOdeElem)
+            this->slipTorsion = torsionalOdeElem->Get<double>("slip");
+        }
+
         sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
         if (!frictionOdeElem)
           gzerr << "Surface friction ode sdf member is NULL" << std::endl;
@@ -88,20 +105,11 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
             frictionOdeElem->Get<double>("mu"));
           this->frictionPyramid->SetMuSecondary(
             frictionOdeElem->Get<double>("mu2"));
-          this->frictionPyramid->SetMuTorsion(
-            frictionOdeElem->Get<double>("mu3"));
-          this->frictionPyramid->SetPatchRadius(
-            frictionOdeElem->Get<double>("patch_radius"));
-          this->frictionPyramid->SetCurvatureRadius(
-            frictionOdeElem->Get<double>("curvature_radius"));
-          this->frictionPyramid->SetUseCurvature(
-            frictionOdeElem->Get<bool>("use_curvature"));
           this->frictionPyramid->direction1 =
             frictionOdeElem->Get<math::Vector3>("fdir1");
 
           this->slip1 = frictionOdeElem->Get<double>("slip1");
           this->slip2 = frictionOdeElem->Get<double>("slip2");
-          this->slip3 = frictionOdeElem->Get<double>("slip3");
         }
       }
     }
@@ -133,19 +141,24 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
-  _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
-  _msg.mutable_friction()->set_mu3(this->frictionPyramid->GetMuTorsion());
-  _msg.mutable_friction()->set_patch_radius(
-      this->frictionPyramid->GetPatchRadius());
-  _msg.mutable_friction()->set_curvature_radius(
-      this->frictionPyramid->GetCurvatureRadius());
-  _msg.mutable_friction()->set_use_curvature(
-      this->frictionPyramid->GetUseCurvature());
+  _msg.mutable_friction()->set_mu(this->frictionPyramid->MuPrimary());
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid->MuSecondary());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
-            this->frictionPyramid->direction1);
+            this->frictionPyramid->direction1.Ign());
+
+  _msg.mutable_friction()->mutable_torsional()->set_coefficient(
+      this->frictionPyramid->MuTorsion());
+
+  _msg.mutable_friction()->mutable_torsional()->set_patch_radius(
+      this->frictionPyramid->PatchRadius());
+  _msg.mutable_friction()->mutable_torsional()->set_surface_radius(
+      this->frictionPyramid->SurfaceRadius());
+  _msg.mutable_friction()->mutable_torsional()->set_use_patch_radius(
+      this->frictionPyramid->UsePatchRadius());
+  _msg.mutable_friction()->mutable_torsional()->mutable_ode()->set_slip(
+      this->slipTorsion);
 
   _msg.set_restitution_coefficient(this->bounce);
   _msg.set_bounce_threshold(this->bounceThreshold);
@@ -169,30 +182,44 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
       this->frictionPyramid->SetMuPrimary(_msg.friction().mu());
     if (_msg.friction().has_mu2())
       this->frictionPyramid->SetMuSecondary(_msg.friction().mu2());
-    if (_msg.friction().has_mu3())
-      this->frictionPyramid->SetMuTorsion(_msg.friction().mu3());
-    if (_msg.friction().has_patch_radius())
-    {
-      this->frictionPyramid->SetPatchRadius(
-          _msg.friction().patch_radius());
-    }
-    if (_msg.friction().has_curvature_radius())
-    {
-      this->frictionPyramid->SetCurvatureRadius(
-          _msg.friction().curvature_radius());
-    }
-    if (_msg.friction().has_use_curvature())
-    {
-      this->frictionPyramid->SetUseCurvature(
-          _msg.friction().use_curvature());
-    }
     if (_msg.friction().has_slip1())
       this->slip1 = _msg.friction().slip1();
     if (_msg.friction().has_slip2())
       this->slip2 = _msg.friction().slip2();
     if (_msg.friction().has_fdir1())
+    {
       this->frictionPyramid->direction1 =
-        msgs::Convert(_msg.friction().fdir1());
+        msgs::ConvertIgn(_msg.friction().fdir1());
+    }
+
+    if (_msg.friction().has_torsional())
+    {
+      if (_msg.friction().torsional().has_coefficient())
+      {
+        this->frictionPyramid->SetMuTorsion(
+            _msg.friction().torsional().coefficient());
+      }
+      if (_msg.friction().torsional().has_patch_radius())
+      {
+        this->frictionPyramid->SetPatchRadius(
+            _msg.friction().torsional().patch_radius());
+      }
+      if (_msg.friction().torsional().has_surface_radius())
+      {
+        this->frictionPyramid->SetSurfaceRadius(
+            _msg.friction().torsional().surface_radius());
+      }
+      if (_msg.friction().torsional().has_use_patch_radius())
+      {
+        this->frictionPyramid->SetUsePatchRadius(
+            _msg.friction().torsional().use_patch_radius());
+      }
+      if (_msg.friction().torsional().has_ode())
+      {
+        if (_msg.friction().torsional().ode().has_slip())
+          this->slipTorsion = _msg.friction().torsional().ode().slip();
+      }
+    }
   }
 
   if (_msg.has_restitution_coefficient())
@@ -215,6 +242,12 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 
 /////////////////////////////////////////////////
 FrictionPyramidPtr ODESurfaceParams::GetFrictionPyramid() const
+{
+  return this->frictionPyramid;
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr ODESurfaceParams::FrictionPyramid() const
 {
   return this->frictionPyramid;
 }

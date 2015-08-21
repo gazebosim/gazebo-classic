@@ -29,7 +29,8 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("JointInspectorDialog");
   this->setWindowTitle(tr("Joint Inspector"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QVBoxLayout *generalLayout = new QVBoxLayout;
 
@@ -88,6 +89,15 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
       odeElem->GetElement("suspension")->Get<double>("cfm"));
   this->configWidget->SetDoubleWidgetValue("suspension_erp",
       odeElem->GetElement("suspension")->Get<double>("erp"));
+
+  // joint type specific properties.
+  this->configWidget->SetStringWidgetValue("gearbox::gearbox_reference_body",
+      jointElem->HasElement("gearbox_reference_body") ?
+      jointElem->Get<std::string>("gearbox_reference_body") : "");
+  this->configWidget->SetDoubleWidgetValue("gearbox::gearbox_ratio",
+      jointElem->Get<double>("gearbox_ratio"));
+  this->configWidget->SetDoubleWidgetValue("screw::thread_pitch",
+      jointElem->Get<double>("thread_pitch"));
 
   this->configWidget->SetWidgetVisible("id", false);
   this->configWidget->SetWidgetVisible("parent_id", false);
@@ -165,6 +175,7 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     std::stringstream axis;
     axis << "axis" << i+1;
     std::string axisStr = axis.str();
+
     this->configWidget->SetWidgetVisible(axisStr, true);
     this->configWidget->SetWidgetReadOnly(axisStr, false);
     this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
@@ -175,10 +186,19 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     std::stringstream axis;
     axis << "axis" << i+1;
     std::string axisStr = axis.str();
+
     this->configWidget->SetWidgetVisible(axisStr, false);
     this->configWidget->SetWidgetReadOnly(axisStr, true);
     this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
   }
+
+  // toggle field visibility according to joint type.
+  bool isGearbox = valueStr == "gearbox";
+  bool isScrew = valueStr == "screw";
+  this->configWidget->SetWidgetVisible("gearbox", isGearbox);
+  this->configWidget->SetWidgetReadOnly("gearbox", !isGearbox);
+  this->configWidget->SetWidgetVisible("screw", isScrew);
+  this->configWidget->SetWidgetReadOnly("screw", !isScrew);
 }
 
 /////////////////////////////////////////////////

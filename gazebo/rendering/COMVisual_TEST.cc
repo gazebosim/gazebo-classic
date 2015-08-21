@@ -63,9 +63,9 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   gazebo::msgs::Link linkMsg;
   linkMsg.set_name("link");
   msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_position(),
-      pos);
+      pos.Ign());
   msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_orientation(),
-      quat);
+      quat.Ign());
 
   // create a link visual
   gazebo::rendering::VisualPtr linkVis;

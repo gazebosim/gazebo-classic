@@ -34,7 +34,8 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("LinkInspector");
   this->setWindowTitle(tr("Link Inspector"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QLabel *linkLabel = new QLabel(tr("Name:"));
   this->linkNameLabel = new QLabel(tr(""));

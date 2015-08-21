@@ -523,7 +523,7 @@ bool ModelCommand::RunImpl()
       if (this->vm.count("info"))
         std::cout << modelMsg.DebugString() << std::endl;
       else if (this->vm.count("pose"))
-        std::cout << gazebo::msgs::Convert(modelMsg.pose()) << std::endl;
+        std::cout << gazebo::msgs::ConvertIgn(modelMsg.pose()) << std::endl;
     }
     else
     {
@@ -540,7 +540,7 @@ bool ModelCommand::RunImpl()
 
     msgs::Model msg;
     msg.set_name(modelName);
-    msgs::Set(msg.mutable_pose(), pose);
+    msgs::Set(msg.mutable_pose(), pose.Ign());
     pub->Publish(msg, true);
   }
 
@@ -568,7 +568,7 @@ bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
 
   msgs::Factory msg;
   msg.set_sdf(_sdf->ToString());
-  msgs::Set(msg.mutable_pose(), _pose);
+  msgs::Set(msg.mutable_pose(), _pose.Ign());
   pub->Publish(msg, true);
 
   return true;

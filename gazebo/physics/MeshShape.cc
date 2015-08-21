@@ -147,7 +147,7 @@ void MeshShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 void MeshShape::ProcessMsg(const msgs::Geometry &_msg)
 {
-  this->SetScale(msgs::Convert(_msg.mesh().scale()));
+  this->SetScale(msgs::ConvertIgn(_msg.mesh().scale()));
   this->SetMesh(_msg.mesh().filename(),
       _msg.mesh().has_submesh() ? _msg.mesh().submesh() : std::string(),
       _msg.mesh().has_center_submesh() ? _msg.mesh().center_submesh() :  false);

@@ -243,8 +243,8 @@ static void printContact (PrintingContext &c, dxJoint *j)
 	if (mode & dContactMu2) c.print ("mu2",ct->contact.surface.mu2);
 	if (mode & dContactMu3) c.print ("mu3",ct->contact.surface.mu3);
 	if (mode & dContactMu3) c.print ("patch_radius",ct->contact.surface.patch_radius);
-	if (mode & dContactMu3) c.print ("curvature_radius",ct->contact.surface.curvature_radius);
-	if (mode & dContactMu3) c.print ("use_curvature",ct->contact.surface.use_curvature);
+	if (mode & dContactMu3) c.print ("surface_radius",ct->contact.surface.surface_radius);
+	if (mode & dContactMu3) c.print ("use_patch_radius",ct->contact.surface.use_patch_radius);
 	if (mode & dContactBounce) c.print ("bounce",ct->contact.surface.bounce);
 	if (mode & dContactBounce) c.print ("bounce_vel",ct->contact.surface.bounce_vel);
 	if (mode & dContactSoftERP) c.print ("soft_ERP",ct->contact.surface.soft_erp);

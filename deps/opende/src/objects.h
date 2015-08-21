@@ -123,6 +123,7 @@ struct dxQuickStepParameters {
   dReal warm_start;  // warm start factor, 0: no warm start, 1: full warm start
   int friction_iterations;  // extra quickstep iterations friction.
   Friction_Model friction_model;  // friction model, enum type Friction_Model
+  World_Solver_Type world_solver_type;  // world step solver, enum type World_Solver_Type.
 };
 
 // robust-step parameters

@@ -85,7 +85,7 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   msgs::Model msg;
   msg.set_name(modelName);
   msg.set_id(model->GetId());
-  msgs::Set(msg.mutable_pose(), pose);
+  msgs::Set(msg.mutable_pose(), pose.Ign());
   modelPub->Publish(msg);
 
   while (pose != model->GetWorldPose())

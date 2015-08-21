@@ -52,7 +52,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
 
-  math::Vector2d imageSize = msgs::Convert(_msg.image_size());
+  math::Vector2d imageSize = msgs::ConvertIgn(_msg.image_size());
 
   double dist = 2.0;
   double width = 1.0;

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _SENSOR_HH_
-#define _SENSOR_HH_
+#ifndef _GAZEBO_SENSOR_HH_
+#define _GAZEBO_SENSOR_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/mutex.hpp>
@@ -24,6 +24,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -130,7 +131,13 @@ namespace gazebo
 
       /// \brief Get the current pose.
       /// \return Current pose of the sensor.
-      public: virtual math::Pose GetPose() const;
+      /// \deprecated See Pose() function that returns an
+      /// ignition::math::Pose3d object.
+      public: virtual math::Pose GetPose() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the current pose.
+      /// \return Current pose of the sensor.
+      public: virtual ignition::math::Pose3d Pose() const;
 
       /// \brief Set whether the sensor is active or not.
       /// \param[in] _value True if active, false if not.
@@ -230,7 +237,7 @@ namespace gazebo
       protected: sdf::ElementPtr sdf;
 
       /// \brief Pose of the sensor.
-      protected: math::Pose pose;
+      protected: ignition::math::Pose3d pose;
 
       /// \brief All event connections.
       protected: std::vector<event::ConnectionPtr> connections;

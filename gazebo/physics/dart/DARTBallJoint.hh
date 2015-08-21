@@ -83,9 +83,6 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool SetLowStop(unsigned int _index,
                                       const math::Angle &_angle);
-
-      /// \brief
-      protected: dart::dynamics::BallJoint *dtBallJoint;
     };
   }
 }

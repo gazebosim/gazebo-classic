@@ -124,8 +124,8 @@ TEST_F(SVGLoader, LoadArcs)
     auto p1 = polyline1[i];
     auto p2 = polyline2[i];
 
-    EXPECT_NEAR(p1.x, p2.x, 0.25);
-    EXPECT_NEAR(p1.y, p2.y, 0.25);
+    EXPECT_NEAR(p1.X(), p2.X(), 0.25);
+    EXPECT_NEAR(p1.Y(), p2.Y(), 0.25);
   }
 
   std::ofstream out("arc_test.html");
@@ -202,8 +202,8 @@ TEST_F(SVGLoader, ClosedLoops)
   out.close();
 
 
-  std::vector< std::vector<math::Vector2d> > closedPolys;
-  std::vector< std::vector<math::Vector2d> > openPolys;
+  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
 
   loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
   EXPECT_EQ(0u, openPolys.size());

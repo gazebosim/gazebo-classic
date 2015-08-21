@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _BULLETTYPES_HH
-#define _BULLETTYPES_HH
+#ifndef _GAZEBO_BULLETTYPES_HH_
+#define _GAZEBO_BULLETTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
 #include "gazebo/physics/bullet/bullet_math_inc.h"

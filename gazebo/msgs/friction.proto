@@ -4,20 +4,58 @@ package gazebo.msgs;
 /// \interface Friction
 /// \brief Information about friction
 
-
 import "vector3d.proto";
 
 message Friction
 {
-  optional double   mu     = 1;
-  optional double   mu2    = 2;
-  optional Vector3d fdir1  = 3;
-  optional double   slip1  = 4;
-  optional double   slip2  = 5;
-  optional double   mu3    = 6;
-  optional double   slip3  = 7;
-  optional double   patch_radius     = 8;
-  optional double   curvature_radius = 9;
-  optional bool     use_curvature    = 10;
+  message Torsional
+  {
+    message ODE
+    {
+      /// \brief Force dependent slip for torsional friction, between the range
+      /// of [0..1].
+      optional double slip = 1;
+    }
+
+    /// \brief Torsional coefficient of friction in the range of [0..1].
+    optional double coefficient = 1;
+
+    /// \brief By default, torsional friction is calculated using the
+    /// "patch_radius", which is sqrt(R*d), where "R" is the radius of the
+    /// collision at the contact point (surface_radius) and "d" is the contact
+    /// depth. If this flag is set to false, surface_radius and contact depth
+    /// will be used instead of patch radius.
+    optional bool use_patch_radius = 2;
+
+    /// \brief Radius of contact patch surface, used for torsional friction.
+    optional double patch_radius = 3;
+
+    /// \brief Surface radius on the point of contact, used for torsional
+    /// friction.
+    optional double surface_radius = 4;
+
+    /// \brief Torsional friction information exclusive to ODE physics engine.
+    optional ODE ode = 5;
+  }
+
+  /// \brief Coefficient of friction in the range of [0..1].
+  optional double mu = 1;
+
+  /// \brief Second coefficient of friction in the range of [0..1].
+  optional double mu2 = 2;
+
+  /// \brief Direction of mu1 in the collision local reference frame.
+  optional Vector3d fdir1 = 3;
+
+  /// \brief Force dependent slip direction 1 in collision local frame, between
+  /// the range of [0..1].
+  optional double slip1 = 4;
+
+  /// \brief Force dependent slip direction 2 in collision local frame, between
+  /// the range of [0..1].
+  optional double slip2 = 5;
+
+  /// \brief Torsional friction.
+  optional Torsional torsional = 6;
 }
 

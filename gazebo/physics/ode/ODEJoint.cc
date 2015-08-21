@@ -641,6 +641,12 @@ void ODEJoint::Reset()
 }
 
 //////////////////////////////////////////////////
+void ODEJoint::CacheForceTorque()
+{
+  // Does nothing for now, will add when recovering pull request #1721
+}
+
+//////////////////////////////////////////////////
 JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 {
   // Note that:
@@ -677,6 +683,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       wrenchAppliedWorld.body2Force =
         this->GetForce(0u) * this->GetLocalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
+    }
+    else if (this->HasType(physics::Base::FIXED_JOINT))
+    {
+      // no correction are necessary for fixed joint
     }
     else
     {

@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the DataLogger widget.
+/// \brief A test class for the main window class.
 class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT

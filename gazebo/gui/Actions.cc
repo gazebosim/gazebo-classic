@@ -31,8 +31,6 @@ QAction *gazebo::gui::g_newAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_openAct = 0;
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_importAct = 0;
-GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveAsAct = 0;
@@ -40,6 +38,8 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveCfgAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_cloneAct = 0;
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_hotkeyChartAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_aboutAct = 0;
 GZ_GUI_VISIBLE
@@ -71,8 +71,6 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_sphereCreateAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_cylinderCreateAct = 0;
-GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_meshCreateAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_pointLghtCreateAct = 0;
 GZ_GUI_VISIBLE

@@ -3,42 +3,24 @@
 <sdf version="1.5">
   <world name="default">
     <physics type="ode">
-      <gravity>0.000000 0.000000 -9.800000</gravity>
       <ode>
         <solver>
           <type>quick</type>
           <iters>1000</iters>
           <precon_iters>0</precon_iters>
-          <sor>1.000000</sor>
+          <sor>1.0</sor>
         </solver>
         <constraints>
           <cfm>0.000000</cfm>
           <erp>0.200000</erp>
-          <contact_max_correcting_vel>1000.000000</contact_max_correcting_vel>
-          <contact_surface_layer>0.00000</contact_surface_layer>
+          <contact_max_correcting_vel>1000.0</contact_max_correcting_vel>
+          <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
-      <bullet>
-        <solver>
-          <type>sequential_impulse</type>
-          <iters>1000</iters>
-          <sor>1.000000</sor>
-        </solver>
-        <constraints>
-          <cfm>0.000000</cfm>
-          <erp>0.200000</erp>
-          <split_impulse>true</split_impulse>
-          <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-          <contact_surface_layer>0.00000</contact_surface_layer>
-        </constraints>
-      </bullet>
-      <real_time_update_rate>0.000000</real_time_update_rate>
-      <max_step_size>0.001</max_step_size>
     </physics>
-
     <gui>
       <camera name="user_camera">
-        <pose>7 -3 2.5 0 0.27 2.35</pose>
+        <pose>-4 1.5 1.9 0 0.17 -0.014</pose>
       </camera>
     </gui>
     <include>
@@ -58,7 +40,7 @@
           <inertia>
             <ixx>0.0016755160819145573</ixx>
             <iyy>0.0016755160819145573</iyy>
-            <izz></izz>
+            <izz>0.0016755160819145573</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -72,15 +54,13 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
-                <kp>500</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
+                <kp>500000</kp>
                 <max_vel>10000</max_vel>
               </ode>
             </contact>
@@ -100,10 +80,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mass_1' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_mass_2'>
@@ -115,7 +91,7 @@
           <inertia>
             <ixx>0.01675516081914557</ixx>
             <iyy>0.01675516081914557</iyy>
-            <izz></izz>
+            <izz>0.01675516081914557</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -129,15 +105,13 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
-                <kp>5000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
+                <kp>500000</kp>
                 <max_vel>10000</max_vel>
               </ode>
             </contact>
@@ -157,10 +131,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mass_2' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_mass_3'>
@@ -172,7 +142,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -186,15 +156,13 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
-                <kp>2120</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
+                <kp>500000</kp>
                 <max_vel>10000</max_vel>
               </ode>
             </contact>
@@ -214,10 +182,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mass_3' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_mass_4'>
@@ -229,7 +193,7 @@
           <inertia>
             <ixx>0.08377580409572787</ixx>
             <iyy>0.08377580409572787</iyy>
-            <izz></izz>
+            <izz>0.08377580409572787</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -243,15 +207,13 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
-                <kp>1000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
+                <kp>500000</kp>
                 <max_vel>10000</max_vel>
               </ode>
             </contact>
@@ -271,10 +233,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mass_4' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_mass_5'>
@@ -300,19 +258,14 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+              </torsional>
             </friction>
             <contact>
               <ode>
-                <!--
-                <kp>4105.0</kp>
-                -->
-                <kp>2052.5</kp>
-                <kd>1000</kd>
-                <min_depth>0</min_depth>
-                <max_vel>100000</max_vel>
+                <kp>500000</kp>
+                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -331,15 +284,11 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mass_5' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
 
 
-    <model name='sphere_mu3_1'>
+    <model name='sphere_coefficient_1'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>0.4 1 0.1  0 0 0</pose>
       <link name="link">
@@ -362,16 +311,14 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.0</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -390,13 +337,9 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mu3_1' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
-    <model name='sphere_mu3_2'>
+    <model name='sphere_coefficient_2'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>0.8 1 0.1  0 0 0</pose>
       <link name="link">
@@ -419,16 +362,14 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.001</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.001</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -447,13 +388,9 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mu3_2' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
-    <model name='sphere_mu3_3'>
+    <model name='sphere_coefficient_3'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>1.2000000000000002 1 0.1  0 0 0</pose>
       <link name="link">
@@ -462,7 +399,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -476,16 +413,14 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -504,13 +439,9 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mu3_3' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
-    <model name='sphere_mu3_4'>
+    <model name='sphere_coefficient_4'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>1.6 1 0.1  0 0 0</pose>
       <link name="link">
@@ -519,7 +450,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -533,16 +464,14 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.01</mu3>
-              </ode>
+              <torsional>
+                <coefficient>0.01</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -561,13 +490,9 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mu3_4' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
-    <model name='sphere_mu3_5'>
+    <model name='sphere_coefficient_5'>
       <allow_auto_disable>0</allow_auto_disable>
       <pose>2.0 1 0.1  0 0 0</pose>
       <link name="link">
@@ -576,7 +501,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -590,16 +515,14 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>1.0</mu3>
-              </ode>
+              <torsional>
+                <coefficient>1.0</coefficient>
+                <patch_radius>2.0</patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -618,10 +541,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_mu3_5' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
 
@@ -635,7 +554,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -649,18 +568,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>0.0</patch_radius>
-                <use_curvature>false</use_curvature>
-              </ode>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -679,10 +595,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_patch_1' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_patch_2'>
@@ -694,7 +606,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -708,18 +620,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>0.1</patch_radius>
-                <use_curvature>false</use_curvature>
-              </ode>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -738,10 +647,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_patch_2' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_patch_3'>
@@ -753,7 +658,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -767,18 +672,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>2.0</patch_radius>
-                <use_curvature>false</use_curvature>
-              </ode>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -797,10 +699,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_patch_3' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_patch_4'>
@@ -812,7 +710,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -826,18 +724,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>5.0</patch_radius>
-                <use_curvature>false</use_curvature>
-              </ode>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -856,10 +751,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_patch_4' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_patch_5'>
@@ -871,7 +762,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -885,18 +776,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
+              <torsional>
+                <coefficient>0.005</coefficient>
                 <patch_radius>10.0</patch_radius>
-                <use_curvature>false</use_curvature>
-              </ode>
+                <use_patch_radius>true</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -915,10 +803,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_patch_5' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
 
@@ -932,7 +816,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -946,18 +830,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-                <curvature_radius>0.01</curvature_radius>
-                <use_curvature>true</use_curvature>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>0.01</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -976,10 +857,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_1' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_radius_2'>
@@ -991,7 +868,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -1005,18 +882,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-                <curvature_radius>0.1</curvature_radius>
-                <use_curvature>true</use_curvature>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>0.1</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -1035,10 +909,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_2' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_radius_3'>
@@ -1050,7 +920,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -1064,18 +934,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-                <curvature_radius>0.8</curvature_radius>
-                <use_curvature>true</use_curvature>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>0.8</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -1094,10 +961,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_3' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_radius_4'>
@@ -1109,7 +972,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -1123,18 +986,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-                <curvature_radius>2.0</curvature_radius>
-                <use_curvature>true</use_curvature>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>2.0</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -1153,10 +1013,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_4' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
     <model name='sphere_radius_5'>
@@ -1168,7 +1024,7 @@
           <inertia>
             <ixx>0.045238934211693047</ixx>
             <iyy>0.045238934211693047</iyy>
-            <izz></izz>
+            <izz>0.045238934211693047</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -1182,18 +1038,15 @@
           </geometry>
           <surface>
             <friction>
-              <ode>
-                <mu3>0.005</mu3>
-                <curvature_radius>10.0</curvature_radius>
-                <use_curvature>true</use_curvature>
-              </ode>
+              <torsional>
+                <coefficient>0.005</coefficient>
+                <surface_radius>10.0</surface_radius>
+                <use_patch_radius>false</use_patch_radius>
+              </torsional>
             </friction>
             <contact>
               <ode>
                 <kp>500000</kp>
-                <kd>100</kd>
-                <min_depth>0</min_depth>
-                <max_vel>10000</max_vel>
               </ode>
             </contact>
           </surface>
@@ -1212,10 +1065,6 @@
           </material>
         </visual>
       </link>
-      <plugin name='sphere_radius_5' filename='libInitialVelocityPlugin.so'>
-        <linear>0 0 0</linear>
-        <angular>0 0 6.283185307179586</angular>
-      </plugin>
     </model>
 
 
