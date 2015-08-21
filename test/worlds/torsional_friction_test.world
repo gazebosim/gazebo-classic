@@ -319,6 +319,8 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <min_depth>0.0001</min_depth>
+                <max_vel>1.0</max_vel>
               </ode>
             </contact>
           </surface>
@@ -370,6 +372,8 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <min_depth>0.0001</min_depth>
+                <max_vel>1.0</max_vel>
               </ode>
             </contact>
           </surface>
@@ -421,6 +425,8 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <min_depth>0.0001</min_depth>
+                <max_vel>1.0</max_vel>
               </ode>
             </contact>
           </surface>
@@ -472,6 +478,8 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <min_depth>0.0001</min_depth>
+                <max_vel>1.0</max_vel>
               </ode>
             </contact>
           </surface>
@@ -523,6 +531,8 @@
             <contact>
               <ode>
                 <kp>500000</kp>
+                <min_depth>0.0001</min_depth>
+                <max_vel>1.0</max_vel>
               </ode>
             </contact>
           </surface>
