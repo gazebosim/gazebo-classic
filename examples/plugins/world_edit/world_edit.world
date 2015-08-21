@@ -54,5 +54,10 @@
     </model>
 
     <plugin filename="libworld_edit.so" name="world_edit"/>
+    <gui>
+      <camera name="user_camera">
+        <pose>11 8 37  0 1.5 1.57</pose>
+      </camera>
+    </gui>
   </world>
 </sdf>
