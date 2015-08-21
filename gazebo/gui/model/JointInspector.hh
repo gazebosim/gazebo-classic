@@ -41,7 +41,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: JointInspector(QWidget *_parent = 0);
+      public: JointInspector(JointMaker *_jointMaker, QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~JointInspector();
@@ -58,6 +58,8 @@ namespace gazebo
       /// \param[in] _pose Pose to set the joint to.
       public: void SetPose(const math::Pose &_pose);
 
+      public: void Open();
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
@@ -66,11 +68,26 @@ namespace gazebo
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
       /// \param[in] _value New joint type value in string.
-      private slots: void OnJointTypeChanged(const QString &_name,
+      private slots: void OnEnumChanged(const QString &_name,
           const QString &_value);
+      private: void OnJointTypeChanged(const QString &_value);
+      private: void OnParentLinkChanged(const QString &_value);
+      private: void OnChildLinkChanged(const QString &_value);
+
+      private slots: void OnSwap();
+
+
+      /// \brief Add a link to the list.
+      /// \param[in] _linkName Scoped link name.
+      private slots: void OnLinkInserted(const std::string &_linkName);
+
+      /// \brief Remove a link from the list.
+      /// \param[in] _linkId Unique link identifying name.
+      private slots: void OnLinkRemoved(const std::string &_linkName);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
+
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
@@ -83,6 +100,11 @@ namespace gazebo
 
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;
+
+      /// \brief A list of gui editor events connected to this palette.
+      private: std::vector<event::ConnectionPtr> connections;
+
+      private: JointMaker *jointMaker;
     };
     /// \}
   }

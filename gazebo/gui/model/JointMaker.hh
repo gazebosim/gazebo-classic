@@ -208,6 +208,8 @@ namespace gazebo
       public: void SetSelected(rendering::VisualPtr _jointVis,
           const bool selected);
 
+      public: std::map<std::string, std::string> LinkList() const;
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -268,6 +270,14 @@ namespace gazebo
       private: void OnSetSelectedJoint(const std::string &_name,
           const bool _selected);
 
+      /// \brief Add a link to the list.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkInserted(const std::string &_linkName);
+
+      /// \brief Remove a link from the list.
+      /// \param[in] _linkId Unique link identifying name.
+      private: void OnLinkRemoved(const std::string &_linkName);
+
       private: void ParentLinkChosen(rendering::VisualPtr _parentLink);
       private: void ChildLinkChosen(rendering::VisualPtr _childLink);
       private: void OnJointTypeChosenDialog(JointType _type);
@@ -284,6 +294,9 @@ namespace gazebo
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
+
+      Q_SIGNALS: void EmitLinkInserted(const std::string &_linkId);
+      Q_SIGNALS: void EmitLinkRemoved(const std::string &_linkId);
 
       /// \brief Qt Callback to open joint inspector
       private slots: void OnOpenInspector();
@@ -355,6 +368,7 @@ namespace gazebo
 
       private: bool mouseMoveEnabled = false;
       private: bool creatingJoint = false;
+      private: std::map<std::string, std::string> linkList;
     };
     /// \}
 

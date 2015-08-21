@@ -121,6 +121,15 @@ JointMaker::JointMaker()
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
 
   this->updateMutex = new boost::recursive_mutex();
+
+  // Gazebo event connections
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkInserted(
+      boost::bind(&JointMaker::OnLinkInserted, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkRemoved(
+      boost::bind(&JointMaker::OnLinkRemoved, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -492,10 +501,14 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointData->SetParent(_parent);
 
   // Inspector
-  jointData->inspector = new JointInspector();
+  jointData->inspector = new JointInspector(this);
   jointData->inspector->setModal(false);
   connect(jointData->inspector, SIGNAL(Applied()),
       jointData, SLOT(OnApply()));
+  connect(this, SIGNAL(EmitLinkRemoved(std::string)), jointData->inspector,
+      SLOT(OnLinkRemoved(std::string)));
+  connect(this, SIGNAL(EmitLinkInserted(std::string)), jointData->inspector,
+      SLOT(OnLinkInserted(std::string)));
 
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
@@ -1057,14 +1070,22 @@ unsigned int JointMaker::GetJointCount()
 /////////////////////////////////////////////////
 void JointData::OnApply()
 {
+  // Get data from inspector
   this->jointMsg->CopyFrom(*this->inspector->GetData());
-  this->type = JointMaker::ConvertJointType(
-      msgs::ConvertJointType(this->jointMsg->type()));
 
+  // Name
   if (this->name != this->jointMsg->name())
     gui::model::Events::jointNameChanged(this->hotspot->GetName(),
         this->jointMsg->name());
   this->name = this->jointMsg->name();
+
+  // Type
+  this->type = JointMaker::ConvertJointType(
+      msgs::ConvertJointType(this->jointMsg->type()));
+
+  // Parent / child
+  gzdbg << "Update JointData's parent and child visuals here or at Update" i
+      << std::endl;
 
   this->dirty = true;
   gui::model::Events::modelChanged();
@@ -1080,8 +1101,7 @@ void JointData::OnOpenInspector()
 void JointData::OpenInspector()
 {
   this->inspector->Update(this->jointMsg);
-  this->inspector->move(QCursor::pos());
-  this->inspector->show();
+  this->inspector->Open();
 }
 
 /////////////////////////////////////////////////
@@ -1376,7 +1396,7 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->jointMsg->set_child_id(joint->child->GetId());
 
   // Inspector
-  joint->inspector = new JointInspector();
+  joint->inspector = new JointInspector(this);
   joint->inspector->Update(joint->jointMsg);
   joint->inspector->setModal(false);
   connect(joint->inspector, SIGNAL(Applied()), joint, SLOT(OnApply()));
@@ -1568,5 +1588,35 @@ void JointMaker::OnJointCreateDialog()
   this->JointAdded();
 
   this->Stop();
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnLinkInserted(const std::string &_linkName)
+{
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  this->linkList[_linkName] = leafName;
+
+  this->EmitLinkInserted(_linkName);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnLinkRemoved(const std::string &_linkName)
+{
+  auto it = this->linkList.find(_linkName);
+  if (it != this->linkList.end())
+  {
+    this->linkList.erase(_linkName);
+    this->EmitLinkRemoved(_linkName);
+  }
+}
+
+/////////////////////////////////////////////////
+std::map<std::string, std::string> JointMaker::LinkList() const
+{
+  return this->linkList;
 }
 

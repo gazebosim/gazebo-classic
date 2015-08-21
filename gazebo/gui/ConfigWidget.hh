@@ -269,6 +269,11 @@ namespace gazebo
       /// \return True if the value is set successfully.
       public: bool SetEnumWidgetValue(const std::string &_name,
           const std::string &_value);
+      public: bool AddItemEnumWidget(const std::string &_name,
+          const std::string &_itemText, const std::string &_itemData);
+      public: bool RemoveItemEnumWidget(const std::string &_name,
+          const std::string &_itemData);
+      public: bool ClearEnumWidget(const std::string &_name);
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
