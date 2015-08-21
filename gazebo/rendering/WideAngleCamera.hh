@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,8 @@ namespace gazebo
     class WideAngleCameraPrivate;
 
     /// \class CameraLens WideAngleCamera.hh rendering/rendering.hh
-    /// \brief Describes a lens of a camera as amapping function of type r = c1*f*fun(theta/c2+c3)
+    /// \brief Describes a lens of a camera
+    ///   as amapping function of type r = c1*f*fun(theta/c2+c3)
     class GAZEBO_VISIBLE CameraLens
     {
       /// \brief Constructor
@@ -69,11 +70,12 @@ namespace gazebo
       /// \param[in] _fun Angle transform function
       /// \param[in] _fun Focal length of the optical system
       /// \param[in] _c3 Angle shift constant, should be 0 in most cases
-      public: void Init(float _c1, float _c2, std::string _fun, float _f, float _c3);
+      public: void Init(double _c1, double _c2, const std::string &_fun,
+                        double _f, double _c3);
 
       /// \brief Init camera lens with standard mapping function
       /// \param[in] _name Mapping function name
-      public: void Init(std::string _name);
+      public: void Init(const std::string &_name);
 
       /// \brief Load camera lens from SDF file
       /// \param[in] _sdf SDF lens element
@@ -92,19 +94,19 @@ namespace gazebo
 
       /// \brief Gets c1 constant
       /// \return c1 constant
-      public: float GetC1() const;
+      public: double GetC1() const;
 
       /// \brief Gets c2 constant
       /// \return c2 constant
-      public: float GetC2() const;
+      public: double GetC2() const;
 
       /// \brief Gets c3 constant
       /// \return c3 constant
-      public: float GetC3() const;
+      public: double GetC3() const;
 
       /// \brief Gets f constant
       /// \return f constant
-      public: float GetF() const;
+      public: double GetF() const;
 
       /// \brief Gets angle transform function
       /// \return Angle transform function string
@@ -112,7 +114,7 @@ namespace gazebo
 
       /// \brief Gets cut off angle
       /// \return Cut off angle
-      public: float GetCutOffAngle() const;
+      public: double GetCutOffAngle() const;
 
       /// \brief Checks if image should be scaled to fit horisontal FOV
       /// \return True if the image will be scaled
@@ -120,43 +122,46 @@ namespace gazebo
 
       /// \brief Set lens projection type
       /// \param[in] _type Lens projection type string
-      public: void SetType(std::string _type);
+      public: void SetType(const std::string &_type);
 
       /// \brief Sets c1 constant
       /// \param[in] _c c1 constant
-      public: void SetC1(float _c);
+      public: void SetC1(double _c);
 
       /// \brief Sets c2 constant
       /// \param[in] _c c2 constant
-      public: void SetC2(float _c);
+      public: void SetC2(double _c);
 
       /// \brief Sets c3 constant
       /// \param[in] _c c3 constant
-      public: void SetC3(float _c);
+      public: void SetC3(double _c);
 
       /// \brief Sets f constant
       /// \param[in] _f f constant
-      public: void SetF(float _f);
+      public: void SetF(double _f);
 
       /// \brief Sets angle transform function
       /// \param[in] _fun Angle transform function string
-      public: void SetFun(std::string _fun);
+      public: void SetFun(const std::string &_fun);
 
       /// \brief Sets cut-off angle
       /// \param[in] _angle cut-off angle
-      public: void SetCutOffAngle(float _angle);
+      public: void SetCutOffAngle(double _angle);
 
       /// \brief Sets whether the image should be scaled to fit horisontal FOV
-      /// \param[in] _scale true if it should, note: c1 and f constants are ignored in this case
+      /// \param[in] _scale true if it should,
+      ///   note: c1 and f constants are ignored in this case
       public: void SetScaleToHFOV(bool _scale);
 
-      /// \brief Set uniform variables of shader for the provided material technique pass
+      /// \brief Set uniform variables of a shader
+      ///   for the provided material technique pass
       /// \param[in] _pass Ogre::Pass used for rendering
       /// \param[in] _ratio Frame aspect ratio
       /// \param[in] _hfov Horisontal field of view
-      public: void SetUniformVariables(Ogre::Pass *_pass, float _ratio, float _hfov);
+      public: void SetUniformVariables(Ogre::Pass *_pass, float _ratio,
+                                       float _hfov);
 
-      /// \brief Converts projection type from one of the predefined projection typed to custom
+      /// \brief Converts projection type from one of presets to `custom`
       private: void ConvertToCustom();
 
       /// \brief SDF element of the lens
@@ -168,13 +173,16 @@ namespace gazebo
 
     /// \class WideAngleCamera WideAngleCamera.hh rendering/rendering.hh
     /// \brief Camera with agile mapping function
-    class GAZEBO_VISIBLE WideAngleCamera : public Camera, protected Ogre::CompositorInstance::Listener
+    class GAZEBO_VISIBLE WideAngleCamera :
+        public Camera,
+        protected Ogre::CompositorInstance::Listener
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
       /// \param[in] _scene Scene that will contain the camera
       /// \param[in] _autoRender Almost everyone should leave this as true.
-      /// \param[in] _textureSize Size of cube map texture used for rendering, may be overriten in sdf
+      /// \param[in] _textureSize Size of cube map texture used for rendering,
+      ///   may be overriten in sdf
       public: WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene,
                               bool _autoRender = true, int _textureSize = 256);
 
@@ -218,15 +226,18 @@ namespace gazebo
       // Documentation inherited
       protected: void RenderImpl() override;
 
-      /// \bried Callback that is used to set mapping material uniform values, implements Ogre::CompositorInstance::Listener interface
+      /// \bried Callback that is used to set mapping material uniform values,
+      ///   implements Ogre::CompositorInstance::Listener interface
       /// \param[in] _pass_id Pass identifier
       /// \param[in] _pass_id Material whose parameters should be set
-      protected: void notifyMaterialRender(Ogre::uint32 _pass_id, Ogre::MaterialPtr &_material) override;
+      protected: void notifyMaterialRender(Ogre::uint32 _pass_id,
+        Ogre::MaterialPtr &_material) override;
 
-      /// \brief Compositor used to render rectangle with attached cube map texture
+      /// \brief Compositor used to render rectangle with attached cube map
       protected: Ogre::CompositorInstance *cubeMapCompInstance;
 
-      /// \brief Set of 6 cameras, each pointing in different direction with FOV of 90deg
+      /// \brief A Set of 6 cameras,
+      ///   each pointing in different direction with FOV of 90deg
       protected: Ogre::Camera *envCameras[6];
 
       /// \brief Render targets for envCameras
@@ -241,7 +252,7 @@ namespace gazebo
       /// \brief Environment texture size
       protected: int envTextureSize;
 
-      /// \brief Pointer to material, that is assigned to 'wamapInstance' compositor
+      /// \brief Pointer to material, used for second rendering pass
       protected: Ogre::MaterialPtr compMat;
 
       /// \brief Camera lens description

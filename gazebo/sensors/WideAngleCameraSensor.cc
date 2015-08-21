@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 #include <mutex>
 
-#include "WideAngleCameraSensor.hh"
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -37,6 +36,7 @@
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/WideAngleCameraSensor.hh"
 
 
 using namespace gazebo;
@@ -148,7 +148,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
       lensTopicName+"info", 1);
 
   this->lensSub = this->node->Subscribe(lensTopicName+"control",
-      &WideAngleCameraSensor::OnCtrlMessage,this);
+      &WideAngleCameraSensor::OnCtrlMessage, this);
 }
 
 //////////////////////////////////////////////////
@@ -175,7 +175,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 
     msgs::CameraLensCmd msg;
 
-    rendering::WideAngleCameraPtr wcamera = 
+    rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
 
     const rendering::CameraLens *lens = wcamera->GetLens();
@@ -209,7 +209,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 
   if (_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET)
   {
-    gzerr << "Control message is not of the set type " << (int)_msg->destiny() << "\n";
+    gzerr << "Control message is not of the set type!\n";
     gzdbg << _msg->DebugString() << "\n";
     return;
   }

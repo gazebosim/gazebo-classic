@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ namespace gazebo
       /// \brief Subscriber to lens control messages
       protected: transport::SubscriberPtr lensSub;
 
-      /// \brief Mutex to lock when receiving or sending lens control/info message
+      /// \brief Mutex to lock when receiving or sending lens message
       protected: std::mutex lensCmdMutex;
 
       /// \brief Horisontal FOV updates to be set in rendering thread

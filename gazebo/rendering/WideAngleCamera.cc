@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  *
 */
 
+#include <GL/glew.h>
+#include <GL/gl.h>
+
 // This file causes include error! WHY?
 // #include "gazebo/rendering/skyx/include/SkyX.h"
 
@@ -26,9 +29,6 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/WideAngleCamera.hh"
-
-#include <GL/glew.h>
-#include <GL/gl.h>
 
 
 using namespace gazebo;
@@ -45,8 +45,8 @@ CameraLens::~CameraLens()
 }
 
 //////////////////////////////////////////////////
-void CameraLens::Init(float _c1, float _c2,
-    std::string _fun, float _f, float _c3)
+void CameraLens::Init(double _c1, double _c2, const std::string &_fun,
+                      double _f, double _c3)
 {
   this->dataPtr->c1 = _c1;
   this->dataPtr->c2 = _c2;
@@ -67,7 +67,7 @@ void CameraLens::Init(float _c1, float _c2,
 }
 
 //////////////////////////////////////////////////
-void CameraLens::Init(std::string _name)
+void CameraLens::Init(const std::string &_name)
 {
   this->SetType(_name);
 }
@@ -123,7 +123,7 @@ bool CameraLens::IsCustom() const
 }
 
 //////////////////////////////////////////////////
-float CameraLens::GetC1() const
+double CameraLens::GetC1() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -131,7 +131,7 @@ float CameraLens::GetC1() const
 }
 
 //////////////////////////////////////////////////
-float CameraLens::GetC2() const
+double CameraLens::GetC2() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -139,7 +139,7 @@ float CameraLens::GetC2() const
 }
 
 //////////////////////////////////////////////////
-float CameraLens::GetC3() const
+double CameraLens::GetC3() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -147,7 +147,7 @@ float CameraLens::GetC3() const
 }
 
 //////////////////////////////////////////////////
-float CameraLens::GetF() const
+double CameraLens::GetF() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -163,7 +163,7 @@ std::string CameraLens::GetFun() const
 }
 
 //////////////////////////////////////////////////
-float CameraLens::GetCutOffAngle() const
+double CameraLens::GetCutOffAngle() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -179,18 +179,18 @@ bool CameraLens::GetScaleToHFOV() const
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetType(std::string _type)
+void CameraLens::SetType(const std::string &_type)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
   // c1, c2, c3, f, fun
-  std::map< std::string, std::tuple<float, float, float,
-      float, std::string> > fun_types = {
-    {"gnomonical",     std::make_tuple(1.0f, 1.0f, 0.0f, 1.0f, "tan")},
-    {"stereographic",  std::make_tuple(2.0f, 2.0f, 0.0f, 1.0f, "tan")},
-    {"equidistant",    std::make_tuple(1.0f, 1.0f, 0.0f, 1.0f, "id")},
-    {"equisolid_angle",std::make_tuple(2.0f, 2.0f, 0.0f, 1.0f, "sin")},
-    {"orthographic",   std::make_tuple(1.0f, 1.0f, 0.0f, 1.0f, "sin")}};
+  std::map< std::string, std::tuple<double, double, double,
+      double, std::string> > fun_types = {
+    {"gnomonical",      std::make_tuple(1.0, 1.0, 0.0, 1.0, "tan")},
+    {"stereographic",   std::make_tuple(2.0, 2.0, 0.0, 1.0, "tan")},
+    {"equidistant",     std::make_tuple(1.0, 1.0, 0.0, 1.0, "id")},
+    {"equisolid_angle", std::make_tuple(2.0, 2.0, 0.0, 1.0, "sin")},
+    {"orthographic",    std::make_tuple(1.0, 1.0, 0.0, 1.0, "sin")}};
 
   fun_types.emplace("custom",
       std::make_tuple(this->GetC1(), this->GetC2(), this->GetC3(), this->GetF(),
@@ -227,12 +227,13 @@ void CameraLens::SetType(std::string _type)
     this->dataPtr->c2 = std::get<1>(params);
     this->dataPtr->c3 = std::get<2>(params);
     this->dataPtr->f = std::get<3>(params);
-    this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
+    this->dataPtr->fun =
+        CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
   }
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetC1(float _c)
+void CameraLens::SetC1(double _c)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -241,11 +242,11 @@ void CameraLens::SetC1(float _c)
   if (!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("c1")->Set((double)_c);
+  this->sdf->GetElement("custom_function")->GetElement("c1")->Set(_c);
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetC2(float _c)
+void CameraLens::SetC2(double _c)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -254,11 +255,11 @@ void CameraLens::SetC2(float _c)
   if (!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("c2")->Set((double)_c);
+  this->sdf->GetElement("custom_function")->GetElement("c2")->Set(_c);
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetC3(float _c)
+void CameraLens::SetC3(double _c)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -267,11 +268,11 @@ void CameraLens::SetC3(float _c)
   if (!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("c3")->Set((double)_c);
+  this->sdf->GetElement("custom_function")->GetElement("c3")->Set(_c);
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetF(float _f)
+void CameraLens::SetF(double _f)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -280,10 +281,10 @@ void CameraLens::SetF(float _f)
   if (!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("f")->Set((double)_f);
+  this->sdf->GetElement("custom_function")->GetElement("f")->Set(_f);
 }
 
-void CameraLens::SetFun(std::string _fun)
+void CameraLens::SetFun(const std::string &_fun)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -306,13 +307,13 @@ void CameraLens::SetFun(std::string _fun)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetCutOffAngle(float _angle)
+void CameraLens::SetCutOffAngle(double _angle)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
   this->dataPtr->cutOffAngle = _angle;
 
-  this->sdf->GetElement("cutoff_angle")->Set((double)_angle);
+  this->sdf->GetElement("cutoff_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -330,12 +331,6 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,
   Ogre::GpuProgramParametersSharedPtr uniforms =
     _pass->getFragmentProgramParameters();
 
-  math::Vector3 fun_m[] = {
-    math::Vector3(1, 0, 0),
-    math::Vector3(0, 1, 0),
-    math::Vector3(0, 0, 1)
-  };
-
   uniforms->setNamedConstant("c1", static_cast<Ogre::Real>(this->dataPtr->c1));
   uniforms->setNamedConstant("c2", static_cast<Ogre::Real>(this->dataPtr->c2));
   uniforms->setNamedConstant("c3", static_cast<Ogre::Real>(this->dataPtr->c3));
@@ -343,7 +338,7 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,
   if (this->GetScaleToHFOV())
   {
     float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
-    float fun_res = this->dataPtr->fun.Apply(param);
+    float fun_res = this->dataPtr->fun.Apply(static_cast<float>(param));
 
     float new_f = 1.0f/(this->dataPtr->c1*fun_res);
 
@@ -375,10 +370,10 @@ void CameraLens::ConvertToCustom()
 
   sdf::ElementPtr cf = this->sdf->AddElement("custom_function");
 
-  cf->AddElement("c1")->Set((double)this->dataPtr->c1);
-  cf->AddElement("c2")->Set((double)this->dataPtr->c2);
-  cf->AddElement("c3")->Set((double)this->dataPtr->c3);
-  cf->AddElement("f")->Set((double)this->dataPtr->f);
+  cf->AddElement("c1")->Set(this->dataPtr->c1);
+  cf->AddElement("c2")->Set(this->dataPtr->c2);
+  cf->AddElement("c3")->Set(this->dataPtr->c3);
+  cf->AddElement("f")->Set(this->dataPtr->f);
 
   cf->AddElement("fun")->Set(this->dataPtr->fun.AsString());
 }
@@ -393,7 +388,8 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
   this->lens = new CameraLens();
 
   envCubeMapTexture = NULL;
-  for(int i=0;i<6;i++)
+
+  for (int i = 0; i < 6; ++i)
   {
     envCameras[i] = NULL;
     envRenderTargets[i] = NULL;
@@ -438,7 +434,7 @@ void WideAngleCamera::Load()
 //////////////////////////////////////////////////
 void WideAngleCamera::Fini()
 {
-  for(int i=0;i<6;i++)
+  for (int i = 0; i < 6; ++i)
   {
     RTShaderSystem::DetachViewport(this->envViewports[i], this->GetScene());
 
@@ -450,7 +446,9 @@ void WideAngleCamera::Fini()
   }
 
   if (this->envCubeMapTexture)
-    Ogre::TextureManager::getSingleton().remove(this->envCubeMapTexture->getName());
+    Ogre::TextureManager::getSingleton().remove(
+      this->envCubeMapTexture->getName());
+
   this->envCubeMapTexture = NULL;
 
   Camera::Fini();
@@ -486,8 +484,10 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
       this->compMat =
           Ogre::MaterialManager::getSingleton().getByName("Gazebo/WideLensMap");
 
-      if (!this->compMat->getTechnique(0)->getPass(0)->getNumTextureUnitStates())
-        this->compMat->getTechnique(0)->getPass(0)->createTextureUnitState();
+      auto pass = this->compMat->getTechnique(0)->getPass(0);
+
+      if (!pass->getNumTextureUnitStates())
+        pass->createTextureUnitState();
 
       this->cubeMapCompInstance->addListener(this);
     }
@@ -513,7 +513,7 @@ void WideAngleCamera::SetEnvTextureSize(int _size)
 //////////////////////////////////////////////////
 void WideAngleCamera::CreateEnvCameras()
 {
-  for(int i=0;i<6;i++)
+  for (int i = 0; i < 6; ++i)
   {
     std::stringstream name_str;
 
@@ -538,9 +538,9 @@ void WideAngleCamera::SetClipDist()
 
   sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
   if (!clipElem)
-    gzthrow("Camera has no <clip> tag.");
+    gzthrow("Camera has no <clip> element.");
 
-  for(int i=0;i<6;i++)
+  for (int i = 0; i<6; ++i)
   {
     if (this->envCameras[i])
     {
@@ -578,7 +578,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
       false,
       fsaa).getPointer();
 
-  for(int i=0;i<6;i++)
+  for (int i = 0; i < 6; ++i)
   {
     Ogre::RenderTarget *rtt;
     rtt = this->envCubeMapTexture->getBuffer(i)->getRenderTarget();
@@ -597,7 +597,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 
     this->envViewports[i] = vp;
 
-    //FIXME: problem with Skyx include
+    // FIXME: problem with Skyx include
     // if (this->GetScene()->GetSkyX())
     //   rtt->addListener(this->GetScene()->GetSkyX());
 
@@ -613,7 +613,7 @@ void WideAngleCamera::RenderImpl()
   math::Quaternion orient = this->GetWorldRotation();
   math::Vector3 pos = this->GetWorldPosition();
 
-  for(int i=0;i<6;i++)
+  for (int i = 0; i < 6; ++i)
   {
     this->envCameras[i]->setPosition(this->camera->getRealPosition());
     this->envCameras[i]->setOrientation(this->camera->getRealOrientation());
@@ -625,7 +625,7 @@ void WideAngleCamera::RenderImpl()
   this->envCameras[3]->pitch(Ogre::Degree(-90));
   this->envCameras[5]->rotate(this->camera->getDerivedUp(), Ogre::Degree(180));
 
-  for(int i=0;i<6;i++)
+  for (int i = 0; i < 6; ++i)
     this->envRenderTargets[i]->update();
 
   compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
@@ -659,7 +659,7 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
     this->GetAspectRatio(),
     this->GetHFOV().Radian());
 
-  //XXX: OGRE does not allow to enable cubemap filtering extention thru it's API,
+  // XXX: OGRE doesn't allow to enable cubemap filtering extention thru it's API
   // suppose that this function was invoked in a thread that has OpenGL context
   glEnable(GL_ARB_seamless_cube_map);
   // Some drivers do not support this extention
