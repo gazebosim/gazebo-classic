@@ -559,10 +559,13 @@ static void* ComputeRows(void *p)
             // torsinal friction should have been added as the third row from
             // contact normal constraint
             // this_is_torsional_friction
-            hi_act = hi[index];
-            lo_act = lo[index];
-            hi_act_erp = hi[index];
-            lo_act_erp = lo[index];
+            hi_act = dFabs (hi[index] * lambda[constraint_index]);
+            lo_act = -hi_act;
+            if (inline_position_correction)
+            {
+              hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+              lo_act_erp = -hi_act_erp;
+            }
             // printf("lo %f hi %f\n", lo[index], hi[index]);
           }
           else

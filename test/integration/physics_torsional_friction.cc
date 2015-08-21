@@ -321,13 +321,13 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       }
       else
       {
-        gzerr << "accz ana [" << (appliedTorque - frictionTorque) / sphere.izz
-              << "accz act [" << acc.z
-              << "] app [" << appliedTorque
-              << "] fri [" << frictionTorque
-              << "] izz [" << sphere.izz
-              << "] coef [" << frictionCoef
-              << "]\n";
+        // gzerr << "accz anly [" << (appliedTorque - frictionTorque) / sphere.izz
+        //       << "] actual [" << acc.z
+        //       << "] app [" << appliedTorque
+        //       << "] fri [" << frictionTorque
+        //       << "] izz [" << sphere.izz
+        //       << "] coef [" << frictionCoef
+        //       << "]\n";
         // acc.z = (appliedTorque - frictionTorque) / Izz
         sphere.error.InsertData(
             acc.z - (appliedTorque - frictionTorque) / sphere.izz);
