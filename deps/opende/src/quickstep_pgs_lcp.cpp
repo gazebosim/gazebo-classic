@@ -553,10 +553,12 @@ static void* ComputeRows(void *p)
         dReal hi_act_erp, lo_act_erp;
         if (constraint_index >= 0)
         {
-          bool this_is_torsional_friction;
-          if (this_is_torsional_friction)
+          // printf ("index diff %d\n", index - constraint_index);
+          if (index - constraint_index >= 3)
           {
-            // how do we know this constraint is for torsional friction?
+            // torsinal friction should have been added as the third row from
+            // contact normal constraint
+            // this_is_torsional_friction
             hi_act = hi[index];
             lo_act = -hi_act;
             hi_act_erp = hi[index];
