@@ -367,6 +367,8 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             info->lo[3] = -rhs;
             info->hi[3] = rhs;
 
+            // printf("lo %f hi %f\n", info->lo[3], info->hi[3]);
+
             // findex[3] must be zero in order for torsional friction moment
             // to be proportional to normal force
             if ( contact.surface.mode & dContactApprox3 )
@@ -374,6 +376,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         }
         else
         {
+            printf("should not be here\n");
             info->lo[3] = 0.0;
             info->hi[3] = 0.0;
         }

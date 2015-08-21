@@ -560,9 +560,10 @@ static void* ComputeRows(void *p)
             // contact normal constraint
             // this_is_torsional_friction
             hi_act = hi[index];
-            lo_act = -hi_act;
+            lo_act = lo[index];
             hi_act_erp = hi[index];
-            lo_act_erp = -hi_act_erp;
+            lo_act_erp = lo[index];
+            // printf("lo %f hi %f\n", lo[index], hi[index]);
           }
           else
           {
@@ -610,7 +611,7 @@ static void* ComputeRows(void *p)
           {
             hi_act_erp = hi[index];
             lo_act_erp = lo[index];
-           }
+          }
         }
         // compute lambda and clamp it to [lo,hi].
         // @@@ SSE not a win here
