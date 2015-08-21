@@ -600,16 +600,18 @@ static void* ComputeRows(void *p)
                 dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
             }
           }
-        } else {
-              // FOR erp throttled by info.c_v_max or info.c
-            hi_act = hi[index];
-            lo_act = lo[index];
-            if (inline_position_correction)
-            {
-              hi_act_erp = hi[index];
-              lo_act_erp = lo[index];
-             }
+        }
+        else
+        {
+          // FOR erp throttled by info.c_v_max or info.c
+          hi_act = hi[index];
+          lo_act = lo[index];
+          if (inline_position_correction)
+          {
+            hi_act_erp = hi[index];
+            lo_act_erp = lo[index];
            }
+        }
         // compute lambda and clamp it to [lo,hi].
         // @@@ SSE not a win here
 #undef SSE_CLAMP
