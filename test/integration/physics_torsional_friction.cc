@@ -282,10 +282,8 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
     ASSERT_TRUE(sphere.link != NULL);
   }
 
-  // gzerr << "0 sec"; getchar();
   // Step so spheres settle in the equilibrium depth
   world->Step(1000);
-  // gzerr << "1 sec"; getchar();
 
   int maxSteps = 10;
   int step = 0;
@@ -313,7 +311,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       double frictionCoef = sphere.coefficient * 3*M_PI/16 *
           sphere.patch;
       double frictionTorque = normalZ * frictionCoef;
-
+      double frictionAcc = (appliedTorque - frictionTorque) / sphere.izz;
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)
       {
@@ -321,21 +319,17 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       }
       else
       {
-        // gzerr << "accz anly [" << (appliedTorque - frictionTorque) / sphere.izz
+        // gzerr << "accz anly [" << frictionAcc
         //       << "] actual [" << acc.z
         //       << "] app [" << appliedTorque
         //       << "] fri [" << frictionTorque
         //       << "] izz [" << sphere.izz
         //       << "] coef [" << frictionCoef
         //       << "]\n";
-        // acc.z = (appliedTorque - frictionTorque) / Izz
-        sphere.error.InsertData(
-            acc.z - (appliedTorque - frictionTorque) / sphere.izz);
-        EXPECT_NEAR(acc.z, (appliedTorque - frictionTorque) / sphere.izz,
-                    g_friction_tolerance);
+        sphere.error.InsertData(acc.z - frictionAcc);
+        EXPECT_NEAR(acc.z, frictionAcc, g_friction_tolerance);
       }
     }
-    // gzerr << "step " << step; getchar();
   }
 
   // Check error separately to reduce console spam
