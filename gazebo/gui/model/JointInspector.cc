@@ -19,33 +19,26 @@
 #include "gazebo/common/Assert.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointInspector.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
+JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
+    : QDialog(_parent), jointMaker(_jointMaker)
 {
   this->setObjectName("JointInspectorDialog");
   this->setWindowTitle(tr("Joint Inspector"));
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
-  QVBoxLayout *generalLayout = new QVBoxLayout;
-
   this->configWidget = new ConfigWidget;
   msgs::Joint jointMsg;
   configWidget->Load(&jointMsg);
 
-  QScrollArea *scrollArea = new QScrollArea;
-  scrollArea->setWidget(configWidget);
-  scrollArea->setWidgetResizable(true);
-
-  generalLayout->setContentsMargins(0, 0, 0, 0);
-  generalLayout->addWidget(scrollArea);
-
-  // fill them with SDF default values
+  // Fill with SDF default values
   sdf::ElementPtr jointElem = msgs::JointToSDF(jointMsg);
   sdf::ElementPtr axisElem = jointElem->GetElement("axis");
   sdf::ElementPtr axisLimitElem = axisElem->GetElement("limit");
@@ -99,9 +92,12 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
   this->configWidget->SetDoubleWidgetValue("screw::thread_pitch",
       jointElem->Get<double>("thread_pitch"));
 
+  // Hide fields
   this->configWidget->SetWidgetVisible("id", false);
   this->configWidget->SetWidgetVisible("parent_id", false);
   this->configWidget->SetWidgetVisible("child_id", false);
+  this->configWidget->SetWidgetVisible("parent", false);
+  this->configWidget->SetWidgetVisible("child", false);
 
   this->configWidget->SetWidgetReadOnly("id", true);
   this->configWidget->SetWidgetReadOnly("parent_id", true);
@@ -109,13 +105,84 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
   this->configWidget->SetWidgetReadOnly("parent", true);
   this->configWidget->SetWidgetReadOnly("child", true);
 
+  // Custom parent / child widgets
+  // Parent
+  std::vector<std::string> links;
+  gazebo::gui::ConfigChildWidget *parentLinkWidget =
+      configWidget->CreateEnumWidget("parent", links, 0);
+  parentLinkWidget->setStyleSheet(
+      "QWidget\
+      {\
+        background-color: " + ConfigWidget::level0BgColor +
+      "}\
+      QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+      {\
+        background-color: " + ConfigWidget::level0WidgetColor +
+      "}");
+  this->configWidget->AddConfigChildWidget("parentCombo", parentLinkWidget);
+
+  // Child
+  gazebo::gui::ConfigChildWidget *childLinkWidget =
+      configWidget->CreateEnumWidget("child", links, 0);
+  childLinkWidget->setStyleSheet(
+      "QWidget\
+      {\
+        background-color: " + ConfigWidget::level0BgColor +
+      "}\
+      QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+      {\
+        background-color: " + ConfigWidget::level0WidgetColor +
+      "}");
+  this->configWidget->AddConfigChildWidget("childCombo", childLinkWidget);
+
+  // Swap button
+  QToolButton *swapButton = new QToolButton();
+  swapButton->setText("Swap");
+  swapButton->setMinimumWidth(60);
+  swapButton->setStyleSheet(
+      "QToolButton\
+      {\
+        background-color: " + ConfigWidget::level0BgColor +
+      "}");
+  connect(swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
+
+  // Links layout
+  QGridLayout *linksLayout = new QGridLayout();
+  linksLayout->setContentsMargins(0, 0, 0, 0);
+  linksLayout->addWidget(parentLinkWidget, 0, 0);
+  linksLayout->addWidget(childLinkWidget, 1, 0);
+  linksLayout->addWidget(swapButton, 0, 1, 2, 1);
+
+  // Add the widgets to the main layout
+  QVBoxLayout *configWidgetLayout = qobject_cast<QVBoxLayout *>(
+      this->configWidget->layout());
+  QGroupBox *widget = qobject_cast<QGroupBox *>(
+      configWidgetLayout->itemAt(0)->widget());
+  QVBoxLayout *widgetLayout = qobject_cast<QVBoxLayout *>(widget->layout());
+  if (widgetLayout)
+    widgetLayout->insertLayout(0, linksLayout);
+  else
+    gzerr << "Not possible to add links to config widget" << std::endl;
+
+  // Connect all enum value changes
   QObject::connect(this->configWidget,
       SIGNAL(EnumValueChanged(const QString &, const QString &)), this,
-      SLOT(OnJointTypeChanged(const QString &, const QString &)));
+      SLOT(OnEnumChanged(const QString &, const QString &)));
 
-  this->OnJointTypeChanged("type",
-      tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
+  // Joint type
+  this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
 
+  // Scroll area
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(this->configWidget);
+  scrollArea->setWidgetResizable(true);
+
+  // General layout
+  QVBoxLayout *generalLayout = new QVBoxLayout;
+  generalLayout->setContentsMargins(0, 0, 0, 0);
+  generalLayout->addWidget(scrollArea);
+
+  // Buttons
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
@@ -129,6 +196,7 @@ JointInspector::JointInspector(QWidget *_parent) : QDialog(_parent)
   buttonsLayout->addWidget(OKButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
+  // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(generalLayout);
   mainLayout->addLayout(buttonsLayout);
@@ -159,12 +227,43 @@ void JointInspector::SetPose(const math::Pose &_pose)
 /////////////////////////////////////////////////
 msgs::Joint *JointInspector::GetData() const
 {
-  return dynamic_cast<msgs::Joint *>(this->configWidget->GetMsg());
+  std::string currentParent =
+      this->configWidget->GetEnumWidgetValue("parentCombo");
+
+  std::string currentChild =
+      this->configWidget->GetEnumWidgetValue("childCombo");
+
+  if (currentParent == currentChild)
+  {
+    gzerr << "Parent link equal to child link - not updating joint."
+        << std::endl;
+    return NULL;
+  }
+
+  // Get updated message from widget
+  msgs::Joint *msg = dynamic_cast<msgs::Joint *>(this->configWidget->GetMsg());
+
+  // Use parent / child from our custom widget
+  msg->set_parent(currentParent);
+  msg->set_child(currentChild);
+
+  return msg;
 }
 
 /////////////////////////////////////////////////
-void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
+void JointInspector::OnEnumChanged(const QString &_name,
     const QString &_value)
+{
+  if (_name == "type")
+    this->OnJointTypeChanged(_value);
+  else if (_name == "parentCombo")
+    this->OnParentLinkChanged(_value);
+  else if (_name == "childCombo")
+    this->OnChildLinkChanged(_value);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnJointTypeChanged(const QString &_value)
 {
   std::string valueStr = _value.toLower().toStdString();
   unsigned int axisCount = JointMaker::GetJointAxisCount(
@@ -199,6 +298,85 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
   this->configWidget->SetWidgetReadOnly("gearbox", !isGearbox);
   this->configWidget->SetWidgetVisible("screw", isScrew);
   this->configWidget->SetWidgetReadOnly("screw", !isScrew);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnParentLinkChanged(const QString &_linkName)
+{
+  gzdbg << "JointInspector::OnParentLinkChanged: " << _linkName.toStdString()
+      << std::endl;
+  // If it's the same as the child, return to previous value
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnChildLinkChanged(const QString &_linkName)
+{
+  gzdbg << "JointInspector::OnChildLinkChanged" << _linkName.toStdString()
+      << std::endl;
+  // If it's the same as the parent, return to previous value
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnSwap()
+{
+  gzdbg << "JointInspector::OnSwap" << std::endl;
+  // Get current values
+
+  // Clear comboboxes
+
+  // Add items according to link list, but remove not allowed options
+  // Consider disabling options
+
+  // Choose new options
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnLinkInserted(const std::string &_linkName)
+{
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  this->configWidget->AddItemEnumWidget("parentCombo", leafName, _linkName);
+  this->configWidget->AddItemEnumWidget("childCombo", leafName, _linkName);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnLinkRemoved(const std::string &_linkName)
+{
+  this->configWidget->RemoveItemEnumWidget("parentCombo", _linkName);
+  this->configWidget->RemoveItemEnumWidget("childCombo", _linkName);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::Open()
+{
+  // Fill link combo boxes
+  this->configWidget->ClearEnumWidget("parentCombo");
+  this->configWidget->ClearEnumWidget("childCombo");
+
+  for (auto link : this->jointMaker->LinkList())
+  {
+    this->configWidget->AddItemEnumWidget("parentCombo", link.second,
+        link.first);
+    this->configWidget->AddItemEnumWidget("childCombo", link.second,
+        link.first);
+  }
+
+  // Select current parent / child
+  std::string currentParent =
+      this->configWidget->GetStringWidgetValue("parent");
+  std::string currentChild =
+      this->configWidget->GetStringWidgetValue("child");
+
+  this->configWidget->blockSignals(true);
+  this->configWidget->SetEnumWidgetValue("parentCombo", currentParent);
+  this->configWidget->SetEnumWidgetValue("childCombo", currentChild);
+  this->configWidget->blockSignals(false);
+
+  this->move(QCursor::pos());
+  this->show();
 }
 
 /////////////////////////////////////////////////

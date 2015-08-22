@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _CONFIG_WIDGET_HH_
-#define _CONFIG_WIDGET_HH_
+#ifndef _GAZEBO_CONFIG_WIDGET_HH_
+#define _GAZEBO_CONFIG_WIDGET_HH_
 
 #include <string>
 #include <vector>
@@ -269,6 +269,27 @@ namespace gazebo
       /// \return True if the value is set successfully.
       public: bool SetEnumWidgetValue(const std::string &_name,
           const std::string &_value);
+
+      /// \brief Add an item to a child enum widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _itemText Enum value to be displayed
+      /// \param[in] _itemData Aditional data for the enum which uniquely
+      /// identifies it.
+      /// \return True if the item is added successfully.
+      public: bool AddItemEnumWidget(const std::string &_name,
+          const std::string &_itemText, const std::string &_itemData);
+
+      /// \brief Remove an item from a child enum widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _itemData Data which uniquely identifies the enum value.
+      /// \return True if the item is removed successfully.
+      public: bool RemoveItemEnumWidget(const std::string &_name,
+          const std::string &_itemData);
+
+      /// \brief Remove all items from a child enum widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return True if successful.
+      public: bool ClearEnumWidget(const std::string &_name);
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -614,37 +635,37 @@ namespace gazebo
       private: google::protobuf::Message *configMsg;
 
       /// \brief Color used for the background of level 0 widgets.
-      private: static const QString level0BgColor;
+      public: static const QString level0BgColor;
 
       /// \brief Color used for the background of level 0 widgets.
-      private: static const QString level1BgColor;
+      public: static const QString level1BgColor;
 
       /// \brief Color used for the background of level 0 widgets.
-      private: static const QString level2BgColor;
+      public: static const QString level2BgColor;
 
       /// \brief Color used for the background of level 0 widgets.
-      private: static const QString level3BgColor;
+      public: static const QString level3BgColor;
 
       /// \brief Color used for the widget areas of of level 0 widgets.
-      private: static const QString level0WidgetColor;
+      public: static const QString level0WidgetColor;
 
       /// \brief Color used for the widget areas of of level 0 widgets.
-      private: static const QString level1WidgetColor;
+      public: static const QString level1WidgetColor;
 
       /// \brief Color used for the widget areas of of level 0 widgets.
-      private: static const QString level2WidgetColor;
+      public: static const QString level2WidgetColor;
 
       /// \brief Color used for the widget areas of of level 0 widgets.
-      private: static const QString level3WidgetColor;
+      public: static const QString level3WidgetColor;
 
       /// \brief Red color used for "red" or "x" fields.
-      private: static const QString redColor;
+      public: static const QString redColor;
 
       /// \brief Red color used for "green" or "y" fields.
-      private: static const QString greenColor;
+      public: static const QString greenColor;
 
       /// \brief Red color used for "blue" or "z" fields.
-      private: static const QString blueColor;
+      public: static const QString blueColor;
     };
   }
 }
