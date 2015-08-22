@@ -62,6 +62,7 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
         if ( contact.surface.mu > 0 ) m += 2;
         if (_dequal(contact.surface.mu, dInfinity)) nub += 2;
     }
+
     if ( contact.surface.mode & dContactMu3 )
     {
         if ( contact.surface.mu3 < 0 ) contact.surface.mu3 = 0;
@@ -308,6 +309,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     // have positive values
     if ( the_m >= 4 )
     {
+        // printf("the_m: %d\n", the_m);
         dVector3 t3 = {0, 0, 0};
 
         // Linear, body 1
@@ -373,17 +375,11 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             // to be proportional to normal force
             if ( contact.surface.mode & dContactApprox3 )
                 info->findex[3] = 0;
-        }
-        else
-        {
-            printf("should not be here\n");
-            info->lo[3] = 0.0;
-            info->hi[3] = 0.0;
-        }
 
-        // set slip (constraint force mixing)
-        if ( contact.surface.mode & dContactSlip3 )
-            info->cfm[3] = contact.surface.slip3;
+            // set slip (constraint force mixing)
+            if ( contact.surface.mode & dContactSlip3 )
+                info->cfm[3] = contact.surface.slip3;
+        }
     }
 }
 

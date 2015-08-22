@@ -1061,14 +1061,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Set the contact surface parameter flags.
   contact.surface.mode = dContactBounce |
                          dContactMu2 |
-                         dContactMu3 |
                          dContactSoftERP |
                          dContactSoftCFM |
                          dContactApprox1 |
                          dContactApprox3 |
                          dContactSlip1 |
-                         dContactSlip2 |
-                         dContactSlip3;
+                         dContactSlip2;
 
   ODESurfaceParamsPtr surf1 = _collision1->GetODESurface();
   ODESurfaceParamsPtr surf2 = _collision2->GetODESurface();
@@ -1135,18 +1133,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                  surf2->FrictionPyramid()->MuSecondary());
   contact.surface.mu3 = std::min(surf1->FrictionPyramid()->MuTorsion(),
                                  surf2->FrictionPyramid()->MuTorsion());
-  contact.surface.patch_radius =
-      std::max(surf1->FrictionPyramid()->PatchRadius(),
-               surf2->FrictionPyramid()->PatchRadius());
-  // the curvature is combined using 1/R = 1/R1 + 1/R2
-  // we can consider doing the same for the patch radius
-  contact.surface.surface_radius = 1/
-      (1/surf1->FrictionPyramid()->SurfaceRadius()+
-      1/surf2->FrictionPyramid()->SurfaceRadius());
-  // not sure how to combine these logic flags
-  contact.surface.use_patch_radius =
-      surf1->FrictionPyramid()->UsePatchRadius() &&
-      surf2->FrictionPyramid()->UsePatchRadius();
 
   // Set the slip values
   contact.surface.slip1 = std::min(surf1->slip1,
@@ -1155,6 +1141,32 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                                    surf2->slip2);
   contact.surface.slip3 = std::min(surf1->slipTorsion,
                                    surf2->slipTorsion);
+
+  if (contact.surface.mu3 > 0)
+  {
+    // gzerr << _collision1->GetScopedName()
+    //       << " mu3 " << contact.surface.mu3 << "\n";
+    contact.surface.mode |= dContactMu3;
+    contact.surface.patch_radius =
+        std::max(surf1->FrictionPyramid()->PatchRadius(),
+                 surf2->FrictionPyramid()->PatchRadius());
+    // the curvature is combined using 1/R = 1/R1 + 1/R2
+    // we can consider doing the same for the patch radius
+    contact.surface.surface_radius = 1/
+        (1/surf1->FrictionPyramid()->SurfaceRadius()+
+        1/surf2->FrictionPyramid()->SurfaceRadius());
+    // not sure how to combine these logic flags
+    contact.surface.use_patch_radius =
+        surf1->FrictionPyramid()->UsePatchRadius() &&
+        surf2->FrictionPyramid()->UsePatchRadius();
+
+    if (contact.surface.slip3 > 0)
+    {
+      // gzerr << _collision1->GetScopedName()
+      //       << " slip3 " << contact.surface.slip3 << "\n";
+      contact.surface.mode |= dContactSlip3;
+    }
+  }
 
   // Set the bounce values
   contact.surface.bounce = std::min(surf1->bounce,

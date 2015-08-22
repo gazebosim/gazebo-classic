@@ -53,7 +53,7 @@ class PhysicsFrictionTest : public ServerFixture,
                 physics::SurfaceParamsPtr surf = (*iter)->GetSurface();
                 // Use the Secondary friction value,
                 // since gravity has a non-zero component in the y direction
-                this->friction = surf->GetFrictionPyramid()->GetMuSecondary();
+                this->friction = surf->FrictionPyramid()->MuSecondary();
               }
             }
     public: ~FrictionDemoBox() {}
@@ -130,6 +130,7 @@ class PhysicsFrictionTest : public ServerFixture,
             auto friction = collision->mutable_surface()->mutable_friction();
             friction->set_mu(_opt.friction1);
             friction->set_mu2(_opt.friction2);
+            friction->mutable_torsional()->set_coefficient(0.0);
             msgs::Set(friction->mutable_fdir1(), _opt.direction1);
 
             return ServerFixture::SpawnModel(model);
@@ -336,7 +337,9 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
     }
   }
 
+  gzerr << "spawned";getchar();
   world->Step(1500);
+  gzerr << "ran";getchar();
 
   gzdbg << "Checking position of boxes" << std::endl;
   std::map<physics::ModelPtr, double>::iterator iter;
@@ -350,6 +353,7 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
     EXPECT_NEAR(cosAngle, cosPosAngle, 1e-2);
     EXPECT_NEAR(sinAngle, sinPosAngle, 1e-2);
   }
+  gzerr << "checked";getchar();
 }
 
 /////////////////////////////////////////////////

@@ -1500,11 +1500,13 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
   if (i == startRow)
   {
     prev_constraint_index = -100;
-    next_constraint_index = constraint_index;
+    nextindex = order[i+1].index;
+    next_constraint_index = findex[nextindex];
   }
   else if (i == startRow+nRows-1)
   {
-    prev_constraint_index = constraint_index;
+    previndex = order[i-1].index;
+    prev_constraint_index = findex[previndex];
     next_constraint_index = -100;
   }
   else
@@ -1524,8 +1526,8 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
   if (constraint_index == prev_constraint_index)
   {
     dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
-    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr, body2_vel);
-    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr, body2_vel);
+    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr+6, body2_vel);
+    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
   }
   else if (constraint_index == next_constraint_index)
   {
