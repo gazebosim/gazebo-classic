@@ -29,6 +29,9 @@
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
 
+1. Make it possible to create custom ConfigWidgets
+    * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
+
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
