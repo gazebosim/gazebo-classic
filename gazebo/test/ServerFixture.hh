@@ -100,13 +100,13 @@ namespace gazebo
     /// \brief Load a world in gzserver.
     /// \param[in] _args Options for the server using the same syntax
     /// used in the command line.
-    /// E.g.: "-v -u" will run gzserver paused and in verbose mode.
+    /// E.g.: "-u --verbose" will run gzserver paused and in verbose mode.
     protected: virtual void LoadArgs(const std::string &_args);
 
     /// \brief Run the server.
     /// \param[in] _args Options for the server using the same syntax
     /// used in the command line.
-    /// E.g.: "-v -u" will run gzserver paused and in verbose mode.
+    /// E.g.: "-u --verbose" will run gzserver paused and in verbose mode.
     protected: void RunServer(const std::string &_args);
 
     /// \brief Get a pointer to the rendering scene.
