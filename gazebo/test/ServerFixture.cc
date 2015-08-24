@@ -169,9 +169,19 @@ void ServerFixture::LoadArgs(const std::string &_args)
   delete this->server;
   this->server = NULL;
 
+  // Split the string into a vector or parameters.
+  std::vector<std::string> params;
+  std::string args = _args;
+  boost::trim_if(args, boost::is_any_of("\t "));
+  boost::split(params, args, boost::is_any_of("\t "), boost::token_compress_on);
+
+  bool paused = false;
+  if (std::find(params.begin(), params.end(), "-u") != params.end())
+    paused = true;
+
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
-    boost::bind(&ServerFixture::RunServer, this, _args));
+    boost::bind(&ServerFixture::RunServer, this, params));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -206,7 +216,9 @@ void ServerFixture::LoadArgs(const std::string &_args)
   // Use a 30 second timeout.
   waitCount = 0;
   maxWaitCount = 3000;
-  while (!physics::get_world() && ++waitCount < maxWaitCount)
+  while ((!physics::get_world() ||
+           physics::get_world()->IsPaused() != paused) &&
+         ++waitCount < maxWaitCount)
   {
     common::Time::MSleep(100);
   }
@@ -218,17 +230,10 @@ void ServerFixture::LoadArgs(const std::string &_args)
 }
 
 /////////////////////////////////////////////////
-void ServerFixture::RunServer(const std::string &_args)
+void ServerFixture::RunServer(const std::vector<std::string> &_args)
 {
-  // Split the string into a vector or parameters.
-  std::vector<std::string> params;
-  std::string args = _args;
-  boost::trim_if(args, boost::is_any_of("\t "));
-  boost::split(params, args, boost::is_any_of("\t "),
-    boost::token_compress_on);
-
   // Make room for an extra parameter (gzserver).
-  int argc = params.size() + 1;
+  int argc = _args.size() + 1;
   char **argv = new char* [argc];
 
   // The first parameter is the name of the program.
@@ -236,8 +241,8 @@ void ServerFixture::RunServer(const std::string &_args)
   argv[0] = strdup(cmd);
 
   // Copy the command line parameters for gzserver.
-  for (size_t i = 0; i < params.size(); ++i)
-    argv[i + 1] = strdup(params.at(i).c_str());
+  for (size_t i = 0; i < _args.size(); ++i)
+    argv[i + 1] = strdup(_args.at(i).c_str());
 
   ASSERT_NO_THROW(this->server = new Server());
 

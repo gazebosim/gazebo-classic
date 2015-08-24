@@ -107,7 +107,7 @@ namespace gazebo
     /// \param[in] _args Options for the server using the same syntax
     /// used in the command line.
     /// E.g.: "-u --verbose" will run gzserver paused and in verbose mode.
-    protected: void RunServer(const std::string &_args);
+    protected: void RunServer(const std::vector<std::string> &_args);
 
     /// \brief Get a pointer to the rendering scene.
     /// \param[in] _sceneName Name of the scene to get.
