@@ -81,7 +81,7 @@ void GUIExampleSpawnWidget::OnButton()
 {
   msgs::Model model;
   model.set_name("plugin_unit_sphere_" + std::to_string(this->counter++));
-  msgs::Set(model.mutable_pose(), math::Pose(0, 0, 1.5, 0, 0, 0));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 1.5, 0, 0, 0));
   const double mass = 1.0;
   const double radius = 0.5;
   msgs::AddSphereLink(model, mass, radius);
