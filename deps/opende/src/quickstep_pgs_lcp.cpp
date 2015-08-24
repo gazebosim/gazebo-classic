@@ -1549,20 +1549,20 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
   }
   else
   {
-    if (constraint_index == next_constraint_index)
-    {
-      // first direction  ---> corresponds to the primary friction direction
-      hi_act = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda[constraint_index]);
-      lo_act = -hi_act;
-      hi_act_erp = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
-      lo_act_erp = -hi_act;
-    }
-    else if (constraint_index == prev_constraint_index)
+    if (constraint_index == prev_constraint_index)
     {
       // second-direction  ---> corresponds to the secondary friction direction
       hi_act = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda[constraint_index]);
       lo_act = -hi_act;
       hi_act_erp = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
+      lo_act_erp = -hi_act;
+    }
+    else if (constraint_index == next_constraint_index)
+    {
+      // first direction  ---> corresponds to the primary friction direction
+      hi_act = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda[constraint_index]);
+      lo_act = -hi_act;
+      hi_act_erp = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
       lo_act_erp = -hi_act;
     }
     else

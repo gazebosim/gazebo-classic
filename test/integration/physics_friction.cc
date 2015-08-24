@@ -130,7 +130,7 @@ class PhysicsFrictionTest : public ServerFixture,
             auto friction = collision->mutable_surface()->mutable_friction();
             friction->set_mu(_opt.friction1);
             friction->set_mu2(_opt.friction2);
-            friction->mutable_torsional()->set_coefficient(0.0);
+            // friction->mutable_torsional()->set_coefficient(0.0);
             msgs::Set(friction->mutable_fdir1(), _opt.direction1);
 
             return ServerFixture::SpawnModel(model);
