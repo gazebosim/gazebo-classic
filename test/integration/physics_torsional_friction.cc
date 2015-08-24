@@ -61,9 +61,9 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       auto surfODE =
           boost::static_pointer_cast<physics::ODESurfaceParams>(surf);
 
-      this->coefficient = surf->GetFrictionPyramid()->GetMuTorsion();
-      this->patch = surf->GetFrictionPyramid()->GetPatchRadius();
-      this->radius = surf->GetFrictionPyramid()->GetSurfaceRadius();
+      this->coefficient = surf->GetFrictionPyramid()->MuTorsion();
+      this->patch = surf->GetFrictionPyramid()->PatchRadius();
+      this->radius = surf->GetFrictionPyramid()->SurfaceRadius();
       this->kp = surfODE->kp;
 
       // Get inertial params
@@ -308,8 +308,10 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
 
       // Calculate torque due to friction
       double normalZ = -sphere.mass * g.z;
-      double frictionTorque = normalZ * sphere.coefficient * 3*M_PI/16 * sphere.patch;
-
+      double frictionCoef = sphere.coefficient * 3*M_PI/16 *
+          sphere.patch;
+      double frictionTorque = normalZ * frictionCoef;
+      double frictionAcc = (appliedTorque - frictionTorque) / sphere.izz;
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)
       {
@@ -317,9 +319,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       }
       else
       {
-        // acc.z = (appliedTorque - frictionTorque) / Izz
-        sphere.error.InsertData(
-            acc.z - (appliedTorque - frictionTorque) / sphere.izz);
+        sphere.error.InsertData(acc.z - frictionAcc);
       }
     }
   }
@@ -405,7 +405,8 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
       double depthAtEquilibrium = sphere.mass * -g.z / sphere.kp;
       double patch = sqrt(sphere.radius * depthAtEquilibrium);
       double normalZ = -sphere.mass * g.z;
-      double frictionTorque = normalZ * sphere.coefficient * 3 * M_PI * patch/ 16;
+      double frictionTorque =
+          normalZ * sphere.coefficient * 3 * M_PI * patch / 16;
 
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)

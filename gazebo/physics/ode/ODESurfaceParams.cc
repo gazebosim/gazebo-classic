@@ -30,7 +30,7 @@ ODESurfaceParams::ODESurfaceParams()
     maxVel(0.01), minDepth(0),
     slip1(0), slip2(0),
     elasticModulus(0), elasticModulusReferenceLength(0),
-    frictionPyramid(new FrictionPyramid())
+    frictionPyramid(new physics::FrictionPyramid())
 {
 }
 
@@ -145,22 +145,22 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
-  _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
+  _msg.mutable_friction()->set_mu(this->frictionPyramid->MuPrimary());
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid->MuSecondary());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
             this->frictionPyramid->direction1.Ign());
 
   _msg.mutable_friction()->mutable_torsional()->set_coefficient(
-      this->frictionPyramid->GetMuTorsion());
+      this->frictionPyramid->MuTorsion());
 
   _msg.mutable_friction()->mutable_torsional()->set_patch_radius(
-      this->frictionPyramid->GetPatchRadius());
+      this->frictionPyramid->PatchRadius());
   _msg.mutable_friction()->mutable_torsional()->set_surface_radius(
-      this->frictionPyramid->GetSurfaceRadius());
+      this->frictionPyramid->SurfaceRadius());
   _msg.mutable_friction()->mutable_torsional()->set_use_patch_radius(
-      this->frictionPyramid->GetUsePatchRadius());
+      this->frictionPyramid->UsePatchRadius());
   _msg.mutable_friction()->mutable_torsional()->mutable_ode()->set_slip(
       this->slipTorsion);
 
@@ -254,6 +254,12 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 
 /////////////////////////////////////////////////
 FrictionPyramidPtr ODESurfaceParams::GetFrictionPyramid() const
+{
+  return this->frictionPyramid;
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr ODESurfaceParams::FrictionPyramid() const
 {
   return this->frictionPyramid;
 }

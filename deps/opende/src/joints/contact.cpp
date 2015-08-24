@@ -52,9 +52,8 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
     if ( contact.surface.mu < 0 ) contact.surface.mu = 0;
     if ( contact.surface.mode & dContactMu2 )
     {
-        if ( contact.surface.mu > 0 ) m++;
+        m += 2;
         if ( contact.surface.mu2 < 0 ) contact.surface.mu2 = 0;
-        if ( contact.surface.mu2 > 0 ) m++;
         if (_dequal(contact.surface.mu, dInfinity)) nub ++;
         if (_dequal(contact.surface.mu2, dInfinity)) nub ++;
     }
@@ -63,10 +62,11 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
         if ( contact.surface.mu > 0 ) m += 2;
         if (_dequal(contact.surface.mu, dInfinity)) nub += 2;
     }
+
     if ( contact.surface.mode & dContactMu3 )
     {
         if ( contact.surface.mu3 < 0 ) contact.surface.mu3 = 0;
-        if ( contact.surface.mu3 > 0 ) m++;
+        m++;  // do this even if mu3 is zero.
         if (_dequal(contact.surface.mu3, dInfinity)) nub ++;
     }
 
@@ -372,16 +372,11 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             // to be proportional to normal force
             if ( contact.surface.mode & dContactApprox3 )
                 info->findex[3] = 0;
-        }
-        else
-        {
-            info->lo[3] = 0.0;
-            info->hi[3] = 0.0;
-        }
 
-        // set slip (constraint force mixing)
-        if ( contact.surface.mode & dContactSlip3 )
-            info->cfm[3] = contact.surface.slip3;
+            // set slip (constraint force mixing)
+            if ( contact.surface.mode & dContactSlip3 )
+                info->cfm[3] = contact.surface.slip3;
+        }
     }
 }
 

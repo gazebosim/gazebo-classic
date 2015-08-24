@@ -43,27 +43,37 @@ namespace gazebo
 
       /// \brief Get the friction coefficient in the primary direction.
       /// \return Friction coefficient in primary direction.
-      public: double GetMuPrimary();
+      /// \deprecated See const function MuPrimary
+      public: double GetMuPrimary() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the friction coefficient in the secondary direction.
       /// \return Friction coefficient in secondary direction.
-      public: double GetMuSecondary();
+      /// \deprecated See const function MuSecondary
+      public: double GetMuSecondary() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the friction coefficient in the primary direction.
+      /// \return Friction coefficient in primary direction.
+      public: double MuPrimary() const;
+
+      /// \brief Get the friction coefficient in the secondary direction.
+      /// \return Friction coefficient in secondary direction.
+      public: double MuSecondary() const;
 
       /// \brief Get the torsional friction coefficient.
       /// \return Torsional friction coefficient.
-      public: double GetMuTorsion();
+      public: double MuTorsion() const;
 
       /// \brief Get the torsional patch radius.
       /// \return Torsional patch radius.
-      public: double GetPatchRadius();
+      public: double PatchRadius() const;
 
       /// \brief Get the torsional surface radius.
       /// \return Torsional surface radius.
-      public: double GetSurfaceRadius();
+      public: double SurfaceRadius() const;
 
       /// \brief Get the torsional "use patch radius" flag.
       /// \return Torsional "use patch radius" flag.
-      public: bool GetUsePatchRadius();
+      public: bool UsePatchRadius() const;
 
       /// \brief Set the friction coefficient in the primary direction.
       /// \param[in] _mu Friction coefficient.
@@ -75,26 +85,34 @@ namespace gazebo
 
       /// \brief Set the torsional friction coefficient.
       /// \param[in] _mu Torsional friction coefficient.
-      public: void SetMuTorsion(double _mu);
+      public: void SetMuTorsion(const double _mu);
 
       /// \brief Set the torsional patch radius.
       /// \param[in] _radius Torsional patch radius.
-      public: void SetPatchRadius(double _radius);
+      public: void SetPatchRadius(const double _radius);
 
       /// \brief Set the torsional surface radius.
       /// \param[in] _radius Torsional surface radius.
-      public: void SetSurfaceRadius(double _radius);
+      public: void SetSurfaceRadius(const double _radius);
 
       /// \brief Set whether to use the surface radius.
       /// \param[in] _use True to use the surface radius.
-      public: void SetUsePatchRadius(bool _use);
+      public: void SetUsePatchRadius(const bool _use);
 
       /// \brief Get the friction coefficient in a single direction.
       /// \param[in] _index Index of friction direction, 0 for primary,
       /// 1 for secondary direction.
       /// \return Friction coefficient, or negative value if invalid
       /// _index is supplied.
-      private: double GetMu(unsigned int _index);
+      /// \deprecated See const function Mu
+      private: double GetMu(unsigned int _index) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the friction coefficient in a single direction.
+      /// \param[in] _index Index of friction direction, 0 for primary,
+      /// 1 for secondary direction.
+      /// \return Friction coefficient, or negative value if invalid
+      /// _index is supplied.
+      private: double Mu(const unsigned int _index) const;
 
       /// \brief Set the friction coefficient in a single direction.
       /// If a negative value is supplied, use an astronomically high
@@ -165,7 +183,14 @@ namespace gazebo
       /// \brief Get access to FrictionPyramid data, if available.
       /// \return Pointer to FrictionPyramid data or NULL if class does
       /// not use FrictionPyramid data.
-      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+      /// \deprecated See function FrictionPyramid
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get access to FrictionPyramid data, if available.
+      /// \return Pointer to FrictionPyramid data or NULL if class does
+      /// not use FrictionPyramid data.
+      public: virtual FrictionPyramidPtr FrictionPyramid() const;
 
       /// \brief Allow collision checking without generating a contact joint.
       public: bool collideWithoutContact;
