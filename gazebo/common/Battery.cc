@@ -76,12 +76,14 @@ std::string Battery::Name() const
 //////////////////////////////////////////////////
 void Battery::InitConsumers()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->powerLoadsMutex);
   this->dataPtr->powerLoads.clear();
 }
 
 /////////////////////////////////////////////////
 uint32_t Battery::AddConsumer()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->powerLoadsMutex);
   uint32_t newId = this->dataPtr->powerLoadCounter++;
   this->dataPtr->powerLoads[newId] = 0.0;
   return newId;
@@ -90,10 +92,9 @@ uint32_t Battery::AddConsumer()
 /////////////////////////////////////////////////
 bool Battery::RemoveConsumer(uint32_t _consumerId)
 {
-  if (this->dataPtr->powerLoads.find(_consumerId) !=
-      this->dataPtr->powerLoads.end())
+  std::lock_guard<std::mutex> lock(this->dataPtr->powerLoadsMutex);
+  if (this->dataPtr->powerLoads.erase(_consumerId))
   {
-    this->dataPtr->powerLoads.erase(_consumerId);
     return true;
   }
   else
@@ -106,6 +107,7 @@ bool Battery::RemoveConsumer(uint32_t _consumerId)
 /////////////////////////////////////////////////
 bool Battery::SetPowerLoad(const uint32_t _consumerId, const double _powerLoad)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->powerLoadsMutex);
   auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
   {
@@ -120,6 +122,7 @@ bool Battery::SetPowerLoad(const uint32_t _consumerId, const double _powerLoad)
 /////////////////////////////////////////////////
 bool Battery::PowerLoad(const uint32_t _consumerId, double &_powerLoad) const
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->powerLoadsMutex);
   auto iter = this->dataPtr->powerLoads.find(_consumerId);
   if (iter == this->dataPtr->powerLoads.end())
   {
@@ -134,6 +137,7 @@ bool Battery::PowerLoad(const uint32_t _consumerId, double &_powerLoad) const
 /////////////////////////////////////////////////
 const Battery::PowerLoad_M &Battery::PowerLoads() const
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->powerLoadsMutex);
   return this->dataPtr->powerLoads;
 }
 

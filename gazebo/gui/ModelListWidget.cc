@@ -1820,6 +1820,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     this->AddProperty(batteryItem, _parent);
     batteryItem->setEnabled(false);
 
+    item = this->variantManager->addProperty(QVariant::String, tr("name"));
+    item->setValue(_msg.battery(i).name().c_str());
+    batteryItem->addSubProperty(item);
+
     // Battery::Voltage
     item = this->variantManager->addProperty(QVariant::Double, tr("voltage"));
     item->setValue(_msg.battery(i).voltage());

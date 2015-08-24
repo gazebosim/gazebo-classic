@@ -20,6 +20,7 @@
 #include <string>
 #include <map>
 #include <functional>
+#include <mutex>
 #include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
@@ -48,6 +49,9 @@ namespace gazebo
 
       /// \brief Name of the battery.
       public: std::string name;
+
+      /// \brief Mutex that protects the powerLoads map
+      public: std::mutex powerLoadsMutex;
     };
   }
 }
