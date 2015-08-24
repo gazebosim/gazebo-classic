@@ -125,7 +125,7 @@ namespace gazebo
       protected: void InitConsumers();
 
       /// \brief Update voltage using an ideal battery model.
-      /// \param[in] _data Pointer to the battery.
+      /// \param[in] _battery Pointer to the battery.
       /// \return New battery voltage.
       private: double UpdateDefault(const BatteryPtr &_battery);
 
