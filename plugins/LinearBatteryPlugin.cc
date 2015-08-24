@@ -103,6 +103,10 @@ void LinearBatteryPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
           std::placeholders::_1));
     }
   }
+  else
+  {
+    gzerr << "No <battery_name> specified.\n";
+  }
 }
 
 /////////////////////////////////////////////////

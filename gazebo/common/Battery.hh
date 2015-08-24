@@ -112,7 +112,7 @@ namespace gazebo
       /// battery voltage as a double.
       /// \sa UpdateData
       public: void SetUpdateFunc(
-                  std::function<double (const BatteryPtr)> _updateFunc);
+                  std::function<double (const BatteryPtr &)> _updateFunc);
 
       /// \brief Update the battery. This will in turn trigger the function
       /// set using the SetUpdateFunc function.
@@ -125,7 +125,7 @@ namespace gazebo
       /// \brief Update voltage using an ideal battery model.
       /// \param[in] _data Pointer to the battery.
       /// \return New battery voltage.
-      private: double UpdateDefault(const BatteryPtr _battery);
+      private: double UpdateDefault(const BatteryPtr &_battery);
 
       /// \internal
       /// \brief Private data pointer.

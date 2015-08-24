@@ -140,7 +140,7 @@ void Battery::Update()
 }
 
 /////////////////////////////////////////////////
-double Battery::UpdateDefault(const BatteryPtr _battery)
+double Battery::UpdateDefault(const BatteryPtr &_battery)
 {
   // Ideal battery
   return _battery->Voltage();
@@ -148,7 +148,7 @@ double Battery::UpdateDefault(const BatteryPtr _battery)
 
 /////////////////////////////////////////////////
 void Battery::SetUpdateFunc(
-    std::function<double (const BatteryPtr)> _updateFunc)
+    std::function<double (const BatteryPtr &)> _updateFunc)
 {
   this->dataPtr->updateFunc = _updateFunc;
 }
