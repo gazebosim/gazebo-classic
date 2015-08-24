@@ -337,9 +337,7 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
     }
   }
 
-  gzerr << "spawned";getchar();
   world->Step(1500);
-  gzerr << "ran";getchar();
 
   gzdbg << "Checking position of boxes" << std::endl;
   std::map<physics::ModelPtr, double>::iterator iter;
@@ -353,7 +351,6 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
     EXPECT_NEAR(cosAngle, cosPosAngle, 1e-2);
     EXPECT_NEAR(sinAngle, sinPosAngle, 1e-2);
   }
-  gzerr << "checked";getchar();
 }
 
 /////////////////////////////////////////////////
