@@ -57,7 +57,7 @@ void Battery::Load(const sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Battery::Init()
 {
-  this->dataPtr->realVoltage = this->dataPtr->initVoltage;
+  this->dataPtr->realVoltage = std::max(0.0, this->dataPtr->initVoltage);
   this->InitConsumers();
 }
 
@@ -150,8 +150,8 @@ double Battery::Voltage() const
 /////////////////////////////////////////////////
 void Battery::Update()
 {
-  this->dataPtr->realVoltage =
-      this->dataPtr->updateFunc(shared_from_this());
+  this->dataPtr->realVoltage = std::max(0.0,
+      this->dataPtr->updateFunc(shared_from_this()));
 }
 
 /////////////////////////////////////////////////
