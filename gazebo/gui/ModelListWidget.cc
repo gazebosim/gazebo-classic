@@ -1816,6 +1816,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     QtVariantProperty *batteryItem;
     batteryItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(), tr("battery"));
+    batteryItem->setToolTip(tr(_msg.battery(i).name().c_str()));
     this->AddProperty(batteryItem, _parent);
     batteryItem->setEnabled(false);
 

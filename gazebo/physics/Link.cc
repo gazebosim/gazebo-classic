@@ -893,6 +893,7 @@ void Link::FillMsg(msgs::Link &_msg)
   for (auto &battery : this->batteries)
   {
     msgs::Battery *bat = _msg.add_battery();
+    bat->set_name(battery->Name());
     bat->set_voltage(battery->Voltage());
   }
 }
