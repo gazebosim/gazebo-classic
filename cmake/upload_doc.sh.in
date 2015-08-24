@@ -8,12 +8,10 @@ if [ ! -f "${HOME}/.s3cfg" ]; then
 fi
 
 # Make documentation if not build
+make doc
 if [ ! -f "@CMAKE_BINARY_DIR@/doxygen/html/index.html" ]; then
-  make doc
-  if [ ! -f "@CMAKE_BINARY_DIR@/doxygen/html/index.html" ]; then
-    echo "Documentation not present. Install doxygen, and run `make doc` in the build directory"
-    exit 1
-  fi
+  echo "Documentation not present. Install doxygen, and run `make doc` in the build directory"
+  exit 1
 fi
 
 # The code API
