@@ -315,13 +315,117 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[out] _dimensions Dimensions of geometry.
       /// \return Type of geometry.
+      /// \deprecated See GeometryWidgetValue() function that accepts an
+      /// ignition math object.
       public: std::string GetGeometryWidgetValue(const std::string &_name,
-          math::Vector3 &_dimensions, std::string &_uri) const;
+          math::Vector3 &_dimensions, std::string &_uri) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a geometry value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[out] _dimensions Dimensions of geometry.
+      /// \return Type of geometry.
+      public: std::string GeometryWidgetValue(const std::string &_name,
+          ignition::math::Vector3d &_dimensions, std::string &_uri) const;
 
       /// \brief Get an enum value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Enum value.
       public: std::string GetEnumWidgetValue(const std::string &_name) const;
+
+      /// \brief Create a widget which has a button header which collapses
+      /// the field widget.
+      /// \param[in] _name Header name.
+      /// \param[out] _childWidget Widget which will be collapsed.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The group widget.
+      public: GroupWidget *CreateGroupWidget(const std::string &_name,
+          ConfigChildWidget *_childWidget, const int _level = 0);
+
+      /// \brief Create a widget for configuring an unsigned integer value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateUIntWidget(const std::string &_key,
+          const int _level = 0);
+
+      /// \brief Create a widget for configuring an integer value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateIntWidget(const std::string &_key,
+          const int _level = 0);
+
+      /// \brief Create a widget for configuring a double value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateDoubleWidget(const std::string &_key,
+          const int _level = 0);
+
+      /// \brief Create a widget for configuring a string value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateStringWidget(const std::string &_key,
+          const int _level = 0);
+
+      /// \brief Create a widget for configuring a bool value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateBoolWidget(const std::string &_key,
+          const int _level = 0);
+
+      /// \brief Create a widget for configuring a vector3 value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateVector3dWidget(const std::string &_key,
+          const int _level = 0);
+
+      /// \brief Create a widget for configuring a color value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateColorWidget(const std::string &_key,
+          const int _level = 0);
+
+      /// \brief Create a widget for configuring a pose value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreatePoseWidget(const std::string &_key,
+          const int _level = 0);
+
+      /// \brief Create a widget for configuring a geometry value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateGeometryWidget(const std::string &_key,
+          const int _level = 0);
+
+      /// \brief Create a widget for configuring an enum value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _values A list of enum values in string.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
+          const std::vector<std::string> &_values, const int _level = 0);
+
+      /// \brief Register a child widget as a child of this widget, so it can
+      /// be updated. Note that the widget is not automatically added to a
+      /// layout.
+      /// \param[in] _name Unique name to indentify the child within this widget
+      /// \param[in] _child Child widget to be added. It doesn't need to be a
+      /// ConfigChildWidget.
+      /// \return True if child successfully added.
+      public: bool AddConfigChildWidget(const std::string &_name,
+          ConfigChildWidget *_child);
+
+      /// \brief Get the number of child widgets.
+      /// \return The number of child widgets.
+      public: unsigned int ConfigChildWidgetCount() const;
 
       /// \brief Parse the input message and either create widgets for
       /// configuring fields of the message, or update the widgets with values
@@ -353,77 +457,6 @@ namespace gazebo
       /// \param[in] _value Vector3 used for updating the message.
       private: void UpdateVector3Msg(google::protobuf::Message *_msg,
           const math::Vector3 &_value);
-
-      /// \brief Create a widget for configuring an unsigned integer value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreateUIntWidget(const std::string &_key,
-          const int _level = 0);
-
-      /// \brief Create a widget for configuring an integer value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreateIntWidget(const std::string &_key,
-          const int _level = 0);
-
-      /// \brief Create a widget for configuring a double value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreateDoubleWidget(const std::string &_key,
-          const int _level = 0);
-
-      /// \brief Create a widget for configuring a string value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreateStringWidget(const std::string &_key,
-          const int _level = 0);
-
-      /// \brief Create a widget for configuring a bool value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreateBoolWidget(const std::string &_key,
-          const int _level = 0);
-
-      /// \brief Create a widget for configuring a vector3 value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreateVector3dWidget(const std::string &_key,
-          const int _level = 0);
-
-      /// \brief Create a widget for configuring a color value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreateColorWidget(const std::string &_key,
-          const int _level = 0);
-
-      /// \brief Create a widget for configuring a pose value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreatePoseWidget(const std::string &_key,
-          const int _level = 0);
-
-      /// \brief Create a widget for configuring a geometry value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreateGeometryWidget(const std::string &_key,
-          const int _level = 0);
-
-      /// \brief Create a widget for configuring an enum value.
-      /// \param[in] _key A key that is used as a label for the widget.
-      /// \param[in] _values A list of enum values in string.
-      /// \param[in] _level Level of the widget in the tree.
-      /// \return The newly created widget.
-      private: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
-          const std::vector<std::string> &_values, const int _level = 0);
 
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
@@ -546,7 +579,7 @@ namespace gazebo
       /// \param[out] _uri URI of the geometry mesh, if any.
       /// \return Type of geometry.
       private: std::string GetGeometryWidgetValue(ConfigChildWidget *_widget,
-          math::Vector3 &_dimensions, std::string &_uri) const;
+          ignition::math::Vector3d &_dimensions, std::string &_uri) const;
 
       /// \brief Get an enum value from a child widget.
       /// \param[in] _widget Pointer to the child widget.

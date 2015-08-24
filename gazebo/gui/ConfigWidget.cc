@@ -205,9 +205,7 @@ void ConfigWidget::GetRangeFromKey(const std::string &_key, double &_min,
 /////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
 {
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -227,9 +225,7 @@ bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
 /////////////////////////////////////////////////
 void ConfigWidget::SetWidgetVisible(const std::string &_name, bool _visible)
 {
-  std::map <std::string, ConfigChildWidget *>::iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -249,9 +245,7 @@ void ConfigWidget::SetWidgetVisible(const std::string &_name, bool _visible)
 /////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetReadOnly(const std::string &_name) const
 {
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -271,9 +265,7 @@ bool ConfigWidget::GetWidgetReadOnly(const std::string &_name) const
 /////////////////////////////////////////////////
 void ConfigWidget::SetWidgetReadOnly(const std::string &_name, bool _readOnly)
 {
-  std::map <std::string, ConfigChildWidget *>::iterator iter =
-      this->configWidgets.find(_name);
-
+  auto iter = this->configWidgets.find(_name);
   if (iter != this->configWidgets.end())
   {
     if (iter->second->groupWidget)
@@ -511,6 +503,17 @@ math::Pose ConfigWidget::GetPoseWidgetValue(const std::string &_name) const
 std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
     math::Vector3 &_dimensions, std::string &_uri) const
 {
+  ignition::math::Vector3d dimensions;
+  std::string type = this->GeometryWidgetValue(_name, dimensions, _uri);
+  _dimensions = dimensions;
+
+  return type;
+}
+
+/////////////////////////////////////////////////
+std::string ConfigWidget::GeometryWidgetValue(const std::string &_name,
+    ignition::math::Vector3d &_dimensions, std::string &_uri) const
+{
   std::string type;
   std::map <std::string, ConfigChildWidget *>::const_iterator iter =
       this->configWidgets.find(_name);
@@ -583,7 +586,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             value = 0;
           if (newWidget)
           {
-            configChildWidget = CreateDoubleWidget(name, _level);
+            configChildWidget = this->CreateDoubleWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateDoubleWidget(configChildWidget, value);
@@ -596,7 +599,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             value = 0;
           if (newWidget)
           {
-            configChildWidget = CreateDoubleWidget(name, _level);
+            configChildWidget = this->CreateDoubleWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateDoubleWidget(configChildWidget, value);
@@ -607,7 +610,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           int64_t value = ref->GetInt64(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateIntWidget(name, _level);
+            configChildWidget = this->CreateIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateIntWidget(configChildWidget, value);
@@ -618,7 +621,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           uint64_t value = ref->GetUInt64(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateUIntWidget(name, _level);
+            configChildWidget = this->CreateUIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateUIntWidget(configChildWidget, value);
@@ -629,7 +632,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           int32_t value = ref->GetInt32(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateIntWidget(name, _level);
+            configChildWidget = this->CreateIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateIntWidget(configChildWidget, value);
@@ -640,7 +643,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           uint32_t value = ref->GetUInt32(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateUIntWidget(name, _level);
+            configChildWidget = this->CreateUIntWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateUIntWidget(configChildWidget, value);
@@ -651,7 +654,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           bool value = ref->GetBool(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateBoolWidget(name, _level);
+            configChildWidget = this->CreateBoolWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateBoolWidget(configChildWidget, value);
@@ -662,7 +665,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           std::string value = ref->GetString(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = CreateStringWidget(name, _level);
+            configChildWidget = this->CreateStringWidget(name, _level);
             newFieldWidget = configChildWidget;
           }
           this->UpdateStringWidget(configChildWidget, value);
@@ -883,112 +886,14 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
           if (newWidget)
           {
-            // Button label
-            QLabel *buttonLabel = new QLabel(
-                tr(this->GetHumanReadableKey(name).c_str()));
-            buttonLabel->setToolTip(tr(name.c_str()));
-
-            // Button icon
-            QCheckBox *buttonIcon = new QCheckBox();
-            buttonIcon->setChecked(true);
-            buttonIcon->setStyleSheet(
-                "QCheckBox::indicator::unchecked {\
-                  image: url(:/images/right_arrow.png);\
-                }\
-                QCheckBox::indicator::checked {\
-                  image: url(:/images/down_arrow.png);\
-                }");
-
-            // Button layout
-            QHBoxLayout *buttonLayout = new QHBoxLayout();
-            buttonLayout->addItem(new QSpacerItem(20*_level, 1,
-                QSizePolicy::Fixed, QSizePolicy::Fixed));
-            buttonLayout->addWidget(buttonLabel);
-            buttonLayout->addWidget(buttonIcon);
-            buttonLayout->setAlignment(buttonIcon, Qt::AlignRight);
-
-            // Button frame
-            QFrame *buttonFrame = new QFrame();
-            buttonFrame->setFrameStyle(QFrame::Box);
-            buttonFrame->setLayout(buttonLayout);
-
-            // Set color for top level button
-            if (_level == 0)
+            // Make it into a group widget
+            ConfigChildWidget *childWidget =
+                qobject_cast<ConfigChildWidget *>(newFieldWidget);
+            if (childWidget)
             {
-              buttonFrame->setStyleSheet(
-                  "QWidget\
-                  {\
-                    background-color: " + this->level0BgColor +
-                  "}");
+              newFieldWidget = this->CreateGroupWidget(name, childWidget,
+                  _level);
             }
-
-            // Child widgets are contained in a group box which can be collapsed
-            GroupWidget *groupWidget = new GroupWidget;
-            groupWidget->setStyleSheet(
-                "QGroupBox {\
-                  border : 0;\
-                  margin : 0;\
-                  padding : 0;\
-                }");
-
-            connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget,
-                SLOT(Toggle(bool)));
-
-            // Set the child widget
-            groupWidget->childWidget = newFieldWidget;
-            qobject_cast<ConfigChildWidget *>(newFieldWidget)->groupWidget
-                = groupWidget;
-            newFieldWidget->setContentsMargins(0, 0, 0, 0);
-
-            // Set color for children
-            if (_level == 0)
-            {
-              newFieldWidget->setStyleSheet(
-                  "QWidget\
-                  {\
-                    background-color: " + this->level1BgColor +
-                  "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-                  {\
-                    background-color: " + this->level1WidgetColor +
-                  "}");
-            }
-            else if (_level == 1)
-            {
-              newFieldWidget->setStyleSheet(
-                  "QWidget\
-                  {\
-                    background-color: " + this->level2BgColor +
-                  "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-                  {\
-                    background-color: " + this->level2WidgetColor +
-                  "}");
-            }
-            else if (_level == 2)
-            {
-              newFieldWidget->setStyleSheet(
-                  "QWidget\
-                  {\
-                    background-color: " + this->level2BgColor +
-                  "}\
-                  QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-                  {\
-                    background-color: " + this->level2WidgetColor +
-                  "}");
-            }
-
-            // Group Layout
-            QGridLayout *configGroupLayout = new QGridLayout;
-            configGroupLayout->setContentsMargins(0, 0, 0, 0);
-            configGroupLayout->setSpacing(0);
-            configGroupLayout->addWidget(buttonFrame, 0, 0);
-            configGroupLayout->addWidget(newFieldWidget, 1, 0);
-            groupWidget->setLayout(configGroupLayout);
-
-            // reset new field widget pointer in order for it to be added
-            // to the parent widget
-            newFieldWidget = groupWidget;
           }
 
           break;
@@ -1069,12 +974,12 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               qobject_cast<GroupWidget *>(newFieldWidget);
           ConfigChildWidget *childWidget = qobject_cast<ConfigChildWidget *>(
               groupWidget->childWidget);
-          this->configWidgets[scopedName] = childWidget;
+          this->AddConfigChildWidget(scopedName, childWidget);
         }
         else if (qobject_cast<ConfigChildWidget *>(newFieldWidget))
         {
-          this->configWidgets[scopedName] =
-              qobject_cast<ConfigChildWidget *>(newFieldWidget);
+          this->AddConfigChildWidget(scopedName,
+              qobject_cast<ConfigChildWidget *>(newFieldWidget));
         }
       }
     }
@@ -1098,6 +1003,114 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
     return widget;
   }
   return NULL;
+}
+
+/////////////////////////////////////////////////
+GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
+    ConfigChildWidget *_childWidget, const int _level)
+{
+  // Button label
+  QLabel *buttonLabel = new QLabel(
+      tr(this->GetHumanReadableKey(_name).c_str()));
+  buttonLabel->setToolTip(tr(_name.c_str()));
+
+  // Button icon
+  QCheckBox *buttonIcon = new QCheckBox();
+  buttonIcon->setChecked(true);
+  buttonIcon->setStyleSheet(
+      "QCheckBox::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QCheckBox::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
+
+  // Button layout
+  QHBoxLayout *buttonLayout = new QHBoxLayout();
+  buttonLayout->addItem(new QSpacerItem(20*_level, 1,
+      QSizePolicy::Fixed, QSizePolicy::Fixed));
+  buttonLayout->addWidget(buttonLabel);
+  buttonLayout->addWidget(buttonIcon);
+  buttonLayout->setAlignment(buttonIcon, Qt::AlignRight);
+
+  // Button frame
+  QFrame *buttonFrame = new QFrame();
+  buttonFrame->setFrameStyle(QFrame::Box);
+  buttonFrame->setLayout(buttonLayout);
+
+  // Set color for top level button
+  if (_level == 0)
+  {
+    buttonFrame->setStyleSheet(
+        "QWidget\
+        {\
+          background-color: " + this->level0BgColor +
+        "}");
+  }
+
+  // Child widgets are contained in a group box which can be collapsed
+  GroupWidget *groupWidget = new GroupWidget;
+  groupWidget->setStyleSheet(
+      "QGroupBox {\
+        border : 0;\
+        margin : 0;\
+        padding : 0;\
+      }");
+
+  connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget, SLOT(Toggle(bool)));
+
+  // Set the child widget
+  groupWidget->childWidget = _childWidget;
+  _childWidget->groupWidget = groupWidget;
+  _childWidget->setContentsMargins(0, 0, 0, 0);
+
+  // Set color for children
+  if (_level == 0)
+  {
+    _childWidget->setStyleSheet(
+        "QWidget\
+        {\
+          background-color: " + this->level1BgColor +
+        "}\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + this->level1WidgetColor +
+        "}");
+  }
+  else if (_level == 1)
+  {
+    _childWidget->setStyleSheet(
+        "QWidget\
+        {\
+          background-color: " + this->level2BgColor +
+        "}\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + this->level2WidgetColor +
+        "}");
+  }
+  else if (_level == 2)
+  {
+    _childWidget->setStyleSheet(
+        "QWidget\
+        {\
+          background-color: " + this->level2BgColor +
+        "}\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + this->level2WidgetColor +
+        "}");
+  }
+
+  // Group Layout
+  QGridLayout *configGroupLayout = new QGridLayout;
+  configGroupLayout->setContentsMargins(0, 0, 0, 0);
+  configGroupLayout->setSpacing(0);
+  configGroupLayout->addWidget(buttonFrame, 0, 0);
+  configGroupLayout->addWidget(_childWidget, 1, 0);
+  groupWidget->setLayout(configGroupLayout);
+
+  return groupWidget;
 }
 
 /////////////////////////////////////////////////
@@ -1201,7 +1214,7 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
   valueSpinBox->setRange(min, max);
   valueSpinBox->setSingleStep(0.01);
-  valueSpinBox->setDecimals(6);
+  valueSpinBox->setDecimals(8);
   valueSpinBox->setAlignment(Qt::AlignRight);
 
   // Unit
@@ -2484,7 +2497,7 @@ math::Pose ConfigWidget::GetPoseWidgetValue(ConfigChildWidget *_widget) const
 
 /////////////////////////////////////////////////
 std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
-    math::Vector3 &_dimensions, std::string &_uri) const
+    ignition::math::Vector3d &_dimensions, std::string &_uri) const
 {
   std::string value;
   if (_widget->widgets.size() != 8u)
@@ -2499,27 +2512,23 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
   bool isMesh = value == "mesh";
   if (value == "box" || isMesh)
   {
-    _dimensions.x =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->value();
-    _dimensions.y =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->value();
-    _dimensions.z =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->value();
+    _dimensions.X(qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->value());
+    _dimensions.Y(qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->value());
+    _dimensions.Z(qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->value());
   }
   else if (value == "cylinder")
   {
-    _dimensions.x =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0;
-    _dimensions.y = _dimensions.x;
-    _dimensions.z =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->value();
+    _dimensions.X(
+        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0);
+    _dimensions.Y(_dimensions.X());
+    _dimensions.Z(qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->value());
   }
   else if (value == "sphere")
   {
-    _dimensions.x =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0;
-    _dimensions.y = _dimensions.x;
-    _dimensions.z = _dimensions.x;
+    _dimensions.X(
+        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0);
+    _dimensions.Y(_dimensions.X());
+    _dimensions.Z(_dimensions.X());
   }
   else if (value == "polyline")
   {
@@ -2576,6 +2585,33 @@ void ConfigWidget::OnEnumValueChanged(const QString &_value)
       return;
     }
   }
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::AddConfigChildWidget(const std::string &_name,
+    ConfigChildWidget *_child)
+{
+  if (_name.empty() || _child == NULL)
+  {
+    gzerr << "Given name or child is invalid. Not adding child widget."
+          << std::endl;
+    return false;
+  }
+  if (this->configWidgets.find(_name) != this->configWidgets.end())
+  {
+    gzerr << "This config widget already has a child with that name. " <<
+       "Names must be unique. Not adding child." << std::endl;
+    return false;
+  }
+
+  this->configWidgets[_name] = _child;
+  return true;
+}
+
+/////////////////////////////////////////////////
+unsigned int ConfigWidget::ConfigChildWidgetCount() const
+{
+  return this->configWidgets.size();
 }
 
 /////////////////////////////////////////////////
