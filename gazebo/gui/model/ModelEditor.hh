@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_EDITOR_HH_
-#define _MODEL_EDITOR_HH_
+#ifndef _GAZEBO_MODEL_EDITOR_HH_
+#define _GAZEBO_MODEL_EDITOR_HH_
 
 #include <string>
 
@@ -27,11 +27,11 @@ namespace gazebo
 {
   namespace gui
   {
-    class ModelEditorPalette;
+    class ModelEditorPrivate;
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
-    class GAZEBO_VISIBLE ModelEditor : public Editor
+    class GZ_GUI_MODEL_VISIBLE ModelEditor : public Editor
     {
       Q_OBJECT
 
@@ -41,6 +41,28 @@ namespace gazebo
 
       /// \brief Destuctor.
       public: virtual ~ModelEditor();
+
+      /// \brief Add an item to palette.
+      /// \param[in] _Item item to add.
+      /// \param[in] _category Category to add the item too.
+      public: void AddItemToPalette(QWidget *_item,
+          const std::string &_category = "");
+
+      /// \brief Qt callback when the model editor's save action is
+      /// triggered.
+      private slots: void Save();
+
+      /// \brief Qt callback when the model editor's save as action is
+      /// triggered.
+      private slots: void SaveAs();
+
+      /// \brief Qt callback when the model editor's new action is
+      /// triggered.
+      private slots: void New();
+
+      /// \brief Qt callback when the model editor's exit action is
+      /// triggered.
+      private slots: void Exit();
 
       /// \brief QT callback when entering model edit mode
       /// \param[in] _checked True if the menu item is checked
@@ -60,36 +82,22 @@ namespace gazebo
       /// \param[in] _action Triggered action.
       private slots: void OnAction(QAction *_action);
 
+      /// \brief Show the schematic view widget
+      /// \param[in] _show True to show the widget, false to hide it.
+      private slots: void OnSchematicView(bool _show);
+
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
 
       /// \brief Toggle main window's toolbar to display model editor icons.
       private: void ToggleToolbar();
 
-      /// \brief Contains all the model editor tools.
-      private: ModelEditorPalette *modelPalette;
+      /// \brief Create menus
+      private: void CreateMenus();
 
-      /// \brief True if model editor is active.
-      private: bool active;
-
-      /// \brief Qt action for selecting and adding a joint in the model editor.
-      private: QAction *jointTypeAct;
-
-      /// \brief Qt action for adding a previously selected joint in the
-      /// model editor.
-      private: QAction *jointAct;
-
-      /// \brief A separator for the joint icon.
-      private: QAction *jointSeparatorAct;
-
-      /// \brief Qt tool button associated with the joint action.
-      private: QToolButton *jointButton;
-
-      /// \brief Qt signal mapper for mapping add jointsignals.
-      private: QSignalMapper *signalMapper;
-
-      /// \brief Previously selected joint type.
-      private: std::string selectedJointType;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ModelEditorPrivate *dataPtr;
     };
   }
 }

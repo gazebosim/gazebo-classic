@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class Events Events.hh common/common.hh
     /// \brief An Event class to get notifications for simulator events
-    class GAZEBO_VISIBLE Events
+    class GZ_COMMON_VISIBLE Events
     {
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the pause signal

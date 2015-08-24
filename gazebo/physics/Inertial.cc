@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "Inertial.hh"
+#include "gazebo/physics/Inertial.hh"
 
 using namespace gazebo;
 using namespace physics;

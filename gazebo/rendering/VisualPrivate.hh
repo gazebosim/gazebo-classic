@@ -33,6 +33,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -55,6 +56,31 @@ namespace gazebo
     /// \brief Private data for the Visual class
     class VisualPrivate
     {
+      /// \brief Constructor
+      public: VisualPrivate()
+              : sceneNode(NULL),
+                transparency(0),
+                castShadows(true),
+                isStatic(false),
+                staticGeom(NULL),
+                visible(true),
+                ribbonTrail(NULL),
+                skeleton(NULL),
+                animState(NULL),
+                useRTShader(true),
+                initialized(false),
+                boundingBox(NULL),
+                id(0),
+                lighting(true),
+                visibilityFlags(GZ_VISIBILITY_ALL),
+                type(Visual::VT_ENTITY),
+                layer(0)
+      {
+      }
+
+      /// \brief Default destructor
+      public: virtual ~VisualPrivate() = default;
+
       /// \brief Pointer to the visual's scene.
       public: ScenePtr scene;
 
@@ -75,6 +101,9 @@ namespace gazebo
 
       /// \brief Transparency value.
       public: float transparency;
+
+      /// \brief True if visual casts shadows.
+      public: bool castShadows;
 
       /// \brief True if the visual is static, which allows Ogre to improve
       /// performance.
@@ -139,6 +168,34 @@ namespace gazebo
 
       /// \brief A list of visual plugins.
       public: std::vector<VisualPluginPtr> plugins;
+
+      /// \brief The visual's mesh name.
+      public: std::string meshName;
+
+      /// \brief The visual's submesh name.
+      public: std::string subMeshName;
+
+      /// \brief Ambient color of the visual.
+      public: common::Color ambient;
+
+      /// \brief Diffuse color of the visual.
+      public: common::Color diffuse;
+
+      /// \brief Specular color of the visual.
+      public: common::Color specular;
+
+      /// \brief Emissive color of the visual.
+      public: common::Color emissive;
+
+      /// \brief Visibility flags of the visual.
+      public: uint32_t visibilityFlags;
+
+      /// \brief type
+      public: Visual::VisualType type;
+
+      /// \brief Index of the layer to which this visual belongs. Layers
+      /// act similar to layers in photoshop.
+      public: int32_t layer;
     };
     /// \}
   }

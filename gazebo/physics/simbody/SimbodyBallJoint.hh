@@ -32,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief SimbodyBallJoint class models a ball joint in Simbody.
-    class GAZEBO_VISIBLE SimbodyBallJoint : public BallJoint<SimbodyJoint>
+    class GZ_PHYSICS_VISIBLE SimbodyBallJoint : public BallJoint<SimbodyJoint>
     {
       /// \brief Simbody Ball Joint Constructor
       public: SimbodyBallJoint(SimTK::MultibodySystem *_world, BasePtr _parent);

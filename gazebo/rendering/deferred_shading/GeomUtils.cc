@@ -16,6 +16,7 @@
 */
 
 #include <OgreMeshManager.h>
+#include <OgreMesh.h>
 #include <OgreSubMesh.h>
 #include <OgreHardwareBufferManager.h>
 

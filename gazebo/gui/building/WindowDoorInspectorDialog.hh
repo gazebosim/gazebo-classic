@@ -21,12 +21,14 @@
 #include <string>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+#include "gazebo/gui/building/BaseInspectorDialog.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE WindowDoorInspectorDialog : public QDialog
+    class GZ_GUI_BUILDING_VISIBLE WindowDoorInspectorDialog
+      : public BaseInspectorDialog
     {
       Q_OBJECT
 

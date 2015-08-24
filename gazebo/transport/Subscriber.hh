@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class Subscriber Subscriber.hh transport/transport.hh
     /// \brief A subscriber to a topic
-    class GAZEBO_VISIBLE Subscriber
+    class GZ_TRANSPORT_VISIBLE Subscriber
     {
       /// \brief Constructor
       /// \param[in] _topic The topic we're subscribing to

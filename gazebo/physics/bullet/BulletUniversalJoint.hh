@@ -35,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \brief A bullet universal joint class
-    class GAZEBO_VISIBLE BulletUniversalJoint
+    class GZ_PHYSICS_VISIBLE BulletUniversalJoint
       : public UniversalJoint<BulletJoint>
     {
       /// \brief Constructor

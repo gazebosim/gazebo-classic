@@ -20,6 +20,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/dart/DARTJointPrivate.hh"
 #include "gazebo/physics/dart/DARTSliderJoint.hh"
 
 using namespace gazebo;
@@ -27,16 +28,15 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
-    : SliderJoint<DARTJoint>(_parent),
-      dtPrismaticJoint(new dart::dynamics::PrismaticJoint())
+  : SliderJoint<DARTJoint>(_parent)
 {
-  this->dtJoint = this->dtPrismaticJoint;
+  this->dataPtr->dtJoint = new dart::dynamics::PrismaticJoint();
 }
 
 //////////////////////////////////////////////////
 DARTSliderJoint::~DARTSliderJoint()
 {
-  delete dtPrismaticJoint;
+  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////
@@ -54,8 +54,8 @@ void DARTSliderJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTSliderJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
-                        this->dtJoint->getTransformFromChildBodyNode();
+  Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
+      this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);
@@ -68,9 +68,13 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
 
   if (_index == 0)
   {
-    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
-                          this->dtJoint->getTransformFromChildBodyNode();
-    Eigen::Vector3d axis = this->dtPrismaticJoint->getAxis();
+    dart::dynamics::PrismaticJoint *dtPrismaticJoint =
+        reinterpret_cast<dart::dynamics::PrismaticJoint *>(
+          this->dataPtr->dtJoint);
+
+    Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
+        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = dtPrismaticJoint->getAxis();
     globalAxis = T.linear() * axis;
   }
   else
@@ -86,13 +90,17 @@ void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   if (_index == 0)
   {
+    dart::dynamics::PrismaticJoint *dtPrismaticJoint =
+        reinterpret_cast<dart::dynamics::PrismaticJoint *>(
+          this->dataPtr->dtJoint);
+
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(
         this->GetAxisFrameOffset(0).RotateVector(_axis));
     Eigen::Isometry3d dartTransfJointLeftToParentLink
-        = this->dtJoint->getTransformFromParentBodyNode().inverse();
+        = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
     dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
 
-    this->dtPrismaticJoint->setAxis(dartVec3);
+    dtPrismaticJoint->setAxis(dartVec3);
   }
   else
   {
@@ -107,7 +115,7 @@ math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dtJoint->getPosition(0);
+    double radianAngle = this->dataPtr->dtJoint->getPosition(0);
     result.SetFromRadian(radianAngle);
   }
   else
@@ -123,8 +131,9 @@ void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
   {
-    this->dtJoint->setVelocity(0, _vel);
-    this->dtJoint->getSkeleton()->computeForwardKinematics(false, true, false);
+    this->dataPtr->dtJoint->setVelocity(0, _vel);
+    this->dataPtr->dtJoint->getSkeleton()->computeForwardKinematics(
+          false, true, false);
   }
   else
     gzerr << "Invalid index[" << _index << "]\n";
@@ -136,7 +145,7 @@ double DARTSliderJoint::GetVelocity(unsigned int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getVelocity(0);
+    result = this->dataPtr->dtJoint->getVelocity(0);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -148,8 +157,8 @@ void DARTSliderJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
   {
-    this->dtJoint->setForceLowerLimit(0, -_force);
-    this->dtJoint->setForceUpperLimit(0, _force);
+    this->dataPtr->dtJoint->setForceLowerLimit(0, -_force);
+    this->dataPtr->dtJoint->setForceUpperLimit(0, _force);
   }
   else
   {
@@ -165,8 +174,8 @@ double DARTSliderJoint::GetMaxForce(unsigned int _index)
   if (_index == 0)
   {
     // Assume that the lower limit and upper limit has equal magnitute
-    // result = this->dtJoint->getForceLowerLimit(0);
-    result = this->dtJoint->getForceUpperLimit(0);
+    // result = this->dataPtr->dtJoint->getForceLowerLimit(0);
+    result = this->dataPtr->dtJoint->getForceUpperLimit(0);
   }
   else
   {
@@ -180,7 +189,7 @@ double DARTSliderJoint::GetMaxForce(unsigned int _index)
 void DARTSliderJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
-    this->dtJoint->setForce(0, _effort);
+    this->dataPtr->dtJoint->setForce(0, _effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

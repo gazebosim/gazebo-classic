@@ -95,7 +95,8 @@ endmacro (BUILD_WARNING)
 
 #################################################
 macro (gz_add_library _name)
-  add_library(${_name} SHARED ${ARGN})
+  # Not defining STATIC or SHARED will use BUILD_SHARED_LIBS variable
+  add_library(${_name} ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
 endmacro ()
 
@@ -125,10 +126,44 @@ endmacro ()
 
 #################################################
 macro (gz_setup_unix)
+    # Using dynamic linking in UNIX by default
+    set(BUILD_SHARED_LIBS TRUE)
 endmacro()
 
 #################################################
 macro (gz_setup_windows)
+    # Using static linking in Windows by default
+    set(BUILD_SHARED_LIBS FALSE)
+    add_definitions(-DBUILDING_STATIC_LIBS -DWIN32_LEAN_AND_MEAN)
+
+    # Need for M_PI constant
+    add_definitions(-D_USE_MATH_DEFINES) 
+
+    # Don't pull in the Windows min/max macros
+    add_definitions(-DNOMINMAX) 
+
+    #use static libraries for FREEIMAGE
+    add_definitions(-DFREEIMAGE_LIB)
+
+    # Use dynamic linking for boost
+    add_definitions(-DBOOST_ALL_DYN_LINK)
+
+    # And force linking to MSVC dynamic runtime
+    if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
+      add_definitions("/MDd")
+    else()
+      add_definitions("/MD")
+    endif()
+
+    # And we want exceptions
+    add_definitions("/EHsc")
+
+    if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+      # Not need if proper cmake gnerator (-G "...Win64") is passed to cmake
+      # Enable as a second measure to workaround over bug
+      # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240 
+      set(CMAKE_SHARED_LINKER_FLAGS "/machine:x64")
+    endif()
 endmacro()
 
 #################################################

@@ -27,16 +27,16 @@
 namespace gazebo
 {
   /// \brief A plugin that simulates lift and drag.
-  class LiftDragPlugin : public ModelPlugin
+  class GAZEBO_VISIBLE LiftDragPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: LiftDragPlugin();
 
-    // Documentation Inherited.
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    /// \brief Destructor.
+    public: ~LiftDragPlugin();
 
     // Documentation Inherited.
-    public: virtual void Init();
+    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
     /// \brief Callback for World Update events.
     protected: virtual void OnUpdate();
@@ -52,9 +52,6 @@ namespace gazebo
 
     /// \brief Pointer to model containing plugin.
     protected: physics::ModelPtr model;
-
-    /// \brief Name of model containing plugin.
-    protected: std::string modelName;
 
     /// \brief Coefficient of Lift / alpha slope.
     /// Lift = C_L * q * S
@@ -91,6 +88,12 @@ namespace gazebo
     /// At 20 °C and 101.325 kPa, dry air has a density of 1.2041 kg/m3.
     protected: double rho;
 
+    /// \brief if the shape is aerodynamically radially symmetric about
+    /// the forward direction. Defaults to false for wing shapes.
+    /// If set to true, the upward direction is determined by the
+    /// angle of attack.
+    protected: bool radialSymmetry;
+
     /// \brief effective planeform surface area
     protected: double area;
 
@@ -106,21 +109,28 @@ namespace gazebo
     /// \brief center of pressure in link local coordinates
     protected: math::Vector3 cp;
 
-    /// \brief forward flight direction in link local coordinates
+    /// \brief Normally, this is taken as a direction parallel to the chord
+    /// of the airfoil in zero angle of attack forward flight.
     protected: math::Vector3 forward;
 
-    /// \brief A vector in the lift/drag plane, anything orthogonal to it
-    /// is considered wing sweep.
+    /// \brief A vector in the lift/drag plane, perpendicular to the forward
+    /// vector. Inflow velocity orthogonal to forward and upward vectors
+    /// is considered flow in the wing sweep direction.
     protected: math::Vector3 upward;
 
-    /// \brief Smooth velocity
+    /// \brief Smoothed velocity
     protected: math::Vector3 velSmooth;
-
-    /// \brief Names of allowed target links, specified in sdf parameters.
-    protected: std::string linkName;
 
     /// \brief Pointer to link currently targeted by mud joint.
     protected: physics::LinkPtr link;
+
+    /// \brief Pointer to a joint that actuates a control surface for
+    /// this lifting body
+    protected: physics::JointPtr controlJoint;
+
+    /// \brief how much to change CL per radian of control surface joint
+    /// value.
+    protected: double controlJointRadToCL;
 
     /// \brief SDF for this plugin;
     protected: sdf::ElementPtr sdf;

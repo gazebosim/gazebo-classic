@@ -38,7 +38,7 @@ namespace gazebo
     ///
     /// This collision is used primarily for ground planes.  Note that while
     /// the plane in infinite, only the part near the camera is drawn.
-    class GAZEBO_VISIBLE PlaneShape : public Shape
+    class GZ_PHYSICS_VISIBLE PlaneShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Link to which we are attached.
@@ -85,6 +85,9 @@ namespace gazebo
       /// this object.
       /// \param[in] _msg Message to update from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
     };
     /// \}
   }

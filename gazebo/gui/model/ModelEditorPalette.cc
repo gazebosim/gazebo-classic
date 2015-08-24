@@ -27,7 +27,7 @@
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/SaveDialog.hh"
+#include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
@@ -42,72 +42,63 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 {
   this->setObjectName("modelEditorPalette");
 
+  this->modelDefaultName = "Untitled";
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  this->modelTreeWidget = new QTreeWidget();
-  this->modelTreeWidget->setColumnCount(1);
-  this->modelTreeWidget->setIndentation(10);
-  this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->modelTreeWidget->header()->hide();
-  this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
+  // Simple Shapes
+  QLabel *shapesLabel = new QLabel(tr(
+       "<font size=4 color='white'>Simple Shapes</font>"));
 
-  this->modelTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-      this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
+  QHBoxLayout *shapesLayout = new QHBoxLayout;
 
-  // Parts tree item
-  this->modelItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Link Palette")));
-  this->modelTreeWidget->addTopLevelItem(this->modelItem);
+  QSize toolButtonSize(70, 70);
+  QSize iconSize(40, 40);
 
-  QTreeWidgetItem *simpleShapesItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Simple Shapes")));
-  this->modelItem->addChild(simpleShapesItem);
-
-  QTreeWidgetItem *simpleShapesChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  simpleShapesItem->addChild(simpleShapesChildItem);
-
-  // Shapes buttons
-  QWidget *modelWidget = new QWidget;
-  QWidget *customWidget = new QWidget;
-  QGridLayout *partsLayout = new QGridLayout;
-  QGridLayout *customLayout = new QGridLayout;
-
-  // cylinder button
-  QPushButton *cylinderButton = new QPushButton(tr("Cylinder"), this);
+  // Cylinder button
+  QToolButton *cylinderButton = new QToolButton(this);
+  cylinderButton->setFixedSize(toolButtonSize);
+  cylinderButton->setToolTip(tr("Cylinder"));
+  cylinderButton->setIcon(QPixmap(":/images/cylinder.png"));
+  cylinderButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  cylinderButton->setIconSize(QSize(iconSize));
   cylinderButton->setCheckable(true);
   cylinderButton->setChecked(false);
   connect(cylinderButton, SIGNAL(clicked()), this, SLOT(OnCylinder()));
+  shapesLayout->addWidget(cylinderButton);
 
   // Sphere button
-  QPushButton *sphereButton = new QPushButton(tr("Sphere"), this);
+  QToolButton *sphereButton = new QToolButton(this);
+  sphereButton->setFixedSize(toolButtonSize);
+  sphereButton->setToolTip(tr("Sphere"));
+  sphereButton->setIcon(QPixmap(":/images/sphere.png"));
+  sphereButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  sphereButton->setIconSize(QSize(iconSize));
   sphereButton->setCheckable(true);
   sphereButton->setChecked(false);
   connect(sphereButton, SIGNAL(clicked()), this, SLOT(OnSphere()));
+  shapesLayout->addWidget(sphereButton);
 
   // Box button
-  QPushButton *boxButton = new QPushButton(tr("Box"), this);
+  QToolButton *boxButton = new QToolButton(this);
+  boxButton->setFixedSize(toolButtonSize);
+  boxButton->setToolTip(tr("Box"));
+  boxButton->setIcon(QPixmap(":/images/box.png"));
+  boxButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  boxButton->setIconSize(QSize(iconSize));
   boxButton->setCheckable(true);
   boxButton->setChecked(false);
   connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
+  shapesLayout->addWidget(boxButton);
 
-  partsLayout->addWidget(cylinderButton, 0, 0);
-  partsLayout->addWidget(sphereButton, 0, 1);
-  partsLayout->addWidget(boxButton, 0, 2);
-  modelWidget->setLayout(partsLayout);
+  // Custom Shapes
+  QLabel *customShapesLabel = new QLabel(tr(
+       "<font size=4 color='white'>Custom Shapes</font>"));
 
-  // custom button
-  QTreeWidgetItem *customItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Custom")));
-  this->modelItem->addChild(customItem);
-
-  QTreeWidgetItem *customChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  customItem->addChild(customChildItem);
+  QHBoxLayout *customLayout = new QHBoxLayout;
+  customLayout->setAlignment(Qt::AlignLeft);
+  customLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+      QSizePolicy::Minimum));
 
   QPushButton *customButton = new QPushButton(tr("Add"), this);
   customButton->setMaximumWidth(60);
@@ -115,88 +106,134 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   customButton->setChecked(false);
   connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
   customLayout->addWidget(customButton, 0, 0);
-  customWidget->setLayout(customLayout);
 
-  this->modelTreeWidget->setItemWidget(simpleShapesChildItem, 0, modelWidget);
-  this->modelTreeWidget->setItemWidget(customChildItem, 0, customWidget);
-  this->modelItem->setExpanded(true);
-  simpleShapesItem->setExpanded(true);
-  simpleShapesChildItem->setExpanded(true);
-  customItem->setExpanded(true);
-  customChildItem->setExpanded(true);
+  // Button group
+  this->linkButtonGroup = new QButtonGroup;
+  this->linkButtonGroup->addButton(cylinderButton);
+  this->linkButtonGroup->addButton(sphereButton);
+  this->linkButtonGroup->addButton(boxButton);
+  this->linkButtonGroup->addButton(customButton);
 
-  this->partButtonGroup = new QButtonGroup;
-  this->partButtonGroup->addButton(cylinderButton);
-  this->partButtonGroup->addButton(sphereButton);
-  this->partButtonGroup->addButton(boxButton);
-  this->partButtonGroup->addButton(customButton);
+  // Model Settings
+  QLabel *settingsLabel = new QLabel(tr(
+       "<font size=4 color='white'>Model Settings</font>"));
 
-  // model settings tree item
-  this->modelSettingsItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Model Settings")));
-  this->modelTreeWidget->addTopLevelItem(this->modelSettingsItem);
+  QGridLayout *settingsLayout = new QGridLayout;
 
-  QTreeWidgetItem *modelSettingsChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->modelSettingsItem->addChild(modelSettingsChildItem);
+  // Model name
+  QLabel *modelLabel = new QLabel(tr("Model Name: "));
+  this->modelNameEdit = new QLineEdit();
+  this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
+  connect(this->modelNameEdit, SIGNAL(textChanged(QString)), this,
+      SLOT(OnNameChanged(QString)));
 
-  QWidget *modelSettingsWidget = new QWidget;
-  QVBoxLayout *modelSettingsLayout = new QVBoxLayout;
-  QGridLayout *dynamicsLayout = new QGridLayout;
-
+  // Static
   QLabel *staticLabel = new QLabel(tr("Static:"));
   this->staticCheck = new QCheckBox;
   this->staticCheck->setChecked(false);
   connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
 
+  // Auto disable
   QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
   this->autoDisableCheck = new QCheckBox;
   this->autoDisableCheck->setChecked(true);
   connect(this->autoDisableCheck, SIGNAL(clicked()), this,
       SLOT(OnAutoDisable()));
 
-  dynamicsLayout->addWidget(staticLabel, 0, 0);
-  dynamicsLayout->addWidget(this->staticCheck, 0, 1);
-  dynamicsLayout->addWidget(autoDisableLabel, 1, 0);
-  dynamicsLayout->addWidget(this->autoDisableCheck, 1, 1);
-
-  modelSettingsLayout->addLayout(dynamicsLayout);
-  modelSettingsWidget->setLayout(modelSettingsLayout);
-  this->modelTreeWidget->setItemWidget(modelSettingsChildItem, 0,
-    modelSettingsWidget);
-  this->modelSettingsItem->setExpanded(true);
-  modelSettingsChildItem->setExpanded(true);
-
-  // plugin
-  this->pluginItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Plugin")));
-  // this->modelTreeWidget->addTopLevelItem(this->pluginItem);
-
-  // save buttons
-  QPushButton *discardButton = new QPushButton(tr("Discard"));
-  connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
-
-  this->saveButton = new QPushButton(tr("Save As"));
-  connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
-
-  QPushButton *doneButton = new QPushButton(tr("Done"));
-  connect(doneButton, SIGNAL(clicked()), this, SLOT(OnDone()));
-
-  QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  buttonsLayout->addWidget(discardButton);
-  buttonsLayout->addWidget(this->saveButton);
-  buttonsLayout->addWidget(doneButton);
-  buttonsLayout->setAlignment(Qt::AlignCenter);
+  settingsLayout->addWidget(modelLabel, 0, 0);
+  settingsLayout->addWidget(this->modelNameEdit, 0, 1);
+  settingsLayout->addWidget(staticLabel, 1, 0);
+  settingsLayout->addWidget(this->staticCheck, 1, 1);
+  settingsLayout->addWidget(autoDisableLabel, 2, 0);
+  settingsLayout->addWidget(this->autoDisableCheck, 2, 1);
 
   this->modelCreator = new ModelCreator();
-  connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
+  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
+  this->otherItemsLayout = new QVBoxLayout();
+  this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
+
+  // Palette layout
+  QVBoxLayout *paletteLayout = new QVBoxLayout();
+  paletteLayout->addWidget(shapesLabel);
+  paletteLayout->addLayout(shapesLayout);
+  paletteLayout->addWidget(customShapesLabel);
+  paletteLayout->addLayout(customLayout);
+  paletteLayout->addLayout(this->otherItemsLayout);
+  paletteLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+      QSizePolicy::Minimum));
+  paletteLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QWidget *paletteWidget = new QWidget();
+  paletteWidget->setLayout(paletteLayout);
+
+  // Model tree
+  this->modelTreeWidget = new QTreeWidget();
+  this->modelTreeWidget->setObjectName("modelTreeWidget");
+  this->modelTreeWidget->setColumnCount(1);
+  this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->modelTreeWidget->header()->hide();
+  this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
+  this->modelTreeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  this->modelTreeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->modelTreeWidget->setVerticalScrollMode(
+      QAbstractItemView::ScrollPerPixel);
+
+  // Links
+  this->linksItem = new QTreeWidgetItem(
+      static_cast<QTreeWidgetItem *>(0),
+      QStringList(QString("%1").arg(tr("Links"))));
+  this->linksItem->setData(0, Qt::UserRole, QVariant(tr("Links")));
+  QFont linksFont = this->linksItem->font(0);
+  linksFont.setBold(true);
+  linksFont.setPointSize(1.1 * linksFont.pointSize());
+  this->linksItem->setFont(0, linksFont);
+  this->modelTreeWidget->addTopLevelItem(this->linksItem);
+
+  // Joints
+  this->jointsItem = new QTreeWidgetItem(
+      static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("%1").arg(tr("Joints"))));
+  this->jointsItem->setData(0, Qt::UserRole, QVariant(tr("Joints")));
+  this->jointsItem->setFont(0, linksFont);
+  this->modelTreeWidget->addTopLevelItem(this->jointsItem);
+
+  connect(this->modelTreeWidget,
+      SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
+      this, SLOT(OnItemDoubleClicked(QTreeWidgetItem *, int)));
+
+  connect(this->modelTreeWidget,
+      SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+      this, SLOT(OnItemClicked(QTreeWidgetItem *, int)));
+
+  connect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
+      this, SLOT(OnItemSelectionChanged()));
+
+  connect(this->modelTreeWidget,
+      SIGNAL(customContextMenuRequested(const QPoint &)),
+      this, SLOT(OnCustomContextMenu(const QPoint &)));
+
+  // Model layout
+  QVBoxLayout *modelLayout = new QVBoxLayout();
+  modelLayout->addWidget(settingsLabel);
+  modelLayout->addLayout(settingsLayout);
+  modelLayout->addWidget(this->modelTreeWidget);
+  modelLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QWidget *modelWidget = new QWidget();
+  modelWidget->setLayout(modelLayout);
+
+  // Main layout
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
-  frameLayout->addWidget(this->modelTreeWidget, 0);
-  frameLayout->addLayout(buttonsLayout);
+
+  QSplitter *splitter = new QSplitter(Qt::Vertical, this);
+  splitter->addWidget(paletteWidget);
+  splitter->addWidget(modelWidget);
+  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(1, 2);
+  splitter->setCollapsible(0, false);
+  splitter->setCollapsible(1, false);
+
+  frameLayout->addWidget(splitter);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
@@ -205,25 +242,61 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->saved = false;
-  this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = "default";
-
   KeyEventHandler::Instance()->AddPressFilter("model_editor",
     boost::bind(&ModelEditorPalette::OnKeyPress, this, _1));
+
+  // Connections
+  this->connections.push_back(
+      gui::model::Events::ConnectSaveModel(
+      boost::bind(&ModelEditorPalette::OnSaveModel, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectNewModel(
+      boost::bind(&ModelEditorPalette::OnNewModel, this)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectModelPropertiesChanged(
+      boost::bind(&ModelEditorPalette::OnModelPropertiesChanged, this, _1, _2,
+      _3, _4)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkInserted(
+      boost::bind(&ModelEditorPalette::OnLinkInserted, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointInserted(
+      boost::bind(&ModelEditorPalette::OnJointInserted, this, _1, _2, _3, _4)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkRemoved(
+      boost::bind(&ModelEditorPalette::OnLinkRemoved, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointRemoved(
+      boost::bind(&ModelEditorPalette::OnJointRemoved, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectJointNameChanged(
+      boost::bind(&ModelEditorPalette::OnJointNameChanged, this, _1, _2)));
+
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&ModelEditorPalette::OnSetSelectedEntity, this, _1, _2)));
+
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedLink(
+       boost::bind(&ModelEditorPalette::OnSetSelectedLink, this, _1, _2)));
+
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedJoint(
+       boost::bind(&ModelEditorPalette::OnSetSelectedJoint, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnItemSelection(QTreeWidgetItem *_item,
-                                         int /*_column*/)
-{
-  if (_item && _item->childCount() > 0)
-    _item->setExpanded(!_item->isExpanded());
+  delete this->modelCreator;
+  this->modelCreator = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -232,7 +305,7 @@ void ModelEditorPalette::OnCylinder()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddPart(ModelCreator::PART_CYLINDER);
+  this->modelCreator->AddLink(ModelCreator::LINK_CYLINDER);
 }
 
 /////////////////////////////////////////////////
@@ -241,7 +314,7 @@ void ModelEditorPalette::OnSphere()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddPart(ModelCreator::PART_SPHERE);
+  this->modelCreator->AddLink(ModelCreator::LINK_SPHERE);
 }
 
 /////////////////////////////////////////////////
@@ -250,7 +323,7 @@ void ModelEditorPalette::OnBox()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddPart(ModelCreator::PART_BOX);
+  this->modelCreator->AddLink(ModelCreator::LINK_BOX);
 }
 
 /////////////////////////////////////////////////
@@ -260,31 +333,88 @@ void ModelEditorPalette::OnCustom()
   importDialog.deleteLater();
   if (importDialog.exec() == QDialog::Accepted)
   {
-    event::Events::setSelectedEntity("", "normal");
-    g_arrowAct->trigger();
-    this->modelCreator->AddCustom(importDialog.GetImportPath());
+    QFileInfo info(QString::fromStdString(importDialog.GetImportPath()));
+    if (info.isFile())
+    {
+      event::Events::setSelectedEntity("", "normal");
+      g_arrowAct->trigger();
+      if (info.completeSuffix().toLower() == "dae" ||
+          info.completeSuffix().toLower() == "stl")
+      {
+        this->modelCreator->AddShape(ModelCreator::LINK_MESH,
+            math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+      }
+      else if (info.completeSuffix().toLower() == "svg")
+      {
+        ExtrudeDialog extrudeDialog(importDialog.GetImportPath(), this);
+        extrudeDialog.deleteLater();
+        if (extrudeDialog.exec() == QDialog::Accepted)
+        {
+          this->modelCreator->AddShape(ModelCreator::LINK_POLYLINE,
+              math::Vector3(1.0/extrudeDialog.GetResolution(),
+              1.0/extrudeDialog.GetResolution(),
+              extrudeDialog.GetThickness()),
+              math::Pose::Zero, importDialog.GetImportPath(),
+              extrudeDialog.GetSamples());
+        }
+        else
+        {
+          this->OnCustom();
+        }
+      }
+    }
   }
   else
   {
     // this unchecks the custom button
-    this->OnPartAdded();
+    this->OnLinkAdded();
   }
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::AddJoint(const std::string &_type)
+void ModelEditorPalette::AddItem(QWidget *_item,
+    const std::string &_category)
+{
+  std::string category = _category;
+  if (category.empty())
+    category = "Other";
+
+  auto iter = this->categories.find(category);
+  QGridLayout *catLayout = NULL;
+  if (iter == this->categories.end())
+  {
+    catLayout = new QGridLayout();
+    this->categories[category] = catLayout;
+
+    std::string catStr =
+        "<font size=4 color='white'>" + category + "</font>";
+    QLabel *catLabel = new QLabel(tr(catStr.c_str()));
+    this->otherItemsLayout->addWidget(catLabel);
+    this->otherItemsLayout->addLayout(catLayout);
+  }
+  else
+    catLayout = iter->second;
+
+  int rowWidth = 3;
+  int row = catLayout->count() / rowWidth;
+  int col = catLayout->count() % rowWidth;
+  catLayout->addWidget(_item, row, col);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::CreateJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
   this->modelCreator->AddJoint(_type);
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnPartAdded()
+void ModelEditorPalette::OnLinkAdded()
 {
-  this->partButtonGroup->setExclusive(false);
-  if (this->partButtonGroup->checkedButton())
-    this->partButtonGroup->checkedButton()->setChecked(false);
-  this->partButtonGroup->setExclusive(true);
+  this->linkButtonGroup->setExclusive(false);
+  if (this->linkButtonGroup->checkedButton())
+    this->linkButtonGroup->checkedButton()->setChecked(false);
+  this->linkButtonGroup->setExclusive(true);
 }
 
 /////////////////////////////////////////////////
@@ -300,68 +430,13 @@ void ModelEditorPalette::OnStatic()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSave()
+void ModelEditorPalette::OnModelPropertiesChanged(
+    bool _static, bool _autoDisable, const math::Pose &/*_pose*/,
+    const std::string &_name)
 {
-  SaveDialog saveDialog;
-  saveDialog.deleteLater();
-  saveDialog.SetTitle("Save Model");
-  saveDialog.SetSaveName(this->modelCreator->GetModelName());
-  saveDialog.SetSaveLocation(QDir::homePath().toStdString());
-  saveDialog.SetFileExtension("sdf");
-  if (saveDialog.exec() == QDialog::Accepted)
-  {
-    this->modelName = saveDialog.GetSaveName();
-    this->saveLocation = saveDialog.GetSaveLocation();
-    this->modelCreator->SetModelName(this->modelName);
-    this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation);
-    this->saveButton->setText("&Save");
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnDiscard()
-{
-  int ret = QMessageBox::warning(0, QString("Discard"),
-      QString("Are you sure you want to discard\n"
-      "your model? All of your work will\n"
-      "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-
-  switch (ret)
-  {
-    case QMessageBox::Discard:
-      this->modelCreator->Reset();
-      this->saveButton->setText("&Save As");
-      this->saveLocation = QDir::homePath().toStdString();
-      break;
-    case QMessageBox::Cancel:
-      // Do nothing
-      break;
-    default:
-      break;
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnDone()
-{
-  SaveDialog saveDialog;
-  saveDialog.SetTitle("Save Model");
-  saveDialog.SetSaveName(this->modelCreator->GetModelName());
-  saveDialog.SetSaveLocation(QDir::homePath().toStdString());
-  saveDialog.SetFileExtension("sdf");
-  if (saveDialog.exec() == QDialog::Accepted)
-  {
-    this->modelName = saveDialog.GetSaveName();
-    this->saveLocation = saveDialog.GetSaveLocation();
-    this->modelCreator->SetModelName(this->modelName);
-    this->modelCreator->GenerateSDF();
-    this->modelCreator->SaveToSDF(this->saveLocation);
-    this->modelCreator->FinishModel();
-    gui::model::Events::finishModel();
-  }
+  this->staticCheck->setChecked(_static);
+  this->autoDisableCheck->setChecked(_autoDisable);
+  this->modelNameEdit->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -370,7 +445,7 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
   if (_event.key == Qt::Key_Escape)
   {
     // call the slots to uncheck the buttons
-    this->OnPartAdded();
+    this->OnLinkAdded();
   }
   if (_event.key == Qt::Key_Delete)
   {
@@ -381,7 +456,308 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
+void ModelEditorPalette::OnItemSelectionChanged()
+{
+  QList<QTreeWidgetItem *> items = this->modelTreeWidget->selectedItems();
+
+  // update and signal new selection
+  for (auto const item : items)
+  {
+    int idx = this->selected.indexOf(item);
+    if (idx >= 0)
+    {
+      this->selected.removeAt(idx);
+      continue;
+    }
+    std::string name = item->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = item->data(1, Qt::UserRole).toString().toStdString();
+
+    if (type == "Link")
+      gui::model::Events::setSelectedLink(name, true);
+    else if (type == "Joint")
+      gui::model::Events::setSelectedJoint(name, true);
+  }
+
+  // deselect
+  for (auto const item : this->selected)
+  {
+    if (item)
+    {
+      std::string name = item->data(0, Qt::UserRole).toString().toStdString();
+      std::string type = item->data(1, Qt::UserRole).toString().toStdString();
+
+      if (type == "Link")
+        gui::model::Events::setSelectedLink(name, false);
+      else if (type == "Joint")
+        gui::model::Events::setSelectedJoint(name, false);
+    }
+  }
+
+  this->selected = items;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
+{
+  // deselect all
+  for (auto &item : this->selected)
+  {
+    if (item)
+      item->setSelected(false);
+  }
+}
+
+/////////////////////////////////////////////////
 ModelCreator *ModelEditorPalette::GetModelCreator()
 {
   return this->modelCreator;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnNameChanged(const QString &_name)
+{
+  gui::model::Events::modelNameChanged(_name.toStdString());
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnNewModel()
+{
+  this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
+
+  this->ClearModelTree();
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSaveModel(const std::string &_saveName)
+{
+  this->modelNameEdit->setText(tr(_saveName.c_str()));
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
+    int /*_column*/)
+{
+  if (_item)
+  {
+    std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
+
+    if (type == "Link")
+      gui::model::Events::openLinkInspector(name);
+    else if (type == "Joint")
+      gui::model::Events::openJointInspector(name);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnItemClicked(QTreeWidgetItem *_item,
+    int /*_column*/)
+{
+  if (_item)
+  {
+    if (this->selected.empty())
+      return;
+
+    QTreeWidgetItem *item = this->selected[0];
+    std::string selectedType =
+        item->data(1, Qt::UserRole).toString().toStdString();
+
+    std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
+
+    if (type != selectedType)
+      this->DeselectType(selectedType);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::DeselectType(const std::string &_type)
+{
+  QObject::disconnect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
+      this, SLOT(OnItemSelectionChanged()));
+
+  for (auto it = this->selected.begin(); it != this->selected.end();)
+  {
+    std::string name = (*it)->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = (*it)->data(1, Qt::UserRole).toString().toStdString();
+    if (type == _type)
+    {
+      (*it)->setSelected(false);
+      it = this->selected.erase(it);
+      if (type == "Link")
+        gui::model::Events::setSelectedLink(name, false);
+      else if (type == "Joint")
+        gui::model::Events::setSelectedJoint(name, false);
+    }
+    else
+      ++it;
+  }
+
+  this->selected = this->modelTreeWidget->selectedItems();
+
+  QObject::connect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
+      this, SLOT(OnItemSelectionChanged()));
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
+{
+  QTreeWidgetItem *item = this->modelTreeWidget->itemAt(_pt);
+
+  if (item)
+  {
+    std::string name = item->data(0, Qt::UserRole).toString().toStdString();
+    std::string type = item->data(1, Qt::UserRole).toString().toStdString();
+
+    if (type == "Link")
+      gui::model::Events::showLinkContextMenu(name);
+    else if (type == "Joint")
+      gui::model::Events::showJointContextMenu(name);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
+{
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  QTreeWidgetItem *newLinkItem = new QTreeWidgetItem(this->linksItem,
+      QStringList(QString("%1").arg(QString::fromStdString(leafName))));
+
+  newLinkItem->setData(0, Qt::UserRole, _linkName.c_str());
+  newLinkItem->setData(1, Qt::UserRole, "Link");
+  this->modelTreeWidget->addTopLevelItem(newLinkItem);
+
+  this->linksItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
+    const std::string &_jointName, const std::string &/*_parentName*/,
+    const std::string &/*_childName*/)
+{
+  std::string leafName = _jointName;
+  size_t idx = _jointName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _jointName.substr(idx+1);
+
+  QTreeWidgetItem *newJointItem = new QTreeWidgetItem(this->jointsItem,
+      QStringList(QString("%1").arg(QString::fromStdString(leafName))));
+
+  newJointItem->setData(0, Qt::UserRole, _jointId.c_str());
+  newJointItem->setData(1, Qt::UserRole, "Joint");
+  this->modelTreeWidget->addTopLevelItem(newJointItem);
+
+  this->jointsItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->linksItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->linksItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _linkId)
+    {
+      this->linksItem->takeChild(this->linksItem->indexOfChild(item));
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->jointsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->jointsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _jointId)
+    {
+      this->jointsItem->takeChild(this->jointsItem->indexOfChild(item));
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::ClearModelTree()
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  // Remove all links
+  this->linksItem->takeChildren();
+  // Remove all joints
+  this->jointsItem->takeChildren();
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
+    const std::string &_newJointName)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->jointsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->jointsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _jointId)
+    {
+      item->setText(0, QString::fromStdString(_newJointName));
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
+    bool _selected)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->linksItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->linksItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _name)
+    {
+      item->setSelected(_selected);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
+    bool _selected)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->jointsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->jointsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _name)
+    {
+      item->setSelected(_selected);
+      break;
+    }
+  }
 }

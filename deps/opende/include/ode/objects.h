@@ -1,4 +1,3 @@
-
 /*************************************************************************
  *                                                                       *
  * Open Dynamics Engine, Copyright (C) 2001,2002 Russell L. Smith.       *
@@ -31,6 +30,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/// \brief  Enum for Friction_Model
+/// Enum of different friction models
+enum Friction_Model {
+  pyramid_friction,
+  cone_friction,
+  box_friction
+};
+
+/// \brief  Enum for World_Solver_Type
+/// Enum of world stepper LCP solver choices
+enum World_Solver_Type{
+  ODE_DEFAULT,
+  DART_PGS,
+  BULLET_PGS
+};
 
 /**
  * @defgroup world World
@@ -137,24 +152,24 @@ ODE_API dReal dWorldGetCFM (dWorldID);
  * @brief Set the world to use shared working memory along with another world.
  *
  * The worlds allocate working memory internally for simulation stepping. This
- * memory is cached among the calls to @c dWordStep and @c dWorldQuickStep. 
- * Similarly, several worlds can be set up to share this memory caches thus 
- * reducing overall memory usage by cost of making worlds inappropriate for 
+ * memory is cached among the calls to @c dWordStep and @c dWorldQuickStep.
+ * Similarly, several worlds can be set up to share this memory caches thus
+ * reducing overall memory usage by cost of making worlds inappropriate for
  * simultaneous simulation in multiple threads.
  *
- * If null value is passed for @a from_world parameter the world is detached from 
- * sharing and returns to defaults for working memory, reservation policy and 
- * memory manager as if just created. This can also be used to enable use of shared 
+ * If null value is passed for @a from_world parameter the world is detached from
+ * sharing and returns to defaults for working memory, reservation policy and
+ * memory manager as if just created. This can also be used to enable use of shared
  * memory for a world that has already had working memory allocated privately.
  * Normally using shared memory after a world has its private working memory allocated
  * is prohibited.
  *
  * Allocation policy used can only increase world's internal reserved memory size
- * and never decreases it. @c dWorldCleanupWorkingMemory can be used to release 
- * working memory for a world in case if number of objects/joint decreases 
+ * and never decreases it. @c dWorldCleanupWorkingMemory can be used to release
+ * working memory for a world in case if number of objects/joint decreases
  * significantly in it.
  *
- * With sharing working memory worlds also automatically share memory reservation 
+ * With sharing working memory worlds also automatically share memory reservation
  * policy and memory manager. Thus, these parameters need to be customized for
  * initial world to be used as sharing source only.
  *
@@ -174,13 +189,13 @@ ODE_API int dWorldUseSharedWorkingMemory(dWorldID w, dWorldID from_world/*=NULL*
 /**
  * @brief Release internal working memory allocated for world
  *
- * The worlds allocate working memory internally for simulation stepping. This 
+ * The worlds allocate working memory internally for simulation stepping. This
  * function can be used to free world's internal memory cache in case if number of
- * objects/joints in the world decreases significantly. By default, internal 
- * allocation policy is used to only increase cache size as necessary and never 
+ * objects/joints in the world decreases significantly. By default, internal
+ * allocation policy is used to only increase cache size as necessary and never
  * decrease it.
  *
- * If a world shares its working memory with other worlds the cache deletion 
+ * If a world shares its working memory with other worlds the cache deletion
  * affects all the linked worlds. However the shared status itself remains intact.
  *
  * The function call does affect neither memory reservation policy nor memory manager.
@@ -206,8 +221,8 @@ ODE_API void dWorldCleanupWorkingMemory(dWorldID w);
  * @c reserve_factor is a quotient that is multiplied by required memory size
  *  to allocate extra reserve whenever reallocation is needed.
  *
- * @c reserve_minimum is a minimum size that is checked against whenever reallocation 
- * is needed to allocate expected working memory minimum at once without extra 
+ * @c reserve_minimum is a minimum size that is checked against whenever reallocation
+ * is needed to allocate expected working memory minimum at once without extra
  * reallocations as number of bodies/joints grows.
  *
  * @ingroup world
@@ -230,7 +245,7 @@ typedef struct
  * are used.
  *
  * Passing @a policyinfo argument as NULL results in reservation policy being
- * reset to defaults as if the world has been just created. The content of 
+ * reset to defaults as if the world has been just created. The content of
  * @a policyinfo structure is copied internally and does not need to remain valid
  * after the call returns.
  *
@@ -268,7 +283,7 @@ ODE_API int dWorldSetStepMemoryReservationPolicy(dWorldID w, const dWorldStepRes
 * @ingroup init
 * @see dWorldSetStepMemoryManager
 */
-typedef struct 
+typedef struct
 {
   unsigned struct_size;
   void *(*alloc_block)(size_t block_size);
@@ -285,12 +300,12 @@ typedef struct
 * based memory manager is used.
 *
 * Passing @a memfuncs argument as NULL results in memory manager being
-* reset to default one as if the world has been just created. The content of 
+* reset to default one as if the world has been just created. The content of
 * @a memfuncs structure is copied internally and does not need to remain valid
 * after the call returns.
 *
 * If the world uses working memory sharing, changing memory manager
-* affects all the worlds linked together. 
+* affects all the worlds linked together.
 *
 * Failure result status means a memory allocation failure.
 *
@@ -398,7 +413,7 @@ ODE_API void dWorldImpulseToForce
  );
 
 /**
- * @brief Set the maximum number of iterations that the RobustStep method 
+ * @brief Set the maximum number of iterations that the RobustStep method
  *        performs per step.
  * @ingroup world
  * @remarks
@@ -440,7 +455,7 @@ ODE_API void dWorldSetQuickStepNumChunks (dWorldID, int num);
 ODE_API void dWorldSetQuickStepNumOverlap (dWorldID, int num);
 
 /**
- * @brief Get the maximum number of iterations that the RobustStep method 
+ * @brief Get the maximum number of iterations that the RobustStep method
  *        performs per step.
  * @ingroup world
  * @return nr of iterations
@@ -553,6 +568,12 @@ ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
 ODE_API dReal dWorldGetQuickStepContactResidualSmoothing (dWorldID);
 
 /**
+ * @brief Get option to turn on experimental threaded position correction.
+ * @ingroup world
+ */
+ODE_API bool dWorldGetQuickStepThreadPositionCorrection (dWorldID);
+
+/**
  * @brief Get option to turn on experimental row reordering.
  * see dWorldGetQuickStepExperimentalRowReordering for details.
  * @ingroup world
@@ -572,6 +593,18 @@ ODE_API dReal dWorldGetQuickStepWarmStartFactor (dWorldID);
 ODE_API int dWorldGetQuickStepExtraFrictionIterations (dWorldID);
 
 /**
+ * @brief Get the friction model.
+ * @ingroup world
+ */
+ODE_API Friction_Model dWorldGetQuickStepFrictionModel(dWorldID);
+
+/**
+ * @brief Get the LCP Solver for world step.
+ * @ingroup world
+ */
+ODE_API World_Solver_Type dWorldGetWorldStepSolverType(dWorldID);
+
+/**
  * @brief Option to turn on inertia ratio reduction.
  * @ingroup world
  * @param irr set to true to turn on inertia ratio reduction.
@@ -584,6 +617,14 @@ ODE_API void dWorldSetQuickStepInertiaRatioReduction (dWorldID, bool irr);
  * @param smooth smoothing coefficent (0: no smothing ~ 1: full smoothing)
  */
 ODE_API void dWorldSetQuickStepContactResidualSmoothing (dWorldID, dReal smoo);
+
+/**
+ * @brief Set threaded projected position correction computations
+ * for potential solver speedup.
+ * @ingroup world
+ * @param thread (false: no threading ~ true: threaded parallel update)
+ */
+ODE_API void dWorldSetQuickStepThreadPositionCorrection (dWorldID, bool thread);
 
 /**
  * @brief Turn on experimental row reordering, so within one sweep,
@@ -616,6 +657,21 @@ ODE_API void dWorldSetQuickStepWarmStartFactor (dWorldID, dReal warm);
  * default sweep.
  */
 ODE_API void dWorldSetQuickStepExtraFrictionIterations (dWorldID, int iters);
+
+/**
+ * @brief Set the friction model from: cone friction, pyramid friction
+ * and box friction.
+ * @ingroup world
+ * @param enum for friction model
+ */
+ODE_API void dWorldSetQuickStepFrictionModel(dWorldID, Friction_Model fricmodel);
+
+/**
+ * @brief Set the LCP Solver from: ODE_DEFAULT, DART_PGS, BULLET_PGS
+ * @ingroup world
+ * @param enum for LCP Solver
+ */
+ODE_API void dWorldSetWorldStepSolverType(dWorldID, World_Solver_Type solverType);
 
 /* PGS experimental parameters */
 
@@ -696,7 +752,7 @@ ODE_API dReal dWorldGetContactSurfaceLayer (dWorldID);
  * A body is considered to be idle when the magnitudes of both its
  * linear average velocity and angular average velocity are below given thresholds.
  * The sample size for the average defaults to one and can be disabled by setting
- * to zero with 
+ * to zero with
  *
  * Thus, every body has six auto-disable parameters: an enabled flag, a idle step
  * count, an idle time, linear/angular average velocity thresholds, and the
@@ -849,7 +905,7 @@ ODE_API void dWorldSetAutoDisableFlag (dWorldID, int do_auto_disable);
  * joint constraints are processed by the stepper (moving the body), then
  * the damping is applied.
  *
- * @note The damping happens right after the moved callback is called; this way 
+ * @note The damping happens right after the moved callback is called; this way
  * it still possible use the exact velocities the body has acquired during the
  * step. You can even use the callback to create your own customized damping.
  */
@@ -1068,7 +1124,7 @@ ODE_API void  dBodySetAutoDisableDefaults (dBodyID);
 /**
  * @brief Retrieves the world attached to te given body.
  * @remarks
- * 
+ *
  * @ingroup bodies
  */
 ODE_API dWorldID dBodyGetWorld (dBodyID);
@@ -1565,7 +1621,7 @@ ODE_API void dBodySetDisabledCallback(dBodyID b, void (*callback)(dBodyID));
 
 /**
  * @brief Return the first geom associated with the body.
- * 
+ *
  * You can traverse through the geoms by repeatedly calling
  * dBodyGetNextGeom().
  *
@@ -1801,7 +1857,7 @@ ODE_API dJointID dJointCreateHinge (dWorldID, dJointGroupID);
  * If it is nonzero the joint is allocated in the given joint group.
  */
 ODE_API dJointID dJointCreateGearbox (dWorldID, dJointGroupID);
- 
+
 /**
  * @brief Create a new joint of the slider type.
  * @ingroup joints
@@ -1999,12 +2055,6 @@ ODE_API void dJointSetData (dJointID, void *data);
  * @ingroup joints
  */
 ODE_API void dJointSetScrewThreadPitch (dJointID, dReal thread_pitch);
-
-/**
- * @brief Set joint viscous damping coefficient
- * @ingroup joints
- */
-ODE_API void dJointSetDamping (dJointID, dReal damping);
 
 /**
  * @brief Get the user-data pointer
@@ -2264,12 +2314,12 @@ ODE_API void dJointSetUniversalAnchor (dJointID, dReal x, dReal y, dReal z);
 ODE_API void dJointSetUniversalAxis1 (dJointID, dReal x, dReal y, dReal z);
 
 /**
- * @brief Set the Universal axis1 as if the 2 bodies were already at 
+ * @brief Set the Universal axis1 as if the 2 bodies were already at
  *        offset1 and offset2 appart with respect to axis1 and axis2.
  * @ingroup joints
  *
- * This function initialize the axis1 and the relative orientation of 
- * each body as if body1 was rotated around the new axis1 by the offset1 
+ * This function initialize the axis1 and the relative orientation of
+ * each body as if body1 was rotated around the new axis1 by the offset1
  * value and as if body2 was rotated around the axis2 by offset2. \br
  * Ex:
 * <PRE>
@@ -2295,8 +2345,8 @@ ODE_API void dJointSetUniversalAxis1 (dJointID, dReal x, dReal y, dReal z);
  *
  * @note Any previous offsets are erased.
  *
- * @warning Calling dJointSetUniversalAnchor, dJointSetUnivesalAxis1, 
- *          dJointSetUniversalAxis2, dJointSetUniversalAxis2Offset 
+ * @warning Calling dJointSetUniversalAnchor, dJointSetUnivesalAxis1,
+ *          dJointSetUniversalAxis2, dJointSetUniversalAxis2Offset
  *          will reset the "zero" angle position.
  */
 ODE_API void dJointSetUniversalAxis1Offset (dJointID, dReal x, dReal y, dReal z,
@@ -2309,12 +2359,12 @@ ODE_API void dJointSetUniversalAxis1Offset (dJointID, dReal x, dReal y, dReal z,
 ODE_API void dJointSetUniversalAxis2 (dJointID, dReal x, dReal y, dReal z);
 
 /**
- * @brief Set the Universal axis2 as if the 2 bodies were already at 
+ * @brief Set the Universal axis2 as if the 2 bodies were already at
  *        offset1 and offset2 appart with respect to axis1 and axis2.
  * @ingroup joints
  *
- * This function initialize the axis2 and the relative orientation of 
- * each body as if body1 was rotated around the axis1 by the offset1 
+ * This function initialize the axis2 and the relative orientation of
+ * each body as if body1 was rotated around the axis1 by the offset1
  * value and as if body2 was rotated around the new axis2 by offset2. \br
  * Ex:
  * <PRE>
@@ -2340,8 +2390,8 @@ ODE_API void dJointSetUniversalAxis2 (dJointID, dReal x, dReal y, dReal z);
  *
  * @note Any previous offsets are erased.
  *
- * @warning Calling dJointSetUniversalAnchor, dJointSetUnivesalAxis1, 
- *          dJointSetUniversalAxis2, dJointSetUniversalAxis2Offset 
+ * @warning Calling dJointSetUniversalAnchor, dJointSetUnivesalAxis1,
+ *          dJointSetUniversalAxis2, dJointSetUniversalAxis2Offset
  *          will reset the "zero" angle position.
  */
 
@@ -2393,7 +2443,7 @@ ODE_API void dJointSetPRParam (dJointID, int parameter, dReal value);
 /**
  * @brief Applies the torque about the rotoide axis of the PR joint
  *
- * That is, it applies a torque with specified magnitude in the direction 
+ * That is, it applies a torque with specified magnitude in the direction
  * of the rotoide axis, to body 1, and with the same magnitude but in opposite
  * direction to body 2. This function is just a wrapper for dBodyAddTorque()}
  * @ingroup joints
@@ -3029,7 +3079,7 @@ ODE_API dReal dJointGetUniversalAngle2Rate (dJointID);
 
 /**
  * @brief Get the joint anchor point, in world coordinates.
- * @return the point on body 1. If the joint is perfectly satisfied, 
+ * @return the point on body 1. If the joint is perfectly satisfied,
  * this will be the same as the point on body 2.
  * @ingroup joints
  */
@@ -3091,8 +3141,8 @@ ODE_API void dJointGetPRAxis2 (dJointID, dVector3 result);
  */
 ODE_API dReal dJointGetPRParam (dJointID, int parameter);
 
-    
-    
+
+
   /**
    * @brief Get the joint anchor point, in world coordinates.
    * @return the point on body 1. If the joint is perfectly satisfied,

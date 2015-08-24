@@ -104,7 +104,7 @@ TEST_F(MsgsTest, BadPackage)
 
 TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 {
-  msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
+  msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3d(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
   EXPECT_DOUBLE_EQ(3, msg.z());
@@ -112,17 +112,17 @@ TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsVector3dToMath)
 {
-  msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
-  math::Vector3 v    = msgs::Convert(msg);
-  EXPECT_DOUBLE_EQ(1, v.x);
-  EXPECT_DOUBLE_EQ(2, v.y);
-  EXPECT_DOUBLE_EQ(3, v.z);
+  msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3d(1, 2, 3));
+  ignition::math::Vector3d v = msgs::ConvertIgn(msg);
+  EXPECT_DOUBLE_EQ(1, v.X());
+  EXPECT_DOUBLE_EQ(2, v.Y());
+  EXPECT_DOUBLE_EQ(3, v.Z());
 }
 
 TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 {
   msgs::Quaternion msg =
-    msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
+    msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
 
   EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
   EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
@@ -133,20 +133,21 @@ TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
 {
   msgs::Quaternion msg =
-    msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
-  math::Quaternion v = msgs::Convert(msg);
+    msgs::Convert(ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
+  ignition::math::Quaterniond v = msgs::ConvertIgn(msg);
 
   // TODO: to real unit test move math::equal to EXPECT_DOUBLE_EQ
-  EXPECT_TRUE(math::equal(v.x, -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.y, 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.z, 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.w, 0.27059805007309851));
+  EXPECT_TRUE(math::equal(v.X(), -0.65328148243818818));
+  EXPECT_TRUE(math::equal(v.Y(), 0.27059805007309856));
+  EXPECT_TRUE(math::equal(v.Z(), 0.65328148243818829));
+  EXPECT_TRUE(math::equal(v.W(), 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 {
-  msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+  msgs::Pose msg = msgs::Convert(ignition::math::Pose3d(
+        ignition::math::Vector3d(1, 2, 3),
+        ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
   EXPECT_DOUBLE_EQ(2, msg.position().y());
@@ -160,17 +161,18 @@ TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgPoseToMath)
 {
-  msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
-  math::Pose v = msgs::Convert(msg);
+  msgs::Pose msg = msgs::Convert(
+      ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
+        ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
+  ignition::math::Pose3d v = msgs::ConvertIgn(msg);
 
-  EXPECT_DOUBLE_EQ(1, v.pos.x);
-  EXPECT_DOUBLE_EQ(2, v.pos.y);
-  EXPECT_DOUBLE_EQ(3, v.pos.z);
-  EXPECT_TRUE(math::equal(v.rot.x, -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.rot.y, 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.rot.z, 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.rot.w, 0.27059805007309851));
+  EXPECT_DOUBLE_EQ(1, v.Pos().X());
+  EXPECT_DOUBLE_EQ(2, v.Pos().Y());
+  EXPECT_DOUBLE_EQ(3, v.Pos().Z());
+  EXPECT_TRUE(math::equal(v.Rot().X(), -0.65328148243818818));
+  EXPECT_TRUE(math::equal(v.Rot().Y(), 0.27059805007309856));
+  EXPECT_TRUE(math::equal(v.Rot().Z(), 0.65328148243818829));
+  EXPECT_TRUE(math::equal(v.Rot().W(), 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, ConvertCommonColorToMsgs)
@@ -207,8 +209,9 @@ TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
 
 TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 {
-  msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
-        math::Vector2d(123, 456), 1.0));
+  msgs::PlaneGeom msg = msgs::Convert(
+      ignition::math::Planed(ignition::math::Vector3d(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
 
   EXPECT_DOUBLE_EQ(0, msg.normal().x());
   EXPECT_DOUBLE_EQ(0, msg.normal().y());
@@ -220,18 +223,19 @@ TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
 {
-  msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
-        math::Vector2d(123, 456), 1.0));
-  math::Plane v = msgs::Convert(msg);
+  msgs::PlaneGeom msg = msgs::Convert(
+      ignition::math::Planed(ignition::math::Vector3d(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
+  ignition::math::Planed v = msgs::ConvertIgn(msg);
 
-  EXPECT_DOUBLE_EQ(0, v.normal.x);
-  EXPECT_DOUBLE_EQ(0, v.normal.y);
-  EXPECT_DOUBLE_EQ(1, v.normal.z);
+  EXPECT_DOUBLE_EQ(0, v.Normal().X());
+  EXPECT_DOUBLE_EQ(0, v.Normal().Y());
+  EXPECT_DOUBLE_EQ(1, v.Normal().Z());
 
-  EXPECT_DOUBLE_EQ(123, v.size.x);
-  EXPECT_DOUBLE_EQ(456, v.size.y);
+  EXPECT_DOUBLE_EQ(123, v.Size().X());
+  EXPECT_DOUBLE_EQ(456, v.Size().Y());
 
-  EXPECT_TRUE(math::equal(1.0, v.d));
+  EXPECT_TRUE(math::equal(1.0, v.Offset()));
 }
 
 //////////////////////////////////////////////////
@@ -265,12 +269,50 @@ TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
   CompareMsgsJointTypeToString(msgs::Joint::BALL);
   CompareMsgsJointTypeToString(msgs::Joint::SCREW);
   CompareMsgsJointTypeToString(msgs::Joint::GEARBOX);
+  CompareMsgsJointTypeToString(msgs::Joint::FIXED);
+}
+
+//////////////////////////////////////////////////
+void CompareMsgsGeometryTypeToString(const msgs::Geometry::Type _type)
+{
+  EXPECT_EQ(_type, msgs::ConvertGeometryType(msgs::ConvertGeometryType(_type)));
+}
+
+//////////////////////////////////////////////////
+TEST_F(MsgsTest, ConvertMsgsGeometryTypeToString)
+{
+  CompareMsgsGeometryTypeToString(msgs::Geometry::BOX);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::SPHERE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::CYLINDER);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::PLANE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::IMAGE);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::HEIGHTMAP);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::MESH);
+  CompareMsgsGeometryTypeToString(msgs::Geometry::POLYLINE);
+
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::BOX), "box");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::SPHERE), "sphere");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::CYLINDER), "cylinder");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::PLANE), "plane");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::IMAGE), "image");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::HEIGHTMAP), "heightmap");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::MESH), "mesh");
+  EXPECT_EQ(msgs::ConvertGeometryType(msgs::Geometry::POLYLINE), "polyline");
+
+  EXPECT_EQ(msgs::ConvertGeometryType("box"), msgs::Geometry::BOX);
+  EXPECT_EQ(msgs::ConvertGeometryType("sphere"), msgs::Geometry::SPHERE);
+  EXPECT_EQ(msgs::ConvertGeometryType("cylinder"), msgs::Geometry::CYLINDER);
+  EXPECT_EQ(msgs::ConvertGeometryType("plane"), msgs::Geometry::PLANE);
+  EXPECT_EQ(msgs::ConvertGeometryType("image"), msgs::Geometry::IMAGE);
+  EXPECT_EQ(msgs::ConvertGeometryType("heightmap"), msgs::Geometry::HEIGHTMAP);
+  EXPECT_EQ(msgs::ConvertGeometryType("mesh"), msgs::Geometry::MESH);
+  EXPECT_EQ(msgs::ConvertGeometryType("polyline"), msgs::Geometry::POLYLINE);
 }
 
 TEST_F(MsgsTest, SetVector3)
 {
   msgs::Vector3d msg;
-  msgs::Set(&msg, math::Vector3(1, 2, 3));
+  msgs::Set(&msg, ignition::math::Vector3d(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
   EXPECT_DOUBLE_EQ(3, msg.z());
@@ -279,7 +321,7 @@ TEST_F(MsgsTest, SetVector3)
 TEST_F(MsgsTest, SetVector2d)
 {
   msgs::Vector2d msg;
-  msgs::Set(&msg, math::Vector2d(1, 2));
+  msgs::Set(&msg, ignition::math::Vector2d(1, 2));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
 }
@@ -287,7 +329,7 @@ TEST_F(MsgsTest, SetVector2d)
 TEST_F(MsgsTest, SetQuaternion)
 {
   msgs::Quaternion msg;
-  msgs::Set(&msg, math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
+  msgs::Set(&msg, ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
   EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
   EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
   EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
@@ -297,8 +339,8 @@ TEST_F(MsgsTest, SetQuaternion)
 TEST_F(MsgsTest, SetPose)
 {
   msgs::Pose msg;
-  msgs::Set(&msg, math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+  msgs::Set(&msg, ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
+        ignition::math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
   EXPECT_DOUBLE_EQ(2, msg.position().y());
@@ -331,8 +373,9 @@ TEST_F(MsgsTest, SetTime)
 TEST_F(MsgsTest, SetPlane)
 {
   msgs::PlaneGeom msg;
-  msgs::Set(&msg, math::Plane(math::Vector3(0, 0, 1),
-                              math::Vector2d(123, 456), 1.0));
+  msgs::Set(&msg, ignition::math::Planed(
+        ignition::math::Vector3d(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
 
   EXPECT_DOUBLE_EQ(0, msg.normal().x());
   EXPECT_DOUBLE_EQ(0, msg.normal().y());
@@ -368,7 +411,7 @@ TEST_F(MsgsTest, GUIFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("gui.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <gui fullscreen='true'>\
          <camera name='camera'>\
@@ -381,7 +424,7 @@ TEST_F(MsgsTest, GUIFromSDF)
            </track_visual>\
          </camera>\
          </gui>\
-       </gazebo>", sdf);
+       </sdf>", sdf));
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
@@ -389,7 +432,7 @@ TEST_F(MsgsTest, GUIFromSDF_EmptyTrackVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("gui.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <gui fullscreen='true'>\
          <camera name='camera'>\
@@ -402,7 +445,7 @@ TEST_F(MsgsTest, GUIFromSDF_EmptyTrackVisual)
            </track_visual>\
          </camera>\
          </gui>\
-       </gazebo>", sdf);
+       </sdf>", sdf));
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
@@ -410,13 +453,13 @@ TEST_F(MsgsTest, GUIFromSDF_WithEmptyCamera)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("gui.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <gui fullscreen='true'>\
          <camera name='camera'>\
          </camera>\
          </gui>\
-       </gazebo>", sdf);
+       </sdf>", sdf));
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
@@ -424,11 +467,11 @@ TEST_F(MsgsTest, GUIFromSDF_WithoutCamera)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("gui.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <gui fullscreen='true'>\
          </gui>\
-       </gazebo>", sdf);
+       </sdf>", sdf));
   msgs::GUI msg = msgs::GUIFromSDF(sdf);
 }
 
@@ -436,7 +479,7 @@ TEST_F(MsgsTest, LightFromSDF_ListDirectional)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("light.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <light type='directional' name='sun'>\
            <cast_shadows>true</cast_shadows>\
@@ -446,12 +489,12 @@ TEST_F(MsgsTest, LightFromSDF_ListDirectional)
            <attenuation>\
              <range>20</range>\
              <constant>0.8</constant>\
-             <linear>0.01</liner>\
+             <linear>0.01</linear>\
              <quadratic>0.0</quadratic>\
            </attenuation>\
            <direction>1.0 1.0 -1.0</direction>\
          </light>\
-       </gazebo>", sdf);
+       </sdf>", sdf));
   msgs::Light msg = msgs::LightFromSDF(sdf);
 }
 
@@ -459,7 +502,7 @@ TEST_F(MsgsTest, LightFromSDF_LightSpot)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("light.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <light type='spot' name='lamp'>\
            <pose>0 0 10 0 0 0</pose>\
@@ -478,7 +521,7 @@ TEST_F(MsgsTest, LightFromSDF_LightSpot)
            </attenuation>\
            <direction>1.0 1.0 -1.0</direction>\
          </light>\
-       </gazebo>", sdf);
+       </sdf>", sdf));
   msgs::Light msg = msgs::LightFromSDF(sdf);
 }
 
@@ -486,7 +529,7 @@ TEST_F(MsgsTest, LightFromSDF_LightPoint)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("light.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <light type='point' name='lamp'>\
            <pose>0 0 10 0 0 0</pose>\
@@ -499,7 +542,7 @@ TEST_F(MsgsTest, LightFromSDF_LightPoint)
              <quadratic>0.0</quadratic>\
            </attenuation>\
          </light>\
-       </gazebo>", sdf);
+       </sdf>", sdf));
   msgs::Light msg = msgs::LightFromSDF(sdf);
 }
 
@@ -507,11 +550,11 @@ TEST_F(MsgsTest, LightFromSDF_LighBadType)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("light.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <light type='_bad_' name='lamp'>\
          </light>\
-       </gazebo>", sdf);
+       </sdf>", sdf));
   msgs::Light msg = msgs::LightFromSDF(sdf);
 }
 
@@ -520,7 +563,7 @@ TEST_F(MsgsTest, VisualFromSDF_PlaneVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
@@ -529,7 +572,7 @@ TEST_F(MsgsTest, VisualFromSDF_PlaneVisual)
            </geometry>\
            <material><script>Gazebo/Grey</script></material>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
@@ -537,7 +580,7 @@ TEST_F(MsgsTest, VisualFromSDF_BoxVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
@@ -546,7 +589,7 @@ TEST_F(MsgsTest, VisualFromSDF_BoxVisual)
            </geometry>\
            <material><script>Gazebo/Grey'</script></material>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
@@ -554,7 +597,7 @@ TEST_F(MsgsTest, VisualFromSDF_SphereVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
@@ -567,7 +610,7 @@ TEST_F(MsgsTest, VisualFromSDF_SphereVisual)
            </shader>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
@@ -575,18 +618,18 @@ TEST_F(MsgsTest, VisualFromSDF_CylinderVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
            <geometry>\
-             <cylinder><radius>1</radius><length>1.0</length></cylinder\
+             <cylinder><radius>1</radius><length>1.0</length></cylinder>\
            </geometry>\
            <material><script>Gazebo/Grey</script>\
            <shader type='normal_map_object_space'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
@@ -594,7 +637,7 @@ TEST_F(MsgsTest, VisualFromSDF_MeshVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
@@ -605,7 +648,7 @@ TEST_F(MsgsTest, VisualFromSDF_MeshVisual)
            <shader type='vertex'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
@@ -613,7 +656,7 @@ TEST_F(MsgsTest, VisualFromSDF_ImageVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
@@ -623,9 +666,9 @@ TEST_F(MsgsTest, VisualFromSDF_ImageVisual)
                <scale>1</scale>\
                <height>1</height>\
                <threshold>255</threshold>\
-               <granularity>10</granularit>\
+               <granularity>10</granularity>\
                <uri>test2.mesh</uri>\
-             <image>\
+             </image>\
            </geometry>\
            <material>\
              <script>Gazebo/Grey</script>\
@@ -636,7 +679,7 @@ TEST_F(MsgsTest, VisualFromSDF_ImageVisual)
              <emissive>.1 .2 .3 1</emissive>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
@@ -644,7 +687,7 @@ TEST_F(MsgsTest, VisualFromSDF_HeigthmapVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <cast_shadows>false</cast_shadows>\
@@ -660,7 +703,7 @@ TEST_F(MsgsTest, VisualFromSDF_HeigthmapVisual)
            <shader type='pixel'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Visual msg = msgs::VisualFromSDF(sdf);
 }
 
@@ -668,11 +711,11 @@ TEST_F(MsgsTest, VisualFromSDF_NoGeometry)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
       common::Exception);
 }
@@ -681,7 +724,7 @@ TEST_F(MsgsTest, VisualFromSDF_ShaderTypeThrow)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <pose>1 1 1 1 2 3</pose>\
@@ -692,28 +735,30 @@ TEST_F(MsgsTest, VisualFromSDF_ShaderTypeThrow)
                <pos>0 0 0</pos>\
              </heightmap>\
            </geometry>\
-           <shader type='throw'/>\
+           <material><script>Gazebo/Grey</script>\
+             <shader type='throw'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
-  msgs::Visual msg = msgs::VisualFromSDF(sdf);
+      </sdf>", sdf));
+  EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
+      common::Exception);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_BadGeometryVisual)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("visual.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
            <pose>1 1 1 1 2 3</pose>\
            <geometry>\
            </geometry>\
            <material><script>Gazebo/Grey</script>\
-           <shader type='pixel'/>\
+             <shader type='pixel'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
                common::Exception);
 }
@@ -733,16 +778,16 @@ TEST_F(MsgsTest, VisualFromSDF_BadGeometryType)
              <bad_type/>\
            </geometry>\
            <material><script>Gazebo/Grey</script>\
-           <shader type='pixel'/>\
+             <shader type='pixel'/>\
            </material>\
          </visual>\
-      </gazebo>", sdf));
+      </sdf>", sdf));
 
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <visual name='visual'>\
          </visual>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
 
   sdf::ElementPtr badElement(new sdf::Element());
   badElement->SetName("bad_type");
@@ -755,17 +800,22 @@ TEST_F(MsgsTest, VisualFromSDF_BadFogType)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <scene>\
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
            <shadows>true</shadows>\
-           <fog><color>1 1 1 1</color> <type>throw</type>\
-           <start>0</start> <end>10</end> <density>1</density> </fog>\
+           <fog>\
+             <color>1 1 1 1</color>\
+             <type>throw</type>\
+             <start>0</start>\
+             <end>10</end>\
+             <density>1</density>\
+           </fog>\
            <grid>false</grid>\
          </scene>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   EXPECT_THROW(msgs::Scene msg = msgs::SceneFromSDF(sdf), common::Exception);
 }
 
@@ -773,16 +823,22 @@ TEST_F(MsgsTest, VisualSceneFromSDF_A)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <scene>\
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
            <shadows>true</shadows>\
-           <fog>1 1 1 1' type='linear' start='0' end='10' density='1'/>\
+           <fog>\
+             <color>1 1 1 1</color>\
+             <type>linear</type>\
+             <start>0</start>\
+             <end>10</end>\
+             <density>1</density>\
+           </fog>\
            <grid>false</grid>\
          </scene>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
 }
 
@@ -790,16 +846,21 @@ TEST_F(MsgsTest, VisualSceneFromSDF_B)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <scene>\
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
            <shadows>false</shadows>\
-           <fog><color>1 1 1 1</color><type>exp</type><start>0</start>\
-           <end>10</end><density>1<density/>\
+           <fog>\
+             <color>1 1 1 1</color>\
+             <type>exp</type>\
+             <start>0</start>\
+             <end>10</end>\
+             <density>1</density>\
+           </fog>\
          </scene>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
 }
 
@@ -807,18 +868,22 @@ TEST_F(MsgsTest, VisualSceneFromSDF_C)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <scene>\
            <ambient>0.1 0.1 0.1 1</ambient>\
            <background>0 0 0 1</background>\
            <shadows>false</shadows>\
-           <fog><color>1 1 1 1</color>\
-           <type>exp2</type><start>0</start><end>10</end>\
-           <density>1</density>\
+           <fog>\
+             <color>1 1 1 1</color>\
+             <type>exp2</type>\
+             <start>0</start>\
+             <end>10</end>\
+             <density>1</density>\
+           </fog>\
            <grid>true</grid>\
          </scene>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
 }
 
@@ -826,11 +891,11 @@ TEST_F(MsgsTest, VisualSceneFromSDF_CEmpty)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <scene>\
          </scene>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
 }
 
@@ -838,12 +903,12 @@ TEST_F(MsgsTest, VisualSceneFromSDF_CEmptyNoSky)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("scene.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
          <scene>\
            <background>0 0 0 1</background>\
          </scene>\
-      </gazebo>", sdf);
+      </sdf>", sdf));
   msgs::Scene msg = msgs::SceneFromSDF(sdf);
 }
 
@@ -852,7 +917,7 @@ TEST_F(MsgsTest, MeshFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());
   sdf::initFile("geometry.sdf", sdf);
-  sdf::readString(
+  ASSERT_TRUE(sdf::readString(
       "<sdf version='" SDF_VERSION "'>\
            <geometry>\
              <mesh>\
@@ -864,8 +929,7 @@ TEST_F(MsgsTest, MeshFromSDF)
                </submesh>\
              </mesh>\
            </geometry>\
-         </visual>\
-      </sdf>", sdf);
+      </sdf>", sdf));
 
   msgs::MeshGeom msg = msgs::MeshFromSDF(sdf->GetElement("mesh"));
   EXPECT_TRUE(msg.has_filename());
@@ -884,6 +948,146 @@ TEST_F(MsgsTest, MeshFromSDF)
 }
 
 /////////////////////////////////////////////////
+TEST_F(MsgsTest, AxisFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("joint.sdf", sdf);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <joint name='arm' type='revolute'>\
+           <parent>arm_base</parent>\
+           <child>arm_shoulder</child>\
+           <axis>\
+             <xyz>0 0 1</xyz>\
+             <limit>\
+               <lower>0.01</lower>\
+               <upper>9</upper>\
+               <effort>2.2</effort>\
+               <velocity>0.1</velocity>\
+             </limit>\
+             <use_parent_model_frame>false</use_parent_model_frame>\
+             <dynamics>\
+               <damping>0.1</damping>\
+               <friction>0.2</friction>\
+             </dynamics>\
+           </axis>\
+         </joint>\
+      </sdf>", sdf));
+  msgs::Axis msg = msgs::AxisFromSDF(sdf->GetElement("axis"));
+
+  EXPECT_TRUE(msg.has_xyz());
+  EXPECT_EQ(msgs::ConvertIgn(msg.xyz()), ignition::math::Vector3d(0, 0, 1));
+  EXPECT_TRUE(msg.has_limit_lower());
+  EXPECT_NEAR(msg.limit_lower(), 0.01, 1e-6);
+  EXPECT_TRUE(msg.has_limit_upper());
+  EXPECT_NEAR(msg.limit_upper(), 9, 1e-6);
+  EXPECT_TRUE(msg.has_limit_effort());
+  EXPECT_NEAR(msg.limit_effort(), 2.2, 1e-6);
+  EXPECT_TRUE(msg.has_limit_velocity());
+  EXPECT_NEAR(msg.limit_velocity(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_use_parent_model_frame());
+  EXPECT_EQ(msg.use_parent_model_frame(), false);
+  EXPECT_TRUE(msg.has_damping());
+  EXPECT_NEAR(msg.damping(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_friction());
+  EXPECT_NEAR(msg.friction(), 0.2, 1e-6);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, JointFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("joint.sdf", sdf);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <joint name='arm' type='revolute'>\
+           <pose>1 2 3 0 1.57 0</pose>\
+           <parent>arm_base</parent>\
+           <child>arm_shoulder</child>\
+           <axis>\
+             <xyz>1 0 0</xyz>\
+             <limit>\
+               <lower>0.1</lower>\
+               <upper>3.14</upper>\
+               <effort>2.4</effort>\
+               <velocity>0.4</velocity>\
+             </limit>\
+             <use_parent_model_frame>true</use_parent_model_frame>\
+             <dynamics>\
+               <damping>1.0</damping>\
+               <friction>0.1</friction>\
+             </dynamics>\
+           </axis>\
+           <physics>\
+             <ode>\
+               <cfm>0.2</cfm>\
+               <bounce>0.1</bounce>\
+               <velocity>1.1</velocity>\
+               <fudge_factor>0.4</fudge_factor>\
+               <limit>\
+                 <cfm>0.0</cfm>\
+                 <erp>0.9</erp>\
+               </limit>\
+               <suspension>\
+                 <cfm>0.1</cfm>\
+                 <erp>0.3</erp>\
+               </suspension>\
+             </ode>\
+           </physics>\
+         </joint>\
+      </sdf>", sdf));
+  msgs::Joint msg = msgs::JointFromSDF(sdf);
+
+  EXPECT_TRUE(msg.has_name());
+  EXPECT_EQ(msg.name(), "arm");
+  EXPECT_TRUE(msg.has_type());
+  EXPECT_EQ(msgs::ConvertJointType(msg.type()), "revolute");
+  EXPECT_TRUE(msg.has_pose());
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0, 1.57, 0));
+  EXPECT_TRUE(msg.has_parent());
+  EXPECT_EQ(msg.parent(), "arm_base");
+  EXPECT_TRUE(msg.has_child());
+  EXPECT_EQ(msg.child(), "arm_shoulder");
+  EXPECT_TRUE(msg.has_cfm());
+  EXPECT_NEAR(msg.cfm(), 0.2, 1e-6);
+  EXPECT_TRUE(msg.has_bounce());
+  EXPECT_NEAR(msg.bounce(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_velocity());
+  EXPECT_NEAR(msg.velocity(), 1.1, 1e-6);
+  EXPECT_TRUE(msg.has_fudge_factor());
+  EXPECT_NEAR(msg.fudge_factor(), 0.4, 1e-6);
+  EXPECT_TRUE(msg.has_limit_cfm());
+  EXPECT_NEAR(msg.limit_cfm(), 0.0, 1e-6);
+  EXPECT_TRUE(msg.has_limit_erp());
+  EXPECT_NEAR(msg.limit_erp(), 0.9, 1e-6);
+  EXPECT_TRUE(msg.has_suspension_cfm());
+  EXPECT_NEAR(msg.suspension_cfm(), 0.1, 1e-6);
+  EXPECT_TRUE(msg.has_suspension_erp());
+  EXPECT_NEAR(msg.suspension_erp(), 0.3, 1e-6);
+
+  EXPECT_TRUE(msg.has_axis1());
+  EXPECT_TRUE(!msg.has_axis2());
+  const msgs::Axis axisMsg = msg.axis1();
+  EXPECT_TRUE(axisMsg.has_xyz());
+  EXPECT_EQ(msgs::ConvertIgn(axisMsg.xyz()), ignition::math::Vector3d(1, 0, 0));
+  EXPECT_TRUE(axisMsg.has_limit_lower());
+  EXPECT_NEAR(axisMsg.limit_lower(), 0.1, 1e-6);
+  EXPECT_TRUE(axisMsg.has_limit_upper());
+  EXPECT_NEAR(axisMsg.limit_upper(), 3.14, 1e-6);
+  EXPECT_TRUE(axisMsg.has_limit_effort());
+  EXPECT_NEAR(axisMsg.limit_effort(), 2.4, 1e-6);
+  EXPECT_TRUE(axisMsg.has_limit_velocity());
+  EXPECT_NEAR(axisMsg.limit_velocity(), 0.4, 1e-6);
+  EXPECT_TRUE(axisMsg.has_use_parent_model_frame());
+  EXPECT_EQ(axisMsg.use_parent_model_frame(), true);
+  EXPECT_TRUE(axisMsg.has_damping());
+  EXPECT_NEAR(axisMsg.damping(), 1.0, 1e-6);
+  EXPECT_TRUE(axisMsg.has_friction());
+  EXPECT_NEAR(axisMsg.friction(), 0.1, 1e-6);
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, LinkToSDF)
 {
   const std::string name("test_link");
@@ -895,7 +1099,7 @@ TEST_F(MsgsTest, LinkToSDF)
   linkMsg.set_self_collide(false);
   linkMsg.set_gravity(true);
   linkMsg.set_kinematic(false);
-  msgs::Set(linkMsg.mutable_pose(), pose);
+  msgs::Set(linkMsg.mutable_pose(), pose.Ign());
 
   const double laserRetro1 = 0.4;
   const double laserRetro2 = 0.5;
@@ -954,8 +1158,9 @@ TEST_F(MsgsTest, CollisionToSDF)
   collisionMsg.set_name(name);
   collisionMsg.set_laser_retro(0.2);
   collisionMsg.set_max_contacts(5);
-  msgs::Set(collisionMsg.mutable_pose(),  math::Pose(math::Vector3(1, 2, 3),
-      math::Quaternion(0, 0, 1, 0)));
+  msgs::Set(collisionMsg.mutable_pose(),
+      ignition::math::Pose3d(ignition::math::Vector3d(1, 2, 3),
+      ignition::math::Quaterniond(0, 0, 1, 0)));
 
   // geometry - see GeometryToSDF for a more detailed test
   msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
@@ -1004,7 +1209,7 @@ TEST_F(MsgsTest, VisualToSDF)
   msgs::Visual visualMsg;
   visualMsg.set_name(name);
   visualMsg.set_laser_retro(laserRetro);
-  msgs::Set(visualMsg.mutable_pose(), pose);
+  msgs::Set(visualMsg.mutable_pose(), pose.Ign());
 
   // geometry - see GeometryToSDF for a more detailed test
   auto geomMsg = visualMsg.mutable_geometry();
@@ -1041,6 +1246,23 @@ TEST_F(MsgsTest, VisualToSDF)
   EXPECT_EQ(materialName, scriptElem->Get<std::string>("name"));
   EXPECT_TRUE(scriptElem->HasElement("uri"));
   EXPECT_EQ(uri, scriptElem->Get<std::string>("uri"));
+
+  // Test the meta.layer property
+  {
+    msgs::Visual msg;
+    auto metaMsg = msg.mutable_meta();
+    metaMsg->set_layer(1);
+
+    sdf::ElementPtr visSdf = msgs::VisualToSDF(msg);
+    EXPECT_TRUE(visSdf->HasElement("meta"));
+    EXPECT_TRUE(visSdf->GetElement("meta")->HasElement("layer"));
+    EXPECT_EQ(visSdf->GetElement("meta")->Get<int32_t>("layer"), 1);
+
+    msgs::Visual msg2 = msgs::VisualFromSDF(visSdf);
+    EXPECT_TRUE(msg2.has_meta());
+    EXPECT_TRUE(msg2.meta().has_layer());
+    EXPECT_EQ(msg2.meta().layer(), 1);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1050,7 +1272,7 @@ TEST_F(MsgsTest, GeometryToSDF)
   msgs::Geometry boxMsg;
   boxMsg.set_type(msgs::Geometry::BOX);
   msgs::BoxGeom *boxGeom = boxMsg.mutable_box();
-  msgs::Set(boxGeom->mutable_size(), math::Vector3(0.5, 0.75, 1.0));
+  msgs::Set(boxGeom->mutable_size(), ignition::math::Vector3d(0.5, 0.75, 1.0));
 
   sdf::ElementPtr boxSDF = msgs::GeometryToSDF(boxMsg);
   sdf::ElementPtr boxElem = boxSDF->GetElement("box");
@@ -1083,8 +1305,8 @@ TEST_F(MsgsTest, GeometryToSDF)
   msgs::Geometry planeMsg;
   planeMsg.set_type(msgs::Geometry::PLANE);
   msgs::PlaneGeom *planeGeom = planeMsg.mutable_plane();
-  msgs::Set(planeGeom->mutable_normal(), math::Vector3(0, 0, 1.0));
-  msgs::Set(planeGeom->mutable_size(), math::Vector2d(0.5, 0.8));
+  msgs::Set(planeGeom->mutable_normal(), ignition::math::Vector3d(0, 0, 1.0));
+  msgs::Set(planeGeom->mutable_size(), ignition::math::Vector2d(0.5, 0.8));
 
   sdf::ElementPtr planeSDF = msgs::GeometryToSDF(planeMsg);
   sdf::ElementPtr planeElem = planeSDF->GetElement("plane");
@@ -1116,8 +1338,10 @@ TEST_F(MsgsTest, GeometryToSDF)
   heightmapMsg.set_type(msgs::Geometry::HEIGHTMAP);
   msgs::HeightmapGeom *heightmapGeom = heightmapMsg.mutable_heightmap();
   heightmapGeom->set_filename("test_heightmap_filename");
-  msgs::Set(heightmapGeom->mutable_size(), math::Vector3(100, 200, 30));
-  msgs::Set(heightmapGeom->mutable_origin(), math::Vector3(50, 100, 15));
+  msgs::Set(heightmapGeom->mutable_size(),
+      ignition::math::Vector3d(100, 200, 30));
+  msgs::Set(heightmapGeom->mutable_origin(),
+      ignition::math::Vector3d(50, 100, 15));
   heightmapGeom->set_use_terrain_paging(true);
 
   msgs::HeightmapGeom_Texture *texture1 = heightmapGeom->add_texture();
@@ -1166,7 +1390,7 @@ TEST_F(MsgsTest, GeometryToSDF)
   meshMsg.set_type(msgs::Geometry::MESH);
   msgs::MeshGeom *meshGeom = meshMsg.mutable_mesh();
   meshGeom->set_filename("test_mesh_filename");
-  msgs::Set(meshGeom->mutable_scale(), math::Vector3(2.3, 1.2, 2.9));
+  msgs::Set(meshGeom->mutable_scale(), ignition::math::Vector3d(2.3, 1.2, 2.9));
   meshGeom->set_submesh("test_mesh_submesh");
   meshGeom->set_center_submesh(false);
 
@@ -1184,11 +1408,11 @@ TEST_F(MsgsTest, GeometryToSDF)
   // polyline
   msgs::Geometry polylineMsg;
   polylineMsg.set_type(msgs::Geometry::POLYLINE);
-  msgs::Polyline *polylineGeom = polylineMsg.mutable_polyline();
+  msgs::Polyline *polylineGeom = polylineMsg.add_polyline();
   polylineGeom->set_height(2.33);
-  msgs::Set(polylineGeom->add_point(), math::Vector2d(0.5, 0.7));
-  msgs::Set(polylineGeom->add_point(), math::Vector2d(3.5, 4.7));
-  msgs::Set(polylineGeom->add_point(), math::Vector2d(1000, 2000));
+  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(0.5, 0.7));
+  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(3.5, 4.7));
+  msgs::Set(polylineGeom->add_point(), ignition::math::Vector2d(1000, 2000));
 
   sdf::ElementPtr polylineSDF = msgs::GeometryToSDF(polylineMsg);
   sdf::ElementPtr polylineElem = polylineSDF->GetElement("polyline");
@@ -1207,7 +1431,7 @@ TEST_F(MsgsTest, MeshToSDF)
 {
   msgs::MeshGeom msg;
   msg.set_filename("test_filename");
-  msgs::Set(msg.mutable_scale(), math::Vector3(0.1, 0.2, 0.3));
+  msgs::Set(msg.mutable_scale(), ignition::math::Vector3d(0.1, 0.2, 0.3));
   msg.set_submesh("test_submesh");
   msg.set_center_submesh(true);
 
@@ -1239,7 +1463,7 @@ TEST_F(MsgsTest, InertialToSDF)
 
   msgs::Inertial msg;
   msg.set_mass(mass);
-  msgs::Set(msg.mutable_pose(), pose);
+  msgs::Set(msg.mutable_pose(), pose.Ign());
   msg.set_ixx(ixx);
   msg.set_ixy(ixy);
   msg.set_ixz(ixz);
@@ -1351,7 +1575,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msgs::Friction *friction = msg.mutable_friction();
   friction->set_mu(mu);
   friction->set_mu2(mu2);
-  msgs::Set(friction->mutable_fdir1(), fdir1);
+  msgs::Set(friction->mutable_fdir1(), fdir1.Ign());
   friction->set_slip1(slip1);
   friction->set_slip2(slip2);
 
@@ -1368,6 +1592,7 @@ TEST_F(MsgsTest, SurfaceToSDF)
   msg.set_min_depth(0.0001);
   msg.set_collide_without_contact(true);
   msg.set_collide_without_contact_bitmask(0x0004);
+  msg.set_collide_bitmask(0x01);
 
   sdf::ElementPtr surfaceSDF = msgs::SurfaceToSDF(msg);
   sdf::ElementPtr frictionElem = surfaceSDF->GetElement("friction");
@@ -1394,6 +1619,8 @@ TEST_F(MsgsTest, SurfaceToSDF)
   EXPECT_TRUE(contactElem->Get<bool>("collide_without_contact"));
   EXPECT_EQ(contactElem->Get<unsigned int>("collide_without_contact_bitmask"),
       static_cast<unsigned int>(0x0004));
+  EXPECT_EQ(contactElem->Get<unsigned int>("collide_bitmask"),
+      static_cast<unsigned int>(0x01));
 }
 
 /////////////////////////////////////////////////
@@ -1436,7 +1663,7 @@ TEST_F(MsgsTest, JointToSDF)
   jointMsg.set_type(type);
   jointMsg.set_parent(parent);
   jointMsg.set_child(child);
-  msgs::Set(jointMsg.mutable_pose(), pose);
+  msgs::Set(jointMsg.mutable_pose(), pose.Ign());
   jointMsg.set_cfm(cfm);
   jointMsg.set_bounce(bounce);
   jointMsg.set_velocity(velocity);
@@ -1447,7 +1674,7 @@ TEST_F(MsgsTest, JointToSDF)
   jointMsg.set_suspension_erp(suspension_erp);
   {
     auto axis1 = jointMsg.mutable_axis1();
-    msgs::Set(axis1->mutable_xyz(), xyz1);
+    msgs::Set(axis1->mutable_xyz(), xyz1.Ign());
     axis1->set_limit_lower(limit_lower1);
     axis1->set_limit_upper(limit_upper1);
     axis1->set_limit_effort(limit_effort1);
@@ -1458,7 +1685,7 @@ TEST_F(MsgsTest, JointToSDF)
   }
   {
     auto axis2 = jointMsg.mutable_axis2();
-    msgs::Set(axis2->mutable_xyz(), xyz2);
+    msgs::Set(axis2->mutable_xyz(), xyz2.Ign());
     axis2->set_limit_lower(limit_lower2);
     axis2->set_limit_upper(limit_upper2);
     axis2->set_limit_effort(limit_effort2);
@@ -1573,7 +1800,7 @@ TEST_F(MsgsTest, AddBoxLink)
 
   const double mass = 1.0;
   const math::Vector3 size(1, 1, 1);
-  msgs::AddBoxLink(model, mass, size);
+  msgs::AddBoxLink(model, mass, size.Ign());
   EXPECT_EQ(model.link_size(), 1);
   {
     auto link = model.link(0);
@@ -1603,7 +1830,7 @@ TEST_F(MsgsTest, AddBoxLink)
       auto collision = link.collision(0);
       auto geometry = collision.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::Convert(geometry.box().size()), size);
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
     }
 
     EXPECT_EQ(link.visual_size(), 1);
@@ -1611,12 +1838,12 @@ TEST_F(MsgsTest, AddBoxLink)
       auto visual = link.visual(0);
       auto geometry = visual.geometry();
       EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
-      EXPECT_EQ(msgs::Convert(geometry.box().size()), size);
+      EXPECT_EQ(msgs::ConvertIgn(geometry.box().size()), size.Ign());
     }
   }
 
   const double massRatio = 2.0;
-  msgs::AddBoxLink(model, mass*massRatio, size);
+  msgs::AddBoxLink(model, mass*massRatio, size.Ign());
   EXPECT_EQ(model.link_size(), 2);
   {
     auto link1 = model.link(0);
@@ -1782,7 +2009,7 @@ TEST_F(MsgsTest, ModelToSDF)
   msgs::Model model;
   model.set_name(name);
   model.set_is_static(false);
-  msgs::Set(model.mutable_pose(), pose);
+  msgs::Set(model.mutable_pose(), pose.Ign());
   EXPECT_EQ(model.link_size(), 0);
   EXPECT_EQ(model.joint_size(), 0);
 
@@ -1791,7 +2018,7 @@ TEST_F(MsgsTest, ModelToSDF)
   const double length = 1.5;
   const double height = 0.9;
   const double width = 0.1;
-  const math::Vector3 boxSize(length, width, height);
+  const ignition::math::Vector3d boxSize(length, width, height);
   const double boxMass = 4.0;
   AddBoxLink(model, boxMass, boxSize);
   ASSERT_EQ(model.link_size(), 1);
@@ -1806,7 +2033,7 @@ TEST_F(MsgsTest, ModelToSDF)
   const math::Pose cylinderPose(-length/2, 0, -height/2, M_PI/2, 0, 0);
   {
     auto link = model.mutable_link(1);
-    msgs::Set(link->mutable_pose(), cylinderPose);
+    msgs::Set(link->mutable_pose(), cylinderPose.Ign());
     link->set_name("rear_wheel");
   }
 
@@ -1817,7 +2044,7 @@ TEST_F(MsgsTest, ModelToSDF)
   const math::Pose spherePose(length/2, 0, -height/2, 0, 0, 0);
   {
     auto link = model.mutable_link(2);
-    msgs::Set(link->mutable_pose(), spherePose);
+    msgs::Set(link->mutable_pose(), spherePose.Ign());
     link->set_name("front_wheel");
   }
 
@@ -1830,7 +2057,7 @@ TEST_F(MsgsTest, ModelToSDF)
   frontJoint->set_type(msgs::ConvertJointType("revolute"));
   frontJoint->set_parent("frame");
   frontJoint->set_child("front_wheel");
-  const math::Vector3 frontAxis(0, 1, 0);
+  const ignition::math::Vector3d frontAxis(0, 1, 0);
   msgs::Set(frontJoint->mutable_axis1()->mutable_xyz(), frontAxis);
 
   // Rear wheel joint
@@ -1841,7 +2068,7 @@ TEST_F(MsgsTest, ModelToSDF)
   rearJoint->set_type(msgs::ConvertJointType("revolute"));
   rearJoint->set_parent("frame");
   rearJoint->set_child("rear_wheel");
-  const math::Vector3 rearAxis(0, 0, 1);
+  const ignition::math::Vector3d rearAxis(0, 0, 1);
   msgs::Set(rearJoint->mutable_axis1()->mutable_xyz(), rearAxis);
 
   sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
@@ -1871,4 +2098,3 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
   EXPECT_EQ(jointElem2->Get<math::Pose>("pose"), math::Pose());
 }
-

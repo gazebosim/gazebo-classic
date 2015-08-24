@@ -72,6 +72,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
     io::Printer printer(output.get(), '$');
 
     printer.Print("#include <boost/shared_ptr.hpp>\n", "name", "includes");
+    printer.Print("#include <gazebo/util/system.hh>\n", "name", "includes");
     printer.Print("#include \"gazebo/msgs/MsgFactory.hh\"\n",
         "name", "includes");
   }

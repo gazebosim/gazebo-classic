@@ -122,10 +122,18 @@ void ODELink::Init()
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
 
           // Set max_vel and min_depth
-          if (g->GetODESurface()->maxVel < 0)
+          boost::any value;
+          if (g->GetODESurface()->maxVel < 0 && this->GetWorld()->
+              GetPhysicsEngine()->GetParam("contact_max_correcting_vel", value))
           {
-            g->GetODESurface()->maxVel =
-             this->GetWorld()->GetPhysicsEngine()->GetContactMaxCorrectingVel();
+            try
+            {
+              g->GetODESurface()->maxVel = boost::any_cast<double>(value);
+            }
+            catch(boost::bad_any_cast &_e)
+            {
+              gzerr << "Failed boost::any_cast in ODELink.cc: " << _e.what();
+            }
           }
           dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
           dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
@@ -182,8 +190,8 @@ void ODELink::MoveCallback(dBodyID _id)
 
   self->dirtyPose.pos -= cog;
 
-  // TODO: this is an ugly line of code. It's like this for speed.
-  self->world->dataPtr->dirtyPoses.push_back(self);
+  // Tell the world that our pose has changed.
+  self->world->_AddDirty(self);
 
   // self->poseMutex->unlock();
 
@@ -585,6 +593,31 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddForceAtWorldPosition"
+          << std::endl;
+  }
+}
+
+//////////////////////////////////////////////////
+void ODELink::AddLinkForce(const math::Vector3 &_force,
+    const math::Vector3 &_offset)
+{
+  if (this->linkId)
+  {
+    // Force vector represents a direction only, so it should be rotated but
+    // not translated
+    math::Vector3 forceWorld = this->GetWorldPose().rot.RotateVector(_force);
+    // Does this need to be rotated?
+    math::Vector3 offsetCoG = _offset - this->inertial->GetCoG();
+
+    this->SetEnabled(true);
+    dBodyAddForceAtRelPos(this->linkId,
+        forceWorld.x, forceWorld.y, forceWorld.z,
+        offsetCoG.x, offsetCoG.y, offsetCoG.z);
+  }
+  else if (!this->IsStatic())
+  {
+    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
+          << " does not exist, unable to AddLinkForce"
           << std::endl;
   }
 }

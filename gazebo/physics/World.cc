@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <time.h>
 
 #include <tbb/parallel_for.h>
@@ -62,6 +68,7 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/WorldPrivate.hh"
@@ -117,6 +124,7 @@ World::World(const std::string &_name)
   this->dataPtr->thread = NULL;
   this->dataPtr->logThread = NULL;
   this->dataPtr->stop = false;
+  this->dataPtr->seekPending = false;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
@@ -148,6 +156,7 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
+  this->dataPtr->presetManager.reset();
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
   delete this->dataPtr->loadModelMutex;
@@ -218,6 +227,8 @@ void World::Load(sdf::ElementPtr _sdf)
                                            &World::OnFactoryMsg, this);
   this->dataPtr->controlSub = this->dataPtr->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
+  this->dataPtr->playbackControlSub = this->dataPtr->node->Subscribe(
+      "~/playback_control", &World::OnPlaybackControl, this);
 
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
                                            &World::OnRequest, this, true);
@@ -239,16 +250,17 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light");
 
-  std::string type = this->dataPtr->sdf->GetElement(
-      "physics")->Get<std::string>("type");
+  // This should come before loading of entities
+  sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
+
+  std::string type = physicsElem->Get<std::string>("type");
   this->dataPtr->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
 
   if (this->dataPtr->physicsEngine == NULL)
     gzthrow("Unable to create physics engine\n");
 
-  // This should come before loading of entities
-  this->dataPtr->physicsEngine->Load(this->dataPtr->sdf->GetElement("physics"));
+  this->dataPtr->physicsEngine->Load(physicsElem);
 
   // This should also come before loading of entities
   {
@@ -257,11 +269,11 @@ void World::Load(sdf::ElementPtr _sdf)
     common::SphericalCoordinates::SurfaceType surfaceType =
       common::SphericalCoordinates::Convert(
         spherical->Get<std::string>("surface_model"));
-    math::Angle latitude, longitude, heading;
+    ignition::math::Angle latitude, longitude, heading;
     double elevation = spherical->Get<double>("elevation");
-    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
-    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
-    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+    latitude.Degree(spherical->Get<double>("latitude_deg"));
+    longitude.Degree(spherical->Get<double>("longitude_deg"));
+    heading.Degree(spherical->Get<double>("heading_deg"));
 
     this->dataPtr->sphericalCoordinates.reset(new common::SphericalCoordinates(
       surfaceType, latitude, longitude, elevation, heading));
@@ -346,6 +358,9 @@ void World::Init()
 
   // Initialize the physics engine
   this->dataPtr->physicsEngine->Init();
+
+  this->dataPtr->presetManager = PresetManagerPtr(
+      new PresetManager(this->dataPtr->physicsEngine, this->dataPtr->sdf));
 
   this->dataPtr->testRay = boost::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
@@ -481,12 +496,62 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
-  if (!this->IsPaused() || this->dataPtr->stepInc > 0)
+  bool stay;
+
+  if (this->dataPtr->stepInc < 0)
   {
+    // Step back: This is implemented by going to the beginning of the log file,
+    // and then, step forward up to the target frame.
+    // ToDo: Use keyframes in the log file to speed up this process.
+    if (!util::LogPlay::Instance()->Rewind())
+    {
+      gzerr << "Error processing a negative multi-step" << std::endl;
+      this->dataPtr->stepInc = 0;
+      return;
+    }
+
+    this->dataPtr->stepInc = this->dataPtr->iterations + this->dataPtr->stepInc;
+
+    // For some reason, the first two chunks contains the same <iterations>
+    // value. If the log file contains <iterations> we will load the same
+    // iterations value twice and this will affect the way we're stepping back.
+    // ToDo: Fix the source of the problem for avoiding this extra step.
+    if (util::LogPlay::Instance()->HasIterations())
+    {
+      this->dataPtr->stepInc +=
+        2 - util::LogPlay::Instance()->GetInitialIterations();
+    }
+
+    if (this->dataPtr->stepInc < 1)
+      this->dataPtr->stepInc = 1;
+    this->dataPtr->iterations = 0;
+  }
+
+  {
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+    // There are two main reasons to keep iterating in the following loop:
+    //   1. If "stepInc" is positive: This means that a client requested to
+    //      advanced the simulation some steps.
+    //   2. If "seekPending" is true: This means that a client requested to
+    //      advance the simulation to a given simulation time ("seek"). We will
+    //      have to check at the end of each iteration if we reached the target
+    //      simulation time.
+    //   Note that if the simulation is not paused (play mode) we will enter
+    //   the loop. However, the code will only execute one iteration (one step).
+    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
+           this->dataPtr->seekPending;
+  }
+  while (stay)
+  {
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+
     std::string data;
     if (!util::LogPlay::Instance()->Step(data))
     {
+      // There are no more chunks, time to exit.
       this->SetPaused(true);
+      this->dataPtr->stepInc = 0;
+      break;
     }
     else
     {
@@ -494,6 +559,14 @@ void World::LogStep()
       sdf::readString(data, this->dataPtr->logPlayStateSDF);
 
       this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
+
+      // If the log file does not contain iterations we have to manually
+      // increase the iteration counter in logPlayState.
+      if (!util::LogPlay::Instance()->HasIterations())
+      {
+        this->dataPtr->logPlayState.SetIterations(
+          this->dataPtr->iterations + 1);
+      }
 
       // Process insertions
       if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
@@ -532,11 +605,28 @@ void World::LogStep()
 
       this->SetState(this->dataPtr->logPlayState);
       this->Update();
-      this->dataPtr->iterations++;
     }
 
     if (this->dataPtr->stepInc > 0)
       this->dataPtr->stepInc--;
+
+    // We may have entered into the loop because a "seek" command was
+    // requested. At this point we have executed one more step. Now, it's time
+    // to check if we have reached the target simulation time specified in the
+    // "seek" command.
+    if (this->dataPtr->seekPending)
+    {
+      this->dataPtr->seekPending =
+        this->GetSimTime() < this->dataPtr->targetSimTime;
+    }
+
+    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
+           this->dataPtr->seekPending;
+
+    // We only run one step if we are in play mode and we don't have
+    // other pending commands.
+    if (!this->IsPaused() && !this->dataPtr->seekPending)
+      break;
   }
 
   this->PublishWorldStats();
@@ -813,6 +903,12 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
+PresetManagerPtr World::GetPresetManager() const
+{
+  return this->dataPtr->presetManager;
+}
+
+//////////////////////////////////////////////////
 common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 {
   return this->dataPtr->sphericalCoordinates;
@@ -1003,7 +1099,7 @@ void World::Reset()
   this->SetPaused(true);
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     math::Rand::SetSeed(math::Rand::GetSeed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
@@ -1094,7 +1190,7 @@ void World::SetPaused(bool _p)
     return;
 
   {
-    boost::recursive_mutex::scoped_lock(*this->dataPtr->worldUpdateMutex);
+    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
     this->dataPtr->pause = _p;
   }
 
@@ -1163,6 +1259,49 @@ void World::OnControl(ConstWorldControlPtr &_data)
       if (_data->reset().has_model_only() && _data->reset().model_only())
         this->dataPtr->resetModelOnly = true;
     }
+  }
+}
+
+//////////////////////////////////////////////////
+void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
+
+  // Ignore this command if there's another one pending.
+  if (this->dataPtr->seekPending)
+    return;
+
+  if (_data->has_pause())
+    this->SetPaused(_data->pause());
+
+  if (_data->has_multi_step())
+  {
+    // stepWorld is a blocking call so set stepInc directly so that world stats
+    // will still be published
+    this->SetPaused(true);
+    this->dataPtr->stepInc += _data->multi_step();
+  }
+
+  if (_data->has_seek())
+  {
+    this->dataPtr->targetSimTime = msgs::Convert(_data->seek());
+    if (this->GetSimTime() > this->dataPtr->targetSimTime)
+      util::LogPlay::Instance()->Rewind();
+    this->dataPtr->seekPending = true;
+  }
+
+  if (_data->has_rewind() && _data->rewind())
+  {
+    util::LogPlay::Instance()->Rewind();
+    this->dataPtr->stepInc = 1;
+  }
+
+  if (_data->has_forward() && _data->forward())
+  {
+    this->dataPtr->targetSimTime = util::LogPlay::Instance()->GetLogEndTime();
+    if (this->GetSimTime() > this->dataPtr->targetSimTime)
+      util::LogPlay::Instance()->Rewind();
+    this->dataPtr->seekPending = true;
   }
 }
 
@@ -1415,7 +1554,7 @@ void World::ProcessRequestMsgs()
       else
       {
         response.set_type("error");
-        response.set_response("nonexistant");
+        response.set_response("nonexistent");
       }
     }
     else if (requestMsg.request() == "world_sdf")
@@ -1524,7 +1663,7 @@ void World::ProcessFactoryMsgs()
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
     for (auto const &factoryMsg : this->dataPtr->factoryMsgs)
     {
-      this->dataPtr->factorySDF->root->ClearElements();
+      this->dataPtr->factorySDF->Root()->ClearElements();
 
       if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
       {
@@ -1557,7 +1696,7 @@ void World::ProcessFactoryMsgs()
           continue;
         }
 
-        this->dataPtr->factorySDF->root->InsertElement(
+        this->dataPtr->factorySDF->Root()->InsertElement(
             model->GetSDF()->Clone());
 
         std::string newName = model->GetName() + "_clone";
@@ -1569,7 +1708,7 @@ void World::ProcessFactoryMsgs()
           i++;
         }
 
-        this->dataPtr->factorySDF->root->GetElement("model")->GetAttribute(
+        this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
             "name")->Set(newName);
       }
       else
@@ -1586,10 +1725,10 @@ void World::ProcessFactoryMsgs()
         if (base)
         {
           sdf::ElementPtr elem;
-          if (this->dataPtr->factorySDF->root->GetName() == "sdf")
-            elem = this->dataPtr->factorySDF->root->GetFirstElement();
+          if (this->dataPtr->factorySDF->Root()->GetName() == "sdf")
+            elem = this->dataPtr->factorySDF->Root()->GetFirstElement();
           else
-            elem = this->dataPtr->factorySDF->root;
+            elem = this->dataPtr->factorySDF->Root();
 
           base->UpdateParameters(elem);
         }
@@ -1600,7 +1739,7 @@ void World::ProcessFactoryMsgs()
         bool isModel = false;
         bool isLight = false;
 
-        sdf::ElementPtr elem = this->dataPtr->factorySDF->root->Clone();
+        sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
 
         if (elem->HasElement("world"))
           elem = elem->GetElement("world");
@@ -1623,21 +1762,23 @@ void World::ProcessFactoryMsgs()
         else
         {
           gzerr << "Unable to find a model, light, or actor in:\n";
-          this->dataPtr->factorySDF->root->PrintValues("");
+          this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
 
         if (!elem)
         {
           gzerr << "Invalid SDF:";
-          this->dataPtr->factorySDF->root->PrintValues("");
+          this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
 
         elem->SetParent(this->dataPtr->sdf);
         elem->GetParent()->InsertElement(elem);
         if (factoryMsg.has_pose())
-          elem->GetElement("pose")->Set(msgs::Convert(factoryMsg.pose()));
+        {
+          elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
+        }
 
         if (isActor)
         {
@@ -1714,6 +1855,7 @@ void World::SetState(const WorldState &_state)
 {
   this->SetSimTime(_state.GetSimTime());
   this->dataPtr->logRealTime = _state.GetRealTime();
+  this->dataPtr->iterations = _state.GetIterations();
 
   const ModelState_M modelStates = _state.GetModelStates();
   for (auto const &modelState : modelStates)
@@ -1798,7 +1940,7 @@ bool World::OnLog(std::ostringstream &_stream)
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->GetFirstUpdate())
   {
-    this->UpdateStateSDF();
+    this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
@@ -1881,7 +2023,7 @@ void World::ProcessMessages()
           // Publish the model's relative pose
           poseMsg->set_name(model->GetScopedName());
           poseMsg->set_id(model->GetId());
-          msgs::Set(poseMsg, model->GetRelativePose());
+          msgs::Set(poseMsg, model->GetRelativePose().Ign());
 
           // Publish each of the model's children relative poses
           Link_V links = model->GetLinks();
@@ -1890,7 +2032,7 @@ void World::ProcessMessages()
             poseMsg = msg.add_pose();
             poseMsg->set_name(link->GetScopedName());
             poseMsg->set_id(link->GetId());
-            msgs::Set(poseMsg, link->GetRelativePose());
+            msgs::Set(poseMsg, link->GetRelativePose().Ign());
           }
         }
 
@@ -1923,6 +2065,8 @@ void World::ProcessMessages()
 //////////////////////////////////////////////////
 void World::PublishWorldStats()
 {
+  this->dataPtr->worldStatsMsg.Clear();
+
   msgs::Set(this->dataPtr->worldStatsMsg.mutable_sim_time(),
       this->GetSimTime());
   msgs::Set(this->dataPtr->worldStatsMsg.mutable_real_time(),
@@ -1932,6 +2076,18 @@ void World::PublishWorldStats()
 
   this->dataPtr->worldStatsMsg.set_iterations(this->dataPtr->iterations);
   this->dataPtr->worldStatsMsg.set_paused(this->IsPaused());
+
+  if (util::LogPlay::Instance()->IsOpen())
+  {
+    msgs::LogPlaybackStatistics logStats;
+    msgs::Set(logStats.mutable_start_time(),
+        util::LogPlay::Instance()->GetLogStartTime());
+    msgs::Set(logStats.mutable_end_time(),
+        util::LogPlay::Instance()->GetLogEndTime());
+
+    this->dataPtr->worldStatsMsg.mutable_log_playback_stats()->CopyFrom(
+        logStats);
+  }
 
   if (this->dataPtr->statPub && this->dataPtr->statPub->HasConnections())
     this->dataPtr->statPub->Publish(this->dataPtr->worldStatsMsg);
@@ -2149,3 +2305,9 @@ void World::EnablePhysicsEngine(bool _enable)
   this->dataPtr->enablePhysicsEngine = _enable;
 }
 
+/////////////////////////////////////////////////
+void World::_AddDirty(Entity *_entity)
+{
+  GZ_ASSERT(_entity != NULL, "_entity is NULL");
+  this->dataPtr->dirtyPoses.push_back(_entity);
+}

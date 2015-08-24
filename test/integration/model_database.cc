@@ -1,5 +1,5 @@
  /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <unistd.h>
 #include "gazebo/common/ModelDatabase.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -36,7 +36,6 @@ class ModelDatabaseTest : public ServerFixture
 void OnModels(const std::map<std::string, std::string> & /*_models*/)
 {
   g_onModels++;
-  g_Connection.reset();
 }
 
 void OnModels1(const std::map<std::string, std::string> & /*_models*/)
@@ -92,6 +91,10 @@ TEST_F(ModelDatabaseTest, GetModelsTwice)
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 1);
 
+
+  // Reset bool reference, so now only g_onModels1 should increment
+  g_Connection.reset();
+
   common::ModelDatabase::Instance()->GetModels(boost::bind(&OnModels, _1));
 
   while (g_onModels1 == 1)
@@ -128,6 +131,10 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 1);
   EXPECT_EQ(g_onModels2, 1);
+
+  // Reset bool reference, so now only g_onModels1 and g_onModels2 should
+  // increment
+  g_Connection.reset();
 
   common::ModelDatabase::Instance()->GetModels(
       boost::bind(&OnModels, _1));

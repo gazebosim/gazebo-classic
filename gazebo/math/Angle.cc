@@ -50,6 +50,12 @@ Angle::Angle(const Angle &_angle)
 }
 
 //////////////////////////////////////////////////
+Angle::Angle(const ignition::math::Angle &_angle)
+{
+  this->value = _angle.Radian();
+}
+
+//////////////////////////////////////////////////
 Angle::~Angle()
 {
 }
@@ -172,4 +178,22 @@ bool Angle::operator>=(const Angle &angle) const
   return this->value > angle.value || math::equal(this->value, angle.value);
 }
 
+//////////////////////////////////////////////////
+ignition::math::Angle Angle::Ign() const
+{
+  return ignition::math::Angle(this->value);
+}
 
+//////////////////////////////////////////////////
+Angle &Angle::operator=(const double &_angle)
+{
+  this->value = _angle;
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Angle &Angle::operator=(const ignition::math::Angle &_angle)
+{
+  this->value = _angle.Radian();
+  return *this;
+}

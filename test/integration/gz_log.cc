@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/util/LogRecord.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class GzLog : public ServerFixture

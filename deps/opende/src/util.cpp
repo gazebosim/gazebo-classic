@@ -115,140 +115,140 @@ void dxWorldProcessContext::FreePreallocationsContext()
 
 void dInternalHandleAutoDisabling (dxWorld *world, dReal stepsize)
 {
-	dxBody *bb;
-	for ( bb=world->firstbody; bb; bb=(dxBody*)bb->next )
-	{
-		// don't freeze objects mid-air (patch 1586738)
-		if ( bb->firstjoint == NULL ) continue;
+  dxBody *bb;
+  for ( bb=world->firstbody; bb; bb=(dxBody*)bb->next )
+  {
+    // don't freeze objects mid-air (patch 1586738)
+    if ( bb->firstjoint == NULL ) continue;
 
-		// nothing to do unless this body is currently enabled and has
-		// the auto-disable flag set
-		if ( (bb->flags & (dxBodyAutoDisable|dxBodyDisabled)) != dxBodyAutoDisable ) continue;
+    // nothing to do unless this body is currently enabled and has
+    // the auto-disable flag set
+    if ( (bb->flags & (dxBodyAutoDisable|dxBodyDisabled)) != dxBodyAutoDisable ) continue;
 
-		// if sampling / threshold testing is disabled, we can never sleep.
-		if ( bb->adis.average_samples == 0 ) continue;
+    // if sampling / threshold testing is disabled, we can never sleep.
+    if ( bb->adis.average_samples == 0 ) continue;
 
-		//
-		// see if the body is idle
-		//
-		
+    //
+    // see if the body is idle
+    //
+
 #ifndef dNODEBUG
-		// sanity check
-		if ( bb->average_counter >= bb->adis.average_samples )
-		{
-			dUASSERT( bb->average_counter < bb->adis.average_samples, "buffer overflow" );
+    // sanity check
+    if ( bb->average_counter >= bb->adis.average_samples )
+    {
+      dUASSERT( bb->average_counter < bb->adis.average_samples, "buffer overflow" );
 
-			// something is going wrong, reset the average-calculations
-			bb->average_ready = 0; // not ready for average calculation
-			bb->average_counter = 0; // reset the buffer index
-		}
+      // something is going wrong, reset the average-calculations
+      bb->average_ready = 0; // not ready for average calculation
+      bb->average_counter = 0; // reset the buffer index
+    }
 #endif // dNODEBUG
 
-		// sample the linear and angular velocity
-		bb->average_lvel_buffer[bb->average_counter][0] = bb->lvel[0];
-		bb->average_lvel_buffer[bb->average_counter][1] = bb->lvel[1];
-		bb->average_lvel_buffer[bb->average_counter][2] = bb->lvel[2];
-		bb->average_avel_buffer[bb->average_counter][0] = bb->avel[0];
-		bb->average_avel_buffer[bb->average_counter][1] = bb->avel[1];
-		bb->average_avel_buffer[bb->average_counter][2] = bb->avel[2];
-		bb->average_counter++;
+    // sample the linear and angular velocity
+    bb->average_lvel_buffer[bb->average_counter][0] = bb->lvel[0];
+    bb->average_lvel_buffer[bb->average_counter][1] = bb->lvel[1];
+    bb->average_lvel_buffer[bb->average_counter][2] = bb->lvel[2];
+    bb->average_avel_buffer[bb->average_counter][0] = bb->avel[0];
+    bb->average_avel_buffer[bb->average_counter][1] = bb->avel[1];
+    bb->average_avel_buffer[bb->average_counter][2] = bb->avel[2];
+    bb->average_counter++;
 
-		// buffer ready test
-		if ( bb->average_counter >= bb->adis.average_samples )
-		{
-			bb->average_counter = 0; // fill the buffer from the beginning
-			bb->average_ready = 1; // this body is ready now for average calculation
-		}
+    // buffer ready test
+    if ( bb->average_counter >= bb->adis.average_samples )
+    {
+      bb->average_counter = 0; // fill the buffer from the beginning
+      bb->average_ready = 1; // this body is ready now for average calculation
+    }
 
-		int idle = 0; // Assume it's in motion unless we have samples to disprove it.
+    int idle = 0; // Assume it's in motion unless we have samples to disprove it.
 
-		// enough samples?
-		if ( bb->average_ready )
-		{
-			idle = 1; // Initial assumption: IDLE
+    // enough samples?
+    if ( bb->average_ready )
+    {
+      idle = 1; // Initial assumption: IDLE
 
-			// the sample buffers are filled and ready for calculation
-			dVector3 average_lvel, average_avel;
+      // the sample buffers are filled and ready for calculation
+      dVector3 average_lvel, average_avel;
 
-			// Store first velocity samples
-			average_lvel[0] = bb->average_lvel_buffer[0][0];
-			average_avel[0] = bb->average_avel_buffer[0][0];
-			average_lvel[1] = bb->average_lvel_buffer[0][1];
-			average_avel[1] = bb->average_avel_buffer[0][1];
-			average_lvel[2] = bb->average_lvel_buffer[0][2];
-			average_avel[2] = bb->average_avel_buffer[0][2];
-			
-			// If we're not in "instantaneous mode"
-			if ( bb->adis.average_samples > 1 )
-			{
-				// add remaining velocities together
-				for ( unsigned int i = 1; i < bb->adis.average_samples; ++i )
-				{
-					average_lvel[0] += bb->average_lvel_buffer[i][0];
-					average_avel[0] += bb->average_avel_buffer[i][0];
-					average_lvel[1] += bb->average_lvel_buffer[i][1];
-					average_avel[1] += bb->average_avel_buffer[i][1];
-					average_lvel[2] += bb->average_lvel_buffer[i][2];
-					average_avel[2] += bb->average_avel_buffer[i][2];
-				}
+      // Store first velocity samples
+      average_lvel[0] = bb->average_lvel_buffer[0][0];
+      average_avel[0] = bb->average_avel_buffer[0][0];
+      average_lvel[1] = bb->average_lvel_buffer[0][1];
+      average_avel[1] = bb->average_avel_buffer[0][1];
+      average_lvel[2] = bb->average_lvel_buffer[0][2];
+      average_avel[2] = bb->average_avel_buffer[0][2];
 
-				// make average
-				dReal r1 = dReal( 1.0 ) / dReal( bb->adis.average_samples );
+      // If we're not in "instantaneous mode"
+      if ( bb->adis.average_samples > 1 )
+      {
+        // add remaining velocities together
+        for ( unsigned int i = 1; i < bb->adis.average_samples; ++i )
+        {
+          average_lvel[0] += bb->average_lvel_buffer[i][0];
+          average_avel[0] += bb->average_avel_buffer[i][0];
+          average_lvel[1] += bb->average_lvel_buffer[i][1];
+          average_avel[1] += bb->average_avel_buffer[i][1];
+          average_lvel[2] += bb->average_lvel_buffer[i][2];
+          average_avel[2] += bb->average_avel_buffer[i][2];
+        }
 
-				average_lvel[0] *= r1;
-				average_avel[0] *= r1;
-				average_lvel[1] *= r1;
-				average_avel[1] *= r1;
-				average_lvel[2] *= r1;
-				average_avel[2] *= r1;
-			}
+        // make average
+        dReal r1 = dReal( 1.0 ) / dReal( bb->adis.average_samples );
 
-			// threshold test
-			dReal av_lspeed, av_aspeed;
-			av_lspeed = dCalcVectorDot3( average_lvel, average_lvel );
-			if ( av_lspeed > bb->adis.linear_average_threshold )
-			{
-				idle = 0; // average linear velocity is too high for idle
-			}
-			else
-			{
-				av_aspeed = dCalcVectorDot3( average_avel, average_avel );
-				if ( av_aspeed > bb->adis.angular_average_threshold )
-				{
-					idle = 0; // average angular velocity is too high for idle
-				}
-			}
-		}
+        average_lvel[0] *= r1;
+        average_avel[0] *= r1;
+        average_lvel[1] *= r1;
+        average_avel[1] *= r1;
+        average_lvel[2] *= r1;
+        average_avel[2] *= r1;
+      }
 
-		// if it's idle, accumulate steps and time.
-		// these counters won't overflow because this code doesn't run for disabled bodies.
-		if (idle) {
-			bb->adis_stepsleft--;
-			bb->adis_timeleft -= stepsize;
-		}
-		else {
-			// Reset countdowns
-			bb->adis_stepsleft = bb->adis.idle_steps;
-			bb->adis_timeleft = bb->adis.idle_time;
-		}
+      // threshold test
+      dReal av_lspeed, av_aspeed;
+      av_lspeed = dCalcVectorDot3( average_lvel, average_lvel );
+      if ( av_lspeed > bb->adis.linear_average_threshold )
+      {
+        idle = 0; // average linear velocity is too high for idle
+      }
+      else
+      {
+        av_aspeed = dCalcVectorDot3( average_avel, average_avel );
+        if ( av_aspeed > bb->adis.angular_average_threshold )
+        {
+          idle = 0; // average angular velocity is too high for idle
+        }
+      }
+    }
 
-		// disable the body if it's idle for a long enough time
-		if ( bb->adis_stepsleft <= 0 && bb->adis_timeleft <= 0 )
-		{
-			bb->flags |= dxBodyDisabled; // set the disable flag
+    // if it's idle, accumulate steps and time.
+    // these counters won't overflow because this code doesn't run for disabled bodies.
+    if (idle) {
+      bb->adis_stepsleft--;
+      bb->adis_timeleft -= stepsize;
+    }
+    else {
+      // Reset countdowns
+      bb->adis_stepsleft = bb->adis.idle_steps;
+      bb->adis_timeleft = bb->adis.idle_time;
+    }
+
+    // disable the body if it's idle for a long enough time
+    if ( bb->adis_stepsleft <= 0 && bb->adis_timeleft <= 0 )
+    {
+      bb->flags |= dxBodyDisabled; // set the disable flag
       if (bb->disabled_callback)
         bb->disabled_callback(bb);
 
-			// disabling bodies should also include resetting the velocity
-			// should prevent jittering in big "islands"
-			bb->lvel[0] = 0;
-			bb->lvel[1] = 0;
-			bb->lvel[2] = 0;
-			bb->avel[0] = 0;
-			bb->avel[1] = 0;
-			bb->avel[2] = 0;
-		}
-	}
+      // disabling bodies should also include resetting the velocity
+      // should prevent jittering in big "islands"
+      bb->lvel[0] = 0;
+      bb->lvel[1] = 0;
+      bb->lvel[2] = 0;
+      bb->avel[0] = 0;
+      bb->avel[1] = 0;
+      bb->avel[2] = 0;
+    }
+  }
 }
 
 
@@ -289,13 +289,13 @@ void dxStepBody (dxBody *b, dReal h)
   for (int j=0; j<3; j++) b->posr.pos[j] += h * b->lvel[j];
 
   if (b->flags & dxBodyFlagFiniteRotation) {
-    dVector3 irv;	// infitesimal rotation vector
-    dQuaternion q;	// quaternion for finite rotation
+    dVector3 irv;  // infitesimal rotation vector
+    dQuaternion q;  // quaternion for finite rotation
 
     if (b->flags & dxBodyFlagFiniteRotationAxis) {
       // split the angular velocity vector into a component along the finite
       // rotation axis, and a component orthogonal to it.
-      dVector3 frv;		// finite rotation vector
+      dVector3 frv;    // finite rotation vector
       dReal k = dCalcVectorDot3 (b->finite_rot_axis,b->avel);
       frv[0] = b->finite_rot_axis[0] * k;
       frv[1] = b->finite_rot_axis[1] * k;
@@ -405,7 +405,7 @@ static size_t EstimateIslandsProcessingMemoryRequirements(dxWorld *world, size_t
 //   context->SavePreallocations(islandcount, islandsizes, body, joint,islandreqs);
 // and put into context
 //
-static size_t BuildIslandsAndEstimateStepperMemoryRequirements(dxWorldProcessContext *context, 
+static size_t BuildIslandsAndEstimateStepperMemoryRequirements(dxWorldProcessContext *context,
   dxWorld *world, dReal stepsize, dmemestimate_fn_t stepperestimate)
 {
   const int sizeelements = 2;
@@ -495,8 +495,8 @@ static size_t BuildIslandsAndEstimateStepperMemoryRequirements(dxWorldProcessCon
               break;
             }
 
-            b = stack[--stacksize];	// pop body off stack
-            *bodycurr++ = b;	// put body on body list
+            b = stack[--stacksize];  // pop body off stack
+            *bodycurr++ = b;  // put body on body list
           }
 
           int bcount = bodycurr - bodystart;
@@ -536,7 +536,7 @@ static size_t BuildIslandsAndEstimateStepperMemoryRequirements(dxWorldProcessCon
     for (dxJoint *j=world->firstjoint; j; j=(dxJoint*)j->next) {
       if ( (( j->node[0].body && (j->node[0].body->flags & dxBodyDisabled)==0 ) ||
         (j->node[1].body && (j->node[1].body->flags & dxBodyDisabled)==0) )
-        && 
+        &&
         j->isEnabled() ) {
           if (j->island_tag <= 0) dDebug (0,"attached enabled joint not tagged");
       }
@@ -600,7 +600,7 @@ void dxProcessIslands (dxWorld *world, dReal stepsize, dstepper_fn_t stepper)
   dxStepWorkingMemory *wmem = world->wmem;
   dIASSERT(wmem != NULL);
 
-  dxWorldProcessContext *context = wmem->GetWorldProcessingContext(); 
+  dxWorldProcessContext *context = wmem->GetWorldProcessingContext();
 
   int islandcount;
   size_t const *islandreqs;
@@ -663,8 +663,10 @@ void dxProcessIslands (dxWorld *world, dReal stepsize, dstepper_fn_t stepper)
   printf("<<<<<<<<<<<< all island threads stopped at time %f with duration %f\n",end_time,end_time - cur_time);
 #endif
 
-  for (int jj=0; jj < islandcount; jj++)
-    world->island_wmems[jj]->GetWorldProcessingContext()->CleanupContext();
+  for (auto &m : world->island_wmems)
+  {
+    m->GetWorldProcessingContext()->CleanupContext();
+  }
 
   context->CleanupContext();
   dIASSERT(context->IsStructureValid());
@@ -682,13 +684,13 @@ static size_t AdjustArenaSizeForReserveRequirements(size_t arenareq, float rsrvf
 }
 
 static dxWorldProcessContext *InternalReallocateWorldProcessContext (
-  dxWorldProcessContext *oldcontext, size_t memreq, 
+  dxWorldProcessContext *oldcontext, size_t memreq,
   const dxWorldProcessMemoryManager *memmgr, float rsrvfactor, unsigned rsrvminimum)
 {
   dxWorldProcessContext *context = oldcontext;
   bool allocsuccess = false;
 
-  size_t oldarenasize; 
+  size_t oldarenasize;
   void *pOldArena;
 
   do {
@@ -709,11 +711,11 @@ static dxWorldProcessContext *InternalReallocateWorldProcessContext (
 
         if (oldcontext->m_pAllocCurrent != oldcontext->m_pAllocBegin) {
 
-          // Save old efficient offset and meaningful data size for the case if 
+          // Save old efficient offset and meaningful data size for the case if
           // reallocation throws the block at different efficient offset
           size_t oldcontextofs = (size_t)oldcontext - (size_t)pOldArena;
           size_t datasize = (size_t)oldcontext->m_pAllocCurrent - (size_t)oldcontext;
-          
+
           // Extra EFFICIENT_ALIGNMENT bytes might be needed after re-allocation with different alignment
           size_t shrunkarenasize = dEFFICIENT_SIZE(datasize + oldcontextofs) + EFFICIENT_ALIGNMENT;
           if (shrunkarenasize < oldarenasize) {
@@ -761,7 +763,7 @@ static dxWorldProcessContext *InternalReallocateWorldProcessContext (
         } else {
           oldcontext->m_pArenaMemMgr->m_fnFree(pOldArena, oldarenasize);
           oldcontext = NULL;
-          
+
           // Zero variables to avoid another freeing on exit
           pOldArena = NULL;
           oldarenasize = 0;
@@ -818,7 +820,7 @@ static void InternalFreeWorldProcessContext (dxWorldProcessContext *context)
 }
 
 
-bool dxReallocateWorldProcessContext (dxWorld *world, 
+bool dxReallocateWorldProcessContext (dxWorld *world,
   dReal stepsize, dmemestimate_fn_t stepperestimate)
 {
   dxStepWorkingMemory *wmem = AllocateOnDemand(world->wmem);  // this is starting a new instance of dxStepWorkingMemory
@@ -844,7 +846,7 @@ bool dxReallocateWorldProcessContext (dxWorld *world,
 
   size_t stepperestimatereq = islandsreq + sesize;
   context = InternalReallocateWorldProcessContext(context, stepperestimatereq, memmgr, 1.0f, reserveinfo->m_uiReserveMinimum);
-  
+
   //
   // above context allocation of the island arrays is successful, then we proceed to allocate more spaces for the actual stepping work
   //
@@ -863,10 +865,23 @@ bool dxReallocateWorldProcessContext (dxWorld *world,
     dxJoint *const *joint;
     context->RetrievePreallocations(islandcount, islandsizes, body, joint, islandreqs);
 
+    if (static_cast<size_t>(islandcount) > world->island_wmems.size())
+      world->island_wmems.resize(islandcount);
+
     for (int jj = 0; jj < islandcount; jj++)
     {
+      dxStepWorkingMemory *island_wmem = NULL;
+
       // for individual islands
-      dxStepWorkingMemory *island_wmem = AllocateOnDemand(world->island_wmems[jj]);  // this is starting a new instance of dxStepWorkingMemory
+      // this is starting a new instance of dxStepWorkingMemory
+      if (!world->island_wmems[jj])
+      {
+        island_wmem = new dxStepWorkingMemory();
+        world->island_wmems[jj] = island_wmem;
+      }
+      else
+        island_wmem = world->island_wmems[jj];
+
       if (!island_wmem) return false;
 
       dxWorldProcessContext *island_oldcontext = island_wmem->GetWorldProcessingContext();
@@ -887,7 +902,7 @@ bool dxReallocateWorldProcessContext (dxWorld *world,
   return context != NULL;
 }
 
-dxWorldProcessContext *dxReallocateTemporayWorldProcessContext(dxWorldProcessContext *oldcontext, 
+dxWorldProcessContext *dxReallocateTemporayWorldProcessContext(dxWorldProcessContext *oldcontext,
   size_t memreq, const dxWorldProcessMemoryManager *memmgr/*=NULL*/, const dxWorldProcessMemoryReserveInfo *reserveinfo/*=NULL*/)
 {
   dxWorldProcessContext *context = oldcontext;

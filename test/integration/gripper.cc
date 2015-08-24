@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/physics/World.hh"

@@ -7,6 +7,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 find_package(gazebo REQUIRED)
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 add_library(projector_plugin SHARED projector.cc)
 target_link_libraries(projector_plugin ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})

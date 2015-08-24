@@ -15,11 +15,11 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define LASER_TOL 1e-5
 #define DOUBLE_TOL 1e-6
@@ -75,7 +75,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
     << "        <type>custom</type>"
     << "      </noise>"
     << "    </ray>"
-    << "    <plugin name ='laser' filename='" << pluginFileName << "'>"
+    << "    <plugin name ='laser' filename='" << pluginFileName << "'/>"
     << "  </sensor>"
     << "</link>"
     << "</model>"
@@ -100,19 +100,19 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
   // Expect the range to be within (max-noise) < max < (max+noise), see
   // custom noise model in RaySensorNoisePlugin.
   // Noise rate value also taken directly from plugin.
-  bool foundNoise = false;
   double fixedNoiseRate = 0.005;
   double noise = maxRange*fixedNoiseRate;
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
   {
     double range = raySensor->GetRange(i);
-    if (fabs(range - maxRange) > LASER_TOL)
-      foundNoise = true;
+    if (std::isinf(range))
+    {
+      continue;
+    }
 
     EXPECT_TRUE(range >= maxRange - noise);
     EXPECT_TRUE(range <= maxRange + noise);
   }
-  EXPECT_TRUE(foundNoise);
 }
 
 TEST_P(NoiseTest, NoisePlugin)

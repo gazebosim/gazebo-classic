@@ -30,7 +30,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody sphere collision
-    class GAZEBO_VISIBLE SimbodySphereShape : public SphereShape
+    class GZ_PHYSICS_VISIBLE SimbodySphereShape : public SphereShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent pointer

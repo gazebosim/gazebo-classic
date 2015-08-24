@@ -20,11 +20,7 @@
 
 #include <string>
 
-#include <sdf/sdf.hh>
-
 #include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -37,7 +33,7 @@ namespace gazebo
 
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
-    class GAZEBO_VISIBLE COMVisual : public Visual
+    class GZ_RENDERING_VISIBLE COMVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
@@ -56,11 +52,12 @@ namespace gazebo
       /// \param[in] _msg Pointer to the message
       public: virtual void Load(ConstLinkPtr &_msg);
 
-      /// \brief Load based on a math::Pose
-      /// \param[in] _pose Pose of the COM visual
-      /// \param[in] _scale Scale factor for the COM visual.
-      private: void Load(const math::Pose &_pose,
-               const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
+      /// \brief Get inertia pose.
+      /// \return Inertia pose in link frame.
+      public: math::Pose GetInertiaPose() const;
+
+      /// \brief Load using previously set member variables.
+      private: void Load();
     };
     /// \}
   }

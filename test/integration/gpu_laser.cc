@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/sensors/sensors.hh"
 
 #define LASER_TOL 1e-5
@@ -147,9 +147,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
 
-  // WARNING: for readings of no return, gazebo returns max range rather
-  // than +inf. issue #124
-  EXPECT_NEAR(raySensor->GetRange(samples-1), maxRange, LASER_TOL);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(samples-1), GZ_DBL_INF);
 
   // Verify ray sensor 2 range readings
   // listen to new laser frames
@@ -173,8 +171,8 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   // Only box01 should be visible to ray sensor 2
   EXPECT_NEAR(raySensor2->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
-  EXPECT_NEAR(raySensor2->GetRange(0), maxRange, LASER_TOL);
-  EXPECT_NEAR(raySensor->GetRange(samples-1), maxRange, LASER_TOL);
+  EXPECT_DOUBLE_EQ(raySensor2->GetRange(0), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(samples-1), GZ_DBL_INF);
 
   // Move all boxes out of range
   world->GetModel(box01)->SetWorldPose(
@@ -195,10 +193,10 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   EXPECT_LT(i, 300);
 
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
-    EXPECT_NEAR(raySensor->GetRange(i), maxRange, LASER_TOL);
+    EXPECT_DOUBLE_EQ(raySensor->GetRange(i), GZ_DBL_INF);
 
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
-    EXPECT_NEAR(raySensor2->GetRange(i), maxRange, LASER_TOL);
+    EXPECT_DOUBLE_EQ(raySensor2->GetRange(i), GZ_DBL_INF);
 
   raySensor->DisconnectNewLaserFrame(c);
   raySensor2->DisconnectNewLaserFrame(c2);
@@ -341,7 +339,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   EXPECT_NEAR(raySensor->GetRangeMax(), maxRange, LASER_TOL);
 
   for (int i = 0; i < raySensor->GetRayCount(); ++i)
-    EXPECT_NEAR(raySensor->GetRange(i), maxRange, LASER_TOL);
+    EXPECT_DOUBLE_EQ(raySensor->GetRange(i), GZ_DBL_INF);
 
   // Move laser model very close to terrain, it should now returns range values
   // that are less than half the max range

@@ -30,7 +30,8 @@ namespace gazebo
     /// there. in order to support more, either expand this class or make sure
     /// that objects that will not get treated correctly will not have
     /// materials generated for them.
-    class GAZEBO_VISIBLE GBufferMaterialGenerator : public MaterialGenerator
+    class GZ_RENDERING_DEFERRED_VISIBLE GBufferMaterialGenerator :
+      public MaterialGenerator
     {
       /// \brief The types of g buffers
       public: enum GBufferType

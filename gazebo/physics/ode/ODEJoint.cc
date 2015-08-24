@@ -345,6 +345,11 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
   }
 
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
+  if (!jointFeedback)
+  {
+    gzerr << "Joint feedback uninitialized" << std::endl;
+    return result;
+  }
 
   if (_index == 0)
     result.Set(jointFeedback->t1[0], jointFeedback->t1[1],
@@ -636,6 +641,12 @@ void ODEJoint::Reset()
 }
 
 //////////////////////////////////////////////////
+void ODEJoint::CacheForceTorque()
+{
+  // Does nothing for now, will add when recovering pull request #1721
+}
+
+//////////////////////////////////////////////////
 JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 {
   // Note that:
@@ -672,6 +683,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       wrenchAppliedWorld.body2Force =
         this->GetForce(0u) * this->GetLocalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
+    }
+    else if (this->HasType(physics::Base::FIXED_JOINT))
+    {
+      // no correction are necessary for fixed joint
     }
     else
     {
@@ -1079,19 +1094,22 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 
   if (this->provideFeedback)
   {
-    this->feedback = new dJointFeedback;
-    this->feedback->f1[0] = 0;
-    this->feedback->f1[1] = 0;
-    this->feedback->f1[2] = 0;
-    this->feedback->t1[0] = 0;
-    this->feedback->t1[1] = 0;
-    this->feedback->t1[2] = 0;
-    this->feedback->f2[0] = 0;
-    this->feedback->f2[1] = 0;
-    this->feedback->f2[2] = 0;
-    this->feedback->t2[0] = 0;
-    this->feedback->t2[1] = 0;
-    this->feedback->t2[2] = 0;
+    if (this->feedback == NULL)
+    {
+      this->feedback = new dJointFeedback;
+      this->feedback->f1[0] = 0;
+      this->feedback->f1[1] = 0;
+      this->feedback->f1[2] = 0;
+      this->feedback->t1[0] = 0;
+      this->feedback->t1[1] = 0;
+      this->feedback->t1[2] = 0;
+      this->feedback->f2[0] = 0;
+      this->feedback->f2[1] = 0;
+      this->feedback->f2[2] = 0;
+      this->feedback->t2[0] = 0;
+      this->feedback->t2[1] = 0;
+      this->feedback->t2[2] = 0;
+    }
 
     if (this->jointId)
       dJointSetFeedback(this->jointId, this->feedback);

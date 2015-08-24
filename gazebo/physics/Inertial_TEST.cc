@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/Inertial.hh"
 
 #define TOL 1e-6

@@ -14,6 +14,13 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <vector>
 #include <boost/thread/mutex.hpp>
 #include <sdf/sdf.hh>
@@ -26,6 +33,7 @@
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/gazebo_config.h"
+#include "gazebo/gazebo_shared.hh"
 #include "gazebo/gazebo.hh"
 
 boost::mutex fini_mutex;
@@ -43,72 +51,15 @@ struct g_vectorStringDup
 };
 
 /////////////////////////////////////////////////
-// This function is used by both setupClient and setupServer
-bool setup(const std::string &_prefix, int _argc, char **_argv)
-{
-  gazebo::common::load();
-
-  // The SDF find file callback.
-  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
-
-  // Initialize the informational logger. This will log warnings, and
-  // errors.
-  gzLogInit(_prefix, "default.log");
-
-  // Load all the system plugins
-  for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
-       g_plugins.begin(); iter != g_plugins.end(); ++iter)
-  {
-    (*iter)->Load(_argc, _argv);
-  }
-
-  if (!gazebo::transport::init())
-  {
-    gzerr << "Unable to initialize transport.\n";
-    return false;
-  }
-
-  // Make sure the model database has started.
-  gazebo::common::ModelDatabase::Instance()->Start();
-
-  // Run transport loop. Starts a thread
-  gazebo::transport::run();
-
-  // Init all system plugins
-  for (std::vector<gazebo::SystemPluginPtr>::iterator iter = g_plugins.begin();
-       iter != g_plugins.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
-  return true;
-}
-
-/////////////////////////////////////////////////
 void gazebo::printVersion()
 {
-  fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
+  gazebo_shared::printVersion();
 }
 
 /////////////////////////////////////////////////
 void gazebo::addPlugin(const std::string &_filename)
 {
-  if (_filename.empty())
-    return;
-  gazebo::SystemPluginPtr plugin =
-    gazebo::SystemPlugin::Create(_filename, _filename);
-
-  if (plugin)
-  {
-    if (plugin->GetType() != SYSTEM_PLUGIN)
-    {
-      gzerr << "System is attempting to load "
-        << "a plugin, but detected an incorrect plugin type. "
-        << "Plugin filename[" << _filename << "].\n";
-      return;
-    }
-    g_plugins.push_back(plugin);
-  }
+  gazebo_shared::addPlugin(_filename, g_plugins);
 }
 
 /////////////////////////////////////////////////
@@ -123,7 +74,7 @@ bool gazebo::setupServer(int _argc, char **_argv)
   g_master->Init(port);
   g_master->RunThread();
 
-  if (!setup("server-", _argc, _argv))
+  if (!gazebo_shared::setup("server-", _argc, _argv, g_plugins))
   {
     gzerr << "Unable to setup Gazebo\n";
     return false;
@@ -169,29 +120,11 @@ bool gazebo::setupServer(const std::vector<std::string> &_args)
 /////////////////////////////////////////////////
 bool gazebo::setupClient(int _argc, char **_argv)
 {
-  if (!setup("client-", _argc, _argv))
+  if (!gazebo_shared::setup("client-", _argc, _argv, g_plugins))
   {
     gzerr << "Unable to setup Gazebo\n";
     return false;
   }
-
-  common::Time waitTime(1, 0);
-  int waitCount = 0;
-  int maxWaitCount = 10;
-
-  // Wait for namespaces.
-  while (!gazebo::transport::waitForNamespaces(waitTime) &&
-      (waitCount++) < maxWaitCount)
-  {
-    gzwarn << "Waited " << waitTime.Double() << "seconds for namespaces.\n";
-  }
-
-  if (waitCount >= maxWaitCount)
-  {
-    gzerr << "Waited " << (waitTime * waitCount).Double()
-      << " seconds for namespaces. Giving up.\n";
-  }
-
   return true;
 }
 
@@ -202,7 +135,15 @@ bool gazebo::setupClient(const std::vector<std::string> &_args)
   std::transform(_args.begin(), _args.end(), pointers.begin(),
                  g_vectorStringDup());
   pointers.push_back(0);
+
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   bool result = gazebo::setupClient(_args.size(), &pointers[0]);
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
 
   // Deallocate memory for the command line arguments alloocated with strdup.
   for (size_t i = 0; i < pointers.size(); ++i)
@@ -272,7 +213,7 @@ gazebo::physics::WorldPtr gazebo::loadWorld(const std::string &_worldFile)
   }
 
   world = gazebo::physics::create_world();
-  gazebo::physics::load_world(world, sdf->root->GetElement("world"));
+  gazebo::physics::load_world(world, sdf->Root()->GetElement("world"));
 
   gazebo::physics::init_world(world);
 

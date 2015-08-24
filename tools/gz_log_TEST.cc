@@ -85,7 +85,8 @@ TEST(gz_log, Echo)
   std::string validEcho =
     "<?xml version='1.0'?>\n<gazebo_log>\n<header>\n<log_version>1.0"
     "</log_version>\n<gazebo_version>1.4.6</gazebo_version>\n"
-    "<rand_seed>24794</rand_seed>\n</header>\n\n<chunk encoding='txt'>"
+    "<rand_seed>24794</rand_seed>\n<log_start>0 0</log_start>\n"
+    "<log_end>0 0</log_end>\n</header>\n\n<chunk encoding='txt'>"
     "<![CDATA[\n<sdf version ='1.3'>\n<world name='default'>\n  "
     "<light name='sun' type='directional'>\n    <cast_shadows>1"
     "</cast_shadows>\n    <pose>0.000000 0.000000 10.000000 0.000000 0.000000 "
@@ -144,7 +145,7 @@ TEST(gz_log, EchoFilter)
   if (std::string("1.4").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "0bf1f293b164bbe820267f970c4b419acdca4b01");
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "55def526741fafdd92a1abd4c8a8adbd8a8d78d6");
+    EXPECT_EQ(shasum, "4c3bac95976836078ac7172d37039857e3c87e1a");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -156,7 +157,7 @@ TEST(gz_log, EchoFilter)
   if (std::string("1.4").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "33db2cbd0841466a67abd7d2bbc69cf2cfae19b6");
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "893eaea0e47bd405d7352b0386678784785758b3");
+    EXPECT_EQ(shasum, "98841d54fb94039129ac1185f8a8e0a4cbfe3e82");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -168,7 +169,7 @@ TEST(gz_log, EchoFilter)
   if (std::string("1.4").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "07113f16d44e2484f769fd1947ff5dca93f55cf4");
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "efd2bdd814203d10502aa519d31ebfc4d15256d6");
+    EXPECT_EQ(shasum, "173894dafa3f893e38b035e788529ccbcd0f4c5a");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -180,7 +181,7 @@ TEST(gz_log, EchoFilter)
   if (std::string("1.4").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "7f34f3fac505707727a74ac8659bb8736932ab07");
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "faf44dc8f4a0d4e33ac08c0d6c8cd3412d26b95e");
+    EXPECT_EQ(shasum, "b2d94544b848aa5c46df129b4a38fd8995463f31");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -193,7 +194,7 @@ TEST(gz_log, EchoFilter)
   if (std::string("1.4").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "d52ba4333511b7e4339db3eb71814c73473fba36");
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "81da84c3c601ace274ef0cb857939b8bad4be82e");
+    EXPECT_EQ(shasum, "73b5f38dbb9adc92f85166554599f05e175b950d");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -206,7 +207,7 @@ TEST(gz_log, EchoFilter)
   if (std::string("1.4").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "2f689dadc66171a76f7f3400bc218485a923c324");
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "86b26d5d97967b65a2ef46fba38567d338033291");
+    EXPECT_EQ(shasum, "6ad8b768b7abac463a7cc038f2130647e6e1ceb6");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 }
@@ -285,7 +286,7 @@ TEST(gz_log, Step)
   // Call gz log step and press q immediately
   std::string stepq0 = custom_exec(std::string("echo 'q' | ") + stepCmd);
   shasum = gazebo::common::get_sha1<std::string>(stepq0);
-  EXPECT_EQ(shasum, "6d3af4f4d1214fe3a4860ab42777eb4d0f89c6b2");
+  EXPECT_EQ(shasum, "e5599c7226cb211a40f0b3ea91cf2a9c39c9b649");
 
   // Call gz log step and press space once, then q
   std::string stepq1 = custom_exec(std::string("echo ' q' | ") + stepCmd);
@@ -293,7 +294,7 @@ TEST(gz_log, Step)
   if (std::string("1.4").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "43eacb140e00ef0525d54667bc558d63dac3d21f");
   else
-    EXPECT_EQ(shasum, "9e682f295f88f92217d172b9f686df2fb7a0754b");
+    EXPECT_EQ(shasum, "29fbb8b2358eab61eb17c03354b2adc5082e3a37");
 
   // Call gz log step and press space twice, then q
   std::string stepq2 = custom_exec(std::string("echo '  q' | ") + stepCmd);
@@ -301,7 +302,7 @@ TEST(gz_log, Step)
   if (std::string("1.4").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "37e133d15d3f74cbc686bfceb26b8db46e2f6bf5");
   else
-    EXPECT_EQ(shasum, "f52796ad928931d158d0573f4fd000e4577efa35");
+    EXPECT_EQ(shasum, "f2ba4ad6b066aede440fcce49f5cd00753896f27");
 }
 
 /////////////////////////////////////////////////

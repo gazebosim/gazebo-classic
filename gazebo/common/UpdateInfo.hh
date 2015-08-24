@@ -27,7 +27,7 @@ namespace gazebo
   {
     /// \class UpdateInfo UpdateInfo.hh common/common.hh
     /// \brief Information for use in an update event.
-    class GAZEBO_VISIBLE UpdateInfo
+    class GZ_COMMON_VISIBLE UpdateInfo
     {
       /// \brief Name of the world.
       public: std::string worldName;

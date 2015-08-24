@@ -41,7 +41,7 @@ namespace gazebo
     /// will intelligently generate fixed joints between the gripper and an
     /// object within the gripper. This allows the object to be manipulated
     /// without falling or behaving poorly.
-    class GAZEBO_VISIBLE Gripper
+    class GZ_PHYSICS_VISIBLE Gripper
     {
       /// \brief Constructor
       /// \param[in] _model The model which contains the Gripper.

@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -24,6 +30,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/ApplyWrenchDialog.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 
 using namespace gazebo;
@@ -43,6 +50,14 @@ ModelRightMenu::ModelRightMenu()
   this->followAct->setStatusTip(tr("Follow the selection"));
   connect(this->followAct, SIGNAL(triggered()), this, SLOT(OnFollow()));
 
+  this->editAct = new QAction(tr("Edit model"), this);
+  this->editAct->setStatusTip(tr("Open on Model Editor"));
+  connect(this->editAct, SIGNAL(triggered()), this, SLOT(OnEdit()));
+
+  this->applyWrenchAct = new QAction(tr("Apply Force/Torque"), this);
+  this->applyWrenchAct->setStatusTip(tr("Apply force and torque to a link"));
+  connect(this->applyWrenchAct, SIGNAL(triggered()), this,
+      SLOT(OnApplyWrench()));
 
   // \todo Reimplement
   // this->snapBelowAct = new QAction(tr("Snap"), this);
@@ -93,6 +108,20 @@ ModelRightMenu::ModelRightMenu()
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
 
+  state = new ViewState(this, "show_inertia", "hide_inertia");
+  state->action = new QAction(tr("Inertia"), this);
+  state->action->setStatusTip(tr("Show moments of inertia"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
+  state = new ViewState(this, "show_link_frame", "hide_link_frame");
+  state->action = new QAction(tr("Link Frames"), this);
+  state->action->setStatusTip(tr("Show link frames"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
+
   // \todo Reimplement
   // this->skeletonAction = new QAction(tr("Skeleton"), this);
   // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
@@ -132,41 +161,70 @@ ModelRightMenu::~ModelRightMenu()
 }
 
 /////////////////////////////////////////////////
-void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
+void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
+    EntityTypes _type)
 {
-  this->modelName = _modelName.substr(0, _modelName.find("::"));
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
+  {
+    this->entityName = _entityName.substr(0, _entityName.find("::"));
+  }
+  else if (_type == EntityTypes::LINK)
+  {
+    this->entityName = _entityName;
+  }
 
   QMenu menu;
+
   menu.addAction(this->moveToAct);
   menu.addAction(this->followAct);
 
-  // menu.addAction(this->snapBelowAct);
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LINK)
+    menu.addAction(this->applyWrenchAct);
 
-  // Create the view menu
-  QMenu *viewMenu = menu.addMenu(tr("View"));
-  for (std::vector<ViewState*>::iterator iter = this->viewStates.begin();
-       iter != this->viewStates.end(); ++iter)
+  if (_type == EntityTypes::MODEL)
   {
-    viewMenu->addAction((*iter)->action);
+    // disable editing planes for now
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    rendering::ScenePtr scene = cam->GetScene();
+    rendering::VisualPtr vis = scene->GetVisual(this->entityName);
+    if (vis && !vis->IsPlane())
+    {
+      menu.addSeparator();
+      menu.addAction(this->editAct);
+      menu.addSeparator();
+    }
 
-    std::map<std::string, bool>::iterator modelIter =
-      (*iter)->modelStates.find(this->modelName);
+    // menu.addAction(this->snapBelowAct);
 
-    if (modelIter == (*iter)->modelStates.end())
-      (*iter)->action->setChecked((*iter)->globalEnable);
-    else
-      (*iter)->action->setChecked(modelIter->second);
+    // Create the view menu
+    QMenu *viewMenu = menu.addMenu(tr("View"));
+    for (std::vector<ViewState*>::iterator iter = this->viewStates.begin();
+         iter != this->viewStates.end(); ++iter)
+    {
+      viewMenu->addAction((*iter)->action);
+
+      std::map<std::string, bool>::iterator modelIter =
+        (*iter)->modelStates.find(this->entityName);
+
+      if (modelIter == (*iter)->modelStates.end())
+        (*iter)->action->setChecked((*iter)->globalEnable);
+      else
+        (*iter)->action->setChecked(modelIter->second);
+    }
   }
 
-  if (g_copyAct && g_pasteAct)
+  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
   {
+    if (g_copyAct && g_pasteAct)
+    {
+      menu.addSeparator();
+      menu.addAction(g_copyAct);
+      menu.addAction(g_pasteAct);
+    }
+
     menu.addSeparator();
-    menu.addAction(g_copyAct);
-    menu.addAction(g_pasteAct);
+    menu.addAction(g_deleteAct);
   }
-
-  menu.addSeparator();
-  menu.addAction(g_deleteAct);
 
   // \todo Reimplement these features.
   // menu.addAction(this->skeletonAction);
@@ -178,15 +236,52 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
 void ModelRightMenu::OnMoveTo()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->MoveToVisual(this->modelName);
+  cam->MoveToVisual(this->entityName);
 }
 
 /////////////////////////////////////////////////
 void ModelRightMenu::OnFollow()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->TrackVisual(this->modelName);
-  gui::Events::follow(this->modelName);
+  cam->TrackVisual(this->entityName);
+  gui::Events::follow(this->entityName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnEdit()
+{
+  g_editModelAct->trigger();
+  gui::Events::editModel(this->entityName);
+}
+
+/////////////////////////////////////////////////
+void ModelRightMenu::OnApplyWrench()
+{
+  ApplyWrenchDialog *applyWrenchDialog = new ApplyWrenchDialog();
+
+  rendering::VisualPtr vis = gui::get_active_camera()->GetScene()->
+      GetVisual(this->entityName);
+
+  if (!vis)
+  {
+    gzerr << "Can't find entity " << this->entityName << std::endl;
+    return;
+  }
+
+  std::string modelName, linkName;
+  if (vis == vis->GetRootVisual())
+  {
+    modelName = this->entityName;
+    // If model selected just take the first link
+    linkName = vis->GetChild(0)->GetName();
+  }
+  else
+  {
+    modelName = vis->GetRootVisual()->GetName();
+    linkName = this->entityName;
+  }
+
+  applyWrenchDialog->Init(modelName, linkName);
 }
 
 /////////////////////////////////////////////////
@@ -199,7 +294,7 @@ void ModelRightMenu::OnFollow()
 //   if (!cam->GetScene())
 //     gzerr << "Invalid user camera scene\n";
 //
-//   // cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
+//   // cam->GetScene()->SnapVisualToNearestBelow(this->entityName);
 // }
 
 /////////////////////////////////////////////////
@@ -207,7 +302,7 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 {
   std::string name = _name;
   if (name.empty())
-    name = this->modelName;
+    name = this->entityName;
 
   // Delete the entity
   if (!name.empty())
@@ -270,19 +365,19 @@ ViewState::ViewState(ModelRightMenu *_parent,
 void ViewState::Callback()
 {
   // Store the check state for the model
-  this->modelStates[this->parent->modelName] = this->action->isChecked();
+  this->modelStates[this->parent->entityName] = this->action->isChecked();
 
   // Send a message with the new check state. The Scene listens to these
   // messages and updates the visualizations accordingly.
   if (this->action->isChecked())
   {
     transport::requestNoReply(this->parent->node, this->checkRequest,
-                              this->parent->modelName);
+                              this->parent->entityName);
   }
   else
   {
     transport::requestNoReply(this->parent->node, this->uncheckRequest,
-                              this->parent->modelName);
+                              this->parent->entityName);
   }
 }
 
@@ -290,17 +385,19 @@ void ViewState::Callback()
 /////////////////////////////////////////////////
 // void ModelRightMenu::OnSkeleton()
 // {
-//   this->skeletonActionState[this->modelName] =
+//   this->skeletonActionState[this->entityName] =
 //     this->skeletonAction->isChecked();
 //
 //   if (this->skeletonAction->isChecked())
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton",
+//         this->entityName);
 //     this->requestMsg->set_dbl_data(1.0);
 //   }
 //   else
 //   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton", this->modelName);
+//     this->requestMsg = msgs::CreateRequest("show_skeleton",
+//         this->entityName);
 //     this->requestMsg->set_dbl_data(0.0);
 //   }
 //

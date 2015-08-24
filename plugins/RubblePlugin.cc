@@ -270,7 +270,7 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
 }
 
 /////////////////////////////////////////////////
-void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
+/*void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
                                 math::Vector3 &_size, double _mass)
 {
   std::ostringstream newModelStr;
@@ -313,10 +313,10 @@ void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
   "</sdf>";
 
   this->world->InsertModelString(newModelStr.str());
-}
+}*/
 
 /////////////////////////////////////////////////
-void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
+/*void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
 {
   std::ostringstream newModelStr, geomStr, inertiaStr;
 
@@ -393,4 +393,4 @@ void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
               << "</sdf>";
 
   this->world->InsertModelString(newModelStr.str());
-}
+}*/

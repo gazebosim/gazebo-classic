@@ -38,7 +38,7 @@ namespace gazebo
     /// \class MultiRayShape MultiRayShape.hh physics/physics.hh
     /// \brief Laser collision contains a set of ray-collisions,
     /// structured to simulate a laser range scanner.
-    class GAZEBO_VISIBLE MultiRayShape : public Shape
+    class GZ_PHYSICS_VISIBLE MultiRayShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision shape.
@@ -125,6 +125,9 @@ namespace gazebo
       /// \brief Update the ray based on a message.
       /// \param[in] _msg Message to update from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
 
       /// \brief Connect a to the new laser scan signal.
       /// \param[in] _subscriber Callback function.

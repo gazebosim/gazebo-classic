@@ -25,30 +25,38 @@
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
+#include "gazebo/rendering/OrthoViewController.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCameraPrivate.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
 //////////////////////////////////////////////////
-UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
+UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
+    bool _stereoEnabled)
   : Camera(_name, _scene),
     dataPtr(new UserCameraPrivate)
 {
   this->dataPtr->orbitViewController = NULL;
+  this->dataPtr->orthoViewController = NULL;
   this->dataPtr->fpsViewController = NULL;
   this->dataPtr->viewController = NULL;
   this->dataPtr->selectionBuffer = NULL;
   this->dataPtr->joyTwistControl = true;
   this->dataPtr->joystickButtonToggleLast = false;
   this->dataPtr->joyPoseControl = true;
+  this->dataPtr->rightCamera = NULL;
+  this->dataPtr->rightViewport = NULL;
+  this->dataPtr->stereoEnabled = _stereoEnabled;
 
-  // We want a render rate of 60Hz. Setting the target to 70Hz to account
-  // for some slop
-  this->SetRenderRate(70.0);
+  // Set default UserCamera render rate to 120Hz when stereo rendering is
+  // enabled. Otherwise use 60Hz.
+  // Some padding is added for safety.
+  this->SetRenderRate(_stereoEnabled ? 130.0 : 70.0);
 
   this->SetUseSDFPose(false);
 }
@@ -57,6 +65,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 UserCamera::~UserCamera()
 {
   delete this->dataPtr->orbitViewController;
+  delete this->dataPtr->orthoViewController;
   delete this->dataPtr->fpsViewController;
 
   this->connections.clear();
@@ -77,18 +86,25 @@ void UserCamera::Load()
   Camera::Load();
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
+
   this->dataPtr->joySubTwist =
     this->dataPtr->node->Subscribe("~/user_camera/joy_twist",
     &UserCamera::OnJoyTwist, this);
+
   this->dataPtr->joySubPose =
     this->dataPtr->node->Subscribe("~/user_camera/joy_pose",
     &UserCamera::OnJoyPose, this);
+
+  this->dataPtr->posePub =
+    this->dataPtr->node->Advertise<msgs::Pose>("~/user_camera/pose", 1, 30.0);
 }
 
 //////////////////////////////////////////////////
 void UserCamera::Init()
 {
   this->dataPtr->orbitViewController = new OrbitViewController(
+      boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
+  this->dataPtr->orthoViewController = new OrthoViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->dataPtr->fpsViewController = new FPSViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
@@ -99,6 +115,23 @@ void UserCamera::Init()
   // Don't yaw along variable axis, causes leaning
   this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
   this->camera->setDirection(1, 0, 0);
+  this->camera->setAutoAspectRatio(false);
+
+  // Right camera
+  if (this->dataPtr->stereoEnabled)
+  {
+    this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
+        "StereoUserRight");
+    this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
+
+    // Don't yaw along variable axis, causes leaning
+    this->dataPtr->rightCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+    this->dataPtr->rightCamera->setDirection(1, 0, 0);
+
+    this->dataPtr->rightCamera->setAutoAspectRatio(false);
+
+    this->sceneNode->attachObject(this->dataPtr->rightCamera);
+  }
 
   this->SetHFOV(GZ_DTOR(60));
 
@@ -171,6 +204,19 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
+void UserCamera::SetDefaultPose(const math::Pose &_pose)
+{
+  this->dataPtr->defaultPose = _pose;
+  this->SetWorldPose(_pose);
+}
+
+//////////////////////////////////////////////////
+math::Pose UserCamera::DefaultPose() const
+{
+  return this->dataPtr->defaultPose;
+}
+
+//////////////////////////////////////////////////
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
@@ -184,6 +230,9 @@ void UserCamera::Update()
 
   if (this->dataPtr->viewController)
     this->dataPtr->viewController->Update();
+
+  // publish camera pose
+  this->dataPtr->posePub->Publish(msgs::Convert(this->GetWorldPose().Ign()));
 }
 
 //////////////////////////////////////////////////
@@ -304,34 +353,74 @@ bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetViewController(const std::string &type)
+void UserCamera::SetViewController(const std::string &_type)
 {
-  if (this->dataPtr->viewController->GetTypeString() == type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
-  if (type == OrbitViewController::GetTypeString())
+  std::string vc = this->dataPtr->viewController->GetTypeString();
+
+  if (_type == OrbitViewController::GetTypeString())
+  {
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
-  else if (type == FPSViewController::GetTypeString())
-    this->dataPtr->viewController = this->dataPtr->fpsViewController;
-  else
-    gzthrow("Invalid view controller type: " + type);
+    this->dataPtr->viewController->Init();
 
-  this->dataPtr->viewController->Init();
+    this->dataPtr->prevViewControllerName = vc;
+  }
+  else if (_type == OrthoViewController::GetTypeString())
+  {
+    this->dataPtr->viewController = this->dataPtr->orthoViewController;
+    if (vc == "orbit")
+    {
+      this->dataPtr->viewController->Init(
+          this->dataPtr->orbitViewController->GetFocalPoint(),
+          this->dataPtr->orbitViewController->Yaw(),
+          this->dataPtr->orbitViewController->Pitch());
+    }
+    else
+      this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
+  }
+  else if (_type == FPSViewController::GetTypeString())
+  {
+    this->dataPtr->viewController = this->dataPtr->fpsViewController;
+    this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
+  }
+  else
+  {
+    gzerr << "Invalid view controller type[" << _type << "]. "
+      << "The view controller is not changed.\n";
+  }
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetViewController(const std::string &type,
-                                    const math::Vector3 &_pos)
+void UserCamera::SetViewController(const std::string &_type,
+                                   const math::Vector3 &_pos)
 {
-  if (this->dataPtr->viewController->GetTypeString() == type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
-  if (type == OrbitViewController::GetTypeString())
+  std::string vc = this->dataPtr->viewController->GetTypeString();
+
+  if (_type == OrbitViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
-  else if (type == FPSViewController::GetTypeString())
+  else if (_type == OrthoViewController::GetTypeString())
+    this->dataPtr->viewController = this->dataPtr->orthoViewController;
+  else if (_type == FPSViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
   else
-    gzthrow("Invalid view controller type: " + type);
+    gzthrow("Invalid view controller type: " + _type);
+
+  this->dataPtr->prevViewControllerName = vc;
 
   this->dataPtr->viewController->Init(_pos);
 }
@@ -349,22 +438,28 @@ unsigned int UserCamera::GetImageHeight() const
 }
 
 //////////////////////////////////////////////////
-void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
+void UserCamera::Resize(unsigned int _w, unsigned int _h)
 {
-  if (this->viewport)
+  this->UpdateFOV();
+  this->dataPtr->viewController->Resize(_w, _h);
+}
+
+//////////////////////////////////////////////////
+void UserCamera::UpdateFOV()
+{
+  Camera::UpdateFOV();
+
+  if (this->dataPtr->stereoEnabled && this->viewport)
   {
-    this->viewport->setDimensions(0, 0, 1, 1);
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
-                   static_cast<double>(this->viewport->getActualHeight());
+      static_cast<double>(this->viewport->getActualHeight());
 
     double hfov =
       this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
 
-    delete [] this->saveFrameBuffer;
-    this->saveFrameBuffer = NULL;
+    this->dataPtr->rightCamera->setAspectRatio(ratio);
+    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
   }
 }
 
@@ -373,27 +468,6 @@ void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
                                        float /*w_*/, float /*h_*/)
 {
   // this->viewport->setDimensions(x, y, w, h);
-}
-
-//////////////////////////////////////////////////
-float UserCamera::GetAvgFPS() const
-{
-  float avgFPS = 0;
-
-  if (this->renderTarget)
-  {
-    float lastFPS, bestFPS, worstFPS = 0;
-    this->renderTarget->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
-  }
-
-  return avgFPS;
-}
-
-//////////////////////////////////////////////////
-unsigned int UserCamera::GetTriangleCount() const
-{
-  return RenderEngine::Instance()->GetWindowManager()->GetTriangleCount(
-      this->windowId);
 }
 
 //////////////////////////////////////////////////
@@ -522,6 +596,33 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
+  // Setup stereo rendering viewports
+  if (this->dataPtr->stereoEnabled)
+  {
+    float focalLength = 1.0;
+
+    // Defaulting to 0.03m stereo baseline.
+    Ogre::Vector2 offset(0.03f, 0.0f);
+
+    this->camera->setFocalLength(focalLength);
+    this->camera->setFrustumOffset(offset);
+
+    this->dataPtr->rightCamera->setFocalLength(focalLength);
+    this->dataPtr->rightCamera->setFrustumOffset(-offset);
+
+    this->dataPtr->rightViewport =
+      this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
+    this->dataPtr->rightViewport->setBackgroundColour(
+        Conversions::Convert(this->scene->GetBackgroundColor()));
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
+    this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+    this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+#endif
+
+    this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  }
+
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
   this->initialized = true;
@@ -623,7 +724,7 @@ std::string UserCamera::GetViewControllerTypeString()
 void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 {
   // Scaling factor applied to rotations.
-  static math::Vector3 rpyFactor(0, 0.01, 0.05);
+  static ignition::math::Vector3d rpyFactor(0, 0.01, 0.05);
 
   // toggle using joystick to move camera
   if (this->dataPtr->joystickButtonToggleLast == false &&
@@ -656,14 +757,16 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
     if (_msg->has_translation())
     {
       const double transRotRatio = 0.05;
-      math::Vector3 trans = msgs::Convert(_msg->translation()) * transRotRatio;
+      ignition::math::Vector3d trans =
+        msgs::ConvertIgn(_msg->translation()) * transRotRatio;
       pose.pos = pose.rot.RotateVector(trans) + pose.pos;
     }
 
     // Get the jostick RPY. We are disabling rotation around x.
     if (_msg->has_rotation())
     {
-      math::Vector3 rot = msgs::Convert(_msg->rotation()) * rpyFactor;
+      ignition::math::Vector3d rot =
+        msgs::ConvertIgn(_msg->rotation()) * rpyFactor;
       pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
     }
 
@@ -680,8 +783,73 @@ void UserCamera::OnJoyPose(ConstPosePtr &_msg)
   if (_msg->has_position() && _msg->has_orientation())
   {
     // Get the XYZ
-    math::Pose pose(msgs::Convert(_msg->position()),
-                    msgs::Convert(_msg->orientation()));
+    ignition::math::Pose3d pose(msgs::ConvertIgn(_msg->position()),
+                                msgs::ConvertIgn(_msg->orientation()));
     this->SetWorldPose(pose);
   }
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetClipDist(float _near, float _far)
+{
+  Camera::SetClipDist(_near, _far);
+
+  // Update right camera, if it exists.
+  if (this->dataPtr->stereoEnabled)
+  {
+    this->dataPtr->rightCamera->setNearClipDistance(
+      this->camera->getNearClipDistance());
+    this->dataPtr->rightCamera->setFarClipDistance(
+      this->camera->getFarClipDistance());
+    this->dataPtr->rightCamera->setRenderingDistance(
+      this->camera->getRenderingDistance());
+  }
+}
+
+//////////////////////////////////////////////////
+bool UserCamera::StereoEnabled() const
+{
+  return this->dataPtr->stereoEnabled;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::EnableStereo(bool _enable)
+{
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
+  if (this->dataPtr->rightViewport)
+  {
+    if (_enable)
+    {
+      this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+      this->dataPtr->rightViewport->setAutoUpdated(true);
+      this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+    }
+    else
+    {
+      this->dataPtr->rightViewport->setAutoUpdated(false);
+      this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK);
+      this->viewport->setDrawBuffer(Ogre::CBT_BACK);
+    }
+  }
+  else
+  {
+    gzwarn << "Tried to enable/disable stereo. "
+           << "However, stereo is turned off via the gui.ini file.\n";
+  }
+#else
+  gzwarn << "Tried to EnableStereo("
+         << _enable
+         << "). However, Ogre version >= 1.10.0 is required.\n";
+#endif
+}
+
+/////////////////////////////////////////////////
+bool UserCamera::SetProjectionType(const std::string &_type)
+{
+  if (_type == "orthographic")
+    this->SetViewController("ortho");
+  else if (!this->dataPtr->prevViewControllerName.empty())
+    this->SetViewController(this->dataPtr->prevViewControllerName);
+
+  return Camera::SetProjectionType(_type);
 }

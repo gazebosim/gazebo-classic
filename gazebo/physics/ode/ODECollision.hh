@@ -36,7 +36,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Base class for all ODE collisions.
-    class GAZEBO_VISIBLE ODECollision : public Collision
+    class GZ_PHYSICS_ODE_VISIBLE ODECollision : public Collision
     {
       /// \brief Constructor.
       /// \param[in] _link Parent Link

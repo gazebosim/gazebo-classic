@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \class MeshShape MeshShape.hh physics/physics.hh
     /// \brief Triangle mesh collision shape
-    class GAZEBO_VISIBLE MeshShape : public Shape
+    class GZ_PHYSICS_VISIBLE MeshShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision.

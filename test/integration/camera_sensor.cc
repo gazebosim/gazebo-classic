@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
@@ -22,7 +24,7 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "scans_cmp.h"
 
 using namespace gazebo;
@@ -422,7 +424,7 @@ int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to
   // statistically unlikely, but possible results.
-  math::Rand::SetSeed(42);
+  ignition::math::Rand::Seed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

@@ -364,7 +364,7 @@ void Master::RunOnce()
     for (iter = this->connections.begin();
         iter != this->connections.end();)
     {
-      if (iter->second->IsOpen())
+      if (iter->second && iter->second->IsOpen())
       {
         iter->second->ProcessWriteQueue();
         ++iter;

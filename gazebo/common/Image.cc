@@ -369,8 +369,12 @@ Color Image::GetMaxColor() const
 //////////////////////////////////////////////////
 void Image::Rescale(int _width, int _height)
 {
+#ifndef _WIN32
   this->bitmap = FreeImage_Rescale(this->bitmap, _width, _height,
       FILTER_LANCZOS3);
+#else
+  gzerr << "Image::Rescale is not implemented on Windows.\n";
+#endif
 }
 
 //////////////////////////////////////////////////
