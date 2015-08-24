@@ -119,12 +119,6 @@ namespace gazebo
       /// \brief Artificial contact slip in torsional dirction.
       public: double slipTorsion;
 
-      /// \brief Elastic modulus.
-      public: double elasticModulus;
-
-      /// \brief Reference length for the elastic modulus.
-      public: double elasticModulusReferenceLength;
-
       /// \brief Friction pyramid parameters (mu1, mu2).
       /// Note that the primary friction pyramid direction can be specified
       /// by fdir1, otherwise a vector constrained to be perpendicular to the

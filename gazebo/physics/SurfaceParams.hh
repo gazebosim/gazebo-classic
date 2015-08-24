@@ -99,6 +99,22 @@ namespace gazebo
       /// \param[in] _use True to use the surface radius.
       public: void SetUsePatchRadius(const bool _use);
 
+      /// \brief Get the elastic modulus
+      /// \return elastic modulus
+      public: double ElasticModulus() const;
+
+      /// \brief Set the elastic modulus
+      /// \param[in] _modulus elastic modulus to set to
+      public: void SetElasticModulus(double _modulus);
+
+      /// \brief Get the elastic modulus reference length
+      /// \return elastic modulus reference length
+      public: double ElasticModulusReferenceLength() const;
+
+      /// \brief Set the elastic modulu reference length
+      /// \param[in] _modulus elastic modulus reference length
+      public: void SetElasticModulusReferenceLength(double _modulusRefLen);
+
       /// \brief Get the friction coefficient in a single direction.
       /// \param[in] _index Index of friction direction, 0 for primary,
       /// 1 for secondary direction.
@@ -154,6 +170,12 @@ namespace gazebo
       /// True to use the constant patch radius parameter. False to use the
       /// surface radius together with contact depth.
       private: bool usePatchRadius;
+
+      /// \brief Elastic modulus.
+      private: double elasticModulus;
+
+      /// \brief Reference length for the elastic modulus.
+      private: double elasticModulusReferenceLength;
     };
 
     /// \class SurfaceParams SurfaceParams.hh physics/physics.hh

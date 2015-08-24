@@ -27,6 +27,8 @@ FrictionPyramid::FrictionPyramid()
   : patchRadius(0.0)
   , surfaceRadius(IGN_DBL_MAX)
   , usePatchRadius(1)
+  , elasticModulus(0)
+  , elasticModulusReferenceLength(0)
 {
   this->mu[0] = 1.0;
   this->mu[1] = 1.0;
@@ -120,6 +122,44 @@ void FrictionPyramid::SetSurfaceRadius(const double _radius)
 void FrictionPyramid::SetUsePatchRadius(const bool _use)
 {
   this->usePatchRadius = _use;
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::ElasticModulus() const
+{
+  return this->elasticModulus;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetElasticModulus(double _modulus)
+{
+  if (_modulus < 0)
+  {
+    this->elasticModulus = 0;
+  }
+  else
+  {
+    this->elasticModulus = _modulus;
+  }
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::ElasticModulusReferenceLength() const
+{
+  return this->elasticModulusReferenceLength;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetElasticModulusReferenceLength(double _modulusRefLen)
+{
+  if (_modulusRefLen < 0)
+  {
+    this->elasticModulusReferenceLength = 0;
+  }
+  else
+  {
+    this->elasticModulusReferenceLength = _modulusRefLen;
+  }
 }
 
 //////////////////////////////////////////////////
