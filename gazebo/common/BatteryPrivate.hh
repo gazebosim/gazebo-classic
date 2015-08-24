@@ -39,6 +39,9 @@ namespace gazebo
       /// \brief Map of unique consumer ID to power loads in watts.
       public: std::map<uint32_t, double> powerLoads;
 
+      /// \brief Counter used to produce unique consumer (powerload) ids.
+      public: uint32_t powerLoadCounter;
+
       /// \brief The function used to to update the real voltage.
       /// It takes as inputs current voltage and list of power loads.
       public: std::function<double (const BatteryPtr)> updateFunc;

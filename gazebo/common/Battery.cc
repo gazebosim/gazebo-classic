@@ -33,6 +33,7 @@ Battery::Battery()
 {
   this->dataPtr->realVoltage = 0.0;
   this->dataPtr->initVoltage = 0.0;
+  this->dataPtr->powerLoadCounter = 0;
 
   this->SetUpdateFunc(std::bind(&Battery::UpdateDefault, this,
         std::placeholders::_1));
@@ -81,15 +82,25 @@ void Battery::InitConsumers()
 /////////////////////////////////////////////////
 uint32_t Battery::AddConsumer()
 {
-  uint32_t consumerId = this->dataPtr->powerLoads.size();
-  this->dataPtr->powerLoads[consumerId] = 0.0;
-  return consumerId;
+  uint32_t newId = this->dataPtr->powerLoadCounter++;
+  this->dataPtr->powerLoads[newId] = 0.0;
+  return newId;
 }
 
 /////////////////////////////////////////////////
-void Battery::RemoveConsumer(uint32_t _consumerId)
+bool Battery::RemoveConsumer(uint32_t _consumerId)
 {
-  this->dataPtr->powerLoads.erase(_consumerId);
+  if (this->dataPtr->powerLoads.find(_consumerId) !=
+      this->dataPtr->powerLoads.end())
+  {
+    this->dataPtr->powerLoads.erase(_consumerId);
+    return true;
+  }
+  else
+  {
+    gzerr << "Invalid battery consumer id[" << _consumerId << "]\n";
+    return false;
+  }
 }
 
 /////////////////////////////////////////////////

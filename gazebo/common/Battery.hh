@@ -80,7 +80,9 @@ namespace gazebo
 
       /// \brief Remove a consumer.
       /// \param[in] _consumerId Unique consumer identifier.
-      public: void RemoveConsumer(const uint32_t _consumerId);
+      /// \return True if the consumer was removed. False if the consumer id
+      /// was not found.
+      public: bool RemoveConsumer(const uint32_t _consumerId);
 
       /// \brief Set consumer power load in watts.
       /// \param[in] _consumerId Unique consumer identifier.

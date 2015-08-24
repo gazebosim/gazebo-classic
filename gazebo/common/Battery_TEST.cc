@@ -34,7 +34,7 @@ TEST_F(BatteryTest, Construction)
   EXPECT_TRUE(battery != NULL);
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), 0.0);
-  EXPECT_EQ(battery->PowerLoads().size(), (size_t)0);
+  EXPECT_EQ(battery->PowerLoads().size(), 0u);
 }
 
 /////////////////////////////////////////////////
@@ -45,8 +45,8 @@ TEST_F(BatteryTest, AddConsumer)
   EXPECT_TRUE(battery != NULL);
 
   uint32_t consumerId = battery->AddConsumer();
-  EXPECT_EQ(consumerId, (uint32_t)0);
-  EXPECT_EQ(battery->PowerLoads().size(), (size_t)1);
+  EXPECT_EQ(consumerId, 0u);
+  EXPECT_EQ(battery->PowerLoads().size(), 1u);
 
   battery->SetPowerLoad(consumerId, 5.0);
 
@@ -63,16 +63,33 @@ TEST_F(BatteryTest, RemoveConsumer)
   EXPECT_TRUE(battery != NULL);
 
   uint32_t consumerId = battery->AddConsumer();
-  EXPECT_EQ(consumerId, (uint32_t)0);
-  EXPECT_EQ(battery->PowerLoads().size(), (size_t)1);
+  EXPECT_EQ(consumerId, 0u);
+  EXPECT_EQ(battery->PowerLoads().size(), 1u);
 
   double powerLoad = 1.0;
   EXPECT_TRUE(battery->SetPowerLoad(consumerId, powerLoad));
   EXPECT_TRUE(battery->PowerLoad(consumerId, powerLoad));
   EXPECT_DOUBLE_EQ(powerLoad, 1.0);
 
-  battery->RemoveConsumer(consumerId);
-  EXPECT_EQ(battery->PowerLoads().size(), (size_t)0);
+  uint32_t consumerId2 = battery->AddConsumer();
+
+  EXPECT_TRUE(battery->RemoveConsumer(consumerId));
+  EXPECT_EQ(battery->PowerLoads().size(), 1u);
+
+  uint32_t consumerId3 = battery->AddConsumer();
+  EXPECT_TRUE(battery->RemoveConsumer(consumerId3));
+  uint32_t consumerId4 = battery->AddConsumer();
+
+  EXPECT_FALSE(consumerId == consumerId2);
+  EXPECT_FALSE(consumerId == consumerId3);
+  EXPECT_FALSE(consumerId == consumerId4);
+
+  EXPECT_FALSE(consumerId2 == consumerId3);
+  EXPECT_FALSE(consumerId2 == consumerId4);
+
+  EXPECT_FALSE(consumerId3 == consumerId4);
+
+  EXPECT_FALSE(battery->RemoveConsumer(25));
 }
 
 /////////////////////////////////////////////////
@@ -85,7 +102,7 @@ TEST_F(BatteryTest, SetPowerLoad)
   // Add two consumers
   uint32_t consumerId1 = battery->AddConsumer();
   uint32_t consumerId2 = battery->AddConsumer();
-  EXPECT_EQ(battery->PowerLoads().size(), (size_t)2);
+  EXPECT_EQ(battery->PowerLoads().size(), 2u);
 
   // Set consumers power load
   double powerLoad1 = 1.0;
