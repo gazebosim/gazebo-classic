@@ -1072,5 +1072,69 @@ void ConfigWidget_TEST::CreatedExternally()
   QVERIFY(groupWidget->childWidget != NULL);
 }
 
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::EnumConfigWidget()
+{
+  // Create a parent widget
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget();
+  QVERIFY(configWidget != NULL);
+
+  // Create an enum child widget
+  std::vector<std::string> enumValues;
+  enumValues.push_back("value1");
+  enumValues.push_back("value2");
+  enumValues.push_back("value3");
+  gazebo::gui::ConfigChildWidget *enumWidget =
+      configWidget->CreateEnumWidget("Enum Label", enumValues);
+
+  QVERIFY(enumWidget != NULL);
+
+  // Add it to parent
+  QVERIFY(configWidget->AddConfigChildWidget("enumWidgetName", enumWidget));
+
+  // Check that all items can be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value1"));
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value2"));
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value3"));
+
+  // Check that an inexistent item cannot be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value4")
+      == false);
+
+  // Check the number of items
+  QComboBox *comboBox = enumWidget->findChild<QComboBox *>();
+  QVERIFY(comboBox != NULL);
+  QCOMPARE(comboBox->count(), 3);
+
+  // Add an item and check count
+  QVERIFY(configWidget->AddItemEnumWidget("enumWidgetName", "value4"));
+  QCOMPARE(comboBox->count(), 4);
+
+  // Check that the new item can be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value4"));
+
+  // Remove an item and check count
+  QVERIFY(configWidget->RemoveItemEnumWidget("enumWidgetName", "value2"));
+  QCOMPARE(comboBox->count(), 3);
+
+  // Check that the removed item cannot be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value2")
+      == false);
+
+  // Clear all items and check count
+  QVERIFY(configWidget->ClearEnumWidget("enumWidgetName"));
+  QCOMPARE(comboBox->count(), 0);
+
+  // Check that none of the previous items can be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value1")
+      == false);
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value2")
+      == false);
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value3")
+      == false);
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value4")
+      == false);
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ConfigWidget_TEST)

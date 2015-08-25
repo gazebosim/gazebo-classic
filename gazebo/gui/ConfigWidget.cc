@@ -934,11 +934,6 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               break;
             }
 
-            // connect enum config widget event so that we can fire an other
-            // event from ConfigWidget that has the name of this field
-            connect(qobject_cast<EnumConfigWidget *>(configChildWidget),
-                SIGNAL(EnumValueChanged(const QString &)), this,
-                SLOT(OnEnumValueChanged(const QString &)));
             newFieldWidget = configChildWidget;
           }
           this->UpdateEnumWidget(configChildWidget, value->name());
@@ -1758,6 +1753,12 @@ ConfigChildWidget *ConfigWidget::CreateEnumWidget(
 
   widget->widgets.push_back(enumComboBox);
 
+  // connect enum config widget event so that we can fire another
+  // event from ConfigWidget that has the name of this field
+  connect(widget,
+      SIGNAL(EnumValueChanged(const QString &)), this,
+      SLOT(OnEnumValueChanged(const QString &)));
+
   return widget;
 }
 
@@ -2327,7 +2328,6 @@ bool ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
   return true;
 }
 
-
 /////////////////////////////////////////////////
 bool ConfigWidget::UpdateEnumWidget(ConfigChildWidget *_widget,
     const std::string &_value)
@@ -2728,4 +2728,109 @@ void GeometryConfigWidget::OnSelectFile()
 void EnumConfigWidget::EnumChanged(const QString &_value)
 {
   emit EnumValueChanged(_value);
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::ClearEnumWidget(const std::string &_name)
+{
+  // Find widget
+  auto iter = this->configWidgets.find(_name);
+
+  if (iter == this->configWidgets.end())
+    return false;
+
+  EnumConfigWidget *enumWidget = dynamic_cast<EnumConfigWidget *>(iter->second);
+
+  if (enumWidget->widgets.size() != 1u)
+  {
+    gzerr << "Error clearing Enum Config widget" << std::endl;
+    return false;
+  }
+
+  QComboBox *valueComboBox = qobject_cast<QComboBox *>(enumWidget->widgets[0]);
+  if (!valueComboBox)
+  {
+    gzerr << "Error clearing Enum Config widget" << std::endl;
+    return false;
+  }
+
+  // Clear
+  valueComboBox->blockSignals(true);
+  valueComboBox->clear();
+  valueComboBox->blockSignals(false);
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::AddItemEnumWidget(const std::string &_name,
+    const std::string &_itemText)
+{
+  // Find widget
+  auto iter = this->configWidgets.find(_name);
+
+  if (iter == this->configWidgets.end())
+    return false;
+
+  EnumConfigWidget *enumWidget = dynamic_cast<EnumConfigWidget *>(iter->second);
+
+  if (enumWidget->widgets.size() != 1u)
+  {
+    gzerr << "Error adding item to Enum Config widget" << std::endl;
+    return false;
+  }
+
+  QComboBox *valueComboBox = qobject_cast<QComboBox *>(enumWidget->widgets[0]);
+  if (!valueComboBox)
+  {
+    gzerr << "Error adding item to Enum Config widget" << std::endl;
+    return false;
+  }
+
+  // Add item
+  valueComboBox->blockSignals(true);
+  valueComboBox->addItem(QString::fromStdString(_itemText));
+  valueComboBox->blockSignals(false);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::RemoveItemEnumWidget(const std::string &_name,
+    const std::string &_itemText)
+{
+  // Find widget
+  auto iter = this->configWidgets.find(_name);
+
+  if (iter == this->configWidgets.end())
+    return false;
+
+  EnumConfigWidget *enumWidget = dynamic_cast<EnumConfigWidget *>(iter->second);
+
+  if (enumWidget->widgets.size() != 1u)
+  {
+    gzerr << "Error removing item from Enum Config widget" << std::endl;
+    return false;
+  }
+
+  QComboBox *valueComboBox = qobject_cast<QComboBox *>(enumWidget->widgets[0]);
+  if (!valueComboBox)
+  {
+    gzerr << "Error removing item from Enum Config widget" << std::endl;
+    return false;
+  }
+
+  // Remove item
+  int index = valueComboBox->findText(QString::fromStdString(
+      _itemText));
+  if (index < 0)
+  {
+    gzerr << "Error removing item from Enum Config widget" << std::endl;
+    return false;
+  }
+
+  valueComboBox->blockSignals(true);
+  valueComboBox->removeItem(index);
+  valueComboBox->blockSignals(false);
+
+  return true;
 }
