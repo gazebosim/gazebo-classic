@@ -1047,7 +1047,11 @@ void JointData::OnApply()
     rendering::VisualPtr childVis = gui::get_active_camera()->GetScene()
         ->GetVisual(scope + this->jointMsg->child());
     if (childVis)
+    {
       this->child = childVis;
+      if (this->jointVisual)
+        childVis->AttachVisual(this->jointVisual);
+    }
     else
       gzwarn << "Invalid child, keeping old child" << std::endl;
   }
@@ -1158,9 +1162,6 @@ void JointData::Update()
 
     this->jointVisual = jointVis;
   }
-  gzdbg << "The joint pose must be rotated before being added" << std::endl;
-  this->jointVisual->SetWorldPose(this->child->GetWorldPose() +
-      this->jointVisual->GetPose());
 
   // Line now connects the child link to the joint frame
   this->line->SetPoint(0, this->child->GetWorldPose().pos
