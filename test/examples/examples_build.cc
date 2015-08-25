@@ -121,6 +121,7 @@ INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
   , "listener"
   , "publisher"
   , "test_fixture"
+  , "transporter"
 ));
 
 int main(int argc, char **argv)
