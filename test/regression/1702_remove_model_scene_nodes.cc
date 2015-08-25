@@ -71,15 +71,15 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   auto collision = link->mutable_collision(0);
   msgs::Set(collision->mutable_pose(), ignition::math::Pose3d());
 
-  auto visual = link->mutable_visual(0);
-  msgs::Set(visual->mutable_pose(), ignition::math::Pose3d());
+  auto linkVisual = link->mutable_visual(0);
+  msgs::Set(linkVisual->mutable_pose(), ignition::math::Pose3d());
 
   physics::ModelPtr box = ServerFixture::SpawnModel(model);
   EXPECT_TRUE(box != NULL);
 
   std::string name = box->GetName();
 
-  gzerr << "spawned"; getchar();
+  // gzerr << "spawned"; getchar();
 
   // delete that model
   ServerFixture::RemoveModel(name);
@@ -96,7 +96,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   EXPECT_TRUE(world->GetModel(name) == NULL);
   EXPECT_LT(count, 1000);
 
-  gzerr << "deleted"; getchar();
+  // gzerr << "deleted"; getchar();
 
   // spawn the exact same model
   // if this succeeds, we're OK.
@@ -109,7 +109,31 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   }
 
   EXPECT_TRUE(world->GetModel(name) != NULL);
-  gzerr << "spawned again"; getchar();
+
+  // important to sleep here, this is where the failure occurs
+  // usleep(2000000);
+  // world->Step(1000);
+  // gzerr << "spawned again"; getchar();
+  // need to sleep long enough for rendering cycle to iterate at least once
+  // or do something like look for visuals through a camera?
+  rendering::ScenePtr scene = rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+  rendering::CameraPtr camera = scene->GetCamera("camera");
+  ASSERT_TRUE(camera != NULL);
+  int sleep = 0;
+  int maxSleep = 5;
+  rendering::VisualPtr visual;
+  while (!visual && sleep < maxSleep)
+  {
+    visual = scene->GetVisual("a_fancy_box::link_1");
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  ASSERT_TRUE(visual != NULL);
+
+  // box should be visible to the camera.
+  EXPECT_TRUE(camera->IsVisible(visual));
+
 }
 
 TEST_P(Issue1702Test, SpawnDeleteSpawnAgain)
