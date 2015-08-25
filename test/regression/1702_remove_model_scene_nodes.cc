@@ -53,7 +53,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // spawn a model
   msgs::Model model;
   model.set_name("a_fancy_box");
-  const ignition::math::Vector3d pos(0.0, 0.0, 5.0);
+  const ignition::math::Vector3d pos(5.0, 0.0, 0.5);
   msgs::Set(model.mutable_pose(),
             ignition::math::Pose3<double>(pos,
             ignition::math::Quaternion<double>::Identity));
@@ -79,6 +79,8 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 
   std::string name = box->GetName();
 
+  gzerr << "spawned"; getchar();
+
   // delete that model
   ServerFixture::RemoveModel(name);
 
@@ -94,6 +96,8 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   EXPECT_TRUE(world->GetModel(name) == NULL);
   EXPECT_LT(count, 1000);
 
+  gzerr << "deleted"; getchar();
+
   // spawn the exact same model
   // if this succeeds, we're OK.
   physics::ModelPtr newBox = ServerFixture::SpawnModel(model);
@@ -105,6 +109,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   }
 
   EXPECT_TRUE(world->GetModel(name) != NULL);
+  gzerr << "spawned again"; getchar();
 }
 
 TEST_P(Issue1702Test, SpawnDeleteSpawnAgain)
