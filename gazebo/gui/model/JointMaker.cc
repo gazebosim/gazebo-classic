@@ -1084,7 +1084,7 @@ void JointData::OnApply()
       msgs::ConvertJointType(this->jointMsg->type()));
 
   // Parent / child
-  gzdbg << "Update JointData's parent and child visuals here or at Update" i
+  gzdbg << "Update JointData's parent and child visuals here or at Update"
       << std::endl;
 
   this->dirty = true;
