@@ -1177,6 +1177,9 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   double L1 = surf1->FrictionPyramid()->ElasticModulusReferenceLength();
   double L2 = surf2->FrictionPyramid()->ElasticModulusReferenceLength();
   contact.surface.elastic_modulus_reference_length = 0.5 * (L1 + L2);
+  // Turn on Contact Elastic Modulus model if elastic modulus > 0
+  if (contact.surface.elastic_modulus > 0.0)
+    contact.surface.mode |= dContactEM;
 
   // Set the bounce values
   contact.surface.bounce = std::min(surf1->bounce,
