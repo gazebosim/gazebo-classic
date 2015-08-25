@@ -28,5 +28,8 @@ class LaserView_TEST : public QTestFixture
 
   /// \brief Test construction and usage in a world with a laser.
   private slots: void Construction();
+
+  /// \brief Test invoking buttons in the laser view widget.
+  private slots: void Buttons();
 };
 #endif

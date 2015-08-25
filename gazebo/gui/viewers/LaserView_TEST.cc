@@ -21,6 +21,9 @@
 /////////////////////////////////////////////////
 void LaserView_TEST::Construction()
 {
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
   this->Load("worlds/ray_test.world");
 
   // Create a new laser view widget
@@ -41,6 +44,58 @@ void LaserView_TEST::Construction()
   for (int j = 0; j < 50; ++j)
   {
     gazebo::common::Time::MSleep(gazebo::math::Rand::GetIntUniform(10, 50));
+    QCoreApplication::processEvents();
+  }
+
+  view->hide();
+  delete view;
+}
+
+/////////////////////////////////////////////////
+void LaserView_TEST::Buttons()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/ray_test.world");
+
+  // Create a new laser view widget
+  gazebo::gui::LaserView *view = new gazebo::gui::LaserView(NULL);
+
+  QVERIFY(view != NULL);
+
+  view->show();
+
+  view->SetTopic("~/hokuyo/link/laser/scan");
+
+ // Spin the Qt update loop for a while to process events.
+  for (int j = 0; j < 50; ++j)
+  {
+    gazebo::common::Time::MSleep(10);
+    QCoreApplication::processEvents();
+  }
+
+  // Get Fit in View button and click it
+  QPushButton *pushButton = view->findChild<QPushButton *>();
+  QVERIFY(pushButton != NULL);
+  pushButton->click();
+
+  // Spin the Qt update loop for a while to process events.
+  for (int j = 0; j < 50; ++j)
+  {
+    gazebo::common::Time::MSleep(10);
+    QCoreApplication::processEvents();
+  }
+
+  // Get Degrees radio button and toggle it
+  QRadioButton *radioButton = view->findChild<QRadioButton *>();
+  QVERIFY(radioButton != NULL);
+  radioButton->toggle();
+
+  // Spin the Qt update loop for a while to process events.
+  for (int j = 0; j < 50; ++j)
+  {
+    gazebo::common::Time::MSleep(10);
     QCoreApplication::processEvents();
   }
 
