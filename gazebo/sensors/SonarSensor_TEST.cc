@@ -147,7 +147,14 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
 /////////////////////////////////////////////////
 void SonarSensor_TEST::GroundPlane(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world", true, _physicsEngine);
+  if (_physicsEngine != "ode")
+  {
+    gzerr << "Sonar range sensing only works in ODE, issue #1038"
+          << std::endl;
+    return;
+  }
+
+  Load("worlds/empty.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -158,13 +165,20 @@ void SonarSensor_TEST::GroundPlane(const std::string &_physicsEngine)
   physics::ModelPtr model = world->GetModel("sonar");
   ASSERT_TRUE(model != NULL);
 
+  // Wait for collision engine to turn over
+  common::Time::MSleep(1000);
+
   // Sonar should detect the ground plane
-  world->Step(100);
+  sonar->Update(true);
   EXPECT_NEAR(sonar->GetRange(), 1.0, 0.01);
 
   // Rotate the model, and the sonar should not see the ground plane
   model->SetWorldPose(ignition::math::Pose3d(0, 0, 1, 0, 1.5707, 0));
-  world->Step(100);
+
+  // Wait for collision engine to turn over
+  common::Time::MSleep(1000);
+
+  sonar->Update(true);
   EXPECT_NEAR(sonar->GetRange(), 2.0, 0.01);
 }
 
