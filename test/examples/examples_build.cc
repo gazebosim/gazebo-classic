@@ -96,6 +96,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "gui_overlay_plugin_spawn"
   , "gui_overlay_plugin_time"
   , "hello_world"
+  , "mainwindow_example"
   , "model_push"
   , "model_move"
   , "parameters"
