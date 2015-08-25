@@ -128,13 +128,15 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
           this->kd = contactOdeElem->Get<double>("kd");
           this->cfm = contactOdeElem->Get<double>("soft_cfm");
           this->erp = contactOdeElem->Get<double>("soft_erp");
-          this->frictionPyramid->SetElasticModulus(
-            contactOdeElem->Get<double>("elastic_modulus"));
-          this->frictionPyramid->SetElasticModulusReferenceLength(
-            contactOdeElem->Get<double>("elastic_modulus_reference_length"));
           this->maxVel = contactOdeElem->Get<double>("max_vel");
           this->minDepth = contactOdeElem->Get<double>("min_depth");
         }
+        this->frictionPyramid->SetPoissonsRatio(
+          contactElem->Get<double>("poissons_ratio"));
+        this->frictionPyramid->SetElasticModulus(
+          contactElem->Get<double>("elastic_modulus"));
+        this->frictionPyramid->SetElasticModulusReferenceLength(
+          contactElem->Get<double>("elastic_modulus_reference_length"));
       }
     }
   }

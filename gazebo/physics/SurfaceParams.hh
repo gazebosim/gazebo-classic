@@ -99,6 +99,14 @@ namespace gazebo
       /// \param[in] _use True to use the surface radius.
       public: void SetUsePatchRadius(const bool _use);
 
+      /// \brief Get the Poisson's ratio
+      /// \return Poisson's ratio
+      public: double PoissonsRatio() const;
+
+      /// \brief Set the Poisson's ratio
+      /// \param[in] _modulus Poisson's ratio
+      public: void SetPoissonsRatio(double _ratio);
+
       /// \brief Get the elastic modulus
       /// \return elastic modulus
       public: double ElasticModulus() const;
@@ -170,6 +178,9 @@ namespace gazebo
       /// True to use the constant patch radius parameter. False to use the
       /// surface radius together with contact depth.
       private: bool usePatchRadius;
+
+      /// \brief Poisson's Ratio
+      private: double poissonsRatio;
 
       /// \brief Elastic modulus.
       private: double elasticModulus;

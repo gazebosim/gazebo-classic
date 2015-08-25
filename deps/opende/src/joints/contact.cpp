@@ -174,9 +174,23 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         }
 
         // use elastic modulus
+        dReal e_star = contact.surface.elastic_modulus;
+        /// \TODO Using Hertzian contact, but ignoring the ^1.5 power!!!
+        /// We should fix this by either linearizing about x, or try
+        /// to rederive the cfm/erp -> kp/kd equivalence (per Catto)
+        /// for stiffness term = K*x^1.5.
+        /// For now, pretend it's just x.
+        ///   equation 5.23 form Contact Mechanics and Friction by Popov
+        dReal stiffness = 4.0 / 3.0 * e_star * sqrt(patch_radius);
+
+        /* 
+        // Alternatively, use thin sheets approximation:
+        //   equation 2.12 form Contact Mechanics and Friction by Popov
         dReal area = M_PI * patch_radius * patch_radius;
-        dReal stiffness = contact.surface.elastic_modulus * area /
+        dReal stiffness = e_star * area /
                           contact.surface.elastic_modulus_reference_length;
+        */
+
         // convert stiffness to erp (known cfm, h, kp)
         // get kd using:
         //   cfm = 1 / ( dt * kp + kd )
