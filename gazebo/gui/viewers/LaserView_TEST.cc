@@ -68,7 +68,7 @@ void LaserView_TEST::Buttons()
 
   view->SetTopic("~/hokuyo/link/laser/scan");
 
- // Spin the Qt update loop for a while to process events.
+  // Spin the Qt update loop for a while to process events.
   for (int j = 0; j < 50; ++j)
   {
     gazebo::common::Time::MSleep(10);
