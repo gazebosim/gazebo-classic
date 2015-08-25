@@ -297,7 +297,7 @@ namespace gazebo
 
     /// \brief Spawn a sonar.
     /// \param[in] _modelName Name of the model.
-    /// \param[in] _sonarName Name of the laser.
+    /// \param[in] _sonarName Name of the sonar.
     /// \param[in] _pose Sonar pose.
     /// \param[in] _minRange Minimum sonar range.
     /// \param[in] _maxRange Maximum sonar range.

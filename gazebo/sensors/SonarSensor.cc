@@ -258,7 +258,7 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
   ignition::math::Vector3d pos;
 
   // A 5-step hysteresis window was chosen to reduce range value from
-  // bouncing. I don't believe we need to expose this value as a parameter.
+  // bouncing.
   if (!this->incomingContacts.empty() || this->emptyContactCount > 5)
   {
     this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
@@ -298,7 +298,7 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
         // Copy the contact message.
         if (len < this->sonarMsg.sonar().range())
         {
-          this->sonarMsg.mutable_sonar()->set_range(std::abs(len));
+          this->sonarMsg.mutable_sonar()->set_range(len);
         }
       }
     }
