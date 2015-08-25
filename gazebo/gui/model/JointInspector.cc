@@ -321,13 +321,21 @@ void JointInspector::OnSwap()
 {
   gzdbg << "JointInspector::OnSwap" << std::endl;
   // Get current values
+  std::string currentParent =
+      this->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->configWidget->GetEnumWidgetValue("childCombo");
 
   // Clear comboboxes
+  // this->configWidget->ClearEnumWidget("parentCombo");
+  // this->configWidget->ClearEnumWidget("childCombo");
 
   // Add items according to link list, but remove not allowed options
   // Consider disabling options
 
   // Choose new options
+  this->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
+  this->configWidget->SetEnumWidgetValue("childCombo", currentParent);
 }
 
 /////////////////////////////////////////////////

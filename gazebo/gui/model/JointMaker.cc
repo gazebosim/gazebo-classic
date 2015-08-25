@@ -1019,8 +1019,15 @@ void JointData::OnApply()
   // Parent
   if (this->jointMsg->parent() != this->parent->GetName())
   {
+    // Get scoped name
+    std::string oldName = this->parent->GetName();
+    std::string scope = oldName;
+    size_t idx = oldName.find_last_of("::");
+    if (idx != std::string::npos)
+      scope = oldName.substr(0, idx+1);
+
     rendering::VisualPtr parentVis = gui::get_active_camera()->GetScene()
-        ->GetVisual(this->jointMsg->parent());
+        ->GetVisual(scope + this->jointMsg->parent());
     if (parentVis)
       this->parent = parentVis;
     else
@@ -1030,8 +1037,15 @@ void JointData::OnApply()
   // Child
   if (this->jointMsg->child() != this->child->GetName())
   {
+    // Get scoped name
+    std::string oldName = this->child->GetName();
+    std::string scope = oldName;
+    size_t idx = oldName.find_last_of("::");
+    if (idx != std::string::npos)
+      scope = oldName.substr(0, idx+1);
+
     rendering::VisualPtr childVis = gui::get_active_camera()->GetScene()
-        ->GetVisual(this->jointMsg->child());
+        ->GetVisual(scope + this->jointMsg->child());
     if (childVis)
       this->child = childVis;
     else
@@ -1064,13 +1078,15 @@ void JointData::Update()
   // get origin of child link visuals
   math::Vector3 childOrigin = this->child->GetWorldPose().pos;
 
-  // set orientation of joint hotspot
+  // set position of joint hotspot
   math::Vector3 dPos = (childOrigin - parentOrigin);
   math::Vector3 center = dPos * 0.5;
   double length = std::max(dPos.GetLength(), 0.001);
   this->hotspot->SetScale(
       math::Vector3(0.008, 0.008, length));
   this->hotspot->SetWorldPosition(parentOrigin + center);
+
+  // set orientation of joint hotspot
   math::Vector3 u = dPos.Normalize();
   math::Vector3 v = math::Vector3::UnitZ;
   double cosTheta = v.Dot(u);
@@ -1122,6 +1138,7 @@ void JointData::Update()
       jointUpdateMsg->clear_axis2();
   }
 
+  // Joint visual
   if (this->jointVisual)
   {
     this->jointVisual->UpdateFromMsg(jointUpdateMsg);
@@ -1141,6 +1158,9 @@ void JointData::Update()
 
     this->jointVisual = jointVis;
   }
+  gzdbg << "The joint pose must be rotated before being added" << std::endl;
+  this->jointVisual->SetWorldPose(this->child->GetWorldPose() +
+      this->jointVisual->GetPose());
 
   // Line now connects the child link to the joint frame
   this->line->SetPoint(0, this->child->GetWorldPose().pos
