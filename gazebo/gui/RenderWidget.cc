@@ -32,6 +32,7 @@
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/RenderWidget.hh"
 
 using namespace gazebo;

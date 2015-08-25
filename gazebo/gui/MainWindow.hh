@@ -28,7 +28,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/HotkeyDialog.hh"
-#include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -42,6 +41,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class InsertModelWidget;
     class RenderWidget;
     class ToolsWidget;
     class ModelListWidget;

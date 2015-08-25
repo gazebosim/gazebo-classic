@@ -24,16 +24,8 @@
 #include <boost/scoped_ptr.hpp>
 
 #include "gazebo/gazebo_config.h"
-
-#include "gazebo/gui/GuiPlugin.hh"
-#include "gazebo/gui/CloneWindow.hh"
-#include "gazebo/gui/TopicSelector.hh"
-#include "gazebo/gui/DataLogger.hh"
-#include "gazebo/gui/viewers/ViewFactory.hh"
-#include "gazebo/gui/viewers/TopicView.hh"
-#include "gazebo/gui/viewers/ImageView.hh"
-
 #include "gazebo/gazebo_client.hh"
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
@@ -48,22 +40,30 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/AlignWidget.hh"
+#include "gazebo/gui/CloneWindow.hh"
+#include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiPlugin.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/RenderWidget.hh"
-#include "gazebo/gui/ToolsWidget.hh"
-#include "gazebo/gui/GLWidget.hh"
-#include "gazebo/gui/AlignWidget.hh"
-#include "gazebo/gui/ViewAngleWidget.hh"
-#include "gazebo/gui/TimePanel.hh"
-#include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/SpaceNav.hh"
+#include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/ToolsWidget.hh"
+#include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/ViewAngleWidget.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
-#include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
+#include "gazebo/gui/terrain/TerrainEditor.hh"
+#include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/gui/viewers/ImageView.hh"
+#include "gazebo/gui/MainWindow.hh"
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
@@ -2195,13 +2195,15 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   bool simulation = _mode == "Simulation";
   bool logPlayback = _mode == "LogPlayback";
 
+  bool simOrLog = simulation || logPlayback;
+
   // File
-  // g_openAct->setVisible(simulation || logPlayback);
-  g_saveAct->setVisible(simulation || logPlayback);
-  g_saveAsAct->setVisible(simulation || logPlayback);
-  g_saveCfgAct->setVisible(simulation || logPlayback);
+  // g_openAct->setVisible(simOrLog);
+  g_saveAct->setVisible(simOrLog);
+  g_saveAsAct->setVisible(simOrLog);
+  g_saveCfgAct->setVisible(simOrLog);
   g_cloneAct->setVisible(simulation);
-  g_quitAct->setVisible(simulation || logPlayback);
+  g_quitAct->setVisible(simOrLog);
 
   // Edit
   this->editMenu->menuAction()->setVisible(simulation);
@@ -2212,34 +2214,34 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_editModelAct->setVisible(simulation);
 
   // Camera
-  g_cameraOrthoAct->setVisible(simulation || logPlayback);
-  g_cameraPerspectiveAct->setVisible(simulation || logPlayback);
-  g_fpsAct->setVisible(simulation || logPlayback);
-  g_orbitAct->setVisible(simulation || logPlayback);
-  g_resetAct->setVisible(simulation || logPlayback);
+  g_cameraOrthoAct->setVisible(simOrLog);
+  g_cameraPerspectiveAct->setVisible(simOrLog);
+  g_fpsAct->setVisible(simOrLog);
+  g_orbitAct->setVisible(simOrLog);
+  g_resetAct->setVisible(simOrLog);
 
   // View
-  g_showGridAct->setVisible(simulation || logPlayback);
-  g_showOriginAct->setVisible(simulation || logPlayback);
-  g_transparentAct->setVisible(simulation || logPlayback);
-  g_viewWireframeAct->setVisible(simulation || logPlayback);
-  g_showCollisionsAct->setVisible(simulation || logPlayback);
-  g_showCOMAct->setVisible(simulation || logPlayback);
-  g_showInertiaAct->setVisible(simulation || logPlayback);
-  g_showLinkFrameAct->setVisible(simulation || logPlayback);
-  g_showContactsAct->setVisible(simulation || logPlayback);
-  g_showJointsAct->setVisible(simulation || logPlayback);
+  g_showGridAct->setVisible(simOrLog);
+  g_showOriginAct->setVisible(simOrLog);
+  g_transparentAct->setVisible(simOrLog);
+  g_viewWireframeAct->setVisible(simOrLog);
+  g_showCollisionsAct->setVisible(simOrLog);
+  g_showCOMAct->setVisible(simOrLog);
+  g_showInertiaAct->setVisible(simOrLog);
+  g_showLinkFrameAct->setVisible(simOrLog);
+  g_showContactsAct->setVisible(simOrLog);
+  g_showJointsAct->setVisible(simOrLog);
 
   // Window
-  g_topicVisAct->setVisible(simulation || logPlayback);
-  g_viewOculusAct->setVisible(simulation || logPlayback);
-  g_overlayAct->setVisible(simulation || logPlayback);
-  g_showToolbarsAct->setVisible(simulation || logPlayback);
-  g_fullScreenAct->setVisible(simulation || logPlayback);
+  g_topicVisAct->setVisible(simOrLog);
+  g_viewOculusAct->setVisible(simOrLog);
+  g_overlayAct->setVisible(simOrLog);
+  g_showToolbarsAct->setVisible(simOrLog);
+  g_fullScreenAct->setVisible(simOrLog);
 
   // About
-  g_hotkeyChartAct->setVisible(simulation || logPlayback);
-  g_aboutAct->setVisible(simulation || logPlayback);
+  g_hotkeyChartAct->setVisible(simOrLog);
+  g_aboutAct->setVisible(simOrLog);
 
   // Insert
   if (logPlayback)
