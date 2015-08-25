@@ -2763,7 +2763,7 @@ bool ConfigWidget::ClearEnumWidget(const std::string &_name)
 
 /////////////////////////////////////////////////
 bool ConfigWidget::AddItemEnumWidget(const std::string &_name,
-    const std::string &_itemText, const std::string &_itemData)
+    const std::string &_itemText)
 {
   // Find widget
   auto iter = this->configWidgets.find(_name);
@@ -2788,8 +2788,7 @@ bool ConfigWidget::AddItemEnumWidget(const std::string &_name,
 
   // Add item
   valueComboBox->blockSignals(true);
-  valueComboBox->addItem(QString::fromStdString(_itemText),
-      QString::fromStdString(_itemData));
+  valueComboBox->addItem(QString::fromStdString(_itemText));
   valueComboBox->blockSignals(false);
 
   return true;
@@ -2797,7 +2796,7 @@ bool ConfigWidget::AddItemEnumWidget(const std::string &_name,
 
 /////////////////////////////////////////////////
 bool ConfigWidget::RemoveItemEnumWidget(const std::string &_name,
-    const std::string &_itemData)
+    const std::string &_itemText)
 {
   // Find widget
   auto iter = this->configWidgets.find(_name);
@@ -2821,8 +2820,8 @@ bool ConfigWidget::RemoveItemEnumWidget(const std::string &_name,
   }
 
   // Remove item
-  int index = valueComboBox->findData(QString::fromStdString(
-      _itemData));
+  int index = valueComboBox->findText(QString::fromStdString(
+      _itemText));
   if (index < 0)
   {
     gzerr << "Error removing item from Enum Config widget" << std::endl;

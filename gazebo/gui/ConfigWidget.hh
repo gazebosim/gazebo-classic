@@ -272,19 +272,17 @@ namespace gazebo
 
       /// \brief Add an item to a child enum widget.
       /// \param[in] _name Name of the child widget.
-      /// \param[in] _itemText Enum value to be displayed
-      /// \param[in] _itemData Aditional data for the enum which uniquely
-      /// identifies it.
+      /// \param[in] _itemText Enum text value.
       /// \return True if the item is added successfully.
       public: bool AddItemEnumWidget(const std::string &_name,
-          const std::string &_itemText, const std::string &_itemData);
+          const std::string &_itemText);
 
       /// \brief Remove an item from a child enum widget.
       /// \param[in] _name Name of the child widget.
-      /// \param[in] _itemData Data which uniquely identifies the enum value.
+      /// \param[in] _itemText Text of the enum value.
       /// \return True if the item is removed successfully.
       public: bool RemoveItemEnumWidget(const std::string &_name,
-          const std::string &_itemData);
+          const std::string &_itemText);
 
       /// \brief Remove all items from a child enum widget.
       /// \param[in] _name Name of the child widget.

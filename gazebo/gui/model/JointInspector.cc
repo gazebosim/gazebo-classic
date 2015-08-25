@@ -346,15 +346,20 @@ void JointInspector::OnLinkInserted(const std::string &_linkName)
   if (idx != std::string::npos)
     leafName = _linkName.substr(idx+1);
 
-  this->configWidget->AddItemEnumWidget("parentCombo", leafName, _linkName);
-  this->configWidget->AddItemEnumWidget("childCombo", leafName, _linkName);
+  this->configWidget->AddItemEnumWidget("parentCombo", leafName);
+  this->configWidget->AddItemEnumWidget("childCombo", leafName);
 }
 
 /////////////////////////////////////////////////
 void JointInspector::OnLinkRemoved(const std::string &_linkName)
 {
-  this->configWidget->RemoveItemEnumWidget("parentCombo", _linkName);
-  this->configWidget->RemoveItemEnumWidget("childCombo", _linkName);
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  this->configWidget->RemoveItemEnumWidget("parentCombo", leafName);
+  this->configWidget->RemoveItemEnumWidget("childCombo", leafName);
 }
 
 /////////////////////////////////////////////////
@@ -366,10 +371,8 @@ void JointInspector::Open()
 
   for (auto link : this->jointMaker->LinkList())
   {
-    this->configWidget->AddItemEnumWidget("parentCombo", link.second,
-        link.first);
-    this->configWidget->AddItemEnumWidget("childCombo", link.second,
-        link.first);
+    this->configWidget->AddItemEnumWidget("parentCombo", link.second);
+    this->configWidget->AddItemEnumWidget("childCombo", link.second);
   }
 
   // Select current parent / child
