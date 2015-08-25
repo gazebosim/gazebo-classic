@@ -53,13 +53,13 @@ if (HAVE_GRAPHVIZ)
      model/GraphView.hh
      model/SchematicViewWidget.hh
   )
- 
+
   set (sources_local ${sources_local}
     model/GraphScene.cc
     model/GraphView.cc
     model/SchematicViewWidget.cc
   )
- 
+
   if (ENABLE_SCREEN_TESTS)
     set (qt_tests_local ${qt_tests_local}
       SchematicViewWidget_TEST.cc
