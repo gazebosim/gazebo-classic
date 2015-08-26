@@ -30,6 +30,9 @@
 1. Make it possible to create custom ConfigWidgets
     * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
 
+1. AddItem / RemoveItem / Clear enum config widgets
+    * [Pull request #1878](https://bitbucket.org/osrf/gazebo/pull-request/1878)
+
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
