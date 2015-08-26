@@ -208,6 +208,10 @@ namespace gazebo
       public: void SetSelected(rendering::VisualPtr _jointVis,
           const bool selected);
 
+      /// \brief Get the list of links.
+      /// \return The list of links, with the link scoped name and leaf name.
+      public: std::map<std::string, std::string> LinkList() const;
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -268,6 +272,14 @@ namespace gazebo
       private: void OnSetSelectedJoint(const std::string &_name,
           const bool _selected);
 
+      /// \brief Add a link to the list.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkInserted(const std::string &_linkName);
+
+      /// \brief Remove a link from the list.
+      /// \param[in] _linkId Unique link identifying name.
+      private: void OnLinkRemoved(const std::string &_linkName);
+
       private: void ParentLinkChosen(rendering::VisualPtr _parentLink);
       private: void ChildLinkChosen(rendering::VisualPtr _childLink);
       private: void OnJointTypeChosenDialog(JointType _type);
@@ -284,6 +296,14 @@ namespace gazebo
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
+
+      /// \brief Qt signal to notify that a link has been inserted.
+      /// \param[in] _linkId Link's unique name.
+      Q_SIGNALS: void EmitLinkInserted(const std::string &_linkId);
+
+      /// \brief Qt signal to notify that a link has been removed.
+      /// \param[in] _linkId Link's unique name.
+      Q_SIGNALS: void EmitLinkRemoved(const std::string &_linkId);
 
       /// \brief Qt Callback to open joint inspector
       private slots: void OnOpenInspector();
@@ -350,6 +370,10 @@ namespace gazebo
       public: static std::map<JointMaker::JointType, std::string>
           jointMaterials;
 
+      /// \brief List of all links currently in the editor. The first string is
+      /// the link's fully scoped name and the second is the leaf name.
+      private: std::map<std::string, std::string> linkList;
+
       /// \brief Inspector for configuring joint properties.
       public: JointCreationDialog *jointCreationDialog;
 
@@ -368,7 +392,7 @@ namespace gazebo
       /// \brief Open the joint inspector.
       public: void OpenInspector();
 
-      /// \brief Update joint.
+      /// \brief Update this joint data.
       public: void Update();
 
       /// \brief Update joint.

@@ -32,6 +32,7 @@ namespace gazebo
   {
     class JointMaker;
     class ConfigWidget;
+    class ConfigChildWidget;
 
     /// \class JointInspector gui/JointInspector.hh
     /// \brief A class to inspect and modify joints.
@@ -40,8 +41,9 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
+      /// \param[in] _jointMaker Pointer to joint maker.
       /// \param[in] _parent Parent QWidget.
-      public: JointInspector(QWidget *_parent = 0);
+      public: JointInspector(JointMaker *_jointMaker, QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~JointInspector();
@@ -58,16 +60,38 @@ namespace gazebo
       /// \param[in] _pose Pose to set the joint to.
       public: void SetPose(const math::Pose &_pose);
 
+      /// \brief Open the inspector.
+      public: void Open();
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
 
-      /// \brief Qt callback when the joint type has changed.
+      /// \brief Qt callback when an enum value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
-      /// \param[in] _value New joint type value in string.
-      private slots: void OnJointTypeChanged(const QString &_name,
+      /// \param[in] _value New value in string.
+      private slots: void OnEnumChanged(const QString &_name,
           const QString &_value);
+
+      /// \brief Callback when the joint type has changed.
+      /// \param[in] _value New joint type.
+      private: void OnJointTypeChanged(const QString &_value);
+
+      /// \brief Callback when the joint parent or child link has changed.
+      /// \param[in] _value New link.
+      private: void OnLinkChanged(const QString &_linkName);
+
+      /// \brief Callback when the swap button is pressed.
+      private slots: void OnSwap();
+
+      /// \brief Add a link to the list.
+      /// \param[in] _linkName Scoped link name.
+      private slots: void OnLinkInserted(const std::string &_linkName);
+
+      /// \brief Remove a link from the list.
+      /// \param[in] _linkId Unique link identifying name.
+      private slots: void OnLinkRemoved(const std::string &_linkName);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -83,6 +107,24 @@ namespace gazebo
 
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;
+
+      /// \brief Widget for the parent link.
+      private: ConfigChildWidget *parentLinkWidget;
+
+      /// \brief Widget for the child link.
+      private: ConfigChildWidget *childLinkWidget;
+
+      /// \brief A list of gui editor events connected to this.
+      private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Pointer to the joint maker.
+      private: JointMaker *jointMaker;
+
+      /// \brief Style sheet for link widgets when there's a warning.
+      private: QString warningStyleSheet;
+
+      /// \brief Normal style sheet for link widgets.
+      private: QString normalStyleSheet;
     };
     /// \}
   }

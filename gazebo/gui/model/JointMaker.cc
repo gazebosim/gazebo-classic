@@ -121,6 +121,15 @@ JointMaker::JointMaker()
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
 
   this->updateMutex = new boost::recursive_mutex();
+
+  // Gazebo event connections
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkInserted(
+      boost::bind(&JointMaker::OnLinkInserted, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkRemoved(
+      boost::bind(&JointMaker::OnLinkRemoved, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -492,10 +501,13 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointData->SetParent(_parent);
 
   // Inspector
-  jointData->inspector = new JointInspector();
+  jointData->inspector = new JointInspector(this);
   jointData->inspector->setModal(false);
-  connect(jointData->inspector, SIGNAL(Applied()),
-      jointData, SLOT(OnApply()));
+  connect(jointData->inspector, SIGNAL(Applied()), jointData, SLOT(OnApply()));
+  connect(this, SIGNAL(EmitLinkRemoved(std::string)), jointData->inspector,
+      SLOT(OnLinkRemoved(std::string)));
+  connect(this, SIGNAL(EmitLinkInserted(std::string)), jointData->inspector,
+      SLOT(OnLinkInserted(std::string)));
 
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
@@ -858,7 +870,7 @@ void JointMaker::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  // update joint line and hotspot position.
+  // Update each joint
   for (auto it : this->joints)
   {
     JointData *joint = it.second;
@@ -1057,14 +1069,62 @@ unsigned int JointMaker::GetJointCount()
 /////////////////////////////////////////////////
 void JointData::OnApply()
 {
-  this->jointMsg->CopyFrom(*this->inspector->GetData());
-  this->type = JointMaker::ConvertJointType(
-      msgs::ConvertJointType(this->jointMsg->type()));
+  // Get data from inspector
+  msgs::Joint *inspectorMsg = this->inspector->GetData();
+  if (!inspectorMsg)
+    return;
 
+  this->jointMsg->CopyFrom(*inspectorMsg);
+
+  // Name
   if (this->name != this->jointMsg->name())
     gui::model::Events::jointNameChanged(this->hotspot->GetName(),
         this->jointMsg->name());
   this->name = this->jointMsg->name();
+
+  // Type
+  this->type = JointMaker::ConvertJointType(
+      msgs::ConvertJointType(this->jointMsg->type()));
+
+  // Parent
+  if (this->jointMsg->parent() != this->parent->GetName())
+  {
+    // Get scoped name
+    std::string oldName = this->parent->GetName();
+    std::string scope = oldName;
+    size_t idx = oldName.find_last_of("::");
+    if (idx != std::string::npos)
+      scope = oldName.substr(0, idx+1);
+
+    rendering::VisualPtr parentVis = gui::get_active_camera()->GetScene()
+        ->GetVisual(scope + this->jointMsg->parent());
+    if (parentVis)
+      this->parent = parentVis;
+    else
+      gzwarn << "Invalid parent, keeping old parent" << std::endl;
+  }
+
+  // Child
+  if (this->jointMsg->child() != this->child->GetName())
+  {
+    // Get scoped name
+    std::string oldName = this->child->GetName();
+    std::string scope = oldName;
+    size_t idx = oldName.find_last_of("::");
+    if (idx != std::string::npos)
+      scope = oldName.substr(0, idx+1);
+
+    rendering::VisualPtr childVis = gui::get_active_camera()->GetScene()
+        ->GetVisual(scope + this->jointMsg->child());
+    if (childVis)
+    {
+      this->child = childVis;
+      if (this->jointVisual)
+        childVis->AttachVisual(this->jointVisual);
+    }
+    else
+      gzwarn << "Invalid child, keeping old child" << std::endl;
+  }
 
   this->dirty = true;
   gui::model::Events::modelChanged();
@@ -1080,8 +1140,7 @@ void JointData::OnOpenInspector()
 void JointData::OpenInspector()
 {
   this->inspector->Update(this->jointMsg);
-  this->inspector->move(QCursor::pos());
-  this->inspector->show();
+  this->inspector->Open();
 }
 
 /////////////////////////////////////////////////
@@ -1213,27 +1272,26 @@ void JointData::Update()
     jointUpdateMsg->mutable_axis2()->CopyFrom(*defaultMsg.mutable_axis2());
   }
 
+  // Joint visual
   if (this->jointVisual)
   {
     this->jointVisual->UpdateFromMsg(jointUpdateMsg);
   }
   else
   {
-    std::string hotspotName = this->hotspot->GetName();
-    std::string jointVisName = hotspotName;
-    size_t idx = hotspotName.find("::");
+    std::string childName = this->child->GetName();
+    std::string jointVisName = childName;
+    size_t idx = childName.find("::");
     if (idx != std::string::npos)
-      jointVisName = hotspotName.substr(0, idx+2);
+      jointVisName = childName.substr(0, idx+2);
     jointVisName += "_JOINT_VISUAL_";
     gazebo::rendering::JointVisualPtr jointVis(
-        new gazebo::rendering::JointVisual(jointVisName, this->hotspot));
+        new gazebo::rendering::JointVisual(jointVisName, this->child));
 
     jointVis->Load(jointUpdateMsg);
 
     this->jointVisual = jointVis;
   }
-  this->jointVisual->SetWorldPose(this->child->GetWorldPose() +
-      this->jointVisual->GetPose());
 
   // Line now connects the child link to the joint frame
   this->line->SetPoint(0, this->child->GetWorldPose().pos
@@ -1376,10 +1434,14 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->jointMsg->set_child_id(joint->child->GetId());
 
   // Inspector
-  joint->inspector = new JointInspector();
+  joint->inspector = new JointInspector(this);
   joint->inspector->Update(joint->jointMsg);
   joint->inspector->setModal(false);
   connect(joint->inspector, SIGNAL(Applied()), joint, SLOT(OnApply()));
+  connect(this, SIGNAL(EmitLinkRemoved(std::string)), joint->inspector,
+      SLOT(OnLinkRemoved(std::string)));
+  connect(this, SIGNAL(EmitLinkInserted(std::string)), joint->inspector,
+      SLOT(OnLinkInserted(std::string)));
 
   // Visuals
   rendering::VisualPtr jointVis(
@@ -1408,6 +1470,36 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
         jointTypes[joint->type], joint->parent->GetName(),
         joint->child->GetName());
   }
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnLinkInserted(const std::string &_linkName)
+{
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  this->linkList[_linkName] = leafName;
+
+  this->EmitLinkInserted(_linkName);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnLinkRemoved(const std::string &_linkName)
+{
+  auto it = this->linkList.find(_linkName);
+  if (it != this->linkList.end())
+  {
+    this->linkList.erase(_linkName);
+    this->EmitLinkRemoved(_linkName);
+  }
+}
+
+/////////////////////////////////////////////////
+std::map<std::string, std::string> JointMaker::LinkList() const
+{
+  return this->linkList;
 }
 
 /////////////////////////////////////////////////
@@ -1498,6 +1590,7 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
       this->jointBeingCreated->SetChild(_childLink);
       this->jointBeingCreated->dirty = true;
       this->jointBeingCreated->Update();
+      _childLink->AttachVisual(this->jointBeingCreated->jointVisual);
     }
   }
 
