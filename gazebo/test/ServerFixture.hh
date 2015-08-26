@@ -104,9 +104,9 @@ namespace gazebo
     protected: virtual void LoadArgs(const std::string &_args);
 
     /// \brief Run the server.
-    /// \param[in] _args Options for the server using the same syntax
+    /// \param[in] _args Vector or options for the server using the same syntax
     /// used in the command line.
-    /// E.g.: "-u --verbose" will run gzserver paused and in verbose mode.
+    /// E.g.: {"-u", "--verbose"} will run gzserver paused and in verbose mode.
     protected: void RunServer(const std::vector<std::string> &_args);
 
     /// \brief Get a pointer to the rendering scene.
