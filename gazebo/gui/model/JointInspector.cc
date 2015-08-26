@@ -231,6 +231,12 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
         {\
           background-color: " + ConfigWidget::level0WidgetColor +
         "}";
+
+  // Qt signal / slot connections
+  connect(this->jointMaker, SIGNAL(EmitLinkRemoved(std::string)), this,
+      SLOT(OnLinkRemoved(std::string)));
+  connect(this->jointMaker, SIGNAL(EmitLinkInserted(std::string)), this,
+      SLOT(OnLinkInserted(std::string)));
 }
 
 /////////////////////////////////////////////////

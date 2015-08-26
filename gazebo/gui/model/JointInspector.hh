@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _JOINT_INSPECTOR_HH_
-#define _JOINT_INSPECTOR_HH_
+#ifndef _GAZEBO_JOINT_INSPECTOR_HH_
+#define _GAZEBO_JOINT_INSPECTOR_HH_
 
 #include <string>
 #include <vector>

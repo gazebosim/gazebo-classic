@@ -442,10 +442,6 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   jointData->inspector = new JointInspector(this);
   jointData->inspector->setModal(false);
   connect(jointData->inspector, SIGNAL(Applied()), jointData, SLOT(OnApply()));
-  connect(this, SIGNAL(EmitLinkRemoved(std::string)), jointData->inspector,
-      SLOT(OnLinkRemoved(std::string)));
-  connect(this, SIGNAL(EmitLinkInserted(std::string)), jointData->inspector,
-      SLOT(OnLinkInserted(std::string)));
 
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
@@ -1301,10 +1297,6 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->inspector->Update(joint->jointMsg);
   joint->inspector->setModal(false);
   connect(joint->inspector, SIGNAL(Applied()), joint, SLOT(OnApply()));
-  connect(this, SIGNAL(EmitLinkRemoved(std::string)), joint->inspector,
-      SLOT(OnLinkRemoved(std::string)));
-  connect(this, SIGNAL(EmitLinkInserted(std::string)), joint->inspector,
-      SLOT(OnLinkInserted(std::string)));
 
   // Visuals
   rendering::VisualPtr jointVis(
