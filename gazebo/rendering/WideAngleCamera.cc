@@ -658,6 +658,5 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
 
   // XXX: OGRE doesn't allow to enable cubemap filtering extention thru it's API
   // suppose that this function was invoked in a thread that has OpenGL context
-  glEnable(GL_ARB_seamless_cube_map);
-  // Some drivers do not support this extention
+  glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
