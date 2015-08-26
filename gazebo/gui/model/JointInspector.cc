@@ -108,9 +108,8 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Custom parent / child widgets
   // Parent
   std::vector<std::string> links;
-  gazebo::gui::ConfigChildWidget *parentLinkWidget =
-      configWidget->CreateEnumWidget("parent", links, 0);
-  parentLinkWidget->setStyleSheet(
+  this->parentLinkWidget = configWidget->CreateEnumWidget("parent", links, 0);
+  this->parentLinkWidget->setStyleSheet(
       "QWidget\
       {\
         background-color: " + ConfigWidget::level0BgColor +
@@ -119,12 +118,12 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
       {\
         background-color: " + ConfigWidget::level0WidgetColor +
       "}");
-  this->configWidget->AddConfigChildWidget("parentCombo", parentLinkWidget);
+  this->configWidget->AddConfigChildWidget("parentCombo",
+      this->parentLinkWidget);
 
   // Child
-  gazebo::gui::ConfigChildWidget *childLinkWidget =
-      configWidget->CreateEnumWidget("child", links, 0);
-  childLinkWidget->setStyleSheet(
+  this->childLinkWidget = configWidget->CreateEnumWidget("child", links, 0);
+  this->childLinkWidget->setStyleSheet(
       "QWidget\
       {\
         background-color: " + ConfigWidget::level0BgColor +
@@ -133,7 +132,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
       {\
         background-color: " + ConfigWidget::level0WidgetColor +
       "}");
-  this->configWidget->AddConfigChildWidget("childCombo", childLinkWidget);
+  this->configWidget->AddConfigChildWidget("childCombo", this->childLinkWidget);
 
   // Swap button
   QToolButton *swapButton = new QToolButton();
@@ -149,8 +148,8 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Links layout
   QGridLayout *linksLayout = new QGridLayout();
   linksLayout->setContentsMargins(0, 0, 0, 0);
-  linksLayout->addWidget(parentLinkWidget, 0, 0);
-  linksLayout->addWidget(childLinkWidget, 1, 0);
+  linksLayout->addWidget(this->parentLinkWidget, 0, 0);
+  linksLayout->addWidget(this->childLinkWidget, 1, 0);
   linksLayout->addWidget(swapButton, 0, 1, 2, 1);
 
   // Add the widgets to the main layout
@@ -205,6 +204,33 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   this->setMinimumHeight(300);
 
   this->setLayout(mainLayout);
+
+  // Style sheets
+  this->normalStyleSheet =
+        "QWidget\
+        {\
+          background-color: " + ConfigWidget::level0BgColor + ";\
+          color: #4c4c4c;\
+        }\
+        QLabel\
+        {\
+          color: #d0d0d0;\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::level0WidgetColor +
+        "}";
+
+  this->warningStyleSheet =
+        "QWidget\
+        {\
+          background-color: " + ConfigWidget::level0BgColor + ";\
+          color: " + ConfigWidget::redColor + ";\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::level0WidgetColor +
+        "}";
 }
 
 /////////////////////////////////////////////////
@@ -235,7 +261,7 @@ msgs::Joint *JointInspector::GetData() const
 
   if (currentParent == currentChild)
   {
-    gzerr << "Parent link equal to child link - not updating joint."
+    gzwarn << "Parent link equal to child link - not updating joint."
         << std::endl;
     return NULL;
   }
@@ -256,10 +282,8 @@ void JointInspector::OnEnumChanged(const QString &_name,
 {
   if (_name == "type")
     this->OnJointTypeChanged(_value);
-  else if (_name == "parentCombo")
-    this->OnParentLinkChanged(_value);
-  else if (_name == "childCombo")
-    this->OnChildLinkChanged(_value);
+  else if (_name == "parentCombo" || _name == "childCombo")
+    this->OnLinkChanged(_value);
 }
 
 /////////////////////////////////////////////////
@@ -301,37 +325,34 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::OnParentLinkChanged(const QString &_linkName)
+void JointInspector::OnLinkChanged(const QString &/*_linkName*/)
 {
-  gzdbg << "JointInspector::OnParentLinkChanged: " << _linkName.toStdString()
-      << std::endl;
-  // If it's the same as the child, return to previous value
-}
-
-/////////////////////////////////////////////////
-void JointInspector::OnChildLinkChanged(const QString &_linkName)
-{
-  gzdbg << "JointInspector::OnChildLinkChanged" << _linkName.toStdString()
-      << std::endl;
-  // If it's the same as the parent, return to previous value
-}
-
-/////////////////////////////////////////////////
-void JointInspector::OnSwap()
-{
-  gzdbg << "JointInspector::OnSwap" << std::endl;
-  // Get current values
   std::string currentParent =
       this->configWidget->GetEnumWidgetValue("parentCombo");
   std::string currentChild =
       this->configWidget->GetEnumWidgetValue("childCombo");
 
-  // Clear comboboxes
-  // this->configWidget->ClearEnumWidget("parentCombo");
-  // this->configWidget->ClearEnumWidget("childCombo");
+  // Warning if it's the same as the child
+  if (currentParent == currentChild)
+  {
+    this->parentLinkWidget->setStyleSheet(this->warningStyleSheet);
+    this->childLinkWidget->setStyleSheet(this->warningStyleSheet);
+  }
+  else
+  {
+    this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
+    this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+  }
+}
 
-  // Add items according to link list, but remove not allowed options
-  // Consider disabling options
+/////////////////////////////////////////////////
+void JointInspector::OnSwap()
+{
+  // Get current values
+  std::string currentParent =
+      this->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->configWidget->GetEnumWidgetValue("childCombo");
 
   // Choose new options
   this->configWidget->SetEnumWidgetValue("parentCombo", currentChild);

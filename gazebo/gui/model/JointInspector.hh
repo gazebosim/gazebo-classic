@@ -32,6 +32,7 @@ namespace gazebo
   {
     class JointMaker;
     class ConfigWidget;
+    class ConfigChildWidget;
 
     /// \class JointInspector gui/JointInspector.hh
     /// \brief A class to inspect and modify joints.
@@ -77,13 +78,9 @@ namespace gazebo
       /// \param[in] _value New joint type.
       private: void OnJointTypeChanged(const QString &_value);
 
-      /// \brief Callback when the joint parent link has changed.
-      /// \param[in] _value New parent.
-      private: void OnParentLinkChanged(const QString &_value);
-
-      /// \brief Callback when the joint child link has changed.
-      /// \param[in] _value New child.
-      private: void OnChildLinkChanged(const QString &_value);
+      /// \brief Callback when the joint parent or child link has changed.
+      /// \param[in] _value New link.
+      private: void OnLinkChanged(const QString &_linkName);
 
       /// \brief Callback when the swap button is pressed.
       private slots: void OnSwap();
@@ -111,11 +108,23 @@ namespace gazebo
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;
 
+      /// \brief Widget for the parent link.
+      private: ConfigChildWidget *parentLinkWidget;
+
+      /// \brief Widget for the child link.
+      private: ConfigChildWidget *childLinkWidget;
+
       /// \brief A list of gui editor events connected to this.
       private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Pointer to the joint maker.
       private: JointMaker *jointMaker;
+
+      /// \brief Style sheet for link widgets when there's a warning.
+      private: QString warningStyleSheet;
+
+      /// \brief Normal style sheet for link widgets.
+      private: QString normalStyleSheet;
     };
     /// \}
   }

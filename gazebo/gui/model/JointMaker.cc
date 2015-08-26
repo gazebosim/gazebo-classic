@@ -1004,7 +1004,11 @@ unsigned int JointMaker::GetJointCount()
 void JointData::OnApply()
 {
   // Get data from inspector
-  this->jointMsg->CopyFrom(*this->inspector->GetData());
+  msgs::Joint *inspectorMsg = this->inspector->GetData();
+  if (!inspectorMsg)
+    return;
+
+  this->jointMsg->CopyFrom(*inspectorMsg);
 
   // Name
   if (this->name != this->jointMsg->name())
