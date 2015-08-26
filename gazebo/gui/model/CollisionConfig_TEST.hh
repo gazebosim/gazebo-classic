@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the polyline extrude dialog.
+/// \brief A test class for the collision config object.
 class CollisionConfig_TEST : public QTestFixture
 {
   Q_OBJECT
