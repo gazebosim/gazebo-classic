@@ -32,7 +32,7 @@ namespace gazebo
     class ViewAngleWidgetPrivate;
 
     /// \brief A gui widget for changing the camera view angle.
-    class GAZEBO_VISIBLE ViewAngleWidget : public QWidget
+    class GZ_GUI_VISIBLE ViewAngleWidget : public QWidget
     {
       Q_OBJECT
 
