@@ -49,6 +49,7 @@ set (install_headers
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests ${qt_tests}
     JointMaker_TEST.cc
+    CollisionConfig_TEST.cc
     ExtrudeDialog_TEST.cc
     ModelCreator_TEST.cc
     ModelData_TEST.cc
