@@ -169,7 +169,7 @@ void ServerFixture::LoadArgs(const std::string &_args)
   delete this->server;
   this->server = NULL;
 
-  // Split the string into a vector or parameters.
+  // Split the string into a vector of parameters.
   std::vector<std::string> params;
   std::string args = _args;
   boost::trim_if(args, boost::is_any_of("\t "));
