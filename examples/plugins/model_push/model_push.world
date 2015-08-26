@@ -31,7 +31,7 @@
         </visual>
       </link>
 
-      <plugin name="model_push" filename="build/libmodel_push.so"/>
+      <plugin name="model_push" filename="libmodel_push.so"/>
     </model>        
   </world>
 </sdf>
