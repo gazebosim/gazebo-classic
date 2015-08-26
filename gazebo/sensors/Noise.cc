@@ -47,7 +47,7 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
       typeString == "gaussian_quantized")
   {
     if (_sensorType == "camera" || _sensorType == "depth" ||
-      _sensorType == "multicamera")
+      _sensorType == "multicamera" || _sensorType == "wideanglecamera")
     {
       noise.reset(new ImageGaussianNoiseModel());
     }
