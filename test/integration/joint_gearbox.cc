@@ -20,6 +20,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 #define TOL 1e-6
+#define ZERO_TOL 1e-10
 using namespace gazebo;
 
 class ODEGearboxJoint_TEST : public ServerFixture
@@ -41,6 +42,7 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("model_1");
+  physics::JointPtr joint0 = model->GetJoint("joint_02");
   physics::JointPtr joint1 = model->GetJoint("joint_12");
   physics::JointPtr joint3 = model->GetJoint("joint_23");
 
@@ -52,46 +54,61 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
   double force3 = 1.0;
   double force1 = force3 * gearboxRatio;
 
-  int steps = 10000;
-  for (int i = 0; i < steps; ++i)
+  // repeat the same test for various joint0 angles (thanks to issue 1703)
+  int directions = 20;
+  double increments = M_PI/4.0;
+  for (int j = -directions; j < directions; ++j)
   {
-    joint1->SetForce(0, force1);
-    joint3->SetForce(0, force3);
-    world->Step(1);
-    if (i%1000 == 0)
-      gzdbg << "gearbox time [" << world->GetSimTime().Double()
-            << "] vel [" << joint1->GetVelocity(0)
-            << "] pose [" << joint1->GetAngle(0).Radian()
-            << "] vel [" << joint3->GetVelocity(0)
-            << "] pose [" << joint3->GetAngle(0).Radian()
-            << "]\n";
-    EXPECT_NEAR(joint1->GetVelocity(0), 0, 1e-6);
-    EXPECT_NEAR(joint3->GetVelocity(0), 0, 1e-6);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), 0, 1e-6);
-    EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, 1e-6);
-  }
+    // reset world
+    world->Reset();
+    // set joint0 angle
+    double angle = (double)j * increments;
+    joint0->SetPosition(0, angle);
+    gzdbg << "j [" << j
+          << "] angle [" << angle
+          << "]\n";
 
-  // slight imbalance
-  for (int i = 0; i < steps; ++i)
-  {
-    joint1->SetForce(0, -force3);
-    joint3->SetForce(0,  force3);
-    world->Step(1);
-    if (i%1000 == 0)
-      gzdbg << "gearbox time [" << world->GetSimTime().Double()
-            << "] vel [" << joint1->GetVelocity(0)
-            << "] pose [" << joint1->GetAngle(0).Radian()
-            << "] vel [" << joint3->GetVelocity(0)
-            << "] pose [" << joint3->GetAngle(0).Radian()
-            << "]\n";
-    EXPECT_GT(joint1->GetVelocity(0), 0);
-    EXPECT_GT(joint3->GetVelocity(0), 0);
-    EXPECT_GT(joint1->GetAngle(0).Radian(), 0);
-    EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
-    EXPECT_NEAR(joint1->GetVelocity(0)*gearboxRatio, -joint3->GetVelocity(0),
-      TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian()*gearboxRatio,
-               -joint3->GetAngle(0).Radian(), TOL);
+    int steps = 10000;
+    for (int i = 0; i < steps; ++i)
+    {
+      joint1->SetForce(0, force1);
+      joint3->SetForce(0, force3);
+      world->Step(1);
+      if (i%1000 == 0)
+        gzdbg << "gearbox time [" << world->GetSimTime().Double()
+              << "] vel [" << joint1->GetVelocity(0)
+              << "] pose [" << joint1->GetAngle(0).Radian()
+              << "] vel [" << joint3->GetVelocity(0)
+              << "] pose [" << joint3->GetAngle(0).Radian()
+              << "]\n";
+      EXPECT_NEAR(joint1->GetVelocity(0), 0, 1e-6);
+      EXPECT_NEAR(joint3->GetVelocity(0), 0, 1e-6);
+      EXPECT_NEAR(joint1->GetAngle(0).Radian(), 0, 1e-6);
+      EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, 1e-6);
+    }
+
+    // slight imbalance
+    for (int i = 0; i < steps; ++i)
+    {
+      joint1->SetForce(0, -force3);
+      joint3->SetForce(0,  force3);
+      world->Step(1);
+      if (i%1000 == 0)
+        gzdbg << "gearbox time [" << world->GetSimTime().Double()
+              << "] vel [" << joint1->GetVelocity(0)
+              << "] pose [" << joint1->GetAngle(0).Radian()
+              << "] vel [" << joint3->GetVelocity(0)
+              << "] pose [" << joint3->GetAngle(0).Radian()
+              << "]\n";
+      EXPECT_GT(joint1->GetVelocity(0), 0);
+      EXPECT_GT(joint3->GetVelocity(0), 0);
+      EXPECT_GT(joint1->GetAngle(0).Radian(), 0);
+      EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
+      EXPECT_NEAR(joint1->GetVelocity(0)*gearboxRatio, -joint3->GetVelocity(0),
+        TOL);
+      EXPECT_NEAR(joint1->GetAngle(0).Radian()*gearboxRatio,
+                 -joint3->GetAngle(0).Radian(), TOL);
+    }
   }
 }
 
