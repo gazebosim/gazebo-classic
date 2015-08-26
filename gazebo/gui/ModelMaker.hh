@@ -31,7 +31,7 @@ namespace gazebo
     class ModelMakerPrivate;
 
     /// \brief Used to insert new models into the scene.
-    class GAZEBO_VISIBLE ModelMaker : public EntityMaker
+    class GZ_GUI_VISIBLE ModelMaker : public EntityMaker
     {
       /// \enum SimpleShapes
       /// \brief Unique identifiers for each simple shape supported.
