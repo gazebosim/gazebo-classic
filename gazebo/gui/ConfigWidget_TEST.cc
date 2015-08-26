@@ -989,5 +989,154 @@ void ConfigWidget_TEST::ConfigWidgetReadOnly()
   delete visualConfigWidget;
 }
 
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::CreatedExternally()
+{
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
+
+  // Create predefined child widgets
+  gazebo::gui::ConfigChildWidget *uintWidget =
+      configWidget->CreateUIntWidget("uint", 0);
+  gazebo::gui::ConfigChildWidget *intWidget =
+      configWidget->CreateIntWidget("int", 0);
+  gazebo::gui::ConfigChildWidget *doubleWidget =
+      configWidget->CreateDoubleWidget("double", 1);
+  gazebo::gui::ConfigChildWidget *stringWidget =
+      configWidget->CreateStringWidget("string", 1);
+  gazebo::gui::ConfigChildWidget *boolWidget =
+      configWidget->CreateBoolWidget("bool", 2);
+  gazebo::gui::ConfigChildWidget *vector3dWidget =
+      configWidget->CreateVector3dWidget("vector3d", 2);
+  gazebo::gui::ConfigChildWidget *colorWidget =
+      configWidget->CreateColorWidget("color", 3);
+  gazebo::gui::ConfigChildWidget *poseWidget =
+      configWidget->CreatePoseWidget("pose", 3);
+
+  std::vector<std::string> enumValues;
+  enumValues.push_back("value1");
+  enumValues.push_back("value2");
+  enumValues.push_back("value3");
+  gazebo::gui::ConfigChildWidget *enumWidget =
+      configWidget->CreateEnumWidget("enum", enumValues, 4);
+
+  QVERIFY(uintWidget != NULL);
+  QVERIFY(intWidget != NULL);
+  QVERIFY(doubleWidget != NULL);
+  QVERIFY(stringWidget != NULL);
+  QVERIFY(boolWidget != NULL);
+  QVERIFY(vector3dWidget != NULL);
+  QVERIFY(colorWidget != NULL);
+  QVERIFY(poseWidget != NULL);
+  QVERIFY(enumWidget != NULL);
+
+  // Create a custom child widget
+  QLabel *customLabel = new QLabel("custom label");
+  QLineEdit *customLineEdit = new QLineEdit();
+  QHBoxLayout *customLayout = new QHBoxLayout();
+  customLayout->addWidget(customLabel);
+  customLayout->addWidget(customLineEdit);
+
+  gazebo::gui::ConfigChildWidget *customWidget =
+      new gazebo::gui::ConfigChildWidget();
+  customWidget->setLayout(customLayout);
+  customWidget->widgets.push_back(customLineEdit);
+
+  // Add child widgets to config widget
+  QCOMPARE(configWidget->ConfigChildWidgetCount(), 0u);
+
+  QVERIFY(configWidget->AddConfigChildWidget("uint", uintWidget));
+  QVERIFY(configWidget->AddConfigChildWidget("int", intWidget));
+  QVERIFY(configWidget->AddConfigChildWidget("double", doubleWidget));
+  QVERIFY(configWidget->AddConfigChildWidget("string", stringWidget));
+  QVERIFY(configWidget->AddConfigChildWidget("bool", boolWidget));
+  QVERIFY(configWidget->AddConfigChildWidget("vector3d", vector3dWidget));
+  QVERIFY(configWidget->AddConfigChildWidget("color", colorWidget));
+  QVERIFY(configWidget->AddConfigChildWidget("pose", poseWidget));
+  QVERIFY(configWidget->AddConfigChildWidget("enum", enumWidget));
+  QVERIFY(configWidget->AddConfigChildWidget("custom", customWidget));
+
+  QCOMPARE(configWidget->ConfigChildWidgetCount(), 10u);
+
+  // Fail to add invalid children
+  QCOMPARE(configWidget->AddConfigChildWidget("", uintWidget), false);
+  QCOMPARE(configWidget->AddConfigChildWidget("validName", NULL), false);
+  QCOMPARE(configWidget->AddConfigChildWidget("uint", intWidget), false);
+
+  QCOMPARE(configWidget->ConfigChildWidgetCount(), 10u);
+
+  // Check that checking visibility works
+  QCOMPARE(configWidget->GetWidgetVisible("uint"), uintWidget->isVisible());
+  QCOMPARE(configWidget->GetWidgetVisible("int"), intWidget->isVisible());
+  QCOMPARE(configWidget->GetWidgetVisible("double"), doubleWidget->isVisible());
+  QCOMPARE(configWidget->GetWidgetVisible("string"), stringWidget->isVisible());
+  QCOMPARE(configWidget->GetWidgetVisible("bool"), boolWidget->isVisible());
+  QCOMPARE(configWidget->GetWidgetVisible("vector3d"),
+      vector3dWidget->isVisible());
+  QCOMPARE(configWidget->GetWidgetVisible("color"), colorWidget->isVisible());
+  QCOMPARE(configWidget->GetWidgetVisible("pose"), poseWidget->isVisible());
+  QCOMPARE(configWidget->GetWidgetVisible("enum"), enumWidget->isVisible());
+  QCOMPARE(configWidget->GetWidgetVisible("custom"), customWidget->isVisible());
+
+  // Set widgets values
+  unsigned int uintValue = 123;
+  int intValue = -456;
+  double doubleValue = 123.456;
+  std::string stringValue("123");
+  bool boolValue = true;
+  ignition::math::Vector3d vector3dValue(1, 2, 3);
+  gazebo::common::Color colorValue(0.1, 0.2, 0.3, 0.4);
+  ignition::math::Pose3d poseValue(1, 2, 3, 0.1, 0.2, 0.3);
+  std::string enumValue("value2");
+  std::string customValue("123456789");
+
+  QVERIFY(configWidget->SetUIntWidgetValue("uint", uintValue));
+  QVERIFY(configWidget->SetIntWidgetValue("int", intValue));
+  QVERIFY(configWidget->SetDoubleWidgetValue("double", doubleValue));
+  QVERIFY(configWidget->SetStringWidgetValue("string", stringValue));
+  QVERIFY(configWidget->SetBoolWidgetValue("bool", boolValue));
+  QVERIFY(configWidget->SetVector3WidgetValue("vector3d",
+      gazebo::math::Vector3(vector3dValue)));
+  QVERIFY(configWidget->SetColorWidgetValue("color", colorValue));
+  QVERIFY(configWidget->SetPoseWidgetValue("pose", poseValue));
+  QVERIFY(configWidget->SetEnumWidgetValue("enum", enumValue));
+  QVERIFY(configWidget->SetStringWidgetValue("custom", customValue));
+
+  // Get widgets values
+  QCOMPARE(configWidget->GetUIntWidgetValue("uint"), uintValue);
+  QCOMPARE(configWidget->GetIntWidgetValue("int"), intValue);
+  QCOMPARE(configWidget->GetDoubleWidgetValue("double"), doubleValue);
+  QCOMPARE(configWidget->GetStringWidgetValue("string"), stringValue);
+  QCOMPARE(configWidget->GetBoolWidgetValue("bool"), boolValue);
+  QCOMPARE(configWidget->GetVector3WidgetValue("vector3d"),
+      gazebo::math::Vector3(vector3dValue));
+  QCOMPARE(configWidget->GetColorWidgetValue("color"), colorValue);
+  QCOMPARE(configWidget->GetPoseWidgetValue("pose"),
+      gazebo::math::Pose(poseValue));
+  QCOMPARE(configWidget->GetEnumWidgetValue("enum"), enumValue);
+  QCOMPARE(configWidget->GetStringWidgetValue("custom"), customValue);
+
+  // Group some widgets
+  QVBoxLayout *groupLayout = new QVBoxLayout();
+  groupLayout->addWidget(uintWidget);
+  groupLayout->addWidget(intWidget);
+  groupLayout->addWidget(doubleWidget);
+
+  QGroupBox *groupBox = new QGroupBox();
+  groupBox->setLayout(groupLayout);
+
+  QVBoxLayout *groupChildWidgetLayout = new QVBoxLayout();
+  groupChildWidgetLayout->addWidget(groupBox);
+
+  gazebo::gui::ConfigChildWidget *groupChildWidget =
+      new gazebo::gui::ConfigChildWidget();
+  groupChildWidget->setLayout(groupChildWidgetLayout);
+  groupChildWidget->widgets.push_back(groupBox);
+
+  gazebo::gui::GroupWidget *groupWidget =
+      configWidget->CreateGroupWidget("groupWidget", groupChildWidget, 0);
+  QVERIFY(groupWidget != NULL);
+  QVERIFY(groupWidget->childWidget != NULL);
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ConfigWidget_TEST)

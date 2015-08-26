@@ -1,0 +1,236 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <plugin name="SimEvents" filename="libSimEventsPlugin.so">
+
+    <session></session>
+
+    <region>
+      <name>start</name>
+      <volume>
+          <!-- min and max are sdf::Vector3 -->
+          <!-- around the origin -->
+          <min>-3 -3 -3</min>
+          <max>3 3 3</max>
+     </volume>
+    </region>
+
+    <region>
+      <name>end</name>
+      <volume>
+        <!-- around 10,10  -->
+        <min>7 7 0</min>
+        <max>13 13 3</max>
+      </volume>
+    </region>
+
+    <event>
+      <name>NewBeer</name>
+      <type>existence</type>
+      <model>beer</model>
+    </event>
+
+    <event>
+      <name>Inactive</name>
+      <type>sim_state</type>
+      <!-- elements can be active or not,
+      and this property can be set at runtime or in the world file
+      with the active element
+      by default, they are.
+      -->
+      <active>false</active>
+    </event>
+
+    <event>
+      <name>All_spawn_and_delete</name>
+      <type>existence</type>
+      <!-- no model  is specified -->
+    </event>
+
+    <!-- when the simulation state changes (pause/play) -->
+    <event>
+      <name>Sim</name>
+      <type>sim_state</type>
+    </event>
+
+    <!-- bounding box intersection event-->
+    <event>
+      <name>Can1_in_0_0</name>
+      <type>inclusion</type>
+      <model>can1</model>
+      <region>start</region>
+    </event>
+
+    <!-- bounding box inclusion event -->
+    <event>
+      <name>Can1_in_10_10</name>
+      <type>inclusion</type>
+      <model>can1</model>
+      <region>end</region>
+    </event>
+
+    <!-- Joint trigger events -->
+    <!-- position (linear or angular) -->
+    <event>
+      <name>joint_position</name>
+      <type>joint</type>
+      <model>revoluter</model>
+      <joint>joint</joint>
+      <range>
+        <type>position</type>
+        <min>5</min>
+        <max>10</max>
+      </range>
+    </event>
+
+
+    <!-- Angle: must be in range -PI to PI  -->
+    <event>
+      <name>joint_angle</name>
+      <type>joint</type>
+      <model>revoluter</model>
+      <joint>joint</joint>
+      <range>
+        <type>normalized_angle</type>
+        <min>3</min>
+        <max>3.1416</max>
+      </range>
+    </event>
+
+    <!-- Velocity -->
+    <event>
+      <name>joint_velocity</name>
+      <type>joint</type>
+      <model>revoluter</model>
+      <joint>joint</joint>
+      <range>
+        <type>velocity</type>
+        <min>3</min>
+        <max>3.3</max>
+      </range>
+    </event>
+
+
+    <!-- Applied Force -->
+    <event>
+      <name>joint_force</name>
+      <type>joint</type>
+      <model>revoluter</model>
+      <joint>joint</joint>
+        <type>applied_force</type>
+        <range>
+          <type>applied_force</type>
+          <min>3</min>
+          <max>3.3</max>
+        </range>
+    </event>
+
+    <!-- Close the plugin element  -->
+    </plugin>
+
+    <!--
+    spawn a few beers in the world (not coke cans, they have
+    meshes that can't be loaded with all engines yet
+    -->
+    <include>
+      <pose>0 0 0 0 0 0</pose>
+      <name>can1</name>
+      <uri>model://beer</uri>
+    </include>
+
+    <include>
+      <pose>5 0 0 0 0 0</pose>
+      <name>can2</name>
+      <uri>model://beer</uri>
+    </include>
+
+    <include>
+      <pose>10 0 0 0 0 0</pose>
+      <uri>model://beer</uri>
+      <name>can3</name>
+    </include>
+
+    <include>
+      <pose>15 0 0 0 0 0</pose>
+      <name>can4</name>
+      <uri>model://beer</uri>
+    </include>
+
+<!--
+Model with a revolute joint
+-->
+    <model name='revoluter'>
+        <pose>0.5 0.5 0.5 0 0 0</pose>
+        <link name='base'>
+        <pose>0 0 0 0 -0 0</pose>
+          <visual name='visual'>
+            <geometry>
+              <box>
+                <size>0.5 1 1</size>
+              </box>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Orange</name>
+              </script>
+            </material>
+          </visual>
+          <collision name='collision'>
+            <geometry>
+              <box>
+                <size>0.5 1 1</size>
+              </box>
+            </geometry>
+          </collision>
+        </link>
+
+        <link name='needle'>
+          <pose>0.25 0 -0.2 0 -0 0</pose>
+            <visual name='visual'>
+              <geometry>
+                <cylinder>
+                  <radius>0.05</radius>
+                  <length>0.5</length>
+                </cylinder>
+              </geometry>
+            </visual>
+
+          <collision name='collision'>
+            <geometry>
+              <cylinder>
+                <radius>0.05</radius>
+                <length>0.5</length>
+              </cylinder>
+            </geometry>
+           </collision>
+        </link>
+
+        <joint name='joint' type='revolute'>
+          <parent>needle</parent>
+          <child>base</child>
+
+          <pose>0 0 0 0 0 0</pose>
+          <axis>
+            <xyz>1 0 0</xyz>
+          </axis>
+        </joint>
+
+        <!-- this joint keeps the model from moving around -->
+        <joint name ='fix' type='fixed'>
+          <parent>world</parent>
+          <child>base</child>
+        </joint>
+
+    </model>
+
+  </world>
+</sdf>
