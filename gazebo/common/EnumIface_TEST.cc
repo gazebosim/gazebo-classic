@@ -45,7 +45,7 @@ TEST_F(EnumIfaceTest, StringCoversion)
   MyType type;
 
   // Set value from string
-  common::EnumIface<MyType>::Set("TYPE1", type);
+  common::EnumIface<MyType>::Set(type, "TYPE1");
   EXPECT_EQ(type, TYPE1);
 
   // Convert value to string

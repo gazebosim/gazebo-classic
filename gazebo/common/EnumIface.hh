@@ -78,7 +78,7 @@ namespace gazebo
       /// \param[in] _str String value to convert to enum value.
       /// \param[in] _e Enum variable to set.
       /// \sa EnumIterator
-      static void Set(const std::string &_str, T &_e)
+      static void Set(T &_e, const std::string &_str)
       {
         static auto begin = std::begin(names);
         static auto end = std::end(names);
