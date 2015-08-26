@@ -23,7 +23,7 @@
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/util/system.hh"
 
-extern GAZEBO_VISIBLE boost::property_tree::ptree g_propTree;
+extern GZ_GUI_VISIBLE boost::property_tree::ptree g_propTree;
 namespace gazebo
 {
   namespace gui
@@ -32,36 +32,36 @@ namespace gazebo
 
     /// \brief Load the graphical interface.
     /// \return True on success.
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     bool load();
 
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     void init();
 
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     bool run(int _argc, char **_argv);
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     void stop();
 
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     void set_world(const std::string& _name);
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     std::string get_world();
 
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     void set_active_camera(rendering::UserCameraPtr _cam);
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     rendering::UserCameraPtr get_active_camera();
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     void clear_active_camera();
 
     /// \brief Return a pointer to the main graphical window.
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     MainWindow *get_main_window();
 
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     unsigned int get_entity_id(const std::string &_name);
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     bool has_entity_name(const std::string &_name);
 
     /// \brief Locate and load the INI configuration file.
@@ -74,7 +74,7 @@ namespace gazebo
     /// \param[in] _file Path to a gui.ini file. This will override
     /// the environment variables.
     /// \return True if an INI file was loaded, false otherwise.
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     bool loadINI(boost::filesystem::path _file = "");
 
     /// \brief Get a property from the GUI INI file.
@@ -82,7 +82,7 @@ namespace gazebo
     /// \param[in] _default Default value to use if property is not found.
     /// \return Property value for the key.
     template<typename T>
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     T getINIProperty(const std::string &_key, const T &_default)
     {
       try
@@ -102,7 +102,7 @@ namespace gazebo
     /// \param[in] _value Value for the key
     /// \sa gui::saveINI
     template<typename T>
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     bool setINIProperty(const std::string &_key, const T &_value)
     {
       g_propTree.put(_key, _value);
@@ -112,7 +112,7 @@ namespace gazebo
     /// \brief Save the configuration parameters to file.
     /// \param[in] _file Filename in which to write the values.
     /// \return True on success.
-    GAZEBO_VISIBLE
+    GZ_GUI_VISIBLE
     bool saveINI(const boost::filesystem::path &_file);
   }
 }
