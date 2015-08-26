@@ -36,7 +36,7 @@ namespace gazebo
     class LinkInspector;
     class ModelPluginInspector;
 
-    class GZ_GUI_MODEL_VISIBLE ModelData
+    class GZ_GUI_VISIBLE ModelData
     {
       /// \brief Get a template SDF string of a simple model.
       /// \return Template SDF string of a simple model.
@@ -49,7 +49,7 @@ namespace gazebo
 
     /// \class LinkData LinkData.hh
     /// \brief Helper class to store link data
-    class GZ_GUI_MODEL_VISIBLE LinkData : public QObject
+    class GZ_GUI_VISIBLE LinkData : public QObject
     {
       Q_OBJECT
 
@@ -178,7 +178,7 @@ namespace gazebo
     };
 
     /// \brief Helper class to store model plugin data
-    class GZ_GUI_MODEL_VISIBLE ModelPluginData : public QObject
+    class GZ_GUI_VISIBLE ModelPluginData : public QObject
     {
       Q_OBJECT
 

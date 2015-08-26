@@ -48,7 +48,7 @@ namespace gazebo
     /// \class ConfigChildWidget ConfigWidget.hh
     /// \brief A convenience widget that also holds pointers to a list of its
     /// child widgets
-    class GAZEBO_VISIBLE ConfigChildWidget : public QFrame
+    class GZ_GUI_VISIBLE ConfigChildWidget : public QFrame
     {
       Q_OBJECT
 
@@ -71,7 +71,7 @@ namespace gazebo
 
     /// \class GeometryConfigWidget ConfigWidget.hh
     /// \brief A widget for configuring geometry properties.
-    class GAZEBO_VISIBLE GeometryConfigWidget : public ConfigChildWidget
+    class GZ_GUI_VISIBLE GeometryConfigWidget : public ConfigChildWidget
     {
       Q_OBJECT
 
@@ -107,7 +107,7 @@ namespace gazebo
 
     /// \class EnumConfigWidget ConfigWidget.hh
     /// \brief A widget for configuring enum values.
-    class GAZEBO_VISIBLE EnumConfigWidget : public ConfigChildWidget
+    class GZ_GUI_VISIBLE EnumConfigWidget : public ConfigChildWidget
     {
       Q_OBJECT
 
@@ -122,7 +122,7 @@ namespace gazebo
 
     /// \class GroupWidget ConfigWidget.hh
     /// \brief A collapsible widget that holds child widgets.
-    class GAZEBO_VISIBLE GroupWidget : public QWidget
+    class GZ_GUI_VISIBLE GroupWidget : public QWidget
     {
       Q_OBJECT
 
@@ -136,7 +136,7 @@ namespace gazebo
 
     /// \class ConfigWidget ConfigWidget.hh
     /// \brief A widget generated from a google protobuf message.
-    class GAZEBO_VISIBLE ConfigWidget : public QWidget
+    class GZ_GUI_VISIBLE ConfigWidget : public QWidget
     {
       Q_OBJECT
 

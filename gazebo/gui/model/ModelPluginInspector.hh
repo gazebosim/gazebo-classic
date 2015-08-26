@@ -32,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief Inspector for model plugin properties.
-    class GZ_GUI_MODEL_VISIBLE ModelPluginInspector : public QDialog
+    class GZ_GUI_VISIBLE ModelPluginInspector : public QDialog
     {
       Q_OBJECT
 

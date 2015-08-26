@@ -28,7 +28,7 @@ namespace gazebo
   {
     namespace model
     {
-      class GZ_GUI_MODEL_VISIBLE Events
+      class GZ_GUI_VISIBLE Events
       {
         /// \brief Connect a boost::slot to the finish model signal.
         /// \param[in] _subscriber the subscriber to this event
