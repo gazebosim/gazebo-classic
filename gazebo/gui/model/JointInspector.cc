@@ -354,7 +354,7 @@ void JointInspector::OnSwap()
   std::string currentChild =
       this->configWidget->GetEnumWidgetValue("childCombo");
 
-  // Choose new options
+  // Choose new values
   this->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
   this->configWidget->SetEnumWidgetValue("childCombo", currentParent);
 }
