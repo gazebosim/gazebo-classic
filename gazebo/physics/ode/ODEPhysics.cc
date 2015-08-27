@@ -1150,12 +1150,21 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // For torsional friction, the curvature is combined using
   //   1/R = 1/R1 + 1/R2
   // we can consider doing the same for the patch radius
-  contact.surface.surface_radius = 1/
-      (1/surf1->FrictionPyramid()->SurfaceRadius()+
-      1/surf2->FrictionPyramid()->SurfaceRadius());
+  double curv1 = 0;
+  if (surf1->FrictionPyramid()->SurfaceRadius() > 0)
+    curv1 = 1 / surf1->FrictionPyramid()->SurfaceRadius();
 
-  // Not sure how to combine these logic flags
-  /// \todo If user wanted to use patch radius, but got settings
+  double curv2 = 0;
+  if (surf2->FrictionPyramid()->SurfaceRadius() > 0)
+    curv2 = 1 / surf2->FrictionPyramid()->SurfaceRadius();
+
+  double curvSum = curv1 + curv2;
+  contact.surface.surface_radius = 0;
+  if (curvSum > 0)
+    contact.surface.surface_radius = 1 / curvSum;
+
+  /// \todo Not sure how to combine these logic flags
+  /// If user wanted to use patch radius, but got settings
   /// overwritten by the logic combination, how do we make sure the
   /// the surface radius is specified or makes sense?
   contact.surface.use_patch_radius =
