@@ -29,7 +29,7 @@ namespace gazebo
     class SplashScreenPrivate;
 
     /// \brief Splash screen that displays an icon and a message.
-    class GAZEBO_VISIBLE SplashScreen : public QObject
+    class GZ_GUI_VISIBLE SplashScreen : public QObject
     {
       Q_OBJECT
 

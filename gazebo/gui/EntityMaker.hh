@@ -33,7 +33,7 @@ namespace gazebo
     /// \{
 
     /// \brief To make an entity, base class
-    class GAZEBO_VISIBLE EntityMaker
+    class GZ_GUI_VISIBLE EntityMaker
     {
       /// \brief Destructor
       public: virtual ~EntityMaker();

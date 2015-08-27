@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class JointCreationDialog gui/JointCreationDialog.hh
     /// \brief A class to inspect and modify joints.
-    class GZ_GUI_MODEL_VISIBLE JointCreationDialog : public QDialog
+    class GZ_GUI_VISIBLE JointCreationDialog : public QDialog
     {
       Q_OBJECT
 
