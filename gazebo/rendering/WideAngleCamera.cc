@@ -406,6 +406,16 @@ void WideAngleCamera::Init()
 {
   Camera::Init();
 
+  for(int i = 0; i < 6; ++i)
+    this->sceneNode->attachObject(this->envCameras[i]);
+
+  // set environment cameras orientation
+  this->envCameras[0]->yaw(Ogre::Degree(-90));
+  this->envCameras[1]->yaw(Ogre::Degree(90));
+  this->envCameras[2]->pitch(Ogre::Degree(90));
+  this->envCameras[3]->pitch(Ogre::Degree(-90));
+  this->envCameras[5]->yaw(Ogre::Degree(180));
+
   this->CreateEnvRenderTexture(this->scopedUniqueName + "_envRttTex");
 }
 
@@ -517,15 +527,18 @@ void WideAngleCamera::CreateEnvCameras()
 
     name_str << this->scopedUniqueName << "_env_" << i;
 
-    envCameras[i] =
+    this->envCameras[i] =
         this->GetScene()->GetManager()->createCamera(name_str.str());
 
-    envCameras[i]->setFixedYawAxis(false);
-    envCameras[i]->setFOVy(Ogre::Degree(90));
-    envCameras[i]->setAspectRatio(1);
+    this->envCameras[i]->setFixedYawAxis(false);
+    this->envCameras[i]->setFOVy(Ogre::Degree(90));
+    this->envCameras[i]->setAspectRatio(1);
 
-    envCameras[i]->setNearClipDistance(0.01);
-    envCameras[i]->setFarClipDistance(1000);
+    this->envCameras[i]->yaw(Ogre::Degree(-90.0));
+    this->envCameras[i]->roll(Ogre::Degree(-90.0));
+
+    this->envCameras[i]->setNearClipDistance(0.01);
+    this->envCameras[i]->setFarClipDistance(1000);
   }
 }
 
@@ -606,21 +619,6 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 void WideAngleCamera::RenderImpl()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->renderMutex);
-
-  math::Quaternion orient = this->GetWorldRotation();
-  math::Vector3 pos = this->GetWorldPosition();
-
-  for (int i = 0; i < 6; ++i)
-  {
-    this->envCameras[i]->setPosition(this->camera->getRealPosition());
-    this->envCameras[i]->setOrientation(this->camera->getRealOrientation());
-  }
-
-  this->envCameras[0]->rotate(this->camera->getDerivedUp(), Ogre::Degree(-90));
-  this->envCameras[1]->rotate(this->camera->getDerivedUp(), Ogre::Degree(90));
-  this->envCameras[2]->pitch(Ogre::Degree(90));
-  this->envCameras[3]->pitch(Ogre::Degree(-90));
-  this->envCameras[5]->rotate(this->camera->getDerivedUp(), Ogre::Degree(180));
 
   for (int i = 0; i < 6; ++i)
     this->envRenderTargets[i]->update();
