@@ -37,7 +37,7 @@ namespace gazebo
     class GLWidget;
     class TimePanel;
 
-    class GAZEBO_VISIBLE RenderWidget : public QWidget
+    class GZ_GUI_VISIBLE RenderWidget : public QWidget
     {
       Q_OBJECT
       public: RenderWidget(QWidget *_parent = 0);
