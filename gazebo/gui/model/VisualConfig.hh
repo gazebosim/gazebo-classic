@@ -25,6 +25,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelData.hh"
+#include "gazebo/gui/model/VisualConfig_TEST.hh"
 
 namespace gazebo
 {
@@ -60,8 +61,9 @@ namespace gazebo
 
     /// \class VisualConfig VisualConfig.hh
     /// \brief A tab for configuring visual properties of a link.
-    class VisualConfig : public QWidget
+    class GZ_GUI_MODEL_VISIBLE VisualConfig : public QWidget
     {
+      friend class ::VisualConfig_TEST;
       Q_OBJECT
 
       /// \brief Constructor
