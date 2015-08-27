@@ -43,7 +43,7 @@ class PhysicsMsgsTest : public ServerFixture,
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
 {
-  // Nested models are not working in simbody yet
+  // Nested models are not working in simbody yet, issue #1718
   if (_physicsEngine == "simbody")
     return;
 
