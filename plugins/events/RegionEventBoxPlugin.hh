@@ -64,8 +64,7 @@ namespace gazebo
     /// \brief Update box region dimensions and pose.
     /// \param[in] _size New size
     /// \param[in] _pose New pose
-    /// \return True if the update is successful
-    private: bool UpdateRegion(const ignition::math::Vector3d &_scale,
+    private: void UpdateRegion(const ignition::math::Vector3d &_scale,
         const ignition::math::Pose3d &_pose);
 
     /// \brief Send event when model enters box region

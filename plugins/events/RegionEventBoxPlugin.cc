@@ -93,13 +93,7 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 
     if (this->hasStaleSizeAndPose)
     {
-      if (!this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose))
-      {
-        gzerr << "RegionEventPlugin::OnUpdate(): "
-            << "failed to update size and pose for model '" << this->modelName
-            << "'" << std::endl;
-        return;
-      }
+      this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose);
       this->hasStaleSizeAndPose = false;
     }
   }
@@ -155,7 +149,7 @@ bool RegionEventBoxPlugin::PointInRegion(const ignition::math::Vector3d &_point,
 }
 
 //////////////////////////////////////////////////
-bool RegionEventBoxPlugin::UpdateRegion(const ignition::math::Vector3d &_size,
+void RegionEventBoxPlugin::UpdateRegion(const ignition::math::Vector3d &_size,
     const ignition::math::Pose3d &_pose)
 {
   ignition::math::Vector3d vmin(_pose.Pos().X() - (_size.X() * 0.5),
@@ -164,8 +158,6 @@ bool RegionEventBoxPlugin::UpdateRegion(const ignition::math::Vector3d &_size,
       _pose.Pos().Y() + (_size.Y() * 0.5), _pose.Pos().Z() + (_size.Z() * 0.5));
 
   this->box = ignition::math::Box(vmin, vmax);
-
-  return true;
 }
 
 //////////////////////////////////////////////////
