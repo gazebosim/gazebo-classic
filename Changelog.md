@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Add function to get the derived scale of a Visual
+    * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
+
 1. Display gearbox and screw joint properties in property tree
     * [Pull request #1838](https://bitbucket.org/osrf/gazebo/pull-request/1838)
 
