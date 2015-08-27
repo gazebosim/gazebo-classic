@@ -735,7 +735,7 @@ void Visual::SetScale(const math::Vector3 &_scale)
     return;
 
   // update geom size based on scale.
-  this->UpdateGeomSize(_scale.Ign());
+  this->UpdateGeomSize(this->DerivedScale() * _scale.Ign());
 
   this->dataPtr->scale = _scale.Ign();
 
@@ -761,7 +761,8 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
   {
     ignition::math::Vector3d size =
         geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
-    ignition::math::Vector3d geomBoxSize = _scale/this->dataPtr->scale*size;
+    ignition::math::Vector3d geomBoxSize = _scale/this->dataPtr->geomSize*size;
+
     geomElem->GetElement("box")->GetElement("size")->Set(
         geomBoxSize);
     this->dataPtr->geomSize = geomBoxSize;
@@ -771,7 +772,7 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
     // update radius the same way as collision shapes
     double radius = geomElem->GetElement("sphere")->Get<double>("radius");
     double newRadius = _scale.Max();
-    double oldRadius = this->dataPtr->scale.Max();
+    double oldRadius = this->dataPtr->geomSize.Max();
     double geomRadius = newRadius/oldRadius*radius;
     geomElem->GetElement("sphere")->GetElement("radius")->Set(geomRadius);
     this->dataPtr->geomSize = ignition::math::Vector3d(
@@ -782,11 +783,11 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
     // update radius the same way as collision shapes
     double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
     double newRadius = std::max(_scale.X(), _scale.Y());
-    double oldRadius = std::max(this->dataPtr->scale.X(),
-        this->dataPtr->scale.Y());
+    double oldRadius = std::max(this->dataPtr->geomSize.X(),
+        this->dataPtr->geomSize.Y());
     double length = geomElem->GetElement("cylinder")->Get<double>("length");
     double geomRadius = newRadius/oldRadius*radius;
-    double geomLength = _scale.Z()/this->dataPtr->scale.Z()*length;
+    double geomLength = _scale.Z()/this->dataPtr->geomSize.Z()*length;
     geomElem->GetElement("cylinder")->GetElement("radius")->Set(
         geomRadius);
     geomElem->GetElement("cylinder")->GetElement("length")->Set(
@@ -811,6 +812,23 @@ ignition::math::Vector3d Visual::GetGeometrySize() const
 math::Vector3 Visual::GetScale()
 {
   return this->dataPtr->scale;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Visual::DerivedScale() const
+{
+  ignition::math::Vector3d derivedScale = this->dataPtr->scale;
+
+  VisualPtr worldVis = this->dataPtr->scene->GetWorldVisual();
+  VisualPtr vis = this->GetParent();
+
+  while (vis && vis != worldVis)
+  {
+    derivedScale = derivedScale * vis->GetScale().Ign();
+    vis = vis->GetParent();
+  }
+
+  return derivedScale;
 }
 
 //////////////////////////////////////////////////

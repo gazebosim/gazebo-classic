@@ -197,6 +197,10 @@ namespace gazebo
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
 
+      /// \brief Get the derived scale.
+      /// \return The derived scaling factor.
+      public: ignition::math::Vector3d DerivedScale() const;
+
       /// \brief Get whether or not lighting is enabled.
       /// \return True if lighting is enabled.
       public: bool GetLighting() const;

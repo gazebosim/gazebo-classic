@@ -1038,6 +1038,224 @@ TEST_F(Visual_TEST, ConvertVisualType)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, Scale)
+{
+  // Load a world containing 3 simple shapes
+  Load("worlds/shapes.world");
+
+  // FIXME need a camera otherwise test produces a gl vertex buffer error
+  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  std::string cameraName = "test_camera";
+  SpawnCamera("test_camera_model", cameraName,
+      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 10;
+  rendering::VisualPtr box, sphere, cylinder;
+  while ((!box || !sphere || !cylinder) && sleep < maxSleep)
+  {
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+
+  // Check that the model, link, and visuals were properly added
+  // and verify initial scale
+
+  // box
+  ASSERT_TRUE(box != NULL);
+  rendering::VisualPtr boxLink;
+  for (unsigned int i = 0; i < box->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = box->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      boxLink = vis;
+  }
+  ASSERT_TRUE(boxLink != NULL);
+
+  rendering::VisualPtr boxVisual;
+  for (unsigned int i = 0; i < boxLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = boxLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      boxVisual = vis;
+  }
+  ASSERT_TRUE(boxVisual != NULL);
+
+  EXPECT_EQ(box->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+
+  EXPECT_EQ(box->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxLink->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->DerivedScale(), ignition::math::Vector3d::One);
+
+  // sphere
+  ASSERT_TRUE(sphere != NULL);
+  rendering::VisualPtr sphereLink;
+  for (unsigned int i = 0; i < sphere->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = sphere->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      sphereLink = vis;
+  }
+  ASSERT_TRUE(sphereLink != NULL);
+
+  rendering::VisualPtr sphereVisual;
+  for (unsigned int i = 0; i < sphereLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = sphereLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      sphereVisual = vis;
+  }
+  ASSERT_TRUE(sphereVisual != NULL);
+
+  EXPECT_EQ(sphere->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+
+  EXPECT_EQ(sphere->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereLink->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->DerivedScale(), ignition::math::Vector3d::One);
+
+  // cylinder
+  ASSERT_TRUE(cylinder != NULL);
+  rendering::VisualPtr cylinderLink;
+  for (unsigned int i = 0; i < cylinder->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = cylinder->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      cylinderLink = vis;
+  }
+  ASSERT_TRUE(cylinderLink != NULL);
+
+  rendering::VisualPtr cylinderVisual;
+  for (unsigned int i = 0; i < cylinderLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = cylinderLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      cylinderVisual = vis;
+  }
+  ASSERT_TRUE(cylinderVisual != NULL);
+
+  EXPECT_EQ(cylinder->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+
+  EXPECT_EQ(cylinder->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderLink->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->DerivedScale(), ignition::math::Vector3d::One);
+
+  // update model scale and verify derived scale and geom size
+  ignition::math::Vector3d newBoxScale(0.4, 0.5, 0.6);
+  box->SetScale(newBoxScale);
+  EXPECT_EQ(box->GetScale().Ign(), newBoxScale);
+  EXPECT_EQ(boxLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->GetGeometrySize(), newBoxScale);
+
+  ignition::math::Vector3d newSphereScale(0.3, 0.3, 0.3);
+  sphere->SetScale(newSphereScale);
+  EXPECT_EQ(sphere->GetScale().Ign(), newSphereScale);
+  EXPECT_EQ(sphereLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->GetGeometrySize(), newSphereScale);
+
+  ignition::math::Vector3d newCylinderScale(0.2, 0.2, 0.5);
+  cylinder->SetScale(newCylinderScale);
+  EXPECT_EQ(cylinder->GetScale().Ign(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->GetGeometrySize(), newCylinderScale);
+
+  // update link scale and verify derived scale and geom size
+  ignition::math::Vector3d newBoxLinkScale(0.2, 0.1, 3);
+  boxLink->SetScale(newBoxLinkScale);
+  EXPECT_EQ(box->GetScale().Ign(), newBoxScale);
+  EXPECT_EQ(boxLink->GetScale().Ign(), newBoxLinkScale);
+  EXPECT_EQ(boxVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->GetGeometrySize(), newBoxScale * newBoxLinkScale);
+
+  EXPECT_EQ(box->DerivedScale(), newBoxScale);
+  EXPECT_EQ(boxLink->DerivedScale(), newBoxScale * newBoxLinkScale);
+  EXPECT_EQ(boxVisual->DerivedScale(), newBoxScale * newBoxLinkScale);
+
+  ignition::math::Vector3d newSphereLinkScale(2, 2, 2);
+  sphereLink->SetScale(newSphereLinkScale);
+  EXPECT_EQ(sphere->GetScale().Ign(), newSphereScale);
+  EXPECT_EQ(sphereLink->GetScale().Ign(), newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->GetGeometrySize(),
+      newSphereScale * newSphereLinkScale);
+
+  EXPECT_EQ(sphere->DerivedScale(), newSphereScale);
+  EXPECT_EQ(sphereLink->DerivedScale(), newSphereScale * newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->DerivedScale(), newSphereScale * newSphereLinkScale);
+
+  ignition::math::Vector3d newCylinderLinkScale(4, 4, 0.5);
+  cylinderLink->SetScale(newCylinderLinkScale);
+  EXPECT_EQ(cylinder->GetScale().Ign(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->GetScale().Ign(), newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->GetGeometrySize(),
+      newCylinderScale * newCylinderLinkScale);
+
+  EXPECT_EQ(cylinder->DerivedScale(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->DerivedScale(),
+      newCylinderScale * newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->DerivedScale(),
+      newCylinderScale * newCylinderLinkScale);
+
+  // update visual scale and verify derived scale and geom size
+  ignition::math::Vector3d newBoxVisualScale(1.2, 1, 50);
+  boxVisual->SetScale(newBoxVisualScale);
+  EXPECT_EQ(box->GetScale().Ign(), newBoxScale);
+  EXPECT_EQ(boxLink->GetScale().Ign(), newBoxLinkScale);
+  EXPECT_EQ(boxVisual->GetScale().Ign(), newBoxVisualScale);
+  EXPECT_EQ(boxVisual->GetGeometrySize(),
+      newBoxScale * newBoxLinkScale * newBoxVisualScale);
+
+  EXPECT_EQ(box->DerivedScale(), newBoxScale);
+  EXPECT_EQ(boxLink->DerivedScale(), newBoxScale * newBoxLinkScale);
+  EXPECT_EQ(boxVisual->DerivedScale(),
+      newBoxScale * newBoxLinkScale * newBoxVisualScale);
+
+  ignition::math::Vector3d newSphereVisualScale(0.08, 0.08, 0.08);
+  sphereVisual->SetScale(newSphereVisualScale);
+  EXPECT_EQ(sphere->GetScale().Ign(), newSphereScale);
+  EXPECT_EQ(sphereLink->GetScale().Ign(), newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->GetScale().Ign(), newSphereVisualScale);
+  EXPECT_EQ(sphereVisual->GetGeometrySize(),
+      newSphereScale * newSphereLinkScale * newSphereVisualScale);
+
+  EXPECT_EQ(sphere->DerivedScale(), newSphereScale);
+  EXPECT_EQ(sphereLink->DerivedScale(), newSphereScale * newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->DerivedScale(),
+      newSphereScale * newSphereLinkScale * newSphereVisualScale);
+
+  ignition::math::Vector3d newCylinderVisualScale(3, 3, 0.25);
+  cylinderVisual->SetScale(newCylinderVisualScale);
+  EXPECT_EQ(cylinder->GetScale().Ign(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->GetScale().Ign(), newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->GetScale().Ign(), newCylinderVisualScale);
+  EXPECT_EQ(cylinderVisual->GetGeometrySize(),
+      newCylinderScale * newCylinderLinkScale * newCylinderVisualScale);
+
+  EXPECT_EQ(cylinder->DerivedScale(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->DerivedScale(),
+      newCylinderScale * newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->DerivedScale(),
+      newCylinderScale * newCylinderLinkScale * newCylinderVisualScale);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
