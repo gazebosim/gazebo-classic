@@ -749,7 +749,7 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
        iter != this->dataPtr->children.end(); ++iter)
   {
-    (*iter)->UpdateGeomSize(_scale);
+    (*iter)->UpdateGeomSize(_scale*this->dataPtr->scale);
   }
 
   // update the same way as server - see Link::UpdateVisualGeomSDF()
