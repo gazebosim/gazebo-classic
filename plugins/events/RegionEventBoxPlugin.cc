@@ -139,9 +139,9 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 
 //////////////////////////////////////////////////
 bool RegionEventBoxPlugin::PointInRegion(const ignition::math::Vector3d &_point,
-    const ignition::math::Box &_box, const ignition::math::Pose3d &_pose)
+    const ignition::math::Box &_box, const ignition::math::Pose3d &_pose) const
 {
-  // transfrom box extents into local space
+  // transform box extents into local space
   // box extents are already axis-aligned (see UpdateRegion) so no need to
   // apply inverse rotation.
   ignition::math::Box localBox(_box.Min() - _pose.Pos(),
@@ -170,6 +170,7 @@ bool RegionEventBoxPlugin::UpdateRegion(const ignition::math::Vector3d &_size,
 
 //////////////////////////////////////////////////
 void RegionEventBoxPlugin::SendEnteringRegionEvent(physics::ModelPtr _model)
+    const
 {
   std::string json = "{";
   json += "\"state\":\"inside\",";
@@ -177,11 +178,12 @@ void RegionEventBoxPlugin::SendEnteringRegionEvent(physics::ModelPtr _model)
   json += "\"model\":\"" + _model->GetName() + "\"";
   json += "}";
 
-  eventSource->Emit(json);
+  this->eventSource->Emit(json);
 }
 
 //////////////////////////////////////////////////
 void RegionEventBoxPlugin::SendExitingRegionEvent(physics::ModelPtr _model)
+    const
 {
   std::string json = "{";
   json += "\"state\":\"outside\",";
@@ -189,5 +191,5 @@ void RegionEventBoxPlugin::SendExitingRegionEvent(physics::ModelPtr _model)
   json += "\"model\":\"" + _model->GetName() + "\"";
   json += "}";
 
-  eventSource->Emit(json);
+  this->eventSource->Emit(json);
 }

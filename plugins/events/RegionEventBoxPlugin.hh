@@ -56,22 +56,25 @@ namespace gazebo
     /// \param[in] _point 3D Point in world space.
     /// \param[in] _box World axis-aligned box.
     /// \param[in] _pose Pose of the model representing the box region.
+    /// \return True if the point is inside the region
     private: bool PointInRegion(const ignition::math::Vector3d &_point,
-        const ignition::math::Box &_box, const ignition::math::Pose3d &_pose);
+        const ignition::math::Box &_box, const ignition::math::Pose3d &_pose)
+        const;
 
     /// \brief Update box region dimensions and pose.
-    /// \param[in] _scale New scale
+    /// \param[in] _size New size
     /// \param[in] _pose New pose
+    /// \return True if the update is successful
     private: bool UpdateRegion(const ignition::math::Vector3d &_scale,
         const ignition::math::Pose3d &_pose);
 
     /// \brief Send event when model enters box region
     /// \param[in] _model Model that entered the box region.
-    private: void SendEnteringRegionEvent(physics::ModelPtr _model);
+    private: void SendEnteringRegionEvent(physics::ModelPtr _model) const;
 
     /// \brief Send event when model exits region
     /// \param[in] _model Model that exit the box region.
-    private: void SendExitingRegionEvent(physics::ModelPtr _model);
+    private: void SendExitingRegionEvent(physics::ModelPtr _model) const;
 
     /// \brief Pointer to the World.
     private: physics::WorldPtr world;
