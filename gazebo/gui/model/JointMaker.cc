@@ -212,35 +212,27 @@ void JointMaker::DisableEventHandlers()
 }
 
 /////////////////////////////////////////////////
-void JointMaker::RemoveJointBeingCreated()
-{
-  if (this->jointBeingCreated->hotspot)
-    this->RemoveJoint(this->jointBeingCreated->hotspot->GetName());
-  else
-    this->RemoveJoint("");
-}
-
-/////////////////////////////////////////////////
 void JointMaker::RemoveJoint(const std::string &_jointId)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
+  std::string jointId = _jointId;
   JointData *joint = NULL;
-  if (this->joints.find(_jointId) != this->joints.end())
+  if (this->joints.find(jointId) != this->joints.end())
   {
-    joint = this->joints[_jointId];
+    joint = this->joints[jointId];
   }
   else if (this->jointBeingCreated)
   {
     joint = this->jointBeingCreated;
+    if (joint->hotspot)
+      jointId = joint->hotspot->GetName();
+    else
+      jointId = "";
   }
 
   if (!joint)
-  {
-    gzerr << "Requested to remove inexistent joint [" << _jointId << "]"
-        << std::endl;
     return;
-  }
 
   rendering::ScenePtr scene = rendering::get_scene();
 
@@ -248,7 +240,10 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
     scene->GetManager()->destroyBillboardSet(joint->handles);
 
   if (joint->hotspot)
+  {
     scene->RemoveVisual(joint->hotspot);
+    joint->hotspot->Fini();
+  }
 
   if (joint->visual)
   {
@@ -281,9 +276,12 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   joint->parent.reset();
   joint->child.reset();
   delete joint;
-  this->joints.erase(_jointId);
   gui::model::Events::modelChanged();
-  gui::model::Events::jointRemoved(_jointId);
+  if (jointId != "")
+  {
+    this->joints.erase(jointId);
+    gui::model::Events::jointRemoved(jointId);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -628,27 +626,19 @@ void JointMaker::Stop()
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   // if (this->jointType != JointMaker::JOINT_NONE)
   {
-    this->creatingJoint = false;
     // Cancel joint creation
-    if (this->jointBeingCreated)
-    {
-      this->RemoveJointBeingCreated();
+    this->RemoveJoint("");
+    if (this->jointCreationDialog)
       this->jointCreationDialog->close();
-      this->jointBeingCreated = NULL;
-      this->creatingJoint = false;
-      this->jointType == JointMaker::JOINT_NONE;
-
-      // Notify ModelEditor to uncheck tool button
-      this->JointAdded();
-    }
+    this->jointBeingCreated = NULL;
+    this->creatingJoint = false;
+    this->jointType == JointMaker::JOINT_NONE;
+    // Notify ModelEditor to uncheck tool button
+    this->JointAdded();
     // this->AddJoint(JointMaker::JOINT_NONE);
     this->mouseMoveEnabled = false;
     if (this->hoverVis)
       this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-    if (this->parentLinkVis)
-      this->parentLinkVis->SetEmissive(common::Color(0, 0, 0));
-    if (this->childLinkVis)
-      this->childLinkVis->SetEmissive(common::Color(0, 0, 0));
     this->parentLinkVis.reset();
     this->childLinkVis.reset();
     this->hoverVis.reset();
@@ -882,12 +872,12 @@ void JointMaker::Update()
         if (joint->parentPose != joint->parent->GetWorldPose() ||
             joint->childPose != joint->child->GetWorldPose() ||
             joint->childScale != joint->child->GetScale())
-         {
-           joint->parentPose = joint->parent->GetWorldPose();
-           joint->childPose = joint->child->GetWorldPose();
-           joint->childScale = joint->child->GetScale();
-           poseUpdate = true;
-         }
+        {
+          joint->parentPose = joint->parent->GetWorldPose();
+          joint->childPose = joint->child->GetWorldPose();
+          joint->childScale = joint->child->GetScale();
+          poseUpdate = true;
+        }
 
         // Create / update joint visual
         if (joint->dirty || poseUpdate)
