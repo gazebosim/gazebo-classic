@@ -222,7 +222,7 @@ void Model::LoadJoints()
   }
 
   // Load nested model joints if the world is not already loaded. Otherwise,
-  // LoadJoints will called from in Model::Load.
+  // LoadJoints will be called from Model::Load.
   if (!this->world->IsLoaded())
   {
     for (auto model : this->models)
@@ -663,13 +663,13 @@ JointPtr Model::GetJoint(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-const Model_V &Model::GetModels() const
+const Model_V &Model::NestedModels() const
 {
   return this->models;
 }
 
 //////////////////////////////////////////////////
-ModelPtr Model::GetModel(const std::string &_name) const
+ModelPtr Model::NestedModel(const std::string &_name) const
 {
   ModelPtr result;
 

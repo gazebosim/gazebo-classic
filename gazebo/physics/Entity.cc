@@ -385,8 +385,9 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 
   if (!this->parentEntity->HasType(MODEL))
   {
-    gzerr << "SWP for CB[" << this->GetName() << "] but parent["
-      << this->parentEntity->GetName() << "] is not a MODEL!" << std::endl;
+    gzerr << "SetWorldPose for Canonical Body [" << this->GetName()
+        << "] but parent[" << this->parentEntity->GetName()
+        << "] is not a MODEL!" << std::endl;
     return;
   }
 

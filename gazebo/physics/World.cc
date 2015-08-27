@@ -2042,7 +2042,7 @@ void World::ProcessMessages()
             }
 
             // add all nested models to the queue
-            Model_V models = m->GetModels();
+            Model_V models = m->NestedModels();
             for (auto const &n : models)
               modelList.push_back(n);
           }
