@@ -36,7 +36,7 @@ namespace gazebo
     /// \class OculusWindow OculusWindow.hh gui/OculusWindow.hh
     /// \brief A widget that renders a camera view suitable for the Oculus
     /// Rift.
-    class GAZEBO_VISIBLE OculusWindow : public QWidget
+    class GZ_GUI_VISIBLE OculusWindow : public QWidget
     {
       Q_OBJECT
 
