@@ -1499,7 +1499,8 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
 
   for (unsigned int i = 0; i < elements.size(); ++i)
   {
-    QDoubleSpinBox *spin = new QDoubleSpinBox();
+    QDoubleSpinBox *spin = new QDoubleSpinBox(widget);
+    connect(spin, SIGNAL(editingFinished()), this, SLOT(OnPoseValueChanged()));
     widget->widgets.push_back(spin);
 
     spin->setRange(min, max);
@@ -2582,6 +2583,34 @@ void ConfigWidget::OnEnumValueChanged(const QString &_value)
     {
       std::string scopedName = iter.first;
       emit EnumValueChanged(tr(scopedName.c_str()), _value);
+      return;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnPoseValueChanged()
+{
+  QDoubleSpinBox *spin =
+      qobject_cast<QDoubleSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  for (auto iter : this->configWidgets)
+  {
+    if (iter.second == widget)
+    {
+      ignition::math::Pose3d pose = this->GetPoseWidgetValue(widget).Ign();
+      std::string scopedName = iter.first;
+
+      emit PoseValueChanged(tr(scopedName.c_str()), pose);
       return;
     }
   }

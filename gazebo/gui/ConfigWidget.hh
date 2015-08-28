@@ -647,11 +647,20 @@ namespace gazebo
       /// \param[in] _value New enum value in string.
       private slots: void OnEnumValueChanged(const QString &_value);
 
+      /// \brief Callback when a pose config widget's value has changed.
+      private slots: void OnPoseValueChanged();
+
       /// \brief Signal that an enum config widget's enum value has changed.
       /// \param[in] _name Scoped name of widget.
-      /// \param[in] _name New enum value string.
+      /// \param[in] _value New enum value string.
       Q_SIGNALS: void EnumValueChanged(const QString &_name,
           const QString &_value);
+
+      /// \brief Signal that a pose config widget's value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _pose New pose.
+      Q_SIGNALS: void PoseValueChanged(const QString &_name,
+          const ignition::math::Pose3d &_pose);
 
       /// \brief Qt event filter currently used to filter mouse wheel events.
       /// \param[in] _obj Object that is watched by the event filter.

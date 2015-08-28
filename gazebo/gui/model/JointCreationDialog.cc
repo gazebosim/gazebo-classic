@@ -127,7 +127,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   ConfigChildWidget *poseWidget = this->configWidget->CreatePoseWidget("pose",
       0);
   this->configWidget->AddConfigChildWidget("pose", poseWidget);
-  this->configWidget->SetWidgetReadOnly("pose", true);
+  connect(this->configWidget,
+      SIGNAL(PoseValueChanged(const QString,
+      const ignition::math::Pose3d)),
+      this, SLOT(OnPoseFromDialog(const QString,
+      const ignition::math::Pose3d)));
 
   QWidget *poseGroupWidget = this->configWidget->CreateGroupWidget(
       "Relative Pose", poseWidget, 0);
@@ -278,6 +282,13 @@ void JointCreationDialog::OnChildFromDialog(int _index)
   gui::model::Events::jointChildChosenDialog(linkName.toStdString());
 
   this->OnChildImpl(linkName);
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnPoseFromDialog(const QString &/*_name*/,
+    const ignition::math::Pose3d &_pose)
+{
+  std::cout << "Pose  " << _pose  << std::endl;
 }
 
 /////////////////////////////////////////////////
