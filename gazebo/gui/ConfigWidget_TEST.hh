@@ -43,6 +43,18 @@ class ConfigWidget_TEST : public QTestFixture
   /// \brief Test creating and updating a config widget without parsing
   /// messages.
   private slots: void CreatedExternally();
+
+  /// \brief Test receiving a signal from child pose widget.
+  private slots: void ChildPoseSignal();
+
+  /// \brief Slot that receives pose signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _pose New pose value.
+  private slots: void OnPoseValueChanged(const QString &_name,
+      const ignition::math::Pose3d &_pose);
+
+  /// \brief Check that pose has been received.
+  private: bool g_poseSignalReceived = false;
 };
 
 #endif

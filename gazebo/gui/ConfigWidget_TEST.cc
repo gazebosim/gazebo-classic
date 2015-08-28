@@ -1072,5 +1072,48 @@ void ConfigWidget_TEST::CreatedExternally()
   QVERIFY(groupWidget->childWidget != NULL);
 }
 
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::ChildPoseSignal()
+{
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
+
+  // Create child pose widget
+  gazebo::gui::ConfigChildWidget *poseWidget =
+      configWidget->CreatePoseWidget("pose", 0);
+  QVERIFY(poseWidget != NULL);
+
+  // Add to config widget
+  QVERIFY(configWidget->AddConfigChildWidget("pose", poseWidget));
+
+  // Connect signals
+  connect(configWidget,
+      SIGNAL(PoseValueChanged(const QString, ignition::math::Pose3d)),
+      this,
+      SLOT(OnPoseValueChanged(const QString, ignition::math::Pose3d)));
+
+  // Check default pose
+  QCOMPARE(configWidget->GetPoseWidgetValue("pose"), gazebo::math::Pose());
+
+  // Get signal emitting widgets
+  QList<QDoubleSpinBox *> spins = poseWidget->findChildren<QDoubleSpinBox *>();
+  QCOMPARE(spins.size(), 6);
+
+  // Change the X value and check new pose at OnPoseValueChanged
+  spins[0]->setValue(1.0);
+  QTest::keyClick(spins[0], Qt::Key_Enter);
+  QVERIFY(g_poseSignalReceived == true);
+
+  delete configWidget;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::OnPoseValueChanged(const QString &_name,
+    const ignition::math::Pose3d &_pose)
+{
+  QVERIFY(_name == "pose");
+  QVERIFY(_pose == ignition::math::Pose3d(1, 0, 0, 0, 0, 0));
+  g_poseSignalReceived = true;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ConfigWidget_TEST)
