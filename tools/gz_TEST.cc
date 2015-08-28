@@ -622,7 +622,7 @@ TEST_F(gzTest, SDF)
   descSums["1.2"] = "f524458ace57d6aabbbc2303da208f65af37ef53";
   descSums["1.3"] = "74a3aa8d31f97328175f43d03410be55631fa0e1";
   descSums["1.4"] = "057f26137669d9d7eeb5a8c6f51e4f4077d9ddcf";
-  descSums["1.5"] = "92fc540f8e9e569d52232c6c284c544e0be4c4b4";
+  descSums["1.5"] = "dddf642e1259439ce47b4664f853ac9f32432762";
 
   // Test each descSum
   for (std::map<std::string, std::string>::iterator iter = descSums.begin();
@@ -641,7 +641,7 @@ TEST_F(gzTest, SDF)
   docSums["1.2"] = "27f9d91080ce8aa18eac27c9d899fde2d4b78785";
   docSums["1.3"] = "ad80986d42eae97baf277118f52d7e8b951d8ea1";
   docSums["1.4"] = "153ddd6ba6797c37c7fcddb2be5362c9969d97a1";
-  docSums["1.5"] = "73f0a042bf2549299f44e6de609e904d9f6da5e0";
+  docSums["1.5"] = "4e99e3a1e3497a0262d5253cbff12be4758e3c16";
 
   // Test each docSum
   for (std::map<std::string, std::string>::iterator iter = docSums.begin();
