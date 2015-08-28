@@ -181,7 +181,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     const rendering::CameraLens *lens = wcamera->GetLens();
 
     msg.set_name(this->GetName());
-    msg.set_destiny(msgs::CameraLensCmd_CmdDestiny_INFO);
+    msg.set_purpose(msgs::CameraLensCmd_CmdPurpose_INFO);
     msg.set_type(lens->GetType());
 
     msg.set_c1(lens->GetC1());
@@ -207,9 +207,9 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->lensCmdMutex);
 
-  if (_msg->destiny() != msgs::CameraLensCmd_CmdDestiny_SET)
+  if (_msg->purpose() != msgs::CameraLensCmd_CmdPurpose_SET)
   {
-    gzerr << "Control message is not of the set type!\n";
+    gzerr << "Control message is not of the `SET` type!\n";
     gzdbg << _msg->DebugString() << "\n";
     return;
   }
