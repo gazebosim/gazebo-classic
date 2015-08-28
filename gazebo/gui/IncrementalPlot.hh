@@ -37,7 +37,7 @@ namespace gazebo
   namespace gui
   {
     /// \brief A plotting widget that handles incremental addition of data.
-    class GAZEBO_VISIBLE IncrementalPlot : public QwtPlot
+    class GZ_GUI_VISIBLE IncrementalPlot : public QwtPlot
     {
       Q_OBJECT
 

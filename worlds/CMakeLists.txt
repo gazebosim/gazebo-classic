@@ -55,6 +55,7 @@ set (files
   rubble.world
   shapes.world
   shapes_layers.world
+  sim_events.world
   simple_arm.world
   simple_gripper.world
   single_rotor_demo.world
