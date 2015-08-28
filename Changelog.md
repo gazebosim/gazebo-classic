@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Added battery class, plugins and test world.
+    * [Pull request #1872](https://bitbucket.org/osrf/gazebo/pull-request/1872)
+
 1. Display gearbox and screw joint properties in property tree
     * [Pull request #1838](https://bitbucket.org/osrf/gazebo/pull-request/1838)
 
