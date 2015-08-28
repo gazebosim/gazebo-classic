@@ -32,6 +32,7 @@
 #cmakedefine HAVE_SPNAV 1
 #cmakedefine HDF5_INSTRUMENT 1
 #cmakedefine HAVE_GRAPHVIZ 1
+#cmakedefine HAVE_UUID 1
 #cmakedefine HAVE_OPENGL 1
 
 #ifdef BUILD_TYPE_PROFILE

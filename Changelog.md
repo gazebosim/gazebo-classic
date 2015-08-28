@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Added battery class, plugins and test world.
+    * [Pull request #1872](https://bitbucket.org/osrf/gazebo/pull-request/1872)
+
 1. Display gearbox and screw joint properties in property tree
     * [Pull request #1838](https://bitbucket.org/osrf/gazebo/pull-request/1838)
 
@@ -27,6 +30,9 @@
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
 
+1. Make it possible to create custom ConfigWidgets
+    * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
+
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
@@ -46,11 +52,17 @@
 1. Added wideanglecamera sensor.
     * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
 
+1. Added Copy constructor and assignment operator to MouseEvent
+    * [Pull request #1855](https://bitbucket.org/osrf/gazebo/pull-request/1855)
+
 1. Added logical_camera sensor.
     * [Pull request #1845](https://bitbucket.org/osrf/gazebo/pull-request/1845)
 
 1. Added RandomVelocityPlugin, which applies a random velocity to a model's link.
     * [Pull request #1839](https://bitbucket.org/osrf/gazebo/pull-request/1839)
+
+1. Sim events for joint position, velocity and applied force
+    * [Pull request #1849](https://bitbucket.org/osrf/gazebo/pull-request/1849)
 
 1. Added magnetometer sensor. A contribution from Andrew Symington.
     * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)
