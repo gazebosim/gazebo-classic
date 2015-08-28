@@ -86,6 +86,14 @@ else ()
   message(STATUS "HDF5 Found")
 endif ()
 ########################################
+check_include_files("GL/glew.h";"GL/gl.h" GL_HEADERS_FOUND)
+if (NOT GL_HEADERS_FOUND)
+  BUILD_WARNING ("OpenGL headers not found, some rendering hacks will be disabled.")
+  set (HAVE_OPENGL OFF CACHE BOOL "HAVE OpenGL" FORCE)
+else ()
+  set (HAVE_OPENGL ON CACHE BOOL "HAVE OpenGL" FORCE)
+endif ()
+########################################
 # Find packages
 
 # In Visual Studio we use configure.bat to trick all path cmake

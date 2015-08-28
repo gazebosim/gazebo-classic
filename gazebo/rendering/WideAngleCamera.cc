@@ -15,8 +15,10 @@
  *
 */
 
+#if defined(HAVE_OPENGL)
 #include <GL/glew.h>
 #include <GL/gl.h>
+#endif
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CameraLensPrivate.hh"
@@ -654,7 +656,9 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
     this->GetAspectRatio(),
     this->GetHFOV().Radian());
 
+#if defined(HAVE_OPENGL)
   // XXX: OGRE doesn't allow to enable cubemap filtering extention thru it's API
   // suppose that this function was invoked in a thread that has OpenGL context
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+#endif
 }
