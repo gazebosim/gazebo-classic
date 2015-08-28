@@ -1,3 +1,5 @@
+#version 130
+
 uniform samplerCube envMap;
 
 uniform float cutOffAngle;
@@ -28,6 +30,10 @@ void main()
   vec3 tc = map(theta);
   gl_FragColor = vec4(textureCube(envMap, tc).rgb, 1);
 
-  if (theta > cutOffAngle || theta < 0.0)
-    gl_FragColor.rgb = gl_FragColor.rgb*0.0;
+  //TODO: move to vertex shader
+  float param2 = cutOffAngle/c2+c3;
+  float cutRadius = c1*f*(fun.x*sin(param2)+fun.y*tan(param2)+fun.z*param2);
+
+  // gl_FragColor.rgb *= 1.0-step(cutRadius,r);
+  gl_FragColor.rgb *= 1.0-smoothstep(cutRadius-0.02,cutRadius,r);
 }
