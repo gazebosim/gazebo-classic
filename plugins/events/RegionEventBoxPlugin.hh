@@ -36,6 +36,16 @@ namespace gazebo
 {
   /// \brief A plugin that fires an event when another model enters the region
   /// defined by the size of this model's box visual.
+  ///
+  /// \verbatim
+  ///   <plugin filename="libRegionEventBoxPlugin.so" name="region_event_box">
+  ///     <event>
+  ///       <name>model_in_region_event_box</name>
+  ///       <type>inclusion</type>
+  ///       <active>true</active>
+  ///     </event>
+  ///   </plugin>
+  /// \endverbatim
   class RegionEventBoxPlugin : public ModelPlugin
   {
     /// \brief Constructor
@@ -91,7 +101,7 @@ namespace gazebo
     public: transport::NodePtr node;
 
     /// \brief Mutex to protect incoming messages
-    public: boost::mutex receiveMutex;
+    public: std::mutex receiveMutex;
 
     /// \brief Box region initial size
     private: ignition::math::Vector3d boxSize;

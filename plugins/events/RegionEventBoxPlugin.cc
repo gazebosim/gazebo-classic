@@ -42,9 +42,27 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       &RegionEventBoxPlugin::OnModelMsg, this);
 
   sdf::ElementPtr linkEl = this->model->GetSDF()->GetElement("link");
+
+
+  if (!linkEl->HasElement("visual"))
+  {
+    gzerr << "RegionEventBoxPlugin requires a visual element. "
+          << "Plugin fails to load."
+          << std::endl;
+    return;
+  }
   sdf::ElementPtr visualEl = linkEl->GetElement("visual");
   sdf::ElementPtr geometryEl = visualEl->GetElement("geometry");
+
+  if (!geometryEl->HasElement("box"))
+  {
+    gzerr << "RegionEventBoxPlugin requires a visual element "
+          << "with a box geometry. Plugin fails to load."
+          << std::endl;
+    return;
+  }
   sdf::ElementPtr boxEl = geometryEl->GetElement("box");
+
   this->boxSize = boxEl->Get<ignition::math::Vector3d>("size");
   this->boxScale = ignition::math::Vector3d::One;
   this->boxPose = this->model->GetWorldPose().Ign();
@@ -72,7 +90,7 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
   if (_msg->has_name() && _msg->name() == this->modelName && _msg->has_scale())
   {
     this->boxScale = msgs::ConvertIgn(_msg->scale());
@@ -83,8 +101,10 @@ void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr &_msg)
 //////////////////////////////////////////////////
 void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
+  // check to see if the box visual geometry has changed size or pose
+  // due to user interaction via the gui, if so update region dimensions
   {
-    boost::mutex::scoped_lock lock(this->receiveMutex);
+    std::lock_guard<std::mutex> lock(this->receiveMutex);
     if (this->boxPose != this->model->GetWorldPose().Ign())
     {
       this->boxPose = this->model->GetWorldPose().Ign();
@@ -98,6 +118,8 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
     }
   }
 
+  // check if any model in the world is in the region or if a model that was
+  // previously in the region has exited the region.
   for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
   {
     physics::ModelPtr m = this->world->GetModel(i);
@@ -152,10 +174,8 @@ bool RegionEventBoxPlugin::PointInRegion(const ignition::math::Vector3d &_point,
 void RegionEventBoxPlugin::UpdateRegion(const ignition::math::Vector3d &_size,
     const ignition::math::Pose3d &_pose)
 {
-  ignition::math::Vector3d vmin(_pose.Pos().X() - (_size.X() * 0.5),
-      _pose.Pos().Y() - (_size.Y() * 0.5), _pose.Pos().Z() - (_size.Z() * 0.5));
-  ignition::math::Vector3d vmax(_pose.Pos().X() + (_size.X() * 0.5),
-      _pose.Pos().Y() + (_size.Y() * 0.5), _pose.Pos().Z() + (_size.Z() * 0.5));
+  ignition::math::Vector3d vmin = _pose.Pos() - _size * 0.5;
+  ignition::math::Vector3d vmax = _pose.Pos() + _size * 0.5;
 
   this->box = ignition::math::Box(vmin, vmax);
 }
