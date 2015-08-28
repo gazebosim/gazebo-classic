@@ -15,11 +15,6 @@
  *
 */
 
-#if defined(HAVE_OPENGL)
-#include <GL/glew.h>
-#include <GL/gl.h>
-#endif
-
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CameraLensPrivate.hh"
 #include "gazebo/rendering/WideAngleCameraPrivate.hh"
@@ -29,6 +24,11 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/WideAngleCamera.hh"
+
+#if defined(HAVE_OPENGL)
+#include <GL/glew.h>
+#include <GL/gl.h>
+#endif
 
 
 using namespace gazebo;
