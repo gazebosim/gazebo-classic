@@ -1089,11 +1089,11 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     _childWidget->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level2BgColor +
+          background-color: " + this->level3BgColor +
         "}\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
         {\
-          background-color: " + this->level2WidgetColor +
+          background-color: " + this->level3WidgetColor +
         "}");
   }
 
