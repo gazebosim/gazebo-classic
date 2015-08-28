@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Added wideanglecamera sensor.
+    * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
+
 1. Added battery class, plugins and test world.
     * [Pull request #1872](https://bitbucket.org/osrf/gazebo/pull-request/1872)
 
@@ -49,9 +52,6 @@
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
 ## Gazebo 6.0
-1. Added wideanglecamera sensor.
-    * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
-
 1. Added Copy constructor and assignment operator to MouseEvent
     * [Pull request #1855](https://bitbucket.org/osrf/gazebo/pull-request/1855)
 
