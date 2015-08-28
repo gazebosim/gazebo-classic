@@ -86,7 +86,7 @@ else ()
   message(STATUS "HDF5 Found")
 endif ()
 ########################################
-check_include_files("GL/glew.h";"GL/gl.h" GL_HEADERS_FOUND)
+check_include_files("GL/gl.h";"GL/glext.h" GL_HEADERS_FOUND)
 if (NOT GL_HEADERS_FOUND)
   BUILD_WARNING ("OpenGL headers not found, some rendering hacks will be disabled.")
   set (HAVE_OPENGL OFF CACHE BOOL "HAVE OpenGL" FORCE)

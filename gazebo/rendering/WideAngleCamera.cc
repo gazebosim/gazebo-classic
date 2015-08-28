@@ -26,8 +26,8 @@
 #include "gazebo/rendering/WideAngleCamera.hh"
 
 #if defined(HAVE_OPENGL)
-#include <GL/glew.h>
 #include <GL/gl.h>
+#include <GL/glext.h>
 #endif
 
 
