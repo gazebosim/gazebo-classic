@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class FloorItem FloorItem.hh
     /// \brief 2D representation of a floor.
-    class GZ_GUI_BUILDING_VISIBLE FloorItem :
+    class GZ_GUI_VISIBLE FloorItem :
       public RectItem, public BuildingItem
     {
       Q_OBJECT

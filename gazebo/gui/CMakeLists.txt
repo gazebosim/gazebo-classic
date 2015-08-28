@@ -16,10 +16,8 @@ include_directories(${tinyxml_INCLUDE_DIRS})
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
-add_subdirectory(building)
-add_subdirectory(model)
-add_subdirectory(terrain)
-add_subdirectory(viewers)
+
+set (internal_qt_headers)
 
 set (sources
   Actions.cc
@@ -149,6 +147,23 @@ set (qt_tests
   ViewAngleWidget_TEST.cc
 )
 
+add_subdirectory(viewers)
+add_subdirectory(terrain)
+add_subdirectory(building)
+add_subdirectory(model)
+
+if (HAVE_GRAPHVIZ)
+  add_definitions(-DWITH_CGRAPH)
+  add_definitions(-DHAVE_STRING_H)
+  # Activate Export macro for building the library itself
+  # if QGVCORE_LIB is not set or equal 0 (null), import macro is used
+  add_definitions(-DQGVCORE_LIB)
+  include_directories(${GRAPHVIZ_INCLUDE_DIR})
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qgv)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qgv/private)
+  add_subdirectory(qgv)
+endif()
+
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests
@@ -171,11 +186,11 @@ gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
-QT4_WRAP_CPP(headers_MOC ${qt_headers})
+QT4_WRAP_CPP(headers_MOC ${qt_headers} ${internal_qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
-gz_add_executable(gzclient main.cc)
+gz_add_library(gazebo_gui ${sources} ${headers_MOC})
+gz_add_executable(gzclient main.cc ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
@@ -188,10 +203,6 @@ target_link_libraries(gazebo_gui
   gazebo_transport
   gazebo_rendering
   gazebo_msgs
-  gazebo_gui_building
-  gazebo_gui_model
-  gazebo_gui_terrain
-  gazebo_gui_viewers
   gzqtpropertybrowser
   ${QT_LIBRARIES}
   ${ogre_libraries}
@@ -201,6 +212,10 @@ target_link_libraries(gazebo_gui
 
 if (UNIX)
   target_link_libraries(gazebo_gui pthread)
+endif()
+
+if (HAVE_GRAPHVIZ)
+  target_link_libraries(gazebo_gui ${GRAPHVIZ_LIBRARIES})
 endif()
 
 target_link_libraries(gzclient gazebo_gui)
