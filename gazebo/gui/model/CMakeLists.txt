@@ -51,6 +51,7 @@ if (ENABLE_SCREEN_TESTS)
     JointMaker_TEST.cc
     CollisionConfig_TEST.cc
     VisualConfig_TEST.cc
+    LinkConfig_TEST.cc
     ExtrudeDialog_TEST.cc
     ModelCreator_TEST.cc
     ModelData_TEST.cc

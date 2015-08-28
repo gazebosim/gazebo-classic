@@ -22,6 +22,7 @@
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/model/LinkConfig_TEST.hh"
 
 #include "gazebo/gui/qt.h"
 
@@ -36,8 +37,9 @@ namespace gazebo
 
     /// \class LinkConfig LinkConfig.hh
     /// \brief A tab for configuring properties of a link.
-    class LinkConfig : public QWidget
+    class GZ_GUI_MODEL_VISIBLE LinkConfig : public QWidget
     {
+      friend class ::LinkConfig_TEST;
       Q_OBJECT
 
       /// \brief Constructor
