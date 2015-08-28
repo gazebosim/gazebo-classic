@@ -43,6 +43,8 @@
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
 ## Gazebo 6.0
+1. Added wideanglecamera sensor.
+    * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
 
 1. Added logical_camera sensor.
     * [Pull request #1845](https://bitbucket.org/osrf/gazebo/pull-request/1845)
