@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _CONFIGWIDGET_TEST_HH_
-#define _CONFIGWIDGET_TEST_HH_
+#ifndef _GAZEBO_CONFIGWIDGET_TEST_HH_
+#define _GAZEBO_CONFIGWIDGET_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
@@ -44,17 +44,113 @@ class ConfigWidget_TEST : public QTestFixture
   /// messages.
   private slots: void CreatedExternally();
 
+  /// \brief Test receiving a signal from child uint widget.
+  private slots: void ChildUIntSignal();
+
+  /// \brief Test receiving a signal from child int widget.
+  private slots: void ChildIntSignal();
+
+  /// \brief Test receiving a signal from child double widget.
+  private slots: void ChildDoubleSignal();
+
+  /// \brief Test receiving a signal from child bool widget.
+  private slots: void ChildBoolSignal();
+
+  /// \brief Test receiving a signal from child string widget.
+  private slots: void ChildStringSignal();
+
+  /// \brief Test receiving a signal from child vector3 widget.
+  private slots: void ChildVector3dSignal();
+
+  /// \brief Test receiving a signal from child color widget.
+  private slots: void ChildColorSignal();
+
   /// \brief Test receiving a signal from child pose widget.
   private slots: void ChildPoseSignal();
 
+  /// \brief Test receiving a signal from child enum widget.
+  private slots: void ChildEnumSignal();
+
+  /// \brief Slot that receives uint signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _value New value.
+  private slots: void OnUIntValueChanged(const QString &_name,
+      const unsigned int _value);
+
+  /// \brief Slot that receives int signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _value New value.
+  private slots: void OnIntValueChanged(const QString &_name,
+      const int _value);
+
+  /// \brief Slot that receives double signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _value New value.
+  private slots: void OnDoubleValueChanged(const QString &_name,
+      const double _value);
+
+  /// \brief Slot that receives bool signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _value New value.
+  private slots: void OnBoolValueChanged(const QString &_name,
+      const bool _value);
+
+  /// \brief Slot that receives string signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _value New value.
+  private slots: void OnStringValueChanged(const QString &_name,
+      const std::string &_value);
+
+  /// \brief Slot that receives vector3 signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _value New value.
+  private slots: void OnVector3dValueChanged(const QString &_name,
+      const ignition::math::Vector3d &_value);
+
+  /// \brief Slot that receives color signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _value New value.
+  private slots: void OnColorValueChanged(const QString &_name,
+      const gazebo::common::Color &_value);
+
   /// \brief Slot that receives pose signals from child widgets.
   /// \param[in] _name Scoped name of child widget which sent signal.
-  /// \param[in] _pose New pose value.
+  /// \param[in] _value New value.
   private slots: void OnPoseValueChanged(const QString &_name,
-      const ignition::math::Pose3d &_pose);
+      const ignition::math::Pose3d &_value);
+
+  /// \brief Slot that receives enum signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _value New value.
+  private slots: void OnEnumValueChanged(const QString &_name,
+      const QString &_value);
+
+  /// \brief Check that uint has been received.
+  private: bool g_uIntSignalReceived = false;
+
+  /// \brief Check that int has been received.
+  private: bool g_intSignalReceived = false;
+
+  /// \brief Check that double has been received.
+  private: bool g_doubleSignalReceived = false;
+
+  /// \brief Check that bool has been received.
+  private: bool g_boolSignalReceived = false;
+
+  /// \brief Check that string has been received.
+  private: bool g_stringSignalReceived = false;
+
+  /// \brief Check that vector3 has been received.
+  private: bool g_vector3SignalReceived = false;
+
+  /// \brief Check that color has been received.
+  private: bool g_colorSignalReceived = false;
 
   /// \brief Check that pose has been received.
   private: bool g_poseSignalReceived = false;
+
+  /// \brief Check that enum has been received.
+  private: bool g_enumSignalReceived = false;
 };
 
 #endif
