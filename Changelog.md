@@ -40,6 +40,9 @@ using the same arguments used in the command line.
 1. Make it possible to create custom ConfigWidgets
     * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
 
+1. Make all child ConfigWidgets emit signals.
+    * [Pull request #1884](https://bitbucket.org/osrf/gazebo/pull-request/1884)
+
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
