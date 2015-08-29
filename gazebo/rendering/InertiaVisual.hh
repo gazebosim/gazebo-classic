@@ -39,6 +39,9 @@ namespace gazebo
       /// \param[in] _vis Parent Visual
       public: InertiaVisual(const std::string &_name, VisualPtr _vis);
 
+      /// \brief Destructor
+      public: ~InertiaVisual();
+
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);

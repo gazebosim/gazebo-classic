@@ -37,6 +37,17 @@ InertiaVisual::InertiaVisual(const std::string &_name, VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+InertiaVisual::~InertiaVisual()
+{
+  InertiaVisualPrivate *dPtr =
+      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
+  dPtr->boxNode->detachAllObjects();
+  dPtr->boxNode->removeAndDestroyAllChildren();
+  dPtr->scene->GetManager()->destroyEntity(
+      this->GetName()+"__BOX__");
+}
+
+/////////////////////////////////////////////////
 void InertiaVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();

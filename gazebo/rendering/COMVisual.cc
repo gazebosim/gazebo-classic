@@ -40,6 +40,17 @@ COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+COMVisual::~COMVisual()
+{
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+  dPtr->sphereNode->detachAllObjects();
+  dPtr->sphereNode->removeAndDestroyAllChildren();
+  dPtr->scene->GetManager()->destroyEntity(
+      this->GetName()+"__SPHERE__");
+}
+
+/////////////////////////////////////////////////
 void COMVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
