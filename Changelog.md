@@ -1,5 +1,9 @@
 ## Gazebo 7.0
 
+1. Added LoadArgs() function to ServerFixture for being able to load a server
+using the same arguments used in the command line.
+    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874
+
 1. Added battery class, plugins and test world.
     * [Pull request #1872](https://bitbucket.org/osrf/gazebo/pull-request/1872)
 
@@ -20,6 +24,9 @@
 
 1. Tweaks to Data Logger, such as multiline text edit for path
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
+
+1. Added TopToolbar and hide / disable several widgets according to WindowMode
+    * [Pull request #1869](https://bitbucket.org/osrf/gazebo/pull-request/1869)
 
 1. Added Visual::IsAncestorOf and Visual::IsDescendantOf
     * [Pull request #1850](https://bitbucket.org/osrf/gazebo/pull-request/1850)

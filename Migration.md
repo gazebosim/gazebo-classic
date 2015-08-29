@@ -2,6 +2,15 @@
 
 ### Modifications
 
+1. **gazebo/test/ServerFixture.hh**
+    + ***Removed:*** protected: void RunServer(const std::string &_worldFilename);
+    + ***Removed:*** protected: void RunServer(const std::string &_worldFilename,
+      bool _paused, const std::string &_physics, const std::vector<std::string> &
+      _systemPlugins = {});
+    + ***Replacement:*** void ServerFixture::RunServer(const std::vector<:string>
+      &_args)
+    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874)
+
 1. **gazebo/gui/building/BuildingMaker.hh**
     * Doesn't inherit from gui::EntityMaker anymore
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
