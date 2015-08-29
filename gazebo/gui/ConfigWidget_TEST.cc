@@ -1466,7 +1466,7 @@ void ConfigWidget_TEST::ChildEnumSignal()
 void ConfigWidget_TEST::OnEnumValueChanged(const QString &_name,
     const QString &_value)
 {
-  QVERIFY(_name == "pose");
+  QVERIFY(_name == "enum");
   QVERIFY(_value == "value3");
   g_enumSignalReceived = true;
 }

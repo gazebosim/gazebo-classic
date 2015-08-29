@@ -934,11 +934,6 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               break;
             }
 
-            // connect enum config widget event so that we can fire an other
-            // event from ConfigWidget that has the name of this field
-            connect(qobject_cast<EnumConfigWidget *>(configChildWidget),
-                SIGNAL(EnumValueChanged(const QString &)), this,
-                SLOT(OnEnumValueChanged(const QString &)));
             newFieldWidget = configChildWidget;
           }
           this->UpdateEnumWidget(configChildWidget, value->name());
@@ -1801,6 +1796,12 @@ ConfigChildWidget *ConfigWidget::CreateEnumWidget(
       widget, SLOT(EnumChanged(const QString &)));
 
   widget->widgets.push_back(enumComboBox);
+
+  // connect enum config widget event so that we can fire another
+  // event from ConfigWidget that has the name of this field
+  connect(widget,
+      SIGNAL(EnumValueChanged(const QString &)), this,
+      SLOT(OnEnumValueChanged(const QString &)));
 
   return widget;
 }
