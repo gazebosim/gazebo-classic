@@ -104,6 +104,9 @@ namespace gazebo
       private: QToolButton *swapButton;
 
       /// \brief Style sheet for link widgets when there's a warning.
+      private: QString activeStyleSheet;
+
+      /// \brief Style sheet for link widgets when there's a warning.
       private: QString warningStyleSheet;
 
       /// \brief Normal style sheet for link widgets.

@@ -65,6 +65,17 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
           background-color: " + ConfigWidget::level0WidgetColor +
         "}";
 
+  this->activeStyleSheet =
+        "QWidget\
+        {\
+          background-color: " + ConfigWidget::level0BgColor + ";\
+          color: " + ConfigWidget::greenColor + ";\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::level0WidgetColor +
+        "}";
+
   // ConfigWidget
   this->configWidget = new ConfigWidget();
 
@@ -116,7 +127,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   // Parent
   std::vector<std::string> links;
   this->parentLinkWidget = configWidget->CreateEnumWidget("parent", links, 0);
-  this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->parentLinkWidget->setStyleSheet(this->activeStyleSheet);
   this->configWidget->AddConfigChildWidget("parentCombo",
       this->parentLinkWidget);
 
@@ -240,6 +251,8 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   this->createButton->setEnabled(false);
   this->swapButton->setEnabled(false);
   this->configWidget->SetWidgetReadOnly("childCombo", true);
+  this->parentLinkWidget->setStyleSheet(this->activeStyleSheet);
+  this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
 
   // Clear links
   this->configWidget->ClearEnumWidget("parentCombo");
@@ -312,11 +325,13 @@ void JointCreationDialog::OnParentFrom3D(const std::string &_linkName)
   if (idx != std::string::npos)
     leafName = _linkName.substr(idx+1);
 
+  this->configWidget->blockSignals(true);
   if (!this->configWidget->SetEnumWidgetValue("parentCombo", leafName))
   {
     gzerr << "Requested link [" << leafName << "] not found" << std::endl;
     return;
   }
+  this->configWidget->blockSignals(false);
 
   this->OnParentImpl(QString::fromStdString(_linkName));
 }
@@ -343,11 +358,13 @@ void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
   if (idx != std::string::npos)
     leafName = _linkName.substr(idx+1);
 
+  this->configWidget->blockSignals(true);
   if (!this->configWidget->SetEnumWidgetValue("childCombo", leafName))
   {
     gzerr << "Requested link [" << leafName << "] not found" << std::endl;
     return;
   }
+  this->configWidget->blockSignals(false);
 
   this->OnChildImpl(QString::fromStdString(_linkName));
 }
@@ -361,14 +378,18 @@ void JointCreationDialog::OnParentImpl(const QString &_linkName)
     return;
   }
 
-  // Enable child selection
-  this->configWidget->SetWidgetReadOnly("childCombo", false);
-
   // Remove empty option
   this->configWidget->RemoveItemEnumWidget("parentCombo", "");
 
   // Check if links are valid
   this->CheckLinksValid();
+
+  // Enable child selection
+  if (this->configWidget->GetWidgetReadOnly("childCombo"))
+  {
+    this->configWidget->SetWidgetReadOnly("childCombo", false);
+    this->childLinkWidget->setStyleSheet(this->activeStyleSheet);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -424,10 +445,6 @@ void JointCreationDialog::OnSwap()
   // Choose new values
   this->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
   this->configWidget->SetEnumWidgetValue("childCombo", currentParent);
-
-  // Trigger signals
-//  this->OnParentFromDialog(currentChild);
-//  this->OnChildFromDialog(currentParent);
 }
 
 /////////////////////////////////////////////////
@@ -453,15 +470,20 @@ void JointCreationDialog::CheckLinksValid()
   std::string currentChild =
       this->configWidget->GetEnumWidgetValue("childCombo");
 
-  // Warning if parent is the same as the child
+  // Warning if parent is the same as the child and don't allow creation
   if (currentParent == currentChild)
   {
     this->parentLinkWidget->setStyleSheet(this->warningStyleSheet);
     this->childLinkWidget->setStyleSheet(this->warningStyleSheet);
+    this->createButton->setEnabled(false);
   }
   else
   {
     this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
-    this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+    if (!this->configWidget->GetWidgetReadOnly("childCombo"))
+    {
+      this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+      this->createButton->setEnabled(true);
+    }
   }
 }
