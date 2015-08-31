@@ -57,7 +57,7 @@ namespace gazebo
 
     /// \class ModelCreator ModelCreator.hh
     /// \brief Create and manage 3D visuals of a model with links and joints.
-    class GAZEBO_VISIBLE ModelCreator : public QObject
+    class GZ_GUI_VISIBLE ModelCreator : public QObject
     {
       Q_OBJECT
 

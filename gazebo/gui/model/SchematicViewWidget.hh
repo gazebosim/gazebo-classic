@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \class SchematicViewWidget SchematicViewWidget.hh
     /// \brief The parent widget of the CML editor
-    class GAZEBO_VISIBLE SchematicViewWidget : public QWidget
+    class GZ_GUI_VISIBLE SchematicViewWidget : public QWidget
     {
       Q_OBJECT
 

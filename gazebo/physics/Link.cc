@@ -22,6 +22,7 @@
 #endif
 
 #include <sstream>
+#include <functional>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -35,6 +36,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Battery.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Model.hh"
@@ -113,6 +115,7 @@ Link::~Link()
   this->publishDataMutex = NULL;
 
   this->collisions.clear();
+  this->batteries.clear();
 }
 
 //////////////////////////////////////////////////
@@ -131,7 +134,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     this->SetSelfCollide(this->GetModel()->GetSelfCollide());
   }
   this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
-      boost::bind(&Link::GetSelfCollide, this));
+      std::bind(&Link::GetSelfCollide, this));
 
   // Parse visuals from SDF
   this->ParseVisuals();
@@ -223,6 +226,16 @@ void Link::Load(sdf::ElementPtr _sdf)
   }
 #endif
 
+  if (this->sdf->HasElement("battery"))
+  {
+    sdf::ElementPtr batteryElem = this->sdf->GetElement("battery");
+    while (batteryElem)
+    {
+      this->LoadBattery(batteryElem);
+      batteryElem = batteryElem->GetNextElement("battery");
+    }
+  }
+
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Link::Update, this, _1)));
 
@@ -255,6 +268,12 @@ void Link::Init()
     }
   }
 
+  // Initialize all the batteries
+  for (auto &battery : this->batteries)
+  {
+    battery->Init();
+  }
+
   this->initialized = true;
 }
 
@@ -265,6 +284,7 @@ void Link::Fini()
   this->childJoints.clear();
   this->collisions.clear();
   this->inertial.reset();
+  this->batteries.clear();
 
   // Remove all the sensors attached to the link
   for (auto const &iter : this->sensors)
@@ -376,6 +396,21 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
       collisionElem = collisionElem->GetNextElement("collision");
     }
   }
+
+  // Update the battery information
+  if (this->sdf->HasElement("battery"))
+  {
+    sdf::ElementPtr batteryElem = this->sdf->GetElement("battery");
+    while (batteryElem)
+    {
+      common::BatteryPtr battery = this->Battery(
+          batteryElem->Get<std::string>("name"));
+
+      if (battery)
+        battery->UpdateParameters(batteryElem);
+      batteryElem = batteryElem->GetNextElement("battery");
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -485,6 +520,12 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
     {
       this->ProcessWrenchMsg(it);
     }
+  }
+
+  // Update the batteries.
+  for (auto &battery : this->batteries)
+  {
+    battery->Update();
   }
 }
 
@@ -856,6 +897,14 @@ void Link::FillMsg(msgs::Link &_msg)
 
   if (this->IsCanonicalLink())
     _msg.set_canonical(true);
+
+  // Fill message with battery information
+  for (auto &battery : this->batteries)
+  {
+    msgs::Battery *bat = _msg.add_battery();
+    bat->set_name(battery->Name());
+    bat->set_voltage(battery->Voltage());
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1044,6 +1093,38 @@ void Link::PublishData()
         this->GetWorldAngularVel().Ign());
     this->dataPub->Publish(this->linkDataMsg);
   }
+}
+
+//////////////////////////////////////////////////
+common::BatteryPtr Link::Battery(const std::string &_name) const
+{
+  common::BatteryPtr result;
+
+  for (auto &battery : this->batteries)
+  {
+    if (battery->Name() == _name)
+    {
+      result = battery;
+      break;
+    }
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+common::BatteryPtr Link::Battery(const size_t _index) const
+{
+  if (_index < this->batteries.size())
+    return this->batteries[_index];
+  else
+    return common::BatteryPtr();
+}
+
+/////////////////////////////////////////////////
+size_t Link::BatteryCount() const
+{
+  return this->batteries.size();
 }
 
 //////////////////////////////////////////////////
@@ -1443,4 +1524,12 @@ void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
 
   const ignition::math::Vector3d torque = msgs::ConvertIgn(_msg.torque());
   this->AddRelativeTorque(torque);
+}
+
+//////////////////////////////////////////////////
+void Link::LoadBattery(sdf::ElementPtr _sdf)
+{
+  common::BatteryPtr battery(new common::Battery());
+  battery->Load(_sdf);
+  this->batteries.push_back(battery);
 }

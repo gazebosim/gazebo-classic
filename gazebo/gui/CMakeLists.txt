@@ -17,7 +17,7 @@ add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
 
-set (internal_headers)
+set (internal_qt_headers)
 
 set (sources
   Actions.cc
@@ -55,6 +55,7 @@ set (sources
   TimeWidget.cc
   ToolsWidget.cc
   TopicSelector.cc
+  TopToolbar.cc
   ViewAngleWidget.cc
 )
 
@@ -92,6 +93,7 @@ set (qt_headers
   TimeWidget.hh
   ToolsWidget.hh
   TopicSelector.hh
+  TopToolbar.hh
   ViewAngleWidget.hh
 )
 
@@ -144,6 +146,7 @@ set (qt_tests
   SplashScreen_TEST.cc
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
+  TopToolbar_TEST.cc
   ViewAngleWidget_TEST.cc
 )
 
@@ -182,15 +185,14 @@ if (ENABLE_SCREEN_TESTS)
 endif()
 
 # Generate executables for each of the QT unit tests
-# gz_build_qt_tests(${qt_tests})
+gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
-QT4_WRAP_CPP(headers_MOC ${qt_headers})
+QT4_WRAP_CPP(headers_MOC ${qt_headers} ${internal_qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers}
-  ${internal_headers})
+gz_add_library(gazebo_gui ${sources} ${headers_MOC})
 gz_add_executable(gzclient main.cc ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)

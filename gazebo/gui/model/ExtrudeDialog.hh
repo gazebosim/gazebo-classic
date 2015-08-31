@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class ExtrudeDialog ExtrudeDialog.hh gui/gui.hh
     /// \brief Dialog for saving to file.
-    class GAZEBO_VISIBLE ExtrudeDialog : public QDialog
+    class GZ_GUI_VISIBLE ExtrudeDialog : public QDialog
     {
       Q_OBJECT
 

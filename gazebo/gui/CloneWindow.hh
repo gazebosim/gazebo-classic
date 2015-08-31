@@ -31,7 +31,7 @@ namespace gazebo
     /// \class CloneConfig CloneConfig.hh gui/CloneConfig.hh
     /// \brief A dialog window used to set some parameters before cloning a
     /// simulation.
-    class GAZEBO_VISIBLE CloneWindow : public QDialog
+    class GZ_GUI_VISIBLE CloneWindow : public QDialog
     {
       Q_OBJECT
 

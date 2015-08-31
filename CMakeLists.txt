@@ -48,6 +48,10 @@ endif()
 # Documentation
 add_subdirectory(doc)
 
+# Configure documentation uploader
+configure_file("${CMAKE_SOURCE_DIR}/cmake/upload_doc.sh.in"
+  ${CMAKE_BINARY_DIR}/upload_doc.sh @ONLY)
+
 # If we're configuring only to build docs, stop here
 if (DOC_ONLY)
   message(WARNING "Configuration was done in DOC_ONLY mode.  You can build documentation (make doc), but nothing else.")
@@ -356,9 +360,6 @@ else (build_errors)
   set(PKG_LIBRARIES
     gazebo
     gazebo_client
-    gazebo_gui_building
-    gazebo_gui_viewers
-    gazebo_gui_model
     gazebo_gui
     gazebo_sensors
     gazebo_rendering
