@@ -37,6 +37,12 @@ class Issue1702Test : public ServerFixture,
 /////////////////////////////////////////////////
 void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "DART fails, see issue #1723.\n";
+    return;
+  }
+
   // Load an empty world
   Load("worlds/camera.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
