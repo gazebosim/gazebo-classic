@@ -36,7 +36,7 @@ namespace gazebo
     /// \class ToolsWidget ToolsWidget.hh gui/ToolsWidget.hh
     /// \brief A widget that manages all the tools on the right side of the
     /// render widget.
-    class GAZEBO_VISIBLE ToolsWidget : public QWidget
+    class GZ_GUI_VISIBLE ToolsWidget : public QWidget
     {
       Q_OBJECT
 

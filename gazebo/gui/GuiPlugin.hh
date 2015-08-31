@@ -23,7 +23,7 @@
 namespace gazebo
 {
   /// \brief A plugin loaded within the gzclient on startup.
-  class GAZEBO_VISIBLE GUIPlugin : public QWidget, public PluginT<GUIPlugin>
+  class GZ_GUI_VISIBLE GUIPlugin : public QWidget, public PluginT<GUIPlugin>
   {
     public: GUIPlugin() : QWidget(NULL)
             {this->type = GUI_PLUGIN;}
@@ -44,8 +44,8 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_GUI_PLUGIN(classname) \
-  extern "C" GAZEBO_VISIBLE gazebo::GUIPlugin *RegisterPlugin(); \
-  GAZEBO_VISIBLE \
+  extern "C" GZ_GUI_VISIBLE gazebo::GUIPlugin *RegisterPlugin(); \
+  GZ_GUI_VISIBLE \
   gazebo::GUIPlugin *RegisterPlugin() \
   {\
     return new classname();\

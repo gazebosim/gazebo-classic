@@ -117,7 +117,7 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_fpsAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_orbitAct = 0;
-GAZEBO_VISIBLE
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_overlayAct = 0;
 
 GZ_GUI_VISIBLE
