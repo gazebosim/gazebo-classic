@@ -197,7 +197,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   if (!torsionalMsg->has_patch_radius())
     torsionalMsg->set_patch_radius(0.0);
   if (!torsionalMsg->has_surface_radius())
-    torsionalMsg->set_surface_radius(IGN_DBL_MAX);
+    torsionalMsg->set_surface_radius(0.0);
 
   ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);

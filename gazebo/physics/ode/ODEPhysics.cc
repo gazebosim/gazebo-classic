@@ -1142,25 +1142,60 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   contact.surface.slip3 = std::min(surf1->slipTorsion,
                                    surf2->slipTorsion);
 
+  // Combine torsional friction patch radius values
+  contact.surface.patch_radius =
+      std::max(surf1->FrictionPyramid()->PatchRadius(),
+               surf2->FrictionPyramid()->PatchRadius());
+
+  // For torsional friction, the curvature is combined using
+  //   1/R = 1/R1 + 1/R2
+  // we can consider doing the same for the patch radius
+  double curv1 = 0;
+  if (surf1->FrictionPyramid()->SurfaceRadius() > 0)
+    curv1 = 1 / surf1->FrictionPyramid()->SurfaceRadius();
+
+  double curv2 = 0;
+  if (surf2->FrictionPyramid()->SurfaceRadius() > 0)
+    curv2 = 1 / surf2->FrictionPyramid()->SurfaceRadius();
+
+  double curvSum = curv1 + curv2;
+  contact.surface.surface_radius = 0;
+  if (curvSum > 0)
+    contact.surface.surface_radius = 1 / curvSum;
+
+  /// \todo Not sure how to combine these logic flags
+  /// If user wanted to use patch radius, but got settings
+  /// overwritten by the logic combination, how do we make sure the
+  /// the surface radius is specified or makes sense?
+  contact.surface.use_patch_radius =
+      surf1->FrictionPyramid()->UsePatchRadius() &&
+      surf2->FrictionPyramid()->UsePatchRadius();
+
   if (contact.surface.mu3 > 0)
   {
-    contact.surface.mode |= dContactMu3;
-    contact.surface.patch_radius =
-        std::max(surf1->FrictionPyramid()->PatchRadius(),
-                 surf2->FrictionPyramid()->PatchRadius());
-    // the curvature is combined using 1/R = 1/R1 + 1/R2
-    // we can consider doing the same for the patch radius
-    contact.surface.surface_radius = 1/
-        (1/surf1->FrictionPyramid()->SurfaceRadius()+
-        1/surf2->FrictionPyramid()->SurfaceRadius());
-    // not sure how to combine these logic flags
-    contact.surface.use_patch_radius =
-        surf1->FrictionPyramid()->UsePatchRadius() &&
-        surf2->FrictionPyramid()->UsePatchRadius();
-
-    if (contact.surface.slip3 > 0)
+    if (contact.surface.use_patch_radius)
     {
-      contact.surface.mode |= dContactSlip3;
+      if (contact.surface.patch_radius > 0)
+      {
+        contact.surface.mode |= dContactMu3;
+
+        if (contact.surface.slip3 > 0)
+        {
+          contact.surface.mode |= dContactSlip3;
+        }
+      }
+    }
+    else
+    {
+      if (contact.surface.surface_radius > 0)
+      {
+        contact.surface.mode |= dContactMu3;
+
+        if (contact.surface.slip3 > 0)
+        {
+          contact.surface.mode |= dContactSlip3;
+        }
+      }
     }
   }
 
