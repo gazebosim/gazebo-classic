@@ -352,47 +352,64 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointChildChosen3D.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the joint type chosen 3d signal.
+        /// \brief Connect a Gazebo event to the joint type chosen dialog
+        /// signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
             ConnectJointTypeChosenDialog(T _subscriber)
           { return jointTypeChosenDialog.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the joint type chosen 3d
+        /// \brief Disconnect a Gazebo event from the joint type chosen dialog
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectJointTypeChosenDialog(
             event::ConnectionPtr _subscriber)
           { jointTypeChosenDialog.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the joint parent chosen 3d signal.
+        /// \brief Connect a Gazebo event to the joint parent chosen dialog
+        /// signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
             ConnectJointParentChosenDialog(T _subscriber)
           { return jointParentChosenDialog.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the joint parent chosen 3d
+        /// \brief Disconnect a Gazebo event from the joint parent chosen dialog
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectJointParentChosenDialog(
             event::ConnectionPtr _subscriber)
           { jointParentChosenDialog.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the joint child chosen 3d signal.
+        /// \brief Connect a Gazebo event to the joint child chosen dialog
+        /// signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
             ConnectJointChildChosenDialog(T _subscriber)
           { return jointChildChosenDialog.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the joint child chosen 3d
-        /// signal.
+        /// \brief Disconnect a Gazebo event from the joint child chosen dialog         /// signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectJointChildChosenDialog(
             event::ConnectionPtr _subscriber)
           { jointChildChosenDialog.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the joint pose chosen dialog
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectJointPoseChosenDialog(T _subscriber)
+          { return jointPoseChosenDialog.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the joint child chosen dialog
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectJointPoseChosenDialog(
+            event::ConnectionPtr _subscriber)
+          { jointPoseChosenDialog.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the joint created dialog signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -502,6 +519,10 @@ namespace gazebo
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string)>
             jointChildChosenDialog;
+
+        /// \brief Request to select or deselect a joint.
+        public: static event::EventT<void (ignition::math::Pose3d)>
+            jointPoseChosenDialog;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void ()> jointCreateDialog;

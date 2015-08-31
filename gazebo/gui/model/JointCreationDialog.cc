@@ -288,7 +288,8 @@ void JointCreationDialog::OnChildFromDialog(int _index)
 void JointCreationDialog::OnPoseFromDialog(const QString &/*_name*/,
     const ignition::math::Pose3d &_pose)
 {
-  std::cout << "Pose  " << _pose  << std::endl;
+  // Notify so 3D is updated
+  gui::model::Events::jointPoseChosenDialog(_pose);
 }
 
 /////////////////////////////////////////////////

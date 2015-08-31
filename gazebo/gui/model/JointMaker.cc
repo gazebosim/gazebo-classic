@@ -110,6 +110,10 @@ JointMaker::JointMaker()
       boost::bind(&JointMaker::OnJointChildChosenDialog, this, _1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectJointPoseChosenDialog(
+      boost::bind(&JointMaker::OnJointPoseChosenDialog, this, _1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectJointCreateDialog(
       boost::bind(&JointMaker::OnJointCreateDialog, this)));
 
@@ -1560,6 +1564,9 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
 
   if (this->jointBeingCreated)
   {
+    // TODO: Keep track of child's original pose and make it semi-transparent,
+    // so we know that it is a temporary preview
+
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
     // Reset current joint
@@ -1623,6 +1630,18 @@ void JointMaker::OnJointChildChosenDialog(const std::string &_linkName)
 
   if (vis && vis != this->parentLinkVis)
     this->ChildLinkChosen(vis);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnJointPoseChosenDialog(const ignition::math::Pose3d &_pose)
+{
+  if (this->parentLinkVis && this->childLinkVis)
+  {
+    ignition::math::Pose3d worldPose =
+        this->parentLinkVis->GetWorldPose().Ign() + _pose;
+
+    this->childLinkVis->SetWorldPose(worldPose);
+  }
 }
 
 /////////////////////////////////////////////////

@@ -53,4 +53,6 @@ event::EventT<void (JointMaker::JointType)>
     model::Events::jointTypeChosenDialog;
 event::EventT<void (std::string)> model::Events::jointParentChosenDialog;
 event::EventT<void (std::string)> model::Events::jointChildChosenDialog;
+event::EventT<void (ignition::math::Pose3d)>
+    model::Events::jointPoseChosenDialog;
 event::EventT<void ()> model::Events::jointCreateDialog;
