@@ -3091,10 +3091,7 @@ bool ConfigWidget::RemoveItemEnumWidget(const std::string &_name,
   int index = valueComboBox->findText(QString::fromStdString(
       _itemText));
   if (index < 0)
-  {
-    gzerr << "Error removing item from Enum Config widget" << std::endl;
     return false;
-  }
 
   valueComboBox->blockSignals(true);
   valueComboBox->removeItem(index);

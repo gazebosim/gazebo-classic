@@ -38,6 +38,34 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   this->jointMaker = _jointMaker;
 
+  // Style sheets
+  this->normalStyleSheet =
+        "QWidget\
+        {\
+          background-color: " + ConfigWidget::level0BgColor + ";\
+          color: #4c4c4c;\
+        }\
+        QLabel\
+        {\
+          color: #d0d0d0;\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::level0WidgetColor +
+        "}";
+
+  this->warningStyleSheet =
+        "QWidget\
+        {\
+          background-color: " + ConfigWidget::level0BgColor + ";\
+          color: " + ConfigWidget::redColor + ";\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::level0WidgetColor +
+        "}";
+
+  // ConfigWidget
   this->configWidget = new ConfigWidget();
 
   // Joint types
@@ -86,35 +114,41 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       "Click again to select child."));
 
   // Parent
-  QLabel *parentLabel = new QLabel("Parent: ");
-  this->parentComboBox = new QComboBox();
-  this->parentComboBox->setInsertPolicy(QComboBox::InsertAlphabetically);
-  connect(this->parentComboBox, SIGNAL(currentIndexChanged(int)), this,
-      SLOT(OnParentFromDialog(int)));
+  std::vector<std::string> links;
+  this->parentLinkWidget = configWidget->CreateEnumWidget("parent", links, 0);
+  this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->configWidget->AddConfigChildWidget("parentCombo",
+      this->parentLinkWidget);
 
   // Child
-  QLabel *childLabel = new QLabel("Child: ");
-  this->childComboBox = new QComboBox();
-  this->childComboBox->setInsertPolicy(QComboBox::InsertAlphabetically);
-  this->childComboBox->setEnabled(false);
-  connect(this->childComboBox, SIGNAL(currentIndexChanged(int)), this,
-      SLOT(OnChildFromDialog(int)));
+  this->childLinkWidget = configWidget->CreateEnumWidget("child", links, 0);
+  this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->configWidget->AddConfigChildWidget("childCombo", this->childLinkWidget);
+  this->configWidget->SetWidgetReadOnly("childCombo", true);
+
+  // Connect all enum value changes
+  QObject::connect(this->configWidget,
+      SIGNAL(EnumValueChanged(const QString &, const QString &)), this,
+      SLOT(OnEnumChanged(const QString &, const QString &)));
 
   // Swap button
   this->swapButton = new QToolButton();
   this->swapButton->setText("Swap");
-  this->swapButton->setMinimumWidth(100);
-  this->swapButton->setEnabled(false);
+  this->swapButton->setMinimumWidth(60);
+  this->swapButton->setStyleSheet(
+      "QToolButton\
+      {\
+        background-color: " + ConfigWidget::level0BgColor +
+      "}");
   connect(this->swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
 
   // Links layout
   QGridLayout *linksLayout = new QGridLayout();
-  linksLayout->addWidget(selectionsText, 0, 0, 1, 3);
-  linksLayout->addWidget(parentLabel, 1, 0);
-  linksLayout->addWidget(this->parentComboBox, 1, 1);
-  linksLayout->addWidget(childLabel, 2, 0);
-  linksLayout->addWidget(this->childComboBox, 2, 1);
-  linksLayout->addWidget(this->swapButton, 1, 2, 2, 1);
+  linksLayout->setContentsMargins(0, 0, 0, 0);
+  linksLayout->addWidget(selectionsText, 0, 0, 1, 2);
+  linksLayout->addWidget(this->parentLinkWidget, 1, 0);
+  linksLayout->addWidget(this->childLinkWidget, 2, 0);
+  linksLayout->addWidget(swapButton, 1, 1, 2, 1);
 
   // Links group widget
   ConfigChildWidget *linksWidget = new ConfigChildWidget();
@@ -178,14 +212,6 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Gazebo event connections
   this->connections.push_back(
-      gui::model::Events::ConnectLinkInserted(
-      boost::bind(&JointCreationDialog::OnLinkInserted, this, _1)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectLinkRemoved(
-      boost::bind(&JointCreationDialog::OnLinkRemoved, this, _1)));
-
-  this->connections.push_back(
       gui::model::Events::ConnectJointParentChosen3D(
       boost::bind(&JointCreationDialog::OnParentFrom3D, this, _1)));
 
@@ -194,8 +220,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       boost::bind(&JointCreationDialog::OnChildFrom3D, this, _1)));
 
   // Qt signal-slot connections
-  connect(this, SIGNAL(EmitLinkRemoved(std::string)),
-      this, SLOT(OnLinkRemovedSlot(std::string)));
+  connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
 }
 
 /////////////////////////////////////////////////
@@ -214,33 +239,25 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   // Reset enabled states
   this->createButton->setEnabled(false);
   this->swapButton->setEnabled(false);
-  this->childComboBox->setEnabled(false);
+  this->configWidget->SetWidgetReadOnly("childCombo", true);
 
-  // Fill link combo boxes
-  this->parentComboBox->blockSignals(true);
-  this->childComboBox->blockSignals(true);
+  // Clear links
+  this->configWidget->ClearEnumWidget("parentCombo");
+  this->configWidget->ClearEnumWidget("childCombo");
 
-  this->parentComboBox->clear();
-  this->childComboBox->clear();
+  // Add an empty option to each
+  this->configWidget->AddItemEnumWidget("parentCombo", "");
+  this->configWidget->AddItemEnumWidget("childCombo", "");
 
-  this->parentComboBox->addItem("", "");
-  this->childComboBox->addItem("", "");
-  for (auto link : this->linkList)
+  // Fill with all existing links
+  for (auto link : this->jointMaker->LinkList())
   {
-    this->parentComboBox->addItem(
-        QString::fromStdString(link.second),
-        QString::fromStdString(link.first));
-    this->childComboBox->addItem(
-        QString::fromStdString(link.second),
-        QString::fromStdString(link.first));
+    this->configWidget->AddItemEnumWidget("parentCombo", link.second);
+    this->configWidget->AddItemEnumWidget("childCombo", link.second);
   }
-  this->parentComboBox->blockSignals(false);
-  this->childComboBox->blockSignals(false);
-
-  // Start combo boxes empty
 
   this->move(0, 0);
-  this->open();
+  this->show();
 }
 
 /////////////////////////////////////////////////
@@ -251,37 +268,26 @@ void JointCreationDialog::OnTypeFromDialog(int _type)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnParentFromDialog(int _index)
+void JointCreationDialog::OnLinkFromDialog()
 {
-  QString linkName = this->parentComboBox->itemData(_index).toString();
-
-  if (linkName.isEmpty())
-  {
-    gzerr << "Empty link name for parent" << std::endl;
-    return;
-  }
+  std::string currentParent =
+      this->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->configWidget->GetEnumWidgetValue("childCombo");
 
   // Notify so 3D is updated
-  gui::model::Events::jointParentChosenDialog(linkName.toStdString());
-
-  this->OnParentImpl(linkName);
-}
-
-/////////////////////////////////////////////////
-void JointCreationDialog::OnChildFromDialog(int _index)
-{
-  QString linkName = this->childComboBox->itemData(_index).toString();
-
-  if (linkName.isEmpty())
+  if (currentParent != currentChild)
   {
-    gzerr << "Empty link name for child" << std::endl;
-    return;
+    if (currentParent != "")
+      gui::model::Events::jointParentChosenDialog(currentParent);
+    if (currentChild != "")
+      gui::model::Events::jointChildChosenDialog(currentChild);
   }
 
-  // Notify so 3D is updated
-  gui::model::Events::jointChildChosenDialog(linkName.toStdString());
+  this->OnParentImpl(QString::fromStdString(currentParent));
 
-  this->OnChildImpl(linkName);
+  if (currentChild != "")
+    this->OnChildImpl(QString::fromStdString(currentChild));
 }
 
 /////////////////////////////////////////////////
@@ -301,17 +307,16 @@ void JointCreationDialog::OnParentFrom3D(const std::string &_linkName)
     return;
   }
 
-  // Update combo box
-  int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
-  if (index == -1)
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  if (!this->configWidget->SetEnumWidgetValue("parentCombo", leafName))
   {
-    gzerr << "Requested link [" << _linkName << "] not found" << std::endl;
+    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
     return;
   }
-
-  this->parentComboBox->blockSignals(true);
-  this->parentComboBox->setCurrentIndex(index);
-  this->parentComboBox->blockSignals(false);
 
   this->OnParentImpl(QString::fromStdString(_linkName));
 }
@@ -325,24 +330,24 @@ void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
     return;
   }
 
-  if (!this->childComboBox->isEnabled())
+  if (this->configWidget->GetWidgetReadOnly("childCombo"))
   {
     gzerr << "It shouldn't be possible to set child before parent."
         << std::endl;
     return;
   }
 
-  // Upodate combo box
-  int index = this->childComboBox->findData(QString::fromStdString(_linkName));
-  if (index == -1)
+  // Update child combo box
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  if (!this->configWidget->SetEnumWidgetValue("childCombo", leafName))
   {
-    gzerr << "Requested link [" << _linkName << "] not found" << std::endl;
+    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
     return;
   }
-
-  this->childComboBox->blockSignals(true);
-  this->childComboBox->setCurrentIndex(index);
-  this->childComboBox->blockSignals(false);
 
   this->OnChildImpl(QString::fromStdString(_linkName));
 }
@@ -357,40 +362,13 @@ void JointCreationDialog::OnParentImpl(const QString &_linkName)
   }
 
   // Enable child selection
-  this->childComboBox->setEnabled(true);
+  this->configWidget->SetWidgetReadOnly("childCombo", false);
 
   // Remove empty option
-  int index = this->parentComboBox->findData("");
+  this->configWidget->RemoveItemEnumWidget("parentCombo", "");
 
-  this->parentComboBox->blockSignals(true);
-  this->parentComboBox->removeItem(index);
-  this->parentComboBox->blockSignals(false);
-
-  // Reset child combo box leaving parent out
-  QString currentChild = this->childComboBox->itemData(
-      this->childComboBox->currentIndex()).toString();
-
-  this->childComboBox->blockSignals(true);
-  this->childComboBox->clear();
-  if (currentChild == "")
-    this->childComboBox->addItem("", "");
-  for (auto link : this->linkList)
-  {
-    QString leafName = QString::fromStdString(link.first);
-    if (leafName == _linkName)
-      continue;
-
-    this->childComboBox->addItem(QString::fromStdString(link.second), leafName);
-  }
-  index = this->childComboBox->findData(currentChild);
-  if (index == -1)
-  {
-    gzerr << "Requested link [" << currentChild.toStdString() << "] not found"
-          << std::endl;
-    return;
-  }
-  this->childComboBox->setCurrentIndex(index);
-  this->childComboBox->blockSignals(false);
+  // Check if links are valid
+  this->CheckLinksValid();
 }
 
 /////////////////////////////////////////////////
@@ -407,79 +385,10 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
   this->swapButton->setEnabled(true);
 
   // Remove empty option
-  int index = this->parentComboBox->findData("");
+  this->configWidget->RemoveItemEnumWidget("childCombo", "");
 
-  this->childComboBox->blockSignals(true);
-  this->childComboBox->removeItem(index);
-  this->childComboBox->blockSignals(false);
-
-  // Reset parent combo box leaving child out
-  QString currentParent = this->parentComboBox->itemData(
-      this->parentComboBox->currentIndex()).toString();
-
-  this->parentComboBox->blockSignals(true);
-  this->parentComboBox->clear();
-  if (currentParent == "")
-    this->parentComboBox->addItem("", "");
-  for (auto link : this->linkList)
-  {
-    QString leafName = QString::fromStdString(link.first);
-    if (leafName == _linkName)
-      continue;
-
-    this->parentComboBox->addItem(QString::fromStdString(link.second),
-        leafName);
-  }
-  index = this->parentComboBox->findData(currentParent);
-  if (index == -1)
-  {
-    gzerr << "Requested link [" << currentParent.toStdString() << "] not found"
-          << std::endl;
-    return;
-  }
-  this->parentComboBox->setCurrentIndex(index);
-  this->parentComboBox->blockSignals(false);
-}
-
-/////////////////////////////////////////////////
-void JointCreationDialog::OnLinkInserted(const std::string &_linkName)
-{
-  std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
-  if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
-
-  this->linkList[_linkName] = leafName;
-}
-
-/////////////////////////////////////////////////
-void JointCreationDialog::OnLinkRemoved(const std::string &_linkName)
-{
-  this->EmitLinkRemoved(_linkName);
-}
-
-/////////////////////////////////////////////////
-void JointCreationDialog::OnLinkRemovedSlot(const std::string &_linkName)
-{
-  auto it = this->linkList.find(_linkName);
-  if (it != this->linkList.end())
-    this->linkList.erase(_linkName);
-
-  int index = this->parentComboBox->findData(QString::fromStdString(_linkName));
-  if (index >= 0)
-  {
-    this->parentComboBox->blockSignals(true);
-    this->parentComboBox->removeItem(index);
-    this->parentComboBox->blockSignals(false);
-  }
-
-  index = this->childComboBox->findData(QString::fromStdString(_linkName));
-  if (index >= 0)
-  {
-    this->childComboBox->blockSignals(true);
-    this->childComboBox->removeItem(index);
-    this->childComboBox->blockSignals(false);
-  }
+  // Check if links are valid
+  this->CheckLinksValid();
 }
 
 /////////////////////////////////////////////////
@@ -506,51 +415,19 @@ void JointCreationDialog::enterEvent(QEvent */*_event*/)
 /////////////////////////////////////////////////
 void JointCreationDialog::OnSwap()
 {
-  QString parentData = this->childComboBox->itemData(
-      this->childComboBox->currentIndex()).toString();
-  QString childData = this->parentComboBox->itemData(
-      this->parentComboBox->currentIndex()).toString();
+  // Get current values
+  std::string currentParent =
+      this->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->configWidget->GetEnumWidgetValue("childCombo");
 
-  if (childData.isEmpty() || parentData.isEmpty())
-  {
-    gzerr << "Can't swap with an empty link name" << std::endl;
-    return;
-  }
+  // Choose new values
+  this->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
+  this->configWidget->SetEnumWidgetValue("childCombo", currentParent);
 
-  // Reset combo boxes to new allowed options
-  this->parentComboBox->blockSignals(true);
-  this->childComboBox->blockSignals(true);
-  this->parentComboBox->clear();
-  this->childComboBox->clear();
-  for (auto link : this->linkList)
-  {
-    QString leafName = QString::fromStdString(link.first);
-    if (leafName != childData)
-    {
-      this->parentComboBox->addItem(QString::fromStdString(link.second),
-          leafName);
-    }
-    if (leafName != parentData)
-    {
-      this->childComboBox->addItem(QString::fromStdString(link.second),
-          leafName);
-    }
-  }
-
-  // Choose new options
-  int indexParent = this->parentComboBox->findData(parentData);
-  int indexChild = this->childComboBox->findData(childData);
-  if (indexParent == -1 || indexChild == -1)
-    return;
-  this->parentComboBox->setCurrentIndex(indexParent);
-  this->childComboBox->setCurrentIndex(indexChild);
-
-  this->parentComboBox->blockSignals(false);
-  this->childComboBox->blockSignals(false);
-
-  // Signals were not being triggered even without blocking, so manually call
-  this->OnParentFromDialog(indexParent);
-  this->OnChildFromDialog(indexChild);
+  // Trigger signals
+//  this->OnParentFromDialog(currentChild);
+//  this->OnChildFromDialog(currentParent);
 }
 
 /////////////////////////////////////////////////
@@ -558,4 +435,33 @@ void JointCreationDialog::UpdateRelativePose(
     const ignition::math::Pose3d &_pose)
 {
   this->configWidget->SetPoseWidgetValue("pose", math::Pose(_pose));
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnEnumChanged(const QString &_name,
+    const QString &/*_value*/)
+{
+  if (_name == "parentCombo" || _name == "childCombo")
+    this->OnLinkFromDialog();
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::CheckLinksValid()
+{
+  std::string currentParent =
+      this->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->configWidget->GetEnumWidgetValue("childCombo");
+
+  // Warning if parent is the same as the child
+  if (currentParent == currentChild)
+  {
+    this->parentLinkWidget->setStyleSheet(this->warningStyleSheet);
+    this->childLinkWidget->setStyleSheet(this->warningStyleSheet);
+  }
+  else
+  {
+    this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
+    this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+  }
 }

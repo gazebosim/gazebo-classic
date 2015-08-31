@@ -33,6 +33,7 @@ namespace gazebo
   {
     class JointMaker;
     class ConfigWidget;
+    class ConfigChildWidget;
 
     /// \class JointCreationDialog gui/JointCreationDialog.hh
     /// \brief A class to inspect and modify joints.
@@ -57,8 +58,7 @@ namespace gazebo
       protected: virtual void enterEvent(QEvent *_event);
 
       private slots: void OnTypeFromDialog(int _type);
-      private slots: void OnParentFromDialog(int _index);
-      private slots: void OnChildFromDialog(int _index);
+      private slots: void OnLinkFromDialog();
       private slots: void OnPoseFromDialog(const QString &_name,
           const ignition::math::Pose3d &_pose);
       private slots: void OnParentFrom3D(const std::string &_linkName);
@@ -66,8 +66,13 @@ namespace gazebo
       private slots: void OnSwap();
       private: void OnParentImpl(const QString &_linkName);
       private: void OnChildImpl(const QString &_linkName);
-      Q_SIGNALS: void EmitLinkRemoved(const std::string &_linkId);
-      private slots: void OnLinkRemovedSlot(const std::string &_linkId);
+
+      /// \brief Qt callback when an enum value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value in string.
+      private slots: void OnEnumChanged(const QString &_name,
+          const QString &_value);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
@@ -75,16 +80,16 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnCreate();
 
-      /// \brief Add a link to the list.
-      /// \param[in] _linkName Scoped link name.
-      private: void OnLinkInserted(const std::string &_linkName);
-
-      /// \brief Remove a link from the list.
-      /// \param[in] _linkId Unique link identifying name.
-      private: void OnLinkRemoved(const std::string &_linkName);
+      private: void CheckLinksValid();
 
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;
+
+      /// \brief Widget for the parent link.
+      private: ConfigChildWidget *parentLinkWidget;
+
+      /// \brief Widget for the child link.
+      private: ConfigChildWidget *childLinkWidget;
 
       /// \brief Config widget for configuring joint properties.
       private: JointMaker *jointMaker;
@@ -95,12 +100,14 @@ namespace gazebo
       private: std::vector<event::ConnectionPtr> connections;
 
 
-      private: QComboBox *parentComboBox;
-      private: QComboBox *childComboBox;
       private: QPushButton *createButton;
       private: QToolButton *swapButton;
 
-      private: std::map<std::string, std::string> linkList;
+      /// \brief Style sheet for link widgets when there's a warning.
+      private: QString warningStyleSheet;
+
+      /// \brief Normal style sheet for link widgets.
+      private: QString normalStyleSheet;
     };
     /// \}
   }

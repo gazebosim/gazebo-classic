@@ -1605,30 +1605,60 @@ void JointMaker::OnJointTypeChosenDialog(JointType _type)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointParentChosenDialog(const std::string &_linkName)
+void JointMaker::OnJointParentChosenDialog(const std::string &_leafName)
 {
+  // Get scoped name
+  std::string linkName;
+  for (auto link : this->linkList)
+  {
+    if (link.second == _leafName)
+    {
+      linkName = link.first;
+      break;
+    }
+  }
+
+  if (linkName.empty())
+    return;
+
+  // Get visual
   rendering::ScenePtr scene = rendering::get_scene();
 
   if (!scene)
     return;
 
-  rendering::VisualPtr vis = scene->GetVisual(_linkName);
+  rendering::VisualPtr vis = scene->GetVisual(linkName);
 
   if (vis)
     this->ParentLinkChosen(vis);
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointChildChosenDialog(const std::string &_linkName)
+void JointMaker::OnJointChildChosenDialog(const std::string &_leafName)
 {
+  // Get scoped name
+  std::string linkName;
+  for (auto link : this->linkList)
+  {
+    if (link.second == _leafName)
+    {
+      linkName = link.first;
+      break;
+    }
+  }
+
+  if (linkName.empty())
+    return;
+
+  // Get visual
   rendering::ScenePtr scene = rendering::get_scene();
 
   if (!scene)
     return;
 
-  rendering::VisualPtr vis = scene->GetVisual(_linkName);
+  rendering::VisualPtr vis = scene->GetVisual(linkName);
 
-  if (vis && vis != this->parentLinkVis)
+  if (vis)
     this->ChildLinkChosen(vis);
 }
 
