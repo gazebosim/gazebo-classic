@@ -42,6 +42,9 @@ namespace gazebo
       /// \brief Destructor
       public: ~InertiaVisual();
 
+      // Inherited from parent class
+      public: virtual void Fini();
+
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
@@ -56,6 +59,10 @@ namespace gazebo
       /// \param[in] _scale Scale factor for the box visual.
       private: void Load(const math::Pose &_pose,
           const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
+
+      /// \brief Destroy all the movable objects attached to a scene node.
+      /// \param[in] _sceneNode Pointer to the scene node to process.
+      private: void DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode);
     };
     /// \}
   }

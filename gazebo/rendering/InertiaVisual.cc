@@ -41,10 +41,24 @@ InertiaVisual::~InertiaVisual()
 {
   InertiaVisualPrivate *dPtr =
       reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
-  dPtr->boxNode->detachAllObjects();
-  dPtr->boxNode->removeAndDestroyAllChildren();
-  dPtr->scene->GetManager()->destroyEntity(
-      this->GetName()+"__BOX__");
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+}
+
+/////////////////////////////////////////////////
+void InertiaVisual::Fini()
+{
+  InertiaVisualPrivate *dPtr =
+      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+  Visual::Fini();
 }
 
 /////////////////////////////////////////////////
@@ -152,4 +166,34 @@ void InertiaVisual::Load(const math::Pose &_pose,
                                                  _pose.rot.y, _pose.rot.z));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+}
+
+/////////////////////////////////////////////////
+void InertiaVisual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
+{
+  if (!_sceneNode)
+    return;
+
+  // Destroy all the attached objects
+  Ogre::SceneNode::ObjectIterator itObject =
+    _sceneNode->getAttachedObjectIterator();
+
+  while (itObject.hasMoreElements())
+  {
+    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
+    if (ent->getMovableType() != DynamicLines::GetMovableType())
+      this->dataPtr->scene->GetManager()->destroyEntity(ent);
+    else
+      delete ent;
+  }
+
+  // Recurse to child SceneNodes
+  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+
+  while (itChild.hasMoreElements())
+  {
+    Ogre::SceneNode* pChildNode =
+        static_cast<Ogre::SceneNode*>(itChild.getNext());
+    this->DestroyAllAttachedMovableObjects(pChildNode);
+  }
 }

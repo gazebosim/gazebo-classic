@@ -185,6 +185,7 @@ Visual::~Visual()
 
   if (this->dataPtr->sceneNode != NULL)
   {
+    // seems we never get into this block because Fini() runs first
     this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
     this->dataPtr->sceneNode->removeAndDestroyAllChildren();
     this->dataPtr->scene->GetManager()->destroySceneNode(
