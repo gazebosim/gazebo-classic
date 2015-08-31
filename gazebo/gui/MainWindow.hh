@@ -41,6 +41,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class InsertModelWidget;
     class RenderWidget;
     class ToolsWidget;
     class ModelListWidget;
@@ -289,6 +290,10 @@ namespace gazebo
       private: void CreateDisabledIcon(const std::string &_pixmap,
                    QAction *_act);
 
+      /// \brief Callback when window mode has changed.
+      /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
+      private: void OnWindowMode(const std::string &_mode);
+
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
@@ -370,6 +375,9 @@ namespace gazebo
 
       /// \brief Hotkey chart dialog.
       private: gui::HotkeyDialog *hotkeyDialog;
+
+      /// \brief Tab to insert models.
+      private: InsertModelWidget *insertModel;
     };
   }
 }
