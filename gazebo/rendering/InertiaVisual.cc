@@ -37,6 +37,31 @@ InertiaVisual::InertiaVisual(const std::string &_name, VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+InertiaVisual::~InertiaVisual()
+{
+  InertiaVisualPrivate *dPtr =
+      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+}
+
+/////////////////////////////////////////////////
+void InertiaVisual::Fini()
+{
+  InertiaVisualPrivate *dPtr =
+      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+  Visual::Fini();
+}
+
+/////////////////////////////////////////////////
 void InertiaVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
@@ -127,14 +152,12 @@ void InertiaVisual::Load(const math::Pose &_pose,
 
   Ogre::MovableObject *boxObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__BOX__"
-          + std::to_string(VisualPrivate::visualIdCount), "unit_box"));
+          this->GetName()+"__BOX__", "unit_box"));
   boxObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   ((Ogre::Entity*)boxObj)->setMaterialName("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
   dPtr->boxNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_BOX_"
-      + std::to_string(VisualPrivate::visualIdCount));
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_BOX_");
 
   dPtr->boxNode->attachObject(boxObj);
   dPtr->boxNode->setScale(_scale.x, _scale.y, _scale.z);
@@ -143,4 +166,34 @@ void InertiaVisual::Load(const math::Pose &_pose,
                                                  _pose.rot.y, _pose.rot.z));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+}
+
+/////////////////////////////////////////////////
+void InertiaVisual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
+{
+  if (!_sceneNode)
+    return;
+
+  // Destroy all the attached objects
+  Ogre::SceneNode::ObjectIterator itObject =
+    _sceneNode->getAttachedObjectIterator();
+
+  while (itObject.hasMoreElements())
+  {
+    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
+    if (ent->getMovableType() != DynamicLines::GetMovableType())
+      this->dataPtr->scene->GetManager()->destroyEntity(ent);
+    else
+      delete ent;
+  }
+
+  // Recurse to child SceneNodes
+  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+
+  while (itChild.hasMoreElements())
+  {
+    Ogre::SceneNode* pChildNode =
+        static_cast<Ogre::SceneNode*>(itChild.getNext());
+    this->DestroyAllAttachedMovableObjects(pChildNode);
+  }
 }

@@ -40,6 +40,31 @@ COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+COMVisual::~COMVisual()
+{
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+}
+
+/////////////////////////////////////////////////
+void COMVisual::Fini()
+{
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+  Visual::Fini();
+}
+
+/////////////////////////////////////////////////
 void COMVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
@@ -122,14 +147,12 @@ void COMVisual::Load()
 
   Ogre::MovableObject *sphereObj =
     (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__SPHERE__"
-          + std::to_string(VisualPrivate::visualIdCount), "unit_sphere"));
+          this->GetName()+"__SPHERE__", "unit_sphere"));
   sphereObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   sphereObj->setCastShadows(false);
 
   dPtr->sphereNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE_"
-      + std::to_string(VisualPrivate::visualIdCount));
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE_");
 
   dPtr->sphereNode->attachObject(sphereObj);
   dPtr->sphereNode->setScale(sphereRadius*2, sphereRadius*2, sphereRadius*2);
@@ -175,4 +198,34 @@ math::Pose COMVisual::GetInertiaPose() const
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
   return dPtr->inertiaPose;
+}
+
+/////////////////////////////////////////////////
+void COMVisual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
+{
+  if (!_sceneNode)
+    return;
+
+  // Destroy all the attached objects
+  Ogre::SceneNode::ObjectIterator itObject =
+    _sceneNode->getAttachedObjectIterator();
+
+  while (itObject.hasMoreElements())
+  {
+    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
+    if (ent->getMovableType() != DynamicLines::GetMovableType())
+      this->dataPtr->scene->GetManager()->destroyEntity(ent);
+    else
+      delete ent;
+  }
+
+  // Recurse to child SceneNodes
+  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+
+  while (itChild.hasMoreElements())
+  {
+    Ogre::SceneNode* pChildNode =
+        static_cast<Ogre::SceneNode*>(itChild.getNext());
+    this->DestroyAllAttachedMovableObjects(pChildNode);
+  }
 }

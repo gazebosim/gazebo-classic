@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \class BuildingModelManip BuildingModelManip.hh
     /// \brief Manipulate a 3D visual associated to a 2D editor item.
-    class GZ_GUI_BUILDING_VISIBLE BuildingModelManip : public QObject
+    class GZ_GUI_VISIBLE BuildingModelManip : public QObject
     {
       Q_OBJECT
 
