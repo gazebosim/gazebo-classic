@@ -747,8 +747,6 @@ void World::Step(unsigned int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
-  //std::cout << this->GetIterations() << std::endl;
-  //std::cout << this->GetSimTime() << std::endl;
   DIAG_TIMER_START("World::Update");
 
   if (this->dataPtr->needsReset)

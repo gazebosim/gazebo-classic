@@ -41,8 +41,8 @@ using LogFeatures_M = std::map<std::string, FeaturesT>;
 // Contains the expected values for each log file under test.
 LogFeatures_M logs =
 {
-  {"state.log",  FeaturesT{1u, 3290u, 28.457, 31.745}},
-  {"state2.log", FeaturesT{23700u, 26168u, 23.700, 26.168}}
+  {"state.log",  FeaturesT {1u, 3290u, 28.457, 31.745}},
+  {"state2.log", FeaturesT {23700u, 26168u, 23.700, 26.168}}
 };
 
 /// \brief Helper class that initializes each test.
