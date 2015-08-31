@@ -61,7 +61,6 @@ typedef struct dSurfaceParameters {
   /* only defined if the corresponding flag is set in mode */
   dReal mu2, mu3;
   dReal elastic_modulus;
-  dReal elastic_modulus_reference_length;
   dReal bounce;
   dReal bounce_vel;
   dReal soft_erp;

@@ -1173,10 +1173,6 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   double E2 = surf2->FrictionPyramid()->ElasticModulus();
   contact.surface.elastic_modulus = 1.0 /
     ((1.0 - nu1*nu1)/E1 + (1.0 - nu2*nu2)/E2);
-  // Not sure if this is correct / useful.
-  double L1 = surf1->FrictionPyramid()->ElasticModulusReferenceLength();
-  double L2 = surf2->FrictionPyramid()->ElasticModulusReferenceLength();
-  contact.surface.elastic_modulus_reference_length = 0.5 * (L1 + L2);
   // Turn on Contact Elastic Modulus model if elastic modulus > 0
   if (contact.surface.elastic_modulus > 0.0)
     contact.surface.mode |= dContactEM;

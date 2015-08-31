@@ -183,14 +183,6 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         ///   equation 5.23 form Contact Mechanics and Friction by Popov
         dReal stiffness = 4.0 / 3.0 * e_star * sqrt(patch_radius);
 
-        /* 
-        // Alternatively, use thin sheets approximation:
-        //   equation 2.12 form Contact Mechanics and Friction by Popov
-        dReal area = M_PI * patch_radius * patch_radius;
-        dReal stiffness = e_star * area /
-                          contact.surface.elastic_modulus_reference_length;
-        */
-
         // convert stiffness to erp (known cfm, h, kp)
         // get kd using:
         //   cfm = 1 / ( dt * kp + kd )

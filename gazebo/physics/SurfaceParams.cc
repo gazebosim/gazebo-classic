@@ -29,7 +29,6 @@ FrictionPyramid::FrictionPyramid()
   , usePatchRadius(1)
   , poissonsRatio(0.3)
   , elasticModulus(0)
-  , elasticModulusReferenceLength(1.0)
 {
   this->mu[0] = 1.0;
   this->mu[1] = 1.0;
@@ -167,25 +166,6 @@ void FrictionPyramid::SetElasticModulus(double _modulus)
   else
   {
     this->elasticModulus = _modulus;
-  }
-}
-
-//////////////////////////////////////////////////
-double FrictionPyramid::ElasticModulusReferenceLength() const
-{
-  return this->elasticModulusReferenceLength;
-}
-
-//////////////////////////////////////////////////
-void FrictionPyramid::SetElasticModulusReferenceLength(double _modulusRefLen)
-{
-  if (_modulusRefLen < 0)
-  {
-    this->elasticModulusReferenceLength = 0;
-  }
-  else
-  {
-    this->elasticModulusReferenceLength = _modulusRefLen;
   }
 }
 
