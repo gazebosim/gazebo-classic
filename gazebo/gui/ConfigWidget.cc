@@ -2743,14 +2743,14 @@ bool ConfigWidget::ClearEnumWidget(const std::string &_name)
 
   if (enumWidget->widgets.size() != 1u)
   {
-    gzerr << "Error clearing Enum Config widget" << std::endl;
+    gzerr << "Enum config widget has wrong number of widgets." << std::endl;
     return false;
   }
 
   QComboBox *valueComboBox = qobject_cast<QComboBox *>(enumWidget->widgets[0]);
   if (!valueComboBox)
   {
-    gzerr << "Error clearing Enum Config widget" << std::endl;
+    gzerr << "Enum config widget doesn't have a QComboBox." << std::endl;
     return false;
   }
 
@@ -2775,14 +2775,14 @@ bool ConfigWidget::AddItemEnumWidget(const std::string &_name,
 
   if (enumWidget->widgets.size() != 1u)
   {
-    gzerr << "Error adding item to Enum Config widget" << std::endl;
+    gzerr << "Enum config widget has wrong number of widgets." << std::endl;
     return false;
   }
 
   QComboBox *valueComboBox = qobject_cast<QComboBox *>(enumWidget->widgets[0]);
   if (!valueComboBox)
   {
-    gzerr << "Error adding item to Enum Config widget" << std::endl;
+    gzerr << "Enum config widget doesn't have a QComboBox." << std::endl;
     return false;
   }
 
@@ -2808,25 +2808,22 @@ bool ConfigWidget::RemoveItemEnumWidget(const std::string &_name,
 
   if (enumWidget->widgets.size() != 1u)
   {
-    gzerr << "Error removing item from Enum Config widget" << std::endl;
+    gzerr << "Enum config widget has wrong number of widgets." << std::endl;
     return false;
   }
 
   QComboBox *valueComboBox = qobject_cast<QComboBox *>(enumWidget->widgets[0]);
   if (!valueComboBox)
   {
-    gzerr << "Error removing item from Enum Config widget" << std::endl;
+    gzerr << "Enum config widget doesn't have a QComboBox." << std::endl;
     return false;
   }
 
-  // Remove item
+  // Remove item if exists, otherwise return false
   int index = valueComboBox->findText(QString::fromStdString(
       _itemText));
   if (index < 0)
-  {
-    gzerr << "Error removing item from Enum Config widget" << std::endl;
     return false;
-  }
 
   valueComboBox->blockSignals(true);
   valueComboBox->removeItem(index);
