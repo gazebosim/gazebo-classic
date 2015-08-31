@@ -34,6 +34,34 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
+  // Style sheets
+  this->normalStyleSheet =
+        "QWidget\
+        {\
+          background-color: " + ConfigWidget::level0BgColor + ";\
+          color: #4c4c4c;\
+        }\
+        QLabel\
+        {\
+          color: #d0d0d0;\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::level0WidgetColor +
+        "}";
+
+  this->warningStyleSheet =
+        "QWidget\
+        {\
+          background-color: " + ConfigWidget::level0BgColor + ";\
+          color: " + ConfigWidget::redColor + ";\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::level0WidgetColor +
+        "}";
+
+  // ConfigWidget
   this->configWidget = new ConfigWidget;
   msgs::Joint jointMsg;
   configWidget->Load(&jointMsg);
@@ -109,29 +137,13 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Parent
   std::vector<std::string> links;
   this->parentLinkWidget = configWidget->CreateEnumWidget("parent", links, 0);
-  this->parentLinkWidget->setStyleSheet(
-      "QWidget\
-      {\
-        background-color: " + ConfigWidget::level0BgColor +
-      "}\
-      QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-      {\
-        background-color: " + ConfigWidget::level0WidgetColor +
-      "}");
+  this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
   this->configWidget->AddConfigChildWidget("parentCombo",
       this->parentLinkWidget);
 
   // Child
   this->childLinkWidget = configWidget->CreateEnumWidget("child", links, 0);
-  this->childLinkWidget->setStyleSheet(
-      "QWidget\
-      {\
-        background-color: " + ConfigWidget::level0BgColor +
-      "}\
-      QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-      {\
-        background-color: " + ConfigWidget::level0WidgetColor +
-      "}");
+  this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
   this->configWidget->AddConfigChildWidget("childCombo", this->childLinkWidget);
 
   // Swap button
@@ -204,33 +216,6 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   this->setMinimumHeight(300);
 
   this->setLayout(mainLayout);
-
-  // Style sheets
-  this->normalStyleSheet =
-        "QWidget\
-        {\
-          background-color: " + ConfigWidget::level0BgColor + ";\
-          color: #4c4c4c;\
-        }\
-        QLabel\
-        {\
-          color: #d0d0d0;\
-        }\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-        {\
-          background-color: " + ConfigWidget::level0WidgetColor +
-        "}";
-
-  this->warningStyleSheet =
-        "QWidget\
-        {\
-          background-color: " + ConfigWidget::level0BgColor + ";\
-          color: " + ConfigWidget::redColor + ";\
-        }\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-        {\
-          background-color: " + ConfigWidget::level0WidgetColor +
-        "}";
 
   // Qt signal / slot connections
   connect(this->jointMaker, SIGNAL(EmitLinkRemoved(std::string)), this,
