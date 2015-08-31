@@ -18,12 +18,17 @@
 #ifndef _GAZEBO_CONFIGWIDGET_TEST_HH_
 #define _GAZEBO_CONFIGWIDGET_TEST_HH_
 
+#include <string>
+
 #include "gazebo/gui/QTestFixture.hh"
 
 /// \brief A test class for the config widget.
 class ConfigWidget_TEST : public QTestFixture
 {
   Q_OBJECT
+
+  /// \brief Constructor.
+  public: ConfigWidget_TEST() = default;
 
   /// \brief Test creating config widgets from empty messages.
   private slots: void EmptyMsgWidget();
