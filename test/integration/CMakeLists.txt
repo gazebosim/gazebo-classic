@@ -88,6 +88,7 @@ set(tests
   world.cc
   world_clone.cc
   world_entity_below_point.cc
+  world_playback.cc
   world_population.cc
   worlds_installed.cc
   )

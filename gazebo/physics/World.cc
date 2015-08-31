@@ -747,6 +747,8 @@ void World::Step(unsigned int _steps)
 //////////////////////////////////////////////////
 void World::Update()
 {
+  //std::cout << this->GetIterations() << std::endl;
+  //std::cout << this->GetSimTime() << std::endl;
   DIAG_TIMER_START("World::Update");
 
   if (this->dataPtr->needsReset)
@@ -1294,13 +1296,17 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   {
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = 1;
+    if (!util::LogPlay::Instance()->HasIterations())
+      this->dataPtr->iterations = 0;
   }
 
   if (_data->has_forward() && _data->forward())
   {
     this->dataPtr->targetSimTime = util::LogPlay::Instance()->GetLogEndTime();
     if (this->GetSimTime() > this->dataPtr->targetSimTime)
+    {
       util::LogPlay::Instance()->Rewind();
+    }
     this->dataPtr->seekPending = true;
   }
 }
