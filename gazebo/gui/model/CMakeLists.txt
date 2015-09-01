@@ -13,6 +13,7 @@ set (sources_local
   model/ModelEditor.cc
   model/ModelEditorEvents.cc
   model/ModelEditorPalette.cc
+  model/ModelPluginInspector.cc
   model/VisualConfig.cc
 )
 
@@ -28,6 +29,7 @@ set (qt_headers_local
   model/ModelData.hh
   model/ModelEditor.hh
   model/ModelEditorPalette.hh
+  model/ModelPluginInspector.hh
   model/VisualConfig.hh
 )
 
@@ -45,6 +47,7 @@ if (ENABLE_SCREEN_TESTS)
     ModelData_TEST.cc
     ModelEditor_TEST.cc
     ModelEditorPalette_TEST.cc
+    ModelPluginInspector_TEST.cc
   )
 endif()
 

@@ -28,6 +28,7 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/gui/model/LinkInspector.hh"
+#include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/VisualConfig.hh"
 #include "gazebo/gui/model/LinkConfig.hh"
 #include "gazebo/gui/model/CollisionConfig.hh"
@@ -1076,3 +1077,35 @@ void LinkData::Update()
     }
   }
 }
+
+/////////////////////////////////////////////////
+ModelPluginData::ModelPluginData()
+{
+  // Initialize SDF
+  this->modelPluginSDF.reset(new sdf::Element);
+  sdf::initFile("plugin.sdf", this->modelPluginSDF);
+
+  // Inspector
+  this->inspector = new ModelPluginInspector();
+}
+
+/////////////////////////////////////////////////
+ModelPluginData::~ModelPluginData()
+{
+  delete this->inspector;
+}
+
+/////////////////////////////////////////////////
+void ModelPluginData::Load(sdf::ElementPtr _pluginElem)
+{
+  this->modelPluginSDF = _pluginElem;
+
+  // Convert SDF to msg
+  msgs::Plugin pluginMsg = msgs::PluginFromSDF(_pluginElem);
+  msgs::PluginPtr pluginPtr(new msgs::Plugin);
+  pluginPtr->CopyFrom(pluginMsg);
+
+  // Update inspector
+  this->inspector->Update(pluginPtr);
+}
+
