@@ -366,9 +366,10 @@ namespace gazebo
       /// \brief Create a widget for configuring a string value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
+      /// \param[in] _type Type of string widget, such as "line" or "plain".
       /// \return The newly created widget.
       public: ConfigChildWidget *CreateStringWidget(const std::string &_key,
-          const int _level = 0);
+          const int _level = 0, const std::string &_type = "line");
 
       /// \brief Create a widget for configuring a bool value.
       /// \param[in] _key A key that is used as a label for the widget.

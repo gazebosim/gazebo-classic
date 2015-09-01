@@ -155,6 +155,10 @@ namespace gazebo
           const std::string &_jointName, const std::string &_parentName,
           const std::string &_childName);
 
+      /// \brief Add a model plugin to the tree.
+      /// \param[in] _modelPluginName Model plugin name.
+      private: void OnModelPluginInserted(const std::string &_modelPluginName);
+
       /// \brief Remove a link from the tree.
       /// \param[in] _linkId Unique link identifying name.
       private: void OnLinkRemoved(const std::string &_linkId);
@@ -218,6 +222,9 @@ namespace gazebo
 
       /// \brief Parent item for all joints.
       private: QTreeWidgetItem *jointsItem;
+
+      /// \brief Parent item for all model plugins.
+      private: QTreeWidgetItem *modelPluginsItem;
 
       /// \brief Mutex to protect updates.
       private: std::recursive_mutex updateMutex;
