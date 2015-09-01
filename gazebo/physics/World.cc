@@ -1302,9 +1302,7 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   {
     this->dataPtr->targetSimTime = util::LogPlay::Instance()->GetLogEndTime();
     if (this->GetSimTime() > this->dataPtr->targetSimTime)
-    {
       util::LogPlay::Instance()->Rewind();
-    }
     this->dataPtr->seekPending = true;
   }
 }
