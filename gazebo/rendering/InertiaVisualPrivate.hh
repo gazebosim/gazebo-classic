@@ -36,9 +36,6 @@ namespace gazebo
     {
       /// \brief Lines that make the cross marking the center of mass.
       public: DynamicLines *crossLines;
-
-      /// \brief Box with uniform density and equivalent inertia.
-      public: Ogre::SceneNode *boxNode;
     };
   }
 }

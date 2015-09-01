@@ -169,10 +169,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
 //////////////////////////////////////////////////
 Visual::~Visual()
 {
-  RTShaderSystem::Instance()->DetachEntity(this);
-
-  if (this->dataPtr->preRenderConnection)
-    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
+  this->Fini();
 
   delete this->dataPtr->boundingBox;
 
@@ -182,22 +179,12 @@ Visual::~Visual()
     delete *iter;
     */
   this->dataPtr->lines.clear();
-
-  if (this->dataPtr->sceneNode != NULL)
-  {
-    // seems we never get into this block because Fini() runs first
-    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
-    this->dataPtr->sceneNode->removeAndDestroyAllChildren();
-    this->dataPtr->scene->GetManager()->destroySceneNode(
-        this->dataPtr->sceneNode->getName());
-    this->dataPtr->sceneNode = NULL;
-  }
-
   this->dataPtr->scene.reset();
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
   this->dataPtr->parent.reset();
   this->dataPtr->children.clear();
+  this->dataPtr->plugins.clear();
 
   delete this->dataPtr;
   this->dataPtr = 0;
@@ -206,7 +193,15 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
-  this->dataPtr->plugins.clear();
+  if (!this->dataPtr->scene)
+    return;
+
+  while (!this->dataPtr->children.empty())
+  {
+    VisualPtr childVis = this->dataPtr->children.front();
+    this->DetachVisual(childVis);
+    childVis->Fini();
+  }
 
   // Detach from the parent
   if (this->dataPtr->parent)
@@ -214,7 +209,9 @@ void Visual::Fini()
 
   if (this->dataPtr->sceneNode)
   {
-    this->dataPtr->sceneNode->detachAllObjects();
+    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
+    // if (this->dataPtr->children.empty())
+       // this->dataPtr->sceneNode->removeAndDestroyAllChildren();
     this->dataPtr->scene->GetManager()->destroySceneNode(
         this->dataPtr->sceneNode);
     this->dataPtr->sceneNode = NULL;
@@ -227,6 +224,10 @@ void Visual::Fini()
   }
 
   RTShaderSystem::Instance()->DetachEntity(this);
+
+  if (this->dataPtr->scene->GetVisual(this->dataPtr->id))
+    this->dataPtr->scene->RemoveVisual(this->dataPtr->id);
+
   this->dataPtr->scene.reset();
 }
 
@@ -266,17 +267,25 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
     if (ent->getMovableType() != DynamicLines::GetMovableType())
       this->dataPtr->scene->GetManager()->destroyEntity(ent);
     else
+      // delete dynamic line
       delete ent;
   }
 
-  // Recurse to child SceneNodes
-  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+  this->dataPtr->lines.clear();
 
-  while (itChild.hasMoreElements())
+  // Recurse to child SceneNodes
+  // only recurse if there are no child visuals otherwise let them clean up
+  // after themselves in Fini()
+  if (this->dataPtr->children.empty())
   {
-    Ogre::SceneNode* pChildNode =
-        static_cast<Ogre::SceneNode*>(itChild.getNext());
-    this->DestroyAllAttachedMovableObjects(pChildNode);
+    Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+
+    while (itChild.hasMoreElements())
+    {
+      Ogre::SceneNode* pChildNode =
+          static_cast<Ogre::SceneNode*>(itChild.getNext());
+      this->DestroyAllAttachedMovableObjects(pChildNode);
+    }
   }
 }
 

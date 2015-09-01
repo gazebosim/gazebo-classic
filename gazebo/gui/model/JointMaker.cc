@@ -712,7 +712,7 @@ bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
       {
         this->RemoveJoint(jointVis->GetName());
       }
-      this->DeselectAll();
+      this->selectedJoints.clear();
       return true;
     }
   }

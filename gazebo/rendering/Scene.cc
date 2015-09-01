@@ -708,6 +708,7 @@ VisualPtr Scene::GetVisual(uint32_t _id) const
   Visual_M::const_iterator iter = this->dataPtr->visuals.find(_id);
   if (iter != this->dataPtr->visuals.end())
     return iter->second;
+
   return VisualPtr();
 }
 
@@ -2303,10 +2304,10 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       VisualPtr visPtr;
       try
       {
-        Visual_M::iterator iter;
-        iter = this->dataPtr->visuals.find(
+        auto iter = this->dataPtr->visuals.find(
             boost::lexical_cast<uint32_t>(_msg->data()));
-        visPtr = iter->second;
+        if (iter != this->dataPtr->visuals.end())
+          visPtr = iter->second;
       } catch(...)
       {
         visPtr = this->GetVisual(_msg->data());
@@ -2952,10 +2953,8 @@ void Scene::RemoveVisual(uint32_t _id)
         ++piter;
     }
 
-    this->RemoveVisualizations(vis);
-
-    vis->Fini();
     this->dataPtr->visuals.erase(iter);
+    vis->Fini();
     if (this->dataPtr->selectedVis && this->dataPtr->selectedVis->GetId() ==
         vis->GetId())
       this->dataPtr->selectedVis.reset();

@@ -40,10 +40,7 @@ namespace gazebo
       public: InertiaVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
-      public: ~InertiaVisual();
-
-      // Inherited from parent class
-      public: virtual void Fini();
+      public: virtual ~InertiaVisual();
 
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
