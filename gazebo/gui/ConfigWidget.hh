@@ -447,29 +447,12 @@ namespace gazebo
       /// \return The number of child widgets.
       public: unsigned int ConfigChildWidgetCount() const;
 
-      /// \brief Color used for the background of level 0 widgets.
-      public: static const QString level0BgColor;
+      /// \brief List of colors used for the background of widgets according to
+      /// their level.
+      public: static const std::vector<QString> bgColors;
 
-      /// \brief Color used for the background of level 1 widgets.
-      public: static const QString level1BgColor;
-
-      /// \brief Color used for the background of level 2 widgets.
-      public: static const QString level2BgColor;
-
-      /// \brief Color used for the background of level 3 widgets.
-      public: static const QString level3BgColor;
-
-      /// \brief Color used for the widget areas of of level 0 widgets.
-      public: static const QString level0WidgetColor;
-
-      /// \brief Color used for the widget areas of of level 1 widgets.
-      public: static const QString level1WidgetColor;
-
-      /// \brief Color used for the widget areas of of level 2 widgets.
-      public: static const QString level2WidgetColor;
-
-      /// \brief Color used for the widget areas of of level 3 widgets.
-      public: static const QString level3WidgetColor;
+      /// \brief List of colors used for widget areas according to their level.
+      public: static const std::vector<QString> widgetColors;
 
       /// \brief Red color used for "red" or "x" fields.
       public: static const QString redColor;

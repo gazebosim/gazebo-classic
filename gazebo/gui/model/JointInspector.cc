@@ -38,7 +38,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   this->normalStyleSheet =
         "QWidget\
         {\
-          background-color: " + ConfigWidget::level0BgColor + ";\
+          background-color: " + ConfigWidget::bgColors[0] + ";\
           color: #4c4c4c;\
         }\
         QLabel\
@@ -47,18 +47,18 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
         }\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
         {\
-          background-color: " + ConfigWidget::level0WidgetColor +
+          background-color: " + ConfigWidget::widgetColors[0] +
         "}";
 
   this->warningStyleSheet =
         "QWidget\
         {\
-          background-color: " + ConfigWidget::level0BgColor + ";\
+          background-color: " + ConfigWidget::bgColors[0] + ";\
           color: " + ConfigWidget::redColor + ";\
         }\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
         {\
-          background-color: " + ConfigWidget::level0WidgetColor +
+          background-color: " + ConfigWidget::widgetColors[0] +
         "}";
 
   // ConfigWidget
@@ -153,7 +153,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   swapButton->setStyleSheet(
       "QToolButton\
       {\
-        background-color: " + ConfigWidget::level0BgColor +
+        background-color: " + ConfigWidget::bgColors[0] +
       "}");
   connect(swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
 
