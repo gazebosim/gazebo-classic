@@ -555,7 +555,7 @@ static void* ComputeRows(void *p)
         {
           if (index - constraint_index >= 3)
           {
-            // torsinal friction should have been added as the third row from
+            // torsional friction should have been added as the third row from
             // contact normal constraint
             // this_is_torsional_friction
             hi_act = dFabs (hi[index] * lambda[constraint_index]);
