@@ -163,7 +163,7 @@ void MultiCameraSensor::Init()
     }
 
     // Increment the noise index -- one for each camera in the setup
-    noiseIndex++;
+    ++noiseIndex;
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);
