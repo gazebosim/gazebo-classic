@@ -1544,7 +1544,9 @@ physics::ModelPtr ServerFixture::GetModel(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void ServerFixture::RemoveModel(const std::string &_name)
+void ServerFixture::RemoveModel(const std::string &_name,
+    unsigned int _sleepEach,
+    int _retries)
 {
   msgs::Request *msg = msgs::CreateRequest("entity_delete", _name);
   this->requestPub->Publish(*msg);
@@ -1553,12 +1555,12 @@ void ServerFixture::RemoveModel(const std::string &_name)
   physics::WorldPtr world = physics::get_world();
 
   int count = 0;
-  while (world->GetModel(_name) != NULL && ++count < 10)
-  {
-    common::Time::MSleep(100);
-  }
+  // Wait for the model to be removed.
+  for (; world->GetModel(_name) != NULL && count < _retries; ++count)
+    common::Time::MSleep(_sleepEach);
+
   EXPECT_TRUE(world->GetModel(_name) == NULL);
-  EXPECT_LT(count, 10);
+  EXPECT_LT(count, _retries);
 
   boost::mutex::scoped_lock lock(this->receiveMutex);
   this->poses.erase(_name);

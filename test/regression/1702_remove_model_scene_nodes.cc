@@ -86,12 +86,8 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   std::string name = box->GetName();
   EXPECT_EQ(name, "a_fancy_box");
 
-  for (auto model : world->GetModels())
-    std::cout << "MODEL1[" << model->GetName() << "]\n";
-
   // delete that model
   ServerFixture::RemoveModel(name);
-
 
   int count = 0;
   while (world->GetModel(name) != NULL && ++count < 10)
@@ -101,43 +97,17 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   EXPECT_TRUE(world->GetModel(name) == NULL);
   EXPECT_LT(count, 10);
 
-  for (auto model : world->GetModels())
-    std::cout << "MODEL2[" << model->GetName() << "]\n";
-
-  /*
-
-  std::cout << "MSLEEP\n";
-  common::Time::Sleep(common::Time(5, 0));
-*/
   // spawn the exact same model
   // if this succeeds, we're OK.
-  std::cout << "Spawn model[" << model.name() << "]\n";
   physics::ModelPtr newBox = ServerFixture::SpawnModel(model);
-  /*count = 0;
-  while (world->GetModel(name) == NULL && ++count < 1000)
-  {
-    common::Time::MSleep(1);
-    world->Step(1);
-  }
-  */
-
-  for (auto model : world->GetModels())
-    std::cout << "MODEL[" << model->GetName() << "]\n";
-
-  if (newBox == NULL)
-    std::cout << "NULL box\n";
-
-  /*std::cout << "Name[" << name << "] NewBoxName[" << newBox->GetScopedName() << "]\n";
   EXPECT_TRUE(world->GetModel(name) != NULL);
-  */
 
   // important to sleep here, this is where the failure occurs
-  // usleep(2000000);
-  // world->Step(1000);
-  // gzerr << "spawned again"; getchar();
   // need to sleep long enough for rendering cycle to iterate at least once
   // or do something like look for visuals through a camera?
-  /*rendering::ScenePtr scene = rendering::get_scene();
+  common::Time::MSleep(1000);
+
+  rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
   rendering::CameraPtr camera = scene->GetCamera("camera");
   ASSERT_TRUE(camera != NULL);
@@ -154,7 +124,6 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 
   // box should be visible to the camera.
   EXPECT_TRUE(camera->IsVisible(visual));
-  */
 }
 
 TEST_P(Issue1702Test, SpawnDeleteSpawnAgain)

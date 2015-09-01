@@ -123,7 +123,12 @@ namespace gazebo
 
       /// \brief Generate shaders for an entity
       /// \param[in] _vis The visual to generate shaders for.
-      public: void GenerateShaders(Visual *_vis);
+      /// \sa GenerateShaders(const VisualPtr &_vis)
+      public: void GenerateShaders(Visual *_vis) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Generate shaders for an entity
+      /// \param[in] _vis The visual to generate shaders for.
+      public: void GenerateShaders(const VisualPtr &_vis);
 
       /// \brief Apply shadows to a scene.
       /// \param[in] _scene The scene to receive shadows.
