@@ -194,17 +194,22 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   generalLayout->addWidget(scrollArea);
 
   // Buttons
-  QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  QPushButton *applyButton = new QPushButton(tr("Apply"));
-  connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-  QPushButton *OKButton = new QPushButton(tr("OK"));
-  OKButton->setDefault(true);
-  connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
+
+  this->applyButton = new QPushButton(tr("Apply"));
+  this->applyButton->setEnabled(true);
+  connect(this->applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
+
+  this->okButton = new QPushButton(tr("OK"));
+  this->okButton->setEnabled(true);
+  this->okButton->setDefault(true);
+  connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
+
+  QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(applyButton);
-  buttonsLayout->addWidget(OKButton);
+  buttonsLayout->addWidget(this->applyButton);
+  buttonsLayout->addWidget(this->okButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
   // Main layout
@@ -252,7 +257,7 @@ msgs::Joint *JointInspector::GetData() const
 
   if (currentParent == currentChild)
   {
-    gzwarn << "Parent link equal to child link - not updating joint."
+    gzerr << "Parent link equal to child link - not updating joint."
         << std::endl;
     return NULL;
   }
@@ -334,6 +339,8 @@ void JointInspector::OnLinkChanged(const QString &/*_linkName*/)
     this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
     this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
   }
+  this->applyButton->setEnabled(currentParent != currentChild);
+  this->okButton->setEnabled(currentParent != currentChild);
 }
 
 /////////////////////////////////////////////////
@@ -397,6 +404,12 @@ void JointInspector::Open()
   this->configWidget->SetEnumWidgetValue("parentCombo", currentParent);
   this->configWidget->SetEnumWidgetValue("childCombo", currentChild);
   this->configWidget->blockSignals(false);
+
+  // Reset states
+  this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->applyButton->setEnabled(true);
+  this->okButton->setEnabled(true);
 
   this->move(QCursor::pos());
   this->show();

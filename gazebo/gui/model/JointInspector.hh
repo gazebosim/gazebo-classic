@@ -114,6 +114,12 @@ namespace gazebo
       /// \brief Widget for the child link.
       private: ConfigChildWidget *childLinkWidget;
 
+      /// \brief Apply button.
+      private: QPushButton *applyButton;
+
+      /// \brief Ok button.
+      private: QPushButton *okButton;
+
       /// \brief A list of gui editor events connected to this.
       private: std::vector<event::ConnectionPtr> connections;
 
