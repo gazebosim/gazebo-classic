@@ -49,6 +49,7 @@ namespace gazebo
   namespace gui
   {
     class LinkData;
+    class ModelPluginData;
     class SaveDialog;
     class JointMaker;
 
@@ -225,6 +226,10 @@ namespace gazebo
       /// \param[in] _type Type of link to be added
       public: void AddLink(LinkType _type);
 
+      /// \brief Add a model plugin to the model
+      /// \param[in] _pluginElem Pointer to plugin SDF element
+      public: void AddModelPlugin(const sdf::ElementPtr _pluginElem);
+
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
 
@@ -314,6 +319,10 @@ namespace gazebo
       /// \brief Open the link inspector.
       /// \param[in] _name Name of link.
       private: void OpenInspector(const std::string &_name);
+
+      /// \brief Open the model plugin inspector.
+      /// \param[in] _name Name of model plugin.
+      private: void OpenModelPluginInspector(const std::string &_name);
 
       // Documentation inherited
       private: virtual void CreateTheEntity();
@@ -422,8 +431,11 @@ namespace gazebo
       /// \brief Type of link being added.
       private: LinkType addLinkType;
 
-      /// \brief A map of model link names to and their visuals.
+      /// \brief A map of model link names to and their data.
       private: std::map<std::string, LinkData *> allLinks;
+
+      /// \brief A map of model plugin names to and their data.
+      private: std::map<std::string, ModelPluginData *> allModelPlugins;
 
       /// \brief Transport node
       private: transport::NodePtr node;
