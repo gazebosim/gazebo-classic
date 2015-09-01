@@ -259,11 +259,75 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
         gazebo::physics::get_world()->GetName(), false, true));
   }
 
-  ASSERT_NO_THROW(this->server->Run());
+  try
+  {
+    this->server->Run();
+  }
+  catch(common::Exception &_e)
+  {
+    gzerr << "Server::Run threw an exception\n";
+    gzerr << _e << std::endl;
+    FAIL();
+  }
+  catch(Ogre::Exception &_e)
+  {
+    gzerr << "Server::Run threw an OGRE exception\n";
+    gzerr << _e.getFile() << ":" << _e.getLine() << " "
+          << _e.what() << std::endl;
+    FAIL();
+  }
+  catch(...)
+  {
+    gzerr << "Server::Run threw an unknown exception\n";
+    FAIL();
+  }
 
-  ASSERT_NO_THROW(this->server->Fini());
+  try
+  {
+    this->server->Fini();
+  }
+  catch(common::Exception &_e)
+  {
+    gzerr << "Server::Fini threw an exception\n";
+    gzerr << _e << std::endl;
+    FAIL();
+  }
+  catch(Ogre::Exception &_e)
+  {
+    gzerr << "Server::Fini threw an OGRE exception\n";
+    gzerr << _e.getFile() << ":" << _e.getLine() << " "
+          << _e.what() << std::endl;
+    FAIL();
+  }
+  catch(...)
+  {
+    gzerr << "Server::Fini threw an unknown exception\n";
+    FAIL();
+  }
 
-  ASSERT_NO_THROW(delete this->server);
+  try
+  {
+    delete this->server;
+  }
+  catch(common::Exception &_e)
+  {
+    gzerr << "Server::~Server threw an exception\n";
+    gzerr << _e << std::endl;
+    FAIL();
+  }
+  catch(Ogre::Exception &_e)
+  {
+    gzerr << "Server::~Server threw an OGRE exception\n";
+    gzerr << _e.getFile() << ":" << _e.getLine() << " "
+          << _e.what() << std::endl;
+    FAIL();
+  }
+  catch(...)
+  {
+    gzerr << "Server::~Server threw an unknown exception\n";
+    FAIL();
+  }
+
   this->server = NULL;
 
   // Deallocate memory for the command line arguments allocated with strdup.
@@ -533,20 +597,7 @@ physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
     "<sdf version='" + std::string(SDF_VERSION) + "'>"
     + msgs::ModelToSDF(_msg)->ToString("")
     + "</sdf>");
-
-  common::Time wait(10, 0);
-  common::Time wallStart = common::Time::GetWallTime();
-  unsigned int waitCount = 0;
-  while (wait > (common::Time::GetWallTime() - wallStart) &&
-         !this->HasEntity(_msg.name()))
-  {
-    common::Time::MSleep(10);
-    if (++waitCount % 100 == 0)
-    {
-      gzwarn << "Waiting " << waitCount / 100 << " seconds for "
-             << "box to spawn." << std::endl;
-    }
-  }
+  this->WaitUntilEntitySpawn(_msg.name(), 1000, 10);
 
   return world->GetModel(_msg.name());
 }
@@ -1498,6 +1549,19 @@ void ServerFixture::RemoveModel(const std::string &_name)
   msgs::Request *msg = msgs::CreateRequest("entity_delete", _name);
   this->requestPub->Publish(*msg);
   delete msg;
+
+  physics::WorldPtr world = physics::get_world();
+
+  int count = 0;
+  while (world->GetModel(_name) != NULL && ++count < 10)
+  {
+    common::Time::MSleep(100);
+  }
+  EXPECT_TRUE(world->GetModel(_name) == NULL);
+  EXPECT_LT(count, 10);
+
+  boost::mutex::scoped_lock lock(this->receiveMutex);
+  this->poses.erase(_name);
 }
 
 /////////////////////////////////////////////////

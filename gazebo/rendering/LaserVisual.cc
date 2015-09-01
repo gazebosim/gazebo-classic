@@ -61,14 +61,9 @@ LaserVisual::~LaserVisual()
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
-  for (auto ray : dPtr->rayFans)
-    this->DeleteDynamicLine(ray);
-
-  for (auto ray : dPtr->noHitRayFans)
-    this->DeleteDynamicLine(ray);
-
-  for (auto ray : dPtr->rayLines)
-    this->DeleteDynamicLine(ray);
+  //
+  // Note: The main Visual class will remove the dynamic lines.
+  //
 
   dPtr->rayFans.clear();
   dPtr->noHitRayFans.clear();

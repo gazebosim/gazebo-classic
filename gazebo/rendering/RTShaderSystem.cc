@@ -40,7 +40,6 @@ using namespace rendering;
 //////////////////////////////////////////////////
 RTShaderSystem::RTShaderSystem()
 {
-  this->entityMutex = new boost::mutex();
   this->initialized = false;
   this->shadowsApplied = false;
   this->pssmSetup.setNull();
@@ -50,7 +49,6 @@ RTShaderSystem::RTShaderSystem()
 RTShaderSystem::~RTShaderSystem()
 {
   this->Fini();
-  delete this->entityMutex;
 }
 
 //////////////////////////////////////////////////
@@ -111,7 +109,7 @@ void RTShaderSystem::Fini()
   }
 
   this->pssmSetup.setNull();
-  this->entities.clear();
+  // this->entities.clear();
   this->scenes.clear();
   this->initialized = false;
 }
@@ -176,32 +174,20 @@ void RTShaderSystem::RemoveScene(const std::string &_scene)
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::AttachEntity(Visual *vis)
+void RTShaderSystem::AttachEntity(Visual * /*_vis*/)
 {
-  if (!this->initialized)
-    return;
-
-  this->entityMutex->lock();
-  this->entities.push_back(vis);
-  this->entityMutex->unlock();
-  this->GenerateShaders(vis);
+  return;
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::DetachEntity(Visual *_vis)
+void RTShaderSystem::DetachEntity(Visual * /*_vis*/)
 {
-  if (!this->initialized)
-    return;
-
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-  this->entities.remove(_vis);
+  return;
 }
 
 //////////////////////////////////////////////////
 void RTShaderSystem::Clear()
 {
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-  this->entities.clear();
 }
 
 //////////////////////////////////////////////////
@@ -228,22 +214,32 @@ void RTShaderSystem::UpdateShaders()
   if (!this->initialized)
     return;
 
-  std::list<Visual*>::iterator iter;
+  for (auto &scene : this->scenes)
+  {
+    VisualPtr vis = scene->GetWorldVisual();
+    if (vis)
+    {
+      this->UpdateShaders(vis);
+    }
+  }
+}
 
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-
-  // Update all the shaders
-  for (iter = this->entities.begin(); iter != this->entities.end(); ++iter)
-    this->GenerateShaders(*iter);
+//////////////////////////////////////////////////
+void RTShaderSystem::UpdateShaders(VisualPtr _vis)
+{
+  this->GenerateShaders(_vis.get());
+  for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    this->UpdateShaders(_vis->GetChild(i));
 }
 
 //////////////////////////////////////////////////
 void RTShaderSystem::GenerateShaders(Visual *vis)
 {
-  if (!this->initialized)
+  if (!this->initialized || !vis)
     return;
 
-  for (unsigned int k = 0; k < vis->GetSceneNode()->numAttachedObjects(); k++)
+  for (unsigned int k = 0; vis->GetSceneNode() &&
+      k < vis->GetSceneNode()->numAttachedObjects(); k++)
   {
     Ogre::MovableObject *obj = vis->GetSceneNode()->getAttachedObject(k);
     Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(obj);

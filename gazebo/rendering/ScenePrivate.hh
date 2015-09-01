@@ -208,6 +208,9 @@ namespace gazebo
       /// \brief Mutex to lock the pose message buffers.
       public: boost::recursive_mutex poseMsgMutex;
 
+      /// \brief Mutex to protect the visuals list.
+      public: std::mutex visualsMutex;
+
       /// \brief Communication Node
       public: transport::NodePtr node;
 
