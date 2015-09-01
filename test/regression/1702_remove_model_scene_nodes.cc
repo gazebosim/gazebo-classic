@@ -56,11 +56,6 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // disable gravity
   physics->SetGravity(math::Vector3::Zero);
 
-  rendering::ScenePtr scene = rendering::get_scene();
-  ASSERT_TRUE(scene != NULL);
-  rendering::CameraPtr camera = scene->GetCamera("camera");
-  ASSERT_TRUE(camera != NULL);
-
   // spawn a model
   msgs::Model model;
   model.set_name("a_fancy_box");
@@ -127,6 +122,10 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // gzerr << "spawned again"; getchar();
   // need to sleep long enough for rendering cycle to iterate at least once
   // or do something like look for visuals through a camera?
+  rendering::ScenePtr scene = rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+  rendering::CameraPtr camera = scene->GetCamera("camera");
+  ASSERT_TRUE(camera != NULL);
   int sleep = 0;
   int maxSleep = 5;
   rendering::VisualPtr visual;

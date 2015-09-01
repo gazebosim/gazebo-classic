@@ -210,8 +210,6 @@ void Visual::Fini()
   if (this->dataPtr->sceneNode)
   {
     this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
-    // if (this->dataPtr->children.empty())
-       // this->dataPtr->sceneNode->removeAndDestroyAllChildren();
     this->dataPtr->scene->GetManager()->destroySceneNode(
         this->dataPtr->sceneNode);
     this->dataPtr->sceneNode = NULL;

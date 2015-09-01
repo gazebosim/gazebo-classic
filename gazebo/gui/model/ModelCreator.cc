@@ -1285,7 +1285,6 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
         this->OnDelete(linkVis->GetName());
       }
       this->selectedLinks.clear();
-      //this->DeselectAll();
     }
   }
   else if (_event.control)
