@@ -2,6 +2,9 @@
 1. Added torsional friction
     * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
 
+1. Added RegionEventBoxPlugin - fires events when models enter / exit the region
+    * [Pull request #1856](https://bitbucket.org/osrf/gazebo/pull-request/1856)
+
 1. Added LoadArgs() function to ServerFixture for being able to load a server
 using the same arguments used in the command line.
     * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874
@@ -42,6 +45,9 @@ using the same arguments used in the command line.
 1. Make it possible to create custom ConfigWidgets
     * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
 
+1. AddItem / RemoveItem / Clear enum config widgets
+    * [Pull request #1878](https://bitbucket.org/osrf/gazebo/pull-request/1878)
+
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
@@ -56,6 +62,9 @@ using the same arguments used in the command line.
 
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
+
+    1. Display model plugins on the left panel and added model plugin inspector
+        * [Pull request #1863](https://bitbucket.org/osrf/gazebo/pull-request/1863)
 
 ## Gazebo 6.0
 

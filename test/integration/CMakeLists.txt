@@ -72,6 +72,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  region_events.cc
   rest_web.cc
   road.cc
   sensor.cc
