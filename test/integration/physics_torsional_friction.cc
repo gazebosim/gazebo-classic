@@ -226,7 +226,7 @@ void PhysicsTorsionalFrictionTest::DepthTest(
       std::abs(contact.depth(0) - expectedDepth)/expectedDepth;
     gzdbg << contact.collision1()
           << " expected " << expectedDepth
-          << " actual " << contact.depth(0) 
+          << " actual " << contact.depth(0)
           << std::endl;
 
     // Less than 1% error
