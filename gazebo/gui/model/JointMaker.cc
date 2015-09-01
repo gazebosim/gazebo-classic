@@ -905,9 +905,19 @@ void JointMaker::Update()
             }
             else
             {
+              // Get poses as homogeneous transforms
+              ignition::math::Matrix4d parent_world(
+                  joint->parent->GetWorldPose().Ign());
+              ignition::math::Matrix4d child_world(
+                  joint->child->GetWorldPose().Ign());
+
+              // w_T_c = w_T_p * p_T_c
+              // w_T_p^-1 * w_T_c = p_T_c
+              ignition::math::Matrix4d child_parent = parent_world.Inverse() *
+                  child_world;
+
               this->jointCreationDialog->UpdateRelativePose(
-                  (joint->child->GetWorldPose() -
-                  joint->parent->GetWorldPose()).Ign());
+                  child_parent.Pose());
             }
           }
         }
@@ -1675,10 +1685,16 @@ void JointMaker::OnJointPoseChosenDialog(const ignition::math::Pose3d &_pose)
 {
   if (this->parentLinkVis && this->childLinkVis)
   {
-    ignition::math::Pose3d worldPose =
-        this->parentLinkVis->GetWorldPose().Ign() + _pose;
+    // Get poses as homogeneous transforms
+    ignition::math::Matrix4d parent_world(
+	parentLinkVis->GetWorldPose().Ign());
+    ignition::math::Matrix4d child_parent(_pose);
 
-    this->childLinkVis->SetWorldPose(worldPose);
+    // w_T_c = w_T_p * p_T_c
+    ignition::math::Matrix4d child_world =
+        parent_world * child_parent;
+
+    this->childLinkVis->SetWorldPose(child_world.Pose());
   }
 }
 
