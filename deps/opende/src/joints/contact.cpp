@@ -309,7 +309,6 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     // have positive values
     if ( the_m >= 4 )
     {
-        // printf("the_m: %d\n", the_m);
         dVector3 t3 = {0, 0, 0};
 
         // Linear, body 1
@@ -368,8 +367,6 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
 
             info->lo[3] = -rhs;
             info->hi[3] = rhs;
-
-            // printf("lo %f hi %f\n", info->lo[3], info->hi[3]);
 
             // findex[3] must be zero in order for torsional friction moment
             // to be proportional to normal force

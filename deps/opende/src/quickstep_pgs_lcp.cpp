@@ -553,7 +553,6 @@ static void* ComputeRows(void *p)
         dReal hi_act_erp, lo_act_erp;
         if (constraint_index >= 0)
         {
-          // printf ("index diff %d\n", index - constraint_index);
           if (index - constraint_index >= 3)
           {
             // torsinal friction should have been added as the third row from
@@ -566,7 +565,6 @@ static void* ComputeRows(void *p)
               hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
               lo_act_erp = -hi_act_erp;
             }
-            // printf("lo %f hi %f\n", lo[index], hi[index]);
           }
           else
           {
@@ -1494,7 +1492,6 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
       }
     }
   }
-
   //startRow, nRows;
   int previndex, nextindex, prev_constraint_index, next_constraint_index;
   if (i == startRow)

@@ -61,9 +61,9 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       auto surfODE =
           boost::static_pointer_cast<physics::ODESurfaceParams>(surf);
 
-      this->coefficient = surf->GetFrictionPyramid()->MuTorsion();
-      this->patch = surf->GetFrictionPyramid()->PatchRadius();
-      this->radius = surf->GetFrictionPyramid()->SurfaceRadius();
+      this->coefficient = surf->FrictionPyramid()->MuTorsion();
+      this->patch = surf->FrictionPyramid()->PatchRadius();
+      this->radius = surf->FrictionPyramid()->SurfaceRadius();
       this->kp = surfODE->kp;
 
       // Get inertial params
@@ -319,15 +319,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
       }
       else
       {
-        // gzerr << "accz anly [" << frictionAcc
-        //       << "] actual [" << acc.z
-        //       << "] app [" << appliedTorque
-        //       << "] fri [" << frictionTorque
-        //       << "] izz [" << sphere.izz
-        //       << "] coef [" << frictionCoef
-        //       << "]\n";
         sphere.error.InsertData(acc.z - frictionAcc);
-        EXPECT_NEAR(acc.z, frictionAcc, g_friction_tolerance);
       }
     }
   }
@@ -336,7 +328,7 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
   for (auto sphere : spheres)
   {
     gzdbg << "Model " << sphere.model->GetName() << std::endl;
-    // EXPECT_NEAR(sphere.error.Map()["maxAbs"], 0.0, g_friction_tolerance);
+    EXPECT_NEAR(sphere.error.Map()["maxAbs"], 0.0, g_friction_tolerance);
   }
 }
 

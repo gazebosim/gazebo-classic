@@ -48,10 +48,7 @@
             </friction>
             <contact>
               <ode>
-                <kp>1109.48486154</kp>
-                <kd>100</kd>
-                <min_depth>0.001</min_depth>
-                <max_vel>1000</max_vel>
+                <kp>500000</kp>
               </ode>
             </contact>
           </surface>
@@ -110,10 +107,7 @@
             </friction>
             <contact>
               <ode>
-                <kp>1109.48486154</kp>
-                <kd>100</kd>
-                <min_depth>0.001</min_depth>
-                <max_vel>1000</max_vel>
+                <kp>500000</kp>
               </ode>
             </contact>
           </surface>
@@ -172,10 +166,7 @@
             </friction>
             <contact>
               <ode>
-                <kp>1109.48486154</kp>
-                <kd>100</kd>
-                <min_depth>0.001</min_depth>
-                <max_vel>1000</max_vel>
+                <kp>500000</kp>
               </ode>
             </contact>
           </surface>
@@ -234,10 +225,7 @@
             </friction>
             <contact>
               <ode>
-                <kp>1109.48486154</kp>
-                <kd>100</kd>
-                <min_depth>0.001</min_depth>
-                <max_vel>1000</max_vel>
+                <kp>500000</kp>
               </ode>
             </contact>
           </surface>
@@ -296,10 +284,7 @@
             </friction>
             <contact>
               <ode>
-                <kp>1109.48486154</kp>
-                <kd>100</kd>
-                <min_depth>0.001</min_depth>
-                <max_vel>1000</max_vel>
+                <kp>500000</kp>
               </ode>
             </contact>
           </surface>
@@ -357,13 +342,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -412,13 +390,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -467,13 +438,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -522,13 +486,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -577,13 +534,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -634,13 +584,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -690,13 +633,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -746,13 +682,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -802,13 +731,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -858,13 +780,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -917,13 +832,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -953,13 +861,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -989,13 +890,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1067,13 +961,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1103,13 +990,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1139,13 +1019,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1217,13 +1090,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1253,13 +1119,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1289,13 +1148,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1367,13 +1219,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1403,13 +1248,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1439,13 +1277,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1517,13 +1348,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1553,13 +1377,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -1589,13 +1406,6 @@
                 <patch_radius>2.0</patch_radius>
               </torsional>
             </friction>
-            <contact>
-              <ode>
-                <kp>500000</kp>
-                <min_depth>0.001</min_depth>
-                <max_vel>100.0</max_vel>
-              </ode>
-            </contact>
           </surface>
         </collision>
         <visual name="visual">
