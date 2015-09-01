@@ -53,8 +53,9 @@ class WorldPlaybackTest : public ServerFixture,
   public: WorldPlaybackTest()
   {
     this->logName = std::string(GetParam());
-    boost::filesystem::path logPath =
-      logPath / TEST_PATH / "logs/" / this->logName;
+    boost::filesystem::path logPath = TEST_PATH;
+    logPath /= "logs/";
+    logPath /= this->logName;
 
     // Start the server with a log file and paused.
     LoadArgs("-u -p " + logPath.string());
