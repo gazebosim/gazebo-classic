@@ -241,7 +241,10 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   rendering::ScenePtr scene = rendering::get_scene();
 
   if (joint->handles)
+  {
     scene->GetManager()->destroyBillboardSet(joint->handles);
+    joint->handles = NULL;
+  }
 
   if (joint->hotspot)
   {
@@ -273,7 +276,10 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   {
     joint->inspector->hide();
     delete joint->inspector;
+    joint->inspector = NULL;
   }
+  if (this->jointBeingCreated && this->jointBeingCreated->hotspot)
+    this->jointBeingCreated = NULL;
   joint->hotspot.reset();
   joint->visual.reset();
   joint->jointVisual.reset();
@@ -291,6 +297,8 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
 /////////////////////////////////////////////////
 void JointMaker::RemoveJointsByLink(const std::string &_linkName)
 {
+  this->Stop();
+
   std::vector<std::string> toDelete;
   for (auto it : this->joints)
   {
