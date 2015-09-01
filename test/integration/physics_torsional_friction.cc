@@ -200,6 +200,7 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     ASSERT_TRUE(sphere.model != NULL);
   }
 
+  std::vector<bool> contactsChecked = {false, false, false, false, false};
   // Check relevant contacts from message
   for (auto contact : this->contactsMsg.contact())
   {
@@ -209,7 +210,9 @@ void PhysicsTorsionalFrictionTest::DepthTest(
 
     // Get corresponding sphere
     int number = std::stoi(contact.collision1().substr(12, 1));
-    ASSERT_GT(number, 0);
+    ASSERT_GE(number, 1);
+    ASSERT_LE(number, 5);
+    contactsChecked[number-1] = true;
     auto sphere = spheres[number-1];
 
     // Check that contact normal is in the positive Z direction
@@ -221,9 +224,19 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     double expectedDepth = sphere.mass * -g.z / sphere.kp;
     double relativeError =
       std::abs(contact.depth(0) - expectedDepth)/expectedDepth;
+    gzdbg << contact.collision1()
+          << " expected " << expectedDepth
+          << " actual " << contact.depth(0) 
+          << std::endl;
 
     // Less than 1% error
     EXPECT_LT(relativeError, 0.01);
+  }
+
+  // Verify that each sphere was checked
+  for (bool contactChecked : contactsChecked)
+  {
+    EXPECT_TRUE(contactChecked);
   }
 }
 
@@ -393,6 +406,7 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
 
     world->Step(1);
     step++;
+    gzdbg << "world time: " << world->GetSimTime().Double() << std::endl;
 
     for (auto sphere : spheres)
     {
@@ -407,6 +421,9 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
       double normalZ = -sphere.mass * g.z;
       double frictionTorque =
           normalZ * sphere.coefficient * 3 * M_PI * patch / 16;
+      gzdbg << sphere.model->GetName()
+            << " frictionTorque " << frictionTorque
+            << std::endl;
 
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)
