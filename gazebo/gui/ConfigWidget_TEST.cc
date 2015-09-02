@@ -757,6 +757,72 @@ void ConfigWidget_TEST::VisualMsgWidget()
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget_TEST::PluginMsgWidget()
+{
+  // create a plugin message with test values
+
+  gazebo::gui::ConfigWidget *pluginConfigWidget =
+      new gazebo::gui::ConfigWidget;
+  gazebo::msgs::Plugin pluginMsg;
+
+  {
+    // plugin
+    pluginMsg.set_name("test_plugin");
+    pluginMsg.set_filename("test_plugin_filename");
+    pluginMsg.set_innerxml("<param>1</param>\n");
+  }
+  pluginConfigWidget->Load(&pluginMsg);
+
+  // retrieve the message from the config widget and
+  // verify that all values have not been changed.
+  {
+    gazebo::msgs::Plugin *retPluginMsg =
+        dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->GetMsg());
+    QVERIFY(retPluginMsg != NULL);
+
+    // plugin
+    QVERIFY(retPluginMsg->name() == "test_plugin");
+    QVERIFY(retPluginMsg->filename() == "test_plugin_filename");
+    QVERIFY(retPluginMsg->innerxml() == "<param>1</param>\n");
+  }
+
+  // update fields in the config widget and
+  // verify that the new message contains the updated values.
+  {
+    // plugin
+    pluginConfigWidget->SetStringWidgetValue("name", "test_plugin_updated");
+    pluginConfigWidget->SetStringWidgetValue("filename",
+        "test_plugin_filename_updated");
+    pluginConfigWidget->SetStringWidgetValue("innerxml",
+        "<param2>new_param</param2>\n");
+  }
+
+  // verify widget values
+  {
+    QVERIFY(pluginConfigWidget->GetStringWidgetValue("name") ==
+        "test_plugin_updated");
+    QVERIFY(pluginConfigWidget->GetStringWidgetValue("filename") ==
+        "test_plugin_filename_updated");
+    QVERIFY(pluginConfigWidget->GetStringWidgetValue("innerxml") ==
+        "<param2>new_param</param2>\n");
+  }
+
+  // verify updates in new msg
+  {
+    gazebo::msgs::Plugin *retPluginMsg =
+        dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->GetMsg());
+    QVERIFY(retPluginMsg != NULL);
+
+    // plugin
+    QVERIFY(retPluginMsg->name() == "test_plugin_updated");
+    QVERIFY(retPluginMsg->filename() == "test_plugin_filename_updated");
+    QVERIFY(retPluginMsg->innerxml() == "<param2>new_param</param2>\n");
+  }
+
+  delete pluginConfigWidget;
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget_TEST::ConfigWidgetVisible()
 {
   gazebo::gui::ConfigWidget *visualConfigWidget =
@@ -847,7 +913,7 @@ void ConfigWidget_TEST::ConfigWidgetReadOnly()
       new gazebo::gui::ConfigWidget;
   gazebo::msgs::Visual visualMsg;
 
-{
+  {
     // visual
     visualMsg.set_id(12345u);
 
@@ -1070,6 +1136,70 @@ void ConfigWidget_TEST::CreatedExternally()
       configWidget->CreateGroupWidget("groupWidget", groupChildWidget, 0);
   QVERIFY(groupWidget != NULL);
   QVERIFY(groupWidget->childWidget != NULL);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::EnumConfigWidget()
+{
+  // Create a parent widget
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget();
+  QVERIFY(configWidget != NULL);
+
+  // Create an enum child widget
+  std::vector<std::string> enumValues;
+  enumValues.push_back("value1");
+  enumValues.push_back("value2");
+  enumValues.push_back("value3");
+  gazebo::gui::ConfigChildWidget *enumWidget =
+      configWidget->CreateEnumWidget("Enum Label", enumValues);
+
+  QVERIFY(enumWidget != NULL);
+
+  // Add it to parent
+  QVERIFY(configWidget->AddConfigChildWidget("enumWidgetName", enumWidget));
+
+  // Check that all items can be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value1"));
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value2"));
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value3"));
+
+  // Check that an inexistent item cannot be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value4")
+      == false);
+
+  // Check the number of items
+  QComboBox *comboBox = enumWidget->findChild<QComboBox *>();
+  QVERIFY(comboBox != NULL);
+  QCOMPARE(comboBox->count(), 3);
+
+  // Add an item and check count
+  QVERIFY(configWidget->AddItemEnumWidget("enumWidgetName", "value4"));
+  QCOMPARE(comboBox->count(), 4);
+
+  // Check that the new item can be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value4"));
+
+  // Remove an item and check count
+  QVERIFY(configWidget->RemoveItemEnumWidget("enumWidgetName", "value2"));
+  QCOMPARE(comboBox->count(), 3);
+
+  // Check that the removed item cannot be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value2")
+      == false);
+
+  // Clear all items and check count
+  QVERIFY(configWidget->ClearEnumWidget("enumWidgetName"));
+  QCOMPARE(comboBox->count(), 0);
+
+  // Check that none of the previous items can be selected
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value1")
+      == false);
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value2")
+      == false);
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value3")
+      == false);
+  QVERIFY(configWidget->SetEnumWidgetValue("enumWidgetName", "value4")
+      == false);
 }
 
 /////////////////////////////////////////////////

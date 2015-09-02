@@ -242,6 +242,23 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { openLinkInspector.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the open model plugin inspector
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectOpenModelPluginInspector(
+            T _subscriber)
+          { return openModelPluginInspector.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the open model plugin
+        /// inspector
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectOpenModelPluginInspector(
+            event::ConnectionPtr _subscriber)
+          { openModelPluginInspector.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the open joint inspector signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -323,6 +340,21 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { setSelectedJoint.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the model plugin inserted signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectModelPluginInserted(
+            T _subscriber)
+          { return modelPluginInserted.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the model plugin inserted
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectModelPluginInserted(
+            event::ConnectionPtr _subscriber)
+          { modelPluginInserted.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -382,6 +414,10 @@ namespace gazebo
         /// \brief Request to open the joint inspector.
         public: static event::EventT<void (std::string)> openJointInspector;
 
+        /// \brief Request to open the model plugin inspector.
+        public: static event::EventT<void (std::string)>
+            openModelPluginInspector;
+
         /// \brief Notify that the joint name has been changed. The first
         /// string is the joint's unique id and the second string is the
         /// new joint name.
@@ -399,6 +435,9 @@ namespace gazebo
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string, bool)> setSelectedJoint;
+
+        /// \brief Notify that a model plugin has been inserted.
+        public: static event::EventT<void (std::string)> modelPluginInserted;
       };
     }
   }

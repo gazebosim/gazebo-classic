@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _CONFIG_WIDGET_HH_
-#define _CONFIG_WIDGET_HH_
+#ifndef _GAZEBO_CONFIG_WIDGET_HH_
+#define _GAZEBO_CONFIG_WIDGET_HH_
 
 #include <string>
 #include <vector>
@@ -270,6 +270,25 @@ namespace gazebo
       public: bool SetEnumWidgetValue(const std::string &_name,
           const std::string &_value);
 
+      /// \brief Add an item to a child enum widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _itemText Enum text value.
+      /// \return True if the item is added successfully.
+      public: bool AddItemEnumWidget(const std::string &_name,
+          const std::string &_itemText);
+
+      /// \brief Remove an item from a child enum widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _itemText Text of the enum value.
+      /// \return True if the item is removed successfully.
+      public: bool RemoveItemEnumWidget(const std::string &_name,
+          const std::string &_itemText);
+
+      /// \brief Remove all items from a child enum widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return True if successful.
+      public: bool ClearEnumWidget(const std::string &_name);
+
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Integer value.
@@ -366,9 +385,10 @@ namespace gazebo
       /// \brief Create a widget for configuring a string value.
       /// \param[in] _key A key that is used as a label for the widget.
       /// \param[in] _level Level of the widget in the tree.
+      /// \param[in] _type Type of string widget, such as "line" or "plain".
       /// \return The newly created widget.
       public: ConfigChildWidget *CreateStringWidget(const std::string &_key,
-          const int _level = 0);
+          const int _level = 0, const std::string &_type = "line");
 
       /// \brief Create a widget for configuring a bool value.
       /// \param[in] _key A key that is used as a label for the widget.
