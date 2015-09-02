@@ -285,7 +285,7 @@ void JointInspector::OnEnumChanged(const QString &_name,
   if (_name == "type")
     this->OnJointTypeChanged(_value);
   else if (_name == "parentCombo" || _name == "childCombo")
-    this->OnLinkChanged(_value);
+    this->OnLinksChanged(_value);
 }
 
 /////////////////////////////////////////////////
@@ -327,7 +327,7 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::OnLinkChanged(const QString &/*_linkName*/)
+void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
 {
   std::string currentParent =
       this->configWidget->GetEnumWidgetValue("parentCombo");
@@ -373,6 +373,8 @@ void JointInspector::OnLinkInserted(const std::string &_linkName)
 
   this->configWidget->AddItemEnumWidget("parentCombo", leafName);
   this->configWidget->AddItemEnumWidget("childCombo", leafName);
+
+  this->OnLinksChanged();
 }
 
 /////////////////////////////////////////////////
@@ -385,6 +387,8 @@ void JointInspector::OnLinkRemoved(const std::string &_linkName)
 
   this->configWidget->RemoveItemEnumWidget("parentCombo", leafName);
   this->configWidget->RemoveItemEnumWidget("childCombo", leafName);
+
+  this->OnLinksChanged();
 }
 
 /////////////////////////////////////////////////

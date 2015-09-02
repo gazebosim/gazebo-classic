@@ -80,7 +80,7 @@ namespace gazebo
 
       /// \brief Callback when the joint parent or child link has changed.
       /// \param[in] _linkName New link's name.
-      private: void OnLinkChanged(const QString &_linkName);
+      private: void OnLinksChanged(const QString &_linkName = "");
 
       /// \brief Callback when the swap button is pressed.
       private slots: void OnSwap();
