@@ -2,6 +2,13 @@
 
 <sdf version='1.5'>
   <world name='default'>
+    <physics type='ode'>
+      <ode>
+        <solver>
+          <iters>150</iters>
+        </solver>
+      </ode>
+    </physics>
     <include>
       <uri>model://ground_plane</uri>
     </include>
@@ -9,8 +16,101 @@
       <uri>model://sun</uri>
     </include>
 
+    <model name='cube1'>
+      <pose>2.7 0 1.1050000000000002 0 0 0</pose>
+      <allow_auto_disable>0</allow_auto_disable>
+      <link name='link'>
+        <inertial>
+          <mass>45.56250000000001</mass>
+          <inertia>
+            <ixx>1.5377343750000003</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1.5377343750000003</iyy>
+            <iyz>0</iyz>
+            <izz>1.5377343750000003</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.45 0.45 0.45</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.01</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.45 0.45 0.45</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='cube2'>
+      <pose>-2.7 0 1.1050000000000002 0 0 0</pose>
+      <allow_auto_disable>0</allow_auto_disable>
+      <link name='link'>
+        <inertial>
+          <mass>45.56250000000001</mass>
+          <inertia>
+            <ixx>1.5377343750000003</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1.5377343750000003</iyy>
+            <iyz>0</iyz>
+            <izz>1.5377343750000003</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.45 0.45 0.45</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.01</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.45 0.45 0.45</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
     <model name='fulcrum'>
       <pose>0 0 0.4 0 0 0</pose>
+      <allow_auto_disable>0</allow_auto_disable>
       <link name='link'>
         <inertial>
           <mass>20.000000000000004</mass>
@@ -33,7 +133,7 @@
             <contact>
               <ode>
                 <max_vel>0.1</max_vel>
-                <min_depth>0.001</min_depth>
+                <min_depth>0.01</min_depth>
               </ode>
             </contact>
           </surface>
@@ -56,6 +156,7 @@
 
     <model name='plank'>
       <pose>0 0 0.8400000000000001 0 0 0</pose>
+      <allow_auto_disable>0</allow_auto_disable>
       <link name='link'>
         <inertial>
           <mass>120.0</mass>
@@ -78,7 +179,7 @@
             <contact>
               <ode>
                 <max_vel>0.1</max_vel>
-                <min_depth>0.001</min_depth>
+                <min_depth>0.01</min_depth>
               </ode>
             </contact>
           </surface>
