@@ -1253,6 +1253,37 @@ TEST_F(Visual_TEST, Scale)
       newCylinderScale * newCylinderLinkScale);
   EXPECT_EQ(cylinderVisual->DerivedScale(),
       newCylinderScale * newCylinderLinkScale * newCylinderVisualScale);
+
+  // clone visual and verify scale
+  rendering::VisualPtr boxClone = box->Clone("boxClone",
+      box->GetParent());
+  rendering::VisualPtr sphereClone = sphere->Clone("sphereClone",
+      sphere->GetParent());
+  rendering::VisualPtr cylinderClone = cylinder->Clone("cylinderClone",
+      cylinder->GetParent());
+
+  std::queue<std::pair<rendering::VisualPtr, rendering::VisualPtr> >
+      cloneVisuals;
+  cloneVisuals.push(std::make_pair(box, boxClone));
+  cloneVisuals.push(std::make_pair(sphere, sphereClone));
+  cloneVisuals.push(std::make_pair(cylinder, cylinderClone));
+  while (!cloneVisuals.empty())
+  {
+    auto visualPair = cloneVisuals.front();
+    cloneVisuals.pop();
+    EXPECT_EQ(visualPair.first->GetScale(), visualPair.second->GetScale());
+    EXPECT_EQ(visualPair.first->DerivedScale(),
+        visualPair.second->DerivedScale());
+    EXPECT_EQ(visualPair.first->GetGeometrySize(),
+        visualPair.second->GetGeometrySize());
+    EXPECT_EQ(visualPair.first->GetChildCount(),
+        visualPair.second->GetChildCount());
+    for (unsigned int i  = 0; i < visualPair.first->GetChildCount(); ++i)
+    {
+      cloneVisuals.push(std::make_pair(
+          visualPair.first->GetChild(i), visualPair.second->GetChild(i)));
+    }
+  }
 }
 
 /////////////////////////////////////////////////

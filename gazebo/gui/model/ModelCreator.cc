@@ -1908,8 +1908,11 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   for (auto linksIt : this->allLinks)
   {
-    if (_name == linksIt.first ||
-        _name.find(linksIt.first) != std::string::npos)
+    std::string linkName;
+    size_t pos = _name.find_last_of("::");
+    if (pos != std::string::npos)
+      linkName = _name.substr(0, pos-1);
+    if (_name == linksIt.first || linkName == linksIt.first)
     {
       this->linkScaleUpdate[linksIt.first] = _scale;
       break;
