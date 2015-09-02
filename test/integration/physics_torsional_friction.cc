@@ -231,7 +231,7 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     }
     else
     {
-      gzdbg << contact.collision1() << "     " << contact.collision2() << std::endl;
+      gzdbg << contact.collision1() << " " << contact.collision2() << std::endl;
       continue;
     }
 
