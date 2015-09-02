@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<%
+  # See-saw world with balanced boxes
+  # SI units (length in meters)
+
+  # wood
+  density = 500
+
+  boxes = {
+    "fulcrum" => {},
+    "plank" => {},
+  }
+  boxes["fulcrum"][:size] = [0.1, 0.5, 0.8]
+  boxes["plank"][:size] = [6.0, 0.5, 0.08]
+  boxes.keys.each do |name|
+    box = boxes[name]
+    dx = box[:size][0]
+    dy = box[:size][1]
+    dz = box[:size][2]
+    volume = box[:size].reduce(:*)
+    box[:pose] = [0, 0, dz/2, 0, 0, 0]
+    box[:mass] = density * volume
+    box[:ixx] = box[:mass] / 12.0 * (dy**2 + dz**2)
+    box[:iyy] = box[:mass] / 12.0 * (dz**2 + dx**2)
+    box[:izz] = box[:mass] / 12.0 * (dx**2 + dy**2)
+  end
+  boxes["plank"][:pose][2] += boxes["fulcrum"][:size][2]
+%>
+<sdf version='1.5'>
+  <world name='default'>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+<%
+  boxes.keys.each do |name|
+    box = boxes[name]
+%>
+    <model name='<%= name %>'>
+      <pose><%= box[:pose].join(" ") %></pose>
+      <link name='link'>
+        <inertial>
+          <mass><%= box[:mass] %></mass>
+          <inertia>
+            <ixx><%= box[:ixx] %></ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy><%= box[:iyy] %></iyy>
+            <iyz>0</iyz>
+            <izz><%= box[:izz] %></izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size><%= box[:size].join(" ") %></size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size><%= box[:size].join(" ") %></size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Wood</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+<%
+  end
+%>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>0 -7 2.41737 0 0.339643 <%= Math::PI / 2%></pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+  </world>
+</sdf>
