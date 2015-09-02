@@ -66,6 +66,9 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     dBodyVectorToWorld(node[0].body, axis1[0], axis1[1], axis1[2], globalAxis1);
     dBodyVectorToWorld(node[1].body, axis2[0], axis2[1], axis2[2], globalAxis2);
 
+    dJointSetGearboxReferenceBody1(this, refBody1);
+    dJointSetGearboxReferenceBody2(this, refBody2);
+
     double ang1 = getHingeAngle(refBody1,node[0].body,globalAxis1,qrel1);
     double ang2 = getHingeAngle(refBody2,node[1].body,globalAxis2,qrel2);
     // printf("a1(%f) a10(%f) a2(%f) a20(%f)\n",
@@ -85,11 +88,11 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     info->J1a[0] = globalAxis1[0];
     info->J1a[1] = globalAxis1[1];
     info->J1a[2] = globalAxis1[2];
-    
+
     info->J2a[0] = ratio * globalAxis2[0];
     info->J2a[1] = ratio * globalAxis2[1];
     info->J2a[2] = ratio * globalAxis2[2];
-    
+
     dReal k = info->fps * info->erp;
     info->c[0] = -k * err;
 

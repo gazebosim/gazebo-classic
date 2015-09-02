@@ -383,14 +383,14 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
     this->UpdatePhysicsPose(true);
 
   EntityPtr parentEnt = this->parentEntity;
-  math::Pose relativePose = this->initialRelativePose;
+  ignition::math::Pose3d relativePose = this->initialRelativePose.Ign();
   math::Pose updatePose = _pose;
 
   while (parentEnt && parentEnt->HasType(MODEL))
   {
     // setting parent Model world pose from canonical link world pose
     // where _pose is the canonical link's world pose
-    parentEnt->worldPose = (-relativePose) + updatePose;
+    parentEnt->worldPose = math::Pose(-relativePose) + updatePose;
 
     parentEnt->worldPose.Correct();
 
@@ -401,7 +401,7 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
       parentEnt->PublishPose();
 
     updatePose = parentEnt->worldPose;
-    relativePose = parentEnt->GetInitialRelativePose();
+    relativePose = parentEnt->GetInitialRelativePose().Ign();
     parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
   }
 
