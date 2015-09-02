@@ -347,10 +347,10 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,
   else
     uniforms->setNamedConstant("f", static_cast<Ogre::Real>(this->dataPtr->f));
 
-  auto vec_fun = this->dataPtr->fun.AsVector3();
+  auto vec_fun = this->dataPtr->fun.AsVector3d();
 
   uniforms->setNamedConstant("fun", Ogre::Vector3(
-      vec_fun.x, vec_fun.y, vec_fun.z));
+      vec_fun.X(), vec_fun.Y(), vec_fun.Z()));
 
   uniforms->setNamedConstant("cutOffAngle",
     static_cast<Ogre::Real>(this->dataPtr->cutOffAngle));
@@ -408,7 +408,7 @@ void WideAngleCamera::Init()
 {
   Camera::Init();
 
-  for(int i = 0; i < 6; ++i)
+  for (int i = 0; i < 6; ++i)
     this->sceneNode->attachObject(this->envCameras[i]);
 
   // set environment cameras orientation
