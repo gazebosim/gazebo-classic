@@ -1,0 +1,60 @@
+<sdf version='1.5'>
+  <world name='default'>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name='RegionEventBox'>
+      <static>1</static>
+      <pose>0 0 0.5 0 -0 0</pose>
+      <link name='link'>
+        <visual name='visual'>
+          <transparency>0.75</transparency>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Yellow</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name='region_event_box' filename='libRegionEventBoxPlugin.so'>
+        <event>
+          <name>model_in_region_event_box</name>
+          <type>inclusion</type>
+          <active>true</active>
+        </event>
+      </plugin>
+    </model>
+
+    <model name='box'>
+      <pose>-5 0 0.05 0 -0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>
