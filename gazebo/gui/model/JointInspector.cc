@@ -38,7 +38,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   this->normalStyleSheet =
         "QWidget\
         {\
-          background-color: " + ConfigWidget::level0BgColor + ";\
+          background-color: " + ConfigWidget::bgColors[0] + ";\
           color: #4c4c4c;\
         }\
         QLabel\
@@ -47,24 +47,24 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
         }\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
         {\
-          background-color: " + ConfigWidget::level0WidgetColor +
+          background-color: " + ConfigWidget::widgetColors[0] +
         "}";
 
   this->warningStyleSheet =
         "QWidget\
         {\
-          background-color: " + ConfigWidget::level0BgColor + ";\
+          background-color: " + ConfigWidget::bgColors[0] + ";\
           color: " + ConfigWidget::redColor + ";\
         }\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
         {\
-          background-color: " + ConfigWidget::level0WidgetColor +
+          background-color: " + ConfigWidget::widgetColors[0] +
         "}";
 
   // ConfigWidget
   this->configWidget = new ConfigWidget;
   msgs::Joint jointMsg;
-  configWidget->Load(&jointMsg);
+  this->configWidget->Load(&jointMsg);
 
   // Fill with SDF default values
   sdf::ElementPtr jointElem = msgs::JointToSDF(jointMsg);
@@ -136,13 +136,15 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Custom parent / child widgets
   // Parent
   std::vector<std::string> links;
-  this->parentLinkWidget = configWidget->CreateEnumWidget("parent", links, 0);
+  this->parentLinkWidget =
+      this->configWidget->CreateEnumWidget("parent", links, 0);
   this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
   this->configWidget->AddConfigChildWidget("parentCombo",
       this->parentLinkWidget);
 
   // Child
-  this->childLinkWidget = configWidget->CreateEnumWidget("child", links, 0);
+  this->childLinkWidget =
+      this->configWidget->CreateEnumWidget("child", links, 0);
   this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
   this->configWidget->AddConfigChildWidget("childCombo", this->childLinkWidget);
 
@@ -153,7 +155,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   swapButton->setStyleSheet(
       "QToolButton\
       {\
-        background-color: " + ConfigWidget::level0BgColor +
+        background-color: " + ConfigWidget::bgColors[0] +
       "}");
   connect(swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
 
@@ -167,20 +169,24 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Add the widgets to the main layout
   QVBoxLayout *configWidgetLayout = qobject_cast<QVBoxLayout *>(
       this->configWidget->layout());
-  QGroupBox *widget = qobject_cast<QGroupBox *>(
-      configWidgetLayout->itemAt(0)->widget());
-  QVBoxLayout *widgetLayout = qobject_cast<QVBoxLayout *>(widget->layout());
-  if (widgetLayout)
-    widgetLayout->insertLayout(0, linksLayout);
-  else
-    gzerr << "Not possible to add links to config widget" << std::endl;
+  if (configWidgetLayout)
+  {
+    QGroupBox *widget = qobject_cast<QGroupBox *>(
+        configWidgetLayout->itemAt(0)->widget());
+    if (widget)
+    {
+      QVBoxLayout *widgetLayout = qobject_cast<QVBoxLayout *>(widget->layout());
+      if (widgetLayout)
+        widgetLayout->insertLayout(0, linksLayout);
+    }
+  }
 
-  // Connect all enum value changes
+  // Connect all enum value changes, which includes type, parent and child
   QObject::connect(this->configWidget,
       SIGNAL(EnumValueChanged(const QString &, const QString &)), this,
       SLOT(OnEnumChanged(const QString &, const QString &)));
 
-  // Joint type
+  // Set initial joint type
   this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
 
   // Scroll area
@@ -194,17 +200,22 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   generalLayout->addWidget(scrollArea);
 
   // Buttons
-  QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  QPushButton *applyButton = new QPushButton(tr("Apply"));
-  connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-  QPushButton *OKButton = new QPushButton(tr("OK"));
-  OKButton->setDefault(true);
-  connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
+
+  this->applyButton = new QPushButton(tr("Apply"));
+  this->applyButton->setEnabled(true);
+  connect(this->applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
+
+  this->okButton = new QPushButton(tr("OK"));
+  this->okButton->setEnabled(true);
+  this->okButton->setDefault(true);
+  connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
+
+  QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(applyButton);
-  buttonsLayout->addWidget(OKButton);
+  buttonsLayout->addWidget(this->applyButton);
+  buttonsLayout->addWidget(this->okButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
   // Main layout
@@ -216,6 +227,12 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   this->setMinimumHeight(300);
 
   this->setLayout(mainLayout);
+
+  // Qt signal / slot connections
+  connect(this->jointMaker, SIGNAL(EmitLinkRemoved(std::string)), this,
+      SLOT(OnLinkRemoved(std::string)));
+  connect(this->jointMaker, SIGNAL(EmitLinkInserted(std::string)), this,
+      SLOT(OnLinkInserted(std::string)));
 }
 
 /////////////////////////////////////////////////
@@ -246,7 +263,7 @@ msgs::Joint *JointInspector::GetData() const
 
   if (currentParent == currentChild)
   {
-    gzwarn << "Parent link equal to child link - not updating joint."
+    gzerr << "Parent link equal to child link - not updating joint."
         << std::endl;
     return NULL;
   }
@@ -268,7 +285,7 @@ void JointInspector::OnEnumChanged(const QString &_name,
   if (_name == "type")
     this->OnJointTypeChanged(_value);
   else if (_name == "parentCombo" || _name == "childCombo")
-    this->OnLinkChanged(_value);
+    this->OnLinksChanged(_value);
 }
 
 /////////////////////////////////////////////////
@@ -310,14 +327,14 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::OnLinkChanged(const QString &/*_linkName*/)
+void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
 {
   std::string currentParent =
       this->configWidget->GetEnumWidgetValue("parentCombo");
   std::string currentChild =
       this->configWidget->GetEnumWidgetValue("childCombo");
 
-  // Warning if it's the same as the child
+  // Warning if parent and child are equal
   if (currentParent == currentChild)
   {
     this->parentLinkWidget->setStyleSheet(this->warningStyleSheet);
@@ -328,6 +345,8 @@ void JointInspector::OnLinkChanged(const QString &/*_linkName*/)
     this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
     this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
   }
+  this->applyButton->setEnabled(currentParent != currentChild);
+  this->okButton->setEnabled(currentParent != currentChild);
 }
 
 /////////////////////////////////////////////////
@@ -354,6 +373,8 @@ void JointInspector::OnLinkInserted(const std::string &_linkName)
 
   this->configWidget->AddItemEnumWidget("parentCombo", leafName);
   this->configWidget->AddItemEnumWidget("childCombo", leafName);
+
+  this->OnLinksChanged();
 }
 
 /////////////////////////////////////////////////
@@ -366,6 +387,8 @@ void JointInspector::OnLinkRemoved(const std::string &_linkName)
 
   this->configWidget->RemoveItemEnumWidget("parentCombo", leafName);
   this->configWidget->RemoveItemEnumWidget("childCombo", leafName);
+
+  this->OnLinksChanged();
 }
 
 /////////////////////////////////////////////////
@@ -391,6 +414,12 @@ void JointInspector::Open()
   this->configWidget->SetEnumWidgetValue("parentCombo", currentParent);
   this->configWidget->SetEnumWidgetValue("childCombo", currentChild);
   this->configWidget->blockSignals(false);
+
+  // Reset states
+  this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->applyButton->setEnabled(true);
+  this->okButton->setEnabled(true);
 
   this->move(QCursor::pos());
   this->show();

@@ -884,12 +884,12 @@ void JointMaker::Update()
         if (joint->parentPose != joint->parent->GetWorldPose() ||
             joint->childPose != joint->child->GetWorldPose() ||
             joint->childScale != joint->child->GetScale())
-        {
-          joint->parentPose = joint->parent->GetWorldPose();
-          joint->childPose = joint->child->GetWorldPose();
-          joint->childScale = joint->child->GetScale();
-          poseUpdate = true;
-        }
+         {
+           joint->parentPose = joint->parent->GetWorldPose();
+           joint->childPose = joint->child->GetWorldPose();
+           joint->childScale = joint->child->GetScale();
+           poseUpdate = true;
+         }
 
         // Create / update joint visual
         if (joint->dirty || poseUpdate)

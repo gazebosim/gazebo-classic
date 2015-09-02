@@ -42,7 +42,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->normalStyleSheet =
         "QWidget\
         {\
-          background-color: " + ConfigWidget::level0BgColor + ";\
+          background-color: " + ConfigWidget::bgColors[0] + ";\
           color: #4c4c4c;\
         }\
         QLabel\
@@ -51,29 +51,29 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
         }\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
         {\
-          background-color: " + ConfigWidget::level0WidgetColor +
+          background-color: " + ConfigWidget::widgetColors[0] +
         "}";
 
   this->warningStyleSheet =
         "QWidget\
         {\
-          background-color: " + ConfigWidget::level0BgColor + ";\
+          background-color: " + ConfigWidget::bgColors[0] + ";\
           color: " + ConfigWidget::redColor + ";\
         }\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
         {\
-          background-color: " + ConfigWidget::level0WidgetColor +
+          background-color: " + ConfigWidget::widgetColors[0] +
         "}";
 
   this->activeStyleSheet =
         "QWidget\
         {\
-          background-color: " + ConfigWidget::level0BgColor + ";\
+          background-color: " + ConfigWidget::bgColors[0] + ";\
           color: " + ConfigWidget::greenColor + ";\
         }\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
         {\
-          background-color: " + ConfigWidget::level0WidgetColor +
+          background-color: " + ConfigWidget::widgetColors[0] +
         "}";
 
   // ConfigWidget
@@ -149,7 +149,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->swapButton->setStyleSheet(
       "QToolButton\
       {\
-        background-color: " + ConfigWidget::level0BgColor +
+        background-color: " + ConfigWidget::bgColors[0] +
       "}");
   connect(this->swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
 
