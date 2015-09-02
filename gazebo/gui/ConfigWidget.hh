@@ -148,7 +148,7 @@ namespace gazebo
 
       /// \brief Load from a google protobuf message.
       /// \param[in] _msg Message to load from.
-      public: void Load(const google::protobuf::Message *_msg);
+      public: void Load(const google::protobuf::Message &_msg);
 
       /// \brief Get the updated message.
       /// \return Updated message.
@@ -199,7 +199,7 @@ namespace gazebo
 
       /// \brief Update the widgets from a message.
       /// \param[in] _msg Message used for updating the widgets.
-      public: void UpdateFromMsg(const google::protobuf::Message *_msg);
+      public: void UpdateFromMsg(const google::protobuf::Message &_msg);
 
       /// \brief Set an integer value to a child widget.
       /// \param[in] _name Name of the child widget.
@@ -436,7 +436,7 @@ namespace gazebo
       /// \param[in] _name Name used when creating new widgets.
       /// \param[in] _level Level of the widget in the tree.
       /// return Updated widget.
-      private: QWidget *Parse(google::protobuf::Message *_msg,
+      private: QWidget *Parse(google::protobuf::Message &_msg,
           bool _update = false, const std::string &_name = "",
           const int _level = 0);
 
@@ -444,18 +444,18 @@ namespace gazebo
       /// param[in] _msg Input vector3d message.
       /// return Parsed vector.
       private: math::Vector3 ParseVector3(
-          const google::protobuf::Message *_msg);
+          const google::protobuf::Message &_msg);
 
       /// \brief Update the message field using values from the widgets.
       /// \param[in] _msg Message to be updated.
       /// \param[in] _name Name of parent widget.
-      private: void UpdateMsg(google::protobuf::Message *_msg,
+      private: void UpdateMsg(google::protobuf::Message &_msg,
           const std::string &_name = "");
 
       /// \brief Update a vector3d message.
       /// \param[in] _msg Vector3d message to be updated.
       /// \param[in] _value Vector3 used for updating the message.
-      private: void UpdateVector3Msg(google::protobuf::Message *_msg,
+      private: void UpdateVector3Msg(google::protobuf::Message &_msg,
           const math::Vector3 &_value);
 
       /// \brief Update a child widget with an unsigned integer value.

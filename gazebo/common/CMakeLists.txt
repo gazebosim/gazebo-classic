@@ -47,6 +47,7 @@ set (sources
   Exception.cc
   Image.cc
   ImageHeightmap.cc
+  KeyEvent.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
