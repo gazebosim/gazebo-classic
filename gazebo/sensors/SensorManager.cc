@@ -118,7 +118,7 @@ void SensorManager::Update(bool _force)
       }
       this->initSensors.clear();
       for (auto &iter : this->worlds)
-        iter.second->SensorsInitialized(false);
+        iter.second->SetSensorsInitialized(false);
     }
 
     for (std::vector<std::string>::iterator iter = this->removeSensors.begin();
@@ -154,7 +154,7 @@ void SensorManager::Update(bool _force)
       }
       this->initSensors.clear();
       for (auto &iter : this->worlds)
-        iter.second->SensorsInitialized(false);
+        iter.second->SetSensorsInitialized(false);
       this->removeAllSensors = false;
     }
   }
@@ -209,7 +209,9 @@ void SensorManager::Init()
 
   // Connect to the create sensor event.
   this->createSensorConnection = event::Events::ConnectCreateSensor(
-      boost::bind(&SensorManager::OnCreateSensor, this, _1, _2, _3, _4));
+      std::bind(&SensorManager::OnCreateSensor, this,
+        std::placeholders::_1, std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4));
 
   this->initialized = true;
 }
@@ -244,9 +246,9 @@ void SensorManager::GetSensorTypes(std::vector<std::string> &_types) const
 
 //////////////////////////////////////////////////
 void SensorManager::OnCreateSensor(sdf::ElementPtr _elem,
-                                 std::string _worldName,
-                                 std::string _parentName,
-                                 uint32_t _parentId)
+    const std::string &_worldName,
+    const std::string &_parentName,
+    const uint32_t _parentId)
 {
   this->CreateSensor(_elem, _worldName, _parentName, _parentId);
 }
@@ -284,7 +286,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   // initialized during the next SensorManager::Update call.
   else
   {
-    this->worlds[_worldName]->SensorsInitialized(false);
+    this->worlds[_worldName]->SetSensorsInitialized(false);
     boost::recursive_mutex::scoped_lock lock(this->mutex);
     this->initSensors.push_back(sensor);
   }

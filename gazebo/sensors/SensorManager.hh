@@ -136,11 +136,12 @@ namespace gazebo
       /// \param[in] _worldName Name of the world in which to create the sensor
       /// \param[in] _parentName The name of the parent link which the sensor is
       /// attached to.
-      /// \return The name of the sensor
+      /// \param[in] _parentId Unique id of the sensor to create.
+      /// \param[out] _sensorName The name of the sensor
       public: void OnCreateSensor(sdf::ElementPtr _elem,
-                                  std::string _worldName,
-                                  std::string _parentName,
-                                  uint32_t _parentId);
+                                  const std::string &_worldName,
+                                  const std::string &_parentName,
+                                  const uint32_t _parentId);
 
       /// \brief Get a sensor
       /// \param[in] _name The name of a sensor to find.

@@ -143,7 +143,7 @@ namespace gazebo
               : callback(_cb)
       {
         // Windows Visual Studio 2012 does not have atomic_bool constructor,
-	// so we have to set "on" using operator=
+        // so we have to set "on" using operator=
         on = _on;
       }
 

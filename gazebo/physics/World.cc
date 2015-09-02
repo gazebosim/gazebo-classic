@@ -634,7 +634,7 @@ void World::LogStep()
 }
 
 //////////////////////////////////////////////////
-void World::SensorsInitialized(const bool _init)
+void World::SetSensorsInitialized(const bool _init)
 {
   this->dataPtr->sensorsInitialized = _init;
 }

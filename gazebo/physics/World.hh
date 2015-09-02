@@ -340,15 +340,15 @@ namespace gazebo
       /// \param[in] _entity Entity that has moved.
       public: void _AddDirty(Entity *_entity);
 
-      /// \internal
-      /// \brief Set whether sensors have been initialized. This should only
-      /// be called by SensorManager
-      /// \param[in] _init True if sensors have been initialized.
-      public: void SensorsInitialized(const bool _init);
-
       /// \brief Get whether sensors have been initialized.
       /// \return True if sensors have been initialized.
       public: bool SensorsInitialized() const;
+
+      /// \internal
+      /// \brief Set whether sensors have been initialized. This should only
+      /// be called by SensorManager.
+      /// \param[in] _init True if sensors have been initialized.
+      public: void SetSensorsInitialized(const bool _init);
 
       /// \cond
       /// This is an internal function.

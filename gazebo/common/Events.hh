@@ -331,17 +331,23 @@ namespace gazebo
       public: static EventT<void (std::string)> diagTimerStop;
 
       /// \brief Remove a sensor
+      ///
+      ///  * Parameter 1 (string): Name of the sensor to remove.
       public: static EventT<void (std::string)> removeSensor;
 
       /// \brief Create a sensor
-      /// \param[in] _elem The SDF element that describes the sensor.
-      /// \param[in] _worldName Name of the world in which to create the sensor.
-      /// \param[in] _parentName The fully scoped parent name (model::link).
-      /// \return The name of the new sensor.
+      /// * Parameter 1[in] (sdf::ElementPtr): The SDF element that describes
+      ///   the sensor.
+      /// * Parameter 2[in] (std::sttring): Name of the world in which to create
+      ///   the sensor.
+      /// * Parameter 3[in] (std::string): The fully scoped parent name
+      ///   (model::link).
+      /// * Parameter 4[in] (uint32_t): ID of the sensor
+      /// * Parameter 5[out] (std::string): Name of the created sensor
       public: static EventT<void (sdf::ElementPtr,
-                  std::string,
-                  std::string,
-                  uint32_t)> createSensor;
+                  const std::string &,
+                  const std::string &,
+                  const uint32_t)> createSensor;
     };
     /// \}
   }

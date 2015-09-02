@@ -273,8 +273,8 @@ void Joint::LoadImpl(const math::Pose &_pose)
           sensorElem->Get<std::string>("name");
 
         // Tell the sensor library to create a sensor.
-        event::Events::createSensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName(), this->GetId());
+        event::Events::createSensor(sensorElem,
+            this->GetWorld()->GetName(), this->GetScopedName(), this->GetId());
 
         this->sensors.push_back(sensorName);
       }
