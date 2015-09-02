@@ -343,7 +343,6 @@ namespace gazebo
       /// * Parameter 3[in] (std::string): The fully scoped parent name
       ///   (model::link).
       /// * Parameter 4[in] (uint32_t): ID of the sensor
-      /// * Parameter 5[out] (std::string): Name of the created sensor
       public: static EventT<void (sdf::ElementPtr,
                   const std::string &,
                   const std::string &,
