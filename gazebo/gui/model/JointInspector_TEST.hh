@@ -28,8 +28,8 @@ class JointInspector_TEST : public QTestFixture
   /// \brief Test adding and removing links.
   private slots: void AddRemoveLink();
 
-  /// \brief Test changing parent / child links
-  private slots: void LinkChanged();
+  /// \brief Test swapping parent / child links
+  private slots: void Swap();
 };
 
 #endif

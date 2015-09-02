@@ -64,7 +64,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // ConfigWidget
   this->configWidget = new ConfigWidget;
   msgs::Joint jointMsg;
-  configWidget->Load(&jointMsg);
+  this->configWidget->Load(&jointMsg);
 
   // Fill with SDF default values
   sdf::ElementPtr jointElem = msgs::JointToSDF(jointMsg);
@@ -136,13 +136,15 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Custom parent / child widgets
   // Parent
   std::vector<std::string> links;
-  this->parentLinkWidget = configWidget->CreateEnumWidget("parent", links, 0);
+  this->parentLinkWidget =
+      this->configWidget->CreateEnumWidget("parent", links, 0);
   this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
   this->configWidget->AddConfigChildWidget("parentCombo",
       this->parentLinkWidget);
 
   // Child
-  this->childLinkWidget = configWidget->CreateEnumWidget("child", links, 0);
+  this->childLinkWidget =
+      this->configWidget->CreateEnumWidget("child", links, 0);
   this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
   this->configWidget->AddConfigChildWidget("childCombo", this->childLinkWidget);
 
@@ -167,20 +169,24 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Add the widgets to the main layout
   QVBoxLayout *configWidgetLayout = qobject_cast<QVBoxLayout *>(
       this->configWidget->layout());
-  QGroupBox *widget = qobject_cast<QGroupBox *>(
-      configWidgetLayout->itemAt(0)->widget());
-  QVBoxLayout *widgetLayout = qobject_cast<QVBoxLayout *>(widget->layout());
-  if (widgetLayout)
-    widgetLayout->insertLayout(0, linksLayout);
-  else
-    gzerr << "Not possible to add links to config widget" << std::endl;
+  if (configWidgetLayout)
+  {
+    QGroupBox *widget = qobject_cast<QGroupBox *>(
+        configWidgetLayout->itemAt(0)->widget());
+    if (widget)
+    {
+      QVBoxLayout *widgetLayout = qobject_cast<QVBoxLayout *>(widget->layout());
+      if (widgetLayout)
+        widgetLayout->insertLayout(0, linksLayout);
+    }
+  }
 
-  // Connect all enum value changes
+  // Connect all enum value changes, which includes type, parent and child
   QObject::connect(this->configWidget,
       SIGNAL(EnumValueChanged(const QString &, const QString &)), this,
       SLOT(OnEnumChanged(const QString &, const QString &)));
 
-  // Joint type
+  // Set initial joint type
   this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
 
   // Scroll area
@@ -328,7 +334,7 @@ void JointInspector::OnLinkChanged(const QString &/*_linkName*/)
   std::string currentChild =
       this->configWidget->GetEnumWidgetValue("childCombo");
 
-  // Warning if it's the same as the child
+  // Warning if parent and child are equal
   if (currentParent == currentChild)
   {
     this->parentLinkWidget->setStyleSheet(this->warningStyleSheet);

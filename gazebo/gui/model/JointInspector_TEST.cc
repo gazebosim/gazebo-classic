@@ -76,7 +76,7 @@ void JointInspector_TEST::AddRemoveLink()
 }
 
 /////////////////////////////////////////////////
-void JointInspector_TEST::LinkChanged()
+void JointInspector_TEST::Swap()
 {
   // Create a joint maker
   gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
