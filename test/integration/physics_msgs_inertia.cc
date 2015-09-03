@@ -185,6 +185,14 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 TEST_P(InertiaMsgsTest, SetCoG)
 {
+  std::string physicsEngine = GetParam();
+  if (physicsEngine == "bullet" || physicsEngine == "simbody")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support dynamically changing a link's center of mass"
+          << std::endl;
+    return;
+  }
   SetCoG(GetParam());
 }
 
@@ -249,7 +257,15 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 TEST_P(InertiaMsgsTest, SetMass)
 {
-  SetMass(GetParam());
+  std::string physicsEngine = GetParam();
+  if (physicsEngine == "simbody")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support dynamically changing a link's mass"
+          << std::endl;
+    return;
+  }
+  SetMass(physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, InertiaMsgsTest,
