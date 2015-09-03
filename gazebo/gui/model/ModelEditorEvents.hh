@@ -202,6 +202,21 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointChanged.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request link removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkRemoval(
+            T _subscriber)
+          { return requestLinkRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestLinkRemoval.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the link removed signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -392,6 +407,9 @@ namespace gazebo
 
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
+
+        /// \brief Request to remove a link.
+        public: static event::EventT<void (std::string)> requestLinkRemoval;
 
         /// \brief Notify that a joint has been inserted. The parameters are:
         /// joint's unique id, joint name, joint type, parent link's name, and
