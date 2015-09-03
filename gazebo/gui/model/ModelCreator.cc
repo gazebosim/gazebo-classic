@@ -160,6 +160,10 @@ ModelCreator::ModelCreator()
         boost::bind(&ModelCreator::RemoveLink, this, _1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectRequestModelPluginRemoval(
+        boost::bind(&ModelCreator::RemoveModelPlugin, this, _1)));
+
+  this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&ModelCreator::Update, this)));
 
@@ -1292,6 +1296,27 @@ void ModelCreator::RemoveLink(const std::string &_entity)
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::RemoveModelPlugin(const std::string &_name)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
+  if (this->allModelPlugins.find(_name) ==
+      this->allModelPlugins.end())
+  {
+    return;
+  }
+
+  ModelPluginData *data = this->allModelPlugins[_name];
+
+  // Remove from map
+  this->allModelPlugins.erase(_name);
+  delete data;
+
+  // Notify removal
+  gui::model::Events::modelPluginRemoved(_name);
 }
 
 /////////////////////////////////////////////////

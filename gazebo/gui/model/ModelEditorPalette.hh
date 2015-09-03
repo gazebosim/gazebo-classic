@@ -167,6 +167,10 @@ namespace gazebo
       /// \param[in] _jointId Unique joint identifying name.
       private: void OnJointRemoved(const std::string &_jointId);
 
+      /// \brief Remove a model plugin from the tree.
+      /// \param[in] _pluginId Unique model plugin identifying name.
+      private: void OnModelPluginRemoved(const std::string &_pluginId);
+
       /// \brief Remove all links and joints from the tree.
       private: void ClearModelTree();
 

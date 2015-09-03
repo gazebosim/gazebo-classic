@@ -386,6 +386,10 @@ namespace gazebo
       /// \brief Qt Callback to open link inspector
       private slots: void OnOpenInspector();
 
+      /// \brief Remove a model plugin from the model.
+      /// \param[in] _linkName Name of the model plugin to remove
+      public: void RemoveModelPlugin(const std::string &_pluginName);
+
       /// \brief Qt signal when the a link has been added.
       Q_SIGNALS: void LinkAdded();
 

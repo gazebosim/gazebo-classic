@@ -280,6 +280,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       boost::bind(&ModelEditorPalette::OnModelPluginInserted, this, _1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectModelPluginRemoved(
+      boost::bind(&ModelEditorPalette::OnModelPluginRemoved, this, _1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
       boost::bind(&ModelEditorPalette::OnLinkRemoved, this, _1)));
 
@@ -716,6 +720,26 @@ void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
     if (listData == _jointId)
     {
       this->jointsItem->takeChild(this->jointsItem->indexOfChild(item));
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnModelPluginRemoved(const std::string &_pluginId)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->modelPluginsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->modelPluginsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _pluginId)
+    {
+      this->modelPluginsItem->takeChild(this->modelPluginsItem->indexOfChild(
+          item));
       break;
     }
   }
