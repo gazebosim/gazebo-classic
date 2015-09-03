@@ -159,6 +159,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetLinkStatic(bool _static);
 
+      // Documentation inherited.
+      public: virtual void UpdateMass();
+
       /// \brief Pointer to bullet compound shape, which is a container
       ///        for other child shapes.
       private: btCollisionShape *compoundShape;
@@ -172,9 +175,6 @@ namespace gazebo
 
       /// \brief Pointer to the bullet physics engine.
       private: BulletPhysicsPtr bulletPhysics;
-
-      // Documentation inherited.
-      public: virtual void UpdateMass();
     };
     /// \}
   }
