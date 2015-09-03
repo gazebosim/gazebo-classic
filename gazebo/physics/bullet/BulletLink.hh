@@ -172,6 +172,9 @@ namespace gazebo
 
       /// \brief Pointer to the bullet physics engine.
       private: BulletPhysicsPtr bulletPhysics;
+
+      // Documentation inherited.
+      public: virtual void UpdateMass();
     };
     /// \}
   }

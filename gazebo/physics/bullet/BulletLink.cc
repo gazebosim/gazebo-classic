@@ -215,6 +215,11 @@ void BulletLink::Fini()
   bulletWorld->removeRigidBody(this->rigidLink);
 }
 
+/////////////////////////////////////////////////////////////////////
+void BulletLink::UpdateMass()
+{
+}
+
 //////////////////////////////////////////////////
 void BulletLink::SetGravityMode(bool _mode)
 {
