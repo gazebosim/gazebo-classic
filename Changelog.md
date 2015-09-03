@@ -1,8 +1,11 @@
 ## Gazebo 7.0
 
+1. Added tests for checking the playback control via messages.
+    * [Pull request #1885](https://bitbucket.org/osrf/gazebo/pull-request/1885)
+
 1. Added LoadArgs() function to ServerFixture for being able to load a server
 using the same arguments used in the command line.
-    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874
+    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874)
 
 1. Added battery class, plugins and test world.
     * [Pull request #1872](https://bitbucket.org/osrf/gazebo/pull-request/1872)
