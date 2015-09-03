@@ -36,7 +36,7 @@ class InertiaMsgsTest : public ServerFixture,
 /////////////////////////////////////////////////
 void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
 {
-  Load("worlds/seesaw.world", false, _physicsEngine);
+  Load("worlds/seesaw.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -68,6 +68,7 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
   msg.add_link();
   auto msgLink = msg.mutable_link(0);
   msgLink->set_name("link");
+  msgLink->set_id(link->GetId());
   auto msgInertial = msgLink->mutable_inertial();
   msgInertial->set_mass(99.9);
   msgInertial->set_ixx(12.3);
