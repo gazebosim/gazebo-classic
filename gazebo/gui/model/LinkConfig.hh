@@ -22,7 +22,6 @@
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/gui/model/LinkConfig_TEST.hh"
 
 #include "gazebo/gui/qt.h"
 
@@ -39,7 +38,6 @@ namespace gazebo
     /// \brief A tab for configuring properties of a link.
     class GZ_GUI_MODEL_VISIBLE LinkConfig : public QWidget
     {
-      friend class ::LinkConfig_TEST;
       Q_OBJECT
 
       /// \brief Constructor
@@ -78,6 +76,9 @@ namespace gazebo
       /// \brief Set the mass of the link.
       /// \param[in] _pose Inertial pose to set the link to.
       public: void SetInertialPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Get the configuration widget for the link
+      public: const ConfigWidget *GetConfigWidget() const;
 
       /// \brief config widget for configuring link properties.
       private: ConfigWidget *configWidget;
