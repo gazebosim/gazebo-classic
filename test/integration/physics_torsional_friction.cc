@@ -126,11 +126,15 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 
   /// \brief Message to be filled with the latest contacts message.
   private: msgs::Contacts contactsMsg;
+
+  /// \brief Mutex to protect reads and writes to contactsMsg.
+  public: mutable boost::mutex mutex;
 };
 
 /////////////////////////////////////////////////
 void PhysicsTorsionalFrictionTest::Callback(const ConstContactsPtr &_msg)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   this->contactsMsg = *_msg;
 }
 
@@ -189,6 +193,13 @@ void PhysicsTorsionalFrictionTest::DepthTest(
 
   ASSERT_EQ(this->contactsMsg.contact().size(), 20);
 
+  // Copy message to local variable
+  msgs::Contacts contacts;
+  {
+    boost::mutex::scoped_lock lock(this->mutex);
+    contacts = this->contactsMsg;
+  }
+
   // Load the spheres
   std::vector<PhysicsTorsionalFrictionTest::SphereData>
       spheres;
@@ -209,14 +220,11 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     ASSERT_TRUE(sphere.model != NULL);
   }
 
-  std::vector<bool> contactsChecked = {false, false, false, false, false};
   // Check relevant contacts from message
-  ASSERT_EQ(this->contactsMsg.contact().size(), 20);
-  for (int i = 0; i < this->contactsMsg.contact().size(); ++i)
+  std::vector<bool> contactsChecked = {false, false, false, false, false};
+  ASSERT_EQ(contacts.contact().size(), 20);
+  for (auto contact : contacts.contact())
   {
-    gzdbg << "Checking contact [" << i << "]" << std::endl;
-    auto contact = this->contactsMsg.contact(i);
-
     // Check if the contact has a sphere for this test
     int number = 0;
     if (contact.has_collision1() &&
@@ -231,7 +239,6 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     }
     else
     {
-      gzdbg << contact.collision1() << " " << contact.collision2() << std::endl;
       continue;
     }
 
