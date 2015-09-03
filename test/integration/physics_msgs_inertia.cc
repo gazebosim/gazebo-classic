@@ -31,6 +31,11 @@ class InertiaMsgsTest : public ServerFixture,
   /// and verify that Inertial accessors register the change.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void InertialAccessors(const std::string &_physicsEngine);
+
+  /// \brief Set mass of link over ~/model/modify
+  /// and verify that it causes a seesaw to unbalance.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void SetMass(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
@@ -111,6 +116,70 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
 TEST_P(InertiaMsgsTest, InertialAccessors)
 {
   InertialAccessors(GetParam());
+}
+
+/////////////////////////////////////////////////
+void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
+{
+  Load("worlds/seesaw.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  math::Vector3 g = physics->GetGravity();
+
+  const std::string modelName("cube1");
+  auto model = world->GetModel(modelName);
+  ASSERT_TRUE(model != NULL);
+  auto link = model->GetLink();
+  ASSERT_TRUE(link != NULL);
+  auto inertial = link->GetInertial();
+  ASSERT_TRUE(inertial != NULL);
+  const double mass = inertial->GetMass();
+  const math::Vector3 cog = inertial->GetCoG();
+  const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
+  const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
+  EXPECT_DOUBLE_EQ(mass, 45.56250000000001);
+  EXPECT_EQ(cog, math::Vector3::Zero);
+  EXPECT_EQ(Ixxyyzz, 1.537734375*math::Vector3::One);
+  EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+
+  // new inertial values
+  msgs::Model msg;
+  msg.set_name(modelName);
+  msg.add_link();
+  auto msgLink = msg.mutable_link(0);
+  msgLink->set_name("link");
+  msgLink->set_id(link->GetId());
+  auto msgInertial = msgLink->mutable_inertial();
+  const double newMass = 500;
+  msgInertial->set_mass(newMass);
+
+  // Set inertial properties by publishing to "~/model/modify"
+  transport::PublisherPtr modelPub =
+    this->node->Advertise<msgs::Model>("~/model/modify");
+  modelPub->WaitForConnection();
+  modelPub->Publish(msg, true);
+
+  while (!math::equal(newMass, inertial->GetMass()))
+  {
+    world->Step(1);
+    common::Time::MSleep(1);
+    modelPub->Publish(msg, true);
+  }
+  EXPECT_DOUBLE_EQ(inertial->GetMass(), msgInertial->mass());
+
+  world->Step(1000);
+  EXPECT_LT(model->GetWorldPose().pos.z, 0.40);
+}
+
+/////////////////////////////////////////////////
+TEST_P(InertiaMsgsTest, SetMass)
+{
+  SetMass(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, InertiaMsgsTest,
