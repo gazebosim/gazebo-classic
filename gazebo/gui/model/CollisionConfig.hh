@@ -110,6 +110,9 @@ namespace gazebo
       public: void GetGeometry(const std::string &_name,
           ignition::math::Vector3d &_size, std::string &_uri);
 
+      /// \brief Get collision configuration data
+      public: std::map<int, const CollisionConfigData *> GetConfigData() const;
+
       /// \brief Qt signal emitted when a collision is removed.
       /// \param[in] _name Name of collision removed.
       Q_SIGNALS: void CollisionRemoved(const std::string &_name);

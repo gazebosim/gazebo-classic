@@ -322,6 +322,18 @@ void CollisionConfig::GetGeometry(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+std::map<int, const CollisionConfigData *> CollisionConfig::GetConfigData() const
+{
+  std::map<int, const CollisionConfigData *> result;
+
+  for (auto &it : this->configs)
+  {
+    result.insert(std::pair<int, CollisionConfigData *>(it.first, it.second));
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
 void CollisionConfigData::OnToggleItem(bool _checked)
 {
   if (_checked)
@@ -329,3 +341,4 @@ void CollisionConfigData::OnToggleItem(bool _checked)
   else
     this->configWidget->hide();
 }
+

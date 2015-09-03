@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/gui/model/CollisionConfig.hh"
+#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/CollisionConfig_TEST.hh"
 
 #include "test_config.h"
@@ -50,8 +51,23 @@ void CollisionConfig_TEST::CollisionUpdates()
   QVERIFY(cc.GetData("c3") != NULL);
   QVERIFY(cc.GetData("NotFound") == NULL);
 
-  // We don't have visibility into the backing config widgets so we
-  // can't test UpdateCollision()
+  msgs::CollisionPtr collisionMsgPtr(new msgs::Collision);
+  collisionMsgPtr->set_laser_retro(0.0000789);
+
+  cc.UpdateCollision("c1", collisionMsgPtr);
+  bool foundConfig = false;
+
+  for (auto &it : cc.GetConfigData())
+  {
+    if (it.second->name == "c1")
+    {
+      const CollisionConfigData *configData = it.second;
+      QCOMPARE(configData->configWidget->GetDoubleWidgetValue("laser_retro"), 0.0000789);
+      foundConfig = true;
+      break;
+    }
+  }
+  QVERIFY(foundConfig);
 
   cc.Reset();
 
