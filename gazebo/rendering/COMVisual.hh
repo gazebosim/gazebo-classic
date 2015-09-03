@@ -41,10 +41,7 @@ namespace gazebo
       public: COMVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
-      public: ~COMVisual();
-
-      // Inherited from parent class
-      public: virtual void Fini();
+      public: virtual ~COMVisual();
 
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer

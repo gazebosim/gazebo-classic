@@ -169,7 +169,6 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
 //////////////////////////////////////////////////
 Visual::~Visual()
 {
-  RTShaderSystem::Instance()->DetachEntity(this);
 
   if (this->dataPtr->preRenderConnection)
     event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
@@ -182,16 +181,6 @@ Visual::~Visual()
     delete *iter;
     */
   this->dataPtr->lines.clear();
-
-  if (this->dataPtr->sceneNode != NULL)
-  {
-    // seems we never get into this block because Fini() runs first
-    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
-    this->dataPtr->sceneNode->removeAndDestroyAllChildren();
-    this->dataPtr->scene->GetManager()->destroySceneNode(
-        this->dataPtr->sceneNode->getName());
-    this->dataPtr->sceneNode = NULL;
-  }
 
   this->dataPtr->scene.reset();
   this->dataPtr->sdf->Reset();
@@ -208,25 +197,34 @@ void Visual::Fini()
 {
   this->dataPtr->plugins.clear();
 
-  // Detach from the parent
-  if (this->dataPtr->parent)
-    this->dataPtr->parent->DetachVisual(this->GetName());
-
-  if (this->dataPtr->sceneNode)
-  {
-    this->dataPtr->sceneNode->detachAllObjects();
-    this->dataPtr->scene->GetManager()->destroySceneNode(
-        this->dataPtr->sceneNode);
-    this->dataPtr->sceneNode = NULL;
-  }
-
   if (this->dataPtr->preRenderConnection)
   {
     event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
     this->dataPtr->preRenderConnection.reset();
   }
 
-  RTShaderSystem::Instance()->DetachEntity(this);
+  std::vector<uint32_t> visualIds;
+  for (auto visual: this->dataPtr->children)
+    visualIds.push_back(visual->GetId());
+
+  for (auto visualId: visualIds)
+    this->dataPtr->scene->RemoveVisual(visualId);
+
+  // Detach from the parent
+  if (this->dataPtr->parent)
+    this->dataPtr->parent->DetachVisual(this->GetName());
+
+  if (this->dataPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
+    this->DestroyAllChildSceneNodes(this->dataPtr->sceneNode);
+    this->dataPtr->sceneNode->removeAndDestroyAllChildren();
+    this->dataPtr->sceneNode->detachAllObjects();
+    this->dataPtr->scene->GetManager()->destroySceneNode(
+        this->dataPtr->sceneNode);
+    this->dataPtr->sceneNode = NULL;
+  }
+
   this->dataPtr->scene.reset();
 }
 
@@ -274,9 +272,25 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 
   while (itChild.hasMoreElements())
   {
-    Ogre::SceneNode* pChildNode =
+    Ogre::SceneNode *pChildNode =
         static_cast<Ogre::SceneNode*>(itChild.getNext());
     this->DestroyAllAttachedMovableObjects(pChildNode);
+  }
+}
+
+/////////////////////////////////////////////////
+void Visual::DestroyAllChildSceneNodes(Ogre::SceneNode *_sceneNode)
+{
+  // Recurse to child SceneNodes
+  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+
+  while (itChild.hasMoreElements())
+  {
+    Ogre::SceneNode *pChildNode =
+        static_cast<Ogre::SceneNode*>(itChild.getNext());
+    this->DestroyAllAttachedMovableObjects(pChildNode);
+    this->DestroyAllChildSceneNodes(pChildNode);
+    this->dataPtr->scene->GetManager()->destroySceneNode(pChildNode);
   }
 }
 
@@ -290,9 +304,6 @@ void Visual::Init()
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
   this->dataPtr->layer = -1;
-
-  if (this->dataPtr->useRTShader)
-    RTShaderSystem::Instance()->AttachEntity(this);
 
   this->dataPtr->initialized = true;
 }
@@ -821,18 +832,6 @@ void Visual::SetLighting(bool _lighting)
     return;
 
   this->dataPtr->lighting = _lighting;
-
-  if (this->dataPtr->useRTShader)
-  {
-    if (this->dataPtr->lighting)
-      RTShaderSystem::Instance()->AttachEntity(this);
-    else
-    {
-      // Detach from RTShaderSystem otherwise setting lighting here will have
-      // no effect if shaders are used.
-      RTShaderSystem::Instance()->DetachEntity(this);
-    }
-  }
 
   try
   {

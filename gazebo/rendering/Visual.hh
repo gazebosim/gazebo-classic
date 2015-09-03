@@ -659,6 +659,11 @@ namespace gazebo
       private: void DestroyAllAttachedMovableObjects(
                    Ogre::SceneNode *_sceneNode);
 
+      /// \brief Destroy all the scene nodes that are children of the given
+      /// _sceneNode.
+      /// \param[in] _sceneNode Pointer to the scene node to process.
+      private: void DestroyAllChildSceneNodes(Ogre::SceneNode *_sceneNode);
+
       /// \brief Helper function to update the geometry object size based on
       /// the scale of the visual.
       /// \param[in] _scale Scale of visual

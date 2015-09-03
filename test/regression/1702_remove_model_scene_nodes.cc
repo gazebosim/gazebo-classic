@@ -44,7 +44,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   }
 
   // Load an empty world
-  Load("worlds/camera.world", true, _physicsEngine);
+  Load("worlds/camera.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -84,44 +84,29 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   EXPECT_TRUE(box != NULL);
 
   std::string name = box->GetName();
-
-  // gzerr << "spawned"; getchar();
+  EXPECT_EQ(name, "a_fancy_box");
 
   // delete that model
   ServerFixture::RemoveModel(name);
 
-  // also test removal with below:
-  // world->RemoveModel(name);
-
   int count = 0;
-  while (world->GetModel(name) != NULL && ++count < 1000)
+  while (world->GetModel(name) != NULL && ++count < 10)
   {
-    common::Time::MSleep(1);
-    world->Step(1);
+    common::Time::MSleep(100);
   }
   EXPECT_TRUE(world->GetModel(name) == NULL);
-  EXPECT_LT(count, 1000);
-
-  // gzerr << "deleted"; getchar();
+  EXPECT_LT(count, 10);
 
   // spawn the exact same model
   // if this succeeds, we're OK.
   physics::ModelPtr newBox = ServerFixture::SpawnModel(model);
-  count = 0;
-  while (world->GetModel(name) == NULL && ++count < 1000)
-  {
-    common::Time::MSleep(1);
-    world->Step(1);
-  }
-
   EXPECT_TRUE(world->GetModel(name) != NULL);
 
   // important to sleep here, this is where the failure occurs
-  // usleep(2000000);
-  // world->Step(1000);
-  // gzerr << "spawned again"; getchar();
   // need to sleep long enough for rendering cycle to iterate at least once
   // or do something like look for visuals through a camera?
+  common::Time::MSleep(1000);
+
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
   rendering::CameraPtr camera = scene->GetCamera("camera");
@@ -139,7 +124,6 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 
   // box should be visible to the camera.
   EXPECT_TRUE(camera->IsVisible(visual));
-
 }
 
 TEST_P(Issue1702Test, SpawnDeleteSpawnAgain)

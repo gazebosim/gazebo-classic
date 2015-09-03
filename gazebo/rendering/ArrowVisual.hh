@@ -39,7 +39,7 @@ namespace gazebo
       public: ArrowVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
-      public: virtual ~ArrowVisual();
+      public: virtual ~ArrowVisual() = default;
 
       /// \brief Load the visual with default parameters
       public: virtual void Load();
