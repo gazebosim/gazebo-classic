@@ -30,13 +30,13 @@ class InertiaMsgsTest : public ServerFixture,
   /// \brief Set inertia parameters over ~/model/modify
   /// and verify that Inertial accessors register the change.
   /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void InertiaAccessors(const std::string &_physicsEngine);
+  public: void InertialAccessors(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-void InertiaMsgsTest::InertiaAccessors(const std::string &_physicsEngine)
+void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world", true, _physicsEngine);
+  Load("worlds/seesaw.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -46,50 +46,58 @@ void InertiaMsgsTest::InertiaAccessors(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
 
-  // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x, 0);
-  EXPECT_EQ(g.y, 0);
-  EXPECT_LE(g.z, -9.8);
+  const std::string modelName("cube1");
+  auto model = world->GetModel(modelName);
+  ASSERT_TRUE(model != NULL);
+  auto link = model->GetLink();
+  ASSERT_TRUE(link != NULL);
+  auto inertial = link->GetInertial();
+  ASSERT_TRUE(inertial != NULL);
+  const double mass = inertial->GetMass();
+  const math::Vector3 cog = inertial->GetCoG();
+  const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
+  const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
+  EXPECT_DOUBLE_EQ(mass, 45.56250000000001);
+  EXPECT_EQ(cog, math::Vector3::Zero);
+  EXPECT_EQ(Ixxyyzz, 1.537734375*math::Vector3::One);
+  EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
 
-  // Set Gravity by publishing to "~/physics"
-  transport::PublisherPtr physicsPub =
-    this->node->Advertise<msgs::Physics>("~/physics");
-  msgs::Physics msg;
-  // it doesn't actually seem to matter what type you set
-  msg.set_type(msgs::Physics::Type_MIN);
+  // new inertial values
+  msgs::Model msg;
+  msg.set_name(modelName);
+  msg.add_link();
+  auto msgLink = msg.mutable_link(0);
+  msgLink->set_name("link");
+  auto msgInertial = msgLink->mutable_inertial();
+  msgInertial->set_mass(99.9);
+  msgInertial->set_ixx(12.3);
+  msgInertial->set_ixy(0.123);
+  msgInertial->set_ixz(0.456);
+  msgInertial->set_iyy(13.4);
+  msgInertial->set_iyz(0.789);
+  msgInertial->set_izz(15.6);
+  const ignition::math::Vector3d newCog(1.1, -2.2, 3.3);
+  msgs::Set(msgInertial->mutable_pose(), ignition::math::Pose3d(
+    newCog, ignition::math::Quaterniond()));
 
-  std::vector<math::Vector3> gravity;
-  gravity.push_back(math::Vector3(0, 0, 9.81));
-  gravity.push_back(math::Vector3(0, 0, -20));
-  gravity.push_back(math::Vector3(0, 0, 20));
-  gravity.push_back(math::Vector3(0, 0, 0));
-  gravity.push_back(math::Vector3(0, 0, -9.81));
-  gravity.push_back(math::Vector3(1, 1, 9.81));
-  gravity.push_back(math::Vector3(2, 3, -20));
-  gravity.push_back(math::Vector3(2, -3, 20));
-  gravity.push_back(math::Vector3(-2, 3, 0));
-  gravity.push_back(math::Vector3(-2, -3, -9.81));
+  // Set inertial properties by publishing to "~/model/modify"
+  transport::PublisherPtr modelPub =
+    this->node->Advertise<msgs::Model>("~/model/modify");
+  modelPub->WaitForConnection();
+  modelPub->Publish(msg, true);
 
-  for (std::vector<math::Vector3>::iterator iter = gravity.begin();
-       iter != gravity.end(); ++iter)
+  while (newCog != inertial->GetCoG().Ign())
   {
-    msgs::Set(msg.mutable_gravity(), (*iter).Ign());
-    physicsPub->Publish(msg);
-
-    while (*iter != physics->GetGravity())
-    {
-      world->Step(1);
-      common::Time::MSleep(1);
-    }
-
-    EXPECT_EQ(*iter, physics->GetGravity());
+    world->Step(1);
+    common::Time::MSleep(1);
+    modelPub->Publish(msg, true);
   }
 }
 
 /////////////////////////////////////////////////
-TEST_P(InertiaMsgsTest, InertiaAccessors)
+TEST_P(InertiaMsgsTest, InertialAccessors)
 {
-  InertiaAccessors(GetParam());
+  InertialAccessors(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, InertiaMsgsTest,
