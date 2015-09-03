@@ -27,7 +27,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 void VisualConfig_TEST::Initialization()
 {
-  gazebo::gui::VisualConfig vc;
+  VisualConfig vc;
 
   QCOMPARE(vc.GetVisualCount(), (unsigned int) 0);
   QVERIFY(vc.GetData("NotFound") == NULL);
@@ -36,8 +36,7 @@ void VisualConfig_TEST::Initialization()
 /////////////////////////////////////////////////
 void VisualConfig_TEST::VisualUpdates()
 {
-  gazebo::gui::VisualConfig vc;
-
+  VisualConfig vc;
   msgs::Visual v1, v2, v3;
 
   vc.AddVisual("v1", &v1);
@@ -55,22 +54,19 @@ void VisualConfig_TEST::VisualUpdates()
   visualMsgPtr->set_transparency(0.50);
 
   vc.UpdateVisual("v1", visualMsgPtr);
+  bool foundConfig = false;
 
-  // Access visual as white box to verify update
-
-  bool found = false;
-  for (auto &it : vc.configs)
+  for (auto &it : vc.GetConfigData())
   {
     if (it.second->name == "v1")
     {
-      VisualConfigData *vcd = it.second;
-      ConfigWidget *cw = vcd->configWidget;
-
-      QCOMPARE(cw->GetDoubleWidgetValue("transparency"), (double)0.50);
-      found = true;
+      const VisualConfigData *configData = it.second;
+      QCOMPARE(configData->configWidget->GetDoubleWidgetValue("transparency"), 0.50);
+      foundConfig = true;
+      break;
     }
   }
-  QVERIFY(found);
+  QVERIFY(foundConfig);
 
   vc.Reset();
 
@@ -85,7 +81,7 @@ void VisualConfig_TEST::VisualUpdates()
 /////////////////////////////////////////////////
 void VisualConfig_TEST::GeometryUpdates()
 {
-  gazebo::gui::VisualConfig vc;
+  VisualConfig vc;
   msgs::Visual v1;
 
   vc.AddVisual("v1", &v1);

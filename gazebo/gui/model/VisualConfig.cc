@@ -343,6 +343,18 @@ void VisualConfig::SetMaterial(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+std::map<int, const VisualConfigData *> VisualConfig::GetConfigData() const
+{
+  std::map<int, const VisualConfigData *> result;
+
+  for (auto &it : this->configs)
+  {
+    result.insert(std::pair<int, VisualConfigData *>(it.first, it.second));
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
 void VisualConfigData::OnToggleItem(bool _checked)
 {
   if (_checked)

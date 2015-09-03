@@ -25,7 +25,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelData.hh"
-#include "gazebo/gui/model/VisualConfig_TEST.hh"
 
 namespace gazebo
 {
@@ -63,7 +62,6 @@ namespace gazebo
     /// \brief A tab for configuring visual properties of a link.
     class GZ_GUI_MODEL_VISIBLE VisualConfig : public QWidget
     {
-      friend class ::VisualConfig_TEST;
       Q_OBJECT
 
       /// \brief Constructor
@@ -122,6 +120,9 @@ namespace gazebo
           const std::string &_materialName,
           const common::Color &_ambient, const common::Color &_diffuse,
           const common::Color &_specular, const common::Color &_emissive);
+
+      /// \brief Get visual configuration data
+      public: std::map<int, const VisualConfigData *> GetConfigData() const;
 
       /// \brief Qt signal emitted when a visual is removed.
       /// \param[in] _name Name of visual removed.
