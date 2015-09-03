@@ -577,9 +577,9 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
         configChildWidget = this->configWidgets[scopedName];
       }
 
-      switch (field->cpp_type())
+      switch (field->type())
       {
-        case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+        case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
           double value = ref->GetDouble(*_msg, field);
           if (!math::equal(value, value))
@@ -592,7 +592,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           this->UpdateDoubleWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+        case google::protobuf::FieldDescriptor::TYPE_FLOAT:
         {
           float value = ref->GetFloat(*_msg, field);
           if (!math::equal(value, value))
@@ -605,7 +605,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           this->UpdateDoubleWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
+        case google::protobuf::FieldDescriptor::TYPE_INT64:
         {
           int64_t value = ref->GetInt64(*_msg, field);
           if (newWidget)
@@ -616,7 +616,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           this->UpdateIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT64:
+        case google::protobuf::FieldDescriptor::TYPE_UINT64:
         {
           uint64_t value = ref->GetUInt64(*_msg, field);
           if (newWidget)
@@ -627,7 +627,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           this->UpdateUIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+        case google::protobuf::FieldDescriptor::TYPE_INT32:
         {
           int32_t value = ref->GetInt32(*_msg, field);
           if (newWidget)
@@ -638,7 +638,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           this->UpdateIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT32:
+        case google::protobuf::FieldDescriptor::TYPE_UINT32:
         {
           uint32_t value = ref->GetUInt32(*_msg, field);
           if (newWidget)
@@ -649,7 +649,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           this->UpdateUIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+        case google::protobuf::FieldDescriptor::TYPE_BOOL:
         {
           bool value = ref->GetBool(*_msg, field);
           if (newWidget)
@@ -660,7 +660,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           this->UpdateBoolWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+        case google::protobuf::FieldDescriptor::TYPE_STRING:
         {
           std::string value = ref->GetString(*_msg, field);
           if (newWidget)
@@ -671,7 +671,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           this->UpdateStringWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
         {
           google::protobuf::Message *valueMsg =
               ref->MutableMessage(_msg, field);
@@ -714,8 +714,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                 if (geomField->is_repeated())
                     continue;
 
-                if (geomField->cpp_type() !=
-                    google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE ||
+                if (geomField->type() !=
+                    google::protobuf::FieldDescriptor::TYPE_MESSAGE ||
                     !valueMsg->GetReflection()->HasField(*valueMsg, geomField))
                   continue;
 
@@ -788,8 +788,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
               const google::protobuf::FieldDescriptor *valueField =
                   valueDescriptor->field(j);
 
-              if (valueField->cpp_type() !=
-                  google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+              if (valueField->type() !=
+                  google::protobuf::FieldDescriptor::TYPE_MESSAGE)
                 continue;
 
               if (valueField->message_type()->name() == "Vector3d")
@@ -898,7 +898,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
 
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+        case google::protobuf::FieldDescriptor::TYPE_ENUM:
         {
           const google::protobuf::EnumValueDescriptor *value =
               ref->GetEnum(*_msg, field);
@@ -1002,6 +1002,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
     widget->setLayout(widgetLayout);
     return widget;
   }
+
   return NULL;
 }
 
@@ -1785,7 +1786,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
     // Update each field in the message
     // TODO update repeated fields
-    if (!field->is_repeated() /*&& ref->HasField(_msg, field)*/)
+    if (!field->is_repeated()) //&& ref->HasField(_msg, field))
     {
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
       if (this->configWidgets.find(scopedName) == this->configWidgets.end())
@@ -1797,65 +1798,65 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
       ConfigChildWidget *childWidget = this->configWidgets[scopedName];
 
-      switch (field->cpp_type())
+      switch (field->type())
       {
-        case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+        case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
           QDoubleSpinBox *valueSpinBox =
               qobject_cast<QDoubleSpinBox *>(childWidget->widgets[0]);
           ref->SetDouble(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+        case google::protobuf::FieldDescriptor::TYPE_FLOAT:
         {
           QDoubleSpinBox *valueSpinBox =
               qobject_cast<QDoubleSpinBox *>(childWidget->widgets[0]);
           ref->SetFloat(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
+        case google::protobuf::FieldDescriptor::TYPE_INT64:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetInt64(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT64:
+        case google::protobuf::FieldDescriptor::TYPE_UINT64:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetUInt64(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+        case google::protobuf::FieldDescriptor::TYPE_INT32:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetInt32(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT32:
+        case google::protobuf::FieldDescriptor::TYPE_UINT32:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetUInt32(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+        case google::protobuf::FieldDescriptor::TYPE_BOOL:
         {
           QRadioButton *valueRadioButton =
               qobject_cast<QRadioButton *>(childWidget->widgets[0]);
           ref->SetBool(_msg, field, valueRadioButton->isChecked());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+        case google::protobuf::FieldDescriptor::TYPE_STRING:
         {
           QLineEdit *valueLineEdit =
               qobject_cast<QLineEdit *>(childWidget->widgets[0]);
           ref->SetString(_msg, field, valueLineEdit->text().toStdString());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
         {
           google::protobuf::Message *valueMsg =
               (ref->MutableMessage(_msg, field));
@@ -1987,8 +1988,8 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
               const google::protobuf::FieldDescriptor *valueField =
                   valueDescriptor->field(j);
 
-              if (valueField->cpp_type() !=
-                  google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+              if (valueField->type() !=
+                  google::protobuf::FieldDescriptor::TYPE_MESSAGE)
                 continue;
 
               if (valueField->message_type()->name() == "Vector3d")
@@ -2073,7 +2074,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+        case google::protobuf::FieldDescriptor::TYPE_ENUM:
         {
           QComboBox *valueComboBox =
               qobject_cast<QComboBox *>(childWidget->widgets[0]);
