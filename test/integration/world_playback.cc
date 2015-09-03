@@ -33,6 +33,7 @@ using namespace gazebo;
 /// The 3rd element is the initial simulation time.
 /// The 4rd element is the final simulation time.
 using FeaturesT = std::tuple<uint32_t, uint32_t, double, double>;
+
 /// \brief List of log files for testing with their expected features.
 /// The key of the map is the log file name.
 /// The value is a tuple containing features to test (e.g.: initial iteration).
@@ -47,7 +48,7 @@ LogFeatures_M logs =
 
 /// \brief Helper class that initializes each test.
 class WorldPlaybackTest : public ServerFixture,
-                          public testing::WithParamInterface<const char*>
+                          public testing::WithParamInterface<const char *>
 {
   /// \brief Class constructor.
   public: WorldPlaybackTest()
@@ -58,7 +59,7 @@ class WorldPlaybackTest : public ServerFixture,
     logPath /= this->logName;
 
     // Start the server with a log file and paused.
-    LoadArgs("-u -p " + logPath.string());
+    this->LoadArgs("-u -p " + logPath.string());
     this->world = physics::get_world("default");
 
     // Prepare the transport.
@@ -128,7 +129,7 @@ TEST_P(WorldPlaybackTest, Step)
   this->world->Step(10);
 
   // Test multiple steps.
-  // Note: If you test a big step size you should increate the waiting time.
+  // Note: If you test a big step size you should increase the waiting time.
   msgs::LogPlaybackControl msg;
   for (auto step : {0, 1, 20, -1, -20})
   {
@@ -137,7 +138,7 @@ TEST_P(WorldPlaybackTest, Step)
     msg.Clear();
     msg.set_multi_step(step);
     this->logPlaybackPub->Publish(msg);
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    this->WaitUntilIteration(expectedIters, 50, 20);
     EXPECT_EQ(world->GetIterations(), expectedIters);
   }
 
@@ -145,15 +146,15 @@ TEST_P(WorldPlaybackTest, Step)
   msg.Clear();
   msg.set_multi_step(-9999999);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  this->WaitUntilIteration(this->expectedInitialIters, 10, 20);
   EXPECT_EQ(world->GetIterations(), this->expectedInitialIters);
 
   // Insane forward jump.
   msg.Clear();
   msg.set_multi_step(9999999);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
-  EXPECT_EQ(world->GetIterations(), this->expectedFinalIters);
+  this->WaitUntilIteration(this->expectedFinalIters, 500, 50);
+  EXPECT_EQ(this->world->GetIterations(), this->expectedFinalIters);
 }
 
 /////////////////////////////////////////////////
@@ -171,7 +172,7 @@ TEST_P(WorldPlaybackTest, Rewind)
     msgs::LogPlaybackControl msg;
     msg.set_rewind(true);
     this->logPlaybackPub->Publish(msg);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    this->WaitUntilIteration(this->expectedInitialIters, 10, 20);
     EXPECT_EQ(world->GetIterations(), this->expectedInitialIters);
   }
 }
@@ -188,7 +189,7 @@ TEST_P(WorldPlaybackTest, Forward)
     msgs::LogPlaybackControl msg;
     msg.set_rewind(true);
     this->logPlaybackPub->Publish(msg);
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    this->WaitUntilIteration(this->expectedInitialIters, 10, 20);
     EXPECT_EQ(world->GetIterations(), this->expectedInitialIters);
 
     // Step forward the world.
@@ -198,7 +199,7 @@ TEST_P(WorldPlaybackTest, Forward)
     msg.Clear();
     msg.set_forward(true);
     this->logPlaybackPub->Publish(msg);
-    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+    this->WaitUntilIteration(this->expectedFinalIters, 50, 400);
     EXPECT_EQ(world->GetIterations(), this->expectedFinalIters);
   }
 }
@@ -218,9 +219,8 @@ TEST_P(WorldPlaybackTest, Seek)
   msg.mutable_seek()->set_sec(msgExpectedTime.sec());
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  auto curTime = this->world->GetSimTime();
-  EXPECT_TRUE(curTime == expectedTime);
+  this->WaitUntilSimTime(expectedTime, 50, 50);
+  EXPECT_TRUE(this->world->GetSimTime() == expectedTime);
 
   // Try to seek to before the initial time.
   msg.Clear();
@@ -228,9 +228,8 @@ TEST_P(WorldPlaybackTest, Seek)
   msg.mutable_seek()->set_sec(0);
   msg.mutable_seek()->set_nsec(0);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  curTime = this->world->GetSimTime();
-  EXPECT_TRUE(curTime == expectedTime);
+  this->WaitUntilSimTime(expectedTime, 50, 50);
+  EXPECT_TRUE(this->world->GetSimTime() == expectedTime);
 
   // Try to seek after the final time.
   msg.Clear();
@@ -238,9 +237,8 @@ TEST_P(WorldPlaybackTest, Seek)
   msg.mutable_seek()->set_sec(999999);
   msg.mutable_seek()->set_nsec(0);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-  curTime = this->world->GetSimTime();
-  EXPECT_TRUE(curTime == expectedTime);
+  this->WaitUntilSimTime(expectedTime, 100, 100);
+  EXPECT_TRUE(this->world->GetSimTime() == expectedTime);
 }
 
 // Test with different log files.
