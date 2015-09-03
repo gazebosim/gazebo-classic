@@ -976,16 +976,18 @@ void Model::FillMsg(msgs::Model &_msg)
   msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (Link_V::iterator iter = this->links.begin(); iter != this->links.end();
-      ++iter)
+  for (const auto &link : this->links)
   {
-    (*iter)->FillMsg(*_msg.add_link());
+    link->FillMsg(*_msg.add_link());
   }
 
-  for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); ++iter)
+  for (const auto &joint : this->joints)
   {
-    (*iter)->FillMsg(*_msg.add_joint());
+    joint->FillMsg(*_msg.add_joint());
+  }
+  for (const auto &model : this->models)
+  {
+    model->FillMsg(*_msg.add_model());
   }
 }
 

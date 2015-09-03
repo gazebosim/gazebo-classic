@@ -369,6 +369,11 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
         entity->SetWorldPoseModel(
             (entity->worldPose - oldModelWorldPose) + _pose, _notify, _publish);
       }
+      else
+      {
+        gzerr << "SetWorldPoseModel error: unknown type of entity in Model."
+          << std::endl;
+      }
     }
   }
 }
@@ -392,7 +397,7 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   }
 
   EntityPtr parentEnt = this->parentEntity;
-  math::Pose relativePose = this->initialRelativePose;
+  ignition::math::Pose3d relativePose = this->initialRelativePose.Ign();
   math::Pose updatePose = _pose;
 
   // recursively update parent model pose based on new canonical link pose
@@ -400,7 +405,7 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   {
     // setting parent Model world pose from canonical link world pose
     // where _pose is the canonical link's world pose
-    parentEnt->worldPose = (-relativePose) + updatePose;
+    parentEnt->worldPose = math::Pose(-relativePose) + updatePose;
 
     parentEnt->worldPose.Correct();
 
@@ -411,7 +416,7 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
       this->parentEntity->PublishPose();
 
     updatePose = parentEnt->worldPose;
-    relativePose = parentEnt->GetInitialRelativePose();
+    relativePose = parentEnt->GetInitialRelativePose().Ign();
 
     parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
   }
