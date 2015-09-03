@@ -93,6 +93,18 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
     common::Time::MSleep(1);
     modelPub->Publish(msg, true);
   }
+  EXPECT_DOUBLE_EQ(inertial->GetMass(), msgInertial->mass());
+  EXPECT_EQ(inertial->GetCoG().Ign(), newCog);
+  EXPECT_EQ(inertial->GetPrincipalMoments(),
+            ignition::math::Vector3d(
+                msgInertial->ixx(),
+                msgInertial->iyy(),
+                msgInertial->izz()));
+  EXPECT_EQ(inertial->GetProductsofInertia(),
+            ignition::math::Vector3d(
+                msgInertial->ixy(),
+                msgInertial->ixz(),
+                msgInertial->iyz()));
 }
 
 /////////////////////////////////////////////////
