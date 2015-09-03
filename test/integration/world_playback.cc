@@ -53,7 +53,7 @@ class WorldPlaybackTest : public ServerFixture,
   /// \brief Class constructor.
   public: WorldPlaybackTest()
   {
-    this->logName = std::string(GetParam());
+    this->logName = std::string(this->GetParam());
     boost::filesystem::path logPath = TEST_PATH;
     logPath /= "logs/";
     logPath /= this->logName;
