@@ -52,6 +52,7 @@
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
 ## Gazebo 6.0
+
 1. Added Copy constructor and assignment operator to MouseEvent
     * [Pull request #1855](https://bitbucket.org/osrf/gazebo/pull-request/1855)
 
