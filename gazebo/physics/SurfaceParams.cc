@@ -123,13 +123,6 @@ void FrictionPyramid::SetUsePatchRadius(const bool _use)
 }
 
 //////////////////////////////////////////////////
-double FrictionPyramid::GetMu(unsigned int _index)
-{
-  GZ_ASSERT(_index < 3, "Invalid _index to GetMu");
-  return this->mu[_index];
-}
-
-//////////////////////////////////////////////////
 double FrictionPyramid::Mu(const unsigned int _index) const
 {
   GZ_ASSERT(_index < 3, "Invalid _index to Mu");

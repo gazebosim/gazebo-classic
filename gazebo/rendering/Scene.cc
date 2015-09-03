@@ -1632,6 +1632,12 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     }
   }
 
+  for (int i = 0; i < _msg.model_size(); ++i)
+  {
+    boost::shared_ptr<msgs::Model> mm(new msgs::Model(_msg.model(i)));
+    this->dataPtr->modelMsgs.push_back(mm);
+  }
+
   return true;
 }
 
@@ -1928,7 +1934,8 @@ void Scene::PreRender()
         // If an object is selected, don't let the physics engine move it.
         if (!this->dataPtr->selectedVis
             || this->dataPtr->selectionMode != "move" ||
-            iter->first != this->dataPtr->selectedVis->GetId())
+            (iter->first != this->dataPtr->selectedVis->GetId() &&
+            !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
         {
           ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
@@ -1960,7 +1967,8 @@ void Scene::PreRender()
             // If an object is selected, don't let the physics engine move it.
             if (!this->dataPtr->selectedVis ||
                 this->dataPtr->selectionMode != "move" ||
-                iter->first != this->dataPtr->selectedVis->GetId())
+                (iter->first != this->dataPtr->selectedVis->GetId()&&
+                !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
             {
               ignition::math::Pose3d pose = msgs::ConvertIgn(pose_msg);
               iter2->second->SetPose(pose);

@@ -665,7 +665,12 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           std::string value = ref->GetString(*_msg, field);
           if (newWidget)
           {
-            configChildWidget = this->CreateStringWidget(name, _level);
+            // Choose either a one-line or a multi-line widget according to name
+            std::string type = "line";
+            if (name == "innerxml")
+              type = "plain";
+
+            configChildWidget = this->CreateStringWidget(name, _level, type);
             newFieldWidget = configChildWidget;
           }
           this->UpdateStringWidget(configChildWidget, value);
@@ -934,11 +939,6 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               break;
             }
 
-            // connect enum config widget event so that we can fire an other
-            // event from ConfigWidget that has the name of this field
-            connect(qobject_cast<EnumConfigWidget *>(configChildWidget),
-                SIGNAL(EnumValueChanged(const QString &)), this,
-                SLOT(OnEnumValueChanged(const QString &)));
             newFieldWidget = configChildWidget;
           }
           this->UpdateEnumWidget(configChildWidget, value->name());
@@ -957,7 +957,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
             {\
               background-color: " + this->level0BgColor +
             "}\
-            QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+            QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
             {\
               background-color: " + this->level0WidgetColor +
             "}");
@@ -1072,7 +1072,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
         {\
           background-color: " + this->level1BgColor +
         "}\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
         {\
           background-color: " + this->level1WidgetColor +
         "}");
@@ -1084,7 +1084,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
         {\
           background-color: " + this->level2BgColor +
         "}\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
         {\
           background-color: " + this->level2WidgetColor +
         "}");
@@ -1094,11 +1094,11 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     _childWidget->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level2BgColor +
+          background-color: " + this->level3BgColor +
         "}\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
         {\
-          background-color: " + this->level2WidgetColor +
+          background-color: " + this->level3WidgetColor +
         "}");
   }
 
@@ -1251,14 +1251,29 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
 
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
-    const int _level)
+    const int _level, const std::string &_type)
 {
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
-  // LineEdit
-  QLineEdit *valueLineEdit = new QLineEdit;
+  // Line or Text Edit based on key
+  QWidget *valueEdit;
+  if (_type == "plain")
+  {
+    valueEdit = new QPlainTextEdit();
+    valueEdit->setMinimumHeight(50);
+  }
+  else if (_type == "line")
+  {
+    valueEdit = new QLineEdit;
+  }
+  else
+  {
+    gzerr << "Unknown type [" << _type << "]. Not creating string widget" <<
+        std::endl;
+    return NULL;
+  }
 
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
@@ -1268,14 +1283,14 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
         QSizePolicy::Fixed, QSizePolicy::Fixed));
   }
   widgetLayout->addWidget(keyLabel);
-  widgetLayout->addWidget(valueLineEdit);
+  widgetLayout->addWidget(valueEdit);
 
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
-  widget->widgets.push_back(valueLineEdit);
+  widget->widgets.push_back(valueEdit);
 
   return widget;
 }
@@ -1758,6 +1773,12 @@ ConfigChildWidget *ConfigWidget::CreateEnumWidget(
 
   widget->widgets.push_back(enumComboBox);
 
+  // connect enum config widget event so that we can fire another
+  // event from ConfigWidget that has the name of this field
+  connect(widget,
+      SIGNAL(EnumValueChanged(const QString &)), this,
+      SLOT(OnEnumValueChanged(const QString &)));
+
   return widget;
 }
 
@@ -1851,9 +1872,19 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
         }
         case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
         {
-          QLineEdit *valueLineEdit =
+          if (qobject_cast<QLineEdit *>(childWidget->widgets[0]))
+          {
+            QLineEdit *valueLineEdit =
               qobject_cast<QLineEdit *>(childWidget->widgets[0]);
-          ref->SetString(_msg, field, valueLineEdit->text().toStdString());
+            ref->SetString(_msg, field, valueLineEdit->text().toStdString());
+          }
+          else if (qobject_cast<QPlainTextEdit *>(childWidget->widgets[0]))
+          {
+            QPlainTextEdit *valueTextEdit =
+                qobject_cast<QPlainTextEdit *>(childWidget->widgets[0]);
+            ref->SetString(_msg, field,
+                valueTextEdit->toPlainText().toStdString());
+          }
           break;
         }
         case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
@@ -2185,8 +2216,18 @@ bool ConfigWidget::UpdateStringWidget(ConfigChildWidget *_widget,
 {
   if (_widget->widgets.size() == 1u)
   {
-    qobject_cast<QLineEdit *>(_widget->widgets[0])->setText(tr(_value.c_str()));
-    return true;
+    if (qobject_cast<QLineEdit *>(_widget->widgets[0]))
+    {
+      qobject_cast<QLineEdit *>(_widget->widgets[0])
+          ->setText(tr(_value.c_str()));
+      return true;
+    }
+    else if (qobject_cast<QPlainTextEdit *>(_widget->widgets[0]))
+    {
+      qobject_cast<QPlainTextEdit *>(_widget->widgets[0])
+          ->setPlainText(tr(_value.c_str()));
+      return true;
+    }
   }
   else
   {
@@ -2327,7 +2368,6 @@ bool ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
   return true;
 }
 
-
 /////////////////////////////////////////////////
 bool ConfigWidget::UpdateEnumWidget(ConfigChildWidget *_widget,
     const std::string &_value)
@@ -2410,8 +2450,16 @@ std::string ConfigWidget::GetStringWidgetValue(ConfigChildWidget *_widget) const
   std::string value;
   if (_widget->widgets.size() == 1u)
   {
-    value =
-        qobject_cast<QLineEdit *>(_widget->widgets[0])->text().toStdString();
+    if (qobject_cast<QLineEdit *>(_widget->widgets[0]))
+    {
+      value =
+          qobject_cast<QLineEdit *>(_widget->widgets[0])->text().toStdString();
+    }
+    else if (qobject_cast<QPlainTextEdit *>(_widget->widgets[0]))
+    {
+      value = qobject_cast<QPlainTextEdit *>(_widget->widgets[0])
+          ->toPlainText().toStdString();
+    }
   }
   else
   {
@@ -2728,4 +2776,106 @@ void GeometryConfigWidget::OnSelectFile()
 void EnumConfigWidget::EnumChanged(const QString &_value)
 {
   emit EnumValueChanged(_value);
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::ClearEnumWidget(const std::string &_name)
+{
+  // Find widget
+  auto iter = this->configWidgets.find(_name);
+
+  if (iter == this->configWidgets.end())
+    return false;
+
+  EnumConfigWidget *enumWidget = dynamic_cast<EnumConfigWidget *>(iter->second);
+
+  if (enumWidget->widgets.size() != 1u)
+  {
+    gzerr << "Enum config widget has wrong number of widgets." << std::endl;
+    return false;
+  }
+
+  QComboBox *valueComboBox = qobject_cast<QComboBox *>(enumWidget->widgets[0]);
+  if (!valueComboBox)
+  {
+    gzerr << "Enum config widget doesn't have a QComboBox." << std::endl;
+    return false;
+  }
+
+  // Clear
+  valueComboBox->blockSignals(true);
+  valueComboBox->clear();
+  valueComboBox->blockSignals(false);
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::AddItemEnumWidget(const std::string &_name,
+    const std::string &_itemText)
+{
+  // Find widget
+  auto iter = this->configWidgets.find(_name);
+
+  if (iter == this->configWidgets.end())
+    return false;
+
+  EnumConfigWidget *enumWidget = dynamic_cast<EnumConfigWidget *>(iter->second);
+
+  if (enumWidget->widgets.size() != 1u)
+  {
+    gzerr << "Enum config widget has wrong number of widgets." << std::endl;
+    return false;
+  }
+
+  QComboBox *valueComboBox = qobject_cast<QComboBox *>(enumWidget->widgets[0]);
+  if (!valueComboBox)
+  {
+    gzerr << "Enum config widget doesn't have a QComboBox." << std::endl;
+    return false;
+  }
+
+  // Add item
+  valueComboBox->blockSignals(true);
+  valueComboBox->addItem(QString::fromStdString(_itemText));
+  valueComboBox->blockSignals(false);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::RemoveItemEnumWidget(const std::string &_name,
+    const std::string &_itemText)
+{
+  // Find widget
+  auto iter = this->configWidgets.find(_name);
+
+  if (iter == this->configWidgets.end())
+    return false;
+
+  EnumConfigWidget *enumWidget = dynamic_cast<EnumConfigWidget *>(iter->second);
+
+  if (enumWidget->widgets.size() != 1u)
+  {
+    gzerr << "Enum config widget has wrong number of widgets." << std::endl;
+    return false;
+  }
+
+  QComboBox *valueComboBox = qobject_cast<QComboBox *>(enumWidget->widgets[0]);
+  if (!valueComboBox)
+  {
+    gzerr << "Enum config widget doesn't have a QComboBox." << std::endl;
+    return false;
+  }
+
+  // Remove item if exists, otherwise return false
+  int index = valueComboBox->findText(QString::fromStdString(
+      _itemText));
+  if (index < 0)
+    return false;
+
+  valueComboBox->blockSignals(true);
+  valueComboBox->removeItem(index);
+  valueComboBox->blockSignals(false);
+
+  return true;
 }
