@@ -34,11 +34,13 @@
 using namespace gazebo;
 using namespace rendering;
 
+//////////////////////////////////////////////////
 CameraLens::CameraLens()
 {
   this->dataPtr = new CameraLensPrivate;
 }
 
+//////////////////////////////////////////////////
 CameraLens::~CameraLens()
 {
   delete this->dataPtr;
