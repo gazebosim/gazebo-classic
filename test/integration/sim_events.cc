@@ -81,7 +81,7 @@ std::string GetEventData()
 // waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewEvent(unsigned int current,
-                             unsigned int max_tries = 10,
+                             unsigned int max_tries = 50,
                              unsigned int ms = 10)
 {
   for (unsigned int i = 0; i < max_tries; i++)
@@ -235,13 +235,13 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////////////////
 void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
 {
-  // simbody stepTo() failure
-  if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
+  if (SKIP_FAILING_TESTS && _physicsEngine != "ode")
+    return;
 
   this->Load("worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
 
-  // Get the elevator model
+  // Get the revoluter model
   physics::ModelPtr model = world->GetModel("revoluter");
   physics::JointPtr joint = model->GetJoint("joint");
 
@@ -259,6 +259,13 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
   joint->SetPosition(0, IGN_PI);
   // check for event
   unsigned int count_after = WaitForNewEvent(count_before);
+  EXPECT_GT(count_after, count_before);
+
+  count_before = GetEventCount();
+
+  joint->SetVelocity(0, 3.1);
+  // check for event
+  count_after = WaitForNewEvent(count_before);
   EXPECT_GT(count_after, count_before);
 }
 

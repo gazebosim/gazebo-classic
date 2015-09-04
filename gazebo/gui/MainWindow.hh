@@ -27,6 +27,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -40,13 +41,14 @@ namespace gazebo
 {
   namespace gui
   {
+    class InsertModelWidget;
     class RenderWidget;
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
     class SpaceNav;
 
-    class GAZEBO_VISIBLE MainWindow : public QMainWindow
+    class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
 
@@ -136,8 +138,15 @@ namespace gazebo
       /// \brief Clone a simulation.
       private slots: void Clone();
 
+      /// \brief Qt callback when the hotkey chart is triggered,
+      private slots: void HotkeyChart();
+
+      /// \brief Qt callback when about is triggered,
       private slots: void About();
+
       private slots: void Step();
+
+      /// \brief Qt callback when the arrow mode is triggered.
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -281,6 +290,10 @@ namespace gazebo
       private: void CreateDisabledIcon(const std::string &_pixmap,
                    QAction *_act);
 
+      /// \brief Callback when window mode has changed.
+      /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
+      private: void OnWindowMode(const std::string &_mode);
+
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
@@ -359,6 +372,12 @@ namespace gazebo
 
       /// \brief Data logger dialog.
       private: gui::DataLogger *dataLogger;
+
+      /// \brief Hotkey chart dialog.
+      private: gui::HotkeyDialog *hotkeyDialog;
+
+      /// \brief Tab to insert models.
+      private: InsertModelWidget *insertModel;
     };
   }
 }

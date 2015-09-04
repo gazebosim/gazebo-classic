@@ -52,6 +52,7 @@
 
 #include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
+#include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -130,6 +131,10 @@ ModelCreator::ModelCreator()
       boost::bind(&ModelCreator::OpenInspector, this, _1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectOpenModelPluginInspector(
+      boost::bind(&ModelCreator::OpenModelPluginInspector, this, _1)));
+
+  this->connections.push_back(
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
@@ -187,6 +192,7 @@ ModelCreator::~ModelCreator()
 
   this->allLinks.clear();
   this->nestedLinks.clear();
+  this->allModelPlugins.clear();
   this->allNestedModels.clear();
   this->node->Fini();
   this->node.reset();
@@ -452,6 +458,16 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
       this->jointMaker->CreateJointFromSDF(jointElem, modelNameStream.str());
       jointElem = jointElem->GetNextElement("joint");
     }
+
+  // Plugins
+  sdf::ElementPtr pluginElem;
+  if (_modelElem->HasElement("plugin"))
+    pluginElem = _modelElem->GetElement("plugin");
+  while (pluginElem)
+  {
+    this->AddModelPlugin(pluginElem);
+    pluginElem = pluginElem->GetNextElement("plugin");
+  }
   }
 
   // Nested models only
@@ -1321,6 +1337,8 @@ void ModelCreator::Reset()
   while (!this->allNestedModels.empty())
     this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
   this->allNestedModels.clear();
+
+  this->allModelPlugins.clear();  
 
   if (!gui::get_active_camera() ||
     !gui::get_active_camera()->GetScene())
@@ -2198,20 +2216,9 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 
-  // If we're editing an existing model, copy the original plugin sdf elements
-  // since we are not generating them.
-  if (this->serverModelSDF)
-  {
-    if (this->serverModelSDF->HasElement("plugin"))
-    {
-      sdf::ElementPtr pluginElem = this->serverModelSDF->GetElement("plugin");
-      while (pluginElem)
-      {
-        modelElem->InsertElement(pluginElem->Clone());
-        pluginElem = pluginElem->GetNextElement("plugin");
-      }
-    }
-  }
+  // Add plugin elements
+  for (auto modelPlugin : this->allModelPlugins)
+    modelElem->InsertElement(modelPlugin.second->modelPluginSDF->Clone());
 
   // Append custom SDF - only plugins for now
   sdf::ElementPtr pluginElem;
@@ -2547,3 +2554,43 @@ void ModelCreator::AppendPluginElement(const std::string &_name,
 
   this->sdfToAppend->InsertElement(pluginElem);
 }
+
+/////////////////////////////////////////////////
+void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
+{
+  if (_pluginElem->HasAttribute("name"))
+  {
+    std::string name = _pluginElem->Get<std::string>("name");
+
+    // Create data
+    ModelPluginData *modelPlugin = new ModelPluginData();
+    modelPlugin->Load(_pluginElem);
+
+    // Add to map
+    {
+      boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+      this->allModelPlugins[name] = modelPlugin;
+    }
+
+    // Notify addition
+    gui::model::Events::modelPluginInserted(name);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OpenModelPluginInspector(const std::string &_name)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
+  auto it = this->allModelPlugins.find(_name);
+  if (it == this->allModelPlugins.end())
+  {
+    gzerr << "Model plugin [" << _name << "] not found." << std::endl;
+    return;
+  }
+
+  ModelPluginData *modelPlugin = it->second;
+  modelPlugin->inspector->move(QCursor::pos());
+  modelPlugin->inspector->show();
+}
+

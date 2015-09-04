@@ -147,6 +147,7 @@ void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 {
   if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
+
   this->SetThreadPitch(_threadPitch);
 }
 
@@ -157,7 +158,7 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
       reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
 
   this->threadPitch = _threadPitch;
-  dtScrewJoint->setPitch(_threadPitch * 2.0 * M_PI);
+  dtScrewJoint->setPitch(DARTTypes::InvertThreadPitch(_threadPitch));
 }
 
 //////////////////////////////////////////////////
@@ -165,6 +166,7 @@ double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
+
   return this->GetThreadPitch();
 }
 
@@ -176,9 +178,10 @@ double DARTScrewJoint::GetThreadPitch()
 
   double result = this->threadPitch;
   if (dtScrewJoint)
-    result = dtScrewJoint->getPitch() * 0.5 / M_PI;
+    result = DARTTypes::InvertThreadPitch(dtScrewJoint->getPitch());
   else
     gzwarn << "dartScrewJoint not created yet, returning cached threadPitch.\n";
+
   return result;
 }
 
@@ -204,13 +207,12 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
   }
   else if (_index == 1)
   {
-    dart::dynamics::ScrewJoint *dtScrewJoint =
-        reinterpret_cast<dart::dynamics::ScrewJoint *>(
-          this->dataPtr->dtJoint);
-
     // linear position
     const double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result = dtScrewJoint->getPitch() * radianAngle * 0.5 / M_PI;
+    result.SetFromRadian(-radianAngle /
+                         const_cast<DARTScrewJoint*>(this)->GetThreadPitch());
+    // TODO: The ScrewJoint::GetThreadPitch() function is not const. As an
+    // workaround, we use const_cast here until #1686 is resolved.
   }
   else
   {

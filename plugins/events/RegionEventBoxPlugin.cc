@@ -25,16 +25,12 @@ GZ_REGISTER_MODEL_PLUGIN(RegionEventBoxPlugin)
 RegionEventBoxPlugin::RegionEventBoxPlugin()
   : ModelPlugin(), eventPub(0)
 {
-  this->receiveMutex = new boost::mutex();
   this->hasStaleSizeAndPose = true;
 }
 
 //////////////////////////////////////////////////
 void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
-  std::cout << "RegionEventBoxPlugin::Load(): model='" << _parent->GetName()
-      << "'" << std::endl << std::flush;
-
   this->model = _parent;
   this->modelName = _parent->GetName();
   this->world = _parent->GetWorld();
@@ -46,14 +42,31 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       &RegionEventBoxPlugin::OnModelMsg, this);
 
   sdf::ElementPtr linkEl = this->model->GetSDF()->GetElement("link");
+
+
+  if (!linkEl->HasElement("visual"))
+  {
+    gzerr << "RegionEventBoxPlugin requires a visual element. "
+          << "Plugin fails to load."
+          << std::endl;
+    return;
+  }
   sdf::ElementPtr visualEl = linkEl->GetElement("visual");
   sdf::ElementPtr geometryEl = visualEl->GetElement("geometry");
-  sdf::ElementPtr boxEl = geometryEl->GetElement("box");
-  this->boxSize = boxEl->Get<math::Vector3>("size");
-  this->boxScale = math::Vector3::One;
-  this->boxPose = this->model->GetWorldPose();
-  this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose);
 
+  if (!geometryEl->HasElement("box"))
+  {
+    gzerr << "RegionEventBoxPlugin requires a visual element "
+          << "with a box geometry. Plugin fails to load."
+          << std::endl;
+    return;
+  }
+  sdf::ElementPtr boxEl = geometryEl->GetElement("box");
+
+  this->boxSize = boxEl->Get<ignition::math::Vector3d>("size");
+  this->boxScale = ignition::math::Vector3d::One;
+  this->boxPose = this->model->GetWorldPose().Ign();
+  this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose);
 
   if (_sdf->HasElement("event"))
   {
@@ -75,40 +88,38 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr & _msg)
+void RegionEventBoxPlugin::OnModelMsg(ConstModelPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
   if (_msg->has_name() && _msg->name() == this->modelName && _msg->has_scale())
   {
-    this->boxScale = msgs::Convert(_msg->scale());
+    this->boxScale = msgs::ConvertIgn(_msg->scale());
     this->hasStaleSizeAndPose = true;
   }
 }
 
 //////////////////////////////////////////////////
-void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo & _info)
+void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
+  // check to see if the box visual geometry has changed size or pose
+  // due to user interaction via the gui, if so update region dimensions
   {
-    boost::mutex::scoped_lock lock(*this->receiveMutex);
-    if (this->boxPose != this->model->GetWorldPose())
+    std::lock_guard<std::mutex> lock(this->receiveMutex);
+    if (this->boxPose != this->model->GetWorldPose().Ign())
     {
-      this->boxPose = this->model->GetWorldPose();
+      this->boxPose = this->model->GetWorldPose().Ign();
       this->hasStaleSizeAndPose = true;
     }
 
     if (this->hasStaleSizeAndPose)
     {
-      if (!this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose))
-      {
-        std::cerr << "RegionEventPlugin::OnUpdate(): "
-            << "failed to update size and pose for model '" << this->modelName
-            << "'" << std::endl << std::flush;
-        return;
-      }
+      this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose);
       this->hasStaleSizeAndPose = false;
     }
   }
 
+  // check if any model in the world is in the region or if a model that was
+  // previously in the region has exited the region.
   for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
   {
     physics::ModelPtr m = this->world->GetModel(i);
@@ -119,7 +130,8 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo & _info)
 
     auto it = this->insiders.find(m->GetName());
 
-    if (this->PointInRegion(m->GetWorldPose().pos, this->box, this->boxPose))
+    if (this->PointInRegion(m->GetWorldPose().pos.Ign(), this->box,
+        this->boxPose))
     {
       if (it == this->insiders.end())
       {
@@ -142,65 +154,54 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo & _info)
 }
 
 //////////////////////////////////////////////////
-bool RegionEventBoxPlugin::PointInRegion(const math::Vector3 &_point,
-    const math::Box &_box, const math::Pose &_pose)
+bool RegionEventBoxPlugin::PointInRegion(const ignition::math::Vector3d &_point,
+    const ignition::math::Box &_box, const ignition::math::Pose3d &_pose) const
 {
-  // transfrom box extents into local space
+  // transform box extents into local space
   // box extents are already axis-aligned (see UpdateRegion) so no need to
   // apply inverse rotation.
-  math::Box localBox(_box.min - _pose.pos, _box.max - _pose.pos);
+  ignition::math::Box localBox(_box.Min() - _pose.Pos(),
+      _box.Max() - _pose.Pos());
 
   // transform point into box space
-  math::Vector3 p = _pose.rot.GetInverse() * (_point - _pose.pos);
+  ignition::math::Vector3d p =
+      _pose.Rot().Inverse() * (_point - _pose.Pos());
 
   return localBox.Contains(p);
 }
 
 //////////////////////////////////////////////////
-bool RegionEventBoxPlugin::UpdateRegion(const math::Vector3 &_size,
-    const math::Pose &_pose)
+void RegionEventBoxPlugin::UpdateRegion(const ignition::math::Vector3d &_size,
+    const ignition::math::Pose3d &_pose)
 {
-  std::cout << "RegionEventBoxPlugin::UpdateSizeAndPose(): model='"
-      << this->modelName << "'" << std::endl << std::flush;
+  ignition::math::Vector3d vmin = _pose.Pos() - _size * 0.5;
+  ignition::math::Vector3d vmax = _pose.Pos() + _size * 0.5;
 
-  math::Vector3 vmin(_pose.pos.x - (_size.x * 0.5),
-      _pose.pos.y - (_size.y * 0.5), _pose.pos.z - (_size.z * 0.5));
-  math::Vector3 vmax(_pose.pos.x + (_size.x * 0.5),
-      _pose.pos.y + (_size.y * 0.5), _pose.pos.z + (_size.z * 0.5));
-
-  this->box = math::Box(vmin, vmax);
-
-  return true;
+  this->box = ignition::math::Box(vmin, vmax);
 }
 
 //////////////////////////////////////////////////
 void RegionEventBoxPlugin::SendEnteringRegionEvent(physics::ModelPtr _model)
+    const
 {
-  std::cout << "RegionEventBoxPlugin::SendEnteringRegionEvent(): model='"
-      << _model->GetName() << "' region='" << this->modelName << "'"
-      << std::endl << std::flush;
-
   std::string json = "{";
   json += "\"state\":\"inside\",";
   json += "\"region\":\"" + this->modelName + "\", ";
   json += "\"model\":\"" + _model->GetName() + "\"";
   json += "}";
 
-  eventSource->Emit(json);
+  this->eventSource->Emit(json);
 }
 
 //////////////////////////////////////////////////
 void RegionEventBoxPlugin::SendExitingRegionEvent(physics::ModelPtr _model)
+    const
 {
-  std::cout << "RegionEventBoxPlugin::SendExitingRegionEvent(): model='"
-      << _model->GetName() << "' region=\"" << this->modelName << "'"
-      << std::endl << std::flush;
-
   std::string json = "{";
   json += "\"state\":\"outside\",";
   json += "\"region\":\"" + this->modelName + "\", ";
   json += "\"model\":\"" + _model->GetName() + "\"";
   json += "}";
 
-  eventSource->Emit(json);
+  this->eventSource->Emit(json);
 }

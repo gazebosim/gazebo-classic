@@ -36,7 +36,9 @@
         </event>
       </plugin>
     </model>
+
     <model name='box'>
+      <pose>-5 0 0.05 0 -0 0</pose>
       <link name='link'>
         <collision name='collision'>
           <geometry>
@@ -52,7 +54,7 @@
             </box>
           </geometry>
         </visual>
-      <pose>-5 0 0.05 0 -0 0</pose>
+      </link>
     </model>
   </world>
 </sdf>

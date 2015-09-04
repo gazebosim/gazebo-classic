@@ -30,7 +30,7 @@ const double g_friction_tolerance = 1e-3;
 class PhysicsFrictionTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
-  protected: PhysicsFrictionTest() : ServerFixture(), spawnCount(0)
+  protected: PhysicsFrictionTest() : ServerFixture()
              {
              }
 
@@ -78,22 +78,22 @@ class PhysicsFrictionTest : public ServerFixture,
             }
 
     /// \brief Size of box to spawn.
-    public: math::Vector3 size;
+    public: ignition::math::Vector3d size;
 
     /// \brief Mass of box to spawn (inertia computed automatically).
     public: double mass;
 
     /// \brief Model pose.
-    public: math::Pose modelPose;
+    public: ignition::math::Pose3d modelPose;
 
     /// \brief Link pose.
-    public: math::Pose linkPose;
+    public: ignition::math::Pose3d linkPose;
 
     /// \brief Inertial pose.
-    public: math::Pose inertialPose;
+    public: ignition::math::Pose3d inertialPose;
 
     /// \brief Collision pose.
-    public: math::Pose collisionPose;
+    public: ignition::math::Pose3d collisionPose;
 
     /// \brief Friction coefficient in primary direction.
     public: double friction1;
@@ -102,93 +102,37 @@ class PhysicsFrictionTest : public ServerFixture,
     public: double friction2;
 
     /// \brief Primary friction direction.
-    public: math::Vector3 direction1;
+    public: ignition::math::Vector3d direction1;
   };
 
   /// \brief Spawn a box with friction coefficients and direction.
   /// \param[in] _opt Options for friction box.
   public: physics::ModelPtr SpawnBox(const SpawnFrictionBoxOptions &_opt)
           {
-            msgs::Factory msg;
-            std::ostringstream modelStr;
-            std::ostringstream modelName;
-            modelName << "box_model" << this->spawnCount++;
+            std::string modelName = this->GetUniqueString("box_model");
 
-            double dx = _opt.size.x;
-            double dy = _opt.size.y;
-            double dz = _opt.size.z;
-            double ixx = _opt.mass/12.0 * (dy*dy + dz*dz);
-            double iyy = _opt.mass/12.0 * (dz*dz + dx*dx);
-            double izz = _opt.mass/12.0 * (dx*dx + dy*dy);
+            msgs::Model model;
+            model.set_name(modelName);
+            msgs::Set(model.mutable_pose(), _opt.modelPose);
 
-            modelStr
-              << "<sdf version='" << SDF_VERSION << "'>"
-              << "<model name ='" << modelName.str() << "'>"
-              << "  <pose>" << _opt.modelPose << "</pose>"
-              << "  <link name='link'>"
-              << "    <pose>" << _opt.linkPose << "</pose>"
-              << "    <inertial>"
-              << "      <pose>" << _opt.inertialPose << "</pose>"
-              << "      <mass>" << _opt.mass << "</mass>"
-              << "      <inertia>"
-              << "        <ixx>" << ixx << "</ixx>"
-              << "        <iyy>" << iyy << "</iyy>"
-              << "        <izz>" << izz << "</izz>"
-              << "        <ixy>" << 0.0 << "</ixy>"
-              << "        <ixz>" << 0.0 << "</ixz>"
-              << "        <iyz>" << 0.0 << "</iyz>"
-              << "      </inertia>"
-              << "    </inertial>"
-              << "    <collision name='collision'>"
-              << "      <pose>" << _opt.collisionPose << "</pose>"
-              << "      <geometry>"
-              << "        <box><size>" << _opt.size << "</size></box>"
-              << "      </geometry>"
-              << "      <surface>"
-              << "        <friction>"
-              << "          <ode>"
-              << "            <mu>" << _opt.friction1 << "</mu>"
-              << "            <mu2>" << _opt.friction2 << "</mu2>"
-              << "            <fdir1>" << _opt.direction1 << "</fdir1>"
-              << "          </ode>"
-              << "        </friction>"
-              << "      </surface>"
-              << "    </collision>"
-              << "    <visual name='visual'>"
-              << "      <pose>" << _opt.collisionPose << "</pose>"
-              << "      <geometry>"
-              << "        <box><size>" << _opt.size << "</size></box>"
-              << "      </geometry>"
-              << "    </visual>"
-              << "  </link>"
-              << "</model>"
-              << "</sdf>";
+            msgs::AddBoxLink(model, _opt.mass, _opt.size);
+            auto link = model.mutable_link(0);
+            msgs::Set(link->mutable_pose(), _opt.linkPose);
 
-            physics::WorldPtr world = physics::get_world("default");
-            world->InsertModelString(modelStr.str());
-
-            physics::ModelPtr model;
-            common::Time wait(100, 0);
-
-            common::Time wallStart = common::Time::GetWallTime();
-            unsigned int waitCount = 0;
-            while (wait > (common::Time::GetWallTime() - wallStart) &&
-                   !this->HasEntity(modelName.str()))
             {
-              common::Time::MSleep(10);
-              if (++waitCount % 100 == 0)
-              {
-                gzwarn << "Waiting " << waitCount / 100 << " seconds for "
-                       << "box to spawn." << std::endl;
-              }
+              auto inertial = link->mutable_inertial();
+              msgs::Set(inertial->mutable_pose(), _opt.inertialPose);
             }
-            if (this->HasEntity(modelName.str()) && waitCount >= 100)
-              gzwarn << "box has spawned." << std::endl;
 
-            if (world != NULL)
-              model = world->GetModel(modelName.str());
+            auto collision = link->mutable_collision(0);
+            msgs::Set(collision->mutable_pose(), _opt.collisionPose);
 
-            return model;
+            auto friction = collision->mutable_surface()->mutable_friction();
+            friction->set_mu(_opt.friction1);
+            friction->set_mu2(_opt.friction2);
+            msgs::Set(friction->mutable_fdir1(), _opt.direction1);
+
+            return ServerFixture::SpawnModel(model);
           }
 
   /// \brief Use the friction_demo world.
@@ -211,9 +155,6 @@ class PhysicsFrictionTest : public ServerFixture,
   /// no NaN's are generated.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DirectionNaN(const std::string &_physicsEngine);
-
-  /// \brief Count of spawned models, used to ensure unique model names.
-  private: unsigned int spawnCount;
 };
 
 class WorldStepFrictionTest : public PhysicsFrictionTest
@@ -369,28 +310,29 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
       // Compute angle for each box
       double radius = 9.0 + ring;
       double angle = 2*M_PI*static_cast<double>(i) / static_cast<double>(boxes);
-      opt.modelPose.pos.Set(radius*cos(angle), radius*sin(angle), dz/2);
+      opt.modelPose.Pos().Set(radius*cos(angle), radius*sin(angle), dz/2);
 
       if (ring == 0)
-        opt.direction1 = math::Vector3(-sin(angle), cos(angle), 0);
+        opt.direction1 = ignition::math::Vector3d(-sin(angle), cos(angle), 0);
       else if (ring < 4)
-        opt.direction1 = math::Vector3(0.0, 1.0, 0.0);
+        opt.direction1 = ignition::math::Vector3d(0.0, 1.0, 0.0);
 
       if (ring == 1)
-        opt.collisionPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.collisionPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 2)
-        opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.linkPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 3)
-        opt.modelPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.modelPose.Rot().Euler(0.0, 0.0, angle);
 
       physics::ModelPtr model = SpawnBox(opt);
       ASSERT_TRUE(model != NULL);
       modelAngles[model] = angle;
 
       // Set velocity, larger for outer rings.
-      model->SetLinearVel(radius * math::Vector3(cos(angle), sin(angle), 0));
+      model->SetLinearVel(
+          radius * ignition::math::Vector3d(cos(angle), sin(angle), 0));
     }
   }
 
@@ -472,21 +414,21 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
       // Compute angle for each box
       double radius = 5.0 + ring;
       double angle = M_PI*static_cast<double>(i) / static_cast<double>(boxes);
-      opt.modelPose.pos.Set(radius*cos(angle), radius*sin(angle), dz/2);
+      opt.modelPose.Pos().Set(radius*cos(angle), radius*sin(angle), dz/2);
 
       if (ring == 0)
-        opt.direction1 = math::Vector3(-sin(angle), cos(angle), 0);
+        opt.direction1 = ignition::math::Vector3d(-sin(angle), cos(angle), 0);
       else
-        opt.direction1 = math::Vector3(0.0, 1.0, 0.0);
+        opt.direction1 = ignition::math::Vector3d(0.0, 1.0, 0.0);
 
       if (ring == 1)
-        opt.collisionPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.collisionPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 2)
-        opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.linkPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 3)
-        opt.modelPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.modelPose.Rot().Euler(0.0, 0.0, angle);
 
       physics::ModelPtr model = SpawnBox(opt);
       ASSERT_TRUE(model != NULL);
@@ -561,8 +503,8 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   // Set box size and anisotropic friction
   SpawnFrictionBoxOptions opt;
   opt.size.Set(dx, dy, dz);
-  opt.direction1 = math::Vector3(0.0, 0.0, 1.0);
-  opt.modelPose.pos.z = dz/2;
+  opt.direction1 = ignition::math::Vector3d(0.0, 0.0, 1.0);
+  opt.modelPose.Pos().Z(dz/2);
 
   physics::ModelPtr model = SpawnBox(opt);
   ASSERT_TRUE(model != NULL);

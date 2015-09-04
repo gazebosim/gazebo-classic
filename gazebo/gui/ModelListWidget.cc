@@ -1577,6 +1577,42 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
       item->setEnabled(false);
     }
   }
+
+  // gearbox
+  if (_msg.has_gearbox())
+  {
+    msgs::Joint::Gearbox gearboxMsg = _msg.gearbox();
+    if (gearboxMsg.has_gearbox_reference_body())
+    {
+      item = this->variantManager->addProperty(QVariant::String,
+          tr("gearbox_reference_body"));
+      item->setValue(gearboxMsg.gearbox_reference_body().c_str());
+      this->propTreeBrowser->addProperty(item);
+      item->setEnabled(false);
+    }
+    if (gearboxMsg.has_gearbox_ratio())
+    {
+      item = this->variantManager->addProperty(QVariant::Double,
+          tr("gearbox_ratio"));
+      item->setValue(gearboxMsg.gearbox_ratio());
+      this->propTreeBrowser->addProperty(item);
+      item->setEnabled(false);
+    }
+  }
+
+  // screw
+  if (_msg.has_screw())
+  {
+    msgs::Joint::Screw screwMsg = _msg.screw();
+    if (screwMsg.has_thread_pitch())
+    {
+      item = this->variantManager->addProperty(QVariant::Double,
+          tr("thread_pitch"));
+      item->setValue(screwMsg.thread_pitch());
+      this->propTreeBrowser->addProperty(item);
+      item->setEnabled(false);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1772,6 +1808,26 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     this->AddProperty(prop, _parent);
 
     // this->FillPropertyTree(_msg.sensor(i), prop);
+  }
+
+  // battery
+  for (int i = 0; i < _msg.battery_size(); ++i)
+  {
+    QtVariantProperty *batteryItem;
+    batteryItem = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(), tr("battery"));
+    batteryItem->setToolTip(tr(_msg.battery(i).name().c_str()));
+    this->AddProperty(batteryItem, _parent);
+    batteryItem->setEnabled(false);
+
+    item = this->variantManager->addProperty(QVariant::String, tr("name"));
+    item->setValue(_msg.battery(i).name().c_str());
+    batteryItem->addSubProperty(item);
+
+    // Battery::Voltage
+    item = this->variantManager->addProperty(QVariant::Double, tr("voltage"));
+    item->setValue(_msg.battery(i).voltage());
+    batteryItem->addSubProperty(item);
   }
 }
 
