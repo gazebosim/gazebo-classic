@@ -292,8 +292,6 @@ namespace gazebo
       /// \brief Marks the end of the enum.
       SENSOR_NOISE_TYPE_END
     };
-
-
     /// \}
   }
 }
