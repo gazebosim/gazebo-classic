@@ -218,11 +218,10 @@ void BulletLink::Fini()
 /////////////////////////////////////////////////////////////////////
 void BulletLink::UpdateMass()
 {
-  auto inertial = this->GetInertial();
-  if (this->rigidLink && inertial)
+  if (this->rigidLink && this->inertial)
   {
-    this->rigidLink->setMassProps(inertial->GetMass(),
-        BulletTypes::ConvertVector3(inertial->GetPrincipalMoments()));
+    this->rigidLink->setMassProps(this->inertial->GetMass(),
+        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
   }
 }
 

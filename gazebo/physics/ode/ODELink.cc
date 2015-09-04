@@ -342,6 +342,11 @@ void ODELink::UpdateCollisionOffsets()
 /////////////////////////////////////////////////////////////////////
 void ODELink::UpdateSurface()
 {
+  if (!this->linkId)
+  {
+    return;
+  }
+
   for (auto child : this->children)
   {
     if (child->HasType(Base::COLLISION))
