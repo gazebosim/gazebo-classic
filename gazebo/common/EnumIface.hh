@@ -223,7 +223,7 @@ namespace gazebo
 
       /// \brief Enum value
       /// Did not use a private data class since this should be the only
-      /// member value every used.
+      /// member value ever used.
       private: Enum c;
     };
 
