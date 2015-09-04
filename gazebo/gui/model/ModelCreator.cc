@@ -85,6 +85,7 @@ ModelCreator::ModelCreator()
   this->jointMaker = new JointMaker();
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
+
   this->inspectAct = new QAction(tr("Open Link Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
@@ -148,12 +149,20 @@ ModelCreator::ModelCreator()
        boost::bind(&ModelCreator::OnSetSelectedLink, this, _1, _2)));
 
   this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedModelPlugin(
+       boost::bind(&ModelCreator::OnSetSelectedModelPlugin, this, _1, _2)));
+
+  this->connections.push_back(
       gui::Events::ConnectScaleEntity(
       boost::bind(&ModelCreator::OnEntityScaleChanged, this, _1, _2)));
 
   this->connections.push_back(
       gui::model::Events::ConnectShowLinkContextMenu(
       boost::bind(&ModelCreator::ShowContextMenu, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectShowModelPluginContextMenu(
+      boost::bind(&ModelCreator::ShowModelPluginContextMenu, this, _1)));
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -1288,6 +1297,33 @@ void ModelCreator::RemoveLink(const std::string &_entity)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::OnRemoveModelPlugin(const QString &_name)
+{
+  this->RemoveModelPlugin(_name.toStdString());
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::RemoveModelPlugin(const std::string &_name)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
+  if (this->allModelPlugins.find(_name) ==
+      this->allModelPlugins.end())
+  {
+    return;
+  }
+
+  ModelPluginData *data = this->allModelPlugins[_name];
+
+  // Remove from map
+  this->allModelPlugins.erase(_name);
+  delete data;
+
+  // Notify removal
+  gui::model::Events::modelPluginRemoved(_name);
+}
+
+/////////////////////////////////////////////////
 bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
@@ -1303,6 +1339,13 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
         this->OnDelete(linkVis->GetName());
       }
       this->DeselectAll();
+    }
+    else if (!this->selectedModelPlugins.empty())
+    {
+      for (auto plugin : this->selectedModelPlugins)
+      {
+        this->RemoveModelPlugin(plugin);
+      }
     }
   }
   else if (_event.control)
@@ -1483,6 +1526,45 @@ void ModelCreator::ShowContextMenu(const std::string &_link)
   }
   QAction *deleteAct = new QAction(tr("Delete"), this);
   connect(deleteAct, SIGNAL(triggered()), this, SLOT(OnDelete()));
+  menu.addAction(deleteAct);
+
+  menu.exec(QCursor::pos());
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::ShowModelPluginContextMenu(const std::string &_name)
+{
+  auto it = this->allModelPlugins.find(_name);
+  if (it == this->allModelPlugins.end())
+    return;
+
+  // Open inspector
+  QAction *inspectorAct = new QAction(tr("Open Model Plugin Inspector"), this);
+
+  // Map signals to pass argument
+  QSignalMapper *inspectorMapper = new QSignalMapper(this);
+
+  connect(inspectorAct, SIGNAL(triggered()), inspectorMapper, SLOT(map()));
+  inspectorMapper->setMapping(inspectorAct, QString::fromStdString(_name));
+
+  connect(inspectorMapper, SIGNAL(mapped(QString)), this,
+      SLOT(OnOpenModelPluginInspector(QString)));
+
+  // Delete
+  QAction *deleteAct = new QAction(tr("Delete"), this);
+
+  // Map signals to pass argument
+  QSignalMapper *deleteMapper = new QSignalMapper(this);
+
+  connect(deleteAct, SIGNAL(triggered()), deleteMapper, SLOT(map()));
+  deleteMapper->setMapping(deleteAct, QString::fromStdString(_name));
+
+  connect(deleteMapper, SIGNAL(mapped(QString)), this,
+      SLOT(OnRemoveModelPlugin(QString)));
+
+  // Menu
+  QMenu menu;
+  menu.addAction(inspectorAct);
   menu.addAction(deleteAct);
 
   menu.exec(QCursor::pos());
@@ -1875,6 +1957,25 @@ void ModelCreator::OnSetSelectedLink(const std::string &_name,
   this->SetSelected(_name, _selected);
 }
 
+/////////////////////////////////////////////////
+void ModelCreator::OnSetSelectedModelPlugin(const std::string &_name,
+    const bool _selected)
+{
+  auto plugin = this->allModelPlugins.find(_name);
+  if (plugin == this->allModelPlugins.end())
+    return;
+
+  auto it = std::find(this->selectedModelPlugins.begin(),
+      this->selectedModelPlugins.end(), _name);
+  if (_selected && it == this->selectedModelPlugins.end())
+  {
+    this->selectedModelPlugins.push_back(_name);
+  }
+  else if (!_selected && it != this->selectedModelPlugins.end())
+  {
+    this->selectedModelPlugins.erase(it);
+  }
+}
 
 /////////////////////////////////////////////////
 void ModelCreator::ModelChanged()
@@ -1963,6 +2064,7 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
     }
   }
 }
+
 /////////////////////////////////////////////////
 ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
 {
@@ -1989,6 +2091,12 @@ void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
     // Notify addition
     gui::model::Events::modelPluginInserted(name);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnOpenModelPluginInspector(const QString &_name)
+{
+  this->OpenModelPluginInspector(_name.toStdString());
 }
 
 /////////////////////////////////////////////////

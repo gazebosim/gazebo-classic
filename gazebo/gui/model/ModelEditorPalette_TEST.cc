@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorPalette_TEST.hh"
 
@@ -76,6 +76,28 @@ void ModelEditorPalette_TEST::AddItem()
       palette->findChild<QToolButton *>("my_tool_button4");
   QVERIFY(retButton4);
   QVERIFY(retButton4 == testButton4);
+
+  delete palette;
+  palette = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette_TEST::ModelPlugins()
+{
+  gui::ModelEditorPalette *palette = new gui::ModelEditorPalette();
+  QVERIFY(palette);
+
+  // Get model plugin item
+  QList<QTreeWidget *> trees = palette->findChildren<QTreeWidget *>();
+  QCOMPARE(trees.size(), 1);
+  QCOMPARE(trees[0]->topLevelItemCount(), 3);
+
+  // Check number of model plugins
+
+
+
+  // Insert a plugin and check number again
+  gazebo::gui::model::Events::modelPluginInserted("plugin1");
 
   delete palette;
   palette = NULL;

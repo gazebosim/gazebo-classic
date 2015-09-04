@@ -189,6 +189,10 @@ namespace gazebo
       /// \param[in] _linkName Name of the link to remove
       public: void RemoveLink(const std::string &_linkName);
 
+      /// \brief Remove a model plugin from the model.
+      /// \param[in] _pluginName Name of the model plugin to remove.
+      public: void RemoveModelPlugin(const std::string &_pluginName);
+
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.
       public: void SetStatic(bool _static);
@@ -299,6 +303,13 @@ namespace gazebo
       private: void OnSetSelectedLink(const std::string &_name,
           const bool _selected);
 
+      /// \brief Callback when a model plugin is selected.
+      /// \param[in] _name Name of plugin.
+      /// \param[in] _selected True if the plugin is selected, false if
+      /// deselected.
+      private: void OnSetSelectedModelPlugin(const std::string &_name,
+          const bool _selected);
+
       /// \brief Create link with default properties from a visual. This
       /// function creates a link that will become the parent of the
       /// input visual. A collision visual with the same geometry as the input
@@ -375,6 +386,11 @@ namespace gazebo
       /// \param[in] _link Name of link the context menu is associated with.
       private: void ShowContextMenu(const std::string &_link);
 
+      /// \brief Show a model plugin's context menu
+      /// \param[in] _link Name of model plugin the context menu is associated
+      /// with.
+      private: void ShowModelPluginContextMenu(const std::string &_name);
+
       /// \brief Qt callback when a delete signal has been emitted. This is
       /// currently triggered by the context menu via right click.
       private slots: void OnDelete();
@@ -385,6 +401,12 @@ namespace gazebo
 
       /// \brief Qt Callback to open link inspector
       private slots: void OnOpenInspector();
+
+      /// \brief Qt Callback to open model plugin  inspector.
+      private slots: void OnOpenModelPluginInspector(const QString &_name);
+
+      /// \brief Qt Callback to remove model plugin.
+      private slots: void OnRemoveModelPlugin(const QString &_name);
 
       /// \brief Qt signal when the a link has been added.
       Q_SIGNALS: void LinkAdded();
@@ -456,6 +478,9 @@ namespace gazebo
 
       /// \brief A list of selected link visuals.
       private: std::vector<rendering::VisualPtr> selectedLinks;
+
+      /// \brief A list of selected model plugins.
+      private: std::vector<std::string> selectedModelPlugins;
 
       /// \brief Names of links copied through g_copyAct
       private: std::vector<std::string> copiedLinkNames;
