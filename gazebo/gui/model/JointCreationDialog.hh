@@ -61,6 +61,7 @@ namespace gazebo
       private slots: void OnLinkFromDialog();
       private slots: void OnPoseFromDialog(const QString &_name,
           const ignition::math::Pose3d &_pose);
+      private slots: void OnResetPoses();
       private slots: void OnParentFrom3D(const std::string &_linkName);
       private slots: void OnChildFrom3D(const std::string &_linkName);
       private slots: void OnSwap();

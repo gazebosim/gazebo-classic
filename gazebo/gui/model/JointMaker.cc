@@ -111,7 +111,7 @@ JointMaker::JointMaker()
 
   this->connections.push_back(
       gui::model::Events::ConnectJointPoseChosenDialog(
-      boost::bind(&JointMaker::OnJointPoseChosenDialog, this, _1)));
+      boost::bind(&JointMaker::OnJointPoseChosenDialog, this, _1, _2)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointCreateDialog(
@@ -167,6 +167,13 @@ void JointMaker::Reset()
     delete this->jointBeingCreated;
     this->jointBeingCreated = NULL;
   }
+
+  // Reset child link
+/*  if (this->childLinkVis)
+  {
+    this->childLinkVis->SetWorldPose(this->childLinkOriginalPose);
+    this->SetHighlighted(this->childLinkVis, false);
+  }*/
 
   this->jointType = JointMaker::JOINT_NONE;
   this->parentLinkVis.reset();
@@ -640,6 +647,19 @@ void JointMaker::Stop()
   {
     // Cancel joint creation
     this->RemoveJoint("");
+
+    // Reset links
+    if (this->parentLinkVis)
+    {
+      this->parentLinkVis->SetWorldPose(this->parentLinkOriginalPose);
+      this->SetHighlighted(this->parentLinkVis, false);
+    }
+    if (this->childLinkVis)
+    {
+      this->childLinkVis->SetWorldPose(this->childLinkOriginalPose);
+      this->SetHighlighted(this->childLinkVis, false);
+    }
+
     if (this->jointCreationDialog)
       this->jointCreationDialog->close();
     this->jointBeingCreated = NULL;
@@ -889,6 +909,35 @@ void JointMaker::Update()
            joint->childPose = joint->child->GetWorldPose();
            joint->childScale = joint->child->GetScale();
            poseUpdate = true;
+
+           // Highlight links connected to joint being created if they have
+           // been moved to another position
+           if (joint == this->jointBeingCreated)
+           {
+             // Parent
+             if (joint->parent == this->parentLinkVis &&
+                 joint->parent->GetWorldPose().Ign() !=
+                 this->parentLinkOriginalPose)
+             {
+               this->SetHighlighted(this->parentLinkVis, true);
+             }
+             else
+             {
+               this->SetHighlighted(this->parentLinkVis, false);
+             }
+
+             // Child
+             if (joint->child == this->childLinkVis &&
+                 joint->child->GetWorldPose().Ign() !=
+                 this->childLinkOriginalPose)
+             {
+               this->SetHighlighted(this->childLinkVis, true);
+             }
+             else
+             {
+               this->SetHighlighted(this->childLinkVis, false);
+             }
+           }
          }
 
         // Create / update joint visual
@@ -1540,8 +1589,6 @@ void JointMaker::ParentLinkChosen(rendering::VisualPtr _parentLink)
     return;
   }
 
-  this->parentLinkVis = _parentLink;
-
   if (this->hoverVis)
   {
     this->hoverVis->SetEmissive(common::Color(0, 0, 0));
@@ -1552,11 +1599,15 @@ void JointMaker::ParentLinkChosen(rendering::VisualPtr _parentLink)
   if (!this->jointBeingCreated)
   {
     this->jointBeingCreated = this->CreateJointLine("JOINT_LINE",
-        this->parentLinkVis);
+        _parentLink);
   }
   // Update parent of joint being created
   else
   {
+    // Reset previous parent
+    this->parentLinkVis->SetWorldPose(this->parentLinkOriginalPose);
+    this->SetHighlighted(this->parentLinkVis, false);
+
     this->jointBeingCreated->SetParent(_parentLink);
 
     // If joint already has parent and child
@@ -1566,6 +1617,9 @@ void JointMaker::ParentLinkChosen(rendering::VisualPtr _parentLink)
     else
       this->jointBeingCreated->UpdateJointLine();
   }
+
+  this->parentLinkVis = _parentLink;
+  this->parentLinkOriginalPose = _parentLink->GetWorldPose().Ign();
 }
 
 /////////////////////////////////////////////////
@@ -1606,10 +1660,15 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
       this->jointBeingCreated->dirty = true;
       this->jointBeingCreated->Update();
       _childLink->AttachVisual(this->jointBeingCreated->jointVisual);
+
+      // Reset previous child
+      this->childLinkVis->SetWorldPose(this->childLinkOriginalPose);
+      this->SetHighlighted(this->childLinkVis, false);
     }
   }
 
   this->childLinkVis = _childLink;
+  this->childLinkOriginalPose = _childLink->GetWorldPose().Ign();
 
   this->mouseMoveEnabled = false;
 }
@@ -1681,20 +1740,33 @@ void JointMaker::OnJointChildChosenDialog(const std::string &_leafName)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointPoseChosenDialog(const ignition::math::Pose3d &_pose)
+void JointMaker::OnJointPoseChosenDialog(const ignition::math::Pose3d &_pose,
+    bool reset)
 {
   if (this->parentLinkVis && this->childLinkVis)
   {
-    // Get poses as homogeneous transforms
-    ignition::math::Matrix4d parent_world(
-	parentLinkVis->GetWorldPose().Ign());
-    ignition::math::Matrix4d child_parent(_pose);
+    ignition::math::Pose3d newChildPose;
 
-    // w_T_c = w_T_p * p_T_c
-    ignition::math::Matrix4d child_world =
-        parent_world * child_parent;
+    if (reset)
+    {
+      newChildPose = this->childLinkOriginalPose;
+      this->parentLinkVis->SetWorldPose(this->parentLinkOriginalPose);
+    }
+    else
+    {
+      // Get poses as homogeneous transforms
+      ignition::math::Matrix4d parent_world(
+          parentLinkVis->GetWorldPose().Ign());
+      ignition::math::Matrix4d child_parent(_pose);
 
-    this->childLinkVis->SetWorldPose(child_world.Pose());
+      // w_T_c = w_T_p * p_T_c
+      ignition::math::Matrix4d child_world =
+          parent_world * child_parent;
+
+      newChildPose = child_world.Pose();
+    }
+
+    this->childLinkVis->SetWorldPose(newChildPose);
   }
 }
 
@@ -1717,6 +1789,18 @@ void JointMaker::OnJointCreateDialog()
         this->jointBeingCreated->parent->GetName(),
         this->jointBeingCreated->child->GetName());
   }
+
+  // Reset visuals
+  if (this->parentLinkVis)
+  {
+    this->SetHighlighted(this->parentLinkVis, false);
+    this->parentLinkVis = NULL;
+  }
+  if (this->childLinkVis)
+  {
+    this->SetHighlighted(this->childLinkVis, false);
+    this->childLinkVis = NULL;
+  }
   this->jointBeingCreated = NULL;
   this->creatingJoint = false;
 
@@ -1724,5 +1808,35 @@ void JointMaker::OnJointCreateDialog()
   this->JointAdded();
 
   this->Stop();
+}
+
+/////////////////////////////////////////////////
+void JointMaker::SetHighlighted(rendering::VisualPtr _vis, bool _highlight)
+{
+  // Taken from ModelAlign
+  if (_vis->GetChildCount() != 0)
+  {
+    for (unsigned int j = 0; j < _vis->GetChildCount(); ++j)
+    {
+      this->SetHighlighted(_vis->GetChild(j), _highlight);
+    }
+  }
+  else
+  {
+    // Highlighting increases transparency for opaque visuals (0 < t < 0.3) and
+    // decreases transparency for semi-transparent visuals (0.3 < t < 1).
+    // A visual will never become fully transparent (t = 1) when highlighted.
+    if (_highlight)
+    {
+      _vis->SetEmissive(common::Color(0, 0, 1, 1));
+      //_vis->SetTransparency((1.0 - _vis->GetTransparency()) * 0.5);
+    }
+    // The inverse operation restores the original transparency value.
+    else
+    {
+      _vis->SetEmissive(common::Color(0, 0, 0, 1));
+      //_vis->SetTransparency(std::abs(_vis->GetTransparency()*2.0-1.0));
+    }
+  }
 }
 

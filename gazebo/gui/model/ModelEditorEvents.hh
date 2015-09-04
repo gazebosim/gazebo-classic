@@ -560,7 +560,7 @@ namespace gazebo
             jointChildChosenDialog;
 
         /// \brief Request to select or deselect a joint.
-        public: static event::EventT<void (ignition::math::Pose3d)>
+        public: static event::EventT<void (ignition::math::Pose3d, bool)>
             jointPoseChosenDialog;
 
         /// \brief Request to select or deselect a joint.

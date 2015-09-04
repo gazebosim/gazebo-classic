@@ -283,7 +283,7 @@ namespace gazebo
       private: void OnJointParentChosenDialog(const std::string &_name);
       private: void OnJointChildChosenDialog(const std::string &_name);
       private: void OnJointPoseChosenDialog(
-          const ignition::math::Pose3d &_pose);
+          const ignition::math::Pose3d &_pose, bool _reset);
       private: void OnJointCreateDialog();
 
       /// \brief Create a joint line.
@@ -292,6 +292,13 @@ namespace gazebo
       /// \return joint data.
       private: JointData *CreateJointLine(const std::string &_name,
           rendering::VisualPtr _parent);
+
+      /// \brief Change the transparency of the visual's leaf children to
+      /// indicate a highlighted state or not. Must do it for each leaf as
+      /// they might have different transparencies.
+      /// \param[in] _vis Visual to be highlighted.
+      /// \param[in] _highlight Whether to highlight or not.
+      private: void SetHighlighted(rendering::VisualPtr _vis, bool _highlight);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
@@ -328,6 +335,12 @@ namespace gazebo
 
       /// \brief Visual currently selected to be the child link.
       private: rendering::VisualPtr childLinkVis;
+
+      /// \brief Visual currently selected to be the child link.
+      private: ignition::math::Pose3d parentLinkOriginalPose;
+
+      /// \brief Visual currently selected to be the child link.
+      private: ignition::math::Pose3d childLinkOriginalPose;
 
       /// \brief Name of joint that is currently being inspected.
       private: std::string inspectName;

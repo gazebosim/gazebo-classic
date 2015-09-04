@@ -34,7 +34,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   this->setMinimumWidth(300);
-  this->setMinimumHeight(550);
+  this->setMinimumHeight(650);
 
   this->jointMaker = _jointMaker;
 
@@ -178,8 +178,23 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       this, SLOT(OnPoseFromDialog(const QString,
       const ignition::math::Pose3d)));
 
+  // Reset pose button
+  QPushButton *resetPoseButton = new QPushButton(tr("Reset"));
+  resetPoseButton->setToolTip("Reset parent and child poses");
+  connect(resetPoseButton, SIGNAL(clicked()), this,
+      SLOT(OnResetPoses()));
+
+  // Pose general layout
+  QVBoxLayout *poseGeneralLayout = new QVBoxLayout();
+  poseGeneralLayout->setContentsMargins(0, 0, 0, 0);
+  poseGeneralLayout->addWidget(poseWidget);
+  poseGeneralLayout->addWidget(resetPoseButton);
+
+  ConfigChildWidget *poseGeneralWidget = new ConfigChildWidget();
+  poseGeneralWidget->setLayout(poseGeneralLayout);
+
   QWidget *poseGroupWidget = this->configWidget->CreateGroupWidget(
-      "Relative Pose", poseWidget, 0);
+      "Relative Pose", poseGeneralWidget, 0);
 
   // Config Widget layout
   QVBoxLayout *configLayout = new QVBoxLayout();
@@ -308,7 +323,7 @@ void JointCreationDialog::OnPoseFromDialog(const QString &/*_name*/,
     const ignition::math::Pose3d &_pose)
 {
   // Notify so 3D is updated
-  gui::model::Events::jointPoseChosenDialog(_pose);
+  gui::model::Events::jointPoseChosenDialog(_pose, false);
 }
 
 /////////////////////////////////////////////////
@@ -452,6 +467,12 @@ void JointCreationDialog::UpdateRelativePose(
     const ignition::math::Pose3d &_pose)
 {
   this->configWidget->SetPoseWidgetValue("pose", math::Pose(_pose));
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnResetPoses()
+{
+  gui::model::Events::jointPoseChosenDialog(ignition::math::Pose3d(), true);
 }
 
 /////////////////////////////////////////////////
