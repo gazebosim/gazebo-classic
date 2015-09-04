@@ -1276,12 +1276,15 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
   QWidget *valueEdit;
   if (_type == "plain")
   {
-    valueEdit = new QPlainTextEdit();
+    valueEdit = new QPlainTextEdit(widget);
     valueEdit->setMinimumHeight(50);
+    // QPlainTextEdit's don't have editingFinished signals
   }
   else if (_type == "line")
   {
-    valueEdit = new QLineEdit;
+    valueEdit = new QLineEdit(widget);
+    connect(valueEdit, SIGNAL(editingFinished()), this,
+        SLOT(OnStringValueChanged()));
   }
   else
   {
@@ -2675,17 +2678,8 @@ void ConfigWidget::OnUIntValueChanged()
   if (!widget)
     return;
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      unsigned int value = this->GetUIntWidgetValue(widget);
-      std::string scopedName = iter.first;
-
-      emit UIntValueChanged(tr(scopedName.c_str()), value);
-      return;
-    }
-  }
+  emit UIntValueChanged(widget->scopedName.c_str(),
+      this->GetUIntWidgetValue(widget));
 }
 
 /////////////////////////////////////////////////
@@ -2703,17 +2697,8 @@ void ConfigWidget::OnIntValueChanged()
   if (!widget)
     return;
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      int value = this->GetIntWidgetValue(widget);
-      std::string scopedName = iter.first;
-
-      emit IntValueChanged(tr(scopedName.c_str()), value);
-      return;
-    }
-  }
+  emit IntValueChanged(widget->scopedName.c_str(),
+      this->GetIntWidgetValue(widget));
 }
 
 /////////////////////////////////////////////////
@@ -2731,17 +2716,8 @@ void ConfigWidget::OnDoubleValueChanged()
   if (!widget)
     return;
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      double value = this->GetDoubleWidgetValue(widget);
-      std::string scopedName = iter.first;
-
-      emit DoubleValueChanged(tr(scopedName.c_str()), value);
-      return;
-    }
-  }
+  emit DoubleValueChanged(widget->scopedName.c_str(),
+      this->GetDoubleWidgetValue(widget));
 }
 
 /////////////////////////////////////////////////
@@ -2759,44 +2735,33 @@ void ConfigWidget::OnBoolValueChanged()
   if (!widget)
     return;
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      bool value = this->GetBoolWidgetValue(widget);
-      std::string scopedName = iter.first;
-
-      emit BoolValueChanged(tr(scopedName.c_str()), value);
-      return;
-    }
-  }
+  emit BoolValueChanged(widget->scopedName.c_str(),
+      this->GetBoolWidgetValue(widget));
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::OnStringValueChanged()
 {
   QLineEdit *lineEdit = qobject_cast<QLineEdit *>(QObject::sender());
+  QPlainTextEdit *plainTextEdit =
+      qobject_cast<QPlainTextEdit *>(QObject::sender());
 
-  if (!lineEdit)
+  QWidget *valueEdit;
+  if (!lineEdit && !plainTextEdit)
     return;
+  else if (lineEdit)
+    valueEdit = lineEdit;
+  else
+    valueEdit = plainTextEdit;
 
   ConfigChildWidget *widget =
-      qobject_cast<ConfigChildWidget *>(lineEdit->parent());
+      qobject_cast<ConfigChildWidget *>(valueEdit->parent());
 
   if (!widget)
     return;
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      std::string value = this->GetStringWidgetValue(widget);
-      std::string scopedName = iter.first;
-
-      emit StringValueChanged(tr(scopedName.c_str()), value);
-      return;
-    }
-  }
+  emit StringValueChanged(widget->scopedName.c_str(),
+      this->GetStringWidgetValue(widget));
 }
 
 /////////////////////////////////////////////////
@@ -2814,18 +2779,8 @@ void ConfigWidget::OnVector3dValueChanged()
   if (!widget)
     return;
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      ignition::math::Vector3d value =
-          this->GetVector3WidgetValue(widget).Ign();
-      std::string scopedName = iter.first;
-
-      emit Vector3dValueChanged(tr(scopedName.c_str()), value);
-      return;
-    }
-  }
+  emit Vector3dValueChanged(widget->scopedName.c_str(),
+      this->GetVector3WidgetValue(widget).Ign());
 }
 
 /////////////////////////////////////////////////
@@ -2843,17 +2798,8 @@ void ConfigWidget::OnColorValueChanged()
   if (!widget)
     return;
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      common::Color value = this->GetColorWidgetValue(widget);
-      std::string scopedName = iter.first;
-
-      emit ColorValueChanged(tr(scopedName.c_str()), value);
-      return;
-    }
-  }
+  emit ColorValueChanged(widget->scopedName.c_str(),
+      this->GetColorWidgetValue(widget));
 }
 
 /////////////////////////////////////////////////
@@ -2871,17 +2817,8 @@ void ConfigWidget::OnPoseValueChanged()
   if (!widget)
     return;
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      ignition::math::Pose3d value = this->GetPoseWidgetValue(widget).Ign();
-      std::string scopedName = iter.first;
-
-      emit PoseValueChanged(tr(scopedName.c_str()), value);
-      return;
-    }
-  }
+  emit PoseValueChanged(widget->scopedName.c_str(),
+      this->GetPoseWidgetValue(widget).Ign());
 }
 
 /////////////////////////////////////////////////
@@ -2890,15 +2827,10 @@ void ConfigWidget::OnEnumValueChanged(const QString &_value)
   ConfigChildWidget *widget =
       qobject_cast<ConfigChildWidget *>(QObject::sender());
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      std::string scopedName = iter.first;
-      emit EnumValueChanged(tr(scopedName.c_str()), _value);
-      return;
-    }
-  }
+  if (!widget)
+    return;
+
+  emit EnumValueChanged(widget->scopedName.c_str(), _value);
 }
 
 /////////////////////////////////////////////////
@@ -2918,6 +2850,7 @@ bool ConfigWidget::AddConfigChildWidget(const std::string &_name,
     return false;
   }
 
+  _child->scopedName = _name;
   this->configWidgets[_name] = _child;
   return true;
 }
