@@ -1173,28 +1173,18 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   if (contact.surface.mu3 > 0)
   {
-    if (contact.surface.use_patch_radius)
+    // Patch radius
+    if ((contact.surface.use_patch_radius &&
+        contact.surface.patch_radius > 0) ||
+    // Surface radius
+        (!contact.surface.use_patch_radius &&
+        contact.surface.surface_radius > 0))
     {
-      if (contact.surface.patch_radius > 0)
-      {
-        contact.surface.mode |= dContactMu3;
+      contact.surface.mode |= dContactMu3;
 
-        if (contact.surface.slip3 > 0)
-        {
-          contact.surface.mode |= dContactSlip3;
-        }
-      }
-    }
-    else
-    {
-      if (contact.surface.surface_radius > 0)
+      if (contact.surface.slip3 > 0)
       {
-        contact.surface.mode |= dContactMu3;
-
-        if (contact.surface.slip3 > 0)
-        {
-          contact.surface.mode |= dContactSlip3;
-        }
+        contact.surface.mode |= dContactSlip3;
       }
     }
   }

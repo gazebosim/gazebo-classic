@@ -126,11 +126,15 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
 
   /// \brief Message to be filled with the latest contacts message.
   private: msgs::Contacts contactsMsg;
+
+  /// \brief Mutex to protect reads and writes to contactsMsg.
+  public: mutable boost::mutex mutex;
 };
 
 /////////////////////////////////////////////////
 void PhysicsTorsionalFrictionTest::Callback(const ConstContactsPtr &_msg)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
   this->contactsMsg = *_msg;
 }
 
@@ -178,7 +182,23 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   // Step for spheres to sink and rest at the final depth
   world->Step(1000);
 
-  EXPECT_GT(this->contactsMsg.contact().size(), 0);
+  // Wait for contact messages to be received
+  int maxSleep = 30;
+  int sleep = 0;
+  while (this->contactsMsg.contact().size() < 20 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+
+  ASSERT_EQ(this->contactsMsg.contact().size(), 20);
+
+  // Copy message to local variable
+  msgs::Contacts contacts;
+  {
+    boost::mutex::scoped_lock lock(this->mutex);
+    contacts = this->contactsMsg;
+  }
 
   // Load the spheres
   std::vector<PhysicsTorsionalFrictionTest::SphereData>
@@ -201,15 +221,31 @@ void PhysicsTorsionalFrictionTest::DepthTest(
   }
 
   // Check relevant contacts from message
-  for (auto contact : this->contactsMsg.contact())
+  std::vector<bool> contactsChecked = {false, false, false, false, false};
+  ASSERT_EQ(contacts.contact().size(), 20);
+  for (auto contact : contacts.contact())
   {
-    if (!(contact.has_collision1() &&
-        contact.collision1().find("sphere_mass") == 0))
+    // Check if the contact has a sphere for this test
+    int number = 0;
+    if (contact.has_collision1() &&
+        contact.collision1().find("sphere_mass") == 0)
+    {
+      number = std::stoi(contact.collision1().substr(12, 1));
+    }
+    else if (contact.has_collision2() &&
+        contact.collision2().find("sphere_mass") == 0)
+    {
+      number = std::stoi(contact.collision2().substr(12, 1));
+    }
+    else
+    {
       continue;
+    }
 
     // Get corresponding sphere
-    int number = std::stoi(contact.collision1().substr(12, 1));
-    ASSERT_GT(number, 0);
+    ASSERT_GE(number, 1);
+    ASSERT_LE(number, 5);
+    contactsChecked[number-1] = true;
     auto sphere = spheres[number-1];
 
     // Check that contact normal is in the positive Z direction
@@ -221,9 +257,19 @@ void PhysicsTorsionalFrictionTest::DepthTest(
     double expectedDepth = sphere.mass * -g.z / sphere.kp;
     double relativeError =
       std::abs(contact.depth(0) - expectedDepth)/expectedDepth;
+    gzdbg << "sphere_mass_" << number
+          << " expected " << expectedDepth
+          << " actual " << contact.depth(0)
+          << std::endl;
 
     // Less than 1% error
     EXPECT_LT(relativeError, 0.01);
+  }
+
+  // Verify that each sphere was checked
+  for (bool contactChecked : contactsChecked)
+  {
+    EXPECT_TRUE(contactChecked);
   }
 }
 
@@ -393,6 +439,7 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
 
     world->Step(1);
     step++;
+    gzdbg << "world time: " << world->GetSimTime().Double() << std::endl;
 
     for (auto sphere : spheres)
     {
@@ -407,6 +454,9 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
       double normalZ = -sphere.mass * g.z;
       double frictionTorque =
           normalZ * sphere.coefficient * 3 * M_PI * patch / 16;
+      gzdbg << sphere.model->GetName()
+            << " frictionTorque " << frictionTorque
+            << std::endl;
 
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)

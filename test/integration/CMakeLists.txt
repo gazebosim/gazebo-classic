@@ -58,6 +58,7 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  nested_model.cc
   noise.cc
   nondefault_world.cc
   physics.cc
@@ -72,6 +73,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  region_events.cc
   rest_web.cc
   road.cc
   sensor.cc

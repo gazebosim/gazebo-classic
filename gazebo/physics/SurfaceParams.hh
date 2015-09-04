@@ -120,14 +120,6 @@ namespace gazebo
       /// 1 for secondary direction.
       /// \return Friction coefficient, or negative value if invalid
       /// _index is supplied.
-      /// \deprecated See const function Mu
-      private: double GetMu(unsigned int _index) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the friction coefficient in a single direction.
-      /// \param[in] _index Index of friction direction, 0 for primary,
-      /// 1 for secondary direction.
-      /// \return Friction coefficient, or negative value if invalid
-      /// _index is supplied.
       private: double Mu(const unsigned int _index) const;
 
       /// \brief Set the friction coefficient in a single direction.
