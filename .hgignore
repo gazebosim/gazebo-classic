@@ -8,3 +8,4 @@ Ogre.log
 *.swp
 .project
 .cproject
+.settings
