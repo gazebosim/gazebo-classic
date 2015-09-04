@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_ENUMITERATOR_HH_
 #define _GAZEBO_ENUMITERATOR_HH_
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -63,7 +62,7 @@ namespace gazebo
       /// \brief Convert enum value to string.
       /// \param[in] _e Enum value to convert.
       /// \return String representation of the enum. An empty string is
-      /// returned if _e is invalid, or the names for the enum has not been
+      /// returned if _e is invalid, or the names for the enum have not been
       /// set.
       static std::string Str(T const &_e)
       {
@@ -189,7 +188,7 @@ namespace gazebo
       }
 
       /// \brief Prefix decrement operator
-      /// \return Interator pointing to the previous value in the enum
+      /// \return Iterator pointing to the previous value in the enum
       public: EnumIterator &operator--()
       {
         GZ_ASSERT(this->c != this->Begin(), "decrementing beyond begin?");
@@ -198,7 +197,7 @@ namespace gazebo
       }
 
       /// \brief Postfix decrement operator
-      /// \return Interator pointing to the previous value in the enum
+      /// \return Iterator pointing to the previous value in the enum
       public: EnumIterator operator--(const int)
       {
         GZ_ASSERT(this->c != this->Begin(), "Decrementing beyond beginning.");
