@@ -111,3 +111,9 @@ msgs::Link *LinkConfig::GetData() const
 {
   return dynamic_cast<msgs::Link *>(this->configWidget->GetMsg());
 }
+
+/////////////////////////////////////////////////
+const ConfigWidget *LinkConfig::GetConfigWidget() const
+{
+  return const_cast<ConfigWidget *>(this->configWidget);
+}
