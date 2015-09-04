@@ -102,11 +102,9 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   physics::ModelPtr newBox = ServerFixture::SpawnModel(model);
   EXPECT_TRUE(world->GetModel(name) != NULL);
 
-  // important to sleep here, this is where the failure occurs
-  // need to sleep long enough for rendering cycle to iterate at least once
-  // or do something like look for visuals through a camera?
-  common::Time::MSleep(1000);
-
+  // This is where the failure occurs (after respawning), but we need to
+  // look for visuals through a camera to ensure the bug is exercised
+  // without the patch.
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
   rendering::CameraPtr camera = scene->GetCamera("camera");
