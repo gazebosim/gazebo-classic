@@ -574,13 +574,17 @@ LinkData* LinkData::Clone(const std::string &_newName)
   {
     std::string newVisName = visIt.first->GetName();
     size_t idx = newVisName.find_last_of("::");
+    std::string leafName = newVisName.substr(idx+1);
     if (idx != std::string::npos)
-      newVisName = cloneVisName + newVisName.substr(idx-1);
+      newVisName = cloneVisName + "::" + leafName;
     else
       newVisName = cloneVisName + "::" + newVisName;
 
     rendering::VisualPtr cloneVis =
         visIt.first->Clone(newVisName, cloneLink->linkVisual);
+
+    // store the leaf name in sdf not the full scoped name
+    cloneVis->GetSDF()->GetAttribute("name")->Set(leafName);
 
     // override transparency
     cloneVis->SetTransparency(visIt.second.transparency());
@@ -594,12 +598,17 @@ LinkData* LinkData::Clone(const std::string &_newName)
   {
     std::string newColName = colIt.first->GetName();
     size_t idx = newColName.find_last_of("::");
+    std::string leafName = newColName.substr(idx+1);
     if (idx != std::string::npos)
-      newColName = cloneVisName + newColName.substr(idx-1);
+      newColName = cloneVisName + "::" + leafName;
     else
       newColName = cloneVisName + "::" + newColName;
     rendering::VisualPtr collisionVis = colIt.first->Clone(newColName,
         cloneLink->linkVisual);
+
+    // store the leaf name in sdf not the full scoped name
+    collisionVis->GetSDF()->GetAttribute("name")->Set(leafName);
+
     collisionVis->SetTransparency(
        ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
     // fix for transparency alpha compositing
@@ -1108,4 +1117,3 @@ void ModelPluginData::Load(sdf::ElementPtr _pluginElem)
   // Update inspector
   this->inspector->Update(pluginPtr);
 }
-

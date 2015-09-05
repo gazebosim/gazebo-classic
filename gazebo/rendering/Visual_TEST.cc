@@ -31,6 +31,7 @@ class Visual_TEST : public ServerFixture
 /////////////////////////////////////////////////
 std::string GetVisualSDFString(const std::string &_name,
     const std::string &_geomType = "box",
+    const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
     gazebo::math::Pose _pose = gazebo::math::Pose::Zero,
     double _transparency = 0, bool _castShadows = true,
     const std::string &_material = "Gazebo/Grey",
@@ -50,22 +51,22 @@ std::string GetVisualSDFString(const std::string &_name,
   {
     visualString
       << "      <box>"
-      << "        <size>1.0 1.0 1.0</size>"
+      << "        <size>" << _size << "</size>"
       << "      </box>";
   }
   else if (_geomType == "sphere")
   {
     visualString
       << "      <sphere>"
-      << "        <radius>0.5</radius>"
+      << "        <radius>" << _size.X() * 0.5 << "</radius>"
       << "      </sphere>";
   }
   else if (_geomType == "cylinder")
   {
     visualString
       << "      <cylinder>"
-      << "        <radius>0.5</radius>"
-      << "        <length>1.0</length>"
+      << "        <radius>" << _size.X() * 0.5 << "</radius>"
+      << "        <length>" << _size.Z() << "</length>"
       << "      </cylinder>";
   }
   visualString
@@ -185,36 +186,122 @@ TEST_F(Visual_TEST, Geometry)
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
 
-  // box geom
-  sdf::ElementPtr boxSDF(new sdf::Element);
-  sdf::initFile("visual.sdf", boxSDF);
-  sdf::readString(GetVisualSDFString("visual_box", "box"), boxSDF);
-  gazebo::rendering::VisualPtr boxVis(
-      new gazebo::rendering::Visual("box_visual", scene));
-  boxVis->Load(boxSDF);
-  EXPECT_EQ(boxVis->GetGeometryType(), "box");
-  EXPECT_EQ(boxVis->GetGeometrySize(), ignition::math::Vector3d::One);
+  // check geometry with unit scale
+  {
+    // box geom
+    sdf::ElementPtr boxSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", boxSDF);
+    sdf::readString(GetVisualSDFString("visual_box", "box"), boxSDF);
+    gazebo::rendering::VisualPtr boxVis(
+        new gazebo::rendering::Visual("box_visual", scene));
+    boxVis->Load(boxSDF);
+    EXPECT_EQ(boxVis->GetGeometryType(), "box");
+    EXPECT_EQ(boxVis->GetGeometrySize(), ignition::math::Vector3d::One);
 
-  // sphere geom
-  sdf::ElementPtr sphereSDF(new sdf::Element);
-  sdf::initFile("visual.sdf", sphereSDF);
-  sdf::readString(GetVisualSDFString("visual_sphere", "sphere"), sphereSDF);
-  gazebo::rendering::VisualPtr sphereVis(
-      new gazebo::rendering::Visual("sphere_visual", scene));
-  sphereVis->Load(sphereSDF);
-  EXPECT_EQ(sphereVis->GetGeometryType(), "sphere");
-  EXPECT_EQ(boxVis->GetGeometrySize(), ignition::math::Vector3d::One);
+    // sphere geom
+    sdf::ElementPtr sphereSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", sphereSDF);
+    sdf::readString(GetVisualSDFString("visual_sphere", "sphere"), sphereSDF);
+    gazebo::rendering::VisualPtr sphereVis(
+        new gazebo::rendering::Visual("sphere_visual", scene));
+    sphereVis->Load(sphereSDF);
+    EXPECT_EQ(sphereVis->GetGeometryType(), "sphere");
+    EXPECT_EQ(sphereVis->GetGeometrySize(), ignition::math::Vector3d::One);
 
-  // cylinder geom
-  sdf::ElementPtr cylinderSDF(new sdf::Element);
-  sdf::initFile("visual.sdf", cylinderSDF);
-  sdf::readString(GetVisualSDFString("visual_cylinder", "cylinder"),
-      cylinderSDF);
-  gazebo::rendering::VisualPtr cylinderVis(
-      new gazebo::rendering::Visual("cylinder_visual", scene));
-  cylinderVis->Load(cylinderSDF);
-  EXPECT_EQ(cylinderVis->GetGeometryType(), "cylinder");
-  EXPECT_EQ(boxVis->GetGeometrySize(), ignition::math::Vector3d::One);
+    // cylinder geom
+    sdf::ElementPtr cylinderSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", cylinderSDF);
+    sdf::readString(GetVisualSDFString("visual_cylinder", "cylinder"),
+        cylinderSDF);
+    gazebo::rendering::VisualPtr cylinderVis(
+        new gazebo::rendering::Visual("cylinder_visual", scene));
+    cylinderVis->Load(cylinderSDF);
+    EXPECT_EQ(cylinderVis->GetGeometryType(), "cylinder");
+    EXPECT_EQ(cylinderVis->GetGeometrySize(), ignition::math::Vector3d::One);
+  }
+
+  // non-unit scale
+  {
+    // box
+    ignition::math::Vector3d boxSize(0.2, 0.4, 2.1);
+    sdf::ElementPtr boxSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", boxSDF);
+    sdf::readString(GetVisualSDFString("visual_box", "box", boxSize), boxSDF);
+    gazebo::rendering::VisualPtr boxVis(
+        new gazebo::rendering::Visual("box_visual", scene));
+    boxVis->Load(boxSDF);
+    EXPECT_EQ(boxVis->GetGeometrySize(), boxSize);
+    EXPECT_EQ(boxVis->GetScale(), boxSize);
+
+    ignition::math::Vector3d boxScale(1.5, 2.4, 3.0);
+    boxVis->SetScale(boxScale);
+    EXPECT_EQ(boxVis->GetGeometrySize(), boxScale);
+    EXPECT_EQ(boxVis->GetScale(), boxScale);
+
+    sdf::ElementPtr newBoxSDF = boxVis->GetSDF();
+    sdf::ElementPtr newBoxGeomElem = newBoxSDF->GetElement("geometry");
+    EXPECT_TRUE(newBoxGeomElem->HasElement("box"));
+    sdf::ElementPtr newBoxGeomBoxElem = newBoxGeomElem->GetElement("box");
+    EXPECT_EQ(
+        newBoxGeomBoxElem->GetElement("size")->Get<ignition::math::Vector3d>(),
+        boxScale);
+
+    // sphere
+    ignition::math::Vector3d sphereSize(3.2, 3.2, 3.2);
+    sdf::ElementPtr sphereSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", sphereSDF);
+    sdf::readString(GetVisualSDFString("visual_sphere", "sphere", sphereSize),
+    sphereSDF);
+    gazebo::rendering::VisualPtr sphereVis(
+        new gazebo::rendering::Visual("sphere_visual", scene));
+    sphereVis->Load(sphereSDF);
+    EXPECT_EQ(sphereVis->GetGeometrySize(), sphereSize);
+    EXPECT_EQ(sphereVis->GetScale(), sphereSize);
+
+    ignition::math::Vector3d sphereScale(3.5, 3.5, 3.5);
+    sphereVis->SetScale(sphereScale);
+    EXPECT_EQ(sphereVis->GetGeometrySize(), sphereScale);
+    EXPECT_EQ(sphereVis->GetScale(), sphereScale);
+
+    sdf::ElementPtr newSphereSDF = sphereVis->GetSDF();
+    sdf::ElementPtr newSphereGeomElem = newSphereSDF->GetElement("geometry");
+    EXPECT_TRUE(newSphereGeomElem->HasElement("sphere"));
+    sdf::ElementPtr newSphereGeomSphereElem =
+        newSphereGeomElem->GetElement("sphere");
+    EXPECT_DOUBLE_EQ(
+        newSphereGeomSphereElem->GetElement("radius")->Get<double>(),
+        sphereScale.X()*0.5);
+
+    // cylinder
+    ignition::math::Vector3d cylinderSize(52, 52, 0.6);
+    sdf::ElementPtr cylinderSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", cylinderSDF);
+    sdf::readString(GetVisualSDFString("visual_cylinder", "cylinder",
+        cylinderSize), cylinderSDF);
+    gazebo::rendering::VisualPtr cylinderVis(
+        new gazebo::rendering::Visual("cylinder_visual", scene));
+    cylinderVis->Load(cylinderSDF);
+    EXPECT_EQ(cylinderVis->GetGeometrySize(), cylinderSize);
+    EXPECT_EQ(cylinderVis->GetScale(), cylinderSize);
+
+    ignition::math::Vector3d cylinderScale(0.1, 0.1, 3.0);
+    cylinderVis->SetScale(cylinderScale);
+    EXPECT_EQ(cylinderVis->GetGeometrySize(), cylinderScale);
+    EXPECT_EQ(cylinderVis->GetScale(), cylinderScale);
+
+    sdf::ElementPtr newCylinderSDF = cylinderVis->GetSDF();
+    sdf::ElementPtr newCylinderGeomElem =
+        newCylinderSDF->GetElement("geometry");
+    EXPECT_TRUE(newCylinderGeomElem->HasElement("cylinder"));
+    sdf::ElementPtr newCylinderGeomCylinderElem =
+        newCylinderGeomElem->GetElement("cylinder");
+    EXPECT_DOUBLE_EQ(
+        newCylinderGeomCylinderElem->GetElement("radius")->Get<double>(),
+        cylinderScale.X()*0.5);
+    EXPECT_DOUBLE_EQ(
+        newCylinderGeomCylinderElem->GetElement("length")->Get<double>(),
+        cylinderScale.Z());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -229,7 +316,8 @@ TEST_F(Visual_TEST, CastShadows)
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
   sdf::readString(GetVisualSDFString("visual_box_has_shadows", "box",
-      gazebo::math::Pose::Zero, 0, true), boxSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true),
+      boxSDF);
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", scene));
   boxVis->Load(boxSDF);
@@ -239,7 +327,8 @@ TEST_F(Visual_TEST, CastShadows)
   sdf::ElementPtr boxSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF2);
   sdf::readString(GetVisualSDFString("visual_box_has_no_shadows", "box",
-      gazebo::math::Pose::Zero, 0, false), boxSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, false),
+      boxSDF2);
   gazebo::rendering::VisualPtr boxVis2(
       new gazebo::rendering::Visual("box_visual2", scene));
   boxVis2->Load(boxSDF2);
@@ -263,7 +352,7 @@ TEST_F(Visual_TEST, Transparency)
   sdf::ElementPtr sphereSDF(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF);
   sdf::readString(GetVisualSDFString("visual_sphere_no_transparency", "sphere",
-      gazebo::math::Pose::Zero, 0), sphereSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), sphereSDF);
   gazebo::rendering::VisualPtr sphereVis(
       new gazebo::rendering::Visual("sphere_visual", scene));
   sphereVis->Load(sphereSDF);
@@ -272,7 +361,8 @@ TEST_F(Visual_TEST, Transparency)
   sdf::ElementPtr sphereSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF2);
   sdf::readString(GetVisualSDFString("visual_sphere_semi_transparent", "sphere",
-      gazebo::math::Pose::Zero, 0.5), sphereSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0.5),
+      sphereSDF2);
   gazebo::rendering::VisualPtr sphereVis2(
       new gazebo::rendering::Visual("sphere_visual2", scene));
   sphereVis2->Load(sphereSDF2);
@@ -344,7 +434,8 @@ TEST_F(Visual_TEST, Material)
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
   sdf::readString(GetVisualSDFString("visual_box_red", "box",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Red"), boxSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Red"), boxSDF);
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", scene));
   boxVis->Load(boxSDF);
@@ -356,7 +447,8 @@ TEST_F(Visual_TEST, Material)
   sdf::ElementPtr boxSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF2);
   sdf::readString(GetVisualSDFString("visual_box_white", "box",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/White", true), boxSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/White", true), boxSDF2);
   gazebo::rendering::VisualPtr boxVis2(
       new gazebo::rendering::Visual("box_visual2", scene));
   boxVis2->Load(boxSDF2);
@@ -437,7 +529,8 @@ TEST_F(Visual_TEST, Lighting)
   sdf::ElementPtr cylinderSDF(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF);
   sdf::readString(GetVisualSDFString("visual_cylinder_lighting", "cylinder",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true), cylinderSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Grey", true), cylinderSDF);
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
@@ -446,7 +539,8 @@ TEST_F(Visual_TEST, Lighting)
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
   sdf::readString(GetVisualSDFString("visual_cylinder_no_lighting", "cylinder",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", false), cylinderSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Grey", false), cylinderSDF2);
   gazebo::rendering::VisualPtr cylinderVis2(
       new gazebo::rendering::Visual("cylinder_visual2", scene));
   cylinderVis2->Load(cylinderSDF2);
@@ -470,9 +564,9 @@ TEST_F(Visual_TEST, Color)
   sdf::ElementPtr cylinderSDF(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF);
   sdf::readString(GetVisualSDFString("visual_cylinder_black", "cylinder",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true,
-      common::Color::Black, common::Color::Black, common::Color::Black,
-      common::Color::Black), cylinderSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Grey", true, common::Color::Black, common::Color::Black,
+      common::Color::Black, common::Color::Black), cylinderSDF);
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
@@ -484,9 +578,9 @@ TEST_F(Visual_TEST, Color)
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
   sdf::readString(GetVisualSDFString("visual_cylinder_color", "cylinder",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true,
-      common::Color::Green, common::Color::Blue, common::Color::Red,
-      common::Color::Yellow), cylinderSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Grey", true, common::Color::Green, common::Color::Blue,
+      common::Color::Red, common::Color::Yellow), cylinderSDF2);
   gazebo::rendering::VisualPtr cylinderVis2(
       new gazebo::rendering::Visual("cylinder_visual2", scene));
   cylinderVis2->Load(cylinderSDF2);

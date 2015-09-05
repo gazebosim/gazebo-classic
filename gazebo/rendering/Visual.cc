@@ -407,11 +407,12 @@ void Visual::Load()
     {
       // geom values give the absolute size so compute a scale that will
       // be mulitiply by the current scale to get to the geom size.
-      math::Vector3 derivedScale = Conversions::Convert(
-          this->dataPtr->sceneNode->_getDerivedScale());
-      ignition::math::Vector3d toScale = geometrySize /
-          derivedScale.Ign();
-      this->dataPtr->sceneNode->scale(toScale.X(), toScale.Y(), toScale.Z());
+      ignition::math::Vector3d derivedScale = this->DerivedScale();
+      ignition::math::Vector3d localScale =
+          geometrySize / (derivedScale / this->dataPtr->scale);
+      this->dataPtr->sceneNode->setScale(
+          Conversions::Convert(math::Vector3(localScale)));
+      this->dataPtr->scale = localScale;
       this->dataPtr->geomSize = geometrySize;
     }
   }
@@ -740,8 +741,8 @@ void Visual::SetScale(const math::Vector3 &_scale)
 
   this->dataPtr->scale = _scale.Ign();
 
-  this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(math::Vector3(this->dataPtr->scale)));
+  this->dataPtr->sceneNode->setScale(Conversions::Convert(
+      math::Vector3(this->dataPtr->scale)));
 }
 
 //////////////////////////////////////////////////
@@ -793,6 +794,7 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
         geomRadius);
     geomElem->GetElement("cylinder")->GetElement("length")->Set(
         geomLength);
+
     this->dataPtr->geomSize =
         ignition::math::Vector3d(geomRadius*2.0, geomRadius*2.0, geomLength);
   }
