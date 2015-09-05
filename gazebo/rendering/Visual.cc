@@ -741,8 +741,8 @@ void Visual::SetScale(const math::Vector3 &_scale)
 
   this->dataPtr->scale = _scale.Ign();
 
-  this->dataPtr->sceneNode->setScale(Conversions::Convert(
-      math::Vector3(this->dataPtr->scale)));
+  this->dataPtr->sceneNode->setScale(
+      Conversions::Convert(math::Vector3(this->dataPtr->scale)));
 }
 
 //////////////////////////////////////////////////
