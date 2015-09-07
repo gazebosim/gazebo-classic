@@ -178,23 +178,23 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
 
-    const rendering::CameraLens *lens = wcamera->GetLens();
+    const rendering::CameraLens *lens = wcamera->Lens();
 
     msg.set_name(this->GetName());
     msg.set_purpose(msgs::CameraLensCmd_CmdPurpose_INFO);
-    msg.set_type(lens->GetType());
+    msg.set_type(lens->Type());
 
-    msg.set_c1(lens->GetC1());
-    msg.set_c2(lens->GetC2());
-    msg.set_c3(lens->GetC3());
-    msg.set_f(lens->GetF());
+    msg.set_c1(lens->C1());
+    msg.set_c2(lens->C2());
+    msg.set_c3(lens->C3());
+    msg.set_f(lens->F());
 
-    msg.set_fun(lens->GetFun());
-    msg.set_scale_to_hfov(lens->GetScaleToHFOV());
-    msg.set_cutoff_angle(lens->GetCutOffAngle());
+    msg.set_fun(lens->Fun());
+    msg.set_scale_to_hfov(lens->ScaleToHFOV());
+    msg.set_cutoff_angle(lens->CutOffAngle());
     msg.set_hfov(wcamera->GetHFOV().Radian());
 
-    msg.set_env_texture_size(wcamera->GetEnvTextureSize());
+    msg.set_env_texture_size(wcamera->EnvTextureSize());
 
     this->lensPub->Publish(msg);
   }
@@ -217,7 +217,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
   rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
 
-  rendering::CameraLens *lens = (wcamera->GetLens());
+  rendering::CameraLens *lens = (wcamera->Lens());
 
   if (_msg->has_type())
     lens->SetType(_msg->type());

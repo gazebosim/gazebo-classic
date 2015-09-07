@@ -86,39 +86,39 @@ namespace gazebo
 
       /// \brief Get lens projection type
       /// \return Lens projection type string
-      public: std::string GetType() const;
+      public: std::string Type() const;
 
       /// \brief Checks if lens type is of the custom type
-      /// \return True if this->GetType() == "custom"
+      /// \return True if this->Type() == "custom"
       public: bool IsCustom() const;
 
       /// \brief Gets c1 constant
       /// \return c1 constant
-      public: double GetC1() const;
+      public: double C1() const;
 
       /// \brief Gets c2 constant
       /// \return c2 constant
-      public: double GetC2() const;
+      public: double C2() const;
 
       /// \brief Gets c3 constant
       /// \return c3 constant
-      public: double GetC3() const;
+      public: double C3() const;
 
       /// \brief Gets f constant
       /// \return f constant
-      public: double GetF() const;
+      public: double F() const;
 
       /// \brief Gets angle transform function
       /// \return Angle transform function string
-      public: std::string GetFun() const;
+      public: std::string Fun() const;
 
       /// \brief Gets cut off angle
       /// \return Cut off angle
-      public: double GetCutOffAngle() const;
+      public: double CutOffAngle() const;
 
       /// \brief Checks if image should be scaled to fit horisontal FOV
       /// \return True if the image will be scaled
-      public: bool GetScaleToHFOV() const;
+      public: bool ScaleToHFOV() const;
 
       /// \brief Set lens projection type
       /// \param[in] _type Lens projection type string
@@ -172,7 +172,7 @@ namespace gazebo
     };
 
     /// \class WideAngleCamera WideAngleCamera.hh rendering/rendering.hh
-    /// \brief Camera with agile mapping function
+    /// \brief Camera with  mapping function
     class GAZEBO_VISIBLE WideAngleCamera :
         public Camera,
         protected Ogre::CompositorInstance::Listener
@@ -200,11 +200,11 @@ namespace gazebo
 
       /// \brief Gets the environment texture size
       /// \return Texture size
-      public: int GetEnvTextureSize() const;
+      public: int EnvTextureSize() const;
 
       /// \brief Gets camera's lens description
       /// \return Camera's lens description
-      public: CameraLens *GetLens();
+      public: CameraLens *Lens();
 
       // Documentation inherited
       public: void SetRenderTarget(Ogre::RenderTarget *_target) override;

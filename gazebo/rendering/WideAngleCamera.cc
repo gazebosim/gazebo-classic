@@ -105,13 +105,13 @@ void CameraLens::Load()
       gzthrow("You need a <custom_function> element to use this lens type");
   }
   else
-    this->Init(this->GetType());
+    this->Init(this->Type());
 
   this->SetCutOffAngle(this->sdf->Get<double>("cutoff_angle"));
 }
 
 //////////////////////////////////////////////////
-std::string CameraLens::GetType() const
+std::string CameraLens::Type() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -121,11 +121,11 @@ std::string CameraLens::GetType() const
 //////////////////////////////////////////////////
 bool CameraLens::IsCustom() const
 {
-  return GetType() == "custom";
+  return this->Type() == "custom";
 }
 
 //////////////////////////////////////////////////
-double CameraLens::GetC1() const
+double CameraLens::C1() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -133,7 +133,7 @@ double CameraLens::GetC1() const
 }
 
 //////////////////////////////////////////////////
-double CameraLens::GetC2() const
+double CameraLens::C2() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -141,7 +141,7 @@ double CameraLens::GetC2() const
 }
 
 //////////////////////////////////////////////////
-double CameraLens::GetC3() const
+double CameraLens::C3() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -149,7 +149,7 @@ double CameraLens::GetC3() const
 }
 
 //////////////////////////////////////////////////
-double CameraLens::GetF() const
+double CameraLens::F() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -157,7 +157,7 @@ double CameraLens::GetF() const
 }
 
 //////////////////////////////////////////////////
-std::string CameraLens::GetFun() const
+std::string CameraLens::Fun() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -165,7 +165,7 @@ std::string CameraLens::GetFun() const
 }
 
 //////////////////////////////////////////////////
-double CameraLens::GetCutOffAngle() const
+double CameraLens::CutOffAngle() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -173,7 +173,7 @@ double CameraLens::GetCutOffAngle() const
 }
 
 //////////////////////////////////////////////////
-bool CameraLens::GetScaleToHFOV() const
+bool CameraLens::ScaleToHFOV() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -195,8 +195,8 @@ void CameraLens::SetType(const std::string &_type)
     {"orthographic",    std::make_tuple(1.0, 1.0, 0.0, 1.0, "sin")}};
 
   fun_types.emplace("custom",
-      std::make_tuple(this->GetC1(), this->GetC2(), this->GetC3(), this->GetF(),
-        CameraLensPrivate::MapFunctionEnum(this->GetFun()).AsString()));
+      std::make_tuple(this->C1(), this->C2(), this->C3(), this->F(),
+        CameraLensPrivate::MapFunctionEnum(this->Fun()).AsString()));
 
   decltype(fun_types)::mapped_type params;
 
@@ -337,7 +337,7 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass,
   uniforms->setNamedConstant("c2", static_cast<Ogre::Real>(this->dataPtr->c2));
   uniforms->setNamedConstant("c3", static_cast<Ogre::Real>(this->dataPtr->c3));
 
-  if (this->GetScaleToHFOV())
+  if (this->ScaleToHFOV())
   {
     float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
     float fun_res = this->dataPtr->fun.Apply(static_cast<float>(param));
@@ -467,7 +467,7 @@ void WideAngleCamera::Fini()
 }
 
 //////////////////////////////////////////////////
-int WideAngleCamera::GetEnvTextureSize() const
+int WideAngleCamera::EnvTextureSize() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->dataMutex);
 
@@ -475,7 +475,7 @@ int WideAngleCamera::GetEnvTextureSize() const
 }
 
 //////////////////////////////////////////////////
-CameraLens *WideAngleCamera::GetLens()
+CameraLens *WideAngleCamera::Lens()
 {
   return this->lens;
 }
@@ -648,13 +648,13 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
   if (!pPass || !pPass->hasFragmentProgram())
     return;
 
-  if (!this->GetLens())
+  if (!this->Lens())
   {
     gzerr << "No lens\n";
     return;
   }
 
-  this->GetLens()->SetUniformVariables(pPass,
+  this->Lens()->SetUniformVariables(pPass,
     this->GetAspectRatio(),
     this->GetHFOV().Radian());
 
