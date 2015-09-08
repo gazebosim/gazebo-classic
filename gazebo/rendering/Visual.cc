@@ -234,6 +234,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 {
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
+
   for (auto iter: this->dataPtr->children)
   {
     iter->Clone(iter->GetName(), result);

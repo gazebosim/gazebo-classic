@@ -12,20 +12,44 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <model name="model0">
+    <model name="model_00">
+      <pose>0 0 0.5 0 0 0</pose>
+      <link name="link_00">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="collision_00">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual_00">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
 
-      <model name="model1">
-        <pose>1 0 0.5 0 0 0</pose>
-        <link name="link1">
-          <pose>0 0 0 0 0 0</pose>
-          <collision name="collision1">
+      <model name="model_01">
+        <pose>1 0 0.0 0 0 0</pose>
+        <link name="link_01">
+          <pose>0.25 0 0.0 0 0 0</pose>
+          <collision name="collision_01">
             <geometry>
               <box>
                 <size>1 1 1</size>
               </box>
             </geometry>
           </collision>
-          <visual name="visual1">
+          <visual name="visual_01">
             <geometry>
               <box>
                 <size>1 1 1</size>
@@ -40,44 +64,15 @@
           </visual>
         </link>
       </model>
-      <model name="model2">
-        <pose>-1 0 0.5 0 0 0</pose>
-        <link name="link2">
-          <collision name="collision2">
-            <geometry>
-              <sphere>
-                <radius>0.5</radius>
-              </sphere>
-            </geometry>
-          </collision>
-          <visual name="visual2">
-            <geometry>
-              <sphere>
-                <radius>0.5</radius>
-              </sphere>
-            </geometry>
-            <material>
-              <script>
-                <uri>file://media/materials/scripts/gazebo.material</uri>
-                <name>Gazebo/Red</name>
-              </script>
-            </material>
-          </visual>
-        </link>
-      </model>
 
-    <joint name='joint1' type='revolute'>
-      <parent>model0::model1::link1</parent>
-      <child>model0::model2::link2</child>
+      <joint name="joint_00" type="revolute">
+        <parent>link_00</parent>
+        <child>model_01::link_01</child>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
-          <xyz>1 0 0</xyz>
-          <limit>
-            <lower>-1000000000000000</lower>
-            <upper>1000000000000000</upper>
-          </limit>
+          <xyz>1.0 0.0 0.0</xyz>
         </axis>
-    </joint>
-
+      </joint>
     </model>
 
   </world>

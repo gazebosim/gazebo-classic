@@ -108,7 +108,6 @@ void Model::LoadLinks()
   if (this->sdf->HasElement("link"))
   {
     sdf::ElementPtr linkElem = this->sdf->GetElement("link");
-//    bool canonicalLinkInitialized = false;
     while (linkElem)
     {
       // Create a new link
@@ -118,6 +117,8 @@ void Model::LoadLinks()
       /// \TODO: canonical link is hardcoded to the first link.
       ///        warn users for now, need  to add parsing of
       ///        the canonical tag in sdf
+
+      // find canonical link - there should only be one within a tree of models
       if (!this->canonicalLink)
       {
         // Get the canonical link from parent, if not found then set the
@@ -157,14 +158,7 @@ void Model::LoadLinks()
         }
       }
 
-/*      if (!canonicalLinkInitialized)
-      {
-        link->SetCanonicalLink(true);
-        this->canonicalLink = link;
-        canonicalLinkInitialized = true;
-      }*/
-
-      // Load the link using the config node. This also loads all of the
+       // Load the link using the config node. This also loads all of the
       // bodies collisionetries
       link->Load(linkElem);
       linkElem = linkElem->GetNextElement("link");
@@ -176,7 +170,7 @@ void Model::LoadLinks()
 //////////////////////////////////////////////////
 void Model::LoadModels()
 {
-  // Load the bodies
+  // Load the models
   if (this->sdf->HasElement("model"))
   {
     sdf::ElementPtr modelElem = this->sdf->GetElement("model");
@@ -227,8 +221,8 @@ void Model::LoadJoints()
     }
   }
 
-  // Load the nested model joints if the world is not already loaded. Otherwise,
-  // LoadJoints will called from in Model::Load.
+  // Load nested model joints if the world is not already loaded. Otherwise,
+  // LoadJoints will be called from Model::Load.
   if (!this->world->IsLoaded())
   {
     for (auto model : this->models)
@@ -240,8 +234,9 @@ void Model::LoadJoints()
 void Model::Init()
 {
   // Record the model's initial pose (for reseting)
-  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+  math::Pose initPose = this->sdf->Get<math::Pose>("pose");
+  this->SetInitialRelativePose(initPose);
+  this->SetRelativePose(initPose);
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
@@ -339,7 +334,7 @@ void Model::Update()
     this->prevAnimationTime = this->world->GetSimTime();
   }
 
-  for (auto model : this->models)
+  for (auto &model : this->models)
     model->Update();
 }
 
@@ -668,22 +663,21 @@ JointPtr Model::GetJoint(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-const Model_V &Model::GetModels() const
+const Model_V &Model::NestedModels() const
 {
   return this->models;
 }
 
 //////////////////////////////////////////////////
-ModelPtr Model::GetModel(const std::string &_name) const
+ModelPtr Model::NestedModel(const std::string &_name) const
 {
-  Model_V::const_iterator iter;
   ModelPtr result;
 
-  for (iter = this->models.begin(); iter != this->models.end(); ++iter)
+  for (auto &m : this->models)
   {
-    if (((*iter)->GetScopedName() == _name) || ((*iter)->GetName() == _name))
+    if ((m->GetScopedName() == _name) || (m->GetName() == _name))
     {
-      result = *iter;
+      result = m;
       break;
     }
   }
@@ -691,6 +685,7 @@ ModelPtr Model::GetModel(const std::string &_name) const
   return result;
 }
 
+//////////////////////////////////////////////////
 //////////////////////////////////////////////////
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
@@ -811,7 +806,7 @@ void Model::LoadPlugins()
     }
   }
 
-  for (auto model : this->models)
+  for (auto &model : this->models)
     model->LoadPlugins();
 }
 
@@ -975,28 +970,23 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
   _msg.set_self_collide(this->GetSelfCollide());
-//  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
   msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
   msgs::Set(_msg.mutable_scale(), this->scale.Ign());
 
-//  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (Link_V::iterator iter = this->links.begin(); iter != this->links.end();
-      ++iter)
+  for (const auto &link : this->links)
   {
-    (*iter)->FillMsg(*_msg.add_link());
+    link->FillMsg(*_msg.add_link());
   }
 
-  for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); ++iter)
+  for (const auto &joint : this->joints)
   {
-    (*iter)->FillMsg(*_msg.add_joint());
+    joint->FillMsg(*_msg.add_joint());
   }
-
-  for (auto &model : this->models)
+  for (const auto &model : this->models)
   {
     model->FillMsg(*_msg.add_model());
   }
@@ -1118,7 +1108,7 @@ void Model::SetState(const ModelState &_state)
   for (ModelState_M::iterator iter = modelStates.begin();
        iter != modelStates.end(); ++iter)
   {
-    ModelPtr model = this->GetModel(iter->first);
+    ModelPtr model = this->NestedModel(iter->first);
     if (model)
       model->SetState(iter->second);
     else
