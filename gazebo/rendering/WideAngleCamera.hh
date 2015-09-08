@@ -171,7 +171,7 @@ namespace gazebo
     };
 
     /// \class WideAngleCamera WideAngleCamera.hh rendering/rendering.hh
-    /// \brief Camera with  mapping function
+    /// \brief Camera with variable mapping function
     class GAZEBO_VISIBLE WideAngleCamera :
         public Camera,
         protected Ogre::CompositorInstance::Listener

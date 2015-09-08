@@ -37,9 +37,9 @@ namespace gazebo
     /// \{
 
     /// \class WideAngleCameraSensor WideAngleCameraSensor.hh sensors/sensors.hh
-    /// \brief Basic camera sensor
+    /// \brief Camera sensor with variable mapping function
     ///
-    /// This sensor is used for simulating cameras with wide angle lens
+    /// This sensor is used for simulating cameras with wide-angle lens
     class WideAngleCameraSensor : public CameraSensor
     {
       /// \brief Constructor
