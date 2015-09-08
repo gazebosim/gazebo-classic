@@ -69,6 +69,9 @@ using the same arguments used in the command line.
     1. Display model plugins on the left panel and added model plugin inspector
         * [Pull request #1863](https://bitbucket.org/osrf/gazebo/pull-request/1863)
 
+    1. Context menu and deletion for model plugins
+        * [Pull request #1890](https://bitbucket.org/osrf/gazebo/pull-request/1890)
+
 ## Gazebo 6.0
 
 1. Added Copy constructor and assignment operator to MouseEvent
