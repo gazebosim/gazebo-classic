@@ -6,27 +6,53 @@ package gazebo.msgs;
 
 message CameraLensCmd
 {
+  /// \brief Types of purpose.
   enum CmdPurpose
   {
     INFO = 1;
     SET = 2;
   }
 
-  required string name          = 1;
+  /// \brief Purpose of the message,
+  ///        if the message is emitted by lens then it is set to INFO
+  ///        to control the lens set this value to `SET`.
   required CmdPurpose purpose   = 2;
 
-  // custom, equdistant, etc.
+  /// \brief Type of projection of the lens
+  ///        possible values are "gnomonical", "stereographic", "equidistant",
+  ///        "equisolid_angle", "stereographic", "custom".
+  ///        If you set this value to "custom" you need to specify at least one
+  ///        of the `c1`, `c2`, `c3`, `f` or `fun`.
   required string type          = 3;
 
+  /// \brief Linear image scaling factor
   optional double c1            = 4;
+
+  /// \brief Angle scaling factor
   optional double c2            = 5;
+
+  /// \brief Angle offset factor 
   optional double c3            = 6;
+
+  /// \brief Linear scaling factor, unlike c1, will be adjusted to match hfov
+  ///        if scale_to_fov is set to `true`.
   optional double f             = 7;
-  // 'tan', 'sin', or 'id'
+
+  /// \brief trigonometrical function used in the mapping function
+  //         possible values are "tan", "sin" or "id".
   optional string fun           = 8;
+
+  /// \brief Scale image to fit horizontal FOV
   optional bool scale_to_hfov   = 9 [default = false];
+
+  /// \brief Everything outside of this angle will be hidden,
+  ///        the angle is counted from camera's X (forward) axis.
   optional double cutoff_angle  = 10;
+
+  /// \brief Horizontal field of view in radians.
   optional double hfov          = 11;
 
+  /// \brief Size of cube map texture,
+  ///        used to store intermediate rendering result.
   optional int32 env_texture_size = 12;
 }
