@@ -65,11 +65,11 @@ namespace gazebo
       public: ~CameraLens();
 
       /// \brief Init custom camera lens with specified parameters
-      /// \param[in] _c1 Image scaling constant
-      /// \param[in] _c2 Angle scaling constant
+      /// \param[in] _c1 Image scaling factor
+      /// \param[in] _c2 Angle scaling factor
       /// \param[in] _fun Angle transform function
       /// \param[in] _fun Focal length of the optical system
-      /// \param[in] _c3 Angle shift constant, should be 0 in most cases
+      /// \param[in] _c3 Angle shift parameter, should be 0 in most cases
       public: void Init(double _c1, double _c2, const std::string &_fun,
                         double _f, double _c3);
 
@@ -92,20 +92,20 @@ namespace gazebo
       /// \return True if this->Type() == "custom"
       public: bool IsCustom() const;
 
-      /// \brief Gets c1 constant
-      /// \return c1 constant
+      /// \brief Gets c1 parameter
+      /// \return c1 parameter
       public: double C1() const;
 
-      /// \brief Gets c2 constant
-      /// \return c2 constant
+      /// \brief Gets c2 parameter
+      /// \return c2 parameter
       public: double C2() const;
 
-      /// \brief Gets c3 constant
-      /// \return c3 constant
+      /// \brief Gets c3 parameter
+      /// \return c3 parameter
       public: double C3() const;
 
-      /// \brief Gets f constant
-      /// \return f constant
+      /// \brief Gets f parameter
+      /// \return f parameter
       public: double F() const;
 
       /// \brief Gets angle transform function
@@ -124,20 +124,20 @@ namespace gazebo
       /// \param[in] _type Lens projection type string
       public: void SetType(const std::string &_type);
 
-      /// \brief Sets c1 constant
-      /// \param[in] _c c1 constant
+      /// \brief Sets c1 parameter
+      /// \param[in] _c c1 parameter
       public: void SetC1(double _c);
 
-      /// \brief Sets c2 constant
-      /// \param[in] _c c2 constant
+      /// \brief Sets c2 parameter
+      /// \param[in] _c c2 parameter
       public: void SetC2(double _c);
 
-      /// \brief Sets c3 constant
-      /// \param[in] _c c3 constant
+      /// \brief Sets c3 parameter
+      /// \param[in] _c c3 parameter
       public: void SetC3(double _c);
 
-      /// \brief Sets f constant
-      /// \param[in] _f f constant
+      /// \brief Sets f parameter
+      /// \param[in] _f f parameter
       public: void SetF(double _f);
 
       /// \brief Sets angle transform function
@@ -150,7 +150,7 @@ namespace gazebo
 
       /// \brief Sets whether the image should be scaled to fit horisontal FOV
       /// \param[in] _scale true if it should,
-      ///   note: c1 and f constants are ignored in this case
+      ///   note: c1 and f parameters are ignored in this case
       public: void SetScaleToHFOV(bool _scale);
 
       /// \brief Set uniform variables of a shader

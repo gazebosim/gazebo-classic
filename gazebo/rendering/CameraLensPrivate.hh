@@ -25,6 +25,7 @@
 #include <utility>
 #include <vector>
 
+#include <ignition/math.hh>
 #include <ignition/math/Vector3.hh>
 
 #include <sdf/sdf.hh>
@@ -40,12 +41,20 @@ namespace gazebo
     /// \brief Private fields of camera lens
     class CameraLensPrivate
     {
-      /// \brief Mapping function constants
+      /// \brief Linear scale factor
       public: double c1 = 1.0;
+
+      /// \brief Angle scale factor
       public: double c2 = 1.0;
+
+      /// \brief Angle offset factor
       public: double c3 = 0.0;
+
+      /// \brief Linear scale factor, may be adjusted in runtime
       public: double f = 1.0;
-      public: double cutOffAngle = 1.5707;
+
+      /// \brief Visible field of view
+      public: double cutOffAngle = IGN_PI*0.5;
 
       /// \brief Enumeration of functions that can be casted to some other types
       public: class MapFunctionEnum
