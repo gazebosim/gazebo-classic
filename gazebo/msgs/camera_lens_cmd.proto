@@ -16,43 +16,43 @@ message CameraLensCmd
   /// \brief Purpose of the message,
   ///        if the message is emitted by lens then it is set to INFO
   ///        to control the lens set this value to `SET`.
-  required CmdPurpose purpose   = 2;
+  required CmdPurpose purpose = 1;
 
   /// \brief Type of projection of the lens
   ///        possible values are "gnomonical", "stereographic", "equidistant",
   ///        "equisolid_angle", "stereographic", "custom".
   ///        If you set this value to "custom" you need to specify at least one
   ///        of the `c1`, `c2`, `c3`, `f` or `fun`.
-  required string type          = 3;
+  required string type = 2;
 
   /// \brief Linear image scaling factor
-  optional double c1            = 4;
+  optional double c1 = 3;
 
   /// \brief Angle scaling factor
-  optional double c2            = 5;
+  optional double c2 = 4;
 
   /// \brief Angle offset factor 
-  optional double c3            = 6;
+  optional double c3 = 5;
 
-  /// \brief Linear scaling factor, unlike c1, will be adjusted to match hfov
+  /// \brief Linear scaling factor, unlike `c1`, will be adjusted to match hfov
   ///        if scale_to_fov is set to `true`.
-  optional double f             = 7;
+  optional double f = 6;
 
-  /// \brief trigonometrical function used in the mapping function
-  //         possible values are "tan", "sin" or "id".
-  optional string fun           = 8;
+  /// \brief Angle modification function
+  //         possible values are "tan", "sin" and "id".
+  optional string fun = 7;
 
   /// \brief Scale image to fit horizontal FOV
-  optional bool scale_to_hfov   = 9 [default = false];
+  optional bool scale_to_hfov = 8 [default = false];
 
   /// \brief Everything outside of this angle will be hidden,
   ///        the angle is counted from camera's X (forward) axis.
-  optional double cutoff_angle  = 10;
+  optional double cutoff_angle = 9;
 
   /// \brief Horizontal field of view in radians.
-  optional double hfov          = 11;
+  optional double hfov = 10;
 
   /// \brief Size of cube map texture,
   ///        used to store intermediate rendering result.
-  optional int32 env_texture_size = 12;
+  optional int32 env_texture_size = 11;
 }
