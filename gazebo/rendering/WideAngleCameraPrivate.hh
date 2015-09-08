@@ -37,9 +37,6 @@ namespace gazebo
       /// \brief Environment texture size
       public: int envTextureSize;
 
-      /// \brief Camera lens description
-      public: CameraLens *lens;
-
       /// \brief Mutex to lock while rendering the world
       public: std::mutex renderMutex;
 

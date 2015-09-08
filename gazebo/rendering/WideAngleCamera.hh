@@ -251,6 +251,9 @@ namespace gazebo
       /// \brief Pointer to material, used for second rendering pass
       protected: Ogre::MaterialPtr compMat;
 
+      /// \brief Camera lens description
+      protected: CameraLens *lens;
+
       /// \internal
       /// \brief Private data pointer
       private: WideAngleCameraPrivate *dataPtr;

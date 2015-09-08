@@ -86,7 +86,7 @@ void CameraLens::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void CameraLens::Load()
 {
-  if (!tdataPtr->his->sdf->HasElement("type"))
+  if (!this->dataPtr->sdf->HasElement("type"))
     gzthrow("You should specify lens type using <type> element");
 
   if (this->IsCustom())
@@ -387,7 +387,7 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
   Camera(_namePrefix, _scene, _autoRender)
 {
   this->dataPtr = new WideAngleCameraPrivate;
-  this->dataPtr->lens = new CameraLens();
+  this->lens = new CameraLens();
 
   envCubeMapTexture = NULL;
   this->dataPtr->envTextureSize = _textureSize;
@@ -402,7 +402,7 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
 //////////////////////////////////////////////////
 WideAngleCamera::~WideAngleCamera()
 {
-  delete this->dataPtr->lens;
+  delete this->lens;
   delete this->dataPtr;
 }
 
@@ -435,13 +435,13 @@ void WideAngleCamera::Load()
   {
     sdf::ElementPtr sdf_lens = this->sdf->GetElement("lens");
 
-    this->dataPtr->lens->Load(sdf_lens);
+    this->lens->Load(sdf_lens);
 
     if (sdf_lens->HasElement("env_texture_size"))
       this->dataPtr->envTextureSize = sdf_lens->Get<int>("env_texture_size");
   }
   else
-    this->dataPtr->lens->Load();
+    this->lens->Load();
 }
 
 //////////////////////////////////////////////////
@@ -478,7 +478,7 @@ int WideAngleCamera::EnvTextureSize() const
 //////////////////////////////////////////////////
 CameraLens *WideAngleCamera::Lens()
 {
-  return this->dataPtr->lens;
+  return this->lens;
 }
 
 //////////////////////////////////////////////////

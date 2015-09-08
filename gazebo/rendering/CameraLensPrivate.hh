@@ -27,6 +27,8 @@
 
 #include <ignition/math/Vector3.hh>
 
+#include <sdf/sdf.hh>
+
 
 namespace gazebo
 {
