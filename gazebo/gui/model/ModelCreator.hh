@@ -387,8 +387,7 @@ namespace gazebo
       private: void ShowContextMenu(const std::string &_link);
 
       /// \brief Show a model plugin's context menu
-      /// \param[in] _link Name of model plugin the context menu is associated
-      /// with.
+      /// \param[in] _name Name of model plugin.
       private: void ShowModelPluginContextMenu(const std::string &_name);
 
       /// \brief Qt callback when a delete signal has been emitted. This is
@@ -402,10 +401,12 @@ namespace gazebo
       /// \brief Qt Callback to open link inspector
       private slots: void OnOpenInspector();
 
-      /// \brief Qt Callback to open model plugin  inspector.
+      /// \brief Qt Callback to open model plugin inspector.
+      /// \param[in] _name Name of model plugin.
       private slots: void OnOpenModelPluginInspector(const QString &_name);
 
       /// \brief Qt Callback to remove model plugin.
+      /// \param[in] _name Name of model plugin.
       private slots: void OnRemoveModelPlugin(const QString &_name);
 
       /// \brief Qt signal when the a link has been added.
