@@ -54,11 +54,14 @@ endif()
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")
+  set (HAVE_OPENGL OFF CACHE BOOL "HAVE OpenGL" FORCE)
 else ()
  if (OPENGL_INCLUDE_DIR)
    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs
                          ${gazeboserver_include_dirs_desc}
                          ${OPENGL_INCLUDE_DIR})
+   set (HAVE_OPENGL ON CACHE BOOL "HAVE OpenGL" FORCE)
+   add_definitions(-DHAVE_OPENGL)
  endif()
  if (OPENGL_LIBRARIES)
    APPEND_TO_CACHED_LIST(gazeboserver_link_libs
@@ -85,14 +88,7 @@ if (NOT HDF5_FOUND)
 else ()
   message(STATUS "HDF5 Found")
 endif ()
-########################################
-check_include_files("GL/gl.h";"GL/glext.h" GL_HEADERS_FOUND)
-if (NOT GL_HEADERS_FOUND)
-  BUILD_WARNING ("OpenGL headers not found, some rendering hacks will be disabled.")
-  set (HAVE_OPENGL OFF CACHE BOOL "HAVE OpenGL" FORCE)
-else ()
-  set (HAVE_OPENGL ON CACHE BOOL "HAVE OpenGL" FORCE)
-endif ()
+
 ########################################
 # Find packages
 
