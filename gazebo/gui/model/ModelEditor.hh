@@ -27,6 +27,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class TopToolbar;
     class ModelEditorPrivate;
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
