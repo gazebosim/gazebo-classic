@@ -172,8 +172,7 @@ void Camera::Load()
   {
     sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
     double angle = elem->Get<double>();
-    auto type = this->sdf->GetParent()->Get<std::string>("type");
-    if ((angle < 0.01 || angle > M_PI) && type != "wideanglecamera")
+    if (angle < 0.01 || angle > M_PI*2)
     {
       gzthrow("Camera horizontal field of view invalid.");
     }
