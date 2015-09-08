@@ -306,7 +306,8 @@ void CameraLens::SetFun(const std::string &_fun)
     gzthrow(sstr.str());
   }
 
-  this->dataPtr->sdf->GetElement("custom_function")->GetElement("fun")->Set(_fun);
+  auto customFunction = this->dataPtr->sdf->GetElement("custom_function");
+  customFunction->GetElement("fun")->Set(_fun);
 }
 
 //////////////////////////////////////////////////
@@ -556,7 +557,7 @@ void WideAngleCamera::SetClipDist()
   if (!clipElem)
     gzthrow("Camera has no <clip> element.");
 
-  for (int i = 0; i<6; ++i)
+  for (int i = 0; i < 6; ++i)
   {
     if (this->envCameras[i])
     {
