@@ -34,6 +34,12 @@ namespace gazebo
     /// \brief Private data for the WideAngleCamera class
     class GZ_RENDERING_VISIBLE WideAngleCameraPrivate
     {
+      /// \brief Environment texture size
+      public: int envTextureSize;
+
+      /// \brief Camera lens description
+      public: CameraLens *lens;
+
       /// \brief Mutex to lock while rendering the world
       public: std::mutex renderMutex;
 

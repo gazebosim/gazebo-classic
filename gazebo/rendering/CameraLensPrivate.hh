@@ -68,12 +68,16 @@ namespace gazebo
                 /// \return Vector3 Vector whose one component is 1
                 ///   and the rest are nulls
                 public: ignition::math::Vector3d AsVector3d() const
-                    { return std::get<1>(value); }
+                {
+                  return std::get<1>(value);
+                }
 
                 /// \brief Cast to std::string
                 /// \return The same string which was passed to constructor
                 public: std::string AsString() const
-                    { return std::get<0>(value); }
+                {
+                  return std::get<0>(value);
+                }
 
                 /// \brief Apply function to float value
                 /// \result The result of application
@@ -115,6 +119,9 @@ namespace gazebo
       /// \brief `fun` component of the mapping function,
       ///   see CameraLens description
       public: MapFunctionEnum fun = MapFunctionEnum("id");
+
+      /// \brief SDF element of the lens
+      public: sdf::ElementPtr sdf;
 
       /// \brief Mutex to lock when getting or setting lens data
       public: std::recursive_mutex dataMutex;

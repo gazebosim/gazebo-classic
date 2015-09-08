@@ -161,12 +161,11 @@ namespace gazebo
       public: void SetUniformVariables(Ogre::Pass *_pass, float _ratio,
                                        float _hfov);
 
+      /// \internal
       /// \brief Converts projection type from one of presets to `custom`
       private: void ConvertToCustom();
 
-      /// \brief SDF element of the lens
-      protected: sdf::ElementPtr sdf;
-
+      /// \internal
       /// \brief Private data pointer
       private: CameraLensPrivate *dataPtr;
     };
@@ -249,15 +248,10 @@ namespace gazebo
       /// \brief A single cube map texture
       protected: Ogre::Texture *envCubeMapTexture;
 
-      /// \brief Environment texture size
-      protected: int envTextureSize;
-
       /// \brief Pointer to material, used for second rendering pass
       protected: Ogre::MaterialPtr compMat;
 
-      /// \brief Camera lens description
-      protected: CameraLens *lens;
-
+      /// \internal
       /// \brief Private data pointer
       private: WideAngleCameraPrivate *dataPtr;
     };

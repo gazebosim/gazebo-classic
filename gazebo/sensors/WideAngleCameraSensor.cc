@@ -180,7 +180,6 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 
     const rendering::CameraLens *lens = wcamera->Lens();
 
-    msg.set_name(this->GetName());
     msg.set_purpose(msgs::CameraLensCmd_CmdPurpose_INFO);
     msg.set_type(lens->Type());
 

@@ -78,22 +78,22 @@ void CameraLens::Init(const std::string &_name)
 //////////////////////////////////////////////////
 void CameraLens::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->dataPtr->sdf = _sdf;
 
-  Load();
+  this->Load();
 }
 
 //////////////////////////////////////////////////
 void CameraLens::Load()
 {
-  if (!this->sdf->HasElement("type"))
+  if (!tdataPtr->his->sdf->HasElement("type"))
     gzthrow("You should specify lens type using <type> element");
 
   if (this->IsCustom())
   {
-    if (this->sdf->HasElement("custom_function"))
+    if (this->dataPtr->sdf->HasElement("custom_function"))
     {
-      sdf::ElementPtr cf = this->sdf->GetElement("custom_function");
+      sdf::ElementPtr cf = this->dataPtr->sdf->GetElement("custom_function");
 
       this->Init(
         cf->Get<double>("c1"),
@@ -108,7 +108,7 @@ void CameraLens::Load()
   else
     this->Init(this->Type());
 
-  this->SetCutOffAngle(this->sdf->Get<double>("cutoff_angle"));
+  this->SetCutOffAngle(this->dataPtr->sdf->Get<double>("cutoff_angle"));
 }
 
 //////////////////////////////////////////////////
@@ -116,7 +116,7 @@ std::string CameraLens::Type() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
-  return this->sdf->Get<std::string>("type");
+  return this->dataPtr->sdf->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
@@ -178,7 +178,7 @@ bool CameraLens::ScaleToHFOV() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
-  return this->sdf->Get<bool>("scale_to_hfov");
+  return this->dataPtr->sdf->Get<bool>("scale_to_hfov");
 }
 
 //////////////////////////////////////////////////
@@ -213,7 +213,7 @@ void CameraLens::SetType(const std::string &_type)
     gzthrow(sstr.str());
   }
 
-  this->sdf->GetElement("type")->Set(_type);
+  this->dataPtr->sdf->GetElement("type")->Set(_type);
 
   if (_type == "custom")
   {
@@ -245,7 +245,7 @@ void CameraLens::SetC1(double _c)
   if (!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("c1")->Set(_c);
+  this->dataPtr->sdf->GetElement("custom_function")->GetElement("c1")->Set(_c);
 }
 
 //////////////////////////////////////////////////
@@ -258,7 +258,7 @@ void CameraLens::SetC2(double _c)
   if (!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("c2")->Set(_c);
+  this->dataPtr->sdf->GetElement("custom_function")->GetElement("c2")->Set(_c);
 }
 
 //////////////////////////////////////////////////
@@ -271,7 +271,7 @@ void CameraLens::SetC3(double _c)
   if (!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("c3")->Set(_c);
+  this->dataPtr->sdf->GetElement("custom_function")->GetElement("c3")->Set(_c);
 }
 
 //////////////////////////////////////////////////
@@ -284,7 +284,7 @@ void CameraLens::SetF(double _f)
   if (!this->IsCustom())
     this->ConvertToCustom();
 
-  this->sdf->GetElement("custom_function")->GetElement("f")->Set(_f);
+  this->dataPtr->sdf->GetElement("custom_function")->GetElement("f")->Set(_f);
 }
 
 void CameraLens::SetFun(const std::string &_fun)
@@ -306,7 +306,7 @@ void CameraLens::SetFun(const std::string &_fun)
     gzthrow(sstr.str());
   }
 
-  this->sdf->GetElement("custom_function")->GetElement("fun")->Set(_fun);
+  this->dataPtr->sdf->GetElement("custom_function")->GetElement("fun")->Set(_fun);
 }
 
 //////////////////////////////////////////////////
@@ -316,7 +316,7 @@ void CameraLens::SetCutOffAngle(double _angle)
 
   this->dataPtr->cutOffAngle = _angle;
 
-  this->sdf->GetElement("cutoff_angle")->Set(_angle);
+  this->dataPtr->sdf->GetElement("cutoff_angle")->Set(_angle);
 }
 
 //////////////////////////////////////////////////
@@ -324,7 +324,7 @@ void CameraLens::SetScaleToHFOV(bool _scale)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
-  this->sdf->GetElement("scale_to_hfov")->Set(_scale);
+  this->dataPtr->sdf->GetElement("scale_to_hfov")->Set(_scale);
 }
 
 //////////////////////////////////////////////////
@@ -371,7 +371,7 @@ void CameraLens::ConvertToCustom()
 
   this->SetType("custom");
 
-  sdf::ElementPtr cf = this->sdf->AddElement("custom_function");
+  sdf::ElementPtr cf = this->dataPtr->sdf->AddElement("custom_function");
 
   cf->AddElement("c1")->Set(this->dataPtr->c1);
   cf->AddElement("c2")->Set(this->dataPtr->c2);
@@ -384,13 +384,13 @@ void CameraLens::ConvertToCustom()
 //////////////////////////////////////////////////
 WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
     ScenePtr _scene, bool _autoRender, int _textureSize):
-  Camera(_namePrefix, _scene, _autoRender),
-  envTextureSize(_textureSize)
+  Camera(_namePrefix, _scene, _autoRender)
 {
   this->dataPtr = new WideAngleCameraPrivate;
-  this->lens = new CameraLens();
+  this->dataPtr->lens = new CameraLens();
 
   envCubeMapTexture = NULL;
+  this->dataPtr->envTextureSize = _textureSize;
 
   for (int i = 0; i < 6; ++i)
   {
@@ -402,8 +402,8 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
 //////////////////////////////////////////////////
 WideAngleCamera::~WideAngleCamera()
 {
+  delete this->dataPtr->lens;
   delete this->dataPtr;
-  delete this->lens;
 }
 
 //////////////////////////////////////////////////
@@ -435,13 +435,13 @@ void WideAngleCamera::Load()
   {
     sdf::ElementPtr sdf_lens = this->sdf->GetElement("lens");
 
-    this->lens->Load(sdf_lens);
+    this->dataPtr->lens->Load(sdf_lens);
 
     if (sdf_lens->HasElement("env_texture_size"))
-      this->envTextureSize = sdf_lens->Get<int>("env_texture_size");
+      this->dataPtr->envTextureSize = sdf_lens->Get<int>("env_texture_size");
   }
   else
-    this->lens->Load();
+    this->dataPtr->lens->Load();
 }
 
 //////////////////////////////////////////////////
@@ -472,13 +472,13 @@ int WideAngleCamera::EnvTextureSize() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->dataMutex);
 
-  return this->envTextureSize;
+  return this->dataPtr->envTextureSize;
 }
 
 //////////////////////////////////////////////////
 CameraLens *WideAngleCamera::Lens()
 {
-  return this->lens;
+  return this->dataPtr->lens;
 }
 
 //////////////////////////////////////////////////
@@ -585,8 +585,8 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
       this->scopedUniqueName+"::"+_textureName,
       "General",
       Ogre::TEX_TYPE_CUBE_MAP,
-      this->envTextureSize,
-      this->envTextureSize,
+      this->dataPtr->envTextureSize,
+      this->dataPtr->envTextureSize,
       0,
       Ogre::PF_A8R8G8B8,
       Ogre::TU_RENDERTARGET,
