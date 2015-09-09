@@ -568,6 +568,12 @@ ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
 ODE_API dReal dWorldGetQuickStepContactResidualSmoothing (dWorldID);
 
 /**
+ * @brief Get SOR scale factor for contact constraints
+ * @ingroup world
+ */
+ODE_API dReal dWorldGetQuickStepContactSORScalingFactor (dWorldID);
+
+/**
  * @brief Get option to turn on experimental threaded position correction.
  * @ingroup world
  */
@@ -617,6 +623,12 @@ ODE_API void dWorldSetQuickStepInertiaRatioReduction (dWorldID, bool irr);
  * @param smooth smoothing coefficent (0: no smothing ~ 1: full smoothing)
  */
 ODE_API void dWorldSetQuickStepContactResidualSmoothing (dWorldID, dReal smoo);
+
+/**
+ * @brief Set SOR scale factor for contact constraints
+ * @ingroup world
+ */
+ODE_API dReal dWorldSetQuickStepContactSORScalingFactor (dWorldID, dReal contact_sor_contact_scale);
 
 /**
  * @brief Set threaded projected position correction computations
