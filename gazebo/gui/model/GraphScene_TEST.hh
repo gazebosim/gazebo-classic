@@ -36,7 +36,6 @@ class GraphScene_TEST : public QTestFixture
 
   /// \brief Test setting of edge color.
   private slots: void EdgeColor();
-
 };
 
 #endif

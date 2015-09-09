@@ -50,7 +50,6 @@ void GraphScene_TEST::NodeUpdates()
 
   QVERIFY(!gs.HasNode("node1"));
   QVERIFY(gs.GetNode("node1") == NULL);
-
 }
 
 /////////////////////////////////////////////////
@@ -74,7 +73,6 @@ void GraphScene_TEST::EdgeUpdates()
   gs.RemoveEdge("edge1");
 
   QVERIFY(!gs.hasEdge(tr("edge1")));
-
 }
 
 /////////////////////////////////////////////////
@@ -96,7 +94,6 @@ void GraphScene_TEST::EdgeColor()
   QCOMPARE(c2.red(), 255);
   QCOMPARE(c2.green(), 0);
   QCOMPARE(c2.blue(), 0);
-
 }
 
 // Generate a main function for the test

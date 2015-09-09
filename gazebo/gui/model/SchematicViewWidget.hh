@@ -114,7 +114,7 @@ namespace gazebo
       private: std::string GetLeafName(const std::string &_scopedName);
 
       /// \brief Helper function to get the entity scopd name without the
-      ///model name prefix.
+      /// model name prefix.
       /// \param[in] _scopedName Scoped name.
       /// \return Scopd name without model prefix.
       private: std::string GetScopedName(const std::string &_scopedName);

@@ -891,10 +891,6 @@ void JointMaker::Update()
             color.a = 0.5;
             joint->handles->getBillboard(0)->setColour(color);
 
-            // notify joint changes
-            std::string parentName = joint->parent->GetName();
-            std::string childName = joint->child->GetName();
-
             // notify others of joints between top level links
             rendering::VisualPtr parentTopLevelLink =
                 joint->parent->GetNthAncestor(2);
@@ -1078,10 +1074,6 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   else if (_type == JOINT_BALL)
   {
     return 0;
-  }
-  else if (_type == JOINT_GEARBOX)
-  {
-    return 2;
   }
   else if (_type == JOINT_GEARBOX)
   {
@@ -1319,7 +1311,6 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   size_t cIdx = jointChildName.find_last_of("::");
   if (cIdx != std::string::npos)
     jointChildName = jointChildName.substr(cIdx+1);
-
 }
 
 /////////////////////////////////////////////////

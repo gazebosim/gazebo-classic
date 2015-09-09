@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_MODEL_MAKER_PRIVATE_HH_
 #define _GAZEBO_MODEL_MAKER_PRIVATE_HH_
 
+#include <list>
+
 #include "gazebo/gui/EntityMakerPrivate.hh"
 
 namespace gazebo

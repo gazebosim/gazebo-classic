@@ -224,7 +224,8 @@ namespace gazebo
             static event::ConnectionPtr ConnectNestedModelRemoved(T _subscriber)
           { return nestedModelRemoved.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the nestedModel removed signal.
+        /// \brief Disconnect a Gazebo event from the nestedModel removed
+        /// signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectNestedModelRemoved(
             event::ConnectionPtr _subscriber)
@@ -521,11 +522,11 @@ namespace gazebo
 
         /// \brief Notify that a model plugin has been inserted.
         public: static event::EventT<void (std::string)> modelPluginInserted;
-        
+
         /// \brief Event triggered when an existing model is to be edited in the
         /// model editor.
-        public: static event::EventT<void (std::string, std::string, std::string)>
-            editModel;
+        public: static event::EventT<void (std::string, std::string,
+            std::string)> editModel;
       };
     }
   }

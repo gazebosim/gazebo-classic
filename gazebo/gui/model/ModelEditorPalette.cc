@@ -178,7 +178,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelTreeWidget->setVerticalScrollMode(
       QAbstractItemView::ScrollPerPixel);
 
- 
   // Model Plugins
   this->modelPluginsItem = new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
       QStringList(QString("%1").arg(tr("Model Plugins"))));

@@ -197,8 +197,8 @@ void h5dump::allocate_contacts(){
     mu_s    = new dReal[2*n];
     set_vector(mu_s, 0, 2*n);
 
-    mu_k    = new dReal[2*n];
-    set_vector(mu_k, 0, 2*n);
+    mu_k    = new dReal[3*n];
+    set_vector(mu_k, 0, 3*n);
 
     contact_pairs = new int[n*2];
     set_vector(contact_pairs, 0, n*2);
@@ -348,6 +348,14 @@ void h5dump::pack_contacts()
           mu_k[2 * k]     = surf.mu;
           mu_k[2 * k + 1] = surf.mu;
         }
+        if ( surf.mode&dContactMu3 ) {
+          mu_k[3*k] = surf.mu3;
+          mu_k[3*k + 1] = surf.mu3;
+        }
+        else {
+          mu_k[3 * k]     = surf.mu;
+          mu_k[3 * k + 1] = surf.mu;
+        }
 
         // find out which bodies we have
         for (int i = 1; i > -1 ; --i )
@@ -413,7 +421,7 @@ void h5dump::dump(bool first)
     dump_array(gct,  "normals",         normals, ncontacts, 3);
     dump_array(gct,  "gaps",            gaps, ncontacts);
     dump_array(gct,  "mu_s",            mu_s, ncontacts, 2);
-    dump_array(gct,  "mu_k",            mu_k, ncontacts, 2);
+    dump_array(gct,  "mu_k",            mu_k, ncontacts, 3);
     dump_array(gct, "pairs",   contact_pairs,    ncontacts, 2);
     gct.close();
     free_contacts();

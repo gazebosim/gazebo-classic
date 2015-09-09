@@ -2010,7 +2010,9 @@ JointMaker *ModelCreator::GetJointMaker() const
 void ModelCreator::UpdateNestedModelSDF(sdf::ElementPtr _modelElem)
 {
   return;
-  if (this->modelName == this->serverModelName)
+
+  // do we still need the code below?
+  /* if (this->modelName == this->serverModelName)
     return;
 
   if (_modelElem->HasElement("joint"))
@@ -2062,7 +2064,7 @@ void ModelCreator::UpdateNestedModelSDF(sdf::ElementPtr _modelElem)
       this->UpdateNestedModelSDF(modelElem);
       modelElem = modelElem->GetNextElement("model");
     }
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -2083,6 +2085,7 @@ void ModelCreator::GenerateSDF()
   if (this->serverModelName.empty())
   {
     // set center of all links and nested models to be origin
+    // TODO set a better origin other than the centroid
     math::Vector3 mid;
     int entityCount = 0;
     for (auto &linksIt : this->allLinks)
