@@ -17,6 +17,8 @@
 #ifndef _CAMERA_LENS_CONTROL_EXAMPLE_HH_
 #define _CAMERA_LENS_CONTROL_EXAMPLE_HH_
 
+#include <string>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/transport/transport.hh>
@@ -44,7 +46,7 @@ namespace gazebo
 
     protected slots: void OnCbTypeChange();
 
-    protected slots: void OnCbFunChange();  
+    protected slots: void OnCbFunChange();
 
     protected slots: void OnSbChange();
 

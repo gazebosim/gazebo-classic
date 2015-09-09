@@ -53,7 +53,7 @@ CameraLensControlExample::CameraLensControlExample()
 
   // Load GUI from file
   QUiLoader loader;
-  QWidget *contentWidget = loader.load(&file,this);
+  QWidget *contentWidget = loader.load(&file, this);
   file.close();
 
   // add loaded widget to layout
@@ -87,7 +87,7 @@ CameraLensControlExample::CameraLensControlExample()
 
   // Listen for selected element in gazebo
   this->selectionSub = this->node->Subscribe("~/selection",
-      &CameraLensControlExample::OnSelect,this);
+      &CameraLensControlExample::OnSelect, this);
 
   this->imageSub.reset();
 }
@@ -130,19 +130,25 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
   this->pbCalibrate->setVisible(false);
 
   // bind Events
-  connect(this->cbType,SIGNAL(currentIndexChanged(int)),
-      this,SLOT(OnTypeChanged()));
-  connect(this->cbFun,SIGNAL(currentIndexChanged(int)),
-      this,SLOT(OnValueChanged()));
-  connect(this->cbScaleToHFOV,SIGNAL(stateChanged(int)),
-      this,SLOT(OnValueChanged()));
+  connect(this->cbType, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(OnTypeChanged()));
+  connect(this->cbFun, SIGNAL(currentIndexChanged(int)),
+      this, SLOT(OnValueChanged()));
+  connect(this->cbScaleToHFOV, SIGNAL(stateChanged(int)),
+      this, SLOT(OnValueChanged()));
 
-  connect(this->sbC1,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
-  connect(this->sbC2,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
-  connect(this->sbC3,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
-  connect(this->sbF,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
-  connect(this->sbCA,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
-  connect(this->sbHFOV,SIGNAL(valueChanged(double)),this,SLOT(OnValueChanged()));
+  connect(this->sbC1, SIGNAL(valueChanged(double)),
+      this, SLOT(OnValueChanged()));
+  connect(this->sbC2, SIGNAL(valueChanged(double)),
+      this, SLOT(OnValueChanged()));
+  connect(this->sbC3, SIGNAL(valueChanged(double)),
+      this, SLOT(OnValueChanged()));
+  connect(this->sbF, SIGNAL(valueChanged(double)),
+      this, SLOT(OnValueChanged()));
+  connect(this->sbCA, SIGNAL(valueChanged(double)),
+      this, SLOT(OnValueChanged()));
+  connect(this->sbHFOV, SIGNAL(valueChanged(double)),
+      this, SLOT(OnValueChanged()));
 
   // Add listener for spawn button
   connect(pbSpawn, SIGNAL(clicked()), this, SLOT(OnButtonSpawn()));
@@ -196,7 +202,7 @@ void CameraLensControlExample::OnButtonSpawn()
     << "              <fun>tan</fun>"
     << "            </custom_function>"
     << "            <env_texture_size>512</env_texture_size>"
-    << "            <cutoff_angle>1.5707</cutoff_angle>"   
+    << "            <cutoff_angle>1.5707</cutoff_angle>"
     << "          </lens>"
     << "        </camera>"
     << "        <always_on>1</always_on>"
@@ -219,7 +225,7 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
   lbName->setText(QString::fromStdString(_msg->name()));
 
   std::string t("wideanglecamera");
-  if (_msg->name().compare(0,t.length(),t) == 0)
+  if (_msg->name().compare(0, t.length(), t) == 0)
   {
     gzmsg << "Selected: " << _msg->name();
     this->selectedElementName = _msg->name();
@@ -232,10 +238,10 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
     // subscribe for the info messages
     this->infoSub = this->node->Subscribe(
         "~/"+_msg->name()+"/link/camera/lens_info",
-        &CameraLensControlExample::OnCameraLensCmd,this);
+        &CameraLensControlExample::OnCameraLensCmd, this);
 
     this->cameraControlPub = this->node->Advertise<msgs::CameraLensCmd>(
-      "~/"+_msg->name()+"/link/camera/lens_control",10);
+      "~/"+_msg->name()+"/link/camera/lens_control", 10);
 
     this->acceptInfoMessages = true;
   }
@@ -282,7 +288,8 @@ void CameraLensControlExample::OnCameraLensCmd(ConstCameraLensCmdPtr &_msg)
   this->sbC3->setEnabled(isCustom);
   this->sbF->setEnabled(isCustom);
 
-  this->acceptInfoMessages = false;  // Information got, runtime update is not needed
+  // Information got, runtime update is not needed
+  this->acceptInfoMessages = false;
 }
 
 /////////////////////////////////////////////////
@@ -295,8 +302,7 @@ void CameraLensControlExample::OnValueChanged()
   {
     msgs::CameraLensCmd msg;
 
-    msg.set_name(this->selectedElementName);
-    msg.set_destiny(msgs::CameraLensCmd_CmdDestiny_SET);
+    msg.set_purpose(msgs::CameraLensCmd_CmdPurpose_SET);
     msg.set_type(this->cbType->currentText().toUtf8().constData());
 
     if (this->cbType->currentText() == "custom")
@@ -309,7 +315,7 @@ void CameraLensControlExample::OnValueChanged()
       msg.set_f(this->sbF->value());
     }
 
-    msg.set_cutoff_angle(this->sbCA->value()) ;
+    msg.set_cutoff_angle(this->sbCA->value());
     msg.set_hfov(this->sbHFOV->value());
     msg.set_scale_to_hfov(this->cbScaleToHFOV->isChecked());
 
