@@ -136,6 +136,14 @@ TopToolbar::TopToolbar(QWidget *_parent)
     g_viewAngleButtonAct = this->dataPtr->toolbar->addWidget(viewAngleButton);
   }
 
+  // Undo & Redo
+  this->dataPtr->toolbar->addSeparator();
+
+  if (g_undoAct)
+    this->dataPtr->toolbar->addAction(g_undoAct);
+  if (g_redoAct)
+    this->dataPtr->toolbar->addAction(g_redoAct);
+
   // Empty space to push whatever comes next to the right
   QWidget *spacer = new QWidget();
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

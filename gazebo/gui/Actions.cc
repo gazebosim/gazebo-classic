@@ -149,3 +149,9 @@ QWidgetAction *gazebo::gui::g_viewAngleAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_viewAngleButtonAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_undoAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_redoAct = 0;

@@ -59,6 +59,9 @@ namespace gazebo
       /// \brief Light publisher that publishes light pose to the server.
       public: transport::PublisherPtr lightPub;
 
+      /// \brief Light publisher that publishes light pose to the server.
+      public: transport::PublisherPtr userCmdPub;
+
       /// \brief Pointer to the user camera.
       public: rendering::UserCameraPtr userCamera;
 

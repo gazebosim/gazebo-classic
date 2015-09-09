@@ -122,6 +122,12 @@ namespace gazebo
     /// \brief Action attached to the view angle button.
     extern GZ_GUI_VISIBLE QAction *g_viewAngleButtonAct;
 
+    /// \brief Action to undo last user command.
+    extern GZ_GUI_VISIBLE QAction *g_undoAct;
+
+    /// \brief Action to redo last undone user command.
+    extern GZ_GUI_VISIBLE QAction *g_redoAct;
+
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
     class GZ_GUI_VISIBLE DeleteAction : public QAction

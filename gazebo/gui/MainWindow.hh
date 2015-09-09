@@ -238,6 +238,12 @@ namespace gazebo
       /// \param[in] _action Action in the group which was triggered.
       private slots: void OnEditorGroup(QAction *_action);
 
+      /// \brief Qt call back when the undo button is pressed.
+      private slots: void OnUndo();
+
+      /// \brief Qt call back when the redo button is pressed.
+      private slots: void OnRedo();
+
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
@@ -268,6 +274,11 @@ namespace gazebo
       /// \brief Light message callback.
       /// \param[in] _msg Pointer to the light message.
       private: void OnLight(ConstLightPtr &_msg);
+
+      /// \brief User command message callback.
+      /// \param[in] _msg Message containing statistics about user commands
+      /// stored in the server.
+      private: void OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg);
 
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnWorldModify(ConstWorldModifyPtr &_msg);
@@ -309,6 +320,12 @@ namespace gazebo
       private: transport::SubscriberPtr guiSub;
       private: transport::SubscriberPtr newEntitySub, statsSub;
       private: transport::SubscriberPtr worldModSub;
+
+      /// \brief Publish undo / redo messages
+      private: transport::PublisherPtr undoRedoPub;
+
+      /// \brief Subscriber to user command stats.
+      private: transport::SubscriberPtr userCmdStatsSub;
 
       /// \brief Subscriber to the light topic.
       private: transport::SubscriberPtr lightSub;

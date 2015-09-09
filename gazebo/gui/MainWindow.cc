@@ -315,6 +315,11 @@ void MainWindow::Init()
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 
+  // Undo / redo transport
+  this->undoRedoPub = this->node->Advertise<msgs::UndoRedo>("~/undo_redo");
+  this->userCmdStatsSub = this->node->Subscribe("~/user_cmd_stats",
+      &MainWindow::OnUserCmdStatsMsg, this);
+
   gui::Events::mainWindowReady();
 }
 
@@ -1461,6 +1466,23 @@ void MainWindow::CreateActions()
 
   g_viewAngleAct = new QWidgetAction(this);
   g_viewAngleAct->setDefaultWidget(viewAngleWidget);
+
+  // Undo / Redo
+  g_undoAct = new QAction(QIcon(":/images/log_step_back.png"),
+      tr("Undo (Ctrl + Z)"), this);
+  g_undoAct->setStatusTip(tr("Undo last command"));
+  g_undoAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/log_step_back.png", g_undoAct);
+  g_undoAct->setEnabled(false);
+  connect(g_undoAct, SIGNAL(triggered()), this, SLOT(OnUndo()));
+
+  g_redoAct = new QAction(QIcon(":/images/log_step_forward.png"),
+      tr("Redo (Shift + Ctrl + Z)"), this);
+  g_redoAct->setStatusTip(tr("Redo last undone command"));
+  g_redoAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/log_step_forward.png", g_redoAct);
+  g_redoAct->setEnabled(false);
+  connect(g_redoAct, SIGNAL(triggered()), this, SLOT(OnRedo()));
 }
 
 /////////////////////////////////////////////////
@@ -1681,6 +1703,12 @@ void MainWindow::DeleteActions()
 
   delete g_viewAngleAct;
   g_viewAngleAct = 0;
+
+  delete g_undoAct;
+  g_undoAct = 0;
+
+  delete g_redoAct;
+  g_redoAct = 0;
 }
 
 
@@ -2248,4 +2276,34 @@ void MainWindow::OnWindowMode(const std::string &_mode)
     this->tabWidget->removeTab(this->tabWidget->indexOf(this->insertModel));
   else if (simulation && this->tabWidget->indexOf(this->insertModel) == -1)
     this->tabWidget->insertTab(1, this->insertModel, "Insert");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnUndo()
+{
+gzdbg << "MainWindow::OnUndo" << std::endl;
+  msgs::UndoRedo msg;
+  msg.set_undo(true);
+  // ID
+  this->undoRedoPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnRedo()
+{
+gzdbg << "MainWindow::OnRedo" << std::endl;
+  msgs::UndoRedo msg;
+  msg.set_undo(false);
+  // ID
+  this->undoRedoPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg)
+{
+gzmsg << "MainWindow::OnUserCmdStatsMsg  "
+<< _msg->undo_cmd_size()  << std::endl;
+
+  g_undoAct->setEnabled(_msg->undo_cmd_count() > 0);
+  g_redoAct->setEnabled(_msg->redo_cmd_count() > 0);
 }

@@ -64,6 +64,7 @@ void ModelManipulator::Clear()
 {
   this->dataPtr->modelPub.reset();
   this->dataPtr->lightPub.reset();
+  this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectionObj.reset();
   this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
@@ -97,6 +98,8 @@ void ModelManipulator::Init()
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
   this->dataPtr->lightPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/light");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
       this->dataPtr->scene->GetWorldVisual()));
@@ -522,12 +525,20 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     // Check to see if the visual is a model.
     if (gui::get_entity_id(_vis->GetName()))
     {
+      // Publish model modify message
       msgs::Model msg;
       msg.set_id(gui::get_entity_id(_vis->GetName()));
       msg.set_name(_vis->GetName());
 
       msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
       this->dataPtr->modelPub->Publish(msg);
+
+      // Register user command on server
+gzdbg << "ModelManipulator::PublishVisualPose" << std::endl;
+      msgs::UserCmd userCmdMsg;
+      userCmdMsg.set_id("Moved " + _vis->GetName());
+      userCmdMsg.set_description("Moved " + _vis->GetName());
+      this->dataPtr->userCmdPub->Publish(userCmdMsg);
     }
     // Otherwise, check to see if the visual is a light
     else if (this->dataPtr->scene->GetLight(_vis->GetName()))
