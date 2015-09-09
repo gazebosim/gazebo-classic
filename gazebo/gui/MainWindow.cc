@@ -56,6 +56,7 @@
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/UserCmdHistory.hh"
 #include "gazebo/gui/ViewAngleWidget.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
@@ -314,11 +315,6 @@ void MainWindow::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
-
-  // Undo / redo transport
-  this->undoRedoPub = this->node->Advertise<msgs::UndoRedo>("~/undo_redo");
-  this->userCmdStatsSub = this->node->Subscribe("~/user_cmd_stats",
-      &MainWindow::OnUserCmdStatsMsg, this);
 
   gui::Events::mainWindowReady();
 }
@@ -1474,7 +1470,6 @@ void MainWindow::CreateActions()
   g_undoAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/log_step_back.png", g_undoAct);
   g_undoAct->setEnabled(false);
-  connect(g_undoAct, SIGNAL(triggered()), this, SLOT(OnUndo()));
 
   g_redoAct = new QAction(QIcon(":/images/log_step_forward.png"),
       tr("Redo (Shift + Ctrl + Z)"), this);
@@ -1482,7 +1477,15 @@ void MainWindow::CreateActions()
   g_redoAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/log_step_forward.png", g_redoAct);
   g_redoAct->setEnabled(false);
-  connect(g_redoAct, SIGNAL(triggered()), this, SLOT(OnRedo()));
+
+  // Command history
+  g_cmdHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
+      tr("Command history"), this);
+  g_cmdHistoryAct->setStatusTip(tr("Show list of user commands"));
+  g_cmdHistoryAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_cmdHistoryAct);
+  g_cmdHistoryAct->setEnabled(false);
+  new UserCmdHistory();
 }
 
 /////////////////////////////////////////////////
@@ -1709,6 +1712,9 @@ void MainWindow::DeleteActions()
 
   delete g_redoAct;
   g_redoAct = 0;
+
+  delete g_cmdHistoryAct;
+  g_cmdHistoryAct = 0;
 }
 
 
@@ -2276,34 +2282,4 @@ void MainWindow::OnWindowMode(const std::string &_mode)
     this->tabWidget->removeTab(this->tabWidget->indexOf(this->insertModel));
   else if (simulation && this->tabWidget->indexOf(this->insertModel) == -1)
     this->tabWidget->insertTab(1, this->insertModel, "Insert");
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnUndo()
-{
-gzdbg << "MainWindow::OnUndo" << std::endl;
-  msgs::UndoRedo msg;
-  msg.set_undo(true);
-  // ID
-  this->undoRedoPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnRedo()
-{
-gzdbg << "MainWindow::OnRedo" << std::endl;
-  msgs::UndoRedo msg;
-  msg.set_undo(false);
-  // ID
-  this->undoRedoPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg)
-{
-gzmsg << "MainWindow::OnUserCmdStatsMsg  "
-<< _msg->undo_cmd_size()  << std::endl;
-
-  g_undoAct->setEnabled(_msg->undo_cmd_count() > 0);
-  g_redoAct->setEnabled(_msg->redo_cmd_count() > 0);
 }

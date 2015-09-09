@@ -137,12 +137,19 @@ TopToolbar::TopToolbar(QWidget *_parent)
   }
 
   // Undo & Redo
-  this->dataPtr->toolbar->addSeparator();
+  if (g_undoAct && g_redoAct && g_cmdHistoryAct)
+  {
+    this->dataPtr->toolbar->addSeparator();
 
-  if (g_undoAct)
+    // Undo
     this->dataPtr->toolbar->addAction(g_undoAct);
-  if (g_redoAct)
+
+    // Redo
     this->dataPtr->toolbar->addAction(g_redoAct);
+
+    // Command history
+    this->dataPtr->toolbar->addAction(g_cmdHistoryAct);
+  }
 
   // Empty space to push whatever comes next to the right
   QWidget *spacer = new QWidget();

@@ -155,3 +155,6 @@ QAction *gazebo::gui::g_undoAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_redoAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_cmdHistoryAct = 0;
