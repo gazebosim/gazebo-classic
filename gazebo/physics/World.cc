@@ -577,31 +577,38 @@ void World::LogStep()
 
         while (modelElem)
         {
-          ModelPtr model = this->LoadModel(modelElem,
-              this->dataPtr->rootElement);
-          model->Init();
+          auto name = modelElem->GetAttribute("name")->GetAsString();
+          if (!this->GetModel(name))
+          {
+            ModelPtr model = this->LoadModel(modelElem,
+                this->dataPtr->rootElement);
 
-          // Disabling plugins on playback
-          // model->LoadPlugins();
+            model->GetSDF()->ToString("");
+
+            model->Init();
+
+            // Disabling plugins on playback
+            // model->LoadPlugins();
+          }
 
           modelElem = modelElem->GetNextElement("model");
         }
       }
 
       // Process deletions
-      if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
-      {
-        sdf::ElementPtr nameElem =
-          this->dataPtr->logPlayStateSDF->GetElement(
-              "deletions")->GetElement("name");
-
-        while (nameElem)
-        {
-          transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->Get<std::string>());
-          nameElem = nameElem->GetNextElement("name");
-        }
-      }
+      //if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
+      //{
+      //  sdf::ElementPtr nameElem =
+      //    this->dataPtr->logPlayStateSDF->GetElement(
+      //        "deletions")->GetElement("name");
+//
+      //  while (nameElem)
+      //  {
+      //    transport::requestNoReply(this->GetName(), "entity_delete",
+      //                              nameElem->Get<std::string>());
+      //    nameElem = nameElem->GetNextElement("name");
+      //  }
+      //}
 
       this->SetState(this->dataPtr->logPlayState);
       this->Update();
@@ -1868,6 +1875,12 @@ void World::SetState(const WorldState &_state)
     else
       gzerr << "Unable to find model[" << modelState.second.GetName() << "]\n";
   }
+
+  for (auto &model : this->GetModels())
+  {
+    if (modelStates.find(model->GetName()) == modelStates.end())
+      this->RemoveModel(model);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -2149,8 +2162,15 @@ void World::LogWorker()
         // Store the entire current state (instead of the diffState). A slow
         // moving link may never be captured if only diff state is recorded.
         boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
+
+        auto insertions = diffState.GetInsertions();
+        this->dataPtr->prevStates[currState].SetInsertions(insertions);
+
         this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
             this->dataPtr->prevStates[currState]);
+
+        std::cout << this->dataPtr->prevStates[currState] << std::endl;
+
         // Tell the logger to update, once the number of states exceeds 1000
         if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >
             1000)
