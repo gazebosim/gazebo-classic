@@ -52,6 +52,8 @@ ModelMaker::ModelMaker() : EntityMaker(*new ModelMakerPrivate)
 
   dPtr->clone = false;
   dPtr->makerPub = dPtr->node->Advertise<msgs::Factory>("~/factory");
+  dPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 }
 
 /////////////////////////////////////////////////
@@ -61,6 +63,7 @@ ModelMaker::~ModelMaker()
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->makerPub.reset();
+  dPtr->userCmdPub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -311,6 +314,7 @@ void ModelMaker::CreateTheEntity()
   ModelMakerPrivate *dPtr =
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
+  std::string modelName;
   msgs::Factory msg;
   if (!dPtr->clone)
   {
@@ -328,7 +332,7 @@ void ModelMaker::CreateTheEntity()
       isLight = true;
     }
 
-    std::string modelName = modelElem->Get<std::string>("name");
+    modelName = modelElem->Get<std::string>("name");
 
     // Automatically create a new name if the model exists
     rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
@@ -363,7 +367,15 @@ void ModelMaker::CreateTheEntity()
           dPtr->modelVisual->GetName().find("_clone_tmp")));
   }
 
+
   dPtr->makerPub->Publish(msg);
+
+  // Register user command on server
+gzdbg << "ModelMaker::CreateTheEntity" << std::endl;
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_id("Inserted " + modelName);
+  userCmdMsg.set_description("Inserted " + modelName);
+  dPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////

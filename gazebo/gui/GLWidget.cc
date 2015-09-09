@@ -126,8 +126,6 @@ GLWidget::GLWidget(QWidget *_parent)
   this->node->Init();
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
 
-  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
-
   // Publishes information about user selections.
   this->selectionPub =
     this->node->Advertise<msgs::Selection>("~/selection");

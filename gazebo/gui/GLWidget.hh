@@ -262,7 +262,7 @@ namespace gazebo
       private: SelectionLevels selectionLevel;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr modelPub, factoryPub;
+      private: transport::PublisherPtr modelPub;
 
       /// \brief Publishes information about user selections.
       private: transport::PublisherPtr selectionPub;

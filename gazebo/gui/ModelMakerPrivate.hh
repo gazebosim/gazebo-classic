@@ -38,6 +38,10 @@ namespace gazebo
 
       /// \brief Publisher for factory messages.
       public: transport::PublisherPtr makerPub;
+
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      public: transport::PublisherPtr userCmdPub;
     };
   }
 }

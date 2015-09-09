@@ -145,6 +145,8 @@ bool ModelRightMenu::Init()
   this->node->Init();
   this->requestSub = this->node->Subscribe("~/request",
       &ModelRightMenu::OnRequest, this);
+  this->userCmdPub =
+      this->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   return true;
 }
@@ -166,6 +168,8 @@ bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 ModelRightMenu::~ModelRightMenu()
 {
   this->node->Fini();
+  this->requestSub.reset();
+  this->userCmdPub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -326,7 +330,16 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 
   // Delete the entity
   if (!name.empty())
+  {
     transport::requestNoReply(this->node, "entity_delete", name);
+
+    // Register user command on server
+  gzdbg << "ModelRightMenu::OnDelete" << std::endl;
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_id("Deleted " + name);
+    userCmdMsg.set_description("Deleted " + name);
+    this->userCmdPub->Publish(userCmdMsg);
+  }
 }
 
 /////////////////////////////////////////////////

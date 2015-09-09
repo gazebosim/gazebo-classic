@@ -110,6 +110,10 @@ namespace gazebo
       /// \brief Subscriber to request messages.
       private: transport::SubscriberPtr requestSub;
 
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      private: transport::PublisherPtr userCmdPub;
+
       /// \brief Name of the active entity.
       private: std::string entityName;
 
