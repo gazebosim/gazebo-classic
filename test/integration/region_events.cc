@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <limits>
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -23,7 +22,7 @@
 
 using namespace gazebo;
 
-// certain tests fail (with the symbody engine
+// certain tests fail (with the simbody engine
 // setting this to true skips those tests
 bool SKIP_FAILING_TESTS = true;
 
@@ -31,7 +30,10 @@ bool SKIP_FAILING_TESTS = true;
 class RegionEventTest
     : public ServerFixture, public testing::WithParamInterface<const char*>
 {
+  // test if event is triggered when a model enters the region
   public: void ModelEnteringRegion(const std::string &_physicsEngine);
+
+  // test if event is triggered when a model exits the region
   public: void ModelLeavingRegion(const std::string &_physicsEngine);
 };
 
@@ -42,6 +44,7 @@ std::string g_event_data;
 std::string g_event_type;
 std::string g_event_name;
 
+/////////////////////////////////////////////////
 // callback for SimEvent messages
 // increment a counter and keep the data around
 void ReceiveSimEvent(ConstSimEventPtr &_msg)
@@ -55,6 +58,7 @@ void ReceiveSimEvent(ConstSimEventPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 unsigned int GetEventCount()
 {
   boost::mutex::scoped_lock lock(g_mutex);
@@ -63,6 +67,7 @@ unsigned int GetEventCount()
   }
 }
 
+/////////////////////////////////////////////////
 std::string GetEventType()
 {
   boost::mutex::scoped_lock lock(g_mutex);
@@ -71,6 +76,7 @@ std::string GetEventType()
   }
 }
 
+/////////////////////////////////////////////////
 std::string GetEventName()
 {
   boost::mutex::scoped_lock lock(g_mutex);
@@ -79,6 +85,7 @@ std::string GetEventName()
   }
 }
 
+/////////////////////////////////////////////////
 std::string GetEventData()
 {
   boost::mutex::scoped_lock lock(g_mutex);
@@ -87,6 +94,7 @@ std::string GetEventData()
   }
 }
 
+/////////////////////////////////////////////////
 // waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewEvent(unsigned int current,
@@ -116,7 +124,7 @@ void RegionEventTest::ModelEnteringRegion(const std::string &_physicsEngine)
 
   Load("test/worlds/region_events.world", false, _physicsEngine);
 
-  physics::WorldPtr world = physics::get_world("default");
+  physics::WorldPtr world = physics::get_world();
   ASSERT_TRUE(world != NULL);
 
   transport::NodePtr node = transport::NodePtr(new transport::Node());
@@ -151,7 +159,7 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
 
   Load("test/worlds/region_events.world", false, _physicsEngine);
 
-  physics::WorldPtr world = physics::get_world("default");
+  physics::WorldPtr world = physics::get_world();
   ASSERT_TRUE(world != NULL);
 
   transport::NodePtr node = transport::NodePtr(new transport::Node());
@@ -186,19 +194,22 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
   EXPECT_STREQ("model_in_region_event_box", GetEventName().c_str());
 }
 
-// Run all test cases
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, RegionEventTest, PHYSICS_ENGINE_VALUES);
-
+/////////////////////////////////////////////////
 TEST_P(RegionEventTest, ModelEnteringRegion)
 {
   ModelEnteringRegion(GetParam());
 }
 
+/////////////////////////////////////////////////
 TEST_P(RegionEventTest, ModelLeavingRegion)
 {
   ModelLeavingRegion(GetParam());
 }
 
+// Run all test cases
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, RegionEventTest, PHYSICS_ENGINE_VALUES);
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   if (argc > 1)

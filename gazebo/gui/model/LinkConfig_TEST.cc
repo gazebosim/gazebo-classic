@@ -40,7 +40,6 @@ void LinkConfig_TEST::Initialization()
   QCOMPARE(cw->GetBoolWidgetValue("gravity"), true);
   QCOMPARE(cw->GetBoolWidgetValue("self_collide"), false);
   QCOMPARE(cw->GetBoolWidgetValue("kinematic"), false);
-
 }
 
 /////////////////////////////////////////////////
@@ -61,7 +60,6 @@ void LinkConfig_TEST::LinkMsgUpdate()
   QCOMPARE(cw->GetBoolWidgetValue("gravity"), false);
   QCOMPARE(cw->GetBoolWidgetValue("self_collide"), true);
   QCOMPARE(cw->GetBoolWidgetValue("kinematic"), true);
-
 }
 
 /////////////////////////////////////////////////
@@ -79,7 +77,6 @@ void LinkConfig_TEST::PoseUpdate()
   QCOMPARE(p.pos.x, 5.0);
   QCOMPARE(p.pos.y, 10.0);
   QCOMPARE(p.pos.z, 15.0);
-
 }
 
 /////////////////////////////////////////////////
@@ -93,7 +90,6 @@ void LinkConfig_TEST::MassUpdate()
   lc.SetMass(50.0);
 
   QCOMPARE(cw->GetDoubleWidgetValue("inertial::mass"), 50.0);
-
 }
 
 /////////////////////////////////////////////////
@@ -113,7 +109,6 @@ void LinkConfig_TEST::InertiaMatrixUpdate()
   QCOMPARE(cw->GetDoubleWidgetValue("inertial::ixy"), 4.0);
   QCOMPARE(cw->GetDoubleWidgetValue("inertial::ixz"), 5.0);
   QCOMPARE(cw->GetDoubleWidgetValue("inertial::iyz"), 6.0);
-
 }
 
 /////////////////////////////////////////////////
@@ -131,7 +126,6 @@ void LinkConfig_TEST::InertialPoseUpdate()
   QCOMPARE(p.pos.x, 5.0);
   QCOMPARE(p.pos.y, 10.0);
   QCOMPARE(p.pos.z, 15.0);
-
 }
 
 // Generate a main function for the test

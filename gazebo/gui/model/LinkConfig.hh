@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class LinkConfig LinkConfig.hh
     /// \brief A tab for configuring properties of a link.
-    class GZ_GUI_MODEL_VISIBLE LinkConfig : public QWidget
+    class GZ_GUI_VISIBLE LinkConfig : public QWidget
     {
       Q_OBJECT
 

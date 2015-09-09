@@ -15,6 +15,7 @@
  *
 */
 
+#include <limits>
 #include <string>
 
 #include "JointEventSource.hh"
@@ -23,11 +24,13 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 JointEventSource::JointEventSource(transport::PublisherPtr _pub,
-    physics::WorldPtr _world)
-  : EventSource(_pub, "joint", _world),
-    range(INVALID),
-    isTriggered(false)
+                                   physics::WorldPtr _world)
+  :EventSource(_pub, "joint", _world),
+  range(INVALID),
+  isTriggered(false)
 {
+  this->min = std::numeric_limits<double>::lowest();
+  this->max = std::numeric_limits<double>::max();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,26 +63,23 @@ void JointEventSource::Load(const sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("range"))
   {
-    sdf::ElementPtr rangeElem =  _sdf->GetElement("range");
+    sdf::ElementPtr rangeElem = _sdf->GetElement("range");
+
+    if (!rangeElem->HasElement("min") &&
+        !rangeElem->HasElement("max") )
+    {
+      gzerr << this->name << ": <range>"
+          << " should have a min and (or) a max element." << std::endl;
+    }
 
     if (rangeElem->HasElement("min"))
     {
       this->min = rangeElem->Get<double>("min");
     }
-    else
-    {
-      gzerr << this->name << ": <range>"
-          << " should have a min element." << std::endl;
-    }
 
     if (rangeElem->HasElement("max"))
     {
       this->max = rangeElem->Get<double>("max");
-    }
-    else
-    {
-      gzerr << this->name << ": <range>"
-          << " should have a max element." << std::endl;
     }
 
     if (rangeElem->HasElement("type"))
@@ -113,7 +113,7 @@ void JointEventSource::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JointEventSource::SetRangeFromString(std::string &_rangeStr)
+void JointEventSource::SetRangeFromString(const std::string &_rangeStr)
 {
   if (_rangeStr == "position")
     this->range = POSITION;
@@ -128,16 +128,25 @@ void JointEventSource::SetRangeFromString(std::string &_rangeStr)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string JointEventSource::GetRangeAsString() const
+std::string JointEventSource::RangeAsString() const
 {
-  std:: string rangeStr;
+  std::string rangeStr;
   switch (this->range)
   {
-    case POSITION: rangeStr = "position"; break;
-    case VELOCITY: rangeStr = "velocity"; break;
-    case ANGLE: rangeStr = "normalized_angle"; break;
-    case FORCE: rangeStr = "applied_force"; break;
-    default: rangeStr = "invalid"; break;
+    case POSITION:
+      rangeStr = "position";
+      break;
+    case VELOCITY:
+      rangeStr = "velocity";
+      break;
+    case ANGLE:
+      rangeStr = "normalized_angle";
+      break;
+    case FORCE:
+      rangeStr = "applied_force";
+      break;
+    default: rangeStr = "invalid";
+      break;
   }
   return rangeStr;
 }
@@ -149,7 +158,7 @@ void JointEventSource::Info() const
   ss << "JointEventSource: " << this->name
       << " model: " << this->modelName
       << " joint: " << this->jointName
-      << " range: " << this->GetRangeAsString()
+      << " range: " << this->RangeAsString()
       << " min: " << this->min
       << " max: " << this->max
       << " triggered: " << this->isTriggered
@@ -238,7 +247,7 @@ void JointEventSource::Update()
   }
 
   // check if the state has changed
-  bool currentState = value > this->min && value < this->max;
+  bool currentState = value >= this->min && value <= this->max;
   if (oldState != currentState)
   {
     this->isTriggered = currentState;
@@ -258,7 +267,7 @@ void JointEventSource::Update()
     if (this->range == ANGLE)
       json += "\"angle\":\"" + std::to_string(angle) + "\", ";
 
-    json += "\"range\":\"" + this->GetRangeAsString() + "\", ";
+    json += "\"range\":\"" + this->RangeAsString() + "\", ";
     json += "\"min\":\"" + std::to_string(this->min) + "\", ";
     json += "\"max\":\"" + std::to_string(this->max) + "\", ";
     json += "\"value\":\"" + std::to_string(value) + "\", ";

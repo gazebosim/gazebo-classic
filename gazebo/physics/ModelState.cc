@@ -46,7 +46,7 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
   }
 
   // Copy all the models
-  const Model_V models = _model->GetModels();
+  const Model_V models = _model->NestedModels();
   for (Model_V::const_iterator iter = models.begin(); iter != models.end();
       ++iter)
   {
@@ -80,7 +80,7 @@ ModelState::ModelState(const ModelPtr _model)
   }
 
   // Copy all the models
-  const Model_V models = _model->GetModels();
+  const Model_V models = _model->NestedModels();
   for (Model_V::const_iterator iter = models.begin(); iter != models.end();
       ++iter)
   {
@@ -141,7 +141,7 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
   }
 
   // Load all the models
-  const Model_V models = _model->GetModels();
+  const Model_V models = _model->NestedModels();
   for (Model_V::const_iterator iter = models.begin(); iter != models.end();
       ++iter)
   {

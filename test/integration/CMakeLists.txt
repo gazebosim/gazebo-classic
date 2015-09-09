@@ -55,8 +55,10 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  logical_camera_sensor.cc
   model.cc
   model_database.cc
+  nested_model.cc
   noise.cc
   nondefault_world.cc
   physics.cc
@@ -68,14 +70,15 @@ set(tests
   physics_msgs.cc
   physics_presets.cc
   physics_thread_safe.cc
+  physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  region_events.cc
   rest_web.cc
   road.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc
-  region_events.cc
   speed.cc
   speed_thread_pr2.cc
   stress_spawn_models.cc

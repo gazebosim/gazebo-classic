@@ -37,6 +37,8 @@ void InRegionEventSource::Load(const sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("region"))
     this->regionName = _sdf->Get<std::string>("region");
+  else
+    gzerr << this->name << " is missing a region element" << std::endl;
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -47,6 +49,8 @@ void InRegionEventSource::Load(const sdf::ElementPtr _sdf)
 ////////////////////////////////////////////////////////////////////////////////
 void InRegionEventSource::Init()
 {
+  this->model = this->world->GetModel(this->modelName);
+
   std::map<std::string, RegionPtr>::const_iterator it =
     this->regions.find(this->regionName);
   if (it != this->regions.end())

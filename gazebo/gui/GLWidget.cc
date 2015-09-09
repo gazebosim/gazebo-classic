@@ -224,21 +224,25 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::showEvent(QShowEvent *_event)
 {
+  // These two functions are most applicable for Linux.
   QApplication::flush();
+  QApplication::syncX();
 
-  if (this->windowId < 0)
-  {
-    this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
-        CreateWindow(this->GetOgreHandle(), this->width(), this->height());
-    if (this->userCamera)
-    {
-      rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-        this->windowId, this->userCamera);
-    }
-  }
+  // Get the window handle in a form that OGRE can use.
+  std::string winHandle = this->GetOgreHandle();
 
+  // Create the OGRE render window
+  this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
+    CreateWindow(winHandle, this->width(), this->height());
+
+  // Attach the user camera to the window
+  rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+      this->windowId, this->userCamera);
+
+  // Let QT continue processing the show event.
   QWidget::showEvent(_event);
 
+  // Grab focus.
   this->setFocus();
 }
 
@@ -278,6 +282,7 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   }
 
   this->update();
+
   _e->accept();
 }
 
@@ -291,7 +296,8 @@ void GLWidget::resizeEvent(QResizeEvent *_e)
   {
     rendering::RenderEngine::Instance()->GetWindowManager()->Resize(
         this->windowId, _e->size().width(), _e->size().height());
-    this->userCamera->Resize(_e->size().width(), _e->size().height());
+    if (this->userCamera)
+      this->userCamera->Resize(_e->size().width(), _e->size().height());
   }
 }
 
@@ -364,12 +370,12 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (this->mouseEvent.Control())
   {
     if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty()
-       && !this->modelEditorEnabled)
+       && !this->modelEditorEnabled && g_copyAct->isEnabled())
     {
       g_copyAct->trigger();
     }
     else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty()
-       && !this->modelEditorEnabled)
+       && !this->modelEditorEnabled && g_pasteAct->isEnabled())
     {
       g_pasteAct->trigger();
     }
@@ -410,15 +416,15 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   /// Switch between RTS modes
   if (this->keyModifiers == Qt::NoModifier && this->state != "make_entity")
   {
-    if (_event->key() == Qt::Key_R)
+    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
       g_rotateAct->trigger();
-    else if (_event->key() == Qt::Key_T)
+    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
       g_translateAct->trigger();
-    else if (_event->key() == Qt::Key_S)
+    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
       g_scaleAct->trigger();
-    else if (_event->key() == Qt::Key_N)
+    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
       g_snapAct->trigger();
-    else if (_event->key() == Qt::Key_Escape)
+    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
       g_arrowAct->trigger();
   }
 
@@ -585,8 +591,11 @@ void GLWidget::OnMousePressNormal()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressMakeEntity()
 {
-  if (this->entityMaker)
-    this->entityMaker->OnMousePush(this->mouseEvent);
+  if (!this->userCamera)
+    return;
+
+  // Allow camera orbiting while making an entity
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 /////////////////////////////////////////////////
@@ -634,10 +643,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::OnMouseMoveMakeEntity()
 {
+  if (!this->userCamera)
+    return;
+
   if (this->entityMaker)
   {
+    // Allow camera orbiting while inserting a new model
     if (this->mouseEvent.Dragging())
-      this->entityMaker->OnMouseDrag(this->mouseEvent);
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
     else
       this->entityMaker->OnMouseMove(this->mouseEvent);
   }
@@ -818,10 +831,14 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
   if (_scene->GetUserCameraCount() == 0)
+  {
     this->userCamera = _scene->CreateUserCamera(cameraName,
         gazebo::gui::getINIProperty<int>("rendering.stereo", 0));
+  }
   else
+  {
     this->userCamera = _scene->GetUserCamera(0);
+  }
 
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
@@ -835,12 +852,6 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
   this->userCamera->SetDefaultPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
-
-  if (this->windowId >= 0)
-  {
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-        this->windowId, this->userCamera);
-  }
 }
 
 /////////////////////////////////////////////////
@@ -859,7 +870,6 @@ void GLWidget::Clear()
   this->keyModifiers = 0;
 }
 
-
 //////////////////////////////////////////////////
 rendering::UserCameraPtr GLWidget::GetCamera() const
 {
@@ -871,20 +881,20 @@ std::string GLWidget::GetOgreHandle() const
 {
   std::string ogreHandle;
 
-#if defined(WIN32) || defined(__APPLE__)
-  ogreHandle = boost::lexical_cast<std::string>(this->winId());
+#if defined(__APPLE__)
+  ogreHandle = std::to_string(this->winId());
+#elif defined(WIN32)
+  ogreHandle = std::to_string(
+      reinterpret_cast<uint32_t>(this->renderFrame->winId()));
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
-  ogreHandle = boost::lexical_cast<std::string>(
-      reinterpret_cast<uint64_t>(info.display()));
-  ogreHandle += ":";
-  ogreHandle += boost::lexical_cast<std::string>(
-      static_cast<uint32_t>(info.screen()));
-  ogreHandle += ":";
   GZ_ASSERT(q_parent, "q_parent is null");
-  ogreHandle += boost::lexical_cast<std::string>(
-      static_cast<uint64_t>(q_parent->winId()));
+
+  ogreHandle =
+    std::to_string(reinterpret_cast<uint64_t>(info.display())) + ":" +
+    std::to_string(static_cast<uint32_t>(info.screen())) + ":" +
+    std::to_string(static_cast<uint64_t>(q_parent->winId()));
 #endif
 
   return ogreHandle;
@@ -934,26 +944,18 @@ void GLWidget::OnCreateEntity(const std::string &_type,
 
   if (_type == "box")
   {
-    this->boxMaker.Start(this->userCamera);
-    if (this->modelMaker.InitFromSDFString(this->boxMaker.GetSDFString()))
+    if (this->modelMaker.InitSimpleShape(ModelMaker::SimpleShapes::BOX))
       this->entityMaker = &this->modelMaker;
   }
   else if (_type == "sphere")
   {
-    this->sphereMaker.Start(this->userCamera);
-    if (this->modelMaker.InitFromSDFString(this->sphereMaker.GetSDFString()))
+    if (this->modelMaker.InitSimpleShape(ModelMaker::SimpleShapes::SPHERE))
       this->entityMaker = &this->modelMaker;
   }
   else if (_type == "cylinder")
   {
-    this->cylinderMaker.Start(this->userCamera);
-    if (this->modelMaker.InitFromSDFString(this->cylinderMaker.GetSDFString()))
+    if (this->modelMaker.InitSimpleShape(ModelMaker::SimpleShapes::CYLINDER))
       this->entityMaker = &this->modelMaker;
-  }
-  else if (_type == "mesh" && !_data.empty())
-  {
-    this->meshMaker.Init(_data);
-    this->entityMaker = &this->meshMaker;
   }
   else if (_type == "model" && !_data.empty())
   {
@@ -971,7 +973,7 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   {
     gui::Events::manipMode("make_entity");
     // TODO: change the cursor to a cross
-    this->entityMaker->Start(this->userCamera);
+    this->entityMaker->Start();
   }
   else
   {
@@ -1044,12 +1046,13 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
     msg.set_selected(true);
     this->selectionPub->Publish(msg);
   }
-  else
+  else if (g_copyAct)
   {
     g_copyAct->setEnabled(false);
   }
 
-  g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
+  if (g_alignAct)
+    g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
 }
 
 /////////////////////////////////////////////////
@@ -1146,7 +1149,7 @@ void GLWidget::Paste(const std::string &_name)
       if (isLight && this->lightMaker.InitFromLight(_name))
       {
         this->entityMaker = &this->lightMaker;
-        this->entityMaker->Start(this->userCamera);
+        this->entityMaker->Start();
         // this makes the entity appear at the mouse cursor
         this->entityMaker->OnMouseMove(this->mouseEvent);
         gui::Events::manipMode("make_entity");
@@ -1154,7 +1157,7 @@ void GLWidget::Paste(const std::string &_name)
       else if (isModel && this->modelMaker.InitFromModel(_name))
       {
         this->entityMaker = &this->modelMaker;
-        this->entityMaker->Start(this->userCamera);
+        this->entityMaker->Start();
         // this makes the entity appear at the mouse cursor
         this->entityMaker->OnMouseMove(this->mouseEvent);
         gui::Events::manipMode("make_entity");

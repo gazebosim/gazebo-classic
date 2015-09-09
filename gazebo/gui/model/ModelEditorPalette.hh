@@ -45,7 +45,7 @@ namespace gazebo
 
     /// \class ModelEditorPalette ModelEditorPalette.hh
     /// \brief A palette of model items which can be added to the editor.
-    class GZ_GUI_MODEL_VISIBLE ModelEditorPalette : public QWidget
+    class GZ_GUI_VISIBLE ModelEditorPalette : public QWidget
     {
       Q_OBJECT
 
@@ -164,6 +164,10 @@ namespace gazebo
       /// \param[in] _linkId Unique nested model identifying name.
       private: void OnNestedModelRemoved(const std::string &_nestedModelId);
 
+      /// \brief Add a model plugin to the tree.
+      /// \param[in] _modelPluginName Model plugin name.
+      private: void OnModelPluginInserted(const std::string &_modelPluginName);
+
       /// \brief Remove a link from the tree.
       /// \param[in] _linkId Unique link identifying name.
       private: void OnLinkRemoved(const std::string &_linkId);
@@ -230,6 +234,9 @@ namespace gazebo
 
       /// \brief Parent item for all joints.
       private: QTreeWidgetItem *jointsItem;
+
+      /// \brief Parent item for all model plugins.
+      private: QTreeWidgetItem *modelPluginsItem;
 
       /// \brief Mutex to protect updates.
       private: std::recursive_mutex updateMutex;

@@ -42,7 +42,6 @@ class LinkConfig_TEST : public QTestFixture
 
   /// \brief Test inertia update
   private slots: void InertialPoseUpdate();
-
 };
 
 #endif

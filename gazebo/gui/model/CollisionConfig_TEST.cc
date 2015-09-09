@@ -62,7 +62,8 @@ void CollisionConfig_TEST::CollisionUpdates()
     if (it.second->name == "c1")
     {
       const CollisionConfigData *configData = it.second;
-      QCOMPARE(configData->configWidget->GetDoubleWidgetValue("laser_retro"), 0.0000789);
+      QCOMPARE(configData->configWidget->GetDoubleWidgetValue("laser_retro"),
+          0.0000789);
       foundConfig = true;
       break;
     }
@@ -76,7 +77,6 @@ void CollisionConfig_TEST::CollisionUpdates()
   QVERIFY(cc.GetData("c1") == NULL);
   QVERIFY(cc.GetData("c2") == NULL);
   QVERIFY(cc.GetData("c3") == NULL);
-
 }
 
 /////////////////////////////////////////////////
@@ -94,7 +94,7 @@ void CollisionConfig_TEST::GeometryUpdates()
   ignition::math::Vector3d size2;
   std::string uri;
 
-  cc.GetGeometry("c1", size2, uri);
+  cc.Geometry("c1", size2, uri);
 
   QCOMPARE(5.0, size2.X());
   QCOMPARE(10.0, size2.Y());
@@ -102,12 +102,12 @@ void CollisionConfig_TEST::GeometryUpdates()
 
   ignition::math::Vector3d size3(0, 0, 0);
 
-  cc.GetGeometry("NotFound", size3, uri);
+  cc.Geometry("NotFound", size3, uri);
 
   QCOMPARE(0.0, size3.X());
   QCOMPARE(0.0, size3.Y());
   QCOMPARE(0.0, size3.Z());
-
 }
+
 // Generate a main function for the test
 QTEST_MAIN(CollisionConfig_TEST)

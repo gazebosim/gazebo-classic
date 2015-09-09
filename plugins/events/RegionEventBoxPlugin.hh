@@ -18,6 +18,12 @@
 #ifndef _GAZEBO_REGION_EVENT_BOX_PLUGIN_HH_
 #define _GAZEBO_REGION_EVENT_BOX_PLUGIN_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+#include <Winsock2.h>
+#endif
+
 #include <map>
 #include <string>
 
@@ -28,22 +34,29 @@
 
 namespace gazebo
 {
-
+  /// \brief A plugin that fires an event when another model enters the region
+  /// defined by the size of this model's box visual.
+  ///
+  /// \verbatim
+  ///   <plugin filename="libRegionEventBoxPlugin.so" name="region_event_box">
+  ///     <event>
+  ///       <name>model_in_region_event_box</name>
+  ///       <type>inclusion</type>
+  ///       <active>true</active>
+  ///     </event>
+  ///   </plugin>
+  /// \endverbatim
   class RegionEventBoxPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: RegionEventBoxPlugin();
 
-    // \brief Documentation Inherited.
+    // Documentation Inherited.
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Callback when a model message is received.
     /// \param[in] _msg model msg
-    public: void OnModelMsg(ConstModelPtr & _msg);
-
-    /// \brief Callback when timestamped poses message is received.
-    /// \param[in] _msg poses stamped msg
-    public:void OnPoseMsg(ConstPosesStampedPtr &_msg);
+    public: void OnModelMsg(ConstModelPtr &_msg);
 
     /// \brief Updates the box event plugin at every physics iteration
     /// \param[in] _info Update info
@@ -53,22 +66,24 @@ namespace gazebo
     /// \param[in] _point 3D Point in world space.
     /// \param[in] _box World axis-aligned box.
     /// \param[in] _pose Pose of the model representing the box region.
-    private: bool PointInRegion(const math::Vector3 &_point,
-        const math::Box &_box, const math::Pose &_pose);
+    /// \return True if the point is inside the region
+    private: bool PointInRegion(const ignition::math::Vector3d &_point,
+        const ignition::math::Box &_box, const ignition::math::Pose3d &_pose)
+        const;
 
     /// \brief Update box region dimensions and pose.
-    /// \param[in] _scale New scale
+    /// \param[in] _size New size
     /// \param[in] _pose New pose
-    private: bool UpdateRegion(const math::Vector3 &_scale,
-        const math::Pose& _pose);
+    private: void UpdateRegion(const ignition::math::Vector3d &_size,
+        const ignition::math::Pose3d &_pose);
 
     /// \brief Send event when model enters box region
     /// \param[in] _model Model that entered the box region.
-    private: void SendEnteringRegionEvent(physics::ModelPtr _model);
+    private: void SendEnteringRegionEvent(physics::ModelPtr _model) const;
 
     /// \brief Send event when model exits region
     /// \param[in] _model Model that exit the box region.
-    private: void SendExitingRegionEvent(physics::ModelPtr _model);
+    private: void SendExitingRegionEvent(physics::ModelPtr _model) const;
 
     /// \brief Pointer to the World.
     private: physics::WorldPtr world;
@@ -86,19 +101,19 @@ namespace gazebo
     public: transport::NodePtr node;
 
     /// \brief Mutex to protect incoming messages
-    public: boost::mutex *receiveMutex;
+    public: std::mutex receiveMutex;
 
     /// \brief Box region initial size
-    private: math::Vector3 boxSize;
+    private: ignition::math::Vector3d boxSize;
 
     /// \brief Box region scale
-    private: math::Vector3 boxScale;
+    private: ignition::math::Vector3d boxScale;
 
     /// \brief Box region pose.
-    private: math::Pose boxPose;
+    private: ignition::math::Pose3d boxPose;
 
     /// \brief Box region
-    private: math::Box box;
+    private: ignition::math::Box box;
 
     /// \brief Subscriber to model/info topic.
     private: transport::SubscriberPtr modelSub;
@@ -115,7 +130,6 @@ namespace gazebo
 
     /// \brief Pointer to event source object that emits sim events
     private: gazebo::EventSourcePtr eventSource;
-
   };
 }
 

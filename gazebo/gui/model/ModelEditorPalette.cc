@@ -178,16 +178,24 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelTreeWidget->setVerticalScrollMode(
       QAbstractItemView::ScrollPerPixel);
 
+  // Model Plugins
+  this->modelPluginsItem = new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("%1").arg(tr("Model Plugins"))));
+  this->modelPluginsItem->setData(0, Qt::UserRole,
+      QVariant(tr("Model Plugins")));
+  QFont headerFont = this->modelPluginsItem->font(0);
+  headerFont.setBold(true);
+  headerFont.setPointSize(1.0 * headerFont.pointSize());
+  this->modelPluginsItem->setFont(0, headerFont);
+  this->modelTreeWidget->addTopLevelItem(this->modelPluginsItem);
+
   // Nested models
   this->nestedModelsItem = new QTreeWidgetItem(
       static_cast<QTreeWidgetItem *>(0),
       QStringList(QString("%1").arg(tr("Nested Models"))));
   this->nestedModelsItem->setData(0, Qt::UserRole,
       QVariant(tr("Nested Models")));
-  QFont nestedModelsFont = this->nestedModelsItem->font(0);
-  nestedModelsFont.setBold(true);
-  nestedModelsFont.setPointSize(1.1 * nestedModelsFont.pointSize());
-  this->nestedModelsItem->setFont(0, nestedModelsFont);
+  this->nestedModelsItem->setFont(0, headerFont);
   this->modelTreeWidget->addTopLevelItem(this->nestedModelsItem);
 
   // Links
@@ -195,8 +203,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       static_cast<QTreeWidgetItem *>(0),
       QStringList(QString("%1").arg(tr("Links"))));
   this->linksItem->setData(0, Qt::UserRole, QVariant(tr("Links")));
-  QFont linksFont = this->linksItem->font(0);
-  this->linksItem->setFont(0, nestedModelsFont);
+  this->linksItem->setFont(0, headerFont);
   this->modelTreeWidget->addTopLevelItem(this->linksItem);
 
   // Joints
@@ -204,7 +211,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       static_cast<QTreeWidgetItem*>(0),
       QStringList(QString("%1").arg(tr("Joints"))));
   this->jointsItem->setData(0, Qt::UserRole, QVariant(tr("Joints")));
-  this->jointsItem->setFont(0, nestedModelsFont);
+  this->jointsItem->setFont(0, headerFont);
   this->modelTreeWidget->addTopLevelItem(this->jointsItem);
 
   connect(this->modelTreeWidget,
@@ -285,6 +292,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
       gui::model::Events::ConnectNestedModelRemoved(
       boost::bind(&ModelEditorPalette::OnNestedModelRemoved, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectModelPluginInserted(
+      boost::bind(&ModelEditorPalette::OnModelPluginInserted, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
@@ -572,6 +583,8 @@ void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
       gui::model::Events::openJointInspector(name);
     else if (type == "Nested Model")
       gui::model::Events::openNestedModelInspector(name);
+    else if (type == "Model Plugin")
+      gui::model::Events::openModelPluginInspector(name);
   }
 }
 
@@ -721,6 +734,21 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
 }
 
 /////////////////////////////////////////////////
+void ModelEditorPalette::OnModelPluginInserted(
+    const std::string &_modelPluginName)
+{
+  QTreeWidgetItem *newModelPluginItem = new QTreeWidgetItem(
+      this->modelPluginsItem, QStringList(QString("%1").arg(
+      QString::fromStdString(_modelPluginName))));
+
+  newModelPluginItem->setData(0, Qt::UserRole, _modelPluginName.c_str());
+  newModelPluginItem->setData(1, Qt::UserRole, "Model Plugin");
+  this->modelTreeWidget->addTopLevelItem(newModelPluginItem);
+
+  this->modelPluginsItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
 void ModelEditorPalette::OnNestedModelRemoved(const std::string &_nestedModelId)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
@@ -788,6 +816,8 @@ void ModelEditorPalette::ClearModelTree()
   this->linksItem->takeChildren();
   // Remove all joints
   this->jointsItem->takeChildren();
+  // Remove all model plugins
+  this->modelPluginsItem->takeChildren();
 }
 
 /////////////////////////////////////////////////

@@ -70,6 +70,7 @@
   <file>images/view_angle_left.png</file>
   <file>images/view_angle_right.png</file>
   <file>images/view_angle_home.png</file>
+  <file>hotkeyTable.html</file>
 
   <file alias='wood.jpg'>../../media/materials/textures/wood.jpg</file>
   <file alias='tiles.jpg'>../../media/materials/textures/ceiling_tiled.jpg</file>

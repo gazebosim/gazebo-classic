@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>Gazebo Keyboard Reference Chart</title>
+
+<style type="text/css">
+
+/*
+Im reseting this style for optimal view using Eric Meyer's CSS Reset - http://meyerweb.com/eric/tools/css/reset/
+------------------------------------------------------------------ */
+body, html
+{
+  height: 100%;
+}
+
+html, body, div, span, applet, object, iframe,
+/*h1, h2, h3, h4, h5, h6,*/ p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td
+{
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+}
+
+body
+{
+  line-height: 1;
+}
+
+ol, ul
+{
+  list-style: none;
+}
+
+blockquote, q
+{
+  quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after
+{
+  content: '';
+  content: none;
+}
+
+:focus
+{
+  outline: 0;
+}
+
+del
+{
+  text-decoration: line-through;
+}
+
+table
+{
+  border-spacing: 0;
+} /* IMPORTANT, I REMOVED border-collapse: collapse; FROM THIS LINE IN ORDER TO MAKE THE OUTER BORDER RADIUS WORK */
+
+
+/*
+Table Style - This is what you want
+------------------------------------------------------------------ */
+p
+{
+  font-family: Arial, Helvetica, sans-serif;
+  color: #444;
+}
+
+h3
+{
+  font-family: Arial, Helvetica, sans-serif;
+  color: #555;
+  font-size: 19px;
+}
+
+a
+{
+  font-family: Arial, Helvetica, sans-serif;
+  color: #999;
+  font-size: 15px;
+}
+
+h4
+{
+  font-family: Arial, Helvetica, sans-serif;
+  color: #999;
+  font-size: 12px;
+}
+
+table
+{
+  font-family:Arial, Helvetica, sans-serif;
+  color:#666;
+  font-size:12px;
+  text-shadow: 1px 1px 0px #fff;
+  background:#eaebec;
+  margin:20px;
+  border:#ccc 1px solid;
+  float: left;
+
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  border-radius:3px;
+
+  -moz-box-shadow: 0 1px 2px #d1d1d1;
+  -webkit-box-shadow: 0 1px 2px #d1d1d1;
+  box-shadow: 0 1px 2px #d1d1d1;
+}
+
+table th
+{
+  padding:16px 0px 16px 0px;
+  border-top:1px solid #fafafa;
+  border-bottom:1px solid #e0e0e0;
+  font-size: 14px;
+
+  background: #ededed;
+  background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#ebebeb));
+  background: -moz-linear-gradient(top,  #ededed,  #ebebeb);
+}
+
+/*section headers*/
+table th.sub
+{
+  padding:10px 0px 10px 0px;
+  border-top:1px solid #fafafa;
+  border-bottom:1px solid #e0e0e0;
+  font-size: 12px;
+  text-align: center;
+  background: #ededed;
+}
+
+table th:first-child
+{
+  text-align: left;
+  padding-left:20px;
+  width:300px;
+}
+
+table th.sub
+{
+  text-align:center;
+}
+
+table th:nth-child(2)
+{
+  width:100px;
+}
+
+table th:nth-child(3)
+{
+  width:450px;
+  text-align:left;
+}
+
+table tr:first-child th:first-child
+{
+  -moz-border-radius-topleft:3px;
+  -webkit-border-top-left-radius:3px;
+  border-top-left-radius:3px;
+}
+
+table tr:first-child th:last-child
+{
+  -moz-border-radius-topright:3px;
+  -webkit-border-top-right-radius:3px;
+  border-top-right-radius:3px;
+}
+
+table tr
+{
+  text-align: center;
+  padding-left:20px;
+}
+
+table tr td:first-child
+{
+  text-align: left;
+  padding-left:20px;
+  border-left: 0;
+}
+
+table tr td
+{
+  padding:10px;
+  border-top: 1px solid #ffffff;
+  border-bottom:1px solid #e0e0e0;
+  border-left: 1px solid #e0e0e0;
+
+  background: #fafafa;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
+  background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
+}
+
+table tr.even td
+{
+  background: #f6f6f6;
+  background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#f6f6f6));
+  background: -moz-linear-gradient(top,  #f8f8f8,  #f6f6f6);
+}
+
+table tr:last-child td
+{
+  border-bottom:0;
+}
+
+table tr:last-child td:first-child
+{
+  -moz-border-radius-bottomleft:3px;
+  -webkit-border-bottom-left-radius:3px;
+  border-bottom-left-radius:3px;
+}
+
+table tr:last-child td:last-child
+{
+  -moz-border-radius-bottomright:3px;
+  -webkit-border-bottom-right-radius:3px;
+  border-bottom-right-radius:3px;
+}
+
+table tr td:last-child
+{
+  text-align: left;
+}
+
+</style>
+
+</head>
+
+<body>
+
+  <div id="container" style="width: 100%">
+
+    <div id="image" style="display:table-cell; vertical-align: middle; height: 57px; padding: 18px">
+      <img src="images/gazebo.svg" width="40px" />
+    </div>
+
+    <div style="display:table-cell; vertical-align: middle; height: 57px">
+      <h3 style="margin-bottom: 2px">Gazebo Keyboard Shortcuts</h3>
+      <a href="http://gazebosim.org/hotkeys/" title="gazebosim.org/hotkeys">View in browser</a>
+    </div>
+
+    <div style="display:table-cell; vertical-align: middle;padding-left: 10px; padding-top: 5px">
+      <h4>(On Mac, use Command in place of Ctrl)</h4>
+    </div>
+
+  </div>
+
+  <div>
+
+    <table cellspacing='0'> <!-- cellspacing='0' is important, must stay -->
+      <tr><th>Action</th><th>Operation</th><th>Instruction</th></tr><!-- Table Header -->
+
+      <!--Mode section-->
+      <tr><th colspan="3" class="sub"><b>MODE</b></th></tr>
+      <tr><td>Enter Selection mode (default mode)</td><td>Esc</td><td>press Esc for mode to select models and right-click for context menu</td></tr><!-- Table Row -->
+      <tr class='even'><td>Enter Rotate mode</td><td>r</td><td>press "r" for Rotate (model) mode</td></tr><!-- Darker Table Row -->
+      <tr><td>Enter Translate mode</td><td>t</td><td>press "t" for Translate (model) mode</td></tr>
+      <tr class='even'><td>Enter Scale mode</td><td>s</td><td>press "s" for Scale (model) mode</td></tr>
+      <tr><td>Enter Snap mode</td><td>n</td><td>press "n" for Snap (model) mode</td></tr>
+
+      <!--Models section -->
+      <tr><th class="sub" colspan="3"><b>MODELS</b></th></tr>
+      <tr class='even'><td>Delete model</td><td>Delete</td><td>press Delete when a model is selected to delete from scene</td></tr>
+      <tr><td>Copy model</td><td>Ctrl + c</td><td>press Ctrl + "c" when model is selected to copy</td></tr>
+      <tr class='even'><td>Paste model</td><td>Ctrl + v</td><td>press Ctrl + "v" to paste copied model</td></tr>
+
+      <!--Manipulating Models section -->
+      <tr><th colspan="3" class="sub"><b>MANIPULATING MODELS</b></th></tr>
+      <tr class='even'><td>Rotate model</td><td>r</td><td>press "r" for Rotate mode; click model & rotate using markers</td></tr>
+      <tr><td>Translate model</td><td>t</td><td>press "t" for Translate mode; click model & translate using markers</td></tr>
+      <tr class='even'><td>Scale model</td><td>s</td><td>press "s" for Scale mode; click model & scale using markers</td></tr>
+      <tr><td>Constrain along axis</td><td>x/y/z</td><td>hold key while manipulating model to constrain movement along that axis</td></tr>
+      <tr class='even'><td>Snap to 45° when rotating</td><td>Ctrl + drag</td><td>hold Ctrl while rotating model to rotate in 45° increments</td></tr>
+      <tr><td>Snap to grid when translating</td><td>Ctrl + drag</td><td>hold Ctrl while translating model to snap to grid</td></tr>
+      <tr class='even'><td>Snap to 1 m when scaling</td><td>Ctrl + drag</td><td>hold Ctrl while scaling mode to scale in 1 m increments</td></tr>
+      <tr><td>Snap when inserting</td><td>Ctrl + drag</td><td>hold Ctrl while inserting model to enable snap to grid</td></tr>
+      <tr class='even'><td>Snap models together</td><td>n</td><td>press "n" for Snap mode; click one link, then a second to snap first link to second</td></tr>
+
+      <!--GUI Layout section -->
+      <tr><th colspan="3" class="sub"><b>GUI LAYOUT</b></th></tr>
+      <tr class='even'><td>Hide toolbars</td><td>Ctrl + h</td><td>hide/show top toolbar and bottom time panel</td></tr>
+      <tr><td>Enter fullscreen</td><td>F11</td><td>enter/exit fullscreen</td></tr>
+    </table>
+
+    <table cellspacing='0'> <!-- cellspacing='0' is important, must stay -->
+      <tr><th>Action</th><th>Operation</th><th>Instruction</th></tr><!-- Table Header -->
+
+      <!--Editors section -->
+      <tr><th colspan="3" class="sub"><b>EDITORS</b></th></tr>
+      <tr class='even'><td>Open Model Editor</td><td>Ctrl + m</td><td>open Model Editor to construct or edit models</td></tr>
+      <tr><td>Open Schematic View (Model Editor)</td><td>Ctrl + e</td><td>open Schematic View in Model Editor</td></tr>
+      <tr class='even'><td>Open Building Editor</td><td>Ctrl + b</td><td>open Building Editor to construct buildings</td></tr>
+      <tr><td>Show floor plan (Building Editor)</td><td>f</td><td>show/hide floor plan in Building Editor 2D View</td></tr>
+      <tr class='even'><td>Show building features (Building Editor)</td><td>g</td><td>show/hide building features in Building Editor 2D View</td></tr>
+      <tr><td>New canvas (both Editors)</td><td>Ctrl + n</td><td>create new canvas</td></tr>
+      <tr class='even'><td>Save model (both Editors)</td><td>Ctrl + s</td><td>save model for later use</td></tr>
+      <tr><td>Save as (both Editors)</td><td>Ctrl + Shift + s</td><td>save model for later use & give it a name</td></tr>
+      <tr class='even'><td>Exit (both Editors)</td><td>Ctrl + x</td><td>exit Editor</td></tr>
+
+      <!--World section -->
+      <tr><th colspan="3" class="sub"><b>WORLD</b></th></tr>
+      <tr class='even'><td>Save world</td><td>Ctrl + s</td><td>press Ctrl + "s" to save world for later use</td></tr>
+      <tr><td>Save as</td><td>Ctrl + Shift + s</td><td>press Ctrl + Shift + "s" to save world for later use & give it a name</td></tr>
+      <tr class='even'><td>Reset world</td><td>Ctrl + r</td><td>press Ctrl + "r" to reset world to its original state</td></tr>
+      <tr><td>Reset model poses</td><td>Ctrl + Shift + r</td><td>press Ctrl + Shift + "r" to reset models to their original poses</td></tr>
+      <!--Data section -->
+      <tr><th colspan="3" class="sub"><b>DATA</b></th></tr>
+      <tr class='even'><td>Visualize topics</td><td>Ctrl + t</td><td>open dialog with list of topics currently advertized</td></tr>
+      <tr><td>Log data</td><td>Ctrl + d</td><td>open dialog to record log files</td></tr>
+      <!--Misc section -->
+      <tr><th colspan="3" class="sub"><b>MISCELLANEOUS</b></th></tr>
+      <tr class='even'><td>Quit Gazebo</td><td>Ctrl + q</td><td>press Ctrl + "q" to quit Gazebo</td></tr>
+    </table>
+
+  </div>
+
+</body>
+</html>
