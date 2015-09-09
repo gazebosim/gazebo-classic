@@ -23,7 +23,6 @@
 #include "gazebo/gui/qgv/QGVNode.h"
 #include "gazebo/gui/qgv/QGVEdge.h"
 
-
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/GraphScene.hh"
 #include "gazebo/gui/model/GraphView.hh"

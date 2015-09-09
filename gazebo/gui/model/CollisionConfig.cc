@@ -338,4 +338,3 @@ void CollisionConfigData::OnToggleItem(bool _checked)
   else
     this->configWidget->hide();
 }
-

@@ -219,8 +219,6 @@ bool ModelMaker::Init()
   if (modelElem->HasElement("pose"))
     modelPose = modelElem->Get<ignition::math::Pose3d>("pose");
 
-//  modelName = this->node->GetTopicNamespace() + "::" +
-//    modelElem->Get<std::string>("name");
   modelName = modelElem->Get<std::string>("name");
 
   dPtr->modelVisual.reset(new rendering::Visual(
@@ -235,55 +233,6 @@ bool ModelMaker::Init()
   if (modelElem->GetName() == "model")
   {
     this->CreateModelFromSDF(modelElem);
-/*    sdf::ElementPtr linkElem = modelElem->GetElement("link");
-
-    try
-    {
-      while (linkElem)
-      {
-        std::string linkName = linkElem->Get<std::string>("name");
-        if (linkElem->HasElement("pose"))
-          linkPose = linkElem->Get<ignition::math::Pose3d>("pose");
-        else
-          linkPose.Set(0, 0, 0, 0, 0, 0);
-
-        rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
-              linkName, dPtr->modelVisual));
-        linkVisual->Load();
-        linkVisual->SetPose(linkPose);
-
-        int visualIndex = 0;
-        sdf::ElementPtr visualElem;
-
-        if (linkElem->HasElement("visual"))
-          visualElem = linkElem->GetElement("visual");
-
-        while (visualElem)
-        {
-          if (visualElem->HasElement("pose"))
-            visualPose = visualElem->Get<ignition::math::Pose3d>("pose");
-          else
-            visualPose.Set(0, 0, 0, 0, 0, 0);
-
-          std::ostringstream visualName;
-          visualName << modelName << "::" << linkName << "::Visual_"
-            << visualIndex++;
-          rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-                linkVisual));
-
-          visVisual->Load(visualElem);
-          visVisual->SetPose(visualPose);
-
-          visualElem = visualElem->GetNextElement("visual");
-        }
-
-        linkElem = linkElem->GetNextElement("link");
-      }
-    }
-    catch(common::Exception &_e)
-    {
-      return false;
-    }*/
   }
   else if (modelElem->GetName() == "light")
   {

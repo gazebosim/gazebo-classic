@@ -190,7 +190,6 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     this->entityName = _entityName;
   }
 
-
   QMenu menu;
 
   // Move To

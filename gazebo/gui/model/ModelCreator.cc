@@ -1288,11 +1288,6 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   }
   gui::model::Events::linkRemoved(linkName);
 
-/*  std::string leafName = linkName;
-  size_t idx = linkName.find_last_of("::");
-  if (idx != std::string::npos)
-    leafName = linkName.substr(idx+1);
-  gui::model::Events::linkRemoved(leafName);*/
   this->ModelChanged();
 }
 
@@ -1338,7 +1333,7 @@ void ModelCreator::Reset()
     this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
   this->allNestedModels.clear();
 
-  this->allModelPlugins.clear();  
+  this->allModelPlugins.clear();
 
   if (!gui::get_active_camera() ||
     !gui::get_active_camera()->GetScene())
@@ -2593,4 +2588,3 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
   modelPlugin->inspector->move(QCursor::pos());
   modelPlugin->inspector->show();
 }
-

@@ -158,7 +158,7 @@ void Model::LoadLinks()
         }
       }
 
-       // Load the link using the config node. This also loads all of the
+      // Load the link using the config node. This also loads all of the
       // bodies collisionetries
       link->Load(linkElem);
       linkElem = linkElem->GetNextElement("link");
@@ -685,7 +685,6 @@ ModelPtr Model::NestedModel(const std::string &_name) const
   return result;
 }
 
-//////////////////////////////////////////////////
 //////////////////////////////////////////////////
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {

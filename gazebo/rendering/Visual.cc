@@ -328,7 +328,6 @@ void Visual::Load()
   std::string subMesh = this->GetSubMeshName();
   bool centerSubMesh = this->GetCenterSubMesh();
 
-//  std::cerr << " LOAD " << this->GetName() << std::endl;
   if (!mesh.empty())
   {
     try
@@ -592,9 +591,6 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
 
   if (!this->HasAttachedObject(_obj->getName()))
   {
-//    std::cerr << this->GetName() << " " << this->GetId() <<
-//        " attach " << _obj->getName() << std::endl;
-
     // update to use unique materials
     Ogre::Entity *entity = dynamic_cast<Ogre::Entity *>(_obj);
     if (entity)
@@ -1869,10 +1865,6 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 math::Box Visual::GetBoundingBox() const
 {
-/*  rendering::VisualPtr rootVis = this->GetRootVisual();
-  rootVis->GetSceneNode()->_updateBounds();
-  rootVis->GetSceneNode()->_update(true, true);*/
-
   math::Box box;
   this->GetBoundsHelper(this->GetSceneNode(), box);
   return box;
@@ -1930,7 +1922,6 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         transform[3][3] = 1;
         // get oriented bounding box in object's local space
         bb.transformAffine(transform);
-
 
         min = Conversions::Convert(bb.getMinimum());
         max = Conversions::Convert(bb.getMaximum());

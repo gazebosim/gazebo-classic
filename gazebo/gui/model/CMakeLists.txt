@@ -73,7 +73,6 @@ if (HAVE_GRAPHVIZ)
       SchematicViewWidget_TEST.cc
     )
   endif()
- 
 
 endif()
 
@@ -82,4 +81,3 @@ set (internal_qt_headers ${internal_qt_headers} ${qt_headers_local} PARENT_SCOPE
 
 gz_build_qt_tests(${qt_tests_local})
 gz_install_includes("gui/model" ${headers_install})
-
