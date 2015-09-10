@@ -955,9 +955,6 @@ void JointMaker::SetModelName(const std::string &_modelName)
 /////////////////////////////////////////////////
 void JointMaker::GenerateSDF()
 {
-  // note this currently only generates top level model joints
-  // since nested model joints are not being loaded in the model creator
-
   this->modelSDF.reset(new sdf::Element);
   sdf::initFile("model.sdf", this->modelSDF);
   this->modelSDF->ClearElements();

@@ -316,8 +316,7 @@ namespace gazebo
       /// \param[in] _linkElem SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
       /// \param[in] _parentVis Parent visual that the link will be attached to.
-      /// return Data describing this link.
-      private: LinkData *CreateLinkFromSDF(sdf::ElementPtr _linkElem,
+      private: void CreateLinkFromSDF(sdf::ElementPtr _linkElem,
           rendering::VisualPtr _parentVis);
 
       /// \brief Open the link inspector.

@@ -934,7 +934,7 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-LinkData *ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
+void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
     rendering::VisualPtr _parentVis)
 {
   LinkData *link = new LinkData();
@@ -1090,7 +1090,6 @@ LinkData *ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
   }
 
   this->ModelChanged();
-  return link;
 }
 
 /////////////////////////////////////////////////
@@ -1599,7 +1598,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
         return false;
 
       // Main window models always handled here
-      // Not possible to interact with nested models for now
+      // Not possible to interact with nested models yet
       if (this->allLinks.find(topLevelVis->GetName()) ==
           this->allLinks.end())
       {
@@ -1782,13 +1781,9 @@ void ModelCreator::GenerateSDF()
     {
       NestedModelData *modelData = nestedModelsIt.second;
 
-      if (!nestedModelsIt.second->modelVisual)
-        continue;
-
       // get only top level nested models
-      if (nestedModelsIt.second->modelVisual->GetParent()
-          != this->previewVisual)
-      continue;
+      if (modelData->Depth() != 2)
+        continue;
 
       mid += modelData->Pose().Pos();
       entityCount++;

@@ -71,6 +71,12 @@ std::string ModelData::GetTemplateSDFString()
 }
 
 /////////////////////////////////////////////////
+double ModelData::GetEditTransparency()
+{
+  return 0.4;
+}
+
+/////////////////////////////////////////////////
 void NestedModelData::SetName(const std::string &_name)
 {
   this->modelSDF->GetAttribute("name")->Set(_name);
@@ -89,9 +95,12 @@ ignition::math::Pose3d NestedModelData::Pose() const
 }
 
 /////////////////////////////////////////////////
-double ModelData::GetEditTransparency()
+int NestedModelData::Depth() const
 {
-  return 0.4;
+  if (!this->modelVisual)
+    return -1;
+
+  return this->modelVisual->GetDepth();
 }
 
 /////////////////////////////////////////////////

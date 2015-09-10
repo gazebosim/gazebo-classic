@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_DATA_HH_
-#define _MODEL_DATA_HH_
+#ifndef _GAZEBO_MODEL_DATA_HH_
+#define _GAZEBO_MODEL_DATA_HH_
 
 #include <map>
 #include <string>
@@ -47,7 +47,8 @@ namespace gazebo
       public: static double GetEditTransparency();
     };
 
-    class NestedModelData
+    /// \brief Helper class to store nested models data.
+    class GZ_GUI_VISIBLE NestedModelData
     {
       /// \brief Set the name of the model.
       /// \param[in] _name Name of model.
@@ -60,6 +61,10 @@ namespace gazebo
       /// \brief Get the pose of the nested model.
       /// \return Pose of nested model.
       public: ignition::math::Pose3d Pose() const;
+
+      /// \brief Get the depth of the nested model. The root model has level 1.
+      /// \return Depth of nested model. Returns -1 if depth cannot be found.
+      public: int Depth() const;
 
       /// \brief SDF representing the model data.
       public: sdf::ElementPtr modelSDF;
