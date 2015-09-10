@@ -200,6 +200,12 @@ void TimePanel::SetPaused(bool _paused)
 /////////////////////////////////////////////////
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
+  {
+    boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+    if (_msg->has_paused())
+      this->SetPaused(_msg->paused());
+  }
+
   if (!this->isVisible())
     return;
 
@@ -227,9 +233,6 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
     this->SetLogPlayWidgetVisible(false);
     gui::Events::windowMode("Simulation");
   }
-
-  if (_msg->has_paused())
-    this->SetPaused(_msg->paused());
 
   if (this->dataPtr->timeWidget->isVisible())
   {

@@ -16,6 +16,8 @@
 */
 
 #include "gazebo/gui/MainWindow.hh"
+
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 #include "gazebo/gui/model/ModelEditor_TEST.hh"
 
@@ -60,6 +62,95 @@ void ModelEditor_TEST::AddItemToPalette()
   // verify that the push button is added.
   QVERIFY(retButton);
   QVERIFY(retButton->text().toStdString() ==  "TEST_BUTTON");
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelEditor_TEST::OnEdit()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // verify we have a model editor widget
+  gui::ModelEditor *modelEditor =
+      dynamic_cast<gui::ModelEditor *>(mainWindow->GetEditor("model"));
+  QVERIFY(modelEditor);
+
+  QVERIFY(gui::g_editModelAct != NULL);
+
+  // verify simulation is not paused
+  QVERIFY(!mainWindow->IsPaused());
+
+  // swtich to editor mode
+  gui::g_editModelAct->toggle();
+
+  // wait the the gui paused state to update
+  int maxSleep = 50;
+  int sleep = 0;
+  while (!mainWindow->IsPaused() && sleep < maxSleep)
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(50);
+    sleep++;
+  }
+  QVERIFY(sleep < maxSleep);
+
+  // verify simulation is paused
+  QVERIFY(mainWindow->IsPaused());
+
+  // swtich back to simulation mode
+  gui::g_editModelAct->toggle();
+
+  // check the gui paused state and it should not change
+  maxSleep = 50;
+  sleep = 0;
+  while (mainWindow->IsPaused() && sleep < maxSleep)
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(50);
+    sleep++;
+  }
+  QVERIFY(sleep == maxSleep);
+
+  // verify simulation is still paused
+  QVERIFY(mainWindow->IsPaused());
+
+  // run the simulation
+  mainWindow->Play();
+
+  // wait the the gui paused state to update
+  maxSleep = 50;
+  sleep = 0;
+  while (mainWindow->IsPaused() && sleep < maxSleep)
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(50);
+    sleep++;
+  }
+  QVERIFY(sleep < maxSleep);
+
+  // verify simulation is now running
+  QVERIFY(!mainWindow->IsPaused());
 
   mainWindow->close();
   delete mainWindow;
