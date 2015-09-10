@@ -62,7 +62,7 @@ namespace gazebo
       /// \return Pose of nested model.
       public: ignition::math::Pose3d Pose() const;
 
-      /// \brief Get the depth of the nested model. The root model has level 1.
+      /// \brief Get the depth of the nested model. The root model has depth 1.
       /// \return Depth of nested model. Returns -1 if depth cannot be found.
       public: int Depth() const;
 

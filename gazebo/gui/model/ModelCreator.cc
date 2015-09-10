@@ -399,7 +399,18 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     modelData->SetPose(_modelElem->Get<ignition::math::Pose3d>("pose"));
   }
 
+  // Notify nested model insertion
+  if (_parentVis)
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->allNestedModels[nestedModelName] = modelData;
+
+    gui::model::Events::nestedModelInserted(nestedModelName);
+  }
+
   // Recursively load models nested in this model
+  // This must be done after other widgets were notified about the current
+  // model but before making joints
   sdf::ElementPtr nestedModelElem;
   if (_modelElem->HasElement("model"))
      nestedModelElem = _modelElem->GetElement("model");
@@ -445,15 +456,6 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
       this->AddModelPlugin(pluginElem);
       pluginElem = pluginElem->GetNextElement("plugin");
     }
-  }
-
-  // Nested models only
-  if (_parentVis)
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allNestedModels[nestedModelName] = modelData;
-
-    gui::model::Events::nestedModelInserted(nestedModelName);
   }
 
   return modelData;

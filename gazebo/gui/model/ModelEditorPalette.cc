@@ -644,13 +644,49 @@ void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
 }
 
 /////////////////////////////////////////////////
+QTreeWidgetItem *ModelEditorPalette::FindItemByData(const std::string &_data,
+    const QTreeWidgetItem &_parentItem)
+{
+  for (int i = 0; i < _parentItem.childCount(); ++i)
+  {
+    QTreeWidgetItem *item = _parentItem.child(i);
+    std::string itemId =
+        item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (itemId == _data)
+    {
+      return item;
+    }
+
+    item = this->FindItemByData(_data, *item);
+    if (item)
+      return item;
+  }
+  return NULL;
+}
+
+/////////////////////////////////////////////////
 void ModelEditorPalette::OnNestedModelInserted(
     const std::string &_nestedModelName)
 {
+  // Divide the name into parent scoped name and leaf name
+  std::string parentScopedName = _nestedModelName;
   std::string leafName = _nestedModelName;
-  size_t idx = _nestedModelName.find("::");
+  size_t idx = _nestedModelName.rfind("::");
   if (idx != std::string::npos)
+  {
+    parentScopedName = _nestedModelName.substr(0, idx);
     leafName = _nestedModelName.substr(idx+2);
+  }
+
+  // Top level by default
+  QTreeWidgetItem *parentItem = this->nestedModelsItem;
+
+  // If the parent model is a nested model
+  QTreeWidgetItem *item = this->FindItemByData(parentScopedName,
+      *this->nestedModelsItem);
+  if (item)
+    parentItem = item;
 
   // check if nested model already exists
   auto treeItems = this->modelTreeWidget->findItems(tr(leafName.c_str()),
@@ -659,12 +695,11 @@ void ModelEditorPalette::OnNestedModelInserted(
     return;
 
   QTreeWidgetItem *newNestedModelItem =
-      new QTreeWidgetItem(this->nestedModelsItem,
+      new QTreeWidgetItem(parentItem,
       QStringList(QString("%1").arg(QString::fromStdString(leafName))));
 
   newNestedModelItem->setData(0, Qt::UserRole, _nestedModelName.c_str());
   newNestedModelItem->setData(1, Qt::UserRole, "Nested Model");
-  this->modelTreeWidget->addTopLevelItem(newNestedModelItem);
 
   this->nestedModelsItem->setExpanded(true);
 }
@@ -682,7 +717,6 @@ void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
 
   newLinkItem->setData(0, Qt::UserRole, _linkName.c_str());
   newLinkItem->setData(1, Qt::UserRole, "Link");
-  this->modelTreeWidget->addTopLevelItem(newLinkItem);
 
   this->linksItem->setExpanded(true);
 }
@@ -702,7 +736,6 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
 
   newJointItem->setData(0, Qt::UserRole, _jointId.c_str());
   newJointItem->setData(1, Qt::UserRole, "Joint");
-  this->modelTreeWidget->addTopLevelItem(newJointItem);
 
   this->jointsItem->setExpanded(true);
 }
@@ -717,7 +750,6 @@ void ModelEditorPalette::OnModelPluginInserted(
 
   newModelPluginItem->setData(0, Qt::UserRole, _modelPluginName.c_str());
   newModelPluginItem->setData(1, Qt::UserRole, "Model Plugin");
-  this->modelTreeWidget->addTopLevelItem(newModelPluginItem);
 
   this->modelPluginsItem->setExpanded(true);
 }
@@ -726,38 +758,20 @@ void ModelEditorPalette::OnModelPluginInserted(
 void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
-  for (int i = 0; i < this->linksItem->childCount(); ++i)
-  {
-    QTreeWidgetItem *item = this->linksItem->child(i);
-    if (!item)
-      continue;
-    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
-    if (listData == _linkId)
-    {
-      this->linksItem->takeChild(this->linksItem->indexOfChild(item));
-      break;
-    }
-  }
+  QTreeWidgetItem *item = this->FindItemByData(_linkId, *this->linksItem);
+  if (item)
+    this->linksItem->takeChild(this->linksItem->indexOfChild(item));
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
-  for (int i = 0; i < this->jointsItem->childCount(); ++i)
-  {
-    QTreeWidgetItem *item = this->jointsItem->child(i);
-    if (!item)
-      continue;
-    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
-    if (listData == _jointId)
-    {
-      this->jointsItem->takeChild(this->jointsItem->indexOfChild(item));
-      break;
-    }
-  }
+  QTreeWidgetItem *item = this->FindItemByData(_jointId, *this->jointsItem);
+  if (item)
+    this->jointsItem->takeChild(this->jointsItem->indexOfChild(item));
 }
 
 /////////////////////////////////////////////////
@@ -779,57 +793,30 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
     const std::string &_newJointName)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
-  for (int i = 0; i < this->jointsItem->childCount(); ++i)
-  {
-    QTreeWidgetItem *item = this->jointsItem->child(i);
-    if (!item)
-      continue;
-    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
-    if (listData == _jointId)
-    {
-      item->setText(0, QString::fromStdString(_newJointName));
-      break;
-    }
-  }
+  QTreeWidgetItem *item = this->FindItemByData(_jointId, *this->jointsItem);
+  if (item)
+    item->setText(0, QString::fromStdString(_newJointName));
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
+void ModelEditorPalette::OnSetSelectedLink(const std::string &_linkId,
     bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
-  for (int i = 0; i < this->linksItem->childCount(); ++i)
-  {
-    QTreeWidgetItem *item = this->linksItem->child(i);
-    if (!item)
-      continue;
-    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
-    if (listData == _name)
-    {
-      item->setSelected(_selected);
-      break;
-    }
-  }
+  QTreeWidgetItem *item = this->FindItemByData(_linkId, *this->linksItem);
+  if (item)
+    item->setSelected(_selected);
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
+void ModelEditorPalette::OnSetSelectedJoint(const std::string &_jointId,
     bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
-  for (int i = 0; i < this->jointsItem->childCount(); ++i)
-  {
-    QTreeWidgetItem *item = this->jointsItem->child(i);
-    if (!item)
-      continue;
-    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
 
-    if (listData == _name)
-    {
-      item->setSelected(_selected);
-      break;
-    }
-  }
+  QTreeWidgetItem *item = this->FindItemByData(_jointId, *this->jointsItem);
+  if (item)
+    item->setSelected(_selected);
 }
