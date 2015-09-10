@@ -648,9 +648,7 @@ void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
     std::string name = item->data(0, Qt::UserRole).toString().toStdString();
     std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
-    if (type == "Nested Model")
-      gui::model::Events::showNestedModelContextMenu(name);
-    else if (type == "Link")
+    if (type == "Link")
       gui::model::Events::showLinkContextMenu(name);
     else if (type == "Joint")
       gui::model::Events::showJointContextMenu(name);

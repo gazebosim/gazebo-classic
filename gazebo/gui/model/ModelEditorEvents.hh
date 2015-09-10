@@ -332,22 +332,6 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointNameChanged.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the show nestedModel context menu
-        /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        /// \return a connection
-        public: template<typename T> static event::ConnectionPtr
-            ConnectShowNestedModelContextMenu(T _subscriber)
-          { return showNestedModelContextMenu.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the show nestedModel context
-        /// menu
-        /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectShowNestedModelContextMenu(
-            event::ConnectionPtr _subscriber)
-          { showNestedModelContextMenu.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the show link context menu signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -508,10 +492,6 @@ namespace gazebo
         /// new joint name.
         public: static event::EventT<void (std::string, std::string)>
             jointNameChanged;
-
-        /// \brief Request to show the nestedModel context menu.
-        public: static event::EventT<void (std::string)>
-            showNestedModelContextMenu;
 
         /// \brief Request to show the link context menu.
         public: static event::EventT<void (std::string)> showLinkContextMenu;
