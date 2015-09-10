@@ -1,7 +1,8 @@
 ## Gazebo 7.0
 
 1. Rename Reset to Reset Time in time widget
-    * [Pull request #1730](https://bitbucket.org/osrf/gazebo/pull-request/1730)
+    * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
+    * [Issue #1730](https://bitbucket.org/osrf/gazebo/issue/1730)
 
 1. Added torsional friction
     * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
