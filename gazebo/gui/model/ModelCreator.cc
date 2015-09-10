@@ -1874,7 +1874,6 @@ void ModelCreator::GenerateSDF()
   }
 
   // Add joint sdf elements
-  this->jointMaker->SetModelName(this->modelName);
   this->jointMaker->GenerateSDF();
   sdf::ElementPtr jointsElem = this->jointMaker->GetSDF();
 

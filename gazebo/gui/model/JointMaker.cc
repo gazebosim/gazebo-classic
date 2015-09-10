@@ -947,12 +947,6 @@ std::string JointMaker::GetScopedLinkName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::SetModelName(const std::string &_modelName)
-{
-  this->modelName = _modelName;
-}
-
-/////////////////////////////////////////////////
 void JointMaker::GenerateSDF()
 {
   this->modelSDF.reset(new sdf::Element);
@@ -1198,30 +1192,32 @@ void JointMaker::DeselectAll()
 void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     const std::string &_modelName)
 {
+  auto scene = gui::get_active_camera()->GetScene();
+  if (!scene)
+    return;
+
   msgs::Joint jointMsg = msgs::JointFromSDF(_jointElem);
 
   // Parent
   std::string parentName = _modelName + "::" + jointMsg.parent();
-  rendering::VisualPtr parentVis =
-      gui::get_active_camera()->GetScene()->GetVisual(parentName);
+  rendering::VisualPtr parentVis = scene->GetVisual(parentName);
   if (!parentVis)
   {
+    // Try to remove one level of scope
     std::string unscopedName =
         jointMsg.parent().substr(jointMsg.parent().find("::")+2);
-    parentVis = gui::get_active_camera()->GetScene()->GetVisual(
-        _modelName + "::" + unscopedName);
+    parentVis = scene->GetVisual(_modelName + "::" + unscopedName);
   }
 
   // Child
   std::string childName = _modelName + "::" + jointMsg.child();
-  rendering::VisualPtr childVis =
-      gui::get_active_camera()->GetScene()->GetVisual(childName);
+  rendering::VisualPtr childVis = scene->GetVisual(childName);
   if (!childVis)
   {
+    // Try to remove one level of scope
     std::string unscopedName =
         jointMsg.child().substr(jointMsg.child().find("::")+2);
-    childVis = gui::get_active_camera()->GetScene()->GetVisual(
-        _modelName + "::" + unscopedName);
+    childVis = scene->GetVisual(_modelName + "::" + unscopedName);
   }
 
   if (!parentVis || !childVis)
