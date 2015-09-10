@@ -69,6 +69,10 @@ using the same arguments used in the command line.
     1. Display model plugins on the left panel and added model plugin inspector
         * [Pull request #1863](https://bitbucket.org/osrf/gazebo/pull-request/1863)
 
+    1. Set physics to be paused when exiting model editor mode
+        * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
+        * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
+
 ## Gazebo 6.0
 
 1. Added Copy constructor and assignment operator to MouseEvent
