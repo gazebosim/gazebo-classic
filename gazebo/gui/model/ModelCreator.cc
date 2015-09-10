@@ -181,10 +181,6 @@ ModelCreator::~ModelCreator()
   while (!this->allLinks.empty())
     this->RemoveLinkImpl(this->allLinks.begin()->first);
 
-  while (!this->nestedLinks.empty())
-    this->RemoveLinkImpl(this->nestedLinks.begin()->first);
-
-  this->nestedLinks.clear();
   this->allNestedModels.clear();
   this->allLinks.clear();
   this->allModelPlugins.clear();
@@ -285,6 +281,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       {
         if (model->GetAttribute("name")->GetAsString() == _modelName)
         {
+          // Create the root model
           this->CreateModelFromSDF(model);
 
           // Hide the model from the scene to substitute with the preview visual
@@ -293,10 +290,10 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
           rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
           rendering::VisualPtr visual = scene->GetVisual(_modelName);
 
-          math::Pose pose;
+          ignition::math::Pose3d pose;
           if (visual)
           {
-            pose = visual->GetWorldPose();
+            pose = visual->GetWorldPose().Ign();
             this->previewVisual->SetWorldPose(pose);
           }
 
@@ -321,7 +318,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 
 /////////////////////////////////////////////////
 NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
-    _modelElem, rendering::VisualPtr _parentVis, bool _attachedToMouse)
+    _modelElem, rendering::VisualPtr _parentVis)
 {
   rendering::VisualPtr modelVisual;
   std::stringstream modelNameStream;
@@ -343,9 +340,9 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
       this->SetModelName(_modelElem->Get<std::string>("name"));
 
     if (_modelElem->HasElement("pose"))
-      this->modelPose = _modelElem->Get<math::Pose>("pose");
+      this->modelPose = _modelElem->Get<ignition::math::Pose3d>("pose");
     else
-      this->modelPose = math::Pose::Zero;
+      this->modelPose = ignition::math::Pose3d::Zero;
     this->previewVisual->SetPose(this->modelPose);
 
     if (_modelElem->HasElement("static"))
@@ -390,7 +387,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     modelVisual->SetTransparency(ModelData::GetEditTransparency());
 
     if (_modelElem->HasElement("pose"))
-      modelVisual->SetPose(_modelElem->Get<math::Pose>("pose"));
+      modelVisual->SetPose(_modelElem->Get<ignition::math::Pose3d>("pose"));
 
     // Only keep SDF and preview visual
     std::string leafName = nestedModelName;
@@ -399,7 +396,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     modelData->modelSDF = _modelElem;
     modelData->modelVisual = modelVisual;
     modelData->SetName(leafName);
-    modelData->SetPose(_modelElem->Get<math::Pose>("pose"));
+    modelData->SetPose(_modelElem->Get<ignition::math::Pose3d>("pose"));
   }
 
   // Recursively load models nested in this model
@@ -411,10 +408,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     if (this->canonicalModel.empty())
       this->canonicalModel = nestedModelName;
 
-    NestedModelData *nestedModelData =
-        this->CreateModelFromSDF(nestedModelElem, modelVisual);
-    rendering::VisualPtr nestedModelVis = nestedModelData->modelVisual;
-    modelData->models[nestedModelVis->GetName()] = nestedModelVis;
+    this->CreateModelFromSDF(nestedModelElem, modelVisual);
     nestedModelElem = nestedModelElem->GetNextElement("model");
   }
 
@@ -424,10 +418,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     linkElem = _modelElem->GetElement("link");
   while (linkElem)
   {
-    LinkData *linkData = this->CreateLinkFromSDF(linkElem, modelVisual);
-    rendering::VisualPtr linkVis = linkData->linkVisual;
-
-    modelData->links[linkVis->GetName()] = linkVis;
+    this->CreateLinkFromSDF(linkElem, modelVisual);
     linkElem = linkElem->GetNextElement("link");
   }
 
@@ -462,8 +453,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allNestedModels[nestedModelName] = modelData;
 
-    if (!_attachedToMouse)
-      gui::model::Events::nestedModelInserted(nestedModelName);
+    gui::model::Events::nestedModelInserted(nestedModelName);
   }
 
   return modelData;
@@ -1098,11 +1088,6 @@ LinkData *ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
     this->allLinks[linkName] = link;
     gui::model::Events::linkInserted(linkName);
   }
-  else
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->nestedLinks[linkName] = link;
-  }
 
   this->ModelChanged();
   return link;
@@ -1153,7 +1138,6 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks.erase(linkName);
-    this->nestedLinks.erase(linkName);
     delete link;
   }
   gui::model::Events::linkRemoved(linkName);
@@ -1213,7 +1197,7 @@ void ModelCreator::Reset()
       scene->GetWorldVisual()));
 
   this->previewVisual->Load();
-  this->modelPose = math::Pose::Zero;
+  this->modelPose = ignition::math::Pose3d::Zero;
   this->previewVisual->SetPose(this->modelPose);
 }
 
@@ -1309,7 +1293,7 @@ void ModelCreator::CreateTheEntity()
   }
 
   msg.set_sdf(this->modelSDF->ToString());
-  msgs::Set(msg.mutable_pose(), this->modelPose.Ign());
+  msgs::Set(msg.mutable_pose(), this->modelPose);
   this->makerPub->Publish(msg);
 }
 
@@ -1786,7 +1770,7 @@ void ModelCreator::GenerateSDF()
   {
     // set center of all links and nested models to be origin
     /// \todo issue #1485 set a better origin other than the centroid
-    math::Vector3 mid;
+    ignition::math::Vector3d mid;
     int entityCount = 0;
     for (auto &linksIt : this->allLinks)
     {
@@ -1806,7 +1790,7 @@ void ModelCreator::GenerateSDF()
           != this->previewVisual)
       continue;
 
-      mid += modelData->GetPose().pos;
+      mid += modelData->Pose().Pos();
       entityCount++;
     }
 
@@ -1815,7 +1799,7 @@ void ModelCreator::GenerateSDF()
       mid /= entityCount;
     }
 
-    this->modelPose.pos = mid;
+    this->modelPose.Pos() = mid;
   }
 
   // Update poses in case they changed
@@ -1838,8 +1822,9 @@ void ModelCreator::GenerateSDF()
         != this->previewVisual)
     continue;
 
-    modelData->SetPose(modelData->modelVisual->GetWorldPose()-this->modelPose);
-    modelData->modelVisual->SetPose(modelData->GetPose());
+    modelData->SetPose(modelData->modelVisual->GetWorldPose().Ign() -
+        this->modelPose);
+    modelData->modelVisual->SetPose(modelData->Pose());
   }
 
   // generate canonical link sdf first.

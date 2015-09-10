@@ -339,12 +339,14 @@ namespace gazebo
       private: std::string CreateModel();
 
       /// \brief Load a model SDF file and create visuals in the model editor.
-      /// This is used mainly when editing existing models.
+      /// This is used mainly when editing existing models. The function is
+      /// called recursively to create nested models.
       /// \param[in] _sdf SDF of a model to be loaded
+      /// \param[in] _parentVis If this is not the root model, it will have a
+      /// parent visual for its parent model.
       /// \return Data describing the model.
       private: NestedModelData *CreateModelFromSDF(sdf::ElementPtr _sdf,
-          rendering::VisualPtr _parentVis = NULL,
-          bool _attachedToMouse = false);
+          rendering::VisualPtr _parentVis = NULL);
 
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
@@ -418,7 +420,7 @@ namespace gazebo
       private: rendering::VisualPtr mouseVisual;
 
       /// \brief The pose of the model.
-      private: math::Pose modelPose;
+      private: ignition::math::Pose3d modelPose;
 
       /// \brief True to create a static model.
       private: bool isStatic;
@@ -437,9 +439,6 @@ namespace gazebo
 
       /// \brief Type of link being added.
       private: LinkType addLinkType;
-
-      /// \brief A map of nested model link names and their visuals.
-      private: std::map<std::string, LinkData *> nestedLinks;
 
       /// \brief A map of nested model names to and their visuals.
       private: std::map<std::string, NestedModelData *> allNestedModels;
