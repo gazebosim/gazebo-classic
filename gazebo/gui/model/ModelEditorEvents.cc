@@ -33,6 +33,8 @@ event::EventT<void (bool, bool, const math::Pose &, const std::string &)>
 event::EventT<void (std::string)> model::Events::saveModel;
 event::EventT<void ()> model::Events::newModel;
 
+event::EventT<void (std::string)> model::Events::nestedModelInserted;
+event::EventT<void (std::string)> model::Events::nestedModelRemoved;
 event::EventT<void (std::string)> model::Events::linkInserted;
 event::EventT<void (std::string)> model::Events::linkRemoved;
 event::EventT<void (std::string, std::string, std::string, std::string,
@@ -40,12 +42,15 @@ event::EventT<void (std::string, std::string, std::string, std::string,
 event::EventT<void (std::string)> model::Events::jointRemoved;
 event::EventT<void (std::string, std::string, std::string, std::string,
     std::string)> model::Events::jointChanged;
+event::EventT<void (std::string)> model::Events::openNestedModelInspector;
 event::EventT<void (std::string)> model::Events::openLinkInspector;
 event::EventT<void (std::string)> model::Events::openJointInspector;
 event::EventT<void (std::string)> model::Events::openModelPluginInspector;
 event::EventT<void (std::string, std::string)> model::Events::jointNameChanged;
+event::EventT<void (std::string)> model::Events::showNestedModelContextMenu;
 event::EventT<void (std::string)> model::Events::showLinkContextMenu;
 event::EventT<void (std::string)> model::Events::showJointContextMenu;
+event::EventT<void (std::string, bool)> model::Events::setSelectedNestedModel;
 event::EventT<void (std::string, bool)> model::Events::setSelectedLink;
 event::EventT<void (std::string, bool)> model::Events::setSelectedJoint;
 event::EventT<void (std::string)> model::Events::modelPluginInserted;

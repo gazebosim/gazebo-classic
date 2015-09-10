@@ -181,6 +181,14 @@ ModelCreator::~ModelCreator()
   while (!this->allLinks.empty())
     this->RemoveLinkImpl(this->allLinks.begin()->first);
 
+  while (!this->nestedLinks.empty())
+    this->RemoveLinkImpl(this->nestedLinks.begin()->first);
+
+  while (!this->allNestedModels.empty())
+    this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
+
+  this->nestedLinks.clear();
+  this->allNestedModels.clear();
   this->allLinks.clear();
   this->allModelPlugins.clear();
   this->node->Fini();
@@ -280,7 +288,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
       {
         if (model->GetAttribute("name")->GetAsString() == _modelName)
         {
-          this->LoadSDF(model);
+          this->CreateModelFromSDF(model);
 
           // Hide the model from the scene to substitute with the preview visual
           this->SetModelVisible(_modelName, false);
@@ -315,64 +323,153 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::LoadSDF(sdf::ElementPtr _modelElem)
+NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
+    _modelElem, rendering::VisualPtr _parentVis, bool _attachedToMouse)
 {
-  // Reset preview visual in case there was something already loaded
-  this->Reset();
+  rendering::VisualPtr modelVisual;
+  std::stringstream modelNameStream;
+  std::string nestedModelName;
+  NestedModelData *modelData = new NestedModelData();
 
-  // Model general info
-  // Keep previewModel with previewName to avoid conflicts
-  if (_modelElem->HasAttribute("name"))
-    this->SetModelName(_modelElem->Get<std::string>("name"));
+  // If no parent vis, this is the root model
+  if (!_parentVis)
+  {
+    // Reset preview visual in case there was something already loaded
+    this->Reset();
 
-  if (_modelElem->HasElement("pose"))
-    this->modelPose = _modelElem->Get<math::Pose>("pose");
+    // Keep previewModel with previewName to avoid conflicts
+    modelVisual = this->previewVisual;
+    modelNameStream << this->previewName << "_" << this->modelCounter;
+
+    // Model general info
+    if (_modelElem->HasAttribute("name"))
+      this->SetModelName(_modelElem->Get<std::string>("name"));
+
+    if (_modelElem->HasElement("pose"))
+      this->modelPose = _modelElem->Get<math::Pose>("pose");
+    else
+      this->modelPose = math::Pose::Zero;
+    this->previewVisual->SetPose(this->modelPose);
+
+    if (_modelElem->HasElement("static"))
+      this->isStatic = _modelElem->Get<bool>("static");
+    if (_modelElem->HasElement("allow_auto_disable"))
+      this->autoDisable = _modelElem->Get<bool>("allow_auto_disable");
+    gui::model::Events::modelPropertiesChanged(this->isStatic,
+        this->autoDisable, this->modelPose, this->GetModelName());
+
+    modelData->modelVisual = modelVisual;
+  }
+  // Nested models are attached to a parent visual
   else
-    this->modelPose = math::Pose::Zero;
-  this->previewVisual->SetPose(this->modelPose);
+  {
+    // Internal name
+    std::stringstream parentNameStream;
+    parentNameStream << _parentVis->GetName();
+    if (_parentVis->GetName() == this->previewName)
+      parentNameStream << "_" << this->modelCounter;
 
-  if (_modelElem->HasElement("static"))
-    this->isStatic = _modelElem->Get<bool>("static");
-  if (_modelElem->HasElement("allow_auto_disable"))
-    this->autoDisable = _modelElem->Get<bool>("allow_auto_disable");
-  gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable,
-      this->modelPose, this->GetModelName());
+    modelNameStream << parentNameStream.str() << "::" <<
+        _modelElem->Get<std::string>("name");
+    nestedModelName = modelNameStream.str();
+
+    // Generate unique name
+    auto itName = this->allNestedModels.find(nestedModelName);
+    int nameCounter = 0;
+    std::string uniqueName;
+    while (itName != this->allNestedModels.end())
+    {
+      std::stringstream uniqueNameStr;
+      uniqueNameStr << nestedModelName << "_" << nameCounter++;
+      uniqueName = uniqueNameStr.str();
+      itName = this->allNestedModels.find(uniqueName);
+    }
+    if (!uniqueName.empty())
+      nestedModelName = uniqueName;
+
+    // Model Visual
+    modelVisual.reset(new rendering::Visual(nestedModelName, _parentVis));
+    modelVisual->Load();
+    modelVisual->SetTransparency(ModelData::GetEditTransparency());
+
+    if (_modelElem->HasElement("pose"))
+      modelVisual->SetPose(_modelElem->Get<math::Pose>("pose"));
+
+    // Only keep SDF and preview visual
+    std::string leafName = nestedModelName;
+    leafName = leafName.substr(leafName.rfind("::")+2);
+
+    modelData->modelSDF = _modelElem;
+    modelData->modelVisual = modelVisual;
+    modelData->SetName(leafName);
+    modelData->SetPose(_modelElem->Get<math::Pose>("pose"));
+  }
+
+  // Recursively load models nested in this model
+  sdf::ElementPtr nestedModelElem;
+  if (_modelElem->HasElement("model"))
+     nestedModelElem = _modelElem->GetElement("model");
+  while (nestedModelElem)
+  {
+    if (this->canonicalModel.empty())
+      this->canonicalModel = nestedModelName;
+
+    NestedModelData *nestedModelData =
+        this->CreateModelFromSDF(nestedModelElem, modelVisual);
+    rendering::VisualPtr nestedModelVis = nestedModelData->modelVisual;
+    modelData->models[nestedModelVis->GetName()] = nestedModelVis;
+    nestedModelElem = nestedModelElem->GetNextElement("model");
+  }
 
   // Links
-  if (!_modelElem->HasElement("link"))
-  {
-    gzerr << "Can't load a model without links." << std::endl;
-    return;
-  }
-  sdf::ElementPtr linkElem = _modelElem->GetElement("link");
+  sdf::ElementPtr linkElem;
+  if (_modelElem->HasElement("link"))
+    linkElem = _modelElem->GetElement("link");
   while (linkElem)
   {
-    this->CreateLinkFromSDF(linkElem);
+    LinkData *linkData = this->CreateLinkFromSDF(linkElem, modelVisual);
+    rendering::VisualPtr linkVis = linkData->linkVisual;
+
+    modelData->links[linkVis->GetName()] = linkVis;
     linkElem = linkElem->GetNextElement("link");
   }
 
-  // Joints
-  std::stringstream previewModelName;
-  previewModelName << this->previewName << "_" << this->modelCounter;
-  sdf::ElementPtr jointElem;
-  if (_modelElem->HasElement("joint"))
-     jointElem = _modelElem->GetElement("joint");
-
-  while (jointElem)
+  // Don't load joints or plugins for nested models
+  if (!_parentVis)
   {
-    this->jointMaker->CreateJointFromSDF(jointElem, previewModelName.str());
-    jointElem = jointElem->GetNextElement("joint");
+    // Joints
+    sdf::ElementPtr jointElem;
+    if (_modelElem->HasElement("joint"))
+       jointElem = _modelElem->GetElement("joint");
+
+    while (jointElem)
+    {
+      this->jointMaker->CreateJointFromSDF(jointElem, modelNameStream.str());
+      jointElem = jointElem->GetNextElement("joint");
+    }
+
+    // Plugins
+    sdf::ElementPtr pluginElem;
+    if (_modelElem->HasElement("plugin"))
+      pluginElem = _modelElem->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->AddModelPlugin(pluginElem);
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
   }
 
-  // Plugins
-  sdf::ElementPtr pluginElem;
-  if (_modelElem->HasElement("plugin"))
-    pluginElem = _modelElem->GetElement("plugin");
-  while (pluginElem)
+  // Nested models only
+  if (_parentVis)
   {
-    this->AddModelPlugin(pluginElem);
-    pluginElem = pluginElem->GetNextElement("plugin");
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->allNestedModels[nestedModelName] = modelData;
+
+    if (!_attachedToMouse)
+      gui::model::Events::nestedModelInserted(nestedModelName);
   }
+
+  return modelData;
 }
 
 /////////////////////////////////////////////////
@@ -380,7 +477,7 @@ void ModelCreator::OnNew()
 {
   this->Stop();
 
-  if (this->allLinks.empty())
+  if (this->allLinks.empty() && this->allNestedModels.empty())
   {
     this->Reset();
     gui::model::Events::newModel();
@@ -494,7 +591,7 @@ void ModelCreator::OnExit()
 {
   this->Stop();
 
-  if (this->allLinks.empty())
+  if (this->allLinks.empty() && this->allNestedModels.empty())
   {
     if (!this->serverModelName.empty())
       this->SetModelVisible(this->serverModelName, true);
@@ -850,7 +947,8 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
+LinkData *ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
+    rendering::VisualPtr _parentVis)
 {
   LinkData *link = new LinkData();
   MainWindow *mainWindow = gui::get_main_window();
@@ -866,7 +964,10 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   std::stringstream linkNameStream;
   std::string leafName = link->GetName();
 
-  linkNameStream << this->previewName << "_" << this->modelCounter << "::";
+  if (_parentVis->GetName() == this->previewName)
+    linkNameStream << this->previewName << "_" << this->modelCounter << "::";
+  else
+    linkNameStream << _parentVis->GetName() << "::";
   linkNameStream << leafName;
   std::string linkName = linkNameStream.str();
 
@@ -881,8 +982,7 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
   if (leafName.find("::") != std::string::npos)
     this->jointMaker->AddScopedLinkName(leafName);
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
-      this->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(linkName, _parentVis));
   linkVisual->Load();
   linkVisual->SetPose(link->Pose());
   link->linkVisual = linkVisual;
@@ -994,13 +1094,81 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
     collisionElem = collisionElem->GetNextElement("collision");
   }
 
+  // Top-level links only
+  if (_parentVis == this->previewVisual)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks[linkName] = link;
     gui::model::Events::linkInserted(linkName);
   }
+  else
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->nestedLinks[linkName] = link;
+  }
 
-  rendering::ScenePtr scene = link->linkVisual->GetScene();
+  this->ModelChanged();
+  return link;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
+{
+  if (!this->previewVisual)
+  {
+    this->Reset();
+    return;
+  }
+
+  NestedModelData *modelData = NULL;
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    if (this->allNestedModels.find(_nestedModelName) ==
+        this->allNestedModels.end())
+    {
+      return;
+    }
+    modelData = this->allNestedModels[_nestedModelName];
+  }
+
+  if (!modelData)
+    return;
+
+  // Copy before reference is deleted.
+  std::string nestedModelName(_nestedModelName);
+
+
+  // remove all its models
+  for (auto &modelIt : modelData->models)
+    this->RemoveNestedModelImpl(modelIt.first);
+
+  // remove all its links and joints
+  for (auto &linkIt : modelData->links)
+  {
+    // if it's a link
+    if (this->nestedLinks.find(linkIt.first) != this->nestedLinks.end())
+    {
+      if (this->jointMaker)
+      {
+        this->jointMaker->RemoveJointsByLink(linkIt.first);
+      }
+      this->RemoveLinkImpl(linkIt.first);
+    }
+  }
+
+  rendering::ScenePtr scene = modelData->modelVisual->GetScene();
+  if (scene)
+  {
+    scene->RemoveVisual(modelData->modelVisual);
+  }
+
+  modelData->modelVisual.reset();
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->allNestedModels.erase(_nestedModelName);
+    delete modelData;
+  }
+  gui::model::Events::nestedModelRemoved(nestedModelName);
 
   this->ModelChanged();
 }
@@ -1049,7 +1217,8 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   link->linkVisual.reset();
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allLinks.erase(_linkName);
+    this->allLinks.erase(linkName);
+    this->nestedLinks.erase(linkName);
     delete link;
   }
   gui::model::Events::linkRemoved(linkName);
@@ -1092,6 +1261,10 @@ void ModelCreator::Reset()
   while (!this->allLinks.empty())
     this->RemoveLinkImpl(this->allLinks.begin()->first);
   this->allLinks.clear();
+
+  while (!this->allNestedModels.empty())
+    this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
+  this->allNestedModels.clear();
 
   this->allModelPlugins.clear();
 
@@ -1385,10 +1558,15 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
   if (vis)
   {
-    rendering::VisualPtr linkVis = vis->GetParent();
-    // Is link
-    if (this->allLinks.find(linkVis->GetName()) !=
-        this->allLinks.end())
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+    if (!topLevelVis)
+      return false;
+
+    // Is link / nested model
+    if (this->allLinks.find(topLevelVis->GetName()) !=
+        this->allLinks.end() ||
+        this->allNestedModels.find(topLevelVis->GetName()) !=
+        this->allNestedModels.end())
     {
       // Handle snap from GLWidget
       if (g_snapAct->isChecked())
@@ -1397,7 +1575,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // trigger link inspector on right click
       if (_event.Button() == common::MouseEvent::RIGHT)
       {
-        this->inspectName = vis->GetParent()->GetName();
+        this->inspectName = topLevelVis->GetName();
 
         this->ShowContextMenu(this->inspectName);
         return true;
@@ -1407,22 +1585,25 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       if (!(QApplication::keyboardModifiers() & Qt::ControlModifier))
       {
         this->DeselectAll();
-        this->SetSelected(linkVis, true);
+        this->SetSelected(topLevelVis, true);
       }
       // Multi-selection mode
       else
       {
-        auto it = std::find(this->selectedLinks.begin(),
-            this->selectedLinks.end(), linkVis);
+        auto itLink = std::find(this->selectedLinks.begin(),
+            this->selectedLinks.end(), topLevelVis);
+   //     auto itNestedModel = std::find(this->selectedNestedModels.begin(),
+     //       this->selectedNestedModels.end(), topLevelVis);
         // Highlight and select clicked link if not already selected
-        if (it == this->selectedLinks.end())
+        if (itLink == this->selectedLinks.end())// &&
+        //    itNestedModel == this->selectedNestedModels.end())
         {
-          this->SetSelected(linkVis, true);
+          this->SetSelected(topLevelVis, true);
         }
         // Deselect if already selected
         else
         {
-          this->SetSelected(linkVis, false);
+          this->SetSelected(topLevelVis, false);
         }
       }
 
@@ -1501,9 +1682,16 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
     rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
     if (vis && !vis->IsPlane())
     {
+      rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+
+      if (!topLevelVis)
+        return false;
+
       // Main window models always handled here
-      if (this->allLinks.find(vis->GetParent()->GetName()) ==
-          this->allLinks.end())
+      if (this->allLinks.find(topLevelVis->GetName()) ==
+          this->allLinks.end() &&
+          this->allNestedModels.find(topLevelVis->GetName()) ==
+          this->allNestedModels.end())
       {
         // Prevent highlighting for snapping
         if (this->manipMode == "snap" || this->manipMode == "select" ||
@@ -1573,12 +1761,12 @@ void ModelCreator::OnOpenInspector()
 void ModelCreator::OpenInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  LinkData *link = this->allLinks[_name];
-  if (!link)
+  if (this->allLinks.find(_name) == this->allLinks.end())
   {
     gzerr << "Link [" << _name << "] not found." << std::endl;
     return;
   }
+  LinkData *link = this->allLinks[_name];
   link->SetPose((link->linkVisual->GetWorldPose()-this->modelPose).Ign());
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
@@ -1670,26 +1858,62 @@ void ModelCreator::GenerateSDF()
 
   if (this->serverModelName.empty())
   {
-    // set center of all links to be origin
-    // TODO set a better origin other than the centroid
+    // set center of all links and nested models to be origin
+    /// \todo issue #1485 set a better origin other than the centroid
     math::Vector3 mid;
+    int entityCount = 0;
     for (auto &linksIt : this->allLinks)
     {
       LinkData *link = linksIt.second;
       mid += link->Pose().Pos();
+      entityCount++;
     }
-    if (!this->allLinks.empty())
-      mid /= this->allLinks.size();
+    for (auto &nestedModelsIt : this->allNestedModels)
+    {
+      NestedModelData *modelData = nestedModelsIt.second;
+
+      if (!nestedModelsIt.second->modelVisual)
+        continue;
+
+      // get only top level nested models
+      if (nestedModelsIt.second->modelVisual->GetParent()
+          != this->previewVisual)
+      continue;
+
+      mid += modelData->GetPose().pos;
+      entityCount++;
+    }
+
+    if (!(this->allLinks.empty() && this->allNestedModels.empty()))
+    {
+      mid /= entityCount;
+    }
+
     this->modelPose.pos = mid;
   }
 
-  // Update preview model and link poses in case they changed
+  // Update poses in case they changed
+  this->previewVisual->SetWorldPose(this->modelPose);
   for (auto &linksIt : this->allLinks)
   {
-    this->previewVisual->SetWorldPose(this->modelPose);
     LinkData *link = linksIt.second;
     link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
     link->linkVisual->SetPose(link->Pose());
+  }
+  for (auto &nestedModelsIt : this->allNestedModels)
+  {
+    NestedModelData *modelData = nestedModelsIt.second;
+
+    if (!nestedModelsIt.second->modelVisual)
+      continue;
+
+    // get only top level nested models
+    if (nestedModelsIt.second->modelVisual->GetParent()
+        != this->previewVisual)
+    continue;
+
+    modelData->SetPose(modelData->modelVisual->GetWorldPose()-this->modelPose);
+    modelData->modelVisual->SetPose(modelData->GetPose());
   }
 
   // generate canonical link sdf first.
@@ -1719,7 +1943,34 @@ void ModelCreator::GenerateSDF()
     modelElem->InsertElement(newLinkElem);
   }
 
+  // generate canonical model sdf first.
+  if (!this->canonicalModel.empty())
+  {
+    auto canonical = this->allNestedModels.find(this->canonicalModel);
+    if (canonical != this->allNestedModels.end())
+    {
+      NestedModelData *nestedModelData = canonical->second;
+     // this->UpdateNestedModelSDF(nestedModelData->modelSDF);
+      modelElem->InsertElement(nestedModelData->modelSDF);
+    }
+  }
+
+  // loop through rest of all nested models and add sdf
+  for (auto &nestedModelsIt : this->allNestedModels)
+  {
+    if (nestedModelsIt.first == this->canonicalModel ||
+        (nestedModelsIt.second->modelVisual &&
+        nestedModelsIt.second->modelVisual->GetParent()
+        != this->previewVisual))
+      continue;
+
+    NestedModelData *nestedModelData = nestedModelsIt.second;
+   // this->UpdateNestedModelSDF(nestedModelData->modelSDF);
+    modelElem->InsertElement(nestedModelData->modelSDF);
+  }
+
   // Add joint sdf elements
+  this->jointMaker->SetModelName(this->modelName);
   this->jointMaker->GenerateSDF();
   sdf::ElementPtr jointsElem = this->jointMaker->GetSDF();
 

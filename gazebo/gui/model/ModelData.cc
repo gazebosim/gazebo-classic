@@ -71,6 +71,82 @@ std::string ModelData::GetTemplateSDFString()
 }
 
 /////////////////////////////////////////////////
+void NestedModelData::SetName(const std::string &_name)
+{
+  this->modelSDF->GetAttribute("name")->Set(_name);
+}
+
+/////////////////////////////////////////////////
+void NestedModelData::SetPose(const math::Pose &_pose)
+{
+  this->modelSDF->GetElement("pose")->Set(_pose);
+}
+
+/////////////////////////////////////////////////
+math::Pose NestedModelData::GetPose() const
+{
+  return this->modelSDF->Get<math::Pose>("pose");
+}
+
+/////////////////////////////////////////////////
+NestedModelData *NestedModelData::Clone(const std::string &_newName)
+{
+  NestedModelData *cloneNestedModel = new NestedModelData();
+
+  cloneNestedModel->modelSDF = this->modelSDF->Clone();
+  cloneNestedModel->SetName(_newName);
+  cloneNestedModel->SetPose(this->GetPose());
+
+  std::string modelVisualName = this->modelVisual->GetName();
+  std::string cloneVisName = _newName;
+  size_t nestedModelIdx = modelVisualName.find("::");
+  if (nestedModelIdx != std::string::npos)
+    cloneVisName = modelVisualName.substr(0, nestedModelIdx+2) + _newName;
+
+  // Create an empty model visual with the same parent
+  rendering::VisualPtr modelVis(new rendering::Visual(cloneVisName,
+      this->modelVisual->GetParent()));
+  modelVis->Load();
+
+  cloneNestedModel->modelVisual = modelVis;
+
+  // Clone child by child altering name
+  this->CloneChildren(this->modelVisual, cloneNestedModel->modelVisual);
+  return cloneNestedModel;
+}
+
+/////////////////////////////////////////////////
+void NestedModelData::CloneChildren(
+    rendering::VisualPtr _from, rendering::VisualPtr _to)
+{
+  for (unsigned int i = 0; i < _from->GetChildCount(); ++i)
+  {
+    std::string newVisName = _from->GetChild(i)->GetName();
+    size_t idx = newVisName.find_last_of("::");
+    if (idx != std::string::npos)
+      newVisName = _to->GetName() + newVisName.substr(idx-1);
+    else
+      newVisName = _to->GetName() + "::" + newVisName;
+
+    // Clone it if it's a leaf
+    if (_from->GetChild(i)->GetChildCount() == 0)
+    {
+      rendering::VisualPtr cloneVis = _from->GetChild(i)->Clone(
+          newVisName, _to);
+    }
+    // Create a new visual if it has children
+    else
+    {
+      rendering::VisualPtr newVis(new rendering::Visual(newVisName, _to));
+      newVis->Load();
+      newVis->SetPose(_from->GetChild(i)->GetPose());
+
+      this->CloneChildren(_from->GetChild(i), newVis);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 double ModelData::GetEditTransparency()
 {
   return 0.4;

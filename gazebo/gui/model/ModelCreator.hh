@@ -48,6 +48,7 @@ namespace gazebo
 
   namespace gui
   {
+    class NestedModelData;
     class LinkData;
     class ModelPluginData;
     class SaveDialog;
@@ -238,6 +239,11 @@ namespace gazebo
       /// \return SDF element describing the link.
       private: sdf::ElementPtr GenerateLinkSDF(LinkData *_link);
 
+      /// \brief Internal helper function to remove a nestedModel without
+      /// removing the joints.
+      /// \param[in] _nestedModelName Name of the nestedModel to remove
+      private: void RemoveNestedModelImpl(const std::string &_nestedModelName);
+
       /// \brief Internal helper function to remove a link without removing
       /// the joints.
       /// \param[in] _linkName Name of the link to remove
@@ -311,10 +317,13 @@ namespace gazebo
       /// \return Cloned link.
       private: LinkData *CloneLink(const std::string &_linkName);
 
-      /// \brief Create a link from an SDF.
-      /// \param[in] _link SDF element of the link that will be used to
+      /// \brief Create a link from an SDF with the specified parent visual.
+      /// \param[in] _linkElem SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
-      private: void CreateLinkFromSDF(sdf::ElementPtr _linkElem);
+      /// \param[in] _parentVis Parent visual that the link will be attached to.
+      /// return Data describing this link.
+      private: LinkData *CreateLinkFromSDF(sdf::ElementPtr _linkElem,
+          rendering::VisualPtr _parentVis);
 
       /// \brief Open the link inspector.
       /// \param[in] _name Name of link.
@@ -337,7 +346,10 @@ namespace gazebo
       /// \brief Load a model SDF file and create visuals in the model editor.
       /// This is used mainly when editing existing models.
       /// \param[in] _sdf SDF of a model to be loaded
-      private: void LoadSDF(sdf::ElementPtr _sdf);
+      /// \return Data describing the model.
+      private: NestedModelData *CreateModelFromSDF(sdf::ElementPtr _sdf,
+          rendering::VisualPtr _parentVis = NULL,
+          bool _attachedToMouse = false);
 
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
@@ -431,6 +443,12 @@ namespace gazebo
       /// \brief Type of link being added.
       private: LinkType addLinkType;
 
+      /// \brief A map of nested model link names and their visuals.
+      private: std::map<std::string, LinkData *> nestedLinks;
+
+      /// \brief A map of nested model names to and their visuals.
+      private: std::map<std::string, NestedModelData *> allNestedModels;
+
       /// \brief A map of model link names to and their data.
       private: std::map<std::string, LinkData *> allLinks;
 
@@ -500,6 +518,9 @@ namespace gazebo
       /// \brief A map of all visuals of the model to be edited to their
       /// visibility.
       private: std::map<uint32_t, bool> serverModelVisible;
+
+      /// \brief Name of the canonical model
+      private: std::string canonicalModel;
 
       /// \brief Name of the canonical link in the model
       private: std::string canonicalLink;

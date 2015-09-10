@@ -81,6 +81,13 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
+      /// \brief Callback when a nested model is selected.
+      /// \param[in] _name Name of nested model.
+      /// \param[in] _selected True if the nested model is selected, false if
+      /// deselected.
+      private: void OnSetSelectedNestedModel(const std::string &_name,
+          bool _selected);
+
       /// \brief Callback when a link is selected.
       /// \param[in] _name Name of link.
       /// \param[in] _selected True if the link is selected, false if
@@ -142,6 +149,10 @@ namespace gazebo
       ///  receives.
       private slots: void OnCustomContextMenu(const QPoint &_pt);
 
+      /// \brief Add a nested model to the tree.
+      /// \param[in] _nestedModelName Scoped nested model name.
+      private: void OnNestedModelInserted(const std::string &_nestedModelName);
+
       /// \brief Add a link to the tree.
       /// \param[in] _linkName Scoped link name.
       private: void OnLinkInserted(const std::string &_linkName);
@@ -158,6 +169,10 @@ namespace gazebo
       /// \brief Add a model plugin to the tree.
       /// \param[in] _modelPluginName Model plugin name.
       private: void OnModelPluginInserted(const std::string &_modelPluginName);
+
+      /// \brief Remove a nested model from the tree.
+      /// \param[in] _linkId Unique nested model identifying name.
+      private: void OnNestedModelRemoved(const std::string &_nestedModelId);
 
       /// \brief Remove a link from the tree.
       /// \param[in] _linkId Unique link identifying name.
@@ -216,6 +231,9 @@ namespace gazebo
 
       /// \brief The tree holding all links and joints.
       private: QTreeWidget *modelTreeWidget;
+
+      /// \brief Parent item for all nested models.
+      private: QTreeWidgetItem *nestedModelsItem;
 
       /// \brief Parent item for all links.
       private: QTreeWidgetItem *linksItem;

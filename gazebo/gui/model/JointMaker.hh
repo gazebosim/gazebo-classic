@@ -135,6 +135,10 @@ namespace gazebo
       public: std::vector<JointData *> GetJointDataByLink(
           const std::string &_linkName) const;
 
+      /// \brief Set the name of the model this joint will be attached to.
+      /// \param[in] _modelName Model name.
+      public: void SetModelName(const std::string &_modelName);
+
       /// \brief Generate SDF for all joints.
       public: void GenerateSDF();
 
@@ -288,9 +292,6 @@ namespace gazebo
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
 
-      /// \brief Visual that is previously hovered over by the mouse
-      private: rendering::VisualPtr prevHoverVis;
-
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
@@ -333,6 +334,9 @@ namespace gazebo
       /// \brief A map of joint type to its corresponding material.
       private: static std::map<JointMaker::JointType, std::string>
           jointMaterials;
+
+      /// \brief Name of the model the joints are attached to.
+      private: std::string modelName;
     };
     /// \}
 
