@@ -293,10 +293,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       boost::bind(&ModelEditorPalette::OnModelPluginInserted, this, _1)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectNestedModelRemoved(
-      boost::bind(&ModelEditorPalette::OnNestedModelRemoved, this, _1)));
-
-  this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
       boost::bind(&ModelEditorPalette::OnLinkRemoved, this, _1)));
 
@@ -724,26 +720,6 @@ void ModelEditorPalette::OnModelPluginInserted(
   this->modelTreeWidget->addTopLevelItem(newModelPluginItem);
 
   this->modelPluginsItem->setExpanded(true);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnNestedModelRemoved(const std::string &_nestedModelId)
-{
-  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
-  for (int i = 0; i < this->nestedModelsItem->childCount(); ++i)
-  {
-    QTreeWidgetItem *item = this->nestedModelsItem->child(i);
-    if (!item)
-      continue;
-    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
-
-    if (listData == _nestedModelId)
-    {
-      this->nestedModelsItem->takeChild(
-          this->nestedModelsItem->indexOfChild(item));
-      break;
-    }
-  }
 }
 
 /////////////////////////////////////////////////

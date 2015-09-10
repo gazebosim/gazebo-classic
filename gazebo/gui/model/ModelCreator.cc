@@ -184,9 +184,6 @@ ModelCreator::~ModelCreator()
   while (!this->nestedLinks.empty())
     this->RemoveLinkImpl(this->nestedLinks.begin()->first);
 
-  while (!this->allNestedModels.empty())
-    this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
-
   this->nestedLinks.clear();
   this->allNestedModels.clear();
   this->allLinks.clear();
@@ -1112,68 +1109,6 @@ LinkData *ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
-{
-  if (!this->previewVisual)
-  {
-    this->Reset();
-    return;
-  }
-
-  NestedModelData *modelData = NULL;
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    if (this->allNestedModels.find(_nestedModelName) ==
-        this->allNestedModels.end())
-    {
-      return;
-    }
-    modelData = this->allNestedModels[_nestedModelName];
-  }
-
-  if (!modelData)
-    return;
-
-  // Copy before reference is deleted.
-  std::string nestedModelName(_nestedModelName);
-
-
-  // remove all its models
-  for (auto &modelIt : modelData->models)
-    this->RemoveNestedModelImpl(modelIt.first);
-
-  // remove all its links and joints
-  for (auto &linkIt : modelData->links)
-  {
-    // if it's a link
-    if (this->nestedLinks.find(linkIt.first) != this->nestedLinks.end())
-    {
-      if (this->jointMaker)
-      {
-        this->jointMaker->RemoveJointsByLink(linkIt.first);
-      }
-      this->RemoveLinkImpl(linkIt.first);
-    }
-  }
-
-  rendering::ScenePtr scene = modelData->modelVisual->GetScene();
-  if (scene)
-  {
-    scene->RemoveVisual(modelData->modelVisual);
-  }
-
-  modelData->modelVisual.reset();
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allNestedModels.erase(_nestedModelName);
-    delete modelData;
-  }
-  gui::model::Events::nestedModelRemoved(nestedModelName);
-
-  this->ModelChanged();
-}
-
-/////////////////////////////////////////////////
 void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 {
   if (!this->previewVisual)
@@ -1262,8 +1197,6 @@ void ModelCreator::Reset()
     this->RemoveLinkImpl(this->allLinks.begin()->first);
   this->allLinks.clear();
 
-  while (!this->allNestedModels.empty())
-    this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
   this->allNestedModels.clear();
 
   this->allModelPlugins.clear();
@@ -1562,11 +1495,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     if (!topLevelVis)
       return false;
 
-    // Is link / nested model
+    // Is link
     if (this->allLinks.find(topLevelVis->GetName()) !=
-        this->allLinks.end() ||
-        this->allNestedModels.find(topLevelVis->GetName()) !=
-        this->allNestedModels.end())
+        this->allLinks.end())
     {
       // Handle snap from GLWidget
       if (g_snapAct->isChecked())
@@ -1590,13 +1521,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // Multi-selection mode
       else
       {
-        auto itLink = std::find(this->selectedLinks.begin(),
+        auto it = std::find(this->selectedLinks.begin(),
             this->selectedLinks.end(), topLevelVis);
-   //     auto itNestedModel = std::find(this->selectedNestedModels.begin(),
-     //       this->selectedNestedModels.end(), topLevelVis);
         // Highlight and select clicked link if not already selected
-        if (itLink == this->selectedLinks.end())// &&
-        //    itNestedModel == this->selectedNestedModels.end())
+        if (it == this->selectedLinks.end())
         {
           this->SetSelected(topLevelVis, true);
         }
@@ -1683,15 +1611,13 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
     if (vis && !vis->IsPlane())
     {
       rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
-
       if (!topLevelVis)
         return false;
 
       // Main window models always handled here
+      // Not possible to interact with nested models for now
       if (this->allLinks.find(topLevelVis->GetName()) ==
-          this->allLinks.end() &&
-          this->allNestedModels.find(topLevelVis->GetName()) ==
-          this->allNestedModels.end())
+          this->allLinks.end())
       {
         // Prevent highlighting for snapping
         if (this->manipMode == "snap" || this->manipMode == "select" ||
@@ -1950,7 +1876,6 @@ void ModelCreator::GenerateSDF()
     if (canonical != this->allNestedModels.end())
     {
       NestedModelData *nestedModelData = canonical->second;
-     // this->UpdateNestedModelSDF(nestedModelData->modelSDF);
       modelElem->InsertElement(nestedModelData->modelSDF);
     }
   }
@@ -1965,7 +1890,6 @@ void ModelCreator::GenerateSDF()
       continue;
 
     NestedModelData *nestedModelData = nestedModelsIt.second;
-   // this->UpdateNestedModelSDF(nestedModelData->modelSDF);
     modelElem->InsertElement(nestedModelData->modelSDF);
   }
 

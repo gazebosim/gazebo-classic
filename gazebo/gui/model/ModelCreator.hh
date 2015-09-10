@@ -239,11 +239,6 @@ namespace gazebo
       /// \return SDF element describing the link.
       private: sdf::ElementPtr GenerateLinkSDF(LinkData *_link);
 
-      /// \brief Internal helper function to remove a nestedModel without
-      /// removing the joints.
-      /// \param[in] _nestedModelName Name of the nestedModel to remove
-      private: void RemoveNestedModelImpl(const std::string &_nestedModelName);
-
       /// \brief Internal helper function to remove a link without removing
       /// the joints.
       /// \param[in] _linkName Name of the link to remove

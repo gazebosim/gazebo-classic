@@ -34,7 +34,6 @@ event::EventT<void (std::string)> model::Events::saveModel;
 event::EventT<void ()> model::Events::newModel;
 
 event::EventT<void (std::string)> model::Events::nestedModelInserted;
-event::EventT<void (std::string)> model::Events::nestedModelRemoved;
 event::EventT<void (std::string)> model::Events::linkInserted;
 event::EventT<void (std::string)> model::Events::linkRemoved;
 event::EventT<void (std::string, std::string, std::string, std::string,

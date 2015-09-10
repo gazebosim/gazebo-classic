@@ -163,10 +163,6 @@ namespace gazebo
       /// \param[in] _modelPluginName Model plugin name.
       private: void OnModelPluginInserted(const std::string &_modelPluginName);
 
-      /// \brief Remove a nested model from the tree.
-      /// \param[in] _linkId Unique nested model identifying name.
-      private: void OnNestedModelRemoved(const std::string &_nestedModelId);
-
       /// \brief Remove a link from the tree.
       /// \param[in] _linkId Unique link identifying name.
       private: void OnLinkRemoved(const std::string &_linkId);
