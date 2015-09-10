@@ -58,6 +58,9 @@ namespace gazebo
       /// \brief Widget's key value.
       public: std::string key;
 
+      /// \brief Widget's scoped name within parent config widget.
+      public: std::string scopedName;
+
       /// \brief List of widgets holding values, such as Spins and LineEdits.
       public: std::vector<QWidget *> widgets;
 
@@ -642,7 +645,7 @@ namespace gazebo
       /// \brief Callback when a string config widget's value has changed.
       private slots: void OnStringValueChanged();
 
-      /// \brief Callback when a vector 3 config widget's value has changed.
+      /// \brief Callback when a vector3 config widget's value has changed.
       private slots: void OnVector3dValueChanged();
 
       /// \brief Callback when a color config widget's value has changed.
@@ -679,6 +682,8 @@ namespace gazebo
           const bool _value);
 
       /// \brief Signal that a string config widget's value has changed.
+      /// Note that only single line widgets will emit signals, so plain
+      /// text widgets don't emit signals.
       /// \param[in] _name Scoped name of widget.
       /// \param[in] _value New string.
       Q_SIGNALS: void StringValueChanged(const QString &_name,
