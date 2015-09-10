@@ -133,15 +133,15 @@ double FrictionPyramid::PoissonsRatio() const
 //////////////////////////////////////////////////
 void FrictionPyramid::SetPoissonsRatio(double _ratio)
 {
-  if (_ratio <= -1.0)
+  if (_ratio < -1.0)
   {
-    this->poissonsRatio = -0.99;
+    this->poissonsRatio = -1.00;
     gzwarn << "Poisson's ratio out of bounds [" << _ratio
            << "] default to [" << this->poissonsRatio << "]\n";
   }
-  else if (_ratio >= 0.5)
+  else if (_ratio > 0.5)
   {
-    this->poissonsRatio = 0.4999;
+    this->poissonsRatio = 0.5;
     gzwarn << "Poisson's ratio out of bounds [" << _ratio
            << "] default to [" << this->poissonsRatio << "]\n";
   }

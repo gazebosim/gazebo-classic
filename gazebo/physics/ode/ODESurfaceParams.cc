@@ -135,6 +135,9 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
           contactElem->Get<double>("poissons_ratio"));
         this->frictionPyramid->SetElasticModulus(
           contactElem->Get<double>("elastic_modulus"));
+        // gzerr << "poisson: [" << this->frictionPyramid->PoissonsRatio()
+        //       << "] em: [" << this->frictionPyramid->ElasticModulus()
+        //       << "] \n";
       }
     }
   }
