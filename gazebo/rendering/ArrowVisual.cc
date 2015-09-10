@@ -42,11 +42,6 @@ ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
-ArrowVisual::~ArrowVisual()
-{
-}
-
-/////////////////////////////////////////////////
 void ArrowVisual::Load()
 {
   Visual::Load();
@@ -102,11 +97,7 @@ void ArrowVisual::ShowShaft(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  dPtr->sceneNode->removeChild(dPtr->shaftNode);
-  if (_show)
-  {
-    dPtr->sceneNode->addChild(dPtr->shaftNode);
-  }
+  dPtr->shaftNode->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -115,11 +106,7 @@ void ArrowVisual::ShowHead(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  dPtr->sceneNode->removeChild(dPtr->headNode);
-  if (_show)
-  {
-    dPtr->sceneNode->addChild(dPtr->headNode);
-  }
+  dPtr->headNode->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -128,17 +115,5 @@ void ArrowVisual::ShowRotation(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  dPtr->sceneNode->removeChild(dPtr->rotationNode);
-  if (_show)
-  {
-    Ogre::MovableObject *rotationObj = dPtr->rotationNode->getAttachedObject(0);
-    if (rotationObj)
-    {
-      rotationObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
-      dynamic_cast<Ogre::Entity *>(rotationObj)->setMaterialName(
-          this->GetMaterialName());
-    }
-    dPtr->rotationNode->setVisible(this->GetVisible());
-    dPtr->sceneNode->addChild(dPtr->rotationNode);
-  }
+  dPtr->rotationNode->setVisible(_show);
 }

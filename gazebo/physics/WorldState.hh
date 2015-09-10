@@ -111,6 +111,10 @@ namespace gazebo
 
       public: void SetInsertions(const std::vector<std::string> &_insertions);
 
+      public: const std::vector<std::string> &GetDeletions() const;
+
+      public: void SetDeletions(const std::vector<std::string> &_deletions);
+
       /// \brief Return true if the values in the state are zero.
       ///
       /// This will check to see if the all model states are zero.

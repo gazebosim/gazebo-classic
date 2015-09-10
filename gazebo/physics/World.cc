@@ -125,6 +125,7 @@ World::World(const std::string &_name)
   this->dataPtr->logThread = NULL;
   this->dataPtr->stop = false;
   this->dataPtr->seekPending = false;
+  this->dataPtr->stepCounter = 0;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
@@ -500,6 +501,8 @@ void World::LogStep()
 
   if (this->dataPtr->stepInc < 0)
   {
+    this->dataPtr->stepInc += this->dataPtr->stepCounter;
+
     // Step back: This is implemented by going to the beginning of the log file,
     // and then, step forward up to the target frame.
     // ToDo: Use keyframes in the log file to speed up this process.
@@ -510,21 +513,9 @@ void World::LogStep()
       return;
     }
 
-    this->dataPtr->stepInc = this->dataPtr->iterations + this->dataPtr->stepInc;
-
-    // For some reason, the first two chunks contains the same <iterations>
-    // value. If the log file contains <iterations> we will load the same
-    // iterations value twice and this will affect the way we're stepping back.
-    // ToDo: Fix the source of the problem for avoiding this extra step.
-    if (util::LogPlay::Instance()->HasIterations())
-    {
-      this->dataPtr->stepInc +=
-        2 - util::LogPlay::Instance()->GetInitialIterations();
-    }
-
-    if (this->dataPtr->stepInc < 1)
-      this->dataPtr->stepInc = 1;
+    this->dataPtr->stepCounter = 0;
     this->dataPtr->iterations = 0;
+    this->dataPtr->stepInc = std::max(1, this->dataPtr->stepInc);
   }
 
   {
@@ -555,6 +546,8 @@ void World::LogStep()
     }
     else
     {
+      this->dataPtr->stepCounter++;
+
       this->dataPtr->logPlayStateSDF->ClearElements();
       sdf::readString(data, this->dataPtr->logPlayStateSDF);
 
@@ -582,9 +575,6 @@ void World::LogStep()
           {
             ModelPtr model = this->LoadModel(modelElem,
                 this->dataPtr->rootElement);
-
-            model->GetSDF()->ToString("");
-
             model->Init();
 
             // Disabling plugins on playback
@@ -596,19 +586,19 @@ void World::LogStep()
       }
 
       // Process deletions
-      //if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
-      //{
-      //  sdf::ElementPtr nameElem =
-      //    this->dataPtr->logPlayStateSDF->GetElement(
-      //        "deletions")->GetElement("name");
-//
-      //  while (nameElem)
-      //  {
-      //    transport::requestNoReply(this->GetName(), "entity_delete",
-      //                              nameElem->Get<std::string>());
-      //    nameElem = nameElem->GetNextElement("name");
-      //  }
-      //}
+      if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
+      {
+        sdf::ElementPtr nameElem =
+          this->dataPtr->logPlayStateSDF->GetElement(
+              "deletions")->GetElement("name");
+
+        while (nameElem)
+        {
+          transport::requestNoReply(this->GetName(), "entity_delete",
+                                    nameElem->Get<std::string>());
+          nameElem = nameElem->GetNextElement("name");
+        }
+      }
 
       this->SetState(this->dataPtr->logPlayState);
       this->Update();
@@ -1293,7 +1283,10 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   {
     this->dataPtr->targetSimTime = msgs::Convert(_data->seek());
     if (this->GetSimTime() > this->dataPtr->targetSimTime)
+    {
       util::LogPlay::Instance()->Rewind();
+      this->dataPtr->stepCounter = 0;
+    }
     this->dataPtr->seekPending = true;
   }
 
@@ -1301,6 +1294,7 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   {
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = 1;
+    this->dataPtr->stepCounter = 0;
     if (!util::LogPlay::Instance()->HasIterations())
       this->dataPtr->iterations = 0;
   }
@@ -1309,7 +1303,10 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   {
     this->dataPtr->targetSimTime = util::LogPlay::Instance()->GetLogEndTime();
     if (this->GetSimTime() > this->dataPtr->targetSimTime)
+    {
       util::LogPlay::Instance()->Rewind();
+      this->dataPtr->stepCounter = 0;
+    }
     this->dataPtr->seekPending = true;
   }
 }
@@ -1875,12 +1872,6 @@ void World::SetState(const WorldState &_state)
     else
       gzerr << "Unable to find model[" << modelState.second.GetName() << "]\n";
   }
-
-  for (auto &model : this->GetModels())
-  {
-    if (modelStates.find(model->GetName()) == modelStates.end())
-      this->RemoveModel(model);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -2165,11 +2156,11 @@ void World::LogWorker()
 
         auto insertions = diffState.GetInsertions();
         this->dataPtr->prevStates[currState].SetInsertions(insertions);
+        auto deletions = diffState.GetDeletions();
+        this->dataPtr->prevStates[currState].SetDeletions(deletions);
 
         this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
             this->dataPtr->prevStates[currState]);
-
-        std::cout << this->dataPtr->prevStates[currState] << std::endl;
 
         // Tell the logger to update, once the number of states exceeds 1000
         if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >

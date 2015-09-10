@@ -173,42 +173,39 @@ void LogPlay::ReadHeader()
 /////////////////////////////////////////////////
 void LogPlay::ReadLogTimes()
 {
-  if (this->GetChunkCount() < 2u)
-  {
-    gzwarn << "Unable to extract log timing information. No chunks available "
-           << "with <sim_time> information." << std::endl;
-    return;
-  }
-
   const std::string kStartDelim = "<sim_time>";
   const std::string kEndDelim = "</sim_time>";
   std::string chunk;
+  bool found = false;
 
-  // Read the start time of the log from the first chunk.
-  this->GetChunk(1, chunk);
+  // Try to read the start time of the log.
+  unsigned int chunksToTry = 2;
+  for (unsigned int i = 0; i < chunksToTry; ++i)
+  {
+    this->GetChunk(i, chunk);
 
-  // Find the first <sim_time> of the log.
-  auto from = chunk.find(kStartDelim);
-  auto to = chunk.find(kEndDelim, from + kStartDelim.size());
-  if (from != std::string::npos && to != std::string::npos)
-  {
-    auto length = to - from - kStartDelim.size();
-    std::string startTime = chunk.substr(from + kStartDelim.size(), length);
-    std::stringstream ss(startTime);
-    ss >> this->logStartTime;
+    // Find the first <sim_time> of the log.
+    auto from = chunk.find(kStartDelim);
+    auto to = chunk.find(kEndDelim, from + kStartDelim.size());
+    if (from != std::string::npos && to != std::string::npos)
+    {
+      auto length = to - from - kStartDelim.size();
+      std::string startTime = chunk.substr(from + kStartDelim.size(), length);
+      std::stringstream ss(startTime);
+      ss >> this->logStartTime;
+      found = true;
+      break;
+    }
   }
-  else
-  {
-    gzwarn << "Unable to find <sim_time>...</sim_time> tags in the first chunk."
-           << std::endl;
-    return;
-  }
+
+  if (!found)
+    gzwarn << "Unable to find <sim_time> tags in any chunk." << std::endl;
 
   this->GetChunk(this->GetChunkCount() - 1, chunk);
 
   // Update the last <sim_time> of the log.
-  to = chunk.rfind(kEndDelim);
-  from = chunk.rfind(kStartDelim, to - 1);
+  auto to = chunk.rfind(kEndDelim);
+  auto from = chunk.rfind(kStartDelim, to - 1);
 
   if (from != std::string::npos && to != std::string::npos)
   {
@@ -228,39 +225,32 @@ void LogPlay::ReadLogTimes()
 /////////////////////////////////////////////////
 bool LogPlay::ReadIterations()
 {
-  if (this->GetChunkCount() < 2u)
-  {
-    gzwarn << "Unable to extract iteration information. No chunks available "
-           << "with <iterations> information. Assuming that the first "
-           << "<iterations> value is 0." << std::endl;
-    return false;
-  }
-
   const std::string kStartDelim = "<iterations>";
   const std::string kEndDelim = "</iterations>";
   std::string chunk;
 
   // Read the first "iterations" value of the log from the first chunk.
-  this->GetChunk(1, chunk);
+  for (unsigned int i = 0; i < this->GetChunkCount(); ++i)
+  {
+    this->GetChunk(i, chunk);
 
-  // Find the first <iterations> of the log.
-  auto from = chunk.find(kStartDelim);
-  auto to = chunk.find(kEndDelim, from + kStartDelim.size());
-  if (from != std::string::npos && to != std::string::npos)
-  {
-    auto length = to - from - kStartDelim.size();
-    std::string iterations = chunk.substr(from + kStartDelim.size(), length);
-    std::stringstream ss(iterations);
-    ss >> this->initialIterations;
-    return true;
+    // Find the first <iterations> of the log.
+    auto from = chunk.find(kStartDelim);
+    auto to = chunk.find(kEndDelim, from + kStartDelim.size());
+    if (from != std::string::npos && to != std::string::npos)
+    {
+      auto length = to - from - kStartDelim.size();
+      std::string iterations = chunk.substr(from + kStartDelim.size(), length);
+      std::stringstream ss(iterations);
+      ss >> this->initialIterations;
+      return true;
+    }
   }
-  else
-  {
-    gzwarn << "Unable to find <iterations>...</iterations> tags in the first "
-           << "chunk. Assuming that the first <iterations> value is 0."
-           << std::endl;
-    return false;
-  }
+
+  gzwarn << "Unable to find <iterations>...</iterations> tags in the first "
+         << "chunk. Assuming that the first <iterations> value is 0."
+         << std::endl;
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -334,17 +324,23 @@ bool LogPlay::Step(std::string &_data)
     this->currentChunk.clear();
 
     if (this->logCurrXml == this->logStartXml)
+    {
       this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+    }
     else if (this->logCurrXml)
     {
       this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
     }
     else
+    {
       return false;
+    }
 
     // Stop if there are no more chunks
     if (!this->logCurrXml)
+    {
       return false;
+    }
 
     if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
     {
@@ -369,7 +365,19 @@ bool LogPlay::Rewind()
   std::lock_guard<std::mutex> lock(this->mutex);
 
   this->currentChunk.clear();
+  this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
   this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+
+  // Skip first <sdf> block (it doesn't have a world state).
+  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+  {
+    gzerr << "Unable to decode log file\n";
+    return false;
+  }
+  std::string endMarker = "</sdf>";
+  size_t end = this->currentChunk.find(endMarker);
+  this->currentChunk.erase(0, end + endMarker.size());
+
   if (!logCurrXml)
   {
     gzerr << "Unable to jump to the beginning of the log file\n";

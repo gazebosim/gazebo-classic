@@ -202,6 +202,19 @@ void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
 }
 
 /////////////////////////////////////////////////
+const std::vector<std::string> &WorldState::GetDeletions() const
+{
+  return this->deletions;
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetDeletions(const std::vector<std::string> &_deletions)
+{
+  this->deletions = _deletions;
+}
+
+
+/////////////////////////////////////////////////
 bool WorldState::IsZero() const
 {
   bool result = this->insertions.size() == 0 && this->deletions.size() == 0;

@@ -593,7 +593,11 @@ namespace gazebo
 
     /// \brief Remove a model by name.
     /// \param[in] _name Name of the model to remove.
-    protected: void RemoveModel(const std::string &_name);
+    /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
+    /// \param[in] _retries Number of iterations until give up
+    protected: void RemoveModel(const std::string &_name,
+                   unsigned int _sleepEach = 1000,
+                   int _retries = 10);
 
     /// \brief Remove a plugin.
     /// \param[in] _name Name of the plugin to remove.
