@@ -101,10 +101,10 @@ void ModelEditor_TEST::OnEdit()
   // verify simulation is not paused
   QVERIFY(!mainWindow->IsPaused());
 
-  // swtich to editor mode
+  // switch to editor mode
   gui::g_editModelAct->toggle();
 
-  // wait the the gui paused state to update
+  // wait for the gui paused state to update
   int maxSleep = 50;
   int sleep = 0;
   while (!mainWindow->IsPaused() && sleep < maxSleep)
@@ -138,7 +138,7 @@ void ModelEditor_TEST::OnEdit()
   // run the simulation
   mainWindow->Play();
 
-  // wait the the gui paused state to update
+  // wait for the gui paused state to update
   maxSleep = 50;
   sleep = 0;
   while (mainWindow->IsPaused() && sleep < maxSleep)
