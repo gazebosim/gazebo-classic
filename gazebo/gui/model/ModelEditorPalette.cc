@@ -501,9 +501,7 @@ void ModelEditorPalette::OnItemSelectionChanged()
     std::string name = item->data(0, Qt::UserRole).toString().toStdString();
     std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
-    if (type == "Nested Model")
-      gui::model::Events::setSelectedNestedModel(name, true);
-    else if (type == "Link")
+    if (type == "Link")
       gui::model::Events::setSelectedLink(name, true);
     else if (type == "Joint")
       gui::model::Events::setSelectedJoint(name, true);
@@ -517,9 +515,7 @@ void ModelEditorPalette::OnItemSelectionChanged()
       std::string name = item->data(0, Qt::UserRole).toString().toStdString();
       std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
-      if (type == "Nested Model")
-        gui::model::Events::setSelectedNestedModel(name, false);
-      else if (type == "Link")
+      if (type == "Link")
         gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
@@ -619,9 +615,7 @@ void ModelEditorPalette::DeselectType(const std::string &_type)
     {
       (*it)->setSelected(false);
       it = this->selected.erase(it);
-      if (type == "Nested Model")
-        gui::model::Events::setSelectedNestedModel(name, false);
-      else if (type == "Link")
+      if (type == "Link")
         gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
@@ -819,26 +813,6 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
     if (listData == _jointId)
     {
       item->setText(0, QString::fromStdString(_newJointName));
-      break;
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnSetSelectedNestedModel(const std::string &_name,
-    bool _selected)
-{
-  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
-  for (int i = 0; i < this->nestedModelsItem->childCount(); ++i)
-  {
-    QTreeWidgetItem *item = this->nestedModelsItem->child(i);
-    if (!item)
-      continue;
-    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
-
-    if (listData == _name)
-    {
-      item->setSelected(_selected);
       break;
     }
   }

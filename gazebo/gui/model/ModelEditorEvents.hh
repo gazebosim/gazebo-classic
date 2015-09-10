@@ -343,19 +343,6 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { showJointContextMenu.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the set selected nested model signal.
-        /// \param[in] _subscriber the subscriber to this event
-        /// \return a connection
-        public: template<typename T> static event::ConnectionPtr
-            ConnectSetSelectedNestedModel(T _subscriber)
-          { return setSelectedNestedModel.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the set selected nested model         /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSetSelectedNestedModel(
-            event::ConnectionPtr _subscriber)
-          { setSelectedNestedModel.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the set selected link signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -477,10 +464,6 @@ namespace gazebo
 
         /// \brief Request to show the joint context menu.
         public: static event::EventT<void (std::string)> showJointContextMenu;
-
-        /// \brief Request to select or deselect a nested model.
-        public: static event::EventT<void (std::string, bool)>
-            setSelectedNestedModel;
 
         /// \brief Request to select or deselect a link.
         public: static event::EventT<void (std::string, bool)> setSelectedLink;

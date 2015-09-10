@@ -48,7 +48,6 @@ event::EventT<void (std::string)> model::Events::openModelPluginInspector;
 event::EventT<void (std::string, std::string)> model::Events::jointNameChanged;
 event::EventT<void (std::string)> model::Events::showLinkContextMenu;
 event::EventT<void (std::string)> model::Events::showJointContextMenu;
-event::EventT<void (std::string, bool)> model::Events::setSelectedNestedModel;
 event::EventT<void (std::string, bool)> model::Events::setSelectedLink;
 event::EventT<void (std::string, bool)> model::Events::setSelectedJoint;
 event::EventT<void (std::string)> model::Events::modelPluginInserted;

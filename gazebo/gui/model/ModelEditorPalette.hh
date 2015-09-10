@@ -81,13 +81,6 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
-      /// \brief Callback when a nested model is selected.
-      /// \param[in] _name Name of nested model.
-      /// \param[in] _selected True if the nested model is selected, false if
-      /// deselected.
-      private: void OnSetSelectedNestedModel(const std::string &_name,
-          bool _selected);
-
       /// \brief Callback when a link is selected.
       /// \param[in] _name Name of link.
       /// \param[in] _selected True if the link is selected, false if
