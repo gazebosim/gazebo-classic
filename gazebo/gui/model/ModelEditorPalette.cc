@@ -576,9 +576,7 @@ void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
     std::string name = _item->data(0, Qt::UserRole).toString().toStdString();
     std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
 
-    if (type == "Nested Model")
-      gui::model::Events::openNestedModelInspector(name);
-    else if (type == "Link")
+    if (type == "Link")
       gui::model::Events::openLinkInspector(name);
     else if (type == "Joint")
       gui::model::Events::openJointInspector(name);

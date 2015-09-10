@@ -257,23 +257,6 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointRemoved.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the open nested model inspector
-        /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        /// \return a connection
-        public: template<typename T>
-            static event::ConnectionPtr
-            ConnectOpenNestedModelInspector(T _subscriber)
-          { return openNestedModelInspector.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the open nested model
-        /// inspector
-        /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectOpenNestedModelInspector(
-            event::ConnectionPtr _subscriber)
-          { openNestedModelInspector.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the open link inspector signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -472,10 +455,6 @@ namespace gazebo
         /// child link's name. All names are scoped.
         public: static event::EventT<void (std::string, std::string,
             std::string, std::string, std::string)> jointChanged;
-
-        /// \brief Request to open the nestedModel inspector.
-        public: static event::EventT<void (std::string)>
-            openNestedModelInspector;
 
         /// \brief Request to open the link inspector.
         public: static event::EventT<void (std::string)> openLinkInspector;
