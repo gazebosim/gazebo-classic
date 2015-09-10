@@ -64,6 +64,7 @@ target_link_libraries(gazebo_util
   gazebo_transport
   gazebo_math
   gazebo_msgs
+  tinyxml2
 )
 
 gz_install_library(gazebo_util)

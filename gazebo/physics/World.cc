@@ -499,7 +499,7 @@ void World::LogStep()
 {
   bool stay;
 
-  if (this->dataPtr->stepInc < 0)
+  /*if (this->dataPtr->stepInc < 0)
   {
     this->dataPtr->stepInc += this->dataPtr->stepCounter;
 
@@ -516,7 +516,7 @@ void World::LogStep()
     this->dataPtr->stepCounter = 0;
     this->dataPtr->iterations = 0;
     this->dataPtr->stepInc = std::max(1, this->dataPtr->stepInc);
-  }
+  }*/
 
   {
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
@@ -529,15 +529,16 @@ void World::LogStep()
     //      simulation time.
     //   Note that if the simulation is not paused (play mode) we will enter
     //   the loop. However, the code will only execute one iteration (one step).
-    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
+    stay = !this->IsPaused() || this->dataPtr->stepInc != 0 ||
            this->dataPtr->seekPending;
   }
   while (stay)
   {
+    std::cout << "Step" << std::endl;
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     std::string data;
-    if (!util::LogPlay::Instance()->Step(data))
+    if (!util::LogPlay::Instance()->Step(this->dataPtr->stepInc, data))
     {
       // There are no more chunks, time to exit.
       this->SetPaused(true);
@@ -546,6 +547,7 @@ void World::LogStep()
     }
     else
     {
+      this->dataPtr->stepInc = 1;
       this->dataPtr->stepCounter++;
 
       this->dataPtr->logPlayStateSDF->ClearElements();

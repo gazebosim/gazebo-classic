@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_LOGPLAY_HH_
 #define _GAZEBO_LOGPLAY_HH_
 
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 #include <list>
 #include <mutex>
@@ -103,6 +103,14 @@ namespace gazebo
       /// \param[out] _data Data from next entry in the log file.
       public: bool Step(std::string &_data);
 
+      /// \brief Step through the open log file backwards.
+      /// \param[out] _data Data from next entry in the log file.
+      public: bool StepBackwards(std::string &_data);
+
+      /// \brief Step through the open log file.
+      /// \param[out] _data Data from next entry in the log file.
+      public: bool Step(const int _step, std::string &_data);
+
       /// \brief Jump to the beginning of the log file. The next step() call
       /// will return the first data "chunk".
       /// \return True If the function succeed or false otherwise.
@@ -143,7 +151,8 @@ namespace gazebo
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.
       /// \return True if the chunk was successfully parsed.
-      private: bool GetChunkData(TiXmlElement *_xml, std::string &_data);
+      private: bool GetChunkData(tinyxml2::XMLElement *_xml,
+                                 std::string &_data);
 
       /// \brief Read the header from the log file.
       private: void ReadHeader();
@@ -157,13 +166,13 @@ namespace gazebo
       private: bool ReadIterations();
 
       /// \brief The XML document of the log file.
-      private: TiXmlDocument xmlDoc;
+      private: tinyxml2::XMLDocument xmlDoc;
 
       /// \brief Start of the log.
-      private: TiXmlElement *logStartXml;
+      private: tinyxml2::XMLElement *logStartXml;
 
       /// \brief Current position in the log file.
-      private: TiXmlElement *logCurrXml;
+      private: tinyxml2::XMLElement *logCurrXml;
 
       /// \brief Name of the log file.
       private: std::string filename;
@@ -188,6 +197,10 @@ namespace gazebo
       private: std::string encoding;
 
       private: std::string currentChunk;
+
+      private: size_t start = 0;
+
+      private: size_t end = 0;
 
       /// \brief Initial simulation iteration contained in the log file.
       private: uint64_t initialIterations;

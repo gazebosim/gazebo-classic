@@ -67,7 +67,7 @@ void LogPlay::Open(const std::string &_logFile)
     gzthrow("Invalid logfile [" + _logFile + "]. This is a directory.");
 
   // Parse the log file
-  if (!this->xmlDoc.LoadFile(_logFile))
+  if (this->xmlDoc.LoadFile(_logFile.c_str()) != tinyxml2::XML_NO_ERROR)
     gzthrow("Unable to parse log file[" << _logFile << "]");
 
   // Get the gazebo_log element
@@ -126,7 +126,7 @@ bool LogPlay::HasIterations() const
 void LogPlay::ReadHeader()
 {
   this->randSeed = ignition::math::Rand::Seed();
-  TiXmlElement *headerXml, *childXml;
+  tinyxml2::XMLElement *headerXml, *childXml;
 
   this->logVersion.clear();
   this->gazeboVersion.clear();
@@ -316,20 +316,24 @@ bool LogPlay::Step(std::string &_data)
 
   std::string startMarker = "<sdf ";
   std::string endMarker = "</sdf>";
-  size_t start = this->currentChunk.find(startMarker);
-  size_t end = this->currentChunk.find(endMarker);
+  this->start = this->currentChunk.find(startMarker,
+      this->end + endMarker.size());
+  this->end = this->currentChunk.find(endMarker,
+      this->end + endMarker.size());
 
-  if (start == std::string::npos || end == std::string::npos)
+  if (this->start == std::string::npos || this->end == std::string::npos)
   {
     this->currentChunk.clear();
 
     if (this->logCurrXml == this->logStartXml)
     {
       this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+      std::cout << "First chunk" << std::endl;
     }
     else if (this->logCurrXml)
     {
       this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
+      std::cout << "Next chunk" << std::endl;
     }
     else
     {
@@ -348,13 +352,106 @@ bool LogPlay::Step(std::string &_data)
       return false;
     }
 
-    start = this->currentChunk.find(startMarker);
-    end = this->currentChunk.find(endMarker);
+    this->start = this->currentChunk.find(startMarker);
+    this->end = this->currentChunk.find(endMarker);
   }
 
-  _data = this->currentChunk.substr(start, end+endMarker.size()-start);
+  _data = this->currentChunk.substr(this->start,
+      this->end + endMarker.size() - this->start);
 
-  this->currentChunk.erase(0, end + endMarker.size());
+  //this->currentChunk.erase(0, end + endMarker.size());
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::Step(const int _step, std::string &_data)
+{
+  std::cout << "Step: " << _step << std::endl;
+  for (auto i = 0; i < std::abs(_step); ++i)
+  {
+    if (_step >= 0)
+    {
+      if (!this->Step(_data))
+        return false;
+    }
+    else
+    {
+      if (!this->StepBackwards(_data))
+        return false;
+    }
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::StepBackwards(std::string &_data)
+{
+  std::string startMarker = "<sdf ";
+  std::string endMarker = "</sdf>";
+
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  if (this->start > 0)
+  {
+    auto from = this->currentChunk.rfind(startMarker, this->start - 1);
+    auto to = this->currentChunk.rfind(endMarker, this->start - 1);
+
+    //if (from >= this->start)
+    //{
+    //  std::cout << "Weird!" << std::endl;
+    //  std::cout << "Start: " << this->start << std::endl;
+    //  std::cout << "From: " << from << std::endl;
+    //}
+
+    this->start = from;
+    this->end = to;
+  }
+
+  if (this->start == 0 || this->end == 0)
+  {
+    this->currentChunk.clear();
+
+    if (this->logCurrXml == this->logStartXml)
+    {
+      std::cout << "First" << std::endl;
+      return false;
+    }
+    else if (this->logCurrXml)
+    {
+      std::cout << "Previous" << std::endl;
+      this->logCurrXml = this->logCurrXml->PreviousSiblingElement("chunk");
+    }
+    else
+    {
+      std::cout << "Error" << std::endl;
+      return false;
+    }
+
+    // Stop if there are no more chunks
+    if (!this->logCurrXml)
+    {
+      std::cout << "No chunks" << std::endl;
+      return false;
+    }
+
+    if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+    {
+      gzerr << "Unable to decode log file\n";
+      return false;
+    }
+
+    std::cout << "Changing chunk" << std::endl;
+
+    this->start = this->currentChunk.rfind(startMarker);
+    this->end = this->currentChunk.rfind(endMarker);
+  }
+
+  _data = this->currentChunk.substr(this->start,
+      this->end + endMarker.size() - this->start);
+
+  //this->currentChunk.erase(start, end + endMarker.size());
 
   return true;
 }
@@ -391,7 +488,7 @@ bool LogPlay::Rewind()
 bool LogPlay::GetChunk(unsigned int _index, std::string &_data)
 {
   unsigned int count = 0;
-  TiXmlElement *xml = this->logStartXml->FirstChildElement("chunk");
+  tinyxml2::XMLElement *xml = this->logStartXml->FirstChildElement("chunk");
 
   while (xml && count < _index)
   {
@@ -406,7 +503,7 @@ bool LogPlay::GetChunk(unsigned int _index, std::string &_data)
 }
 
 /////////////////////////////////////////////////
-bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
+bool LogPlay::GetChunkData(tinyxml2::XMLElement *_xml, std::string &_data)
 {
   // Make sure we have valid xml pointer
   if (!_xml)
@@ -480,7 +577,7 @@ std::string LogPlay::GetEncoding() const
 unsigned int LogPlay::GetChunkCount() const
 {
   unsigned int count = 0;
-  TiXmlElement *xml = this->logStartXml->FirstChildElement("chunk");
+  tinyxml2::XMLElement *xml = this->logStartXml->FirstChildElement("chunk");
 
   while (xml)
   {
