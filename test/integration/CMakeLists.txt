@@ -70,6 +70,7 @@ set(tests
   physics_msgs.cc
   physics_presets.cc
   physics_thread_safe.cc
+  physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
   region_events.cc

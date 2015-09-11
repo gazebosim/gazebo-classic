@@ -292,6 +292,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       boost::bind(&ModelEditorPalette::OnJointRemoved, this, _1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectModelPluginRemoved(
+      boost::bind(&ModelEditorPalette::OnModelPluginRemoved, this, _1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectJointNameChanged(
       boost::bind(&ModelEditorPalette::OnJointNameChanged, this, _1, _2)));
 
@@ -492,6 +496,8 @@ void ModelEditorPalette::OnItemSelectionChanged()
       gui::model::Events::setSelectedLink(name, true);
     else if (type == "Joint")
       gui::model::Events::setSelectedJoint(name, true);
+    else if (type == "Model Plugin")
+      gui::model::Events::setSelectedModelPlugin(name, true);
   }
 
   // deselect
@@ -506,6 +512,8 @@ void ModelEditorPalette::OnItemSelectionChanged()
         gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
+    else if (type == "Model Plugin")
+      gui::model::Events::setSelectedModelPlugin(name, false);
     }
   }
 
@@ -606,6 +614,8 @@ void ModelEditorPalette::DeselectType(const std::string &_type)
         gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
+      else if (type == "Model Plugin")
+        gui::model::Events::setSelectedModelPlugin(name, false);
     }
     else
       ++it;
@@ -631,6 +641,8 @@ void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
       gui::model::Events::showLinkContextMenu(name);
     else if (type == "Joint")
       gui::model::Events::showJointContextMenu(name);
+    else if (type == "Model Plugin")
+      gui::model::Events::showModelPluginContextMenu(name);
   }
 }
 

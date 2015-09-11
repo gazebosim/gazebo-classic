@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _BULLETSURFACEPARAMS_HH_
-#define _BULLETSURFACEPARAMS_HH_
+#ifndef _GAZEBO_BULLETSURFACEPARAMS_HH_
+#define _GAZEBO_BULLETSURFACEPARAMS_HH_
 
 #include <sdf/sdf.hh>
 
@@ -52,7 +52,11 @@ namespace gazebo
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
       // Documentation inherited.
-      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
+          GAZEBO_DEPRECATED(7.0);
+
+      // Documentation inherited.
+      public: virtual FrictionPyramidPtr FrictionPyramid() const;
 
       /// \brief Friction pyramid parameters (mu1, mu2).
       // For further documentation, see:
