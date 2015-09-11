@@ -2877,3 +2877,18 @@ bool ConfigWidget::RemoveItemEnumWidget(const std::string &_name,
 
   return true;
 }
+
+/////////////////////////////////////////////////
+void ConfigWidget::InsertLayout(QLayout *_layout, int _pos)
+{
+  QGroupBox *box = qobject_cast<QGroupBox *>(
+      this->layout()->itemAt(0)->widget());
+  if (!box)
+    return;
+
+  QVBoxLayout *boxLayout = qobject_cast<QVBoxLayout *>(box->layout());
+  if (!boxLayout)
+    return;
+
+  boxLayout->insertLayout(_pos, _layout);
+}

@@ -1335,12 +1335,8 @@ void JointMaker::OnLinkInserted(const std::string &_linkName)
 /////////////////////////////////////////////////
 void JointMaker::OnLinkRemoved(const std::string &_linkName)
 {
-  auto it = this->linkList.find(_linkName);
-  if (it != this->linkList.end())
-  {
-    this->linkList.erase(_linkName);
+  if (this->linkList.erase(_linkName))
     this->EmitLinkRemoved(_linkName);
-  }
 }
 
 /////////////////////////////////////////////////
