@@ -166,20 +166,8 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   linksLayout->addWidget(this->childLinkWidget, 1, 0);
   linksLayout->addWidget(swapButton, 0, 1, 2, 1);
 
-  // Add the widgets to the main layout
-  QVBoxLayout *configWidgetLayout = qobject_cast<QVBoxLayout *>(
-      this->configWidget->layout());
-  if (configWidgetLayout)
-  {
-    QGroupBox *widget = qobject_cast<QGroupBox *>(
-        configWidgetLayout->itemAt(0)->widget());
-    if (widget)
-    {
-      QVBoxLayout *widgetLayout = qobject_cast<QVBoxLayout *>(widget->layout());
-      if (widgetLayout)
-        widgetLayout->insertLayout(0, linksLayout);
-    }
-  }
+  // Insert on the top of config widget's layout
+  this->configWidget->InsertLayout(linksLayout, 0);
 
   // Connect all enum value changes, which includes type, parent and child
   QObject::connect(this->configWidget,
@@ -398,7 +386,7 @@ void JointInspector::Open()
   this->configWidget->ClearEnumWidget("parentCombo");
   this->configWidget->ClearEnumWidget("childCombo");
 
-  for (auto link : this->jointMaker->LinkList())
+  for (const auto &link : this->jointMaker->LinkList())
   {
     this->configWidget->AddItemEnumWidget("parentCombo", link.second);
     this->configWidget->AddItemEnumWidget("childCombo", link.second);
