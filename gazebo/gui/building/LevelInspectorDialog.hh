@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class LevelInspectorDialog LevelInspectorDialog.hh
     /// \brief Dialog for configuring a building level
-    class GZ_GUI_BUILDING_VISIBLE LevelInspectorDialog
+    class GZ_GUI_VISIBLE LevelInspectorDialog
       : public BaseInspectorDialog
     {
       Q_OBJECT

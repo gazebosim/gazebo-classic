@@ -9,12 +9,12 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-set (GAZEBO_MAJOR_VERSION 6)
+set (GAZEBO_MAJOR_VERSION 7)
 set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 9)
+set (GAZEBO_PATCH_VERSION 0)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -47,6 +47,10 @@ endif()
 
 # Documentation
 add_subdirectory(doc)
+
+# Configure documentation uploader
+configure_file("${CMAKE_SOURCE_DIR}/cmake/upload_doc.sh.in"
+  ${CMAKE_BINARY_DIR}/upload_doc.sh @ONLY)
 
 # If we're configuring only to build docs, stop here
 if (DOC_ONLY)
@@ -356,9 +360,6 @@ else (build_errors)
   set(PKG_LIBRARIES
     gazebo
     gazebo_client
-    gazebo_gui_building
-    gazebo_gui_viewers
-    gazebo_gui_model
     gazebo_gui
     gazebo_sensors
     gazebo_rendering

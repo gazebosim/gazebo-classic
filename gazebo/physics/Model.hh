@@ -152,6 +152,15 @@ namespace gazebo
       /// \return Get the number of joints.
       public: unsigned int GetJointCount() const;
 
+      /// \brief Get a nested model that is a direct child of this model.
+      /// \param[in] _name Name of the child model to get.
+      /// \return Pointer to the model, NULL if the name is invalid.
+      public: ModelPtr NestedModel(const std::string &_name) const;
+
+      /// \brief Get all the nested models.
+      /// \return a vector of Model's in this model
+      public: const Model_V &NestedModels() const;
+
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model
@@ -348,6 +357,9 @@ namespace gazebo
       /// \brief Load all the links.
       private: void LoadLinks();
 
+      /// \brief Load all the nested models.
+      private: void LoadModels();
+
       /// \brief Load a joint helper function.
       /// \param[in] _sdf SDF parameter.
       private: void LoadJoint(sdf::ElementPtr _sdf);
@@ -382,6 +394,9 @@ namespace gazebo
 
       /// \brief Cached list of links. This is here for performance.
       private: Link_V links;
+
+      /// \brief Cached list of nested models.
+      private: Model_V models;
 
       /// \brief All the grippers in the model.
       private: std::vector<GripperPtr> grippers;
