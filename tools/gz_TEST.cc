@@ -299,7 +299,7 @@ TEST_F(gzTest, Model)
 
     waitForMsg("gz model -w default -m my_box -f " + filename);
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
@@ -322,7 +322,7 @@ TEST_F(gzTest, Model)
     cmd += filename + " | gz model -w default -m my_box -s";
     waitForMsg(cmd);
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
