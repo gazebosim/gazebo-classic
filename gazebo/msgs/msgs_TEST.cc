@@ -1266,7 +1266,9 @@ TEST_F(MsgsTest, CollisionFromSDF_Contact)
             </bounce>\
             <contact>\
               <collide_without_contact>1</collide_without_contact>\
-              <collide_without_contact_bitmask>2</collide_without_contact_bitmask>\
+              <collide_without_contact_bitmask>\
+                2\
+              </collide_without_contact_bitmask>\
               <collide_bitmask>3</collide_bitmask>\
               <ode>\
                 <soft_cfm>0.4</soft_cfm>\
