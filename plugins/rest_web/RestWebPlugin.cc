@@ -66,8 +66,6 @@ RestWebPlugin::RestWebPlugin()
   char s[37];
   uuid_unparse(uuid, s);
   this->session = s;
-#else
-  this->session = common::Time::GetWallTimeAsISOString();
 #endif
 
 #endif
@@ -277,7 +275,6 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 //////////////////////////////////////////////////
 void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 {
-  gzerr << "RestWebPlugin::OnRestLoginRequest" << std::endl;
   boost::mutex::scoped_lock lock(this->requestQMutex);
   this->msgLoginQ.push_back(_msg);
 }
