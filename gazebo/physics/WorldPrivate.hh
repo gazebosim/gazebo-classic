@@ -78,9 +78,6 @@ namespace gazebo
       /// \brief Number of steps in increment by.
       public: int stepInc;
 
-      /// \brief Step counter.
-      public: uint64_t stepCounter;
-
       /// \brief Stores the simulation time target during a 'seek' operation.
       public: common::Time targetSimTime;
 

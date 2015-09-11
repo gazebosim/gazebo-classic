@@ -534,10 +534,13 @@ void World::LogStep()
   }
   while (stay)
   {
-    std::cout << "Step" << std::endl;
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     std::string data;
+
+    if (!this->IsPaused() && this->dataPtr->stepInc == 0)
+      this->dataPtr->stepInc = 1;
+
     if (!util::LogPlay::Instance()->Step(this->dataPtr->stepInc, data))
     {
       // There are no more chunks, time to exit.
@@ -548,7 +551,6 @@ void World::LogStep()
     else
     {
       this->dataPtr->stepInc = 1;
-      this->dataPtr->stepCounter++;
 
       this->dataPtr->logPlayStateSDF->ClearElements();
       sdf::readString(data, this->dataPtr->logPlayStateSDF);
@@ -1287,7 +1289,6 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
     if (this->GetSimTime() > this->dataPtr->targetSimTime)
     {
       util::LogPlay::Instance()->Rewind();
-      this->dataPtr->stepCounter = 0;
     }
     this->dataPtr->seekPending = true;
   }
@@ -1296,20 +1297,16 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   {
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = 1;
-    this->dataPtr->stepCounter = 0;
     if (!util::LogPlay::Instance()->HasIterations())
       this->dataPtr->iterations = 0;
   }
 
   if (_data->has_forward() && _data->forward())
   {
-    this->dataPtr->targetSimTime = util::LogPlay::Instance()->GetLogEndTime();
-    if (this->GetSimTime() > this->dataPtr->targetSimTime)
-    {
-      util::LogPlay::Instance()->Rewind();
-      this->dataPtr->stepCounter = 0;
-    }
-    this->dataPtr->seekPending = true;
+    util::LogPlay::Instance()->Forward();
+    this->dataPtr->stepInc = -1;
+    this->SetPaused(true);
+    // ToDo: Update iterations if the log doesn't have it.
   }
 }
 

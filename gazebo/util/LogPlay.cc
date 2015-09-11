@@ -367,7 +367,6 @@ bool LogPlay::Step(std::string &_data)
 /////////////////////////////////////////////////
 bool LogPlay::Step(const int _step, std::string &_data)
 {
-  std::cout << "Step: " << _step << std::endl;
   for (auto i = 0; i < std::abs(_step); ++i)
   {
     if (_step >= 0)
@@ -398,13 +397,6 @@ bool LogPlay::StepBackwards(std::string &_data)
     auto from = this->currentChunk.rfind(startMarker, this->start - 1);
     auto to = this->currentChunk.rfind(endMarker, this->start - 1);
 
-    //if (from >= this->start)
-    //{
-    //  std::cout << "Weird!" << std::endl;
-    //  std::cout << "Start: " << this->start << std::endl;
-    //  std::cout << "From: " << from << std::endl;
-    //}
-
     this->start = from;
     this->end = to;
   }
@@ -415,24 +407,20 @@ bool LogPlay::StepBackwards(std::string &_data)
 
     if (this->logCurrXml == this->logStartXml)
     {
-      std::cout << "First" << std::endl;
       return false;
     }
     else if (this->logCurrXml)
     {
-      std::cout << "Previous" << std::endl;
       this->logCurrXml = this->logCurrXml->PreviousSiblingElement("chunk");
     }
     else
     {
-      std::cout << "Error" << std::endl;
       return false;
     }
 
     // Stop if there are no more chunks
     if (!this->logCurrXml)
     {
-      std::cout << "No chunks" << std::endl;
       return false;
     }
 
@@ -441,8 +429,6 @@ bool LogPlay::StepBackwards(std::string &_data)
       gzerr << "Unable to decode log file\n";
       return false;
     }
-
-    std::cout << "Changing chunk" << std::endl;
 
     this->start = this->currentChunk.rfind(startMarker);
     this->end = this->currentChunk.rfind(endMarker);
@@ -462,8 +448,14 @@ bool LogPlay::Rewind()
   std::lock_guard<std::mutex> lock(this->mutex);
 
   this->currentChunk.clear();
-  this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
+  //this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
   this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+
+  if (!logCurrXml)
+  {
+    gzerr << "Unable to jump to the beginning of the log file\n";
+    return false;
+  }
 
   // Skip first <sdf> block (it doesn't have a world state).
   if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
@@ -472,14 +464,33 @@ bool LogPlay::Rewind()
     return false;
   }
   std::string endMarker = "</sdf>";
-  size_t end = this->currentChunk.find(endMarker);
-  this->currentChunk.erase(0, end + endMarker.size());
+  this->start = 0;
+  this->end = this->currentChunk.find(endMarker);
 
-  if (!logCurrXml)
+  // Remove the special first <sdf> block.
+  this->currentChunk.erase(0, this->end + endMarker.size());
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::Forward()
+{
+  std::string startMarker = "<sdf ";
+  std::string endMarker = "</sdf>";
+
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  // Get the last chunk.
+  this->logCurrXml = this->logStartXml->LastChildElement("chunk");
+  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
   {
-    gzerr << "Unable to jump to the beginning of the log file\n";
+    gzerr << "Unable to decode log file\n";
     return false;
   }
+
+  this->start = this->currentChunk.size() - 1;
+  this->end = this->currentChunk.size() - 1;
 
   return true;
 }
