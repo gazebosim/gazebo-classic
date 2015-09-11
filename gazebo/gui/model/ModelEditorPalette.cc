@@ -309,7 +309,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedModelPlugin(
-       boost::bind(&ModelEditorPalette::OnSetSelectedModelPlugin, this, _1, _2)));
+     boost::bind(&ModelEditorPalette::OnSetSelectedModelPlugin, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
