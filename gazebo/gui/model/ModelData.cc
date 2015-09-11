@@ -524,7 +524,8 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
 }
 
 /////////////////////////////////////////////////
-void LinkData::AddCollision(rendering::VisualPtr _collisionVis)
+void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
+    const msgs::Collision *_msg)
 {
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
@@ -539,6 +540,9 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis)
     leafName = visName.substr(idx+1);
 
   msgs::Collision collisionMsg;
+  if (_msg)
+    collisionMsg = *_msg;
+
   collisionMsg.set_name(leafName);
   msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
   geomMsg->CopyFrom(visualMsg.geometry());
