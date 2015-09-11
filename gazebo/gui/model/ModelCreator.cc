@@ -1307,13 +1307,13 @@ void ModelCreator::RemoveModelPlugin(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  if (this->allModelPlugins.find(_name) ==
-      this->allModelPlugins.end())
+  auto it = this->allModelPlugins.find(_name);
+  if (it == this->allModelPlugins.end())
   {
     return;
   }
 
-  ModelPluginData *data = this->allModelPlugins[_name];
+  ModelPluginData *data = it->second;
 
   // Remove from map
   this->allModelPlugins.erase(_name);
@@ -1334,7 +1334,7 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   {
     if (!this->selectedLinks.empty())
     {
-      for (auto linkVis : this->selectedLinks)
+      for (const auto &linkVis : this->selectedLinks)
       {
         this->OnDelete(linkVis->GetName());
       }
@@ -1342,7 +1342,7 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
     }
     else if (!this->selectedModelPlugins.empty())
     {
-      for (auto plugin : this->selectedModelPlugins)
+      for (const auto &plugin : this->selectedModelPlugins)
       {
         this->RemoveModelPlugin(plugin);
       }
