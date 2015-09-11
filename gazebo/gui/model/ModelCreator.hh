@@ -366,8 +366,15 @@ namespace gazebo
       private: void OnEntityScaleChanged(const std::string &_name,
           const math::Vector3 &_scale);
 
-      /// \brief Deselect all currently selected link visuals.
+      /// \brief Deselect anything whose selection is handled here, such as
+      /// links and model plugins.
       private: void DeselectAll();
+
+      /// \brief Deselect all currently selected links.
+      private: void DeselectAllLinks();
+
+      /// \brief Deselect all currently selected model plugins.
+      private: void DeselectAllModelPlugins();
 
       /// \brief Set visibilty of a visual recursively while storing their
       /// original values

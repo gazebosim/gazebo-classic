@@ -94,7 +94,15 @@ namespace gazebo
       private: void OnSetSelectedJoint(const std::string &_name,
           bool _selected);
 
-      /// \brief Helper function to deselect a link or a joint.
+      /// \brief Callback when a model plugin is selected.
+      /// \param[in] _name Name of model plugin.
+      /// \param[in] _selected True if the model plugin is selected, false if
+      /// deselected.
+      private: void OnSetSelectedModelPlugin(const std::string &_name,
+          bool _selected);
+
+      /// \brief Helper function to deselect a specific type, such as link or
+      /// joint.
       /// \param[in] _type Type: Link or Joint.
       private: void DeselectType(const std::string &_type);
 

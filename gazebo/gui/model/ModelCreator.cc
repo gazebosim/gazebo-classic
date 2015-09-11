@@ -1332,13 +1332,13 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   }
   else if (_event.key == Qt::Key_Delete)
   {
+    this->DeselectAll();
     if (!this->selectedLinks.empty())
     {
       for (const auto &linkVis : this->selectedLinks)
       {
         this->OnDelete(linkVis->GetName());
       }
-      this->DeselectAll();
     }
     else if (!this->selectedModelPlugins.empty())
     {
@@ -1455,6 +1455,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // Multi-selection mode
       else
       {
+        this->DeselectAllModelPlugins();
+
         auto it = std::find(this->selectedLinks.begin(),
             this->selectedLinks.end(), linkVis);
         // Highlight and select clicked link if not already selected
@@ -1867,12 +1869,31 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAll()
 {
+  this->DeselectAllLinks();
+  this->DeselectAllModelPlugins();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::DeselectAllLinks()
+{
   while (!this->selectedLinks.empty())
   {
     rendering::VisualPtr vis = this->selectedLinks[0];
     vis->SetHighlighted(false);
     this->selectedLinks.erase(this->selectedLinks.begin());
     model::Events::setSelectedLink(vis->GetName(), false);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::DeselectAllModelPlugins()
+{
+  while (!this->selectedModelPlugins.empty())
+  {
+    auto it = this->selectedModelPlugins.begin();
+    std::string name = this->selectedModelPlugins[0];
+    this->selectedModelPlugins.erase(it);
+    model::Events::setSelectedModelPlugin(name, false);
   }
 }
 
