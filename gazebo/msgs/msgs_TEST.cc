@@ -1162,6 +1162,165 @@ TEST_F(MsgsTest, MeshFromSDF)
 }
 
 /////////////////////////////////////////////////
+TEST_F(MsgsTest, CollisionFromSDF_Friction)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("collision.sdf", sdf);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+        <collision name='collision_name'>\
+          <geometry>\
+            <cylinder>\
+              <radius>1.23</radius>\
+              <length>4.56</length>\
+            </cylinder>\
+          </geometry>\
+          <surface>\
+            <friction>\
+              <ode>\
+                <mu>0.1</mu>\
+                <mu2>0.2</mu2>\
+                <fdir1>0.3 0.4 0.5</fdir1>\
+                <slip1>0.6</slip1>\
+                <slip2>0.7</slip2>\
+              </ode>\
+              <torsional>\
+                <coefficient>0.8</coefficient>\
+                <patch_radius>0.9</patch_radius>\
+                <surface_radius>1.0</surface_radius>\
+                <use_patch_radius>0</use_patch_radius>\
+                <ode>\
+                  <slip>1.1</slip>\
+                </ode>\
+              </torsional>\
+            </friction>\
+          </surface>\
+        </collision>\
+      </sdf>", sdf));
+
+  msgs::Collision msg = msgs::CollisionFromSDF(sdf);
+
+  // Translational friction
+  EXPECT_TRUE(msg.has_surface());
+  EXPECT_TRUE(msg.surface().has_friction());
+
+  msgs::Friction friction = msg.surface().friction();
+
+  EXPECT_TRUE(friction.has_mu());
+  EXPECT_DOUBLE_EQ(0.1, friction.mu());
+
+  EXPECT_TRUE(friction.has_mu2());
+  EXPECT_DOUBLE_EQ(0.2, friction.mu2());
+
+  EXPECT_TRUE(friction.has_fdir1());
+  EXPECT_EQ(ignition::math::Vector3d(0.3, 0.4, 0.5),
+      msgs::ConvertIgn(friction.fdir1()));
+
+  EXPECT_TRUE(friction.has_slip1());
+  EXPECT_DOUBLE_EQ(0.6, friction.slip1());
+
+  EXPECT_TRUE(friction.has_slip2());
+  EXPECT_DOUBLE_EQ(0.7, friction.slip2());
+
+  // Torsional friction
+  EXPECT_TRUE(friction.has_torsional());
+  msgs::Friction::Torsional torsional = friction.torsional();
+
+  EXPECT_TRUE(torsional.has_coefficient());
+  EXPECT_DOUBLE_EQ(0.8, torsional.coefficient());
+
+  EXPECT_TRUE(torsional.has_patch_radius());
+  EXPECT_DOUBLE_EQ(0.9, torsional.patch_radius());
+
+  EXPECT_TRUE(torsional.has_surface_radius());
+  EXPECT_DOUBLE_EQ(1.0, torsional.surface_radius());
+
+  EXPECT_TRUE(torsional.has_patch_radius());
+  EXPECT_FALSE(torsional.use_patch_radius());
+
+  EXPECT_TRUE(torsional.has_ode());
+  EXPECT_TRUE(torsional.ode().has_slip());
+  EXPECT_DOUBLE_EQ(1.1, torsional.ode().slip());
+}
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, CollisionFromSDF_Contact)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("collision.sdf", sdf);
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+        <collision name='collision_name'>\
+          <geometry>\
+            <cylinder>\
+              <radius>1.23</radius>\
+              <length>4.56</length>\
+            </cylinder>\
+          </geometry>\
+          <laser_retro>0.7</laser_retro>\
+          <max_contacts>8</max_contacts>\
+          <surface>\
+            <bounce>\
+              <restitution_coefficient>0.9</restitution_coefficient>\
+              <threshold>1.0</threshold>\
+            </bounce>\
+            <contact>\
+              <collide_without_contact>1</collide_without_contact>\
+              <collide_without_contact_bitmask>2</collide_without_contact_bitmask>\
+              <collide_bitmask>3</collide_bitmask>\
+              <ode>\
+                <soft_cfm>0.4</soft_cfm>\
+                <soft_erp>0.5</soft_erp>\
+                <kp>0.6</kp>\
+                <kd>0.7</kd>\
+                <max_vel>0.8</max_vel>\
+                <min_depth>0.9</min_depth>\
+              </ode>\
+            </contact>\
+          </surface>\
+        </collision>\
+      </sdf>", sdf));
+
+  msgs::Collision msg = msgs::CollisionFromSDF(sdf);
+
+  EXPECT_TRUE(msg.has_surface());
+  msgs::Surface surface = msg.surface();
+
+  EXPECT_TRUE(surface.has_restitution_coefficient());
+  EXPECT_DOUBLE_EQ(0.9, surface.restitution_coefficient());
+
+  EXPECT_TRUE(surface.has_bounce_threshold());
+  EXPECT_DOUBLE_EQ(1.0, surface.bounce_threshold());
+
+  EXPECT_TRUE(surface.has_soft_cfm());
+  EXPECT_DOUBLE_EQ(0.4, surface.soft_cfm());
+
+  EXPECT_TRUE(surface.has_soft_erp());
+  EXPECT_DOUBLE_EQ(0.5, surface.soft_erp());
+
+  EXPECT_TRUE(surface.has_kp());
+  EXPECT_DOUBLE_EQ(0.6, surface.kp());
+
+  EXPECT_TRUE(surface.has_kd());
+  EXPECT_DOUBLE_EQ(0.7, surface.kd());
+
+  EXPECT_TRUE(surface.has_max_vel());
+  EXPECT_DOUBLE_EQ(0.8, surface.max_vel());
+
+  EXPECT_TRUE(surface.has_min_depth());
+  EXPECT_DOUBLE_EQ(0.9, surface.min_depth());
+
+  EXPECT_TRUE(surface.has_collide_without_contact());
+  EXPECT_TRUE(surface.collide_without_contact());
+
+  EXPECT_TRUE(surface.has_collide_without_contact_bitmask());
+  EXPECT_EQ(2, surface.collide_without_contact_bitmask());
+
+  EXPECT_TRUE(surface.has_collide_bitmask());
+  EXPECT_EQ(3, surface.collide_bitmask());
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, AxisFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());
