@@ -27,6 +27,12 @@ class ModelEditorPalette_TEST : public QTestFixture
 
   /// \brief Tests adding an item to the palette.
   private slots: void AddItem();
+
+  /// \brief Tests the nested model list.
+  private slots: void AddRemoveNestedModels();
+
+  /// \brief Tests loading nested models.
+  private slots: void LoadNestedModel();
 };
 
 #endif

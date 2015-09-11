@@ -85,7 +85,8 @@ namespace gazebo
       /// \param[in] _linkId Unique id of link.
       /// \param[in] _selected True if the link is selected, false if
       /// deselected.
-      private: void OnSetSelectedLink(const std::string &_linkId, bool _selected);
+      private: void OnSetSelectedLink(const std::string &_linkId,
+          bool _selected);
 
       /// \brief Callback when a joint is selected.
       /// \param[in] _jointId Unique id of joint.
