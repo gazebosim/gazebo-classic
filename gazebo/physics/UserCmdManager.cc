@@ -20,6 +20,9 @@
   #include <Winsock2.h>
 #endif
 
+#include "gazebo/transport/transport.hh"
+
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/WorldState.hh"
 
@@ -33,15 +36,36 @@ using namespace physics;
 /////////////////////////////////////////////////
 UserCmd::UserCmd(std::string _id,
                  physics::WorldPtr _world,
-                 const std::string &_description)
+                 const std::string &_description,
+                 msgs::UserCmd::Type _type,
+                 const std::string &_name)
   : dataPtr(new UserCmdPrivate())
 {
 gzdbg << "UserCmd::UserCmd" << std::endl;
   this->dataPtr->id = _id;
   this->dataPtr->world = _world;
   this->dataPtr->description = _description;
+  this->dataPtr->type = _type;
+  this->dataPtr->name = _name;
+  this->dataPtr->sdf = NULL;
+  this->dataPtr->node = NULL;
 
+  // Record current world state
   this->dataPtr->startState = WorldState(this->dataPtr->world);
+
+  // Insertion
+  if (_type == msgs::UserCmd::INSERTING)
+  {
+gzdbg << "INSERTING  " << _name << std::endl;
+    physics::ModelPtr model = _world->GetModel(_name);
+    if (!model)
+      gzerr << "Model [" << _name << "] not found." << std::endl;
+    else
+      this->dataPtr->sdf = model->GetSDF();
+
+    this->dataPtr->node = transport::NodePtr(new transport::Node());
+    this->dataPtr->node->Init();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -50,6 +74,14 @@ void UserCmd::Undo()
 gzdbg << "UserCmd::Undo" << std::endl;
   // Record / override the state for redo
   this->dataPtr->endState = WorldState(this->dataPtr->world);
+
+  // Insertion
+  if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
+      this->dataPtr->node && !this->dataPtr->name.empty())
+  {
+    // Delete
+    transport::requestNoReply(this->dataPtr->node, "entity_delete", this->dataPtr->name);
+  }
 
   // Set the world state
   this->dataPtr->world->SetState(this->dataPtr->startState);
@@ -73,6 +105,12 @@ std::string UserCmd::Id()
 std::string UserCmd::Description()
 {
   return this->dataPtr->description;
+}
+
+/////////////////////////////////////////////////
+msgs::UserCmd::Type UserCmd::Type()
+{
+  return this->dataPtr->type;
 }
 
 /////////////////////////////////////////////////
@@ -106,10 +144,17 @@ UserCmdManager::~UserCmdManager()
 void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 {
 gzdbg << "UserCmdManager::OnUserCmdMsg" << std::endl;
+
+  std::string name;
+  if (_msg->has_entity_name())
+    name = _msg->entity_name();
+
   UserCmd *cmd = new UserCmd(
       _msg->id(),
       this->dataPtr->world,
-      _msg->description());
+      _msg->description(),
+      _msg->type(),
+      name);
 
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmd);
@@ -182,6 +227,7 @@ gzdbg << "UserCmdManager::PublishCurrentStats" << std::endl;
     msgs::UserCmd *msg = statsMsg.add_undo_cmd();
     msg->set_id(cmd->Id());
     msg->set_description(cmd->Description());
+    msg->set_type(cmd->Type());
   }
 
   for (auto cmd : this->dataPtr->redoCmds)
@@ -189,6 +235,7 @@ gzdbg << "UserCmdManager::PublishCurrentStats" << std::endl;
     msgs::UserCmd *msg = statsMsg.add_redo_cmd();
     msg->set_id(cmd->Id());
     msg->set_description(cmd->Description());
+    msg->set_type(cmd->Type());
   }
 
   this->dataPtr->userCmdStatsPub->Publish(statsMsg);

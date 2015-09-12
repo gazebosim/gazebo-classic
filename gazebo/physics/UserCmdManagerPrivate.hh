@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_USER_CMD_MANAGER_PRIVATE_HH_
 #define _GAZEBO_USER_CMD_MANAGER_PRIVATE_HH_
 
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
@@ -50,6 +51,13 @@ namespace gazebo
 
       /// \brief Description for the command.
       public: std::string description;
+
+      public: msgs::UserCmd::Type type;
+      public: sdf::ElementPtr sdf;
+      public: std::string name;
+
+      /// \brief Node for communication.
+      public: transport::NodePtr node;
     };
 
     class UserCmd;

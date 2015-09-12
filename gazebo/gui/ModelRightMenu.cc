@@ -338,6 +338,7 @@ void ModelRightMenu::OnDelete(const std::string &_name)
     msgs::UserCmd userCmdMsg;
     userCmdMsg.set_id("Deleted " + name);
     userCmdMsg.set_description("Deleted " + name);
+    userCmdMsg.set_type(msgs::UserCmd::DELETING);
     this->userCmdPub->Publish(userCmdMsg);
   }
 }

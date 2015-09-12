@@ -375,6 +375,8 @@ gzdbg << "ModelMaker::CreateTheEntity" << std::endl;
   msgs::UserCmd userCmdMsg;
   userCmdMsg.set_id("Inserted " + modelName);
   userCmdMsg.set_description("Inserted " + modelName);
+  userCmdMsg.set_type(msgs::UserCmd::INSERTING);
+  userCmdMsg.set_entity_name(modelName);
   dPtr->userCmdPub->Publish(userCmdMsg);
 }
 

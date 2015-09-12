@@ -39,7 +39,9 @@ namespace gazebo
       /// "Rotate box", "Delete sphere", etc.
       public: UserCmd(std::string _id,
                       physics::WorldPtr _world,
-                      const std::string &_description);
+                      const std::string &_description,
+                      msgs::UserCmd::Type _type,
+                      const std::string &_name = "");
 
       /// \brief Destructor
       public: virtual ~UserCmd() = default;
@@ -58,6 +60,10 @@ namespace gazebo
       /// \brief Return this command's description
       /// \return Description
       public: std::string Description();
+
+      /// \brief Return this command's description
+      /// \return Description
+      public: msgs::UserCmd::Type Type();
 
       /// \internal
       /// \brief Pointer to private data.

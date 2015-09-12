@@ -370,6 +370,7 @@ gzdbg << "ModelSnap::PublishVisualPose" << std::endl;
     msgs::UserCmd userCmdMsg;
     userCmdMsg.set_id("Snapped " + _vis->GetName());
     userCmdMsg.set_description("Snapped " + _vis->GetName());
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
     this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }

@@ -538,6 +538,7 @@ gzdbg << "ModelManipulator::PublishVisualPose" << std::endl;
       msgs::UserCmd userCmdMsg;
       userCmdMsg.set_id("Moved " + _vis->GetName());
       userCmdMsg.set_description("Moved " + _vis->GetName());
+      userCmdMsg.set_type(msgs::UserCmd::MOVING);
       this->dataPtr->userCmdPub->Publish(userCmdMsg);
     }
     // Otherwise, check to see if the visual is a light
