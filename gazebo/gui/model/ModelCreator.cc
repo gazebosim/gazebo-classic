@@ -1672,12 +1672,13 @@ void ModelCreator::OnOpenInspector()
 void ModelCreator::OpenInspector(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  if (this->allLinks.find(_name) == this->allLinks.end())
+  auto it = this->allLinks.find(_name);
+  if (it == this->allLinks.end())
   {
     gzerr << "Link [" << _name << "] not found." << std::endl;
     return;
   }
-  LinkData *link = this->allLinks[_name];
+  LinkData *link = it->second;
   link->SetPose((link->linkVisual->GetWorldPose()-this->modelPose).Ign());
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
@@ -1811,13 +1812,12 @@ void ModelCreator::GenerateSDF()
   {
     NestedModelData *modelData = nestedModelsIt.second;
 
-    if (!nestedModelsIt.second->modelVisual)
+    if (!modelData->modelVisual)
       continue;
 
     // get only top level nested models
-    if (nestedModelsIt.second->modelVisual->GetParent()
-        != this->previewVisual)
-    continue;
+    if (modelData->Depth() != 2)
+      continue;
 
     modelData->SetPose(modelData->modelVisual->GetWorldPose().Ign() -
         this->modelPose);
@@ -1865,13 +1865,12 @@ void ModelCreator::GenerateSDF()
   // loop through rest of all nested models and add sdf
   for (auto &nestedModelsIt : this->allNestedModels)
   {
+    NestedModelData *nestedModelData = nestedModelsIt.second;
+
     if (nestedModelsIt.first == this->canonicalModel ||
-        (nestedModelsIt.second->modelVisual &&
-        nestedModelsIt.second->modelVisual->GetParent()
-        != this->previewVisual))
+        nestedModelData->Depth() != 2)
       continue;
 
-    NestedModelData *nestedModelData = nestedModelsIt.second;
     modelElem->InsertElement(nestedModelData->modelSDF);
   }
 

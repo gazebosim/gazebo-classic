@@ -211,6 +211,11 @@ void ModelEditorPalette_TEST::LoadNestedModel()
       "ModelPreview_1::joint_01_UNIQUE_ID_");
   QVERIFY(jointsItem->child(2)->data(0, Qt::UserRole) ==
       "ModelPreview_1::joint_02_UNIQUE_ID_");
+
+  delete palette;
+  palette = NULL;
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 
