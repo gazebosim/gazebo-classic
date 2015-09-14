@@ -53,13 +53,37 @@ gzdbg << "UserCmd::UserCmd" << std::endl;
   // Record current world state
   this->dataPtr->startState = WorldState(this->dataPtr->world);
 
-  // Insertion
+  // Inserting
   if (_type == msgs::UserCmd::INSERTING)
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
     this->dataPtr->node->Init();
     this->dataPtr->factoryPub =
         this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+  }
+  // Deleting
+  else if (_type == msgs::UserCmd::DELETING)
+  {
+    this->dataPtr->node = transport::NodePtr(new transport::Node());
+    this->dataPtr->node->Init();
+    this->dataPtr->factoryPub =
+        this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+
+    physics::ModelPtr model =
+        this->dataPtr->world->GetModel(this->dataPtr->name);
+    if (!model)
+    {
+      gzerr << "Model [" << this->dataPtr->name << "] not found."
+          << std::endl;
+      return;
+    }
+
+    this->dataPtr->sdf.reset(new sdf::SDF);
+    this->dataPtr->sdf->Root()->Copy(model->GetSDF());
+
+    // Delete from here because we need to make ssure to copy the model first
+    transport::requestNoReply(
+        this->dataPtr->node, "entity_delete", this->dataPtr->name);
   }
 }
 
@@ -70,7 +94,7 @@ gzdbg << "UserCmd::Undo" << std::endl;
   // Record / override the state for redo
   this->dataPtr->endState = WorldState(this->dataPtr->world);
 
-  // Insertion
+  // Undo insertion
   if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
       this->dataPtr->node && !this->dataPtr->name.empty())
   {
@@ -95,6 +119,14 @@ gzdbg << "UserCmd::Undo" << std::endl;
     transport::requestNoReply(
         this->dataPtr->node, "entity_delete", this->dataPtr->name);
   }
+  // Undo deletion
+  else if (this->dataPtr->type == msgs::UserCmd::DELETING &&
+      this->dataPtr->node && this->dataPtr->sdf)
+  {
+    msgs::Factory msg;
+    msg.set_sdf(this->dataPtr->sdf->ToString());
+    this->dataPtr->factoryPub->Publish(msg);
+  }
 
   // Set the world state
   this->dataPtr->world->SetState(this->dataPtr->startState);
@@ -105,14 +137,20 @@ void UserCmd::Redo()
 {
 gzdbg << "UserCmd::Redo" << std::endl;
 
-  // Insertion
+  // Redo insertion
   if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
       this->dataPtr->node && this->dataPtr->sdf)
   {
     msgs::Factory msg;
     msg.set_sdf(this->dataPtr->sdf->ToString());
-//    msgs::Set(msg.mutable_pose(), this->modelPose.Ign());
     this->dataPtr->factoryPub->Publish(msg);
+  }
+  // Redo deletion
+  else if (this->dataPtr->type == msgs::UserCmd::DELETING &&
+      this->dataPtr->node && !this->dataPtr->name.empty())
+  {
+    transport::requestNoReply(
+        this->dataPtr->node, "entity_delete", this->dataPtr->name);
   }
 
   // Set the world state

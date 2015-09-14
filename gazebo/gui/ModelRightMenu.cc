@@ -331,14 +331,15 @@ void ModelRightMenu::OnDelete(const std::string &_name)
   // Delete the entity
   if (!name.empty())
   {
-    transport::requestNoReply(this->node, "entity_delete", name);
+  //  transport::requestNoReply(this->node, "entity_delete", name);
 
-    // Register user command on server
+    // Send user command and UserCmdManager will publish delete request
   gzdbg << "ModelRightMenu::OnDelete" << std::endl;
     msgs::UserCmd userCmdMsg;
     userCmdMsg.set_id("Deleted " + name);
     userCmdMsg.set_description("Deleted " + name);
     userCmdMsg.set_type(msgs::UserCmd::DELETING);
+    userCmdMsg.set_entity_name(name);
     this->userCmdPub->Publish(userCmdMsg);
   }
 }
