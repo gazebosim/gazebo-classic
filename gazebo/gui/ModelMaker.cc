@@ -52,8 +52,6 @@ ModelMaker::ModelMaker() : EntityMaker(*new ModelMakerPrivate)
 
   dPtr->clone = false;
   dPtr->makerPub = dPtr->node->Advertise<msgs::Factory>("~/factory");
-  dPtr->userCmdPub =
-      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 }
 
 /////////////////////////////////////////////////
@@ -63,7 +61,6 @@ ModelMaker::~ModelMaker()
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->makerPub.reset();
-  dPtr->userCmdPub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -373,8 +370,8 @@ void ModelMaker::CreateTheEntity()
   // Register user command on server
 gzdbg << "ModelMaker::CreateTheEntity" << std::endl;
   msgs::UserCmd userCmdMsg;
-  userCmdMsg.set_id("Inserted " + modelName);
-  userCmdMsg.set_description("Inserted " + modelName);
+  userCmdMsg.set_id("Insert [" + modelName + "]");
+  userCmdMsg.set_description("Insert [" + modelName + "]");
   userCmdMsg.set_type(msgs::UserCmd::INSERTING);
   userCmdMsg.set_entity_name(modelName);
   dPtr->userCmdPub->Publish(userCmdMsg);

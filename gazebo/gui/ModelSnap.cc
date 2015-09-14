@@ -368,8 +368,8 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
     // Register user command on server
 gzdbg << "ModelSnap::PublishVisualPose" << std::endl;
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_id("Snapped " + _vis->GetName());
-    userCmdMsg.set_description("Snapped " + _vis->GetName());
+    userCmdMsg.set_id("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
     this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }

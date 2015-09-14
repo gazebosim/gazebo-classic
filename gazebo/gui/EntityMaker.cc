@@ -40,6 +40,8 @@ EntityMaker::EntityMaker(EntityMakerPrivate &_dataPtr)
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 }
 
 //////////////////////////////////////////////////
@@ -47,6 +49,7 @@ EntityMaker::~EntityMaker()
 {
   this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
+  this->dataPtr->userCmdPub.reset();
 
   delete this->dataPtr;
   this->dataPtr = NULL;

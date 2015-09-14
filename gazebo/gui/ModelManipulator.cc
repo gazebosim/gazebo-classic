@@ -532,14 +532,6 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
 
       msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
       this->dataPtr->modelPub->Publish(msg);
-
-      // Register user command on server
-gzdbg << "ModelManipulator::PublishVisualPose" << std::endl;
-      msgs::UserCmd userCmdMsg;
-      userCmdMsg.set_id("Moved " + _vis->GetName());
-      userCmdMsg.set_description("Moved " + _vis->GetName());
-      userCmdMsg.set_type(msgs::UserCmd::MOVING);
-      this->dataPtr->userCmdPub->Publish(userCmdMsg);
     }
     // Otherwise, check to see if the visual is a light
     else if (this->dataPtr->scene->GetLight(_vis->GetName()))
@@ -549,6 +541,37 @@ gzdbg << "ModelManipulator::PublishVisualPose" << std::endl;
       msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
       this->dataPtr->lightPub->Publish(msg);
     }
+    else
+    {
+      gzerr << "Visual [" << _vis->GetName() << "] isn't a model or a light"
+          << std::endl;
+      return;
+    }
+
+gzdbg << "ModelManipulator::PublishVisualPose" << std::endl;
+    // Register user command on server
+    std::string description;
+    if (this->dataPtr->manipMode == "translate")
+    {
+      description = "Translate [";
+    }
+    else if (this->dataPtr->manipMode == "rotate")
+    {
+      description = "Rotate [";
+    }
+    else
+    {
+      gzerr << "Unknown mode [" << this->dataPtr->manipMode << "]. " <<
+          "Not sending user command." << std::endl;
+      return;
+    }
+
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_id(description + _vis->GetName() + "]");
+    userCmdMsg.set_description(description + _vis->GetName() + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
+    userCmdMsg.set_entity_name(_vis->GetName());
+    this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
 
@@ -567,6 +590,14 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
       msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
       this->dataPtr->modelPub->Publish(msg);
       _vis->SetScale(this->dataPtr->mouseVisualScale);
+
+      // Register user command on server
+      msgs::UserCmd userCmdMsg;
+      userCmdMsg.set_id("Scale [" + _vis->GetName() + "]");
+      userCmdMsg.set_description("Scale [" + _vis->GetName() + "]");
+      userCmdMsg.set_type(msgs::UserCmd::SCALING);
+      userCmdMsg.set_entity_name(_vis->GetName());
+      this->dataPtr->userCmdPub->Publish(userCmdMsg);
     }
   }
 }

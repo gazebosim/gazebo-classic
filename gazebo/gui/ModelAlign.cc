@@ -293,6 +293,18 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     if (_publish)
       this->PublishVisualPose(vis);
   }
+
+  // Register user command on server
+  if (_publish)
+  {
+  gzdbg << "ModelAlign::AlignVisuals" << std::endl;
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_id("Align to [" + this->dataPtr->targetVis->GetName() + "]");
+    userCmdMsg.set_description(
+        "Align to [" + this->dataPtr->targetVis->GetName() + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
+    this->dataPtr->userCmdPub->Publish(userCmdMsg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -311,13 +323,6 @@ void ModelAlign::PublishVisualPose(rendering::VisualPtr _vis)
 
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
     this->dataPtr->modelPub->Publish(msg);
-
-    // Register user command on server
-gzdbg << "ModelAlign::PublishVisualPose" << std::endl;
-    msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_id("Aligned " + _vis->GetName());
-    userCmdMsg.set_description("Aligned " + _vis->GetName());
-    this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
 
