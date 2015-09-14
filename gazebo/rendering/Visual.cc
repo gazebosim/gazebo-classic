@@ -2314,66 +2314,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    if (_msg->material().has_lighting())
-    {
-      this->SetLighting(_msg->material().lighting());
-    }
-
-    if (_msg->material().has_script())
-    {
-      for (int i = 0; i < _msg->material().script().uri_size(); ++i)
-      {
-        RenderEngine::Instance()->AddResourcePath(
-            _msg->material().script().uri(i));
-      }
-      if (_msg->material().script().has_name() &&
-          !_msg->material().script().name().empty())
-      {
-        this->SetMaterial(_msg->material().script().name());
-      }
-    }
-
-    if (_msg->material().has_ambient())
-      this->SetAmbient(msgs::Convert(_msg->material().ambient()));
-
-    if (_msg->material().has_diffuse())
-      this->SetDiffuse(msgs::Convert(_msg->material().diffuse()));
-
-    if (_msg->material().has_specular())
-      this->SetSpecular(msgs::Convert(_msg->material().specular()));
-
-    if (_msg->material().has_emissive())
-      this->SetEmissive(msgs::Convert(_msg->material().emissive()));
-
-
-    if (_msg->material().has_shader_type())
-    {
-      if (_msg->material().shader_type() == msgs::Material::VERTEX)
-      {
-        this->SetShaderType("vertex");
-      }
-      else if (_msg->material().shader_type() == msgs::Material::PIXEL)
-      {
-        this->SetShaderType("pixel");
-      }
-      else if (_msg->material().shader_type() ==
-          msgs::Material::NORMAL_MAP_OBJECT_SPACE)
-      {
-        this->SetShaderType("normal_map_object_space");
-      }
-      else if (_msg->material().shader_type() ==
-          msgs::Material::NORMAL_MAP_TANGENT_SPACE)
-      {
-        this->SetShaderType("normal_map_tangent_space");
-      }
-      else
-      {
-        gzerr << "Unrecognized shader type" << std::endl;
-      }
-
-      if (_msg->material().has_normal_map())
-        this->SetNormalMap(_msg->material().normal_map());
-    }
+    this->ProcessMaterialMsg(_msg->material());
   }
 
   if (_msg->has_transparency())
@@ -3045,4 +2986,65 @@ msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
       break;
   }
   return visualType;
+}
+
+/////////////////////////////////////////////////
+void Visual::ProcessMaterialMsg(const msgs::Material &_msg)
+{
+  if (_msg.has_lighting())
+  {
+    this->SetLighting(_msg.lighting());
+  }
+
+  if (_msg.has_script())
+  {
+    for (int i = 0; i < _msg.script().uri_size(); ++i)
+    {
+      RenderEngine::Instance()->AddResourcePath(_msg.script().uri(i));
+    }
+
+    if (_msg.script().has_name() && !_msg.script().name().empty())
+    {
+      this->SetMaterial(_msg.script().name());
+    }
+  }
+
+  if (_msg.has_ambient())
+    this->SetAmbient(msgs::Convert(_msg.ambient()));
+
+  if (_msg.has_diffuse())
+    this->SetDiffuse(msgs::Convert(_msg.diffuse()));
+
+  if (_msg.has_specular())
+    this->SetSpecular(msgs::Convert(_msg.specular()));
+
+  if (_msg.has_emissive())
+    this->SetEmissive(msgs::Convert(_msg.emissive()));
+
+  if (_msg.has_shader_type())
+  {
+    if (_msg.shader_type() == msgs::Material::VERTEX)
+    {
+      this->SetShaderType("vertex");
+    }
+    else if (_msg.shader_type() == msgs::Material::PIXEL)
+    {
+      this->SetShaderType("pixel");
+    }
+    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+    {
+      this->SetShaderType("normal_map_object_space");
+    }
+    else if (_msg.shader_type() == msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+    {
+      this->SetShaderType("normal_map_tangent_space");
+    }
+    else
+    {
+      gzerr << "Unrecognized shader type" << std::endl;
+    }
+
+    if (_msg.has_normal_map())
+      this->SetNormalMap(_msg.normal_map());
+  }
 }

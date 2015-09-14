@@ -30,6 +30,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/rendering/MarkerManager.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -327,6 +328,9 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Manager of marker visuals
+      public: MarkerManager markerManager;
     };
   }
 }

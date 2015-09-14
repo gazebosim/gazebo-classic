@@ -37,6 +37,7 @@
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
 #include "gazebo/rendering/LinkFrameVisual.hh"
+#include "gazebo/rendering/MarkerVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -176,6 +177,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
 
   this->dataPtr->sceneSimTimePosesApplied = common::Time();
   this->dataPtr->sceneSimTimePosesReceived = common::Time();
+
+  this->dataPtr->markerManager.Init();
 }
 
 //////////////////////////////////////////////////
@@ -2543,6 +2546,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           {
             this->dataPtr->terrain = new Heightmap(shared_from_this());
             this->dataPtr->terrain->LoadFromMsg(_msg);
+            double height = this->dataPtr->terrain->GetHeight(39.0625, 39.0625);
+            std::cout << "\n\nGZHeight[" << height << "]\n\n";
           }
           else
             gzerr << "Only one Heightmap can be created per Scene\n";

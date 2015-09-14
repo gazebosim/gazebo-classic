@@ -51,6 +51,7 @@ namespace gazebo
     class Visual;
     class LaserVisual;
     class LogicalCameraVisual;
+    class MarkerVisual;
     class SonarVisual;
     class WrenchVisual;
     class CameraVisual;
@@ -109,6 +110,10 @@ namespace gazebo
     /// \def LaserVisualPtr
     /// \brief Shared pointer to LaserVisual
     typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;
+
+    /// \def MarkerVisualPtr
+    /// \brief Shared pointer to MarkerVisual
+    typedef boost::shared_ptr<MarkerVisual> MarkerVisualPtr;
 
     /// \def SonarVisualPtr
     /// \brief Shared pointer to SonarVisual

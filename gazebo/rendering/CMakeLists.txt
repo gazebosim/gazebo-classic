@@ -42,6 +42,8 @@ set (sources
   JointVisual.cc
   LaserVisual.cc
   LinkFrameVisual.cc
+  MarkerManager.cc
+  MarkerVisual.cc
   SonarVisual.cc
   Light.cc
   LogicalCameraVisual.cc
@@ -104,6 +106,8 @@ set (headers
   LogicalCameraVisual.hh
   SonarVisual.hh
   Light.hh
+  MarkerManager.hh
+  MarkerVisual.hh
   Material.hh
   MovableText.hh
   OrbitViewController.hh

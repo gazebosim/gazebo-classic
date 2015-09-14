@@ -595,6 +595,10 @@ namespace gazebo
                         const std::string &_name, ScenePtr _scene,
                         bool _useRTShader = true);
 
+      /// \brief Process a material message.
+      /// \param[in] _msg The material message.
+      protected: void ProcessMaterialMsg(const msgs::Material &_msg);
+
       /// \brief Helper function for initializing the visual with a scene as
       /// its parent.
       /// \param[in] _name Name of the visual.

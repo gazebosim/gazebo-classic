@@ -288,7 +288,7 @@ void dxStepBody (dxBody *b, dReal h)
   // handle linear velocity
   for (int j=0; j<3; j++) b->posr.pos[j] += h * b->lvel[j];
 
-  if (b->flags & dxBodyFlagFiniteRotation) {
+  if (true || (b->flags & dxBodyFlagFiniteRotation)) {
     dVector3 irv;  // infitesimal rotation vector
     dQuaternion q;  // quaternion for finite rotation
 
