@@ -56,15 +56,10 @@ gzdbg << "UserCmd::UserCmd" << std::endl;
   // Insertion
   if (_type == msgs::UserCmd::INSERTING)
   {
-gzdbg << "INSERTING  " << _name << std::endl;
-    physics::ModelPtr model = _world->GetModel(_name);
-    if (!model)
-      gzerr << "Model [" << _name << "] not found." << std::endl;
-    else
-      this->dataPtr->sdf = model->GetSDF();
-
     this->dataPtr->node = transport::NodePtr(new transport::Node());
     this->dataPtr->node->Init();
+    this->dataPtr->factoryPub =
+        this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
   }
 }
 
@@ -79,8 +74,26 @@ gzdbg << "UserCmd::Undo" << std::endl;
   if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
       this->dataPtr->node && !this->dataPtr->name.empty())
   {
+    // Keep model for redo
+    if (!this->dataPtr->sdf)
+    {
+      physics::ModelPtr model =
+          this->dataPtr->world->GetModel(this->dataPtr->name);
+      if (!model)
+      {
+        gzerr << "Model [" << this->dataPtr->name << "] not found."
+            << std::endl;
+      }
+      else
+      {
+        this->dataPtr->sdf.reset(new sdf::SDF);
+        this->dataPtr->sdf->Root(model->GetSDF());
+      }
+    }
+
     // Delete
-    transport::requestNoReply(this->dataPtr->node, "entity_delete", this->dataPtr->name);
+    transport::requestNoReply(
+        this->dataPtr->node, "entity_delete", this->dataPtr->name);
   }
 
   // Set the world state
@@ -91,6 +104,17 @@ gzdbg << "UserCmd::Undo" << std::endl;
 void UserCmd::Redo()
 {
 gzdbg << "UserCmd::Redo" << std::endl;
+
+  // Insertion
+  if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
+      this->dataPtr->node && this->dataPtr->sdf)
+  {
+    msgs::Factory msg;
+    msg.set_sdf(this->dataPtr->sdf->ToString());
+//    msgs::Set(msg.mutable_pose(), this->modelPose.Ign());
+    this->dataPtr->factoryPub->Publish(msg);
+  }
+
   // Set the world state
   this->dataPtr->world->SetState(this->dataPtr->endState);
 }

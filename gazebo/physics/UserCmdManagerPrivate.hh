@@ -53,11 +53,15 @@ namespace gazebo
       public: std::string description;
 
       public: msgs::UserCmd::Type type;
-      public: sdf::ElementPtr sdf;
+      public: sdf::SDFPtr sdf;
       public: std::string name;
 
       /// \brief Node for communication.
+      /// TODO: have node on manager instead, so it's only one
       public: transport::NodePtr node;
+
+      /// \brief Publisher that publishes msg to spawn new model
+      public: transport::PublisherPtr factoryPub;
     };
 
     class UserCmd;
