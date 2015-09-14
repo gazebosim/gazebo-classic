@@ -553,9 +553,11 @@ static void* ComputeRows(void *p)
         dReal hi_act_erp, lo_act_erp;
         if (constraint_index >= 0)
         {
-          if (friction_model == pyramid_friction)
+          if (index - constraint_index >= 3)
           {
-            // FOR erp throttled by info.c_v_max or info.c
+            // torsional friction should have been added as the third row from
+            // contact normal constraint
+            // this_is_torsional_friction
             hi_act = dFabs (hi[index] * lambda[constraint_index]);
             lo_act = -hi_act;
             if (inline_position_correction)
@@ -564,37 +566,54 @@ static void* ComputeRows(void *p)
               lo_act_erp = -hi_act_erp;
             }
           }
-          else if (friction_model == cone_friction)
-          {
-            quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
-                constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
-          }
-          else if(friction_model == box_friction)
-          {
-            hi_act = hi[index];
-            lo_act = -hi_act;
-            hi_act_erp = hi[index];
-            lo_act_erp = -hi_act_erp;
-          }
           else
           {
-              // initialize the hi and lo to get rid of warnings
-              hi_act = dInfinity;
-              lo_act = -dInfinity;
-              hi_act_erp = dInfinity;
-              lo_act_erp = -dInfinity;
-              dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
-          }
-        } else {
-              // FOR erp throttled by info.c_v_max or info.c
-            hi_act = hi[index];
-            lo_act = lo[index];
-            if (inline_position_correction)
+            // deal with non-torsional frictions
+            if (friction_model == pyramid_friction)
             {
+              // FOR erp throttled by info.c_v_max or info.c
+              hi_act = dFabs (hi[index] * lambda[constraint_index]);
+              lo_act = -hi_act;
+              if (inline_position_correction)
+              {
+                hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+                lo_act_erp = -hi_act_erp;
+              }
+            }
+            else if (friction_model == cone_friction)
+            {
+              quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
+                  constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
+            }
+            else if(friction_model == box_friction)
+            {
+              hi_act = hi[index];
+              lo_act = -hi_act;
               hi_act_erp = hi[index];
-              lo_act_erp = lo[index];
-             }
-           }
+              lo_act_erp = -hi_act_erp;
+            }
+            else
+            {
+                // initialize the hi and lo to get rid of warnings
+                hi_act = dInfinity;
+                lo_act = -dInfinity;
+                hi_act_erp = dInfinity;
+                lo_act_erp = -dInfinity;
+                dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
+            }
+          }
+        }
+        else
+        {
+          // FOR erp throttled by info.c_v_max or info.c
+          hi_act = hi[index];
+          lo_act = lo[index];
+          if (inline_position_correction)
+          {
+            hi_act_erp = hi[index];
+            lo_act_erp = lo[index];
+          }
+        }
         // compute lambda and clamp it to [lo,hi].
         // @@@ SSE not a win here
 #undef SSE_CLAMP
@@ -1478,11 +1497,13 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
   if (i == startRow)
   {
     prev_constraint_index = -100;
-    next_constraint_index = constraint_index;
+    nextindex = order[i+1].index;
+    next_constraint_index = findex[nextindex];
   }
   else if (i == startRow+nRows-1)
   {
-    prev_constraint_index = constraint_index;
+    previndex = order[i-1].index;
+    prev_constraint_index = findex[previndex];
     next_constraint_index = -100;
   }
   else
@@ -1493,18 +1514,24 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
     next_constraint_index = findex[nextindex];
   }
 
-  if (constraint_index == next_constraint_index)
+  // use previndex and nextindex to see if this is part of the same
+  // contact constraint.  The problem is that with torsional friction,
+  // there are 3 consecutive constraints sharing the same constraint index.
+  // But we want to ignore anything to do with the third torsional
+  // friction constraint row here.
+  // So we need to check against previous constraint row first:
+  if (constraint_index == prev_constraint_index)
+  {
+    dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
+    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr+6, body2_vel);
+    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
+  }
+  else if (constraint_index == next_constraint_index)
   {
     // body1 was always the 1st body in the body pair
     dRealPtr J_next_ptr =  J_orig + index*12 + 12;
     v_f1 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
     v_f2 = quickstep::dot6(J_next_ptr, body1_vel) + quickstep::dot6(J_next_ptr+6, body2_vel);
-  }
-  else if (constraint_index == prev_constraint_index)
-  {
-    dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
-    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr, body2_vel);
-    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr, body2_vel);
   }
   else
   {
@@ -1519,20 +1546,20 @@ void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_
   }
   else
   {
-    if (constraint_index == next_constraint_index)
-    {
-      // first direction  ---> corresponds to the primary friction direction
-      hi_act = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda[constraint_index]);
-      lo_act = -hi_act;
-      hi_act_erp = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
-      lo_act_erp = -hi_act;
-    }
-    else if (constraint_index == prev_constraint_index)
+    if (constraint_index == prev_constraint_index)
     {
       // second-direction  ---> corresponds to the secondary friction direction
       hi_act = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda[constraint_index]);
       lo_act = -hi_act;
       hi_act_erp = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
+      lo_act_erp = -hi_act;
+    }
+    else if (constraint_index == next_constraint_index)
+    {
+      // first direction  ---> corresponds to the primary friction direction
+      hi_act = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda[constraint_index]);
+      lo_act = -hi_act;
+      hi_act_erp = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
       lo_act_erp = -hi_act;
     }
     else

@@ -97,26 +97,22 @@ namespace gazebo
                                  bool _paused, const std::string &_physics,
                           const std::vector<std::string> &_systemPlugins = {});
 
+    /// \brief Load a world in gzserver.
+    /// \param[in] _args Options for the server using the same syntax
+    /// used in the command line.
+    /// E.g.: "-u --verbose" will run gzserver paused and in verbose mode.
+    protected: virtual void LoadArgs(const std::string &_args);
+
     /// \brief Run the server.
-    /// \param[in] _worldFilename Name of the world to run in simulation.
-    protected: void RunServer(const std::string &_worldFilename);
-
-    /// \brief Run the server, start paused/unpaused, and specify the physics
-    /// engine.
-    /// \param[in] _worldFilename Name of the world to load.
-    /// \param[in] _paused True to start the world paused.
-    /// \param[in] _physics Name of the physics engine.
-    /// \param[in] _systemPlugins Array of system plugins to load.
-    protected: void RunServer(const std::string &_worldFilename, bool _paused,
-                              const std::string &_physics,
-                          const std::vector<std::string> &_systemPlugins = {});
-
+    /// \param[in] _args Vector of options for the server using the same syntax
+    /// used in the command line.
+    /// E.g.: {"-u", "--verbose"} will run gzserver paused and in verbose mode.
+    protected: void RunServer(const std::vector<std::string> &_args);
 
     /// \brief Get a pointer to the rendering scene.
     /// \param[in] _sceneName Name of the scene to get.
     protected: rendering::ScenePtr GetScene(
                    const std::string &_sceneName = "default");
-
 
     /// \brief Function that received world stastics messages.
     /// \param[in] _msg World statistics message.
@@ -459,8 +455,26 @@ namespace gazebo
     /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
     /// \param[in] _retries Number of iterations until give up
     protected: void WaitUntilSensorSpawn(const std::string &_name,
-                                       unsigned int _sleepEach,
-                                       int _retries);
+                                         unsigned int _sleepEach,
+                                         int _retries);
+
+    /// \brief Wait for a number of ms. and attempts until the world reaches a
+    /// target "iterations" value
+    /// \param _goalIteration Target iterations value
+    /// \param _sleepEach Number of milliseconds to sleep in each iteration
+    /// \param _retries Number of iterations until give up
+    protected: void WaitUntilIteration(const uint32_t _goalIteration,
+                                       const int _sleepEach,
+                                       const int _retries) const;
+
+    /// \brief Wait for a number of ms. and attempts until the world reaches a
+    /// target simulation time
+    /// \param _goalTime Target simulation time.
+    /// \param _sleepEach Number of milliseconds to sleep in each iteration
+    /// \param _retries Number of iterations until give up
+    protected: void WaitUntilSimTime(const common::Time &_goalTime,
+                                     const int _ms,
+                                     const int _maxRetries) const;
 
     /// \brief Spawn a light.
     /// \param[in] _name Name for the light.

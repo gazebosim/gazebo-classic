@@ -33,56 +33,27 @@ namespace gazebo
     /// values.
     /// \param[in] end Enum value that marks the end of the enum values.
     /// \param[in] names A vector of strings, one for each enum value.
-#define GZ_ENUM(enumType, begin, end, ...) \
-    template<> enumType common::EnumId<enumType>::range[] = {begin, end};\
-    template<> std::vector<std::string> common::EnumId<enumType>::names = \
+    /// \sa EnumIface
+    /// \sa EnumIterator
+    #define GZ_ENUM(enumType, begin, end, ...) \
+    template<> enumType common::EnumIface<enumType>::range[] = {begin, end}; \
+    template<> std::vector<std::string> common::EnumIface<enumType>::names = \
     {__VA_ARGS__};
 
-    /// \internal
-    /// A utility structure for mapping enums to strings.
-    /*template<typename T>
-    class EnumRefHolder
-    {
-      /// \brief Constructor
-      /// \param[in] _value Reference to the enum value
-      public: EnumRefHolder(T &_value): value(_value)
-      {
-      }
-
-      /// \brief Enum value
-      public: T &value;
-    };
-
-    /// \internal
-    /// A utility structure for mapping enums to strings.
+    /// \brief Enum interface. Use this interface to convert an enum to
+    /// a string, and set an enum from a string.
     template<typename T>
-    class EnumConstRefHolder
+    class EnumIface
     {
-      /// \brief Constructor
-      /// \param[in] _value Reference to the enum value
-      public: EnumConstRefHolder(T const &_value) : value(_value)
-      {
-      }
-
-      /// \brief Enum value
-      public: T const &value;
-    };
-    */
-
-    template<typename T>
-    class EnumId
-    {
-      /*public: EnumId(const T _begin, const T _end,
-                     const std::initializer_list<std::string> &_names)
-                     : begin(_begin), end(_end), names(_names)
-      {
-      }*/
-
+      /// \brief Get the beginning enum value.
+      /// \return Enum value that marks the beginning of the enum list.
       public: static T Begin()
       {
         return range[0];
       }
 
+      /// \brief Get the end enum value.
+      /// \return Enum value that marks the end of the enum list.
       public: static T End()
       {
         return range[1];
@@ -91,7 +62,7 @@ namespace gazebo
       /// \brief Convert enum value to string.
       /// \param[in] _e Enum value to convert.
       /// \return String representation of the enum. An empty string is
-      /// returned if _e is invalid, or the names for the enum has not been
+      /// returned if _e is invalid, or the names for the enum have not been
       /// set.
       static std::string Str(T const &_e)
       {
@@ -106,7 +77,7 @@ namespace gazebo
       /// \param[in] _str String value to convert to enum value.
       /// \param[in] _e Enum variable to set.
       /// \sa EnumIterator
-      static void Set(const std::string &_str, T &_e)
+      static void Set(T &_e, const std::string &_str)
       {
         static auto begin = std::begin(names);
         static auto end = std::end(names);
@@ -118,60 +89,15 @@ namespace gazebo
         }
       }
 
+      /// \internal
+      /// \brief The beginning and end values. Do not use this directly.
       public: static T range[2];
 
-      /// \brief Array of string names for each element in the enum
+      /// \internal
+      /// \brief Array of string names for each element in the enum. Do not
+      /// use this directly.
       public: static std::vector<std::string> names;
     };
-
-    /// \brief A template to encapsulate an enum names, and provides
-    /// string<->enum conversion.
-    /// \sa EnumIterator
-    /*template<typename T>
-    struct EnumIdentity
-    {
-      /// \brief Convert enum value to string.
-      /// \param[in] _e Enum value to convert.
-      /// \return String representation of the enum. An empty string is
-      /// returned if _e is invalid, or the names for the enum has not been
-      /// set.
-      static std::string Str(T const &_e)
-      {
-        if (_e < names.size())
-          return names[_e];
-        else
-          return "";
-      }
-
-      /// \brief Set an enum from a string. This function requires a valid
-      /// string, and an array of names for the enum must exist.
-      /// \param[in] _str String value to convert to enum value.
-      /// \param[in] _e Enum variable to set.
-      /// \sa EnumIterator
-      static void Set(const std::string &_str, T &_e)
-      {
-        static auto begin = std::begin(names);
-        static auto end = std::end(names);
-
-        auto find = std::find(begin, end, _str);
-        if (find != end)
-        {
-          _e = static_cast<T>(std::distance(begin, find));
-        }
-      }
-
-      /// \brief Array of string names for each element in the enum
-      private: static std::vector<std::string> names;
-    };*/
-
-    /// \brief Use these two function to define the beginning and end of an
-    /// enum.
-    /// \sa EnumIterator
-    namespace EnumDetails
-    {
-      void begin();
-      void end();
-    }
 
     /// \brief An iterator over enum types.
     ///
@@ -186,32 +112,19 @@ namespace gazebo
     ///   MY_TYPE_END
     /// };
     ///
-    /// // String names for each enum item
-    /// template<> std::vector<std::string> EnumIdentity<MyType>::names =
-    /// {
-    ///   "TYPE1",
-    ///   "TYPE2",
-    ///   "MY_TYPE_END"
-    /// };
-    ///
-    /// MyType begin(EnumIdentity<MyType>)
-    /// {
-    ///   return MY_TYPE_BEGIN;
-    /// }
-    ///
-    /// MyType end(EnumIdentity<MyType>)
-    /// {
-    ///   return MY_TYPE_END;
-    /// }
+    /// GZ_ENUM(MyType, MY_TYPE_BEGIN, MY_TYPE_END,
+    ///  "TYPE1",
+    ///  "TYPE2",
+    ///  "MY_TYPE_END")
     ///
     /// int main()
     /// {
-    ///   EnumIterator<MyType> i = MY_TYPE_BEGIN;
+    ///   EnumIface<MyType> i = MY_TYPE_BEGIN;
     ///   std::cout << "Type Number[" << *i << "]\n";
-    ///   std::cout << "Type Name[" << EnumIdentity::ToStr(*i) << "]\n";
+    ///   std::cout << "Type Name[" << EnumIface::Str(*i) << "]\n";
     ///   i++;
     ///   std::cout << "Type++ Number[" << *i << "]\n";
-    ///   std::cout << "Type++ Name[" << EnumIdentity::ToStr(*i) << "]\n";
+    ///   std::cout << "Type++ Name[" << EnumIface::Str(*i) << "]\n";
     /// }
     /// \verbatim
     template<typename Enum>
@@ -245,18 +158,14 @@ namespace gazebo
       /// \return Value at the beginning of the enum list
       public: static Enum Begin()
       {
-        return EnumId<Enum>::Begin();
-        //using EnumDetails::begin;
-        //return begin(EnumIdentity<Enum>());
+        return EnumIface<Enum>::Begin();
       }
 
       /// \brief Get the end of the enum
       /// \return Value at the end of the enum list
       public: static Enum End()
       {
-        return EnumId<Enum>::End();
-        // using EnumDetails::end;
-        //return end(EnumIdentity<Enum>());
+        return EnumIface<Enum>::End();
       }
 
       /// \brief Prefix increment operator.
@@ -279,7 +188,7 @@ namespace gazebo
       }
 
       /// \brief Prefix decrement operator
-      /// \return Interator pointing to the previous value in the enum
+      /// \return Iterator pointing to the previous value in the enum
       public: EnumIterator &operator--()
       {
         GZ_ASSERT(this->c != this->Begin(), "decrementing beyond begin?");
@@ -288,7 +197,7 @@ namespace gazebo
       }
 
       /// \brief Postfix decrement operator
-      /// \return Interator pointing to the previous value in the enum
+      /// \return Iterator pointing to the previous value in the enum
       public: EnumIterator operator--(const int)
       {
         GZ_ASSERT(this->c != this->Begin(), "Decrementing beyond beginning.");
@@ -314,7 +223,7 @@ namespace gazebo
 
       /// \brief Enum value
       /// Did not use a private data class since this should be the only
-      /// member value every used.
+      /// member value ever used.
       private: Enum c;
     };
 
@@ -337,30 +246,6 @@ namespace gazebo
     {
       return !(_e1 == _e2);
     }
-
-    /// \brief Output an enum as a string
-    /// \param[in] _out Output stream
-    /// \param[in] _data Enum to output
-    /// \return Output stream
-    /*template<typename T>
-    std::ostream &operator<<(std::ostream &_out,
-        EnumConstRefHolder<T> const &_data)
-    {
-      return _out << EnumIdentity<T>::names[_data.value];
-    }*/
-
-    /// \brief Set an enum from a string
-    /// \param[in] _out Input stream
-    /// \param[out] _data Enum to set
-    /// \return Input stream
-    /*template<typename T>
-    std::istream &operator>>(std::istream &_in, T &_data)
-    {
-      std::string value;
-      _in >> value;
-      EnumIdentity<T>::Set(value, _data);
-      return _in;
-    }*/
   }
 }
 #endif

@@ -20,7 +20,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "gazebo/util/system.hh"
-#include "gazebo/common/EnumIterator.hh"
+#include "gazebo/common/EnumIface.hh"
 
 /// \file
 /// \ingroup gazebo_sensors
@@ -35,6 +35,7 @@ namespace gazebo
     class Sensor;
     class RaySensor;
     class CameraSensor;
+    class LogicalCameraSensor;
     class MagnetometerSensor;
     class MultiCameraSensor;
     class DepthCameraSensor;
@@ -193,6 +194,10 @@ namespace gazebo
     /// \brief Vector of WirelessReceiver
     typedef std::vector<WirelessReceiver> WirelessReceiver_V;
 
+    /// \def LogicalCameraSensorPtr
+    /// \brief Shared pointer to LogicalCameraSensor
+    typedef boost::shared_ptr<LogicalCameraSensor> LogicalCameraSensorPtr;
+
     /// \def SensorNoiseType
     /// \brief Eumeration of all sensor noise types
     enum SensorNoiseType
@@ -291,15 +296,6 @@ namespace gazebo
       /// use this.
       SENSOR_NOISE_TYPE_END
     };
-
-    /// \brief Function used to define the beginning of the enum. This is
-    /// used by the common::EnumIterator.
-    //SensorNoiseType begin(common::EnumIdentity<SensorNoiseType>);
-
-    /// \brief Function used to define the end of the enum. This is
-    /// used by the common::EnumIterator.
-    //SensorNoiseType end(common::EnumIdentity<SensorNoiseType>);
-
     /// \}
   }
 }

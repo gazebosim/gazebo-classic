@@ -73,6 +73,9 @@ namespace gazebo
     // Documentation inherited
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    // Documentation inherited
+    public: virtual void Reset();
+
     /// \brief Update the plugin once every iteration of simulation.
     /// \param[in] _info World update information.
     private: void Update(const common::UpdateInfo &_info);
