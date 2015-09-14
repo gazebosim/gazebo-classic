@@ -1,0 +1,120 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Marker
+/// \brief A message used to draw visuals
+
+import "time.proto";
+import "pose.proto";
+import "vector3d.proto";
+import "material.proto";
+
+message Marker
+{
+  /// \brief The marker type (shape/geometry)
+  enum Type
+  {
+    CUBE          = 0;
+    CYLINDER      = 1;
+    LINE_STRIP    = 2;
+    LINE_LIST     = 3;
+    POINTS        = 4;
+    SPHERE        = 5;
+    TEXT          = 6;
+    TRIANGLE_FAN  = 7;
+    TRIANGLE_LIST = 8;
+  }
+
+  /// \brief How to interpret the data. 
+  enum Action
+  {
+    /// \brief Use this action to create a new marker or modify an exisiting 
+    /// marker. A marker will be created if the provided id does not match
+    /// an exisiting marker, otherwise the marker with the provided id will
+    /// be modified.
+    ADD_MODIFY = 0;
+
+    /// \brief Use this action to delete an existing marking.
+    /// Nothing will happend if the provided id does not match an exisiting
+    /// marker.
+    DELETE     = 1;
+
+    /// \brief Delete all the markers. If a namespace is provided,
+    /// then only the markers in the provided namespace are deleted.
+    DELETE_ALL = 2;
+  }
+
+  /// \brief The action to take
+  ///
+  /// Relevant Type: all
+  required Action action     = 1;
+
+  /// \brief Namespace of the marker. A namespace groups id's together.
+  ///
+  /// Relevant Action: ADD_MODIFY, DELETE, DELETE_ALL
+  optional string ns         = 2; 
+
+  /// \brief The id within the namespace of the visual. Each marker has a
+  /// unique id. It's up to the user to select id values.
+  ///
+  /// Relevant Action: ADD_MODIFY, DELETE
+  ///
+  /// Relevant Type: all
+  optional uint64 id         = 3; 
+
+  /// \brief The layer the visual belongs to.
+  ///
+  /// Relevant Action: ADD_MODIFY
+  ///
+  /// Relevant Type: all
+  optional string layer      = 4[default="default"];
+
+  /// \brief The type of geometry.
+  ///
+  /// Relevant Action: ADD_MODIFY
+  optional Type type         = 5;
+
+  /// \brief How long to keep the visual alive before deletion. A value of 
+  /// zero indicates forever.
+  ///
+  /// Relevant Action: ADD_MODIFY
+  ///
+  /// Relevant Type: all
+  optional Time lifetime     = 6;
+
+  /// \brief Pose of the marker
+  ///
+  /// Relevant Action: ADD_MODIFY
+  ///
+  /// Relevant Type: all
+  optional Pose pose         = 7;
+
+  /// \brief Scale of the marker
+  ///
+  /// Relevant Action: ADD_MODIFY
+  ///
+  /// Relevant Type: all
+  optional Vector3d scale    = 8;
+
+  /// \brief Marker color
+  ///
+  /// Relevant Action: ADD_MODIFY
+  ///
+  /// Relevant Type: all
+  optional Material material = 9;
+
+  /// \brief Used to specify geometry for a LINE_STRIP, LINE_LIST, POINTS,
+  /// TRIANGLE_LIST, and TRIANGLE_FAN
+  ///
+  /// Relevant Action: ADD_MODIFY
+  ///
+  /// Relevant Type: LINE_STRIP, LINE_LIST, POINTS, TRIANGLE_FAN, TRIANGLE_LIST
+  repeated Vector3d point    = 10;
+
+  /// \brief String to display. Only used for TEXT marker.
+  ///
+  /// Relevant Action: ADD_MODIFY
+  ///
+  /// Relevant Type: TEXT
+  optional string text       = 11;
+}
