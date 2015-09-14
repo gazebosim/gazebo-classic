@@ -132,7 +132,7 @@ void COMVisual::Load()
   sphereObj->setCastShadows(false);
 
   dPtr->sphereNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE_");
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE");
 
   dPtr->sphereNode->attachObject(sphereObj);
   dPtr->sphereNode->setScale(sphereRadius*2, sphereRadius*2, sphereRadius*2);

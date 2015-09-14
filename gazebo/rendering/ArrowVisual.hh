@@ -55,6 +55,9 @@ namespace gazebo
       /// \brief Show the head of the arrow visual.
       /// \param[in] _show True to show the arrow head.
       public: void ShowHead(bool _show);
+
+      // Documentation inherited
+      public: virtual void SetVisible(bool _visible, bool _cascade = true);
     };
     /// \}
   }

@@ -39,6 +39,10 @@ ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
   dPtr->headNode = NULL;
   dPtr->shaftNode = NULL;
   dPtr->rotationNode = NULL;
+
+  dPtr->headNodeVisible = true;
+  dPtr->shaftNodeVisible = true;
+  dPtr->rotationNodeVisible = false;
 }
 
 /////////////////////////////////////////////////
@@ -97,7 +101,10 @@ void ArrowVisual::ShowShaft(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  dPtr->shaftNode->setVisible(_show);
+  dPtr->shaftNodeVisible = _show;
+
+  if (dPtr->shaftNode)
+    dPtr->shaftNode->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -106,7 +113,9 @@ void ArrowVisual::ShowHead(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  dPtr->headNode->setVisible(_show);
+  dPtr->headNodeVisible = _show;
+  if (dPtr->headNode)
+    dPtr->headNode->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -115,5 +124,20 @@ void ArrowVisual::ShowRotation(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  dPtr->rotationNode->setVisible(_show);
+  dPtr->rotationNodeVisible = _show;
+
+  if (dPtr->rotationNode)
+    dPtr->rotationNode->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void ArrowVisual::SetVisible(bool _visible, bool _cascade)
+{
+  ArrowVisualPrivate *dPtr =
+      reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
+
+  dPtr->headNode->setVisible(dPtr->headNodeVisible && _visible, _cascade);
+  dPtr->shaftNode->setVisible(dPtr->shaftNodeVisible && _visible, _cascade);
+  dPtr->rotationNode->setVisible(
+      dPtr->rotationNodeVisible && _visible, _cascade);
 }
