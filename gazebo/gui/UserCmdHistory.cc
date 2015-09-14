@@ -32,8 +32,10 @@ UserCmdHistory::UserCmdHistory()
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
-  this->dataPtr->undoRedoPub = this->dataPtr->node->Advertise<msgs::UndoRedo>("~/undo_redo");
-  this->dataPtr->userCmdStatsSub = this->dataPtr->node->Subscribe("~/user_cmd_stats",
+  this->dataPtr->undoRedoPub =
+      this->dataPtr->node->Advertise<msgs::UndoRedo>("~/undo_redo");
+  this->dataPtr->userCmdStatsSub =
+      this->dataPtr->node->Subscribe("~/user_cmd_stats",
       &UserCmdHistory::OnUserCmdStatsMsg, this);
 
   // Qt connections
