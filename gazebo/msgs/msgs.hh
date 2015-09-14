@@ -79,34 +79,6 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
-    /// \brief Convert a math::Vector3 to a msgs::Vector3d
-    /// \param[in] _v The vector to convert
-    /// \return A msgs::Vector3d object
-    /// \deprecated See function that accepts an ignition::math object.
-    GAZEBO_VISIBLE
-    msgs::Vector3d Convert(const math::Vector3 &_v) GAZEBO_DEPRECATED(6.0);
-
-    /// \brief Convert a math::Vector2d to a msgs::Vector2d
-    /// \param[in] _v The vector to convert
-    /// \return A msgs::Vector2d object
-    /// \deprecated See function that accepts an ignition::math object.
-    GAZEBO_VISIBLE
-    msgs::Vector2d Convert(const math::Vector2d &_v) GAZEBO_DEPRECATED(6.0);
-
-    /// \brief Convert a math::Quaternion to a msgs::Quaternion
-    /// \param[in] _q The quaternion to convert
-    /// \return A msgs::Quaternion object
-    /// \deprecated See function that accepts an ignition::math object.
-    GAZEBO_VISIBLE
-    msgs::Quaternion Convert(const math::Quaternion &_q) GAZEBO_DEPRECATED(6.0);
-
-    /// \brief Convert a math::Pose to a msgs::Pose
-    /// \param[in] _p The pose to convert
-    /// \return A msgs::Pose object
-    /// \deprecated See function that accepts an ignition::math object.
-    GAZEBO_VISIBLE
-    msgs::Pose Convert(const math::Pose &_p) GAZEBO_DEPRECATED(6.0);
-
     /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector3d object
@@ -143,13 +115,6 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Time Convert(const common::Time &_t);
 
-    /// \brief Convert a math::Plane to a msgs::PlaneGeom
-    /// \param[in] _p The plane to convert
-    /// \return A msgs::PlaneGeom object
-    /// \deprecated See function that accepts an ignition::math object.
-    GAZEBO_VISIBLE
-    msgs::PlaneGeom Convert(const math::Plane &_p) GAZEBO_DEPRECATED(6.0);
-
     /// \brief Convert a ignition::math::Planed to a msgs::PlaneGeom
     /// \param[in] _p The plane to convert
     /// \return A msgs::PlaneGeom object
@@ -181,38 +146,6 @@ namespace gazebo
     /// \return Geometry type string.
     GAZEBO_VISIBLE
     std::string ConvertGeometryType(const msgs::Geometry::Type _type);
-
-    /// \brief Convert a msgs::Vector3d to a math::Vector
-    /// \param[in] _v The plane to convert
-    /// \return A math::Vector3 object
-    /// \deprecated See ConvertIgn() function that returns an ignition::math
-    /// object.
-    GAZEBO_VISIBLE
-    math::Vector3 Convert(const msgs::Vector3d &_v) GAZEBO_DEPRECATED(6.0);
-
-    /// \brief Convert a msgs::Vector2d to a math::Vector2d
-    /// \param[in] _v The vector2 to convert
-    /// \return A math::Vector2d object
-    /// \deprecated See ConvertIgn() function that returns an ignition::math
-    /// object.
-    GAZEBO_VISIBLE
-    math::Vector2d Convert(const msgs::Vector2d &_v) GAZEBO_DEPRECATED(6.0);
-
-    /// \brief Convert a msgs::Quaternion to a math::Quaternion
-    /// \param[in] _q The quaternion to convert
-    /// \return A math::Quaternion object
-    /// \deprecated See ConvertIgn() function that returns an ignition::math
-    /// object.
-    GAZEBO_VISIBLE
-    math::Quaternion Convert(const msgs::Quaternion &_q) GAZEBO_DEPRECATED(6.0);
-
-    /// \brief Convert a msgs::Pose to a math::Pose
-    /// \param[in] _q The pose to convert
-    /// \return A math::Pose object
-    /// \deprecated See ConvertIgn() function that returns an ignition::math
-    /// object.
-    GAZEBO_VISIBLE
-    math::Pose Convert(const msgs::Pose &_p) GAZEBO_DEPRECATED(6.0);
 
     /// \brief Convert a msgs::Vector3d to an ignition::math::Vector
     /// \param[in] _v The plane to convert
@@ -256,14 +189,6 @@ namespace gazebo
     GAZEBO_VISIBLE
     common::Time Convert(const msgs::Time &_t);
 
-    /// \brief Convert a msgs::PlaneGeom to a math::Plane
-    /// \param[in] _p The plane to convert
-    /// \return A math::Plane object
-    /// \deprecated See ConvertIgn() function that returns an ignition::math
-    /// object.
-    GAZEBO_VISIBLE
-    math::Plane Convert(const msgs::PlaneGeom &_p) GAZEBO_DEPRECATED(6.0);
-
     /// \brief Convert a msgs::PlaneGeom to an ignition::math::Planed
     /// \param[in] _p The plane to convert
     /// \return An ignition::math::Planed object
@@ -275,41 +200,6 @@ namespace gazebo
     /// \param[in] _i A common::Image reference
     GAZEBO_VISIBLE
     void Set(msgs::Image *_msg, const common::Image &_i);
-
-    /// \brief Set a msgs::Vector3d from a math::Vector3
-    /// \param[out] _pt A msgs::Vector3d pointer
-    /// \param[in] _v A math::Vector3 reference
-    /// \deprecated See Set() function that accepts an
-    /// ignition::math::Vector3d object.
-    GAZEBO_VISIBLE
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v)
-    GAZEBO_DEPRECATED(6.0);
-
-    /// \brief Set a msgs::Vector2d from a math::Vector3
-    /// \param[out] _pt A msgs::Vector2d pointer
-    /// \param[in] _v A math::Vector2d reference
-    /// \deprecated See Set() function that accepts an
-    /// ignition::math::Vector2d object.
-    GAZEBO_VISIBLE
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v)
-    GAZEBO_DEPRECATED(6.0);
-
-    /// \brief Set a msgs::Quaternion from a math::Quaternion
-    /// \param[out] _q A msgs::Quaternion pointer
-    /// \param[in] _v A math::Quaternion reference
-    /// \deprecated See Set() function that accepts an
-    /// ignition::math::Quaterniond object.
-    GAZEBO_VISIBLE
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v)
-    GAZEBO_DEPRECATED(6.0);
-
-    /// \brief Set a msgs::Pose from a math::Pose
-    /// \param[out] _p A msgs::Pose pointer
-    /// \param[in] _v A math::Pose reference
-    /// \deprecated See Set() function that accepts an
-    /// ignition::math::Pose3d object.
-    GAZEBO_VISIBLE
-    void Set(msgs::Pose *_p, const math::Pose &_v) GAZEBO_DEPRECATED(6.0);
 
     /// \brief Set a msgs::Vector3d from an ignition::math::Vector3d
     /// \param[out] _pt A msgs::Vector3d pointer
@@ -354,14 +244,6 @@ namespace gazebo
     GAZEBO_VISIBLE
     void Set(msgs::SphericalCoordinates *_s,
              const common::SphericalCoordinates &_v);
-
-    /// \brief Set a msgs::Plane from a math::Plane
-    /// \param[out] _p A msgs::Plane pointer
-    /// \param[in] _v A math::Plane reference
-    /// \deprecated See Set() function that accepts an
-    /// ignition::math::Planed object.
-    GAZEBO_VISIBLE
-    void Set(msgs::PlaneGeom *_p, const math::Plane &_v) GAZEBO_DEPRECATED(6.0);
 
     /// \brief Set a msgs::Plane from an ignition::math::Planed
     /// \param[out] _p A msgs::Plane pointer
@@ -584,19 +466,6 @@ namespace gazebo
     GAZEBO_VISIBLE
     sdf::ElementPtr MeshToSDF(const msgs::MeshGeom &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
-
-    /// \brief Add a simple box link to a Model message.
-    /// The size and mass of the box are specified, and a
-    /// single collision is added, along with an inertial
-    /// block corresponding to a box of uniform density.
-    /// \param[out] _model The msgs::Model to which the link is added.
-    /// \param[in] _mass Mass of the box.
-    /// \param[in] _size Size of the box.
-    /// \deprecated See AddBoxLink() function that accepts an
-    /// ignition::math::Vector3d object.
-    GAZEBO_VISIBLE
-    void AddBoxLink(msgs::Model &_model, const double _mass,
-                    const math::Vector3 &_size) GAZEBO_DEPRECATED(6.0);
 
     /// \brief Add a simple box link to a Model message.
     /// The size and mass of the box are specified, and a

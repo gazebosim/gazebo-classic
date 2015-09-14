@@ -179,12 +179,6 @@ OpenALSink::~OpenALSink()
 }
 
 /////////////////////////////////////////////////
-bool OpenALSink::SetPose(const math::Pose &_pose)
-{
-  return this->SetPose(_pose.Ign());
-}
-
-/////////////////////////////////////////////////
 bool OpenALSink::SetPose(const ignition::math::Pose3d &_pose)
 {
   ALenum error;
@@ -223,12 +217,6 @@ bool OpenALSink::SetPose(const ignition::math::Pose3d &_pose)
   }
 
   return true;
-}
-
-/////////////////////////////////////////////////
-bool OpenALSink::SetVelocity(const math::Vector3 &_vel)
-{
-  return this->SetVelocity(_vel.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -315,12 +303,6 @@ bool OpenALSource::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-bool OpenALSource::SetPose(const math::Pose &_pose)
-{
-  return this->SetPose(_pose.Ign());
-}
-
-/////////////////////////////////////////////////
 bool OpenALSource::SetPose(const ignition::math::Pose3d &_pose)
 {
   ALfloat p[3] = {static_cast<float>(_pose.Pos().X()),
@@ -339,12 +321,6 @@ bool OpenALSource::SetPose(const ignition::math::Pose3d &_pose)
   }
 
   return true;
-}
-
-/////////////////////////////////////////////////
-bool OpenALSource::SetVelocity(const math::Vector3 &_vel)
-{
-  return this->SetVelocity(_vel.Ign());
 }
 
 /////////////////////////////////////////////////
