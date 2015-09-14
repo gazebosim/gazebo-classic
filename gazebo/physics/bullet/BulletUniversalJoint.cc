@@ -234,41 +234,6 @@ void BulletUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetMaxForce(unsigned int _index, double _t)
-{
-  if (this->bulletUniversal)
-  {
-    if (_index == 0)
-      this->bulletUniversal->setMaxMotorImpulse1(_t);
-    else if (_index == 1)
-      this->bulletUniversal->setMaxMotorImpulse2(_t);
-    else
-      gzerr << "Invalid axis index[" << _index << "]\n";
-  }
-  else
-    gzerr << "bulletUniversal does not yet exist" << std::endl;
-}
-
-//////////////////////////////////////////////////
-double BulletUniversalJoint::GetMaxForce(unsigned int _index)
-{
-  double result = 0;
-  if (this->bulletUniversal)
-  {
-    if (_index == 0)
-      result = this->bulletUniversal->getMaxMotorImpulse1();
-    else if (_index == 1)
-      result = this->bulletUniversal->getMaxMotorImpulse2();
-    else
-      gzerr << "Invalid axis index[" << _index << "]\n";
-  }
-  else
-    gzerr << "bulletUniversal does not yet exist" << std::endl;
-
-  return result;
-}
-
-//////////////////////////////////////////////////
 bool BulletUniversalJoint::SetHighStop(unsigned int _index,
     const math::Angle &_angle)
 {

@@ -205,7 +205,7 @@ dReal dJointGetPUPositionRate( dJointID j )
 
 
 
-void 
+void
 dxJointPU::getSureMaxInfo( SureMaxInfo* info )
 {
   info->max_m = 6;
@@ -457,58 +457,6 @@ void dJointSetPUAnchor( dJointID j, dReal x, dReal y, dReal z )
 }
 
 /**
- * This function initialize the anchor and the relative position of each body
- * as if body2 was at its current position + [dx,dy,dy].
- * Ex:
- * <PRE>
- * dReal offset = 1;
- * dVector3 dir;
- * dJointGetPUAxis3(jId, dir);
- * dJointSetPUAnchor(jId, 0, 0, 0);
- * // If you request the position you will have: dJointGetPUPosition(jId) == 0
- * dJointSetPUAnchorDelta(jId, 0, 0, 0, dir[X]*offset, dir[Y]*offset, dir[Z]*offset);
- * // If you request the position you will have: dJointGetPUPosition(jId) == -offset
- * </PRE>
-
- * @param j The PU joint for which the anchor point will be set
- * @param x The X position of the anchor point in world frame
- * @param y The Y position of the anchor point in world frame
- * @param z The Z position of the anchor point in world frame
- * @param dx A delta to be added to the X position as if the anchor was set
- *           when body1 was at current_position[X] + dx
- * @param dx A delta to be added to the Y position as if the anchor was set
- *           when body1 was at current_position[Y] + dy
- * @param dx A delta to be added to the Z position as if the anchor was set
- *           when body1 was at current_position[Z] + dz
- * @note Should have the same meaning as dJointSetSliderAxisDelta
- */
-void dJointSetPUAnchorDelta( dJointID j, dReal x, dReal y, dReal z,
-                             dReal dx, dReal dy, dReal dz )
-{
-    dxJointPU* joint = ( dxJointPU* ) j;
-    dUASSERT( joint, "bad joint argument" );
-    checktype( joint, PU );
-
-    if ( joint->node[0].body )
-    {
-        joint->node[0].body->posr.pos[0] += dx;
-        joint->node[0].body->posr.pos[1] += dy;
-        joint->node[0].body->posr.pos[2] += dz;
-    }
-
-    setAnchors( joint, x, y, z, joint->anchor1, joint->anchor2 );
-
-    if ( joint->node[0].body )
-    {
-        joint->node[0].body->posr.pos[0] -= dx;
-        joint->node[0].body->posr.pos[1] -= dy;
-        joint->node[0].body->posr.pos[2] -= dz;
-    }
-
-    joint->computeInitialRelativeRotations();
-}
-
-/**
  * \brief This function initialize the anchor and the relative position of each body
  * such that dJointGetPUPosition will return the dot product of axis and [dx,dy,dy].
  *
@@ -523,7 +471,6 @@ void dJointSetPUAnchorDelta( dJointID j, dReal x, dReal y, dReal z,
  * dJointGetPUAxis3(jId, dir);
  * dJointSetPUAnchor(jId, 0, 0, 0);
  * // If you request the position you will have: dJointGetPUPosition(jId) == 0
- * dJointSetPUAnchorDelta(jId, 0, 0, 0, dir[X]*offset, dir[Y]*offset, dir[Z]*offset);
  * // If you request the position you will have: dJointGetPUPosition(jId) == offset
  * </PRE>
 

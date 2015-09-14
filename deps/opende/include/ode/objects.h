@@ -1334,25 +1334,25 @@ ODE_API void dBodyAddRelTorque        (dBodyID, dReal fx, dReal fy, dReal fz);
  * @ingroup bodies
  */
 ODE_API void dBodyAddForceAtPos       (dBodyID, dReal fx, dReal fy, dReal fz,
-			                dReal px, dReal py, dReal pz);
+                      dReal px, dReal py, dReal pz);
 /**
  * @brief Add force at specified point in body in local coordinates.
  * @ingroup bodies
  */
 ODE_API void dBodyAddForceAtRelPos    (dBodyID, dReal fx, dReal fy, dReal fz,
-			                dReal px, dReal py, dReal pz);
+                      dReal px, dReal py, dReal pz);
 /**
  * @brief Add force at specified point in body in global coordinates.
  * @ingroup bodies
  */
 ODE_API void dBodyAddRelForceAtPos    (dBodyID, dReal fx, dReal fy, dReal fz,
-			                dReal px, dReal py, dReal pz);
+                      dReal px, dReal py, dReal pz);
 /**
  * @brief Add force at specified point in body in local coordinates.
  * @ingroup bodies
  */
 ODE_API void dBodyAddRelForceAtRelPos (dBodyID, dReal fx, dReal fy, dReal fz,
-			                dReal px, dReal py, dReal pz);
+                      dReal px, dReal py, dReal pz);
 
 /**
  * @brief Return the current accumulated force vector.
@@ -1778,48 +1778,48 @@ ODE_API void dBodySetGyroscopicMode(dBodyID b, int enabled);
  *
  *
  * \li  dParamLoStop Low stop angle or position. Setting this to
- *	-dInfinity (the default value) turns off the low stop.
- *	For rotational joints, this stop must be greater than -pi to be
- *	effective.
+ *  -dInfinity (the default value) turns off the low stop.
+ *  For rotational joints, this stop must be greater than -pi to be
+ *  effective.
  * \li  dParamHiStop High stop angle or position. Setting this to
- *	dInfinity (the default value) turns off the high stop.
- *	For rotational joints, this stop must be less than pi to be
- *	effective.
- *	If the high stop is less than the low stop then both stops will
- *	be ineffective.
+ *  dInfinity (the default value) turns off the high stop.
+ *  For rotational joints, this stop must be less than pi to be
+ *  effective.
+ *  If the high stop is less than the low stop then both stops will
+ *  be ineffective.
  * \li  dParamVel Desired motor velocity (this will be an angular or
- *	linear velocity).
+ *  linear velocity).
  * \li  dParamFMax The maximum force or torque that the motor will use to
- *	achieve the desired velocity.
- *	This must always be greater than or equal to zero.
- *	Setting this to zero (the default value) turns off the motor.
+ *  achieve the desired velocity.
+ *  This must always be greater than or equal to zero.
+ *  Setting this to zero (the default value) turns off the motor.
  * \li  dParamFudgeFactor The current joint stop/motor implementation has
- *	a small problem:
- *	when the joint is at one stop and the motor is set to move it away
- *	from the stop, too much force may be applied for one time step,
- *	causing a ``jumping'' motion.
- *	This fudge factor is used to scale this excess force.
- *	It should have a value between zero and one (the default value).
- *	If the jumping motion is too visible in a joint, the value can be
- *	reduced.
- *	Making this value too small can prevent the motor from being able to
- *	move the joint away from a stop.
+ *  a small problem:
+ *  when the joint is at one stop and the motor is set to move it away
+ *  from the stop, too much force may be applied for one time step,
+ *  causing a ``jumping'' motion.
+ *  This fudge factor is used to scale this excess force.
+ *  It should have a value between zero and one (the default value).
+ *  If the jumping motion is too visible in a joint, the value can be
+ *  reduced.
+ *  Making this value too small can prevent the motor from being able to
+ *  move the joint away from a stop.
  * \li  dParamBounce The bouncyness of the stops.
- *	This is a restitution parameter in the range 0..1.
- *	0 means the stops are not bouncy at all, 1 means maximum bouncyness.
+ *  This is a restitution parameter in the range 0..1.
+ *  0 means the stops are not bouncy at all, 1 means maximum bouncyness.
  * \li  dParamCFM The constraint force mixing (CFM) value used when not
- *	at a stop.
+ *  at a stop.
  * \li  dParamStopERP The error reduction parameter (ERP) used by the
- *	stops.
+ *  stops.
  * \li  dParamStopCFM The constraint force mixing (CFM) value used by the
- *	stops. Together with the ERP value this can be used to get spongy or
- *	soft stops.
- *	Note that this is intended for unpowered joints, it does not really
- *	work as expected when a powered joint reaches its limit.
+ *  stops. Together with the ERP value this can be used to get spongy or
+ *  soft stops.
+ *  Note that this is intended for unpowered joints, it does not really
+ *  work as expected when a powered joint reaches its limit.
  * \li  dParamSuspensionERP Suspension error reduction parameter (ERP).
- *	Currently this is only implemented on the hinge-2 joint.
+ *  Currently this is only implemented on the hinge-2 joint.
  * \li  dParamSuspensionCFM Suspension constraint force mixing (CFM) value.
- *	Currently this is only implemented on the hinge-2 joint.
+ *  Currently this is only implemented on the hinge-2 joint.
  *
  * If a particular parameter is not implemented by a given joint, setting it
  * will have no effect.
@@ -2458,13 +2458,6 @@ ODE_API void dJointAddPRTorque (dJointID j, dReal torque);
   ODE_API void dJointSetPUAnchor (dJointID, dReal x, dReal y, dReal z);
 
   /**
-   * @brief set anchor
-   * @ingroup joints
-   */
-  ODE_API_DEPRECATED ODE_API void dJointSetPUAnchorDelta (dJointID, dReal x, dReal y, dReal z,
-                                                          dReal dx, dReal dy, dReal dz);
-
-  /**
    * @brief Set the PU anchor as if the 2 bodies were already at [dx, dy, dz] appart.
    * @ingroup joints
    *
@@ -2593,21 +2586,6 @@ ODE_API void dJointAddPRTorque (dJointID j, dReal torque);
   ODE_API void dJointSetPistonAxis (dJointID, dReal x, dReal y, dReal z);
 
   /**
-   * This function set prismatic axis of the joint and also set the position
-   * of the joint.
-   *
-   * @ingroup joints
-   * @param j The joint affected by this function
-   * @param x The x component of the axis
-   * @param y The y component of the axis
-   * @param z The z component of the axis
-   * @param dx The Initial position of the prismatic join in the x direction
-   * @param dy The Initial position of the prismatic join in the y direction
-   * @param dz The Initial position of the prismatic join in the z direction
-   */
-  ODE_API_DEPRECATED ODE_API void dJointSetPistonAxisDelta (dJointID j, dReal x, dReal y, dReal z, dReal ax, dReal ay, dReal az);
-
-  /**
    * @brief set joint parameter
    * @ingroup joints
    */
@@ -2651,7 +2629,7 @@ ODE_API void dJointSetAMotorNumAxes (dJointID, int num);
  * @ingroup joints
  */
 ODE_API void dJointSetAMotorAxis (dJointID, int anum, int rel,
-			  dReal x, dReal y, dReal z);
+        dReal x, dReal y, dReal z);
 
 /**
  * @brief Tell the AMotor what the current angle is along axis anum.
@@ -3351,11 +3329,11 @@ ODE_API void dJointGetAMotorAxis (dJointID, int anum, dVector3 result);
  * return the relative mode.
  *
  * For dAMotorEuler mode:
- * \li	Only axes 0 and 2 need to be set. Axis 1 will be determined
-	automatically at each time step.
- * \li	Axes 0 and 2 must be perpendicular to each other.
- * \li	Axis 0 must be anchored to the first body, axis 2 must be anchored
-	to the second body.
+ * \li  Only axes 0 and 2 need to be set. Axis 1 will be determined
+  automatically at each time step.
+ * \li  Axes 0 and 2 must be perpendicular to each other.
+ * \li  Axis 0 must be anchored to the first body, axis 2 must be anchored
+  to the second body.
  * @ingroup joints
  */
 ODE_API int dJointGetAMotorAxisRel (dJointID, int anum);

@@ -131,12 +131,6 @@ namespace gazebo
 
       /// \brief Get the current pose.
       /// \return Current pose of the sensor.
-      /// \deprecated See Pose() function that returns an
-      /// ignition::math::Pose3d object.
-      public: virtual math::Pose GetPose() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the current pose.
-      /// \return Current pose of the sensor.
       public: virtual ignition::math::Pose3d Pose() const;
 
       /// \brief Set whether the sensor is active or not.
@@ -207,15 +201,6 @@ namespace gazebo
       /// \return The sensor's parent's ID.
       public: uint32_t GetParentId() const;
 
-      /// \brief Get the sensor's noise model.
-      /// Depracted in favour of GetNoise(const SensorNoiseType _type)
-      /// which explicitly specifies the noise stream
-      /// \param[in] _index Index of the noise model. For most sensors this
-      /// will be 0. For a multi camera sensor the index can be >=0.
-      /// \return The sensor's noise model.
-      public: NoisePtr GetNoise(unsigned int _index = 0) const
-              GAZEBO_DEPRECATED(6.0);
-
       /// \brief Get the sensor's noise model for a specified noise type.
       /// \param[in] _type Index of the noise type. Refer to
       /// SensorNoiseType enumeration for possible indices
@@ -277,10 +262,7 @@ namespace gazebo
       /// \brief Noise added to sensor data
       /// The key maps to a SensorNoiseType, and is kept as an int value
       /// for backward compatibilty with Gazebo 5&6.
-      /// \todo: Change to std::map<SensorNoiseType, NoisePtr> in Gazebo7.
-      /// Adding the word GAZEBO_DEPRECATED here so that a grep will find
-      /// the above note.
-      protected: std::map<int, NoisePtr> noises;
+      protected: std::map<SensorNoiseType, NoisePtr> noises;
 
       /// \brief Mutex to protect resetting lastUpdateTime.
       private: boost::mutex mutexLastUpdateTime;

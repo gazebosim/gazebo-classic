@@ -20,6 +20,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "gazebo/util/system.hh"
+#include "gazebo/common/EnumIterator.hh"
 
 /// \file
 /// \ingroup gazebo_sensors
@@ -196,9 +197,14 @@ namespace gazebo
     /// \brief Eumeration of all sensor noise types
     enum SensorNoiseType
     {
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
+      SENSOR_NOISE_TYPE_BEGIN = 0,
+
       /// \brief Noise streams for the Camera sensor
       /// \sa CameraSensor
-      NO_NOISE = 0,
+      NO_NOISE = SENSOR_NOISE_TYPE_BEGIN,
 
       /// \brief Noise streams for the Camera sensor
       /// \sa CameraSensor
@@ -278,8 +284,22 @@ namespace gazebo
 
       /// \brief IMU linear acceleration Z noise stream
       /// \sa ImuSensor
-      IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20
+      IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20,
+
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
+      SENSOR_NOISE_TYPE_END
     };
+
+    /// \brief Function used to define the beginning of the enum. This is
+    /// used by the common::EnumIterator.
+    //SensorNoiseType begin(common::EnumIdentity<SensorNoiseType>);
+
+    /// \brief Function used to define the end of the enum. This is
+    /// used by the common::EnumIterator.
+    //SensorNoiseType end(common::EnumIdentity<SensorNoiseType>);
+
     /// \}
   }
 }

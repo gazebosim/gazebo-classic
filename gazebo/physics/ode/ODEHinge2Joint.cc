@@ -170,26 +170,6 @@ void ODEHinge2Joint::SetVelocity(unsigned int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-double ODEHinge2Joint::GetMaxForce(unsigned int _index)
-{
-  if (_index == 0)
-    return this->GetParam(dParamFMax);
-  else
-    return this->GetParam(dParamFMax2);
-}
-
-
-//////////////////////////////////////////////////
-void ODEHinge2Joint::SetMaxForce(unsigned int _index, double _t)
-{
-  if (_index == 0)
-    this->SetParam(dParamFMax, _t);
-  else
-    this->SetParam(dParamFMax2, _t);
-}
-
-
-//////////////////////////////////////////////////
 void ODEHinge2Joint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (this->jointId)

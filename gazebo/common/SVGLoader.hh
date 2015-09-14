@@ -103,20 +103,6 @@ namespace gazebo
       /// \param[in] _tol Tolerence when comparing distance between 2 points.
       /// \param[out] _closedPolys A vector to collect new closed loops
       /// \param[out] _openPolys A vector to collect non closed paths
-      /// \deprecated See PathsToClosedPolylines that accepts ignition::math
-      /// objects
-      public: static void PathsToClosedPolylines(
-                  const std::vector<common::SVGPath> &_paths,
-                  double _tol,
-                  std::vector< std::vector<math::Vector2d> > &_closedPolys,
-                  std::vector< std::vector<math::Vector2d> > &_openPolys)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Reads in paths and outputs closed polylines and open polylines
-      /// \param[in] _paths The input paths
-      /// \param[in] _tol Tolerence when comparing distance between 2 points.
-      /// \param[out] _closedPolys A vector to collect new closed loops
-      /// \param[out] _openPolys A vector to collect non closed paths
       public: static void PathsToClosedPolylines(
           const std::vector<common::SVGPath> &_paths,
           double _tol,

@@ -183,23 +183,11 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle GpsSensor::GetLongitude() const
-{
-  return this->Longitude();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle GpsSensor::Longitude() const
 {
   ignition::math::Angle angle;
   angle.Degree(this->lastGpsMsg.longitude_deg());
   return angle;
-}
-
-//////////////////////////////////////////////////
-math::Angle GpsSensor::GetLatitude() const
-{
-  return this->Latitude();
 }
 
 //////////////////////////////////////////////////

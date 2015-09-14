@@ -94,12 +94,6 @@ namespace gazebo
       public: void Set(float _r = 1, float _g = 1 , float _b = 1, float _a = 1);
 
       /// \brief Get the color in HSV colorspace
-      /// \return HSV values in a math::Vector3 format
-      /// \deprecated See HSV() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetAsHSV() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the color in HSV colorspace
       /// \return HSV values in an ignition::math::Vector3d format.
       public: ignition::math::Vector3d HSV() const;
 

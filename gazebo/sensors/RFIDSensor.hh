@@ -76,14 +76,6 @@ namespace gazebo
       /// \brief Check the range for one RFID tag.
       /// \param[in] _pose Pose of a tag.
       /// \return Checks if tag is in range
-      /// \deprecated See CheckTagRange() that accepts an
-      /// ignition::math::Pose3d object.
-      private: bool CheckTagRange(const math::Pose &_pose)
-               GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Check the range for one RFID tag.
-      /// \param[in] _pose Pose of a tag.
-      /// \return Checks if tag is in range
       private: bool CheckTagRange(const ignition::math::Pose3d &_pose);
 
       /// \brief Parent entity

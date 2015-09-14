@@ -45,27 +45,27 @@ ODE_API int dMassCheck(const dMass *m);
 ODE_API void dMassSetZero (dMass *);
 
 ODE_API void dMassSetParameters (dMass *, dReal themass,
-			 dReal cgx, dReal cgy, dReal cgz,
-			 dReal I11, dReal I22, dReal I33,
-			 dReal I12, dReal I13, dReal I23);
+       dReal cgx, dReal cgy, dReal cgz,
+       dReal I11, dReal I22, dReal I33,
+       dReal I12, dReal I13, dReal I23);
 
 ODE_API void dMassSetSphere (dMass *, dReal density, dReal radius);
 ODE_API void dMassSetSphereTotal (dMass *, dReal total_mass, dReal radius);
 
 ODE_API void dMassSetCapsule (dMass *, dReal density, int direction,
-		  	dReal radius, dReal length);
+        dReal radius, dReal length);
 ODE_API void dMassSetCapsuleTotal (dMass *, dReal total_mass, int direction,
-			dReal radius, dReal length);
+      dReal radius, dReal length);
 
 ODE_API void dMassSetCylinder (dMass *, dReal density, int direction,
-		       dReal radius, dReal length);
+           dReal radius, dReal length);
 ODE_API void dMassSetCylinderTotal (dMass *, dReal total_mass, int direction,
-			    dReal radius, dReal length);
+          dReal radius, dReal length);
 
 ODE_API void dMassSetBox (dMass *, dReal density,
-		  dReal lx, dReal ly, dReal lz);
+      dReal lx, dReal ly, dReal lz);
 ODE_API void dMassSetBoxTotal (dMass *, dReal total_mass,
-		       dReal lx, dReal ly, dReal lz);
+           dReal lx, dReal ly, dReal lz);
 
 ODE_API void dMassSetTrimesh (dMass *, dReal density, dGeomID g);
 
@@ -80,11 +80,6 @@ ODE_API void dMassRotate (dMass *, const dMatrix3 R);
 ODE_API void dMassAdd (dMass *a, const dMass *b);
 
 
-// Backwards compatible API
-ODE_API ODE_API_DEPRECATED void dMassSetCappedCylinder(dMass *a, dReal b, int c, dReal d, dReal e);
-ODE_API ODE_API_DEPRECATED void dMassSetCappedCylinderTotal(dMass *a, dReal b, int c, dReal d, dReal e);
-
-
 struct dMass {
   dReal mass;
   dVector3 c;
@@ -96,8 +91,8 @@ struct dMass {
   void setZero()
     { dMassSetZero (this); }
   void setParameters (dReal themass, dReal cgx, dReal cgy, dReal cgz,
-		      dReal I11, dReal I22, dReal I33,
-		      dReal I12, dReal I13, dReal I23)
+          dReal I11, dReal I22, dReal I33,
+          dReal I12, dReal I13, dReal I23)
     { dMassSetParameters (this,themass,cgx,cgy,cgz,I11,I22,I33,I12,I13,I23); }
 
   void setSphere (dReal density, dReal radius)

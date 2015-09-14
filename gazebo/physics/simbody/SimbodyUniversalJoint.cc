@@ -125,19 +125,6 @@ void SimbodyUniversalJoint::SetForceImpl(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodyUniversalJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented\n";
-  return 0;
-}
-
-//////////////////////////////////////////////////
 math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
     unsigned int _index) const
 {

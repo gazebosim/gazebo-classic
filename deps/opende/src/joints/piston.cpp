@@ -171,7 +171,7 @@ dReal dJointGetPistonAngleRate ( dJointID j )
 }
 
 
-void 
+void
 dxJointPiston::getSureMaxInfo( SureMaxInfo* info )
 {
   info->max_m = 6;
@@ -516,41 +516,6 @@ void dJointSetPistonAxis ( dJointID j, dReal x, dReal y, dReal z )
 
     joint->computeInitialRelativeRotation();
 }
-
-
-void dJointSetPistonAxisDelta ( dJointID j, dReal x, dReal y, dReal z,
-                                dReal dx, dReal dy, dReal dz )
-{
-    dxJointPiston* joint = ( dxJointPiston* ) j;
-    dUASSERT ( joint, "bad joint argument" );
-    checktype ( joint, Piston );
-
-    setAxes ( joint, x, y, z, joint->axis1, joint->axis2 );
-
-    joint->computeInitialRelativeRotation();
-
-    dVector3 c = {0,0,0};
-    if ( joint->node[1].body )
-    {
-        c[0] = ( joint->node[0].body->posr.pos[0] -
-                 joint->node[1].body->posr.pos[0] - dx );
-        c[1] = ( joint->node[0].body->posr.pos[1] -
-                 joint->node[1].body->posr.pos[1] - dy );
-        c[2] = ( joint->node[0].body->posr.pos[2] -
-                 joint->node[1].body->posr.pos[2] - dz );
-    }
-    else if ( joint->node[0].body )
-    {
-        c[0] = joint->node[0].body->posr.pos[0] - dx;
-        c[1] = joint->node[0].body->posr.pos[1] - dy;
-        c[2] = joint->node[0].body->posr.pos[2] - dz;
-    }
-
-    // Convert into frame of body 1
-    dMultiply1_331 ( joint->anchor1, joint->node[0].body->posr.R, c );
-}
-
-
 
 void dJointGetPistonAxis ( dJointID j, dVector3 result )
 {
