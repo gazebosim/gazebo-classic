@@ -455,8 +455,26 @@ namespace gazebo
     /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
     /// \param[in] _retries Number of iterations until give up
     protected: void WaitUntilSensorSpawn(const std::string &_name,
-                                       unsigned int _sleepEach,
-                                       int _retries);
+                                         unsigned int _sleepEach,
+                                         int _retries);
+
+    /// \brief Wait for a number of ms. and attempts until the world reaches a
+    /// target "iterations" value
+    /// \param _goalIteration Target iterations value
+    /// \param _sleepEach Number of milliseconds to sleep in each iteration
+    /// \param _retries Number of iterations until give up
+    protected: void WaitUntilIteration(const uint32_t _goalIteration,
+                                       const int _sleepEach,
+                                       const int _retries) const;
+
+    /// \brief Wait for a number of ms. and attempts until the world reaches a
+    /// target simulation time
+    /// \param _goalTime Target simulation time.
+    /// \param _sleepEach Number of milliseconds to sleep in each iteration
+    /// \param _retries Number of iterations until give up
+    protected: void WaitUntilSimTime(const common::Time &_goalTime,
+                                     const int _ms,
+                                     const int _maxRetries) const;
 
     /// \brief Spawn a light.
     /// \param[in] _name Name for the light.

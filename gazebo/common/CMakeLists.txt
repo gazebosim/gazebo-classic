@@ -90,6 +90,7 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
+  EnumIface.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -130,6 +131,7 @@ set (gtest_sources
   CommonIface_TEST.cc
   Console_TEST.cc
   Dem_TEST.cc
+  EnumIface_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
   Image_TEST.cc

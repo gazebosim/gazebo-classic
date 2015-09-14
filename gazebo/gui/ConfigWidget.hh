@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _CONFIG_WIDGET_HH_
-#define _CONFIG_WIDGET_HH_
+#ifndef _GAZEBO_CONFIG_WIDGET_HH_
+#define _GAZEBO_CONFIG_WIDGET_HH_
 
 #include <string>
 #include <vector>
@@ -269,6 +269,25 @@ namespace gazebo
       /// \return True if the value is set successfully.
       public: bool SetEnumWidgetValue(const std::string &_name,
           const std::string &_value);
+
+      /// \brief Add an item to a child enum widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _itemText Enum text value.
+      /// \return True if the item is added successfully.
+      public: bool AddItemEnumWidget(const std::string &_name,
+          const std::string &_itemText);
+
+      /// \brief Remove an item from a child enum widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _itemText Text of the enum value.
+      /// \return True if the item is removed successfully.
+      public: bool RemoveItemEnumWidget(const std::string &_name,
+          const std::string &_itemText);
+
+      /// \brief Remove all items from a child enum widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return True if successful.
+      public: bool ClearEnumWidget(const std::string &_name);
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
