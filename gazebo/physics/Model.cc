@@ -1104,14 +1104,13 @@ void Model::SetState(const ModelState &_state)
   }
 
   ModelState_M modelStates = _state.NestedModelStates();
-  for (ModelState_M::iterator iter = modelStates.begin();
-       iter != modelStates.end(); ++iter)
+  for (const auto &ms : modelStates)
   {
-    ModelPtr model = this->NestedModel(iter->first);
+    ModelPtr model = this->NestedModel(ms.first);
     if (model)
-      model->SetState(iter->second);
+      model->SetState(ms.second);
     else
-      gzerr << "Unable to find model[" << iter->first << "]\n";
+      gzerr << "Unable to find model[" << ms.first << "]\n";
   }
 
   // For now we don't use the joint state values to set the state of

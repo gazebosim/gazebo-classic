@@ -257,11 +257,9 @@ namespace gazebo
           _out << iter->second;
         }
 
-        for (ModelState_M::const_iterator iter =
-            _state.modelStates.begin(); iter != _state.modelStates.end();
-            ++iter)
+        for (const auto &ms : _state.modelStates)
         {
-          _out << iter->second;
+          _out << ms.second;
         }
 
         // Output the joint information

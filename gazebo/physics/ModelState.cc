@@ -47,11 +47,10 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
 
   // Copy all the models
   const Model_V models = _model->NestedModels();
-  for (Model_V::const_iterator iter = models.begin(); iter != models.end();
-      ++iter)
+  for (const auto &m : models)
   {
-    this->modelStates.insert(std::make_pair((*iter)->GetName(),
-          ModelState(*iter, _realTime, _simTime, _iterations)));
+    this->modelStates.insert(std::make_pair(m->GetName(),
+          ModelState(m, _realTime, _simTime, _iterations)));
   }
 
   // Copy all the joints
@@ -81,11 +80,10 @@ ModelState::ModelState(const ModelPtr _model)
 
   // Copy all the models
   const Model_V models = _model->NestedModels();
-  for (Model_V::const_iterator iter = models.begin(); iter != models.end();
-      ++iter)
+  for (const auto &m : models)
   {
-    this->modelStates.insert(std::make_pair((*iter)->GetName(),
-          ModelState(*iter)));
+    this->modelStates.insert(std::make_pair(m->GetName(),
+          ModelState(m)));
   }
 
   // Copy all the joints
@@ -142,17 +140,14 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
 
   // Load all the models
   const Model_V models = _model->NestedModels();
-  for (Model_V::const_iterator iter = models.begin(); iter != models.end();
-      ++iter)
+  for (const auto &m : models)
   {
-    this->modelStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime,
-        _iterations);
+    this->modelStates[m->GetName()].Load(m, _realTime, _simTime, _iterations);
   }
 
   // Remove models that no longer exist. We determine this by checking the time
   // stamp on each model.
-  for (ModelState_M::iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end();)
+  for (auto iter = this->modelStates.begin(); iter != this->modelStates.end();)
   {
     if (iter->second.GetRealTime() != this->realTime)
       this->modelStates.erase(iter++);
@@ -253,10 +248,9 @@ bool ModelState::IsZero() const
     result = result && iter->second.IsZero();
   }
 
-  for (ModelState_M::const_iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end() && result; ++iter)
+  for (const auto &ms : this->modelStates)
   {
-    result = result && iter->second.IsZero();
+    result = result && ms.second.IsZero();
   }
 
   /*for (JointState_M::const_iterator iter = this->jointStates.begin();
@@ -393,7 +387,7 @@ unsigned int ModelState::NestedModelStateCount() const
 ModelState ModelState::NestedModelState(const std::string &_modelName) const
 {
   // Search for the link name
-  ModelState_M::const_iterator iter = this->modelStates.find(_modelName);
+  auto iter = this->modelStates.find(_modelName);
   if (iter != this->modelStates.end())
     return iter->second;
 
@@ -405,7 +399,7 @@ ModelState ModelState::NestedModelState(const std::string &_modelName) const
 bool ModelState::HasNestedModelState(const std::string &_modelName) const
 {
   // Search for the model name
-  ModelState_M::const_iterator iter = this->modelStates.find(_modelName);
+  auto iter = this->modelStates.find(_modelName);
   if (iter != this->modelStates.end())
     return true;
 
@@ -439,10 +433,9 @@ ModelState &ModelState::operator=(const ModelState &_state)
   }
 
   // Copy the model states.
-  for (ModelState_M::const_iterator iter =
-       _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
+  for (const auto &ms : _state.modelStates)
   {
-    this->modelStates.insert(std::make_pair(iter->first, iter->second));
+    this->modelStates.insert(std::make_pair(ms.first, ms.second));
   }
 
   // Copy the joint states.
@@ -486,15 +479,14 @@ ModelState ModelState::operator-(const ModelState &_state) const
   }
 
   // Insert the model state diffs.
-  for (ModelState_M::const_iterator iter =
-       this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
+  for (const auto &ms : this->modelStates)
   {
     try
     {
-      if (_state.HasNestedModelState(iter->second.GetName()))
+      if (_state.HasNestedModelState(ms.second.GetName()))
       {
-        ModelState state = iter->second - _state.NestedModelState(
-            iter->second.GetName());
+        ModelState state = ms.second - _state.NestedModelState(
+            ms.second.GetName());
         if (!state.IsZero())
           result.modelStates.insert(std::make_pair(state.GetName(), state));
       }
@@ -560,15 +552,14 @@ ModelState ModelState::operator+(const ModelState &_state) const
   }
 
   // Insert the model state diffs.
-  for (ModelState_M::const_iterator iter =
-       this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
+  for (const auto &ms : this->modelStates)
   {
     try
     {
-      if (_state.HasNestedModelState(iter->second.GetName()))
+      if (_state.HasNestedModelState(ms.second.GetName()))
       {
-        ModelState state = iter->second + _state.NestedModelState(
-            iter->second.GetName());
+        ModelState state = ms.second + _state.NestedModelState(
+            ms.second.GetName());
         result.modelStates.insert(std::make_pair(state.GetName(), state));
       }
     }
@@ -617,11 +608,10 @@ void ModelState::FillSDF(sdf::ElementPtr _sdf)
     iter->second.FillSDF(elem);
   }
 
-  for (ModelState_M::iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
+  for (auto &ms : this->modelStates)
   {
     sdf::ElementPtr elem = _sdf->AddElement("model");
-    iter->second.FillSDF(elem);
+    ms.second.FillSDF(elem);
   }
 
   for (JointState_M::iterator iter = this->jointStates.begin();
@@ -643,10 +633,9 @@ void ModelState::SetWallTime(const common::Time &_time)
     iter->second.SetWallTime(_time);
   }
 
-  for (ModelState_M::iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
+  for (auto &ms : this->modelStates)
   {
-    iter->second.SetWallTime(_time);
+    ms.second.SetWallTime(_time);
   }
 
   for (JointState_M::iterator iter = this->jointStates.begin();
@@ -667,10 +656,9 @@ void ModelState::SetRealTime(const common::Time &_time)
     iter->second.SetRealTime(_time);
   }
 
-  for (ModelState_M::iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
+  for (auto &ms : this->modelStates)
   {
-    iter->second.SetRealTime(_time);
+    ms.second.SetRealTime(_time);
   }
 
   for (JointState_M::iterator iter = this->jointStates.begin();
@@ -691,10 +679,9 @@ void ModelState::SetSimTime(const common::Time &_time)
     iter->second.SetSimTime(_time);
   }
 
-  for (ModelState_M::iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
+  for (auto &ms : this->modelStates)
   {
-    iter->second.SetSimTime(_time);
+    ms.second.SetSimTime(_time);
   }
 
   for (JointState_M::iterator iter = this->jointStates.begin();
