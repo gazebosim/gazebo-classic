@@ -209,15 +209,6 @@ void Dem::GetGeoReference(double _x, double _y,
 }
 
 //////////////////////////////////////////////////
-void Dem::GetGeoReferenceOrigin(math::Angle &_latitude, math::Angle &_longitude)
-{
-  ignition::math::Angle lat, lon;
-  this->GetGeoReferenceOrigin(lat, lon);
-  _latitude = lat;
-  _longitude = lon;
-}
-
-//////////////////////////////////////////////////
 void Dem::GetGeoReferenceOrigin(ignition::math::Angle &_latitude,
     ignition::math::Angle &_longitude) const
 {
@@ -246,15 +237,6 @@ double Dem::GetWorldWidth() const
 double Dem::GetWorldHeight() const
 {
   return this->dataPtr->worldHeight;
-}
-
-//////////////////////////////////////////////////
-void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
-                        const math::Vector3 &_size, const math::Vector3 &_scale,
-                        bool _flipY, std::vector<float> &_heights)
-{
-  this->FillHeightMap(_subSampling, _vertSize, _size.Ign(), _scale.Ign(),
-      _flipY, _heights);
 }
 
 //////////////////////////////////////////////////

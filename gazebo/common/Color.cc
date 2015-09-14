@@ -139,12 +139,6 @@ void Color::SetFromHSV(float _h, float _s, float _v)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Color::GetAsHSV() const
-{
-  return this->HSV();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Color::HSV() const
 {
   ignition::math::Vector3d hsv;
