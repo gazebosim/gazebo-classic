@@ -187,11 +187,11 @@ namespace gazebo
 
       /// \brief Return true if there is a nested model with the specified name.
       /// \param[in] _modelName Name of the model state.
-      /// \return True if the model exists in this model.
+      /// \return True if the model exists in this model state.
       public: bool HasNestedModelState(const std::string &_modelName) const;
 
       /// \brief Get the nested model states.
-      /// \return A map of nested model states.
+      /// \return A map of model names to model states.
       public: const ModelState_M &NestedModelStates() const;
 
       /// \brief Populate a state SDF element with data from the object.

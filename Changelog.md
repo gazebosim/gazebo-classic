@@ -4,6 +4,7 @@
 
 1. Support loading and spawning nested models
     * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
+    * [Pull request #1895](https://bitbucket.org/osrf/gazebo/pull-request/1895)
 
 1. Added EnumIface, which supports iterators over enums.
     * [Pull request #1847](https://bitbucket.org/osrf/gazebo/pull-request/1847)
