@@ -73,19 +73,7 @@ namespace gazebo
 
       /// \brief Get the minimum angle
       /// \return The minimum angle object
-      /// \deprecated See AngleMin() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetAngleMin() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the minimum angle
-      /// \return The minimum angle object
       public: ignition::math::Angle AngleMin() const;
-
-      /// \brief Get the maximum angle
-      /// \return the maximum angle object
-      /// \deprecated See AngleMax() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetAngleMax() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the maximum angle
       /// \return the maximum angle object
@@ -125,19 +113,7 @@ namespace gazebo
 
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      /// \deprecated See VerticalAngleMin() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetVerticalAngleMin() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the vertical scan bottom angle
-      /// \return The minimum angle of the scan block
       public: ignition::math::Angle VerticalAngleMin() const;
-
-      /// \brief Get the vertical scan line top angle
-      /// \return The Maximum angle of the scan block
-      /// \deprecated See VerticalAngleMax() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetVerticalAngleMax() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block

@@ -162,12 +162,6 @@ void RFIDSensor::EvaluateTags()
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
-{
-  return this->CheckTagRange(_pose.Ign());
-}
-
-//////////////////////////////////////////////////
 bool RFIDSensor::CheckTagRange(const ignition::math::Pose3d &_pose)
 {
   // copy sensor vector pos into a temp var

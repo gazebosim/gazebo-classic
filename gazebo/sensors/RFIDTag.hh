@@ -63,12 +63,6 @@ namespace gazebo
 
       /// \brief Returns pose of tag in world coordinate.
       /// \return Pose of object.
-      /// \deprecated See TagPose() function that returns an
-      /// ignition::math::Pose3d object.
-      public: math::Pose GetTagPose() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Returns pose of tag in world coordinate.
-      /// \return Pose of object.
       public: ignition::math::Pose3d TagPose() const;
 
       /// \brief Pointer the entity that has the RFID tag.

@@ -23,6 +23,7 @@
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/EnumIface.hh"
 #include "gazebo/common/Image.hh"
 
 #include "gazebo/physics/World.hh"
