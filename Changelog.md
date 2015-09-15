@@ -5,6 +5,9 @@
 1. Support loading and spawning nested models
     * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
 
+1. Added EnumIface, which supports iterators over enums.
+    * [Pull request #1847](https://bitbucket.org/osrf/gazebo/pull-request/1847)
+
 1. Added RegionEventBoxPlugin - fires events when models enter / exit the region
     * [Pull request #1856](https://bitbucket.org/osrf/gazebo/pull-request/1856)
 
