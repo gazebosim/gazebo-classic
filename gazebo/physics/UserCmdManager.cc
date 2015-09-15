@@ -60,6 +60,8 @@ gzdbg << "UserCmd::UserCmd" << std::endl;
     this->dataPtr->node->Init();
     this->dataPtr->factoryPub =
         this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+    this->dataPtr->lightPub =
+        this->dataPtr->node->Advertise<msgs::Light>("~/light");
   }
   // Deleting
   else if (_type == msgs::UserCmd::DELETING)
@@ -68,18 +70,24 @@ gzdbg << "UserCmd::UserCmd" << std::endl;
     this->dataPtr->node->Init();
     this->dataPtr->factoryPub =
         this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+    this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>("~/light");
 
     physics::ModelPtr model =
         this->dataPtr->world->GetModel(this->dataPtr->name);
-    if (!model)
+    msgs::Light light =
+        this->dataPtr->world->GetLightMsg(this->dataPtr->name);
+    if (!model && !light.has_name())
     {
-      gzerr << "Model [" << this->dataPtr->name << "] not found."
+      gzerr << "Entity [" << this->dataPtr->name << "] not found."
           << std::endl;
       return;
     }
 
     this->dataPtr->sdf.reset(new sdf::SDF);
-    this->dataPtr->sdf->Root()->Copy(model->GetSDF());
+    if (model)
+      this->dataPtr->sdf->Root()->Copy(model->GetSDF());
+    else if (light.has_name())
+      this->dataPtr->sdf->Root()->Copy(msgs::LightToSDF(light));
 
     // Delete from here because we need to make ssure to copy the model first
     transport::requestNoReply(
@@ -98,21 +106,25 @@ gzdbg << "UserCmd::Undo" << std::endl;
   if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
       this->dataPtr->node && !this->dataPtr->name.empty())
   {
-    // Keep model for redo
+    // Keep sdf for redo
     if (!this->dataPtr->sdf)
     {
       physics::ModelPtr model =
           this->dataPtr->world->GetModel(this->dataPtr->name);
-      if (!model)
+      msgs::Light light =
+          this->dataPtr->world->GetLightMsg(this->dataPtr->name);
+      if (!model && !light.has_name())
       {
-        gzerr << "Model [" << this->dataPtr->name << "] not found."
+        gzerr << "Entity [" << this->dataPtr->name << "] not found."
             << std::endl;
+        return;
       }
-      else
-      {
-        this->dataPtr->sdf.reset(new sdf::SDF);
-        this->dataPtr->sdf->Root(model->GetSDF());
-      }
+
+      this->dataPtr->sdf.reset(new sdf::SDF);
+      if (model)
+        this->dataPtr->sdf->Root()->Copy(model->GetSDF());
+      else if (light.has_name())
+        this->dataPtr->sdf->Root()->Copy(msgs::LightToSDF(light));
     }
 
     // Delete
@@ -123,9 +135,17 @@ gzdbg << "UserCmd::Undo" << std::endl;
   else if (this->dataPtr->type == msgs::UserCmd::DELETING &&
       this->dataPtr->node && this->dataPtr->sdf)
   {
-    msgs::Factory msg;
-    msg.set_sdf(this->dataPtr->sdf->ToString());
-    this->dataPtr->factoryPub->Publish(msg);
+    if (this->dataPtr->sdf->Root()->GetName() == "model")
+    {
+      msgs::Factory msg;
+      msg.set_sdf(this->dataPtr->sdf->ToString());
+      this->dataPtr->factoryPub->Publish(msg);
+    }
+    else if (this->dataPtr->sdf->Root()->GetName() == "light")
+    {
+      msgs::Light msg = msgs::LightFromSDF(this->dataPtr->sdf->Root());
+      this->dataPtr->lightPub->Publish(msg);
+    }
   }
 
   // Set the world state

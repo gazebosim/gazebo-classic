@@ -949,6 +949,21 @@ EntityPtr World::GetEntity(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+msgs::Light World::GetLightMsg(const std::string &_name)
+{
+  if (this->dataPtr->sdf->HasElement("light"))
+  {
+    sdf::ElementPtr lightElem = this->dataPtr->sdf->GetElement("light");
+    while (lightElem && lightElem->Get<std::string>("name") != _name)
+      lightElem = lightElem->GetNextElement("light");
+
+    msgs::Light msg = msgs::LightFromSDF(lightElem);
+    return msg;
+  }
+  return msgs::Light();
+}
+
+//////////////////////////////////////////////////
 ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->loadModelMutex);

@@ -211,6 +211,13 @@ namespace gazebo
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
+      /// \brief Get a model by name.
+      /// This function is the same as GetByName, but limits the search to
+      /// only models.
+      /// \param[in] _name The name of the Model to find.
+      /// \return A pointer to the Model, or NULL if no model was found.
+      public: msgs::Light GetLightMsg(const std::string &_name);
+
       /// \brief Get the nearest model below and not encapsulating a point.
       /// Only objects below the start point can be returned. Any object
       /// that encapsulates the start point can not be returned from this

@@ -62,6 +62,9 @@ namespace gazebo
 
       /// \brief Publisher that publishes msg to spawn new model
       public: transport::PublisherPtr factoryPub;
+
+      /// \brief Publisher that publishes msg to spawn new model
+      public: transport::PublisherPtr lightPub;
     };
 
     class UserCmd;
