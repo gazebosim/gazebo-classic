@@ -9,7 +9,11 @@ message CameraLensCmd
   /// \brief Types of purpose.
   enum CmdPurpose
   {
+    /// \brief The message is emitted by lens and provides information
+    ///        about it's current state
     INFO = 1;
+
+    /// \brief The message will change specified lens properties
     SET = 2;
   }
 
