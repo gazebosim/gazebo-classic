@@ -883,6 +883,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
+  _joint->inspector->SetJointId(_joint->hotspot->GetName());
 
   return jointId;
 }
