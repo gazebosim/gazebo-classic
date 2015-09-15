@@ -48,8 +48,9 @@ CameraLens::~CameraLens()
 }
 
 //////////////////////////////////////////////////
-void CameraLens::Init(double _c1, double _c2, const std::string &_fun,
-                      double _f, double _c3)
+void CameraLens::Init(const double _c1, const double _c2,
+                      const std::string &_fun, const double _f,
+                      const double _c3)
 {
   this->dataPtr->c1 = _c1;
   this->dataPtr->c2 = _c2;
@@ -236,7 +237,7 @@ void CameraLens::SetType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetC1(double _c)
+void CameraLens::SetC1(const double _c)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -249,7 +250,7 @@ void CameraLens::SetC1(double _c)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetC2(double _c)
+void CameraLens::SetC2(const double _c)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -262,7 +263,7 @@ void CameraLens::SetC2(double _c)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetC3(double _c)
+void CameraLens::SetC3(const double _c)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -275,7 +276,7 @@ void CameraLens::SetC3(double _c)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetF(double _f)
+void CameraLens::SetF(const double _f)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -312,7 +313,7 @@ void CameraLens::SetFun(const std::string &_fun)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetCutOffAngle(double _angle)
+void CameraLens::SetCutOffAngle(const double _angle)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -322,7 +323,7 @@ void CameraLens::SetCutOffAngle(double _angle)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetScaleToHFOV(bool _scale)
+void CameraLens::SetScaleToHFOV(const bool _scale)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
 
@@ -330,8 +331,8 @@ void CameraLens::SetScaleToHFOV(bool _scale)
 }
 
 //////////////////////////////////////////////////
-void CameraLens::SetUniformVariables(Ogre::Pass *_pass,
-    float _ratio, float _hfov)
+void CameraLens::SetUniformVariables(Ogre::Pass *_pass, const float _ratio,
+                                     const float _hfov)
 {
   Ogre::GpuProgramParametersSharedPtr uniforms =
     _pass->getFragmentProgramParameters();
@@ -385,8 +386,9 @@ void CameraLens::ConvertToCustom()
 
 //////////////////////////////////////////////////
 WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
-    ScenePtr _scene, bool _autoRender, int _textureSize):
-  Camera(_namePrefix, _scene, _autoRender)
+                                 ScenePtr _scene, const bool _autoRender,
+                                 const int _textureSize)
+    : Camera(_namePrefix, _scene, _autoRender)
 {
   this->dataPtr = new WideAngleCameraPrivate;
   this->lens = new CameraLens();
@@ -515,7 +517,7 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
-void WideAngleCamera::SetEnvTextureSize(int _size)
+void WideAngleCamera::SetEnvTextureSize(const int _size)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->dataMutex);
 
@@ -638,7 +640,7 @@ void WideAngleCamera::RenderImpl()
 
 //////////////////////////////////////////////////
 void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
-    Ogre::MaterialPtr &_material)
+                                           Ogre::MaterialPtr &_material)
 {
   if (_material.isNull())
     return;

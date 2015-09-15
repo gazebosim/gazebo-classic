@@ -70,8 +70,9 @@ namespace gazebo
       /// \param[in] _fun Angle transform function
       /// \param[in] _f Focal length of the optical system
       /// \param[in] _c3 Angle shift parameter, should be 0 in most cases
-      public: void Init(double _c1, double _c2, const std::string &_fun,
-                        double _f, double _c3);
+      public: void Init(const double _c1, const double _c2,
+                        const std::string &_fun, const double _f,
+                        const double _c3);
 
       /// \brief Init camera lens with standard mapping function
       /// \param[in] _name Mapping function name
@@ -126,19 +127,19 @@ namespace gazebo
 
       /// \brief Sets c1 parameter
       /// \param[in] _c c1 parameter
-      public: void SetC1(double _c);
+      public: void SetC1(const double _c);
 
       /// \brief Sets c2 parameter
       /// \param[in] _c c2 parameter
-      public: void SetC2(double _c);
+      public: void SetC2(const double _c);
 
       /// \brief Sets c3 parameter
       /// \param[in] _c c3 parameter
-      public: void SetC3(double _c);
+      public: void SetC3(const double _c);
 
       /// \brief Sets f parameter
       /// \param[in] _f f parameter
-      public: void SetF(double _f);
+      public: void SetF(const double _f);
 
       /// \brief Sets angle transform function
       /// \param[in] _fun Angle transform function string
@@ -146,20 +147,20 @@ namespace gazebo
 
       /// \brief Sets cut-off angle
       /// \param[in] _angle cut-off angle
-      public: void SetCutOffAngle(double _angle);
+      public: void SetCutOffAngle(const double _angle);
 
       /// \brief Sets whether the image should be scaled to fit horizontal FOV
       /// \param[in] _scale true if it should,
       ///   note: c1 and f parameters are ignored in this case
-      public: void SetScaleToHFOV(bool _scale);
+      public: void SetScaleToHFOV(const bool _scale);
 
       /// \brief Set uniform variables of a shader
       ///   for the provided material technique pass
       /// \param[in] _pass Ogre::Pass used for rendering
       /// \param[in] _ratio Frame aspect ratio
       /// \param[in] _hfov Horizlontal field of view
-      public: void SetUniformVariables(Ogre::Pass *_pass, float _ratio,
-                                       float _hfov);
+      public: void SetUniformVariables(Ogre::Pass *_pass, const float _ratio,
+                                       const float _hfov);
 
       /// \internal
       /// \brief Converts projection type from one of presets to `custom`
@@ -183,7 +184,8 @@ namespace gazebo
       /// \param[in] _textureSize Size of cube map texture used for rendering,
       ///   may be overriten in sdf
       public: WideAngleCamera(const std::string &_namePrefix, ScenePtr _scene,
-                              bool _autoRender = true, int _textureSize = 256);
+                              const bool _autoRender = true,
+                              const int _textureSize = 256);
 
       /// \brief Destructor
       public: virtual ~WideAngleCamera();
@@ -210,7 +212,7 @@ namespace gazebo
 
       /// \brief Sets environment texture size
       /// \param[in] _size Texture size
-      public: void SetEnvTextureSize(int _size);
+      public: void SetEnvTextureSize(const int _size);
 
       /// \brief Creates a set of 6 cameras pointing in different directions
       protected: void CreateEnvCameras();

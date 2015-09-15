@@ -94,7 +94,7 @@ namespace gazebo
 
                 /// \brief Apply function to float value
                 /// \result The result of application
-                public: float Apply(float _t)
+                public: float Apply(const float _t)
                 {
                   return std::get<2>(value)(_t);
                 }
