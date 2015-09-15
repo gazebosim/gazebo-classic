@@ -1183,6 +1183,32 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::WaitUntilIteration(const uint32_t _goalIteration,
+    const int _sleepEach, const int _retries) const
+{
+  int i = 0;
+  auto world = physics::get_world();
+  while ((world->GetIterations() != _goalIteration) && (i < _retries))
+  {
+    ++i;
+    common::Time::MSleep(_sleepEach);
+  }
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::WaitUntilSimTime(const common::Time &_goalTime,
+    const int _sleepEach, const int _retries) const
+{
+  int i = 0;
+  auto world = physics::get_world();
+  while ((world->GetSimTime() != _goalTime) && (i < _retries))
+  {
+    ++i;
+    common::Time::MSleep(_sleepEach);
+  }
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::SpawnLight(const std::string &_name,
     const std::string &_type,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
