@@ -55,7 +55,11 @@ namespace gazebo
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
       // Documentation inherited.
-      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
+          GAZEBO_DEPRECATED(7.0);
+
+      // Documentation inherited.
+      public: virtual FrictionPyramidPtr FrictionPyramid() const;
 
       /// \internal
       /// \brief Pointer to private data

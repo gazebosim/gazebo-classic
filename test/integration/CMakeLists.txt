@@ -58,6 +58,7 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  nested_model.cc
   noise.cc
   nondefault_world.cc
   physics.cc
@@ -69,6 +70,7 @@ set(tests
   physics_msgs.cc
   physics_presets.cc
   physics_thread_safe.cc
+  physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
   region_events.cc
@@ -89,6 +91,7 @@ set(tests
   world.cc
   world_clone.cc
   world_entity_below_point.cc
+  world_playback.cc
   world_population.cc
   worlds_installed.cc
   )

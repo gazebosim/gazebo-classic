@@ -1,11 +1,22 @@
 ## Gazebo 7.0
+1. Added torsional friction
+    * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
+
+1. Support loading and spawning nested models
+    * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
+
+1. Added EnumIface, which supports iterators over enums.
+    * [Pull request #1847](https://bitbucket.org/osrf/gazebo/pull-request/1847)
 
 1. Added RegionEventBoxPlugin - fires events when models enter / exit the region
     * [Pull request #1856](https://bitbucket.org/osrf/gazebo/pull-request/1856)
 
+1. Added tests for checking the playback control via messages.
+    * [Pull request #1885](https://bitbucket.org/osrf/gazebo/pull-request/1885)
+
 1. Added LoadArgs() function to ServerFixture for being able to load a server
 using the same arguments used in the command line.
-    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874
+    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874)
 
 1. Added battery class, plugins and test world.
     * [Pull request #1872](https://bitbucket.org/osrf/gazebo/pull-request/1872)
