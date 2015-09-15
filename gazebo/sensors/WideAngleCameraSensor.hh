@@ -43,10 +43,10 @@ namespace gazebo
     class GAZEBO_VISIBLE WideAngleCameraSensor : public CameraSensor
     {
       /// \brief Constructor
-      public: WideAngleCameraSensor();
+      public: WideAngleCameraSensor() = default;
 
       /// \brief Destructor
-      public: virtual ~WideAngleCameraSensor();
+      public: virtual ~WideAngleCameraSensor() = default;
 
       // Documentation inherited
       public: void Load(const std::string &_worldName) override;
@@ -73,7 +73,7 @@ namespace gazebo
       /// \brief Mutex to lock when receiving or sending lens message
       protected: std::mutex lensCmdMutex;
 
-      /// \brief Horisontal FOV updates to be set in rendering thread
+      /// \brief Horizontal FOV updates to be set in rendering thread
       private: std::queue<double> hfovCmdQueue;
     };
     /// \}

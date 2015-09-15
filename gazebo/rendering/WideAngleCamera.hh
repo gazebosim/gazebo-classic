@@ -68,7 +68,7 @@ namespace gazebo
       /// \param[in] _c1 Image scaling factor
       /// \param[in] _c2 Angle scaling factor
       /// \param[in] _fun Angle transform function
-      /// \param[in] _fun Focal length of the optical system
+      /// \param[in] _f Focal length of the optical system
       /// \param[in] _c3 Angle shift parameter, should be 0 in most cases
       public: void Init(double _c1, double _c2, const std::string &_fun,
                         double _f, double _c3);
@@ -116,7 +116,7 @@ namespace gazebo
       /// \return Cut off angle
       public: double CutOffAngle() const;
 
-      /// \brief Checks if image should be scaled to fit horisontal FOV
+      /// \brief Checks if image should be scaled to fit horizontal FOV
       /// \return True if the image will be scaled
       public: bool ScaleToHFOV() const;
 
@@ -148,7 +148,7 @@ namespace gazebo
       /// \param[in] _angle cut-off angle
       public: void SetCutOffAngle(double _angle);
 
-      /// \brief Sets whether the image should be scaled to fit horisontal FOV
+      /// \brief Sets whether the image should be scaled to fit horizontal FOV
       /// \param[in] _scale true if it should,
       ///   note: c1 and f parameters are ignored in this case
       public: void SetScaleToHFOV(bool _scale);
@@ -157,7 +157,7 @@ namespace gazebo
       ///   for the provided material technique pass
       /// \param[in] _pass Ogre::Pass used for rendering
       /// \param[in] _ratio Frame aspect ratio
-      /// \param[in] _hfov Horisontal field of view
+      /// \param[in] _hfov Horizlontal field of view
       public: void SetUniformVariables(Ogre::Pass *_pass, float _ratio,
                                        float _hfov);
 
@@ -203,7 +203,7 @@ namespace gazebo
 
       /// \brief Gets camera's lens description
       /// \return Camera's lens description
-      public: CameraLens *Lens();
+      public: CameraLens *Lens() const;
 
       // Documentation inherited
       public: void SetRenderTarget(Ogre::RenderTarget *_target) override;
@@ -228,7 +228,7 @@ namespace gazebo
       /// \bried Callback that is used to set mapping material uniform values,
       ///   implements Ogre::CompositorInstance::Listener interface
       /// \param[in] _pass_id Pass identifier
-      /// \param[in] _pass_id Material whose parameters should be set
+      /// \param[in] _material Material whose parameters should be set
       protected: void notifyMaterialRender(Ogre::uint32 _pass_id,
         Ogre::MaterialPtr &_material) override;
 

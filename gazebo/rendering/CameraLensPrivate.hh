@@ -64,11 +64,13 @@ namespace gazebo
                 public: explicit MapFunctionEnum(const std::string &_str)
                 {
                   for (auto item : variants)
+                  {
                     if (std::get<0>(item) == _str)
                     {
                       value = item;
                       return;
                     }
+                  }
 
                   // function provided is not in array
                   throw std::invalid_argument("Unknown function");
@@ -92,7 +94,10 @@ namespace gazebo
 
                 /// \brief Apply function to float value
                 /// \result The result of application
-                public: float Apply(float _t) { return std::get<2>(value)(_t); }
+                public: float Apply(float _t)
+                {
+                  return std::get<2>(value)(_t);
+                }
 
                 /// \brief Assignment operator
                 /// \param[in] _fun Rvalue
@@ -106,18 +111,18 @@ namespace gazebo
                 /// List of all available functions and it's representations
                 private: const std::vector<
                     std::tuple<std::string, ignition::math::Vector3d,
-                        std::function<float(float)> > > variants = {
+                        std::function<float (float)> > > variants = {
                           std::make_tuple("sin",
                               ignition::math::Vector3d::UnitX,
-                              std::function<float(float)>(
-                                  static_cast<float(*)(float)>(&std::sin))),
+                              std::function<float (float)>(
+                                  static_cast<float (*)(float)>(&std::sin))),
                           std::make_tuple("tan",
                               ignition::math::Vector3d::UnitY,
-                              std::function<float(float)>(
-                                  static_cast<float(*)(float)>(&std::tan))),
+                              std::function<float (float)>(
+                                  static_cast<float (*)(float)>(&std::tan))),
                           std::make_tuple("id",
                               ignition::math::Vector3d::UnitZ,
-                              std::function<float(float)>(
+                              std::function<float (float)>(
                                   [](float t) -> float
                                   {
                                     return t;

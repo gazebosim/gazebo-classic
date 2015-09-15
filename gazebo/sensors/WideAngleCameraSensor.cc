@@ -45,16 +45,6 @@ using namespace sensors;
 GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
 //////////////////////////////////////////////////
-WideAngleCameraSensor::WideAngleCameraSensor()
-{
-}
-
-//////////////////////////////////////////////////
-WideAngleCameraSensor::~WideAngleCameraSensor()
-{
-}
-
-//////////////////////////////////////////////////
 void WideAngleCameraSensor::Init()
 {
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==

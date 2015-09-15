@@ -287,6 +287,7 @@ void CameraLens::SetF(double _f)
   this->dataPtr->sdf->GetElement("custom_function")->GetElement("f")->Set(_f);
 }
 
+//////////////////////////////////////////////////
 void CameraLens::SetFun(const std::string &_fun)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->dataMutex);
@@ -477,7 +478,7 @@ int WideAngleCamera::EnvTextureSize() const
 }
 
 //////////////////////////////////////////////////
-CameraLens *WideAngleCamera::Lens()
+CameraLens *WideAngleCamera::Lens() const
 {
   return this->lens;
 }

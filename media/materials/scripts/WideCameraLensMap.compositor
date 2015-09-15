@@ -1,14 +1,14 @@
 compositor WideCameraLensMap/ParametrisedMap
 {
-    technique
+  technique
+  {
+    target_output
     {
-        target_output
-        {
-            input none
-            pass render_quad
-            {
-                material Gazebo/WideLensMap
-            }
-        }
+      input none
+      pass render_quad
+      {
+        material Gazebo/WideLensMap
+      }
     }
+  }
 }
