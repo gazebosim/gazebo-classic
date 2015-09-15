@@ -1323,6 +1323,162 @@ TEST_F(MsgsTest, CollisionFromSDF_Contact)
 }
 
 /////////////////////////////////////////////////
+TEST_F(MsgsTest, SurfaceToFromSDF)
+{
+  // Surface
+  double restitution_coefficient = 0.1;
+  double threshold = 0.2;
+
+
+  // Friction
+  double mu = 0.1;
+  double mu2 = 0.2;
+  ignition::math::Vector3d fdir1(-0.3, 0.4, -0.5);
+  double slip1 = 0.6;
+  double slip2 = 0.7;
+  double mu3 = 0.8;
+  double patch_radius = 0.9;
+  double surface_radius = 1.0;
+  bool use_patch_radius = false;
+  double slip3 = 1.1;
+
+  // Contact
+  bool collide_without_contact = true;
+  int32_t collide_without_contact_bitmask = 123;
+  int32_t collide_bitmask = 456;
+  bool soft_cfm = 0.1;
+  bool soft_erp = 0.2;
+  bool kp = 0.3;
+  bool kd = 0.4;
+  bool max_vel = 0.5;
+  bool min_depth = 0.6;
+
+  // Create message
+  msgs::Surface surfaceMsg1;
+  surfaceMsg1.set_restitution_coefficient(restitution_coefficient);
+  surfaceMsg1.set_bounce_threshold(threshold);
+  surfaceMsg1.set_soft_cfm(soft_cfm);
+  surfaceMsg1.set_soft_erp(soft_erp);
+  surfaceMsg1.set_kp(kp);
+  surfaceMsg1.set_kd(kd);
+  surfaceMsg1.set_max_vel(max_vel);
+  surfaceMsg1.set_min_depth(min_depth);
+  surfaceMsg1.set_collide_without_contact(collide_without_contact);
+  surfaceMsg1.set_collide_without_contact_bitmask(
+      collide_without_contact_bitmask);
+  surfaceMsg1.set_collide_bitmask(collide_bitmask);
+
+  msgs::Friction frictionMsg1;
+  frictionMsg1.set_mu(mu);
+  frictionMsg1.set_mu2(mu2);
+  msgs::Set(frictionMsg1.mutable_fdir1(), fdir1);
+  frictionMsg1.set_slip1(slip1);
+  frictionMsg1.set_slip2(slip2);
+
+  msgs::Friction::Torsional torsionalMsg1;
+  torsionalMsg1.set_coefficient(mu3);
+  torsionalMsg1.set_patch_radius(patch_radius);
+  torsionalMsg1.set_surface_radius(surface_radius);
+  torsionalMsg1.set_use_patch_radius(use_patch_radius);
+
+  msgs::Friction::Torsional::ODE torsionalOdeMsg1;
+  torsionalOdeMsg1.set_slip(slip3);
+
+  auto torsionalODE = torsionalMsg1.mutable_ode();
+  torsionalODE->CopyFrom(torsionalOdeMsg1);
+
+  auto torsional = frictionMsg1.mutable_torsional();
+  torsional->CopyFrom(torsionalMsg1);
+
+  auto friction = surfaceMsg1.mutable_friction();
+  friction->CopyFrom(frictionMsg1);
+
+  // To SDF
+  sdf::ElementPtr sdf1 = msgs::SurfaceToSDF(surfaceMsg1);
+
+  // Back to Msg
+  msgs::Surface surfaceMsg2 = msgs::SurfaceFromSDF(sdf1);
+  EXPECT_DOUBLE_EQ(surfaceMsg2.restitution_coefficient(),
+      restitution_coefficient);
+  EXPECT_DOUBLE_EQ(surfaceMsg2.bounce_threshold(), threshold);
+  EXPECT_DOUBLE_EQ(surfaceMsg2.soft_cfm(), soft_cfm);
+  EXPECT_DOUBLE_EQ(surfaceMsg2.soft_erp(), soft_erp);
+  EXPECT_DOUBLE_EQ(surfaceMsg2.kp(), kp);
+  EXPECT_DOUBLE_EQ(surfaceMsg2.kd(), kd);
+  EXPECT_DOUBLE_EQ(surfaceMsg2.max_vel(), max_vel);
+  EXPECT_DOUBLE_EQ(surfaceMsg2.min_depth(), min_depth);
+  EXPECT_EQ(surfaceMsg2.collide_without_contact(), collide_without_contact);
+  EXPECT_EQ(surfaceMsg2.collide_without_contact_bitmask(),
+      collide_without_contact_bitmask);
+  EXPECT_EQ(surfaceMsg2.collide_bitmask(), collide_bitmask);
+
+  ASSERT_TRUE(surfaceMsg2.has_friction());
+  msgs::Friction frictionMsg2 = surfaceMsg2.friction();
+
+  EXPECT_DOUBLE_EQ(frictionMsg2.mu(), mu);
+  EXPECT_DOUBLE_EQ(frictionMsg2.mu2(), mu2);
+  EXPECT_EQ(msgs::ConvertIgn(frictionMsg2.fdir1()), fdir1);
+  EXPECT_DOUBLE_EQ(frictionMsg2.slip1(), slip1);
+  EXPECT_DOUBLE_EQ(frictionMsg2.slip2(), slip2);
+  ASSERT_TRUE(frictionMsg2.has_torsional());
+  EXPECT_DOUBLE_EQ(frictionMsg2.torsional().coefficient(), mu3);
+  EXPECT_DOUBLE_EQ(frictionMsg2.torsional().patch_radius(), patch_radius);
+  EXPECT_DOUBLE_EQ(frictionMsg2.torsional().surface_radius(), surface_radius);
+  EXPECT_EQ(frictionMsg2.torsional().use_patch_radius(), use_patch_radius);
+  ASSERT_TRUE(frictionMsg2.torsional().has_ode());
+  EXPECT_DOUBLE_EQ(frictionMsg2.torsional().ode().slip(), slip3);
+
+  // Back to SDF
+  sdf::ElementPtr sdf2;
+  sdf2.reset(new sdf::Element);
+  sdf::initFile("surface.sdf", sdf2);
+  msgs::SurfaceToSDF(surfaceMsg2, sdf2);
+
+  ASSERT_TRUE(sdf2 != NULL);
+
+  ASSERT_TRUE(sdf2->HasElement("bounce"));
+  EXPECT_DOUBLE_EQ(
+      sdf2->GetElement("bounce")->Get<double>("restitution_coefficient"),
+      restitution_coefficient);
+  EXPECT_DOUBLE_EQ(
+      sdf2->GetElement("bounce")->Get<double>("threshold"), threshold);
+
+  ASSERT_TRUE(sdf2->HasElement("contact"));
+  sdf::ElementPtr contactSdf2 = sdf2->GetElement("contact");
+
+  EXPECT_EQ(contactSdf2->Get<bool>("collide_without_contact"),
+      collide_without_contact);
+  EXPECT_EQ(contactSdf2->Get<int>("collide_without_contact_bitmask"),
+      collide_without_contact_bitmask);
+  EXPECT_EQ(contactSdf2->Get<int>("collide_bitmask"), collide_bitmask);
+
+  ASSERT_TRUE(sdf2->HasElement("friction"));
+  ASSERT_TRUE(sdf2->GetElement("friction")->HasElement("ode"));
+  sdf::ElementPtr odeSdf2 =
+      sdf2->GetElement("friction")->GetElement("ode");
+
+  EXPECT_DOUBLE_EQ(odeSdf2->Get<double>("mu"), mu);
+  EXPECT_DOUBLE_EQ(odeSdf2->Get<double>("mu2"), mu2);
+  EXPECT_EQ(odeSdf2->Get<ignition::math::Vector3d>("fdir1"), fdir1);
+  EXPECT_DOUBLE_EQ(odeSdf2->Get<double>("slip1"), slip1);
+  EXPECT_DOUBLE_EQ(odeSdf2->Get<double>("slip2"), slip2);
+
+  ASSERT_TRUE(sdf2->GetElement("friction")->HasElement("torsional"));
+  sdf::ElementPtr torsionalSdf2 =
+      sdf2->GetElement("friction")->GetElement("torsional");
+
+  EXPECT_DOUBLE_EQ(torsionalSdf2->Get<double>("coefficient"), mu3);
+  EXPECT_DOUBLE_EQ(torsionalSdf2->Get<double>("patch_radius"), patch_radius);
+  EXPECT_DOUBLE_EQ(torsionalSdf2->Get<double>("surface_radius"),
+      surface_radius);
+  EXPECT_EQ(torsionalSdf2->Get<bool>("use_patch_radius"),
+      use_patch_radius);
+  ASSERT_TRUE(torsionalSdf2->HasElement("ode"));
+  EXPECT_DOUBLE_EQ(torsionalSdf2->GetElement("ode")->Get<double>("slip"),
+      slip3);
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, AxisFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());
