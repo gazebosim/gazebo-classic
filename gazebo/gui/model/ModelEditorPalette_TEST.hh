@@ -36,6 +36,9 @@ class ModelEditorPalette_TEST : public QTestFixture
 
   /// \brief Tests the model plugin list.
   private slots: void AddRemoveModelPlugins();
+
+  /// \brief Tests the model plugin list.
+  private slots: void DeleteKey();
 };
 
 #endif

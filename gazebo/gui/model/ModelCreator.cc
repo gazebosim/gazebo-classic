@@ -1326,19 +1326,23 @@ void ModelCreator::RemoveModelPlugin(const std::string &_name)
 /////////////////////////////////////////////////
 bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
 {
+std::cout << "AAA" << std::endl;
   if (_event.key == Qt::Key_Escape)
   {
     this->Stop();
   }
   else if (_event.key == Qt::Key_Delete)
   {
-    this->DeselectAll();
+std::cout << "BBB" << std::endl;
     if (!this->selectedLinks.empty())
     {
+std::cout << "CCC" << std::endl;
       for (const auto &linkVis : this->selectedLinks)
       {
+std::cout << "DDD" << std::endl;
         this->OnDelete(linkVis->GetName());
       }
+      this->DeselectAll();
     }
     else if (!this->selectedModelPlugins.empty())
     {
@@ -1346,6 +1350,7 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
       {
         this->RemoveModelPlugin(plugin);
       }
+      this->DeselectAll();
     }
   }
   else if (_event.control)
@@ -1900,6 +1905,7 @@ void ModelCreator::DeselectAllModelPlugins()
 /////////////////////////////////////////////////
 void ModelCreator::SetSelected(const std::string &_name, const bool _selected)
 {
+std::cout << "SetSelected name" << std::endl;
   auto it = this->allLinks.find(_name);
   if (it == this->allLinks.end())
     return;
@@ -1975,6 +1981,7 @@ void ModelCreator::OnSetSelectedEntity(const std::string &/*_name*/,
 void ModelCreator::OnSetSelectedLink(const std::string &_name,
     const bool _selected)
 {
+std::cout << "SetSelectedLink" << std::endl;
   this->SetSelected(_name, _selected);
 }
 

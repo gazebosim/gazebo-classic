@@ -30,6 +30,9 @@ class ModelCreator_TEST : public QTestFixture
 
   /// \brief Tests selecting links in the model editor
   private slots: void Selection();
+
+  /// \brief Tests selecting links in the model editor
+  private slots: void DeleteKey();
 };
 
 #endif

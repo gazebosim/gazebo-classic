@@ -17,6 +17,7 @@
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -193,6 +194,76 @@ void ModelCreator_TEST::Selection()
   QVERIFY(cylinder->GetHighlighted());
   QVERIFY(!box->GetHighlighted());
   QVERIFY(!sphere->GetHighlighted());
+
+  delete modelCreator;
+  modelCreator = NULL;
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator_TEST::DeleteKey()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  // Get the GLWidget
+  gazebo::gui::GLWidget *glWidget =
+    mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != NULL);
+
+  // Start a model creator
+  gui::ModelCreator *modelCreator = new gui::ModelCreator();
+  QVERIFY(modelCreator);
+
+  // Insert a link
+  modelCreator->AddShape(gui::ModelCreator::LINK_CYLINDER);
+  gazebo::rendering::VisualPtr link =
+      scene->GetVisual("ModelPreview_0::link_0");
+  QVERIFY(link != NULL);
+
+  // Select the link and verify it is selected
+  modelCreator->SetSelected(link, true);
+  QVERIFY(link->GetHighlighted());
+
+  // Press delete key
+  QTest::keyClick(glWidget, Qt::Key_Delete, Qt::NoModifier, 100);
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Verify link is gone
+  link = scene->GetVisual("ModelPreview_0::link_0");
+  QVERIFY(link == NULL);
 
   delete modelCreator;
   modelCreator = NULL;

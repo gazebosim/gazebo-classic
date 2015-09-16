@@ -15,6 +15,10 @@
  *
 */
 
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/MainWindow.hh"
+
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorPalette_TEST.hh"
@@ -207,6 +211,115 @@ void ModelEditorPalette_TEST::AddRemoveModelPlugins()
 
   delete palette;
   palette = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette_TEST::DeleteKey()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Edit the top level model
+  gui::g_editModelAct->trigger();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the GLWidget
+  gazebo::gui::GLWidget *glWidget =
+    mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != NULL);
+
+  // Get palette
+  gazebo::gui::ModelEditorPalette *palette =
+      mainWindow->findChild<gazebo::gui::ModelEditorPalette *>();
+  QVERIFY(palette != NULL);
+
+  // Get model creator
+  gui::ModelCreator *modelCreator = palette->GetModelCreator();
+  QVERIFY(modelCreator);
+
+  // Get tree
+  QTreeWidget *tree = palette->findChild<QTreeWidget *>();
+  QCOMPARE(tree->topLevelItemCount(), 3);
+
+  // Insert model plugin
+  gazebo::gui::model::Events::modelPluginInserted("plugin");
+
+  // Get model plugins item
+  QTreeWidgetItem *modelPluginsItem = tree->topLevelItem(0);
+  QVERIFY(modelPluginsItem->text(0) == "Model Plugins");
+
+  // Check model plugin is there
+  QCOMPARE(modelPluginsItem->childCount(), 1);
+  QVERIFY(modelPluginsItem->child(0)->data(0, Qt::UserRole) == "plugin");
+
+  // Insert link
+  gazebo::gui::model::Events::linkInserted("link");
+
+  // Get links item
+  QTreeWidgetItem *linksItem = tree->topLevelItem(1);
+  QVERIFY(linksItem->text(0) == "Links");
+
+  // Check link is there
+  QCOMPARE(linksItem->childCount(), 1);
+  QVERIFY(linksItem->child(0)->data(0, Qt::UserRole) == "link");
+
+  // Select the link
+  gazebo::gui::model::Events::setSelectedLink("link", true);
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Verify it is selected
+  QVERIFY(linksItem->child(0)->isSelected());
+
+  // Press delete key
+  QTest::keyClick(glWidget, Qt::Key_Delete, Qt::NoModifier, 100);
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 50; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Verify link is gone
+  QCOMPARE(linksItem->childCount(), 0);
+
+
+  delete palette;
+  palette = NULL;
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 // Generate a main function for the test
