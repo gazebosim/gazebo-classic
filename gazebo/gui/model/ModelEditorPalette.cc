@@ -192,7 +192,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   // Nested models
   this->nestedModelsItem = new QTreeWidgetItem(
       static_cast<QTreeWidgetItem *>(0),
-      QStringList(QString("%1").arg(tr("Nested Models"))));
+      QStringList(QString("%1").arg(tr("Models"))));
   this->nestedModelsItem->setData(0, Qt::UserRole,
       QVariant(tr("Nested Models")));
   this->nestedModelsItem->setFont(0, headerFont);
