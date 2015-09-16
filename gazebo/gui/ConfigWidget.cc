@@ -24,14 +24,12 @@
 using namespace gazebo;
 using namespace gui;
 
-const QString ConfigWidget::level0BgColor = "#999999";
-const QString ConfigWidget::level1BgColor = "#777777";
-const QString ConfigWidget::level2BgColor = "#555555";
-const QString ConfigWidget::level3BgColor = "#333333";
-const QString ConfigWidget::level0WidgetColor = "#eeeeee";
-const QString ConfigWidget::level1WidgetColor = "#cccccc";
-const QString ConfigWidget::level2WidgetColor = "#aaaaaa";
-const QString ConfigWidget::level3WidgetColor = "#888888";
+const std::vector<QString> ConfigWidget::bgColors(
+      {"#999999", "#777777", "#555555", "#333333"});
+
+const std::vector<QString> ConfigWidget::widgetColors(
+      {"#eeeeee", "#cccccc", "#aaaaaa", "#888888"});
+
 const QString ConfigWidget::redColor = "#d42b2b";
 const QString ConfigWidget::greenColor = "#3bc43b";
 const QString ConfigWidget::blueColor = "#0d0df2";
@@ -955,11 +953,11 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
         newFieldWidget->setStyleSheet(
             "QWidget\
             {\
-              background-color: " + this->level0BgColor +
+              background-color: " + this->bgColors[0] +
             "}\
             QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
             {\
-              background-color: " + this->level0WidgetColor +
+              background-color: " + this->widgetColors[0] +
             "}");
       }
 
@@ -1044,7 +1042,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     buttonFrame->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level0BgColor +
+          background-color: " + this->bgColors[0] +
         "}");
   }
 
@@ -1070,11 +1068,11 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     _childWidget->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level1BgColor +
+          background-color: " + this->bgColors[1] +
         "}\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
         {\
-          background-color: " + this->level1WidgetColor +
+          background-color: " + this->widgetColors[1] +
         "}");
   }
   else if (_level == 1)
@@ -1082,11 +1080,11 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     _childWidget->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level2BgColor +
+          background-color: " + this->bgColors[2] +
         "}\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
         {\
-          background-color: " + this->level2WidgetColor +
+          background-color: " + this->widgetColors[2] +
         "}");
   }
   else if (_level == 2)
@@ -1094,11 +1092,11 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     _childWidget->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level3BgColor +
+          background-color: " + this->bgColors[3] +
         "}\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
         {\
-          background-color: " + this->level3WidgetColor +
+          background-color: " + this->widgetColors[3] +
         "}");
   }
 
@@ -2878,4 +2876,19 @@ bool ConfigWidget::RemoveItemEnumWidget(const std::string &_name,
   valueComboBox->blockSignals(false);
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::InsertLayout(QLayout *_layout, int _pos)
+{
+  QGroupBox *box = qobject_cast<QGroupBox *>(
+      this->layout()->itemAt(0)->widget());
+  if (!box)
+    return;
+
+  QVBoxLayout *boxLayout = qobject_cast<QVBoxLayout *>(box->layout());
+  if (!boxLayout)
+    return;
+
+  boxLayout->insertLayout(_pos, _layout);
 }
