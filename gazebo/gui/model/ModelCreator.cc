@@ -1332,13 +1332,13 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   }
   else if (_event.key == Qt::Key_Delete)
   {
-    this->DeselectAll();
     if (!this->selectedLinks.empty())
     {
       for (const auto &linkVis : this->selectedLinks)
       {
         this->OnDelete(linkVis->GetName());
       }
+      this->DeselectAll();
     }
     else if (!this->selectedModelPlugins.empty())
     {
@@ -1346,6 +1346,7 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
       {
         this->RemoveModelPlugin(plugin);
       }
+      this->DeselectAll();
     }
   }
   else if (_event.control)
