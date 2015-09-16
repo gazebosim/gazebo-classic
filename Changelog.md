@@ -61,6 +61,10 @@ using the same arguments used in the command line.
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
 1. Model editor updates
+    1. Choose / swap parent and child links in joint inspector
+        * [Pull request #1887](https://bitbucket.org/osrf/gazebo/pull-request/1887)
+        * [Issue #1500](https://bitbucket.org/osrf/gazebo/issue/1500)
+
     1. Added support for more joint types (gearbox and fixed joints).
         * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
