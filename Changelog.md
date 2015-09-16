@@ -48,6 +48,9 @@ using the same arguments used in the command line.
 1. Added msgs::PluginFromSDF and tests
     * [Pull request #1858](https://bitbucket.org/osrf/gazebo/pull-request/1858)
 
+1. Added msgs::CollisionFromSDF msgs::SurfaceFromSDF and msgs::FrictionFromSDF
+    * [Pull request #1900](https://bitbucket.org/osrf/gazebo/pull-request/1900)
+
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
 
