@@ -60,8 +60,9 @@ set (sources ${sources}
   JointController.cc
   JointState.cc
   Link.cc
-  LightState.cc
   LinkState.cc
+  Light.cc
+  LightState.cc
   MapShape.cc
   MeshShape.cc
   Model.cc
@@ -107,8 +108,9 @@ set (headers
   JointController.hh
   JointWrench.hh
   JointState.hh
-  Link.hh
+  Light.hh
   LightState.hh
+  Link.hh
   LinkState.hh
   MapShape.hh
   MeshShape.hh
