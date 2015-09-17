@@ -1409,7 +1409,7 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   EXPECT_DOUBLE_EQ(surfaceMsg2.min_depth(), min_depth);
   EXPECT_EQ(surfaceMsg2.collide_without_contact(), collide_without_contact);
   EXPECT_EQ(surfaceMsg2.collide_without_contact_bitmask(),
-      collide_without_contact_bitmask);
+      static_cast<unsigned int>(collide_without_contact_bitmask));
   EXPECT_EQ(surfaceMsg2.collide_bitmask(), collide_bitmask);
 
   ASSERT_TRUE(surfaceMsg2.has_friction());
