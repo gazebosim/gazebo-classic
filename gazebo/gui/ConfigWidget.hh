@@ -443,6 +443,12 @@ namespace gazebo
       public: bool AddConfigChildWidget(const std::string &_name,
           ConfigChildWidget *_child);
 
+      /// \brief Insert a layout into the config widget's layout at a specific
+      /// position.
+      /// \param[in] _layout The layout to be inserted.
+      /// \param[in] _pos The position to insert at, 0 being the top.
+      public: void InsertLayout(QLayout *_layout, int _pos);
+
       /// \brief Get the number of child widgets.
       /// \return The number of child widgets.
       public: unsigned int ConfigChildWidgetCount() const;
