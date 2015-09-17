@@ -310,6 +310,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
        boost::bind(&ModelEditorPalette::OnSetSelectedJoint, this, _1, _2)));
+
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedModelPlugin(
+     boost::bind(&ModelEditorPalette::OnSetSelectedModelPlugin, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
@@ -817,6 +821,26 @@ void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->jointsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _name)
+    {
+      item->setSelected(_selected);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSetSelectedModelPlugin(const std::string &_name,
+    bool _selected)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->modelPluginsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->modelPluginsItem->child(i);
     if (!item)
       continue;
     std::string listData = item->data(0, Qt::UserRole).toString().toStdString();

@@ -1318,13 +1318,13 @@ void ModelCreator::RemoveModelPlugin(const std::string &_name)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  if (this->allModelPlugins.find(_name) ==
-      this->allModelPlugins.end())
+  auto it = this->allModelPlugins.find(_name);
+  if (it == this->allModelPlugins.end())
   {
     return;
   }
 
-  ModelPluginData *data = this->allModelPlugins[_name];
+  ModelPluginData *data = it->second;
 
   // Remove from map
   this->allModelPlugins.erase(_name);
@@ -1345,7 +1345,7 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   {
     if (!this->selectedLinks.empty())
     {
-      for (auto linkVis : this->selectedLinks)
+      for (const auto &linkVis : this->selectedLinks)
       {
         this->OnDelete(linkVis->GetName());
       }
@@ -1353,10 +1353,11 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
     }
     else if (!this->selectedModelPlugins.empty())
     {
-      for (auto plugin : this->selectedModelPlugins)
+      for (const auto &plugin : this->selectedModelPlugins)
       {
         this->RemoveModelPlugin(plugin);
       }
+      this->DeselectAll();
     }
   }
   else if (_event.control)
@@ -1466,6 +1467,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // Multi-selection mode
       else
       {
+        this->DeselectAllModelPlugins();
+
         auto it = std::find(this->selectedLinks.begin(),
             this->selectedLinks.end(), linkVis);
         // Highlight and select clicked link if not already selected
@@ -1878,12 +1881,31 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAll()
 {
+  this->DeselectAllLinks();
+  this->DeselectAllModelPlugins();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::DeselectAllLinks()
+{
   while (!this->selectedLinks.empty())
   {
     rendering::VisualPtr vis = this->selectedLinks[0];
     vis->SetHighlighted(false);
     this->selectedLinks.erase(this->selectedLinks.begin());
     model::Events::setSelectedLink(vis->GetName(), false);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::DeselectAllModelPlugins()
+{
+  while (!this->selectedModelPlugins.empty())
+  {
+    auto it = this->selectedModelPlugins.begin();
+    std::string name = this->selectedModelPlugins[0];
+    this->selectedModelPlugins.erase(it);
+    model::Events::setSelectedModelPlugin(name, false);
   }
 }
 
