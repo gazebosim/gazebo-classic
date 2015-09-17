@@ -1316,10 +1316,10 @@ TEST_F(MsgsTest, CollisionFromSDF_Contact)
   EXPECT_TRUE(surface.collide_without_contact());
 
   EXPECT_TRUE(surface.has_collide_without_contact_bitmask());
-  EXPECT_EQ(2, surface.collide_without_contact_bitmask());
+  EXPECT_EQ(2u, surface.collide_without_contact_bitmask());
 
   EXPECT_TRUE(surface.has_collide_bitmask());
-  EXPECT_EQ(3, surface.collide_bitmask());
+  EXPECT_EQ(3u, surface.collide_bitmask());
 }
 
 /////////////////////////////////////////////////
@@ -1346,12 +1346,12 @@ TEST_F(MsgsTest, SurfaceToFromSDF)
   bool collide_without_contact = true;
   int32_t collide_without_contact_bitmask = 123;
   int32_t collide_bitmask = 456;
-  bool soft_cfm = 0.1;
-  bool soft_erp = 0.2;
-  bool kp = 0.3;
-  bool kd = 0.4;
-  bool max_vel = 0.5;
-  bool min_depth = 0.6;
+  double soft_cfm = 0.1;
+  double soft_erp = 0.2;
+  double kp = 0.3;
+  double kd = 0.4;
+  double max_vel = 0.5;
+  double min_depth = 0.6;
 
   // Create message
   msgs::Surface surfaceMsg1;
