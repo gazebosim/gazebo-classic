@@ -20,6 +20,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/JointController.hh"
 #include "plugins/SinusoidalForcePlugin.hh"
 
 using namespace gazebo;
@@ -88,6 +89,14 @@ void SinusoidalForcePlugin::Load(physics::ModelPtr _model,
             << max << "], period [" << period << "]" << std::endl;
     }
   }
+
+  // Joint controller
+  this->jointController = this->model->GetJointController();
+  for (auto data : this->dataList)
+  {
+//    this->jointController->SetPositionPID(data.joint->GetScopedName(),
+  //      common::PID(1220, 1, 25));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -107,7 +116,10 @@ void SinusoidalForcePlugin::OnUpdate()
     double force = data.average +
         data.amplitude * sin (2 * IGN_PI * t / data.period);
 
-    data.joint->SetForce(0, force);
+    this->jointController->SetPositionTarget(
+          data.joint->GetScopedName(), force);
+//std::cout << force << std::endl;
+//    data.joint->SetForce(0, force);
   }
 }
 

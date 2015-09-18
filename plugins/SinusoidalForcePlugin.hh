@@ -65,6 +65,8 @@ namespace gazebo
 
     // \brief List of all joints and the forces which should be applied.
     private: std::vector<ForceData> dataList;
+
+    private: physics::JointControllerPtr jointController;
   };
 }
 #endif
