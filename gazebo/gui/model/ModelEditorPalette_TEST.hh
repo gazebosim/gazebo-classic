@@ -35,6 +35,15 @@ class ModelEditorPalette_TEST : public QTestFixture
 
   /// \brief Tests the nested model list.
   private slots: void AddRemoveNestedModels();
+
+  /// \brief Tests the link list.
+  private slots: void AddRemoveLinks();
+
+  /// \brief Tests the joint list.
+  private slots: void AddRemoveJoints();
+
+  /// \brief Tests the model plugin list.
+  private slots: void AddRemoveModelPlugins();
 };
 
 #endif

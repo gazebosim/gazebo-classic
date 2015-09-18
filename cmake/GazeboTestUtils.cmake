@@ -5,7 +5,7 @@
 macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
-    string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
+    string(REGEX REPLACE "\\.cc" "" BINARY_NAME ${GTEST_SOURCE_file})
     set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
     if(USE_LOW_MEMORY_TESTS)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
