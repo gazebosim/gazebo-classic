@@ -23,4 +23,7 @@ message Model
   repeated Visual visual       = 8;
   optional Vector3d scale      = 9;
   optional bool self_collide   = 10;
+
+  /// \brief An array of nested models.
+  repeated Model model         = 11;
 }

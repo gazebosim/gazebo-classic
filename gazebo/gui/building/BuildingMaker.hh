@@ -43,7 +43,7 @@ namespace gazebo
     /// \{
 
     /// \brief Create and manage 3D visuals of a building.
-    class GZ_GUI_BUILDING_VISIBLE BuildingMaker
+    class GZ_GUI_VISIBLE BuildingMaker
     {
       /// \enum SaveState
       /// \brief Save states for the building editor.
