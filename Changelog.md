@@ -64,6 +64,10 @@ using the same arguments used in the command line.
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
 1. Model editor updates
+    1. Choose / swap parent and child links in joint inspector
+        * [Pull request #1887](https://bitbucket.org/osrf/gazebo/pull-request/1887)
+        * [Issue #1500](https://bitbucket.org/osrf/gazebo/issue/1500)
+
     1. Added support for more joint types (gearbox and fixed joints).
         * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
@@ -77,6 +81,9 @@ using the same arguments used in the command line.
 
     1. Display model plugins on the left panel and added model plugin inspector
         * [Pull request #1863](https://bitbucket.org/osrf/gazebo/pull-request/1863)
+
+    1. Context menu and deletion for model plugins
+        * [Pull request #1890](https://bitbucket.org/osrf/gazebo/pull-request/1890)
 
 ## Gazebo 6.0
 
@@ -1043,6 +1050,11 @@ compilation on Windows.
     * [Issue #1087](https://bitbucket.org/osrf/gazebo/issue/1087)
 1. Fixed memory leak in image conversion
     * [Pull request #1073](https://bitbucket.org/osrf/gazebo/pull-request/1073)
+
+### Gazebo 2.2.1 (xxxx-xx-xx)
+
+1. Fix heightmap model texture loading.
+    * [Pull request #1596](https://bitbucket.org/osrf/gazebo/pull-request/1596)
 
 ### Gazebo 2.2.0 (2014-01-10)
 
