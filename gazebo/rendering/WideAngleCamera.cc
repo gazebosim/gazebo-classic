@@ -391,22 +391,22 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
     : Camera(_namePrefix, _scene, _autoRender)
 {
   this->dataPtr = new WideAngleCameraPrivate;
-  this->lens = new CameraLens();
+  this->dataPtr->lens = new CameraLens();
 
-  envCubeMapTexture = NULL;
+  this->dataPtr->envCubeMapTexture = NULL;
   this->dataPtr->envTextureSize = _textureSize;
 
   for (int i = 0; i < 6; ++i)
   {
-    envCameras[i] = NULL;
-    envRenderTargets[i] = NULL;
+    this->dataPtr->envCameras[i] = NULL;
+    this->dataPtr->envRenderTargets[i] = NULL;
   }
 }
 
 //////////////////////////////////////////////////
 WideAngleCamera::~WideAngleCamera()
 {
-  delete this->lens;
+  delete this->Lens();
   delete this->dataPtr;
 }
 
@@ -416,14 +416,14 @@ void WideAngleCamera::Init()
   Camera::Init();
 
   for (int i = 0; i < 6; ++i)
-    this->sceneNode->attachObject(this->envCameras[i]);
+    this->sceneNode->attachObject(this->dataPtr->envCameras[i]);
 
   // set environment cameras orientation
-  this->envCameras[0]->yaw(Ogre::Degree(-90));
-  this->envCameras[1]->yaw(Ogre::Degree(90));
-  this->envCameras[2]->pitch(Ogre::Degree(90));
-  this->envCameras[3]->pitch(Ogre::Degree(-90));
-  this->envCameras[5]->yaw(Ogre::Degree(180));
+  this->dataPtr->envCameras[0]->yaw(Ogre::Degree(-90));
+  this->dataPtr->envCameras[1]->yaw(Ogre::Degree(90));
+  this->dataPtr->envCameras[2]->pitch(Ogre::Degree(90));
+  this->dataPtr->envCameras[3]->pitch(Ogre::Degree(-90));
+  this->dataPtr->envCameras[5]->yaw(Ogre::Degree(180));
 
   this->CreateEnvRenderTexture(this->scopedUniqueName + "_envRttTex");
 }
@@ -439,13 +439,13 @@ void WideAngleCamera::Load()
   {
     sdf::ElementPtr sdf_lens = this->sdf->GetElement("lens");
 
-    this->lens->Load(sdf_lens);
+    this->Lens()->Load(sdf_lens);
 
     if (sdf_lens->HasElement("env_texture_size"))
       this->dataPtr->envTextureSize = sdf_lens->Get<int>("env_texture_size");
   }
   else
-    this->lens->Load();
+    this->Lens()->Load();
 }
 
 //////////////////////////////////////////////////
@@ -453,20 +453,22 @@ void WideAngleCamera::Fini()
 {
   for (int i = 0; i < 6; ++i)
   {
-    RTShaderSystem::DetachViewport(this->envViewports[i], this->GetScene());
+    RTShaderSystem::DetachViewport(this->dataPtr->envViewports[i],
+                                   this->GetScene());
 
-    this->envRenderTargets[i]->removeAllViewports();
-    this->envRenderTargets[i] = NULL;
+    this->dataPtr->envRenderTargets[i]->removeAllViewports();
+    this->dataPtr->envRenderTargets[i] = NULL;
 
-    this->GetScene()->GetManager()->destroyCamera(envCameras[i]->getName());
-    envCameras[i] = NULL;
+    this->GetScene()->GetManager()->destroyCamera(
+        this->dataPtr->envCameras[i]->getName());
+    this->dataPtr->envCameras[i] = NULL;
   }
 
-  if (this->envCubeMapTexture)
+  if (this->dataPtr->envCubeMapTexture)
     Ogre::TextureManager::getSingleton().remove(
-      this->envCubeMapTexture->getName());
+      this->dataPtr->envCubeMapTexture->getName());
 
-  this->envCubeMapTexture = NULL;
+  this->dataPtr->envCubeMapTexture = NULL;
 
   Camera::Fini();
 }
@@ -482,7 +484,7 @@ int WideAngleCamera::EnvTextureSize() const
 //////////////////////////////////////////////////
 CameraLens *WideAngleCamera::Lens() const
 {
-  return this->lens;
+  return this->dataPtr->lens;
 }
 
 //////////////////////////////////////////////////
@@ -492,27 +494,27 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   if (this->renderTarget)
   {
-    this->cubeMapCompInstance =
+    this->dataPtr->cubeMapCompInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
           "WideCameraLensMap/ParametrisedMap");
 
-    if (this->envCubeMapTexture)
+    if (this->dataPtr->envCubeMapTexture)
     {
-      this->compMat =
+      this->dataPtr->compMat =
           Ogre::MaterialManager::getSingleton().getByName("Gazebo/WideLensMap");
 
-      auto pass = this->compMat->getTechnique(0)->getPass(0);
+      auto pass = this->dataPtr->compMat->getTechnique(0)->getPass(0);
 
       if (!pass->getNumTextureUnitStates())
         pass->createTextureUnitState();
 
-      this->cubeMapCompInstance->addListener(this);
+      this->dataPtr->cubeMapCompInstance->addListener(this);
     }
     else
       gzerr << "Compositor texture MISSING";
 
 
-    this->cubeMapCompInstance->setEnabled(true);
+    this->dataPtr->cubeMapCompInstance->setEnabled(true);
   }
 }
 
@@ -536,18 +538,18 @@ void WideAngleCamera::CreateEnvCameras()
 
     name_str << this->scopedUniqueName << "_env_" << i;
 
-    this->envCameras[i] =
+    this->dataPtr->envCameras[i] =
         this->GetScene()->GetManager()->createCamera(name_str.str());
 
-    this->envCameras[i]->setFixedYawAxis(false);
-    this->envCameras[i]->setFOVy(Ogre::Degree(90));
-    this->envCameras[i]->setAspectRatio(1);
+    this->dataPtr->envCameras[i]->setFixedYawAxis(false);
+    this->dataPtr->envCameras[i]->setFOVy(Ogre::Degree(90));
+    this->dataPtr->envCameras[i]->setAspectRatio(1);
 
-    this->envCameras[i]->yaw(Ogre::Degree(-90.0));
-    this->envCameras[i]->roll(Ogre::Degree(-90.0));
+    this->dataPtr->envCameras[i]->yaw(Ogre::Degree(-90.0));
+    this->dataPtr->envCameras[i]->roll(Ogre::Degree(-90.0));
 
-    this->envCameras[i]->setNearClipDistance(0.01);
-    this->envCameras[i]->setFarClipDistance(1000);
+    this->dataPtr->envCameras[i]->setNearClipDistance(0.01);
+    this->dataPtr->envCameras[i]->setFarClipDistance(1000);
   }
 }
 
@@ -562,11 +564,14 @@ void WideAngleCamera::SetClipDist()
 
   for (int i = 0; i < 6; ++i)
   {
-    if (this->envCameras[i])
+    if (this->dataPtr->envCameras[i])
     {
-      this->envCameras[i]->setNearClipDistance(clipElem->Get<double>("near"));
-      this->envCameras[i]->setFarClipDistance(clipElem->Get<double>("far"));
-      this->envCameras[i]->setRenderingDistance(clipElem->Get<double>("far"));
+      this->dataPtr->envCameras[i]->setNearClipDistance(
+          clipElem->Get<double>("near"));
+      this->dataPtr->envCameras[i]->setFarClipDistance(
+          clipElem->Get<double>("far"));
+      this->dataPtr->envCameras[i]->setRenderingDistance(
+          clipElem->Get<double>("far"));
     }
     else
     {
@@ -585,25 +590,26 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
   fsaa = 0;
 #endif
 
-  this->envCubeMapTexture = Ogre::TextureManager::getSingleton().createManual(
-      this->scopedUniqueName+"::"+_textureName,
-      "General",
-      Ogre::TEX_TYPE_CUBE_MAP,
-      this->dataPtr->envTextureSize,
-      this->dataPtr->envTextureSize,
-      0,
-      Ogre::PF_A8R8G8B8,
-      Ogre::TU_RENDERTARGET,
-      0,
-      false,
-      fsaa).getPointer();
+  this->dataPtr->envCubeMapTexture =
+      Ogre::TextureManager::getSingleton().createManual(
+          this->scopedUniqueName+"::"+_textureName,
+          "General",
+          Ogre::TEX_TYPE_CUBE_MAP,
+          this->dataPtr->envTextureSize,
+          this->dataPtr->envTextureSize,
+          0,
+          Ogre::PF_A8R8G8B8,
+          Ogre::TU_RENDERTARGET,
+          0,
+          false,
+          fsaa).getPointer();
 
   for (int i = 0; i < 6; ++i)
   {
     Ogre::RenderTarget *rtt;
-    rtt = this->envCubeMapTexture->getBuffer(i)->getRenderTarget();
+    rtt = this->dataPtr->envCubeMapTexture->getBuffer(i)->getRenderTarget();
 
-    Ogre::Viewport *vp = rtt->addViewport(this->envCameras[i]);
+    Ogre::Viewport *vp = rtt->addViewport(this->dataPtr->envCameras[i]);
     vp->setClearEveryFrame(true);
     vp->setShadowsEnabled(true);
     vp->setOverlaysEnabled(false);
@@ -615,12 +621,12 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
     vp->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
-    this->envViewports[i] = vp;
+    this->dataPtr->envViewports[i] = vp;
 
     if (this->GetScene()->GetSkyX())
       rtt->addListener(this->GetScene()->GetSkyX());
 
-    this->envRenderTargets[i] = rtt;
+    this->dataPtr->envRenderTargets[i] = rtt;
   }
 }
 
@@ -630,10 +636,10 @@ void WideAngleCamera::RenderImpl()
   std::lock_guard<std::mutex> lock(this->dataPtr->renderMutex);
 
   for (int i = 0; i < 6; ++i)
-    this->envRenderTargets[i]->update();
+    this->dataPtr->envRenderTargets[i]->update();
 
-  compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(
-    this->envCubeMapTexture->getName());
+  this->dataPtr->compMat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->
+      setTextureName(this->dataPtr->envCubeMapTexture->getName());
 
   this->renderTarget->update();
 }

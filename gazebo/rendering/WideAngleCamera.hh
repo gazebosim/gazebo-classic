@@ -234,28 +234,6 @@ namespace gazebo
       protected: void notifyMaterialRender(Ogre::uint32 _pass_id,
         Ogre::MaterialPtr &_material) override;
 
-      /// \brief Compositor used to render rectangle with attached cube map
-      protected: Ogre::CompositorInstance *cubeMapCompInstance;
-
-      /// \brief A Set of 6 cameras,
-      ///   each pointing in different direction with FOV of 90deg
-      protected: Ogre::Camera *envCameras[6];
-
-      /// \brief Render targets for envCameras
-      protected: Ogre::RenderTarget *envRenderTargets[6];
-
-      /// \brief Viewports for the render targets
-      protected: Ogre::Viewport *envViewports[6];
-
-      /// \brief A single cube map texture
-      protected: Ogre::Texture *envCubeMapTexture;
-
-      /// \brief Pointer to material, used for second rendering pass
-      protected: Ogre::MaterialPtr compMat;
-
-      /// \brief Camera lens description
-      protected: CameraLens *lens;
-
       /// \internal
       /// \brief Private data pointer
       private: WideAngleCameraPrivate *dataPtr;
