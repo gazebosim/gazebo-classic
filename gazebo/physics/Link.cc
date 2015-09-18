@@ -166,7 +166,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       else if (sensorElem->Get<std::string>("type") != "__default__")
       {
         // This must match the implementation in Sensors::GetScopedName
-        std::string sensorName = this->GetScopedName() + "::" +
+        std::string sensorName = this->GetScopedName(true) + "::" +
           sensorElem->Get<std::string>("name");
 
         // Tell the sensor library to create a sensor.

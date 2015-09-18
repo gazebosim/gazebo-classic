@@ -318,7 +318,7 @@ void Joint::LoadImpl(const math::Pose &_pose)
       if (sensorElem->Get<std::string>("type") == "force_torque")
       {
         // This must match the implementation in Sensors::GetScopedName
-        std::string sensorName = this->GetScopedName() + "::" +
+        std::string sensorName = this->GetScopedName(true) + "::" +
           sensorElem->Get<std::string>("name");
 
         // Tell the sensor library to create a sensor.
