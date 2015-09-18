@@ -338,9 +338,9 @@ namespace gazebo
       /// \brief Create a sensor
       /// * Parameter 1[in] (sdf::ElementPtr): The SDF element that describes
       ///   the sensor.
-      /// * Parameter 2[in] (std::sttring): Name of the world in which to create
+      /// * Parameter 2[in] (std::string): Name of the world in which to create
       ///   the sensor.
-      /// * Parameter 3[in] (std::string): The fully scoped parent name
+      /// * Parameter 3[in] (std::string): The scoped parent name
       ///   (model::link).
       /// * Parameter 4[in] (uint32_t): ID of the sensor
       public: static EventT<void (sdf::ElementPtr,
