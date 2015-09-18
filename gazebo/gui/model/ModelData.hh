@@ -29,16 +29,12 @@ namespace boost
   class recursive_mutex;
 }
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 namespace gazebo
 {
   namespace gui
   {
     class LinkInspector;
+    class ModelPluginInspector;
 
     class GZ_GUI_VISIBLE ModelData
     {
@@ -179,6 +175,28 @@ namespace gazebo
 
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
+    };
+
+    /// \brief Helper class to store model plugin data
+    class GZ_GUI_VISIBLE ModelPluginData : public QObject
+    {
+      Q_OBJECT
+
+      /// \brief Constructor
+      public: ModelPluginData();
+
+      /// \brief Destructor
+      public: ~ModelPluginData();
+
+      /// \brief Load data from the plugin SDF
+      /// \param[in] _pluginElem SDF element.
+      public: void Load(sdf::ElementPtr _pluginElem);
+
+      /// \brief Inspector for configuring model plugin properties.
+      public: ModelPluginInspector *inspector;
+
+      /// \brief SDF representing the model plugin data.
+      public: sdf::ElementPtr modelPluginSDF;
     };
   }
 }

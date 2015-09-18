@@ -933,7 +933,9 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   {
     this->inertial->ProcessMsg(_msg.inertial());
     this->SetEnabled(true);
-    this->UpdateMass();
+    // Only update the Center of Mass if object is dynamic
+    if (!this->GetKinematic())
+      this->UpdateMass();
   }
 
   if (_msg.has_pose())
