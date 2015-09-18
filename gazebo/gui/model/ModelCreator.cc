@@ -74,8 +74,12 @@ ModelCreator::ModelCreator()
   this->jointMaker = new JointMaker();
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
-  connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
-          SLOT(OnDelete(const std::string &)));
+
+  if (g_deleteAct)
+  {
+    connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
+        SLOT(OnDelete(const std::string &)));
+  }
 
   this->connections.push_back(
       gui::Events::ConnectAlignMode(

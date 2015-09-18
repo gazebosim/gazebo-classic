@@ -28,6 +28,7 @@
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportIface.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Light.hh"
