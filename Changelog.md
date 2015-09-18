@@ -1,4 +1,25 @@
 ## Gazebo 7.0
+1. Added torsional friction
+    * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
+
+1. Support loading and spawning nested models
+    * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
+
+1. Added EnumIface, which supports iterators over enums.
+    * [Pull request #1847](https://bitbucket.org/osrf/gazebo/pull-request/1847)
+
+1. Added RegionEventBoxPlugin - fires events when models enter / exit the region
+    * [Pull request #1856](https://bitbucket.org/osrf/gazebo/pull-request/1856)
+
+1. Added tests for checking the playback control via messages.
+    * [Pull request #1885](https://bitbucket.org/osrf/gazebo/pull-request/1885)
+
+1. Added LoadArgs() function to ServerFixture for being able to load a server
+using the same arguments used in the command line.
+    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874)
+
+1. Added battery class, plugins and test world.
+    * [Pull request #1872](https://bitbucket.org/osrf/gazebo/pull-request/1872)
 
 1. Display gearbox and screw joint properties in property tree
     * [Pull request #1838](https://bitbucket.org/osrf/gazebo/pull-request/1838)
@@ -18,6 +39,9 @@
 1. Tweaks to Data Logger, such as multiline text edit for path
     * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
 
+1. Added TopToolbar and hide / disable several widgets according to WindowMode
+    * [Pull request #1869](https://bitbucket.org/osrf/gazebo/pull-request/1869)
+
 1. Added Visual::IsAncestorOf and Visual::IsDescendantOf
     * [Pull request #1850](https://bitbucket.org/osrf/gazebo/pull-request/1850)
 
@@ -27,10 +51,20 @@
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
 
+1. Make it possible to create custom ConfigWidgets
+    * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
+
+1. AddItem / RemoveItem / Clear enum config widgets
+    * [Pull request #1878](https://bitbucket.org/osrf/gazebo/pull-request/1878)
+
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
 1. Model editor updates
+    1. Choose / swap parent and child links in joint inspector
+        * [Pull request #1887](https://bitbucket.org/osrf/gazebo/pull-request/1887)
+        * [Issue #1500](https://bitbucket.org/osrf/gazebo/issue/1500)
+
     1. Added support for more joint types (gearbox and fixed joints).
         * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
@@ -42,13 +76,22 @@
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
+    1. Display model plugins on the left panel and added model plugin inspector
+        * [Pull request #1863](https://bitbucket.org/osrf/gazebo/pull-request/1863)
+
 ## Gazebo 6.0
+
+1. Added Copy constructor and assignment operator to MouseEvent
+    * [Pull request #1855](https://bitbucket.org/osrf/gazebo/pull-request/1855)
 
 1. Added logical_camera sensor.
     * [Pull request #1845](https://bitbucket.org/osrf/gazebo/pull-request/1845)
 
 1. Added RandomVelocityPlugin, which applies a random velocity to a model's link.
     * [Pull request #1839](https://bitbucket.org/osrf/gazebo/pull-request/1839)
+
+1. Sim events for joint position, velocity and applied force
+    * [Pull request #1849](https://bitbucket.org/osrf/gazebo/pull-request/1849)
 
 1. Added magnetometer sensor. A contribution from Andrew Symington.
     * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)

@@ -27,6 +27,7 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -119,10 +120,11 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       gui::model::Events::ConnectFinishModel(
       boost::bind(&ModelEditor::OnFinish, this)));
 
-  // Add a joint icon to the render widget toolbar
+  // Add a joint icon to the toolbar
   this->dataPtr->jointAct  = new QAction(QIcon(":/images/draw_link.svg"),
       tr("Joint"), this);
   this->dataPtr->jointAct->setCheckable(true);
+  this->dataPtr->jointAct->setObjectName("modelEditorJointAct");
 
   // set up the action group so that only one action is active at one time.
   QActionGroup *actionGroup = g_arrowAct->actionGroup();
@@ -133,14 +135,13 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
         this, SLOT(OnAction(QAction *)));
   }
 
-  QToolBar *toolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
-  this->dataPtr->jointButton = new QToolButton(toolbar);
-  this->dataPtr->jointButton->setObjectName("jointToolButton");
-  this->dataPtr->jointButton->setCheckable(false);
-  this->dataPtr->jointButton->setFixedWidth(15);
-  this->dataPtr->jointButton->setPopupMode(QToolButton::InstantPopup);
-  QMenu *jointMenu = new QMenu(this->dataPtr->jointButton);
-  this->dataPtr->jointButton->setMenu(jointMenu);
+  QToolButton *jointButton = new QToolButton();
+  jointButton->setObjectName("jointToolButton");
+  jointButton->setCheckable(false);
+  jointButton->setFixedWidth(15);
+  jointButton->setPopupMode(QToolButton::InstantPopup);
+  QMenu *jointMenu = new QMenu(jointButton);
+  jointButton->setMenu(jointMenu);
   QAction *revoluteJointAct = new QAction(tr("Revolute"), this);
   QAction *revolute2JointAct = new QAction(tr("Revolute2"), this);
   QAction *prismaticJointAct = new QAction(tr("Prismatic"), this);
@@ -179,17 +180,25 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointActionGroup->addAction(fixedJointAct);
   jointActionGroup->setExclusive(true);
 
-  QAction *toolbarSpacer = toolbar->findChild<QAction *>(
-      "toolbarSpacerAction");
-  GZ_ASSERT(toolbarSpacer, "Toolbar spacer not found");
+  TopToolbar *topToolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
 
-  this->dataPtr->jointSeparatorAct = toolbar->insertSeparator(toolbarSpacer);
-  toolbar->insertAction(toolbarSpacer, this->dataPtr->jointAct);
-  this->dataPtr->jointTypeAct = toolbar->insertWidget(toolbarSpacer,
-      this->dataPtr->jointButton);
+  // Separator
+  QAction *jointSeparatorAct =
+      topToolbar->InsertSeparator("toolbarSpacerAction");
+  jointSeparatorAct->setObjectName(
+      "modelEditorJointSeparatorAct");
+
+  // Joint create action
+  topToolbar->InsertAction("toolbarSpacerAction", this->dataPtr->jointAct);
+
+  // Joint type dropdown
+  QAction *jointTypeAct = topToolbar->InsertWidget("toolbarSpacerAction",
+      jointButton);
+  jointTypeAct->setObjectName("modelEditorJointTypeAct");
+
   this->dataPtr->jointAct->setVisible(false);
-  this->dataPtr->jointSeparatorAct->setVisible(false);
-  this->dataPtr->jointTypeAct->setVisible(false);
+  jointSeparatorAct->setVisible(false);
+  jointTypeAct->setVisible(false);
 
   this->dataPtr->signalMapper = new QSignalMapper(this);
   connect(this->dataPtr->signalMapper, SIGNAL(mapped(const QString)),
@@ -416,37 +425,8 @@ void ModelEditor::OnAction(QAction *_action)
 /////////////////////////////////////////////////
 void ModelEditor::ToggleToolbar()
 {
-  QToolBar *toolbar =
-      this->mainWindow->GetRenderWidget()->GetToolbar();
-  QList<QAction *> actions = toolbar->actions();
-
-  for (int i = 0; i < actions.size(); ++i)
-  {
-    if (actions[i] == g_arrowAct ||
-        actions[i] == g_rotateAct ||
-        actions[i] == g_translateAct ||
-        actions[i] == g_scaleAct ||
-        actions[i] == g_screenshotAct ||
-        actions[i] == g_copyAct ||
-        actions[i] == g_pasteAct ||
-        actions[i] == g_alignButtonAct ||
-        actions[i] == g_viewAngleButtonAct ||
-        actions[i] == g_snapAct ||
-        actions[i]->objectName() == "toolbarSpacerAction")
-    {
-      actions[i]->setVisible(true);
-      if (i > 0 && actions[i-1]->isSeparator())
-      {
-        actions[i-1]->setVisible(true);
-      }
-    }
-    else
-    {
-      actions[i]->setVisible(!this->dataPtr->active);
-    }
-  }
-
-  this->dataPtr->jointAct->setVisible(this->dataPtr->active);
-  this->dataPtr->jointTypeAct->setVisible(this->dataPtr->active);
-  this->dataPtr->jointSeparatorAct->setVisible(this->dataPtr->active);
+  if (this->dataPtr->active)
+    gui::Events::windowMode("ModelEditor");
+  else
+    gui::Events::windowMode("Simulation");
 }
