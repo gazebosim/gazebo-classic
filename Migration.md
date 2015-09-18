@@ -146,7 +146,7 @@ release will remove the deprecated code.
     + ***Deprecation:***Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,const int _operation, const math::Pose &_offset = math::Pose::Zero);
     + ***Replacement:***Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,const int _operation,const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);
 
-1. **
+1. **gazebo/common/MeshManager.hh**
     + ***Deprecation:***void GetMeshAABB(const Mesh *_mesh,math::Vector3 &_center,math::Vector3 &_minXYZ,math::Vector3 &_maxXYZ);
     + ***Replacement:***void GetMeshAABB(const Mesh *_mesh,ignition::math::Vector3d &_center,ignition::math::Vector3d &_min_xyz,ignition::math::Vector3d &_max_xyz);
     + ***Deprecation:***void GenSphericalTexCoord(const Mesh *_mesh,math::Vector3 _center);
