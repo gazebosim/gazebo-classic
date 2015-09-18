@@ -36,10 +36,10 @@ dxJointContact::dxJointContact( dxWorld *w ) :
 }
 
 
-void 
+void
 dxJointContact::getSureMaxInfo( SureMaxInfo* info )
 {
-    info->max_m = 3; // ...as the actual m is very likely to hit the maximum
+    info->max_m = 4; // ...as the actual m is very likely to hit the maximum
 }
 
 
@@ -52,9 +52,8 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
     if ( contact.surface.mu < 0 ) contact.surface.mu = 0;
     if ( contact.surface.mode & dContactMu2 )
     {
-        if ( contact.surface.mu > 0 ) m++;
+        m += 2;
         if ( contact.surface.mu2 < 0 ) contact.surface.mu2 = 0;
-        if ( contact.surface.mu2 > 0 ) m++;
         if (_dequal(contact.surface.mu, dInfinity)) nub ++;
         if (_dequal(contact.surface.mu2, dInfinity)) nub ++;
     }
@@ -62,6 +61,13 @@ dxJointContact::getInfo1( dxJoint::Info1 *info )
     {
         if ( contact.surface.mu > 0 ) m += 2;
         if (_dequal(contact.surface.mu, dInfinity)) nub += 2;
+    }
+
+    if ( contact.surface.mode & dContactMu3 )
+    {
+        if ( contact.surface.mu3 < 0 ) contact.surface.mu3 = 0;
+        m++;  // do this even if mu3 is zero.
+        if (_dequal(contact.surface.mu3, dInfinity)) nub ++;
     }
 
     the_m = m;
@@ -75,6 +81,7 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
 {
     int s = info->rowskip;
     int s2 = 2 * s;
+    int s3 = 3 * s;
 
     // get normal, with sign adjusted for body1/body2 polarity
     dVector3 normal;
@@ -293,6 +300,83 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         // set slip (constraint force mixing)
         if ( contact.surface.mode & dContactSlip2 )
             info->cfm[2] = contact.surface.slip2;
+    }
+
+    // now do jacobian for rotational forces
+
+    // third friction direction (torsional)
+    // note that this will only be reachable if mu and mu2
+    // have positive values
+    if ( the_m >= 4 )
+    {
+        dVector3 t3 = {0, 0, 0};
+
+        // Linear, body 1
+        info->J1l[s3+0] = t3[0];
+        info->J1l[s3+1] = t3[1];
+        info->J1l[s3+2] = t3[2];
+
+        // Angular, body 1
+        info->J1a[s3+0] = normal[0];
+        info->J1a[s3+1] = normal[1];
+        info->J1a[s3+2] = normal[2];
+        if ( node[1].body )
+        {
+            // Linear, body 2
+            info->J2l[s3+0] = -t3[0];
+            info->J2l[s3+1] = -t3[1];
+            info->J2l[s3+2] = -t3[2];
+
+            // Angular, body 2
+            info->J2a[s3+0] = -normal[0];
+            info->J2a[s3+1] = -normal[1];
+            info->J2a[s3+2] = -normal[2];
+        }
+        // set LCP bounds and friction index. this depends on the approximation
+        // mode
+        if ( contact.surface.mode & dContactMu3 )
+        {
+            // Use user defined torsional patch radius
+            //
+            // M = torsional moment
+            // F = normal force
+            // a = patch radius
+            // R = surface radius
+            // d = depth
+            // mu = torsional friction coefficient
+            //
+            // M = (3 * pi * a * mu3)/16 * F
+            //
+            // When using radius:
+            //
+            // a = sqrt (R * d)
+            //
+            // M = (3 * pi * mu3 * sqrt (R * d))/16 * F
+
+            dReal patch_radius;
+            if (!contact.surface.use_patch_radius)
+            {
+              patch_radius = sqrt(contact.surface.surface_radius * depth);
+            }
+            else
+            {
+              patch_radius = contact.surface.patch_radius;
+            }
+
+            double rhs = (3 * M_PI * patch_radius * contact.surface.mu3)/16;
+
+            info->lo[3] = -rhs;
+            info->hi[3] = rhs;
+
+            // findex[3] must be zero in order for torsional friction moment
+            // to be proportional to normal force
+            if ( contact.surface.mode & dContactApprox3 )
+                info->findex[3] = 0;
+
+            // set slip (constraint force mixing)
+            if ( contact.surface.mode & dContactSlip3 )
+                info->cfm[3] = contact.surface.slip3;
+        }
     }
 }
 
