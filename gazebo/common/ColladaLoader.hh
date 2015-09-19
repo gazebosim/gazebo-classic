@@ -25,11 +25,12 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
-
+#include <tinyxml2.h>
 #include "gazebo/common/MeshLoader.hh"
 #include "gazebo/util/system.hh"
 
 class TiXmlElement;
+class XMLElement;
 
 namespace gazebo
 {
@@ -61,64 +62,66 @@ namespace gazebo
       /// \param[in] _skelXml Pointer the skeleton xml instance
       /// \param[in] _transform A tranform to apply
       /// \param[in,out] _mesh The mesh being loaded
-      private: void LoadController(TiXmlElement *_contrXml,
-          TiXmlElement *_skelXml,
+      private: void LoadController(tinyxml2::XMLElement *_contrXml,
+          tinyxml2::XMLElement *_skelXml,
           const ignition::math::Matrix4d &_transform, Mesh *_mesh);
 
       /// \brief Load animations for a skeleton
       /// \param[in] _xml Animation XML instance
       /// \param[in,out] _skel Pointer to the skeleton
-      private: void LoadAnimations(TiXmlElement *_xml, Skeleton *_skel);
+      private: void LoadAnimations(tinyxml2::XMLElement *_xml, Skeleton *_skel);
 
       /// \brief Load a set of animations for a skeleton
       /// \param[in] _xml Pointer to the animation set XML instance
       /// \param[in,out] _skel Pointer to the skeleton
-      private: void LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel);
+      private: void LoadAnimationSet(tinyxml2::XMLElement *_xml,
+           Skeleton *_skel);
 
       /// \brief Load skeleton nodes
       /// \param[in] _xml Pointer to the XML instance
       /// \param[in,out] _xml Pointer to the Skeleton node parent
-      private: SkeletonNode* LoadSkeletonNodes(TiXmlElement *_xml,
+      private: SkeletonNode* LoadSkeletonNodes(tinyxml2::XMLElement *_xml,
                                                SkeletonNode *_parent);
 
       /// \brief Set the tranform for a skeleton node
       /// \param[in] _xml Pointer to the XML instance
       /// \param[in,out] _node The skeleton node
-      private: void SetSkeletonNodeTransform(TiXmlElement *_elem,
+      private: void SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
                                              SkeletonNode *_node);
 
       /// \brief Load geometry elements
       /// \param[in] _xml Pointer to the XML instance
       /// \param[in] _tranform Transform to apply to the loaded geometry
       /// \param[in,out] _mesh Pointer to the mesh currently being loaded
-      private: void LoadGeometry(TiXmlElement *_xml,
+      private: void LoadGeometry(tinyxml2::XMLElement *_xml,
                    const ignition::math::Matrix4d &_transform, Mesh *_mesh);
 
       /// \brief Get an XML element by ID
       /// \param[in] _parent The parent element
       /// \param[in] _name String name of the element
       /// \param[out] _id String ID of the element
-      private: TiXmlElement *GetElementId(TiXmlElement *_parent,
-                                          const std::string &_name,
-                                          const std::string &_id);
+      private: tinyxml2::XMLElement *GetElementId(
+          tinyxml2::XMLElement *_parent, const std::string &_name,
+          const std::string &_id);
 
       /// \brief Get an XML element by ID
       /// \param[in] _name String name of the element
       /// \param[out] _id String ID of the element
-      private: TiXmlElement *GetElementId(const std::string &_name,
-                                           const std::string &_id);
+      private: tinyxml2::XMLElement *GetElementId(const std::string &_name,
+                                                  const std::string &_id);
 
       /// \brief Load a node
       /// \param[in] _elem Pointer to the node XML instance
       /// \param[in,out] _mesh Pointer to the current mesh
       /// \param[out] _transform Transform to apply to the node
-      private: void LoadNode(TiXmlElement *_elem, Mesh *_mesh,
+      private: void LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
                    const ignition::math::Matrix4d &_transform);
 
       /// \brief Load a transform
       /// \param[in] _elem Pointer to the transform XML instance
       /// \return A Matrix4 transform
-      private: ignition::math::Matrix4d LoadNodeTransform(TiXmlElement *_elem);
+      private: ignition::math::Matrix4d LoadNodeTransform(
+          tinyxml2::XMLElement *_elem);
 
       /// \brief Load vertices
       /// \param[in] _id String id of the vertices XML node
@@ -181,7 +184,7 @@ namespace gazebo
       /// \param[in] _eleme Pointer to the XML element
       /// \param[in] _type One of {diffuse, ambient, emission}
       /// \param[out] _mat Material to load the texture or color into
-      private: void LoadColorOrTexture(TiXmlElement *_elem,
+      private: void LoadColorOrTexture(tinyxml2::XMLElement *_elem,
                                        const std::string &_type,
                                        Material *_mat);
 
@@ -189,7 +192,7 @@ namespace gazebo
       /// \param[in] _trianglesXml Pointer the triangles XML instance
       /// \param[in] _transform Transform to apply to all triangles
       /// \param[out] _mesh Mesh that is currently being loaded
-      private: void LoadTriangles(TiXmlElement *_trianglesXml,
+      private: void LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
                                    const ignition::math::Matrix4d &_transform,
                                    Mesh *_mesh);
 
@@ -197,7 +200,7 @@ namespace gazebo
       /// \param[in] _polylistXml Pointer to the XML element
       /// \param[in] _transform Transform to apply to each polygon
       /// \param[out] _mesh Mesh that is currently being loaded
-      private: void LoadPolylist(TiXmlElement *_polylistXml,
+      private: void LoadPolylist(tinyxml2::XMLElement *_polylistXml,
                                    const ignition::math::Matrix4d &_transform,
                                    Mesh *_mesh);
 
@@ -205,7 +208,7 @@ namespace gazebo
       /// \param[in] _xml Pointer to the XML element
       /// \param[in] _transform Transform to apply
       /// \param[out] _mesh Mesh that is currently being loaded
-      private: void LoadLines(TiXmlElement *_xml,
+      private: void LoadLines(tinyxml2::XMLElement *_xml,
                                const ignition::math::Matrix4d &_transform,
                                Mesh *_mesh);
 
@@ -216,12 +219,13 @@ namespace gazebo
       /// \brief Load a float value
       /// \param[out] _elem Pointer to the XML element
       /// \return The float value
-      private: float LoadFloat(TiXmlElement *_elem);
+      private: float LoadFloat(tinyxml2::XMLElement *_elem);
 
       /// \brief Load a transparent material. NOT IMPLEMENTED
       /// \param[in] _elem Pointer to the XML element
       /// \param[out] _mat Material to hold the transparent properties
-      private: void LoadTransparent(TiXmlElement *_elem, Material *_mat);
+      private: void LoadTransparent(tinyxml2::XMLElement *_elem,
+          Material *_mat);
 
       /// \internal
       /// \brief Pointer to private data.

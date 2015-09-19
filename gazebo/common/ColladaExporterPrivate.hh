@@ -21,8 +21,7 @@
 #include <map>
 #include <string>
 #include <vector>
-
-class TiXmlElement;
+#include <tinyxml2.h>
 
 namespace gazebo
 {
@@ -51,6 +50,10 @@ namespace gazebo
       /// \brief True to export texture images to '../materials/textures'
       /// folder
       public: bool exportTextures;
+
+      /// \brief XML document containing the Collada file
+      public: tinyxml2::XMLDocument xmlDoc;
+
     };
   }
 }

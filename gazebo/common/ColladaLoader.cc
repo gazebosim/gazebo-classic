@@ -21,6 +21,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/unordered_map.hpp>
+#include <tinyxml2.h>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
@@ -96,7 +97,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   // reset scale
   this->dataPtr->meter = 1.0;
 
-  TiXmlDocument xmlDoc;
+  tinyxml2::XMLDocument xmlDoc;
 
   this->dataPtr->path.clear();
   if (_filename.rfind('/') != std::string::npos)
@@ -105,7 +106,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   }
 
   this->dataPtr->filename = _filename;
-  if (!xmlDoc.LoadFile(_filename))
+  if (xmlDoc.LoadFile(_filename.c_str()) != tinyxml2::XML_NO_ERROR)
     gzerr << "Unable to load collada file[" << _filename << "]\n";
 
   this->dataPtr->colladaXml = xmlDoc.FirstChildElement("COLLADA");
@@ -116,11 +117,10 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
       std::string(this->dataPtr->colladaXml->Attribute("version")) != "1.4.1")
     gzerr << "Invalid collada file. Must be version 1.4.0 or 1.4.1\n";
 
-  TiXmlElement *assetXml =
-      this->dataPtr->colladaXml->FirstChildElement("asset");
+  auto assetXml = this->dataPtr->colladaXml->FirstChildElement("asset");
   if (assetXml)
   {
-    TiXmlElement *unitXml = assetXml->FirstChildElement("unit");
+    auto unitXml = assetXml->FirstChildElement("unit");
     if (unitXml && unitXml->Attribute("meter"))
       this->dataPtr->meter = ignition::math::parseFloat(
           unitXml->Attribute("meter"));
@@ -140,12 +140,11 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 /////////////////////////////////////////////////
 void ColladaLoader::LoadScene(Mesh *_mesh)
 {
-  TiXmlElement *sceneXml =
-      this->dataPtr->colladaXml->FirstChildElement("scene");
+  auto sceneXml = this->dataPtr->colladaXml->FirstChildElement("scene");
   std::string sceneURL =
     sceneXml->FirstChildElement("instance_visual_scene")->Attribute("url");
 
-  TiXmlElement *visSceneXml = this->GetElementId("visual_scene", sceneURL);
+  auto visSceneXml = this->GetElementId("visual_scene", sceneURL);
 
   if (!visSceneXml)
   {
@@ -153,7 +152,7 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
     return;
   }
 
-  TiXmlElement *nodeXml = visSceneXml->FirstChildElement("node");
+  auto nodeXml = visSceneXml->FirstChildElement("node");
   while (nodeXml)
   {
     this->LoadNode(nodeXml, _mesh, ignition::math::Matrix4d::Identity);
@@ -162,11 +161,11 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
+void ColladaLoader::LoadNode(tinyxml2::XMLElement *_elem, Mesh *_mesh,
     const ignition::math::Matrix4d &_transform)
 {
-  TiXmlElement *nodeXml;
-  TiXmlElement *instGeomXml;
+  tinyxml2::XMLElement *nodeXml;
+  tinyxml2::XMLElement *instGeomXml;
 
   ignition::math::Matrix4d transform = this->LoadNodeTransform(_elem);
   transform = _transform * transform;
@@ -204,10 +203,10 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
   while (instGeomXml)
   {
     std::string geomURL = instGeomXml->Attribute("url");
-    TiXmlElement *geomXml = this->GetElementId("geometry", geomURL);
+    auto geomXml = this->GetElementId("geometry", geomURL);
 
     this->dataPtr->materialMap.clear();
-    TiXmlElement *bindMatXml, *techniqueXml, *matXml;
+    tinyxml2::XMLElement *bindMatXml, *techniqueXml, *matXml;
     bindMatXml = instGeomXml->FirstChildElement("bind_material");
     while (bindMatXml)
     {
@@ -229,19 +228,18 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     instGeomXml = instGeomXml->NextSiblingElement("instance_geometry");
   }
 
-  TiXmlElement *instContrXml =
-    nodeXml->FirstChildElement("instance_controller");
+  auto instContrXml = nodeXml->FirstChildElement("instance_controller");
   while (instContrXml)
   {
     std::string contrURL = instContrXml->Attribute("url");
-    TiXmlElement *contrXml = this->GetElementId("controller", contrURL);
+    auto contrXml = this->GetElementId("controller", contrURL);
 
-    TiXmlElement *instSkelXml = instContrXml->FirstChildElement("skeleton");
+    auto instSkelXml = instContrXml->FirstChildElement("skeleton");
     std::string rootURL = instSkelXml->GetText();
-    TiXmlElement *rootNodeXml = this->GetElementId("node", rootURL);
+    auto rootNodeXml = this->GetElementId("node", rootURL);
 
     this->dataPtr->materialMap.clear();
-    TiXmlElement *bindMatXml, *techniqueXml, *matXml;
+    tinyxml2::XMLElement *bindMatXml, *techniqueXml, *matXml;
     bindMatXml = instContrXml->FirstChildElement("bind_material");
     while (bindMatXml)
     {
@@ -265,7 +263,8 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
 }
 
 /////////////////////////////////////////////////
-ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
+ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(
+    tinyxml2::XMLElement *_elem)
 {
   ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
 
@@ -292,7 +291,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
       transform.Translate(translate);
     }
 
-    TiXmlElement *rotateXml = _elem->FirstChildElement("rotate");
+    auto rotateXml = _elem->FirstChildElement("rotate");
     while (rotateXml)
     {
       ignition::math::Matrix3d mat;
@@ -328,20 +327,20 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadController(TiXmlElement *_contrXml,
-      TiXmlElement *_skelXml,
+void ColladaLoader::LoadController(tinyxml2::XMLElement *_contrXml,
+      tinyxml2::XMLElement *_skelXml,
       const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
   Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL));
   _mesh->SetSkeleton(skeleton);
 
-  TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
+  auto rootXml = _contrXml->GetDocument()->RootElement();
 
   if (rootXml->FirstChildElement("library_animations"))
     this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
         skeleton);
 
-  TiXmlElement *skinXml = _contrXml->FirstChildElement("skin");
+  auto skinXml = _contrXml->FirstChildElement("skin");
   std::string geomURL = skinXml->Attribute("source");
 
   ignition::math::Matrix4d bindTrans;
@@ -358,9 +357,9 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
 
   skeleton->SetBindShapeTransform(bindTrans);
 
-  TiXmlElement *jointsXml = skinXml->FirstChildElement("joints");
+  auto jointsXml = skinXml->FirstChildElement("joints");
   std::string jointsURL, invBindMatURL;
-  TiXmlElement *inputXml = jointsXml->FirstChildElement("input");
+  auto inputXml = jointsXml->FirstChildElement("input");
   while (inputXml)
   {
     std::string semantic = inputXml->Attribute("semantic");
@@ -388,7 +387,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   std::vector<std::string> joints;
   boost::split(joints, jointsStr, boost::is_any_of("   "));
 
-  TiXmlElement *invBMXml = this->GetElementId("source", invBindMatURL);
+  auto invBMXml = this->GetElementId("source", invBindMatURL);
 
   if (!invBMXml)
   {
@@ -425,7 +424,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
     skeleton->GetNodeByName(joints[i])->SetInverseBindTransform(mat);
   }
 
-  TiXmlElement *vertWeightsXml = skinXml->FirstChildElement("vertex_weights");
+  auto vertWeightsXml = skinXml->FirstChildElement("vertex_weights");
 
   inputXml = vertWeightsXml->FirstChildElement("input");
   unsigned int jOffset = 0;
@@ -436,7 +435,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
     std::string semantic = inputXml->Attribute("semantic");
     std::string source = inputXml->Attribute("source");
     int offset;
-    inputXml->Attribute("offset", &offset);
+    offset = inputXml->IntAttribute("offset");
 
     if (semantic == "JOINT")
       jOffset = offset;
@@ -449,7 +448,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
     inputXml = inputXml->NextSiblingElement("input");
   }
 
-  TiXmlElement *weightsXml = this->GetElementId("source", weightsURL);
+  auto weightsXml = this->GetElementId("source", weightsURL);
 
   std::string wString = weightsXml->FirstChildElement("float_array")->GetText();
   std::vector<std::string> wStrs;
@@ -489,14 +488,14 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
     }
   }
 
-  TiXmlElement *geomXml = this->GetElementId("geometry", geomURL);
+  auto geomXml = this->GetElementId("geometry", geomURL);
   this->LoadGeometry(geomXml, _transform, _mesh);
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadAnimations(TiXmlElement *_xml, Skeleton *_skel)
+void ColladaLoader::LoadAnimations(tinyxml2::XMLElement *_xml, Skeleton *_skel)
 {
-  TiXmlElement *childXml = _xml->FirstChildElement("animation");
+  auto childXml = _xml->FirstChildElement("animation");
   if (childXml->FirstChildElement("animation"))
   {
     while (childXml)
@@ -510,7 +509,8 @@ void ColladaLoader::LoadAnimations(TiXmlElement *_xml, Skeleton *_skel)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
+void ColladaLoader::LoadAnimationSet(tinyxml2::XMLElement *_xml,
+    Skeleton *_skel)
 {
   std::stringstream animName;
   if (_xml->Attribute("name"))
@@ -523,10 +523,10 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
 
   RawSkeletonAnim animation;
 
-  TiXmlElement *animXml = _xml->FirstChildElement("animation");
+  auto animXml = _xml->FirstChildElement("animation");
   while (animXml)
   {
-    TiXmlElement *chanXml = animXml->FirstChildElement("channel");
+    auto chanXml = animXml->FirstChildElement("channel");
 
     while (chanXml)
     {
@@ -567,11 +567,11 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
           }
         }
 
-      TiXmlElement *frameTimesXml = NULL;
-      TiXmlElement *frameTransXml = NULL;
+      tinyxml2::XMLElement *frameTimesXml = NULL;
+      tinyxml2::XMLElement *frameTransXml = NULL;
 
-      TiXmlElement *sampXml = this->GetElementId("sampler", sourceURL);
-      TiXmlElement *inputXml = sampXml->FirstChildElement("input");
+      auto sampXml = this->GetElementId("sampler", sourceURL);
+      auto inputXml = sampXml->FirstChildElement("input");
       while (inputXml)
       {
         std::string semantic = inputXml->Attribute("semantic");
@@ -586,7 +586,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
 
         inputXml = inputXml->NextSiblingElement("input");
       }
-      TiXmlElement *timeArray = frameTimesXml->FirstChildElement("float_array");
+      auto timeArray = frameTimesXml->FirstChildElement("float_array");
       std::string timeStr = timeArray->GetText();
       std::vector<std::string> timeStrs;
       boost::split(timeStrs, timeStr, boost::is_any_of("   "));
@@ -595,7 +595,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
       for (unsigned int i = 0; i < timeStrs.size(); ++i)
         times.push_back(math::parseFloat(timeStrs[i]));
 
-      TiXmlElement *output = frameTransXml->FirstChildElement("float_array");
+      auto output = frameTransXml->FirstChildElement("float_array");
       std::string outputStr = output->GetText();
       std::vector<std::string> outputStrs;
       boost::split(outputStrs, outputStr, boost::is_any_of("   "));
@@ -604,8 +604,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
       for (unsigned int i = 0; i < outputStrs.size(); ++i)
         values.push_back(math::parseFloat(outputStrs[i]));
 
-      TiXmlElement *accessor =
-        frameTransXml->FirstChildElement("technique_common");
+      auto accessor = frameTransXml->FirstChildElement("technique_common");
       accessor = accessor->FirstChildElement("accessor");
 
       unsigned int stride =
@@ -662,7 +661,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
 }
 
 /////////////////////////////////////////////////
-SkeletonNode* ColladaLoader::LoadSkeletonNodes(TiXmlElement *_xml,
+SkeletonNode* ColladaLoader::LoadSkeletonNodes(tinyxml2::XMLElement *_xml,
       SkeletonNode *_parent)
 {
   std::string name;
@@ -678,7 +677,7 @@ SkeletonNode* ColladaLoader::LoadSkeletonNodes(TiXmlElement *_xml,
 
   this->SetSkeletonNodeTransform(_xml, node);
 
-  TiXmlElement *childXml = _xml->FirstChildElement("node");
+  auto childXml = _xml->FirstChildElement("node");
   while (childXml)
   {
     this->LoadSkeletonNodes(childXml, node);
@@ -688,7 +687,7 @@ SkeletonNode* ColladaLoader::LoadSkeletonNodes(TiXmlElement *_xml,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
+void ColladaLoader::SetSkeletonNodeTransform(tinyxml2::XMLElement *_elem,
       SkeletonNode *_node)
 {
   ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
@@ -729,7 +728,7 @@ void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
       _node->AddRawTransform(nt);
     }
 
-    TiXmlElement *rotateXml = _elem->FirstChildElement("rotate");
+    auto rotateXml = _elem->FirstChildElement("rotate");
     while (rotateXml)
     {
       ignition::math::Matrix3d mat;
@@ -780,11 +779,11 @@ void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
+void ColladaLoader::LoadGeometry(tinyxml2::XMLElement *_xml,
     const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
-  TiXmlElement *meshXml = _xml->FirstChildElement("mesh");
-  TiXmlElement *childXml;
+  auto meshXml = _xml->FirstChildElement("mesh");
+  tinyxml2::XMLElement *childXml;
 
   if (!meshXml)
     return;
@@ -812,14 +811,14 @@ void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
 }
 
 /////////////////////////////////////////////////
-TiXmlElement *ColladaLoader::GetElementId(const std::string &_name,
-                                          const std::string &_id)
+tinyxml2::XMLElement *ColladaLoader::GetElementId(const std::string &_name,
+                                                  const std::string &_id)
 {
   return this->GetElementId(this->dataPtr->colladaXml, _name, _id);
 }
 
 /////////////////////////////////////////////////
-TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
+tinyxml2::XMLElement *ColladaLoader::GetElementId(tinyxml2::XMLElement *_parent,
     const std::string &_name,
     const std::string &_id)
 {
@@ -834,10 +833,10 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
     return _parent;
   }
 
-  TiXmlElement *elem = _parent->FirstChildElement();
+  auto elem = _parent->FirstChildElement();
   while (elem)
   {
-    TiXmlElement *result = this->GetElementId(elem, _name, _id);
+    auto result = this->GetElementId(elem, _name, _id);
     if (result)
     {
       return result;
@@ -868,8 +867,8 @@ void ColladaLoader::LoadVertices(const std::string &_id,
     std::map<unsigned int, unsigned int> &_vertDups,
     std::map<unsigned int, unsigned int> &_normDups)
 {
-  TiXmlElement *verticesXml = this->GetElementId(this->dataPtr->colladaXml,
-                                                 "vertices", _id);
+  auto verticesXml = this->GetElementId(this->dataPtr->colladaXml,
+                                        "vertices", _id);
 
   if (!verticesXml)
   {
@@ -877,7 +876,7 @@ void ColladaLoader::LoadVertices(const std::string &_id,
     return;
   }
 
-  TiXmlElement *inputXml = verticesXml->FirstChildElement("input");
+  auto inputXml = verticesXml->FirstChildElement("input");
   while (inputXml)
   {
     std::string semantic = inputXml->Attribute("semantic");
@@ -908,14 +907,14 @@ void ColladaLoader::LoadPositions(const std::string &_id,
     return;
   }
 
-  TiXmlElement *sourceXml = this->GetElementId("source", _id);
+  auto sourceXml = this->GetElementId("source", _id);
   if (!sourceXml)
   {
     gzerr << "Unable to find source\n";
     return;
   }
 
-  TiXmlElement *floatArrayXml = sourceXml->FirstChildElement("float_array");
+  auto floatArrayXml = sourceXml->FirstChildElement("float_array");
   if (!floatArrayXml || !floatArrayXml->GetText())
   {
     int count = 1;
@@ -990,14 +989,14 @@ void ColladaLoader::LoadNormals(const std::string &_id,
   ignition::math::Matrix4d rotMat = _transform;
   rotMat.Translate(ignition::math::Vector3d::Zero);
 
-  TiXmlElement *normalsXml = this->GetElementId("source", _id);
+  auto normalsXml = this->GetElementId("source", _id);
   if (!normalsXml)
   {
     gzerr << "Unable to find normals[" << _id << "] in collada file\n";
     return;
   }
 
-  TiXmlElement *floatArrayXml = normalsXml->FirstChildElement("float_array");
+  auto floatArrayXml = normalsXml->FirstChildElement("float_array");
   if (!floatArrayXml || !floatArrayXml->GetText())
   {
     int count = 1;
@@ -1071,7 +1070,7 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
   int totCount = 0;
 
   // Get the source element for the texture coordinates.
-  TiXmlElement *xml = this->GetElementId("source", _id);
+  auto xml = this->GetElementId("source", _id);
   if (!xml)
   {
     gzerr << "Unable to find tex coords[" << _id << "] in collada file\n";
@@ -1080,7 +1079,7 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
 
   // Get the array of float values. These are the raw values for the texture
   // coordinates.
-  TiXmlElement *floatArrayXml = xml->FirstChildElement("float_array");
+  auto floatArrayXml = xml->FirstChildElement("float_array");
   if (!floatArrayXml || !floatArrayXml->GetText())
   {
     int count = 1;
@@ -1213,23 +1212,23 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
     return this->dataPtr->materialIds[_name];
   }
 
-  TiXmlElement *matXml = this->GetElementId("material", _name);
+  auto matXml = this->GetElementId("material", _name);
   if (!matXml || !matXml->FirstChildElement("instance_effect"))
     return NULL;
 
   Material *mat = new Material();
   std::string effectName =
     matXml->FirstChildElement("instance_effect")->Attribute("url");
-  TiXmlElement *effectXml = this->GetElementId("effect", effectName);
+  auto effectXml = this->GetElementId("effect", effectName);
 
-  TiXmlElement *commonXml = effectXml->FirstChildElement("profile_COMMON");
+  auto commonXml = effectXml->FirstChildElement("profile_COMMON");
   if (commonXml)
   {
-    TiXmlElement *techniqueXml = commonXml->FirstChildElement("technique");
-    TiXmlElement *lambertXml = techniqueXml->FirstChildElement("lambert");
+    auto techniqueXml = commonXml->FirstChildElement("technique");
+    auto lambertXml = techniqueXml->FirstChildElement("lambert");
 
-    TiXmlElement *phongXml = techniqueXml->FirstChildElement("phong");
-    TiXmlElement *blinnXml = techniqueXml->FirstChildElement("blinn");
+    auto phongXml = techniqueXml->FirstChildElement("phong");
+    auto blinnXml = techniqueXml->FirstChildElement("blinn");
     if (lambertXml)
     {
       this->LoadColorOrTexture(lambertXml, "ambient", mat);
@@ -1243,7 +1242,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
 
       if (lambertXml->FirstChildElement("transparent"))
       {
-        TiXmlElement *transXml = lambertXml->FirstChildElement("transparent");
+        auto transXml = lambertXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
       }
     }
@@ -1262,7 +1261,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
             this->LoadFloat(phongXml->FirstChildElement("transparency")));
       if (phongXml->FirstChildElement("transparent"))
       {
-        TiXmlElement *transXml = phongXml->FirstChildElement("transparent");
+        auto transXml = phongXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
       }
     }
@@ -1281,17 +1280,17 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
             this->LoadFloat(blinnXml->FirstChildElement("transparency")));
       if (blinnXml->FirstChildElement("transparent"))
       {
-        TiXmlElement *transXml = blinnXml->FirstChildElement("transparent");
+        auto transXml = blinnXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
       }
     }
   }
 
-  TiXmlElement *glslXml = effectXml->FirstChildElement("profile_GLSL");
+  auto glslXml = effectXml->FirstChildElement("profile_GLSL");
   if (glslXml)
     gzerr << "profile_GLSL unsupported\n";
 
-  TiXmlElement *cgXml = effectXml->FirstChildElement("profile_CG");
+  auto cgXml = effectXml->FirstChildElement("profile_CG");
   if (cgXml)
     gzerr << "profile_CG unsupported\n";
 
@@ -1301,13 +1300,13 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
+void ColladaLoader::LoadColorOrTexture(tinyxml2::XMLElement *_elem,
     const std::string &_type, Material *_mat)
 {
-  if (!_elem || !_elem->FirstChildElement(_type))
+  if (!_elem || !_elem->FirstChildElement(_type.c_str()))
     return;
 
-  TiXmlElement *typeElem = _elem->FirstChildElement(_type);
+  auto typeElem = _elem->FirstChildElement(_type.c_str());
 
   if (typeElem->FirstChildElement("color"))
   {
@@ -1325,10 +1324,10 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   else if (typeElem->FirstChildElement("texture"))
   {
     _mat->SetLighting(true);
-    TiXmlElement *imageXml = NULL;
+    tinyxml2::XMLElement *imageXml = NULL;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");
-    TiXmlElement *textureXml = this->GetElementId("newparam", textureName);
+    auto textureXml = this->GetElementId("newparam", textureName);
     if (textureXml)
     {
       if (std::string(textureXml->Value()) == "image")
@@ -1337,15 +1336,15 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
       }
       else
       {
-        TiXmlElement *sampler = textureXml->FirstChildElement("sampler2D");
+        auto sampler = textureXml->FirstChildElement("sampler2D");
         if (sampler)
         {
           std::string sourceName =
             sampler->FirstChildElement("source")->GetText();
-          TiXmlElement *sourceXml = this->GetElementId("newparam", sourceName);
+          auto sourceXml = this->GetElementId("newparam", sourceName);
           if (sourceXml)
           {
-            TiXmlElement *surfaceXml = sourceXml->FirstChildElement("surface");
+            auto surfaceXml = sourceXml->FirstChildElement("surface");
             if (surfaceXml && surfaceXml->FirstChildElement("init_from"))
             {
               imageXml = this->GetElementId("image",
@@ -1370,7 +1369,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
+void ColladaLoader::LoadPolylist(tinyxml2::XMLElement *_polylistXml,
     const ignition::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
@@ -1406,7 +1405,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
       subMesh->SetMaterialIndex(matIndex);
   }
 
-  TiXmlElement *polylistInputXml = _polylistXml->FirstChildElement("input");
+  auto polylistInputXml = _polylistXml->FirstChildElement("input");
 
   std::vector<ignition::math::Vector3d> verts;
   std::vector<ignition::math::Vector3d> norms;
@@ -1474,7 +1473,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   // if vcount >= 4, anchor around 0 (note this is bad for concave elements)
   //   e.g. if vcount = 4, break into triangle 1: [0,1,2], triangle 2: [0,2,3]
   std::vector<std::string> vcountStrs;
-  TiXmlElement *vcountXml = _polylistXml->FirstChildElement("vcount");
+  auto vcountXml = _polylistXml->FirstChildElement("vcount");
   std::string vcountStr = vcountXml->GetText();
   boost::split(vcountStrs, vcountStr, boost::is_any_of("   "));
   std::vector<int> vcounts;
@@ -1482,7 +1481,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     vcounts.push_back(math::parseInt(vcountStrs[j]));
 
   // read p
-  TiXmlElement *pXml = _polylistXml->FirstChildElement("p");
+  auto pXml = _polylistXml->FirstChildElement("p");
   std::string pStr = pXml->GetText();
 
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
@@ -1674,7 +1673,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
+void ColladaLoader::LoadTriangles(tinyxml2::XMLElement *_trianglesXml,
                                   const ignition::math::Matrix4d &_transform,
                                   Mesh *_mesh)
 {
@@ -1705,7 +1704,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       subMesh->SetMaterialIndex(matIndex);
   }
 
-  TiXmlElement *trianglesInputXml = _trianglesXml->FirstChildElement("input");
+  auto trianglesInputXml = _trianglesXml->FirstChildElement("input");
 
   std::vector<ignition::math::Vector3d> verts;
   std::vector<ignition::math::Vector3d> norms;
@@ -1765,7 +1764,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     offsetSize++;
   }
 
-  TiXmlElement *pXml = _trianglesXml->FirstChildElement("p");
+  auto pXml = _trianglesXml->FirstChildElement("p");
   if (!pXml || !pXml->GetText())
   {
     int count = 1;
@@ -1951,7 +1950,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadLines(TiXmlElement *_xml,
+void ColladaLoader::LoadLines(tinyxml2::XMLElement *_xml,
     const ignition::math::Matrix4d &_transform,
     Mesh *_mesh)
 {
@@ -1959,7 +1958,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
   subMesh->SetName(this->dataPtr->currentNodeName);
   subMesh->SetPrimitiveType(SubMesh::LINES);
 
-  TiXmlElement *inputXml = _xml->FirstChildElement("input");
+  auto inputXml = _xml->FirstChildElement("input");
   // std::string semantic = inputXml->Attribute("semantic");
   std::string source = inputXml->Attribute("source");
 
@@ -1967,7 +1966,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
   std::vector<ignition::math::Vector3d> norms;
   this->LoadVertices(source, _transform, verts, norms);
 
-  TiXmlElement *pXml = _xml->FirstChildElement("p");
+  auto pXml = _xml->FirstChildElement("p");
   std::string pStr = pXml->GetText();
   std::istringstream iss(pStr);
 
@@ -1988,7 +1987,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
 }
 
 /////////////////////////////////////////////////
-float ColladaLoader::LoadFloat(TiXmlElement *_elem)
+float ColladaLoader::LoadFloat(tinyxml2::XMLElement *_elem)
 {
   float value = 0;
 
@@ -2002,7 +2001,7 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
 }
 
 /////////////////////////////////////////////////
-void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
+void ColladaLoader::LoadTransparent(tinyxml2::XMLElement *_elem, Material *_mat)
 {
   const char *opaqueCStr = _elem->Attribute("opaque");
   if (!opaqueCStr)

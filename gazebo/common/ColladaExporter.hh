@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <tinyxml2.h>
 
 #include "gazebo/common/MeshExporter.hh"
 #include "gazebo/util/system.hh"
@@ -60,7 +61,7 @@ namespace gazebo
 
       /// \brief Export asset element
       /// \param[in] _assetXml Pointer to the asset XML instance
-      private: void ExportAsset(TiXmlElement *_assetXml);
+      private: void ExportAsset(tinyxml2::XMLElement *_assetXml);
 
       /// \brief Export geometry source
       /// \param[in] _subMesh Pointer to a submesh
@@ -69,37 +70,40 @@ namespace gazebo
       /// \param[in] _meshID Mesh ID (mesh_<number>)
       private: void ExportGeometrySource(
           const gazebo::common::SubMesh *_subMesh,
-          TiXmlElement *_meshXml, GeometryType _type, const char *_meshID);
+          tinyxml2::XMLElement *_meshXml, GeometryType _type,
+          const char *_meshID);
 
       /// \brief Export library geometries element
       /// \param[in] libraryGeometriesXml Pointer to the library geometries
       /// XML instance
-      private: void ExportGeometries(TiXmlElement *_libraryGeometriesXml);
+      private: void ExportGeometries(
+          tinyxml2::XMLElement *_libraryGeometriesXml);
 
       /// \brief Export library images element
       /// \param[in] _libraryImagesXml Pointer to the library images XML
       /// instance
       /// \return integer, number of images
-      private: int ExportImages(TiXmlElement *_libraryImagesXml);
+      private: int ExportImages(tinyxml2::XMLElement *_libraryImagesXml);
 
       /// \brief Export library materials element
       /// \param[in] _libraryMaterialsXml Pointer to the library materials XML
       /// instance
-      private: void ExportMaterials(TiXmlElement *_libraryMaterialsXml);
+      private: void ExportMaterials(tinyxml2::XMLElement *_libraryMaterialsXml);
 
       /// \brief Export library effects element
       /// \param[in] _libraryEffectsXml Pointer to the library effects XML
       /// instance
-      private: void ExportEffects(TiXmlElement *_libraryEffectsXml);
+      private: void ExportEffects(tinyxml2::XMLElement *_libraryEffectsXml);
 
       /// \brief Export library visual scenes element
       /// \param[in] _libraryVisualScenesXml Pointer to the library visual
       /// scenes XML instance
-      private: void ExportVisualScenes(TiXmlElement *_libraryVisualScenesXml);
+      private: void ExportVisualScenes(
+          tinyxml2::XMLElement *_libraryVisualScenesXml);
 
       /// \brief Export scene element
       /// \param[in] _sceneXml Pointer to the scene XML instance
-      private: void ExportScene(TiXmlElement *_sceneXml);
+      private: void ExportScene(tinyxml2::XMLElement *_sceneXml);
 
       /// \internal
       /// \brief Pointer to private data.

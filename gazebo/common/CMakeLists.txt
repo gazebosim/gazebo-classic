@@ -223,6 +223,7 @@ target_link_libraries(gazebo_common
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
+  tinyxml2
 )
 
 if (UNIX)
