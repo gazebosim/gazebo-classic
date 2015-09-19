@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/JointInspector_TEST.hh"
 
@@ -114,7 +115,7 @@ void JointInspector_TEST::Swap()
   // Get swap button
   QList<QToolButton *> toolButtons =
       jointInspector->findChildren<QToolButton *>();
-  QVERIFY(toolButtons.size() == 1);
+  QVERIFY(toolButtons.size() == 2);
 
   // Trigger swap
   toolButtons[0]->click();
@@ -122,6 +123,47 @@ void JointInspector_TEST::Swap()
   // Check parent and child links
   QVERIFY(parentBox->currentText() == "link2");
   QVERIFY(childBox->currentText() == "link1");
+
+  delete jointInspector;
+  delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointInspector_TEST::RemoveButton()
+{
+  // Create a joint maker
+  gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Add joint
+  gazebo::gui::model::Events::linkInserted("model::link1");
+  gazebo::gui::model::Events::linkInserted("model::link2");
+  gazebo::gui::model::Events::jointInserted("joint_id", "joint_name",
+      "revolute", "model::link1", "model::link2");
+
+  std::vector<gazebo::gui::JointData *> jointDatas =
+      jointMaker->GetJointDataByLink("model::link1");
+
+std::cout << jointDatas.size() << std::endl;
+
+  QVERIFY(jointDatas.size() == 1);
+
+  // Create a joint inspector
+  gazebo::gui::JointInspector *jointInspector =
+      new gazebo::gui::JointInspector(jointMaker);
+  QVERIFY(jointInspector != NULL);
+
+  // Open it so link boxes are updated with new links
+  jointInspector->Open();
+
+  // Get buttons
+  QList<QToolButton *> toolButtons =
+      jointInspector->findChildren<QToolButton *>();
+  QVERIFY(toolButtons.size() == 2);
+  QVERIFY(toolButtons[0]->text() == "");
+
+  // Trigger remove
+  toolButtons[1]->click();
 
   delete jointInspector;
   delete jointMaker;

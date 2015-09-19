@@ -280,10 +280,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       boost::bind(&ModelEditorPalette::OnModelPluginInserted, this, _1)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectModelPluginRemoved(
-      boost::bind(&ModelEditorPalette::OnModelPluginRemoved, this, _1)));
-
-  this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
       boost::bind(&ModelEditorPalette::OnLinkRemoved, this, _1)));
 
