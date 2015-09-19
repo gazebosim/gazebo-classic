@@ -489,7 +489,7 @@ bool LogPlay::Forward()
 
   // Get the last chunk.
   this->logCurrXml = this->logStartXml->LastChildElement("chunk");
-  this->getchunkCounter = this->GetChunkCount() - 1;
+  this->chunkCounter = this->GetChunkCount() - 1;
   if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
   {
     gzerr << "Unable to decode log file\n";
@@ -516,7 +516,7 @@ bool LogPlay::Seek(const common::Time &_time)
     int imid = imin + ((imax - imin) / 2);
     if (!this->GetChunk(imid, this->currentChunk))
     {
-      gzerr << "Unable to jump to chunk [" << imin >> "]" << std::endl;
+      gzerr << "Unable to jump to chunk [" << imin << "]" << std::endl;
       return false;
     }
 
