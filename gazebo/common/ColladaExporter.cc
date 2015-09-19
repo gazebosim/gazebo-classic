@@ -365,7 +365,7 @@ int ColladaExporter::ExportImages(tinyxml2::XMLElement *_libraryImagesXml)
 
       auto initFromXml = this->dataPtr->xmlDoc.NewElement("init_from");
       initFromXml->LinkEndChild(this->dataPtr->xmlDoc.NewText(
-        imageString.substr(imageString.find("meshes/")+7)));
+        imageString.substr(imageString.find("meshes/")+7).c_str()));
       imageXml->LinkEndChild(initFromXml);
 
       if (this->dataPtr->exportTextures)

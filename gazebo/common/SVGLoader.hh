@@ -24,6 +24,7 @@
 
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Matrix3.hh>
+#include <tinyxml2.h>
 
 #include <gazebo/common/Console.hh>
 #include <gazebo/math/Vector2d.hh>
@@ -138,13 +139,14 @@ namespace gazebo
       /// \brief Gets data from an XML path element
       /// \param[in] _pElement The path Element
       /// \param[out] _path The path that receives the data.
-      private: void GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path);
+      private: void GetPathAttribs(tinyxml2::XMLElement *_pElement,
+                                   SVGPath &_path);
 
       /// \brief Reads the paths from the root XML element
       /// \param[in] _pParent The parent XML node of the SVG file
       /// \param[out] _paths The vector of paths that receives the data
-      private: void GetSvgPaths(TiXmlNode *_pParent,
-                                  std::vector<SVGPath> &_paths);
+      private: void GetSvgPaths(tinyxml2::XMLNode *_pParent,
+                                std::vector<SVGPath> &_paths);
 
       /// \brief Generates new commands for every repeat commands in subpaths
       /// \param[in] _subpaths The subpaths (with repeats)

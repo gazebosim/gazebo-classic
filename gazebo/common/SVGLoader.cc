@@ -16,7 +16,7 @@
  */
 
 #include <algorithm>
-#include <tinyxml.h>
+#include <tinyxml2.h>
 #include <utility>
 
 #include <gazebo/common/Console.hh>
@@ -579,10 +579,10 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
+void SVGLoader::GetPathAttribs(tinyxml2::XMLElement *_pElement, SVGPath &_path)
 {
   GZ_ASSERT(_pElement, "empty XML element where a path was expected");
-  TiXmlAttribute *pAttrib = _pElement->FirstAttribute();
+  auto pAttrib = _pElement->FirstAttribute();
   while (pAttrib)
   {
     std::string name = lowercase(pAttrib->Name());
@@ -617,20 +617,21 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
 }
 
 /////////////////////////////////////////////////
-void SVGLoader::GetSvgPaths(TiXmlNode *_pParent, std::vector<SVGPath> &_paths)
+void SVGLoader::GetSvgPaths(tinyxml2::XMLNode *_pParent,
+    std::vector<SVGPath> &_paths)
 {
   if (!_pParent)
     return;
 
-  TiXmlNode *pChild;
-  int t = _pParent->Type();
+  tinyxml2::XMLNode *pChild;
+  auto t = _pParent->ToElement();
   std::string name;
-  if ( t == TiXmlNode::TINYXML_ELEMENT)
+  if (t)
   {
     name = lowercase(_pParent->Value());
     if (name == "path")
     {
-      TiXmlElement *element = _pParent->ToElement();
+      auto element = _pParent->ToElement();
       SVGPath p;
       this->GetPathAttribs(element, p);
       _paths.push_back(p);
@@ -658,8 +659,8 @@ bool SVGLoader::Parse(const std::string &_filename,
   try
   {
     // load the named file and dump its structure to STDOUT
-    TiXmlDocument doc(_filename.c_str());
-    if (!doc.LoadFile())
+    tinyxml2::XMLDocument doc;
+    if (doc.LoadFile(_filename.c_str()) != tinyxml2::XML_NO_ERROR)
     {
       std::ostringstream os;
       gzerr << "Failed to load file " <<  _filename << std::endl;
