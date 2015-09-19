@@ -209,6 +209,8 @@ namespace gazebo
 
       private: size_t end = 0;
 
+      private: size_t chunkCounter = 0;
+
       /// \brief Initial simulation iteration contained in the log file.
       private: uint64_t initialIterations;
 

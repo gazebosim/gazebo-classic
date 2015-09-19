@@ -73,6 +73,8 @@ void LogPlay::Open(const std::string &_logFile)
   // Get the gazebo_log element
   this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
 
+  chunkCounter = 0;
+
   if (!this->logStartXml)
     gzthrow("Log file is missing the <gazebo_log> element");
 
@@ -328,11 +330,13 @@ bool LogPlay::Step(std::string &_data)
     if (this->logCurrXml == this->logStartXml)
     {
       this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+      this->chunkCounter = 0;
       std::cout << "First chunk" << std::endl;
     }
     else if (this->logCurrXml)
     {
       this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
+      this->chunkCounter++;
       std::cout << "Next chunk" << std::endl;
     }
     else
@@ -412,6 +416,7 @@ bool LogPlay::StepBackwards(std::string &_data)
     else if (this->logCurrXml)
     {
       this->logCurrXml = this->logCurrXml->PreviousSiblingElement("chunk");
+      chunkCounter--;
     }
     else
     {
@@ -450,6 +455,7 @@ bool LogPlay::Rewind()
   this->currentChunk.clear();
   //this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
   this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+  this->chunkCounter = 0;
 
   if (!logCurrXml)
   {
@@ -483,6 +489,7 @@ bool LogPlay::Forward()
 
   // Get the last chunk.
   this->logCurrXml = this->logStartXml->LastChildElement("chunk");
+  this->getchunkCounter = this->GetChunkCount() - 1;
   if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
   {
     gzerr << "Unable to decode log file\n";
@@ -492,6 +499,31 @@ bool LogPlay::Forward()
   this->start = this->currentChunk.size() - 1;
   this->end = this->currentChunk.size() - 1;
 
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::Seek(const common::Time &_time)
+{
+  // Locate the chunk.
+  int imin = 0;
+  int imax = this->GetChunkCount() - 1;
+  common::Time key = _time;
+
+  while (imin <= imax)
+  {
+    // Midpoint.
+    int imid = imin + ((imax - imin) / 2);
+    if (!this->GetChunk(imid, this->currentChunk))
+    {
+      gzerr << "Unable to jump to chunk [" << imin >> "]" << std::endl;
+      return false;
+    }
+
+
+  }
+
+  // Locate the entry.
   return true;
 }
 

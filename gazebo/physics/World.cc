@@ -125,7 +125,6 @@ World::World(const std::string &_name)
   this->dataPtr->logThread = NULL;
   this->dataPtr->stop = false;
   this->dataPtr->seekPending = false;
-  this->dataPtr->stepCounter = 0;
 
   this->dataPtr->currentStateBuffer = 0;
   this->dataPtr->stateToggle = 0;
