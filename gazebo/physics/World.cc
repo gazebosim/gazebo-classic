@@ -1294,6 +1294,8 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   {
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = 1;
+    if (!util::LogPlay::Instance()->HasIterations())
+      this->dataPtr->iterations = 0;
   }
 
   if (_data->has_forward() && _data->forward())

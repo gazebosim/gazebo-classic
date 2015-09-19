@@ -15,27 +15,21 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_EDITOR_PALETTE_TEST_HH_
-#define _GAZEBO_MODEL_EDITOR_PALETTE_TEST_HH_
+#ifndef _GAZEBO_JOINT_INSPECTOR_TEST_HH_
+#define _GAZEBO_JOINT_INSPECTOR_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelEditorPalette class.
-class ModelEditorPalette_TEST : public QTestFixture
+/// \brief A test class for the joint inspector.
+class JointInspector_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Tests adding an item to the palette.
-  private slots: void AddItem();
+  /// \brief Test adding and removing links.
+  private slots: void AddRemoveLink();
 
-  /// \brief Tests the link list.
-  private slots: void AddRemoveLinks();
-
-  /// \brief Tests the joint list.
-  private slots: void AddRemoveJoints();
-
-  /// \brief Tests the model plugin list.
-  private slots: void AddRemoveModelPlugins();
+  /// \brief Test swapping parent / child links
+  private slots: void Swap();
 };
 
 #endif

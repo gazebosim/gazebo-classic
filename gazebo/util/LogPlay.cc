@@ -57,6 +57,8 @@ LogPlay::~LogPlay()
 /////////////////////////////////////////////////
 void LogPlay::Open(const std::string &_logFile)
 {
+  this->currentChunk.clear();
+
   boost::filesystem::path path(_logFile);
   if (!boost::filesystem::exists(path))
     gzthrow("Invalid logfile [" + _logFile + "]. Does not exist.");

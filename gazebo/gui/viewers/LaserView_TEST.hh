@@ -15,27 +15,21 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_EDITOR_PALETTE_TEST_HH_
-#define _GAZEBO_MODEL_EDITOR_PALETTE_TEST_HH_
+#ifndef _GAZEBO_LASERVIEW_TEST_HH_
+#define _GAZEBO_LASERVIEW_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
+#include "gazebo/gui/viewers/LaserView.hh"
 
-/// \brief A test class for the ModelEditorPalette class.
-class ModelEditorPalette_TEST : public QTestFixture
+/// \brief A test class for the LaserView widget.
+class LaserView_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Tests adding an item to the palette.
-  private slots: void AddItem();
+  /// \brief Test construction and usage in a world with a laser.
+  private slots: void Construction();
 
-  /// \brief Tests the link list.
-  private slots: void AddRemoveLinks();
-
-  /// \brief Tests the joint list.
-  private slots: void AddRemoveJoints();
-
-  /// \brief Tests the model plugin list.
-  private slots: void AddRemoveModelPlugins();
+  /// \brief Test invoking buttons in the laser view widget.
+  private slots: void Buttons();
 };
-
 #endif
