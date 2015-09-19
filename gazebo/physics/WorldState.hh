@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/ModelState.hh"
+#include "gazebo/physics/LightState.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -89,11 +90,21 @@ namespace gazebo
       /// \return A vector of model states.
       public: const ModelState_M &GetModelStates() const;
 
+      /// \brief Get the light states.
+      /// \return A vector of light states.
+      public: const LightState_M &LightStates() const;
+
       /// \brief Get the number of model states.
       ///
       /// Returns the number of models in this instance.
       /// \return Number of models.
       public: unsigned int GetModelStateCount() const;
+
+      /// \brief Get the number of light states.
+      ///
+      /// Returns the number of lights in this instance.
+      /// \return Number of lights.
+      public: unsigned int LightStateCount() const;
 
       /// \brief Get a model state by model name.
       /// \param[in] _modelName Name of the model state to get.
@@ -101,11 +112,23 @@ namespace gazebo
       /// \throws common::Exception When the _modelName doesn't exist.
       public: ModelState GetModelState(const std::string &_modelName) const;
 
+      /// \brief Get a light state by light name.
+      /// \param[in] _lightName Name of the light state to get.
+      /// \return The light state.
+      /// \throws common::Exception When the _lightName doesn't exist.
+      public: LightState GetLightState(const std::string &_lightName) const;
+
       /// \brief Return true if WorldState has a ModelState with the given
       /// name.
       /// \param[in] _modelName Name of the model to search for.
       /// \return True if the ModelState exists.
       public: bool HasModelState(const std::string &_modelName) const;
+
+      /// \brief Return true if WorldState has a LightState with the given
+      /// name.
+      /// \param[in] _lightName Name of the light to search for.
+      /// \return True if the LightState exists.
+      public: bool HasLightState(const std::string &_lightName) const;
 
       /// \brief Return true if the values in the state are zero.
       ///
@@ -196,13 +219,22 @@ namespace gazebo
           _out << iter->second;
         }
 
-        _out << "</state>";
+        // List the light states
+        for (auto iter = _state.lightStates.begin();
+            iter != _state.lightStates.end(); ++iter)
+        {
+          _out << iter->second;
+        }
 
+        _out << "</state>";
         return _out;
       }
 
       /// \brief State of all the models.
       private: ModelState_M modelStates;
+
+      /// \brief State of all the lights.
+      private: LightState_M lightStates;
 
       /// \brief List of new added models. The
       /// value is the SDF that describes the model.

@@ -18,9 +18,6 @@
 #ifndef _GAZEBO_LIGHT_STATE_HH_
 #define _GAZEBO_LIGHT_STATE_HH_
 
-// #include <vector>
-// #include <string>
-// #include <boost/regex.hpp>
 #include <iomanip>
 
 #include "gazebo/physics/State.hh"
@@ -46,6 +43,17 @@ namespace gazebo
       /// \brief Default constructor.
       public: LightState() = default;
 
+      /// \brief Constructor.
+      ///
+      /// Build a LightState from an existing Light.
+      /// \param[in] _light Pointer to the light from which to gather state
+      /// info.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
+      public: LightState(const LightPtr _light, const common::Time &_realTime,
+                  const common::Time &_simTime, const uint64_t _iterations);
+
       /// \brief Constructor
       ///
       /// Build a LightState from SDF data
@@ -60,6 +68,17 @@ namespace gazebo
       /// Load LightState information from stored data in and SDF::Element
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(const sdf::ElementPtr _elem);
+
+      /// \brief Load state from Light pointer.
+      ///
+      /// Build a LightState from an existing Light.
+      /// \param[in] _light Pointer to the light from which to gather state
+      /// info.
+      /// \param[in] _realTime Real time stamp.
+      /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
+      public: void Load(const LightPtr _light, const common::Time &_realTime,
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Get the stored light pose.
       /// \return Pose of the Light.

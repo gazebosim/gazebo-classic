@@ -36,6 +36,7 @@ namespace gazebo
     class World;
     class Model;
     class Actor;
+    class Light;
     class Link;
     class Collision;
     class FrictionPyramid;
@@ -61,6 +62,7 @@ namespace gazebo
     class HeightmapShape;
     class PolylineShape;
     class ModelState;
+    class LightState;
     class LinkState;
     class JointState;
 
@@ -91,6 +93,10 @@ namespace gazebo
     /// \def LinkPtr
     /// \brief Boost shared pointer to a Link object
     typedef boost::shared_ptr<Link> LinkPtr;
+
+    /// \def LightPtr
+    /// \brief Boost shared pointer to a Light object
+    typedef boost::shared_ptr<Light> LightPtr;
 
     /// \def CollisionPtr
     /// \brief Boost shared pointer to a Collision object
@@ -200,6 +206,10 @@ namespace gazebo
     /// \brief Vector of LinkPtr
     typedef std::vector<LinkPtr>  Link_V;
 
+    /// \def Light_V
+    /// \brief Vector of LightPtr
+    typedef std::vector<LightPtr>  Light_V;
+
     /// \def Collision_V
     /// \brief Vector of CollisionPtr
     typedef std::vector<CollisionPtr>  Collision_V;
@@ -207,6 +217,10 @@ namespace gazebo
     /// \def ModelState_M
     /// \brief Map of model state
     typedef std::map<std::string, ModelState> ModelState_M;
+
+    /// \def LightState_M
+    /// \brief Map of link state
+    typedef std::map<std::string, LightState> LightState_M;
 
     /// \def LinkState_M
     /// \brief Map of link state

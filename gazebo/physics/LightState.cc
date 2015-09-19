@@ -15,14 +15,19 @@
  *
  */
 
-// #include "gazebo/common/Exception.hh"
-// #include "gazebo/physics/Light.hh"
-// #include "gazebo/physics/Link.hh"
-// #include "gazebo/physics/World.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/LightState.hh"
 
 using namespace gazebo;
 using namespace physics;
+
+/////////////////////////////////////////////////
+LightState::LightState(const LightPtr _light, const common::Time &_realTime,
+    const common::Time &_simTime, const uint64_t _iterations)
+: State(_light->GetName(), _realTime, _simTime, _iterations)
+{
+  this->pose = _light->GetWorldPose().Ign();
+}
 
 /////////////////////////////////////////////////
 LightState::LightState(const sdf::ElementPtr _sdf)
@@ -42,6 +47,18 @@ void LightState::Load(const sdf::ElementPtr _elem)
     this->pose = _elem->Get<ignition::math::Pose3d>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
+}
+
+/////////////////////////////////////////////////
+void LightState::Load(const LightPtr _light, const common::Time &_realTime,
+    const common::Time &_simTime, const uint64_t _iterations)
+{
+  this->name = _light->GetName();
+  this->wallTime = common::Time::GetWallTime();
+  this->realTime = _realTime;
+  this->simTime = _simTime;
+  this->iterations = _iterations;
+  this->pose = _light->GetWorldPose().Ign();
 }
 
 /////////////////////////////////////////////////

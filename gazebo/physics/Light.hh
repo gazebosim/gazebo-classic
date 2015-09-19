@@ -18,16 +18,7 @@
 #ifndef _GAZEBO_PHYSICS_LIGHT_HH_
 #define _GAZEBO_PHYSICS_LIGHT_HH_
 
-// #include <string>
-// #include <map>
-// #include <vector>
-// #include <boost/thread/recursive_mutex.hpp>
-//
-// #include "gazebo/common/CommonTypes.hh"
-// #include "gazebo/physics/PhysicsTypes.hh"
-// #include "gazebo/physics/LightState.hh"
 #include "gazebo/physics/Entity.hh"
-// #include "gazebo/util/system.hh"
 #include "gazebo/physics/Light.hh"
 
 namespace boost
@@ -51,14 +42,14 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
-      public: explicit Light(BasePtr _parent);
+      public: Light(BasePtr _parent);
 
       /// \brief Initialize the light.
-      public: virtual void Init();
+      public: void Init();
 
       /// \brief Fill a light message.
       /// \param[out] _msg Message to fill using this light's data.
-      public: virtual void FillMsg(msgs::Light &_msg);
+      public: void FillMsg(msgs::Light &_msg);
 
       /// \brief Update parameters from a light message.
       /// \param[in] _msg Message to process.
@@ -67,6 +58,16 @@ namespace gazebo
       /// \brief Set the current light state.
       /// \param[in] _state State to set the light to.
       public: void SetState(const LightState &_state);
+
+      /// \internal
+      /// \brief Called when the pose is changed. Do not call this directly.
+      public: virtual void OnPoseChange();
+
+      /// \brief Publish the pose.
+      private: void PublishPose();
+
+      /// \brief Light message container.
+      protected: msgs::Light *msg;
     };
     /// \}
   }

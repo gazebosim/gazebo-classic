@@ -27,6 +27,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/WorldState.hh"
 
@@ -54,6 +55,14 @@ WorldState::WorldState(const WorldPtr _world)
     this->modelStates.insert(std::make_pair((*iter)->GetName(),
           ModelState(*iter, this->realTime, this->simTime, this->iterations)));
   }
+
+  // Add a state for all the lights
+  Light_V lights = _world->Lights();
+  for (auto iter = lights.begin(); iter != lights.end(); ++iter)
+  {
+    this->lightStates.insert(std::make_pair((*iter)->GetName(),
+          LightState(*iter, this->realTime, this->simTime, this->iterations)));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -68,6 +77,7 @@ WorldState::~WorldState()
 {
   this->world.reset();
   this->modelStates.clear();
+  this->lightStates.clear();
 }
 
 /////////////////////////////////////////////////
@@ -81,6 +91,7 @@ void WorldState::Load(const WorldPtr _world)
   this->iterations = _world->GetIterations();
 
   // Add a state for all the models
+  this->modelStates.clear();
   Model_V models = _world->GetModels();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
@@ -88,7 +99,7 @@ void WorldState::Load(const WorldPtr _world)
     this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
         this->simTime, this->iterations);
   }
-
+/*
   // Remove models that no longer exist. We determine this by check the time
   // stamp on each model.
   for (ModelState_M::iterator iter = this->modelStates.begin();
@@ -98,6 +109,14 @@ void WorldState::Load(const WorldPtr _world)
       this->modelStates.erase(iter++);
     else
       ++iter;
+  }
+*/
+  // Add a state for all the lights
+  Light_V lights = _world->Lights();
+  for (auto iter = lights.begin(); iter != lights.end(); ++iter)
+  {
+    this->lightStates[(*iter)->GetName()].Load(*iter, this->realTime,
+        this->simTime, this->iterations);
   }
 }
 
@@ -129,6 +148,25 @@ void WorldState::Load(const sdf::ElementPtr _elem)
       childElem = childElem->GetNextElement("model");
     }
   }
+
+  // Add the light states
+  this->lightStates.clear();
+  if (_elem->HasElement("light"))
+  {
+    sdf::ElementPtr childElem = _elem->GetElement("light");
+
+    while (childElem)
+    {
+      std::string lightName = childElem->Get<std::string>("name");
+      this->lightStates.insert(std::make_pair(
+            lightName, LightState(childElem)));
+      this->lightStates[lightName].SetSimTime(this->simTime);
+      this->lightStates[lightName].SetWallTime(this->wallTime);
+      this->lightStates[lightName].SetRealTime(this->realTime);
+      this->lightStates[lightName].SetIterations(this->iterations);
+      childElem = childElem->GetNextElement("light");
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -141,6 +179,12 @@ void WorldState::SetWorld(const WorldPtr _world)
 const ModelState_M &WorldState::GetModelStates() const
 {
   return this->modelStates;
+}
+
+/////////////////////////////////////////////////
+const LightState_M &WorldState::LightStates() const
+{
+  return this->lightStates;
 }
 
 /////////////////////////////////////////////////
@@ -166,6 +210,12 @@ unsigned int WorldState::GetModelStateCount() const
 }
 
 /////////////////////////////////////////////////
+unsigned int WorldState::LightStateCount() const
+{
+  return this->lightStates.size();
+}
+
+/////////////////////////////////////////////////
 ModelState WorldState::GetModelState(const std::string &_modelName) const
 {
   // Search for the model name
@@ -179,11 +229,35 @@ ModelState WorldState::GetModelState(const std::string &_modelName) const
 }
 
 /////////////////////////////////////////////////
+LightState WorldState::GetLightState(const std::string &_lightName) const
+{
+  // Search for the light name
+  LightState_M::const_iterator iter = this->lightStates.find(_lightName);
+  if (iter != this->lightStates.end())
+    return iter->second;
+
+  // Throw exception if the light name doesn't exist.
+  gzthrow("Invalid light name[" + _lightName + "].");
+  return LightState();
+}
+
+/////////////////////////////////////////////////
 bool WorldState::HasModelState(const std::string &_modelName) const
 {
   // Search for the model name
   ModelState_M::const_iterator iter = this->modelStates.find(_modelName);
   if (iter != this->modelStates.end())
+    return true;
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool WorldState::HasLightState(const std::string &_lightName) const
+{
+  // Search for the light name
+  LightState_M::const_iterator iter = this->lightStates.find(_lightName);
+  if (iter != this->lightStates.end())
     return true;
 
   return false;
@@ -272,6 +346,26 @@ WorldState WorldState::operator-(const WorldState &_state) const
     {
       ModelPtr model = this->world->GetModel(iter->second.GetName());
       result.insertions.push_back(model->GetSDF()->ToString(""));
+    }
+  }
+
+  // Subtract the light states.
+  for (auto iter = _state.lightStates.begin();
+      iter != _state.lightStates.end(); ++iter)
+  {
+    if (this->HasLightState(iter->second.GetName()))
+    {
+      LightState state = this->GetLightState(iter->second.GetName()) -
+        iter->second;
+
+      if (!state.IsZero())
+      {
+        result.lightStates.insert(std::make_pair(state.GetName(), state));
+      }
+    }
+    else
+    {
+      result.deletions.push_back(iter->second.GetName());
     }
   }
 

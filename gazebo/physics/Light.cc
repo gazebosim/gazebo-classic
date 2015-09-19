@@ -21,35 +21,8 @@
   #include <Winsock2.h>
 #endif
 
-// #include <tbb/parallel_for.h>
-// #include <tbb/blocked_range.h>
-// #include <float.h>
-//
-// #include <boost/thread/recursive_mutex.hpp>
-// #include <sstream>
-//
-// #include "gazebo/util/OpenAL.hh"
-// #include "gazebo/common/KeyFrame.hh"
-// #include "gazebo/common/Animation.hh"
-// #include "gazebo/common/Plugin.hh"
-// #include "gazebo/common/Events.hh"
-// #include "gazebo/common/Exception.hh"
-// #include "gazebo/common/Console.hh"
-// #include "gazebo/common/CommonTypes.hh"
-//
-// #include "gazebo/physics/Gripper.hh"
-// #include "gazebo/physics/Joint.hh"
-// #include "gazebo/physics/JointController.hh"
-// #include "gazebo/physics/Link.hh"
-#include "gazebo/physics/World.hh"
-// #include "gazebo/physics/PhysicsEngine.hh"
-// #include "gazebo/physics/Light.hh"
-// #include "gazebo/physics/Contact.hh"
-//
-// #include "gazebo/sensors/SensorManager.hh"
-//
-// #include "gazebo/transport/Node.hh"
 
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/LightState.hh"
 #include "gazebo/physics/Light.hh"
 
@@ -102,11 +75,36 @@ void Light::ProcessMsg(const msgs::Light &_msg)
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
     this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
+
+//  this->msg->CopyFrom(_msg);
 }
 
 //////////////////////////////////////////////////
 void Light::SetState(const LightState &_state)
 {
-  this->SetWorldPose(_state.Pose(), true);
+  this->worldPose = _state.Pose();
+}
+
+//////////////////////////////////////////////////
+void Light::OnPoseChange()
+{
+/*
+  ignition::math::Pose3d p;
+  for (unsigned int i = 0; i < this->attachedModels.size(); ++i)
+  {
+    p = this->GetWorldPose();
+    p.pos += this->attachedModelsOffset[i].pos;
+    p.rot = p.rot * this->attachedModelsOffset[i].rot;
+
+    this->attachedModels[i]->SetWorldPose(p, true);
+  }
+*/
+}
+
+//////////////////////////////////////////////////
+void Light::PublishPose()
+{
+  this->world->PublishLightPose(boost::dynamic_pointer_cast<Light>(
+      shared_from_this()));
 }
 

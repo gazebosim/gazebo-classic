@@ -121,7 +121,7 @@ namespace gazebo
       /// \param[in] _pose The new world pose.
       /// \param[in] _notify True = tell children of the pose change.
       /// \param[in] _publish True to publish the pose.
-      public: void SetWorldPose(const math::Pose &_pose,
+      public: virtual void SetWorldPose(const math::Pose &_pose,
                                 bool _notify = true,
                                 bool _publish = true);
 
@@ -241,7 +241,7 @@ namespace gazebo
       protected: virtual void OnPoseChange() = 0;
 
       /// \brief Publish the pose.
-      private: void PublishPose();
+      private: virtual void PublishPose();
 
       /// \brief Helper function to get the collision bounding box.
       /// \param[in] _base Object to calculated the bounding box for.
