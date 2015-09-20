@@ -44,6 +44,8 @@
 using namespace gazebo;
 using namespace util;
 
+using Timestamp = std::chrono::steady_clock::time_point;
+
 /////////////////////////////////////////////////
 LogPlay::LogPlay()
 {
@@ -101,6 +103,14 @@ void LogPlay::Open(const std::string &_logFile)
 
   this->start = 0;
   this->end = -1 * this->kEndFrame.size();
+
+  // Testing
+  Timestamp t1 = std::chrono::steady_clock::now();
+  std::cout << this->GetChunkCount() << " chunks" << std::endl;
+  Timestamp t2 = std::chrono::steady_clock::now();
+  std::chrono::duration<double> elapsed = t2 - t1;
+  std::cout << std::chrono::duration_cast<std::chrono::milliseconds>
+           (elapsed).count() << " ms" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -435,7 +445,10 @@ bool LogPlay::StepBack(std::string &_data)
   if (this->start <= 0 || from == std::string::npos || to == std::string::npos)
   {
     if (!this->PrevChunk())
+    {
+      std::cout << "Prevchunk error" << std::endl;
       return false;
+    }
 
     from = this->currentChunk.rfind(this->kStartFrame);
     to = this->currentChunk.rfind(this->kEndFrame);
@@ -519,21 +532,34 @@ bool LogPlay::Forward()
 /////////////////////////////////////////////////
 bool LogPlay::Seek(const common::Time &_time)
 {
+  std::cout << "Seek" << std::endl;
+
   const std::string kStartDelim = "<sim_time>";
   const std::string kEndDelim = "</sim_time>";
   common::Time logTime;
 
+  int counter = 0;
+
   // 1st step: Locate the chunk: We're looking for the first chunk that has
   // a time greater than the target time.
+
+  /*
   if (!this->Rewind())
     return false;
 
   while (true)
   {
+    Timestamp t2 = std::chrono::steady_clock::now();
+
     std::string frame;
     if (!this->Step(frame))
       return false;
   
+    Timestamp t3 = std::chrono::steady_clock::now();
+    auto elapsed = t3 - t2;
+    std::cout << "St: " << std::chrono::duration_cast<std::chrono::milliseconds>
+           (elapsed).count() << " ms" << std::endl;
+
     // Search the <sim_time> in the first frame of the current chunk.
     auto from = frame.find(kStartDelim);
     auto to = frame.find(kEndDelim, from + kStartDelim.size());
@@ -544,22 +570,88 @@ bool LogPlay::Seek(const common::Time &_time)
       std::stringstream ss(logTimeStr);
       ss >> logTime;
 
+      ++counter;
+
       // Chunk found.
       if (logTime > _time)
         break;
     }
 
+    Timestamp t4 = std::chrono::steady_clock::now();
+    elapsed = t4 - t3;
+    std::cout << "Se: " << std::chrono::duration_cast<std::chrono::milliseconds>
+           (elapsed).count() << " ms" << std::endl;
+
     // Skip the rest of the frames, we jump to the next chunk.
     if (!this->NextChunk())
       return false;
+
+    Timestamp t5 = std::chrono::steady_clock::now();
+    elapsed = t5 - t4;
+    std::cout << "NC: " << std::chrono::duration_cast<std::chrono::milliseconds>
+           (elapsed).count() << " ms" << std::endl;
   }
+  */
+
+  auto imin = 0u;
+  auto imax = this->GetChunkCount();
+  while (imin <= imax)
+  {
+    auto imid = imin + ((imax - imin) / 2);
+    std::cout << "[" << imin << "," << imid << "," << imax << "]" << std::endl;
+    this->GetChunk(imid, this->currentChunk);
+
+    this->start = 0;
+    this->end = -1 * this->kEndFrame.size();
+
+    std::string frame;
+    if (!this->Step(frame))
+      return false;
+
+    // Search the <sim_time> in the first frame of the current chunk.
+    auto from = frame.find(kStartDelim);
+    auto to = frame.find(kEndDelim, from + kStartDelim.size());
+    if (from != std::string::npos && to != std::string::npos)
+    {
+      auto length = to - from - kStartDelim.size();
+      auto logTimeStr = frame.substr(from + kStartDelim.size(), length);
+      std::stringstream ss(logTimeStr);
+      ss >> logTime;
+
+      ++counter;
+
+      std::cout << "Log time: " << logTime << std::endl;
+      std::cout << "Target time:" << _time << std::endl;
+
+      // Chunk found.
+      if (logTime == _time)
+        break;
+      else if (logTime < _time)
+        imin = imid + 1;
+      else
+        imax = imid - 1;
+    }
+  }
+
+  if (logTime < _time)
+  {
+    std::cout << "Next chunk!" << std::endl;
+    if (!this->NextChunk())
+      return false;
+  }
+
+  std::cout << counter << " chunks" << std::endl;
+  counter = 0;
 
   // 2nd step: Locate the frame in the previous chunk.
   while (true)
   {
     std::string frame;
     if (!this->StepBack(frame))
+    {
+      std::cout << "Bye" << std::endl;
       return false;
+    }
 
     // Search the <sim_time> in the frame of the current chunk.
     auto from = frame.find(kStartDelim);
@@ -571,11 +663,18 @@ bool LogPlay::Seek(const common::Time &_time)
       std::stringstream ss(logTimeStr);
       ss >> logTime;
 
+      ++counter;
+
+      std::cout << "Log time: " << logTime << std::endl;
+      std::cout << "Target time:" << _time << std::endl;
+
       // frame found.
       if (logTime < _time)
         break;
     }
   }
+
+  std::cout << counter << " frames" << std::endl;
 
   return true;
 }
@@ -584,16 +683,16 @@ bool LogPlay::Seek(const common::Time &_time)
 bool LogPlay::GetChunk(unsigned int _index, std::string &_data)
 {
   unsigned int count = 0;
-  tinyxml2::XMLElement *xml = this->logStartXml->FirstChildElement("chunk");
+  this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
 
-  while (xml && count < _index)
+  while (this->logCurrXml && count < _index)
   {
     count++;
-    xml = xml->NextSiblingElement("chunk");
+    this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
   }
 
-  if (xml && count == _index)
-    return this->GetChunkData(xml, _data);
+  if (this->logCurrXml && count == _index)
+    return this->GetChunkData(this->logCurrXml, _data);
   else
     return false;
 }
@@ -636,11 +735,11 @@ bool LogPlay::GetChunkData(tinyxml2::XMLElement *_xml, std::string &_data)
   }
   else if (this->encoding == "zlib")
   {
-    std::string data = _xml->GetText();
+    //std::string data = _xml->GetText();
     std::string buffer;
 
     // Decode the base64 string
-    buffer = Base64Decode(data);
+    buffer = Base64Decode(_xml->GetText());
 
     // Decompress the zlib data
     {
@@ -655,7 +754,7 @@ bool LogPlay::GetChunkData(tinyxml2::XMLElement *_xml, std::string &_data)
   }
   else
   {
-    gzerr << "Inavlid encoding[" << this->encoding << "] in log file["
+    gzerr << "Invalid encoding[" << this->encoding << "] in log file["
       << this->filename << "]\n";
     return false;
   }
@@ -673,7 +772,7 @@ std::string LogPlay::GetEncoding() const
 unsigned int LogPlay::GetChunkCount() const
 {
   unsigned int count = 0;
-  tinyxml2::XMLElement *xml = this->logStartXml->FirstChildElement("chunk");
+  auto xml = this->logStartXml->FirstChildElement("chunk");
 
   while (xml)
   {
@@ -687,9 +786,16 @@ unsigned int LogPlay::GetChunkCount() const
 /////////////////////////////////////////////////
 bool LogPlay::NextChunk()
 {
+  Timestamp t1 = std::chrono::steady_clock::now();
+
   auto next = this->logCurrXml->NextSiblingElement("chunk");
   if (!next)
     return false;
+
+  Timestamp t2 = std::chrono::steady_clock::now();
+  std::chrono::duration<double> elapsed = t2 - t1;
+  std::cout << "next: " << std::chrono::duration_cast<std::chrono::milliseconds>
+           (elapsed).count() << " ms" << std::endl;
 
   this->logCurrXml = next;
   if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
@@ -697,6 +803,11 @@ bool LogPlay::NextChunk()
     gzerr << "Unable to decode log file\n";
     return false;
   }
+
+  Timestamp t3 = std::chrono::steady_clock::now();
+  elapsed = t3 - t2;
+  std::cout << "GCD: " << std::chrono::duration_cast<std::chrono::milliseconds>
+           (elapsed).count() << " ms" << std::endl;
 
   this->start = 0;
   this->end = -1 * this->kEndFrame.size();
