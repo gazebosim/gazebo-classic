@@ -1285,11 +1285,8 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   if (_data->has_seek())
   {
     this->dataPtr->targetSimTime = msgs::Convert(_data->seek());
-    if (this->GetSimTime() > this->dataPtr->targetSimTime)
-    {
-      util::LogPlay::Instance()->Rewind();
-    }
-    this->dataPtr->seekPending = true;
+    util::LogPlay::Instance()->Seek(this->dataPtr->targetSimTime);
+    this->dataPtr->stepInc = 1;
   }
 
   if (_data->has_rewind() && _data->rewind())

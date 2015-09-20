@@ -105,7 +105,7 @@ namespace gazebo
 
       /// \brief Step through the open log file backwards.
       /// \param[out] _data Data from next entry in the log file.
-      public: bool StepBackwards(std::string &_data);
+      public: bool StepBack(std::string &_data);
 
       /// \brief Step through the open log file.
       /// \param[out] _data Data from next entry in the log file.
@@ -172,6 +172,16 @@ namespace gazebo
       /// "iterations" value.
       private: bool ReadIterations();
 
+      private: bool NextChunk();
+
+      private: bool PrevChunk();
+
+      private: const unsigned int kNumChunksToTry = 2u;
+
+      private: const std::string kStartFrame = "<sdf ";
+
+      private: const std::string kEndFrame   = "</sdf>";
+
       /// \brief The XML document of the log file.
       private: tinyxml2::XMLDocument xmlDoc;
 
@@ -205,11 +215,9 @@ namespace gazebo
 
       private: std::string currentChunk;
 
-      private: size_t start = 0;
+      private: size_t start;
 
-      private: size_t end = 0;
-
-      private: size_t chunkCounter = 0;
+      private: size_t end;
 
       /// \brief Initial simulation iteration contained in the log file.
       private: uint64_t initialIterations;

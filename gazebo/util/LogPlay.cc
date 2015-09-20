@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
@@ -73,8 +74,6 @@ void LogPlay::Open(const std::string &_logFile)
   // Get the gazebo_log element
   this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
 
-  chunkCounter = 0;
-
   if (!this->logStartXml)
     gzthrow("Log file is missing the <gazebo_log> element");
 
@@ -92,6 +91,16 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Extract the initial "iterations" value from the log.
   this->iterationsFound = this->ReadIterations();
+
+  this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
+  if (!logCurrXml)
+    gzthrow("Unable to find the first chunk");
+
+  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+    gzthrow("Unable to decode log file");
+
+  this->start = 0;
+  this->end = -1 * this->kEndFrame.size();
 }
 
 /////////////////////////////////////////////////
@@ -168,7 +177,7 @@ void LogPlay::ReadHeader()
   else
     this->randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
 
-  /// Set the random number seed for simulation
+  // Set the random number seed for simulation
   ignition::math::Rand::Seed(this->randSeed);
 }
 
@@ -180,11 +189,23 @@ void LogPlay::ReadLogTimes()
   std::string chunk;
   bool found = false;
 
+  auto chunkXml = this->logStartXml->FirstChildElement("chunk");
+
   // Try to read the start time of the log.
-  unsigned int chunksToTry = 2;
-  for (unsigned int i = 0; i < chunksToTry; ++i)
+  auto numChunksToTry = std::min(this->GetChunkCount(), this->kNumChunksToTry);
+  for (unsigned int i = 0; i < numChunksToTry; ++i)
   {
-    this->GetChunk(i, chunk);
+    if (!chunkXml)
+    {
+      gzerr << "Unable to find the first chunk" << std::endl;
+      return;
+    }
+
+    if (!this->GetChunkData(chunkXml, chunk))
+    {
+      gzerr << "Unable to decode log file" << std::endl;
+      return;
+    }
 
     // Find the first <sim_time> of the log.
     auto from = chunk.find(kStartDelim);
@@ -198,12 +219,26 @@ void LogPlay::ReadLogTimes()
       found = true;
       break;
     }
+
+    chunkXml = chunkXml->NextSiblingElement("chunk");
   }
 
   if (!found)
     gzwarn << "Unable to find <sim_time> tags in any chunk." << std::endl;
 
-  this->GetChunk(this->GetChunkCount() - 1, chunk);
+  // Jump to the last chunk for finding the last <sim_time>.
+  auto lastChunk = this->logStartXml->LastChildElement("chunk");
+  if (!lastChunk)
+  {
+    gzerr << "Unable to jump to the last chunk of the log file\n";
+    return;
+  }
+
+  if (!this->GetChunkData(lastChunk, chunk))
+  {
+    gzerr << "Unable to decode log file\n";
+    return;
+  }
 
   // Update the last <sim_time> of the log.
   auto to = chunk.rfind(kEndDelim);
@@ -231,10 +266,23 @@ bool LogPlay::ReadIterations()
   const std::string kEndDelim = "</iterations>";
   std::string chunk;
 
+  auto chunkXml = this->logStartXml->FirstChildElement("chunk");
+
   // Read the first "iterations" value of the log from the first chunk.
-  for (unsigned int i = 0; i < this->GetChunkCount(); ++i)
+  auto numChunksToTry = std::min(this->GetChunkCount(), this->kNumChunksToTry);
+  for (unsigned int i = 0; i < numChunksToTry; ++i)
   {
-    this->GetChunk(i, chunk);
+    if (!chunkXml)
+    {
+      gzerr << "Unable to find the first chunk" << std::endl;
+      return false;
+    }
+
+    if (!this->GetChunkData(chunkXml, chunk))
+    {
+      gzerr << "Unable to decode log file" << std::endl;
+      return false;
+    }
 
     // Find the first <iterations> of the log.
     auto from = chunk.find(kStartDelim);
@@ -247,6 +295,8 @@ bool LogPlay::ReadIterations()
       ss >> this->initialIterations;
       return true;
     }
+
+    chunkXml = chunkXml->NextSiblingElement("chunk");
   }
 
   gzwarn << "Unable to find <iterations>...</iterations> tags in the first "
@@ -316,54 +366,30 @@ bool LogPlay::Step(std::string &_data)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  std::string startMarker = "<sdf ";
-  std::string endMarker = "</sdf>";
-  this->start = this->currentChunk.find(startMarker,
-      this->end + endMarker.size());
-  this->end = this->currentChunk.find(endMarker,
-      this->end + endMarker.size());
+  auto from = this->currentChunk.find(this->kStartFrame,
+      this->end + this->kEndFrame.size());
+  auto to = this->currentChunk.find(this->kEndFrame,
+      this->end + this->kEndFrame.size());
 
-  if (this->start == std::string::npos || this->end == std::string::npos)
+  if (from == std::string::npos || to == std::string::npos)
   {
-    this->currentChunk.clear();
+    if (!this->NextChunk())
+      return false;
 
-    if (this->logCurrXml == this->logStartXml)
+    from = this->currentChunk.find(this->kStartFrame);
+    to = this->currentChunk.find(this->kEndFrame);
+    if (from == std::string::npos || to == std::string::npos)
     {
-      this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-      this->chunkCounter = 0;
-      std::cout << "First chunk" << std::endl;
-    }
-    else if (this->logCurrXml)
-    {
-      this->logCurrXml = this->logCurrXml->NextSiblingElement("chunk");
-      this->chunkCounter++;
-      std::cout << "Next chunk" << std::endl;
-    }
-    else
-    {
+      gzerr << "Unable to find an <sdf> frame in current chunk\n";
       return false;
     }
-
-    // Stop if there are no more chunks
-    if (!this->logCurrXml)
-    {
-      return false;
-    }
-
-    if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
-    {
-      gzerr << "Unable to decode log file\n";
-      return false;
-    }
-
-    this->start = this->currentChunk.find(startMarker);
-    this->end = this->currentChunk.find(endMarker);
   }
 
-  _data = this->currentChunk.substr(this->start,
-      this->end + endMarker.size() - this->start);
+  this->start = from;
+  this->end = to; 
 
-  //this->currentChunk.erase(0, end + endMarker.size());
+  _data = this->currentChunk.substr(this->start,
+      this->end + this->kEndFrame.size() - this->start);
 
   return true;
 }
@@ -371,78 +397,60 @@ bool LogPlay::Step(std::string &_data)
 /////////////////////////////////////////////////
 bool LogPlay::Step(const int _step, std::string &_data)
 {
+  bool res = false;
   for (auto i = 0; i < std::abs(_step); ++i)
   {
     if (_step >= 0)
     {
       if (!this->Step(_data))
-        return false;
+        return res;
     }
     else
     {
-      if (!this->StepBackwards(_data))
-        return false;
+      if (!this->StepBack(_data))
+        return res;
     }
+
+    // If at least one of the steps was successfuly executed we'll return true.
+    res = true;
   }
 
-  return true;
+  return res;
 }
 
 /////////////////////////////////////////////////
-bool LogPlay::StepBackwards(std::string &_data)
+bool LogPlay::StepBack(std::string &_data)
 {
-  std::string startMarker = "<sdf ";
-  std::string endMarker = "</sdf>";
+  auto from = std::string::npos;
+  auto to = std::string::npos;
 
   std::lock_guard<std::mutex> lock(this->mutex);
 
   if (this->start > 0)
   {
-    auto from = this->currentChunk.rfind(startMarker, this->start - 1);
-    auto to = this->currentChunk.rfind(endMarker, this->start - 1);
-
-    this->start = from;
-    this->end = to;
+    from = this->currentChunk.rfind(this->kStartFrame, this->start - 1);
+    to = this->currentChunk.rfind(this->kEndFrame, this->start - 1);
   }
 
-  if (this->start == 0 || this->end == 0)
+  if (this->start <= 0 || from == std::string::npos || to == std::string::npos)
   {
-    this->currentChunk.clear();
+    if (!this->PrevChunk())
+      return false;
 
-    if (this->logCurrXml == this->logStartXml)
+    from = this->currentChunk.rfind(this->kStartFrame);
+    to = this->currentChunk.rfind(this->kEndFrame);
+    if (from == std::string::npos || to == std::string::npos)
     {
+      gzerr << "Unable to find an <sdf> frame in current chunk\n";
       return false;
     }
-    else if (this->logCurrXml)
-    {
-      this->logCurrXml = this->logCurrXml->PreviousSiblingElement("chunk");
-      chunkCounter--;
-    }
-    else
-    {
-      return false;
-    }
-
-    // Stop if there are no more chunks
-    if (!this->logCurrXml)
-    {
-      return false;
-    }
-
-    if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
-    {
-      gzerr << "Unable to decode log file\n";
-      return false;
-    }
-
-    this->start = this->currentChunk.rfind(startMarker);
-    this->end = this->currentChunk.rfind(endMarker);
   }
+
+  this->start = from;
+  this->end = to;
 
   _data = this->currentChunk.substr(this->start,
-      this->end + endMarker.size() - this->start);
-
-  //this->currentChunk.erase(start, end + endMarker.size());
+      this->end + this->kEndFrame.size() - this->start);
 
   return true;
 }
@@ -453,28 +461,32 @@ bool LogPlay::Rewind()
   std::lock_guard<std::mutex> lock(this->mutex);
 
   this->currentChunk.clear();
-  //this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
   this->logCurrXml = this->logStartXml->FirstChildElement("chunk");
-  this->chunkCounter = 0;
-
   if (!logCurrXml)
   {
     gzerr << "Unable to jump to the beginning of the log file\n";
     return false;
   }
 
-  // Skip first <sdf> block (it doesn't have a world state).
   if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
   {
     gzerr << "Unable to decode log file\n";
     return false;
   }
-  std::string endMarker = "</sdf>";
-  this->start = 0;
-  this->end = this->currentChunk.find(endMarker);
+
+  // Skip first <sdf> block (it doesn't have a world state).
+  this->end = this->currentChunk.find(this->kEndFrame);
+  if (this->end == std::string::npos)
+  {
+    std::cerr << "Unable to find the first <sdf> block" << std::endl;
+    return false;
+  }
 
   // Remove the special first <sdf> block.
-  this->currentChunk.erase(0, this->end + endMarker.size());
+  this->currentChunk.erase(0, this->end + this->kEndFrame.size());
+
+  this->start = 0;
+  this->end = -1 * this->kEndFrame.size();
 
   return true;
 }
@@ -482,14 +494,16 @@ bool LogPlay::Rewind()
 /////////////////////////////////////////////////
 bool LogPlay::Forward()
 {
-  std::string startMarker = "<sdf ";
-  std::string endMarker = "</sdf>";
-
   std::lock_guard<std::mutex> lock(this->mutex);
 
   // Get the last chunk.
   this->logCurrXml = this->logStartXml->LastChildElement("chunk");
-  this->chunkCounter = this->GetChunkCount() - 1;
+  if (!logCurrXml)
+  {
+    gzerr << "Unable to jump to the end of the log file\n";
+    return false;
+  }
+
   if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
   {
     gzerr << "Unable to decode log file\n";
@@ -505,25 +519,64 @@ bool LogPlay::Forward()
 /////////////////////////////////////////////////
 bool LogPlay::Seek(const common::Time &_time)
 {
-  // Locate the chunk.
-  int imin = 0;
-  int imax = this->GetChunkCount() - 1;
-  common::Time key = _time;
+  const std::string kStartDelim = "<sim_time>";
+  const std::string kEndDelim = "</sim_time>";
+  common::Time logTime;
 
-  while (imin <= imax)
+  // 1st step: Locate the chunk: We're looking for the first chunk that has
+  // a time greater than the target time.
+  if (!this->Rewind())
+    return false;
+
+  while (true)
   {
-    // Midpoint.
-    int imid = imin + ((imax - imin) / 2);
-    if (!this->GetChunk(imid, this->currentChunk))
-    {
-      gzerr << "Unable to jump to chunk [" << imin << "]" << std::endl;
+    std::string frame;
+    if (!this->Step(frame))
       return false;
+  
+    // Search the <sim_time> in the first frame of the current chunk.
+    auto from = frame.find(kStartDelim);
+    auto to = frame.find(kEndDelim, from + kStartDelim.size());
+    if (from != std::string::npos && to != std::string::npos)
+    {
+      auto length = to - from - kStartDelim.size();
+      auto logTimeStr = frame.substr(from + kStartDelim.size(), length);
+      std::stringstream ss(logTimeStr);
+      ss >> logTime;
+
+      // Chunk found.
+      if (logTime > _time)
+        break;
     }
 
-
+    // Skip the rest of the frames, we jump to the next chunk.
+    if (!this->NextChunk())
+      return false;
   }
 
-  // Locate the entry.
+  // 2nd step: Locate the frame in the previous chunk.
+  while (true)
+  {
+    std::string frame;
+    if (!this->StepBack(frame))
+      return false;
+
+    // Search the <sim_time> in the frame of the current chunk.
+    auto from = frame.find(kStartDelim);
+    auto to = frame.find(kEndDelim, from + kStartDelim.size());
+    if (from != std::string::npos && to != std::string::npos)
+    {
+      auto length = to - from - kStartDelim.size();
+      auto logTimeStr = frame.substr(from + kStartDelim.size(), length);
+      std::stringstream ss(logTimeStr);
+      ss >> logTime;
+
+      // frame found.
+      if (logTime < _time)
+        break;
+    }
+  }
+
   return true;
 }
 
@@ -629,4 +682,44 @@ unsigned int LogPlay::GetChunkCount() const
   }
 
   return count;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::NextChunk()
+{
+  auto next = this->logCurrXml->NextSiblingElement("chunk");
+  if (!next)
+    return false;
+
+  this->logCurrXml = next;
+  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+  {
+    gzerr << "Unable to decode log file\n";
+    return false;
+  }
+
+  this->start = 0;
+  this->end = -1 * this->kEndFrame.size();
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool LogPlay::PrevChunk()
+{
+  auto prev = this->logCurrXml->PreviousSiblingElement("chunk");
+  if (!prev)
+    return false;
+
+  this->logCurrXml = prev;
+  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+  {
+    gzerr << "Unable to decode log file\n";
+    return false;
+  }
+
+  this->start = this->currentChunk.size() - 1;
+  this->end = this->currentChunk.size() - 1;
+
+  return true;
 }
