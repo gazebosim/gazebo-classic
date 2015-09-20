@@ -496,137 +496,84 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
-  bool stay;
-
-  /*if (this->dataPtr->stepInc < 0)
-  {
-    this->dataPtr->stepInc += this->dataPtr->stepCounter;
-
-    // Step back: This is implemented by going to the beginning of the log file,
-    // and then, step forward up to the target frame.
-    // ToDo: Use keyframes in the log file to speed up this process.
-    if (!util::LogPlay::Instance()->Rewind())
-    {
-      gzerr << "Error processing a negative multi-step" << std::endl;
-      this->dataPtr->stepInc = 0;
-      return;
-    }
-
-    this->dataPtr->stepCounter = 0;
-    this->dataPtr->iterations = 0;
-    this->dataPtr->stepInc = std::max(1, this->dataPtr->stepInc);
-  }*/
-
-  {
-    boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
-    // There are two main reasons to keep iterating in the following loop:
-    //   1. If "stepInc" is positive: This means that a client requested to
-    //      advanced the simulation some steps.
-    //   2. If "seekPending" is true: This means that a client requested to
-    //      advance the simulation to a given simulation time ("seek"). We will
-    //      have to check at the end of each iteration if we reached the target
-    //      simulation time.
-    //   Note that if the simulation is not paused (play mode) we will enter
-    //   the loop. However, the code will only execute one iteration (one step).
-    stay = !this->IsPaused() || this->dataPtr->stepInc != 0 ||
-           this->dataPtr->seekPending;
-  }
-  while (stay)
   {
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
-    std::string data;
-
-    if (!this->IsPaused() && this->dataPtr->stepInc == 0)
-      this->dataPtr->stepInc = 1;
-
-    if (!util::LogPlay::Instance()->Step(this->dataPtr->stepInc, data))
+    if (!this->IsPaused() || this->dataPtr->stepInc != 0)
     {
-      // There are no more chunks, time to exit.
-      this->SetPaused(true);
-      this->dataPtr->stepInc = 0;
-      break;
-    }
-    else
-    {
-      this->dataPtr->stepInc = 1;
-
-      this->dataPtr->logPlayStateSDF->ClearElements();
-      sdf::readString(data, this->dataPtr->logPlayStateSDF);
-
-      this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
-
-      // If the log file does not contain iterations we have to manually
-      // increase the iteration counter in logPlayState.
-      if (!util::LogPlay::Instance()->HasIterations())
+      if (!this->IsPaused() && this->dataPtr->stepInc == 0)
+        this->dataPtr->stepInc = 1;
+  
+      std::string data;
+      if (!util::LogPlay::Instance()->Step(this->dataPtr->stepInc, data))
       {
-        this->dataPtr->logPlayState.SetIterations(
-          this->dataPtr->iterations + 1);
+        // There are no more chunks, time to exit.
+        this->SetPaused(true);
+        this->dataPtr->stepInc = 0;
       }
-
-      // Process insertions
-      if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
+      else
       {
-        sdf::ElementPtr modelElem =
-          this->dataPtr->logPlayStateSDF->GetElement(
-              "insertions")->GetElement("model");
-
-        while (modelElem)
+        this->dataPtr->stepInc = 1;
+  
+        this->dataPtr->logPlayStateSDF->ClearElements();
+        sdf::readString(data, this->dataPtr->logPlayStateSDF);
+  
+        this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
+  
+        // If the log file does not contain iterations we have to manually
+        // increase the iteration counter in logPlayState.
+        if (!util::LogPlay::Instance()->HasIterations())
         {
-          auto name = modelElem->GetAttribute("name")->GetAsString();
-          if (!this->GetModel(name))
+          this->dataPtr->logPlayState.SetIterations(
+            this->dataPtr->iterations + 1);
+        }
+  
+        // Process insertions
+        if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
+        {
+          sdf::ElementPtr modelElem =
+            this->dataPtr->logPlayStateSDF->GetElement(
+                "insertions")->GetElement("model");
+  
+          while (modelElem)
           {
-            ModelPtr model = this->LoadModel(modelElem,
-                this->dataPtr->rootElement);
-            model->Init();
-
-            // Disabling plugins on playback
-            // model->LoadPlugins();
+            auto name = modelElem->GetAttribute("name")->GetAsString();
+            if (!this->GetModel(name))
+            {
+              ModelPtr model = this->LoadModel(modelElem,
+                  this->dataPtr->rootElement);
+              model->Init();
+  
+              // Disabling plugins on playback
+              // model->LoadPlugins();
+            }
+  
+            modelElem = modelElem->GetNextElement("model");
           }
-
-          modelElem = modelElem->GetNextElement("model");
         }
-      }
-
-      // Process deletions
-      if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
-      {
-        sdf::ElementPtr nameElem =
-          this->dataPtr->logPlayStateSDF->GetElement(
-              "deletions")->GetElement("name");
-
-        while (nameElem)
+  
+        // Process deletions
+        if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
         {
-          transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->Get<std::string>());
-          nameElem = nameElem->GetNextElement("name");
+          sdf::ElementPtr nameElem =
+            this->dataPtr->logPlayStateSDF->GetElement(
+                "deletions")->GetElement("name");
+  
+          while (nameElem)
+          {
+            transport::requestNoReply(this->GetName(), "entity_delete",
+                                      nameElem->Get<std::string>());
+            nameElem = nameElem->GetNextElement("name");
+          }
         }
+  
+        this->SetState(this->dataPtr->logPlayState);
+        this->Update();
       }
-
-      this->SetState(this->dataPtr->logPlayState);
-      this->Update();
+  
+      if (this->dataPtr->stepInc > 0)
+        this->dataPtr->stepInc--;
     }
-
-    if (this->dataPtr->stepInc > 0)
-      this->dataPtr->stepInc--;
-
-    // We may have entered into the loop because a "seek" command was
-    // requested. At this point we have executed one more step. Now, it's time
-    // to check if we have reached the target simulation time specified in the
-    // "seek" command.
-    if (this->dataPtr->seekPending)
-    {
-      this->dataPtr->seekPending =
-        this->GetSimTime() < this->dataPtr->targetSimTime;
-    }
-
-    stay = !this->IsPaused() || this->dataPtr->stepInc > 0 ||
-           this->dataPtr->seekPending;
-
-    // We only run one step if we are in play mode and we don't have
-    // other pending commands.
-    if (!this->IsPaused() && !this->dataPtr->seekPending)
-      break;
   }
 
   this->PublishWorldStats();
@@ -1266,10 +1213,6 @@ void World::OnControl(ConstWorldControlPtr &_data)
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
-
-  // Ignore this command if there's another one pending.
-  if (this->dataPtr->seekPending)
-    return;
 
   if (_data->has_pause())
     this->SetPaused(_data->pause());

@@ -182,6 +182,10 @@ namespace gazebo
 
       private: const std::string kEndFrame   = "</sdf>";
 
+      private: const std::string kStartTime = "<sim_time>";
+
+      private: const std::string kEndTime = "</sim_time>";
+
       /// \brief The XML document of the log file.
       private: tinyxml2::XMLDocument xmlDoc;
 
