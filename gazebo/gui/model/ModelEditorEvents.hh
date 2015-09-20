@@ -314,6 +314,21 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { showJointContextMenu.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the show model plugin context menu
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectShowModelPluginContextMenu(T _subscriber)
+          { return showModelPluginContextMenu.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the show model plugin context
+        /// menu signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectShowModelPluginContextMenu(
+            event::ConnectionPtr _subscriber)
+          { showModelPluginContextMenu.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the set selected link signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -340,6 +355,21 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { setSelectedJoint.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the set selected model plugin
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectSetSelectedModelPlugin(T _subscriber)
+          { return setSelectedModelPlugin.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the set selected model plugin
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectSetSelectedModelPlugin(
+            event::ConnectionPtr _subscriber)
+          { setSelectedModelPlugin.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the model plugin inserted signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -354,6 +384,21 @@ namespace gazebo
         public: static void DisconnectModelPluginInserted(
             event::ConnectionPtr _subscriber)
           { modelPluginInserted.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the model plugin removed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectModelPluginRemoved(
+            T _subscriber)
+          { return modelPluginRemoved.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the model plugin removed
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectModelPluginRemoved(
+            event::ConnectionPtr _subscriber)
+          { modelPluginRemoved.Disconnect(_subscriber); }
 
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
@@ -430,14 +475,25 @@ namespace gazebo
         /// \brief Request to show the joint context menu.
         public: static event::EventT<void (std::string)> showJointContextMenu;
 
+        /// \brief Request to show the model plugin context menu.
+        public: static event::EventT<void (std::string)>
+            showModelPluginContextMenu;
+
         /// \brief Request to select or deselect a link.
         public: static event::EventT<void (std::string, bool)> setSelectedLink;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string, bool)> setSelectedJoint;
 
+        /// \brief Request to select or deselect a model plugin.
+        public: static event::EventT<void (std::string, bool)>
+            setSelectedModelPlugin;
+
         /// \brief Notify that a model plugin has been inserted.
         public: static event::EventT<void (std::string)> modelPluginInserted;
+
+        /// \brief Notify that a model plugin has been removed.
+        public: static event::EventT<void (std::string)> modelPluginRemoved;
       };
     }
   }

@@ -458,7 +458,7 @@ namespace gazebo
                                          unsigned int _sleepEach,
                                          int _retries);
 
-    /// \brief Wait for a number of ms. and attempts. until the world reaches a
+    /// \brief Wait for a number of ms. and attempts until the world reaches a
     /// target "iterations" value
     /// \param _goalIteration Target iterations value
     /// \param _sleepEach Number of milliseconds to sleep in each iteration
@@ -467,7 +467,7 @@ namespace gazebo
                                        const int _sleepEach,
                                        const int _retries) const;
 
-    /// \brief Wait for a number of ms. and attempts. until the world reaches a
+    /// \brief Wait for a number of ms. and attempts until the world reaches a
     /// target simulation time
     /// \param _goalTime Target simulation time.
     /// \param _sleepEach Number of milliseconds to sleep in each iteration
