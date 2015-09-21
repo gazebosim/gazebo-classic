@@ -48,7 +48,7 @@ namespace gazebo
       public: math::Vector2i mouseStart;
 
       /// \brief The current visual attached to the mouse.
-      public: rendering::VisualPtr mouseMoveVis;
+      public: std::string mouseMoveVisName;
 
       /// \brief Transportation node.
       public: transport::NodePtr node;

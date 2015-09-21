@@ -57,7 +57,20 @@ namespace gazebo
       /// \param[in] _config Either a configuration (min, center, max),
       /// or "reset" to restore the original pose.
       /// \param[in] _publish True to publish new alignment pose
+      /// \deprecated See AlignVisuals(const std::vector<std::string>
+      ///             &_visuals, ... );
       public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
+          const std::string &_axis, const std::string &_config,
+          const std::string &_target, bool _publish = true)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Callback when a specific alignment configuration is set.
+      /// \param[in] _visualNames Names of the visuals to be aligned.
+      /// \param[in] _axis Axis of alignment: x, y, or z.
+      /// \param[in] _config Either a configuration (min, center, max),
+      /// or "reset" to restore the original pose.
+      /// \param[in] _publish True to publish new alignment pose
+      public: void AlignVisuals(const std::vector<std::string> &_visualNames,
           const std::string &_axis, const std::string &_config,
           const std::string &_target, bool _publish = true);
 

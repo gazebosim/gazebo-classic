@@ -204,7 +204,17 @@ void Visual::Fini()
 
   std::vector<uint32_t> visualIds;
   for (auto visual: this->dataPtr->children)
-    visualIds.push_back(visual->GetId());
+  {
+    if (!visual)
+      continue;
+
+    // Only remove non-gui visuals. We don't want to delete the
+    // SelectionObj.
+    if (visual->GetType() != VT_GUI)
+      visualIds.push_back(visual->GetId());
+    else
+      this->DetachVisual(visual->GetName());
+  }
 
   for (auto visualId: visualIds)
     this->dataPtr->scene->RemoveVisual(visualId);
@@ -552,8 +562,8 @@ std::string Visual::GetName() const
 void Visual::AttachVisual(VisualPtr _vis)
 {
   if (!_vis)
-    gzerr << "Visual is null\n";
-  else
+    gzerr << "Visual is null.\n";
+  else if (_vis->GetSceneNode())
   {
     if (_vis->GetSceneNode()->getParentSceneNode())
     {
@@ -1585,7 +1595,9 @@ bool Visual::GetCastShadows() const
 //////////////////////////////////////////////////
 void Visual::SetVisible(bool _visible, bool _cascade)
 {
-  this->dataPtr->sceneNode->setVisible(_visible, _cascade);
+  if (this->dataPtr->sceneNode)
+    this->dataPtr->sceneNode->setVisible(_visible, _cascade);
+
   if (_cascade)
   {
     for (auto child: this->dataPtr->children)
@@ -1623,20 +1635,22 @@ void Visual::SetPosition(const math::Vector3 &_pos)
     this->staticGeom = NULL;
     // this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
   }*/
-  GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
-  this->dataPtr->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
-
-  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  if (this->dataPtr->sceneNode)
+  {
+    this->dataPtr->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
+    this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  }
 }
 
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
-  GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
-  this->dataPtr->sceneNode->setOrientation(
-      Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
-
-  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  if (this->dataPtr->sceneNode)
+  {
+    this->dataPtr->sceneNode->setOrientation(
+        Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
+    this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  }
 }
 
 //////////////////////////////////////////////////

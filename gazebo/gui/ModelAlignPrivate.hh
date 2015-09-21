@@ -49,20 +49,20 @@ namespace gazebo
       public: rendering::ScenePtr scene;
 
       /// \brief The last selected visual which will be used for alignment.
-      public: rendering::VisualPtr targetVis;
+      public: std::string targetVis;
 
       /// \brief True if the model align tool is initialized.
       public: bool initialized;
 
       /// \brief selected visuals.
-      public: std::vector<rendering::VisualPtr> selectedVisuals;
+      public: std::vector<std::string> selectedVisuals;
 
       /// \brief A list of connections. Currently used only
       /// to get the align configuration event.
       public: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Original model pose used when user resets alignment.
-      public: std::map<rendering::VisualPtr, math::Pose> originalVisualPose;
+      public: std::map<std::string, math::Pose> originalVisualPose;
     };
   }
 }

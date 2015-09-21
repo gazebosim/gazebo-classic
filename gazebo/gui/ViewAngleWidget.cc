@@ -17,6 +17,7 @@
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -152,13 +153,14 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
   ignition::math::Vector3d lookAt = ignition::math::Vector3d::Zero;
 
   // If there are selected visuals, look at their center
-  std::vector<rendering::VisualPtr> selectedVisuals =
-      glWidget->SelectedVisuals();
+  std::vector<std::string> selectedVisuals = glWidget->SelectedVisuals();
 
   if (!selectedVisuals.empty())
   {
-    for (auto const &vis : selectedVisuals)
+    rendering::ScenePtr scene = rendering::get_scene();
+    for (auto const &visName : selectedVisuals)
     {
+      rendering::VisualPtr vis = scene->GetVisual(visName);
       ignition::math::Vector3d visPos = vis->GetWorldPose().pos.Ign();
       lookAt += visPos;
     }

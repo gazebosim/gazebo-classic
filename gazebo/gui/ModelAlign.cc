@@ -60,14 +60,11 @@ ModelAlign::~ModelAlign()
 /////////////////////////////////////////////////
 void ModelAlign::Clear()
 {
-  this->dataPtr->targetVis.reset();
   this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
   this->dataPtr->node.reset();
   this->dataPtr->modelPub.reset();
-  this->dataPtr->selectedVisuals.clear();
   this->dataPtr->connections.clear();
-  this->dataPtr->originalVisualPose.clear();
   this->dataPtr->initialized = false;
 }
 
@@ -183,16 +180,31 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     const std::string &_axis, const std::string &_config,
     const std::string &_target, bool _publish)
 {
+  std::vector<std::string> visNames;
+  for (auto const &vis : _visuals)
+  {
+    if (vis)
+      visNames.push_back(vis->GetName());
+  }
+  this->AlignVisuals(visNames, _axis, _config, _target, _publish);
+}
+
+/////////////////////////////////////////////////
+void ModelAlign::AlignVisuals(const std::vector<std::string> &_visualNames,
+    const std::string &_axis, const std::string &_config,
+    const std::string &_target, bool _publish)
+{
   if (_config == "reset" || _publish)
   {
-    std::map<rendering::VisualPtr, math::Pose>::iterator it =
+    std::map<std::string, math::Pose>::iterator it =
         this->dataPtr->originalVisualPose.begin();
     for (it; it != this->dataPtr->originalVisualPose.end(); ++it)
     {
-      if (it->first)
+      rendering::VisualPtr visPtr = this->dataPtr->scene->GetVisual(it->first);
+      if (visPtr)
       {
-        it->first->SetWorldPose(it->second);
-        this->SetHighlighted(it->first, false);
+        visPtr->SetWorldPose(it->second);
+        this->SetHighlighted(visPtr, false);
       }
     }
     this->dataPtr->originalVisualPose.clear();
@@ -202,7 +214,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       return;
   }
 
-  this->dataPtr->selectedVisuals = _visuals;
+  this->dataPtr->selectedVisuals = _visualNames;
 
   if (this->dataPtr->selectedVisuals.size() <= 1)
     return;
@@ -222,10 +234,18 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     this->dataPtr->targetVis = this->dataPtr->selectedVisuals.back();
   }
 
-  math::Pose targetWorldPose = this->dataPtr->targetVis->GetWorldPose();
-  math::Box targetBbox = this->dataPtr->targetVis->GetBoundingBox();
-  targetBbox.min *= this->dataPtr->targetVis->GetScale();
-  targetBbox.max *= this->dataPtr->targetVis->GetScale();
+  rendering::VisualPtr visPtr = this->dataPtr->scene->GetVisual(
+      this->dataPtr->targetVis);
+  if (!visPtr)
+  {
+    gzerr << "Invalid visual name[" << this->dataPtr->targetVis << "]\n";
+    return;
+  }
+
+  math::Pose targetWorldPose = visPtr->GetWorldPose();
+  math::Box targetBbox = visPtr->GetBoundingBox();
+  targetBbox.min *= visPtr->GetScale();
+  targetBbox.max *= visPtr->GetScale();
 
   std::vector<math::Vector3> targetVertices;
   this->Transform(targetBbox, targetWorldPose, targetVertices);
@@ -236,7 +256,10 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 
   for (unsigned i = start; i < end; ++i)
   {
-    rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
+    rendering::VisualPtr vis = this->dataPtr->scene->GetVisual(
+        this->dataPtr->selectedVisuals[i]);
+    if (!vis)
+      continue;
 
     math::Pose worldPose = vis->GetWorldPose();
     math::Box bbox = vis->GetBoundingBox();
@@ -260,10 +283,10 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 
     if (!_publish)
     {
-      if (this->dataPtr->originalVisualPose.find(vis) ==
+      if (this->dataPtr->originalVisualPose.find(vis->GetName()) ==
           this->dataPtr->originalVisualPose.end())
       {
-        this->dataPtr->originalVisualPose[vis] = vis->GetWorldPose();
+        this->dataPtr->originalVisualPose[vis->GetName()] = vis->GetWorldPose();
         this->SetHighlighted(vis, true);
       }
       // prevent the visual pose from being updated by the server

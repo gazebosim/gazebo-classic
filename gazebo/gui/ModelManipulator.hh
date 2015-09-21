@@ -59,7 +59,14 @@ namespace gazebo
       public: void SetManipulationMode(const std::string &_mode);
 
       /// \brief Set the visual to be manipulated by the model manipulator.
-      public: void SetAttachedVisual(rendering::VisualPtr _vis);
+      /// \param[in] _vis The visual to attach
+      /// \deprecated See SetAttachedVisual(const std::string &_visName);
+      public: void SetAttachedVisual(rendering::VisualPtr _vis)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the visual to be manipulated by the model manipulator.
+      /// \param[in] _visName Name of the visual to attach
+      public: void SetAttachedVisual(const std::string &_visName);
 
       /// \brief Process an object translate mouse press event.
       /// \param[in] _event Mouse event.

@@ -68,7 +68,6 @@ void ModelManipulator::Clear()
   this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
   this->dataPtr->node.reset();
-  this->dataPtr->mouseMoveVis.reset();
   this->dataPtr->mouseChildVisualScale.clear();
   this->dataPtr->manipMode = "";
   this->dataPtr->globalManip = false;
@@ -616,13 +615,14 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 
     this->SetMouseMoveVisual(vis);
 
-    event::Events::setSelectedEntity(
-        this->dataPtr->mouseMoveVis->GetName(), "move");
+    event::Events::setSelectedEntity(this->dataPtr->mouseMoveVisName, "move");
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
 
-    if (this->dataPtr->mouseMoveVis && !this->dataPtr->mouseMoveVis->IsPlane())
+    rendering::VisualPtr visPtr = this->dataPtr->scene->GetVisual(
+        this->dataPtr->mouseMoveVisName);
+    if (visPtr && !visPtr->IsPlane())
     {
-      this->dataPtr->selectionObj->Attach(this->dataPtr->mouseMoveVis);
+      this->dataPtr->selectionObj->Attach(visPtr);
       this->dataPtr->selectionObj->SetMode(this->dataPtr->manipMode);
     }
     else
@@ -642,7 +642,10 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
   this->dataPtr->mouseEvent = _event;
   if (this->dataPtr->mouseEvent.Dragging())
   {
-    if (this->dataPtr->mouseMoveVis &&
+    rendering::VisualPtr visPtr = this->dataPtr->scene->GetVisual(
+        this->dataPtr->mouseMoveVisName);
+
+    if (visPtr &&
         this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
       math::Vector3 axis = math::Vector3::Zero;
@@ -658,30 +661,29 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
       {
         if (axis != math::Vector3::Zero)
         {
-          this->TranslateEntity(this->dataPtr->mouseMoveVis, axis, false);
+          this->TranslateEntity(visPtr, axis, false);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::TRANS_X)
         {
-          this->TranslateEntity(this->dataPtr->mouseMoveVis,
+          this->TranslateEntity(visPtr,
               math::Vector3::UnitX, !this->dataPtr->globalManip);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::TRANS_Y)
         {
-          this->TranslateEntity(this->dataPtr->mouseMoveVis,
+          this->TranslateEntity(visPtr,
               math::Vector3::UnitY, !this->dataPtr->globalManip);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::TRANS_Z)
         {
-          this->TranslateEntity(this->dataPtr->mouseMoveVis,
+          this->TranslateEntity(visPtr,
             math::Vector3::UnitZ, !this->dataPtr->globalManip);
         }
         else
         {
-          this->TranslateEntity(
-              this->dataPtr->mouseMoveVis, math::Vector3(1, 1, 0));
+          this->TranslateEntity(visPtr, math::Vector3(1, 1, 0));
         }
       }
       else if (this->dataPtr->selectionObj->GetMode()
@@ -689,27 +691,27 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
       {
         if (axis != math::Vector3::Zero)
         {
-          this->RotateEntity(this->dataPtr->mouseMoveVis, axis, false);
+          this->RotateEntity(visPtr, axis, false);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::ROT_X
             || this->dataPtr->keyEvent.key == Qt::Key_X)
         {
-          this->RotateEntity(this->dataPtr->mouseMoveVis, math::Vector3::UnitX,
+          this->RotateEntity(visPtr, math::Vector3::UnitX,
               !this->dataPtr->globalManip);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Y
             || this->dataPtr->keyEvent.key == Qt::Key_Y)
         {
-          this->RotateEntity(this->dataPtr->mouseMoveVis, math::Vector3::UnitY,
+          this->RotateEntity(visPtr, math::Vector3::UnitY,
               !this->dataPtr->globalManip);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Z
             || this->dataPtr->keyEvent.key == Qt::Key_Z)
         {
-          this->RotateEntity(this->dataPtr->mouseMoveVis, math::Vector3::UnitZ,
+          this->RotateEntity(visPtr, math::Vector3::UnitZ,
               !this->dataPtr->globalManip);
         }
       }
@@ -718,28 +720,25 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
       {
         if (axis != math::Vector3::Zero)
         {
-          this->ScaleEntity(this->dataPtr->mouseMoveVis, axis, false);
+          this->ScaleEntity(visPtr, axis, false);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::SCALE_X
             || this->dataPtr->keyEvent.key == Qt::Key_X)
         {
-          this->ScaleEntity(this->dataPtr->mouseMoveVis,
-              math::Vector3::UnitX, true);
+          this->ScaleEntity(visPtr, math::Vector3::UnitX, true);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::SCALE_Y
             || this->dataPtr->keyEvent.key == Qt::Key_Y)
         {
-          this->ScaleEntity(this->dataPtr->mouseMoveVis,
-              math::Vector3::UnitY, true);
+          this->ScaleEntity(visPtr, math::Vector3::UnitY, true);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::SCALE_Z
             || this->dataPtr->keyEvent.key == Qt::Key_Z)
         {
-          this->ScaleEntity(this->dataPtr->mouseMoveVis,
-              math::Vector3::UnitZ, true);
+          this->ScaleEntity(visPtr, math::Vector3::UnitZ, true);
         }
       }
     }
@@ -775,17 +774,22 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
   this->dataPtr->mouseEvent = _event;
   if (this->dataPtr->mouseEvent.Dragging())
   {
+    rendering::VisualPtr visPtr = this->dataPtr->scene->GetVisual(
+        this->dataPtr->mouseMoveVisName);
+
     // If we were dragging a visual around, then publish its new pose to the
     // server
-    if (this->dataPtr->mouseMoveVis)
+    if (visPtr)
     {
       if (this->dataPtr->manipMode == "scale")
       {
         this->dataPtr->selectionObj->UpdateSize();
-        this->PublishVisualScale(this->dataPtr->mouseMoveVis);
+        this->PublishVisualScale(visPtr);
       }
       else
-        this->PublishVisualPose(this->dataPtr->mouseMoveVis);
+      {
+        this->PublishVisualPose(visPtr);
+      }
       this->SetMouseMoveVisual(rendering::VisualPtr());
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     }
@@ -812,8 +816,11 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
 void ModelManipulator::SetManipulationMode(const std::string &_mode)
 {
   this->dataPtr->manipMode = _mode;
+  rendering::VisualPtr visPtr = this->dataPtr->scene->GetVisual(
+      this->dataPtr->mouseMoveVisName);
+
   if (this->dataPtr->selectionObj->GetMode() !=
-      rendering::SelectionObj::SELECTION_NONE ||  this->dataPtr->mouseMoveVis)
+      rendering::SelectionObj::SELECTION_NONE || visPtr)
   {
     this->dataPtr->selectionObj->SetMode(this->dataPtr->manipMode);
     if (this->dataPtr->manipMode != "translate"
@@ -824,27 +831,42 @@ void ModelManipulator::SetManipulationMode(const std::string &_mode)
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
+void ModelManipulator::SetAttachedVisual(const std::string &_visName)
 {
-  rendering::VisualPtr vis = _vis;
+  rendering::VisualPtr vis = this->dataPtr->scene->GetVisual(_visName);
+
+  if (!vis || !vis->GetRootVisual())
+    return;
 
   if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+  {
     vis = vis->GetRootVisual();
+  }
 
   this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose();
 
   this->SetMouseMoveVisual(vis);
 
-  if (this->dataPtr->mouseMoveVis && !this->dataPtr->mouseMoveVis->IsPlane())
-    this->dataPtr->selectionObj->Attach(this->dataPtr->mouseMoveVis);
+  rendering::VisualPtr visPtr = this->dataPtr->scene->GetVisual(
+      this->dataPtr->mouseMoveVisName);
+
+  if (visPtr && !visPtr->IsPlane())
+    this->dataPtr->selectionObj->Attach(visPtr);
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
+{
+  if (_vis)
+    this->SetAttachedVisual(_vis->GetName());
 }
 
 /////////////////////////////////////////////////
 void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
 {
-  this->dataPtr->mouseMoveVis = _vis;
   if (_vis)
   {
+    this->dataPtr->mouseMoveVisName = _vis->GetName();
     this->dataPtr->mouseVisualScale = _vis->GetScale();
     this->dataPtr->mouseChildVisualScale.clear();
     // keep track of all child visual scale for scaling to work in
@@ -857,7 +879,10 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
     this->dataPtr->mouseVisualBbox = _vis->GetBoundingBox();
   }
   else
+  {
+    this->dataPtr->mouseMoveVisName.clear();
     this->dataPtr->mouseVisualScale = math::Vector3::One;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -873,10 +898,13 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
         || _event.key == Qt::Key_Z)
     {
       this->dataPtr->mouseStart = this->dataPtr->mouseEvent.Pos();
-      if (this->dataPtr->mouseMoveVis)
+
+      rendering::VisualPtr visPtr = this->dataPtr->scene->GetVisual(
+        this->dataPtr->mouseMoveVisName);
+
+      if (visPtr)
       {
-        this->dataPtr->mouseMoveVisStartPose =
-            this->dataPtr->mouseMoveVis->GetWorldPose();
+        this->dataPtr->mouseMoveVisStartPose = visPtr->GetWorldPose();
       }
     }
     else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
@@ -899,11 +927,13 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     if (_event.key == Qt::Key_X || _event.key == Qt::Key_Y
         || _event.key == Qt::Key_Z)
     {
+      rendering::VisualPtr visPtr = this->dataPtr->scene->GetVisual(
+        this->dataPtr->mouseMoveVisName);
+
       this->dataPtr->mouseStart = this->dataPtr->mouseEvent.Pos();
-      if (this->dataPtr->mouseMoveVis)
+      if (visPtr)
       {
-        this->dataPtr->mouseMoveVisStartPose =
-            this->dataPtr->mouseMoveVis->GetWorldPose();
+        this->dataPtr->mouseMoveVisStartPose = visPtr->GetWorldPose();
       }
     }
     else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
