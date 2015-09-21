@@ -230,7 +230,7 @@ void LogPlay::ReadLogTimes()
 
   if (!this->GetChunkData(lastChunk, chunk))
     return;
-  
+
   // Update the last <sim_time> of the log.
   auto to = chunk.rfind(this->kEndTime);
   auto from = chunk.rfind(this->kStartTime, to - 1);
@@ -374,7 +374,7 @@ bool LogPlay::Step(std::string &_data)
   }
 
   this->start = from;
-  this->end = to; 
+  this->end = to;
 
   _data = this->currentChunk.substr(this->start,
       this->end + this->kEndFrame.size() - this->start);
@@ -500,7 +500,7 @@ bool LogPlay::Forward()
 
 /////////////////////////////////////////////////
 bool LogPlay::Seek(const common::Time &_time)
-{  
+{
   common::Time logTime = this->logStartTime;
 
   // 1st step: Locate the chunk: We're looking for the first chunk that has

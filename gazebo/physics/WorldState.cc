@@ -86,7 +86,7 @@ void WorldState::Load(const WorldPtr _world)
        iter != models.end(); ++iter)
   {
     this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
-          this->simTime, this->iterations);
+        this->simTime, this->iterations);
   }
 
   // Remove models that no longer exist. We determine this by check the time

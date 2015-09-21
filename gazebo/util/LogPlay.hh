@@ -119,7 +119,7 @@ namespace gazebo
       /// \return True If the function succeed or false otherwise.
       public: bool Rewind();
 
-       /// \brief Jump to the end of the log file.
+      /// \brief Jump to the end of the log file.
       /// \return True If the function succeed or false otherwise.
       public: bool Forward();
 
@@ -170,20 +170,33 @@ namespace gazebo
 
       /// \brief Update the internal variable that keeps track of the initial
       /// "iterations" value.
+      /// \return True when the operation succeed or false otherwise
+      /// (e.g.: if the <iterations> elements are not found).
       private: bool ReadIterations();
 
+      /// \brief If possible, jump to the next chunk.
+      /// \return True if the operation succeed or false if there were no more
+      /// chunks after the current one.
       private: bool NextChunk();
 
+      /// \brief If possible, jump to the previous chunk.
+      /// \return True if the operation succeed or false if there were no more
+      /// chunks before the current one.
       private: bool PrevChunk();
 
+      /// \brief Max number of chunks to inspect when looking for XML elements.
       private: const unsigned int kNumChunksToTry = 2u;
 
+      /// \brief XML tag delimiting the beginning of a frame.
       private: const std::string kStartFrame = "<sdf ";
 
+      /// \brief XML tag delimiting the end of a frame.
       private: const std::string kEndFrame   = "</sdf>";
 
+      /// \brief XML tag delimiting the beginning of a simulation time element.
       private: const std::string kStartTime = "<sim_time>";
 
+      /// \brief XML tag delimiting the end of a simulation time element.
       private: const std::string kEndTime = "</sim_time>";
 
       /// \brief The XML document of the log file.
@@ -217,10 +230,15 @@ namespace gazebo
       /// \brief The encoding for the current chunk in the log file.
       private: std::string encoding;
 
+      /// \brief This is the chunk where the current frame is contained.
       private: std::string currentChunk;
 
+      /// \brief The current chunk might contain multiple frames.
+      /// This variable points to the beginning of the last frame dispatched.
       private: size_t start;
 
+      /// \brief The current chunk might contain multiple frames.
+      /// This variable points to the end of the last frame dispatched.
       private: size_t end;
 
       /// \brief Initial simulation iteration contained in the log file.
