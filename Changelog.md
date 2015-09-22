@@ -1,4 +1,8 @@
 ## Gazebo 7.0
+
+1. Update physics when the world is reset
+    * [Pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
+
 1. Added torsional friction
     * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
 
