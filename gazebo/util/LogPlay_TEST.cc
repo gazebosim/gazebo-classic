@@ -346,6 +346,67 @@ TEST_F(LogPlay_TEST, MultiStep)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test Seek().
+TEST_F(LogPlay_TEST, Seek)
+{
+  gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
+
+  // Open a correct log file.
+  boost::filesystem::path logFilePath(TEST_PATH);
+  logFilePath /= boost::filesystem::path("logs");
+  logFilePath /= boost::filesystem::path("state.log");
+
+  EXPECT_NO_THROW(player->Open(logFilePath.string()));
+
+  std::string frame;
+  EXPECT_TRUE(player->Seek(common::Time(30.0)));
+  EXPECT_TRUE(player->Step(frame));
+  std::string expectedShashum = "a2af44bc561194dfeae9526c224d56bb332a4233";
+  std::string shasum = gazebo::common::get_sha1<std::string>(frame);
+  EXPECT_EQ(shasum, expectedShashum);
+
+  EXPECT_TRUE(player->Seek(common::Time(31.5)));
+  EXPECT_TRUE(player->Step(frame));
+  expectedShashum = "113748a3c02575f514b27bc5b4307f621644ad41";
+  shasum = gazebo::common::get_sha1<std::string>(frame);
+  EXPECT_EQ(shasum, expectedShashum);
+
+  EXPECT_TRUE(player->Seek(common::Time(30.0)));
+  EXPECT_TRUE(player->Step(frame));
+  expectedShashum = "a2af44bc561194dfeae9526c224d56bb332a4233";
+  shasum = gazebo::common::get_sha1<std::string>(frame);
+  EXPECT_EQ(shasum, expectedShashum);
+
+  // Seek the to the beginning of the log.
+  EXPECT_TRUE(player->Seek(common::Time(28.457)));
+  EXPECT_TRUE(player->Step(frame));
+  expectedShashum = "0a61e946f14f7395a8bdb7974cb1e18c0d9e3d22";
+  shasum = gazebo::common::get_sha1<std::string>(frame);
+  EXPECT_EQ(shasum, expectedShashum);
+
+  // Seek the to the end of the log.
+  EXPECT_TRUE(player->Seek(common::Time(31.745)));
+  EXPECT_TRUE(player->Step(frame));
+  expectedShashum = "961cf9dcd38c12f33a8b2f3a3a6fdb879b2faa98";
+  shasum = gazebo::common::get_sha1<std::string>(frame);
+  EXPECT_EQ(shasum, expectedShashum);
+
+  // Try to seek before the beginning of the log.
+  EXPECT_TRUE(player->Seek(common::Time(25.0)));
+  EXPECT_TRUE(player->Step(frame));
+  expectedShashum = "0a61e946f14f7395a8bdb7974cb1e18c0d9e3d22";
+  shasum = gazebo::common::get_sha1<std::string>(frame);
+  EXPECT_EQ(shasum, expectedShashum);
+
+  // Try to seek after the end of the log.
+  EXPECT_TRUE(player->Seek(common::Time(35.0)));
+  EXPECT_TRUE(player->Step(frame));
+  expectedShashum = "961cf9dcd38c12f33a8b2f3a3a6fdb879b2faa98";
+  shasum = gazebo::common::get_sha1<std::string>(frame);
+  EXPECT_EQ(shasum, expectedShashum);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

@@ -501,33 +501,45 @@ bool LogPlay::Forward()
 /////////////////////////////////////////////////
 bool LogPlay::Seek(const common::Time &_time)
 {
+  if (_time >= this->logEndTime)
+  {
+    this->Forward();
+    std::string frame;
+    this->Step(-2, frame);
+    return true;
+  }
+
   common::Time logTime = this->logStartTime;
 
   // 1st step: Locate the chunk: We're looking for the first chunk that has
   // a time greater than the target time.
-  auto imin = 0u;
-  auto imax = this->GetChunkCount() - 1;
+  int64_t imin = 0;
+  int64_t imax = this->GetChunkCount() - 1;
   while (imin <= imax)
   {
-    auto imid = imin + ((imax - imin) / 2);
+    int64_t imid = imin + ((imax - imin) / 2);
     this->GetChunk(imid, this->currentChunk);
 
     this->start = 0;
     this->end = -1 * this->kEndFrame.size();
 
-    std::string frame;
-    if (!this->Step(frame))
-      return false;
-
-    // Search the <sim_time> in the first frame of the current chunk.
-    auto from = frame.find(this->kStartTime);
-    auto to = frame.find(this->kEndTime, from + this->kStartTime.size());
-    if (from != std::string::npos && to != std::string::npos)
+    for (unsigned int i = 0; i < 2; ++i)
     {
-      auto length = to - from - this->kStartTime.size();
-      auto logTimeStr = frame.substr(from + this->kStartTime.size(), length);
-      std::stringstream ss(logTimeStr);
-      ss >> logTime;
+      std::string frame;
+      if (!this->Step(frame))
+        return false;
+
+      // Search the <sim_time> in the first frame of the current chunk.
+      auto from = frame.find(this->kStartTime);
+      auto to = frame.find(this->kEndTime, from + this->kStartTime.size());
+      if (from != std::string::npos && to != std::string::npos)
+      {
+        auto length = to - from - this->kStartTime.size();
+        auto logTimeStr = frame.substr(from + this->kStartTime.size(), length);
+        std::stringstream ss(logTimeStr);
+        ss >> logTime;
+        break;
+      }
     }
 
     // Chunk found.
@@ -550,7 +562,7 @@ bool LogPlay::Seek(const common::Time &_time)
   {
     std::string frame;
     if (!this->StepBack(frame))
-      return false;
+      break;
 
     // Search the <sim_time> in the frame of the current chunk.
     auto from = frame.find(this->kStartTime);
