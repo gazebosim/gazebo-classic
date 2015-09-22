@@ -1,8 +1,8 @@
 :: This file is a helper for gazebo configuration (cmake) on Windows
-:: 
+::
 :: It is designed to work with a workspace detailed in the INSTALL_WIN32.md
 :: file. Please follow the instructions there. The workspace layout should be:
-:: 
+::
 :: gz-ws/
 ::   sdformat/
 ::   ...     # all dependencies detailed in the INSTALL file
@@ -64,6 +64,7 @@ set OGRE_LIB_SUFFIX=.lib
 cmake -G "NMake Makefiles"^
     -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%"^
     -DUSE_EXTERNAL_TINYXML:BOOL=False^
+    -DUSE_EXTERNAL_TINYXML2:BOOL=False^
     -DFREEIMAGE_RUNS=1^
     -DPROTOBUF_SRC_ROOT_FOLDER="%PROTOBUF_PATH%"^
     -DBOOST_ROOT:STRING="%BOOST_PATH%"^

@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_LOGPLAY_HH_
 #define _GAZEBO_LOGPLAY_HH_
 
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 #include <list>
 #include <mutex>
@@ -103,10 +103,25 @@ namespace gazebo
       /// \param[out] _data Data from next entry in the log file.
       public: bool Step(std::string &_data);
 
+      /// \brief Step through the open log file backwards.
+      /// \param[out] _data Data from next entry in the log file.
+      public: bool StepBack(std::string &_data);
+
+      /// \brief Step through the open log file.
+      /// \param[out] _data Data from next entry in the log file.
+      public: bool Step(const int _step, std::string &_data);
+
+      /// \brief Seek.
+      public: bool Seek(const common::Time &_time);
+
       /// \brief Jump to the beginning of the log file. The next step() call
       /// will return the first data "chunk".
       /// \return True If the function succeed or false otherwise.
       public: bool Rewind();
+
+      /// \brief Jump to the end of the log file.
+      /// \return True If the function succeed or false otherwise.
+      public: bool Forward();
 
       /// \brief Get the number of chunks (steps) in the open log file.
       /// \return The number of recorded states in the log file.
@@ -143,7 +158,8 @@ namespace gazebo
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.
       /// \return True if the chunk was successfully parsed.
-      private: bool GetChunkData(TiXmlElement *_xml, std::string &_data);
+      private: bool GetChunkData(tinyxml2::XMLElement *_xml,
+                                 std::string &_data);
 
       /// \brief Read the header from the log file.
       private: void ReadHeader();
@@ -154,16 +170,43 @@ namespace gazebo
 
       /// \brief Update the internal variable that keeps track of the initial
       /// "iterations" value.
+      /// \return True when the operation succeed or false otherwise
+      /// (e.g.: if the <iterations> elements are not found).
       private: bool ReadIterations();
 
+      /// \brief If possible, jump to the next chunk.
+      /// \return True if the operation succeed or false if there were no more
+      /// chunks after the current one.
+      private: bool NextChunk();
+
+      /// \brief If possible, jump to the previous chunk.
+      /// \return True if the operation succeed or false if there were no more
+      /// chunks before the current one.
+      private: bool PrevChunk();
+
+      /// \brief Max number of chunks to inspect when looking for XML elements.
+      private: const unsigned int kNumChunksToTry = 2u;
+
+      /// \brief XML tag delimiting the beginning of a frame.
+      private: const std::string kStartFrame = "<sdf ";
+
+      /// \brief XML tag delimiting the end of a frame.
+      private: const std::string kEndFrame   = "</sdf>";
+
+      /// \brief XML tag delimiting the beginning of a simulation time element.
+      private: const std::string kStartTime = "<sim_time>";
+
+      /// \brief XML tag delimiting the end of a simulation time element.
+      private: const std::string kEndTime = "</sim_time>";
+
       /// \brief The XML document of the log file.
-      private: TiXmlDocument xmlDoc;
+      private: tinyxml2::XMLDocument xmlDoc;
 
       /// \brief Start of the log.
-      private: TiXmlElement *logStartXml;
+      private: tinyxml2::XMLElement *logStartXml;
 
       /// \brief Current position in the log file.
-      private: TiXmlElement *logCurrXml;
+      private: tinyxml2::XMLElement *logCurrXml;
 
       /// \brief Name of the log file.
       private: std::string filename;
@@ -187,7 +230,16 @@ namespace gazebo
       /// \brief The encoding for the current chunk in the log file.
       private: std::string encoding;
 
+      /// \brief This is the chunk where the current frame is contained.
       private: std::string currentChunk;
+
+      /// \brief The current chunk might contain multiple frames.
+      /// This variable points to the beginning of the last frame dispatched.
+      private: size_t start;
+
+      /// \brief The current chunk might contain multiple frames.
+      /// This variable points to the end of the last frame dispatched.
+      private: size_t end;
 
       /// \brief Initial simulation iteration contained in the log file.
       private: uint64_t initialIterations;
