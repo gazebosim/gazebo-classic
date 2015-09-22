@@ -25,6 +25,7 @@ using namespace gazebo;
 
 class ModelStateTest : public gazebo::testing::AutoLogFixture { };
 
+//////////////////////////////////////////////////
 TEST_F(ModelStateTest, Nested)
 {
   std::ostringstream sdfStr;
