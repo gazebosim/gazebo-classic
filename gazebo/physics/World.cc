@@ -503,7 +503,7 @@ void World::LogStep()
     {
       if (!this->IsPaused() && this->dataPtr->stepInc == 0)
         this->dataPtr->stepInc = 1;
-  
+
       std::string data;
       if (!util::LogPlay::Instance()->Step(this->dataPtr->stepInc, data))
       {
@@ -514,12 +514,12 @@ void World::LogStep()
       else
       {
         this->dataPtr->stepInc = 1;
-  
+
         this->dataPtr->logPlayStateSDF->ClearElements();
         sdf::readString(data, this->dataPtr->logPlayStateSDF);
-  
+
         this->dataPtr->logPlayState.Load(this->dataPtr->logPlayStateSDF);
-  
+
         // If the log file does not contain iterations we have to manually
         // increase the iteration counter in logPlayState.
         if (!util::LogPlay::Instance()->HasIterations())
@@ -527,14 +527,14 @@ void World::LogStep()
           this->dataPtr->logPlayState.SetIterations(
             this->dataPtr->iterations + 1);
         }
-  
+
         // Process insertions
         if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
         {
           sdf::ElementPtr modelElem =
             this->dataPtr->logPlayStateSDF->GetElement(
                 "insertions")->GetElement("model");
-  
+
           while (modelElem)
           {
             auto name = modelElem->GetAttribute("name")->GetAsString();
@@ -543,22 +543,22 @@ void World::LogStep()
               ModelPtr model = this->LoadModel(modelElem,
                   this->dataPtr->rootElement);
               model->Init();
-  
+
               // Disabling plugins on playback
               // model->LoadPlugins();
             }
-  
+
             modelElem = modelElem->GetNextElement("model");
           }
         }
-  
+
         // Process deletions
         if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
         {
           sdf::ElementPtr nameElem =
             this->dataPtr->logPlayStateSDF->GetElement(
                 "deletions")->GetElement("name");
-  
+
           while (nameElem)
           {
             transport::requestNoReply(this->GetName(), "entity_delete",
@@ -566,11 +566,11 @@ void World::LogStep()
             nameElem = nameElem->GetNextElement("name");
           }
         }
-  
+
         this->SetState(this->dataPtr->logPlayState);
         this->Update();
       }
-  
+
       if (this->dataPtr->stepInc > 0)
         this->dataPtr->stepInc--;
     }
