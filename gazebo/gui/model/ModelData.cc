@@ -461,9 +461,9 @@ void LinkData::UpdateConfig()
   {
     std::string name = it.first->GetName();
     std::string leafName = name;
-    size_t idx = name.find_last_of("::");
+    size_t idx = name.rfind("::");
     if (idx != std::string::npos)
-      leafName = name.substr(idx+1);
+      leafName = name.substr(idx+2);
     visualConfig->SetGeometry(leafName, it.first->GetGeometrySize(),
         it.first->GetMeshName());
 
@@ -493,9 +493,9 @@ void LinkData::UpdateConfig()
   {
     std::string name = colIt.first->GetName();
     std::string leafName = name;
-    size_t idx = name.find_last_of("::");
+    size_t idx = name.rfind("::");
     if (idx != std::string::npos)
-      leafName = name.substr(idx+1);
+      leafName = name.substr(idx+2);
     collisionConfig->SetGeometry(leafName, colIt.first->GetGeometrySize(),
         colIt.first->GetMeshName());
 
@@ -516,9 +516,9 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
 
   std::string visName = _visual->GetName();
   std::string leafName = visName;
-  size_t idx = visName.find_last_of("::");
+  size_t idx = visName.rfind("::");
   if (idx != std::string::npos)
-    leafName = visName.substr(idx+1);
+    leafName = visName.substr(idx+2);
 
   visualConfig->AddVisual(leafName, &visualMsg);
 }
@@ -534,9 +534,9 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis)
 
   std::string visName = _collisionVis->GetName();
   std::string leafName = visName;
-  size_t idx = visName.find_last_of("::");
+  size_t idx = visName.rfind("::");
   if (idx != std::string::npos)
-    leafName = visName.substr(idx+1);
+    leafName = visName.substr(idx+2);
 
   msgs::Collision collisionMsg;
   collisionMsg.set_name(leafName);
@@ -573,8 +573,8 @@ LinkData* LinkData::Clone(const std::string &_newName)
   for (auto &visIt : this->visuals)
   {
     std::string newVisName = visIt.first->GetName();
-    size_t idx = newVisName.find_last_of("::");
-    std::string leafName = newVisName.substr(idx+1);
+    size_t idx = newVisName.rfind("::");
+    std::string leafName = newVisName.substr(idx+2);
     if (idx != std::string::npos)
       newVisName = cloneVisName + "::" + leafName;
     else
@@ -597,8 +597,8 @@ LinkData* LinkData::Clone(const std::string &_newName)
   for (auto &colIt : this->collisions)
   {
     std::string newColName = colIt.first->GetName();
-    size_t idx = newColName.find_last_of("::");
-    std::string leafName = newColName.substr(idx+1);
+    size_t idx = newColName.rfind("::");
+    std::string leafName = newColName.substr(idx+2);
     if (idx != std::string::npos)
       newColName = cloneVisName + "::" + leafName;
     else
@@ -665,9 +665,9 @@ bool LinkData::Apply()
     {
       std::string name = it.first->GetName();
       std::string leafName = name;
-      size_t idx = name.find_last_of("::");
+      size_t idx = name.rfind("::");
       if (idx != std::string::npos)
-        leafName = name.substr(idx+1);
+        leafName = name.substr(idx+2);
       msgs::Visual *updateMsg = visualConfig->GetData(leafName);
       if (updateMsg)
       {
@@ -798,9 +798,9 @@ bool LinkData::Apply()
     {
       std::string name = it.first->GetName();
       std::string leafName = name;
-      size_t idx = name.find_last_of("::");
+      size_t idx = name.rfind("::");
       if (idx != std::string::npos)
-        leafName = name.substr(idx+1);
+        leafName = name.substr(idx+2);
       msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
       if (updateMsg)
       {

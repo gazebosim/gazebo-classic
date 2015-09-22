@@ -803,9 +803,9 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   std::string linkName = link->linkVisual->GetName();
 
   std::string leafName = linkName;
-  size_t idx = linkName.find_last_of("::");
+  size_t idx = linkName.rfind("::");
   if (idx != std::string::npos)
-    leafName = linkName.substr(idx+1);
+    leafName = linkName.substr(idx+2);
 
   link->SetName(leafName);
 
@@ -846,9 +846,9 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
   }
 
   std::string leafName = newName;
-  size_t idx = newName.find_last_of("::");
+  size_t idx = newName.rfind("::");
   if (idx != std::string::npos)
-    leafName = newName.substr(idx+1);
+    leafName = newName.substr(idx+2);
   LinkData *link = it->second->Clone(leafName);
 
   this->allLinks[newName] = link;
@@ -2039,9 +2039,9 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   for (auto linksIt : this->allLinks)
   {
     std::string linkName;
-    size_t pos = _name.find_last_of("::");
+    size_t pos = _name.rfind("::");
     if (pos != std::string::npos)
-      linkName = _name.substr(0, pos-1);
+      linkName = _name.substr(0, pos);
     if (_name == linksIt.first || linkName == linksIt.first)
     {
       this->linkScaleUpdate[linksIt.first] = _scale;
