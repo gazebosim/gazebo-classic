@@ -223,7 +223,8 @@ void Visual::Fini()
   if (this->dataPtr->parent)
     this->dataPtr->parent->DetachVisual(this->GetName());
 
-  if (this->dataPtr->sceneNode)
+  if (this->dataPtr->sceneNode &&
+      this->dataPtr->scene->GetManager()->hasSceneNode(this->GetName()))
   {
     this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
     this->DestroyAllChildSceneNodes(this->dataPtr->sceneNode);
@@ -235,6 +236,7 @@ void Visual::Fini()
   }
 
   this->dataPtr->scene.reset();
+  this->dataPtr->lines.clear();
 }
 
 /////////////////////////////////////////////////

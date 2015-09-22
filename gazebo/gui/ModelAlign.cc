@@ -76,10 +76,17 @@ void ModelAlign::Init()
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (!cam)
+  {
+    std::cerr << "No active camera\n";
+    gzerr << "Unable to get user camera pointer\n";
     return;
+  }
 
   if (!cam->GetScene())
+  {
+    gzerr << "Unable to get scene pointer\n";
     return;
+  }
 
   this->dataPtr->userCamera = cam;
   this->dataPtr->scene = cam->GetScene();
@@ -194,6 +201,12 @@ void ModelAlign::AlignVisuals(const std::vector<std::string> &_visualNames,
     const std::string &_axis, const std::string &_config,
     const std::string &_target, bool _publish)
 {
+  if (!this->dataPtr->scene)
+  {
+    gzerr << "Invalid scene pointer, unable to align visuals.\n";
+    return;
+  }
+
   if (_config == "reset" || _publish)
   {
     std::map<std::string, math::Pose>::iterator it =

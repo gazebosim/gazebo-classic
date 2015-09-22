@@ -64,7 +64,7 @@ SonarVisual::~SonarVisual()
   SonarVisualPrivate *dPtr =
       reinterpret_cast<SonarVisualPrivate *>(this->dataPtr);
 
-  delete dPtr->sonarRay;
+  this->DeleteDynamicLine(dPtr->sonarRay);
   dPtr->sonarRay = NULL;
 }
 

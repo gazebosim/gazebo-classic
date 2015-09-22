@@ -140,4 +140,6 @@ void ArrowVisual::SetVisible(bool _visible, bool _cascade)
   dPtr->shaftNode->setVisible(dPtr->shaftNodeVisible && _visible, _cascade);
   dPtr->rotationNode->setVisible(
       dPtr->rotationNodeVisible && _visible, _cascade);
+
+  this->dataPtr->visible = _visible;
 }

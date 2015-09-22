@@ -60,7 +60,6 @@ Light::~Light()
 
   if (this->visual)
   {
-    this->visual->DeleteDynamicLine(this->line);
     this->scene->RemoveVisual(this->visual);
     this->visual.reset();
   }

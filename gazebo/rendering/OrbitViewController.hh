@@ -37,7 +37,8 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _camera Pointer to the camera to control.
-      public: OrbitViewController(UserCameraPtr _camera);
+      public: OrbitViewController(UserCameraPtr _camera,
+                  const std::string &_name = "OrbitViewController");
 
       /// \brief Destructor.
       public: virtual ~OrbitViewController();

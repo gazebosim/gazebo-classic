@@ -44,8 +44,45 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
 
+    /// \internal
+    /// \brief Movable text factory used by the Ogre Scene Manager to create
+    /// and destroy MovableText objects.
+    class MovableTextFactory : public Ogre::MovableObjectFactory
+    {
+      /// \brief Constructor
+      public: MovableTextFactory();
+
+      /// \brief Destructor
+      public: virtual ~MovableTextFactory();
+
+      /// \brief Gets the type flag for this factory.
+      /// \return The type flag for this factory.
+      public: const Ogre::String &getType() const;
+
+      /// \brief Destroy an instance of the object.
+      /// \param[in] _obj Pointer to the object that should be destroyed
+      public: void destroyInstance(Ogre::MovableObject *_obj);
+
+      /// \brief Create a new instance of the object.
+      /// \param[in] _name The name of the new object
+      /// \param[in] _params Name/value pair list of additional parameters
+      /// required to construct the object (defined per subtype).
+      protected: Ogre::MovableObject *createInstanceImpl(
+                     const Ogre::String &_name,
+                     const Ogre::NameValuePairList *_params);
+
+      /// \brief The name of the factory
+      private: const Ogre::String name = "MovableText";
+    };
+
     /// \class MovableText MovableText.hh rendering/rendering.hh
-    /// \brief Movable text
+    /// \brief Movable text. Example instantiation:
+    ///
+    /// Ogre::SceneManager *manager;
+    /// MovableText *text = static_cast<MovableText*>(
+    ///       manager->createMovableObject(
+    ///         "_UNIQUE_NAME_OF_THE_OBJECT_", "MovableText"));
+    /// text->Load(...);
     class GZ_RENDERING_VISIBLE MovableText
       : public Ogre::MovableObject, public Ogre::Renderable
     {

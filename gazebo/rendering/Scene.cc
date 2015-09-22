@@ -18,6 +18,7 @@
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/MovableText.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -222,12 +223,20 @@ void Scene::Clear()
       this->RemoveLight(this->dataPtr->lights.begin()->second);
   this->dataPtr->lights.clear();
 
-  // Remove the root of the visual tree. This will recursively remove all
-  // visuals.
+  // Remove the root of the visual tree. This will recursively remove most
+  // of the visuals.
   if (this->dataPtr->worldVisual)
   {
     this->dataPtr->worldVisual->Fini();
     this->dataPtr->worldVisual.reset();
+    this->dataPtr->visuals.erase(this->dataPtr->visuals.begin());
+  }
+
+  // Remove any remaining visuals.
+  for (auto &visual : this->dataPtr->visuals)
+  {
+    this->RemoveVisualizations(visual.second);
+    visual.second->Fini();
   }
   this->dataPtr->visuals.clear();
 
@@ -285,6 +294,8 @@ void Scene::Load()
 {
   this->dataPtr->initialized = false;
   Ogre::Root *root = RenderEngine::Instance()->root;
+
+  root->addMovableObjectFactory(new MovableTextFactory());
 
   if (this->dataPtr->manager)
     root->destroySceneManager(this->dataPtr->manager);
