@@ -63,6 +63,13 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   double contactMaxCorrectingVel = 50;
   double contactSurfaceLayer = 0.02;
 
+  double contactResidualSmoothing = 0.1;
+  double contactSorScale = 1.0;
+  bool threadPositionCorrection = true;
+  bool experimentalRowReordering = true;
+  double warmStartFactor = 1.0;
+  int extraFrictionIterations = 15;
+
   // test setting/getting physics engine params
   EXPECT_TRUE(odePhysics->SetParam("solver_type", type));
   EXPECT_TRUE(odePhysics->SetParam("precon_iters", preconIters));
@@ -74,6 +81,18 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
                                     contactMaxCorrectingVel));
   EXPECT_TRUE(odePhysics->SetParam("contact_surface_layer",
                                     contactSurfaceLayer));
+  EXPECT_TRUE(odePhysics->SetParam("contact_residual_smoothing",
+                                    contactResidualSmoothing)
+  EXPECT_TRUE(odePhysics->SetParam("contact_sor_scale",
+                                    contactSorScale)
+  EXPECT_TRUE(odePhysics->SetParam("thread_position_correction",
+                                    threadPositionCorrection)
+  EXPECT_TRUE(odePhysics->SetParam("experimental_row_reordering",
+                                    experimentalRowReordering)
+  EXPECT_TRUE(odePhysics->SetParam("warm_start_factor",
+                                    warmStartFactor)
+  EXPECT_TRUE(odePhysics->SetParam("extra_friction_iterations",
+                                    extraFrictionIterations)
 
   boost::any value;
   value = odePhysics->GetParam("solver_type");
@@ -100,6 +119,24 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   value = odePhysics->GetParam("contact_surface_layer");
   double contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
+  value = odePhysics->GetParam("contact_residual_smoothing");
+  double contactResidualSmoothingRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(contactResidualSmoothing, contactResidualSmoothingRet);
+  value = odePhysics->GetParam("contact_sor_scale");
+  double contactSorScaleRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(contactSorScale, contactSorScaleRet);
+  value = odePhysics->GetParam("thread_position_correction");
+  double threadPositionCorrectionRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(threadPositionCorrection, threadPositionCorrectionRet);
+  value = odePhysics->GetParam("experimental_row_reordering");
+  double experimentalRowReorderingRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(experimentalRowReordering, experimentalRowReorderingRet);
+  value = odePhysics->GetParam("warm_start_factor");
+  double warmStartFactorRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(warmStartFactor, warmStartFactorRet);
+  value = odePhysics->GetParam("extra_friction_iterations");
+  double extraFrictionIterationsRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(extraFrictionIterations, extraFrictionIterationsRet);
 
   // verify against equivalent functions
   EXPECT_EQ(type, odePhysics->GetStepType());
