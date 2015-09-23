@@ -34,18 +34,20 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   // test extrusion of a path with two subpaths:
   // a smaller square inside a bigger square.
   // The smaller square should be treated as a hole inside the bigger square.
-  std::vector<std::vector<math::Vector2d> > path;
-  std::vector<math::Vector2d> subpath01;
-  subpath01.push_back(math::Vector2d(0, 0));
-  subpath01.push_back(math::Vector2d(1, 0));
-  subpath01.push_back(math::Vector2d(1, 1));
-  subpath01.push_back(math::Vector2d(0, 1));
+  std::vector<std::vector<ignition::math::Vector2d> > path;
+  std::vector<ignition::math::Vector2d> subpath01;
+  subpath01.push_back(ignition::math::Vector2d(0, 0));
+  subpath01.push_back(ignition::math::Vector2d(1, 0));
+  subpath01.push_back(ignition::math::Vector2d(1, 1));
+  subpath01.push_back(ignition::math::Vector2d(0, 1));
+  subpath01.push_back(ignition::math::Vector2d(0, 0));
 
-  std::vector<math::Vector2d> subpath02;
-  subpath02.push_back(math::Vector2d(0.25, 0.25));
-  subpath02.push_back(math::Vector2d(0.25, 0.75));
-  subpath02.push_back(math::Vector2d(0.75, 0.75));
-  subpath02.push_back(math::Vector2d(0.75, 0.25));
+  std::vector<ignition::math::Vector2d> subpath02;
+  subpath02.push_back(ignition::math::Vector2d(0.25, 0.25));
+  subpath02.push_back(ignition::math::Vector2d(0.25, 0.75));
+  subpath02.push_back(ignition::math::Vector2d(0.75, 0.75));
+  subpath02.push_back(ignition::math::Vector2d(0.75, 0.25));
+  subpath02.push_back(ignition::math::Vector2d(0.25, 0.25));
 
   path.push_back(subpath01);
   path.push_back(subpath02);
@@ -66,20 +68,21 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   // check submesh bounds
   const common::SubMesh *submesh = mesh->GetSubMesh(0);
   EXPECT_TRUE(submesh != NULL);
-  EXPECT_EQ(submesh->GetMin(), math::Vector3(0, 0, 0));
-  EXPECT_EQ(submesh->GetMax(), math::Vector3(1.0, 1.0, 10.0));
+  EXPECT_EQ(ignition::math::Vector3d(0, 0, 0), submesh->Min());
+  EXPECT_EQ(ignition::math::Vector3d(1.0, 1.0, 10.0), submesh->Max());
 
   // check vertices
   for (unsigned int i = 0; i < submesh->GetVertexCount(); ++i)
   {
-    math::Vector3 v = submesh->GetVertex(i);
+    ignition::math::Vector3d v = submesh->Vertex(i);
 
     // check no vertices are in the region of the hole
-    EXPECT_FALSE((v.x > 0.25 && v.x < 0.75));
-    EXPECT_FALSE((v.y > 0.25 && v.y < 0.75));
+    EXPECT_FALSE((v.X() > 0.25 && v.X() < 0.75));
+    EXPECT_FALSE((v.Y() > 0.25 && v.Y() < 0.75));
 
     // check extruded height
-    EXPECT_TRUE((math::equal(v.z, 0.0) || math::equal(v.z, 10.0)));
+    EXPECT_TRUE((ignition::math::equal(v.Z(), 0.0) ||
+          ignition::math::equal(v.Z(), 10.0)));
   }
 
   // verify same number of normals and vertices
@@ -88,36 +91,40 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   // check normals
   for (unsigned int i = 0; i < submesh->GetNormalCount(); ++i)
   {
-    math::Vector3 v = submesh->GetVertex(i);
-    math::Vector3 n = submesh->GetNormal(i);
+    ignition::math::Vector3d v = submesh->Vertex(i);
+    ignition::math::Vector3d n = submesh->Normal(i);
 
     // vertex at 0 could be a bottom face or side face
-    if (math::equal(v.z, 0.0))
+    if (ignition::math::equal(v.Z(), 0.0))
     {
-      if (math::equal(n.z, 0.0))
+      if (ignition::math::equal(n.Z(), 0.0))
       {
         // side face - check non-zero normal
-        EXPECT_TRUE(!(math::equal(n.x, 0.0) && math::equal(n.y, 0.0)));
+        EXPECT_TRUE(!(ignition::math::equal(n.X(), 0.0) &&
+              ignition::math::equal(n.Y(), 0.0)));
       }
       else
       {
         // bottom face - normal in -z direction
-        EXPECT_TRUE((n == -math::Vector3::UnitZ) || (math::equal(n.z, 0.0)));
+        EXPECT_TRUE((n == -ignition::math::Vector3d::UnitZ) ||
+            (ignition::math::equal(n.Z(), 0.0)));
       }
     }
 
     // vertex at height could be a top face or side face
-    if (math::equal(v.z, 10.0))
+    if (ignition::math::equal(v.Z(), 10.0))
     {
-      if (math::equal(n.z, 0.0))
+      if (ignition::math::equal(n.Z(), 0.0))
       {
         // side face - check non-zero normal
-        EXPECT_TRUE(!(math::equal(n.x, 0.0) && math::equal(n.y, 0.0)));
+        EXPECT_TRUE(!(ignition::math::equal(n.X(), 0.0) &&
+              ignition::math::equal(n.Y(), 0.0)));
       }
       else
       {
         // top face - normal in +z direction
-        EXPECT_TRUE((n == math::Vector3::UnitZ) || (math::equal(n.z, 0.0)));
+        EXPECT_TRUE((n == ignition::math::Vector3d::UnitZ) ||
+            (ignition::math::equal(n.Z(), 0.0)));
       }
     }
   }
@@ -129,23 +136,21 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   // test extrusion of a path that has two closed subpaths, i.e.,
   // first and last vertices are the same.
   // The following two subpaths form the letter 'A'.
-  std::vector<std::vector<math::Vector2d> > path2;
-  std::vector<math::Vector2d> subpath03;
-  subpath03.push_back(math::Vector2d(2.27467, 1.0967));
-  subpath03.push_back(math::Vector2d(1.81094, 2.35418));
-  subpath03.push_back(math::Vector2d(2.74009, 2.35418));
-  subpath03.push_back(math::Vector2d(2.27467, 1.0967));
+  std::vector<std::vector<ignition::math::Vector2d> > path2;
+  std::vector<ignition::math::Vector2d> subpath03;
+  subpath03.push_back(ignition::math::Vector2d(2.27467, 1.0967));
+  subpath03.push_back(ignition::math::Vector2d(1.81094, 2.35418));
+  subpath03.push_back(ignition::math::Vector2d(2.74009, 2.35418));
 
-  std::vector<math::Vector2d> subpath04;
-  subpath04.push_back(math::Vector2d(2.08173, 0.7599));
-  subpath04.push_back(math::Vector2d(2.4693, 0.7599));
-  subpath04.push_back(math::Vector2d(3.4323, 3.28672));
-  subpath04.push_back(math::Vector2d(3.07689, 3.28672));
-  subpath04.push_back(math::Vector2d(2.84672, 2.63851));
-  subpath04.push_back(math::Vector2d(1.7077, 2.63851));
-  subpath04.push_back(math::Vector2d(1.47753, 3.28672));
-  subpath04.push_back(math::Vector2d(1.11704, 3.28672));
-  subpath04.push_back(math::Vector2d(2.08173, 0.7599));
+  std::vector<ignition::math::Vector2d> subpath04;
+  subpath04.push_back(ignition::math::Vector2d(2.08173, 0.7599));
+  subpath04.push_back(ignition::math::Vector2d(2.4693, 0.7599));
+  subpath04.push_back(ignition::math::Vector2d(3.4323, 3.28672));
+  subpath04.push_back(ignition::math::Vector2d(3.07689, 3.28672));
+  subpath04.push_back(ignition::math::Vector2d(2.84672, 2.63851));
+  subpath04.push_back(ignition::math::Vector2d(1.7077, 2.63851));
+  subpath04.push_back(ignition::math::Vector2d(1.47753, 3.28672));
+  subpath04.push_back(ignition::math::Vector2d(1.11704, 3.28672));
 
   path2.push_back(subpath03);
   path2.push_back(subpath04);
@@ -166,28 +171,32 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   // check submesh bounds
   const common::SubMesh *submesh = mesh->GetSubMesh(0);
   EXPECT_TRUE(submesh != NULL);
-  EXPECT_EQ(submesh->GetMin(), math::Vector3(1.11704, 0.7599, 0));
-  EXPECT_EQ(submesh->GetMax(), math::Vector3(3.4323, 3.28672, 2.0));
+  EXPECT_EQ(submesh->Min(), ignition::math::Vector3d(1.11704, 0.7599, 0));
+  EXPECT_EQ(submesh->Max(), ignition::math::Vector3d(3.4323, 3.28672, 2.0));
 
   for (unsigned int i = 0; i < submesh->GetVertexCount(); ++i)
   {
-    math::Vector3 v = submesh->GetVertex(i);
+    ignition::math::Vector3d v = submesh->Vertex(i);
 
     // check no vertices are in the region of the hole using a point-in-polygon
     // algorithm
     bool pointInPolygon = false;
     for (unsigned int j = 0, k = subpath03.size()-1; j < subpath03.size();
-        k = j++)
+        k = ++j)
     {
-      if ( ((subpath03[j].y > v.y) != (subpath03[k].y > v.y)) &&
-         (v.x < (subpath03[k].x-subpath03[j].x) * (v.y-subpath03[j].y) /
-         (subpath03[k].y-subpath03[j].y) + subpath03[j].x) )
+      if (((subpath03[j].Y() > v.Y()) != (subpath03[k].Y() > v.Y())) &&
+          (v.X() < (subpath03[k].X()-subpath03[j].X()) *
+           (v.Y()-subpath03[j].Y()) /
+         (subpath03[k].Y()-subpath03[j].Y()) + subpath03[j].X()) )
+      {
        pointInPolygon = !pointInPolygon;
+      }
     }
     EXPECT_FALSE(pointInPolygon);
 
     // check extruded height
-    EXPECT_TRUE((math::equal(v.z, 0.0) || math::equal(v.z, 2.0)));
+    EXPECT_TRUE((ignition::math::equal(v.Z(), 0.0) ||
+          ignition::math::equal(v.Z(), 2.0)));
   }
 
   // verify same number of normals and vertices
@@ -196,36 +205,40 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   // check normals
   for (unsigned int i = 0; i < submesh->GetNormalCount(); ++i)
   {
-    math::Vector3 v = submesh->GetVertex(i);
-    math::Vector3 n = submesh->GetNormal(i);
+    ignition::math::Vector3d v = submesh->Vertex(i);
+    ignition::math::Vector3d n = submesh->Normal(i);
 
     // vertex at 0 could be a bottom face or side face
-    if (math::equal(v.z, 0.0))
+    if (ignition::math::equal(v.Z(), 0.0))
     {
-      if (math::equal(n.z, 0.0))
+      if (ignition::math::equal(n.Z(), 0.0))
       {
         // side face - check non-zero normal
-        EXPECT_TRUE(!(math::equal(n.x, 0.0) && math::equal(n.y, 0.0)));
+        EXPECT_TRUE(!(ignition::math::equal(n.X(), 0.0) &&
+                      ignition::math::equal(n.Y(), 0.0)));
       }
       else
       {
         // bottom face - normal in -z direction
-        EXPECT_TRUE((n == -math::Vector3::UnitZ) || (math::equal(n.z, 0.0)));
+        EXPECT_TRUE((n == -ignition::math::Vector3d::UnitZ) ||
+                    (ignition::math::equal(n.Z(), 0.0)));
       }
     }
 
     // vertex at height could be a top face or side face
-    if (math::equal(v.z, 10.0))
+    if (ignition::math::equal(v.Z(), 10.0))
     {
-      if (math::equal(n.z, 0.0))
+      if (ignition::math::equal(n.Z(), 0.0))
       {
         // side face - check non-zero normal
-        EXPECT_TRUE(!(math::equal(n.x, 0.0) && math::equal(n.y, 0.0)));
+        EXPECT_TRUE(!(ignition::math::equal(n.X(), 0.0) &&
+                      ignition::math::equal(n.Y(), 0.0)));
       }
       else
       {
         // top face - normal in +z direction
-        EXPECT_TRUE((n == math::Vector3::UnitZ) || (math::equal(n.z, 0.0)));
+        EXPECT_TRUE((n == ignition::math::Vector3d::UnitZ) ||
+                    (ignition::math::equal(n.Z(), 0.0)));
       }
     }
   }

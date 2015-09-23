@@ -137,7 +137,6 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       info->cfm[2] = cfm;
       info->cfm[3] = cfm;
       info->cfm[4] = cfm;
-      info->cfm[5] = cfm;
     }
 
     // constraint rows 1 to 3
@@ -331,9 +330,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       // info->J1a[s1+0] = -1;
       // info->J1a[s1+1] = 0;
       // info->J1a[s1+2] = 0;
-      // printf("screw err lin[%f], ang[%f], diff[%f] [%d] tp[%f]\n",
-      //   thread_pitch*lin_disp, cumulative_angle, lin_err,
-      //   (int)this->use_damping, thread_pitch);
+      // printf("screw err lin[%f], ang[%f], diff[%f] tp[%f]\n",
+      //   thread_pitch*lin_disp, cumulative_angle, lin_err, thread_pitch);
 
       // compute last two elements of right hand side. we want to align the offset
       // point (in body 2's frame) with the center of body 1.
@@ -387,25 +385,6 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
       // uncommnet to enforce slider joint limit
       // limot.addLimot ( this, info, 5, ax1, 0 );
-
-      /* comment out linear damping, use only rotation damping
-      // linear joint damping
-      if (this->use_damping)
-      {
-        // added J1ld and J2ld for damping, only 1 row
-        info->J1ld[0] = ax1[0];
-        info->J1ld[1] = ax1[1];
-        info->J1ld[2] = ax1[2];
-        if ( this->node[1].body )
-        {
-          info->J2ld[0] = -ax1[0];
-          info->J2ld[1] = -ax1[1];
-          info->J2ld[2] = -ax1[2];
-        }
-        // there's no rhs for damping setup, all we want to use is the
-        // jacobian information above
-      }
-      */
     }
 
     // constraint rows 4 and 5
@@ -477,23 +456,6 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
       // enforcing rotation joint limit
       limot.addLimot( this, info, 5, ax1, 1 );
-
-      // rotational joint damping
-      if (this->use_damping)
-      {
-        // added J1ad and J2ad for damping, only 1 row
-        info->J1ad[0] = ax1[0];
-        info->J1ad[1] = ax1[1];
-        info->J1ad[2] = ax1[2];
-        if ( this->node[1].body )
-        {
-          info->J2ad[0] = -ax1[0];
-          info->J2ad[1] = -ax1[1];
-          info->J2ad[2] = -ax1[2];
-        }
-        // there's no rhs for damping setup, all we want to use is
-        // the jacobian information above
-      }
     }
 }
 

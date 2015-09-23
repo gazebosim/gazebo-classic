@@ -52,7 +52,18 @@ namespace gazebo
       /// Each element in the outer vector consists of a vector of vertices that
       /// describe one polyline.
       /// \sa SetVertices
-      public: std::vector<std::vector<math::Vector2d> > GetVertices() const;
+      /// \deprecated See Vertices function that returns an array of
+      /// ignition::math::Vector2d objects.
+      public: std::vector<std::vector<math::Vector2d> > GetVertices() const
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the vertices of the polylines
+      /// \return A multidimensional vector of polylines and their vertices.
+      /// Each element in the outer vector consists of a vector of vertices that
+      /// describe one polyline.
+      /// \sa SetVertices
+      public: std::vector<std::vector<ignition::math::Vector2d> >
+              Vertices() const;
 
       /// \brief Get the height of the polylines.
       /// \return The height of the polylines.
@@ -77,8 +88,22 @@ namespace gazebo
       /// \param[in] _vertices A multidimensional vector of polylines and their
       /// vertices. Each element in the outer vector consists of a vector of
       /// vertices that describe one polyline.
+      /// \deprecated See SetVertices function that accepts an
+      /// ignition::math::Vector2d object.
       private: virtual void SetVertices(
-                  const std::vector<std::vector<math::Vector2d> > &_vertices);
+                   const std::vector<std::vector<math::Vector2d> > &_vertices)
+                   GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set the vertices of the polylines. The polylines are assumed
+      /// to be closed and non-intersecting. If there is more than one polyline,
+      /// a ray casting algorithm will be used to identify the
+      /// exterior/interior edges and remove the holes in the shape.
+      /// \param[in] _vertices A multidimensional vector of polylines and their
+      /// vertices. Each element in the outer vector consists of a vector of
+      /// vertices that describe one polyline.
+      private: virtual void SetVertices(
+                   const std::vector<std::vector<ignition::math::Vector2d> >
+                   &_vertices);
 
       /// \brief Set the vertices of the polyline
       /// \param[in] _msg geometry msg containing the vertex information
@@ -88,8 +113,19 @@ namespace gazebo
       /// \param[in] _height Height of the polygon
       /// \param[in] _vertices std::vector<math::Vector2d>
       /// containing the vertex information
+      /// \deprecated See SetPolylineShape that accepts an
+      /// ignition::math::Vector2d object.
       private: void SetPolylineShape(const double &_height,
-                  const std::vector<std::vector<math::Vector2d> > &_vertices);
+                  const std::vector<std::vector<math::Vector2d> > &_vertices)
+               GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set the parameters of polyline shape
+      /// \param[in] _height Height of the polygon
+      /// \param[in] _vertices std::vector<math::Vector2d>
+      /// containing the vertex information
+      private: void SetPolylineShape(const double &_height,
+                  const std::vector<std::vector<ignition::math::Vector2d> >
+                  &_vertices);
 
       /// \brief Set the height of the polylines. The same height value is set
       /// for all polylines.

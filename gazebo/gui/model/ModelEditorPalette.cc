@@ -178,15 +178,23 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelTreeWidget->setVerticalScrollMode(
       QAbstractItemView::ScrollPerPixel);
 
+  // Model Plugins
+  this->modelPluginsItem = new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+      QStringList(QString("%1").arg(tr("Model Plugins"))));
+  this->modelPluginsItem->setData(0, Qt::UserRole,
+      QVariant(tr("Model Plugins")));
+  QFont headerFont = this->modelPluginsItem->font(0);
+  headerFont.setBold(true);
+  headerFont.setPointSize(1.0 * headerFont.pointSize());
+  this->modelPluginsItem->setFont(0, headerFont);
+  this->modelTreeWidget->addTopLevelItem(this->modelPluginsItem);
+
   // Links
   this->linksItem = new QTreeWidgetItem(
       static_cast<QTreeWidgetItem *>(0),
       QStringList(QString("%1").arg(tr("Links"))));
   this->linksItem->setData(0, Qt::UserRole, QVariant(tr("Links")));
-  QFont linksFont = this->linksItem->font(0);
-  linksFont.setBold(true);
-  linksFont.setPointSize(1.1 * linksFont.pointSize());
-  this->linksItem->setFont(0, linksFont);
+  this->linksItem->setFont(0, headerFont);
   this->modelTreeWidget->addTopLevelItem(this->linksItem);
 
   // Joints
@@ -194,7 +202,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       static_cast<QTreeWidgetItem*>(0),
       QStringList(QString("%1").arg(tr("Joints"))));
   this->jointsItem->setData(0, Qt::UserRole, QVariant(tr("Joints")));
-  this->jointsItem->setFont(0, linksFont);
+  this->jointsItem->setFont(0, headerFont);
   this->modelTreeWidget->addTopLevelItem(this->jointsItem);
 
   connect(this->modelTreeWidget,
@@ -268,12 +276,20 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       boost::bind(&ModelEditorPalette::OnJointInserted, this, _1, _2, _3, _4)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectModelPluginInserted(
+      boost::bind(&ModelEditorPalette::OnModelPluginInserted, this, _1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
       boost::bind(&ModelEditorPalette::OnLinkRemoved, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointRemoved(
       boost::bind(&ModelEditorPalette::OnJointRemoved, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectModelPluginRemoved(
+      boost::bind(&ModelEditorPalette::OnModelPluginRemoved, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointNameChanged(
@@ -290,6 +306,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
        boost::bind(&ModelEditorPalette::OnSetSelectedJoint, this, _1, _2)));
+
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedModelPlugin(
+     boost::bind(&ModelEditorPalette::OnSetSelectedModelPlugin, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
@@ -476,6 +496,8 @@ void ModelEditorPalette::OnItemSelectionChanged()
       gui::model::Events::setSelectedLink(name, true);
     else if (type == "Joint")
       gui::model::Events::setSelectedJoint(name, true);
+    else if (type == "Model Plugin")
+      gui::model::Events::setSelectedModelPlugin(name, true);
   }
 
   // deselect
@@ -490,6 +512,8 @@ void ModelEditorPalette::OnItemSelectionChanged()
         gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
+    else if (type == "Model Plugin")
+      gui::model::Events::setSelectedModelPlugin(name, false);
     }
   }
 
@@ -547,6 +571,8 @@ void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
       gui::model::Events::openLinkInspector(name);
     else if (type == "Joint")
       gui::model::Events::openJointInspector(name);
+    else if (type == "Model Plugin")
+      gui::model::Events::openModelPluginInspector(name);
   }
 }
 
@@ -588,6 +614,8 @@ void ModelEditorPalette::DeselectType(const std::string &_type)
         gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
+      else if (type == "Model Plugin")
+        gui::model::Events::setSelectedModelPlugin(name, false);
     }
     else
       ++it;
@@ -613,6 +641,8 @@ void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
       gui::model::Events::showLinkContextMenu(name);
     else if (type == "Joint")
       gui::model::Events::showJointContextMenu(name);
+    else if (type == "Model Plugin")
+      gui::model::Events::showModelPluginContextMenu(name);
   }
 }
 
@@ -655,6 +685,21 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
 }
 
 /////////////////////////////////////////////////
+void ModelEditorPalette::OnModelPluginInserted(
+    const std::string &_modelPluginName)
+{
+  QTreeWidgetItem *newModelPluginItem = new QTreeWidgetItem(
+      this->modelPluginsItem, QStringList(QString("%1").arg(
+      QString::fromStdString(_modelPluginName))));
+
+  newModelPluginItem->setData(0, Qt::UserRole, _modelPluginName.c_str());
+  newModelPluginItem->setData(1, Qt::UserRole, "Model Plugin");
+  this->modelTreeWidget->addTopLevelItem(newModelPluginItem);
+
+  this->modelPluginsItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
 void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
@@ -693,6 +738,26 @@ void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 }
 
 /////////////////////////////////////////////////
+void ModelEditorPalette::OnModelPluginRemoved(const std::string &_pluginId)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->modelPluginsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->modelPluginsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _pluginId)
+    {
+      this->modelPluginsItem->takeChild(this->modelPluginsItem->indexOfChild(
+          item));
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelEditorPalette::ClearModelTree()
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
@@ -700,6 +765,8 @@ void ModelEditorPalette::ClearModelTree()
   this->linksItem->takeChildren();
   // Remove all joints
   this->jointsItem->takeChildren();
+  // Remove all model plugins
+  this->modelPluginsItem->takeChildren();
 }
 
 /////////////////////////////////////////////////
@@ -750,6 +817,26 @@ void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->jointsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _name)
+    {
+      item->setSelected(_selected);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSetSelectedModelPlugin(const std::string &_name,
+    bool _selected)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->modelPluginsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->modelPluginsItem->child(i);
     if (!item)
       continue;
     std::string listData = item->data(0, Qt::UserRole).toString().toStdString();

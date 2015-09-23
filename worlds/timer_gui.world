@@ -32,6 +32,7 @@
         <reset_button>1</reset_button>
         <countdown_time>5 5000</countdown_time>
       </plugin>
+    </gui>
 
     <!-- A global light source -->
     <include>

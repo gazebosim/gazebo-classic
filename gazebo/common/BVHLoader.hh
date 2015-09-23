@@ -14,14 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef BVHLOADER_HH
-#define BVHLOADER_HH
+#ifndef _GAZEBO_BVHLOADER_HH_
+#define _GAZEBO_BVHLOADER_HH_
 
-#include <vector>
-#include <map>
 #include <string>
 
-#include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 
 #define X_POSITION 0

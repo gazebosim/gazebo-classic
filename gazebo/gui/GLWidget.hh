@@ -22,6 +22,8 @@
 #include <utility>
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -35,10 +37,6 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/gui/BoxMaker.hh"
-#include "gazebo/gui/SphereMaker.hh"
-#include "gazebo/gui/CylinderMaker.hh"
-#include "gazebo/gui/MeshMaker.hh"
 #include "gazebo/gui/ModelMaker.hh"
 #include "gazebo/gui/LightMaker.hh"
 #include "gazebo/util/system.hh"
@@ -47,7 +45,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE GLWidget : public QWidget
+    class GZ_GUI_VISIBLE GLWidget : public QWidget
     {
       Q_OBJECT
 
@@ -73,6 +71,10 @@ namespace gazebo
       public: rendering::ScenePtr GetScene() const;
 
       public: void Clear();
+
+      /// \brief Returns the list of selected visuals.
+      /// \return List with pointers to selected visuals.
+      public: std::vector<rendering::VisualPtr> SelectedVisuals() const;
 
       signals: void clicked();
 
@@ -209,6 +211,20 @@ namespace gazebo
       /// \brief QT Callback that turns on perspective projection
       private slots: void OnPerspective();
 
+      /// \brief Set this->mouseEvent's Buttons property to the value of
+      /// _event->buttons(). Note that this is different from the
+      /// SetMouseEventButtons, plural, function.
+      /// \sa SetMouseEventButtons
+      /// \param[in] _button The QT mouse button
+      private: void SetMouseEventButton(const Qt::MouseButton &_button);
+
+      /// \brief Set this->mouseEvent's Button property to the value of
+      /// _event->button(). Note that this is different from the
+      /// SetMouseEventButton, singular, function.
+      /// \sa SetMouseEventButton
+      /// \param[in] _button The QT mouse buttons
+      private: void SetMouseEventButtons(const Qt::MouseButtons &_buttons);
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
@@ -221,14 +237,19 @@ namespace gazebo
 
       private: std::vector<event::ConnectionPtr> connections;
 
+      /// \brief Pointer to the current maker.
       private: EntityMaker *entityMaker;
-      private: BoxMaker boxMaker;
-      private: SphereMaker sphereMaker;
-      private: CylinderMaker cylinderMaker;
-      private: MeshMaker meshMaker;
+
+      /// \brief Model maker.
       private: ModelMaker modelMaker;
+
+      /// \brief Point light maker
       private: PointLightMaker pointLightMaker;
+
+      /// \brief Spot light maker
       private: SpotLightMaker spotLightMaker;
+
+      /// \brief Directional light maker
       private: DirectionalLightMaker directionalLightMaker;
 
       /// \brief Light maker

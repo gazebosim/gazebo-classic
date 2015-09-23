@@ -1,8 +1,8 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Joint 
-/// \brief Message for creating joint in rendering::Scene
+/// \interface Joint
+/// \brief Message for creating joint
 
 
 import "axis.proto";
@@ -11,6 +11,22 @@ import "sensor.proto";
 
 message Joint
 {
+
+  message Gearbox
+  {
+    /// \brief Gearbox joint reference body link
+    required string gearbox_reference_body = 1;
+
+    /// \brief Gearbox ratio.
+    required double gearbox_ratio = 2;
+  }
+
+  message Screw
+  {
+    /// \brief Screw joint thread pitch.
+    required double thread_pitch = 1;
+  }
+
   enum Type
   {
     REVOLUTE  = 1;
@@ -20,6 +36,7 @@ message Joint
     BALL      = 5;
     SCREW     = 6;
     GEARBOX   = 7;
+    FIXED     = 8;
   }
 
   required string name           = 1;
@@ -43,5 +60,8 @@ message Joint
   optional double suspension_cfm = 18;
   optional double suspension_erp = 19;
 
-  repeated Sensor sensor         = 20;
+  optional Gearbox gearbox       = 20;
+  optional Screw screw           = 21;
+
+  repeated Sensor sensor         = 22;
 }

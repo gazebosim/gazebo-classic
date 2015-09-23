@@ -22,8 +22,12 @@
 #include <vector>
 #include <list>
 
+#include <boost/thread/mutex.hpp>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -37,13 +41,14 @@ namespace gazebo
 {
   namespace gui
   {
+    class InsertModelWidget;
     class RenderWidget;
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
     class SpaceNav;
 
-    class GAZEBO_VISIBLE MainWindow : public QMainWindow
+    class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
 
@@ -124,7 +129,6 @@ namespace gazebo
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
-      private slots: void Import();
       private slots: void Save();
       private slots: void SaveAs();
 
@@ -134,8 +138,15 @@ namespace gazebo
       /// \brief Clone a simulation.
       private slots: void Clone();
 
+      /// \brief Qt callback when the hotkey chart is triggered,
+      private slots: void HotkeyChart();
+
+      /// \brief Qt callback when about is triggered,
       private slots: void About();
+
       private slots: void Step();
+
+      /// \brief Qt callback when the arrow mode is triggered.
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -188,7 +199,8 @@ namespace gazebo
       /// \brief Qt callback when the show inertia action is triggered.
       private slots: void ShowInertia();
 
-      private slots: void Reset();
+      /// \brief Qt callback when the show link frame action is triggered.
+      private slots: void ShowLinkFrame();
 
       /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
@@ -209,6 +221,9 @@ namespace gazebo
 
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
+
+      /// \brief QT callback when the data logger is shut down.
+      private slots: void OnDataLoggerClosed();
 
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
@@ -274,6 +289,10 @@ namespace gazebo
       /// \param[in, out] _act Action that receives the icon.
       private: void CreateDisabledIcon(const std::string &_pixmap,
                    QAction *_act);
+
+      /// \brief Callback when window mode has changed.
+      /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
+      private: void OnWindowMode(const std::string &_mode);
 
       private: QToolBar *playToolbar;
 
@@ -350,6 +369,15 @@ namespace gazebo
 
       /// \brief Splitter for the main window.
       private: QSplitter *splitter;
+
+      /// \brief Data logger dialog.
+      private: gui::DataLogger *dataLogger;
+
+      /// \brief Hotkey chart dialog.
+      private: gui::HotkeyDialog *hotkeyDialog;
+
+      /// \brief Tab to insert models.
+      private: InsertModelWidget *insertModel;
     };
   }
 }

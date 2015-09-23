@@ -229,8 +229,10 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find TBB
   pkg_check_modules(TBB tbb)
+  set (TBB_PKG_CONFIG "tbb")
   if (NOT TBB_FOUND)
     message(STATUS "TBB not found, attempting to detect manually")
+    set (TBB_PKG_CONFIG "")
 
     find_library(tbb_library tbb ENV LD_LIBRARY_PATH)
     if (tbb_library)
@@ -474,7 +476,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 3.0.4)
+set (SDFormat_MIN_VERSION 3.1.1)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
@@ -486,7 +488,7 @@ endif()
 
 ########################################
 # Find QT
-find_package (Qt4)
+find_package(Qt4 COMPONENTS QtWebKit QtCore QtGui QtXml QtXmlPatterns REQUIRED)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()
@@ -600,13 +602,16 @@ else ()
 endif ()
 
 ########################################
-# Find ignition math
-find_package(ignition-math2 QUIET)
-if (NOT ignition-math2_FOUND)
-  message(STATUS "Looking for ignition-math2-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math2 library.")
-else()
-  message(STATUS "Looking for ignition-math2-config.cmake - found")
+# Find ignition math in unix platforms
+# In Windows we expect a call from configure.bat script with the paths
+if (NOT WIN32)
+  find_package(ignition-math2 QUIET)
+  if (NOT ignition-math2_FOUND)
+    message(STATUS "Looking for ignition-math2-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math2 library.")
+  else()
+    message(STATUS "Looking for ignition-math2-config.cmake - found")
+  endif()
 endif()
 
 ########################################

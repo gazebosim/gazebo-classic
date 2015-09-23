@@ -95,7 +95,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   if (!this->enabled)
     return;
 
-  math::Vector2i drag = _event.pos - _event.prevPos;
+  math::Vector2i drag = _event.Pos() - _event.PrevPos();
 
   math::Vector3 directionVec(0, 0, 0);
 
@@ -106,14 +106,14 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   // If the event is the initial press of a mouse button, then update
   // the focal point and distance.
-  if (_event.pressPos == _event.pos)
+  if (_event.PressPos() == _event.Pos())
   {
     if (!this->camera->GetScene()->GetFirstContact(
-         this->camera, _event.pressPos, this->focalPoint))
+         this->camera, _event.PressPos(), this->focalPoint))
     {
       math::Vector3 origin, dir;
       this->camera->GetCameraToViewportRay(
-          _event.pressPos.x, _event.pressPos.y, origin, dir);
+          _event.PressPos().X(), _event.PressPos().Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }
 
@@ -128,13 +128,13 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   this->refVisual->SetVisible(true);
 
   // Middle mouse button or Shift + Left button is used to Orbit.
-  if (_event.dragging &&
-      (_event.buttons & common::MouseEvent::MIDDLE ||
-      (_event.buttons & common::MouseEvent::LEFT && _event.shift)))
+  if (_event.Dragging() &&
+      (_event.Buttons() & common::MouseEvent::MIDDLE ||
+      (_event.Buttons() & common::MouseEvent::LEFT && _event.Shift())))
   {
     // Compute the delta yaw and pitch.
-    double dy = this->NormalizeYaw(drag.x * _event.moveScale * -0.4);
-    double dp = this->NormalizePitch(drag.y * _event.moveScale * 0.4);
+    double dy = this->NormalizeYaw(drag.x * _event.MoveScale() * -0.4);
+    double dp = this->NormalizePitch(drag.y * _event.MoveScale() * 0.4);
 
     // Limit rotation to pitch only if the "y" key is pressed.
     if (!this->key.empty() && this->key == "y")
@@ -146,14 +146,14 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     this->Orbit(dy, dp);
   }
   // The left mouse button is used to translate the camera.
-  else if ((_event.buttons & common::MouseEvent::LEFT) && _event.dragging)
+  else if ((_event.Buttons() & common::MouseEvent::LEFT) && _event.Dragging())
   {
     math::Vector3 translation;
 
     double factor = 1.0;
 
     // The control key increases zoom speed by a factor of two.
-    if (_event.control)
+    if (_event.Control())
       factor *= 2.0;
 
     // If the "x", "y", or "z" key is pressed, then lock translation to the
@@ -188,20 +188,20 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     }
   }
   // The right mouse button is used to zoom the camera.
-  else if ((_event.buttons & common::MouseEvent::RIGHT) && _event.dragging)
+  else if ((_event.Buttons() & common::MouseEvent::RIGHT) && _event.Dragging())
   {
     double amount = 1.0 + (drag.y / static_cast<float>(height));
-    this->Zoom(amount, _event.pressPos);
+    this->Zoom(amount, _event.PressPos());
   }
   // The scroll wheel controls zoom.
-  else if (_event.type == common::MouseEvent::SCROLL)
+  else if (_event.Type() == common::MouseEvent::SCROLL)
   {
     if (!this->camera->GetScene()->GetFirstContact(
-         this->camera, _event.pos, this->focalPoint))
+         this->camera, _event.Pos(), this->focalPoint))
     {
       math::Vector3 origin, dir;
       this->camera->GetCameraToViewportRay(
-          _event.pos.x, _event.pos.y, origin, dir);
+          _event.Pos().X(), _event.Pos().Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }
 
@@ -211,14 +211,14 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     double factor = 1.0;
 
     // The control key increases zoom speed by a factor of two.
-    if (_event.control)
+    if (_event.Control())
       factor *= 2;
 
     // This assumes that _event.scroll.y is -1 or +1
     double zoomFactor = 10;
-    double amount = 1.0 + _event.scroll.y * factor * _event.moveScale
+    double amount = 1.0 + _event.Scroll().Y() * factor * _event.MoveScale()
         * zoomFactor;
-    this->Zoom(amount, _event.pos);
+    this->Zoom(amount, _event.Pos());
   }
   else
     this->refVisual->SetVisible(false);

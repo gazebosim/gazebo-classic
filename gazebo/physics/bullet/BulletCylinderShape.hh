@@ -23,6 +23,7 @@
 #define _BULLETCYLINDERSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/util/system.hh"
 

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A camera sensor using OpenGL
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).

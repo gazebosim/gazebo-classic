@@ -45,11 +45,14 @@ TimePanel::TimePanel(QWidget *_parent)
 
   // Time Widget
   this->dataPtr->timeWidget = new TimeWidget(this);
+  this->dataPtr->timeWidget->setObjectName("timeWidget");
   connect(this, SIGNAL(SetTimeWidgetVisible(bool)),
       this->dataPtr->timeWidget, SLOT(setVisible(bool)));
 
   // LogPlay Widget
   this->dataPtr->logPlayWidget = new LogPlayWidget(this);
+  this->dataPtr->logPlayWidget->setObjectName("logPlayWidget");
+  this->dataPtr->logPlayWidget->setVisible(false);
   connect(this, SIGNAL(SetLogPlayWidgetVisible(bool)),
       this->dataPtr->logPlayWidget, SLOT(setVisible(bool)));
 
@@ -199,6 +202,12 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
+  if (_msg->has_paused())
+    this->SetPaused(_msg->paused());
+
+  if (!this->isVisible())
+    return;
+
   this->dataPtr->simTimes.push_back(msgs::Convert(_msg->sim_time()));
   if (this->dataPtr->simTimes.size() > 20)
     this->dataPtr->simTimes.pop_front();
@@ -207,19 +216,20 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   if (this->dataPtr->realTimes.size() > 20)
     this->dataPtr->realTimes.pop_front();
 
-  if (_msg->has_log_playback() && _msg->log_playback())
+  if (_msg->has_log_playback_stats() &&
+      !this->dataPtr->logPlayWidget->isVisible())
   {
     this->SetTimeWidgetVisible(false);
     this->SetLogPlayWidgetVisible(true);
+    gui::Events::windowMode("LogPlayback");
   }
-  else
+  else if (!_msg->has_log_playback_stats() &&
+      !this->dataPtr->timeWidget->isVisible())
   {
     this->SetTimeWidgetVisible(true);
     this->SetLogPlayWidgetVisible(false);
+    gui::Events::windowMode("Simulation");
   }
-
-  if (_msg->has_paused())
-    this->SetPaused(_msg->paused());
 
   if (this->dataPtr->timeWidget->isVisible())
   {
@@ -231,22 +241,32 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
     this->dataPtr->timeWidget->EmitSetRealTime(QString::fromStdString(
         msgs::Convert(_msg->real_time()).FormattedString()));
 
-
     // Set the iterations
     this->dataPtr->timeWidget->EmitSetIterations(QString::fromStdString(
         boost::lexical_cast<std::string>(_msg->iterations())));
   }
   else if (this->dataPtr->logPlayWidget->isVisible())
   {
-    // Set simulation time
-    this->dataPtr->logPlayWidget->EmitSetCurrentTime(QString::fromStdString(
-        msgs::Convert(_msg->sim_time()).FormattedString()));
+    // Set current time
+    this->dataPtr->logPlayWidget->EmitSetCurrentTime(
+        msgs::Convert(_msg->sim_time()));
+
+    // Set start time in text and in ms
+    this->dataPtr->logPlayWidget->EmitSetStartTime(
+        msgs::Convert(_msg->log_playback_stats().start_time()));
+
+    // Set end time in text and in ms
+    this->dataPtr->logPlayWidget->EmitSetEndTime(
+        msgs::Convert(_msg->log_playback_stats().end_time()));
   }
 }
 
 /////////////////////////////////////////////////
 void TimePanel::Update()
 {
+  if (!this->isVisible())
+    return;
+
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
   // Avoid apparent race condition on start, seen on Windows.

@@ -38,6 +38,8 @@
 #include <boost/iostreams/copy.hpp>
 #include <iomanip>
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Base64.hh"
@@ -47,7 +49,6 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gazebo_config.h"
-#include "gazebo/math/Rand.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/util/LogRecord.hh"
 
@@ -680,7 +681,7 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
          << "<header>\n"
          << "<log_version>" << GZ_LOG_VERSION << "</log_version>\n"
          << "<gazebo_version>" << GAZEBO_VERSION_FULL << "</gazebo_version>\n"
-         << "<rand_seed>" << math::Rand::GetSeed() << "</rand_seed>\n"
+         << "<rand_seed>" << ignition::math::Rand::Seed() << "</rand_seed>\n"
          << "</header>\n";
 
   this->buffer.append(stream.str());

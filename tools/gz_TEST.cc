@@ -289,7 +289,7 @@ TEST_F(gzTest, Model)
     gazebo::msgs::Model msg;
     msg.set_name("simple_arm");
     gazebo::msgs::Set(msg.mutable_pose(),
-        gazebo::math::Pose(1.1, 2.3, 4.5, 0.1, 1.2, 3.4));
+        ignition::math::Pose3d(1.1, 2.3, 4.5, 0.1, 1.2, 3.4));
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
 
@@ -299,7 +299,7 @@ TEST_F(gzTest, Model)
 
     waitForMsg("gz model -w default -m my_box -f " + filename);
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
@@ -308,7 +308,8 @@ TEST_F(gzTest, Model)
 
     gazebo::msgs::Factory msg;
     msg.set_sdf(sdf->ToString());
-    gazebo::msgs::Set(msg.mutable_pose(), gazebo::math::Pose(0, 0, 0, 0, 0, 0));
+    gazebo::msgs::Set(msg.mutable_pose(),
+        ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -321,7 +322,7 @@ TEST_F(gzTest, Model)
     cmd += filename + " | gz model -w default -m my_box -s";
     waitForMsg(cmd);
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
@@ -330,7 +331,8 @@ TEST_F(gzTest, Model)
 
     gazebo::msgs::Factory msg;
     msg.set_sdf(sdf->ToString());
-    gazebo::msgs::Set(msg.mutable_pose(), gazebo::math::Pose(0, 0, 0, 0, 0, 0));
+    gazebo::msgs::Set(msg.mutable_pose(),
+        ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -620,7 +622,7 @@ TEST_F(gzTest, SDF)
   descSums["1.2"] = "f524458ace57d6aabbbc2303da208f65af37ef53";
   descSums["1.3"] = "74a3aa8d31f97328175f43d03410be55631fa0e1";
   descSums["1.4"] = "057f26137669d9d7eeb5a8c6f51e4f4077d9ddcf";
-  descSums["1.5"] = "159e58d1566adae48b751dc51fd66cbd1a9b736c";
+  descSums["1.5"] = "269390565152134210aa4ea2a0a5082262fbca31";
 
   // Test each descSum
   for (std::map<std::string, std::string>::iterator iter = descSums.begin();
@@ -639,7 +641,7 @@ TEST_F(gzTest, SDF)
   docSums["1.2"] = "27f9d91080ce8aa18eac27c9d899fde2d4b78785";
   docSums["1.3"] = "ad80986d42eae97baf277118f52d7e8b951d8ea1";
   docSums["1.4"] = "153ddd6ba6797c37c7fcddb2be5362c9969d97a1";
-  docSums["1.5"] = "1eedfa77b8b54d498743468b6e5f0390d912fbf8";
+  docSums["1.5"] = "88e644192c4dcb82755c94e5e1b50fe97712e251";
 
   // Test each docSum
   for (std::map<std::string, std::string>::iterator iter = docSums.begin();
@@ -653,7 +655,7 @@ TEST_F(gzTest, SDF)
 
 
   path = TEST_PATH;
-  path /= "worlds/empty_different_name.world";
+  path /= "worlds/box_plane_low_friction_test.world";
 
   {
     // Check empty.world
@@ -670,7 +672,7 @@ TEST_F(gzTest, SDF)
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "7591115673a2f1d525ea3674ce42707db67b8fcb");
+    EXPECT_EQ(shasum, "ea127f9858a5e07c40ef6d949ef6113236adddfa");
   }
 
   path = PROJECT_BINARY_PATH;

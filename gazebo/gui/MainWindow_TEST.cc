@@ -19,6 +19,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GLWidget.hh"
@@ -734,6 +735,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_aboutAct);
 
+  QVERIFY(gazebo::gui::g_hotkeyChartAct);
+
   QVERIFY(gazebo::gui::g_quitAct);
 
   QVERIFY(gazebo::gui::g_resetModelsAct);
@@ -766,8 +769,6 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_cylinderCreateAct);
 
-  QVERIFY(gazebo::gui::g_meshCreateAct);
-
   QVERIFY(gazebo::gui::g_pointLghtCreateAct);
 
   QVERIFY(gazebo::gui::g_spotLghtCreateAct);
@@ -781,6 +782,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(gazebo::gui::g_showGridAct);
 
   QVERIFY(gazebo::gui::g_showOriginAct);
+
+  QVERIFY(gazebo::gui::g_showLinkFrameAct);
 
   QVERIFY(gazebo::gui::g_transparentAct);
 
@@ -818,6 +821,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_alignAct);
 
+  QVERIFY(gazebo::gui::g_viewAngleAct);
+
   QVERIFY(gazebo::gui::g_cameraOrthoAct);
 
   QVERIFY(gazebo::gui::g_cameraPerspectiveAct);
@@ -838,6 +843,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_cloneAct);
 
   QVERIFY(!gazebo::gui::g_aboutAct);
+
+  QVERIFY(!gazebo::gui::g_hotkeyChartAct);
 
   QVERIFY(!gazebo::gui::g_quitAct);
 
@@ -871,8 +878,6 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(!gazebo::gui::g_cylinderCreateAct);
 
-  QVERIFY(!gazebo::gui::g_meshCreateAct);
-
   QVERIFY(!gazebo::gui::g_pointLghtCreateAct);
 
   QVERIFY(!gazebo::gui::g_spotLghtCreateAct);
@@ -886,6 +891,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_showGridAct);
 
   QVERIFY(!gazebo::gui::g_showOriginAct);
+
+  QVERIFY(!gazebo::gui::g_showLinkFrameAct);
 
   QVERIFY(!gazebo::gui::g_transparentAct);
 
@@ -922,6 +929,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_snapAct);
 
   QVERIFY(!gazebo::gui::g_alignAct);
+
+  QVERIFY(!gazebo::gui::g_viewAngleAct);
 
   QVERIFY(!gazebo::gui::g_cameraOrthoAct);
 
@@ -984,6 +993,125 @@ void MainWindow_TEST::SetUserCameraPoseSDF()
   }
 
   cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::MenuBar()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  QList<QMenuBar *> menuBars  = mainWindow->findChildren<QMenuBar *>();
+  QVERIFY(!menuBars.empty());
+
+  std::set<std::string> mainMenus;
+  mainMenus.insert("&File");
+  mainMenus.insert("&Edit");
+  mainMenus.insert("&Camera");
+  mainMenus.insert("&View");
+  mainMenus.insert("&Window");
+  mainMenus.insert("&Help");
+
+  // verify all menus are created in the menu bar.
+  std::set<std::string> mainMenusCopy = mainMenus;
+  QMenuBar *menuBar = menuBars[0];
+  QList<QMenu *> menus  = menuBar->findChildren<QMenu *>();
+  for (auto &m : menus)
+  {
+    auto it = mainMenusCopy.find(m->title().toStdString());
+    QVERIFY(it != mainMenus.end());
+    mainMenusCopy.erase(it);
+  }
+
+  // test adding a new menu to the menu bar
+  QMenu newMenu(tr("&TEST"));
+  mainWindow->AddMenu(&newMenu);
+
+  QList<QMenu *> newMenus  = menuBar->findChildren<QMenu *>();
+  mainMenusCopy = mainMenus;
+  mainMenusCopy.insert("&TEST");
+  for (auto &m : menus)
+  {
+    std::string title = m->title().toStdString();
+    auto it = mainMenusCopy.find(title);
+    QVERIFY(it != mainMenus.end());
+    mainMenusCopy.erase(it);
+  }
+
+  // test calling ShowMenuBar and verify all menus remain the same
+  mainWindow->ShowMenuBar();
+
+  menus  = menuBar->findChildren<QMenu *>();
+  mainMenusCopy = mainMenus;
+  mainMenusCopy.insert("TEST");
+  for (auto &m : menus)
+  {
+    std::string title = m->title().toStdString();
+    auto it = mainMenusCopy.find(title);
+    QVERIFY(it != mainMenus.end());
+    mainMenusCopy.erase(title);
+  }
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::WindowModes()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check edit actions are visible
+  QVERIFY(gazebo::gui::g_resetModelsAct->isVisible());
+  QVERIFY(gazebo::gui::g_resetWorldAct->isVisible());
+  QVERIFY(gazebo::gui::g_editBuildingAct->isVisible());
+  QVERIFY(gazebo::gui::g_editModelAct->isVisible());
+
+  // Change to Model Editor mode
+  gazebo::gui::Events::windowMode("ModelEditor");
+
+  // Check edit actions are not visible
+  QVERIFY(!gazebo::gui::g_resetModelsAct->isVisible());
+  QVERIFY(!gazebo::gui::g_resetWorldAct->isVisible());
+  QVERIFY(!gazebo::gui::g_editBuildingAct->isVisible());
+  QVERIFY(!gazebo::gui::g_editModelAct->isVisible());
+
+  // Terminate
   mainWindow->close();
   delete mainWindow;
 }

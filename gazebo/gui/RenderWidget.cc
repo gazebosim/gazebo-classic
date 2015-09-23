@@ -32,6 +32,7 @@
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/RenderWidget.hh"
 
 using namespace gazebo;
@@ -50,91 +51,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  this->toolFrame = new QFrame;
-  this->toolFrame->setObjectName("toolFrame");
-  this->toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  // Top toolbar
+  this->topToolbar = new TopToolbar();
 
-  this->toolbar = new QToolBar;
-  QHBoxLayout *toolLayout = new QHBoxLayout;
-  toolLayout->setContentsMargins(0, 0, 0, 0);
-
-  QActionGroup *actionGroup = new QActionGroup(this->toolFrame);
-  if (g_arrowAct)
-  {
-    actionGroup->addAction(g_arrowAct);
-    this->toolbar->addAction(g_arrowAct);
-  }
-  if (g_translateAct)
-  {
-    actionGroup->addAction(g_translateAct);
-    this->toolbar->addAction(g_translateAct);
-  }
-  if (g_rotateAct)
-  {
-    actionGroup->addAction(g_rotateAct);
-    this->toolbar->addAction(g_rotateAct);
-  }
-  if (g_scaleAct)
-  {
-    actionGroup->addAction(g_scaleAct);
-    this->toolbar->addAction(g_scaleAct);
-  }
-
-  this->toolbar->addSeparator();
-
-  if (g_boxCreateAct)
-    this->toolbar->addAction(g_boxCreateAct);
-  if (g_sphereCreateAct)
-    this->toolbar->addAction(g_sphereCreateAct);
-  if (g_cylinderCreateAct)
-    this->toolbar->addAction(g_cylinderCreateAct);
-  this->toolbar->addSeparator();
-  if (g_pointLghtCreateAct)
-    this->toolbar->addAction(g_pointLghtCreateAct);
-  if (g_spotLghtCreateAct)
-    this->toolbar->addAction(g_spotLghtCreateAct);
-  if (g_dirLghtCreateAct)
-    this->toolbar->addAction(g_dirLghtCreateAct);
-  this->toolbar->addSeparator();
-  if (g_screenshotAct)
-    this->toolbar->addAction(g_screenshotAct);
-
-  this->toolbar->addSeparator();
-  if (g_copyAct)
-    this->toolbar->addAction(g_copyAct);
-  if (g_pasteAct)
-    this->toolbar->addAction(g_pasteAct);
-
-  this->toolbar->addSeparator();
-
-  if (g_alignAct)
-  {
-    QToolButton *alignButton = new QToolButton;
-    alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    alignButton->setIcon(QIcon(":/images/align.png"));
-    alignButton->setToolTip(
-        tr("In Selection Mode, hold Ctrl and select 2 objects to align"));
-    alignButton->setArrowType(Qt::NoArrow);
-    QMenu *alignMenu = new QMenu(alignButton);
-    alignMenu->addAction(g_alignAct);
-    alignButton->setMenu(alignMenu);
-    alignButton->setPopupMode(QToolButton::InstantPopup);
-    g_alignButtonAct = this->toolbar->addWidget(alignButton);
-    connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
-  }
-
-  this->toolbar->addSeparator();
-
-  if (g_snapAct)
-  {
-    actionGroup->addAction(g_snapAct);
-    this->toolbar->addAction(g_snapAct);
-  }
-
-  toolLayout->addSpacing(10);
-  toolLayout->addWidget(this->toolbar);
-  this->toolFrame->setLayout(toolLayout);
-
+  // GLWigdet
   this->glWidget = new GLWidget(this->mainFrame);
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
@@ -159,7 +79,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QFrame *render3DFrame = new QFrame;
   render3DFrame->setObjectName("render3DFrame");
   QVBoxLayout *render3DLayout = new QVBoxLayout;
-  render3DLayout->addWidget(this->toolFrame);
+  render3DLayout->addWidget(this->topToolbar);
   render3DLayout->addWidget(this->glWidget);
   render3DLayout->setContentsMargins(0, 0, 0, 0);
   render3DLayout->setSpacing(0);
@@ -231,8 +151,8 @@ RenderWidget::~RenderWidget()
   delete this->glWidget;
   this->glWidget = NULL;
 
-  delete this->toolbar;
-  this->toolbar = NULL;
+  delete this->topToolbar;
+  this->topToolbar = NULL;
 
   // we created the scene here we are responsible for removing it.
   rendering::remove_scene(gui::get_world());
@@ -326,23 +246,23 @@ std::string RenderWidget::GetOverlayMsg() const
 /////////////////////////////////////////////////
 void RenderWidget::ShowToolbar(const bool _show)
 {
-  if (this->toolbar)
+  if (this->topToolbar)
   {
     if (_show)
     {
-      this->toolFrame->show();
+      this->topToolbar->show();
     }
     else
     {
-      this->toolFrame->hide();
+      this->topToolbar->hide();
     }
   }
 }
 
 /////////////////////////////////////////////////
-QToolBar *RenderWidget::GetToolbar() const
+TopToolbar *RenderWidget::GetToolbar() const
 {
-  return this->toolbar;
+  return this->topToolbar;
 }
 
 /////////////////////////////////////////////////

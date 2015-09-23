@@ -42,6 +42,8 @@ SelectionObj::SelectionObj(const std::string &_name, VisualPtr _vis)
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
+  dPtr->type = VT_GUI;
+
   dPtr->state = SELECTION_NONE;
   dPtr->mode = SELECTION_NONE;
 

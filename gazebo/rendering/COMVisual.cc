@@ -34,6 +34,9 @@ using namespace rendering;
 COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
   : Visual(*new COMVisualPrivate, _name, _vis, false)
 {
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+  dPtr->type = VT_PHYSICS;
 }
 
 /////////////////////////////////////////////////
@@ -176,4 +179,3 @@ math::Pose COMVisual::GetInertiaPose() const
 
   return dPtr->inertiaPose;
 }
-

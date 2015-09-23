@@ -20,12 +20,14 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Assert.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -107,6 +109,10 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       this->mainWindow->CloneAction(g_showToolbarsAct, this);
   this->dataPtr->fullScreenAct =
       this->mainWindow->CloneAction(g_fullScreenAct, this);
+  this->dataPtr->cameraOrthoAct =
+      this->mainWindow->CloneAction(g_cameraOrthoAct, this);
+  this->dataPtr->cameraPerspectiveAct =
+      this->mainWindow->CloneAction(g_cameraPerspectiveAct, this);
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
@@ -114,10 +120,11 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       gui::model::Events::ConnectFinishModel(
       boost::bind(&ModelEditor::OnFinish, this)));
 
-  // Add a joint icon to the render widget toolbar
+  // Add a joint icon to the toolbar
   this->dataPtr->jointAct  = new QAction(QIcon(":/images/draw_link.svg"),
       tr("Joint"), this);
   this->dataPtr->jointAct->setCheckable(true);
+  this->dataPtr->jointAct->setObjectName("modelEditorJointAct");
 
   // set up the action group so that only one action is active at one time.
   QActionGroup *actionGroup = g_arrowAct->actionGroup();
@@ -128,20 +135,21 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
         this, SLOT(OnAction(QAction *)));
   }
 
-  QToolBar *toolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
-  this->dataPtr->jointButton = new QToolButton(toolbar);
-  this->dataPtr->jointButton->setObjectName("jointToolButton");
-  this->dataPtr->jointButton->setCheckable(false);
-  this->dataPtr->jointButton->setFixedWidth(15);
-  this->dataPtr->jointButton->setPopupMode(QToolButton::InstantPopup);
-  QMenu *jointMenu = new QMenu(this->dataPtr->jointButton);
-  this->dataPtr->jointButton->setMenu(jointMenu);
+  QToolButton *jointButton = new QToolButton();
+  jointButton->setObjectName("jointToolButton");
+  jointButton->setCheckable(false);
+  jointButton->setFixedWidth(15);
+  jointButton->setPopupMode(QToolButton::InstantPopup);
+  QMenu *jointMenu = new QMenu(jointButton);
+  jointButton->setMenu(jointMenu);
   QAction *revoluteJointAct = new QAction(tr("Revolute"), this);
   QAction *revolute2JointAct = new QAction(tr("Revolute2"), this);
   QAction *prismaticJointAct = new QAction(tr("Prismatic"), this);
   QAction *ballJointAct = new QAction(tr("Ball"), this);
   QAction *universalJointAct = new QAction(tr("Universal"), this);
   QAction *screwJointAct = new QAction(tr("Screw"), this);
+  QAction *gearboxJointAct = new QAction(tr("Gearbox"), this);
+  QAction *fixedJointAct = new QAction(tr("Fixed"), this);
 
   revoluteJointAct->setCheckable(true);
   revolute2JointAct->setCheckable(true);
@@ -149,6 +157,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   ballJointAct->setCheckable(true);
   universalJointAct->setCheckable(true);
   screwJointAct->setCheckable(true);
+  gearboxJointAct->setCheckable(true);
+  fixedJointAct->setCheckable(true);
 
   jointMenu->addAction(revoluteJointAct);
   jointMenu->addAction(revolute2JointAct);
@@ -156,6 +166,8 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointMenu->addAction(ballJointAct);
   jointMenu->addAction(universalJointAct);
   jointMenu->addAction(screwJointAct);
+  jointMenu->addAction(gearboxJointAct);
+  jointMenu->addAction(fixedJointAct);
 
   QActionGroup *jointActionGroup = new QActionGroup(this);
   jointActionGroup->addAction(revoluteJointAct);
@@ -164,14 +176,29 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointActionGroup->addAction(ballJointAct);
   jointActionGroup->addAction(universalJointAct);
   jointActionGroup->addAction(screwJointAct);
+  jointActionGroup->addAction(gearboxJointAct);
+  jointActionGroup->addAction(fixedJointAct);
   jointActionGroup->setExclusive(true);
 
-  this->dataPtr->jointSeparatorAct = toolbar->addSeparator();
-  toolbar->addAction(this->dataPtr->jointAct);
-  this->dataPtr->jointTypeAct = toolbar->addWidget(this->dataPtr->jointButton);
+  TopToolbar *topToolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
+
+  // Separator
+  QAction *jointSeparatorAct =
+      topToolbar->InsertSeparator("toolbarSpacerAction");
+  jointSeparatorAct->setObjectName(
+      "modelEditorJointSeparatorAct");
+
+  // Joint create action
+  topToolbar->InsertAction("toolbarSpacerAction", this->dataPtr->jointAct);
+
+  // Joint type dropdown
+  QAction *jointTypeAct = topToolbar->InsertWidget("toolbarSpacerAction",
+      jointButton);
+  jointTypeAct->setObjectName("modelEditorJointTypeAct");
+
   this->dataPtr->jointAct->setVisible(false);
-  this->dataPtr->jointSeparatorAct->setVisible(false);
-  this->dataPtr->jointTypeAct->setVisible(false);
+  jointSeparatorAct->setVisible(false);
+  jointTypeAct->setVisible(false);
 
   this->dataPtr->signalMapper = new QSignalMapper(this);
   connect(this->dataPtr->signalMapper, SIGNAL(mapped(const QString)),
@@ -201,6 +228,14 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       SLOT(map()));
   this->dataPtr->signalMapper->setMapping(screwJointAct,
       screwJointAct->text().toLower());
+  connect(gearboxJointAct, SIGNAL(triggered()), this->dataPtr->signalMapper,
+      SLOT(map()));
+  this->dataPtr->signalMapper->setMapping(gearboxJointAct,
+      gearboxJointAct->text().toLower());
+  connect(fixedJointAct, SIGNAL(triggered()), this->dataPtr->signalMapper,
+      SLOT(map()));
+  this->dataPtr->signalMapper->setMapping(fixedJointAct,
+      fixedJointAct->text().toLower());
 
   // set default joint type.
   revoluteJointAct->setChecked(true);
@@ -292,6 +327,10 @@ void ModelEditor::CreateMenus()
   fileMenu->addAction(this->dataPtr->saveAsAct);
   fileMenu->addAction(this->dataPtr->exitAct);
 
+  QMenu *cameraMenu = this->dataPtr->menuBar->addMenu(tr("&Camera"));
+  cameraMenu->addAction(this->dataPtr->cameraOrthoAct);
+  cameraMenu->addAction(this->dataPtr->cameraPerspectiveAct);
+
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
   viewMenu->addAction(this->dataPtr->showJointsAct);
 
@@ -337,7 +376,6 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   if (!this->dataPtr->active)
   {
     this->CreateMenus();
-    this->dataPtr->mainWindowPaused = this->mainWindow->IsPaused();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("modelEditorTab");
     this->mainWindow->ShowMenuBar(this->dataPtr->menuBar);
@@ -350,8 +388,6 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->ShowMenuBar();
     this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
-    if (!this->dataPtr->mainWindowPaused)
-      this->mainWindow->Play();
   }
 
 #ifdef HAVE_GRAPHVIZ
@@ -386,35 +422,8 @@ void ModelEditor::OnAction(QAction *_action)
 /////////////////////////////////////////////////
 void ModelEditor::ToggleToolbar()
 {
-  QToolBar *toolbar =
-      this->mainWindow->GetRenderWidget()->GetToolbar();
-  QList<QAction *> actions = toolbar->actions();
-
-  for (int i = 0; i < actions.size(); ++i)
-  {
-    if (actions[i] == g_arrowAct ||
-        actions[i] == g_rotateAct ||
-        actions[i] == g_translateAct ||
-        actions[i] == g_scaleAct ||
-        actions[i] == g_screenshotAct ||
-        actions[i] == g_copyAct ||
-        actions[i] == g_pasteAct ||
-        actions[i] == g_alignButtonAct ||
-        actions[i] == g_snapAct)
-    {
-      actions[i]->setVisible(true);
-      if (i > 0 && actions[i-1]->isSeparator())
-      {
-        actions[i-1]->setVisible(true);
-      }
-    }
-    else
-    {
-      actions[i]->setVisible(!this->dataPtr->active);
-    }
-  }
-
-  this->dataPtr->jointAct->setVisible(this->dataPtr->active);
-  this->dataPtr->jointTypeAct->setVisible(this->dataPtr->active);
-  this->dataPtr->jointSeparatorAct->setVisible(this->dataPtr->active);
+  if (this->dataPtr->active)
+    gui::Events::windowMode("ModelEditor");
+  else
+    gui::Events::windowMode("Simulation");
 }

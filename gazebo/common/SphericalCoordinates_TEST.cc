@@ -37,9 +37,9 @@ TEST_F(SphericalCoordinatesTest, Constructor)
   {
     common::SphericalCoordinates sc;
     EXPECT_EQ(sc.GetSurfaceType(), st);
-    EXPECT_EQ(sc.GetLatitudeReference(), math::Angle());
-    EXPECT_EQ(sc.GetLongitudeReference(), math::Angle());
-    EXPECT_EQ(sc.GetHeadingOffset(), math::Angle());
+    EXPECT_EQ(sc.LatitudeReference(), ignition::math::Angle());
+    EXPECT_EQ(sc.LongitudeReference(), ignition::math::Angle());
+    EXPECT_EQ(sc.HeadingOffset(), ignition::math::Angle());
     EXPECT_NEAR(sc.GetElevationReference(), 0.0, 1e-6);
   }
 
@@ -47,21 +47,21 @@ TEST_F(SphericalCoordinatesTest, Constructor)
   {
     common::SphericalCoordinates sc(st);
     EXPECT_EQ(sc.GetSurfaceType(), st);
-    EXPECT_EQ(sc.GetLatitudeReference(), math::Angle());
-    EXPECT_EQ(sc.GetLongitudeReference(), math::Angle());
-    EXPECT_EQ(sc.GetHeadingOffset(), math::Angle());
+    EXPECT_EQ(sc.LatitudeReference(), ignition::math::Angle());
+    EXPECT_EQ(sc.LongitudeReference(), ignition::math::Angle());
+    EXPECT_EQ(sc.HeadingOffset(), ignition::math::Angle());
     EXPECT_NEAR(sc.GetElevationReference(), 0.0, 1e-6);
   }
 
   // All arguments
   {
-    math::Angle lat(0.3), lon(-1.2), heading(0.5);
+    ignition::math::Angle lat(0.3), lon(-1.2), heading(0.5);
     double elev = 354.1;
     common::SphericalCoordinates sc(st, lat, lon, elev, heading);
     EXPECT_EQ(sc.GetSurfaceType(), st);
-    EXPECT_EQ(sc.GetLatitudeReference(), lat);
-    EXPECT_EQ(sc.GetLongitudeReference(), lon);
-    EXPECT_EQ(sc.GetHeadingOffset(), heading);
+    EXPECT_EQ(sc.LatitudeReference(), lat);
+    EXPECT_EQ(sc.LongitudeReference(), lon);
+    EXPECT_EQ(sc.HeadingOffset(), heading);
     EXPECT_NEAR(sc.GetElevationReference(), elev, 1e-6);
   }
 }
@@ -88,13 +88,13 @@ TEST_F(SphericalCoordinatesTest, SetFunctions)
   // Default parameters
   common::SphericalCoordinates sc;
   EXPECT_EQ(sc.GetSurfaceType(), st);
-  EXPECT_EQ(sc.GetLatitudeReference(), math::Angle());
-  EXPECT_EQ(sc.GetLongitudeReference(), math::Angle());
-  EXPECT_EQ(sc.GetHeadingOffset(), math::Angle());
+  EXPECT_EQ(sc.LatitudeReference(), ignition::math::Angle());
+  EXPECT_EQ(sc.LongitudeReference(), ignition::math::Angle());
+  EXPECT_EQ(sc.HeadingOffset(), ignition::math::Angle());
   EXPECT_NEAR(sc.GetElevationReference(), 0.0, 1e-6);
 
   {
-    math::Angle lat(0.3), lon(-1.2), heading(0.5);
+    ignition::math::Angle lat(0.3), lon(-1.2), heading(0.5);
     double elev = 354.1;
     sc.SetSurfaceType(st);
     sc.SetLatitudeReference(lat);
@@ -103,9 +103,9 @@ TEST_F(SphericalCoordinatesTest, SetFunctions)
     sc.SetElevationReference(elev);
 
     EXPECT_EQ(sc.GetSurfaceType(), st);
-    EXPECT_EQ(sc.GetLatitudeReference(), lat);
-    EXPECT_EQ(sc.GetLongitudeReference(), lon);
-    EXPECT_EQ(sc.GetHeadingOffset(), heading);
+    EXPECT_EQ(sc.LatitudeReference(), lat);
+    EXPECT_EQ(sc.LongitudeReference(), lon);
+    EXPECT_EQ(sc.HeadingOffset(), heading);
     EXPECT_NEAR(sc.GetElevationReference(), elev, 1e-6);
   }
 }
@@ -120,64 +120,65 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
 
   {
     // Parameters
-    math::Angle lat(0.3), lon(-1.2), heading(math::Angle::HalfPi);
+    ignition::math::Angle lat(0.3), lon(-1.2),
+      heading(ignition::math::Angle::HalfPi);
     double elev = 354.1;
     common::SphericalCoordinates sc(st, lat, lon, elev, heading);
 
     // Check GlobalFromLocal with heading offset of 90 degrees
     {
       // local frame
-      math::Vector3 xyz;
+      ignition::math::Vector3d xyz;
       // east, north, up
-      math::Vector3 enu;
+      ignition::math::Vector3d enu;
 
       xyz.Set(1, 0, 0);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+      EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
+      EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
 
       xyz.Set(0, 1, 0);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+      EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
+      EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
 
       xyz.Set(1, -1, 0);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+      EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
+      EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
 
       xyz.Set(2243.52334, 556.35, 435.6553);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+      EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
+      EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
     }
 
     // Check SphericalFromLocal
     {
       // local frame
-      math::Vector3 xyz;
+      ignition::math::Vector3d xyz;
       // spherical coordinates
-      math::Vector3 sph;
+      ignition::math::Vector3d sph;
 
       // No offset
       xyz.Set(0, 0, 0);
       sph = sc.SphericalFromLocal(xyz);
       // latitude
-      EXPECT_NEAR(sph.x, lat.Degree(), 1e-6);
+      EXPECT_NEAR(sph.X(), lat.Degree(), 1e-6);
       // longitude
-      EXPECT_NEAR(sph.y, lon.Degree(), 1e-6);
+      EXPECT_NEAR(sph.Y(), lon.Degree(), 1e-6);
       // elevation
-      EXPECT_NEAR(sph.z, elev, 1e-6);
+      EXPECT_NEAR(sph.Z(), elev, 1e-6);
 
       // 200 km offset in x (pi/2 heading offset means North)
       xyz.Set(2e5, 0, 0);
       sph = sc.SphericalFromLocal(xyz);
       // increase in latitude about 1.8 degrees
-      EXPECT_NEAR(sph.x, lat.Degree() + 1.8, 0.008);
+      EXPECT_NEAR(sph.X(), lat.Degree() + 1.8, 0.008);
       // no change in longitude
-      EXPECT_NEAR(sph.y, lon.Degree(), 1e-6);
+      EXPECT_NEAR(sph.Y(), lon.Degree(), 1e-6);
       // no change in elevation
-      EXPECT_NEAR(sph.z, elev, 1e-6);
+      EXPECT_NEAR(sph.Z(), elev, 1e-6);
     }
   }
 }
@@ -186,11 +187,11 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
 // Test distance
 TEST_F(SphericalCoordinatesTest, Distance)
 {
-  math::Angle latA, longA, latB, longB;
-  latA.SetFromDegree(46.250944);
-  longA.SetFromDegree(-122.249972);
-  latB.SetFromDegree(46.124953);
-  longB.SetFromDegree(-122.251683);
+  ignition::math::Angle latA, longA, latB, longB;
+  latA.Degree(46.250944);
+  longA.Degree(-122.249972);
+  latB.Degree(46.124953);
+  longB.Degree(-122.251683);
   double d = common::SphericalCoordinates::Distance(latA, longA, latB, longB);
 
   EXPECT_NEAR(14002, d, 20);

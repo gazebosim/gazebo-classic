@@ -1,6 +1,67 @@
+## Gazebo 6.X to 7.X
+
+### Modifications
+
+1. **gazebo/test/ServerFixture.hh**
+    + ***Removed:*** protected: void RunServer(const std::string &_worldFilename);
+    + ***Removed:*** protected: void RunServer(const std::string &_worldFilename,
+      bool _paused, const std::string &_physics, const std::vector<std::string> &
+      _systemPlugins = {});
+    + ***Replacement:*** void ServerFixture::RunServer(const std::vector<:string>
+      &_args)
+    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874)
+
+1. **gazebo/gui/building/BuildingMaker.hh**
+    * Doesn't inherit from gui::EntityMaker anymore
+    * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
+
+1. **gazebo/gui/EntityMaker.hh**
+    + ***Removed:*** EntityMaker();
+    + ***Replacement:*** EntityMaker(EntityMakerPrivate &_dataPtr);
+    + ***Removed:*** public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
+    + ***Replacement:*** public: virtual void Start();
+    + ***Removed:*** public: virtual void Stop() = 0;
+    + ***Replacement:*** public: virtual void Stop();
+
+### Deletions
+
+1. **gazebo rendering libraries**
+    * The following libraries have been removed: `libgazebo_skyx`, `libgazebo_selection_buffer`, `libgazebo_rendering_deferred`. Gazebo now combines all the different rendering libraries into `libgazebo_rendering.so`.
+    * [Pull request #1817](https://bitbucket.org/osrf/gazebo/pull-request/1817)
+
+1. **gazebo physics libraries**
+    * The following libraries have been removed: `libgazebo_ode_physics`, `libgazebo_simbody_physics`, `libgazebo_dart_physics`, and `libgazebo_bullet_physics`. Gazebo now combines all the different physics engine libraries into `libgazebo_physics.so`.
+    * [Pull request #1814](https://bitbucket.org/osrf/gazebo/pull-request/1814)
+
+1. **gazebo/gui/BoxMaker.hh**
+
+1. **gazebo/gui/CylinderMaker.hh**
+
+1. **gazebo/gui/SphereMaker.hh**
+
+1. **gazebo/gui/MeshMaker.hh**
+
+1. **gazebo/gui/EntityMaker.hh**
+    + public: typedef boost::function<void(const math::Vector3 &pos,
+                  const math::Vector3 &scale)> CreateCallback;
+    + public: static void SetSnapToGrid(bool _snap);
+    + public: virtual bool IsActive() const = 0;
+    + public: virtual void OnMousePush(const common::MouseEvent &_event);
+    + public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+    + protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
+
+
 ## Gazebo 5.X to 6.X
 
 ### Modifications
+
+1. **gazebo/common/MouseEvent.hh**
+    * Replaced all member variables with functions that use Ignition Math.
+    * [Pull request #1777](https://bitbucket.org/osrf/gazebo/pull-request/1777)
+
+1. **gazebo/msgs/world_stats.proto**
+    + ***Removed:*** optional bool log_playback = 8;
+    + ***Replacement:*** optional LogPlaybackStatistics log_playback_stats = 8;
 
 1. **gazebo/physics/JointState.hh**
     + ***Removed:*** public: JointState(JointPtr _joint, const common::Time
@@ -46,9 +107,18 @@
     common::Time &_realTime, const common::Time &_simTime, const uint64_t
     _iterations)
 
-1. ignition-math is now a dependency.
+1. ignition-math is now a dependency. Many classes and functions are modified to use ignition-math, please see the pull request listing below for individual changes.
     + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
     + [Gazebo migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
+    * [Pull request #1756](https://bitbucket.org/osrf/gazebo/pull-request/1756)
+    * [Pull request #1766](https://bitbucket.org/osrf/gazebo/pull-request/1766)
+    * [Pull request #1774](https://bitbucket.org/osrf/gazebo/pull-request/1774)
+    * [Pull request #1771](https://bitbucket.org/osrf/gazebo/pull-request/1771)
+    * [Pull request #1776](https://bitbucket.org/osrf/gazebo/pull-request/1776)
+    * [Pull request #1777](https://bitbucket.org/osrf/gazebo/pull-request/1777)
+    * [Pull request #1772](https://bitbucket.org/osrf/gazebo/pull-request/1772)
+    * [Pull request #1773](https://bitbucket.org/osrf/gazebo/pull-request/1773)
+    * [Pull request #1778](https://bitbucket.org/osrf/gazebo/pull-request/1778)
 
 1. Gazebo client's should now use `gazebo/gazebo_client.hh` and `libgazebo_client.so` instead of `gazebo/gazebo.hh` and `libgazebo.so`. This separates running a Gazebo server from a Gazebo client.
 
@@ -86,6 +156,12 @@
     + The ShowEditor(bool _show)
 
 ### Additions
+
+1. **gazebo/msgs/log_playback_control.proto**
+    + New message to control the playback from a log file.
+
+1. **gazebo/util/LogPlay.hh**
+    + public: bool Rewind()
 
 1. **gazebo/physics/LinkState.hh**
     + public: virtual void SetIterations(const uint64_t _iterations)

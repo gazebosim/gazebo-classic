@@ -28,11 +28,11 @@ namespace gazebo
   {
     extern GZ_GUI_VISIBLE QAction *g_newAct;
     extern GZ_GUI_VISIBLE QAction *g_openAct;
-    extern GZ_GUI_VISIBLE QAction *g_importAct;
     extern GZ_GUI_VISIBLE QAction *g_saveAct;
     extern GZ_GUI_VISIBLE QAction *g_saveAsAct;
     extern GZ_GUI_VISIBLE QAction *g_saveCfgAct;
     extern GZ_GUI_VISIBLE QAction *g_cloneAct;
+    extern GZ_GUI_VISIBLE QAction *g_hotkeyChartAct;
     extern GZ_GUI_VISIBLE QAction *g_aboutAct;
     extern GZ_GUI_VISIBLE QAction *g_quitAct;
 
@@ -51,23 +51,36 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_boxCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_sphereCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_cylinderCreateAct;
-    extern GZ_GUI_VISIBLE QAction *g_meshCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_pointLghtCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_spotLghtCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_dirLghtCreateAct;
 
     extern GZ_GUI_VISIBLE QAction *g_screenshotAct;
 
+    /// \brief Action to show/hide collision visuals for all models.
     extern GZ_GUI_VISIBLE QAction *g_showCollisionsAct;
+
+    /// \brief Action to show/hide the grid over the ground plane.
     extern GZ_GUI_VISIBLE QAction *g_showGridAct;
 
     /// \brief Action to show/hide the world origin indicator.
     extern GZ_GUI_VISIBLE QAction *g_showOriginAct;
 
+    /// \brief Action to show/hide contact visuals for all models.
     extern GZ_GUI_VISIBLE QAction *g_showContactsAct;
+
+    /// \brief Action to show/hide joint visuals for all models.
     extern GZ_GUI_VISIBLE QAction *g_showJointsAct;
+
+    /// \brief Action to show/hide CoM visuals for all models.
     extern GZ_GUI_VISIBLE QAction *g_showCOMAct;
+
+    /// \brief Action to show/hide inertia visuals for all models.
     extern GZ_GUI_VISIBLE QAction *g_showInertiaAct;
+
+    /// \brief Action to show/hide link frame visuals for all models.
+    extern GZ_GUI_VISIBLE QAction *g_showLinkFrameAct;
+
     extern GZ_GUI_VISIBLE QAction *g_transparentAct;
 
     extern GZ_GUI_VISIBLE QAction *g_resetAct;
@@ -103,9 +116,15 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_alignButtonAct;
     extern GZ_GUI_VISIBLE QAction *g_snapAct;
 
+    /// \brief Action to open the view angle widget.
+    extern GZ_GUI_VISIBLE QWidgetAction *g_viewAngleAct;
+
+    /// \brief Action attached to the view angle button.
+    extern GZ_GUI_VISIBLE QAction *g_viewAngleButtonAct;
+
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
-    class GAZEBO_VISIBLE DeleteAction : public QAction
+    class GZ_GUI_VISIBLE DeleteAction : public QAction
     {
       Q_OBJECT
       /// \brief Constructor

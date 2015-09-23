@@ -54,6 +54,9 @@ namespace gazebo
       public: void Load(const msgs::CameraSensor &_msg);
       using Visual::Load;
 
+      // Documentation inherited
+      protected: virtual void Fini();
+
       /// \brief Update the visual
       private: void Update();
     };

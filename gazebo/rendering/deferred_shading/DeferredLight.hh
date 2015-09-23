@@ -31,7 +31,7 @@ namespace gazebo
     /// Deferred light geometry. Each instance matches a normal light.
     /// Should not be created by the user.
     /// XXX support other types of light other than point lights.
-    class GZ_RENDERING_DEFERRED_VISIBLE DeferredLight :
+    class GZ_RENDERING_VISIBLE DeferredLight :
       public Ogre::SimpleRenderable
     {
       /// \brief Constructor

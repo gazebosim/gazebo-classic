@@ -33,6 +33,18 @@ namespace gazebo
     /// \brief Visualization for the apply wrench GUI
     class GAZEBO_VISIBLE ApplyWrenchVisual : public Visual
     {
+      /// \enum Modes
+      /// \brief Visual is in one of these modes at each time.
+      public: enum Mode
+      {
+        /// \brief None
+        NONE = 0,
+        /// \brief Force
+        FORCE = 1,
+        /// \brief Torque
+        TORQUE = 2
+      };
+
       /// \brief Constructor
       /// \param[in] _name Name of the visual
       /// \param[in] _parentVis Pointer to the parent visual
@@ -59,11 +71,17 @@ namespace gazebo
 
       /// \brief Update force vector, force text and mode.
       /// \param[in] _forceVector New vector.
-      public: void SetForce(const math::Vector3 &_forceVector);
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
+      public: void SetForce(const math::Vector3 &_forceVector,
+          const bool _rotatedByMouse);
 
       /// \brief Update torque vector, torque text and mode.
       /// \param[in] _torqueVector New vector.
-      public: void SetTorque(const math::Vector3 &_torqueVector);
+      /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
+      /// or not.
+      public: void SetTorque(const math::Vector3 &_torqueVector,
+          const bool _rotatedByMouse);
 
       /// \brief Update the force visual according to the force and force
       /// position vectors.
@@ -83,6 +101,15 @@ namespace gazebo
       /// \brief Returns the torque visual.
       /// \return Pointer to torque visual.
       public: rendering::VisualPtr GetTorqueVisual() const;
+
+      /// \brief Returns the rotation tool.
+      /// \return Pointer to rotation tool.
+      public: rendering::SelectionObjPtr GetRotTool() const;
+
+      /// \brief Set the mode to force, torque or none, update colors
+      /// and visibility accordingly.
+      /// \param[in] _mode New mode.
+      public: void SetMode(Mode _mode);
 
       /// \brief Get the rotation to point the positive Z axis to the
       /// given direction.

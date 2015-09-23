@@ -107,6 +107,10 @@ namespace gazebo
       /// \param[in] _camera Camera associated to an image sensor
       public: virtual void SetCamera(rendering::CameraPtr _camera);
 
+      /// \brief Output information about the noise model.
+      /// \param[in] _out Output stream
+      public: virtual void Print(std::ostream &_out) const;
+
       /// \brief Which type of noise we're applying
       private: NoiseType type;
 

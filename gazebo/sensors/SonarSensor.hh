@@ -14,15 +14,13 @@
  * limitations under the License.
  *
 */
-
-#ifndef _SONARSENSOR_HH_
-#define _SONARSENSOR_HH_
+#ifndef _GAZEBO_SONARSENSOR_HH_
+#define _GAZEBO_SONARSENSOR_HH_
 
 #include <string>
 #include <list>
+#include <ignition/math/Pose3.hh>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
@@ -131,7 +129,7 @@ namespace gazebo
       private: ContactMsgs_L incomingContacts;
 
       /// \brief Pose of the sonar shape's midpoint.
-      private: math::Pose sonarMidPose;
+      private: ignition::math::Pose3d sonarMidPose;
 
       /// \brief Minimum range
       private: double rangeMin;

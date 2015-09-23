@@ -129,7 +129,14 @@ void Entity::Load(sdf::ElementPtr _sdf)
     this->visualMsg->set_parent_name(this->world->GetName());
     this->visualMsg->set_parent_id(0);
   }
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
+
+  if (this->HasType(Base::MODEL))
+    this->visualMsg->set_type(msgs::Visual::MODEL);
+  if (this->HasType(Base::LINK))
+    this->visualMsg->set_type(msgs::Visual::LINK);
+  if (this->HasType(Base::COLLISION))
+    this->visualMsg->set_type(msgs::Visual::COLLISION);
 
   this->visPub->Publish(*this->visualMsg);
 
@@ -328,29 +335,44 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
     {
       EntityPtr entity = boost::static_pointer_cast<Entity>(*iter);
 
-      if (entity->IsCanonicalLink())
-        entity->worldPose = (entity->initialRelativePose + _pose);
+      if (entity->HasType(LINK))
+      {
+        if (entity->IsCanonicalLink())
+          entity->worldPose = (entity->initialRelativePose + _pose);
+        else
+        {
+          entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+          if (_publish)
+            entity->PublishPose();
+        }
+
+        if (_notify)
+          entity->UpdatePhysicsPose(false);
+
+        // Tell collisions that their current world pose is dirty (needs
+        // updating). We set a dirty flag instead of directly updating the
+        // value to improve performance.
+        for (Base_V::iterator iterC = (*iter)->children.begin();
+             iterC != (*iter)->children.end(); ++iterC)
+        {
+          if ((*iterC)->HasType(COLLISION))
+          {
+            CollisionPtr entityC =
+                boost::static_pointer_cast<Collision>(*iterC);
+            entityC->SetWorldPoseDirty();
+          }
+        }
+      }
+      else if (entity->HasType(MODEL))
+      {
+        // set pose of nested models
+        entity->SetWorldPoseModel(
+            (entity->worldPose - oldModelWorldPose) + _pose, _notify, _publish);
+      }
       else
       {
-        entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
-        if (_publish)
-          entity->PublishPose();
-      }
-
-      if (_notify)
-        entity->UpdatePhysicsPose(false);
-
-      // Tell collisions that their current world pose is dirty (needs
-      // updating). We set a dirty flag instead of directly updating the
-      // value to improve performance.
-      for (Base_V::iterator iterC = (*iter)->children.begin();
-           iterC != (*iter)->children.end(); ++iterC)
-      {
-        if ((*iterC)->HasType(COLLISION))
-        {
-          CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
-          entityC->SetWorldPoseDirty();
-        }
+        gzerr << "SetWorldPoseModel error: unknown type of entity in Model."
+          << std::endl;
       }
     }
   }
@@ -366,37 +388,51 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   if (_notify)
     this->UpdatePhysicsPose(true);
 
-  // also update parent model's pose
-  if (this->parentEntity->HasType(MODEL))
+  if (!this->parentEntity->HasType(MODEL))
+  {
+    gzerr << "SetWorldPose for Canonical Body [" << this->GetName()
+        << "] but parent[" << this->parentEntity->GetName()
+        << "] is not a MODEL!" << std::endl;
+    return;
+  }
+
+  EntityPtr parentEnt = this->parentEntity;
+  ignition::math::Pose3d relativePose = this->initialRelativePose.Ign();
+  math::Pose updatePose = _pose;
+
+  // recursively update parent model pose based on new canonical link pose
+  while (parentEnt && parentEnt->HasType(MODEL))
   {
     // setting parent Model world pose from canonical link world pose
     // where _pose is the canonical link's world pose
-    this->parentEntity->worldPose = (-this->initialRelativePose) + _pose;
+    parentEnt->worldPose = math::Pose(-relativePose) + updatePose;
 
-    this->parentEntity->worldPose.Correct();
+    parentEnt->worldPose.Correct();
 
     if (_notify)
-      this->parentEntity->UpdatePhysicsPose(false);
+      parentEnt->UpdatePhysicsPose(false);
 
     if (_publish)
       this->parentEntity->PublishPose();
 
-    // Tell collisions that their current world pose is dirty (needs
-    // updating). We set a dirty flag instead of directly updating the
-    // value to improve performance.
-    for (Base_V::iterator iterC = this->children.begin();
-        iterC != this->children.end(); ++iterC)
+    updatePose = parentEnt->worldPose;
+    relativePose = parentEnt->GetInitialRelativePose().Ign();
+
+    parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
+  }
+
+  // Tell collisions that their current world pose is dirty (needs
+  // updating). We set a dirty flag instead of directly updating the
+  // value to improve performance.
+  for (Base_V::iterator iterC = this->children.begin();
+      iterC != this->children.end(); ++iterC)
+  {
+    if ((*iterC)->HasType(COLLISION))
     {
-      if ((*iterC)->HasType(COLLISION))
-      {
-        CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
-        entityC->SetWorldPoseDirty();
-      }
+      CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+      entityC->SetWorldPoseDirty();
     }
   }
-  else
-    gzerr << "SWP for CB[" << this->GetName() << "] but parent["
-      << this->parentEntity->GetName() << "] is not a MODEL!\n";
 }
 
 //////////////////////////////////////////////////
@@ -538,7 +574,7 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 {
   if (_msg->name() == this->GetScopedName())
   {
-    math::Pose p = msgs::Convert(*_msg);
+    ignition::math::Pose3d p = msgs::ConvertIgn(*_msg);
     this->SetWorldPose(p);
   }
 }
