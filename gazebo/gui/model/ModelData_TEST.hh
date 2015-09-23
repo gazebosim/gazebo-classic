@@ -25,6 +25,9 @@ class ModelData_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Tests cloning link
+  private slots: void Clone();
+
   /// \brief Tests scaling link
   private slots: void LinkScale();
 };
