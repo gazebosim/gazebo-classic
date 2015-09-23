@@ -158,7 +158,7 @@ namespace gazebo
       ///   for the provided material technique pass
       /// \param[in] _pass Ogre::Pass used for rendering
       /// \param[in] _ratio Frame aspect ratio
-      /// \param[in] _hfov Horizlontal field of view
+      /// \param[in] _hfov Horizontal field of view
       public: void SetUniformVariables(Ogre::Pass *_pass, const float _ratio,
                                        const float _hfov);
 

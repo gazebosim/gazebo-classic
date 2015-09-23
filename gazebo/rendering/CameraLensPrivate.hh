@@ -133,7 +133,7 @@ namespace gazebo
               };
 
       /// \brief `fun` component of the mapping function,
-      ///   see CameraLens description
+      /// \see CameraLens description
       public: MapFunctionEnum fun = MapFunctionEnum("id");
 
       /// \brief SDF element of the lens
