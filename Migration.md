@@ -2,6 +2,10 @@
 
 ### Modifications
 
+1. **gazebo/rendering/Camera.hh**
+    + ***Removed:*** public: void SetClipDist();
+    + ***Replacement:*** public: virtual void SetClipDist();
+
 1. **gazebo/test/ServerFixture.hh**
     + ***Removed:*** protected: void RunServer(const std::string &_worldFilename);
     + ***Removed:*** protected: void RunServer(const std::string &_worldFilename,
