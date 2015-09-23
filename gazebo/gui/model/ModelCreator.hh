@@ -49,6 +49,7 @@ namespace gazebo
   namespace gui
   {
     class LinkData;
+    class ModelPluginData;
     class SaveDialog;
     class JointMaker;
 
@@ -188,6 +189,10 @@ namespace gazebo
       /// \param[in] _linkName Name of the link to remove
       public: void RemoveLink(const std::string &_linkName);
 
+      /// \brief Remove a model plugin from the model.
+      /// \param[in] _pluginName Name of the model plugin to remove.
+      public: void RemoveModelPlugin(const std::string &_pluginName);
+
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.
       public: void SetStatic(bool _static);
@@ -224,6 +229,10 @@ namespace gazebo
       /// \brief Add a link to the model
       /// \param[in] _type Type of link to be added
       public: void AddLink(LinkType _type);
+
+      /// \brief Add a model plugin to the model
+      /// \param[in] _pluginElem Pointer to plugin SDF element
+      public: void AddModelPlugin(const sdf::ElementPtr _pluginElem);
 
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
@@ -294,6 +303,13 @@ namespace gazebo
       private: void OnSetSelectedLink(const std::string &_name,
           const bool _selected);
 
+      /// \brief Callback when a model plugin is selected.
+      /// \param[in] _name Name of plugin.
+      /// \param[in] _selected True if the plugin is selected, false if
+      /// deselected.
+      private: void OnSetSelectedModelPlugin(const std::string &_name,
+          const bool _selected);
+
       /// \brief Create link with default properties from a visual. This
       /// function creates a link that will become the parent of the
       /// input visual. A collision visual with the same geometry as the input
@@ -314,6 +330,10 @@ namespace gazebo
       /// \brief Open the link inspector.
       /// \param[in] _name Name of link.
       private: void OpenInspector(const std::string &_name);
+
+      /// \brief Open the model plugin inspector.
+      /// \param[in] _name Name of model plugin.
+      private: void OpenModelPluginInspector(const std::string &_name);
 
       // Documentation inherited
       private: virtual void CreateTheEntity();
@@ -346,8 +366,15 @@ namespace gazebo
       private: void OnEntityScaleChanged(const std::string &_name,
           const math::Vector3 &_scale);
 
-      /// \brief Deselect all currently selected link visuals.
+      /// \brief Deselect anything whose selection is handled here, such as
+      /// links and model plugins.
       private: void DeselectAll();
+
+      /// \brief Deselect all currently selected links.
+      private: void DeselectAllLinks();
+
+      /// \brief Deselect all currently selected model plugins.
+      private: void DeselectAllModelPlugins();
 
       /// \brief Set visibilty of a visual recursively while storing their
       /// original values
@@ -366,6 +393,10 @@ namespace gazebo
       /// \param[in] _link Name of link the context menu is associated with.
       private: void ShowContextMenu(const std::string &_link);
 
+      /// \brief Show a model plugin's context menu
+      /// \param[in] _name Name of model plugin.
+      private: void ShowModelPluginContextMenu(const std::string &_name);
+
       /// \brief Qt callback when a delete signal has been emitted. This is
       /// currently triggered by the context menu via right click.
       private slots: void OnDelete();
@@ -376,6 +407,14 @@ namespace gazebo
 
       /// \brief Qt Callback to open link inspector
       private slots: void OnOpenInspector();
+
+      /// \brief Qt Callback to open model plugin inspector.
+      /// \param[in] _name Name of model plugin.
+      private slots: void OnOpenModelPluginInspector(const QString &_name);
+
+      /// \brief Qt Callback to remove model plugin.
+      /// \param[in] _name Name of model plugin.
+      private slots: void OnRemoveModelPlugin(const QString &_name);
 
       /// \brief Qt signal when the a link has been added.
       Q_SIGNALS: void LinkAdded();
@@ -422,8 +461,11 @@ namespace gazebo
       /// \brief Type of link being added.
       private: LinkType addLinkType;
 
-      /// \brief A map of model link names to and their visuals.
+      /// \brief A map of model link names to and their data.
       private: std::map<std::string, LinkData *> allLinks;
+
+      /// \brief A map of model plugin names to and their data.
+      private: std::map<std::string, ModelPluginData *> allModelPlugins;
 
       /// \brief Transport node
       private: transport::NodePtr node;
@@ -444,6 +486,9 @@ namespace gazebo
 
       /// \brief A list of selected link visuals.
       private: std::vector<rendering::VisualPtr> selectedLinks;
+
+      /// \brief A list of selected model plugins.
+      private: std::vector<std::string> selectedModelPlugins;
 
       /// \brief Names of links copied through g_copyAct
       private: std::vector<std::string> copiedLinkNames;

@@ -25,6 +25,7 @@ set (sources
   Sensor.cc
   SensorFactory.cc
   SensorManager.cc
+  SensorTypes.cc
   SonarSensor.cc
   WideAngleCameraSensor.cc
   WirelessReceiver.cc

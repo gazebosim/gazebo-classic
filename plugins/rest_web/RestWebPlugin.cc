@@ -82,7 +82,7 @@ RestWebPlugin::~RestWebPlugin()
 {
   // tell the requestQ to stop precessing
   this->stopMsgProcessing = true;
-  if (this->requestQThread->joinable())
+  if (this->requestQThread && this->requestQThread->joinable())
   {
     this->requestQThread->join();
     delete this->requestQThread;

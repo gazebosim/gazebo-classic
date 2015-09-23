@@ -58,6 +58,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ModelRightMenu();
 
+      /// \brief Initialize the right menu.
+      /// \return True on success.
+      public: bool Init();
+
       /// \brief Show the right menu.
       /// \param[in] _entityName Name of the entity that is active.
       /// \param[in] _pt Point on the GUI that has received the right-click
@@ -96,6 +100,10 @@ namespace gazebo
       /// \param[in] _msg Request message to process.
       private: void OnRequest(ConstRequestPtr &_msg);
 
+      /// \brief Callback when window mode has changed.
+      /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
+      private: void OnWindowMode(const std::string &_mode);
+
       /// \brief Node for communication.
       private: transport::NodePtr node;
 
@@ -117,6 +125,12 @@ namespace gazebo
       /// \brief Action for applying force and torque to a model.
       private: QAction *applyWrenchAct;
 
+      /// \brief All event connections.
+      private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief The current window mode, such as "Simulation" or "LogPlayback".
+      private: std::string windowMode;
+
       /// \brief Action for snapping an object to another object below the
       /// first.
       // private: QAction *snapBelowAct;
@@ -127,11 +141,6 @@ namespace gazebo
 
       // The view state class is a friend for convenience
       private: friend class ViewState;
-
-      /// \todo In gazebo 3.0 move this function to the correct section.
-      /// \brief Initialize the right menu.
-      /// \return True on success.
-      public: bool Init();
     };
 
     /// \class ViewState ViewState.hh gui/gui.hh

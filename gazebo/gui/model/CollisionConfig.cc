@@ -165,6 +165,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   // TODO: auto-fill them with SDF defaults
   if (!msgToLoad.has_max_contacts())
     msgToLoad.set_max_contacts(10);
+
   msgs::Surface *surfaceMsg = msgToLoad.mutable_surface();
   if (!surfaceMsg->has_bounce_threshold())
     surfaceMsg->set_bounce_threshold(10e5);
@@ -180,11 +181,23 @@ void CollisionConfig::AddCollision(const std::string &_name,
     surfaceMsg->set_collide_without_contact_bitmask(1);
   if (!surfaceMsg->has_collide_bitmask())
     surfaceMsg->set_collide_bitmask(1);
+
   msgs::Friction *frictionMsg = surfaceMsg->mutable_friction();
   if (!frictionMsg->has_mu())
     frictionMsg->set_mu(1.0);
   if (!frictionMsg->has_mu2())
     frictionMsg->set_mu2(1.0);
+
+  msgs::Friction::Torsional *torsionalMsg =
+      frictionMsg->mutable_torsional();
+  if (!torsionalMsg->has_coefficient())
+    torsionalMsg->set_coefficient(1.0);
+  if (!torsionalMsg->has_use_patch_radius())
+    torsionalMsg->set_use_patch_radius(true);
+  if (!torsionalMsg->has_patch_radius())
+    torsionalMsg->set_patch_radius(0.0);
+  if (!torsionalMsg->has_surface_radius())
+    torsionalMsg->set_surface_radius(0.0);
 
   ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);
