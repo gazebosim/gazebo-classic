@@ -93,7 +93,7 @@ namespace gazebo
                 }
 
                 /// \brief Apply function to float value
-                /// \result The result of application
+                /// \return The result of application
                 public: float Apply(const float _t)
                 {
                   return std::get<2>(value)(_t);
@@ -101,7 +101,7 @@ namespace gazebo
 
                 /// \brief Assignment operator
                 /// \param[in] _fun Rvalue
-                /// \result Reference to (*this)
+                /// \return Reference to (*this)
                 public: MapFunctionEnum &operator=(const MapFunctionEnum &_fun)
                 {
                   this->value = _fun.value;
