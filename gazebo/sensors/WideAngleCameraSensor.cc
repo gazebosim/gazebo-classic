@@ -135,9 +135,10 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   boost::replace_all(lensTopicName, "::", "/");
 
   sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
-  if (lensSdf->HasElement("advertise") && lensSdf->Get<bool>("advertise"))
-    this->lensPub = this->node->Advertise<msgs::CameraLensCmd>(
-      lensTopicName+"info", 1);
+
+  // create a topic that publishes lens states
+  this->lensPub = this->node->Advertise<msgs::CameraLensCmd>(
+    lensTopicName+"info", 1);
 
   this->lensSub = this->node->Subscribe(lensTopicName+"control",
       &WideAngleCameraSensor::OnCtrlMessage, this);
