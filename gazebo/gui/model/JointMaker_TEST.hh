@@ -42,6 +42,9 @@ class JointMaker_TEST : public QTestFixture
 
   /// \brief Test getting joint material.
   private slots: void JointMaterial();
+
+  /// \brief Test managing the link list
+  private slots: void LinkList();
 };
 
 #endif

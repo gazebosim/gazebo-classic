@@ -36,6 +36,7 @@ set(tests
   1208_world_plugin_init.cc
   1375_world_reset.cc
   1569_hydra_crash.cc
+  1694_world_accel.cc
   1702_remove_model_scene_nodes.cc
 )
 
