@@ -511,7 +511,7 @@ void WideAngleCamera::SetRenderTarget(Ogre::RenderTarget *_target)
       this->dataPtr->cubeMapCompInstance->addListener(this);
     }
     else
-      gzerr << "Compositor texture MISSING";
+      gzerr << "Compositor texture MISSING" << std::endl;
 
 
     this->dataPtr->cubeMapCompInstance->setEnabled(true);
@@ -575,7 +575,7 @@ void WideAngleCamera::SetClipDist()
     }
     else
     {
-      gzerr << "Setting clip distances failed -- no camera yet\n";
+      gzerr << "Setting clip distances failed -- no camera yet" << std::endl;
       break;
     }
   }
@@ -661,7 +661,7 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
 
   if (!this->Lens())
   {
-    gzerr << "No lens\n";
+    gzerr << "No lens" << std::endl;
     return;
   }
 
