@@ -50,7 +50,8 @@ void WideAngleCameraSensor::Init()
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "Unable to create WideAngleCameraSensor. Rendering is disabled.\n";
+    gzerr << "Unable to create WideAngleCameraSensor. Rendering is disabled."
+        << std::endl;
     return;
   }
 
@@ -66,7 +67,7 @@ void WideAngleCameraSensor::Init()
       // This usually means rendering is not available
       if (!this->scene)
       {
-        gzerr << "Unable to create WideAngleCameraSensor.\n";
+        gzerr << "Unable to create WideAngleCameraSensor." << std::endl;
         return;
       }
     }
@@ -76,7 +77,8 @@ void WideAngleCameraSensor::Init()
 
     if (!this->camera)
     {
-      gzerr << "Unable to create wide angle camera sensor[mono_camera]\n";
+      gzerr << "Unable to create wide angle camera sensor[mono_camera]"
+          << std::endl;
       return;
     }
     this->camera->SetCaptureData(true);
@@ -110,7 +112,7 @@ void WideAngleCameraSensor::Init()
     }
   }
   else
-    gzerr << "No world name\n";
+    gzerr << "No world name" << std::endl;
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
@@ -198,8 +200,8 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
 
   if (_msg->purpose() != msgs::CameraLensCmd_CmdPurpose_SET)
   {
-    gzerr << "Control message is not of the `SET` type!\n";
-    gzdbg << _msg->DebugString() << "\n";
+    gzerr << "Control message is not of the `SET` type!" << std::endl;
+    gzdbg << _msg->DebugString() << std::endl;
     return;
   }
 
