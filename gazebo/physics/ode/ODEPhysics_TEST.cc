@@ -62,7 +62,6 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   double erp = 0.12;
   double contactMaxCorrectingVel = 50;
   double contactSurfaceLayer = 0.02;
-
   double contactResidualSmoothing = 0.1;
   double contactSorScale = 1.0;
   bool threadPositionCorrection = true;
@@ -126,16 +125,16 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   double contactSorScaleRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSorScale, contactSorScaleRet);
   value = odePhysics->GetParam("thread_position_correction");
-  double threadPositionCorrectionRet = boost::any_cast<double>(value);
+  bool threadPositionCorrectionRet = boost::any_cast<bool>(value);
   EXPECT_DOUBLE_EQ(threadPositionCorrection, threadPositionCorrectionRet);
   value = odePhysics->GetParam("experimental_row_reordering");
-  double experimentalRowReorderingRet = boost::any_cast<double>(value);
+  bool experimentalRowReorderingRet = boost::any_cast<bool>(value);
   EXPECT_DOUBLE_EQ(experimentalRowReordering, experimentalRowReorderingRet);
   value = odePhysics->GetParam("warm_start_factor");
   double warmStartFactorRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(warmStartFactor, warmStartFactorRet);
   value = odePhysics->GetParam("extra_friction_iterations");
-  double extraFrictionIterationsRet = boost::any_cast<double>(value);
+  int extraFrictionIterationsRet = boost::any_cast<int>(value);
   EXPECT_DOUBLE_EQ(extraFrictionIterations, extraFrictionIterationsRet);
 
   // verify against equivalent functions
@@ -159,6 +158,12 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   erp = 0.22;
   contactMaxCorrectingVel = 40;
   contactSurfaceLayer = 0.03;
+  contactResidualSmoothing = 0.09;
+  contactSorScale = 0.9;
+  threadPositionCorrection = false;
+  experimentalRowReordering = false;
+  warmStartFactor = 0.9;
+  extraFrictionIterations = 14;
 
   EXPECT_TRUE(odePhysics->SetParam("solver_type", type));
   EXPECT_TRUE(odePhysics->SetParam("precon_iters", preconIters));
@@ -170,6 +175,18 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
                                     contactMaxCorrectingVel));
   EXPECT_TRUE(odePhysics->SetParam("contact_surface_layer",
                                     contactSurfaceLayer));
+  EXPECT_TRUE(odePhysics->SetParam("contact_residual_smoothing",
+                                    contactResidualSmoothing)
+  EXPECT_TRUE(odePhysics->SetParam("contact_sor_scale",
+                                    contactSorScale)
+  EXPECT_TRUE(odePhysics->SetParam("thread_position_correction",
+                                    threadPositionCorrection)
+  EXPECT_TRUE(odePhysics->SetParam("experimental_row_reordering",
+                                    experimentalRowReordering)
+  EXPECT_TRUE(odePhysics->SetParam("warm_start_factor",
+                                    warmStartFactor)
+  EXPECT_TRUE(odePhysics->SetParam("extra_friction_iterations",
+                                    extraFrictionIterations)
 
   value = odePhysics->GetParam("solver_type");
   typeRet = boost::any_cast<std::string>(value);
@@ -195,6 +212,24 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   value = odePhysics->GetParam("contact_surface_layer");
   contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
+  value = odePhysics->GetParam("contact_residual_smoothing");
+  contactResidualSmoothingRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(contactResidualSmoothing, contactResidualSmoothingRet);
+  value = odePhysics->GetParam("contact_sor_scale");
+  contactSorScaleRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(contactSorScale, contactSorScaleRet);
+  value = odePhysics->GetParam("thread_position_correction");
+  threadPositionCorrectionRet = boost::any_cast<bool>(value);
+  EXPECT_DOUBLE_EQ(threadPositionCorrection, threadPositionCorrectionRet);
+  value = odePhysics->GetParam("experimental_row_reordering");
+  experimentalRowReorderingRet = boost::any_cast<bool>(value);
+  EXPECT_DOUBLE_EQ(experimentalRowReordering, experimentalRowReorderingRet);
+  value = odePhysics->GetParam("warm_start_factor");
+  warmStartFactorRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(warmStartFactor, warmStartFactorRet);
+  value = odePhysics->GetParam("extra_friction_iterations");
+  extraFrictionIterationsRet = boost::any_cast<int>(value);
+  EXPECT_DOUBLE_EQ(extraFrictionIterations, extraFrictionIterationsRet);
 
   EXPECT_EQ(type, odePhysics->GetStepType());
   EXPECT_EQ(preconIters, odePhysics->GetSORPGSPreconIters());
@@ -342,6 +377,14 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   physicsPubMsg.set_erp(0.25);
   physicsPubMsg.set_contact_max_correcting_vel(10);
   physicsPubMsg.set_contact_surface_layer(0.01);
+  /// \TODO: will not add below now, see asme branch for separation
+  /// of physics params for different engines.
+  // physicsPubMsg.set_contact_residual_smoothing(0.8);
+  // physicsPubMsg.set_contact_sor_scale(0.7);
+  // physicsPubMsg.set_thread_position_correction(true);
+  // physicsPubMsg.set_experimental_row_reordering(true);
+  // physicsPubMsg.set_warm_start_factor(0.6);
+  // physicsPubMsg.set_extra_friction_iterations(89);
 
   physicsPubMsg.set_type(msgs::Physics::ODE);
   physicsPubMsg.set_solver_type("quick");
@@ -376,6 +419,20 @@ void ODEPhysics_TEST::PhysicsMsgParam()
       physicsPubMsg.contact_max_correcting_vel());
   EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_surface_layer(),
       physicsPubMsg.contact_surface_layer());
+  /// \TODO: will not add below now, see asme branch for separation
+  /// of physics params for different engines.
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_residual_smoothing(),
+  //     physicsPubMsg.contact_residual_smoothing());
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_sor_scale(),
+  //     physicsPubMsg.contact_sor_scale());
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.thread_position_correction(),
+  //     physicsPubMsg.thread_position_correction());
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.experimental_row_reordering(),
+  //     physicsPubMsg.experimental_row_reordering());
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.warm_start_factor(),
+  //     physicsPubMsg.warm_start_factor());
+  // EXPECT_DOUBLE_EQ(physicsResponseMsg.extra_friction_iterations(),
+  //     physicsPubMsg.extra_friction_iterations());
 
   phyNode->Fini();
 }
