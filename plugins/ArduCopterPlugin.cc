@@ -316,7 +316,7 @@ void ArduCopterPlugin::SendState()
   pkt.imu_linear_acceleration_xyz[0] = linearAccel.x;
   pkt.imu_linear_acceleration_xyz[1] = linearAccel.y;
   pkt.imu_linear_acceleration_xyz[2] = linearAccel.z;
-  gzerr << "lin accel [" << linearAccel << "]\n";
+  // gzerr << "lin accel [" << linearAccel << "]\n";
 
   // get angular velocity in body frame
   math::Vector3 angularVel = this->imuSensor->AngularVelocity();
@@ -361,15 +361,15 @@ void ArduCopterPlugin::SendState()
   // get transform from world NED to Model frame
   math::Pose NEDToModel = worldToModel - gazeboToNED;
 
-  gzerr << "ned to model [" << NEDToModel << "]\n";
+  // gzerr << "ned to model [" << NEDToModel << "]\n";
   pkt.position_xyz[0] = NEDToModel.pos.x;  // N
   pkt.position_xyz[1] = NEDToModel.pos.y;  // E
   pkt.position_xyz[2] = NEDToModel.pos.z;  // D
   // This is the rotation from world NED frame to the quadrotor
   // frame.
-  gzerr << "imu [" << worldToModel.rot.GetAsEuler() << "]\n";
-  gzerr << "ned [" << gazeboToNED.rot.GetAsEuler() << "]\n";
-  gzerr << "rot [" << NEDToModel.rot.GetAsEuler() << "]\n";
+  // gzerr << "imu [" << worldToModel.rot.GetAsEuler() << "]\n";
+  // gzerr << "ned [" << gazeboToNED.rot.GetAsEuler() << "]\n";
+  // gzerr << "rot [" << NEDToModel.rot.GetAsEuler() << "]\n";
   pkt.imu_orientation_quat[0] = NEDToModel.rot.w;
   pkt.imu_orientation_quat[1] = NEDToModel.rot.x;
   pkt.imu_orientation_quat[2] = NEDToModel.rot.y;
