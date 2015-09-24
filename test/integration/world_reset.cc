@@ -46,7 +46,15 @@ class WorldResetTest : public ServerFixture,
 void WorldResetTest::ModelPose(const std::string &_physicsEngine,
                                const std::string &_world, int _resets)
 {
-  if (_physicsEngine == "dart")
+  if (_physicsEngine == "simbody" &&
+      _world.find("pr2") != std::string::npos)
+  {
+    gzerr << "Simbody fails this test with the PR2 due to issue #1672"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "dart" &&
+      _world.find("pr2") != std::string::npos)
   {
     gzerr << "Abort test since dart does not support ray sensor in PR2, "
           << "Please see issue #911.\n";
@@ -121,7 +129,15 @@ TEST_P(WorldResetTest, ModelPose)
 void WorldResetTest::WorldName(const std::string &_physicsEngine,
                                const std::string &_world, int _resets)
 {
-  if (_physicsEngine == "dart")
+  if (_physicsEngine == "simbody" &&
+      _world.find("pr2") != std::string::npos)
+  {
+    gzerr << "Simbody fails this test with the PR2 due to issue #1672"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "dart" &&
+      _world.find("pr2") != std::string::npos)
   {
     gzerr << "Abort test since dart does not support ray sensor in PR2, "
           << "Please see issue #911.\n";
