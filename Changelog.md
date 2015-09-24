@@ -1,10 +1,18 @@
 ## Gazebo 7.0
+
+1. Rename Reset to Reset Time in time widget
+    * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
+    * [Issue #1730](https://bitbucket.org/osrf/gazebo/issue/1730)
+
 1. Added torsional friction
     * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
 
 1. Support loading and spawning nested models
     * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
 
+1. Add function to get the derived scale of a Visual
+    * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
+    
 1. Added EnumIface, which supports iterators over enums.
     * [Pull request #1847](https://bitbucket.org/osrf/gazebo/pull-request/1847)
 
@@ -81,6 +89,10 @@ using the same arguments used in the command line.
 
     1. Context menu and deletion for model plugins
         * [Pull request #1890](https://bitbucket.org/osrf/gazebo/pull-request/1890)
+
+    1. Set physics to be paused when exiting model editor mode
+        * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
+        * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
 
 ## Gazebo 6.0
 

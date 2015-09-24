@@ -65,7 +65,7 @@ namespace gazebo
 
       /// \brief Set the unique id for the joint this inspector is attached to.
       /// The ID might be generated after the inspector.
-      /// \param[in] Unique id.
+      /// \param[in] _id Unique id.
       public: void SetJointId(const std::string &_id);
 
       /// \brief Qt event emiited when the mouse enters this widget.

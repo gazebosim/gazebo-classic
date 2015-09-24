@@ -415,9 +415,9 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
 
   std::string jointVisName = jointVis->GetName();
   std::string leafName = jointVisName;
-  size_t pIdx = jointVisName.find_last_of("::");
+  size_t pIdx = jointVisName.rfind("::");
   if (pIdx != std::string::npos)
-    leafName = jointVisName.substr(pIdx+1);
+    leafName = jointVisName.substr(pIdx+2);
 
   JointData *jointData = new JointData();
   jointData->dirty = false;
@@ -460,9 +460,9 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   {
     std::string jointParentName = jointData->parent->GetName();
     std::string leafName = jointParentName;
-    size_t pIdx = jointParentName.find_last_of("::");
+    size_t pIdx = jointParentName.rfind("::");
     if (pIdx != std::string::npos)
-      leafName = jointParentName.substr(pIdx+1);
+      leafName = jointParentName.substr(pIdx+2);
 
     jointData->jointMsg->set_parent(leafName);
     jointData->jointMsg->set_parent_id(jointData->parent->GetId());
@@ -471,9 +471,9 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   {
     std::string jointChildName = jointData->child->GetName();
     std::string leafName = jointChildName;
-    size_t pIdx = jointChildName.find_last_of("::");
+    size_t pIdx = jointChildName.rfind("::");
     if (pIdx != std::string::npos)
-      leafName = jointChildName.substr(pIdx+1);
+      leafName = jointChildName.substr(pIdx+2);
 
     jointData->jointMsg->set_child(leafName);
     jointData->jointMsg->set_child_id(jointData->child->GetId());
@@ -894,9 +894,9 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     std::string parentName = joint->parent->GetName();
     std::string parentLeafName = parentName;
-    size_t pIdx = parentName.find_last_of("::");
+    size_t pIdx = parentName.rfind("::");
     if (pIdx != std::string::npos)
-      parentLeafName = parentName.substr(pIdx+1);
+      parentLeafName = parentName.substr(pIdx+2);
 
     parentLeafName = this->GetScopedLinkName(parentLeafName);
     parentElem->Set(parentLeafName);
@@ -904,9 +904,9 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     std::string childName = joint->child->GetName();
     std::string childLeafName = childName;
-    size_t cIdx = childName.find_last_of("::");
+    size_t cIdx = childName.rfind("::");
     if (cIdx != std::string::npos)
-      childLeafName = childName.substr(cIdx+1);
+      childLeafName = childName.substr(cIdx+2);
     childLeafName = this->GetScopedLinkName(childLeafName);
     childElem->Set(childLeafName);
   }
@@ -1026,9 +1026,9 @@ void JointData::OnApply()
     // Get scoped name
     std::string oldName = this->parent->GetName();
     std::string scope = oldName;
-    size_t idx = oldName.find_last_of("::");
+    size_t idx = oldName.rfind("::");
     if (idx != std::string::npos)
-      scope = oldName.substr(0, idx+1);
+      scope = oldName.substr(0, idx+2);
 
     rendering::VisualPtr parentVis = gui::get_active_camera()->GetScene()
         ->GetVisual(scope + this->jointMsg->parent());
@@ -1044,9 +1044,9 @@ void JointData::OnApply()
     // Get scoped name
     std::string oldName = this->child->GetName();
     std::string scope = oldName;
-    size_t idx = oldName.find_last_of("::");
+    size_t idx = oldName.rfind("::");
     if (idx != std::string::npos)
-      scope = oldName.substr(0, idx+1);
+      scope = oldName.substr(0, idx+2);
 
     rendering::VisualPtr childVis = gui::get_active_camera()->GetScene()
         ->GetVisual(scope + this->jointMsg->child());
@@ -1327,9 +1327,9 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 void JointMaker::OnLinkInserted(const std::string &_linkName)
 {
   std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  size_t idx = _linkName.rfind("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    leafName = _linkName.substr(idx+2);
 
   this->linkList[_linkName] = leafName;
 
