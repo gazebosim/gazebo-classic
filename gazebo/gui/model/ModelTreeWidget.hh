@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,67 +15,44 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_EDITOR_PALETTE_HH_
-#define _GAZEBO_MODEL_EDITOR_PALETTE_HH_
+#ifndef _GAZEBO_MODEL_TREE_WIDGET_HH_
+#define _GAZEBO_MODEL_TREE_WIDGET_HH_
 
 #include <mutex>
-#include <map>
 #include <string>
 #include <vector>
 
-#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/KeyEvent.hh"
 
-#include "gazebo/gui/model/ModelCreator.hh"
+//#include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  namespace rendering
-  {
-  }
-
   namespace gui
   {
-    class ModelCreator;
+    //class ModelCreator;
 
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class ModelEditorPalette ModelEditorPalette.hh
-    /// \brief A palette of model items which can be added to the editor.
-    class GZ_GUI_VISIBLE ModelEditorPalette : public QWidget
+    /// \class ModelTreeWidget ModelTreeWidget.hh
+    /// \brief A widget that displays model properties
+    class GZ_GUI_VISIBLE ModelTreeWidget : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: ModelEditorPalette(QWidget *_parent = 0);
+      public: ModelTreeWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~ModelEditorPalette();
+      public: ~ModelTreeWidget();
 
-      /// \brief Add an item to the model editor palette.
-      /// \param[in] _Item item to add.
-      /// \param[in] _category Category to add the item too.
-      public: void AddItem(QWidget *_item,
-          const std::string &_category = "Other");
-
-      /// \brief Add a joint to the model.
-      /// \param[in] _type Type of joint to add.
-      public: void CreateJoint(const std::string &_type);
-
-      /// \brief Get the model creator.
-      /// \return a pointer to the model creator.
-      public: ModelCreator *GetModelCreator();
-
-      /// \brief Key event filter callback when key is pressed.
-      /// \param[in] _event The key event.
-      /// \return True if the event was handled
-      private: bool OnKeyPress(const common::KeyEvent &_event);
-
-      /*/// \brief Callback when an entity is selected.
+      /// \brief Callback when an entity is selected.
       /// \param[in] _name Name of entity.
       /// \param[in] _mode Select mode
       private: void OnSetSelectedEntity(const std::string &_name,
@@ -104,24 +81,9 @@ namespace gazebo
       /// \brief Helper function to deselect a specific type, such as link or
       /// joint.
       /// \param[in] _type Type: Link or Joint.
-      private: void DeselectType(const std::string &_type);*/
+      private: void DeselectType(const std::string &_type);
 
-      /// \brief Qt callback when cylinder button is clicked.
-      private slots: void OnCylinder();
-
-      /// \brief Qt callback when sphere button is clicked.
-      private slots: void OnSphere();
-
-      /// \brief Qt callback when box button is clicked.
-      private slots: void OnBox();
-
-      /// \brief Qt callback when custom button is clicked.
-      private slots: void OnCustom();
-
-      /// \brief Qt callback when a link has been added.
-      private slots: void OnLinkAdded();
-
-      /*/// \brief Qt callback when the model is to be made static.
+      /// \brief Qt callback when the model is to be made static.
       private slots: void OnStatic();
 
       /// \brief Qt callback when the model is allowed to auto disable at rest.
@@ -205,21 +167,9 @@ namespace gazebo
           const math::Pose &_pose, const std::string &_name);
 
       /// \brief A list of gui editor events connected to this palette.
-      private: std::vector<event::ConnectionPtr> connections;*/
+      private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Links button group.
-      private: QButtonGroup *linkButtonGroup;
-
-      /// \brief Model creator.
-      private: ModelCreator *modelCreator;
-
-      /// \brief Layout for other items in the palette.
-      private: QVBoxLayout *otherItemsLayout;
-
-/// \brief Map of categories to their layout
-      private: std::map<std::string, QGridLayout *> categories;
-
-/*      /// \brief Static checkbox, true to create a static model.
+      /// \brief Static checkbox, true to create a static model.
       private: QCheckBox *staticCheck;
 
       /// \brief Auto disable checkbox, true to allow model to auto-disable at
@@ -249,7 +199,6 @@ namespace gazebo
 
       /// \brief Keeps track of selected items.
       private: QList<QTreeWidgetItem *> selected;
-      */
     };
   }
 }

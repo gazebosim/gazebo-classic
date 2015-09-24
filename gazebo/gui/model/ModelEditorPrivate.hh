@@ -27,6 +27,7 @@ namespace gazebo
   namespace gui
   {
     class SchematicViewWidget;
+    class ModelTreeWidget;
     class ModelEditorPalette;
 
     /// \internal
@@ -37,8 +38,11 @@ namespace gazebo
       /// \brief Menubar containing actions related to the editor.
       public: QMenuBar *menuBar;
 
-      /// \brief Contains all the model editor tools.
+      /// \brief A palette of entities that can be inserted into the editor.
       public: ModelEditorPalette *modelPalette;
+
+      /// \brief A display of model settings and its child entities
+      public: ModelTreeWidget *modelTree;
 
       /// \brief True if model editor is active.
       public: bool active;

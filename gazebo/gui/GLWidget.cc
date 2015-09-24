@@ -933,6 +933,9 @@ void GLWidget::OnMoveMode(bool _mode)
 void GLWidget::OnCreateEntity(const std::string &_type,
                               const std::string &_data)
 {
+  if (this->modelEditorEnabled)
+    return;
+
   this->ClearSelection();
 
   if (this->entityMaker)

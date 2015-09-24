@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,99 +17,26 @@
 
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/model/ExtrudeDialog.hh"
-#include "gazebo/gui/model/ImportDialog.hh"
-#include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/ModelTreeWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
+ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
     : QWidget(_parent)
 {
-  this->setObjectName("modelEditorPalette");
+  this->setObjectName("ModelTreeWidget");
 
-//  this->modelDefaultName = "Untitled";
+  this->modelDefaultName = "Untitled";
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  // Simple Shapes
-  QLabel *shapesLabel = new QLabel(tr(
-       "<font size=4 color='white'>Simple Shapes</font>"));
-
-  QHBoxLayout *shapesLayout = new QHBoxLayout;
-
-  QSize toolButtonSize(70, 70);
-  QSize iconSize(40, 40);
-
-  // Cylinder button
-  QToolButton *cylinderButton = new QToolButton(this);
-  cylinderButton->setFixedSize(toolButtonSize);
-  cylinderButton->setToolTip(tr("Cylinder"));
-  cylinderButton->setIcon(QPixmap(":/images/cylinder.png"));
-  cylinderButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  cylinderButton->setIconSize(QSize(iconSize));
-  cylinderButton->setCheckable(true);
-  cylinderButton->setChecked(false);
-  connect(cylinderButton, SIGNAL(clicked()), this, SLOT(OnCylinder()));
-  shapesLayout->addWidget(cylinderButton);
-
-  // Sphere button
-  QToolButton *sphereButton = new QToolButton(this);
-  sphereButton->setFixedSize(toolButtonSize);
-  sphereButton->setToolTip(tr("Sphere"));
-  sphereButton->setIcon(QPixmap(":/images/sphere.png"));
-  sphereButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  sphereButton->setIconSize(QSize(iconSize));
-  sphereButton->setCheckable(true);
-  sphereButton->setChecked(false);
-  connect(sphereButton, SIGNAL(clicked()), this, SLOT(OnSphere()));
-  shapesLayout->addWidget(sphereButton);
-
-  // Box button
-  QToolButton *boxButton = new QToolButton(this);
-  boxButton->setFixedSize(toolButtonSize);
-  boxButton->setToolTip(tr("Box"));
-  boxButton->setIcon(QPixmap(":/images/box.png"));
-  boxButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  boxButton->setIconSize(QSize(iconSize));
-  boxButton->setCheckable(true);
-  boxButton->setChecked(false);
-  connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
-  shapesLayout->addWidget(boxButton);
-
-  // Custom Shapes
-  QLabel *customShapesLabel = new QLabel(tr(
-       "<font size=4 color='white'>Custom Shapes</font>"));
-
-  QHBoxLayout *customLayout = new QHBoxLayout;
-  customLayout->setAlignment(Qt::AlignLeft);
-  customLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
-      QSizePolicy::Minimum));
-
-  QPushButton *customButton = new QPushButton(tr("Add"), this);
-  customButton->setMaximumWidth(60);
-  customButton->setCheckable(true);
-  customButton->setChecked(false);
-  connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
-  customLayout->addWidget(customButton, 0, 0);
-
-  // Button group
-  this->linkButtonGroup = new QButtonGroup;
-  this->linkButtonGroup->addButton(cylinderButton);
-  this->linkButtonGroup->addButton(sphereButton);
-  this->linkButtonGroup->addButton(boxButton);
-  this->linkButtonGroup->addButton(customButton);
-
-/*  // Model Settings
+  // Model Settings
   QLabel *settingsLabel = new QLabel(tr(
        "<font size=4 color='white'>Model Settings</font>"));
 
@@ -140,28 +67,15 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   settingsLayout->addWidget(staticLabel, 1, 0);
   settingsLayout->addWidget(this->staticCheck, 1, 1);
   settingsLayout->addWidget(autoDisableLabel, 2, 0);
-  settingsLayout->addWidget(this->autoDisableCheck, 2, 1);*/
+  settingsLayout->addWidget(this->autoDisableCheck, 2, 1);
 
-  this->modelCreator = new ModelCreator();
-  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
+//  this->modelCreator = new ModelCreator();
+//  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
-  this->otherItemsLayout = new QVBoxLayout();
-  this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
+//  this->otherItemsLayout = new QVBoxLayout();
+//  this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
 
-  // Palette layout
-  QVBoxLayout *paletteLayout = new QVBoxLayout();
-  paletteLayout->addWidget(shapesLabel);
-  paletteLayout->addLayout(shapesLayout);
-  paletteLayout->addWidget(customShapesLabel);
-  paletteLayout->addLayout(customLayout);
-  paletteLayout->addLayout(this->otherItemsLayout);
-  paletteLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
-      QSizePolicy::Minimum));
-  paletteLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-  QWidget *paletteWidget = new QWidget();
-  paletteWidget->setLayout(paletteLayout);
-
-/*  // Model tree
+  // Model tree
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setObjectName("modelTreeWidget");
   this->modelTreeWidget->setColumnCount(1);
@@ -222,22 +136,13 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   modelLayout->addWidget(this->modelTreeWidget);
   modelLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
   QWidget *modelWidget = new QWidget();
-  modelWidget->setLayout(modelLayout);*/
+  modelWidget->setLayout(modelLayout);
 
   // Main layout
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-/*  QSplitter *splitter = new QSplitter(Qt::Vertical, this);
-  splitter->addWidget(paletteWidget);
-  splitter->addWidget(modelWidget);
-  splitter->setStretchFactor(0, 1);
-  splitter->setStretchFactor(1, 2);
-  splitter->setCollapsible(0, false);
-  splitter->setCollapsible(1, false);
-
-  frameLayout->addWidget(splitter);*/
-  frameLayout->addWidget(paletteWidget);
+  frameLayout->addWidget(modelWidget);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
@@ -246,208 +151,85 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  KeyEventHandler::Instance()->AddPressFilter("model_editor",
-    boost::bind(&ModelEditorPalette::OnKeyPress, this, _1));
-
-/*  // Connections
+  // Connections
   this->connections.push_back(
       gui::model::Events::ConnectSaveModel(
-      boost::bind(&ModelEditorPalette::OnSaveModel, this, _1)));
+      boost::bind(&ModelTreeWidget::OnSaveModel, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectNewModel(
-      boost::bind(&ModelEditorPalette::OnNewModel, this)));
+      boost::bind(&ModelTreeWidget::OnNewModel, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
-      boost::bind(&ModelEditorPalette::OnModelPropertiesChanged, this, _1, _2,
+      boost::bind(&ModelTreeWidget::OnModelPropertiesChanged, this, _1, _2,
       _3, _4)));
 
   this->connections.push_back(
       gui::model::Events::ConnectLinkInserted(
-      boost::bind(&ModelEditorPalette::OnLinkInserted, this, _1)));
+      boost::bind(&ModelTreeWidget::OnLinkInserted, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointInserted(
-      boost::bind(&ModelEditorPalette::OnJointInserted, this, _1, _2, _3, _4)));
+      boost::bind(&ModelTreeWidget::OnJointInserted, this, _1, _2, _3, _4)));
 
   this->connections.push_back(
       gui::model::Events::ConnectModelPluginInserted(
-      boost::bind(&ModelEditorPalette::OnModelPluginInserted, this, _1)));
+      boost::bind(&ModelTreeWidget::OnModelPluginInserted, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
-      boost::bind(&ModelEditorPalette::OnLinkRemoved, this, _1)));
+      boost::bind(&ModelTreeWidget::OnLinkRemoved, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointRemoved(
-      boost::bind(&ModelEditorPalette::OnJointRemoved, this, _1)));
+      boost::bind(&ModelTreeWidget::OnJointRemoved, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectModelPluginRemoved(
-      boost::bind(&ModelEditorPalette::OnModelPluginRemoved, this, _1)));
+      boost::bind(&ModelTreeWidget::OnModelPluginRemoved, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointNameChanged(
-      boost::bind(&ModelEditorPalette::OnJointNameChanged, this, _1, _2)));
+      boost::bind(&ModelTreeWidget::OnJointNameChanged, this, _1, _2)));
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&ModelEditorPalette::OnSetSelectedEntity, this, _1, _2)));
+       boost::bind(&ModelTreeWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedLink(
-       boost::bind(&ModelEditorPalette::OnSetSelectedLink, this, _1, _2)));
+       boost::bind(&ModelTreeWidget::OnSetSelectedLink, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
-       boost::bind(&ModelEditorPalette::OnSetSelectedJoint, this, _1, _2)));
+       boost::bind(&ModelTreeWidget::OnSetSelectedJoint, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedModelPlugin(
-     boost::bind(&ModelEditorPalette::OnSetSelectedModelPlugin, this, _1, _2)));*/
+     boost::bind(&ModelTreeWidget::OnSetSelectedModelPlugin, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
-ModelEditorPalette::~ModelEditorPalette()
+ModelTreeWidget::~ModelTreeWidget()
 {
-  delete this->modelCreator;
-  this->modelCreator = NULL;
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnCylinder()
+void ModelTreeWidget::OnAutoDisable()
 {
-  event::Events::setSelectedEntity("", "normal");
-  g_arrowAct->trigger();
-
-  this->modelCreator->AddLink(ModelCreator::LINK_CYLINDER);
+//  this->modelCreator->SetAutoDisable(this->autoDisableCheck->isChecked());
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSphere()
+void ModelTreeWidget::OnStatic()
 {
-  event::Events::setSelectedEntity("", "normal");
-  g_arrowAct->trigger();
-
-  this->modelCreator->AddLink(ModelCreator::LINK_SPHERE);
+//  this->modelCreator->SetStatic(this->staticCheck->isChecked());
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnBox()
-{
-  event::Events::setSelectedEntity("", "normal");
-  g_arrowAct->trigger();
-
-  this->modelCreator->AddLink(ModelCreator::LINK_BOX);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnCustom()
-{
-  ImportDialog importDialog(this);
-  importDialog.deleteLater();
-  if (importDialog.exec() == QDialog::Accepted)
-  {
-    QFileInfo info(QString::fromStdString(importDialog.GetImportPath()));
-    if (info.isFile())
-    {
-      event::Events::setSelectedEntity("", "normal");
-      g_arrowAct->trigger();
-      if (info.completeSuffix().toLower() == "dae" ||
-          info.completeSuffix().toLower() == "stl")
-      {
-        this->modelCreator->AddShape(ModelCreator::LINK_MESH,
-            math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
-      }
-      else if (info.completeSuffix().toLower() == "svg")
-      {
-        ExtrudeDialog extrudeDialog(importDialog.GetImportPath(), this);
-        extrudeDialog.deleteLater();
-        if (extrudeDialog.exec() == QDialog::Accepted)
-        {
-          this->modelCreator->AddShape(ModelCreator::LINK_POLYLINE,
-              math::Vector3(1.0/extrudeDialog.GetResolution(),
-              1.0/extrudeDialog.GetResolution(),
-              extrudeDialog.GetThickness()),
-              math::Pose::Zero, importDialog.GetImportPath(),
-              extrudeDialog.GetSamples());
-        }
-        else
-        {
-          this->OnCustom();
-        }
-      }
-    }
-  }
-  else
-  {
-    // this unchecks the custom button
-    this->OnLinkAdded();
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::AddItem(QWidget *_item,
-    const std::string &_category)
-{
-  std::string category = _category;
-  if (category.empty())
-    category = "Other";
-
-  auto iter = this->categories.find(category);
-  QGridLayout *catLayout = NULL;
-  if (iter == this->categories.end())
-  {
-    catLayout = new QGridLayout();
-    this->categories[category] = catLayout;
-
-    std::string catStr =
-        "<font size=4 color='white'>" + category + "</font>";
-    QLabel *catLabel = new QLabel(tr(catStr.c_str()));
-    this->otherItemsLayout->addWidget(catLabel);
-    this->otherItemsLayout->addLayout(catLayout);
-  }
-  else
-    catLayout = iter->second;
-
-  int rowWidth = 3;
-  int row = catLayout->count() / rowWidth;
-  int col = catLayout->count() % rowWidth;
-  catLayout->addWidget(_item, row, col);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::CreateJoint(const std::string &_type)
-{
-  event::Events::setSelectedEntity("", "normal");
-  this->modelCreator->AddJoint(_type);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnLinkAdded()
-{
-  this->linkButtonGroup->setExclusive(false);
-  if (this->linkButtonGroup->checkedButton())
-    this->linkButtonGroup->checkedButton()->setChecked(false);
-  this->linkButtonGroup->setExclusive(true);
-}
-
-/*/////////////////////////////////////////////////
-void ModelEditorPalette::OnAutoDisable()
-{
-  this->modelCreator->SetAutoDisable(this->autoDisableCheck->isChecked());
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnStatic()
-{
-  this->modelCreator->SetStatic(this->staticCheck->isChecked());
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnModelPropertiesChanged(
-    bool _static, bool _autoDisable, const math::Pose &_pose,
+void ModelTreeWidget::OnModelPropertiesChanged(
+    bool _static, bool _autoDisable, const math::Pose &/*_pose*/,
     const std::string &_name)
 {
   this->staticCheck->setChecked(_static);
@@ -455,8 +237,24 @@ void ModelEditorPalette::OnModelPropertiesChanged(
   this->modelNameEdit->setText(tr(_name.c_str()));
 }
 
+/*/////////////////////////////////////////////////
+bool ModelTreeWidget::OnKeyPress(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Escape)
+  {
+    // call the slots to uncheck the buttons
+    this->OnLinkAdded();
+  }
+  if (_event.key == Qt::Key_Delete)
+  {
+    event::Events::setSelectedEntity("", "normal");
+    g_arrowAct->trigger();
+  }
+  return false;
+}*/
+
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnItemSelectionChanged()
+void ModelTreeWidget::OnItemSelectionChanged()
 {
   QList<QTreeWidgetItem *> items = this->modelTreeWidget->selectedItems();
 
@@ -501,8 +299,8 @@ void ModelEditorPalette::OnItemSelectionChanged()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSetSelectedEntity(const std::string &_name,
-    const std::string &_mode)
+void ModelTreeWidget::OnSetSelectedEntity(const std::string &/*_name*/,
+    const std::string &/*_mode*/)
 {
   // deselect all
   for (auto &item : this->selected)
@@ -512,16 +310,20 @@ void ModelEditorPalette::OnSetSelectedEntity(const std::string &_name,
   }
 }
 
-
+/*/////////////////////////////////////////////////
+ModelCreator *ModelTreeWidget::GetModelCreator()
+{
+  return this->modelCreator;
+}*/
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnNameChanged(const QString &_name)
+void ModelTreeWidget::OnNameChanged(const QString &_name)
 {
   gui::model::Events::modelNameChanged(_name.toStdString());
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnNewModel()
+void ModelTreeWidget::OnNewModel()
 {
   this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
 
@@ -529,14 +331,14 @@ void ModelEditorPalette::OnNewModel()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSaveModel(const std::string &_saveName)
+void ModelTreeWidget::OnSaveModel(const std::string &_saveName)
 {
   this->modelNameEdit->setText(tr(_saveName.c_str()));
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
-    int _column)
+void ModelTreeWidget::OnItemDoubleClicked(QTreeWidgetItem *_item,
+    int /*_column*/)
 {
   if (_item)
   {
@@ -553,8 +355,8 @@ void ModelEditorPalette::OnItemDoubleClicked(QTreeWidgetItem *_item,
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnItemClicked(QTreeWidgetItem *_item,
-    int _column)
+void ModelTreeWidget::OnItemClicked(QTreeWidgetItem *_item,
+    int /*_column*/)
 {
   if (_item)
   {
@@ -573,7 +375,7 @@ void ModelEditorPalette::OnItemClicked(QTreeWidgetItem *_item,
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::DeselectType(const std::string &_type)
+void ModelTreeWidget::DeselectType(const std::string &_type)
 {
   QObject::disconnect(this->modelTreeWidget, SIGNAL(itemSelectionChanged()),
       this, SLOT(OnItemSelectionChanged()));
@@ -604,7 +406,7 @@ void ModelEditorPalette::DeselectType(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
+void ModelTreeWidget::OnCustomContextMenu(const QPoint &_pt)
 {
   QTreeWidgetItem *item = this->modelTreeWidget->itemAt(_pt);
 
@@ -623,7 +425,7 @@ void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
+void ModelTreeWidget::OnLinkInserted(const std::string &_linkName)
 {
   std::string leafName = _linkName;
   size_t idx = _linkName.find_last_of("::");
@@ -641,9 +443,9 @@ void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
-    const std::string &_jointName, const std::string &_parentName,
-    const std::string &_childName)
+void ModelTreeWidget::OnJointInserted(const std::string &_jointId,
+    const std::string &_jointName, const std::string &/*_parentName*/,
+    const std::string &/*_childName*/)
 {
   std::string leafName = _jointName;
   size_t idx = _jointName.find_last_of("::");
@@ -661,7 +463,7 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnModelPluginInserted(
+void ModelTreeWidget::OnModelPluginInserted(
     const std::string &_modelPluginName)
 {
   QTreeWidgetItem *newModelPluginItem = new QTreeWidgetItem(
@@ -676,7 +478,7 @@ void ModelEditorPalette::OnModelPluginInserted(
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
+void ModelTreeWidget::OnLinkRemoved(const std::string &_linkId)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->linksItem->childCount(); ++i)
@@ -695,7 +497,7 @@ void ModelEditorPalette::OnLinkRemoved(const std::string &_linkId)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
+void ModelTreeWidget::OnJointRemoved(const std::string &_jointId)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
@@ -714,7 +516,7 @@ void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnModelPluginRemoved(const std::string &_pluginId)
+void ModelTreeWidget::OnModelPluginRemoved(const std::string &_pluginId)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->modelPluginsItem->childCount(); ++i)
@@ -734,7 +536,7 @@ void ModelEditorPalette::OnModelPluginRemoved(const std::string &_pluginId)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::ClearModelTree()
+void ModelTreeWidget::ClearModelTree()
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   // Remove all links
@@ -746,7 +548,7 @@ void ModelEditorPalette::ClearModelTree()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
+void ModelTreeWidget::OnJointNameChanged(const std::string &_jointId,
     const std::string &_newJointName)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
@@ -766,7 +568,7 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
+void ModelTreeWidget::OnSetSelectedLink(const std::string &_name,
     bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
@@ -786,7 +588,7 @@ void ModelEditorPalette::OnSetSelectedLink(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
+void ModelTreeWidget::OnSetSelectedJoint(const std::string &_name,
     bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
@@ -806,7 +608,7 @@ void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnSetSelectedModelPlugin(const std::string &_name,
+void ModelTreeWidget::OnSetSelectedModelPlugin(const std::string &_name,
     bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
@@ -823,26 +625,4 @@ void ModelEditorPalette::OnSetSelectedModelPlugin(const std::string &_name,
       break;
     }
   }
-}*/
-
-/////////////////////////////////////////////////
-bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
-{
-  if (_event.key == Qt::Key_Escape)
-  {
-    // call the slots to uncheck the buttons
-    this->OnLinkAdded();
-  }
-  if (_event.key == Qt::Key_Delete)
-  {
-    event::Events::setSelectedEntity("", "normal");
-    g_arrowAct->trigger();
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
-ModelCreator *ModelEditorPalette::GetModelCreator()
-{
-  return this->modelCreator;
 }

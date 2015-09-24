@@ -28,6 +28,7 @@
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/model/ModelTreeWidget.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -47,9 +48,15 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow), dataPtr(new ModelEditorPrivate)
 {
   this->dataPtr->active = false;
-  // Create the model editor tab
+  // Create the model editor palette tab
   this->dataPtr->modelPalette = new ModelEditorPalette(_mainWindow);
-  this->Init("modelEditorTab", "Model Editor", this->dataPtr->modelPalette);
+  this->Init("modelEditorTab", "Palette", this->dataPtr->modelPalette);
+
+  // create the model tree tab
+  this->dataPtr->modelTree = new ModelTreeWidget(_mainWindow);
+
+  GZ_ASSERT(this->tabWidget != NULL, "Editor tab widget is NULL");
+  this->tabWidget->addTab(this->dataPtr->modelTree, tr("Settings"));
 
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
