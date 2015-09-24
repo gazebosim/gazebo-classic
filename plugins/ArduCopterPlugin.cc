@@ -303,8 +303,8 @@ void ArduCopterPlugin::SendState()
   //   y right
   //   z down
 
-  // get linear acceleration
-  math::Vector3 linearAccel = this->imuSensor->GetLinearAcceleration();
+  // get linear acceleration in body frame
+  math::Vector3 linearAccel = this->imuSensor->LinearAcceleration();
 
   // rotate gravity into imu frame, subtract it
   // math::Vector3 gravity =
@@ -316,35 +316,75 @@ void ArduCopterPlugin::SendState()
   pkt.imu_linear_acceleration_xyz[0] = linearAccel.x;
   pkt.imu_linear_acceleration_xyz[1] = linearAccel.y;
   pkt.imu_linear_acceleration_xyz[2] = linearAccel.z;
+  gzerr << "lin accel [" << linearAccel << "]\n";
 
-  // get angular velocity
-  math::Vector3 angularVel = this->imuSensor->GetAngularVelocity();
+  // get angular velocity in body frame
+  math::Vector3 angularVel = this->imuSensor->AngularVelocity();
   // copy to pkt
   pkt.imu_angular_velocity_rpy[0] = angularVel.x;
   pkt.imu_angular_velocity_rpy[1] = angularVel.y;
   pkt.imu_angular_velocity_rpy[2] = angularVel.z;
 
   // get orientation with offset added
-  math::Quaternion worldQ = this->imuSensor->GetOrientation();
-  pkt.imu_orientation_quat[0] = worldQ.w;
-  pkt.imu_orientation_quat[1] = worldQ.x;
-  pkt.imu_orientation_quat[2] = worldQ.y;
-  pkt.imu_orientation_quat[3] = worldQ.z;
+  // math::Quaternion worldQ = this->imuSensor->Orientation();
+  // pkt.imu_orientation_quat[0] = worldQ.w;
+  // pkt.imu_orientation_quat[1] = worldQ.x;
+  // pkt.imu_orientation_quat[2] = worldQ.y;
+  // pkt.imu_orientation_quat[3] = worldQ.z;
 
   // get inertial pose and velocity
-  //
-  // math::Pose modelPose = this->model->GetWorldPose();
-  math::Pose modelPose = this->imuLink->GetWorldPose();
-  math::Vector3 worldPos = modelPose.pos;
-  pkt.position_xyz[0] = worldPos.x;
-  pkt.position_xyz[1] = worldPos.y;
-  pkt.position_xyz[2] = worldPos.z;
+  // position of the quadrotor in world frame
+  // this position is used to calcualte bearing and distance
+  // from starting location, then use that to update gps position.
+  // The algorithm looks something like below (from ardupilot helper
+  // libraries):
+  //   bearing = to_degrees(atan2(position.y, position.x));
+  //   distance = math.sqrt(self.position.x**2 + self.position.y**2)
+  //   (self.latitude, self.longitude) = util.gps_newpos(
+  //    self.home_latitude, self.home_longitude, bearing, distance)
+  // where xyz is in the NED directions.
+  // Gazebo world xyz is assumed to be N, -E, -D, so flip some stuff
+  // around.
+  // orientation of the quadrotor in world NED frame -
+  // assuming the world NED frame has xyz mapped to NED,
+  // imuLink is NED - z down
 
-  math::Vector3 worldVel = this->imuLink->GetWorldLinearVel();
-  // velocity in NED
-  pkt.velocity_xyz[0] = worldVel.x;
-  pkt.velocity_xyz[1] = worldVel.y;
-  pkt.velocity_xyz[2] = worldVel.z;
+  // gazeboToNED brings us from gazebo model: x-forward, y-right, z-down
+  // to the aerospace convention: x-forward, y-left, z-up
+  math::Pose gazeboToNED =
+    math::Pose(math::Vector3(), math::Vector3(M_PI, 0, 0));
+
+  // model world pose brings us to model, x-forward, y-left, z-up
+  // adding gazeboToNED gets us to the x-forward, y-right, z-down
+  math::Pose worldToModel = gazeboToNED + this->model->GetWorldPose();
+
+  // get transform from world NED to Model frame
+  math::Pose NEDToModel = worldToModel - gazeboToNED;
+
+  gzerr << "ned to model [" << NEDToModel << "]\n";
+  pkt.position_xyz[0] = NEDToModel.pos.x;  // N
+  pkt.position_xyz[1] = NEDToModel.pos.y;  // E
+  pkt.position_xyz[2] = NEDToModel.pos.z;  // D
+  // This is the rotation from world NED frame to the quadrotor
+  // frame.
+  gzerr << "imu [" << worldToModel.rot.GetAsEuler() << "]\n";
+  gzerr << "ned [" << gazeboToNED.rot.GetAsEuler() << "]\n";
+  gzerr << "rot [" << NEDToModel.rot.GetAsEuler() << "]\n";
+  pkt.imu_orientation_quat[0] = NEDToModel.rot.w;
+  pkt.imu_orientation_quat[1] = NEDToModel.rot.x;
+  pkt.imu_orientation_quat[2] = NEDToModel.rot.y;
+  pkt.imu_orientation_quat[3] = NEDToModel.rot.z;
+
+  // Get NED velocity in body frame *
+  // or...
+  // Get model velocity in NED frame
+  math::Vector3 velGazeboWorldFrame =
+    this->model->GetLink()->GetWorldLinearVel();
+  math::Vector3 velNEDFrame =
+    gazeboToNED.rot.RotateVectorReverse(velGazeboWorldFrame);
+  pkt.velocity_xyz[0] = velNEDFrame.x;
+  pkt.velocity_xyz[1] = velNEDFrame.y;
+  pkt.velocity_xyz[2] = velNEDFrame.z;
 
   struct sockaddr_in sockaddr;
   this->make_sockaddr("127.0.0.1", 9003, sockaddr);
