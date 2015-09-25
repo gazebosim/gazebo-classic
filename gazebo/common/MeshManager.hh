@@ -84,31 +84,12 @@ namespace gazebo
       /// \brief Get mesh aabb and center.
       /// \param[in] _mesh the mesh
       /// \param[out] _center the AAB center position
-      /// \param[out] _minXYZ the bounding box minimum
-      /// \param[out] _maxXYZ the bounding box maximum
-      /// \deprecated See GetMeshAABB that accepts ignition::math::Vector3d.
-      public: void GetMeshAABB(const Mesh *_mesh,
-                               math::Vector3 &_center,
-                               math::Vector3 &_minXYZ,
-                               math::Vector3 &_maxXYZ) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get mesh aabb and center.
-      /// \param[in] _mesh the mesh
-      /// \param[out] _center the AAB center position
       /// \param[out] _min_xyz the bounding box minimum
       /// \param[out] _max_xyz the bounding box maximum
       public: void GetMeshAABB(const Mesh *_mesh,
                   ignition::math::Vector3d &_center,
                   ignition::math::Vector3d &_min_xyz,
                   ignition::math::Vector3d &_max_xyz);
-
-      /// \brief generate spherical texture coordinates
-      /// \param[in] _mesh Pointer to the mesh
-      /// \param[in] _center Center of the mesh
-      /// \deprecated See GenSphericalTexCoord function that accepts
-      /// ignition::math::Vector3d.
-      public: void GenSphericalTexCoord(const Mesh *_mesh,
-                  math::Vector3 _center) GAZEBO_DEPRECATED(6.0);
 
       /// \brief generate spherical texture coordinates
       /// \param[in] _mesh Pointer to the mesh
@@ -144,37 +125,9 @@ namespace gazebo
       /// \param[in] _name the name of the new mesh
       /// \param[in] _sides the x y x dimentions of eah side in meter
       /// \param[in] _uvCoords the texture coordinates
-      /// \deprecated See CreateBox function that accepts
-      /// ignition::math::Vector3d and ignition::math::Vector2d.
-      public: void CreateBox(const std::string &_name,
-                  const math::Vector3 &_sides,
-                  const math::Vector2d &_uvCoords) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Create a Box mesh
-      /// \param[in] _name the name of the new mesh
-      /// \param[in] _sides the x y x dimentions of eah side in meter
-      /// \param[in] _uvCoords the texture coordinates
       public: void CreateBox(const std::string &_name,
                              const ignition::math::Vector3d &_sides,
                              const ignition::math::Vector2d &_uvCoords);
-
-      /// \brief Create an extruded mesh from polylines. The polylines are
-      /// assumed to be closed and non-intersecting. Delaunay triangulation is
-      /// applied to create the resulting mesh. If there is more than one
-      /// polyline, a ray casting algorithm will be used to identify the
-      /// exterior/interior edges and remove holes from the 2D shape before
-      /// extrusion.
-      /// \param[in] _name the name of the new mesh
-      /// \param[in] _vertices A multidimensional vector of polylines and their
-      /// vertices. Each element in the outer vector consists of a vector of
-      /// vertices that describe one polyline.
-      /// edges and remove the holes in the shape.
-      /// \param[in] _height the height of extrusion
-      /// \deprecated See CreateExtrudedPolyline that accepts
-      /// ignition::math::Vector2d.
-      public: void CreateExtrudedPolyline(const std::string &_name,
-                  const std::vector<std::vector<math::Vector2d> > &_vertices,
-                  double _height) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Create an extruded mesh from polylines. The polylines are
       /// assumed to be closed and non-intersecting. Delaunay triangulation is
@@ -240,38 +193,10 @@ namespace gazebo
       /// \param[in] _plane plane parameters
       /// \param[in] _segments number of segments in x and y
       /// \param[in] _uvTile the texture tile size in x and y
-      /// \deprecated See CreatePlane function that accepts ignition::math
-      /// objects.
-      public: void CreatePlane(const std::string &_name,
-                  const math::Plane &_plane,
-                  const math::Vector2d &_segments,
-                  const math::Vector2d &_uvTile) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Create mesh for a plane
-      /// \param[in] _name
-      /// \param[in] _plane plane parameters
-      /// \param[in] _segments number of segments in x and y
-      /// \param[in] _uvTile the texture tile size in x and y
       public: void CreatePlane(const std::string &_name,
                                const ignition::math::Planed &_plane,
                                const ignition::math::Vector2d &_segments,
                                const ignition::math::Vector2d &_uvTile);
-
-      /// \brief Create mesh for a plane
-      /// \param[in] _name the name of the new mesh
-      /// \param[in] _normal the normal to the plane
-      /// \param[in] _d distance from the origin along normal
-      /// \param[in] _size the size of the plane in x and y
-      /// \param[in] _segments the number of segments in x and y
-      /// \param[in] _uvTile the texture tile size in x and y
-      /// \deprecated See CreatePlane function that accepts ignition::math
-      /// objects.
-      public: void CreatePlane(const std::string &_name,
-                  const math::Vector3 &_normal,
-                  double _d,
-                  const math::Vector2d &_size,
-                  const math::Vector2d &_segments,
-                  const math::Vector2d &_uvTile) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Create mesh for a plane
       /// \param[in] _name the name of the new mesh
@@ -305,18 +230,6 @@ namespace gazebo
       public: void CreateCamera(const std::string &_name, float _scale);
 
 #ifdef HAVE_GTS
-      /// \brief Create a boolean mesh from two meshes
-      /// \param[in] _name the name of the new mesh
-      /// \param[in] _m1 the parent mesh in the boolean operation
-      /// \param[in] _m2 the child mesh in the boolean operation
-      /// \param[in] _operation the boolean operation applied to the two meshes
-      /// \param[in] _offset _m2's pose offset from _m1
-      /// \deprecated See CreateBoolean function that accepts
-      /// ignition::math::Pose3d.
-      public: void CreateBoolean(const std::string &_name, const Mesh *_m1,
-          const Mesh *_m2, const int _operation,
-          const math::Pose &_offset = math::Pose::Zero) GAZEBO_DEPRECATED(6.0);
-
       /// \brief Create a boolean mesh from two meshes
       /// \param[in] _name the name of the new mesh
       /// \param[in] _m1 the parent mesh in the boolean operation

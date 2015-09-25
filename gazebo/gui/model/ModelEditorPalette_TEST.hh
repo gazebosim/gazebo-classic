@@ -27,6 +27,15 @@ class ModelEditorPalette_TEST : public QTestFixture
 
   /// \brief Tests adding an item to the palette.
   private slots: void AddItem();
+
+  /// \brief Tests the link list.
+  private slots: void AddRemoveLinks();
+
+  /// \brief Tests the joint list.
+  private slots: void AddRemoveJoints();
+
+  /// \brief Tests the model plugin list.
+  private slots: void AddRemoveModelPlugins();
 };
 
 #endif
