@@ -36,6 +36,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/common/CommonIface.hh"
@@ -288,6 +290,20 @@ namespace gazebo
                    double _vResolution = 1.0,
                    const std::string &_noiseType = "", double _noiseMean = 0.0,
                    double _noiseStdDev = 0.0);
+
+    /// \brief Spawn a sonar.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _sonarName Name of the sonar.
+    /// \param[in] _pose Sonar pose.
+    /// \param[in] _minRange Minimum sonar range.
+    /// \param[in] _maxRange Maximum sonar range.
+    /// \param[in] _radius Sonar cone radius.
+    protected: sensors::SonarSensorPtr SpawnSonar(const std::string &_modelName,
+                   const std::string &_sonarName,
+                   const ignition::math::Pose3d &_pose,
+                   const double _minRange,
+                   const double _maxRange,
+                   const double _radius);
 
     /// \brief Spawn a gpu laser.
     /// \param[in] _modelName Name of the model.
