@@ -116,9 +116,9 @@ std::string SchematicViewWidget::GetLeafName(const std::string &_scopedName)
     return "";
 
   std::string leafName = _scopedName;
-  size_t idx = _scopedName.find_last_of("::");
+  size_t idx = _scopedName.rfind("::");
   if (idx != std::string::npos)
-    leafName = _scopedName.substr(idx+1);
+    leafName = _scopedName.substr(idx+2);
   return leafName;
 }
 
