@@ -42,6 +42,36 @@
 using namespace gazebo;
 using namespace rendering;
 
+/////////////////////////////////////////////////
+MovableTextFactory::MovableTextFactory()
+{
+}
+
+/////////////////////////////////////////////////
+MovableTextFactory::~MovableTextFactory()
+{
+}
+
+/////////////////////////////////////////////////
+const Ogre::String &MovableTextFactory::getType() const
+{
+  return this->name;
+}
+
+/////////////////////////////////////////////////
+Ogre::MovableObject *MovableTextFactory::createInstanceImpl(
+    const Ogre::String & /*_name*/,
+    const Ogre::NameValuePairList * /*_params*/)
+{
+  return new MovableText();
+}
+
+//////////////////////////////////////////////////
+void MovableTextFactory::destroyInstance(Ogre::MovableObject *_obj)
+{
+  delete _obj;
+}
+
 //////////////////////////////////////////////////
 MovableText::MovableText()
     : camera(NULL),
