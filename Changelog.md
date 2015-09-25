@@ -964,6 +964,11 @@ compilation on Windows.
 1. Fixed memory leak in image conversion
     * [Pull request #1073](https://bitbucket.org/osrf/gazebo/pull-request/1073)
 
+### Gazebo 2.2.1 (xxxx-xx-xx)
+
+1. Fix heightmap model texture loading.
+    * [Pull request #1596](https://bitbucket.org/osrf/gazebo/pull-request/1596)
+
 ### Gazebo 2.2.0 (2014-01-10)
 
 1. Fix compilation when using OGRE-1.9 (full support is being worked on)
