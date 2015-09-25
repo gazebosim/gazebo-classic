@@ -998,7 +998,8 @@ void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem)
     colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
 
     // Add to link
-    link->AddCollision(colVisual);
+    msgs::Collision colMsg = msgs::CollisionFromSDF(collisionElem);
+    link->AddCollision(colVisual, &colMsg);
 
     collisionElem = collisionElem->GetNextElement("collision");
   }

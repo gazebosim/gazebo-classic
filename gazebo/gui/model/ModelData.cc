@@ -524,10 +524,10 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
 }
 
 /////////////////////////////////////////////////
-void LinkData::AddCollision(rendering::VisualPtr _collisionVis)
+void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
+    const msgs::Collision *_msg)
 {
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
-  msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
 
   sdf::ElementPtr collisionSDF(new sdf::Element);
   sdf::initFile("collision.sdf", collisionSDF);
@@ -539,11 +539,21 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis)
     leafName = visName.substr(idx+2);
 
   msgs::Collision collisionMsg;
-  collisionMsg.set_name(leafName);
-  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
-  geomMsg->CopyFrom(visualMsg.geometry());
-  msgs::Pose *poseMsg = collisionMsg.mutable_pose();
-  poseMsg->CopyFrom(visualMsg.pose());
+  // Use input message
+  if (_msg)
+  {
+    collisionMsg = *_msg;
+  }
+  // Get data from input visual
+  else
+  {
+    msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
+    collisionMsg.set_name(leafName);
+    msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+    geomMsg->CopyFrom(visualMsg.geometry());
+    msgs::Pose *poseMsg = collisionMsg.mutable_pose();
+    poseMsg->CopyFrom(visualMsg.pose());
+  }
 
   this->collisions[_collisionVis] = collisionMsg;
   collisionConfig->AddCollision(leafName, &collisionMsg);
