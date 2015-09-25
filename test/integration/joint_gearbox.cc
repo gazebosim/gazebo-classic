@@ -20,7 +20,6 @@
 #include "gazebo/test/ServerFixture.hh"
 
 #define TOL 1e-6
-#define ZERO_TOL 1e-10
 using namespace gazebo;
 
 class ODEGearboxJoint_TEST : public ServerFixture
