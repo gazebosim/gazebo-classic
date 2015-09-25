@@ -1,4 +1,9 @@
 ## Gazebo 7.0
+
+1. Resolve issue #1702
+    * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
+    * [Pull request #1906](https://bitbucket.org/osrf/gazebo/pull-request/1906)
+
 1. Added torsional friction
     * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
 
