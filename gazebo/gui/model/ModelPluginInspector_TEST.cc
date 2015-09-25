@@ -96,5 +96,32 @@ void ModelPluginInspector_TEST::Update()
   delete inspector;
 }
 
+/////////////////////////////////////////////////
+void ModelPluginInspector_TEST::RemoveButton()
+{
+  // Create a modelPlugin inspector
+  gazebo::gui::ModelPluginInspector *modelPluginInspector =
+      new gazebo::gui::ModelPluginInspector();
+  QVERIFY(modelPluginInspector != NULL);
+
+  // Open it
+  modelPluginInspector->open();
+  QVERIFY(modelPluginInspector->isVisible());
+
+  // Get buttons
+  QList<QToolButton *> toolButtons =
+      modelPluginInspector->findChildren<QToolButton *>();
+  QVERIFY(toolButtons.size() == 1);
+  QVERIFY(toolButtons[0]->text() == "");
+
+  // Trigger remove
+  toolButtons[0]->click();
+
+  // Check modelPlugin inspector disappeared
+  QVERIFY(!modelPluginInspector->isVisible());
+
+  delete modelPluginInspector;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ModelPluginInspector_TEST)

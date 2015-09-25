@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _LINK_INSPECTOR_HH_
-#define _LINK_INSPECTOR_HH_
+#ifndef _GAZEBO_LINK_INSPECTOR_HH_
+#define _GAZEBO_LINK_INSPECTOR_HH_
 
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
     class VisualConfig;
     class CollisionConfig;
 
-    class LinkInspector : public QDialog
+    class GZ_GUI_VISIBLE LinkInspector : public QDialog
     {
       Q_OBJECT
 

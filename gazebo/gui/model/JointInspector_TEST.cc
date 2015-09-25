@@ -118,7 +118,7 @@ void JointInspector_TEST::Swap()
   QVERIFY(toolButtons.size() == 2);
 
   // Trigger swap
-  toolButtons[0]->click();
+  toolButtons[1]->click();
 
   // Check parent and child links
   QVERIFY(parentBox->currentText() == "link2");
@@ -135,26 +135,14 @@ void JointInspector_TEST::RemoveButton()
   gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
   QVERIFY(jointMaker != NULL);
 
-  // Add joint
-  gazebo::gui::model::Events::linkInserted("model::link1");
-  gazebo::gui::model::Events::linkInserted("model::link2");
-  gazebo::gui::model::Events::jointInserted("joint_id", "joint_name",
-      "revolute", "model::link1", "model::link2");
-
-  std::vector<gazebo::gui::JointData *> jointDatas =
-      jointMaker->GetJointDataByLink("model::link1");
-
-std::cout << jointDatas.size() << std::endl;
-
-  QVERIFY(jointDatas.size() == 1);
-
   // Create a joint inspector
   gazebo::gui::JointInspector *jointInspector =
       new gazebo::gui::JointInspector(jointMaker);
   QVERIFY(jointInspector != NULL);
 
-  // Open it so link boxes are updated with new links
+  // Open it
   jointInspector->Open();
+  QVERIFY(jointInspector->isVisible());
 
   // Get buttons
   QList<QToolButton *> toolButtons =
@@ -163,7 +151,10 @@ std::cout << jointDatas.size() << std::endl;
   QVERIFY(toolButtons[0]->text() == "");
 
   // Trigger remove
-  toolButtons[1]->click();
+  toolButtons[0]->click();
+
+  // Check joint inspector disappeared
+  QVERIFY(!jointInspector->isVisible());
 
   delete jointInspector;
   delete jointMaker;

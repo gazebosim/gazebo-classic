@@ -15,7 +15,6 @@
  *
 */
 
-#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/model/LinkInspector_TEST.hh"
 
@@ -24,26 +23,30 @@
 /////////////////////////////////////////////////
 void LinkInspector_TEST::RemoveButton()
 {
-/*
-  this->dataPtr->connection =
-      gui::model::Events::ConnectRequestLinkRemoval(
-      boost::bind(&LinkInspector_TEST::RemoveLink, this, _1));
-
   // Create a link inspector
   gazebo::gui::LinkInspector *linkInspector =
-      new gazebo::gui::LinkInspector(linkMaker);
+      new gazebo::gui::LinkInspector();
   QVERIFY(linkInspector != NULL);
+
+  // Open it
+  linkInspector->open();
+  QVERIFY(linkInspector->isVisible());
 
   // Get buttons
   QList<QToolButton *> toolButtons =
       linkInspector->findChildren<QToolButton *>();
-  QVERIFY(toolButtons.size() == 1);
+
+  // 3 tool buttons: remove link, remove visual, remove collision
+  QVERIFY(toolButtons.size() == 3);
+  QVERIFY(toolButtons[0]->text() == "");
 
   // Trigger remove
   toolButtons[0]->click();
 
+  // Check link inspector disappeared
+  QVERIFY(!linkInspector->isVisible());
+
   delete linkInspector;
-*/
 }
 
 // Generate a main function for the test
