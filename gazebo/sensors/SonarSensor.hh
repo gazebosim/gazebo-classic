@@ -98,6 +98,9 @@ namespace gazebo
       public: void DisconnectUpdate(event::ConnectionPtr &_conn)
               {update.Disconnect(_conn);}
 
+      /// \brief Update event.
+      protected: event::EventT<void(msgs::SonarStamped)> update;
+
       /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);
 
@@ -140,8 +143,9 @@ namespace gazebo
       /// \brief Radius of the sonar cone at maximum range.
       private: double radius;
 
-      /// \brief Update event.
-      protected: event::EventT<void(msgs::SonarStamped)> update;
+      /// \brief Counts the number of times there were no contacts. This is
+      /// used to reduce the range value jumping.
+      private: int emptyContactCount;
     };
     /// \}
   }

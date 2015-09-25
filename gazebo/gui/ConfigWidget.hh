@@ -446,9 +446,31 @@ namespace gazebo
       public: bool AddConfigChildWidget(const std::string &_name,
           ConfigChildWidget *_child);
 
+      /// \brief Insert a layout into the config widget's layout at a specific
+      /// position.
+      /// \param[in] _layout The layout to be inserted.
+      /// \param[in] _pos The position to insert at, 0 being the top.
+      public: void InsertLayout(QLayout *_layout, int _pos);
+
       /// \brief Get the number of child widgets.
       /// \return The number of child widgets.
       public: unsigned int ConfigChildWidgetCount() const;
+
+      /// \brief List of colors used for the background of widgets according to
+      /// their level.
+      public: static const std::vector<QString> bgColors;
+
+      /// \brief List of colors used for widget areas according to their level.
+      public: static const std::vector<QString> widgetColors;
+
+      /// \brief Red color used for "red" or "x" fields.
+      public: static const QString redColor;
+
+      /// \brief Green color used for "green" or "y" fields.
+      public: static const QString greenColor;
+
+      /// \brief Blue color used for "blue" or "z" fields.
+      public: static const QString blueColor;
 
       /// \brief Parse the input message and either create widgets for
       /// configuring fields of the message, or update the widgets with values
@@ -708,39 +730,6 @@ namespace gazebo
 
       /// \brief A copy of the message with fields to be configured by widgets.
       private: google::protobuf::Message *configMsg;
-
-      /// \brief Color used for the background of level 0 widgets.
-      private: static const QString level0BgColor;
-
-      /// \brief Color used for the background of level 0 widgets.
-      private: static const QString level1BgColor;
-
-      /// \brief Color used for the background of level 0 widgets.
-      private: static const QString level2BgColor;
-
-      /// \brief Color used for the background of level 0 widgets.
-      private: static const QString level3BgColor;
-
-      /// \brief Color used for the widget areas of of level 0 widgets.
-      private: static const QString level0WidgetColor;
-
-      /// \brief Color used for the widget areas of of level 0 widgets.
-      private: static const QString level1WidgetColor;
-
-      /// \brief Color used for the widget areas of of level 0 widgets.
-      private: static const QString level2WidgetColor;
-
-      /// \brief Color used for the widget areas of of level 0 widgets.
-      private: static const QString level3WidgetColor;
-
-      /// \brief Red color used for "red" or "x" fields.
-      private: static const QString redColor;
-
-      /// \brief Red color used for "green" or "y" fields.
-      private: static const QString greenColor;
-
-      /// \brief Red color used for "blue" or "z" fields.
-      private: static const QString blueColor;
     };
   }
 }
