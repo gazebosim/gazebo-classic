@@ -122,7 +122,6 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->id = this->dataPtr->visualIdCount--;
   this->dataPtr->boundingBox = NULL;
   this->dataPtr->useRTShader = _useRTShader;
-  this->dataPtr->scale = ignition::math::Vector3d::One;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->dataPtr->sdf);
@@ -234,7 +233,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 {
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
-
+  result->SetScale(this->dataPtr->scale);
   for (auto iter: this->dataPtr->children)
   {
     iter->Clone(iter->GetName(), result);
@@ -288,6 +287,7 @@ void Visual::Init()
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
   this->dataPtr->layer = -1;
+  this->dataPtr->scale = ignition::math::Vector3d::One;
 
   if (this->dataPtr->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
@@ -369,32 +369,33 @@ void Visual::Load()
   {
     sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
 
+    ignition::math::Vector3d geometrySize;
     bool hasGeom = true;
     if (geomElem->HasElement("box"))
     {
-      this->dataPtr->scale =
+      geometrySize =
           geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
       double r = geomElem->GetElement("sphere")->Get<double>("radius");
-      this->dataPtr->scale.Set(r * 2.0, r * 2.0, r * 2.0);
+      geometrySize.Set(r * 2.0, r * 2.0, r * 2.0);
     }
     else if (geomElem->HasElement("cylinder"))
     {
       double r = geomElem->GetElement("cylinder")->Get<double>("radius");
       double l = geomElem->GetElement("cylinder")->Get<double>("length");
-      this->dataPtr->scale.Set(r * 2.0, r * 2.0, l);
+      geometrySize.Set(r * 2.0, r * 2.0, l);
     }
     else if (geomElem->HasElement("plane"))
     {
       math::Vector2d size =
         geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      this->dataPtr->scale.Set(size.x, size.y, 1);
+      geometrySize.Set(size.x, size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
-      this->dataPtr->scale =
+      geometrySize =
           geomElem->GetElement("mesh")->Get<ignition::math::Vector3d>("scale");
     }
     else
@@ -406,12 +407,13 @@ void Visual::Load()
     {
       // geom values give the absolute size so compute a scale that will
       // be mulitiply by the current scale to get to the geom size.
-      math::Vector3 derivedScale = Conversions::Convert(
-          this->dataPtr->sceneNode->_getDerivedScale());
-      ignition::math::Vector3d toScale = this->dataPtr->scale /
-          derivedScale.Ign();
-      this->dataPtr->sceneNode->scale(toScale.X(), toScale.Y(), toScale.Z());
-      this->dataPtr->geomSize = this->dataPtr->scale;
+      ignition::math::Vector3d derivedScale = this->DerivedScale();
+      ignition::math::Vector3d localScale =
+          geometrySize / (derivedScale / this->dataPtr->scale);
+      this->dataPtr->sceneNode->setScale(
+          Conversions::Convert(math::Vector3(localScale)));
+      this->dataPtr->scale = localScale;
+      this->dataPtr->geomSize = geometrySize;
     }
   }
 
@@ -734,7 +736,8 @@ void Visual::SetScale(const math::Vector3 &_scale)
     return;
 
   // update geom size based on scale.
-  this->UpdateGeomSize(_scale.Ign());
+  this->UpdateGeomSize(
+      this->DerivedScale() / this->dataPtr->scale * _scale.Ign());
 
   this->dataPtr->scale = _scale.Ign();
 
@@ -748,7 +751,7 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
        iter != this->dataPtr->children.end(); ++iter)
   {
-    (*iter)->UpdateGeomSize(_scale);
+    (*iter)->UpdateGeomSize(_scale * (*iter)->GetScale().Ign());
   }
 
   // update the same way as server - see Link::UpdateVisualGeomSDF()
@@ -760,7 +763,8 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
   {
     ignition::math::Vector3d size =
         geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
-    ignition::math::Vector3d geomBoxSize = _scale/this->dataPtr->scale*size;
+    ignition::math::Vector3d geomBoxSize = _scale/this->dataPtr->geomSize*size;
+
     geomElem->GetElement("box")->GetElement("size")->Set(
         geomBoxSize);
     this->dataPtr->geomSize = geomBoxSize;
@@ -770,7 +774,7 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
     // update radius the same way as collision shapes
     double radius = geomElem->GetElement("sphere")->Get<double>("radius");
     double newRadius = _scale.Max();
-    double oldRadius = this->dataPtr->scale.Max();
+    double oldRadius = this->dataPtr->geomSize.Max();
     double geomRadius = newRadius/oldRadius*radius;
     geomElem->GetElement("sphere")->GetElement("radius")->Set(geomRadius);
     this->dataPtr->geomSize = ignition::math::Vector3d(
@@ -781,15 +785,16 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
     // update radius the same way as collision shapes
     double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
     double newRadius = std::max(_scale.X(), _scale.Y());
-    double oldRadius = std::max(this->dataPtr->scale.X(),
-        this->dataPtr->scale.Y());
+    double oldRadius = std::max(this->dataPtr->geomSize.X(),
+        this->dataPtr->geomSize.Y());
     double length = geomElem->GetElement("cylinder")->Get<double>("length");
     double geomRadius = newRadius/oldRadius*radius;
-    double geomLength = _scale.Z()/this->dataPtr->scale.Z()*length;
+    double geomLength = _scale.Z()/this->dataPtr->geomSize.Z()*length;
     geomElem->GetElement("cylinder")->GetElement("radius")->Set(
         geomRadius);
     geomElem->GetElement("cylinder")->GetElement("length")->Set(
         geomLength);
+
     this->dataPtr->geomSize =
         ignition::math::Vector3d(geomRadius*2.0, geomRadius*2.0, geomLength);
   }
@@ -810,6 +815,23 @@ ignition::math::Vector3d Visual::GetGeometrySize() const
 math::Vector3 Visual::GetScale()
 {
   return this->dataPtr->scale;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Visual::DerivedScale() const
+{
+  ignition::math::Vector3d derivedScale = this->dataPtr->scale;
+
+  VisualPtr worldVis = this->dataPtr->scene->GetWorldVisual();
+  VisualPtr vis = this->GetParent();
+
+  while (vis && vis != worldVis)
+  {
+    derivedScale = derivedScale * vis->GetScale().Ign();
+    vis = vis->GetParent();
+  }
+
+  return derivedScale;
 }
 
 //////////////////////////////////////////////////
@@ -2366,7 +2388,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
-    this->SetScale(geomScale);
+    this->SetScale(geomScale * this->dataPtr->scale / this->DerivedScale());
   }
 
   if (_msg->has_material())

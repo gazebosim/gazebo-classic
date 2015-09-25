@@ -15,7 +15,7 @@
  *
 */
 
-#include <gazebo/gazebo.hh>
+#include <gazebo/gazebo_client.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
 
@@ -23,7 +23,7 @@
 int main(int _argc, char **_argv)
 {
   // Load gazebo
-  gazebo::setupClient(_argc, _argv);
+  gazebo::client::setup(_argc, _argv);
 
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
@@ -42,5 +42,5 @@ int main(int _argc, char **_argv)
   pub->Publish(msg);
 
   // Make sure to shut everything down.
-  gazebo::shutdown();
+  gazebo::client::shutdown();
 }

@@ -15,21 +15,21 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_DATA_TEST_HH_
-#define _GAZEBO_MODEL_DATA_TEST_HH_
+#ifndef _GAZEBO_LASERVIEW_TEST_HH_
+#define _GAZEBO_LASERVIEW_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
+#include "gazebo/gui/viewers/LaserView.hh"
 
-/// \brief A test class for the ModelData class.
-class ModelData_TEST : public QTestFixture
+/// \brief A test class for the LaserView widget.
+class LaserView_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Tests cloning link
-  private slots: void Clone();
+  /// \brief Test construction and usage in a world with a laser.
+  private slots: void Construction();
 
-  /// \brief Tests scaling link
-  private slots: void LinkScale();
+  /// \brief Test invoking buttons in the laser view widget.
+  private slots: void Buttons();
 };
-
 #endif
