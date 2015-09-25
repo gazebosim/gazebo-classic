@@ -113,7 +113,7 @@ namespace gazebo
     {
       public: Rotor()
       {
-        this->maxRpm = 8000;
+        this->maxRpm = 838.0;
         this->cmd = 0;
         this->multiplier = 1;
 
@@ -148,7 +148,7 @@ namespace gazebo
       protected: int id;
 
       /// \brief Max rotor propeller RPM.
-      protected: int maxRpm;
+      protected: double maxRpm;
 
       /// \brief Next command to be applied to the propeller
       protected: double cmd;

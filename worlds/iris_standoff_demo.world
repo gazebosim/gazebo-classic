@@ -112,6 +112,7 @@
         </axis>
       </joint>
 
+      <!-- visual markers for debugging
       <link name="rotor_0_blade_1_cp">
         <gravity>0</gravity>
         <pose>0.13 -0.22 0.216 0 -0 0</pose>
@@ -467,15 +468,16 @@
           </geometry>
         </visual>
       </link>
+      -->
 
       <!-- plugins -->
       <plugin name="rotor_0_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <alpha_stall>0.4</alpha_stall>
-        <cla>5.000</cla>
-        <cda>0.3</cda>
+        <alpha_stall>1.4</alpha_stall>
+        <cla>0.2500</cla>
+        <cda>0.10</cda>
         <cma>0.00</cma>
-        <cla_stall>-1.0</cla_stall>
+        <cla_stall>-0.025</cla_stall>
         <cda_stall>0.0</cda_stall>
         <cma_stall>0.0</cma_stall>
         <area>0.2</area>
@@ -487,11 +489,11 @@
       </plugin>
       <plugin name="rotor_0_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <alpha_stall>0.4</alpha_stall>
-        <cla>5.000</cla>
-        <cda>0.3</cda>
+        <alpha_stall>1.4</alpha_stall>
+        <cla>0.2500</cla>
+        <cda>0.10</cda>
         <cma>0.00</cma>
-        <cla_stall>-1.0</cla_stall>
+        <cla_stall>-0.025</cla_stall>
         <cda_stall>0.0</cda_stall>
         <cma_stall>0.0</cma_stall>
         <area>0.2</area>
@@ -504,11 +506,11 @@
 
       <plugin name="rotor_1_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <alpha_stall>0.4</alpha_stall>
-        <cla>5.000</cla>
-        <cda>0.3</cda>
+        <alpha_stall>1.4</alpha_stall>
+        <cla>0.2500</cla>
+        <cda>0.10</cda>
         <cma>0.00</cma>
-        <cla_stall>-1.0</cla_stall>
+        <cla_stall>-0.025</cla_stall>
         <cda_stall>0.0</cda_stall>
         <cma_stall>0.0</cma_stall>
         <area>0.2</area>
@@ -520,11 +522,11 @@
       </plugin>
       <plugin name="rotor_1_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <alpha_stall>0.4</alpha_stall>
-        <cla>5.000</cla>
-        <cda>0.3</cda>
+        <alpha_stall>1.4</alpha_stall>
+        <cla>0.2500</cla>
+        <cda>0.10</cda>
         <cma>0.00</cma>
-        <cla_stall>-1.0</cla_stall>
+        <cla_stall>-0.025</cla_stall>
         <cda_stall>0.0</cda_stall>
         <cma_stall>0.0</cma_stall>
         <area>0.2</area>
@@ -537,11 +539,11 @@
 
       <plugin name="rotor_2_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <alpha_stall>0.4</alpha_stall>
-        <cla>5.000</cla>
-        <cda>0.3</cda>
+        <alpha_stall>1.4</alpha_stall>
+        <cla>0.2500</cla>
+        <cda>0.10</cda>
         <cma>0.00</cma>
-        <cla_stall>-1.0</cla_stall>
+        <cla_stall>-0.025</cla_stall>
         <cda_stall>0.0</cda_stall>
         <cma_stall>0.0</cma_stall>
         <area>0.2</area>
@@ -553,11 +555,11 @@
       </plugin>
       <plugin name="rotor_2_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <alpha_stall>0.4</alpha_stall>
-        <cla>5.000</cla>
-        <cda>0.3</cda>
+        <alpha_stall>1.4</alpha_stall>
+        <cla>0.2500</cla>
+        <cda>0.10</cda>
         <cma>0.00</cma>
-        <cla_stall>-1.0</cla_stall>
+        <cla_stall>-0.025</cla_stall>
         <cda_stall>0.0</cda_stall>
         <cma_stall>0.0</cma_stall>
         <area>0.2</area>
@@ -570,11 +572,11 @@
 
       <plugin name="rotor_3_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <alpha_stall>0.4</alpha_stall>
-        <cla>5.000</cla>
-        <cda>0.3</cda>
+        <alpha_stall>1.4</alpha_stall>
+        <cla>0.2500</cla>
+        <cda>0.10</cda>
         <cma>0.00</cma>
-        <cla_stall>-1.0</cla_stall>
+        <cla_stall>-0.025</cla_stall>
         <cda_stall>0.0</cda_stall>
         <cma_stall>0.0</cma_stall>
         <area>0.2</area>
@@ -586,11 +588,11 @@
       </plugin>
       <plugin name="rotor_3_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
-        <alpha_stall>0.4</alpha_stall>
-        <cla>5.000</cla>
-        <cda>0.3</cda>
+        <alpha_stall>1.4</alpha_stall>
+        <cla>0.2500</cla>
+        <cda>0.10</cda>
         <cma>0.00</cma>
-        <cla_stall>-1.0</cla_stall>
+        <cla_stall>-0.025</cla_stall>
         <cda_stall>0.0</cda_stall>
         <cma_stall>0.0</cma_stall>
         <area>0.2</area>
@@ -603,6 +605,13 @@
       <plugin name="arducopter_plugin" filename="libArduCopterPlugin.so">
         <imuLinkName>iris::iris/imu_link</imuLinkName>
         <rotor id="0">
+          <vel_p_gain>0.2</vel_p_gain>
+          <vel_i_gain>0</vel_i_gain>
+          <vel_d_gain>0</vel_d_gain>
+          <vel_i_max>0</vel_i_max>
+          <vel_i_min>0</vel_i_min>
+          <vel_cmd_max>2.0</vel_cmd_max>
+          <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_0_joint</jointName>
           <linkName>iris::rotor_0</linkName>
           <turningDirection>ccw</turningDirection>
@@ -615,9 +624,16 @@
           <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
           <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
           <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
-          <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+          <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="1">
+          <vel_p_gain>0.2</vel_p_gain>
+          <vel_i_gain>0</vel_i_gain>
+          <vel_d_gain>0</vel_d_gain>
+          <vel_i_max>0</vel_i_max>
+          <vel_i_min>0</vel_i_min>
+          <vel_cmd_max>2.0</vel_cmd_max>
+          <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_1_joint</jointName>
           <linkName>iris::rotor_1</linkName>
           <turningDirection>ccw</turningDirection>
@@ -631,9 +647,16 @@
           <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
           <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
           <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
-          <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+          <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="2">
+          <vel_p_gain>0.2</vel_p_gain>
+          <vel_i_gain>0</vel_i_gain>
+          <vel_d_gain>0</vel_d_gain>
+          <vel_i_max>0</vel_i_max>
+          <vel_i_min>0</vel_i_min>
+          <vel_cmd_max>2.0</vel_cmd_max>
+          <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_2_joint</jointName>
           <linkName>iris::rotor_2</linkName>
           <turningDirection>cw</turningDirection>
@@ -647,9 +670,16 @@
           <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
           <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
           <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
-          <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+          <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="3">
+          <vel_p_gain>0.2</vel_p_gain>
+          <vel_i_gain>0</vel_i_gain>
+          <vel_d_gain>0</vel_d_gain>
+          <vel_i_max>0</vel_i_max>
+          <vel_i_min>0</vel_i_min>
+          <vel_cmd_max>2.0</vel_cmd_max>
+          <vel_cmd_min>-2.0</vel_cmd_min>
           <jointName>iris::rotor_3_joint</jointName>
           <linkName>iris::rotor_3</linkName>
           <turningDirection>cw</turningDirection>
@@ -663,7 +693,7 @@
           <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
           <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
           <motorSpeedPubTopic>motor_speed/3</motorSpeedPubTopic>
-          <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+          <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
       </plugin>
 

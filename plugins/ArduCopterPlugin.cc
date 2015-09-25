@@ -283,10 +283,10 @@ void ArduCopterPlugin::GetMotorCommand()
     usleep(100);
   }
 
-  const double maxRPM = 1200.0;
   for (unsigned i = 0; i < this->rotors.size(); ++i)
   {
-    this->rotors[i].cmd = maxRPM * pkt.motor_speed[i];
+    // std::cout << i << ": " << pkt.motor_speed[i] << "\n";
+    this->rotors[i].cmd = this->rotors[i].maxRpm * pkt.motor_speed[i];
   }
 }
 
