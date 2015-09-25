@@ -690,6 +690,45 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
 }
 
 /////////////////////////////////////////////////
+sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
+    const std::string &_sonarName,
+    const ignition::math::Pose3d &_pose,
+    const double _minRange,
+    const double _maxRange,
+    const double _radius)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _modelName << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pose << "</pose>"
+    << "<link name ='body'>"
+    << "  <sensor name ='" << _sonarName << "' type ='sonar'>"
+    << "    <sonar>"
+    << "      <min>" << _minRange << "</min>"
+    << "      <max>" << _maxRange << "</max>"
+    << "      <radius>" << _radius << "</radius>"
+    << "    </sonar>"
+    << "    <visualize>true</visualize>"
+    << "    <always_on>true</always_on>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_modelName, 100, 100);
+  WaitUntilSensorSpawn(_sonarName, 100, 100);
+  return boost::dynamic_pointer_cast<sensors::SonarSensor>(
+      sensors::get_sensor(_sonarName));
+}
+
+
+/////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
