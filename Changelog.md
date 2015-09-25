@@ -12,7 +12,7 @@
 
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
-    
+
 1. Added EnumIface, which supports iterators over enums.
     * [Pull request #1847](https://bitbucket.org/osrf/gazebo/pull-request/1847)
 
@@ -92,6 +92,10 @@ using the same arguments used in the command line.
 
     1. Context menu and deletion for model plugins
         * [Pull request #1890](https://bitbucket.org/osrf/gazebo/pull-request/1890)
+
+    1. Delete self from inspector
+        * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
+        * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
 
     1. Set physics to be paused when exiting model editor mode
         * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
