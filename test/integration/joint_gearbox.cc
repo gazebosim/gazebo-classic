@@ -80,10 +80,10 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
               << "] vel [" << joint3->GetVelocity(0)
               << "] pose [" << joint3->GetAngle(0).Radian()
               << "]\n";
-      EXPECT_NEAR(joint1->GetVelocity(0), 0, 1e-6);
-      EXPECT_NEAR(joint3->GetVelocity(0), 0, 1e-6);
-      EXPECT_NEAR(joint1->GetAngle(0).Radian(), 0, 1e-6);
-      EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, 1e-6);
+      EXPECT_NEAR(joint1->GetVelocity(0), 0, TOL);
+      EXPECT_NEAR(joint3->GetVelocity(0), 0, TOL);
+      EXPECT_NEAR(joint1->GetAngle(0).Radian(), 0, TOL);
+      EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, TOL);
     }
 
     // slight imbalance
@@ -155,10 +155,10 @@ void ODEGearboxJoint_TEST::SetGearboxRatio(const std::string &_physicsEngine)
             << "] vel [" << joint3->GetVelocity(0)
             << "] pose [" << joint3->GetAngle(0).Radian()
             << "]\n";
-    EXPECT_NEAR(joint1->GetVelocity(0), 0, 1e-6);
-    EXPECT_NEAR(joint3->GetVelocity(0), 0, 1e-6);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), 0, 1e-6);
-    EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, 1e-6);
+    EXPECT_NEAR(joint1->GetVelocity(0), 0, TOL);
+    EXPECT_NEAR(joint3->GetVelocity(0), 0, TOL);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian(), 0, TOL);
+    EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, TOL);
   }
 
   // slight imbalance
