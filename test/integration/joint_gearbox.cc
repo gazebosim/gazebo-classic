@@ -61,7 +61,7 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
     // reset world
     world->Reset();
     // set joint0 angle
-    double angle = (double)j * increments;
+    double angle = static_case<double>(j) * increments;
     joint0->SetPosition(0, angle);
     gzdbg << "j [" << j
           << "] angle [" << angle
