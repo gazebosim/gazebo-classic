@@ -55,18 +55,6 @@ namespace gazebo
       /// \param[in] _operation the boolean operation applied to the two meshes
       /// \param[in] _offset _m2's pose offset from _m1
       /// \return a pointer to the created mesh
-      /// \deprecated See CreateBoolean function that accepts ignition math
-      /// objects
-      public: Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,
-          const int _operation, const math::Pose &_offset = math::Pose::Zero)
-               GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Create a boolean mesh from two meshes
-      /// \param[in] _m1 the parent mesh in the boolean operation
-      /// \param[in] _m2 the child mesh in the boolean operation
-      /// \param[in] _operation the boolean operation applied to the two meshes
-      /// \param[in] _offset _m2's pose offset from _m1
-      /// \return a pointer to the created mesh
       public: Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,
           const int _operation,
           const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);

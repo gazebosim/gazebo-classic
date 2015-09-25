@@ -60,6 +60,9 @@ using the same arguments used in the command line.
 1. Added msgs::PluginFromSDF and tests
     * [Pull request #1858](https://bitbucket.org/osrf/gazebo/pull-request/1858)
 
+1. Added msgs::CollisionFromSDF msgs::SurfaceFromSDF and msgs::FrictionFromSDF
+    * [Pull request #1900](https://bitbucket.org/osrf/gazebo/pull-request/1900)
+
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
 
@@ -68,6 +71,9 @@ using the same arguments used in the command line.
 
 1. AddItem / RemoveItem / Clear enum config widgets
     * [Pull request #1878](https://bitbucket.org/osrf/gazebo/pull-request/1878)
+
+1. Make all child ConfigWidgets emit signals.
+    * [Pull request #1884](https://bitbucket.org/osrf/gazebo/pull-request/1884)
 
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
