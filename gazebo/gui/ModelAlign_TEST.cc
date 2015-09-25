@@ -36,6 +36,13 @@ void ModelAlign_TEST::AlignXMin()
 
   this->Load("worlds/align.world", false, false, true);
 
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
   QVERIFY(scene != NULL);
@@ -54,6 +61,7 @@ void ModelAlign_TEST::AlignXMin()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -73,6 +81,7 @@ void ModelAlign_TEST::AlignXMin()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -81,12 +90,13 @@ void ModelAlign_TEST::AlignXMin()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "x", "min", "first");
+      modelVisualNames, "x", "min", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -101,6 +111,9 @@ void ModelAlign_TEST::AlignXMin()
         bbox.GetXLength()/2.0;
     QVERIFY(gazebo::math::equal(minX, targetMinX, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -110,6 +123,13 @@ void ModelAlign_TEST::AlignXCenter()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/align.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -129,6 +149,7 @@ void ModelAlign_TEST::AlignXCenter()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -148,6 +169,7 @@ void ModelAlign_TEST::AlignXCenter()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -156,12 +178,13 @@ void ModelAlign_TEST::AlignXCenter()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "x", "center", "first");
+      modelVisualNames, "x", "center", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -176,6 +199,9 @@ void ModelAlign_TEST::AlignXCenter()
     double centerX = vis->GetWorldPose().pos.x + centerOffsets[i].x;
     QVERIFY(gazebo::math::equal(centerX, targetCenterX, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -185,6 +211,13 @@ void ModelAlign_TEST::AlignXMax()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/align.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -204,6 +237,7 @@ void ModelAlign_TEST::AlignXMax()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -223,6 +257,7 @@ void ModelAlign_TEST::AlignXMax()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -231,12 +266,13 @@ void ModelAlign_TEST::AlignXMax()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "x", "max", "first");
+      modelVisualNames, "x", "max", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -252,6 +288,9 @@ void ModelAlign_TEST::AlignXMax()
         + bbox.GetXLength()/2.0;
     QVERIFY(gazebo::math::equal(maxX, targetMaxX, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -261,6 +300,13 @@ void ModelAlign_TEST::AlignYMin()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/align.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -280,6 +326,7 @@ void ModelAlign_TEST::AlignYMin()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -299,6 +346,7 @@ void ModelAlign_TEST::AlignYMin()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -307,12 +355,13 @@ void ModelAlign_TEST::AlignYMin()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "y", "min", "first");
+      modelVisualNames, "y", "min", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -327,6 +376,9 @@ void ModelAlign_TEST::AlignYMin()
         bbox.GetYLength()/2.0;
     QVERIFY(gazebo::math::equal(minY, targetMinY, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -336,6 +388,13 @@ void ModelAlign_TEST::AlignYCenter()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/align.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -355,6 +414,7 @@ void ModelAlign_TEST::AlignYCenter()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -374,6 +434,7 @@ void ModelAlign_TEST::AlignYCenter()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -382,12 +443,13 @@ void ModelAlign_TEST::AlignYCenter()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "y", "center", "first");
+      modelVisualNames, "y", "center", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -403,6 +465,9 @@ void ModelAlign_TEST::AlignYCenter()
     double centerY = vis->GetWorldPose().pos.y + centerOffsets[i].y;
     QVERIFY(gazebo::math::equal(centerY, targetCenterY, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -412,6 +477,13 @@ void ModelAlign_TEST::AlignYMax()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/align.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -431,6 +503,7 @@ void ModelAlign_TEST::AlignYMax()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -450,6 +523,7 @@ void ModelAlign_TEST::AlignYMax()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -458,12 +532,13 @@ void ModelAlign_TEST::AlignYMax()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "y", "max", "first");
+      modelVisualNames, "y", "max", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -479,6 +554,9 @@ void ModelAlign_TEST::AlignYMax()
         + bbox.GetYLength()/2.0;
     QVERIFY(gazebo::math::equal(maxY, targetMaxY, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -488,6 +566,13 @@ void ModelAlign_TEST::AlignZMin()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/align.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -507,6 +592,7 @@ void ModelAlign_TEST::AlignZMin()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -526,6 +612,7 @@ void ModelAlign_TEST::AlignZMin()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -534,12 +621,13 @@ void ModelAlign_TEST::AlignZMin()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "z", "min", "first");
+      modelVisualNames, "z", "min", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -554,6 +642,9 @@ void ModelAlign_TEST::AlignZMin()
         bbox.GetZLength()/2.0;
     QVERIFY(gazebo::math::equal(minZ, targetMinZ, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -563,6 +654,13 @@ void ModelAlign_TEST::AlignZCenter()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/align.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -582,6 +680,7 @@ void ModelAlign_TEST::AlignZCenter()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -601,6 +700,7 @@ void ModelAlign_TEST::AlignZCenter()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -609,12 +709,13 @@ void ModelAlign_TEST::AlignZCenter()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "z", "center", "first");
+      modelVisualNames, "z", "center", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -629,6 +730,9 @@ void ModelAlign_TEST::AlignZCenter()
     double centerZ = vis->GetWorldPose().pos.z + centerOffsets[i].z;
     QVERIFY(gazebo::math::equal(centerZ, targetCenterZ, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -638,6 +742,13 @@ void ModelAlign_TEST::AlignZMax()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/align.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -657,6 +768,7 @@ void ModelAlign_TEST::AlignZMax()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -676,6 +788,7 @@ void ModelAlign_TEST::AlignZMax()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -684,12 +797,13 @@ void ModelAlign_TEST::AlignZMax()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "z", "max", "first");
+      modelVisualNames, "z", "max", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -705,6 +819,9 @@ void ModelAlign_TEST::AlignZMax()
         + bbox.GetZLength()/2.0;
     QVERIFY(gazebo::math::equal(maxZ, targetMaxZ, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -714,6 +831,13 @@ void ModelAlign_TEST::AlignScale()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/shapes.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -732,6 +856,7 @@ void ModelAlign_TEST::AlignScale()
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
+    mainWindow->repaint();
     sleep++;
   }
 
@@ -751,6 +876,7 @@ void ModelAlign_TEST::AlignScale()
   }
 
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   std::vector<gazebo::math::Vector3> centerOffsets;
   for (unsigned int i = 0; i < modelNames.size(); ++i)
   {
@@ -759,6 +885,7 @@ void ModelAlign_TEST::AlignScale()
     gazebo::math::Vector3 modelCenterOffset =
         modelVis->GetBoundingBox().GetCenter();
     modelVisuals.push_back(modelVis);
+    modelVisualNames.push_back(modelVis->GetName());
     centerOffsets.push_back(modelCenterOffset);
   }
 
@@ -769,7 +896,7 @@ void ModelAlign_TEST::AlignScale()
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "x", "min", "first");
+      modelVisualNames, "x", "min", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
   gazebo::math::Vector3 targetScale = modelVisuals[0]->GetScale();
@@ -787,6 +914,9 @@ void ModelAlign_TEST::AlignScale()
         visScale.x * bbox.GetXLength()/2.0;
     QVERIFY(gazebo::math::equal(minX, targetMinX, 1e-5));
   }
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 /////////////////////////////////////////////////
@@ -796,6 +926,13 @@ void ModelAlign_TEST::SetHighlighted()
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/blank.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   gazebo::rendering::ScenePtr scene;
   scene = gazebo::rendering::get_scene("default");
@@ -849,12 +986,15 @@ void ModelAlign_TEST::SetHighlighted()
 
   // Align preview
   std::vector<gazebo::rendering::VisualPtr> modelVisuals;
+  std::vector<std::string> modelVisualNames;
   modelVisuals.push_back(vis1);
+  modelVisualNames.push_back(vis1->GetName());
   modelVisuals.push_back(otherVis);
+  modelVisualNames.push_back(otherVis->GetName());
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "x", "min", "last", false);
+      modelVisualNames, "x", "min", "last", false);
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -871,7 +1011,7 @@ void ModelAlign_TEST::SetHighlighted()
 
   // Reset
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "x", "reset", "last", false);
+      modelVisualNames, "x", "reset", "last", false);
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -888,7 +1028,7 @@ void ModelAlign_TEST::SetHighlighted()
 
   // Align preview again
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "z", "max", "last", false);
+      modelVisualNames, "z", "max", "last", false);
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -905,7 +1045,7 @@ void ModelAlign_TEST::SetHighlighted()
 
   // Publish the position
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "z", "max", "last", true);
+      modelVisualNames, "z", "max", "last", true);
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -919,6 +1059,9 @@ void ModelAlign_TEST::SetHighlighted()
       static_cast<double>(vis3_2->GetTransparency()), vis3_2Transp, 1e-5));
   QVERIFY(gazebo::math::equal(
       static_cast<double>(vis4->GetTransparency()), vis4Transp, 1e-5));
+
+  mainWindow->close();
+  delete mainWindow;
 }
 
 // Generate a main function for the test

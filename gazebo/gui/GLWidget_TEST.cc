@@ -80,16 +80,15 @@ void GLWidget_TEST::SelectObject()
   QVERIFY(g_gotBoxSelection);
 
   // Check the selected visuals list
-  std::vector<gazebo::rendering::VisualPtr> selectedVisuals =
-      glWidget->SelectedVisuals();
+  std::vector<std::string> selectedVisuals = glWidget->SelectedVisuals();
 
   QVERIFY(selectedVisuals.size() == 1u);
-  QVERIFY(selectedVisuals[0]->GetName() == "box");
+  QVERIFY(selectedVisuals[0] == "box");
 
   // Delete the selected object. This is here to make sure the GUI does not
   // segfault if an object is deleted.
   {
-    std::string name = selectedVisuals.back()->GetName();
+    std::string name = selectedVisuals.back();
     gazebo::transport::requestNoReply(node, "entity_delete", name);
 
     // Process some events, and draw the screen

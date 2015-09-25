@@ -485,7 +485,7 @@ namespace gazebo
       private: math::Pose origin;
 
       /// \brief A list of selected link visuals.
-      private: std::vector<rendering::VisualPtr> selectedLinks;
+      private: std::vector<std::string> selectedLinks;
 
       /// \brief A list of selected model plugins.
       private: std::vector<std::string> selectedModelPlugins;

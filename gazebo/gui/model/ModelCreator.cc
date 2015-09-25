@@ -1336,7 +1336,7 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
     {
       for (const auto &linkVis : this->selectedLinks)
       {
-        this->OnDelete(linkVis->GetName());
+        this->OnDelete(linkVis);
       }
       this->DeselectAll();
     }
@@ -1459,7 +1459,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->DeselectAllModelPlugins();
 
         auto it = std::find(this->selectedLinks.begin(),
-            this->selectedLinks.end(), linkVis);
+            this->selectedLinks.end(), linkVis->GetName());
         // Highlight and select clicked link if not already selected
         if (it == this->selectedLinks.end())
         {
@@ -1681,7 +1681,7 @@ void ModelCreator::OnCopy()
     this->copiedLinkNames.clear();
     for (auto vis : this->selectedLinks)
     {
-      this->copiedLinkNames.push_back(vis->GetName());
+      this->copiedLinkNames.push_back(vis);
     }
     g_pasteAct->setEnabled(true);
   }
@@ -1877,12 +1877,16 @@ void ModelCreator::DeselectAll()
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAllLinks()
 {
+  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   while (!this->selectedLinks.empty())
   {
-    rendering::VisualPtr vis = this->selectedLinks[0];
-    vis->SetHighlighted(false);
+    rendering::VisualPtr vis = scene->GetVisual(this->selectedLinks[0]);
+    if (vis)
+    {
+      vis->SetHighlighted(false);
+      model::Events::setSelectedLink(this->selectedLinks[0], false);
+    }
     this->selectedLinks.erase(this->selectedLinks.begin());
-    model::Events::setSelectedLink(vis->GetName(), false);
   }
 }
 
@@ -1917,12 +1921,12 @@ void ModelCreator::SetSelected(rendering::VisualPtr _linkVis,
 
   _linkVis->SetHighlighted(_selected);
   auto it = std::find(this->selectedLinks.begin(),
-      this->selectedLinks.end(), _linkVis);
+      this->selectedLinks.end(), _linkVis->GetName());
   if (_selected)
   {
     if (it == this->selectedLinks.end())
     {
-      this->selectedLinks.push_back(_linkVis);
+      this->selectedLinks.push_back(_linkVis->GetName());
       model::Events::setSelectedLink(_linkVis->GetName(), _selected);
     }
   }
@@ -1958,8 +1962,7 @@ void ModelCreator::OnManipMode(const std::string &_mode)
   // deselect 0 to n-1 models.
   if (this->selectedLinks.size() > 1)
   {
-    rendering::VisualPtr link =
-        this->selectedLinks[this->selectedLinks.size()-1];
+    std::string link = this->selectedLinks[this->selectedLinks.size()-1];
     this->DeselectAll();
     this->SetSelected(link, true);
   }

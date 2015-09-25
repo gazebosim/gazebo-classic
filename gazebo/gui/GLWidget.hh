@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Returns the list of selected visuals.
       /// \return List with pointers to selected visuals.
-      public: std::vector<rendering::VisualPtr> SelectedVisuals() const;
+      public: std::vector<std::string> SelectedVisuals() const;
 
       signals: void clicked();
 
@@ -172,7 +172,7 @@ namespace gazebo
 
       /// \brief Set the selected visual, which will highlight the
       /// visual
-      private: void SetSelectedVisual(rendering::VisualPtr _vis);
+      private: void SetSelectedVisual(const std::string &_vis);
 
       /// \brief Deselect all visuals, removing highlight and publishing message
       private: void DeselectAllVisuals();
@@ -256,7 +256,7 @@ namespace gazebo
       private: LightMaker lightMaker;
 
       /// \brief A list of selected visuals.
-      private: std::vector<rendering::VisualPtr> selectedVisuals;
+      private: std::vector<std::string> selectedVisuals;
 
       /// \brief Indicates how deep into the model to select.
       private: SelectionLevels selectionLevel;

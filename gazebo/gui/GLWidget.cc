@@ -329,18 +329,23 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     boost::mutex::scoped_lock lock(this->selectedVisMutex);
     while (!this->selectedVisuals.empty())
     {
-      std::string name = this->selectedVisuals.back()->GetName();
-      int id = this->selectedVisuals.back()->GetId();
+      std::string name = this->selectedVisuals.back();
+      rendering::VisualPtr visPtr = this->scene->GetVisual(name);
       this->selectedVisuals.pop_back();
 
-      // Publish message about visual deselection
-      msgs::Selection msg;
-      msg.set_id(id);
-      msg.set_name(name);
-      msg.set_selected(false);
-      this->selectionPub->Publish(msg);
+      if (visPtr)
+      {
+        int id = visPtr->GetId();
 
-      g_deleteAct->Signal(name);
+        // Publish message about visual deselection
+        msgs::Selection msg;
+        msg.set_id(id);
+        msg.set_name(name);
+        msg.set_selected(false);
+        this->selectionPub->Publish(msg);
+
+        g_deleteAct->Signal(name);
+      }
     }
   }
 
@@ -767,7 +772,7 @@ void GLWidget::OnMouseReleaseNormal()
         selectVis = modelVis;
         this->selectionLevel = SelectionLevels::MODEL;
       }
-      this->SetSelectedVisual(selectVis);
+      this->SetSelectedVisual(selectVis->GetName());
       event::Events::setSelectedEntity(selectVis->GetName(), "normal");
 
       // Open context menu
@@ -786,7 +791,7 @@ void GLWidget::OnMouseReleaseNormal()
       }
     }
     else
-      this->SetSelectedVisual(rendering::VisualPtr());
+      this->SetSelectedVisual("");
   }
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
@@ -864,7 +869,7 @@ void GLWidget::Clear()
   gui::clear_active_camera();
   this->userCamera.reset();
   this->scene.reset();
-  this->SetSelectedVisual(rendering::VisualPtr());
+  this->SetSelectedVisual("");
   this->keyModifiers = 0;
 }
 
@@ -910,7 +915,7 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::OnCreateScene(const std::string &_name)
 {
-  this->SetSelectedVisual(rendering::VisualPtr());
+  this->SetSelectedVisual("");
 
   this->ViewScene(rendering::get_scene(_name));
 
@@ -994,13 +999,13 @@ void GLWidget::OnOrbit()
 }
 
 /////////////////////////////////////////////////
-std::vector<rendering::VisualPtr> GLWidget::SelectedVisuals() const
+std::vector<std::string> GLWidget::SelectedVisuals() const
 {
   return this->selectedVisuals;
 }
 
 /////////////////////////////////////////////////
-void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
+void GLWidget::SetSelectedVisual(const std::string &_vis)
 {
   // deselect all if not in multi-selection mode.
   if (!this->mouseEvent.Control())
@@ -1012,19 +1017,21 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 
   msgs::Selection msg;
 
-  if (_vis && !_vis->IsPlane())
+  rendering::VisualPtr visPtr = this->scene->GetVisual(_vis);
+
+  if (visPtr && !visPtr->IsPlane())
   {
-    if (_vis == _vis->GetRootVisual())
+    if (visPtr == visPtr->GetRootVisual())
       this->selectionLevel = SelectionLevels::MODEL;
     else
       this->selectionLevel = SelectionLevels::LINK;
 
-    _vis->SetHighlighted(true);
+    visPtr->SetHighlighted(true);
 
     // enable multi-selection if control is pressed
     if (this->selectedVisuals.empty() || this->mouseEvent.Control())
     {
-      std::vector<rendering::VisualPtr>::iterator it =
+      std::vector<std::string>::iterator it =
         std::find(this->selectedVisuals.begin(),
             this->selectedVisuals.end(), _vis);
       if (it == this->selectedVisuals.end())
@@ -1032,15 +1039,14 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
       else
       {
         // if element already exists, move to the back of vector
-        rendering::VisualPtr vis = (*it);
+        this->selectedVisuals.push_back(*it);
         this->selectedVisuals.erase(it);
-        this->selectedVisuals.push_back(vis);
       }
     }
     g_copyAct->setEnabled(true);
 
-    msg.set_id(_vis->GetId());
-    msg.set_name(_vis->GetName());
+    msg.set_id(visPtr->GetId());
+    msg.set_name(_vis);
     msg.set_selected(true);
     this->selectionPub->Publish(msg);
   }
@@ -1061,11 +1067,16 @@ void GLWidget::DeselectAllVisuals()
   msgs::Selection msg;
   for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
   {
-    this->selectedVisuals[i]->SetHighlighted(false);
-    msg.set_id(this->selectedVisuals[i]->GetId());
-    msg.set_name(this->selectedVisuals[i]->GetName());
-    msg.set_selected(false);
-    this->selectionPub->Publish(msg);
+    rendering::VisualPtr visPtr = this->scene->GetVisual(
+        this->selectedVisuals[i]);
+    if (visPtr)
+    {
+      visPtr->SetHighlighted(false);
+      msg.set_id(visPtr->GetId());
+      msg.set_name(this->selectedVisuals[i]);
+      msg.set_selected(false);
+      this->selectionPub->Publish(msg);
+    }
   }
   this->selectedVisuals.clear();
 }
@@ -1092,11 +1103,13 @@ void GLWidget::OnManipMode(const std::string &_mode)
     // deselect 0 to n-1 models.
     if (this->selectedVisuals.size() > 1)
     {
-      for (std::vector<rendering::VisualPtr>::iterator it
+      for (std::vector<std::string>::iterator it
           = this->selectedVisuals.begin(); it != --this->selectedVisuals.end();)
       {
-         (*it)->SetHighlighted(false);
-         it = this->selectedVisuals.erase(it);
+        rendering::VisualPtr visPtr = this->scene->GetVisual(*it);
+        if (visPtr)
+          visPtr->SetHighlighted(false);
+        it = this->selectedVisuals.erase(it);
       }
     }
   }
@@ -1108,7 +1121,7 @@ void GLWidget::OnCopy()
   boost::mutex::scoped_lock lock(this->selectedVisMutex);
   if (!this->selectedVisuals.empty() && !this->modelEditorEnabled)
   {
-    this->Copy(this->selectedVisuals.back()->GetName());
+    this->Copy(this->selectedVisuals.back());
   }
 }
 
@@ -1167,7 +1180,7 @@ void GLWidget::Paste(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::ClearSelection()
 {
-  this->SetSelectedVisual(rendering::VisualPtr());
+  this->SetSelectedVisual("");
 
   this->scene->SelectVisual("", "normal");
 }
@@ -1182,21 +1195,26 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
     boost::replace_first(name, gui::get_world()+"::", "");
 
     rendering::VisualPtr selection = this->scene->GetVisual(name);
+    if (!selection)
+    {
+      gzerr << "Unknown visual[" << name << "]\n";
+      return;
+    }
 
-    std::vector<rendering::VisualPtr>::iterator it =
+    std::vector<std::string>::iterator it =
       std::find(this->selectedVisuals.begin(),
-          this->selectedVisuals.end(), selection);
+          this->selectedVisuals.end(), selection->GetName());
 
     // Shortcircuit the case when GLWidget already selected the visual.
-    if (it == this->selectedVisuals.end() || _name != (*it)->GetName())
+    if (it == this->selectedVisuals.end() || _name != *it)
     {
-      this->SetSelectedVisual(selection);
+      this->SetSelectedVisual(selection->GetName());
       this->scene->SelectVisual(name, _mode);
     }
   }
   else if (!this->selectedVisuals.empty())
   {
-    this->SetSelectedVisual(rendering::VisualPtr());
+    this->SetSelectedVisual("");
     this->scene->SelectVisual("", _mode);
   }
 }
@@ -1239,11 +1257,11 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
     boost::mutex::scoped_lock lock(this->selectedVisMutex);
     if (!this->selectedVisuals.empty())
     {
-      for (std::vector<rendering::VisualPtr>::iterator it =
+      for (std::vector<std::string>::iterator it =
           this->selectedVisuals.begin(); it != this->selectedVisuals.end();
           ++it)
       {
-        if ((*it)->GetName() == _msg->data())
+        if (*it == _msg->data())
         {
           ModelManipulator::Instance()->Detach();
           this->selectedVisuals.erase(it);
