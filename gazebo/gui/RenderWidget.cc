@@ -22,7 +22,6 @@
 
 #include <iomanip>
 
-#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
