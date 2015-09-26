@@ -724,9 +724,9 @@ void ModelEditorPalette::OnNestedModelInserted(
 void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
 {
   std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  size_t idx = _linkName.rfind("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    leafName = _linkName.substr(idx+2);
 
   QTreeWidgetItem *newLinkItem = new QTreeWidgetItem(this->linksItem,
       QStringList(QString("%1").arg(QString::fromStdString(leafName))));
@@ -743,9 +743,9 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
     const std::string &/*_childName*/)
 {
   std::string leafName = _jointName;
-  size_t idx = _jointName.find_last_of("::");
+  size_t idx = _jointName.rfind("::");
   if (idx != std::string::npos)
-    leafName = _jointName.substr(idx+1);
+    leafName = _jointName.substr(idx+2);
 
   QTreeWidgetItem *newJointItem = new QTreeWidgetItem(this->jointsItem,
       QStringList(QString("%1").arg(QString::fromStdString(leafName))));

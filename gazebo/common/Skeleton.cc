@@ -146,21 +146,9 @@ void Skeleton::BuildNodeMap()
 }
 
 //////////////////////////////////////////////////
-void Skeleton::SetBindShapeTransform(math::Matrix4 _trans)
-{
-  this->SetBindShapeTransform(_trans.Ign());
-}
-
-//////////////////////////////////////////////////
 void Skeleton::SetBindShapeTransform(const ignition::math::Matrix4d &_trans)
 {
   this->bindShapeTransform = _trans;
-}
-
-//////////////////////////////////////////////////
-math::Matrix4 Skeleton::GetBindShapeTransform()
-{
-  return this->BindShapeTransform();
 }
 
 //////////////////////////////////////////////////
@@ -329,12 +317,6 @@ bool SkeletonNode::IsJoint()
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::SetTransform(math::Matrix4 _trans, bool _updateChildren)
-{
-  this->SetTransform(_trans.Ign(), _updateChildren);
-}
-
-//////////////////////////////////////////////////
 void SkeletonNode::SetTransform(const ignition::math::Matrix4d &_trans,
     bool _updateChildren)
 {
@@ -348,12 +330,6 @@ void SkeletonNode::SetTransform(const ignition::math::Matrix4d &_trans,
   /// propagate the change to the children nodes
   if (_updateChildren)
     this->UpdateChildrenTransforms();
-}
-
-//////////////////////////////////////////////////
-void SkeletonNode::SetInitialTransform(math::Matrix4 _trans)
-{
-  this->SetInitialTransform(_trans.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -393,21 +369,9 @@ void SkeletonNode::UpdateChildrenTransforms()
 }
 
 //////////////////////////////////////////////////
-math::Matrix4 SkeletonNode::GetTransform()
-{
-  return this->Transform();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Matrix4d SkeletonNode::Transform()
 {
   return this->transform;
-}
-
-//////////////////////////////////////////////////
-void SkeletonNode::SetModelTransform(math::Matrix4 _trans, bool _updateChildren)
-{
-  this->SetModelTransform(_trans.Ign(), _updateChildren);
 }
 
 //////////////////////////////////////////////////
@@ -429,12 +393,6 @@ void SkeletonNode::SetModelTransform(
 
   if (_updateChildren)
     this->UpdateChildrenTransforms();
-}
-
-//////////////////////////////////////////////////
-math::Matrix4 SkeletonNode::GetModelTransform()
-{
-  return this->ModelTransform();
 }
 
 //////////////////////////////////////////////////
@@ -515,22 +473,10 @@ unsigned int SkeletonNode::GetHandle()
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::SetInverseBindTransform(math::Matrix4 _invBM)
-{
-  this->SetInverseBindTransform(_invBM.Ign());
-}
-
-//////////////////////////////////////////////////
 void SkeletonNode::SetInverseBindTransform(
     const ignition::math::Matrix4d &_invBM)
 {
   this->invBindTransform = _invBM;
-}
-
-//////////////////////////////////////////////////
-math::Matrix4 SkeletonNode::GetInverseBindTransform()
-{
-  return this->InverseBindTransform();
 }
 
 //////////////////////////////////////////////////
@@ -585,15 +531,6 @@ NodeTransform::NodeTransform(TransformType _type)
 }
 
 //////////////////////////////////////////////////
-NodeTransform::NodeTransform(math::Matrix4 _mat, std::string _sid,
-    TransformType _type)
-{
-  this->sid = _sid;
-  this->type = _type;
-  this->transform = _mat.Ign();
-}
-
-//////////////////////////////////////////////////
 NodeTransform::NodeTransform(const ignition::math::Matrix4d &_mat,
     const std::string &_sid, TransformType _type)
 {
@@ -605,12 +542,6 @@ NodeTransform::NodeTransform(const ignition::math::Matrix4d &_mat,
 //////////////////////////////////////////////////
 NodeTransform::~NodeTransform()
 {
-}
-
-//////////////////////////////////////////////////
-void NodeTransform::Set(math::Matrix4 _mat)
-{
-  this->Set(_mat.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -629,12 +560,6 @@ void NodeTransform::SetType(TransformType _type)
 void NodeTransform::SetSID(std::string _sid)
 {
   this->sid = _sid;
-}
-
-//////////////////////////////////////////////////
-math::Matrix4 NodeTransform::Get()
-{
-  return this->GetTransform();
 }
 
 //////////////////////////////////////////////////
@@ -662,12 +587,6 @@ void NodeTransform::SetComponent(unsigned int _idx, double _value)
 }
 
 //////////////////////////////////////////////////
-void NodeTransform::SetSourceValues(math::Matrix4 _mat)
-{
-  this->SetSourceValues(_mat.Ign());
-}
-
-//////////////////////////////////////////////////
 void NodeTransform::SetSourceValues(const ignition::math::Matrix4d &_mat)
 {
   this->source.resize(16);
@@ -683,24 +602,12 @@ void NodeTransform::SetSourceValues(const ignition::math::Matrix4d &_mat)
 }
 
 //////////////////////////////////////////////////
-void NodeTransform::SetSourceValues(math::Vector3 _vec)
-{
-  this->SetSourceValues(_vec.Ign());
-}
-
-//////////////////////////////////////////////////
 void NodeTransform::SetSourceValues(const ignition::math::Vector3d &_vec)
 {
   this->source.resize(3);
   this->source[0] = _vec.X();
   this->source[1] = _vec.Y();
   this->source[2] = _vec.Z();
-}
-
-//////////////////////////////////////////////////
-void NodeTransform::SetSourceValues(math::Vector3 _axis, double _angle)
-{
-  this->SetSourceValues(_axis.Ign(), _angle);
 }
 
 //////////////////////////////////////////////////
@@ -761,16 +668,6 @@ ignition::math::Matrix4d NodeTransform::operator*(NodeTransform _t)
   ignition::math::Matrix4d m;
 
   m = this->transform * _t();
-
-  return m;
-}
-
-//////////////////////////////////////////////////
-math::Matrix4 NodeTransform::operator*(math::Matrix4 _m)
-{
-  math::Matrix4 m;
-
-  m = gazebo::math::Matrix4(this->transform) * _m;
 
   return m;
 }

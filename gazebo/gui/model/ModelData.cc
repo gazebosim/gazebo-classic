@@ -488,9 +488,9 @@ void LinkData::UpdateConfig()
   {
     std::string name = it.first->GetName();
     std::string leafName = name;
-    size_t idx = name.find_last_of("::");
+    size_t idx = name.rfind("::");
     if (idx != std::string::npos)
-      leafName = name.substr(idx+1);
+      leafName = name.substr(idx+2);
     visualConfig->SetGeometry(leafName, it.first->GetGeometrySize(),
         it.first->GetMeshName());
 
@@ -520,9 +520,9 @@ void LinkData::UpdateConfig()
   {
     std::string name = colIt.first->GetName();
     std::string leafName = name;
-    size_t idx = name.find_last_of("::");
+    size_t idx = name.rfind("::");
     if (idx != std::string::npos)
-      leafName = name.substr(idx+1);
+      leafName = name.substr(idx+2);
     collisionConfig->SetGeometry(leafName, colIt.first->GetGeometrySize(),
         colIt.first->GetMeshName());
 
@@ -543,34 +543,44 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
 
   std::string visName = _visual->GetName();
   std::string leafName = visName;
-  size_t idx = visName.find_last_of("::");
+  size_t idx = visName.rfind("::");
   if (idx != std::string::npos)
-    leafName = visName.substr(idx+1);
+    leafName = visName.substr(idx+2);
 
   visualConfig->AddVisual(leafName, &visualMsg);
 }
 
 /////////////////////////////////////////////////
-void LinkData::AddCollision(rendering::VisualPtr _collisionVis)
+void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
+    const msgs::Collision *_msg)
 {
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
-  msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
 
   sdf::ElementPtr collisionSDF(new sdf::Element);
   sdf::initFile("collision.sdf", collisionSDF);
 
   std::string visName = _collisionVis->GetName();
   std::string leafName = visName;
-  size_t idx = visName.find_last_of("::");
+  size_t idx = visName.rfind("::");
   if (idx != std::string::npos)
-    leafName = visName.substr(idx+1);
+    leafName = visName.substr(idx+2);
 
   msgs::Collision collisionMsg;
-  collisionMsg.set_name(leafName);
-  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
-  geomMsg->CopyFrom(visualMsg.geometry());
-  msgs::Pose *poseMsg = collisionMsg.mutable_pose();
-  poseMsg->CopyFrom(visualMsg.pose());
+  // Use input message
+  if (_msg)
+  {
+    collisionMsg = *_msg;
+  }
+  // Get data from input visual
+  else
+  {
+    msgs::Visual visualMsg = msgs::VisualFromSDF(_collisionVis->GetSDF());
+    collisionMsg.set_name(leafName);
+    msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+    geomMsg->CopyFrom(visualMsg.geometry());
+    msgs::Pose *poseMsg = collisionMsg.mutable_pose();
+    poseMsg->CopyFrom(visualMsg.pose());
+  }
 
   this->collisions[_collisionVis] = collisionMsg;
   collisionConfig->AddCollision(leafName, &collisionMsg);
@@ -600,14 +610,18 @@ LinkData* LinkData::Clone(const std::string &_newName)
   for (auto &visIt : this->visuals)
   {
     std::string newVisName = visIt.first->GetName();
-    size_t idx = newVisName.find_last_of("::");
+    size_t idx = newVisName.rfind("::");
+    std::string leafName = newVisName.substr(idx+2);
     if (idx != std::string::npos)
-      newVisName = cloneVisName + newVisName.substr(idx-1);
+      newVisName = cloneVisName + "::" + leafName;
     else
       newVisName = cloneVisName + "::" + newVisName;
 
     rendering::VisualPtr cloneVis =
         visIt.first->Clone(newVisName, cloneLink->linkVisual);
+
+    // store the leaf name in sdf not the full scoped name
+    cloneVis->GetSDF()->GetAttribute("name")->Set(leafName);
 
     // override transparency
     cloneVis->SetTransparency(visIt.second.transparency());
@@ -620,13 +634,18 @@ LinkData* LinkData::Clone(const std::string &_newName)
   for (auto &colIt : this->collisions)
   {
     std::string newColName = colIt.first->GetName();
-    size_t idx = newColName.find_last_of("::");
+    size_t idx = newColName.rfind("::");
+    std::string leafName = newColName.substr(idx+2);
     if (idx != std::string::npos)
-      newColName = cloneVisName + newColName.substr(idx-1);
+      newColName = cloneVisName + "::" + leafName;
     else
       newColName = cloneVisName + "::" + newColName;
     rendering::VisualPtr collisionVis = colIt.first->Clone(newColName,
         cloneLink->linkVisual);
+
+    // store the leaf name in sdf not the full scoped name
+    collisionVis->GetSDF()->GetAttribute("name")->Set(leafName);
+
     collisionVis->SetTransparency(
        ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
     // fix for transparency alpha compositing
@@ -683,9 +702,9 @@ bool LinkData::Apply()
     {
       std::string name = it.first->GetName();
       std::string leafName = name;
-      size_t idx = name.find_last_of("::");
+      size_t idx = name.rfind("::");
       if (idx != std::string::npos)
-        leafName = name.substr(idx+1);
+        leafName = name.substr(idx+2);
       msgs::Visual *updateMsg = visualConfig->GetData(leafName);
       if (updateMsg)
       {
@@ -816,9 +835,9 @@ bool LinkData::Apply()
     {
       std::string name = it.first->GetName();
       std::string leafName = name;
-      size_t idx = name.find_last_of("::");
+      size_t idx = name.rfind("::");
       if (idx != std::string::npos)
-        leafName = name.substr(idx+1);
+        leafName = name.substr(idx+2);
       msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
       if (updateMsg)
       {
@@ -1135,4 +1154,3 @@ void ModelPluginData::Load(sdf::ElementPtr _pluginElem)
   // Update inspector
   this->inspector->Update(pluginPtr);
 }
-

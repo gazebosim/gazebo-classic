@@ -23,6 +23,138 @@
 using namespace gazebo;
 
 /////////////////////////////////////////////////
+void ModelData_TEST::Clone()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  gui::LinkData *link = new gui::LinkData();
+
+  double mass = 1.0;
+  ignition::math::Vector3d size = ignition::math::Vector3d::One;
+
+  // create a link
+  msgs::Model model;
+  msgs::AddBoxLink(model, mass, size);
+  link->Load(msgs::LinkToSDF(model.link(0)));
+  rendering::VisualPtr linkVis(new rendering::Visual("model::box_link",
+      scene->GetWorldVisual()));
+  link->linkVisual = linkVis;
+
+  // add a visual
+  rendering::VisualPtr vis(
+      new rendering::Visual("model::box_link::visual", linkVis));
+  vis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+  link->AddVisual(vis);
+
+  // add a collision visual
+  rendering::VisualPtr collisionVis(
+      new rendering::Visual("model::box_link::collision", linkVis));
+  collisionVis->Load(msgs::VisualToSDF(model.link(0).visual(0)));
+  link->AddCollision(collisionVis);
+
+  // verify clone link
+  std::string cloneLinkName = "box_link_clone";
+  gui::LinkData *cloneLink = link->Clone(cloneLinkName);
+  QCOMPARE(cloneLink->GetName(), cloneLinkName);
+  QCOMPARE(cloneLink->Scale(), ignition::math::Vector3d::One);
+  QCOMPARE(cloneLink->Pose(), ignition::math::Pose3d::Zero);
+  QVERIFY(cloneLink->linkVisual != NULL);
+  QCOMPARE(cloneLink->linkVisual->GetName(), "model::" + cloneLinkName);
+  QVERIFY(cloneLink->Scale() == ignition::math::Vector3d::One);
+
+  // verify clone link visual
+  QCOMPARE(cloneLink->visuals.size(), link->visuals.size());
+  QVERIFY(cloneLink->visuals.size() == 1u);
+  rendering::VisualPtr cloneVis = cloneLink->visuals.begin()->first;
+  QVERIFY(cloneVis != NULL);
+  QCOMPARE(cloneVis->GetName(), "model::" + cloneLinkName + "::visual");
+  QCOMPARE(cloneVis->GetGeometryType(), std::string("box"));
+  QCOMPARE(cloneVis->GetGeometrySize(), size);
+
+  // verify clone link collision
+  QCOMPARE(cloneLink->collisions.size(), link->collisions.size());
+  QVERIFY(cloneLink->collisions.size() == 1u);
+  rendering::VisualPtr cloneCol = cloneLink->collisions.begin()->first;
+  QVERIFY(cloneCol != NULL);
+  QCOMPARE(cloneCol->GetName(), "model::" + cloneLinkName + "::collision");
+  QCOMPARE(cloneCol->GetGeometryType(), std::string("box"));
+  QCOMPARE(cloneCol->GetGeometrySize(), size);
+
+  // verify link sdf
+  sdf::ElementPtr linkSDF = cloneLink->linkSDF;
+  QVERIFY(linkSDF->HasElement("inertial"));
+  sdf::ElementPtr inertialElem = linkSDF->GetElement("inertial");
+  QVERIFY(inertialElem->HasElement("inertia"));
+  sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
+  QVERIFY(inertialElem->HasElement("mass"));
+  sdf::ElementPtr massElem = inertialElem->GetElement("mass");
+  QVERIFY(ignition::math::equal(massElem->Get<double>(), mass));
+
+  msgs::Inertial inertialMsg = model.link(0).inertial();
+  double ixx = inertialMsg.ixx();
+  double iyy = inertialMsg.iyy();
+  double izz = inertialMsg.izz();
+  double ixy = inertialMsg.ixy();
+  double ixz = inertialMsg.ixz();
+  double iyz = inertialMsg.iyz();
+
+  QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixx"), ixx));
+  QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyy"), iyy));
+  QVERIFY(ignition::math::equal(inertiaElem->Get<double>("izz"), izz));
+  QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixy"), ixy));
+  QVERIFY(ignition::math::equal(inertiaElem->Get<double>("ixz"), ixz));
+  QVERIFY(ignition::math::equal(inertiaElem->Get<double>("iyz"), iyz));
+
+  // verify visual sdf
+  sdf::ElementPtr visualElem = cloneVis->GetSDF();
+  QCOMPARE(visualElem->Get<std::string>("name"), std::string("visual"));
+  sdf::ElementPtr visualGeomElem = visualElem->GetElement("geometry");
+  QVERIFY(visualGeomElem->HasElement("box"));
+  sdf::ElementPtr visualGeomBoxElem = visualGeomElem->GetElement("box");
+  QCOMPARE(visualGeomBoxElem->Get<ignition::math::Vector3d>("size"),
+     size);
+
+  // verify collision sdf
+  sdf::ElementPtr colElem = cloneCol->GetSDF();
+  QCOMPARE(colElem->Get<std::string>("name"), std::string("collision"));
+  sdf::ElementPtr colGeomElem = colElem->GetElement("geometry");
+  QVERIFY(colGeomElem ->HasElement("box"));
+  sdf::ElementPtr colGeomBoxElem = colGeomElem->GetElement("box");
+  QCOMPARE(colGeomBoxElem->Get<ignition::math::Vector3d>("size"),
+     size);
+
+  delete link;
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
 void ModelData_TEST::LinkScale()
 {
   this->resMaxPercentChange = 5.0;

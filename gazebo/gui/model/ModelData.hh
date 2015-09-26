@@ -119,7 +119,9 @@ namespace gazebo
 
       /// \brief Add a collision to the link.
       /// \param[in] _collisionVis Visual representing the collision.
-      public: void AddCollision(rendering::VisualPtr _collisionVis);
+      /// \param[in] _msg Optional message containing collision params.
+      public: void AddCollision(rendering::VisualPtr _collisionVis,
+          const msgs::Collision *_msg = NULL);
 
       /// \brief Update the inspector widget if necessary.
       public: void UpdateConfig();
