@@ -116,12 +116,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 
   EXPECT_TRUE(world->GetModel(name) != NULL);
 
-  // important to sleep here, this is where the failure occurs
-  // usleep(2000000);
-  // world->Step(1000);
-  // gzerr << "spawned again"; getchar();
-  // need to sleep long enough for rendering cycle to iterate at least once
-  // or do something like look for visuals through a camera?
+  // Look through a camera to ensure visuals are generated
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
   rendering::CameraPtr camera = scene->GetCamera("camera");
