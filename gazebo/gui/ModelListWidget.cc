@@ -43,10 +43,6 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/gui/GuiIface.hh"
 
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
-
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 

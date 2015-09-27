@@ -876,35 +876,6 @@ bool Vector2dCompare(const ignition::math::Vector2d &_a,
 void SVGLoader::PathsToClosedPolylines(
     const std::vector<common::SVGPath> &_paths,
     double _tol,
-    std::vector< std::vector<math::Vector2d> > &_closedPolys,
-    std::vector< std::vector<math::Vector2d> > &_openPolys)
-{
-  std::vector<std::vector<ignition::math::Vector2d>> closedPolys;
-  std::vector<std::vector<ignition::math::Vector2d>> openPolys;
-
-  for (auto const &closed : _closedPolys)
-  {
-    std::vector<ignition::math::Vector2d> vecs;
-    for (auto const &v : closed)
-      vecs.push_back(v.Ign());
-    closedPolys.push_back(vecs);
-  }
-
-  for (auto const &open : _openPolys)
-  {
-    std::vector<ignition::math::Vector2d> vecs;
-    for (auto const &v : open)
-      vecs.push_back(v.Ign());
-    openPolys.push_back(vecs);
-  }
-
-  PathsToClosedPolylines(_paths, _tol, closedPolys, openPolys);
-}
-
-/////////////////////////////////////////////////
-void SVGLoader::PathsToClosedPolylines(
-    const std::vector<common::SVGPath> &_paths,
-    double _tol,
     std::vector< std::vector<ignition::math::Vector2d> > &_closedPolys,
     std::vector< std::vector<ignition::math::Vector2d> > &_openPolys)
 {
