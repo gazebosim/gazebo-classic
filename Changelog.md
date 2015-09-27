@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Update physics when the world is reset
+    * [Pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
+
 1. Resolve issue #1702
     * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
     * [Pull request #1907](https://bitbucket.org/osrf/gazebo/pull-request/1907)
