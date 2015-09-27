@@ -169,7 +169,8 @@ void InertiaVisual::Load(const math::Pose &_pose,
 }
 
 /////////////////////////////////////////////////
-void InertiaVisual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
+void InertiaVisual::DestroyAllAttachedMovableObjects(
+        Ogre::SceneNode *_sceneNode)
 {
   if (!_sceneNode)
     return;

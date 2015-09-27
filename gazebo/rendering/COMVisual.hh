@@ -64,7 +64,8 @@ namespace gazebo
 
       /// \brief Destroy all the movable objects attached to a scene node.
       /// \param[in] _sceneNode Pointer to the scene node to process.
-      private: void DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode);
+      private: void DestroyAllAttachedMovableObjects(
+                        Ogre::SceneNode *_sceneNode);
     };
     /// \}
   }

@@ -134,7 +134,6 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
 
   // box should be visible to the camera.
   EXPECT_TRUE(camera->IsVisible(visual));
-
 }
 
 TEST_P(Issue1702Test, SpawnDeleteSpawnAgain)
