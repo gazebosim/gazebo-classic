@@ -30,6 +30,13 @@ class ModelCreator_TEST : public QTestFixture
 
   /// \brief Tests selecting links in the model editor
   private slots: void Selection();
+
+  /// \brief Tests addition of plugin elements.
+  private slots: void AddPluginElement();
+
+  /// \brief Tests removal of plugin elements.
+  private slots: void RemovePluginElement();
+
 };
 
 #endif

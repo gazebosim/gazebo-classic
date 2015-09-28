@@ -64,7 +64,16 @@ namespace gazebo
       /// \return _sdf SDF describing the entity.
       public: sdf::ElementPtr GetEntitySDF(const std::string &_name);
 
+      /// \brief Add a plugin element to the model.
+      /// \param[in] _name Name of plugin element.
+      /// \param[in] _filename Filename for the plugin.
+      /// \param[in] _element SDF describing plugin.
       public: void AppendPluginElement(const std::string &_name,
+          const std::string &_filename, sdf::ElementPtr _element);
+
+      /// \brief Remove a plugin element from the model.
+      /// \param[in] _name Name of plugin element.
+      public: void RemovePluginElement(const std::string &_name,
           const std::string &_filename, sdf::ElementPtr _element);
 
       /// \brief Qt callback when the model editor's save action is

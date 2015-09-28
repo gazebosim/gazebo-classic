@@ -2225,6 +2225,12 @@ void ModelCreator::GenerateSDF()
 }
 
 /////////////////////////////////////////////////
+const sdf::ElementPtr ModelCreator::GetSDFToAppend()
+{
+  return this->sdfToAppend;
+}
+
+/////////////////////////////////////////////////
 sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
 {
   std::stringstream visualNameStream;
@@ -2508,15 +2514,22 @@ ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
 void ModelCreator::AppendPluginElement(const std::string &_name,
     const std::string &_filename, sdf::ElementPtr _sdfElement)
 {
+//  std::cerr << "ModelCreator::AppendPluginElement(): before=" << this->sdfToAppend->ToString("") << std::endl;
+//  std::cerr << "   element=" << _sdfElement->ToString("") << std::endl;
+
   // Insert into existing plugin element
-  sdf::ElementPtr pluginElem;
+  sdf::ElementPtr pluginElem = NULL;
+
   if (this->sdfToAppend->HasElement("plugin"))
      pluginElem = this->sdfToAppend->GetElement("plugin");
+
   while (pluginElem)
   {
     if (pluginElem->Get<std::string>("name") == _name)
     {
       pluginElem->InsertElement(_sdfElement);
+      _sdfElement->SetParent(pluginElem);
+//      std::cerr << "ModelCreator::AppendPluginElement(): after=" << this->sdfToAppend->ToString("") << std::endl;
       return;
     }
     pluginElem = pluginElem->GetNextElement("plugin");
@@ -2525,10 +2538,58 @@ void ModelCreator::AppendPluginElement(const std::string &_name,
   // Create new plugin element
   pluginElem.reset(new sdf::Element);
   pluginElem->SetName("plugin");
+
   pluginElem->AddAttribute("name", "string", _name, "0", "name");
   pluginElem->AddAttribute("filename", "string", _filename, "0", "filename");
 
   pluginElem->InsertElement(_sdfElement);
+  _sdfElement->SetParent(pluginElem);
 
   this->sdfToAppend->InsertElement(pluginElem);
+
+//  std::cerr << "ModelCreator::AppendPluginElement(): after=" << this->sdfToAppend->ToString("") << std::endl;
+}
+
+static bool MatchingConnection(sdf::ElementPtr conn1, sdf::ElementPtr conn2)
+{
+  // No comparison operator in Element class?
+  return conn1->ToString("") == conn2->ToString("");
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::RemovePluginElement(const std::string &_name,
+    const std::string &_filename, sdf::ElementPtr _sdfElement)
+{
+//  std::cerr << "ModelCreator::RemovePluginElement(): before=" << this->sdfToAppend->ToString("") << std::endl;
+//  std::cerr << "   element=" << _sdfElement->ToString("") << std::endl;
+
+  sdf::ElementPtr pluginElem = NULL;
+
+  if (this->sdfToAppend->HasElement("plugin"))
+     pluginElem = this->sdfToAppend->GetElement("plugin");
+
+  while (pluginElem)
+  {
+    if (pluginElem->Get<std::string>("name") == _name &&
+        pluginElem->Get<std::string>("filename") == _filename)
+    {
+      sdf::ElementPtr connectionElem = pluginElem->GetElement("connection");
+      while (connectionElem)
+      {
+        if (MatchingConnection(connectionElem, _sdfElement))
+          pluginElem->RemoveChild(connectionElem);
+
+        connectionElem = connectionElem->GetNextElement("connection");
+      }
+    }
+    //  Remove plugin element if last connection was deleted
+    if (pluginElem->GetFirstElement() == NULL)
+    {
+      this->sdfToAppend->RemoveChild(pluginElem);
+      break;
+    }
+    pluginElem = pluginElem->GetNextElement("plugin");
+  }
+//  std::cerr << "ModelCreator::RemovePluginElement(): after=" << this->sdfToAppend->ToString("") << std::endl;
+
 }

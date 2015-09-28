@@ -467,3 +467,11 @@ void ModelEditor::AppendPluginElement(const std::string &_name,
   this->dataPtr->modelPalette->GetModelCreator()->
       AppendPluginElement(_name, _filename, _element);
 }
+
+/////////////////////////////////////////////////
+void ModelEditor::RemovePluginElement(const std::string &_name,
+    const std::string &_filename, sdf::ElementPtr _element)
+{
+  this->dataPtr->modelPalette->GetModelCreator()->
+      RemovePluginElement(_name, _filename, _element);
+}

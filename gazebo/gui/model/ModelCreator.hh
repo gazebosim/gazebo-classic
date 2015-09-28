@@ -226,11 +226,18 @@ namespace gazebo
       /// \return Current save state.
       public: enum SaveState GetCurrentSaveState() const;
 
-      /// \brief Append plugin element.
-      /// \param[in[ _name
-      /// \param[in[ _filename
-      /// \param[in[ _element
+      /// \brief Append a plugin element.
+      /// \param[in[ _name Name of the plugin element.
+      /// \param[in[ _filename Filename for the plugin.
+      /// \param[in[ _element SDF describing plugin.
       public: void AppendPluginElement(const std::string &_name,
+          const std::string &_filename, sdf::ElementPtr _element);
+
+      /// \brief Remove a plugin element.
+      /// \param[in[ _name Name of the plugin element.
+      /// \param[in[ _filename Filename for the plugin.
+      /// \param[in[ _element SDF describing plugin.
+      public: void RemovePluginElement(const std::string &_name,
           const std::string &_filename, sdf::ElementPtr _element);
 
       /// \brief Add an entity to the model
@@ -248,6 +255,9 @@ namespace gazebo
 
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
+
+      /// \brief Get SDF to append to model.
+      public: const sdf::ElementPtr GetSDFToAppend();
 
       /// \brief Update nested model SDF with new model name.
       /// \param[in] _modelElem Model SDF.
