@@ -7,6 +7,10 @@
 1. Update physics when the world is reset
     * [Pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
 
+1. Resolve issue #1702
+    * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
+    * [Pull request #1907](https://bitbucket.org/osrf/gazebo/pull-request/1907)
+
 1. Rename Reset to Reset Time in time widget
     * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
     * [Issue #1730](https://bitbucket.org/osrf/gazebo/issue/1730)
