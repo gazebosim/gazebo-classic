@@ -74,9 +74,6 @@ namespace gazebo
       /// \param[in] _name Name to set to.
       // public: void SetName(const std::string &_name);
 
-      /// \brief Qt signal emitted to request this link to be removed.
-      Q_SIGNALS: void RequestLinkRemoval();
-
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 
