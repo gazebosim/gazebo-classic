@@ -48,12 +48,6 @@ std::string NodeAnimation::GetName() const
 }
 
 //////////////////////////////////////////////////
-void NodeAnimation::AddKeyFrame(const double _time, const math::Matrix4 &_trans)
-{
-  this->AddKeyFrame(_time, _trans.Ign());
-}
-
-//////////////////////////////////////////////////
 void NodeAnimation::AddKeyFrame(const double _time,
     const ignition::math::Matrix4d &_trans)
 {
@@ -61,12 +55,6 @@ void NodeAnimation::AddKeyFrame(const double _time,
     this->length = _time;
 
   this->keyFrames[_time] = _trans;
-}
-
-//////////////////////////////////////////////////
-void NodeAnimation::AddKeyFrame(const double _time, const math::Pose &_pose)
-{
-  this->AddKeyFrame(_time, _pose.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -83,15 +71,6 @@ void NodeAnimation::AddKeyFrame(const double _time,
 unsigned int NodeAnimation::GetFrameCount() const
 {
   return this->keyFrames.size();
-}
-
-//////////////////////////////////////////////////
-void NodeAnimation::GetKeyFrame(const unsigned int _i, double &_time,
-        math::Matrix4 &_trans) const
-{
-  ignition::math::Matrix4d trans;
-  this->GetKeyFrame(_i, _time, trans);
-  _trans = trans;
 }
 
 //////////////////////////////////////////////////
@@ -116,13 +95,6 @@ void NodeAnimation::GetKeyFrame(const unsigned int _i, double &_time,
 }
 
 //////////////////////////////////////////////////
-std::pair<double, math::Matrix4> NodeAnimation::GetKeyFrame(
-  const unsigned int _i) const
-{
-  return this->KeyFrame(_i);
-}
-
-//////////////////////////////////////////////////
 std::pair<double, ignition::math::Matrix4d> NodeAnimation::KeyFrame(
   const unsigned int _i) const
 {
@@ -137,12 +109,6 @@ std::pair<double, ignition::math::Matrix4d> NodeAnimation::KeyFrame(
 double NodeAnimation::GetLength() const
 {
   return this->length;
-}
-
-//////////////////////////////////////////////////
-math::Matrix4 NodeAnimation::GetFrameAt(double _time, bool _loop) const
-{
-  return this->FrameAt(_time, _loop);
 }
 
 //////////////////////////////////////////////////
@@ -270,13 +236,6 @@ bool SkeletonAnimation::HasNode(const std::string& _node) const
 }
 
 //////////////////////////////////////////////////
-void SkeletonAnimation::AddKeyFrame(const std::string &_node,
-    const double _time, const math::Matrix4 &_mat)
-{
-  this->AddKeyFrame(_node, _time, _mat.Ign());
-}
-
-//////////////////////////////////////////////////
 void SkeletonAnimation::AddKeyFrame(const std::string& _node,
     const double _time, const ignition::math::Matrix4d &_mat)
 {
@@ -287,13 +246,6 @@ void SkeletonAnimation::AddKeyFrame(const std::string& _node,
     this->length = _time;
 
   this->animations[_node]->AddKeyFrame(_time, _mat);
-}
-
-//////////////////////////////////////////////////
-void SkeletonAnimation::AddKeyFrame(const std::string &_node,
-      const double _time, const math::Pose &_pose)
-{
-  this->AddKeyFrame(_node, _time, _pose.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -310,13 +262,6 @@ void SkeletonAnimation::AddKeyFrame(const std::string &_node,
 }
 
 //////////////////////////////////////////////////
-math::Matrix4 SkeletonAnimation::GetNodePoseAt(const std::string &_nod,
-    const double _time, const bool _loop)
-{
-  return this->NodePoseAt(_nod, _time, _loop);
-}
-
-//////////////////////////////////////////////////
 ignition::math::Matrix4d SkeletonAnimation::NodePoseAt(
     const std::string &_node, const double _time, const bool _loop)
 {
@@ -326,19 +271,6 @@ ignition::math::Matrix4d SkeletonAnimation::NodePoseAt(
     mat = this->animations[_node]->FrameAt(_time, _loop);
 
   return mat;
-}
-
-//////////////////////////////////////////////////
-std::map<std::string, math::Matrix4> SkeletonAnimation::GetPoseAt(
-    const double _time, const bool _loop) const
-{
-  std::map<std::string, ignition::math::Matrix4d> tmp;
-  std::map<std::string, math::Matrix4> result;
-  tmp = this->PoseAt(_time, _loop);
-
-  for (auto const &t : tmp)
-    result[t.first] = t.second;
-  return result;
 }
 
 //////////////////////////////////////////////////
@@ -356,19 +288,6 @@ std::map<std::string, ignition::math::Matrix4d> SkeletonAnimation::PoseAt(
     pose[anim.first] = anim.second->FrameAt(_time, _loop);
 
   return pose;
-}
-
-//////////////////////////////////////////////////
-std::map<std::string, math::Matrix4> SkeletonAnimation::GetPoseAtX(
-    const double _x, const std::string &_node, const bool _loop) const
-{
-  std::map<std::string, ignition::math::Matrix4d> tmp;
-  std::map<std::string, math::Matrix4> result;
-  tmp = this->PoseAtX(_x, _node, _loop);
-
-  for (auto const &t : tmp)
-    result[t.first] = t.second;
-  return result;
 }
 
 //////////////////////////////////////////////////

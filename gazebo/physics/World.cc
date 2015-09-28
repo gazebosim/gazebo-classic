@@ -700,7 +700,9 @@ void World::Step()
     this->dataPtr->prevStepWallTime = common::Time::GetWallTime();
 
     double stepTime = this->dataPtr->physicsEngine->GetMaxStepSize();
-    if (!this->IsPaused() || this->dataPtr->stepInc > 0)
+
+    if (!this->IsPaused() || this->dataPtr->stepInc > 0
+        || this->dataPtr->needsReset)
     {
       // query timestep to allow dynamic time step size updates
       this->dataPtr->simTime += stepTime;
@@ -1093,6 +1095,9 @@ void World::ResetTime()
   this->dataPtr->startTime = common::Time::GetWallTime();
   this->dataPtr->realTimeOffset = common::Time(0);
   this->dataPtr->iterations = 0;
+
+  if (this->IsPaused())
+    this->dataPtr->pauseStartTime = this->dataPtr->startTime;
 
   // Signal a reset has occurred. The SensorManager listens to this event
   // to reset each sensor's last update time.
