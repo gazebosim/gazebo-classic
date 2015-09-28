@@ -15,21 +15,15 @@
  *
 */
 
-#ifndef _GAZEBO_JOINT_INSPECTOR_TEST_HH_
-#define _GAZEBO_JOINT_INSPECTOR_TEST_HH_
+#ifndef _GAZEBO_LINK_INSPECTOR_TEST_HH_
+#define _GAZEBO_LINK_INSPECTOR_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the joint inspector.
-class JointInspector_TEST : public QTestFixture
+/// \brief A test class for the link inspector.
+class LinkInspector_TEST : public QTestFixture
 {
   Q_OBJECT
-
-  /// \brief Test adding and removing links.
-  private slots: void AddRemoveLink();
-
-  /// \brief Test swapping parent / child links
-  private slots: void Swap();
 
   /// \brief Test pressing remove button.
   private slots: void RemoveButton();

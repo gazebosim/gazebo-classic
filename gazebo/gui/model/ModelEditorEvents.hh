@@ -425,8 +425,8 @@ namespace gazebo
             T _subscriber)
           { return requestModelPluginRemoval.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the request model plugin removal
-        /// signal.
+        /// \brief Disconnect a Gazebo event from the request model plugin
+        /// removal signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectRequestModelPluginRemoval(
             event::ConnectionPtr _subscriber)
@@ -633,7 +633,8 @@ namespace gazebo
         public: static event::EventT<void (std::string)> modelPluginRemoved;
 
         /// \brief Request to remove a model plugin.
-        public: static event::EventT<void (std::string)> requestModelPluginRemoval;
+        public: static event::EventT<void (std::string)>
+            requestModelPluginRemoval;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string)> jointParentChosen3D;
