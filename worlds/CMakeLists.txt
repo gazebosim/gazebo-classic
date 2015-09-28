@@ -44,6 +44,7 @@ set (files
   projector.world
   quad_rotor_demo.world
   quad_rotor_demo_2.world
+  random_velocity.world
   ray_cpu.world
   ray_noise_plugin.world
   road.world
@@ -54,12 +55,14 @@ set (files
   rubble.world
   shapes.world
   shapes_layers.world
+  sim_events.world
   simple_arm.world
   simple_gripper.world
   single_rotor_demo.world
   sonar_demo.world
   sphere_atlas_demo.world
   stacks.world
+  torsional_friction_demo.world
   transporter.world
   trigger.world
   twin_rotor_demo.world

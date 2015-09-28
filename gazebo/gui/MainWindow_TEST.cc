@@ -19,6 +19,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GLWidget.hh"
@@ -734,6 +735,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_aboutAct);
 
+  QVERIFY(gazebo::gui::g_hotkeyChartAct);
+
   QVERIFY(gazebo::gui::g_quitAct);
 
   QVERIFY(gazebo::gui::g_resetModelsAct);
@@ -765,8 +768,6 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(gazebo::gui::g_sphereCreateAct);
 
   QVERIFY(gazebo::gui::g_cylinderCreateAct);
-
-  QVERIFY(gazebo::gui::g_meshCreateAct);
 
   QVERIFY(gazebo::gui::g_pointLghtCreateAct);
 
@@ -843,6 +844,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(!gazebo::gui::g_aboutAct);
 
+  QVERIFY(!gazebo::gui::g_hotkeyChartAct);
+
   QVERIFY(!gazebo::gui::g_quitAct);
 
   QVERIFY(!gazebo::gui::g_resetModelsAct);
@@ -874,8 +877,6 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_sphereCreateAct);
 
   QVERIFY(!gazebo::gui::g_cylinderCreateAct);
-
-  QVERIFY(!gazebo::gui::g_meshCreateAct);
 
   QVERIFY(!gazebo::gui::g_pointLghtCreateAct);
 
@@ -1068,6 +1069,49 @@ void MainWindow_TEST::MenuBar()
   }
 
   cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::WindowModes()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check edit actions are visible
+  QVERIFY(gazebo::gui::g_resetModelsAct->isVisible());
+  QVERIFY(gazebo::gui::g_resetWorldAct->isVisible());
+  QVERIFY(gazebo::gui::g_editBuildingAct->isVisible());
+  QVERIFY(gazebo::gui::g_editModelAct->isVisible());
+
+  // Change to Model Editor mode
+  gazebo::gui::Events::windowMode("ModelEditor");
+
+  // Check edit actions are not visible
+  QVERIFY(!gazebo::gui::g_resetModelsAct->isVisible());
+  QVERIFY(!gazebo::gui::g_resetWorldAct->isVisible());
+  QVERIFY(!gazebo::gui::g_editBuildingAct->isVisible());
+  QVERIFY(!gazebo::gui::g_editModelAct->isVisible());
+
+  // Terminate
   mainWindow->close();
   delete mainWindow;
 }

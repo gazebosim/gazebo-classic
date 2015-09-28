@@ -74,9 +74,9 @@ void DARTSurfaceParams::FillMsg(msgs::Surface &_msg)
   SurfaceParams::FillMsg(_msg);
 
   _msg.mutable_friction()->set_mu(
-        this->dataPtr->frictionPyramid->GetMuPrimary());
+        this->dataPtr->frictionPyramid->MuPrimary());
   _msg.mutable_friction()->set_mu2(
-        this->dataPtr->frictionPyramid->GetMuSecondary());
+        this->dataPtr->frictionPyramid->MuSecondary());
 }
 
 /////////////////////////////////////////////////
@@ -95,6 +95,12 @@ void DARTSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 
 /////////////////////////////////////////////////
 FrictionPyramidPtr DARTSurfaceParams::GetFrictionPyramid() const
+{
+  return this->dataPtr->frictionPyramid;
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr DARTSurfaceParams::FrictionPyramid() const
 {
   return this->dataPtr->frictionPyramid;
 }

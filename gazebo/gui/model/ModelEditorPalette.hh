@@ -45,7 +45,7 @@ namespace gazebo
 
     /// \class ModelEditorPalette ModelEditorPalette.hh
     /// \brief A palette of model items which can be added to the editor.
-    class GZ_GUI_MODEL_VISIBLE ModelEditorPalette : public QWidget
+    class GZ_GUI_VISIBLE ModelEditorPalette : public QWidget
     {
       Q_OBJECT
 
@@ -94,7 +94,15 @@ namespace gazebo
       private: void OnSetSelectedJoint(const std::string &_name,
           bool _selected);
 
-      /// \brief Helper function to deselect a link or a joint.
+      /// \brief Callback when a model plugin is selected.
+      /// \param[in] _name Name of model plugin.
+      /// \param[in] _selected True if the model plugin is selected, false if
+      /// deselected.
+      private: void OnSetSelectedModelPlugin(const std::string &_name,
+          bool _selected);
+
+      /// \brief Helper function to deselect a specific type, such as link or
+      /// joint.
       /// \param[in] _type Type: Link or Joint.
       private: void DeselectType(const std::string &_type);
 
@@ -155,6 +163,10 @@ namespace gazebo
           const std::string &_jointName, const std::string &_parentName,
           const std::string &_childName);
 
+      /// \brief Add a model plugin to the tree.
+      /// \param[in] _modelPluginName Model plugin name.
+      private: void OnModelPluginInserted(const std::string &_modelPluginName);
+
       /// \brief Remove a link from the tree.
       /// \param[in] _linkId Unique link identifying name.
       private: void OnLinkRemoved(const std::string &_linkId);
@@ -162,6 +174,10 @@ namespace gazebo
       /// \brief Remove a joint from the tree.
       /// \param[in] _jointId Unique joint identifying name.
       private: void OnJointRemoved(const std::string &_jointId);
+
+      /// \brief Remove a model plugin from the tree.
+      /// \param[in] _pluginId Unique model plugin identifying name.
+      private: void OnModelPluginRemoved(const std::string &_pluginId);
 
       /// \brief Remove all links and joints from the tree.
       private: void ClearModelTree();
@@ -218,6 +234,9 @@ namespace gazebo
 
       /// \brief Parent item for all joints.
       private: QTreeWidgetItem *jointsItem;
+
+      /// \brief Parent item for all model plugins.
+      private: QTreeWidgetItem *modelPluginsItem;
 
       /// \brief Mutex to protect updates.
       private: std::recursive_mutex updateMutex;

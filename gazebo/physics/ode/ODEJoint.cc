@@ -429,10 +429,6 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "fmax")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
     }
     else if (_key == "friction")
@@ -445,10 +441,6 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "vel")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       this->SetParam(dParamVel | group, boost::any_cast<double>(_value));
     }
     else if (_key == "hi_stop")
@@ -559,10 +551,6 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else if (_key == "fmax")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       return this->GetParam(dParamFMax | group);
     }
     else if (_key == "friction")
@@ -571,10 +559,6 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else if (_key == "vel")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       return this->GetParam(dParamVel | group);
     }
     else if (_key == "hi_stop")

@@ -54,9 +54,12 @@ set (plugins
   InitialVelocityPlugin
   JointTrajectoryPlugin
   LiftDragPlugin
+  LinearBatteryConsumerPlugin
+  LinearBatteryPlugin
   ModelPropShop
   MudPlugin
   PressurePlugin
+  RandomVelocityPlugin
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
