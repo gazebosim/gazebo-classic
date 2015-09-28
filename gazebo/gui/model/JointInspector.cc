@@ -366,9 +366,9 @@ void JointInspector::OnSwap()
 void JointInspector::OnLinkInserted(const std::string &_linkName)
 {
   std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  size_t idx = _linkName.rfind("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    leafName = _linkName.substr(idx+2);
 
   this->configWidget->AddItemEnumWidget("parentCombo", leafName);
   this->configWidget->AddItemEnumWidget("childCombo", leafName);
@@ -380,9 +380,9 @@ void JointInspector::OnLinkInserted(const std::string &_linkName)
 void JointInspector::OnLinkRemoved(const std::string &_linkName)
 {
   std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  size_t idx = _linkName.rfind("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    leafName = _linkName.substr(idx+2);
 
   this->configWidget->RemoveItemEnumWidget("parentCombo", leafName);
   this->configWidget->RemoveItemEnumWidget("childCombo", leafName);

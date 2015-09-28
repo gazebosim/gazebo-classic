@@ -46,7 +46,7 @@ int main(int _argc, char **_argv)
     gazebo::common::Time::MSleep(100);
 
     // Generate a pose
-    gazebo::math::Pose pose(1, 2, 3, 4, 5, 6);
+    ignition::math::Pose3d pose(1, 2, 3, 4, 5, 6);
 
     // Convert to a pose message
     gazebo::msgs::Pose msg;

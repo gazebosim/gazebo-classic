@@ -17,7 +17,6 @@
 
 #include "gazebo/common/Console.hh"
 
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 
 #include "gazebo/gui/model/ModelEditorEvents.hh"

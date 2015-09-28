@@ -360,8 +360,10 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   _msg.set_parent_id(this->GetParentId());
   msgs::Set(_msg.mutable_pose(), this->Pose());
 
-  _msg.set_visualize(this->GetVisualize());
+  _msg.set_always_on(this->IsActive());
   _msg.set_topic(this->GetTopic());
+  _msg.set_update_rate(this->GetUpdateRate());
+  _msg.set_visualize(this->GetVisualize());
 
   if (this->GetType() == "logical_camera")
   {
@@ -376,10 +378,14 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   {
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
+    auto cam = camSensor->GetCamera();
+    camMsg->set_horizontal_fov(cam->GetHFOV().Radian());
     camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
-    rendering::DistortionPtr distortion =
-        camSensor->GetCamera()->GetDistortion();
+    camMsg->set_image_format(cam->GetImageFormat());
+    camMsg->set_near_clip(cam->GetNearClip());
+    camMsg->set_far_clip(cam->GetFarClip());
+    auto distortion = cam->GetDistortion();
     if (distortion)
     {
       msgs::Distortion *distortionMsg = camMsg->mutable_distortion();

@@ -715,7 +715,7 @@ namespace gazebo
 
       /// \brief Signal that an enum config widget's enum value has changed.
       /// \param[in] _name Scoped name of widget.
-      /// \param[in] _name New enum value string.
+      /// \param[in] _value New enum value string.
       Q_SIGNALS: void EnumValueChanged(const QString &_name,
           const QString &_value);
 

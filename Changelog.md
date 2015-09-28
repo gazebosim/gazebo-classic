@@ -1,10 +1,21 @@
 ## Gazebo 7.0
+
+1. Update physics when the world is reset
+    * [Pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
+
+1. Rename Reset to Reset Time in time widget
+    * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
+    * [Issue #1730](https://bitbucket.org/osrf/gazebo/issue/1730)
+
 1. Added torsional friction
     * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
 
 1. Support loading and spawning nested models
     * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
 
+1. Add function to get the derived scale of a Visual
+    * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
+    
 1. Added EnumIface, which supports iterators over enums.
     * [Pull request #1847](https://bitbucket.org/osrf/gazebo/pull-request/1847)
 
@@ -48,6 +59,9 @@ using the same arguments used in the command line.
 1. Added msgs::PluginFromSDF and tests
     * [Pull request #1858](https://bitbucket.org/osrf/gazebo/pull-request/1858)
 
+1. Added msgs::CollisionFromSDF msgs::SurfaceFromSDF and msgs::FrictionFromSDF
+    * [Pull request #1900](https://bitbucket.org/osrf/gazebo/pull-request/1900)
+
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
 
@@ -84,6 +98,10 @@ using the same arguments used in the command line.
 
     1. Context menu and deletion for model plugins
         * [Pull request #1890](https://bitbucket.org/osrf/gazebo/pull-request/1890)
+
+    1. Set physics to be paused when exiting model editor mode
+        * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
+        * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
 
 ## Gazebo 6.0
 
@@ -1050,6 +1068,11 @@ compilation on Windows.
     * [Issue #1087](https://bitbucket.org/osrf/gazebo/issue/1087)
 1. Fixed memory leak in image conversion
     * [Pull request #1073](https://bitbucket.org/osrf/gazebo/pull-request/1073)
+
+### Gazebo 2.2.1 (xxxx-xx-xx)
+
+1. Fix heightmap model texture loading.
+    * [Pull request #1596](https://bitbucket.org/osrf/gazebo/pull-request/1596)
 
 ### Gazebo 2.2.0 (2014-01-10)
 
