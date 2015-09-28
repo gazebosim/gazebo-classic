@@ -1011,7 +1011,7 @@ std::vector<rendering::VisualPtr> GLWidget::SelectedVisuals() const
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> GLWidget::SelectedVisuals() const
+std::vector<std::string> GLWidget::SelectedVisualNames() const
 {
   return this->selectedVisuals;
 }

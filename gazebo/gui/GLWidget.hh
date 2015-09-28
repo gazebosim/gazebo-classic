@@ -80,7 +80,7 @@ namespace gazebo
 
       /// \brief Returns the list of selected visual names.
       /// \return List with names of selected visuals.
-      public: std::vector<std::string> SelectedVisuals() const;
+      public: std::vector<std::string> SelectedVisualNames() const;
 
       signals: void clicked();
 
