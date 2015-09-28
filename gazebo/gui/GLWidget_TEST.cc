@@ -80,7 +80,7 @@ void GLWidget_TEST::SelectObject()
   QVERIFY(g_gotBoxSelection);
 
   // Check the selected visuals list
-  std::vector<std::string> selectedVisuals = glWidget->SelectedVisuals();
+  std::vector<std::string> selectedVisuals = glWidget->SelectedVisualNames();
 
   QVERIFY(selectedVisuals.size() == 1u);
   QVERIFY(selectedVisuals[0] == "box");
