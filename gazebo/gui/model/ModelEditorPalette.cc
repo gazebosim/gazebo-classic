@@ -288,6 +288,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
       boost::bind(&ModelEditorPalette::OnJointRemoved, this, _1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectModelPluginRemoved(
+      boost::bind(&ModelEditorPalette::OnModelPluginRemoved, this, _1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectJointNameChanged(
       boost::bind(&ModelEditorPalette::OnJointNameChanged, this, _1, _2)));
 
@@ -302,6 +306,10 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
        boost::bind(&ModelEditorPalette::OnSetSelectedJoint, this, _1, _2)));
+
+  this->connections.push_back(
+     gui::model::Events::ConnectSetSelectedModelPlugin(
+     boost::bind(&ModelEditorPalette::OnSetSelectedModelPlugin, this, _1, _2)));
 }
 
 /////////////////////////////////////////////////
@@ -488,6 +496,8 @@ void ModelEditorPalette::OnItemSelectionChanged()
       gui::model::Events::setSelectedLink(name, true);
     else if (type == "Joint")
       gui::model::Events::setSelectedJoint(name, true);
+    else if (type == "Model Plugin")
+      gui::model::Events::setSelectedModelPlugin(name, true);
   }
 
   // deselect
@@ -502,6 +512,8 @@ void ModelEditorPalette::OnItemSelectionChanged()
         gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
+    else if (type == "Model Plugin")
+      gui::model::Events::setSelectedModelPlugin(name, false);
     }
   }
 
@@ -602,6 +614,8 @@ void ModelEditorPalette::DeselectType(const std::string &_type)
         gui::model::Events::setSelectedLink(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
+      else if (type == "Model Plugin")
+        gui::model::Events::setSelectedModelPlugin(name, false);
     }
     else
       ++it;
@@ -627,6 +641,8 @@ void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
       gui::model::Events::showLinkContextMenu(name);
     else if (type == "Joint")
       gui::model::Events::showJointContextMenu(name);
+    else if (type == "Model Plugin")
+      gui::model::Events::showModelPluginContextMenu(name);
   }
 }
 
@@ -634,9 +650,9 @@ void ModelEditorPalette::OnCustomContextMenu(const QPoint &_pt)
 void ModelEditorPalette::OnLinkInserted(const std::string &_linkName)
 {
   std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  size_t idx = _linkName.rfind("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    leafName = _linkName.substr(idx+2);
 
   QTreeWidgetItem *newLinkItem = new QTreeWidgetItem(this->linksItem,
       QStringList(QString("%1").arg(QString::fromStdString(leafName))));
@@ -654,9 +670,9 @@ void ModelEditorPalette::OnJointInserted(const std::string &_jointId,
     const std::string &/*_childName*/)
 {
   std::string leafName = _jointName;
-  size_t idx = _jointName.find_last_of("::");
+  size_t idx = _jointName.rfind("::");
   if (idx != std::string::npos)
-    leafName = _jointName.substr(idx+1);
+    leafName = _jointName.substr(idx+2);
 
   QTreeWidgetItem *newJointItem = new QTreeWidgetItem(this->jointsItem,
       QStringList(QString("%1").arg(QString::fromStdString(leafName))));
@@ -722,6 +738,26 @@ void ModelEditorPalette::OnJointRemoved(const std::string &_jointId)
 }
 
 /////////////////////////////////////////////////
+void ModelEditorPalette::OnModelPluginRemoved(const std::string &_pluginId)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->modelPluginsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->modelPluginsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _pluginId)
+    {
+      this->modelPluginsItem->takeChild(this->modelPluginsItem->indexOfChild(
+          item));
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelEditorPalette::ClearModelTree()
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
@@ -781,6 +817,26 @@ void ModelEditorPalette::OnSetSelectedJoint(const std::string &_name,
   for (int i = 0; i < this->jointsItem->childCount(); ++i)
   {
     QTreeWidgetItem *item = this->jointsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _name)
+    {
+      item->setSelected(_selected);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnSetSelectedModelPlugin(const std::string &_name,
+    bool _selected)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->modelPluginsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->modelPluginsItem->child(i);
     if (!item)
       continue;
     std::string listData = item->data(0, Qt::UserRole).toString().toStdString();

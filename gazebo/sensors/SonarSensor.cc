@@ -48,6 +48,7 @@ GZ_REGISTER_STATIC_SENSOR("sonar", SonarSensor)
 SonarSensor::SonarSensor()
 : Sensor(sensors::OTHER)
 {
+  this->emptyContactCount = 0;
 }
 
 //////////////////////////////////////////////////
@@ -256,8 +257,18 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
     this->pose + this->parentEntity->GetWorldPose().Ign();
   ignition::math::Vector3d pos;
 
-  if (!this->incomingContacts.empty())
+  // A 5-step hysteresis window was chosen to reduce range value from
+  // bouncing.
+  if (!this->incomingContacts.empty() || this->emptyContactCount > 5)
+  {
     this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
+    this->emptyContactCount = 0;
+  }
+  else
+  {
+    ++this->emptyContactCount;
+  }
+
 
   // Iterate over all the contact messages
   for (ContactMsgs_L::iterator iter = this->incomingContacts.begin();
@@ -267,19 +278,22 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
     for (int i = 0; i < (*iter)->contact_size(); ++i)
     {
       // Debug output:
-      // std::cout << "Collision1[" << (*iter)->contact(i).collision1() << "]"
-      //  << "C2[" << (*iter)->contact(i).collision2() << "]\n";
+      // std::cout << "C1[" << (*iter)->contact(i).collision1() << "]"
+      //   << "C2[" << (*iter)->contact(i).collision2() << "]\n";
 
       for (int j = 0; j < (*iter)->contact(i).position_size(); ++j)
       {
-        pos = msgs::ConvertIgn((*iter)->contact(i).position(j));
-        ignition::math::Vector3d relPos = pos - referencePose.Pos();
-        double len = pos.Distance(referencePose.Pos());
+        // Get the contact position relative to the reference position.
+        pos = msgs::ConvertIgn((*iter)->contact(i).position(j)) -
+          referencePose.Pos();
+
+        // Compute the sensed range.
+        double len = pos.Length() - (*iter)->contact(i).depth(j);
 
         // Debug output:
-        // std::cout << "  SP[" << this->pose.pos << "]  P[" << pos
-        //  << "] Len[" << len << "]D["
-        //  << (*iter)->contact(i).depth(j) << "]\n";
+        // std::cout << "  RP[" << referencePose << "]  P[" << pos
+        //   << "] L[" << len << "] D["
+        //   << (*iter)->contact(i).depth(j) << "]\n";
 
         // Copy the contact message.
         if (len < this->sonarMsg.sonar().range())

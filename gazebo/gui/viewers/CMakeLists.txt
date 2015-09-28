@@ -27,6 +27,7 @@ set (headers_install
 
 set (qt_tests_local
   ImagesView_TEST.cc
+  LaserView_TEST.cc
 )
 
 gz_build_qt_tests(${qt_tests_local})
