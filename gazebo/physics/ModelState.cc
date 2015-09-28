@@ -46,8 +46,7 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
   }
 
   // Copy all the models
-  const Model_V models = _model->NestedModels();
-  for (const auto &m : models)
+  for (const auto &m : _model->NestedModels())
   {
     this->modelStates.insert(std::make_pair(m->GetName(),
           ModelState(m, _realTime, _simTime, _iterations)));
@@ -79,8 +78,7 @@ ModelState::ModelState(const ModelPtr _model)
   }
 
   // Copy all the models
-  const Model_V models = _model->NestedModels();
-  for (const auto &m : models)
+  for (const auto &m : _model->NestedModels())
   {
     this->modelStates.insert(std::make_pair(m->GetName(),
           ModelState(m)));
@@ -139,8 +137,7 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
   }
 
   // Load all the models
-  const Model_V models = _model->NestedModels();
-  for (const auto &m : models)
+  for (const auto &m : _model->NestedModels())
   {
     this->modelStates[m->GetName()].Load(m, _realTime, _simTime, _iterations);
   }
@@ -308,19 +305,14 @@ LinkState ModelState::GetLinkState(const std::string &_linkName) const
   if (iter != this->linkStates.end())
     return iter->second;
 
-  gzthrow("Invalid link name[" + _linkName + "]");
+  gzerr << "Invalid link name[" + _linkName + "]" << std::endl;
   return LinkState();
 }
 
 /////////////////////////////////////////////////
 bool ModelState::HasLinkState(const std::string &_linkName) const
 {
-  // Search for the link name
-  LinkState_M::const_iterator iter = this->linkStates.find(_linkName);
-  if (iter != this->linkStates.end())
-    return true;
-
-  return false;
+  return this->linkStates.find(_linkName) != this->linkStates.end();
 }
 
 /////////////////////////////////////////////////
@@ -345,7 +337,7 @@ JointState ModelState::GetJointState(unsigned int _index) const
     return iter->second;
   }
 
-  gzthrow("Index is out of range");
+  gzerr << "Index is out of range" << std::endl;
   return JointState();
 }
 
@@ -356,7 +348,7 @@ JointState ModelState::GetJointState(const std::string &_jointName) const
   if (iter != this->jointStates.end())
     return iter->second;
 
-  gzthrow("Invalid joint name[" + _jointName + "]");
+  gzerr << "Invalid joint name[" + _jointName + "]" << std::endl;
   return JointState();
 }
 
@@ -391,19 +383,14 @@ ModelState ModelState::NestedModelState(const std::string &_modelName) const
   if (iter != this->modelStates.end())
     return iter->second;
 
-  gzthrow("Invalid model name[" + _modelName + "]");
+  gzerr << "Invalid model name[" + _modelName + "]" << std::endl;
   return ModelState();
 }
 
 /////////////////////////////////////////////////
 bool ModelState::HasNestedModelState(const std::string &_modelName) const
 {
-  // Search for the model name
-  auto iter = this->modelStates.find(_modelName);
-  if (iter != this->modelStates.end())
-    return true;
-
-  return false;
+  return this->modelStates.find(_modelName) != this->modelStates.end();
 }
 
 /////////////////////////////////////////////////
