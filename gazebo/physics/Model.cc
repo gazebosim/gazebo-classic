@@ -1103,8 +1103,7 @@ void Model::SetState(const ModelState &_state)
       gzerr << "Unable to find link[" << iter->first << "]\n";
   }
 
-  ModelState_M modelStates = _state.NestedModelStates();
-  for (const auto &ms : modelStates)
+  for (const auto &ms : _state.NestedModelStates())
   {
     ModelPtr model = this->NestedModel(ms.first);
     if (model)
