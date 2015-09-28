@@ -32,10 +32,11 @@ release will remove the deprecated code.
 
 ### Deprecations
 
-1. **gazeob/gui/RTShaderSystem.hh**
+1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis) 
     + ***No replacement for AttachEntity ***
-    +
+
+1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void DetachEntity(Visual *_vis)  
     + ***No replacement for DetachEntity ***
 
