@@ -1608,7 +1608,9 @@ bool Visual::GetCastShadows() const
 //////////////////////////////////////////////////
 void Visual::SetVisible(bool _visible, bool _cascade)
 {
-  this->dataPtr->sceneNode->setVisible(_visible, _cascade);
+  if (this->dataPtr->sceneNode)
+    this->dataPtr->sceneNode->setVisible(_visible, _cascade);
+
   if (_cascade)
   {
     for (auto child: this->dataPtr->children)
