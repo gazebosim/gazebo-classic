@@ -30,6 +30,20 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual void Stop() = 0;
     + ***Replacement:*** public: virtual void Stop();
 
+### Deprecations
+
+1. **gazebo/gui/GLWidget.hh**
+    + ***Deprecated:*** std::vector<rendering::VisualPtr> SelectedVisuals() const;
+    + ***Replacement:*** std::vector<std::string> SelectedVisuals() const;
+
+1. **gazebo/gui/ModelAlign.hh**
+    + ***Deprecated:*** void AlignVisuals(std::vector<rendering::VisualPtr> _visuals, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true)
+    + ***Replacement:*** void AlignVisuals(const std::vector<std::string> &_visualNames, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true);
+
+1. **gazebo/gui/ModelManipulator.hh**
+    + **Deprecated:*** void SetAttachedVisual(rendering::VisualPtr _vis)
+    + **Replacement:*** void SetAttachedVisual(const std::string &_visName);
+
 ### Deletions
 
 1. **gazebo rendering libraries**

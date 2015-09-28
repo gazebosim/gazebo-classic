@@ -74,6 +74,12 @@ namespace gazebo
 
       /// \brief Returns the list of selected visuals.
       /// \return List with pointers to selected visuals.
+      /// \deprecated Use std::vector<std::string> SelectedVisuals() const
+      public: std::vector<rendering::VisualPtr> SelectedVisuals() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns the list of selected visual names.
+      /// \return List with names of selected visuals.
       public: std::vector<std::string> SelectedVisuals() const;
 
       signals: void clicked();

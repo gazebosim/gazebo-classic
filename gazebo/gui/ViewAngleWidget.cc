@@ -153,7 +153,7 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
   ignition::math::Vector3d lookAt = ignition::math::Vector3d::Zero;
 
   // If there are selected visuals, look at their center
-  std::vector<std::string> selectedVisuals = glWidget->SelectedVisuals();
+  std::vector<std::string> selectedVisuals = glWidget->SelectedVisualNames();
 
   if (!selectedVisuals.empty())
   {

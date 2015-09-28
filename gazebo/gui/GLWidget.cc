@@ -999,6 +999,18 @@ void GLWidget::OnOrbit()
 }
 
 /////////////////////////////////////////////////
+std::vector<rendering::VisualPtr> GLWidget::SelectedVisuals() const
+{
+  std::vector<rendering::VisualPtr> result;
+  for (auto const &name : this->selectedVisuals)
+  {
+    result.push_back(this->scene->GetVisual(name));
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
 std::vector<std::string> GLWidget::SelectedVisuals() const
 {
   return this->selectedVisuals;
