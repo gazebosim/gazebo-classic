@@ -218,7 +218,6 @@ void CameraLens::SetType(const std::string &_type)
   catch(...)
   {
     gzerr << "Unknown lens type [" << _type << "]" << std::endl;
-
     return;
   }
 
@@ -321,7 +320,6 @@ void CameraLens::SetFun(const std::string &_fun)
   {
     gzerr << "`Fun` value [" << _fun << "] is not known, "
           << "keeping the old one" << std::endl;
-
     return;
   }
 
@@ -680,7 +678,6 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
   if (!this->Lens())
   {
     gzerr << "No lens" << std::endl;
-
     return;
   }
 
