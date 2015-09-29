@@ -137,7 +137,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
 
   // create a topic that publishes lens states
-  this->lensPub = this->node->Advertise<msgs::CameraLensCmd>(
+  this->lensPub = this->node->Advertise<msgs::CameraLens>(
     lensTopicName+"info", 1);
 
   this->lensSub = this->node->Subscribe(lensTopicName+"control",
@@ -166,14 +166,13 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     for (; !this->hfovCmdQueue.empty(); this->hfovCmdQueue.pop())
       this->camera->SetHFOV(math::Angle(this->hfovCmdQueue.front()));
 
-    msgs::CameraLensCmd msg;
+    msgs::CameraLens msg;
 
     rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
 
     const rendering::CameraLens *lens = wcamera->Lens();
 
-    msg.set_purpose(msgs::CameraLensCmd_CmdPurpose_INFO);
     msg.set_type(lens->Type());
 
     msg.set_c1(lens->C1());
@@ -195,16 +194,9 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 }
 
 //////////////////////////////////////////////////
-void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
+void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->lensCmdMutex);
-
-  if (_msg->purpose() != msgs::CameraLensCmd_CmdPurpose_SET)
-  {
-    gzerr << "Control message is not of the `SET` type!" << std::endl;
-    gzdbg << _msg->DebugString() << std::endl;
-    return;
-  }
 
   rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
