@@ -28,9 +28,6 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 void ModelCreator_TEST::SaveState()
 {
-  return;
-
-
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -121,8 +118,6 @@ void ModelCreator_TEST::SaveState()
 /////////////////////////////////////////////////
 void ModelCreator_TEST::Selection()
 {
-  return;
-
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
@@ -210,10 +205,6 @@ void ModelCreator_TEST::Selection()
 /////////////////////////////////////////////////
 void ModelCreator_TEST::AddPluginElement()
 {
-  return;
-
-
-
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
   {
     sdf::ElementPtr connectionElem(new sdf::Element);
