@@ -1717,15 +1717,29 @@ void World::ProcessLightMsgs()
     // such as GzWeb.
     if (!light)
     {
-      this->dataPtr->sceneMsg.add_light()->CopyFrom(lightMsg);
-
-      // add to the world sdf
+      // Add to world SDF
       sdf::ElementPtr lightSDF = msgs::LightToSDF(lightMsg);
       lightSDF->SetParent(this->dataPtr->sdf);
       lightSDF->GetParent()->InsertElement(lightSDF);
+
+      // Create new light object
+      this->LoadLight(lightSDF, this->dataPtr->rootElement);
     }
     else
     {
+      // Update in scene message
+      for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
+      {
+        if (this->dataPtr->sceneMsg.light(i).name() == lightMsg.name())
+        {
+          this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(lightMsg);
+          break;
+        }
+      }
+
+      // Update in world SDF
+
+      // Update light object
       light->ProcessMsg(lightMsg);
     }
   }
@@ -2344,7 +2358,20 @@ void World::RemoveModel(const std::string &_name)
       childElem = childElem->GetNextElement("light");
     if (childElem)
     {
+      // Remove light object
+      for (auto light = this->dataPtr->lights.begin();
+               light != this->dataPtr->lights.end(); ++light)
+      {
+        if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
+        {
+          this->dataPtr->lights.erase(light);
+          break;
+        }
+      }
+
+      // Remove from SDF
       this->dataPtr->sdf->RemoveChild(childElem);
+
       // Find the light by name in the scene msg, and remove it.
       for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
       {
@@ -2385,6 +2412,20 @@ void World::RemoveModel(const std::string &_name)
       if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
       {
         this->dataPtr->publishModelPoses.erase(model);
+        break;
+      }
+    }
+  }
+
+  // Cleanup the publishLightPoses list.
+  {
+    boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
+    for (auto light = this->dataPtr->publishLightPoses.begin();
+             light != this->dataPtr->publishLightPoses.end(); ++light)
+    {
+      if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
+      {
+        this->dataPtr->publishLightPoses.erase(light);
         break;
       }
     }

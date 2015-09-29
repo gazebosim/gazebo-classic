@@ -63,11 +63,15 @@ namespace gazebo
       /// \brief Called when the pose is changed. Do not call this directly.
       public: virtual void OnPoseChange();
 
+      /// \brief Get the light in message form.
+      /// \return The light as a protobuf message.
+      public: msgs::Light LightMsg() const;
+
       /// \brief Publish the pose.
       private: void PublishPose();
 
       /// \brief Light message container.
-      protected: msgs::Light *msg;
+      protected: msgs::Light msg;
     };
     /// \}
   }

@@ -58,27 +58,13 @@ void Light::FillMsg(msgs::Light &_msg)
 //////////////////////////////////////////////////
 void Light::ProcessMsg(const msgs::Light &_msg)
 {
-/*
-  if (_msg.has_id() && _msg.id() != this->GetId())
-  {
-    gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
-    return;
-  }
-  else if ((_msg.has_id() && _msg.id() != this->GetId()) &&
-            _msg.name() != this->GetScopedName())
-  {
-    gzerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
-      << "]\n";
-    return;
-  }
-*/
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
   {
     this->worldPose = msgs::ConvertIgn(_msg.pose());
   }
 
-//  this->msg->CopyFrom(_msg);
+  this->msg.MergeFrom(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -109,6 +95,12 @@ void Light::PublishPose()
 {
   this->world->PublishLightPose(boost::dynamic_pointer_cast<Light>(
       shared_from_this()));
+}
+
+/////////////////////////////////////////////////
+msgs::Light Light::LightMsg() const
+{
+  return this->msg;
 }
 
 
