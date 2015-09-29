@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/bind.hpp>
 #include <algorithm>
 
 #include "gazebo/transport/transport.hh"

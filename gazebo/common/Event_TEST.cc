@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <boost/bind.hpp>
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/Event.hh>
 #include "test/util.hh"

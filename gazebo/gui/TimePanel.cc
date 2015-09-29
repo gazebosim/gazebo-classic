@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include <boost/bind.hpp>
 #include <sstream>
 
 #include "gazebo/transport/Node.hh"
