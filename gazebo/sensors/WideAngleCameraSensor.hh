@@ -64,7 +64,7 @@ namespace gazebo
 
       /// \brief Handle incoming control message
       /// \param[in] _msg Message received from topic
-      protected: void OnCtrlMessage(ConstCameraLensCmdPtr &_msg);
+      protected: void OnCtrlMessage(ConstCameraLensPtr &_msg);
 
       // \internal
       // \brief Private data pointer

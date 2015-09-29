@@ -37,6 +37,7 @@
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/WideAngleCameraSensor.hh"
+#include "gazebo/sensors/WideAngleCameraSensorPrivate.hh"
 
 
 using namespace gazebo;
@@ -44,12 +45,13 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
-
-WideAngleCameraSensor::~WideAngleCameraSensor():
+//////////////////////////////////////////////////
+WideAngleCameraSensor::WideAngleCameraSensor()
   : dataPtr(new WideAngleCameraSensorPrivate)
 {
 }
 
+//////////////////////////////////////////////////
 WideAngleCameraSensor::~WideAngleCameraSensor()
 {
   delete this->dataPtr;
