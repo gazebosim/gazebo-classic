@@ -108,7 +108,8 @@ namespace gazebo
                   return *this;
                 }
 
-                /// List of all available functions and it's representations
+                /// \brief List of all available functions
+                ///   and its associated representations
                 private: const std::vector<
                     std::tuple<std::string, ignition::math::Vector3d,
                         std::function<float (float)> > > variants = {

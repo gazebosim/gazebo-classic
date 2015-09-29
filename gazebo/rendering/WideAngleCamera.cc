@@ -63,10 +63,10 @@ void CameraLens::Init(const double _c1, const double _c2,
   }
   catch(...)
   {
-    std::stringstream sstr;
-    sstr << "Failed to create custom mapping with function [" << _fun << "]";
+    gzerr << "`fun` value [" << _fun << "] is not known, "
+          << "[tan] will be used instead" << std::endl;
 
-    gzthrow(sstr.str());
+    this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum("tan");
   }
 }
 
@@ -88,7 +88,10 @@ void CameraLens::Load(sdf::ElementPtr _sdf)
 void CameraLens::Load()
 {
   if (!this->dataPtr->sdf->HasElement("type"))
-    gzthrow("You should specify lens type using <type> element");
+  {
+    gzwarn << "You should specify lens type using <type> element";
+    this->dataPtr->sdf->AddElement("type");
+  }
 
   if (this->IsCustom())
   {
@@ -104,7 +107,13 @@ void CameraLens::Load()
         cf->Get<double>("c3"));
     }
     else
-      gzthrow("You need a <custom_function> element to use this lens type");
+    {
+      gzerr << "You need a <custom_function> element to use this lens type, "
+            << "setting lens type to `stereographic`" << std::endl;
+
+      this->dataPtr->sdf->GetElement("type")->Set("stereographic");
+      this->Init(this->Type());
+    }
   }
   else
     this->Init(this->Type());
@@ -208,10 +217,9 @@ void CameraLens::SetType(const std::string &_type)
   }
   catch(...)
   {
-    std::stringstream sstr;
-    sstr << "Unknown mapping function [" << _type << "]";
+    gzerr << "Unknown lens type [" << _type << "]" << std::endl;
 
-    gzthrow(sstr.str());
+    return;
   }
 
   this->dataPtr->sdf->GetElement("type")->Set(_type);
@@ -231,8 +239,17 @@ void CameraLens::SetType(const std::string &_type)
     this->dataPtr->c2 = std::get<1>(params);
     this->dataPtr->c3 = std::get<2>(params);
     this->dataPtr->f = std::get<3>(params);
-    this->dataPtr->fun =
-        CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
+
+    try
+    {
+      this->dataPtr->fun =
+          CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
+    }
+    catch(const std::exception &ex)
+    {
+      gzerr << "`fun` value [" << std::get<4>(params) 
+            << "] is not known, keeping the old one" << std::endl;
+    }
   }
 }
 
@@ -300,12 +317,12 @@ void CameraLens::SetFun(const std::string &_fun)
   {
     this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum(_fun);
   }
-  catch(...)
+  catch(const std::exception &ex)
   {
-    std::stringstream sstr;
-    sstr << "Failed to create custom mapping with function [" << _fun << "]";
+    gzerr << "`Fun` value [" << _fun << "] is not known, "
+          << "keeping the old one" << std::endl;
 
-    gzthrow(sstr.str());
+    return;
   }
 
   auto customFunction = this->dataPtr->sdf->GetElement("custom_function");
@@ -558,9 +575,9 @@ void WideAngleCamera::SetClipDist()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->dataMutex);
 
+  // <clip> element presence is already checked
+  // in Camera::SetClipDist(float,float)
   sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
-  if (!clipElem)
-    gzthrow("Camera has no <clip> element.");
 
   for (int i = 0; i < 6; ++i)
   {
@@ -575,7 +592,8 @@ void WideAngleCamera::SetClipDist()
     }
     else
     {
-      gzerr << "Setting clip distances failed -- no camera yet" << std::endl;
+      gzerr << "Setting clip distances failed - no camera yet" << std::endl;
+
       break;
     }
   }
@@ -662,6 +680,7 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
   if (!this->Lens())
   {
     gzerr << "No lens" << std::endl;
+
     return;
   }
 
@@ -670,7 +689,7 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
     this->GetHFOV().Radian());
 
 #if defined(HAVE_OPENGL)
-  // XXX: OGRE doesn't allow to enable cubemap filtering extention thru it's API
+  // XXX: OGRE doesn't allow to enable cubemap filtering extention thru its API
   // suppose that this function was invoked in a thread that has OpenGL context
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
