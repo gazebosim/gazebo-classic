@@ -488,6 +488,10 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
+      /// \brief Process all received light messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessLightMsgs();
+
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
 

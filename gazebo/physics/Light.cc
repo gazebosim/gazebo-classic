@@ -74,7 +74,9 @@ void Light::ProcessMsg(const msgs::Light &_msg)
 */
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
-    this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
+  {
+    this->worldPose = msgs::ConvertIgn(_msg.pose());
+  }
 
 //  this->msg->CopyFrom(_msg);
 }
@@ -82,7 +84,8 @@ void Light::ProcessMsg(const msgs::Light &_msg)
 //////////////////////////////////////////////////
 void Light::SetState(const LightState &_state)
 {
-  this->worldPose = _state.Pose();
+  this->worldPose = math::Pose(_state.Pose());
+  this->PublishPose();
 }
 
 //////////////////////////////////////////////////

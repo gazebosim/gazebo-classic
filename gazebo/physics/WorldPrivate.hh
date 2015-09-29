@@ -189,6 +189,9 @@ namespace gazebo
       /// \brief Model message buffer.
       public: std::list<msgs::Model> modelMsgs;
 
+      /// \brief Light message buffer.
+      public: std::list<msgs::Light> lightMsgs;
+
       /// \brief True to reset the world on next update.
       public: bool needsReset;
 

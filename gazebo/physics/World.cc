@@ -1729,6 +1729,41 @@ void World::ProcessModelMsgs()
 }
 
 //////////////////////////////////////////////////
+void World::ProcessLightMsgs()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  for (auto const &lightMsg : this->dataPtr->lightMsgs)
+  {
+    LightPtr light = this->Light(lightMsg.name());
+
+    // Add a new light if the light doesn't exist.
+    // Note that this is dangerous, an old message might be trying to modify the
+    // pose of a light which has been deleted and ends up creating a new light.
+    // Consider separating light handling into 2 topics like it's done for
+    // models: ~/factory and ~/model/modify. That would affect other clients
+    // such as GzWeb.
+    if (!light)
+    {
+      this->dataPtr->sceneMsg.add_light()->CopyFrom(lightMsg);
+
+      // add to the world sdf
+      sdf::ElementPtr lightSDF = msgs::LightToSDF(lightMsg);
+      lightSDF->SetParent(this->dataPtr->sdf);
+      lightSDF->GetParent()->InsertElement(lightSDF);
+    }
+    else
+    {
+      light->ProcessMsg(lightMsg);
+    }
+  }
+
+  if (!this->dataPtr->lightMsgs.empty())
+  {
+    this->dataPtr->lightMsgs.clear();
+  }
+}
+
+//////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
   std::list<sdf::ElementPtr> modelsToLoad;
@@ -2139,31 +2174,6 @@ void World::ProcessMessages()
           this->dataPtr->posePub->Publish(msg);
       }
 
-      // Light poses
-      if (!this->dataPtr->publishLightPoses.empty())
-      {
-        for (auto const &light : this->dataPtr->publishLightPoses)
-        {
-          std::list<LightPtr> lightList;
-          lightList.push_back(light);
-          while (!lightList.empty())
-          {
-            LightPtr lightPtr = lightList.front();
-            lightList.pop_front();
-            msgs::Pose *poseMsg = msg.add_pose();
-
-            // Publish the light's world pose
-            // \todo Change to relative once lights can be attached to links
-            poseMsg->set_name(lightPtr->GetScopedName());
-            poseMsg->set_id(lightPtr->GetId());
-            msgs::Set(poseMsg, lightPtr->GetWorldPose().Ign());
-          }
-        }
-
-        if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
-          this->dataPtr->posePub->Publish(msg);
-      }
-
       if (this->dataPtr->poseLocalPub &&
           this->dataPtr->poseLocalPub->HasConnections())
       {
@@ -2173,6 +2183,33 @@ void World::ProcessMessages()
       }
     }
     this->dataPtr->publishModelPoses.clear();
+
+    // Light poses
+    if (!this->dataPtr->publishLightPoses.empty())
+    {
+      if (this->dataPtr->lightPub &&
+          this->dataPtr->lightPub->HasConnections())
+      {
+        for (auto const &light : this->dataPtr->publishLightPoses)
+        {
+          std::list<LightPtr> lightList;
+          lightList.push_back(light);
+          while (!lightList.empty())
+          {
+            LightPtr lightPtr = lightList.front();
+            lightList.pop_front();
+
+            // Publish the light's world pose
+            // \todo Change to relative once lights can be attached to links
+            msgs::Light msg;
+            msg.set_name(lightPtr->GetScopedName());
+            msgs::Set(msg.mutable_pose(), lightPtr->GetWorldPose().Ign());
+            this->dataPtr->lightPub->Publish(msg);
+          }
+        }
+      }
+    }
+    this->dataPtr->publishLightPoses.clear();
   }
 
   if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
@@ -2182,6 +2219,7 @@ void World::ProcessMessages()
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
+    this->ProcessLightMsgs();
     this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
   }
 }
@@ -2382,36 +2420,7 @@ void World::RemoveModel(const std::string &_name)
 void World::OnLightMsg(ConstLightPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-
-  bool lightExists = false;
-
-  // Find the light by name, and copy the new parameters.
-  for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
-  {
-    if (this->dataPtr->sceneMsg.light(i).name() == _msg->name())
-    {
-      lightExists = true;
-      this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(*_msg);
-
-      sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("light");
-      while (childElem && childElem->Get<std::string>("name") != _msg->name())
-        childElem = childElem->GetNextElement("light");
-      if (childElem)
-        msgs::LightToSDF(*_msg, childElem);
-      break;
-    }
-  }
-
-  // Add a new light if the light doesn't exist.
-  if (!lightExists)
-  {
-    this->dataPtr->sceneMsg.add_light()->CopyFrom(*_msg);
-
-    // add to the world sdf
-    sdf::ElementPtr lightSDF = msgs::LightToSDF(*_msg);
-    lightSDF->SetParent(this->dataPtr->sdf);
-    lightSDF->GetParent()->InsertElement(lightSDF);
-  }
+  this->dataPtr->lightMsgs.push_back(*_msg);
 }
 
 /////////////////////////////////////////////////
