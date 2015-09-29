@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 
 #include "gazebo/common/Exception.hh"

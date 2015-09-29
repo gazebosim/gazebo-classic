@@ -19,6 +19,7 @@
  * Date: 09 Sept. 2008
 */
 
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 
 #include "gazebo/common/Exception.hh"

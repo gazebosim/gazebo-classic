@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/algorithim/string.hpp>
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"

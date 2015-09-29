@@ -19,6 +19,7 @@
  * Date: 29 March 2012
 */
 
+#include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include "gazebo/physics/World.hh"
