@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <boost/algorithim/string.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/sensors/SensorFactory.hh"
 

@@ -18,7 +18,7 @@
  * Author: Matt Thompson
  * Date: 6 September 2008
 */
-#include <boost/algorithim/string.hpp>
+#include <boost/algorithm/string.hpp>
 
 
 #include "gazebo/transport/Node.hh"
