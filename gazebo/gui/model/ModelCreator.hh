@@ -327,8 +327,8 @@ namespace gazebo
       /// \param[in] _linkElem SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
       /// \param[in] _parentVis Parent visual that the link will be attached to.
-      private: void CreateLinkFromSDF(sdf::ElementPtr _linkElem,
-          rendering::VisualPtr _parentVis);
+      private: void CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
+          const rendering::VisualPtr &_parentVis);
 
       /// \brief Open the link inspector.
       /// \param[in] _name Name of link.
@@ -355,8 +355,8 @@ namespace gazebo
       /// \param[in] _parentVis If this is not the root model, it will have a
       /// parent visual for its parent model.
       /// \return Data describing the model.
-      private: NestedModelData *CreateModelFromSDF(sdf::ElementPtr _sdf,
-          rendering::VisualPtr _parentVis = NULL);
+      private: NestedModelData *CreateModelFromSDF(const sdf::ElementPtr &_sdf,
+          const rendering::VisualPtr &_parentVis = NULL);
 
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.

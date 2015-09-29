@@ -326,8 +326,8 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
-    _modelElem, rendering::VisualPtr _parentVis)
+NestedModelData *ModelCreator::CreateModelFromSDF(
+    const sdf::ElementPtr &_modelElem, const rendering::VisualPtr &_parentVis)
 {
   rendering::VisualPtr modelVisual;
   std::stringstream modelNameStream;
@@ -945,8 +945,8 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
-    rendering::VisualPtr _parentVis)
+void ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
+    const rendering::VisualPtr &_parentVis)
 {
   LinkData *link = new LinkData();
   MainWindow *mainWindow = gui::get_main_window();

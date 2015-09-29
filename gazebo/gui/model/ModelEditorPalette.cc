@@ -278,7 +278,8 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->connections.push_back(
       gui::model::Events::ConnectNestedModelInserted(
-      boost::bind(&ModelEditorPalette::OnNestedModelInserted, this, _1)));
+      std::bind(&ModelEditorPalette::OnNestedModelInserted, this,
+      std::placeholders::_1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectLinkInserted(
@@ -837,7 +838,7 @@ void ModelEditorPalette::OnJointNameChanged(const std::string &_jointId,
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSetSelectedLink(const std::string &_linkId,
-    bool _selected)
+    const bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
 
@@ -848,7 +849,7 @@ void ModelEditorPalette::OnSetSelectedLink(const std::string &_linkId,
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSetSelectedJoint(const std::string &_jointId,
-    bool _selected)
+    const bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
 
@@ -859,7 +860,7 @@ void ModelEditorPalette::OnSetSelectedJoint(const std::string &_jointId,
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSetSelectedModelPlugin(const std::string &_name,
-    bool _selected)
+    const bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
   for (int i = 0; i < this->modelPluginsItem->childCount(); ++i)

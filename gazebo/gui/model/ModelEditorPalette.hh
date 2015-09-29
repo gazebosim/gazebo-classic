@@ -86,21 +86,21 @@ namespace gazebo
       /// \param[in] _selected True if the link is selected, false if
       /// deselected.
       private: void OnSetSelectedLink(const std::string &_linkId,
-          bool _selected);
+          const bool _selected);
 
       /// \brief Callback when a joint is selected.
       /// \param[in] _jointId Unique id of joint.
       /// \param[in] _selected True if the joint is selected, false if
       /// deselected.
       private: void OnSetSelectedJoint(const std::string &_jointId,
-          bool _selected);
+          const bool _selected);
 
       /// \brief Callback when a model plugin is selected.
       /// \param[in] _name Name of model plugin.
       /// \param[in] _selected True if the model plugin is selected, false if
       /// deselected.
       private: void OnSetSelectedModelPlugin(const std::string &_name,
-          bool _selected);
+          const bool _selected);
 
       /// \brief Helper function to deselect a specific type, such as link or
       /// joint.
