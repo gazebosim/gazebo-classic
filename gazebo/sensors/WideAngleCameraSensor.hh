@@ -18,7 +18,6 @@
 #ifndef _GAZEBO_SENSORS_WIDEANGLE_CAMERA_SENSOR_HH_
 #define _GAZEBO_SENSORS_WIDEANGLE_CAMERA_SENSOR_HH_
 
-#include <queue>
 #include <string>
 
 #include "gazebo/sensors/Sensor.hh"
@@ -33,6 +32,9 @@ namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data class
+    class WideAngleCameraSensorPrivate;
+
     /// \addtogroup gazebo_sensors Sensors
     /// \{
 
@@ -43,10 +45,10 @@ namespace gazebo
     class GAZEBO_VISIBLE WideAngleCameraSensor : public CameraSensor
     {
       /// \brief Constructor
-      public: WideAngleCameraSensor() = default;
+      public: WideAngleCameraSensor();
 
       /// \brief Destructor
-      public: virtual ~WideAngleCameraSensor() = default;
+      public: virtual ~WideAngleCameraSensor();
 
       // Documentation inherited
       public: void Load(const std::string &_worldName) override;
@@ -64,17 +66,9 @@ namespace gazebo
       /// \param[in] _msg Message received from topic
       protected: void OnCtrlMessage(ConstCameraLensCmdPtr &_msg);
 
-      /// \brief Publisher of lens info messages
-      protected: transport::PublisherPtr lensPub;
-
-      /// \brief Subscriber to lens control messages
-      protected: transport::SubscriberPtr lensSub;
-
-      /// \brief Mutex to lock when receiving or sending lens message
-      protected: std::mutex lensCmdMutex;
-
-      /// \brief Horizontal FOV updates to be set in rendering thread
-      private: std::queue<double> hfovCmdQueue;
+      // \internal
+      // \brief Private data pointer
+      public: WideAngleCameraSensorPrivate *dataPtr = nullptr;
     };
     /// \}
   }

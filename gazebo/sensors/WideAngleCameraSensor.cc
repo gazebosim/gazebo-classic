@@ -44,6 +44,17 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
+
+WideAngleCameraSensor::~WideAngleCameraSensor():
+  : dataPtr(new WideAngleCameraSensorPrivate)
+{
+}
+
+WideAngleCameraSensor::~WideAngleCameraSensor()
+{
+  delete this->dataPtr;
+}
+
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::Init()
 {
@@ -137,18 +148,18 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
 
   // create a topic that publishes lens states
-  this->lensPub = this->node->Advertise<msgs::CameraLens>(
+  this->dataPtr->lensPub = this->node->Advertise<msgs::CameraLens>(
     lensTopicName+"info", 1);
 
-  this->lensSub = this->node->Subscribe(lensTopicName+"control",
+  this->dataPtr->lensSub = this->node->Subscribe(lensTopicName+"control",
       &WideAngleCameraSensor::OnCtrlMessage, this);
 }
 
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::Fini()
 {
-  this->lensPub.reset();
-  this->lensSub.reset();
+  this->dataPtr->lensPub.reset();
+  this->dataPtr->lensSub.reset();
 
   CameraSensor::Fini();
 }
@@ -159,12 +170,13 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
   if (!CameraSensor::UpdateImpl(_force))
     return false;
 
-  if (this->lensPub && this->lensPub->HasConnections())
+  if (this->dataPtr->lensPub && this->dataPtr->lensPub->HasConnections())
   {
-    std::lock_guard<std::mutex> lock(this->lensCmdMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->lensCmdMutex);
 
-    for (; !this->hfovCmdQueue.empty(); this->hfovCmdQueue.pop())
-      this->camera->SetHFOV(math::Angle(this->hfovCmdQueue.front()));
+    for (; !this->dataPtr->hfovCmdQueue.empty();
+            this->dataPtr->hfovCmdQueue.pop())
+      this->camera->SetHFOV(math::Angle(this->dataPtr->hfovCmdQueue.front()));
 
     msgs::CameraLens msg;
 
@@ -187,7 +199,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 
     msg.set_env_texture_size(wcamera->EnvTextureSize());
 
-    this->lensPub->Publish(msg);
+    this->dataPtr->lensPub->Publish(msg);
   }
 
   return true;
@@ -196,7 +208,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensPtr &_msg)
 {
-  std::lock_guard<std::mutex> lock(this->lensCmdMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->lensCmdMutex);
 
   rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
@@ -222,7 +234,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensPtr &_msg)
     lens->SetCutOffAngle(_msg->cutoff_angle());
 
   if (_msg->has_hfov())
-    this->hfovCmdQueue.push(_msg->hfov());
+    this->dataPtr->hfovCmdQueue.push(_msg->hfov());
 
   if (_msg->has_fun())
     lens->SetFun(_msg->fun());
