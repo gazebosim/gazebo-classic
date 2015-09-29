@@ -59,6 +59,8 @@ set (sources ${sources}
   Joint.cc
   JointController.cc
   JointState.cc
+  Light.cc
+  LightState.cc
   Link.cc
   LinkState.cc
   MapShape.cc

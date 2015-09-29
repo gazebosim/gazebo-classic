@@ -28,6 +28,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/WorldState.hh"
 
 using namespace gazebo;
@@ -54,6 +55,14 @@ WorldState::WorldState(const WorldPtr _world)
     this->modelStates.insert(std::make_pair((*iter)->GetName(),
           ModelState(*iter, this->realTime, this->simTime, this->iterations)));
   }
+
+  // Add states for all the lights
+  Light_V lights = _world->Lights();
+  for (auto iter = lights.begin(); iter != lights.end(); ++iter)
+  {
+    this->lightStates.insert(std::make_pair((*iter)->GetName(),
+          LightState(*iter, this->realTime, this->simTime, this->iterations)));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -68,6 +77,7 @@ WorldState::~WorldState()
 {
   this->world.reset();
   this->modelStates.clear();
+  this->lightStates.clear();
 }
 
 /////////////////////////////////////////////////
@@ -81,6 +91,7 @@ void WorldState::Load(const WorldPtr _world)
   this->iterations = _world->GetIterations();
 
   // Add a state for all the models
+  this->modelStates.clear();
   Model_V models = _world->GetModels();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
@@ -89,15 +100,13 @@ void WorldState::Load(const WorldPtr _world)
         this->simTime, this->iterations);
   }
 
-  // Remove models that no longer exist. We determine this by check the time
-  // stamp on each model.
-  for (ModelState_M::iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end();)
+  // Add states for all the lights
+  this->lightStates.clear();
+  Light_V lights = _world->Lights();
+  for (auto iter = lights.begin(); iter != lights.end(); ++iter)
   {
-    if (iter->second.GetRealTime() != this->realTime)
-      this->modelStates.erase(iter++);
-    else
-      ++iter;
+    this->lightStates[(*iter)->GetName()].Load(*iter, this->realTime,
+        this->simTime, this->iterations);
   }
 }
 
@@ -129,6 +138,25 @@ void WorldState::Load(const sdf::ElementPtr _elem)
       childElem = childElem->GetNextElement("model");
     }
   }
+
+  // Add the light states
+  this->lightStates.clear();
+  if (_elem->HasElement("light"))
+  {
+    sdf::ElementPtr childElem = _elem->GetElement("light");
+
+    while (childElem)
+    {
+      std::string lightName = childElem->Get<std::string>("name");
+      this->lightStates.insert(std::make_pair(
+            lightName, LightState(childElem)));
+      this->lightStates[lightName].SetSimTime(this->simTime);
+      this->lightStates[lightName].SetWallTime(this->wallTime);
+      this->lightStates[lightName].SetRealTime(this->realTime);
+      this->lightStates[lightName].SetIterations(this->iterations);
+      childElem = childElem->GetNextElement("light");
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -141,6 +169,12 @@ void WorldState::SetWorld(const WorldPtr _world)
 const ModelState_M &WorldState::GetModelStates() const
 {
   return this->modelStates;
+}
+
+/////////////////////////////////////////////////
+const LightState_M &WorldState::LightStates() const
+{
+  return this->lightStates;
 }
 
 /////////////////////////////////////////////////

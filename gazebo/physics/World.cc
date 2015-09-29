@@ -70,6 +70,7 @@
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/World.hh"
@@ -843,6 +844,7 @@ void World::Fini()
   this->dataPtr->plugins.clear();
 
   this->dataPtr->publishModelPoses.clear();
+  this->dataPtr->publishLightPoses.clear();
 
   this->dataPtr->node->Fini();
 
@@ -940,6 +942,13 @@ ModelPtr World::GetModel(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+LightPtr World::Light(const std::string &_name)
+{
+  boost::mutex::scoped_lock lock(*this->dataPtr->loadModelMutex);
+  return boost::dynamic_pointer_cast<physics::Light>(this->GetByName(_name));
+}
+
+//////////////////////////////////////////////////
 EntityPtr World::GetEntity(const std::string &_name)
 {
   return boost::dynamic_pointer_cast<Entity>(this->GetByName(_name));
@@ -976,6 +985,31 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
+LightPtr World::LoadLight(sdf::ElementPtr _sdf, BasePtr _parent)
+{
+  boost::mutex::scoped_lock lock(*this->dataPtr->loadModelMutex);
+
+  if (_sdf->GetName() != "light")
+  {
+    gzerr << "SDF is missing the <light> tag" << std::endl;
+    return NULL;
+  }
+
+  // Add to scene message
+  msgs::Light *msg = this->dataPtr->sceneMsg.add_light();
+  msg->CopyFrom(msgs::LightFromSDF(_sdf));
+
+  // Create new light object
+  LightPtr light(new physics::Light(_parent));
+  light->ProcessMsg(*msg);
+  light->SetWorld(shared_from_this());
+  light->Load(_sdf);
+  this->dataPtr->lights.push_back(light);
+
+  return light;
+}
+
+//////////////////////////////////////////////////
 ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
 {
   ActorPtr actor(new Actor(_parent));
@@ -1007,8 +1041,7 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
     sdf::ElementPtr childElem = _sdf->GetElement("light");
     while (childElem)
     {
-      msgs::Light *lm = this->dataPtr->sceneMsg.add_light();
-      lm->CopyFrom(msgs::LightFromSDF(childElem));
+      this->LoadLight(childElem, _parent);
 
       childElem = childElem->GetNextElement("light");
     }
@@ -1075,6 +1108,12 @@ ModelPtr World::GetModel(unsigned int _index) const
 Model_V World::GetModels() const
 {
   return this->dataPtr->models;
+}
+
+//////////////////////////////////////////////////
+Light_V World::Lights() const
+{
+  return this->dataPtr->lights;
 }
 
 //////////////////////////////////////////////////
@@ -1663,6 +1702,41 @@ void World::ProcessModelMsgs()
 }
 
 //////////////////////////////////////////////////
+void World::ProcessLightMsgs()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  for (auto const &lightMsg : this->dataPtr->lightMsgs)
+  {
+    LightPtr light = this->Light(lightMsg.name());
+
+    // Add a new light if the light doesn't exist.
+    // Note that this is dangerous, an old message might be trying to modify the
+    // pose of a light which has been deleted and ends up creating a new light.
+    // Consider separating light handling into 2 topics like it's done for
+    // models: ~/factory and ~/model/modify. That would affect other clients
+    // such as GzWeb.
+    if (!light)
+    {
+      this->dataPtr->sceneMsg.add_light()->CopyFrom(lightMsg);
+
+      // add to the world sdf
+      sdf::ElementPtr lightSDF = msgs::LightToSDF(lightMsg);
+      lightSDF->SetParent(this->dataPtr->sdf);
+      lightSDF->GetParent()->InsertElement(lightSDF);
+    }
+    else
+    {
+      light->ProcessMsg(lightMsg);
+    }
+  }
+
+  if (!this->dataPtr->lightMsgs.empty())
+  {
+    this->dataPtr->lightMsgs.clear();
+  }
+}
+
+//////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
   std::list<sdf::ElementPtr> modelsToLoad;
@@ -1865,6 +1939,7 @@ void World::SetState(const WorldState &_state)
   this->dataPtr->logRealTime = _state.GetRealTime();
   this->dataPtr->iterations = _state.GetIterations();
 
+  // Models
   const ModelState_M modelStates = _state.GetModelStates();
   for (auto const &modelState : modelStates)
   {
@@ -1873,6 +1948,20 @@ void World::SetState(const WorldState &_state)
       model->SetState(modelState.second);
     else
       gzerr << "Unable to find model[" << modelState.second.GetName() << "]\n";
+  }
+
+  // Lights
+  const LightState_M lightStates = _state.LightStates();
+  for (auto const &lightState : lightStates)
+  {
+    LightPtr light = this->Light(lightState.second.GetName());
+    if (light)
+      light->SetState(lightState.second);
+    else
+    {
+      gzerr << "Unable to find light[" << lightState.second.GetName() << "]"
+            << std::endl;
+    }
   }
 }
 
@@ -2060,6 +2149,33 @@ void World::ProcessMessages()
           this->dataPtr->posePub->Publish(msg);
       }
 
+    // Light poses
+    if (!this->dataPtr->publishLightPoses.empty())
+    {
+      if (this->dataPtr->lightPub &&
+          this->dataPtr->lightPub->HasConnections())
+      {
+        for (auto const &light : this->dataPtr->publishLightPoses)
+        {
+          std::list<LightPtr> lightList;
+          lightList.push_back(light);
+          while (!lightList.empty())
+          {
+            LightPtr lightPtr = lightList.front();
+            lightList.pop_front();
+
+            // Publish the light's world pose
+            // \todo Change to relative once lights can be attached to links
+            msgs::Light lightMsg;
+            lightMsg.set_name(lightPtr->GetScopedName());
+            msgs::Set(lightMsg.mutable_pose(), lightPtr->GetWorldPose().Ign());
+            this->dataPtr->lightPub->Publish(lightMsg);
+          }
+        }
+      }
+    }
+    this->dataPtr->publishLightPoses.clear();
+
       if (this->dataPtr->poseLocalPub &&
           this->dataPtr->poseLocalPub->HasConnections())
       {
@@ -2078,6 +2194,7 @@ void World::ProcessMessages()
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
+    this->ProcessLightMsgs();
     this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
   }
 }
@@ -2127,6 +2244,15 @@ void World::PublishModelPose(physics::ModelPtr _model)
 
   // Only add if the model name is not in the list
   this->dataPtr->publishModelPoses.insert(_model);
+}
+
+//////////////////////////////////////////////////
+void World::PublishLightPose(physics::LightPtr _light)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
+  // Only add if the light name is not in the list
+  this->dataPtr->publishLightPoses.insert(_light);
 }
 
 //////////////////////////////////////////////////
@@ -2269,36 +2395,7 @@ void World::RemoveModel(const std::string &_name)
 void World::OnLightMsg(ConstLightPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-
-  bool lightExists = false;
-
-  // Find the light by name, and copy the new parameters.
-  for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
-  {
-    if (this->dataPtr->sceneMsg.light(i).name() == _msg->name())
-    {
-      lightExists = true;
-      this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(*_msg);
-
-      sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("light");
-      while (childElem && childElem->Get<std::string>("name") != _msg->name())
-        childElem = childElem->GetNextElement("light");
-      if (childElem)
-        msgs::LightToSDF(*_msg, childElem);
-      break;
-    }
-  }
-
-  // Add a new light if the light doesn't exist.
-  if (!lightExists)
-  {
-    this->dataPtr->sceneMsg.add_light()->CopyFrom(*_msg);
-
-    // add to the world sdf
-    sdf::ElementPtr lightSDF = msgs::LightToSDF(*_msg);
-    lightSDF->SetParent(this->dataPtr->sdf);
-    lightSDF->GetParent()->InsertElement(lightSDF);
-  }
+  this->dataPtr->lightMsgs.push_back(*_msg);
 }
 
 /////////////////////////////////////////////////

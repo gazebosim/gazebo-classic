@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/ModelState.hh"
+#include "gazebo/physics/LightState.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -88,6 +89,10 @@ namespace gazebo
       /// \brief Get the model states.
       /// \return A vector of model states.
       public: const ModelState_M &GetModelStates() const;
+
+      /// \brief Get the light states.
+      /// \return A vector of light states.
+      public: const LightState_M &LightStates() const;
 
       /// \brief Get the number of model states.
       ///
@@ -196,6 +201,13 @@ namespace gazebo
           _out << iter->second;
         }
 
+        // List the light states
+        for (auto iter = _state.lightStates.begin();
+            iter != _state.lightStates.end(); ++iter)
+        {
+          _out << iter->second;
+        }
+
         _out << "</state>";
 
         return _out;
@@ -203,6 +215,9 @@ namespace gazebo
 
       /// \brief State of all the models.
       private: ModelState_M modelStates;
+
+      /// \brief A map between all the light names and their states.
+      private: LightState_M lightStates;
 
       /// \brief List of new added models. The
       /// value is the SDF that describes the model.

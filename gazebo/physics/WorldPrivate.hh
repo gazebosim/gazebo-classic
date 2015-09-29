@@ -189,6 +189,9 @@ namespace gazebo
       /// \brief Model message buffer.
       public: std::list<msgs::Model> modelMsgs;
 
+      /// \brief Light message buffer.
+      public: std::list<msgs::Light> lightMsgs;
+
       /// \brief True to reset the world on next update.
       public: bool needsReset;
 
@@ -250,6 +253,9 @@ namespace gazebo
       /// \brief The list of models that need to publish their pose.
       public: std::set<ModelPtr> publishModelPoses;
 
+      /// \brief The list of lights that need to publish their pose.
+      public: std::set<LightPtr> publishLightPoses;
+
       /// \brief Info passed through the WorldUpdateBegin event.
       public: common::UpdateInfo updateInfo;
 
@@ -286,6 +292,9 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       public: Model_V models;
+
+      /// \brief A cached list of lights.
+      public: Light_V lights;
 
       /// \brief This mutex is used to by the ::RemoveModel and
       /// ::ProcessFactoryMsgs functions.
