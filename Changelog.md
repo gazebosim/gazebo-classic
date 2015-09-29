@@ -2,6 +2,7 @@
 
 1. Resolve issue #1702
     * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
+    * [Pull request #1905](https://bitbucket.org/osrf/gazebo/pull-request/1905)
     * [Pull request #1913](https://bitbucket.org/osrf/gazebo/pull-request/1913)
 
 1. Update physics when the world is reset
