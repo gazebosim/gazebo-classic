@@ -75,7 +75,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
     << "        <type>custom</type>"
     << "      </noise>"
     << "    </ray>"
-    << "    <plugin name ='laser' filename='" << pluginFileName << "'>"
+    << "    <plugin name ='laser' filename='" << pluginFileName << "'/>"
     << "  </sensor>"
     << "</link>"
     << "</model>"
