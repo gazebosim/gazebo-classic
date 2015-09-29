@@ -43,6 +43,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   gazebo::rendering::VisualPtr childVis;
   childVis.reset(
       new gazebo::rendering::Visual("child", scene->GetWorldVisual()));
+  childVis->Load();
 
   // create a joint message for testing
   gazebo::msgs::JointPtr jointMsg;

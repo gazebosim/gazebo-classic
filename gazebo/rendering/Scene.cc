@@ -223,22 +223,28 @@ void Scene::Clear()
       this->RemoveLight(this->dataPtr->lights.begin()->second);
   this->dataPtr->lights.clear();
 
+  std::cout << "Scene REmove World Visual. Count[" << this->dataPtr->visuals.size() << "]\n";
   // Remove the root of the visual tree. This will recursively remove most
   // of the visuals.
   if (this->dataPtr->worldVisual)
   {
-    this->dataPtr->worldVisual->Fini();
+    this->RemoveVisual(this->dataPtr->worldVisual);
+    // this->dataPtr->worldVisual->Fini();
     this->dataPtr->worldVisual.reset();
-    this->dataPtr->visuals.erase(this->dataPtr->visuals.begin());
+    // this->dataPtr->visuals.erase(this->dataPtr->visuals.begin());
   }
+  std::cout << "Scene World Visual removed. Count[" << this->dataPtr->visuals.size() << "]\n\n";
+
 
   // Remove any remaining visuals.
   for (auto &visual : this->dataPtr->visuals)
   {
-    this->RemoveVisualizations(visual.second);
+    std::cout << "Scene -> Fini[" << visual.second->GetName() << "]\n";
+    // this->RemoveVisualizations(visual.second);
     visual.second->Fini();
   }
   this->dataPtr->visuals.clear();
+  this->dataPtr->worldVisual.reset();
 
   for (uint32_t i = 0; i < this->dataPtr->grids.size(); ++i)
     delete this->dataPtr->grids[i];
@@ -2951,6 +2957,7 @@ void Scene::RemoveVisual(uint32_t _id)
   if (iter != this->dataPtr->visuals.end())
   {
     VisualPtr vis = iter->second;
+    std::cout << "Scene::REmoveVisual[" << vis->GetName() << "]\n";
     // Remove all projectors attached to the visual
     auto piter = this->dataPtr->projectors.begin();
     while (piter != this->dataPtr->projectors.end())

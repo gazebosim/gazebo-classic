@@ -292,7 +292,7 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   mainWindow->close();
   delete mainWindow;
 }
-/*
+
 /////////////////////////////////////////////////
 void ApplyWrenchDialog_TEST::MouseInteractions()
 {
@@ -650,7 +650,6 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   mainWindow->close();
   delete mainWindow;
 }
-*/
 
 // Generate a main function for the test
 QTEST_MAIN(ApplyWrenchDialog_TEST)

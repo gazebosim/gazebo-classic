@@ -62,6 +62,7 @@ void ModelData_TEST::Clone()
   link->Load(msgs::LinkToSDF(model.link(0)));
   rendering::VisualPtr linkVis(new rendering::Visual("model::box_link",
       scene->GetWorldVisual()));
+  linkVis->Load();
   link->linkVisual = linkVis;
 
   // add a visual
@@ -195,6 +196,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddBoxLink(model, mass, size);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("box_link", scene));
+    linkVis->Load();
     link->linkVisual = linkVis;
 
     // add a collision visual
@@ -344,6 +346,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddCylinderLink(model, mass, radius, length);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("cylinder_link", scene));
+    linkVis->Load();
     link->linkVisual = linkVis;
 
     // add a collision visual
@@ -498,6 +501,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddSphereLink(model, mass, radius);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link", scene));
+    linkVis->Load();
     link->linkVisual = linkVis;
 
     // add a collision visual
@@ -646,6 +650,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddSphereLink(model, mass, radius);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link2", scene));
+    linkVis->Load();
     link->linkVisual = linkVis;
 
     // add a collision visual
@@ -746,6 +751,7 @@ void ModelData_TEST::LinkScale()
     msgs::AddSphereLink(model, mass, radius);
     link->Load(msgs::LinkToSDF(model.link(0)));
     rendering::VisualPtr linkVis(new rendering::Visual("sphere_link3", scene));
+    linkVis->Load();
     link->linkVisual = linkVis;
 
     // add a collision visual

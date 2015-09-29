@@ -193,6 +193,7 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
+  std::cout << "Visual::Fini[" << this->GetName() << "]\n";
   this->dataPtr->plugins.clear();
 
   if (this->dataPtr->preRenderConnection)
@@ -201,6 +202,7 @@ void Visual::Fini()
     this->dataPtr->preRenderConnection.reset();
   }
 
+  std::cout << "    Children Count[" << this->dataPtr->children.size() << "]\n";
   std::vector<uint32_t> visualIds;
   for (auto visual: this->dataPtr->children)
   {
@@ -210,7 +212,10 @@ void Visual::Fini()
     // Only remove non-gui visuals. We don't want to delete the
     // SelectionObj.
     if (visual->GetType() != VT_GUI)
+    {
+      std::cout << "VisualId[" << visual->GetName() << "]\n";
       visualIds.push_back(visual->GetId());
+    }
     else
       this->DetachVisual(visual->GetName());
   }
@@ -220,7 +225,11 @@ void Visual::Fini()
 
   // Detach from the parent
   if (this->dataPtr->parent)
+  {
+    std::cout << "    ParentVisual["
+              << this->dataPtr->parent->GetName() << "]\n";
     this->dataPtr->parent->DetachVisual(this->GetName());
+  }
 
   if (this->dataPtr->sceneNode &&
       this->dataPtr->scene->GetManager()->hasSceneNode(this->GetName()))
@@ -315,6 +324,7 @@ void Visual::Init()
   this->dataPtr->layer = -1;
   this->dataPtr->scale = ignition::math::Vector3d::One;
 
+  std::cout << "VIsual::Init[" << this->GetName() << "]\n";
   this->dataPtr->initialized = true;
 }
 
@@ -565,16 +575,21 @@ std::string Visual::GetName() const
 //////////////////////////////////////////////////
 void Visual::AttachVisual(VisualPtr _vis)
 {
+  std::cout << "AttachVisual[" << _vis->GetName()  << "] to [" << this->GetName() << "]\n";
   if (!_vis)
     gzerr << "Visual is null.\n";
-  else if (_vis->GetSceneNode())
+  else
   {
-    if (_vis->GetSceneNode()->getParentSceneNode())
+    if (_vis->GetSceneNode())
     {
-      _vis->GetSceneNode()->getParentSceneNode()->removeChild(
-          _vis->GetSceneNode());
+      if (_vis->GetSceneNode()->getParentSceneNode())
+      {
+        _vis->GetSceneNode()->getParentSceneNode()->removeChild(
+            _vis->GetSceneNode());
+      }
+      this->dataPtr->sceneNode->addChild(_vis->GetSceneNode());
     }
-    this->dataPtr->sceneNode->addChild(_vis->GetSceneNode());
+
     this->dataPtr->children.push_back(_vis);
     _vis->dataPtr->parent = shared_from_this();
   }
@@ -596,10 +611,18 @@ void Visual::DetachVisual(const std::string &_name)
     if ((*iter)->GetName() == _name)
     {
       VisualPtr childVis = (*iter);
+      if (childVis)
+      {
+        std::cout << "DetachVisual[" << childVis->GetName() << "] from["
+                  << this->GetName() << "]\n";
+        //std::cout << "  SceneNode Me[" << this->dataPtr->sceneNode << "] Child[" << childVis->GetSceneNode() << "]\n";
+        //std::cout << "  SceneNOde Name[" << this->dataPtr->sceneNode->getName() << "]\n";
+        //std::cout << "  CHild SceneNOde Name[" << childVis->GetSceneNode()->getName() << "]\n";
+        if (this->dataPtr->sceneNode && childVis->GetSceneNode())
+          this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
+        childVis->GetParent().reset();
+      }
       this->dataPtr->children.erase(iter);
-      if (this->dataPtr->sceneNode)
-        this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
-      childVis->GetParent().reset();
       break;
     }
   }

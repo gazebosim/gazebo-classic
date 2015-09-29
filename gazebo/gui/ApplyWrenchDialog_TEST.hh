@@ -31,7 +31,7 @@ class ApplyWrenchDialog_TEST : public QTestFixture
   private slots: void ApplyForceTorqueFromDialog();
 
   /// \brief Test mouse interactions.
-  // private slots: void MouseInteractions();
+  private slots: void MouseInteractions();
 };
 
 #endif

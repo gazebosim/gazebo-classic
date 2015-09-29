@@ -58,12 +58,7 @@ namespace gazebo
 
       /// \brief Load using previously set member variables.
       private: void Load();
-
-      /// \brief Destroy all the movable objects attached to a scene node.
-      /// \param[in] _sceneNode Pointer to the scene node to process.
-      private: void DestroyAllAttachedMovableObjects(
-        Ogre::SceneNode *_sceneNode);
-    };
+   };
     /// \}
   }
 }
