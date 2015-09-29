@@ -30,6 +30,7 @@
 #include <string>
 #include <iostream>
 
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"

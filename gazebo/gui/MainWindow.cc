@@ -15,6 +15,7 @@
  *
  */
 #include <sdf/sdf.hh>
+#include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include "gazebo/gazebo_config.h"

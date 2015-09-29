@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include "gazebo/rendering/ogre_gazebo.h"
 

@@ -19,6 +19,7 @@
  * Date: 29 March 2012
 */
 
+#include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"

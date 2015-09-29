@@ -17,6 +17,7 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
