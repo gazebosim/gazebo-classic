@@ -23,7 +23,6 @@
 
 #include "gazebo/common/MeshManager.hh"
 
-#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"

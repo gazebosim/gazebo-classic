@@ -1,5 +1,12 @@
 ## Gazebo 7.0
 
+1. Update physics when the world is reset
+    * [Pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
+
+1. Resolve issue #1702
+    * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
+    * [Pull request #1905](https://bitbucket.org/osrf/gazebo/pull-request/1905)
+
 1. Rename Reset to Reset Time in time widget
     * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
     * [Issue #1730](https://bitbucket.org/osrf/gazebo/issue/1730)
@@ -56,6 +63,9 @@ using the same arguments used in the command line.
 1. Added msgs::PluginFromSDF and tests
     * [Pull request #1858](https://bitbucket.org/osrf/gazebo/pull-request/1858)
 
+1. Added msgs::CollisionFromSDF msgs::SurfaceFromSDF and msgs::FrictionFromSDF
+    * [Pull request #1900](https://bitbucket.org/osrf/gazebo/pull-request/1900)
+
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
 
@@ -64,6 +74,9 @@ using the same arguments used in the command line.
 
 1. AddItem / RemoveItem / Clear enum config widgets
     * [Pull request #1878](https://bitbucket.org/osrf/gazebo/pull-request/1878)
+
+1. Make all child ConfigWidgets emit signals.
+    * [Pull request #1884](https://bitbucket.org/osrf/gazebo/pull-request/1884)
 
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
