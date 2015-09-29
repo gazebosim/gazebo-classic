@@ -9,6 +9,10 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/rendering/OribitViewController.hh**
+    + ***Removed:*** public: OrbitViewController(UserCameraPtr _camera);
+    + ***Replacement:*** public: OrbitViewController(UserCameraPtr _camera, const std::string &_name = "OrbitViewController");
+
 1. **gazebo/test/ServerFixture.hh**
     + ***Removed:*** protected: void RunServer(const std::string &_worldFilename);
     + ***Removed:*** protected: void RunServer(const std::string &_worldFilename,
