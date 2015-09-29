@@ -18,6 +18,7 @@
  * Author: Nate Koenig
  * Date: 14 Dec 2007
  */
+#include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"

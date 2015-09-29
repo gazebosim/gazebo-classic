@@ -19,6 +19,7 @@
  * Author: Nate Koenig
  * Date: 18 Dec 2009
  */
+#include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 

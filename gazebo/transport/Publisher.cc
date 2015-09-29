@@ -17,6 +17,7 @@
 /* Desc: Handles pushing messages out on a named topic
  * Author: Nate Koenig
  */
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/transport/Node.hh"

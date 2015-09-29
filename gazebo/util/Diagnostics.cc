@@ -18,6 +18,7 @@
  * Author: Nate Koenig
  * Date: 2 Feb 2011
  */
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"

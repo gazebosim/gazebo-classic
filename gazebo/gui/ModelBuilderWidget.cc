@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/UserCamera.hh"
 

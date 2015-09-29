@@ -17,6 +17,7 @@
 /* Desc: Camera Visualization Class
  * Author: Nate Koenig
  */
+#include <boost/bind.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
