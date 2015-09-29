@@ -17,6 +17,7 @@
 #ifndef _SUBSCRIPTIONTRANSPORT_HH_
 #define _SUBSCRIPTIONTRANSPORT_HH_
 
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
 

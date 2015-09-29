@@ -18,6 +18,7 @@
 #include <dirent.h>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <boost/function.hpp>
 #include <sdf/sdf.hh>
 
 // Moved to top to avoid osx compilation errors

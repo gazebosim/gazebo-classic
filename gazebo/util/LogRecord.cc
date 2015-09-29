@@ -17,6 +17,7 @@
 
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/function.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>

@@ -19,6 +19,7 @@
  * Date: 03 Apr 2007
  */
 
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/msgs/msgs.hh"
