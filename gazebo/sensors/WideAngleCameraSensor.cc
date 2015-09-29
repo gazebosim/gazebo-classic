@@ -131,7 +131,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
       this->GetTopic(), 50);
 
   std::string lensTopicName = "~/";
-  lensTopicName += this->parentName + "/" + this->GetName() + "/lens_";
+  lensTopicName += this->parentName + "/" + this->GetName() + "/lens/";
   boost::replace_all(lensTopicName, "::", "/");
 
   sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
