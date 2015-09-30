@@ -438,7 +438,7 @@ namespace gazebo
       private: rendering::VisualPtr previewVisual;
 
       /// \brief Visual currently being inserted into the model.
-      private: rendering::VisualPtr visualBeingInserted;
+      private: rendering::VisualPtr mouseVisual;
 
       /// \brief The pose of the model.
       private: math::Pose modelPose;

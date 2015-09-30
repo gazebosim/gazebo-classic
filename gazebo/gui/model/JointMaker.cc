@@ -229,15 +229,20 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
 
   std::string jointId = _jointId;
   JointData *joint = NULL;
+
+  // Existing joint
   if (this->joints.find(jointId) != this->joints.end())
   {
     joint = this->joints[jointId];
   }
+  // Joint being created
   else if (this->jointBeingCreated)
   {
     joint = this->jointBeingCreated;
+    // Already has hotspot
     if (joint->hotspot)
       jointId = joint->hotspot->GetName();
+    // Still only line
     else
       jointId = "";
   }
@@ -662,7 +667,7 @@ void JointMaker::Stop()
 
     if (this->jointCreationDialog)
       this->jointCreationDialog->close();
-    this->jointBeingCreated = NULL;
+    //this->jointBeingCreated = NULL;
     this->creatingJoint = false;
     this->jointType == JointMaker::JOINT_NONE;
     // Notify ModelEditor to uncheck tool button
@@ -725,34 +730,30 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   // Case when a parent link is already selected and currently
   // extending the joint line to a child link
   if (this->parentLinkVis && !this->childLinkVis && this->hoverVis
-      && this->jointBeingCreated && this->jointBeingCreated->line)
+      && this->jointBeingCreated && this->jointBeingCreated->line &&
+      this->jointBeingCreated->parent)
   {
     math::Vector3 parentPos;
+
     // Set end point to center of child link
     if (!this->hoverVis->IsPlane())
     {
-      if (this->jointBeingCreated->parent)
-      {
-        parentPos =  this->GetLinkWorldCentroid(this->jointBeingCreated->parent)
-            - this->jointBeingCreated->line->GetPoint(0);
-        this->jointBeingCreated->line->SetPoint(1,
-            this->GetLinkWorldCentroid(this->hoverVis) - parentPos);
-      }
+      parentPos =  this->GetLinkWorldCentroid(this->jointBeingCreated->parent)
+	  - this->jointBeingCreated->line->GetPoint(0);
     }
+    // Set end point to mouse plane intersection
     else
     {
-      // Set end point to mouse plane intersection
       math::Vector3 pt;
       camera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
           math::Plane(math::Vector3(0, 0, 1)), pt);
-      if (this->jointBeingCreated->parent)
-      {
-        parentPos = this->GetLinkWorldCentroid(this->jointBeingCreated->parent)
-            - this->jointBeingCreated->line->GetPoint(0);
-        this->jointBeingCreated->line->SetPoint(1,
-            this->GetLinkWorldCentroid(this->hoverVis) - parentPos + pt);
-      }
+
+      parentPos = this->GetLinkWorldCentroid(this->jointBeingCreated->parent)
+	  - this->jointBeingCreated->line->GetPoint(0) - pt;
     }
+
+    this->jointBeingCreated->line->SetPoint(1,
+	this->GetLinkWorldCentroid(this->hoverVis) - parentPos);
   }
   return true;
 }
@@ -1596,7 +1597,7 @@ void JointMaker::ParentLinkChosen(rendering::VisualPtr _parentLink)
     this->hoverVis.reset();
   }
 
-  // Started joint creation
+  // Choosing parent for the first time
   if (!this->jointBeingCreated)
   {
     this->jointBeingCreated = this->CreateJointLine("JOINT_LINE",
@@ -1637,12 +1638,9 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
 
   if (this->jointBeingCreated)
   {
-    // TODO: Keep track of child's original pose and make it semi-transparent,
-    // so we know that it is a temporary preview
-
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-    // Reset current joint
+    // Choosing child for the first time
     if (!this->childLinkVis)
     {
       this->RemoveJoint("");
@@ -1678,8 +1676,12 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
 void JointMaker::OnJointTypeChosenDialog(JointType _type)
 {
   this->jointType = _type;
-  this->jointBeingCreated->SetType(_type);
-  this->jointBeingCreated->Update();
+
+  if (this->jointBeingCreated)
+  {
+    this->jointBeingCreated->SetType(_type);
+    this->jointBeingCreated->Update();
+  }
 }
 
 /////////////////////////////////////////////////
