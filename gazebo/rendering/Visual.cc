@@ -168,8 +168,6 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
 //////////////////////////////////////////////////
 Visual::~Visual()
 {
-  RTShaderSystem::Instance()->DetachEntity(this);
-
   if (this->dataPtr->preRenderConnection)
     event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
 
@@ -224,7 +222,6 @@ void Visual::Fini()
     this->dataPtr->preRenderConnection.reset();
   }
 
-  RTShaderSystem::Instance()->DetachEntity(this);
   this->dataPtr->scene.reset();
 }
 
@@ -288,9 +285,6 @@ void Visual::Init()
   this->dataPtr->staticGeom = NULL;
   this->dataPtr->layer = -1;
   this->dataPtr->scale = ignition::math::Vector3d::One;
-
-  if (this->dataPtr->useRTShader)
-    RTShaderSystem::Instance()->AttachEntity(this);
 
   this->dataPtr->initialized = true;
 }
@@ -841,18 +835,6 @@ void Visual::SetLighting(bool _lighting)
     return;
 
   this->dataPtr->lighting = _lighting;
-
-  if (this->dataPtr->useRTShader)
-  {
-    if (this->dataPtr->lighting)
-      RTShaderSystem::Instance()->AttachEntity(this);
-    else
-    {
-      // Detach from RTShaderSystem otherwise setting lighting here will have
-      // no effect if shaders are used.
-      RTShaderSystem::Instance()->DetachEntity(this);
-    }
-  }
 
   try
   {
