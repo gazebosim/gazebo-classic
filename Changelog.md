@@ -1,5 +1,44 @@
 ## Gazebo 2.0
 
+### Gazebo 2.2.6 (2015-09-28)
+
+1. Backport fixes to setup.sh from pull request #1430 to 2.2 branch
+    * [Pull request 1889](https://bitbucket.org/osrf/gazebo/pull-request/1889)
+1. Fix heightmap texture loading (2.2)
+    * [Pull request 1596](https://bitbucket.org/osrf/gazebo/pull-request/1596)
+1. Prevent out of bounds array access in SkidSteerDrivePlugin (found by cppcheck 1.68)
+    * [Pull request 1379](https://bitbucket.org/osrf/gazebo/pull-request/1379)
+1. Fix build with boost 1.57 for 2.2 branch (#1399)
+    * [Pull request 1358](https://bitbucket.org/osrf/gazebo/pull-request/1358)
+1. Fix manpage test failures by incrementing year to 2015
+    * [Pull request 1361](https://bitbucket.org/osrf/gazebo/pull-request/1361)
+1. Fix build for OS X 10.10 (#1304, #1289)
+    * [Pull request 1346](https://bitbucket.org/osrf/gazebo/pull-request/1346)
+1. Restore ODELink ABI, use Link variables instead (#1354)
+    * [Pull request 1347](https://bitbucket.org/osrf/gazebo/pull-request/1347)
+1. Fix inertia_ratio test
+    * [Pull request 1344](https://bitbucket.org/osrf/gazebo/pull-request/1344)
+1. backport collision visual fix -> 2.2
+    * [Pull request 1343](https://bitbucket.org/osrf/gazebo/pull-request/1343)
+1. Fix two code_check errors on 2.2
+    * [Pull request 1314](https://bitbucket.org/osrf/gazebo/pull-request/1314)
+1. issue #243 fix Link::GetWorldLinearAccel and Link::GetWorldAngularAccel for ODE
+    * [Pull request 1284](https://bitbucket.org/osrf/gazebo/pull-request/1284)
+
+### Gazebo 2.2.3 (2014-04-29)
+
+1. Removed redundant call to World::Init
+    * [Pull request #1107](https://bitbucket.org/osrf/gazebo/pull-request/1107)
+    * [Issue #1208](https://bitbucket.org/osrf/gazebo/issue/1208)
+1. Return proper error codes when gazebo exits
+    * [Pull request #1085](https://bitbucket.org/osrf/gazebo/pull-request/1085)
+    * [Issue #1178](https://bitbucket.org/osrf/gazebo/issue/1178)
+1. Fixed Camera::GetWorldRotation().
+    * [Pull request #1071](https://bitbucket.org/osrf/gazebo/pull-request/1071)
+    * [Issue #1087](https://bitbucket.org/osrf/gazebo/issue/1087)
+1. Fixed memory leak in image conversion
+    * [Pull request #1073](https://bitbucket.org/osrf/gazebo/pull-request/1073)
+
 ### Gazebo 2.2.1 (xxxx-xx-xx)
 
 1. Fix heightmap model texture loading.
