@@ -74,7 +74,8 @@ namespace gazebo
                 lighting(true),
                 visibilityFlags(GZ_VISIBILITY_ALL),
                 type(Visual::VT_ENTITY),
-                layer(0)
+                layer(0),
+                geomSize(ignition::math::Vector3d::One)
       {
       }
 
@@ -161,7 +162,7 @@ namespace gazebo
       public: static uint32_t visualIdCount;
 
       /// \brief Scale of visual.
-      public: math::Vector3 scale;
+      public: ignition::math::Vector3d scale;
 
       /// \brief True if lighting will be applied to this visual.
       public: bool lighting;
@@ -196,6 +197,9 @@ namespace gazebo
       /// \brief Index of the layer to which this visual belongs. Layers
       /// act similar to layers in photoshop.
       public: int32_t layer;
+
+      /// \brief Size of attached geometry
+      public: ignition::math::Vector3d geomSize;
     };
     /// \}
   }

@@ -35,7 +35,7 @@ namespace gazebo
     /// \cond
     /// \brief A custom combobox that pull in a list of topics for user
     /// selection.
-    class GZ_GUI_VIEWERS_VISIBLE TopicCombo : public QComboBox
+    class GZ_GUI_VISIBLE TopicCombo : public QComboBox
     {
       /// \brief Constructor
       /// \param[in] _w Parent widget.
@@ -73,7 +73,7 @@ namespace gazebo
     /// \endcond
 
     /// \brief Base class for widgets that display topic data.
-    class GZ_GUI_VIEWERS_VISIBLE TopicView : public QDialog
+    class GZ_GUI_VISIBLE TopicView : public QDialog
     {
       Q_OBJECT
 

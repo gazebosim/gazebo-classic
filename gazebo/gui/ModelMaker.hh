@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_MAKER_HH_
-#define _MODEL_MAKER_HH_
+#ifndef _GAZEBO_MODEL_MAKER_HH_
+#define _GAZEBO_MODEL_MAKER_HH_
 
 #include <list>
 #include <string>
@@ -26,49 +26,61 @@
 
 namespace gazebo
 {
-  namespace msgs
-  {
-    class Visual;
-  }
-
   namespace gui
   {
-    class GAZEBO_VISIBLE ModelMaker : public EntityMaker
+    class ModelMakerPrivate;
+
+    /// \brief Used to insert new models into the scene.
+    class GZ_GUI_VISIBLE ModelMaker : public EntityMaker
     {
+      /// \enum SimpleShapes
+      /// \brief Unique identifiers for each simple shape supported.
+      public: enum SimpleShapes {
+                  /// \brief Box
+                  BOX,
+                  /// \brief Sphere
+                  SPHERE,
+                  /// \brief Cylinder
+                  CYLINDER
+                };
+
+      /// \brief Constructor
       public: ModelMaker();
-      public: virtual ~ModelMaker();
+
+      /// \brief Destructor
+      public: ~ModelMaker();
+
+      // Documentation inherited
+      public: virtual void Stop();
 
       /// \brief Initialize the model maker with an existing model
       /// \param[in] _modelName Name of existing model in the scene.
       /// \return True if initialization is successful.
       public: bool InitFromModel(const std::string &_modelName);
 
-      public: bool InitFromSDFString(const std::string &_data);
+      /// \brief Initialize the model maker from a file.
+      /// \param[in] _filename Path to the file.
+      /// \return True if initialization is successful.
       public: bool InitFromFile(const std::string &_filename);
 
-      public: virtual void Start(const rendering::UserCameraPtr _camera);
+      /// \brief Initialize the model maker to make one of the supported simple
+      /// shapes.
+      /// \param[in] _shape The desired shape.
+      /// \return True if initialization is successful.
+      public: bool InitSimpleShape(SimpleShapes _shape);
 
-      public: virtual void Stop();
-      public: virtual bool IsActive() const;
+      // Documentation inherited
+      public: virtual ignition::math::Vector3d EntityPosition() const;
 
-      public: virtual void OnMousePush(const common::MouseEvent &_event);
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
-      public: virtual void OnMouseMove(const common::MouseEvent &_event);
+      // Documentation inherited
+      protected: virtual void SetEntityPosition(
+          const ignition::math::Vector3d &_pos);
 
       /// \brief Internal init function.
       private: bool Init();
 
+      /// \brief Publish a factory message to create the entity.
       private: virtual void CreateTheEntity();
-      private: int state;
-      private: bool leftMousePressed;
-      private: math::Vector2i mousePushPos, mouseReleasePos;
-
-      private: rendering::VisualPtr modelVisual;
-      private: std::list<rendering::VisualPtr> visuals;
-      private: sdf::SDFPtr modelSDF;
-
-      private: bool clone;
     };
   }
 }

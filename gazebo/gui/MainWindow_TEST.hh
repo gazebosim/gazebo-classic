@@ -58,6 +58,9 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test that menus are created in the main window menu bar.
   private slots: void MenuBar();
+
+  /// \brief Test different window modes.
+  private slots: void WindowModes();
 };
 
 #endif

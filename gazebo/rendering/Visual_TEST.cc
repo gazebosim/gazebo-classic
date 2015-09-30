@@ -31,6 +31,7 @@ class Visual_TEST : public ServerFixture
 /////////////////////////////////////////////////
 std::string GetVisualSDFString(const std::string &_name,
     const std::string &_geomType = "box",
+    const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
     gazebo::math::Pose _pose = gazebo::math::Pose::Zero,
     double _transparency = 0, bool _castShadows = true,
     const std::string &_material = "Gazebo/Grey",
@@ -50,22 +51,22 @@ std::string GetVisualSDFString(const std::string &_name,
   {
     visualString
       << "      <box>"
-      << "        <size>1.0 1.0 1.0</size>"
+      << "        <size>" << _size << "</size>"
       << "      </box>";
   }
   else if (_geomType == "sphere")
   {
     visualString
       << "      <sphere>"
-      << "        <radius>0.5</radius>"
+      << "        <radius>" << _size.X() * 0.5 << "</radius>"
       << "      </sphere>";
   }
   else if (_geomType == "cylinder")
   {
     visualString
       << "      <cylinder>"
-      << "        <radius>0.5</radius>"
-      << "        <length>1.0</length>"
+      << "        <radius>" << _size.X() * 0.5 << "</radius>"
+      << "        <length>" << _size.Z() << "</length>"
       << "      </cylinder>";
   }
   visualString
@@ -178,40 +179,129 @@ TEST_F(Visual_TEST, BoundingBox)
 }
 
 /////////////////////////////////////////////////
-TEST_F(Visual_TEST, GetGeometryType)
+TEST_F(Visual_TEST, Geometry)
 {
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
 
-  // box geom
-  sdf::ElementPtr boxSDF(new sdf::Element);
-  sdf::initFile("visual.sdf", boxSDF);
-  sdf::readString(GetVisualSDFString("visual_box", "box"), boxSDF);
-  gazebo::rendering::VisualPtr boxVis(
-      new gazebo::rendering::Visual("box_visual", scene));
-  boxVis->Load(boxSDF);
-  EXPECT_EQ(boxVis->GetGeometryType(), "box");
+  // check geometry with unit scale
+  {
+    // box geom
+    sdf::ElementPtr boxSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", boxSDF);
+    sdf::readString(GetVisualSDFString("visual_box", "box"), boxSDF);
+    gazebo::rendering::VisualPtr boxVis(
+        new gazebo::rendering::Visual("box_visual", scene));
+    boxVis->Load(boxSDF);
+    EXPECT_EQ(boxVis->GetGeometryType(), "box");
+    EXPECT_EQ(boxVis->GetGeometrySize(), ignition::math::Vector3d::One);
 
-  // sphere geom
-  sdf::ElementPtr sphereSDF(new sdf::Element);
-  sdf::initFile("visual.sdf", sphereSDF);
-  sdf::readString(GetVisualSDFString("visual_sphere", "sphere"), sphereSDF);
-  gazebo::rendering::VisualPtr sphereVis(
-      new gazebo::rendering::Visual("sphere_visual", scene));
-  sphereVis->Load(sphereSDF);
-  EXPECT_EQ(sphereVis->GetGeometryType(), "sphere");
+    // sphere geom
+    sdf::ElementPtr sphereSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", sphereSDF);
+    sdf::readString(GetVisualSDFString("visual_sphere", "sphere"), sphereSDF);
+    gazebo::rendering::VisualPtr sphereVis(
+        new gazebo::rendering::Visual("sphere_visual", scene));
+    sphereVis->Load(sphereSDF);
+    EXPECT_EQ(sphereVis->GetGeometryType(), "sphere");
+    EXPECT_EQ(sphereVis->GetGeometrySize(), ignition::math::Vector3d::One);
 
-  // cylinder geom
-  sdf::ElementPtr cylinderSDF(new sdf::Element);
-  sdf::initFile("visual.sdf", cylinderSDF);
-  sdf::readString(GetVisualSDFString("visual_cylinder", "cylinder"),
-      cylinderSDF);
-  gazebo::rendering::VisualPtr cylinderVis(
-      new gazebo::rendering::Visual("cylinder_visual", scene));
-  cylinderVis->Load(cylinderSDF);
-  EXPECT_EQ(cylinderVis->GetGeometryType(), "cylinder");
+    // cylinder geom
+    sdf::ElementPtr cylinderSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", cylinderSDF);
+    sdf::readString(GetVisualSDFString("visual_cylinder", "cylinder"),
+        cylinderSDF);
+    gazebo::rendering::VisualPtr cylinderVis(
+        new gazebo::rendering::Visual("cylinder_visual", scene));
+    cylinderVis->Load(cylinderSDF);
+    EXPECT_EQ(cylinderVis->GetGeometryType(), "cylinder");
+    EXPECT_EQ(cylinderVis->GetGeometrySize(), ignition::math::Vector3d::One);
+  }
+
+  // non-unit scale
+  {
+    // box
+    ignition::math::Vector3d boxSize(0.2, 0.4, 2.1);
+    sdf::ElementPtr boxSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", boxSDF);
+    sdf::readString(GetVisualSDFString("visual_box", "box", boxSize), boxSDF);
+    gazebo::rendering::VisualPtr boxVis(
+        new gazebo::rendering::Visual("box_visual", scene));
+    boxVis->Load(boxSDF);
+    EXPECT_EQ(boxVis->GetGeometrySize(), boxSize);
+    EXPECT_EQ(boxVis->GetScale(), boxSize);
+
+    ignition::math::Vector3d boxScale(1.5, 2.4, 3.0);
+    boxVis->SetScale(boxScale);
+    EXPECT_EQ(boxVis->GetGeometrySize(), boxScale);
+    EXPECT_EQ(boxVis->GetScale(), boxScale);
+
+    sdf::ElementPtr newBoxSDF = boxVis->GetSDF();
+    sdf::ElementPtr newBoxGeomElem = newBoxSDF->GetElement("geometry");
+    EXPECT_TRUE(newBoxGeomElem->HasElement("box"));
+    sdf::ElementPtr newBoxGeomBoxElem = newBoxGeomElem->GetElement("box");
+    EXPECT_EQ(
+        newBoxGeomBoxElem->GetElement("size")->Get<ignition::math::Vector3d>(),
+        boxScale);
+
+    // sphere
+    ignition::math::Vector3d sphereSize(3.2, 3.2, 3.2);
+    sdf::ElementPtr sphereSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", sphereSDF);
+    sdf::readString(GetVisualSDFString("visual_sphere", "sphere", sphereSize),
+    sphereSDF);
+    gazebo::rendering::VisualPtr sphereVis(
+        new gazebo::rendering::Visual("sphere_visual", scene));
+    sphereVis->Load(sphereSDF);
+    EXPECT_EQ(sphereVis->GetGeometrySize(), sphereSize);
+    EXPECT_EQ(sphereVis->GetScale(), sphereSize);
+
+    ignition::math::Vector3d sphereScale(3.5, 3.5, 3.5);
+    sphereVis->SetScale(sphereScale);
+    EXPECT_EQ(sphereVis->GetGeometrySize(), sphereScale);
+    EXPECT_EQ(sphereVis->GetScale(), sphereScale);
+
+    sdf::ElementPtr newSphereSDF = sphereVis->GetSDF();
+    sdf::ElementPtr newSphereGeomElem = newSphereSDF->GetElement("geometry");
+    EXPECT_TRUE(newSphereGeomElem->HasElement("sphere"));
+    sdf::ElementPtr newSphereGeomSphereElem =
+        newSphereGeomElem->GetElement("sphere");
+    EXPECT_DOUBLE_EQ(
+        newSphereGeomSphereElem->GetElement("radius")->Get<double>(),
+        sphereScale.X()*0.5);
+
+    // cylinder
+    ignition::math::Vector3d cylinderSize(52, 52, 0.6);
+    sdf::ElementPtr cylinderSDF(new sdf::Element);
+    sdf::initFile("visual.sdf", cylinderSDF);
+    sdf::readString(GetVisualSDFString("visual_cylinder", "cylinder",
+        cylinderSize), cylinderSDF);
+    gazebo::rendering::VisualPtr cylinderVis(
+        new gazebo::rendering::Visual("cylinder_visual", scene));
+    cylinderVis->Load(cylinderSDF);
+    EXPECT_EQ(cylinderVis->GetGeometrySize(), cylinderSize);
+    EXPECT_EQ(cylinderVis->GetScale(), cylinderSize);
+
+    ignition::math::Vector3d cylinderScale(0.1, 0.1, 3.0);
+    cylinderVis->SetScale(cylinderScale);
+    EXPECT_EQ(cylinderVis->GetGeometrySize(), cylinderScale);
+    EXPECT_EQ(cylinderVis->GetScale(), cylinderScale);
+
+    sdf::ElementPtr newCylinderSDF = cylinderVis->GetSDF();
+    sdf::ElementPtr newCylinderGeomElem =
+        newCylinderSDF->GetElement("geometry");
+    EXPECT_TRUE(newCylinderGeomElem->HasElement("cylinder"));
+    sdf::ElementPtr newCylinderGeomCylinderElem =
+        newCylinderGeomElem->GetElement("cylinder");
+    EXPECT_DOUBLE_EQ(
+        newCylinderGeomCylinderElem->GetElement("radius")->Get<double>(),
+        cylinderScale.X()*0.5);
+    EXPECT_DOUBLE_EQ(
+        newCylinderGeomCylinderElem->GetElement("length")->Get<double>(),
+        cylinderScale.Z());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -226,7 +316,8 @@ TEST_F(Visual_TEST, CastShadows)
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
   sdf::readString(GetVisualSDFString("visual_box_has_shadows", "box",
-      gazebo::math::Pose::Zero, 0, true), boxSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true),
+      boxSDF);
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", scene));
   boxVis->Load(boxSDF);
@@ -236,7 +327,8 @@ TEST_F(Visual_TEST, CastShadows)
   sdf::ElementPtr boxSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF2);
   sdf::readString(GetVisualSDFString("visual_box_has_no_shadows", "box",
-      gazebo::math::Pose::Zero, 0, false), boxSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, false),
+      boxSDF2);
   gazebo::rendering::VisualPtr boxVis2(
       new gazebo::rendering::Visual("box_visual2", scene));
   boxVis2->Load(boxSDF2);
@@ -260,7 +352,7 @@ TEST_F(Visual_TEST, Transparency)
   sdf::ElementPtr sphereSDF(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF);
   sdf::readString(GetVisualSDFString("visual_sphere_no_transparency", "sphere",
-      gazebo::math::Pose::Zero, 0), sphereSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), sphereSDF);
   gazebo::rendering::VisualPtr sphereVis(
       new gazebo::rendering::Visual("sphere_visual", scene));
   sphereVis->Load(sphereSDF);
@@ -269,7 +361,8 @@ TEST_F(Visual_TEST, Transparency)
   sdf::ElementPtr sphereSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF2);
   sdf::readString(GetVisualSDFString("visual_sphere_semi_transparent", "sphere",
-      gazebo::math::Pose::Zero, 0.5), sphereSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0.5),
+      sphereSDF2);
   gazebo::rendering::VisualPtr sphereVis2(
       new gazebo::rendering::Visual("sphere_visual2", scene));
   sphereVis2->Load(sphereSDF2);
@@ -283,6 +376,54 @@ TEST_F(Visual_TEST, Transparency)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, ChildTransparency)
+{
+  Load("worlds/empty.world");
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Create a visual as child of the world visual
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+
+  // Create a visual as child of vis1
+  gazebo::rendering::VisualPtr vis2;
+  vis2.reset(new gazebo::rendering::Visual("vis2", vis1));
+  vis2->Load();
+
+  // Check default transparency
+  EXPECT_NEAR(vis1->GetTransparency(), 0.0, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), 0.0, 1e-10);
+
+  // Set vis1's transparency with default cascade
+  float defaultCascade = 0.1;
+  vis1->SetTransparency(defaultCascade);
+  EXPECT_NEAR(vis1->GetTransparency(), defaultCascade, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), defaultCascade, 1e-10);
+
+  // Set vis1's transparency with explicit cascade
+  float explicitCascade = 0.2;
+  vis1->SetTransparency(explicitCascade, true);
+  EXPECT_NEAR(vis1->GetTransparency(), explicitCascade, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), explicitCascade, 1e-10);
+
+  // Set vis1's transparency with no cascade
+  float noCascade = 0.3;
+  vis1->SetTransparency(noCascade, false);
+  EXPECT_NEAR(vis1->GetTransparency(), noCascade, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), explicitCascade, 1e-10);
+
+  // Set vis2's transparency
+  float vis2Transparency = 0.4;
+  vis2->SetTransparency(vis2Transparency);
+  EXPECT_NEAR(vis1->GetTransparency(), noCascade, 1e-10);
+  EXPECT_NEAR(vis2->GetTransparency(), vis2Transparency, 1e-10);
+}
+
+/////////////////////////////////////////////////
 TEST_F(Visual_TEST, Material)
 {
   Load("worlds/empty.world");
@@ -293,7 +434,8 @@ TEST_F(Visual_TEST, Material)
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
   sdf::readString(GetVisualSDFString("visual_box_red", "box",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Red"), boxSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Red"), boxSDF);
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", scene));
   boxVis->Load(boxSDF);
@@ -305,7 +447,8 @@ TEST_F(Visual_TEST, Material)
   sdf::ElementPtr boxSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF2);
   sdf::readString(GetVisualSDFString("visual_box_white", "box",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/White", true), boxSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/White", true), boxSDF2);
   gazebo::rendering::VisualPtr boxVis2(
       new gazebo::rendering::Visual("box_visual2", scene));
   boxVis2->Load(boxSDF2);
@@ -320,6 +463,62 @@ TEST_F(Visual_TEST, Material)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, ChildMaterial)
+{
+  Load("worlds/empty.world");
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Create a visual as child of the world visual
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+
+  // Create a visual as child of vis1
+  gazebo::rendering::VisualPtr vis2;
+  vis2.reset(new gazebo::rendering::Visual("vis2", vis1));
+  vis2->Load();
+
+  // Check material is empty
+  EXPECT_TRUE(vis1->GetMaterialName().empty());
+  EXPECT_TRUE(vis2->GetMaterialName().empty());
+
+  // Set vis1's material with default cascade
+  std::string defaultCascade = "Gazebo/Grey";
+  vis1->SetMaterial(defaultCascade);
+  EXPECT_TRUE(vis1->GetMaterialName().find(defaultCascade) !=
+      std::string::npos);
+  EXPECT_TRUE(vis2->GetMaterialName().find(defaultCascade) !=
+      std::string::npos);
+
+  // Set vis1's material with explicit cascade
+  std::string explicitCascade = "Gazebo/Red";
+  vis1->SetMaterial(explicitCascade, true, true);
+  EXPECT_TRUE(vis1->GetMaterialName().find(explicitCascade) !=
+      std::string::npos);
+  EXPECT_TRUE(vis2->GetMaterialName().find(explicitCascade) !=
+      std::string::npos);
+
+  // Set vis1's material with no cascade
+  std::string noCascade = "Gazebo/Green";
+  vis1->SetMaterial(noCascade, true, false);
+  EXPECT_TRUE(vis1->GetMaterialName().find(noCascade) !=
+      std::string::npos);
+  EXPECT_TRUE(vis2->GetMaterialName().find(explicitCascade) !=
+      std::string::npos);
+
+  // Set vis2's material
+  std::string vis2Material = "Gazebo/Blue";
+  vis2->SetMaterial(vis2Material);
+  EXPECT_TRUE(vis1->GetMaterialName().find(noCascade) !=
+      std::string::npos);
+  EXPECT_TRUE(vis2->GetMaterialName().find(vis2Material) !=
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
 TEST_F(Visual_TEST, Lighting)
 {
   Load("worlds/empty.world");
@@ -330,7 +529,8 @@ TEST_F(Visual_TEST, Lighting)
   sdf::ElementPtr cylinderSDF(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF);
   sdf::readString(GetVisualSDFString("visual_cylinder_lighting", "cylinder",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true), cylinderSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Grey", true), cylinderSDF);
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
@@ -339,7 +539,8 @@ TEST_F(Visual_TEST, Lighting)
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
   sdf::readString(GetVisualSDFString("visual_cylinder_no_lighting", "cylinder",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", false), cylinderSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Grey", false), cylinderSDF2);
   gazebo::rendering::VisualPtr cylinderVis2(
       new gazebo::rendering::Visual("cylinder_visual2", scene));
   cylinderVis2->Load(cylinderSDF2);
@@ -363,9 +564,9 @@ TEST_F(Visual_TEST, Color)
   sdf::ElementPtr cylinderSDF(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF);
   sdf::readString(GetVisualSDFString("visual_cylinder_black", "cylinder",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true,
-      common::Color::Black, common::Color::Black, common::Color::Black,
-      common::Color::Black), cylinderSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Grey", true, common::Color::Black, common::Color::Black,
+      common::Color::Black, common::Color::Black), cylinderSDF);
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
@@ -377,9 +578,9 @@ TEST_F(Visual_TEST, Color)
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
   sdf::readString(GetVisualSDFString("visual_cylinder_color", "cylinder",
-      gazebo::math::Pose::Zero, 0, true, "Gazebo/Grey", true,
-      common::Color::Green, common::Color::Blue, common::Color::Red,
-      common::Color::Yellow), cylinderSDF2);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0, true,
+      "Gazebo/Grey", true, common::Color::Green, common::Color::Blue,
+      common::Color::Red, common::Color::Yellow), cylinderSDF2);
   gazebo::rendering::VisualPtr cylinderVis2(
       new gazebo::rendering::Visual("cylinder_visual2", scene));
   cylinderVis2->Load(cylinderSDF2);
@@ -432,6 +633,108 @@ TEST_F(Visual_TEST, Color)
     cylinderVis2->SetEmissive(color);
     EXPECT_EQ(cylinderVis2->GetEmissive(), color);
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, ChildColor)
+{
+  Load("worlds/empty.world");
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Create a visual as child of the world visual
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+
+  // Create a visual as child of vis1
+  gazebo::rendering::VisualPtr vis2;
+  vis2.reset(new gazebo::rendering::Visual("vis2", vis1));
+  vis2->Load();
+
+  // Check default colors
+  EXPECT_EQ(vis1->GetAmbient(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetEmissive(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetSpecular(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetDiffuse(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetAmbient(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetEmissive(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetSpecular(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetDiffuse(), gazebo::common::Color(0, 0, 0, 0));
+
+  // Set vis1's color with default cascade
+  gazebo::common::Color defaultCascadeAmbient(0.1, 0, 0, 1);
+  gazebo::common::Color defaultCascadeEmissive(0.2, 0, 0, 1);
+  gazebo::common::Color defaultCascadeSpecular(0.3, 0, 0, 1);
+  gazebo::common::Color defaultCascadeDiffuse(0.4, 0, 0, 1);
+  vis1->SetAmbient(defaultCascadeAmbient);
+  vis1->SetEmissive(defaultCascadeEmissive);
+  vis1->SetSpecular(defaultCascadeSpecular);
+  vis1->SetDiffuse(defaultCascadeDiffuse);
+  EXPECT_EQ(vis1->GetAmbient(), defaultCascadeAmbient);
+  EXPECT_EQ(vis1->GetEmissive(), defaultCascadeEmissive);
+  EXPECT_EQ(vis1->GetSpecular(), defaultCascadeSpecular);
+  EXPECT_EQ(vis1->GetDiffuse(), defaultCascadeDiffuse);
+  EXPECT_EQ(vis2->GetAmbient(), defaultCascadeAmbient);
+  EXPECT_EQ(vis2->GetEmissive(), defaultCascadeEmissive);
+  EXPECT_EQ(vis2->GetSpecular(), defaultCascadeSpecular);
+  EXPECT_EQ(vis2->GetDiffuse(), defaultCascadeDiffuse);
+
+  // Set vis1's color with explicit cascade
+  gazebo::common::Color explicitCascadeAmbient(0, 0.1, 0, 1);
+  gazebo::common::Color explicitCascadeEmissive(0, 0.2, 0, 1);
+  gazebo::common::Color explicitCascadeSpecular(0, 0.3, 0, 1);
+  gazebo::common::Color explicitCascadeDiffuse(0, 0.4, 0, 1);
+  vis1->SetAmbient(explicitCascadeAmbient, true);
+  vis1->SetEmissive(explicitCascadeEmissive, true);
+  vis1->SetSpecular(explicitCascadeSpecular, true);
+  vis1->SetDiffuse(explicitCascadeDiffuse, true);
+  EXPECT_EQ(vis1->GetAmbient(), explicitCascadeAmbient);
+  EXPECT_EQ(vis1->GetEmissive(), explicitCascadeEmissive);
+  EXPECT_EQ(vis1->GetSpecular(), explicitCascadeSpecular);
+  EXPECT_EQ(vis1->GetDiffuse(), explicitCascadeDiffuse);
+  EXPECT_EQ(vis2->GetAmbient(), explicitCascadeAmbient);
+  EXPECT_EQ(vis2->GetEmissive(), explicitCascadeEmissive);
+  EXPECT_EQ(vis2->GetSpecular(), explicitCascadeSpecular);
+  EXPECT_EQ(vis2->GetDiffuse(), explicitCascadeDiffuse);
+
+  // Set vis1's color with no cascade
+  gazebo::common::Color noCascadeAmbient(0, 0, 0.1, 1);
+  gazebo::common::Color noCascadeEmissive(0, 0, 0.2, 1);
+  gazebo::common::Color noCascadeSpecular(0, 0, 0.3, 1);
+  gazebo::common::Color noCascadeDiffuse(0, 0, 0.4, 1);
+  vis1->SetAmbient(noCascadeAmbient, false);
+  vis1->SetEmissive(noCascadeEmissive, false);
+  vis1->SetSpecular(noCascadeSpecular, false);
+  vis1->SetDiffuse(noCascadeDiffuse, false);
+  EXPECT_EQ(vis1->GetAmbient(), noCascadeAmbient);
+  EXPECT_EQ(vis1->GetEmissive(), noCascadeEmissive);
+  EXPECT_EQ(vis1->GetSpecular(), noCascadeSpecular);
+  EXPECT_EQ(vis1->GetDiffuse(), noCascadeDiffuse);
+  EXPECT_EQ(vis2->GetAmbient(), explicitCascadeAmbient);
+  EXPECT_EQ(vis2->GetEmissive(), explicitCascadeEmissive);
+  EXPECT_EQ(vis2->GetSpecular(), explicitCascadeSpecular);
+  EXPECT_EQ(vis2->GetDiffuse(), explicitCascadeDiffuse);
+
+  // Set vis2's color
+  gazebo::common::Color vis2Ambient(0.1, 0.1, 0.1, 1);
+  gazebo::common::Color vis2Emissive(0.1, 0.2, 0.2, 1);
+  gazebo::common::Color vis2Specular(0.1, 0.3, 0.3, 1);
+  gazebo::common::Color vis2Diffuse(0.1, 0.4, 0.4, 1);
+  vis2->SetAmbient(vis2Ambient);
+  vis2->SetEmissive(vis2Emissive);
+  vis2->SetSpecular(vis2Specular);
+  vis2->SetDiffuse(vis2Diffuse);
+  EXPECT_EQ(vis1->GetAmbient(), noCascadeAmbient);
+  EXPECT_EQ(vis1->GetEmissive(), noCascadeEmissive);
+  EXPECT_EQ(vis1->GetSpecular(), noCascadeSpecular);
+  EXPECT_EQ(vis1->GetDiffuse(), noCascadeDiffuse);
+  EXPECT_EQ(vis2->GetAmbient(), vis2Ambient);
+  EXPECT_EQ(vis2->GetEmissive(), vis2Emissive);
+  EXPECT_EQ(vis2->GetSpecular(), vis2Specular);
+  EXPECT_EQ(vis2->GetDiffuse(), vis2Diffuse);
 }
 
 /////////////////////////////////////////////////
@@ -826,6 +1129,255 @@ TEST_F(Visual_TEST, ConvertVisualType)
       rendering::Visual::ConvertVisualType(msgs::Visual::GUI));
   EXPECT_EQ(rendering::Visual::VT_PHYSICS,
       rendering::Visual::ConvertVisualType(msgs::Visual::PHYSICS));
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, Scale)
+{
+  // Load a world containing 3 simple shapes
+  Load("worlds/shapes.world");
+
+  // FIXME need a camera otherwise test produces a gl vertex buffer error
+  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  std::string cameraName = "test_camera";
+  SpawnCamera("test_camera_model", cameraName,
+      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 10;
+  rendering::VisualPtr box, sphere, cylinder;
+  while ((!box || !sphere || !cylinder) && sleep < maxSleep)
+  {
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+
+  // Check that the model, link, and visuals were properly added
+  // and verify initial scale
+
+  // box
+  ASSERT_TRUE(box != NULL);
+  rendering::VisualPtr boxLink;
+  for (unsigned int i = 0; i < box->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = box->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      boxLink = vis;
+  }
+  ASSERT_TRUE(boxLink != NULL);
+
+  rendering::VisualPtr boxVisual;
+  for (unsigned int i = 0; i < boxLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = boxLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      boxVisual = vis;
+  }
+  ASSERT_TRUE(boxVisual != NULL);
+
+  EXPECT_EQ(box->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+
+  EXPECT_EQ(box->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxLink->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->DerivedScale(), ignition::math::Vector3d::One);
+
+  // sphere
+  ASSERT_TRUE(sphere != NULL);
+  rendering::VisualPtr sphereLink;
+  for (unsigned int i = 0; i < sphere->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = sphere->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      sphereLink = vis;
+  }
+  ASSERT_TRUE(sphereLink != NULL);
+
+  rendering::VisualPtr sphereVisual;
+  for (unsigned int i = 0; i < sphereLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = sphereLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      sphereVisual = vis;
+  }
+  ASSERT_TRUE(sphereVisual != NULL);
+
+  EXPECT_EQ(sphere->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+
+  EXPECT_EQ(sphere->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereLink->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->DerivedScale(), ignition::math::Vector3d::One);
+
+  // cylinder
+  ASSERT_TRUE(cylinder != NULL);
+  rendering::VisualPtr cylinderLink;
+  for (unsigned int i = 0; i < cylinder->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = cylinder->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      cylinderLink = vis;
+  }
+  ASSERT_TRUE(cylinderLink != NULL);
+
+  rendering::VisualPtr cylinderVisual;
+  for (unsigned int i = 0; i < cylinderLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = cylinderLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      cylinderVisual = vis;
+  }
+  ASSERT_TRUE(cylinderVisual != NULL);
+
+  EXPECT_EQ(cylinder->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+
+  EXPECT_EQ(cylinder->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderLink->DerivedScale(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->DerivedScale(), ignition::math::Vector3d::One);
+
+  // update model scale and verify derived scale and geom size
+  ignition::math::Vector3d newBoxScale(0.4, 0.5, 0.6);
+  box->SetScale(newBoxScale);
+  EXPECT_EQ(box->GetScale().Ign(), newBoxScale);
+  EXPECT_EQ(boxLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->GetGeometrySize(), newBoxScale);
+
+  ignition::math::Vector3d newSphereScale(0.3, 0.3, 0.3);
+  sphere->SetScale(newSphereScale);
+  EXPECT_EQ(sphere->GetScale().Ign(), newSphereScale);
+  EXPECT_EQ(sphereLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->GetGeometrySize(), newSphereScale);
+
+  ignition::math::Vector3d newCylinderScale(0.2, 0.2, 0.5);
+  cylinder->SetScale(newCylinderScale);
+  EXPECT_EQ(cylinder->GetScale().Ign(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->GetGeometrySize(), newCylinderScale);
+
+  // update link scale and verify derived scale and geom size
+  ignition::math::Vector3d newBoxLinkScale(0.2, 0.1, 3);
+  boxLink->SetScale(newBoxLinkScale);
+  EXPECT_EQ(box->GetScale().Ign(), newBoxScale);
+  EXPECT_EQ(boxLink->GetScale().Ign(), newBoxLinkScale);
+  EXPECT_EQ(boxVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(boxVisual->GetGeometrySize(), newBoxScale * newBoxLinkScale);
+
+  EXPECT_EQ(box->DerivedScale(), newBoxScale);
+  EXPECT_EQ(boxLink->DerivedScale(), newBoxScale * newBoxLinkScale);
+  EXPECT_EQ(boxVisual->DerivedScale(), newBoxScale * newBoxLinkScale);
+
+  ignition::math::Vector3d newSphereLinkScale(2, 2, 2);
+  sphereLink->SetScale(newSphereLinkScale);
+  EXPECT_EQ(sphere->GetScale().Ign(), newSphereScale);
+  EXPECT_EQ(sphereLink->GetScale().Ign(), newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(sphereVisual->GetGeometrySize(),
+      newSphereScale * newSphereLinkScale);
+
+  EXPECT_EQ(sphere->DerivedScale(), newSphereScale);
+  EXPECT_EQ(sphereLink->DerivedScale(), newSphereScale * newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->DerivedScale(), newSphereScale * newSphereLinkScale);
+
+  ignition::math::Vector3d newCylinderLinkScale(4, 4, 0.5);
+  cylinderLink->SetScale(newCylinderLinkScale);
+  EXPECT_EQ(cylinder->GetScale().Ign(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->GetScale().Ign(), newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->GetScale().Ign(), ignition::math::Vector3d::One);
+  EXPECT_EQ(cylinderVisual->GetGeometrySize(),
+      newCylinderScale * newCylinderLinkScale);
+
+  EXPECT_EQ(cylinder->DerivedScale(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->DerivedScale(),
+      newCylinderScale * newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->DerivedScale(),
+      newCylinderScale * newCylinderLinkScale);
+
+  // update visual scale and verify derived scale and geom size
+  ignition::math::Vector3d newBoxVisualScale(1.2, 1, 50);
+  boxVisual->SetScale(newBoxVisualScale);
+  EXPECT_EQ(box->GetScale().Ign(), newBoxScale);
+  EXPECT_EQ(boxLink->GetScale().Ign(), newBoxLinkScale);
+  EXPECT_EQ(boxVisual->GetScale().Ign(), newBoxVisualScale);
+  EXPECT_EQ(boxVisual->GetGeometrySize(),
+      newBoxScale * newBoxLinkScale * newBoxVisualScale);
+
+  EXPECT_EQ(box->DerivedScale(), newBoxScale);
+  EXPECT_EQ(boxLink->DerivedScale(), newBoxScale * newBoxLinkScale);
+  EXPECT_EQ(boxVisual->DerivedScale(),
+      newBoxScale * newBoxLinkScale * newBoxVisualScale);
+
+  ignition::math::Vector3d newSphereVisualScale(0.08, 0.08, 0.08);
+  sphereVisual->SetScale(newSphereVisualScale);
+  EXPECT_EQ(sphere->GetScale().Ign(), newSphereScale);
+  EXPECT_EQ(sphereLink->GetScale().Ign(), newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->GetScale().Ign(), newSphereVisualScale);
+  EXPECT_EQ(sphereVisual->GetGeometrySize(),
+      newSphereScale * newSphereLinkScale * newSphereVisualScale);
+
+  EXPECT_EQ(sphere->DerivedScale(), newSphereScale);
+  EXPECT_EQ(sphereLink->DerivedScale(), newSphereScale * newSphereLinkScale);
+  EXPECT_EQ(sphereVisual->DerivedScale(),
+      newSphereScale * newSphereLinkScale * newSphereVisualScale);
+
+  ignition::math::Vector3d newCylinderVisualScale(3, 3, 0.25);
+  cylinderVisual->SetScale(newCylinderVisualScale);
+  EXPECT_EQ(cylinder->GetScale().Ign(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->GetScale().Ign(), newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->GetScale().Ign(), newCylinderVisualScale);
+  EXPECT_EQ(cylinderVisual->GetGeometrySize(),
+      newCylinderScale * newCylinderLinkScale * newCylinderVisualScale);
+
+  EXPECT_EQ(cylinder->DerivedScale(), newCylinderScale);
+  EXPECT_EQ(cylinderLink->DerivedScale(),
+      newCylinderScale * newCylinderLinkScale);
+  EXPECT_EQ(cylinderVisual->DerivedScale(),
+      newCylinderScale * newCylinderLinkScale * newCylinderVisualScale);
+
+  // clone visual and verify scale
+  rendering::VisualPtr boxClone = box->Clone("boxClone",
+      box->GetParent());
+  rendering::VisualPtr sphereClone = sphere->Clone("sphereClone",
+      sphere->GetParent());
+  rendering::VisualPtr cylinderClone = cylinder->Clone("cylinderClone",
+      cylinder->GetParent());
+
+  std::queue<std::pair<rendering::VisualPtr, rendering::VisualPtr> >
+      cloneVisuals;
+  cloneVisuals.push(std::make_pair(box, boxClone));
+  cloneVisuals.push(std::make_pair(sphere, sphereClone));
+  cloneVisuals.push(std::make_pair(cylinder, cylinderClone));
+  while (!cloneVisuals.empty())
+  {
+    auto visualPair = cloneVisuals.front();
+    cloneVisuals.pop();
+    EXPECT_EQ(visualPair.first->GetScale(), visualPair.second->GetScale());
+    EXPECT_EQ(visualPair.first->DerivedScale(),
+        visualPair.second->DerivedScale());
+    EXPECT_EQ(visualPair.first->GetGeometrySize(),
+        visualPair.second->GetGeometrySize());
+    EXPECT_EQ(visualPair.first->GetChildCount(),
+        visualPair.second->GetChildCount());
+    for (unsigned int i  = 0; i < visualPair.first->GetChildCount(); ++i)
+    {
+      cloneVisuals.push(std::make_pair(
+          visualPair.first->GetChild(i), visualPair.second->GetChild(i)));
+    }
+  }
 }
 
 /////////////////////////////////////////////////

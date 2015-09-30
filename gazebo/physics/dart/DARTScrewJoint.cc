@@ -208,7 +208,8 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
   dart::dynamics::ScrewJoint *dtScrewJoint =
       reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
 
-  dtScrewJoint->setPitch(DARTTypes::ConvPitch(_threadPitch));
+  this->threadPitch = _threadPitch;
+  dtScrewJoint->setPitch(DARTTypes::InvertThreadPitch(_threadPitch));
 }
 
 //////////////////////////////////////////////////
@@ -227,10 +228,19 @@ double DARTScrewJoint::GetThreadPitch()
     !this->dataPtr->IsInitialized() ||
     (std::abs(reinterpret_cast<dart::dynamics::ScrewJoint *>(
       this->dataPtr->dtJoint)->getPitch() -
-      DARTTypes::ConvPitch(this->threadPitch)) < 1e-6),
+      DARTTypes::InvertThreadPitch(this->threadPitch)) < 1e-6),
     "Gazebo and DART disagree in thread pitch.");
 
-  return this->threadPitch;
+  dart::dynamics::ScrewJoint *dtScrewJoint =
+      reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
+
+  double result = this->threadPitch;
+  if (dtScrewJoint)
+    result = DARTTypes::InvertThreadPitch(dtScrewJoint->getPitch());
+  else
+    gzwarn << "dartScrewJoint not created yet, returning cached threadPitch.\n";
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -346,14 +356,12 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
   }
   else if (_index == 1)
   {
-    dart::dynamics::ScrewJoint *dtScrewJoint =
-        reinterpret_cast<dart::dynamics::ScrewJoint *>(
-          this->dataPtr->dtJoint);
-
     // linear position
     const double radianAngle = this->dataPtr->dtJoint->getPosition(0);
     result.SetFromRadian(-radianAngle /
-                         DARTTypes::ConvPitch(dtScrewJoint->getPitch()));
+                         const_cast<DARTScrewJoint*>(this)->GetThreadPitch());
+    // TODO: The ScrewJoint::GetThreadPitch() function is not const. As an
+    // workaround, we use const_cast here until #1686 is resolved.
   }
   else
   {

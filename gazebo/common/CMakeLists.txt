@@ -33,6 +33,7 @@ set (sources
   Animation.cc
   Assert.cc
   AudioDecoder.cc
+  Battery.cc
   Base64.cc
   BVHLoader.cc
   ColladaExporter.cc
@@ -80,6 +81,7 @@ set (headers
   Animation.hh
   Assert.hh
   AudioDecoder.hh
+  Battery.hh
   Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
@@ -88,6 +90,7 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
+  EnumIface.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -121,12 +124,14 @@ set (headers
 
 set (gtest_sources
   Animation_TEST.cc
+  Battery_TEST.cc
   ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
   Dem_TEST.cc
+  EnumIface_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
   Image_TEST.cc
@@ -134,6 +139,7 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   MeshManager_TEST.cc
+  MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc

@@ -19,6 +19,7 @@
 #define _GAZEBO_DARTTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/common/Assert.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/util/system.hh"
@@ -108,14 +109,17 @@ namespace gazebo
             return pose;
         }
 
-      /// \brief Convert pitch between two different definitions of Gazebo and
-      /// DART.
+      /// \brief Invert thread pitch to match the different definitions of
+      /// thread pitch in Gazebo and DART.
       ///
-      /// Gazebo and DART use different definitions of pitch: Gazebo version
-      /// means NEGATIVE angular motion per linear motion while DART version
-      /// means linear motion per single rotation.
-      public: static double ConvPitch(double _pitch)
+      /// [Definitions of thread pitch]
+      /// Gazebo: NEGATIVE angular motion per linear motion.
+      /// DART  : linear motion per single rotation.
+      public: static double InvertThreadPitch(double _pitch)
       {
+        GZ_ASSERT(std::abs(_pitch) > 0.0,
+                  "Zero thread pitch is not allowed.\n");
+
         return -2.0 * M_PI / _pitch;
       }
     };
