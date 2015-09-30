@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <string>
+#include <boost/function.hpp>
 
 #include <sdf/sdf.hh>
 

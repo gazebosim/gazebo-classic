@@ -28,6 +28,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <sdf/sdf.hh>
 #include "gazebo/common/Image.hh"

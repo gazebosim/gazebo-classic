@@ -20,6 +20,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+#include <boost/lexical_cast.hpp>
 
 #include <string.h>
 #include <math.h>

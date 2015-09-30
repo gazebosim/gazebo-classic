@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/function.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 

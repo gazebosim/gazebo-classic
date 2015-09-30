@@ -24,6 +24,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"

@@ -1563,7 +1563,14 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = this->GetWorldStepSolverType();
   else
   {
+    #ifndef _WIN32
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    #endif
     return PhysicsEngine::GetParam(_key, _value);
+    #ifndef _WIN32
+    #pragma GCC diagnostic pop
+    #endif
   }
   return true;
 }

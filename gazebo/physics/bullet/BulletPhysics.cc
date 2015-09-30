@@ -648,7 +648,14 @@ bool BulletPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
   else
   {
+    #ifndef _WIN32
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    #endif
     return PhysicsEngine::GetParam(_key, _value);
+    #ifndef _WIN32
+    #pragma GCC diagnostic pop
+    #endif
   }
   return true;
 }

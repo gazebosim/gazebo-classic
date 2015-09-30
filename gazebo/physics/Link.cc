@@ -24,6 +24,8 @@
 #include <sstream>
 #include <functional>
 
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportIface.hh"

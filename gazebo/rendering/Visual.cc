@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/lexical_cast.hpp>
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"

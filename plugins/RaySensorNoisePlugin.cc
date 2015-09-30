@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <functional>
 #include "gazebo/sensors/Noise.hh"
 #include "RaySensorNoisePlugin.hh"
 
@@ -50,7 +50,8 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
   if (noise)
   {
     noise->SetCustomNoiseCallback(
-      boost::bind(&RaySensorNoisePlugin::OnApplyNoise, this, _1));
+      std::bind(&RaySensorNoisePlugin::OnApplyNoise, this,
+        std::placeholders::_1));
   }
   else
   {
