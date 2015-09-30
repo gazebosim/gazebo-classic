@@ -163,6 +163,21 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { newModel.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the nested model inserted signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr
+            ConnectNestedModelInserted(T _subscriber)
+          { return nestedModelInserted.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the nested model inserted
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectNestedModelInserted(
+            event::ConnectionPtr _subscriber)
+          { nestedModelInserted.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the link inserted signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -462,6 +477,9 @@ namespace gazebo
 
         /// \brief Notify that model has been newed.
         public: static event::EventT<void ()> newModel;
+
+        /// \brief Notify that a nested model has been inserted.
+        public: static event::EventT<void (std::string)> nestedModelInserted;
 
         /// \brief Notify that a link has been inserted.
         public: static event::EventT<void (std::string)> linkInserted;
