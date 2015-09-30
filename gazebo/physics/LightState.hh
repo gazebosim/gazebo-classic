@@ -77,6 +77,29 @@ namespace gazebo
       /// \return Pose of the Light.
       public: const ignition::math::Pose3d Pose() const;
 
+      /// \brief Return true if the values in the state are zero.
+      /// \return True if the values in the state are zero.
+      public: bool IsZero() const;
+
+      /// \brief Populate a state SDF element with data from the object.
+      /// \param[out] _sdf SDF element to populate.
+      public: void FillSDF(sdf::ElementPtr _sdf);
+
+      /// \brief Assignment operator
+      /// \param[in] _state State value
+      /// \return this
+      public: LightState &operator=(const LightState &_state);
+
+      /// \brief Subtraction operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: LightState operator-(const LightState &_state) const;
+
+      /// \brief Addition operator.
+      /// \param[in] _pt A state to substract.
+      /// \return The resulting state.
+      public: LightState operator+(const LightState &_state) const;
+
       /// \brief Stream insertion operator.
       /// \param[in] _out output stream.
       /// \param[in] _state Light state to output.
