@@ -70,24 +70,16 @@ void Light::ProcessMsg(const msgs::Light &_msg)
 //////////////////////////////////////////////////
 void Light::SetState(const LightState &_state)
 {
-  this->worldPose = math::Pose(_state.Pose());
-  this->PublishPose();
+  if (this->worldPose != math::Pose(_state.Pose()))
+  {
+    this->worldPose = math::Pose(_state.Pose());
+    this->PublishPose();
+  }
 }
 
 //////////////////////////////////////////////////
 void Light::OnPoseChange()
 {
-/*
-  ignition::math::Pose3d p;
-  for (unsigned int i = 0; i < this->attachedModels.size(); ++i)
-  {
-    p = this->GetWorldPose();
-    p.pos += this->attachedModelsOffset[i].pos;
-    p.rot = p.rot * this->attachedModelsOffset[i].rot;
-
-    this->attachedModels[i]->SetWorldPose(p, true);
-  }
-*/
 }
 
 //////////////////////////////////////////////////

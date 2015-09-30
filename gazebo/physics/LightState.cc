@@ -66,57 +66,5 @@ const ignition::math::Pose3d LightState::Pose() const
 {
   return this->pose;
 }
-/*
-/////////////////////////////////////////////////
-bool LightState::IsZero() const
-{
-  bool result = true;
 
-  return result && this->pose == ignition::math::Pose3d::Zero;
-}
-
-/////////////////////////////////////////////////
-LightState &LightState::operator=(const LightState &_state)
-{
-  State::operator=(_state);
-
-  // Copy the pose
-  this->pose = _state.pose;
-
-  return *this;
-}
-
-/////////////////////////////////////////////////
-LightState LightState::operator-(const LightState &_state) const
-{
-  LightState result;
-
-  result.name = this->name;
-  result.pose.Pos() = this->pose.Pos() - _state.pose.Pos();
-  result.pose.Rot() = _state.pose.Rot().Inverse() * this->pose.Rot();
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-LightState LightState::operator+(const LightState &_state) const
-{
-  LightState result;
-
-  result.name = this->name;
-  result.pose.Pos() = this->pose.Pos() + _state.pose.Pos();
-  result.pose.Rot() = _state.pose.Rot() * this->pose.Rot();
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-void LightState::FillSDF(sdf::ElementPtr _sdf)
-{
-  _sdf->ClearElements();
-
-  _sdf->GetAttribute("name")->Set(this->name);
-  _sdf->GetElement("pose")->Set(this->pose);
-}
-*/
 
