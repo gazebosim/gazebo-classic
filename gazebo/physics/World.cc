@@ -2408,10 +2408,9 @@ void World::RemoveModel(const std::string &_name)
   // Cleanup the publishLightPoses list.
   {
     boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
-    for (auto light = this->dataPtr->publishLightPoses.begin();
-        light != this->dataPtr->publishLightPoses.end(); ++light)
+    for (auto light : this->dataPtr->publishLightPoses)
     {
-      if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
+      if (light->GetName() == _name || light->GetScopedName() == _name)
       {
         this->dataPtr->publishLightPoses.erase(light);
         break;
