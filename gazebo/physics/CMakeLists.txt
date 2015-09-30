@@ -107,6 +107,8 @@ set (headers
   JointController.hh
   JointWrench.hh
   JointState.hh
+  Light.hh
+  LightState.hh
   Link.hh
   LinkState.hh
   MapShape.hh
