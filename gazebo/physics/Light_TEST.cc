@@ -76,7 +76,8 @@ TEST_F(LightTest, LightMsg)
   EXPECT_EQ(lightPtr->GetWorldPose(), pose);
 
   // Get message
-  msgs::Light newLightMsg = lightPtr->LightMsg();
+  msgs::Light newLightMsg;
+  lightPtr->FillMsg(newLightMsg);
 
   // Check message against original message
   EXPECT_EQ(lightMsg.name(), newLightMsg.name());

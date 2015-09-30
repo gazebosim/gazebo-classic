@@ -19,12 +19,6 @@
 #define _GAZEBO_PHYSICS_LIGHT_HH_
 
 #include "gazebo/physics/Entity.hh"
-#include "gazebo/physics/Light.hh"
-
-namespace boost
-{
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -35,9 +29,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class Light Light.hh physics/physics.hh
-    /// \brief A light entity, which has no physics states, but is used
-    /// by sensors and rendering.
+    /// \brief A light entity.
     class GZ_PHYSICS_VISIBLE Light : public Entity
     {
       /// \brief Constructor.
@@ -47,25 +39,20 @@ namespace gazebo
       /// \brief Initialize the light.
       public: void Init();
 
-      /// \brief Fill a light message.
-      /// \param[out] _msg Message to fill using this light's data.
-      public: void FillMsg(msgs::Light &_msg);
-
-      /// \brief Update parameters from a light message.
+      /// \brief Update this light's parameters from a message.
       /// \param[in] _msg Message to process.
       public: void ProcessMsg(const msgs::Light &_msg);
+
+      /// \brief Fill a light message with this light's parameters.
+      /// \param[out] _msg Message to fill using this light's data.
+      public: void FillMsg(msgs::Light &_msg);
 
       /// \brief Set the current light state.
       /// \param[in] _state State to set the light to.
       public: void SetState(const LightState &_state);
 
-      /// \internal
-      /// \brief Called when the pose is changed. Do not call this directly.
-      public: virtual void OnPoseChange();
-
-      /// \brief Get the light in message form.
-      /// \return The light as a protobuf message.
-      public: msgs::Light LightMsg() const;
+      // Documentation inherited
+      public: void OnPoseChange() {};
 
       /// \brief Publish the pose.
       private: void PublishPose();

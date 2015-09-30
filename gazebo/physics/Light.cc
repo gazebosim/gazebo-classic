@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/LightState.hh"
 #include "gazebo/physics/Light.hh"
@@ -47,15 +46,6 @@ void Light::Init()
 }
 
 //////////////////////////////////////////////////
-void Light::FillMsg(msgs::Light &_msg)
-{
-  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
-
-  _msg.set_name(this->GetScopedName());
-  msgs::Set(_msg.mutable_pose(), relPose);
-}
-
-//////////////////////////////////////////////////
 void Light::ProcessMsg(const msgs::Light &_msg)
 {
   this->SetName(this->world->StripWorldName(_msg.name()));
@@ -68,18 +58,24 @@ void Light::ProcessMsg(const msgs::Light &_msg)
 }
 
 //////////////////////////////////////////////////
-void Light::SetState(const LightState &_state)
+void Light::FillMsg(msgs::Light &_msg)
 {
-  if (this->worldPose != math::Pose(_state.Pose()))
-  {
-    this->worldPose = math::Pose(_state.Pose());
-    this->PublishPose();
-  }
+  _msg.MergeFrom(this->msg);
+
+  _msg.set_name(this->GetScopedName());
+
+  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
+  msgs::Set(_msg.mutable_pose(), relPose);
 }
 
 //////////////////////////////////////////////////
-void Light::OnPoseChange()
+void Light::SetState(const LightState &_state)
 {
+  if (this->worldPose == math::Pose(_state.Pose()))
+    return;
+
+  this->worldPose = math::Pose(_state.Pose());
+  this->PublishPose();
 }
 
 //////////////////////////////////////////////////
@@ -88,11 +84,4 @@ void Light::PublishPose()
   this->world->PublishLightPose(boost::dynamic_pointer_cast<Light>(
       shared_from_this()));
 }
-
-/////////////////////////////////////////////////
-msgs::Light Light::LightMsg() const
-{
-  return this->msg;
-}
-
 
