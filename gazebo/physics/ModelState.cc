@@ -118,6 +118,7 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
   this->pose = _model->GetWorldPose();
 
   // Load all the links
+  this->linkStates.clear();
   const Link_V links = _model->GetLinks();
   for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
   {
@@ -125,31 +126,11 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
         _iterations);
   }
 
-  // Remove links that no longer exist. We determine this by checking the time
-  // stamp on each link.
-  for (LinkState_M::iterator iter = this->linkStates.begin();
-       iter != this->linkStates.end();)
-  {
-    if (iter->second.GetRealTime() != this->realTime)
-      this->linkStates.erase(iter++);
-    else
-      ++iter;
-  }
-
   // Load all the models
+  this->modelStates.clear();
   for (const auto &m : _model->NestedModels())
   {
     this->modelStates[m->GetName()].Load(m, _realTime, _simTime, _iterations);
-  }
-
-  // Remove models that no longer exist. We determine this by checking the time
-  // stamp on each model.
-  for (auto iter = this->modelStates.begin(); iter != this->modelStates.end();)
-  {
-    if (iter->second.GetRealTime() != this->realTime)
-      this->modelStates.erase(iter++);
-    else
-      ++iter;
   }
 
   // Copy all the joints

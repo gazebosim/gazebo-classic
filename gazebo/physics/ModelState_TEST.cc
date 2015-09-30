@@ -71,9 +71,11 @@ TEST_F(ModelStateTest, Nested)
   EXPECT_TRUE(worldElem->HasElement("state"));
   sdf::ElementPtr stateElem = worldElem->GetElement("state");
   EXPECT_TRUE(stateElem->HasElement("model"));
+  sdf::ElementPtr modelElem = stateElem->GetElement("model");
+  EXPECT_TRUE(modelElem != NULL);
 
   // create the model state
-  physics::ModelState modelState(stateElem->GetElement("model"));
+  physics::ModelState modelState(modelElem);
 
   // fill sdf and load it back to a new model state
   sdf::ElementPtr modelStateElem(new sdf::Element);
