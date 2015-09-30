@@ -228,7 +228,6 @@ void RenderEngine::RemoveScene(const std::string &_name)
 
   if (iter != this->scenes.end())
   {
-    RTShaderSystem::Instance()->Clear();
     rendering::Events::removeScene(_name);
 
     (*iter)->Clear();
