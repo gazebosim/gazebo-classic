@@ -5,6 +5,7 @@
 1. Update physics when the world is reset
     * Backport of [pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
     * [Pull request #1916](https://bitbucket.org/osrf/gazebo/pull-request/1916)
+    * [Issue #101](https://bitbucket.org/osrf/gazebo/issue/101)
 
 1. Added Copy constructor and assignment operator to MouseEvent
     * [Pull request #1855](https://bitbucket.org/osrf/gazebo/pull-request/1855)
