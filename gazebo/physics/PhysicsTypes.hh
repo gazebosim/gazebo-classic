@@ -214,7 +214,7 @@ namespace gazebo
     typedef std::map<std::string, ModelState> ModelState_M;
 
     /// \def LightState_M
-    /// \brief Map of link state
+    /// \brief Map of light state
     typedef std::map<std::string, LightState> LightState_M;
 
     /// \def LinkState_M

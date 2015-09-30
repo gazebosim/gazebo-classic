@@ -318,10 +318,10 @@ namespace gazebo
       public: void PublishModelPose(physics::ModelPtr _model);
 
       /// \brief Publish pose updates for a light.
-      /// This list of lights to publish is processed and cleared once every
-      /// iteration.
+      /// Adds light to a list of lights to publish, which is processed and
+      /// cleared once every iteration.
       /// \param[in] _light Pointer to the light to publish.
-      public: void PublishLightPose(physics::LightPtr _light);
+      public: void PublishLightPose(const physics::LightPtr _light);
 
       /// \brief Get the total number of iterations.
       /// \return Number of iterations that simulation has taken.
@@ -387,7 +387,8 @@ namespace gazebo
       /// \param[in] _sdf SDF element containing the Light description.
       /// \param[in] _parent Parent of the light.
       /// \return Pointer to the newly created Light.
-      private: LightPtr LoadLight(sdf::ElementPtr _sdf, BasePtr _parent);
+      private: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
+          const BasePtr &_parent);
 
       /// \brief Load an actor.
       /// \param[in] _sdf SDF element containing the Actor description.
