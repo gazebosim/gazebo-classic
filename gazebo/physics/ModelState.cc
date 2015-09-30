@@ -667,6 +667,11 @@ void ModelState::SetIterations(const uint64_t _iterations)
   for (auto &linkState : this->linkStates)
     linkState.second.SetIterations(_iterations);
 
+  for (auto &ms : this->modelStates)
+  {
+    ms.second.SetIterations(_iterations);
+  }
+
   for (auto &jointState : this->jointStates)
     jointState.second.SetIterations(_iterations);
 }
