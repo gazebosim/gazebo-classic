@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/gazebo.hh"
 #include "ServerFixture.hh"
