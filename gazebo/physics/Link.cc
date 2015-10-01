@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
 #include <sstream>
 
 #include "gazebo/msgs/msgs.hh"

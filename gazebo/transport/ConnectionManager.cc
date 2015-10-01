@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get

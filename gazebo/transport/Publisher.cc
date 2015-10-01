@@ -17,6 +17,7 @@
 /* Desc: Handles pushing messages out on a named topic
  * Author: Nate Koenig
  */
+#include <boost/bind.hpp>
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
