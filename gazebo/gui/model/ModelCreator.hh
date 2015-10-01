@@ -128,9 +128,16 @@ namespace gazebo
       /// \return True if the user chose to save, false if the user cancelled.
       private: bool OnSaveAs();
 
-      /// \brief Callback for when the name is changed through the Palette.
+      /// \brief Callback for when the name is changed through the model
+      /// settings tab.
       /// \param[in] _modelName The newly entered model name.
       private: void OnNameChanged(const std::string &_modelName);
+
+      /// \brief Event received when the model properties changed.
+      /// \param[in] _static New static property of the model.
+      /// \param[in] _autoDisable New allow_auto_disable property of the model.
+      private: void OnPropertiesChanged(const bool _static,
+          const bool _autoDisable);
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
@@ -188,9 +195,9 @@ namespace gazebo
       /// \param[in] _type Type of joint to add.
       public: void AddJoint(const std::string &_type);
 
-      /// \brief Remove a link from the model.
-      /// \param[in] _linkName Name of the link to remove
-      public: void RemoveLink(const std::string &_linkName);
+      /// \brief Remove an entity from the model.
+      /// \param[in] _entityName Name of the entity to remove
+      public: void RemoveEntity(const std::string &_entityName);
 
       /// \brief Remove a model plugin from the model.
       /// \param[in] _pluginName Name of the model plugin to remove.
@@ -248,6 +255,11 @@ namespace gazebo
       /// \param[in] _link Link data used to generate the sdf.
       /// \return SDF element describing the link.
       private: sdf::ElementPtr GenerateLinkSDF(LinkData *_link);
+
+      /// \brief Internal helper function to remove a nestedModel without
+      /// removing the joints.
+      /// \param[in] _nestedModelName Name of the nestedModel to remove
+      private: void RemoveNestedModelImpl(const std::string &_nestedModelName);
 
       /// \brief Internal helper function to remove a link without removing
       /// the joints.
@@ -333,7 +345,8 @@ namespace gazebo
       /// \param[in] _linkElem SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
       /// \param[in] _parentVis Parent visual that the link will be attached to.
-      private: void CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
+      /// return Data describing this link.
+      private: LinkData *CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
           const rendering::VisualPtr &_parentVis);
 
       /// \brief Open the link inspector.
@@ -483,6 +496,9 @@ namespace gazebo
 
       /// \brief A map of model plugin names to and their data.
       private: std::map<std::string, ModelPluginData *> allModelPlugins;
+
+      /// \brief A map of nested model link names and their visuals.
+      private: std::map<std::string, LinkData *> nestedLinks;
 
       /// \brief Transport node
       private: transport::NodePtr node;

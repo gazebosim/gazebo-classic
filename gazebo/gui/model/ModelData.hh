@@ -71,6 +71,12 @@ namespace gazebo
 
       /// \brief Visual representing this model.
       public: rendering::VisualPtr modelVisual;
+
+      /// \brief Models inside this model
+      public: std::map<std::string, rendering::VisualPtr> models;
+
+      /// \brief Links inside this model
+      public: std::map<std::string, rendering::VisualPtr> links;
     };
 
     /// \class LinkData LinkData.hh

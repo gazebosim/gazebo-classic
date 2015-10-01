@@ -171,8 +171,11 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
 
   this->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
-      boost::bind(&ModelTreeWidget::OnModelPropertiesChanged, this, _1, _2,
-      _3, _4)));
+      boost::bind(&ModelTreeWidget::OnModelPropertiesChanged, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectModelNameChanged(
+      boost::bind(&ModelTreeWidget::OnModelNameChanged, this, _1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectNestedModelInserted(
@@ -232,23 +235,36 @@ ModelTreeWidget::~ModelTreeWidget()
 /////////////////////////////////////////////////
 void ModelTreeWidget::OnAutoDisable()
 {
-//  this->modelCreator->SetAutoDisable(this->autoDisableCheck->isChecked());
+  gui::model::Events::modelPropertiesChanged(this->staticCheck->isChecked(),
+      this->autoDisableCheck->isChecked());
 }
 
 /////////////////////////////////////////////////
 void ModelTreeWidget::OnStatic()
 {
-//  this->modelCreator->SetStatic(this->staticCheck->isChecked());
+  gui::model::Events::modelPropertiesChanged(this->staticCheck->isChecked(),
+      this->autoDisableCheck->isChecked());
 }
 
 /////////////////////////////////////////////////
 void ModelTreeWidget::OnModelPropertiesChanged(
-    bool _static, bool _autoDisable, const math::Pose &/*_pose*/,
-    const std::string &_name)
+    bool _static, bool _autoDisable)
 {
+  bool oldState = this->staticCheck->blockSignals(true);
   this->staticCheck->setChecked(_static);
+  this->staticCheck->blockSignals(oldState);
+
+  oldState = this->autoDisableCheck->blockSignals(true);
   this->autoDisableCheck->setChecked(_autoDisable);
+  this->autoDisableCheck->blockSignals(oldState);
+}
+
+/////////////////////////////////////////////////
+void ModelTreeWidget::OnModelNameChanged(const std::string &_name)
+{
+  bool oldState = this->modelNameEdit->blockSignals(true);
   this->modelNameEdit->setText(tr(_name.c_str()));
+  this->modelNameEdit->blockSignals(oldState);
 }
 
 /*/////////////////////////////////////////////////

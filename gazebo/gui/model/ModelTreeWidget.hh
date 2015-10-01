@@ -166,10 +166,11 @@ namespace gazebo
       /// \brief Event received when the model properties changed.
       /// \param[in] _static New static property of the model.
       /// \param[in] _autoDisable New allow_auto_disable property of the model.
-      /// \param[in] _pose New model pose.
+      private: void OnModelPropertiesChanged(bool _static, bool _autoDisable);
+
+      /// \brief Event received when the model name changed.
       /// \param[in] _name New name.
-      private: void OnModelPropertiesChanged(bool _static, bool _autoDisable,
-          const math::Pose &_pose, const std::string &_name);
+      private: void OnModelNameChanged(const std::string &_name);
 
       /// \brief Recursively look for an item with the given data under the
       /// given _parentItem.

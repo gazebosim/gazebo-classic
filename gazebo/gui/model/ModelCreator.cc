@@ -168,6 +168,10 @@ ModelCreator::ModelCreator()
       event::Events::ConnectPreRender(
         boost::bind(&ModelCreator::Update, this)));
 
+  this->connections.push_back(
+      gui::model::Events::ConnectModelPropertiesChanged(
+      boost::bind(&ModelCreator::OnPropertiesChanged, this, _1, _2)));
+
   if (g_copyAct)
   {
     g_copyAct->setEnabled(false);
@@ -190,8 +194,15 @@ ModelCreator::~ModelCreator()
   while (!this->allLinks.empty())
     this->RemoveLinkImpl(this->allLinks.begin()->first);
 
+  while (!this->nestedLinks.empty())
+    this->RemoveLinkImpl(this->nestedLinks.begin()->first);
+
+  while (!this->allNestedModels.empty())
+    this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
+
   this->allNestedModels.clear();
   this->allLinks.clear();
+  this->nestedLinks.clear();
   this->allModelPlugins.clear();
   this->node->Fini();
   this->node.reset();
@@ -359,7 +370,8 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     if (_modelElem->HasElement("allow_auto_disable"))
       this->autoDisable = _modelElem->Get<bool>("allow_auto_disable");
     gui::model::Events::modelPropertiesChanged(this->isStatic,
-        this->autoDisable, this->modelPose, this->GetModelName());
+        this->autoDisable);
+    gui::model::Events::modelNameChanged(this->GetModelName());
 
     modelData->modelVisual = modelVisual;
   }
@@ -428,7 +440,10 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     if (this->canonicalModel.empty())
       this->canonicalModel = nestedModelName;
 
-    this->CreateModelFromSDF(nestedModelElem, modelVisual);
+    NestedModelData *nestedModelData =
+        this->CreateModelFromSDF(nestedModelElem, modelVisual);
+    rendering::VisualPtr nestedModelVis = nestedModelData->modelVisual;
+    modelData->models[nestedModelVis->GetName()] = nestedModelVis;
     nestedModelElem = nestedModelElem->GetNextElement("model");
   }
 
@@ -438,7 +453,10 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     linkElem = _modelElem->GetElement("link");
   while (linkElem)
   {
-    this->CreateLinkFromSDF(linkElem, modelVisual);
+    LinkData *linkData = this->CreateLinkFromSDF(linkElem, modelVisual);
+    rendering::VisualPtr linkVis = linkData->linkVisual;
+
+    modelData->links[linkVis->GetName()] = linkVis;
     linkElem = linkElem->GetNextElement("link");
   }
 
@@ -662,6 +680,15 @@ void ModelCreator::OnExit()
 
   gui::model::Events::newModel();
   gui::model::Events::finishModel();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnPropertiesChanged(const bool _static,
+    const bool _autoDisable)
+{
+  this->autoDisable = _autoDisable;
+  this->isStatic = _static;
+  this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
@@ -945,7 +972,7 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
+LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     const rendering::VisualPtr &_parentVis)
 {
   LinkData *link = new LinkData();
@@ -1100,6 +1127,75 @@ void ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     this->allLinks[linkName] = link;
     gui::model::Events::linkInserted(linkName);
   }
+  else
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->nestedLinks[linkName] = link;
+  }
+
+  this->ModelChanged();
+
+  return link;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
+{
+  if (!this->previewVisual)
+  {
+    this->Reset();
+    return;
+  }
+
+  NestedModelData *modelData = NULL;
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    if (this->allNestedModels.find(_nestedModelName) ==
+        this->allNestedModels.end())
+    {
+      return;
+    }
+    modelData = this->allNestedModels[_nestedModelName];
+  }
+
+  if (!modelData)
+    return;
+
+  // Copy before reference is deleted.
+  std::string nestedModelName(_nestedModelName);
+
+
+  // remove all its models
+  for (auto &modelIt : modelData->models)
+    this->RemoveNestedModelImpl(modelIt.first);
+
+  // remove all its links and joints
+  for (auto &linkIt : modelData->links)
+  {
+    // if it's a link
+    if (this->nestedLinks.find(linkIt.first) != this->nestedLinks.end())
+    {
+      if (this->jointMaker)
+      {
+        this->jointMaker->RemoveJointsByLink(linkIt.first);
+      }
+      this->RemoveLinkImpl(linkIt.first);
+    }
+  }
+
+  rendering::ScenePtr scene = modelData->modelVisual->GetScene();
+  if (scene)
+  {
+    scene->RemoveVisual(modelData->modelVisual);
+  }
+
+  modelData->modelVisual.reset();
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->allNestedModels.erase(_nestedModelName);
+    delete modelData;
+  }
+  gui::model::Events::nestedModelRemoved(nestedModelName);
 
   this->ModelChanged();
 }
@@ -1149,6 +1245,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks.erase(linkName);
+    this->nestedLinks.erase(linkName);
     delete link;
   }
   gui::model::Events::linkRemoved(linkName);
@@ -1185,13 +1282,15 @@ void ModelCreator::Reset()
 
   this->isStatic = false;
   this->autoDisable = true;
-  gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable,
-      this->modelPose, this->GetModelName());
+  gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable);
+  gui::model::Events::modelNameChanged(this->GetModelName());
 
   while (!this->allLinks.empty())
     this->RemoveLinkImpl(this->allLinks.begin()->first);
   this->allLinks.clear();
 
+  while (!this->allNestedModels.empty())
+    this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
   this->allNestedModels.clear();
 
   this->allModelPlugins.clear();
@@ -1351,7 +1450,7 @@ void ModelCreator::Stop()
 {
   if (this->addEntityType != ENTITY_NONE && this->mouseVisual)
   {
-    this->RemoveLinkImpl(this->mouseVisual->GetName());
+    this->RemoveEntity(this->mouseVisual->GetName());
     this->mouseVisual.reset();
     emit LinkAdded();
   }
@@ -1372,13 +1471,20 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
-  this->RemoveLink(_entity);
+  this->RemoveEntity(_entity);
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::RemoveLink(const std::string &_entity)
+void ModelCreator::RemoveEntity(const std::string &_entity)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
+  // if it's a nestedModel
+  if (this->allNestedModels.find(_entity) != this->allNestedModels.end())
+  {
+    this->RemoveNestedModelImpl(_entity);
+    return;
+  }
 
   // if it's a link
   if (this->allLinks.find(_entity) != this->allLinks.end())
@@ -1526,12 +1632,23 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       return true;
 
     // set the link data pose
-    if (this->allLinks.find(this->mouseVisual->GetName()) !=
-        this->allLinks.end())
+    auto linkIt = this->allLinks.find(this->mouseVisual->GetName());
+    if (linkIt != this->allLinks.end())
     {
-      LinkData *link = this->allLinks[this->mouseVisual->GetName()];
+      LinkData *link = linkIt->second;
       link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
+    }
+    else
+    {
+      auto modelIt = this->allNestedModels.find(this->mouseVisual->GetName());
+      if (modelIt != this->allNestedModels.end())
+      {
+        NestedModelData *modelData = modelIt->second;
+        modelData->SetPose((
+            this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
+        gui::model::Events::nestedModelInserted(this->mouseVisual->GetName());
+      }
     }
 
     // reset and return
