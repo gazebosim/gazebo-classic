@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <math.h>
 
 #include "gazebo/common/Assert.hh"
@@ -368,12 +370,12 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (this->mouseEvent.Control())
   {
     if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty()
-       && !this->modelEditorEnabled)
+       && !this->modelEditorEnabled && g_copyAct->isEnabled())
     {
       g_copyAct->trigger();
     }
     else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty()
-       && !this->modelEditorEnabled)
+       && !this->modelEditorEnabled && g_pasteAct->isEnabled())
     {
       g_pasteAct->trigger();
     }
@@ -414,15 +416,15 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   /// Switch between RTS modes
   if (this->keyModifiers == Qt::NoModifier && this->state != "make_entity")
   {
-    if (_event->key() == Qt::Key_R)
+    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
       g_rotateAct->trigger();
-    else if (_event->key() == Qt::Key_T)
+    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
       g_translateAct->trigger();
-    else if (_event->key() == Qt::Key_S)
+    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
       g_scaleAct->trigger();
-    else if (_event->key() == Qt::Key_N)
+    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
       g_snapAct->trigger();
-    else if (_event->key() == Qt::Key_Escape)
+    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
       g_arrowAct->trigger();
   }
 

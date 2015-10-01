@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_DATA_HH_
-#define _MODEL_DATA_HH_
+#ifndef _GAZEBO_MODEL_DATA_HH_
+#define _GAZEBO_MODEL_DATA_HH_
 
 #include <map>
 #include <string>
@@ -29,16 +29,12 @@ namespace boost
   class recursive_mutex;
 }
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 namespace gazebo
 {
   namespace gui
   {
     class LinkInspector;
+    class ModelPluginInspector;
 
     class GZ_GUI_VISIBLE ModelData
     {
@@ -49,6 +45,32 @@ namespace gazebo
       /// \brief Get the default transparency setting for entities in model
       /// editor.
       public: static double GetEditTransparency();
+    };
+
+    /// \brief Helper class to store nested models data.
+    class GZ_GUI_VISIBLE NestedModelData
+    {
+      /// \brief Set the name of the model.
+      /// \param[in] _name Name of model.
+      public: void SetName(const std::string &_name);
+
+      /// \brief Set the pose of the model.
+      /// \param[in] _pose Pose of model.
+      public: void SetPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Get the pose of the nested model.
+      /// \return Pose of nested model.
+      public: ignition::math::Pose3d Pose() const;
+
+      /// \brief Get the depth of the nested model. The root model has depth 1.
+      /// \return Depth of nested model. Returns -1 if depth cannot be found.
+      public: int Depth() const;
+
+      /// \brief SDF representing the model data.
+      public: sdf::ElementPtr modelSDF;
+
+      /// \brief Visual representing this model.
+      public: rendering::VisualPtr modelVisual;
     };
 
     /// \class LinkData LinkData.hh
@@ -97,7 +119,9 @@ namespace gazebo
 
       /// \brief Add a collision to the link.
       /// \param[in] _collisionVis Visual representing the collision.
-      public: void AddCollision(rendering::VisualPtr _collisionVis);
+      /// \param[in] _msg Optional message containing collision params.
+      public: void AddCollision(rendering::VisualPtr _collisionVis,
+          const msgs::Collision *_msg = NULL);
 
       /// \brief Update the inspector widget if necessary.
       public: void UpdateConfig();
@@ -179,6 +203,28 @@ namespace gazebo
 
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
+    };
+
+    /// \brief Helper class to store model plugin data
+    class GZ_GUI_VISIBLE ModelPluginData : public QObject
+    {
+      Q_OBJECT
+
+      /// \brief Constructor
+      public: ModelPluginData();
+
+      /// \brief Destructor
+      public: ~ModelPluginData();
+
+      /// \brief Load data from the plugin SDF
+      /// \param[in] _pluginElem SDF element.
+      public: void Load(sdf::ElementPtr _pluginElem);
+
+      /// \brief Inspector for configuring model plugin properties.
+      public: ModelPluginInspector *inspector;
+
+      /// \brief SDF representing the model plugin data.
+      public: sdf::ElementPtr modelPluginSDF;
     };
   }
 }

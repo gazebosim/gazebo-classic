@@ -19,6 +19,7 @@
 #define _GAZEBO_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -196,6 +197,10 @@ namespace gazebo
       /// \brief Get the scale.
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
+
+      /// \brief Get the scale of the visual as inherited from all parents.
+      /// \return The derived scaling factor.
+      public: ignition::math::Vector3d DerivedScale() const;
 
       /// \brief Get whether or not lighting is enabled.
       /// \return True if lighting is enabled.
