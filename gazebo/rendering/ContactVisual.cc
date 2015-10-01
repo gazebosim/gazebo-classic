@@ -17,13 +17,13 @@
 /* Desc: Contact Visualization Class
  * Author: Nate Koenig
  */
-#include <boost/bind.hpp>
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/Node.hh"
