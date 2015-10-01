@@ -366,7 +366,8 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
 
     // Register user command on server
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_id("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_id("Snap [" + _vis->GetName() + "]" +
+        gazebo::common::Time::GetWallTimeAsISOString());
     userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
     this->dataPtr->userCmdPub->Publish(userCmdMsg);

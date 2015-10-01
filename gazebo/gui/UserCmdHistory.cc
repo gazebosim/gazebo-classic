@@ -111,7 +111,7 @@ void UserCmdHistory::OnUndoHovered(QAction *_action)
     action->setChecked(beforeThis);
     action->blockSignals(false);
 
-    if (action->text() == _action->text())
+    if (action->data() == _action->data())
       beforeThis = false;
   }
 }
@@ -149,7 +149,7 @@ void UserCmdHistory::OnRedoHovered(QAction *_action)
     action->setChecked(beforeThis);
     action->blockSignals(false);
 
-    if (action->text() == _action->text())
+    if (action->data() == _action->data())
       beforeThis = false;
   }
 }

@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_USER_CMD_MANAGER_HH_
 #define _GAZEBO_USER_CMD_MANAGER_HH_
 
+#include <string>
+
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
