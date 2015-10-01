@@ -78,6 +78,9 @@ namespace gazebo
       /// \brief Pointer to the schematic view widget.
       public: SchematicViewWidget *svWidget;
 
+      /// \brief Pointer to the Insert model widget in main window.
+      public: QWidget *insertModel;
+
       /// \brief Show toolbars action cloned from main window.
       public: QAction *showToolbarsAct;
 

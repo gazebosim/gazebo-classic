@@ -62,6 +62,15 @@ namespace gazebo
       public: void AddItem(QWidget *_item,
           const std::string &_category = "Other");
 
+      /// \brief Add a widget inside the model editor palette widget
+      /// \param[in] _index Index in the splitter to insert the widget at.
+      /// \param[in] _widget Widget to be added.
+      public: void InsertWidget(unsigned int _index, QWidget *_widget);
+
+      /// \brief Remove a widget from the model editor palette widget
+      /// \param[in] _widget Widget to be added.
+      public: void RemoveWidget(QWidget *_widget);
+
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
       public: void CreateJoint(const std::string &_type);
@@ -218,6 +227,9 @@ namespace gazebo
 
 /// \brief Map of categories to their layout
       private: std::map<std::string, QGridLayout *> categories;
+
+      /// \brief Vertical splitter between widgets.
+      private: QSplitter *splitter;
 
 /*      /// \brief Static checkbox, true to create a static model.
       private: QCheckBox *staticCheck;

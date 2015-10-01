@@ -93,6 +93,11 @@ namespace gazebo
       /// \brief Toggle main window's toolbar to display model editor icons.
       private: void ToggleToolbar();
 
+      /// \brief Toggle the Insert tab on and off in model editor mode.
+      /// This takes the main window Insert tab and adds it to the editor
+      /// Note that ToggleToolbar restores the Insert tab in the main window
+      private: void ToggleInsertWidget();
+
       /// \brief Create menus
       private: void CreateMenus();
 
