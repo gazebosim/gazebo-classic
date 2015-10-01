@@ -4,7 +4,7 @@
     * [Pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
 
 1. Light and light state for the server side
-    * [Pull request #1918](https://bitbucket.org/osrf/gazebo/pull-request/1918)
+    * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
 
 1. Rename Reset to Reset Time in time widget
     * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
