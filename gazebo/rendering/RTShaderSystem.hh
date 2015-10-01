@@ -99,10 +99,14 @@ namespace gazebo
 
       /// \brief Set an Ogre::Entity to use RT shaders.
       /// \param[in] _vis Visual that will use the RTShaderSystem.
+      /// \deprecated This function is no longer needed, and has no
+      /// implementation.
       public: void AttachEntity(Visual *vis) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Remove and entity.
       /// \param[in] _vis Remove this visual.
+      /// \deprecated This function is no longer needed, and has no
+      /// implementation.
       public: void DetachEntity(Visual *_vis) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set a viewport to use shaders.

@@ -34,6 +34,16 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual void Stop() = 0;
     + ***Replacement:*** public: virtual void Stop();
 
+### Deprecations
+
+1. **gazebo/gui/RTShaderSystem.hh**
+    + ***Deprecation:*** void AttachEntity(Visual *vis) 
+    + ***No replacement for AttachEntity ***
+
+1. **gazebo/gui/RTShaderSystem.hh**
+    + ***Deprecation:*** void DetachEntity(Visual *_vis)  
+    + ***No replacement for DetachEntity ***
+
 ### Deletions
 
 1. **gazebo rendering libraries**

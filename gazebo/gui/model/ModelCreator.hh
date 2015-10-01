@@ -48,6 +48,7 @@ namespace gazebo
 
   namespace gui
   {
+    class NestedModelData;
     class LinkData;
     class ModelPluginData;
     class SaveDialog;
@@ -322,10 +323,12 @@ namespace gazebo
       /// \return Cloned link.
       private: LinkData *CloneLink(const std::string &_linkName);
 
-      /// \brief Create a link from an SDF.
-      /// \param[in] _link SDF element of the link that will be used to
+      /// \brief Create a link from an SDF with the specified parent visual.
+      /// \param[in] _linkElem SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
-      private: void CreateLinkFromSDF(sdf::ElementPtr _linkElem);
+      /// \param[in] _parentVis Parent visual that the link will be attached to.
+      private: void CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
+          const rendering::VisualPtr &_parentVis);
 
       /// \brief Open the link inspector.
       /// \param[in] _name Name of link.
@@ -346,9 +349,14 @@ namespace gazebo
       private: std::string CreateModel();
 
       /// \brief Load a model SDF file and create visuals in the model editor.
-      /// This is used mainly when editing existing models.
+      /// This is used mainly when editing existing models. The function is
+      /// called recursively to create nested models.
       /// \param[in] _sdf SDF of a model to be loaded
-      private: void LoadSDF(sdf::ElementPtr _sdf);
+      /// \param[in] _parentVis If this is not the root model, it will have a
+      /// parent visual for its parent model.
+      /// \return Data describing the model.
+      private: NestedModelData *CreateModelFromSDF(const sdf::ElementPtr &_sdf,
+          const rendering::VisualPtr &_parentVis = NULL);
 
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
@@ -441,7 +449,7 @@ namespace gazebo
       private: rendering::VisualPtr mouseVisual;
 
       /// \brief The pose of the model.
-      private: math::Pose modelPose;
+      private: ignition::math::Pose3d modelPose;
 
       /// \brief True to create a static model.
       private: bool isStatic;
@@ -460,6 +468,9 @@ namespace gazebo
 
       /// \brief Type of link being added.
       private: LinkType addLinkType;
+
+      /// \brief A map of nested model names to and their visuals.
+      private: std::map<std::string, NestedModelData *> allNestedModels;
 
       /// \brief A map of model link names to and their data.
       private: std::map<std::string, LinkData *> allLinks;
@@ -533,6 +544,9 @@ namespace gazebo
       /// \brief A map of all visuals of the model to be edited to their
       /// visibility.
       private: std::map<uint32_t, bool> serverModelVisible;
+
+      /// \brief Name of the canonical model
+      private: std::string canonicalModel;
 
       /// \brief Name of the canonical link in the model
       private: std::string canonicalLink;

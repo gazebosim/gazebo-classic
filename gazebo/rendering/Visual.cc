@@ -173,11 +173,6 @@ Visual::~Visual()
 
   delete this->dataPtr->boundingBox;
 
-  // delete instance from lines vector
-  /*for (std::list<DynamicLines*>::iterator iter = this->dataPtr->lines.begin();
-       iter != this->dataPtr->lines.end(); ++iter)
-    delete *iter;
-    */
   this->dataPtr->lines.clear();
 
   this->dataPtr->scene.reset();
@@ -323,8 +318,6 @@ void Visual::Init()
   this->dataPtr->staticGeom = NULL;
   this->dataPtr->layer = -1;
   this->dataPtr->scale = ignition::math::Vector3d::One;
-
-  std::cout << "VIsual::Init[" << this->GetName() << "]\n";
   this->dataPtr->initialized = true;
 }
 
