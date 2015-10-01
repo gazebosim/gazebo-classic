@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/JointInspector_TEST.hh"
 
@@ -114,14 +115,46 @@ void JointInspector_TEST::Swap()
   // Get swap button
   QList<QToolButton *> toolButtons =
       jointInspector->findChildren<QToolButton *>();
-  QVERIFY(toolButtons.size() == 1);
+  QVERIFY(toolButtons.size() == 2);
 
   // Trigger swap
-  toolButtons[0]->click();
+  toolButtons[1]->click();
 
   // Check parent and child links
   QVERIFY(parentBox->currentText() == "link2");
   QVERIFY(childBox->currentText() == "link1");
+
+  delete jointInspector;
+  delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointInspector_TEST::RemoveButton()
+{
+  // Create a joint maker
+  gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Create a joint inspector
+  gazebo::gui::JointInspector *jointInspector =
+      new gazebo::gui::JointInspector(jointMaker);
+  QVERIFY(jointInspector != NULL);
+
+  // Open it
+  jointInspector->Open();
+  QVERIFY(jointInspector->isVisible());
+
+  // Get buttons
+  QList<QToolButton *> toolButtons =
+      jointInspector->findChildren<QToolButton *>();
+  QVERIFY(toolButtons.size() == 2);
+  QVERIFY(toolButtons[0]->text() == "");
+
+  // Trigger remove
+  toolButtons[0]->click();
+
+  // Check joint inspector disappeared
+  QVERIFY(!jointInspector->isVisible());
 
   delete jointInspector;
   delete jointMaker;

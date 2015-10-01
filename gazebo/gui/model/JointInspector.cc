@@ -188,6 +188,15 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   generalLayout->addWidget(scrollArea);
 
   // Buttons
+  QToolButton *removeButton = new QToolButton(this);
+  removeButton->setFixedSize(QSize(30, 30));
+  removeButton->setToolTip("Remove joint");
+  removeButton->setIcon(QPixmap(":/images/trashcan.png"));
+  removeButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  removeButton->setIconSize(QSize(16, 16));
+  removeButton->setCheckable(false);
+  connect(removeButton, SIGNAL(clicked()), this, SLOT(OnRemove()));
+
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
@@ -201,6 +210,8 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
+  buttonsLayout->addWidget(removeButton);
+  buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(this->applyButton);
   buttonsLayout->addWidget(this->okButton);
@@ -411,6 +422,20 @@ void JointInspector::Open()
 
   this->move(QCursor::pos());
   this->show();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetJointId(const std::string &_id)
+{
+  this->jointId = _id;
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnRemove()
+{
+  this->close();
+
+  this->jointMaker->RemoveJoint(this->jointId);
 }
 
 /////////////////////////////////////////////////
