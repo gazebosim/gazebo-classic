@@ -195,6 +195,10 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
       boost::bind(&ModelTreeWidget::OnModelPluginInserted, this, _1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectNestedModelRemoved(
+      boost::bind(&ModelTreeWidget::OnNestedModelRemoved, this, _1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
       boost::bind(&ModelTreeWidget::OnLinkRemoved, this, _1)));
 
@@ -623,16 +627,16 @@ QTreeWidgetItem *ModelTreeWidget::FindItemByData(const std::string &_data,
 }
 
 /////////////////////////////////////////////////
-void ModelTreeWidget::OnNestedModelInserted(const std::string &_nestedModelName)
+void ModelTreeWidget::OnNestedModelInserted(const std::string &_nestedModelId)
 {
   // Divide the name into parent scoped name and leaf name
-  std::string parentScopedName = _nestedModelName;
-  std::string leafName = _nestedModelName;
-  size_t idx = _nestedModelName.rfind("::");
+  std::string parentScopedName = _nestedModelId;
+  std::string leafName = _nestedModelId;
+  size_t idx = _nestedModelId.rfind("::");
   if (idx != std::string::npos)
   {
-    parentScopedName = _nestedModelName.substr(0, idx);
-    leafName = _nestedModelName.substr(idx+2);
+    parentScopedName = _nestedModelId.substr(0, idx);
+    leafName = _nestedModelId.substr(idx+2);
   }
 
   // Top level by default
@@ -654,8 +658,28 @@ void ModelTreeWidget::OnNestedModelInserted(const std::string &_nestedModelName)
       new QTreeWidgetItem(parentItem,
       QStringList(QString("%1").arg(QString::fromStdString(leafName))));
 
-  newNestedModelItem->setData(0, Qt::UserRole, _nestedModelName.c_str());
+  newNestedModelItem->setData(0, Qt::UserRole, _nestedModelId.c_str());
   newNestedModelItem->setData(1, Qt::UserRole, "Nested Model");
 
   this->nestedModelsItem->setExpanded(true);
+}
+
+/////////////////////////////////////////////////
+void ModelTreeWidget::OnNestedModelRemoved(const std::string &_nestedModelId)
+{
+  std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
+  for (int i = 0; i < this->nestedModelsItem->childCount(); ++i)
+  {
+    QTreeWidgetItem *item = this->nestedModelsItem->child(i);
+    if (!item)
+      continue;
+    std::string listData = item->data(0, Qt::UserRole).toString().toStdString();
+
+    if (listData == _nestedModelId)
+    {
+      this->nestedModelsItem->takeChild(
+          this->nestedModelsItem->indexOfChild(item));
+      break;
+    }
+  }
 }
