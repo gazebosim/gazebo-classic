@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/bind.hpp>
 #include <string>
 
 #include "gazebo/rendering/DynamicLines.hh"
