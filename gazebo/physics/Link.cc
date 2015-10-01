@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <sstream>
 #include <functional>
 

@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/bind.hpp>
 #include <gtest/gtest.h>
 #include <ignition/math/Angle.hh>
 #include "gazebo/test/ServerFixture.hh"

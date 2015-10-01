@@ -22,6 +22,7 @@
 #include <string>
 #include <boost/function.hpp>
 
+#include <boost/function.hpp>
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"

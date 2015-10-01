@@ -17,6 +17,7 @@
  * thenounproject.com
  * Stairs designed by Brian Oppenlander from the thenounproject.com
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/gui/building/BuildingEditorPalettePrivate.hh"
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
