@@ -67,7 +67,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: UserCmdPrivate *dataPtr;
+      protected: UserCmdPrivate *dataPtr;
     };
 
     class UserCmdManagerPrivate;

@@ -40,6 +40,9 @@ namespace gazebo
       public: transport::SubscriberPtr userCmdStatsSub;
 
       public: msgs::UserCmdStats msg;
+
+      public: QActionGroup *undoActions;
+      public: QActionGroup *redoActions;
     };
   }
 }

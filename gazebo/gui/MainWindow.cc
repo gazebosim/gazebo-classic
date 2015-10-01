@@ -1464,11 +1464,11 @@ void MainWindow::CreateActions()
   g_viewAngleAct->setDefaultWidget(viewAngleWidget);
 
   // Undo
-  g_undoAct = new QAction(QIcon(":/images/log_step_back.png"),
+  g_undoAct = new QAction(QIcon(":/images/undo.png"),
       tr("Undo (Ctrl + Z)"), this);
   g_undoAct->setStatusTip(tr("Undo last command"));
   g_undoAct->setCheckable(false);
-  this->CreateDisabledIcon(":/images/log_step_back.png", g_undoAct);
+  this->CreateDisabledIcon(":/images/undo.png", g_undoAct);
   g_undoAct->setEnabled(false);
 
   // Undo history
@@ -1480,11 +1480,11 @@ void MainWindow::CreateActions()
   g_undoHistoryAct->setEnabled(false);
 
   // Redo
-  g_redoAct = new QAction(QIcon(":/images/log_step_forward.png"),
+  g_redoAct = new QAction(QIcon(":/images/redo.png"),
       tr("Redo (Shift + Ctrl + Z)"), this);
   g_redoAct->setStatusTip(tr("Redo last undone command"));
   g_redoAct->setCheckable(false);
-  this->CreateDisabledIcon(":/images/log_step_forward.png", g_redoAct);
+  this->CreateDisabledIcon(":/images/redo.png", g_redoAct);
   g_redoAct->setEnabled(false);
 
   // Redo history

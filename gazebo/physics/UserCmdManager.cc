@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/range/adaptor/reversed.hpp>
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/Model.hh"
@@ -143,42 +145,84 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
   // Undo
   if (_msg->undo())
   {
-    // Check if msg id is found in the undo vector
-
-    // Maybe sanity check that it is indeed the last command by that
-    // gzclient in the list?
-
-    // Get the command
+    // Get the last done command
     UserCmd *cmd = this->dataPtr->undoCmds.back();
 
-    // Undo it
-    cmd->Undo();
+    // If there's an id, get that command instead
+    if (_msg->has_id())
+    {
+      bool found = false;
+      for (auto cmdIt : this->dataPtr->undoCmds)
+      {
+        if (cmdIt->Id() == _msg->id())
+        {
+          cmd = cmdIt;
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+      {
+        gzerr << "Requested command [" << _msg->id() <<
+            "] is not in the undo queue and won't be undone." << std::endl;
+        return;
+      }
+    }
 
-    // Remove from undo list
-    this->dataPtr->undoCmds.pop_back();
+    // Undo all commands up to the one desired
+    for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->undoCmds))
+    {
+      // Undo it
+      cmdIt->Undo();
 
-    // Add command to redo list
-    this->dataPtr->redoCmds.push_back(cmd);
+      // Transfer to the redo list
+      this->dataPtr->undoCmds.pop_back();
+      this->dataPtr->redoCmds.push_back(cmdIt);
+
+      if (cmdIt == cmd)
+        break;
+    }
   }
   // Redo
   else
   {
-    // Check if msg id is found in the redo vector
-
-    // Maybe sanity check that it is indeed the last command by that
-    // gzclient in the list?
-
-    // Get the command
+    // Get last undone command
     UserCmd *cmd = this->dataPtr->redoCmds.back();
 
-    // Redo it
-    cmd->Redo();
+    // If there's an id, get that command instead
+    if (_msg->has_id())
+    {
+      bool found = false;
+      for (auto cmdIt : this->dataPtr->redoCmds)
+      {
+        if (cmdIt->Id() == _msg->id())
+        {
+          cmd = cmdIt;
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+      {
+        gzerr << "Requested command [" << _msg->id() <<
+            "] is not in the redo queue and won't be redone." << std::endl;
+        return;
+      }
+    }
 
-    // Remove from redo list
-    this->dataPtr->redoCmds.pop_back();
+    // Redo all commands up to the one desired
+    for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->redoCmds))
+    {
+      // Redo it
+      cmdIt->Redo();
 
-    // Add command to undo list
-    this->dataPtr->undoCmds.push_back(cmd);
+      // Transfer to the undo list
+      this->dataPtr->redoCmds.pop_back();
+      this->dataPtr->undoCmds.push_back(cmdIt);
+
+      if (cmdIt == cmd)
+        break;
+    }
   }
 
   this->PublishCurrentStats();

@@ -8,4 +8,7 @@ message UndoRedo
 {
   /// \brief True to undo, false to redo.
   required bool undo = 1;
+
+  /// \brief Unique id of the user command.
+  optional string id = 2;
 }

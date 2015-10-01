@@ -49,11 +49,26 @@ namespace gazebo
       /// \brief Qt call back when the undo button is pressed.
       private slots: void OnUndo();
 
+      /// \brief Qt call back when the undo button is pressed.
+      private slots: void OnUndoCommand(QAction *_action);
+
+      /// \brief Qt call back when the undo button is pressed.
+      private slots: void OnUndoHovered(QAction *_action);
+
+      /// \brief Qt call back when the undo history button is pressed.
+      private slots: void OnUndoCmdHistory();
+
       /// \brief Qt call back when the redo button is pressed.
       private slots: void OnRedo();
 
-      /// \brief Qt call back when the redo button is pressed.
-      private slots: void OnCmdHistory();
+      /// \brief Qt call back when the undo button is pressed.
+      private slots: void OnRedoCommand(QAction *_action);
+
+      /// \brief Qt call back when the undo button is pressed.
+      private slots: void OnRedoHovered(QAction *_action);
+
+      /// \brief Qt call back when the redo history button is pressed.
+      private slots: void OnRedoCmdHistory();
 
       /// \brief User command message callback.
       /// \param[in] _msg Message containing statistics about user commands
