@@ -26,6 +26,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>

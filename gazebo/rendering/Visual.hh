@@ -19,6 +19,7 @@
 #define _GAZEBO_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 #include <string>
 #include <utility>
 #include <vector>
