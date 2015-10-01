@@ -75,6 +75,7 @@ void ModelSnap::Clear()
 
   this->dataPtr->node.reset();
   this->dataPtr->modelPub.reset();
+  this->dataPtr->userCmdPub.reset();
 
   if (this->dataPtr->updateMutex)
   {
@@ -128,6 +129,8 @@ void ModelSnap::Init()
   this->dataPtr->node->Init();
   this->dataPtr->modelPub =
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->rayQuery.reset(
       new rendering::RayQuery(this->dataPtr->userCamera));
@@ -353,12 +356,20 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
   // Check to see if the visual is a model.
   if (gui::get_entity_id(_vis->GetName()))
   {
+    // Publish model modify message
     msgs::Model msg;
     msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
 
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
     this->dataPtr->modelPub->Publish(msg);
+
+    // Register user command on server
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_id("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
+    this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
 

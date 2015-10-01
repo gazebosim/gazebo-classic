@@ -1,0 +1,11 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface UndoRedo
+/// \brief A message requesting to undo / redo user commands.
+
+message UndoRedo
+{
+  /// \brief True to undo, false to redo.
+  required bool undo = 1;
+}

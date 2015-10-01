@@ -1,0 +1,33 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface UserCmd
+/// \brief Notifies that a new command has been executed by a user
+
+message UserCmd
+{
+  /// \brief Types of user commands
+  enum Type
+  {
+    /// \brief New model insertion
+    INSERTING = 0;
+    /// \brief Model deletion
+    DELETING = 1;
+    /// \brief Model moving
+    MOVING = 2;
+    /// \brief Model scaling
+    SCALING = 3;
+  }
+
+  /// \brief Unique id for user command.
+  required string id = 1;
+
+  /// \brief Description for the command.
+  required string description = 2;
+
+  /// \brief Type of command.
+  required Type type = 3;
+
+  /// \brief Name of entity related to the command.
+  optional string entity_name = 4;
+}

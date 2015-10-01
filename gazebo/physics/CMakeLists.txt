@@ -79,6 +79,7 @@ set (sources ${sources}
   SphereShape.cc
   State.cc
   SurfaceParams.cc
+  UserCmdManager.cc
   World.cc
   WorldState.cc
 )
@@ -129,6 +130,7 @@ set (headers
   State.hh
   SurfaceParams.hh
   UniversalJoint.hh
+  UserCmdManager.hh
   World.hh
   WorldState.hh)
 

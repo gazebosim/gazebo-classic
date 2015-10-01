@@ -56,6 +56,7 @@
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/UserCmdHistory.hh"
 #include "gazebo/gui/ViewAngleWidget.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
@@ -1461,6 +1462,40 @@ void MainWindow::CreateActions()
 
   g_viewAngleAct = new QWidgetAction(this);
   g_viewAngleAct->setDefaultWidget(viewAngleWidget);
+
+  // Undo
+  g_undoAct = new QAction(QIcon(":/images/log_step_back.png"),
+      tr("Undo (Ctrl + Z)"), this);
+  g_undoAct->setStatusTip(tr("Undo last command"));
+  g_undoAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/log_step_back.png", g_undoAct);
+  g_undoAct->setEnabled(false);
+
+  // Undo history
+  g_undoHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
+      tr("Undo history"), this);
+  g_undoHistoryAct->setStatusTip(tr("Commands which can be undone"));
+  g_undoHistoryAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_undoHistoryAct);
+  g_undoHistoryAct->setEnabled(false);
+
+  // Redo
+  g_redoAct = new QAction(QIcon(":/images/log_step_forward.png"),
+      tr("Redo (Shift + Ctrl + Z)"), this);
+  g_redoAct->setStatusTip(tr("Redo last undone command"));
+  g_redoAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/log_step_forward.png", g_redoAct);
+  g_redoAct->setEnabled(false);
+
+  // Redo history
+  g_redoHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
+      tr("Redo history"), this);
+  g_redoHistoryAct->setStatusTip(tr("Commands which can be redone"));
+  g_redoHistoryAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_redoHistoryAct);
+  g_redoHistoryAct->setEnabled(false);
+
+  new UserCmdHistory();
 }
 
 /////////////////////////////////////////////////
@@ -1681,6 +1716,18 @@ void MainWindow::DeleteActions()
 
   delete g_viewAngleAct;
   g_viewAngleAct = 0;
+
+  delete g_undoAct;
+  g_undoAct = 0;
+
+  delete g_undoHistoryAct;
+  g_undoHistoryAct = 0;
+
+  delete g_redoAct;
+  g_redoAct = 0;
+
+  delete g_redoHistoryAct;
+  g_redoHistoryAct = 0;
 }
 
 
