@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_DATA_HH_
-#define _MODEL_DATA_HH_
+#ifndef _GAZEBO_MODEL_DATA_HH_
+#define _GAZEBO_MODEL_DATA_HH_
 
 #include <map>
 #include <string>
@@ -45,6 +45,32 @@ namespace gazebo
       /// \brief Get the default transparency setting for entities in model
       /// editor.
       public: static double GetEditTransparency();
+    };
+
+    /// \brief Helper class to store nested models data.
+    class GZ_GUI_VISIBLE NestedModelData
+    {
+      /// \brief Set the name of the model.
+      /// \param[in] _name Name of model.
+      public: void SetName(const std::string &_name);
+
+      /// \brief Set the pose of the model.
+      /// \param[in] _pose Pose of model.
+      public: void SetPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Get the pose of the nested model.
+      /// \return Pose of nested model.
+      public: ignition::math::Pose3d Pose() const;
+
+      /// \brief Get the depth of the nested model. The root model has depth 1.
+      /// \return Depth of nested model. Returns -1 if depth cannot be found.
+      public: int Depth() const;
+
+      /// \brief SDF representing the model data.
+      public: sdf::ElementPtr modelSDF;
+
+      /// \brief Visual representing this model.
+      public: rendering::VisualPtr modelVisual;
     };
 
     /// \class LinkData LinkData.hh

@@ -77,6 +77,33 @@ double ModelData::GetEditTransparency()
 }
 
 /////////////////////////////////////////////////
+void NestedModelData::SetName(const std::string &_name)
+{
+  this->modelSDF->GetAttribute("name")->Set(_name);
+}
+
+/////////////////////////////////////////////////
+void NestedModelData::SetPose(const ignition::math::Pose3d &_pose)
+{
+  this->modelSDF->GetElement("pose")->Set(_pose);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Pose3d NestedModelData::Pose() const
+{
+  return this->modelSDF->Get<ignition::math::Pose3d>("pose");
+}
+
+/////////////////////////////////////////////////
+int NestedModelData::Depth() const
+{
+  if (!this->modelVisual)
+    return -1;
+
+  return this->modelVisual->GetDepth();
+}
+
+/////////////////////////////////////////////////
 LinkData::LinkData()
 {
   this->linkSDF.reset(new sdf::Element);
