@@ -90,13 +90,13 @@ namespace gazebo
     /// \brief Boost shared pointer to an Actor object
     typedef boost::shared_ptr<Actor> ActorPtr;
 
-    /// \def LinkPtr
-    /// \brief Boost shared pointer to a Link object
-    typedef boost::shared_ptr<Link> LinkPtr;
-
     /// \def LightPtr
     /// \brief Boost shared pointer to a Light object
     typedef boost::shared_ptr<Light> LightPtr;
+
+    /// \def LinkPtr
+    /// \brief Boost shared pointer to a Link object
+    typedef boost::shared_ptr<Link> LinkPtr;
 
     /// \def CollisionPtr
     /// \brief Boost shared pointer to a Collision object
@@ -202,13 +202,13 @@ namespace gazebo
     /// \brief Vector of JointControllerPtr
     typedef std::vector<JointControllerPtr> JointController_V;
 
-    /// \def Link_V
-    /// \brief Vector of LinkPtr
-    typedef std::vector<LinkPtr>  Link_V;
-
     /// \def Light_V
     /// \brief Vector of LightPtr
     typedef std::vector<LightPtr>  Light_V;
+
+    /// \def Link_V
+    /// \brief Vector of LinkPtr
+    typedef std::vector<LinkPtr>  Link_V;
 
     /// \def Collision_V
     /// \brief Vector of CollisionPtr
@@ -219,7 +219,7 @@ namespace gazebo
     typedef std::map<std::string, ModelState> ModelState_M;
 
     /// \def LightState_M
-    /// \brief Map of link state
+    /// \brief Map of light state
     typedef std::map<std::string, LightState> LightState_M;
 
     /// \def LinkState_M

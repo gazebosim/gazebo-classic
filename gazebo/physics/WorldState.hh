@@ -227,13 +227,14 @@ namespace gazebo
         }
 
         _out << "</state>";
+
         return _out;
       }
 
       /// \brief State of all the models.
       private: ModelState_M modelStates;
 
-      /// \brief State of all the lights.
+      /// \brief A map between all the light names and their states.
       private: LightState_M lightStates;
 
       /// \brief List of new added models. The

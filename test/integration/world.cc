@@ -15,6 +15,7 @@
  *
 */
 #include "gazebo/test/ServerFixture.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
@@ -70,9 +71,16 @@ TEST_F(WorldTest, ModifyLight)
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+  world->SetPaused(true);
 
   // Make sure there is only one light, and it is named "sun"
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 1);
+    EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
@@ -90,11 +98,23 @@ TEST_F(WorldTest, ModifyLight)
   }
 
   // Allow the world time to process the messages
-  world->Step(10);
+  // Must be big enough to pass `processMsgsPeriod`
+  world->Step(1000);
 
   // Get the new scene, and make sure the color of the "sun" light is
   // correct.
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 1);
+    EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
+    msgs::Light lightMsg;
+    lights[0]->FillMsg(lightMsg);
+    EXPECT_EQ(lightMsg.diffuse().r(), 0);
+    EXPECT_EQ(lightMsg.diffuse().g(), 1);
+    EXPECT_EQ(lightMsg.diffuse().b(), 0);
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
@@ -113,9 +133,21 @@ TEST_F(WorldTest, ModifyLight)
   }
 
   // Allow the world time to process the messages
-  world->Step(10);
+  world->Step(1000);
 
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 2);
+    EXPECT_STREQ(lights[1]->GetName().c_str(), "test_light");
+    msgs::Light lightMsg;
+    lights[1]->FillMsg(lightMsg);
+    EXPECT_EQ(lightMsg.diffuse().r(), 1);
+    EXPECT_EQ(lightMsg.diffuse().g(), 0);
+    EXPECT_EQ(lightMsg.diffuse().b(), 1);
+    EXPECT_EQ(lightMsg.type(), msgs::Light::POINT);
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_light");
@@ -133,6 +165,12 @@ TEST_F(WorldTest, ModifyLight)
 
   // Verify that the test_light is gone and that the sun remains
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 1);
+    EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 1);
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
@@ -148,9 +186,21 @@ TEST_F(WorldTest, ModifyLight)
   }
 
   // Allow the world time to process the messages
-  world->Step(10);
+  world->Step(1000);
 
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 2);
+    EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
+    msgs::Light lightMsg;
+    lights[1]->FillMsg(lightMsg);
+    EXPECT_EQ(lightMsg.diffuse().r(), 1);
+    EXPECT_EQ(lightMsg.diffuse().g(), 1);
+    EXPECT_EQ(lightMsg.diffuse().b(), 0);
+    EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");
@@ -172,10 +222,31 @@ TEST_F(WorldTest, ModifyLight)
   }
 
   // Allow the world time to process the messages
-  world->Step(10);
+  world->Step(1000);
 
   // Verify the light gets the new pose and retains values of other properties
   {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 2);
+    EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
+    msgs::Light lightMsg;
+    lights[1]->FillMsg(lightMsg);
+    EXPECT_EQ(lightMsg.diffuse().r(), 1);
+    EXPECT_EQ(lightMsg.diffuse().g(), 1);
+    EXPECT_EQ(lightMsg.diffuse().b(), 0);
+
+    EXPECT_EQ(lightMsg.pose().position().x(), 3);
+    EXPECT_EQ(lightMsg.pose().position().y(), 2);
+    EXPECT_EQ(lightMsg.pose().position().z(), 1);
+    EXPECT_EQ(lightMsg.pose().orientation().w(), 0);
+    EXPECT_EQ(lightMsg.pose().orientation().x(), 1);
+    EXPECT_EQ(lightMsg.pose().orientation().y(), 0);
+    EXPECT_EQ(lightMsg.pose().orientation().z(), 0);
+
+    EXPECT_EQ(lightMsg.type(), msgs::Light::SPOT);
+
+    // Check scene message
     msgs::Scene sceneMsg = world->GetSceneMsg();
     EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(1).name().c_str(), "test_spot_light");

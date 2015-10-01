@@ -21,7 +21,6 @@
 #include <iomanip>
 
 #include "gazebo/physics/State.hh"
-// #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,9 +34,6 @@ namespace gazebo
     ///
     /// This class captures the entire state of a Light at one
     /// specific time during a simulation run.
-    ///
-    /// State of a Light includes the state of all its child Links and
-    /// Joints.
     class GZ_PHYSICS_VISIBLE LightState : public State
     {
       /// \brief Default constructor.
@@ -59,9 +55,6 @@ namespace gazebo
       /// Build a LightState from SDF data
       /// \param[in] _sdf SDF data to load a light state from.
       public: explicit LightState(const sdf::ElementPtr _sdf);
-
-      /// \brief Destructor.
-      public: virtual ~LightState() = default;
 
       /// \brief Load state from SDF element.
       ///
@@ -134,7 +127,9 @@ namespace gazebo
       /// \brief Pose of the light.
       private: ignition::math::Pose3d pose;
     };
+
     /// \}
   }
 }
 #endif
+

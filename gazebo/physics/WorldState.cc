@@ -27,8 +27,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
-#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/WorldState.hh"
 
 using namespace gazebo;
@@ -56,7 +56,7 @@ WorldState::WorldState(const WorldPtr _world)
           ModelState(*iter, this->realTime, this->simTime, this->iterations)));
   }
 
-  // Add a state for all the lights
+  // Add states for all the lights
   Light_V lights = _world->Lights();
   for (auto iter = lights.begin(); iter != lights.end(); ++iter)
   {
@@ -99,19 +99,9 @@ void WorldState::Load(const WorldPtr _world)
     this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
         this->simTime, this->iterations);
   }
-/*
-  // Remove models that no longer exist. We determine this by check the time
-  // stamp on each model.
-  for (ModelState_M::iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end();)
-  {
-    if (iter->second.GetRealTime() != this->realTime)
-      this->modelStates.erase(iter++);
-    else
-      ++iter;
-  }
-*/
-  // Add a state for all the lights
+
+  // Add states for all the lights
+  this->lightStates.clear();
   Light_V lights = _world->Lights();
   for (auto iter = lights.begin(); iter != lights.end(); ++iter)
   {
@@ -232,7 +222,7 @@ ModelState WorldState::GetModelState(const std::string &_modelName) const
 LightState WorldState::GetLightState(const std::string &_lightName) const
 {
   // Search for the light name
-  LightState_M::const_iterator iter = this->lightStates.find(_lightName);
+  auto iter = this->lightStates.find(_lightName);
   if (iter != this->lightStates.end())
     return iter->second;
 
@@ -256,7 +246,7 @@ bool WorldState::HasModelState(const std::string &_modelName) const
 bool WorldState::HasLightState(const std::string &_lightName) const
 {
   // Search for the light name
-  LightState_M::const_iterator iter = this->lightStates.find(_lightName);
+  auto iter = this->lightStates.find(_lightName);
   if (iter != this->lightStates.end())
     return true;
 
@@ -268,8 +258,16 @@ bool WorldState::IsZero() const
 {
   bool result = this->insertions.size() == 0 && this->deletions.size() == 0;
 
+  // Model
   for (ModelState_M::const_iterator iter = this->modelStates.begin();
        iter != this->modelStates.end() && result; ++iter)
+  {
+    result = result && iter->second.IsZero();
+  }
+
+  // Light
+  for (auto iter = this->lightStates.begin();
+      iter != this->lightStates.end() && result; ++iter)
   {
     result = result && iter->second.IsZero();
   }
@@ -282,8 +280,9 @@ WorldState &WorldState::operator=(const WorldState &_state)
 {
   State::operator=(_state);
 
-  // Clear the model states
+  // Clear the states
   this->modelStates.clear();
+  this->lightStates.clear();
 
   this->insertions.clear();
   this->deletions.clear();
@@ -294,6 +293,14 @@ WorldState &WorldState::operator=(const WorldState &_state)
   {
     this->modelStates.insert(std::make_pair(iter->first,
           ModelState(iter->second)));
+  }
+
+  // Copy the light states.
+  for (auto iter = _state.lightStates.begin();
+      iter != _state.lightStates.end(); ++iter)
+  {
+    this->lightStates.insert(std::make_pair(iter->first,
+          LightState(iter->second)));
   }
 
   // Copy the insertions
@@ -338,6 +345,26 @@ WorldState WorldState::operator-(const WorldState &_state) const
     }
   }
 
+  // Subtract the light states.
+  for (auto iter = _state.lightStates.begin();
+      iter != _state.lightStates.end(); ++iter)
+  {
+    if (this->HasLightState(iter->second.GetName()))
+    {
+      LightState state = this->GetLightState(iter->second.GetName()) -
+          iter->second;
+
+      if (!state.IsZero())
+      {
+        result.lightStates.insert(std::make_pair(state.GetName(), state));
+      }
+    }
+    else
+    {
+      result.deletions.push_back(iter->second.GetName());
+    }
+  }
+
   // Add in the new model states
   for (ModelState_M::const_iterator iter =
        this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
@@ -349,23 +376,14 @@ WorldState WorldState::operator-(const WorldState &_state) const
     }
   }
 
-  // Subtract the light states.
-  for (auto iter = _state.lightStates.begin();
-      iter != _state.lightStates.end(); ++iter)
+  // Add in the new light states
+  for (auto iter = this->lightStates.begin();
+      iter != this->lightStates.end(); ++iter)
   {
-    if (this->HasLightState(iter->second.GetName()))
+    if (!_state.HasLightState(iter->second.GetName()) && this->world)
     {
-      LightState state = this->GetLightState(iter->second.GetName()) -
-        iter->second;
-
-      if (!state.IsZero())
-      {
-        result.lightStates.insert(std::make_pair(state.GetName(), state));
-      }
-    }
-    else
-    {
-      result.deletions.push_back(iter->second.GetName());
+      LightPtr light = this->world->Light(iter->second.GetName());
+      result.insertions.push_back(light->GetSDF()->ToString(""));
     }
   }
 
@@ -383,13 +401,22 @@ WorldState WorldState::operator+(const WorldState &_state) const
   result.wallTime = this->wallTime;
   result.iterations = this->iterations;
 
-  // Add the states.
+  // Add the model states.
   for (ModelState_M::const_iterator iter =
        _state.modelStates.begin(); iter != _state.modelStates.end(); ++iter)
   {
     ModelState state = this->GetModelState(iter->second.GetName()) +
       iter->second;
     result.modelStates.insert(std::make_pair(state.GetName(), state));
+  }
+
+  // Add the light states.
+  for (auto iter = _state.lightStates.begin();
+      iter != _state.lightStates.end(); ++iter)
+  {
+    LightState state = this->GetLightState(iter->second.GetName()) +
+      iter->second;
+    result.lightStates.insert(std::make_pair(state.GetName(), state));
   }
 
   return result;
@@ -406,10 +433,19 @@ void WorldState::FillSDF(sdf::ElementPtr _sdf)
   _sdf->GetElement("wall_time")->Set(this->wallTime);
   _sdf->GetElement("iterations")->Set(this->iterations);
 
+  // Models
   for (ModelState_M::iterator iter =
        this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
   {
     sdf::ElementPtr elem = _sdf->AddElement("model");
+    iter->second.FillSDF(elem);
+  }
+
+  // Lights
+  for (auto iter = this->lightStates.begin();
+      iter != this->lightStates.end(); ++iter)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("light");
     iter->second.FillSDF(elem);
   }
 }
@@ -419,8 +455,16 @@ void WorldState::SetWallTime(const common::Time &_time)
 {
   State::SetWallTime(_time);
 
+  // Models
   for (ModelState_M::iterator iter = this->modelStates.begin();
        iter != this->modelStates.end(); ++iter)
+  {
+    iter->second.SetWallTime(_time);
+  }
+
+  // Lights
+  for (auto iter = this->lightStates.begin();
+      iter != this->lightStates.end(); ++iter)
   {
     iter->second.SetWallTime(_time);
   }
@@ -431,8 +475,16 @@ void WorldState::SetRealTime(const common::Time &_time)
 {
   State::SetRealTime(_time);
 
+  // Models
   for (ModelState_M::iterator iter = this->modelStates.begin();
            iter != this->modelStates.end(); ++iter)
+  {
+    iter->second.SetRealTime(_time);
+  }
+
+  // Lights
+  for (auto iter = this->lightStates.begin();
+      iter != this->lightStates.end(); ++iter)
   {
     iter->second.SetRealTime(_time);
   }
@@ -443,8 +495,16 @@ void WorldState::SetSimTime(const common::Time &_time)
 {
   State::SetSimTime(_time);
 
+  // Models
   for (ModelState_M::iterator iter = this->modelStates.begin();
        iter != this->modelStates.end(); ++iter)
+  {
+    iter->second.SetSimTime(_time);
+  }
+
+  // Lights
+  for (auto iter = this->lightStates.begin();
+      iter != this->lightStates.end(); ++iter)
   {
     iter->second.SetSimTime(_time);
   }
@@ -455,6 +515,11 @@ void WorldState::SetIterations(const uint64_t _iterations)
 {
   State::SetIterations(_iterations);
 
+  // Models
   for (auto &modelState : this->modelStates)
     modelState.second.SetIterations(_iterations);
+
+  // Lights
+  for (auto &lightState : this->lightStates)
+    lightState.second.SetIterations(_iterations);
 }

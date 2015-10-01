@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/LightState.hh"
 #include "gazebo/physics/Light.hh"
@@ -47,61 +46,36 @@ void Light::Init()
 }
 
 //////////////////////////////////////////////////
-void Light::FillMsg(msgs::Light &_msg)
-{
-  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
-
-  _msg.set_name(this->GetScopedName());
-  msgs::Set(_msg.mutable_pose(), relPose);
-}
-
-//////////////////////////////////////////////////
 void Light::ProcessMsg(const msgs::Light &_msg)
 {
-/*
-  if (_msg.has_id() && _msg.id() != this->GetId())
-  {
-    gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
-    return;
-  }
-  else if ((_msg.has_id() && _msg.id() != this->GetId()) &&
-            _msg.name() != this->GetScopedName())
-  {
-    gzerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
-      << "]\n";
-    return;
-  }
-*/
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
   {
     this->worldPose = msgs::ConvertIgn(_msg.pose());
   }
 
-//  this->msg->CopyFrom(_msg);
+  this->msg.MergeFrom(_msg);
+}
+
+//////////////////////////////////////////////////
+void Light::FillMsg(msgs::Light &_msg)
+{
+  _msg.MergeFrom(this->msg);
+
+  _msg.set_name(this->GetScopedName());
+
+  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
+  msgs::Set(_msg.mutable_pose(), relPose);
 }
 
 //////////////////////////////////////////////////
 void Light::SetState(const LightState &_state)
 {
+  if (this->worldPose == math::Pose(_state.Pose()))
+    return;
+
   this->worldPose = math::Pose(_state.Pose());
   this->PublishPose();
-}
-
-//////////////////////////////////////////////////
-void Light::OnPoseChange()
-{
-/*
-  ignition::math::Pose3d p;
-  for (unsigned int i = 0; i < this->attachedModels.size(); ++i)
-  {
-    p = this->GetWorldPose();
-    p.pos += this->attachedModelsOffset[i].pos;
-    p.rot = p.rot * this->attachedModelsOffset[i].rot;
-
-    this->attachedModels[i]->SetWorldPose(p, true);
-  }
-*/
 }
 
 //////////////////////////////////////////////////
