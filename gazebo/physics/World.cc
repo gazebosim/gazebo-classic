@@ -1713,9 +1713,9 @@ void World::ProcessLightMsgs()
     //
     // Note that this is dangerous, an old message might be trying to modify the
     // pose of a light which has been deleted and ends up creating a new light.
-    // Consider separating light handling into many topics like it's done for
-    // models: ~/factory, ~/model/modify, ~/pose/info.
-    // That would affect user code and other clients such as GzWeb.
+    //
+    // ~/factory is preferred, but support spawning lights through ~/light for
+    // backwards compatibility
     if (!light)
     {
       // Add to world SDF
@@ -1752,7 +1752,7 @@ void World::ProcessLightMsgs()
 //////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
-  std::list<sdf::ElementPtr> modelsToLoad;
+  std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
@@ -1886,11 +1886,7 @@ void World::ProcessFactoryMsgs()
         }
         else if (isLight)
         {
-          /// \TODO: Current broken. See Issue #67.
-          msgs::Light *lm = this->dataPtr->sceneMsg.add_light();
-          lm->CopyFrom(msgs::LightFromSDF(elem));
-
-          this->dataPtr->lightPub->Publish(*lm);
+          lightsToLoad.push_back(elem);
         }
       }
     }
@@ -1898,6 +1894,7 @@ void World::ProcessFactoryMsgs()
     this->dataPtr->factoryMsgs.clear();
   }
 
+  // Load models
   for (auto const &elem : modelsToLoad)
   {
     try
@@ -1911,6 +1908,21 @@ void World::ProcessFactoryMsgs()
     catch(...)
     {
       gzerr << "Loading model from factory message failed\n";
+    }
+  }
+
+  // Load lights
+  for (auto const &elem : lightsToLoad)
+  {
+    try
+    {
+      boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+      LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+    }
+    catch(...)
+    {
+      gzerr << "Loading light from factory message failed\n";
     }
   }
 }
