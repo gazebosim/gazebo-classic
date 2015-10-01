@@ -9,6 +9,10 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/rendering/Visual.hh**
+    + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true); 
+    + ***Replacement:*** public: virtual void SetVisible(bool _visible, bool _cascade = true);
+
 1. **gazebo/rendering/OribitViewController.hh**
     + ***Removed:*** public: OrbitViewController(UserCameraPtr _camera);
     + ***Replacement:*** public: OrbitViewController(UserCameraPtr _camera, const std::string &_name = "OrbitViewController");
