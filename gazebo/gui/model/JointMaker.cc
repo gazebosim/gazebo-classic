@@ -1253,8 +1253,8 @@ void JointMaker::DeselectAll()
     rendering::VisualPtr vis = scene->GetVisual(this->selectedJoints[0]);
     if (vis)
       vis->SetHighlighted(false);
-    this->selectedJoints.erase(this->selectedJoints.begin());
     model::Events::setSelectedJoint(this->selectedJoints[0], false);
+    this->selectedJoints.erase(this->selectedJoints.begin());
   }
 }
 
