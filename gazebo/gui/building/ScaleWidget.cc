@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/bind.hpp>
 #include <sstream>
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/ScaleWidget.hh"
