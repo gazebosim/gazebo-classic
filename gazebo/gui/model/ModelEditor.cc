@@ -256,6 +256,10 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
       SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
 
+  this->dataPtr->connections.push_back(
+      gui::Events::ConnectCreateEntity(
+        boost::bind(&ModelEditor::OnCreateEntity, this, _1, _2)));
+
   this->dataPtr->menuBar = NULL;
   this->dataPtr->insertModel = NULL;
 }
@@ -481,4 +485,44 @@ void ModelEditor::ToggleToolbar()
     gui::Events::windowMode("ModelEditor");
   else
     gui::Events::windowMode("Simulation");
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::OnCreateEntity(const std::string &_type,
+                                  const std::string &_data)
+{
+  if (!this->dataPtr->active)
+    return;
+
+  if (_type == "model" && !_data.empty())
+  {
+
+    sdf::SDFPtr modelSDF(new sdf::SDF);
+    sdf::initFile("root.sdf", modelSDF);
+
+    if (!sdf::readFile(_data, modelSDF))
+    {
+      gzerr << "Unable to load file[" << _data << "]\n";
+      return;
+    }
+
+    if (modelSDF->Root()->HasElement("model"))
+    {
+      this->AddEntity(modelSDF->Root()->GetElement("model"));
+    }
+    else
+    {
+      gzerr << "No model in SDF\n";
+      return;
+    }
+
+  }
+}
+
+////////////////////////////////////////////////
+void ModelEditor::AddEntity(sdf::ElementPtr _sdf)
+{
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+  this->dataPtr->modelPalette->GetModelCreator()->AddEntity(_sdf);
 }

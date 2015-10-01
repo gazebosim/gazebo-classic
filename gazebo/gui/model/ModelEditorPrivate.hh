@@ -92,6 +92,9 @@ namespace gazebo
 
       /// \brief Camera perspective view action cloned from main window.
       public: QAction *cameraPerspectiveAct;
+
+      /// \brief A list of event connections.
+      public: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

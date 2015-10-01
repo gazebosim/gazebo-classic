@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
 #include "gazebo/util/system.hh"
@@ -100,6 +102,18 @@ namespace gazebo
 
       /// \brief Create menus
       private: void CreateMenus();
+
+      /// \brief Event callback used for inserting models into the editor
+      /// \param[in] _type Type of entity to be inserted
+      /// \param[in] _data Event data (e.g. name of model).
+      private: void OnCreateEntity(const std::string &_type,
+                                   const std::string &_data);
+
+      /// \brief Add an entity to the editor
+      /// \param[in] _sdf SDF describing the entity.
+      public: void AddEntity(sdf::ElementPtr _sdf);
+
+
 
       /// \internal
       /// \brief Pointer to private data.

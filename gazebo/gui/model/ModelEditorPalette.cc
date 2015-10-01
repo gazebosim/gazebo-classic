@@ -166,7 +166,7 @@ void ModelEditorPalette::OnCylinder()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddLink(ModelCreator::LINK_CYLINDER);
+  this->modelCreator->AddLink(ModelCreator::ENTITY_CYLINDER);
 }
 
 /////////////////////////////////////////////////
@@ -175,7 +175,7 @@ void ModelEditorPalette::OnSphere()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddLink(ModelCreator::LINK_SPHERE);
+  this->modelCreator->AddLink(ModelCreator::ENTITY_SPHERE);
 }
 
 /////////////////////////////////////////////////
@@ -184,7 +184,7 @@ void ModelEditorPalette::OnBox()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddLink(ModelCreator::LINK_BOX);
+  this->modelCreator->AddLink(ModelCreator::ENTITY_BOX);
 }
 
 /////////////////////////////////////////////////
@@ -202,7 +202,7 @@ void ModelEditorPalette::OnCustom()
       if (info.completeSuffix().toLower() == "dae" ||
           info.completeSuffix().toLower() == "stl")
       {
-        this->modelCreator->AddShape(ModelCreator::LINK_MESH,
+        this->modelCreator->AddShape(ModelCreator::ENTITY_MESH,
             math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
       }
       else if (info.completeSuffix().toLower() == "svg")
@@ -211,7 +211,7 @@ void ModelEditorPalette::OnCustom()
         extrudeDialog.deleteLater();
         if (extrudeDialog.exec() == QDialog::Accepted)
         {
-          this->modelCreator->AddShape(ModelCreator::LINK_POLYLINE,
+          this->modelCreator->AddShape(ModelCreator::ENTITY_POLYLINE,
               math::Vector3(1.0/extrudeDialog.GetResolution(),
               1.0/extrudeDialog.GetResolution(),
               extrudeDialog.GetThickness()),

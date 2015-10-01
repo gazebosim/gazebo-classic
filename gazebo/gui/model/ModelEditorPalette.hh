@@ -91,24 +91,25 @@ namespace gazebo
           const std::string &_mode);
 
       /// \brief Callback when a link is selected.
-      /// \param[in] _name Name of link.
+      /// \param[in] _linkId Unique id of link.
       /// \param[in] _selected True if the link is selected, false if
       /// deselected.
-      private: void OnSetSelectedLink(const std::string &_name, bool _selected);
+      private: void OnSetSelectedLink(const std::string &_linkId,
+          const bool _selected);
 
       /// \brief Callback when a joint is selected.
-      /// \param[in] _name Name of joint.
+      /// \param[in] _jointId Unique id of joint.
       /// \param[in] _selected True if the joint is selected, false if
       /// deselected.
-      private: void OnSetSelectedJoint(const std::string &_name,
-          bool _selected);
+      private: void OnSetSelectedJoint(const std::string &_jointId,
+          const bool _selected);
 
       /// \brief Callback when a model plugin is selected.
       /// \param[in] _name Name of model plugin.
       /// \param[in] _selected True if the model plugin is selected, false if
       /// deselected.
       private: void OnSetSelectedModelPlugin(const std::string &_name,
-          bool _selected);
+          const bool _selected);
 
       /// \brief Helper function to deselect a specific type, such as link or
       /// joint.
@@ -212,6 +213,14 @@ namespace gazebo
       /// \param[in] _name New name.
       private: void OnModelPropertiesChanged(bool _static, bool _autoDisable,
           const math::Pose &_pose, const std::string &_name);
+
+      /// \brief Recursively look for an item with the given data under the
+      /// given _parentItem.
+      /// \param[in] _data Data which was assigned to the searched item as
+      /// (0, Qt::UserRole) when the item was created.
+      /// \param[in] _parentItem Item to look within.
+      private: QTreeWidgetItem *FindItemByData(const std::string &_data,
+          const QTreeWidgetItem &_parentItem);
 
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;*/

@@ -15,6 +15,10 @@
  *
 */
 
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorPalette_TEST.hh"
