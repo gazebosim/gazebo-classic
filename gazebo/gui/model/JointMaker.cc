@@ -331,7 +331,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
                 this->selectedJoints.end(), vis);
             // Highlight and select clicked joint if not already selected
             // Otherwise deselect if already selected
-            this->SetSelected(vis, it == this->selectedJoints.end());
+            this->SetSelected(vis->GetName(), it == this->selectedJoints.end());
           }
         }
       }
@@ -719,7 +719,7 @@ bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
     {
       for (auto jointVis : this->selectedJoints)
       {
-        this->RemoveJoint(jointVis->GetName());
+        this->RemoveJoint(jointVis);
       }
       this->DeselectAll();
       return true;
@@ -1209,7 +1209,7 @@ void JointMaker::SetSelected(const std::string &_name,
   if (it == this->joints.end())
     return;
 
-  this->SetSelected((*it).second->hotspot, _selected);
+  this->SetSelected((*it).second->hotspot->GetName(), _selected);
 }
 
 /////////////////////////////////////////////////
@@ -1226,7 +1226,7 @@ void JointMaker::SetSelected(rendering::VisualPtr _jointVis,
   {
     if (it == this->selectedJoints.end())
     {
-      this->selectedJoints.push_back(_jointVis);
+      this->selectedJoints.push_back(_jointVis->GetName());
       model::Events::setSelectedJoint(_jointVis->GetName(), _selected);
     }
   }
@@ -1243,12 +1243,14 @@ void JointMaker::SetSelected(rendering::VisualPtr _jointVis,
 /////////////////////////////////////////////////
 void JointMaker::DeselectAll()
 {
+  rendering::ScenePtr scene = rendering::get_scene();
   while (!this->selectedJoints.empty())
   {
-    rendering::VisualPtr vis = this->selectedJoints[0];
-    vis->SetHighlighted(false);
+    rendering::VisualPtr vis = scene->GetVisual(this->selectedJoints[0]);
+    if (vis)
+      vis->SetHighlighted(false);
     this->selectedJoints.erase(this->selectedJoints.begin());
-    model::Events::setSelectedJoint(vis->GetName(), false);
+    model::Events::setSelectedJoint(this->selectedJoints[0], false);
   }
 }
 

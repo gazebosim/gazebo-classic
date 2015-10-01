@@ -339,7 +339,7 @@ namespace gazebo
       private: boost::recursive_mutex *updateMutex;
 
       /// \brief A list of selected link visuals.
-      private: std::vector<rendering::VisualPtr> selectedJoints;
+      private: std::vector<std::string> selectedJoints;
 
       /// \brief A list of scoped link names.
       private: std::vector<std::string> scopedLinkedNames;
