@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 #include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"

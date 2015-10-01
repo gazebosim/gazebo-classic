@@ -18,6 +18,7 @@
  * Author: Carle Cote
  * Date: 23 february 2004
 */
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/MultiRayShape.hh"

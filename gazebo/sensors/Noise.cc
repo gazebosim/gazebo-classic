@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/function.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 

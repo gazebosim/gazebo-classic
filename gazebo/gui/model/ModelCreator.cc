@@ -15,6 +15,7 @@
  *
  */
 
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <sstream>
 #include <string>

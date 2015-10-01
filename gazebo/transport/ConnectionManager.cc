@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Console.hh"

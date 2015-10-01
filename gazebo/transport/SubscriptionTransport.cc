@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include "gazebo/transport/ConnectionManager.hh"
 #include "gazebo/transport/SubscriptionTransport.hh"
 

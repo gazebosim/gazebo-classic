@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <math.h>
 
 #include "gazebo/common/Assert.hh"

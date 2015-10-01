@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/gui/JointControlWidget.hh"

@@ -23,6 +23,7 @@
 #include <list>
 #include <vector>
 
+#include <boost/function.hpp>
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"

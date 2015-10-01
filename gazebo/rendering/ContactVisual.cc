@@ -17,6 +17,7 @@
 /* Desc: Contact Visualization Class
  * Author: Nate Koenig
  */
+#include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/Node.hh"

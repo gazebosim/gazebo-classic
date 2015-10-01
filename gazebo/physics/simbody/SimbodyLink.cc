@@ -19,6 +19,7 @@
  * Date: 13 Feb 2006
  */
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 
 #include "gazebo/common/Assert.hh"

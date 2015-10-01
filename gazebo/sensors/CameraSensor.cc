@@ -18,6 +18,8 @@
  * Author: Nate Koenig
  * Date: 15 July 2003
  */
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"

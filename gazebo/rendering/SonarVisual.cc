@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"

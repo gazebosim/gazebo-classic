@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/SurfaceParams.hh"
