@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/Scene.hh"
