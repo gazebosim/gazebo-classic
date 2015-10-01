@@ -138,7 +138,8 @@ class BitbucketPullRequests
     summaries_hg.split("\n").each { |sum|
       id = sum.scan(/#[0-9]*\)/).to_s()[/([0-9])+/]
         jsonHash = getJson(@url_pullrequests + "/" + id)
-      puts "[pr #{id}] " + jsonHash["title"]
+      puts "1. " + jsonHash["title"]
+      puts "    * [Pull request #{id}](https://bitbucket.org/osrf/gazebo/pull-request/#{id})"
     }
   end
 
