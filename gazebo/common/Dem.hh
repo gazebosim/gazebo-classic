@@ -73,15 +73,6 @@ namespace gazebo
       /// origin in WGS84.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
-      /// \deprecated See GetGeoReferenceOrigin() that accepts
-      /// ignition::math::Angle objects.
-      public: void GetGeoReferenceOrigin(math::Angle &_latitude,
-                  math::Angle &_longitude) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the georeferenced coordinates (lat, long) of the terrain's
-      /// origin in WGS84.
-      /// \param[out] _latitude Georeferenced latitude.
-      /// \param[out] _longitude Georeferenced longitude.
       public: void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,
                   ignition::math::Angle &_longitude) const;
 
@@ -110,22 +101,6 @@ namespace gazebo
       /// \brief Get the real world height in meters.
       /// \return Terrain's real world height in meters.
       public: double GetWorldHeight() const;
-
-      /// \brief Create a lookup table of the terrain's height.
-      /// \param[in] _subsampling Multiplier used to increase the resolution.
-      /// Ex: A subsampling of 2 in a terrain of 129x129 means that the height
-      /// vector will be 257 * 257.
-      /// \param[in] _vertSize Number of points per row.
-      /// \param[in] _size Real dimmensions of the terrain in meters.
-      /// \param[in] _scale Vector3 used to scale the height.
-      /// \param[in] _flipY If true, it inverts the order in which the vector
-      /// is filled.
-      /// \param[out] _heights Vector containing the terrain heights.
-      /// \deprecated See FillHeightMap() function that accepts
-      /// ignition::math objects.
-      public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
-          const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
-          std::vector<float> &_heights) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Create a lookup table of the terrain's height.
       /// \param[in] _subsampling Multiplier used to increase the resolution.
