@@ -2,6 +2,10 @@
 
 ### Gazebo 6.x.x
 
+1. Update inertia properties during simulation
+    * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
+    * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
+
 1. Update physics when the world is reset
     * Backport of [pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
     * [Pull request #1916](https://bitbucket.org/osrf/gazebo/pull-request/1916)
