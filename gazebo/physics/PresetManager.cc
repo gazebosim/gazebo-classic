@@ -73,6 +73,10 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
   {
     for (auto const &param : this->dataPtr->parameterMap)
     {
+      #ifndef _WIN32
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+      #endif
       // disable params we know can't be set
       if (param.first != "type" &&
           !_physicsEngine->SetParam(param.first, param.second))
@@ -81,6 +85,9 @@ bool Preset::SetAllPhysicsParameters(PhysicsEnginePtr _physicsEngine) const
           << "] in physics engine" << std::endl;
         result = false;
       }
+      #ifndef _WIN32
+      #pragma GCC diagnostic pop
+      #endif
     }
   }
 

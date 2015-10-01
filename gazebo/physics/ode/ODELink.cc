@@ -124,7 +124,7 @@ void ODELink::Init()
           // Set max_vel and min_depth
           if (g->GetODESurface()->maxVel < 0)
           {
-            if(!this->GetWorld()->GetPhysicsEngine()->Param<double>(
+            if (!this->GetWorld()->GetPhysicsEngine()->Param<double>(
                   "contact_max_correcting_vel", g->GetODESurface()->maxVel))
             {
               gzerr << "Failed to get contact_max_correcting_vel\n";

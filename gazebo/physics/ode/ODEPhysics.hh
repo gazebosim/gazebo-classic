@@ -137,26 +137,48 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
 
-      // Documentation inherited
-      public: virtual void SetWorldCFM(double cfm);
+      /// \brief Set the CFM parameter
+      /// \param[in] _cfm New constraint force mixing  value
+      /// \sa GetWorldCFM
+      public: void SetWorldCFM(const double &_cfm);
 
-      // Documentation inherited
-      public: virtual void SetWorldERP(double erp);
+      /// \brief Set the ERP parameter
+      /// \param[in] _value New error reduction parameter value
+      /// \sa GetWorldERP
+      public: void SetWorldERP(double erp);
+
+      /// \brief Get the minimum step size
+      /// \return The minimum step size.
+      /// \sa SetMinStepSize
+      public: double MinStepSize() const;
+
+      /// \brief Set the minimum step size
+      /// \param[in] _value The minimum step size.
+      /// \sa MinStepSize
+      public: void SetMinStepSize(const double &_value);
 
       // Documentation inherited
       public: virtual void SetSORPGSPreconIters(unsigned int iters);
 
-      // Documentation inherited
-      public: virtual void SetSORPGSIters(unsigned int iters);
+      /// \brief Set the successive over-relaxation PGS iterations parameter
+      /// value.
+      /// \param[in] _iters The successive over-relaxation PGS iterations.
+      /// value.
+      /// \sa GetSORPGSIters
+      public: void SetSORPGSIters(const unsigned int &_iters);
 
       // Documentation inherited
       public: virtual void SetSORPGSW(double w);
 
-      // Documentation inherited
-      public: virtual void SetContactMaxCorrectingVel(double vel);
+      /// \brief Set the contact max correcting velocity parameter value.
+      /// \param[in] _vel Max correcting velocity.
+      /// \sa SetContactMaxCorrectingVel
+      public: void SetContactMaxCorrectingVel(const double &_vel);
 
-      // Documentation inherited
-      public: virtual void SetContactSurfaceLayer(double layer_depth);
+      /// \brief Set the contact surface layer parameter value
+      /// \param[in] _layerDepth Surface layer depth
+      /// \sa GetContactSurfaceLayer
+      public: void SetContactSurfaceLayer(const double &_layerDepth);
 
       /// \brief Set friction model type.
       /// \param[in] _fricModel Type of friction model.
@@ -168,25 +190,35 @@ namespace gazebo
               SetWorldStepSolverType(const std::string &_worldSolverType);
 
       // Documentation inherited
-      public: virtual void SetMaxContacts(unsigned int max_contacts);
+      public: virtual void SetMaxContacts(const unsigned int &_maxContacts);
 
-      // Documentation inherited
-      public: virtual double GetWorldCFM();
+      /// \brief Get the CFM parameter
+      /// \return The constraint force mixing parameter value
+      /// \sa SetWorldCFM
+      public: double GetWorldCFM() const;
 
-      // Documentation inherited
-      public: virtual double GetWorldERP();
+      /// \brief Get the ERP parameter
+      /// \return The error reduction parameter value
+      /// \sa SetWorldERP
+      public: double GetWorldERP();
 
       // Documentation inherited
       public: virtual int GetSORPGSPreconIters();
 
-      // Documentation inherited
-      public: virtual int GetSORPGSIters();
+      /// \brief Get the successive over-relaxation PGS iterations parameter
+      /// value.
+      /// \return The successive over-relaxation PGS iterations parameter
+      /// value.
+      /// \sa SetSORPGSIters
+      public: unsigned int GetSORPGSIters() const;
 
       // Documentation inherited
       public: virtual double GetSORPGSW();
 
-      // Documentation inherited
-      public: virtual double GetContactMaxCorrectingVel();
+      /// \brief Get the contact max correcting velocity parameter value.
+      /// \return Max correcting velocity value.
+      /// \sa SetContactMaxCorrectingVel
+      public: double GetContactMaxCorrectingVel() const;
 
       /// \brief Get friction model.
       /// \return Friction model type.
@@ -196,8 +228,10 @@ namespace gazebo
       /// \return Type of solver used by world step.
       public: virtual std::string GetWorldStepSolverType() const;
 
-      // Documentation inherited
-      public: virtual double GetContactSurfaceLayer();
+      /// \brief Get the contact surface layer parameter value
+      /// \return Contact suerface layer depth.
+      /// \sa SetContactSurfaceLayer
+      public: double GetContactSurfaceLayer() const;
 
       // Documentation inherited
       public: virtual unsigned int GetMaxContacts();
@@ -207,10 +241,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
-
-      /// Documentation inherited
-      public: virtual bool SetParam(const std::string &_key,
-                  const boost::any &_value);
 
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
@@ -268,7 +298,7 @@ namespace gazebo
 
       /// \brief Get the step type (quick, world).
       /// \return The step type.
-      public: virtual std::string GetStepType() const;
+      public: std::string GetStepType() const;
 
       /// \brief Set the step type (quick, world).
       /// \param[in] _type The step type (quick or world).
@@ -309,6 +339,84 @@ namespace gazebo
       /// \param[in] _collision2 The second collision object.
       private: void AddCollider(ODECollision *_collision1,
                                 ODECollision *_collision2);
+
+
+      /// \brief Get the SOR LCP Tolerance value
+      /// \return The successive over-relaxation linear complementatory
+      /// problem tolerance value.
+      /// \sa SetSORLCPTolerance
+      public: double SORLCPTolerance() const;
+
+      /// \brief Set the SOR LCP Tolerance value
+      /// \param[in] _value The successive over-relaxation linear
+      /// complementatory problem tolerance value.
+      /// \sa SORLCPTolerance
+      public: void SetSORLCPTolerance(const double &_value);
+
+      /// \brief Get whether dynamic rescaling of the momement of inertia is
+      /// enabled.
+      /// \return True if dynamic rescaling of the MOI is enabled.
+      /// \sa SetUseDynamicMOIRescaling
+      public: bool UseDynamicMOIRescaling() const;
+
+      /// \brief Set whether dynamic rescaling of the momement of inertia is
+      /// enabled.
+      /// \param[in] _value True if dynamic rescaling of the MOI is enabled.
+      /// \sa UseDynamicMOIRescaling
+      public: void SetUseDynamicMOIRescaling(const bool &_value);
+
+      /// \brief Get the contact residual smoothing parameter value.
+      /// \return the contact residual smoothing value
+      /// \sa SetContactResidualSmoothing
+      public: double ContactResidualSmoothing() const;
+
+      /// \brief Set the contact residual smoothing parameter value.
+      /// \param[in] _value The contact residual smoothing value
+      /// \sa ContactResidualSmoothing
+      public: void SetContactResidualSmoothing(const double &_value);
+
+      /// \brief Get the thread position correction parameter value.
+      /// \return The thread position correction parameter value
+      /// \sa SetThreadPositionCorrection
+      public: bool ThreadPositionCorrection() const;
+
+      /// \brief Set the thread position correction parameter value.
+      /// \param[in] _value The thread position correction parameter value
+      /// \sa ThreadPositionCorrection
+      public: void SetThreadPositionCorrection(const bool &_value);
+
+      /// \brief Get the experimental row reordering parameter value
+      /// \return The experimental row reordering parameter value
+      /// \sa SetExperimentalRowReordering
+      public: bool ExperimentalRowReordering() const;
+
+      /// \brief Set the experimental row reordering parameter value
+      /// \param[in] _value The experimental row reordering parameter value
+      /// \sa ExperimentalRowReordering
+      public: void SetExperimentalRowReordering(const bool &_value);
+
+      /// \brief Get the warm start factor
+      /// \return The warm start factor
+      /// \sa SetWarmStartFactor
+      public: double WarmStartFactor() const;
+
+      /// \brief Set the warm start factor
+      /// \param[in] _value The warm start factor
+      /// \sa WarmStartFactor
+      public: void SetWarmStartFactor(const double &_value);
+
+      /// \brief Get the extra friction iterations parameter value
+      /// \return The extra friction iterations parameter value
+      /// \sa SetExtraFrictionIterations
+      public: double ExtraFrictionIterations() const;
+
+      /// \brief Get the extra friction iterations parameter value
+      /// \param[in] _value The extra friction iterations parameter value
+      /// \sa ExtraFrictionIterations
+      public: void SetExtraFrictionIterations(const int &_value);
+
+      /// \brief Helper function to create all the ODE parameters.
+      private: void CreateParams();
 
       /// \internal
       /// \brief Private data pointer.

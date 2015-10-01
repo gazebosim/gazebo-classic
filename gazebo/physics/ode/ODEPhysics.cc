@@ -154,54 +154,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
   // Note: this was moved from physics::PhysicsEngine constructor.
   this->SetSeed(math::Rand::GetSeed());
 
-  this->params.Add<double>("solver_type",
-      std::bind(&PhysicsEngine::GetStepType, this),
-      std::bind(&PhysicsEngine::SetStepType, this, std::placeholders::_1));
-
-  this->params.Add<double>("cfm",
-      std::bind(&PhysicsEngine::CFM, this),
-      std::bind(&PhysicsEngine::SetCFM, this, std::placeholders::_1));
-
-  this->params.Add<double>("erp",
-      std::bind(&PhysicsEngine::ERP, this),
-      std::bind(&PhysicsEngine::SetERP, this, std::placeholders::_1));
-
-  this->params.Add<double>("sor",
-      std::bind(&PhysicsEngine::SOR, this),
-      std::bind(&PhysicsEngine::SetSOR, this, std::placeholders::_1));
-
-  this->params.Add<int>("percon_iters",
-      std::bind(&PhysicsEngine::PreconIters, this),
-      std::bind(&PhysicsEngine::SetPreconIters, this, std::placeholders::_1));
-
-  this->params.Add<int>("iters",
-      std::bind(&PhysicsEngine::Iters, this),
-      std::bind(&PhysicsEngine::SetIters, this, std::placeholders::_1));
-
-  this->params.Add<std::string>("friction_model",
-      std::bind(&PhysicsEngine::GetFrictionModel, this),
-      std::bind(&PhysicsEngine::SetFrictionModel, this, std::placeholders::_1));
-
-  this->params.Add<std::string>("world_step_solver",
-      std::bind(&PhysicsEngine::GetWorldStepSolverType, this),
-      std::bind(&PhysicsEngine::SetWorldStepSolverType, this,
-        std::placeholders::_1));
-
-  this->params.Add<double>("contact_max_correcting_vel",
-      std::bind(&PhysicsEngine::ContactMaxCorrectingVel, this),
-      std::bind(&PhysicsEngine::SetContactMaxCorrectingVel, this,
-        std::placeholders::_1));
-
-  this->params.Add<double>("contact_surface_layer",
-      std::bind(&PhysicsEngine::ContactSurfaceLayer, this),
-      std::bind(&PhysicsEngine::SetContactSurfaceLayer, this,
-        std::placeholders::_1));
-
-  this->params.Add<double>("max_contacts",
-      std::bind(&PhysicsEngine::MaxContacts, this),
-      std::bind(&PhysicsEngine::SetMaxContacts, this,
-        std::placeholders::_1));
-
+  this->CreateParams();
 }
 
 //////////////////////////////////////////////////
@@ -729,7 +682,7 @@ void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetSORPGSIters(unsigned int _iters)
+void ODEPhysics::SetSORPGSIters(const unsigned int &_iters)
 {
   this->sdf->GetElement("ode")->GetElement(
       "solver")->GetElement("iters")->Set(_iters);
@@ -756,7 +709,7 @@ void ODEPhysics::SetFrictionModel(const std::string &_fricModel)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetWorldCFM(double _cfm)
+void ODEPhysics::SetWorldCFM(const double &_cfm)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
   elem = elem->GetElement("constraints");
@@ -775,7 +728,7 @@ void ODEPhysics::SetWorldERP(double _erp)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetContactMaxCorrectingVel(double _vel)
+void ODEPhysics::SetContactMaxCorrectingVel(const double &_vel)
 {
   this->sdf->GetElement("ode")->GetElement(
       "constraints")->GetElement(
@@ -784,7 +737,7 @@ void ODEPhysics::SetContactMaxCorrectingVel(double _vel)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetContactSurfaceLayer(double _depth)
+void ODEPhysics::SetContactSurfaceLayer(const double &_depth)
 {
   this->sdf->GetElement("ode")->GetElement(
       "constraints")->GetElement("contact_surface_layer")->Set(_depth);
@@ -792,7 +745,7 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
+void ODEPhysics::SetMaxContacts(const unsigned int &_maxContacts)
 {
   this->dataPtr->maxContacts = _maxContacts;
   this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
@@ -801,8 +754,8 @@ void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 //////////////////////////////////////////////////
 void ODEPhysics::SetWorldStepSolverType(const std::string &_worldSolverType)
 {
-    dWorldSetWorldStepSolverType(this->dataPtr->worldId,
-    ConvertWorldStepSolverType(_worldSolverType));
+  dWorldSetWorldStepSolverType(this->dataPtr->worldId,
+      ConvertWorldStepSolverType(_worldSolverType));
 }
 
 //////////////////////////////////////////////////
@@ -811,11 +764,12 @@ int ODEPhysics::GetSORPGSPreconIters()
   return this->sdf->GetElement("ode")->GetElement(
       "solver")->Get<int>("precon_iters");
 }
+
 //////////////////////////////////////////////////
-int ODEPhysics::GetSORPGSIters()
+unsigned int ODEPhysics::GetSORPGSIters() const
 {
   return this->sdf->GetElement("ode")->GetElement(
-      "solver")->Get<int>("iters");
+      "solver")->Get<unsigned int>("iters");
 }
 
 //////////////////////////////////////////////////
@@ -840,7 +794,7 @@ std::string ODEPhysics::GetWorldStepSolverType() const
 }
 
 //////////////////////////////////////////////////
-double ODEPhysics::GetWorldCFM()
+double ODEPhysics::GetWorldCFM() const
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
   elem = elem->GetElement("constraints");
@@ -856,14 +810,14 @@ double ODEPhysics::GetWorldERP()
 }
 
 //////////////////////////////////////////////////
-double ODEPhysics::GetContactMaxCorrectingVel()
+double ODEPhysics::GetContactMaxCorrectingVel() const
 {
   return this->sdf->GetElement("ode")->GetElement(
       "constraints")->Get<double>("contact_max_correcting_vel");
 }
 
 //////////////////////////////////////////////////
-double ODEPhysics::GetContactSurfaceLayer()
+double ODEPhysics::GetContactSurfaceLayer() const
 {
   return this->sdf->GetElement("ode")->GetElement(
       "constraints")->Get<double>("contact_surface_layer");
@@ -1405,189 +1359,107 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetCFM(const double &_value)
+double ODEPhysics::MinStepSize() const
 {
-  odeElem->GetElement("constraints")->GetElement("cfm")->Set(_value);
-  dWorldSetCFM(this->dataPtr->worldId, _value);
+  return this->sdf->GetElement("ode")->GetElement("solver")->Get<double>(
+      "min_step_size");
 }
 
 //////////////////////////////////////////////////
-double ODEPhysics::CFM() const
+void ODEPhysics::SetMinStepSize(const double &_value)
 {
-  return this->sdf->GetElement("ode")->GetElement(
-      "constraints")->Get<double>("cfm");
+  this->sdf->GetElement("ode")->GetElement("solver")->GetElement(
+      "min_step_size")->GetValue()->Set(_value);
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetERP(const double &_value)
+double ODEPhysics::SORLCPTolerance() const
 {
-  odeElem->GetElement("constraints")->GetElement("erp")->Set(_value);
-  dWorldSetERP(this->dataPtr->worldId, _value);
+  return dWorldGetQuickStepTolerance(this->dataPtr->worldId);
 }
 
 //////////////////////////////////////////////////
-double ODEPhysics::ERP() const
+void ODEPhysics::SetSORLCPTolerance(const double &_value)
 {
-  return this->sdf->GetElement("ode")->GetElement(
-      "constraints")->Get<double>("erp");
+  dWorldSetQuickStepTolerance(this->dataPtr->worldId, _value);
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetSOR(const double &_value)
+bool ODEPhysics::UseDynamicMOIRescaling() const
 {
-  odeElem->GetElement("solver")->GetElement("sor")->Set(_value);
-  dWorldSetQuickStepW(this->dataPtr->worldId, _value);
+  return dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
 }
 
 //////////////////////////////////////////////////
-double ODEPhysics::SOR() const
+void ODEPhysics::SetUseDynamicMOIRescaling(const bool &_value)
 {
-  return this->sdf->GetElement("ode")->GetElement("solver")->Get<double>("sor");
-}
-
-//////////////////////////////////////////////////
-void ODEPhysics::SetPreconIters(const int &_value)
-{
-  odeElem->GetElement("solver")->GetElement("precon_iters")->Set(_value);
-  dWorldSetQuickStepPreconIterations(this->dataPtr->worldId, _value);
-}
-
-//////////////////////////////////////////////////
-int ODEPhysics::PreconIters() const
-{
-  return this->sdf->GetElement("ode")->GetElement(
-      "solver")->Get<int>("precon_iters");
-}
-
-//////////////////////////////////////////////////
-void ODEPhysics::SetIters(const int &_value)
-{
-  odeElem->GetElement("solver")->GetElement("iters")->Set(_value);
-  dWorldSetQuickStepNumIterations(this->dataPtr->worldId, _value);
-}
-
-//////////////////////////////////////////////////
-int ODEPhysics::Iters() const
-{
-  return this->sdf->GetElement("ode")->GetElement("solver")->Get<int>("iters");
-}
-
-//////////////////////////////////////////////////
-void ODEPhysics::SetContactMaxCorrectingVel(const double &_value)
-{
-  odeElem->GetElement("constraints")->GetElement(
-      "contact_max_correcting_vel")->Set(_value);
-  dWorldSetContactMaxCorrectingVel(this->dataPtr->worldId, _value);
-}
-
-//////////////////////////////////////////////////
-double ODEPhysics::ContactMaxCorrectingVel() const
-{
-  return this->sdf->GetElement("ode")->GetElement(
-      "constraints")->Get<double>("contact_max_correcting_vel");
-}
-
-//////////////////////////////////////////////////
-void ODEPhysics::SetContactSurfaceLayer(const double &_value)
-{
-  this->sdf->GetElement("ode")->GetElement("constraints")->GetElement(
-      "contact_surface_layer")->Set(_value);
-  dWorldSetContactSurfaceLayer(this->dataPtr->worldId, _value);
-}
-
-//////////////////////////////////////////////////
-double ODEPhysics::ContactSurfaceLayer() const
-{
-  return this->sdf->GetElement("ode")->GetElement(
-      "constraints")->Get<double>("contact_surface_layer");
-}
-
-//////////////////////////////////////////////////
-void ODEPhysics::SetMaxContacts(const int &_value)
-{
-  this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
-}
-
-//////////////////////////////////////////////////
-int ODEPhysics::ContactSurfaceLayer() const
-{
-  return this->sdf->Get<int>("max_contacts");
-}
-
-//////////////////////////////////////////////////
-bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
-{
-  sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
-
-  try
+  dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, _value);
+  if (this->sdf->GetElement("ode")->GetElement("solver")->HasElement(
+        "use_dynamic_moi_rescaling"))
   {
-    else if (_key == "min_step_size")
-    {
-      /// TODO: Implement min step size param
-      double value = boost::any_cast<double>(_value);
-      odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
-    }
-    else if (_key == "sor_lcp_tolerance")
-    {
-      dWorldSetQuickStepTolerance(this->dataPtr->worldId,
-          boost::any_cast<double>(_value));
-    }
-    else if (_key == "rms_error_tolerance")
-    {
-      gzwarn << "please use sor_lcp_tolerance in the future.\n";
-      dWorldSetQuickStepTolerance(this->dataPtr->worldId,
-          boost::any_cast<double>(_value));
-    }
-    else if (_key == "inertia_ratio_reduction" ||
-             _key == "use_dynamic_moi_rescaling")
-    {
-      bool value = boost::any_cast<bool>(_value);
-      dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, value);
-      if (odeElem->GetElement("solver")->HasElement(
-            "use_dynamic_moi_rescaling"))
-      {
-        odeElem->GetElement("solver")->GetElement(
-            "use_dynamic_moi_rescaling")->Set(value);
-      }
-    }
-    else if (_key == "contact_residual_smoothing")
-    {
-      dWorldSetQuickStepContactResidualSmoothing(this->dataPtr->worldId,
-        boost::any_cast<double>(_value));
-    }
-    else if (_key == "thread_position_correction")
-    {
-      dWorldSetQuickStepThreadPositionCorrection(this->dataPtr->worldId,
-        boost::any_cast<bool>(_value));
-    }
-    else if (_key == "experimental_row_reordering")
-    {
-      dWorldSetQuickStepExperimentalRowReordering(this->dataPtr->worldId,
-        boost::any_cast<bool>(_value));
-    }
-    else if (_key == "warm_start_factor")
-    {
-      dWorldSetQuickStepWarmStartFactor(this->dataPtr->worldId,
-        boost::any_cast<double>(_value));
-    }
-    else if (_key == "extra_friction_iterations")
-    {
-      dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId,
-        boost::any_cast<int>(_value));
-    }
-    else
-    {
-      return PhysicsEngine::SetParam(_key, _value);
-    }
+    this->sdf->GetElement("ode")->GetElement("solver")->GetElement(
+        "use_dynamic_moi_rescaling")->Set(_value);
   }
-  catch(boost::bad_any_cast &e)
-  {
-    gzerr << "ODEPhysics::SetParam(" << _key << ") boost::any_cast error: "
-          << e.what() << std::endl;
-    return false;
-  }
-  return true;
+}
+
+//////////////////////////////////////////////////
+double ODEPhysics::ContactResidualSmoothing() const
+{
+  return dWorldGetQuickStepContactResidualSmoothing(this->dataPtr->worldId);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetContactResidualSmoothing(const double &_value)
+{
+  dWorldSetQuickStepContactResidualSmoothing(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+bool ODEPhysics::ThreadPositionCorrection() const
+{
+  return dWorldGetQuickStepThreadPositionCorrection(this->dataPtr->worldId);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetThreadPositionCorrection(const bool &_value)
+{
+  dWorldSetQuickStepThreadPositionCorrection(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+bool ODEPhysics::ExperimentalRowReordering() const
+{
+  return dWorldGetQuickStepExperimentalRowReordering(this->dataPtr->worldId);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetExperimentalRowReordering(const bool &_value)
+{
+  dWorldSetQuickStepExperimentalRowReordering(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+double ODEPhysics::WarmStartFactor() const
+{
+  return dWorldGetQuickStepWarmStartFactor(this->dataPtr->worldId);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetWarmStartFactor(const double &_value)
+{
+  dWorldSetQuickStepWarmStartFactor(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+double ODEPhysics::ExtraFrictionIterations() const
+{
+  return dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetExtraFrictionIterations(const int &_value)
+{
+  dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId, _value);
 }
 
 //////////////////////////////////////////////////
@@ -1632,11 +1504,6 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = odeElem->GetElement("solver")->Get<double>("min_step_size");
   else if (_key == "sor_lcp_tolerance")
     _value = dWorldGetQuickStepTolerance(this->dataPtr->worldId);
-  else if (_key == "rms_error_tolerance")
-  {
-    gzwarn << "please use sor_lcp_tolerance in the future.\n";
-    _value = dWorldGetQuickStepTolerance(this->dataPtr->worldId);
-  }
   else if (_key == "rms_error")
     _value = dWorldGetQuickStepRMSDeltaLambda(this->dataPtr->worldId);
   else if (_key == "constraint_residual")
@@ -1675,4 +1542,97 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     #endif
   }
   return true;
+}
+
+/////////////////////////////////////////////////
+void ODEPhysics::CreateParams()
+{
+  this->params.Add<std::string>("solver_type",
+      std::bind(&ODEPhysics::GetStepType, this),
+      std::bind(&ODEPhysics::SetStepType, this, std::placeholders::_1));
+
+  this->params.Add<double>("cfm",
+      std::bind(&ODEPhysics::GetWorldCFM, this),
+      std::bind(&ODEPhysics::SetWorldCFM, this, std::placeholders::_1));
+
+  this->params.Add<double>("erp",
+      std::bind(&ODEPhysics::GetWorldERP, this),
+      std::bind(&ODEPhysics::SetWorldERP, this, std::placeholders::_1));
+
+  this->params.Add<double>("sor",
+      std::bind(&ODEPhysics::GetSORPGSW, this),
+      std::bind(&ODEPhysics::SetSORPGSW, this, std::placeholders::_1));
+
+  this->params.Add<int>("precon_iters",
+      std::bind(&ODEPhysics::GetSORPGSPreconIters, this),
+      std::bind(&ODEPhysics::SetSORPGSPreconIters, this,
+        std::placeholders::_1));
+
+  this->params.Add<unsigned int>("iters",
+      std::bind(&ODEPhysics::GetSORPGSIters, this),
+      std::bind(&ODEPhysics::SetSORPGSIters, this, std::placeholders::_1));
+
+  this->params.Add<std::string>("friction_model",
+      std::bind(&ODEPhysics::GetFrictionModel, this),
+      std::bind(&ODEPhysics::SetFrictionModel, this, std::placeholders::_1));
+
+  this->params.Add<std::string>("world_step_solver",
+      std::bind(&ODEPhysics::GetWorldStepSolverType, this),
+      std::bind(&ODEPhysics::SetWorldStepSolverType, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("contact_max_correcting_vel",
+      std::bind(&ODEPhysics::GetContactMaxCorrectingVel, this),
+      std::bind(&ODEPhysics::SetContactMaxCorrectingVel, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("contact_surface_layer",
+      std::bind(&ODEPhysics::GetContactSurfaceLayer, this),
+      std::bind(&ODEPhysics::SetContactSurfaceLayer, this,
+        std::placeholders::_1));
+
+  this->params.Add<unsigned int>("max_contacts",
+      std::bind(&ODEPhysics::GetMaxContacts, this),
+      std::bind(&ODEPhysics::SetMaxContacts, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("min_step_size",
+      std::bind(&ODEPhysics::MinStepSize, this),
+      std::bind(&ODEPhysics::SetMinStepSize, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("sor_lcp_tolerance",
+      std::bind(&ODEPhysics::SORLCPTolerance, this),
+      std::bind(&ODEPhysics::SetSORLCPTolerance, this,
+        std::placeholders::_1));
+
+  this->params.Add<bool>("use_dynamic_moi_rescaling",
+      std::bind(&ODEPhysics::UseDynamicMOIRescaling, this),
+      std::bind(&ODEPhysics::SetUseDynamicMOIRescaling, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("contact_residual_smoothing",
+      std::bind(&ODEPhysics::ContactResidualSmoothing, this),
+      std::bind(&ODEPhysics::SetContactResidualSmoothing, this,
+        std::placeholders::_1));
+
+  this->params.Add<bool>("thread_position_correction",
+      std::bind(&ODEPhysics::ThreadPositionCorrection, this),
+      std::bind(&ODEPhysics::SetThreadPositionCorrection, this,
+        std::placeholders::_1));
+
+  this->params.Add<bool>("experimental_row_reordering",
+      std::bind(&ODEPhysics::ExperimentalRowReordering, this),
+      std::bind(&ODEPhysics::SetExperimentalRowReordering, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("warm_start_factor",
+      std::bind(&ODEPhysics::WarmStartFactor, this),
+      std::bind(&ODEPhysics::SetWarmStartFactor, this,
+        std::placeholders::_1));
+
+  this->params.Add<int>("extra_friction_iterations",
+      std::bind(&ODEPhysics::ExtraFrictionIterations, this),
+      std::bind(&ODEPhysics::SetExtraFrictionIterations, this,
+        std::placeholders::_1));
 }

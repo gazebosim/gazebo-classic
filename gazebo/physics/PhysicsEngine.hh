@@ -160,36 +160,8 @@ namespace gazebo
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
-      /// \param[in] _cfm Constraint force mixing.
-      public: virtual void SetWorldCFM(double /*_cfm*/)
-                  GAZEBO_DEPRECATED(6.0) {}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _erp Error reduction parameter.
-      public: virtual void SetWorldERP(double /*_erp*/)
-                  GAZEBO_DEPRECATED(6.0) {}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
       /// \param[in] _autoDisable True to enable auto disabling of bodies.
       public: virtual void SetAutoDisableFlag(bool _autoDisable);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _vel Max correcting velocity.
-      public: virtual void SetContactMaxCorrectingVel(double /*_vel*/)
-                  GAZEBO_DEPRECATED(6.0) {}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _layerDepth Surface layer depth
-      public: virtual void SetContactSurfaceLayer(double /*_layerDepth*/)
-                  GAZEBO_DEPRECATED(6.0) {}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -199,35 +171,9 @@ namespace gazebo
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
-      /// \brief Get World CFM.
-      /// \return World CFM.
-      public: virtual double GetWorldCFM() GAZEBO_DEPRECATED(6.0) {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Get World ERP.
-      /// \return World ERP.
-      public: virtual double GetWorldERP() GAZEBO_DEPRECATED(6.0) {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
       /// \brief access functions to set ODE parameters..
       /// \return Auto disable flag.
       public: virtual bool GetAutoDisableFlag() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters.
-      /// \return Max correcting velocity.
-      public: virtual double GetContactMaxCorrectingVel()
-              GAZEBO_DEPRECATED(6.0) {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters.
-      /// \return Contact suerface layer depth.
-      public: virtual double GetContactSurfaceLayer()
-              GAZEBO_DEPRECATED(6.0) {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.

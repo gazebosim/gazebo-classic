@@ -592,7 +592,14 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     else
     {
+      #ifndef _WIN32
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+      #endif
       return PhysicsEngine::SetParam(_key, _value);
+      #ifndef _WIN32
+      #pragma GCC diagnostic pop
+      #endif
     }
   }
   catch(boost::bad_any_cast &e)
