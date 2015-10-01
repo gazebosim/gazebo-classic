@@ -153,6 +153,55 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
   this->SetSeed(math::Rand::GetSeed());
+
+  this->params.Add<double>("solver_type",
+      std::bind(&PhysicsEngine::GetStepType, this),
+      std::bind(&PhysicsEngine::SetStepType, this, std::placeholders::_1));
+
+  this->params.Add<double>("cfm",
+      std::bind(&PhysicsEngine::CFM, this),
+      std::bind(&PhysicsEngine::SetCFM, this, std::placeholders::_1));
+
+  this->params.Add<double>("erp",
+      std::bind(&PhysicsEngine::ERP, this),
+      std::bind(&PhysicsEngine::SetERP, this, std::placeholders::_1));
+
+  this->params.Add<double>("sor",
+      std::bind(&PhysicsEngine::SOR, this),
+      std::bind(&PhysicsEngine::SetSOR, this, std::placeholders::_1));
+
+  this->params.Add<int>("percon_iters",
+      std::bind(&PhysicsEngine::PreconIters, this),
+      std::bind(&PhysicsEngine::SetPreconIters, this, std::placeholders::_1));
+
+  this->params.Add<int>("iters",
+      std::bind(&PhysicsEngine::Iters, this),
+      std::bind(&PhysicsEngine::SetIters, this, std::placeholders::_1));
+
+  this->params.Add<std::string>("friction_model",
+      std::bind(&PhysicsEngine::GetFrictionModel, this),
+      std::bind(&PhysicsEngine::SetFrictionModel, this, std::placeholders::_1));
+
+  this->params.Add<std::string>("world_step_solver",
+      std::bind(&PhysicsEngine::GetWorldStepSolverType, this),
+      std::bind(&PhysicsEngine::SetWorldStepSolverType, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("contact_max_correcting_vel",
+      std::bind(&PhysicsEngine::ContactMaxCorrectingVel, this),
+      std::bind(&PhysicsEngine::SetContactMaxCorrectingVel, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("contact_surface_layer",
+      std::bind(&PhysicsEngine::ContactSurfaceLayer, this),
+      std::bind(&PhysicsEngine::SetContactSurfaceLayer, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("max_contacts",
+      std::bind(&PhysicsEngine::MaxContacts, this),
+      std::bind(&PhysicsEngine::SetMaxContacts, this,
+        std::placeholders::_1));
+
 }
 
 //////////////////////////////////////////////////
@@ -1356,6 +1405,116 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 }
 
 //////////////////////////////////////////////////
+void ODEPhysics::SetCFM(const double &_value)
+{
+  odeElem->GetElement("constraints")->GetElement("cfm")->Set(_value);
+  dWorldSetCFM(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+double ODEPhysics::CFM() const
+{
+  return this->sdf->GetElement("ode")->GetElement(
+      "constraints")->Get<double>("cfm");
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetERP(const double &_value)
+{
+  odeElem->GetElement("constraints")->GetElement("erp")->Set(_value);
+  dWorldSetERP(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+double ODEPhysics::ERP() const
+{
+  return this->sdf->GetElement("ode")->GetElement(
+      "constraints")->Get<double>("erp");
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetSOR(const double &_value)
+{
+  odeElem->GetElement("solver")->GetElement("sor")->Set(_value);
+  dWorldSetQuickStepW(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+double ODEPhysics::SOR() const
+{
+  return this->sdf->GetElement("ode")->GetElement("solver")->Get<double>("sor");
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetPreconIters(const int &_value)
+{
+  odeElem->GetElement("solver")->GetElement("precon_iters")->Set(_value);
+  dWorldSetQuickStepPreconIterations(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+int ODEPhysics::PreconIters() const
+{
+  return this->sdf->GetElement("ode")->GetElement(
+      "solver")->Get<int>("precon_iters");
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetIters(const int &_value)
+{
+  odeElem->GetElement("solver")->GetElement("iters")->Set(_value);
+  dWorldSetQuickStepNumIterations(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+int ODEPhysics::Iters() const
+{
+  return this->sdf->GetElement("ode")->GetElement("solver")->Get<int>("iters");
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetContactMaxCorrectingVel(const double &_value)
+{
+  odeElem->GetElement("constraints")->GetElement(
+      "contact_max_correcting_vel")->Set(_value);
+  dWorldSetContactMaxCorrectingVel(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+double ODEPhysics::ContactMaxCorrectingVel() const
+{
+  return this->sdf->GetElement("ode")->GetElement(
+      "constraints")->Get<double>("contact_max_correcting_vel");
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetContactSurfaceLayer(const double &_value)
+{
+  this->sdf->GetElement("ode")->GetElement("constraints")->GetElement(
+      "contact_surface_layer")->Set(_value);
+  dWorldSetContactSurfaceLayer(this->dataPtr->worldId, _value);
+}
+
+//////////////////////////////////////////////////
+double ODEPhysics::ContactSurfaceLayer() const
+{
+  return this->sdf->GetElement("ode")->GetElement(
+      "constraints")->Get<double>("contact_surface_layer");
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetMaxContacts(const int &_value)
+{
+  this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
+}
+
+//////////////////////////////////////////////////
+int ODEPhysics::ContactSurfaceLayer() const
+{
+  return this->sdf->Get<int>("max_contacts");
+}
+
+//////////////////////////////////////////////////
 bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
@@ -1363,63 +1522,6 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 
   try
   {
-    if (_key == "solver_type")
-    {
-      this->SetStepType(boost::any_cast<std::string>(_value));
-    }
-    else if (_key == "cfm")
-    {
-      double value = boost::any_cast<double>(_value);
-      odeElem->GetElement("constraints")->GetElement("cfm")->Set(value);
-      dWorldSetCFM(this->dataPtr->worldId, value);
-    }
-    else if (_key == "erp")
-    {
-      double value = boost::any_cast<double>(_value);
-      odeElem->GetElement("constraints")->GetElement("erp")->Set(value);
-      dWorldSetERP(this->dataPtr->worldId, value);
-    }
-    else if (_key == "precon_iters")
-    {
-      int value = boost::any_cast<int>(_value);
-      odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
-      dWorldSetQuickStepPreconIterations(this->dataPtr->worldId, value);
-    }
-    else if (_key == "iters")
-    {
-      int value = boost::any_cast<int>(_value);
-      odeElem->GetElement("solver")->GetElement("iters")->Set(value);
-      dWorldSetQuickStepNumIterations(this->dataPtr->worldId, value);
-    }
-    else if (_key == "sor")
-    {
-      double value = boost::any_cast<double>(_value);
-      odeElem->GetElement("solver")->GetElement("sor")->Set(value);
-      dWorldSetQuickStepW(this->dataPtr->worldId, value);
-    }
-    else if (_key == "friction_model")
-      this->SetFrictionModel(boost::any_cast<std::string>(_value));
-    else if (_key == "world_step_solver")
-      this->SetWorldStepSolverType(boost::any_cast<std::string>(_value));
-    else if (_key == "contact_max_correcting_vel")
-    {
-      double value = boost::any_cast<double>(_value);
-      odeElem->GetElement("constraints")->GetElement(
-          "contact_max_correcting_vel")->Set(value);
-      dWorldSetContactMaxCorrectingVel(this->dataPtr->worldId, value);
-    }
-    else if (_key == "contact_surface_layer")
-    {
-      double value = boost::any_cast<double>(_value);
-      odeElem->GetElement("constraints")->GetElement(
-          "contact_surface_layer")->Set(value);
-      dWorldSetContactSurfaceLayer(this->dataPtr->worldId, value);
-    }
-    else if (_key == "max_contacts")
-    {
-      int value = boost::any_cast<int>(_value);
-      this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
-    }
     else if (_key == "min_step_size")
     {
       /// TODO: Implement min step size param

@@ -270,19 +270,19 @@ bool PhysicsEngine::GetParam(const std::string &_key,
   }
   else if (_key == "max_step_size")
   {
-    double value;
+    double value = 0.0;
     this->Param<double>(_key, value);
     _value = value;
   }
   else if (_key == "real_time_update_rate")
   {
-    double value;
+    double value = 0.0;
     this->Param<double>(_key, value);
     _value = value;
   }
   else if (_key == "real_time_factor")
   {
-    double value;
+    double value = 0.0;
     this->Param<double>(_key, value);
     _value = value;
   }

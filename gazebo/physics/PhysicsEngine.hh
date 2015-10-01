@@ -20,12 +20,15 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
 #include <functional>
+#include <typeinfo>
+#include <map>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/common/Console.hh"
 
 namespace gazebo
 {
@@ -267,7 +270,116 @@ namespace gazebo
               bool SetParam(const std::string &_key,
                             const T &_value)
               {
-                return this->params.Set<T>(_key, _value);
+                return this->params.Set(_key, _value);
+              }
+
+      /// \brief Set a parameter of the physics engine.
+      /// See SetParam documentation for descriptions of duplicate parameters.
+      /// \param[in] _key String key
+      /// Below is a list of _key parameter definitions:
+      ///       -# "solver_type" (string) - returns solver used by engine, e.g.
+      ///          "sequential_impulse' for Bullet, "quick" for ODE
+      ///          "Featherstone and Lemkes" for DART and
+      ///          "Spatial Algebra and Elastic Foundation" for Simbody.
+      ///       -# "cfm" (double) - global CFM (ODE/Bullet)
+      ///       -# "erp" (double) - global ERP (ODE/Bullet)
+      ///       -# "precon_iters" (bool) - precondition iterations
+      ///          (experimental). (ODE)
+      ///       -# "iters" (int) - number of LCP PGS iterations. If
+      ///          sor_lcp_tolerance is negative, full iteration count is
+      ///          executed.  Otherwise, PGS may stop iteration early if
+      ///          sor_lcp_tolerance is satisfied by the total RMS residual.
+      ///       -# "sor" (double) - relaxation parameter for Projected
+      ///          Gauss-Seidel (PGS) updates. (ODE/Bullet)
+      ///       -# "contact_max_correcting_vel" (double) - truncates correction
+      ///          impulses from ERP by this value. (ODE)
+      ///       -# "contact_surface_layer" (double) - ERP is 0 for
+      ///          interpenetration depths below this value. (ODE/Bullet)
+      ///       -# "max_contacts" (int) - max number of contact constraints
+      ///          between any pair of collision bodies.
+      ///       -# "min_step_size" (double) - minimum internal step size.
+      ///          (defined but not used in ode).
+      ///       -# "max_step_size" (double) - maximum physics step size when
+      ///          physics update step must return.
+      ///
+      /// \param[in] _value The value to set to
+      /// \return true if SetParam is successful, false if operation fails.
+      /// \deprecated Use template<typename T>
+      //              bool SetParam(const std::string &_key, const T &_value);
+      public: bool SetParam(const std::string &_key,
+                            const boost::any &_value) GAZEBO_DEPRECATED(7.0)
+              {
+                try
+                {
+                  double value;
+                  value = boost::any_cast<double>(_value);
+                  return this->params.Set(_key, value);
+                }
+                catch(...)
+                {
+                }
+
+                try
+                {
+                  float value;
+                  value = boost::any_cast<float>(_value);
+                  return this->params.Set(_key, value);
+                }
+                catch(...)
+                {
+                }
+
+                try
+                {
+                  int value;
+                  value = boost::any_cast<int>(_value);
+                  return this->params.Set(_key, value);
+                }
+                catch(...)
+                {
+                }
+
+                try
+                {
+                  bool value;
+                  value = boost::any_cast<bool>(_value);
+                  return this->params.Set(_key, value);
+                }
+                catch(...)
+                {
+                }
+
+                try
+                {
+                  std::string value;
+                  value = boost::any_cast<std::string>(_value);
+                  return this->params.Set(_key, value);
+                }
+                catch(...)
+                {
+                }
+
+                try
+                {
+                  ignition::math::Vector3d value;
+                  value = boost::any_cast<ignition::math::Vector3d>(_value);
+                  return this->params.Set(_key, value);
+                }
+                catch(...)
+                {
+                }
+
+                try
+                {
+                  gazebo::math::Vector3 value;
+                  value = boost::any_cast<gazebo::math::Vector3>(_value);
+                  return this->params.Set(_key, value);
+                }
+                catch(...)
+                {
+                }
+
+                return false;
               }
 
 
@@ -372,6 +484,8 @@ namespace gazebo
 
       protected: class ParamDispatcherBase
                  {
+                   public: ParamDispatcherBase() = default;
+                   public: virtual ~ParamDispatcherBase() = default;
                  };
 
       protected: template<typename T>
@@ -391,12 +505,6 @@ namespace gazebo
                  {
                    public: ParamManager()
                            {
-                             /*this->adders[std::type_id(double)] =
-                               std::bind(&ParamManager::AddDouble, this,
-                                   std::placeholders::_1,
-                                   std::placeholders::_2,
-                                   std::placeholders::_3);
-                                   */
                            }
 
                    public: virtual ~ParamManager()
@@ -410,26 +518,40 @@ namespace gazebo
                            {
                              this->params[_key] =
                                new ParamDispatcher<T>(_getFn, _setFn);
-                             //this->types[std::type_id(T)](_getFn, _setFn);
                            }
-
-                   /*public: void AddDouble(const std::string &_key,
-                                          GetParamFn<double>::Type &_getFn,
-                                          SetParamFn<double>::Type &_setFn)
-                           {
-                             this->dblParams[_key].getFn = _getFn;
-                             this->dblParams[_key].setFn = _setFn;
-                           }
-                           */
 
                    public: template<typename T>
                            bool Set(const std::string &_key,
                                     const T &_value)
                            {
-                             static_cast<ParamDispatcher<T>*>(
-                                 this->params[_key])->setFn(_value);
+                             // Find the parameter dispatcher
+                             auto iter = this->params.find(_key);
 
-                             return true;
+                             // Make sure it exists
+                             if (iter != this->params.end())
+                             {
+                               // Attempt a cast to the correct type.
+                               ParamDispatcher<T> *dispatcher =
+                                 dynamic_cast<ParamDispatcher<T>*>(
+                                     iter->second);
+
+                               // Call the function used to set the
+                               // parameter.
+                               if (dispatcher)
+                               {
+                                 dispatcher->setFn(_value);
+                                 return true;
+                               }
+                               else
+                               {
+                                 gzerr << "Invalid type[" << typeid(T).name()
+                                   << "] for key[" << _key << "]\n";
+                               }
+                             }
+                             else
+                               gzerr << "Invalid key[" << _key << "]\n";
+
+                             return false;
                            }
 
                    public: template<typename T>
@@ -447,11 +569,6 @@ namespace gazebo
                            }
 
                    public: std::map<std::string, ParamDispatcherBase*> params;
-
-                           /*ParamDispatcher<int>> intParams;
-                   public: std::map<std::string,
-                           ParamDispatcher<double>> dblParams;
-                           */
                  };
 
       protected: ParamManager params;
