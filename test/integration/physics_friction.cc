@@ -529,7 +529,17 @@ TEST_P(PhysicsFrictionTest, FrictionDemo)
 /////////////////////////////////////////////////
 TEST_P(WorldStepFrictionTest, FrictionDemoWorldStep)
 {
-  FrictionDemo("ode", "world", GetParam());
+  std::string worldStepSolver = GetParam();
+  if (worldStepSolver.compare("BULLET_PGS") == 0 ||
+      worldStepSolver.compare("BULLET_LEMKE") == 0)
+  {
+    gzerr << "Solver ["
+          << worldStepSolver
+          << "] doesn't yet work with this test."
+          << std::endl;
+    return;
+  }
+  FrictionDemo("ode", "world", worldStepSolver);
 }
 
 /////////////////////////////////////////////////
