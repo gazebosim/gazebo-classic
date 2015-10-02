@@ -95,7 +95,7 @@ void ODELink::Init()
   {
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
     math::Vector3 cogVec = this->inertial->GetCoG();
-    for (auto child : this->children)
+    for (auto const &child : this->children)
     {
       if (child->HasType(Base::COLLISION))
       {
@@ -311,7 +311,7 @@ void ODELink::UpdateCollisionOffsets()
   {
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
     math::Vector3 cogVec = this->inertial->GetCoG();
-    for (auto child : this->children)
+    for (auto const &child : this->children)
     {
       if (child->HasType(Base::COLLISION))
       {
@@ -347,7 +347,7 @@ void ODELink::UpdateSurface()
     return;
   }
 
-  for (auto child : this->children)
+  for (auto const &child : this->children)
   {
     if (child->HasType(Base::COLLISION))
     {
