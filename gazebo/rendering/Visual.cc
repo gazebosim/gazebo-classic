@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
@@ -182,6 +184,7 @@ Visual::~Visual()
 
   if (this->dataPtr->sceneNode != NULL)
   {
+    // seems we never get into this block because Fini() runs first
     this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
     this->dataPtr->sceneNode->removeAndDestroyAllChildren();
     this->dataPtr->scene->GetManager()->destroySceneNode(
@@ -1590,7 +1593,9 @@ bool Visual::GetCastShadows() const
 //////////////////////////////////////////////////
 void Visual::SetVisible(bool _visible, bool _cascade)
 {
-  this->dataPtr->sceneNode->setVisible(_visible, _cascade);
+  if (this->dataPtr->sceneNode)
+    this->dataPtr->sceneNode->setVisible(_visible, _cascade);
+
   if (_cascade)
   {
     for (auto child: this->dataPtr->children)
