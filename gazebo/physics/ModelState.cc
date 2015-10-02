@@ -359,7 +359,7 @@ unsigned int ModelState::NestedModelStateCount() const
 /////////////////////////////////////////////////
 ModelState ModelState::NestedModelState(const std::string &_modelName) const
 {
-  // Search for the link name
+  // Search for the model name
   auto iter = this->modelStates.find(_modelName);
   if (iter != this->modelStates.end())
     return iter->second;
