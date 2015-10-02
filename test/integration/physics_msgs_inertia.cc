@@ -55,6 +55,7 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
+  EXPECT_EQ(g, math::Vector3(0, 0, -9.8));
 
   const std::string modelName("cube1");
   auto model = world->GetModel(modelName);
@@ -135,6 +136,7 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
+  EXPECT_EQ(g, math::Vector3(0, 0, -9.8));
 
   const std::string modelName("plank");
   auto model = world->GetModel(modelName);
@@ -208,6 +210,7 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
+  EXPECT_EQ(g, math::Vector3(0, 0, -9.8));
 
   const std::string modelName("cube1");
   auto model = world->GetModel(modelName);
