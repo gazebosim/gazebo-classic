@@ -64,7 +64,7 @@ namespace gazebo
       Q_OBJECT
 
       /// \enum Entity types
-      /// \brief Unique identifiers for link types that can be created.
+      /// \brief Unique identifiers for entity types that can be created.
       public: enum EntityType
       {
         /// \brief none
