@@ -127,6 +127,12 @@ namespace gazebo
       /// \brief Subscriber to light messages.
       public: transport::SubscriberPtr lightSub;
 
+      /// \brief Subscriber to light factory messages.
+      public: transport::SubscriberPtr lightFactorySub;
+
+      /// \brief Subscriber to light modify messages.
+      public: transport::SubscriberPtr lightModifySub;
+
       /// \brief Subscriber to model messages.
       public: transport::SubscriberPtr modelSub;
 
@@ -189,8 +195,11 @@ namespace gazebo
       /// \brief Model message buffer.
       public: std::list<msgs::Model> modelMsgs;
 
-      /// \brief Light message buffer.
-      public: std::list<msgs::Light> lightMsgs;
+      /// \brief Light factory message buffer.
+      public: std::list<msgs::Light> lightFactoryMsgs;
+
+      /// \brief Light modify message buffer.
+      public: std::list<msgs::Light> lightModifyMsgs;
 
       /// \brief True to reset the world on next update.
       public: bool needsReset;

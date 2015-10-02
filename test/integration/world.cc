@@ -86,15 +86,15 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
   }
 
-  transport::PublisherPtr lightPub = this->node->Advertise<msgs::Light>(
-        "~/light");
+  transport::PublisherPtr lightModifyPub = this->node->Advertise<msgs::Light>(
+        "~/light/modify");
 
   // Set the light to be green
   {
     msgs::Light lightMsg;
     lightMsg.set_name("sun");
     msgs::Set(lightMsg.mutable_diffuse(), common::Color(0, 1, 0));
-    lightPub->Publish(lightMsg);
+    lightModifyPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
@@ -123,13 +123,16 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(sceneMsg.light(0).diffuse().b(), 0);
   }
 
+  transport::PublisherPtr lightFactoryPub = this->node->Advertise<msgs::Light>(
+        "~/factory/light");
+
   // Add a new light
   {
     msgs::Light lightMsg;
     lightMsg.set_name("test_light");
     msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 0, 1));
     lightMsg.set_type(msgs::Light::POINT);
-    lightPub->Publish(lightMsg);
+    lightFactoryPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
@@ -182,7 +185,7 @@ TEST_F(WorldTest, ModifyLight)
     lightMsg.set_name("test_spot_light");
     msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 1, 0));
     lightMsg.set_type(msgs::Light::SPOT);
-    lightPub->Publish(lightMsg);
+    lightFactoryPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
@@ -218,7 +221,7 @@ TEST_F(WorldTest, ModifyLight)
         ignition::math::Pose3d(
           ignition::math::Vector3d(3, 2, 1),
           ignition::math::Quaterniond(0, 1, 0, 0)));
-    lightPub->Publish(lightMsg);
+    lightModifyPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
