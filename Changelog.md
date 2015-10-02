@@ -117,8 +117,8 @@ using the same arguments used in the command line.
         * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
         * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
 
-    1. Add Insert tab to model editor palette
-        * [Pull request #1xxx](https://bitbucket.org/osrf/gazebo/pull-request/1xxx)
+    1. Add Insert tab to model editor
+        * [Pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
 
 ## Gazebo 6.0
 
