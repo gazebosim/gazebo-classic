@@ -69,6 +69,15 @@ namespace gazebo
                 return btVector3(_vec.x, _vec.y, _vec.z);
               }
 
+      /// \brief Convert an ignition Vector3d to a bullet btVector3.
+      /// \param[in] _vec Ignition Vector3d.
+      /// \return Bullet Vector3.
+      public: static btVector3 ConvertVector3(
+                  const ignition::math::Vector3d &_vec)
+              {
+                return btVector3(_vec.X(), _vec.Y(), _vec.Z());
+              }
+
       /// \brief Convert a bullet btVector4 to a gazebo Vector4.
       /// \param[in] _bt Bullet Vector4.
       /// \return Gazebo Vector4.

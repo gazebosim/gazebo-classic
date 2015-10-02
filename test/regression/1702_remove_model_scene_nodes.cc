@@ -54,7 +54,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // spawn a model
   msgs::Model model;

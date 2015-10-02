@@ -85,7 +85,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
       std::bind(&PhysicsEngine::SetTargetRealTimeFactor, this,
         std::placeholders::_1));
 
-  this->params.Add<gazebo::math::Vector3>("gravity",
+  this->params.Add<ignition::math::Vector3d>("gravity",
       std::bind(&PhysicsEngine::GetGravity, this),
       std::bind(&PhysicsEngine::SetGravity, this, std::placeholders::_1));
 
@@ -135,9 +135,9 @@ PhysicsEngine::~PhysicsEngine()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 PhysicsEngine::GetGravity() const
+ignition::math::Vector3d PhysicsEngine::GetGravity() const
 {
-  return this->sdf->Get<math::Vector3>("gravity");
+  return this->sdf->Get<ignition::math::Vector3d>("gravity");
 }
 
 //////////////////////////////////////////////////
@@ -288,8 +288,8 @@ bool PhysicsEngine::GetParam(const std::string &_key,
   }
   else if (_key == "gravity")
   {
-    gazebo::math::Vector3 value;
-    this->Param<gazebo::math::Vector3>(_key, value);
+    ignition::math::Vector3d value;
+    this->Param<ignition::math::Vector3d>(_key, value);
     _value = value;
   }
   else if (_key == "magnetic_field")

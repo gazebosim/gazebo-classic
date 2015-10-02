@@ -190,7 +190,7 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   gzdbg << "GetFTDemoHelper for physics " << _physicsEngine
         << "joint type " << opt.jointType
         << " joint axis " << opt.jointAxis << std::endl;
-  ignition::math::Vector3d g = _physics->GetGravity().Ign();
+  ignition::math::Vector3d g = _physics->GetGravity();
   double mass = opt.mass;
 
   physics::ModelPtr model = SpawnBox(opt);

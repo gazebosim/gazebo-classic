@@ -86,7 +86,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+  world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // box in front of ray sensor 1 and 2
   math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
@@ -255,7 +255,7 @@ TEST_F(GPURaySensorTest, NameCollision)
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+  world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // box in front of ray sensor 1 and 2
   math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));

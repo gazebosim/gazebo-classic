@@ -401,7 +401,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
       boost::any_cast<double>(this->GetParam("contact_surface_layer")));
 
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->GetGravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
         msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
@@ -786,7 +786,7 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void BulletPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
   this->dynamicsWorld->setGravity(

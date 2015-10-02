@@ -138,7 +138,7 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
 
   // The altimeter should have a velocity of v = g * dt
   EXPECT_DOUBLE_EQ(altSensor->VerticalVelocity(),
-      physics->GetGravity().z * (physics->GetMaxStepSize()*steps));
+      physics->GetGravity().Z() * (physics->GetMaxStepSize()*steps));
 }
 
 /////////////////////////////////////////////////

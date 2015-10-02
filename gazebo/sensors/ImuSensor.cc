@@ -417,7 +417,7 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
     this->imuMsg.set_entity_name(this->parentName);
 
-    this->gravity = this->world->GetPhysicsEngine()->GetGravity().Ign();
+    this->gravity = this->world->GetPhysicsEngine()->GetGravity();
 
     msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
 

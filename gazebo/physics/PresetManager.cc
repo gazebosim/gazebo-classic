@@ -367,7 +367,14 @@ bool PresetManager::SetCurrentProfileParam(const std::string &_key,
     return false;
   try
   {
+    #ifndef _WIN32
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    #endif
     return this->dataPtr->physicsEngine->SetParam(_key, _value);
+    #ifndef _WIN32
+    #pragma GCC diagnostic pop
+    #endif
   }
   catch(const boost::bad_any_cast &e)
   {

@@ -142,12 +142,12 @@ namespace gazebo
 
       /// \brief Return the gravity vector.
       /// \return The gravity vector.
-      public: virtual math::Vector3 GetGravity() const;
+      public: virtual ignition::math::Vector3d GetGravity() const;
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
       public: virtual void SetGravity(
-                  const gazebo::math::Vector3 &_gravity) = 0;
+                  const ignition::math::Vector3d &_gravity) = 0;
 
       /// \brief Set the magnetic field vector.
       /// \param[in] _value New magnetic field.
@@ -216,6 +216,7 @@ namespace gazebo
               bool SetParam(const std::string &_key,
                             const T &_value)
               {
+                std::cout << "SetParam Proper\n";
                 return this->params.Set(_key, _value);
               }
 
@@ -255,8 +256,10 @@ namespace gazebo
       public: bool SetParam(const std::string &_key,
                             const boost::any &_value) GAZEBO_DEPRECATED(7.0)
               {
+                std::cout << "SetParam BOOST\n";
                 try
                 {
+                  std::cout << "    double\n";
                   double value;
                   value = boost::any_cast<double>(_value);
                   return this->params.Set(_key, value);
@@ -267,6 +270,7 @@ namespace gazebo
 
                 try
                 {
+                  std::cout << "    float\n";
                   float value;
                   value = boost::any_cast<float>(_value);
                   return this->params.Set(_key, value);
@@ -277,6 +281,7 @@ namespace gazebo
 
                 try
                 {
+                  std::cout << "    int\n";
                   int value;
                   value = boost::any_cast<int>(_value);
                   return this->params.Set(_key, value);
@@ -287,6 +292,7 @@ namespace gazebo
 
                 try
                 {
+                  std::cout << "    bool\n";
                   bool value;
                   value = boost::any_cast<bool>(_value);
                   return this->params.Set(_key, value);
@@ -297,6 +303,7 @@ namespace gazebo
 
                 try
                 {
+                  std::cout << "    string\n";
                   std::string value;
                   value = boost::any_cast<std::string>(_value);
                   return this->params.Set(_key, value);
@@ -307,6 +314,7 @@ namespace gazebo
 
                 try
                 {
+                  std::cout << "    ign::vector3d\n";
                   ignition::math::Vector3d value;
                   value = boost::any_cast<ignition::math::Vector3d>(_value);
                   return this->params.Set(_key, value);
@@ -317,6 +325,7 @@ namespace gazebo
 
                 try
                 {
+                  std::cout << "    gz::vector3d\n";
                   gazebo::math::Vector3 value;
                   value = boost::any_cast<gazebo::math::Vector3>(_value);
                   return this->params.Set(_key, value);

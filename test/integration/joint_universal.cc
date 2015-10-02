@@ -110,7 +110,7 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
     double gy = pow(-1, i % 2) * gravityMag;
 
     // Set gravity to push horizontally
-    physics->SetGravity(math::Vector3(gx, gy, 0));
+    physics->SetGravity(ignition::math::Vector3d(gx, gy, 0));
     world->Step(1000);
 
     // jointLower: axis[0] = {1, 0, 0}
@@ -209,7 +209,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
@@ -322,7 +322,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);

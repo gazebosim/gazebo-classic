@@ -95,7 +95,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   }
 
   double z = 3;
-  double gravityZ = physics->GetGravity().z;
+  double gravityZ = physics->GetGravity().Z();
   double stepSize = physics->GetMaxStepSize();
 
   std::string modelName = "imuModel";

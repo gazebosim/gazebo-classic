@@ -390,7 +390,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // set the gravity vector
-  math::Vector3 g(0.0, 1.0, -9.81);
+  ignition::math::Vector3d g(0.0, 1.0, -9.81);
   physics->SetGravity(g);
 
   // Spawn concentric semi-circles of boxes
@@ -446,7 +446,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   {
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
-    double velMag = g.y * sinAngle * t;
+    double velMag = g.Y() * sinAngle * t;
     math::Vector3 vel = iter->first->GetWorldLinearVel();
     EXPECT_NEAR(velMag*cosAngle, vel.x, 5*g_friction_tolerance);
     EXPECT_NEAR(velMag*sinAngle, vel.y, 5*g_friction_tolerance);
@@ -492,7 +492,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 
   // set the gravity vector
   // small positive y component
-  math::Vector3 g(0.0, 1.5, -1.0);
+  ignition::math::Vector3d g(0.0, 1.5, -1.0);
   physics->SetGravity(g);
 
   // Spawn a single box
@@ -514,7 +514,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   double t = world->GetSimTime().Double();
 
   gzdbg << "Checking velocity after " << t << " seconds" << std::endl;
-  double velMag = (g.y+g.z) * t;
+  double velMag = (g.Y()+g.Z()) * t;
   math::Vector3 vel = model->GetWorldLinearVel();
   EXPECT_NEAR(0.0, vel.x, g_friction_tolerance);
   EXPECT_NEAR(velMag, vel.y, g_friction_tolerance);

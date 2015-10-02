@@ -44,7 +44,7 @@ TEST_F(Inertial_TEST, InertialWorld)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), "ode");
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);

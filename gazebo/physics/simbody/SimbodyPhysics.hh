@@ -94,7 +94,7 @@ namespace gazebo
       public: SimTK::MultibodySystem *GetDynamicsWorld() const;
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
@@ -119,6 +119,12 @@ namespace gazebo
       /// \param[in] _v Gazeb's math::Vector3 object
       /// \return Simbody's SimTK::Vec3 object
       public: static SimTK::Vec3 Vector3ToVec3(const math::Vector3 &_v);
+
+      /// \brief Convert ignition::math::Vector3d to SimTK::Vec3
+      /// \param[in] _v Ignition math::Vector3d object
+      /// \return Simbody's SimTK::Vec3 object
+      public: static SimTK::Vec3 Vector3ToVec3(
+                  const ignition::math::Vector3d &_v);
 
       /// \brief Convert SimTK::Vec3 to gazebo::math::Vector3
       /// \param[in] _v Simbody's SimTK::Vec3 object

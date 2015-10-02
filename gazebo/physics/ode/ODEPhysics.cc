@@ -295,7 +295,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
       this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->GetGravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
       msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
@@ -911,10 +911,11 @@ void ODEPhysics::SetStepType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
+  dWorldSetGravity(this->dataPtr->worldId,
+      _gravity.X(), _gravity.Y(), _gravity.Z());
 }
 
 //////////////////////////////////////////////////

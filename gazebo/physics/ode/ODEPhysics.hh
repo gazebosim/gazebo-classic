@@ -135,7 +135,7 @@ namespace gazebo
                                            ModelPtr _parent);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       /// \brief Set the CFM parameter
       /// \param[in] _cfm New constraint force mixing  value

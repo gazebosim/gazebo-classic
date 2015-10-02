@@ -192,7 +192,7 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
 
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->GetGravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
       msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
@@ -791,7 +791,7 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
 }
 
 //////////////////////////////////////////////////
-void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void SimbodyPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
 
@@ -888,7 +888,7 @@ void SimbodyPhysics::InitSimbodySystem()
   // this->contact.setTransitionVelocity(0.01);  // now done in Load using sdf
 
   // Specify gravity (read in above from world).
-  if (!math::equal(this->GetGravity().GetLength(), 0.0))
+  if (!math::equal(this->GetGravity().Length(), 0.0))
     this->gravity.setDefaultGravityVector(
       SimbodyPhysics::Vector3ToVec3(this->GetGravity()));
   else
@@ -1554,6 +1554,12 @@ math::Quaternion SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
 SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const math::Vector3 &_v)
 {
   return SimTK::Vec3(_v.x, _v.y, _v.z);
+}
+
+/////////////////////////////////////////////////
+SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const ignition::math::Vector3d &_v)
+{
+  return SimTK::Vec3(_v.X(), _v.Y(), _v.Z());
 }
 
 /////////////////////////////////////////////////

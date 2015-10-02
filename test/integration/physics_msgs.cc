@@ -101,7 +101,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // spawn a box
   std::string name = "test_box";
@@ -315,7 +315,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
