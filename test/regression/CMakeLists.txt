@@ -50,6 +50,7 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   346_save_lights.cc
   846_typo_in_camera.cc
+  1702_remove_model_scene_nodes.cc
 )
 
 gz_build_dri_tests(${dri_tests})

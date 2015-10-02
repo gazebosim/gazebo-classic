@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
 #include <vector>
