@@ -357,7 +357,7 @@ namespace gazebo
       /// \param[in] _name Name of model plugin.
       private: void OpenModelPluginInspector(const std::string &_name);
 
-      /// Spawn the entity in simulation.
+      /// \brief Spawn the entity in simulation.
       private: virtual void CreateTheEntity();
 
       /// \brief Internal init function.

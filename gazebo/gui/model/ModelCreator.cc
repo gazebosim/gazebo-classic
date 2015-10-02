@@ -1130,19 +1130,6 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   }
 
   // Top-level links only
-/*  if (_parentVis == this->previewVisual)
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allLinks[linkName] = link;
-    gui::model::Events::linkInserted(linkName);
-  }
-  else
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->nestedLinks[linkName] = link;
-  }*/
-
-  // Top-level links only
   if (_parentVis == this->previewVisual)
     gui::model::Events::linkInserted(linkName);
 

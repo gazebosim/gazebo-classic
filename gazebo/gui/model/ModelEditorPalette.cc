@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *

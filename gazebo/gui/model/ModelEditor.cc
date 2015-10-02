@@ -29,7 +29,6 @@
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TopToolbar.hh"
-#include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"

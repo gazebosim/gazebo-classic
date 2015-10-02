@@ -210,7 +210,7 @@ namespace gazebo
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
 
-      /// \brief flag set to true if this is a link of a nested model.
+      /// \brief Flag set to true if this is a link of a nested model.
       public: bool nested;
     };
 
