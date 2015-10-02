@@ -9,6 +9,15 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Removed:*** public: static event::EventT<void (bool, bool, const math::Pose &, const std::string &)> modelPropertiesChanged
+    + ***Replacement:*** public: static event::EventT<void (bool, bool)> modelPropertiesChanged
+    + ***Note:*** Removed last two arguments, model pose and name, from the function
+
+1. **gazebo/rendering/OribitViewController.hh**
+    + ***Removed:*** public: OrbitViewController(UserCameraPtr _camera);
+    + ***Replacement:*** public: OrbitViewController(UserCameraPtr _camera, const std::string &_name = "OrbitViewController");
+
 1. **gazebo/rendering/OribitViewController.hh**
     + ***Removed:*** public: OrbitViewController(UserCameraPtr _camera);
     + ***Replacement:*** public: OrbitViewController(UserCameraPtr _camera, const std::string &_name = "OrbitViewController");
@@ -37,11 +46,11 @@ release will remove the deprecated code.
 ### Deprecations
 
 1. **gazebo/gui/RTShaderSystem.hh**
-    + ***Deprecation:*** void AttachEntity(Visual *vis) 
+    + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***
 
 1. **gazebo/gui/RTShaderSystem.hh**
-    + ***Deprecation:*** void DetachEntity(Visual *_vis)  
+    + ***Deprecation:*** void DetachEntity(Visual *_vis)
     + ***No replacement for DetachEntity ***
 
 ### Deletions
@@ -81,7 +90,7 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Vector3d HSV() const;
 
 1. **gazebo/common/Dem.hh**
-    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude); 
+    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude);
     + ***Replacement:*** void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,  ignition::math::Angle &_longitude) const;
     + ***Deprecation:***void FillHeightMap(int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY, std::vector<float> &_heights);
     + ***Replacement:***void FillHeightMap(const int _subSampling, const unsigned int _vertSize, const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale, const bool _flipY, std::vector<float> &_heights);

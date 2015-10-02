@@ -51,6 +51,10 @@ namespace gazebo
       public: void AddItemToPalette(QWidget *_item,
           const std::string &_category = "");
 
+      /// \brief Add an entity to the editor
+      /// \param[in] _sdf SDF describing the entity.
+      public: void AddEntity(sdf::ElementPtr _sdf);
+
       /// \brief Qt callback when the model editor's save action is
       /// triggered.
       private slots: void Save();
@@ -108,12 +112,6 @@ namespace gazebo
       /// \param[in] _data Event data (e.g. name of model).
       private: void OnCreateEntity(const std::string &_type,
                                    const std::string &_data);
-
-      /// \brief Add an entity to the editor
-      /// \param[in] _sdf SDF describing the entity.
-      public: void AddEntity(sdf::ElementPtr _sdf);
-
-
 
       /// \internal
       /// \brief Pointer to private data.

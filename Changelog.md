@@ -20,7 +20,7 @@
 
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
-    
+
 1. Added EnumIface, which supports iterators over enums.
     * [Pull request #1847](https://bitbucket.org/osrf/gazebo/pull-request/1847)
 
@@ -111,6 +111,9 @@ using the same arguments used in the command line.
     1. Set physics to be paused when exiting model editor mode
         * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
         * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
+
+    1. Add Insert tab to model editor palette
+        * [Pull request #1xxx](https://bitbucket.org/osrf/gazebo/pull-request/1xxx)
 
 ## Gazebo 6.0
 

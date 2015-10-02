@@ -56,7 +56,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->modelTree->hide();
   this->Init("modelEditorTab", "Insert", this->dataPtr->modelPalette);
   this->tabWidget->addTab(this->dataPtr->modelTree, tr("Settings"));
-//  this->Init("modelEditorTab", "Settings", this->dataPtr->modelPalette);
 
   GZ_ASSERT(this->tabWidget != NULL, "Editor tab widget is NULL");
 
@@ -490,14 +489,13 @@ void ModelEditor::ToggleToolbar()
 
 /////////////////////////////////////////////////
 void ModelEditor::OnCreateEntity(const std::string &_type,
-                                  const std::string &_data)
+                                 const std::string &_data)
 {
   if (!this->dataPtr->active)
     return;
 
   if (_type == "model" && !_data.empty())
   {
-
     sdf::SDFPtr modelSDF(new sdf::SDF);
     sdf::initFile("root.sdf", modelSDF);
 

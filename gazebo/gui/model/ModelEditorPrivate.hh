@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_MODEL_EDITOR_PRIVATE_HH_
 #define _GAZEBO_MODEL_EDITOR_PRIVATE_HH_
 
+#include <vector>
 #include <string>
 
 #include "gazebo/gui/qt.h"
