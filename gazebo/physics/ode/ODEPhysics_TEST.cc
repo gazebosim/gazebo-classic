@@ -126,16 +126,16 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   EXPECT_DOUBLE_EQ(contactSorScale, contactSorScaleRet);
   value = odePhysics->GetParam("thread_position_correction");
   bool threadPositionCorrectionRet = boost::any_cast<bool>(value);
-  EXPECT_DOUBLE_EQ(threadPositionCorrection, threadPositionCorrectionRet);
+  EXPECT_EQ(threadPositionCorrection, threadPositionCorrectionRet);
   value = odePhysics->GetParam("experimental_row_reordering");
   bool experimentalRowReorderingRet = boost::any_cast<bool>(value);
-  EXPECT_DOUBLE_EQ(experimentalRowReordering, experimentalRowReorderingRet);
+  EXPECT_EQ(experimentalRowReordering, experimentalRowReorderingRet);
   value = odePhysics->GetParam("warm_start_factor");
   double warmStartFactorRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(warmStartFactor, warmStartFactorRet);
   value = odePhysics->GetParam("extra_friction_iterations");
   int extraFrictionIterationsRet = boost::any_cast<int>(value);
-  EXPECT_DOUBLE_EQ(extraFrictionIterations, extraFrictionIterationsRet);
+  EXPECT_EQ(extraFrictionIterations, extraFrictionIterationsRet);
 
   // verify against equivalent functions
   EXPECT_EQ(type, odePhysics->GetStepType());
