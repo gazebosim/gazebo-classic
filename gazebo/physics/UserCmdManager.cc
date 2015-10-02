@@ -145,6 +145,12 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
   // Undo
   if (_msg->undo())
   {
+    if (this->dataPtr->undoCmds.empty())
+    {
+      gzwarn << "No commands to be undone" << std::endl;
+      return;
+    }
+
     // Get the last done command
     UserCmd *cmd = this->dataPtr->undoCmds.back();
 
@@ -186,6 +192,12 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
   // Redo
   else
   {
+    if (this->dataPtr->redoCmds.empty())
+    {
+      gzwarn << "No commands to be undone" << std::endl;
+      return;
+    }
+
     // Get last undone command
     UserCmd *cmd = this->dataPtr->redoCmds.back();
 
