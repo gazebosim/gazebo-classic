@@ -15,6 +15,14 @@ release will remove the deprecated code.
     + ***Replacement:*** ~/light/modify - for modifying existing lights
     * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
 
+1. **gazebo/rendering/Visual.hh**
+    + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true); 
+    + ***Replacement:*** public: virtual void SetVisible(bool _visible, bool _cascade = true);
+
+1. **gazebo/rendering/OribitViewController.hh**
+    + ***Removed:*** public: OrbitViewController(UserCameraPtr _camera);
+    + ***Replacement:*** public: OrbitViewController(UserCameraPtr _camera, const std::string &_name = "OrbitViewController");
+
 1. **gazebo/test/ServerFixture.hh**
     + ***Removed:*** protected: void RunServer(const std::string &_worldFilename);
     + ***Removed:*** protected: void RunServer(const std::string &_worldFilename,
@@ -35,6 +43,16 @@ release will remove the deprecated code.
     + ***Replacement:*** public: virtual void Start();
     + ***Removed:*** public: virtual void Stop() = 0;
     + ***Replacement:*** public: virtual void Stop();
+
+### Deprecations
+
+1. **gazebo/gui/RTShaderSystem.hh**
+    + ***Deprecation:*** void AttachEntity(Visual *vis) 
+    + ***No replacement for AttachEntity ***
+
+1. **gazebo/gui/RTShaderSystem.hh**
+    + ***Deprecation:*** void DetachEntity(Visual *_vis)  
+    + ***No replacement for DetachEntity ***
 
 ### Deletions
 

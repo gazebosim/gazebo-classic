@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 
+#include <boost/function.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 

@@ -1,5 +1,11 @@
 ## Gazebo 7.0
 
+1. Resolve issue #1702
+    * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
+    * [Pull request #1905](https://bitbucket.org/osrf/gazebo/pull-request/1905)
+    * [Pull request #1913](https://bitbucket.org/osrf/gazebo/pull-request/1913)
+    * [Pull request #1914](https://bitbucket.org/osrf/gazebo/pull-request/1914)
+
 1. Update physics when the world is reset
     * [Pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
 
@@ -87,6 +93,7 @@ using the same arguments used in the command line.
 
     1. Added support for more joint types (gearbox and fixed joints).
         * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
+
     1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
         * [Pull request #1787](https://bitbucket.org/osrf/gazebo/pull-request/1787)
 
@@ -96,11 +103,18 @@ using the same arguments used in the command line.
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
+    1. Load and save nested models
+        * [Pull request #1894](https://bitbucket.org/osrf/gazebo/pull-request/1894)
+
     1. Display model plugins on the left panel and added model plugin inspector
         * [Pull request #1863](https://bitbucket.org/osrf/gazebo/pull-request/1863)
 
     1. Context menu and deletion for model plugins
         * [Pull request #1890](https://bitbucket.org/osrf/gazebo/pull-request/1890)
+
+    1. Delete self from inspector
+        * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
+        * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
 
     1. Set physics to be paused when exiting model editor mode
         * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
@@ -108,8 +122,17 @@ using the same arguments used in the command line.
 
 ## Gazebo 6.0
 
+### Gazebo 6.2.0 (2015-10-02)
+
+1. Update physics when the world is reset
+    * Backport of [pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
+    * [Pull request #1916](https://bitbucket.org/osrf/gazebo/pull-request/1916)
+    * [Issue #101](https://bitbucket.org/osrf/gazebo/issue/101)
+
 1. Added Copy constructor and assignment operator to MouseEvent
     * [Pull request #1855](https://bitbucket.org/osrf/gazebo/pull-request/1855)
+
+### Gazebo 6.1.0 (2015-08-02)
 
 1. Added logical_camera sensor.
     * [Pull request #1845](https://bitbucket.org/osrf/gazebo/pull-request/1845)
@@ -119,6 +142,8 @@ using the same arguments used in the command line.
 
 1. Sim events for joint position, velocity and applied force
     * [Pull request #1849](https://bitbucket.org/osrf/gazebo/pull-request/1849)
+
+### Gazebo 6.0.0 (2015-07-27)
 
 1. Added magnetometer sensor. A contribution from Andrew Symington.
     * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)
@@ -477,6 +502,8 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+### Gazebo 5.2.0 (2015-10-02)
 
 1. Initialize sigact struct fields that valgrind said were being used uninitialized
     * [Pull request #1809](https://bitbucket.org/osrf/gazebo/pull-request/1809)
@@ -1057,6 +1084,31 @@ compilation on Windows.
     * [Pull request #1005](https://bitbucket.org/osrf/gazebo/pull-request/1005)
 
 ## Gazebo 2.0
+
+### Gazebo 2.2.6 (2015-09-28)
+
+1. Backport fixes to setup.sh from pull request #1430 to 2.2 branch
+    * [Pull request 1889](https://bitbucket.org/osrf/gazebo/pull-request/1889)
+1. Fix heightmap texture loading (2.2)
+    * [Pull request 1596](https://bitbucket.org/osrf/gazebo/pull-request/1596)
+1. Prevent out of bounds array access in SkidSteerDrivePlugin (found by cppcheck 1.68)
+    * [Pull request 1379](https://bitbucket.org/osrf/gazebo/pull-request/1379)
+1. Fix build with boost 1.57 for 2.2 branch (#1399)
+    * [Pull request 1358](https://bitbucket.org/osrf/gazebo/pull-request/1358)
+1. Fix manpage test failures by incrementing year to 2015
+    * [Pull request 1361](https://bitbucket.org/osrf/gazebo/pull-request/1361)
+1. Fix build for OS X 10.10 (#1304, #1289)
+    * [Pull request 1346](https://bitbucket.org/osrf/gazebo/pull-request/1346)
+1. Restore ODELink ABI, use Link variables instead (#1354)
+    * [Pull request 1347](https://bitbucket.org/osrf/gazebo/pull-request/1347)
+1. Fix inertia_ratio test
+    * [Pull request 1344](https://bitbucket.org/osrf/gazebo/pull-request/1344)
+1. backport collision visual fix -> 2.2
+    * [Pull request 1343](https://bitbucket.org/osrf/gazebo/pull-request/1343)
+1. Fix two code_check errors on 2.2
+    * [Pull request 1314](https://bitbucket.org/osrf/gazebo/pull-request/1314)
+1. issue #243 fix Link::GetWorldLinearAccel and Link::GetWorldAngularAccel for ODE
+    * [Pull request 1284](https://bitbucket.org/osrf/gazebo/pull-request/1284)
 
 ### Gazebo 2.2.3 (2014-04-29)
 

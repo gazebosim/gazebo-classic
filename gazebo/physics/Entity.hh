@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportTypes.hh"

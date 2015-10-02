@@ -32,19 +32,19 @@ class WorldResetTest : public ServerFixture,
   /// \param[in] _world Name of world to load
   /// \param[in] _resets Number of resets to perform in the test
   public: void ModelPose(const std::string &_physicsEngine,
-                         const std::string &_world, int _resets);
+                         const std::string &_world, const int _resets);
 
   /// \brief Test resetting different worlds
   /// \param[in] _physicsEngine Physics engine type.
   /// \param[in] _world Name of world to load
   /// \param[in] _resets Number of resets to perform in the test
   public: void WorldName(const std::string &_physicsEngine,
-                         const std::string &_world, int _resets);
+                         const std::string &_world, const int _resets);
 };
 
 /////////////////////////////////////////////////
 void WorldResetTest::ModelPose(const std::string &_physicsEngine,
-                               const std::string &_world, int _resets)
+                               const std::string &_world, const int _resets)
 {
   if (_physicsEngine == "simbody" &&
       _world.find("pr2") != std::string::npos)
@@ -127,7 +127,7 @@ TEST_P(WorldResetTest, ModelPose)
 
 /////////////////////////////////////////////////
 void WorldResetTest::WorldName(const std::string &_physicsEngine,
-                               const std::string &_world, int _resets)
+                               const std::string &_world, const int _resets)
 {
   if (_physicsEngine == "simbody" &&
       _world.find("pr2") != std::string::npos)

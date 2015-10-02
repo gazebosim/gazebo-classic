@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
@@ -252,7 +253,6 @@ void Scene::Clear()
   this->dataPtr->skyx = NULL;
 
   RTShaderSystem::Instance()->RemoveScene(this->GetName());
-  RTShaderSystem::Instance()->Clear();
 
   this->dataPtr->connections.clear();
 

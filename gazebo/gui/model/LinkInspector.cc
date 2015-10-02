@@ -19,6 +19,7 @@
 
 #include "gazebo/gui/ConfigWidget.hh"
 
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/LinkConfig.hh"
 #include "gazebo/gui/model/VisualConfig.hh"
 #include "gazebo/gui/model/CollisionConfig.hh"
@@ -57,14 +58,29 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   this->tabWidget->addTab(this->visualConfig, "Visual");
   this->tabWidget->addTab(this->collisionConfig, "Collision");
 
-  QHBoxLayout *buttonsLayout = new QHBoxLayout;
+  // Buttons
+  QToolButton *removeButton = new QToolButton(this);
+  removeButton->setFixedSize(QSize(30, 30));
+  removeButton->setToolTip("Remove link");
+  removeButton->setIcon(QPixmap(":/images/trashcan.png"));
+  removeButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  removeButton->setIconSize(QSize(16, 16));
+  removeButton->setCheckable(false);
+  connect(removeButton, SIGNAL(clicked()), this, SLOT(OnRemove()));
+
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
+
   QPushButton *applyButton = new QPushButton(tr("Apply"));
   connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
+
   QPushButton *OKButton = new QPushButton(tr("OK"));
   OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
+
+  QHBoxLayout *buttonsLayout = new QHBoxLayout;
+  buttonsLayout->addWidget(removeButton);
+  buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(applyButton);
   buttonsLayout->addWidget(OKButton);
@@ -119,6 +135,14 @@ CollisionConfig *LinkInspector::GetCollisionConfig() const
 }
 
 /////////////////////////////////////////////////
+void LinkInspector::OnRemove()
+{
+  this->close();
+
+  model::Events::requestLinkRemoval(this->linkId);
+}
+
+/////////////////////////////////////////////////
 void LinkInspector::OnCancel()
 {
   this->close();
@@ -140,4 +164,10 @@ void LinkInspector::OnOK()
 void LinkInspector::enterEvent(QEvent */*_event*/)
 {
   QApplication::setOverrideCursor(Qt::ArrowCursor);
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::SetLinkId(const std::string &_id)
+{
+  this->linkId = _id;
 }
