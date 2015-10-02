@@ -65,21 +65,6 @@ SphericalCoordinates::SphericalCoordinates(const SurfaceType _type)
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
-    const math::Angle &_latitude,
-    const math::Angle &_longitude,
-    double _elevation,
-    const math::Angle &_heading)
-: dataPtr(new SphericalCoordinatesPrivate)
-{
-  this->SetSurfaceType(_type);
-  this->SetLatitudeReference(ignition::math::Angle(_latitude.Radian()));
-  this->SetLongitudeReference(ignition::math::Angle(_longitude.Radian()));
-  this->SetElevationReference(_elevation);
-  this->SetHeadingOffset(ignition::math::Angle(_heading.Radian()));
-}
-
-//////////////////////////////////////////////////
-SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
     const ignition::math::Angle &_latitude,
     const ignition::math::Angle &_longitude,
     double _elevation,
@@ -107,21 +92,9 @@ SphericalCoordinates::SurfaceType SphericalCoordinates::GetSurfaceType() const
 }
 
 //////////////////////////////////////////////////
-math::Angle SphericalCoordinates::GetLatitudeReference() const
-{
-  return this->LatitudeReference();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle SphericalCoordinates::LatitudeReference() const
 {
   return this->dataPtr->latitudeReference;
-}
-
-//////////////////////////////////////////////////
-math::Angle SphericalCoordinates::GetLongitudeReference() const
-{
-  return this->LongitudeReference();
 }
 
 //////////////////////////////////////////////////
@@ -134,12 +107,6 @@ ignition::math::Angle SphericalCoordinates::LongitudeReference() const
 double SphericalCoordinates::GetElevationReference() const
 {
   return this->dataPtr->elevationReference;
-}
-
-//////////////////////////////////////////////////
-math::Angle SphericalCoordinates::GetHeadingOffset() const
-{
-  return this->HeadingOffset();
 }
 
 //////////////////////////////////////////////////
@@ -156,23 +123,9 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetLatitudeReference(
-    const math::Angle &_angle)
-{
-  this->SetLatitudeReference(ignition::math::Angle(_angle.Radian()));
-}
-
-//////////////////////////////////////////////////
-void SphericalCoordinates::SetLatitudeReference(
     const ignition::math::Angle &_angle)
 {
   this->dataPtr->latitudeReference.Radian(_angle.Radian());
-}
-
-//////////////////////////////////////////////////
-void SphericalCoordinates::SetLongitudeReference(
-    const math::Angle &_angle)
-{
-  this->SetLongitudeReference(ignition::math::Angle(_angle.Radian()));
 }
 
 //////////////////////////////////////////////////
@@ -189,22 +142,9 @@ void SphericalCoordinates::SetElevationReference(double _elevation)
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::SetHeadingOffset(const math::Angle &_angle)
-{
-  this->SetHeadingOffset(ignition::math::Angle(_angle.Radian()));
-}
-
-//////////////////////////////////////////////////
 void SphericalCoordinates::SetHeadingOffset(const ignition::math::Angle &_angle)
 {
   this->dataPtr->headingOffset.Radian(_angle.Radian());
-}
-
-//////////////////////////////////////////////////
-math::Vector3 SphericalCoordinates::SphericalFromLocal(
-    const math::Vector3 &_xyz) const
-{
-  return this->SphericalFromLocal(_xyz.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -256,13 +196,6 @@ ignition::math::Vector3d SphericalCoordinates::SphericalFromLocal(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SphericalCoordinates::GlobalFromLocal(
-    const math::Vector3 &_xyz) const
-{
-  return this->GlobalFromLocal(_xyz.Ign());
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d SphericalCoordinates::GlobalFromLocal(
     const ignition::math::Vector3d &_xyz) const
 {
@@ -271,19 +204,6 @@ ignition::math::Vector3d SphericalCoordinates::GlobalFromLocal(
   double east  = _xyz.X() * headingCosine - _xyz.Y() * headingSine;
   double north = _xyz.X() * headingSine   + _xyz.Y() * headingCosine;
   return ignition::math::Vector3d(east, north, _xyz.Z());
-}
-
-//////////////////////////////////////////////////
-/// Based on Haversine formula (http://en.wikipedia.org/wiki/Haversine_formula).
-double SphericalCoordinates::Distance(const math::Angle &_latA,
-                                      const math::Angle &_lonA,
-                                      const math::Angle &_latB,
-                                      const math::Angle &_lonB)
-{
-  return Distance(ignition::math::Angle(_latA.Radian()),
-                  ignition::math::Angle(_lonA.Radian()),
-                  ignition::math::Angle(_latB.Radian()),
-                  ignition::math::Angle(_lonB.Radian()));
 }
 
 //////////////////////////////////////////////////

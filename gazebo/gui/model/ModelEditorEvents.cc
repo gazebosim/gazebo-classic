@@ -33,8 +33,10 @@ event::EventT<void (bool, bool, const math::Pose &, const std::string &)>
 event::EventT<void (std::string)> model::Events::saveModel;
 event::EventT<void ()> model::Events::newModel;
 
+event::EventT<void (std::string)> model::Events::nestedModelInserted;
 event::EventT<void (std::string)> model::Events::linkInserted;
 event::EventT<void (std::string)> model::Events::linkRemoved;
+event::EventT<void (std::string)> model::Events::requestLinkRemoval;
 event::EventT<void (std::string, std::string, std::string, std::string,
     std::string)> model::Events::jointInserted;
 event::EventT<void (std::string)> model::Events::jointRemoved;
@@ -52,3 +54,4 @@ event::EventT<void (std::string, bool)> model::Events::setSelectedJoint;
 event::EventT<void (std::string, bool)> model::Events::setSelectedModelPlugin;
 event::EventT<void (std::string)> model::Events::modelPluginInserted;
 event::EventT<void (std::string)> model::Events::modelPluginRemoved;
+event::EventT<void (std::string)> model::Events::requestModelPluginRemoval;

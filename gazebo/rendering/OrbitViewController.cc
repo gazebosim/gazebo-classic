@@ -32,15 +32,15 @@ static const float PITCH_LIMIT_LOW = -M_PI*0.5 + 0.001;
 static const float PITCH_LIMIT_HIGH = M_PI*0.5 - 0.001;
 
 //////////////////////////////////////////////////
-OrbitViewController::OrbitViewController(UserCameraPtr _camera)
+OrbitViewController::OrbitViewController(UserCameraPtr _camera,
+    const std::string &_name)
   : ViewController(_camera), distance(5.0f)
 {
   this->typeString = TYPE_STRING;
   this->init = false;
 
   // Create a visual that is used a reference point.
-  this->refVisual.reset(new Visual("OrbitViewController",
-                        this->camera->GetScene()));
+  this->refVisual.reset(new Visual(_name, this->camera->GetScene()));
 
   this->refVisual->Load();
   this->refVisual->AttachMesh("unit_sphere");
