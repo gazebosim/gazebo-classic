@@ -15,9 +15,9 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>100</iters>
+          <iters>200</iters>
           <precon_iters>0</precon_iters>
-          <sor>1.300000</sor>
+          <sor>1.000000</sor>
         </solver>
         <constraints>
           <cfm>0.000000</cfm>
@@ -161,10 +161,10 @@
         <parent>world</parent>
         <child>link_2</child>
         <axis>
-          <xyz>1.000000 0.000000 0.000000</xyz>
+          <xyz>0.000000 0.000000 1.000000</xyz>
           <limit>
-            <upper>0</upper>
-            <lower>0</lower>
+            <upper>-1000.0</upper>
+            <lower>1000.0</lower>
           </limit>
           <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
