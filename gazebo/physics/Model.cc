@@ -1269,3 +1269,17 @@ double Model::GetWorldEnergy() const
 {
   return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }
+
+/////////////////////////////////////////////////
+gazebo::physics::JointPtr Model::CreateJoint(
+  std::string _name, std::string _type,
+  physics::LinkPtr _parent, physics::LinkPtr _child)
+{
+  gazebo::physics::ModelPtr m(this);
+  gazebo::physics::JointPtr joint =
+    this->world->GetPhysicsEngine()->CreateJoint(_type, m);
+  joint->SetName(_name);
+  joint->Attach(_parent, _child);
+  this->joints.push_back(joint);
+  return joint;
+}

@@ -351,6 +351,15 @@ namespace gazebo
       /// \return this link's total energy
       public: double GetWorldEnergy() const;
 
+      /// \brief Create a joint for this model
+      /// \param[in] _name name of joint
+      /// \param[in] _type type of joint
+      /// \param[in] _parent parent link of joint
+      /// \param[in] _child child link of joint
+      public: gazebo::physics::JointPtr CreateJoint(
+        std::string _name, std::string _type,
+        physics::LinkPtr _parent, physics::LinkPtr _child);
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
