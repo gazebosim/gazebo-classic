@@ -876,8 +876,21 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     // (over the given timestep)
     IFTIMING(dTimerNow ("update position"));
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; ++bodycurr) {
+    dReal *cforcecurr = cforce;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+         cforcecurr+=8, ++bodycurr)
+    {
       dxBody *b = *bodycurr;
+      {
+        // sum all forces (external and constraint) into facc and tacc
+        // so dBodyGetForce and dBodyGetTorque returns total force and torque
+        // on the body
+        for (unsigned int j = 0; j < 3; ++j)
+        {
+          b->facc[j] += cforcecurr[j];
+          b->tacc[j] += cforcecurr[4+j];
+        }
+      }
       dxStepBody (b,stepsize);
     }
   }
