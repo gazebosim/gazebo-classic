@@ -82,10 +82,10 @@ void UndoTest::MsgPassing()
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init();
 
-  gazebo::transport::PublisherPtr userCmdStatsPub =
-      node->Advertise<gazebo::msgs::UserCmdStats>("~/user_cmd_stats");
   gazebo::transport::PublisherPtr userCmdPub =
       node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
+  gazebo::transport::PublisherPtr undoRedoPub =
+      node->Advertise<gazebo::msgs::UndoRedo>("~/undo_redo");
   gazebo::transport::SubscriberPtr undoRedoSub = node->Subscribe("~/undo_redo",
       &UndoTest::OnUndoRedo, this);
   gazebo::transport::SubscriberPtr userCmdStatsSub =
@@ -100,8 +100,8 @@ void UndoTest::MsgPassing()
   for (auto num : {1, 2, 3})
   {
     gazebo::msgs::UserCmd msg;
-    msg.set_id("ID_" + num);
-    msg.set_description("description_" + num);
+    msg.set_id("ID_" + std::to_string(num));
+    msg.set_description("description_" + std::to_string(num));
     msg.set_type(gazebo::msgs::UserCmd::MOVING);
 
     userCmdPub->Publish(msg);
@@ -125,47 +125,6 @@ void UndoTest::MsgPassing()
     QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled() == false);
   }
 
-
-
-/*
-  // Publish a message with user commands
-  gazebo::msgs::UserCmdStats statsMsg;
-
-  statsMsg.set_undo_cmd_count(3);
-  statsMsg.set_redo_cmd_count(2);
-
-  for (auto num : {1, 2, 3})
-  {
-    gazebo::msgs::UserCmd *msg = statsMsg.add_undo_cmd();
-    msg->set_id("ID_" + num);
-    msg->set_description("description_" + num);
-    msg->set_type(gazebo::msgs::UserCmd::MOVING);
-  }
-
-  for (auto num : {1, 2})
-  {
-    gazebo::msgs::UserCmd *msg = statsMsg.add_redo_cmd();
-    msg->set_id("ID_" + num);
-    msg->set_description("description_" + num);
-    msg->set_type(gazebo::msgs::UserCmd::MOVING);
-  }
-
-  userCmdStatsPub->Publish(statsMsg);
-*/
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
-
-  // Check the actions were enabled
-  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
-  QVERIFY(gazebo::gui::g_redoAct->isEnabled() == true);
-  QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled() == true);
-  QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled() == true);
-
   // Trigger undo
   QVERIFY(this->g_undoMsgReceived == false);
   gazebo::gui::g_undoAct->trigger();
@@ -181,6 +140,16 @@ void UndoTest::MsgPassing()
   // Check undo msg was published
   QVERIFY(this->g_undoMsgReceived == true);
 
+  // Check that the server received the message and published proper stats
+  QCOMPARE(g_undoCmdCount, 2);
+  QCOMPARE(g_redoCmdCount, 1);
+
+  // Check that redo is also enabled now
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+  QVERIFY(gazebo::gui::g_redoAct->isEnabled() == true);
+  QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled() == true);
+  QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled() == true);
+
   // Trigger redo
   QVERIFY(this->g_redoMsgReceived == false);
   gazebo::gui::g_redoAct->trigger();
@@ -195,6 +164,43 @@ void UndoTest::MsgPassing()
 
   // Check undo msg was published
   QVERIFY(this->g_redoMsgReceived == true);
+
+  // Check that the server received the message and published proper stats
+  QCOMPARE(g_undoCmdCount, 3);
+  QCOMPARE(g_redoCmdCount, 0);
+
+  // Check that redo is not enabled anymore
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+  QVERIFY(gazebo::gui::g_redoAct->isEnabled() == false);
+  QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled() == true);
+  QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled() == false);
+
+  // Publish an undo request with skipped samples
+  {
+    gazebo::msgs::UndoRedo msg;
+    msg.set_undo(true);
+    msg.set_id("ID_1");
+
+    undoRedoPub->Publish(msg);
+  }
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check that the server received the message and published proper stats
+  QCOMPARE(g_undoCmdCount, 0);
+  QCOMPARE(g_redoCmdCount, 3);
+
+  // Check that redo is enabled but undo isn't
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == false);
+  QVERIFY(gazebo::gui::g_redoAct->isEnabled() == true);
+  QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled() == false);
+  QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled() == true);
 
   node.reset();
   delete mainWindow;
