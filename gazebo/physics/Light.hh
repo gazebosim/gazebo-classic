@@ -52,13 +52,13 @@ namespace gazebo
       public: void SetState(const LightState &_state);
 
       // Documentation inherited
-      public: void OnPoseChange() {}
+      public: void OnPoseChange();
 
       /// \brief Publish the pose.
       private: void PublishPose();
 
       /// \brief Light message container.
-      protected: msgs::Light msg;
+      private: msgs::Light msg;
     };
     /// \}
   }

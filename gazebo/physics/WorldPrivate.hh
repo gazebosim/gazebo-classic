@@ -163,6 +163,9 @@ namespace gazebo
       /// \brief Mutex to protext loading of models.
       public: boost::mutex *loadModelMutex;
 
+      /// \brief Mutex to protext loading of lights.
+      public: boost::mutex *loadLightMutex;
+
       /// \TODO: Add an accessor for this, and make it private
       /// Used in Entity.cc.
       /// Entity::Reset to call Entity::SetWorldPose and Entity::SetRelativePose

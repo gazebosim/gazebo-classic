@@ -146,13 +146,16 @@ void WorldState::Load(const sdf::ElementPtr _elem)
 
     while (childElem)
     {
+      LightState lightState(childElem);
+      lightState.SetSimTime(this->simTime);
+      lightState.SetWallTime(this->wallTime);
+      lightState.SetRealTime(this->realTime);
+      lightState.SetIterations(this->iterations);
+
       std::string lightName = childElem->Get<std::string>("name");
       this->lightStates.insert(std::make_pair(
-            lightName, LightState(childElem)));
-      this->lightStates[lightName].SetSimTime(this->simTime);
-      this->lightStates[lightName].SetWallTime(this->wallTime);
-      this->lightStates[lightName].SetRealTime(this->realTime);
-      this->lightStates[lightName].SetIterations(this->iterations);
+            lightName, lightState));
+
       childElem = childElem->GetNextElement("light");
     }
   }
@@ -207,7 +210,7 @@ ModelState WorldState::GetModelState(const std::string &_modelName) const
     return iter->second;
 
   // Throw exception if the model name doesn't exist.
-  gzthrow("Invalid model name[" + _modelName + "].");
+  gzerr << "Invalid model name[" + _modelName + "]." << std::endl;
   return ModelState();
 }
 
@@ -220,30 +223,20 @@ LightState WorldState::GetLightState(const std::string &_lightName) const
     return iter->second;
 
   // Throw exception if the light name doesn't exist.
-  gzthrow("Invalid light name[" + _lightName + "].");
+  gzerr << "Invalid light name[" + _lightName + "]." << std::endl;
   return LightState();
 }
 
 /////////////////////////////////////////////////
 bool WorldState::HasModelState(const std::string &_modelName) const
 {
-  // Search for the model name
-  ModelState_M::const_iterator iter = this->modelStates.find(_modelName);
-  if (iter != this->modelStates.end())
-    return true;
-
-  return false;
+  return this->modelStates.find(_modelName) != this->modelStates.end();
 }
 
 /////////////////////////////////////////////////
 bool WorldState::HasLightState(const std::string &_lightName) const
 {
-  // Search for the light name
-  auto iter = this->lightStates.find(_lightName);
-  if (iter != this->lightStates.end())
-    return true;
-
-  return false;
+  return this->lightStates.find(_lightName) != this->lightStates.end();
 }
 
 /////////////////////////////////////////////////
