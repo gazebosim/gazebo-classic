@@ -121,7 +121,8 @@ namespace gazebo
       public: void FinishModel();
 
       /// \brief Add a link to the model.
-      /// \param[in] _type Type of link to add: box, cylinder, or sphere.
+      /// \param[in] _type Type of link to add: ENTITY_BOX, ENTITY_CYLINDER,
+      /// ENTITY_SPHERE, ENTITY_MESH or ENTITY_POLYLINE.
       /// \param[in] _size Size of the link.
       /// \param[in] _pose Pose of the link.
       /// \param[in] _samples Number of samples for polyline.
