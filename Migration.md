@@ -9,6 +9,12 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **Light topic**
+    + ***Removed:*** ~/light
+    + ***Replacement:*** ~/factory/light - for spawning new lights
+    + ***Replacement:*** ~/light/modify - for modifying existing lights
+    * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
+
 1. **gazebo/test/ServerFixture.hh**
     + ***Removed:*** protected: void RunServer(const std::string &_worldFilename);
     + ***Removed:*** protected: void RunServer(const std::string &_worldFilename,
@@ -67,7 +73,7 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Vector3d HSV() const;
 
 1. **gazebo/common/Dem.hh**
-    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude); 
+    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude);
     + ***Replacement:*** void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,  ignition::math::Angle &_longitude) const;
     + ***Deprecation:***void FillHeightMap(int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY, std::vector<float> &_heights);
     + ***Replacement:***void FillHeightMap(const int _subSampling, const unsigned int _vertSize, const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale, const bool _flipY, std::vector<float> &_heights);
