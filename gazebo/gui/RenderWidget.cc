@@ -25,7 +25,6 @@
 #include <iomanip>
 #include <boost/algorithm/string.hpp>
 
-#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 

@@ -316,31 +316,6 @@ namespace gazebo
       /// \param[in] _feedback ODE Joint Contact feedback information.
       public: void ProcessJointFeedback(ODEJointFeedback *_feedback);
 
-      protected: virtual void OnRequest(ConstRequestPtr &_msg);
-
-      protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
-
-      /// \brief Primary collision callback.
-      /// \param[in] _data Pointer to user data.
-      /// \param[in] _o1 First geom to check for collisions.
-      /// \param[in] _o2 Second geom to check for collisions.
-      private: static void CollisionCallback(void *_data, dGeomID _o1,
-                                             dGeomID _o2);
-
-
-      /// \brief Create a triangle mesh object collider.
-      /// \param[in] _collision1 The first collision object.
-      /// \param[in] _collision2 The second collision object.
-      private: void AddTrimeshCollider(ODECollision *_collision1,
-                                       ODECollision *_collision2);
-
-      /// \brief Create a normal object collider.
-      /// \param[in] _collision1 The first collision object.
-      /// \param[in] _collision2 The second collision object.
-      private: void AddCollider(ODECollision *_collision1,
-                                ODECollision *_collision2);
-
-
       /// \brief Get the SOR LCP Tolerance value
       /// \return The successive over-relaxation linear complementatory
       /// problem tolerance value.
@@ -408,12 +383,46 @@ namespace gazebo
       /// \brief Get the extra friction iterations parameter value
       /// \return The extra friction iterations parameter value
       /// \sa SetExtraFrictionIterations
-      public: double ExtraFrictionIterations() const;
+      public: int ExtraFrictionIterations() const;
 
-      /// \brief Get the extra friction iterations parameter value
+      /// \brief Set the extra friction iterations parameter value
       /// \param[in] _value The extra friction iterations parameter value
       /// \sa ExtraFrictionIterations
       public: void SetExtraFrictionIterations(const int &_value);
+
+      /// \brief Get the contact SOR scale factor
+      /// \return The contact successive over-relaxation scale factor
+      /// \sa SetContactSORScale
+      public: double ContactSORScale() const;
+
+      /// \brief Set the contact SOR scale factor
+      /// \param[in] _value The contact successive over-relaxation scale factor
+      /// \sa ContactSORScale
+      public: void SetContactSORScale(const double &_value);
+
+      protected: virtual void OnRequest(ConstRequestPtr &_msg);
+
+      protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
+
+      /// \brief Primary collision callback.
+      /// \param[in] _data Pointer to user data.
+      /// \param[in] _o1 First geom to check for collisions.
+      /// \param[in] _o2 Second geom to check for collisions.
+      private: static void CollisionCallback(void *_data, dGeomID _o1,
+                                             dGeomID _o2);
+
+
+      /// \brief Create a triangle mesh object collider.
+      /// \param[in] _collision1 The first collision object.
+      /// \param[in] _collision2 The second collision object.
+      private: void AddTrimeshCollider(ODECollision *_collision1,
+                                       ODECollision *_collision2);
+
+      /// \brief Create a normal object collider.
+      /// \param[in] _collision1 The first collision object.
+      /// \param[in] _collision2 The second collision object.
+      private: void AddCollider(ODECollision *_collision1,
+                                ODECollision *_collision2);
 
       /// \brief Helper function to create all the ODE parameters.
       private: void CreateParams();

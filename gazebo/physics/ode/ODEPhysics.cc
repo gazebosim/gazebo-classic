@@ -1452,7 +1452,7 @@ void ODEPhysics::SetWarmStartFactor(const double &_value)
 }
 
 //////////////////////////////////////////////////
-double ODEPhysics::ExtraFrictionIterations() const
+int ODEPhysics::ExtraFrictionIterations() const
 {
   return dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
 }
@@ -1516,6 +1516,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
   else if (_key == "contact_residual_smoothing")
     _value = dWorldGetQuickStepContactResidualSmoothing(this->dataPtr->worldId);
+  else if (_key == "contact_sor_scale")
+    _value = dWorldGetQuickStepContactSORScalingFactor(this->dataPtr->worldId);
   else if (_key == "thread_position_correction")
     _value = dWorldGetQuickStepThreadPositionCorrection(this->dataPtr->worldId);
   else if (_key == "experimental_row_reordering")
@@ -1543,6 +1545,18 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     #endif
   }
   return true;
+}
+
+/////////////////////////////////////////////////
+double ODEPhysics::ContactSORScale() const
+{
+  return dWorldGetQuickStepContactSORScalingFactor(this->dataPtr->worldId);
+}
+
+/////////////////////////////////////////////////
+void ODEPhysics::SetContactSORScale(const double &_value)
+{
+  dWorldSetQuickStepContactSORScalingFactor(this->dataPtr->worldId, _value);
 }
 
 /////////////////////////////////////////////////
@@ -1635,5 +1649,10 @@ void ODEPhysics::CreateParams()
   this->params.Add<int>("extra_friction_iterations",
       std::bind(&ODEPhysics::ExtraFrictionIterations, this),
       std::bind(&ODEPhysics::SetExtraFrictionIterations, this,
+        std::placeholders::_1));
+
+  this->params.Add<double>("contact_sor_scale",
+      std::bind(&ODEPhysics::ContactSORScale, this),
+      std::bind(&ODEPhysics::SetContactSORScale, this,
         std::placeholders::_1));
 }

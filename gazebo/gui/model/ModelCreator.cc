@@ -166,6 +166,14 @@ ModelCreator::ModelCreator()
       boost::bind(&ModelCreator::ShowModelPluginContextMenu, this, _1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectRequestLinkRemoval(
+        boost::bind(&ModelCreator::RemoveLink, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectRequestModelPluginRemoval(
+        boost::bind(&ModelCreator::RemoveModelPlugin, this, _1)));
+
+  this->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&ModelCreator::Update, this)));
 
@@ -867,6 +875,8 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   link->linkVisual = _visual->GetParent();
   link->AddVisual(_visual);
 
+  link->inspector->SetLinkId(link->linkVisual->GetName());
+
   // override transparency
   _visual->SetTransparency(_visual->GetTransparency() *
       (1-ModelData::GetEditTransparency()-0.1)
@@ -985,6 +995,7 @@ void ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   linkVisual->Load();
   linkVisual->SetPose(link->Pose());
   link->linkVisual = linkVisual;
+  link->inspector->SetLinkId(link->linkVisual->GetName());
 
   // Visuals
   int visualIndex = 0;
