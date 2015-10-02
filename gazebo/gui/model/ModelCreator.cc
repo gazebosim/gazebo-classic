@@ -1996,7 +1996,6 @@ JointMaker *ModelCreator::GetJointMaker() const
 /////////////////////////////////////////////////
 void ModelCreator::UpdateNestedModelSDF(sdf::ElementPtr _modelElem)
 {
-  return;
   if (this->modelName == this->serverModelName)
     return;
 
@@ -2514,9 +2513,6 @@ ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
 void ModelCreator::AppendPluginElement(const std::string &_name,
     const std::string &_filename, sdf::ElementPtr _sdfElement)
 {
-//  std::cerr << "ModelCreator::AppendPluginElement(): before=" << this->sdfToAppend->ToString("") << std::endl;
-//  std::cerr << "   element=" << _sdfElement->ToString("") << std::endl;
-
   // Insert into existing plugin element
   sdf::ElementPtr pluginElem = NULL;
 
@@ -2529,7 +2525,6 @@ void ModelCreator::AppendPluginElement(const std::string &_name,
     {
       pluginElem->InsertElement(_sdfElement);
       _sdfElement->SetParent(pluginElem);
-//      std::cerr << "ModelCreator::AppendPluginElement(): after=" << this->sdfToAppend->ToString("") << std::endl;
       return;
     }
     pluginElem = pluginElem->GetNextElement("plugin");
@@ -2546,8 +2541,6 @@ void ModelCreator::AppendPluginElement(const std::string &_name,
   _sdfElement->SetParent(pluginElem);
 
   this->sdfToAppend->InsertElement(pluginElem);
-
-//  std::cerr << "ModelCreator::AppendPluginElement(): after=" << this->sdfToAppend->ToString("") << std::endl;
 }
 
 static bool MatchingConnection(sdf::ElementPtr conn1, sdf::ElementPtr conn2)
@@ -2560,9 +2553,6 @@ static bool MatchingConnection(sdf::ElementPtr conn1, sdf::ElementPtr conn2)
 void ModelCreator::RemovePluginElement(const std::string &_name,
     const std::string &_filename, sdf::ElementPtr _sdfElement)
 {
-//  std::cerr << "ModelCreator::RemovePluginElement(): before=" << this->sdfToAppend->ToString("") << std::endl;
-//  std::cerr << "   element=" << _sdfElement->ToString("") << std::endl;
-
   sdf::ElementPtr pluginElem = NULL;
 
   if (this->sdfToAppend->HasElement("plugin"))
@@ -2590,6 +2580,4 @@ void ModelCreator::RemovePluginElement(const std::string &_name,
     }
     pluginElem = pluginElem->GetNextElement("plugin");
   }
-//  std::cerr << "ModelCreator::RemovePluginElement(): after=" << this->sdfToAppend->ToString("") << std::endl;
-
 }

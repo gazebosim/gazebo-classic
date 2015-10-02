@@ -224,7 +224,7 @@ namespace gazebo
             static event::ConnectionPtr ConnectNestedModelRemoved(T _subscriber)
           { return nestedModelRemoved.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the nestedModel removed signal.
+        /// \brief Disconnect a Gazebo event from nestedModel removed signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectNestedModelRemoved(
             event::ConnectionPtr _subscriber)

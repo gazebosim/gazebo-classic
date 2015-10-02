@@ -28,7 +28,6 @@
 
 namespace gazebo
 {
-
   class RegionEventBoxPlugin : public ModelPlugin
   {
     /// \brief Constructor
@@ -115,7 +114,6 @@ namespace gazebo
 
     /// \brief Pointer to event source object that emits sim events
     private: gazebo::EventSourcePtr eventSource;
-
   };
 }
 

@@ -322,7 +322,8 @@ void CollisionConfig::GetGeometry(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-std::map<int, const CollisionConfigData *> CollisionConfig::GetConfigData() const
+std::map<int, const CollisionConfigData *> CollisionConfig::GetConfigData()
+  const
 {
   std::map<int, const CollisionConfigData *> result;
 

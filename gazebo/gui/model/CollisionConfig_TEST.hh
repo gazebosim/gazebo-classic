@@ -33,7 +33,6 @@ class CollisionConfig_TEST : public QTestFixture
 
   /// \brief Test geometry data management
   private slots: void GeometryUpdates();
-
 };
 
 #endif

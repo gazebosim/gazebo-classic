@@ -36,7 +36,6 @@ class ModelCreator_TEST : public QTestFixture
 
   /// \brief Tests removal of plugin elements.
   private slots: void RemovePluginElement();
-
 };
 
 #endif

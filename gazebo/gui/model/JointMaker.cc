@@ -1108,11 +1108,6 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   {
     return 2;
   }
-  else if (_type == JOINT_GEARBOX)
-  {
-    return 2;
-  }
-
   return 0;
 }
 
@@ -1344,7 +1339,6 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   size_t cIdx = jointChildName.find_last_of("::");
   if (cIdx != std::string::npos)
     jointChildName = jointChildName.substr(cIdx+1);
-
 }
 
 /////////////////////////////////////////////////

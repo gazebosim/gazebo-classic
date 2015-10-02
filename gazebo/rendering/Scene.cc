@@ -2514,8 +2514,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   }
   else
   {
-//    std::cerr << "process visual _msg " << _msg->name() << " " << _msg->id() << std::endl;
-
     VisualPtr visual;
 
     // TODO: A bit of a hack.

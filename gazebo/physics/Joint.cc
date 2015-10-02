@@ -237,7 +237,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
         parentModel = parentModel->GetParent();
       else
         break;
-
     }
 
     if (!childLink)

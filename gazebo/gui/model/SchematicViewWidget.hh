@@ -114,7 +114,7 @@ namespace gazebo
       private: std::string GetLeafName(const std::string &_scopedName);
 
       /// \brief Helper function to get the entity scopd name without the
-      ///model name prefix.
+      /// model name prefix.
       /// \param[in] _scopedName Scoped name.
       /// \return Scopd name without model prefix.
       private: std::string GetScopedName(const std::string &_scopedName);
@@ -138,6 +138,10 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
+      /// \brief Callback when a joint is removed
+      /// \param[in] _jointId Name of the joint.
+      public: void OnJointRemoved(const std::string &_jointId);
+
       /// \brief Qt event received when the widget is being resized
       /// \param[in] _event Resize event.
       private: void resizeEvent(QResizeEvent *_event);
@@ -152,6 +156,9 @@ namespace gazebo
 
       /// \brief Qt callback when selected items have changed.
       private slots: void OnSelectionChanged();
+
+      /// \brief Qt Callback when a component is to be deleted.
+      private slots: void OnDeleteJoint();
 
       /// \brief Qt Graphics Scene where graphics items are drawn in
       private: GraphScene *scene;
@@ -176,6 +183,12 @@ namespace gazebo
 
       /// \brief Keeps track of selected items.
       private: QList<QGraphicsItem *> selectedItems;
+
+      /// \brief Qt action for deleting a connection.
+      private: QAction *deleteJointAction;
+
+      /// \brief Name of connection to be deleted.
+      private: std::string deleteJointName;
     };
   }
 }

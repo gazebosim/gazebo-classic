@@ -343,7 +343,8 @@ void ModelCreator_TEST::AddPluginElement()
   delete modelCreator;
 }
 
-static sdf::ElementPtr FindElementNamed(sdf::ElementPtr _parent, const std::string _name)
+static sdf::ElementPtr FindElementNamed(sdf::ElementPtr _parent,
+    const std::string &_name)
 {
   sdf::ElementPtr result = NULL;
   if (_parent)
@@ -365,7 +366,8 @@ void ModelCreator_TEST::RemovePluginElement()
 
   stream1 << "<sdf version='1.5'>"
           << "<model name='SampleModel'>"
-          << "<plugin name='simple_connections' filename='libSimpleConnectionsPlugin.so'>"
+          << "<plugin name='simple_connections' "
+          << "filename='libSimpleConnectionsPlugin.so'>"
           << "<connection>"
           << "  <source>AA_battery</source>"
           << "  <source_port>positive</source_port>"
@@ -377,14 +379,16 @@ void ModelCreator_TEST::RemovePluginElement()
           << "</sdf>";
 
   sdf1.SetFromString(stream1.str());
-  sdf::ElementPtr batterySwitchConnection = FindElementNamed(sdf1.Root(), "connection");
+  sdf::ElementPtr batterySwitchConnection =
+      FindElementNamed(sdf1.Root(), "connection");
 
   modelCreator->AppendPluginElement("simple_connections",
       "libSimpleConnectionsPlugin.so", batterySwitchConnection);
 
   stream2 << "<sdf version='1.5'>"
           << "<model name='SampleModel'>"
-          << "<plugin name='simple_connections' filename='libSimpleConnectionsPlugin.so'>"
+          << "<plugin name='simple_connections' "
+          << "filename='libSimpleConnectionsPlugin.so'>"
           << "<connection>"
           << "  <source>power_switch</source>"
           << "  <source_port>connector0</source_port>"
@@ -396,14 +400,16 @@ void ModelCreator_TEST::RemovePluginElement()
           << "</sdf>";
 
   sdf2.SetFromString(stream2.str());
-  sdf::ElementPtr switchMotorConnection = FindElementNamed(sdf2.Root(), "connection");
+  sdf::ElementPtr switchMotorConnection =
+      FindElementNamed(sdf2.Root(), "connection");
 
   modelCreator->AppendPluginElement("simple_connections",
       "libSimpleConnectionsPlugin.so", switchMotorConnection);
 
   stream3 << "<sdf version='1.5'>"
           << "<model name='SampleModel'>"
-          << "<plugin name='simple_connections' filename='libSimpleConnectionsPlugin.so'>"
+          << "<plugin name='simple_connections' "
+          << "filename='libSimpleConnectionsPlugin.so'>"
           << "<connection>"
           << "  <source>motor</source>"
           << "  <source_port>connector2</source_port>"
@@ -415,7 +421,8 @@ void ModelCreator_TEST::RemovePluginElement()
           << "</sdf>";
 
   sdf3.SetFromString(stream3.str());
-  sdf::ElementPtr motorBatteryConnection = FindElementNamed(sdf3.Root(), "connection");
+  sdf::ElementPtr motorBatteryConnection =
+      FindElementNamed(sdf3.Root(), "connection");
 
   modelCreator->AppendPluginElement("simple_connections",
       "libSimpleConnectionsPlugin.so", motorBatteryConnection);
