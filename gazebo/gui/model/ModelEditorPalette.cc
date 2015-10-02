@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
@@ -15,19 +16,18 @@
  *
 */
 
+#include <boost/bind.hpp>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
-#include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
-#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
-#include "gazebo/gui/model/ModelEditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;

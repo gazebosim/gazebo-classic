@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/math/Pose.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/KeyEvent.hh"
 

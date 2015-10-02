@@ -17,8 +17,6 @@
 
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/gui/KeyEventHandler.hh"
-#include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"

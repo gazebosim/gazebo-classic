@@ -63,6 +63,11 @@ namespace gazebo
       /// \brief Open the inspector.
       public: void Open();
 
+      /// \brief Set the unique id for the joint this inspector is attached to.
+      /// The ID might be generated after the inspector.
+      /// \param[in] _id Unique id.
+      public: void SetJointId(const std::string &_id);
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
@@ -95,6 +100,9 @@ namespace gazebo
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
+
+      /// \brief Qt callback when the Remove button is pressed.
+      private slots: void OnRemove();
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
@@ -133,6 +141,9 @@ namespace gazebo
 
       /// \brief Normal style sheet for link widgets.
       private: QString normalStyleSheet;
+
+      /// \brief Unique ID which identifies this joint in the joint maker.
+      private: std::string jointId;
     };
     /// \}
   }

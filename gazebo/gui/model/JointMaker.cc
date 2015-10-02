@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
 #include <vector>
@@ -194,6 +195,9 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   auto jointIt = this->joints.find(_jointId);
   if (jointIt != this->joints.end())
   {
+    // Copy the ID before it is deleted
+    std::string jointId = _jointId;
+
     JointData *joint = jointIt->second;
     rendering::ScenePtr scene = joint->hotspot->GetScene();
     if (scene)
@@ -227,7 +231,7 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
     delete joint;
     this->joints.erase(jointIt);
     gui::model::Events::modelChanged();
-    gui::model::Events::jointRemoved(_jointId);
+    gui::model::Events::jointRemoved(jointId);
   }
 }
 
@@ -798,6 +802,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
+  _joint->inspector->SetJointId(_joint->hotspot->GetName());
 
   std::string parentName = _joint->parent->GetName();
   std::string childName = _joint->child->GetName();

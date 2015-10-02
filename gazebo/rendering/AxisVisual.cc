@@ -237,8 +237,5 @@ void AxisVisual::SetAxisVisible(unsigned int _axis, bool _visible)
       return;
   };
 
-  if (_visible)
-    this->AttachVisual(axis);
-  else
-    this->DetachVisual(axis);
+  axis->SetVisible(_visible);
 }

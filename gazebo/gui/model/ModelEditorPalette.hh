@@ -18,10 +18,8 @@
 #ifndef _GAZEBO_MODEL_EDITOR_PALETTE_HH_
 #define _GAZEBO_MODEL_EDITOR_PALETTE_HH_
 
-#include <mutex>
 #include <map>
 #include <string>
-#include <vector>
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"

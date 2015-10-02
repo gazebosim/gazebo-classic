@@ -13,6 +13,10 @@ release will remove the deprecated code.
     + ***Removed:*** public: static event::EventT<void (bool, bool, const math::Pose &, const std::string &)> modelPropertiesChanged
     + ***Replacement:*** public: static event::EventT<void (bool, bool)> modelPropertiesChanged
     + ***Note:*** Removed last two arguments, model pose and name, from the function
+    
+1. **gazebo/rendering/Visual.hh**
+    + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true); 
+    + ***Replacement:*** public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
 1. **gazebo/rendering/OribitViewController.hh**
     + ***Removed:*** public: OrbitViewController(UserCameraPtr _camera);
