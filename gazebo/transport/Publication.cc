@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include "SubscriptionTransport.hh"
 #include "Publication.hh"
 #include "Node.hh"
