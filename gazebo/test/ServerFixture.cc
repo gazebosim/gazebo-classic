@@ -20,6 +20,7 @@
 #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <stdio.h>
 #include <string>
 #include <cmath>
