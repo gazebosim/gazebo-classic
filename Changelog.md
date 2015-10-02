@@ -2,6 +2,8 @@
 
 ### Gazebo 5.x.x
 
+### Gazebo 5.2.0 (2015-10-02)
+
 1. Initialize sigact struct fields that valgrind said were being used uninitialized
     * [Pull request #1809](https://bitbucket.org/osrf/gazebo/pull-request/1809)
 
