@@ -1144,14 +1144,12 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   {
     for (auto &it : link->visuals)
     {
-      rendering::VisualPtr vis = it.first;
-      scene->RemoveVisual(vis);
+      scene->RemoveVisual(it.first);
     }
     scene->RemoveVisual(link->linkVisual);
     for (auto &colIt : link->collisions)
     {
-      rendering::VisualPtr vis = colIt.first;
-      scene->RemoveVisual(vis);
+      scene->RemoveVisual(colIt.first);
     }
 
     scene->RemoveVisual(link->linkVisual);
@@ -2006,16 +2004,21 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
   newLinkElem->GetElement("pose")->Set(_link->linkVisual->GetWorldPose()
       - this->modelPose);
 
+  rendering::ScenePtr scene = rendering::get_scene();
+
   // visuals
   for (auto const &it : _link->visuals)
   {
-    rendering::VisualPtr visual = it.first;
-    msgs::Visual visualMsg = it.second;
-    sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
+    rendering::VisualPtr visual = scene->GetVisual(it.first);
+    if (visual)
+    {
+      msgs::Visual visualMsg = it.second;
+      sdf::ElementPtr visualElem = visual->GetSDF()->Clone();
 
-    visualElem->GetElement("transparency")->Set<double>(
-        visualMsg.transparency());
-    newLinkElem->InsertElement(visualElem);
+      visualElem->GetElement("transparency")->Set<double>(
+          visualMsg.transparency());
+      newLinkElem->InsertElement(visualElem);
+    }
   }
 
   // collisions

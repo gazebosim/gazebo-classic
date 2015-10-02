@@ -182,20 +182,25 @@ void LinkData::SetPose(const ignition::math::Pose3d &_pose)
 /////////////////////////////////////////////////
 void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 {
+  rendering::ScenePtr scene = this->linkVisual->GetScene();
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
   ignition::math::Vector3d dScale = _scale / this->scale;
   for (auto const &it : this->visuals)
   {
-    std::string name = it.first->GetName();
-    std::string linkName = this->linkVisual->GetName();
-    std::string leafName =
+    rendering::VisualPtr vis = scene->GetVisual(it.first);
+    if (vis)
+    {
+      std::string name = it.first;
+      std::string linkName = this->linkVisual->GetName();
+      std::string leafName =
         name.substr(name.find(linkName)+linkName.size()+2);
-    ignition::math::Vector3d visOldSize;
-    std::string uri;
-    visualConfig->Geometry(leafName,  visOldSize, uri);
-    ignition::math::Vector3d visNewSize = it.first->GetGeometrySize();
-    visualConfig->SetGeometry(leafName, visNewSize);
+      ignition::math::Vector3d visOldSize;
+      std::string uri;
+      visualConfig->Geometry(leafName,  visOldSize, uri);
+      ignition::math::Vector3d visNewSize = vis->GetGeometrySize();
+      visualConfig->SetGeometry(leafName, visNewSize);
+    }
   }
 
   std::map<std::string, ignition::math::Vector3d> colOldSizes;
@@ -203,18 +208,22 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   for (auto const &it : this->collisions)
   {
-    std::string name = it.first->GetName();
-    std::string linkName = this->linkVisual->GetName();
-    std::string leafName =
+    rendering::VisualPtr vis = scene->GetVisual(it.first);
+    if (vis)
+    {
+      std::string name = it.first;
+      std::string linkName = this->linkVisual->GetName();
+      std::string leafName =
         name.substr(name.find(linkName)+linkName.size()+2);
 
-    ignition::math::Vector3d colOldSize;
-    std::string uri;
-    collisionConfig->Geometry(leafName,  colOldSize, uri);
-    ignition::math::Vector3d colNewSize = it.first->GetGeometrySize();
-    collisionConfig->SetGeometry(leafName, colNewSize);
-    colOldSizes[name] = colOldSize;
-    colNewSizes[name] = colNewSize;
+      ignition::math::Vector3d colOldSize;
+      std::string uri;
+      collisionConfig->Geometry(leafName,  colOldSize, uri);
+      ignition::math::Vector3d colNewSize = vis->GetGeometrySize();
+      collisionConfig->SetGeometry(leafName, colNewSize);
+      colOldSizes[name] = colOldSize;
+      colNewSizes[name] = colNewSize;
+    }
   }
 
   if (this->collisions.empty())
@@ -232,34 +241,38 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   double oldVol = 0;
   for (auto const &it : this->collisions)
   {
-    ignition::math::Vector3d oldSize = colOldSizes[it.first->GetName()];
-    ignition::math::Vector3d newSize = colNewSizes[it.first->GetName()];
-    std::string geomStr = it.first->GetGeometryType();
-    if (geomStr == "sphere")
+    rendering::VisualPtr vis = scene->GetVisual(it.first);
+    if (vis)
     {
-      double r = oldSize.X() * 0.5;
-      double r3 = r*r*r;
-      double newR = newSize.X() * 0.5;
-      double newR3 = newR*newR*newR;
-      // sphere volume: 4/3 * PI * r^3
-      oldVol += 4.0 / 3.0 * IGN_PI * r3;
-      newVol += 4.0 / 3.0 * IGN_PI * newR3;
-    }
-    else if (geomStr == "cylinder")
-    {
-      double r = oldSize.X() * 0.5;
-      double r2 = r*r;
-      double newR = newSize.X() * 0.5;
-      double newR2 = newR*newR;
-      // cylinder volume: PI * r^2 * height
-      oldVol += IGN_PI * r2 * oldSize.Z();
-      newVol += IGN_PI * newR2 * newSize.Z();
-    }
-    else
-    {
-      // box, mesh, and other geometry types - use bounding box
-      oldVol += oldSize.X() * oldSize.Y() * oldSize.Z();
-      newVol += newSize.X() * newSize.Y() * newSize.Z();
+      ignition::math::Vector3d oldSize = colOldSizes[it.first];
+      ignition::math::Vector3d newSize = colNewSizes[it.first];
+      std::string geomStr = vis->GetGeometryType();
+      if (geomStr == "sphere")
+      {
+        double r = oldSize.X() * 0.5;
+        double r3 = r*r*r;
+        double newR = newSize.X() * 0.5;
+        double newR3 = newR*newR*newR;
+        // sphere volume: 4/3 * PI * r^3
+        oldVol += 4.0 / 3.0 * IGN_PI * r3;
+        newVol += 4.0 / 3.0 * IGN_PI * newR3;
+      }
+      else if (geomStr == "cylinder")
+      {
+        double r = oldSize.X() * 0.5;
+        double r2 = r*r;
+        double newR = newSize.X() * 0.5;
+        double newR2 = newR*newR;
+        // cylinder volume: PI * r^2 * height
+        oldVol += IGN_PI * r2 * oldSize.Z();
+        newVol += IGN_PI * newR2 * newSize.Z();
+      }
+      else
+      {
+        // box, mesh, and other geometry types - use bounding box
+        oldVol += oldSize.X() * oldSize.Y() * oldSize.Z();
+        newVol += newSize.X() * newSize.Y() * newSize.Z();
+      }
     }
   }
 
@@ -301,34 +314,38 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   if (this->collisions.size() == 1u)
   {
     auto const &it = this->collisions.begin();
-    std::string geomStr = it->first->GetGeometryType();
-    dInertiaScale = colNewSizes[it->first->GetName()] /
-        colOldSizes[it->first->GetName()];
-    if (geomStr == "sphere")
+    rendering::VisualPtr vis = scene->GetVisual(it->first);
+    if (vis)
     {
-      // solve for r^2
-      double r2 = ixx / (oldMass * 0.4);
+      std::string geomStr = vis->GetGeometryType();
+      dInertiaScale = colNewSizes[it->first] / colOldSizes[it->first];
+      if (geomStr == "sphere")
+      {
+        // solve for r^2
+        double r2 = ixx / (oldMass * 0.4);
 
-      // compute new inertia values based on new mass and radius
-      newIxx = newMass * 0.4 * (dInertiaScale.X() * dInertiaScale.X()) * r2;
-      newIyy = newIxx;
-      newIzz = newIxx;
-    }
-    else if (geomStr == "cylinder")
-    {
-      // solve for r^2 and l^2
-      double r2 = izz / (oldMass * 0.5);
-      double l2 = (ixx / oldMass - 0.25 * r2) * 12.0;
+        // compute new inertia values based on new mass and radius
+        newIxx = newMass * 0.4 * (dInertiaScale.X() * dInertiaScale.X()) * r2;
+        newIyy = newIxx;
+        newIzz = newIxx;
+      }
+      else if (geomStr == "cylinder")
+      {
+        // solve for r^2 and l^2
+        double r2 = izz / (oldMass * 0.5);
+        double l2 = (ixx / oldMass - 0.25 * r2) * 12.0;
 
-      // compute new inertia values based on new mass, radius and length
-      newIxx = newMass * (0.25 * (dInertiaScale.X() * dInertiaScale.X() * r2) +
-          (dInertiaScale.Z() * dInertiaScale.Z() * l2) / 12.0);
-      newIyy = newIxx;
-      newIzz = newMass * 0.5 * (dInertiaScale.X() * dInertiaScale.X() * r2);
-    }
-    else
-    {
-      boxInertia = true;
+        // compute new inertia values based on new mass, radius and length
+        newIxx = newMass * (0.25 * (dInertiaScale.X() *
+              dInertiaScale.X() * r2) + (dInertiaScale.Z() *
+              dInertiaScale.Z() * l2) / 12.0);
+        newIyy = newIxx;
+        newIzz = newMass * 0.5 * (dInertiaScale.X() * dInertiaScale.X() * r2);
+      }
+      else
+      {
+        boxInertia = true;
+      }
     }
   }
   else
@@ -482,54 +499,64 @@ void LinkData::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void LinkData::UpdateConfig()
 {
+  rendering::ScenePtr scene = rendering::get_scene();
+
   // set new geom size if scale has changed.
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   for (auto &it : this->visuals)
   {
-    std::string name = it.first->GetName();
-    std::string leafName = name;
-    size_t idx = name.rfind("::");
-    if (idx != std::string::npos)
-      leafName = name.substr(idx+2);
-    visualConfig->SetGeometry(leafName, it.first->GetGeometrySize(),
-        it.first->GetMeshName());
+    rendering::VisualPtr vis = scene->GetVisual(it.first);
+    if (vis)
+    {
+      std::string name = it.first;
+      std::string leafName = name;
+      size_t idx = name.rfind("::");
+      if (idx != std::string::npos)
+        leafName = name.substr(idx+2);
+      visualConfig->SetGeometry(leafName, vis->GetGeometrySize(),
+          vis->GetMeshName());
 
-    msgs::Visual *updateMsg = visualConfig->GetData(leafName);
-    msgs::Visual visualMsg = it.second;
-    updateMsg->clear_scale();
-    msgs::Material *matMsg = updateMsg->mutable_material();
-    // clear empty colors so they are not used by visual updates
-    common::Color emptyColor;
-    if (msgs::Convert(matMsg->ambient()) == emptyColor)
-      matMsg->clear_ambient();
-    if (msgs::Convert(matMsg->diffuse()) == emptyColor)
-      matMsg->clear_diffuse();
-    if (msgs::Convert(matMsg->specular()) == emptyColor)
-      matMsg->clear_specular();
-    if (msgs::Convert(matMsg->emissive()) == emptyColor)
-      matMsg->clear_emissive();
+      msgs::Visual *updateMsg = visualConfig->GetData(leafName);
+      msgs::Visual visualMsg = it.second;
+      updateMsg->clear_scale();
+      msgs::Material *matMsg = updateMsg->mutable_material();
+      // clear empty colors so they are not used by visual updates
+      common::Color emptyColor;
+      if (msgs::Convert(matMsg->ambient()) == emptyColor)
+        matMsg->clear_ambient();
+      if (msgs::Convert(matMsg->diffuse()) == emptyColor)
+        matMsg->clear_diffuse();
+      if (msgs::Convert(matMsg->specular()) == emptyColor)
+        matMsg->clear_specular();
+      if (msgs::Convert(matMsg->emissive()) == emptyColor)
+        matMsg->clear_emissive();
 
-    if (matMsg->has_diffuse())
-      matMsg->mutable_diffuse()->set_a(1.0-updateMsg->transparency());
+      if (matMsg->has_diffuse())
+        matMsg->mutable_diffuse()->set_a(1.0-updateMsg->transparency());
 
-    visualMsg.CopyFrom(*updateMsg);
-    it.second = visualMsg;
+      visualMsg.CopyFrom(*updateMsg);
+      it.second = visualMsg;
+    }
   }
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
   for (auto &colIt : this->collisions)
   {
-    std::string name = colIt.first->GetName();
-    std::string leafName = name;
-    size_t idx = name.rfind("::");
-    if (idx != std::string::npos)
-      leafName = name.substr(idx+2);
-    collisionConfig->SetGeometry(leafName, colIt.first->GetGeometrySize(),
-        colIt.first->GetMeshName());
+    rendering::VisualPtr vis = scene->GetVisual(colIt.first);
+    if (vis)
+    {
+      std::string name = colIt.first;
+      std::string leafName = name;
+      size_t idx = name.rfind("::");
+      if (idx != std::string::npos)
+        leafName = name.substr(idx+2);
+      collisionConfig->SetGeometry(leafName, vis->GetGeometrySize(),
+          vis->GetMeshName());
 
-    msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
-    msgs::Collision collisionMsg = colIt.second;
-    collisionMsg.CopyFrom(*updateMsg);
-    colIt.second = collisionMsg;
+      msgs::Collision *updateMsg = collisionConfig->GetData(leafName);
+      msgs::Collision collisionMsg = colIt.second;
+      collisionMsg.CopyFrom(*updateMsg);
+      colIt.second = collisionMsg;
+    }
   }
 }
 
@@ -539,7 +566,7 @@ void LinkData::AddVisual(rendering::VisualPtr _visual)
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
   msgs::Visual visualMsg = msgs::VisualFromSDF(_visual->GetSDF());
 
-  this->visuals[_visual] = visualMsg;
+  this->visuals[_visual->GetName()] = visualMsg;
 
   std::string visName = _visual->GetName();
   std::string leafName = visName;
@@ -582,7 +609,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
     poseMsg->CopyFrom(visualMsg.pose());
   }
 
-  this->collisions[_collisionVis] = collisionMsg;
+  this->collisions[_collisionVis->GetName()] = collisionMsg;
   collisionConfig->AddCollision(leafName, &collisionMsg);
 }
 
@@ -605,54 +632,66 @@ LinkData* LinkData::Clone(const std::string &_newName)
       this->linkVisual->GetParent()));
   linkVis->Load();
 
+  rendering::ScenePtr scene = this->linkVisual->GetScene();
+
   cloneLink->linkVisual = linkVis;
 
   for (auto &visIt : this->visuals)
   {
-    std::string newVisName = visIt.first->GetName();
-    size_t idx = newVisName.rfind("::");
-    std::string leafName = newVisName.substr(idx+2);
-    if (idx != std::string::npos)
-      newVisName = cloneVisName + "::" + leafName;
-    else
-      newVisName = cloneVisName + "::" + newVisName;
+    rendering::VisualPtr vis = scene->GetVisual(visIt.first);
+    if (vis)
+    {
+      std::string newVisName = visIt.first;
+      size_t idx = newVisName.rfind("::");
+      std::string leafName = newVisName.substr(idx+2);
+      if (idx != std::string::npos)
+        newVisName = cloneVisName + "::" + leafName;
+      else
+        newVisName = cloneVisName + "::" + newVisName;
 
-    rendering::VisualPtr cloneVis =
-        visIt.first->Clone(newVisName, cloneLink->linkVisual);
+      rendering::VisualPtr cloneVis =
+        vis->Clone(newVisName, cloneLink->linkVisual);
 
-    // store the leaf name in sdf not the full scoped name
-    cloneVis->GetSDF()->GetAttribute("name")->Set(leafName);
+      // store the leaf name in sdf not the full scoped name
+      cloneVis->GetSDF()->GetAttribute("name")->Set(leafName);
 
-    // override transparency
-    cloneVis->SetTransparency(visIt.second.transparency());
-    cloneLink->AddVisual(cloneVis);
-    cloneVis->SetTransparency(visIt.second.transparency() *
-        (1-ModelData::GetEditTransparency()-0.1)
-        + ModelData::GetEditTransparency());
+      // override transparency
+      cloneVis->SetTransparency(visIt.second.transparency());
+      cloneLink->AddVisual(cloneVis);
+      cloneVis->SetTransparency(visIt.second.transparency() *
+          (1-ModelData::GetEditTransparency()-0.1)
+          + ModelData::GetEditTransparency());
+    }
   }
 
   for (auto &colIt : this->collisions)
   {
-    std::string newColName = colIt.first->GetName();
-    size_t idx = newColName.rfind("::");
-    std::string leafName = newColName.substr(idx+2);
-    if (idx != std::string::npos)
-      newColName = cloneVisName + "::" + leafName;
-    else
-      newColName = cloneVisName + "::" + newColName;
-    rendering::VisualPtr collisionVis = colIt.first->Clone(newColName,
-        cloneLink->linkVisual);
+    rendering::VisualPtr vis = scene->GetVisual(colIt.first);
+    if (vis)
+    {
+      std::string newColName = colIt.first;
+      size_t idx = newColName.rfind("::");
+      std::string leafName = newColName.substr(idx+2);
+      if (idx != std::string::npos)
+        newColName = cloneVisName + "::" + leafName;
+      else
+        newColName = cloneVisName + "::" + newColName;
+      rendering::VisualPtr collisionVis = vis->Clone(newColName,
+          cloneLink->linkVisual);
 
-    // store the leaf name in sdf not the full scoped name
-    collisionVis->GetSDF()->GetAttribute("name")->Set(leafName);
+      // store the leaf name in sdf not the full scoped name
+      collisionVis->GetSDF()->GetAttribute("name")->Set(leafName);
 
-    collisionVis->SetTransparency(
-       ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
-    // fix for transparency alpha compositing
-    Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
+      collisionVis->SetTransparency(
+          ignition::math::clamp(
+            ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
+
+      // fix for transparency alpha compositing
+      Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
         getAttachedObject(0);
-    colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
-    cloneLink->AddCollision(collisionVis);
+      colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+      cloneLink->AddCollision(collisionVis);
+    }
   }
   return cloneLink;
 }
@@ -700,7 +739,7 @@ bool LinkData::Apply()
     VisualConfig *visualConfig = this->inspector->GetVisualConfig();
     for (auto &it : this->visuals)
     {
-      std::string name = it.first->GetName();
+      std::string name = it.first;
       std::string leafName = name;
       size_t idx = name.rfind("::");
       if (idx != std::string::npos)
@@ -833,7 +872,7 @@ bool LinkData::Apply()
         this->inspector->GetCollisionConfig();
     for (auto &it : this->collisions)
     {
-      std::string name = it.first->GetName();
+      std::string name = it.first;
       std::string leafName = name;
       size_t idx = name.rfind("::");
       if (idx != std::string::npos)
@@ -934,13 +973,15 @@ void LinkData::OnAddVisual(const std::string &_name)
   std::ostringstream visualName;
   visualName << this->linkVisual->GetName() << "::" << _name;
 
+  rendering::ScenePtr scene = this->linkVisual->GetScene();
   rendering::VisualPtr visVisual;
   rendering::VisualPtr refVisual;
   if (!this->visuals.empty())
   {
     // add new visual by cloning last instance
-    refVisual = this->visuals.rbegin()->first;
-    visVisual = refVisual->Clone(visualName.str(), this->linkVisual);
+    refVisual = scene->GetVisual(this->visuals.rbegin()->first);
+    if (refVisual)
+      visVisual = refVisual->Clone(visualName.str(), this->linkVisual);
   }
   else
   {
@@ -959,12 +1000,13 @@ void LinkData::OnAddVisual(const std::string &_name)
   msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
   // store the correct transparency setting
   if (refVisual)
-    visualMsg.set_transparency(this->visuals[refVisual].transparency());
+    visualMsg.set_transparency(
+        this->visuals[refVisual->GetName()].transparency());
 
   msgs::VisualPtr visualMsgPtr(new msgs::Visual);
   visualMsgPtr->CopyFrom(visualMsg);
   visualConfig->UpdateVisual(_name, visualMsgPtr);
-  this->visuals[visVisual] = visualMsg;
+  this->visuals[visVisual->GetName()] = visualMsg;
   visVisual->SetTransparency(visualMsg.transparency() *
       (1-ModelData::GetEditTransparency()-0.1)
       + ModelData::GetEditTransparency());
@@ -980,12 +1022,17 @@ void LinkData::OnAddCollision(const std::string &_name)
   std::stringstream collisionName;
   collisionName << this->linkVisual->GetName() << "::" << _name;
 
+  rendering::ScenePtr scene = this->linkVisual->GetScene();
   rendering::VisualPtr collisionVis;
   if (!this->collisions.empty())
   {
-    // add new collision by cloning last instance
-    collisionVis = this->collisions.rbegin()->first->Clone(collisionName.str(),
-        this->linkVisual);
+    rendering::VisualPtr vis = scene->GetVisual(
+        this->collisions.rbegin()->first);
+    if (vis)
+    {
+      // add new collision by cloning last instance
+      collisionVis = vis->Clone(collisionName.str(), this->linkVisual);
+    }
   }
   else
   {
@@ -996,7 +1043,7 @@ void LinkData::OnAddCollision(const std::string &_name)
 
     collisionVis.reset(new rendering::Visual(collisionName.str(),
         this->linkVisual));
-    sdf::ElementPtr collisionElem =  modelTemplateSDF->Root()
+    sdf::ElementPtr collisionElem = modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     collisionVis->Load(collisionElem);
     collisionVis->SetMaterial("Gazebo/Orange");
@@ -1011,7 +1058,7 @@ void LinkData::OnAddCollision(const std::string &_name)
   msgs::CollisionPtr collisionMsgPtr(new msgs::Collision);
   collisionMsgPtr->CopyFrom(collisionMsg);
   collisionConfig->UpdateCollision(_name, collisionMsgPtr);
-  this->collisions[collisionVis] = collisionMsg;
+  this->collisions[collisionVis->GetName()] = collisionMsg;
 
   collisionVis->SetTransparency(
       ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
@@ -1033,7 +1080,7 @@ void LinkData::OnRemoveVisual(const std::string &_name)
 
   for (auto it = this->visuals.begin(); it != this->visuals.end(); ++it)
   {
-    if (visualName == it->first->GetName())
+    if (visualName == it->first)
     {
       this->linkVisual->DetachVisual(it->first);
       this->linkVisual->GetScene()->RemoveVisual(it->first);
@@ -1054,7 +1101,7 @@ void LinkData::OnRemoveCollision(const std::string &_name)
 
   for (auto it = this->collisions.begin(); it != this->collisions.end(); ++it)
   {
-    if (collisionName == it->first->GetName())
+    if (collisionName == it->first)
     {
       this->linkVisual->DetachVisual(it->first);
       this->linkVisual->GetScene()->RemoveVisual(it->first);
@@ -1068,6 +1115,7 @@ void LinkData::OnRemoveCollision(const std::string &_name)
 void LinkData::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  rendering::ScenePtr scene = this->linkVisual->GetScene();
 
   while (!this->visualUpdateMsgs.empty())
   {
@@ -1080,13 +1128,17 @@ void LinkData::Update()
     {
       if (it.second.name() == updateMsgPtr->name())
       {
-        // make visual semi-transparent here
-        // but generated sdf will use the correct transparency value
-        it.first->UpdateFromMsg(updateMsgPtr);
-        it.first->SetTransparency(updateMsgPtr->transparency() *
-            (1-ModelData::GetEditTransparency()-0.1)
-            + ModelData::GetEditTransparency());
-        break;
+        rendering::VisualPtr vis = scene->GetVisual(it.first);
+        if (vis)
+        {
+          // make visual semi-transparent here
+          // but generated sdf will use the correct transparency value
+          vis->UpdateFromMsg(updateMsgPtr);
+          vis->SetTransparency(updateMsgPtr->transparency() *
+              (1-ModelData::GetEditTransparency()-0.1)
+              + ModelData::GetEditTransparency());
+          break;
+        }
       }
     }
   }
@@ -1099,26 +1151,30 @@ void LinkData::Update()
     {
       if (it.second.name() == collisionMsg.name())
       {
-        msgs::Visual collisionVisMsg;
-        msgs::Geometry *geomMsg = collisionVisMsg.mutable_geometry();
-        geomMsg->CopyFrom(collisionMsg.geometry());
-        msgs::Pose *poseMsg = collisionVisMsg.mutable_pose();
-        poseMsg->CopyFrom(collisionMsg.pose());
-
-        boost::shared_ptr<gazebo::msgs::Visual> updateMsgPtr;
-        updateMsgPtr.reset(new msgs::Visual);
-        updateMsgPtr->CopyFrom(collisionVisMsg);
-        std::string origGeomType = it.first->GetGeometryType();
-        it.first->UpdateFromMsg(updateMsgPtr);
-
-        // fix for transparency alpha compositing
-        if (it.first->GetGeometryType() != origGeomType)
+        rendering::VisualPtr vis = scene->GetVisual(it.first);
+        if (vis)
         {
-          Ogre::MovableObject *colObj = it.first->GetSceneNode()->
+          msgs::Visual collisionVisMsg;
+          msgs::Geometry *geomMsg = collisionVisMsg.mutable_geometry();
+          geomMsg->CopyFrom(collisionMsg.geometry());
+          msgs::Pose *poseMsg = collisionVisMsg.mutable_pose();
+          poseMsg->CopyFrom(collisionMsg.pose());
+
+          boost::shared_ptr<gazebo::msgs::Visual> updateMsgPtr;
+          updateMsgPtr.reset(new msgs::Visual);
+          updateMsgPtr->CopyFrom(collisionVisMsg);
+          std::string origGeomType = vis->GetGeometryType();
+          vis->UpdateFromMsg(updateMsgPtr);
+
+          // fix for transparency alpha compositing
+          if (vis->GetGeometryType() != origGeomType)
+          {
+            Ogre::MovableObject *colObj = vis->GetSceneNode()->
               getAttachedObject(0);
-          colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+            colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+          }
+          break;
         }
-        break;
       }
     }
   }

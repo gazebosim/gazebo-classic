@@ -90,7 +90,8 @@ void ModelData_TEST::Clone()
   // verify clone link visual
   QCOMPARE(cloneLink->visuals.size(), link->visuals.size());
   QVERIFY(cloneLink->visuals.size() == 1u);
-  rendering::VisualPtr cloneVis = cloneLink->visuals.begin()->first;
+  rendering::VisualPtr cloneVis = scene->GetVisual(
+      cloneLink->visuals.begin()->first);
   QVERIFY(cloneVis != NULL);
   QCOMPARE(cloneVis->GetName(), "model::" + cloneLinkName + "::visual");
   QCOMPARE(cloneVis->GetGeometryType(), std::string("box"));
@@ -99,7 +100,8 @@ void ModelData_TEST::Clone()
   // verify clone link collision
   QCOMPARE(cloneLink->collisions.size(), link->collisions.size());
   QVERIFY(cloneLink->collisions.size() == 1u);
-  rendering::VisualPtr cloneCol = cloneLink->collisions.begin()->first;
+  rendering::VisualPtr cloneCol = scene->GetVisual(
+      cloneLink->collisions.begin()->first);
   QVERIFY(cloneCol != NULL);
   QCOMPARE(cloneCol->GetName(), "model::" + cloneLinkName + "::collision");
   QCOMPARE(cloneCol->GetGeometryType(), std::string("box"));

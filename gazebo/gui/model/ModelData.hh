@@ -190,7 +190,7 @@ namespace gazebo
       public: rendering::VisualPtr linkVisual;
 
       /// \brief Visuals of the link.
-      public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
+      public: std::map<std::string, msgs::Visual> visuals;
 
       /// \brief Msgs for updating visuals.
       public: std::vector<msgs::Visual *> visualUpdateMsgs;
@@ -199,7 +199,7 @@ namespace gazebo
       public: std::vector<msgs::Collision *> collisionUpdateMsgs;
 
       /// \brief Collisions of the link.
-      public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
+      public: std::map<std::string, msgs::Collision> collisions;
 
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;

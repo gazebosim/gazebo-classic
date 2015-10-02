@@ -375,12 +375,12 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (this->mouseEvent.Control())
   {
     if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty()
-       && !this->modelEditorEnabled && g_copyAct->isEnabled())
+        && !this->modelEditorEnabled && g_copyAct->isEnabled())
     {
       g_copyAct->trigger();
     }
     else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty()
-       && !this->modelEditorEnabled && g_pasteAct->isEnabled())
+        && !this->modelEditorEnabled && g_pasteAct->isEnabled())
     {
       g_pasteAct->trigger();
     }

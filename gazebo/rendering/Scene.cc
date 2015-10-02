@@ -2976,6 +2976,16 @@ void Scene::RemoveVisual(VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+void Scene::RemoveVisual(const std::string &_name)
+{
+  VisualPtr vis = this->GetVisual(_name);
+  if (vis)
+    this->RemoveVisual(vis->GetId());
+  else
+    gzwarn << "Unable to find visual with name[" << _name << "]\n";
+}
+
+/////////////////////////////////////////////////
 void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 {
   if (!_vis)

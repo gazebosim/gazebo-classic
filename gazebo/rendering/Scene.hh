@@ -363,6 +363,10 @@ namespace gazebo
       public: void RemoveVisual(VisualPtr _vis);
 
       /// \brief Remove a visual from the scene.
+      /// \param[in] _name Name of the visual to remove.
+      public: void RemoveVisual(const std::string &_name);
+
+      /// \brief Remove a visual from the scene.
       /// \param[in] _id Id of the visual to remove.
       public: void RemoveVisual(uint32_t _id);
 
