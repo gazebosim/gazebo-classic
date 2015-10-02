@@ -114,36 +114,8 @@ namespace gazebo
       /// \brief Set save state upon a change to the model.
       public: void ModelChanged();
 
-      /// \brief Callback for newing the model.
-      private: void OnNew();
-
       /// \brief Helper function to manage writing files to disk.
       public: void SaveModelFiles();
-
-      /// \brief Callback for saving the model.
-      /// \return True if the user chose to save, false if the user cancelled.
-      private: bool OnSave();
-
-      /// \brief Callback for selecting a folder and saving the model.
-      /// \return True if the user chose to save, false if the user cancelled.
-      private: bool OnSaveAs();
-
-      /// \brief Callback for when the name is changed through the model
-      /// settings tab.
-      /// \param[in] _modelName The newly entered model name.
-      private: void OnNameChanged(const std::string &_modelName);
-
-      /// \brief Event received when the model properties changed.
-      /// \param[in] _static New static property of the model.
-      /// \param[in] _autoDisable New allow_auto_disable property of the model.
-      private: void OnPropertiesChanged(const bool _static,
-          const bool _autoDisable);
-
-      /// \brief Callback received when exiting the editor mode.
-      private: void OnExit();
-
-      /// \brief Update callback on PreRender.
-      private: void Update();
 
       /// \brief Finish the model and create the entity on the gzserver.
       public: void FinishModel();
@@ -255,6 +227,34 @@ namespace gazebo
       /// \param[in] _link Link data used to generate the sdf.
       /// \return SDF element describing the link.
       private: sdf::ElementPtr GenerateLinkSDF(LinkData *_link);
+
+      /// \brief Callback for newing the model.
+      private: void OnNew();
+
+      /// \brief Callback for saving the model.
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSave();
+
+      /// \brief Callback for selecting a folder and saving the model.
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSaveAs();
+
+      /// \brief Callback for when the name is changed through the model
+      /// settings tab.
+      /// \param[in] _modelName The newly entered model name.
+      private: void OnNameChanged(const std::string &_modelName);
+
+      /// \brief Event received when the model properties changed.
+      /// \param[in] _static New static property of the model.
+      /// \param[in] _autoDisable New allow_auto_disable property of the model.
+      private: void OnPropertiesChanged(const bool _static,
+          const bool _autoDisable);
+
+      /// \brief Callback received when exiting the editor mode.
+      private: void OnExit();
+
+      /// \brief Update callback on PreRender.
+      private: void Update();
 
       /// \brief Internal helper function to remove a nestedModel without
       /// removing the joints.
@@ -496,9 +496,6 @@ namespace gazebo
 
       /// \brief A map of model plugin names to and their data.
       private: std::map<std::string, ModelPluginData *> allModelPlugins;
-
-      /// \brief A map of nested model link names and their visuals.
-      private: std::map<std::string, LinkData *> nestedLinks;
 
       /// \brief Transport node
       private: transport::NodePtr node;

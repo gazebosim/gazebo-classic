@@ -453,7 +453,7 @@ void ModelEditor::ToggleInsertWidget()
   if (insertModelIdx < 0)
   {
     gzerr << "Insert tab not found. It will not be available in the"
-        << "model editor" << std::endl;
+        << " model editor" << std::endl;
     return;
   }
 
@@ -462,6 +462,7 @@ void ModelEditor::ToggleInsertWidget()
   this->dataPtr->modelPalette->InsertWidget(1, this->dataPtr->insertModel);
   this->dataPtr->modelPalette->show();
   this->dataPtr->insertModel->show();
+  this->tabWidget->setCurrentIndex(0);
 }
 
 /////////////////////////////////////////////////
@@ -515,7 +516,6 @@ void ModelEditor::OnCreateEntity(const std::string &_type,
       gzerr << "No model in SDF\n";
       return;
     }
-
   }
 }
 

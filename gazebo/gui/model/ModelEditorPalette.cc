@@ -135,12 +135,9 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->splitter = new QSplitter(Qt::Vertical, this);
   this->splitter->addWidget(paletteWidget);
-  //this->splitter->setSizes(sizes);
-  this->splitter->setStretchFactor(0, 1);
   splitter->setCollapsible(0, false);
 
   frameLayout->addWidget(this->splitter);
-//  frameLayout->addWidget(paletteWidget);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
@@ -277,14 +274,8 @@ void ModelEditorPalette::InsertWidget(unsigned int _index, QWidget *_widget)
   GZ_ASSERT(childCount > 0,
       "ModelEditorPalette splitter has no child widget");
 
-/*  QSize widgetSize = this->size();
-  int newSize = widgetSize.height() / (this->splitter->count()+1);
-  QList<int> newSizes;
-  for (int i = 0; i < childCount+1; ++i)
-    newSizes.append(newSize);*/
-
   this->splitter->insertWidget(_index, _widget);
-  this->splitter->setStretchFactor(_index, 2);
+  this->splitter->setStretchFactor(_index, 1);
 }
 
 /////////////////////////////////////////////////

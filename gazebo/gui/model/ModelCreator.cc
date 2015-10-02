@@ -194,15 +194,11 @@ ModelCreator::~ModelCreator()
   while (!this->allLinks.empty())
     this->RemoveLinkImpl(this->allLinks.begin()->first);
 
-  while (!this->nestedLinks.empty())
-    this->RemoveLinkImpl(this->nestedLinks.begin()->first);
-
   while (!this->allNestedModels.empty())
     this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
 
   this->allNestedModels.clear();
   this->allLinks.clear();
-  this->nestedLinks.clear();
   this->allModelPlugins.clear();
   this->node->Fini();
   this->node.reset();
@@ -454,6 +450,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
   while (linkElem)
   {
     LinkData *linkData = this->CreateLinkFromSDF(linkElem, modelVisual);
+    linkData->nested = true;
     rendering::VisualPtr linkVis = linkData->linkVisual;
 
     modelData->links[linkVis->GetName()] = linkVis;
@@ -1121,7 +1118,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   }
 
   // Top-level links only
-  if (_parentVis == this->previewVisual)
+/*  if (_parentVis == this->previewVisual)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks[linkName] = link;
@@ -1131,6 +1128,15 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->nestedLinks[linkName] = link;
+  }*/
+
+  // Top-level links only
+  if (_parentVis == this->previewVisual)
+    gui::model::Events::linkInserted(linkName);
+
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    this->allLinks[linkName] = link;
   }
 
   this->ModelChanged();
@@ -1173,7 +1179,7 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
   for (auto &linkIt : modelData->links)
   {
     // if it's a link
-    if (this->nestedLinks.find(linkIt.first) != this->nestedLinks.end())
+    if (this->allLinks.find(linkIt.first) != this->allLinks.end())
     {
       if (this->jointMaker)
       {
@@ -1212,9 +1218,10 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   LinkData *link = NULL;
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    if (this->allLinks.find(_linkName) == this->allLinks.end())
+    auto linkIt = this->allLinks.find(_linkName);
+    if (linkIt == this->allLinks.end())
       return;
-    link = this->allLinks[_linkName];
+    link = linkIt->second;
   }
 
   if (!link)
@@ -1245,7 +1252,6 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   {
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allLinks.erase(linkName);
-    this->nestedLinks.erase(linkName);
     delete link;
   }
   gui::model::Events::linkRemoved(linkName);
@@ -1421,7 +1427,7 @@ void ModelCreator::AddEntity(sdf::ElementPtr _sdf)
   {
     // Create a top-level nested model
     NestedModelData *modelData =
-        this->CreateModelFromSDF(_sdf, this->previewVisual/*, true*/);
+        this->CreateModelFromSDF(_sdf, this->previewVisual);
 
     rendering::VisualPtr entityVisual = modelData->modelVisual;
 
@@ -2003,6 +2009,8 @@ void ModelCreator::GenerateSDF()
     for (auto &linksIt : this->allLinks)
     {
       LinkData *link = linksIt.second;
+      if (link->nested)
+        continue;
       mid += link->Pose().Pos();
       entityCount++;
     }
@@ -2031,6 +2039,8 @@ void ModelCreator::GenerateSDF()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
+    if (link->nested)
+      continue;
     link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
     link->linkVisual->SetPose(link->Pose());
   }
@@ -2057,20 +2067,22 @@ void ModelCreator::GenerateSDF()
     if (canonical != this->allLinks.end())
     {
       LinkData *link = canonical->second;
-      link->UpdateConfig();
-
-      sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(link);
-      modelElem->InsertElement(newLinkElem);
+      if (!link->nested)
+      {
+        link->UpdateConfig();
+        sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(link);
+        modelElem->InsertElement(newLinkElem);
+      }
     }
   }
 
   // loop through rest of all links and generate sdf
   for (auto &linksIt : this->allLinks)
   {
-    if (linksIt.first == this->canonicalLink)
+    LinkData *link = linksIt.second;
+    if (linksIt.first == this->canonicalLink || link->nested)
       continue;
 
-    LinkData *link = linksIt.second;
     link->UpdateConfig();
 
     sdf::ElementPtr newLinkElem = this->GenerateLinkSDF(link);

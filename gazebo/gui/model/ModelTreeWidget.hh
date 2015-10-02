@@ -26,7 +26,6 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/KeyEvent.hh"
 
-//#include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -34,8 +33,6 @@ namespace gazebo
 {
   namespace gui
   {
-    //class ModelCreator;
-
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -50,7 +47,7 @@ namespace gazebo
       public: ModelTreeWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~ModelTreeWidget();
+      public: ~ModelTreeWidget() = default;
 
       /// \brief Callback when an entity is selected.
       /// \param[in] _name Name of entity.

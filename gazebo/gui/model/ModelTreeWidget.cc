@@ -69,12 +69,6 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
   settingsLayout->addWidget(autoDisableLabel, 2, 0);
   settingsLayout->addWidget(this->autoDisableCheck, 2, 1);
 
-//  this->modelCreator = new ModelCreator();
-//  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
-
-//  this->otherItemsLayout = new QVBoxLayout();
-//  this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
-
   // Model tree
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setObjectName("modelTreeWidget");
@@ -232,11 +226,6 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-ModelTreeWidget::~ModelTreeWidget()
-{
-}
-
-/////////////////////////////////////////////////
 void ModelTreeWidget::OnAutoDisable()
 {
   gui::model::Events::modelPropertiesChanged(this->staticCheck->isChecked(),
@@ -270,22 +259,6 @@ void ModelTreeWidget::OnModelNameChanged(const std::string &_name)
   this->modelNameEdit->setText(tr(_name.c_str()));
   this->modelNameEdit->blockSignals(oldState);
 }
-
-/*/////////////////////////////////////////////////
-bool ModelTreeWidget::OnKeyPress(const common::KeyEvent &_event)
-{
-  if (_event.key == Qt::Key_Escape)
-  {
-    // call the slots to uncheck the buttons
-    this->OnLinkAdded();
-  }
-  if (_event.key == Qt::Key_Delete)
-  {
-    event::Events::setSelectedEntity("", "normal");
-    g_arrowAct->trigger();
-  }
-  return false;
-}*/
 
 /////////////////////////////////////////////////
 void ModelTreeWidget::OnItemSelectionChanged()
