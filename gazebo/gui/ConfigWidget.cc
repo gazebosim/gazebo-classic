@@ -24,14 +24,12 @@
 using namespace gazebo;
 using namespace gui;
 
-const QString ConfigWidget::level0BgColor = "#999999";
-const QString ConfigWidget::level1BgColor = "#777777";
-const QString ConfigWidget::level2BgColor = "#555555";
-const QString ConfigWidget::level3BgColor = "#333333";
-const QString ConfigWidget::level0WidgetColor = "#eeeeee";
-const QString ConfigWidget::level1WidgetColor = "#cccccc";
-const QString ConfigWidget::level2WidgetColor = "#aaaaaa";
-const QString ConfigWidget::level3WidgetColor = "#888888";
+const std::vector<QString> ConfigWidget::bgColors(
+      {"#999999", "#777777", "#555555", "#333333"});
+
+const std::vector<QString> ConfigWidget::widgetColors(
+      {"#eeeeee", "#cccccc", "#aaaaaa", "#888888"});
+
 const QString ConfigWidget::redColor = "#d42b2b";
 const QString ConfigWidget::greenColor = "#3bc43b";
 const QString ConfigWidget::blueColor = "#0d0df2";
@@ -955,11 +953,11 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
         newFieldWidget->setStyleSheet(
             "QWidget\
             {\
-              background-color: " + this->level0BgColor +
+              background-color: " + this->bgColors[0] +
             "}\
             QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
             {\
-              background-color: " + this->level0WidgetColor +
+              background-color: " + this->widgetColors[0] +
             "}");
       }
 
@@ -1044,7 +1042,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     buttonFrame->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level0BgColor +
+          background-color: " + this->bgColors[0] +
         "}");
   }
 
@@ -1070,11 +1068,11 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     _childWidget->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level1BgColor +
+          background-color: " + this->bgColors[1] +
         "}\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
         {\
-          background-color: " + this->level1WidgetColor +
+          background-color: " + this->widgetColors[1] +
         "}");
   }
   else if (_level == 1)
@@ -1082,11 +1080,11 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     _childWidget->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level2BgColor +
+          background-color: " + this->bgColors[2] +
         "}\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
         {\
-          background-color: " + this->level2WidgetColor +
+          background-color: " + this->widgetColors[2] +
         "}");
   }
   else if (_level == 2)
@@ -1094,11 +1092,11 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
     _childWidget->setStyleSheet(
         "QWidget\
         {\
-          background-color: " + this->level3BgColor +
+          background-color: " + this->bgColors[3] +
         "}\
         QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox, QPlainTextEdit\
         {\
-          background-color: " + this->level3WidgetColor +
+          background-color: " + this->widgetColors[3] +
         "}");
   }
 
@@ -1136,14 +1134,19 @@ math::Vector3 ConfigWidget::ParseVector3(const google::protobuf::Message *_msg)
 ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // SpinBox
-  QSpinBox *valueSpinBox = new QSpinBox;
+  QSpinBox *valueSpinBox = new QSpinBox(widget);
   valueSpinBox->setRange(0, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
+  connect(valueSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnUIntValueChanged()));
 
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
@@ -1156,7 +1159,6 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
   widgetLayout->addWidget(valueSpinBox);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1169,14 +1171,19 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // SpinBox
-  QSpinBox *valueSpinBox = new QSpinBox;
+  QSpinBox *valueSpinBox = new QSpinBox(widget);
   valueSpinBox->setRange(-1e8, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
+  connect(valueSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnIntValueChanged()));
 
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
@@ -1189,7 +1196,6 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
   widgetLayout->addWidget(valueSpinBox);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1202,6 +1208,9 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
@@ -1211,11 +1220,13 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   double max = 0;
   this->GetRangeFromKey(_key, min, max);
 
-  QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox(widget);
   valueSpinBox->setRange(min, max);
   valueSpinBox->setSingleStep(0.01);
   valueSpinBox->setDecimals(8);
   valueSpinBox->setAlignment(Qt::AlignRight);
+  connect(valueSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnDoubleValueChanged()));
 
   // Unit
   std::string jointType = this->GetEnumWidgetValue("type");
@@ -1238,7 +1249,6 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
     widgetLayout->addWidget(unitLabel);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->key = _key;
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
@@ -1253,6 +1263,9 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
     const int _level, const std::string &_type)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
@@ -1261,12 +1274,15 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
   QWidget *valueEdit;
   if (_type == "plain")
   {
-    valueEdit = new QPlainTextEdit();
+    valueEdit = new QPlainTextEdit(widget);
     valueEdit->setMinimumHeight(50);
+    // QPlainTextEdit's don't have editingFinished signals
   }
   else if (_type == "line")
   {
-    valueEdit = new QLineEdit;
+    valueEdit = new QLineEdit(widget);
+    connect(valueEdit, SIGNAL(editingFinished()), this,
+        SLOT(OnStringValueChanged()));
   }
   else
   {
@@ -1286,7 +1302,6 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
   widgetLayout->addWidget(valueEdit);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1299,20 +1314,30 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // Buttons
-  QHBoxLayout *buttonLayout = new QHBoxLayout;
-  QRadioButton *valueTrueRadioButton = new QRadioButton;
+  QRadioButton *valueTrueRadioButton = new QRadioButton(widget);
   valueTrueRadioButton->setText(tr("True"));
-  QRadioButton *valueFalseRadioButton = new QRadioButton;
+  connect(valueTrueRadioButton, SIGNAL(toggled(bool)), this,
+      SLOT(OnBoolValueChanged()));
+
+  QRadioButton *valueFalseRadioButton = new QRadioButton(widget);
   valueFalseRadioButton->setText(tr("False"));
+  connect(valueFalseRadioButton, SIGNAL(toggled(bool)), this,
+      SLOT(OnBoolValueChanged()));
+
   QButtonGroup *boolButtonGroup = new QButtonGroup;
   boolButtonGroup->addButton(valueTrueRadioButton);
   boolButtonGroup->addButton(valueFalseRadioButton);
   boolButtonGroup->setExclusive(true);
+
+  QHBoxLayout *buttonLayout = new QHBoxLayout;
   buttonLayout->addWidget(valueTrueRadioButton);
   buttonLayout->addWidget(valueFalseRadioButton);
 
@@ -1327,7 +1352,6 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
   widgetLayout->addLayout(buttonLayout);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1341,6 +1365,9 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
     const std::string &_key, const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Labels
   QLabel *vecXLabel = new QLabel(tr("X"));
   QLabel *vecYLabel = new QLabel(tr("Y"));
@@ -1354,26 +1381,32 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   double max = 0;
   this->GetRangeFromKey(_key, min, max);
 
-  QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox(widget);
   vecXSpinBox->setRange(min, max);
   vecXSpinBox->setSingleStep(0.01);
   vecXSpinBox->setDecimals(6);
   vecXSpinBox->setAlignment(Qt::AlignRight);
   vecXSpinBox->setMaximumWidth(100);
+  connect(vecXSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnVector3dValueChanged()));
 
-  QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox(widget);
   vecYSpinBox->setRange(min, max);
   vecYSpinBox->setSingleStep(0.01);
   vecYSpinBox->setDecimals(6);
   vecYSpinBox->setAlignment(Qt::AlignRight);
   vecYSpinBox->setMaximumWidth(100);
+  connect(vecYSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnVector3dValueChanged()));
 
-  QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox(widget);
   vecZSpinBox->setRange(min, max);
   vecZSpinBox->setSingleStep(0.01);
   vecZSpinBox->setDecimals(6);
   vecZSpinBox->setAlignment(Qt::AlignRight);
   vecZSpinBox->setMaximumWidth(100);
+  connect(vecZSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnVector3dValueChanged()));
 
   // This is inside a group
   int level = _level + 1;
@@ -1394,7 +1427,6 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   widgetLayout->setAlignment(vecZLabel, Qt::AlignRight);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1409,6 +1441,9 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
 ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Labels
   QLabel *colorRLabel = new QLabel(tr("R"));
   QLabel *colorGLabel = new QLabel(tr("G"));
@@ -1424,33 +1459,41 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   double max = 0;
   this->GetRangeFromKey(_key, min, max);
 
-  QDoubleSpinBox *colorRSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *colorRSpinBox = new QDoubleSpinBox(widget);
   colorRSpinBox->setRange(0, 1.0);
   colorRSpinBox->setSingleStep(0.1);
   colorRSpinBox->setDecimals(3);
   colorRSpinBox->setAlignment(Qt::AlignRight);
   colorRSpinBox->setMaximumWidth(10);
+  connect(colorRSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnColorValueChanged()));
 
-  QDoubleSpinBox *colorGSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *colorGSpinBox = new QDoubleSpinBox(widget);
   colorGSpinBox->setRange(0, 1.0);
   colorGSpinBox->setSingleStep(0.1);
   colorGSpinBox->setDecimals(3);
   colorGSpinBox->setAlignment(Qt::AlignRight);
   colorGSpinBox->setMaximumWidth(10);
+  connect(colorGSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnColorValueChanged()));
 
-  QDoubleSpinBox *colorBSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *colorBSpinBox = new QDoubleSpinBox(widget);
   colorBSpinBox->setRange(0, 1.0);
   colorBSpinBox->setSingleStep(0.1);
   colorBSpinBox->setDecimals(3);
   colorBSpinBox->setAlignment(Qt::AlignRight);
   colorBSpinBox->setMaximumWidth(10);
+  connect(colorBSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnColorValueChanged()));
 
-  QDoubleSpinBox *colorASpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *colorASpinBox = new QDoubleSpinBox(widget);
   colorASpinBox->setRange(0, 1.0);
   colorASpinBox->setSingleStep(0.1);
   colorASpinBox->setDecimals(3);
   colorASpinBox->setAlignment(Qt::AlignRight);
   colorASpinBox->setMaximumWidth(10);
+  connect(colorASpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnColorValueChanged()));
 
   // This is inside a group
   int level = _level + 1;
@@ -1474,7 +1517,6 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   widgetLayout->setAlignment(colorALabel, Qt::AlignRight);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1519,7 +1561,8 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
 
   for (unsigned int i = 0; i < elements.size(); ++i)
   {
-    QDoubleSpinBox *spin = new QDoubleSpinBox();
+    QDoubleSpinBox *spin = new QDoubleSpinBox(widget);
+    connect(spin, SIGNAL(editingFinished()), this, SLOT(OnPoseValueChanged()));
     widget->widgets.push_back(spin);
 
     spin->setRange(min, max);
@@ -2619,20 +2662,173 @@ void ConfigWidget::OnItemSelection(QTreeWidgetItem *_item,
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget::OnUIntValueChanged()
+{
+  QSpinBox *spin =
+      qobject_cast<QSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit UIntValueChanged(widget->scopedName.c_str(),
+      this->GetUIntWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnIntValueChanged()
+{
+  QSpinBox *spin =
+      qobject_cast<QSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit IntValueChanged(widget->scopedName.c_str(),
+      this->GetIntWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnDoubleValueChanged()
+{
+  QDoubleSpinBox *spin =
+      qobject_cast<QDoubleSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit DoubleValueChanged(widget->scopedName.c_str(),
+      this->GetDoubleWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnBoolValueChanged()
+{
+  QRadioButton *radio =
+      qobject_cast<QRadioButton *>(QObject::sender());
+
+  if (!radio)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(radio->parent());
+
+  if (!widget)
+    return;
+
+  emit BoolValueChanged(widget->scopedName.c_str(),
+      this->GetBoolWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnStringValueChanged()
+{
+  QLineEdit *lineEdit = qobject_cast<QLineEdit *>(QObject::sender());
+  QPlainTextEdit *plainTextEdit =
+      qobject_cast<QPlainTextEdit *>(QObject::sender());
+
+  QWidget *valueEdit;
+  if (!lineEdit && !plainTextEdit)
+    return;
+  else if (lineEdit)
+    valueEdit = lineEdit;
+  else
+    valueEdit = plainTextEdit;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(valueEdit->parent());
+
+  if (!widget)
+    return;
+
+  emit StringValueChanged(widget->scopedName.c_str(),
+      this->GetStringWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnVector3dValueChanged()
+{
+  QDoubleSpinBox *spin =
+      qobject_cast<QDoubleSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit Vector3dValueChanged(widget->scopedName.c_str(),
+      this->GetVector3WidgetValue(widget).Ign());
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnColorValueChanged()
+{
+  QDoubleSpinBox *spin =
+      qobject_cast<QDoubleSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit ColorValueChanged(widget->scopedName.c_str(),
+      this->GetColorWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnPoseValueChanged()
+{
+  QDoubleSpinBox *spin =
+      qobject_cast<QDoubleSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit PoseValueChanged(widget->scopedName.c_str(),
+      this->GetPoseWidgetValue(widget).Ign());
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget::OnEnumValueChanged(const QString &_value)
 {
   ConfigChildWidget *widget =
       qobject_cast<ConfigChildWidget *>(QObject::sender());
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      std::string scopedName = iter.first;
-      emit EnumValueChanged(tr(scopedName.c_str()), _value);
-      return;
-    }
-  }
+  if (!widget)
+    return;
+
+  emit EnumValueChanged(widget->scopedName.c_str(), _value);
 }
 
 /////////////////////////////////////////////////
@@ -2652,6 +2848,7 @@ bool ConfigWidget::AddConfigChildWidget(const std::string &_name,
     return false;
   }
 
+  _child->scopedName = _name;
   this->configWidgets[_name] = _child;
   return true;
 }
@@ -2878,4 +3075,19 @@ bool ConfigWidget::RemoveItemEnumWidget(const std::string &_name,
   valueComboBox->blockSignals(false);
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::InsertLayout(QLayout *_layout, int _pos)
+{
+  QGroupBox *box = qobject_cast<QGroupBox *>(
+      this->layout()->itemAt(0)->widget());
+  if (!box)
+    return;
+
+  QVBoxLayout *boxLayout = qobject_cast<QVBoxLayout *>(box->layout());
+  if (!boxLayout)
+    return;
+
+  boxLayout->insertLayout(_pos, _layout);
 }

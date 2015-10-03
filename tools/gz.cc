@@ -491,7 +491,7 @@ bool ModelCommand::RunImpl()
       return false;
     }
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     if (!sdf::init(sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed" << std::endl;
@@ -517,7 +517,7 @@ bool ModelCommand::RunImpl()
       sdfString += input;
     }
 
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     if (!sdf::init(sdf))
     {
       std::cerr << "Error: SDF parsing the xml failed" << std::endl;
@@ -570,7 +570,7 @@ bool ModelCommand::RunImpl()
 }
 
 /////////////////////////////////////////////////
-bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
+bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
     const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
 {
   sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
@@ -984,7 +984,7 @@ bool SDFCommand::RunImpl()
     std::cerr << "Error initializing log file" << std::endl;
   }
 
-  boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+  sdf::SDFPtr sdf(new sdf::SDF());
 
   if (this->vm.count("version"))
   {

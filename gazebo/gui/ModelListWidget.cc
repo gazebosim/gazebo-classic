@@ -24,6 +24,8 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -42,10 +44,6 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/gui/GuiIface.hh"
-
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"

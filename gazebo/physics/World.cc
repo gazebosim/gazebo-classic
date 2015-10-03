@@ -26,6 +26,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -694,7 +695,9 @@ void World::Step()
     this->dataPtr->prevStepWallTime = common::Time::GetWallTime();
 
     double stepTime = this->dataPtr->physicsEngine->GetMaxStepSize();
-    if (!this->IsPaused() || this->dataPtr->stepInc > 0)
+
+    if (!this->IsPaused() || this->dataPtr->stepInc > 0
+        || this->dataPtr->needsReset)
     {
       // query timestep to allow dynamic time step size updates
       this->dataPtr->simTime += stepTime;
@@ -1097,6 +1100,10 @@ void World::ResetTime()
   this->dataPtr->startTime = common::Time::GetWallTime();
   this->dataPtr->realTimeOffset = common::Time(0);
   this->dataPtr->iterations = 0;
+
+  if (this->IsPaused())
+    this->dataPtr->pauseStartTime = this->dataPtr->startTime;
+
   sensors::SensorManager::Instance()->ResetLastUpdateTimes();
 }
 
@@ -1310,6 +1317,8 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   {
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = 1;
+    if (!util::LogPlay::Instance()->HasIterations())
+      this->dataPtr->iterations = 0;
   }
 
   if (_data->has_forward() && _data->forward())

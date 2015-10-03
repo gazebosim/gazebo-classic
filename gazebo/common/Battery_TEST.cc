@@ -15,7 +15,6 @@
  *
 */
 
-#include "gazebo/physics/Model.hh"
 #include "gazebo/common/Battery.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "test/util.hh"

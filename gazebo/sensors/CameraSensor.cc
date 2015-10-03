@@ -20,6 +20,9 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
+
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
