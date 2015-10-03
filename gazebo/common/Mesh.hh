@@ -67,17 +67,7 @@ namespace gazebo
 
       /// \brief Get the maximun X, Y, Z values
       /// \return the upper bounds of the bounding box
-      /// \deprecated See Max function that returns ignition::math::Vector3d
-      public: math::Vector3 GetMax() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the maximun X, Y, Z values
-      /// \return the upper bounds of the bounding box
       public: ignition::math::Vector3d Max() const;
-
-      /// \brief Get the minimum X, Y, Z values
-      /// \return the lower bounds of the bounding box
-      /// \deprecated See Min function that returns ignition::math::Vector3d
-      public: math::Vector3 GetMin() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the minimum X, Y, Z values
       /// \return the lower bounds of the bounding box
@@ -149,29 +139,11 @@ namespace gazebo
 
       /// \brief Get AABB coordinate
       /// \param[out] _center of the bounding box
-      /// \param[out] _min_xyz bounding box minimum values
-      /// \param[out] _max_xyz bounding box maximum values
-      /// \deprecated See GetAABB function that accepts
-      /// ignition::math::Vector3d
-      public: void GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
-                           math::Vector3 &_max_xyz) const
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get AABB coordinate
-      /// \param[out] _center of the bounding box
       /// \param[out] _minXYZ bounding box minimum values
       /// \param[out] _maxXYZ bounding box maximum values
       public: void GetAABB(ignition::math::Vector3d &_center,
                            ignition::math::Vector3d &_minXYZ,
                            ignition::math::Vector3d &_maxXYZ) const;
-
-      /// \brief Generate texture coordinates using spherical projection
-      /// from center
-      /// \param[in] _center the center of the projection
-      /// \deprecated See GenSphericalTexCoord that accepts
-      /// ignition::math::Vector3d.
-      public: void GenSphericalTexCoord(const math::Vector3 &_center)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Generate texture coordinates using spherical projection
       /// from center
@@ -195,34 +167,13 @@ namespace gazebo
 
       /// \brief Scale all vertices by the _factor vector
       /// \param[in] _factor Scaling vector
-      /// \deprecated See SetScale function that accepts
-      /// ignition::math::Vector3d
-      public: void SetScale(const math::Vector3 &_factor)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Scale all vertices by the _factor vector
-      /// \param[in] _factor Scaling vector
       public: void SetScale(const ignition::math::Vector3d &_factor);
-
-      /// \brief Move the center of the mesh to the given coordinate. This
-      /// will move all the vertices in all submeshes.
-      /// \param[in] _center Location of the mesh center.
-      /// \deprecated See Center function that accepts
-      /// ignition::math::Vector3
-      public: void Center(const math::Vector3 &_center = math::Vector3::Zero)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Move the center of the mesh to the given coordinate. This
       /// will move all the vertices in all submeshes.
       /// \param[in] _center Location of the mesh center.
       public: void Center(const ignition::math::Vector3d &_center =
                   ignition::math::Vector3d::Zero);
-
-      /// \brief Move all vertices in all submeshes by _vec.
-      /// \param[in] _vec Amount to translate vertices.
-      /// \deprecated See Translate function that accepts
-      /// ignition::math::Vector3d.
-      public: void Translate(const math::Vector3 &_vec) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Move all vertices in all submeshes by _vec.
       /// \param[in] _vec Amount to translate vertices.
@@ -295,22 +246,8 @@ namespace gazebo
 
       /// \brief Copy vertices from a vector
       /// \param[in] _verts the vertices to copy from
-      /// \deprecated See CopyVertices that accepts
-      /// ignition::math::Vector3d.
-      public: void CopyVertices(const std::vector<math::Vector3> &_verts)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Copy vertices from a vector
-      /// \param[in] _verts the vertices to copy from
       public: void CopyVertices(
                   const std::vector<ignition::math::Vector3d> &_verts);
-
-      /// \brief Copy normals from a vector
-      /// \param[in] _norms to copy from
-      /// \deprecated See CopyNormals that accepts
-      /// ignition::math::Vector3d.
-      public: void CopyNormals(const std::vector<math::Vector3> &_norms)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Copy normals from a vector
       /// \param[in] _norms to copy from
@@ -339,12 +276,6 @@ namespace gazebo
 
       /// \brief Add a vertex to the mesh
       /// \param[in] _v the new position
-      /// \deprecated See AddVertex function that accepts
-      /// ignition::math::Vector3d.
-      public: void AddVertex(const math::Vector3 &_v) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Add a vertex to the mesh
-      /// \param[in] _v the new position
       public: void AddVertex(const ignition::math::Vector3d &_v);
 
       /// \brief Add a vertex to the mesh
@@ -352,12 +283,6 @@ namespace gazebo
       /// \param[in] _y position along y
       /// \param[in] _z position along z
       public: void AddVertex(double _x, double _y, double _z);
-
-      /// \brief Add a normal to the mesh
-      /// \param[in] _n the normal
-      /// \deprecated See AddNormal function that accepts
-      /// ignition::math::Vector3d.
-      public: void AddNormal(const math::Vector3 &_n) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Add a normal to the mesh
       /// \param[in] _n the normal
@@ -384,23 +309,7 @@ namespace gazebo
       /// \brief Get a vertex
       /// \param[in] _i the vertex index
       /// \return the position or throws an exception
-      /// \deprecated See Vertex function that return an
-      /// ignition::math::Vector3d.
-      public: math::Vector3 GetVertex(unsigned int _i) const
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get a vertex
-      /// \param[in] _i the vertex index
-      /// \return the position or throws an exception
       public: ignition::math::Vector3d Vertex(unsigned int _i) const;
-
-      /// \brief Set a vertex
-      /// \param[in] _i the index
-      /// \param[in] _v the position
-      /// \deprecated See SetVertex function that accepts
-      /// ignition::math::Vector3d.
-      public: void SetVertex(unsigned int _i, const math::Vector3 &_v)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Set a vertex
       /// \param[in] _i the index
@@ -411,37 +320,13 @@ namespace gazebo
       /// \brief Get a normal
       /// \param[in] _i the normal index
       /// \return the orientation of the normal, or throws an exception
-      /// \deprecated See Normal function that return
-      /// ignition::math::Vector3d.
-      public: math::Vector3 GetNormal(unsigned int _i) const
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get a normal
-      /// \param[in] _i the normal index
-      /// \return the orientation of the normal, or throws an exception
       public: ignition::math::Vector3d Normal(unsigned int _i) const;
-
-      /// \brief Set a normal
-      /// \param[in] _i the normal index
-      /// \param[in] _n the normal direction
-      /// \deprecated See SetNormal function that accepts
-      /// ignition::math::Vector3d.
-      public: void SetNormal(unsigned int _i, const math::Vector3 &_n)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Set a normal
       /// \param[in] _i the normal index
       /// \param[in] _n the normal direction
       public: void SetNormal(unsigned int _i,
                   const ignition::math::Vector3d &_n);
-
-      /// \brief Get a tex coord
-      /// \param[in] _i the texture index
-      /// \return the texture coordinates
-      /// \deprecated See TexCoord function that return
-      /// ignition::math::Vector2d.
-      public: math::Vector2d GetTexCoord(unsigned int _i) const
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get a tex coord
       /// \param[in] _i the texture index
@@ -455,14 +340,6 @@ namespace gazebo
       /// \brief Set a tex coord
       /// \param[in] _i
       /// \param[in] _t
-      /// \deprecated See SetTexCoord function that accepts
-      /// ignition::math::Vector2d.
-      public: void SetTexCoord(unsigned int _i, const math::Vector2d &_t)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set a tex coord
-      /// \param[in] _i
-      /// \param[in] _t
       public: void SetTexCoord(unsigned int _i,
                                const ignition::math::Vector2d &_t);
 
@@ -470,19 +347,9 @@ namespace gazebo
       /// \param[in] _i
       public: unsigned int GetIndex(unsigned int _i) const;
 
-      /// \brief Get the maximum X, Y, Z values
-      /// \return Max X,Y,Z values from all vertices in submesh
-      /// \deprecated See Max function that returns ignition::math::Vector3d.
-      public: math::Vector3 GetMax() const GAZEBO_DEPRECATED(6.0);
-
       /// \brief Get the maximum X, Y, Z values from all the vertices
       /// \return Max X,Y,Z values from all vertices in submesh
       public: ignition::math::Vector3d Max() const;
-
-      /// \brief Get the minimum X, Y, Z values from all the vertices
-      /// \return Min X,Y,Z values from all vertices in submesh
-      /// \deprecated See Min function that returns ignition::math::Vector3d.
-      public: math::Vector3 GetMin() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the minimum X, Y, Z values from all the vertices
       /// \return Min X,Y,Z values from all vertices in submesh
@@ -517,22 +384,7 @@ namespace gazebo
       /// \brief Return true if this submesh has the vertex
       /// \param[in] _v
       /// \return Return true if this submesh has the vertex
-      /// \deprecated See HasVertex function that accepts
-      /// ignition::math::Vector3d.
-      public: bool HasVertex(const math::Vector3 &_v) const
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Return true if this submesh has the vertex
-      /// \param[in] _v
-      /// \return Return true if this submesh has the vertex
       public: bool HasVertex(const ignition::math::Vector3d &_v) const;
-
-      /// \brief Get the index of the vertex
-      /// \param[in] _v
-      /// \deprecated See GetVertexIndex function that accepts
-      /// ignition::math::Vector3d.
-      public: unsigned int GetVertexIndex(const math::Vector3 &_v) const
-               GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the index of the vertex
       /// \param[in] _v Vertex to check
@@ -551,14 +403,6 @@ namespace gazebo
       /// \brief Generate texture coordinates using spherical projection
       /// from center
       /// \param[in] _center
-      /// \deprecated See GenSphericalTexCoord that accepts
-      /// ignition::math::Vector3d.
-      public: void GenSphericalTexCoord(const math::Vector3 &_center)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Generate texture coordinates using spherical projection
-      /// from center
-      /// \param[in] _center
       public: void GenSphericalTexCoord(
                   const ignition::math::Vector3d &_center);
 
@@ -569,33 +413,12 @@ namespace gazebo
       /// \brief Move the center of the submesh to the given coordinate. This
       /// will move all the vertices.
       /// \param[in] _center Location of the mesh center.
-      /// \deprecated See Center function that accepts
-      /// ignition::math::Vector3d.
-      public: void Center(const math::Vector3 &_center = math::Vector3::Zero)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Move the center of the submesh to the given coordinate. This
-      /// will move all the vertices.
-      /// \param[in] _center Location of the mesh center.
       public: void Center(const ignition::math::Vector3d &_center =
                   ignition::math::Vector3d::Zero);
 
       /// \brief Move all vertices by _vec.
       /// \param[in] _vec Amount to translate vertices.
-      /// \deprecated See Translate function that accepts
-      /// ignition::math::Vector3d.
-      public: void Translate(const math::Vector3 &_vec) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Move all vertices by _vec.
-      /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const ignition::math::Vector3d &_vec);
-
-      /// \brief Scale all vertices by the _factor vector
-      /// \param[in] _factor Scaling vector
-      /// \deprecated See SetScale function accepts
-      /// ignition::math::Vector3d.
-      public: void SetScale(const math::Vector3 &_factor)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Scale all vertices by the _factor vector
       /// \param[in] _factor Scaling vector
