@@ -63,10 +63,8 @@ void CameraLens::Init(const double _c1, const double _c2,
   }
   catch(...)
   {
-    std::stringstream sstr;
-    sstr << "Failed to create custom mapping with function [" << _fun << "]";
-
-    gzthrow(sstr.str());
+    gzerr << "Failed to create custom mapping with function [" << _fun << "]"
+      << std::endl;
   }
 }
 
@@ -88,7 +86,7 @@ void CameraLens::Load(sdf::ElementPtr _sdf)
 void CameraLens::Load()
 {
   if (!this->dataPtr->sdf->HasElement("type"))
-    gzthrow("You should specify lens type using <type> element");
+    gzerr << "You should specify lens type using <type> element" << std::endl;
 
   if (this->IsCustom())
   {
@@ -104,7 +102,8 @@ void CameraLens::Load()
         cf->Get<double>("c3"));
     }
     else
-      gzthrow("You need a <custom_function> element to use this lens type");
+      gzerr << "You need a <custom_function> element to use this lens type"
+        << std::endl;
   }
   else
     this->Init(this->Type());
@@ -208,10 +207,7 @@ void CameraLens::SetType(const std::string &_type)
   }
   catch(...)
   {
-    std::stringstream sstr;
-    sstr << "Unknown mapping function [" << _type << "]";
-
-    gzthrow(sstr.str());
+    gzerr << "Unknown mapping function [" << _type << "]" << std::endl;
   }
 
   this->dataPtr->sdf->GetElement("type")->Set(_type);
@@ -231,8 +227,17 @@ void CameraLens::SetType(const std::string &_type)
     this->dataPtr->c2 = std::get<1>(params);
     this->dataPtr->c3 = std::get<2>(params);
     this->dataPtr->f = std::get<3>(params);
-    this->dataPtr->fun =
-        CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
+
+    try
+    {
+      this->dataPtr->fun =
+          CameraLensPrivate::MapFunctionEnum(std::get<4>(params));
+    }
+    catch(...)
+    {
+      gzerr << "Failed to create custom mapping with function ["
+          << std::get<4>(params) << "]" << std::endl;
+    }
   }
 }
 
@@ -302,10 +307,9 @@ void CameraLens::SetFun(const std::string &_fun)
   }
   catch(...)
   {
-    std::stringstream sstr;
-    sstr << "Failed to create custom mapping with function [" << _fun << "]";
-
-    gzthrow(sstr.str());
+    gzerr << "Failed to create custom mapping with function [" << _fun << "]"
+        << std::endl;
+    return;
   }
 
   auto customFunction = this->dataPtr->sdf->GetElement("custom_function");
@@ -344,19 +348,19 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass, const float _ratio,
   if (this->ScaleToHFOV())
   {
     float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
-    float fun_res = this->dataPtr->fun.Apply(static_cast<float>(param));
+    float funRes = this->dataPtr->fun.Apply(static_cast<float>(param));
 
-    float new_f = 1.0f/(this->dataPtr->c1*fun_res);
+    float newF = 1.0f/(this->dataPtr->c1*funRes);
 
-    uniforms->setNamedConstant("f", static_cast<Ogre::Real>(new_f));
+    uniforms->setNamedConstant("f", static_cast<Ogre::Real>(newF));
   }
   else
     uniforms->setNamedConstant("f", static_cast<Ogre::Real>(this->dataPtr->f));
 
-  auto vec_fun = this->dataPtr->fun.AsVector3d();
+  auto vecFun = this->dataPtr->fun.AsVector3d();
 
   uniforms->setNamedConstant("fun", Ogre::Vector3(
-      vec_fun.X(), vec_fun.Y(), vec_fun.Z()));
+      vecFun.X(), vecFun.Y(), vecFun.Z()));
 
   uniforms->setNamedConstant("cutOffAngle",
     static_cast<Ogre::Real>(this->dataPtr->cutOffAngle));
@@ -558,9 +562,12 @@ void WideAngleCamera::SetClipDist()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->dataMutex);
 
+  if (!this->sdf->HasElement("clip"))
+  {
+    gzerr << "Camera has no <clip> element." << std::endl;
+    return;
+  }
   sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
-  if (!clipElem)
-    gzthrow("Camera has no <clip> element.");
 
   for (int i = 0; i < 6; ++i)
   {

@@ -1,62 +1,46 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface CameraLensCmd
+/// \interface CameraLens
 /// \brief Information and control over a camera lens element
 
-message CameraLensCmd
+message CameraLens
 {
-  /// \brief Types of purpose.
-  enum CmdPurpose
-  {
-    /// \brief The message is emitted by lens and provides information
-    ///        about it's current state
-    INFO = 1;
-
-    /// \brief The message will change specified lens properties
-    SET = 2;
-  }
-
-  /// \brief Purpose of the message,
-  ///        if the message is emitted by lens then it is set to INFO
-  ///        to control the lens set this value to `SET`.
-  required CmdPurpose purpose = 1;
-
   /// \brief Type of projection of the lens
   ///        possible values are "gnomonical", "stereographic", "equidistant",
   ///        "equisolid_angle", "stereographic", "custom".
   ///        If you set this value to "custom" you need to specify at least one
   ///        of the `c1`, `c2`, `c3`, `f` or `fun`.
-  required string type = 2;
+  required string type = 1;
 
   /// \brief Linear image scaling factor
-  optional double c1 = 3;
+  optional double c1 = 2;
 
   /// \brief Angle scaling factor
-  optional double c2 = 4;
+  optional double c2 = 3;
 
   /// \brief Angle offset factor
-  optional double c3 = 5;
+  optional double c3 = 4;
 
   /// \brief Linear scaling factor, unlike `c1`, will be adjusted to match hfov
   ///        if scale_to_fov is set to `true`.
-  optional double f = 6;
+  optional double f = 5;
 
   /// \brief Angle modification function
   //         possible values are "tan", "sin" and "id".
-  optional string fun = 7;
+  optional string fun = 6;
 
   /// \brief Scale image to fit horizontal FOV
-  optional bool scale_to_hfov = 8 [default = false];
+  optional bool scale_to_hfov = 7;
 
   /// \brief Everything outside of this angle will be hidden,
   ///        the angle is counted from camera's X (forward) axis.
-  optional double cutoff_angle = 9;
+  optional double cutoff_angle = 8;
 
   /// \brief Horizontal field of view in radians.
-  optional double hfov = 10;
+  optional double hfov = 9;
 
   /// \brief Size of cube map texture,
   ///        used to store intermediate rendering result.
-  optional int32 env_texture_size = 11;
+  optional int32 env_texture_size = 10;
 }

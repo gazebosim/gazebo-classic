@@ -15,11 +15,12 @@
  *
 */
 
-#ifndef _GAZEBO_SENSORS_WIDEANGLE_CAMERA_SENSOR_HH_
-#define _GAZEBO_SENSORS_WIDEANGLE_CAMERA_SENSOR_HH_
+#ifndef _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
+#define _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
 
 #include <queue>
 #include <string>
+#include <memory>
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/msgs/MessageTypes.hh"
@@ -33,6 +34,8 @@ namespace gazebo
 {
   namespace sensors
   {
+    class WideAngleCameraSensorPrivate;
+
     /// \addtogroup gazebo_sensors Sensors
     /// \{
 
@@ -43,10 +46,10 @@ namespace gazebo
     class GAZEBO_VISIBLE WideAngleCameraSensor : public CameraSensor
     {
       /// \brief Constructor
-      public: WideAngleCameraSensor() = default;
+      public: WideAngleCameraSensor();
 
       /// \brief Destructor
-      public: virtual ~WideAngleCameraSensor() = default;
+      public: virtual ~WideAngleCameraSensor();
 
       // Documentation inherited
       public: void Load(const std::string &_worldName) override;
@@ -62,19 +65,10 @@ namespace gazebo
 
       /// \brief Handle incoming control message
       /// \param[in] _msg Message received from topic
-      protected: void OnCtrlMessage(ConstCameraLensCmdPtr &_msg);
+      protected: void OnCtrlMessage(ConstCameraLensPtr &_msg);
 
-      /// \brief Publisher of lens info messages
-      protected: transport::PublisherPtr lensPub;
-
-      /// \brief Subscriber to lens control messages
-      protected: transport::SubscriberPtr lensSub;
-
-      /// \brief Mutex to lock when receiving or sending lens message
-      protected: std::mutex lensCmdMutex;
-
-      /// \brief Horizontal FOV updates to be set in rendering thread
-      private: std::queue<double> hfovCmdQueue;
+      /// \brief Private data pointer.
+      private: std::unique_ptr<WideAngleCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

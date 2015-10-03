@@ -73,7 +73,7 @@ namespace gazebo
                   }
 
                   // function provided is not in array
-                  throw std::invalid_argument("Unknown function");
+                  throw std::invalid_argument("Unknown function " + _str);
                 }
 
                 /// \brief Cast to ignition::math::Vector3d,

@@ -36,6 +36,7 @@
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/WideAngleCameraSensorPrivate.hh"
 #include "gazebo/sensors/WideAngleCameraSensor.hh"
 
 
@@ -43,6 +44,17 @@ using namespace gazebo;
 using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
+
+//////////////////////////////////////////////////
+WideAngleCameraSensor::WideAngleCameraSensor()
+  : dataPtr(new WideAngleCameraSensorPrivate)
+{
+}
+
+//////////////////////////////////////////////////
+WideAngleCameraSensor::~WideAngleCameraSensor()
+{
+}
 
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::Init()
@@ -90,7 +102,8 @@ void WideAngleCameraSensor::Init()
     if (this->camera->GetImageWidth() == 0 ||
         this->camera->GetImageHeight() == 0)
     {
-      gzthrow("image has zero size");
+      gzerr << "image has zero size" << std::endl;
+      return;
     }
 
     this->camera->Init();
@@ -131,24 +144,24 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
       this->GetTopic(), 50);
 
   std::string lensTopicName = "~/";
-  lensTopicName += this->parentName + "/" + this->GetName() + "/lens_";
+  lensTopicName += this->parentName + "/" + this->GetName() + "/lens/";
   boost::replace_all(lensTopicName, "::", "/");
 
   sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
 
   // create a topic that publishes lens states
-  this->lensPub = this->node->Advertise<msgs::CameraLensCmd>(
-    lensTopicName+"info", 1);
+  this->dataPtr->lensPub = this->node->Advertise<msgs::CameraLens>(
+    lensTopicName + "info", 1);
 
-  this->lensSub = this->node->Subscribe(lensTopicName+"control",
+  this->dataPtr->lensSub = this->node->Subscribe(lensTopicName + "control",
       &WideAngleCameraSensor::OnCtrlMessage, this);
 }
 
 //////////////////////////////////////////////////
 void WideAngleCameraSensor::Fini()
 {
-  this->lensPub.reset();
-  this->lensSub.reset();
+  this->dataPtr->lensPub.reset();
+  this->dataPtr->lensSub.reset();
 
   CameraSensor::Fini();
 }
@@ -159,21 +172,21 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
   if (!CameraSensor::UpdateImpl(_force))
     return false;
 
-  if (this->lensPub && this->lensPub->HasConnections())
+  if (this->dataPtr->lensPub && this->dataPtr->lensPub->HasConnections())
   {
-    std::lock_guard<std::mutex> lock(this->lensCmdMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->lensCmdMutex);
 
-    for (; !this->hfovCmdQueue.empty(); this->hfovCmdQueue.pop())
-      this->camera->SetHFOV(math::Angle(this->hfovCmdQueue.front()));
+    for (; !this->dataPtr->hfovCmdQueue.empty();
+        this->dataPtr->hfovCmdQueue.pop())
+      this->camera->SetHFOV(math::Angle(this->dataPtr->hfovCmdQueue.front()));
 
-    msgs::CameraLensCmd msg;
+    msgs::CameraLens msg;
 
     rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
 
     const rendering::CameraLens *lens = wcamera->Lens();
 
-    msg.set_purpose(msgs::CameraLensCmd_CmdPurpose_INFO);
     msg.set_type(lens->Type());
 
     msg.set_c1(lens->C1());
@@ -188,23 +201,16 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 
     msg.set_env_texture_size(wcamera->EnvTextureSize());
 
-    this->lensPub->Publish(msg);
+    this->dataPtr->lensPub->Publish(msg);
   }
 
   return true;
 }
 
 //////////////////////////////////////////////////
-void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
+void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensPtr &_msg)
 {
-  std::lock_guard<std::mutex> lock(this->lensCmdMutex);
-
-  if (_msg->purpose() != msgs::CameraLensCmd_CmdPurpose_SET)
-  {
-    gzerr << "Control message is not of the `SET` type!" << std::endl;
-    gzdbg << _msg->DebugString() << std::endl;
-    return;
-  }
+  std::lock_guard<std::mutex> lock(this->dataPtr->lensCmdMutex);
 
   rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
@@ -230,7 +236,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensCmdPtr &_msg)
     lens->SetCutOffAngle(_msg->cutoff_angle());
 
   if (_msg->has_hfov())
-    this->hfovCmdQueue.push(_msg->hfov());
+    this->dataPtr->hfovCmdQueue.push(_msg->hfov());
 
   if (_msg->has_fun())
     lens->SetFun(_msg->fun());
