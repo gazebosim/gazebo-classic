@@ -31,51 +31,54 @@ namespace gazebo
   {
     class UserCmdHistoryPrivate;
 
-    /// \brief A gui widget for changing the camera view angle.
+    /// \brief Class which manages user commands in the client side.
     class GZ_GUI_VISIBLE UserCmdHistory : public QObject
     {
       Q_OBJECT
 
       /// \brief Constructor
-      /// \param[in] _parent Parent Qt widget.
       public: UserCmdHistory();
 
       /// \brief Destructor
       public: virtual ~UserCmdHistory();
 
-      /// \brief Qt call back when the undo button is pressed.
+      /// \internal
+      /// \brief Triggers OnStatsSlot
       signals: void StatsSignal();
 
       /// \brief Qt call back when the undo button is pressed.
       private slots: void OnUndo();
 
-      /// \brief Qt call back when the undo button is pressed.
+      /// \brief Qt call back when an undo history action is triggered.
+      /// It publishes an undo request message.
       private slots: void OnUndoCommand(QAction *_action);
 
-      /// \brief Qt call back when the undo button is pressed.
+      /// \brief Qt call back when an undo history action is hovered.
       private slots: void OnUndoHovered(QAction *_action);
 
       /// \brief Qt call back when the undo history button is pressed.
+      /// It opens the undo history menu.
       private slots: void OnUndoCmdHistory();
 
       /// \brief Qt call back when the redo button is pressed.
       private slots: void OnRedo();
 
-      /// \brief Qt call back when the undo button is pressed.
+      /// \brief Qt call back when a redo history action is triggered.
+      /// It publishes a redo request message.
       private slots: void OnRedoCommand(QAction *_action);
 
-      /// \brief Qt call back when the undo button is pressed.
+      /// \brief Qt call back when a redo history action is hovered.
       private slots: void OnRedoHovered(QAction *_action);
 
       /// \brief Qt call back when the redo history button is pressed.
+      /// It opens the redo history menu.
       private slots: void OnRedoCmdHistory();
 
-      /// \brief User command message callback.
-      /// \param[in] _msg Message containing statistics about user commands
-      /// stored in the server.
+      /// \brief Updates the widgets according to the user command stats
+      /// message.
       private slots: void OnStatsSlot();
 
-      /// \brief User command message callback.
+      /// \brief User command statistics message callback.
       /// \param[in] _msg Message containing statistics about user commands
       /// stored in the server.
       private: void OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg);

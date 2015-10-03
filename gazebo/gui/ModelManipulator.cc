@@ -569,7 +569,6 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
         gazebo::common::Time::GetWallTimeAsISOString());
     userCmdMsg.set_description(description + _vis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
-    userCmdMsg.set_entity_name(_vis->GetName());
     this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
@@ -589,15 +588,6 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
       msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
       this->dataPtr->modelPub->Publish(msg);
       _vis->SetScale(this->dataPtr->mouseVisualScale);
-
-      // Register user command on server
-      msgs::UserCmd userCmdMsg;
-      userCmdMsg.set_id("Scale [" + _vis->GetName() + "]" +
-          gazebo::common::Time::GetWallTimeAsISOString());
-      userCmdMsg.set_description("Scale [" + _vis->GetName() + "]");
-      userCmdMsg.set_type(msgs::UserCmd::SCALING);
-      userCmdMsg.set_entity_name(_vis->GetName());
-      this->dataPtr->userCmdPub->Publish(userCmdMsg);
     }
   }
 }

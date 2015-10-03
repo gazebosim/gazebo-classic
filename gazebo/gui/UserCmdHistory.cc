@@ -119,10 +119,7 @@ void UserCmdHistory::OnUndoHovered(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedo()
 {
-  msgs::UndoRedo msg;
-  msg.set_undo(false);
-  // ID
-  this->dataPtr->undoRedoPub->Publish(msg);
+  this->OnRedoCommand(NULL);
 }
 
 /////////////////////////////////////////////////

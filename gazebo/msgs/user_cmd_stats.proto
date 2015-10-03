@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface UserCmdStats
-/// \brief Contains stattistics about user commands in the server.
+/// \brief Contains statistics about user commands.
 
 import "user_cmd.proto";
 

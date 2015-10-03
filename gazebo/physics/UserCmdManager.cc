@@ -24,7 +24,6 @@
 
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/WorldState.hh"
 
@@ -39,20 +38,23 @@ using namespace physics;
 UserCmd::UserCmd(std::string _id,
                  physics::WorldPtr _world,
                  const std::string &_description,
-                 msgs::UserCmd::Type _type,
-                 const std::string &_name)
+                 msgs::UserCmd::Type _type)
   : dataPtr(new UserCmdPrivate())
 {
   this->dataPtr->id = _id;
   this->dataPtr->world = _world;
   this->dataPtr->description = _description;
   this->dataPtr->type = _type;
-  this->dataPtr->name = _name;
-  this->dataPtr->sdf = NULL;
-  this->dataPtr->node = NULL;
 
   // Record current world state
   this->dataPtr->startState = WorldState(this->dataPtr->world);
+}
+
+/////////////////////////////////////////////////
+UserCmd::~UserCmd()
+{
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -61,14 +63,12 @@ void UserCmd::Undo()
   // Record / override the state for redo
   this->dataPtr->endState = WorldState(this->dataPtr->world);
 
-  // Set the world state
   this->dataPtr->world->SetState(this->dataPtr->startState);
 }
 
 /////////////////////////////////////////////////
 void UserCmd::Redo()
 {
-  // Set the world state
   this->dataPtr->world->SetState(this->dataPtr->endState);
 }
 
@@ -119,16 +119,12 @@ UserCmdManager::~UserCmdManager()
 /////////////////////////////////////////////////
 void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 {
-  std::string name;
-  if (_msg->has_entity_name())
-    name = _msg->entity_name();
-
+  // Create command
   UserCmd *cmd = new UserCmd(
       _msg->id(),
       this->dataPtr->world,
       _msg->description(),
-      _msg->type(),
-      name);
+      _msg->type());
 
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmd);
@@ -136,6 +132,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   // Clear redo list
   this->dataPtr->redoCmds.clear();
 
+  // Publish stats
   this->PublishCurrentStats();
 }
 
@@ -175,7 +172,7 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
       }
     }
 
-    // Undo all commands up to the one desired
+    // Undo all commands up to the desired one
     for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->undoCmds))
     {
       // Undo it
@@ -222,7 +219,7 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
       }
     }
 
-    // Redo all commands up to the one desired
+    // Redo all commands up to the desired one
     for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->redoCmds))
     {
       // Redo it

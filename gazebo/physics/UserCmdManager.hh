@@ -39,32 +39,31 @@ namespace gazebo
       /// \param[in] _world Pointer to the world
       /// \param[in] _description Description for the command, such as
       /// "Rotate box", "Delete sphere", etc.
+      /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
       public: UserCmd(std::string _id,
                       physics::WorldPtr _world,
                       const std::string &_description,
-                      msgs::UserCmd::Type _type,
-                      const std::string &_name = "");
+                      msgs::UserCmd::Type _type);
 
       /// \brief Destructor
-      public: virtual ~UserCmd() = default;
+      public: virtual ~UserCmd();
 
-      /// \brief Set the world state to the one just before the user command.
+      /// \brief Undo this command.
       public: virtual void Undo();
 
-      /// \brief Set the world state to be that of the moment undo was last
-      /// called.
+      /// \brief Redo this command.
       public: virtual void Redo();
 
       /// \brief Return this command's unique ID.
       /// \return Unique ID
       public: std::string Id();
 
-      /// \brief Return this command's description
+      /// \brief Return this command's description.
       /// \return Description
       public: std::string Description();
 
-      /// \brief Return this command's description
-      /// \return Description
+      /// \brief Return this command's type.
+      /// \return Command type
       public: msgs::UserCmd::Type Type();
 
       /// \internal
@@ -78,16 +77,19 @@ namespace gazebo
     class GAZEBO_VISIBLE UserCmdManager
     {
       /// \brief Constructor.
+      /// \param[in] _world Pointer to the world.
       public: UserCmdManager(const WorldPtr _world);
 
       /// \brief Destructor.
       public: virtual ~UserCmdManager();
 
-      /// \brief Callback when a UserCmd message is received.
+      /// \brief Callback when a UserCmd message is received, notifying that
+      /// a new command has been executed by a user.
       /// \param[in] _msg Incoming message
       private: void OnUserCmdMsg(ConstUserCmdPtr &_msg);
 
-      /// \brief Callback when an UndoRedo message is received.
+      /// \brief Callback when an UndoRedo message is received, notifying that a
+      /// user is requesting to undo / redo commands.
       /// \param[in] _msg Incoming message
       private: void OnUndoRedoMsg(ConstUndoRedoPtr &_msg);
 

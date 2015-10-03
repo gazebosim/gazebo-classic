@@ -2,13 +2,14 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface UndoRedo
-/// \brief A message requesting to undo / redo user commands.
+/// \brief A message requesting to undo or redo user commands.
 
 message UndoRedo
 {
   /// \brief True to undo, false to redo.
   required bool undo = 1;
 
-  /// \brief Unique id of the user command.
+  /// \brief Unique id of the user command. If this is provided, all commands
+  /// leading to that will be undone / redone.
   optional string id = 2;
 }
