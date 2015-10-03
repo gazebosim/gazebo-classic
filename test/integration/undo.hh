@@ -29,16 +29,18 @@ class UndoTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Response message received
-  /// \brief _msg Message containing the response data
+  /// \brief Test message passing between gui::UserCmdHistory and
+  /// physics::UserCmdManager.
+  private slots: void MsgPassing();
+
+  /// \brief UndoRedo message received
+  /// \brief _msg Message containing an undo/redo request.
   private: void OnUndoRedo(ConstUndoRedoPtr &_msg);
 
-  /// \brief Response message received
-  /// \brief _msg Message containing the response data
+  /// \brief UserCmdStats message received
+  /// \brief _msg Message containing statistics about user commands saved in i
+  /// the server.
   private: void OnUserCmdStats(ConstUserCmdStatsPtr &_msg);
-
-  /// \brief Test receiving stats msgs and sending undo / redo requests.
-  private slots: void MsgPassing();
 
   /// \brief Check that undo message has been received.
   private: bool g_undoMsgReceived = false;
@@ -46,8 +48,10 @@ class UndoTest : public QTestFixture
   /// \brief Check that redo message has been received.
   private: bool g_redoMsgReceived = false;
 
-  /// \brief Check that redo message has been received.
+  /// \brief Number of undo commands in the stats msg.
   private: int g_undoCmdCount = -1;
+
+  /// \brief Number of redo commands in the stats msg.
   private: int g_redoCmdCount = -1;
 };
 

@@ -241,6 +241,9 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  delete this->userCmdHistory;
+  this->userCmdHistory = NULL;
+
   this->DeleteActions();
 }
 
@@ -1495,7 +1498,7 @@ void MainWindow::CreateActions()
   this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_redoHistoryAct);
   g_redoHistoryAct->setEnabled(false);
 
-  new UserCmdHistory();
+  this->userCmdHistory = new UserCmdHistory();
 }
 
 /////////////////////////////////////////////////
