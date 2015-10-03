@@ -25,8 +25,16 @@ class ModelEditorPalette_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Tests loading nested models.
+  /// FIXME: This test only passes if ran before the others, otherwise it
+  /// crashes on QCoreApplication::processEvents
+  private slots: void LoadNestedModel();
+
   /// \brief Tests adding an item to the palette.
   private slots: void AddItem();
+
+  /// \brief Tests the nested model list.
+  private slots: void AddRemoveNestedModels();
 
   /// \brief Tests the link list.
   private slots: void AddRemoveLinks();

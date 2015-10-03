@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/gui/model/ModelEditorEvents.hh"
+
 #include "gazebo/gui/model/ModelPluginInspectorPrivate.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 
@@ -54,13 +56,25 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
   generalLayout->addWidget(scrollArea);
 
   // Buttons
+  QToolButton *removeButton = new QToolButton(this);
+  removeButton->setFixedSize(QSize(30, 30));
+  removeButton->setToolTip("Remove model plugin");
+  removeButton->setIcon(QPixmap(":/images/trashcan.png"));
+  removeButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  removeButton->setIconSize(QSize(16, 16));
+  removeButton->setCheckable(false);
+  connect(removeButton, SIGNAL(clicked()), this, SLOT(OnRemove()));
+
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
+
   QPushButton *OKButton = new QPushButton(tr("OK"));
   OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
+  buttonsLayout->addWidget(removeButton);
+  buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(OKButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
@@ -77,6 +91,15 @@ ModelPluginInspector::~ModelPluginInspector()
 {
   delete this->dataPtr;
   this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelPluginInspector::OnRemove()
+{
+  this->close();
+
+  model::Events::requestModelPluginRemoval(
+      this->dataPtr->configWidget->GetStringWidgetValue("name"));
 }
 
 /////////////////////////////////////////////////

@@ -19,6 +19,7 @@
 #define _GAZEBO_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -298,7 +299,7 @@ namespace gazebo
       /// \brief Set whether the visual is visible.
       /// \param[in] _visible set this node visible.
       /// \param[in] _cascade setting this parameter in children too.
-      public: void SetVisible(bool _visible, bool _cascade = true);
+      public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
       /// \brief Toggle whether this visual is visible.
       public: void ToggleVisible();
