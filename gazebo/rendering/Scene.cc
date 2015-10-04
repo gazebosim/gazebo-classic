@@ -555,7 +555,7 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
 
 //////////////////////////////////////////////////
 WideAngleCameraPtr Scene::CreateWideAngleCamera(const std::string &_name,
-                                                bool _autoRender)
+                                                const bool _autoRender)
 {
   WideAngleCameraPtr camera(new WideAngleCamera(_name,
         shared_from_this(), _autoRender));
