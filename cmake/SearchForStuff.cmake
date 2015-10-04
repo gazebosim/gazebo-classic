@@ -476,7 +476,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 3.0.0)
+set (SDFormat_MIN_VERSION 3.3.0)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
@@ -488,7 +488,7 @@ endif()
 
 ########################################
 # Find QT
-find_package (Qt4)
+find_package(Qt4 COMPONENTS QtWebKit QtCore QtGui QtXml QtXmlPatterns REQUIRED)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()

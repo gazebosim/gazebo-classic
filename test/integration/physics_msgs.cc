@@ -887,7 +887,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
   model->FillMsg(msg);
 
   // only ode supports gearbox joint
-  unsigned jointSize = 2;
+  int jointSize = 2;
   if (_physicsEngine == "ode")
     jointSize = 3;
 

@@ -137,13 +137,6 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
 
 //////////////////////////////////////////////////
 Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
-    const math::Pose &_offset)
-{
-  return this->CreateBoolean(_m1, _m2, _operation, _offset.Ign());
-}
-
-//////////////////////////////////////////////////
-Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
     const ignition::math::Pose3d &_offset)
 {
   GtsSurface *s1, *s2, *s3;

@@ -23,7 +23,7 @@
 #include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/model/qgv/QGVScene.h"
+#include "gazebo/gui/qgv/QGVScene.h"
 
 namespace gazebo
 {

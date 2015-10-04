@@ -360,8 +360,8 @@ std::string RestApi::Request(const std::string &_reqUrl,
   curl_easy_cleanup(curl);
   if (res != CURLE_OK)
   {
-    gzerr << "Request to " << url << " failed: ";
-    gzerr << curl_easy_strerror(res) << std::endl;
+    gzerr << "Request to " << url << " failed: "
+          << curl_easy_strerror(res) << std::endl;
     throw RestException(curl_easy_strerror(res));
   }
   // copy the data into a string

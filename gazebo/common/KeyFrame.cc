@@ -49,22 +49,9 @@ PoseKeyFrame::~PoseKeyFrame()
 }
 
 /////////////////////////////////////////////////
-void PoseKeyFrame::SetTranslation(const math::Vector3 &_trans)
-{
-  this->translate.Set(_trans.x, _trans.y, _trans.z);
-}
-
-/////////////////////////////////////////////////
 void PoseKeyFrame::Translation(const ignition::math::Vector3d &_trans)
 {
   this->translate = _trans;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 PoseKeyFrame::GetTranslation() const
-{
-  return gazebo::math::Vector3(this->translate.X(), this->translate.Y(),
-                               this->translate.Z());
 }
 
 /////////////////////////////////////////////////
@@ -74,22 +61,9 @@ ignition::math::Vector3d PoseKeyFrame::Translation() const
 }
 
 /////////////////////////////////////////////////
-void PoseKeyFrame::SetRotation(const math::Quaternion &_rot)
-{
-  this->rotate.Set(_rot.w, _rot.x, _rot.y, _rot.z);
-}
-
-/////////////////////////////////////////////////
 void PoseKeyFrame::Rotation(const ignition::math::Quaterniond &_rot)
 {
   this->rotate = _rot;
-}
-
-/////////////////////////////////////////////////
-math::Quaternion PoseKeyFrame::GetRotation() const
-{
-  return gazebo::math::Quaternion(this->rotate.W(),
-      this->rotate.X(), this->rotate.Y(), this->rotate.Z());
 }
 
 /////////////////////////////////////////////////

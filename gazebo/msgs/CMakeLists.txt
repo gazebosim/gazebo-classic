@@ -4,6 +4,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 set (msgs
   altimeter.proto
   axis.proto
+  battery.proto
   boxgeom.proto
   camerasensor.proto
   camera_cmd.proto
@@ -51,6 +52,8 @@ set (msgs
   log_playback_control.proto
   log_playback_stats.proto
   log_status.proto
+  logical_camera_image.proto
+  logical_camera_sensor.proto
   magnetometer.proto
   material.proto
   meshgeom.proto

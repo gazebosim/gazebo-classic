@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class AlignWidget AlignWidget.hh gui/Gui.hh
     /// \brief A gui widget for aligning models
-    class GAZEBO_VISIBLE AlignWidget : public QWidget
+    class GZ_GUI_VISIBLE AlignWidget : public QWidget
     {
       Q_OBJECT
 

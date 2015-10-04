@@ -20,6 +20,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "gazebo/util/system.hh"
+#include "gazebo/common/EnumIface.hh"
 
 /// \file
 /// \ingroup gazebo_sensors
@@ -34,6 +35,7 @@ namespace gazebo
     class Sensor;
     class RaySensor;
     class CameraSensor;
+    class LogicalCameraSensor;
     class MagnetometerSensor;
     class MultiCameraSensor;
     class DepthCameraSensor;
@@ -192,13 +194,20 @@ namespace gazebo
     /// \brief Vector of WirelessReceiver
     typedef std::vector<WirelessReceiver> WirelessReceiver_V;
 
+    /// \def LogicalCameraSensorPtr
+    /// \brief Shared pointer to LogicalCameraSensor
+    typedef boost::shared_ptr<LogicalCameraSensor> LogicalCameraSensorPtr;
+
     /// \def SensorNoiseType
     /// \brief Eumeration of all sensor noise types
     enum SensorNoiseType
     {
+      /// \brief Marks the start of the enum.
+      SENSOR_NOISE_TYPE_BEGIN = 0,
+
       /// \brief Noise streams for the Camera sensor
       /// \sa CameraSensor
-      NO_NOISE = 0,
+      NO_NOISE = SENSOR_NOISE_TYPE_BEGIN,
 
       /// \brief Noise streams for the Camera sensor
       /// \sa CameraSensor
@@ -278,7 +287,10 @@ namespace gazebo
 
       /// \brief IMU linear acceleration Z noise stream
       /// \sa ImuSensor
-      IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20
+      IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20,
+
+      /// \brief Marks the end of the enum.
+      SENSOR_NOISE_TYPE_END
     };
     /// \}
   }

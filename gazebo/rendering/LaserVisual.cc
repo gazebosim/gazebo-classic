@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
+
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -193,6 +195,7 @@ void LaserVisual::Update()
 }
 
 /////////////////////////////////////////////////
-void LaserVisual::SetEmissive(const common::Color &/*_color*/)
+void LaserVisual::SetEmissive(const common::Color &/*_color*/,
+    const bool /*_cascade*/)
 {
 }
