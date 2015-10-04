@@ -15,21 +15,18 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_DATA_TEST_HH_
-#define _GAZEBO_MODEL_DATA_TEST_HH_
+#ifndef _GAZEBO_LINK_INSPECTOR_TEST_HH_
+#define _GAZEBO_LINK_INSPECTOR_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelData class.
-class ModelData_TEST : public QTestFixture
+/// \brief A test class for the link inspector.
+class LinkInspector_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Tests cloning link
-  private slots: void Clone();
-
-  /// \brief Tests scaling link
-  private slots: void LinkScale();
+  /// \brief Test pressing remove button.
+  private slots: void RemoveButton();
 };
 
 #endif

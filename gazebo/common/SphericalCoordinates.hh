@@ -62,20 +62,6 @@ namespace gazebo
       /// \param[in] _longitude Reference longitude.
       /// \param[in] _elevation Reference elevation.
       /// \param[in] _heading Heading offset.
-      /// \deprecated See SphericalCoordinates constructor that accepts
-      /// ignition::math::Angle objects.
-      public: SphericalCoordinates(const SurfaceType _type,
-                  const math::Angle &_latitude,
-                  const math::Angle &_longitude,
-                  double _elevation,
-                  const math::Angle &_heading) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Constructor with surface type, angle, and elevation inputs.
-      /// \param[in] _type SurfaceType specification.
-      /// \param[in] _latitude Reference latitude.
-      /// \param[in] _longitude Reference longitude.
-      /// \param[in] _elevation Reference elevation.
-      /// \param[in] _heading Heading offset.
       public: SphericalCoordinates(const SurfaceType _type,
                                    const ignition::math::Angle &_latitude,
                                    const ignition::math::Angle &_longitude,
@@ -89,26 +75,8 @@ namespace gazebo
       /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
       ///         altitude above sea level (m).
-      /// \deprecated See SphericalFromLocal function that use
-      /// ignition::math::Vector3d objects.
-      public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz) const
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Convert a Cartesian position vector to geodetic coordinates.
-      /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
-      /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
-      ///         altitude above sea level (m).
       public: ignition::math::Vector3d SphericalFromLocal(
                   const ignition::math::Vector3d &_xyz) const;
-
-      /// \brief Convert a Cartesian velocity vector in the local gazebo frame
-      ///        to a global Cartesian frame with components East, North, Up.
-      /// \param[in] _xyz Cartesian vector in gazebo's world frame.
-      /// \return Rotated vector with components (x,y,z): (East, North, Up).
-      /// \deprecated See GlobalFromLocal function that use
-      /// ignition::math::Vector3d objects.
-      public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz) const
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Convert a Cartesian velocity vector in the local gazebo frame
       ///        to a global Cartesian frame with components East, North, Up.
@@ -131,22 +99,6 @@ namespace gazebo
       /// \param[in] _latB Latitude of point B.
       /// \param[in] _longB Longitude of point B.
       /// \return Distance in meters.
-      /// \deprecated See Distance() function that accepts
-      /// ignition::math::Angle objects.
-      public: static double Distance(const math::Angle &_latA,
-                  const math::Angle &_lonA,
-                  const math::Angle &_latB,
-                  const math::Angle &_lonB) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the distance between two points expressed in geographic
-      /// latitude and longitude. It assumes that both points are at sea level.
-      /// Example: _latA = 38.0016667 and _lonA = -123.0016667) represents
-      /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
-      /// \param[in] _latA Latitude of point A.
-      /// \param[in] _longA Longitude of point A.
-      /// \param[in] _latB Latitude of point B.
-      /// \param[in] _longB Longitude of point B.
-      /// \return Distance in meters.
       public: static double Distance(const ignition::math::Angle &_latA,
                                      const ignition::math::Angle &_lonA,
                                      const ignition::math::Angle &_latB,
@@ -159,19 +111,7 @@ namespace gazebo
 
       /// \brief Get reference geodetic latitude.
       /// \return Reference geodetic latitude.
-      /// \deprecated See LatitudeReference function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetLatitudeReference() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get reference geodetic latitude.
-      /// \return Reference geodetic latitude.
       public: ignition::math::Angle LatitudeReference() const;
-
-      /// \brief Get reference longitude.
-      /// \return Reference longitude.
-      /// \deprecated See LongitudeReference function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetLongitudeReference() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get reference longitude.
       /// \return Reference longitude.
@@ -185,14 +125,6 @@ namespace gazebo
       ///        angle from East to gazebo x-axis, or equivalently
       ///        from North to gazebo y-axis.
       /// \return Heading offset of gazebo reference frame.
-      /// \deprecated See HeadingOffset() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetHeadingOffset() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get heading offset for gazebo reference frame, expressed as
-      ///        angle from East to gazebo x-axis, or equivalently
-      ///        from North to gazebo y-axis.
-      /// \return Heading offset of gazebo reference frame.
       public: ignition::math::Angle HeadingOffset() const;
 
       /// \brief Set SurfaceType for planetary surface model.
@@ -201,21 +133,7 @@ namespace gazebo
 
       /// \brief Set reference geodetic latitude.
       /// \param[in] _angle Reference geodetic latitude.
-      /// \deprecated See SetLatitudeReference function that accepts an
-      /// ignition::math::Angle object.
-      public: void SetLatitudeReference(const math::Angle &_angle)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set reference geodetic latitude.
-      /// \param[in] _angle Reference geodetic latitude.
       public: void SetLatitudeReference(const ignition::math::Angle &_angle);
-
-      /// \brief Set reference longitude.
-      /// \param[in] _angle Reference longitude.
-      /// \deprecated See SetLongitudeReference function that accepts an
-      /// ignition::math::Angle object.
-      public: void SetLongitudeReference(const math::Angle &_angle)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Set reference longitude.
       /// \param[in] _angle Reference longitude.
@@ -224,13 +142,6 @@ namespace gazebo
       /// \brief Set reference elevation above sea level in meters.
       /// \param[in] _elevation Reference elevation.
       public: void SetElevationReference(double _elevation);
-
-      /// \brief Set heading angle offset for gazebo frame.
-      /// \param[in] _angle Heading offset for gazebo frame.
-      /// \deprecated See SetHeadingOffset function that accepts an
-      /// ignition::math::Angle object.
-      public: void SetHeadingOffset(const math::Angle &_angle)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Set heading angle offset for gazebo frame.
       /// \param[in] _angle Heading offset for gazebo frame.
