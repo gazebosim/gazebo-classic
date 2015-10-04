@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
