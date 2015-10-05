@@ -618,11 +618,12 @@ endif()
 # Find the Ignition_Transport library
 find_package(ignition-transport0 QUIET REQUIRED)
 if (NOT ignition-transport0_FOUND)
-  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev)")
+  BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev)")
+else()
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
+  include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
+  link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
 endif()
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
-include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
-link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
 
 ########################################
 # Find QWT (QT graphing library)
