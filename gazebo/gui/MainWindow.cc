@@ -1471,7 +1471,7 @@ void MainWindow::CreateActions()
   // Undo
   g_undoAct = new QAction(QIcon(":/images/undo.png"),
       tr("Undo (Ctrl + Z)"), this);
-  g_undoAct->setStatusTip(tr("Undo last command"));
+  g_undoAct->setShortcut(tr("Ctrl+Z"));
   g_undoAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/undo.png", g_undoAct);
   g_undoAct->setEnabled(false);
@@ -1479,7 +1479,6 @@ void MainWindow::CreateActions()
   // Undo history
   g_undoHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
       tr("Undo history"), this);
-  g_undoHistoryAct->setStatusTip(tr("Commands which can be undone"));
   g_undoHistoryAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_undoHistoryAct);
   g_undoHistoryAct->setEnabled(false);
@@ -1487,7 +1486,7 @@ void MainWindow::CreateActions()
   // Redo
   g_redoAct = new QAction(QIcon(":/images/redo.png"),
       tr("Redo (Shift + Ctrl + Z)"), this);
-  g_redoAct->setStatusTip(tr("Redo last undone command"));
+  g_redoAct->setShortcut(tr("Shift+Ctrl+Z"));
   g_redoAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/redo.png", g_redoAct);
   g_redoAct->setEnabled(false);
@@ -1495,7 +1494,6 @@ void MainWindow::CreateActions()
   // Redo history
   g_redoHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
       tr("Redo history"), this);
-  g_redoHistoryAct->setStatusTip(tr("Commands which can be redone"));
   g_redoHistoryAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_redoHistoryAct);
   g_redoHistoryAct->setEnabled(false);
