@@ -299,7 +299,7 @@ ignition::math::Pose3d Sensor::Pose() const
 }
 
 //////////////////////////////////////////////////
-void SetPose(const ignition::math::Pose3d &_pose)
+void Sensor::SetPose(const ignition::math::Pose3d &_pose)
 {
   this->pose = _pose;
 }
