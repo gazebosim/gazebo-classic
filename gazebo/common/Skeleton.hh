@@ -99,21 +99,8 @@ namespace gazebo
 
       /// \brief Set the bind pose skeletal transform
       /// \param[in] _trans the transform
-      /// \deprecated See SetBindShapeTransform that accepts
-      /// ignition::math::Matrix4d
-      public: void SetBindShapeTransform(math::Matrix4 _trans)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set the bind pose skeletal transform
-      /// \param[in] _trans the transform
       public: void SetBindShapeTransform(
                   const ignition::math::Matrix4d &_trans);
-
-      /// \brief Return bind pose skeletal transform
-      /// \return a matrix
-      /// \deprecated See BindShapeTransform that return
-      /// ignition::math::Matrix4d.
-      public: math::Matrix4 GetBindShapeTransform() GAZEBO_DEPRECATED(6.0);
 
       /// \brief Return bind pose skeletal transform
       /// \return a matrix
@@ -232,26 +219,8 @@ namespace gazebo
       /// \param[in] _trans the transformation
       /// \param[in] _updateChildren when true the UpdateChildrenTransforms
       /// operation is performed
-      /// \deprecated See SetTransform function that accepts
-      /// ignition::math::Matrix4d.
-      public: void SetTransform(math::Matrix4 _trans,
-                  bool _updateChildren = true) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set a transformation
-      /// \param[in] _trans the transformation
-      /// \param[in] _updateChildren when true the UpdateChildrenTransforms
-      /// operation is performed
       public: void SetTransform(const ignition::math::Matrix4d &_trans,
                                 bool _updateChildren = true);
-
-      /// \brief Set the model transformation
-      /// \param[in] _trans the transformation
-      /// \param[in] _updateChildren when true the UpdateChildrenTransforms
-      /// operation is performed
-      /// \deprecated See SetModelTransform that accepts
-      /// ignition::math::Matrix4d.
-      public: void SetModelTransform(math::Matrix4 _trans,
-                  bool _updateChildren = true) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Set the model transformation
       /// \param[in] _trans the transformation
@@ -265,25 +234,12 @@ namespace gazebo
 
       /// \brief Sets the initial transformation
       /// \param[in] _tras the transfromation matrix
-      /// \deprecated See SetInitialTransform that accepts
-      /// ignition::math::Matrix4d.
-      public: void SetInitialTransform(math::Matrix4 _tras)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Sets the initial transformation
-      /// \param[in] _tras the transfromation matrix
       public: void SetInitialTransform(const ignition::math::Matrix4d &_tras);
 
       /// \brief Reset the transformation to the initial transformation
       /// \param[in] _resetChildren when true, performs the operation for every
       /// node in the tree
       public: void Reset(bool _resetChildren);
-
-      /// \brief Get transform relative to parent
-      /// \return Transform relative to parent
-      /// \deprecated See Transform function that return
-      /// ignition::math::Matrix4d.
-      public: math::Matrix4 GetTransform() GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get transform relative to parent
       /// \return Transform relative to parent
@@ -334,31 +290,12 @@ namespace gazebo
 
       /// \brief Assign the inverse of the bind pose skeletal transform
       /// \param[in] _invBM the transform
-      /// \deprecated See SetInverseBindTransform that accepts
-      /// ignition::math::Matrix4d.
-      public: void SetInverseBindTransform(math::Matrix4 _invBM)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Assign the inverse of the bind pose skeletal transform
-      /// \param[in] _invBM the transform
       public: void SetInverseBindTransform(
                   const ignition::math::Matrix4d &_invBM);
 
       /// \brief Retrieve the inverse of the bind pose skeletal transform
       /// \return the transform
-      /// \deprecated See InverseBindTransform function that returns
-      /// ignition::math::Matrix4d.
-      public: math::Matrix4 GetInverseBindTransform() GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Retrieve the inverse of the bind pose skeletal transform
-      /// \return the transform
       public: ignition::math::Matrix4d InverseBindTransform();
-
-      /// \brief Retrieve the model transform
-      /// \return the transform
-      /// \deprecated See ModelTransform function that returns
-      /// ignition::math::Matrix4d.
-      public: math::Matrix4 GetModelTransform() GAZEBO_DEPRECATED(6.0);
 
       /// \brief Retrieve the model transform
       /// \return the transform
@@ -434,27 +371,12 @@ namespace gazebo
       /// \param[in] _mat the matrix
       /// \param[in] _sid identifier
       /// \param[in] _type the type of transform
-      /// \deprecated See NodeTransform constructor that accepts
-      /// ignition::math::Matrix4d.
-      public: NodeTransform(math::Matrix4 _mat, std::string _sid = "_default_",
-                  TransformType _type = MATRIX) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Constructor
-      /// \param[in] _mat the matrix
-      /// \param[in] _sid identifier
-      /// \param[in] _type the type of transform
       public: NodeTransform(const ignition::math::Matrix4d &_mat,
                   const std::string &_sid = "_default_",
                   TransformType _type = MATRIX);
 
       /// \brief Destructor. It does nothing.
       public: ~NodeTransform();
-
-      /// \brief Assign a transformation
-      /// \param[in] _mat the transform
-      /// \deprecated See Set function that accepts
-      /// ignition::math::Matrix4d.
-      public: void Set(math::Matrix4 _mat) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Assign a transformation
       /// \param[in] _mat the transform
@@ -467,12 +389,6 @@ namespace gazebo
       /// \brief Set the SID
       /// \param[in] _sid the sid
       public: void SetSID(std::string _sid);
-
-      /// \brief Returns the transformation matrix
-      /// \return the matrix
-      /// \deprecated See GetTransform function that returns
-      /// ignition::math::Matrix4d.
-      public: math::Matrix4 Get() GAZEBO_DEPRECATED(6.0);
 
       /// \brief Returns the transformation matrix
       /// \return The transform matrix
@@ -493,31 +409,11 @@ namespace gazebo
 
       /// \brief Set source data values
       /// param[in] _mat the values
-      /// \deprecated See SetSourceValues function that accepts
-      /// ignition::math::Matrix4d.
-      public: void SetSourceValues(math::Matrix4 _mat) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set source data values
-      /// param[in] _mat the values
       public: void SetSourceValues(const ignition::math::Matrix4d &_mat);
 
       /// \brief Set source data values
       /// \param[in] _vec Vector to set source data values from.
-      /// \deprecated See SetSourceValues function that accepts
-      /// ignition::math::Vector3d.
-      public: void SetSourceValues(math::Vector3 _vec) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set source data values
-      /// \param[in] _vec Vector to set source data values from.
       public: void SetSourceValues(const ignition::math::Vector3d &_vec);
-
-      /// \brief Sets source matrix values from roation
-      /// \param[in] _axis of rotation
-      /// \param[in] _angle of rotation
-      /// \deprecated See SetSourceValues function that accepts
-      /// ignition::math::Vector3d.
-      public: void SetSourceValues(math::Vector3 _axis, double _angle)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Sets source matrix values from roation
       /// \param[in] _axis of rotation
@@ -539,12 +435,6 @@ namespace gazebo
       /// \param[in] _t a transform
       /// \return transform matrix multiplied by _t's transform
       public: ignition::math::Matrix4d operator*(NodeTransform _t);
-
-      /// \brief Matrix multiplication operator
-      /// \param[in] _m a matrix
-      /// \return transform matrix multiplied by _m
-      /// \deprecated See operator* that accepts ignition::math::Matrix4d.
-      public: math::Matrix4 operator* (math::Matrix4 _m) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Matrix multiplication operator
       /// \param[in] _m a matrix
