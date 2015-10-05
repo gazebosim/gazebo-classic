@@ -185,5 +185,6 @@ set (gtest_sources
   PresetManager_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
+  UserCmdManager_TEST.cc
 )
 gz_build_tests(${gtest_sources})
