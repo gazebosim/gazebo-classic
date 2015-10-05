@@ -108,10 +108,14 @@ void Actor::Load(sdf::ElementPtr _sdf)
     /// create the link sdfs for the model
     NodeMap nodes = this->skeleton->GetNodes();
 
+    /// self_collide should be added to prevent error messages
+    // _sdf->GetElement("self_collide")->Set(false);
+
     sdf::ElementPtr linkSdf;
     linkSdf = _sdf->GetElement("link");
     linkSdf->GetAttribute("name")->Set(actorName + "_pose");
     linkSdf->GetElement("gravity")->Set(false);
+    linkSdf->GetElement("self_collide")->Set(false);
     sdf::ElementPtr linkPose = linkSdf->GetElement("pose");
 
 //    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
@@ -133,6 +137,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
       linkSdf->GetAttribute("name")->Set(bone->GetName());
       linkSdf->GetElement("gravity")->Set(false);
+      linkSdf->GetElement("self_collide")->Set(false);
       linkPose = linkSdf->GetElement("pose");
       ignition::math::Pose3d pose(bone->ModelTransform().Translation(),
                                   bone->ModelTransform().Rotation());
@@ -165,7 +170,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
                             "__SKELETON_VISUAL__", math::Pose(), 0.02,
                             "Gazebo/Red", Color::Red);
 
-      for (unsigned int i = 0; i < bone->GetChildCount(); i++)
+      for (unsigned int i = 0; i < bone->GetChildCount(); ++i)
       {
         SkeletonNode *curChild = bone->GetChild(i);
 
@@ -341,7 +346,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
     this->skelAnimation[this->skinFile] =
         this->skeleton->GetAnimation(0);
     std::map<std::string, std::string> skelMap;
-    for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
+    for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
       skelMap[this->skeleton->GetNodeByHandle(i)->GetName()] =
         this->skeleton->GetNodeByHandle(i)->GetName();
     this->skelNodesMap[this->skinFile] = skelMap;
@@ -383,7 +388,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       if (this->skeleton->GetNumNodes() != skel->GetNumNodes())
         compatible = false;
       else
-        for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
+        for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
         {
           SkeletonNode *skinNode = this->skeleton->GetNodeByHandle(i);
           SkeletonNode *animNode = skel->GetNodeByHandle(i);
@@ -480,7 +485,7 @@ void Actor::Update()
 
   TrajectoryInfo tinfo;
 
-  for (unsigned int i = 0; i < this->trajInfo.size(); i++)
+  for (unsigned int i = 0; i < this->trajInfo.size(); ++i)
     if (this->trajInfo[i].startTime <= scriptTime &&
           this->trajInfo[i].endTime >= scriptTime)
     {
@@ -560,7 +565,7 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   ignition::math::Matrix4d modelTrans(ignition::math::Matrix4d::Identity);
   ignition::math::Pose3d mainLinkPose;
 
-  for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
+  for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
   {
     SkeletonNode *bone = this->skeleton->GetNodeByHandle(i);
     SkeletonNode *parentBone = bone->GetParent();
