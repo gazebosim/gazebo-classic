@@ -37,7 +37,7 @@ SkidSteerDrivePlugin::SkidSteerDrivePlugin()
 int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
 {
   // Bounds checking on index
-  if (_index < 0 or _index >= NUMBER_OF_WHEELS)
+  if (_index < 0 || _index >= NUMBER_OF_WHEELS)
   {
     gzerr << "Joint index " << _index <<  " out of bounds [0, "
           << NUMBER_OF_WHEELS << "] in model " << this->model->GetName()
@@ -130,7 +130,7 @@ void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
   //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
 
   double vel_lin = _msg->position().x() / this->wheelRadius;
-  double vel_rot = -1 * msgs::Convert(_msg->orientation()).GetAsEuler().z
+  double vel_rot = -1 * msgs::ConvertIgn(_msg->orientation()).Euler().Z()
                    * (this->wheelSeparation / this->wheelRadius);
 
   this->joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);

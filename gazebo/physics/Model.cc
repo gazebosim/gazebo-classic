@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 #include <float.h>
@@ -75,8 +81,14 @@ void Model::Load(sdf::ElementPtr _sdf)
         boost::bind(&Entity::IsStatic, this));
   }
 
+  if (this->sdf->HasElement("self_collide"))
+  {
+    this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  }
+
   if (this->sdf->HasElement("allow_auto_disable"))
     this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -324,9 +336,9 @@ void Model::Fini()
 {
   Entity::Fini();
 
+  this->plugins.clear();
   this->attachedModels.clear();
   this->joints.clear();
-  this->plugins.clear();
   this->links.clear();
   this->canonicalLink.reset();
 }
@@ -860,11 +872,12 @@ void Model::FillMsg(msgs::Model &_msg)
 {
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
-  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
+  _msg.set_self_collide(this->GetSelfCollide());
+  msgs::Set(_msg.mutable_pose(), this->GetWorldPose().Ign());
   _msg.set_id(this->GetId());
-  msgs::Set(_msg.mutable_scale(), this->scale);
+  msgs::Set(_msg.mutable_scale(), this->scale.Ign());
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose().Ign());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   for (Link_V::iterator iter = this->links.begin(); iter != this->links.end();
@@ -898,7 +911,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
-    this->SetWorldPose(msgs::Convert(_msg.pose()));
+    this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)
   {
     LinkPtr link = this->GetLinkById(_msg.link(i).id());
@@ -910,7 +923,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     this->SetStatic(_msg.is_static());
 
   if (_msg.has_scale())
-    this->SetScale(msgs::Convert(_msg.scale()));
+    this->SetScale(msgs::ConvertIgn(_msg.scale()));
 }
 
 //////////////////////////////////////////////////
@@ -1073,6 +1086,18 @@ void Model::SetAutoDisable(bool _auto)
 bool Model::GetAutoDisable() const
 {
   return this->sdf->Get<bool>("allow_auto_disable");
+}
+
+/////////////////////////////////////////////////
+void Model::SetSelfCollide(bool _self_collide)
+{
+  this->sdf->GetElement("self_collide")->Set(_self_collide);
+}
+
+/////////////////////////////////////////////////
+bool Model::GetSelfCollide() const
+{
+  return this->sdf->Get<bool>("self_collide");
 }
 
 /////////////////////////////////////////////////

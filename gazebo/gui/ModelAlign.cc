@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -46,9 +52,23 @@ ModelAlign::ModelAlign()
 /////////////////////////////////////////////////
 ModelAlign::~ModelAlign()
 {
-  this->dataPtr->modelPub.reset();
+  this->Clear();
   delete this->dataPtr;
   this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelAlign::Clear()
+{
+  this->dataPtr->targetVis.reset();
+  this->dataPtr->userCamera.reset();
+  this->dataPtr->scene.reset();
+  this->dataPtr->node.reset();
+  this->dataPtr->modelPub.reset();
+  this->dataPtr->selectedVisuals.clear();
+  this->dataPtr->connections.clear();
+  this->dataPtr->originalVisualPose.clear();
+  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
@@ -172,8 +192,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       if (it->first)
       {
         it->first->SetWorldPose(it->second);
-        it->first->SetTransparency(std::abs(
-            it->first->GetTransparency()*2.0-1.0));
+        this->SetHighlighted(it->first, false);
       }
     }
     this->dataPtr->originalVisualPose.clear();
@@ -245,7 +264,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
           this->dataPtr->originalVisualPose.end())
       {
         this->dataPtr->originalVisualPose[vis] = vis->GetWorldPose();
-        vis->SetTransparency((1.0 - vis->GetTransparency()) * 0.5);
+        this->SetHighlighted(vis, true);
       }
       // prevent the visual pose from being updated by the server
       if (this->dataPtr->scene)
@@ -286,7 +305,34 @@ void ModelAlign::PublishVisualPose(rendering::VisualPtr _vis)
     msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
 
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
     this->dataPtr->modelPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelAlign::SetHighlighted(rendering::VisualPtr _vis, bool _highlight)
+{
+  if (_vis->GetChildCount() != 0)
+  {
+    for (unsigned int j = 0; j < _vis->GetChildCount(); ++j)
+    {
+      this->SetHighlighted(_vis->GetChild(j), _highlight);
+    }
+  }
+  else
+  {
+    // Highlighting increases transparency for opaque visuals (0 < t < 0.3) and
+    // decreases transparency for semi-transparent visuals (0.3 < t < 1).
+    // A visual will never become fully transparent (t = 1) when highlighted.
+    if (_highlight)
+    {
+      _vis->SetTransparency((1.0 - _vis->GetTransparency()) * 0.5);
+    }
+    // The inverse operation restores the original transparency value.
+    else
+    {
+      _vis->SetTransparency(std::abs(_vis->GetTransparency()*2.0-1.0));
+    }
   }
 }

@@ -2,6 +2,7 @@ if (@PKG_NAME@_CONFIG_INCLUDED)
   return()
 endif()
 set(@PKG_NAME@_CONFIG_INCLUDED TRUE)
+set(@PKG_NAME@_VERSION @GAZEBO_VERSION@)
 
 set(@PKG_NAME@_PLUGIN_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins")
 
@@ -100,7 +101,11 @@ set(CMAKE_MODULE_PATH
 
 foreach(dep @PKG_DEPENDS@)
   if(NOT ${dep}_FOUND)
-    find_package(${dep} REQUIRED)
+    if (${dep} MATCHES "Boost")
+      find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system filesystem program_options regex iostreams date_time)
+    else()
+      find_package(${dep} REQUIRED)
+    endif()
   endif()
   list(APPEND @PKG_NAME@_INCLUDE_DIRS ${${dep}_INCLUDE_DIRS})
 
@@ -120,8 +125,12 @@ foreach(dep @PKG_DEPENDS@)
     list(APPEND GAZEBO_LIBRARIES ${OGRE_Terrain_LIBRARIES}
       ${OGRE_Paging_LIBRARIES})
   endif()
-
 endforeach()
+
+find_package(ignition-math2 REQUIRED)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-MATH_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-MATH_LIBRARY_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${IGNITION-MATH_LIBRARIES})
 
 list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins)
 list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@)

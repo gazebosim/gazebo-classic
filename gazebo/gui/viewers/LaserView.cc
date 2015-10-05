@@ -15,6 +15,12 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -232,8 +238,15 @@ void LaserView::LaserItem::paint(QPainter *_painter,
   boost::mutex::scoped_lock lock(this->mutex);
 
   QColor orange(245, 129, 19, 255);
+  QColor noHitDarkGrey(200, 200, 200, 255);
+  QColor noHitLightGrey(200, 200, 200, 50);
   QColor darkGrey(100, 100, 100, 255);
   QColor lightGrey(100, 100, 100, 50);
+  _painter->setPen(QPen(noHitDarkGrey));
+  _painter->setBrush(noHitLightGrey);
+
+  // Draw the filled polygon that fill the gaps for the laser rays
+  _painter->drawPolygon(&this->noHitPoints[0], this->noHitPoints.size());
 
   _painter->setPen(QPen(darkGrey));
   _painter->setBrush(lightGrey);
@@ -260,7 +273,9 @@ void LaserView::LaserItem::paint(QPainter *_painter,
   {
     double x1, y1;
 
-    double rangeScaled = this->ranges[index] * this->scale;
+    double r = this->ranges[index];
+    double hitRange = std::isinf(r) ? 0 : r;
+    double rangeScaled = hitRange * this->scale;
     double rangeMaxScaled = this->rangeMax * this->scale;
 
     this->indexAngle = this->angleMin + index * this->angleStep;
@@ -411,6 +426,7 @@ void LaserView::LaserItem::Clear()
   boost::mutex::scoped_lock lock(this->mutex);
   this->ranges.clear();
   this->points.clear();
+  this->noHitPoints.clear();
 }
 
 /////////////////////////////////////////////////
@@ -447,6 +463,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
     // A min range > 0 means we have to draw an inner circle, so we twice as
     // many points
     this->points.resize(this->ranges.size() * 2);
+    this->noHitPoints.resize(this->ranges.size() * 2);
   }
   else if (math::equal(this->rangeMin, 0.0) &&
       this->ranges.size() + 1 != this->points.size())
@@ -454,6 +471,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
     // A min range == 0 mean we just need a closing point at the (0, 0)
     // location
     this->points.resize(this->ranges.size() + 1);
+    this->noHitPoints.resize(this->ranges.size() + 1);
   }
 
   double angle = this->angleMin;
@@ -461,9 +479,16 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
   // Add a point for each laser reading
   for (unsigned int i = 0; i < this->ranges.size(); ++i)
   {
-    QPointF pt(this->ranges[i] * this->scale * cos(angle),
-        -this->ranges[i] * this->scale * sin(angle));
+    double r = this->ranges[i];
+    double hitRange = std::isinf(r) ? 0 : r;
+    QPointF pt(hitRange * this->scale * cos(angle),
+        -hitRange * this->scale * sin(angle));
     this->points[i] = pt;
+    double noHitRange = std::isinf(r) ? this->rangeMax : hitRange;
+    QPointF noHitPt(noHitRange * this->scale * cos(angle),
+        -noHitRange * this->scale * sin(angle));
+    this->noHitPoints[i] = noHitPt;
+
     angle += this->angleStep;
   }
 
@@ -476,6 +501,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
       QPointF pt(this->rangeMin * this->scale * cos(angle),
           -this->rangeMin * this->scale * sin(angle));
       this->points[i + this->ranges.size()] = pt;
+      this->noHitPoints[i + this->ranges.size()] = pt;
       angle -= this->angleStep;
     }
   }
@@ -483,6 +509,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
   {
     // Connect the last point to the (0,0)
     this->points[this->ranges.size()] = QPointF(0, 0);
+    this->noHitPoints[this->ranges.size()] = QPointF(0, 0);
   }
 
   // Tell QT we have changed.

@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
 #include "gazebo/msgs/msgs.hh"
@@ -94,12 +100,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
     gzwarn << "No shape has been specified. Error!!!\n";
-
-  if (!this->shape->HasType(Base::MULTIRAY_SHAPE) &&
-      !this->shape->HasType(Base::RAY_SHAPE))
-  {
-    this->visPub->Publish(this->CreateCollisionVisual());
-  }
 }
 
 //////////////////////////////////////////////////
@@ -266,7 +266,7 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::FillMsg(msgs::Collision &_msg)
 {
-  msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
+  msgs::Set(_msg.mutable_pose(), this->GetRelativePose().Ign());
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
@@ -274,11 +274,13 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->shape->FillMsg(*_msg.mutable_geometry());
   this->surface->FillMsg(*_msg.mutable_surface());
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
 
   if (!this->HasType(physics::Base::SENSOR_COLLISION))
   {
     _msg.add_visual()->CopyFrom(*this->visualMsg);
+    // TODO remove the need to create the special collision visual msg and
+    // let the gui handle this.
     _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
   }
 }
@@ -299,7 +301,7 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
   if (_msg.has_pose())
   {
     this->link->SetEnabled(true);
-    this->SetRelativePose(msgs::Convert(_msg.pose()));
+    this->SetRelativePose(msgs::ConvertIgn(_msg.pose()));
   }
 
   if (_msg.has_geometry())
@@ -327,7 +329,8 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
-  msgs::Set(msg.mutable_pose(), this->GetRelativePose());
+  msg.set_type(msgs::Visual::COLLISION);
+  msgs::Set(msg.mutable_pose(), this->GetRelativePose().Ign());
   msg.mutable_material()->mutable_script()->add_uri(
       "file://media/materials/scripts/gazebo.material");
   msg.mutable_material()->mutable_script()->set_name(

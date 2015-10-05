@@ -23,6 +23,9 @@
 #define _BULLETBOXSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet box collision
-    class GAZEBO_VISIBLE BulletBoxShape : public BoxShape
+    class GZ_PHYSICS_VISIBLE BulletBoxShape : public BoxShape
     {
       /// \brief Constructor
       public: BulletBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}

@@ -15,13 +15,25 @@
  *
 */
 
-#include <dirent.h>
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/function.hpp>
 #include <sdf/sdf.hh>
+
+#ifndef _WIN32
+  #include <dirent.h>
+#else
+  #include "gazebo/common/win_dirent.h"
+#endif
 
 // Moved to top to avoid osx compilation errors
 #include "gazebo/math/Rand.hh"
@@ -116,22 +128,11 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 Camera::~Camera()
 {
   delete [] this->saveFrameBuffer;
+  this->saveFrameBuffer = NULL;
   delete [] this->bayerFrameBuffer;
+  this->bayerFrameBuffer = NULL;
 
-  this->sceneNode = NULL;
-
-  if (this->renderTexture && this->scene->GetInitialized())
-    Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
-  this->renderTexture = NULL;
-  this->renderTarget = NULL;
-
-  if (this->camera && this->scene && this->scene->GetManager())
-  {
-    this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
-    this->camera = NULL;
-  }
-
-  this->connections.clear();
+  this->Fini();
 
   this->sdf->Reset();
   this->sdf.reset();
@@ -222,17 +223,29 @@ void Camera::Init()
 void Camera::Fini()
 {
   this->initialized = false;
-  this->connections.clear();
   this->dataPtr->node.reset();
 
-  RTShaderSystem::DetachViewport(this->viewport, this->scene);
+  if (this->viewport && this->scene)
+    RTShaderSystem::DetachViewport(this->viewport, this->scene);
 
-  if (this->renderTarget && this->scene->GetInitialized())
+  if (this->renderTarget)
     this->renderTarget->removeAllViewports();
-
-  this->viewport = NULL;
   this->renderTarget = NULL;
 
+  if (this->renderTexture)
+    Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
+  this->renderTexture = NULL;
+
+  if (this->camera)
+  {
+    this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
+    this->camera = NULL;
+  }
+
+  this->sceneNode = NULL;
+  this->viewport = NULL;
+
+  this->scene.reset();
   this->connections.clear();
 }
 
@@ -653,6 +666,7 @@ void Camera::SetClipDist(float _near, float _far)
 void Camera::SetHFOV(math::Angle _angle)
 {
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
+  this->UpdateFOV();
 }
 
 //////////////////////////////////////////////////
@@ -1057,7 +1071,8 @@ bool Camera::SaveFrame(const unsigned char *_image,
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
 
   // OGRE 1.9 renames codeToFile to encodeToFile
-  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+  // Looks like 1.9RC, which we're using on Windows, doesn't have this change.
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
   pCodec->codeToFile(stream, filename, codecDataPtr);
   #else
   pCodec->encodeToFile(stream, filename, codecDataPtr);
@@ -1266,6 +1281,9 @@ void Camera::CreateCamera()
   this->camera = this->scene->GetManager()->createCamera(
       this->scopedUniqueName);
 
+  if (this->sdf->HasElement("projection_type"))
+    this->SetProjectionType(this->sdf->Get<std::string>("projection_type"));
+
   this->camera->setFixedYawAxis(false);
   this->camera->yaw(Ogre::Degree(-90.0));
   this->camera->roll(Ogre::Degree(-90.0));
@@ -1305,6 +1323,9 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setShadowsEnabled(true);
     this->viewport->setOverlaysEnabled(false);
 
+    if (this->camera->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
+      this->scene->SetShadowsEnabled(false);
+
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
     this->viewport->setBackgroundColour(
@@ -1317,6 +1338,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     double hfov = this->GetHFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
@@ -1714,4 +1736,80 @@ void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
 DistortionPtr Camera::GetDistortion() const
 {
   return this->dataPtr->distortion;
+}
+
+//////////////////////////////////////////////////
+void Camera::UpdateFOV()
+{
+  if (this->viewport)
+  {
+    this->viewport->setDimensions(0, 0, 1, 1);
+    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
+      static_cast<double>(this->viewport->getActualHeight());
+
+    double hfov = this->sdf->Get<double>("horizontal_fov");
+    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+
+    this->camera->setAspectRatio(ratio);
+    this->camera->setFOVy(Ogre::Radian(vfov));
+
+    delete [] this->saveFrameBuffer;
+    this->saveFrameBuffer = NULL;
+  }
+}
+
+//////////////////////////////////////////////////
+float Camera::GetAvgFPS() const
+{
+  if (this->renderTarget)
+    return this->renderTarget->getAverageFPS();
+  else
+    return 0.0f;
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::GetTriangleCount() const
+{
+  return this->renderTarget->getTriangleCount();
+}
+
+//////////////////////////////////////////////////
+bool Camera::SetProjectionType(const std::string &_type)
+{
+  bool result = true;
+
+  if (_type == "orthographic")
+  {
+    // Shadows do not work properly with orthographic projection
+    this->scene->SetShadowsEnabled(false);
+    this->camera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
+  }
+  else if (_type == "perspective")
+  {
+    this->camera->setProjectionType(Ogre::PT_PERSPECTIVE);
+    this->camera->setCustomProjectionMatrix(false);
+    this->scene->SetShadowsEnabled(true);
+  }
+  else
+  {
+    gzerr << "Invalid projection type[" << _type << "]. "
+      << "Valid values are 'perspective' and 'orthographic'.\n";
+    result = false;
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string Camera::GetProjectionType() const
+{
+  if (this->camera->getProjectionType() == Ogre::PT_ORTHOGRAPHIC)
+  {
+    return "orthographic";
+  }
+  // There are only two types of projection in OGRE.
+  else
+  {
+    return "perspective";
+  }
 }

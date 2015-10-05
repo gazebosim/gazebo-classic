@@ -21,6 +21,12 @@
 #ifndef _STATE_HH_
 #define _STATE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <string>
 
 #include <sdf/sdf.hh>
@@ -40,7 +46,7 @@ namespace gazebo
     /// \brief State of an entity.
     ///
     /// This is the base class for all State information.
-    class GAZEBO_VISIBLE State
+    class GZ_PHYSICS_VISIBLE State
     {
       /// \brief Default constructor
       public: State();
@@ -50,11 +56,13 @@ namespace gazebo
       /// Construct a State object using some basic information.
       /// \param _name Name associated with the State information. This is
       /// typically the name of an Entity.
-      /// \pararm _realTime Clock time since simulation started.
+      /// \param _realTime Clock time since simulation started.
       /// \param _simTime Simulation time associated with this State info.
+      /// \param _iterations Simulation iterations since simulation started.
       public: State(const std::string &_name,
                     const common::Time &_realTime,
-                    const common::Time &_simTime);
+                    const common::Time &_simTime,
+                    const uint64_t _iterations);
 
       /// \brief Destructor
       public: virtual ~State();
@@ -97,6 +105,10 @@ namespace gazebo
       /// \return Simulation time when the data was recorded.
       public: common::Time GetSimTime() const;
 
+      /// \brief Get the iterations when this state was generated
+      /// \return Iterations when the data was recorded
+      public: uint64_t GetIterations() const;
+
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State
       /// data was recorded.
@@ -110,11 +122,19 @@ namespace gazebo
       /// \param[in] _time Simulation time when the data was recorded.
       public: virtual void SetSimTime(const common::Time &_time);
 
-      /// Name associated with this State
+      /// \brief Set the iterations when this state was generated
+      /// \param[in] _iterations Iterations when the data was recorded.
+      public: virtual void SetIterations(const uint64_t _iterations);
+
+      /// \brief Name associated with this State
       protected: std::string name;
 
-      /// Times for the state data
+      /// \brief Times for the state data
       protected: common::Time wallTime, realTime, simTime;
+
+      /// \brief The number of simulation iterations when this state was
+      /// generated.
+      protected: uint64_t iterations;
     };
     /// \}
   }

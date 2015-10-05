@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class SubscribeOptions SubscribeOptions.hh transport/transport.hh
     /// \brief Options for a subscription
-    class GAZEBO_VISIBLE SubscribeOptions
+    class GZ_TRANSPORT_VISIBLE SubscribeOptions
     {
       /// \brief Constructor
       public: SubscribeOptions()

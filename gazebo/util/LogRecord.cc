@@ -15,6 +15,21 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+
+  #include <io.h>
+
+  // Seems like W_OK does not exists on Windows.
+  // Reading access function documentation, the value should be 2
+  // http://msdn.microsoft.com/en-us/library/1w06ktdy.aspx
+  // Test for write permission.
+  #define W_OK    2
+  #define access _access
+#endif
+
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
@@ -25,6 +40,9 @@
 #include <boost/iostreams/copy.hpp>
 #include <iomanip>
 
+#include <ignition/math/Rand.hh>
+
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Base64.hh"
 #include "gazebo/common/Console.hh"
@@ -33,7 +51,6 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gazebo_config.h"
-#include "gazebo/math/Rand.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/util/LogRecord.hh"
 
@@ -52,9 +69,12 @@ LogRecord::LogRecord()
   this->readyToStart = false;
 
   // Get the user's home directory
-  // \todo getenv is not portable, and there is no generic cross-platform
-  // method. Must check OS and choose a method
-  char *homePath = getenv("HOME");
+#ifndef _WIN32
+  const char *homePath = common::getEnv("HOME");
+#else
+  const char *homePath = common::getEnv("HOMEPATH");
+#endif
+
   GZ_ASSERT(homePath, "HOME environment variable is missing");
 
   if (!homePath)
@@ -554,7 +574,7 @@ unsigned int LogRecord::Log::Update()
     std::string data = stream.str();
     if (!data.empty())
     {
-      const std::string encodingLocal = this->parent->GetEncoding();
+      const std::string &encodingLocal = this->parent->GetEncoding();
 
       this->buffer.append("<chunk encoding='");
       this->buffer.append(encodingLocal);
@@ -654,8 +674,8 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(this->completePath))
-    gzlog << "Filename[" + this->completePath.string() + "], already exists."
-      << " The log file will be overwritten.\n";
+    gzlog << "Filename [" + this->completePath.string() + "], already exists."
+          << " The log file will be overwritten.\n";
 
   std::ostringstream stream;
   stream << "<?xml version='1.0'?>\n"
@@ -663,7 +683,7 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
          << "<header>\n"
          << "<log_version>" << GZ_LOG_VERSION << "</log_version>\n"
          << "<gazebo_version>" << GAZEBO_VERSION_FULL << "</gazebo_version>\n"
-         << "<rand_seed>" << math::Rand::GetSeed() << "</rand_seed>\n"
+         << "<rand_seed>" << ignition::math::Rand::Seed() << "</rand_seed>\n"
          << "</header>\n";
 
   this->buffer.append(stream.str());

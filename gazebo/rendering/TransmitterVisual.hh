@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class TransmitterVisual TransmitterVisual.hh rendering/rendering.hh
     /// \brief Visualization for the wireless propagation data.
-    class GAZEBO_VISIBLE TransmitterVisual : public Visual
+    class GZ_RENDERING_VISIBLE TransmitterVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.

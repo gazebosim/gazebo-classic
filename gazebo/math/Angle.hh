@@ -15,10 +15,11 @@
  *
 */
 
-#ifndef _ANGLE_HH_
-#define _ANGLE_HH_
+#ifndef _GAZEBO_ANGLE_HH_
+#define _GAZEBO_ANGLE_HH_
 
 #include <math.h>
+#include <ignition/math/Angle.hh>
 #include <iostream>
 #include "gazebo/util/system.hh"
 
@@ -49,7 +50,7 @@ namespace gazebo
 
   /// \class Angle Angle.hh math/gzmath.hh
   /// \brief An angle and related functions.
-  class GAZEBO_VISIBLE Angle
+  class GZ_MATH_VISIBLE Angle
   {
     /// \brief math::Angle(0)
     public: static const Angle Zero;
@@ -73,6 +74,10 @@ namespace gazebo
     /// \brief Copy constructor
     /// \param[in] _angle Angle to copy
     public: Angle(const Angle &_angle);
+
+    /// \brief Ignition copy constructor
+    /// \param[in] _angle Ignition angle to copy
+    public: Angle(const ignition::math::Angle &_angle);
 
     /// \brief Destructor
     public: virtual ~Angle();
@@ -138,6 +143,20 @@ namespace gazebo
     /// \param[in] _angle Angle for division
     /// \return angle
     public: Angle operator/=(const Angle &_angle);
+
+    /// \brief Convert this angle to an ignition::math::Angle.
+    /// \return This Angle as an ignition::math::Angle.
+    public: ignition::math::Angle Ign() const;
+
+    /// \brief Assignment operator
+    /// \param[in] _angle Radians
+    /// \return The new angle
+    public: Angle &operator=(const double &_angle);
+
+    /// \brief Assignment operator
+    /// \param[in] _angle ignition::math::Angle to copy
+    /// \return The new angle
+    public: Angle &operator=(const ignition::math::Angle &_angle);
 
     /// \brief Equality operator, result = this == _angle
     /// \param[in] _angle Angle to check for equality

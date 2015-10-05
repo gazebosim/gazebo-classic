@@ -15,6 +15,12 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderEvents.hh"
@@ -26,6 +32,7 @@
 #include "gazebo/rendering/SelectionObj.hh"
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
 
@@ -39,21 +46,33 @@ using namespace gui;
 ModelManipulator::ModelManipulator()
   : dataPtr(new ModelManipulatorPrivate)
 {
-  this->dataPtr->initialized = false;
-  this->dataPtr->selectionObj.reset();
-  this->dataPtr->mouseMoveVis.reset();
-
   this->dataPtr->manipMode = "";
   this->dataPtr->globalManip = false;
+  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
 ModelManipulator::~ModelManipulator()
 {
-  this->dataPtr->modelPub.reset();
-  this->dataPtr->selectionObj.reset();
+  this->Clear();
   delete this->dataPtr;
   this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelManipulator::Clear()
+{
+  this->dataPtr->modelPub.reset();
+  this->dataPtr->lightPub.reset();
+  this->dataPtr->selectionObj.reset();
+  this->dataPtr->userCamera.reset();
+  this->dataPtr->scene.reset();
+  this->dataPtr->node.reset();
+  this->dataPtr->mouseMoveVis.reset();
+  this->dataPtr->mouseChildVisualScale.clear();
+  this->dataPtr->manipMode = "";
+  this->dataPtr->globalManip = false;
+  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
@@ -116,14 +135,14 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 
   math::Vector3 pressPoint;
   this->dataPtr->userCamera->GetWorldPointOnPlane(
-      this->dataPtr->mouseEvent.pressPos.x,
-      this->dataPtr->mouseEvent.pressPos.y,
+      this->dataPtr->mouseEvent.PressPos().X(),
+      this->dataPtr->mouseEvent.PressPos().Y(),
       math::Plane(normal, offset), pressPoint);
 
   math::Vector3 newPoint;
   this->dataPtr->userCamera->GetWorldPointOnPlane(
-      this->dataPtr->mouseEvent.pos.x,
-      this->dataPtr->mouseEvent.pos.y,
+      this->dataPtr->mouseEvent.Pos().X(),
+      this->dataPtr->mouseEvent.Pos().Y(),
       math::Plane(normal, offset), newPoint);
 
   math::Vector3 v1 = pressPoint - this->dataPtr->mouseMoveVisStartPose.pos;
@@ -136,7 +155,9 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   if (signTest < 0 )
     angle *= -1;
 
-  if (this->dataPtr->mouseEvent.control)
+  // Using Qt control modifier instead of Gazebo's for now.
+  // See GLWidget::keyPressEvent
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
 
   math::Quaternion rot(_axis, angle);
@@ -157,7 +178,7 @@ math::Vector3 ModelManipulator::GetMousePositionOnPlane(
   math::Vector3 origin1, dir1, p1;
 
   // Cast ray from the camera into the world
-  _camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
+  _camera->GetCameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
       origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
@@ -303,8 +324,9 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(const math::Pose &_pose,
     const math::Vector3 &_axis, bool _local) const
 {
   return GetMouseMoveDistance(this->dataPtr->userCamera,
-      this->dataPtr->mouseStart, math::Vector2i(this->dataPtr->mouseEvent.pos.x,
-      this->dataPtr->mouseEvent.pos.y), _pose, _axis, _local);
+      this->dataPtr->mouseStart,
+      math::Vector2i(this->dataPtr->mouseEvent.Pos().X(),
+      this->dataPtr->mouseEvent.Pos().Y()), _pose, _axis, _local);
 }
 
 /////////////////////////////////////////////////
@@ -319,10 +341,127 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
   math::Vector3 scale = (bboxSize + pose.rot.RotateVectorReverse(distance))
       / bboxSize;
 
-  // a bit hacky to check for unit sphere and cylinder simple shapes in order
-  // to restrict the scaling dimensions.
-  if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
-      _vis->GetName().find("unit_sphere") != std::string::npos)
+  // extended scaling to work in model editor mode by checking geometry
+  // type of first visual child.
+  std::string geomType;
+  if (_vis == _vis->GetRootVisual())
+  {
+    // link-level visuals
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+
+      if (childVis->GetPose().pos != math::Vector3::Zero)
+      {
+        gzwarn << "Scaling is currently limited to simple shapes with their "
+            << "origin in the centroid." << std::endl;
+        return;
+      }
+      // visual/collision level visuals
+      for (unsigned int j = 0; j < childVis->GetChildCount(); ++j)
+      {
+        rendering::VisualPtr grandChildVis = childVis->GetChild(j);
+        std::string thisGeomType = grandChildVis->GetGeometryType();
+
+        if (grandChildVis->GetPose().pos != math::Vector3::Zero)
+        {
+          gzwarn << "Scaling is currently limited to simple shapes with their "
+              << "origin in the centroid." << std::endl;
+          return;
+        }
+
+        if (thisGeomType == "")
+          continue;
+
+        if (geomType == "")
+        {
+          geomType = thisGeomType;
+        }
+        else if (thisGeomType != geomType)
+        {
+          gzwarn << "Scaling is currently limited to models consisting of a " <<
+              "single simple geometry type." << std::endl;
+          return;
+        }
+      }
+    }
+
+    if (this->dataPtr->keyEvent.key == Qt::Key_Shift || geomType == "sphere")
+    {
+      scale = this->UpdateScale(_axis, scale, "sphere");
+    }
+    else if (geomType == "cylinder")
+    {
+      scale = this->UpdateScale(_axis, scale, "cylinder");
+    }
+    else if (geomType == "box")
+    {
+      // keep new scale as it is
+    }
+    else
+    {
+      // TODO scaling for complex models are not yet functional.
+      // Limit scaling to simple shapes for now.
+      gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
+      return;
+    }
+
+    math::Vector3 newScale = this->dataPtr->mouseVisualScale * scale.GetAbs();
+
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+    {
+      newScale = SnapPoint(newScale);
+      // prevent setting zero scale
+      newScale.x = std::max(1e-4, newScale.x);
+      newScale.y = std::max(1e-4, newScale.y);
+      newScale.z = std::max(1e-4, newScale.z);
+    }
+    _vis->SetScale(newScale);
+    Events::scaleEntity(_vis->GetName(), newScale);
+  }
+  else
+  {
+    // model editor mode -> apply scaling to individual visuals
+    if (this->dataPtr->mouseChildVisualScale.size() != _vis->GetChildCount())
+    {
+      gzerr << "Incorrect number of child visuals to be scaled. " <<
+          "This should not happen" << std::endl;
+      return;
+    }
+
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+      geomType = childVis->GetGeometryType();
+      if (childVis != this->dataPtr->selectionObj &&
+          geomType != "" && geomType != "mesh")
+      {
+        math::Vector3 geomScale = this->UpdateScale(_axis, scale,
+            childVis->GetGeometryType());
+        math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
+            * geomScale.GetAbs();
+
+        if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+        {
+          newScale = SnapPoint(newScale);
+          // prevent setting zero scale
+          newScale.x = std::max(1e-4, newScale.x);
+          newScale.y = std::max(1e-4, newScale.y);
+          newScale.z = std::max(1e-4, newScale.z);
+        }
+        childVis->SetScale(newScale);
+        Events::scaleEntity(childVis->GetName(), newScale);
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+math::Vector3 ModelManipulator::UpdateScale(const math::Vector3 &_axis,
+    const math::Vector3 &_scale, const std::string &_geom)
+{
+  math::Vector3 scale = _scale;
+  if (_geom == "sphere")
   {
     if (_axis.x > 0)
     {
@@ -340,7 +479,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.y = scale.z;
     }
   }
-  else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
+  else if (_geom == "cylinder")
   {
     if (_axis.x > 0)
     {
@@ -351,29 +490,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       scale.x = scale.y;
     }
   }
-  else if (_vis->GetName().find("unit_box") != std::string::npos)
-  {
-  }
-  else
-  {
-    // TODO scaling for complex models are not yet functional.
-    // Limit scaling to simple shapes for now.
-    gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
-    return;
-  }
 
-  math::Vector3 newScale = this->dataPtr->mouseVisualScale * scale.GetAbs();
-
-  if (this->dataPtr->mouseEvent.control)
-  {
-    newScale = SnapPoint(newScale);
-    // prevent setting zero scale
-    newScale.x = std::max(1e-4, newScale.x);
-    newScale.y = std::max(1e-4, newScale.y);
-    newScale.z = std::max(1e-4, newScale.z);
-  }
-
-  _vis->SetScale(newScale);
+  return scale;
 }
 
 /////////////////////////////////////////////////
@@ -385,7 +503,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
 
   pose.pos = this->dataPtr->mouseMoveVisStartPose.pos + distance;
 
-  if (this->dataPtr->mouseEvent.control)
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
     pose.pos = SnapPoint(pose.pos);
   }
@@ -408,7 +526,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
       msg.set_id(gui::get_entity_id(_vis->GetName()));
       msg.set_name(_vis->GetName());
 
-      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
       this->dataPtr->modelPub->Publish(msg);
     }
     // Otherwise, check to see if the visual is a light
@@ -416,7 +534,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     {
       msgs::Light msg;
       msg.set_name(_vis->GetName());
-      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+      msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
       this->dataPtr->lightPub->Publish(msg);
     }
   }
@@ -434,7 +552,7 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
       msg.set_id(gui::get_entity_id(_vis->GetName()));
       msg.set_name(_vis->GetName());
 
-      msgs::Set(msg.mutable_scale(), _vis->GetScale());
+      msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
       this->dataPtr->modelPub->Publish(msg);
       _vis->SetScale(this->dataPtr->mouseVisualScale);
     }
@@ -445,12 +563,12 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
-  this->dataPtr->mouseStart = _event.pressPos;
+  this->dataPtr->mouseStart = _event.PressPos();
   this->SetMouseMoveVisual(rendering::VisualPtr());
 
   rendering::VisualPtr vis;
   rendering::VisualPtr mouseVis
-      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.pos);
+      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
   if (!this->dataPtr->keyEvent.key && (this->dataPtr->selectionObj->GetMode() ==
@@ -465,23 +583,33 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   }
 
   if (vis && !vis->IsPlane() &&
-      this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+      this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
   {
+    // Root visual
     rendering::VisualPtr rootVis = vis->GetRootVisual();
+
+    // Root visual's immediate child
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+
+    // If the root visual's ID can be found, it is a model in the main window
     if (gui::get_entity_id(rootVis->GetName()))
     {
       // select model
       vis = rootVis;
     }
-    else if (vis->GetParent() != rootVis &&
-        vis->GetParent() != this->dataPtr->scene->GetWorldVisual())
-    {
-      // select link
-      vis = vis->GetParent();
-    }
-    else
+    // If it is not a model and its parent is either a direct child or
+    // grandchild of the world, this is a light, so just keep vis = vis
+    else if (vis->GetParent() == rootVis ||
+        vis->GetParent() == this->dataPtr->scene->GetWorldVisual())
     {
       // select light
+    }
+    // Otherwise, this is a visual in the model editor, so we want to get its
+    // top level visual below the root.
+    else
+    {
+      // select link / nested model
+      vis = topLevelVis;
     }
 
     this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose();
@@ -512,10 +640,10 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
-  if (this->dataPtr->mouseEvent.dragging)
+  if (this->dataPtr->mouseEvent.Dragging())
   {
     if (this->dataPtr->mouseMoveVis &&
-        this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+        this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
       math::Vector3 axis = math::Vector3::Zero;
       if (this->dataPtr->keyEvent.key == Qt::Key_X)
@@ -621,7 +749,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
   else
   {
     std::string manipState;
-    this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.pos,
+    this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos(),
         manipState);
     this->dataPtr->selectionObj->SetState(manipState);
 
@@ -630,7 +758,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     else
     {
       rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
-          this->dataPtr->mouseEvent.pos);
+          this->dataPtr->mouseEvent.Pos());
 
       if (vis && !vis->IsPlane())
         QApplication::setOverrideCursor(Qt::OpenHandCursor);
@@ -645,7 +773,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
 void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
-  if (this->dataPtr->mouseEvent.dragging)
+  if (this->dataPtr->mouseEvent.Dragging())
   {
     // If we were dragging a visual around, then publish its new pose to the
     // server
@@ -665,10 +793,10 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
   }
   else
   {
-    if (this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+    if (this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
       rendering::VisualPtr vis =
-        this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.pos);
+        this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
       if (vis && vis->IsPlane())
       {
         this->dataPtr->selectionObj->SetMode(
@@ -718,6 +846,14 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
   if (_vis)
   {
     this->dataPtr->mouseVisualScale = _vis->GetScale();
+    this->dataPtr->mouseChildVisualScale.clear();
+    // keep track of all child visual scale for scaling to work in
+    // model editor mode.
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    {
+      rendering::VisualPtr childVis = _vis->GetChild(i);
+      this->dataPtr->mouseChildVisualScale.push_back(childVis->GetScale());
+    }
     this->dataPtr->mouseVisualBbox = _vis->GetBoundingBox();
   }
   else
@@ -736,7 +872,7 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
     if (_event.key == Qt::Key_X || _event.key == Qt::Key_Y
         || _event.key == Qt::Key_Z)
     {
-      this->dataPtr->mouseStart = this->dataPtr->mouseEvent.pos;
+      this->dataPtr->mouseStart = this->dataPtr->mouseEvent.Pos();
       if (this->dataPtr->mouseMoveVis)
       {
         this->dataPtr->mouseMoveVisStartPose =
@@ -763,7 +899,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     if (_event.key == Qt::Key_X || _event.key == Qt::Key_Y
         || _event.key == Qt::Key_Z)
     {
-      this->dataPtr->mouseStart = this->dataPtr->mouseEvent.pos;
+      this->dataPtr->mouseStart = this->dataPtr->mouseEvent.Pos();
       if (this->dataPtr->mouseMoveVis)
       {
         this->dataPtr->mouseMoveVisStartPose =

@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #define LINUX
-#ifdef WINDOWS
+#ifdef _WIN32
   #include <direct.h>
   #define GetCurrentDir _getcwd
 #else
@@ -53,7 +53,7 @@ namespace gazebo
     ///            Should point to Ogre RenderSystem_GL.so et. al.
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class GAZEBO_VISIBLE SystemPaths : public SingletonT<SystemPaths>
+    class GZ_COMMON_VISIBLE SystemPaths : public SingletonT<SystemPaths>
     {
       /// Constructor for SystemPaths
       private: SystemPaths();

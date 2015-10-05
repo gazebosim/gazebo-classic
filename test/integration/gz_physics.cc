@@ -15,10 +15,13 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-class GzPhysics : public ServerFixture
+class GzPhysics : public ServerFixture,
+                  public testing::WithParamInterface<const char*>
+
 {
 };
 
@@ -99,6 +102,32 @@ TEST_F(GzPhysics, Iters)
 }
 
 /////////////////////////////////////////////////
+// \brief Test setting the physics profile for each physics engine.
+TEST_P(GzPhysics, Profile)
+{
+  Load("test/worlds/presets.world", false, GetParam());
+
+  // Get a pointer to the world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world->GetPhysicsEngine() != NULL);
+
+  // Check initial profile and step size
+  EXPECT_EQ(world->GetPresetManager()->CurrentProfile(), "preset_1");
+  EXPECT_FLOAT_EQ(world->GetPhysicsEngine()->GetMaxStepSize(), 0.01);
+
+  // Change profile
+  custom_exec("gz physics -o preset_2");
+  EXPECT_EQ(world->GetPresetManager()->CurrentProfile(), "preset_2");
+  EXPECT_FLOAT_EQ(world->GetPhysicsEngine()->GetMaxStepSize(), 0.02);
+
+  // Change profile and override step size
+  custom_exec("gz physics -o preset_1 -s 0.001");
+  EXPECT_EQ(world->GetPresetManager()->CurrentProfile(), "preset_1");
+  EXPECT_FLOAT_EQ(world->GetPhysicsEngine()->GetMaxStepSize(), 0.001);
+}
+
+/////////////////////////////////////////////////
 // \brief Test setting the update rate.
 TEST_F(GzPhysics, UpdateRate)
 {
@@ -117,6 +146,8 @@ TEST_F(GzPhysics, UpdateRate)
   custom_exec("gz physics -u 0.5");
   EXPECT_NEAR(world->GetPhysicsEngine()->GetRealTimeUpdateRate(), 0.5, 1e-3);
 }
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, GzPhysics, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

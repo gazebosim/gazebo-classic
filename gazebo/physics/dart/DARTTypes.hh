@@ -38,6 +38,7 @@ namespace gazebo
     class DARTJoint;
     class DARTCollision;
     class DARTRayShape;
+    class DARTSurfaceParams;
 
     typedef boost::shared_ptr<DARTPhysics>   DARTPhysicsPtr;
     typedef boost::shared_ptr<DARTModel>     DARTModelPtr;
@@ -45,6 +46,7 @@ namespace gazebo
     typedef boost::shared_ptr<DARTJoint>     DARTJointPtr;
     typedef boost::shared_ptr<DARTCollision> DARTCollisionPtr;
     typedef boost::shared_ptr<DARTRayShape>  DARTRayShapePtr;
+    typedef boost::shared_ptr<DARTSurfaceParams> DARTSurfaceParamsPtr;
 
     /// \addtogroup gazebo_physics_dart
     /// \{
@@ -52,7 +54,7 @@ namespace gazebo
     /// \class DARTTypes DARTTypes.hh
     /// \brief A set of functions for converting between the math types used
     ///        by gazebo and dart.
-    class GAZEBO_VISIBLE DARTTypes
+    class GZ_PHYSICS_VISIBLE DARTTypes
     {
       /// \brief
       public: static Eigen::Vector3d ConvVec3(const math::Vector3 &_vec3)

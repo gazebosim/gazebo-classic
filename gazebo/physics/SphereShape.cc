@@ -83,3 +83,9 @@ void SphereShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetRadius(_msg.sphere().radius());
 }
+
+//////////////////////////////////////////////////
+double SphereShape::ComputeVolume() const
+{
+  return 4*M_PI*pow(this->GetRadius(), 3)/3;
+}

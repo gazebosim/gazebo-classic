@@ -46,7 +46,7 @@ namespace gazebo
 
     /// \class MovableText MovableText.hh rendering/rendering.hh
     /// \brief Movable text
-    class GAZEBO_VISIBLE MovableText
+    class GZ_RENDERING_VISIBLE MovableText
       : public Ogre::MovableObject, public Ogre::Renderable
     {
       /// \enum HorizAlign

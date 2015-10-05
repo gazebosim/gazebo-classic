@@ -38,7 +38,7 @@
 //                      for proper contact dynamics.
 // MAX_CONTACT_JOINTS truncates <max_contacts> specified in SDF
 #define MAX_COLLIDE_RETURNS 250
-#define MAX_CONTACT_JOINTS 32
+#define MAX_CONTACT_JOINTS 250
 
 namespace gazebo
 {
@@ -51,7 +51,7 @@ namespace gazebo
     /// \class Contact Contact.hh physics/physics.hh
     /// \brief A contact between two collisions. Each contact can consist of
     /// a number of contact points
-    class GAZEBO_VISIBLE Contact
+    class GZ_PHYSICS_VISIBLE Contact
     {
       /// \brief Constructor.
       public: Contact();
@@ -91,6 +91,7 @@ namespace gazebo
       public: Collision *collision2;
 
       /// \brief Array of forces for the contact.
+      /// All forces and torques are in the world frame.
       /// All forces and torques are relative to the center of mass of the
       /// respective links that the collision elments are attached to.
       public: JointWrench wrench[MAX_CONTACT_JOINTS];

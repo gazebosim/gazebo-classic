@@ -30,9 +30,24 @@ using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-AxisVisual::AxisVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(*new AxisVisualPrivate, _name, _vis, false)
+AxisVisual::AxisVisual(const std::string &_name, VisualPtr _parent)
+  : Visual(*new AxisVisualPrivate, _name, _parent, false)
 {
+  AxisVisualPrivate *dPtr =
+      reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_GUI;
+}
+
+//////////////////////////////////////////////////
+AxisVisual::AxisVisual(VisualPrivate &_dataPtr, const std::string &_name,
+    VisualPtr _parent)
+    : Visual(_dataPtr, _name, _parent, false)
+{
+  AxisVisualPrivate *dPtr =
+      reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_GUI;
 }
 
 /////////////////////////////////////////////////

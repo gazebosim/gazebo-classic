@@ -204,7 +204,10 @@ void EditorView::contextMenuEvent(QContextMenuEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::wheelEvent(QWheelEvent *_event)
 {
-  int numSteps = (_event->delta()/8) / 15;
+  int wheelIncr = 120;
+  int sign = (_event->delta() > 0) ? 1 : -1;
+  int delta = std::max(std::abs(_event->delta()), wheelIncr) * sign;
+  int numSteps = delta / wheelIncr;
 
   QMatrix mat = matrix();
   QPointF mousePosition = _event->pos();
@@ -1281,8 +1284,8 @@ void EditorView::OnOpenLevelInspector()
   if (floorItem)
   {
     this->levelInspector->floorWidget->show();
-    this->levelInspector->SetFloorColor(floorItem->Get3dColor());
-    this->levelInspector->SetFloorTexture(floorItem->Get3dTexture());
+    this->levelInspector->SetColor(floorItem->Get3dColor());
+    this->levelInspector->SetTexture(floorItem->Get3dTexture());
   }
   else
   {
@@ -1303,8 +1306,8 @@ void EditorView::OnLevelApply()
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
-    floorItem->Set3dTexture(dialog->GetFloorTexture());
-    floorItem->Set3dColor(dialog->GetFloorColor());
+    floorItem->Set3dTexture(dialog->GetTexture());
+    floorItem->Set3dColor(dialog->GetColor());
     floorItem->Set3dTransparency(0.4);
     floorItem->FloorChanged();
   }

@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-/* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/common/Exception.hh"
 
@@ -96,7 +97,7 @@ bool RFIDTag::UpdateImpl(bool /*_force*/)
   if (this->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, entity->GetWorldPose());
+    msgs::Set(&msg, entity->GetWorldPose().Ign());
 
     // msg.set_position(link->GetWorldPose().pos);
     // msg.set_orientation(link->GetWorldPose().rot);
@@ -122,4 +123,16 @@ bool RFIDTag::UpdateImpl(bool /*_force*/)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+math::Pose RFIDTag::GetTagPose() const
+{
+  return this->TagPose();
+}
+
+/////////////////////////////////////////////////
+ignition::math::Pose3d RFIDTag::TagPose() const
+{
+  return entity->GetWorldPose().Ign();
 }

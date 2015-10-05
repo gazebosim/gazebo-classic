@@ -24,8 +24,6 @@
 #include <vector>
 
 #include "SimEventsException.hh"
-#include "InRegionEventSource.hh"
-#include "ExistenceEventSource.hh"
 #include "SimStateEventSource.hh"
 
 namespace gazebo
@@ -65,6 +63,9 @@ namespace gazebo
 
     /// \brief List of all sim event emitters
     private: std::vector<EventSourcePtr> events;
+
+    /// \brief Node for communication.
+    private: transport::NodePtr node;
 
     /// \brief the publisher for SimEvents
     private: transport::PublisherPtr pub;

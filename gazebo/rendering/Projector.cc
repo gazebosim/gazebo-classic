@@ -128,14 +128,14 @@ void Projector::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Projector::Load(const msgs::Projector &_msg)
 {
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   std::string textureName;
   double nearClip = 0.1;
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
   if (_msg.has_pose())
-    pose = msgs::Convert(_msg.pose());
+    pose = msgs::ConvertIgn(_msg.pose());
 
   if (_msg.has_texture())
     textureName = _msg.texture();

@@ -18,6 +18,12 @@
  * Author: Nate Koenig
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
@@ -35,7 +41,8 @@ WorldState::WorldState()
 
 /////////////////////////////////////////////////
 WorldState::WorldState(const WorldPtr _world)
-  : State(_world->GetName(), _world->GetRealTime(), _world->GetSimTime())
+  : State(_world->GetName(), _world->GetRealTime(), _world->GetSimTime(),
+      _world->GetIterations())
 {
   this->world = _world;
 
@@ -45,7 +52,7 @@ WorldState::WorldState(const WorldPtr _world)
        iter != models.end(); ++iter)
   {
     this->modelStates.insert(std::make_pair((*iter)->GetName(),
-          ModelState(*iter, this->realTime, this->simTime)));
+          ModelState(*iter, this->realTime, this->simTime, this->iterations)));
   }
 }
 
@@ -71,6 +78,7 @@ void WorldState::Load(const WorldPtr _world)
   this->wallTime = common::Time::GetWallTime();
   this->simTime = _world->GetSimTime();
   this->realTime = _world->GetRealTime();
+  this->iterations = _world->GetIterations();
 
   // Add a state for all the models
   Model_V models = _world->GetModels();
@@ -78,7 +86,7 @@ void WorldState::Load(const WorldPtr _world)
        iter != models.end(); ++iter)
   {
     this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
-        this->simTime);
+        this->simTime, this->iterations);
   }
 
   // Remove models that no longer exist. We determine this by check the time
@@ -101,6 +109,7 @@ void WorldState::Load(const sdf::ElementPtr _elem)
   this->simTime = _elem->Get<common::Time>("sim_time");
   this->wallTime = _elem->Get<common::Time>("wall_time");
   this->realTime = _elem->Get<common::Time>("real_time");
+  this->iterations = _elem->Get<uint64_t>("iterations");
 
   // Add the model states
   this->modelStates.clear();
@@ -116,6 +125,7 @@ void WorldState::Load(const sdf::ElementPtr _elem)
       this->modelStates[modelName].SetSimTime(this->simTime);
       this->modelStates[modelName].SetWallTime(this->wallTime);
       this->modelStates[modelName].SetRealTime(this->realTime);
+      this->modelStates[modelName].SetIterations(this->iterations);
       childElem = childElem->GetNextElement("model");
     }
   }
@@ -232,6 +242,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   result.simTime = this->simTime;
   result.realTime = this->realTime;
   result.wallTime = this->wallTime;
+  result.iterations = this->iterations;
 
   // Subtract the model states.
   for (ModelState_M::const_iterator iter =
@@ -276,6 +287,7 @@ WorldState WorldState::operator+(const WorldState &_state) const
   result.simTime = this->simTime;
   result.realTime = this->realTime;
   result.wallTime = this->wallTime;
+  result.iterations = this->iterations;
 
   // Add the states.
   for (ModelState_M::const_iterator iter =
@@ -298,6 +310,7 @@ void WorldState::FillSDF(sdf::ElementPtr _sdf)
   _sdf->GetElement("sim_time")->Set(this->simTime);
   _sdf->GetElement("real_time")->Set(this->realTime);
   _sdf->GetElement("wall_time")->Set(this->wallTime);
+  _sdf->GetElement("iterations")->Set(this->iterations);
 
   for (ModelState_M::iterator iter =
        this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
@@ -341,4 +354,13 @@ void WorldState::SetSimTime(const common::Time &_time)
   {
     iter->second.SetSimTime(_time);
   }
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetIterations(const uint64_t _iterations)
+{
+  State::SetIterations(_iterations);
+
+  for (auto &modelState : this->modelStates)
+    modelState.second.SetIterations(_iterations);
 }

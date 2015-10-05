@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class MeshLoader MeshLoader.hh common/common.hh
     /// \brief Base class for loading meshes
-    class GAZEBO_VISIBLE MeshLoader
+    class GZ_COMMON_VISIBLE MeshLoader
     {
       /// \brief Constructor
       public: MeshLoader();

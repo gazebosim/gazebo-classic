@@ -157,8 +157,17 @@ namespace gazebo
       /// \brief String form of the id.
       public: std::string idString;
 
+      /// \brief List of model visual messages to process.
+      public: VisualMsgs_L modelVisualMsgs;
+
+      /// \brief List of link visual messages to process.
+      public: VisualMsgs_L linkVisualMsgs;
+
       /// \brief List of visual messages to process.
       public: VisualMsgs_L visualMsgs;
+
+      /// \brief List of collision visual messages to process.
+      public: VisualMsgs_L collisionVisualMsgs;
 
       /// \brief List of light message to process.
       public: LightMsgs_L lightMsgs;
@@ -193,9 +202,6 @@ namespace gazebo
       /// \brief List of skeleton message to process.
       public: SkeletonPoseMsgs_L skeletonPoseMsgs;
 
-      /// \brief A message used to select an object.
-      public: boost::shared_ptr<msgs::Selection const> selectionMsg;
-
       /// \brief Mutex to lock the various message buffers.
       public: boost::mutex *receiveMutex;
 
@@ -226,9 +232,6 @@ namespace gazebo
       /// \brief Subscribe to joint updates.
       public: transport::SubscriberPtr jointSub;
 
-      /// \brief Subscribe to selection updates.
-      public: transport::SubscriberPtr selectionSub;
-
       /// \brief Subscribe to reponses.
       public: transport::SubscriberPtr responseSub;
 
@@ -255,6 +258,9 @@ namespace gazebo
 
       /// \brief The top level in our tree of visuals
       public: VisualPtr worldVisual;
+
+      /// \brief Visual representing the world origin frame.
+      public: OriginVisualPtr originVisual;
 
       /// \brief Pointer to a visual selected by a user via the GUI.
       public: VisualPtr selectedVis;
@@ -286,6 +292,12 @@ namespace gazebo
 
       /// \brief True when all COMs should be visualized.
       public: bool showCOMs;
+
+      /// \brief True when all inertias should be visualized.
+      public: bool showInertias;
+
+      /// \brief True when all link frames should be visualized.
+      public: bool showLinkFrames;
 
       /// \brief True when all collisions should be visualized.
       public: bool showCollisions;

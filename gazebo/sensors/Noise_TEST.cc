@@ -23,7 +23,8 @@
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/bind.hpp>
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/GaussianNoiseModel.hh"
 #include "test/util.hh"
@@ -111,7 +112,7 @@ void NoNoise(sensors::NoisePtr _noise, unsigned int _count)
   // Expect no change in input value
   for (unsigned int i = 0; i < _count; ++i)
   {
-    double x = math::Rand::GetDblUniform(-1e6, 1e6);
+    double x = ignition::math::Rand::DblUniform(-1e6, 1e6);
     EXPECT_NEAR(x, _noise->Apply(x), 1e-6);
   }
 }

@@ -1,0 +1,18 @@
+{
+  "name": "secure",
+  "version": "0.0.0",
+  "description": "a simple website with basic auth and https",
+  "main": "exp_server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.4.3",
+    "express": "^4.6.1",
+    "passport": "^0.2.0",
+    "passport-http": "^0.2.2"
+  }
+}

@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
-
-#ifndef _COLLADALOADER_PRIVATE_HH_
-#define _COLLADALOADER_PRIVATE_HH_
+#ifndef _GAZEBO_COLLADALOADER_PRIVATE_HH_
+#define _GAZEBO_COLLADALOADER_PRIVATE_HH_
 
 #include <map>
 #include <string>
 #include <vector>
+
+#include <ignition/math/Vector3.hh>
 
 class TiXmlElement;
 
@@ -52,13 +53,16 @@ namespace gazebo
       public: std::string currentNodeName;
 
       /// \brief Map of collada POSITION ids to list of vectors.
-      public: std::map<std::string, std::vector<math::Vector3> > positionIds;
+      public: std::map<std::string,
+              std::vector<ignition::math::Vector3d> > positionIds;
 
       /// \brief Map of collada NORMAL ids to list of normals.
-      public: std::map<std::string, std::vector<math::Vector3> > normalIds;
+      public: std::map<std::string,
+              std::vector<ignition::math::Vector3d> > normalIds;
 
       /// \brief Map of collada TEXCOORD ids to list of texture coordinates.
-      public: std::map<std::string, std::vector<math::Vector2d> >texcoordIds;
+      public: std::map<std::string,
+              std::vector<ignition::math::Vector2d> >texcoordIds;
 
       /// \brief Map of collada Material ids to Gazebo materials.
       public: std::map<std::string, Material *> materialIds;

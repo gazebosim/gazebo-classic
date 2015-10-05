@@ -38,7 +38,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody collisions
-    class GAZEBO_VISIBLE SimbodyCollision : public Collision
+    class GZ_PHYSICS_VISIBLE SimbodyCollision : public Collision
     {
       /// \brief Constructor
       public: SimbodyCollision(LinkPtr _parent);

@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class IOManager IOManager.hh transport/transport.hh
     /// \brief Manages boost::asio IO
-    class GAZEBO_VISIBLE IOManager
+    class GZ_TRANSPORT_VISIBLE IOManager
     {
       /// \brief Constructor
       public: IOManager();

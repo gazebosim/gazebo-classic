@@ -35,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \brief Ray shape for bullet
-    class GAZEBO_VISIBLE BulletRayShape : public RayShape
+    class GZ_PHYSICS_VISIBLE BulletRayShape : public RayShape
     {
       public: BulletRayShape(PhysicsEnginePtr _physicsEngine);
 

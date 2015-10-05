@@ -14,6 +14,12 @@
  * limitations under the License.
  *
  */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 #include <iomanip>
@@ -29,7 +35,6 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/RenderWidget.hh"
-#include "gazebo/gui/building/BuildingEditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -39,10 +44,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   : QWidget(_parent)
 {
   this->setObjectName("renderWidget");
-  this->show();
-
-  this->clear = false;
-  this->create = false;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
@@ -51,70 +52,128 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  QFrame *toolFrame = new QFrame;
-  toolFrame->setObjectName("toolFrame");
-  toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  this->toolFrame = new QFrame;
+  this->toolFrame->setObjectName("toolFrame");
+  this->toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
   this->toolbar = new QToolBar;
   QHBoxLayout *toolLayout = new QHBoxLayout;
   toolLayout->setContentsMargins(0, 0, 0, 0);
 
-  QActionGroup *actionGroup = new QActionGroup(toolFrame);
-  actionGroup->addAction(g_arrowAct);
-  actionGroup->addAction(g_translateAct);
-  actionGroup->addAction(g_rotateAct);
-  actionGroup->addAction(g_scaleAct);
-  actionGroup->addAction(g_snapAct);
-
-  this->toolbar->addAction(g_arrowAct);
-  this->toolbar->addAction(g_translateAct);
-  this->toolbar->addAction(g_rotateAct);
-  this->toolbar->addAction(g_scaleAct);
-
-  this->toolbar->addSeparator();
-  this->toolbar->addAction(g_boxCreateAct);
-  this->toolbar->addAction(g_sphereCreateAct);
-  this->toolbar->addAction(g_cylinderCreateAct);
-  this->toolbar->addSeparator();
-  this->toolbar->addAction(g_pointLghtCreateAct);
-  this->toolbar->addAction(g_spotLghtCreateAct);
-  this->toolbar->addAction(g_dirLghtCreateAct);
-  this->toolbar->addSeparator();
-  this->toolbar->addAction(g_screenshotAct);
-
-  this->toolbar->addSeparator();
-  this->toolbar->addAction(g_copyAct);
-  this->toolbar->addAction(g_pasteAct);
+  // Manipulation modes
+  QActionGroup *actionGroup = new QActionGroup(this->toolFrame);
+  if (g_arrowAct)
+  {
+    actionGroup->addAction(g_arrowAct);
+    this->toolbar->addAction(g_arrowAct);
+  }
+  if (g_translateAct)
+  {
+    actionGroup->addAction(g_translateAct);
+    this->toolbar->addAction(g_translateAct);
+  }
+  if (g_rotateAct)
+  {
+    actionGroup->addAction(g_rotateAct);
+    this->toolbar->addAction(g_rotateAct);
+  }
+  if (g_scaleAct)
+  {
+    actionGroup->addAction(g_scaleAct);
+    this->toolbar->addAction(g_scaleAct);
+  }
 
   this->toolbar->addSeparator();
 
-  QToolButton *alignButton = new QToolButton;
-  alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  alignButton->setIcon(QIcon(":/images/align.png"));
-  alignButton->setToolTip(
-      tr("In Selection Mode, hold Ctrl and select 2 objects to align"));
-  alignButton->setArrowType(Qt::NoArrow);
-  QMenu *alignMenu = new QMenu(alignButton);
-  alignMenu->addAction(g_alignAct);
-  alignButton->setMenu(alignMenu);
-  alignButton->setPopupMode(QToolButton::InstantPopup);
-  g_alignButtonAct = this->toolbar->addWidget(alignButton);
-  connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
+  // Insert simple shapes
+  if (g_boxCreateAct)
+    this->toolbar->addAction(g_boxCreateAct);
+  if (g_sphereCreateAct)
+    this->toolbar->addAction(g_sphereCreateAct);
+  if (g_cylinderCreateAct)
+    this->toolbar->addAction(g_cylinderCreateAct);
+  this->toolbar->addSeparator();
+
+  // Insert lights
+  if (g_pointLghtCreateAct)
+    this->toolbar->addAction(g_pointLghtCreateAct);
+  if (g_spotLghtCreateAct)
+    this->toolbar->addAction(g_spotLghtCreateAct);
+  if (g_dirLghtCreateAct)
+    this->toolbar->addAction(g_dirLghtCreateAct);
+  this->toolbar->addSeparator();
+
+  // Copy & Paste
+  if (g_copyAct)
+    this->toolbar->addAction(g_copyAct);
+  if (g_pasteAct)
+    this->toolbar->addAction(g_pasteAct);
 
   this->toolbar->addSeparator();
-  this->toolbar->addAction(g_snapAct);
+
+  // Align
+  if (g_alignAct)
+  {
+    QToolButton *alignButton = new QToolButton;
+    alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    alignButton->setIcon(QIcon(":/images/align.png"));
+    alignButton->setToolTip(
+        tr("In Selection Mode, hold Ctrl and select 2 objects to align"));
+    alignButton->setArrowType(Qt::NoArrow);
+    QMenu *alignMenu = new QMenu(alignButton);
+    alignMenu->addAction(g_alignAct);
+    alignButton->setMenu(alignMenu);
+    alignButton->setPopupMode(QToolButton::InstantPopup);
+    g_alignButtonAct = this->toolbar->addWidget(alignButton);
+    connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
+  }
+
+  // Snap
+  if (g_snapAct)
+  {
+    actionGroup->addAction(g_snapAct);
+    this->toolbar->addAction(g_snapAct);
+  }
+
+  this->toolbar->addSeparator();
+
+  // View angle
+  if (g_viewAngleAct)
+  {
+    QToolButton *viewAngleButton = new QToolButton;
+    viewAngleButton->setObjectName("viewAngleToolBarButton");
+    viewAngleButton->setStyleSheet(
+        "#viewAngleToolBarButton{padding-right:10px}");
+    viewAngleButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    viewAngleButton->setIcon(QIcon(":/images/view_angle_front.png"));
+    viewAngleButton->setToolTip(tr("Change the view angle"));
+
+    QMenu *viewAngleMenu = new QMenu(viewAngleButton);
+    viewAngleMenu->addAction(g_viewAngleAct);
+
+    viewAngleButton->setMenu(viewAngleMenu);
+    viewAngleButton->setPopupMode(QToolButton::InstantPopup);
+    g_viewAngleButtonAct = this->toolbar->addWidget(viewAngleButton);
+  }
+
+  // Empty space to push whatever comes next to the right
+  QWidget *spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  QAction *spacerAction = this->toolbar->addWidget(spacer);
+  spacerAction->setObjectName("toolbarSpacerAction");
+
+  // Screenshot / logging
+  if (g_screenshotAct)
+    this->toolbar->addAction(g_screenshotAct);
+  if (g_dataLoggerAct)
+    this->toolbar->addAction(g_dataLoggerAct);
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(this->toolbar);
-  toolFrame->setLayout(toolLayout);
+  toolLayout->addSpacing(10);
+  this->toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
-  rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
-
-  this->buildingEditorWidget = new BuildingEditorWidget(this);
-  this->buildingEditorWidget->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Expanding);
-  this->buildingEditorWidget->hide();
 
   this->msgOverlayLabel = new QLabel(this->glWidget);
   this->msgOverlayLabel->setStyleSheet(
@@ -123,14 +182,14 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
-  TimePanel *timePanel = new TimePanel(this);
+  this->timePanel = new TimePanel(this);
 
   this->bottomFrame = new QFrame;
   this->bottomFrame->setObjectName("renderBottomFrame");
   this->bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
-  bottomPanelLayout->addWidget(timePanel, 0);
+  bottomPanelLayout->addWidget(this->timePanel, 0);
   bottomPanelLayout->setSpacing(0);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   this->bottomFrame->setLayout(bottomPanelLayout);
@@ -138,24 +197,21 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QFrame *render3DFrame = new QFrame;
   render3DFrame->setObjectName("render3DFrame");
   QVBoxLayout *render3DLayout = new QVBoxLayout;
-  render3DLayout->addWidget(toolFrame);
+  render3DLayout->addWidget(this->toolFrame);
   render3DLayout->addWidget(this->glWidget);
   render3DLayout->setContentsMargins(0, 0, 0, 0);
   render3DLayout->setSpacing(0);
   render3DFrame->setLayout(render3DLayout);
 
-  QSplitter *splitter = new QSplitter(this);
-  splitter->addWidget(this->buildingEditorWidget);
-  splitter->addWidget(render3DFrame);
+  this->splitter = new QSplitter(this);
+  this->splitter->addWidget(render3DFrame);
   QList<int> sizes;
   sizes.push_back(300);
-  sizes.push_back(300);
-  splitter->setSizes(sizes);
-  splitter->setStretchFactor(0, 1);
-  splitter->setStretchFactor(1, 1);
-  splitter->setOrientation(Qt::Vertical);
+  this->splitter->setSizes(sizes);
+  this->splitter->setStretchFactor(0, 1);
+  this->splitter->setOrientation(Qt::Vertical);
 
-  frameLayout->addWidget(splitter);
+  frameLayout->addWidget(this->splitter);
   frameLayout->addWidget(this->bottomFrame);
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0);
@@ -215,109 +271,61 @@ RenderWidget::~RenderWidget()
 
   delete this->toolbar;
   this->toolbar = NULL;
+
+  // we created the scene here we are responsible for removing it.
+  rendering::remove_scene(gui::get_world());
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::update()
+void RenderWidget::InsertWidget(unsigned int _index, QWidget *_widget)
 {
-  if (this->clear)
+  if (static_cast<int>(_index) <= this->splitter->count())
   {
-    rendering::remove_scene(this->clearName);
-    this->clear = false;
-    return;
-  }
-  else if (this->create)
-  {
-    rendering::create_scene(this->createName, true);
-    this->create = false;
-    return;
-  }
+    // set equal size for now. There should always be at least one widget
+    // (render3DFrame) in the splitter.
+    int childCount = this->splitter->count();
+    GZ_ASSERT(childCount > 0,
+        "RenderWidget splitter has no child widget");
 
-  rendering::UserCameraPtr cam = this->glWidget->GetCamera();
+    QSize widgetSize = this->size();
+    int newSize = widgetSize.height() / (this->splitter->count()+1);
+    QList<int> newSizes;
+    for (int i = 0; i < childCount+1; ++i)
+      newSizes.append(newSize);
 
-  if (!cam || !cam->GetInitialized())
-  {
-    event::Events::preRender();
-    return;
-  }
-
-  // float fps = cam->GetAvgFPS();
-  // int triangleCount = cam->GetTriangleCount();
-  // math::Pose pose = cam->GetWorldPose();
-
-  // std::ostringstream stream;
-
-  // stream << std::fixed << std::setprecision(2) << pose.pos.x;
-  // this->xPosEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2) << pose.pos.y;
-  // this->yPosEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2) << pose.pos.z;
-  // this->zPosEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().x);
-  // this->rollEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().y);
-  // this->pitchEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().z);
-  // this->yawEdit->setText(tr(stream.str().c_str()));
-  // stream.str("");
-
-  /*stream << std::fixed << std::setprecision(1) << fps;
-  this->fpsEdit->setText(tr(stream.str().c_str()));
-  stream.str("");
-
-  stream << std::fixed << std::setprecision(2) << triangleCount;
-  this->trianglesEdit->setText(tr(stream.str().c_str()));
-  */
-
-  this->glWidget->update();
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::ShowEditor(bool _show)
-{
-  if (_show)
-  {
-    this->buildingEditorWidget->show();
-    this->baseOverlayMsg = "Building is view-only";
-    this->OnClearOverlayMsg();
-    this->bottomFrame->hide();
-    this->ShowToolbar(false);
+    this->splitter->insertWidget(_index, _widget);
+    this->splitter->setSizes(newSizes);
+    this->splitter->setStretchFactor(_index, 1);
   }
   else
-  {
-    this->buildingEditorWidget->hide();
-    this->baseOverlayMsg = "";
-    this->OnClearOverlayMsg();
+    gzerr << "Unable to add widget, index out of range " << std::endl;
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::ShowTimePanel(bool _show)
+{
+  if (_show)
     this->bottomFrame->show();
-    this->ShowToolbar(true);
-  }
+  else
+    this->bottomFrame->hide();
+}
+
+/////////////////////////////////////////////////
+TimePanel *RenderWidget::GetTimePanel() const
+{
+  return this->timePanel;
 }
 
 /////////////////////////////////////////////////
 void RenderWidget::RemoveScene(const std::string &_name)
 {
-  this->clear = true;
-  this->clearName = _name;
+  rendering::remove_scene(_name);
 }
 
 /////////////////////////////////////////////////
 void RenderWidget::CreateScene(const std::string &_name)
 {
-  this->create = true;
-  this->createName = _name;
+  rendering::create_scene(_name, true);
 }
 
 /////////////////////////////////////////////////
@@ -341,6 +349,13 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 }
 
 /////////////////////////////////////////////////
+void RenderWidget::SetOverlaysVisible(const bool _visible)
+{
+  for (auto const &plugin : this->plugins)
+    plugin->setVisible(_visible);
+}
+
+/////////////////////////////////////////////////
 std::string RenderWidget::GetOverlayMsg() const
 {
   return this->msgOverlayLabel->text().toStdString();
@@ -353,11 +368,11 @@ void RenderWidget::ShowToolbar(const bool _show)
   {
     if (_show)
     {
-      this->toolbar->show();
+      this->toolFrame->show();
     }
     else
     {
-      this->toolbar->hide();
+      this->toolFrame->hide();
     }
   }
 }

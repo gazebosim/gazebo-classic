@@ -54,7 +54,7 @@ TEST_F(SystemPathsTest, SystemPaths)
   std::string gzResourcePath = "GAZEBO_RESOURCE_PATH=" + paths->GetTmpPath() +
       "/resource:/test/me/now";
   putenv(const_cast<char*>(gzResourcePath.c_str()));
-  const std::list<std::string> pathList1 = paths->GetGazeboPaths();
+  const std::list<std::string> &pathList1 = paths->GetGazeboPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList1.size());
   EXPECT_STREQ((paths->GetTmpPath() + "/resource").c_str(),
       pathList1.front().c_str());
@@ -63,7 +63,7 @@ TEST_F(SystemPathsTest, SystemPaths)
   std::string ogreResourcePath = "OGRE_RESOURCE_PATH=" + paths->GetTmpPath() +
       "/ogre:/test/ogre/now";
   putenv(const_cast<char*>(ogreResourcePath.c_str()));
-  const std::list<std::string> pathList2 = paths->GetOgrePaths();
+  const std::list<std::string> &pathList2 = paths->GetOgrePaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList2.size());
   EXPECT_STREQ((paths->GetTmpPath() + "/ogre").c_str(),
       pathList2.front().c_str());
@@ -72,7 +72,7 @@ TEST_F(SystemPathsTest, SystemPaths)
   std::string gzPluginPath = "GAZEBO_PLUGIN_PATH=" + paths->GetTmpPath() +
       "/plugin:/test/plugin/now";
   putenv(const_cast<char*>(gzPluginPath.c_str()));
-  const std::list<std::string> pathList3 = paths->GetPluginPaths();
+  const std::list<std::string> &pathList3 = paths->GetPluginPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
   EXPECT_STREQ((paths->GetTmpPath() + "/plugin").c_str(),
       pathList3.front().c_str());

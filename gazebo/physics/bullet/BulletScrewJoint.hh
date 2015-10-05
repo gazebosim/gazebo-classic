@@ -39,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief A screw joint
-    class GAZEBO_VISIBLE BulletScrewJoint : public ScrewJoint<BulletJoint>
+    class GZ_PHYSICS_VISIBLE BulletScrewJoint : public ScrewJoint<BulletJoint>
     {
       /// \brief Constructor
       /// \param[in] _world Pointer to the dynamics world.

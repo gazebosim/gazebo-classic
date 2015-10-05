@@ -54,6 +54,9 @@ class ModelAlign_TEST : public QTestFixture
 
   /// \brief Test aligning models with non unit scale.
   private slots: void AlignScale();
+
+  /// \brief Test if the highlighting is properly reset for nested visuals.
+  private slots: void SetHighlighted();
 };
 
 #endif

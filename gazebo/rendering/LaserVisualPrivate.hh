@@ -42,6 +42,9 @@ namespace gazebo
       /// \brief Renders the laser data as a triangle fan.
       public: std::vector<DynamicLines *> rayFans;
 
+      /// \brief Renders laser data for rays that do not hit obstacles.
+      public: std::vector<DynamicLines *> noHitRayFans;
+
       /// \brief Renders the laser data as a line list.
       public: std::vector<DynamicLines *> rayLines;
 

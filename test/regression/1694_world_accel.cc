@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <gazebo/rendering/rendering.hh>
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 

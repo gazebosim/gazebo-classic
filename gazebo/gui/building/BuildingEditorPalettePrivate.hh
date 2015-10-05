@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 #include "gazebo/common/Events.hh"
 #include "gazebo/gui/qt.h"
 
@@ -31,6 +32,21 @@ namespace gazebo
     /// \brief Private data for BuildingEditorPalette
     class BuildingEditorPalettePrivate
     {
+      /// \brief Custom color dialog.
+      public: QColorDialog *customColorDialog;
+
+      /// \brief Custom color button.
+      public: QPushButton *customColorButton;
+
+      /// \brief Link each button ID to a draw mode.
+      public: std::map<std::string, int> brushIdToModeMap;
+
+      /// \brief Name of the last default texture mode.
+      public: std::string lastDefaultTexture;
+
+      /// \brief Name of the last default color mode.
+      public: std::string lastDefaultColor;
+
       /// \brief Default name of the building model.
       public: std::string buildingDefaultName;
 

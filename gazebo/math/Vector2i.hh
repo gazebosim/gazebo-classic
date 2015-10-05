@@ -14,17 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: Two dimensional vector
- * Author: Nate Koenig
- * Date: 3 Apr 2007
- */
-
-#ifndef _VECTOR2I_HH_
-#define _VECTOR2I_HH_
+#ifndef _GAZEBO_VECTOR2I_HH_
+#define _GAZEBO_VECTOR2I_HH_
 
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -36,7 +33,7 @@ namespace gazebo
 
     /// \class Vector2i Vector2i.hh math/gzmath.hh
     /// \brief Generic integer x, y vector
-    class GAZEBO_VISIBLE Vector2i
+    class GZ_MATH_VISIBLE Vector2i
     {
       /// \brief Constructor
       public: Vector2i();
@@ -46,9 +43,13 @@ namespace gazebo
       /// \param[in] _y value along y
       public: Vector2i(const int &_x, const int &_y);
 
-      /// \brief Copy onstructor
+      /// \brief Copy constructor
       /// \param[in] _pt a point
       public: Vector2i(const Vector2i &_pt);
+
+      /// \brief Copy constructor for ignition math
+      /// \param[in] _pt a point
+      public: Vector2i(const ignition::math::Vector2i &_pt);
 
       /// \brief Destructor
       public: virtual ~Vector2i();
@@ -75,6 +76,11 @@ namespace gazebo
       /// \param[in] _v the value
       /// \return this
       public: Vector2i &operator =(const Vector2i &_v);
+
+      /// \brief Assignment operator for ignition math
+      /// \param[in] _v the value
+      /// \return this
+      public: Vector2i &operator =(const ignition::math::Vector2i &_v);
 
       /// \brief Assignment operator
       /// \param[in] _value the value for x and y
@@ -164,6 +170,11 @@ namespace gazebo
       /// \brief Array subscript operator
       /// \param[in] _index the array index
       public: int operator[](unsigned int _index) const;
+
+      /// \brief Convert this vector to ignition::math::Vector2i
+      /// \return Return an ignition::math::Vector2i representation of this
+      /// vector.
+      public: ignition::math::Vector2i Ign() const;
 
       /// \brief x data
       public: int x;

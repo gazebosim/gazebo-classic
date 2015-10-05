@@ -48,7 +48,8 @@ namespace gazebo
     ///
     /// This class allows Gazebo to generate per-pixel shaders for every
     /// material at run-time.
-    class GAZEBO_VISIBLE RTShaderSystem : public SingletonT<RTShaderSystem>
+    class GZ_RENDERING_VISIBLE RTShaderSystem :
+      public SingletonT<RTShaderSystem>
     {
       /// \enum LightingModel.
       /// \brief The type of lighting.
@@ -88,6 +89,10 @@ namespace gazebo
       /// \brief Remove a scene
       /// \param[in] The scene to remove
       public: void RemoveScene(ScenePtr _scene);
+
+      /// \brief Remove a scene
+      /// \param[in] Name of the scene to remove.
+      public: void RemoveScene(const std::string &_scene);
 
       /// \brief Update the shaders. This should not be called frequently.
       public: void UpdateShaders();

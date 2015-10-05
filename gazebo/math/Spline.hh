@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class Spline Spline.hh math/gzmath.hh
     /// \brief Splines
-    class GAZEBO_VISIBLE Spline
+    class GZ_MATH_VISIBLE Spline
     {
       /// \brief constructor
       public: Spline();

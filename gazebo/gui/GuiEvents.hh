@@ -80,6 +80,17 @@ namespace gazebo
               { fullScreen.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the show toolbars signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectShowToolbars(T _subscriber)
+              { return showToolbars.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the show toolbars signal
+      public: static void DisconnectShowToolbars(event::ConnectionPtr
+          _subscriber)
+              { showToolbars.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to the view FPS signal
       public: template<typename T>
               static event::ConnectionPtr ConnectFPS(T _subscriber)
@@ -154,6 +165,17 @@ namespace gazebo
               { follow.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the edit model signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectEditModel(T _subscriber)
+              { return editModel.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the edit model signal
+      public: static void DisconnectEditModel(
+              event::ConnectionPtr _subscriber)
+              { editModel.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to the main window ready signal
       public: template<typename T>
               static event::ConnectionPtr ConnectMainWindowReady(T _subscriber)
@@ -175,6 +197,17 @@ namespace gazebo
       public: static void DisconnectLeftPaneVisibility(
               event::ConnectionPtr _subscriber)
               { leftPaneVisibility.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the scale entity signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectScaleEntity(T _subscriber)
+              { return scaleEntity.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the scale entity signal
+      public: static void DisconnectScaleEntity(
+              event::ConnectionPtr _subscriber)
+              { scaleEntity.Disconnect(_subscriber); }
 
       /// \brief Indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
@@ -199,6 +232,9 @@ namespace gazebo
       /// \brief An event to trigger full screen mode.
       public: static event::EventT<void (bool)> fullScreen;
 
+      /// \brief An event to trigger show toolbars.
+      public: static event::EventT<void (bool)> showToolbars;
+
       /// \brief An event to enable first-person-shooter view control.
       public: static event::EventT<void ()> fps;
 
@@ -208,6 +244,10 @@ namespace gazebo
       /// \brief Event triggered when the user follows a model. The model
       /// name is given as the function parameter.
       public: static event::EventT<void (const std::string &)> follow;
+
+      /// \brief Event triggered when the user selects edit a model. The model
+      /// name is given as the function parameter.
+      public: static event::EventT<void (const std::string &)> editModel;
 
       /// \brief Event triggered when a key is pressed
       public: static event::EventT<void (std::string)> keyPress;
@@ -220,6 +260,10 @@ namespace gazebo
 
       /// \brief Main window ready event.
       public: static event::EventT<void ()> mainWindowReady;
+
+      /// \brief Scale entity event.
+      public: static event::EventT<void (const std::string &,
+          const math::Vector3 &)> scaleEntity;
     };
   }
 }
