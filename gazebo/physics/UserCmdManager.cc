@@ -61,7 +61,6 @@ UserCmd::~UserCmd()
 void UserCmd::Undo()
 {
   // Record / override the state for redo
-  // FIXME: This needs to save velocity but isn't doing it
   this->dataPtr->endState = WorldState(this->dataPtr->world);
 
   // Reset physics states for the whole world
