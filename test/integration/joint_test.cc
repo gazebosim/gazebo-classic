@@ -393,6 +393,56 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
+void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
+{
+  // Load empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Spawn two boxes
+  SpawnBox("box1", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
+      math::Vector3::Zero, false);
+  SpawnBox("box2", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
+      math::Vector3::Zero, false);
+  physics::ModelPtr model  = world->GetModel("box1");
+  physics::ModelPtr model2 = world->GetModel("box2");
+  ASSERT_TRUE(model  != NULL);
+  ASSERT_TRUE(model2 != NULL);
+
+  // Get link pointers
+  physics::LinkPtr parent = model->GetLink();
+  physics::LinkPtr child  = model2->GetLink();
+
+  // Create dynamic joint
+  std::string name = "dynamic_joint_unique";
+  physics::JointPtr joint;
+  joint = model->CreateJoint(name, "revolute", parent, child);
+  joint->Init();
+
+  // Get model joints (used for visualization)
+  physics::Joint_V joints = model->GetJoints();
+  physics::Joint_V::iterator iter;
+  bool jointFound = false;
+  for (iter = joints.begin(); iter != joints.end(); ++iter)
+  {
+    if ((*iter)->GetName() == name)
+    {
+      jointFound = true;
+      break;
+    }
+  }
+  EXPECT_TRUE(jointFound);
+}
+
+//////////////////////////////////////////////////
 TEST_F(JointTest, joint_SDF14)
 {
   Load("worlds/SDF_1_4.world");
@@ -447,6 +497,11 @@ TEST_P(JointTest, GetInertiaRatio)
 TEST_P(JointTest, SpringDamperTest)
 {
   SpringDamperTest(this->physicsEngine);
+}
+
+TEST_P(JointTest, DynamicJointVisualization)
+{
+  DynamicJointVisualization(this->physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTest,
