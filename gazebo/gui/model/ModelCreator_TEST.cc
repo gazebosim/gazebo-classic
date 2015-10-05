@@ -66,7 +66,7 @@ void ModelCreator_TEST::NestedModel()
   sdf::ElementPtr boxModelSDF = msgs::ModelToSDF(model);
 
   modelCreator->AddEntity(boxModelSDF);
-  
+
   // Verify it has been added
   gazebo::rendering::VisualPtr boxModelVis =
       scene->GetVisual("ModelPreview_0::box_model");
