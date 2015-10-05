@@ -66,7 +66,7 @@ namespace gazebo
           bool _useParentFrame, msgs::Joint::Type _type);
 
       // Documentation Inherited.
-      public: void SetVisible(bool _visible, bool _cascade = true);
+      public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
       /// \brief Update the joint visual based on a message.
       /// \param[in] _msg Joint message

@@ -103,6 +103,72 @@ TEST_F(CameraSensor, CheckThrottle)
 }
 
 /////////////////////////////////////////////////
+TEST_F(CameraSensor, FillMsg)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn sensors of various sizes to test speed
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+
+  // test resolution, my machine gets about 106 fps
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 0;
+  math::Pose setPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  msgs::Sensor msg;
+  sensor->FillMsg(msg);
+
+  // Required fields
+  EXPECT_EQ(msg.name(), cameraName);
+  EXPECT_EQ(msg.parent(), sensor->GetParentName());
+  EXPECT_EQ(msg.type(), "camera");
+
+  // Optional fields
+  ASSERT_TRUE(msg.has_always_on());
+  EXPECT_EQ(msg.always_on(), sensor->IsActive());
+
+  ASSERT_TRUE(msg.has_pose());
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()), sensor->Pose());
+
+  ASSERT_TRUE(msg.has_topic());
+  EXPECT_EQ(msg.topic(), sensor->GetTopic());
+
+  ASSERT_TRUE(msg.has_update_rate());
+  EXPECT_EQ(msg.update_rate(), sensor->GetUpdateRate());
+
+  ASSERT_TRUE(msg.has_visualize());
+  EXPECT_EQ(msg.visualize(), sensor->GetVisualize());
+
+  ASSERT_FALSE(msg.has_contact());
+  ASSERT_FALSE(msg.has_ray());
+  ASSERT_TRUE(msg.has_camera());
+  auto cameraMsg = msg.camera();
+  auto cam = camSensor->GetCamera();
+  EXPECT_EQ(cameraMsg.horizontal_fov(), cam->GetHFOV().Radian());
+  EXPECT_EQ(cameraMsg.image_size().x(), camSensor->GetImageWidth());
+  EXPECT_EQ(cameraMsg.image_size().y(), camSensor->GetImageHeight());
+  EXPECT_EQ(cameraMsg.image_format(), cam->GetImageFormat());
+  EXPECT_EQ(cameraMsg.near_clip(), cam->GetNearClip());
+  EXPECT_EQ(cameraMsg.far_clip(), cam->GetFarClip());
+}
+
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, UnlimitedTest)
 {
   Load("worlds/empty_test.world");

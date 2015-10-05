@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
 #include <gazebo/gazebo_config.h>
 #ifdef HAVE_SPNAV
 #include <spnav.h>

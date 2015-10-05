@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _LINK_INSPECTOR_HH_
-#define _LINK_INSPECTOR_HH_
+#ifndef _GAZEBO_LINK_INSPECTOR_HH_
+#define _GAZEBO_LINK_INSPECTOR_HH_
 
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
     class VisualConfig;
     class CollisionConfig;
 
-    class LinkInspector : public QDialog
+    class GZ_GUI_VISIBLE LinkInspector : public QDialog
     {
       Q_OBJECT
 
@@ -61,6 +62,10 @@ namespace gazebo
       /// \return Tab widget with visual configurations.
       public: CollisionConfig *GetCollisionConfig() const;
 
+      /// \brief Set the id for this link
+      /// \param[in] New link id.
+      public: void SetLinkId(const std::string &_id);
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
@@ -75,6 +80,9 @@ namespace gazebo
       /// \brief Qt signal emitted to indicate that changes should be applied
       /// and the inspector closed.
       Q_SIGNALS: void Accepted();
+
+      /// \brief Qt callback when the Remove button is pressed.
+      private slots: void OnRemove();
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
@@ -99,6 +107,9 @@ namespace gazebo
 
       /// \brief Widget with configurable collision properties.
       private: CollisionConfig *collisionConfig;
+
+      /// \brief Unique id for this link.
+      private: std::string linkId;
     };
     /// \}
   }
