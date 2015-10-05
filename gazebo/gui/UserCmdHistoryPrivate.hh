@@ -39,7 +39,7 @@ namespace gazebo
       /// \brief Subscriber to user command stats.
       public: transport::SubscriberPtr userCmdStatsSub;
 
-      /// \brief Copy of last received user command stats message. 
+      /// \brief Copy of last received user command stats message.
       public: msgs::UserCmdStats msg;
 
       /// \brief Group of actions in undo history menu.
