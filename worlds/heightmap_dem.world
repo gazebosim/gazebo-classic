@@ -2,8 +2,20 @@
 <sdf version="1.5">
   <world name="default">
     <!-- A global light source -->
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>150</iters>
+        </solver>
+      </ode>
+    </physics>
     <include>
       <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://cart_soft_suspension</uri>
+      <pose>5.6 6.8 66.0  0.2 1.1 2.3</pose>
     </include>
     <model name="heightmap">
       <static>true</static>
