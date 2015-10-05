@@ -146,6 +146,7 @@ gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
+  undo.cc
 )
 
 gz_build_qt_tests(${qt_tests})

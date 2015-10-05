@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <sstream>
 #include <functional>
 
@@ -1012,6 +1014,12 @@ void Link::OnPoseChange()
 void Link::SetState(const LinkState &_state)
 {
   this->SetWorldPose(_state.GetPose());
+  this->SetLinearVel(_state.GetVelocity().pos);
+  this->SetAngularVel(_state.GetVelocity().rot.GetAsEuler());
+  this->SetLinearAccel(_state.GetAcceleration().pos);
+  this->SetAngularAccel(_state.GetAcceleration().rot.GetAsEuler());
+  this->SetForce(_state.GetWrench().pos);
+  this->SetTorque(_state.GetWrench().rot.GetAsEuler());
 
   /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)

@@ -829,9 +829,11 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_undoAct);
 
+  QVERIFY(gazebo::gui::g_undoHistoryAct);
+
   QVERIFY(gazebo::gui::g_redoAct);
 
-  QVERIFY(gazebo::gui::g_cmdHistoryAct);
+  QVERIFY(gazebo::gui::g_redoHistoryAct);
 
   mainWindow->close();
   delete mainWindow;
@@ -944,9 +946,11 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(!gazebo::gui::g_undoAct);
 
+  QVERIFY(!gazebo::gui::g_undoHistoryAct);
+
   QVERIFY(!gazebo::gui::g_redoAct);
 
-  QVERIFY(!gazebo::gui::g_cmdHistoryAct);
+  QVERIFY(!gazebo::gui::g_redoHistoryAct);
 }
 
 /////////////////////////////////////////////////

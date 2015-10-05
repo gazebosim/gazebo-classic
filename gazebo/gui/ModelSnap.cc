@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -129,7 +131,6 @@ void ModelSnap::Init()
   this->dataPtr->node->Init();
   this->dataPtr->modelPub =
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
-
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
@@ -357,7 +358,7 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
   // Check to see if the visual is a model.
   if (gui::get_entity_id(_vis->GetName()))
   {
-   // Publish model modify message
+    // Publish model modify message
     msgs::Model msg;
     msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
@@ -366,9 +367,9 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
     this->dataPtr->modelPub->Publish(msg);
 
     // Register user command on server
-gzdbg << "ModelSnap::PublishVisualPose" << std::endl;
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_id("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_id("Snap [" + _vis->GetName() + "]" +
+        gazebo::common::Time::GetWallTimeAsISOString());
     userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
     this->dataPtr->userCmdPub->Publish(userCmdMsg);

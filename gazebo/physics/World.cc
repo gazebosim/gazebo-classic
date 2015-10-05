@@ -26,6 +26,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -2476,4 +2477,11 @@ void World::_AddDirty(Entity *_entity)
 {
   GZ_ASSERT(_entity != NULL, "_entity is NULL");
   this->dataPtr->dirtyPoses.push_back(_entity);
+}
+
+/////////////////////////////////////////////////
+void World::ResetPhysicsStates()
+{
+  for (auto &model : this->dataPtr->models)
+    model->ResetPhysicsStates();
 }

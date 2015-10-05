@@ -21,6 +21,8 @@
 #endif
 
 #include <sdf/sdf.hh>
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include "gazebo/gazebo_config.h"
@@ -241,6 +243,9 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  delete this->userCmdHistory;
+  this->userCmdHistory = NULL;
+
   this->DeleteActions();
 }
 
@@ -1463,29 +1468,37 @@ void MainWindow::CreateActions()
   g_viewAngleAct = new QWidgetAction(this);
   g_viewAngleAct->setDefaultWidget(viewAngleWidget);
 
-  // Undo / Redo
-  g_undoAct = new QAction(QIcon(":/images/log_step_back.png"),
+  // Undo
+  g_undoAct = new QAction(QIcon(":/images/undo.png"),
       tr("Undo (Ctrl + Z)"), this);
-  g_undoAct->setStatusTip(tr("Undo last command"));
+  g_undoAct->setShortcut(tr("Ctrl+Z"));
   g_undoAct->setCheckable(false);
-  this->CreateDisabledIcon(":/images/log_step_back.png", g_undoAct);
+  this->CreateDisabledIcon(":/images/undo.png", g_undoAct);
   g_undoAct->setEnabled(false);
 
-  g_redoAct = new QAction(QIcon(":/images/log_step_forward.png"),
+  // Undo history
+  g_undoHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
+      tr("Undo history"), this);
+  g_undoHistoryAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_undoHistoryAct);
+  g_undoHistoryAct->setEnabled(false);
+
+  // Redo
+  g_redoAct = new QAction(QIcon(":/images/redo.png"),
       tr("Redo (Shift + Ctrl + Z)"), this);
-  g_redoAct->setStatusTip(tr("Redo last undone command"));
+  g_redoAct->setShortcut(tr("Shift+Ctrl+Z"));
   g_redoAct->setCheckable(false);
-  this->CreateDisabledIcon(":/images/log_step_forward.png", g_redoAct);
+  this->CreateDisabledIcon(":/images/redo.png", g_redoAct);
   g_redoAct->setEnabled(false);
 
-  // Command history
-  g_cmdHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
-      tr("Command history"), this);
-  g_cmdHistoryAct->setStatusTip(tr("Show list of user commands"));
-  g_cmdHistoryAct->setCheckable(false);
-  this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_cmdHistoryAct);
-  g_cmdHistoryAct->setEnabled(false);
-  new UserCmdHistory();
+  // Redo history
+  g_redoHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
+      tr("Redo history"), this);
+  g_redoHistoryAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_redoHistoryAct);
+  g_redoHistoryAct->setEnabled(false);
+
+  this->userCmdHistory = new UserCmdHistory();
 }
 
 /////////////////////////////////////////////////
@@ -1710,11 +1723,14 @@ void MainWindow::DeleteActions()
   delete g_undoAct;
   g_undoAct = 0;
 
+  delete g_undoHistoryAct;
+  g_undoHistoryAct = 0;
+
   delete g_redoAct;
   g_redoAct = 0;
 
-  delete g_cmdHistoryAct;
-  g_cmdHistoryAct = 0;
+  delete g_redoHistoryAct;
+  g_redoHistoryAct = 0;
 }
 
 

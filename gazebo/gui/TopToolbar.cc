@@ -65,6 +65,17 @@ TopToolbar::TopToolbar(QWidget *_parent)
 
   this->dataPtr->toolbar->addSeparator();
 
+  // Undo & Redo
+  if (g_undoAct && g_redoAct && g_redoHistoryAct && g_undoHistoryAct)
+  {
+    this->dataPtr->toolbar->addAction(g_undoAct);
+    this->dataPtr->toolbar->addAction(g_undoHistoryAct);
+    this->dataPtr->toolbar->addAction(g_redoAct);
+    this->dataPtr->toolbar->addAction(g_redoHistoryAct);
+
+    this->dataPtr->toolbar->addSeparator();
+  }
+
   // Insert simple shapes
   if (g_boxCreateAct)
     this->dataPtr->toolbar->addAction(g_boxCreateAct);
@@ -134,21 +145,6 @@ TopToolbar::TopToolbar(QWidget *_parent)
     viewAngleButton->setMenu(viewAngleMenu);
     viewAngleButton->setPopupMode(QToolButton::InstantPopup);
     g_viewAngleButtonAct = this->dataPtr->toolbar->addWidget(viewAngleButton);
-  }
-
-  // Undo & Redo
-  if (g_undoAct && g_redoAct && g_cmdHistoryAct)
-  {
-    this->dataPtr->toolbar->addSeparator();
-
-    // Undo
-    this->dataPtr->toolbar->addAction(g_undoAct);
-
-    // Redo
-    this->dataPtr->toolbar->addAction(g_redoAct);
-
-    // Command history
-    this->dataPtr->toolbar->addAction(g_cmdHistoryAct);
   }
 
   // Empty space to push whatever comes next to the right

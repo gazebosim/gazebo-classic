@@ -36,22 +36,21 @@ namespace gazebo
       /// \brief Pointer to the world.
       public: WorldPtr world;
 
-      /// \brief SDF representing the whole world state the moment the user
-      /// command was executed.
+      /// \brief Whole world state the moment the user command was executed.
       public: WorldState startState;
 
-      /// \brief SDF representing the whole world state for the most recent
-      /// time the user has triggeded undo for this command.
+      /// \brief Whole world state for the most recent time the user has
+      /// triggered undo for this command.
       public: WorldState endState;
 
       /// \brief Unique ID identifying this command in the server. It is set by
-      /// the client which generated the user command, so we must find a way to
-      /// avoid collisions.
+      /// the client which generated the user command.
       public: std::string id;
 
       /// \brief Description for the command.
       public: std::string description;
 
+      /// \brief Type of command, such as MOVING or DELETING.
       public: msgs::UserCmd::Type type;
       public: sdf::SDFPtr sdf;
       public: std::string name;
@@ -88,9 +87,13 @@ namespace gazebo
       /// \brief Publisher of undo redo statistics messages.
       public: transport::PublisherPtr userCmdStatsPub;
 
+      /// \brief list of commands which can be undone.
       public: std::vector<UserCmd *> undoCmds;
+
+      /// \brief list of commands which can be redone.
       public: std::vector<UserCmd *> redoCmds;
     };
   }
 }
 #endif
+

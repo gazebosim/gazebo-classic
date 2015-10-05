@@ -525,7 +525,6 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     // Check to see if the visual is a model.
     if (gui::get_entity_id(_vis->GetName()))
     {
-      // Publish model modify message
       msgs::Model msg;
       msg.set_id(gui::get_entity_id(_vis->GetName()));
       msg.set_name(_vis->GetName());
@@ -548,7 +547,6 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
       return;
     }
 
-gzdbg << "ModelManipulator::PublishVisualPose" << std::endl;
     // Register user command on server
     std::string description;
     if (this->dataPtr->manipMode == "translate")
@@ -567,7 +565,8 @@ gzdbg << "ModelManipulator::PublishVisualPose" << std::endl;
     }
 
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_id(description + _vis->GetName() + "]");
+    userCmdMsg.set_id(description + _vis->GetName() + "]" +
+        gazebo::common::Time::GetWallTimeAsISOString());
     userCmdMsg.set_description(description + _vis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
     userCmdMsg.set_entity_name(_vis->GetName());

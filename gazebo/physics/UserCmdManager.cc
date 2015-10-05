@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/range/adaptor/reversed.hpp>
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/Model.hh"
@@ -41,7 +43,6 @@ UserCmd::UserCmd(std::string _id,
                  const std::string &_name)
   : dataPtr(new UserCmdPrivate())
 {
-gzdbg << "UserCmd::UserCmd" << std::endl;
   this->dataPtr->id = _id;
   this->dataPtr->world = _world;
   this->dataPtr->description = _description;
@@ -96,9 +97,15 @@ gzdbg << "UserCmd::UserCmd" << std::endl;
 }
 
 /////////////////////////////////////////////////
+UserCmd::~UserCmd()
+{
+  delete this->dataPtr;
+  this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
 void UserCmd::Undo()
 {
-gzdbg << "UserCmd::Undo" << std::endl;
   // Record / override the state for redo
   this->dataPtr->endState = WorldState(this->dataPtr->world);
 
@@ -148,7 +155,10 @@ gzdbg << "UserCmd::Undo" << std::endl;
     }
   }
 
-  // Set the world state
+  // Reset physics states for the whole world
+  this->dataPtr->world->ResetPhysicsStates();
+
+  // Set state to the moment the command was executed
   this->dataPtr->world->SetState(this->dataPtr->startState);
 }
 
@@ -173,7 +183,10 @@ gzdbg << "UserCmd::Redo" << std::endl;
         this->dataPtr->node, "entity_delete", this->dataPtr->name);
   }
 
-  // Set the world state
+  // Reset physics states for the whole world
+  this->dataPtr->world->ResetPhysicsStates();
+
+  // Set state to the moment undo was triggered
   this->dataPtr->world->SetState(this->dataPtr->endState);
 }
 
@@ -199,7 +212,6 @@ msgs::UserCmd::Type UserCmd::Type()
 UserCmdManager::UserCmdManager(const WorldPtr _world)
   : dataPtr(new UserCmdManagerPrivate())
 {
-gzdbg << "UserCmdManager::UserCmdManager" << std::endl;
   this->dataPtr->world = _world;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -225,12 +237,11 @@ UserCmdManager::~UserCmdManager()
 /////////////////////////////////////////////////
 void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 {
-gzdbg << "UserCmdManager::OnUserCmdMsg" << std::endl;
-
   std::string name;
   if (_msg->has_entity_name())
     name = _msg->entity_name();
 
+  // Create command
   UserCmd *cmd = new UserCmd(
       _msg->id(),
       this->dataPtr->world,
@@ -244,52 +255,106 @@ gzdbg << "UserCmdManager::OnUserCmdMsg" << std::endl;
   // Clear redo list
   this->dataPtr->redoCmds.clear();
 
+  // Publish stats
   this->PublishCurrentStats();
 }
 
 /////////////////////////////////////////////////
 void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
 {
-gzdbg << "UserCmdManager::OnUserRedoMsg" << std::endl;
   // Undo
   if (_msg->undo())
   {
-    // Check if msg id is found in the undo vector
+    if (this->dataPtr->undoCmds.empty())
+    {
+      gzwarn << "No commands to be undone" << std::endl;
+      return;
+    }
 
-    // Maybe sanity check that it is indeed the last command by that
-    // gzclient in the list?
-
-    // Get the command
+    // Get the last done command
     UserCmd *cmd = this->dataPtr->undoCmds.back();
 
-    // Undo it
-    cmd->Undo();
+    // If there's an id, get that command instead
+    if (_msg->has_id())
+    {
+      bool found = false;
+      for (auto cmdIt : this->dataPtr->undoCmds)
+      {
+        if (cmdIt->Id() == _msg->id())
+        {
+          cmd = cmdIt;
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+      {
+        gzerr << "Requested command [" << _msg->id() <<
+            "] is not in the undo queue and won't be undone." << std::endl;
+        return;
+      }
+    }
 
-    // Remove from undo list
-    this->dataPtr->undoCmds.pop_back();
+    // Undo all commands up to the desired one
+    for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->undoCmds))
+    {
+      // Undo it
+      cmdIt->Undo();
 
-    // Add command to redo list
-    this->dataPtr->redoCmds.push_back(cmd);
+      // Transfer to the redo list
+      this->dataPtr->undoCmds.pop_back();
+      this->dataPtr->redoCmds.push_back(cmdIt);
+
+      if (cmdIt == cmd)
+        break;
+    }
   }
   // Redo
   else
   {
-    // Check if msg id is found in the redo vector
+    if (this->dataPtr->redoCmds.empty())
+    {
+      gzwarn << "No commands to be undone" << std::endl;
+      return;
+    }
 
-    // Maybe sanity check that it is indeed the last command by that
-    // gzclient in the list?
-
-    // Get the command
+    // Get last undone command
     UserCmd *cmd = this->dataPtr->redoCmds.back();
 
-    // Redo it
-    cmd->Redo();
+    // If there's an id, get that command instead
+    if (_msg->has_id())
+    {
+      bool found = false;
+      for (auto cmdIt : this->dataPtr->redoCmds)
+      {
+        if (cmdIt->Id() == _msg->id())
+        {
+          cmd = cmdIt;
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+      {
+        gzerr << "Requested command [" << _msg->id() <<
+            "] is not in the redo queue and won't be redone." << std::endl;
+        return;
+      }
+    }
 
-    // Remove from redo list
-    this->dataPtr->redoCmds.pop_back();
+    // Redo all commands up to the desired one
+    for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->redoCmds))
+    {
+      // Redo it
+      cmdIt->Redo();
 
-    // Add command to undo list
-    this->dataPtr->undoCmds.push_back(cmd);
+      // Transfer to the undo list
+      this->dataPtr->redoCmds.pop_back();
+      this->dataPtr->undoCmds.push_back(cmdIt);
+
+      if (cmdIt == cmd)
+        break;
+    }
   }
 
   this->PublishCurrentStats();
@@ -298,7 +363,6 @@ gzdbg << "UserCmdManager::OnUserRedoMsg" << std::endl;
 /////////////////////////////////////////////////
 void UserCmdManager::PublishCurrentStats()
 {
-gzdbg << "UserCmdManager::PublishCurrentStats" << std::endl;
   msgs::UserCmdStats statsMsg;
 
   statsMsg.set_undo_cmd_count(this->dataPtr->undoCmds.size());
@@ -322,4 +386,5 @@ gzdbg << "UserCmdManager::PublishCurrentStats" << std::endl;
 
   this->dataPtr->userCmdStatsPub->Publish(statsMsg);
 }
+
 

@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/range/adaptor/reversed.hpp>
+
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/Actions.hh"
@@ -28,6 +30,19 @@ using namespace gui;
 UserCmdHistory::UserCmdHistory()
   : dataPtr(new UserCmdHistoryPrivate)
 {
+  if (!g_undoAct || !g_redoAct || !g_undoHistoryAct || !g_redoHistoryAct)
+  {
+    gzerr << "Action missing, not initializing UserCmdHistory" << std::endl;
+    return;
+  }
+
+  // Action groups
+  this->dataPtr->undoActions = new QActionGroup(this);
+  this->dataPtr->undoActions->setExclusive(false);
+
+  this->dataPtr->redoActions = new QActionGroup(this);
+  this->dataPtr->redoActions->setExclusive(false);
+
   // Pub / sub
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -41,12 +56,22 @@ UserCmdHistory::UserCmdHistory()
   // Qt connections
   connect(this, SIGNAL(StatsSignal()), this, SLOT(OnStatsSlot()));
 
-  if (g_undoAct && g_redoAct && g_cmdHistoryAct)
-  {
-    connect(g_undoAct, SIGNAL(triggered()), this, SLOT(OnUndo()));
-    connect(g_redoAct, SIGNAL(triggered()), this, SLOT(OnRedo()));
-    connect(g_cmdHistoryAct, SIGNAL(triggered()), this, SLOT(OnCmdHistory()));
-  }
+  connect(g_undoAct, SIGNAL(triggered()), this, SLOT(OnUndo()));
+  connect(g_redoAct, SIGNAL(triggered()), this, SLOT(OnRedo()));
+  connect(g_undoHistoryAct, SIGNAL(triggered()), this,
+      SLOT(OnUndoCmdHistory()));
+  connect(g_redoHistoryAct, SIGNAL(triggered()), this,
+      SLOT(OnRedoCmdHistory()));
+
+  connect(this->dataPtr->undoActions, SIGNAL(triggered(QAction *)), this,
+      SLOT(OnUndoCommand(QAction *)));
+  connect(this->dataPtr->undoActions, SIGNAL(hovered(QAction *)), this,
+      SLOT(OnUndoHovered(QAction *)));
+
+  connect(this->dataPtr->redoActions, SIGNAL(triggered(QAction *)), this,
+      SLOT(OnRedoCommand(QAction *)));
+  connect(this->dataPtr->redoActions, SIGNAL(hovered(QAction *)), this,
+      SLOT(OnRedoHovered(QAction *)));
 }
 
 /////////////////////////////////////////////////
@@ -59,27 +84,76 @@ UserCmdHistory::~UserCmdHistory()
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndo()
 {
-gzdbg << "UserCmdHistory::OnUndo" << std::endl;
+  this->OnUndoCommand(NULL);
+}
+
+/////////////////////////////////////////////////
+void UserCmdHistory::OnUndoCommand(QAction *_action)
+{
   msgs::UndoRedo msg;
   msg.set_undo(true);
-  // ID
+
+  if (_action)
+  {
+    msg.set_id(_action->data().toString().toStdString());
+  }
+
   this->dataPtr->undoRedoPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void UserCmdHistory::OnUndoHovered(QAction *_action)
+{
+  bool beforeThis = true;
+  for (auto action : this->dataPtr->undoActions->actions())
+  {
+    action->blockSignals(true);
+    action->setChecked(beforeThis);
+    action->blockSignals(false);
+
+    if (action->data() == _action->data())
+      beforeThis = false;
+  }
 }
 
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedo()
 {
-gzdbg << "UserCmdHistory::OnRedo" << std::endl;
+  this->OnRedoCommand(NULL);
+}
+
+/////////////////////////////////////////////////
+void UserCmdHistory::OnRedoCommand(QAction *_action)
+{
   msgs::UndoRedo msg;
   msg.set_undo(false);
-  // ID
+
+  if (_action)
+  {
+    msg.set_id(_action->data().toString().toStdString());
+  }
+
   this->dataPtr->undoRedoPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void UserCmdHistory::OnRedoHovered(QAction *_action)
+{
+  bool beforeThis = true;
+  for (auto action : this->dataPtr->redoActions->actions())
+  {
+    action->blockSignals(true);
+    action->setChecked(beforeThis);
+    action->blockSignals(false);
+
+    if (action->data() == _action->data())
+      beforeThis = false;
+  }
 }
 
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg)
 {
-gzmsg << "UserCmdHistory::OnUserCmdStatsMsg  " << std::endl;
   this->dataPtr->msg.CopyFrom(*_msg);
 
   this->StatsSignal();
@@ -88,37 +162,55 @@ gzmsg << "UserCmdHistory::OnUserCmdStatsMsg  " << std::endl;
 /////////////////////////////////////////////////
 void UserCmdHistory::OnStatsSlot()
 {
-gzmsg << "UserCmdHistory::OnStatsSlot  "
-<< this->dataPtr->msg.undo_cmd_size()  << std::endl;
-
   g_undoAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);
   g_redoAct->setEnabled(this->dataPtr->msg.redo_cmd_count() > 0);
-  g_cmdHistoryAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0 ||
-                              this->dataPtr->msg.redo_cmd_count() > 0);
+  g_undoHistoryAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);
+  g_redoHistoryAct->setEnabled(this->dataPtr->msg.redo_cmd_count() > 0);
 }
 
 /////////////////////////////////////////////////
-void UserCmdHistory::OnCmdHistory()
+void UserCmdHistory::OnUndoCmdHistory()
 {
-gzmsg << "UserCmdHistory::OnCmdHistory  "
-<< this->dataPtr->msg.undo_cmd_size()  << std::endl;
-
-  QMenu menu;
-
-  for (auto cmd : this->dataPtr->msg.undo_cmd())
+  // Clear undo action group
+  for (auto action : this->dataPtr->undoActions->actions())
   {
-    QAction *action = new QAction(QString::fromStdString(cmd.description()),
-        this);
-    menu.addAction(action);
+    this->dataPtr->undoActions->removeAction(action);
   }
 
-  menu.addSeparator();
-
-  for (auto cmd : this->dataPtr->msg.redo_cmd())
+  // Create new menu
+  QMenu menu;
+  for (auto cmd : boost::adaptors::reverse(this->dataPtr->msg.undo_cmd()))
   {
     QAction *action = new QAction(QString::fromStdString(cmd.description()),
         this);
+    action->setData(QVariant(QString::fromStdString(cmd.id())));
+    action->setCheckable(true);
     menu.addAction(action);
+    this->dataPtr->undoActions->addAction(action);
+  }
+
+  menu.exec(QCursor::pos());
+}
+
+/////////////////////////////////////////////////
+void UserCmdHistory::OnRedoCmdHistory()
+{
+  // Clear redo action group
+  for (auto action : this->dataPtr->redoActions->actions())
+  {
+    this->dataPtr->redoActions->removeAction(action);
+  }
+
+  // Create new menu
+  QMenu menu;
+  for (auto cmd : boost::adaptors::reverse(this->dataPtr->msg.redo_cmd()))
+  {
+    QAction *action = new QAction(QString::fromStdString(cmd.description()),
+        this);
+    action->setData(QVariant(QString::fromStdString(cmd.id())));
+    action->setCheckable(true);
+    menu.addAction(action);
+    this->dataPtr->redoActions->addAction(action);
   }
 
   menu.exec(QCursor::pos());
