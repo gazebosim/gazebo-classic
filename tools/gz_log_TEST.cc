@@ -181,7 +181,7 @@ TEST(gz_log, EchoFilter)
   if (std::string("1.4").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "7f34f3fac505707727a74ac8659bb8736932ab07");
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "b2d94544b848aa5c46df129b4a38fd8995463f31");
+    EXPECT_EQ(shasum, "594de8f16f10ce881fcb5a17ff98ed9847891221");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
