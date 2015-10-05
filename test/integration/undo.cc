@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-#include <boost/filesystem.hpp>
-#include "gazebo/math/Helpers.hh"
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/UserCmdHistory.hh"
 #include "undo.hh"
@@ -265,6 +262,7 @@ void UndoTest::MsgPassing()
   QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled() == true);
   QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled() == false);
 
+  // Clean up
   node.reset();
   delete mainWindow;
   mainWindow = NULL;

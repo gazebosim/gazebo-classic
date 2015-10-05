@@ -2337,3 +2337,10 @@ void World::_AddDirty(Entity *_entity)
   GZ_ASSERT(_entity != NULL, "_entity is NULL");
   this->dataPtr->dirtyPoses.push_back(_entity);
 }
+
+/////////////////////////////////////////////////
+void World::ResetPhysicsStates()
+{
+  for (auto &model : this->dataPtr->models)
+    model->ResetPhysicsStates();
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 class QtProperty;
 class QtTreePropertyBrowser;
 
-/// \brief A test class for the UserCmdHistory.
+/// \brief Test undo / redo user commands.
 class UndoTest : public QTestFixture
 {
   Q_OBJECT
@@ -38,7 +38,7 @@ class UndoTest : public QTestFixture
   private: void OnUndoRedo(ConstUndoRedoPtr &_msg);
 
   /// \brief UserCmdStats message received
-  /// \brief _msg Message containing statistics about user commands saved in i
+  /// \brief _msg Message containing statistics about user commands saved in
   /// the server.
   private: void OnUserCmdStats(ConstUserCmdStatsPtr &_msg);
 
