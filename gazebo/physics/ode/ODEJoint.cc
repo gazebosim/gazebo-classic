@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
@@ -429,10 +430,6 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "fmax")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
     }
     else if (_key == "friction")
@@ -445,10 +442,6 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "vel")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       this->SetParam(dParamVel | group, boost::any_cast<double>(_value));
     }
     else if (_key == "hi_stop")
@@ -559,10 +552,6 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else if (_key == "fmax")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       return this->GetParam(dParamFMax | group);
     }
     else if (_key == "friction")
@@ -571,10 +560,6 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else if (_key == "vel")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       return this->GetParam(dParamVel | group);
     }
     else if (_key == "hi_stop")
@@ -641,6 +626,12 @@ void ODEJoint::Reset()
 }
 
 //////////////////////////////////////////////////
+void ODEJoint::CacheForceTorque()
+{
+  // Does nothing for now, will add when recovering pull request #1721
+}
+
+//////////////////////////////////////////////////
 JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 {
   // Note that:
@@ -677,6 +668,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       wrenchAppliedWorld.body2Force =
         this->GetForce(0u) * this->GetLocalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
+    }
+    else if (this->HasType(physics::Base::FIXED_JOINT))
+    {
+      // no correction are necessary for fixed joint
     }
     else
     {

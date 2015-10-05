@@ -14,12 +14,15 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
@@ -117,7 +120,7 @@ void MultiCameraSensor::Init()
   }
 
   // Each camera has its own noise pointer
-  int noiseIndex = 0;
+  common::EnumIterator<SensorNoiseType> noiseIndex = SENSOR_NOISE_TYPE_BEGIN;
 
   // Create and initialize all the cameras
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
@@ -143,26 +146,26 @@ void MultiCameraSensor::Init()
     camera->Init();
     camera->CreateRenderTexture(camera->GetName() + "_RttTex");
 
-    math::Pose cameraPose = this->pose;
+    ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentId, true);
 
     if (cameraSdf->HasElement("noise"))
     {
       // Create a noise model and attach the camera
-      this->noises[noiseIndex] = NoiseFactory::NewNoiseModel(
+      this->noises[*noiseIndex] = NoiseFactory::NewNoiseModel(
         cameraSdf->GetElement("noise"), this->GetType());
-      this->noises[noiseIndex]->SetCamera(camera);
+      this->noises[*noiseIndex]->SetCamera(camera);
     }
     else
     {
-      this->noises[noiseIndex] = NoisePtr(new Noise(Noise::NONE));
+      this->noises[*noiseIndex] = NoisePtr(new Noise(Noise::NONE));
     }
 
     // Increment the noise index -- one for each camera in the setup
-    noiseIndex++;
+    ++noiseIndex;
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);

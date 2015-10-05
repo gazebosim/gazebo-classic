@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -265,6 +266,7 @@ void TerrainEditorPalette::OnSave()
   common::Image img = heightmap->GetImage();
 
   // Get a filename to save to.
+  // Note that file dialog static functions seem to be broken (issue #1514)
   std::string filename = QFileDialog::getSaveFileName(this,
       tr("Save Heightmap"), QString(),
       tr("PNG Files (*.png)")).toStdString();

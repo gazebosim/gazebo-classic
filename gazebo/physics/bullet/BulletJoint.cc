@@ -19,8 +19,10 @@
  * Date: 15 May 2009
  */
 
+#include <boost/bind.hpp>
 #include <string>
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
@@ -206,6 +208,7 @@ void BulletJoint::CacheForceTorque()
   else
   {
     /// \TODO: implement for other joint types
+    // note that for fixed joint no further modification is needed
     // gzerr << "force torque for joint type [" << this->GetType()
     //       << "] not implemented, returns false results!!\n";
   }
@@ -344,6 +347,7 @@ void BulletJoint::CacheForceTorque()
 //////////////////////////////////////////////////
 JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
 {
+  GZ_ASSERT(this->constraint != NULL, "constraint should be valid");
   return this->wrench;
 }
 

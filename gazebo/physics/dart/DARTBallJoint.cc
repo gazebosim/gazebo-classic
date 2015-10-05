@@ -18,6 +18,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/dart/DARTJointPrivate.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
 
 using namespace gazebo;
@@ -25,16 +26,15 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTBallJoint::DARTBallJoint(BasePtr _parent)
-  : BallJoint<DARTJoint>(_parent),
-    dtBallJoint(new dart::dynamics::BallJoint())
+  : BallJoint<DARTJoint>(_parent)
 {
-  this->dtJoint = this->dtBallJoint;
+  this->dataPtr->dtJoint = new dart::dynamics::BallJoint();
 }
 
 //////////////////////////////////////////////////
 DARTBallJoint::~DARTBallJoint()
 {
-  delete dtBallJoint;
+  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////
@@ -52,8 +52,8 @@ void DARTBallJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
-                        this->dtJoint->getTransformFromChildBodyNode();
+  Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
+                        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);

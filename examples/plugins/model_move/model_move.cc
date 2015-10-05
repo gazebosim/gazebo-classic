@@ -19,6 +19,8 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -52,11 +54,11 @@ void ModelMove::Move(const math::Vector3 &_start, const math::Vector3 &_end,
     gazebo::common::PoseKeyFrame *key = this->anim->CreateKeyFrame(
         i + currFrame);
 
-    key->SetTranslation(math::Vector3(
+    key->Translation(ignition::math::Vector3d(
          _translation.x + xStep * i,
          _translation.y + yStep * i,
          _translation.z + zStep * i));
-    key->SetRotation(math::Quaternion(0, 0, 0));
+    key->Rotation(ignition::math::Quaterniond(0, 0, 0));
   }
 
   _translation.Set(_translation.x + xStep * duration,
@@ -82,12 +84,12 @@ void ModelMove::InitiateMove()
 
   // set starting location of the box
   key = this->anim->CreateKeyFrame(0);
-  key->SetTranslation(math::Vector3(0, 0, 0));
-  key->SetRotation(math::Quaternion(0, 0, 0));
+  key->Translation(ignition::math::Vector3d(0, 0, 0));
+  key->Rotation(ignition::math::Quaterniond(0, 0, 0));
 
   math::Vector3 translation = math::Vector3(0, 0, 0);
 
-  // Move to the start_position to first goal
+  // Move to the startPosition to first goal
   this->Move(this->startPosition, this->pathGoals[0].pos, translation);
 
   for (unsigned int i = 0; i < this->pathGoals.size()-1; ++i)
@@ -104,7 +106,7 @@ void ModelMove::OnPathMsg(ConstPoseAnimationPtr &_msg)
 
   // Store message poses into the pathGoals and launch movement
   for (unsigned int i = 0; i < _msg->pose_size(); ++i)
-    this->pathGoals.push_back(gazebo::msgs::Convert(_msg->pose(i)));
+    this->pathGoals.push_back(gazebo::msgs::ConvertIgn(_msg->pose(i)));
 
   this->InitiateMove();
 }
@@ -151,10 +153,11 @@ void ModelMove::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       // Ready to start the move. Store the initial pose of the model
       // and call initiateMove
-      sdf::Vector3 sdfPose =
-        _sdf->GetParent()->GetElement("pose")->Get<sdf::Pose>().pos;
+      ignition::math::Vector3d sdfPose =
+        _sdf->GetParent()->GetElement("pose")
+            ->Get<ignition::math::Pose3d>().Pos();
       this->startPosition =
-        math::Vector3(sdfPose.x, sdfPose.y, sdfPose.z);
+        math::Vector3(sdfPose.X(), sdfPose.Y(), sdfPose.Z());
 
       this->InitiateMove();
     }

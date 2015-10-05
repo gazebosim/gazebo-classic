@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MESHMANAGER_HH_
-#define _MESHMANAGER_HH_
+#ifndef _GAZEBO_MESHMANAGER_HH_
+#define _GAZEBO_MESHMANAGER_HH_
 
 #include <map>
 #include <utility>
@@ -23,12 +23,18 @@
 #include <vector>
 #include <boost/thread/mutex.hpp>
 
+#include <ignition/math/Plane.hh>
+#include <ignition/math/Matrix3.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Plane.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -81,13 +87,15 @@ namespace gazebo
       /// \param[out] _min_xyz the bounding box minimum
       /// \param[out] _max_xyz the bounding box maximum
       public: void GetMeshAABB(const Mesh *_mesh,
-                               math::Vector3 &_center,
-                               math::Vector3 &_min_xyz,
-                               math::Vector3 &_max_xyz);
+                  ignition::math::Vector3d &_center,
+                  ignition::math::Vector3d &_min_xyz,
+                  ignition::math::Vector3d &_max_xyz);
 
       /// \brief generate spherical texture coordinates
+      /// \param[in] _mesh Pointer to the mesh
+      /// \param[in] _center Center of the mesh
       public: void GenSphericalTexCoord(const Mesh *_mesh,
-                                        math::Vector3 _center);
+                  const ignition::math::Vector3d &_center);
 
       /// \brief Add a mesh to the manager.
       ///
@@ -118,8 +126,8 @@ namespace gazebo
       /// \param[in] _sides the x y x dimentions of eah side in meter
       /// \param[in] _uvCoords the texture coordinates
       public: void CreateBox(const std::string &_name,
-                             const math::Vector3 &_sides,
-                             const math::Vector2d &_uvCoords);
+                             const ignition::math::Vector3d &_sides,
+                             const ignition::math::Vector2d &_uvCoords);
 
       /// \brief Create an extruded mesh from polylines. The polylines are
       /// assumed to be closed and non-intersecting. Delaunay triangulation is
@@ -134,8 +142,8 @@ namespace gazebo
       /// edges and remove the holes in the shape.
       /// \param[in] _height the height of extrusion
       public: void CreateExtrudedPolyline(const std::string &_name,
-                  const std::vector<std::vector<math::Vector2d> > &_vertices,
-                  double _height);
+                  const std::vector<std::vector<ignition::math::Vector2d> >
+                  &_vertices, double _height);
 
       /// \brief Create a cylinder mesh
       /// \param[in] _name the name of the new mesh
@@ -186,9 +194,9 @@ namespace gazebo
       /// \param[in] _segments number of segments in x and y
       /// \param[in] _uvTile the texture tile size in x and y
       public: void CreatePlane(const std::string &_name,
-                               const math::Plane &_plane,
-                               const math::Vector2d &_segments,
-                               const math::Vector2d &_uvTile);
+                               const ignition::math::Planed &_plane,
+                               const ignition::math::Vector2d &_segments,
+                               const ignition::math::Vector2d &_uvTile);
 
       /// \brief Create mesh for a plane
       /// \param[in] _name the name of the new mesh
@@ -198,11 +206,11 @@ namespace gazebo
       /// \param[in] _segments the number of segments in x and y
       /// \param[in] _uvTile the texture tile size in x and y
       public: void CreatePlane(const std::string &_name,
-                               const math::Vector3 &_normal,
-                               double _d,
-                               const math::Vector2d &_size,
-                               const math::Vector2d &_segments,
-                               const math::Vector2d &_uvTile);
+                               const ignition::math::Vector3d &_normal,
+                               const double _d,
+                               const ignition::math::Vector2d &_size,
+                               const ignition::math::Vector2d &_segments,
+                               const ignition::math::Vector2d &_uvTile);
 
       /// \brief Tesselate a 2D mesh
       ///
@@ -230,7 +238,7 @@ namespace gazebo
       /// \param[in] _offset _m2's pose offset from _m1
       public: void CreateBoolean(const std::string &_name, const Mesh *_m1,
           const Mesh *_m2, const int _operation,
-          const math::Pose &_offset = math::Pose::Zero);
+          const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);
 #endif
 
       /// \brief Converts a vector of polylines into a table of vertices and
@@ -241,10 +249,11 @@ namespace gazebo
       /// \param[out] _edges a list of edges (made of start/end point indices
       /// from the vertex table)
       private: static void ConvertPolylinesToVerticesAndEdges(
-                      const std::vector<std::vector<math::Vector2d> > &_polys,
-                      double _tol,
-                      std::vector<math::Vector2d> &_vertices,
-                      std::vector<math::Vector2i> &_edges);
+                   const std::vector<std::vector<ignition::math::Vector2d> >
+                   &_polys,
+                   double _tol,
+                   std::vector<ignition::math::Vector2d> &_vertices,
+                   std::vector<ignition::math::Vector2i> &_edges);
 
       /// \brief Check a point againts a list, and only adds it to the list
       /// if it is not there already.
@@ -254,8 +263,8 @@ namespace gazebo
       /// considered to be the same point.
       /// \return the index of the point.
       private: static size_t AddUniquePointToVerticesTable(
-                      std::vector<math::Vector2d> &_vertices,
-                      const math::Vector2d &_p,
+                      std::vector<ignition::math::Vector2d> &_vertices,
+                      const ignition::math::Vector2d &_p,
                       double _tol);
 
       /// \brief 3D mesh loader for COLLADA files

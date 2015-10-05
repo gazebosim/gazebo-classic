@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A persepective X11 OpenGL Camera Sensor
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
-#ifndef _CAMERASENSOR_HH_
-#define _CAMERASENSOR_HH_
+#ifndef _GAZEBO_CAMERASENSOR_HH_
+#define _GAZEBO_CAMERASENSOR_HH_
 
 #include <string>
 

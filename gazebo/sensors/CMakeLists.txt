@@ -5,6 +5,7 @@ if (WIN32)
 endif()
 
 set (sources
+  AltimeterSensor.cc
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
@@ -13,6 +14,8 @@ set (sources
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
+  LogicalCameraSensor.cc
+  MagnetometerSensor.cc
   MultiCameraSensor.cc
   Noise.cc
   RaySensor.cc
@@ -22,6 +25,7 @@ set (sources
   Sensor.cc
   SensorFactory.cc
   SensorManager.cc
+  SensorTypes.cc
   SonarSensor.cc
   WirelessReceiver.cc
   WirelessTransceiver.cc
@@ -29,6 +33,7 @@ set (sources
 )
 
 set (headers
+  AltimeterSensor.hh
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
@@ -37,6 +42,8 @@ set (headers
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
+  LogicalCameraSensor.hh
+  MagnetometerSensor.hh
   MultiCameraSensor.hh
   Noise.hh
   RaySensor.hh
@@ -54,9 +61,11 @@ set (headers
 )
 
 set (gtest_sources
+  AltimeterSensor_TEST.cc
   ForceTorqueSensor_TEST.cc
   GpsSensor_TEST.cc
   ImuSensor_TEST.cc
+  MagnetometerSensor_TEST.cc
   Noise_TEST.cc
   RaySensor_TEST.cc
   Sensor_TEST.cc

@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/bind.hpp>
 
 #include "gazebo/transport/transport.hh"
 
@@ -357,7 +358,7 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
     msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
 
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
     this->dataPtr->modelPub->Publish(msg);
   }
 }

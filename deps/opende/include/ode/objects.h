@@ -39,6 +39,14 @@ enum Friction_Model {
   box_friction
 };
 
+/// \brief  Enum for World_Solver_Type
+/// Enum of world stepper LCP solver choices
+enum World_Solver_Type{
+  ODE_DEFAULT,
+  DART_PGS,
+  BULLET_PGS
+};
+
 /**
  * @defgroup world World
  *
@@ -560,6 +568,12 @@ ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
 ODE_API dReal dWorldGetQuickStepContactResidualSmoothing (dWorldID);
 
 /**
+ * @brief Get SOR scale factor for contact constraints
+ * @ingroup world
+ */
+ODE_API dReal dWorldGetQuickStepContactSORScalingFactor (dWorldID);
+
+/**
  * @brief Get option to turn on experimental threaded position correction.
  * @ingroup world
  */
@@ -591,6 +605,12 @@ ODE_API int dWorldGetQuickStepExtraFrictionIterations (dWorldID);
 ODE_API Friction_Model dWorldGetQuickStepFrictionModel(dWorldID);
 
 /**
+ * @brief Get the LCP Solver for world step.
+ * @ingroup world
+ */
+ODE_API World_Solver_Type dWorldGetWorldStepSolverType(dWorldID);
+
+/**
  * @brief Option to turn on inertia ratio reduction.
  * @ingroup world
  * @param irr set to true to turn on inertia ratio reduction.
@@ -603,6 +623,12 @@ ODE_API void dWorldSetQuickStepInertiaRatioReduction (dWorldID, bool irr);
  * @param smooth smoothing coefficent (0: no smothing ~ 1: full smoothing)
  */
 ODE_API void dWorldSetQuickStepContactResidualSmoothing (dWorldID, dReal smoo);
+
+/**
+ * @brief Set SOR scale factor for contact constraints
+ * @ingroup world
+ */
+ODE_API void dWorldSetQuickStepContactSORScalingFactor (dWorldID, dReal contact_sor_contact_scale);
 
 /**
  * @brief Set threaded projected position correction computations
@@ -651,6 +677,13 @@ ODE_API void dWorldSetQuickStepExtraFrictionIterations (dWorldID, int iters);
  * @param enum for friction model
  */
 ODE_API void dWorldSetQuickStepFrictionModel(dWorldID, Friction_Model fricmodel);
+
+/**
+ * @brief Set the LCP Solver from: ODE_DEFAULT, DART_PGS, BULLET_PGS
+ * @ingroup world
+ * @param enum for LCP Solver
+ */
+ODE_API void dWorldSetWorldStepSolverType(dWorldID, World_Solver_Type solverType);
 
 /* PGS experimental parameters */
 

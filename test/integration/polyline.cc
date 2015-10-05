@@ -101,12 +101,13 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
 
   EXPECT_DOUBLE_EQ(polyShape->GetHeight(), 1.0);
 
-  std::vector<std::vector<math::Vector2d> > vertices = polyShape->GetVertices();
-  EXPECT_EQ(vertices[0][0], math::Vector2d(-0.5, -0.5));
-  EXPECT_EQ(vertices[0][1], math::Vector2d(-0.5, 0.5));
-  EXPECT_EQ(vertices[0][2], math::Vector2d(0.5, 0.5));
-  EXPECT_EQ(vertices[0][3], math::Vector2d(0.0, 0.0));
-  EXPECT_EQ(vertices[0][4], math::Vector2d(0.5, -0.5));
+  std::vector<std::vector<ignition::math::Vector2d> > vertices =
+    polyShape->Vertices();
+  EXPECT_EQ(vertices[0][0], ignition::math::Vector2d(-0.5, -0.5));
+  EXPECT_EQ(vertices[0][1], ignition::math::Vector2d(-0.5, 0.5));
+  EXPECT_EQ(vertices[0][2], ignition::math::Vector2d(0.5, 0.5));
+  EXPECT_EQ(vertices[0][3], ignition::math::Vector2d(0.0, 0.0));
+  EXPECT_EQ(vertices[0][4], ignition::math::Vector2d(0.5, -0.5));
 
   // Check the FillMsg function
   {

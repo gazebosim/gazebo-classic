@@ -15,6 +15,7 @@
  *
 */
 #include <string.h>
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -267,7 +268,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
 
     msgs::Model msgModel;
     msgModel.set_name(this->GetUniqueString("model"));
-    msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
+    msgs::AddBoxLink(msgModel, mass, ignition::math::Vector3d(dx, dy, dz));
     model = this->SpawnModel(msgModel);
   }
   ASSERT_TRUE(model != NULL);
@@ -398,7 +399,7 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
     math::Pose modelPose, linkPose, inertialPose;
 
     msgModel.set_name(this->GetUniqueString("model"));
-    msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
+    msgs::AddBoxLink(msgModel, mass, ignition::math::Vector3d(dx, dy, dz));
     modelPose.pos.x = i * dz;
     modelPose.pos.z = dz;
 
@@ -431,9 +432,9 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
       auto msgLink = msgModel.mutable_link(0);
       auto msgInertial = msgLink->mutable_inertial();
 
-      msgs::Set(msgModel.mutable_pose(), modelPose);
-      msgs::Set(msgLink->mutable_pose(), linkPose);
-      msgs::Set(msgInertial->mutable_pose(), inertialPose);
+      msgs::Set(msgModel.mutable_pose(), modelPose.Ign());
+      msgs::Set(msgLink->mutable_pose(), linkPose.Ign());
+      msgs::Set(msgInertial->mutable_pose(), inertialPose.Ign());
     }
 
     auto model = this->SpawnModel(msgModel);
@@ -611,11 +612,11 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
                                << forceOffsets[i].z << std::endl;
 
     // Publish message
-    msgs::Set(msg.mutable_force(), forces[i]);
-    msgs::Set(msg.mutable_torque(), torques[i]);
+    msgs::Set(msg.mutable_force(), forces[i].Ign());
+    msgs::Set(msg.mutable_torque(), torques[i].Ign());
     // Leave optional field unset if it's zero
     if (forceOffsets[i] != math::Vector3::Zero)
-      msgs::Set(msg.mutable_force_offset(), forceOffsets[i]);
+      msgs::Set(msg.mutable_force_offset(), forceOffsets[i].Ign());
 
     wrenchPub->Publish(msg);
 

@@ -34,6 +34,10 @@
 #include "joints/hinge.h"
 #include "gazebo/gazebo_config.h"
 
+#ifdef HAVE_DART
+#include "step_dart_pgs_wrapper.h"
+#endif
+
 #ifdef HDF5_INSTRUMENT
 #include <ode/h5dump.h>
 #endif
@@ -443,6 +447,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     // 'findex' vector.
     dReal *lo, *hi, *J, *A, *rhs;
     dReal *c_v_max;
+    World_Solver_Type solver_type;
     int *findex;
 
     {
@@ -463,6 +468,7 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
 
       c_v_max = context->AllocateArray<dReal> (mlocal);
       for(int i=0; i<mlocal; i++) c_v_max[i] = world->contactp.max_vel;
+      solver_type = world->qs.world_solver_type;
 
       int mskip = dPAD(mlocal);
       A = context->AllocateArray<dReal> (mlocal*mskip);
@@ -725,10 +731,25 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING(dTimerNow ("solving LCP problem"));
 
-      // solve the LCP problem and get lambda.
-      // this will destroy A but that's OK
-      dSolveLCP (context, m, A, lambda, rhs, NULL, nub, lo, hi, findex);
-
+      if (solver_type == ODE_DEFAULT)
+      {
+        // solve the LCP problem and get lambda.
+        // this will destroy A but that's OK
+        dSolveLCP (context, m, A, lambda, rhs, NULL, nub, lo, hi, findex);
+      }
+      else if (solver_type == DART_PGS)
+      {
+#ifdef HAVE_DART
+        const int mskip = dPAD(m);
+        dSolveLCP_dart_pgs(m, mskip, A, lambda, rhs, nub, lo, hi, findex);
+#else
+        dMessage(d_ERR_LCP, "HAVE_DART is NOT defined");
+#endif
+      }
+      else
+      {
+        dMessage(d_ERR_LCP, "Unrecognized Solver Type");
+      }
     } END_STATE_SAVE(context, lcpstate);
 
     {
@@ -821,8 +842,21 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     // (over the given timestep)
     IFTIMING(dTimerNow ("update position"));
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; ++bodycurr) {
+    dReal *cforcecurr = cforce;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+         cforcecurr+=8, ++bodycurr)
+    {
       dxBody *b = *bodycurr;
+      {
+        // sum all forces (external and constraint) into facc and tacc
+        // so dBodyGetForce and dBodyGetTorque returns total force and torque
+        // on the body
+        for (unsigned int j = 0; j < 3; ++j)
+        {
+          b->facc[j] += cforcecurr[j];
+          b->tacc[j] += cforcecurr[4+j];
+        }
+      }
       dxStepBody (b,stepsize);
     }
   }

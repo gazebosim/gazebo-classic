@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class DataLogger DataLogger.hh gui/DataLogger.hh
     /// \brief A widget that provides data logging functionality.
-    class GAZEBO_VISIBLE DataLogger : public QDialog
+    class GZ_GUI_VISIBLE DataLogger : public QDialog
     {
       Q_OBJECT
 
@@ -109,8 +109,8 @@ namespace gazebo
       /// \brief Log base path.
       private: QString basePath;
 
-      /// \brief Line edit to display the log destination path.
-      private: QLineEdit *destPath;
+      /// \brief Text edit to display the log destination path.
+      private: QPlainTextEdit *destPath;
 
       /// \brief Label to display the log destination uri.
       private: QLineEdit *destURI;

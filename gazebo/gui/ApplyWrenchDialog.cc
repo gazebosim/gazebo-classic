@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -48,7 +49,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->mainWindow = gui::get_main_window();
 
   this->setWindowTitle(tr("Apply Force and Torque"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
   this->setWindowModality(Qt::NonModal);
   this->setStyleSheet(
       "QPushButton {\
@@ -614,9 +616,9 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
 void ApplyWrenchDialog::OnApplyAll()
 {
   msgs::Wrench msg;
-  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
-  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
-  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector);
+  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector.Ign());
+  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
+  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
 
   this->dataPtr->wrenchPub->Publish(msg);
 }
@@ -625,9 +627,9 @@ void ApplyWrenchDialog::OnApplyAll()
 void ApplyWrenchDialog::OnApplyForce()
 {
   msgs::Wrench msg;
-  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
-  msgs::Set(msg.mutable_torque(), math::Vector3::Zero);
-  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector);
+  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector.Ign());
+  msgs::Set(msg.mutable_torque(), ignition::math::Vector3d::Zero);
+  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
 
   this->dataPtr->wrenchPub->Publish(msg);
 }
@@ -636,8 +638,8 @@ void ApplyWrenchDialog::OnApplyForce()
 void ApplyWrenchDialog::OnApplyTorque()
 {
   msgs::Wrench msg;
-  msgs::Set(msg.mutable_force(), math::Vector3::Zero);
-  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
+  msgs::Set(msg.mutable_force(), ignition::math::Vector3d::Zero);
+  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
 
   this->dataPtr->wrenchPub->Publish(msg);
 }

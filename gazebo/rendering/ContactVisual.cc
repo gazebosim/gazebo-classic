@@ -17,12 +17,13 @@
 /* Desc: Contact Visualization Class
  * Author: Nate Koenig
  */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/transport/Node.hh"
@@ -103,13 +104,13 @@ void ContactVisual::Update()
   {
     for (int j = 0; j < dPtr->contactsMsg->contact(i).position_size(); j++)
     {
-      math::Vector3 pos = msgs::Convert(
+      math::Vector3 pos = msgs::ConvertIgn(
           dPtr->contactsMsg->contact(i).position(j));
-      math::Vector3 normal = msgs::Convert(
+      math::Vector3 normal = msgs::ConvertIgn(
           dPtr->contactsMsg->contact(i).normal(j));
       double depth = dPtr->contactsMsg->contact(i).depth(j);
 
-      math::Vector3 force = msgs::Convert(
+      math::Vector3 force = msgs::ConvertIgn(
           dPtr->contactsMsg->contact(i).wrench(j).body_1_wrench().force());
 
       // Scaling factor for the normal line.

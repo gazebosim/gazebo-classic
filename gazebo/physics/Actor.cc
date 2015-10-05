@@ -108,10 +108,14 @@ void Actor::Load(sdf::ElementPtr _sdf)
     /// create the link sdfs for the model
     NodeMap nodes = this->skeleton->GetNodes();
 
+    /// self_collide should be added to prevent error messages
+    // _sdf->GetElement("self_collide")->Set(false);
+
     sdf::ElementPtr linkSdf;
     linkSdf = _sdf->GetElement("link");
     linkSdf->GetAttribute("name")->Set(actorName + "_pose");
     linkSdf->GetElement("gravity")->Set(false);
+    linkSdf->GetElement("self_collide")->Set(false);
     sdf::ElementPtr linkPose = linkSdf->GetElement("pose");
 
 //    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
@@ -133,11 +137,12 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
       linkSdf->GetAttribute("name")->Set(bone->GetName());
       linkSdf->GetElement("gravity")->Set(false);
+      linkSdf->GetElement("self_collide")->Set(false);
       linkPose = linkSdf->GetElement("pose");
-      math::Pose pose(bone->GetModelTransform().GetTranslation(),
-                      bone->GetModelTransform().GetRotation());
+      ignition::math::Pose3d pose(bone->ModelTransform().Translation(),
+                                  bone->ModelTransform().Rotation());
       if (bone->IsRootNode())
-        pose = math::Pose();
+        pose = ignition::math::Pose3d();
       linkPose->Set(pose);
 
       /// FIXME hardcoded inertia of a sphere with mass 1.0 and radius 0.01
@@ -165,24 +170,26 @@ void Actor::Load(sdf::ElementPtr _sdf)
                             "__SKELETON_VISUAL__", math::Pose(), 0.02,
                             "Gazebo/Red", Color::Red);
 
-      for (unsigned int i = 0; i < bone->GetChildCount(); i++)
+      for (unsigned int i = 0; i < bone->GetChildCount(); ++i)
       {
         SkeletonNode *curChild = bone->GetChild(i);
 
-        math::Vector3 dir = curChild->GetModelTransform().GetTranslation() -
-            bone->GetModelTransform().GetTranslation();
+        math::Vector3 dir = curChild->ModelTransform().Translation() -
+            bone->ModelTransform().Translation();
         double length = dir.GetLength();
 
         if (!math::equal(length, 0.0))
         {
-          math::Vector3 r = curChild->GetTransform().GetTranslation();
-          math::Vector3 linkPos = math::Vector3(r.x / 2.0,
-                                    r.y / 2.0, r.z / 2.0);
+          ignition::math::Vector3d r =
+            curChild->Transform().Translation();
+          ignition::math::Vector3d linkPos =
+            ignition::math::Vector3d(r.X() / 2.0, r.Y() / 2.0, r.Z() / 2.0);
           double theta = atan2(dir.y, dir.x);
           double phi = acos(dir.z / length);
 
-          math::Pose bonePose(linkPos, math::Quaternion(0.0, phi, theta));
-          bonePose.rot = pose.rot.GetInverse() * bonePose.rot;
+          ignition::math::Pose3d bonePose(linkPos,
+              ignition::math::Quaterniond(0.0, phi, theta));
+          bonePose.Rot() = pose.Rot().Inverse() * bonePose.Rot();
 
           this->AddBoxVisual(linkSdf, bone->GetName() + "_" +
             curChild->GetName() + "__SKELETON_VISUAL__", bonePose,
@@ -339,7 +346,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
     this->skelAnimation[this->skinFile] =
         this->skeleton->GetAnimation(0);
     std::map<std::string, std::string> skelMap;
-    for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
+    for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
       skelMap[this->skeleton->GetNodeByHandle(i)->GetName()] =
         this->skeleton->GetNodeByHandle(i)->GetName();
     this->skelNodesMap[this->skinFile] = skelMap;
@@ -381,7 +388,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       if (this->skeleton->GetNumNodes() != skel->GetNumNodes())
         compatible = false;
       else
-        for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
+        for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
         {
           SkeletonNode *skinNode = this->skeleton->GetNodeByHandle(i);
           SkeletonNode *animNode = skel->GetNodeByHandle(i);
@@ -478,7 +485,7 @@ void Actor::Update()
 
   TrajectoryInfo tinfo;
 
-  for (unsigned int i = 0; i < this->trajInfo.size(); i++)
+  for (unsigned int i = 0; i < this->trajInfo.size(); ++i)
     if (this->trajInfo[i].startTime <= scriptTime &&
           this->trajInfo[i].endTime >= scriptTime)
     {
@@ -491,59 +498,137 @@ void Actor::Update()
   SkeletonAnimation *skelAnim = this->skelAnimation[tinfo.type];
   std::map<std::string, std::string> skelMap = this->skelNodesMap[tinfo.type];
 
-  math::Pose modelPose;
-  std::map<std::string, math::Matrix4> frame;
+  ignition::math::Pose3d modelPose;
+  std::map<std::string, ignition::math::Matrix4d> frame;
   if (this->trajectories.find(tinfo.id) != this->trajectories.end())
   {
     common::PoseKeyFrame posFrame(0.0);
     this->trajectories[tinfo.id]->SetTime(scriptTime);
     this->trajectories[tinfo.id]->GetInterpolatedKeyFrame(posFrame);
-    modelPose.pos = posFrame.Translation();
-    modelPose.rot = posFrame.Rotation();
+
+    modelPose.Pos() = posFrame.Translation();
+    modelPose.Rot() = posFrame.Rotation();
 
     if (this->lastTraj == tinfo.id)
-      this->pathLength += fabs(this->lastPos.Distance(modelPose.pos));
+      this->pathLength += fabs(this->lastPos.Distance(modelPose.Pos()));
     else
     {
       common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
         (this->trajectories[tinfo.id]->GetKeyFrame(0));
-      math::Vector3 vector3Ign;
+      ignition::math::Vector3d vector3Ign;
       vector3Ign = frame0->Translation();
-      this->pathLength = fabs(modelPose.pos.Distance(vector3Ign));
+      this->pathLength = fabs(modelPose.Pos().Distance(vector3Ign));
     }
-    this->lastPos = modelPose.pos;
+    this->lastPos = modelPose.Pos();
   }
   if (this->interpolateX[tinfo.type] &&
         this->trajectories.find(tinfo.id) != this->trajectories.end())
   {
-    frame = skelAnim->GetPoseAtX(this->pathLength,
+    frame = skelAnim->PoseAtX(this->pathLength,
               skelMap[this->skeleton->GetRootNode()->GetName()]);
   }
   else
-    frame = skelAnim->GetPoseAt(scriptTime);
+    frame = skelAnim->PoseAt(scriptTime);
 
   this->lastTraj = tinfo.id;
 
-  math::Matrix4 rootTrans =
-                  frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
+  ignition::math::Matrix4d rootTrans =
+    frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
 
-  math::Vector3 rootPos = rootTrans.GetTranslation();
-  math::Quaternion rootRot = rootTrans.GetRotation();
+  ignition::math::Vector3d rootPos = rootTrans.Translation();
+  ignition::math::Quaterniond rootRot = rootTrans.Rotation();
 
   if (tinfo.translated)
-    rootPos.x = 0.0;
-  math::Pose actorPose;
-  actorPose.pos = modelPose.pos + modelPose.rot.RotateVector(rootPos);
-  actorPose.rot = modelPose.rot *rootRot;
+    rootPos.X() = 0.0;
+  ignition::math::Pose3d actorPose;
+  actorPose.Pos() = modelPose.Pos() + modelPose.Rot().RotateVector(rootPos);
+  actorPose.Rot() = modelPose.Rot() * rootRot;
 
-  math::Matrix4 rootM(actorPose.rot.GetAsMatrix4());
-  rootM.SetTranslate(actorPose.pos);
+  ignition::math::Matrix4d rootM(actorPose.Rot());
+  rootM.Translate(actorPose.Pos());
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
   this->SetPose(frame, skelMap, currentTime.Double());
 
   this->lastScriptTime = scriptTime;
+}
+
+//////////////////////////////////////////////////
+void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
+      std::map<std::string, std::string> _skelMap, double _time)
+{
+  msgs::PoseAnimation msg;
+  msg.set_model_name(this->visualName);
+  msg.set_model_id(this->visualId);
+
+  ignition::math::Matrix4d modelTrans(ignition::math::Matrix4d::Identity);
+  ignition::math::Pose3d mainLinkPose;
+
+  for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
+  {
+    SkeletonNode *bone = this->skeleton->GetNodeByHandle(i);
+    SkeletonNode *parentBone = bone->GetParent();
+    ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
+    if (_frame.find(_skelMap[bone->GetName()]) != _frame.end())
+      transform = _frame[_skelMap[bone->GetName()]];
+    else
+      transform = bone->Transform();
+
+    LinkPtr currentLink = this->GetChildLink(bone->GetName());
+    ignition::math::Pose3d bonePose = transform.Pose();
+
+    if (!bonePose.IsFinite())
+    {
+      std::cerr << "ACTOR: " << _time << " " << bone->GetName()
+                << " " << bonePose << "\n";
+      bonePose.Correct();
+    }
+
+    msgs::Pose *bone_pose = msg.add_pose();
+    bone_pose->set_name(bone->GetName());
+
+    if (!parentBone)
+    {
+      bone_pose->mutable_position()->CopyFrom(
+          msgs::Convert(ignition::math::Vector3d()));
+      bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(
+            ignition::math::Quaterniond()));
+      mainLinkPose = bonePose;
+    }
+    else
+    {
+      bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.Pos()));
+      bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.Rot()));
+      LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
+      math::Pose parentPose = parentLink->GetWorldPose();
+      math::Matrix4 parentTrans(parentPose.rot.GetAsMatrix4());
+      parentTrans.SetTranslate(parentPose.pos);
+      transform = (parentTrans * transform).Ign();
+    }
+
+    msgs::Pose *link_pose = msg.add_pose();
+    link_pose->set_name(currentLink->GetScopedName());
+    link_pose->set_id(currentLink->GetId());
+    ignition::math::Pose3d linkPose = transform.Pose() - mainLinkPose;
+    link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.Pos()));
+    link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.Rot()));
+    currentLink->SetWorldPose(transform.Pose(), true, false);
+  }
+
+  msgs::Time *stamp = msg.add_time();
+  stamp->CopyFrom(msgs::Convert(_time));
+
+  msgs::Pose *model_pose = msg.add_pose();
+  model_pose->set_name(this->GetScopedName());
+  model_pose->set_id(this->GetId());
+  model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.Pos()));
+  model_pose->mutable_orientation()->CopyFrom(
+      msgs::Convert(mainLinkPose.Rot()));
+
+  if (this->bonePosePub && this->bonePosePub->HasConnections())
+    this->bonePosePub->Publish(msg);
+  this->SetWorldPose(mainLinkPose, true, false);
 }
 
 //////////////////////////////////////////////////
@@ -557,7 +642,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
   math::Matrix4 modelTrans(math::Matrix4::IDENTITY);
   math::Pose mainLinkPose;
 
-  for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); i++)
+  for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
   {
     SkeletonNode *bone = this->skeleton->GetNodeByHandle(i);
     SkeletonNode *parentBone = bone->GetParent();
@@ -565,7 +650,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
     if (_frame.find(_skelMap[bone->GetName()]) != _frame.end())
       transform = _frame[_skelMap[bone->GetName()]];
     else
-      transform = bone->GetTransform();
+      transform = bone->Transform();
 
     LinkPtr currentLink = this->GetChildLink(bone->GetName());
     math::Pose bonePose = transform.GetAsPose();
@@ -582,15 +667,18 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 
     if (!parentBone)
     {
-      bone_pose->mutable_position()->CopyFrom(msgs::Convert(math::Vector3()));
+      bone_pose->mutable_position()->CopyFrom(
+          msgs::Convert(ignition::math::Vector3d()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(
-                                                    math::Quaternion()));
+            ignition::math::Quaterniond()));
       mainLinkPose = bonePose;
     }
     else
     {
-      bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.pos));
-      bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.rot));
+      bone_pose->mutable_position()->CopyFrom(
+          msgs::Convert(bonePose.pos.Ign()));
+      bone_pose->mutable_orientation()->CopyFrom(
+          msgs::Convert(bonePose.rot.Ign()));
       LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
       math::Pose parentPose = parentLink->GetWorldPose();
       math::Matrix4 parentTrans(parentPose.rot.GetAsMatrix4());
@@ -602,8 +690,10 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
     link_pose->set_name(currentLink->GetScopedName());
     link_pose->set_id(currentLink->GetId());
     math::Pose linkPose = transform.GetAsPose() - mainLinkPose;
-    link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.pos));
-    link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.rot));
+    link_pose->mutable_position()->CopyFrom(
+        msgs::Convert(linkPose.pos.Ign()));
+    link_pose->mutable_orientation()->CopyFrom(
+        msgs::Convert(linkPose.rot.Ign()));
     currentLink->SetWorldPose(transform.GetAsPose(), true, false);
   }
 
@@ -613,8 +703,10 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
   msgs::Pose *model_pose = msg.add_pose();
   model_pose->set_name(this->GetScopedName());
   model_pose->set_id(this->GetId());
-  model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.pos));
-  model_pose->mutable_orientation()->CopyFrom(msgs::Convert(mainLinkPose.rot));
+  model_pose->mutable_position()->CopyFrom(
+      msgs::Convert(mainLinkPose.pos.Ign()));
+  model_pose->mutable_orientation()->CopyFrom(
+      msgs::Convert(mainLinkPose.rot.Ign()));
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())
     this->bonePosePub->Publish(msg);

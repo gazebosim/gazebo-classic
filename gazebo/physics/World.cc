@@ -26,6 +26,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -269,11 +270,11 @@ void World::Load(sdf::ElementPtr _sdf)
     common::SphericalCoordinates::SurfaceType surfaceType =
       common::SphericalCoordinates::Convert(
         spherical->Get<std::string>("surface_model"));
-    math::Angle latitude, longitude, heading;
+    ignition::math::Angle latitude, longitude, heading;
     double elevation = spherical->Get<double>("elevation");
-    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
-    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
-    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+    latitude.Degree(spherical->Get<double>("latitude_deg"));
+    longitude.Degree(spherical->Get<double>("longitude_deg"));
+    heading.Degree(spherical->Get<double>("heading_deg"));
 
     this->dataPtr->sphericalCoordinates.reset(new common::SphericalCoordinates(
       surfaceType, latitude, longitude, elevation, heading));
@@ -690,7 +691,9 @@ void World::Step()
     this->dataPtr->prevStepWallTime = common::Time::GetWallTime();
 
     double stepTime = this->dataPtr->physicsEngine->GetMaxStepSize();
-    if (!this->IsPaused() || this->dataPtr->stepInc > 0)
+
+    if (!this->IsPaused() || this->dataPtr->stepInc > 0
+        || this->dataPtr->needsReset)
     {
       // query timestep to allow dynamic time step size updates
       this->dataPtr->simTime += stepTime;
@@ -1083,6 +1086,10 @@ void World::ResetTime()
   this->dataPtr->startTime = common::Time::GetWallTime();
   this->dataPtr->realTimeOffset = common::Time(0);
   this->dataPtr->iterations = 0;
+
+  if (this->IsPaused())
+    this->dataPtr->pauseStartTime = this->dataPtr->startTime;
+
   sensors::SensorManager::Instance()->ResetLastUpdateTimes();
 }
 
@@ -1294,6 +1301,8 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
   {
     util::LogPlay::Instance()->Rewind();
     this->dataPtr->stepInc = 1;
+    if (!util::LogPlay::Instance()->HasIterations())
+      this->dataPtr->iterations = 0;
   }
 
   if (_data->has_forward() && _data->forward())
@@ -1776,7 +1785,9 @@ void World::ProcessFactoryMsgs()
         elem->SetParent(this->dataPtr->sdf);
         elem->GetParent()->InsertElement(elem);
         if (factoryMsg.has_pose())
-          elem->GetElement("pose")->Set(msgs::Convert(factoryMsg.pose()));
+        {
+          elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
+        }
 
         if (isActor)
         {
@@ -2016,21 +2027,33 @@ void World::ProcessMessages()
       {
         for (auto const &model : this->dataPtr->publishModelPoses)
         {
-          msgs::Pose *poseMsg = msg.add_pose();
-
-          // Publish the model's relative pose
-          poseMsg->set_name(model->GetScopedName());
-          poseMsg->set_id(model->GetId());
-          msgs::Set(poseMsg, model->GetRelativePose());
-
-          // Publish each of the model's children relative poses
-          Link_V links = model->GetLinks();
-          for (auto const &link : links)
+          std::list<ModelPtr> modelList;
+          modelList.push_back(model);
+          while (!modelList.empty())
           {
-            poseMsg = msg.add_pose();
-            poseMsg->set_name(link->GetScopedName());
-            poseMsg->set_id(link->GetId());
-            msgs::Set(poseMsg, link->GetRelativePose());
+            ModelPtr m = modelList.front();
+            modelList.pop_front();
+            msgs::Pose *poseMsg = msg.add_pose();
+
+            // Publish the model's relative pose
+            poseMsg->set_name(m->GetScopedName());
+            poseMsg->set_id(m->GetId());
+            msgs::Set(poseMsg, m->GetRelativePose().Ign());
+
+            // Publish each of the model's child links relative poses
+            Link_V links = m->GetLinks();
+            for (auto const &link : links)
+            {
+              poseMsg = msg.add_pose();
+              poseMsg->set_name(link->GetScopedName());
+              poseMsg->set_id(link->GetId());
+              msgs::Set(poseMsg, link->GetRelativePose().Ign());
+            }
+
+            // add all nested models to the queue
+            Model_V models = m->NestedModels();
+            for (auto const &n : models)
+              modelList.push_back(n);
           }
         }
 

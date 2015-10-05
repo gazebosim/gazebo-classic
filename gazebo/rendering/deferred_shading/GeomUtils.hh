@@ -25,7 +25,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GZ_RENDERING_DEFERRED_VISIBLE GeomUtils
+    class GZ_RENDERING_VISIBLE GeomUtils
     {
       /// \brief Create a sphere Mesh with a given name, radius, number of
       /// rings and number of segments

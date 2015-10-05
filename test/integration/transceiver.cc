@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Rand.hh>
 
 #include <boost/foreach.hpp>
 #include "gazebo/test/ServerFixture.hh"
@@ -78,18 +79,19 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
   Load("worlds/empty.world", true, _physicsEngine);
 
   // Generate a random number [1-10] of transmitters
-  int nTransmitters = math::Rand::GetIntUniform(1, 10);
+  int nTransmitters = ignition::math::Rand::IntUniform(1, 10);
 
   for (int i = 0; i < nTransmitters; ++i)
   {
-    double txFreq = math::Rand::GetDblUniform(this->MinFreq, this->MaxFreq);
+    double txFreq = ignition::math::Rand::DblUniform(this->MinFreq,
+        this->MaxFreq);
     std::ostringstream convert;
     convert << i;
     std::string txModelName = "tx" + convert.str();
     std::string txSensorName = "wirelessTransmitter" + convert.str();
     std::string txEssid = "osrf" + convert.str();
-    double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-    double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+    double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+    double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
     math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
 
     SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
@@ -178,8 +180,8 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
   std::string tx2ModelName = "tx2";
   std::string tx2SensorName = "wirelessTransmitter2";
   std::string txEssid = "osrf";
-  double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-  double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+  double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+  double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
   math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
 
   SpawnWirelessTransmitterSensor(tx1ModelName, tx1SensorName, txPose.pos,

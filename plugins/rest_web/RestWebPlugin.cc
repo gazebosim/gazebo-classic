@@ -20,6 +20,8 @@
   #pragma comment(lib, "Rpcrt4.lib")
 #else /* UNIX */
 
+#include <gazebo/gazebo.hh>
+
 #ifdef HAVE_UUID
   #include <uuid/uuid.h>
 #endif
@@ -67,7 +69,11 @@ RestWebPlugin::RestWebPlugin()
 #endif
 
 #endif
-
+  if (this->session.empty())
+  {
+    // alternative to uuid
+    this->session = common::Time::GetWallTimeAsISOString();
+  }
   gzmsg << "REST web Session : " << this->session << endl;
 }
 
@@ -76,7 +82,7 @@ RestWebPlugin::~RestWebPlugin()
 {
   // tell the requestQ to stop precessing
   this->stopMsgProcessing = true;
-  if (this->requestQThread->joinable())
+  if (this->requestQThread && this->requestQThread->joinable())
   {
     this->requestQThread->join();
     delete this->requestQThread;

@@ -23,6 +23,8 @@
 
 #include <sstream>
 #include <set>
+#include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Exception.hh"
 
@@ -32,11 +34,11 @@
 
 #include "gazebo/math/Quaternion.hh"
 
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 
@@ -61,7 +63,7 @@ const std::string BuildingMaker::buildingDefaultName = "Untitled";
 const std::string BuildingMaker::previewName = "BuildingPreview";
 
 /////////////////////////////////////////////////
-BuildingMaker::BuildingMaker() : EntityMaker()
+BuildingMaker::BuildingMaker()
 {
   this->conversionScale = 0.01;
 
@@ -108,15 +110,23 @@ BuildingMaker::BuildingMaker() : EntityMaker()
 
   this->saveDialog = new SaveDialog(SaveDialog::BUILDING);
 
+  // Transport
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
+
   this->Reset();
 }
 
 /////////////////////////////////////////////////
 BuildingMaker::~BuildingMaker()
 {
-//  this->camera.reset();
   if (this->saveDialog)
     delete this->saveDialog;
+
+  this->node->Fini();
+  this->node.reset();
+  this->makerPub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -428,6 +438,13 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
     this->Reset();
   }
 
+  if (_steps == 0)
+  {
+    gzerr << "Can't make stairs with 0 steps" << std::endl;
+    return "";
+  }
+
+  // Link visual
   std::ostringstream linkNameStream;
   linkNameStream << "Stairs_" << this->stairsCounter++;
   std::string linkName = linkNameStream.str();
@@ -436,56 +453,52 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
       "::" + linkName, this->previewVisual));
   linkVisual->Load();
 
+  // Size for the whole staircase as one thing
+  math::Vector3 totalSize = BuildingMaker::ConvertSize(_size);
+
+  // Parent visual which will act as a container for the all the steps
   std::ostringstream visualName;
   visualName << this->previewName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
+  visVisual->Load();
+  visVisual->SetPosition(math::Vector3(0, 0, totalSize.z/2.0));
+  visVisual->SetScale(totalSize);
 
+  // Visual SDF template (unit box)
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visVisual->Load(visualElem);
-  visVisual->DetachObjects();
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
 
+  // Relative size of each step within the parent visual
+  double dSteps = static_cast<double>(_steps);
+  double rise = 1.0 / dSteps;
+  double run = 1.0 / dSteps;
+
+  for (int i = 0; i < _steps; ++i)
+  {
+    std::stringstream visualStepName;
+    visualStepName << visualName.str() << "step" << i;
+    rendering::VisualPtr stepVisual(new rendering::Visual(
+        visualStepName.str(), visVisual));
+    stepVisual->Load(visualElem);
+
+    stepVisual->SetPosition(math::Vector3(0, 0.5-run*(0.5+i),
+        -0.5 + rise*(0.5+i)));
+    stepVisual->SetScale(math::Vector3(1, run, rise));
+  }
+
+  // Stairs manip
   BuildingModelManip *stairsManip = new BuildingModelManip();
   stairsManip->SetMaker(this);
   stairsManip->SetName(linkName);
   stairsManip->SetVisual(visVisual);
   stairsManip->SetLevel(this->currentLevel);
-  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
-  visVisual->SetScale(scaledSize);
-  double dSteps = static_cast<double>(_steps);
-  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = stairsManip;
-
-  std::stringstream visualStepName;
-  visualStepName << visualName.str() << "step" << 0;
-  rendering::VisualPtr baseStepVisual(new rendering::Visual(
-      visualStepName.str(), visVisual));
-  visualElem->GetElement("material")->ClearElements();
-  visualElem->GetElement("material")->AddElement("ambient")
-      ->Set(gazebo::common::Color(1, 1, 1));
-  visualElem->AddElement("cast_shadows")->Set(false);
-  baseStepVisual->Load(visualElem);
-
-  double rise = 1.0 / dSteps;
-  double run = 1.0 / dSteps;
-  baseStepVisual->SetScale(math::Vector3(1, run, rise));
-
-  math::Vector3 baseOffset(0, 0.5 - run/2.0,
-      -0.5 + rise/2.0);
-  baseStepVisual->SetPosition(baseOffset);
-
-  for (int i = 1; i < _steps; ++i)
-  {
-    visualStepName.str("");
-    visualStepName << visualName.str() << "step" << i;
-    rendering::VisualPtr stepVisual = baseStepVisual->Clone(
-        visualStepName.str(), visVisual);
-    stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
-        baseOffset.z + rise*i));
-    stepVisual->SetRotation(baseStepVisual->GetRotation());
-  }
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
@@ -571,18 +584,6 @@ void BuildingMaker::RemoveWall(const std::string &_wallName)
   this->RemovePart(_wallName);
 }
 
-
-/////////////////////////////////////////////////
-void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
-{
-  this->camera = _camera;
-}
-
-/////////////////////////////////////////////////
-void BuildingMaker::Stop()
-{
-}
-
 /////////////////////////////////////////////////
 void BuildingMaker::Reset()
 {
@@ -615,12 +616,6 @@ void BuildingMaker::Reset()
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
     delete (*it).second;
   this->allItems.clear();
-}
-
-/////////////////////////////////////////////////
-bool BuildingMaker::IsActive() const
-{
-  return true;
 }
 
 /////////////////////////////////////////////////
@@ -1049,14 +1044,14 @@ void BuildingMaker::GenerateSDFWithCSG()
           continue;
         for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
         {
-          m1SubMesh->AddVertex(subMesh->GetVertex(j));
+          m1SubMesh->AddVertex(subMesh->Vertex(j));
         }
         for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
         {
           m1SubMesh->AddIndex(subMesh->GetIndex(j));
         }
       }
-      m1->SetScale(math::Vector3(wallVis->GetScale()));
+      m1->SetScale(wallVis->GetScale().Ign());
 
       std::string booleanMeshName = buildingModelManip->GetName() + "_Boolean";
       common::Mesh *booleanMesh = NULL;
@@ -1090,18 +1085,18 @@ void BuildingMaker::GenerateSDFWithCSG()
               continue;
             for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
             {
-              m2SubMesh->AddVertex(subMesh->GetVertex(j));
+              m2SubMesh->AddVertex(subMesh->Vertex(j));
             }
             for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
             {
               m2SubMesh->AddIndex(subMesh->GetIndex(j));
             }
           }
-          m2->SetScale(math::Vector3(attachedVis->GetScale()));
+          m2->SetScale(attachedVis->GetScale().Ign());
           // create csg but don't add to mesh manager just yet
           common::MeshCSG csg;
           booleanMesh = csg.CreateBoolean(m1, m2, common::MeshCSG::DIFFERENCE,
-              offset);
+              offset.Ign());
         }
       }
       // add to mesh manager after all boolean operations are done

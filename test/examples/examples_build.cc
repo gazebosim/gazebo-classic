@@ -96,6 +96,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "gui_overlay_plugin_spawn"
   , "gui_overlay_plugin_time"
   , "hello_world"
+  , "mainwindow_example"
   , "model_push"
   , "model_move"
   , "parameters"
@@ -113,14 +114,15 @@ TEST_P(ExamplesBuild_Standalone, Standalone)
 ///////////////////////////////////////////////////////////////////
 INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
   "actuator"
-  // , "animated_box"
-  // , "arrange"
+  , "animated_box"
+  , "arrange"
   , "clone_simulation"
   , "custom_main"
   , "custom_main_pkgconfig"
-  // , "listener"
-  // , "publisher"
+  , "listener"
+  , "publisher"
   , "test_fixture"
+  , "transporter"
 ));
 
 int main(int argc, char **argv)

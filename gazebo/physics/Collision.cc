@@ -266,7 +266,7 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::FillMsg(msgs::Collision &_msg)
 {
-  msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
+  msgs::Set(_msg.mutable_pose(), this->GetRelativePose().Ign());
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
@@ -274,7 +274,7 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->shape->FillMsg(*_msg.mutable_geometry());
   this->surface->FillMsg(*_msg.mutable_surface());
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
 
   if (!this->HasType(physics::Base::SENSOR_COLLISION))
   {
@@ -301,7 +301,7 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
   if (_msg.has_pose())
   {
     this->link->SetEnabled(true);
-    this->SetRelativePose(msgs::Convert(_msg.pose()));
+    this->SetRelativePose(msgs::ConvertIgn(_msg.pose()));
   }
 
   if (_msg.has_geometry())
@@ -330,7 +330,7 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
   msg.set_type(msgs::Visual::COLLISION);
-  msgs::Set(msg.mutable_pose(), this->GetRelativePose());
+  msgs::Set(msg.mutable_pose(), this->GetRelativePose().Ign());
   msg.mutable_material()->mutable_script()->add_uri(
       "file://media/materials/scripts/gazebo.material");
   msg.mutable_material()->mutable_script()->set_name(

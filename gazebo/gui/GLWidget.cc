@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <math.h>
 
 #include "gazebo/common/Assert.hh"
@@ -368,12 +370,12 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (this->mouseEvent.Control())
   {
     if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty()
-       && !this->modelEditorEnabled)
+       && !this->modelEditorEnabled && g_copyAct->isEnabled())
     {
       g_copyAct->trigger();
     }
     else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty()
-       && !this->modelEditorEnabled)
+       && !this->modelEditorEnabled && g_pasteAct->isEnabled())
     {
       g_pasteAct->trigger();
     }
@@ -414,15 +416,15 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   /// Switch between RTS modes
   if (this->keyModifiers == Qt::NoModifier && this->state != "make_entity")
   {
-    if (_event->key() == Qt::Key_R)
+    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
       g_rotateAct->trigger();
-    else if (_event->key() == Qt::Key_T)
+    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
       g_translateAct->trigger();
-    else if (_event->key() == Qt::Key_S)
+    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
       g_scaleAct->trigger();
-    else if (_event->key() == Qt::Key_N)
+    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
       g_snapAct->trigger();
-    else if (_event->key() == Qt::Key_Escape)
+    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
       g_arrowAct->trigger();
   }
 
@@ -589,8 +591,11 @@ void GLWidget::OnMousePressNormal()
 /////////////////////////////////////////////////
 void GLWidget::OnMousePressMakeEntity()
 {
-  if (this->entityMaker)
-    this->entityMaker->OnMousePush(this->mouseEvent);
+  if (!this->userCamera)
+    return;
+
+  // Allow camera orbiting while making an entity
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 /////////////////////////////////////////////////
@@ -638,10 +643,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::OnMouseMoveMakeEntity()
 {
+  if (!this->userCamera)
+    return;
+
   if (this->entityMaker)
   {
+    // Allow camera orbiting while inserting a new model
     if (this->mouseEvent.Dragging())
-      this->entityMaker->OnMouseDrag(this->mouseEvent);
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
     else
       this->entityMaker->OnMouseMove(this->mouseEvent);
   }
@@ -935,26 +944,18 @@ void GLWidget::OnCreateEntity(const std::string &_type,
 
   if (_type == "box")
   {
-    this->boxMaker.Start(this->userCamera);
-    if (this->modelMaker.InitFromSDFString(this->boxMaker.GetSDFString()))
+    if (this->modelMaker.InitSimpleShape(ModelMaker::SimpleShapes::BOX))
       this->entityMaker = &this->modelMaker;
   }
   else if (_type == "sphere")
   {
-    this->sphereMaker.Start(this->userCamera);
-    if (this->modelMaker.InitFromSDFString(this->sphereMaker.GetSDFString()))
+    if (this->modelMaker.InitSimpleShape(ModelMaker::SimpleShapes::SPHERE))
       this->entityMaker = &this->modelMaker;
   }
   else if (_type == "cylinder")
   {
-    this->cylinderMaker.Start(this->userCamera);
-    if (this->modelMaker.InitFromSDFString(this->cylinderMaker.GetSDFString()))
+    if (this->modelMaker.InitSimpleShape(ModelMaker::SimpleShapes::CYLINDER))
       this->entityMaker = &this->modelMaker;
-  }
-  else if (_type == "mesh" && !_data.empty())
-  {
-    this->meshMaker.Init(_data);
-    this->entityMaker = &this->meshMaker;
   }
   else if (_type == "model" && !_data.empty())
   {
@@ -972,7 +973,7 @@ void GLWidget::OnCreateEntity(const std::string &_type,
   {
     gui::Events::manipMode("make_entity");
     // TODO: change the cursor to a cross
-    this->entityMaker->Start(this->userCamera);
+    this->entityMaker->Start();
   }
   else
   {
@@ -1148,7 +1149,7 @@ void GLWidget::Paste(const std::string &_name)
       if (isLight && this->lightMaker.InitFromLight(_name))
       {
         this->entityMaker = &this->lightMaker;
-        this->entityMaker->Start(this->userCamera);
+        this->entityMaker->Start();
         // this makes the entity appear at the mouse cursor
         this->entityMaker->OnMouseMove(this->mouseEvent);
         gui::Events::manipMode("make_entity");
@@ -1156,7 +1157,7 @@ void GLWidget::Paste(const std::string &_name)
       else if (isModel && this->modelMaker.InitFromModel(_name))
       {
         this->entityMaker = &this->modelMaker;
-        this->entityMaker->Start(this->userCamera);
+        this->entityMaker->Start();
         // this makes the entity appear at the mouse cursor
         this->entityMaker->OnMouseMove(this->mouseEvent);
         gui::Events::manipMode("make_entity");
@@ -1222,7 +1223,7 @@ void GLWidget::PopHistory()
     msg.set_id(gui::get_entity_id(this->moveHistory.back().first));
     msg.set_name(this->moveHistory.back().first);
 
-    msgs::Set(msg.mutable_pose(), this->moveHistory.back().second);
+    msgs::Set(msg.mutable_pose(), this->moveHistory.back().second.Ign());
     this->scene->GetVisual(this->moveHistory.back().first)->SetWorldPose(
         this->moveHistory.back().second);
 

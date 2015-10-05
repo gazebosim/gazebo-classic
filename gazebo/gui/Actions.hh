@@ -28,11 +28,11 @@ namespace gazebo
   {
     extern GZ_GUI_VISIBLE QAction *g_newAct;
     extern GZ_GUI_VISIBLE QAction *g_openAct;
-    extern GZ_GUI_VISIBLE QAction *g_importAct;
     extern GZ_GUI_VISIBLE QAction *g_saveAct;
     extern GZ_GUI_VISIBLE QAction *g_saveAsAct;
     extern GZ_GUI_VISIBLE QAction *g_saveCfgAct;
     extern GZ_GUI_VISIBLE QAction *g_cloneAct;
+    extern GZ_GUI_VISIBLE QAction *g_hotkeyChartAct;
     extern GZ_GUI_VISIBLE QAction *g_aboutAct;
     extern GZ_GUI_VISIBLE QAction *g_quitAct;
 
@@ -51,7 +51,6 @@ namespace gazebo
     extern GZ_GUI_VISIBLE QAction *g_boxCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_sphereCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_cylinderCreateAct;
-    extern GZ_GUI_VISIBLE QAction *g_meshCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_pointLghtCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_spotLghtCreateAct;
     extern GZ_GUI_VISIBLE QAction *g_dirLghtCreateAct;
@@ -125,7 +124,7 @@ namespace gazebo
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
-    class GAZEBO_VISIBLE DeleteAction : public QAction
+    class GZ_GUI_VISIBLE DeleteAction : public QAction
     {
       Q_OBJECT
       /// \brief Constructor
