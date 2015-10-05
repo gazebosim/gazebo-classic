@@ -299,6 +299,12 @@ ignition::math::Pose3d Sensor::Pose() const
 }
 
 //////////////////////////////////////////////////
+void SetPose(const ignition::math::Pose3d &_pose)
+{
+  this->pose = _pose;
+}
+
+//////////////////////////////////////////////////
 double Sensor::GetUpdateRate()
 {
   if (this->updatePeriod.Double() > 0.0)
