@@ -207,17 +207,15 @@ namespace gazebo
         }
 
         // List the model states
-        for (ModelState_M::const_iterator iter = _state.modelStates.begin();
-            iter != _state.modelStates.end(); ++iter)
+        for (const auto &model : _state.modelStates)
         {
-          _out << iter->second;
+          _out << model.second;
         }
 
         // List the light states
-        for (auto iter = _state.lightStates.begin();
-            iter != _state.lightStates.end(); ++iter)
+        for (const auto &light : _state.lightStates)
         {
-          _out << iter->second;
+          _out << light.second;
         }
 
         _out << "</state>";
