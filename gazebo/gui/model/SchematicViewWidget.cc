@@ -433,12 +433,14 @@ void SchematicViewWidget::OnDeleteJoint()
   this->deleteJointName = "";
 }
 
+/////////////////////////////////////////////////
 void SchematicViewWidget::OnJointRemoved(const std::string &_jointId)
 {
   if (this->HasEdge(_jointId))
     this->RemoveEdge(_jointId);
 }
 
+/////////////////////////////////////////////////
 void SchematicViewWidget::OnShowJointContextMenu(const std::string &_jointId)
 {
   this->deleteJointName = _jointId;

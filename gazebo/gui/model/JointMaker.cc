@@ -1028,8 +1028,6 @@ void JointMaker::GenerateSDF()
     size_t pIdx = parentName.find("::");
     if (pIdx != std::string::npos)
       parentName = parentName.substr(pIdx+2);
-//    parentName = this->modelName + "::" + parentName;
-    // parentLeafName = this->GetScopedLinkName(parentLeafName);
     parentElem->Set(parentName);
 
     sdf::ElementPtr childElem = jointElem->GetElement("child");
@@ -1037,27 +1035,7 @@ void JointMaker::GenerateSDF()
     size_t cIdx = childName.find("::");
     if (cIdx != std::string::npos)
       childName = childName.substr(cIdx+2);
-//    childName = this->modelName + "::" + childName;
-    // childLeafName = this->GetScopedLinkName(childLeafName);
     childElem->Set(childName);
-
-/*    sdf::ElementPtr parentElem = jointElem->GetElement("parent");
-    std::string parentName = joint->parent->GetName();
-    std::string parentLeafName = parentName;
-    size_t pIdx = parentName.find_last_of("::");
-    if (pIdx != std::string::npos)
-      parentLeafName = parentName.substr(pIdx+1);
-    parentLeafName = this->GetScopedLinkName(parentLeafName);
-    parentElem->Set(parentLeafName);
-
-    sdf::ElementPtr childElem = jointElem->GetElement("child");
-    std::string childName = joint->child->GetName();
-    std::string childLeafName = childName;
-    size_t cIdx = childName.find_last_of("::");
-    if (cIdx != std::string::npos)
-      childLeafName = childName.substr(cIdx+1);
-    childLeafName = this->GetScopedLinkName(childLeafName);
-    childElem->Set(childLeafName);*/
   }
 }
 
@@ -1114,11 +1092,6 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   {
     return 2;
   }
-  else if (_type == JOINT_GEARBOX)
-  {
-    return 2;
-  }
-
   return 0;
 }
 

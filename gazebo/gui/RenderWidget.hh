@@ -19,7 +19,6 @@
 
 #include <string>
 #include <vector>
-#include <map>
 #include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
