@@ -1,5 +1,10 @@
 ## Gazebo 6.0
 
+### Gazebo 6.x.x 
+
+1. Added `Sensor::SetPose` function
+    * [Pull request #1935](https://bitbucket.org/osrf/gazebo/pull-request/1935)
+
 ### Gazebo 6.2.0 (2015-10-02)
 
 1. Update physics when the world is reset
