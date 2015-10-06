@@ -108,7 +108,7 @@ namespace gazebo
       public: bool HasModelState(const std::string &_modelName) const;
 
       /// \brief Get the vector of SDF insertions.
-      /// return A vector of SDF blocks. Each block contains the SDF of the
+      /// \return A vector of SDF blocks. Each block contains the SDF of the
       /// model to be spawned in the simulation.
       public: const std::vector<std::string> &Insertions() const;
 
@@ -119,7 +119,7 @@ namespace gazebo
       public: void SetInsertions(const std::vector<std::string> &_insertions);
 
       /// \brief Get the vector of SDF deletions.
-      /// return A vector of SDF blocks. Each block contains the SDF of the
+      /// \return A vector of SDF blocks. Each block contains the SDF of the
       /// model to be removed from the simulation.
       public: const std::vector<std::string> &Deletions() const;
 
