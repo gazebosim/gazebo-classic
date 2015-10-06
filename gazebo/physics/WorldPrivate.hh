@@ -78,9 +78,6 @@ namespace gazebo
       /// \brief Number of steps in increment by.
       public: int stepInc;
 
-      /// \brief Stores the simulation time target during a 'seek' operation.
-      public: common::Time targetSimTime;
-
       /// \brief All the event connections.
       public: event::Connection_V connections;
 

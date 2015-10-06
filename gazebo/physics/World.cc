@@ -55,6 +55,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Time.hh"
 
 #include "gazebo/math/Vector3.hh"
 
@@ -1233,8 +1234,8 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 
   if (_data->has_seek())
   {
-    this->dataPtr->targetSimTime = msgs::Convert(_data->seek());
-    util::LogPlay::Instance()->Seek(this->dataPtr->targetSimTime);
+    common::Time targetSimTime = msgs::Convert(_data->seek());
+    util::LogPlay::Instance()->Seek(targetSimTime);
     this->dataPtr->stepInc = 1;
   }
 
