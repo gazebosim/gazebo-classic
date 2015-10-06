@@ -366,7 +366,6 @@ TEST_F(LogPlay_TEST, Seek)
   std::string frame;
   EXPECT_TRUE(player->Seek(common::Time(30.0)));
   EXPECT_TRUE(player->Step(frame));
-  std::string expectedShashum = "a2af44bc561194dfeae9526c224d56bb332a4233";
   std::string shasum = gazebo::common::get_sha1<std::string>(frame);
   EXPECT_EQ(shasum, expectedShashum1);
 
