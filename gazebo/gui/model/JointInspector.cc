@@ -152,14 +152,15 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   QToolButton *swapButton = new QToolButton();
   swapButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   swapButton->setIcon(QPixmap(":/images/swap-parent-child.png"));
-  swapButton->setFixedSize(QSize(35, 35));
+  swapButton->setFixedSize(QSize(45, 35));
   swapButton->setIconSize(QSize(25, 25));
   swapButton->setToolTip("Swap parent and child");
   swapButton->setStyleSheet(
       "QToolButton\
       {\
-        background-color: " + ConfigWidget::bgColors[0] +
-      "}");
+        background-color: " + ConfigWidget::bgColors[0] + ";\
+        margin-left: 10px;\
+      }");
   connect(swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
 
   // Links layout
