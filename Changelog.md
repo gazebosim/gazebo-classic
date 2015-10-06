@@ -1,6 +1,6 @@
 ## Gazebo 6.0
 
-### Gazebo 6.x.x 
+### Gazebo 6.3.0 (2015-10-06)
 
 1. Added `Sensor::SetPose` function
     * [Pull request #1935](https://bitbucket.org/osrf/gazebo/pull-request/1935)
