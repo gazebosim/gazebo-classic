@@ -282,8 +282,8 @@ TEST_F(LogPlay_TEST, StepBack)
   for (int i = 0; i < 284; ++i)
     EXPECT_TRUE(player->StepBack(frame));
 
-  // The last StepBack() should cause a transition to the previous one.
-  // simulation time should be 31.744.
+  // The last StepBack() should cause a transition to a different chunk.
+  // Simulation time should be 31.460.
   expectedShashum = "043e1f2975619bf5b25aefab749d66f3aa510ef6";
   shasum = gazebo::common::get_sha1<std::string>(frame);
   EXPECT_EQ(shasum, expectedShashum);
