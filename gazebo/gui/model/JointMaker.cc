@@ -1323,7 +1323,6 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   size_t cIdx = jointChildName.find_last_of("::");
   if (cIdx != std::string::npos)
     jointChildName = jointChildName.substr(cIdx+1);
-
 }
 
 /////////////////////////////////////////////////

@@ -540,8 +540,6 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 {
   std::vector<QWidget *> newWidgets;
 
-  std::cerr << ">>> ConfigWidget::Parse(): msg=" << _msg->DebugString() << std::endl;
-
   const google::protobuf::Descriptor *d = _msg->GetDescriptor();
   if (!d)
     return NULL;

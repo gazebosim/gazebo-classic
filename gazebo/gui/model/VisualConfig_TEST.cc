@@ -76,7 +76,6 @@ void VisualConfig_TEST::VisualUpdates()
   QVERIFY(vc.GetData("v1") == NULL);
   QVERIFY(vc.GetData("v2") == NULL);
   QVERIFY(vc.GetData("v3") == NULL);
-
 }
 
 /////////////////////////////////////////////////
@@ -107,7 +106,6 @@ void VisualConfig_TEST::GeometryUpdates()
   QCOMPARE(0.0, size3.X());
   QCOMPARE(0.0, size3.Y());
   QCOMPARE(0.0, size3.Z());
-
 }
 
 // Generate a main function for the test

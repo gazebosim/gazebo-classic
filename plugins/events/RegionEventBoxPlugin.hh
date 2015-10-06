@@ -130,7 +130,6 @@ namespace gazebo
 
     /// \brief Pointer to event source object that emits sim events
     private: gazebo::EventSourcePtr eventSource;
-
   };
 }
 
