@@ -222,13 +222,6 @@ namespace gazebo
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
-      /// \brief Get a model by name.
-      /// This function is the same as GetByName, but limits the search to
-      /// only models.
-      /// \param[in] _name The name of the Model to find.
-      /// \return A pointer to the Model, or NULL if no model was found.
-      public: msgs::Light GetLightMsg(const std::string &_name);
-
       /// \brief Get the nearest model below and not encapsulating a point.
       /// Only objects below the start point can be returned. Any object
       /// that encapsulates the start point can not be returned from this
@@ -493,9 +486,13 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
-      /// \brief Process all received light messages.
+      /// \brief Process all received light factory messages.
       /// Must only be called from the World::ProcessMessages function.
-      private: void ProcessLightMsgs();
+      private: void ProcessLightFactoryMsgs();
+
+      /// \brief Process all received light modify messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessLightModifyMsgs();
 
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
@@ -511,7 +508,20 @@ namespace gazebo
 
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.
-      private: void OnLightMsg(ConstLightPtr &_msg);
+      /// \deprecated Topic ~/light deprecated.
+      /// See OnLightFactoryMsg which subscribes to ~/factory/light and
+      /// OnLightModifyMsg which subscribes to ~/light/modify
+      private: void OnLightMsg(ConstLightPtr &_msg) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Callback when a light message is received in the
+      /// ~/factory/light topic.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightFactoryMsg(ConstLightPtr &_msg);
+
+      /// \brief Callback when a light message is received in the
+      /// ~/light/modify topic.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightModifyMsg(ConstLightPtr &_msg);
 
       /// \internal
       /// \brief Private data pointer.

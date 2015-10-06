@@ -42,7 +42,7 @@ LightMaker::LightMaker() : EntityMaker(*new LightMakerPrivate)
   LightMakerPrivate *dPtr =
       reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
 
-  dPtr->lightPub = dPtr->node->Advertise<msgs::Light>("~/light");
+  dPtr->lightPub = dPtr->node->Advertise<msgs::Light>("~/factory/light");
 
   msgs::Set(dPtr->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
   msgs::Set(dPtr->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));

@@ -25,6 +25,7 @@
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/WorldState.hh"
 
@@ -75,9 +76,9 @@ UserCmd::UserCmd(std::string _id,
 
     physics::ModelPtr model =
         this->dataPtr->world->GetModel(this->dataPtr->name);
-    msgs::Light light =
-        this->dataPtr->world->GetLightMsg(this->dataPtr->name);
-    if (!model && !light.has_name())
+    physics::LightPtr light =
+        this->dataPtr->world->Light(this->dataPtr->name);
+    if (!model && !light)
     {
       gzerr << "Entity [" << this->dataPtr->name << "] not found."
           << std::endl;
@@ -87,8 +88,8 @@ UserCmd::UserCmd(std::string _id,
     this->dataPtr->sdf.reset(new sdf::SDF);
     if (model)
       this->dataPtr->sdf->Root()->Copy(model->GetSDF());
-    else if (light.has_name())
-      this->dataPtr->sdf->Root()->Copy(msgs::LightToSDF(light));
+    else if (light)
+      this->dataPtr->sdf->Root()->Copy(light->GetSDF());
 
     // Delete from here because we need to make ssure to copy the model first
     transport::requestNoReply(
@@ -118,9 +119,9 @@ void UserCmd::Undo()
     {
       physics::ModelPtr model =
           this->dataPtr->world->GetModel(this->dataPtr->name);
-      msgs::Light light =
-          this->dataPtr->world->GetLightMsg(this->dataPtr->name);
-      if (!model && !light.has_name())
+      physics::LightPtr light =
+          this->dataPtr->world->Light(this->dataPtr->name);
+      if (!model && !light)
       {
         gzerr << "Entity [" << this->dataPtr->name << "] not found."
             << std::endl;
@@ -130,8 +131,8 @@ void UserCmd::Undo()
       this->dataPtr->sdf.reset(new sdf::SDF);
       if (model)
         this->dataPtr->sdf->Root()->Copy(model->GetSDF());
-      else if (light.has_name())
-        this->dataPtr->sdf->Root()->Copy(msgs::LightToSDF(light));
+      else if (light)
+        this->dataPtr->sdf->Root()->Copy(light->GetSDF());
     }
 
     // Delete

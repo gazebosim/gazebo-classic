@@ -577,13 +577,21 @@ namespace gazebo
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg,
           Visual::VisualType _type = Visual::VT_ENTITY);
 
-      /// \brief Light message callback.
+      /// \brief Light factory message callback.
       /// \param[in] _msg The message data.
-      private: void OnLightMsg(ConstLightPtr &_msg);
+      private: void OnLightFactoryMsg(ConstLightPtr &_msg);
 
-      /// \brief Process a light message.
+      /// \brief Light modify message callback.
       /// \param[in] _msg The message data.
-      private: bool ProcessLightMsg(ConstLightPtr &_msg);
+      private: void OnLightModifyMsg(ConstLightPtr &_msg);
+
+      /// \brief Process a light factory message.
+      /// \param[in] _msg The message data.
+      private: bool ProcessLightFactoryMsg(ConstLightPtr &_msg);
+
+      /// \brief Process a light modify message.
+      /// \param[in] _msg The message data.
+      private: bool ProcessLightModifyMsg(ConstLightPtr &_msg);
 
       /// \brief Process a request message.
       /// \param[in] _msg The message data.

@@ -86,15 +86,15 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_STREQ(sceneMsg.light(0).name().c_str(), "sun");
   }
 
-  transport::PublisherPtr lightPub = this->node->Advertise<msgs::Light>(
-        "~/light");
+  transport::PublisherPtr lightModifyPub = this->node->Advertise<msgs::Light>(
+        "~/light/modify");
 
   // Set the light to be green
   {
     msgs::Light lightMsg;
     lightMsg.set_name("sun");
     msgs::Set(lightMsg.mutable_diffuse(), common::Color(0, 1, 0));
-    lightPub->Publish(lightMsg);
+    lightModifyPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
@@ -123,13 +123,16 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(sceneMsg.light(0).diffuse().b(), 0);
   }
 
+  transport::PublisherPtr lightFactoryPub = this->node->Advertise<msgs::Light>(
+        "~/factory/light");
+
   // Add a new light
   {
     msgs::Light lightMsg;
     lightMsg.set_name("test_light");
     msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 0, 1));
     lightMsg.set_type(msgs::Light::POINT);
-    lightPub->Publish(lightMsg);
+    lightFactoryPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
@@ -182,7 +185,7 @@ TEST_F(WorldTest, ModifyLight)
     lightMsg.set_name("test_spot_light");
     msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 1, 0));
     lightMsg.set_type(msgs::Light::SPOT);
-    lightPub->Publish(lightMsg);
+    lightFactoryPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
@@ -218,7 +221,7 @@ TEST_F(WorldTest, ModifyLight)
         ignition::math::Pose3d(
           ignition::math::Vector3d(3, 2, 1),
           ignition::math::Quaterniond(0, 1, 0, 0)));
-    lightPub->Publish(lightMsg);
+    lightModifyPub->Publish(lightMsg);
   }
 
   // Allow the world time to process the messages
@@ -263,6 +266,40 @@ TEST_F(WorldTest, ModifyLight)
     EXPECT_EQ(sceneMsg.light(1).pose().orientation().z(), 0);
 
     EXPECT_EQ(sceneMsg.light(1).type(), msgs::Light::SPOT);
+  }
+
+  // Add a new light with the name of a light that has been deleted
+  {
+    msgs::Light lightMsg;
+    lightMsg.set_name("test_light");
+    msgs::Set(lightMsg.mutable_diffuse(), common::Color(0, 0, 1));
+    lightMsg.set_type(msgs::Light::DIRECTIONAL);
+    lightFactoryPub->Publish(lightMsg);
+  }
+
+  // Allow the world time to process the messages
+  world->Step(1000);
+
+  {
+    // Check light objects
+    physics::Light_V lights = world->Lights();
+    EXPECT_EQ(lights.size(), 3);
+    EXPECT_STREQ(lights[2]->GetName().c_str(), "test_light");
+    msgs::Light lightMsg;
+    lights[2]->FillMsg(lightMsg);
+    EXPECT_DOUBLE_EQ(lightMsg.diffuse().r(), 0);
+    EXPECT_EQ(lightMsg.diffuse().g(), 0);
+    EXPECT_EQ(lightMsg.diffuse().b(), 1);
+    EXPECT_EQ(lightMsg.type(), msgs::Light::DIRECTIONAL);
+
+    // Check scene message
+    msgs::Scene sceneMsg = world->GetSceneMsg();
+    EXPECT_EQ(sceneMsg.light_size(), 3);
+    EXPECT_STREQ(sceneMsg.light(2).name().c_str(), "test_light");
+    EXPECT_EQ(sceneMsg.light(2).diffuse().r(), 0);
+    EXPECT_EQ(sceneMsg.light(2).diffuse().g(), 0);
+    EXPECT_EQ(sceneMsg.light(2).diffuse().b(), 1);
+    EXPECT_EQ(sceneMsg.light(2).type(), msgs::Light::DIRECTIONAL);
   }
 }
 

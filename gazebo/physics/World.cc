@@ -119,6 +119,7 @@ World::World(const std::string &_name)
 
   this->dataPtr->receiveMutex = new boost::recursive_mutex();
   this->dataPtr->loadModelMutex = new boost::mutex();
+  this->dataPtr->loadLightMutex = new boost::mutex();
 
   this->dataPtr->initialized = false;
   this->dataPtr->loaded = false;
@@ -165,6 +166,8 @@ World::~World()
   this->dataPtr->receiveMutex = NULL;
   delete this->dataPtr->loadModelMutex;
   this->dataPtr->loadModelMutex = NULL;
+  delete this->dataPtr->loadLightMutex;
+  this->dataPtr->loadLightMutex = NULL;
   delete this->dataPtr->setWorldPoseMutex;
   this->dataPtr->setWorldPoseMutex = NULL;
   delete this->dataPtr->worldUpdateMutex;
@@ -238,8 +241,15 @@ void World::Load(sdf::ElementPtr _sdf)
                                            &World::OnRequest, this, true);
   this->dataPtr->jointSub = this->dataPtr->node->Subscribe("~/joint",
       &World::JointLog, this);
+
   this->dataPtr->lightSub = this->dataPtr->node->Subscribe("~/light",
       &World::OnLightMsg, this);
+  this->dataPtr->lightFactorySub =
+      this->dataPtr->node->Subscribe("~/factory/light",
+      &World::OnLightFactoryMsg, this);
+  this->dataPtr->lightModifySub =
+      this->dataPtr->node->Subscribe("~/light/modify",
+      &World::OnLightModifyMsg, this);
 
   this->dataPtr->modelSub = this->dataPtr->node->Subscribe<msgs::Model>(
       "~/model/modify", &World::OnModelMsg, this);
@@ -252,7 +262,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->modelPub = this->dataPtr->node->Advertise<msgs::Model>(
       "~/model/info");
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
-      "~/light");
+      "~/light/modify");
 
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
@@ -950,7 +960,7 @@ ModelPtr World::GetModel(const std::string &_name)
 //////////////////////////////////////////////////
 LightPtr World::Light(const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(*this->dataPtr->loadModelMutex);
+  boost::mutex::scoped_lock lock(*this->dataPtr->loadLightMutex);
   return boost::dynamic_pointer_cast<physics::Light>(this->GetByName(_name));
 }
 
@@ -958,21 +968,6 @@ LightPtr World::Light(const std::string &_name)
 EntityPtr World::GetEntity(const std::string &_name)
 {
   return boost::dynamic_pointer_cast<Entity>(this->GetByName(_name));
-}
-
-//////////////////////////////////////////////////
-msgs::Light World::GetLightMsg(const std::string &_name)
-{
-  if (this->dataPtr->sdf->HasElement("light"))
-  {
-    sdf::ElementPtr lightElem = this->dataPtr->sdf->GetElement("light");
-    while (lightElem && lightElem->Get<std::string>("name") != _name)
-      lightElem = lightElem->GetNextElement("light");
-
-    msgs::Light msg = msgs::LightFromSDF(lightElem);
-    return msg;
-  }
-  return msgs::Light();
 }
 
 //////////////////////////////////////////////////
@@ -1008,7 +1003,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 //////////////////////////////////////////////////
 LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
 {
-  boost::mutex::scoped_lock lock(*this->dataPtr->loadModelMutex);
+  boost::mutex::scoped_lock lock(*this->dataPtr->loadLightMutex);
 
   if (_sdf->GetName() != "light")
   {
@@ -1723,57 +1718,78 @@ void World::ProcessModelMsgs()
 }
 
 //////////////////////////////////////////////////
-void World::ProcessLightMsgs()
+void World::ProcessLightModifyMsgs()
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  for (auto const &lightMsg : this->dataPtr->lightMsgs)
+  for (auto const &lightModifyMsg : this->dataPtr->lightModifyMsgs)
   {
-    LightPtr light = this->Light(lightMsg.name());
+    LightPtr light = this->Light(lightModifyMsg.name());
 
-    // Add a new light if the light doesn't exist.
-    //
-    // Note that this is dangerous, an old message might be trying to modify the
-    // pose of a light which has been deleted and ends up creating a new light.
-    // Consider separating light handling into many topics like it's done for
-    // models: ~/factory, ~/model/modify, ~/pose/info.
-    // That would affect user code and other clients such as GzWeb.
     if (!light)
     {
-      // Add to world SDF
-      sdf::ElementPtr lightSDF = msgs::LightToSDF(lightMsg);
-      lightSDF->SetParent(this->dataPtr->sdf);
-      lightSDF->GetParent()->InsertElement(lightSDF);
-
-      // Create new light object
-      this->LoadLight(lightSDF, this->dataPtr->rootElement);
+      gzerr << "Light [" << lightModifyMsg.name() << "] not found."
+          << " Use topic ~/factory/light to spawn a new light." << std::endl;
+      continue;
     }
     else
     {
       // Update in scene message
       for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
       {
-        if (this->dataPtr->sceneMsg.light(i).name() == lightMsg.name())
+        if (this->dataPtr->sceneMsg.light(i).name() == lightModifyMsg.name())
         {
-          this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(lightMsg);
+          this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(lightModifyMsg);
           break;
         }
       }
 
       // Update light object
-      light->ProcessMsg(lightMsg);
+      light->ProcessMsg(lightModifyMsg);
     }
   }
 
-  if (!this->dataPtr->lightMsgs.empty())
+  if (!this->dataPtr->lightModifyMsgs.empty())
   {
-    this->dataPtr->lightMsgs.clear();
+    this->dataPtr->lightModifyMsgs.clear();
+  }
+}
+
+//////////////////////////////////////////////////
+void World::ProcessLightFactoryMsgs()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  for (auto const &lightFactoryMsg : this->dataPtr->lightFactoryMsgs)
+  {
+    LightPtr light = this->Light(lightFactoryMsg.name());
+
+    if (light)
+    {
+      gzerr << "Light [" << lightFactoryMsg.name() << "] already exists."
+          << " Use topic ~/light/modify to modify it." << std::endl;
+      continue;
+    }
+    else
+    {
+      // Add to world SDF
+      sdf::ElementPtr lightSDF = msgs::LightToSDF(lightFactoryMsg);
+      lightSDF->SetParent(this->dataPtr->sdf);
+      lightSDF->GetParent()->InsertElement(lightSDF);
+
+      // Create new light object
+      this->LoadLight(lightSDF, this->dataPtr->rootElement);
+    }
+  }
+
+  if (!this->dataPtr->lightFactoryMsgs.empty())
+  {
+    this->dataPtr->lightFactoryMsgs.clear();
   }
 }
 
 //////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
-  std::list<sdf::ElementPtr> modelsToLoad;
+  std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
@@ -1907,11 +1923,7 @@ void World::ProcessFactoryMsgs()
         }
         else if (isLight)
         {
-          /// \TODO: Current broken. See Issue #67.
-          msgs::Light *lm = this->dataPtr->sceneMsg.add_light();
-          lm->CopyFrom(msgs::LightFromSDF(elem));
-
-          this->dataPtr->lightPub->Publish(*lm);
+          lightsToLoad.push_back(elem);
         }
       }
     }
@@ -1919,6 +1931,7 @@ void World::ProcessFactoryMsgs()
     this->dataPtr->factoryMsgs.clear();
   }
 
+  // Load models
   for (auto const &elem : modelsToLoad)
   {
     try
@@ -1932,6 +1945,21 @@ void World::ProcessFactoryMsgs()
     catch(...)
     {
       gzerr << "Loading model from factory message failed\n";
+    }
+  }
+
+  // Load lights
+  for (auto const &elem : lightsToLoad)
+  {
+    try
+    {
+      boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+      LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+    }
+    catch(...)
+    {
+      gzerr << "Loading light from factory message failed\n";
     }
   }
 }
@@ -2192,8 +2220,24 @@ void World::ProcessMessages()
       }
     }
     this->dataPtr->publishModelPoses.clear();
+  }
 
-    // Light poses
+  if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
+      this->dataPtr->processMsgsPeriod)
+  {
+    this->ProcessEntityMsgs();
+    this->ProcessRequestMsgs();
+    this->ProcessFactoryMsgs();
+    this->ProcessModelMsgs();
+    this->ProcessLightFactoryMsgs();
+    this->ProcessLightModifyMsgs();
+    this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
+  }
+
+  // Process light poses after light factory
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
     if (!this->dataPtr->publishLightPoses.empty() && this->dataPtr->lightPub &&
         this->dataPtr->lightPub->HasConnections())
     {
@@ -2208,17 +2252,6 @@ void World::ProcessMessages()
       }
     }
     this->dataPtr->publishLightPoses.clear();
-  }
-
-  if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
-      this->dataPtr->processMsgsPeriod)
-  {
-    this->ProcessEntityMsgs();
-    this->ProcessRequestMsgs();
-    this->ProcessFactoryMsgs();
-    this->ProcessModelMsgs();
-    this->ProcessLightMsgs();
-    this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
   }
 }
 
@@ -2429,10 +2462,9 @@ void World::RemoveModel(const std::string &_name)
   // Cleanup the publishLightPoses list.
   {
     boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
-    for (auto light = this->dataPtr->publishLightPoses.begin();
-        light != this->dataPtr->publishLightPoses.end(); ++light)
+    for (auto light : this->dataPtr->publishLightPoses)
     {
-      if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
+      if (light->GetName() == _name || light->GetScopedName() == _name)
       {
         this->dataPtr->publishLightPoses.erase(light);
         break;
@@ -2442,10 +2474,24 @@ void World::RemoveModel(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void World::OnLightMsg(ConstLightPtr &_msg)
+void World::OnLightMsg(ConstLightPtr &/*_msg*/)
+{
+  gzerr << "Topic ~/light deprecated, use ~/factory/light to spawn new lights "
+      << "and ~/light/modify to modify existing lights." << std::endl;
+}
+
+/////////////////////////////////////////////////
+void World::OnLightModifyMsg(ConstLightPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->lightMsgs.push_back(*_msg);
+  this->dataPtr->lightModifyMsgs.push_back(*_msg);
+}
+
+/////////////////////////////////////////////////
+void World::OnLightFactoryMsg(ConstLightPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->lightFactoryMsgs.push_back(*_msg);
 }
 
 /////////////////////////////////////////////////

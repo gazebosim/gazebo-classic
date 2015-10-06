@@ -97,7 +97,7 @@ void ModelManipulator::Init()
   this->dataPtr->modelPub =
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
   this->dataPtr->lightPub =
-      this->dataPtr->node->Advertise<msgs::Light>("~/light");
+      this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 

@@ -85,3 +85,8 @@ void Light::PublishPose()
       shared_from_this()));
 }
 
+//////////////////////////////////////////////////
+void Light::OnPoseChange()
+{
+}
+
