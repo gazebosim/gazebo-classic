@@ -20,6 +20,7 @@
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointMaker.hh"
+#include "gazebo/gui/model/JointCreationDialogPrivate.hh"
 #include "gazebo/gui/model/JointCreationDialog.hh"
 
 using namespace gazebo;
@@ -27,7 +28,8 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
-    QWidget *_parent) : QDialog(_parent)
+    QWidget *_parent) : QDialog(_parent),
+    dataPtr(new JointCreationDialogPrivate)
 {
   this->setObjectName("JointCreationDialogDialog");
   this->setWindowTitle(tr("Create Joint"));
@@ -36,10 +38,10 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setMinimumWidth(300);
   this->setMinimumHeight(650);
 
-  this->jointMaker = _jointMaker;
+  this->dataPtr->jointMaker = _jointMaker;
 
   // Style sheets
-  this->normalStyleSheet =
+  this->dataPtr->normalStyleSheet =
         "QWidget\
         {\
           background-color: " + ConfigWidget::bgColors[0] + ";\
@@ -54,7 +56,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
           background-color: " + ConfigWidget::widgetColors[0] +
         "}";
 
-  this->warningStyleSheet =
+  this->dataPtr->warningStyleSheet =
         "QWidget\
         {\
           background-color: " + ConfigWidget::bgColors[0] + ";\
@@ -65,7 +67,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
           background-color: " + ConfigWidget::widgetColors[0] +
         "}";
 
-  this->activeStyleSheet =
+  this->dataPtr->activeStyleSheet =
         "QWidget\
         {\
           background-color: " + ConfigWidget::bgColors[0] + ";\
@@ -77,7 +79,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
         "}";
 
   // ConfigWidget
-  this->configWidget = new ConfigWidget();
+  this->dataPtr->configWidget = new ConfigWidget();
 
   // Joint types
   QRadioButton *fixedJointRadio = new QRadioButton(tr("Fixed"));
@@ -89,16 +91,16 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QRadioButton *ballJointRadio = new QRadioButton(tr("Ball"));
   QRadioButton *gearboxJointRadio = new QRadioButton(tr("Gearbox"));
 
-  this->typeButtons = new QButtonGroup();
-  this->typeButtons->addButton(fixedJointRadio, 1);
-  this->typeButtons->addButton(prismaticJointRadio, 2);
-  this->typeButtons->addButton(revoluteJointRadio, 3);
-  this->typeButtons->addButton(revolute2JointRadio, 4);
-  this->typeButtons->addButton(screwJointRadio, 5);
-  this->typeButtons->addButton(universalJointRadio, 6);
-  this->typeButtons->addButton(ballJointRadio, 7);
-  this->typeButtons->addButton(gearboxJointRadio, 7);
-  connect(this->typeButtons, SIGNAL(buttonClicked(int)),
+  this->dataPtr->typeButtons = new QButtonGroup();
+  this->dataPtr->typeButtons->addButton(fixedJointRadio, 1);
+  this->dataPtr->typeButtons->addButton(prismaticJointRadio, 2);
+  this->dataPtr->typeButtons->addButton(revoluteJointRadio, 3);
+  this->dataPtr->typeButtons->addButton(revolute2JointRadio, 4);
+  this->dataPtr->typeButtons->addButton(screwJointRadio, 5);
+  this->dataPtr->typeButtons->addButton(universalJointRadio, 6);
+  this->dataPtr->typeButtons->addButton(ballJointRadio, 7);
+  this->dataPtr->typeButtons->addButton(gearboxJointRadio, 7);
+  connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
       this, SLOT(OnTypeFromDialog(int)));
 
   // Types layout
@@ -117,7 +119,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   typesWidget->setLayout(typesLayout);
 
   QWidget *typesGroupWidget =
-      this->configWidget->CreateGroupWidget("Joint types", typesWidget, 0);
+      this->dataPtr->configWidget->CreateGroupWidget("Joint types",
+      typesWidget, 0);
 
   // Link selections
   QLabel *selectionsText = new QLabel(tr(
@@ -126,56 +129,62 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Parent
   std::vector<std::string> links;
-  this->parentLinkWidget = configWidget->CreateEnumWidget("parent", links, 0);
-  this->parentLinkWidget->setStyleSheet(this->activeStyleSheet);
-  this->configWidget->AddConfigChildWidget("parentCombo",
-      this->parentLinkWidget);
+  this->dataPtr->parentLinkWidget =
+      this->dataPtr->configWidget->CreateEnumWidget("parent", links, 0);
+  this->dataPtr->parentLinkWidget->setStyleSheet(
+      this->dataPtr->activeStyleSheet);
+  this->dataPtr->configWidget->AddConfigChildWidget("parentCombo",
+      this->dataPtr->parentLinkWidget);
 
   // Child
-  this->childLinkWidget = configWidget->CreateEnumWidget("child", links, 0);
-  this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
-  this->configWidget->AddConfigChildWidget("childCombo", this->childLinkWidget);
-  this->configWidget->SetWidgetReadOnly("childCombo", true);
+  this->dataPtr->childLinkWidget =
+      this->dataPtr->configWidget->CreateEnumWidget("child", links, 0);
+  this->dataPtr->childLinkWidget->setStyleSheet(
+      this->dataPtr->normalStyleSheet);
+  this->dataPtr->configWidget->AddConfigChildWidget("childCombo",
+      this->dataPtr->childLinkWidget);
+  this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", true);
 
   // Connect all enum value changes
-  QObject::connect(this->configWidget,
+  QObject::connect(this->dataPtr->configWidget,
       SIGNAL(EnumValueChanged(const QString &, const QString &)), this,
       SLOT(OnEnumChanged(const QString &, const QString &)));
 
   // Swap button
-  this->swapButton = new QToolButton();
-  this->swapButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->swapButton->setIcon(QPixmap(":/images/swap-parent-child.png"));
-  this->swapButton->setFixedSize(QSize(50, 50));
-  this->swapButton->setIconSize(QSize(35, 35));
-  this->swapButton->setToolTip("Swap parent and child");
-  this->swapButton->setStyleSheet(
+  this->dataPtr->swapButton = new QToolButton();
+  this->dataPtr->swapButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->swapButton->setIcon(
+      QPixmap(":/images/swap-parent-child.png"));
+  this->dataPtr->swapButton->setFixedSize(QSize(50, 50));
+  this->dataPtr->swapButton->setIconSize(QSize(35, 35));
+  this->dataPtr->swapButton->setToolTip("Swap parent and child");
+  this->dataPtr->swapButton->setStyleSheet(
       "QToolButton\
       {\
         background-color: " + ConfigWidget::bgColors[0] +
       "}");
-  connect(this->swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
+  connect(this->dataPtr->swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
 
   // Links layout
   QGridLayout *linksLayout = new QGridLayout();
   linksLayout->setContentsMargins(0, 0, 0, 0);
   linksLayout->addWidget(selectionsText, 0, 0, 1, 2);
-  linksLayout->addWidget(this->parentLinkWidget, 1, 0);
-  linksLayout->addWidget(this->childLinkWidget, 2, 0);
-  linksLayout->addWidget(this->swapButton, 1, 1, 2, 1);
+  linksLayout->addWidget(this->dataPtr->parentLinkWidget, 1, 0);
+  linksLayout->addWidget(this->dataPtr->childLinkWidget, 2, 0);
+  linksLayout->addWidget(this->dataPtr->swapButton, 1, 1, 2, 1);
 
   // Links group widget
   ConfigChildWidget *linksWidget = new ConfigChildWidget();
   linksWidget->setLayout(linksLayout);
 
-  QWidget *linksGroupWidget = this->configWidget->CreateGroupWidget(
+  QWidget *linksGroupWidget = this->dataPtr->configWidget->CreateGroupWidget(
       "Link Selections", linksWidget, 0);
 
   // Pose widget
-  ConfigChildWidget *poseWidget = this->configWidget->CreatePoseWidget("pose",
-      0);
-  this->configWidget->AddConfigChildWidget("pose", poseWidget);
-  connect(this->configWidget,
+  ConfigChildWidget *poseWidget =
+      this->dataPtr->configWidget->CreatePoseWidget("pose", 0);
+  this->dataPtr->configWidget->AddConfigChildWidget("pose", poseWidget);
+  connect(this->dataPtr->configWidget,
       SIGNAL(PoseValueChanged(const QString,
       const ignition::math::Pose3d)),
       this, SLOT(OnPoseFromDialog(const QString,
@@ -196,7 +205,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   ConfigChildWidget *poseGeneralWidget = new ConfigChildWidget();
   poseGeneralWidget->setLayout(poseGeneralLayout);
 
-  QWidget *poseGroupWidget = this->configWidget->CreateGroupWidget(
+  QWidget *poseGroupWidget = this->dataPtr->configWidget->CreateGroupWidget(
       "Relative Pose", poseGeneralWidget, 0);
 
   // Config Widget layout
@@ -205,11 +214,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   configLayout->addWidget(linksGroupWidget);
   configLayout->addWidget(poseGroupWidget);
 
-  this->configWidget->setLayout(configLayout);
+  this->dataPtr->configWidget->setLayout(configLayout);
 
   // Scroll area
   QScrollArea *scrollArea = new QScrollArea;
-  scrollArea->setWidget(configWidget);
+  scrollArea->setWidget(this->dataPtr->configWidget);
   scrollArea->setWidgetResizable(true);
 
   // General layout
@@ -222,14 +231,15 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
   // Create button
-  this->createButton = new QPushButton(tr("Create"));
-  this->createButton->setEnabled(false);
-  connect(this->createButton, SIGNAL(clicked()), this, SLOT(OnCreate()));
+  this->dataPtr->createButton = new QPushButton(tr("Create"));
+  this->dataPtr->createButton->setEnabled(false);
+  connect(this->dataPtr->createButton, SIGNAL(clicked()), this,
+      SLOT(OnCreate()));
 
   // Buttons layout
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(createButton);
+  buttonsLayout->addWidget(this->dataPtr->createButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
   // Main layout
@@ -240,11 +250,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setLayout(mainLayout);
 
   // Gazebo event connections
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectJointParentFrom3D(
       boost::bind(&JointCreationDialog::OnParentFrom3D, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectJointChildFrom3D(
       boost::bind(&JointCreationDialog::OnChildFrom3D, this, _1)));
 
@@ -253,9 +263,16 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 }
 
 /////////////////////////////////////////////////
+JointCreationDialog::~JointCreationDialog()
+{
+  delete this->dataPtr;
+  this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
 void JointCreationDialog::Open(JointMaker::JointType _type)
 {
-  if (!this->jointMaker)
+  if (!this->dataPtr->jointMaker)
   {
     gzerr << "Joint maker not found, can't open joint creation dialog."
         << std::endl;
@@ -263,28 +280,31 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   }
 
   // Check joint type
-  this->typeButtons->button(static_cast<int>(_type))->setChecked(true);
+  this->dataPtr->typeButtons->button(static_cast<int>(_type))
+      ->setChecked(true);
 
   // Reset enabled states
-  this->createButton->setEnabled(false);
-  this->swapButton->setEnabled(false);
-  this->configWidget->SetWidgetReadOnly("childCombo", true);
-  this->parentLinkWidget->setStyleSheet(this->activeStyleSheet);
-  this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->dataPtr->createButton->setEnabled(false);
+  this->dataPtr->swapButton->setEnabled(false);
+  this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", true);
+  this->dataPtr->parentLinkWidget->setStyleSheet(
+      this->dataPtr->activeStyleSheet);
+  this->dataPtr->childLinkWidget->setStyleSheet(
+      this->dataPtr->normalStyleSheet);
 
   // Clear links
-  this->configWidget->ClearEnumWidget("parentCombo");
-  this->configWidget->ClearEnumWidget("childCombo");
+  this->dataPtr->configWidget->ClearEnumWidget("parentCombo");
+  this->dataPtr->configWidget->ClearEnumWidget("childCombo");
 
   // Add an empty option to each
-  this->configWidget->AddItemEnumWidget("parentCombo", "");
-  this->configWidget->AddItemEnumWidget("childCombo", "");
+  this->dataPtr->configWidget->AddItemEnumWidget("parentCombo", "");
+  this->dataPtr->configWidget->AddItemEnumWidget("childCombo", "");
 
   // Fill with all existing links
-  for (auto link : this->jointMaker->LinkList())
+  for (auto link : this->dataPtr->jointMaker->LinkList())
   {
-    this->configWidget->AddItemEnumWidget("parentCombo", link.second);
-    this->configWidget->AddItemEnumWidget("childCombo", link.second);
+    this->dataPtr->configWidget->AddItemEnumWidget("parentCombo", link.second);
+    this->dataPtr->configWidget->AddItemEnumWidget("childCombo", link.second);
   }
 
   this->move(0, 0);
@@ -302,9 +322,9 @@ void JointCreationDialog::OnTypeFromDialog(int _type)
 void JointCreationDialog::OnLinkFromDialog()
 {
   std::string currentParent =
-      this->configWidget->GetEnumWidgetValue("parentCombo");
+      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
   std::string currentChild =
-      this->configWidget->GetEnumWidgetValue("childCombo");
+      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
 
   // Notify so 3D is updated
   if (currentParent != currentChild)
@@ -343,13 +363,14 @@ void JointCreationDialog::OnParentFrom3D(const std::string &_linkName)
   if (idx != std::string::npos)
     leafName = _linkName.substr(idx+1);
 
-  this->configWidget->blockSignals(true);
-  if (!this->configWidget->SetEnumWidgetValue("parentCombo", leafName))
+  this->dataPtr->configWidget->blockSignals(true);
+  if (!this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo",
+      leafName))
   {
     gzerr << "Requested link [" << leafName << "] not found" << std::endl;
     return;
   }
-  this->configWidget->blockSignals(false);
+  this->dataPtr->configWidget->blockSignals(false);
 
   this->OnParentImpl(QString::fromStdString(_linkName));
 }
@@ -363,7 +384,7 @@ void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
     return;
   }
 
-  if (this->configWidget->GetWidgetReadOnly("childCombo"))
+  if (this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
   {
     gzerr << "It shouldn't be possible to set child before parent."
         << std::endl;
@@ -376,13 +397,13 @@ void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
   if (idx != std::string::npos)
     leafName = _linkName.substr(idx+1);
 
-  this->configWidget->blockSignals(true);
-  if (!this->configWidget->SetEnumWidgetValue("childCombo", leafName))
+  this->dataPtr->configWidget->blockSignals(true);
+  if (!this->dataPtr->configWidget->SetEnumWidgetValue("childCombo", leafName))
   {
     gzerr << "Requested link [" << leafName << "] not found" << std::endl;
     return;
   }
-  this->configWidget->blockSignals(false);
+  this->dataPtr->configWidget->blockSignals(false);
 
   this->OnChildImpl(QString::fromStdString(_linkName));
 }
@@ -397,16 +418,17 @@ void JointCreationDialog::OnParentImpl(const QString &_linkName)
   }
 
   // Remove empty option
-  this->configWidget->RemoveItemEnumWidget("parentCombo", "");
+  this->dataPtr->configWidget->RemoveItemEnumWidget("parentCombo", "");
 
   // Check if links are valid
   this->CheckLinksValid();
 
   // Enable child selection
-  if (this->configWidget->GetWidgetReadOnly("childCombo"))
+  if (this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
   {
-    this->configWidget->SetWidgetReadOnly("childCombo", false);
-    this->childLinkWidget->setStyleSheet(this->activeStyleSheet);
+    this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", false);
+    this->dataPtr->childLinkWidget->setStyleSheet(
+        this->dataPtr->activeStyleSheet);
   }
 }
 
@@ -420,11 +442,11 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
   }
 
   // Enable create and swap
-  this->createButton->setEnabled(true);
-  this->swapButton->setEnabled(true);
+  this->dataPtr->createButton->setEnabled(true);
+  this->dataPtr->swapButton->setEnabled(true);
 
   // Remove empty option
-  this->configWidget->RemoveItemEnumWidget("childCombo", "");
+  this->dataPtr->configWidget->RemoveItemEnumWidget("childCombo", "");
 
   // Check if links are valid
   this->CheckLinksValid();
@@ -434,7 +456,7 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
 void JointCreationDialog::OnCancel()
 {
   this->close();
-  this->jointMaker->Stop();
+  this->dataPtr->jointMaker->Stop();
 }
 
 /////////////////////////////////////////////////
@@ -456,20 +478,20 @@ void JointCreationDialog::OnSwap()
 {
   // Get current values
   std::string currentParent =
-      this->configWidget->GetEnumWidgetValue("parentCombo");
+      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
   std::string currentChild =
-      this->configWidget->GetEnumWidgetValue("childCombo");
+      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
 
   // Choose new values
-  this->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
-  this->configWidget->SetEnumWidgetValue("childCombo", currentParent);
+  this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
+  this->dataPtr->configWidget->SetEnumWidgetValue("childCombo", currentParent);
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::UpdateRelativePose(
     const ignition::math::Pose3d &_pose)
 {
-  this->configWidget->SetPoseWidgetValue("pose", math::Pose(_pose));
+  this->dataPtr->configWidget->SetPoseWidgetValue("pose", math::Pose(_pose));
 }
 
 /////////////////////////////////////////////////
@@ -490,24 +512,28 @@ void JointCreationDialog::OnEnumChanged(const QString &_name,
 void JointCreationDialog::CheckLinksValid()
 {
   std::string currentParent =
-      this->configWidget->GetEnumWidgetValue("parentCombo");
+      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
   std::string currentChild =
-      this->configWidget->GetEnumWidgetValue("childCombo");
+      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
 
   // Warning if parent is the same as the child and don't allow creation
   if (currentParent == currentChild)
   {
-    this->parentLinkWidget->setStyleSheet(this->warningStyleSheet);
-    this->childLinkWidget->setStyleSheet(this->warningStyleSheet);
-    this->createButton->setEnabled(false);
+    this->dataPtr->parentLinkWidget->setStyleSheet(
+        this->dataPtr->warningStyleSheet);
+    this->dataPtr->childLinkWidget->setStyleSheet(
+        this->dataPtr->warningStyleSheet);
+    this->dataPtr->createButton->setEnabled(false);
   }
   else
   {
-    this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
-    if (!this->configWidget->GetWidgetReadOnly("childCombo"))
+    this->dataPtr->parentLinkWidget->setStyleSheet(
+        this->dataPtr->normalStyleSheet);
+    if (!this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
     {
-      this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
-      this->createButton->setEnabled(true);
+      this->dataPtr->childLinkWidget->setStyleSheet(
+          this->dataPtr->normalStyleSheet);
+      this->dataPtr->createButton->setEnabled(true);
     }
   }
 }
