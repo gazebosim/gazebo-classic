@@ -99,20 +99,20 @@ JointMaker::JointMaker()
       boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectJointTypeChosenDialog(
-      boost::bind(&JointMaker::OnJointTypeChosenDialog, this, _1)));
+      gui::model::Events::ConnectJointTypeFromDialog(
+      boost::bind(&JointMaker::OnJointTypeFromDialog, this, _1)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectJointParentChosenDialog(
-      boost::bind(&JointMaker::OnJointParentChosenDialog, this, _1)));
+      gui::model::Events::ConnectJointParentFromDialog(
+      boost::bind(&JointMaker::OnJointParentFromDialog, this, _1)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectJointChildChosenDialog(
-      boost::bind(&JointMaker::OnJointChildChosenDialog, this, _1)));
+      gui::model::Events::ConnectJointChildFromDialog(
+      boost::bind(&JointMaker::OnJointChildFromDialog, this, _1)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectJointPoseChosenDialog(
-      boost::bind(&JointMaker::OnJointPoseChosenDialog, this, _1, _2)));
+      gui::model::Events::ConnectJointPoseFromDialog(
+      boost::bind(&JointMaker::OnJointPoseFromDialog, this, _1, _2)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointCreateDialog(
@@ -439,22 +439,22 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         // Pressed parent link
         if (!this->parentLinkVis)
         {
-          this->ParentLinkChosen(this->hoverVis);
+          this->NewParentLink(this->hoverVis);
 
           if (this->parentLinkVis)
           {
-            gui::model::Events::jointParentChosen3D(
+            gui::model::Events::jointParentFrom3D(
                 this->parentLinkVis->GetName());
           }
         }
         // Pressed child link
         else if (this->parentLinkVis != this->hoverVis)
         {
-          this->ChildLinkChosen(this->hoverVis);
+          this->NewChildLink(this->hoverVis);
 
           if (this->childLinkVis)
           {
-            gui::model::Events::jointChildChosen3D(
+            gui::model::Events::jointChildFrom3D(
                 this->childLinkVis->GetName());
           }
         }
@@ -1578,7 +1578,7 @@ void JointMaker::ShowJoints(bool _show)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::ParentLinkChosen(rendering::VisualPtr _parentLink)
+void JointMaker::NewParentLink(rendering::VisualPtr _parentLink)
 {
   if (!_parentLink)
   {
@@ -1620,7 +1620,7 @@ void JointMaker::ParentLinkChosen(rendering::VisualPtr _parentLink)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
+void JointMaker::NewChildLink(rendering::VisualPtr _childLink)
 {
   if (!_childLink)
   {
@@ -1668,7 +1668,7 @@ void JointMaker::ChildLinkChosen(rendering::VisualPtr _childLink)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointTypeChosenDialog(JointType _type)
+void JointMaker::OnJointTypeFromDialog(JointType _type)
 {
   this->jointType = _type;
 
@@ -1680,7 +1680,7 @@ void JointMaker::OnJointTypeChosenDialog(JointType _type)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointParentChosenDialog(const std::string &_leafName)
+void JointMaker::OnJointParentFromDialog(const std::string &_leafName)
 {
   // Get scoped name
   std::string linkName;
@@ -1705,11 +1705,11 @@ void JointMaker::OnJointParentChosenDialog(const std::string &_leafName)
   rendering::VisualPtr vis = scene->GetVisual(linkName);
 
   if (vis)
-    this->ParentLinkChosen(vis);
+    this->NewParentLink(vis);
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointChildChosenDialog(const std::string &_leafName)
+void JointMaker::OnJointChildFromDialog(const std::string &_leafName)
 {
   // Get scoped name
   std::string linkName;
@@ -1734,11 +1734,11 @@ void JointMaker::OnJointChildChosenDialog(const std::string &_leafName)
   rendering::VisualPtr vis = scene->GetVisual(linkName);
 
   if (vis)
-    this->ChildLinkChosen(vis);
+    this->NewChildLink(vis);
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointPoseChosenDialog(const ignition::math::Pose3d &_pose,
+void JointMaker::OnJointPoseFromDialog(const ignition::math::Pose3d &_pose,
     bool reset)
 {
   if (this->parentLinkVis && this->childLinkVis)

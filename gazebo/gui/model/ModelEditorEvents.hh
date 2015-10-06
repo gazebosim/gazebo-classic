@@ -447,93 +447,93 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { requestModelPluginRemoval.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the joint parent chosen 3d signal.
+        /// \brief Connect a Gazebo event to the joint parent from 3d signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
-            ConnectJointParentChosen3D(T _subscriber)
-          { return jointParentChosen3D.Connect(_subscriber); }
+            ConnectJointParentFrom3D(T _subscriber)
+          { return jointParentFrom3D.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the joint parent chosen 3d
+        /// \brief Disconnect a Gazebo event from the joint parent from 3d
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectJointParentChosen3D(
+        public: static void DisconnectJointParentFrom3D(
             event::ConnectionPtr _subscriber)
-          { jointParentChosen3D.Disconnect(_subscriber); }
+          { jointParentFrom3D.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the joint child chosen 3d signal.
+        /// \brief Connect a Gazebo event to the joint child from 3d signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
-            ConnectJointChildChosen3D(T _subscriber)
-          { return jointChildChosen3D.Connect(_subscriber); }
+            ConnectJointChildFrom3D(T _subscriber)
+          { return jointChildFrom3D.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the joint child chosen 3d
+        /// \brief Disconnect a Gazebo event from the joint child from 3d
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectJointChildChosen3D(
+        public: static void DisconnectJointChildFrom3D(
             event::ConnectionPtr _subscriber)
-          { jointChildChosen3D.Disconnect(_subscriber); }
+          { jointChildFrom3D.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the joint type chosen dialog
-        /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        /// \return a connection
-        public: template<typename T> static event::ConnectionPtr
-            ConnectJointTypeChosenDialog(T _subscriber)
-          { return jointTypeChosenDialog.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the joint type chosen dialog
-        /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectJointTypeChosenDialog(
-            event::ConnectionPtr _subscriber)
-          { jointTypeChosenDialog.Disconnect(_subscriber); }
-
-        /// \brief Connect a Gazebo event to the joint parent chosen dialog
+        /// \brief Connect a Gazebo event to the joint type from dialog
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
-            ConnectJointParentChosenDialog(T _subscriber)
-          { return jointParentChosenDialog.Connect(_subscriber); }
+            ConnectJointTypeFromDialog(T _subscriber)
+          { return jointTypeFromDialog.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the joint parent chosen dialog
+        /// \brief Disconnect a Gazebo event from the joint type from dialog
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectJointParentChosenDialog(
+        public: static void DisconnectJointTypeFromDialog(
             event::ConnectionPtr _subscriber)
-          { jointParentChosenDialog.Disconnect(_subscriber); }
+          { jointTypeFromDialog.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the joint child chosen dialog
+        /// \brief Connect a Gazebo event to the joint parent from dialog
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
-            ConnectJointChildChosenDialog(T _subscriber)
-          { return jointChildChosenDialog.Connect(_subscriber); }
+            ConnectJointParentFromDialog(T _subscriber)
+          { return jointParentFromDialog.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the joint child chosen dialog
+        /// \brief Disconnect a Gazebo event from the joint parent from dialog
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectJointChildChosenDialog(
+        public: static void DisconnectJointParentFromDialog(
             event::ConnectionPtr _subscriber)
-          { jointChildChosenDialog.Disconnect(_subscriber); }
+          { jointParentFromDialog.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the joint pose chosen dialog
+        /// \brief Connect a Gazebo event to the joint child from dialog
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
-            ConnectJointPoseChosenDialog(T _subscriber)
-          { return jointPoseChosenDialog.Connect(_subscriber); }
+            ConnectJointChildFromDialog(T _subscriber)
+          { return jointChildFromDialog.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the joint child chosen dialog
+        /// \brief Disconnect a Gazebo event from the joint child from dialog
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectJointPoseChosenDialog(
+        public: static void DisconnectJointChildFromDialog(
             event::ConnectionPtr _subscriber)
-          { jointPoseChosenDialog.Disconnect(_subscriber); }
+          { jointChildFromDialog.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the joint pose from dialog
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectJointPoseFromDialog(T _subscriber)
+          { return jointPoseFromDialog.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the joint child from dialog
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectJointPoseFromDialog(
+            event::ConnectionPtr _subscriber)
+          { jointPoseFromDialog.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the joint created dialog signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -655,26 +655,26 @@ namespace gazebo
             requestModelPluginRemoval;
 
         /// \brief Request to select or deselect a joint.
-        public: static event::EventT<void (std::string)> jointParentChosen3D;
+        public: static event::EventT<void (std::string)> jointParentFrom3D;
 
         /// \brief Request to select or deselect a joint.
-        public: static event::EventT<void (std::string)> jointChildChosen3D;
+        public: static event::EventT<void (std::string)> jointChildFrom3D;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (JointMaker::JointType)>
-            jointTypeChosenDialog;
+            jointTypeFromDialog;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string)>
-            jointParentChosenDialog;
+            jointParentFromDialog;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string)>
-            jointChildChosenDialog;
+            jointChildFromDialog;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (ignition::math::Pose3d, bool)>
-            jointPoseChosenDialog;
+            jointPoseFromDialog;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void ()> jointCreateDialog;

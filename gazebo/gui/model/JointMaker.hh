@@ -277,12 +277,12 @@ namespace gazebo
       /// \param[in] _linkId Unique link identifying name.
       private: void OnLinkRemoved(const std::string &_linkName);
 
-      private: void ParentLinkChosen(rendering::VisualPtr _parentLink);
-      private: void ChildLinkChosen(rendering::VisualPtr _childLink);
-      private: void OnJointTypeChosenDialog(JointType _type);
-      private: void OnJointParentChosenDialog(const std::string &_name);
-      private: void OnJointChildChosenDialog(const std::string &_name);
-      private: void OnJointPoseChosenDialog(
+      private: void NewParentLink(rendering::VisualPtr _parentLink);
+      private: void NewChildLink(rendering::VisualPtr _childLink);
+      private: void OnJointTypeFromDialog(JointType _type);
+      private: void OnJointParentFromDialog(const std::string &_name);
+      private: void OnJointChildFromDialog(const std::string &_name);
+      private: void OnJointPoseFromDialog(
           const ignition::math::Pose3d &_pose, bool _reset);
       private: void OnJointCreateDialog();
 

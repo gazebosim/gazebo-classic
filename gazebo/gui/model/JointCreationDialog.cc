@@ -144,8 +144,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Swap button
   this->swapButton = new QToolButton();
-  this->swapButton->setText("Swap");
-  this->swapButton->setMinimumWidth(60);
+  this->swapButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->swapButton->setIcon(QPixmap(":/images/swap-parent-child.png"));
+  this->swapButton->setFixedSize(QSize(50, 50));
+  this->swapButton->setIconSize(QSize(35, 35));
+  this->swapButton->setToolTip("Swap parent and child");
   this->swapButton->setStyleSheet(
       "QToolButton\
       {\
@@ -159,7 +162,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   linksLayout->addWidget(selectionsText, 0, 0, 1, 2);
   linksLayout->addWidget(this->parentLinkWidget, 1, 0);
   linksLayout->addWidget(this->childLinkWidget, 2, 0);
-  linksLayout->addWidget(swapButton, 1, 1, 2, 1);
+  linksLayout->addWidget(this->swapButton, 1, 1, 2, 1);
 
   // Links group widget
   ConfigChildWidget *linksWidget = new ConfigChildWidget();
@@ -238,11 +241,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Gazebo event connections
   this->connections.push_back(
-      gui::model::Events::ConnectJointParentChosen3D(
+      gui::model::Events::ConnectJointParentFrom3D(
       boost::bind(&JointCreationDialog::OnParentFrom3D, this, _1)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectJointChildChosen3D(
+      gui::model::Events::ConnectJointChildFrom3D(
       boost::bind(&JointCreationDialog::OnChildFrom3D, this, _1)));
 
   // Qt signal-slot connections
@@ -292,7 +295,7 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
 void JointCreationDialog::OnTypeFromDialog(int _type)
 {
   JointMaker::JointType type = static_cast<JointMaker::JointType>(_type);
-  gui::model::Events::jointTypeChosenDialog(type);
+  gui::model::Events::jointTypeFromDialog(type);
 }
 
 /////////////////////////////////////////////////
@@ -307,9 +310,9 @@ void JointCreationDialog::OnLinkFromDialog()
   if (currentParent != currentChild)
   {
     if (currentParent != "")
-      gui::model::Events::jointParentChosenDialog(currentParent);
+      gui::model::Events::jointParentFromDialog(currentParent);
     if (currentChild != "")
-      gui::model::Events::jointChildChosenDialog(currentChild);
+      gui::model::Events::jointChildFromDialog(currentChild);
   }
 
   this->OnParentImpl(QString::fromStdString(currentParent));
@@ -323,7 +326,7 @@ void JointCreationDialog::OnPoseFromDialog(const QString &/*_name*/,
     const ignition::math::Pose3d &_pose)
 {
   // Notify so 3D is updated
-  gui::model::Events::jointPoseChosenDialog(_pose, false);
+  gui::model::Events::jointPoseFromDialog(_pose, false);
 }
 
 /////////////////////////////////////////////////
@@ -472,7 +475,7 @@ void JointCreationDialog::UpdateRelativePose(
 /////////////////////////////////////////////////
 void JointCreationDialog::OnResetPoses()
 {
-  gui::model::Events::jointPoseChosenDialog(ignition::math::Pose3d(), true);
+  gui::model::Events::jointPoseFromDialog(ignition::math::Pose3d(), true);
 }
 
 /////////////////////////////////////////////////
