@@ -85,9 +85,6 @@ namespace gazebo
 
       /// \brief Camera perspective view action cloned from main window.
       public: QAction *cameraPerspectiveAct;
-
-      /// \brief Save the main window paused state to use when returning.
-      public: bool mainWindowPaused;
     };
   }
 }

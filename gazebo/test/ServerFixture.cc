@@ -20,6 +20,7 @@
 #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <stdio.h>
 #include <string>
 #include <cmath>
@@ -690,6 +691,45 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
 }
 
 /////////////////////////////////////////////////
+sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
+    const std::string &_sonarName,
+    const ignition::math::Pose3d &_pose,
+    const double _minRange,
+    const double _maxRange,
+    const double _radius)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _modelName << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pose << "</pose>"
+    << "<link name ='body'>"
+    << "  <sensor name ='" << _sonarName << "' type ='sonar'>"
+    << "    <sonar>"
+    << "      <min>" << _minRange << "</min>"
+    << "      <max>" << _maxRange << "</max>"
+    << "      <radius>" << _radius << "</radius>"
+    << "    </sonar>"
+    << "    <visualize>true</visualize>"
+    << "    <always_on>true</always_on>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_modelName, 100, 100);
+  WaitUntilSensorSpawn(_sonarName, 100, 100);
+  return boost::dynamic_pointer_cast<sensors::SonarSensor>(
+      sensors::get_sensor(_sonarName));
+}
+
+
+/////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
@@ -1180,6 +1220,32 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
     FAIL() << "ServerFixture timeout: max number of retries ("
            << _retries
            << ") exceeded while awaiting the spawn of " << _name;
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::WaitUntilIteration(const uint32_t _goalIteration,
+    const int _sleepEach, const int _retries) const
+{
+  int i = 0;
+  auto world = physics::get_world();
+  while ((world->GetIterations() != _goalIteration) && (i < _retries))
+  {
+    ++i;
+    common::Time::MSleep(_sleepEach);
+  }
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::WaitUntilSimTime(const common::Time &_goalTime,
+    const int _sleepEach, const int _retries) const
+{
+  int i = 0;
+  auto world = physics::get_world();
+  while ((world->GetSimTime() != _goalTime) && (i < _retries))
+  {
+    ++i;
+    common::Time::MSleep(_sleepEach);
+  }
 }
 
 /////////////////////////////////////////////////

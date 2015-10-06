@@ -405,6 +405,24 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::Collision from a collision SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Collision object
+    GAZEBO_VISIBLE
+    msgs::Collision CollisionFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Surface from a surface SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Surface object
+    GAZEBO_VISIBLE
+    msgs::Surface SurfaceFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Friction from a friction SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Friction object
+    GAZEBO_VISIBLE
+    msgs::Friction FrictionFromSDF(sdf::ElementPtr _sdf);
+
     /// \brief Create a msgs::Axis from an axis SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::Axis object
