@@ -32,6 +32,7 @@
 #include "gazebo/rendering/SonarVisual.hh"
 #include "gazebo/rendering/WrenchVisual.hh"
 #include "gazebo/rendering/CameraVisual.hh"
+#include "gazebo/rendering/LogicalCameraVisual.hh"
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
@@ -1631,12 +1632,10 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     }
   }
 
+  for (int i = 0; i < _msg.model_size(); ++i)
   {
-    for (int i = 0; i < _msg.model_size(); ++i)
-    {
-      boost::shared_ptr<msgs::Model> mm(new msgs::Model(_msg.model(i)));
-      this->dataPtr->modelMsgs.push_back(mm);
-    }
+    boost::shared_ptr<msgs::Model> mm(new msgs::Model(_msg.model(i)));
+    this->dataPtr->modelMsgs.push_back(mm);
   }
 
   return true;
@@ -1968,7 +1967,7 @@ void Scene::PreRender()
             // If an object is selected, don't let the physics engine move it.
             if (!this->dataPtr->selectedVis ||
                 this->dataPtr->selectionMode != "move" ||
-                (iter->first != this->dataPtr->selectedVis->GetId() &&
+                (iter->first != this->dataPtr->selectedVis->GetId()&&
                 !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
             {
               ignition::math::Pose3d pose = msgs::ConvertIgn(pose_msg);
@@ -2090,6 +2089,28 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         cameraVis->Load(_msg->camera());
         this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
       }
+    }
+  }
+  else if (_msg->type() == "logical_camera" && _msg->visualize())
+  {
+    VisualPtr parentVis = this->GetVisual(_msg->parent_id());
+    if (!parentVis)
+      return false;
+
+    Visual_M::iterator iter = this->dataPtr->visuals.find(_msg->id());
+    if (iter == this->dataPtr->visuals.end())
+    {
+      LogicalCameraVisualPtr cameraVis(new LogicalCameraVisual(
+            _msg->name()+"_GUIONLY_logical_camera_vis", parentVis));
+
+      // need to call AttachVisual in order for cameraVis to be added to
+      // parentVis' children list so that it can be properly deleted.
+      parentVis->AttachVisual(cameraVis);
+
+      cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
+      cameraVis->SetId(_msg->id());
+      cameraVis->Load(_msg->logical_camera());
+      this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
@@ -2682,8 +2703,6 @@ void Scene::OnModelMsg(ConstModelPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->modelMsgs.push_back(_msg);
-
-//  std::cerr << "model msg " << _msg->DebugString() << std::endl;
 }
 
 /////////////////////////////////////////////////

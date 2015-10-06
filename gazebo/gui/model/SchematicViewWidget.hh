@@ -38,7 +38,7 @@ namespace gazebo
 
     /// \class SchematicViewWidget SchematicViewWidget.hh
     /// \brief The parent widget of the CML editor
-    class GZ_GUI_MODEL_VISIBLE SchematicViewWidget : public QWidget
+    class GZ_GUI_VISIBLE SchematicViewWidget : public QWidget
     {
       Q_OBJECT
 
@@ -137,6 +137,10 @@ namespace gazebo
       /// \param[in] _mode Select mode
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
+
+      /// \brief Callback when a joint is removed
+      /// \param[in] _jointId Name of the joint.
+      private: void OnShowJointContextMenu(const std::string &_jointId);
 
       /// \brief Callback when a joint is removed
       /// \param[in] _jointId Name of the joint.

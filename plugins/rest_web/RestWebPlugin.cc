@@ -20,6 +20,8 @@
   #pragma comment(lib, "Rpcrt4.lib")
 #else /* UNIX */
 
+#include <gazebo/gazebo.hh>
+
 #ifdef HAVE_UUID
   #include <uuid/uuid.h>
 #endif
@@ -64,12 +66,14 @@ RestWebPlugin::RestWebPlugin()
   char s[37];
   uuid_unparse(uuid, s);
   this->session = s;
-#else
-  this->session = common::Time::GetWallTimeAsISOString();
 #endif
 
 #endif
-
+  if (this->session.empty())
+  {
+    // alternative to uuid
+    this->session = common::Time::GetWallTimeAsISOString();
+  }
   gzmsg << "REST web Session : " << this->session << endl;
 }
 
@@ -78,7 +82,7 @@ RestWebPlugin::~RestWebPlugin()
 {
   // tell the requestQ to stop precessing
   this->stopMsgProcessing = true;
-  if (this->requestQThread->joinable())
+  if (this->requestQThread && this->requestQThread->joinable())
   {
     this->requestQThread->join();
     delete this->requestQThread;
@@ -271,7 +275,6 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 //////////////////////////////////////////////////
 void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 {
-  gzerr << "RestWebPlugin::OnRestLoginRequest" << std::endl;
   boost::mutex::scoped_lock lock(this->requestQMutex);
   this->msgLoginQ.push_back(_msg);
 }

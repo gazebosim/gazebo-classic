@@ -365,8 +365,14 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
       }
       else if (entity->HasType(MODEL))
       {
+        // set pose of nested models
         entity->SetWorldPoseModel(
             (entity->worldPose - oldModelWorldPose) + _pose, _notify, _publish);
+      }
+      else
+      {
+        gzerr << "SetWorldPoseModel error: unknown type of entity in Model."
+          << std::endl;
       }
     }
   }
@@ -382,15 +388,24 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   if (_notify)
     this->UpdatePhysicsPose(true);
 
+  if (!this->parentEntity->HasType(MODEL))
+  {
+    gzerr << "SetWorldPose for Canonical Body [" << this->GetName()
+        << "] but parent[" << this->parentEntity->GetName()
+        << "] is not a MODEL!" << std::endl;
+    return;
+  }
+
   EntityPtr parentEnt = this->parentEntity;
-  math::Pose relativePose = this->initialRelativePose;
+  ignition::math::Pose3d relativePose = this->initialRelativePose.Ign();
   math::Pose updatePose = _pose;
 
+  // recursively update parent model pose based on new canonical link pose
   while (parentEnt && parentEnt->HasType(MODEL))
   {
     // setting parent Model world pose from canonical link world pose
     // where _pose is the canonical link's world pose
-    parentEnt->worldPose = (-relativePose) + updatePose;
+    parentEnt->worldPose = math::Pose(-relativePose) + updatePose;
 
     parentEnt->worldPose.Correct();
 
@@ -398,10 +413,11 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
       parentEnt->UpdatePhysicsPose(false);
 
     if (_publish)
-      parentEnt->PublishPose();
+      this->parentEntity->PublishPose();
 
     updatePose = parentEnt->worldPose;
-    relativePose = parentEnt->GetInitialRelativePose();
+    relativePose = parentEnt->GetInitialRelativePose().Ign();
+
     parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
   }
 
@@ -417,40 +433,6 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
       entityC->SetWorldPoseDirty();
     }
   }
-
-
-
-/*  // also update parent model's pose
-  if (this->parentEntity->HasType(MODEL))
-  {
-    // setting parent Model world pose from canonical link world pose
-    // where _pose is the canonical link's world pose
-    this->parentEntity->worldPose = (-this->initialRelativePose) + _pose;
-
-    this->parentEntity->worldPose.Correct();
-
-    if (_notify)
-      this->parentEntity->UpdatePhysicsPose(false);
-
-    if (_publish)
-      this->parentEntity->PublishPose();
-
-    // Tell collisions that their current world pose is dirty (needs
-    // updating). We set a dirty flag instead of directly updating the
-    // value to improve performance.
-    for (Base_V::iterator iterC = this->children.begin();
-        iterC != this->children.end(); ++iterC)
-    {
-      if ((*iterC)->HasType(COLLISION))
-      {
-        CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
-        entityC->SetWorldPoseDirty();
-      }
-    }
-  }
-  else
-    gzerr << "SWP for CB[" << this->GetName() << "] but parent["
-      << this->parentEntity->GetName() << "] is not a MODEL!\n";*/
 }
 
 //////////////////////////////////////////////////

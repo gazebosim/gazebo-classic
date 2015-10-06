@@ -342,6 +342,19 @@ material Gazebo/Orange
   }
 }
 
+material Gazebo/Indigo
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.33 0.0 0.5
+      diffuse 0.33 0.0 0.5
+      specular 0.1 0.1 0.1 1
+    }
+  }
+}
+
 material Gazebo/WhiteGlow : Gazebo/White
 {
   technique

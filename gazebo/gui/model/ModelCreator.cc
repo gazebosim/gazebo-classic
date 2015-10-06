@@ -52,6 +52,7 @@
 
 #include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
+#include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -130,6 +131,10 @@ ModelCreator::ModelCreator()
       boost::bind(&ModelCreator::OpenInspector, this, _1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectOpenModelPluginInspector(
+      boost::bind(&ModelCreator::OpenModelPluginInspector, this, _1)));
+
+  this->connections.push_back(
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
 
@@ -187,6 +192,7 @@ ModelCreator::~ModelCreator()
 
   this->allLinks.clear();
   this->nestedLinks.clear();
+  this->allModelPlugins.clear();
   this->allNestedModels.clear();
   this->node->Fini();
   this->node.reset();
@@ -452,6 +458,16 @@ NestedModelData *ModelCreator::CreateModelFromSDF(sdf::ElementPtr
       this->jointMaker->CreateJointFromSDF(jointElem, modelNameStream.str());
       jointElem = jointElem->GetNextElement("joint");
     }
+
+  // Plugins
+  sdf::ElementPtr pluginElem;
+  if (_modelElem->HasElement("plugin"))
+    pluginElem = _modelElem->GetElement("plugin");
+  while (pluginElem)
+  {
+    this->AddModelPlugin(pluginElem);
+    pluginElem = pluginElem->GetNextElement("plugin");
+  }
   }
 
   // Nested models only
@@ -1019,7 +1035,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(sdf::ElementPtr _linkElem,
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName, _parentVis));
   linkVisual->Load();
-  linkVisual->SetPose(link->GetPose());
+  linkVisual->SetPose(link->Pose());
   link->linkVisual = linkVisual;
 
   // Visuals
@@ -1272,11 +1288,6 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
   }
   gui::model::Events::linkRemoved(linkName);
 
-  std::string leafName = linkName;
-  size_t idx = linkName.find_last_of("::");
-  if (idx != std::string::npos)
-    leafName = linkName.substr(idx+1);
-  gui::model::Events::linkRemoved(leafName);
   this->ModelChanged();
 }
 
@@ -1321,6 +1332,8 @@ void ModelCreator::Reset()
   while (!this->allNestedModels.empty())
     this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
   this->allNestedModels.clear();
+
+  this->allModelPlugins.clear();
 
   if (!gui::get_active_camera() ||
     !gui::get_active_camera()->GetScene())
@@ -1947,7 +1960,7 @@ void ModelCreator::OnPaste()
     }
 
     // Propagate copied entity's Z position and rotation
-    math::Pose copiedPose = copiedLink->GetPose();
+    math::Pose copiedPose = copiedLink->Pose();
     clonePose.pos.z = copiedPose.pos.z;
     clonePose.rot = copiedPose.rot;
 
@@ -1994,9 +2007,12 @@ JointMaker *ModelCreator::GetJointMaker() const
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::UpdateNestedModelSDF(sdf::ElementPtr _modelElem)
+void ModelCreator::UpdateNestedModelSDF(sdf::ElementPtr /*_modelElem*/)
 {
-  if (this->modelName == this->serverModelName)
+  return;
+
+  // do we still need the code below?
+  /* if (this->modelName == this->serverModelName)
     return;
 
   if (_modelElem->HasElement("joint"))
@@ -2048,7 +2064,7 @@ void ModelCreator::UpdateNestedModelSDF(sdf::ElementPtr _modelElem)
       this->UpdateNestedModelSDF(modelElem);
       modelElem = modelElem->GetNextElement("model");
     }
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -2069,12 +2085,13 @@ void ModelCreator::GenerateSDF()
   if (this->serverModelName.empty())
   {
     // set center of all links and nested models to be origin
+    // TODO set a better origin other than the centroid
     math::Vector3 mid;
     int entityCount = 0;
     for (auto &linksIt : this->allLinks)
     {
       LinkData *link = linksIt.second;
-      mid += link->GetPose().Pos();
+      mid += link->Pose().Pos();
       entityCount++;
     }
     for (auto &nestedModelsIt : this->allNestedModels)
@@ -2109,7 +2126,7 @@ void ModelCreator::GenerateSDF()
   {
     LinkData *link = linksIt.second;
     link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
-    link->linkVisual->SetPose(link->GetPose());
+    link->linkVisual->SetPose(link->Pose());
   }
   for (auto &nestedModelsIt : this->allNestedModels)
   {
@@ -2431,7 +2448,7 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    if (link->GetPose() != link->linkVisual->GetPose().Ign())
+    if (link->Pose() != link->linkVisual->GetPose().Ign())
     {
       link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
       this->ModelChanged();
@@ -2514,11 +2531,9 @@ void ModelCreator::AppendPluginElement(const std::string &_name,
     const std::string &_filename, sdf::ElementPtr _sdfElement)
 {
   // Insert into existing plugin element
-  sdf::ElementPtr pluginElem = NULL;
-
+  sdf::ElementPtr pluginElem;
   if (this->sdfToAppend->HasElement("plugin"))
      pluginElem = this->sdfToAppend->GetElement("plugin");
-
   while (pluginElem)
   {
     if (pluginElem->Get<std::string>("name") == _name)
@@ -2533,7 +2548,6 @@ void ModelCreator::AppendPluginElement(const std::string &_name,
   // Create new plugin element
   pluginElem.reset(new sdf::Element);
   pluginElem->SetName("plugin");
-
   pluginElem->AddAttribute("name", "string", _name, "0", "name");
   pluginElem->AddAttribute("filename", "string", _filename, "0", "filename");
 
@@ -2581,3 +2595,43 @@ void ModelCreator::RemovePluginElement(const std::string &_name,
     pluginElem = pluginElem->GetNextElement("plugin");
   }
 }
+
+/////////////////////////////////////////////////
+void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
+{
+  if (_pluginElem->HasAttribute("name"))
+  {
+    std::string name = _pluginElem->Get<std::string>("name");
+
+    // Create data
+    ModelPluginData *modelPlugin = new ModelPluginData();
+    modelPlugin->Load(_pluginElem);
+
+    // Add to map
+    {
+      boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+      this->allModelPlugins[name] = modelPlugin;
+    }
+
+    // Notify addition
+    gui::model::Events::modelPluginInserted(name);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OpenModelPluginInspector(const std::string &_name)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
+  auto it = this->allModelPlugins.find(_name);
+  if (it == this->allModelPlugins.end())
+  {
+    gzerr << "Model plugin [" << _name << "] not found." << std::endl;
+    return;
+  }
+
+  ModelPluginData *modelPlugin = it->second;
+  modelPlugin->inspector->move(QCursor::pos());
+  modelPlugin->inspector->show();
+}
+

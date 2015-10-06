@@ -289,9 +289,9 @@ void VisualConfig::SetGeometry(const std::string &_name,
   {
     if (it.second->name == _name)
     {
-      math::Vector3 dimensions;
+      ignition::math::Vector3d dimensions;
       std::string uri;
-      std::string type = it.second->configWidget->GetGeometryWidgetValue(
+      std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
           _size, _uri);
@@ -301,17 +301,14 @@ void VisualConfig::SetGeometry(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void VisualConfig::GetGeometry(const std::string &_name,
+void VisualConfig::Geometry(const std::string &_name,
     ignition::math::Vector3d &_size, std::string &_uri)
 {
   for (auto &it : this->configs)
   {
     if (it.second->name == _name)
     {
-      math::Vector3 dimensions;
-      it.second->configWidget->GetGeometryWidgetValue("geometry",
-          dimensions, _uri);
-      _size = dimensions.Ign();
+      it.second->configWidget->GeometryWidgetValue("geometry", _size, _uri);
       break;
     }
   }

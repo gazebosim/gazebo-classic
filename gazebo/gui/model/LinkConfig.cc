@@ -79,7 +79,7 @@ void LinkConfig::Update(ConstLinkPtr _linkMsg)
 /////////////////////////////////////////////////
 void LinkConfig::SetPose(const ignition::math::Pose3d &_pose)
 {
-  this->configWidget->SetPoseWidgetValue("pose", math::Pose(_pose));
+  this->configWidget->SetPoseWidgetValue("pose", _pose);
 }
 
 /////////////////////////////////////////////////
@@ -103,7 +103,7 @@ void LinkConfig::SetInertiaMatrix(const double _ixx, const double _iyy,
 /////////////////////////////////////////////////
 void LinkConfig::SetInertialPose(const ignition::math::Pose3d &_pose)
 {
-  this->configWidget->SetPoseWidgetValue("inertial::pose", math::Pose(_pose));
+  this->configWidget->SetPoseWidgetValue("inertial::pose", _pose);
 }
 
 /////////////////////////////////////////////////

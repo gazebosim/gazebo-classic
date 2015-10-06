@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _RENDER_WIDGET_HH_
-#define _RENDER_WIDGET_HH_
+#ifndef _GAZEBO_RENDER_WIDGET_HH_
+#define _GAZEBO_RENDER_WIDGET_HH_
 
 #include <string>
 #include <vector>
@@ -26,19 +26,16 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
 
-class QLineEdit;
-class QLabel;
-class QFrame;
-class QHBoxLayout;
 
 namespace gazebo
 {
   namespace gui
   {
+    class TopToolbar;
     class GLWidget;
     class TimePanel;
 
-    class GAZEBO_VISIBLE RenderWidget : public QWidget
+    class GZ_GUI_VISIBLE RenderWidget : public QWidget
     {
       Q_OBJECT
       public: RenderWidget(QWidget *_parent = 0);
@@ -51,10 +48,6 @@ namespace gazebo
       /// \param[in] _widget Widget to be added.
       /// \param[in] _index Index in the splitter to add the widget at.
       public: void InsertWidget(unsigned int _index, QWidget *_widget);
-
-      /// \brief Get the number of widgets inside the render widget.
-      /// \return Number of widgets.
-      public: unsigned int GetWidgetCount();
 
       /// \brief Show the time panel.
       /// \para[in] _show True to show the panel, false to hide it.
@@ -74,18 +67,6 @@ namespace gazebo
       /// \param[in] _visible True to show the GUI overlays, false to hide them.
       public: void SetOverlaysVisible(const bool _visible);
 
-      /// \brief Add a widget to the bottom row stack of widgets.
-      /// \param[in] _name Name of the widget
-      /// \param[in] _widget Pointer to the widget to add.
-      public: void AddToBottomRow(const std::string &_name, QWidget *_widget);
-
-      /// \brief Show a widget in the bottom row.
-      /// \sa AddToBottomRow
-      /// \param[in] _name Name of the widge to show. The widget must have
-      /// been added using AddToBottomRow. The string "default" will show
-      /// the Time Panel.
-      public: void ShowBottomRow(const std::string &_name = "default");
-
       /// \brief Get the overlay message being displayed
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
@@ -97,7 +78,7 @@ namespace gazebo
 
       /// \brief Get the toolbar on top of the render widget
       /// \return Toolbar
-      public: QToolBar *GetToolbar() const;
+      public: TopToolbar *GetToolbar() const;
 
       /// \brief Set the visibility of the toolbar.
       /// \param[in] _show Whether or not to show the toolbar.
@@ -113,9 +94,6 @@ namespace gazebo
       /// \param[in] _modelName Name of the model that is being followed.
       private: void OnFollow(const std::string &_modelName);
 
-      /// \brief Handle align model user event.
-      private: void OnAlign();
-
       /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
 
@@ -129,25 +107,7 @@ namespace gazebo
       private: QFrame *bottomFrame;
 
       /// \brief Frame which holds the top toolbar.
-      private: QFrame *toolFrame;
-
-      private: QLabel *xyzLabel;
-      private: QLineEdit *xPosEdit;
-      private: QLineEdit *yPosEdit;
-      private: QLineEdit *zPosEdit;
-
-      private: QLabel *rpyLabel;
-      private: QLineEdit *rollEdit;
-      private: QLineEdit *pitchEdit;
-      private: QLineEdit *yawEdit;
-      private: QLineEdit *fpsEdit;
-      private: QLineEdit *trianglesEdit;
-
-      /// \brief Widget for the top toolbar
-      private: QToolBar *toolbar;
-
-      private: QToolBar *mouseToolbar;
-      private: QToolBar *editToolbar;
+      private: TopToolbar *topToolbar;
 
       /// \brief An overlay label on the 3D render widget
       private: QLabel *msgOverlayLabel;
@@ -163,12 +123,6 @@ namespace gazebo
 
       /// \brief Time panel widget.
       private: TimePanel *timePanel;
-
-      /// \brief Used to control size of each pane.
-      private: QStackedWidget *bottomRow;
-
-      /// \brief Map of names to widgets in the bottomRow QStackedWidget
-      private: std::map<std::string, int> bottomRowStack;
     };
   }
 }

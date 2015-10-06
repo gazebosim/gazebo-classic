@@ -436,8 +436,17 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       if (childVis != this->dataPtr->selectionObj &&
           geomType != "" && geomType != "mesh")
       {
-        math::Vector3 geomScale = this->UpdateScale(_axis, scale,
-            childVis->GetGeometryType());
+        math::Vector3 geomScale = scale;
+        if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
+            geomType == "sphere")
+        {
+          geomScale = this->UpdateScale(_axis, scale, "sphere");
+        }
+        else if (geomType == "cylinder")
+        {
+          geomScale = this->UpdateScale(_axis, scale, "cylinder");
+        }
+
         math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
             * geomScale.GetAbs();
 

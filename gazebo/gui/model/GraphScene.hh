@@ -23,7 +23,7 @@
 #include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/model/qgv/QGVScene.h"
+#include "gazebo/gui/qgv/QGVScene.h"
 
 namespace gazebo
 {
@@ -31,7 +31,7 @@ namespace gazebo
   {
     /// \class GraphScene GraphScene.hh
     /// \brief A scene of 2D graph nodes and edges
-    class GZ_GUI_MODEL_VISIBLE GraphScene : public QGVScene
+    class GZ_GUI_VISIBLE GraphScene : public QGVScene
     {
       Q_OBJECT
 

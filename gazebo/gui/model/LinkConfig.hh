@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class LinkConfig LinkConfig.hh
     /// \brief A tab for configuring properties of a link.
-    class GZ_GUI_MODEL_VISIBLE LinkConfig : public QWidget
+    class GZ_GUI_VISIBLE LinkConfig : public QWidget
     {
       Q_OBJECT
 
@@ -73,7 +73,7 @@ namespace gazebo
           const double _izz, const double _ixy, const double _ixz,
           const double _iyz);
 
-      /// \brief Set the mass of the link.
+      /// \brief Set the inertial pose of the link.
       /// \param[in] _pose Inertial pose to set the link to.
       public: void SetInertialPose(const ignition::math::Pose3d &_pose);
 

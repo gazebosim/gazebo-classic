@@ -61,8 +61,8 @@ void VisualConfig_TEST::VisualUpdates()
     if (it.second->name == "v1")
     {
       const VisualConfigData *configData = it.second;
-      QCOMPARE(configData->configWidget
-          ->GetDoubleWidgetValue("transparency"), 0.50);
+      QCOMPARE(configData->configWidget->GetDoubleWidgetValue("transparency"),
+          0.50);
       foundConfig = true;
       break;
     }
@@ -76,6 +76,7 @@ void VisualConfig_TEST::VisualUpdates()
   QVERIFY(vc.GetData("v1") == NULL);
   QVERIFY(vc.GetData("v2") == NULL);
   QVERIFY(vc.GetData("v3") == NULL);
+
 }
 
 /////////////////////////////////////////////////
@@ -93,7 +94,7 @@ void VisualConfig_TEST::GeometryUpdates()
   ignition::math::Vector3d size2;
   std::string uri;
 
-  vc.GetGeometry("v1", size2, uri);
+  vc.Geometry("v1", size2, uri);
 
   QCOMPARE(5.0, size2.X());
   QCOMPARE(10.0, size2.Y());
@@ -101,11 +102,12 @@ void VisualConfig_TEST::GeometryUpdates()
 
   ignition::math::Vector3d size3(0, 0, 0);
 
-  vc.GetGeometry("NotFound", size3, uri);
+  vc.Geometry("NotFound", size3, uri);
 
   QCOMPARE(0.0, size3.X());
   QCOMPARE(0.0, size3.Y());
   QCOMPARE(0.0, size3.Z());
+
 }
 
 // Generate a main function for the test

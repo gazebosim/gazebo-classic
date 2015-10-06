@@ -60,7 +60,7 @@ namespace gazebo
 
     /// \class CollisionConfig CollisionConfig.hh
     /// \brief A tab for configuring collision properties of a link.
-    class GZ_GUI_MODEL_VISIBLE CollisionConfig : public QWidget
+    class GZ_GUI_VISIBLE CollisionConfig : public QWidget
     {
       Q_OBJECT
 
@@ -107,8 +107,8 @@ namespace gazebo
       /// \param[in] _name Name of collision.
       /// \param[in] _size Size of the geometry.
       /// \param[in] _uri URI of the geometry.
-      public: void GetGeometry(const std::string &_name,
-          ignition::math::Vector3d &_size, std::string &_uri);
+      public: void Geometry(const std::string &_name,
+          ignition::math::Vector3d &_size, std::string &_uri) const;
 
       /// \brief Get collision configuration data
       public: std::map<int, const CollisionConfigData *> GetConfigData() const;

@@ -476,7 +476,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 3.0.0)
+set (SDFormat_MIN_VERSION 3.1.1)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
@@ -488,7 +488,7 @@ endif()
 
 ########################################
 # Find QT
-find_package (Qt4)
+find_package(Qt4 COMPONENTS QtWebKit QtCore QtGui QtXml QtXmlPatterns REQUIRED)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()
@@ -559,17 +559,6 @@ find_program(XSLTPROC xsltproc)
 if (NOT EXISTS ${XSLTPROC})
   BUILD_WARNING("xsltproc not found. The check_test_ran.py script will cause tests to fail.")
 endif()
-
-########################################
-# Find uuid-dev Library
-pkg_check_modules(uuid uuid)
-if (uuid_FOUND)
-  message (STATUS "Looking for uuid - found")
-  set (HAVE_UUID TRUE)
-else ()
-  set (HAVE_UUID FALSE)
-  BUILD_WARNING ("uuid-dev library not found - Gazebo will not have uuid support.")
-endif ()
 
 ########################################
 # Find uuid-dev Library

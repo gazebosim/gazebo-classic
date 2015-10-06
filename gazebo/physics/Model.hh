@@ -152,14 +152,14 @@ namespace gazebo
       /// \return Get the number of joints.
       public: unsigned int GetJointCount() const;
 
-      /// \brief Get a model by name.
-      /// \param[in] _name Name of the model to get.
+      /// \brief Get a nested model that is a direct child of this model.
+      /// \param[in] _name Name of the child model to get.
       /// \return Pointer to the model, NULL if the name is invalid.
-      public: ModelPtr GetModel(const std::string &_name) const;
+      public: ModelPtr NestedModel(const std::string &_name) const;
 
       /// \brief Get all the nested models.
       /// \return a vector of Model's in this model
-      public: const Model_V &GetModels() const;
+      public: const Model_V &NestedModels() const;
 
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly

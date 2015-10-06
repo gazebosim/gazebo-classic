@@ -20,10 +20,10 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
 
-#include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/gui/model/qgv/QGVNode.h"
-#include "gazebo/gui/model/qgv/QGVEdge.h"
+#include "gazebo/gui/qgv/QGVNode.h"
+#include "gazebo/gui/qgv/QGVEdge.h"
 
+#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/GraphScene.hh"
 #include "gazebo/gui/model/GraphView.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
@@ -122,6 +122,10 @@ void SchematicViewWidget::Init()
   this->connections.push_back(
       gui::model::Events::ConnectJointRemoved(
           boost::bind(&SchematicViewWidget::OnJointRemoved, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectShowJointContextMenu(
+          boost::bind(&SchematicViewWidget::OnShowJointContextMenu, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -155,7 +159,7 @@ void SchematicViewWidget::AddNode(const std::string &_node)
 {
   //  std::string name = this->GetLeafName(_node);
   std::string name = this->GetScopedName(_node);
-//  std::cerr << " add node " << name << std::endl;
+  std::cerr << " add node " << name << std::endl;
 
   if (this->scene->HasNode(name))
     return;
@@ -215,15 +219,22 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   if (this->HasEdge(_id))
     return;
 
+//  std::string parentNode = this->GetLeafName(_parent);
+//  std::string childNode = this->GetLeafName(_child);
   std::string parentNode = this->GetScopedName(_parent);
   std::string childNode = this->GetScopedName(_child);
+
 
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 
   QGVEdge *edge = this->scene->AddEdge(_id, parentNode, childNode);
+  if (!edge)
+    return;
+
   edge->setData(0, tr(_id.c_str()));
   edge->setData(1, tr("Joint"));
+
   this->edges[_id] = edge;
 
   std::string materialName = JointMaker::GetJointMaterial(_type);
@@ -242,6 +253,7 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   }
 
   this->scene->SetEdgeColor(_id, edgeColor);
+
   this->scene->applyLayout();
 
   this->FitInView();
@@ -326,25 +338,10 @@ void SchematicViewWidget::FitInView()
 void SchematicViewWidget::OnCustomContextMenu(const QString &_id)
 {
   std::string itemId = _id.toStdString();
-
-  auto it = this->edges.find(itemId);
-  if (it != this->edges.end())
-  {
-    this->deleteJointName = itemId;
-    QMenu menu;
-    menu.addAction(this->deleteJointAction);
-    menu.exec(QCursor::pos());
-  }
-//  if (this->edges.find(itemId) != this->edges.end())
-//    gui::model::Events::showJointContextMenu(itemId);
-//  else if (this->scene->HasNode(this->GetLeafName(itemId)))
-//    gui::model::Events::showLinkContextMenu(itemId);
-//
-//  auto it = this->edges.find(_id.toStdString());
-//  if (it != this->edges.end())
-//  {
-////    it->second->setSelected(_selected);
-//  }
+  if (this->edges.find(itemId) != this->edges.end())
+    gui::model::Events::showJointContextMenu(itemId);
+  else if (this->scene->HasNode(this->GetLeafName(itemId)))
+    gui::model::Events::showLinkContextMenu(itemId);
 }
 
 /////////////////////////////////////////////////
@@ -442,4 +439,11 @@ void SchematicViewWidget::OnJointRemoved(const std::string &_jointId)
     this->RemoveEdge(_jointId);
 }
 
+void SchematicViewWidget::OnShowJointContextMenu(const std::string &_jointId)
+{
+  this->deleteJointName = _jointId;
+  QMenu menu;
+  menu.addAction(this->deleteJointAction);
+  menu.exec(QCursor::pos());
+}
 

@@ -55,7 +55,7 @@ namespace gazebo
 
     /// \class JointMaker JointMaker.hh
     /// \brief Joint visualization
-    class GZ_GUI_MODEL_VISIBLE JointMaker : public QObject
+    class GZ_GUI_VISIBLE JointMaker : public QObject
     {
       Q_OBJECT
 
@@ -77,7 +77,7 @@ namespace gazebo
         JOINT_SCREW,
         /// \brief Universal joint
         JOINT_UNIVERSAL,
-        /// \brief Revolute joint
+        /// \brief Ball joint
         JOINT_BALL,
         /// \brief Gearbox joint
         JOINT_GEARBOX
@@ -343,7 +343,7 @@ namespace gazebo
 
     /// \class JointData JointData.hh
     /// \brief Helper class to store joint data
-    class GZ_GUI_MODEL_VISIBLE JointData : public QObject
+    class GZ_GUI_VISIBLE JointData : public QObject
     {
       Q_OBJECT
 

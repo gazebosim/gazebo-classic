@@ -29,18 +29,14 @@ namespace boost
   class recursive_mutex;
 }
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 namespace gazebo
 {
   namespace gui
   {
     class LinkInspector;
+    class ModelPluginInspector;
 
-    class GZ_GUI_MODEL_VISIBLE ModelData
+    class GZ_GUI_VISIBLE ModelData
     {
       /// \brief Get a template SDF string of a simple model.
       /// \return Template SDF string of a simple model.
@@ -86,7 +82,7 @@ namespace gazebo
 
     /// \class LinkData LinkData.hh
     /// \brief Helper class to store link data
-    class GZ_GUI_MODEL_VISIBLE LinkData : public QObject
+    class GZ_GUI_VISIBLE LinkData : public QObject
     {
       Q_OBJECT
 
@@ -106,7 +102,7 @@ namespace gazebo
 
       /// \brief Get the pose of the link.
       /// \return Pose of link.
-      public: ignition::math::Pose3d GetPose() const;
+      public: ignition::math::Pose3d Pose() const;
 
       /// \brief Set the pose of the link.
       /// \param[in] _pose Pose of link.
@@ -118,7 +114,7 @@ namespace gazebo
 
       /// \brief Get the scale of the link.
       /// \return Scale of link.
-      public: ignition::math::Vector3d GetScale() const;
+      public: ignition::math::Vector3d Scale() const;
 
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale of link.
@@ -212,6 +208,28 @@ namespace gazebo
 
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
+    };
+
+    /// \brief Helper class to store model plugin data
+    class GZ_GUI_VISIBLE ModelPluginData : public QObject
+    {
+      Q_OBJECT
+
+      /// \brief Constructor
+      public: ModelPluginData();
+
+      /// \brief Destructor
+      public: ~ModelPluginData();
+
+      /// \brief Load data from the plugin SDF
+      /// \param[in] _pluginElem SDF element.
+      public: void Load(sdf::ElementPtr _pluginElem);
+
+      /// \brief Inspector for configuring model plugin properties.
+      public: ModelPluginInspector *inspector;
+
+      /// \brief SDF representing the model plugin data.
+      public: sdf::ElementPtr modelPluginSDF;
     };
   }
 }

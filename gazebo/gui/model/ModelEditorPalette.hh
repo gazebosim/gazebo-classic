@@ -45,7 +45,7 @@ namespace gazebo
 
     /// \class ModelEditorPalette ModelEditorPalette.hh
     /// \brief A palette of model items which can be added to the editor.
-    class GZ_GUI_MODEL_VISIBLE ModelEditorPalette : public QWidget
+    class GZ_GUI_VISIBLE ModelEditorPalette : public QWidget
     {
       Q_OBJECT
 
@@ -153,15 +153,20 @@ namespace gazebo
       /// \brief Add a joint to the tree.
       /// \param[in] _jointId Unique joint identifying name.
       /// \param[in] _jointName Scoped name which can be changed by the user.
-      /// \param[in] _jointName Scoped name of the parent link.
-      /// \param[in] _jointName Scoped name of the child link.
+      /// \param[in] _type Type of joint.
+      /// \param[in] _parentName Scoped name of the parent link.
+      /// \param[in] _childName Scoped name of the child link.
       private: void OnJointInserted(const std::string &_jointId,
-          const std::string &_jointName, const std::string &_parentName,
-          const std::string &_childName);
+          const std::string &_jointName, const std::string &_type,
+          const std::string &_parentName, const std::string &_childName);
 
       /// \brief Remove a nested model from the tree.
       /// \param[in] _linkId Unique nested model identifying name.
       private: void OnNestedModelRemoved(const std::string &_nestedModelId);
+
+      /// \brief Add a model plugin to the tree.
+      /// \param[in] _modelPluginName Model plugin name.
+      private: void OnModelPluginInserted(const std::string &_modelPluginName);
 
       /// \brief Remove a link from the tree.
       /// \param[in] _linkId Unique link identifying name.
@@ -229,6 +234,9 @@ namespace gazebo
 
       /// \brief Parent item for all joints.
       private: QTreeWidgetItem *jointsItem;
+
+      /// \brief Parent item for all model plugins.
+      private: QTreeWidgetItem *modelPluginsItem;
 
       /// \brief Mutex to protect updates.
       private: std::recursive_mutex updateMutex;
