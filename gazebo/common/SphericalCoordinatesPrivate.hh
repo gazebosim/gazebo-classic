@@ -19,9 +19,10 @@
 #define _GAZEBO_SPHERICALCOORDINATES_PRIVATE_HH_
 
 #include <ignition/math/Angle.hh>
+#include <ignition/math/Matrix3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/math/Angle.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -53,6 +54,33 @@ namespace gazebo
       /// \brief Heading offset, expressed as angle from East to
       ///        gazebo x-axis, or equivalently from North to gazebo y-axis.
       public: ignition::math::Angle headingOffset;
+
+      /// \brief Semi-major axis ellipse parameter
+      public: double ell_a;
+
+      /// \brief Semi-minor axis ellipse parameter
+      public: double ell_b;
+
+      /// \brief Flattening ellipse parameter
+      public: double ell_f;
+
+      /// \brief First eccentricity ellipse parameter
+      public: double ell_e;
+
+      /// \brief Second eccentricity ellipse parameter
+      public: double ell_p;
+
+      /// \brief Rotation matrix that moves ECEF to GLOBAL
+      public: ignition::math::Matrix3d rotECEF2ENU;
+
+      /// \brief Cache the ECEF position of the the origin
+      public: ignition::math::Vector3d origin;
+
+      /// \brief Cache cosine head transform
+      public: double cosHea;
+
+      /// \brief Cache sine head transform
+      public: double sinHea;
     };
     /// \}
   }
