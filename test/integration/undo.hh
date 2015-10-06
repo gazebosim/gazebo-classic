@@ -29,6 +29,9 @@ class UndoTest : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Default constructor
+  public: UndoTest() = default;
+
   /// \brief Test message passing between gui::UserCmdHistory and
   /// physics::UserCmdManager.
   private slots: void MsgPassing();

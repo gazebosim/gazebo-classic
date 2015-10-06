@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_USER_CMD_MANAGER_PRIVATE_HH_
 #define _GAZEBO_USER_CMD_MANAGER_PRIVATE_HH_
 
+#include <string>
+#include <vector>
 #include <sdf/sdf.hh>
 
 #include "gazebo/transport/Node.hh"
