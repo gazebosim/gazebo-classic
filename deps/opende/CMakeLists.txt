@@ -24,6 +24,11 @@ if (HAVE_DART)
   link_directories(${DARTCore_LIBRARY_DIRS})
 endif()
 
+if (HAVE_BULLET)
+  include_directories(${BULLET_INCLUDE_DIRS})
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
 add_subdirectory(OPCODE)
 add_subdirectory(GIMPACT)
 add_subdirectory(ou)
@@ -195,6 +200,8 @@ src/robuststep.cpp
 src/rotation.cpp
 src/sphere.cpp
 src/step.cpp
+src/step_bullet_lemke_wrapper.cpp
+src/step_bullet_pgs_wrapper.cpp
 src/step_dart_pgs_wrapper.cpp
 src/symm.c
 src/timer.cpp

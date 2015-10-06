@@ -44,7 +44,8 @@ enum Friction_Model {
 enum World_Solver_Type{
   ODE_DEFAULT,
   DART_PGS,
-  BULLET_PGS
+  BULLET_PGS,
+  BULLET_LEMKE
 };
 
 /**
