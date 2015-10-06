@@ -523,6 +523,7 @@ bool LogPlay::Seek(const common::Time &_time)
     this->start = 0;
     this->end = -1 * this->kEndFrame.size();
 
+    // We try a few times looking for <sim_time>.
     for (unsigned int i = 0; i < 2; ++i)
     {
       std::string frame;

@@ -108,10 +108,14 @@ namespace gazebo
       public: bool StepBack(std::string &_data);
 
       /// \brief Step through the open log file.
+      /// \param[in] _step Number of samples to step (forward or backwards).
       /// \param[out] _data Data from next entry in the log file.
       public: bool Step(const int _step, std::string &_data);
 
-      /// \brief Seek.
+      /// \brief Jump to the closest sample that has its simulation time lower
+      /// than the time specified as a parameter.
+      /// \param[in] _time Target simulation time.
+      /// \return True if operation succeed or false otherwise.
       public: bool Seek(const common::Time &_time);
 
       /// \brief Jump to the beginning of the log file. The next step() call
