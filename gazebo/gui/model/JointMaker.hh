@@ -407,9 +407,29 @@ namespace gazebo
       /// \brief Update joint.
       public: void UpdateJointLine();
 
-      public: void SetType(JointMaker::JointType _type);
-      public: void SetParent(rendering::VisualPtr _vis);
-      public: void SetChild(rendering::VisualPtr _vis);
+      /// \brief Set joint type
+      /// \param[in] _type New joint type.
+      public: void SetType(const JointMaker::JointType _type);
+
+      /// \brief Set joint parent visual
+      /// \param[in] _vis New parent visual.
+      public: void SetParent(const rendering::VisualPtr &_vis);
+
+      /// \brief Set joint child visual
+      /// \param[in] _vis New child visual.
+      public: void SetChild(const rendering::VisualPtr &_vis);
+
+      /// \brief Get joint type
+      /// \param[in] _type New joint type.
+      public: JointMaker::JointType Type() const;
+
+      /// \brief Get joint parent visual
+      /// \param[in] _vis Pointer to parent visual.
+      public: rendering::VisualPtr Parent() const;
+
+      /// \brief Get joint child visual
+      /// \param[in] _vis Pointer to child visual.
+      public: rendering::VisualPtr Child() const;
 
       /// \brief Name of the joint.
       public: std::string name;
@@ -422,12 +442,6 @@ namespace gazebo
 
       /// \brieft Visual of the hotspot
       public: rendering::VisualPtr hotspot;
-
-      /// \brief Parent visual the joint is connected to.
-      public: rendering::VisualPtr parent;
-
-      /// \brief Child visual the joint is connected to.
-      public: rendering::VisualPtr child;
 
       /// \internal
       /// \brief Parent visual pose used to determine if updates are needed.
@@ -447,9 +461,6 @@ namespace gazebo
       /// \brief Visual handle used to represent joint parent
       public: Ogre::BillboardSet *handles;
 
-      /// \brief Type of joint.
-      public: JointMaker::JointType type;
-
       /// \brief True if the joint visual needs update.
       public: bool dirty;
 
@@ -465,6 +476,15 @@ namespace gazebo
       /// \brief Qt Callback when joint inspector configurations are to be
       /// applied.
       private slots: void OnApply();
+
+      /// \brief Type of joint.
+      private: JointMaker::JointType type;
+
+      /// \brief Parent visual the joint is connected to.
+      private: rendering::VisualPtr parent;
+
+      /// \brief Child visual the joint is connected to.
+      private: rendering::VisualPtr child;
     };
     /// \}
   }
