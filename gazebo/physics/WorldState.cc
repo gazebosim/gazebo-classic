@@ -190,7 +190,7 @@ bool WorldState::HasModelState(const std::string &_modelName) const
 }
 
 /////////////////////////////////////////////////
-const std::vector<std::string> &WorldState::GetInsertions() const
+const std::vector<std::string> &WorldState::Insertions() const
 {
   return this->insertions;
 }
@@ -202,7 +202,7 @@ void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
 }
 
 /////////////////////////////////////////////////
-const std::vector<std::string> &WorldState::GetDeletions() const
+const std::vector<std::string> &WorldState::Deletions() const
 {
   return this->deletions;
 }

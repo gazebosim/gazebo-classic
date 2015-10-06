@@ -2099,9 +2099,9 @@ void World::LogWorker()
         // moving link may never be captured if only diff state is recorded.
         boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
 
-        auto insertions = diffState.GetInsertions();
+        auto insertions = diffState.Insertions();
         this->dataPtr->prevStates[currState].SetInsertions(insertions);
-        auto deletions = diffState.GetDeletions();
+        auto deletions = diffState.Deletions();
         this->dataPtr->prevStates[currState].SetDeletions(deletions);
 
         this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
