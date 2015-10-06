@@ -606,7 +606,10 @@ bool LogPlay::GetChunkData(tinyxml2::XMLElement *_xml, std::string &_data)
 {
   // Make sure we have valid xml pointer
   if (!_xml)
+  {
+    gzerr << "NULL XML element" << std::endl;
     return false;
+  }
 
   /// Get the chunk's encoding
   this->encoding = _xml->Attribute("encoding");
