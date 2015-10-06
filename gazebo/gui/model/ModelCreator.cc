@@ -2557,10 +2557,10 @@ void ModelCreator::AppendPluginElement(const std::string &_name,
   this->sdfToAppend->InsertElement(pluginElem);
 }
 
-static bool MatchingConnection(sdf::ElementPtr conn1, sdf::ElementPtr conn2)
+static bool MatchingElement(sdf::ElementPtr e1, sdf::ElementPtr e2)
 {
   // No comparison operator in Element class?
-  return conn1->ToString("") == conn2->ToString("");
+  return e1->ToString("") == e2->ToString("");
 }
 
 /////////////////////////////////////////////////
@@ -2577,16 +2577,19 @@ void ModelCreator::RemovePluginElement(const std::string &_name,
     if (pluginElem->Get<std::string>("name") == _name &&
         pluginElem->Get<std::string>("filename") == _filename)
     {
-      sdf::ElementPtr connectionElem = pluginElem->GetElement("connection");
-      while (connectionElem)
+      std::string childName = _sdfElement->GetName();
+      if (pluginElem->HasElement(childName))
       {
-        if (MatchingConnection(connectionElem, _sdfElement))
-          pluginElem->RemoveChild(connectionElem);
-
-        connectionElem = connectionElem->GetNextElement("connection");
+        sdf::ElementPtr childElem = pluginElem->GetElement(childName);
+        while (childElem)
+        {
+          if (MatchingElement(_sdfElement, childElem))
+            pluginElem->RemoveChild(childElem);
+          childElem = childElem->GetNextElement(childName);
+        }
       }
     }
-    //  Remove plugin element if last connection was deleted
+    //  Remove plugin element if last element was deleted
     if (pluginElem->GetFirstElement() == NULL)
     {
       this->sdfToAppend->RemoveChild(pluginElem);
