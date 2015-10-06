@@ -150,8 +150,11 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
 
   // Swap button
   QToolButton *swapButton = new QToolButton();
-  swapButton->setText("Swap");
-  swapButton->setMinimumWidth(60);
+  swapButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  swapButton->setIcon(QPixmap(":/images/swap-parent-child.png"));
+  swapButton->setFixedSize(QSize(35, 35));
+  swapButton->setIconSize(QSize(25, 25));
+  swapButton->setToolTip("Swap parent and child");
   swapButton->setStyleSheet(
       "QToolButton\
       {\
