@@ -240,7 +240,7 @@ void CameraLens::SetType(const std::string &_type)
     }
     catch(const std::exception &ex)
     {
-      gzerr << "`fun` value [" << std::get<4>(params) 
+      gzerr << "`fun` value [" << std::get<4>(params)
             << "] is not known, keeping the old one" << std::endl;
     }
   }
