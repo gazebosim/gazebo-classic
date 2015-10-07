@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_SENSORS_WIDEANGLE_CAMERA_SENSOR_HH_
-#define _GAZEBO_SENSORS_WIDEANGLE_CAMERA_SENSOR_HH_
+#ifndef _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
+#define _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/sensors/Sensor.hh"
@@ -66,9 +67,9 @@ namespace gazebo
       /// \param[in] _msg Message received from topic
       protected: void OnCtrlMessage(ConstCameraLensPtr &_msg);
 
-      // \internal
-      // \brief Private data pointer
-      public: WideAngleCameraSensorPrivate *dataPtr = nullptr;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::unique_ptr<WideAngleCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

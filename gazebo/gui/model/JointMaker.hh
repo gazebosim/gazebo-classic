@@ -308,9 +308,6 @@ namespace gazebo
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
 
-      /// \brief Visual that is previously hovered over by the mouse
-      private: rendering::VisualPtr prevHoverVis;
-
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 

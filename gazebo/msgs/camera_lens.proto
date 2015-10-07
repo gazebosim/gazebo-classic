@@ -1,7 +1,7 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface CameraLensCmd
+/// \interface CameraLens
 /// \brief Information and control over a camera lens element
 
 message CameraLens

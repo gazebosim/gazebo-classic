@@ -198,22 +198,22 @@ void CameraLens::SetType(const std::string &_type)
 
   // c1, c2, c3, f, fun
   std::map< std::string, std::tuple<double, double, double,
-      double, std::string> > fun_types = {
+      double, std::string> > funTypes = {
     {"gnomonical",      std::make_tuple(1.0, 1.0, 0.0, 1.0, "tan")},
     {"stereographic",   std::make_tuple(2.0, 2.0, 0.0, 1.0, "tan")},
     {"equidistant",     std::make_tuple(1.0, 1.0, 0.0, 1.0, "id")},
     {"equisolid_angle", std::make_tuple(2.0, 2.0, 0.0, 1.0, "sin")},
     {"orthographic",    std::make_tuple(1.0, 1.0, 0.0, 1.0, "sin")}};
 
-  fun_types.emplace("custom",
+  funTypes.emplace("custom",
       std::make_tuple(this->C1(), this->C2(), this->C3(), this->F(),
         CameraLensPrivate::MapFunctionEnum(this->Fun()).AsString()));
 
-  decltype(fun_types)::mapped_type params;
+  decltype(funTypes)::mapped_type params;
 
   try
   {
-    params = fun_types.at(_type);
+    params = funTypes.at(_type);
   }
   catch(...)
   {
@@ -359,19 +359,19 @@ void CameraLens::SetUniformVariables(Ogre::Pass *_pass, const float _ratio,
   if (this->ScaleToHFOV())
   {
     float param = (_hfov/2)/this->dataPtr->c2+this->dataPtr->c3;
-    float fun_res = this->dataPtr->fun.Apply(static_cast<float>(param));
+    float funRes = this->dataPtr->fun.Apply(static_cast<float>(param));
 
-    float new_f = 1.0f/(this->dataPtr->c1*fun_res);
+    float newF = 1.0f/(this->dataPtr->c1*funRes);
 
-    uniforms->setNamedConstant("f", static_cast<Ogre::Real>(new_f));
+    uniforms->setNamedConstant("f", static_cast<Ogre::Real>(newF));
   }
   else
     uniforms->setNamedConstant("f", static_cast<Ogre::Real>(this->dataPtr->f));
 
-  auto vec_fun = this->dataPtr->fun.AsVector3d();
+  auto vecFun = this->dataPtr->fun.AsVector3d();
 
   uniforms->setNamedConstant("fun", Ogre::Vector3(
-      vec_fun.X(), vec_fun.Y(), vec_fun.Z()));
+      vecFun.X(), vecFun.Y(), vecFun.Z()));
 
   uniforms->setNamedConstant("cutOffAngle",
     static_cast<Ogre::Real>(this->dataPtr->cutOffAngle));
@@ -452,15 +452,22 @@ void WideAngleCamera::Load()
 
   if (this->sdf->HasElement("lens"))
   {
-    sdf::ElementPtr sdf_lens = this->sdf->GetElement("lens");
+    sdf::ElementPtr sdfLens = this->sdf->GetElement("lens");
 
-    this->Lens()->Load(sdf_lens);
+    this->dataPtr->lens->Load(sdfLens);
 
-    if (sdf_lens->HasElement("env_texture_size"))
-      this->dataPtr->envTextureSize = sdf_lens->Get<int>("env_texture_size");
+    if (sdfLens->HasElement("env_texture_size"))
+      this->dataPtr->envTextureSize = sdfLens->Get<int>("env_texture_size");
   }
   else
-    this->Lens()->Load();
+    this->dataPtr->lens->Load();
+
+  std::string lensType = this->dataPtr->lens->Type();
+  if (lensType == "gnomonical" && this->GetHFOV() > (IGN_PI/2.0))
+  {
+    gzerr << "The recommended camera horizontal FOV should be <= PI/2"
+        << " for lens of type 'gnomonical'." << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////

@@ -14,23 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_WIDE_ANGLE_CAMERA_CAMERA_SENSOR_PRIVATE_HH_
-#define _GAZEBO_RENDERING_WIDE_ANGLE_CAMERA_CAMERA_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_WIDEANGLE_CAMERA_SENSOR_PRIVATE_HH_
+#define _GAZEBO_WIDEANGLE_CAMERA_SENSOR_PRIVATE_HH_
 
 #include <mutex>
 #include <queue>
 
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/util/system.hh"
 
 
 namespace gazebo
 {
   namespace sensors
   {
-    /// \brief Private data for the WideAngleCameraSensor class
-    class GZ_RENDERING_VISIBLE WideAngleCameraSensorPrivate
+    /// \internal
+    /// \brief Wide angle camera sensor private data.
+    class WideAngleCameraSensorPrivate
     {
       /// \brief Publisher of lens info messages
       public: transport::PublisherPtr lensPub;

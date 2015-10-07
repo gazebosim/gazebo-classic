@@ -36,8 +36,8 @@
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
-#include "gazebo/sensors/WideAngleCameraSensor.hh"
 #include "gazebo/sensors/WideAngleCameraSensorPrivate.hh"
+#include "gazebo/sensors/WideAngleCameraSensor.hh"
 
 
 using namespace gazebo;
@@ -103,7 +103,8 @@ void WideAngleCameraSensor::Init()
     if (this->camera->GetImageWidth() == 0 ||
         this->camera->GetImageHeight() == 0)
     {
-      gzthrow("image has zero size");
+      gzerr << "image has zero size" << std::endl;
+      return;
     }
 
     this->camera->Init();
@@ -153,7 +154,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   this->dataPtr->lensPub = this->node->Advertise<msgs::CameraLens>(
     lensTopicName+"info", 1);
 
-  this->dataPtr->lensSub = this->node->Subscribe(lensTopicName+"control",
+  this->dataPtr->lensSub = this->node->Subscribe(lensTopicName + "control",
       &WideAngleCameraSensor::OnCtrlMessage, this);
 }
 
@@ -177,7 +178,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     std::lock_guard<std::mutex> lock(this->dataPtr->lensCmdMutex);
 
     for (; !this->dataPtr->hfovCmdQueue.empty();
-            this->dataPtr->hfovCmdQueue.pop())
+        this->dataPtr->hfovCmdQueue.pop())
       this->camera->SetHFOV(math::Angle(this->dataPtr->hfovCmdQueue.front()));
 
     msgs::CameraLens msg;
