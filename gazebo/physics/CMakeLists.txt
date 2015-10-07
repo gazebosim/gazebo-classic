@@ -185,6 +185,7 @@ set (gtest_sources
   JointController_TEST.cc
   Light_TEST.cc
   LightState_TEST.cc
+  ModelState_TEST.cc
   PhysicsEngine_TEST.cc
   PresetManager_TEST.cc
   Road_TEST.cc
