@@ -18,6 +18,8 @@
  * Desc: Projector
  * Author: Jared Duke, John Hsu, Nate Koenig
  */
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 
 #include "gazebo/rendering/RTShaderSystem.hh"
 

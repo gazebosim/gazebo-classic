@@ -131,8 +131,11 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
 //////////////////////////////////////////////////
 OculusCamera::~OculusCamera()
 {
-  RenderEngine::Instance()->root->destroySceneManager(
-      this->dataPtr->externalSceneManager);
+  if (this->dataPtr->externalSceneManager)
+  {
+    RenderEngine::Instance()->root->destroySceneManager(
+        this->dataPtr->externalSceneManager);
+  }
 
   ovrHmd_Destroy(this->dataPtr->hmd);
   ovr_Shutdown();

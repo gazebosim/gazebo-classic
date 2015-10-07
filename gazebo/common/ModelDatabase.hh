@@ -21,6 +21,7 @@
 #include <map>
 #include <utility>
 
+#include <boost/function.hpp>
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
