@@ -17,6 +17,7 @@
 
 #include <mutex>
 
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -49,12 +50,6 @@ GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 WideAngleCameraSensor::WideAngleCameraSensor()
   : dataPtr(new WideAngleCameraSensorPrivate)
 {
-}
-
-//////////////////////////////////////////////////
-WideAngleCameraSensor::~WideAngleCameraSensor()
-{
-  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////

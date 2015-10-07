@@ -62,7 +62,7 @@ namespace gazebo
       public: CameraLens();
 
       /// \brief Destructor
-      public: ~CameraLens();
+      public: ~CameraLens() = default;
 
       /// \brief Init custom camera lens with specified parameters
       /// \param[in] _c1 Image scaling factor

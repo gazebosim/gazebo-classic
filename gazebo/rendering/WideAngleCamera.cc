@@ -42,11 +42,6 @@ CameraLens::CameraLens()
 }
 
 //////////////////////////////////////////////////
-CameraLens::~CameraLens()
-{
-}
-
-//////////////////////////////////////////////////
 void CameraLens::Init(const double _c1, const double _c2,
                       const std::string &_fun, const double _f,
                       const double _c3)
@@ -60,7 +55,7 @@ void CameraLens::Init(const double _c1, const double _c2,
   {
     this->dataPtr->fun = CameraLensPrivate::MapFunctionEnum(_fun);
   }
-  catch(...)
+  catch(const std::exception &ex)
   {
     gzerr << "`fun` value [" << _fun << "] is not known, "
           << "[tan] will be used instead" << std::endl;
@@ -403,9 +398,8 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
                                  ScenePtr _scene, const bool _autoRender,
                                  const int _textureSize)
     : Camera(_namePrefix, _scene, _autoRender),
-      dataPtr(new CameraLensPrivate)
+      dataPtr(new WideAngleCameraPrivate)
 {
-  this->dataPtr = new WideAngleCameraPrivate;
   this->dataPtr->lens = new CameraLens();
 
   this->dataPtr->envCubeMapTexture = NULL;
