@@ -734,7 +734,7 @@ std::string ModelCreator::AddShape(EntityType _type,
 
   std::stringstream linkNameStream;
   linkNameStream << this->previewName << "_" << this->modelCounter
-      << "::ENTITY_" << this->linkCounter++;
+      << "::link_" << this->linkCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,

@@ -3215,7 +3215,7 @@ void Scene::ShowContacts(bool _show)
     this->dataPtr->visuals[this->dataPtr->contactVisId] = vis;
   }
   else
-    vis = boost::dynamic_pointer_cast<ContactVisual>(
+    vis = std::dynamic_pointer_cast<ContactVisual>(
         this->dataPtr->visuals[this->dataPtr->contactVisId]);
 
   if (vis)
