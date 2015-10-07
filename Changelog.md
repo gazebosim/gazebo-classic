@@ -1,5 +1,11 @@
 ## Gazebo 6.0
 
+### Gazebo 6.x.x
+
+1. Update inertia properties during simulation
+    * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
+    * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
+
 ### Gazebo 6.3.0 (2015-10-06)
 
 1. Added `Sensor::SetPose` function
