@@ -55,12 +55,14 @@ event::EventT<void (std::string, bool)> model::Events::setSelectedModelPlugin;
 event::EventT<void (std::string)> model::Events::modelPluginInserted;
 event::EventT<void (std::string)> model::Events::modelPluginRemoved;
 event::EventT<void (std::string)> model::Events::requestModelPluginRemoval;
-event::EventT<void (std::string)> model::Events::jointParentChosen3D;
-event::EventT<void (std::string)> model::Events::jointChildChosen3D;
-event::EventT<void (JointMaker::JointType)>
-    model::Events::jointTypeChosenDialog;
-event::EventT<void (std::string)> model::Events::jointParentChosenDialog;
-event::EventT<void (std::string)> model::Events::jointChildChosenDialog;
-event::EventT<void (ignition::math::Pose3d, bool)>
-    model::Events::jointPoseChosenDialog;
+
+// Joint creation
 event::EventT<void ()> model::Events::jointCreateDialog;
+event::EventT<void (std::string)> model::Events::jointParentFrom3D;
+event::EventT<void (std::string)> model::Events::jointChildFrom3D;
+event::EventT<void (JointMaker::JointType)>
+    model::Events::jointTypeFromDialog;
+event::EventT<void (std::string)> model::Events::jointParentFromDialog;
+event::EventT<void (std::string)> model::Events::jointChildFromDialog;
+event::EventT<void (ignition::math::Pose3d, bool)>
+    model::Events::jointPoseFromDialog;

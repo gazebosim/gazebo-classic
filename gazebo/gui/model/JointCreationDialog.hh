@@ -34,6 +34,7 @@ namespace gazebo
     class JointMaker;
     class ConfigWidget;
     class ConfigChildWidget;
+    class JointCreationDialogPrivate;
 
     /// \class JointCreationDialog gui/JointCreationDialog.hh
     /// \brief A class to inspect and modify joints.
@@ -42,76 +43,84 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
+      /// \param[in] _jointMaker Pointer to the joint maker.
       /// \param[in] _parent Parent QWidget.
       public: JointCreationDialog(JointMaker *_jointMaker,
           QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~JointCreationDialog() = default;
+      public: ~JointCreationDialog();
 
+      /// \brief Open the dialog.
+      /// \param[in] _type Joint type which will be selected when dialog opens.
       public: void Open(JointMaker::JointType _type);
 
+      /// \brief Update the relative pose widget.
+      /// \param[in] _pose New pose.
       public: void UpdateRelativePose(const ignition::math::Pose3d &_pose);
 
-      /// \brief Qt event emiited when the mouse enters this widget.
-      /// \param[in] _event Qt event.
+      // Documentation inherited
       protected: virtual void enterEvent(QEvent *_event);
 
+      /// \brief Qt callback when joint type is changed on the dialog.
+      /// \param[in] _type Index of type chosen
       private slots: void OnTypeFromDialog(int _type);
+
+      /// \brief Qt callback when a link is chosen on the dialog.
       private slots: void OnLinkFromDialog();
+
+      /// \brief Qt callback when the pose is changed on the dialog.
+      /// \param[in] _name Name of the pose widget in the config widget that
+      /// emitted the signal.
+      /// \param[in] _pose New pose.
       private slots: void OnPoseFromDialog(const QString &_name,
           const ignition::math::Pose3d &_pose);
-      private slots: void OnResetPoses();
-      private slots: void OnParentFrom3D(const std::string &_linkName);
-      private slots: void OnChildFrom3D(const std::string &_linkName);
-      private slots: void OnSwap();
-      private: void OnParentImpl(const QString &_linkName);
-      private: void OnChildImpl(const QString &_linkName);
 
-      /// \brief Qt callback when an enum value has changed.
-      /// \param[in] _name of widget in the config widget that emitted the
-      /// signal.
+      /// \brief Qt callback when an enum value has changed on the dialog.
+      /// \param[in] _name Name of the enum widget in the config widget that
+      /// emitted the signal.
       /// \param[in] _value New value in string.
       private slots: void OnEnumChanged(const QString &_name,
           const QString &_value);
 
+      /// \brief Qt callback when the Reset poses button is pressed.
+      private slots: void OnResetPoses();
+
+      /// \brief Qt callback when the Swap links button is pressed.
+      private slots: void OnSwap();
+
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
-      /// \brief Qt callback when the Ok button is pressed.
+      /// \brief Qt callback when the Create button is pressed.
       private slots: void OnCreate();
 
+      /// \brief Event callback when the parent link is chosen in the 3D scene.
+      /// \param[in] _linkName Name of new parent link.
+      private: void OnParentFrom3D(const std::string &_linkName);
+
+      /// \brief Event callback when the child link is chosen in the 3D scene.
+      /// \param[in] _linkName Name of new child link.
+      private: void OnChildFrom3D(const std::string &_linkName);
+
+      /// \brief Check if the current parent and child link selection is valid.
       private: void CheckLinksValid();
 
-      /// \brief Config widget for configuring joint properties.
-      private: ConfigWidget *configWidget;
+      /// \internal
+      /// \brief Handles choosing the parent link, whether it is chosen from the
+      /// dialog or the 3D scene.
+      /// \param[in] _linkName Name of new parent link.
+      private: void OnParentImpl(const QString &_linkName);
 
-      /// \brief Widget for the parent link.
-      private: ConfigChildWidget *parentLinkWidget;
+      /// \internal
+      /// \brief Handles choosing the child link, whether it is chosen from the
+      /// dialog or the 3D scene.
+      /// \param[in] _linkName Name of new child link.
+      private: void OnChildImpl(const QString &_linkName);
 
-      /// \brief Widget for the child link.
-      private: ConfigChildWidget *childLinkWidget;
-
-      /// \brief Config widget for configuring joint properties.
-      private: JointMaker *jointMaker;
-
-      private: QButtonGroup *typeButtons;
-
-      /// \brief A list of gui editor events connected to this palette.
-      private: std::vector<event::ConnectionPtr> connections;
-
-
-      private: QPushButton *createButton;
-      private: QToolButton *swapButton;
-
-      /// \brief Style sheet for link widgets when there's a warning.
-      private: QString activeStyleSheet;
-
-      /// \brief Style sheet for link widgets when there's a warning.
-      private: QString warningStyleSheet;
-
-      /// \brief Normal style sheet for link widgets.
-      private: QString normalStyleSheet;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: JointCreationDialogPrivate *dataPtr;
     };
     /// \}
   }
