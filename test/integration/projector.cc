@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "images_cmp.h"
 
 using namespace gazebo;

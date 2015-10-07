@@ -17,7 +17,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"

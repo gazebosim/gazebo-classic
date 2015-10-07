@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class GpsSensor_TEST : public ServerFixture
@@ -102,8 +102,8 @@ TEST_F(GpsSensor_TEST, CreateGps)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  EXPECT_DOUBLE_EQ(sensor->GetLatitude().Radian(), 0.0);
-  EXPECT_DOUBLE_EQ(sensor->GetLongitude().Radian(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->Latitude().Radian(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->Longitude().Radian(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->GetAltitude(), 0.0);
 
   EXPECT_TRUE(sensor->IsActive());

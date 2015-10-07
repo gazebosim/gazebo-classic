@@ -20,7 +20,11 @@
  */
 
 #include <sys/types.h>
-#include <unistd.h>
+#ifdef _WIN32
+  #include <process.h>
+#else
+  #include <unistd.h>
+#endif
 #include <ctime>
 
 #include "gazebo/math/Rand.hh"
@@ -32,7 +36,11 @@ using namespace math;
 // We don't seed with time for the cases when two processes are started the
 // same time (this mostly happens with launch scripts that start a server
 // and gui simultaneously).
-uint32_t Rand::seed = getpid();
+#ifdef _WIN32
+  uint32_t Rand::seed = _getpid();
+#else
+  uint32_t Rand::seed = getpid();
+#endif
 
 GeneratorType *Rand::randGenerator = new GeneratorType(seed);
 

@@ -32,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief A screw joint
-    class GAZEBO_VISIBLE SimbodyScrewJoint : public ScrewJoint<SimbodyJoint>
+    class GZ_PHYSICS_VISIBLE SimbodyScrewJoint : public ScrewJoint<SimbodyJoint>
     {
       /// \brief Constructor
       /// \param[in] _world Pointer to the Simbody world.

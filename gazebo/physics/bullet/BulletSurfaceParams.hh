@@ -33,7 +33,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet surface parameters.
-    class GAZEBO_VISIBLE BulletSurfaceParams : public SurfaceParams
+    class GZ_PHYSICS_VISIBLE BulletSurfaceParams : public SurfaceParams
     {
       /// \brief Constructor.
       public: BulletSurfaceParams();
@@ -51,11 +51,14 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
+      // Documentation inherited.
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+
       /// \brief Friction pyramid parameters (mu1, mu2).
       // For further documentation, see:
       // github.com/erwincoumans/bullet3/blob/master/src/BulletDynamics
       // /ConstraintSolver/btSequentialImpulseConstraintSolver.cpp#L910
-      FrictionPyramid frictionPyramid;
+      private: FrictionPyramidPtr frictionPyramid;
     };
     /// \}
   }

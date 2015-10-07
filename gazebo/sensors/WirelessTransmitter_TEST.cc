@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class WirelessTransmitter_TEST : public ServerFixture
@@ -63,11 +63,13 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
   double freq = 2442.0;
   double power = 14.5;
   double gain = 2.6;
-  math::Pose txPose(math::Vector3(0.0, 0.0, 0.055), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d txPose(
+      ignition::math::Vector3d(0.0, 0.0, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn a wireless transmitter with sensor visualization
-  SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
-      txPose.rot.GetAsEuler(), txEssid, freq, power, gain);
+  SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.Pos(),
+      txPose.Rot().Euler(), txEssid, freq, power, gain);
 
   this->tx = boost::static_pointer_cast<sensors::WirelessTransmitter>(
       sensors::SensorManager::Instance()->GetSensor(txSensorName));
@@ -139,15 +141,18 @@ void WirelessTransmitter_TEST::TestSignalStrength()
 {
   int samples = 100;
   double signStrengthAvg = 0.0;
-  math::Pose txPose(math::Vector3(3.0, 3.0, 0.055), math::Quaternion(0, 0, 0));
-  math::Pose txPoseOccluded(math::Vector3(-3.0, -3.0, 0.055),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d txPose(
+      ignition::math::Vector3d(3.0, 3.0, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d txPoseOccluded(
+      ignition::math::Vector3d(-3.0, -3.0, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Take some samples and get the average signal strength
   for (int i = 0; i < samples; ++i)
   {
     this->tx->Update(true);
-    signStrengthAvg += tx->GetSignalStrength(txPose, tx->GetGain());
+    signStrengthAvg += this->tx->SignalStrength(txPose, tx->GetGain());
   }
   signStrengthAvg /= samples;
 
@@ -199,11 +204,13 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
   double freq = 2442.0;
   double power = 14.5;
   double gain = 2.6;
-  math::Pose txPose(math::Vector3(3.0, 3.0, 0.055), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d txPose(
+      ignition::math::Vector3d(3.0, 3.0, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn a wireless transmitter without sensor visualization
   SpawnWirelessTransmitterSensor(txModelName + "NoVisual",
-      txNoVisualSensorName, txPose.pos, txPose.rot.GetAsEuler(),
+      txNoVisualSensorName, txPose.Pos(), txPose.Rot().Euler(),
       txEssid + "NoVisual", freq, power, gain, false);
 
   txNoVisual = boost::static_pointer_cast<sensors::WirelessTransmitter>(

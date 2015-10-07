@@ -47,6 +47,10 @@ namespace gazebo
       /// \brief Initialize the model manipulator.
       public: void Init();
 
+      /// \brief Clear the model manipulator. This explicity cleans up the
+      /// internal state of the singleton and prepares it for exit.
+      public: void Clear();
+
       /// \brief Detach the manipulator from an entity
       public: void Detach();
 
@@ -123,6 +127,8 @@ namespace gazebo
 
       /// \brief Helper function to get the distance moved by the mouse.
       /// \param[in] _camera Pointer to user camera.
+      /// \param[in] _start Start point.
+      /// \param[in] _end End point.
       /// \param[in] _pose Pose of origin.
       /// \param[in] _axis Movement axis.
       /// \param[in] _local True to get distance in local frame.
@@ -152,6 +158,15 @@ namespace gazebo
       /// \brief Publish visual's scale to the server
       /// \param[in] _vis Pointer to the visual whose scale is to be published.
       private: void PublishVisualScale(rendering::VisualPtr _vis);
+
+      /// \brief Helper function to constrain the scale dimensions for simple
+      /// shapes
+      /// \param[in] _axis Scaling axis.
+      /// \param[in] _scale Input scale to be updated.
+      /// \param[in] _geom Type of geometry.
+      /// \return Updated scale.
+      private: math::Vector3 UpdateScale(const math::Vector3 &_axis,
+          const math::Vector3 &_scale, const std::string &_geom);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelManipulator>;

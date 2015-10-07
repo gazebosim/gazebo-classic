@@ -18,6 +18,12 @@
 #ifndef _GEARBOXJOINT_HH_
 #define _GEARBOXJOINT_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <string>
 
 #include "gazebo/math/Angle.hh"
@@ -34,7 +40,7 @@ namespace gazebo
     /// \class GearboxJoint GearboxJoint.hh physics/physics.hh
     /// \brief A double axis gearbox joint
     template<class T>
-    class GAZEBO_VISIBLE GearboxJoint : public T
+    class GZ_PHYSICS_VISIBLE GearboxJoint : public T
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link

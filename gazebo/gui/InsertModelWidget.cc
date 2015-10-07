@@ -15,8 +15,16 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <fstream>
+
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
 
@@ -84,7 +92,19 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   if (!additionalPaths.empty())
   {
     common::SystemPaths::Instance()->AddModelPaths(additionalPaths);
-    this->UpdateLocalPath(additionalPaths);
+
+    // Get each path in the : separated list
+    std::string delim(":");
+    size_t pos1 = 0;
+    size_t pos2 = additionalPaths.find(delim);
+    while (pos2 != std::string::npos)
+    {
+      this->UpdateLocalPath(additionalPaths.substr(pos1, pos2-pos1));
+      pos1 = pos2+1;
+      pos2 = additionalPaths.find(delim, pos2+1);
+    }
+    this->UpdateLocalPath(additionalPaths.substr(pos1,
+          additionalPaths.size()-pos1));
   }
 
   // Connect callbacks now that everything else is initialized
@@ -153,6 +173,7 @@ void InsertModelWidget::Update()
     }
 
     this->dataPtr->modelBuffer.clear();
+    this->dataPtr->getModelsConnection.reset();
   }
   else
     QTimer::singleShot(1000, this, SLOT(Update()));
@@ -166,7 +187,6 @@ void InsertModelWidget::OnModels(
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   this->dataPtr->modelBuffer = _models;
-  this->dataPtr->getModelsConnection.reset();
 }
 
 /////////////////////////////////////////////////

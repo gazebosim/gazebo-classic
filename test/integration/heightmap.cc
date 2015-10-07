@@ -16,14 +16,15 @@
 */
 
 #include <string.h>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "heights_cmp.h"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "images_cmp.h"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -33,6 +34,7 @@ class HeightmapTest : public ServerFixture,
   public: void PhysicsLoad(const std::string &_physicsEngine);
   public: void WhiteAlpha(const std::string &_physicsEngine);
   public: void WhiteNoAlpha(const std::string &_physicsEngine);
+  public: void Volume(const std::string &_physicsEngine);
   public: void NotSquareImage();
   public: void InvalidSizeImage();
   // public: void Heights(const std::string &_physicsEngine);
@@ -70,8 +72,8 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == math::Vector3(129, 129, 10));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
 
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
   common::Image testImage = shape->GetImage();
@@ -194,6 +196,41 @@ void HeightmapTest::InvalidSizeImage()
   delete this->server;
 }
 
+/////////////////////////////////////////////////
+void HeightmapTest::Volume(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "simbody")
+  {
+    // SimbodyHeightmapShape unimplemented. ComputeVolume actually returns 0 as
+    // an error code, which is the correct answer, but we'll skip it for now.
+    gzerr << "Aborting test for "
+          << _physicsEngine
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for "
+          << _physicsEngine
+          << ", see issue #909" << std::endl;
+    return;
+  }
+
+  Load("worlds/heightmap_test.world", true, _physicsEngine);
+
+  physics::ModelPtr model = GetModel("heightmap");
+  EXPECT_TRUE(model != NULL);
+
+  physics::CollisionPtr collision =
+    model->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr shape =
+    boost::dynamic_pointer_cast<physics::HeightmapShape>(
+        collision->GetShape());
+
+  EXPECT_DOUBLE_EQ(shape->ComputeVolume(), 0);
+}
+
 /*
 void HeightmapTest::Heights(const std::string &_physicsEngine)
 {
@@ -238,8 +275,8 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == math::Vector3(129, 129, 10));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
 
   std::vector<float> physicsTest;
   std::vector<float> renderTest;
@@ -347,6 +384,12 @@ TEST_P(HeightmapTest, WhiteAlpha)
 TEST_P(HeightmapTest, WhiteNoAlpha)
 {
   WhiteNoAlpha(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, Volume)
+{
+  Volume(GetParam());
 }
 
 /////////////////////////////////////////////////

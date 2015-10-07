@@ -33,8 +33,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics_dart DART Physics
     /// \{
 
+    /// Forward declare private data class
+    class DARTRayShapePrivate;
+
     /// \brief Ray collision
-    class GAZEBO_VISIBLE DARTRayShape : public RayShape
+    class GZ_PHYSICS_VISIBLE DARTRayShape : public RayShape
     {
       /// \brief Constructor for a global ray.
       /// \param[in] _physicsEngine Pointer to the physics engine.
@@ -62,8 +65,9 @@ namespace gazebo
       public: virtual void SetPoints(const math::Vector3 &_posStart,
                                      const math::Vector3 &_posEnd);
 
-      /// \brief Pointer to the DART physics engine
-      private: DARTPhysicsPtr physicsEngine;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTRayShapePrivate *dataPtr;
     };
   }
 }

@@ -41,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet Link class
-    class GAZEBO_VISIBLE BulletLink : public Link
+    class GZ_PHYSICS_VISIBLE BulletLink : public Link
     {
       /// \brief Constructor
       public: BulletLink(EntityPtr _parent);
@@ -143,6 +143,10 @@ namespace gazebo
                   const math::Vector3 &_force,
                   const math::Vector3 &_relpos);
 
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
+
       // Documentation inherited.
       public: virtual void AddTorque(const math::Vector3 &_torque);
 
@@ -154,6 +158,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetLinkStatic(bool _static);
+
+      // Documentation inherited.
+      public: virtual void UpdateMass();
 
       /// \brief Pointer to bullet compound shape, which is a container
       ///        for other child shapes.

@@ -4,15 +4,16 @@ package gazebo.msgs;
 /// \interface WorldStatistics
 /// \brief A message statiscs about a world
 
-
+import "log_playback_stats.proto";
 import "time.proto";
 
 message WorldStatistics
 {
-  required Time  sim_time    = 2;
-  required Time  pause_time  = 3;
-  required Time  real_time   = 4;
-  required bool  paused      = 5;
-  required uint64 iterations = 6;
-  optional int32 model_count = 7;
+  required Time  sim_time                           = 2;
+  required Time  pause_time                         = 3;
+  required Time  real_time                          = 4;
+  required bool  paused                             = 5;
+  required uint64 iterations                        = 6;
+  optional int32 model_count                        = 7;
+  optional LogPlaybackStatistics log_playback_stats = 8;
 }

@@ -16,7 +16,7 @@
 */
 
 #include <boost/thread.hpp>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 

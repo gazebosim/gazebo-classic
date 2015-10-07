@@ -15,7 +15,7 @@
  *
 */
 #include <boost/bind.hpp>
-#include "Inertial.hh"
+#include "gazebo/physics/Inertial.hh"
 
 using namespace gazebo;
 using namespace physics;

@@ -60,6 +60,7 @@ OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
 /////////////////////////////////////////////////
 OculusWindow::~OculusWindow()
 {
+  this->scene.reset();
   if (this->attachCameraThread)
     this->attachCameraThread->join();
   delete this->attachCameraThread;

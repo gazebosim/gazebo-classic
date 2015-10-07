@@ -610,6 +610,7 @@ void ModelListWidget_TEST::LinkProperties()
   gazebo::gui::ModelListWidget *modelListWidget
       = new gazebo::gui::ModelListWidget;
   modelListWidget->show();
+  modelListWidget->setGeometry(0, 0, 400, 800);
   QCoreApplication::processEvents();
 
   this->Load("worlds/multilink_shape.world");
@@ -713,6 +714,7 @@ void ModelListWidget_TEST::LinkProperties()
   QRect boxLinkRect = modelTreeWidget->visualItemRect(boxLinkItem);
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
       boxLinkRect.center() );
+
   QCoreApplication::processEvents();
   sleep = 0;
   maxSleep = 5;
@@ -787,10 +789,12 @@ void ModelListWidget_TEST::LinkProperties()
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
       sphereLinkRect.center() );
   QCoreApplication::processEvents();
+  QTest::qWait(100);
   sleep = 0;
   maxSleep = 5;
   while (!sphereLinkItem->isSelected() && sleep < maxSleep)
   {
+    QCoreApplication::processEvents();
     QTest::qWait(10);
     sleep++;
   }

@@ -36,11 +36,20 @@ namespace gazebo
     /// \brief Private data for the COM Visual class
     class COMVisualPrivate : public VisualPrivate
     {
-      /// \brief Lines that make the cross marking the center of mass
+      /// \brief Lines that make the cross marking the center of mass.
       public: DynamicLines *crossLines;
 
-      /// \brief Box that make the cross marking the center of mass
-      public: Ogre::SceneNode *boxNode;
+      /// \brief Sphere with density of lead and equivalent mass.
+      public: Ogre::SceneNode *sphereNode;
+
+      /// \brief Inertia pose in link frame.
+      public: math::Pose inertiaPose;
+
+      /// \brief Parent link name.
+      public: std::string linkName;
+
+      /// \brief Link mass.
+      public: double mass;
     };
   }
 }

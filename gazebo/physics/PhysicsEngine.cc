@@ -14,6 +14,13 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -31,6 +38,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/PresetManager.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -102,6 +110,15 @@ PhysicsEngine::~PhysicsEngine()
 math::Vector3 PhysicsEngine::GetGravity() const
 {
   return this->sdf->Get<math::Vector3>("gravity");
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d PhysicsEngine::MagneticField() const
+{
+  if (this->sdf->HasElement("magnetic_field"))
+    return this->sdf->Get<ignition::math::Vector3d>("magnetic_field");
+  else
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -177,22 +194,7 @@ void PhysicsEngine::SetMaxStepSize(double _stepSize)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetWorldCFM(double /*_cfm*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetWorldERP(double /*_erp*/)
-{
-}
-
-//////////////////////////////////////////////////
 void PhysicsEngine::SetAutoDisableFlag(bool /*_autoDisable*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 {
 }
 
@@ -207,30 +209,130 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &/*_msg*/)
+void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  this->world->GetPresetManager()->CurrentProfile(_msg->profile_name());
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
+bool PhysicsEngine::SetParam(const std::string &_key,
+    const boost::any &_value)
 {
-}
-
-//////////////////////////////////////////////////
-bool PhysicsEngine::SetParam(const std::string &/*_key*/,
-    const boost::any &/*_value*/)
-{
+  try
+  {
+    if (_key == "type")
+    {
+      // Cannot set physics engine type from SetParam
+      return false;
+    }
+    if (_key == "max_step_size")
+      this->SetMaxStepSize(boost::any_cast<double>(_value));
+    else if (_key == "real_time_update_rate")
+      this->SetRealTimeUpdateRate(boost::any_cast<double>(_value));
+    else if (_key == "real_time_factor")
+      this->SetTargetRealTimeFactor(boost::any_cast<double>(_value));
+    else if (_key == "gravity")
+    {
+      boost::any copy = _value;
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+      if (_value.type() == typeid(sdf::Vector3))
+      {
+        copy = boost::lexical_cast<ignition::math::Vector3d>
+            (boost::any_cast<sdf::Vector3>(_value));
+      }
+      else if (_value.type() == typeid(math::Vector3))
+      {
+        copy = boost::lexical_cast<ignition::math::Vector3d>
+            (boost::any_cast<math::Vector3>(_value));
+      }
+      this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
+    }
+    else if (_key == "magnetic_field")
+    {
+      boost::any copy = _value;
+      if (_value.type() == typeid(sdf::Vector3))
+      {
+        copy = boost::lexical_cast<ignition::math::Vector3d>
+            (boost::any_cast<sdf::Vector3>(_value));
+      }
+      else if (_value.type() == typeid(math::Vector3))
+      {
+        copy = boost::lexical_cast<ignition::math::Vector3d>
+            (boost::any_cast<math::Vector3>(_value));
+      }
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
+      this->sdf->GetElement("magnetic_field")->
+          Set(boost::any_cast<ignition::math::Vector3d>(copy));
+    }
+    else
+    {
+      gzwarn << "SetParam failed for [" << _key << "] in physics engine "
+             << this->GetType() << std::endl;
+      return false;
+    }
+  }
+  catch(boost::bad_any_cast &_e)
+  {
+    gzerr << "Caught bad any_cast in PhysicsEngine::SetParam: " << _e.what()
+          << std::endl;
+    return false;
+  }
+  catch(boost::bad_lexical_cast &_e)
+  {
+    gzerr << "Caught bad lexical_cast in PhysicsEngine::SetParam: " << _e.what()
+          << std::endl;
+    return false;
+  }
   return true;
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
+boost::any PhysicsEngine::GetParam(const std::string &_key) const
 {
-  return 0;
+  boost::any value;
+  this->PhysicsEngine::GetParam(_key, value);
+  return value;
+}
+
+//////////////////////////////////////////////////
+bool PhysicsEngine::GetParam(const std::string &_key,
+    boost::any &_value) const
+{
+  if (_key == "type")
+    _value = this->GetType();
+  else if (_key == "max_step_size")
+    _value = this->GetMaxStepSize();
+  else if (_key == "real_time_update_rate")
+    _value = this->GetRealTimeUpdateRate();
+  else if (_key == "real_time_factor")
+    _value = this->GetTargetRealTimeFactor();
+  else if (_key == "gravity")
+    _value = this->GetGravity();
+  else if (_key == "magnetic_field")
+    _value = this->sdf->Get<math::Vector3>("magnetic_field");
+  else
+  {
+    gzwarn << "GetParam failed for [" << _key << "] in physics engine "
+           << this->GetType() << std::endl;
+    return false;
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
 ContactManager *PhysicsEngine::GetContactManager() const
 {
   return this->contactManager;
+}
+
+//////////////////////////////////////////////////
+sdf::ElementPtr PhysicsEngine::GetSDF() const
+{
+  return this->sdf;
 }

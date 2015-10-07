@@ -99,3 +99,33 @@ TEST_F(BoxTest, OperatorPlus)
   EXPECT_TRUE(box == math::Box(math::Vector3(-2, -2, -2),
                                math::Vector3(4, 4, 4)));
 }
+
+/////////////////////////////////////////////////
+TEST_F(BoxTest, Contains)
+{
+  math::Box box = math::Box(math::Vector3(0, 0, 0), math::Vector3(1, 1, 1));
+
+  EXPECT_TRUE(box.Contains(math::Vector3(0, 0, 0)));
+  EXPECT_TRUE(box.Contains(math::Vector3(0, 0, 1)));
+  EXPECT_TRUE(box.Contains(math::Vector3(0, 1, 1)));
+  EXPECT_TRUE(box.Contains(math::Vector3(1, 1, 1)));
+  EXPECT_TRUE(box.Contains(math::Vector3(1, 1, 0)));
+  EXPECT_TRUE(box.Contains(math::Vector3(1, 0, 0)));
+  EXPECT_TRUE(box.Contains(math::Vector3(0.5, 0.5, 0.5)));
+
+  EXPECT_FALSE(box.Contains(math::Vector3(0, 0, -1)));
+  EXPECT_FALSE(box.Contains(math::Vector3(0, -1, -1)));
+  EXPECT_FALSE(box.Contains(math::Vector3(-1, -1, -1)));
+  EXPECT_FALSE(box.Contains(math::Vector3(-1, -1, 0)));
+  EXPECT_FALSE(box.Contains(math::Vector3(-1, 0, 0)));
+
+  EXPECT_FALSE(box.Contains(math::Vector3(0.5, 0.5, -0.5)));
+  EXPECT_FALSE(box.Contains(math::Vector3(0.5, -0.5, 0.5)));
+  EXPECT_FALSE(box.Contains(math::Vector3(-0.5, 0.5, 0.5)));
+  EXPECT_FALSE(box.Contains(math::Vector3(-0.5, -0.5, 0.5)));
+  EXPECT_FALSE(box.Contains(math::Vector3(-0.5, -0.5, -0.5)));
+
+  EXPECT_FALSE(box.Contains(math::Vector3(0, 0, -0.01)));
+  EXPECT_FALSE(box.Contains(math::Vector3(0, -0.01, 0)));
+  EXPECT_FALSE(box.Contains(math::Vector3(-0.01, 0, 0)));
+}

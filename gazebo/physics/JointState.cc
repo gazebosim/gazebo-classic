@@ -32,8 +32,8 @@ JointState::JointState()
 
 /////////////////////////////////////////////////
 JointState::JointState(JointPtr _joint, const common::Time &_realTime,
-    const common::Time &_simTime)
-: State(_joint->GetName(), _realTime, _simTime)
+    const common::Time &_simTime, const uint64_t _iterations)
+: State(_joint->GetName(), _realTime, _simTime, _iterations)
 {
   // Set the joint angles.
   for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
@@ -43,7 +43,7 @@ JointState::JointState(JointPtr _joint, const common::Time &_realTime,
 /////////////////////////////////////////////////
 JointState::JointState(JointPtr _joint)
 : State(_joint->GetName(), _joint->GetWorld()->GetRealTime(),
-        _joint->GetWorld()->GetSimTime())
+        _joint->GetWorld()->GetSimTime(), _joint->GetWorld()->GetIterations())
 {
   // Set the joint angles.
   for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)

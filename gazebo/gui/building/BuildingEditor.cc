@@ -20,6 +20,7 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
@@ -32,19 +33,20 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow)
 {
   // Tips
-  QLabel *tipsLabel = new QLabel(tr(
+  this->tipsLabel = new QLabel(tr(
       "<font size=4 color='white'><b>?</b></font>"));
-  tipsLabel->setToolTip(tr("<font size=3><p><b> Tips: </b></b>"
+  this->tipsLabel->setToolTip(tr("<font size=3><p><b> Tips: </b></b>"
       "<p>Double-click an object to open an Inspector with configuration "
       "options.</p>"
       "<p>Currently, windows & doors are simple holes in the wall.</p>"
       "<p>Because Gazebo only supports simple primitive shapes, all floors "
       "will be rectangular.</p>"));
+  this->tipsLabel->installEventFilter(this);
 
   // Create the building editor tab
   this->buildingPalette = new BuildingEditorPalette;
   this->Init("buildingEditorTab", "Building Editor", this->buildingPalette,
-      tipsLabel);
+      this->tipsLabel);
 
   this->newAct = new QAction(tr("&New"), this->mainWindow);
   this->newAct->setStatusTip(tr("New"));
@@ -76,6 +78,15 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
       gui::editor::Events::ConnectFinishBuildingModel(
       boost::bind(&BuildingEditor::OnFinish, this)));
 
+  this->buildingEditorWidget = new BuildingEditorWidget(
+      this->mainWindow->GetRenderWidget());
+  this->buildingEditorWidget->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
+  this->buildingEditorWidget->hide();
+
+  this->mainWindow->GetRenderWidget()->InsertWidget(0,
+      this->buildingEditorWidget);
+
   this->menuBar = NULL;
 }
 
@@ -87,15 +98,13 @@ BuildingEditor::~BuildingEditor()
 ////////////////////////////////////////////////
 void BuildingEditor::Save()
 {
-  gui::editor::Events::saveBuildingEditor(
-    this->buildingPalette->GetModelName());
+  gui::editor::Events::saveBuildingEditor();
 }
 
 ////////////////////////////////////////////////
 void BuildingEditor::SaveAs()
 {
-  gui::editor::Events::saveAsBuildingEditor(
-      this->buildingPalette->GetModelName());
+  gui::editor::Events::saveAsBuildingEditor();
 }
 
 /////////////////////////////////////////////////
@@ -139,17 +148,41 @@ void BuildingEditor::OnEdit(bool _checked)
   if (_checked)
   {
     this->CreateMenus();
+    this->mainWindowPaused = this->mainWindow->IsPaused();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("buildingEditorTab");
     this->mainWindow->ShowMenuBar(this->menuBar);
-    this->mainWindow->GetRenderWidget()->ShowEditor(true);
+    this->buildingEditorWidget->show();
+    this->mainWindow->GetRenderWidget()->DisplayOverlayMsg(
+        "Building is View Only");
+    this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
+    this->mainWindow->GetRenderWidget()->ShowToolbar(false);
   }
   else
   {
+    this->buildingPalette->CustomColorDialog()->reject();
     this->mainWindow->ShowLeftColumnWidget();
-    this->mainWindow->GetRenderWidget()->ShowEditor(false);
+    this->buildingEditorWidget->hide();
+    this->mainWindow->GetRenderWidget()->DisplayOverlayMsg("");
+    this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
+    this->mainWindow->GetRenderWidget()->ShowToolbar(true);
     this->mainWindow->ShowMenuBar();
-    this->mainWindow->Play();
+    if (!this->mainWindowPaused)
+      this->mainWindow->Play();
   }
   gui::editor::Events::toggleEditMode(_checked);
+}
+
+/////////////////////////////////////////////////
+bool BuildingEditor::eventFilter(QObject *_obj, QEvent *_event)
+{
+  QLabel *label = qobject_cast<QLabel *>(_obj);
+  if (label && label == this->tipsLabel &&
+      _event->type() == QEvent::MouseButtonRelease)
+  {
+    QToolTip::showText(this->tipsLabel->mapToGlobal(QPoint()),
+        this->tipsLabel->toolTip());
+    return true;
+  }
+  return false;
 }

@@ -23,8 +23,8 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/physics/physics.hh"
-#include "test/integration/helper_physics_generator.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 

@@ -16,10 +16,12 @@
  */
 #include <sys/stat.h>
 #include <string>
+#include <map>
 
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/math/Vector2i.hh"
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
@@ -49,16 +51,17 @@ MeshManager::MeshManager()
 
   // Create some basic shapes
   this->CreatePlane("unit_plane",
-      math::Plane(math::Vector3(0, 0, 1), math::Vector2d(1, 1), 0),
-      math::Vector2d(1, 1),
-      math::Vector2d(1, 1));
+      ignition::math::Planed(
+        ignition::math::Vector3d(0, 0, 1), ignition::math::Vector2d(1, 1), 0),
+      ignition::math::Vector2d(1, 1),
+      ignition::math::Vector2d(1, 1));
 
   this->CreateSphere("unit_sphere", 0.5, 32, 32);
   this->CreateSphere("joint_anchor", 0.01, 32, 32);
-  this->CreateBox("body_cg", math::Vector3(0.014, 0.014, 0.014),
-      math::Vector2d(0.014, 0.014));
-  this->CreateBox("unit_box", math::Vector3(1, 1, 1),
-      math::Vector2d(1, 1));
+  this->CreateBox("body_cg", ignition::math::Vector3d(0.014, 0.014, 0.014),
+      ignition::math::Vector2d(0.014, 0.014));
+  this->CreateBox("unit_box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector2d(1, 1));
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
@@ -191,17 +194,35 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
       extension) != this->fileExtensions.end();
 }
 
-
 //////////////////////////////////////////////////
 void MeshManager::GetMeshAABB(const Mesh *_mesh, math::Vector3 &_center,
-    math::Vector3 &_min_xyz, math::Vector3 &_max_xyz)
+    math::Vector3 &_minXYZ, math::Vector3 &_maxXYZ)
+{
+  ignition::math::Vector3d center, minXYZ, maxXYZ;
+  this->GetMeshAABB(_mesh, center, minXYZ, maxXYZ);
+  _center = center;
+  _minXYZ = minXYZ;
+  _maxXYZ = maxXYZ;
+}
+
+//////////////////////////////////////////////////
+void MeshManager::GetMeshAABB(const Mesh *_mesh,
+    ignition::math::Vector3d &_center,
+    ignition::math::Vector3d &_minXYZ, ignition::math::Vector3d &_maxXYZ)
 {
   if (this->HasMesh(_mesh->GetName()))
-    this->meshes[_mesh->GetName()]->GetAABB(_center, _min_xyz, _max_xyz);
+    this->meshes[_mesh->GetName()]->GetAABB(_center, _minXYZ, _maxXYZ);
 }
 
 //////////////////////////////////////////////////
 void MeshManager::GenSphericalTexCoord(const Mesh *_mesh, math::Vector3 _center)
+{
+  this->GenSphericalTexCoord(_mesh, _center.Ign());
+}
+
+//////////////////////////////////////////////////
+void MeshManager::GenSphericalTexCoord(const Mesh *_mesh,
+    const ignition::math::Vector3d &_center)
 {
   if (this->HasMesh(_mesh->GetName()))
     this->meshes[_mesh->GetName()]->GenSphericalTexCoord(_center);
@@ -251,7 +272,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
   float deltaRingAngle = (M_PI / rings);
-  math::Vector3 vert, norm;
+  ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
 
   Mesh *mesh = new Mesh();
@@ -265,13 +286,13 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   for (ring = 0; ring <= rings; ++ring)
   {
     float r0 = radius * sinf(ring * deltaRingAngle);
-    vert.y = radius * cosf(ring * deltaRingAngle);
+    vert.Y() = radius * cosf(ring * deltaRingAngle);
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; ++seg)
     {
-      vert.x = r0 * sinf(seg * deltaSegAngle);
-      vert.z = r0 * cosf(seg * deltaSegAngle);
+      vert.X() = r0 * sinf(seg * deltaSegAngle);
+      vert.Z() = r0 * cosf(seg * deltaSegAngle);
 
       norm = vert;
       norm.Normalize();
@@ -300,55 +321,78 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
-                              const math::Vector2d &segments,
-                              const math::Vector2d &uvTile)
+void MeshManager::CreatePlane(const std::string &_name,
+    const math::Plane &_plane,
+    const math::Vector2d &_segments,
+    const math::Vector2d &_uvTile)
 {
-  this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
+  this->CreatePlane(_name, _plane.Ign(), _segments.Ign(), _uvTile.Ign());
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreatePlane(const std::string &name,
-    const math::Vector3 &normal, double d, const math::Vector2d &size,
-    const math::Vector2d &segments, const math::Vector2d &uvTile)
+void MeshManager::CreatePlane(const std::string &_name,
+    const ignition::math::Planed &_plane,
+    const ignition::math::Vector2d &_segments,
+    const ignition::math::Vector2d &_uvTile)
 {
-  if (this->HasMesh(name))
+  this->CreatePlane(_name, _plane.Normal(), _plane.Offset(), _plane.Size(),
+      _segments, _uvTile);
+}
+
+//////////////////////////////////////////////////
+void MeshManager::CreatePlane(const std::string &_name,
+    const math::Vector3 &_normal, double _d, const math::Vector2d &_size,
+    const math::Vector2d &_segments, const math::Vector2d &_uvTile)
+{
+  this->CreatePlane(_name, _normal.Ign(), _d, _size.Ign(), _segments.Ign(),
+      _uvTile.Ign());
+}
+
+//////////////////////////////////////////////////
+void MeshManager::CreatePlane(const std::string &_name,
+    const ignition::math::Vector3d &_normal,
+    const double _d,
+    const ignition::math::Vector2d &_size,
+    const ignition::math::Vector2d &_segments,
+    const ignition::math::Vector2d &_uvTile)
+{
+  if (this->HasMesh(_name))
   {
     return;
   }
 
   Mesh *mesh = new Mesh();
-  mesh->SetName(name);
-  this->meshes.insert(std::make_pair(name, mesh));
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
-  math::Vector3 zAxis, yAxis, xAxis;
-  zAxis = normal;
+  ignition::math::Vector3d zAxis, yAxis, xAxis;
+  zAxis = _normal;
   zAxis.Normalize();
-  yAxis = zAxis.GetPerpendicular();
+  yAxis = zAxis.Perpendicular();
   xAxis = yAxis.Cross(zAxis);
 
-  math::Matrix4 xlate, xform, rot;
-  xlate = rot = math::Matrix4::IDENTITY;
+  ignition::math::Matrix4d xlate, xform, rot;
+  xlate = rot = ignition::math::Matrix4d::Identity;
 
-  math::Matrix3 rot3;
-  rot3.SetFromAxes(xAxis, yAxis, zAxis);
+  ignition::math::Matrix3d rot3;
+  rot3.Axes(xAxis, yAxis, zAxis);
 
   rot = rot3;
 
-  xlate.SetTranslate(normal * -d);
+  xlate.Translate(_normal * -_d);
   xform = xlate * rot;
 
-  math::Vector3 vec;
-  math::Vector3 norm(0, 0, 1);
-  double xSpace = size.x / segments.x;
-  double ySpace = size.y / segments.y;
-  double halfWidth = size.x / 2.0;
-  double halfHeight = size.y / 2.0;
-  double xTex = uvTile.x / segments.x;
-  double yTex = uvTile.y / segments.y;
+  ignition::math::Vector3d vec;
+  ignition::math::Vector3d norm(0, 0, 1);
+  double xSpace = _size.X() / _segments.X();
+  double ySpace = _size.Y() / _segments.Y();
+  double halfWidth = _size.X() / 2.0;
+  double halfHeight = _size.Y() / 2.0;
+  double xTex = _uvTile.X() / _segments.X();
+  double yTex = _uvTile.Y() / _segments.Y();
 
   // Give it some thickness to reduce shadow artifacts.
   double thickness = 0.01;
@@ -356,14 +400,14 @@ void MeshManager::CreatePlane(const std::string &name,
   for (int i = 0; i <= 1; ++i)
   {
     double z = i*thickness;
-    for (int y = 0; y <= segments.y; ++y)
+    for (int y = 0; y <= _segments.Y(); ++y)
     {
-      for (int x = 0; x <= segments.x; ++x)
+      for (int x = 0; x <= _segments.X(); ++x)
       {
         // Compute the position of the vertex
-        vec.x = (x * xSpace) - halfWidth;
-        vec.y = (y * ySpace) - halfHeight;
-        vec.z = -z;
+        vec.X() = (x * xSpace) - halfWidth;
+        vec.Y() = (y * ySpace) - halfHeight;
+        vec.Z() = -z;
         vec = xform.TransformAffine(vec);
         subMesh->AddVertex(vec);
 
@@ -377,23 +421,31 @@ void MeshManager::CreatePlane(const std::string &name,
     }
   }
 
-  this->Tesselate2DMesh(subMesh, segments.x + 1, segments.y + 1, false);
+  this->Tesselate2DMesh(subMesh, _segments.X() + 1, _segments.Y() + 1, false);
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
-    const math::Vector2d &uvCoords)
+void MeshManager::CreateBox(const std::string &_name,
+    const math::Vector3 &_sides, const math::Vector2d &_uvCoords)
+{
+  this->CreateBox(_name, _sides.Ign(), _uvCoords.Ign());
+}
+
+//////////////////////////////////////////////////
+void MeshManager::CreateBox(const std::string &_name,
+    const ignition::math::Vector3d &_sides,
+    const ignition::math::Vector2d &_uvCoords)
 {
   int i, k;
 
-  if (this->HasMesh(name))
+  if (this->HasMesh(_name))
   {
     return;
   }
 
   Mesh *mesh = new Mesh();
-  mesh->SetName(name);
-  this->meshes.insert(std::make_pair(name, mesh));
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -425,7 +477,8 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   // Texture coords
   double t[4][2] =
   {
-    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
+    {_uvCoords.X(), 0}, {0, 0}, {0, _uvCoords.Y()},
+    {_uvCoords.X(), _uvCoords.Y()}
   };
 
   // Vertices
@@ -456,9 +509,9 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   // Compute the vertices
   for (i = 0; i < 8; ++i)
   {
-    v[i][0] *= sides.x * 0.5;
-    v[i][1] *= sides.y * 0.5;
-    v[i][2] *= sides.z * 0.5;
+    v[i][0] *= _sides.X() * 0.5;
+    v[i][1] *= _sides.Y() * 0.5;
+    v[i][2] *= _sides.Z() * 0.5;
   }
 
   // For each face
@@ -476,22 +529,60 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   }
 
   // Set the indices
-  for (i = 0; i < 36; i++)
+  for (i = 0; i < 36; ++i)
     subMesh->AddIndex(ind[i]);
 }
 
 //////////////////////////////////////////////////
 void MeshManager::CreateExtrudedPolyline(const std::string &_name,
-    const std::vector<math::Vector2d> &_vertices,
-    const double &_height, const math::Vector2d & /*_uvCoords*/)
+    const std::vector<std::vector<math::Vector2d> > &_polys, double _height)
 {
+  std::vector<std::vector<ignition::math::Vector2d> > polys;
+  for (auto const &polyVec : _polys)
+  {
+    std::vector<ignition::math::Vector2d> newVec;
+    for (auto const &poly : polyVec)
+      newVec.push_back(poly.Ign());
+    polys.push_back(newVec);
+  }
+
+  this->CreateExtrudedPolyline(_name, polys, _height);
+}
+
+//////////////////////////////////////////////////
+void MeshManager::CreateExtrudedPolyline(const std::string &_name,
+    const std::vector<std::vector<ignition::math::Vector2d> > &_polys,
+    double _height)
+{
+  // distance tolerence between 2 points. This is used when creating a list
+  // of distinct points in the polylines.
+  double tol = 1e-4;
+  #if !HAVE_GTS
+    gzerr << "GTS library not found. Can not extrude polyline" << std::endl;
+    return;
+  #endif
+  auto polys = _polys;
+  // close all the loops
+  for (auto &poly : polys)
+  {
+    // does the poly ends with the first point?
+    auto first = poly[0];
+    auto last = poly[poly.size()-1];
+    double d = (first.X() - last.X()) * (first.X() - last.X());
+    d += (first.Y() - last.Y()) * (first.Y() - last.Y());
+
+    // within range
+    if (d >  tol * tol)
+    {
+      // add the first point at the end
+      poly.push_back(first);
+    }
+  }
+
   if (this->HasMesh(_name))
   {
     return;
   }
-
-  int i;
-  int numSides = _vertices.size();
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
@@ -500,108 +591,176 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
+  std::vector<ignition::math::Vector2d> vertices;
+  std::vector<ignition::math::Vector2i> edges;
+  MeshManager::ConvertPolylinesToVerticesAndEdges(polys,
+                                                  tol,
+                                                  vertices,
+                                                  edges);
   #if HAVE_GTS
+  if (!GTSMeshUtils::DelaunayTriangulation(vertices, edges, subMesh))
   {
-    if (!GTSMeshUtils::CreateExtrudedPolyline(_vertices, _height, subMesh))
-    {
-      gzerr << "Unable to create extruded polyline.\n";
-      delete mesh;
-      return;
-    }
-  }
-  #else
-  {
-    gzerr << "GTS library not found.\n" <<
-             "Polylines rendered may be incorrect, if concave\n";
-
-    // Add the vertices
-    for (i = 0; i < numSides; ++i)
-    {
-      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
-      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
-    }
-
-    // Euler's Formula: numFaces = numEdges - numVertices + 2
-    //                           = numSides + 2
-    // # of SideFaces = numFaces - (upper face + lower face)
-    //                = numFaces - 2
-    //                = numSides
-
-    // for lower face
-    int startVert = 0;
-    int endVert = numSides * 2 - 2;
-    subMesh->AddIndex(startVert);
-    startVert += 2;
-    subMesh->AddIndex(startVert);
-    subMesh->AddIndex(endVert);
-    for (i = 1; i < numSides-2; ++i)
-    {
-      if (i%2)
-      {
-        subMesh->AddIndex(startVert);
-        startVert += 2;
-        subMesh->AddIndex(startVert);
-        subMesh->AddIndex(endVert);
-      }
-      else
-      {
-        subMesh->AddIndex(endVert);
-        endVert -= 2;
-        subMesh->AddIndex(startVert);
-        subMesh->AddIndex(endVert);
-      }
-    }
-
-    // for upper face
-    startVert = 1;
-    endVert = numSides*2-1;
-    subMesh->AddIndex(startVert);
-    startVert += 2;
-    subMesh->AddIndex(endVert);
-    subMesh->AddIndex(startVert);
-    for (i = 1; i < numSides-2; ++i)
-    {
-      if (!i%2)
-      {
-        subMesh->AddIndex(startVert);
-        startVert += 2;
-        subMesh->AddIndex(startVert);
-        subMesh->AddIndex(endVert);
-      }
-      else
-      {
-        subMesh->AddIndex(endVert);
-        endVert -= 2;
-        subMesh->AddIndex(endVert);
-        subMesh->AddIndex(startVert);
-      }
-    }
+    gzerr << "Unable to triangulate polyline." << std::endl;
+    delete mesh;
+    return;
   }
   #endif
 
-  // for each sideface
-  for (i = 0; i < numSides; ++i)
+  std::vector<ignition::math::Vector3d> normals;
+  for (unsigned int i  = 0; i < edges.size(); ++i)
   {
-    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
-    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
-  }
-  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, 0.0);
-  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, _height);
+    // we retrieve each edge's coordinates
+    int i0 = edges[i][0];
+    int i1 = edges[i][1];
+    ignition::math::Vector2d edgeV0 = vertices[i0];
+    ignition::math::Vector2d edgeV1 = vertices[i1];
 
-  for (i = 0; i < numSides; ++i)
+    // we look for those points in the subMesh (where indices may have changed)
+    for (unsigned int j = 0; j < subMesh->GetIndexCount(); j+=3)
+    {
+      ignition::math::Vector3d v0 = subMesh->Vertex(subMesh->GetIndex(j));
+      ignition::math::Vector3d v1 = subMesh->Vertex(subMesh->GetIndex(j+1));
+      ignition::math::Vector3d v2 = subMesh->Vertex(subMesh->GetIndex(j+2));
+
+      std::vector<ignition::math::Vector3d> triangle;
+      triangle.push_back(v0);
+      triangle.push_back(v1);
+      triangle.push_back(v2);
+
+      int ev0 = -1;
+      for (unsigned int k = 0; k < triangle.size(); ++k)
+      {
+        if (ignition::math::Vector2d(triangle[k].X(), triangle[k].Y()) ==
+            edgeV0)
+        {
+          // found a vertex in triangle that matches the vertex of the edge
+          ev0 = k;
+          break;
+        }
+      }
+      if (ev0 >=0)
+      {
+        int ev1 = -1;
+        int ev2 = -1;
+        for (unsigned int k = 0; k < triangle.size()-1; ++k)
+        {
+          int index = (ev0 + k + 1) % triangle.size();
+          ignition::math::Vector3d triV = triangle[index];
+          if (math::Vector2d(triV.X(), triV.Y()) == edgeV1)
+          {
+            // found another vertex in triangle that matches the vertex of the
+            // other edge.
+            ev1 = index;
+            // Store the index of the third triangle vertex.
+            // It's either 0, 1, or 2. Find it using simple bitwise operation.
+            ev2 =  ~(ev1 | ev0) & 0x03;
+            break;
+          }
+        }
+        if (ev1 >= 0 && ev2 >= 0 && ev0 != ev1 && ev0 != ev2)
+        {
+          // Found an edge in triangle that matches the exterior edge.
+          // Now find its normal.
+
+          ignition::math::Vector3d edgeVec = triangle[ev0] - triangle[ev1];
+          edgeVec.Normalize();
+          ignition::math::Vector3d normal(edgeVec.Y(), -edgeVec.X(), 0);
+
+          ignition::math::Vector3d otherEdgeVec = triangle[ev0] - triangle[ev2];
+          otherEdgeVec.Normalize();
+          double angle0 = otherEdgeVec.Dot(normal);
+          double angle1 = otherEdgeVec.Dot(-normal);
+
+          if (angle0 > angle1)
+          {
+            if (angle0 >= 0)
+              normals.push_back(normal);
+          }
+          else
+          {
+            if (angle1 >= 0)
+              normals.push_back(-normal);
+          }
+        }
+      }
+    }
+  }
+
+  // number of exterior edge normals found should be equal to the number of
+  // exterior edges
+  if (normals.size() != edges.size())
   {
-    subMesh->AddIndex(i*2+numSides*2);
-    subMesh->AddIndex(i*2+1+numSides*2);
-    subMesh->AddIndex(i*2+2+numSides*2);
-
-    subMesh->AddIndex(i*2+2+numSides*2);
-    subMesh->AddIndex(i*2+1+numSides*2);
-    subMesh->AddIndex(i*2+3+numSides*2);
+    gzerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
+    return;
   }
 
-  if (subMesh->GetNormalCount() != subMesh->GetVertexCount())
-    subMesh->SetNormalCount(subMesh->GetVertexCount());
-  subMesh->RecalculateNormals();
+  unsigned int numVertices = subMesh->GetVertexCount();
+
+  // add normal for bottom face
+  for (unsigned int i = 0; i < numVertices; ++i)
+    subMesh->AddNormal(-ignition::math::Vector3d::UnitZ);
+
+  // create the top face
+  for (unsigned int i = 0; i < numVertices; ++i)
+  {
+    ignition::math::Vector3d v = subMesh->Vertex(i);
+    subMesh->AddVertex(v.X(), v.Y(), _height);
+    subMesh->AddNormal(ignition::math::Vector3d::UnitZ);
+  }
+  unsigned int numIndices = subMesh->GetIndexCount();
+  for (unsigned int i = 0; i < numIndices; i+=3)
+  {
+    unsigned int i0 = subMesh->GetIndex(i);
+    unsigned int i1 = subMesh->GetIndex(i+1);
+    unsigned int i2 = subMesh->GetIndex(i+2);
+    subMesh->AddIndex(numVertices+i0);
+    subMesh->AddIndex(numVertices+i2);
+    subMesh->AddIndex(numVertices+i1);
+  }
+
+  // create the side faces
+  for (unsigned int i = 0; i < edges.size(); ++i)
+  {
+    // we retrieve each edge's coordinates
+    int i0 = edges[i][0];
+    int i1 = edges[i][1];
+    ignition::math::Vector2d v0 = vertices[i0];
+    ignition::math::Vector2d v1 = vertices[i1];
+
+    ignition::math::Vector2d edge2d = v1 - v0;
+    ignition::math::Vector3d edge(edge2d.X(), edge2d.Y(), 0);
+    ignition::math::Vector3d cross = edge.Cross(normals[i]);
+
+    unsigned int vCount = subMesh->GetVertexCount();
+
+    subMesh->AddVertex(ignition::math::Vector3d(v0.X(), v0.Y(), 0));
+    if (cross.Z() >0)
+    {
+      subMesh->AddVertex(ignition::math::Vector3d(v0.X(), v0.Y(), _height));
+      subMesh->AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), _height));
+    }
+    else
+    {
+      subMesh->AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), _height));
+      subMesh->AddVertex(ignition::math::Vector3d(v0.X(), v0.Y(), _height));
+    }
+    subMesh->AddVertex(ignition::math::Vector3d(v0.X(), v0.Y(), 0));
+    if (cross.Z() >0)
+    {
+      subMesh->AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), _height));
+      subMesh->AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), 0));
+    }
+    else
+    {
+      subMesh->AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), 0));
+      subMesh->AddVertex(ignition::math::Vector3d(v1.X(), v1.Y(), _height));
+    }
+    for (unsigned int j = 0; j < 6; ++j)
+    {
+      subMesh->AddIndex(vCount++);
+      subMesh->AddNormal(normals[i]);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -644,7 +803,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   // Texture coords
   /*float t[4][2] =
     {
-    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
+    {uvCoords.X(), 0}, {0, 0}, {0, uvCoords.Y()}, {uvCoords.X(), uvCoords.Y()}
     };*/
 
   // Vertices
@@ -673,7 +832,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   };
 
   // Compute the vertices
-  for (i = 0; i < 8; i++)
+  for (i = 0; i < 8; ++i)
   {
     v[i][0] *= _scale * 0.5;
     v[i][1] *= _scale * 0.5;
@@ -681,7 +840,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   }
 
   // For each face
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 6; ++i)
   {
     // For each vertex in the face
     for (k = 0; k < 4; k++)
@@ -695,7 +854,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   }
 
   // Set the indices
-  for (i = 0; i < 36; i++)
+  for (i = 0; i < 36; ++i)
     subMesh->AddIndex(ind[i]);
 
   mesh->RecalculateNormals();
@@ -705,7 +864,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
 void MeshManager::CreateCylinder(const std::string &name, float radius,
                                  float height, int rings, int segments)
 {
-  math::Vector3 vert, norm;
+  ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
@@ -725,17 +884,17 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   // Generate the group of rings for the cylinder
   for (ring = 0; ring <= rings; ++ring)
   {
-    vert.z = ring * height/rings - height/2.0;
+    vert.Z() = ring * height/rings - height/2.0;
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; ++seg)
     {
-      vert.y = radius * cosf(seg * deltaSegAngle);
-      vert.x = radius * sinf(seg * deltaSegAngle);
+      vert.Y() = radius * cosf(seg * deltaSegAngle);
+      vert.X() = radius * sinf(seg * deltaSegAngle);
 
       // TODO: Don't think these normals are correct.
       norm = vert;
-      norm.z = 0;
+      norm.Z() = 0;
       norm.Normalize();
 
       // Add one vertex to the strip which makes up the sphere
@@ -761,12 +920,12 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 
   // This block generates the top cap
   {
-    vert.z = height/2.0;
+    vert.Z() = height/2.0;
     // Generate the group of segments for the top ring
     for (seg = 0; seg <= segments; ++seg)
     {
-      vert.y = radius * cosf(seg * deltaSegAngle);
-      vert.x = radius * sinf(seg * deltaSegAngle);
+      vert.Y() = radius * cosf(seg * deltaSegAngle);
+      vert.X() = radius * sinf(seg * deltaSegAngle);
       subMesh->AddVertex(vert);
       subMesh->AddNormal(0, 0, 1);
       subMesh->AddTexCoord(
@@ -790,12 +949,12 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 
   // This block generates the bottom cap
   {
-    vert.z = -height/2.0;
+    vert.Z() = -height/2.0;
     // Generate the group of segments for the bottom ring
     for (seg = 0; seg <= segments; ++seg)
     {
-      vert.y = radius * cosf(seg * deltaSegAngle);
-      vert.x = radius * sinf(seg * deltaSegAngle);
+      vert.Y() = radius * cosf(seg * deltaSegAngle);
+      vert.X() = radius * sinf(seg * deltaSegAngle);
       subMesh->AddVertex(vert);
       subMesh->AddNormal(0, 0, -1);
       subMesh->AddTexCoord(
@@ -822,7 +981,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 void MeshManager::CreateCone(const std::string &name, float radius,
     float height, int rings, int segments)
 {
-  math::Vector3 vert, norm;
+  ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   unsigned int i, j;
   int ring, seg;
@@ -847,15 +1006,15 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   // Generate the group of rings for the cone
   for (ring = 0; ring < rings; ring++)
   {
-    vert.z = ring * height/rings - height/2.0;
+    vert.Z() = ring * height/rings - height/2.0;
 
-    double ringRadius = ((height - (vert.z+height/2.0)) / height) * radius;
+    double ringRadius = ((height - (vert.Z()+height/2.0)) / height) * radius;
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.y = ringRadius * cosf(seg * deltaSegAngle);
-      vert.x = ringRadius * sinf(seg * deltaSegAngle);
+      vert.Y() = ringRadius * cosf(seg * deltaSegAngle);
+      vert.X() = ringRadius * sinf(seg * deltaSegAngle);
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -915,13 +1074,13 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   {
     norm.Set();
 
-    for (j = 0; j < 3; j++)
-      norm += subMesh->GetNormal(subMesh->GetIndex(i+j));
+    for (j = 0; j < 3; ++j)
+      norm += subMesh->Normal(subMesh->GetIndex(i+j));
 
     norm /= 3;
     norm.Normalize();
 
-    for (j = 0; j < 3; j++)
+    for (j = 0; j < 3; ++j)
       subMesh->SetNormal(subMesh->GetIndex(i+j), norm);
   }
 
@@ -929,42 +1088,42 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateTube(const std::string &name, float innerRadius,
-    float outterRadius, float height, int rings,
-    int segments)
+void MeshManager::CreateTube(const std::string &_name, float _innerRadius,
+    float _outerRadius, float _height, int _rings, int _segments, double _arc)
 {
-  math::Vector3 vert, norm;
+  ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
-  float deltaSegAngle = (2.0 * M_PI / segments);
 
-  // Needs at lest 2 rings, and 3 segments
-  rings = std::max(rings, 1);
-  segments = std::max(segments, 3);
+  // Needs at lest 1 ring, and 3 segments
+  int rings = std::max(_rings, 1);
+  int segments = std::max(_segments, 3);
+
+  float deltaSegAngle = (_arc / segments);
 
   float radius = 0;
 
-  radius = outterRadius;
+  radius = _outerRadius;
 
-  if (this->HasMesh(name))
+  if (this->HasMesh(_name))
     return;
 
   Mesh *mesh = new Mesh();
-  mesh->SetName(name);
-  this->meshes.insert(std::make_pair(name, mesh));
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
   // Generate the group of rings for the outsides of the cylinder
-  for (ring = 0; ring <= rings; ring++)
+  for (ring = 0; ring <= rings; ++ring)
   {
-    vert.z = ring * height/rings - height/2.0;
+    vert.Z() = ring * _height/rings - _height/2.0;
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; seg++)
+    for (seg = 0; seg <= segments; ++seg)
     {
-      vert.y = radius * cosf(seg * deltaSegAngle);
-      vert.x = radius * sinf(seg * deltaSegAngle);
+      vert.Y() = radius * cosf(seg * deltaSegAngle);
+      vert.X() = radius * sinf(seg * deltaSegAngle);
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -977,33 +1136,43 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
           static_cast<float>(seg) / static_cast<float>(segments),
           static_cast<float>(ring) / static_cast<float>(rings));
 
+      // outer triangles connecting ring [ring] to ring [ring + 1]
       if (ring != rings)
       {
-        // each vertex (except the last) has six indices
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex);
-        subMesh->AddIndex(verticeIndex + segments);
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex + 1);
-        subMesh->AddIndex(verticeIndex);
+        if (seg != 0)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex);
+          subMesh->AddIndex(verticeIndex + segments);
+        }
+        if (seg != segments)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex + 1);
+          subMesh->AddIndex(verticeIndex);
+        }
       }
-      else
+      // ring [rings] is the edge of the top cap
+      else if (seg != segments)
       {
-        // This indices form the top cap
+        // These indices form the top cap
         subMesh->AddIndex(verticeIndex);
         subMesh->AddIndex(verticeIndex + segments + 1);
         subMesh->AddIndex(verticeIndex+1);
+
         subMesh->AddIndex(verticeIndex+1);
         subMesh->AddIndex(verticeIndex + segments + 1);
         subMesh->AddIndex(verticeIndex + segments + 2);
       }
 
-      // There indices form the bottom cap
+      // ring [0] is the edge of the bottom cap
       if (ring == 0 && seg < segments)
       {
+        // These indices form the bottom cap
         subMesh->AddIndex(verticeIndex+1);
         subMesh->AddIndex(verticeIndex + (segments+1) * (((rings+1)*2)-1));
         subMesh->AddIndex(verticeIndex);
+
         subMesh->AddIndex(verticeIndex + (segments+1) * (((rings+1)*2)-1) + 1);
         subMesh->AddIndex(verticeIndex + (segments+1) * (((rings+1)*2)-1));
         subMesh->AddIndex(verticeIndex+1);
@@ -1014,16 +1183,16 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   }
 
   // Generate the group of rings for the inside of the cylinder
-  radius = innerRadius;
-  for (ring = 0; ring <= rings; ring++)
+  radius = _innerRadius;
+  for (ring = 0; ring <= rings; ++ring)
   {
-    vert.z = (height/2.0) - (ring * height/rings);
+    vert.Z() = (_height/2.0) - (ring * _height/rings);
 
     // Generate the group of segments for the current ring
-    for (seg = 0; seg <= segments; seg++)
+    for (seg = 0; seg <= segments; ++seg)
     {
-      vert.y = radius * cosf(seg * deltaSegAngle);
-      vert.x = radius * sinf(seg * deltaSegAngle);
+      vert.Y() = radius * cosf(seg * deltaSegAngle);
+      vert.X() = radius * sinf(seg * deltaSegAngle);
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -1036,18 +1205,49 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
           static_cast<float>(seg) / static_cast<float>(segments),
           static_cast<float>(ring) / static_cast<float>(rings));
 
+      // inner triangles connecting ring [ring] to ring [ring + 1]
       if (ring != rings)
       {
-        // each vertex (except the last) has six indices
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex);
-        subMesh->AddIndex(verticeIndex + segments);
-
-        subMesh->AddIndex(verticeIndex + segments + 1);
-        subMesh->AddIndex(verticeIndex + 1);
-        subMesh->AddIndex(verticeIndex);
+        // each vertex has six indices (2 triangles)
+        if (seg != 0)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex);
+          subMesh->AddIndex(verticeIndex + segments);
+        }
+        if (seg != segments)
+        {
+          subMesh->AddIndex(verticeIndex + segments + 1);
+          subMesh->AddIndex(verticeIndex + 1);
+          subMesh->AddIndex(verticeIndex);
+        }
       }
       verticeIndex++;
+    }
+  }
+
+  // Close ends in case it's not a full circle
+  if (!ignition::math::equal(_arc, 2.0 * M_PI))
+  {
+    for (ring = 0; ring < rings; ++ring)
+    {
+      // Close beginning
+      subMesh->AddIndex((segments+1)*(ring+1));
+      subMesh->AddIndex((segments+1)*ring);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-2-ring));
+
+      subMesh->AddIndex((segments+1)*((rings+1)*2-2-ring));
+      subMesh->AddIndex((segments+1)*ring);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-1-ring));
+
+      // Close end
+      subMesh->AddIndex((segments+1)*((rings+1)*2-2-ring)+segments);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-1-ring)+segments);
+      subMesh->AddIndex((segments+1)*(ring+1)+segments);
+
+      subMesh->AddIndex((segments+1)*(ring+1)+segments);
+      subMesh->AddIndex((segments+1)*((rings+1)*2-1-ring)+segments);
+      subMesh->AddIndex((segments+1)*ring+segments);
     }
   }
 
@@ -1125,6 +1325,13 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
 void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
     const Mesh *_m2, int _operation, const math::Pose &_offset)
 {
+  this->CreateBoolean(_name, _m1, _m2, _operation, _offset.Ign());
+}
+
+//////////////////////////////////////////////////
+void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
+    const Mesh *_m2, int _operation, const ignition::math::Pose3d &_offset)
+{
   if (this->HasMesh(_name))
     return;
 
@@ -1135,3 +1342,54 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
 }
 #endif
 
+//////////////////////////////////////////////////
+size_t MeshManager::AddUniquePointToVerticesTable(
+                     std::vector<ignition::math::Vector2d> &_vertices,
+                     const ignition::math::Vector2d &_p,
+                     double _tol)
+{
+  double sqrTol = _tol * _tol;
+  for (auto i = 0u; i != _vertices.size(); ++i)
+  {
+    auto v = _vertices[i] - _p;
+    double d = (v.X() * v.X() + v.Y() * v.Y());
+    if ( d < sqrTol)
+    {
+      return i;
+    }
+  }
+  _vertices.push_back(_p);
+  size_t r =  _vertices.size() -1;
+  return r;
+}
+
+//////////////////////////////////////////////////
+void MeshManager::ConvertPolylinesToVerticesAndEdges(
+    const std::vector<std::vector<ignition::math::Vector2d> > &_polys,
+    double _tol,
+    std::vector<ignition::math::Vector2d> &_vertices,
+    std::vector<ignition::math::Vector2i> &edges)
+{
+  for (auto poly : _polys)
+  {
+    ignition::math::Vector2d previous = poly[0];
+    for (auto i = 1u; i != poly.size(); ++i)
+    {
+      auto p = poly[i];
+      auto startPointIndex = AddUniquePointToVerticesTable(_vertices,
+          previous, _tol);
+      auto endPointIndex = AddUniquePointToVerticesTable(_vertices,
+          p, _tol);
+      // current end point is now the starting point for the next edge
+      previous = p;
+      if (startPointIndex == endPointIndex)
+      {
+        gzwarn << "Ignoring edge without 2 distinct vertices" << std::endl;
+        continue;
+      }
+      // add the new edge
+      ignition::math::Vector2i e(startPointIndex, endPointIndex);
+      edges.push_back(e);
+    }
+  }
+}

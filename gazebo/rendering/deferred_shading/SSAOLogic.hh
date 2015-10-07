@@ -28,7 +28,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE SSAOLogic : public ListenerFactoryLogic
+    class GZ_RENDERING_DEFERRED_VISIBLE SSAOLogic : public ListenerFactoryLogic
     {
       /// @copydoc ListenerFactoryLogic::createListener
       protected: virtual Ogre::CompositorInstance::Listener *createListener(

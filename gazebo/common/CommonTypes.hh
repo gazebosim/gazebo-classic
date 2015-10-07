@@ -37,8 +37,11 @@
 #if defined(__GNUC__)
 #define GAZEBO_DEPRECATED(version) __attribute__((deprecated))
 #define GAZEBO_FORCEINLINE __attribute__((always_inline))
-#elif defined(MSVC)
-#define GAZEBO_DEPRECATED(version) ()
+#elif defined(_WIN32)
+// GAZEBO_DEPRECATED should be defined as something like
+// __declspec(deprecated), but it needs to go *before* the function name,
+// and we're putting GAZEBO_DEPRECATED *after* the function.
+#define GAZEBO_DEPRECATED(version)
 #define GAZEBO_FORCEINLINE __forceinline
 #else
 #define GAZEBO_DEPRECATED(version) ()

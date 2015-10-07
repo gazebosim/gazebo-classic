@@ -40,7 +40,7 @@ namespace gazebo
     /// \class ViewFactory ViewFactory.hh gui/viewers/ViewFactory.hh
     /// \brief The view factory creates GUI widgets to visualize data on
     /// a topic.
-    class GAZEBO_VISIBLE ViewFactory
+    class GZ_GUI_VIEWERS_VISIBLE ViewFactory
     {
       /// \brief Register all known views
       public: static void RegisterAll();
@@ -76,11 +76,11 @@ namespace gazebo
     /// \param[in] msgtype Type of message to visualize.
     /// \param[in] classname C++ class name for the view.
     #define GZ_REGISTER_STATIC_VIEWER(msgtype, classname) \
-    GAZEBO_VISIBLE TopicView *New##classname(QWidget *_parent) \
+    GZ_GUI_VIEWERS_VISIBLE TopicView *New##classname(QWidget *_parent) \
     { \
       return new gazebo::gui::classname(_parent); \
     } \
-    GAZEBO_VISIBLE \
+    GZ_GUI_VIEWERS_VISIBLE \
     void Register##classname() \
     {\
       ViewFactory::RegisterView(msgtype, New##classname);\

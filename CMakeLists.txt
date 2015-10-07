@@ -9,12 +9,12 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-set (GAZEBO_MAJOR_VERSION 5)
-set (GAZEBO_MINOR_VERSION 2)
+set (GAZEBO_MAJOR_VERSION 6)
+set (GAZEBO_MINOR_VERSION 3)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 1)
+set (GAZEBO_PATCH_VERSION 0)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -47,6 +47,10 @@ endif()
 
 # Documentation
 add_subdirectory(doc)
+
+# Configure documentation uploader
+configure_file("${CMAKE_SOURCE_DIR}/cmake/upload_doc.sh.in"
+  ${CMAKE_BINARY_DIR}/upload_doc.sh @ONLY)
 
 # If we're configuring only to build docs, stop here
 if (DOC_ONLY)
@@ -155,6 +159,10 @@ endif (NOT CMAKE_BUILD_TYPE)
 # uppercase old supported and deprecated modes
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
 
+if (NOT DEFINED HDF5_INSTRUMENT)
+  set (HDF5_INSTRUMENT FALSE)
+endif()
+
 set (BUILD_TYPE_PROFILE FALSE)
 set (BUILD_TYPE_RELEASE FALSE)
 set (BUILD_TYPE_RELWITHDEBINFO FALSE)
@@ -215,12 +223,18 @@ if (UNIX AND NOT APPLE)
   filter_valid_compiler_flags(-fvisibility=hidden -fvisibility-inlines-hidden)
 endif()
 
-# Visual Studio enables c++11 support by default
-if (NOT MSVC)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPERCASE}} -std=c++11")
+if (MSVC)
+  # Unable to be filtered flags (failing due to limitations in filter_valid_compiler_warnings)
+  # Handling exceptions rightly
+  set(UNFILTERED_FLAGS "/EHsc")
 endif()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS}")
+# Visual Studio enables c++11 support by default
+if (NOT MSVC)
+  set(UNFILTERED_FLAGS "-std=c++11")
+endif()
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS} ${UNFILTERED_FLAGS}")
 
 #################################################
 # OS Specific initialization
@@ -236,6 +250,9 @@ endif()
 
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+include_directories(SYSTEM
+  ${IGNITION-MATH_INCLUDE_DIRS}
+)
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
@@ -336,41 +353,65 @@ else (build_errors)
   ########################################
   # Make the cmake config files
   set(PKG_NAME ${PROJECT_NAME_UPPER})
+
+  # Order is important, if A depends on B, please add B after A.
+  # The list should have at the very end the libraries 
+  # without internal interdependencies
   set(PKG_LIBRARIES
     gazebo
-    gazebo_common
-    gazebo_gimpact
-    gazebo_gui
+    gazebo_client
     gazebo_gui_building
     gazebo_gui_viewers
-    gazebo_math
-    gazebo_msgs
-    gazebo_ode
-    gazebo_opcode
-    gazebo_opende_ou
-    gazebo_physics
-    gazebo_physics_ode
+    gazebo_gui_model
+    gazebo_gui
+    gazebo_sensors
     gazebo_rendering
     gazebo_selection_buffer
-    gazebo_sensors
-    gazebo_skyx
-    gazebo_transport
-    gazebo_util)
+  )
 
-  if (NOT CCD_FOUND)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
+  # "Second level" deps. Depends on a variety of first level deps
+  if (HAVE_DART)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_dart)
+  endif()
+  if (HAVE_BULLET)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
+  endif()
+  if (HAVE_SIMBODY)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_simbody)
   endif()
 
   if (INCLUDE_PLAYER)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
   endif()
 
-  if (HAVE_BULLET)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
-  endif()
+  set(PKG_LIBRARIES ${PKG_LIBRARIES}
+    gazebo_physics_ode
+    gazebo_physics
+    gazebo_ode
+  )
 
+  # "First level" deps, mostly depends on math and/or common
   if (${OGRE_VERSION} GREATER 1.7.4)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
+  endif()
+
+  set(PKG_LIBRARIES ${PKG_LIBRARIES}
+    gazebo_transport
+    gazebo_msgs
+    gazebo_util
+    gazebo_common)
+
+  # No other internal dependencies:
+  set(PKG_LIBRARIES ${PKG_LIBRARIES}
+    gazebo_skyx
+    gazebo_gimpact
+    gazebo_opcode
+    gazebo_opende_ou
+    gazebo_math
+  )
+
+  if (NOT CCD_FOUND)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
   endif()
 
   set(PKG_DEPENDS Boost Protobuf SDFormat OGRE)

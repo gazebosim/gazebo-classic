@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/bind.hpp>
 
 #include "gazebo/transport/transport.hh"
@@ -32,6 +38,8 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
 {
   TransmitterVisualPrivate *dPtr =
       reinterpret_cast<TransmitterVisualPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_SENSOR;
 
   dPtr->isFirst = true;
   dPtr->receivedMsg = false;

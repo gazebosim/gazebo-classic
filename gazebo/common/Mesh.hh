@@ -20,8 +20,12 @@
 #include <vector>
 #include <string>
 
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -37,7 +41,7 @@ namespace gazebo
 
     /// \class Mesh Mesh.hh common/common.hh
     /// \brief A 3D mesh
-    class GAZEBO_VISIBLE Mesh
+    class GZ_COMMON_VISIBLE Mesh
     {
       /// \brief Constructor
       public: Mesh();
@@ -63,11 +67,21 @@ namespace gazebo
 
       /// \brief Get the maximun X, Y, Z values
       /// \return the upper bounds of the bounding box
-      public: math::Vector3 GetMax() const;
+      /// \deprecated See Max function that returns ignition::math::Vector3d
+      public: math::Vector3 GetMax() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the maximun X, Y, Z values
+      /// \return the upper bounds of the bounding box
+      public: ignition::math::Vector3d Max() const;
 
       /// \brief Get the minimum X, Y, Z values
       /// \return the lower bounds of the bounding box
-      public: math::Vector3 GetMin() const;
+      /// \deprecated See Min function that returns ignition::math::Vector3d
+      public: math::Vector3 GetMin() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the minimum X, Y, Z values
+      /// \return the lower bounds of the bounding box
+      public: ignition::math::Vector3d Min() const;
 
       /// \brief Return the number of vertices
       /// \return the count
@@ -137,13 +151,33 @@ namespace gazebo
       /// \param[out] _center of the bounding box
       /// \param[out] _min_xyz bounding box minimum values
       /// \param[out] _max_xyz bounding box maximum values
+      /// \deprecated See GetAABB function that accepts
+      /// ignition::math::Vector3d
       public: void GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
-                           math::Vector3 &_max_xyz) const;
+                           math::Vector3 &_max_xyz) const
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get AABB coordinate
+      /// \param[out] _center of the bounding box
+      /// \param[out] _minXYZ bounding box minimum values
+      /// \param[out] _maxXYZ bounding box maximum values
+      public: void GetAABB(ignition::math::Vector3d &_center,
+                           ignition::math::Vector3d &_minXYZ,
+                           ignition::math::Vector3d &_maxXYZ) const;
 
       /// \brief Generate texture coordinates using spherical projection
       /// from center
       /// \param[in] _center the center of the projection
-      public: void GenSphericalTexCoord(const math::Vector3 &_center);
+      /// \deprecated See GenSphericalTexCoord that accepts
+      /// ignition::math::Vector3d.
+      public: void GenSphericalTexCoord(const math::Vector3 &_center)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Generate texture coordinates using spherical projection
+      /// from center
+      /// \param[in] _center the center of the projection
+      public: void GenSphericalTexCoord(
+                  const ignition::math::Vector3d &_center);
 
       /// \brief Get the skeleton to which this mesh is attached.
       /// \return pointer to skeleton, or NULL if none is present.
@@ -161,16 +195,38 @@ namespace gazebo
 
       /// \brief Scale all vertices by the _factor vector
       /// \param[in] _factor Scaling vector
-      public: void SetScale(const math::Vector3 &_factor);
+      /// \deprecated See SetScale function that accepts
+      /// ignition::math::Vector3d
+      public: void SetScale(const math::Vector3 &_factor)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Scale all vertices by the _factor vector
+      /// \param[in] _factor Scaling vector
+      public: void SetScale(const ignition::math::Vector3d &_factor);
 
       /// \brief Move the center of the mesh to the given coordinate. This
       /// will move all the vertices in all submeshes.
       /// \param[in] _center Location of the mesh center.
-      public: void Center(const math::Vector3 &_center = math::Vector3::Zero);
+      /// \deprecated See Center function that accepts
+      /// ignition::math::Vector3
+      public: void Center(const math::Vector3 &_center = math::Vector3::Zero)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Move the center of the mesh to the given coordinate. This
+      /// will move all the vertices in all submeshes.
+      /// \param[in] _center Location of the mesh center.
+      public: void Center(const ignition::math::Vector3d &_center =
+                  ignition::math::Vector3d::Zero);
 
       /// \brief Move all vertices in all submeshes by _vec.
       /// \param[in] _vec Amount to translate vertices.
-      public: void Translate(const math::Vector3 &_vec);
+      /// \deprecated See Translate function that accepts
+      /// ignition::math::Vector3d.
+      public: void Translate(const math::Vector3 &_vec) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Move all vertices in all submeshes by _vec.
+      /// \param[in] _vec Amount to translate vertices.
+      public: void Translate(const ignition::math::Vector3d &_vec);
 
       /// \brief The name of the mesh
       private: std::string name;
@@ -190,7 +246,7 @@ namespace gazebo
 
     /// \brief Vertex to node weighted assignement for skeleton animation
     /// visualization
-    class GAZEBO_VISIBLE NodeAssignment
+    class GZ_COMMON_VISIBLE NodeAssignment
     {
       /// \brief Constructor.
       public: NodeAssignment();
@@ -206,7 +262,7 @@ namespace gazebo
     };
 
     /// \brief A child mesh
-    class GAZEBO_VISIBLE SubMesh
+    class GZ_COMMON_VISIBLE SubMesh
     {
       /// \brief An enumeration of the geometric mesh primitives
       public: enum PrimitiveType {POINTS, LINES, LINESTRIPS, TRIANGLES,
@@ -239,11 +295,27 @@ namespace gazebo
 
       /// \brief Copy vertices from a vector
       /// \param[in] _verts the vertices to copy from
-      public: void CopyVertices(const std::vector<math::Vector3> &_verts);
+      /// \deprecated See CopyVertices that accepts
+      /// ignition::math::Vector3d.
+      public: void CopyVertices(const std::vector<math::Vector3> &_verts)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Copy vertices from a vector
+      /// \param[in] _verts the vertices to copy from
+      public: void CopyVertices(
+                  const std::vector<ignition::math::Vector3d> &_verts);
 
       /// \brief Copy normals from a vector
       /// \param[in] _norms to copy from
-      public: void CopyNormals(const std::vector<math::Vector3> &_norms);
+      /// \deprecated See CopyNormals that accepts
+      /// ignition::math::Vector3d.
+      public: void CopyNormals(const std::vector<math::Vector3> &_norms)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Copy normals from a vector
+      /// \param[in] _norms to copy from
+      public: void CopyNormals(
+                  const std::vector<ignition::math::Vector3d> &_norms);
 
       /// \brief Resize the vertex array
       /// \param[in] _count the new size of the array
@@ -267,7 +339,13 @@ namespace gazebo
 
       /// \brief Add a vertex to the mesh
       /// \param[in] _v the new position
-      public: void AddVertex(const math::Vector3 &_v);
+      /// \deprecated See AddVertex function that accepts
+      /// ignition::math::Vector3d.
+      public: void AddVertex(const math::Vector3 &_v) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Add a vertex to the mesh
+      /// \param[in] _v the new position
+      public: void AddVertex(const ignition::math::Vector3d &_v);
 
       /// \brief Add a vertex to the mesh
       /// \param[in] _x position along x
@@ -277,7 +355,13 @@ namespace gazebo
 
       /// \brief Add a normal to the mesh
       /// \param[in] _n the normal
-      public: void AddNormal(const math::Vector3 &_n);
+      /// \deprecated See AddNormal function that accepts
+      /// ignition::math::Vector3d.
+      public: void AddNormal(const math::Vector3 &_n) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Add a normal to the mesh
+      /// \param[in] _n the normal
+      public: void AddNormal(const ignition::math::Vector3d &_n);
 
       /// \brief Add a normal to the mesh
       /// \param[in] _x position along x
@@ -300,27 +384,69 @@ namespace gazebo
       /// \brief Get a vertex
       /// \param[in] _i the vertex index
       /// \return the position or throws an exception
-      public: math::Vector3 GetVertex(unsigned int _i) const;
+      /// \deprecated See Vertex function that return an
+      /// ignition::math::Vector3d.
+      public: math::Vector3 GetVertex(unsigned int _i) const
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get a vertex
+      /// \param[in] _i the vertex index
+      /// \return the position or throws an exception
+      public: ignition::math::Vector3d Vertex(unsigned int _i) const;
 
       /// \brief Set a vertex
       /// \param[in] _i the index
       /// \param[in] _v the position
-      public: void SetVertex(unsigned int _i, const math::Vector3 &_v);
+      /// \deprecated See SetVertex function that accepts
+      /// ignition::math::Vector3d.
+      public: void SetVertex(unsigned int _i, const math::Vector3 &_v)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set a vertex
+      /// \param[in] _i the index
+      /// \param[in] _v the position
+      public: void SetVertex(unsigned int _i,
+                  const ignition::math::Vector3d &_v);
 
       /// \brief Get a normal
       /// \param[in] _i the normal index
       /// \return the orientation of the normal, or throws an exception
-      public: math::Vector3 GetNormal(unsigned int _i) const;
+      /// \deprecated See Normal function that return
+      /// ignition::math::Vector3d.
+      public: math::Vector3 GetNormal(unsigned int _i) const
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get a normal
+      /// \param[in] _i the normal index
+      /// \return the orientation of the normal, or throws an exception
+      public: ignition::math::Vector3d Normal(unsigned int _i) const;
 
       /// \brief Set a normal
       /// \param[in] _i the normal index
       /// \param[in] _n the normal direction
-      public: void SetNormal(unsigned int _i, const math::Vector3 &_n);
+      /// \deprecated See SetNormal function that accepts
+      /// ignition::math::Vector3d.
+      public: void SetNormal(unsigned int _i, const math::Vector3 &_n)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set a normal
+      /// \param[in] _i the normal index
+      /// \param[in] _n the normal direction
+      public: void SetNormal(unsigned int _i,
+                  const ignition::math::Vector3d &_n);
 
       /// \brief Get a tex coord
       /// \param[in] _i the texture index
       /// \return the texture coordinates
-      public: math::Vector2d GetTexCoord(unsigned int _i) const;
+      /// \deprecated See TexCoord function that return
+      /// ignition::math::Vector2d.
+      public: math::Vector2d GetTexCoord(unsigned int _i) const
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get a tex coord
+      /// \param[in] _i the texture index
+      /// \return the texture coordinates
+      public: ignition::math::Vector2d TexCoord(unsigned int _i) const;
 
       /// \brief Get a vertex - skeleton node assignment
       /// \param[in] _i the index of the assignment
@@ -329,19 +455,38 @@ namespace gazebo
       /// \brief Set a tex coord
       /// \param[in] _i
       /// \param[in] _t
-      public: void SetTexCoord(unsigned int _i, const math::Vector2d &_t);
+      /// \deprecated See SetTexCoord function that accepts
+      /// ignition::math::Vector2d.
+      public: void SetTexCoord(unsigned int _i, const math::Vector2d &_t)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set a tex coord
+      /// \param[in] _i
+      /// \param[in] _t
+      public: void SetTexCoord(unsigned int _i,
+                               const ignition::math::Vector2d &_t);
 
       /// \brief Get an index
       /// \param[in] _i
       public: unsigned int GetIndex(unsigned int _i) const;
 
-      /// \brief Get the maximun X, Y, Z values
-      /// \return
-      public: math::Vector3 GetMax() const;
+      /// \brief Get the maximum X, Y, Z values
+      /// \return Max X,Y,Z values from all vertices in submesh
+      /// \deprecated See Max function that returns ignition::math::Vector3d.
+      public: math::Vector3 GetMax() const GAZEBO_DEPRECATED(6.0);
 
-      /// \brief Get the minimum X, Y, Z values
-      /// \return
-      public: math::Vector3 GetMin() const;
+      /// \brief Get the maximum X, Y, Z values from all the vertices
+      /// \return Max X,Y,Z values from all vertices in submesh
+      public: ignition::math::Vector3d Max() const;
+
+      /// \brief Get the minimum X, Y, Z values from all the vertices
+      /// \return Min X,Y,Z values from all vertices in submesh
+      /// \deprecated See Min function that returns ignition::math::Vector3d.
+      public: math::Vector3 GetMin() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the minimum X, Y, Z values from all the vertices
+      /// \return Min X,Y,Z values from all vertices in submesh
+      public: ignition::math::Vector3d Min() const;
 
       /// \brief Return the number of vertices
       public: unsigned int GetVertexCount() const;
@@ -371,11 +516,29 @@ namespace gazebo
 
       /// \brief Return true if this submesh has the vertex
       /// \param[in] _v
-      public: bool HasVertex(const math::Vector3 &_v) const;
+      /// \return Return true if this submesh has the vertex
+      /// \deprecated See HasVertex function that accepts
+      /// ignition::math::Vector3d.
+      public: bool HasVertex(const math::Vector3 &_v) const
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Return true if this submesh has the vertex
+      /// \param[in] _v
+      /// \return Return true if this submesh has the vertex
+      public: bool HasVertex(const ignition::math::Vector3d &_v) const;
 
       /// \brief Get the index of the vertex
       /// \param[in] _v
-      public: unsigned int GetVertexIndex(const math::Vector3 &_v) const;
+      /// \deprecated See GetVertexIndex function that accepts
+      /// ignition::math::Vector3d.
+      public: unsigned int GetVertexIndex(const math::Vector3 &_v) const
+               GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the index of the vertex
+      /// \param[in] _v Vertex to check
+      /// \return Index of the vertex that matches _v.
+      public: unsigned int GetVertexIndex(
+                  const ignition::math::Vector3d &_v) const;
 
       /// \brief Put all the data into flat arrays
       /// \param[in] _verArr
@@ -385,14 +548,19 @@ namespace gazebo
       /// \brief Recalculate all the normals.
       public: void RecalculateNormals();
 
-      /// \brief Reset mesh center to geometric center
+      /// \brief Generate texture coordinates using spherical projection
+      /// from center
       /// \param[in] _center
-      public: void SetSubMeshCenter(math::Vector3 _center);
+      /// \deprecated See GenSphericalTexCoord that accepts
+      /// ignition::math::Vector3d.
+      public: void GenSphericalTexCoord(const math::Vector3 &_center)
+              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Generate texture coordinates using spherical projection
       /// from center
       /// \param[in] _center
-      public: void GenSphericalTexCoord(const math::Vector3 &_center);
+      public: void GenSphericalTexCoord(
+                  const ignition::math::Vector3d &_center);
 
       /// \brief Scale all vertices by _factor
       /// \param[in] _factor Scaling factor
@@ -401,24 +569,46 @@ namespace gazebo
       /// \brief Move the center of the submesh to the given coordinate. This
       /// will move all the vertices.
       /// \param[in] _center Location of the mesh center.
-      public: void Center(const math::Vector3 &_center = math::Vector3::Zero);
+      /// \deprecated See Center function that accepts
+      /// ignition::math::Vector3d.
+      public: void Center(const math::Vector3 &_center = math::Vector3::Zero)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Move the center of the submesh to the given coordinate. This
+      /// will move all the vertices.
+      /// \param[in] _center Location of the mesh center.
+      public: void Center(const ignition::math::Vector3d &_center =
+                  ignition::math::Vector3d::Zero);
 
       /// \brief Move all vertices by _vec.
       /// \param[in] _vec Amount to translate vertices.
-      public: void Translate(const math::Vector3 &_vec);
+      /// \deprecated See Translate function that accepts
+      /// ignition::math::Vector3d.
+      public: void Translate(const math::Vector3 &_vec) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Move all vertices by _vec.
+      /// \param[in] _vec Amount to translate vertices.
+      public: void Translate(const ignition::math::Vector3d &_vec);
 
       /// \brief Scale all vertices by the _factor vector
       /// \param[in] _factor Scaling vector
-      public: void SetScale(const math::Vector3 &_factor);
+      /// \deprecated See SetScale function accepts
+      /// ignition::math::Vector3d.
+      public: void SetScale(const math::Vector3 &_factor)
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Scale all vertices by the _factor vector
+      /// \param[in] _factor Scaling vector
+      public: void SetScale(const ignition::math::Vector3d &_factor);
 
       /// \brief the vertex array
-      private: std::vector< math::Vector3 > vertices;
+      private: std::vector<ignition::math::Vector3d> vertices;
 
       /// \brief the normal array
-      private: std::vector< math::Vector3 > normals;
+      private: std::vector<ignition::math::Vector3d> normals;
 
       /// \brief the texture coordinate array
-      private: std::vector< math::Vector2d > texCoords;
+      private: std::vector<ignition::math::Vector2d> texCoords;
 
       /// \brief the vertex index array
       private: std::vector<unsigned int> indices;

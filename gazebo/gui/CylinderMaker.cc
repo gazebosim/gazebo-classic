@@ -14,6 +14,13 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sstream>
 
 #include "gazebo/msgs/msgs.hh"
@@ -46,7 +53,7 @@ CylinderMaker::CylinderMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            ignition::math::Quaterniond());
 }
 
 CylinderMaker::~CylinderMaker()
@@ -86,7 +93,7 @@ void CylinderMaker::OnMousePush(const common::MouseEvent &_event)
   if (this->state == 0)
     return;
 
-  this->mousePushPos = _event.pressPos;
+  this->mousePushPos = _event.PressPos();
 }
 
 void CylinderMaker::OnMouseRelease(const common::MouseEvent &_event)
@@ -95,7 +102,7 @@ void CylinderMaker::OnMouseRelease(const common::MouseEvent &_event)
     return;
 
   this->state++;
-  this->mouseReleasePos = _event.pos;
+  this->mouseReleasePos = _event.Pos();
 
   if (this->state == 3)
   {
@@ -119,15 +126,15 @@ void CylinderMaker::OnMouseMove(const common::MouseEvent &_event)
                   this->visualMsg->pose().position().y(),
                   this->visualMsg->pose().position().z());
 
-  double size = (this->mouseReleasePos.y - _event.pos.y) * 0.01;
-  if (!_event.shift)
+  double size = (this->mouseReleasePos.y - _event.Pos().Y()) * 0.01;
+  if (!_event.Shift())
     size = rint(size);
 
   this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(size);
 
   p.z = size / 2.0;
 
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p.Ign());
   this->visPub->Publish(*this->visualMsg);
 }
 
@@ -153,7 +160,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1.Round();
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y, math::Plane(norm), p2))
+        _event.Pos().X(), _event.Pos().Y(), math::Plane(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -162,7 +169,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   p2 = this->GetSnappedPoint(p2);
 
   if (this->state == 1)
-    msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
+    msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1.Ign());
 
   math::Vector3 p(this->visualMsg->pose().position().x(),
                   this->visualMsg->pose().position().y(),
@@ -179,7 +186,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
     this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(0.01);
   }
 
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p.Ign());
   this->visPub->Publish(*this->visualMsg);
 }
 
@@ -192,7 +199,7 @@ std::string CylinderMaker::GetSDFString()
     modelName << "unit_cylinder_" << counter;
     model.set_name(modelName.str());
   }
-  msgs::Set(model.mutable_pose(), math::Pose(0, 0, 0.5, 0, 0, 0));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
   msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   model.mutable_link(0)->set_name("link");
 

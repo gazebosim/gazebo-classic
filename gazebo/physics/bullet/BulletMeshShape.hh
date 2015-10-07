@@ -31,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \brief Triangle mesh collision
-    class GAZEBO_VISIBLE BulletMeshShape : public MeshShape
+    class GZ_PHYSICS_VISIBLE BulletMeshShape : public MeshShape
     {
       /// \brief Constructor
       public: BulletMeshShape(CollisionPtr _parent);

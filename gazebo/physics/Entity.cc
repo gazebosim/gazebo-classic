@@ -19,6 +19,12 @@
  * Date: 03 Apr 2007
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -125,7 +131,14 @@ void Entity::Load(sdf::ElementPtr _sdf)
     this->visualMsg->set_parent_name(this->world->GetName());
     this->visualMsg->set_parent_id(0);
   }
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
+  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
+
+  if (this->HasType(Base::MODEL))
+    this->visualMsg->set_type(msgs::Visual::MODEL);
+  if (this->HasType(Base::LINK))
+    this->visualMsg->set_type(msgs::Visual::LINK);
+  if (this->HasType(Base::COLLISION))
+    this->visualMsg->set_type(msgs::Visual::COLLISION);
 
   this->visPub->Publish(*this->visualMsg);
 
@@ -534,7 +547,7 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 {
   if (_msg->name() == this->GetScopedName())
   {
-    math::Pose p = msgs::Convert(*_msg);
+    ignition::math::Pose3d p = msgs::ConvertIgn(*_msg);
     this->SetWorldPose(p);
   }
 }
@@ -590,8 +603,8 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
-  offset.pos = kf.GetTranslation();
-  offset.rot = kf.GetRotation();
+  offset.pos = kf.Translation();
+  offset.rot = kf.Rotation();
 
   this->SetWorldPose(offset);
   this->prevAnimationTime = _info.simTime;

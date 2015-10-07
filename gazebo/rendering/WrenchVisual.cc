@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/bind.hpp>
 
 #include "gazebo/common/MeshManager.hh"
@@ -35,6 +41,8 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
 {
   WrenchVisualPrivate *dPtr =
       reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_PHYSICS;
 
   dPtr->enabled = true;
   dPtr->receivedMsg = false;
@@ -121,8 +129,8 @@ WrenchVisual::~WrenchVisual()
 void WrenchVisual::Load(ConstJointPtr &_msg)
 {
   Visual::Load();
-  this->SetPosition(msgs::Convert(_msg->pose().position()));
-  this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+  this->SetPosition(msgs::ConvertIgn(_msg->pose().position()));
+  this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
 }
 
 /////////////////////////////////////////////////
@@ -153,9 +161,10 @@ void WrenchVisual::Update()
       exp(-dPtr->wrenchMsg->wrench().torque().z() / magScale)) - offset;
 
   magScale = 50000;
-  math::Vector3 force = msgs::Convert(dPtr->wrenchMsg->wrench().force());
+  ignition::math::Vector3d force =
+    msgs::ConvertIgn(dPtr->wrenchMsg->wrench().force());
   double forceScale = (2.0 * vRange) / (1 +
-      exp(force.GetSquaredLength() / magScale)) - offset;
+      exp(force.SquaredLength() / magScale)) - offset;
 
   dPtr->forceLine->SetPoint(1, force*forceScale);
   dPtr->forceLine->Update();

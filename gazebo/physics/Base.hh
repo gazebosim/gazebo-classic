@@ -23,6 +23,12 @@
 #ifndef _GAZEBO_PHYSICS_BASE_HH_
 #define _GAZEBO_PHYSICS_BASE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 
@@ -71,7 +77,7 @@ namespace gazebo
 
     /// \class Base Base.hh physics/physics.hh
     /// \brief Base class for most physics classes
-    class GAZEBO_VISIBLE Base : public boost::enable_shared_from_this<Base>
+    class GZ_PHYSICS_VISIBLE Base : public boost::enable_shared_from_this<Base>
     {
       /// \enum EntityType
       /// \brief Unique identifiers for all entity types.
@@ -109,6 +115,8 @@ namespace gazebo
                 UNIVERSAL_JOINT = 0x00001000,
                 /// \brief GearboxJoint type
                 GEARBOX_JOINT   = 0x00002000,
+                /// \brief FixedJoint type
+                FIXED_JOINT     = 0x00004000,
 
                 /// \brief Shape type
                 SHAPE           = 0x00010000,

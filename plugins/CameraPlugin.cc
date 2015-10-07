@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+#include <Winsock2.h>
+#endif
+
 #include "gazebo/sensors/DepthCameraSensor.hh"
 #include "plugins/CameraPlugin.hh"
 
@@ -21,7 +27,8 @@ using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(CameraPlugin)
 
 /////////////////////////////////////////////////
-CameraPlugin::CameraPlugin() : SensorPlugin()
+CameraPlugin::CameraPlugin()
+: SensorPlugin(), width(0), height(0), depth(0)
 {
 }
 

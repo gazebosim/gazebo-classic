@@ -28,6 +28,9 @@ class ConfigWidget_TEST : public QTestFixture
   /// \brief Test creating config widgets from empty messages.
   private slots: void EmptyMsgWidget();
 
+  /// \brief Test creating a config widget from a joint message.
+  private slots: void JointMsgWidget();
+
   /// \brief Test creating a config widget from a visual message.
   private slots: void VisualMsgWidget();
 

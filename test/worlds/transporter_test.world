@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <scene>
+      <ambient>1 1 1 1</ambient>
+      <background>0 0 0 0</background>
+      <grid>false</grid>
+      <origin_visual>false</origin_visual>
+    </scene>
+    <gui>
+      <camera name="user_camera">
+        <pose>0 0 1.2 0 1.5707 0</pose>
+      </camera>
+    </gui>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>10 10</size>
+            </plane>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <model name="box">
+      <pose>10 10 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>10 10 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>10 10 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/White</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <plugin filename="libTransporterPlugin.so" name="transporter">
+      <activation_topic>~/transporter</activation_topic>
+
+      <pad name="pad1">
+        <destination>pad2</destination>
+        <activation>auto</activation>
+
+        <outgoing>
+          <min>100 -0.5 0</min>
+          <max>101  0.5 1</max>
+        </outgoing>
+
+        <incoming>
+          <pose>0 0 0.5 0 0 0</pose>
+        </incoming>
+      </pad>
+
+      <pad name="pad2">
+        <destination>pad1</destination>
+        <activation>manual</activation>
+
+        <outgoing>
+          <min>-101 -0.5 0</min>
+          <max>-100  0.5 1</max>
+        </outgoing>
+
+        <incoming>
+          <pose>0 0 0.5 0 0 0</pose>
+        </incoming>
+      </pad>
+    </plugin>
+
+  </world>
+</sdf>

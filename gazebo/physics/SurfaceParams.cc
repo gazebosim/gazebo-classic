@@ -83,7 +83,8 @@ void FrictionPyramid::SetMu(unsigned int _index, double _mu)
 //////////////////////////////////////////////////
 SurfaceParams::SurfaceParams()
   : collideWithoutContact(false),
-    collideWithoutContactBitmask(1)
+    collideWithoutContactBitmask(1),
+    collideBitmask(65535)
 {
 }
 
@@ -108,6 +109,12 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
         contactElem->Get<bool>("collide_without_contact");
       this->collideWithoutContactBitmask =
           contactElem->Get<unsigned int>("collide_without_contact_bitmask");
+
+      if (contactElem->HasElement("collide_bitmask"))
+      {
+        this->collideBitmask =
+          contactElem->Get<unsigned int>("collide_bitmask");
+      }
     }
   }
 }
@@ -117,13 +124,22 @@ void SurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   _msg.set_collide_without_contact(this->collideWithoutContact);
   _msg.set_collide_without_contact_bitmask(this->collideWithoutContactBitmask);
+  _msg.set_collide_bitmask(this->collideBitmask);
 }
 
-
+/////////////////////////////////////////////////
 void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 {
   if (_msg.has_collide_without_contact())
     this->collideWithoutContact = _msg.collide_without_contact();
   if (_msg.has_collide_without_contact_bitmask())
     this->collideWithoutContactBitmask = _msg.collide_without_contact_bitmask();
+  if (_msg.has_collide_bitmask())
+    this->collideBitmask = _msg.collide_bitmask();
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr SurfaceParams::GetFrictionPyramid() const
+{
+  return FrictionPyramidPtr();
 }

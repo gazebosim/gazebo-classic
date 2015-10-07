@@ -57,7 +57,7 @@ namespace gazebo
 
     /// \class Rand Rand.hh gzmath/gzmath.hh
     /// \brief Random number generator class
-    class GAZEBO_VISIBLE Rand
+    class GZ_MATH_VISIBLE Rand
     {
       /// \brief Set the seed value.
       /// \param[in] _seed The seed used to initialize the randon number

@@ -42,7 +42,7 @@ namespace gazebo
 
     /// \class PhysicsFactory PhysicsFactory.hh physics/physics.hh
     /// \brief The physics factory instantiates different physics engines.
-    class GAZEBO_VISIBLE PhysicsFactory
+    class GZ_PHYSICS_VISIBLE PhysicsFactory
     {
       /// \brief Register everything.
       public: static void RegisterAll();
@@ -75,11 +75,11 @@ namespace gazebo
     /// \param[in] name Physics type name, as it appears in the world file.
     /// \param[in] classname C++ class name for the physics engine.
     #define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
-    GAZEBO_VISIBLE PhysicsEnginePtr New##classname(WorldPtr _world) \
+    GZ_PHYSICS_VISIBLE PhysicsEnginePtr New##classname(WorldPtr _world) \
     { \
       return PhysicsEnginePtr(new gazebo::physics::classname(_world)); \
     } \
-    GAZEBO_VISIBLE \
+    GZ_PHYSICS_VISIBLE \
     void Register##classname() \
     {\
       PhysicsFactory::RegisterPhysicsEngine(name, New##classname);\

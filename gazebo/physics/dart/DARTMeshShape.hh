@@ -25,10 +25,11 @@ namespace gazebo
 {
   namespace physics
   {
-    class DARTMesh;
+    /// Forward declare private data class
+    class DARTMeshShapePrivate;
 
     /// \brief Triangle mesh collision.
-    class GAZEBO_VISIBLE DARTMeshShape : public MeshShape
+    class GZ_PHYSICS_VISIBLE DARTMeshShape : public MeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.
@@ -46,8 +47,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Update();
 
-      /// \brief DART collision mesh helper class
-      private: DARTMesh *dartMesh;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTMeshShapePrivate *dataPtr;
     };
   }
 }

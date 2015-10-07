@@ -15,6 +15,13 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/thread/recursive_mutex.hpp>
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/MeshManager.hh"
@@ -72,18 +79,26 @@ void MeshShape::Init()
   if (this->sdf->HasElement("submesh"))
   {
     sdf::ElementPtr submeshElem = this->sdf->GetElement("submesh");
-    this->submesh = new common::SubMesh(
-      this->mesh->GetSubMesh(submeshElem->Get<std::string>("name")));
-
-    if (!this->submesh)
-      gzthrow("Unable to get submesh with name[" +
-          submeshElem->Get<std::string>("name") + "]");
-
-    // Center the submesh if specified in SDF.
-    if (submeshElem->HasElement("center") &&
-        submeshElem->Get<bool>("center"))
+    std::string submeshName = submeshElem->Get<std::string>("name");
+    if (submeshName != "__default__" && !submeshName.empty())
     {
-      this->submesh->Center();
+      const common::SubMesh *smesh = this->mesh->GetSubMesh(submeshName);
+      if (smesh)
+      {
+        this->submesh = new common::SubMesh(
+          this->mesh->GetSubMesh(submeshName));
+
+        if (!this->submesh)
+          gzthrow("Unable to get submesh with name[" +
+              submeshElem->Get<std::string>("name") + "]");
+
+        // Center the submesh if specified in SDF.
+        if (submeshElem->HasElement("center") &&
+            submeshElem->Get<bool>("center"))
+        {
+          this->submesh->Center(ignition::math::Vector3d::Zero);
+        }
+      }
     }
   }
 }
@@ -132,7 +147,7 @@ void MeshShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 void MeshShape::ProcessMsg(const msgs::Geometry &_msg)
 {
-  this->SetScale(msgs::Convert(_msg.mesh().scale()));
+  this->SetScale(msgs::ConvertIgn(_msg.mesh().scale()));
   this->SetMesh(_msg.mesh().filename(),
       _msg.mesh().has_submesh() ? _msg.mesh().submesh() : std::string(),
       _msg.mesh().has_center_submesh() ? _msg.mesh().center_submesh() :  false);

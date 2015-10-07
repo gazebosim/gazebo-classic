@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class AudioDecoder AudioDecoder.hh common/common.hh
     /// \brief An audio decoder based on FFMPEG.
-    class GAZEBO_VISIBLE AudioDecoder
+    class GZ_COMMON_VISIBLE AudioDecoder
     {
       /// \brief Constructor.
       public: AudioDecoder();

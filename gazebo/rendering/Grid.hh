@@ -50,7 +50,7 @@ namespace gazebo
     ///
     ///  Displays a grid of cells, drawn with lines.  A grid with an
     ///  identity orientation is drawn along the XY plane.
-    class GAZEBO_VISIBLE Grid
+    class GZ_RENDERING_VISIBLE Grid
     {
       /// \brief Constructor
       ///

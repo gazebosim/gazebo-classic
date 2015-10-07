@@ -39,7 +39,7 @@ namespace gazebo
     class PopulationPrivate;
 
     /// \brief Stores all the posible parameters that define a population.
-    class GAZEBO_VISIBLE PopulationParams
+    class GZ_PHYSICS_VISIBLE PopulationParams
     {
       /// \brief The three side lengths of the box.
       public: math::Vector3 size;
@@ -82,7 +82,7 @@ namespace gazebo
     /// \brief Class that automatically populates an environment with multiple
     /// objects based on several parameters to define the number of objects,
     /// shape of the object distribution or type of distribution.
-    class GAZEBO_VISIBLE Population
+    class GZ_PHYSICS_VISIBLE Population
     {
       /// \brief Constructor. Load an sdf file containing a population element.
       /// \param[in] _sdf SDF parameters.

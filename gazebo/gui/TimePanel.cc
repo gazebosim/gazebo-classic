@@ -14,6 +14,13 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/bind.hpp>
 #include <sstream>
 
@@ -21,161 +28,64 @@
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/gui/TimeWidget.hh"
+#include "gazebo/gui/LogPlayWidget.hh"
 #include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/TimePanelPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 TimePanel::TimePanel(QWidget *_parent)
-  : QWidget(_parent)
+  : QWidget(_parent), dataPtr(new TimePanelPrivate)
 {
   this->setObjectName("timePanel");
 
+  // Time Widget
+  this->dataPtr->timeWidget = new TimeWidget(this);
+  this->dataPtr->timeWidget->setObjectName("timeWidget");
+  connect(this, SIGNAL(SetTimeWidgetVisible(bool)),
+      this->dataPtr->timeWidget, SLOT(setVisible(bool)));
+
+  // LogPlay Widget
+  this->dataPtr->logPlayWidget = new LogPlayWidget(this);
+  this->dataPtr->logPlayWidget->setObjectName("logPlayWidget");
+  connect(this, SIGNAL(SetLogPlayWidgetVisible(bool)),
+      this->dataPtr->logPlayWidget, SLOT(setVisible(bool)));
+
+  // Layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
-
-  QScrollArea *scrollArea = new QScrollArea(this);
-  scrollArea->setLineWidth(1);
-  scrollArea->setFrameShape(QFrame::NoFrame);
-  scrollArea->setFrameShadow(QFrame::Plain);
-  scrollArea->setWidgetResizable(true);
-  scrollArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-  // Play control (Play/Step/Pause)
-  QSpinBox *stepSpinBox = new QSpinBox;
-  stepSpinBox->setRange(1, 9999);
-  connect(stepSpinBox, SIGNAL(valueChanged(int)), this,
-      SLOT(OnStepValueChanged(int)));
-
-  QWidget *stepWidget = new QWidget;
-  QLabel *stepLabel = new QLabel(tr("Steps:"));
-  QVBoxLayout *stepLayout = new QVBoxLayout;
-  stepLayout->addWidget(stepLabel);
-  stepLayout->addWidget(stepSpinBox);
-  stepWidget->setLayout(stepLayout);
-
-  QLabel *stepToolBarLabel = new QLabel(tr("Steps:"));
-
-  QMenu *stepMenu = new QMenu;
-  this->stepButton = new QToolButton;
-  this->stepButton->setMaximumSize(35, stepButton->height());
-  QWidgetAction *stepAction = new QWidgetAction(stepMenu);
-  stepAction->setDefaultWidget(stepWidget);
-  stepMenu->addAction(stepAction);
-  this->stepButton->setMenu(stepMenu);
-  this->stepButton->setPopupMode(QToolButton::InstantPopup);
-  this->stepButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-  this->stepButton->setContentsMargins(0, 0, 0, 0);
-  this->OnStepValueChanged(1);
-
-  connect(stepSpinBox, SIGNAL(editingFinished()), stepMenu,
-      SLOT(hide()));
-
-  QFrame *frame = new QFrame(scrollArea);
-  frame->setFrameShape(QFrame::NoFrame);
-  scrollArea->setWidget(frame);
-
-  QToolBar *playToolbar = new QToolBar;
-  playToolbar->setObjectName("playToolBar");
-  playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  playToolbar->addAction(g_playAct);
-  playToolbar->addAction(g_pauseAct);
-
-  QLabel *emptyLabel = new QLabel(tr("  "));
-  playToolbar->addWidget(emptyLabel);
-  playToolbar->addAction(g_stepAct);
-  playToolbar->addWidget(stepToolBarLabel);
-  playToolbar->addWidget(this->stepButton);
-
-  this->percentRealTimeEdit = new QLineEdit;
-  this->percentRealTimeEdit->setObjectName("timePanelPercentRealTime");
-  this->percentRealTimeEdit->setReadOnly(true);
-  this->percentRealTimeEdit->setFixedWidth(90);
-
-  this->simTimeEdit = new QLineEdit;
-  this->simTimeEdit->setObjectName("timePanelSimTime");
-  this->simTimeEdit->setReadOnly(true);
-  this->simTimeEdit->setFixedWidth(110);
-
-  this->realTimeEdit = new QLineEdit;
-  this->realTimeEdit->setObjectName("timePanelRealTime");
-  this->realTimeEdit->setReadOnly(true);
-  this->realTimeEdit->setFixedWidth(110);
-
-  this->iterationsEdit = new QLineEdit;
-  this->iterationsEdit->setReadOnly(true);
-  this->iterationsEdit->setFixedWidth(110);
-
-  QPushButton *timeResetButton = new QPushButton("Reset");
-  timeResetButton->setFocusPolicy(Qt::NoFocus);
-  connect(timeResetButton, SIGNAL(clicked()),
-          this, SLOT(OnTimeReset()));
-
-  QHBoxLayout *frameLayout = new QHBoxLayout;
-  frameLayout->setContentsMargins(0, 0, 0, 0);
-  frameLayout->addItem(new QSpacerItem(5, -1, QSizePolicy::Expanding,
-                             QSizePolicy::Minimum));
-  frameLayout->addWidget(playToolbar);
-
-  frameLayout->addWidget(new QLabel(tr("Real Time Factor:")));
-  frameLayout->addWidget(this->percentRealTimeEdit);
-
-  frameLayout->addWidget(new QLabel(tr("Sim Time:")));
-  frameLayout->addWidget(this->simTimeEdit);
-
-  frameLayout->addWidget(new QLabel(tr("Real Time:")));
-  frameLayout->addWidget(this->realTimeEdit);
-
-  frameLayout->addWidget(new QLabel(tr("Iterations:")));
-  frameLayout->addWidget(this->iterationsEdit);
-
-  frameLayout->addWidget(timeResetButton);
-
-  frameLayout->addItem(new QSpacerItem(15, -1, QSizePolicy::Expanding,
-                       QSizePolicy::Minimum));
-
-  frame->setLayout(frameLayout);
-  frame->layout()->setContentsMargins(0, 0, 0, 0);
-
-  mainLayout->addWidget(scrollArea);
+  mainLayout->addWidget(this->dataPtr->timeWidget);
+  mainLayout->addWidget(this->dataPtr->logPlayWidget);
   this->setLayout(mainLayout);
 
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  // Transport
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
 
-  this->statsSub =
-    this->node->Subscribe("~/world_stats", &TimePanel::OnStats, this);
-  this->worldControlPub =
-    this->node->Advertise<msgs::WorldControl>("~/world_control");
+  this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
+      "~/world_stats", &TimePanel::OnStats, this);
 
+  this->dataPtr->worldControlPub = this->dataPtr->node->
+      Advertise<msgs::WorldControl>("~/world_control");
+
+  // Timer
   QTimer *timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(Update()));
   timer->start(33);
 
-  this->connections.push_back(
+  // Connections
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectFullScreen(
-        boost::bind(&TimePanel::OnFullScreen, this, _1)));
+      boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
-  this->show();
-
-  // Create a QueuedConnection to set iterations.
-  // This is used for thread safety.
-  connect(this, SIGNAL(SetIterations(QString)),
-          this->iterationsEdit, SLOT(setText(QString)), Qt::QueuedConnection);
-
-  // Create a QueuedConnection to set sim time.
-  // This is used for thread safety.
-  connect(this, SIGNAL(SetSimTime(QString)),
-          this->simTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
-
-  // Create a QueuedConnection to set real time.
-  // This is used for thread safety.
-  connect(this, SIGNAL(SetRealTime(QString)),
-          this->realTimeEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
 }
 
 /////////////////////////////////////////////////
@@ -191,91 +101,180 @@ void TimePanel::OnFullScreen(bool /*_value*/)
 /////////////////////////////////////////////////
 TimePanel::~TimePanel()
 {
-  this->node.reset();
+  this->dataPtr->node.reset();
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::OnPlayActionChanged()
+{
+  // Tests don't see external actions
+  if (!g_stepAct)
+    return;
+
+  if (this->IsPaused())
+  {
+    g_stepAct->setToolTip("Step the world");
+    g_stepAct->setEnabled(true);
+  }
+  else
+  {
+    g_stepAct->setToolTip("Pause the world before stepping");
+    g_stepAct->setEnabled(false);
+  }
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowRealTimeFactor(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowRealTimeFactor(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowRealTime(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowRealTime(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowSimTime(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowSimTime(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowIterations(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowIterations(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowFPS(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowFPS(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowStepWidget(bool _show)
+{
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->ShowStepWidget(_show);
+  else
+    gzwarn << "Time widget not visible" << std::endl;
+}
+
+/////////////////////////////////////////////////
+bool TimePanel::IsPaused() const
+{
+  return this->dataPtr->paused;
+}
+
+/////////////////////////////////////////////////
+void TimePanel::SetPaused(bool _paused)
+{
+  this->dataPtr->paused = _paused;
+
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->SetPaused(_paused);
+  else if (this->dataPtr->logPlayWidget->isVisible())
+    this->dataPtr->logPlayWidget->SetPaused(_paused);
 }
 
 /////////////////////////////////////////////////
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
-  this->simTimes.push_back(msgs::Convert(_msg->sim_time()));
-  if (this->simTimes.size() > 20)
-    this->simTimes.pop_front();
+  this->dataPtr->simTimes.push_back(msgs::Convert(_msg->sim_time()));
+  if (this->dataPtr->simTimes.size() > 20)
+    this->dataPtr->simTimes.pop_front();
 
-  this->realTimes.push_back(msgs::Convert(_msg->real_time()));
-  if (this->realTimes.size() > 20)
-    this->realTimes.pop_front();
+  this->dataPtr->realTimes.push_back(msgs::Convert(_msg->real_time()));
+  if (this->dataPtr->realTimes.size() > 20)
+    this->dataPtr->realTimes.pop_front();
 
-  if (_msg->paused() && (g_playAct && !g_playAct->isVisible()))
+  if (_msg->has_log_playback_stats())
   {
-    g_playAct->setVisible(true);
-    g_pauseAct->setVisible(false);
+    this->SetTimeWidgetVisible(false);
+    this->SetLogPlayWidgetVisible(true);
   }
-  else if (!_msg->paused() && (g_pauseAct && !g_pauseAct->isVisible()))
+  else
   {
-    g_pauseAct->setVisible(true);
-    g_playAct->setVisible(false);
+    this->SetTimeWidgetVisible(true);
+    this->SetLogPlayWidgetVisible(false);
   }
 
-  // Set simulation time
-  this->SetSimTime(QString::fromStdString(FormatTime(_msg->sim_time())));
+  if (_msg->has_paused())
+    this->SetPaused(_msg->paused());
 
-  // Set real time
-  this->SetRealTime(QString::fromStdString(FormatTime(_msg->real_time())));
+  if (this->dataPtr->timeWidget->isVisible())
+  {
+    // Set simulation time
+    this->dataPtr->timeWidget->EmitSetSimTime(QString::fromStdString(
+        msgs::Convert(_msg->sim_time()).FormattedString()));
 
-  // Set the iterations
-  this->SetIterations(QString::fromStdString(
+    // Set real time
+    this->dataPtr->timeWidget->EmitSetRealTime(QString::fromStdString(
+        msgs::Convert(_msg->real_time()).FormattedString()));
+
+    // Set the iterations
+    this->dataPtr->timeWidget->EmitSetIterations(QString::fromStdString(
         boost::lexical_cast<std::string>(_msg->iterations())));
+  }
+  else if (this->dataPtr->logPlayWidget->isVisible())
+  {
+    // Set current time
+    this->dataPtr->logPlayWidget->EmitSetCurrentTime(
+        msgs::Convert(_msg->sim_time()));
+
+    // Set start time in text and in ms
+    this->dataPtr->logPlayWidget->EmitSetStartTime(
+        msgs::Convert(_msg->log_playback_stats().start_time()));
+
+    // Set end time in text and in ms
+    this->dataPtr->logPlayWidget->EmitSetEndTime(
+        msgs::Convert(_msg->log_playback_stats().end_time()));
+  }
 }
-
-/////////////////////////////////////////////////
-std::string TimePanel::FormatTime(const msgs::Time &_msg)
-{
-  std::ostringstream stream;
-  unsigned int day, hour, min, sec, msec;
-
-  stream.str("");
-
-  sec = _msg.sec();
-
-  day = sec / 86400;
-  sec -= day * 86400;
-
-  hour = sec / 3600;
-  sec -= hour * 3600;
-
-  min = sec / 60;
-  sec -= min * 60;
-
-  msec = rint(_msg.nsec() * 1e-6);
-
-  stream << std::setw(2) << std::setfill('0') << day << " ";
-  stream << std::setw(2) << std::setfill('0') << hour << ":";
-  stream << std::setw(2) << std::setfill('0') << min << ":";
-  stream << std::setw(2) << std::setfill('0') << sec << ".";
-  stream << std::setw(3) << std::setfill('0') << msec;
-
-  return stream.str();
-}
-
 
 /////////////////////////////////////////////////
 void TimePanel::Update()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+
+  // Avoid apparent race condition on start, seen on Windows.
+  if (!this->dataPtr->simTimes.size() || !this->dataPtr->realTimes.size())
+    return;
 
   std::ostringstream percent;
 
   common::Time simAvg, realAvg;
   std::list<common::Time>::iterator simIter, realIter;
 
-  simIter = ++(this->simTimes.begin());
-  realIter = ++(this->realTimes.begin());
-  while (simIter != this->simTimes.end() && realIter != this->realTimes.end())
+  simIter = ++(this->dataPtr->simTimes.begin());
+  realIter = ++(this->dataPtr->realTimes.begin());
+  while (simIter != this->dataPtr->simTimes.end() &&
+      realIter != this->dataPtr->realTimes.end())
   {
-    simAvg += ((*simIter) - this->simTimes.front());
-    realAvg += ((*realIter) - this->realTimes.front());
+    simAvg += ((*simIter) - this->dataPtr->simTimes.front());
+    realAvg += ((*realIter) - this->dataPtr->realTimes.front());
     ++simIter;
     ++realIter;
   }
@@ -289,7 +288,22 @@ void TimePanel::Update()
   else
     percent << "0";
 
-  this->percentRealTimeEdit->setText(tr(percent.str().c_str()));
+  if (this->dataPtr->timeWidget->isVisible())
+    this->dataPtr->timeWidget->SetPercentRealTimeEdit(percent.str().c_str());
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  if (cam)
+  {
+    std::ostringstream avgFPS;
+    avgFPS << cam->GetAvgFPS();
+
+    if (this->dataPtr->timeWidget->isVisible())
+    {
+      // Set the avg fps
+      this->dataPtr->timeWidget->EmitSetFPS(QString::fromStdString(
+          boost::lexical_cast<std::string>(avgFPS.str().c_str())));
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -298,19 +312,11 @@ void TimePanel::OnTimeReset()
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(true);
-  this->worldControlPub->Publish(msg);
+  this->dataPtr->worldControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void TimePanel::OnStepValueChanged(int _value)
 {
-  // text formating and resizing for better presentation
-  std::string numStr = QString::number(_value).toStdString();
-  QFont stepFont = this->stepButton->font();
-  stepFont.setPointSizeF(11 - numStr.size()/2.0);
-  this->stepButton->setFont(stepFont);
-  numStr.insert(numStr.end(), 4 - numStr.size(), ' ');
-  this->stepButton->setText(tr(numStr.c_str()));
-
   emit gui::Events::inputStepSize(_value);
 }

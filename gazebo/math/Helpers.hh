@@ -32,6 +32,9 @@
 /// \brief Double min value
 #define GZ_DBL_MIN std::numeric_limits<double>::min()
 
+/// \brief Double positive infinite value
+#define GZ_DBL_INF std::numeric_limits<double>::infinity()
+
 /// \brief Float maximum value
 #define GZ_FLT_MAX std::numeric_limits<float>::max()
 
@@ -178,7 +181,15 @@ namespace gazebo
     template<typename T>
     inline T precision(const T &_a, const unsigned int &_precision)
     {
-      return boost::math::round(_a * pow(10, _precision)) / pow(10, _precision);
+      if (!std::isinf(_a))
+      {
+        return boost::math::round(
+          _a * pow(10, _precision)) / pow(10, _precision);
+      }
+      else
+      {
+        return _a;
+      }
     }
 
     /// \brief is this a power of 2?

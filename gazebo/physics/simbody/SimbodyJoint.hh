@@ -34,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all joints
-    class GAZEBO_VISIBLE SimbodyJoint : public Joint
+    class GZ_PHYSICS_VISIBLE SimbodyJoint : public Joint
     {
       /// \brief Constructor
       public: SimbodyJoint(BasePtr _parent);

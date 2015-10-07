@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class Road Road.hh rendering/rendering.hh
     /// \brief Used to render a strip of road.
-    class GAZEBO_VISIBLE Road2d
+    class GZ_RENDERING_VISIBLE Road2d
     {
       /// \brief Constructor
       public: Road2d();
@@ -79,7 +79,7 @@ namespace gazebo
                  public: std::string name;
 
                  /// \brief Point that make up the middle of the road.
-                 public: std::vector<math::Vector3> points;
+                 public: std::vector<ignition::math::Vector3d> points;
 
                  /// \brief Width of the road.
                  public: double width;

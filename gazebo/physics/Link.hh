@@ -21,6 +21,12 @@
 #ifndef _LINK_HH_
 #define _LINK_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <map>
 #include <vector>
 #include <string>
@@ -58,7 +64,7 @@ namespace gazebo
     /// \brief Link class defines a rigid body entity, containing
     /// information on inertia, visual and collision properties of
     /// a rigid body.
-    class GAZEBO_VISIBLE Link : public Entity
+    class GZ_PHYSICS_VISIBLE Link : public Entity
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of this link.
@@ -119,7 +125,8 @@ namespace gazebo
 
       /// \brief Set whether this body will collide with others in the
       /// model.
-      /// \param[in] _collid True to enable collisions.
+      /// \sa GetSelfCollide
+      /// \param[in] _collide True to enable collisions.
       public: virtual void SetSelfCollide(bool _collide) = 0;
 
       /// \brief Set the collide mode of the body.
@@ -132,8 +139,12 @@ namespace gazebo
       /// ghost: collides with everything else but other ghost
       public: void SetCollideMode(const std::string &_mode);
 
-      /// \brief Get Self-Collision Flag, if this is true, this body will
-      /// collide with other bodies even if they share the same parent.
+      /// \brief Get Self-Collision Flag.
+      /// Two links within the same model will not collide if both have
+      /// self_collide == false. \n
+      /// link 1 and link2 collide = link1.self_collide || link2.self_collide
+      /// Bodies connected by a joint are exempt from this, and will
+      /// never collide.
       /// \return True if self collision is enabled.
       public: bool GetSelfCollide() const;
 
@@ -187,6 +198,15 @@ namespace gazebo
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force,
                   const math::Vector3 &_relPos) = 0;
+
+      /// \brief Add a force expressed in the link frame.
+      /// \param[in] _force Direction vector expressed in the link frame. Each
+      /// component corresponds to the force which will be added in that axis
+      /// and the vector's magnitude corresponds to the total force.
+      /// \param[in] _offset Offset position expressed in the link frame. It
+      /// defaults to the link origin.
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero) = 0;
 
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
@@ -263,8 +283,12 @@ namespace gazebo
       /// \return Angular momentum of the body.
       public: math::Vector3 GetWorldAngularMomentum() const;
 
-      /// \brief Get the angular acceleration of the body in the world
-      /// frame.
+      /// \brief Get the angular acceleration of the body in the world frame,
+      /// which is computed as (I^-1 * (T - w x L)), where
+      /// I: inertia matrix in world frame
+      /// T: sum of external torques in world frame
+      /// L: angular momentum of CoG in world frame
+      /// w: angular velocity in world frame
       /// \return Angular acceleration of the body in the world frame.
       public: math::Vector3 GetWorldAngularAccel() const;
 
@@ -561,6 +585,15 @@ namespace gazebo
       /// \brief Update visual msgs.
       private: void UpdateVisualMsg();
 
+      /// \brief Called when a new wrench message arrives. The wrench's force,
+      /// torque and force offset are described in the link frame,
+      /// \param[in] _msg The wrench message.
+      private: void OnWrenchMsg(ConstWrenchPtr &_msg);
+
+      /// \brief Process the message and add force and torque.
+      /// \param[in] _msg The message to set the wrench from.
+      private: void ProcessWrenchMsg(const msgs::Wrench &_msg);
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
@@ -618,6 +651,15 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
+
+      /// \brief Wrench subscriber.
+      private: transport::SubscriberPtr wrenchSub;
+
+      /// \brief Vector of wrench messages to be processed.
+      private: std::vector<msgs::Wrench> wrenchMsgs;
+
+      /// \brief Mutex to protect the wrenchMsgs variable.
+      private: boost::mutex wrenchMsgMutex;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

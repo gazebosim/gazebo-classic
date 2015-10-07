@@ -47,7 +47,7 @@ namespace gazebo
     ///
     /// State of a Model includes the state of all its child Links and
     /// Joints.
-    class GAZEBO_VISIBLE ModelState : public State
+    class GZ_PHYSICS_VISIBLE ModelState : public State
     {
       /// \brief Default constructor.
       public: ModelState();
@@ -59,8 +59,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: ModelState(const ModelPtr _model, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor.
       ///
@@ -85,8 +86,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: void Load(const ModelPtr _model, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Load state from SDF element.
       ///
@@ -187,6 +189,11 @@ namespace gazebo
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
       public: virtual void SetSimTime(const common::Time &_time);
+
+      /// \brief Set the simulation iterations when this state was generated
+      /// \param[in] _iterations Simulation iterations when the data was
+      /// recorded.
+      public: virtual void SetIterations(const uint64_t _iterations);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

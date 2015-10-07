@@ -116,11 +116,19 @@ int Logger::Buffer::sync()
   {
     if (this->type == Logger::STDOUT)
     {
-     std::cout << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      #ifndef _WIN32
+      std::cout << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      #else
+      std::cout << this->str();
+      #endif
     }
     else
     {
-     std::cerr << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      #ifndef _WIN32
+      std::cerr << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      #else
+      std::cerr << this->str();
+      #endif
     }
   }
 
