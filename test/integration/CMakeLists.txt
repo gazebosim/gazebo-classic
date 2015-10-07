@@ -69,6 +69,7 @@ set(tests
   physics_msgs.cc
   physics_msgs_inertia.cc
   physics_presets.cc
+  physics_solver.cc
   physics_thread_safe.cc
   pioneer2dx.cc
   plugin.cc

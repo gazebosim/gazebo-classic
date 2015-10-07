@@ -626,6 +626,8 @@ ODEPhysics::ConvertWorldStepSolverType(const std::string &_solverType)
     result = ODE_DEFAULT;
   else if (_solverType.compare("DART_PGS") == 0)
     result = DART_PGS;
+  else if (_solverType.compare("BULLET_LEMKE") == 0)
+    result = BULLET_LEMKE;
   else if (_solverType.compare("BULLET_PGS") == 0)
     result = BULLET_PGS;
   else
@@ -653,6 +655,11 @@ ODEPhysics::ConvertWorldStepSolverType(const World_Solver_Type _solverType)
     case DART_PGS:
     {
       result = "DART_PGS";
+      break;
+    }
+    case BULLET_LEMKE:
+    {
+      result = "BULLET_LEMKE";
       break;
     }
     case BULLET_PGS:
