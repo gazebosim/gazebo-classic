@@ -133,6 +133,11 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   this->configWidget->SetWidgetReadOnly("parent", true);
   this->configWidget->SetWidgetReadOnly("child", true);
 
+  // Get name widget
+  this->nameWidget = this->configWidget->ConfigChildWidgetByName("name");
+  if (!this->nameWidget)
+    gzerr << "Name widget not found" << std::endl;
+
   // Custom parent / child widgets
   // Parent
   std::vector<std::string> links;
@@ -174,6 +179,27 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
       SIGNAL(EnumValueChanged(const QString &, const QString &)), this,
       SLOT(OnEnumChanged(const QString &, const QString &)));
 
+  // Connect pose value changes, for joint pose
+  QObject::connect(this->configWidget,
+      SIGNAL(PoseValueChanged(const QString &,
+      const ignition::math::Pose3d &)), this,
+      SLOT(OnPoseChanged(const QString &,
+      const ignition::math::Pose3d &)));
+
+  // Connect vector value changes, for axes
+  QObject::connect(this->configWidget,
+      SIGNAL(Vector3dValueChanged(const QString &,
+      const ignition::math::Vector3d &)), this,
+      SLOT(OnVector3dChanged(const QString &,
+      const ignition::math::Vector3d &)));
+
+  // Connect string value changes, for name
+  QObject::connect(this->configWidget,
+      SIGNAL(StringValueChanged(const QString &,
+      const std::string &)), this,
+      SLOT(OnStringChanged(const QString &,
+      const std::string &)));
+
   // Set initial joint type
   this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
 
@@ -200,10 +226,6 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  this->applyButton = new QPushButton(tr("Apply"));
-  this->applyButton->setEnabled(true);
-  connect(this->applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-
   this->okButton = new QPushButton(tr("OK"));
   this->okButton->setEnabled(true);
   this->okButton->setDefault(true);
@@ -213,7 +235,6 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   buttonsLayout->addWidget(removeButton);
   buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(this->applyButton);
   buttonsLayout->addWidget(this->okButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
@@ -288,6 +309,43 @@ void JointInspector::OnEnumChanged(const QString &_name,
 }
 
 /////////////////////////////////////////////////
+void JointInspector::OnPoseChanged(const QString &/*_name*/,
+    const ignition::math::Pose3d &/*_pose*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnVector3dChanged(const QString &/*_name*/,
+    const ignition::math::Vector3d &/*_vec*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnStringChanged(const QString &_name,
+    const std::string &_str)
+{
+  // Handle joint name
+  if (_name != "name")
+    return;
+
+  this->validJointName = !_str.empty();
+
+  // Warning if joint name is invalid
+  if (!this->validJointName)
+  {
+    this->nameWidget->setStyleSheet(this->warningStyleSheet);
+  }
+  else
+  {
+    this->nameWidget->setStyleSheet(this->normalStyleSheet);
+  }
+
+  this->UpdateValid();
+}
+
+/////////////////////////////////////////////////
 void JointInspector::OnJointTypeChanged(const QString &_value)
 {
   std::string valueStr = _value.toLower().toStdString();
@@ -323,6 +381,8 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
   this->configWidget->SetWidgetReadOnly("gearbox", !isGearbox);
   this->configWidget->SetWidgetVisible("screw", isScrew);
   this->configWidget->SetWidgetReadOnly("screw", !isScrew);
+
+  emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -344,8 +404,8 @@ void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
     this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
     this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
   }
-  this->applyButton->setEnabled(currentParent != currentChild);
-  this->okButton->setEnabled(currentParent != currentChild);
+  this->validLinks = currentParent != currentChild;
+  this->UpdateValid();
 }
 
 /////////////////////////////////////////////////
@@ -417,7 +477,6 @@ void JointInspector::Open()
   // Reset states
   this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
   this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
-  this->applyButton->setEnabled(true);
   this->okButton->setEnabled(true);
 
   this->move(QCursor::pos());
@@ -445,12 +504,6 @@ void JointInspector::OnCancel()
 }
 
 /////////////////////////////////////////////////
-void JointInspector::OnApply()
-{
-  emit Applied();
-}
-
-/////////////////////////////////////////////////
 void JointInspector::OnOK()
 {
   emit Applied();
@@ -461,4 +514,17 @@ void JointInspector::OnOK()
 void JointInspector::enterEvent(QEvent */*_event*/)
 {
   QApplication::setOverrideCursor(Qt::ArrowCursor);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::UpdateValid()
+{
+  bool valid = this->validJointName && this->validLinks;
+
+  this->okButton->setEnabled(valid);
+
+  if (valid)
+  {
+    emit Applied();
+  }
 }

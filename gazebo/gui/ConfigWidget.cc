@@ -3091,3 +3091,15 @@ void ConfigWidget::InsertLayout(QLayout *_layout, int _pos)
 
   boxLayout->insertLayout(_pos, _layout);
 }
+
+/////////////////////////////////////////////////
+ConfigChildWidget *ConfigWidget::ConfigChildWidgetByName(
+    const std::string &_name) const
+{
+  auto iter = this->configWidgets.find(_name);
+
+  if (iter != this->configWidgets.end())
+    return iter->second;
+  else
+    return NULL;
+}

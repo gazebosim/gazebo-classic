@@ -452,6 +452,13 @@ namespace gazebo
       /// \param[in] _pos The position to insert at, 0 being the top.
       public: void InsertLayout(QLayout *_layout, int _pos);
 
+      /// \brief Get a config child widget by its name.
+      /// \param[in] _name Scoped name of the child widget.
+      /// \return The child widgets with the given name or NULL if it wasn't
+      /// found.
+      public: ConfigChildWidget *ConfigChildWidgetByName(
+          const std::string &_name) const;
+
       /// \brief Get the number of child widgets.
       /// \return The number of child widgets.
       public: unsigned int ConfigChildWidgetCount() const;
