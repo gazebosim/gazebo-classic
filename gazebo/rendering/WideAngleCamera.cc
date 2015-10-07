@@ -452,10 +452,10 @@ void WideAngleCamera::Load()
     this->dataPtr->lens->Load();
 
   std::string lensType = this->dataPtr->lens->Type();
-  if (lensType == "gnomonical" && this->GetHFOV() > (IGN_PI))
+  if (lensType == "gnomonical" && this->GetHFOV() > (IGN_PI/2.0))
   {
-    gzerr << "The camera horizontal FOV should be < PI/2 for lens of type"
-        << " 'gnomonical'." << std::endl;
+    gzerr << "The recommended camera horizontal FOV should be <= PI/2"
+        << " for lens of type 'gnomonical'." << std::endl;
   }
 }
 
