@@ -168,7 +168,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: CameraLensPrivate *dataPtr;
+      private: std::unique_ptr<CameraLensPrivate> dataPtr;
     };
 
     /// \class WideAngleCamera WideAngleCamera.hh rendering/rendering.hh
@@ -236,7 +236,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: WideAngleCameraPrivate *dataPtr;
+      private: std::unique_ptr<WideAngleCameraPrivate> dataPtr;
     };
     /// \}
   }

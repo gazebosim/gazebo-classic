@@ -37,14 +37,13 @@ using namespace rendering;
 
 //////////////////////////////////////////////////
 CameraLens::CameraLens()
+  : dataPtr(new CameraLensPrivate)
 {
-  this->dataPtr = new CameraLensPrivate;
 }
 
 //////////////////////////////////////////////////
 CameraLens::~CameraLens()
 {
-  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
@@ -403,7 +402,8 @@ void CameraLens::ConvertToCustom()
 WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
                                  ScenePtr _scene, const bool _autoRender,
                                  const int _textureSize)
-    : Camera(_namePrefix, _scene, _autoRender)
+    : Camera(_namePrefix, _scene, _autoRender),
+      dataPtr(new CameraLensPrivate)
 {
   this->dataPtr = new WideAngleCameraPrivate;
   this->dataPtr->lens = new CameraLens();
@@ -422,7 +422,6 @@ WideAngleCamera::WideAngleCamera(const std::string &_namePrefix,
 WideAngleCamera::~WideAngleCamera()
 {
   delete this->Lens();
-  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
