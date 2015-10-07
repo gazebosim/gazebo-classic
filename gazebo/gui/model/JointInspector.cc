@@ -226,7 +226,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  this->okButton = new QPushButton(tr("OK"));
+  this->okButton = new QPushButton(tr("Save"));
   this->okButton->setEnabled(true);
   this->okButton->setDefault(true);
   connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
@@ -342,7 +342,7 @@ void JointInspector::OnStringChanged(const QString &_name,
     this->nameWidget->setStyleSheet(this->normalStyleSheet);
   }
 
-  this->UpdateValid();
+  this->CheckValid();
 }
 
 /////////////////////////////////////////////////
@@ -405,7 +405,7 @@ void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
     this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
   }
   this->validLinks = currentParent != currentChild;
-  this->UpdateValid();
+  this->CheckValid();
 }
 
 /////////////////////////////////////////////////
@@ -479,6 +479,9 @@ void JointInspector::Open()
   this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
   this->okButton->setEnabled(true);
 
+  // Keep original data in case user cancels
+  this->originalDataMsg.CopyFrom(*this->GetData());
+
   this->move(QCursor::pos());
   this->show();
 }
@@ -498,8 +501,31 @@ void JointInspector::OnRemove()
 }
 
 /////////////////////////////////////////////////
+void JointInspector::RestoreOriginalData()
+{
+  msgs::JointPtr jointPtr;
+  jointPtr.reset(new msgs::Joint);
+  jointPtr->CopyFrom(this->originalDataMsg);
+
+  // Update default widgets
+  this->Update(jointPtr);
+
+  // Update custom widgets
+  this->configWidget->blockSignals(true);
+  this->configWidget->SetEnumWidgetValue("parentCombo",
+      this->configWidget->GetStringWidgetValue("parent"));
+  this->configWidget->SetEnumWidgetValue("childCombo",
+      this->configWidget->GetStringWidgetValue("child"));
+  this->configWidget->blockSignals(false);
+
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
 void JointInspector::OnCancel()
 {
+  this->RestoreOriginalData();
+
   this->close();
 }
 
@@ -517,7 +543,7 @@ void JointInspector::enterEvent(QEvent */*_event*/)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::UpdateValid()
+void JointInspector::CheckValid()
 {
   bool valid = this->validJointName && this->validLinks;
 

@@ -132,7 +132,10 @@ namespace gazebo
       private slots: void OnOK();
 
       /// \brief Enable ok button if all values in the dialog are valid.
-      private: void UpdateValid();
+      private: void CheckValid();
+
+      /// \brief
+      private: void RestoreOriginalData();
 
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;
@@ -171,6 +174,8 @@ namespace gazebo
 
       /// \brief Flag that indicates whether current links are valid.
       private: bool validLinks;
+
+      private: msgs::Joint originalDataMsg;
     };
     /// \}
   }

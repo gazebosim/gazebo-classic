@@ -1601,5 +1601,40 @@ void ConfigWidget_TEST::OnEnumValueChanged(const QString &_name,
   g_enumSignalReceived = true;
 }
 
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::GetChildWidgetByName()
+{
+  // Create config widget and check it has no children
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
+  QVERIFY(configWidget != NULL);
+  QCOMPARE(configWidget->ConfigChildWidgetCount(), 0u);
+
+  // Try to get a child widget by name
+  gazebo::gui::ConfigChildWidget *widget =
+      configWidget->ConfigChildWidgetByName("child_widget");
+  QVERIFY(widget == NULL);
+
+  widget = configWidget->ConfigChildWidgetByName("");
+  QVERIFY(widget == NULL);
+
+  // Create child widget
+  gazebo::gui::ConfigChildWidget *childWidget =
+      configWidget->CreateBoolWidget("child_widget");
+  QVERIFY(childWidget != NULL);
+
+  // Add to config widget
+  QVERIFY(configWidget->AddConfigChildWidget("child_widget", childWidget));
+  QCOMPARE(configWidget->ConfigChildWidgetCount(), 1u);
+
+  // Get the widget by name
+  widget = configWidget->ConfigChildWidgetByName("child_widget");
+  QVERIFY(widget != NULL);
+
+  widget = configWidget->ConfigChildWidgetByName("bad_name");
+  QVERIFY(widget == NULL);
+
+  delete configWidget;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ConfigWidget_TEST)
