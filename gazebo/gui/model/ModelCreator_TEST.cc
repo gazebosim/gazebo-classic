@@ -53,20 +53,21 @@ void ModelCreator_TEST::NestedModel()
   gazebo::rendering::ScenePtr scene = cam->GetScene();
   QVERIFY(scene != NULL);
 
-  // Start never saved
+  // Create a model creator
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
   QVERIFY(modelCreator != NULL);
 
-  // add a box model
+  // Create a box model and add it to the model crerator
   double mass = 1.0;
   ignition::math::Vector3d size = ignition::math::Vector3d::One;
   msgs::Model model;
   model.set_name("box_model");
   msgs::AddBoxLink(model, mass, size);
-
-  // verify the box model has been added
   sdf::ElementPtr boxModelSDF = msgs::ModelToSDF(model);
+
   modelCreator->AddEntity(boxModelSDF);
+
+  // Verify it has been added
   gazebo::rendering::VisualPtr boxModelVis =
       scene->GetVisual("ModelPreview_0::box_model");
   QVERIFY(boxModelVis != NULL);
