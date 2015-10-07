@@ -56,7 +56,7 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
   // repeat the same test for various joint0 angles (thanks to issue 1703)
   int directions = 20;
   double increments = M_PI/4.0;
-  for (int j = -directions; j < directions; ++j)
+  for (int j = -directions; j < directions; j+=2)
   {
     // reset world
     world->Reset();

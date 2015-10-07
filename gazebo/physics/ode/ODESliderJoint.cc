@@ -144,18 +144,6 @@ double ODESliderJoint::GetParam(unsigned int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetMaxForce(unsigned int /*_index*/, double _t)
-{
-  this->SetParam(dParamFMax, _t);
-}
-
-//////////////////////////////////////////////////
-double ODESliderJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return this->GetParam(dParamFMax);
-}
-
-//////////////////////////////////////////////////
 math::Vector3 ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
 {
   dVector3 result;
