@@ -261,6 +261,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
       SLOT(OnLinkRemoved(std::string)));
   connect(this->jointMaker, SIGNAL(EmitLinkInserted(std::string)), this,
       SLOT(OnLinkInserted(std::string)));
+  connect(this, SIGNAL(rejected()), this, SLOT(RestoreOriginalData()));
 
   // Initialize variables
   this->validJointName = true;
