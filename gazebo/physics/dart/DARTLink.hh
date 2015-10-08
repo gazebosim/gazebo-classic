@@ -179,6 +179,9 @@ namespace gazebo
       /// \param[in] _dartChildJoint Pointer to the child joint.
       public: void AddDARTChildJoint(DARTJointPtr _dartChildJoint);
 
+      // Documentation inherited.
+      public: virtual void UpdateMass();
+
       /// \internal
       /// \brief Pointer to private data
       private: DARTLinkPrivate *dataPtr;

@@ -40,9 +40,10 @@ set (headers_install
 
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests_local
+    ExtrudeDialog_TEST.cc
     JointInspector_TEST.cc
     JointMaker_TEST.cc
-    ExtrudeDialog_TEST.cc
+    LinkInspector_TEST.cc
     ModelCreator_TEST.cc
     ModelData_TEST.cc
     ModelEditor_TEST.cc
@@ -69,7 +70,7 @@ if (HAVE_GRAPHVIZ)
       SchematicViewWidget_TEST.cc
     )
   endif()
- 
+
 endif()
 
 set (sources ${sources} ${sources_local} PARENT_SCOPE)

@@ -308,9 +308,6 @@ namespace gazebo
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
 
-      /// \brief Visual that is previously hovered over by the mouse
-      private: rendering::VisualPtr prevHoverVis;
-
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
@@ -367,6 +364,9 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Open the joint inspector.
+      public: void OpenInspector();
+
       /// \brief Update this joint data.
       public: void Update();
 
@@ -417,9 +417,6 @@ namespace gazebo
 
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;
-
-      /// \brief Open the joint inspector.
-      public: void OpenInspector();
 
       /// \brief Qt Callback when joint inspector is to be opened.
       private slots: void OnOpenInspector();
