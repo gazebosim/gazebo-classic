@@ -153,7 +153,7 @@ namespace gazebo
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnPoseChanged(const QString &_name,
-          const ignition::math::Pose3d &_pose);
+          const ignition::math::Pose3d &_value);
 
       /// \brief Qt callback when a geometry value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
@@ -163,6 +163,27 @@ namespace gazebo
           const std::string &_value,
           const ignition::math::Vector3d &_dimensions,
           const std::string &_uri);
+
+      /// \brief Qt callback when a color value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnColorChanged(const QString &_name,
+          const gazebo::common::Color &_value);
+
+      /// \brief Qt callback when a double value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnDoubleChanged(const QString &_name,
+          const double _value);
+
+      /// \brief Qt callback when a string value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnStringChanged(const QString &_name,
+          const std::string &_value);
 
       /// \brief Map of id to visual config widget.
       private: std::map<int, VisualConfigData *> configs;

@@ -200,6 +200,18 @@ void VisualConfig::AddVisual(const std::string &_name,
       const std::string &, const ignition::math::Vector3d &,
       const std::string &)));
 
+  connect(configWidget, SIGNAL(ColorValueChanged(const QString &,
+      const gazebo::common::Color &)), this,
+      SLOT(OnColorChanged(const QString &, const gazebo::common::Color &)));
+
+  connect(configWidget, SIGNAL(DoubleValueChanged(const QString &,
+      const double)), this,
+      SLOT(OnDoubleChanged(const QString &, const double)));
+
+  connect(configWidget, SIGNAL(StringValueChanged(const QString &,
+      const std::string &)), this,
+      SLOT(OnStringChanged(const QString &, const std::string &)));
+
   // Item layout
   QVBoxLayout *itemLayout = new QVBoxLayout();
   itemLayout->addWidget(headerWidget);
@@ -362,7 +374,7 @@ void VisualConfig::SetMaterial(const std::string &_name,
 
 /////////////////////////////////////////////////
 void VisualConfig::OnPoseChanged(const QString &/*_name*/,
-    const ignition::math::Pose3d &/*_pose*/)
+    const ignition::math::Pose3d &/*_value*/)
 {
   emit Applied();
 }
@@ -374,6 +386,31 @@ void VisualConfig::OnGeometryChanged(const std::string &/*_name*/,
     const std::string &/*_uri*/)
 {
   emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnColorChanged(const QString &/*_name*/,
+    const gazebo::common::Color &/*_value*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnDoubleChanged(const QString &_name,
+    const double /*_value*/)
+{
+  // Only transparency affects the visualization
+  if (_name == "transparency")
+    emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnStringChanged(const QString &_name,
+    const std::string &/*_value*/)
+{
+  // Only material script affects the visualization
+  if (_name == "material::script::name")
+    emit Applied();
 }
 
 /////////////////////////////////////////////////
