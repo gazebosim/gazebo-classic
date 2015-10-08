@@ -118,7 +118,6 @@ World::World(const std::string &_name)
 
   this->dataPtr->receiveMutex = new boost::recursive_mutex();
   this->dataPtr->loadModelMutex = new boost::mutex();
-  this->dataPtr->loadLightMutex = new boost::mutex();
 
   this->dataPtr->initialized = false;
   this->dataPtr->loaded = false;
@@ -164,8 +163,6 @@ World::~World()
   this->dataPtr->receiveMutex = NULL;
   delete this->dataPtr->loadModelMutex;
   this->dataPtr->loadModelMutex = NULL;
-  delete this->dataPtr->loadLightMutex;
-  this->dataPtr->loadLightMutex = NULL;
   delete this->dataPtr->setWorldPoseMutex;
   this->dataPtr->setWorldPoseMutex = NULL;
   delete this->dataPtr->worldUpdateMutex;
@@ -955,7 +952,7 @@ ModelPtr World::GetModel(const std::string &_name)
 //////////////////////////////////////////////////
 LightPtr World::Light(const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(*this->dataPtr->loadLightMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
   return boost::dynamic_pointer_cast<physics::Light>(this->GetByName(_name));
 }
 
@@ -998,7 +995,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 //////////////////////////////////////////////////
 LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
 {
-  boost::mutex::scoped_lock lock(*this->dataPtr->loadLightMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
 
   if (_sdf->GetName() != "light")
   {

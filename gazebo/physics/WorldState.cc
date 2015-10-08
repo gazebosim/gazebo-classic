@@ -209,7 +209,7 @@ ModelState WorldState::GetModelState(const std::string &_modelName) const
   if (iter != this->modelStates.end())
     return iter->second;
 
-  // Throw exception if the model name doesn't exist.
+  // Error if the model name doesn't exist.
   gzerr << "Invalid model name[" + _modelName + "]." << std::endl;
   return ModelState();
 }
@@ -222,7 +222,7 @@ LightState WorldState::GetLightState(const std::string &_lightName) const
   if (iter != this->lightStates.end())
     return iter->second;
 
-  // Throw exception if the light name doesn't exist.
+  // Error if the light name doesn't exist.
   gzerr << "Invalid light name[" + _lightName + "]." << std::endl;
   return LightState();
 }
