@@ -1555,6 +1555,58 @@ void ConfigWidget_TEST::OnPoseValueChanged(const QString &_name,
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget_TEST::ChildGeometrySignal()
+{
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
+
+  // Create child widget
+  gazebo::gui::ConfigChildWidget *geometryWidget =
+      configWidget->CreateGeometryWidget("geometry");
+  QVERIFY(geometryWidget != NULL);
+
+  // Add to config widget
+  QVERIFY(configWidget->AddConfigChildWidget("geometry", geometryWidget));
+
+  // Connect signals
+  connect(configWidget,
+      SIGNAL(GeometryValueChanged(const std::string &, const std::string &,
+      const ignition::math::Vector3d &, const std::string &)),
+      this,
+      SLOT(OnGeometryValueChanged(const std::string &, const std::string &,
+      const ignition::math::Vector3d &, const std::string &)));
+
+  // Check default
+  ignition::math::Vector3d dimensions;
+  std::string uri;
+  std::string value = configWidget->GeometryWidgetValue("geometry",
+      dimensions, uri);
+
+  // Get signal emitting widgets
+  QList<QDoubleSpinBox *> spins =
+      geometryWidget->findChildren<QDoubleSpinBox *>();
+  QCOMPARE(spins.size(), 5);
+
+  // Change the value and check new pose at OnGeometryValueChanged
+  spins[2]->setValue(2.0);
+  QTest::keyClick(spins[2], Qt::Key_Enter);
+  QVERIFY(g_geometrySignalReceived == true);
+
+  delete configWidget;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::OnGeometryValueChanged(const std::string &_name,
+    const std::string &_value, const ignition::math::Vector3d &_dimensions,
+    const std::string &_uri)
+{
+  QVERIFY(_name == "geometry");
+  QVERIFY(_value == "box");
+  QVERIFY(_dimensions == ignition::math::Vector3d(2, 1, 1));
+  QVERIFY(_uri == "");
+  g_geometrySignalReceived = true;
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget_TEST::ChildEnumSignal()
 {
   gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;

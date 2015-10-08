@@ -667,6 +667,12 @@ namespace gazebo
       /// \brief Callback when a pose config widget's value has changed.
       private slots: void OnPoseValueChanged();
 
+      /// \brief Callback when a pose config widget's value has changed.
+      private slots: void OnGeometryValueChanged();
+
+      /// \brief Callback when a pose config widget's value has changed.
+      private slots: void OnGeometryValueChanged(const int _value);
+
       /// \brief Callback when an enum config widget's enum value has changed.
       /// \param[in] _value New enum value in string.
       private slots: void OnEnumValueChanged(const QString &_value);
@@ -719,6 +725,13 @@ namespace gazebo
       /// \param[in] _pose New pose.
       Q_SIGNALS: void PoseValueChanged(const QString &_name,
           const ignition::math::Pose3d &_pose);
+
+      /// \brief Signal that an enum config widget's enum value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _value New enum value string.
+      Q_SIGNALS: void GeometryValueChanged(const std::string &_name,
+          const std::string &_value, const ignition::math::Vector3d &_dimensions,
+          const std::string &_uri);
 
       /// \brief Signal that an enum config widget's enum value has changed.
       /// \param[in] _name Scoped name of widget.
