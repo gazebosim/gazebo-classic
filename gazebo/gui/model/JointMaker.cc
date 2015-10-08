@@ -1016,7 +1016,8 @@ void JointData::OnApply()
       msgs::ConvertJointType(this->jointMsg->type()));
 
   // Parent
-  if (this->parent->GetName().find(this->jointMsg->parent()) == -1)
+  if (this->parent->GetName().find(this->jointMsg->parent()) !=
+      std::string::npos)
   {
     // Get scoped name
     std::string oldName = this->parent->GetName();
@@ -1034,7 +1035,8 @@ void JointData::OnApply()
   }
 
   // Child
-  if (this->child->GetName().find(this->jointMsg->child()) == -1)
+  if (this->child->GetName().find(this->jointMsg->child()) !=
+      std::string::npos)
   {
     // Get scoped name
     std::string oldName = this->child->GetName();

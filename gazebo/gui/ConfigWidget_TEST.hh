@@ -138,7 +138,9 @@ class ConfigWidget_TEST : public QTestFixture
 
   /// \brief Slot that receives geometry signals from child widgets.
   /// \param[in] _name Scoped name of child widget which sent signal.
-  /// \param[in] _value New value.
+  /// \param[in] _value New geometry value.
+  /// \param[in] _dimensions New dimensions.
+  /// \param[in] _uri New uri for meshes.
   private slots: void OnGeometryValueChanged(const std::string &_name,
       const std::string &_value, const ignition::math::Vector3d &_dimensions,
       const std::string &_uri);

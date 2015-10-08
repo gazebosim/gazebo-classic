@@ -190,6 +190,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetReadOnly("plugin", true);
   configWidget->SetWidgetReadOnly("type", true);
 
+  // Connect config widget signals
   connect(configWidget, SIGNAL(PoseValueChanged(const QString &,
       const ignition::math::Pose3d &)), this,
       SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
@@ -418,8 +419,7 @@ void VisualConfig::RestoreOriginalData()
 {
   for (auto &it : this->configs)
   {
-    VisualConfigData *configData = it.second;
-    configData->RestoreOriginalData();
+    it.second->RestoreOriginalData();
   }
 }
 

@@ -84,21 +84,21 @@ namespace gazebo
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnPoseChanged(const QString &_name,
-          const ignition::math::Pose3d &_pose);
+          const ignition::math::Pose3d &_value);
 
       /// \brief Qt callback when a Vector3d value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnVector3dChanged(const QString &_name,
-          const ignition::math::Vector3d &_vec);
+          const ignition::math::Vector3d &_value);
 
       /// \brief Qt callback when a string value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnStringChanged(const QString &_name,
-          const std::string &_str);
+          const std::string &_value);
 
       /// \brief Callback when the joint type has changed.
       /// \param[in] _value New joint type.
@@ -131,7 +131,7 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief
+      /// \brief Restore the widget's data to how it was when first opened.
       private slots: void RestoreOriginalData();
 
       /// \brief Enable ok button if all values in the dialog are valid.
@@ -175,6 +175,8 @@ namespace gazebo
       /// \brief Flag that indicates whether current links are valid.
       private: bool validLinks;
 
+      /// \brief Message containing the data which was in the widget when first
+      /// open.
       private: msgs::Joint originalDataMsg;
     };
     /// \}

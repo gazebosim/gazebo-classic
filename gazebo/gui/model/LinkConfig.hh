@@ -77,10 +77,10 @@ namespace gazebo
       /// \param[in] _pose Inertial pose to set the link to.
       public: void SetInertialPose(const ignition::math::Pose3d &_pose);
 
-      /// \brief
+      /// \brief Initialize widget.
       public: void Init();
 
-      /// \brief
+      /// \brief Restore the widget's data to how it was when first opened.
       public slots: void RestoreOriginalData();
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
@@ -91,11 +91,13 @@ namespace gazebo
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnPoseChanged(const QString &_name,
-          const ignition::math::Pose3d &_pose);
+          const ignition::math::Pose3d &_value);
 
       /// \brief config widget for configuring link properties.
       private: ConfigWidget *configWidget;
 
+      /// \brief Message containing the data which was in the widget when first
+      /// open.
       private: msgs::Link originalDataMsg;
     };
     /// \}

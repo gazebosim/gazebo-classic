@@ -373,8 +373,7 @@ void CollisionConfig::RestoreOriginalData()
 {
   for (auto &it : this->configs)
   {
-    CollisionConfigData *configData = it.second;
-    configData->RestoreOriginalData();
+    it.second->RestoreOriginalData();
   }
 }
 

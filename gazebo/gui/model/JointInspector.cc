@@ -184,24 +184,19 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
       SLOT(OnEnumChanged(const QString &, const QString &)));
 
   // Connect pose value changes, for joint pose
-  QObject::connect(this->configWidget,
-      SIGNAL(PoseValueChanged(const QString &,
+  connect(this->configWidget, SIGNAL(PoseValueChanged(const QString &,
       const ignition::math::Pose3d &)), this,
-      SLOT(OnPoseChanged(const QString &,
-      const ignition::math::Pose3d &)));
+      SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
 
   // Connect vector value changes, for axes
-  QObject::connect(this->configWidget,
-      SIGNAL(Vector3dValueChanged(const QString &,
+  connect(this->configWidget, SIGNAL(Vector3dValueChanged(const QString &,
       const ignition::math::Vector3d &)), this,
       SLOT(OnVector3dChanged(const QString &,
       const ignition::math::Vector3d &)));
 
   // Connect string value changes, for name
-  QObject::connect(this->configWidget,
-      SIGNAL(StringValueChanged(const QString &,
-      const std::string &)), this,
-      SLOT(OnStringChanged(const QString &,
+  connect(this->configWidget, SIGNAL(StringValueChanged(const QString &,
+      const std::string &)), this, SLOT(OnStringChanged(const QString &,
       const std::string &)));
 
   // Set initial joint type

@@ -66,7 +66,7 @@ namespace gazebo
       /// \param[in] New link id.
       public: void SetLinkId(const std::string &_id);
 
-      /// \brief
+      /// \brief Open the inspector.
       public: void Open();
 
       /// \brief Qt event emiited when the mouse enters this widget.
@@ -93,7 +93,10 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
+      /// \brief Qt callback when one of the child configs has been applied.
       private slots: void OnConfigApplied();
+
+      /// \brief Restore the widget's data to how it was when first opened.
       private slots: void RestoreOriginalData();
 
       /// \brief Main tab widget within the link inspector.

@@ -39,7 +39,7 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \brief
+      /// \brief Restore the widget's data to how it was when first opened.
       public slots: void RestoreOriginalData();
 
       /// \brief Qt callback when this item's button has been pressed.
@@ -58,6 +58,8 @@ namespace gazebo
       /// \brief Widget associated with this data.
       public: QWidget *widget;
 
+      /// \brief Message containing the data which was in the widget when first
+      /// open.
       public: msgs::Collision originalDataMsg;
     };
 
@@ -73,10 +75,10 @@ namespace gazebo
       /// \brief Destructor
       public: ~CollisionConfig();
 
-      /// \brief
+      /// \brief Initialize widget.
       public: void Init();
 
-      /// \brief
+      /// \brief Restore the widget's data to how it was when first opened.
       public slots: void RestoreOriginalData();
 
       /// \brief Add a collision widget to the tab.
@@ -142,12 +144,14 @@ namespace gazebo
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnPoseChanged(const QString &_name,
-          const ignition::math::Pose3d &_pose);
+          const ignition::math::Pose3d &_value);
 
       /// \brief Qt callback when a geometry value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
-      /// \param[in] _value New value.
+      /// \param[in] _value New geometry value.
+      /// \param[in] _dimensions New dimensions.
+      /// \param[in] _uri New uri, for meshes.
       private slots: void OnGeometryChanged(const std::string &_name,
           const std::string &_value,
           const ignition::math::Vector3d &_dimensions,

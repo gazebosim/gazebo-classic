@@ -1580,6 +1580,9 @@ void ConfigWidget_TEST::ChildGeometrySignal()
   std::string uri;
   std::string value = configWidget->GeometryWidgetValue("geometry",
       dimensions, uri);
+  QVERIFY(value == "box");
+  QVERIFY(dimensions == ignition::math::Vector3d(1, 1, 1));
+  QVERIFY(uri == "");
 
   // Get signal emitting widgets
   QList<QDoubleSpinBox *> spins =
@@ -1682,6 +1685,7 @@ void ConfigWidget_TEST::GetChildWidgetByName()
   widget = configWidget->ConfigChildWidgetByName("child_widget");
   QVERIFY(widget != NULL);
 
+  // Check that a bad name returns NULL
   widget = configWidget->ConfigChildWidgetByName("bad_name");
   QVERIFY(widget == NULL);
 
