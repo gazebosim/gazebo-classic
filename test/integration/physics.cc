@@ -189,6 +189,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       world->Step(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
+      EXPECT_EQ(model->GetWorldLinearAccel(), g);
       EXPECT_EQ(vel1.x, 0);
       EXPECT_EQ(vel1.y, 0);
       EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
@@ -203,6 +204,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       world->Step(steps);
       vel2 = model->GetWorldLinearVel();
       pose2 = model->GetWorldPose();
+      EXPECT_EQ(model->GetWorldLinearAccel(), g);
       EXPECT_LT(vel2.z, vel1.z);
       EXPECT_LT(pose2.pos.z, pose1.pos.z);
 
@@ -274,9 +276,15 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
       if (name == "test_empty")
+      {
+        // EXPECT_EQ(model->GetWorldLinearAccel(), g);
         EXPECT_NEAR(vel1.z, g.z*t, -g.z*t*PHYSICS_TOL);
+      }
       else
+      {
+        // EXPECT_EQ(model->GetWorldLinearAccel(), math::Vector3::Zero);
         EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
+      }
 
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
