@@ -49,6 +49,8 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   this->visualConfig = new VisualConfig;
   connect(this->visualConfig, SIGNAL(Applied()), this, SLOT(OnConfigApplied()));
   this->collisionConfig = new CollisionConfig;
+  connect(this->collisionConfig, SIGNAL(Applied()), this,
+      SLOT(OnConfigApplied()));
 
   // Create the main tab widget for all components in a link
   this->tabWidget = new QTabWidget();
@@ -182,7 +184,7 @@ void LinkInspector::Open()
 {
   this->linkConfig->Init();
   this->visualConfig->Init();
- // this->collisionConfig->Init();
+  this->collisionConfig->Init();
 
   this->move(QCursor::pos());
   this->show();
@@ -193,7 +195,7 @@ void LinkInspector::RestoreOriginalData()
 {
   this->linkConfig->RestoreOriginalData();
   this->visualConfig->RestoreOriginalData();
-//  this->collisionConfig->RestoreOriginalData();
+  this->collisionConfig->RestoreOriginalData();
 
   emit Applied();
 }
