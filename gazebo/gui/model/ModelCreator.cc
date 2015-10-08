@@ -1779,8 +1779,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
   LinkData *link = it->second;
   link->SetPose((link->linkVisual->GetWorldPose()-this->modelPose).Ign());
   link->UpdateConfig();
-  link->inspector->move(QCursor::pos());
-  link->inspector->show();
+  link->inspector->Open();
 }
 
 /////////////////////////////////////////////////

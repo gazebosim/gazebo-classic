@@ -63,11 +63,23 @@ LinkConfig::LinkConfig()
   generalLayout->addWidget(scrollArea);
 
   this->setLayout(generalLayout);
+
+  // Connections
+  connect(this->configWidget, SIGNAL(PoseValueChanged(const QString &,
+      const ignition::math::Pose3d &)), this,
+      SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
 }
 
 /////////////////////////////////////////////////
 LinkConfig::~LinkConfig()
 {
+}
+
+/////////////////////////////////////////////////
+void LinkConfig::Init()
+{
+  // Keep original data in case user cancels
+  this->originalDataMsg.CopyFrom(*this->GetData());
 }
 
 /////////////////////////////////////////////////
@@ -111,3 +123,25 @@ msgs::Link *LinkConfig::GetData() const
 {
   return dynamic_cast<msgs::Link *>(this->configWidget->GetMsg());
 }
+
+/////////////////////////////////////////////////
+void LinkConfig::OnPoseChanged(const QString &/*_name*/,
+    const ignition::math::Pose3d &/*_pose*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void LinkConfig::RestoreOriginalData()
+{
+  msgs::LinkPtr linkPtr;
+  linkPtr.reset(new msgs::Link);
+  linkPtr->CopyFrom(this->originalDataMsg);
+
+  // Update default widgets
+  this->configWidget->blockSignals(true);
+  this->Update(linkPtr);
+  this->configWidget->blockSignals(false);
+}
+
+

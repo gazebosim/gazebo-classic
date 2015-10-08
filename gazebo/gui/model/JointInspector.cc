@@ -233,7 +233,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  this->okButton = new QPushButton(tr("Save"));
+  this->okButton = new QPushButton(tr("OK"));
   this->okButton->setEnabled(true);
   this->okButton->setDefault(true);
   connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
