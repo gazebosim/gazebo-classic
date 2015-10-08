@@ -18,6 +18,7 @@
 
 1. Support loading and spawning nested models
     * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
+    * [Pull request #1895](https://bitbucket.org/osrf/gazebo/pull-request/1895)
 
 1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
     * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
@@ -121,6 +122,17 @@ using the same arguments used in the command line.
         * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
 
 ## Gazebo 6.0
+
+### Gazebo 6.x.x
+
+1. Update inertia properties during simulation
+    * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
+    * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
+
+### Gazebo 6.3.0 (2015-10-06)
+
+1. Added `Sensor::SetPose` function
+    * [Pull request #1935](https://bitbucket.org/osrf/gazebo/pull-request/1935)
 
 ### Gazebo 6.2.0 (2015-10-02)
 

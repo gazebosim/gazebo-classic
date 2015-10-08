@@ -95,19 +95,6 @@ double SimbodySliderJoint::GetVelocity(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzdbg << "SetMaxForce doesn't make sense in simbody...\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodySliderJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzdbg << "GetMaxForce doesn't make sense in simbody...\n";
-  return 0;
-}
-
-//////////////////////////////////////////////////
 void SimbodySliderJoint::SetForceImpl(unsigned int _index, double _torque)
 {
   if (_index < this->GetAngleCount())

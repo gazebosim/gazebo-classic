@@ -98,16 +98,6 @@ namespace gazebo
       /// \param[in] _vel Velocity to apply to the joint axis.
       public: virtual void SetVelocity(unsigned int _index, double _vel);
 
-      /// \brief Set the max allowed force of an axis(index).
-      /// \param[in] _index Axis index.
-      /// \param[in] _force Maximum force value.
-      public: virtual void SetMaxForce(unsigned int _index, double _force);
-
-      /// \brief Get the max allowed force of an axis(index).
-      /// \param[in] _index Axis index.
-      /// \return Maximum force value.
-      public: virtual double GetMaxForce(unsigned int _index);
-
       /// \brief Get the axis of rotation
       /// \param[in] _index Axis index.
       /// \return The axis in world coordinate frame.
