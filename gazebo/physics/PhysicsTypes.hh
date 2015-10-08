@@ -44,6 +44,7 @@ namespace gazebo
     class JointController;
     class Contact;
     class PresetManager;
+    class UserCmd;
     class UserCmdManager;
     class PhysicsEngine;
     class Mass;
@@ -112,9 +113,13 @@ namespace gazebo
     /// \brief Shared pointer to a PresetManager object
     typedef boost::shared_ptr<PresetManager> PresetManagerPtr;
 
+    /// \def  UserCmdPtr
+    /// \brief Shared pointer to a UserCmd object
+    typedef std::shared_ptr<UserCmd> UserCmdPtr;
+
     /// \def  UserCmdManagerPtr
     /// \brief Shared pointer to a UserCmdManager object
-    typedef boost::shared_ptr<UserCmdManager> UserCmdManagerPtr;
+    typedef std::shared_ptr<UserCmdManager> UserCmdManagerPtr;
 
     /// \def ShapePtr
     /// \brief Boost shared pointer to a Shape object

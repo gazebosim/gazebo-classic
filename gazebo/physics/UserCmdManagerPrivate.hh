@@ -77,11 +77,11 @@ namespace gazebo
       /// \brief Publisher of undo redo statistics messages.
       public: transport::PublisherPtr userCmdStatsPub;
 
-      /// \brief list of commands which can be undone.
-      public: std::vector<UserCmd *> undoCmds;
+      /// \brief List of commands which can be undone.
+      public: std::vector<UserCmdPtr> undoCmds;
 
-      /// \brief list of commands which can be redone.
-      public: std::vector<UserCmd *> redoCmds;
+      /// \brief List of commands which can be redone.
+      public: std::vector<UserCmdPtr> redoCmds;
     };
   }
 }

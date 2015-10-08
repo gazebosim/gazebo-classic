@@ -128,11 +128,11 @@ UserCmdManager::~UserCmdManager()
 void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 {
   // Create command
-  UserCmd *cmd = new UserCmd(
+  UserCmdPtr cmd(new UserCmd(
       _msg->id(),
       this->dataPtr->world,
       _msg->description(),
-      _msg->type());
+      _msg->type()));
 
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmd);
@@ -157,7 +157,7 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
     }
 
     // Get the last done command
-    UserCmd *cmd = this->dataPtr->undoCmds.back();
+    UserCmdPtr cmd = this->dataPtr->undoCmds.back();
 
     // If there's an id, get that command instead
     if (_msg->has_id())
@@ -204,7 +204,7 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
     }
 
     // Get last undone command
-    UserCmd *cmd = this->dataPtr->redoCmds.back();
+    UserCmdPtr cmd = this->dataPtr->redoCmds.back();
 
     // If there's an id, get that command instead
     if (_msg->has_id())

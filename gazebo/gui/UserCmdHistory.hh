@@ -51,9 +51,11 @@ namespace gazebo
 
       /// \brief Qt call back when an undo history action is triggered.
       /// It publishes an undo request message.
+      /// \param[in] _action Pointer to action which was triggered,
       private slots: void OnUndoCommand(QAction *_action);
 
       /// \brief Qt call back when an undo history action is hovered.
+      /// \param[in] _action Pointer to action which was hovered,
       private slots: void OnUndoHovered(QAction *_action);
 
       /// \brief Qt call back when the undo history button is pressed.
@@ -65,9 +67,11 @@ namespace gazebo
 
       /// \brief Qt call back when a redo history action is triggered.
       /// It publishes a redo request message.
+      /// \param[in] _action Pointer to action which was triggered,
       private slots: void OnRedoCommand(QAction *_action);
 
       /// \brief Qt call back when a redo history action is hovered.
+      /// \param[in] _action Pointer to action which was hovered,
       private slots: void OnRedoHovered(QAction *_action);
 
       /// \brief Qt call back when the redo history button is pressed.

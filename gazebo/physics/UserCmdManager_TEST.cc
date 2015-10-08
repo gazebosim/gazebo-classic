@@ -15,10 +15,11 @@
  *
 */
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 #include "gazebo/physics/UserCmdManager.hh"
-#include "sdf/sdf.hh"
 
 using namespace gazebo;
 
