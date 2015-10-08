@@ -1,5 +1,10 @@
 ## Gazebo 7.0
 
+1. KeyEvent constructor should be in a source file. Removed a few visibility
+flags from c functions. Windows did not like `CPPTYPE_*` in
+`gazebo/gui/ConfigWidget.cc`, so I replaced it with `TYPE_*`.
+    * [Pull request #1943](https://bitbucket.org/osrf/gazebo/pull-request/1943)
+
 1. Resolve issue #1702
     * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
     * [Pull request #1905](https://bitbucket.org/osrf/gazebo/pull-request/1905)
