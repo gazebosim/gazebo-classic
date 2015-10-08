@@ -429,11 +429,10 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
 
   // Get model joints (used for visualization)
   physics::Joint_V joints = model->GetJoints();
-  physics::Joint_V::iterator iter;
   bool jointFound = false;
-  for (iter = joints.begin(); iter != joints.end(); ++iter)
+  for (auto const &joint : joints)
   {
-    if ((*iter)->GetName() == name)
+    if (joint->GetName() == name)
     {
       jointFound = true;
       break;
