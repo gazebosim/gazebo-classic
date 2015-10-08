@@ -156,20 +156,6 @@ double BulletBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-double BulletBallJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented\n";
-  return 0;
-}
-
-/////////////////////////////////////////////////
-void BulletBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzerr << "Not implemented\n";
-  return;
-}
-
-/////////////////////////////////////////////////
 math::Vector3 BulletBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";

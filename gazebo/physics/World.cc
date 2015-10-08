@@ -294,25 +294,6 @@ void World::Load(sdf::ElementPtr _sdf)
     // Create all the entities
     this->LoadEntities(this->dataPtr->sdf, this->dataPtr->rootElement);
 
-    // Set the state of the entities
-    if (this->dataPtr->sdf->HasElement("state"))
-    {
-      sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("state");
-
-      while (childElem)
-      {
-        WorldState myState;
-        myState.Load(childElem);
-        this->SetState(myState);
-
-        childElem = childElem->GetNextElement("state");
-
-        // TODO: We currently load just the first state data. Need to
-        // implement a better mechanism for handling multiple states
-        break;
-      }
-    }
-
     for (unsigned int i = 0; i < this->GetModelCount(); ++i)
       this->GetModel(i)->LoadJoints();
   }
@@ -387,6 +368,25 @@ void World::Init()
   {
     Population population(this->dataPtr->sdf, shared_from_this());
     population.PopulateAll();
+  }
+
+  // Set the state of the entities
+  if (this->dataPtr->sdf->HasElement("state"))
+  {
+    sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("state");
+
+    while (childElem)
+    {
+      WorldState myState;
+      myState.Load(childElem);
+      this->SetState(myState);
+
+      childElem = childElem->GetNextElement("state");
+
+      // TODO: We currently load just the first state data. Need to
+      // implement a better mechanism for handling multiple states
+      break;
+    }
   }
 
   this->dataPtr->initialized = true;
