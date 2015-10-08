@@ -155,13 +155,17 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
 
   // Swap button
   QToolButton *swapButton = new QToolButton();
-  swapButton->setText("Swap");
-  swapButton->setMinimumWidth(60);
+  swapButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  swapButton->setIcon(QPixmap(":/images/swap-parent-child.png"));
+  swapButton->setFixedSize(QSize(45, 35));
+  swapButton->setIconSize(QSize(25, 25));
+  swapButton->setToolTip("Swap parent and child");
   swapButton->setStyleSheet(
       "QToolButton\
       {\
-        background-color: " + ConfigWidget::bgColors[0] +
-      "}");
+        background-color: " + ConfigWidget::bgColors[0] + ";\
+        margin-left: 10px;\
+      }");
   connect(swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
 
   // Links layout
@@ -257,6 +261,10 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
       SLOT(OnLinkRemoved(std::string)));
   connect(this->jointMaker, SIGNAL(EmitLinkInserted(std::string)), this,
       SLOT(OnLinkInserted(std::string)));
+
+  // Initialize variables
+  this->validJointName = true;
+  this->validLinks = true;
 }
 
 /////////////////////////////////////////////////
@@ -334,6 +342,7 @@ void JointInspector::OnStringChanged(const QString &_name,
   if (_name != "name")
     return;
 
+  /// \todo Also check if name overlaps with other joints
   this->validJointName = !_str.empty();
 
   // Warning if joint name is invalid
@@ -346,7 +355,7 @@ void JointInspector::OnStringChanged(const QString &_name,
     this->nameWidget->setStyleSheet(this->normalStyleSheet);
   }
 
-  // Only apply if valid
+  // Only apply if all fields are valid
   this->CheckValid();
   if (this->okButton->isEnabled())
     emit Applied();
@@ -413,7 +422,7 @@ void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
   }
   this->validLinks = currentParent != currentChild;
 
-  // Only apply if valid
+  // Only apply if all fields are valid
   this->CheckValid();
   if (this->okButton->isEnabled())
     emit Applied();

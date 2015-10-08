@@ -299,6 +299,26 @@ ignition::math::Pose3d Sensor::Pose() const
 }
 
 //////////////////////////////////////////////////
+void Sensor::SetPose(const ignition::math::Pose3d &_pose)
+{
+  this->pose = _pose;
+
+  // Update the visualization with the pose information.
+  if (this->sensorPub && this->GetVisualize())
+  {
+    msgs::Sensor msg;
+    msg.set_name(this->GetName());
+    msg.set_id(this->GetId());
+    msg.set_parent(this->GetParentName());
+    msg.set_parent_id(this->GetParentId());
+    msg.set_type(this->GetType());
+    msg.set_visualize(true);
+    msgs::Set(msg.mutable_pose(), this->pose);
+    this->sensorPub->Publish(msg);
+  }
+}
+
+//////////////////////////////////////////////////
 double Sensor::GetUpdateRate()
 {
   if (this->updatePeriod.Double() > 0.0)

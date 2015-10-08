@@ -454,7 +454,7 @@ namespace gazebo
 
       /// \brief Get a config child widget by its name.
       /// \param[in] _name Scoped name of the child widget.
-      /// \return The child widgets with the given name or NULL if it wasn't
+      /// \return The child widget with the given name or NULL if it wasn't
       /// found.
       public: ConfigChildWidget *ConfigChildWidgetByName(
           const std::string &_name) const;
