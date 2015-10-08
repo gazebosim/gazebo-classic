@@ -357,8 +357,9 @@ namespace gazebo
       /// \param[in] _type type of joint
       /// \param[in] _parent parent link of joint
       /// \param[in] _child child link of joint
+      /// \return a JointPtr to the new joint created
       public: gazebo::physics::JointPtr CreateJoint(
-        std::string _name, std::string _type,
+        const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
 
       /// \brief Callback when the pose of the model has been changed.

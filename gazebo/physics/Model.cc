@@ -1274,7 +1274,7 @@ double Model::GetWorldEnergy() const
 
 /////////////////////////////////////////////////
 gazebo::physics::JointPtr Model::CreateJoint(
-  std::string _name, std::string _type,
+  const std::string &_name, const std::string &_type,
   physics::LinkPtr _parent, physics::LinkPtr _child)
 {
   gazebo::physics::ModelPtr m(this);
