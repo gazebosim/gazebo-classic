@@ -131,11 +131,11 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
+      /// \brief
+      private slots: void RestoreOriginalData();
+
       /// \brief Enable ok button if all values in the dialog are valid.
       private: void CheckValid();
-
-      /// \brief
-      private: void RestoreOriginalData();
 
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;

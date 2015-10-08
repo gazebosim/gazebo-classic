@@ -223,6 +223,9 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   removeButton->setCheckable(false);
   connect(removeButton, SIGNAL(clicked()), this, SLOT(OnRemove()));
 
+  QPushButton *resetButton = new QPushButton(tr("Reset"));
+  connect(resetButton, SIGNAL(clicked()), this, SLOT(RestoreOriginalData()));
+
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
@@ -234,6 +237,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(removeButton);
   buttonsLayout->addStretch(5);
+  buttonsLayout->addWidget(resetButton);
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(this->okButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
@@ -342,7 +346,10 @@ void JointInspector::OnStringChanged(const QString &_name,
     this->nameWidget->setStyleSheet(this->normalStyleSheet);
   }
 
+  // Only apply if valid
   this->CheckValid();
+  if (this->okButton->isEnabled())
+    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -405,7 +412,11 @@ void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
     this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
   }
   this->validLinks = currentParent != currentChild;
+
+  // Only apply if valid
   this->CheckValid();
+  if (this->okButton->isEnabled())
+    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -417,8 +428,10 @@ void JointInspector::OnSwap()
   std::string currentChild =
       this->configWidget->GetEnumWidgetValue("childCombo");
 
-  // Choose new values
+  // Choose new values. We only need signals to be emitted once.
+  this->configWidget->blockSignals(true);
   this->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
+  this->configWidget->blockSignals(false);
   this->configWidget->SetEnumWidgetValue("childCombo", currentParent);
 }
 
@@ -508,10 +521,10 @@ void JointInspector::RestoreOriginalData()
   jointPtr->CopyFrom(this->originalDataMsg);
 
   // Update default widgets
+  this->configWidget->blockSignals(true);
   this->Update(jointPtr);
 
   // Update custom widgets
-  this->configWidget->blockSignals(true);
   this->configWidget->SetEnumWidgetValue("parentCombo",
       this->configWidget->GetStringWidgetValue("parent"));
   this->configWidget->SetEnumWidgetValue("childCombo",
@@ -548,9 +561,4 @@ void JointInspector::CheckValid()
   bool valid = this->validJointName && this->validLinks;
 
   this->okButton->setEnabled(valid);
-
-  if (valid)
-  {
-    emit Applied();
-  }
 }
