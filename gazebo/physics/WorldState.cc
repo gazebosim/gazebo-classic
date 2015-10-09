@@ -90,13 +90,23 @@ void WorldState::Load(const WorldPtr _world)
   this->iterations = _world->GetIterations();
 
   // Add a state for all the models
-  this->modelStates.clear();
   Model_V models = _world->GetModels();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
     this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
         this->simTime, this->iterations);
+  }
+
+  // Remove models that no longer exist. We determine this by check the time
+  // stamp on each model.
+  for (ModelState_M::iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end();)
+  {
+    if (iter->second.GetRealTime() != this->realTime)
+      this->modelStates.erase(iter++);
+    else
+      ++iter;
   }
 
   // Add states for all the lights
