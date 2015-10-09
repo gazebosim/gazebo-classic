@@ -25,6 +25,9 @@ class JointInspector_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Constructor
+  public: JointInspector_TEST() = default;
+
   /// \brief Test adding and removing links.
   private slots: void AddRemoveLink();
 

@@ -70,10 +70,26 @@ void LinkInspector_TEST::AppliedSignal()
       linkInspector->findChildren<QDoubleSpinBox *>();
   QVERIFY(spins.size() == 19);
 
+  // Get push buttons
+  QList<QPushButton *> pushButtons =
+      linkInspector->findChildren<QPushButton *>();
+  QVERIFY(pushButtons.size() == 3);
+
   // Edit link pose (13~18)
   spins[18]->setValue(2.0);
   QTest::keyClick(spins[18], Qt::Key_Enter);
   QCOMPARE(g_appliedSignalCount, 1u);
+  QVERIFY(linkInspector->isVisible());
+
+  // Reset
+  pushButtons[0]->click();
+  QCOMPARE(g_appliedSignalCount, 2u);
+  QVERIFY(linkInspector->isVisible());
+
+  // Ok
+  pushButtons[2]->click();
+  QCOMPARE(g_appliedSignalCount, 3u);
+  QVERIFY(!linkInspector->isVisible());
 
   delete linkInspector;
 }

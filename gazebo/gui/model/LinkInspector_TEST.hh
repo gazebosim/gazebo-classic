@@ -25,6 +25,9 @@ class LinkInspector_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Constructor
+  public: LinkInspector_TEST() = default;
+
   /// \brief Test pressing remove button.
   private slots: void RemoveButton();
 

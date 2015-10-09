@@ -45,10 +45,20 @@ void CollisionConfig_TEST::AppliedSignal()
       collisionConfig->findChildren<QDoubleSpinBox *>();
   QVERIFY(spins.size() == 32);
 
+  // Get combo boxes
+  QList<QComboBox *> combos =
+      collisionConfig->findChildren<QComboBox *>();
+  QVERIFY(combos.size() == 1);
+
   // Edit collision pose (2~7)
   spins[2]->setValue(2.0);
   QTest::keyClick(spins[2], Qt::Key_Enter);
   QCOMPARE(g_appliedSignalCount, 1u);
+
+  // Edit geometry (0)
+  combos[0]->setCurrentIndex(2);
+  QTest::keyClick(combos[0], Qt::Key_Enter);
+  QCOMPARE(g_appliedSignalCount, 2u);
 
   delete collisionConfig;
 }

@@ -230,7 +230,6 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
 
   this->okButton = new QPushButton(tr("OK"));
   this->okButton->setEnabled(true);
-  this->okButton->setDefault(true);
   connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
@@ -573,4 +572,13 @@ void JointInspector::CheckValid()
   bool valid = this->validJointName && this->validLinks;
 
   this->okButton->setEnabled(valid);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::keyPressEvent(QKeyEvent *_event)
+{
+  if (_event->key() == Qt::Key_Enter)
+    _event->accept();
+  else
+    QDialog::keyPressEvent(_event);
 }

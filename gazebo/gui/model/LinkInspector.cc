@@ -79,7 +79,6 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
   QPushButton *OKButton = new QPushButton(tr("OK"));
-  OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
@@ -198,4 +197,13 @@ void LinkInspector::RestoreOriginalData()
   this->collisionConfig->RestoreOriginalData();
 
   emit Applied();
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::keyPressEvent(QKeyEvent *_event)
+{
+  if (_event->key() == Qt::Key_Enter)
+    _event->accept();
+  else
+    QDialog::keyPressEvent(_event);
 }

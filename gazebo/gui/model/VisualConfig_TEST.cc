@@ -65,6 +65,11 @@ void VisualConfig_TEST::AppliedSignal()
   QTest::keyClick(combos[0], Qt::Key_Enter);
   QCOMPARE(g_appliedSignalCount, 3u);
 
+  // Edit color (13~28)
+  spins[15]->setValue(0.3);
+  QTest::keyClick(spins[15], Qt::Key_Enter);
+  QCOMPARE(g_appliedSignalCount, 4u);
+
   delete visualConfig;
 }
 

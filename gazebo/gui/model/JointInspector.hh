@@ -134,6 +134,10 @@ namespace gazebo
       /// \brief Restore the widget's data to how it was when first opened.
       private slots: void RestoreOriginalData();
 
+      /// \brief Qt key press event.
+      /// \param[in] _event Qt key event.
+      private: void keyPressEvent(QKeyEvent *_event);
+
       /// \brief Enable ok button if all values in the dialog are valid.
       private: void CheckValid();
 
