@@ -180,31 +180,6 @@ void ODEUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetMaxForce(unsigned int _index, double _t)
-{
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    this->SetParam(dParamFMax, _t);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    this->SetParam(dParamFMax2, _t);
-  else
-    gzerr << "Joint index out of bounds.\n";
-}
-
-//////////////////////////////////////////////////
-double ODEUniversalJoint::GetMaxForce(unsigned int _index)
-{
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    return ODEJoint::GetParam(dParamFMax);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    return ODEJoint::GetParam(dParamFMax2);
-
-  gzerr << "Joint index out of bounds.\n";
-  return 0;
-}
-
-//////////////////////////////////////////////////
 double ODEUniversalJoint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
