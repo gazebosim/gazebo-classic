@@ -499,6 +499,7 @@ void JointInspector::Open()
   // Reset states
   this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
   this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->nameWidget->setStyleSheet(this->normalStyleSheet);
   this->okButton->setEnabled(true);
 
   // Keep original data in case user cancels

@@ -114,6 +114,10 @@ using the same arguments used in the command line.
         * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
         * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
 
+    1. Apply inspector changes in real time and add reset button
+        * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
+        * [Issue #1472](https://bitbucket.org/osrf/gazebo/issue/1472)
+
     1. Set physics to be paused when exiting model editor mode
         * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
         * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
