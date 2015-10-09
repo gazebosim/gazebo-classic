@@ -363,6 +363,10 @@ namespace gazebo
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
 
+      /// \brief Remove a joint for this model
+      /// \param[in] _name name of joint
+      public: void RemoveJoint(const std::string &_name);
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 

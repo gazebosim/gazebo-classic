@@ -1294,3 +1294,29 @@ gazebo::physics::JointPtr Model::CreateJoint(
   this->joints.push_back(joint);
   return joint;
 }
+
+/////////////////////////////////////////////////
+void Model::RemoveJoint(const std::string &_name)
+{
+  bool paused = this->world->IsPaused();
+  gazebo::physics::JointPtr joint = this->GetJoint(_name);
+  if (joint)
+  {
+    this->world->SetPaused(true);
+    joint->Detach();
+    for (Joint_V::iterator jiter = this->joints.begin();
+                           jiter != this->joints.end(); ++jiter)
+    {
+      if ((*jiter)->GetScopedName() == _name || (*jiter)->GetName() == _name)
+        this->joints.erase(jiter);
+    }
+    joint.reset();
+    this->world->SetPaused(paused);
+  }
+  else
+  {
+    gzwarn << "Joint [" << _name
+           << "] does not exist in model [" << this->GetName()
+           << "], not removed.\n";
+  }
+}

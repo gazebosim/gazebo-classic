@@ -7,6 +7,14 @@ release will remove the deprecated code.
 
 ## Gazebo 6.X to 7.X
 
+### Additions
+
+1. **gazebo/physics/Model.hh**
+    + public: gazebo::physics::JointPtr CreateJoint(
+        const std::string &_name, const std::string &_type,
+        physics::LinkPtr _parent, physics::LinkPtr _child);
+    + public: void RemoveJoint(const std::string &_name);
+
 ### Modifications
 
 1. **gazebo/msgs/logical_camera_sensors.proto**
