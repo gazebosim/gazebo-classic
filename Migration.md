@@ -9,6 +9,10 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/msgs/logical_camera_sensors.proto**
+    + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
+    + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
+
 1. **Light topic**
     + ***Removed:*** ~/light
     + ***Replacement:*** ~/factory/light - for spawning new lights

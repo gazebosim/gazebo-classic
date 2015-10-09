@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Change the `near` and `far` members of `gazebo/msgs/logical_camera_sensors.proto` to `near_clip` and `far_clip`
+    + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
+
 1. Resolve issue #1702
     * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
     * [Pull request #1905](https://bitbucket.org/osrf/gazebo/pull-request/1905)
