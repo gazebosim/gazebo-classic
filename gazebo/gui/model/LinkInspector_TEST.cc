@@ -63,7 +63,7 @@ void LinkInspector_TEST::AppliedSignal()
   // Open it
   linkInspector->Open();
   QVERIFY(linkInspector->isVisible());
-  QCOMPARE(g_appliedSignalCount, 0);
+  QCOMPARE(g_appliedSignalCount, 0u);
 
   // Get spins
   QList<QDoubleSpinBox *> spins =
@@ -73,7 +73,7 @@ void LinkInspector_TEST::AppliedSignal()
   // Edit link pose (13~18)
   spins[18]->setValue(2.0);
   QTest::keyClick(spins[18], Qt::Key_Enter);
-  QVERIFY(g_appliedSignalCount == 1);
+  QCOMPARE(g_appliedSignalCount, 1u);
 
   delete linkInspector;
 }

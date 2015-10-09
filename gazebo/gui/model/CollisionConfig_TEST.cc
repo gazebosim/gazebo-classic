@@ -33,7 +33,7 @@ void CollisionConfig_TEST::AppliedSignal()
 
   // Init it
   collisionConfig->Init();
-  QCOMPARE(g_appliedSignalCount, 0);
+  QCOMPARE(g_appliedSignalCount, 0u);
   QCOMPARE(collisionConfig->GetCollisionCount(), 0u);
 
   // Add a collision
@@ -48,7 +48,7 @@ void CollisionConfig_TEST::AppliedSignal()
   // Edit collision pose (2~7)
   spins[2]->setValue(2.0);
   QTest::keyClick(spins[2], Qt::Key_Enter);
-  QVERIFY(g_appliedSignalCount == 1);
+  QCOMPARE(g_appliedSignalCount, 1u);
 
   delete collisionConfig;
 }

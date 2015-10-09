@@ -33,7 +33,7 @@ void VisualConfig_TEST::AppliedSignal()
 
   // Init it
   visualConfig->Init();
-  QCOMPARE(g_appliedSignalCount, 0);
+  QCOMPARE(g_appliedSignalCount, 0u);
   QCOMPARE(visualConfig->GetVisualCount(), 0u);
 
   // Add a visual
@@ -45,10 +45,25 @@ void VisualConfig_TEST::AppliedSignal()
       visualConfig->findChildren<QDoubleSpinBox *>();
   QVERIFY(spins.size() == 32);
 
+  // Get combo boxes
+  QList<QComboBox *> combos =
+      visualConfig->findChildren<QComboBox *>();
+  QVERIFY(combos.size() == 3);
+
+  // Edit transparency (0)
+  spins[0]->setValue(0.5);
+  QTest::keyClick(spins[0], Qt::Key_Enter);
+  QCOMPARE(g_appliedSignalCount, 1u);
+
   // Edit visual pose (2~7)
   spins[2]->setValue(2.0);
   QTest::keyClick(spins[2], Qt::Key_Enter);
-  QVERIFY(g_appliedSignalCount == 1);
+  QCOMPARE(g_appliedSignalCount, 2u);
+
+  // Edit geometry (0)
+  combos[0]->setCurrentIndex(2);
+  QTest::keyClick(combos[0], Qt::Key_Enter);
+  QCOMPARE(g_appliedSignalCount, 3u);
 
   delete visualConfig;
 }

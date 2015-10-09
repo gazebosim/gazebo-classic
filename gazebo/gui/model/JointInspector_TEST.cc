@@ -178,7 +178,7 @@ void JointInspector_TEST::AppliedSignal()
   // Open it
   jointInspector->Open();
   QVERIFY(jointInspector->isVisible());
-  QCOMPARE(g_appliedSignalCount, 0);
+  QCOMPARE(g_appliedSignalCount, 0u);
 
   // Get spins
   QList<QDoubleSpinBox *> spins =
@@ -188,7 +188,7 @@ void JointInspector_TEST::AppliedSignal()
   // Edit pose
   spins[0]->setValue(2.0);
   QTest::keyClick(spins[0], Qt::Key_Enter);
-  QVERIFY(g_appliedSignalCount == 1);
+  QCOMPARE(g_appliedSignalCount, 1u);
 
   delete jointInspector;
   delete jointMaker;

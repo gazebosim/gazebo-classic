@@ -32,7 +32,7 @@ class VisualConfig_TEST : public QTestFixture
   private slots: void OnApply();
 
   /// \brief Count how many Applied signals have been emitted.
-  private: bool g_appliedSignalCount = 0;
+  private: unsigned int g_appliedSignalCount = 0;
 };
 
 #endif
