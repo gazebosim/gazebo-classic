@@ -66,11 +66,6 @@ SchematicViewWidget::SchematicViewWidget(QWidget *_parent)
 
   connect(this->scene, SIGNAL(selectionChanged()),
       this, SLOT(OnSelectionChanged()));
-
-  this->deleteJointName = "";
-  this->deleteJointAction = new QAction(tr("Delete"), this);
-  connect(this->deleteJointAction, SIGNAL(triggered()),
-      this, SLOT(OnDeleteJoint()));
 }
 
 /////////////////////////////////////////////////
@@ -118,14 +113,6 @@ void SchematicViewWidget::Init()
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
        boost::bind(&SchematicViewWidget::OnSetSelectedJoint, this, _1, _2)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectJointRemoved(
-          boost::bind(&SchematicViewWidget::OnJointRemoved, this, _1)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectShowJointContextMenu(
-          boost::bind(&SchematicViewWidget::OnShowJointContextMenu, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -424,28 +411,3 @@ void SchematicViewWidget::OnSelectionChanged()
 
   this->selectedItems = items;
 }
-
-/////////////////////////////////////////////////
-void SchematicViewWidget::OnDeleteJoint()
-{
-  this->RemoveEdge(this->deleteJointName);
-  gui::model::Events::jointRemoved(this->deleteJointName);
-  this->deleteJointName = "";
-}
-
-/////////////////////////////////////////////////
-void SchematicViewWidget::OnJointRemoved(const std::string &_jointId)
-{
-  if (this->HasEdge(_jointId))
-    this->RemoveEdge(_jointId);
-}
-
-/////////////////////////////////////////////////
-void SchematicViewWidget::OnShowJointContextMenu(const std::string &_jointId)
-{
-  this->deleteJointName = _jointId;
-  QMenu menu;
-  menu.addAction(this->deleteJointAction);
-  menu.exec(QCursor::pos());
-}
-

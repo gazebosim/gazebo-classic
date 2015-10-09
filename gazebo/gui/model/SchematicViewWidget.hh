@@ -138,14 +138,6 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
-      /// \brief Callback when a joint is removed
-      /// \param[in] _jointId Name of the joint.
-      private: void OnShowJointContextMenu(const std::string &_jointId);
-
-      /// \brief Callback when a joint is removed
-      /// \param[in] _jointId Name of the joint.
-      public: void OnJointRemoved(const std::string &_jointId);
-
       /// \brief Qt event received when the widget is being resized
       /// \param[in] _event Resize event.
       private: void resizeEvent(QResizeEvent *_event);
@@ -160,9 +152,6 @@ namespace gazebo
 
       /// \brief Qt callback when selected items have changed.
       private slots: void OnSelectionChanged();
-
-      /// \brief Qt Callback when a component is to be deleted.
-      private slots: void OnDeleteJoint();
 
       /// \brief Qt Graphics Scene where graphics items are drawn in
       private: GraphScene *scene;
@@ -187,12 +176,6 @@ namespace gazebo
 
       /// \brief Keeps track of selected items.
       private: QList<QGraphicsItem *> selectedItems;
-
-      /// \brief Qt action for deleting a connection.
-      private: QAction *deleteJointAction;
-
-      /// \brief Name of connection to be deleted.
-      private: std::string deleteJointName;
     };
   }
 }
