@@ -36,8 +36,13 @@ void CollisionConfig_TEST::AppliedSignal()
   QCOMPARE(g_appliedSignalCount, 0u);
   QCOMPARE(collisionConfig->GetCollisionCount(), 0u);
 
+  // Get push buttons
+  QList<QPushButton *> pushButtons =
+      collisionConfig->findChildren<QPushButton *>();
+  QVERIFY(pushButtons.size() == 1);
+
   // Add a collision
-  collisionConfig->AddCollision("collision_name");
+  pushButtons[0]->click();
   QCOMPARE(collisionConfig->GetCollisionCount(), 1u);
 
   // Get spins

@@ -48,6 +48,7 @@ set (qt_tests_local
 
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests_local
+    ${qt_tests_local}
     ExtrudeDialog_TEST.cc
     JointMaker_TEST.cc
     ModelCreator_TEST.cc

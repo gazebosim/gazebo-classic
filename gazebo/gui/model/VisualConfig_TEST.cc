@@ -36,8 +36,13 @@ void VisualConfig_TEST::AppliedSignal()
   QCOMPARE(g_appliedSignalCount, 0u);
   QCOMPARE(visualConfig->GetVisualCount(), 0u);
 
-  // Add a visual
-  visualConfig->AddVisual("visual_name");
+  // Get push buttons
+  QList<QPushButton *> pushButtons =
+      visualConfig->findChildren<QPushButton *>();
+  QVERIFY(pushButtons.size() == 1);
+
+  // Add a collision
+  pushButtons[0]->click();
   QCOMPARE(visualConfig->GetVisualCount(), 1u);
 
   // Get spins
