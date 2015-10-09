@@ -74,12 +74,6 @@ namespace gazebo
       public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited.
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited.
-      public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,
                   const math::Angle &_angle);
 

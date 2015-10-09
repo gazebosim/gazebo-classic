@@ -190,50 +190,6 @@ void DARTHinge2Joint::SetVelocity(unsigned int _index, double _vel)
 }
 
 //////////////////////////////////////////////////
-double DARTHinge2Joint::GetMaxForce(unsigned int _index)
-{
-  double result = 0.0;
-
-  if (_index == 0)
-  {
-    // Assume that the lower limit and upper limit has equal magnitute
-    // result = this->dataPtr->dtJoint->getForceLowerLimit(0);
-    result = this->dataPtr->dtJoint->getForceUpperLimit(0);
-  }
-  else if (_index == 1)
-  {
-    // Assume that the lower limit and upper limit has equal magnitute
-    // result = this->dataPtr->dtJoint->getForceLowerLimit(1);
-    result = this->dataPtr->dtJoint->getForceUpperLimit(1);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-void DARTHinge2Joint::SetMaxForce(unsigned int _index, double _force)
-{
-  if (_index == 0)
-  {
-    this->dataPtr->dtJoint->setForceLowerLimit(0, -_force);
-    this->dataPtr->dtJoint->setForceUpperLimit(0, _force);
-  }
-  else if (_index == 1)
-  {
-    this->dataPtr->dtJoint->setForceLowerLimit(1, -_force);
-    this->dataPtr->dtJoint->setForceUpperLimit(1, _force);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-}
-
-//////////////////////////////////////////////////
 void DARTHinge2Joint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)

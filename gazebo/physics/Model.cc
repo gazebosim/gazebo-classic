@@ -1105,6 +1105,15 @@ void Model::SetState(const ModelState &_state)
       gzerr << "Unable to find link[" << iter->first << "]\n";
   }
 
+  for (const auto &ms : _state.NestedModelStates())
+  {
+    ModelPtr model = this->NestedModel(ms.first);
+    if (model)
+      model->SetState(ms.second);
+    else
+      gzerr << "Unable to find model[" << ms.first << "]\n";
+  }
+
   // For now we don't use the joint state values to set the state of
   // simulation.
   // for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)

@@ -9,6 +9,10 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/msgs/logical_camera_sensors.proto**
+    + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
+    + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
+
 1. **gazebo/rendering/Visual.hh**
     + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true); 
     + ***Replacement:*** public: virtual void SetVisible(bool _visible, bool _cascade = true);
