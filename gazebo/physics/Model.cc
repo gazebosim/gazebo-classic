@@ -1307,8 +1307,11 @@ void Model::RemoveJoint(const std::string &_name)
     for (Joint_V::iterator jiter = this->joints.begin();
                            jiter != this->joints.end(); ++jiter)
     {
-      if ((*jiter)->GetScopedName() == _name || (*jiter)->GetName() == _name)
+      if (*jiter == joint)
+      {
         this->joints.erase(jiter);
+        break;
+      }
     }
     joint.reset();
     this->world->SetPaused(paused);

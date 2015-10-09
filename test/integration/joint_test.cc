@@ -439,6 +439,14 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
     }
   }
   EXPECT_TRUE(jointFound);
+
+  // step to let joint creation finish before removing it
+  world->Step(1000);
+
+  // test remove joint
+  model->RemoveJoint(name);
+  joint = model->GetJoint(name);
+  EXPECT_TRUE(joint == NULL);
 }
 
 //////////////////////////////////////////////////
