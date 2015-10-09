@@ -15,18 +15,15 @@
  *
 */
 
-#ifndef _GAZEBO_LINK_INSPECTOR_TEST_HH_
-#define _GAZEBO_LINK_INSPECTOR_TEST_HH_
+#ifndef _GAZEBO_VISUAL_CONFIG_TEST_HH_
+#define _GAZEBO_VISUAL_CONFIG_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the link inspector.
-class LinkInspector_TEST : public QTestFixture
+/// \brief A test class for the visual config.
+class VisualConfig_TEST : public QTestFixture
 {
   Q_OBJECT
-
-  /// \brief Test pressing remove button.
-  private slots: void RemoveButton();
 
   /// \brief Test that the Applied signal is emitted when widgets are edited.
   private slots: void AppliedSignal();

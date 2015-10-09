@@ -33,6 +33,15 @@ class JointInspector_TEST : public QTestFixture
 
   /// \brief Test pressing remove button.
   private slots: void RemoveButton();
+
+  /// \brief Test that the Applied signal is emitted when widgets are edited.
+  private slots: void AppliedSignal();
+
+  /// \brief Slot that receives Applied signals.
+  private slots: void OnApply();
+
+  /// \brief Count how many Applied signals have been emitted.
+  private: bool g_appliedSignalCount = 0;
 };
 
 #endif

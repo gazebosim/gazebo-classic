@@ -29,7 +29,7 @@ void LinkInspector_TEST::RemoveButton()
   QVERIFY(linkInspector != NULL);
 
   // Open it
-  linkInspector->open();
+  linkInspector->Open();
   QVERIFY(linkInspector->isVisible());
 
   // Get buttons
@@ -47,6 +47,41 @@ void LinkInspector_TEST::RemoveButton()
   QVERIFY(!linkInspector->isVisible());
 
   delete linkInspector;
+}
+
+/////////////////////////////////////////////////
+void LinkInspector_TEST::AppliedSignal()
+{
+  // Create a link inspector
+  gazebo::gui::LinkInspector *linkInspector =
+      new gazebo::gui::LinkInspector();
+  QVERIFY(linkInspector != NULL);
+
+  // Connect signals
+  connect(linkInspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+
+  // Open it
+  linkInspector->Open();
+  QVERIFY(linkInspector->isVisible());
+  QCOMPARE(g_appliedSignalCount, 0);
+
+  // Get spins
+  QList<QDoubleSpinBox *> spins =
+      linkInspector->findChildren<QDoubleSpinBox *>();
+  QVERIFY(spins.size() == 19);
+
+  // Edit link pose (13~18)
+  spins[18]->setValue(2.0);
+  QTest::keyClick(spins[18], Qt::Key_Enter);
+  QVERIFY(g_appliedSignalCount == 1);
+
+  delete linkInspector;
+}
+
+/////////////////////////////////////////////////
+void LinkInspector_TEST::OnApply()
+{
+  g_appliedSignalCount++;
 }
 
 // Generate a main function for the test

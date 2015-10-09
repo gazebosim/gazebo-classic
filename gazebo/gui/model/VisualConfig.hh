@@ -65,7 +65,7 @@ namespace gazebo
 
     /// \class VisualConfig VisualConfig.hh
     /// \brief A tab for configuring visual properties of a link.
-    class VisualConfig : public QWidget
+    class GZ_GUI_VISIBLE VisualConfig : public QWidget
     {
       Q_OBJECT
 

@@ -40,6 +40,7 @@ set (headers_install
 
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests_local
+    CollisionConfig_TEST.cc
     ExtrudeDialog_TEST.cc
     JointInspector_TEST.cc
     JointMaker_TEST.cc
@@ -49,6 +50,7 @@ if (ENABLE_SCREEN_TESTS)
     ModelEditor_TEST.cc
     ModelEditorPalette_TEST.cc
     ModelPluginInspector_TEST.cc
+    VisualConfig_TEST.cc
   )
 endif()
 

@@ -160,5 +160,45 @@ void JointInspector_TEST::RemoveButton()
   delete jointMaker;
 }
 
+/////////////////////////////////////////////////
+void JointInspector_TEST::AppliedSignal()
+{
+  // Create a joint maker
+  gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Create a joint inspector
+  gazebo::gui::JointInspector *jointInspector =
+      new gazebo::gui::JointInspector(jointMaker);
+  QVERIFY(jointInspector != NULL);
+
+  // Connect signals
+  connect(jointInspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+
+  // Open it
+  jointInspector->Open();
+  QVERIFY(jointInspector->isVisible());
+  QCOMPARE(g_appliedSignalCount, 0);
+
+  // Get spins
+  QList<QDoubleSpinBox *> spins =
+      jointInspector->findChildren<QDoubleSpinBox *>();
+  QVERIFY(spins.size() == 34);
+
+  // Edit pose
+  spins[0]->setValue(2.0);
+  QTest::keyClick(spins[0], Qt::Key_Enter);
+  QVERIFY(g_appliedSignalCount == 1);
+
+  delete jointInspector;
+  delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointInspector_TEST::OnApply()
+{
+  g_appliedSignalCount++;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(JointInspector_TEST)

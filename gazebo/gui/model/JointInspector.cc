@@ -298,6 +298,11 @@ msgs::Joint *JointInspector::GetData() const
 
   // Get updated message from widget
   msgs::Joint *msg = dynamic_cast<msgs::Joint *>(this->configWidget->GetMsg());
+  if (!msg)
+  {
+    gzerr << "It wasn't possible to get the joint message" << std::endl;
+    return NULL;
+  }
 
   // Use parent / child from our custom widget
   msg->set_parent(currentParent);
@@ -498,7 +503,9 @@ void JointInspector::Open()
   this->okButton->setEnabled(true);
 
   // Keep original data in case user cancels
-  this->originalDataMsg.CopyFrom(*this->GetData());
+  auto msg = this->GetData();
+  if (msg)
+    this->originalDataMsg.CopyFrom(*msg);
 
   this->move(QCursor::pos());
   this->show();
