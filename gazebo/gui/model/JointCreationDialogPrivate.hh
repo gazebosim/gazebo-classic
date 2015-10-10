@@ -43,6 +43,12 @@ namespace gazebo
       /// \brief Group of buttons for joint types.
       public: QButtonGroup *typeButtons;
 
+      /// \brief Axis presets combo box.
+      public: QComboBox *axis1PresetsCombo;
+
+      /// \brief Axis presets combo box.
+      public: QComboBox *axis2PresetsCombo;
+
       /// \brief A list of gui editor events connected to this palette.
       public: std::vector<event::ConnectionPtr> connections;
 

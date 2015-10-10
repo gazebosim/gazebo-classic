@@ -69,6 +69,13 @@ namespace gazebo
       /// \brief Qt callback when a link is chosen on the dialog.
       private slots: void OnLinkFromDialog();
 
+      /// \brief Qt callback when the axis is changed on the dialog.
+      /// \param[in] _name Name of the axis widget in the config widget that
+      /// emitted the signal.
+      /// \param[in] _pose New pose.
+      private slots: void OnVector3dFromDialog(const QString &_name,
+          const ignition::math::Vector3d &_pose);
+
       /// \brief Qt callback when the pose is changed on the dialog.
       /// \param[in] _name Name of the pose widget in the config widget that
       /// emitted the signal.
@@ -85,6 +92,10 @@ namespace gazebo
 
       /// \brief Qt callback when the Reset poses button is pressed.
       private slots: void OnResetPoses();
+
+      /// \brief Qt callback when the axis combo box is changed.
+      private slots: void OnAxis1Presets(const QString &_axis);
+      private slots: void OnAxis2Presets(const QString &_axis);
 
       /// \brief Qt callback when the Swap links button is pressed.
       private slots: void OnSwap();

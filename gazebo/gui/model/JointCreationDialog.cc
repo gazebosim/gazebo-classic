@@ -180,6 +180,55 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QWidget *linksGroupWidget = this->dataPtr->configWidget->CreateGroupWidget(
       "Link Selections", linksWidget, 0);
 
+  // Axis1 widget
+  ConfigChildWidget *axis1Widget =
+      this->dataPtr->configWidget->CreateVector3dWidget("axis1", 0);
+  this->dataPtr->configWidget->AddConfigChildWidget("axis1", axis1Widget);
+  connect(this->dataPtr->configWidget,
+      SIGNAL(Vector3dValueChanged(const QString,
+      const ignition::math::Vector3d)),
+      this, SLOT(OnVector3dFromDialog(const QString,
+      const ignition::math::Vector3d)));
+
+  // Axis1 presets widget
+  this->dataPtr->axis1PresetsCombo = new QComboBox();
+  this->dataPtr->axis1PresetsCombo->addItem("X");
+  this->dataPtr->axis1PresetsCombo->addItem("Y");
+  this->dataPtr->axis1PresetsCombo->addItem("Z");
+  this->dataPtr->axis1PresetsCombo->addItem("Custom");
+  connect(this->dataPtr->axis1PresetsCombo,
+      SIGNAL(currentIndexChanged(const QString &)), this,
+      SLOT(OnAxis1Presets(const QString &)));
+
+  // Axis2 widget
+  ConfigChildWidget *axis2Widget =
+      this->dataPtr->configWidget->CreateVector3dWidget("axis2", 0);
+  this->dataPtr->configWidget->AddConfigChildWidget("axis2", axis2Widget);
+
+  // Axis2 presets widget
+  this->dataPtr->axis2PresetsCombo = new QComboBox();
+  this->dataPtr->axis2PresetsCombo->addItem("X");
+  this->dataPtr->axis2PresetsCombo->addItem("Y");
+  this->dataPtr->axis2PresetsCombo->addItem("Z");
+  this->dataPtr->axis2PresetsCombo->addItem("Custom");
+  connect(this->dataPtr->axis2PresetsCombo,
+      SIGNAL(currentIndexChanged(const QString &)), this,
+      SLOT(OnAxis2Presets(const QString &)));
+
+  // Axis general layout
+  QGridLayout *axisGeneralLayout = new QGridLayout();
+  axisGeneralLayout->setContentsMargins(0, 0, 0, 0);
+  axisGeneralLayout->addWidget(axis1Widget, 0, 0);
+  axisGeneralLayout->addWidget(this->dataPtr->axis1PresetsCombo, 0, 1);
+  axisGeneralLayout->addWidget(axis2Widget, 1, 0);
+  axisGeneralLayout->addWidget(this->dataPtr->axis2PresetsCombo, 1, 1);
+
+  ConfigChildWidget *axisGeneralWidget = new ConfigChildWidget();
+  axisGeneralWidget->setLayout(axisGeneralLayout);
+
+  QWidget *axisGroupWidget = this->dataPtr->configWidget->CreateGroupWidget(
+      "Joint axis", axisGeneralWidget, 0);
+
   // Pose widget
   ConfigChildWidget *poseWidget =
       this->dataPtr->configWidget->CreatePoseWidget("pose", 0);
@@ -212,6 +261,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QVBoxLayout *configLayout = new QVBoxLayout();
   configLayout->addWidget(typesGroupWidget);
   configLayout->addWidget(linksGroupWidget);
+  configLayout->addWidget(axisGroupWidget);
   configLayout->addWidget(poseGroupWidget);
 
   this->dataPtr->configWidget->setLayout(configLayout);
@@ -347,6 +397,67 @@ void JointCreationDialog::OnPoseFromDialog(const QString &/*_name*/,
 {
   // Notify so 3D is updated
   gui::model::Events::jointPoseFromDialog(_pose, false);
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnVector3dFromDialog(const QString &_name,
+    const ignition::math::Vector3d &_value)
+{
+  int preset = 3;
+  if (_value == ignition::math::Vector3d::UnitX)
+    preset = 0;
+  else if (_value == ignition::math::Vector3d::UnitY)
+    preset = 1;
+  else if (_value == ignition::math::Vector3d::UnitZ)
+    preset = 2;
+
+  if (_name == "axis1")
+    this->dataPtr->axis1PresetsCombo->setCurrentIndex(preset);
+  else if (_name == "axis2")
+    this->dataPtr->axis2PresetsCombo->setCurrentIndex(preset);
+
+  // Notify so 3D is updated
+std::cout << _value << std::endl;
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnAxis1Presets(const QString &_axis)
+{
+  ignition::math::Vector3d vec;
+  if (_axis == "X")
+    vec = ignition::math::Vector3d::UnitX;
+  else if (_axis == "Y")
+    vec = ignition::math::Vector3d::UnitY;
+  else if (_axis == "Z")
+    vec = ignition::math::Vector3d::UnitZ;
+  else
+    return;
+
+  // Update widget
+  this->dataPtr->configWidget->SetVector3WidgetValue("axis1", vec);
+
+  // Notify
+  this->OnVector3dFromDialog("axis1", vec);
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnAxis2Presets(const QString &_axis)
+{
+  ignition::math::Vector3d vec;
+  if (_axis == "X")
+    vec = ignition::math::Vector3d::UnitX;
+  else if (_axis == "Y")
+    vec = ignition::math::Vector3d::UnitY;
+  else if (_axis == "Z")
+    vec = ignition::math::Vector3d::UnitZ;
+  else
+    return;
+
+  // Update widget
+  this->dataPtr->configWidget->SetVector3WidgetValue("axis2", vec);
+
+  // Notify
+  this->OnVector3dFromDialog("axis2", vec);
 }
 
 /////////////////////////////////////////////////
