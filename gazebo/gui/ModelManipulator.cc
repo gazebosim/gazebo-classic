@@ -565,8 +565,6 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     }
 
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_id(description + _vis->GetName() + "]" +
-        gazebo::common::Time::GetWallTimeAsISOString());
     userCmdMsg.set_description(description + _vis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
     this->dataPtr->userCmdPub->Publish(userCmdMsg);

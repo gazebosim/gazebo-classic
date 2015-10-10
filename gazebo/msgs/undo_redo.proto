@@ -11,5 +11,5 @@ message UndoRedo
 
   /// \brief Unique id of the user command. If this is provided, all commands
   /// leading to that will be undone / redone.
-  optional string id = 2;
+  optional uint32 id = 2;
 }

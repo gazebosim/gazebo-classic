@@ -43,7 +43,7 @@ TEST_F(UserCmdManagerTest, CreateCmd)
   EXPECT_TRUE(manager != NULL);
 
   // Create the command
-  std::string id = "unique_id";
+  unsigned int id = 21;
   std::string description = "Command description";
   msgs::UserCmd::Type type = msgs::UserCmd::MOVING;
   physics::UserCmd *cmd = new physics::UserCmd(id, world, description, type);

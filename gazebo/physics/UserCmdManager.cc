@@ -35,10 +35,10 @@ using namespace physics;
 
 
 /////////////////////////////////////////////////
-UserCmd::UserCmd(std::string _id,
+UserCmd::UserCmd(const unsigned int _id,
                  physics::WorldPtr _world,
                  const std::string &_description,
-                 msgs::UserCmd::Type _type)
+                 const msgs::UserCmd::Type _type)
   : dataPtr(new UserCmdPrivate())
 {
   this->dataPtr->id = _id;
@@ -81,19 +81,19 @@ void UserCmd::Redo()
 }
 
 /////////////////////////////////////////////////
-std::string UserCmd::Id()
+unsigned int UserCmd::Id() const
 {
   return this->dataPtr->id;
 }
 
 /////////////////////////////////////////////////
-std::string UserCmd::Description()
+std::string UserCmd::Description() const
 {
   return this->dataPtr->description;
 }
 
 /////////////////////////////////////////////////
-msgs::UserCmd::Type UserCmd::Type()
+msgs::UserCmd::Type UserCmd::Type() const
 {
   return this->dataPtr->type;
 }
@@ -115,6 +115,8 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
 
   this->dataPtr->userCmdStatsPub =
     this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
+
+  this->dataPtr->idCounter = 0;
 }
 
 /////////////////////////////////////////////////
@@ -127,11 +129,11 @@ UserCmdManager::~UserCmdManager()
 /////////////////////////////////////////////////
 void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 {
+  // Generate unique id
+  unsigned int id = this->dataPtr->idCounter++;
+
   // Create command
-  UserCmdPtr cmd(new UserCmd(
-      _msg->id(),
-      this->dataPtr->world,
-      _msg->description(),
+  UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type()));
 
   // Add it to undo list

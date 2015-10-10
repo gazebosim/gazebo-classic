@@ -40,10 +40,10 @@ namespace gazebo
       /// \param[in] _description Description for the command, such as
       /// "Rotate box", "Delete sphere", etc.
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
-      public: UserCmd(std::string _id,
+      public: UserCmd(const unsigned int _id,
                       physics::WorldPtr _world,
                       const std::string &_description,
-                      msgs::UserCmd::Type _type);
+                      const msgs::UserCmd::Type _type);
 
       /// \brief Destructor
       public: virtual ~UserCmd();
@@ -56,15 +56,15 @@ namespace gazebo
 
       /// \brief Return this command's unique ID.
       /// \return Unique ID
-      public: std::string Id();
+      public: unsigned int Id() const;
 
       /// \brief Return this command's description.
       /// \return Description
-      public: std::string Description();
+      public: std::string Description() const;
 
       /// \brief Return this command's type.
       /// \return Command type
-      public: msgs::UserCmd::Type Type();
+      public: msgs::UserCmd::Type Type() const;
 
       /// \internal
       /// \brief Pointer to private data.

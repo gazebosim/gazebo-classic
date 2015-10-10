@@ -297,8 +297,6 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   if (_publish)
   {
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_id("Align to [" + this->dataPtr->targetVis->GetName() + "]" +
-        gazebo::common::Time::GetWallTimeAsISOString());
     userCmdMsg.set_description(
         "Align to [" + this->dataPtr->targetVis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);

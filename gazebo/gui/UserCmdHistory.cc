@@ -95,7 +95,7 @@ void UserCmdHistory::OnUndoCommand(QAction *_action)
 
   if (_action)
   {
-    msg.set_id(_action->data().toString().toStdString());
+    msg.set_id(_action->data().toUInt());
   }
 
   this->dataPtr->undoRedoPub->Publish(msg);
@@ -130,7 +130,7 @@ void UserCmdHistory::OnRedoCommand(QAction *_action)
 
   if (_action)
   {
-    msg.set_id(_action->data().toString().toStdString());
+    msg.set_id(_action->data().toUInt());
   }
 
   this->dataPtr->undoRedoPub->Publish(msg);
@@ -183,7 +183,7 @@ void UserCmdHistory::OnUndoCmdHistory()
   {
     QAction *action = new QAction(QString::fromStdString(cmd.description()),
         this);
-    action->setData(QVariant(QString::fromStdString(cmd.id())));
+    action->setData(QVariant(cmd.id()));
     action->setCheckable(true);
     menu.addAction(action);
     this->dataPtr->undoActions->addAction(action);
@@ -207,7 +207,7 @@ void UserCmdHistory::OnRedoCmdHistory()
   {
     QAction *action = new QAction(QString::fromStdString(cmd.description()),
         this);
-    action->setData(QVariant(QString::fromStdString(cmd.id())));
+    action->setData(QVariant(cmd.id()));
     action->setCheckable(true);
     menu.addAction(action);
     this->dataPtr->redoActions->addAction(action);
