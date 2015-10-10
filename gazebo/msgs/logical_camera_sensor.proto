@@ -7,14 +7,14 @@ package gazebo.msgs;
 message LogicalCameraSensor
 {
   /// \brief Near clipping plane of the view frustum in meters.
-  required double near         = 1;
+  required double near_clip       = 1;
 
   /// \brief Far clipping plane of the view frustum in meters.
-  required double far          = 2;
+  required double far_clip        = 2;
 
   /// \brief Horizontal field of view in radians.
-  required double horizontal_fov          = 3;
+  required double horizontal_fov  = 3;
 
   /// \brief Near and far clipping plane aspect ratio (width/height).
-  required double aspect_ratio = 4;
+  required double aspect_ratio    = 4;
 }
