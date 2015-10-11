@@ -20,6 +20,10 @@
     * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
     * [Issue #1730](https://bitbucket.org/osrf/gazebo/issue/1730)
 
+1. Set QTestfFxture to verbose
+    * [Pull request #1944](https://bitbucket.org/osrf/gazebo/pull-request/1944)
+    * [Issue #1756](https://bitbucket.org/osrf/gazebo/issue/1756)
+
 1. Added torsional friction
     * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
 
