@@ -229,6 +229,79 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QWidget *axisGroupWidget = this->dataPtr->configWidget->CreateGroupWidget(
       "Joint axis", axisGeneralWidget, 0);
 
+  // Align widgets
+  QLabel *xAlignLabel = new QLabel(tr("X: "));
+  QLabel *yAlignLabel = new QLabel(tr("Y: "));
+  QLabel *zAlignLabel = new QLabel(tr("Z: "));
+
+  this->dataPtr->xAlignMin = new QToolButton();
+  this->dataPtr->xAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->xAlignMin->setIcon(QIcon(":/images/x_min.png"));
+
+  this->dataPtr->xAlignCenter = new QToolButton();
+  this->dataPtr->xAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->xAlignCenter->setIcon(QIcon(":/images/x_center.png"));
+
+  this->dataPtr->xAlignMax = new QToolButton();
+  this->dataPtr->xAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->xAlignMax->setIcon(QIcon(":/images/x_max.png"));
+
+  this->dataPtr->yAlignMin = new QToolButton();
+  this->dataPtr->yAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->yAlignMin->setIcon(QIcon(":/images/y_min.png"));
+
+  this->dataPtr->yAlignCenter = new QToolButton();
+  this->dataPtr->yAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->yAlignCenter->setIcon(QIcon(":/images/y_center.png"));
+
+  this->dataPtr->yAlignMax = new QToolButton();
+  this->dataPtr->yAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->yAlignMax->setIcon(QIcon(":/images/y_max.png"));
+
+  this->dataPtr->zAlignMin = new QToolButton();
+  this->dataPtr->zAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->zAlignMin->setIcon(QIcon(":/images/z_min.png"));
+
+  this->dataPtr->zAlignCenter = new QToolButton();
+  this->dataPtr->zAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->zAlignCenter->setIcon(QIcon(":/images/z_center.png"));
+
+  this->dataPtr->zAlignMax = new QToolButton();
+  this->dataPtr->zAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  this->dataPtr->zAlignMax->setIcon(QIcon(":/images/z_max.png"));
+
+  QButtonGroup *alignButtonGroup = new QButtonGroup();
+  connect(alignButtonGroup, SIGNAL(triggered()), this, SLOT(OnAlign));
+
+  // Align dropdown
+  auto alignCombo = new QComboBox();
+  alignCombo->addItem("Child to Parent");
+  alignCombo->addItem("Parent to Child");
+
+  // Align layout
+  QGridLayout *alignLayout = new QGridLayout();
+  alignLayout->addWidget(xAlignLabel, 0, 0);
+  alignLayout->addWidget(this->dataPtr->xAlignMin, 0, 1);
+  alignLayout->addWidget(this->dataPtr->xAlignCenter, 0, 2);
+  alignLayout->addWidget(this->dataPtr->xAlignMax, 0, 3);
+  alignLayout->addWidget(yAlignLabel, 1, 0);
+  alignLayout->addWidget(this->dataPtr->yAlignMin, 1, 1);
+  alignLayout->addWidget(this->dataPtr->yAlignCenter, 1, 2);
+  alignLayout->addWidget(this->dataPtr->yAlignMax, 1, 3);
+  alignLayout->addWidget(zAlignLabel, 2, 0);
+  alignLayout->addWidget(this->dataPtr->zAlignMin, 2, 1);
+  alignLayout->addWidget(this->dataPtr->zAlignCenter, 2, 2);
+  alignLayout->addWidget(this->dataPtr->zAlignMax, 2, 3);
+  alignLayout->addWidget(alignCombo, 0, 4, 1, 3);
+
+  // Align group widget
+  ConfigChildWidget *alignWidget = new ConfigChildWidget();
+  alignWidget->setLayout(alignLayout);
+
+  QWidget *alignGroupWidget =
+      this->dataPtr->configWidget->CreateGroupWidget("Align links",
+      alignWidget, 0);
+
   // Pose widget
   ConfigChildWidget *poseWidget =
       this->dataPtr->configWidget->CreatePoseWidget("pose", 0);
@@ -262,6 +335,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   configLayout->addWidget(typesGroupWidget);
   configLayout->addWidget(linksGroupWidget);
   configLayout->addWidget(axisGroupWidget);
+  configLayout->addWidget(alignGroupWidget);
   configLayout->addWidget(poseGroupWidget);
 
   this->dataPtr->configWidget->setLayout(configLayout);

@@ -66,6 +66,17 @@ namespace gazebo
 
       /// \brief Normal style sheet for link widgets.
       public: QString normalStyleSheet;
+
+      public: QToolButton *xAlignMin;
+      public: QToolButton *xAlignCenter;
+      public: QToolButton *xAlignMax;
+      public: QToolButton *yAlignMin;
+      public: QToolButton *yAlignCenter;
+      public: QToolButton *yAlignMax;
+      public: QToolButton *zAlignMin;
+      public: QToolButton *zAlignCenter;
+      public: QToolButton *zAlignMax;
+
     };
   }
 }
