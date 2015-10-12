@@ -35,6 +35,7 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/ModelAlign.hh"
 
 #include "gazebo/gui/model/JointCreationDialog.hh"
 #include "gazebo/gui/model/JointInspector.hh"
@@ -113,6 +114,10 @@ JointMaker::JointMaker()
   this->connections.push_back(
       gui::model::Events::ConnectJointPoseFromDialog(
       boost::bind(&JointMaker::OnJointPoseFromDialog, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectAlignJointLinks(
+      boost::bind(&JointMaker::OnAlignJointLinks, this, _1, _2, _3)));
 
   this->connections.push_back(
       gui::model::Events::ConnectJointCreateDialog(
@@ -1786,6 +1791,23 @@ void JointMaker::OnJointPoseFromDialog(const ignition::math::Pose3d &_pose,
 
     this->childLinkVis->SetWorldPose(newChildPose);
   }
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnAlignJointLinks(const bool _childToParent,
+    const std::string &_axis, const std::string &_config)
+{
+  if (!this->parentLinkVis || !this->childLinkVis)
+    return;
+
+  std::vector<rendering::VisualPtr> links;
+  links.push_back(this->parentLinkVis);
+  links.push_back(this->childLinkVis);
+
+  std::string target = _childToParent ? "first" : "last";
+
+  ModelAlign::Instance()->AlignVisuals(links, _axis, _config,
+      target, true);
 }
 
 /////////////////////////////////////////////////

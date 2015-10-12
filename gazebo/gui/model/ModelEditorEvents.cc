@@ -66,3 +66,5 @@ event::EventT<void (std::string)> model::Events::jointParentFromDialog;
 event::EventT<void (std::string)> model::Events::jointChildFromDialog;
 event::EventT<void (ignition::math::Pose3d, bool)>
     model::Events::jointPoseFromDialog;
+event::EventT<void (bool, std::string, std::string)>
+    model::Events::alignJointLinks;

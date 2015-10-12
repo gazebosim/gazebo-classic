@@ -284,6 +284,9 @@ namespace gazebo
       private: void OnJointChildFromDialog(const std::string &_name);
       private: void OnJointPoseFromDialog(
           const ignition::math::Pose3d &_pose, bool _reset);
+      private: void OnAlignJointLinks(
+          const bool _childToParent, const std::string &_axis,
+          const std::string &_mode);
       private: void OnJointCreateDialog();
 
       /// \brief Create a joint line.

@@ -36,7 +36,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   this->setMinimumWidth(300);
-  this->setMinimumHeight(650);
+  this->setMinimumHeight(900);
 
   this->dataPtr->jointMaker = _jointMaker;
 
@@ -234,65 +234,100 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QLabel *yAlignLabel = new QLabel(tr("Y: "));
   QLabel *zAlignLabel = new QLabel(tr("Z: "));
 
-  this->dataPtr->xAlignMin = new QToolButton();
-  this->dataPtr->xAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->dataPtr->xAlignMin->setIcon(QIcon(":/images/x_min.png"));
+  auto xAlignMin = new QToolButton();
+  xAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  xAlignMin->setIcon(QIcon(":/images/x_min.png"));
+  xAlignMin->setCheckable(true);
 
-  this->dataPtr->xAlignCenter = new QToolButton();
-  this->dataPtr->xAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->dataPtr->xAlignCenter->setIcon(QIcon(":/images/x_center.png"));
+  auto xAlignCenter = new QToolButton();
+  xAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  xAlignCenter->setIcon(QIcon(":/images/x_center.png"));
+  xAlignCenter->setCheckable(true);
 
-  this->dataPtr->xAlignMax = new QToolButton();
-  this->dataPtr->xAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->dataPtr->xAlignMax->setIcon(QIcon(":/images/x_max.png"));
+  auto xAlignMax = new QToolButton();
+  xAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  xAlignMax->setIcon(QIcon(":/images/x_max.png"));
+  xAlignMax->setCheckable(true);
 
-  this->dataPtr->yAlignMin = new QToolButton();
-  this->dataPtr->yAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->dataPtr->yAlignMin->setIcon(QIcon(":/images/y_min.png"));
+  auto yAlignMin = new QToolButton();
+  yAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  yAlignMin->setIcon(QIcon(":/images/y_min.png"));
+  yAlignMin->setCheckable(true);
 
-  this->dataPtr->yAlignCenter = new QToolButton();
-  this->dataPtr->yAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->dataPtr->yAlignCenter->setIcon(QIcon(":/images/y_center.png"));
+  auto yAlignCenter = new QToolButton();
+  yAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  yAlignCenter->setIcon(QIcon(":/images/y_center.png"));
+  yAlignCenter->setCheckable(true);
 
-  this->dataPtr->yAlignMax = new QToolButton();
-  this->dataPtr->yAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->dataPtr->yAlignMax->setIcon(QIcon(":/images/y_max.png"));
+  auto yAlignMax = new QToolButton();
+  yAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  yAlignMax->setIcon(QIcon(":/images/y_max.png"));
+  yAlignMax->setCheckable(true);
 
-  this->dataPtr->zAlignMin = new QToolButton();
-  this->dataPtr->zAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->dataPtr->zAlignMin->setIcon(QIcon(":/images/z_min.png"));
+  auto zAlignMin = new QToolButton();
+  zAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  zAlignMin->setIcon(QIcon(":/images/z_min.png"));
+  zAlignMin->setCheckable(true);
 
-  this->dataPtr->zAlignCenter = new QToolButton();
-  this->dataPtr->zAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->dataPtr->zAlignCenter->setIcon(QIcon(":/images/z_center.png"));
+  auto zAlignCenter = new QToolButton();
+  zAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  zAlignCenter->setIcon(QIcon(":/images/z_center.png"));
+  zAlignCenter->setCheckable(true);
 
-  this->dataPtr->zAlignMax = new QToolButton();
-  this->dataPtr->zAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
-  this->dataPtr->zAlignMax->setIcon(QIcon(":/images/z_max.png"));
+  auto zAlignMax = new QToolButton();
+  zAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  zAlignMax->setIcon(QIcon(":/images/z_max.png"));
+  zAlignMax->setCheckable(true);
 
-  QButtonGroup *alignButtonGroup = new QButtonGroup();
-  connect(alignButtonGroup, SIGNAL(triggered()), this, SLOT(OnAlign));
+  auto alignXButtonGroup = new QButtonGroup();
+  alignXButtonGroup->setExclusive(false);
+  alignXButtonGroup->addButton(xAlignMin, 0);
+  alignXButtonGroup->addButton(xAlignCenter, 1);
+  alignXButtonGroup->addButton(xAlignMax, 2);
+  connect(alignXButtonGroup, SIGNAL(buttonClicked(const int)),
+      this, SLOT(OnAlign(const int)));
+  this->dataPtr->alignGroups.push_back(alignXButtonGroup);
+
+  auto alignYButtonGroup = new QButtonGroup();
+  alignYButtonGroup->setExclusive(false);
+  alignYButtonGroup->addButton(yAlignMin, 0);
+  alignYButtonGroup->addButton(yAlignCenter, 1);
+  alignYButtonGroup->addButton(yAlignMax, 2);
+  connect(alignYButtonGroup, SIGNAL(buttonClicked(const int)),
+      this, SLOT(OnAlign(const int)));
+  this->dataPtr->alignGroups.push_back(alignYButtonGroup);
+
+  auto alignZButtonGroup = new QButtonGroup();
+  alignZButtonGroup->setExclusive(false);
+  alignZButtonGroup->addButton(zAlignMin, 0);
+  alignZButtonGroup->addButton(zAlignCenter, 1);
+  alignZButtonGroup->addButton(zAlignMax, 2);
+  connect(alignZButtonGroup, SIGNAL(buttonClicked(const int)),
+      this, SLOT(OnAlign(const int)));
+  this->dataPtr->alignGroups.push_back(alignZButtonGroup);
 
   // Align dropdown
-  auto alignCombo = new QComboBox();
-  alignCombo->addItem("Child to Parent");
-  alignCombo->addItem("Parent to Child");
+  this->dataPtr->alignCombo = new QComboBox();
+  this->dataPtr->alignCombo->addItem("Child to Parent", 0);
+  this->dataPtr->alignCombo->addItem("Parent to Child", 1);
+  connect(this->dataPtr->alignCombo, SIGNAL(currentIndexChanged(const int)),
+      this, SLOT(OnAlign(const int)));
 
   // Align layout
   QGridLayout *alignLayout = new QGridLayout();
   alignLayout->addWidget(xAlignLabel, 0, 0);
-  alignLayout->addWidget(this->dataPtr->xAlignMin, 0, 1);
-  alignLayout->addWidget(this->dataPtr->xAlignCenter, 0, 2);
-  alignLayout->addWidget(this->dataPtr->xAlignMax, 0, 3);
+  alignLayout->addWidget(xAlignMin, 0, 1);
+  alignLayout->addWidget(xAlignCenter, 0, 2);
+  alignLayout->addWidget(xAlignMax, 0, 3);
   alignLayout->addWidget(yAlignLabel, 1, 0);
-  alignLayout->addWidget(this->dataPtr->yAlignMin, 1, 1);
-  alignLayout->addWidget(this->dataPtr->yAlignCenter, 1, 2);
-  alignLayout->addWidget(this->dataPtr->yAlignMax, 1, 3);
+  alignLayout->addWidget(yAlignMin, 1, 1);
+  alignLayout->addWidget(yAlignCenter, 1, 2);
+  alignLayout->addWidget(yAlignMax, 1, 3);
   alignLayout->addWidget(zAlignLabel, 2, 0);
-  alignLayout->addWidget(this->dataPtr->zAlignMin, 2, 1);
-  alignLayout->addWidget(this->dataPtr->zAlignCenter, 2, 2);
-  alignLayout->addWidget(this->dataPtr->zAlignMax, 2, 3);
-  alignLayout->addWidget(alignCombo, 0, 4, 1, 3);
+  alignLayout->addWidget(zAlignMin, 2, 1);
+  alignLayout->addWidget(zAlignCenter, 2, 2);
+  alignLayout->addWidget(zAlignMax, 2, 3);
+  alignLayout->addWidget(this->dataPtr->alignCombo, 0, 4, 1, 3);
 
   // Align group widget
   ConfigChildWidget *alignWidget = new ConfigChildWidget();
@@ -677,6 +712,17 @@ void JointCreationDialog::UpdateRelativePose(
     const ignition::math::Pose3d &_pose)
 {
   this->dataPtr->configWidget->SetPoseWidgetValue("pose", math::Pose(_pose));
+
+  // TODO: Uncheck all align buttons if the pose is not satisfying alignment
+  // How to know if the pose update is due to an align request coming from
+  // here?
+/*
+  for (auto group : this->dataPtr->alignGroups)
+  {
+    if (group->checkedButton())
+      group->checkedButton()->setChecked(false);
+  }
+*/
 }
 
 /////////////////////////////////////////////////
@@ -720,5 +766,43 @@ void JointCreationDialog::CheckLinksValid()
           this->dataPtr->normalStyleSheet);
       this->dataPtr->createButton->setEnabled(true);
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::OnAlign(const int _int)
+{
+  // Reset pose
+  gui::model::Events::jointPoseFromDialog(ignition::math::Pose3d(), true);
+
+  // Reference link
+  bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
+
+  // Button groups
+  std::vector<std::string> axes = {"x", "y", "z"};
+  for (unsigned int g = 0; g < this->dataPtr->alignGroups.size(); ++g)
+  {
+    auto group = this->dataPtr->alignGroups[g];
+
+    // Uncheck other buttons in the same group
+    if (this->sender() == group)
+    {
+      for (int i = 0; i < group->buttons().size(); ++i)
+      {
+        if (i != _int)
+        {
+          group->buttons()[i]->setChecked(false);
+        }
+      }
+    }
+
+    // Emit event for the checked button of each group
+    int checked = group->checkedId();
+    if (checked == 0)
+        gui::model::Events::alignJointLinks(childToParent, axes[g], "min");
+    else if (checked == 1)
+      gui::model::Events::alignJointLinks(childToParent, axes[g], "center");
+    else if (checked == 2)
+      gui::model::Events::alignJointLinks(childToParent, axes[g], "max");
   }
 }

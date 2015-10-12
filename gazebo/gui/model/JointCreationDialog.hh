@@ -96,6 +96,7 @@ namespace gazebo
       /// \brief Qt callback when the axis combo box is changed.
       private slots: void OnAxis1Presets(const QString &_axis);
       private slots: void OnAxis2Presets(const QString &_axis);
+      private slots: void OnAlign(const int _int);
 
       /// \brief Qt callback when the Swap links button is pressed.
       private slots: void OnSwap();

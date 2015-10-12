@@ -549,6 +549,20 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointCreateDialog.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the joint created dialog signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectAlignJointLinks(T _subscriber)
+          { return alignJointLinks.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the joint created dialog
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectAlignJointLinks(
+            event::ConnectionPtr _subscriber)
+          { alignJointLinks.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -678,6 +692,10 @@ namespace gazebo
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void ()> jointCreateDialog;
+
+        /// \brief Request to select or deselect a joint.
+        public: static event::EventT<void (bool, std::string, std::string)>
+            alignJointLinks;
       };
     }
   }
