@@ -13,6 +13,10 @@ release will remove the deprecated code.
     + ***Removed:*** public: static event::EventT<void (bool, bool, const math::Pose &, const std::string &)> modelPropertiesChanged
     + ***Replacement:*** public: static event::EventT<void (bool, bool)> modelPropertiesChanged
     + ***Note:*** Removed last two arguments, model pose and name, from the function
+    
+1. **gazebo/msgs/logical_camera_sensors.proto**
+    + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
+    + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
 
 1. **gazebo/rendering/Visual.hh**
     + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true);
