@@ -103,21 +103,6 @@ void ODEFixedJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void ODEFixedJoint::SetMaxForce(unsigned int /*index*/, double /*_t*/)
-{
-  gzwarn << "ODEFixedJoint: called method "
-         << "SetMaxForce that is not valid for joints of type fixed.\n";
-}
-
-//////////////////////////////////////////////////
-double ODEFixedJoint::GetMaxForce(unsigned int /*index*/)
-{
-  gzwarn << "ODEFixedJoint: called method "
-         << "GetMaxForce that is not valid for joints of type fixed.\n";
-  return 0.0;
-}
-
-//////////////////////////////////////////////////
 void ODEFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 {
   gzwarn << "ODEFixedJoint: called method "

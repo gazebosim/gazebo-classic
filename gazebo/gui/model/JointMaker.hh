@@ -364,6 +364,9 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Open the joint inspector.
+      public: void OpenInspector();
+
       /// \brief Update this joint data.
       public: void Update();
 
@@ -414,9 +417,6 @@ namespace gazebo
 
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;
-
-      /// \brief Open the joint inspector.
-      public: void OpenInspector();
 
       /// \brief Qt Callback when joint inspector is to be opened.
       private slots: void OnOpenInspector();

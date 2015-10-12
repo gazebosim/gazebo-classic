@@ -2123,6 +2123,10 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       cameraVis->Load(_msg->logical_camera());
       this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
     }
+    else if (_msg->has_pose())
+    {
+      iter->second->SetPose(msgs::ConvertIgn(_msg->pose()));
+    }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
            !_msg->topic().empty())
