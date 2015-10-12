@@ -96,7 +96,7 @@ void LogPlay::Open(const std::string &_logFile)
   if (!logCurrXml)
     gzthrow("Unable to find the first chunk");
 
-  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+  if (!this->ChunkData(this->logCurrXml, this->currentChunk))
     gzthrow("Unable to decode log file");
 
   this->start = 0;
@@ -198,7 +198,7 @@ void LogPlay::ReadLogTimes()
       return;
     }
 
-    if (!this->GetChunkData(chunkXml, chunk))
+    if (!this->ChunkData(chunkXml, chunk))
       return;
 
     // Find the first <sim_time> of the log.
@@ -228,7 +228,7 @@ void LogPlay::ReadLogTimes()
     return;
   }
 
-  if (!this->GetChunkData(lastChunk, chunk))
+  if (!this->ChunkData(lastChunk, chunk))
     return;
 
   // Update the last <sim_time> of the log.
@@ -269,7 +269,7 @@ bool LogPlay::ReadIterations()
     }
 
     std::string chunk;
-    if (!this->GetChunkData(chunkXml, chunk))
+    if (!this->ChunkData(chunkXml, chunk))
       return false;
 
     // Find the first <iterations> of the log.
@@ -456,7 +456,7 @@ bool LogPlay::Rewind()
     return false;
   }
 
-  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+  if (!this->ChunkData(this->logCurrXml, this->currentChunk))
     return false;
 
   // Skip first <sdf> block (it doesn't have a world state).
@@ -489,7 +489,7 @@ bool LogPlay::Forward()
     return false;
   }
 
-  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+  if (!this->ChunkData(this->logCurrXml, this->currentChunk))
     return false;
 
   this->start = this->currentChunk.size() - 1;
@@ -597,13 +597,13 @@ bool LogPlay::GetChunk(unsigned int _index, std::string &_data)
   }
 
   if (this->logCurrXml && count == _index)
-    return this->GetChunkData(this->logCurrXml, _data);
+    return this->ChunkData(this->logCurrXml, _data);
   else
     return false;
 }
 
 /////////////////////////////////////////////////
-bool LogPlay::GetChunkData(tinyxml2::XMLElement *_xml, std::string &_data)
+bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data)
 {
   // Make sure we have valid xml pointer
   if (!_xml)
@@ -698,7 +698,7 @@ bool LogPlay::NextChunk()
     return false;
 
   this->logCurrXml = next;
-  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+  if (!this->ChunkData(this->logCurrXml, this->currentChunk))
     return false;
 
   this->start = 0;
@@ -715,7 +715,7 @@ bool LogPlay::PrevChunk()
     return false;
 
   this->logCurrXml = prev;
-  if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
+  if (!this->ChunkData(this->logCurrXml, this->currentChunk))
     return false;
 
   this->start = this->currentChunk.size() - 1;

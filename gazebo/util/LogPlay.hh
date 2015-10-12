@@ -162,8 +162,8 @@ namespace gazebo
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.
       /// \return True if the chunk was successfully parsed.
-      private: bool GetChunkData(tinyxml2::XMLElement *_xml,
-                                 std::string &_data);
+      private: bool ChunkData(tinyxml2::XMLElement *_xml,
+                              std::string &_data);
 
       /// \brief Read the header from the log file.
       private: void ReadHeader();
