@@ -5,6 +5,7 @@ set (sources_local
   model/ExtrudeDialog.cc
   model/ImportDialog.cc
   model/JointCreationDialog.cc
+  model/JointData.cc
   model/JointInspector.cc
   model/JointMaker.cc
   model/LinkConfig.cc
@@ -23,6 +24,7 @@ set (qt_headers_local
   model/ExtrudeDialog.hh
   model/ImportDialog.hh
   model/JointCreationDialog.hh
+  model/JointData.hh
   model/JointInspector.hh
   model/JointMaker.hh
   model/LinkConfig.hh

@@ -21,6 +21,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/JointData.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointMaker_TEST.hh"
 

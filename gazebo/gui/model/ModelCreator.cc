@@ -52,6 +52,7 @@
 #include "gazebo/gui/MainWindow.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
+#include "gazebo/gui/model/JointData.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
