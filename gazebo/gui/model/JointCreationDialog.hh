@@ -62,10 +62,6 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void enterEvent(QEvent *_event);
 
-      /// \brief Qt callback when joint type is changed on the dialog.
-      /// \param[in] _type Index of type chosen
-      private slots: void OnTypeFromDialog(int _type);
-
       /// \brief Qt callback when a link is chosen on the dialog.
       private slots: void OnLinkFromDialog();
 
@@ -109,11 +105,11 @@ namespace gazebo
 
       /// \brief Event callback when the parent link is chosen in the 3D scene.
       /// \param[in] _linkName Name of new parent link.
-      private: void OnParentFrom3D(const std::string &_linkName);
+      public: void NewParent(const std::string &_linkName);
 
       /// \brief Event callback when the child link is chosen in the 3D scene.
       /// \param[in] _linkName Name of new child link.
-      private: void OnChildFrom3D(const std::string &_linkName);
+      public: void NewChild(const std::string &_linkName);
 
       /// \brief Check if the current parent and child link selection is valid.
       private: void CheckLinksValid();

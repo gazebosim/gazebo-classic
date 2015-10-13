@@ -101,30 +101,6 @@ JointMaker::JointMaker()
       boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
 
   this->connections.push_back(
-      gui::model::Events::ConnectJointTypeFromDialog(
-      boost::bind(&JointMaker::OnJointTypeFromDialog, this, _1)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectJointParentFromDialog(
-      boost::bind(&JointMaker::OnJointParentFromDialog, this, _1)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectJointChildFromDialog(
-      boost::bind(&JointMaker::OnJointChildFromDialog, this, _1)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectJointPoseFromDialog(
-      boost::bind(&JointMaker::OnJointPoseFromDialog, this, _1, _2)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectAlignJointLinks(
-      boost::bind(&JointMaker::OnAlignJointLinks, this, _1, _2, _3)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectJointCreateDialog(
-      boost::bind(&JointMaker::OnJointCreateDialog, this)));
-
-  this->connections.push_back(
       event::Events::ConnectSetSelectedEntity(
       boost::bind(&JointMaker::OnSetSelectedEntity, this, _1, _2)));
 
@@ -449,7 +425,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 
           if (this->parentLinkVis)
           {
-            gui::model::Events::jointParentFrom3D(
+            this->jointCreationDialog->NewParent(
                 this->parentLinkVis->GetName());
           }
         }
@@ -460,7 +436,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 
           if (this->childLinkVis)
           {
-            gui::model::Events::jointChildFrom3D(
+            this->jointCreationDialog->NewChild(
                 this->childLinkVis->GetName());
           }
         }
@@ -1428,32 +1404,32 @@ void JointMaker::NewChildLink(rendering::VisualPtr _childLink)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointTypeFromDialog(JointType _type)
+void JointMaker::NewType(const int _typeInt)
 {
-  this->jointType = _type;
+  this->jointType = static_cast<JointMaker::JointType>(_typeInt);
 
   if (this->jointBeingCreated)
   {
-    this->jointBeingCreated->SetType(_type);
+    this->jointBeingCreated->SetType(this->jointType);
     this->jointBeingCreated->Update();
   }
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointParentFromDialog(const std::string &_leafName)
+void JointMaker::NewParentLink(const std::string &_name)
 {
   // Get scoped name
-  std::string linkName;
+  std::string scopedName;
   for (auto link : this->linkList)
   {
-    if (link.second == _leafName)
+    if (link.second == _name || link.first == _name)
     {
-      linkName = link.first;
+      scopedName = link.first;
       break;
     }
   }
 
-  if (linkName.empty())
+  if (scopedName.empty())
     return;
 
   // Get visual
@@ -1462,27 +1438,27 @@ void JointMaker::OnJointParentFromDialog(const std::string &_leafName)
   if (!scene)
     return;
 
-  rendering::VisualPtr vis = scene->GetVisual(linkName);
+  rendering::VisualPtr vis = scene->GetVisual(scopedName);
 
   if (vis)
     this->NewParentLink(vis);
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointChildFromDialog(const std::string &_leafName)
+void JointMaker::NewChildLink(const std::string &_name)
 {
   // Get scoped name
-  std::string linkName;
+  std::string scopedName;
   for (auto link : this->linkList)
   {
-    if (link.second == _leafName)
+    if (link.second == _name || link.first == _name)
     {
-      linkName = link.first;
+      scopedName = link.first;
       break;
     }
   }
 
-  if (linkName.empty())
+  if (scopedName.empty())
     return;
 
   // Get visual
@@ -1491,14 +1467,14 @@ void JointMaker::OnJointChildFromDialog(const std::string &_leafName)
   if (!scene)
     return;
 
-  rendering::VisualPtr vis = scene->GetVisual(linkName);
+  rendering::VisualPtr vis = scene->GetVisual(scopedName);
 
   if (vis)
     this->NewChildLink(vis);
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointPoseFromDialog(const ignition::math::Pose3d &_pose,
+void JointMaker::NewPose(const ignition::math::Pose3d &_pose,
     bool reset)
 {
   if (this->parentLinkVis && this->childLinkVis)
@@ -1529,7 +1505,7 @@ void JointMaker::OnJointPoseFromDialog(const ignition::math::Pose3d &_pose,
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnAlignJointLinks(const bool _childToParent,
+void JointMaker::AlignLinks(const bool _childToParent,
     const std::string &_axis, const std::string &_config)
 {
   if (!this->parentLinkVis || !this->childLinkVis)
@@ -1546,7 +1522,7 @@ void JointMaker::OnAlignJointLinks(const bool _childToParent,
 }
 
 /////////////////////////////////////////////////
-void JointMaker::OnJointCreateDialog()
+void JointMaker::CreationComplete()
 {
   gui::model::Events::modelChanged();
   this->jointType = JointMaker::JOINT_NONE;

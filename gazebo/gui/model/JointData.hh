@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_JOINT_DATA_HH_
 #define _GAZEBO_JOINT_DATA_HH_
 
+#include <string>
+
 #include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/gui/qt.h"
@@ -37,6 +39,12 @@ namespace gazebo
     class GZ_GUI_VISIBLE JointData : public QObject
     {
       Q_OBJECT
+
+      /// \brief Constructor;
+      public: JointData() = default;
+
+      /// \brief Destructor;
+      public: ~JointData() = default;
 
       /// \brief Open the joint inspector.
       public: void OpenInspector();

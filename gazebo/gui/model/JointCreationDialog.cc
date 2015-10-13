@@ -18,7 +18,6 @@
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
-#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointCreationDialogPrivate.hh"
 #include "gazebo/gui/model/JointCreationDialog.hh"
@@ -101,7 +100,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->typeButtons->addButton(ballJointRadio, 7);
   this->dataPtr->typeButtons->addButton(gearboxJointRadio, 7);
   connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
-      this, SLOT(OnTypeFromDialog(int)));
+      this->dataPtr->jointMaker, SLOT(NewType(int)));
 
   // Types layout
   QGridLayout *typesLayout = new QGridLayout();
@@ -408,15 +407,6 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   this->setLayout(mainLayout);
 
-  // Gazebo event connections
-  this->dataPtr->connections.push_back(
-      gui::model::Events::ConnectJointParentFrom3D(
-      boost::bind(&JointCreationDialog::OnParentFrom3D, this, _1)));
-
-  this->dataPtr->connections.push_back(
-      gui::model::Events::ConnectJointChildFrom3D(
-      boost::bind(&JointCreationDialog::OnChildFrom3D, this, _1)));
-
   // Qt signal-slot connections
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
 }
@@ -471,13 +461,6 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnTypeFromDialog(int _type)
-{
-  JointMaker::JointType type = static_cast<JointMaker::JointType>(_type);
-  gui::model::Events::jointTypeFromDialog(type);
-}
-
-/////////////////////////////////////////////////
 void JointCreationDialog::OnLinkFromDialog()
 {
   std::string currentParent =
@@ -489,9 +472,9 @@ void JointCreationDialog::OnLinkFromDialog()
   if (currentParent != currentChild)
   {
     if (currentParent != "")
-      gui::model::Events::jointParentFromDialog(currentParent);
+      this->dataPtr->jointMaker->NewParentLink(currentParent);
     if (currentChild != "")
-      gui::model::Events::jointChildFromDialog(currentChild);
+      this->dataPtr->jointMaker->NewChildLink(currentChild);
   }
 
   this->OnParentImpl(QString::fromStdString(currentParent));
@@ -504,8 +487,8 @@ void JointCreationDialog::OnLinkFromDialog()
 void JointCreationDialog::OnPoseFromDialog(const QString &/*_name*/,
     const ignition::math::Pose3d &_pose)
 {
-  // Notify so 3D is updated
-  gui::model::Events::jointPoseFromDialog(_pose, false);
+  // Update 3D scene
+  this->dataPtr->jointMaker->NewPose(_pose, false);
 }
 
 /////////////////////////////////////////////////
@@ -570,7 +553,7 @@ void JointCreationDialog::OnAxis2Presets(const QString &_axis)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnParentFrom3D(const std::string &_linkName)
+void JointCreationDialog::NewParent(const std::string &_linkName)
 {
   if (_linkName.empty())
   {
@@ -596,7 +579,7 @@ void JointCreationDialog::OnParentFrom3D(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnChildFrom3D(const std::string &_linkName)
+void JointCreationDialog::NewChild(const std::string &_linkName)
 {
   if (_linkName.empty())
   {
@@ -683,8 +666,7 @@ void JointCreationDialog::OnCancel()
 void JointCreationDialog::OnCreate()
 {
   this->accept();
-
-  gui::model::Events::jointCreateDialog();
+  this->dataPtr->jointMaker->CreationComplete();
 }
 
 /////////////////////////////////////////////////
@@ -728,7 +710,7 @@ void JointCreationDialog::UpdateRelativePose(
 /////////////////////////////////////////////////
 void JointCreationDialog::OnResetPoses()
 {
-  gui::model::Events::jointPoseFromDialog(ignition::math::Pose3d(), true);
+  this->dataPtr->jointMaker->NewPose(ignition::math::Pose3d(), true);
 }
 
 /////////////////////////////////////////////////
@@ -773,13 +755,14 @@ void JointCreationDialog::CheckLinksValid()
 void JointCreationDialog::OnAlign(const int _int)
 {
   // Reset pose
-  gui::model::Events::jointPoseFromDialog(ignition::math::Pose3d(), true);
+  this->dataPtr->jointMaker->NewPose(ignition::math::Pose3d(), true);
 
   // Reference link
   bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
 
   // Button groups
   std::vector<std::string> axes = {"x", "y", "z"};
+  std::vector<std::string> configs = {"min", "center", "max"};
   for (unsigned int g = 0; g < this->dataPtr->alignGroups.size(); ++g)
   {
     auto group = this->dataPtr->alignGroups[g];
@@ -796,13 +779,12 @@ void JointCreationDialog::OnAlign(const int _int)
       }
     }
 
-    // Emit event for the checked button of each group
+    // Align for the checked button of each group
     int checked = group->checkedId();
-    if (checked == 0)
-        gui::model::Events::alignJointLinks(childToParent, axes[g], "min");
-    else if (checked == 1)
-      gui::model::Events::alignJointLinks(childToParent, axes[g], "center");
-    else if (checked == 2)
-      gui::model::Events::alignJointLinks(childToParent, axes[g], "max");
+    if (checked >= 0 && checked <=2)
+    {
+      this->dataPtr->jointMaker->AlignLinks(childToParent, axes[g],
+          configs[checked]);
+    }
   }
 }

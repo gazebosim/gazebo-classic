@@ -279,15 +279,15 @@ namespace gazebo
 
       private: void NewParentLink(rendering::VisualPtr _parentLink);
       private: void NewChildLink(rendering::VisualPtr _childLink);
-      private: void OnJointTypeFromDialog(JointType _type);
-      private: void OnJointParentFromDialog(const std::string &_name);
-      private: void OnJointChildFromDialog(const std::string &_name);
-      private: void OnJointPoseFromDialog(
+      public slots: void NewType(const int _typeInt);
+      public: void NewParentLink(const std::string &_name);
+      public: void NewChildLink(const std::string &_name);
+      public: void NewPose(
           const ignition::math::Pose3d &_pose, bool _reset);
-      private: void OnAlignJointLinks(
+      public: void AlignLinks(
           const bool _childToParent, const std::string &_axis,
           const std::string &_mode);
-      private: void OnJointCreateDialog();
+      public: void CreationComplete();
 
       /// \brief Create a joint line.
       /// \param[in] _name Name to give the visual that contains the joint line.
