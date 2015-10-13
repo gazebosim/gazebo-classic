@@ -153,6 +153,14 @@ namespace gazebo
       public: CameraPtr CreateCamera(const std::string &_name,
                                      bool _autoRender = true);
 
+      /// \brief Create a wide-angle camera
+      /// \param[in] _name Name of the new camera.
+      /// \param[in] _autoRender True to allow Gazebo to automatically
+      /// render the camera. This should almost always be true.
+      /// \return Pointer to the new camera.
+      public: WideAngleCameraPtr CreateWideAngleCamera(const std::string &_name,
+          const bool _autoRender = true);
+
 #ifdef HAVE_OCULUS
       /// \brief Create an oculus rift camera
       /// \param[in] _name Name of the new camera.
