@@ -143,7 +143,7 @@ namespace gazebo
       /// \brief Set the current pose.
       /// \param[in] _pose New pose of the sensor.
       /// \sa Pose()
-      public: virtual void SetPose(const ignition::math::Pose3d &_pose);
+      public: void SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set whether the sensor is active or not.
       /// \param[in] _value True if active, false if not.
