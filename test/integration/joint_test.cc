@@ -395,6 +395,12 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 //////////////////////////////////////////////////
 void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
 {
+  /// \TODO: simbody not complete for this test
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #862.\n";
+    return;
+  }
   // Load empty world
   Load("worlds/empty.world", true, _physicsEngine);
 

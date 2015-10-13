@@ -1291,6 +1291,8 @@ gazebo::physics::JointPtr Model::CreateJoint(
     this->world->GetPhysicsEngine()->CreateJoint(_type, m);
   joint->SetName(_name);
   joint->Attach(_parent, _child);
+  // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf
+  joint->Load(_parent, _child, gazebo::math::Pose());
   this->joints.push_back(joint);
   return joint;
 }
