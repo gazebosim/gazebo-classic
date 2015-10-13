@@ -21,7 +21,6 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
-#include "gazebo/gui/model/JointMaker.hh"
 
 namespace gazebo
 {

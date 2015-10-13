@@ -530,8 +530,6 @@ msgs::Joint JointMaker::SetupDefaultJointMsg(JointType _type)
   std::string type = JointMaker::GetTypeAsString(_type);
 
   msgs::Joint msg;
-
- // msg.reset(new msgs::Joint);
   msgs::Set(msg.mutable_pose(),
       ignition::math::Pose3d::Zero);
 
@@ -649,7 +647,7 @@ void JointMaker::Stop()
 
     if (this->jointCreationDialog)
       this->jointCreationDialog->close();
-    //this->jointBeingCreated = NULL;
+    // this->jointBeingCreated = NULL;
     this->creatingJoint = false;
     this->jointType == JointMaker::JOINT_NONE;
     // Notify ModelEditor to uncheck tool button
@@ -732,11 +730,11 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
           math::Plane(math::Vector3(0, 0, 1)), pt);
 
       parentPos = this->GetLinkWorldCentroid(this->jointBeingCreated->Parent())
-	  - this->jointBeingCreated->line->GetPoint(0) - pt;
+          - this->jointBeingCreated->line->GetPoint(0) - pt;
     }
 
     this->jointBeingCreated->line->SetPoint(1,
-	this->GetLinkWorldCentroid(this->hoverVis) - parentPos);
+        this->GetLinkWorldCentroid(this->hoverVis) - parentPos);
   }
   return true;
 }
@@ -1580,13 +1578,13 @@ void JointMaker::SetHighlighted(rendering::VisualPtr _vis, bool _highlight)
     if (_highlight)
     {
       _vis->SetEmissive(common::Color(0, 0, 1, 1));
-      //_vis->SetTransparency((1.0 - _vis->GetTransparency()) * 0.5);
+      // _vis->SetTransparency((1.0 - _vis->GetTransparency()) * 0.5);
     }
     // The inverse operation restores the original transparency value.
     else
     {
       _vis->SetEmissive(common::Color(0, 0, 0, 1));
-      //_vis->SetTransparency(std::abs(_vis->GetTransparency()*2.0-1.0));
+      // _vis->SetTransparency(std::abs(_vis->GetTransparency()*2.0-1.0));
     }
   }
 }
