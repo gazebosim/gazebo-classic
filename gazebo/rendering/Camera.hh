@@ -93,7 +93,7 @@ namespace gazebo
       /// \param[in] _sdf The SDF camera info
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-       /// \brief Load the camera with default parmeters
+      /// \brief Load the camera with default parmeters
       public: virtual void Load();
 
       /// \brief Initialize the camera
@@ -620,7 +620,7 @@ namespace gazebo
                    std::string _format, int _width, int _height);
 
       /// \brief Set the clip distance based on stored SDF values
-      private: void SetClipDist();
+      private: virtual void SetClipDist();
 
       /// \brief Get the OGRE image pixel format in
       /// \param[in] _format The Gazebo image format
