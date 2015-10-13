@@ -130,14 +130,18 @@ JointMaker::JointType JointData::Type() const
 void JointData::SetChild(const rendering::VisualPtr &_vis)
 {
   this->child = _vis;
-  std::string jointChildName = this->child->GetName();
-  std::string leafName = jointChildName;
-  size_t pIdx = jointChildName.find_last_of("::");
-  if (pIdx != std::string::npos)
-    leafName = jointChildName.substr(pIdx+1);
 
-  this->jointMsg->set_child(leafName);
-  this->jointMsg->set_child_id(this->child->GetId());
+  if (this->jointMsg)
+  {
+    std::string jointChildName = this->child->GetName();
+    std::string leafName = jointChildName;
+    size_t pIdx = jointChildName.find_last_of("::");
+    if (pIdx != std::string::npos)
+      leafName = jointChildName.substr(pIdx+1);
+
+    this->jointMsg->set_child(leafName);
+    this->jointMsg->set_child_id(this->child->GetId());
+  }
 
   this->dirty = true;
 }
