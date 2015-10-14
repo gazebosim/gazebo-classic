@@ -37,7 +37,6 @@ set(tests
   1375_world_reset.cc
   1569_hydra_crash.cc
   1694_world_accel.cc
-  1702_remove_model_scene_nodes.cc
 )
 
 gz_build_tests(${tests})
