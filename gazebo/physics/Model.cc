@@ -1313,16 +1313,10 @@ void Model::RemoveJoint(const std::string &_name)
   {
     this->world->SetPaused(true);
     joint->Detach();
-    for (Joint_V::iterator jiter = this->joints.begin();
-                           jiter != this->joints.end(); ++jiter)
-    {
-      if (*jiter == joint)
-      {
-        this->joints.erase(jiter);
-        break;
-      }
-    }
-    joint.reset();
+
+    this->joints.erase(
+      std::remove(this->joints.begin(), this->joints.end(), joint),
+      this->joints.end());
     this->world->SetPaused(paused);
   }
   else
