@@ -203,14 +203,6 @@ namespace gazebo
                   Ogre::Node::TransformSpace _relativeTo =
                   Ogre::Node::TS_WORLD);
 
-      /// \brief Rotate the camera around the z-axis
-      /// \param[in] _angle Rotation amount
-      public: void RotateYaw(math::Angle _angle) GAZEBO_DEPRECATED(4.0);
-
-      /// \brief Rotate the camera around the y-axis
-      /// \param[in] _angle Pitch amount
-      public: void RotatePitch(math::Angle _angle) GAZEBO_DEPRECATED(4.0);
-
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters
       /// \param[in] _far Far clip distance in meters
