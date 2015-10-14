@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_ENTITYMAKER_HH_
 #define _GAZEBO_ENTITYMAKER_HH_
 
+#include <boost/function.hpp>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/transport/TransportTypes.hh"

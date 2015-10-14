@@ -26,6 +26,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -293,25 +294,6 @@ void World::Load(sdf::ElementPtr _sdf)
     // Create all the entities
     this->LoadEntities(this->dataPtr->sdf, this->dataPtr->rootElement);
 
-    // Set the state of the entities
-    if (this->dataPtr->sdf->HasElement("state"))
-    {
-      sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("state");
-
-      while (childElem)
-      {
-        WorldState myState;
-        myState.Load(childElem);
-        this->SetState(myState);
-
-        childElem = childElem->GetNextElement("state");
-
-        // TODO: We currently load just the first state data. Need to
-        // implement a better mechanism for handling multiple states
-        break;
-      }
-    }
-
     for (unsigned int i = 0; i < this->GetModelCount(); ++i)
       this->GetModel(i)->LoadJoints();
   }
@@ -386,6 +368,25 @@ void World::Init()
   {
     Population population(this->dataPtr->sdf, shared_from_this());
     population.PopulateAll();
+  }
+
+  // Set the state of the entities
+  if (this->dataPtr->sdf->HasElement("state"))
+  {
+    sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("state");
+
+    while (childElem)
+    {
+      WorldState myState;
+      myState.Load(childElem);
+      this->SetState(myState);
+
+      childElem = childElem->GetNextElement("state");
+
+      // TODO: We currently load just the first state data. Need to
+      // implement a better mechanism for handling multiple states
+      break;
+    }
   }
 
   this->dataPtr->initialized = true;
@@ -690,7 +691,9 @@ void World::Step()
     this->dataPtr->prevStepWallTime = common::Time::GetWallTime();
 
     double stepTime = this->dataPtr->physicsEngine->GetMaxStepSize();
-    if (!this->IsPaused() || this->dataPtr->stepInc > 0)
+
+    if (!this->IsPaused() || this->dataPtr->stepInc > 0
+        || this->dataPtr->needsReset)
     {
       // query timestep to allow dynamic time step size updates
       this->dataPtr->simTime += stepTime;
@@ -1083,6 +1086,10 @@ void World::ResetTime()
   this->dataPtr->startTime = common::Time::GetWallTime();
   this->dataPtr->realTimeOffset = common::Time(0);
   this->dataPtr->iterations = 0;
+
+  if (this->IsPaused())
+    this->dataPtr->pauseStartTime = this->dataPtr->startTime;
+
   sensors::SensorManager::Instance()->ResetLastUpdateTimes();
 }
 

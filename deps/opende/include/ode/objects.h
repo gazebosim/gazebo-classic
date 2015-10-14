@@ -44,7 +44,8 @@ enum Friction_Model {
 enum World_Solver_Type{
   ODE_DEFAULT,
   DART_PGS,
-  BULLET_PGS
+  BULLET_PGS,
+  BULLET_LEMKE
 };
 
 /**
@@ -628,7 +629,7 @@ ODE_API void dWorldSetQuickStepContactResidualSmoothing (dWorldID, dReal smoo);
  * @brief Set SOR scale factor for contact constraints
  * @ingroup world
  */
-ODE_API dReal dWorldSetQuickStepContactSORScalingFactor (dWorldID, dReal contact_sor_contact_scale);
+ODE_API void dWorldSetQuickStepContactSORScalingFactor (dWorldID, dReal contact_sor_contact_scale);
 
 /**
  * @brief Set threaded projected position correction computations

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
@@ -249,7 +250,6 @@ void Scene::Clear()
   this->dataPtr->skyx = NULL;
 
   RTShaderSystem::Instance()->RemoveScene(this->GetName());
-  RTShaderSystem::Instance()->Clear();
 
   this->dataPtr->connections.clear();
 
@@ -2110,6 +2110,10 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       cameraVis->SetId(_msg->id());
       cameraVis->Load(_msg->logical_camera());
       this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
+    }
+    else if (_msg->has_pose())
+    {
+      iter->second->SetPose(msgs::ConvertIgn(_msg->pose()));
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&

@@ -30,6 +30,9 @@ class ModelPluginInspector_TEST : public QTestFixture
 
   /// \brief Test updating the inspector.
   private slots: void Update();
+
+  /// \brief Test pressing remove button.
+  private slots: void RemoveButton();
 };
 
 #endif

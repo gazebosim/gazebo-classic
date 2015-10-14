@@ -142,8 +142,8 @@ public:
     { dWorldSetQuickStepInertiaRatioReduction (get_id(), irr); }
   void setQuickStepContactResidualSmoothing(dReal smoo)
     { dWorldSetQuickStepContactResidualSmoothing (get_id(), smoo); }
-  dReal setQuickStepContactSORScalingFactor(dReal contact_sor_scale) const
-    { return dWorldSetQuickStepContactSORScalingFactor (get_id(), contact_sor_scale); }
+  void setQuickStepContactSORScalingFactor(dReal contact_sor_scale) const
+    { dWorldSetQuickStepContactSORScalingFactor (get_id(), contact_sor_scale); }
   void setQuickStepThreadPositionCorrection(bool thread)
     { dWorldSetQuickStepThreadPositionCorrection (get_id(), thread); }
   void setQuickStepExperimentalRowReordering(bool order)

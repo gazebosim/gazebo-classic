@@ -2340,7 +2340,7 @@ void dWorldSetQuickStepContactResidualSmoothing (dWorldID w, dReal smoo)
   w->qs.smooth_contacts = smoo;
 }
 
-dReal  dWorldSetQuickStepContactSORScalingFactor (dWorldID w, dReal contact_sor_scale)
+void dWorldSetQuickStepContactSORScalingFactor (dWorldID w, dReal contact_sor_scale)
 {
   dAASSERT(w);
   w->qs.contact_sor_scale = contact_sor_scale;
