@@ -6,6 +6,11 @@
     * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
     * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
 
+### Gazebo 6.3.1 (2015-10-14)
+
+1. Fix ABI problem. Make `Sensor::SetPose` function non virtual.
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+
 ### Gazebo 6.3.0 (2015-10-06)
 
 1. Added `Sensor::SetPose` function

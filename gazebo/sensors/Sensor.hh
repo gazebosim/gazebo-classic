@@ -141,6 +141,9 @@ namespace gazebo
       public: virtual ignition::math::Pose3d Pose() const;
 
       /// \brief Set the current pose.
+      ///        TODO: this method is declared non virtual to fix an ABI
+      ///        problem detected in gazebo6 series, it will be virtual
+      ///        from gazebo7 on.
       /// \param[in] _pose New pose of the sensor.
       /// \sa Pose()
       public: void SetPose(const ignition::math::Pose3d &_pose);
