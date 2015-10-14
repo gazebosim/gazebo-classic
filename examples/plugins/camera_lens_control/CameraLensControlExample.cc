@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-
+ */
 #include <sstream>
 #include <gazebo/msgs/msgs.hh>
 
 #include <QtUiTools/QUiLoader>
 
 #include "CameraLensControlExample.hh"
-
 
 using namespace gazebo;
 
@@ -32,8 +30,6 @@ GZ_REGISTER_GUI_PLUGIN(CameraLensControlExample)
 CameraLensControlExample::CameraLensControlExample()
   : GUIPlugin()
 {
-  this->counter = 0;
-
   // Set the frame background and foreground colors
   this->setStyleSheet(
       "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
@@ -56,7 +52,10 @@ CameraLensControlExample::CameraLensControlExample()
   QWidget *contentWidget = loader.load(&file, this);
   file.close();
 
-  // add loaded widget to layout
+  // Prevent mouse events' propagation to parent widget
+  contentWidget->installEventFilter(this);
+
+  // Add loaded widget to layout
   frameLayout->addWidget(contentWidget);
 
   // Add frameLayout to the frame
@@ -88,8 +87,6 @@ CameraLensControlExample::CameraLensControlExample()
   // Listen for selected element in gazebo
   this->selectionSub = this->node->Subscribe("~/selection",
       &CameraLensControlExample::OnSelect, this);
-
-  this->imageSub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -105,6 +102,7 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
   this->pbSpawn     = _parent->findChild<QPushButton*>("pbSpawn");
   this->pbCalibrate = _parent->findChild<QPushButton*>("pbCalibrate");
   this->lbName      = _parent->findChild<QLabel*>("lbName");
+  this->lbName->setText("Spawn and select a camera.");
   this->cbType      = _parent->findChild<QComboBox*>("cbType");
   this->cbFun       = _parent->findChild<QComboBox*>("cbFun");
   this->sbC1        = _parent->findChild<QDoubleSpinBox*>("sbC1");
@@ -151,7 +149,7 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
       this, SLOT(OnValueChanged()));
 
   // Add listener for spawn button
-  connect(pbSpawn, SIGNAL(clicked()), this, SLOT(OnButtonSpawn()));
+  connect(this->pbSpawn, SIGNAL(clicked()), this, SLOT(OnButtonSpawn()));
 }
 
 /////////////////////////////////////////////////
@@ -164,6 +162,11 @@ void CameraLensControlExample::OnButtonSpawn()
     << "    <link name='link'>"
     << "      <inertial>"
     << "        <mass>0.1</mass>"
+    << "        <inertia>"
+    << "          <ixx>0.000166667</ixx>"
+    << "          <iyy>0.000166667</iyy>"
+    << "          <izz>0.000166667</izz>"
+    << "        </inertia>"
     << "      </inertial>"
     << "      <collision name='collision'>"
     << "        <geometry>"
@@ -194,7 +197,6 @@ void CameraLensControlExample::OnButtonSpawn()
     << "          <lens>"
     << "            <type>equisolid_angle</type>"
     << "            <scale_to_hfov>true</scale_to_hfov>"
-    << "            <advertise>true</advertise>"
     << "            <custom_function>"
     << "              <c1>2</c1>"
     << "              <c2>2.0</c2>"
@@ -222,35 +224,32 @@ void CameraLensControlExample::OnButtonSpawn()
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
 {
-  lbName->setText(QString::fromStdString(_msg->name()));
+  this->lbName->setText(QString::fromStdString(_msg->name()));
 
   std::string t("wideanglecamera");
   if (_msg->name().compare(0, t.length(), t) == 0)
   {
-    gzmsg << "Selected: " << _msg->name();
     this->selectedElementName = _msg->name();
-
-    gzmsg << " [Appropriate element]";
 
     if (this->infoSub)
       this->infoSub->Unsubscribe();
 
     // subscribe for the info messages
     this->infoSub = this->node->Subscribe(
-        "~/"+_msg->name()+"/link/camera/lens_info",
-        &CameraLensControlExample::OnCameraLensCmd, this);
+        "~/"+_msg->name()+"/link/camera/lens/info",
+        &CameraLensControlExample::OnCameraLens, this);
 
-    this->cameraControlPub = this->node->Advertise<msgs::CameraLensCmd>(
-      "~/"+_msg->name()+"/link/camera/lens_control", 10);
+    this->cameraControlPub = this->node->Advertise<msgs::CameraLens>(
+        "~/"+_msg->name()+"/link/camera/lens/control", 10);
 
     this->acceptInfoMessages = true;
   }
-
-  gzmsg << std::endl;
+  else
+    this->lbName->setText("Spawn and select a camera.");
 }
 
 /////////////////////////////////////////////////
-void CameraLensControlExample::OnCameraLensCmd(ConstCameraLensCmdPtr &_msg)
+void CameraLensControlExample::OnCameraLens(ConstCameraLensPtr &_msg)
 {
   if (!this->acceptInfoMessages)
     return;
@@ -271,11 +270,11 @@ void CameraLensControlExample::OnCameraLensCmd(ConstCameraLensCmdPtr &_msg)
     this->sbHFOV->setValue(_msg->hfov());
 
   this->cbType->setCurrentIndex(
-    this->cbType->findText(QString::fromStdString(_msg->type())));
+      this->cbType->findText(QString::fromStdString(_msg->type())));
 
   if (_msg->has_fun())
     this->cbFun->setCurrentIndex(
-      this->cbFun->findText(QString::fromStdString(_msg->fun())));
+        this->cbFun->findText(QString::fromStdString(_msg->fun())));
 
   if (_msg->has_scale_to_hfov())
     this->cbScaleToHFOV->setChecked(_msg->scale_to_hfov());
@@ -300,9 +299,8 @@ void CameraLensControlExample::OnValueChanged()
 
   if (this->selectedElementName != "")
   {
-    msgs::CameraLensCmd msg;
+    msgs::CameraLens msg;
 
-    msg.set_purpose(msgs::CameraLensCmd_CmdPurpose_SET);
     msg.set_type(this->cbType->currentText().toUtf8().constData());
 
     if (this->cbType->currentText() == "custom")
@@ -320,7 +318,6 @@ void CameraLensControlExample::OnValueChanged()
     msg.set_scale_to_hfov(this->cbScaleToHFOV->isChecked());
 
     this->cameraControlPub->Publish(msg);
-    gzmsg << "Control message sent" << std::endl;
   }
 }
 
@@ -338,4 +335,23 @@ void CameraLensControlExample::OnTypeChanged()
   this->sbC2->setEnabled(isCustom);
   this->sbC3->setEnabled(isCustom);
   this->sbF->setEnabled(isCustom);
+}
+
+/////////////////////////////////////////////////
+bool CameraLensControlExample::eventFilter(QObject *obj, QEvent *event)
+{
+  std::set<QEvent::Type> filtered = { QEvent::MouseButtonDblClick,
+                                      QEvent::MouseButtonPress,
+                                      QEvent::MouseButtonRelease,
+                                      QEvent::MouseMove,
+                                      QEvent::MouseTrackingChange };
+
+  if (filtered.find(event->type()) != filtered.end())
+  {
+    return true;
+  }
+  else
+  {
+    return GUIPlugin::eventFilter(obj, event);
+  }
 }

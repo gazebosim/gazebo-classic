@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _CAMERA_LENS_CONTROL_EXAMPLE_HH_
-#define _CAMERA_LENS_CONTROL_EXAMPLE_HH_
+#ifndef _GAZEBO_CAMERA_LENS_CONTROL_EXAMPLE_HH_
+#define _GAZEBO_CAMERA_LENS_CONTROL_EXAMPLE_HH_
 
 #include <string>
 
@@ -37,39 +37,39 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~CameraLensControlExample();
 
-    protected: virtual void LoadGUIComponents(QWidget *_parent);
+    // /// \
+    // protected: void mouseMoveEvent(QMouseEvent *_event) override;
+    // protected: void mousePressEvent(QMouseEvent *_event) override;
+    // protected: void mouseReleaseEvent(QMouseEvent *_event) override;
+    // protected: void mouseDoubleClickEvent(QMouseEvent *_event) override;
+    protected: bool eventFilter(QObject *obj, QEvent *event) override;
 
-    /// \brief Callbacks for QUI events
-    protected slots: void OnButtonSpawn();
+    /// \brief Load GUI components
+    /// \param[in] _parent Pointer to the parent widget
+    private: virtual void LoadGUIComponents(QWidget *_parent);
 
-    protected slots: void OnButtonCalibrate();
+    /// \brief Callback to spawn a button
+    private slots: void OnButtonSpawn();
 
-    protected slots: void OnCbTypeChange();
+    /// \brief Callback triggered when a value has been changed.
+    private slots: void OnValueChanged();
 
-    protected slots: void OnCbFunChange();
-
-    protected slots: void OnSbChange();
-
-    protected slots: void OnValueChanged();
-
-    protected slots: void OnCustomRequested();
-
-    protected slots: void OnTypeChanged();
+    /// \brief Callback when a type has been changed
+    private slots: void OnTypeChanged();
 
     /// \brief Callback for "~/selection" topic
-    protected: void OnSelect(ConstSelectionPtr &_msg);
-
-    /// \brief Callback for "~/*/wideanglecamera_*/link/image_stamped" topic
-    protected: void OnImageUpdate(ConstImageStampedPtr &_msg);
+    /// \param[in] _msg The selection message
+    private: void OnSelect(ConstSelectionPtr &_msg);
 
     /// \brief Callback for "~/*/wideanglecamera_*/link/lens_info" topic
-    protected: void OnCameraLensCmd(ConstCameraLensCmdPtr &_msg);
+    /// \param[in] _msg The camera lens command message
+    private: void OnCameraLens(ConstCameraLensPtr &_msg);
 
     /// \brief Counter used to create unique model names.
-    private: unsigned int counter;
+    private: unsigned int counter = 0;
 
     // \brief Name of current element selected in gazebo.
-    protected: std::string selectedElementName;
+    private: std::string selectedElementName;
 
     /// \brief Node used to establish communication with gzserver.
     private: transport::NodePtr node;
@@ -84,23 +84,42 @@ namespace gazebo
     private: transport::SubscriberPtr selectionSub;
 
     /// \brief Subscriber to camera image messages.
-    private: transport::SubscriberPtr imageSub;
-
-    /// \brief Subscriber to camera image messages.
     private: transport::SubscriberPtr infoSub;
 
-    /// \brief QT Widgets, that will be loaded from .ui file
+    /// \brief Spawn button.
     private: QPushButton *pbSpawn;
+
+    /// \brief Calibrate button.
     private: QPushButton *pbCalibrate;
+
+    /// \brief Label name.
     private: QLabel *lbName;
+
+    /// \brief Type combo box.
     private: QComboBox *cbType;
+
+    /// \brief Function combo box.
     private: QComboBox *cbFun;
+
+    /// \brief Spin box for lens C1 value.
     private: QDoubleSpinBox *sbC1;
+
+    /// \brief Spin box for lens C2 value.
     private: QDoubleSpinBox *sbC2;
+
+    /// \brief Spin box for lens C3 value.
     private: QDoubleSpinBox *sbC3;
+
+    /// \brief Spin box for lens linear scaling factor.
     private: QDoubleSpinBox *sbF;
+
+    /// \brief Spin box for horizontal field of view.
     private: QDoubleSpinBox *sbHFOV;
+
+    /// \brief Spin box for cutoff angle.
     private: QDoubleSpinBox *sbCA;
+
+    /// \brief Checkbox to scale to horizontal field of view.
     private: QCheckBox *cbScaleToHFOV;
 
     /// \brief Ignore messages from topic provider if it is set to false
