@@ -4,12 +4,12 @@
 
 ### Gazebo 6.3.1 (2015-10-14)
 
+1. Fix ABI problem. Make `Sensor::SetPose` function non virtual.
+    * [Pull request #1947](https://bitbucket.org/osrf/gazebo/pull-request/1947)
+
 1. Update inertia properties during simulation
     * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
     * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
-
-1. Fix ABI problem. Make `Sensor::SetPose` function non virtual.
-    * [Pull request #1947](https://bitbucket.org/osrf/gazebo/pull-request/1947)
 
 ### Gazebo 6.3.0 (2015-10-06)
 
