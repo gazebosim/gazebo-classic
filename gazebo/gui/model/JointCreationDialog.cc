@@ -101,6 +101,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->typeButtons->addButton(gearboxJointRadio, 7);
   connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
       this->dataPtr->jointMaker, SLOT(NewType(int)));
+  connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
+      this, SLOT(NewType(int)));
 
   // Types layout
   QGridLayout *typesLayout = new QGridLayout();
@@ -180,9 +182,9 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       "Link Selections", linksWidget, 0);
 
   // Axis1 widget
-  ConfigChildWidget *axis1Widget =
+  ConfigChildWidget *axis1ConfigWidget =
       this->dataPtr->configWidget->CreateVector3dWidget("axis1", 0);
-  this->dataPtr->configWidget->AddConfigChildWidget("axis1", axis1Widget);
+  this->dataPtr->configWidget->AddConfigChildWidget("axis1", axis1ConfigWidget);
   connect(this->dataPtr->configWidget,
       SIGNAL(Vector3dValueChanged(const QString,
       const ignition::math::Vector3d)),
@@ -199,10 +201,19 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       SIGNAL(currentIndexChanged(const QString &)), this,
       SLOT(OnAxis1Presets(const QString &)));
 
+  // Axis1 layout
+  auto axis1Layout = new QHBoxLayout();
+  axis1Layout->setContentsMargins(0, 0, 0, 0);
+  axis1Layout->addWidget(axis1ConfigWidget);
+  axis1Layout->addWidget(this->dataPtr->axis1PresetsCombo);
+
+  this->dataPtr->axis1Widget = new QWidget();
+  this->dataPtr->axis1Widget->setLayout(axis1Layout);
+
   // Axis2 widget
-  ConfigChildWidget *axis2Widget =
+  ConfigChildWidget *axis2ConfigWidget =
       this->dataPtr->configWidget->CreateVector3dWidget("axis2", 0);
-  this->dataPtr->configWidget->AddConfigChildWidget("axis2", axis2Widget);
+  this->dataPtr->configWidget->AddConfigChildWidget("axis2", axis2ConfigWidget);
 
   // Axis2 presets widget
   this->dataPtr->axis2PresetsCombo = new QComboBox();
@@ -214,13 +225,20 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       SIGNAL(currentIndexChanged(const QString &)), this,
       SLOT(OnAxis2Presets(const QString &)));
 
+  // Axis2 layout
+  auto axis2Layout = new QHBoxLayout();
+  axis2Layout->setContentsMargins(0, 0, 0, 0);
+  axis2Layout->addWidget(axis2ConfigWidget);
+  axis2Layout->addWidget(this->dataPtr->axis2PresetsCombo);
+
+  this->dataPtr->axis2Widget = new QWidget();
+  this->dataPtr->axis2Widget->setLayout(axis2Layout);
+
   // Axis general layout
-  QGridLayout *axisGeneralLayout = new QGridLayout();
+  auto *axisGeneralLayout = new QVBoxLayout();
   axisGeneralLayout->setContentsMargins(0, 0, 0, 0);
-  axisGeneralLayout->addWidget(axis1Widget, 0, 0);
-  axisGeneralLayout->addWidget(this->dataPtr->axis1PresetsCombo, 0, 1);
-  axisGeneralLayout->addWidget(axis2Widget, 1, 0);
-  axisGeneralLayout->addWidget(this->dataPtr->axis2PresetsCombo, 1, 1);
+  axisGeneralLayout->addWidget(this->dataPtr->axis1Widget);
+  axisGeneralLayout->addWidget(this->dataPtr->axis2Widget);
 
   ConfigChildWidget *axisGeneralWidget = new ConfigChildWidget();
   axisGeneralWidget->setLayout(axisGeneralLayout);
@@ -431,6 +449,7 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   // Check joint type
   this->dataPtr->typeButtons->button(static_cast<int>(_type))
       ->setChecked(true);
+  this->NewType(_type);
 
   // Reset enabled states
   this->dataPtr->createButton->setEnabled(false);
@@ -787,4 +806,14 @@ void JointCreationDialog::OnAlign(const int _int)
           configs[checked]);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::NewType(const int _typeInt)
+{
+  auto type = static_cast<JointMaker::JointType>(_typeInt);
+  unsigned int axisCount = JointMaker::GetJointAxisCount(type);
+
+  this->dataPtr->axis1Widget->setVisible(axisCount > 0);
+  this->dataPtr->axis2Widget->setVisible(axisCount > 1);
 }
