@@ -361,7 +361,7 @@ namespace gazebo
       ///         returns NULL JointPtr() if joint by name _name
       ///         already exists.
       /// \throws common::Exception When _type is not recognized
-      public: gazebo::physics::JointPtr CreateJoint(
+      public: boost::weak_ptr<gazebo::physics::Joint> CreateJoint(
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
 
