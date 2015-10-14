@@ -446,6 +446,9 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
   }
   EXPECT_TRUE(jointFound);
 
+  // Try to create the joint with the same name
+  EXPECT_TRUE(model->CreateJoint(name, "revolute", parent, child) == NULL);
+
   // step to let joint creation finish before removing it
   world->Step(1000);
 

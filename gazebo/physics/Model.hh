@@ -357,7 +357,9 @@ namespace gazebo
       /// \param[in] _type type of joint
       /// \param[in] _parent parent link of joint
       /// \param[in] _child child link of joint
-      /// \return a JointPtr to the new joint created
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
       /// \throws common::Exception When _type is not recognized
       public: gazebo::physics::JointPtr CreateJoint(
         const std::string &_name, const std::string &_type,
