@@ -121,6 +121,20 @@ void JointData::SetType(const JointMaker::JointType _type)
 }
 
 /////////////////////////////////////////////////
+void JointData::SetAxis(const QString &_axis,
+    const ignition::math::Vector3d &_value)
+{
+  if (this->jointMsg)
+  {
+    if (_axis == "axis1" && this->jointMsg->has_axis1())
+      msgs::Set(this->jointMsg->mutable_axis1()->mutable_xyz(), _value);
+    else if (_axis == "axis2" && this->jointMsg->has_axis2())
+      msgs::Set(this->jointMsg->mutable_axis2()->mutable_xyz(), _value);
+    this->dirty = true;
+  }
+}
+
+/////////////////////////////////////////////////
 JointMaker::JointType JointData::Type() const
 {
   return this->type;

@@ -527,8 +527,7 @@ void JointCreationDialog::OnVector3dFromDialog(const QString &_name,
   else if (_name == "axis2")
     this->dataPtr->axis2PresetsCombo->setCurrentIndex(preset);
 
-  // Notify so 3D is updated
-std::cout << _value << std::endl;
+  this->dataPtr->jointMaker->NewAxis(_name, _value);
 }
 
 /////////////////////////////////////////////////

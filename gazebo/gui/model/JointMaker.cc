@@ -1414,6 +1414,17 @@ void JointMaker::NewType(const int _typeInt)
 }
 
 /////////////////////////////////////////////////
+void JointMaker::NewAxis(const QString &_axis,
+      const ignition::math::Vector3d &_value)
+{
+  if (this->jointBeingCreated)
+  {
+    this->jointBeingCreated->SetAxis(_axis, _value);
+    this->jointBeingCreated->Update();
+  }
+}
+
+/////////////////////////////////////////////////
 void JointMaker::NewParentLink(const std::string &_name)
 {
   // Get scoped name

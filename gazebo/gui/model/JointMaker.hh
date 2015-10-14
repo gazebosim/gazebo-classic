@@ -23,6 +23,7 @@
 #include <vector>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -280,6 +281,8 @@ namespace gazebo
       private: void NewParentLink(rendering::VisualPtr _parentLink);
       private: void NewChildLink(rendering::VisualPtr _childLink);
       public slots: void NewType(const int _typeInt);
+      public slots: void NewAxis(const QString &_axis,
+          const ignition::math::Vector3d &_value);
       public: void NewParentLink(const std::string &_name);
       public: void NewChildLink(const std::string &_name);
       public: void NewPose(
