@@ -47,32 +47,32 @@ namespace gazebo
       signals: void StatsSignal();
 
       /// \brief Qt call back when the undo button is pressed.
-      private slots: void OnUndo();
+      private slots: virtual void OnUndo();
 
       /// \brief Qt call back when an undo history action is triggered.
       /// It publishes an undo request message.
-      private slots: void OnUndoCommand(QAction *_action);
+      private slots: virtual void OnUndoCommand(QAction *_action);
 
       /// \brief Qt call back when an undo history action is hovered.
-      private slots: void OnUndoHovered(QAction *_action);
+      private slots: virtual void OnUndoHovered(QAction *_action);
 
       /// \brief Qt call back when the undo history button is pressed.
       /// It opens the undo history menu.
-      private slots: void OnUndoCmdHistory();
+      private slots: virtual void OnUndoCmdHistory();
 
       /// \brief Qt call back when the redo button is pressed.
-      private slots: void OnRedo();
+      private slots: virtual void OnRedo();
 
       /// \brief Qt call back when a redo history action is triggered.
       /// It publishes a redo request message.
-      private slots: void OnRedoCommand(QAction *_action);
+      private slots: virtual void OnRedoCommand(QAction *_action);
 
       /// \brief Qt call back when a redo history action is hovered.
-      private slots: void OnRedoHovered(QAction *_action);
+      private slots: virtual void OnRedoHovered(QAction *_action);
 
       /// \brief Qt call back when the redo history button is pressed.
       /// It opens the redo history menu.
-      private slots: void OnRedoCmdHistory();
+      private slots: virtual void OnRedoCmdHistory();
 
       /// \brief Updates the widgets according to the user command stats
       /// message.

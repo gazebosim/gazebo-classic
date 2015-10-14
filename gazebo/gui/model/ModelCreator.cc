@@ -56,6 +56,7 @@
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/MEUserCmdManager.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 
 using namespace gazebo;
@@ -189,6 +190,7 @@ ModelCreator::ModelCreator()
   }
 
   this->saveDialog = new SaveDialog(SaveDialog::MODEL);
+  MEUserCmdManager::Instance()->Init();
 
   this->Reset();
 }
@@ -196,6 +198,8 @@ ModelCreator::ModelCreator()
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
+  MEUserCmdManager::Instance()->Clear();
+
   while (!this->allLinks.empty())
     this->RemoveLinkImpl(this->allLinks.begin()->first);
 

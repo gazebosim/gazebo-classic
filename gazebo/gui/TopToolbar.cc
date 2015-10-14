@@ -206,7 +206,11 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
         acts[i] == g_copyAct ||
         acts[i] == g_pasteAct ||
         acts[i] == g_alignButtonAct ||
-        acts[i] == g_snapAct)
+        acts[i] == g_snapAct ||
+        acts[i] == g_undoAct ||
+        acts[i] == g_undoHistoryAct ||
+        acts[i] == g_redoAct ||
+        acts[i] == g_redoHistoryAct)
     {
       acts[i]->setVisible(modelEditor || simulation);
       acts[i]->setEnabled(modelEditor || simulation);

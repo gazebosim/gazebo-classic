@@ -13,6 +13,7 @@ set (sources_local
   model/ModelEditor.cc
   model/ModelEditorEvents.cc
   model/ModelEditorPalette.cc
+  model/MEUserCmdManager.cc
   model/ModelPluginInspector.cc
   model/VisualConfig.cc
 )
@@ -29,6 +30,7 @@ set (qt_headers_local
   model/ModelData.hh
   model/ModelEditor.hh
   model/ModelEditorPalette.hh
+  model/MEUserCmdManager.hh
   model/ModelPluginInspector.hh
   model/VisualConfig.hh
 )

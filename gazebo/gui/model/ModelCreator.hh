@@ -53,6 +53,7 @@ namespace gazebo
     class ModelPluginData;
     class SaveDialog;
     class JointMaker;
+    class MEUserCmdManager;
 
     /// \addtogroup gazebo_gui
     /// \{
