@@ -16,10 +16,19 @@
 */
 
 #if defined(HAVE_OPENGL)
+
+#if defined(__APPLE__)
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
+#else
+#if defined(_WIN32)
+  #include <windows.h>
+#endif /* _WIN32 */
 #include <GL/gl.h>
 #include <GL/glext.h>
-#endif
+#endif /* __APPLE__ */
 
+#endif /* HAVE_OPENGL */
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CameraLensPrivate.hh"
