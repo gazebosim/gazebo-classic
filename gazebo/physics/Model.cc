@@ -1282,20 +1282,19 @@ double Model::GetWorldEnergy() const
 }
 
 /////////////////////////////////////////////////
-gazebo::physics::JointPtr Model::CreateJoint(
+boost::weak_ptr<gazebo::physics::Joint> Model::CreateJoint(
   const std::string &_name, const std::string &_type,
   physics::LinkPtr _parent, physics::LinkPtr _child)
 {
-  gazebo::physics::JointPtr joint;
   if (this->GetJoint(_name))
   {
     gzwarn << "Model [" << this->GetName()
            << "] already has a joint named [" << _name
            << "], skipping creating joint.\n";
-    return joint;
+    return boost::weak_ptr<gazebo::physics::Joint>();
   }
   gazebo::physics::ModelPtr m(this);
-  joint = this->world->GetPhysicsEngine()->CreateJoint(_type, m);
+  auto joint = this->world->GetPhysicsEngine()->CreateJoint(_type, m);
   joint->SetName(_name);
   joint->Attach(_parent, _child);
   // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf
