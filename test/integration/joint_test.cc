@@ -429,38 +429,33 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
 
   // Create dynamic joint
   std::string name = "dynamic_joint_unique";
-  auto j = model->CreateJoint(name, "revolute", parent, child);
-  physics::JointPtr joint = j.lock();
-  EXPECT_TRUE(joint != NULL);
-  if (joint)
+  physics::JointPtr joint;
+  joint = model->CreateJoint(name, "revolute", parent, child);
+  joint->Init();
+
+  // Get model joints (used for visualization)
+  physics::Joint_V joints = model->GetJoints();
+  bool jointFound = false;
+  for (auto const &joint : joints)
   {
-    joint->Init();
-
-    // Get model joints (used for visualization)
-    physics::Joint_V joints = model->GetJoints();
-    bool jointFound = false;
-    for (auto const &joint : joints)
+    if (joint->GetName() == name)
     {
-      if (joint->GetName() == name)
-      {
-        jointFound = true;
-        break;
-      }
+      jointFound = true;
+      break;
     }
-    EXPECT_TRUE(jointFound);
-
-    // Try to create the joint with the same name
-    j = model->CreateJoint(name, "revolute", parent, child);
-    EXPECT_TRUE(j.lock() == NULL);
-
-    // step to let joint creation finish before removing it
-    world->Step(1000);
-
-    // test remove joint
-    model->RemoveJoint(name);
-    joint = model->GetJoint(name);
-    EXPECT_TRUE(joint == NULL);
   }
+  EXPECT_TRUE(jointFound);
+
+  // Try to create the joint with the same name
+  EXPECT_TRUE(model->CreateJoint(name, "revolute", parent, child) == NULL);
+
+  // step to let joint creation finish before removing it
+  world->Step(1000);
+
+  // test remove joint
+  model->RemoveJoint(name);
+  joint = model->GetJoint(name);
+  EXPECT_TRUE(joint == NULL);
 }
 
 //////////////////////////////////////////////////

@@ -357,11 +357,11 @@ namespace gazebo
       /// \param[in] _type type of joint
       /// \param[in] _parent parent link of joint
       /// \param[in] _child child link of joint
-      /// \return a weak share pointer to the new joint created,
-      ///         returns NULL if joint by name _name
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
       ///         already exists.
       /// \throws common::Exception When _type is not recognized
-      public: boost::weak_ptr<gazebo::physics::Joint> CreateJoint(
+      public: gazebo::physics::JointPtr CreateJoint(
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
 
