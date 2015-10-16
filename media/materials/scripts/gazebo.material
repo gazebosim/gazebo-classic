@@ -1552,3 +1552,16 @@ material Gazebo/Grass
     }
   }
 }
+
+material Gazebo/Editor
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1
+      specular .1 .1 .1 128
+    }
+  }
+}

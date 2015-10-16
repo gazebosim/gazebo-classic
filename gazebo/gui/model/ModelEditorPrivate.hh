@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "gazebo/gui/model/ModelEditorTypes.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -85,6 +86,10 @@ namespace gazebo
 
       /// \brief Camera perspective view action cloned from main window.
       public: QAction *cameraPerspectiveAct;
+
+      /// \brief Model editor material switcher used to switch the non-editable
+      /// models in the background to use a different material
+      public: EditorMaterialSwitcherPtr materialSwitcher;
     };
   }
 }

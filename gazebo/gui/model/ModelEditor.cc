@@ -23,18 +23,23 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Assert.hh"
 
+#include "gazebo/rendering/UserCamera.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/model/EditorMaterialSwitcher.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPrivate.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
+#include "gazebo/gui/model/ModelEditorTypes.hh"
 
 #ifdef HAVE_GRAPHVIZ
 #include "gazebo/gui/model/SchematicViewWidget.hh"
@@ -51,6 +56,10 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   // Create the model editor tab
   this->dataPtr->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->dataPtr->modelPalette);
+
+  this->dataPtr->materialSwitcher.reset(new EditorMaterialSwitcher(
+      boost::dynamic_pointer_cast<rendering::Camera>(
+      gui::get_active_camera())));
 
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
@@ -402,6 +411,7 @@ void ModelEditor::OnEdit(bool /*_checked*/)
 #endif
 
   this->dataPtr->active = !this->dataPtr->active;
+  this->ToggleMaterialScheme();
   this->ToggleToolbar();
   // g_editModelAct->setChecked(this->dataPtr->active);
 }
@@ -418,6 +428,15 @@ void ModelEditor::OnAction(QAction *_action)
 {
   if (_action != this->dataPtr->jointAct)
     this->dataPtr->modelPalette->CreateJoint("none");
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::ToggleMaterialScheme()
+{
+  if (this->dataPtr->active)
+    this->dataPtr->materialSwitcher->SetMaterialScheme("ModelEditor");
+  else
+    this->dataPtr->materialSwitcher->SetMaterialScheme("");
 }
 
 /////////////////////////////////////////////////
