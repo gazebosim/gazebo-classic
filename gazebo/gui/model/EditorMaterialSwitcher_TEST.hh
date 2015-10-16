@@ -20,12 +20,12 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelEditor class.
+/// \brief A test class for the EditorMaterialSwitcher class.
 class EditorMaterialSwitcher_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Tests entering and exiting model editor mode .
+  /// \brief Tests creating a material switcher.
   private slots: void CreateMaterialSwitcher();
 };
 

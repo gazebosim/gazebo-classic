@@ -1,8 +1,11 @@
 ## Gazebo 7.0
 
+1. Make non-editable background models white in model editor
+    * [Pull request #1950](https://bitbucket.org/osrf/gazebo/pull-request/1950)
+
 1. Added wide angle camera sensor.
     * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
-    
+
 1. Change the `near` and `far` members of `gazebo/msgs/logical_camera_sensors.proto` to `near_clip` and `far_clip`
     + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
 
