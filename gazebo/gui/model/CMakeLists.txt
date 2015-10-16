@@ -20,7 +20,6 @@ set (sources_local
 
 set (qt_headers_local
   model/CollisionConfig.hh
-  model/EditorMaterialSwitcher.hh
   model/ExtrudeDialog.hh
   model/ImportDialog.hh
   model/JointInspector.hh

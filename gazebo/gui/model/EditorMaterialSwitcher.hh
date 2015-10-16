@@ -20,9 +20,7 @@
 
 #include <string>
 
-#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
-# include "gazebo/rendering/ogre_gazebo.h"
-#endif
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
