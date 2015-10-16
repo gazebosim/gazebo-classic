@@ -1294,8 +1294,8 @@ gazebo::physics::JointPtr Model::CreateJoint(
            << "], skipping creating joint.\n";
     return joint;
   }
-  gazebo::physics::ModelPtr m(this);
-  joint = this->world->GetPhysicsEngine()->CreateJoint(_type, m);
+  joint =
+    this->world->GetPhysicsEngine()->CreateJoint(_type, shared_from_this());
   joint->SetName(_name);
   joint->Attach(_parent, _child);
   // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf

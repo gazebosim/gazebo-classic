@@ -859,6 +859,7 @@ void World::Fini()
     this->dataPtr->physicsEngine.reset();
   }
 
+  this->dataPtr->models.clear();
   this->dataPtr->prevStates[0].SetWorld(WorldPtr());
   this->dataPtr->prevStates[1].SetWorld(WorldPtr());
 
