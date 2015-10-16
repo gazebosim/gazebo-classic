@@ -21,8 +21,10 @@
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
-#include <gazebo/transport/transport.hh>
-#include <gazebo/gui/gui.hh>
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <gazebo/transport/transport.hh>
+# include <gazebo/gui/gui.hh>
+#endif
 
 namespace gazebo
 {
