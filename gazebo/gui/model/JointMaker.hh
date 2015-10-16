@@ -285,8 +285,9 @@ namespace gazebo
           const ignition::math::Vector3d &_value);
       public: void NewParentLink(const std::string &_name);
       public: void NewChildLink(const std::string &_name);
-      public: void NewPose(
+      public: void NewRelativePose(
           const ignition::math::Pose3d &_pose, bool _reset);
+      public: void NewJointPose(const ignition::math::Pose3d &_pose);
       public: void AlignLinks(
           const bool _childToParent, const std::string &_axis,
           const std::string &_mode);

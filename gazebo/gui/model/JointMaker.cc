@@ -1483,7 +1483,17 @@ void JointMaker::NewChildLink(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::NewPose(const ignition::math::Pose3d &_pose,
+void JointMaker::NewJointPose(const ignition::math::Pose3d &_pose)
+{
+  if (this->jointBeingCreated)
+  {
+    this->jointBeingCreated->SetJointPose(_pose);
+    this->jointBeingCreated->Update();
+  }
+}
+
+/////////////////////////////////////////////////
+void JointMaker::NewRelativePose(const ignition::math::Pose3d &_pose,
     bool reset)
 {
   if (this->parentLinkVis && this->childLinkVis)

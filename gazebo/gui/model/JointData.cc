@@ -135,6 +135,16 @@ void JointData::SetAxis(const QString &_axis,
 }
 
 /////////////////////////////////////////////////
+void JointData::SetJointPose(const ignition::math::Pose3d &_pose)
+{
+  if (this->jointMsg)
+  {
+    msgs::Set(this->jointMsg->mutable_pose(), _pose);
+    this->dirty = true;
+  }
+}
+
+/////////////////////////////////////////////////
 JointMaker::JointType JointData::Type() const
 {
   return this->type;

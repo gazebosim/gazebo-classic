@@ -59,10 +59,15 @@ namespace gazebo
       /// \param[in] _type New joint type.
       public: void SetType(const JointMaker::JointType _type);
 
-      /// \brief Set joint type
-      /// \param[in] _type New joint type.
+      /// \brief Set joint axis
+      /// \param[in] _axis New axis name, either "axis1" or "axis2".
+      /// \param[in] _value New axis value.
       public: void SetAxis(const QString &_axis,
           const ignition::math::Vector3d &_value);
+
+      /// \brief Set joint pose
+      /// \param[in] _type New joint type.
+      public: void SetJointPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set joint parent visual
       /// \param[in] _vis New parent visual.

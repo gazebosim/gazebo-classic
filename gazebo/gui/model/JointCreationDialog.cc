@@ -204,8 +204,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   // Axis1 layout
   auto axis1Layout = new QHBoxLayout();
   axis1Layout->setContentsMargins(0, 0, 0, 0);
-  axis1Layout->addWidget(axis1ConfigWidget);
   axis1Layout->addWidget(this->dataPtr->axis1PresetsCombo);
+  axis1Layout->addWidget(axis1ConfigWidget);
 
   this->dataPtr->axis1Widget = new QWidget();
   this->dataPtr->axis1Widget->setLayout(axis1Layout);
@@ -228,8 +228,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   // Axis2 layout
   auto axis2Layout = new QHBoxLayout();
   axis2Layout->setContentsMargins(0, 0, 0, 0);
-  axis2Layout->addWidget(axis2ConfigWidget);
   axis2Layout->addWidget(this->dataPtr->axis2PresetsCombo);
+  axis2Layout->addWidget(axis2ConfigWidget);
 
   this->dataPtr->axis2Widget = new QWidget();
   this->dataPtr->axis2Widget->setLayout(axis2Layout);
@@ -354,15 +354,21 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       this->dataPtr->configWidget->CreateGroupWidget("Align links",
       alignWidget, 0);
 
-  // Pose widget
-  ConfigChildWidget *poseWidget =
-      this->dataPtr->configWidget->CreatePoseWidget("pose", 0);
-  this->dataPtr->configWidget->AddConfigChildWidget("pose", poseWidget);
-  connect(this->dataPtr->configWidget,
-      SIGNAL(PoseValueChanged(const QString,
-      const ignition::math::Pose3d)),
-      this, SLOT(OnPoseFromDialog(const QString,
-      const ignition::math::Pose3d)));
+  // Joint pose widget
+  ConfigChildWidget *jointPoseWidget =
+      this->dataPtr->configWidget->CreatePoseWidget("joint_pose", 0);
+  this->dataPtr->configWidget->AddConfigChildWidget("joint_pose",
+      jointPoseWidget);
+
+  // Joint pose group
+  QWidget *jointPoseGroupWidget = this->dataPtr->configWidget->CreateGroupWidget(
+      "Joint Pose", jointPoseWidget, 0);
+
+  // Relative pose widget
+  ConfigChildWidget *relativePoseWidget =
+      this->dataPtr->configWidget->CreatePoseWidget("relative_pose", 0);
+  this->dataPtr->configWidget->AddConfigChildWidget("relative_pose",
+      relativePoseWidget);
 
   // Reset pose button
   QPushButton *resetPoseButton = new QPushButton(tr("Reset"));
@@ -370,17 +376,25 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   connect(resetPoseButton, SIGNAL(clicked()), this,
       SLOT(OnResetPoses()));
 
-  // Pose general layout
-  QVBoxLayout *poseGeneralLayout = new QVBoxLayout();
-  poseGeneralLayout->setContentsMargins(0, 0, 0, 0);
-  poseGeneralLayout->addWidget(poseWidget);
-  poseGeneralLayout->addWidget(resetPoseButton);
+  // Relative pose general layout
+  QVBoxLayout *relativePoseGeneralLayout = new QVBoxLayout();
+  relativePoseGeneralLayout->setContentsMargins(0, 0, 0, 0);
+  relativePoseGeneralLayout->addWidget(relativePoseWidget);
+  relativePoseGeneralLayout->addWidget(resetPoseButton);
 
-  ConfigChildWidget *poseGeneralWidget = new ConfigChildWidget();
-  poseGeneralWidget->setLayout(poseGeneralLayout);
+  ConfigChildWidget *relativePoseGeneralWidget = new ConfigChildWidget();
+  relativePoseGeneralWidget->setLayout(relativePoseGeneralLayout);
 
-  QWidget *poseGroupWidget = this->dataPtr->configWidget->CreateGroupWidget(
-      "Relative Pose", poseGeneralWidget, 0);
+  QWidget *relativePoseGroupWidget =
+      this->dataPtr->configWidget->CreateGroupWidget(
+      "Relative Pose", relativePoseGeneralWidget, 0);
+
+  // Connect pose widgets signal
+  connect(this->dataPtr->configWidget,
+      SIGNAL(PoseValueChanged(const QString,
+      const ignition::math::Pose3d)),
+      this, SLOT(OnPoseFromDialog(const QString,
+      const ignition::math::Pose3d)));
 
   // Config Widget layout
   QVBoxLayout *configLayout = new QVBoxLayout();
@@ -388,7 +402,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   configLayout->addWidget(linksGroupWidget);
   configLayout->addWidget(axisGroupWidget);
   configLayout->addWidget(alignGroupWidget);
-  configLayout->addWidget(poseGroupWidget);
+  configLayout->addWidget(jointPoseGroupWidget);
+  configLayout->addWidget(relativePoseGroupWidget);
 
   this->dataPtr->configWidget->setLayout(configLayout);
 
@@ -503,11 +518,13 @@ void JointCreationDialog::OnLinkFromDialog()
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnPoseFromDialog(const QString &/*_name*/,
+void JointCreationDialog::OnPoseFromDialog(const QString &_name,
     const ignition::math::Pose3d &_pose)
 {
-  // Update 3D scene
-  this->dataPtr->jointMaker->NewPose(_pose, false);
+  if (_name == "relative_pose")
+    this->dataPtr->jointMaker->NewRelativePose(_pose, false);
+  else if (_name == "joint_pose")
+    this->dataPtr->jointMaker->NewJointPose(_pose);
 }
 
 /////////////////////////////////////////////////
@@ -728,7 +745,7 @@ void JointCreationDialog::UpdateRelativePose(
 /////////////////////////////////////////////////
 void JointCreationDialog::OnResetPoses()
 {
-  this->dataPtr->jointMaker->NewPose(ignition::math::Pose3d(), true);
+  this->dataPtr->jointMaker->NewRelativePose(ignition::math::Pose3d(), true);
 }
 
 /////////////////////////////////////////////////
@@ -773,7 +790,7 @@ void JointCreationDialog::CheckLinksValid()
 void JointCreationDialog::OnAlign(const int _int)
 {
   // Reset pose
-  this->dataPtr->jointMaker->NewPose(ignition::math::Pose3d(), true);
+  this->dataPtr->jointMaker->NewRelativePose(ignition::math::Pose3d(), true);
 
   // Reference link
   bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
