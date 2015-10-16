@@ -533,8 +533,8 @@ std::string ConfigWidget::GetEnumWidgetValue(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
-    const std::string &_name, const int _level)
+QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
+  bool _update, const std::string &_name, const int _level)
 {
   std::vector<QWidget *> newWidgets;
 
@@ -575,9 +575,9 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
         configChildWidget = this->configWidgets[scopedName];
       }
 
-      switch (field->cpp_type())
+      switch (field->type())
       {
-        case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+        case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
           double value = ref->GetDouble(*_msg, field);
           if (!math::equal(value, value))
@@ -590,7 +590,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateDoubleWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+        case google::protobuf::FieldDescriptor::TYPE_FLOAT:
         {
           float value = ref->GetFloat(*_msg, field);
           if (!math::equal(value, value))
@@ -603,7 +603,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateDoubleWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
+        case google::protobuf::FieldDescriptor::TYPE_INT64:
         {
           int64_t value = ref->GetInt64(*_msg, field);
           if (newWidget)
@@ -614,7 +614,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT64:
+        case google::protobuf::FieldDescriptor::TYPE_UINT64:
         {
           uint64_t value = ref->GetUInt64(*_msg, field);
           if (newWidget)
@@ -625,7 +625,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateUIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+        case google::protobuf::FieldDescriptor::TYPE_INT32:
         {
           int32_t value = ref->GetInt32(*_msg, field);
           if (newWidget)
@@ -636,7 +636,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT32:
+        case google::protobuf::FieldDescriptor::TYPE_UINT32:
         {
           uint32_t value = ref->GetUInt32(*_msg, field);
           if (newWidget)
@@ -647,7 +647,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateUIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+        case google::protobuf::FieldDescriptor::TYPE_BOOL:
         {
           bool value = ref->GetBool(*_msg, field);
           if (newWidget)
@@ -658,7 +658,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateBoolWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+        case google::protobuf::FieldDescriptor::TYPE_STRING:
         {
           std::string value = ref->GetString(*_msg, field);
           if (newWidget)
@@ -674,7 +674,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateStringWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
         {
           google::protobuf::Message *valueMsg =
               ref->MutableMessage(_msg, field);
@@ -717,8 +717,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                 if (geomField->is_repeated())
                     continue;
 
-                if (geomField->cpp_type() !=
-                    google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE ||
+                if (geomField->type() !=
+                    google::protobuf::FieldDescriptor::TYPE_MESSAGE ||
                     !valueMsg->GetReflection()->HasField(*valueMsg, geomField))
                   continue;
 
@@ -791,8 +791,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               const google::protobuf::FieldDescriptor *valueField =
                   valueDescriptor->field(j);
 
-              if (valueField->cpp_type() !=
-                  google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+              if (valueField->type() !=
+                  google::protobuf::FieldDescriptor::TYPE_MESSAGE)
                 continue;
 
               if (valueField->message_type()->name() == "Vector3d")
@@ -901,7 +901,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+        case google::protobuf::FieldDescriptor::TYPE_ENUM:
         {
           const google::protobuf::EnumValueDescriptor *value =
               ref->GetEnum(*_msg, field);
@@ -1000,6 +1000,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
     widget->setLayout(widgetLayout);
     return widget;
   }
+
   return NULL;
 }
 
@@ -1115,8 +1116,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
 math::Vector3 ConfigWidget::ParseVector3(const google::protobuf::Message *_msg)
 {
   math::Vector3 vec3;
-  const google::protobuf::Descriptor *valueDescriptor =
-      _msg->GetDescriptor();
+  const google::protobuf::Descriptor *valueDescriptor = _msg->GetDescriptor();
   std::vector<double> values;
   for (unsigned int i = 0; i < 3; ++i)
   {
@@ -1862,58 +1862,58 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
       ConfigChildWidget *childWidget = this->configWidgets[scopedName];
 
-      switch (field->cpp_type())
+      switch (field->type())
       {
-        case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+        case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
           QDoubleSpinBox *valueSpinBox =
               qobject_cast<QDoubleSpinBox *>(childWidget->widgets[0]);
           ref->SetDouble(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+        case google::protobuf::FieldDescriptor::TYPE_FLOAT:
         {
           QDoubleSpinBox *valueSpinBox =
               qobject_cast<QDoubleSpinBox *>(childWidget->widgets[0]);
           ref->SetFloat(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
+        case google::protobuf::FieldDescriptor::TYPE_INT64:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetInt64(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT64:
+        case google::protobuf::FieldDescriptor::TYPE_UINT64:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetUInt64(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+        case google::protobuf::FieldDescriptor::TYPE_INT32:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetInt32(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT32:
+        case google::protobuf::FieldDescriptor::TYPE_UINT32:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetUInt32(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+        case google::protobuf::FieldDescriptor::TYPE_BOOL:
         {
           QRadioButton *valueRadioButton =
               qobject_cast<QRadioButton *>(childWidget->widgets[0]);
           ref->SetBool(_msg, field, valueRadioButton->isChecked());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+        case google::protobuf::FieldDescriptor::TYPE_STRING:
         {
           if (qobject_cast<QLineEdit *>(childWidget->widgets[0]))
           {
@@ -1930,7 +1930,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
           }
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
         {
           google::protobuf::Message *valueMsg =
               (ref->MutableMessage(_msg, field));
@@ -2062,8 +2062,8 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
               const google::protobuf::FieldDescriptor *valueField =
                   valueDescriptor->field(j);
 
-              if (valueField->cpp_type() !=
-                  google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+              if (valueField->type() !=
+                  google::protobuf::FieldDescriptor::TYPE_MESSAGE)
                 continue;
 
               if (valueField->message_type()->name() == "Vector3d")
@@ -2148,7 +2148,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+        case google::protobuf::FieldDescriptor::TYPE_ENUM:
         {
           QComboBox *valueComboBox =
               qobject_cast<QComboBox *>(childWidget->widgets[0]);
@@ -2181,8 +2181,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 void ConfigWidget::UpdateVector3Msg(google::protobuf::Message *_msg,
     const math::Vector3 &_value)
 {
-  const google::protobuf::Descriptor *valueDescriptor =
-      _msg->GetDescriptor();
+  const google::protobuf::Descriptor *valueDescriptor = _msg->GetDescriptor();
 
   std::vector<double> values;
   values.push_back(_value.x);
