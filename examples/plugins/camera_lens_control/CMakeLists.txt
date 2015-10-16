@@ -11,9 +11,12 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
-QT4_WRAP_CPP(headers_MOC CameraLensControlExample.hh)
+set (resources resources.qrc)
 
-add_library(camera_lens_control_example SHARED ${headers_MOC}
+QT4_WRAP_CPP(headers_MOC CameraLensControlExample.hh)
+QT4_ADD_RESOURCES(resources_RCC ${resources})
+
+add_library(camera_lens_control_example SHARED ${headers_MOC} ${resources_RCC}
   CameraLensControlExample.cc)
 target_link_libraries(camera_lens_control_example ${GAZEBO_LIBRARIES}
     ${QT_LIBRARIES} Qt4::QtUiTools)

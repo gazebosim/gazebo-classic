@@ -44,7 +44,7 @@ CameraLensControlExample::CameraLensControlExample()
   QVBoxLayout *frameLayout = new QVBoxLayout();
 
   // Open file with GUI description
-  QFile file("./mainwindow.ui");
+  QFile file(":/mainwindow.ui");
   file.open(QFile::ReadOnly);
 
   // Load GUI from file
