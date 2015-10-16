@@ -2842,11 +2842,15 @@ void ConfigWidget::OnGeometryValueChanged()
   if (!senderWidget)
     return;
 
-  // Must take the 3rd parent because the spin changes parent when inserted into
-  // geomSizeWidget and then geomDimensionsWidget
-  ConfigChildWidget *widget =
-      qobject_cast<ConfigChildWidget *>(
-      senderWidget->parent()->parent()->parent());
+  ConfigChildWidget *widget;
+  QWidget sender = senderWidget;
+  while (sender->parent() != NULL)
+  {
+    sender = sender->parent();
+    widget = qobject_cast<ConfigChildWidget *>(sender);
+    if (!widget)
+      break;
+  }
 
   if (!widget)
     return;

@@ -38,12 +38,14 @@ QTestFixture::QTestFixture()
     resMaxPercentChange(0), shareMaxPercentChange(0),
     residentStart(0), shareStart(0)
 {
-  gazebo::common::Console::SetQuiet(false);
 }
 
 /////////////////////////////////////////////////
 void QTestFixture::initTestCase()
 {
+  // Verbose mode
+  gazebo::common::Console::SetQuiet(false);
+
   // Initialize the informational logger. This will log warnings, and
   // errors.
   gzLogInit("qtest-", "test.log");

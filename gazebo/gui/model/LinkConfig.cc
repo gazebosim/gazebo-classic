@@ -143,5 +143,3 @@ void LinkConfig::RestoreOriginalData()
   this->Update(linkPtr);
   this->configWidget->blockSignals(false);
 }
-
-
