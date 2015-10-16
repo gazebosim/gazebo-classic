@@ -14,6 +14,7 @@ release will remove the deprecated code.
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
     + public: void RemoveJoint(const std::string &_name);
+    + public: boost::shared_ptr<Model> shared_from_this();
 
 ### Modifications
 

@@ -401,7 +401,7 @@ void Model::RemoveChild(EntityPtr _child)
 }
 
 //////////////////////////////////////////////////
-public: boost::shared_ptr<Model> Model::shared_from_this()
+boost::shared_ptr<Model> Model::shared_from_this()
 {
   return boost::static_pointer_cast<Model>(Entity::shared_from_this());
 }
