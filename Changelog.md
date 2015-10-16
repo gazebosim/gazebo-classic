@@ -3,6 +3,11 @@
 1. Make non-editable background models white in model editor
     * [Pull request #1950](https://bitbucket.org/osrf/gazebo/pull-request/1950)
 
+1. KeyEvent constructor should be in a source file. Removed a few visibility
+flags from c functions. Windows did not like `CPPTYPE_*` in
+`gazebo/gui/ConfigWidget.cc`, so I replaced it with `TYPE_*`.
+    * [Pull request #1943](https://bitbucket.org/osrf/gazebo/pull-request/1943)
+
 1. Added wide angle camera sensor.
     * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
 
