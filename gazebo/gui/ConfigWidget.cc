@@ -2843,11 +2843,10 @@ void ConfigWidget::OnGeometryValueChanged()
     return;
 
   ConfigChildWidget *widget;
-  QWidget sender = senderWidget;
-  while (sender->parent() != NULL)
+  while (senderWidget->parent() != NULL)
   {
-    sender = sender->parent();
-    widget = qobject_cast<ConfigChildWidget *>(sender);
+    senderWidget = senderWidget->parent();
+    widget = qobject_cast<ConfigChildWidget *>(senderWidget);
     if (!widget)
       break;
   }
