@@ -136,17 +136,19 @@ TopToolbar::TopToolbar(QWidget *_parent)
     g_viewAngleButtonAct = this->dataPtr->toolbar->addWidget(viewAngleButton);
   }
 
-  // Empty space to push whatever comes next to the right
-  QWidget *spacer = new QWidget();
-  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  QAction *spacerAction = this->dataPtr->toolbar->addWidget(spacer);
-  spacerAction->setObjectName("toolbarSpacerAction");
+  this->dataPtr->toolbar->addSeparator();
 
   // Screenshot / logging
   if (g_screenshotAct)
     this->dataPtr->toolbar->addAction(g_screenshotAct);
   if (g_dataLoggerAct)
     this->dataPtr->toolbar->addAction(g_dataLoggerAct);
+
+  // Empty space to push whatever comes next to the right
+  QWidget *spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  QAction *spacerAction = this->dataPtr->toolbar->addWidget(spacer);
+  spacerAction->setObjectName("toolbarSpacerAction");
 
   // Layout
   QHBoxLayout *toolLayout = new QHBoxLayout;
@@ -268,4 +270,22 @@ QAction *TopToolbar::InsertWidget(const QString &_before, QWidget *_widget)
   }
 
   return this->dataPtr->toolbar->insertWidget(beforeAction, _widget);
+}
+
+/////////////////////////////////////////////////
+void TopToolbar::AddAction(QAction *_action)
+{
+  this->dataPtr->toolbar->addAction(_action);
+}
+
+/////////////////////////////////////////////////
+QAction *TopToolbar::AddSeparator()
+{
+  return this->dataPtr->toolbar->addSeparator();
+}
+
+/////////////////////////////////////////////////
+QAction *TopToolbar::AddWidget(QWidget *_widget)
+{
+  return this->dataPtr->toolbar->addWidget(_widget);
 }

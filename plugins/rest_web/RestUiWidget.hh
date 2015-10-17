@@ -31,6 +31,11 @@
 
 namespace gazebo
 {
+  namespace gui
+  {
+    class TopToolbar;
+  }
+
   /// \class RestUiWidget RestUiWidget.hh RestUiWidget.hh
   /// \brief REST user interface widget
   class GAZEBO_VISIBLE RestUiWidget : public QWidget
@@ -99,6 +104,12 @@ namespace gazebo
     /// thread.
     private: std::list<boost::shared_ptr<const gazebo::msgs::RestError>>
         msgRespQ;
+
+    /// \brief Gazebo main window toolbar.
+    private: gui::TopToolbar *toolbar;
+
+    /// \brief Label to display name of user who is logged in.
+    private: QLabel *loginLabel;
   };
 }
 

@@ -15,6 +15,10 @@
  *
 */
 
+#include <gazebo/gui/MainWindow.hh>
+#include <gazebo/gui/RenderWidget.hh>
+#include <gazebo/gui/TopToolbar.hh>
+
 #include <QMessageBox>
 #include "RestUiWidget.hh"
 
@@ -44,6 +48,26 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
   this->errorSub = node->Subscribe("/gazebo/rest/rest_error",
                                    &RestUiWidget::OnResponse,
                                    this);
+
+  this->toolbar = NULL;
+  gui::MainWindow *mainWindow = qobject_cast<gui::MainWindow *>(_parent);
+  if (mainWindow)
+  {
+    gui::RenderWidget *renderWidget = mainWindow->GetRenderWidget();
+    if (renderWidget)
+    {
+      this->toolbar = renderWidget->GetToolbar();
+
+      this->loginLabel = new QLabel();
+      this->toolbar->AddWidget(this->loginLabel);
+    }
+  }
+  if (!this->toolbar)
+  {
+    gzerr << "Unable to find Gazebo toolbar. Log-in status will not be shown"
+        << std::endl;
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -58,22 +82,25 @@ void RestUiWidget::Logout()
     this->logoutPub->Publish(msg);
     this->loginMenuAction.setEnabled(true);
     this->logoutMenuAction.setEnabled(false);
+    this->loginLabel->setText(tr(""));
   }
 }
 
 /////////////////////////////////////////////////
 void RestUiWidget::Login()
 {
-  if (this->loginDialog.exec() != QDialog::Rejected)
-  {
-    gazebo::msgs::RestLogin msg;
-    msg.set_url(this->loginDialog.GetUrl());
-    msg.set_username(this->loginDialog.GetUsername());
-    msg.set_password(this->loginDialog.GetPassword());
-    this->loginPub->Publish(msg);
-    this->loginMenuAction.setEnabled(false);
-    this->logoutMenuAction.setEnabled(true);
-  }
+  if (this->loginDialog.exec() == QDialog::Rejected)
+    return;
+
+  gazebo::msgs::RestLogin msg;
+  msg.set_url(this->loginDialog.GetUrl());
+  std::string username = this->loginDialog.GetUsername();
+  msg.set_username(username);
+  msg.set_password(this->loginDialog.GetPassword());
+  this->loginPub->Publish(msg);
+  this->loginMenuAction.setEnabled(false);
+  this->logoutMenuAction.setEnabled(true);
+  this->loginLabel->setText(QString::fromStdString(username));
 }
 
 /////////////////////////////////////////////////
