@@ -17,6 +17,8 @@
 
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/rendering/Material.hh"
+
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointCreationDialogPrivate.hh"
@@ -137,6 +139,19 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->configWidget->AddConfigChildWidget("parentCombo",
       this->dataPtr->parentLinkWidget);
 
+  QPixmap parentPix(":/images/child-link.png");
+  parentPix = parentPix.scaled(15, 15);
+  auto parentIcon = new QLabel();
+  parentIcon->setPixmap(parentPix);
+  parentIcon->setMaximumWidth(15);
+  auto parentLayout = qobject_cast<QHBoxLayout *>(
+      this->dataPtr->parentLinkWidget->layout());
+  if (parentLayout)
+  {
+    parentLayout->insertWidget(1, parentIcon);
+    parentLayout->setAlignment(parentIcon, Qt::AlignLeft);
+  }
+
   // Child
   this->dataPtr->childLinkWidget =
       this->dataPtr->configWidget->CreateEnumWidget("child", links, 0);
@@ -145,6 +160,17 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->configWidget->AddConfigChildWidget("childCombo",
       this->dataPtr->childLinkWidget);
   this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", true);
+
+  this->dataPtr->childIcon = new QLabel();
+  this->dataPtr->childIcon->setMinimumWidth(15);
+  this->dataPtr->childIcon->setMaximumHeight(15);
+  auto childLayout = qobject_cast<QHBoxLayout *>(
+      this->dataPtr->childLinkWidget->layout());
+  if (childLayout)
+  {
+    childLayout->insertWidget(1, this->dataPtr->childIcon);
+    childLayout->setAlignment(this->dataPtr->childIcon, Qt::AlignLeft);
+  }
 
   // Connect all enum value changes
   QObject::connect(this->dataPtr->configWidget,
@@ -830,6 +856,21 @@ void JointCreationDialog::NewType(const int _typeInt)
   auto type = static_cast<JointMaker::JointType>(_typeInt);
   unsigned int axisCount = JointMaker::GetJointAxisCount(type);
 
+  // Display correct number of axes for this type
   this->dataPtr->axis1Widget->setVisible(axisCount > 0);
   this->dataPtr->axis2Widget->setVisible(axisCount > 1);
+
+  // Change child icon color according to type
+  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::GetMaterialAsColor(
+      this->dataPtr->jointMaker->jointMaterials[type],
+      matAmbient, matDiffuse, matSpecular, matEmissive);
+
+  std::ostringstream sheet;
+  sheet << "QLabel{background-color: rgb(" <<
+          (matAmbient[0] * 255) << ", " <<
+          (matAmbient[1] * 255) << ", " <<
+          (matAmbient[2] * 255) << "); }";
+
+  this->dataPtr->childIcon->setStyleSheet(QString::fromStdString(sheet.str()));
 }
