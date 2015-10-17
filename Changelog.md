@@ -1,5 +1,13 @@
 ## Gazebo 7.0
 
+1. KeyEvent constructor should be in a source file. Removed a few visibility
+flags from c functions. Windows did not like `CPPTYPE_*` in
+`gazebo/gui/ConfigWidget.cc`, so I replaced it with `TYPE_*`.
+    * [Pull request #1943](https://bitbucket.org/osrf/gazebo/pull-request/1943)
+
+1. Added wide angle camera sensor.
+    * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
+    
 1. Change the `near` and `far` members of `gazebo/msgs/logical_camera_sensors.proto` to `near_clip` and `far_clip`
     + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
 

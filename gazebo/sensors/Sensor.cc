@@ -394,7 +394,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     camMsg->set_horizontal_fov(camSensor->HorizontalFOV().Radian());
     camMsg->set_aspect_ratio(camSensor->AspectRatio());
   }
-  else if (this->GetType() == "camera")
+  else if (this->GetType() == "camera" || this->GetType() == "wideanglecamera")
   {
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
@@ -439,7 +439,8 @@ NoisePtr Sensor::GetNoise(unsigned int _index) const
   SensorNoiseType noiseType = NO_NOISE;
 
   // Camera mapping
-  if (this->GetType().compare("camera") == 0)
+  if (this->GetType().compare("camera") == 0 ||
+      this->GetType().compare("wideanglecamera") == 0)
   {
     noiseType = CAMERA_NOISE;
   }
