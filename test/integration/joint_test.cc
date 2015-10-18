@@ -458,7 +458,7 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
   EXPECT_TRUE(joint == NULL);
 
   // test that removing a non-existent joint will not break gazebo
-  EXPECT_NO_THROW(model->RemoveJoint("this_joint_doees_not_exist"));
+  EXPECT_TRUE(model->RemoveJoint("this_joint_doees_not_exist"));
 }
 
 //////////////////////////////////////////////////

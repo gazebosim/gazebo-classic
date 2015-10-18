@@ -1311,7 +1311,7 @@ gazebo::physics::JointPtr Model::CreateJoint(
 }
 
 /////////////////////////////////////////////////
-void Model::RemoveJoint(const std::string &_name)
+bool Model::RemoveJoint(const std::string &_name)
 {
   bool paused = this->world->IsPaused();
   gazebo::physics::JointPtr joint = this->GetJoint(_name);
@@ -1324,11 +1324,13 @@ void Model::RemoveJoint(const std::string &_name)
       std::remove(this->joints.begin(), this->joints.end(), joint),
       this->joints.end());
     this->world->SetPaused(paused);
+    return true;
   }
   else
   {
     gzwarn << "Joint [" << _name
            << "] does not exist in model [" << this->GetName()
            << "], not removed.\n";
+    return false;
   }
 }

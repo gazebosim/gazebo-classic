@@ -367,7 +367,8 @@ namespace gazebo
 
       /// \brief Remove a joint for this model
       /// \param[in] _name name of joint
-      public: void RemoveJoint(const std::string &_name);
+      /// \return true if successful, false if not.
+      public: bool RemoveJoint(const std::string &_name);
 
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself
