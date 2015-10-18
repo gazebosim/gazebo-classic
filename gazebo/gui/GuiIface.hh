@@ -82,7 +82,6 @@ namespace gazebo
     /// \param[in] _default Default value to use if property is not found.
     /// \return Property value for the key.
     template<typename T>
-    GZ_GUI_VISIBLE
     T getINIProperty(const std::string &_key, const T &_default)
     {
       try
@@ -102,7 +101,6 @@ namespace gazebo
     /// \param[in] _value Value for the key
     /// \sa gui::saveINI
     template<typename T>
-    GZ_GUI_VISIBLE
     bool setINIProperty(const std::string &_key, const T &_value)
     {
       g_propTree.put(_key, _value);
