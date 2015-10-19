@@ -43,7 +43,7 @@ namespace gazebo
     class GZ_GUI_VISIBLE EditorMaterialSwitcher
     {
       /// \brief Constructor
-      /// \param[in] _camera Pointer to the camera whose viewport  will be
+      /// \param[in] _camera Pointer to the camera whose viewport will be
       /// updated to see the effect of the material switch.
       public: EditorMaterialSwitcher(const rendering::CameraPtr &_camera);
 
