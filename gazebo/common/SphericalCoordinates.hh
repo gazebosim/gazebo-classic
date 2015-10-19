@@ -63,7 +63,7 @@ namespace gazebo
                 /// \brief Local tangent plane (East, North, Up)
                 GLOBAL = 3,
 
-                /// \brief Heading-adjusted tangent plane (Z, Y, Z)
+                /// \brief Heading-adjusted tangent plane (X, Y, Z)
                 LOCAL = 4
               };
 
@@ -112,6 +112,13 @@ namespace gazebo
       public: math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz) const
               GAZEBO_DEPRECATED(6.0);
 
+      /// \brief Convert a Cartesian position vector to geodetic coordinates.
+      /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
+      /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
+      ///         altitude above sea level (m).
+      public: ignition::math::Vector3d SphericalFromLocal(
+                  const ignition::math::Vector3d &_xyz) const;
+
       /// \brief Convert a Cartesian velocity vector in the local gazebo frame
       ///        to a global Cartesian frame with components East, North, Up.
       /// \param[in] _xyz Cartesian vector in gazebo's world frame.
@@ -120,6 +127,48 @@ namespace gazebo
       /// ignition::math::Vector3d objects.
       public: math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz) const
               GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Convert a Cartesian velocity vector in the local gazebo frame
+      ///        to a global Cartesian frame with components East, North, Up.
+      /// \param[in] _xyz Cartesian vector in gazebo's world frame.
+      /// \return Rotated vector with components (x,y,z): (East, North, Up).
+      public: ignition::math::Vector3d GlobalFromLocal(
+                  const ignition::math::Vector3d &_xyz) const;
+
+      /// \brief Convert a string to a SurfaceType.
+      /// \param[in] _str String to convert.
+      /// \return Conversion to SurfaceType.
+      public: static SurfaceType Convert(const std::string &_str);
+
+      /// \brief Get the distance between two points expressed in geographic
+      /// latitude and longitude. It assumes that both points are at sea level.
+      /// Example: _latA = 38.0016667 and _lonA = -123.0016667) represents
+      /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
+      /// \param[in] _latA Latitude of point A.
+      /// \param[in] _longA Longitude of point A.
+      /// \param[in] _latB Latitude of point B.
+      /// \param[in] _longB Longitude of point B.
+      /// \return Distance in meters.
+      /// \deprecated See Distance() function that accepts
+      /// ignition::math::Angle objects.
+      public: static double Distance(const math::Angle &_latA,
+                  const math::Angle &_lonA,
+                  const math::Angle &_latB,
+                  const math::Angle &_lonB) GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the distance between two points expressed in geographic
+      /// latitude and longitude. It assumes that both points are at sea level.
+      /// Example: _latA = 38.0016667 and _lonA = -123.0016667) represents
+      /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
+      /// \param[in] _latA Latitude of point A.
+      /// \param[in] _longA Longitude of point A.
+      /// \param[in] _latB Latitude of point B.
+      /// \param[in] _longB Longitude of point B.
+      /// \return Distance in meters.
+      public: static double Distance(const ignition::math::Angle &_latA,
+                                     const ignition::math::Angle &_lonA,
+                                     const ignition::math::Angle &_latB,
+                                     const ignition::math::Angle &_lonB);
 
       /// \brief Get SurfaceType currently in use.
       /// \return Current SurfaceType value.
@@ -180,14 +229,14 @@ namespace gazebo
 
       /// \brief Set reference longitude.
       /// \param[in] _angle Reference longitude.
-      public: void SetLongitudeReference(const ignition::math::Angle &_angle);
-
-      /// \brief Set reference longitude.
-      /// \param[in] _angle Reference longitude.
       /// \deprecated See SetLongitudeReference function that accepts an
       /// ignition::math::Angle object.
       public: void SetLongitudeReference(const math::Angle &_angle)
               GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Set reference longitude.
+      /// \param[in] _angle Reference longitude.
+      public: void SetLongitudeReference(const ignition::math::Angle &_angle);
 
       /// \brief Set reference elevation above sea level in meters.
       /// \param[in] _elevation Reference elevation.
@@ -195,26 +244,19 @@ namespace gazebo
 
       /// \brief Set heading angle offset for gazebo frame.
       /// \param[in] _angle Heading offset for gazebo frame.
-      public: void SetHeadingOffset(const ignition::math::Angle &_angle);
+      /// \deprecated See SetHeadingOffset function that accepts an
+      /// ignition::math::Angle object.
+      public: void SetHeadingOffset(const math::Angle &_angle)
+              GAZEBO_DEPRECATED(6.0);
 
-      /// \brief Convert a Cartesian position vector to geodetic coordinates.
-      /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
-      /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
-      ///         altitude above sea level (m).
-      public: ignition::math::Vector3d SphericalFromLocal(
-                  const ignition::math::Vector3d &_xyz) const;
+      /// \brief Set heading angle offset for gazebo frame.
+      /// \param[in] _angle Heading offset for gazebo frame.
+      public: void SetHeadingOffset(const ignition::math::Angle &_angle);
 
       /// \brief Convert a geodetic position vector to Cartesian coordinates.
       /// \param[in] _xyz Geodetic position int the planetary frame of reference
       /// \return Coordinates: Cartesian position vector in gazebo's world frame
       public: ignition::math::Vector3d LocalFromSpherical(
-                  const ignition::math::Vector3d &_xyz) const;
-
-      /// \brief Convert a Cartesian velocity vector in the local gazebo frame
-      ///        to a global Cartesian frame with components East, North, Up.
-      /// \param[in] _xyz Cartesian vector in gazebo's world frame.
-      /// \return Rotated vector with components (x,y,z): (East, North, Up).
-      public: ignition::math::Vector3d GlobalFromLocal(
                   const ignition::math::Vector3d &_xyz) const;
 
       /// \brief Convert a Cartesian velocity vector with components East,
@@ -224,40 +266,6 @@ namespace gazebo
       public: ignition::math::Vector3d LocalFromGlobal(
                   const ignition::math::Vector3d &_xyz) const;
 
-      /// \brief Convert a string to a SurfaceType.
-      /// \param[in] _str String to convert.
-      /// \return Conversion to SurfaceType.
-      public: static SurfaceType Convert(const std::string &_str);
-
-      /// \brief Get the distance between two points expressed in geographic
-      /// latitude and longitude. It assumes that both points are at sea level.
-      /// Example: _latA = 38.0016667 and _lonA = -123.0016667) represents
-      /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
-      /// \param[in] _latA Latitude of point A.
-      /// \param[in] _longA Longitude of point A.
-      /// \param[in] _latB Latitude of point B.
-      /// \param[in] _longB Longitude of point B.
-      /// \return Distance in meters.
-      /// \deprecated See Distance() function that accepts
-      /// ignition::math::Angle objects.
-      public: static double Distance(const math::Angle &_latA,
-                  const math::Angle &_lonA,
-                  const math::Angle &_latB,
-                  const math::Angle &_lonB) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the distance between two points expressed in geographic
-      /// latitude and longitude. It assumes that both points are at sea level.
-      /// Example: _latA = 38.0016667 and _lonA = -123.0016667) represents
-      /// the point with latitude 38d 0'6.00"N and longitude 123d 0'6.00"W.
-      /// \param[in] _latA Latitude of point A.
-      /// \param[in] _longA Longitude of point A.
-      /// \param[in] _latB Latitude of point B.
-      /// \param[in] _longB Longitude of point B.
-      /// \return Distance in meters.
-      public: static double Distance(const ignition::math::Angle &_latA,
-                                     const ignition::math::Angle &_lonA,
-                                     const ignition::math::Angle &_latB,
-                                     const ignition::math::Angle &_lonB);
 
       /// \brief Update coordinate transformation matrix with reference location
       public: void UpdateTransformationMatrix();
