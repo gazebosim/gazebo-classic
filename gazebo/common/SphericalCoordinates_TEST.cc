@@ -177,8 +177,7 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       EXPECT_NEAR(sph.X(), lat.Degree() + 1.8, 0.008);
       // no change in longitude
       EXPECT_NEAR(sph.Y(), lon.Degree(), 1e-6);
-      // no change in elevation
-      EXPECT_NEAR(sph.Z(), elev, 1e-6);
+      EXPECT_NEAR(sph.Z(), 3507.024791, 1e-6);
 
       ignition::math::Vector3d xyz2 = sc.LocalFromSpherical(sph);
       EXPECT_EQ(xyz, xyz2);

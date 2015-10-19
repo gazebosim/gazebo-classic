@@ -379,24 +379,31 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
   {
     // ENU (note no break at end of case)
     case LOCAL:
-      tmp.X(-_pos.X() * this->dataPtr->cosHea + _pos.Y() *
+      {
+        tmp.X(-_pos.X() * this->dataPtr->cosHea + _pos.Y() *
             this->dataPtr->sinHea);
-      tmp.Y(-_pos.X() * this->dataPtr->sinHea - _pos.Y() *
+        tmp.Y(-_pos.X() * this->dataPtr->sinHea - _pos.Y() *
             this->dataPtr->cosHea);
+      }
 
     // spherical
     case GLOBAL:
-      tmp = this->dataPtr->origin + this->dataPtr->rotECEFToGlobal.Inverse() * tmp;
-      break;
+      {
+        tmp = this->dataPtr->origin +
+          this->dataPtr->rotECEFToGlobal.Inverse() * tmp;
+        break;
+      }
 
     // ECEF
     case SPHERICAL:
-      tmp.X((_pos.Z() + curvature) * cosLat * cosLon);
-      tmp.Y((_pos.Z() + curvature) * cosLat * sinLon);
-      tmp.Z(((this->dataPtr->ellB * this->dataPtr->ellB)/
-            (this->dataPtr->ellA * this->dataPtr->ellA) *
-            curvature + _pos.Z()) * sinLat);
-      break;
+      {
+        tmp.X((_pos.Z() + curvature) * cosLat * cosLon);
+        tmp.Y((_pos.Z() + curvature) * cosLat * sinLon);
+        tmp.Z(((this->dataPtr->ellB * this->dataPtr->ellB)/
+              (this->dataPtr->ellA * this->dataPtr->ellA) *
+              curvature + _pos.Z()) * sinLat);
+        break;
+      }
     // Do nothing
     case ECEF:
       break;
@@ -441,9 +448,6 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
         tmp.X(lat);
         tmp.Y(lon);
         tmp.Z(p/nCosLat - nCurvature);
-
-        // altitude relative to sea level
-        //tmp.Z(this->dataPtr->elevationReference + _pos.Z());
         break;
       }
 
