@@ -209,8 +209,6 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       // Convert degrees to radians
       osrf_s.X() *= 0.0174532925;
       osrf_s.Y() *= 0.0174532925;
-      goog_s.X() *= 0.0174532925;
-      goog_s.Y() *= 0.0174532925;
 
       // Set the ORIGIN to be the Open Source Robotics Foundation
       common::SphericalCoordinates sc2(st, ignition::math::Angle(osrf_s.X()),
@@ -234,16 +232,16 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       EXPECT_NEAR(tmp.Y(), osrf_s.Y(), 1e-2);
       EXPECT_NEAR(tmp.Z(), osrf_s.Z(), 1e-2);
 
-      // Check that WGS84 -> GLOBAL works (to 1e-2 of a meter)
+      // Check that SPHERICAL -> LOCAL works
       tmp = sc2.LocalFromSpherical(goog_s);
-      EXPECT_NEAR(tmp.X(), vec.X(), 1e-1);
-      EXPECT_NEAR(tmp.Y(), vec.Y(), 1e-1);
-      EXPECT_NEAR(tmp.Z(), vec.Z(), 1e-1);
+      EXPECT_NEAR(tmp.X(), vec.X(), 8e-2);
+      EXPECT_NEAR(tmp.Y(), vec.Y(), 8e-2);
+      EXPECT_NEAR(tmp.Z(), vec.Z(), 1e-2);
 
-      // Check that WGS84 -> GLOBAL works (to 1e-2 of a meter)
+      // Check that SPHERICAL -> LOCAL -> SPHERICAL works
       tmp = sc2.SphericalFromLocal(tmp);
-      EXPECT_NEAR(tmp.X(), goog_s.X(), 1e-2);
-      EXPECT_NEAR(tmp.Y(), goog_s.Y(), 1e-2);
+      EXPECT_NEAR(tmp.X(), goog_s.X(), 8e-2);
+      EXPECT_NEAR(tmp.Y(), goog_s.Y(), 8e-2);
       EXPECT_NEAR(tmp.Z(), goog_s.Z(), 1e-2);
     }
   }

@@ -343,10 +343,8 @@ void SphericalCoordinates::UpdateTransformationMatrix()
     this->dataPtr->latitudeReference.Radian(),
     this->dataPtr->longitudeReference.Radian(),
     this->dataPtr->elevationReference);
-  std::cout << "Origin1[" << this->dataPtr->origin << "]\n";
   this->dataPtr->origin =
     this->PositionTransform(this->dataPtr->origin, SPHERICAL, ECEF);
-  std::cout << "Origin2[" << this->dataPtr->origin << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -450,14 +448,7 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
 
     // Convert from ECEF TO LOCAL
     case LOCAL:
-      std::cout << "Tmp1 [" << tmp << "]\n";
-      std::cout << "Origin[" << this->dataPtr->origin << "]\n";
-      std::cout << "Minus[" << tmp - this->dataPtr->origin << "]\n";
-      std::cout << "ROT [" << this->dataPtr->rotECEF2ENU << "]\n";
-
       tmp = this->dataPtr->rotECEF2ENU * (tmp - this->dataPtr->origin);
-      std::cout << "ElevationRef[" << this->dataPtr->elevationReference
-        << "] tmp.Z()[" << tmp.Z() << "]\n";
 
       tmp = ignition::math::Vector3d(
           tmp.X() * this->dataPtr->cosHea - tmp.Y() * this->dataPtr->sinHea,

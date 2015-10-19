@@ -1,5 +1,24 @@
 ## Gazebo 6.0
 
+### Gazebo 6.x.x
+
+### Gazebo 6.4.0 (2015-10-14)
+
+1. Fix ABI problem. Make `Sensor::SetPose` function non virtual.
+    * [Pull request #1947](https://bitbucket.org/osrf/gazebo/pull-request/1947)
+
+1. Update inertia properties during simulation
+    * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
+    * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
+    
+1. Fix transparency correction for opaque materials
+    * [Pull request #1946](https://bitbucket.org/osrf/gazebo/pull-requests/1946/fix-transparency-correction-for-opaque/diff)
+
+### Gazebo 6.3.0 (2015-10-06)
+
+1. Added `Sensor::SetPose` function
+    * [Pull request #1935](https://bitbucket.org/osrf/gazebo/pull-request/1935)
+
 ### Gazebo 6.2.0 (2015-10-02)
 
 1. Update physics when the world is reset

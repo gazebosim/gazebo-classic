@@ -215,6 +215,16 @@ void BulletLink::Fini()
   bulletWorld->removeRigidBody(this->rigidLink);
 }
 
+/////////////////////////////////////////////////////////////////////
+void BulletLink::UpdateMass()
+{
+  if (this->rigidLink && this->inertial)
+  {
+    this->rigidLink->setMassProps(this->inertial->GetMass(),
+        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
+  }
+}
+
 //////////////////////////////////////////////////
 void BulletLink::SetGravityMode(bool _mode)
 {
