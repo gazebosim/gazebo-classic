@@ -266,7 +266,6 @@ namespace gazebo
       public: ignition::math::Vector3d LocalFromGlobal(
                   const ignition::math::Vector3d &_xyz) const;
 
-
       /// \brief Update coordinate transformation matrix with reference location
       public: void UpdateTransformationMatrix();
 

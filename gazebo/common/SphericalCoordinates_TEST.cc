@@ -178,7 +178,7 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       // no change in longitude
       EXPECT_NEAR(sph.Y(), lon.Degree(), 1e-6);
       // no change in elevation
-      // EXPECT_NEAR(sph.Z(), elev, 1e-6);
+      EXPECT_NEAR(sph.Z(), elev, 1e-6);
 
       ignition::math::Vector3d xyz2 = sc.LocalFromSpherical(sph);
       EXPECT_EQ(xyz, xyz2);
@@ -214,16 +214,16 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       common::SphericalCoordinates sc2(st, ignition::math::Angle(osrf_s.X()),
           ignition::math::Angle(osrf_s.Y()), osrf_s.Z(), 0.0);
 
-      // Check that SPHERICAL -> ECEF works (to 1e2 of a meter)
+      // Check that SPHERICAL -> ECEF works
       tmp = sc2.PositionTransform(osrf_s,
           common::SphericalCoordinates::SPHERICAL,
           common::SphericalCoordinates::ECEF);
 
-      EXPECT_NEAR(tmp.X(), osrf_e.X(), 1e-1);
-      EXPECT_NEAR(tmp.Y(), osrf_e.Y(), 1e-1);
-      EXPECT_NEAR(tmp.Z(), osrf_e.Z(), 1e-1);
+      EXPECT_NEAR(tmp.X(), osrf_e.X(), 8e-2);
+      EXPECT_NEAR(tmp.Y(), osrf_e.Y(), 8e-2);
+      EXPECT_NEAR(tmp.Z(), osrf_e.Z(), 1e-2);
 
-      // Check that ECEF -> SPHERICAL works (to 1e-6 of a degree)
+      // Check that ECEF -> SPHERICAL works
       tmp = sc2.PositionTransform(tmp,
           common::SphericalCoordinates::ECEF,
           common::SphericalCoordinates::SPHERICAL);

@@ -56,22 +56,22 @@ namespace gazebo
       public: ignition::math::Angle headingOffset;
 
       /// \brief Semi-major axis ellipse parameter
-      public: double ell_a;
+      public: double ellA;
 
       /// \brief Semi-minor axis ellipse parameter
-      public: double ell_b;
+      public: double ellB;
 
       /// \brief Flattening ellipse parameter
-      public: double ell_f;
+      public: double ellF;
 
       /// \brief First eccentricity ellipse parameter
-      public: double ell_e;
+      public: double ellE;
 
       /// \brief Second eccentricity ellipse parameter
-      public: double ell_p;
+      public: double ellP;
 
       /// \brief Rotation matrix that moves ECEF to GLOBAL
-      public: ignition::math::Matrix3d rotECEF2ENU;
+      public: ignition::math::Matrix3d rotECEFToGlobal;
 
       /// \brief Cache the ECEF position of the the origin
       public: ignition::math::Vector3d origin;

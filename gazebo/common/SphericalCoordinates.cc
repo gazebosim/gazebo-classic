@@ -168,20 +168,20 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
   switch (this->dataPtr->surfaceType)
   {
     case EARTH_WGS84:
-      this->dataPtr->ell_a = g_EarthWGS84AxisEquatorial;
-      this->dataPtr->ell_b = g_EarthWGS84AxisPolar;
-      this->dataPtr->ell_f = (this->dataPtr->ell_a - this->dataPtr->ell_b) /
-        this->dataPtr->ell_a;
+      this->dataPtr->ellA = g_EarthWGS84AxisEquatorial;
+      this->dataPtr->ellB = g_EarthWGS84AxisPolar;
+      this->dataPtr->ellF = (this->dataPtr->ellA - this->dataPtr->ellB) /
+        this->dataPtr->ellA;
 
-      this->dataPtr->ell_e = sqrt(
-          (this->dataPtr->ell_a * this->dataPtr->ell_a - this->dataPtr->ell_b *
-           this->dataPtr->ell_b) /
-          (this->dataPtr->ell_a * this->dataPtr->ell_a));
+      this->dataPtr->ellE = sqrt(
+          (this->dataPtr->ellA * this->dataPtr->ellA - this->dataPtr->ellB *
+           this->dataPtr->ellB) /
+          (this->dataPtr->ellA * this->dataPtr->ellA));
 
-      this->dataPtr->ell_p = sqrt(
-          (this->dataPtr->ell_a * this->dataPtr->ell_a - this->dataPtr->ell_b *
-           this->dataPtr->ell_b) /
-          (this->dataPtr->ell_b * this->dataPtr->ell_b));
+      this->dataPtr->ellP = sqrt(
+          (this->dataPtr->ellA * this->dataPtr->ellA - this->dataPtr->ellB *
+           this->dataPtr->ellB) /
+          (this->dataPtr->ellB * this->dataPtr->ellB));
 
       break;
     default:
@@ -331,7 +331,7 @@ void SphericalCoordinates::UpdateTransformationMatrix()
   double sinLon = sin(this->dataPtr->longitudeReference.Radian());
 
   // Create a rotation matrix that moves ECEF to GLOBAL
-  this->dataPtr->rotECEF2ENU = ignition::math::Matrix3d(
+  this->dataPtr->rotECEFToGlobal = ignition::math::Matrix3d(
                       -sinLon,           cosLon,          0.0,
                       -cosLon * sinLat, -sinLon * sinLat, cosLat,
                        cosLon * cosLat,  sinLon * cosLat, sinLat);
@@ -367,12 +367,12 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
   double sinLon = sin(_pos.Y());
 
   // Radius of planet curvature (meters)
-  double curvature = 1.0 - this->dataPtr->ell_e * this->dataPtr->ell_e *
+  double curvature = 1.0 - this->dataPtr->ellE * this->dataPtr->ellE *
     sinLat * sinLat;
   if (curvature < 0)
-    curvature = this->dataPtr->ell_a;
+    curvature = this->dataPtr->ellA;
   else
-    curvature = this->dataPtr->ell_a / sqrt(curvature);
+    curvature = this->dataPtr->ellA / sqrt(curvature);
 
   // Convert whatever arrives to a more flexible ECEF coordinate
   switch (_in)
@@ -386,15 +386,15 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
 
     // spherical
     case GLOBAL:
-      tmp = this->dataPtr->origin + this->dataPtr->rotECEF2ENU.Inverse() * tmp;
+      tmp = this->dataPtr->origin + this->dataPtr->rotECEFToGlobal.Inverse() * tmp;
       break;
 
     // ECEF
     case SPHERICAL:
       tmp.X((_pos.Z() + curvature) * cosLat * cosLon);
       tmp.Y((_pos.Z() + curvature) * cosLat * sinLon);
-      tmp.Z(((this->dataPtr->ell_b * this->dataPtr->ell_b)/
-            (this->dataPtr->ell_a * this->dataPtr->ell_a) *
+      tmp.Z(((this->dataPtr->ellB * this->dataPtr->ellB)/
+            (this->dataPtr->ellA * this->dataPtr->ellA) *
             curvature + _pos.Z()) * sinLat);
       break;
     // Do nothing
@@ -412,30 +412,30 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
       {
         // Convert from ECEF to SPHERICAL
         double p = sqrt(tmp.X() * tmp.X() + tmp.Y() * tmp.Y());
-        double t = atan((tmp.Z() * this->dataPtr->ell_a) /
-            (p * this->dataPtr->ell_b));
+        double t = atan((tmp.Z() * this->dataPtr->ellA) /
+            (p * this->dataPtr->ellB));
         double sinT = sin(t);
         double cosT = cos(t);
 
         // Calculate latitude and longitude
-        double lat = atan((tmp.Z() + this->dataPtr->ell_p *
-              this->dataPtr->ell_p * this->dataPtr->ell_b * sinT
+        double lat = atan((tmp.Z() + this->dataPtr->ellP *
+              this->dataPtr->ellP * this->dataPtr->ellB * sinT
               * sinT * sinT) /
-            (p - this->dataPtr->ell_e * this->dataPtr->ell_e *
-             this->dataPtr->ell_a * cosT * cosT * cosT));
+            (p - this->dataPtr->ellE * this->dataPtr->ellE *
+             this->dataPtr->ellA * cosT * cosT * cosT));
 
         double lon = atan2(tmp.Y(), tmp.X());
 
         // Recalculate radius of planet curvature
         double nSinLat = sin(lat);
         double nCosLat = cos(lat);
-        double nCurvature = 1.0 - this->dataPtr->ell_e *
-          this->dataPtr->ell_e * nSinLat * nSinLat;
+        double nCurvature = 1.0 - this->dataPtr->ellE *
+          this->dataPtr->ellE * nSinLat * nSinLat;
 
         if (nCurvature < 0)
-          nCurvature = this->dataPtr->ell_a;
+          nCurvature = this->dataPtr->ellA;
         else
-          nCurvature = this->dataPtr->ell_a / sqrt(nCurvature);
+          nCurvature = this->dataPtr->ellA / sqrt(nCurvature);
 
         // Now calculate Z
         tmp.X(lat);
@@ -449,12 +449,12 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
 
     // Convert from ECEF TO GLOBAL
     case GLOBAL:
-      tmp = this->dataPtr->rotECEF2ENU * (tmp - this->dataPtr->origin);
+      tmp = this->dataPtr->rotECEFToGlobal * (tmp - this->dataPtr->origin);
       break;
 
     // Convert from ECEF TO LOCAL
     case LOCAL:
-      tmp = this->dataPtr->rotECEF2ENU * (tmp - this->dataPtr->origin);
+      tmp = this->dataPtr->rotECEFToGlobal * (tmp - this->dataPtr->origin);
 
       tmp = ignition::math::Vector3d(
           tmp.X() * this->dataPtr->cosHea - tmp.Y() * this->dataPtr->sinHea,
@@ -500,7 +500,7 @@ ignition::math::Vector3d SphericalCoordinates::VelocityTransform(
             this->dataPtr->cosHea);
     // spherical
     case GLOBAL:
-      tmp = this->dataPtr->rotECEF2ENU.Inverse() * tmp;
+      tmp = this->dataPtr->rotECEFToGlobal.Inverse() * tmp;
       break;
     // Do nothing
     case ECEF:
@@ -520,12 +520,12 @@ ignition::math::Vector3d SphericalCoordinates::VelocityTransform(
 
     // Convert from ECEF to global
     case GLOBAL:
-      tmp = this->dataPtr->rotECEF2ENU * tmp;
+      tmp = this->dataPtr->rotECEFToGlobal * tmp;
       break;
 
     // Convert from ECEF to local
     case LOCAL:
-      tmp = this->dataPtr->rotECEF2ENU * tmp;
+      tmp = this->dataPtr->rotECEFToGlobal * tmp;
       tmp = ignition::math::Vector3d(
           tmp.X() * this->dataPtr->cosHea - tmp.Y() * this->dataPtr->sinHea,
           tmp.X() * this->dataPtr->sinHea + tmp.Y() * this->dataPtr->cosHea,
