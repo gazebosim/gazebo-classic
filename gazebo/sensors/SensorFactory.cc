@@ -45,6 +45,7 @@ void RegisterRaySensor();
 void RegisterRFIDSensor();
 void RegisterRFIDTag();
 void RegisterSonarSensor();
+void RegisterWideAngleCameraSensor();
 void RegisterWirelessReceiver();
 void RegisterWirelessTransmitter();
 
@@ -61,16 +62,17 @@ void SensorFactory::RegisterAll()
   RegisterContactSensor();
   RegisterDepthCameraSensor();
   RegisterForceTorqueSensor();
-  RegisterImuSensor();
   RegisterGpsSensor();
   RegisterGpuRaySensor();
+  RegisterImuSensor();
   RegisterLogicalCameraSensor();
-  RegisterMultiCameraSensor();
   RegisterMagnetometerSensor();
+  RegisterMultiCameraSensor();
   RegisterRaySensor();
   RegisterRFIDSensor();
   RegisterRFIDTag();
   RegisterSonarSensor();
+  RegisterWideAngleCameraSensor();
   RegisterWirelessReceiver();
   RegisterWirelessTransmitter();
 }
