@@ -310,8 +310,11 @@ namespace gazebo
       private: transport::SubscriberPtr newEntitySub, statsSub;
       private: transport::SubscriberPtr worldModSub;
 
-      /// \brief Subscriber to the light topic.
-      private: transport::SubscriberPtr lightSub;
+      /// \brief Subscriber to the light modify topic.
+      private: transport::SubscriberPtr lightModifySub;
+
+      /// \brief Subscriber to the light factory topic.
+      private: transport::SubscriberPtr lightFactorySub;
 
       private: QDockWidget *toolsDock;
 

@@ -20,6 +20,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 1. Update physics when the world is reset
     * [Pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
 
+1. Light and light state for the server side
+    * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
+
 1. Rename Reset to Reset Time in time widget
     * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
     * [Issue #1730](https://bitbucket.org/osrf/gazebo/issue/1730)
