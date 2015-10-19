@@ -54,11 +54,14 @@ endif()
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")
+  set (HAVE_OPENGL FALSE)
 else ()
  if (OPENGL_INCLUDE_DIR)
    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs
                          ${gazeboserver_include_dirs_desc}
                          ${OPENGL_INCLUDE_DIR})
+   set (HAVE_OPENGL TRUE)
+   add_definitions(-DHAVE_OPENGL)
  endif()
  if (OPENGL_LIBRARIES)
    APPEND_TO_CACHED_LIST(gazeboserver_link_libs
@@ -85,6 +88,7 @@ if (NOT HDF5_FOUND)
 else ()
   message(STATUS "HDF5 Found")
 endif ()
+
 ########################################
 # Find packages
 
@@ -476,7 +480,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 3.3.0)
+set (SDFormat_MIN_VERSION 3.5.0)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)

@@ -35,6 +35,8 @@ shadow_caster_fp.glsl
 shadow_caster_vp.glsl
 spot_shadow_receiver_fp.glsl
 spot_shadow_receiver_vp.glsl
+wide_lens_map_fp.glsl
+wide_lens_map_vs.glsl
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/programs/)

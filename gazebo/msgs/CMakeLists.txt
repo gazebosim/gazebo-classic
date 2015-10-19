@@ -8,6 +8,7 @@ set (msgs
   boxgeom.proto
   camerasensor.proto
   camera_cmd.proto
+  camera_lens.proto
   cessna.proto
   collision.proto
   color.proto
