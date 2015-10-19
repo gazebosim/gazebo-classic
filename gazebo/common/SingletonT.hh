@@ -30,11 +30,7 @@
 /// \class SingletonT SingletonT.hh common/common.hh
 /// \brief Singleton template class
 template <class T>
-#ifdef _WIN32
-class SingletonT
-#else
 class GZ_COMMON_VISIBLE SingletonT
-#endif
 {
   /// \brief Get an instance of the singleton
   public: static T *Instance()
