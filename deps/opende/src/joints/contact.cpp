@@ -190,6 +190,9 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         // get erp using:
         //   kd = (1 - erp) / cfm
         local_erp = 1.0 - kd * info->cfm[0];
+
+        // debug, comparing stiffnesss, force and depth
+        // printf("depth: %f, d: %f, k: %f, f: %f\n", depth, kd, stiffness, stiffness*depth);
     }
     dReal k = info->fps * local_erp;
 
