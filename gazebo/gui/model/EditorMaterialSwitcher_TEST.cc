@@ -37,7 +37,6 @@ void EditorMaterialSwitcher_TEST::CreateMaterialSwitcher()
   emptyMaterialSwitcher->SetMaterialScheme(scheme);
   QCOMPARE(emptyMaterialSwitcher->MaterialScheme(), std::string(""));
 
-
   // create a material swticher with a camera
   this->Load("test/worlds/box.world", false, false, true);
   rendering::ScenePtr scene =
@@ -48,7 +47,7 @@ void EditorMaterialSwitcher_TEST::CreateMaterialSwitcher()
   camera->Init();
   camera->CreateRenderTexture("test_render_target");
 
-  // construvtor
+  // constructor
   gui::EditorMaterialSwitcherPtr materialSwitcher(
       new gui::EditorMaterialSwitcher(camera));
 
