@@ -100,7 +100,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->typeButtons->addButton(screwJointRadio, 5);
   this->dataPtr->typeButtons->addButton(universalJointRadio, 6);
   this->dataPtr->typeButtons->addButton(ballJointRadio, 7);
-  this->dataPtr->typeButtons->addButton(gearboxJointRadio, 7);
+  this->dataPtr->typeButtons->addButton(gearboxJointRadio, 8);
   connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
       this->dataPtr->jointMaker, SLOT(NewType(int)));
   connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
@@ -126,7 +126,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       typesWidget, 0);
 
   // Link selections
-  QLabel *selectionsText = new QLabel(tr(
+  this->dataPtr->selectionsText = new QLabel(tr(
       "Click a link in the scene to select parent.\n"
       "Click again to select child."));
 
@@ -144,17 +144,15 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   parentLabel->setMaximumWidth(50);
 
   // Add parent icon
-  QPixmap parentPix(":/images/child-link.png");
-  parentPix = parentPix.scaled(15, 15);
-  auto parentIcon = new QLabel();
-  parentIcon->setPixmap(parentPix);
-  parentIcon->setMaximumWidth(15);
+  this->dataPtr->parentIcon = new QLabel();
+  this->dataPtr->parentIcon->setMinimumWidth(15);
+  this->dataPtr->parentIcon->setMaximumHeight(15);
   auto parentLayout = qobject_cast<QHBoxLayout *>(
       this->dataPtr->parentLinkWidget->layout());
   if (parentLayout)
   {
-    parentLayout->insertWidget(1, parentIcon);
-    parentLayout->setAlignment(parentIcon, Qt::AlignLeft);
+    parentLayout->insertWidget(1, this->dataPtr->parentIcon);
+    parentLayout->setAlignment(this->dataPtr->parentIcon, Qt::AlignLeft);
   }
 
   // Child config
@@ -171,15 +169,17 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   childLabel->setMaximumWidth(50);
 
   // Add child icon
-  this->dataPtr->childIcon = new QLabel();
-  this->dataPtr->childIcon->setMinimumWidth(15);
-  this->dataPtr->childIcon->setMaximumHeight(15);
+  QPixmap childPix(":/images/child-link.png");
+  childPix = childPix.scaled(15, 15);
+  auto childIcon = new QLabel();
+  childIcon->setPixmap(childPix);
+  childIcon->setMaximumWidth(15);
   auto childLayout = qobject_cast<QHBoxLayout *>(
       this->dataPtr->childLinkWidget->layout());
   if (childLayout)
   {
-    childLayout->insertWidget(1, this->dataPtr->childIcon);
-    childLayout->setAlignment(this->dataPtr->childIcon, Qt::AlignLeft);
+    childLayout->insertWidget(1, childIcon);
+    childLayout->setAlignment(childIcon, Qt::AlignLeft);
   }
 
   // Connect all enum value changes
@@ -205,7 +205,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   // Links layout
   QGridLayout *linksLayout = new QGridLayout();
   linksLayout->setContentsMargins(0, 0, 0, 0);
-  linksLayout->addWidget(selectionsText, 0, 0, 1, 2);
+  linksLayout->addWidget(this->dataPtr->selectionsText, 0, 0, 1, 2);
   linksLayout->addWidget(this->dataPtr->parentLinkWidget, 1, 0);
   linksLayout->addWidget(this->dataPtr->childLinkWidget, 2, 0);
   linksLayout->addWidget(this->dataPtr->swapButton, 1, 1, 2, 1);
@@ -397,7 +397,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       jointPoseWidget);
 
   // Joint pose group
-  QWidget *jointPoseGroupWidget = this->dataPtr->configWidget->CreateGroupWidget(
+  QWidget *jointPoseGroupWidget =
+      this->dataPtr->configWidget->CreateGroupWidget(
       "Joint Pose", jointPoseWidget, 0);
 
   // Relative pose widget
@@ -722,6 +723,9 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
   // Remove empty option
   this->dataPtr->configWidget->RemoveItemEnumWidget("childCombo", "");
 
+  // Update selection text
+  this->dataPtr->selectionsText->setText("Select parent and child links");
+
   // Check if links are valid
   this->CheckLinksValid();
 }
@@ -882,5 +886,5 @@ void JointCreationDialog::NewType(const int _typeInt)
           (matAmbient[1] * 255) << ", " <<
           (matAmbient[2] * 255) << "); }";
 
-  this->dataPtr->childIcon->setStyleSheet(QString::fromStdString(sheet.str()));
+  this->dataPtr->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
 }

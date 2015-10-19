@@ -71,7 +71,8 @@ namespace gazebo
       public: QComboBox *alignCombo;
       public: QWidget *axis1Widget;
       public: QWidget *axis2Widget;
-      public: QLabel *childIcon;
+      public: QLabel *parentIcon;
+      public: QLabel *selectionsText;
     };
   }
 }
