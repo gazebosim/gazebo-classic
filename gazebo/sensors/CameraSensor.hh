@@ -97,10 +97,10 @@ namespace gazebo
       private: void Render();
 
       /// \brief Pointer to the camera.
-      private: rendering::CameraPtr camera;
+      protected: rendering::CameraPtr camera;
 
       /// \brief Publisher of image messages.
-      private: transport::PublisherPtr imagePub;
+      protected: transport::PublisherPtr imagePub;
 
       /// \brief True if the sensor was rendered.
       private: bool rendered;

@@ -52,28 +52,6 @@ namespace gazebo
   GAZEBO_VISIBLE
   bool setupServer(const std::vector<std::string> &_args);
 
-  /// \brief Start a gazebo client. This starts transportation, and makes it
-  /// possible to connect to a running simulation.
-  /// \param[in] _argc Number of commandline arguments.
-  /// \param[in] _argv The commandline arguments.
-  /// \return True on success.
-  /// \sa gazebo_client.hh
-  GAZEBO_VISIBLE
-  bool setupClient(int _argc = 0, char **_argv = 0) GAZEBO_DEPRECATED(6.0);
-
-  /// \brief Start a gazebo client. This starts transportation, and makes it
-  /// possible to connect to a running simulation.
-  /// \param[in] _args Vector of arguments only parsed by the system plugins.
-  /// Note that when you run gazebo/gzserver, all the options (--version,
-  /// --server-plugin, etc.) are parsed but when using Gazebo as a library, the
-  /// arguments are only parsed by the system plugins.
-  /// \sa gazebo::SystemPlugin::Load()
-  /// \return True on success.
-  /// \sa gazebo_client.hh
-  GAZEBO_VISIBLE
-  bool setupClient(const std::vector<std::string> &_args)
-  GAZEBO_DEPRECATED(6.0);
-
   /// \brief Create and load a new world from an SDF world file.
   /// \param[in] _worldFile The world file to load from.
   /// \return Pointer to the created world. NULL on error.
