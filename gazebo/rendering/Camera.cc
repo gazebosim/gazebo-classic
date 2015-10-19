@@ -623,18 +623,6 @@ void Camera::Pitch(const math::Angle &_angle,
 }
 
 //////////////////////////////////////////////////
-void Camera::RotateYaw(math::Angle _angle)
-{
-  this->Yaw(_angle);
-}
-
-//////////////////////////////////////////////////
-void Camera::RotatePitch(math::Angle _angle)
-{
-  this->Pitch(_angle);
-}
-
-//////////////////////////////////////////////////
 void Camera::SetClipDist()
 {
   sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
