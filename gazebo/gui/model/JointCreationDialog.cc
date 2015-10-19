@@ -130,7 +130,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       "Click a link in the scene to select parent.\n"
       "Click again to select child."));
 
-  // Parent
+  // Parent config
   std::vector<std::string> links;
   this->dataPtr->parentLinkWidget =
       this->dataPtr->configWidget->CreateEnumWidget("parent", links, 0);
@@ -139,6 +139,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->configWidget->AddConfigChildWidget("parentCombo",
       this->dataPtr->parentLinkWidget);
 
+  // Resize parent label
+  auto parentLabel = this->dataPtr->parentLinkWidget->findChild<QLabel *>();
+  parentLabel->setMaximumWidth(50);
+
+  // Add parent icon
   QPixmap parentPix(":/images/child-link.png");
   parentPix = parentPix.scaled(15, 15);
   auto parentIcon = new QLabel();
@@ -152,7 +157,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
     parentLayout->setAlignment(parentIcon, Qt::AlignLeft);
   }
 
-  // Child
+  // Child config
   this->dataPtr->childLinkWidget =
       this->dataPtr->configWidget->CreateEnumWidget("child", links, 0);
   this->dataPtr->childLinkWidget->setStyleSheet(
@@ -161,6 +166,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       this->dataPtr->childLinkWidget);
   this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", true);
 
+  // Resize child label
+  auto childLabel = this->dataPtr->childLinkWidget->findChild<QLabel *>();
+  childLabel->setMaximumWidth(50);
+
+  // Add child icon
   this->dataPtr->childIcon = new QLabel();
   this->dataPtr->childIcon->setMinimumWidth(15);
   this->dataPtr->childIcon->setMaximumHeight(15);
