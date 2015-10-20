@@ -183,13 +183,21 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         ///   equation 5.23 form Contact Mechanics and Friction by Popov
         dReal stiffness = 4.0 / 3.0 * e_star * sqrt(patch_radius);
 
-        // convert stiffness to erp (known cfm, h, kp)
+        // to convert stiffness to erp:
+        // first recover kd from previous cfm and erp
+        // then compute new cfm and erp.
         // get kd using:
         //   cfm = 1 / ( dt * kp + kd )
-        dReal kd = 1.0/info->cfm[0] - stiffness/info->fps;
-        // get erp using:
-        //   kd = (1 - erp) / cfm
-        local_erp = 1.0 - kd * info->cfm[0];
+        dReal kd = 1.0/info->cfm[0] - local_erp/info->fps;
+        // compute erp using stiffness and kd
+        dReal kph = stiffness/info->fps;
+        local_erp = (kph) / (kph + kd);
+        // compute new cfm for the new stiffness
+        info->cfm[0] = 1.0 / (stiffness/info->fps + kd);
+
+        // debug, comparing stiffnesss, force and depth
+        // printf("depth: %f, d: %f, k: %f, f: %f\n",
+        //   depth, kd, stiffness, stiffness*depth);
     }
     dReal k = info->fps * local_erp;
 
