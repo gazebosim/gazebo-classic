@@ -58,15 +58,6 @@ namespace gazebo
       /// \brief Button to swap parent and child links.
       public: QToolButton *swapButton;
 
-      /// \brief Style sheet for link widget which is currently active.
-      public: QString activeStyleSheet;
-
-      /// \brief Style sheet for link widgets when there's a warning.
-      public: QString warningStyleSheet;
-
-      /// \brief Normal style sheet for link widgets.
-      public: QString normalStyleSheet;
-
       public: std::vector<QButtonGroup *> alignGroups;
       public: QComboBox *alignCombo;
       public: QWidget *axis1Widget;

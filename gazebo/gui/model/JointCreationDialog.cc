@@ -41,44 +41,6 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   this->dataPtr->jointMaker = _jointMaker;
 
-  // Style sheets
-  this->dataPtr->normalStyleSheet =
-        "QWidget\
-        {\
-          background-color: " + ConfigWidget::bgColors[0] + ";\
-          color: #4c4c4c;\
-        }\
-        QLabel\
-        {\
-          color: #d0d0d0;\
-        }\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-        {\
-          background-color: " + ConfigWidget::widgetColors[0] +
-        "}";
-
-  this->dataPtr->warningStyleSheet =
-        "QWidget\
-        {\
-          background-color: " + ConfigWidget::bgColors[0] + ";\
-          color: " + ConfigWidget::redColor + ";\
-        }\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-        {\
-          background-color: " + ConfigWidget::widgetColors[0] +
-        "}";
-
-  this->dataPtr->activeStyleSheet =
-        "QWidget\
-        {\
-          background-color: " + ConfigWidget::bgColors[0] + ";\
-          color: " + ConfigWidget::greenColor + ";\
-        }\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-        {\
-          background-color: " + ConfigWidget::widgetColors[0] +
-        "}";
-
   // ConfigWidget
   this->dataPtr->configWidget = new ConfigWidget();
 
@@ -135,7 +97,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->parentLinkWidget =
       this->dataPtr->configWidget->CreateEnumWidget("parent", links, 0);
   this->dataPtr->parentLinkWidget->setStyleSheet(
-      this->dataPtr->activeStyleSheet);
+      ConfigWidget::StyleSheet("active", 1));
   this->dataPtr->configWidget->AddConfigChildWidget("parentCombo",
       this->dataPtr->parentLinkWidget);
 
@@ -159,7 +121,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->childLinkWidget =
       this->dataPtr->configWidget->CreateEnumWidget("child", links, 0);
   this->dataPtr->childLinkWidget->setStyleSheet(
-      this->dataPtr->normalStyleSheet);
+      ConfigWidget::StyleSheet("normal", 1));
   this->dataPtr->configWidget->AddConfigChildWidget("childCombo",
       this->dataPtr->childLinkWidget);
   this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", true);
@@ -508,9 +470,9 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   this->dataPtr->swapButton->setEnabled(false);
   this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", true);
   this->dataPtr->parentLinkWidget->setStyleSheet(
-      this->dataPtr->activeStyleSheet);
+      ConfigWidget::StyleSheet("active", 1));
   this->dataPtr->childLinkWidget->setStyleSheet(
-      this->dataPtr->normalStyleSheet);
+      ConfigWidget::StyleSheet("normal", 1));
 
   // Clear links
   this->dataPtr->configWidget->ClearEnumWidget("parentCombo");
@@ -703,7 +665,7 @@ void JointCreationDialog::OnParentImpl(const QString &_linkName)
   {
     this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", false);
     this->dataPtr->childLinkWidget->setStyleSheet(
-        this->dataPtr->activeStyleSheet);
+        ConfigWidget::StyleSheet("active", 1));
   }
 }
 
@@ -808,19 +770,19 @@ void JointCreationDialog::CheckLinksValid()
   if (currentParent == currentChild)
   {
     this->dataPtr->parentLinkWidget->setStyleSheet(
-        this->dataPtr->warningStyleSheet);
+        ConfigWidget::StyleSheet("warning", 1));
     this->dataPtr->childLinkWidget->setStyleSheet(
-        this->dataPtr->warningStyleSheet);
+        ConfigWidget::StyleSheet("warning", 1));
     this->dataPtr->createButton->setEnabled(false);
   }
   else
   {
     this->dataPtr->parentLinkWidget->setStyleSheet(
-        this->dataPtr->normalStyleSheet);
+        ConfigWidget::StyleSheet("normal", 1));
     if (!this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
     {
       this->dataPtr->childLinkWidget->setStyleSheet(
-          this->dataPtr->normalStyleSheet);
+          ConfigWidget::StyleSheet("normal", 1));
       this->dataPtr->createButton->setEnabled(true);
     }
   }
