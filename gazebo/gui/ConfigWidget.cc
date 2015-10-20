@@ -1368,6 +1368,19 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
 
+  // Presets
+  auto presetsCombo = new QComboBox(widget);
+  presetsCombo->addItem("Custom", 0);
+  presetsCombo->addItem("X", 1);
+  presetsCombo->addItem("-X", 2);
+  presetsCombo->addItem("Y", 3);
+  presetsCombo->addItem("-Y", 4);
+  presetsCombo->addItem("Z", 5);
+  presetsCombo->addItem("-Z", 6);
+  presetsCombo->setMinimumWidth(80);
+  connect(presetsCombo, SIGNAL(currentIndexChanged(const int)), this,
+      SLOT(OnVector3dPresetChanged(const int)));
+
   // Labels
   QLabel *vecXLabel = new QLabel(tr("X"));
   QLabel *vecYLabel = new QLabel(tr("Y"));
@@ -1415,6 +1428,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   widgetLayout->addItem(new QSpacerItem(20*level, 1,
       QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(presetsCombo);
   widgetLayout->addWidget(vecXLabel);
   widgetLayout->addWidget(vecXSpinBox);
   widgetLayout->addWidget(vecYLabel);
@@ -1433,6 +1447,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   widget->widgets.push_back(vecXSpinBox);
   widget->widgets.push_back(vecYSpinBox);
   widget->widgets.push_back(vecZSpinBox);
+  widget->widgets.push_back(presetsCombo);
 
   return widget;
 }
@@ -2117,7 +2132,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
           else if (field->message_type()->name() == "Vector3d")
           {
             std::vector<double> values;
-            for (unsigned int j = 0; j < childWidget->widgets.size(); ++j)
+            for (unsigned int j = 0; j < 3; ++j)
             {
               QDoubleSpinBox *valueSpinBox =
                   qobject_cast<QDoubleSpinBox *>(childWidget->widgets[j]);
@@ -2298,11 +2313,29 @@ bool ConfigWidget::UpdateBoolWidget(ConfigChildWidget *_widget, bool _value)
 bool ConfigWidget::UpdateVector3Widget(ConfigChildWidget *_widget,
     const math::Vector3 &_vec)
 {
-  if (_widget->widgets.size() == 3u)
+  if (_widget->widgets.size() == 4u)
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_vec.x);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_vec.y);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_vec.z);
+
+    // Update preset
+    int preset = 0;
+    if (_vec == math::Vector3::UnitX)
+      preset = 1;
+    else if (_vec == -math::Vector3::UnitX)
+      preset = 2;
+    else if (_vec == math::Vector3::UnitY)
+      preset = 3;
+    else if (_vec == -math::Vector3::UnitY)
+      preset = 4;
+    else if (_vec == math::Vector3::UnitZ)
+      preset = 5;
+    else if (_vec == -math::Vector3::UnitZ)
+      preset = 6;
+
+    qobject_cast<QComboBox *>(_widget->widgets[3])->setCurrentIndex(preset);
+
     return true;
   }
   else
@@ -2530,7 +2563,7 @@ math::Vector3 ConfigWidget::GetVector3WidgetValue(ConfigChildWidget *_widget)
     const
 {
   math::Vector3 value;
-  if (_widget->widgets.size() == 3u)
+  if (_widget->widgets.size() == 4u)
   {
     value.x = qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->value();
     value.y = qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->value();
@@ -2776,8 +2809,46 @@ void ConfigWidget::OnVector3dValueChanged()
   if (!widget)
     return;
 
-  emit Vector3dValueChanged(widget->scopedName.c_str(),
-      this->GetVector3WidgetValue(widget).Ign());
+  auto value = this->GetVector3WidgetValue(widget).Ign();
+
+  // Update preset
+  this->UpdateVector3Widget(widget, value);
+
+  // Signal
+  emit Vector3dValueChanged(widget->scopedName.c_str(), value);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnVector3dPresetChanged(const int _index)
+{
+  auto combo = qobject_cast<QComboBox *>(QObject::sender());
+
+  if (!combo)
+    return;
+
+  auto widget = qobject_cast<ConfigChildWidget *>(combo->parent());
+
+  if (!widget)
+    return;
+
+  // Update spins
+  ignition::math::Vector3d vec;
+  if (_index == 1)
+    vec = ignition::math::Vector3d::UnitX;
+  else if (_index == 2)
+    vec = -ignition::math::Vector3d::UnitX;
+  else if (_index == 3)
+    vec = ignition::math::Vector3d::UnitY;
+  else if (_index == 4)
+    vec = -ignition::math::Vector3d::UnitY;
+  else if (_index == 5)
+    vec = ignition::math::Vector3d::UnitZ;
+  else if (_index == 6)
+    vec = -ignition::math::Vector3d::UnitZ;
+  else
+    return;
+
+  this->UpdateVector3Widget(widget, vec);
 }
 
 /////////////////////////////////////////////////
