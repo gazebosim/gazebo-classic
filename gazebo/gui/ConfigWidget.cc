@@ -2849,6 +2849,9 @@ void ConfigWidget::OnVector3dPresetChanged(const int _index)
     return;
 
   this->UpdateVector3Widget(widget, vec);
+
+  // Signal
+  emit Vector3dValueChanged(widget->scopedName.c_str(), vec);
 }
 
 /////////////////////////////////////////////////

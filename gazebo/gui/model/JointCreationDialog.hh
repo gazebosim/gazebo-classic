@@ -90,8 +90,6 @@ namespace gazebo
       private slots: void OnResetPoses();
 
       /// \brief Qt callback when the axis combo box is changed.
-      private slots: void OnAxis1Presets(const QString &_axis);
-      private slots: void OnAxis2Presets(const QString &_axis);
       private slots: void OnAlign(const int _int);
       private slots: void NewType(const int _typeInt);
 

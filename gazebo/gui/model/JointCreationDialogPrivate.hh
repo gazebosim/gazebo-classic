@@ -60,8 +60,8 @@ namespace gazebo
 
       public: std::vector<QButtonGroup *> alignGroups;
       public: QComboBox *alignCombo;
-      public: QWidget *axis1Widget;
-      public: QWidget *axis2Widget;
+      public: ConfigChildWidget *axis1Widget;
+      public: ConfigChildWidget *axis2Widget;
       public: QLabel *parentIcon;
       public: QLabel *selectionsText;
     };
