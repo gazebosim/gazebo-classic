@@ -1742,6 +1742,11 @@ void ModelCreator::ShowContextMenu(const std::string &_link)
   if (it == this->allLinks.end())
     return;
 
+  // disable interacting with nested links for now
+  LinkData *link = it->second;
+  if (link->nested)
+    return;
+
   this->inspectName = _link;
   QMenu menu;
   if (this->inspectAct)
@@ -1879,8 +1884,8 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  if (this->allLinks.find(vis->GetParent()->GetName()) !=
-      this->allLinks.end())
+  auto it = this->allLinks.find(vis->GetParent()->GetName());
+  if (it != this->allLinks.end())
   {
     this->OpenInspector(vis->GetParent()->GetName());
     return true;
@@ -1909,7 +1914,12 @@ void ModelCreator::OpenInspector(const std::string &_name)
     gzerr << "Link [" << _name << "] not found." << std::endl;
     return;
   }
+
+  // disable interacting with nested links for now
   LinkData *link = it->second;
+  if (link->nested)
+    return;
+
   link->SetPose((link->linkVisual->GetWorldPose()-this->modelPose).Ign());
   link->UpdateConfig();
   link->inspector->move(QCursor::pos());
