@@ -654,6 +654,10 @@ namespace gazebo
       /// \brief Callback when a vector3 config widget's value has changed.
       private slots: void OnVector3dValueChanged();
 
+      /// \brief Callback when a vector3 config widget's preset has changed.
+      /// \param[in] _index Index of the chosen preset.
+      private slots: void OnVector3dPresetChanged(const int _index);
+
       /// \brief Callback when a color config widget's value has changed.
       private slots: void OnColorValueChanged();
 
