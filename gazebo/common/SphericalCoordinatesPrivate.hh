@@ -73,6 +73,9 @@ namespace gazebo
       /// \brief Rotation matrix that moves ECEF to GLOBAL
       public: ignition::math::Matrix3d rotECEFToGlobal;
 
+      /// \brief Rotation matrix that moves GLOBAL to ECEF
+      public: ignition::math::Matrix3d rotGlobalToECEF;
+
       /// \brief Cache the ECEF position of the the origin
       public: ignition::math::Vector3d origin;
 

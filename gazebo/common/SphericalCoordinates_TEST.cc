@@ -170,13 +170,15 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       // elevation
       EXPECT_NEAR(sph.Z(), elev, 1e-6);
 
-      // 200 km offset in x (pi/2 heading offset means North)
+      // 200 km offset in x (pi/2 heading offset means North). We use
+      // SphericalFromLocal, which means that xyz is a linear movement on
+      // a plane (not along the curvature of Earth). This will result in
+      // a large height offset.
       xyz.Set(2e5, 0, 0);
       sph = sc.SphericalFromLocal(xyz);
       // increase in latitude about 1.8 degrees
       EXPECT_NEAR(sph.X(), lat.Degree() + 1.8, 0.008);
       // no change in longitude
-      EXPECT_NEAR(sph.Y(), lon.Degree(), 1e-6);
       EXPECT_NEAR(sph.Z(), 3507.024791, 1e-6);
 
       ignition::math::Vector3d xyz2 = sc.LocalFromSpherical(sph);

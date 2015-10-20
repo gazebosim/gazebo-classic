@@ -25,15 +25,19 @@ using namespace gazebo;
 using namespace common;
 
 // Parameters for EARTH_WGS84 model
-// a: Semi-major equatorial axis (meters)
-// b: Semi-minor polar axis (meters)
-// if: inverse flattening (no units)
 // wikipedia: World_Geodetic_System#A_new_World_Geodetic_System:_WGS_84
+
+// a: Equatorial radius. Semi-major axis of the WGS84 spheroid (meters).
 const double g_EarthWGS84AxisEquatorial = 6378137.0;
+
+// b: Polar radius. Semi-minor axis of the wgs84 spheroid (meters).
 const double g_EarthWGS84AxisPolar = 6356752.314245;
 
-const double g_EarthSphere = 6371000.0;
-// const double g_EarthWGS84Flattening = 1/298.257223563;
+// if: WGS84 inverse flattening parameter (no units)
+const double g_EarthWGS84Flattening = 1.0/298.257223560;
+
+// Radius of the Earth (meters).
+const double g_EarthRadius = 6371000.0;
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SurfaceType SphericalCoordinates::Convert(
@@ -168,22 +172,32 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
   switch (this->dataPtr->surfaceType)
   {
     case EARTH_WGS84:
+      {
+      // Set the semi-major axis
       this->dataPtr->ellA = g_EarthWGS84AxisEquatorial;
+
+      // Set the semi-minor axis
       this->dataPtr->ellB = g_EarthWGS84AxisPolar;
-      this->dataPtr->ellF = (this->dataPtr->ellA - this->dataPtr->ellB) /
-        this->dataPtr->ellA;
 
-      this->dataPtr->ellE = sqrt(
-          (this->dataPtr->ellA * this->dataPtr->ellA - this->dataPtr->ellB *
-           this->dataPtr->ellB) /
-          (this->dataPtr->ellA * this->dataPtr->ellA));
+      // Set the flattening parameter
+      this->dataPtr->ellF = g_EarthWGS84Flattening;
 
+
+
+      // Set the first eccentricity ellipse parameter
+      // https://en.wikipedia.org/wiki/Eccentricity_(mathematics)#Ellipses
+      this->dataPtr->ellE = sqrt(1.0 -
+          std::pow(this->dataPtr->ellB, 2) / std::pow(this->dataPtr->ellA, 2));
+
+
+      // Set the second eccentricity ellipse parameter
+      // https://en.wikipedia.org/wiki/Eccentricity_(mathematics)#Ellipses
       this->dataPtr->ellP = sqrt(
-          (this->dataPtr->ellA * this->dataPtr->ellA - this->dataPtr->ellB *
-           this->dataPtr->ellB) /
-          (this->dataPtr->ellB * this->dataPtr->ellB));
+          std::pow(this->dataPtr->ellA, 2) / std::pow(this->dataPtr->ellB, 2) -
+          1.0);
 
       break;
+      }
     default:
       gzerr << "Unknown surface type[" << this->dataPtr->surfaceType << "]\n";
       break;
@@ -317,7 +331,7 @@ double SphericalCoordinates::Distance(const ignition::math::Angle &_latA,
              cos(_latA.Radian()) * cos(_latB.Radian());
 
   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  double d = g_EarthSphere * c;
+  double d = g_EarthRadius * c;
   return d;
 }
 
@@ -331,10 +345,17 @@ void SphericalCoordinates::UpdateTransformationMatrix()
   double sinLon = sin(this->dataPtr->longitudeReference.Radian());
 
   // Create a rotation matrix that moves ECEF to GLOBAL
+  // http://www.navipedia.net/index.php/
+  // Transformations_between_ECEF_and_ENU_coordinates
   this->dataPtr->rotECEFToGlobal = ignition::math::Matrix3d(
                       -sinLon,           cosLon,          0.0,
                       -cosLon * sinLat, -sinLon * sinLat, cosLat,
                        cosLon * cosLat,  sinLon * cosLat, sinLat);
+
+  this->dataPtr->rotGlobalToECEF = ignition::math::Matrix3d(
+                      -sinLon, -cosLon * sinLat, cosLon * cosLat,
+                       cosLon, -sinLon * sinLat, sinLon * cosLat,
+                       0,      cosLat,           sinLat);
 
   // Cache heading transforms -- note that we have to negate the heading in
   // order to preserve backward compatibility. ie. Gazebo has traditionally
@@ -367,34 +388,32 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
   double sinLon = sin(_pos.Y());
 
   // Radius of planet curvature (meters)
-  double curvature = 1.0 - this->dataPtr->ellE * this->dataPtr->ellE *
-    sinLat * sinLat;
-  if (curvature < 0)
-    curvature = this->dataPtr->ellA;
-  else
-    curvature = this->dataPtr->ellA / sqrt(curvature);
+  double curvature = 1.0 -
+    this->dataPtr->ellE * this->dataPtr->ellE * sinLat * sinLat;
+  curvature = this->dataPtr->ellA / sqrt(curvature);
 
   // Convert whatever arrives to a more flexible ECEF coordinate
   switch (_in)
   {
-    // ENU (note no break at end of case)
+    // East, North, Up (ENU), note no break at end of case
     case LOCAL:
       {
         tmp.X(-_pos.X() * this->dataPtr->cosHea + _pos.Y() *
             this->dataPtr->sinHea);
         tmp.Y(-_pos.X() * this->dataPtr->sinHea - _pos.Y() *
             this->dataPtr->cosHea);
-      }
 
-    // spherical
-    case GLOBAL:
-      {
-        tmp = this->dataPtr->origin +
-          this->dataPtr->rotECEFToGlobal.Inverse() * tmp;
+        tmp = this->dataPtr->origin + this->dataPtr->rotGlobalToECEF * tmp;
+
         break;
       }
 
-    // ECEF
+    case GLOBAL:
+      {
+        tmp = this->dataPtr->rotGlobalToECEF * tmp;
+        break;
+      }
+
     case SPHERICAL:
       {
         tmp.X((_pos.Z() + curvature) * cosLat * cosLon);
@@ -419,35 +438,29 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
       {
         // Convert from ECEF to SPHERICAL
         double p = sqrt(tmp.X() * tmp.X() + tmp.Y() * tmp.Y());
-        double t = atan((tmp.Z() * this->dataPtr->ellA) /
+        double theta = atan((tmp.Z() * this->dataPtr->ellA) /
             (p * this->dataPtr->ellB));
-        double sinT = sin(t);
-        double cosT = cos(t);
 
         // Calculate latitude and longitude
-        double lat = atan((tmp.Z() + this->dataPtr->ellP *
-              this->dataPtr->ellP * this->dataPtr->ellB * sinT
-              * sinT * sinT) /
-            (p - this->dataPtr->ellE * this->dataPtr->ellE *
-             this->dataPtr->ellA * cosT * cosT * cosT));
+        double lat = atan(
+            (tmp.Z() + std::pow(this->dataPtr->ellP, 2) * this->dataPtr->ellB *
+             std::pow(sin(theta), 3)) /
+            (p - std::pow(this->dataPtr->ellE, 2) *
+             this->dataPtr->ellA * std::pow(cos(theta), 3)
+            ));
 
         double lon = atan2(tmp.Y(), tmp.X());
 
-        // Recalculate radius of planet curvature
-        double nSinLat = sin(lat);
-        double nCosLat = cos(lat);
-        double nCurvature = 1.0 - this->dataPtr->ellE *
-          this->dataPtr->ellE * nSinLat * nSinLat;
+        // Recalculate radius of planet curvature at the current latitude.
+        double nCurvature = 1.0 - std::pow(this->dataPtr->ellE, 2) *
+          std::pow(sin(lat), 2);
+        nCurvature = this->dataPtr->ellA / sqrt(nCurvature);
 
-        if (nCurvature < 0)
-          nCurvature = this->dataPtr->ellA;
-        else
-          nCurvature = this->dataPtr->ellA / sqrt(nCurvature);
-
-        // Now calculate Z
         tmp.X(lat);
         tmp.Y(lon);
-        tmp.Z(p/nCosLat - nCurvature);
+
+        // Now calculate Z
+        tmp.Z(p/cos(lat) - nCurvature);
         break;
       }
 
@@ -504,7 +517,7 @@ ignition::math::Vector3d SphericalCoordinates::VelocityTransform(
             this->dataPtr->cosHea);
     // spherical
     case GLOBAL:
-      tmp = this->dataPtr->rotECEFToGlobal.Inverse() * tmp;
+      tmp = this->dataPtr->rotGlobalToECEF * tmp;
       break;
     // Do nothing
     case ECEF:
