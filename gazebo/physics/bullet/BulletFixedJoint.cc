@@ -186,21 +186,6 @@ double BulletFixedJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletFixedJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzwarn << "BulletFixedJoint: called method "
-         << "SetMaxForce that is not valid for joints of type fixed.\n";
-}
-
-//////////////////////////////////////////////////
-double BulletFixedJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzwarn << "BulletFixedJoint: called method "
-         << "GetMaxForce that is not valid for joints of type fixed.\n";
-  return 0.0;
-}
-
-//////////////////////////////////////////////////
 void BulletFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 {
   gzwarn << "BulletFixedJoint: called method "

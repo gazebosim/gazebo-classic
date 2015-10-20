@@ -675,12 +675,6 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetAngle(unsigned int _index, math::Angle _angle)
-{
-  this->SetPosition(_index, _angle.Radian());
-}
-
-//////////////////////////////////////////////////
 bool Joint::SetPosition(unsigned int /*_index*/, double _position)
 {
   // parent class doesn't do much, derived classes do all the work.

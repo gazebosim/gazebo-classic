@@ -38,6 +38,7 @@ QTestFixture::QTestFixture()
     resMaxPercentChange(0), shareMaxPercentChange(0),
     residentStart(0), shareStart(0)
 {
+  gazebo::common::Console::SetQuiet(false);
 }
 
 /////////////////////////////////////////////////

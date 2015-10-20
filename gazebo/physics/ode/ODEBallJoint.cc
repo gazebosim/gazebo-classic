@@ -87,17 +87,6 @@ double ODEBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-double ODEBallJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return 0;
-}
-
-//////////////////////////////////////////////////
-void ODEBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-}
-
-//////////////////////////////////////////////////
 math::Angle ODEBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   return math::Angle(0);
