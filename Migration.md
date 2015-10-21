@@ -9,8 +9,22 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/rendering/Camera.hh**
+    + ***Removed:*** public: void SetClipDist();
+    + ***Replacement:*** public: virtual void SetClipDist();
+    
+1. **gazebo/msgs/logical_camera_sensors.proto**
+    + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
+    + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
+
+1. **Light topic**
+    + ***Removed:*** ~/light
+    + ***Replacement:*** ~/factory/light - for spawning new lights
+    + ***Replacement:*** ~/light/modify - for modifying existing lights
+    * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
+
 1. **gazebo/rendering/Visual.hh**
-    + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true); 
+    + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true);
     + ***Replacement:*** public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
 1. **gazebo/rendering/OribitViewController.hh**
@@ -41,11 +55,11 @@ release will remove the deprecated code.
 ### Deprecations
 
 1. **gazebo/gui/RTShaderSystem.hh**
-    + ***Deprecation:*** void AttachEntity(Visual *vis) 
+    + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***
 
 1. **gazebo/gui/RTShaderSystem.hh**
-    + ***Deprecation:*** void DetachEntity(Visual *_vis)  
+    + ***Deprecation:*** void DetachEntity(Visual *_vis)
     + ***No replacement for DetachEntity ***
 
 ### Deletions
@@ -85,7 +99,7 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Vector3d HSV() const;
 
 1. **gazebo/common/Dem.hh**
-    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude); 
+    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude);
     + ***Replacement:*** void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,  ignition::math::Angle &_longitude) const;
     + ***Deprecation:***void FillHeightMap(int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY, std::vector<float> &_heights);
     + ***Replacement:***void FillHeightMap(const int _subSampling, const unsigned int _vertSize, const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale, const bool _flipY, std::vector<float> &_heights);

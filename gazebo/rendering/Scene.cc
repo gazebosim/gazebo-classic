@@ -45,6 +45,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/WideAngleCamera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
@@ -131,11 +132,13 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->visSub =
       this->dataPtr->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
 
-  this->dataPtr->lightPub =
-      this->dataPtr->node->Advertise<msgs::Light>("~/light");
+  this->dataPtr->lightFactorySub =
+      this->dataPtr->node->Subscribe("~/factory/light",
+      &Scene::OnLightFactoryMsg, this);
 
-  this->dataPtr->lightSub =
-      this->dataPtr->node->Subscribe("~/light", &Scene::OnLightMsg, this);
+  this->dataPtr->lightModifySub =
+      this->dataPtr->node->Subscribe("~/light/modify",
+      &Scene::OnLightModifyMsg, this);
 
   if (_isServer)
   {
@@ -185,7 +188,8 @@ void Scene::Clear()
   this->dataPtr->node->Fini();
   this->dataPtr->modelMsgs.clear();
   this->dataPtr->visualMsgs.clear();
-  this->dataPtr->lightMsgs.clear();
+  this->dataPtr->lightFactoryMsgs.clear();
+  this->dataPtr->lightModifyMsgs.clear();
   this->dataPtr->poseMsgs.clear();
   this->dataPtr->sceneMsgs.clear();
   this->dataPtr->jointMsgs.clear();
@@ -199,11 +203,11 @@ void Scene::Clear()
   this->dataPtr->skeletonPoseSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
-  this->dataPtr->lightSub.reset();
+  this->dataPtr->lightFactorySub.reset();
+  this->dataPtr->lightModifySub.reset();
   this->dataPtr->requestSub.reset();
   this->dataPtr->responseSub.reset();
   this->dataPtr->modelInfoSub.reset();
-  this->dataPtr->lightPub.reset();
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
 
@@ -546,6 +550,17 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
                                         bool _autoRender)
 {
   DepthCameraPtr camera(new DepthCamera(this->dataPtr->name + "::" + _name,
+        shared_from_this(), _autoRender));
+  this->dataPtr->cameras.push_back(camera);
+
+  return camera;
+}
+
+//////////////////////////////////////////////////
+WideAngleCameraPtr Scene::CreateWideAngleCamera(const std::string &_name,
+                                                const bool _autoRender)
+{
+  WideAngleCameraPtr camera(new WideAngleCamera(_name,
         shared_from_this(), _autoRender));
   this->dataPtr->cameras.push_back(camera);
 
@@ -1456,7 +1471,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   for (int i = 0; i < _msg->light_size(); ++i)
   {
     boost::shared_ptr<msgs::Light> lm(new msgs::Light(_msg->light(i)));
-    this->dataPtr->lightMsgs.push_back(lm);
+    this->dataPtr->lightFactoryMsgs.push_back(lm);
   }
 
   for (int i = 0; i < _msg->joint_size(); ++i)
@@ -1716,7 +1731,8 @@ void Scene::PreRender()
   SceneMsgs_L sceneMsgsCopy;
   ModelMsgs_L modelMsgsCopy;
   SensorMsgs_L sensorMsgsCopy;
-  LightMsgs_L lightMsgsCopy;
+  LightMsgs_L lightFactoryMsgsCopy;
+  LightMsgs_L lightModifyMsgsCopy;
   VisualMsgs_L modelVisualMsgsCopy;
   VisualMsgs_L linkVisualMsgsCopy;
   VisualMsgs_L visualMsgsCopy;
@@ -1740,9 +1756,15 @@ void Scene::PreRender()
               std::back_inserter(sensorMsgsCopy));
     this->dataPtr->sensorMsgs.clear();
 
-    std::copy(this->dataPtr->lightMsgs.begin(), this->dataPtr->lightMsgs.end(),
-              std::back_inserter(lightMsgsCopy));
-    this->dataPtr->lightMsgs.clear();
+    std::copy(this->dataPtr->lightFactoryMsgs.begin(),
+              this->dataPtr->lightFactoryMsgs.end(),
+              std::back_inserter(lightFactoryMsgsCopy));
+    this->dataPtr->lightFactoryMsgs.clear();
+
+    std::copy(this->dataPtr->lightModifyMsgs.begin(),
+              this->dataPtr->lightModifyMsgs.end(),
+              std::back_inserter(lightModifyMsgsCopy));
+    this->dataPtr->lightModifyMsgs.clear();
 
     std::copy(this->dataPtr->modelVisualMsgs.begin(),
               this->dataPtr->modelVisualMsgs.end(),
@@ -1806,11 +1828,22 @@ void Scene::PreRender()
       ++sensorIter;
   }
 
-  // Process the light messages.
-  for (lightIter = lightMsgsCopy.begin(); lightIter != lightMsgsCopy.end();)
+  // Process the light factory messages.
+  for (lightIter = lightFactoryMsgsCopy.begin();
+      lightIter != lightFactoryMsgsCopy.end();)
   {
-    if (this->ProcessLightMsg(*lightIter))
-      lightMsgsCopy.erase(lightIter++);
+    if (this->ProcessLightFactoryMsg(*lightIter))
+      lightFactoryMsgsCopy.erase(lightIter++);
+    else
+      ++lightIter;
+  }
+
+  // Process the light modify messages.
+  for (lightIter = lightModifyMsgsCopy.begin();
+      lightIter != lightModifyMsgsCopy.end();)
+  {
+    if (this->ProcessLightModifyMsg(*lightIter))
+      lightModifyMsgsCopy.erase(lightIter++);
     else
       ++lightIter;
   }
@@ -1896,8 +1929,11 @@ void Scene::PreRender()
     std::copy(sensorMsgsCopy.begin(), sensorMsgsCopy.end(),
         std::front_inserter(this->dataPtr->sensorMsgs));
 
-    std::copy(lightMsgsCopy.begin(), lightMsgsCopy.end(),
-        std::front_inserter(this->dataPtr->lightMsgs));
+    std::copy(lightFactoryMsgsCopy.begin(), lightFactoryMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->lightFactoryMsgs));
+
+    std::copy(lightModifyMsgsCopy.begin(), lightModifyMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->lightModifyMsgs));
 
     std::copy(modelVisualMsgsCopy.begin(), modelVisualMsgsCopy.end(),
         std::front_inserter(this->dataPtr->modelVisualMsgs));
@@ -2110,6 +2146,10 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       cameraVis->SetId(_msg->id());
       cameraVis->Load(_msg->logical_camera());
       this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
+    }
+    else if (_msg->has_pose())
+    {
+      iter->second->SetPose(msgs::ConvertIgn(_msg->pose()));
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
@@ -2667,16 +2707,22 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
   this->dataPtr->skeletonPoseMsgs.push_back(_msg);
 }
 
-
 /////////////////////////////////////////////////
-void Scene::OnLightMsg(ConstLightPtr &_msg)
+void Scene::OnLightFactoryMsg(ConstLightPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->lightMsgs.push_back(_msg);
+  this->dataPtr->lightFactoryMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
+void Scene::OnLightModifyMsg(ConstLightPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->lightModifyMsgs.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
+bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 {
   Light_M::iterator iter;
   iter = this->dataPtr->lights.find(_msg->name());
@@ -2687,6 +2733,28 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
     light->LoadFromMsg(_msg);
     this->dataPtr->lights[_msg->name()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
+  }
+  else
+  {
+    gzerr << "Light [" << _msg->name() << "] already exists."
+        << " Use topic ~/light/modify to modify it." << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
+{
+  Light_M::iterator iter;
+  iter = this->dataPtr->lights.find(_msg->name());
+
+  if (iter == this->dataPtr->lights.end())
+  {
+    gzerr << "Light [" << _msg->name() << "] not found."
+        << " Use topic ~/factory/light to spawn a new light." << std::endl;
+    return false;
   }
   else
   {

@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/ModelState.hh"
+#include "gazebo/physics/LightState.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -89,6 +90,10 @@ namespace gazebo
       /// \return A vector of model states.
       public: const ModelState_M &GetModelStates() const;
 
+      /// \brief Get the light states.
+      /// \return A vector of light states.
+      public: const LightState_M &LightStates() const;
+
       /// \brief Get the number of model states.
       ///
       /// Returns the number of models in this instance.
@@ -101,11 +106,23 @@ namespace gazebo
       /// \throws common::Exception When the _modelName doesn't exist.
       public: ModelState GetModelState(const std::string &_modelName) const;
 
+      /// \brief Get a light state by light name.
+      /// \param[in] _lightName Name of the light state to get.
+      /// \return The light state.
+      /// \throws common::Exception When the _lightName doesn't exist.
+      public: LightState GetLightState(const std::string &_lightName) const;
+
       /// \brief Return true if WorldState has a ModelState with the given
       /// name.
       /// \param[in] _modelName Name of the model to search for.
       /// \return True if the ModelState exists.
       public: bool HasModelState(const std::string &_modelName) const;
+
+      /// \brief Return true if WorldState has a LightState with the given
+      /// name.
+      /// \param[in] _lightName Name of the light to search for.
+      /// \return True if the LightState exists.
+      public: bool HasLightState(const std::string &_lightName) const;
 
       /// \brief Get the vector of SDF insertions.
       /// \return A vector of SDF blocks. Each block contains the SDF of the
@@ -211,10 +228,15 @@ namespace gazebo
         }
 
         // List the model states
-        for (ModelState_M::const_iterator iter = _state.modelStates.begin();
-            iter != _state.modelStates.end(); ++iter)
+        for (const auto &model : _state.modelStates)
         {
-          _out << iter->second;
+          _out << model.second;
+        }
+
+        // List the light states
+        for (const auto &light : _state.lightStates)
+        {
+          _out << light.second;
         }
 
         _out << "</state>";
@@ -224,6 +246,9 @@ namespace gazebo
 
       /// \brief State of all the models.
       private: ModelState_M modelStates;
+
+      /// \brief A map between all the light names and their states.
+      private: LightState_M lightStates;
 
       /// \brief List of new added models. The
       /// value is the SDF that describes the model.
