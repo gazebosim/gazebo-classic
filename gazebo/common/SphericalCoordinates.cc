@@ -34,7 +34,7 @@ const double g_EarthWGS84AxisEquatorial = 6378137.0;
 const double g_EarthWGS84AxisPolar = 6356752.314245;
 
 // if: WGS84 inverse flattening parameter (no units)
-const double g_EarthWGS84Flattening = 1.0/298.257223560;
+const double g_EarthWGS84Flattening = 1.0/298.257223563;
 
 // Radius of the Earth (meters).
 const double g_EarthRadius = 6371000.0;
@@ -182,13 +182,10 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
       // Set the flattening parameter
       this->dataPtr->ellF = g_EarthWGS84Flattening;
 
-
-
       // Set the first eccentricity ellipse parameter
       // https://en.wikipedia.org/wiki/Eccentricity_(mathematics)#Ellipses
       this->dataPtr->ellE = sqrt(1.0 -
           std::pow(this->dataPtr->ellB, 2) / std::pow(this->dataPtr->ellA, 2));
-
 
       // Set the second eccentricity ellipse parameter
       // https://en.wikipedia.org/wiki/Eccentricity_(mathematics)#Ellipses
@@ -352,6 +349,9 @@ void SphericalCoordinates::UpdateTransformationMatrix()
                       -cosLon * sinLat, -sinLon * sinLat, cosLat,
                        cosLon * cosLat,  sinLon * cosLat, sinLat);
 
+  // Create a rotation matrix that moves GLOBAL to ECEF
+  // http://www.navipedia.net/index.php/
+  // Transformations_between_ECEF_and_ENU_coordinates
   this->dataPtr->rotGlobalToECEF = ignition::math::Matrix3d(
                       -sinLon, -cosLon * sinLat, cosLon * cosLat,
                        cosLon, -sinLon * sinLat, sinLon * cosLat,
@@ -402,15 +402,11 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
             this->dataPtr->sinHea);
         tmp.Y(-_pos.X() * this->dataPtr->sinHea - _pos.Y() *
             this->dataPtr->cosHea);
-
-        tmp = this->dataPtr->origin + this->dataPtr->rotGlobalToECEF * tmp;
-
-        break;
       }
 
     case GLOBAL:
       {
-        tmp = this->dataPtr->rotGlobalToECEF * tmp;
+        tmp = this->dataPtr->origin + this->dataPtr->rotGlobalToECEF * tmp;
         break;
       }
 
@@ -423,6 +419,7 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
               curvature + _pos.Z()) * sinLat);
         break;
       }
+
     // Do nothing
     case ECEF:
       break;

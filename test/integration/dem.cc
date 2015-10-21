@@ -42,6 +42,7 @@ TEST_F(Dem_TEST, GPS)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
   physics::ModelPtr model = world->GetModel("box1");
+  ASSERT_TRUE(model != NULL);
 
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
@@ -61,7 +62,7 @@ TEST_F(Dem_TEST, GPS)
   // Get the georeference coordinates of the DEM's origin
   dem.Load(path.string());
   dem.GetGeoReferenceOrigin(latitude, longitude);
-  elevation = dem.GetElevation(0, 0);
+  elevation = dem.GetElevation(0.0, 0.0);
 
   EXPECT_NEAR(sensor->Latitude().Degree(), latitude.Degree(), DOUBLE_TOL);
   EXPECT_NEAR(sensor->Longitude().Degree(), longitude.Degree(), DOUBLE_TOL);
