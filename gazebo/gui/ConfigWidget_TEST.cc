@@ -1461,7 +1461,7 @@ void ConfigWidget_TEST::ChildVector3dSignal()
 
   // Change the preset value and check new vector3 at OnVector3dValueChanged
   combos[0]->setCurrentIndex(4);
-  QTest::keyClick(spins[0], Qt::Key_Enter);
+  QTest::keyClick(combos[0], Qt::Key_Enter);
   QVERIFY(g_vector3SignalCount == 2);
 
   delete configWidget;
