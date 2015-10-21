@@ -131,11 +131,25 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
     else
     {
       Ogre::Entity *entity = subEntity->getParent();
+      if (!entity)
+        return NULL;
+
+      std::string userAny = "";
+      try
+      {
+        userAny = Ogre::any_cast<std::string>(
+            entity->getUserObjectBindings().getUserAny());
+      }
+      catch(Ogre::Exception &e)
+      {
+        return NULL;
+      }
 
       rendering::VisualPtr result =
-          this->camera->GetScene()->GetVisual(Ogre::any_cast<std::string>(
-          entity->getUserObjectBindings().getUserAny()));
-      if (result && result->IsPlane())
+          this->camera->GetScene()->GetVisual(userAny);
+
+      if (result && result->IsPlane() &&
+          result->GetName().find("ground_plane") != std::string::npos)
       {
         Ogre::Technique *originalTechnique = _originalMaterial->getTechnique(0);
         if (originalTechnique)
