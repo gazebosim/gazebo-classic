@@ -443,8 +443,7 @@ ignition::math::Vector3d SphericalCoordinates::PositionTransform(
             (tmp.Z() + std::pow(this->dataPtr->ellP, 2) * this->dataPtr->ellB *
              std::pow(sin(theta), 3)) /
             (p - std::pow(this->dataPtr->ellE, 2) *
-             this->dataPtr->ellA * std::pow(cos(theta), 3)
-            ));
+             this->dataPtr->ellA * std::pow(cos(theta), 3)));
 
         double lon = atan2(tmp.Y(), tmp.X());
 
