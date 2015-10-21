@@ -117,6 +117,8 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
 {
   if (_rend && typeid(*_rend) == typeid(Ogre::SubEntity))
   {
+    std::string material = "";
+
     const Ogre::SubEntity *subEntity =
       static_cast<const Ogre::SubEntity *>(_rend);
 
@@ -148,19 +150,33 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
       rendering::VisualPtr result =
           this->camera->GetScene()->GetVisual(userAny);
 
-      if (result && result->IsPlane() &&
-          result->GetName().find("ground_plane") != std::string::npos)
+      if (!result)
+        return NULL;
+
+      if (result->IsPlane())
       {
-        Ogre::Technique *originalTechnique = _originalMaterial->getTechnique(0);
-        if (originalTechnique)
-          return originalTechnique;
+        // use grey color for planes
+        material = "Gazebo/EditorPlane";
+      }
+      else
+      {
+        // set the rest of the visuals to use the model editor
+        // background material
+        material = "Gazebo/Editor";
       }
     }
 
-    // set the rest of the visuals to use the model editor background material
+    if (material.empty())
+      return NULL;
+
+    // set the material for the models
     Ogre::ResourcePtr res =
-        Ogre::MaterialManager::getSingleton().load("Gazebo/Editor",
+        Ogre::MaterialManager::getSingleton().getByName(material);
+    if (res.isNull())
+    {
+        Ogre::MaterialManager::getSingleton().load(material,
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    }
 
     // OGRE 1.9 changes the shared pointer definition
     // But the 1.9 RC, which we're using on Windows, doesn't have the
