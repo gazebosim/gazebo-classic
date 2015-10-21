@@ -111,6 +111,8 @@ namespace gazebo
     class EditorMaterialListener : public Ogre::MaterialManager::Listener
     {
       /// \brief Constructor
+      /// \param[in] _camera Pointer to the camera whose viewport will be
+      /// updated to see the effect of the material switch.
       public: EditorMaterialListener(const rendering::CameraPtr &_camera);
 
       /// \brief Destructor

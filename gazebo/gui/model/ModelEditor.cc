@@ -57,9 +57,19 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->dataPtr->modelPalette);
 
-  this->dataPtr->materialSwitcher.reset(new EditorMaterialSwitcher(
-      boost::dynamic_pointer_cast<rendering::Camera>(
-      gui::get_active_camera())));
+  rendering::CameraPtr camera = boost::dynamic_pointer_cast<rendering::Camera>(
+      gui::get_active_camera());
+  if (camera)
+  {
+    this->dataPtr->materialSwitcher.reset(new EditorMaterialSwitcher(camera));
+  }
+  else
+  {
+    gzerr << "User camera is NULL. "
+        << "Non-editable models will keep their original material"
+        << std::endl;
+  }
+
 
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
