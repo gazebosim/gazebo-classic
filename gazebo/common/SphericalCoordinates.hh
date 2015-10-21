@@ -254,7 +254,7 @@ namespace gazebo
       public: void SetHeadingOffset(const ignition::math::Angle &_angle);
 
       /// \brief Convert a geodetic position vector to Cartesian coordinates.
-      /// \param[in] _xyz Geodetic position int the planetary frame of reference
+      /// \param[in] _xyz Geodetic position in the planetary frame of reference
       /// \return Coordinates: Cartesian position vector in gazebo's world frame
       public: ignition::math::Vector3d LocalFromSpherical(
                   const ignition::math::Vector3d &_xyz) const;
