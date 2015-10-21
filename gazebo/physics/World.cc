@@ -72,6 +72,7 @@
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/World.hh"
@@ -237,8 +238,15 @@ void World::Load(sdf::ElementPtr _sdf)
                                            &World::OnRequest, this, true);
   this->dataPtr->jointSub = this->dataPtr->node->Subscribe("~/joint",
       &World::JointLog, this);
+
   this->dataPtr->lightSub = this->dataPtr->node->Subscribe("~/light",
       &World::OnLightMsg, this);
+  this->dataPtr->lightFactorySub =
+      this->dataPtr->node->Subscribe("~/factory/light",
+      &World::OnLightFactoryMsg, this);
+  this->dataPtr->lightModifySub =
+      this->dataPtr->node->Subscribe("~/light/modify",
+      &World::OnLightModifyMsg, this);
 
   this->dataPtr->modelSub = this->dataPtr->node->Subscribe<msgs::Model>(
       "~/model/modify", &World::OnModelMsg, this);
@@ -251,7 +259,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->modelPub = this->dataPtr->node->Advertise<msgs::Model>(
       "~/model/info");
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
-      "~/light");
+      "~/light/modify");
 
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
@@ -849,6 +857,7 @@ void World::Fini()
   this->dataPtr->plugins.clear();
 
   this->dataPtr->publishModelPoses.clear();
+  this->dataPtr->publishLightPoses.clear();
 
   this->dataPtr->node->Fini();
 
@@ -946,6 +955,13 @@ ModelPtr World::GetModel(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+LightPtr World::Light(const std::string &_name)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
+  return boost::dynamic_pointer_cast<physics::Light>(this->GetByName(_name));
+}
+
+//////////////////////////////////////////////////
 EntityPtr World::GetEntity(const std::string &_name)
 {
   return boost::dynamic_pointer_cast<Entity>(this->GetByName(_name));
@@ -982,6 +998,31 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
+LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
+
+  if (_sdf->GetName() != "light")
+  {
+    gzerr << "SDF is missing the <light> tag" << std::endl;
+    return NULL;
+  }
+
+  // Add to scene message
+  msgs::Light *msg = this->dataPtr->sceneMsg.add_light();
+  msg->CopyFrom(msgs::LightFromSDF(_sdf));
+
+  // Create new light object
+  LightPtr light(new physics::Light(_parent));
+  light->ProcessMsg(*msg);
+  light->SetWorld(shared_from_this());
+  light->Load(_sdf);
+  this->dataPtr->lights.push_back(light);
+
+  return light;
+}
+
+//////////////////////////////////////////////////
 ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
 {
   ActorPtr actor(new Actor(_parent));
@@ -1013,8 +1054,7 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
     sdf::ElementPtr childElem = _sdf->GetElement("light");
     while (childElem)
     {
-      msgs::Light *lm = this->dataPtr->sceneMsg.add_light();
-      lm->CopyFrom(msgs::LightFromSDF(childElem));
+      this->LoadLight(childElem, _parent);
 
       childElem = childElem->GetNextElement("light");
     }
@@ -1081,6 +1121,12 @@ ModelPtr World::GetModel(unsigned int _index) const
 Model_V World::GetModels() const
 {
   return this->dataPtr->models;
+}
+
+//////////////////////////////////////////////////
+Light_V World::Lights() const
+{
+  return this->dataPtr->lights;
 }
 
 //////////////////////////////////////////////////
@@ -1669,9 +1715,78 @@ void World::ProcessModelMsgs()
 }
 
 //////////////////////////////////////////////////
+void World::ProcessLightModifyMsgs()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  for (auto const &lightModifyMsg : this->dataPtr->lightModifyMsgs)
+  {
+    LightPtr light = this->Light(lightModifyMsg.name());
+
+    if (!light)
+    {
+      gzerr << "Light [" << lightModifyMsg.name() << "] not found."
+          << " Use topic ~/factory/light to spawn a new light." << std::endl;
+      continue;
+    }
+    else
+    {
+      // Update in scene message
+      for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
+      {
+        if (this->dataPtr->sceneMsg.light(i).name() == lightModifyMsg.name())
+        {
+          this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(lightModifyMsg);
+          break;
+        }
+      }
+
+      // Update light object
+      light->ProcessMsg(lightModifyMsg);
+    }
+  }
+
+  if (!this->dataPtr->lightModifyMsgs.empty())
+  {
+    this->dataPtr->lightModifyMsgs.clear();
+  }
+}
+
+//////////////////////////////////////////////////
+void World::ProcessLightFactoryMsgs()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  for (auto const &lightFactoryMsg : this->dataPtr->lightFactoryMsgs)
+  {
+    LightPtr light = this->Light(lightFactoryMsg.name());
+
+    if (light)
+    {
+      gzerr << "Light [" << lightFactoryMsg.name() << "] already exists."
+          << " Use topic ~/light/modify to modify it." << std::endl;
+      continue;
+    }
+    else
+    {
+      // Add to world SDF
+      sdf::ElementPtr lightSDF = msgs::LightToSDF(lightFactoryMsg);
+      lightSDF->SetParent(this->dataPtr->sdf);
+      lightSDF->GetParent()->InsertElement(lightSDF);
+
+      // Create new light object
+      this->LoadLight(lightSDF, this->dataPtr->rootElement);
+    }
+  }
+
+  if (!this->dataPtr->lightFactoryMsgs.empty())
+  {
+    this->dataPtr->lightFactoryMsgs.clear();
+  }
+}
+
+//////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
-  std::list<sdf::ElementPtr> modelsToLoad;
+  std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
@@ -1805,11 +1920,7 @@ void World::ProcessFactoryMsgs()
         }
         else if (isLight)
         {
-          /// \TODO: Current broken. See Issue #67.
-          msgs::Light *lm = this->dataPtr->sceneMsg.add_light();
-          lm->CopyFrom(msgs::LightFromSDF(elem));
-
-          this->dataPtr->lightPub->Publish(*lm);
+          lightsToLoad.push_back(elem);
         }
       }
     }
@@ -1817,6 +1928,7 @@ void World::ProcessFactoryMsgs()
     this->dataPtr->factoryMsgs.clear();
   }
 
+  // Load models
   for (auto const &elem : modelsToLoad)
   {
     try
@@ -1830,6 +1942,21 @@ void World::ProcessFactoryMsgs()
     catch(...)
     {
       gzerr << "Loading model from factory message failed\n";
+    }
+  }
+
+  // Load lights
+  for (auto const &elem : lightsToLoad)
+  {
+    try
+    {
+      boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+      LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+    }
+    catch(...)
+    {
+      gzerr << "Loading light from factory message failed\n";
     }
   }
 }
@@ -1871,6 +1998,7 @@ void World::SetState(const WorldState &_state)
   this->dataPtr->logRealTime = _state.GetRealTime();
   this->dataPtr->iterations = _state.GetIterations();
 
+  // Models
   const ModelState_M modelStates = _state.GetModelStates();
   for (auto const &modelState : modelStates)
   {
@@ -1879,6 +2007,20 @@ void World::SetState(const WorldState &_state)
       model->SetState(modelState.second);
     else
       gzerr << "Unable to find model[" << modelState.second.GetName() << "]\n";
+  }
+
+  // Lights
+  const LightState_M lightStates = _state.LightStates();
+  for (auto const &lightState : lightStates)
+  {
+    LightPtr light = this->Light(lightState.second.GetName());
+    if (light)
+      light->SetState(lightState.second);
+    else
+    {
+      gzerr << "Unable to find light[" << lightState.second.GetName() << "]"
+            << std::endl;
+    }
   }
 }
 
@@ -2084,7 +2226,29 @@ void World::ProcessMessages()
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
+    this->ProcessLightFactoryMsgs();
+    this->ProcessLightModifyMsgs();
     this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
+  }
+
+  // Process light poses after light factory
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
+    if (!this->dataPtr->publishLightPoses.empty() && this->dataPtr->lightPub &&
+        this->dataPtr->lightPub->HasConnections())
+    {
+      for (auto const &light : this->dataPtr->publishLightPoses)
+      {
+        // Publish the light's world pose
+        // \todo Change to relative once lights can be attached to links
+        msgs::Light lightMsg;
+        lightMsg.set_name(light->GetScopedName());
+        msgs::Set(lightMsg.mutable_pose(), light->GetWorldPose().Ign());
+        this->dataPtr->lightPub->Publish(lightMsg);
+      }
+    }
+    this->dataPtr->publishLightPoses.clear();
   }
 }
 
@@ -2133,6 +2297,15 @@ void World::PublishModelPose(physics::ModelPtr _model)
 
   // Only add if the model name is not in the list
   this->dataPtr->publishModelPoses.insert(_model);
+}
+
+//////////////////////////////////////////////////
+void World::PublishLightPose(const physics::LightPtr _light)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
+  // Only add if the light name is not in the list
+  this->dataPtr->publishLightPoses.insert(_light);
 }
 
 //////////////////////////////////////////////////
@@ -2224,7 +2397,20 @@ void World::RemoveModel(const std::string &_name)
       childElem = childElem->GetNextElement("light");
     if (childElem)
     {
+      // Remove light object
+      for (auto light = this->dataPtr->lights.begin();
+          light != this->dataPtr->lights.end(); ++light)
+      {
+        if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
+        {
+          this->dataPtr->lights.erase(light);
+          break;
+        }
+      }
+
+      // Remove from SDF
       this->dataPtr->sdf->RemoveChild(childElem);
+
       // Find the light by name in the scene msg, and remove it.
       for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
       {
@@ -2269,42 +2455,40 @@ void World::RemoveModel(const std::string &_name)
       }
     }
   }
+
+  // Cleanup the publishLightPoses list.
+  {
+    boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
+    for (auto light : this->dataPtr->publishLightPoses)
+    {
+      if (light->GetName() == _name || light->GetScopedName() == _name)
+      {
+        this->dataPtr->publishLightPoses.erase(light);
+        break;
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
-void World::OnLightMsg(ConstLightPtr &_msg)
+void World::OnLightMsg(ConstLightPtr &/*_msg*/)
+{
+  gzerr << "Topic ~/light deprecated, use ~/factory/light to spawn new lights "
+      << "and ~/light/modify to modify existing lights." << std::endl;
+}
+
+/////////////////////////////////////////////////
+void World::OnLightModifyMsg(ConstLightPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->lightModifyMsgs.push_back(*_msg);
+}
 
-  bool lightExists = false;
-
-  // Find the light by name, and copy the new parameters.
-  for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
-  {
-    if (this->dataPtr->sceneMsg.light(i).name() == _msg->name())
-    {
-      lightExists = true;
-      this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(*_msg);
-
-      sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("light");
-      while (childElem && childElem->Get<std::string>("name") != _msg->name())
-        childElem = childElem->GetNextElement("light");
-      if (childElem)
-        msgs::LightToSDF(*_msg, childElem);
-      break;
-    }
-  }
-
-  // Add a new light if the light doesn't exist.
-  if (!lightExists)
-  {
-    this->dataPtr->sceneMsg.add_light()->CopyFrom(*_msg);
-
-    // add to the world sdf
-    sdf::ElementPtr lightSDF = msgs::LightToSDF(*_msg);
-    lightSDF->SetParent(this->dataPtr->sdf);
-    lightSDF->GetParent()->InsertElement(lightSDF);
-  }
+/////////////////////////////////////////////////
+void World::OnLightFactoryMsg(ConstLightPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->lightFactoryMsgs.push_back(*_msg);
 }
 
 /////////////////////////////////////////////////
