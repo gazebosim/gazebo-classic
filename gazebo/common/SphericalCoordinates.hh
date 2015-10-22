@@ -255,14 +255,14 @@ namespace gazebo
 
       /// \brief Convert a geodetic position vector to Cartesian coordinates.
       /// \param[in] _xyz Geodetic position in the planetary frame of reference
-      /// \return Coordinates: Cartesian position vector in gazebo's world frame
+      /// \return Cartesian vector in Gazebo's world frame
       public: ignition::math::Vector3d LocalFromSpherical(
                   const ignition::math::Vector3d &_xyz) const;
 
-      /// \brief Convert a Cartesian velocity vector with components East,
-      /// North, Up to a global Gazebo cartesian frame vector XYZ
-      /// \param[in] _xyz Cartesian vector in gazebo's world frame.
-      /// \return Rotated vector with components (x,y,z): (East, North, Up).
+      /// \brief Convert a Cartesian vector with components East,
+      /// North, Up to a local Gazebo cartesian frame vector XYZ.
+      /// \param[in] Vector with components (x,y,z): (East, North, Up).
+      /// \return Cartesian vector in Gazebo's world frame.
       public: ignition::math::Vector3d LocalFromGlobal(
                   const ignition::math::Vector3d &_xyz) const;
 
