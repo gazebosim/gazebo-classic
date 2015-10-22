@@ -1,6 +1,9 @@
 ## Gazebo 6.0
 
-### Gazebo 6.x.x
+### Gazebo 6.5.0 (2015-10-22)
+
+1. Added ability to convert from spherical coordinates to local coordinates.
+    * [Pull request #1955](https://bitbucket.org/osrf/gazebo/pull-request/1955)
 
 ### Gazebo 6.4.0 (2015-10-14)
 
