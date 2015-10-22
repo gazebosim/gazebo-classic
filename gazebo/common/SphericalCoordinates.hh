@@ -25,6 +25,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Matrix3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -47,6 +48,23 @@ namespace gazebo
                 /// \brief Model of reference ellipsoid for earth, based on
                 /// WGS 84 standard. see wikipedia: World_Geodetic_System
                 EARTH_WGS84 = 1
+              };
+
+      /// \enum CoordinateType
+      /// \brief Unique identifiers for coordinate types.
+      public: enum CoordinateType
+              {
+                /// \brief Latitude, Longitude and Altitude by SurfaceType
+                SPHERICAL = 1,
+
+                /// \brief Earth centered, earth fixed Cartesian
+                ECEF = 2,
+
+                /// \brief Local tangent plane (East, North, Up)
+                GLOBAL = 3,
+
+                /// \brief Heading-adjusted tangent plane (X, Y, Z)
+                LOCAL = 4
               };
 
       /// \brief Constructor.
@@ -152,7 +170,6 @@ namespace gazebo
                                      const ignition::math::Angle &_latB,
                                      const ignition::math::Angle &_lonB);
 
-
       /// \brief Get SurfaceType currently in use.
       /// \return Current SurfaceType value.
       public: SurfaceType GetSurfaceType() const;
@@ -236,7 +253,41 @@ namespace gazebo
       /// \param[in] _angle Heading offset for gazebo frame.
       public: void SetHeadingOffset(const ignition::math::Angle &_angle);
 
-      /// internal
+      /// \brief Convert a geodetic position vector to Cartesian coordinates.
+      /// \param[in] _xyz Geodetic position in the planetary frame of reference
+      /// \return Cartesian vector in Gazebo's world frame
+      public: ignition::math::Vector3d LocalFromSpherical(
+                  const ignition::math::Vector3d &_xyz) const;
+
+      /// \brief Convert a Cartesian vector with components East,
+      /// North, Up to a local Gazebo cartesian frame vector XYZ.
+      /// \param[in] Vector with components (x,y,z): (East, North, Up).
+      /// \return Cartesian vector in Gazebo's world frame.
+      public: ignition::math::Vector3d LocalFromGlobal(
+                  const ignition::math::Vector3d &_xyz) const;
+
+      /// \brief Update coordinate transformation matrix with reference location
+      public: void UpdateTransformationMatrix();
+
+      /// \brief Convert between positions in SPHERICAL/ECEF/LOCAL/GLOBAL frame
+      /// \param[in] _pos Position vector in frame defined by parameter _in
+      /// \param[in] _in  CoordinateType for input
+      /// \param[in] _out CoordinateType for output
+      /// \return Transformed coordinate using cached orgin
+      public: ignition::math::Vector3d
+              PositionTransform(const ignition::math::Vector3d &_pos,
+                  const CoordinateType &_in, const CoordinateType &_out) const;
+
+      /// \brief Convert between velocity in SPHERICAL/ECEF/LOCAL/GLOBAL frame
+      /// \param[in] _pos Velocity vector in frame defined by parameter _in
+      /// \param[in] _in  CoordinateType for input
+      /// \param[in] _out CoordinateType for output
+      /// \return Transformed velocity vector
+      public: ignition::math::Vector3d VelocityTransform(
+                  const ignition::math::Vector3d &_vel,
+                  const CoordinateType &_in, const CoordinateType &_out) const;
+
+      /// \internal
       /// \brief Pointer to the private data
       private: SphericalCoordinatesPrivate *dataPtr;
     };
