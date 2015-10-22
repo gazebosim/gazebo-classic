@@ -36,6 +36,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/MainWindow.hh"
 
+#include "gazebo/gui/model/JointCreationDialog.hh"
 #include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointMaker.hh"
@@ -77,6 +78,8 @@ JointMaker::JointMaker()
   this->jointTypes[JOINT_BALL]      = "ball";
   this->jointTypes[JOINT_GEARBOX]   = "gearbox";
   this->jointTypes[JOINT_NONE]      = "none";
+
+  this->jointCreationDialog = new JointCreationDialog(this);
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -565,6 +568,8 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
     // Add an event filter, which allows the JointMaker to capture mouse events.
     MouseEventHandler::Instance()->AddMoveFilter("model_joint",
         boost::bind(&JointMaker::OnMouseMove, this, _1));
+
+    this->jointCreationDialog->Open(_type);
   }
   else
   {

@@ -47,6 +47,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class JointCreationDialog;
     class JointData;
     class JointInspector;
 
@@ -354,6 +355,8 @@ namespace gazebo
       /// \brief List of all links currently in the editor. The first string is
       /// the link's fully scoped name and the second is the leaf name.
       private: std::map<std::string, std::string> linkList;
+
+      private: JointCreationDialog *jointCreationDialog;
     };
     /// \}
 

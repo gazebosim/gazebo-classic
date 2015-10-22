@@ -4,6 +4,7 @@ set (sources_local
   model/CollisionConfig.cc
   model/ExtrudeDialog.cc
   model/ImportDialog.cc
+  model/JointCreationDialog.cc
   model/JointInspector.cc
   model/JointMaker.cc
   model/LinkConfig.cc
@@ -21,6 +22,7 @@ set (qt_headers_local
   model/CollisionConfig.hh
   model/ExtrudeDialog.hh
   model/ImportDialog.hh
+  model/JointCreationDialog.hh
   model/JointInspector.hh
   model/JointMaker.hh
   model/LinkConfig.hh
