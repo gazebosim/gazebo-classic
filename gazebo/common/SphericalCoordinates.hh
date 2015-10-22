@@ -270,7 +270,7 @@ namespace gazebo
       public: void UpdateTransformationMatrix();
 
       /// \brief Convert between positions in SPHERICAL/ECEF/LOCAL/GLOBAL frame
-      /// \param[in] _pos Position vectot in frame defined by parameter _in
+      /// \param[in] _pos Position vector in frame defined by parameter _in
       /// \param[in] _in  CoordinateType for input
       /// \param[in] _out CoordinateType for output
       /// \return Transformed coordinate using cached orgin
