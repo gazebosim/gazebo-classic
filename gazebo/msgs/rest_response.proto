@@ -1,0 +1,32 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestResponse
+/// \brief A message for reporting a response from a REST service call
+
+message RestResponse
+{
+  enum Type
+  {
+    /// \brief Rest service call was successfull
+    SUCCESS = 1;
+
+    /// \brief Error calling rest service
+    ERROR    = 2;
+
+    /// \brief Response to a login request
+    LOGIN    = 3;
+
+    /// \brief Response to a logout request
+    LOGOUT   = 4;
+  }
+
+  /// \brief ID of the response message
+  optional int32 id    = 1;
+
+  /// \brief Type of response
+  required Type type   = 2;
+
+  /// \brief Message describing the response
+  optional string msg  = 3;
+}
