@@ -398,14 +398,6 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           this->mouseJoint = newJoint;
           this->newJointCreated = true;
 
-          std::string jointParentName = this->mouseJoint->parent->GetName();
-          size_t pIdx = jointParentName.find_last_of("::");
-          if (pIdx != std::string::npos)
-            jointParentName = jointParentName.substr(pIdx+1);
-          std::string jointChildName = this->mouseJoint->child->GetName();
-          size_t cIdx = jointChildName.find_last_of("::");
-          if (cIdx != std::string::npos)
-            jointChildName = jointChildName.substr(cIdx+1);
           gui::model::Events::modelChanged();
         }
       }
