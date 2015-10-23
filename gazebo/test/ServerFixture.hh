@@ -36,6 +36,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/common/CommonIface.hh"
@@ -289,6 +291,20 @@ namespace gazebo
                    const std::string &_noiseType = "", double _noiseMean = 0.0,
                    double _noiseStdDev = 0.0);
 
+    /// \brief Spawn a sonar.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _sonarName Name of the sonar.
+    /// \param[in] _pose Sonar pose.
+    /// \param[in] _minRange Minimum sonar range.
+    /// \param[in] _maxRange Maximum sonar range.
+    /// \param[in] _radius Sonar cone radius.
+    protected: sensors::SonarSensorPtr SpawnSonar(const std::string &_modelName,
+                   const std::string &_sonarName,
+                   const ignition::math::Pose3d &_pose,
+                   const double _minRange,
+                   const double _maxRange,
+                   const double _radius);
+
     /// \brief Spawn a gpu laser.
     /// \param[in] _modelName Name of the model.
     /// \param[in] _raySensorName Name of the laser.
@@ -455,8 +471,26 @@ namespace gazebo
     /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
     /// \param[in] _retries Number of iterations until give up
     protected: void WaitUntilSensorSpawn(const std::string &_name,
-                                       unsigned int _sleepEach,
-                                       int _retries);
+                                         unsigned int _sleepEach,
+                                         int _retries);
+
+    /// \brief Wait for a number of ms. and attempts until the world reaches a
+    /// target "iterations" value
+    /// \param _goalIteration Target iterations value
+    /// \param _sleepEach Number of milliseconds to sleep in each iteration
+    /// \param _retries Number of iterations until give up
+    protected: void WaitUntilIteration(const uint32_t _goalIteration,
+                                       const int _sleepEach,
+                                       const int _retries) const;
+
+    /// \brief Wait for a number of ms. and attempts until the world reaches a
+    /// target simulation time
+    /// \param _goalTime Target simulation time.
+    /// \param _sleepEach Number of milliseconds to sleep in each iteration
+    /// \param _retries Number of iterations until give up
+    protected: void WaitUntilSimTime(const common::Time &_goalTime,
+                                     const int _ms,
+                                     const int _maxRetries) const;
 
     /// \brief Spawn a light.
     /// \param[in] _name Name for the light.

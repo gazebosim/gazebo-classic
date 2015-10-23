@@ -25,6 +25,8 @@
 #include <tbb/blocked_range.h>
 #include <float.h>
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
@@ -1103,15 +1105,22 @@ void Model::SetState(const ModelState &_state)
       gzerr << "Unable to find link[" << iter->first << "]\n";
   }
 
-  ModelState_M modelStates = _state.GetModelStates();
-  for (ModelState_M::iterator iter = modelStates.begin();
-       iter != modelStates.end(); ++iter)
+  for (const auto &ms : _state.NestedModelStates())
   {
-    ModelPtr model = this->NestedModel(iter->first);
+    ModelPtr model = this->NestedModel(ms.first);
     if (model)
-      model->SetState(iter->second);
+      model->SetState(ms.second);
     else
-      gzerr << "Unable to find model[" << iter->first << "]\n";
+      gzerr << "Unable to find model[" << ms.first << "]\n";
+  }
+
+  for (const auto &ms : _state.NestedModelStates())
+  {
+    ModelPtr model = this->NestedModel(ms.first);
+    if (model)
+      model->SetState(ms.second);
+    else
+      gzerr << "Unable to find model[" << ms.first << "]\n";
   }
 
   // For now we don't use the joint state values to set the state of

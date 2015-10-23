@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_DATA_HH_
-#define _MODEL_DATA_HH_
+#ifndef _GAZEBO_MODEL_DATA_HH_
+#define _GAZEBO_MODEL_DATA_HH_
 
 #include <map>
 #include <string>
@@ -47,32 +47,41 @@ namespace gazebo
       public: static double GetEditTransparency();
     };
 
-    class NestedModelData
+    /// \brief Helper class to store nested models data.
+    class GZ_GUI_VISIBLE NestedModelData
     {
+      /// \brief Set the name of the model.
+      /// \param[in] _name Name of model.
       public: void SetName(const std::string &_name);
 
       /// \brief Set the pose of the model.
       /// \param[in] _pose Pose of model.
-      public: void SetPose(const math::Pose &_pose);
+      public: void SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Get the pose of the nested model.
       /// \return Pose of nested model.
-      public: math::Pose GetPose() const;
+      public: ignition::math::Pose3d Pose() const;
 
-      /// \brief Clone the link data.
-      /// \param[in] _newName Name to give to the cloned link.
-      /// \return A clone of this link data.
+      /// \brief Clone the nested model data.
+      /// \param[in] _newName Name to give to the cloned nested model.
+      /// \return A clone of this nested model data.
       public: NestedModelData *Clone(const std::string &_newName);
 
+      /// \brief Clone children of a visual.
+      /// \param[in] _from the visual being cloned
+      /// \param[in] _to the cloned visual
       public: void CloneChildren(rendering::VisualPtr _from,
           rendering::VisualPtr _to);
+
+      /// \brief Get the depth of the nested model. The root model has depth 1.
+      /// \return Depth of nested model. Returns -1 if depth cannot be found.
+      public: int Depth() const;
 
       /// \brief SDF representing the model data.
       public: sdf::ElementPtr modelSDF;
 
       /// \brief Visual representing this model.
       public: rendering::VisualPtr modelVisual;
-
       /// \brief Models inside this model
       public: std::map<std::string, rendering::VisualPtr> models;
 
@@ -126,7 +135,9 @@ namespace gazebo
 
       /// \brief Add a collision to the link.
       /// \param[in] _collisionVis Visual representing the collision.
-      public: void AddCollision(rendering::VisualPtr _collisionVis);
+      /// \param[in] _msg Optional message containing collision params.
+      public: void AddCollision(rendering::VisualPtr _collisionVis,
+          const msgs::Collision *_msg = NULL);
 
       /// \brief Update the inspector widget if necessary.
       public: void UpdateConfig();

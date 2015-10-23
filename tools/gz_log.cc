@@ -21,7 +21,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/algorithm/string/regex.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 

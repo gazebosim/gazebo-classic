@@ -1023,7 +1023,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       if (findex[i] < 0)
         Ad[i] = sor_w / (sum + cfm[i]);
       else
-        Ad[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
+        Ad[i] = qs->contact_sor_scale * sor_w / (sum + cfm[i]);
     }
   }
 
@@ -1049,7 +1049,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
         if (findex[i] < 0)
           Ad_precon[i] = sor_w / (sum + cfm[i]);
         else
-          Ad_precon[i] = CONTACT_SOR_SCALE * sor_w / (sum + cfm[i]);
+          Ad_precon[i] = qs->contact_sor_scale * sor_w / (sum + cfm[i]);
       }
     }
 
