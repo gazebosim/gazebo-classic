@@ -21,6 +21,8 @@
 #endif
 
 #include <sdf/sdf.hh>
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include "gazebo/gazebo_config.h"
@@ -303,7 +305,12 @@ void MainWindow::Init()
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this, true);
 
-  this->lightSub = this->node->Subscribe("~/light", &MainWindow::OnLight, this);
+  // \todo Treating both light topics the same way, this should be improved
+  this->lightModifySub = this->node->Subscribe("~/light/modify",
+      &MainWindow::OnLight, this);
+
+  this->lightFactorySub = this->node->Subscribe("~/factory/light",
+      &MainWindow::OnLight, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",

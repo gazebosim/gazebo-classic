@@ -37,6 +37,7 @@ event::EventT<void (std::string)> model::Events::nestedModelInserted;
 event::EventT<void (std::string)> model::Events::linkInserted;
 event::EventT<void (std::string)> model::Events::nestedModelRemoved;
 event::EventT<void (std::string)> model::Events::linkRemoved;
+event::EventT<void (std::string)> model::Events::requestLinkRemoval;
 event::EventT<void (std::string, std::string, std::string, std::string,
     std::string)> model::Events::jointInserted;
 event::EventT<void (std::string)> model::Events::jointRemoved;
@@ -50,8 +51,12 @@ event::EventT<void (std::string, std::string)> model::Events::jointNameChanged;
 event::EventT<void (std::string)> model::Events::showNestedModelContextMenu;
 event::EventT<void (std::string)> model::Events::showLinkContextMenu;
 event::EventT<void (std::string)> model::Events::showJointContextMenu;
+event::EventT<void (std::string)> model::Events::showModelPluginContextMenu;
 event::EventT<void (std::string, bool)> model::Events::setSelectedLink;
 event::EventT<void (std::string, bool)> model::Events::setSelectedJoint;
+event::EventT<void (std::string, bool)> model::Events::setSelectedModelPlugin;
 event::EventT<void (std::string)> model::Events::modelPluginInserted;
+event::EventT<void (std::string)> model::Events::modelPluginRemoved;
+event::EventT<void (std::string)> model::Events::requestModelPluginRemoval;
 event::EventT<void (std::string, std::string, std::string)>
     model::Events::editModel;

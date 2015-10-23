@@ -20,9 +20,10 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <iomanip>
 
-#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 

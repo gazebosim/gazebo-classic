@@ -254,13 +254,13 @@ namespace gazebo
 
       /// \brief Convert a World_Solver_Type enum to a string.
       /// \param[in] _solverType World_Solver_Type enum.
-      /// \return world solver type string. Returns "unknown" if
+      /// \return World solver type string. Returns "unknown" if
       /// _solverType is unrecognized.
       public: static std::string
               ConvertWorldStepSolverType(const World_Solver_Type _solverType);
 
       /// \brief Convert a string to a World_Solver_Type enum.
-      /// \param[in] _solverType world solver type string.
+      /// \param[in] _solverType World solver type string.
       /// \return A World_Solver_Type enum. Defaults to ODE_DEFAULT
       /// if _solverType is unrecognized.
       public: static World_Solver_Type

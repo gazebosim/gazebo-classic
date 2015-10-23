@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/bind.hpp>
 #include <string>
 
 #include "gazebo/gazebo_config.h"
@@ -401,7 +402,6 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   if (!this->dataPtr->active)
   {
     this->CreateMenus();
-    this->dataPtr->mainWindowPaused = this->mainWindow->IsPaused();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("modelEditorTab");
     this->mainWindow->ShowMenuBar(this->dataPtr->menuBar);
@@ -414,8 +414,6 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->ShowMenuBar();
     this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
-    if (!this->dataPtr->mainWindowPaused)
-      this->mainWindow->Play();
   }
 
 #ifdef HAVE_GRAPHVIZ

@@ -20,6 +20,7 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/model/JointInspector.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointMaker_TEST.hh"
 
@@ -570,6 +571,50 @@ void JointMaker_TEST::JointMaterial()
     QVERIFY(jointMaterials.find(mat) == jointMaterials.end());
     jointMaterials.insert(mat);
   }
+  delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointMaker_TEST::LinkList()
+{
+  this->Load("worlds/empty.world");
+
+  gui::JointMaker *jointMaker = new gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Check there are no links in the beginning
+  auto linkList = jointMaker->LinkList();
+  QVERIFY(linkList.empty());
+
+  // Send notification that a link has been inserted
+  gui::model::Events::linkInserted("model::link1");
+  QTest::qWait(200);
+
+  // Check it was received
+  linkList = jointMaker->LinkList();
+  QVERIFY(linkList.size() == 1);
+  QVERIFY(linkList.find("model::link1") != linkList.end());
+  QVERIFY(linkList["model::link1"] == "link1");
+
+  // Send notification that another link has been inserted
+  gui::model::Events::linkInserted("model::link2");
+  QTest::qWait(200);
+
+  // Check it was received
+  linkList = jointMaker->LinkList();
+  QVERIFY(linkList.size() == 2);
+  QVERIFY(linkList.find("model::link2") != linkList.end());
+  QVERIFY(linkList["model::link2"] == "link2");
+
+  // Send notification that a link has been removed
+  gui::model::Events::linkRemoved("model::link1");
+  QTest::qWait(200);
+
+  // Check it was received
+  linkList = jointMaker->LinkList();
+  QVERIFY(linkList.size() == 1);
+  QVERIFY(linkList.find("model::link1") == linkList.end());
+
   delete jointMaker;
 }
 

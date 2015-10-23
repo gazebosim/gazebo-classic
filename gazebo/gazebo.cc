@@ -22,6 +22,7 @@
 #endif
 
 #include <vector>
+#include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
 #include <sdf/sdf.hh>
 
@@ -111,41 +112,6 @@ bool gazebo::setupServer(const std::vector<std::string> &_args)
   bool result = gazebo::setupServer(_args.size(), &pointers[0]);
 
   // Deallocate memory for the command line arguments allocated with strdup.
-  for (size_t i = 0; i < pointers.size(); ++i)
-    free(pointers.at(i));
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-bool gazebo::setupClient(int _argc, char **_argv)
-{
-  if (!gazebo_shared::setup("client-", _argc, _argv, g_plugins))
-  {
-    gzerr << "Unable to setup Gazebo\n";
-    return false;
-  }
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool gazebo::setupClient(const std::vector<std::string> &_args)
-{
-  std::vector<char *> pointers(_args.size());
-  std::transform(_args.begin(), _args.end(), pointers.begin(),
-                 g_vectorStringDup());
-  pointers.push_back(0);
-
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  bool result = gazebo::setupClient(_args.size(), &pointers[0]);
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
-
-  // Deallocate memory for the command line arguments alloocated with strdup.
   for (size_t i = 0; i < pointers.size(); ++i)
     free(pointers.at(i));
 

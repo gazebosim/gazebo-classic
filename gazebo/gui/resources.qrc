@@ -77,5 +77,6 @@
   <file alias='bricks.png'>../../media/materials/textures/bricks.png</file>
   <file>images/com.png</file>
   <file>images/splash.svg</file>
+  <file>images/swap-parent-child.png</file>
 </qresource>
 </RCC>

@@ -206,6 +206,10 @@ namespace gazebo
       public: void SetSelected(rendering::VisualPtr _jointVis,
           const bool selected);
 
+      /// \brief Get the list of links.
+      /// \return The list of links, with the link scoped name and leaf name.
+      public: std::map<std::string, std::string> LinkList() const;
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -266,6 +270,14 @@ namespace gazebo
       private: void OnSetSelectedJoint(const std::string &_name,
           const bool _selected);
 
+      /// \brief Add a link to the list.
+      /// \param[in] _linkName Scoped link name.
+      private: void OnLinkInserted(const std::string &_linkName);
+
+      /// \brief Remove a link from the list.
+      /// \param[in] _linkId Unique link identifying name.
+      private: void OnLinkRemoved(const std::string &_linkName);
+
       /// \brief Create a joint line.
       /// \param[in] _name Name to give the visual that contains the joint line.
       /// \param[in] _parent Parent of the joint.
@@ -275,6 +287,14 @@ namespace gazebo
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
+
+      /// \brief Qt signal to notify that a link has been inserted.
+      /// \param[in] _linkId Link's unique name.
+      Q_SIGNALS: void EmitLinkInserted(const std::string &_linkId);
+
+      /// \brief Qt signal to notify that a link has been removed.
+      /// \param[in] _linkId Link's unique name.
+      Q_SIGNALS: void EmitLinkRemoved(const std::string &_linkId);
 
       /// \brief Qt Callback to open joint inspector
       private slots: void OnOpenInspector();
@@ -329,14 +349,18 @@ namespace gazebo
       private: std::vector<std::string> scopedLinkedNames;
 
       /// \brief A map of joint type to its string value.
-      private: static std::map<JointMaker::JointType, std::string> jointTypes;
+      public: static std::map<JointMaker::JointType, std::string> jointTypes;
 
       /// \brief A map of joint type to its corresponding material.
-      private: static std::map<JointMaker::JointType, std::string>
+      public: static std::map<JointMaker::JointType, std::string>
           jointMaterials;
 
       /// \brief Name of the model the joints are attached to.
       private: std::string modelName;
+      
+      /// \brief List of all links currently in the editor. The first string is
+      /// the link's fully scoped name and the second is the leaf name.
+      private: std::map<std::string, std::string> linkList;
     };
     /// \}
 
@@ -346,6 +370,12 @@ namespace gazebo
     class GZ_GUI_VISIBLE JointData : public QObject
     {
       Q_OBJECT
+
+      /// \brief Open the joint inspector.
+      public: void OpenInspector();
+
+      /// \brief Update this joint data.
+      public: void Update();
 
       /// \brief Name of the joint.
       public: std::string name;
@@ -394,9 +424,6 @@ namespace gazebo
 
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;
-
-      /// \brief Open the joint inspector.
-      public: void OpenInspector();
 
       /// \brief Qt Callback when joint inspector is to be opened.
       private slots: void OnOpenInspector();

@@ -167,8 +167,8 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectNestedModelInserted(
-            T _subscriber)
+            static event::ConnectionPtr
+            ConnectNestedModelInserted(T _subscriber)
           { return nestedModelInserted.Connect(_subscriber); }
 
         /// \brief Disconnect a Gazebo event from the nested model inserted
@@ -230,6 +230,21 @@ namespace gazebo
         public: static void DisconnectNestedModelRemoved(
             event::ConnectionPtr _subscriber)
           { nestedModelRemoved.Disconnect(_subscriber); }
+                    
+        /// \brief Connect a Gazebo event to the request link removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkRemoval(
+            T _subscriber)
+          { return requestLinkRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestLinkRemoval.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the link removed signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -375,6 +390,21 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { showJointContextMenu.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the show model plugin context menu
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectShowModelPluginContextMenu(T _subscriber)
+          { return showModelPluginContextMenu.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the show model plugin context
+        /// menu signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectShowModelPluginContextMenu(
+            event::ConnectionPtr _subscriber)
+          { showModelPluginContextMenu.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the set selected link signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -401,6 +431,21 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { setSelectedJoint.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the set selected model plugin
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T> static event::ConnectionPtr
+            ConnectSetSelectedModelPlugin(T _subscriber)
+          { return setSelectedModelPlugin.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the set selected model plugin
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectSetSelectedModelPlugin(
+            event::ConnectionPtr _subscriber)
+          { setSelectedModelPlugin.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the edit modelsignal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -425,6 +470,37 @@ namespace gazebo
         public: static void DisconnectModelPluginInserted(
             event::ConnectionPtr _subscriber)
           { modelPluginInserted.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the model plugin removed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectModelPluginRemoved(
+            T _subscriber)
+          { return modelPluginRemoved.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the model plugin removed
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectModelPluginRemoved(
+            event::ConnectionPtr _subscriber)
+          { modelPluginRemoved.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request model plugin removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestModelPluginRemoval(
+            T _subscriber)
+          { return requestModelPluginRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request model plugin
+        /// removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestModelPluginRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestModelPluginRemoval.Disconnect(_subscriber); }
 
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
@@ -468,6 +544,9 @@ namespace gazebo
         public: static event::EventT<void (std::string)> nestedModelRemoved;
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
+
+        /// \brief Request to remove a link.
+        public: static event::EventT<void (std::string)> requestLinkRemoval;
 
         /// \brief Notify that a joint has been inserted. The parameters are:
         /// joint's unique id, joint name, joint type, parent link's name, and
@@ -514,19 +593,34 @@ namespace gazebo
         /// \brief Request to show the joint context menu.
         public: static event::EventT<void (std::string)> showJointContextMenu;
 
-        /// \brief Request to select or deselect an entity.
+        /// \brief Request to show the model plugin context menu.
+        public: static event::EventT<void (std::string)>
+            showModelPluginContextMenu;
+
+        /// \brief Request to select or deselect an link.
         public: static event::EventT<void (std::string, bool)> setSelectedLink;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string, bool)> setSelectedJoint;
 
+        /// \brief Request to select or deselect a model plugin.
+        public: static event::EventT<void (std::string, bool)>
+            setSelectedModelPlugin;
+
         /// \brief Notify that a model plugin has been inserted.
         public: static event::EventT<void (std::string)> modelPluginInserted;
 
+        /// \brief Notify that a model plugin has been removed.
+        public: static event::EventT<void (std::string)> modelPluginRemoved;
+
+        /// \brief Request to remove a model plugin.
+        public: static event::EventT<void (std::string)>
+            requestModelPluginRemoval;
+
         /// \brief Event triggered when an existing model is to be edited in the
-        /// model editor.
+        /// model editor.     
         public: static event::EventT<void (std::string, std::string,
-            std::string)> editModel;
+          std::string)> editModel;
       };
     }
   }

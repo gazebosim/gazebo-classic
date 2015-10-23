@@ -129,26 +129,11 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v)
-    {
-      _pt->set_x(_v.x);
-      _pt->set_y(_v.y);
-      _pt->set_z(_v.z);
-    }
-
-    /////////////////////////////////////////////
     void Set(msgs::Vector3d *_pt, const ignition::math::Vector3d &_v)
     {
       _pt->set_x(_v.X());
       _pt->set_y(_v.Y());
       _pt->set_z(_v.Z());
-    }
-
-    /////////////////////////////////////////////
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v)
-    {
-      _pt->set_x(_v.x);
-      _pt->set_y(_v.y);
     }
 
     /////////////////////////////////////////////
@@ -159,28 +144,12 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v)
-    {
-      _q->set_x(_v.x);
-      _q->set_y(_v.y);
-      _q->set_z(_v.z);
-      _q->set_w(_v.w);
-    }
-
-    /////////////////////////////////////////////
     void Set(msgs::Quaternion *_q, const ignition::math::Quaterniond &_v)
     {
       _q->set_x(_v.X());
       _q->set_y(_v.Y());
       _q->set_z(_v.Z());
       _q->set_w(_v.W());
-    }
-
-    /////////////////////////////////////////////
-    void Set(msgs::Pose *_p, const math::Pose &_v)
-    {
-      Set(_p->mutable_position(), _v.pos.Ign());
-      Set(_p->mutable_orientation(), _v.rot.Ign());
     }
 
     /////////////////////////////////////////////
@@ -229,15 +198,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
-    {
-      Set(_p->mutable_normal(), _v.normal.Ign());
-      _p->mutable_size()->set_x(_v.size.x);
-      _p->mutable_size()->set_y(_v.size.y);
-      _p->set_d(_v.d);
-    }
-
-    /////////////////////////////////////////////////
     void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v)
     {
       Set(_p->mutable_normal(), _v.Normal());
@@ -275,12 +235,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Vector3d Convert(const math::Vector3 &_v)
-    {
-      return Convert(_v.Ign());
-    }
-
-    /////////////////////////////////////////////////
     msgs::Vector3d Convert(const ignition::math::Vector3d &_v)
     {
       msgs::Vector3d result;
@@ -288,12 +242,6 @@ namespace gazebo
       result.set_y(_v.Y());
       result.set_z(_v.Z());
       return result;
-    }
-
-    /////////////////////////////////////////////////
-    msgs::Vector2d Convert(const math::Vector2d &_v)
-    {
-      return Convert(_v.Ign());
     }
 
     /////////////////////////////////////////////////
@@ -306,12 +254,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    msgs::Quaternion Convert(const math::Quaternion &_q)
-    {
-      return Convert(_q.Ign());
-    }
-
-    /////////////////////////////////////////////
     msgs::Quaternion Convert(const ignition::math::Quaterniond &_q)
     {
       msgs::Quaternion result;
@@ -320,12 +262,6 @@ namespace gazebo
       result.set_z(_q.Z());
       result.set_w(_q.W());
       return result;
-    }
-
-    /////////////////////////////////////////////
-    msgs::Pose Convert(const math::Pose &_p)
-    {
-      return Convert(_p.Ign());
     }
 
     /////////////////////////////////////////////
@@ -354,16 +290,6 @@ namespace gazebo
       msgs::Time result;
       result.set_sec(_t.sec);
       result.set_nsec(_t.nsec);
-      return result;
-    }
-
-    msgs::PlaneGeom Convert(const math::Plane &_p)
-    {
-      msgs::PlaneGeom result;
-      result.mutable_normal()->CopyFrom(Convert(_p.normal.Ign()));
-      result.mutable_size()->set_x(_p.size.x);
-      result.mutable_size()->set_y(_p.size.y);
-      result.set_d(_p.d);
       return result;
     }
 
@@ -582,21 +508,9 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    math::Vector3 Convert(const msgs::Vector3d &_v)
-    {
-      return math::Vector3(_v.x(), _v.y(), _v.z());
-    }
-
-    /////////////////////////////////////////////
     ignition::math::Vector3d ConvertIgn(const msgs::Vector3d &_v)
     {
       return ignition::math::Vector3d(_v.x(), _v.y(), _v.z());
-    }
-
-    /////////////////////////////////////////////
-    math::Vector2d Convert(const msgs::Vector2d &_v)
-    {
-      return math::Vector2d(_v.x(), _v.y());
     }
 
     /////////////////////////////////////////////
@@ -606,22 +520,9 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    math::Quaternion Convert(const msgs::Quaternion &_q)
-    {
-      return math::Quaternion(_q.w(), _q.x(), _q.y(), _q.z());
-    }
-
-    /////////////////////////////////////////////
     ignition::math::Quaterniond ConvertIgn(const msgs::Quaternion &_q)
     {
       return ignition::math::Quaterniond(_q.w(), _q.x(), _q.y(), _q.z());
-    }
-
-    /////////////////////////////////////////////
-    math::Pose Convert(const msgs::Pose &_p)
-    {
-      return math::Pose(
-          ConvertIgn(_p.position()), ConvertIgn(_p.orientation()));
     }
 
     /////////////////////////////////////////////
@@ -641,14 +542,6 @@ namespace gazebo
     common::Time Convert(const msgs::Time &_t)
     {
       return common::Time(_t.sec(), _t.nsec());
-    }
-
-    /////////////////////////////////////////////
-    math::Plane Convert(const msgs::PlaneGeom &_p)
-    {
-      return math::Plane(ConvertIgn(_p.normal()),
-          ignition::math::Vector2d(_p.size().x(), _p.size().y()),
-          _p.d());
     }
 
     /////////////////////////////////////////////
@@ -1089,6 +982,219 @@ namespace gazebo
           ss << innerElem->ToString("");
         }
         plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Collision CollisionFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Collision result;
+
+      if (_sdf->GetName() != "collision")
+      {
+        gzerr << "Cannot create a collision message from a ["
+          << _sdf->GetName() << "] SDF element." << std::endl;
+        return result;
+      }
+
+      result.set_name(_sdf->Get<std::string>("name"));
+
+      if (_sdf->HasElement("laser_retro"))
+        result.set_laser_retro(_sdf->Get<double>("laser_retro"));
+
+      if (_sdf->HasElement("max_contacts"))
+        result.set_max_contacts(_sdf->Get<double>("max_contacts"));
+
+      if (_sdf->HasElement("pose"))
+      {
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
+      }
+
+      // Load the geometry
+      if (_sdf->HasElement("geometry"))
+      {
+        auto geomMsg = result.mutable_geometry();
+        geomMsg->CopyFrom(GeometryFromSDF(_sdf->GetElement("geometry")));
+      }
+
+      // Load the surface
+      if (_sdf->HasElement("surface"))
+      {
+        auto surfaceMsg = result.mutable_surface();
+        surfaceMsg->CopyFrom(SurfaceFromSDF(_sdf->GetElement("surface")));
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Surface SurfaceFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Surface result;
+
+      if (_sdf->GetName() != "surface")
+      {
+        gzerr << "Cannot create a surface message from a ["
+          << _sdf->GetName() << "] SDF element." << std::endl;
+        return result;
+      }
+
+      // Load the friction
+      if (_sdf->HasElement("friction"))
+      {
+        auto frictionMsg = result.mutable_friction();
+        frictionMsg->CopyFrom(FrictionFromSDF(_sdf->GetElement("friction")));
+      }
+
+      // Load bounce elements
+      if (_sdf->HasElement("bounce"))
+      {
+        sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
+        if (bounceElem->HasElement("restitution_coefficient"))
+        {
+          result.set_restitution_coefficient(
+              bounceElem->Get<double>("restitution_coefficient"));
+        }
+        if (bounceElem->HasElement("threshold"))
+          result.set_bounce_threshold(bounceElem->Get<double>("threshold"));
+      }
+
+      // Load contact elements. Note the hierarchy differs in SDF and msg
+      if (_sdf->HasElement("contact"))
+      {
+        sdf::ElementPtr contactElem = _sdf->GetElement("contact");
+
+        /// \todo Getting only ODE elements, find a way to get others too
+        if (contactElem->HasElement("ode"))
+        {
+          sdf::ElementPtr odeElem = contactElem->GetElement("ode");
+
+          if (odeElem->HasElement("soft_cfm"))
+            result.set_soft_cfm(odeElem->Get<double>("soft_cfm"));
+
+          if (odeElem->HasElement("soft_erp"))
+            result.set_soft_erp(odeElem->Get<double>("soft_erp"));
+
+          if (odeElem->HasElement("kp"))
+            result.set_kp(odeElem->Get<double>("kp"));
+
+          if (odeElem->HasElement("kd"))
+            result.set_kd(odeElem->Get<double>("kd"));
+
+          if (odeElem->HasElement("max_vel"))
+            result.set_max_vel(odeElem->Get<double>("max_vel"));
+
+          if (odeElem->HasElement("min_depth"))
+            result.set_min_depth(odeElem->Get<double>("min_depth"));
+        }
+
+        if (contactElem->HasElement("collide_without_contact"))
+        {
+          result.set_collide_without_contact(
+              contactElem->Get<bool>("collide_without_contact"));
+        }
+
+        if (contactElem->HasElement("collide_without_contact_bitmask"))
+        {
+          result.set_collide_without_contact_bitmask(
+              contactElem->Get<int>("collide_without_contact_bitmask"));
+        }
+
+        if (contactElem->HasElement("collide_bitmask"))
+        {
+          result.set_collide_bitmask(contactElem->Get<int>("collide_bitmask"));
+        }
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Friction FrictionFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Friction result;
+
+      if (_sdf->GetName() != "friction")
+      {
+        gzerr << "Cannot create a friction message from a ["
+          << _sdf->GetName() << "] SDF element." << std::endl;
+        return result;
+      }
+
+      /// \todo Getting only ODE elements, find a way to get others too
+      if (_sdf->HasElement("ode"))
+      {
+        sdf::ElementPtr odeElem = _sdf->GetElement("ode");
+
+        if (odeElem->HasElement("mu"))
+          result.set_mu(odeElem->Get<double>("mu"));
+
+        if (odeElem->HasElement("mu2"))
+          result.set_mu2(odeElem->Get<double>("mu2"));
+
+        if (odeElem->HasElement("fdir1"))
+        {
+          msgs::Set(result.mutable_fdir1(),
+              odeElem->Get<ignition::math::Vector3d>("fdir1"));
+        }
+
+        if (odeElem->HasElement("slip1"))
+          result.set_slip1(odeElem->Get<double>("slip1"));
+
+        if (odeElem->HasElement("slip2"))
+          result.set_slip2(odeElem->Get<double>("slip2"));
+      }
+
+      // Load torsional friction
+      if (_sdf->HasElement("torsional"))
+      {
+        sdf::ElementPtr torsionalElem = _sdf->GetElement("torsional");
+
+        msgs::Friction::Torsional torsionalMsg;
+
+        if (torsionalElem->HasElement("coefficient"))
+        {
+          torsionalMsg.set_coefficient(
+              torsionalElem->Get<double>("coefficient"));
+        }
+
+        if (torsionalElem->HasElement("use_patch_radius"))
+        {
+          torsionalMsg.set_use_patch_radius(
+              torsionalElem->Get<bool>("use_patch_radius"));
+        }
+
+        if (torsionalElem->HasElement("patch_radius"))
+        {
+          torsionalMsg.set_patch_radius(
+              torsionalElem->Get<double>("patch_radius"));
+        }
+
+        if (torsionalElem->HasElement("surface_radius"))
+        {
+          torsionalMsg.set_surface_radius(
+              torsionalElem->Get<double>("surface_radius"));
+        }
+
+        if (torsionalElem->HasElement("ode"))
+        {
+          sdf::ElementPtr odeElem = torsionalElem->GetElement("ode");
+
+          if (odeElem->HasElement("slip"))
+          {
+            msgs::Friction::Torsional::ODE torsionalOdeMsg;
+            torsionalOdeMsg.set_slip(odeElem->Get<double>("slip"));
+
+            auto torsionalODE = torsionalMsg.mutable_ode();
+            torsionalODE->CopyFrom(torsionalOdeMsg);
+          }
+        }
+
+        auto torsional = result.mutable_torsional();
+        torsional->CopyFrom(torsionalMsg);
       }
 
       return result;
@@ -2319,13 +2425,6 @@ namespace gazebo
         script->set_uri(0, "file://media/materials/scripts/gazebo.material");
         script->set_name("Gazebo/Grey");
       }
-    }
-
-    ////////////////////////////////////////////////////////
-    void AddBoxLink(Model &_model, const double _mass,
-                    const math::Vector3 &_size)
-    {
-      AddBoxLink(_model, _mass, _size.Ign());
     }
 
     ////////////////////////////////////////////////////////

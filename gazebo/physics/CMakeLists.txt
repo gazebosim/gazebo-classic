@@ -59,6 +59,8 @@ set (sources ${sources}
   Joint.cc
   JointController.cc
   JointState.cc
+  Light.cc
+  LightState.cc
   Link.cc
   LinkState.cc
   MapShape.cc
@@ -105,6 +107,8 @@ set (headers
   JointController.hh
   JointWrench.hh
   JointState.hh
+  Light.hh
+  LightState.hh
   Link.hh
   LinkState.hh
   MapShape.hh
@@ -179,6 +183,9 @@ set (gtest_sources
   CylinderShape_TEST.cc
   Inertial_TEST.cc
   JointController_TEST.cc
+  Light_TEST.cc
+  LightState_TEST.cc
+  ModelState_TEST.cc
   PhysicsEngine_TEST.cc
   PresetManager_TEST.cc
   Road_TEST.cc
