@@ -37,7 +37,6 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
     logoutMenuAction(_logout),
     title(_menuTitle),
     node(new gazebo::transport::Node()),
-    logoutDialog(this, _defautlUrl),
     loginDialog(this, _loginTitle, _urlLabel, _defautlUrl)
 {
   this->node->Init();
@@ -45,9 +44,11 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
       "/gazebo/rest/rest_login");
   this->logoutPub = node->Advertise<gazebo::msgs::RestLogout>(
       "/gazebo/rest/rest_logout");
-  this->errorSub = node->Subscribe("/gazebo/rest/rest_error",
+  this->responseSub = node->Subscribe("/gazebo/rest/rest_response",
                                    &RestUiWidget::OnResponse,
                                    this);
+
+  this->restID = common::Time::GetWallTime().nsec;
 
   this->toolbar = NULL;
   gui::MainWindow *mainWindow = qobject_cast<gui::MainWindow *>(_parent);
@@ -67,23 +68,34 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
     gzerr << "Unable to find Gazebo toolbar. Log-in status will not be shown"
         << std::endl;
   }
-
 }
 
 /////////////////////////////////////////////////
 void RestUiWidget::Logout()
 {
-  if (this->logoutDialog.exec() != QDialog::Rejected)
-  {
-    gazebo::msgs::RestLogout msg;
-    std::string url = this->loginDialog.GetUrl();
-    msg.set_url(url);
-    gzmsg << "Logging out from: " << url << std::endl;
-    this->logoutPub->Publish(msg);
-    this->loginMenuAction.setEnabled(true);
-    this->logoutMenuAction.setEnabled(false);
-    this->loginLabel->setText(tr(""));
-  }
+  QMessageBox msgBox(QMessageBox::NoIcon, QString("Logout"),
+      QString("Are you ready to log out?\n\n"));
+
+  QPushButton *cancelButton = msgBox.addButton("Cancel",
+      QMessageBox::RejectRole);
+  QPushButton *logoutButton =
+      msgBox.addButton("Logout", QMessageBox::AcceptRole);
+  msgBox.setDefaultButton(logoutButton);
+  msgBox.setEscapeButton(cancelButton);
+
+  msgBox.exec();
+  if (msgBox.clickedButton() == cancelButton)
+    return;
+
+  gazebo::msgs::RestLogout msg;
+  msg.set_id(this->restID);
+  std::string url = this->loginDialog.GetUrl();
+  msg.set_url(url);
+  gzmsg << "Logging out from: " << url << std::endl;
+  this->logoutPub->Publish(msg);
+  this->loginMenuAction.setEnabled(true);
+  this->logoutMenuAction.setEnabled(false);
+  this->loginLabel->setText(tr("Logging out..."));
 }
 
 /////////////////////////////////////////////////
@@ -93,20 +105,23 @@ void RestUiWidget::Login()
     return;
 
   gazebo::msgs::RestLogin msg;
+  msg.set_id(this->restID);
   msg.set_url(this->loginDialog.GetUrl());
-  std::string username = this->loginDialog.GetUsername();
-  msg.set_username(username);
+  msg.set_username(this->loginDialog.GetUsername());
   msg.set_password(this->loginDialog.GetPassword());
   this->loginPub->Publish(msg);
   this->loginMenuAction.setEnabled(false);
   this->logoutMenuAction.setEnabled(true);
-  this->loginLabel->setText(QString::fromStdString(username));
+  this->loginLabel->setText(tr("Logging in..."));
 }
 
 /////////////////////////////////////////////////
-void RestUiWidget::OnResponse(ConstRestErrorPtr &_msg)
+void RestUiWidget::OnResponse(ConstRestResponsePtr &_msg)
 {
-  gzerr << "Error received:" << std::endl;
+  if (!_msg->has_id() || _msg->id() != this->restID)
+    return;
+
+  gzerr << "Response received:" << std::endl;
   gzerr << " type: " << _msg->type() << std::endl;
   gzerr << " msg:  " << _msg->msg() << std::endl;
   // add msg to queue for later processing from the GUI thread
@@ -119,7 +134,7 @@ void RestUiWidget::Update()
   // Login problem?
   while (!this->msgRespQ.empty())
   {
-    ConstRestErrorPtr msg = this->msgRespQ.front();
+    ConstRestResponsePtr msg = this->msgRespQ.front();
     std::string msgStr = msg->msg();
     this->msgRespQ.pop_front();
 
@@ -130,19 +145,29 @@ void RestUiWidget::Update()
       this->logoutMenuAction.setEnabled(false);
     }
 
-    if (msg->type() == "Error")
+    if (msg->type() == msgs::RestResponse::ERROR)
     {
       msgStr += "\n\nIf the server is not available, ";
       msgStr += "logout to hide theses messages.";
       QMessageBox::critical(this,
                             tr(this->title.c_str()),
                             tr(msgStr.c_str()));
+      this->loginLabel->setText(tr(""));
     }
-    else
+    else if (msg->type() == msgs::RestResponse::SUCCESS)
     {
       QMessageBox::information(this,
                                tr(this->title.c_str()),
                                tr(msgStr.c_str()));
+    }
+    else if (msg->type() == msgs::RestResponse::LOGIN)
+    {
+      this->loginLabel->setText(
+          QString::fromStdString(this->loginDialog.GetUsername()));
+    }
+    else if (msg->type() == msgs::RestResponse::LOGOUT)
+    {
+      this->loginLabel->setText(tr(""));
     }
   }
 }

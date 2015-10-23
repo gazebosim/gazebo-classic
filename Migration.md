@@ -12,7 +12,7 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Camera.hh**
     + ***Removed:*** public: void SetClipDist();
     + ***Replacement:*** public: virtual void SetClipDist();
-    
+
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
     + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
@@ -58,6 +58,8 @@ release will remove the deprecated code.
 
 ### Deletions
 
+1. **plugins/rest_web/RestUiLogoutDialog.hh.hh**
+
 1. **gazebo rendering libraries**
     * The following libraries have been removed: `libgazebo_skyx`, `libgazebo_selection_buffer`, `libgazebo_rendering_deferred`. Gazebo now combines all the different rendering libraries into `libgazebo_rendering.so`.
     * [Pull request #1817](https://bitbucket.org/osrf/gazebo/pull-request/1817)
@@ -93,7 +95,7 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Vector3d HSV() const;
 
 1. **gazebo/common/Dem.hh**
-    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude); 
+    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude);
     + ***Replacement:*** void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,  ignition::math::Angle &_longitude) const;
     + ***Deprecation:***void FillHeightMap(int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY, std::vector<float> &_heights);
     + ***Replacement:***void FillHeightMap(const int _subSampling, const unsigned int _vertSize, const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale, const bool _flipY, std::vector<float> &_heights);

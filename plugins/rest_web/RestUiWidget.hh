@@ -27,7 +27,6 @@
 #endif
 #include <gazebo/util/system.hh>
 #include "RestUiLoginDialog.hh"
-#include "RestUiLogoutDialog.hh"
 
 namespace gazebo
 {
@@ -69,9 +68,9 @@ namespace gazebo
     /// the plugin's update.
     public: void Update();
 
-    /// \brief Called everytime a response  message is received.
-    /// \param[in] _msg Rest error message.
-    private: void OnResponse(ConstRestErrorPtr &_msg);
+    /// \brief Called everytime a response message is received.
+    /// \param[in] _msg Rest response message.
+    private: void OnResponse(ConstRestResponsePtr &_msg);
 
     /// \brief Login menu item
     private: QAction &loginMenuAction;
@@ -85,9 +84,6 @@ namespace gazebo
     /// \brief Pub/sub node to communicate with gzserver.
     private: gazebo::transport::NodePtr node;
 
-     /// \brief Login dialog.
-    private: gui::RestUiLogoutDialog logoutDialog;
-
     /// \brief Login dialog.
     private: gui::RestUiLoginDialog loginDialog;
 
@@ -97,12 +93,12 @@ namespace gazebo
     /// \brief Gazebo logout topic publisher
     private: gazebo::transport::PublisherPtr logoutPub;
 
-    /// \brief Gazebo error topic subscriber.
-    private: gazebo::transport::SubscriberPtr errorSub;
+    /// \brief Gazebo response topic subscriber.
+    private: gazebo::transport::SubscriberPtr responseSub;
 
-    /// \brief List of unprocessed error messages to be displayed from the gui
-    /// thread.
-    private: std::list<boost::shared_ptr<const gazebo::msgs::RestError>>
+    /// \brief List of unprocessed response messages to be displayed from the
+    /// gui thread.
+    private: std::list<boost::shared_ptr<const gazebo::msgs::RestResponse>>
         msgRespQ;
 
     /// \brief Gazebo main window toolbar.
@@ -110,6 +106,9 @@ namespace gazebo
 
     /// \brief Label to display name of user who is logged in.
     private: QLabel *loginLabel;
+
+    /// \brief ID of this rest service client
+    private: int restID;
   };
 }
 

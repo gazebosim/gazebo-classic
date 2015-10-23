@@ -7,6 +7,7 @@ package gazebo.msgs;
 
 message RestPost
 {
-  required string route = 1;
-  required string json  = 2;
+  required int32 id     = 1;
+  required string route = 2;
+  required string json  = 3;
 }
