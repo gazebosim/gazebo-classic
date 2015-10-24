@@ -7,7 +7,9 @@ package gazebo.msgs;
 
 message RestPost
 {
-  required int32 id     = 1;
+  /// \brief ID of this request message
+  optional int32 id     = 1;
+
   required string route = 2;
   required string json  = 3;
 }
