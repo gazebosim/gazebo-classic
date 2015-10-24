@@ -171,5 +171,63 @@ void TopToolbar_TEST::Insert()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void TopToolbar_TEST::Add()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the top toolbar
+  gazebo::gui::TopToolbar *topToolbar =
+      mainWindow->findChild<gazebo::gui::TopToolbar *>("topToolbar");
+  QVERIFY(topToolbar != NULL);
+
+  // Get number of actions
+  QToolBar *toolbar = topToolbar->findChild<QToolBar *>("topToolbarToolbar");
+  QVERIFY(toolbar != NULL);
+
+  int actionsCount = toolbar->actions().size();
+
+  // Add separator and see increase in number of actions
+  QAction *separator = topToolbar->AddSeparator();
+  QVERIFY(separator != NULL);
+  QCOMPARE(toolbar->actions().size(), actionsCount + 1);
+  actionsCount = toolbar->actions().size();
+
+  // Add widget and see increase in number of actions
+  QWidget *widget = new QWidget();
+  QAction *widgetAct = topToolbar->AddWidget(widget);
+  QVERIFY(widgetAct != NULL);
+  QCOMPARE(toolbar->actions().size(), actionsCount + 1);
+  actionsCount = toolbar->actions().size();
+
+  // Add action and see increase in number of actions
+  QAction *action = new QAction(this);
+  topToolbar->AddAction(action);
+  QCOMPARE(toolbar->actions().size(), actionsCount + 1);
+  actionsCount = toolbar->actions().size();
+
+  // Clean up
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(TopToolbar_TEST)
