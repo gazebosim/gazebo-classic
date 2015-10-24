@@ -222,7 +222,6 @@ void TopToolbar_TEST::Add()
   QAction *action = new QAction(this);
   topToolbar->AddAction(action);
   QCOMPARE(toolbar->actions().size(), actionsCount + 1);
-  actionsCount = toolbar->actions().size();
 
   // Clean up
   mainWindow->close();
