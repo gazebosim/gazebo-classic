@@ -147,6 +147,8 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
 
   // Add listener for spawn button
   connect(this->pbSpawn, SIGNAL(clicked()), this, SLOT(OnButtonSpawn()));
+
+  this->UpdateWidgets();
 }
 
 /////////////////////////////////////////////////
@@ -276,15 +278,9 @@ void CameraLensControlExample::OnCameraLens(ConstCameraLensPtr &_msg)
   if (_msg->has_scale_to_hfov())
     this->cbScaleToHFOV->setChecked(_msg->scale_to_hfov());
 
-  bool isCustom = (this->cbType->currentText() == "custom");
+  this->UpdateWidgets();
 
-  this->cbFun->setEnabled(isCustom);
-  this->sbC1->setEnabled(isCustom);
-  this->sbC2->setEnabled(isCustom);
-  this->sbC3->setEnabled(isCustom);
-  this->sbF->setEnabled(isCustom);
-
-  // Information got, runtime update is not needed
+  // Information received, runtime update is not needed
   this->acceptInfoMessages = false;
 }
 
@@ -325,6 +321,12 @@ void CameraLensControlExample::OnTypeChanged()
 
   this->acceptInfoMessages = true;
 
+  this->UpdateWidgets();
+}
+
+/////////////////////////////////////////////////
+void CameraLensControlExample::UpdateWidgets()
+{
   bool isCustom = (this->cbType->currentText() == "custom");
 
   this->cbFun->setEnabled(isCustom);

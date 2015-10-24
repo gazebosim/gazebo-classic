@@ -43,6 +43,9 @@ namespace gazebo
     /// \param[in] _parent Pointer to the parent widget
     private: virtual void LoadGUIComponents(QWidget *_parent);
 
+    /// \brief Update the GUI components based on the lens type.
+    private: void UpdateWidgets();
+
     /// \brief Callback to spawn a button
     private slots: void OnButtonSpawn();
 
