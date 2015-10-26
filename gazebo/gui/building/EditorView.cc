@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
@@ -1283,8 +1284,8 @@ void EditorView::OnOpenLevelInspector()
   if (floorItem)
   {
     this->levelInspector->floorWidget->show();
-    this->levelInspector->SetFloorColor(floorItem->Get3dColor());
-    this->levelInspector->SetFloorTexture(floorItem->Get3dTexture());
+    this->levelInspector->SetColor(floorItem->Get3dColor());
+    this->levelInspector->SetTexture(floorItem->Get3dTexture());
   }
   else
   {
@@ -1305,8 +1306,8 @@ void EditorView::OnLevelApply()
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
-    floorItem->Set3dTexture(dialog->GetFloorTexture());
-    floorItem->Set3dColor(dialog->GetFloorColor());
+    floorItem->Set3dTexture(dialog->GetTexture());
+    floorItem->Set3dColor(dialog->GetColor());
     floorItem->Set3dTransparency(0.4);
     floorItem->FloorChanged();
   }

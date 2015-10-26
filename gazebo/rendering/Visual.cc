@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
@@ -36,6 +38,7 @@
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Material.hh"
+#include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 #include "gazebo/rendering/Visual.hh"
 
@@ -121,7 +124,6 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->id = this->dataPtr->visualIdCount--;
   this->dataPtr->boundingBox = NULL;
   this->dataPtr->useRTShader = _useRTShader;
-  this->dataPtr->scale = math::Vector3::One;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->dataPtr->sdf);
@@ -168,8 +170,6 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
 //////////////////////////////////////////////////
 Visual::~Visual()
 {
-  RTShaderSystem::Instance()->DetachEntity(this);
-
   if (this->dataPtr->preRenderConnection)
     event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
 
@@ -184,6 +184,7 @@ Visual::~Visual()
 
   if (this->dataPtr->sceneNode != NULL)
   {
+    // seems we never get into this block because Fini() runs first
     this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
     this->dataPtr->sceneNode->removeAndDestroyAllChildren();
     this->dataPtr->scene->GetManager()->destroySceneNode(
@@ -224,7 +225,6 @@ void Visual::Fini()
     this->dataPtr->preRenderConnection.reset();
   }
 
-  RTShaderSystem::Instance()->DetachEntity(this);
   this->dataPtr->scene.reset();
 }
 
@@ -233,11 +233,10 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 {
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  result->SetScale(this->dataPtr->scale);
+  for (auto iter: this->dataPtr->children)
   {
-    (*iter)->Clone((*iter)->GetName(), result);
+    iter->Clone(iter->GetName(), result);
   }
 
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
@@ -288,9 +287,7 @@ void Visual::Init()
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
   this->dataPtr->layer = -1;
-
-  if (this->dataPtr->useRTShader)
-    RTShaderSystem::Instance()->AttachEntity(this);
+  this->dataPtr->scale = ignition::math::Vector3d::One;
 
   this->dataPtr->initialized = true;
 }
@@ -369,33 +366,34 @@ void Visual::Load()
   {
     sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
 
+    ignition::math::Vector3d geometrySize;
     bool hasGeom = true;
     if (geomElem->HasElement("box"))
     {
-      this->dataPtr->scale =
-          geomElem->GetElement("box")->Get<math::Vector3>("size");
+      geometrySize =
+          geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
       double r = geomElem->GetElement("sphere")->Get<double>("radius");
-      this->dataPtr->scale.Set(r * 2.0, r * 2.0, r * 2.0);
+      geometrySize.Set(r * 2.0, r * 2.0, r * 2.0);
     }
     else if (geomElem->HasElement("cylinder"))
     {
       double r = geomElem->GetElement("cylinder")->Get<double>("radius");
       double l = geomElem->GetElement("cylinder")->Get<double>("length");
-      this->dataPtr->scale.Set(r * 2.0, r * 2.0, l);
+      geometrySize.Set(r * 2.0, r * 2.0, l);
     }
     else if (geomElem->HasElement("plane"))
     {
       math::Vector2d size =
         geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      this->dataPtr->scale.Set(size.x, size.y, 1);
+      geometrySize.Set(size.x, size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
-      this->dataPtr->scale =
-          geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
+      geometrySize =
+          geomElem->GetElement("mesh")->Get<ignition::math::Vector3d>("scale");
     }
     else
     {
@@ -406,10 +404,13 @@ void Visual::Load()
     {
       // geom values give the absolute size so compute a scale that will
       // be mulitiply by the current scale to get to the geom size.
-      math::Vector3 derivedScale = Conversions::Convert(
-          this->dataPtr->sceneNode->_getDerivedScale());
-      math::Vector3 toScale = this->dataPtr->scale / derivedScale;
-      this->dataPtr->sceneNode->scale(toScale.x, toScale.y, toScale.z);
+      ignition::math::Vector3d derivedScale = this->DerivedScale();
+      ignition::math::Vector3d localScale =
+          geometrySize / (derivedScale / this->dataPtr->scale);
+      this->dataPtr->sceneNode->setScale(
+          Conversions::Convert(math::Vector3(localScale)));
+      this->dataPtr->scale = localScale;
+      this->dataPtr->geomSize = geometrySize;
     }
   }
 
@@ -728,53 +729,83 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
-  if (this->dataPtr->scale == _scale)
+  if (this->dataPtr->scale == _scale.Ign())
     return;
 
-  this->dataPtr->scale = _scale;
-
   // update geom size based on scale.
-  this->UpdateGeomSize(this->dataPtr->scale);
+  this->UpdateGeomSize(
+      this->DerivedScale() / this->dataPtr->scale * _scale.Ign());
+
+  this->dataPtr->scale = _scale.Ign();
 
   this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(this->dataPtr->scale));
+      Conversions::Convert(math::Vector3(this->dataPtr->scale)));
 }
 
 //////////////////////////////////////////////////
-void Visual::UpdateGeomSize(const math::Vector3 &_scale)
+void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
 {
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
        iter != this->dataPtr->children.end(); ++iter)
   {
-    (*iter)->UpdateGeomSize(_scale);
+    (*iter)->UpdateGeomSize(_scale * (*iter)->GetScale().Ign());
   }
 
-  math::Vector3 derivedScale = math::Vector3::One;
-  VisualPtr parentVis = this->GetParent();
-  if (parentVis)
-  {
-     derivedScale = Conversions::Convert(
-        parentVis->GetSceneNode()->_getDerivedScale());
-  }
+  // update the same way as server - see Link::UpdateVisualGeomSDF()
+  if (!this->dataPtr->sdf->HasElement("geometry"))
+    return;
 
   sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
   if (geomElem->HasElement("box"))
   {
-    geomElem->GetElement("box")->GetElement("size")->Set(_scale);
+    ignition::math::Vector3d size =
+        geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
+    ignition::math::Vector3d geomBoxSize = _scale/this->dataPtr->geomSize*size;
+
+    geomElem->GetElement("box")->GetElement("size")->Set(
+        geomBoxSize);
+    this->dataPtr->geomSize = geomBoxSize;
   }
   else if (geomElem->HasElement("sphere"))
   {
-    geomElem->GetElement("sphere")->GetElement("radius")->Set(
-        _scale.x*0.5);
+    // update radius the same way as collision shapes
+    double radius = geomElem->GetElement("sphere")->Get<double>("radius");
+    double newRadius = _scale.Max();
+    double oldRadius = this->dataPtr->geomSize.Max();
+    double geomRadius = newRadius/oldRadius*radius;
+    geomElem->GetElement("sphere")->GetElement("radius")->Set(geomRadius);
+    this->dataPtr->geomSize = ignition::math::Vector3d(
+        geomRadius*2.0, geomRadius*2.0, geomRadius*2.0);
   }
   else if (geomElem->HasElement("cylinder"))
   {
-    geomElem->GetElement("cylinder")->GetElement("radius")
-        ->Set(_scale.x*0.5);
-    geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z);
+    // update radius the same way as collision shapes
+    double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
+    double newRadius = std::max(_scale.X(), _scale.Y());
+    double oldRadius = std::max(this->dataPtr->geomSize.X(),
+        this->dataPtr->geomSize.Y());
+    double length = geomElem->GetElement("cylinder")->Get<double>("length");
+    double geomRadius = newRadius/oldRadius*radius;
+    double geomLength = _scale.Z()/this->dataPtr->geomSize.Z()*length;
+    geomElem->GetElement("cylinder")->GetElement("radius")->Set(
+        geomRadius);
+    geomElem->GetElement("cylinder")->GetElement("length")->Set(
+        geomLength);
+
+    this->dataPtr->geomSize =
+        ignition::math::Vector3d(geomRadius*2.0, geomRadius*2.0, geomLength);
   }
   else if (geomElem->HasElement("mesh"))
+  {
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
+    this->dataPtr->geomSize = _scale;
+  }
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Visual::GetGeometrySize() const
+{
+  return this->dataPtr->geomSize;
 }
 
 //////////////////////////////////////////////////
@@ -784,24 +815,29 @@ math::Vector3 Visual::GetScale()
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d Visual::DerivedScale() const
+{
+  ignition::math::Vector3d derivedScale = this->dataPtr->scale;
+
+  VisualPtr worldVis = this->dataPtr->scene->GetWorldVisual();
+  VisualPtr vis = this->GetParent();
+
+  while (vis && vis != worldVis)
+  {
+    derivedScale = derivedScale * vis->GetScale().Ign();
+    vis = vis->GetParent();
+  }
+
+  return derivedScale;
+}
+
+//////////////////////////////////////////////////
 void Visual::SetLighting(bool _lighting)
 {
   if (this->dataPtr->lighting == _lighting)
     return;
 
   this->dataPtr->lighting = _lighting;
-
-  if (this->dataPtr->useRTShader)
-  {
-    if (this->dataPtr->lighting)
-      RTShaderSystem::Instance()->AttachEntity(this);
-    else
-    {
-      // Detach from RTShaderSystem otherwise setting lighting here will have
-      // no effect if shaders are used.
-      RTShaderSystem::Instance()->DetachEntity(this);
-    }
-  }
 
   try
   {
@@ -871,7 +907,8 @@ bool Visual::GetLighting() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetMaterial(const std::string &_materialName, bool _unique)
+void Visual::SetMaterial(const std::string &_materialName, bool _unique,
+    const bool _cascade)
 {
   if (_materialName.empty() || _materialName == "__default__")
     return;
@@ -967,17 +1004,30 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     // Apply material to all child scene nodes
     for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
     {
-      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode*>(
+      Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode *>(
           this->dataPtr->sceneNode->getChild(i));
-      for (int j = 0; j < sn->numAttachedObjects(); j++)
+      for (int j = 0; j < sn->numAttachedObjects(); ++j)
       {
         Ogre::MovableObject *obj = sn->getAttachedObject(j);
 
-        if (dynamic_cast<Ogre::Entity*>(obj))
-          ((Ogre::Entity*)obj)->setMaterialName(this->dataPtr->myMaterialName);
+        MovableText *text = dynamic_cast<MovableText *>(obj);
+        if (text)
+        {
+          common::Color ambient, diffuse, specular, emissive;
+          bool matFound = rendering::Material::GetMaterialAsColor(
+              this->dataPtr->myMaterialName, ambient, diffuse, specular,
+              emissive);
+
+          if (matFound)
+          {
+            text->SetColor(ambient);
+          }
+        }
+        else if (dynamic_cast<Ogre::Entity *>(obj))
+          ((Ogre::Entity *)obj)->setMaterialName(this->dataPtr->myMaterialName);
         else
         {
-          ((Ogre::SimpleRenderable*)obj)->setMaterial(
+          ((Ogre::SimpleRenderable *)obj)->setMaterial(
               this->dataPtr->myMaterialName);
         }
       }
@@ -994,20 +1044,22 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   // check if material has color components, if so, set them.
   if (matColor)
   {
-    this->SetAmbient(matAmbient);
-    this->SetDiffuse(matDiffuse);
-    this->SetSpecular(matSpecular);
-    this->SetEmissive(matEmissive);
+    this->SetAmbient(matAmbient, false);
+    this->SetDiffuse(matDiffuse, false);
+    this->SetSpecular(matSpecular, false);
+    this->SetEmissive(matEmissive, false);
   }
 
   // Re-apply the transparency filter for the last known transparency value
-  this->SetTransparencyInnerLoop();
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
 
   // Apply material to all child visuals
-  for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
-       iter != this->dataPtr->children.end(); ++iter)
+  if (_cascade)
   {
-    (*iter)->SetMaterial(_materialName, _unique);
+    for (auto &child : this->dataPtr->children)
+    {
+      child->SetMaterial(_materialName, _unique, _cascade);
+    }
   }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized()
@@ -1022,7 +1074,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
 }
 
 /////////////////////////////////////////////////
-void Visual::SetAmbient(const common::Color &_color)
+void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1032,11 +1084,6 @@ void Visual::SetAmbient(const common::Color &_color)
     std::string matName = this->GetName() + "_MATERIAL_";
     Ogre::MaterialManager::getSingleton().create(matName, "General");
     this->SetMaterial(matName);
-  }
-
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
-  {
-    this->dataPtr->children[i]->SetAmbient(_color);
   }
 
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
@@ -1076,9 +1123,12 @@ void Visual::SetAmbient(const common::Color &_color)
     }
   }
 
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  if (_cascade)
   {
-    this->dataPtr->children[i]->SetAmbient(_color);
+    for (auto &child : this->dataPtr->children)
+    {
+      child->SetAmbient(_color, _cascade);
+    }
   }
 
   this->dataPtr->ambient = _color;
@@ -1088,7 +1138,7 @@ void Visual::SetAmbient(const common::Color &_color)
 }
 
 /////////////////////////////////////////////////
-void Visual::SetDiffuse(const common::Color &_color)
+void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1141,9 +1191,12 @@ void Visual::SetDiffuse(const common::Color &_color)
     }
   }
 
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  if (_cascade)
   {
-    this->dataPtr->children[i]->SetDiffuse(_color);
+    for (auto &child : this->dataPtr->children)
+    {
+      child->SetDiffuse(_color, _cascade);
+    }
   }
 
   this->dataPtr->diffuse = _color;
@@ -1153,7 +1206,7 @@ void Visual::SetDiffuse(const common::Color &_color)
 }
 
 /////////////////////////////////////////////////
-void Visual::SetSpecular(const common::Color &_color)
+void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1202,9 +1255,12 @@ void Visual::SetSpecular(const common::Color &_color)
     }
   }
 
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  if (_cascade)
   {
-    this->dataPtr->children[i]->SetSpecular(_color);
+    for (auto &child : this->dataPtr->children)
+    {
+      child->SetSpecular(_color, _cascade);
+    }
   }
 
   this->dataPtr->specular = _color;
@@ -1214,7 +1270,7 @@ void Visual::SetSpecular(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetEmissive(const common::Color &_color)
+void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
 {
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
@@ -1253,9 +1309,12 @@ void Visual::SetEmissive(const common::Color &_color)
     }
   }
 
-  for (unsigned int i = 0; i < this->dataPtr->children.size(); ++i)
+  if (_cascade)
   {
-    this->dataPtr->children[i]->SetEmissive(_color);
+    for (auto &child : this->dataPtr->children)
+    {
+      child->SetEmissive(_color, _cascade);
+    }
   }
 
   this->dataPtr->emissive = _color;
@@ -1287,57 +1346,6 @@ common::Color Visual::GetEmissive() const
 {
   return this->dataPtr->emissive;
 }
-
-/////////////////////////////////////////////////
-void Visual::AttachAxes()
-{
-  std::ostringstream nodeName;
-
-  nodeName << this->dataPtr->sceneNode->getName() << "_AXES_NODE";
-
-  if (!this->dataPtr->sceneNode->getCreator()->hasEntity("axis_cylinder"))
-    this->InsertMesh(common::MeshManager::Instance()->GetMesh("axis_cylinder"));
-
-  Ogre::SceneNode *node = this->dataPtr->sceneNode->createChildSceneNode(
-      nodeName.str());
-  Ogre::SceneNode *x, *y, *z;
-
-  x = node->createChildSceneNode(nodeName.str() + "_axisX");
-  x->setInheritScale(true);
-  x->translate(.25, 0, 0);
-  x->yaw(Ogre::Radian(M_PI/2.0));
-
-  y = node->createChildSceneNode(nodeName.str() + "_axisY");
-  y->setInheritScale(true);
-  y->translate(0, .25, 0);
-  y->pitch(Ogre::Radian(M_PI/2.0));
-
-  z = node->createChildSceneNode(nodeName.str() + "_axisZ");
-  z->translate(0, 0, .25);
-  z->setInheritScale(true);
-
-  Ogre::MovableObject *xobj, *yobj, *zobj;
-
-  xobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(
-        nodeName.str()+"X_AXIS", "axis_cylinder"));
-  xobj->setCastShadows(false);
-  ((Ogre::Entity*)xobj)->setMaterialName("Gazebo/Red");
-
-  yobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(
-        nodeName.str()+"Y_AXIS", "axis_cylinder"));
-  yobj->setCastShadows(false);
-  ((Ogre::Entity*)yobj)->setMaterialName("Gazebo/Green");
-
-  zobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(
-        nodeName.str()+"Z_AXIS", "axis_cylinder"));
-  zobj->setCastShadows(false);
-  ((Ogre::Entity*)zobj)->setMaterialName("Gazebo/Blue");
-
-  x->attachObject(xobj);
-  y->attachObject(yobj);
-  z->attachObject(zobj);
-}
-
 
 //////////////////////////////////////////////////
 void Visual::SetWireframe(bool _show)
@@ -1391,13 +1399,12 @@ void Visual::SetWireframe(bool _show)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetTransparencyInnerLoop()
+void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 {
-  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
-      i++)
+  for (unsigned int i = 0; i < _sceneNode->numAttachedObjects(); ++i)
   {
     Ogre::Entity *entity = NULL;
-    Ogre::MovableObject *obj = this->dataPtr->sceneNode->getAttachedObject(i);
+    Ogre::MovableObject *obj = _sceneNode->getAttachedObject(i);
 
     entity = dynamic_cast<Ogre::Entity*>(obj);
 
@@ -1408,24 +1415,25 @@ void Visual::SetTransparencyInnerLoop()
       continue;
 
     // For each ogre::entity
-    for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
+    for (unsigned int j = 0; j < entity->getNumSubEntities(); ++j)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
 
-      unsigned int techniqueCount, passCount;
+      unsigned int techniqueCount, passCount, unitStateCount;
       Ogre::Technique *technique;
       Ogre::Pass *pass;
       Ogre::ColourValue dc;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-           techniqueCount++)
+           ++techniqueCount)
       {
         technique = material->getTechnique(techniqueCount);
 
-        for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+        for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
         {
           pass = technique->getPass(passCount);
+
           // Need to fix transparency
           if (!pass->isProgrammable() &&
               pass->getPolygonMode() == Ogre::PM_SOLID)
@@ -1448,6 +1456,20 @@ void Visual::SetTransparencyInnerLoop()
           dc.a = (1.0f - this->dataPtr->transparency);
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
+
+          for (unitStateCount = 0; unitStateCount <
+              pass->getNumTextureUnitStates(); ++unitStateCount)
+          {
+            auto textureUnitState = pass->getTextureUnitState(unitStateCount);
+
+            if (textureUnitState->getColourBlendMode().operation ==
+                Ogre::LBX_SOURCE1)
+            {
+              textureUnitState->setAlphaOperation(
+                  Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
+                  1.0 - this->dataPtr->transparency);
+            }
+          }
         }
       }
     }
@@ -1455,7 +1477,7 @@ void Visual::SetTransparencyInnerLoop()
 }
 
 //////////////////////////////////////////////////
-void Visual::SetTransparency(float _trans)
+void Visual::SetTransparency(float _trans, const bool _cascade)
 {
   if (math::equal(this->dataPtr->transparency, _trans))
     return;
@@ -1463,14 +1485,31 @@ void Visual::SetTransparency(float _trans)
   this->dataPtr->transparency = std::min(
       std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
 
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  if (_cascade)
   {
-    (*iter)->SetTransparency(_trans);
+    for (auto &child : this->dataPtr->children)
+    {
+      // Don't change some visualizations when link changes
+      if (!(this->GetType() == VT_LINK &&
+          (child->GetType() == VT_GUI ||
+           child->GetType() == VT_PHYSICS ||
+           child->GetType() == VT_SENSOR)))
+      {
+        child->SetTransparency(_trans);
+      }
+    }
   }
 
-  this->SetTransparencyInnerLoop();
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
+
+  // For child nodes' scene nodes
+  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
+  {
+    Ogre::SceneNode *childSceneNode = dynamic_cast<Ogre::SceneNode*>(
+        this->dataPtr->sceneNode->getChild(i));
+
+    this->SetTransparencyInnerLoop(childSceneNode);
+  }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
@@ -1499,6 +1538,17 @@ void Visual::SetHighlighted(bool _highlighted)
   else if (this->dataPtr->boundingBox)
   {
     this->dataPtr->boundingBox->SetVisible(false);
+  }
+
+  // If this is a link, highlight frame visual
+  if (this->GetType() == VT_LINK)
+  {
+    VisualPtr linkFrameVis;
+    for (auto child : this->dataPtr->children)
+    {
+      if (child->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+        child->SetHighlighted(_highlighted);
+    }
   }
 }
 
@@ -1543,7 +1593,9 @@ bool Visual::GetCastShadows() const
 //////////////////////////////////////////////////
 void Visual::SetVisible(bool _visible, bool _cascade)
 {
-  this->dataPtr->sceneNode->setVisible(_visible, _cascade);
+  if (this->dataPtr->sceneNode)
+    this->dataPtr->sceneNode->setVisible(_visible, _cascade);
+
   if (_cascade)
   {
     for (auto child: this->dataPtr->children)
@@ -1980,11 +2032,11 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
         if (node->GetParent())
           ogreSkeleton->getBone(node->GetParent()->GetName())->addChild(bone);
 
-        math::Matrix4 trans = node->GetTransform();
-        math::Vector3 pos = trans.GetTranslation();
-        math::Quaternion q = trans.GetRotation();
-        bone->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
-        bone->setOrientation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
+        ignition::math::Matrix4d trans = node->Transform();
+        ignition::math::Vector3d pos = trans.Translation();
+        ignition::math::Quaterniond q = trans.Rotation();
+        bone->setPosition(Ogre::Vector3(pos.X(), pos.Y(), pos.Z()));
+        bone->setOrientation(Ogre::Quaternion(q.W(), q.X(), q.Y(), q.Z()));
         bone->setInheritOrientation(true);
         bone->setManuallyControlled(true);
         bone->setInitialState();
@@ -2013,7 +2065,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
 
       // Recenter the vertices if requested.
       if (_centerSubmesh)
-        subMesh.Center();
+        subMesh.Center(ignition::math::Vector3d::Zero);
 
       ogreSubMesh = ogreMesh->createSubMesh();
       ogreSubMesh->useSharedVertices = false;
@@ -2112,21 +2164,21 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       // Add all the vertices
       for (j = 0; j < subMesh.GetVertexCount(); j++)
       {
-        *vertices++ = subMesh.GetVertex(j).x;
-        *vertices++ = subMesh.GetVertex(j).y;
-        *vertices++ = subMesh.GetVertex(j).z;
+        *vertices++ = subMesh.Vertex(j).X();
+        *vertices++ = subMesh.Vertex(j).Y();
+        *vertices++ = subMesh.Vertex(j).Z();
 
         if (subMesh.GetNormalCount() > 0)
         {
-          *vertices++ = subMesh.GetNormal(j).x;
-          *vertices++ = subMesh.GetNormal(j).y;
-          *vertices++ = subMesh.GetNormal(j).z;
+          *vertices++ = subMesh.Normal(j).X();
+          *vertices++ = subMesh.Normal(j).Y();
+          *vertices++ = subMesh.Normal(j).Z();
         }
 
         if (subMesh.GetTexCoordCount() > 0)
         {
-          *vertices++ = subMesh.GetTexCoord(j).x;
-          *vertices++ = subMesh.GetTexCoord(j).y;
+          *vertices++ = subMesh.TexCoord(j).X();
+          *vertices++ = subMesh.TexCoord(j).Y();
         }
       }
 
@@ -2151,13 +2203,13 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       iBuf->unlock();
     }
 
-    math::Vector3 max = _mesh->GetMax();
-    math::Vector3 min = _mesh->GetMin();
+    ignition::math::Vector3d max = _mesh->Max();
+    ignition::math::Vector3d min = _mesh->Min();
 
     if (_mesh->HasSkeleton())
     {
-      min = math::Vector3(-1, -1, -1);
-      max = math::Vector3(1, 1, 1);
+      min = ignition::math::Vector3d(-1, -1, -1);
+      max = ignition::math::Vector3d(1, 1, 1);
     }
 
     if (!max.IsFinite())
@@ -2167,8 +2219,8 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       gzthrow("Min bounding box is not finite[" << min << "]\n");
 
     ogreMesh->_setBounds(Ogre::AxisAlignedBox(
-          Ogre::Vector3(min.x, min.y, min.z),
-          Ogre::Vector3(max.x, max.y, max.z)),
+          Ogre::Vector3(min.X(), min.Y(), min.Z()),
+          Ogre::Vector3(max.X(), max.Y(), max.Z())),
           false);
 
     // this line makes clear the mesh is loaded (avoids memory leaks)
@@ -2199,13 +2251,13 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   }
 
   if (_msg->has_pose())
-    this->SetPose(msgs::Convert(_msg->pose()));
+    this->SetPose(msgs::ConvertIgn(_msg->pose()));
 
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());
 
   if (_msg->has_scale())
-    this->SetScale(msgs::Convert(_msg->scale()));
+    this->SetScale(msgs::ConvertIgn(_msg->scale()));
 
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
@@ -2278,7 +2330,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
-      geomScale = msgs::Convert(_msg->geometry().box().size());
+      geomScale = msgs::ConvertIgn(_msg->geometry().box().size());
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
@@ -2305,11 +2357,15 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           = _msg->geometry().image().scale();
     }
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-      geomScale = msgs::Convert(_msg->geometry().heightmap().size());
+    {
+      geomScale = msgs::ConvertIgn(_msg->geometry().heightmap().size());
+    }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       if (_msg->geometry().mesh().has_scale())
-        geomScale = msgs::Convert(_msg->geometry().mesh().scale());
+      {
+        geomScale = msgs::ConvertIgn(_msg->geometry().mesh().scale());
+      }
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY ||
         _msg->geometry().type() == msgs::Geometry::POLYLINE)
@@ -2319,7 +2375,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
-    this->SetScale(geomScale);
+    this->SetScale(geomScale * this->dataPtr->scale / this->DerivedScale());
   }
 
   if (_msg->has_material())
@@ -2440,6 +2496,42 @@ VisualPtr Visual::GetNthAncestor(unsigned int _n)
   return p;
 }
 
+/////////////////////////////////////////////////
+bool Visual::IsAncestorOf(const rendering::VisualPtr _visual) const
+{
+  if (!_visual || !this->dataPtr->scene)
+    return false;
+
+  rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
+  rendering::VisualPtr vis = _visual->GetParent();
+  while (vis)
+  {
+    if (vis->GetName() == this->GetName())
+      return true;
+    vis = vis->GetParent();
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool Visual::IsDescendantOf(const rendering::VisualPtr _visual) const
+{
+  if (!_visual || !this->dataPtr->scene)
+    return false;
+
+  rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
+  rendering::VisualPtr vis = this->GetParent();
+  while (vis)
+  {
+    if (vis->GetName() == _visual->GetName())
+      return true;
+    vis = vis->GetParent();
+  }
+
+  return false;
+}
+
 //////////////////////////////////////////////////
 unsigned int Visual::GetDepth() const
 {
@@ -2528,14 +2620,15 @@ std::string Visual::GetMeshName() const
       {
         sdf::ElementPtr polylineElem = geomElem->GetElement("polyline");
 
-        std::vector<std::vector<math::Vector2d> > polylines;
+        std::vector<std::vector<ignition::math::Vector2d> > polylines;
         while (polylineElem)
         {
-          std::vector<math::Vector2d> vertices;
+          std::vector<ignition::math::Vector2d> vertices;
           sdf::ElementPtr pointElem = polylineElem->GetElement("point");
           while (pointElem)
           {
-            math::Vector2d point = pointElem->Get<math::Vector2d>();
+            ignition::math::Vector2d point =
+              pointElem->Get<ignition::math::Vector2d>();
             vertices.push_back(point);
             pointElem = pointElem->GetNextElement("point");
           }
@@ -2819,6 +2912,18 @@ void Visual::ShowInertia(bool _show)
 }
 
 //////////////////////////////////////////////////
+void Visual::ShowLinkFrame(bool _show)
+{
+  if (this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  for (auto &child : this->dataPtr->children)
+  {
+    child->ShowLinkFrame(_show);
+  }
+}
+
+//////////////////////////////////////////////////
 void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
 {
   if (!this->dataPtr->skeleton)
@@ -2942,13 +3047,13 @@ sdf::ElementPtr Visual::GetSDF() const
 }
 
 //////////////////////////////////////////////////
-rendering::VisualType Visual::GetType() const
+Visual::VisualType Visual::GetType() const
 {
   return this->dataPtr->type;
 }
 
 //////////////////////////////////////////////////
-void Visual::SetType(const rendering::VisualType _type)
+void Visual::SetType(const Visual::VisualType _type)
 {
   this->dataPtr->type = _type;
 }
@@ -2964,4 +3069,82 @@ void Visual::ToggleLayer(const int32_t _layer)
   {
     this->ToggleVisible();
   }
+}
+
+//////////////////////////////////////////////////
+Visual::VisualType Visual::ConvertVisualType(const msgs::Visual::Type &_type)
+{
+  Visual::VisualType visualType = Visual::VT_ENTITY;
+
+  switch (_type)
+  {
+    case msgs::Visual::ENTITY:
+      visualType = Visual::VT_ENTITY;
+      break;
+    case msgs::Visual::MODEL:
+      visualType = Visual::VT_MODEL;
+      break;
+    case msgs::Visual::LINK:
+      visualType = Visual::VT_LINK;
+      break;
+    case msgs::Visual::VISUAL:
+      visualType = Visual::VT_VISUAL;
+      break;
+    case msgs::Visual::COLLISION:
+      visualType = Visual::VT_COLLISION;
+      break;
+    case msgs::Visual::SENSOR:
+      visualType = Visual::VT_SENSOR;
+      break;
+    case msgs::Visual::GUI:
+      visualType = Visual::VT_GUI;
+      break;
+    case msgs::Visual::PHYSICS:
+      visualType = Visual::VT_PHYSICS;
+      break;
+    default:
+      gzerr << "Cannot convert visual type. Defaults to 'VT_ENTITY'"
+          << std::endl;
+      break;
+  }
+  return visualType;
+}
+
+//////////////////////////////////////////////////
+msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
+{
+  msgs::Visual::Type visualType = msgs::Visual::ENTITY;
+
+  switch (_type)
+  {
+    case Visual::VT_ENTITY:
+      visualType = msgs::Visual::ENTITY;
+      break;
+    case Visual::VT_MODEL:
+      visualType = msgs::Visual::MODEL;
+      break;
+    case Visual::VT_LINK:
+      visualType = msgs::Visual::LINK;
+      break;
+    case Visual::VT_VISUAL:
+      visualType = msgs::Visual::VISUAL;
+      break;
+    case Visual::VT_COLLISION:
+      visualType = msgs::Visual::COLLISION;
+      break;
+    case Visual::VT_SENSOR:
+      visualType = msgs::Visual::SENSOR;
+      break;
+    case Visual::VT_GUI:
+      visualType = msgs::Visual::GUI;
+      break;
+    case Visual::VT_PHYSICS:
+      visualType = msgs::Visual::PHYSICS;
+      break;
+    default:
+      gzerr << "Cannot convert visual type. Defaults to 'msgs::Visual::ENTITY'"
+          << std::endl;
+      break;
+  }
+  return visualType;
 }

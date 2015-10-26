@@ -14,7 +14,13 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+#include <Winsock2.h>
+#endif
 
+#include <boost/algorithm/string.hpp>
 #include <stdio.h>
 #include <string>
 #include <cmath>
@@ -28,7 +34,12 @@ using namespace gazebo;
 std::string gazebo::custom_exec(std::string _cmd)
 {
   _cmd += " 2>/dev/null";
-  FILE* pipe = popen(_cmd.c_str(), "r");
+
+#ifdef _WIN32
+  FILE *pipe = _popen(_cmd.c_str(), "r");
+#else
+  FILE *pipe = popen(_cmd.c_str(), "r");
+#endif
 
   if (!pipe)
     return "ERROR";
@@ -42,7 +53,12 @@ std::string gazebo::custom_exec(std::string _cmd)
       result += buffer;
   }
 
+#ifdef _WIN32
+  _pclose(pipe);
+#else
   pclose(pipe);
+#endif
+
   return result;
 }
 
@@ -134,16 +150,39 @@ void ServerFixture::Load(const std::string &_worldFilename, bool _paused)
 
 /////////////////////////////////////////////////
 void ServerFixture::Load(const std::string &_worldFilename,
-                  bool _paused, const std::string &_physics,
-                  const std::vector<std::string> &_systemPlugins)
+                         bool _paused, const std::string &_physics,
+                         const std::vector<std::string> &_systemPlugins)
+{
+  std::string params = _worldFilename;
+  if (!_physics.empty())
+    params += " -e " + _physics;
+  if (_paused)
+    params += " -u";
+  for (auto plugin : _systemPlugins)
+    params += " -s " + plugin;
+
+  this->LoadArgs(params);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::LoadArgs(const std::string &_args)
 {
   delete this->server;
   this->server = NULL;
 
+  // Split the string into a vector of parameters.
+  std::vector<std::string> params;
+  std::string args = _args;
+  boost::trim_if(args, boost::is_any_of("\t "));
+  boost::split(params, args, boost::is_any_of("\t "), boost::token_compress_on);
+
+  bool paused = false;
+  if (std::find(params.begin(), params.end(), "-u") != params.end())
+    paused = true;
+
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
-     boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                 _paused, _physics, _systemPlugins));
+    boost::bind(&ServerFixture::RunServer, this, params));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -152,14 +191,13 @@ void ServerFixture::Load(const std::string &_worldFilename,
          ++waitCount < maxWaitCount)
     common::Time::MSleep(100);
   gzdbg << "ServerFixture load in "
-         << static_cast<double>(waitCount)/10.0
-         << " seconds, timeout after "
-         << static_cast<double>(maxWaitCount)/10.0
-         << " seconds\n";
+        << static_cast<double>(waitCount)/10.0
+        << " seconds, timeout after "
+        << static_cast<double>(maxWaitCount)/10.0
+        << " seconds\n";
 
   if (waitCount >= maxWaitCount)
-    this->launchTimeoutFailure(
-        "while waiting for Load() function", waitCount);
+    this->launchTimeoutFailure("while waiting for Load() function", waitCount);
 
   this->node = transport::NodePtr(new transport::Node());
   ASSERT_NO_THROW(this->node->Init());
@@ -180,9 +218,12 @@ void ServerFixture::Load(const std::string &_worldFilename,
   waitCount = 0;
   maxWaitCount = 3000;
   while ((!physics::get_world() ||
-           physics::get_world()->IsPaused() != _paused) &&
+           physics::get_world()->IsPaused() != paused) &&
          ++waitCount < maxWaitCount)
+  {
     common::Time::MSleep(100);
+  }
+
   ASSERT_LT(waitCount, maxWaitCount);
 
   this->factoryPub->WaitForConnection();
@@ -190,39 +231,34 @@ void ServerFixture::Load(const std::string &_worldFilename,
 }
 
 /////////////////////////////////////////////////
-void ServerFixture::RunServer(const std::string &_worldFilename)
+void ServerFixture::RunServer(const std::vector<std::string> &_args)
 {
-  this->RunServer(_worldFilename, false, "");
-}
+  // Make room for an extra parameter (gzserver).
+  int argc = _args.size() + 1;
+  char **argv = new char* [argc];
 
-/////////////////////////////////////////////////
-void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
-               const std::string &_physics,
-               const std::vector<std::string> &_systemPlugins)
-{
+  // The first parameter is the name of the program.
+  const char *cmd = "gzserver";
+  argv[0] = strdup(cmd);
+
+  // Copy the command line parameters for gzserver.
+  for (size_t i = 0; i < _args.size(); ++i)
+    argv[i + 1] = strdup(_args.at(i).c_str());
+
   ASSERT_NO_THROW(this->server = new Server());
 
-  for (auto const &plugin : _systemPlugins)
+  if (!this->server->ParseArgs(argc, argv))
   {
-    gazebo::addPlugin(plugin);
+    ASSERT_NO_THROW(delete this->server);
+    this->server = NULL;
+    return;
   }
 
-  this->server->PreLoad();
-
-  if (_physics.length())
-    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
-                                           _physics));
-  else
-    ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
-
-  if (!rendering::get_scene(
-        gazebo::physics::get_world()->GetName()))
+  if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
   {
     ASSERT_NO_THROW(rendering::create_scene(
         gazebo::physics::get_world()->GetName(), false, true));
   }
-
-  ASSERT_NO_THROW(this->SetPause(_paused));
 
   ASSERT_NO_THROW(this->server->Run());
 
@@ -230,6 +266,12 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
 
   ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
+
+  // Deallocate memory for the command line arguments allocated with strdup.
+  for (int i = 0; i < argc; ++i)
+    free(argv[i]);
+
+  delete[] argv;
 }
 
 /////////////////////////////////////////////////
@@ -295,8 +337,7 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
   boost::mutex::scoped_lock lock(this->receiveMutex);
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    this->poses[_msg->pose(i).name()] =
-      msgs::Convert(_msg->pose(i));
+    this->poses[_msg->pose(i).name()] = msgs::ConvertIgn(_msg->pose(i));
   }
 }
 
@@ -650,6 +691,45 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
 }
 
 /////////////////////////////////////////////////
+sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
+    const std::string &_sonarName,
+    const ignition::math::Pose3d &_pose,
+    const double _minRange,
+    const double _maxRange,
+    const double _radius)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _modelName << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pose << "</pose>"
+    << "<link name ='body'>"
+    << "  <sensor name ='" << _sonarName << "' type ='sonar'>"
+    << "    <sonar>"
+    << "      <min>" << _minRange << "</min>"
+    << "      <max>" << _maxRange << "</max>"
+    << "      <radius>" << _radius << "</radius>"
+    << "    </sonar>"
+    << "    <visualize>true</visualize>"
+    << "    <always_on>true</always_on>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_modelName, 100, 100);
+  WaitUntilSensorSpawn(_sonarName, 100, 100);
+  return boost::dynamic_pointer_cast<sensors::SonarSensor>(
+      sensors::get_sensor(_sonarName));
+}
+
+
+/////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
@@ -903,6 +983,113 @@ void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
+    const std::string &_sensorName,
+    const std::string &_collisionType,
+    const std::string &_topic,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
+    bool _static)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+  std::ostringstream shapeStr;
+
+  if (_collisionType == "box")
+  {
+    shapeStr << " <box><size>1 1 1</size></box>";
+  }
+  else if (_collisionType == "cylinder")
+  {
+    shapeStr << "<cylinder>"
+             << "  <radius>.5</radius><length>1.0</length>"
+             << "</cylinder>";
+  }
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _name << "'>"
+    << "<static>" << _static << "</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <collision name ='contact_collision'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </visual>"
+    << "  <sensor name='" << _sensorName << "' type='altimeter'>"
+    << "    <topic>" << _topic << "</topic>"
+    << "    <altimeter>"
+    << "    </altimeter>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_name, 20, 50);
+  WaitUntilSensorSpawn(_sensorName, 100, 100);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnUnitMagnetometerSensor(const std::string &_name,
+    const std::string &_sensorName,
+    const std::string &_collisionType,
+    const std::string &_topic,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy, bool _static)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+  std::ostringstream shapeStr;
+  if (_collisionType == "box")
+  {
+    shapeStr << " <box><size>1 1 1</size></box>";
+  }
+  else if (_collisionType == "cylinder")
+  {
+    shapeStr << "<cylinder>"
+             << "  <radius>.5</radius><length>1.0</length>"
+             << "</cylinder>";
+  }
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _name << "'>"
+    << "<static>" << _static << "</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <collision name ='contact_collision'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << shapeStr.str()
+    << "    </geometry>"
+    << "  </visual>"
+    << "  <sensor name='" << _sensorName << "' type='magnetometer'>"
+    << "    <topic>" << _topic << "</topic>"
+    << "    <magnetometer>"
+    << "    </magnetometer>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_name, 20, 50);
+  WaitUntilSensorSpawn(_sensorName, 100, 100);
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::launchTimeoutFailure(const char *_logMsg,
                                          const int _timeoutCS)
 {
@@ -1036,6 +1223,32 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::WaitUntilIteration(const uint32_t _goalIteration,
+    const int _sleepEach, const int _retries) const
+{
+  int i = 0;
+  auto world = physics::get_world();
+  while ((world->GetIterations() != _goalIteration) && (i < _retries))
+  {
+    ++i;
+    common::Time::MSleep(_sleepEach);
+  }
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::WaitUntilSimTime(const common::Time &_goalTime,
+    const int _sleepEach, const int _retries) const
+{
+  int i = 0;
+  auto world = physics::get_world();
+  while ((world->GetSimTime() != _goalTime) && (i < _retries))
+  {
+    ++i;
+    common::Time::MSleep(_sleepEach);
+  }
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::SpawnLight(const std::string &_name,
     const std::string &_type,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
@@ -1110,7 +1323,8 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
   msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1174,13 +1388,15 @@ void ServerFixture::SpawnSphere(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
   msgs::AddSphereLink(model, 1.0, _radius);
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
   msgs::Set(link->mutable_inertial()->mutable_pose(),
-            math::Pose(_cog, math::Quaternion()));
+            ignition::math::Pose3d(_cog.Ign(),
+              ignition::math::Quaterniond()));
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     << msgs::ModelToSDF(model)->ToString("")
@@ -1204,8 +1420,9 @@ void ServerFixture::SpawnBox(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
-  msgs::AddBoxLink(model, 1.0, _size);
+  msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::AddBoxLink(model, 1.0, _size.Ign());
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
@@ -1271,7 +1488,8 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), math::Pose(_pos, _rpy));
+  msgs::Set(model.mutable_pose(),
+      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
   model.add_link();
   model.mutable_link(0)->set_name("body");
 

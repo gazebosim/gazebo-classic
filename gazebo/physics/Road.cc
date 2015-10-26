@@ -95,7 +95,7 @@ void Road::Init()
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   while (pointElem)
   {
-    math::Vector3 point = pointElem->Get<math::Vector3>();
+    ignition::math::Vector3d point = pointElem->Get<ignition::math::Vector3d>();
     pointElem = pointElem->GetNextElement("point");
 
     msgs::Vector3d *ptMsg = msg.add_point();

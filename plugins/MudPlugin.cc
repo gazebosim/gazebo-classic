@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/algorithm/string.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
@@ -238,7 +239,8 @@ void MudPlugin::OnUpdate()
             for (unsigned int j = 0; j < pc; ++j)
             {
               contactPositionAverage +=
-                msgs::Convert(this->newestContactsMsg.contact(i).position(j));
+                msgs::ConvertIgn(
+                    this->newestContactsMsg.contact(i).position(j));
             }
             // Then divide by numer of contact points
             contactPositionAverage /= static_cast<double>(pc);

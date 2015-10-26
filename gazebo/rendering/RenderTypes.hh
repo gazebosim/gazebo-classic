@@ -46,10 +46,12 @@ namespace gazebo
     class Camera;
     class UserCamera;
     class DepthCamera;
+    class WideAngleCamera;
     class GpuLaser;
     class DynamicLines;
     class Visual;
     class LaserVisual;
+    class LogicalCameraVisual;
     class SonarVisual;
     class WrenchVisual;
     class CameraVisual;
@@ -63,6 +65,7 @@ namespace gazebo
     class RFIDTagVisual;
     class ApplyWrenchVisual;
     class OriginVisual;
+    class LinkFrameVisual;
     class WindowManager;
     class SelectionObj;
     class RayQuery;
@@ -92,6 +95,10 @@ namespace gazebo
     /// \brief Shared pointer to DepthCamera
     typedef boost::shared_ptr<DepthCamera> DepthCameraPtr;
 
+    /// \def WideAngleCameraPtr
+    /// \brief Shared pointer to WideAngleCamera
+    typedef boost::shared_ptr<WideAngleCamera> WideAngleCameraPtr;
+
     /// \def GpuLaserPtr
     /// \brief Shared pointer to GpuLaser
     typedef boost::shared_ptr<GpuLaser> GpuLaserPtr;
@@ -119,6 +126,10 @@ namespace gazebo
     /// \def CameraVisualPtr
     /// \brief Shared pointer to CameraVisual
     typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
+
+    /// \def LogicalCameraVisualPtr
+    /// \brief Shared pointer to LogicalCameraVisual
+    typedef boost::shared_ptr<LogicalCameraVisual> LogicalCameraVisualPtr;
 
     /// \def JointVisualPtr
     /// \brief Shared pointer to JointVisual
@@ -159,6 +170,10 @@ namespace gazebo
     /// \def OriginVisualPtr
     /// \brief Shared pointer to OriginVisual
     typedef boost::shared_ptr<OriginVisual> OriginVisualPtr;
+
+    /// \def LinkFrameVisualPtr
+    /// \brief Shared pointer to LinkFrameVisual
+    typedef boost::shared_ptr<LinkFrameVisual> LinkFrameVisualPtr;
 
     /// \def WindowManager
     /// \brief Shared pointer to WindowManager
@@ -209,27 +224,6 @@ namespace gazebo
 
       /// \brief N/A
       RENDERING_MESH_RESOURCE = 6
-    };
-
-    /// \brief Type of visual
-    enum VisualType
-    {
-      /// \brief Entity visual
-      VT_ENTITY,
-      /// \brief Model visual
-      VT_MODEL,
-      /// \brief Link visual
-      VT_LINK,
-      /// \brief Visual visual
-      VT_VISUAL,
-      /// \brief Collision visual
-      VT_COLLISION,
-      /// \brief Sensor visual
-      VT_SENSOR,
-      /// \brief GUI visual
-      VT_GUI,
-      /// \brief Physics data visual
-      VT_PHYSICS
     };
   }
 }

@@ -14,19 +14,17 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
-#include <boost/math/special_functions/round.hpp>
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Helpers.hh"
-#include "gazebo/math/Rand.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/GaussianNoiseModel.hh"
@@ -55,9 +53,9 @@ namespace gazebo
       // Sample three values within the range [0,1.0] and set them for use in
       // the fragment shader, which will interpret them as offsets from (0,0)
       // to use when computing pseudo-random values.
-      Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
-                            math::Rand::GetDblUniform(0.0, 1.0),
-                            math::Rand::GetDblUniform(0.0, 1.0));
+      Ogre::Vector3 offsets(ignition::math::Rand::DblUniform(0.0, 1.0),
+                            ignition::math::Rand::DblUniform(0.0, 1.0),
+                            ignition::math::Rand::DblUniform(0.0, 1.0));
       // These calls are setting parameters that are declared in two places:
       // 1. media/materials/scripts/gazebo.material, in
       //    fragment_program Gazebo/GaussianCameraNoiseFS
@@ -116,12 +114,14 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
     biasMean = _sdf->Get<double>("bias_mean");
   if (_sdf->HasElement("bias_stddev"))
     biasStdDev = _sdf->Get<double>("bias_stddev");
-  this->bias = math::Rand::GetDblNormal(biasMean, biasStdDev);
+  this->bias = ignition::math::Rand::DblNormal(biasMean, biasStdDev);
   // With equal probability, we pick a negative bias (by convention,
   // rateBiasMean should be positive, though it would work fine if
   // negative).
-  if (math::Rand::GetDblUniform() < 0.5)
+  if (ignition::math::Rand::DblUniform() < 0.5)
     this->bias = -this->bias;
+
+  /// \todo Remove this, and use Noise::Print. See ImuSensor for an example
   gzlog << "applying Gaussian noise model with mean " << this->mean
     << ", stddev " << this->stdDev
     << ", bias " << this->bias << std::endl;
@@ -133,7 +133,7 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
     {
       gzerr << "Noise precision cannot be less than 0" << std::endl;
     }
-    else if (!math::equal(this->precision, 0.0, 1e-6))
+    else if (!ignition::math::equal(this->precision, 0.0, 1e-6))
     {
       this->quantized = true;
     }
@@ -150,14 +150,14 @@ void GaussianNoiseModel::Fini()
 double GaussianNoiseModel::ApplyImpl(double _in)
 {
   // Add independent (uncorrelated) Gaussian noise to each input value.
-  double whiteNoise = math::Rand::GetDblNormal(this->mean, this->stdDev);
+  double whiteNoise = ignition::math::Rand::DblNormal(this->mean, this->stdDev);
   double output = _in + this->bias + whiteNoise;
   if (this->quantized)
   {
     // Apply this->precision
-    if (!math::equal(this->precision, 0.0, 1e-6))
+    if (!ignition::math::equal(this->precision, 0.0, 1e-6))
     {
-      output = boost::math::round(output / this->precision) * this->precision;
+      output = std::round(output / this->precision) * this->precision;
     }
   }
   return output;
@@ -179,6 +179,16 @@ double GaussianNoiseModel::GetStdDev() const
 double GaussianNoiseModel::GetBias() const
 {
   return this->bias;
+}
+
+//////////////////////////////////////////////////
+void GaussianNoiseModel::Print(std::ostream &_out) const
+{
+  _out << "Gaussian noise, mean[" << this->mean << "], "
+    << "stdDev[" << this->stdDev << "] "
+    << "bias[" << this->bias << "] "
+    << "precision[" << this->precision << "] "
+    << "quantized[" << this->quantized << "]";
 }
 
 //////////////////////////////////////////////////
@@ -223,4 +233,14 @@ void ImageGaussianNoiseModel::Fini()
     this->gaussianNoiseInstance->removeListener(
       this->gaussianNoiseCompositorListener.get());
   }
+}
+
+//////////////////////////////////////////////////
+void ImageGaussianNoiseModel::Print(std::ostream &_out) const
+{
+  _out << "Image Gaussian noise, mean[" << this->mean << "], "
+    << "stdDev[" << this->stdDev << "] "
+    << "bias[" << this->bias << "] "
+    << "precision[" << this->precision << "] "
+    << "quantized[" << this->quantized << "]";
 }

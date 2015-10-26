@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 
+#include <boost/function.hpp>
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -106,6 +107,10 @@ namespace gazebo
       /// shaders for more efficient noise generation.
       /// \param[in] _camera Camera associated to an image sensor
       public: virtual void SetCamera(rendering::CameraPtr _camera);
+
+      /// \brief Output information about the noise model.
+      /// \param[in] _out Output stream
+      public: virtual void Print(std::ostream &_out) const;
 
       /// \brief Which type of noise we're applying
       private: NoiseType type;

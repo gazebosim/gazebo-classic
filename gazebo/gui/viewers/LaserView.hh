@@ -34,7 +34,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GZ_GUI_VIEWERS_VISIBLE LaserView : public TopicView
+    class GZ_GUI_VISIBLE LaserView : public TopicView
     {
       Q_OBJECT
 
@@ -144,6 +144,9 @@ namespace gazebo
 
                  /// \brief The vector of points to draw.
                  private: std::vector<QPointF> points;
+
+                 /// \brief The vector of points to draw for rays with no hit.
+                 private: std::vector<QPointF> noHitPoints;
 
                  /// \brief The vector of range values, as returned by the
                  /// laser sensor.

@@ -20,6 +20,7 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
+#include <boost/bind.hpp>
 #include <unistd.h>
 
 #include "gazebo/common/Console.hh"
@@ -37,6 +38,7 @@ QTestFixture::QTestFixture()
     resMaxPercentChange(0), shareMaxPercentChange(0),
     residentStart(0), shareStart(0)
 {
+  gazebo::common::Console::SetQuiet(false);
 }
 
 /////////////////////////////////////////////////

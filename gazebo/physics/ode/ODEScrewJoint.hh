@@ -27,7 +27,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A screw joint.
-    class GZ_PHYSICS_ODE_VISIBLE ODEScrewJoint : public ScrewJoint<ODEJoint>
+    class GZ_PHYSICS_VISIBLE ODEScrewJoint : public ScrewJoint<ODEJoint>
     {
       /// \brief Constructor.
       /// \param[in] _worldId ODE world id.
@@ -75,12 +75,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetVelocity(unsigned int _index, double _angle);
-
-      // Documentation inherited
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited
-      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited
       public: virtual double GetParam(unsigned int _parameter) const;

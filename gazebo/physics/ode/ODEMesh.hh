@@ -28,7 +28,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Triangle mesh helper class.
-    class GZ_PHYSICS_ODE_VISIBLE ODEMesh
+    class GZ_PHYSICS_VISIBLE ODEMesh
     {
       /// \brief Constructor.
       public: explicit ODEMesh();

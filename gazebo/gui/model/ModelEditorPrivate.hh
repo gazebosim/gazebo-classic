@@ -43,18 +43,9 @@ namespace gazebo
       /// \brief True if model editor is active.
       public: bool active;
 
-      /// \brief Qt action for selecting and adding a joint in the model editor.
-      public: QAction *jointTypeAct;
-
       /// \brief Qt action for adding a previously selected joint in the
       /// model editor.
       public: QAction *jointAct;
-
-      /// \brief A separator for the joint icon.
-      public: QAction *jointSeparatorAct;
-
-      /// \brief Qt tool button associated with the joint action.
-      public: QToolButton *jointButton;
 
       /// \brief Qt signal mapper for mapping add jointsignals.
       public: QSignalMapper *signalMapper;
@@ -89,8 +80,11 @@ namespace gazebo
       /// \brief Fullscreen action cloned from main window.
       public: QAction *fullScreenAct;
 
-      /// \brief Save the main window paused state to use when returning.
-      public: bool mainWindowPaused;
+      /// \brief Camera orthographic view action cloned from main window.
+      public: QAction *cameraOrthoAct;
+
+      /// \brief Camera perspective view action cloned from main window.
+      public: QAction *cameraPerspectiveAct;
     };
   }
 }

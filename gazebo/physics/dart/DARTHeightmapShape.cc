@@ -20,18 +20,22 @@
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTHeightmapShape.hh"
 
+#include "gazebo/physics/dart/DARTHeightmapShapePrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 DARTHeightmapShape::DARTHeightmapShape(CollisionPtr _parent)
-    : HeightmapShape(_parent)
+  : HeightmapShape(_parent),
+    dataPtr(new DARTHeightmapShapePrivate())
 {
 }
 
 //////////////////////////////////////////////////
 DARTHeightmapShape::~DARTHeightmapShape()
 {
+  delete dataPtr;
 }
 
 //////////////////////////////////////////////////

@@ -1,91 +1,59 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
-include (${QT_USE_FILE})
 
-set (sources
-  BuildingEditor.cc
-  BuildingEditorEvents.cc
-  BuildingEditorPalette.cc
-  BuildingEditorWidget.cc
-  BuildingItem.cc
-  BuildingMaker.cc
-  BuildingModelManip.cc
-  DoorItem.cc
-  EditorItem.cc
-  EditorView.cc
-  FloorItem.cc
-  GrabberHandle.cc
-  GridLines.cc
-  ImportImageDialog.cc
-  ImportImageView.cc
-  LevelInspectorDialog.cc
-  LevelWidget.cc
-  MeasureItem.cc
-  RectItem.cc
-  RotateHandle.cc
-  ScaleWidget.cc
-  SegmentItem.cc
-  StairsInspectorDialog.cc
-  StairsItem.cc
-  WallInspectorDialog.cc
-  WallSegmentItem.cc
-  WindowDoorInspectorDialog.cc
-  WindowItem.cc
+set (sources ${sources}
+  building/BaseInspectorDialog.cc
+  building/BuildingEditor.cc
+  building/BuildingEditorEvents.cc
+  building/BuildingEditorPalette.cc
+  building/BuildingEditorWidget.cc
+  building/BuildingItem.cc
+  building/BuildingMaker.cc
+  building/BuildingModelManip.cc
+  building/DoorItem.cc
+  building/EditorItem.cc
+  building/EditorView.cc
+  building/FloorItem.cc
+  building/GrabberHandle.cc
+  building/GridLines.cc
+  building/ImportImageDialog.cc
+  building/ImportImageView.cc
+  building/LevelInspectorDialog.cc
+  building/LevelWidget.cc
+  building/MeasureItem.cc
+  building/RectItem.cc
+  building/RotateHandle.cc
+  building/ScaleWidget.cc
+  building/SegmentItem.cc
+  building/StairsInspectorDialog.cc
+  building/StairsItem.cc
+  building/WallInspectorDialog.cc
+  building/WallSegmentItem.cc
+  building/WindowDoorInspectorDialog.cc
+  building/WindowItem.cc
+  PARENT_SCOPE
 )
 
-set (qt_headers
-  BuildingEditor.hh
-  BuildingEditorPalette.hh
-  BuildingModelManip.hh
-  DoorItem.hh
-  EditorItem.hh
-  EditorView.hh
-  FloorItem.hh
-  ImportImageDialog.hh
-  ImportImageView.hh
-  LevelInspectorDialog.hh
-  LevelWidget.hh
-  MeasureItem.hh
-  RectItem.hh
-  ScaleWidget.hh
-  StairsInspectorDialog.hh
-  StairsItem.hh
-  WallInspectorDialog.hh
-  WallSegmentItem.hh
-  WindowDoorInspectorDialog.hh
-  WindowItem.hh
+set (internal_qt_headers ${internal_qt_headers}
+  building/BaseInspectorDialog.hh
+  building/BuildingEditor.hh
+  building/BuildingEditorPalette.hh
+  building/BuildingModelManip.hh
+  building/DoorItem.hh
+  building/EditorItem.hh
+  building/EditorView.hh
+  building/FloorItem.hh
+  building/ImportImageDialog.hh
+  building/ImportImageView.hh
+  building/LevelInspectorDialog.hh
+  building/LevelWidget.hh
+  building/MeasureItem.hh
+  building/RectItem.hh
+  building/ScaleWidget.hh
+  building/StairsInspectorDialog.hh
+  building/StairsItem.hh
+  building/WallInspectorDialog.hh
+  building/WallSegmentItem.hh
+  building/WindowDoorInspectorDialog.hh
+  building/WindowItem.hh
+  PARENT_SCOPE
 )
-
-set (headers
-  BuildingEditorEvents.hh
-  BuildingEditorWidget.hh
-  BuildingItem.hh
-  BuildingMaker.hh
-  GrabberHandle.hh
-  GridLines.hh
-  RotateHandle.hh
-  SegmentItem.hh
-)
-
-set (resources ../resources.qrc)
-QT4_WRAP_CPP(headers_MOC ${qt_headers})
-QT4_ADD_RESOURCES(resources_RCC ${resources})
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI_BUILDING")
-
-if (WIN32)
-  add_library(gazebo_gui_building STATIC ${sources} ${headers_MOC} ${headers} ${resources_RCC})
-  target_link_libraries(gazebo_gui_building ${general_libraries})
-else()
-  gz_add_library(gazebo_gui_building ${sources} ${headers_MOC} ${headers} ${resources_RCC})
-endif()
-
-target_link_libraries(gazebo_gui_building
-  gazebo_rendering
-  gazebo_transport
-  gazebo_msgs
-  gazebo_common
-  ${QT_LIBRARIES})
-
-gz_install_library(gazebo_gui_building)

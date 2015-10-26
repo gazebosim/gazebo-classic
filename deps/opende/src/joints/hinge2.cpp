@@ -138,8 +138,6 @@ dxJointHinge2::getInfo2( dxJoint::Info2 *info )
       info->cfm[1] = cfm;
       info->cfm[2] = cfm;
       info->cfm[3] = cfm;
-      info->cfm[4] = cfm;
-      info->cfm[5] = cfm;
     }
 
     // get information we need to set the hinge row

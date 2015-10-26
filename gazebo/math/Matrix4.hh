@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _MATRIX4_HH_
-#define _MATRIX4_HH_
+#ifndef _GAZEBO_MATRIX4_HH_
+#define _GAZEBO_MATRIX4_HH_
 
 #include <assert.h>
 #include <iostream>
+#include <ignition/math/Matrix4.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
@@ -44,6 +45,10 @@ namespace gazebo
       /// \brief Copy constructor
       /// \param _m Matrix to copy
       public: Matrix4(const Matrix4 &_m);
+
+      /// \brief Copy constructor for ignition math
+      /// \param _m Matrix to copy
+      public: Matrix4(const ignition::math::Matrix4d &_m);
 
       /// \brief Constructor
       /// \param[in] _v00 Row 0, Col 0 value
@@ -136,6 +141,11 @@ namespace gazebo
       /// \return itself
       public: Matrix4 &operator =(const Matrix4 &_mat);
 
+      /// \brief Equal operator for ignition math
+      /// \param _mat Incoming matrix
+      /// \return itself
+      public: Matrix4 &operator=(const ignition::math::Matrix4d &_mat);
+
       /// \brief Equal operator for 3x3 matrix
       /// \param _mat Incoming matrix
       /// \return itself
@@ -178,6 +188,10 @@ namespace gazebo
       /// \return true if the 2 matrices are equal (using the tolerance 1e-6),
       ///  false otherwise
       public: bool operator==(const Matrix4 &_m) const;
+
+      /// \brief Convert this matrix to an ignition::math::Matrix4d.
+      /// \return This matrix as an ignition::math::Matrix4d.
+      public: ignition::math::Matrix4d Ign() const;
 
       /// \brief Stream insertion operator
       /// \param _out output stream

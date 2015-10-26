@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -241,7 +242,7 @@ namespace gazebo
       protected: virtual void OnPoseChange() = 0;
 
       /// \brief Publish the pose.
-      private: void PublishPose();
+      private: virtual void PublishPose();
 
       /// \brief Helper function to get the collision bounding box.
       /// \param[in] _base Object to calculated the bounding box for.

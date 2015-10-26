@@ -18,8 +18,8 @@
 #ifndef _GAZEBO_IMU_SENSOR_PLUGIN_HH_
 #define _GAZEBO_IMU_SENSOR_PLUGIN_HH_
 
-#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Events.hh"
 
 namespace gazebo

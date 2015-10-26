@@ -576,7 +576,7 @@ QWidget#terrainEditorWidget > QWidget
   border-top-right-radius: 10px;
 }
 
-QWidget#toolFrame
+QWidget#topToolbar
 {
   border-bottom: 1px solid #101010;
   background-color: #808080;
@@ -747,4 +747,21 @@ QAbstractSpinBox::down-arrow:hover
   image: url(:/images/down_spin_arrow.png);
   width: 10px;
   height: 10px;
+}
+
+QLineEdit#logPlayCurrentTime
+{
+  background-color: #808080;
+        color: #cfcfcf;
+        font-size: 15px;
+}
+QLineEdit#logPlayCurrentTime:focus
+{
+  background-color: #707070;
+}
+
+QTextEdit#splashVersionTextEdit
+{
+  color: #f58113;
+  font-size: 10px;
 }

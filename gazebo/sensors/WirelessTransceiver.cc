@@ -14,15 +14,14 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <sstream>
-#include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -68,7 +67,8 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 
   GZ_ASSERT(this->parentEntity.lock() != NULL, "parentEntity is NULL");
 
-  this->referencePose = this->pose + this->parentEntity.lock()->GetWorldPose();
+  this->referencePose = this->pose +
+    this->parentEntity.lock()->GetWorldPose().Ign();
 
   if (!this->sdf->HasElement("transceiver"))
   {

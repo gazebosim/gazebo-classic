@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_LOG_PLAY_WIDGET_HH_
 #define _GAZEBO_LOG_PLAY_WIDGET_HH_
 
+#include "gazebo/common/Time.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/util/system.hh"
@@ -26,9 +27,12 @@ namespace gazebo
   namespace gui
   {
     class LogPlayWidgetPrivate;
+    class LogPlayViewPrivate;
     class TimePanel;
 
-    class GAZEBO_VISIBLE LogPlayWidget : public QWidget
+    /// \class LogPlayWidget LogPlayWidget.hh
+    /// \brief Widget which displays log playback options.
+    class GZ_GUI_VISIBLE LogPlayWidget : public QWidget
     {
       Q_OBJECT
 
@@ -48,9 +52,17 @@ namespace gazebo
       /// indicates the simulation is running
       public: void SetPaused(const bool _paused);
 
-      /// \brief Emit signal to set sim time line edit.
-      /// \param[in] _string String representation of current time.
-      public: void EmitSetCurrentTime(const QString &_string);
+      /// \brief Emit signal to set current time.
+      /// \param[in] _time Current time.
+      public: void EmitSetCurrentTime(const common::Time &_time);
+
+      /// \brief Emit signal to set start time.
+      /// \param[in] _time Start time.
+      public: void EmitSetStartTime(const common::Time &_time);
+
+      /// \brief Emit signal to set end time.
+      /// \param[in] _time End time.
+      public: void EmitSetEndTime(const common::Time &_time);
 
       /// \brief Play simulation.
       public slots: void OnPlay();
@@ -60,6 +72,19 @@ namespace gazebo
 
       /// \brief Step simulation forward.
       public slots: void OnStepForward();
+
+      /// \brief Step simulation back.
+      public slots: void OnStepBack();
+
+      /// \brief Jump to the start of the log file.
+      public slots: void OnRewind();
+
+      /// \brief Jump to the end of the log file.
+      public slots: void OnForward();
+
+      /// \brief Jump to a given time in the log file
+      /// \param[in] _time Desired time
+      public slots: void OnSeek(const common::Time &_time);
 
       /// \brief Qt signal to show the play button.
       signals: void ShowPlay();
@@ -77,9 +102,94 @@ namespace gazebo
       /// \param[in] _string String representation of current time.
       signals: void SetCurrentTime(const QString &);
 
+      /// \brief Qt signal used to set the end time line edit.
+      /// \param[in] _string String representation of current time.
+      signals: void SetEndTime(const QString &);
+
+      /// \brief Qt signal used to set the current time in the view.
+      /// \param[in] _time Current time.
+      signals: void SetCurrentTime(const common::Time &_time);
+
+      /// \brief Qt signal used to set the start time in the view.
+      /// \param[in] _time Start time.
+      signals: void SetStartTime(const common::Time &_time);
+
+      /// \brief Qt signal used to set the end time in the view.
+      /// \param[in] _time End time.
+      signals: void SetEndTime(const common::Time &_time);
+
+      /// \brief Publish a multistep message.
+      /// \param[in] _step Number of steps.
+      private: void PublishMultistep(const int _step);
+
+      /// \brief Helper function to prepare each of the buttons.
+      /// \param[in] _button Pointer to the button.
+      /// \param[in] _icon Icon uri.
+      /// \param[in] _isSmall True if the button is small.
+      private: void SetupButton(QToolButton *_button, QString _icon,
+          bool _isSmall);
+
       /// \internal
       /// \brief Pointer to private data.
       private: LogPlayWidgetPrivate *dataPtr;
+    };
+
+    /// \class LogPlayView LogPlayView.hh
+    /// \brief View for the timeline.
+    class GZ_GUI_VISIBLE LogPlayView: public QGraphicsView
+    {
+      Q_OBJECT
+
+      /// \brief Constructor;
+      /// \param[in] _parent Parent widget.
+      public: LogPlayView(LogPlayWidget *_parent = 0);
+
+      /// \brief Set the position of the current time item.
+      /// \param[in] _time Current time.
+      public slots: void SetCurrentTime(const common::Time &_time);
+
+      /// \brief Set the log start time.
+      /// \param[in] _time Start time.
+      public slots: void SetStartTime(const common::Time &_time);
+
+      /// \brief Set the log end time.
+      /// \param[in] _time End time.
+      public slots: void SetEndTime(const common::Time &_time);
+
+      /// \brief Draw the timeline.
+      public slots: void DrawTimeline();
+
+      /// \brief Qt signal used to seek.
+      /// \param[in] _time Time to jump to.
+      signals: void Seek(const common::Time &_time);
+
+      // Documentation inherited
+      protected: void mousePressEvent(QMouseEvent *_event);
+
+      // Documentation inherited
+      protected: void mouseReleaseEvent(QMouseEvent *_event);
+
+      // Documentation inherited
+      protected: void mouseMoveEvent(QMouseEvent *_event);
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: LogPlayViewPrivate *dataPtr;
+    };
+
+    /// \class CurrentTimeItem CurrentTimeItem.hh
+    /// \brief Item which represents the current time within the view.
+    class GZ_GUI_VISIBLE CurrentTimeItem: public QObject,
+        public QGraphicsRectItem
+    {
+      Q_OBJECT
+
+      /// \brief Constructor;
+      public: CurrentTimeItem();
+
+      // Documentation inherited
+      private: virtual void paint(QPainter *_painter,
+          const QStyleOptionGraphicsItem *_option, QWidget *_widget);
     };
   }
 }

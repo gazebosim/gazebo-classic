@@ -153,6 +153,14 @@ namespace gazebo
       public: CameraPtr CreateCamera(const std::string &_name,
                                      bool _autoRender = true);
 
+      /// \brief Create a wide-angle camera
+      /// \param[in] _name Name of the new camera.
+      /// \param[in] _autoRender True to allow Gazebo to automatically
+      /// render the camera. This should almost always be true.
+      /// \return Pointer to the new camera.
+      public: WideAngleCameraPtr CreateWideAngleCamera(const std::string &_name,
+          const bool _autoRender = true);
+
 #ifdef HAVE_OCULUS
       /// \brief Create an oculus rift camera
       /// \param[in] _name Name of the new camera.
@@ -426,6 +434,10 @@ namespace gazebo
       /// \param[in] _show True to enable inertia visualization.
       public: void ShowInertias(bool _show);
 
+      /// \brief Enable or disable link frame visualization.
+      /// \param[in] _show True to enable link frame visualization.
+      public: void ShowLinkFrames(bool _show);
+
       /// \brief Enable or disable joint visualization.
       /// \param[in] _show True to enable joint visualization.
       public: void ShowJoints(bool _show);
@@ -571,15 +583,23 @@ namespace gazebo
       /// \param[in] _type Type of visual.
       /// \return True if message is processed successfully.
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg,
-          rendering::VisualType _type = rendering::VT_ENTITY);
+          Visual::VisualType _type = Visual::VT_ENTITY);
 
-      /// \brief Light message callback.
+      /// \brief Light factory message callback.
       /// \param[in] _msg The message data.
-      private: void OnLightMsg(ConstLightPtr &_msg);
+      private: void OnLightFactoryMsg(ConstLightPtr &_msg);
 
-      /// \brief Process a light message.
+      /// \brief Light modify message callback.
       /// \param[in] _msg The message data.
-      private: bool ProcessLightMsg(ConstLightPtr &_msg);
+      private: void OnLightModifyMsg(ConstLightPtr &_msg);
+
+      /// \brief Process a light factory message.
+      /// \param[in] _msg The message data.
+      private: bool ProcessLightFactoryMsg(ConstLightPtr &_msg);
+
+      /// \brief Process a light modify message.
+      /// \param[in] _msg The message data.
+      private: bool ProcessLightModifyMsg(ConstLightPtr &_msg);
 
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
@@ -622,6 +642,12 @@ namespace gazebo
       /// \param[in] _elem SDF element data.
       /// \param[in] _linkVisual Pointer to the link's visual.
       private: void CreateInertiaVisual(sdf::ElementPtr _elem,
+          VisualPtr _linkVisual);
+
+      /// \brief Create a new link frame visual.
+      /// \param[in] _msg Message containing the link data.
+      /// \param[in] _linkVisual Pointer to the link's visual.
+      private: void CreateLinkFrameVisual(ConstLinkPtr &_msg,
           VisualPtr _linkVisual);
 
       /// \brief Helper function to remove all visualizations attached to a

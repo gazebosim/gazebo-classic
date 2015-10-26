@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the DataLogger widget.
+/// \brief A test class for the main window class.
 class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
@@ -55,6 +55,12 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test Set user camera pose via SDF
   private slots: void SetUserCameraPoseSDF();
+
+  /// \brief Test that menus are created in the main window menu bar.
+  private slots: void MenuBar();
+
+  /// \brief Test different window modes.
+  private slots: void WindowModes();
 };
 
 #endif

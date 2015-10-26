@@ -31,8 +31,6 @@ QAction *gazebo::gui::g_newAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_openAct = 0;
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_importAct = 0;
-GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveAsAct = 0;
@@ -40,6 +38,8 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_saveCfgAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_cloneAct = 0;
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_hotkeyChartAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_aboutAct = 0;
 GZ_GUI_VISIBLE
@@ -72,8 +72,6 @@ QAction *gazebo::gui::g_sphereCreateAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_cylinderCreateAct = 0;
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_meshCreateAct = 0;
-GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_pointLghtCreateAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_spotLghtCreateAct = 0;
@@ -98,6 +96,8 @@ QAction *gazebo::gui::g_showCOMAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_showInertiaAct = 0;
 GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_showLinkFrameAct = 0;
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_viewWireframeAct = 0;
@@ -117,7 +117,7 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_fpsAct = 0;
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_orbitAct = 0;
-GAZEBO_VISIBLE
+GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_overlayAct = 0;
 
 GZ_GUI_VISIBLE
@@ -143,3 +143,9 @@ QWidgetAction *gazebo::gui::g_alignAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_alignButtonAct = 0;
+
+GZ_GUI_VISIBLE
+QWidgetAction *gazebo::gui::g_viewAngleAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_viewAngleButtonAct = 0;

@@ -19,6 +19,7 @@
 #define _GAZEBO_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -58,6 +59,27 @@ namespace gazebo
     class GZ_RENDERING_VISIBLE Visual :
       public boost::enable_shared_from_this<Visual>
     {
+      /// \brief Type of visual
+      public: enum VisualType
+      {
+        /// \brief Entity visual
+        VT_ENTITY,
+        /// \brief Model visual
+        VT_MODEL,
+        /// \brief Link visual
+        VT_LINK,
+        /// \brief Visual visual
+        VT_VISUAL,
+        /// \brief Collision visual
+        VT_COLLISION,
+        /// \brief Sensor visual
+        VT_SENSOR,
+        /// \brief GUI visual
+        VT_GUI,
+        /// \brief Physics data visual
+        VT_PHYSICS
+      };
+
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
       /// \param[in] _parent Parent of the visual.
@@ -176,6 +198,10 @@ namespace gazebo
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
 
+      /// \brief Get the scale of the visual as inherited from all parents.
+      /// \return The derived scaling factor.
+      public: ignition::math::Vector3d DerivedScale() const;
+
       /// \brief Get whether or not lighting is enabled.
       /// \return True if lighting is enabled.
       public: bool GetLighting() const;
@@ -189,20 +215,33 @@ namespace gazebo
       /// \param[in] _unique True to make the material unique, which
       /// allows the material to change without changing materials that
       /// originally had the same name.
+      /// \param[in] _cascade Whether to set this parameter in children too.
       public: void SetMaterial(const std::string &_materialName,
-                               bool _unique = true);
+                               bool _unique = true, const bool _cascade = true);
 
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
-      public: void SetAmbient(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetAmbient(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
-      public: void SetDiffuse(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetDiffuse(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
-      public: void SetSpecular(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetSpecular(const common::Color &_color,
+          const bool _cascade = true);
+
+      /// \brief Set the emissive value.
+      /// \param[in] _color The emissive color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: virtual void SetEmissive(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Get the ambient color of the visual.
       /// \return Ambient color.
@@ -220,21 +259,20 @@ namespace gazebo
       /// \return Emissive color.
       public: common::Color GetEmissive() const;
 
-      /// \brief Attach visualization axes
-      public: void AttachAxes();
-
       /// \brief Enable or disable wireframe for this visual.
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);
 
       /// \brief Set the transparency of a single visual without calling
       /// UpdateShaders.
-      private: void SetTransparencyInnerLoop();
+      /// \param[in] _sceneNode The target scene node.
+      private: void SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode);
 
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.
-      public: void SetTransparency(float _trans);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetTransparency(float _trans, const bool _cascade = true);
 
       /// \brief Get the transparency.
       /// \return The transparency.
@@ -243,16 +281,12 @@ namespace gazebo
       /// \brief Set the visual to be visually highlighted. This is most
       /// often used when an object is selected by a user via the GUI.
       /// \param[in] _highlighted True to enable the highlighting.
-      public: void SetHighlighted(bool _highlighted);
+      public: virtual void SetHighlighted(bool _highlighted);
 
       /// \brief Get whether or not the visual is visually highlighted. This is
       /// most often means that an object is selected by a user via the GUI.
       /// \return True if the visual is highlighted.
       public: bool GetHighlighted() const;
-
-      /// \brief Set the emissive value.
-      /// \param[in] _color The emissive color.
-      public: virtual void SetEmissive(const common::Color &_color);
 
       /// \brief Get whether the visual casts shadows.
       /// \return True if the visual casts shadows.
@@ -265,7 +299,7 @@ namespace gazebo
       /// \brief Set whether the visual is visible.
       /// \param[in] _visible set this node visible.
       /// \param[in] _cascade setting this parameter in children too.
-      public: void SetVisible(bool _visible, bool _cascade = true);
+      public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
       /// \brief Toggle whether this visual is visible.
       public: void ToggleVisible();
@@ -413,6 +447,16 @@ namespace gazebo
       /// \return The nth ancestor counting from the world.
       public: VisualPtr GetNthAncestor(unsigned int _n);
 
+      /// \brief Check if this visual is an ancestor of another visual.
+      /// \param[in] _visual The other visual.
+      /// \return True if this visual is an ancestor.
+      public: bool IsAncestorOf(const rendering::VisualPtr _visual) const;
+
+      /// \brief Check if this visual is a descendant of another visual.
+      /// \param[in] _visual The other visual.
+      /// \return True if this visual is a descendant.
+      public: bool IsDescendantOf(const rendering::VisualPtr _visual) const;
+
       /// \brief Get the depth of this visual, where 0 is the depth of the
       /// world visual.
       /// \return This visual's depth.
@@ -487,6 +531,10 @@ namespace gazebo
       /// \param[in] _show True to show inertia visualizations.
       public: void ShowInertia(bool _show);
 
+      /// \brief Display link frame visuals.
+      /// \param[in] _show True to show link frame visualizations.
+      public: void ShowLinkFrame(bool _show);
+
       /// \brief Set animation skeleton pose.
       /// \param[in] _pose Skelton message
       public: void SetSkeletonPose(const msgs::PoseAnimation &_pose);
@@ -513,6 +561,10 @@ namespace gazebo
       /// \return Type of geometry in string.
       public: std::string GetGeometryType() const;
 
+      /// \brief Get the geometry size.
+      /// \return Size of geometry.
+      public: ignition::math::Vector3d GetGeometrySize() const;
+
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
       public: std::string GetMeshName() const;
@@ -532,11 +584,23 @@ namespace gazebo
 
       /// \brief Get type of visual.
       /// \return Visual type.
-      public: VisualType GetType() const;
+      public: Visual::VisualType GetType() const;
 
       /// \brief Set type of visual.
       /// \param[in] _type Visual type.
-      public: void SetType(const VisualType _type);
+      public: void SetType(const Visual::VisualType _type);
+
+      /// \brief Convert from msgs::Visual::Type to VisualType.
+      /// \param[in] _type A msgs::Visual::Type enum.
+      /// \return VisualType enum.
+      public: static Visual::VisualType ConvertVisualType(
+          const msgs::Visual::Type &_type);
+
+      /// \brief Convert from msgs::Visual::Type to VisualType.
+      /// \param[in] _type VisualType enum.
+      /// \return A msgs::Visual::Type enum.
+      public: static msgs::Visual::Type ConvertVisualType(
+          const Visual::VisualType &_type);
 
       /// \internal
       /// \brief Constructor used by inherited classes
@@ -603,7 +667,7 @@ namespace gazebo
       /// \brief Helper function to update the geometry object size based on
       /// the scale of the visual.
       /// \param[in] _scale Scale of visual
-      private: void UpdateGeomSize(const math::Vector3 &_scale);
+      private: void UpdateGeomSize(const ignition::math::Vector3d &_scale);
 
       /// \internal
       /// \brief Pointer to private data.

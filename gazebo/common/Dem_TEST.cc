@@ -17,6 +17,8 @@
 
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Dem.hh"
 #include "gazebo/math/Angle.hh"
@@ -117,7 +119,7 @@ TEST_F(DemTest, BasicAPI)
   ASSERT_ANY_THROW(dem.GetElevation(width, height));
 
   // Check GetGeoReferenceOrigin()
-  math::Angle latitude, longitude;
+  ignition::math::Angle latitude, longitude;
   dem.GetGeoReferenceOrigin(latitude, longitude);
   EXPECT_FLOAT_EQ(38.001667, latitude.Degree());
   EXPECT_FLOAT_EQ(-122.22278, longitude.Degree());
@@ -135,22 +137,23 @@ TEST_F(DemTest, FillHeightmap)
   // Use FillHeightMap() to retrieve a vector<float> after some transformations
   int subsampling;
   unsigned vertSize;
-  math::Vector3 size;
-  math::Vector3 scale;
+  ignition::math::Vector3d size;
+  ignition::math::Vector3d scale;
   bool flipY;
   std::vector<float> elevations;
 
   subsampling = 2;
   vertSize = (dem.GetWidth() * subsampling) - 1;
-  size.x = dem.GetWorldWidth();
-  size.y = dem.GetWorldHeight();
-  size.z = dem.GetMaxElevation() - dem.GetMinElevation();
-  scale.x = size.x / vertSize;
-  scale.y = size.y / vertSize;
-  if (math::equal(dem.GetMaxElevation(), 0.0f))
-    scale.z = fabs(size.z);
+  size.X(dem.GetWorldWidth());
+  size.Y(dem.GetWorldHeight());
+  size.Z(dem.GetMaxElevation() - dem.GetMinElevation());
+  scale.X(size.X() / vertSize);
+  scale.Y(size.Y() / vertSize);
+
+  if (ignition::math::equal(dem.GetMaxElevation(), 0.0f))
+    scale.Z(fabs(size.Z()));
   else
-    scale.z = fabs(size.z) / dem.GetMaxElevation();
+    scale.Z(fabs(size.Z()) / dem.GetMaxElevation());
   flipY = false;
 
   dem.FillHeightMap(subsampling, vertSize, size, scale, flipY, elevations);

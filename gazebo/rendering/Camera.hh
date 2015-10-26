@@ -19,6 +19,7 @@
 #define _GAZEBO_RENDERING_CAMERA_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 #include <string>
 #include <utility>
 #include <list>
@@ -92,7 +93,7 @@ namespace gazebo
       /// \param[in] _sdf The SDF camera info
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-       /// \brief Load the camera with default parmeters
+      /// \brief Load the camera with default parmeters
       public: virtual void Load();
 
       /// \brief Initialize the camera
@@ -201,14 +202,6 @@ namespace gazebo
       public: void Yaw(const math::Angle &_angle,
                   Ogre::Node::TransformSpace _relativeTo =
                   Ogre::Node::TS_WORLD);
-
-      /// \brief Rotate the camera around the z-axis
-      /// \param[in] _angle Rotation amount
-      public: void RotateYaw(math::Angle _angle) GAZEBO_DEPRECATED(4.0);
-
-      /// \brief Rotate the camera around the y-axis
-      /// \param[in] _angle Pitch amount
-      public: void RotatePitch(math::Angle _angle) GAZEBO_DEPRECATED(4.0);
 
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters
@@ -619,7 +612,7 @@ namespace gazebo
                    std::string _format, int _width, int _height);
 
       /// \brief Set the clip distance based on stored SDF values
-      private: void SetClipDist();
+      private: virtual void SetClipDist();
 
       /// \brief Get the OGRE image pixel format in
       /// \param[in] _format The Gazebo image format

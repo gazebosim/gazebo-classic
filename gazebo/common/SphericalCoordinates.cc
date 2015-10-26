@@ -14,14 +14,12 @@
  * limitations under the License.
  *
 */
-
 #include <string>
 #include <math.h>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/SphericalCoordinatesPrivate.hh"
-
 
 using namespace gazebo;
 using namespace common;
@@ -67,11 +65,11 @@ SphericalCoordinates::SphericalCoordinates(const SurfaceType _type)
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
-                                           const math::Angle &_latitude,
-                                           const math::Angle &_longitude,
-                                           double _elevation,
-                                           const math::Angle &_heading)
-  : dataPtr(new SphericalCoordinatesPrivate)
+    const ignition::math::Angle &_latitude,
+    const ignition::math::Angle &_longitude,
+    double _elevation,
+    const ignition::math::Angle &_heading)
+: dataPtr(new SphericalCoordinatesPrivate)
 {
   this->SetSurfaceType(_type);
   this->SetLatitudeReference(_latitude);
@@ -94,13 +92,13 @@ SphericalCoordinates::SurfaceType SphericalCoordinates::GetSurfaceType() const
 }
 
 //////////////////////////////////////////////////
-math::Angle SphericalCoordinates::GetLatitudeReference() const
+ignition::math::Angle SphericalCoordinates::LatitudeReference() const
 {
   return this->dataPtr->latitudeReference;
 }
 
 //////////////////////////////////////////////////
-math::Angle SphericalCoordinates::GetLongitudeReference() const
+ignition::math::Angle SphericalCoordinates::LongitudeReference() const
 {
   return this->dataPtr->longitudeReference;
 }
@@ -112,7 +110,7 @@ double SphericalCoordinates::GetElevationReference() const
 }
 
 //////////////////////////////////////////////////
-math::Angle SphericalCoordinates::GetHeadingOffset() const
+ignition::math::Angle SphericalCoordinates::HeadingOffset() const
 {
   return this->dataPtr->headingOffset;
 }
@@ -124,15 +122,17 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::SetLatitudeReference(const math::Angle &_angle)
+void SphericalCoordinates::SetLatitudeReference(
+    const ignition::math::Angle &_angle)
 {
-  this->dataPtr->latitudeReference.SetFromRadian(_angle.Radian());
+  this->dataPtr->latitudeReference.Radian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::SetLongitudeReference(const math::Angle &_angle)
+void SphericalCoordinates::SetLongitudeReference(
+    const ignition::math::Angle &_angle)
 {
-  this->dataPtr->longitudeReference.SetFromRadian(_angle.Radian());
+  this->dataPtr->longitudeReference.Radian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
@@ -142,14 +142,14 @@ void SphericalCoordinates::SetElevationReference(double _elevation)
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::SetHeadingOffset(const math::Angle &_angle)
+void SphericalCoordinates::SetHeadingOffset(const ignition::math::Angle &_angle)
 {
-  this->dataPtr->headingOffset.SetFromRadian(_angle.Radian());
+  this->dataPtr->headingOffset.Radian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SphericalCoordinates::SphericalFromLocal(
-    const math::Vector3 &_xyz) const
+ignition::math::Vector3d SphericalCoordinates::SphericalFromLocal(
+    const ignition::math::Vector3d &_xyz) const
 {
   double radiusMeridional = 1.0;
   double radiusNormal = 1.0;
@@ -177,44 +177,44 @@ math::Vector3 SphericalCoordinates::SphericalFromLocal(
       break;
   }
 
-  math::Vector3 spherical;
-  double east  = _xyz.x * headingCosine - _xyz.y * headingSine;
-  double north = _xyz.x * headingSine   + _xyz.y * headingCosine;
+  ignition::math::Vector3d spherical;
+  double east  = _xyz.X() * headingCosine - _xyz.Y() * headingSine;
+  double north = _xyz.X() * headingSine   + _xyz.Y() * headingCosine;
   // Assumes small changes in latitude / longitude.
   // May not work well near the north / south poles.
-  math::Angle deltaLatitude(north / radiusMeridional);
-  math::Angle deltaLongitude(east / radiusNormal);
+  ignition::math::Angle deltaLatitude(north / radiusMeridional);
+  ignition::math::Angle deltaLongitude(east / radiusNormal);
   // geodetic latitude in degrees
-  spherical.x = this->dataPtr->latitudeReference.Degree() +
-                deltaLatitude.Degree();
+  spherical.X(this->dataPtr->latitudeReference.Degree() +
+              deltaLatitude.Degree());
   // geodetic longitude in degrees
-  spherical.y = this->dataPtr->longitudeReference.Degree() +
-                deltaLongitude.Degree();
+  spherical.Y(this->dataPtr->longitudeReference.Degree() +
+              deltaLongitude.Degree());
   // altitude relative to sea level
-  spherical.z = this->dataPtr->elevationReference + _xyz.z;
+  spherical.Z(this->dataPtr->elevationReference + _xyz.Z());
   return spherical;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SphericalCoordinates::GlobalFromLocal(const math::Vector3 &_xyz)
-    const
+ignition::math::Vector3d SphericalCoordinates::GlobalFromLocal(
+    const ignition::math::Vector3d &_xyz) const
 {
   double headingSine = sin(this->dataPtr->headingOffset.Radian());
   double headingCosine = cos(this->dataPtr->headingOffset.Radian());
-  double east  = _xyz.x * headingCosine - _xyz.y * headingSine;
-  double north = _xyz.x * headingSine   + _xyz.y * headingCosine;
-  return math::Vector3(east, north, _xyz.z);
+  double east  = _xyz.X() * headingCosine - _xyz.Y() * headingSine;
+  double north = _xyz.X() * headingSine   + _xyz.Y() * headingCosine;
+  return ignition::math::Vector3d(east, north, _xyz.Z());
 }
 
 //////////////////////////////////////////////////
 /// Based on Haversine formula (http://en.wikipedia.org/wiki/Haversine_formula).
-double SphericalCoordinates::Distance(const math::Angle &_latA,
-                                      const math::Angle &_lonA,
-                                      const math::Angle &_latB,
-                                      const math::Angle &_lonB)
+double SphericalCoordinates::Distance(const ignition::math::Angle &_latA,
+                                      const ignition::math::Angle &_lonA,
+                                      const ignition::math::Angle &_latB,
+                                      const ignition::math::Angle &_lonB)
 {
-  math::Angle dLat = _latB - _latA;
-  math::Angle dLon = _lonB - _lonA;
+  ignition::math::Angle dLat = _latB - _latA;
+  ignition::math::Angle dLon = _lonB - _lonA;
   double a = sin(dLat.Radian() / 2) * sin(dLat.Radian() / 2) +
              sin(dLon.Radian() / 2) * sin(dLon.Radian() / 2) *
              cos(_latA.Radian()) * cos(_latB.Radian());
