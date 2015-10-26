@@ -1,7 +1,7 @@
 ## Gazebo 7.0
 
-1. Update rest web plugin to publish response messages
-    * [Pull request #1943](https://bitbucket.org/osrf/gazebo/pull-request/1943)
+1. Update rest web plugin to publish response messages and display login user name in toolbar.
+    * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
 
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
