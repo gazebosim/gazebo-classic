@@ -43,11 +43,37 @@ namespace gazebo
 
       /// \brief Get the friction coefficient in the primary direction.
       /// \return Friction coefficient in primary direction.
-      public: double GetMuPrimary();
+      /// \deprecated See const function MuPrimary
+      public: double GetMuPrimary() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the friction coefficient in the secondary direction.
       /// \return Friction coefficient in secondary direction.
-      public: double GetMuSecondary();
+      /// \deprecated See const function MuSecondary
+      public: double GetMuSecondary() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the friction coefficient in the primary direction.
+      /// \return Friction coefficient in primary direction.
+      public: double MuPrimary() const;
+
+      /// \brief Get the friction coefficient in the secondary direction.
+      /// \return Friction coefficient in secondary direction.
+      public: double MuSecondary() const;
+
+      /// \brief Get the torsional friction coefficient.
+      /// \return Torsional friction coefficient.
+      public: double MuTorsion() const;
+
+      /// \brief Get the torsional patch radius.
+      /// \return Torsional patch radius.
+      public: double PatchRadius() const;
+
+      /// \brief Get the torsional surface radius.
+      /// \return Torsional surface radius.
+      public: double SurfaceRadius() const;
+
+      /// \brief Get the torsional "use patch radius" flag.
+      /// \return Torsional "use patch radius" flag.
+      public: bool UsePatchRadius() const;
 
       /// \brief Set the friction coefficient in the primary direction.
       /// \param[in] _mu Friction coefficient.
@@ -57,12 +83,28 @@ namespace gazebo
       /// \param[in] _mu Friction coefficient.
       public: void SetMuSecondary(double _mu);
 
+      /// \brief Set the torsional friction coefficient.
+      /// \param[in] _mu Torsional friction coefficient.
+      public: void SetMuTorsion(const double _mu);
+
+      /// \brief Set the torsional patch radius.
+      /// \param[in] _radius Torsional patch radius.
+      public: void SetPatchRadius(const double _radius);
+
+      /// \brief Set the torsional surface radius.
+      /// \param[in] _radius Torsional surface radius.
+      public: void SetSurfaceRadius(const double _radius);
+
+      /// \brief Set whether to use the surface radius.
+      /// \param[in] _use True to use the surface radius.
+      public: void SetUsePatchRadius(const bool _use);
+
       /// \brief Get the friction coefficient in a single direction.
       /// \param[in] _index Index of friction direction, 0 for primary,
       /// 1 for secondary direction.
       /// \return Friction coefficient, or negative value if invalid
       /// _index is supplied.
-      private: double GetMu(unsigned int _index);
+      private: double Mu(const unsigned int _index) const;
 
       /// \brief Set the friction coefficient in a single direction.
       /// If a negative value is supplied, use an astronomically high
@@ -84,7 +126,26 @@ namespace gazebo
       /// \brief Array of dry friction coefficients. mu[0] is in the
       /// primary direction as defined by the friction pyramid.
       /// mu[1] is in the second direction.
-      private: double mu[2];
+      /// mu[2] is in the torsional direction.
+      private: double mu[3];
+
+      /// \brief Radius of the contact patch used to calculate torsional
+      /// friction. The same patch is used by all contact points in this
+      /// surface.
+      /// The patch is equal to the square root of the surface radius times the
+      /// contact depth: a = srqt(R * d).
+      private: double patchRadius;
+
+      /// \brief Radius of the surface to be used to calculate torsional
+      /// friction. The same radius is used for all contacts points in this
+      /// surface.
+      private: double surfaceRadius;
+
+      /// \brief Flag for choosing the method for computing the contact
+      /// patch radius in torsional friction.
+      /// True to use the constant patch radius parameter. False to use the
+      /// surface radius together with contact depth.
+      private: bool usePatchRadius;
     };
 
     /// \class SurfaceParams SurfaceParams.hh physics/physics.hh
@@ -114,7 +175,14 @@ namespace gazebo
       /// \brief Get access to FrictionPyramid data, if available.
       /// \return Pointer to FrictionPyramid data or NULL if class does
       /// not use FrictionPyramid data.
-      public: virtual FrictionPyramidPtr GetFrictionPyramid() const;
+      /// \deprecated See function FrictionPyramid
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get access to FrictionPyramid data, if available.
+      /// \return Pointer to FrictionPyramid data or NULL if class does
+      /// not use FrictionPyramid data.
+      public: virtual FrictionPyramidPtr FrictionPyramid() const;
 
       /// \brief Allow collision checking without generating a contact joint.
       public: bool collideWithoutContact;

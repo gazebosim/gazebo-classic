@@ -110,11 +110,11 @@ void BulletLink::Init()
 
       SurfaceParamsPtr surface = collision->GetSurface();
       GZ_ASSERT(surface, "Surface pointer for is invalid");
-      FrictionPyramidPtr friction = surface->GetFrictionPyramid();
+      FrictionPyramidPtr friction = surface->FrictionPyramid();
       GZ_ASSERT(friction, "Friction pointer is invalid");
 
-      hackMu1 = friction->GetMuPrimary();
-      hackMu2 = friction->GetMuSecondary();
+      hackMu1 = friction->MuPrimary();
+      hackMu2 = friction->MuSecondary();
       // gzerr << "link[" << this->GetName()
       //       << "] mu[" << hackMu1
       //       << "] mu2[" << hackMu2 << "]\n";
@@ -213,6 +213,16 @@ void BulletLink::Fini()
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
   GZ_ASSERT(bulletWorld != NULL, "Bullet dynamics world is NULL");
   bulletWorld->removeRigidBody(this->rigidLink);
+}
+
+/////////////////////////////////////////////////////////////////////
+void BulletLink::UpdateMass()
+{
+  if (this->rigidLink && this->inertial)
+  {
+    this->rigidLink->setMassProps(this->inertial->GetMass(),
+        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
+  }
 }
 
 //////////////////////////////////////////////////

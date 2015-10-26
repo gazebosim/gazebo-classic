@@ -20,8 +20,8 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
 
-#include "gazebo/gui/model/qgv/QGVNode.h"
-#include "gazebo/gui/model/qgv/QGVEdge.h"
+#include "gazebo/gui/qgv/QGVNode.h"
+#include "gazebo/gui/qgv/QGVEdge.h"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/GraphScene.hh"
@@ -116,9 +116,9 @@ std::string SchematicViewWidget::GetLeafName(const std::string &_scopedName)
     return "";
 
   std::string leafName = _scopedName;
-  size_t idx = _scopedName.find_last_of("::");
+  size_t idx = _scopedName.rfind("::");
   if (idx != std::string::npos)
-    leafName = _scopedName.substr(idx+1);
+    leafName = _scopedName.substr(idx+2);
   return leafName;
 }
 

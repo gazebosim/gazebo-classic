@@ -28,7 +28,6 @@ GZ_REGISTER_MODEL_PLUGIN(SkidSteerDrivePlugin)
 /////////////////////////////////////////////////
 SkidSteerDrivePlugin::SkidSteerDrivePlugin()
 {
-  this->maxForce = 5.0;
   this->wheelRadius = 0.0;
   this->wheelSeparation = 0.0;
 }
@@ -60,7 +59,7 @@ int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
 
 /////////////////////////////////////////////////
 void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
-                                sdf::ElementPtr   _sdf)
+                                sdf::ElementPtr /*_sdf*/)
 {
   this->model = _model;
 
@@ -76,16 +75,6 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 
   if (err > 0)
     return;
-
-  if (_sdf->HasElement("max_force"))
-  {
-    this->maxForce = _sdf->GetElement("max_force")->Get<double>();
-    gzwarn << "The MaxForce API is deprecated in Gazebo, "
-           << "and the max_force tag is no longer used in this plugin."
-           << std::endl;
-  }
-  else
-    gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";
 
   // This assumes that front and rear wheel spacing is identical
   this->wheelSeparation = this->joints[RIGHT_FRONT]->GetAnchor(0).Distance(

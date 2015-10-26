@@ -156,19 +156,6 @@ void BulletHinge2Joint::SetForceImpl(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-double BulletHinge2Joint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return 0;
-}
-
-//////////////////////////////////////////////////
 bool BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {

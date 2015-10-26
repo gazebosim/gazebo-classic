@@ -63,19 +63,7 @@ namespace gazebo
 
       /// \brief Set the translation for the keyframe
       /// \param[in] _trans Translation amount
-      /// \deprecated See Translation function that accepts ignition::math
-      public: void SetTranslation(
-                  const math::Vector3 &_trans) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set the translation for the keyframe
-      /// \param[in] _trans Translation amount
       public: void Translation(const ignition::math::Vector3d &_trans);
-
-      /// \brief Get the translation of the keyframe
-      /// \return The translation amount
-      /// \deprecated See Translation function that returns igntion::math
-      public: math::Vector3 GetTranslation() const
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the translation of the keyframe
       /// \return The translation amount
@@ -83,19 +71,7 @@ namespace gazebo
 
       /// \brief Set the rotation for the keyframe
       /// \param[in] _rot Rotation amount
-      /// \deprecated See Rotation function that accepts ignition::math
-      public: void SetRotation(const math::Quaternion &_rot)
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set the rotation for the keyframe
-      /// \param[in] _rot Rotation amount
       public: void Rotation(const ignition::math::Quaterniond &_rot);
-
-      /// \brief Get the rotation of the keyframe
-      /// \return The rotation amount
-      /// \deprecated See Rotation function that returns ignition::math
-      public: math::Quaternion GetRotation() const
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the rotation of the keyframe
       /// \return The rotation amount

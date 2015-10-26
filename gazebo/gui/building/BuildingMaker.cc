@@ -23,6 +23,8 @@
 
 #include <sstream>
 #include <set>
+#include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Exception.hh"
 
@@ -32,11 +34,11 @@
 
 #include "gazebo/math/Quaternion.hh"
 
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 
@@ -61,7 +63,7 @@ const std::string BuildingMaker::buildingDefaultName = "Untitled";
 const std::string BuildingMaker::previewName = "BuildingPreview";
 
 /////////////////////////////////////////////////
-BuildingMaker::BuildingMaker() : EntityMaker()
+BuildingMaker::BuildingMaker()
 {
   this->conversionScale = 0.01;
 
@@ -108,15 +110,23 @@ BuildingMaker::BuildingMaker() : EntityMaker()
 
   this->saveDialog = new SaveDialog(SaveDialog::BUILDING);
 
+  // Transport
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
+
   this->Reset();
 }
 
 /////////////////////////////////////////////////
 BuildingMaker::~BuildingMaker()
 {
-//  this->camera.reset();
   if (this->saveDialog)
     delete this->saveDialog;
+
+  this->node->Fini();
+  this->node.reset();
+  this->makerPub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -574,18 +584,6 @@ void BuildingMaker::RemoveWall(const std::string &_wallName)
   this->RemovePart(_wallName);
 }
 
-
-/////////////////////////////////////////////////
-void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
-{
-  this->camera = _camera;
-}
-
-/////////////////////////////////////////////////
-void BuildingMaker::Stop()
-{
-}
-
 /////////////////////////////////////////////////
 void BuildingMaker::Reset()
 {
@@ -618,12 +616,6 @@ void BuildingMaker::Reset()
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
     delete (*it).second;
   this->allItems.clear();
-}
-
-/////////////////////////////////////////////////
-bool BuildingMaker::IsActive() const
-{
-  return true;
 }
 
 /////////////////////////////////////////////////

@@ -201,24 +201,6 @@ GtsSurface *GTSMeshUtils::DelaunayTriangulation(
 
 //////////////////////////////////////////////////
 bool GTSMeshUtils::DelaunayTriangulation(
-    const std::vector<math::Vector2d> &_vertices,
-    const std::vector<math::Vector2i> &_edges,
-    SubMesh *_subMesh)
-{
-  std::vector<ignition::math::Vector2d> vertices;
-  std::vector<ignition::math::Vector2i> edges;
-
-  for (auto const &vert : _vertices)
-    vertices.push_back(vert.Ign());
-
-  for (auto const &edge : _edges)
-    edges.push_back(edge.Ign());
-
-  return DelaunayTriangulation(vertices, edges, _subMesh);
-}
-
-//////////////////////////////////////////////////
-bool GTSMeshUtils::DelaunayTriangulation(
     const std::vector<ignition::math::Vector2d> &_vertices,
     const std::vector<ignition::math::Vector2i> &_edges,
     SubMesh *_subMesh)

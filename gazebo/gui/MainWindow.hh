@@ -41,13 +41,14 @@ namespace gazebo
 {
   namespace gui
   {
+    class InsertModelWidget;
     class RenderWidget;
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
     class SpaceNav;
 
-    class GAZEBO_VISIBLE MainWindow : public QMainWindow
+    class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
 
@@ -289,6 +290,10 @@ namespace gazebo
       private: void CreateDisabledIcon(const std::string &_pixmap,
                    QAction *_act);
 
+      /// \brief Callback when window mode has changed.
+      /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
+      private: void OnWindowMode(const std::string &_mode);
+
       private: QToolBar *playToolbar;
 
       private: RenderWidget *renderWidget;
@@ -305,8 +310,11 @@ namespace gazebo
       private: transport::SubscriberPtr newEntitySub, statsSub;
       private: transport::SubscriberPtr worldModSub;
 
-      /// \brief Subscriber to the light topic.
-      private: transport::SubscriberPtr lightSub;
+      /// \brief Subscriber to the light modify topic.
+      private: transport::SubscriberPtr lightModifySub;
+
+      /// \brief Subscriber to the light factory topic.
+      private: transport::SubscriberPtr lightFactorySub;
 
       private: QDockWidget *toolsDock;
 
@@ -370,6 +378,9 @@ namespace gazebo
 
       /// \brief Hotkey chart dialog.
       private: gui::HotkeyDialog *hotkeyDialog;
+
+      /// \brief Tab to insert models.
+      private: InsertModelWidget *insertModel;
     };
   }
 }

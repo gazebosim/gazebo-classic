@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
 #include <sstream>
 
 #include "gazebo/transport/Node.hh"
@@ -52,6 +53,7 @@ TimePanel::TimePanel(QWidget *_parent)
   // LogPlay Widget
   this->dataPtr->logPlayWidget = new LogPlayWidget(this);
   this->dataPtr->logPlayWidget->setObjectName("logPlayWidget");
+  this->dataPtr->logPlayWidget->setVisible(false);
   connect(this, SIGNAL(SetLogPlayWidgetVisible(bool)),
       this->dataPtr->logPlayWidget, SLOT(setVisible(bool)));
 
@@ -201,6 +203,12 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
+  if (_msg->has_paused())
+    this->SetPaused(_msg->paused());
+
+  if (!this->isVisible())
+    return;
+
   this->dataPtr->simTimes.push_back(msgs::Convert(_msg->sim_time()));
   if (this->dataPtr->simTimes.size() > 20)
     this->dataPtr->simTimes.pop_front();
@@ -209,19 +217,20 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
   if (this->dataPtr->realTimes.size() > 20)
     this->dataPtr->realTimes.pop_front();
 
-  if (_msg->has_log_playback_stats())
+  if (_msg->has_log_playback_stats() &&
+      !this->dataPtr->logPlayWidget->isVisible())
   {
     this->SetTimeWidgetVisible(false);
     this->SetLogPlayWidgetVisible(true);
+    gui::Events::windowMode("LogPlayback");
   }
-  else
+  else if (!_msg->has_log_playback_stats() &&
+      !this->dataPtr->timeWidget->isVisible())
   {
     this->SetTimeWidgetVisible(true);
     this->SetLogPlayWidgetVisible(false);
+    gui::Events::windowMode("Simulation");
   }
-
-  if (_msg->has_paused())
-    this->SetPaused(_msg->paused());
 
   if (this->dataPtr->timeWidget->isVisible())
   {
@@ -256,6 +265,9 @@ void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 /////////////////////////////////////////////////
 void TimePanel::Update()
 {
+  if (!this->isVisible())
+    return;
+
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
   // Avoid apparent race condition on start, seen on Windows.
