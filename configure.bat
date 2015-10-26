@@ -1,8 +1,8 @@
 :: This file is a helper for gazebo configuration (cmake) on Windows
-:: 
+::
 :: It is designed to work with a workspace detailed in the INSTALL_WIN32.md
 :: file. Please follow the instructions there. The workspace layout should be:
-:: 
+::
 :: gz-ws/
 ::   sdformat/
 ::   ...     # all dependencies detailed in the INSTALL file
@@ -33,6 +33,8 @@ set CURL_LIBRARY_NAME=libcurl_a
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
 @set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
+@set IGNITION-TRANSPORT_PATH=%cd%\..\..\ign-transport\build\install\%build_type%
+@set IGNITION-TRANSPORT_CMAKE_PREFIX_PATH=%IGNITION-TRANSPORT_PATH%\lib\cmake\ignition-transport0
 
 @set TBB_PATH=%cd%\..\..\tbb43_20141023oss
 @set TBB_LIBRARY_DIR=%TBB_PATH%\lib\intel64\vc12
@@ -57,12 +59,16 @@ set OGRE_LIB_SUFFIX=.lib
 
 @set IGN_MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
 
+@set ZEROMQ_PATH=%cd%\..\..\ZeroMQ-3.2.4
+
+@set CPPZMQ_PATH=%cd%\..\..\cppzmq
+
 @set INCLUDE=%FREEIMAGE_INCLUDE_DIR%;%TBB_INCLUDEDIR%;%DLFCN_WIN32_INCLUDE_DIR%;%INCLUDE%
 @set LIB=%FREEIMAGE_LIBRARY_DIR%;%BOOST_LIBRARY_DIR%;%TBB_LIBRARY_DIR%;%DLFCN_WIN32_LIBRARY_DIR%;%LIB%
 @set PATH=%QT4_BIN_DIR%;%PATH%
 
 cmake -G "NMake Makefiles"^
-    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%"^
+    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%;%IGNITION-TRANSPORT_CMAKE_PREFIX_PATH%"^
     -DUSE_EXTERNAL_TINYXML:BOOL=False^
     -DFREEIMAGE_RUNS=1^
     -DPROTOBUF_SRC_ROOT_FOLDER="%PROTOBUF_PATH%"^
@@ -85,6 +91,8 @@ cmake -G "NMake Makefiles"^
     -DIGNITION-MATH_INCLUDE_DIRS:STRING="%IGN_MATH_PATH%\include\ignition\math2"^
     -DIGNITION-MATH_LIBRARY_DIRS:STRING="%IGN_MATH_PATH%\lib"^
     -DIGNITION-MATH_LIBRARIES="ignition-math2"^
+    -DZeroMQ_ROOT_DIR="@ZEROMQ_PATH@"^
+    -DCPPZMQ_HEADER_PATH="@CPPZMQ_PATH@"^
     -DCMAKE_INSTALL_PREFIX="install\%build_type%"^
     -DCMAKE_BUILD_TYPE="%build_type%"^
     -DENABLE_TESTS_COMPILATION:BOOL=False^
