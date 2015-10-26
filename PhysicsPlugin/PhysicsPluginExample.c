@@ -14,6 +14,11 @@
  * limitations under the License.
  *
 */
+/*
+ *
+ * gzserver -l libPhysicsPluginExample.so -e plugin
+ *
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include "gazebo/physics/PhysicsPlugin.h"
@@ -54,6 +59,10 @@ int update_physics(void)
 {
   /* Add in any functions required to update/step physics engine. */
   printf("Update/step physcis engine\n");
+
+  // get data from gazebo (e.g. gui commands, sensor data, other commands?)
+
+  // send data back to gazebo
 
   return 0;
 }

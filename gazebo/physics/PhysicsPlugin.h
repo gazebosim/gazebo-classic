@@ -94,6 +94,27 @@ typedef int (*SetPhysicsParamsFnPtr)(void);
  */
 typedef int (*DestroyPhysicsFnPtr)(void);
 
+struct _Quaternion
+{
+  double w;
+  double x;
+  double y;
+  double z;
+};
+
+struct _Vector3
+{
+  double x;
+  double y;
+  double z;
+};
+
+struct _Pose
+{
+  _Vector3 pos;
+  _Quaternion rot;
+};
+
 /* \brief The physics plugin structure
  * This structure defines all the functions necessary to create and control
  * a physics engine.
@@ -141,6 +162,16 @@ struct _PhysicsPlugin
    * \sa DestroyPhysicsFnPtr
    */
   DestroyPhysicsFnPtr destroyPhysics;
+
+  /* \brief data structure holding model information
+   * that needs to be passed between gazebo and plugin.
+   */
+  int lotOfModelData;
+
+  /* \brief data structure holding state information
+   * that needs to be passed between gazebo and plugin.
+   */
+  _Pose *pose;
 };
 typedef struct _PhysicsPlugin PhysicsPlugin;
 
