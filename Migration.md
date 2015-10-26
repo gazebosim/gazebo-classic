@@ -22,6 +22,12 @@ release will remove the deprecated code.
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
     + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
 
+1. **Light topic**
+    + ***Removed:*** ~/light
+    + ***Replacement:*** ~/factory/light - for spawning new lights
+    + ***Replacement:*** ~/light/modify - for modifying existing lights
+    * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
+
 1. **gazebo/rendering/Visual.hh**
     + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true);
     + ***Replacement:*** public: virtual void SetVisible(bool _visible, bool _cascade = true);
