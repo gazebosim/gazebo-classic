@@ -1,5 +1,10 @@
 ## Gazebo 6.0
 
+### Gazebo 6.6.0 (201X-XX-XX)
+
+1. Backport model editor toolbar fixed joint option from [pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
+    * [Pull request #1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)
+
 ### Gazebo 6.5.0 (2015-10-22)
 
 1. Added ability to convert from spherical coordinates to local coordinates.
@@ -13,7 +18,7 @@
 1. Update inertia properties during simulation
     * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
     * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
-    
+
 1. Fix transparency correction for opaque materials
     * [Pull request #1946](https://bitbucket.org/osrf/gazebo/pull-requests/1946/fix-transparency-correction-for-opaque/diff)
 
