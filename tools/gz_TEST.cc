@@ -350,7 +350,7 @@ TEST_F(gzTest, Model)
     // Check that a few values exist. We don't check the sha1 value
     // because a few values, such as pose, are dynamic.
     EXPECT_TRUE(modelInfo.find("name: \"my_box\"") != std::string::npos);
-    EXPECT_TRUE(modelInfo.find("id: 9") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("id: 10") != std::string::npos);
     EXPECT_TRUE(modelInfo.find("name: \"my_box::link::collision\"")
         != std::string::npos);
 
