@@ -2359,6 +2359,8 @@ uint32_t World::GetIterations() const
 //////////////////////////////////////////////////
 void World::RemoveModel(const std::string &_name)
 {
+  boost::recursive_mutex::scoped_lock plock(
+      *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
   boost::mutex::scoped_lock flock(this->dataPtr->factoryDeleteMutex);
 
   // Remove all the dirty poses from the delete entity.
