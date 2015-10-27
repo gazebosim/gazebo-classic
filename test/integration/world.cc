@@ -340,6 +340,7 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   EXPECT_TRUE(sphereModel != NULL);
   EXPECT_TRUE(boxModel != NULL);
 
+  world->Step(1);
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
 
