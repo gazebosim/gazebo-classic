@@ -1,5 +1,9 @@
 ## Gazebo 7.0
 
+1. Improve overall speed of log playback. Added new functions to LogPlay.
+   Use tinyxml2 for playback.
+    * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
+
 1 Added Ignition Transport dependency.
   * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
 
@@ -10,7 +14,7 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 
 1. Added wide angle camera sensor.
     * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
-    
+
 1. Change the `near` and `far` members of `gazebo/msgs/logical_camera_sensors.proto` to `near_clip` and `far_clip`
     + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
 
