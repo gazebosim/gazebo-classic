@@ -1,5 +1,12 @@
 ## Gazebo 7.0
 
+1. Improve overall speed of log playback. Added new functions to LogPlay.
+   Use tinyxml2 for playback.
+    * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
+
+1 Added Ignition Transport dependency.
+  * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
+
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
 `gazebo/gui/ConfigWidget.cc`, so I replaced it with `TYPE_*`.
@@ -121,6 +128,9 @@ using the same arguments used in the command line.
 
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
+
+    1. Added icons for child and parent link in joint inspector
+        * [Pull request #1953](https://bitbucket.org/osrf/gazebo/pull-request/1953)
 
     1. Load and save nested models
         * [Pull request #1894](https://bitbucket.org/osrf/gazebo/pull-request/1894)
