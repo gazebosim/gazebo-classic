@@ -260,6 +260,11 @@ namespace gazebo
       /// \return The transparency.
       public: float GetTransparency();
 
+      /// \brief Get the transparency of the visual as inherited from all
+      /// parents.
+      /// \return The derived transparency.
+      public: float DerivedTransparency() const;
+
       /// \brief Set the visual to be visually highlighted. This is most
       /// often used when an object is selected by a user via the GUI.
       /// \param[in] _highlighted True to enable the highlighting.
@@ -640,6 +645,10 @@ namespace gazebo
       /// the scale of the visual.
       /// \param[in] _scale Scale of visual
       private: void UpdateGeomSize(const math::Vector3 &_scale);
+
+      /// \brief Helper function to update the transparency of the visual
+      /// \param[in] _cascade True to update the children's transparency too.
+      private: void UpdateTransparency(const bool _cascade = true);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -1397,7 +1397,8 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           }
 
           dc = pass->getDiffuse();
-          dc.a = (1.0f - this->dataPtr->transparency);
+
+          dc.a = (1.0f - this->DerivedTransparency());
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
 
@@ -1421,6 +1422,33 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 }
 
 //////////////////////////////////////////////////
+void Visual::UpdateTransparency(const bool _cascade)
+{
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
+
+  if (_cascade)
+  {
+    for (auto child : this->dataPtr->children)
+    {
+      // Don't change some visualizations when link changes
+      if (!(this->GetType() == VT_LINK &&
+          (child->GetType() == VT_GUI ||
+           child->GetType() == VT_PHYSICS ||
+           child->GetType() == VT_SENSOR)))
+      {
+        child->UpdateTransparency(_cascade);
+      }
+    }
+  }
+
+  if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
+    RTShaderSystem::Instance()->UpdateShaders();
+
+  this->dataPtr->sdf->GetElement("transparency")->Set(
+      this->dataPtr->transparency);
+}
+
+//////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
   if (math::equal(this->dataPtr->transparency, _trans))
@@ -1429,33 +1457,8 @@ void Visual::SetTransparency(float _trans)
   this->dataPtr->transparency = std::min(
       std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
 
-  for (auto child : this->dataPtr->children)
-  {
-    // Don't change some visualizations when link changes
-    if (!(this->GetType() == VT_LINK &&
-        (child->GetType() == VT_GUI ||
-         child->GetType() == VT_PHYSICS ||
-         child->GetType() == VT_SENSOR)))
-    {
-      child->SetTransparency(_trans);
-    }
-  }
-
-  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
-
-  // For child nodes' scene nodes
-  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
-  {
-    Ogre::SceneNode *childSceneNode = dynamic_cast<Ogre::SceneNode*>(
-        this->dataPtr->sceneNode->getChild(i));
-
-    this->SetTransparencyInnerLoop(childSceneNode);
-  }
-
-  if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
-    RTShaderSystem::Instance()->UpdateShaders();
-
-  this->dataPtr->sdf->GetElement("transparency")->Set(_trans);
+  // cascade is true by default in gazebo versions <= 6
+  this->UpdateTransparency(true);
 }
 
 //////////////////////////////////////////////////
@@ -1507,6 +1510,24 @@ bool Visual::GetHighlighted() const
 float Visual::GetTransparency()
 {
   return this->dataPtr->transparency;
+}
+
+//////////////////////////////////////////////////
+float Visual::DerivedTransparency() const
+{
+  float derivedTransparency = this->dataPtr->transparency;
+
+  VisualPtr worldVis = this->dataPtr->scene->GetWorldVisual();
+  VisualPtr vis = this->GetParent();
+
+  while (vis && vis != worldVis)
+  {
+    derivedTransparency = 1 - ((1 - derivedTransparency) *
+        (1 - vis->GetTransparency()));
+    vis = vis->GetParent();
+  }
+
+  return derivedTransparency;
 }
 
 //////////////////////////////////////////////////
