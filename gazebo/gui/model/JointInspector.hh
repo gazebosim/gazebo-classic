@@ -139,7 +139,8 @@ namespace gazebo
       private: void keyPressEvent(QKeyEvent *_event);
 
       /// \brief Enable ok button if all values in the dialog are valid.
-      private: void CheckValid();
+      /// \return True if all values are valid.
+      private: bool CheckValid();
 
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;
@@ -163,12 +164,6 @@ namespace gazebo
 
       /// \brief Pointer to the joint maker.
       private: JointMaker *jointMaker;
-
-      /// \brief Style sheet for link widgets when there's a warning.
-      private: QString warningStyleSheet;
-
-      /// \brief Normal style sheet for link widgets.
-      private: QString normalStyleSheet;
 
       /// \brief Unique ID which identifies this joint in the joint maker.
       private: std::string jointId;
