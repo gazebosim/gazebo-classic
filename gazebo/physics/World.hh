@@ -507,7 +507,7 @@ namespace gazebo
       /// \deprecated Topic ~/light deprecated.
       /// See OnLightFactoryMsg which subscribes to ~/factory/light and
       /// OnLightModifyMsg which subscribes to ~/light/modify
-      private: void OnLightMsg(ConstLightPtr &_msg) GAZEBO_DEPRECATED(7.0);
+      private: void OnLightMsg(ConstLightPtr &_msg);
 
       /// \brief Callback when a light message is received in the
       /// ~/factory/light topic.
