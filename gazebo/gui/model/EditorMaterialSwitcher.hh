@@ -127,6 +127,7 @@ namespace gazebo
       /// \param[in] _lodIndex The material level-of-detail
       /// \param[in] _rend Pointer to the Ogre::Renderable object requesting
       /// the use of the techinique
+      /// \return The Ogre material technique to use when scheme is not found.
       public: virtual Ogre::Technique *handleSchemeNotFound(
                   uint16_t _schemeIndex, const Ogre::String &_schemeName,
                   Ogre::Material *_originalMaterial, uint16_t _lodIndex,

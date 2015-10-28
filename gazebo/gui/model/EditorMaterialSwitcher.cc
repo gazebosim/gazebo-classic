@@ -122,6 +122,13 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
     const Ogre::SubEntity *subEntity =
       static_cast<const Ogre::SubEntity *>(_rend);
 
+    if (!subEntity)
+    {
+      gzerr << "Unable to get an Ogre sub-entity when switching editor model "
+          << "material" << std::endl;
+      return NULL;
+    }
+
     // use the original material for gui visuals
     if (!(subEntity->getParent()->getVisibilityFlags() &
         (GZ_VISIBILITY_ALL &  ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE))))
@@ -134,7 +141,11 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
     {
       Ogre::Entity *entity = subEntity->getParent();
       if (!entity)
+      {
+        gzerr << "Unable to get an Ogre entity when switching editor model "
+            << "material" << std::endl;
         return NULL;
+      }
 
       std::string userAny = "";
       try
@@ -144,6 +155,8 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
       }
       catch(Ogre::Exception &e)
       {
+        gzerr << "Unable to cast Ogre user data when switching editor model "
+            <<  "material" << std::endl;
         return NULL;
       }
 
@@ -167,15 +180,18 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
     }
 
     if (material.empty())
+    {
+      gzerr << "Cannot find model editor materials" << std::endl;
       return NULL;
+    }
 
     // set the material for the models
     Ogre::ResourcePtr res =
         Ogre::MaterialManager::getSingleton().getByName(material);
     if (res.isNull())
     {
-        Ogre::MaterialManager::getSingleton().load(material,
-        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+      Ogre::MaterialManager::getSingleton().load(material,
+      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     }
 
     // OGRE 1.9 changes the shared pointer definition
