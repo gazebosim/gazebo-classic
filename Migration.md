@@ -7,6 +7,15 @@ release will remove the deprecated code.
 
 ## Gazebo 6.X to 7.X
 
+### Additions
+
+1. **gazebo/physics/Model.hh**
+    + public: gazebo::physics::JointPtr CreateJoint(
+        const std::string &_name, const std::string &_type,
+        physics::LinkPtr _parent, physics::LinkPtr _child);
+    + public: bool RemoveJoint(const std::string &_name);
+    + public: boost::shared_ptr<Model> shared_from_this();
+
 ### Modifications
 
 1. **gazebo/rendering/Camera.hh**
@@ -16,6 +25,12 @@ release will remove the deprecated code.
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
     + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
+
+1. **Light topic**
+    + ***Removed:*** ~/light
+    + ***Replacement:*** ~/factory/light - for spawning new lights
+    + ***Replacement:*** ~/light/modify - for modifying existing lights
+    * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
 
 1. **gazebo/rendering/Visual.hh**
     + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true);
@@ -93,7 +108,7 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Vector3d HSV() const;
 
 1. **gazebo/common/Dem.hh**
-    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude); 
+    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude);
     + ***Replacement:*** void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,  ignition::math::Angle &_longitude) const;
     + ***Deprecation:***void FillHeightMap(int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY, std::vector<float> &_heights);
     + ***Replacement:***void FillHeightMap(const int _subSampling, const unsigned int _vertSize, const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale, const bool _flipY, std::vector<float> &_heights);

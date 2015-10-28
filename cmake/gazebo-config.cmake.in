@@ -10,6 +10,12 @@ set(@PKG_NAME@_PLUGIN_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo
 # materials scripts, shaders, and other related resources are stored.
 set(@PKG_NAME@_MEDIA_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_VERSION@/media")
 
+set(@PKG_NAME@_PLUGIN_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins")
+
+# The media path contains the location on disk where images,
+# materials scripts, shaders, and other related resources are stored.
+set(@PKG_NAME@_MEDIA_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_VERSION@/media")
+
 #################################################
 # @PKG_NAME@_PROTO_PATH, @PKG_NAME@_PROTO_INCLUDE_DIRS, and
 # @PKG_NAME@_PROTO_LIBRARIES
@@ -27,7 +33,7 @@ set(@PKG_NAME@_MEDIA_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_VERSION@/
 #
 # package my.msgs;
 # import "vector3d.proto";
-# 
+#
 # message MyMessage
 # {
 #   required gazebo.msgs.Vector3d p = 1;
@@ -82,7 +88,7 @@ endif ()
 foreach(lib @PKG_LIBRARIES@)
   set(onelib "${lib}-NOTFOUND")
   find_library(onelib ${lib}
-    PATHS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@
+    PATHS "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@"
     NO_DEFAULT_PATH
     )
   if(NOT onelib)
