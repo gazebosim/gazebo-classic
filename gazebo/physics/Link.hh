@@ -569,6 +569,25 @@ namespace gazebo
       /// \sa Link::Battery()
       public: size_t BatteryCount() const;
 
+      /// \brief Get the unique ID of a visual.
+      /// \param[in] _visName Name of the visual.
+      /// \param[out] _visualId The unique ID of the visual.
+      /// \return True if getting the unique ID of the visual was successful.
+      public: bool VisualId(const std::string &_visName, uint32_t &_visualId)
+        const;
+
+      /// \brief Get the pose of a visual.
+      /// \param[in] _id Unique ID of visual.
+      /// \param[out] _pose Pose of the visual relative to this link.
+      /// \return True if getting the pose of the visual was successful.
+      public: bool VisualPose(uint32_t _id, math::Pose &_pose) const;
+
+      /// \brief Set the pose of a visual.
+      /// \param[in] _id Unique ID of visual message.
+      /// \param[in] _pose Pose relative to this link to place the visual.
+      /// \return True if setting the pose of the visual was successful.
+      public: bool SetVisualPose(uint32_t _id, const math::Pose &_pose);
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 

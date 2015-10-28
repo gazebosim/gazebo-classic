@@ -1123,6 +1123,74 @@ size_t Link::BatteryCount() const
 }
 
 //////////////////////////////////////////////////
+bool Link::VisualId(const std::string &_visName, uint32_t &_visualId) const
+{
+  for (auto &iter : this->visuals)
+    if (iter.second.name() == _visName ||
+        iter.second.name() == this->GetScopedName() + "::" + _visName)
+    {
+      _visualId = iter.first;
+      return true;
+    }
+  gzerr << "Invalid visual name[" << _visName << "]\n";
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool Link::VisualPose(uint32_t _id, math::Pose &_pose) const
+{
+  auto iter = this->visuals.find(_id);
+  if (iter == this->visuals.end())
+  {
+    gzerr << "Invalid visual id[" << _id << "]\n";
+    return false;
+  }
+  const msgs::Visual &msg = iter->second;
+  _pose = msgs::ConvertIgn(msg.pose());
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Link::SetVisualPose(uint32_t _id, const math::Pose &_pose)
+{
+  auto iter = this->visuals.find(_id);
+  if (iter == this->visuals.end())
+  {
+    gzerr << "Invalid visual id[" << _id << "]\n";
+    return false;
+  }
+  msgs::Visual &msg = iter->second;
+  msgs::Set(msg.mutable_pose(), _pose.Ign());
+  std::string linkName = this->GetScopedName();
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      std::string visName = linkName + "::" +
+        visualElem->Get<std::string>("name");
+
+      // update visual msg if it exists
+      if (msg.name() == visName)
+      {
+        visualElem->GetElement("pose")->Set(_pose);
+        break;
+      }
+
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
+  msgs::Visual visual;
+  visual.set_name(msg.name());
+  visual.set_id(_id);
+  visual.set_parent_name(linkName);
+  visual.set_parent_id(this->GetId());
+  msgs::Set(visual.mutable_pose(), _pose.Ign());
+  this->visPub->Publish(visual);
+  return true;
+}
+
+//////////////////////////////////////////////////
 void Link::OnCollision(ConstContactsPtr &_msg)
 {
   std::string collisionName1;
