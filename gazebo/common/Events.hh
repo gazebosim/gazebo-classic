@@ -176,7 +176,7 @@ namespace gazebo
               static ConnectionPtr ConnectTimeReset(T _subscriber)
               { return timeReset.Connect(_subscriber); }
 
-      /// \brief Disconnect from the times reset signal
+      /// \brief Disconnect from the time reset signal
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectTimeReset(ConnectionPtr _subscriber)
               { timeReset.Disconnect(_subscriber); }
@@ -336,13 +336,13 @@ namespace gazebo
       public: static EventT<void (std::string)> removeSensor;
 
       /// \brief Create a sensor
-      /// * Parameter 1[in] (sdf::ElementPtr): The SDF element that describes
+      /// * Parameter 1 (sdf::ElementPtr): The SDF element that describes
       ///   the sensor.
-      /// * Parameter 2[in] (std::string): Name of the world in which to create
+      /// * Parameter 2 (std::string): Name of the world in which to create
       ///   the sensor.
-      /// * Parameter 3[in] (std::string): The scoped parent name
+      /// * Parameter 3 (std::string): The scoped parent name
       ///   (model::link).
-      /// * Parameter 4[in] (uint32_t): ID of the sensor
+      /// * Parameter 4 (uint32_t): ID of the sensor
       public: static EventT<void (sdf::ElementPtr,
                   const std::string &,
                   const std::string &,
