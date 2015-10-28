@@ -144,7 +144,7 @@ namespace gazebo
       {
         // Windows Visual Studio 2012 does not have atomic_bool constructor,
         // so we have to set "on" using operator=
-        on = _on;
+        this->on = _on;
       }
 
       /// \brief On/off value for the event callback
