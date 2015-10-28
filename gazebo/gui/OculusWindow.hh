@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace gazebo
     /// \class OculusWindow OculusWindow.hh gui/OculusWindow.hh
     /// \brief A widget that renders a camera view suitable for the Oculus
     /// Rift.
-    class GAZEBO_VISIBLE OculusWindow : public QWidget
+    class GZ_GUI_VISIBLE OculusWindow : public QWidget
     {
       Q_OBJECT
 

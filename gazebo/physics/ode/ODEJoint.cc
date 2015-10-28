@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
@@ -345,6 +346,11 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
   }
 
   dJointFeedback *jointFeedback = dJointGetFeedback(this->jointId);
+  if (!jointFeedback)
+  {
+    gzerr << "Joint feedback uninitialized" << std::endl;
+    return result;
+  }
 
   if (_index == 0)
     result.Set(jointFeedback->t1[0], jointFeedback->t1[1],
@@ -424,10 +430,6 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "fmax")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
     }
     else if (_key == "friction")
@@ -440,10 +442,6 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "vel")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       this->SetParam(dParamVel | group, boost::any_cast<double>(_value));
     }
     else if (_key == "hi_stop")
@@ -554,10 +552,6 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else if (_key == "fmax")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       return this->GetParam(dParamFMax | group);
     }
     else if (_key == "friction")
@@ -566,10 +560,6 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else if (_key == "vel")
     {
-      gzwarn << "The '" << _key << "' parameter is deprecated "
-             << "to enable Coulomb joint friction with the "
-             << "'friction' parameter"
-             << std::endl;
       return this->GetParam(dParamVel | group);
     }
     else if (_key == "hi_stop")
@@ -636,6 +626,12 @@ void ODEJoint::Reset()
 }
 
 //////////////////////////////////////////////////
+void ODEJoint::CacheForceTorque()
+{
+  // Does nothing for now, will add when recovering pull request #1721
+}
+
+//////////////////////////////////////////////////
 JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 {
   // Note that:
@@ -673,6 +669,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
         this->GetForce(0u) * this->GetLocalAxis(0u);
       wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
     }
+    else if (this->HasType(physics::Base::FIXED_JOINT))
+    {
+      // no correction are necessary for fixed joint
+    }
     else
     {
       /// \TODO: fix for multi-axis joints
@@ -687,7 +687,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 
       // convert torque from about child CG to joint anchor location
       // cg position specified in child link frame
-      math::Pose cgPose = this->childLink->GetInertial()->GetPose();
+      math::Pose cgPose;
+      auto inertial = this->childLink->GetInertial();
+      if (inertial)
+        cgPose = inertial->GetPose();
 
       // anchorPose location of joint in child frame
       // childMomentArm: from child CG to joint location in child link frame
@@ -730,7 +733,10 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       // CG to joint anchor location
 
       // parent cg specified in parent link frame
-      math::Pose cgPose = this->parentLink->GetInertial()->GetPose();
+      math::Pose cgPose;
+      auto inertial = this->parentLink->GetInertial();
+      if (inertial)
+        cgPose = inertial->GetPose();
 
       // get parent CG pose in child link frame
       math::Pose parentCGInChildLink =
@@ -1073,19 +1079,22 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 
   if (this->provideFeedback)
   {
-    this->feedback = new dJointFeedback;
-    this->feedback->f1[0] = 0;
-    this->feedback->f1[1] = 0;
-    this->feedback->f1[2] = 0;
-    this->feedback->t1[0] = 0;
-    this->feedback->t1[1] = 0;
-    this->feedback->t1[2] = 0;
-    this->feedback->f2[0] = 0;
-    this->feedback->f2[1] = 0;
-    this->feedback->f2[2] = 0;
-    this->feedback->t2[0] = 0;
-    this->feedback->t2[1] = 0;
-    this->feedback->t2[2] = 0;
+    if (this->feedback == NULL)
+    {
+      this->feedback = new dJointFeedback;
+      this->feedback->f1[0] = 0;
+      this->feedback->f1[1] = 0;
+      this->feedback->f1[2] = 0;
+      this->feedback->t1[0] = 0;
+      this->feedback->t1[1] = 0;
+      this->feedback->t1[2] = 0;
+      this->feedback->f2[0] = 0;
+      this->feedback->f2[1] = 0;
+      this->feedback->f2[2] = 0;
+      this->feedback->t2[0] = 0;
+      this->feedback->t2[1] = 0;
+      this->feedback->t2[2] = 0;
+    }
 
     if (this->jointId)
       dJointSetFeedback(this->jointId, this->feedback);

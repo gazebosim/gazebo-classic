@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@
 #define _GAZEBO_HEIGHTMAPDATA_HH_
 
 #include <vector>
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
@@ -31,7 +34,7 @@ namespace gazebo
 
     /// \class HeightmapData HeightmapData.hh common/common.hh
     /// \brief Encapsulates a generic heightmap data file.
-    class GAZEBO_VISIBLE HeightmapData
+    class GZ_COMMON_VISIBLE HeightmapData
     {
       /// \brief Destructor.
       public: virtual ~HeightmapData() {}
@@ -47,8 +50,8 @@ namespace gazebo
       /// is filled.
       /// \param[out] _heights Vector containing the terrain heights.
       public: virtual void FillHeightMap(int _subSampling,
-          unsigned int _vertSize, const math::Vector3 &_size,
-          const math::Vector3 &_scale, bool _flipY,
+          unsigned int _vertSize, const ignition::math::Vector3d &_size,
+          const ignition::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights) = 0;
 
       /// \brief Get the terrain's height.

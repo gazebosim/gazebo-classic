@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,47 +15,40 @@
  *
 */
 
+#include "gazebo/common/Assert.hh"
 #include "gazebo/gui/building/LevelInspectorDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
+LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent)
+  : BaseInspectorDialog(_parent)
 {
   this->setObjectName("levelInspectorDialog");
   this->setWindowTitle(tr("Level Inspector"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QLabel *levelLabel = new QLabel(tr("Level Name: "));
   this->levelNameLineEdit = new QLineEdit;
   this->levelNameLineEdit->setPlaceholderText(tr("Level X"));
 
-  QLabel *floorColorLabel = new QLabel(tr("Floor Color: "));
-  this->floorColorComboBox = new QComboBox;
-  this->floorColorComboBox->setIconSize(QSize(15, 15));
-  this->floorColorComboBox->setMinimumWidth(50);
-  this->floorColorComboBox->setSizePolicy(QSizePolicy::Fixed,
-      QSizePolicy::Fixed);
-  QPixmap floorColorIcon(15, 15);
-  this->floorColorList.push_back(QColor(255, 255, 255, 255));
-  this->floorColorList.push_back(QColor(194, 169, 160, 255));
-  this->floorColorList.push_back(QColor(235, 206, 157, 255));
-  this->floorColorList.push_back(QColor(254, 121,   5, 255));
-  this->floorColorList.push_back(QColor(255, 195,  78, 255));
-  this->floorColorList.push_back(QColor(111, 203, 172, 255));
-  for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
-  {
-    floorColorIcon.fill(this->floorColorList.at(i));
-    this->floorColorComboBox->addItem(floorColorIcon, QString(""));
-  }
+  this->InitColorComboBox();
+  QHBoxLayout *colorLayout = new QHBoxLayout;
+  QLabel *colorLabel = new QLabel(tr("Floor Color: "));
+  colorLayout->addWidget(colorLabel);
+  colorLayout->addWidget(this->colorComboBox);
 
-  QHBoxLayout *floorColorLayout = new QHBoxLayout;
-  floorColorLayout->addWidget(floorColorLabel);
-  floorColorLayout->addWidget(floorColorComboBox);
+  this->InitTextureComboBox();
+  QHBoxLayout *textureLayout = new QHBoxLayout;
+  QLabel *textureLabel = new QLabel(tr("Floor Texture: "));
+  textureLayout->addWidget(textureLabel);
+  textureLayout->addWidget(this->textureComboBox);
 
   QVBoxLayout *floorLayout = new QVBoxLayout;
-  floorLayout->addLayout(floorColorLayout);
+  floorLayout->addLayout(colorLayout);
+  floorLayout->addLayout(textureLayout);
 
   this->floorWidget = new QWidget;
   this->floorWidget->setLayout(floorLayout);
@@ -123,12 +116,6 @@ double LevelInspectorDialog::GetHeight() const
 }
 
 /////////////////////////////////////////////////
-QColor LevelInspectorDialog::GetFloorColor() const
-{
-  return this->floorColorList[this->floorColorComboBox->currentIndex()];
-}
-
-/////////////////////////////////////////////////
 void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 {
   this->levelNameLineEdit->setText(QString(_levelName.c_str()));
@@ -139,20 +126,6 @@ void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 void LevelInspectorDialog::SetHeight(double _height)
 {
   this->heightSpinBox->setValue(_height);
-}
-
-/////////////////////////////////////////////////
-void LevelInspectorDialog::SetFloorColor(const QColor _color)
-{
-  // Find index corresponding to color (only a few colors allowed so far)
-  for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
-  {
-    if (this->floorColorList[i] == _color)
-    {
-      this->floorColorComboBox->setCurrentIndex(i);
-      break;
-    }
-  }
 }
 
 /////////////////////////////////////////////////

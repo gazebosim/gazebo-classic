@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/bind.hpp>
 
 #include "gazebo/transport/transport.hh"
 
@@ -46,29 +53,58 @@ ModelSnap::ModelSnap()
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
   this->dataPtr->snapLines = NULL;
-
-  this->dataPtr->updateMutex = new boost::recursive_mutex();
+  this->dataPtr->updateMutex = NULL;
 }
 
 /////////////////////////////////////////////////
 ModelSnap::~ModelSnap()
 {
+  this->Clear();
+  delete this->dataPtr;
+  this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelSnap::Clear()
+{
+  this->dataPtr->selectedTriangleDirty = false;
+  this->dataPtr->hoverTriangleDirty = false;
+  this->dataPtr->selectedTriangle.clear();
+  this->dataPtr->hoverTriangle.clear();
+  this->dataPtr->selectedVis.reset();
+  this->dataPtr->hoverVis.reset();
+
+  this->dataPtr->node.reset();
   this->dataPtr->modelPub.reset();
 
+  if (this->dataPtr->updateMutex)
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-    if (this->dataPtr->snapLines)
-      delete this->dataPtr->snapLines;
+    delete this->dataPtr->snapLines;
+    this->dataPtr->snapLines = NULL;
     this->dataPtr->snapVisual.reset();
+
+    if (this->dataPtr->snapHighlight != NULL &&
+        this->dataPtr->highlightVisual != NULL)
+    {
+      this->dataPtr->highlightVisual->
+          DeleteDynamicLine(this->dataPtr->snapHighlight);
+    }
+    this->dataPtr->highlightVisual.reset();
   }
 
-  event::Events::DisconnectRender(this->dataPtr->renderConnection);
+  if (this->dataPtr->renderConnection)
+    event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
 
   delete this->dataPtr->updateMutex;
+  this->dataPtr->updateMutex = NULL;
 
-  delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr->scene.reset();
+  this->dataPtr->userCamera.reset();
+  this->dataPtr->rayQuery.reset();
+
+  this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
@@ -86,6 +122,8 @@ void ModelSnap::Init()
 
   this->dataPtr->userCamera = cam;
   this->dataPtr->scene =  cam->GetScene();
+
+  this->dataPtr->updateMutex = new boost::recursive_mutex();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -113,7 +151,8 @@ void ModelSnap::Reset()
 
   if (this->dataPtr->snapVisual)
   {
-    this->dataPtr->snapVisual->SetVisible(false);
+    if (this->dataPtr->snapVisual->GetVisible())
+      this->dataPtr->snapVisual->SetVisible(false);
     if (this->dataPtr->snapVisual->GetParent())
     {
       this->dataPtr->snapVisual->GetParent()->DetachVisual(
@@ -148,14 +187,14 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
   this->dataPtr->mouseEvent = _event;
 
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
-      this->dataPtr->mouseEvent.pos);
+      this->dataPtr->mouseEvent.Pos());
   if (vis && !vis->IsPlane())
   {
     // get the triangle being hovered so that it can be highlighted
     math::Vector3 intersect;
     std::vector<math::Vector3> hoverTriangle;
-    this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-        vis->GetRootVisual(), intersect, hoverTriangle);
+    this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+        _event.Pos().Y(), vis->GetRootVisual(), intersect, hoverTriangle);
 
     if (!hoverTriangle.empty())
     {
@@ -189,19 +228,38 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
   this->dataPtr->mouseEvent = _event;
 
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
-      this->dataPtr->mouseEvent.pos);
+      this->dataPtr->mouseEvent.Pos());
 
   if (vis && !vis->IsPlane() &&
-      this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+      this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
   {
-    // select first triangle on any mesh, if it's on the same mesh, update the
-    // triangle vertices.
-    if (!this->dataPtr->selectedVis ||
-       (vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual()))
+    // Parent model or parent link
+    rendering::VisualPtr currentParent = vis->GetRootVisual();
+    rendering::VisualPtr previousParent;
+    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+
+    if (gui::get_entity_id(currentParent->GetName()))
+    {
+      if (this->dataPtr->selectedVis)
+        previousParent = this->dataPtr->selectedVis->GetRootVisual();
+    }
+    else
+    {
+      currentParent = topLevelVis;
+      if (this->dataPtr->selectedVis)
+      {
+        previousParent = this->dataPtr->selectedVis->GetNthAncestor(2);
+      }
+    }
+
+    // Select first triangle on any mesh
+    // Update triangle if the new triangle is on the same model/link
+    if (!this->dataPtr->selectedVis || (currentParent  == previousParent))
     {
       math::Vector3 intersect;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          vis->GetRootVisual(), intersect, this->dataPtr->selectedTriangle);
+      this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+          _event.Pos().Y(), currentParent, intersect,
+          this->dataPtr->selectedTriangle);
 
       if (!this->dataPtr->selectedTriangle.empty())
       {
@@ -211,7 +269,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       if (!this->dataPtr->renderConnection)
       {
         this->dataPtr->renderConnection = event::Events::ConnectRender(
-              boost::bind(&ModelSnap::Update, this));
+            boost::bind(&ModelSnap::Update, this));
       }
     }
     else
@@ -219,13 +277,12 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       // select triangle on the target
       math::Vector3 intersect;
       std::vector<math::Vector3> vertices;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          vis->GetRootVisual(), intersect, vertices);
+      this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+          _event.Pos().Y(), currentParent, intersect, vertices);
 
       if (!vertices.empty())
       {
-        this->Snap(this->dataPtr->selectedTriangle, vertices,
-            this->dataPtr->selectedVis->GetRootVisual());
+        this->Snap(this->dataPtr->selectedTriangle, vertices, previousParent);
 
         this->Reset();
         gui::Events::manipMode("select");
@@ -301,7 +358,7 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
     msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
 
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
+    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
     this->dataPtr->modelPub->Publish(msg);
   }
 }

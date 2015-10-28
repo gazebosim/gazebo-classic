@@ -6,7 +6,6 @@ package gazebo.msgs;
 /// \todo Document me.
 
 
-import "pose.proto";
 import "time.proto";
 
 message JointAnimation

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,8 +151,8 @@ void Light::UpdateFromMsg(ConstLightPtr &_msg)
 
   if (_msg->has_pose())
   {
-    this->SetPosition(msgs::Convert(_msg->pose().position()));
-    this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+    this->SetPosition(msgs::ConvertIgn(_msg->pose().position()));
+    this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
   }
 }
 
@@ -165,8 +165,8 @@ void Light::LoadFromMsg(const msgs::Light &_msg)
 
   if (_msg.has_pose())
   {
-    this->SetPosition(msgs::Convert(_msg.pose().position()));
-    this->SetRotation(msgs::Convert(_msg.pose().orientation()));
+    this->SetPosition(msgs::ConvertIgn(_msg.pose().position()));
+    this->SetRotation(msgs::ConvertIgn(_msg.pose().orientation()));
   }
 }
 
@@ -215,8 +215,7 @@ void Light::CreateVisual()
 
     // Create a scene node to hold the light selection object.
     Ogre::SceneNode *visSceneNode;
-    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode(
-        this->GetName() + "_SELECTION_NODE_");
+    visSceneNode = this->visual->GetSceneNode()->createChildSceneNode();
 
     // Make sure the unit_sphere has been inserted.
     this->visual->InsertMesh("unit_sphere");
@@ -236,7 +235,7 @@ void Light::CreateVisual()
     // Make sure the selection object is rendered only in the selection
     // buffer.
     obj->setVisibilityFlags(GZ_VISIBILITY_SELECTION);
-    obj->setUserAny(Ogre::Any(this->GetName()));
+    obj->getUserObjectBindings().setUserAny(Ogre::Any(this->GetName()));
     obj->setCastShadows(false);
 
     // Scale the selection object to roughly match the light visual size.
@@ -591,11 +590,12 @@ void Light::FillMsg(msgs::Light &_msg) const
   else if (lightType == "directional")
     _msg.set_type(msgs::Light::DIRECTIONAL);
 
-  msgs::Set(_msg.mutable_pose()->mutable_position(), this->GetPosition());
-  msgs::Set(_msg.mutable_pose()->mutable_orientation(), this->GetRotation());
+  msgs::Set(_msg.mutable_pose()->mutable_position(), this->GetPosition().Ign());
+  msgs::Set(_msg.mutable_pose()->mutable_orientation(),
+      this->GetRotation().Ign());
   msgs::Set(_msg.mutable_diffuse(), this->GetDiffuseColor());
   msgs::Set(_msg.mutable_specular(), this->GetSpecularColor());
-  msgs::Set(_msg.mutable_direction(), this->GetDirection());
+  msgs::Set(_msg.mutable_direction(), this->GetDirection().Ign());
 
   _msg.set_cast_shadows(this->light->getCastShadows());
 

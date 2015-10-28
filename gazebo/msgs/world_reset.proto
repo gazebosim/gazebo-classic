@@ -5,8 +5,6 @@ package gazebo.msgs;
 /// \brief A message that controls how the world is reset
 
 
-import "header.proto";
-
 message WorldReset
 {
   optional bool all          = 1[default = true];

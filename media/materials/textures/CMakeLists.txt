@@ -1,7 +1,10 @@
 set (files
   beigeWall.jpg
+  building_frame.png
+  bricks.png
   ceiling_tiled.jpg
   clouds.jpg
+  com.png
   dirt_diffusespecular.png
   dirt_normal.png
   flat_normal.png
@@ -22,6 +25,7 @@ set (files
   random.png
   residential.jpg
   road1.jpg
+  runway.png
   secondary.jpg
   sidewalk.jpg
   steps.jpeg

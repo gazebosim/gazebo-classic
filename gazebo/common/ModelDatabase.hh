@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <map>
 #include <utility>
 
+#include <boost/function.hpp>
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -45,7 +46,7 @@ namespace gazebo
     /// \class ModelDatabase ModelDatabase.hh common/common.hh
     /// \brief Connects to model database, and has utility functions to find
     /// models.
-    class GAZEBO_VISIBLE ModelDatabase : public SingletonT<ModelDatabase>
+    class GZ_COMMON_VISIBLE ModelDatabase : public SingletonT<ModelDatabase>
     {
       /// \brief Constructor. This will update the model cache
       private: ModelDatabase();

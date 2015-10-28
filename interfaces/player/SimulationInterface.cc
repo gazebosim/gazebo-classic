@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include "player.h"
 
 #include "gazebo/transport/transport.hh"
-#include "gazebo/gazebo.hh"
+#include "gazebo/gazebo_client.hh"
 
 #include "GazeboTime.hh"
 #include "GazeboDriver.hh"
@@ -39,7 +39,7 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
     GazeboDriver *_driver, ConfigFile *_cf, int _section)
 : GazeboInterface(_addr, _driver, _cf, _section)
 {
-  gazebo::setupClient();
+  gazebo::client::setup();
 
   worldName = _cf->ReadString(_section, "world_name", "default");
 
@@ -73,7 +73,7 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
 // Destructor
 SimulationInterface::~SimulationInterface()
 {
-  gazebo::shutdown();
+  gazebo::client::shutdown();
   if (this->responseQueue)
   {
     delete this->responseQueue;
@@ -107,7 +107,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,
@@ -129,7 +129,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,

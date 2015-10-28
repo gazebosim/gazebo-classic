@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,48 +83,48 @@ std::string Mesh::GetName() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Mesh::GetMax() const
+ignition::math::Vector3d Mesh::Max() const
 {
-  math::Vector3 max;
+  ignition::math::Vector3d max;
   std::vector<SubMesh*>::const_iterator iter;
 
-  max.x = -FLT_MAX;
-  max.y = -FLT_MAX;
-  max.z = -FLT_MAX;
+  max.X(-FLT_MAX);
+  max.Y(-FLT_MAX);
+  max.Z(-FLT_MAX);
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
 
-    math::Vector3 smax = (*iter)->GetMax();
-    max.x = std::max(max.x, smax.x);
-    max.y = std::max(max.y, smax.y);
-    max.z = std::max(max.z, smax.z);
+    ignition::math::Vector3d smax = (*iter)->Max();
+    max.X(std::max(max.X(), smax.X()));
+    max.Y(std::max(max.Y(), smax.Y()));
+    max.Z(std::max(max.Z(), smax.Z()));
   }
 
   return max;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Mesh::GetMin() const
+ignition::math::Vector3d Mesh::Min() const
 {
-  math::Vector3 min;
+  ignition::math::Vector3d min;
   std::vector<SubMesh *>::const_iterator iter;
 
-  min.x = FLT_MAX;
-  min.y = FLT_MAX;
-  min.z = FLT_MAX;
+  min.X(FLT_MAX);
+  min.Y(FLT_MAX);
+  min.Z(FLT_MAX);
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
 
-    math::Vector3 smin = (*iter)->GetMin();
-    min.x = std::min(min.x, smin.x);
-    min.y = std::min(min.y, smin.y);
-    min.z = std::min(min.z, smin.z);
+    ignition::math::Vector3d smin = (*iter)->Min();
+    min.X(std::min(min.X(), smin.X()));
+    min.Y(std::min(min.Y(), smin.Y()));
+    min.Z(std::min(min.Z(), smin.Z()));
   }
 
   return min;
@@ -311,7 +311,7 @@ void Mesh::FillArrays(float **_vertArr, int **_indArr) const
 
     memcpy(vPtr, vertTmp, sizeof(vertTmp[0])*(*iter)->GetVertexCount()*3);
 
-    for (unsigned int i = 0; i < (*iter)->GetIndexCount(); i++)
+    for (unsigned int i = 0; i < (*iter)->GetIndexCount(); ++i)
     {
       (*_indArr)[index++] = (*iter)->GetIndex(i) + offset;
     }
@@ -363,7 +363,7 @@ void Mesh::Scale(double _factor)
 }
 
 //////////////////////////////////////////////////
-void Mesh::SetScale(const math::Vector3 &_factor)
+void Mesh::SetScale(const ignition::math::Vector3d &_factor)
 {
   std::vector<SubMesh*>::iterator iter;
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
@@ -371,7 +371,7 @@ void Mesh::SetScale(const math::Vector3 &_factor)
 }
 
 //////////////////////////////////////////////////
-void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
+void Mesh::GenSphericalTexCoord(const ignition::math::Vector3d &_center)
 {
   std::vector<SubMesh*>::iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
@@ -379,18 +379,18 @@ void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
 }
 
 //////////////////////////////////////////////////
-void Mesh::Center(const math::Vector3 &_center)
+void Mesh::Center(const ignition::math::Vector3d &_center)
 {
-  math::Vector3 min, max, half;
-  min = this->GetMin();
-  max = this->GetMax();
+  ignition::math::Vector3d min, max, half;
+  min = this->Min();
+  max = this->Max();
   half = (max - min) * 0.5;
 
   this->Translate(_center - (min + half));
 }
 
 //////////////////////////////////////////////////
-void Mesh::Translate(const math::Vector3 &_vec)
+void Mesh::Translate(const ignition::math::Vector3d &_vec)
 {
   std::vector<SubMesh*>::iterator iter;
 
@@ -416,6 +416,12 @@ SubMesh::SubMesh()
 //////////////////////////////////////////////////
 SubMesh::SubMesh(const SubMesh *_mesh)
 {
+  if (!_mesh)
+  {
+    gzerr << "Submesh is NULL." << std::endl;
+    return;
+  }
+
   this->name = _mesh->name;
   this->materialIndex = _mesh->materialIndex;
   this->primitiveType = _mesh->primitiveType;
@@ -454,7 +460,7 @@ SubMesh::PrimitiveType SubMesh::GetPrimitiveType() const
 }
 
 //////////////////////////////////////////////////
-void SubMesh::CopyVertices(const std::vector<math::Vector3> &_verts)
+void SubMesh::CopyVertices(const std::vector<ignition::math::Vector3d> &_verts)
 {
   this->vertices.clear();
   this->vertices.resize(_verts.size());
@@ -462,15 +468,15 @@ void SubMesh::CopyVertices(const std::vector<math::Vector3> &_verts)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::CopyNormals(const std::vector<math::Vector3> &_norms)
+void SubMesh::CopyNormals(const std::vector<ignition::math::Vector3d> &_norms)
 {
   this->normals.clear();
   this->normals.resize(_norms.size());
-  for (unsigned int i = 0; i < _norms.size(); i++)
+  for (unsigned int i = 0; i < _norms.size(); ++i)
   {
     this->normals[i] = _norms[i];
     this->normals[i].Normalize();
-    if (math::equal(this->normals[i].GetLength(), 0.0))
+    if (ignition::math::equal(this->normals[i].Length(), 0.0))
     {
       this->normals[i].Set(0, 0, 1);
     }
@@ -508,7 +514,7 @@ void SubMesh::AddIndex(unsigned int _i)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddVertex(const math::Vector3 &_v)
+void SubMesh::AddVertex(const ignition::math::Vector3d &_v)
 {
   this->vertices.push_back(_v);
 }
@@ -516,11 +522,11 @@ void SubMesh::AddVertex(const math::Vector3 &_v)
 //////////////////////////////////////////////////
 void SubMesh::AddVertex(double _x, double _y, double _z)
 {
-  this->AddVertex(math::Vector3(_x, _y, _z));
+  this->AddVertex(ignition::math::Vector3d(_x, _y, _z));
 }
 
 //////////////////////////////////////////////////
-void SubMesh::AddNormal(const math::Vector3 &_n)
+void SubMesh::AddNormal(const ignition::math::Vector3d &_n)
 {
   this->normals.push_back(_n);
 }
@@ -528,13 +534,13 @@ void SubMesh::AddNormal(const math::Vector3 &_n)
 //////////////////////////////////////////////////
 void SubMesh::AddNormal(double _x, double _y, double _z)
 {
-  this->AddNormal(math::Vector3(_x, _y, _z));
+  this->AddNormal(ignition::math::Vector3d(_x, _y, _z));
 }
 
 //////////////////////////////////////////////////
 void SubMesh::AddTexCoord(double _u, double _v)
 {
-  this->texCoords.push_back(math::Vector2d(_u, _v));
+  this->texCoords.push_back(ignition::math::Vector2d(_u, _v));
 }
 
 //////////////////////////////////////////////////
@@ -550,7 +556,7 @@ void SubMesh::AddNodeAssignment(unsigned int _vertex, unsigned int _node,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SubMesh::GetVertex(unsigned int _i) const
+ignition::math::Vector3d SubMesh::Vertex(unsigned int _i) const
 {
   if (_i >= this->vertices.size())
     gzthrow("Index too large");
@@ -559,7 +565,7 @@ math::Vector3 SubMesh::GetVertex(unsigned int _i) const
 }
 
 //////////////////////////////////////////////////
-void SubMesh::SetVertex(unsigned int _i, const math::Vector3 &_v)
+void SubMesh::SetVertex(unsigned int _i, const ignition::math::Vector3d &_v)
 {
   if (_i >= this->vertices.size())
     gzthrow("Index too large");
@@ -568,7 +574,7 @@ void SubMesh::SetVertex(unsigned int _i, const math::Vector3 &_v)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SubMesh::GetNormal(unsigned int _i) const
+ignition::math::Vector3d SubMesh::Normal(unsigned int _i) const
 {
   if (_i >= this->normals.size())
     gzthrow("Index too large");
@@ -577,7 +583,7 @@ math::Vector3 SubMesh::GetNormal(unsigned int _i) const
 }
 
 //////////////////////////////////////////////////
-void SubMesh::SetNormal(unsigned int _i, const math::Vector3 &_n)
+void SubMesh::SetNormal(unsigned int _i, const ignition::math::Vector3d &_n)
 {
   if (_i >= this->normals.size())
     gzthrow("Index too large");
@@ -586,7 +592,7 @@ void SubMesh::SetNormal(unsigned int _i, const math::Vector3 &_n)
 }
 
 //////////////////////////////////////////////////
-math::Vector2d SubMesh::GetTexCoord(unsigned int _i) const
+ignition::math::Vector2d SubMesh::TexCoord(unsigned int _i) const
 {
   if (_i >= this->texCoords.size())
     gzthrow("Index too large");
@@ -604,7 +610,7 @@ NodeAssignment SubMesh::GetNodeAssignment(unsigned int _i) const
 }
 
 //////////////////////////////////////////////////
-void SubMesh::SetTexCoord(unsigned int _i, const math::Vector2d &_t)
+void SubMesh::SetTexCoord(unsigned int _i, const ignition::math::Vector2d &_t)
 {
   if (_i >= this->texCoords.size())
     gzthrow("Index too large");
@@ -622,40 +628,40 @@ unsigned int SubMesh::GetIndex(unsigned int _i) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SubMesh::GetMax() const
+ignition::math::Vector3d SubMesh::Max() const
 {
-  math::Vector3 max;
-  std::vector<math::Vector3>::const_iterator iter;
+  ignition::math::Vector3d max;
+  std::vector<ignition::math::Vector3d>::const_iterator iter;
 
-  max.x = -FLT_MAX;
-  max.y = -FLT_MAX;
-  max.z = -FLT_MAX;
+  max.X(-FLT_MAX);
+  max.Y(-FLT_MAX);
+  max.Z(-FLT_MAX);
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
-    max.x = std::max(max.x, (*iter).x);
-    max.y = std::max(max.y, (*iter).y);
-    max.z = std::max(max.z, (*iter).z);
+    max.X(std::max(max.X(), (*iter).X()));
+    max.Y(std::max(max.Y(), (*iter).Y()));
+    max.Z(std::max(max.Z(), (*iter).Z()));
   }
 
   return max;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SubMesh::GetMin() const
+ignition::math::Vector3d SubMesh::Min() const
 {
-  math::Vector3 min;
-  std::vector<math::Vector3>::const_iterator iter;
+  ignition::math::Vector3d min;
+  std::vector<ignition::math::Vector3d>::const_iterator iter;
 
-  min.x = FLT_MAX;
-  min.y = FLT_MAX;
-  min.z = FLT_MAX;
+  min.X(FLT_MAX);
+  min.Y(FLT_MAX);
+  min.Z(FLT_MAX);
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
-    min.x = std::min(min.x, (*iter).x);
-    min.y = std::min(min.y, (*iter).y);
-    min.z = std::min(min.z, (*iter).z);
+    min.X(std::min(min.X(), (*iter).X()));
+    min.Y(std::min(min.Y(), (*iter).Y()));
+    min.Z(std::min(min.Z(), (*iter).Z()));
   }
 
   return min;
@@ -716,9 +722,9 @@ unsigned int SubMesh::GetMaterialIndex() const
 }
 
 //////////////////////////////////////////////////
-bool SubMesh::HasVertex(const math::Vector3 &_v) const
+bool SubMesh::HasVertex(const ignition::math::Vector3d &_v) const
 {
-  std::vector< math::Vector3 >::const_iterator iter;
+  std::vector< ignition::math::Vector3d >::const_iterator iter;
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
     if (_v.Equal(*iter))
@@ -728,9 +734,9 @@ bool SubMesh::HasVertex(const math::Vector3 &_v) const
 }
 
 //////////////////////////////////////////////////
-unsigned int SubMesh::GetVertexIndex(const math::Vector3 &_v) const
+unsigned int SubMesh::GetVertexIndex(const ignition::math::Vector3d &_v) const
 {
-  std::vector< math::Vector3 >::const_iterator iter;
+  std::vector< ignition::math::Vector3d >::const_iterator iter;
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
     if (_v.Equal(*iter))
@@ -745,8 +751,8 @@ void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
   if (this->vertices.empty() || this->indices.empty())
     gzerr << "No vertices or indices\n";
 
-  std::vector< math::Vector3 >::const_iterator viter;
-  std::vector< unsigned int >::const_iterator iiter;
+  std::vector<ignition::math::Vector3d>::const_iterator viter;
+  std::vector<unsigned int>::const_iterator iiter;
   unsigned int i;
 
   if (*_vertArr)
@@ -761,14 +767,16 @@ void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
   for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end();
       ++viter)
   {
-    (*_vertArr)[i++] = static_cast<float>((*viter).x);
-    (*_vertArr)[i++] = static_cast<float>((*viter).y);
-    (*_vertArr)[i++] = static_cast<float>((*viter).z);
+    (*_vertArr)[i++] = static_cast<float>((*viter).X());
+    (*_vertArr)[i++] = static_cast<float>((*viter).Y());
+    (*_vertArr)[i++] = static_cast<float>((*viter).Z());
   }
 
   for (iiter = this->indices.begin(), i = 0;
       iiter != this->indices.end(); ++iiter)
+  {
     (*_indArr)[i++] = (*iiter);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -779,7 +787,7 @@ void SubMesh::RecalculateNormals()
     return;
 
   // Reset all the normals
-  for (i = 0; i < this->normals.size(); i++)
+  for (i = 0; i < this->normals.size(); ++i)
     this->normals[i].Set(0, 0, 0);
 
   if (this->normals.size() != this->vertices.size())
@@ -788,12 +796,12 @@ void SubMesh::RecalculateNormals()
   // For each face, which is defined by three indices, calculate the normals
   for (i = 0; i < this->indices.size(); i+= 3)
   {
-    math::Vector3 v1 = this->vertices[this->indices[i]];
-    math::Vector3 v2 = this->vertices[this->indices[i+1]];
-    math::Vector3 v3 = this->vertices[this->indices[i+2]];
-    math::Vector3 n = math::Vector3::GetNormal(v1, v2, v3);
+    ignition::math::Vector3d v1 = this->vertices[this->indices[i]];
+    ignition::math::Vector3d v2 = this->vertices[this->indices[i+1]];
+    ignition::math::Vector3d v3 = this->vertices[this->indices[i+2]];
+    ignition::math::Vector3d n = ignition::math::Vector3d::Normal(v1, v2, v3);
 
-    for (unsigned int j = 0; j< this->vertices.size(); j++)
+    for (unsigned int j = 0; j< this->vertices.size(); ++j)
     {
       if (this->vertices[j] == v1 ||
           this->vertices[j] == v2 ||
@@ -805,56 +813,57 @@ void SubMesh::RecalculateNormals()
   }
 
   // Normalize the results
-  for (i = 0; i < this->normals.size(); i++)
+  for (i = 0; i < this->normals.size(); ++i)
   {
     this->normals[i].Normalize();
   }
 }
 
 //////////////////////////////////////////////////
-void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
-                   math::Vector3 &_max_xyz) const
+void Mesh::GetAABB(ignition::math::Vector3d &_center,
+                   ignition::math::Vector3d &_minXYZ,
+                   ignition::math::Vector3d &_maxXYZ) const
 {
   // find aabb center
-  _min_xyz.x = 1e15;
-  _max_xyz.x = -1e15;
-  _min_xyz.y = 1e15;
-  _max_xyz.y = -1e15;
-  _min_xyz.z = 1e15;
-  _max_xyz.z = -1e15;
-  _center.x = 0;
-  _center.y = 0;
-  _center.z = 0;
+  _minXYZ.X(1e15);
+  _maxXYZ.X(-1e15);
+  _minXYZ.Y(1e15);
+  _maxXYZ.Y(-1e15);
+  _minXYZ.Z(1e15);
+  _maxXYZ.Z(-1e15);
+  _center.X(0);
+  _center.Y(0);
+  _center.Z(0);
 
   std::vector<SubMesh*>::const_iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
   {
-    math::Vector3 max = (*siter)->GetMax();
-    math::Vector3 min = (*siter)->GetMin();
-    _min_xyz.x = std::min(_min_xyz.x, min.x);
-    _max_xyz.x = std::max(_max_xyz.x, max.x);
-    _min_xyz.y = std::min(_min_xyz.y, min.y);
-    _max_xyz.y = std::max(_max_xyz.y, max.y);
-    _min_xyz.z = std::min(_min_xyz.z, min.z);
-    _max_xyz.z = std::max(_max_xyz.z, max.z);
+    ignition::math::Vector3d max = (*siter)->Max();
+    ignition::math::Vector3d min = (*siter)->Min();
+
+    _minXYZ.X(std::min(_minXYZ.X(), min.X()));
+    _maxXYZ.X(std::max(_maxXYZ.X(), max.X()));
+    _minXYZ.Y(std::min(_minXYZ.Y(), min.Y()));
+    _maxXYZ.Y(std::max(_maxXYZ.Y(), max.Y()));
+    _minXYZ.Z(std::min(_minXYZ.Z(), min.Z()));
+    _maxXYZ.Z(std::max(_maxXYZ.Z(), max.Z()));
   }
-  _center.x = 0.5*(_min_xyz.x+_max_xyz.x);
-  _center.y = 0.5*(_min_xyz.y+_max_xyz.y);
-  _center.z = 0.5*(_min_xyz.z+_max_xyz.z);
+  _center.X(0.5 * (_minXYZ.X() + _maxXYZ.X()));
+  _center.Y(0.5 * (_minXYZ.Y() + _maxXYZ.Y()));
+  _center.Z(0.5 * (_minXYZ.Z() + _maxXYZ.Z()));
 }
 
-
 //////////////////////////////////////////////////
-void SubMesh::GenSphericalTexCoord(const math::Vector3 &_center)
+void SubMesh::GenSphericalTexCoord(const ignition::math::Vector3d &_center)
 {
-  std::vector<math::Vector3>::const_iterator viter;
+  std::vector<ignition::math::Vector3d>::const_iterator viter;
   for (viter = this->vertices.begin(); viter != this->vertices.end(); ++viter)
   {
     // generate projected texture coordinates, projected from center
     // get x, y, z for computing texture coordinate projections
-    double x = (*viter).x - _center.x;
-    double y = (*viter).y - _center.y;
-    double z = (*viter).z - _center.z;
+    double x = (*viter).X() - _center.X();
+    double y = (*viter).Y() - _center.Y();
+    double z = (*viter).Z() - _center.Z();
 
     double r = std::max(0.000001, sqrt(x*x+y*y+z*z));
     double s = std::min(1.0, std::max(-1.0, z/r));
@@ -868,44 +877,33 @@ void SubMesh::GenSphericalTexCoord(const math::Vector3 &_center)
 //////////////////////////////////////////////////
 void SubMesh::Scale(double _factor)
 {
-  for (std::vector<math::Vector3>::iterator iter = this->vertices.begin();
-       iter != this->vertices.end(); ++iter)
-  {
-    (*iter) *= _factor;
-  }
+  for (auto &vert : this->vertices)
+    vert *= _factor;
 }
 
 //////////////////////////////////////////////////
-void SubMesh::SetScale(const math::Vector3 &_factor)
+void SubMesh::SetScale(const ignition::math::Vector3d &_factor)
 {
-  for (std::vector<math::Vector3>::iterator iter = this->vertices.begin();
-       iter != this->vertices.end(); ++iter)
-  {
-    (*iter).x *= _factor.x;
-    (*iter).y *= _factor.y;
-    (*iter).z *= _factor.z;
-  }
+  for (auto &vert : this->vertices)
+    vert *= _factor;
 }
 
 //////////////////////////////////////////////////
-void SubMesh::Center(const math::Vector3 &_center)
+void SubMesh::Center(const ignition::math::Vector3d &_center)
 {
-  math::Vector3 min, max, half;
-  min = this->GetMin();
-  max = this->GetMax();
+  ignition::math::Vector3d min, max, half;
+  min = this->Min();
+  max = this->Max();
   half = (max - min) * 0.5;
 
   this->Translate(_center - (min + half));
 }
 
 //////////////////////////////////////////////////
-void SubMesh::Translate(const math::Vector3 &_vec)
+void SubMesh::Translate(const ignition::math::Vector3d &_vec)
 {
-  for (std::vector<math::Vector3>::iterator iter = this->vertices.begin();
-       iter != this->vertices.end(); ++iter)
-  {
-    (*iter) += _vec;
-  }
+  for (auto &vert : this->vertices)
+    vert += _vec;
 }
 
 //////////////////////////////////////////////////

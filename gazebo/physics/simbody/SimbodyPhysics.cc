@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,10 +39,13 @@
 #include "gazebo/physics/simbody/SimbodySliderJoint.hh"
 #include "gazebo/physics/simbody/SimbodyHinge2Joint.hh"
 #include "gazebo/physics/simbody/SimbodyScrewJoint.hh"
+#include "gazebo/physics/simbody/SimbodyFixedJoint.hh"
 
+#include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -161,13 +164,13 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
     simbodyContactElem->Get<double>("viscous_friction");
 
   // below are not used yet, but should work it into the system
-  this->contactMaterialViscousFriction =
-    simbodyContactElem->Get<double>("plastic_coef_restitution");
   this->contactMaterialPlasticCoefRestitution =
-    simbodyContactElem->Get<double>("plastic_impact_velocity");
+    simbodyContactElem->Get<double>("plastic_coef_restitution");
   this->contactMaterialPlasticImpactVelocity =
-    simbodyContactElem->Get<double>("override_impact_capture_velocity");
+    simbodyContactElem->Get<double>("plastic_impact_velocity");
   this->contactImpactCaptureVelocity =
+    simbodyContactElem->Get<double>("override_impact_capture_velocity");
+  this->contactStictionTransitionVelocity =
     simbodyContactElem->Get<double>("override_stiction_transition_velocity");
 }
 
@@ -188,7 +191,10 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
 
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->GetGravity().Ign()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+      msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -202,11 +208,16 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
@@ -234,9 +245,6 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -402,6 +410,224 @@ void SimbodyPhysics::InitForThread()
 //////////////////////////////////////////////////
 void SimbodyPhysics::UpdateCollision()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
+
+  this->contactManager->ResetCount();
+
+  // Get all contacts from Simbody
+  const SimTK::State &state = this->integ->getState();
+
+  // get contact snapshot
+  const SimTK::ContactSnapshot &contactSnapshot =
+    this->tracker.getActiveContacts(state);
+
+  int numc = contactSnapshot.getNumContacts();
+
+  int count = 0;
+  for (int j = 0; j < numc; ++j)
+  {
+    // get contact stuff from Simbody
+    const SimTK::Contact &simbodyContact = contactSnapshot.getContact(j);
+    {
+      SimTK::ContactSurfaceIndex csi1 = simbodyContact.getSurface1();
+      SimTK::ContactSurfaceIndex csi2 = simbodyContact.getSurface2();
+      const SimTK::ContactSurface &cs1 = this->tracker.getContactSurface(csi1);
+      const SimTK::ContactSurface &cs2 = this->tracker.getContactSurface(csi2);
+
+      /// \TODO: See issue #1584
+      /// \TODO: below, get collision data from simbody contacts
+      Collision *collision1 = NULL;
+      Collision *collision2 = NULL;
+      physics::LinkPtr link1 = NULL;
+      physics::LinkPtr link2 = NULL;
+
+      /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
+      const SimTK::ContactGeometry &cg1 = cs1.getShape();
+      const SimTK::ContactGeometry &cg2 = cs2.getShape();
+
+      /// \TODO: proof of concept only
+      /// loop through all link->all collisions and find
+      /// this is going to be very very slow, we'll need
+      /// something with a void* pointer in simbody
+      /// to support something like this.
+      physics::Model_V models = this->world->GetModels();
+      for (physics::Model_V::iterator mi = models.begin();
+           mi != models.end(); ++mi)
+      {
+        physics::Link_V links = (*mi)->GetLinks();
+        for (Link_V::iterator li = links.begin(); li != links.end(); ++li)
+        {
+          Collision_V collisions = (*li)->GetCollisions();
+          for (Collision_V::iterator ci = collisions.begin();
+               ci != collisions.end(); ++ci)
+          {
+            /// compare SimbodyCollision::GetCollisionShape() to
+            /// ContactGeometry from SimTK::ContactForce
+            SimbodyCollisionPtr sc =
+              boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+            if (sc->GetCollisionShape() == &cg1)
+            {
+              collision1 = (*ci).get();
+              link1 = (*li);
+            }
+            else if (sc->GetCollisionShape() == &cg2)
+            {
+              collision2 = (*ci).get();
+              link2 = (*li);
+            }
+          }
+        }
+      }
+
+      // add contacts to the manager. This will return NULL if no one is
+      // listening for contact information.
+      Contact *contactFeedback = this->contactManager->NewContact(collision1,
+          collision2, this->world->GetSimTime());
+
+      if (contactFeedback)
+      {
+        const bool useContactPatch = true;
+        if (useContactPatch)
+        {
+          // get contact patch to get detailed contacts
+          // see https://github.com/simbody/simbody/blob/master/examples/ExampleContactPlayground.cpp#L110
+          SimTK::ContactPatch patch;
+          this->system.realize(state, SimTK::Stage::Velocity);
+          const bool found =
+             this->contact.calcContactPatchDetailsById(
+               state, simbodyContact.getContactId(), patch);
+
+          // loop through details of patch
+          if (found)
+          {
+            for (int i = 0; i < patch.getNumDetails(); ++i)
+            {
+              if (count >= MAX_CONTACT_JOINTS)
+              {
+                gzerr << "max contact count [" << MAX_CONTACT_JOINTS
+                      << "] exceeded. truncating info.\n";
+                continue;
+              }
+              // gzerr << "count: " << count << "\n";
+
+              // get detail
+              const SimTK::ContactDetail &detail = patch.getContactDetail(i);
+              // get contact information from simbody and
+              // add them to contactFeedback.
+              // Store the contact depth
+              contactFeedback->depths[count] = detail.getDeformation();
+
+              // Store the contact position
+              contactFeedback->positions[count].Set(
+                detail.getContactPoint()[0],
+                detail.getContactPoint()[1],
+                detail.getContactPoint()[2]);
+
+              // Store the contact normal
+              contactFeedback->normals[count].Set(
+                detail.getContactNormal()[0],
+                detail.getContactNormal()[1],
+                detail.getContactNormal()[2]);
+
+              // Store the contact forces
+              const SimTK::Vec3 f2 = detail.getForceOnSurface2();
+              const SimTK::SpatialVec s2 =
+                SimTK::SpatialVec(SimTK::Vec3(0, 0, 0), f2);
+              /// Get transform from point to CG.
+              /// detail.getContactPoint() returns in body frame
+              /// per gazebo contact feedback convention.
+              const SimTK::Vec3 offset2 = -detail.getContactPoint();
+              SimTK::SpatialVec s2cg = SimTK::shiftForceBy(s2, offset2);
+              SimTK::Vec3 t2cg = s2cg[0];
+              SimTK::Vec3 f2cg = s2cg[1];
+
+              /// shift for body 1
+              /// \TODO: generalize wrench shifting below later and add
+              /// it to JointWrench class for shifting wrenches around
+              /// arbitrarily based on frames.
+              ///
+              /// shift forces to link1 frame without rotating it first
+              math::Pose pose1 = link1->GetWorldPose();
+              math::Pose pose2 = link2->GetWorldPose();
+              const SimTK::Vec3 offset1 = -detail.getContactPoint()
+                + SimbodyPhysics::Vector3ToVec3(pose1.pos - pose2.pos);
+              SimTK::SpatialVec s1cg = SimTK::shiftForceBy(-s2, offset1);
+
+              /// get torque and force components
+              SimTK::Vec3 t1cg = s1cg[0];
+              SimTK::Vec3 f1cg = s1cg[1];
+
+              /* actually don't need to do this? confirm that
+                 everything is in the world frame!
+              /// \TODO: rotate it into link 1 frame, there must be
+              /// a clean way to do this in simbody...
+              /// my gazebo way of rotating frames for now, to replace with
+              /// clean simbody function calls.
+              /// rotation from link2 to link1 frame specified in link2 frame
+              math::Quaternion rot21 = (pose1 - pose2).rot;
+              t1cg = SimbodyPhysics::Vector3ToVec3(
+                rot21.RotateVectorReverse(SimbodyPhysics::Vec3ToVector3(t1cg)));
+              f1cg = SimbodyPhysics::Vector3ToVec3(
+                rot21.RotateVectorReverse(SimbodyPhysics::Vec3ToVector3(f1cg)));
+
+              gzerr << "numc: " << j << "\n";
+              gzerr << "count: " << count << "\n";
+              gzerr << "index: " << i << "\n";
+              gzerr << "offset 2: " << detail.getContactPoint() << "\n";
+              gzerr << "s2: " << s2 << "\n";
+              gzerr << "s2cg: " << s2cg << "\n";
+              gzerr << "f2cg: " << f2cg << "\n";
+              gzerr << "t2cg: " << t2cg << "\n";
+              gzerr << "offset 1: " << detail.getContactPoint() << "\n";
+              gzerr << "s1cg: " << s1cg << "\n";
+              gzerr << "f1cg: " << f1cg << "\n";
+              gzerr << "t1cg: " << t1cg << "\n";
+              */
+
+              // copy.
+              contactFeedback->wrench[count].body1Force.Set(
+                f1cg[0], f1cg[1], f1cg[2]);
+              contactFeedback->wrench[count].body2Force.Set(
+                f2cg[0], f2cg[1], f2cg[2]);
+              contactFeedback->wrench[count].body1Torque.Set(
+                t1cg[0], t1cg[1], t1cg[2]);
+              contactFeedback->wrench[count].body2Torque.Set(
+                t2cg[0], t2cg[1], t2cg[2]);
+
+              // Increase the counters
+              ++count;
+              contactFeedback->count = count;
+            }
+          }
+        }
+        else  // use single ContactForce
+        {
+          // // get contact information from simbody ContactForce and
+          // // add it to contactFeedback.
+
+          // /// \TODO: confirm the contact depth is zero?
+          // contactFeedback->depths[count] = 0.0;
+
+          // // Store the contact position
+          // contactFeedback->positions[count].Set(
+          //   contactForce.getContactPoint()[0],
+          //   contactForce.getContactPoint()[1],
+          //   contactForce.getContactPoint()[2]);
+
+          // // Store the contact normal
+          // contactFeedback->normals[j].Set(
+          //   0, 0, 0);
+          //   // contactForce.getContactNormal()[0],
+          //   // contactForce.getContactNormal()[1],
+          //   // contactForce.getContactNormal()[2]);
+
+          // // Increase the counters
+          // ++count;
+          // contactFeedback->count = count;
+        }
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -455,7 +681,7 @@ void SimbodyPhysics::UpdatePhysics()
       math::Pose pose = SimbodyPhysics::Transform2Pose(
         simbodyLink->masterMobod.getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
-      this->world->dirtyPoses.push_back(
+      this->world->dataPtr->dirtyPoses.push_back(
         boost::static_pointer_cast<Entity>(*lx).get());
     }
 
@@ -556,6 +782,8 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
     joint.reset(new SimbodyHinge2Joint(this->dynamicsWorld, _parent));
   else if (_type == "screw")
     joint.reset(new SimbodyScrewJoint(this->dynamicsWorld, _parent));
+  else if (_type == "fixed")
+    joint.reset(new SimbodyFixedJoint(this->dynamicsWorld, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
@@ -595,6 +823,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
   _mbgraph.addJointType(GetTypeString(physics::Base::SLIDER_JOINT), 1);
   _mbgraph.addJointType(GetTypeString(physics::Base::UNIVERSAL_JOINT), 2);
   _mbgraph.addJointType(GetTypeString(physics::Base::SCREW_JOINT), 1);
+  _mbgraph.addJointType(GetTypeString(physics::Base::FIXED_JOINT), 0);
 
   // Simbody has a Ball constraint that is a good choice if you need to
   // break a loop at a ball joint.
@@ -1018,6 +1247,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         ballJoint.setDefaultRotation(defR_FM);
         mobod = ballJoint;
       }
+      else if (type == "fixed")
+      {
+        MobilizedBody::Weld fixedJoint(
+            parentMobod,  X_IF0,
+            massProps,    X_OM0);
+        mobod = fixedJoint;
+      }
       else
       {
         gzerr << "Simbody joint type [" << type << "] not implemented.\n";
@@ -1130,6 +1366,8 @@ std::string SimbodyPhysics::GetTypeString(physics::Base::EntityType _type)
       return "screw";
   else if (_type & physics::Base::UNIVERSAL_JOINT)
       return "universal";
+  else if (_type & physics::Base::FIXED_JOINT)
+      return "fixed";
 
   gzerr << "Unrecognized joint type\n";
   return "UNRECOGNIZED";
@@ -1172,6 +1410,10 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
     Transform X_LC =
       SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
 
+    // use pointer to store CollisionGeometry
+    SimbodyCollisionPtr sc =
+      boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+
     switch ((*ci)->GetShapeType() & (~physics::Entity::SHAPE))
     {
       case physics::Entity::PLANE_SHAPE:
@@ -1179,17 +1421,11 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         boost::shared_ptr<physics::PlaneShape> p =
           boost::dynamic_pointer_cast<physics::PlaneShape>((*ci)->GetShape());
 
-        // Add a contact surface to represent the ground.
-        // Half space normal is -x; must rotate about y to make it +z.
-        this->matter.Ground().updBody().addContactSurface(Rotation(Pi/2, YAxis),
-           ContactSurface(ContactGeometry::HalfSpace(), material));
-
-        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal());
-
         // by default, simbody HalfSpace normal is in the -X direction
         // rotate it based on normal vector specified by user
         // Create a rotation whos x-axis is in the
         // negative normal vector direction
+        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal());
         Rotation R_XN(-UnitVec3(normal), XAxis);
 
         ContactSurface surface(ContactGeometry::HalfSpace(), material);
@@ -1197,7 +1433,12 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         if (addModelClique)
             surface.joinClique(_modelClique);
 
-        _mobod.updBody().addContactSurface(R_XN, surface);
+        int surfNum = _mobod.updBody().addContactSurface(R_XN, surface);
+
+        // store ContactGeometry pointer in SimbodyCollision object
+        SimTK::ContactSurface &contactSurf =
+          _mobod.updBody().updContactSurface(surfNum);
+        sc->SetCollisionShape(&contactSurf.updShape());
       }
       break;
 
@@ -1209,7 +1450,12 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         ContactSurface surface(ContactGeometry::Sphere(r), material);
         if (addModelClique)
             surface.joinClique(_modelClique);
-        _mobod.updBody().addContactSurface(X_LC, surface);
+        int surfNum = _mobod.updBody().addContactSurface(X_LC, surface);
+
+        // store ContactGeometry pointer in SimbodyCollision object
+        SimTK::ContactSurface &contactSurf =
+          _mobod.updBody().updContactSurface(surfNum);
+        sc->SetCollisionShape(&contactSurf.updShape());
       }
       break;
 
@@ -1234,7 +1480,12 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
 
         if (addModelClique)
             surface.joinClique(_modelClique);
-        _mobod.updBody().addContactSurface(X_LC, surface);
+        int surfNum = _mobod.updBody().addContactSurface(X_LC, surface);
+
+        // store ContactGeometry pointer in SimbodyCollision object
+        SimTK::ContactSurface &contactSurf =
+          _mobod.updBody().updContactSurface(surfNum);
+        sc->SetCollisionShape(&contactSurf.updShape());
       }
       break;
 
@@ -1259,7 +1510,12 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
 
         if (addModelClique)
             surface.joinClique(_modelClique);
-        _mobod.updBody().addContactSurface(X_LC, surface);
+        int surfNum = _mobod.updBody().addContactSurface(X_LC, surface);
+
+        // store ContactGeometry pointer in SimbodyCollision object
+        SimTK::ContactSurface &contactSurf =
+          _mobod.updBody().updContactSurface(surfNum);
+        sc->SetCollisionShape(&contactSurf.updShape());
       }
       break;
       default:
@@ -1341,99 +1597,102 @@ std::string SimbodyPhysics::GetTypeString(unsigned int _type)
 //////////////////////////////////////////////////
 boost::any SimbodyPhysics::GetParam(const std::string &_key) const
 {
-  if (_key == "type")
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
+}
+
+//////////////////////////////////////////////////
+bool SimbodyPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
+  if (_key == "solver_type")
   {
-    gzwarn << "Please use keyword `solver_typ` in the future.\n";
-    return this->GetParam("solver_type");
-  }
-  else if (_key == "solver_type")
-  {
-    return "Spatial Algebra and Elastic Foundation";
+    _value = std::string("Spatial Algebra and Elastic Foundation");
   }
   else if (_key == "integrator_type")
   {
-    return this->integratorType;
+    _value = this->integratorType;
   }
   else if (_key == "accuracy")
   {
     if (this->integ)
-      return this->integ->getAccuracyInUse();
+      _value = this->integ->getAccuracyInUse();
     else
-      return 0.0f;
+      _value = 0.0f;
   }
   else if (_key == "max_transient_velocity")
   {
-    return this->contact.getTransitionVelocity();
-  }
-  else if (_key == "max_step_size")
-  {
-    return this->GetMaxStepSize();
+    _value = this->contact.getTransitionVelocity();
   }
   else
   {
-    gzwarn << "key [" << _key
-           << "] not supported, returning (int)0." << std::endl;
-    return 0;
+    return PhysicsEngine::GetParam(_key, _value);
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
 bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
-  /// \TODO fill this out, see issue #1116
-  if (_key == "accuracy")
+  try
   {
-    int value;
-    try
+    if (_key == "accuracy")
     {
-      value = boost::any_cast<int>(_value);
+      this->integ->setAccuracy(boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "max_transient_velocity")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      this->contact.setTransitionVelocity(boost::any_cast<double>(_value));
     }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
+    else if (_key == "stiffness")
+    {
+      this->contactMaterialStiffness = boost::any_cast<double>(_value);
+    }
+    else if (_key == "dissipation")
+    {
+      this->contactMaterialDissipation = boost::any_cast<double>(_value);
+    }
+    else if (_key == "plastic_coef_restitution")
+    {
+      this->contactMaterialPlasticCoefRestitution =
+          boost::any_cast<double>(_value);
+    }
+    else if (_key == "plastic_impact_velocity")
+    {
+      this->contactMaterialPlasticImpactVelocity =
+          boost::any_cast<double>(_value);
+    }
+    else if (_key == "static_friction")
+    {
+      this->contactMaterialStaticFriction = boost::any_cast<double>(_value);
+    }
+    else if (_key == "dynamic_friction")
+    {
+      this->contactMaterialDynamicFriction = boost::any_cast<double>(_value);
+    }
+    else if (_key == "viscous_friction")
+    {
+      this->contactMaterialViscousFriction = boost::any_cast<double>(_value);
+    }
+    else if (_key == "override_impact_capture_velocity")
+    {
+      this->contactMaterialPlasticImpactVelocity =
+          boost::any_cast<double>(_value);
+    }
+    else if (_key == "override_stiction_transition_velocity")
+    {
+      this->contactImpactCaptureVelocity = boost::any_cast<double>(_value);
+    }
+    else
+    {
+      return PhysicsEngine::SetParam(_key, _value);
+    }
+  }
+  catch(boost::bad_any_cast &e)
+  {
+    gzerr << "SimbodyPhysics::SetParam(" << _key << ") boost::any_cast error: "
+          << e.what() << std::endl;
     return false;
   }
-  else if (_key == "max_transient_velocity")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
-    return false;
-  }
-  else if (_key == "max_step_size")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    gzerr << "Setting [" << _key << "] in Simbody to [" << value
-          << "] not yet supported.\n";
-    return false;
-  }
-  else
-  {
-    gzwarn << _key << " is not supported in Simbody" << std::endl;
-    return false;
-  }
-  // should never get here
-  return false;
+  return true;
 }

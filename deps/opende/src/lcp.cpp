@@ -534,10 +534,17 @@ void dLCP::transfer_i_to_C (int i)
         for (int j=0; j<nC; ++j) Ltgt[j] = ell[j];
       }
       const int nC = m_nC;
-      m_d[nC] = dRecip (AROW(i)[i] - dDot(m_ell,m_Dell,nC));
+      dReal Aii_dDot = AROW(i)[i] - dDot(m_ell, m_Dell, nC);
+      if(dFabs(Aii_dDot) < 1e-16) {
+          Aii_dDot += 1e-6;
+      }
+      m_d[nC] = dRecip (Aii_dDot);
     }
     else {
-      m_d[0] = dRecip (AROW(i)[i]);
+        if(dFabs(AROW(i)[i]) < 1e-16) {
+            AROW(i)[i] += 1e-6;
+        }
+        m_d[0] = dRecip (AROW(i)[i]);
     }
 
     swapProblem (m_A,m_x,m_b,m_w,m_lo,m_hi,m_p,m_state,m_findex,m_n,m_nC,i,m_nskip,1);
@@ -582,10 +589,17 @@ void dLCP::transfer_i_from_N_to_C (int i)
         for (int j=0; j<nC; ++j) Ltgt[j] = ell[j] = Dell[j] * d[j];
       }
       const int nC = m_nC;
-      m_d[nC] = dRecip (AROW(i)[i] - dDot(m_ell,m_Dell,nC));
+      dReal Aii_dDot = AROW(i)[i] - dDot(m_ell, m_Dell, nC);
+      if(dFabs(Aii_dDot) < 1e-16) {
+          Aii_dDot += 1e-6;
+      }
+      m_d[nC] = dRecip (Aii_dDot);
     }
     else {
-      m_d[0] = dRecip (AROW(i)[i]);
+        if(dFabs(AROW(i)[i]) < 1e-16) {
+            AROW(i)[i] += 1e-6;
+        }
+        m_d[0] = dRecip (AROW(i)[i]);
     }
 
     swapProblem (m_A,m_x,m_b,m_w,m_lo,m_hi,m_p,m_state,m_findex,m_n,m_nC,i,m_nskip,1);

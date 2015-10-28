@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief A screw joint
-    class GAZEBO_VISIBLE BulletScrewJoint : public ScrewJoint<BulletJoint>
+    class GZ_PHYSICS_VISIBLE BulletScrewJoint : public ScrewJoint<BulletJoint>
     {
       /// \brief Constructor
       /// \param[in] _world Pointer to the dynamics world.
@@ -97,16 +97,6 @@ namespace gazebo
       /// \param[in] _index Axis index.
       /// \param[in] _vel Velocity to apply to the joint axis.
       public: virtual void SetVelocity(unsigned int _index, double _vel);
-
-      /// \brief Set the max allowed force of an axis(index).
-      /// \param[in] _index Axis index.
-      /// \param[in] _force Maximum force value.
-      public: virtual void SetMaxForce(unsigned int _index, double _force);
-
-      /// \brief Get the max allowed force of an axis(index).
-      /// \param[in] _index Axis index.
-      /// \return Maximum force value.
-      public: virtual double GetMaxForce(unsigned int _index);
 
       /// \brief Get the axis of rotation
       /// \param[in] _index Axis index.

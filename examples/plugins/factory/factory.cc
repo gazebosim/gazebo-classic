@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Pose3.hh>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/gazebo.hh"
@@ -51,7 +52,7 @@ class Factory : public WorldPlugin
           </model>\
         </sdf>");
     // Demonstrate using a custom model name.
-    sdf::ElementPtr model = sphereSDF.root->GetElement("model");
+    sdf::ElementPtr model = sphereSDF.Root()->GetElement("model");
     model->GetAttribute("name")->SetFromString("unique_sphere");
     _parent->InsertModelSDF(sphereSDF);
 
@@ -75,7 +76,9 @@ class Factory : public WorldPlugin
 
       // Pose to initialize the model to
       msgs::Set(msg.mutable_pose(),
-      math::Pose(math::Vector3(1, -2, 0), math::Quaternion(0, 0, 0)));
+          ignition::math::Pose3d(
+            ignition::math::Vector3d(1, -2, 0),
+            ignition::math::Quaterniond(0, 0, 0)));
 
       // Send the message
       factoryPub->Publish(msg);

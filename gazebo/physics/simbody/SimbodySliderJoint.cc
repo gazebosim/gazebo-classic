@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,19 +92,6 @@ double SimbodySliderJoint::GetVelocity(unsigned int _index) const
     gzerr << "Invalid index for joint, returning NaN\n";
     return SimTK::NaN;
   }
-}
-
-//////////////////////////////////////////////////
-void SimbodySliderJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzdbg << "SetMaxForce doesn't make sense in simbody...\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodySliderJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzdbg << "GetMaxForce doesn't make sense in simbody...\n";
-  return 0;
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ namespace gazebo
 {
   namespace transport
   {
-    extern bool is_stopped();
+    extern GZ_TRANSPORT_VISIBLE bool is_stopped();
 
     class IOManager;
     class Connection;
@@ -53,7 +53,7 @@ namespace gazebo
     /// \cond
     /// \brief A task instance that is created when data is read from
     /// a socket and used by TBB
-    class GAZEBO_VISIBLE ConnectionReadTask : public tbb::task
+    class GZ_TRANSPORT_VISIBLE ConnectionReadTask : public tbb::task
     {
       /// \brief Constructor
       /// \param[_in] _func Boost function pointer, which is the function
@@ -97,7 +97,7 @@ namespace gazebo
     ///
     /// \class Connection Connection.hh transport/transport.hh
     /// \brief Single TCP/IP connection manager
-    class GAZEBO_VISIBLE Connection :
+    class GZ_TRANSPORT_VISIBLE Connection :
       public boost::enable_shared_from_this<Connection>
     {
       /// \brief Constructor

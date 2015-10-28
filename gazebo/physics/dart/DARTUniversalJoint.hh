@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ namespace gazebo
   namespace physics
   {
     /// \brief A universal joint.
-    class GAZEBO_VISIBLE DARTUniversalJoint : public UniversalJoint<DARTJoint>
+    class GZ_PHYSICS_VISIBLE DARTUniversalJoint :
+      public UniversalJoint<DARTJoint>
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
@@ -62,16 +63,7 @@ namespace gazebo
       public: virtual void SetVelocity(unsigned int _index, double _vel);
 
       // Documentation inherited
-      public: virtual void SetMaxForce(unsigned int _index, double _force);
-
-      // Documentation inherited
-      public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
-
-      /// \brief Universal joint of DART
-      protected: dart::dynamics::UniversalJoint *dtUniveralJoint;
     };
   }
 }

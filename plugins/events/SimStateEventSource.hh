@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,11 @@ namespace gazebo
 
     /// \brief Load the name of the event from the world file
     /// \param[in] _sdf the event element in the world file
-    public: virtual void Load(const sdf::ElementPtr &_sdf);
+    public: virtual void Load(const sdf::ElementPtr _sdf);
+
+    /// \brief Update for every time step
+    /// \param[in] _info Update information provided by the server.
+    public: virtual void OnUpdate(const common::UpdateInfo &_info);
 
     /// \brief Callback for the pause event
     /// \param[in] _p true if the sim has been paused
@@ -48,6 +52,12 @@ namespace gazebo
 
     /// \brief Pointer to the Gazebo pause event connection
     private: event::ConnectionPtr pauseConnection;
+
+    /// \brief Pointer to the update event connection
+    private: event::ConnectionPtr updateConnection;
+
+    /// \brief Simulation time at the previous step
+    private: common::Time simTime;
   };
 }
 

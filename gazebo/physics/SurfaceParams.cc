@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
@@ -25,9 +24,13 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 FrictionPyramid::FrictionPyramid()
+  : patchRadius(0.0)
+  , surfaceRadius(IGN_DBL_MAX)
+  , usePatchRadius(1)
 {
   this->mu[0] = 1.0;
   this->mu[1] = 1.0;
+  this->mu[2] = 1.0;
 }
 
 //////////////////////////////////////////////////
@@ -38,13 +41,49 @@ FrictionPyramid::~FrictionPyramid()
 //////////////////////////////////////////////////
 double FrictionPyramid::GetMuPrimary()
 {
-  return this->GetMu(0);
+  return this->Mu(0);
 }
 
 //////////////////////////////////////////////////
 double FrictionPyramid::GetMuSecondary()
 {
-  return this->GetMu(1);
+  return this->Mu(1);
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::MuPrimary() const
+{
+  return this->Mu(0);
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::MuSecondary() const
+{
+  return this->Mu(1);
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::MuTorsion() const
+{
+  return this->Mu(2);
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::PatchRadius() const
+{
+  return this->patchRadius;
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::SurfaceRadius() const
+{
+  return this->surfaceRadius;
+}
+
+//////////////////////////////////////////////////
+bool FrictionPyramid::UsePatchRadius() const
+{
+  return this->usePatchRadius;
 }
 
 //////////////////////////////////////////////////
@@ -60,16 +99,40 @@ void FrictionPyramid::SetMuSecondary(double _mu)
 }
 
 //////////////////////////////////////////////////
-double FrictionPyramid::GetMu(unsigned int _index)
+void FrictionPyramid::SetMuTorsion(const double _mu)
 {
-  GZ_ASSERT(_index < 2, "Invalid _index to GetMu");
+  this->SetMu(2, _mu);
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetPatchRadius(const double _radius)
+{
+  this->patchRadius = _radius;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetSurfaceRadius(const double _radius)
+{
+  this->surfaceRadius = _radius;
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetUsePatchRadius(const bool _use)
+{
+  this->usePatchRadius = _use;
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::Mu(const unsigned int _index) const
+{
+  GZ_ASSERT(_index < 3, "Invalid _index to Mu");
   return this->mu[_index];
 }
 
 //////////////////////////////////////////////////
 void FrictionPyramid::SetMu(unsigned int _index, double _mu)
 {
-  GZ_ASSERT(_index < 2, "Invalid _index to SetMu");
+  GZ_ASSERT(_index < 3, "Invalid _index to SetMu");
   if (_mu < 0)
   {
     this->mu[_index] = GZ_FLT_MAX;
@@ -83,7 +146,8 @@ void FrictionPyramid::SetMu(unsigned int _index, double _mu)
 //////////////////////////////////////////////////
 SurfaceParams::SurfaceParams()
   : collideWithoutContact(false),
-    collideWithoutContactBitmask(1)
+    collideWithoutContactBitmask(1),
+    collideBitmask(65535)
 {
 }
 
@@ -108,6 +172,12 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
         contactElem->Get<bool>("collide_without_contact");
       this->collideWithoutContactBitmask =
           contactElem->Get<unsigned int>("collide_without_contact_bitmask");
+
+      if (contactElem->HasElement("collide_bitmask"))
+      {
+        this->collideBitmask =
+          contactElem->Get<unsigned int>("collide_bitmask");
+      }
     }
   }
 }
@@ -117,13 +187,28 @@ void SurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   _msg.set_collide_without_contact(this->collideWithoutContact);
   _msg.set_collide_without_contact_bitmask(this->collideWithoutContactBitmask);
+  _msg.set_collide_bitmask(this->collideBitmask);
 }
 
-
+/////////////////////////////////////////////////
 void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 {
   if (_msg.has_collide_without_contact())
     this->collideWithoutContact = _msg.collide_without_contact();
   if (_msg.has_collide_without_contact_bitmask())
     this->collideWithoutContactBitmask = _msg.collide_without_contact_bitmask();
+  if (_msg.has_collide_bitmask())
+    this->collideBitmask = _msg.collide_bitmask();
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr SurfaceParams::GetFrictionPyramid() const
+{
+  return FrictionPyramidPtr();
+}
+
+/////////////////////////////////////////////////
+FrictionPyramidPtr SurfaceParams::FrictionPyramid() const
+{
+  return FrictionPyramidPtr();
 }

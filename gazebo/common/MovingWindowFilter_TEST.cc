@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/MovingWindowFilter.hh"
-#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 
@@ -39,7 +40,7 @@ TEST(MovingWindowFilterTest, FilterSomething)
 {
   common::MovingWindowFilter<double> doubleMWF;
   common::MovingWindowFilter<double> doubleMWF2;
-  common::MovingWindowFilter<math::Vector3> vectorMWF;
+  common::MovingWindowFilter<ignition::math::Vector3d> vectorMWF;
 
   doubleMWF.SetWindowSize(10);
   doubleMWF2.SetWindowSize(2);
@@ -49,9 +50,9 @@ TEST(MovingWindowFilterTest, FilterSomething)
   {
     doubleMWF.Update(static_cast<double>(i));
     doubleMWF2.Update(static_cast<double>(i));
-    math::Vector3 v(1.0*static_cast<double>(i),
-                    2.0*static_cast<double>(i),
-                    3.0*static_cast<double>(i));
+    ignition::math::Vector3d v(1.0*static_cast<double>(i),
+        2.0*static_cast<double>(i),
+        3.0*static_cast<double>(i));
     vectorMWF.Update(v);
   }
 
@@ -61,11 +62,11 @@ TEST(MovingWindowFilterTest, FilterSomething)
   EXPECT_DOUBLE_EQ(doubleMWF.Get(), sum/10.0);
   EXPECT_DOUBLE_EQ(doubleMWF2.Get(), (18.0+19.0)/2.0);
 
-  math::Vector3 vsum;
+  ignition::math::Vector3d vsum;
   for (unsigned int i = 0; i < 20; ++i)
-    vsum += math::Vector3(1.0*static_cast<double>(i),
-                          2.0*static_cast<double>(i),
-                          3.0*static_cast<double>(i));
+    vsum += ignition::math::Vector3d(1.0*static_cast<double>(i),
+        2.0*static_cast<double>(i),
+        3.0*static_cast<double>(i));
   EXPECT_EQ(vectorMWF.Get(), vsum / 20.0);
 }
 

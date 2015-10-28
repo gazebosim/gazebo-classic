@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,12 @@
 */
 #ifndef _WINDOWMANAGER_HH_
 #define _WINDOWMANAGER_HH_
+
+#ifdef _WIN32
+  // Oh, yeah, CreateWindow is taken, too.
+  #include <windows.h>
+  #undef CreateWindow
+#endif
 
 #include <string>
 #include <vector>
@@ -37,7 +43,7 @@ namespace gazebo
 
     /// \class WindowManager WindowManager.hh rendering/rendering.hh
     /// \brief Class to mangage render windows.
-    class GAZEBO_VISIBLE WindowManager
+    class GZ_RENDERING_VISIBLE WindowManager
     {
       /// \brief Constructor
       public: WindowManager();

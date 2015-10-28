@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,19 +25,22 @@
 #include "gazebo/physics/dart/DARTMeshShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
 
+#include "gazebo/physics/dart/DARTMeshShapePrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTMeshShape::DARTMeshShape(CollisionPtr _parent) : MeshShape(_parent)
+DARTMeshShape::DARTMeshShape(CollisionPtr _parent)
+  : MeshShape(_parent),
+    dataPtr(new DARTMeshShapePrivate())
 {
-  this->dartMesh = new DARTMesh();
 }
 
 //////////////////////////////////////////////////
 DARTMeshShape::~DARTMeshShape()
 {
-  delete this->dartMesh;
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
@@ -59,13 +62,13 @@ void DARTMeshShape::Init()
 
   if (this->submesh)
   {
-    this->dartMesh->Init(this->submesh,
+    this->dataPtr->dartMesh->Init(this->submesh,
         boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
         this->sdf->Get<math::Vector3>("scale"));
   }
   else
   {
-    this->dartMesh->Init(this->mesh,
+    this->dataPtr->dartMesh->Init(this->mesh,
         boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
         this->sdf->Get<math::Vector3>("scale"));
   }

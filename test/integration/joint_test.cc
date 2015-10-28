@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"
 
 #define TOL 1e-6
@@ -236,7 +236,7 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   ASSERT_TRUE(linkRevolute2 != NULL);
 
   physics::JointPtr jointPluginImplicit = modelPlugin->GetJoint("joint_1");
-  ASSERT_TRUE(jointPluginImplicit);
+  ASSERT_TRUE(jointPluginImplicit != NULL);
 
   int cyclesPrismatic = 0;
   int cyclesRevolute = 0;
@@ -393,6 +393,75 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
+void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
+{
+  /// \TODO: simbody not complete for this test
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #862.\n";
+    return;
+  }
+  // Load empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Spawn two boxes
+  SpawnBox("box1", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
+      math::Vector3::Zero, false);
+  SpawnBox("box2", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
+      math::Vector3::Zero, false);
+  physics::ModelPtr model  = world->GetModel("box1");
+  physics::ModelPtr model2 = world->GetModel("box2");
+  ASSERT_TRUE(model  != NULL);
+  ASSERT_TRUE(model2 != NULL);
+
+  // Get link pointers
+  physics::LinkPtr parent = model->GetLink();
+  physics::LinkPtr child  = model2->GetLink();
+
+  // Create dynamic joint
+  std::string name = "dynamic_joint_unique";
+  physics::JointPtr joint;
+  joint = model->CreateJoint(name, "revolute", parent, child);
+  joint->Init();
+
+  // Get model joints (used for visualization)
+  physics::Joint_V joints = model->GetJoints();
+  bool jointFound = false;
+  for (auto const &joint : joints)
+  {
+    if (joint->GetName() == name)
+    {
+      jointFound = true;
+      break;
+    }
+  }
+  EXPECT_TRUE(jointFound);
+
+  // Try to create the joint with the same name
+  EXPECT_TRUE(model->CreateJoint(name, "revolute", parent, child) == NULL);
+
+  // step to let joint creation finish before removing it
+  world->Step(1000);
+
+  // test remove joint
+  EXPECT_TRUE(model->RemoveJoint(name));
+  joint = model->GetJoint(name);
+  EXPECT_TRUE(joint == NULL);
+
+  // test that removing a non-existent joint will not break gazebo
+  EXPECT_FALSE(model->RemoveJoint("this_joint_doees_not_exist"));
+}
+
+//////////////////////////////////////////////////
 TEST_F(JointTest, joint_SDF14)
 {
   Load("worlds/SDF_1_4.world");
@@ -414,22 +483,22 @@ TEST_F(JointTest, joint_SDF14)
     gzthrow("Unable to get joint14_model");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine);
+  EXPECT_TRUE(physicsEngine != NULL);
   physics::ModelPtr model = world->GetModel("joint14_model");
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
   physics::LinkPtr link1 = model->GetLink("body1");
-  EXPECT_TRUE(link1);
+  EXPECT_TRUE(link1 != NULL);
   physics::LinkPtr link2 = model->GetLink("body2");
-  EXPECT_TRUE(link2);
+  EXPECT_TRUE(link2 != NULL);
 
   EXPECT_EQ(model->GetJointCount(), 1u);
   physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
-  EXPECT_TRUE(joint);
+  EXPECT_TRUE(joint != NULL);
 
   physics::LinkPtr parent = joint->GetParent();
-  EXPECT_TRUE(parent);
+  EXPECT_TRUE(parent != NULL);
   physics::LinkPtr child = joint->GetChild();
-  EXPECT_TRUE(child);
+  EXPECT_TRUE(child != NULL);
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
 }
@@ -447,6 +516,11 @@ TEST_P(JointTest, GetInertiaRatio)
 TEST_P(JointTest, SpringDamperTest)
 {
   SpringDamperTest(this->physicsEngine);
+}
+
+TEST_P(JointTest, DynamicJointVisualization)
+{
+  DynamicJointVisualization(this->physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTest,

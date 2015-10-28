@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -389,26 +389,6 @@ void BulletScrewJoint::SetForceImpl(unsigned int _index, double _force)
   }
   else
     gzerr << "bulletScrew not created yet.\n";
-}
-
-//////////////////////////////////////////////////
-void BulletScrewJoint::SetMaxForce(unsigned int /*_index*/, double _force)
-{
-  if (this->bulletScrew)
-    this->bulletScrew->setMaxLinMotorForce(_force);
-  else
-    gzerr << "bulletScrew not created yet\n";
-}
-
-//////////////////////////////////////////////////
-double BulletScrewJoint::GetMaxForce(unsigned int /*index*/)
-{
-  double result = 0;
-  if (this->bulletScrew)
-    result = this->bulletScrew->getMaxLinMotorForce();
-  else
-    gzerr << "bulletScrew not created yet\n";
-  return result;
 }
 
 //////////////////////////////////////////////////

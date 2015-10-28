@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -53,7 +54,7 @@ namespace gazebo
 
     /// \class Entity Entity.hh physics/physics.hh
     /// \brief Base class for all physics objects in Gazebo.
-    class GAZEBO_VISIBLE Entity : public Base
+    class GZ_PHYSICS_VISIBLE Entity : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the entity.
@@ -241,7 +242,7 @@ namespace gazebo
       protected: virtual void OnPoseChange() = 0;
 
       /// \brief Publish the pose.
-      private: void PublishPose();
+      private: virtual void PublishPose();
 
       /// \brief Helper function to get the collision bounding box.
       /// \param[in] _base Object to calculated the bounding box for.

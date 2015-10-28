@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody Link class
-    class GAZEBO_VISIBLE SimbodyLink : public Link
+    class GZ_PHYSICS_VISIBLE SimbodyLink : public Link
     {
       /// \brief Constructor
       public: SimbodyLink(EntityPtr _parent);
@@ -125,6 +125,10 @@ namespace gazebo
                   const math::Vector3 &_force,
                   const math::Vector3 &_relpos);
 
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
+
       // Documentation inherited.
       public: virtual void AddTorque(const math::Vector3 &_torque);
 
@@ -156,6 +160,9 @@ namespace gazebo
         int _numFragments) const;
 
       public: void SetDirtyPose(const math::Pose &_pose);
+
+      // Documentation inherited.
+      public: virtual void UpdateMass();
 
       /// \brief Internal call to change effect of gravity on Link
       /// based on gravityMode if gravityModeDirty is true.

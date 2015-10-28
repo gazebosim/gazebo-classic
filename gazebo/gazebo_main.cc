@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,11 @@ void help()
   << "  --minimal_comms               Reduce the TCP/IP traffic output by "
   <<                                  "gazebo.\n"
   << "  -g [ --gui-plugin ] arg       Load a GUI plugin.\n"
-  << "  -s [ --server-plugin ] arg    Load a server plugin.\n\n";
+  << "  -s [ --server-plugin ] arg    Load a server plugin.\n"
+  << "  -o [ --profile ] arg          Physics preset profile name from the "
+  << "options in\n"
+  << "                                the world file.\n"
+  << "\n";
 }
 
 /////////////////////////////////////////////////
@@ -113,7 +117,10 @@ int main(int _argc, char **_argv)
   }
 
   struct sigaction sigact;
+  sigact.sa_flags = 0;
   sigact.sa_handler = sig_handler;
+  if (sigemptyset(&sigact.sa_mask) != 0)
+    std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
   {
     gzerr << "Stopping. Unable to catch SIGINT.\n"

@@ -3,13 +3,16 @@ set (files
   blank.world
   camera.world
   cart_demo.world
+  cessna_demo.world
   contact.world
   depth_camera.world
+  elevator.world
   empty_1_0.world
   empty_bullet.world
   empty_sky.world
   empty.world
   everything.world
+  flocking.world
   force_torque_demo.world
   friction_demo.world
   gripper.world
@@ -25,7 +28,12 @@ set (files
   mud.world
   multilink_shape.world
   openal.world
+  ortho.world
+  osrf_elevator.world
   pioneer2dx.world
+  pioneer2dx_camera.world
+  pioneer2dx_laser.world
+  pioneer2dx_laser_camera.world
   plane_demo.world
   plugin.world
   polyline.world
@@ -36,6 +44,7 @@ set (files
   projector.world
   quad_rotor_demo.world
   quad_rotor_demo_2.world
+  random_velocity.world
   ray_cpu.world
   ray_noise_plugin.world
   road.world
@@ -45,14 +54,19 @@ set (files
   robocup_3Dsim.world
   rubble.world
   shapes.world
+  shapes_layers.world
+  sim_events.world
   simple_arm.world
   simple_gripper.world
   single_rotor_demo.world
   sonar_demo.world
   sphere_atlas_demo.world
   stacks.world
+  torsional_friction_demo.world
+  transporter.world
   trigger.world
   twin_rotor_demo.world
+  underwater.world
   willowgarage.world
   wireless_sensors.world
 )

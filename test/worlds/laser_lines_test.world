@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+     <scene>
+      <ambient>1 1 1 1</ambient>
+      <background>1 1 1 1</background>
+      <grid>false</grid>
+      <origin_visual>false</origin_visual>
+    </scene>
+    <gui>
+      <camera name="user_camera">
+        <pose>0.5 0 0.5 0 1.5707 0</pose>
+      </camera>
+    </gui>
+ 
+    <model name="model_1">
+      <static>true</static>
+      <link name="link_1">
+        <sensor name="laser_sensor" type="ray">
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>4</samples>
+                <resolution>1</resolution>
+                <min_angle>-1.0</min_angle>
+                <max_angle>1.0</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0</min>
+              <max>1</max>
+              <resolution>1</resolution>
+            </range>
+          </ray>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+        </sensor>
+      </link>
+    </model>
+  </world>
+</sdf>

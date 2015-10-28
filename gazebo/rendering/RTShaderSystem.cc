@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,19 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sys/stat.h>
 #include <boost/bind.hpp>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -33,7 +40,6 @@ using namespace rendering;
 //////////////////////////////////////////////////
 RTShaderSystem::RTShaderSystem()
 {
-  this->entityMutex = new boost::mutex();
   this->initialized = false;
   this->shadowsApplied = false;
   this->pssmSetup.setNull();
@@ -43,7 +49,6 @@ RTShaderSystem::RTShaderSystem()
 RTShaderSystem::~RTShaderSystem()
 {
   this->Fini();
-  delete this->entityMutex;
 }
 
 //////////////////////////////////////////////////
@@ -94,7 +99,8 @@ void RTShaderSystem::Fini()
   // Finalize RTShader system.
   if (this->shaderGenerator != NULL)
   {
-#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+    // On Windows, we're using 1.9RC1, which doesn't have a bunch of changes.
+#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
     Ogre::RTShader::ShaderGenerator::finalize();
 #else
     Ogre::RTShader::ShaderGenerator::destroy();
@@ -103,7 +109,6 @@ void RTShaderSystem::Fini()
   }
 
   this->pssmSetup.setNull();
-  this->entities.clear();
   this->scenes.clear();
   this->initialized = false;
 }
@@ -147,37 +152,40 @@ void RTShaderSystem::RemoveScene(ScenePtr _scene)
     this->shaderGenerator->removeSceneManager(_scene->GetManager());
     this->shaderGenerator->removeAllShaderBasedTechniques();
     this->shaderGenerator->flushShaderCache();
-    // this->UpdateShaders();
   }
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::AttachEntity(Visual *vis)
+void RTShaderSystem::RemoveScene(const std::string &_scene)
 {
   if (!this->initialized)
     return;
 
-  this->entityMutex->lock();
-  this->entities.push_back(vis);
-  this->entityMutex->unlock();
-  this->GenerateShaders(vis);
+  for (auto iter : this->scenes)
+  {
+    if (iter->GetName() == _scene)
+    {
+      this->RemoveScene(iter);
+      return;
+    }
+  }
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::DetachEntity(Visual *_vis)
+void RTShaderSystem::AttachEntity(Visual * /*_vis*/)
 {
-  if (!this->initialized)
-    return;
+  return;
+}
 
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-  this->entities.remove(_vis);
+//////////////////////////////////////////////////
+void RTShaderSystem::DetachEntity(Visual * /*_vis*/)
+{
+  return;
 }
 
 //////////////////////////////////////////////////
 void RTShaderSystem::Clear()
 {
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-  this->entities.clear();
 }
 
 //////////////////////////////////////////////////
@@ -204,24 +212,44 @@ void RTShaderSystem::UpdateShaders()
   if (!this->initialized)
     return;
 
-  std::list<Visual*>::iterator iter;
-
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-
-  // Update all the shaders
-  for (iter = this->entities.begin(); iter != this->entities.end(); ++iter)
-    this->GenerateShaders(*iter);
+  for (auto &scene : this->scenes)
+  {
+    VisualPtr vis = scene->GetWorldVisual();
+    if (vis)
+    {
+      this->UpdateShaders(vis);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::GenerateShaders(Visual *vis)
+void RTShaderSystem::UpdateShaders(VisualPtr _vis)
 {
-  if (!this->initialized)
+  if (_vis)
+  {
+    this->GenerateShaders(_vis);
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+      this->UpdateShaders(_vis->GetChild(i));
+  }
+}
+
+//////////////////////////////////////////////////
+void RTShaderSystem::GenerateShaders(Visual *_vis)
+{
+  VisualPtr vis(_vis);
+  this->GenerateShaders(vis);
+}
+
+//////////////////////////////////////////////////
+void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
+{
+  if (!this->initialized || !_vis)
     return;
 
-  for (unsigned int k = 0; k < vis->GetSceneNode()->numAttachedObjects(); k++)
+  for (unsigned int k = 0; _vis->GetSceneNode() &&
+      k < _vis->GetSceneNode()->numAttachedObjects(); ++k)
   {
-    Ogre::MovableObject *obj = vis->GetSceneNode()->getAttachedObject(k);
+    Ogre::MovableObject *obj = _vis->GetSceneNode()->getAttachedObject(k);
     Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(obj);
     if (!entity)
       continue;
@@ -268,7 +296,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
           renderState->reset();
 
           /// This doesn't seem to work properly.
-          if (vis->GetShaderType() == "normal_map_object_space")
+          if (_vis->GetShaderType() == "normal_map_object_space")
           {
             Ogre::RTShader::SubRenderState* subRenderState =
               this->shaderGenerator->createSubRenderState(
@@ -280,10 +308,10 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             normalMapSubRS->setNormalMapSpace(
                 Ogre::RTShader::NormalMapLighting::NMS_OBJECT);
 
-            normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
+            normalMapSubRS->setNormalMapTextureName(_vis->GetNormalMap());
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (vis->GetShaderType() == "normal_map_tangent_space")
+          else if (_vis->GetShaderType() == "normal_map_tangent_space")
           {
             Ogre::RTShader::SubRenderState* subRenderState =
               this->shaderGenerator->createSubRenderState(
@@ -295,11 +323,11 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             normalMapSubRS->setNormalMapSpace(
                 Ogre::RTShader::NormalMapLighting::NMS_TANGENT);
 
-            normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
+            normalMapSubRS->setNormalMapTextureName(_vis->GetNormalMap());
 
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (vis->GetShaderType() == "vertex")
+          else if (_vis->GetShaderType() == "vertex")
           {
             Ogre::RTShader::SubRenderState *perPerVertexLightModel =
               this->shaderGenerator->createSubRenderState(
@@ -386,7 +414,11 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           stream << tmpdir << "/gazebo-" << user << "-rtshaderlibcache" << "/";
           cachePath = stream.str();
           // Create the directory
+#ifdef _WIN32
+          if (mkdir(cachePath.c_str()) != 0)
+#else
           if (mkdir(cachePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
+#endif
           {
             if (errno != EEXIST)
             {
@@ -487,7 +519,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   }
 
   double shadowFarDistance = 500;
-  double cameraNearClip = 0.1;
+  double cameraNearClip = 0.01;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
   Ogre::PSSMShadowCameraSetup *cameraSetup =

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,31 +177,6 @@ void ODEUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
-}
-
-//////////////////////////////////////////////////
-void ODEUniversalJoint::SetMaxForce(unsigned int _index, double _t)
-{
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    this->SetParam(dParamFMax, _t);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    this->SetParam(dParamFMax2, _t);
-  else
-    gzerr << "Joint index out of bounds.\n";
-}
-
-//////////////////////////////////////////////////
-double ODEUniversalJoint::GetMaxForce(unsigned int _index)
-{
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    return ODEJoint::GetParam(dParamFMax);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    return ODEJoint::GetParam(dParamFMax2);
-
-  gzerr << "Joint index out of bounds.\n";
-  return 0;
 }
 
 //////////////////////////////////////////////////

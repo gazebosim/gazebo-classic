@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace gazebo
     ///
     /// Each physics engine should implement this class.
     template< class T>
-    class GAZEBO_VISIBLE BallJoint : public T
+    class GZ_PHYSICS_VISIBLE BallJoint : public T
     {
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent link.

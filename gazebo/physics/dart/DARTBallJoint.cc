@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/dart/DARTJointPrivate.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
 
 using namespace gazebo;
@@ -25,16 +26,15 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTBallJoint::DARTBallJoint(BasePtr _parent)
-  : BallJoint<DARTJoint>(_parent),
-    dtBallJoint(new dart::dynamics::BallJoint())
+  : BallJoint<DARTJoint>(_parent)
 {
-  this->dtJoint = this->dtBallJoint;
+  this->dataPtr->dtJoint = new dart::dynamics::BallJoint();
 }
 
 //////////////////////////////////////////////////
 DARTBallJoint::~DARTBallJoint()
 {
-  delete dtBallJoint;
+  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////
@@ -52,8 +52,8 @@ void DARTBallJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
-                        this->dtJoint->getTransformFromChildBodyNode();
+  Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
+                        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);
@@ -75,17 +75,6 @@ double DARTBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "DARTBallJoint::GetVelocity not implemented" << std::endl;
   return 0;
-}
-
-//////////////////////////////////////////////////
-double DARTBallJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return 0;
-}
-
-//////////////////////////////////////////////////
-void DARTBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
 }
 
 //////////////////////////////////////////////////

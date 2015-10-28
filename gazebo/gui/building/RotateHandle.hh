@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class RotateHandle RotateHandle.hh
     /// \brief Handle for rotating an editor item
-    class GAZEBO_VISIBLE RotateHandle : public QGraphicsItem
+    class GZ_GUI_VISIBLE RotateHandle : public QGraphicsItem
     {
       /// \brief Constructor
       /// param[in] _parent Parent graphics item.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: Color class
- * Author: Nate Koenig
- * Date: 08 May 2009
- */
-
 #include <math.h>
 #include <algorithm>
 
@@ -87,7 +82,7 @@ void Color::SetFromHSV(float _h, float _s, float _v)
 
   _h = static_cast<int>(_h) % 360;
 
-  if (math::equal(_s, 0.0f))
+  if (ignition::math::equal(_s, 0.0f))
   {
     // acromatic (grey)
     this->r = this->g = this->b = _v;
@@ -144,77 +139,64 @@ void Color::SetFromHSV(float _h, float _s, float _v)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Color::GetAsHSV() const
+ignition::math::Vector3d Color::HSV() const
 {
-  math::Vector3 hsv;
+  ignition::math::Vector3d hsv;
   float x, v, f, i;
 
   x = std::min(this->r, std::min(this->g, this->b));
   v = std::max(this->r, std::max(this->g, this->b));
 
-  if (math::equal(v, x))
+  if (ignition::math::equal(v, x))
   {
     gzerr << "rgb to hsv undefined\n";
     return hsv;
   }
 
-  if (math::equal(r, x))
+  if (ignition::math::equal(r, x))
     f = this->g - this->b;
-  else if (math::equal(this->g, x))
+  else if (ignition::math::equal(this->g, x))
     f = this->b - this->r;
   else
     f = this->r - this->g;
 
-  if (math::equal(this->r, x))
+  if (ignition::math::equal(this->r, x))
     i = 3;
-  else if (math::equal(this->g, x))
+  else if (ignition::math::equal(this->g, x))
     i = 5;
   else
     i = 1;
 
-  hsv.x = i - f /(v - x);
-  hsv.y = (v - x)/v;
-  hsv.z = v;
+  hsv.X(i - f /(v - x));
+  hsv.Y((v - x)/v);
+  hsv.Z(v);
 
   return hsv;
 }
 
-
 //////////////////////////////////////////////////
 math::Vector3 Color::GetAsYUV() const
 {
-  math::Vector3 yuv;
+  return this->YUV();
+}
 
-  yuv.x = 0.299*this->r + 0.587*this->g + 0.114*this->b;
-  yuv.y = -0.1679*this->r - 0.332*this->g + 0.5*this->b + 0.5;
-  yuv.z = 0.5*this->r - 0.4189*this->g - 0.08105*this->b + 0.5;
+//////////////////////////////////////////////////
+ignition::math::Vector3d Color::YUV() const
+{
+  ignition::math::Vector3d yuv;
 
-  yuv.x = yuv.x < 0 ? 0: yuv.x;
-  yuv.x = yuv.x > 255 ? 255.0: yuv.x;
+  yuv.X(0.299*this->r + 0.587*this->g + 0.114*this->b);
+  yuv.Y(-0.1679*this->r - 0.332*this->g + 0.5*this->b + 0.5);
+  yuv.Z(0.5*this->r - 0.4189*this->g - 0.08105*this->b + 0.5);
 
-  yuv.y = yuv.y < 0 ? 0: yuv.y;
-  yuv.y = yuv.y > 255 ? 255.0: yuv.y;
+  yuv.X(yuv.X() < 0 ? 0: yuv.X());
+  yuv.X(yuv.X() > 255 ? 255.0: yuv.X());
 
-  yuv.z = yuv.z < 0 ? 0: yuv.z;
-  yuv.z = yuv.z > 255 ? 255.0: yuv.z;
+  yuv.Y(yuv.Y() < 0 ? 0: yuv.Y());
+  yuv.Y(yuv.Y() > 255 ? 255.0: yuv.Y());
 
-
-
-  /*if (yuv.x > 255)
-    yuv.x = 255;
-    if (yuv.x < 0)
-    yuv.x = 0;
-
-    if (yuv.y > 255)
-    yuv.y = 255;
-    if (yuv.y < 0)
-    yuv.y = 0;
-
-    if (yuv.z > 255)
-    yuv.z = 255;
-    if (yuv.z < 0)
-    yuv.z = 0;
-    */
+  yuv.Z(yuv.Z() < 0 ? 0: yuv.Z());
+  yuv.Z(yuv.Z() > 255 ? 255.0: yuv.Z());
 
   return yuv;
 }
@@ -512,10 +494,10 @@ const Color &Color::operator*=(const Color &pt)
 //////////////////////////////////////////////////
 bool Color::operator ==(const Color &_pt) const
 {
-  return math::equal(this->r, _pt.r) &&
-         math::equal(this->g, _pt.g) &&
-         math::equal(this->b, _pt.b) &&
-         math::equal(this->a, _pt.a);
+  return ignition::math::equal(this->r, _pt.r) &&
+         ignition::math::equal(this->g, _pt.g) &&
+         ignition::math::equal(this->b, _pt.b) &&
+         ignition::math::equal(this->a, _pt.a);
 }
 
 //////////////////////////////////////////////////

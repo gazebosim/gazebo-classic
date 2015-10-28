@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ namespace gazebo
   {
     class ModelEditWidget;
 
-    class GAZEBO_VISIBLE ModelListWidget : public QWidget
+    class GZ_GUI_VISIBLE ModelListWidget : public QWidget
     {
       Q_OBJECT
       public: ModelListWidget(QWidget *_parent = 0);
@@ -198,6 +198,10 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void PhysicsPropertyChanged(QtProperty *_item);
 
+      /// \brief Called when a GUI property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void GUIPropertyChanged(QtProperty *_item);
+
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
 
@@ -211,10 +215,22 @@ namespace gazebo
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
 
+      /// \brief GUI tree item.
+      private: QTreeWidgetItem *guiItem;
+
+      /// \brief Scene tree item.
       private: QTreeWidgetItem *sceneItem;
+
+      /// \brief Physics tree item.
       private: QTreeWidgetItem *physicsItem;
+
+      /// \brief Models tree item.
       private: QTreeWidgetItem *modelsItem;
+
+      /// \brief Lights tree item.
       private: QTreeWidgetItem *lightsItem;
+
+      /// \brief Spherical coordinates tree item.
       private: QTreeWidgetItem *sphericalCoordItem;
 
       private: QtVariantPropertyManager *variantManager;
@@ -255,7 +271,7 @@ namespace gazebo
       private: msgs::Physics_Type physicsType;
     };
 
-    class GAZEBO_VISIBLE ModelListSheetDelegate: public QItemDelegate
+    class GZ_GUI_VISIBLE ModelListSheetDelegate: public QItemDelegate
     {
       Q_OBJECT
       public: ModelListSheetDelegate(QTreeView *view, QWidget *parent);

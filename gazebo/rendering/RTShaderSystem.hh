@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,8 @@ namespace gazebo
     ///
     /// This class allows Gazebo to generate per-pixel shaders for every
     /// material at run-time.
-    class GAZEBO_VISIBLE RTShaderSystem : public SingletonT<RTShaderSystem>
+    class GZ_RENDERING_VISIBLE RTShaderSystem :
+      public SingletonT<RTShaderSystem>
     {
       /// \enum LightingModel.
       /// \brief The type of lighting.
@@ -79,7 +80,7 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Clear the shader system
-      public: void Clear();
+      public: void Clear() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Add a scene manager
       /// \param[in] _scene The scene to process
@@ -89,16 +90,24 @@ namespace gazebo
       /// \param[in] The scene to remove
       public: void RemoveScene(ScenePtr _scene);
 
+      /// \brief Remove a scene
+      /// \param[in] Name of the scene to remove.
+      public: void RemoveScene(const std::string &_scene);
+
       /// \brief Update the shaders. This should not be called frequently.
       public: void UpdateShaders();
 
       /// \brief Set an Ogre::Entity to use RT shaders.
       /// \param[in] _vis Visual that will use the RTShaderSystem.
-      public: void AttachEntity(Visual *vis);
+      /// \deprecated This function is no longer needed, and has no
+      /// implementation.
+      public: void AttachEntity(Visual *vis) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Remove and entity.
       /// \param[in] _vis Remove this visual.
-      public: void DetachEntity(Visual *_vis);
+      /// \deprecated This function is no longer needed, and has no
+      /// implementation.
+      public: void DetachEntity(Visual *_vis) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set a viewport to use shaders.
       /// \param[in] _viewport The viewport to add.
@@ -118,7 +127,12 @@ namespace gazebo
 
       /// \brief Generate shaders for an entity
       /// \param[in] _vis The visual to generate shaders for.
-      public: void GenerateShaders(Visual *_vis);
+      /// \sa GenerateShaders(const VisualPtr &_vis)
+      public: void GenerateShaders(Visual *_vis) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Generate shaders for an entity
+      /// \param[in] _vis The visual to generate shaders for.
+      public: void GenerateShaders(const VisualPtr &_vis);
 
       /// \brief Apply shadows to a scene.
       /// \param[in] _scene The scene to receive shadows.
@@ -139,6 +153,10 @@ namespace gazebo
       private: bool GetPaths(std::string &_coreLibsPath,
                              std::string &_cachePath);
 
+      /// \brief Update the shaders for a visual.
+      /// \param[in] _vis Pointer to the visual to update.
+      private: void UpdateShaders(VisualPtr _vis);
+
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 7
       /// \brief The shader generator.
       private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
@@ -146,9 +164,6 @@ namespace gazebo
       /// \brief Used to generate shadows.
       private: Ogre::RTShader::SubRenderState *shadowRenderState;
 #endif
-
-      /// \brief All the entites being used.
-      private: std::list<Visual*> entities;
 
       /// \brief True if initialized.
       private: bool initialized;
@@ -158,9 +173,6 @@ namespace gazebo
 
       /// \brief All the scenes.
       private: std::vector<ScenePtr> scenes;
-
-      /// \brief Mutex used to protext the entities list.
-      private: boost::mutex *entityMutex;
 
       /// \brief Parallel Split Shadow Map (PSSM) camera setup
       private: Ogre::ShadowCameraSetupPtr pssmSetup;

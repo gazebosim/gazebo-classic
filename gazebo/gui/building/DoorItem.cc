@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,12 @@ using namespace gui;
 DoorItem::DoorItem(): RectItem(), BuildingItem()
 {
   this->editorType = "Door";
-  this->scale = BuildingMaker::conversionScale;
+  this->itemScale = BuildingMaker::conversionScale;
 
   this->level = 0;
   this->levelBaseHeight = 0;
 
-  this->doorDepth = 15;
+  this->doorDepth = 17;
   this->doorHeight = 200;
   this->doorWidth = 90;
   this->doorElevation = 0;
@@ -46,6 +46,7 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->drawingHeight = this->height;
 
   this->UpdateCornerPositions();
+  this->UpdateMeasures();
 
   this->doorPos = this->scenePos();
 
@@ -154,18 +155,18 @@ void DoorItem::OnApply()
   WindowDoorInspectorDialog *dialog =
      qobject_cast<WindowDoorInspectorDialog *>(QObject::sender());
 
-  QPointF itemPos = this->doorPos * this->scale;
+  QPointF itemPos = this->doorPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->scale,
-      (dialog->GetDepth() / this->scale)));
-  this->doorWidth = dialog->GetWidth() / this->scale;
-  this->doorHeight = dialog->GetHeight() / this->scale;
-  this->doorDepth = dialog->GetDepth() / this->scale;
-  this->doorElevation = dialog->GetElevation() / this->scale;
+  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
+      (dialog->GetDepth() / this->itemScale)));
+  this->doorWidth = dialog->GetWidth() / this->itemScale;
+  this->doorHeight = dialog->GetHeight() / this->itemScale;
+  this->doorDepth = dialog->GetDepth() / this->itemScale;
+  this->doorElevation = dialog->GetElevation() / this->itemScale;
   if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
       || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
   {
-    itemPos = dialog->GetPosition() / this->scale;
+    itemPos = dialog->GetPosition() / this->itemScale;
     itemPos.setY(-itemPos.y());
     this->doorPos = itemPos;
     this->setPos(this->doorPos);
@@ -178,11 +179,11 @@ void DoorItem::OnApply()
 void DoorItem::OnOpenInspector()
 {
   this->inspector->SetName(this->GetName());
-  this->inspector->SetWidth(this->doorWidth * this->scale);
-  this->inspector->SetDepth(this->doorDepth * this->scale);
-  this->inspector->SetHeight(this->doorHeight * this->scale);
-  this->inspector->SetElevation(this->doorElevation * this->scale);
-  QPointF itemPos = this->doorPos * this->scale;
+  this->inspector->SetWidth(this->doorWidth * this->itemScale);
+  this->inspector->SetDepth(this->doorDepth * this->itemScale);
+  this->inspector->SetHeight(this->doorHeight * this->itemScale);
+  this->inspector->SetElevation(this->doorElevation * this->itemScale);
+  QPointF itemPos = this->doorPos * this->itemScale;
   itemPos.setY(-itemPos.y());
   this->inspector->SetPosition(itemPos);
   this->inspector->move(QCursor::pos());
@@ -204,6 +205,7 @@ void DoorItem::SizeChanged()
 {
   emit WidthChanged(this->doorWidth);
   emit DepthChanged(this->doorDepth);
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////

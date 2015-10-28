@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 #ifndef _INSERT_MODEL_WIDGET_HH_
 #define _INSERT_MODEL_WIDGET_HH_
 
+
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"
@@ -36,7 +38,7 @@ namespace gazebo
     /// \brief Private
     class InsertModelWidgetPrivate;
 
-    class GAZEBO_VISIBLE InsertModelWidget : public QWidget
+    class GZ_GUI_VISIBLE InsertModelWidget : public QWidget
     {
       Q_OBJECT
 
@@ -45,6 +47,9 @@ namespace gazebo
 
       /// \brief Destructor
       public: virtual ~InsertModelWidget();
+
+      /// \brief Check if input path is in the fileTreeWidget.
+      public: bool LocalPathInFileWidget(const std::string &_path);
 
       /// \brief Callback triggered when the ModelDatabase has returned
       /// the list of models.
@@ -67,6 +72,12 @@ namespace gazebo
       /// \brief QT callback when a path is changed.
       /// \param[in] _path The path that was changed.
       private slots: void OnDirectoryChanged(const QString &_path);
+
+      /// \brief check if path exists with special care to filesystem
+      /// permissions
+      /// \param[in] _path The path to check.
+      private: static bool IsPathAccessible
+        (const boost::filesystem::path &_path);
 
       /// \brief Update the list of models on the local system.
       private: void UpdateAllLocalPaths();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace gazebo
     /// \class Hinge2Joint Hinge2Joint.hh physics/physics.hh
     /// \brief A two axis hinge joint
     template< class T>
-    class GAZEBO_VISIBLE Hinge2Joint : public T
+    class GZ_PHYSICS_VISIBLE Hinge2Joint : public T
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent link.

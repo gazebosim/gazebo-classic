@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ namespace gazebo
 
     /// \class WindowItem WindowItem.hh
     /// \brief 2D representation of a window.
-    class GAZEBO_VISIBLE WindowItem : public RectItem, public BuildingItem
+    class GZ_GUI_VISIBLE WindowItem :
+      public RectItem, public BuildingItem
     {
         Q_OBJECT
 
@@ -91,9 +92,6 @@ namespace gazebo
 
         /// \brief Elevation of the window item in pixels.
         private: double windowElevation;
-
-        /// \brief Scale for converting pixels to metric units.
-        private: double scale;
 
         /// \brief Inspector for configuring the window item.
         private: WindowDoorInspectorDialog *inspector;

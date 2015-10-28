@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,9 +52,6 @@ namespace gazebo
 
       /// \brief Current mouse event.
       public: common::MouseEvent mouseEvent;
-
-      /// \brief Current key event.
-      public: common::KeyEvent keyEvent;
 
       /// \brief True if the model align tool is initialized.
       public: bool initialized;

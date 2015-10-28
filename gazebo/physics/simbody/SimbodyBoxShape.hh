@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody box collision
-    class GAZEBO_VISIBLE SimbodyBoxShape : public BoxShape
+    class GZ_PHYSICS_VISIBLE SimbodyBoxShape : public BoxShape
     {
       /// \brief Constructor
       public: SimbodyBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,13 @@
 #include <vector>
 #include <sdf/sdf.hh>
 
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/UtilTypes.hh"
 
 #include "gazebo/gazebo_config.h"
@@ -47,7 +51,7 @@ namespace gazebo
 
     /// \class OpenAL OpenAL.hh util/util.hh
     /// \brief 3D audio setup and playback.
-    class GAZEBO_VISIBLE OpenAL : public SingletonT<OpenAL>
+    class GZ_UTIL_VISIBLE OpenAL : public SingletonT<OpenAL>
     {
       /// \brief Constructor
       private: OpenAL();
@@ -88,7 +92,7 @@ namespace gazebo
 
     /// \class OpenALSink OpenALSink.hh util/util.hh
     /// \brief OpenAL Listener. This can be thought of as a microphone.
-    class GAZEBO_VISIBLE OpenALSink
+    class GZ_UTIL_VISIBLE OpenALSink
     {
       /// \brief Constructor
       public: OpenALSink();
@@ -99,17 +103,17 @@ namespace gazebo
       /// \brief Set the position of the sink.
       /// \param[in] _pose New pose of the sink.
       /// \return True on success.
-      public: bool SetPose(const math::Pose &_pose);
+      public: bool SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the velocity of the sink
       /// \param[in] _vel Velocity of the sink.
       /// \return True on success.
-      public: bool SetVelocity(const math::Vector3 &_vel);
+      public: bool SetVelocity(const ignition::math::Vector3d &_vel);
     };
 
     /// \class OpenALSource OpenALSource.hh util/util.hh
     /// \brief OpenAL Source. This can be thought of as a speaker.
-    class GAZEBO_VISIBLE OpenALSource
+    class GZ_UTIL_VISIBLE OpenALSource
     {
       /// \brief Constructor.
       public: OpenALSource();
@@ -125,12 +129,12 @@ namespace gazebo
       /// \brief Set the position of the source.
       /// \param[in] _pose New pose of the source.
       /// \return True on success.
-      public: bool SetPose(const math::Pose &_pose);
+      public: bool SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the velocity of the source.
       /// \param[in] _vel New velocity of the source.
       /// \return True on success.
-      public: bool SetVelocity(const math::Vector3 &_vel);
+      public: bool SetVelocity(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the pitch of the source.
       /// \param[in] _p Pitch value.

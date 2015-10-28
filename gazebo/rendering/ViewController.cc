@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/ViewController.hh"
 
@@ -33,7 +40,8 @@ ViewController::~ViewController()
 }
 
 //////////////////////////////////////////////////
-void ViewController::Init(const math::Vector3 &/*_focalPoint*/)
+void ViewController::Init(const math::Vector3 &/*_focalPoint*/,
+    double /*_yaw*/, double /*_pitch*/)
 {
 }
 
@@ -49,5 +57,8 @@ void ViewController::SetEnabled(bool _value)
   this->enabled = _value;
 }
 
-
-
+//////////////////////////////////////////////////
+void ViewController::Resize(const unsigned int /*_width*/,
+                            const unsigned int /*_height*/)
+{
+}

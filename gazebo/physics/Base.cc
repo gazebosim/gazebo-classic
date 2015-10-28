@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,14 @@
  * limitations under the License.
  *
 */
+
+// We also include this winsock2 trick in Base.hh but it is used last,
+// so we need it again here.
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -294,7 +302,7 @@ BasePtr Base::GetByName(const std::string &_name)
 //////////////////////////////////////////////////
 std::string Base::GetScopedName(bool _prependWorldName) const
 {
-  if (_prependWorldName)
+  if (_prependWorldName && this->world)
     return this->world->GetName() + "::" + this->scopedName;
   else
     return this->scopedName;
@@ -385,5 +393,3 @@ const sdf::ElementPtr Base::GetSDF()
   this->sdf->Update();
   return this->sdf;
 }
-
-

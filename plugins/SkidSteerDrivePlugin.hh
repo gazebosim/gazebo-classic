@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,9 +66,6 @@ namespace gazebo
 
     /// \brief Pointer to each wheel joint
     private: physics::JointPtr joints[NUMBER_OF_WHEELS];
-
-    /// \brief Max force limit for each wheel joint (Default 5.0)
-    private: double maxForce;
 
     /// \brief Distance between wheels on the same axis (Determined from SDF)
     private: double wheelSeparation;

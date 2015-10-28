@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include <unistd.h>
 #include <string.h>
+#include <vector>
 
 #include "player.h"
 #include "gazebo/util/system.hh"
@@ -76,10 +77,7 @@ class GAZEBO_VISIBLE GazeboDriver : public Driver
   private: GazeboInterface *LookupDevice(player_devaddr_t addr);
 
   /// Array of interfaces associated with this driver
-  protected: GazeboInterface **devices;
-
-  /// \brief Number of devices
-  protected: int deviceCount;
+  protected: std::vector<GazeboInterface *> devices;
 
   /// \brief Max device count
   protected: int deviceMaxCount;

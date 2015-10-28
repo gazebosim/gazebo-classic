@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestError
+/// \brief A message for reporting to gzclient an error when accessing
+/// a REST service
+
+message RestError
+{
+  required string type = 1;
+  optional string msg  = 2;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,18 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 #include <float.h>
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
@@ -73,9 +81,17 @@ void Model::Load(sdf::ElementPtr _sdf)
         boost::bind(&Entity::IsStatic, this));
   }
 
+  if (this->sdf->HasElement("self_collide"))
+  {
+    this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
+  }
+
   if (this->sdf->HasElement("allow_auto_disable"))
     this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+
   this->LoadLinks();
+
+  this->LoadModels();
 
   // Load the joints if the world is already loaded. Otherwise, the World
   // has some special logic to load models that takes into account state
@@ -94,7 +110,6 @@ void Model::LoadLinks()
   if (this->sdf->HasElement("link"))
   {
     sdf::ElementPtr linkElem = this->sdf->GetElement("link");
-    bool canonicalLinkInitialized = false;
     while (linkElem)
     {
       // Create a new link
@@ -104,11 +119,45 @@ void Model::LoadLinks()
       /// \TODO: canonical link is hardcoded to the first link.
       ///        warn users for now, need  to add parsing of
       ///        the canonical tag in sdf
-      if (!canonicalLinkInitialized)
+
+      // find canonical link - there should only be one within a tree of models
+      if (!this->canonicalLink)
       {
-        link->SetCanonicalLink(true);
-        this->canonicalLink = link;
-        canonicalLinkInitialized = true;
+        // Get the canonical link from parent, if not found then set the
+        // current link as the canonoical link.
+        LinkPtr cLink;
+        BasePtr entity = this->GetParent();
+        while (entity && entity->HasType(MODEL))
+        {
+          ModelPtr model = boost::static_pointer_cast<Model>(entity);
+          LinkPtr tmpLink = model->GetLink();
+          if (tmpLink)
+          {
+            cLink = tmpLink;
+            break;
+          }
+          entity = entity->GetParent();
+        }
+
+        if (cLink)
+        {
+          this->canonicalLink = cLink;
+        }
+        else
+        {
+          // first link found, set as canonical link
+          link->SetCanonicalLink(true);
+          this->canonicalLink = link;
+
+          // notify parent models of this canonical link
+          entity = this->GetParent();
+          while (entity && entity->HasType(MODEL))
+          {
+            ModelPtr model = boost::static_pointer_cast<Model>(entity);
+            model->canonicalLink = this->canonicalLink;
+            entity = entity->GetParent();
+          }
+        }
       }
 
       // Load the link using the config node. This also loads all of the
@@ -117,6 +166,29 @@ void Model::LoadLinks()
       linkElem = linkElem->GetNextElement("link");
       this->links.push_back(link);
     }
+  }
+}
+
+//////////////////////////////////////////////////
+void Model::LoadModels()
+{
+  // Load the models
+  if (this->sdf->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = this->sdf->GetElement("model");
+    while (modelElem)
+    {
+      // Create a new model
+      ModelPtr model = this->GetWorld()->GetPhysicsEngine()->CreateModel(
+          boost::static_pointer_cast<Model>(shared_from_this()));
+      model->SetWorld(this->GetWorld());
+      model->Load(modelElem);
+      this->models.push_back(model);
+      modelElem = modelElem->GetNextElement("model");
+    }
+
+    for (auto &model : this->models)
+      model->SetEnabled(true);
   }
 }
 
@@ -150,15 +222,23 @@ void Model::LoadJoints()
       gripperElem = gripperElem->GetNextElement("gripper");
     }
   }
+
+  // Load nested model joints if the world is not already loaded. Otherwise,
+  // LoadJoints will be called from Model::Load.
+  if (!this->world->IsLoaded())
+  {
+    for (auto model : this->models)
+      model->LoadJoints();
+  }
 }
 
 //////////////////////////////////////////////////
 void Model::Init()
 {
   // Record the model's initial pose (for reseting)
-  this->SetInitialRelativePose(this->GetWorldPose());
-
-  this->SetRelativePose(this->GetWorldPose());
+  math::Pose initPose = this->sdf->Get<math::Pose>("pose");
+  this->SetInitialRelativePose(initPose);
+  this->SetRelativePose(initPose);
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
@@ -255,6 +335,9 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
+
+  for (auto &model : this->models)
+    model->Update();
 }
 
 //////////////////////////////////////////////////
@@ -318,15 +401,22 @@ void Model::RemoveChild(EntityPtr _child)
 }
 
 //////////////////////////////////////////////////
+boost::shared_ptr<Model> Model::shared_from_this()
+{
+  return boost::static_pointer_cast<Model>(Entity::shared_from_this());
+}
+
+//////////////////////////////////////////////////
 void Model::Fini()
 {
   Entity::Fini();
 
+  this->plugins.clear();
   this->attachedModels.clear();
   this->joints.clear();
-  this->plugins.clear();
   this->links.clear();
   this->canonicalLink.reset();
+  this->models.clear();
 }
 
 //////////////////////////////////////////////////
@@ -581,6 +671,29 @@ JointPtr Model::GetJoint(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+const Model_V &Model::NestedModels() const
+{
+  return this->models;
+}
+
+//////////////////////////////////////////////////
+ModelPtr Model::NestedModel(const std::string &_name) const
+{
+  ModelPtr result;
+
+  for (auto &m : this->models)
+  {
+    if ((m->GetScopedName() == _name) || (m->GetName() == _name))
+    {
+      result = m;
+      break;
+    }
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
   return boost::dynamic_pointer_cast<Link>(this->GetById(_id));
@@ -699,6 +812,9 @@ void Model::LoadPlugins()
         << "Plugins for the model will not be loaded.\n";
     }
   }
+
+  for (auto &model : this->models)
+    model->LoadPlugins();
 }
 
 //////////////////////////////////////////////////
@@ -856,25 +972,30 @@ void Model::SetLaserRetro(const float _retro)
 //////////////////////////////////////////////////
 void Model::FillMsg(msgs::Model &_msg)
 {
+  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
+
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
-  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
+  _msg.set_self_collide(this->GetSelfCollide());
+  msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
-  msgs::Set(_msg.mutable_scale(), this->scale);
+  msgs::Set(_msg.mutable_scale(), this->scale.Ign());
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
+  msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (Link_V::iterator iter = this->links.begin(); iter != this->links.end();
-      ++iter)
+  for (const auto &link : this->links)
   {
-    (*iter)->FillMsg(*_msg.add_link());
+    link->FillMsg(*_msg.add_link());
   }
 
-  for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); ++iter)
+  for (const auto &joint : this->joints)
   {
-    (*iter)->FillMsg(*_msg.add_joint());
+    joint->FillMsg(*_msg.add_joint());
+  }
+  for (const auto &model : this->models)
+  {
+    model->FillMsg(*_msg.add_model());
   }
 }
 
@@ -896,7 +1017,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
-    this->SetWorldPose(msgs::Convert(_msg.pose()));
+    this->SetWorldPose(msgs::ConvertIgn(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)
   {
     LinkPtr link = this->GetLinkById(_msg.link(i).id());
@@ -908,7 +1029,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     this->SetStatic(_msg.is_static());
 
   if (_msg.has_scale())
-    this->SetScale(msgs::Convert(_msg.scale()));
+    this->SetScale(msgs::ConvertIgn(_msg.scale()));
 }
 
 //////////////////////////////////////////////////
@@ -988,6 +1109,15 @@ void Model::SetState(const ModelState &_state)
       link->SetState(iter->second);
     else
       gzerr << "Unable to find link[" << iter->first << "]\n";
+  }
+
+  for (const auto &ms : _state.NestedModelStates())
+  {
+    ModelPtr model = this->NestedModel(ms.first);
+    if (model)
+      model->SetState(ms.second);
+    else
+      gzerr << "Unable to find model[" << ms.first << "]\n";
   }
 
   // For now we don't use the joint state values to set the state of
@@ -1074,6 +1204,18 @@ bool Model::GetAutoDisable() const
 }
 
 /////////////////////////////////////////////////
+void Model::SetSelfCollide(bool _self_collide)
+{
+  this->sdf->GetElement("self_collide")->Set(_self_collide);
+}
+
+/////////////////////////////////////////////////
+bool Model::GetSelfCollide() const
+{
+  return this->sdf->Get<bool>("self_collide");
+}
+
+/////////////////////////////////////////////////
 void Model::RemoveLink(const std::string &_name)
 {
   for (Link_V::iterator iter = this->links.begin();
@@ -1143,4 +1285,52 @@ double Model::GetWorldEnergyKinetic() const
 double Model::GetWorldEnergy() const
 {
   return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
+}
+
+/////////////////////////////////////////////////
+gazebo::physics::JointPtr Model::CreateJoint(
+  const std::string &_name, const std::string &_type,
+  physics::LinkPtr _parent, physics::LinkPtr _child)
+{
+  gazebo::physics::JointPtr joint;
+  if (this->GetJoint(_name))
+  {
+    gzwarn << "Model [" << this->GetName()
+           << "] already has a joint named [" << _name
+           << "], skipping creating joint.\n";
+    return joint;
+  }
+  joint =
+    this->world->GetPhysicsEngine()->CreateJoint(_type, shared_from_this());
+  joint->SetName(_name);
+  joint->Attach(_parent, _child);
+  // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf
+  joint->Load(_parent, _child, gazebo::math::Pose());
+  this->joints.push_back(joint);
+  return joint;
+}
+
+/////////////////////////////////////////////////
+bool Model::RemoveJoint(const std::string &_name)
+{
+  bool paused = this->world->IsPaused();
+  gazebo::physics::JointPtr joint = this->GetJoint(_name);
+  if (joint)
+  {
+    this->world->SetPaused(true);
+    joint->Detach();
+
+    this->joints.erase(
+      std::remove(this->joints.begin(), this->joints.end(), joint),
+      this->joints.end());
+    this->world->SetPaused(paused);
+    return true;
+  }
+  else
+  {
+    gzwarn << "Joint [" << _name
+           << "] does not exist in model [" << this->GetName()
+           << "], not removed.\n";
+    return false;
+  }
 }

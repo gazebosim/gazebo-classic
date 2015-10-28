@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace gazebo
     /// \class BuildingItem BuildingItem.hh
     /// \brief Base class of a items that have building level properties such as
     /// the level number and level height.
-    class GAZEBO_VISIBLE BuildingItem
+    class GZ_GUI_VISIBLE BuildingItem
     {
         /// \brief Constructor
         public: BuildingItem();

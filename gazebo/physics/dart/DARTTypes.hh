@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _GAZEBO_DARTTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/common/Assert.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/util/system.hh"
@@ -37,6 +38,7 @@ namespace gazebo
     class DARTJoint;
     class DARTCollision;
     class DARTRayShape;
+    class DARTSurfaceParams;
 
     typedef boost::shared_ptr<DARTPhysics>   DARTPhysicsPtr;
     typedef boost::shared_ptr<DARTModel>     DARTModelPtr;
@@ -44,6 +46,7 @@ namespace gazebo
     typedef boost::shared_ptr<DARTJoint>     DARTJointPtr;
     typedef boost::shared_ptr<DARTCollision> DARTCollisionPtr;
     typedef boost::shared_ptr<DARTRayShape>  DARTRayShapePtr;
+    typedef boost::shared_ptr<DARTSurfaceParams> DARTSurfaceParamsPtr;
 
     /// \addtogroup gazebo_physics_dart
     /// \{
@@ -51,7 +54,7 @@ namespace gazebo
     /// \class DARTTypes DARTTypes.hh
     /// \brief A set of functions for converting between the math types used
     ///        by gazebo and dart.
-    class GAZEBO_VISIBLE DARTTypes
+    class GZ_PHYSICS_VISIBLE DARTTypes
     {
       /// \brief
       public: static Eigen::Vector3d ConvVec3(const math::Vector3 &_vec3)
@@ -100,6 +103,20 @@ namespace gazebo
             pose.rot = ConvQuat(Eigen::Quaterniond(_T.linear()));
             return pose;
         }
+
+      /// \brief Invert thread pitch to match the different definitions of
+      /// thread pitch in Gazebo and DART.
+      ///
+      /// [Definitions of thread pitch]
+      /// Gazebo: NEGATIVE angular motion per linear motion.
+      /// DART  : linear motion per single rotation.
+      public: static double InvertThreadPitch(double _pitch)
+      {
+        GZ_ASSERT(std::abs(_pitch) > 0.0,
+                  "Zero thread pitch is not allowed.\n");
+
+        return -2.0 * M_PI / _pitch;
+      }
     };
   }
 }

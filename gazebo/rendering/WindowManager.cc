@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,9 @@ void WindowManager::Fini()
 //////////////////////////////////////////////////
 void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
-  this->windows[_windowId]->removeAllViewports();
+  if (static_cast<unsigned int>(_windowId) < this->windows.size() &&
+      this->windows[_windowId])
+    this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
 }
 
@@ -80,18 +82,14 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
-#ifdef Q_OS_MAC
+  // Mac and Windows *must* use externalWindow handle.
+#if defined(Q_OS_MAC) || defined(_MSC_VER)
   params["externalWindowHandle"] = _ogreHandle;
 #else
   params["parentWindowHandle"] = _ogreHandle;
 #endif
-  params["externalGLControl"] = true;
-
-  if (_width > 1 && _height > 1)
-  {
-    params["FSAA"] = "4";
-    params["stereoMode"] = "Frame Sequential";
-  }
+  params["FSAA"] = "4";
+  params["stereoMode"] = "Frame Sequential";
 
   // Set the macAPI for Ogre based on the Qt implementation
 #ifdef QT_MAC_USE_COCOA
@@ -100,6 +98,10 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 #else
   params["macAPI"] = "carbon";
 #endif
+
+  // Hide window if dimensions are less than or equal to one.
+  if (_width <= 1 && _height <=1)
+    params["border"] = "none";
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
@@ -127,8 +129,11 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   if (window)
   {
     window->setActive(true);
-    // window->setVisible(true);
+    window->setVisible(true);
     window->setAutoUpdated(false);
+
+    // Windows needs to reposition the render window to 0,0.
+    window->reposition(0, 0);
 
     this->windows.push_back(window);
   }

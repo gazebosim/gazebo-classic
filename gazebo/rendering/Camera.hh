@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _GAZEBO_RENDERING_CAMERA_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 #include <string>
 #include <utility>
 #include <list>
@@ -75,7 +76,8 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
+    class GZ_RENDERING_VISIBLE Camera :
+      public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -91,7 +93,7 @@ namespace gazebo
       /// \param[in] _sdf The SDF camera info
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-       /// \brief Load the camera with default parmeters
+      /// \brief Load the camera with default parmeters
       public: virtual void Load();
 
       /// \brief Initialize the camera
@@ -200,14 +202,6 @@ namespace gazebo
       public: void Yaw(const math::Angle &_angle,
                   Ogre::Node::TransformSpace _relativeTo =
                   Ogre::Node::TS_WORLD);
-
-      /// \brief Rotate the camera around the z-axis
-      /// \param[in] _angle Rotation amount
-      public: void RotateYaw(math::Angle _angle) GAZEBO_DEPRECATED(4.0);
-
-      /// \brief Rotate the camera around the y-axis
-      /// \param[in] _angle Pitch amount
-      public: void RotatePitch(math::Angle _angle) GAZEBO_DEPRECATED(4.0);
 
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters
@@ -334,11 +328,11 @@ namespace gazebo
 
       /// \brief Get the average FPS
       /// \return The average frames per second
-      public: virtual float GetAvgFPS() const {return 0;}
+      public: virtual float GetAvgFPS() const;
 
       /// \brief Get the triangle count
       /// \return The current triangle count
-      public: virtual unsigned int GetTriangleCount() const {return 0;}
+      public: virtual unsigned int GetTriangleCount() const;
 
       /// \brief Set the aspect ratio
       /// \param[in] _ratio The aspect ratio (width / height) in pixels
@@ -529,6 +523,18 @@ namespace gazebo
       /// \return Distortion model.
       public: DistortionPtr GetDistortion() const;
 
+      /// \brief Set the type of projection used by the camera.
+      /// \param[in] _type The type of projection: "perspective" or
+      /// "orthographic".
+      /// \return True if successful.
+      /// \sa GetProjectionType()
+      public: virtual bool SetProjectionType(const std::string &_type);
+
+      /// \brief Return the projection type as a string.
+      /// \return "perspective" or "orthographic"
+      /// \sa SetProjectionType(const std::string &_type)
+      public: std::string GetProjectionType() const;
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
@@ -592,6 +598,9 @@ namespace gazebo
       /// completed.
       protected: virtual void AnimationComplete();
 
+      /// \brief Update the camera's field of view.
+      protected: virtual void UpdateFOV();
+
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
       /// \param[in] _dst Destination buffer for the image data
@@ -603,7 +612,7 @@ namespace gazebo
                    std::string _format, int _width, int _height);
 
       /// \brief Set the clip distance based on stored SDF values
-      private: void SetClipDist();
+      private: virtual void SetClipDist();
 
       /// \brief Get the OGRE image pixel format in
       /// \param[in] _format The Gazebo image format

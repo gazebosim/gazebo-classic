@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A single axis hinge joint.
-    class GAZEBO_VISIBLE DARTHingeJoint : public HingeJoint<DARTJoint>
+    class GZ_PHYSICS_VISIBLE DARTHingeJoint : public HingeJoint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of the Joint
@@ -65,16 +65,7 @@ namespace gazebo
       public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetMaxForce(unsigned int _index, double _force);
-
-      // Documentation inherited
-      public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
-
-      /// \brief Revolute joint of DART
-      protected: dart::dynamics::RevoluteJoint *dtRevoluteJoint;
     };
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,12 @@
 
 #ifndef _IMAGE_HH_
 #define _IMAGE_HH_
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #ifdef BOOL
 #undef BOOL
@@ -65,7 +71,7 @@ namespace gazebo
 
     /// \class Image Image.hh common/common.hh
     /// \brief Encapsulates an image
-    class GAZEBO_VISIBLE Image
+    class GZ_COMMON_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormat

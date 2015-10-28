@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
 
+    /// Forward declare private data class
+    class DARTMultiRayShapePrivate;
+
     /// \brief DART specific version of MultiRayShape
-    class GAZEBO_VISIBLE DARTMultiRayShape : public MultiRayShape
+    class GZ_PHYSICS_VISIBLE DARTMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
@@ -49,8 +52,9 @@ namespace gazebo
       protected: void AddRay(const math::Vector3 &_start,
                              const math::Vector3 &_end);
 
-      /// \brief Pointer to the DART physics engine.
-      private: DARTPhysicsPtr physicsEngine;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTMultiRayShapePrivate *dataPtr;
     };
   }
 }

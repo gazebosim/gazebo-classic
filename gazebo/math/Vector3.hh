@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Nate Koenig
- * Date: 3 Apr 2007
- */
-
-#ifndef _VECTOR3_HH_
-#define _VECTOR3_HH_
+#ifndef _GAZEBO_VECTOR3_HH_
+#define _GAZEBO_VECTOR3_HH_
 
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/util/system.hh"
@@ -40,7 +36,7 @@ namespace gazebo
     /// \brief The Vector3 class represents the generic vector containing 3
     ///        elements.  Since it's commonly used to keep coordinate system
     ///        related information, its elements are labeled by x, y, z.
-    class GAZEBO_VISIBLE Vector3
+    class GZ_MATH_VISIBLE Vector3
     {
       /// \brief math::Vector3(0, 0, 0)
       public: static const Vector3 Zero;
@@ -65,6 +61,10 @@ namespace gazebo
       /// \param[in] _y value along y
       /// \param[in] _z value along z
       public: Vector3(const double &_x, const double &_y, const double &_z);
+
+      /// \brief Ignition math copy constructor
+      /// \param[in] _v a vector
+      public: Vector3(const ignition::math::Vector3d &_v);
 
       /// \brief Copy constructor
       /// \param[in] _v a vector
@@ -168,9 +168,18 @@ namespace gazebo
       /// \return the minimum element
       public: double GetMin() const;
 
-      /// \brief Assignment operator
+      /// \brief Convert this vector to an ignition::math::Vector3d.
+      /// \return This vector as an ignition::math::Vector3d.
+      public: ignition::math::Vector3d Ign() const;
+
+      /// \brief Assignment operator for ignition math
       /// \param[in] _v a new value
       /// \return this
+      public: Vector3 &operator=(const ignition::math::Vector3d &_v);
+
+      /// \brief Assignment operator
+      /// \param[in] _v a new value
+      /// \return The new vector
       public: Vector3 &operator =(const Vector3 &_v);
 
       /// \brief Assignment operator

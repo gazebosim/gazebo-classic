@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ namespace gazebo
 
     /// \class FloorItem FloorItem.hh
     /// \brief 2D representation of a floor.
-    class GAZEBO_VISIBLE FloorItem : public RectItem, public BuildingItem
+    class GZ_GUI_VISIBLE FloorItem :
+      public RectItem, public BuildingItem
     {
       Q_OBJECT
 

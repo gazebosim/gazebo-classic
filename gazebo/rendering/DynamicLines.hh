@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class DynamicLines DynamicLines.hh rendering/rendering.hh
     /// \brief Class for drawing lines that can change
-    class GAZEBO_VISIBLE DynamicLines : public DynamicRenderable
+    class GZ_RENDERING_VISIBLE DynamicLines : public DynamicRenderable
     {
       /// \brief Constructor
       /// \param[in] _opType The type of Line

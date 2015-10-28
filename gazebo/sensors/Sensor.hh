@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef _SENSOR_HH_
-#define _SENSOR_HH_
+#ifndef _GAZEBO_SENSOR_HH_
+#define _GAZEBO_SENSOR_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/mutex.hpp>
 #include <vector>
+#include <map>
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -129,7 +131,19 @@ namespace gazebo
 
       /// \brief Get the current pose.
       /// \return Current pose of the sensor.
-      public: virtual math::Pose GetPose() const;
+      /// \deprecated See Pose() function that returns an
+      /// ignition::math::Pose3d object.
+      public: virtual math::Pose GetPose() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the current pose.
+      /// \return Current pose of the sensor.
+      /// \sa SetPose()
+      public: virtual ignition::math::Pose3d Pose() const;
+
+      /// \brief Set the current pose.
+      /// \param[in] _pose New pose of the sensor.
+      /// \sa Pose()
+      public: virtual void SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set whether the sensor is active or not.
       /// \param[in] _value True if active, false if not.
@@ -200,10 +214,19 @@ namespace gazebo
       public: uint32_t GetParentId() const;
 
       /// \brief Get the sensor's noise model.
+      /// Depracted in favour of GetNoise(const SensorNoiseType _type)
+      /// which explicitly specifies the noise stream
       /// \param[in] _index Index of the noise model. For most sensors this
       /// will be 0. For a multi camera sensor the index can be >=0.
       /// \return The sensor's noise model.
-      public: NoisePtr GetNoise(unsigned int _index = 0) const;
+      public: NoisePtr GetNoise(unsigned int _index = 0) const
+              GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the sensor's noise model for a specified noise type.
+      /// \param[in] _type Index of the noise type. Refer to
+      /// SensorNoiseType enumeration for possible indices
+      /// \return The sensor's noise model for the given noise type
+      public: NoisePtr GetNoise(const SensorNoiseType _type) const;
 
       /// \brief Return true if the sensor needs to be updated.
       /// \return True when sensor should be updated.
@@ -220,7 +243,7 @@ namespace gazebo
       protected: sdf::ElementPtr sdf;
 
       /// \brief Pose of the sensor.
-      protected: math::Pose pose;
+      protected: ignition::math::Pose3d pose;
 
       /// \brief All event connections.
       protected: std::vector<event::ConnectionPtr> connections;
@@ -258,7 +281,12 @@ namespace gazebo
       protected: common::Time lastMeasurementTime;
 
       /// \brief Noise added to sensor data
-      protected: std::vector<NoisePtr> noises;
+      /// The key maps to a SensorNoiseType, and is kept as an int value
+      /// for backward compatibilty with Gazebo 5&6.
+      /// \todo: Change to std::map<SensorNoiseType, NoisePtr> in Gazebo7.
+      /// Adding the word GAZEBO_DEPRECATED here so that a grep will find
+      /// the above note.
+      protected: std::map<int, NoisePtr> noises;
 
       /// \brief Mutex to protect resetting lastUpdateTime.
       private: boost::mutex mutexLastUpdateTime;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,39 @@
  *
 */
 
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
+#ifdef _WIN32
+  // For socket(), connect(), send(), and recv().
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+  #include <iphlpapi.h>
+  // Type used for raw data on this platform.
+  typedef char raw_type;
+  #define snprintf _snprintf
+#else
+  // For data types
+  #include <sys/types.h>
+  // For socket(), connect(), send(), and recv()
+  #include <sys/socket.h>
+  // For gethostbyname()
+  #include <netdb.h>
+  // For inet_addr()
+  #include <arpa/inet.h>
+  // For close()
+  #include <unistd.h>
+  // For sockaddr_in
+  #include <netinet/in.h>
+  // Type used for raw data on this platform
+  typedef void raw_type;
+  #include <ifaddrs.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "gazebo/common/Console.hh"
@@ -700,6 +725,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
   // GAZEBO_HOSTNAME have failed.
   if (addressIsUnspecified(address))
   {
+#ifndef _WIN32
     // the following is *nix implementation to get the external IP of the
     // current machine.
 
@@ -757,6 +783,80 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     }
 
     freeifaddrs(ifaddr);
+// _WIN32
+#else
+  // Establish our default return value, in case everything below fails.
+  std::string retAddr("127.0.0.1");
+
+  // Look up our address.
+  ULONG outBufLen = 0;
+  PIP_ADAPTER_ADDRESSES addrs = NULL;
+
+  // Not sure whether these are the right flags, but they work
+  // on Windows 7
+  ULONG flags = (GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST |
+                 GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_FRIENDLY_NAME);
+
+  // The first time, it'll fail; we're asking how much space is needed to
+  // store the result.
+  GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen);
+
+  // Allocate the required space.
+  addrs = new IP_ADAPTER_ADDRESSES[outBufLen];
+  ULONG ret;
+
+  // Now the call should succeed.
+  if ((ret = GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen)) ==
+      NO_ERROR)
+  {
+    // Iterate over all returned adapters, arbitrarily sticking with the
+    // last non-loopback one that we find.
+    for (PIP_ADAPTER_ADDRESSES curr = addrs; curr; curr = curr->Next)
+    {
+      // Iterate over all unicast addresses for this adapter
+      for (PIP_ADAPTER_UNICAST_ADDRESS unicast = curr->FirstUnicastAddress;
+           unicast; unicast = unicast->Next)
+      {
+        // Cast to get an IPv4 numeric address (the AF_INET flag used above
+        // ensures that we're only going to get IPv4 address here).
+        sockaddr_in* sockaddress =
+          reinterpret_cast<sockaddr_in*>(unicast->Address.lpSockaddr);
+
+        // Make it a dotted quad
+        char ipv4Str[3*4+3+1];
+
+        snprintf(ipv4Str, sizeof(ipv4Str), "%d.%d.%d.%d",
+          sockaddress->sin_addr.S_un.S_un_b.s_b1,
+          sockaddress->sin_addr.S_un.S_un_b.s_b2,
+          sockaddress->sin_addr.S_un.S_un_b.s_b3,
+          sockaddress->sin_addr.S_un.S_un_b.s_b4);
+
+        // Ignore loopback address (that's our default anyway)
+        if (!strcmp(ipv4Str, "127.0.0.1"))
+          continue;
+
+        retAddr = ipv4Str;
+      }
+    }
+  }
+  else
+  {
+    gzerr << "GetAdaptersAddresses() failed: " << ret << std::endl;
+  }
+
+  delete [] addrs;
+
+  if (retAddr == "127.0.0.1")
+  {
+    gzwarn <<
+      "Couldn't find a preferred IP via the GetAdaptersAddresses() call; "
+      "I'm assuming that your IP "
+      "address is 127.0.0.1.  This should work for local processes, "
+      "but will almost certainly not work if you have remote processes."
+      "Report to the disc-zmq development team to seek a fix." << std::endl;
+  }
+  address = boost::asio::ip::address_v4::from_string(retAddr);
+#endif
   }
 
   // Complain if we were unable to find a valid address
@@ -771,7 +871,12 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 bool Connection::ValidateIP(const std::string &_ip)
 {
   struct sockaddr_in sa;
+
+#ifdef _WIN32
+  int result = InetPton(AF_INET, _ip.c_str(), &(sa.sin_addr));
+#else
   int result = inet_pton(AF_INET, _ip.c_str(), &(sa.sin_addr));
+#endif
   return result != 0;
 }
 

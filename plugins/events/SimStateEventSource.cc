@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,17 +33,35 @@ SimStateEventSource::~SimStateEventSource()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimStateEventSource::Load(const sdf::ElementPtr &_sdf)
+void SimStateEventSource::Load(const sdf::ElementPtr _sdf)
 {
   EventSource::Load(_sdf);
+
   // Listen to the pause event. This event is broadcast every
   // simulation iteration.
   this->pauseConnection = event::Events::ConnectPause(
       boost::bind(&SimStateEventSource::OnPause, this, _1));
+
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&SimStateEventSource::OnUpdate, this, _1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimStateEventSource::OnPause(bool _pause)
+void SimStateEventSource::OnUpdate(const common::UpdateInfo &_info)
+{
+  if (_info.simTime < this->simTime)
+  {
+    std::string json;
+    json = "{\"state\": \"reset\" }";
+    this->Emit(json);
+  }
+  this->simTime = _info.simTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void SimStateEventSource::OnPause(const bool _pause)
 {
   std::string json;
   if (_pause)
@@ -55,4 +73,5 @@ void SimStateEventSource::OnPause(bool _pause)
     json = "{\"state\": \"running\" }";
   }
   this->Emit(json);
+  this->hasPaused = _pause;
 }

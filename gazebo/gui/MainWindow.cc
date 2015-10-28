@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,20 @@
  * limitations under the License.
  *
  */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sdf/sdf.hh>
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include "gazebo/gazebo_config.h"
+#include "gazebo/gazebo_client.hh"
 
-#include "gazebo/gui/GuiPlugin.hh"
-#include "gazebo/gui/CloneWindow.hh"
-#include "gazebo/gui/TopicSelector.hh"
-#include "gazebo/gui/DataLogger.hh"
-#include "gazebo/gui/viewers/ViewFactory.hh"
-#include "gazebo/gui/viewers/TopicView.hh"
-#include "gazebo/gui/viewers/ImageView.hh"
-
-#include "gazebo/gazebo.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
@@ -41,19 +42,30 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/AlignWidget.hh"
+#include "gazebo/gui/CloneWindow.hh"
+#include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiPlugin.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
+#include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/RenderWidget.hh"
-#include "gazebo/gui/ToolsWidget.hh"
-#include "gazebo/gui/GLWidget.hh"
-#include "gazebo/gui/AlignWidget.hh"
-#include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/SpaceNav.hh"
+#include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/ToolsWidget.hh"
+#include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/ViewAngleWidget.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
-#include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
+#include "gazebo/gui/terrain/TerrainEditor.hh"
+#include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/gui/viewers/ImageView.hh"
+#include "gazebo/gui/MainWindow.hh"
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
@@ -101,22 +113,24 @@ MainWindow::MainWindow()
   this->leftColumn = new QStackedWidget(this);
 
   this->modelListWidget = new ModelListWidget(this);
-  InsertModelWidget *insertModel = new InsertModelWidget(this);
+  this->insertModel = new InsertModelWidget(this);
+  LayersWidget *layersWidget = new LayersWidget(this);
 
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
   this->tabWidget->addTab(this->modelListWidget, "World");
   this->tabWidget->addTab(insertModel, "Insert");
+  this->tabWidget->addTab(layersWidget, "Layers");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
   this->AddToLeftColumn("default", this->tabWidget);
 
-  this->CreateEditors();
-
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
+
+  this->CreateEditors();
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -126,11 +140,18 @@ MainWindow::MainWindow()
   this->splitter->addWidget(this->toolsWidget);
   this->splitter->setContentsMargins(0, 0, 0, 0);
 
+#ifdef _WIN32
+  // The splitter appears solid white in Windows, so we make it transparent.
+  this->splitter->setStyleSheet(
+  "QSplitter { color: #ffffff; background-color: transparent; }"
+  "QSplitter::handle { color: #ffffff; background-color: transparent; }");
+#endif
+
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
   sizes.push_back(this->width() - MINIMUM_TAB_WIDTH);
   sizes.push_back(0);
-  splitter->setSizes(sizes);
+  this->splitter->setSizes(sizes);
 
   this->splitter->setStretchFactor(0, 0);
   this->splitter->setStretchFactor(1, 2);
@@ -166,6 +187,10 @@ MainWindow::MainWindow()
         boost::bind(&MainWindow::OnFullScreen, this, _1)));
 
   this->connections.push_back(
+      gui::Events::ConnectShowToolbars(
+        boost::bind(&MainWindow::OnShowToolbars, this, _1)));
+
+  this->connections.push_back(
       gui::Events::ConnectMoveMode(
         boost::bind(&MainWindow::OnMoveMode, this, _1)));
 
@@ -185,6 +210,10 @@ MainWindow::MainWindow()
       gui::Events::ConnectFollow(
         boost::bind(&MainWindow::OnFollow, this, _1)));
 
+  this->connections.push_back(
+      gui::Events::ConnectWindowMode(
+      boost::bind(&MainWindow::OnWindowMode, this, _1)));
+
   gui::ViewFactory::RegisterAll();
 
   // Do these things last
@@ -199,11 +228,21 @@ MainWindow::MainWindow()
   // Use a signal/slot to load plugins. This makes the process thread safe.
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
+
+  // Create data logger dialog
+  this->dataLogger = new gui::DataLogger(this);
+  connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
+
+  // Hotkey dialog
+  this->hotkeyDialog = NULL;
+
+  this->show();
 }
 
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  this->DeleteActions();
 }
 
 /////////////////////////////////////////////////
@@ -240,10 +279,8 @@ void MainWindow::Load()
 /////////////////////////////////////////////////
 void MainWindow::Init()
 {
-  this->renderWidget->show();
-
   // Default window size is entire desktop.
-  QSize winSize = QApplication::desktop()->size();
+  QSize winSize = QApplication::desktop()->screenGeometry().size();
 
   // Get the size properties from the INI file.
   int winWidth = getINIProperty<int>("geometry.width", winSize.width());
@@ -262,18 +299,18 @@ void MainWindow::Init()
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
-  this->selectionPub =
-    this->node->Advertise<msgs::Selection>("~/selection");
   this->scenePub =
     this->node->Advertise<msgs::Scene>("~/scene");
 
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this, true);
 
-  this->lightSub = this->node->Subscribe("~/light", &MainWindow::OnLight, this);
+  // \todo Treating both light topics the same way, this should be improved
+  this->lightModifySub = this->node->Subscribe("~/light/modify",
+      &MainWindow::OnLight, this);
 
-  this->statsSub =
-    this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
+  this->lightFactorySub = this->node->Subscribe("~/factory/light",
+      &MainWindow::OnLight, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
@@ -297,12 +334,6 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 
   this->connections.clear();
 
-  delete this->renderWidget;
-
-  // Cleanup the space navigator
-  delete this->spacenav;
-  this->spacenav = NULL;
-
 #ifdef HAVE_OCULUS
   if (this->oculusWindow)
   {
@@ -310,8 +341,15 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
     this->oculusWindow = NULL;
   }
 #endif
+  delete this->renderWidget;
 
-  gazebo::shutdown();
+  // Cleanup the space navigator
+  delete this->spacenav;
+  this->spacenav = NULL;
+
+  emit Close();
+
+  gazebo::client::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -353,6 +391,7 @@ void MainWindow::SelectTopic()
 /////////////////////////////////////////////////
 void MainWindow::Open()
 {
+  // Note that file dialog static functions seem to be broken (issue #1514)
   std::string filename = QFileDialog::getOpenFileName(this,
       tr("Open World"), "",
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
@@ -362,24 +401,6 @@ void MainWindow::Open()
     msgs::ServerControl msg;
     msg.set_open_filename(filename);
     this->serverControlPub->Publish(msg);
-  }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::Import()
-{
-  std::string filename = QFileDialog::getOpenFileName(this,
-      tr("Import Collada Mesh"), "",
-      tr("SDF Files (*.dae *.zip)")).toStdString();
-
-  if (!filename.empty())
-  {
-    if (filename.find(".dae") != std::string::npos)
-    {
-      gui::Events::createEntity("mesh", filename);
-    }
-    else
-      gzerr << "Unable to import mesh[" << filename << "]\n";
   }
 }
 
@@ -411,17 +432,24 @@ void MainWindow::SaveINI()
 /////////////////////////////////////////////////
 void MainWindow::SaveAs()
 {
-  std::string filename = QFileDialog::getSaveFileName(this,
-      tr("Save World"), QString(),
-      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
+  QFileDialog fileDialog(this, tr("Save World"), QDir::homePath(),
+      tr("SDF Files (*.xml *.sdf *.world)"));
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
 
-  // Return if the user has canceled.
-  if (filename.empty())
-    return;
+  if (fileDialog.exec() == QDialog::Accepted)
+  {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
 
-  g_saveAct->setEnabled(true);
-  this->saveFilename = filename;
-  this->Save();
+    std::string filename = selected[0].toStdString();
+
+    g_saveAct->setEnabled(true);
+    this->saveFilename = filename;
+    this->Save();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -444,9 +472,9 @@ void MainWindow::Save()
     sdf::SDF sdf_parsed;
     sdf_parsed.SetFromString(msg.data());
     // Check that sdf contains world
-    if (sdf_parsed.root->HasElement("world"))
+    if (sdf_parsed.Root()->HasElement("world"))
     {
-      sdf::ElementPtr world = sdf_parsed.root->GetElement("world");
+      sdf::ElementPtr world = sdf_parsed.Root()->GetElement("world");
       sdf::ElementPtr guiElem = world->GetElement("gui");
 
       if (guiElem->HasAttribute("fullscreen"))
@@ -458,8 +486,11 @@ void MainWindow::Save()
       cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
+
+      cameraElem->GetElement("projection_type")->Set(cam->GetProjectionType());
+
       // TODO: export track_visual properties as well.
-      msgData = sdf_parsed.root->ToString("");
+      msgData = sdf_parsed.Root()->ToString("");
     }
     else
     {
@@ -558,13 +589,23 @@ void MainWindow::About()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::HotkeyChart()
+{
+  // Opening for the first time
+  if (!this->hotkeyDialog)
+  {
+    this->hotkeyDialog = new HotkeyDialog(this);
+  }
+
+  this->hotkeyDialog->show();
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Play()
 {
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  g_pauseAct->setVisible(true);
-  g_playAct->setVisible(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -574,8 +615,6 @@ void MainWindow::Pause()
   msgs::WorldControl msg;
   msg.set_pause(true);
 
-  g_pauseAct->setVisible(false);
-  g_playAct->setVisible(true);
   this->worldControlPub->Publish(msg);
 }
 
@@ -752,20 +791,24 @@ void MainWindow::OnFullScreen(bool _value)
     this->toolsWidget->show();
     this->menuBar->show();
   }
+  g_fullScreenAct->setChecked(_value);
+  g_fullscreen = _value;
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Reset()
+void MainWindow::OnShowToolbars(bool _value)
 {
-  rendering::UserCameraPtr cam = gui::get_active_camera();
-
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = camPos - lookAt;
-
-  double yaw = atan2(delta.x, delta.y);
-  double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  cam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
+  if (_value)
+  {
+    this->GetRenderWidget()->GetTimePanel()->show();
+    this->GetRenderWidget()->GetToolbar()->show();
+  }
+  else
+  {
+    this->GetRenderWidget()->GetTimePanel()->hide();
+    this->GetRenderWidget()->GetToolbar()->hide();
+  }
+  g_showToolbarsAct->setChecked(_value);
 }
 
 /////////////////////////////////////////////////
@@ -785,6 +828,15 @@ void MainWindow::ShowGrid()
   msgs::Scene msg;
   msg.set_name(gui::get_world());
   msg.set_grid(g_showGridAct->isChecked());
+  this->scenePub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowOrigin()
+{
+  msgs::Scene msg;
+  msg.set_name(gui::get_world());
+  msg.set_origin_visual(g_showOriginAct->isChecked());
   this->scenePub->Publish(msg);
 }
 
@@ -822,6 +874,12 @@ void MainWindow::SetWireframe()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowGUIOverlays()
+{
+  this->GetRenderWidget()->SetOverlaysVisible(g_overlayAct->isChecked());
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowCOM()
 {
   if (g_showCOMAct->isChecked())
@@ -830,6 +888,32 @@ void MainWindow::ShowCOM()
   else
     transport::requestNoReply(this->node->GetTopicNamespace(),
         "hide_com", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowInertia()
+{
+  if (g_showInertiaAct->isChecked())
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_inertia", "all");
+  else
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_inertia", "all");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowLinkFrame()
+{
+  if (g_showLinkFrameAct->isChecked())
+  {
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "show_link_frame", "all");
+  }
+  else
+  {
+    transport::requestNoReply(this->node->GetTopicNamespace(),
+        "hide_link_frame", "all");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -848,6 +932,12 @@ void MainWindow::FullScreen()
 {
   g_fullscreen = !g_fullscreen;
   gui::Events::fullScreen(g_fullscreen);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ShowToolbars()
+{
+  gui::Events::showToolbars(g_showToolbarsAct->isChecked());
 }
 
 /////////////////////////////////////////////////
@@ -896,8 +986,21 @@ void MainWindow::ViewOculus()
 /////////////////////////////////////////////////
 void MainWindow::DataLogger()
 {
-  gui::DataLogger *dataLogger = new gui::DataLogger(this);
-  dataLogger->show();
+  if (g_dataLoggerAct->isChecked())
+  {
+    this->dataLogger->show();
+  }
+  else
+  {
+    this->dataLogger->close();
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnDataLoggerClosed()
+{
+  // Uncheck action on toolbar when user closes dialog
+  g_dataLoggerAct->setChecked(false);
 }
 
 /////////////////////////////////////////////////
@@ -927,12 +1030,6 @@ void MainWindow::CreateActions()
   g_openAct->setStatusTip(tr("Open an world file"));
   connect(g_openAct, SIGNAL(triggered()), this, SLOT(Open()));
 
-  /*g_importAct = new QAction(tr("&Import Mesh"), this);
-  g_importAct->setShortcut(tr("Ctrl+I"));
-  g_importAct->setStatusTip(tr("Import a Collada mesh"));
-  connect(g_importAct, SIGNAL(triggered()), this, SLOT(Import()));
-  */
-
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
@@ -952,6 +1049,10 @@ void MainWindow::CreateActions()
   g_cloneAct->setStatusTip(tr("Clone the world"));
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
 
+  g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
+  g_hotkeyChartAct->setStatusTip(tr("Show the hotkey chart"));
+  connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
+
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
   connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
@@ -962,12 +1063,14 @@ void MainWindow::CreateActions()
 
   g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   g_resetModelsAct->setShortcut(tr("Ctrl+Shift+R"));
+  this->addAction(g_resetModelsAct);
   g_resetModelsAct->setStatusTip(tr("Reset model poses"));
   connect(g_resetModelsAct, SIGNAL(triggered()), this,
     SLOT(OnResetModelOnly()));
 
   g_resetWorldAct = new QAction(tr("&Reset World"), this);
   g_resetWorldAct->setShortcut(tr("Ctrl+R"));
+  this->addAction(g_resetWorldAct);
   g_resetWorldAct->setStatusTip(tr("Reset the world"));
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
@@ -999,13 +1102,12 @@ void MainWindow::CreateActions()
   g_stepAct->setStatusTip(tr("Step the world"));
   connect(g_stepAct, SIGNAL(triggered()), this, SLOT(Step()));
   this->CreateDisabledIcon(":/images/end.png", g_stepAct);
+  g_stepAct->setEnabled(false);
 
   g_playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   g_playAct->setStatusTip(tr("Run the world"));
   g_playAct->setVisible(false);
   connect(g_playAct, SIGNAL(triggered()), this, SLOT(Play()));
-  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
-  this->OnPlayActionChanged();
 
   g_pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   g_pauseAct->setStatusTip(tr("Pause the world"));
@@ -1068,15 +1170,6 @@ void MainWindow::CreateActions()
       SLOT(CreateCylinder()));
   this->CreateDisabledIcon(":/images/cylinder.png", g_cylinderCreateAct);
 
-  g_meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
-      tr("Mesh"), this);
-  g_meshCreateAct->setStatusTip(tr("Create a mesh"));
-  g_meshCreateAct->setCheckable(true);
-  connect(g_meshCreateAct, SIGNAL(triggered()), this,
-      SLOT(CreateMesh()));
-  this->CreateDisabledIcon(":/images/cylinder.png", g_meshCreateAct);
-
-
   g_pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
   g_pointLghtCreateAct->setStatusTip(tr("Create a point light"));
@@ -1101,10 +1194,8 @@ void MainWindow::CreateActions()
       SLOT(CreateDirectionalLight()));
   this->CreateDisabledIcon(":/images/directionallight.png", g_dirLghtCreateAct);
 
-  g_resetAct = new QAction(tr("Reset Camera"), this);
-  g_resetAct->setStatusTip(tr("Move camera to pose"));
-  connect(g_resetAct, SIGNAL(triggered()), this,
-      SLOT(Reset()));
+  g_resetAct = new QAction(tr("Reset View Angle"), this);
+  g_resetAct->setStatusTip(tr("Move camera to initial pose"));
 
   g_showCollisionsAct = new QAction(tr("Collisions"), this);
   g_showCollisionsAct->setStatusTip(tr("Show Collisions"));
@@ -1120,6 +1211,13 @@ void MainWindow::CreateActions()
   connect(g_showGridAct, SIGNAL(triggered()), this,
           SLOT(ShowGrid()));
 
+  g_showOriginAct = new QAction(tr("Origin"), this);
+  g_showOriginAct->setStatusTip(tr("Show World Origin"));
+  g_showOriginAct->setCheckable(true);
+  g_showOriginAct->setChecked(true);
+  connect(g_showOriginAct, SIGNAL(triggered()), this,
+          SLOT(ShowOrigin()));
+
   g_transparentAct = new QAction(tr("Transparent"), this);
   g_transparentAct->setStatusTip(tr("Transparent"));
   g_transparentAct->setCheckable(true);
@@ -1134,12 +1232,26 @@ void MainWindow::CreateActions()
   connect(g_viewWireframeAct, SIGNAL(triggered()), this,
           SLOT(SetWireframe()));
 
-  g_showCOMAct = new QAction(tr("Center of Mass / Inertia"), this);
-  g_showCOMAct->setStatusTip(tr("Show COM/MOI"));
+  g_showCOMAct = new QAction(tr("Center of Mass"), this);
+  g_showCOMAct->setStatusTip(tr("Show center of mass"));
   g_showCOMAct->setCheckable(true);
   g_showCOMAct->setChecked(false);
   connect(g_showCOMAct, SIGNAL(triggered()), this,
           SLOT(ShowCOM()));
+
+  g_showInertiaAct = new QAction(tr("Inertias"), this);
+  g_showInertiaAct->setStatusTip(tr("Show moments of inertia"));
+  g_showInertiaAct->setCheckable(true);
+  g_showInertiaAct->setChecked(false);
+  connect(g_showInertiaAct, SIGNAL(triggered()), this,
+      SLOT(ShowInertia()));
+
+  g_showLinkFrameAct = new QAction(tr("Link Frames"), this);
+  g_showLinkFrameAct->setStatusTip(tr("Show link frames"));
+  g_showLinkFrameAct->setCheckable(true);
+  g_showLinkFrameAct->setChecked(false);
+  connect(g_showLinkFrameAct, SIGNAL(triggered()), this,
+      SLOT(ShowLinkFrame()));
 
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
@@ -1155,8 +1267,19 @@ void MainWindow::CreateActions()
   connect(g_showJointsAct, SIGNAL(triggered()), this,
           SLOT(ShowJoints()));
 
+  g_showToolbarsAct = new QAction(tr("Show Toolbars"), this);
+  g_showToolbarsAct->setStatusTip(
+      tr("Show or hide the top and bottom toolbars"));
+  g_showToolbarsAct->setShortcut(tr("Ctrl+H"));
+  this->addAction(g_showToolbarsAct);
+  g_showToolbarsAct->setCheckable(true);
+  g_showToolbarsAct->setChecked(true);
+  connect(g_showToolbarsAct, SIGNAL(triggered()), this,
+      SLOT(ShowToolbars()));
+
   g_fullScreenAct = new QAction(tr("Full Screen"), this);
-  g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));
+  g_fullScreenAct->setStatusTip(tr("Full Screen (F-11 to exit)"));
+  g_fullScreenAct->setShortcut(tr("F11"));
   connect(g_fullScreenAct, SIGNAL(triggered()), this,
       SLOT(FullScreen()));
 
@@ -1172,6 +1295,13 @@ void MainWindow::CreateActions()
   g_orbitAct->setChecked(true);
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
+  g_overlayAct = new QAction(tr("Show GUI Overlays"), this);
+  g_overlayAct->setStatusTip(tr("Show GUI Overlays"));
+  g_overlayAct->setEnabled(false);
+  g_overlayAct->setCheckable(true);
+  g_overlayAct->setChecked(false);
+  connect(g_overlayAct, SIGNAL(triggered()), this, SLOT(ShowGUIOverlays()));
+
   QActionGroup *viewControlActionGroup = new QActionGroup(this);
   viewControlActionGroup->addAction(g_fpsAct);
   viewControlActionGroup->addAction(g_orbitAct);
@@ -1184,9 +1314,28 @@ void MainWindow::CreateActions()
   g_viewOculusAct->setEnabled(false);
 #endif
 
-  g_dataLoggerAct = new QAction(tr("&Log Data"), this);
+  g_cameraOrthoAct = new QAction(tr("Orthographic"), this);
+  g_cameraOrthoAct->setStatusTip(tr("Orthographic Projection"));
+  g_cameraOrthoAct->setCheckable(true);
+  g_cameraOrthoAct->setChecked(false);
+
+  g_cameraPerspectiveAct = new QAction(tr("Perspective"), this);
+  g_cameraPerspectiveAct->setStatusTip(tr("Perspective Projection"));
+  g_cameraPerspectiveAct->setCheckable(true);
+  g_cameraPerspectiveAct->setChecked(true);
+
+  QActionGroup *projectionActionGroup = new QActionGroup(this);
+  projectionActionGroup->addAction(g_cameraOrthoAct);
+  projectionActionGroup->addAction(g_cameraPerspectiveAct);
+  projectionActionGroup->setExclusive(true);
+
+  g_dataLoggerAct = new QAction(QIcon(":images/log_record.png"),
+      tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
+  g_dataLoggerAct->setToolTip(tr("Log Data (Ctrl+D)"));
+  g_dataLoggerAct->setCheckable(true);
+  g_dataLoggerAct->setChecked(false);
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
 
   g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
@@ -1285,6 +1434,40 @@ void MainWindow::CreateActions()
   g_alignAct->setDefaultWidget(alignWidget);
   g_alignAct->setEnabled(false);
   connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
+
+  // set up view angle actions and widget
+  QAction *viewAngleTop = new QAction(QIcon(":/images/view_angle_top.png"),
+      tr("View from the top"), this);
+  QAction *viewAngleBottom = new QAction(
+      QIcon(":/images/view_angle_bottom.png"),
+      tr("View from the bottom"), this);
+  QAction *viewAngleFront = new QAction(QIcon(":/images/view_angle_front.png"),
+      tr("View from the front"), this);
+  QAction *viewAngleBack = new QAction(QIcon(":/images/view_angle_back.png"),
+      tr("View from the back"), this);
+  QAction *viewAngleLeft = new QAction(QIcon(":/images/view_angle_left.png"),
+      tr("View from the left"), this);
+  QAction *viewAngleRight = new QAction(QIcon(":/images/view_angle_right.png"),
+      tr("View from the right"), this);
+
+  // Create another action instead of using g_resetAct here directly because
+  // we don't want the icon on the menu.
+  QAction *viewAngleReset = new QAction(QIcon(":/images/view_angle_home.png"),
+      tr("Reset View Angle"), this);
+  connect(g_resetAct, SIGNAL(triggered()), viewAngleReset, SLOT(trigger()));
+
+  ViewAngleWidget *viewAngleWidget = new ViewAngleWidget(this);
+  viewAngleWidget->setObjectName("viewAngleWidget");
+  viewAngleWidget->Add(ViewAngleWidget::TOP, viewAngleTop);
+  viewAngleWidget->Add(ViewAngleWidget::BOTTOM, viewAngleBottom);
+  viewAngleWidget->Add(ViewAngleWidget::FRONT, viewAngleFront);
+  viewAngleWidget->Add(ViewAngleWidget::BACK, viewAngleBack);
+  viewAngleWidget->Add(ViewAngleWidget::LEFT, viewAngleLeft);
+  viewAngleWidget->Add(ViewAngleWidget::RIGHT, viewAngleRight);
+  viewAngleWidget->Add(ViewAngleWidget::RESET, viewAngleReset);
+
+  g_viewAngleAct = new QWidgetAction(this);
+  g_viewAngleAct->setDefaultWidget(viewAngleWidget);
 }
 
 /////////////////////////////////////////////////
@@ -1305,6 +1488,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
     this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     this->setMenuBar(this->menuBar);
 
+    // populate main window's menu bar with menus from normal simulation mode
     this->CreateMenuBar();
   }
 
@@ -1317,12 +1501,20 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
     // Note: for some reason we can not call menuBar() again,
     // so manually retrieving the menubar from the mainwindow.
     QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
-    newMenuBar = menuBars[0];
+    if (!menuBars.empty())
+      newMenuBar = menuBars[0];
   }
   else
   {
     newMenuBar = _bar;
   }
+
+  if (!newMenuBar)
+  {
+    gzerr << "Unable to set NULL menu bar" << std::endl;
+    return;
+  }
+
   QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
   for (int i = 0; i < menus.size(); ++i)
   {
@@ -1336,6 +1528,170 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::DeleteActions()
+{
+  delete g_topicVisAct;
+  g_topicVisAct = 0;
+
+  delete g_openAct;
+  g_openAct = 0;
+
+  delete g_saveAct;
+  g_saveAct = 0;
+
+  delete g_saveAsAct;
+  g_saveAsAct = 0;
+
+  delete g_saveCfgAct;
+  g_saveCfgAct = 0;
+
+  delete g_cloneAct;
+  g_cloneAct = 0;
+
+  delete g_hotkeyChartAct;
+  g_hotkeyChartAct = 0;
+
+  delete g_aboutAct;
+  g_aboutAct = 0;
+
+  delete g_quitAct;
+  g_quitAct = 0;
+
+  delete g_resetModelsAct;
+  g_resetModelsAct = 0;
+
+  delete g_resetWorldAct;
+  g_resetWorldAct = 0;
+
+  delete g_editBuildingAct;
+  g_editBuildingAct = 0;
+
+  delete g_editTerrainAct;
+  g_editTerrainAct = 0;
+
+  delete g_editModelAct;
+  g_editModelAct = 0;
+
+  delete g_stepAct;
+  g_stepAct = 0;
+
+  delete g_playAct;
+  g_playAct = 0;
+
+  delete g_pauseAct;
+  g_pauseAct = 0;
+
+  delete g_arrowAct;
+  g_arrowAct = 0,
+
+  delete g_translateAct;
+  g_translateAct = 0;
+
+  delete g_rotateAct;
+  g_rotateAct = 0;
+
+  delete g_scaleAct;
+  g_scaleAct = 0;
+
+  delete g_boxCreateAct;
+  g_boxCreateAct = 0;
+
+  delete g_sphereCreateAct;
+  g_sphereCreateAct = 0;
+
+  delete g_cylinderCreateAct;
+  g_cylinderCreateAct = 0;
+
+  delete g_pointLghtCreateAct;
+  g_pointLghtCreateAct = 0;
+
+  delete g_spotLghtCreateAct;
+  g_spotLghtCreateAct = 0;
+
+  delete g_dirLghtCreateAct;
+  g_dirLghtCreateAct = 0;
+
+  delete g_resetAct;
+  g_resetAct = 0;
+
+  delete g_showCollisionsAct;
+  g_showCollisionsAct = 0;
+
+  delete g_showGridAct;
+  g_showGridAct = 0;
+
+  delete g_showOriginAct;
+  g_showOriginAct = 0;
+
+  delete g_transparentAct;
+  g_transparentAct = 0;
+
+  delete g_viewWireframeAct;
+  g_viewWireframeAct = 0;
+
+  delete g_showCOMAct;
+  g_showCOMAct = 0;
+
+  delete g_showInertiaAct;
+  g_showInertiaAct = 0;
+
+  delete g_showLinkFrameAct;
+  g_showLinkFrameAct = 0;
+
+  delete g_showContactsAct;
+  g_showContactsAct = 0;
+
+  delete g_showJointsAct;
+  g_showJointsAct = 0;
+
+  delete g_showToolbarsAct;
+  g_showToolbarsAct = 0;
+
+  delete g_fullScreenAct;
+  g_fullScreenAct = 0;
+
+  delete g_fpsAct;
+  g_fpsAct = 0;
+
+  delete g_orbitAct;
+  g_orbitAct = 0;
+
+  delete g_overlayAct;
+  g_overlayAct = 0;
+
+  delete g_viewOculusAct;
+  g_viewOculusAct = 0;
+
+  delete g_dataLoggerAct;
+  g_dataLoggerAct = 0;
+
+  delete g_screenshotAct;
+  g_screenshotAct = 0;
+
+  delete g_copyAct;
+  g_copyAct = 0;
+
+  delete g_pasteAct;
+  g_pasteAct = 0;
+
+  delete g_snapAct;
+  g_snapAct = 0;
+
+  delete g_alignAct;
+  g_alignAct = 0;
+
+  delete g_cameraOrthoAct;
+  g_cameraOrthoAct = 0;
+
+  delete g_cameraPerspectiveAct;
+  g_cameraPerspectiveAct = 0;
+
+  delete g_viewAngleAct;
+  g_viewAngleAct = 0;
+}
+
+
+/////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
   // main window's menu bar
@@ -1343,7 +1699,6 @@ void MainWindow::CreateMenuBar()
 
   QMenu *fileMenu = bar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
-  // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);
   fileMenu->addAction(g_saveAct);
   fileMenu->addAction(g_saveAsAct);
@@ -1356,16 +1711,25 @@ void MainWindow::CreateMenuBar()
   this->editMenu = bar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
+  editMenu->addSeparator();
   editMenu->addAction(g_editBuildingAct);
+  editMenu->addAction(g_editModelAct);
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
 
-  // \TODO: Add this back in when implementing the full Model Editor spec.
-  editMenu->addAction(g_editModelAct);
+  QMenu *cameraMenu = bar->addMenu(tr("&Camera"));
+  cameraMenu->addAction(g_cameraOrthoAct);
+  cameraMenu->addAction(g_cameraPerspectiveAct);
+  cameraMenu->addSeparator();
+  cameraMenu->addAction(g_fpsAct);
+  cameraMenu->addAction(g_orbitAct);
+  cameraMenu->addSeparator();
+  cameraMenu->addAction(g_resetAct);
 
   QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
+  viewMenu->addAction(g_showOriginAct);
   viewMenu->addSeparator();
 
   viewMenu->addAction(g_transparentAct);
@@ -1374,22 +1738,18 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showCollisionsAct);
   viewMenu->addAction(g_showJointsAct);
   viewMenu->addAction(g_showCOMAct);
+  viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
-  viewMenu->addSeparator();
-
-  viewMenu->addAction(g_resetAct);
-  viewMenu->addAction(g_fullScreenAct);
-  viewMenu->addSeparator();
-
-  viewMenu->addAction(g_fpsAct);
-  viewMenu->addAction(g_orbitAct);
+  viewMenu->addAction(g_showLinkFrameAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
-  windowMenu->addAction(g_dataLoggerAct);
-
   windowMenu->addAction(g_viewOculusAct);
+  windowMenu->addSeparator();
+  windowMenu->addAction(g_overlayAct);
+  windowMenu->addAction(g_showToolbarsAct);
+  windowMenu->addAction(g_fullScreenAct);
 
 #ifdef HAVE_QWT
   // windowMenu->addAction(g_diagnosticsAct);
@@ -1398,7 +1758,32 @@ void MainWindow::CreateMenuBar()
   bar->addSeparator();
 
   QMenu *helpMenu = bar->addMenu(tr("&Help"));
+  helpMenu->addAction(g_hotkeyChartAct);
   helpMenu->addAction(g_aboutAct);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::AddMenu(QMenu *_menu)
+{
+  if (!_menu)
+    return;
+
+  // Get the main window's menubar
+  // Note: for some reason we can not call menuBar() again,
+  // so manually retrieving the menubar from the mainwindow.
+  QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
+  if (!menuBars.empty())
+  {
+    // Note: addMenu(QMenu *) works the first time but when
+    // ShowMenuBar() is called more than once which results in menus being
+    // re-added, (e.g. when switching between model editor and simulation modes)
+    // _menu does not show up in the menu bar.
+    // So workaround is to use addMenu(QString)
+    QMenu *newMenu = menuBars[0]->addMenu(_menu->title());
+
+    for (auto &menuAct : _menu->actions())
+      newMenu->addAction(menuAct);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1414,15 +1799,6 @@ void MainWindow::CreateMenus()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::CreateToolbars()
-{
-  this->playToolbar = this->addToolBar(tr("Play"));
-  this->playToolbar->addAction(g_playAct);
-  this->playToolbar->addAction(g_pauseAct);
-  this->playToolbar->addAction(g_stepAct);
-}
-
-/////////////////////////////////////////////////
 void MainWindow::OnMoveMode(bool _mode)
 {
   if (_mode)
@@ -1430,7 +1806,6 @@ void MainWindow::OnMoveMode(bool _mode)
     g_boxCreateAct->setChecked(false);
     g_sphereCreateAct->setChecked(false);
     g_cylinderCreateAct->setChecked(false);
-    g_meshCreateAct->setChecked(false);
     g_pointLghtCreateAct->setChecked(false);
     g_spotLghtCreateAct->setChecked(false);
     g_dirLghtCreateAct->setChecked(false);
@@ -1466,13 +1841,22 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
       math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
 
-      cam->SetWorldPose(cam_pose);
+      cam->SetDefaultPose(cam_pose);
       cam->SetUseSDFPose(true);
     }
 
     if (_msg->camera().has_view_controller())
     {
       cam->SetViewController(_msg->camera().view_controller());
+    }
+
+    if (_msg->camera().has_projection_type())
+    {
+      cam->SetProjectionType(_msg->camera().projection_type());
+      g_cameraOrthoAct->setChecked(true);
+      // Disable view control options when in ortho projection
+      g_fpsAct->setEnabled(false);
+      g_orbitAct->setEnabled(false);
     }
 
     if (_msg->camera().has_track())
@@ -1536,6 +1920,9 @@ void MainWindow::OnAddPlugins()
     }
   }
   this->pluginMsgs.clear();
+
+  g_overlayAct->setChecked(true);
+  g_overlayAct->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
@@ -1676,36 +2063,6 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void MainWindow::OnStats(ConstWorldStatisticsPtr &_msg)
-{
-  if (_msg->paused() && g_pauseAct->isVisible())
-  {
-    g_pauseAct->setVisible(false);
-    g_playAct->setVisible(true);
-  }
-  else if (!_msg->paused() && !g_playAct->isVisible())
-  {
-    g_pauseAct->setVisible(true);
-    g_playAct->setVisible(false);
-  }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnPlayActionChanged()
-{
-  if (g_playAct->isVisible())
-  {
-    g_stepAct->setToolTip("Step the world");
-    g_stepAct->setEnabled(true);
-  }
-  else
-  {
-    g_stepAct->setToolTip("Pause the world before stepping");
-    g_stepAct->setEnabled(false);
-  }
-}
-
-/////////////////////////////////////////////////
 void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 {
   _item->setExpanded(!_item->isExpanded());
@@ -1737,16 +2094,28 @@ RenderWidget *MainWindow::GetRenderWidget() const
 }
 
 /////////////////////////////////////////////////
+bool MainWindow::IsPaused() const
+{
+  if (this->renderWidget)
+  {
+    TimePanel *timePanel = this->renderWidget->GetTimePanel();
+    if (timePanel)
+      return timePanel->IsPaused();
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateEditors()
 {
   // Create a Terrain Editor
-  this->editors.push_back(new TerrainEditor(this));
+  this->editors["terrain"] = new TerrainEditor(this);
 
   // Create a Building Editor
-  this->editors.push_back(new BuildingEditor(this));
+  this->editors["building"] = new BuildingEditor(this);
 
   // Create a Model Editor
-  this->editors.push_back(new ModelEditor(this));
+  this->editors["model"] = new ModelEditor(this);
 }
 
 /////////////////////////////////////////////////
@@ -1789,4 +2158,101 @@ void MainWindow::OnEditorGroup(QAction *_action)
       editorGroup->actions()[i]->setChecked(false);
     }
   }
+}
+
+/////////////////////////////////////////////////
+Editor *MainWindow::GetEditor(const std::string &_name) const
+{
+  auto iter = this->editors.find(_name);
+  if (iter != this->editors.end())
+    return iter->second;
+
+  return NULL;
+}
+
+/////////////////////////////////////////////////
+QAction *MainWindow::CloneAction(QAction *_action, QObject *_parent)
+{
+  if (!_action || !_parent)
+  {
+    gzwarn << "Missing action or parent. Not cloning action." << std::endl;
+    return NULL;
+  }
+
+  QAction *actionClone = new QAction(_action->text(), _parent);
+
+  // Copy basic information from original action.
+  actionClone->setStatusTip(_action->statusTip());
+  actionClone->setCheckable(_action->isCheckable());
+  actionClone->setChecked(_action->isChecked());
+
+  // Do not copy shortcut to avoid overlaps. Instead, connect actions.
+  // Cloned action will trigger original action, which does the desired effect.
+  connect(actionClone, SIGNAL(triggered()), _action, SLOT(trigger()));
+  // Then the original action reports its checked state to the cloned action
+  // without triggering it circularly.
+  connect(_action, SIGNAL(toggled(bool)), actionClone, SLOT(setChecked(bool)));
+
+  return actionClone;
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnWindowMode(const std::string &_mode)
+{
+  bool simulation = _mode == "Simulation";
+  bool logPlayback = _mode == "LogPlayback";
+
+  bool simOrLog = simulation || logPlayback;
+
+  // File
+  // g_openAct->setVisible(simOrLog);
+  g_saveAct->setVisible(simOrLog);
+  g_saveAsAct->setVisible(simOrLog);
+  g_saveCfgAct->setVisible(simOrLog);
+  g_cloneAct->setVisible(simulation);
+  g_quitAct->setVisible(simOrLog);
+
+  // Edit
+  this->editMenu->menuAction()->setVisible(simulation);
+  g_resetModelsAct->setVisible(simulation);
+  g_resetWorldAct->setVisible(simulation);
+  g_editBuildingAct->setVisible(simulation);
+  // g_editTerrainAct->setVisible(simulation);
+  g_editModelAct->setVisible(simulation);
+
+  // Camera
+  g_cameraOrthoAct->setVisible(simOrLog);
+  g_cameraPerspectiveAct->setVisible(simOrLog);
+  g_fpsAct->setVisible(simOrLog);
+  g_orbitAct->setVisible(simOrLog);
+  g_resetAct->setVisible(simOrLog);
+
+  // View
+  g_showGridAct->setVisible(simOrLog);
+  g_showOriginAct->setVisible(simOrLog);
+  g_transparentAct->setVisible(simOrLog);
+  g_viewWireframeAct->setVisible(simOrLog);
+  g_showCollisionsAct->setVisible(simOrLog);
+  g_showCOMAct->setVisible(simOrLog);
+  g_showInertiaAct->setVisible(simOrLog);
+  g_showLinkFrameAct->setVisible(simOrLog);
+  g_showContactsAct->setVisible(simOrLog);
+  g_showJointsAct->setVisible(simOrLog);
+
+  // Window
+  g_topicVisAct->setVisible(simOrLog);
+  g_viewOculusAct->setVisible(simOrLog);
+  g_overlayAct->setVisible(simOrLog);
+  g_showToolbarsAct->setVisible(simOrLog);
+  g_fullScreenAct->setVisible(simOrLog);
+
+  // About
+  g_hotkeyChartAct->setVisible(simOrLog);
+  g_aboutAct->setVisible(simOrLog);
+
+  // Insert
+  if (logPlayback)
+    this->tabWidget->removeTab(this->tabWidget->indexOf(this->insertModel));
+  else if (simulation && this->tabWidget->indexOf(this->insertModel) == -1)
+    this->tabWidget->insertTab(1, this->insertModel, "Insert");
 }

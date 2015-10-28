@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,22 @@
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTHeightmapShape.hh"
 
+#include "gazebo/physics/dart/DARTHeightmapShapePrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 DARTHeightmapShape::DARTHeightmapShape(CollisionPtr _parent)
-    : HeightmapShape(_parent)
+  : HeightmapShape(_parent),
+    dataPtr(new DARTHeightmapShapePrivate())
 {
 }
 
 //////////////////////////////////////////////////
 DARTHeightmapShape::~DARTHeightmapShape()
 {
+  delete dataPtr;
 }
 
 //////////////////////////////////////////////////

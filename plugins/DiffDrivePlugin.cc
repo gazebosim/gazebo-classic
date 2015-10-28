@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ enum {RIGHT, LEFT};
 DiffDrivePlugin::DiffDrivePlugin()
 {
   this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
+  this->wheelSeparation = 1.0;
+  this->wheelRadius = 1.0;
 }
 
 /////////////////////////////////////////////////
@@ -52,14 +54,6 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
       _sdf->GetElement("left_joint")->Get<std::string>());
   this->rightJoint = _model->GetJoint(
       _sdf->GetElement("right_joint")->Get<std::string>());
-
-  if (_sdf->HasElement("torque"))
-  {
-    this->torque = _sdf->GetElement("torque")->Get<double>();
-    gzwarn << "The MaxForce API is deprecated in Gazebo, "
-           << "and the torque tag is no longer used in this plugin."
-           << std::endl;
-  }
 
   if (!this->leftJoint)
     gzerr << "Unable to find left joint["
@@ -92,7 +86,7 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
   double vr, va;
 
   vr = _msg->position().x();
-  va =  msgs::Convert(_msg->orientation()).GetAsEuler().z;
+  va =  msgs::ConvertIgn(_msg->orientation()).Euler().Z();
 
   this->wheelSpeed[LEFT] = vr + va * this->wheelSeparation / 2.0;
   this->wheelSpeed[RIGHT] = vr - va * this->wheelSeparation / 2.0;

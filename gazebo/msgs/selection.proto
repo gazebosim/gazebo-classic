@@ -5,13 +5,9 @@ package gazebo.msgs;
 /// \brief A message for GUI selection data
 
 
-import "header.proto";
-
 message Selection
 {
   required uint32 id     = 1;
   required string name   = 2;
   optional bool selected = 3 [default = false];
 }
-
-

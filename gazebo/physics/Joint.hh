@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace gazebo
 
     /// \class Joint Joint.hh physics/physics.hh
     /// \brief Base class for all joints
-    class GAZEBO_VISIBLE Joint : public Base
+    class GZ_PHYSICS_VISIBLE Joint : public Base
     {
       /// \enum Attribute
       /// \brief Joint attribute types.
@@ -351,29 +351,6 @@ namespace gazebo
       /// on conventions.
       public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
-      /// \brief Set the max allowed force of an axis(index) when using
-      /// Joint::SetVelocity.
-      /// Current implementation in Bullet and ODE is enforced using impulses,
-      /// which enforces force/torque limits when calling Joint::SetVelocity.
-      /// Current implementation is engine dependent. See for example
-      /// ODE implementation in ODEHingeJoint::SetMaxForce.
-      /// Note this functionality is not implemented in DART and Simbody.
-      /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _force Maximum force that can be applied to the axis.
-      public: virtual void SetMaxForce(unsigned int _index, double _force)
-              GAZEBO_DEPRECATED(5.0) = 0;
-
-      /// \brief Get the max allowed force of an axis(index) when using
-      /// Joint::SetVelocity.
-      /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.
-      /// \param[in] _index Index of the axis.
-      /// \return The maximum force.
-      public: virtual double GetMaxForce(unsigned int _index)
-              GAZEBO_DEPRECATED(5.0) = 0;
-
       /// \brief Get the angle of rotation of an axis(index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
@@ -382,19 +359,6 @@ namespace gazebo
       /// \brief Get the angle count.
       /// \return The number of DOF for the joint.
       public: virtual unsigned int GetAngleCount() const = 0;
-
-      /// \brief If the Joint is static, Gazebo stores the state of
-      /// this Joint as a scalar inside the Joint class, so
-      /// this call will NOT move the joint dynamically for a static Model.
-      /// But if this Model is not static, then it is updated dynamically.
-      /// The child links of this joint are updated based on position change.
-      /// And all the links connected to the child link of this joint
-      /// except through the parent link of this joint moves with the child
-      /// link.
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _angle Angle to set the joint to.
-      public: void SetAngle(unsigned int _index, math::Angle _angle)
-              GAZEBO_DEPRECATED(4.0);
 
       /// \brief The child links of this joint are updated based on desired
       /// position.  And all the links connected to the child link of this joint
@@ -460,7 +424,7 @@ namespace gazebo
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       public: virtual double GetParam(const std::string &_key,
-                                      unsigned int _index) = 0;
+                                      unsigned int _index);
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
@@ -470,9 +434,13 @@ namespace gazebo
       /// \return Pointer to the parent link.
       public: LinkPtr GetParent() const;
 
+      /// \brief Get the joint type as msgs::Joint::Type.
+      /// \return Joint type.
+      public: msgs::Joint::Type GetMsgType() const;
+
       /// \brief Fill a joint message.
       /// \param[out] _msg Message to fill with this joint's properties.
-      public: void FillMsg(msgs::Joint &_msg);
+      public: virtual void FillMsg(msgs::Joint &_msg);
 
       /// \brief Computes moment of inertia (MOI) across a specified joint axis.
       /// The ratio is given in the form of MOI_chidl / MOI_parent.

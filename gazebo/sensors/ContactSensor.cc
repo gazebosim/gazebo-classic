@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,13 @@
  * Date: 09 Sept. 2008
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 
 #include "gazebo/common/Exception.hh"
@@ -92,6 +99,7 @@ void ContactSensor::Load(const std::string &_worldName)
 
   std::string entityName =
       this->world->GetEntity(this->parentName)->GetScopedName();
+  std::string filterName = entityName + "::" + this->GetName();
 
   // Get all the collision elements
   while (collisionElem)
@@ -112,7 +120,7 @@ void ContactSensor::Load(const std::string &_worldName)
     // this sensor
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    std::string topic = mgr->CreateFilter(this->GetScopedName(), this->collisions);
+    std::string topic = mgr->CreateFilter(filterName, this->collisions);
     if (!this->contactSub)
     {
       this->contactSub = this->node->Subscribe(topic,
@@ -207,10 +215,11 @@ void ContactSensor::Fini()
   {
     std::string entityName =
         this->world->GetEntity(this->parentName)->GetScopedName();
+    std::string filterName = entityName + "::" + this->GetName();
 
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    mgr->RemoveFilter(entityName);
+    mgr->RemoveFilter(filterName);
   }
 
   this->contactSub.reset();

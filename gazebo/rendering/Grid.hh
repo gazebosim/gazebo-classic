@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ namespace gazebo
     ///
     ///  Displays a grid of cells, drawn with lines.  A grid with an
     ///  identity orientation is drawn along the XY plane.
-    class GAZEBO_VISIBLE Grid
+    class GZ_RENDERING_VISIBLE Grid
     {
       /// \brief Constructor
       ///

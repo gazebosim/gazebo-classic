@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,19 +86,6 @@ void SimbodyHinge2Joint::SetForceImpl(
     unsigned int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-double SimbodyHinge2Joint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return 0;
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ namespace gazebo
     /// \{
 
     /// \brief A two axis hinge joint
-    class GAZEBO_VISIBLE SimbodyHinge2Joint : public Hinge2Joint<SimbodyJoint>
+    class GZ_PHYSICS_VISIBLE SimbodyHinge2Joint :
+      public Hinge2Joint<SimbodyJoint>
     {
       /// \brief Constructor
       public: SimbodyHinge2Joint(SimTK::MultibodySystem *world,
@@ -61,12 +62,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);
-
-      // Documentation inherited.
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited.
-      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;

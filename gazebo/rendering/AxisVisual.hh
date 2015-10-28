@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@ namespace gazebo
 
     /// \class AxisVisual AxisVisual.hh rendering/rendering.hh
     /// \brief Basic axis visualization
-    class GAZEBO_VISIBLE AxisVisual : public Visual
+    class GZ_RENDERING_VISIBLE AxisVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the AxisVisual
-      /// \param[in] _vis Parent visual
-      public: AxisVisual(const std::string &_name, VisualPtr _vis);
+      /// \param[in] _parent Parent visual
+      public: AxisVisual(const std::string &_name, VisualPtr _parent);
 
       /// \brief Destructor
       public: virtual ~AxisVisual();
@@ -83,6 +83,14 @@ namespace gazebo
       /// \param[in] _axis The number of the axis (0, 1, 2 = x,y,z)
       /// \param[in] _visible True to set the axis to be visible.
       public: void SetAxisVisible(unsigned int _axis, bool _visible);
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _parent Parent of the visual.
+      protected: AxisVisual(VisualPrivate &_dataPtr,
+          const std::string &_name, VisualPtr _parent);
     };
     /// \}
   }

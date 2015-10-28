@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,12 @@ Angle::Angle(double _radian)
 Angle::Angle(const Angle &_angle)
 {
   this->value = _angle.value;
+}
+
+//////////////////////////////////////////////////
+Angle::Angle(const ignition::math::Angle &_angle)
+{
+  this->value = _angle.Radian();
 }
 
 //////////////////////////////////////////////////
@@ -172,4 +178,22 @@ bool Angle::operator>=(const Angle &angle) const
   return this->value > angle.value || math::equal(this->value, angle.value);
 }
 
+//////////////////////////////////////////////////
+ignition::math::Angle Angle::Ign() const
+{
+  return ignition::math::Angle(this->value);
+}
 
+//////////////////////////////////////////////////
+Angle &Angle::operator=(const double &_angle)
+{
+  this->value = _angle;
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Angle &Angle::operator=(const ignition::math::Angle &_angle)
+{
+  this->value = _angle.Radian();
+  return *this;
+}

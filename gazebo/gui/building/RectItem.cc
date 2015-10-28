@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,13 @@ RectItem::RectItem()
 
   this->width = 100;
   this->height = 100;
+  this->highlighted = true;
 
   this->drawingOriginX = 0;
   this->drawingOriginY = 0;
 
   this->positionOnWall = 0;
+  this->angleOnWall = 0;
 
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
@@ -92,6 +94,11 @@ RectItem::~RectItem()
   }
   this->rotateHandle->setParentItem(NULL);
   delete this->rotateHandle;
+  if (!this->measures.empty())
+  {
+    delete this->measures[0];
+    delete this->measures[1];
+  }
 }
 
 /////////////////////////////////////////////////
@@ -136,6 +143,11 @@ void RectItem::SetHighlighted(bool _highlighted)
   if (_highlighted)
   {
     this->setZValue(zValueSelected);
+    WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+        this->parentItem());
+    if (wallItem)
+      wallItem->setZValue(wallItem->zValueSelected);
+
     for (int i = 0; i < 8; ++i)
     {
       if (this->grabbers[i]->isEnabled())
@@ -147,6 +159,11 @@ void RectItem::SetHighlighted(bool _highlighted)
   else
   {
     this->setZValue(zValueIdle);
+    WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+        this->parentItem());
+    if (wallItem)
+      wallItem->setZValue(wallItem->zValueIdle);
+
     for (int i = 0; i < 8; ++i)
     {
       if (this->grabbers[i]->isEnabled())
@@ -155,6 +172,8 @@ void RectItem::SetHighlighted(bool _highlighted)
     this->rotateHandle->removeSceneEventFilter(this);
     this->Set3dTransparency(0.4);
   }
+  this->highlighted = _highlighted;
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
@@ -244,6 +263,10 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
       {
         angle = 180;
         this->SetRotation(this->GetRotation() + angle);
+        if (this->GetAngleOnWall() < 90)
+          this->SetAngleOnWall(180);
+        else
+          this->SetAngleOnWall(0);
       }
     }
     else
@@ -476,6 +499,24 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
         dx = cos(-angle) * deltaWidth/2;
         dy = -sin(-angle) * deltaWidth/2;
         this->SetPosition(this->pos() - QPointF(dx, dy));
+        if (this->parentItem())
+        {
+          WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+              this->parentItem());
+          if (wallItem)
+          {
+            if (this->GetAngleOnWall() < 90)
+            {
+              this->positionOnWall -= deltaWidth /
+                  (2*wallItem->line().length());
+            }
+            else
+            {
+              this->positionOnWall += deltaWidth /
+                  (2*wallItem->line().length());
+            }
+          }
+        }
         break;
       }
       case 5:
@@ -490,6 +531,24 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
         dx = cos(angle) * deltaWidth/2;
         dy = sin(angle) * deltaWidth/2;
         this->SetPosition(this->pos() + QPointF(dx, dy));
+        if (this->parentItem())
+        {
+          WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+              this->parentItem());
+          if (wallItem)
+          {
+            if (this->GetAngleOnWall() < 90)
+            {
+              this->positionOnWall += deltaWidth /
+                  (2*wallItem->line().length());
+            }
+            else
+            {
+              this->positionOnWall -= deltaWidth /
+                  (2*wallItem->line().length());
+            }
+          }
+        }
         break;
       }
       default:
@@ -697,12 +756,26 @@ double RectItem::GetHeight() const
 void RectItem::SetPositionOnWall(double _positionOnWall)
 {
   this->positionOnWall = _positionOnWall;
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
 double RectItem::GetPositionOnWall() const
 {
   return this->positionOnWall;
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetAngleOnWall(double _angleOnWall)
+{
+  this->angleOnWall = _angleOnWall;
+  this->UpdateMeasures();
+}
+
+/////////////////////////////////////////////////
+double RectItem::GetAngleOnWall() const
+{
+  return this->angleOnWall;
 }
 
 /////////////////////////////////////////////////
@@ -836,6 +909,7 @@ void RectItem::SizeChanged()
 {
   emit DepthChanged(this->drawingHeight);
   emit WidthChanged(this->drawingWidth);
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
@@ -865,5 +939,79 @@ void RectItem::SetResizeFlag(unsigned int _flag)
     this->grabbers[2]->setEnabled(true);
     this->grabbers[4]->setEnabled(true);
     this->grabbers[6]->setEnabled(true);
+  }
+}
+
+/////////////////////////////////////////////////
+void RectItem::UpdateMeasures()
+{
+  // Only windows and doors can have a wall as parent
+  WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+    this->parentItem());
+  if (wallItem == NULL)
+  {
+    for (unsigned int i = 0; i < this->measures.size(); ++i)
+    {
+      this->measures[i]->setVisible(false);
+    }
+    return;
+  }
+
+  if (this->measures.empty())
+  {
+    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
+    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
+    this->measures[0]->setVisible(false);
+    this->measures[1]->setVisible(false);
+  }
+
+  this->measures[0]->setParentItem(wallItem);
+  this->measures[1]->setParentItem(wallItem);
+  this->measures[0]->setVisible(this->highlighted);
+  this->measures[1]->setVisible(this->highlighted);
+
+  if (this->highlighted)
+  {
+    // Half wall thickness
+    double t = wallItem->GetThickness()/2;
+    // Distance in px between wall line and measure line
+    double d = 20 + t;
+    // Half the RectItem's length
+    double w = this->drawingWidth/2;
+    // This item's angle on the scene
+    double angle = GZ_DTOR(this->rotationAngle);
+    // Free vector of t on wall direction, for the extremes
+    QPointF tVec(t*qCos(angle), t*qSin(angle));
+    // Free vector of d perpendicular to the wall
+    QPointF dVec(d*qCos(angle+M_PI/2.0), d*qSin(angle+M_PI/2.0));
+
+    QPointF p1wall = wallItem->GetStartPoint();
+    QPointF p2wall = wallItem->GetEndPoint();
+    QPointF p1rect(this->scenePos().x()-w*qCos(angle),
+                   this->scenePos().y()-w*qSin(angle));
+    QPointF p2rect(this->scenePos().x()+w*qCos(angle),
+                   this->scenePos().y()+w*qSin(angle));
+
+    QPointF extreme1 = p1wall;
+    QPointF extreme2 = p2wall;
+
+    // Swap extremes if item is flipped on wall
+    if (this->GetAngleOnWall() > 90)
+    {
+      extreme1 = p2wall;
+      extreme2 = p1wall;
+    }
+
+    // Measure 0, from extreme 1 to RectItem's start point
+    this->measures[0]->SetStartPoint(extreme1 - tVec - dVec);
+    this->measures[0]->SetEndPoint(p1rect - dVec);
+    // Measure 1, from RectItem's end point to extreme 2
+    this->measures[1]->SetStartPoint(p2rect - dVec);
+    this->measures[1]->SetEndPoint(extreme2 + tVec - dVec);
+
+    this->measures[0]->SetValue(
+        (this->measures[0]->line().length())*this->itemScale);
+    this->measures[1]->SetValue(
+        (this->measures[1]->line().length())*this->itemScale);
   }
 }

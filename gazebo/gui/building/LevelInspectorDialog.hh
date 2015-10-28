@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+#include "gazebo/gui/building/BaseInspectorDialog.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,8 @@ namespace gazebo
 
     /// \class LevelInspectorDialog LevelInspectorDialog.hh
     /// \brief Dialog for configuring a building level
-    class GAZEBO_VISIBLE LevelInspectorDialog : public QDialog
+    class GZ_GUI_VISIBLE LevelInspectorDialog
+      : public BaseInspectorDialog
     {
       Q_OBJECT
 
@@ -51,10 +53,6 @@ namespace gazebo
       /// \return The level height in pixels.
       public: double GetHeight() const;
 
-      /// \brief Get the color of this level's floor.
-      /// \return Floor color.
-      public: QColor GetFloorColor() const;
-
       /// \brief Set the name of the level.
       /// \param[in] _levelName New level name.
       public: void SetLevelName(const std::string &_levelName);
@@ -62,10 +60,6 @@ namespace gazebo
       /// \brief Set the height of the level.
       /// \param[in] _height Level height in pixels.
       public: void SetHeight(double _height);
-
-      /// \brief Set the color of this level's floor.
-      /// \param[in] _color Color.
-      public: void SetFloorColor(const QColor _color);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -90,15 +84,6 @@ namespace gazebo
 
       /// \brief Spin box for configuring the floor thickness.
       private: QDoubleSpinBox *floorThicknessSpinBox;
-
-      /// \brief Combo box for configuring the floor material.
-      private: QComboBox *materialComboBox;
-
-      /// \brief Combo box for selecting the color of the floor.
-      private: QComboBox *floorColorComboBox;
-
-      /// \brief Vector of color options for the floor.
-      private: std::vector<QColor> floorColorList;
     };
     /// \}
   }

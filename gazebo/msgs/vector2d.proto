@@ -5,8 +5,6 @@ package gazebo.msgs;
 /// \brief Message for a vector2 double
 
 
-import "header.proto";
-
 message Vector2d
 {
   required double x = 1;

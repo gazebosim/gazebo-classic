@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,25 +51,6 @@ namespace gazebo
   /// \return True on success.
   GAZEBO_VISIBLE
   bool setupServer(const std::vector<std::string> &_args);
-
-  /// \brief Start a gazebo client. This starts transportation, and makes it
-  /// possible to connect to a running simulation.
-  /// \param[in] _argc Number of commandline arguments.
-  /// \param[in] _argv The commandline arguments.
-  /// \return True on success.
-  GAZEBO_VISIBLE
-  bool setupClient(int _argc = 0, char **_argv = 0);
-
-  /// \brief Start a gazebo client. This starts transportation, and makes it
-  /// possible to connect to a running simulation.
-  /// \param[in] _args Vector of arguments only parsed by the system plugins.
-  /// Note that when you run gazebo/gzserver, all the options (--version,
-  /// --server-plugin, etc.) are parsed but when using Gazebo as a library, the
-  /// arguments are only parsed by the system plugins.
-  /// \sa gazebo::SystemPlugin::Load()
-  /// \return True on success.
-  GAZEBO_VISIBLE
-  bool setupClient(const std::vector<std::string> &_args);
 
   /// \brief Create and load a new world from an SDF world file.
   /// \param[in] _worldFile The world file to load from.

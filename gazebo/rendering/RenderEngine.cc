@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,34 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
-#ifdef  __APPLE__
+#include <string>
+#include <iostream>
+#include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
+#include <sys/types.h>
+
+#ifdef __APPLE__
 # include <QtCore/qglobal.h>
 #endif
 
-#ifndef Q_OS_MAC  // Not Apple
+// Not Apple or Windows
+#if not defined( Q_OS_MAC) && not defined(_WIN32)
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>
 #endif
 
-#include <sys/types.h>
-#include <dirent.h>
-#include <string>
-#include <iostream>
-
-#include <boost/filesystem.hpp>
+#ifndef _WIN32
+  #include <dirent.h>
+#else
+  #include "gazebo/common/win_dirent.h"
+#endif
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -141,10 +152,12 @@ void RenderEngine::Load()
     this->SetupResources();
   }
 
-  std::stringstream stream;
-  stream << (int32_t)this->dummyWindowId;
+  // Create a 1x1 render window so that we can grab a GL context. Based on
+  // testing, this is a hard requirement by Apple. We also need it to
+  // properly initialize GLWidget and UserCameras. See the GLWidget
+  // constructor.
+  this->windowManager->CreateWindow(std::to_string(this->dummyWindowId), 1, 1);
 
-  this->windowManager->CreateWindow(stream.str(), 1, 1);
   this->CheckSystemCapabilities();
 }
 
@@ -218,7 +231,6 @@ void RenderEngine::RemoveScene(const std::string &_name)
 
   if (iter != this->scenes.end())
   {
-    RTShaderSystem::Instance()->Clear();
     rendering::Events::removeScene(_name);
 
     (*iter)->Clear();
@@ -264,7 +276,6 @@ unsigned int RenderEngine::GetSceneCount() const
 void RenderEngine::PreRender()
 {
   this->root->_fireFrameStarted();
-  this->root->_fireFrameRenderingQueued();
 }
 
 //////////////////////////////////////////////////
@@ -275,8 +286,10 @@ void RenderEngine::Render()
 //////////////////////////////////////////////////
 void RenderEngine::PostRender()
 {
-  // _fireFrameRenderingQueued needs to be here for CEGUI to work
-  // this->root->_fireFrameRenderingQueued();
+  // _fireFrameRenderingQueued was here for CEGUI to work. Leaving because
+  // it shouldn't harm anything, and we don't want to introduce
+  // a regression.
+  this->root->_fireFrameRenderingQueued();
   this->root->_fireFrameEnded();
 }
 
@@ -284,7 +297,12 @@ void RenderEngine::PostRender()
 void RenderEngine::Init()
 {
   if (this->renderPathType == NONE)
+  {
+    gzwarn << "Cannot initialize render engine since "
+           << "render path type is NONE. Ignore this warning if"
+           << "rendering has been turned off on purpose.\n";
     return;
+  }
 
   this->initialized = false;
 
@@ -370,7 +388,8 @@ void RenderEngine::Fini()
     this->scenes[i].reset();
   this->scenes.clear();
 
-#ifndef Q_OS_MAC
+  // Not Apple or Windows
+# if not defined( Q_OS_MAC) && not defined(_WIN32)
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -380,7 +399,7 @@ void RenderEngine::Fini()
     XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
     this->dummyDisplay = NULL;
   }
-#endif
+# endif
 
   this->initialized = false;
 }
@@ -670,7 +689,7 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
-#ifdef Q_OS_MAC
+#if defined Q_OS_MAC || _WIN32
   this->dummyDisplay = 0;
 #else
   try

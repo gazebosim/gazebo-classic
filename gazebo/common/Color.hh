@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Color class
- * Author: Nate Koenig
- * Date: 08 May 2009
- */
-
 #ifndef _GAZEBO_COLOR_HH_
 #define _GAZEBO_COLOR_HH_
 
 #include <iostream>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +33,7 @@ namespace gazebo
 
     /// \class Color Color.hh common/common.hh
     /// \brief Defines a color
-    class GAZEBO_VISIBLE Color
+    class GZ_COMMON_VISIBLE Color
     {
       /// \brief (1, 1, 1)
       public: static const Color White;
@@ -97,8 +94,8 @@ namespace gazebo
       public: void Set(float _r = 1, float _g = 1 , float _b = 1, float _a = 1);
 
       /// \brief Get the color in HSV colorspace
-      /// \return HSV values in a math::Vector3 format
-      public: math::Vector3 GetAsHSV() const;
+      /// \return HSV values in an ignition::math::Vector3d format.
+      public: ignition::math::Vector3d HSV() const;
 
       /// \brief Set a color based on HSV values
       /// \param[in] _h Hue(0..360)
@@ -108,7 +105,13 @@ namespace gazebo
 
       /// \brief Get the color in YUV colorspace
       /// \return the YUV  color
+      /// \deprecated See YUV() function that returns an
+      /// ignition::math::Vector3d object.
       public: math::Vector3 GetAsYUV() const;
+
+      /// \brief Get the color in YUV colorspace
+      /// \return The YUV color in an ignition::math::Vector3d format.
+      public: ignition::math::Vector3d YUV() const;
 
       /// \brief Set from yuv
       /// \param[in] _y value

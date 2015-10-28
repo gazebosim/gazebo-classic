@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,8 +69,8 @@ TEST_F(ColladaExporter, ExportBox)
   const common::Mesh *meshReloaded = loader.Load(filenameOut);
 
   EXPECT_EQ(meshOriginal->GetName(), meshReloaded->GetName());
-  EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());
-  EXPECT_EQ(meshOriginal->GetMin(), meshReloaded->GetMin());
+  EXPECT_EQ(meshOriginal->Max(), meshReloaded->Max());
+  EXPECT_EQ(meshOriginal->Min(), meshReloaded->Min());
   EXPECT_EQ(meshOriginal->GetSubMeshCount(), meshReloaded->GetSubMeshCount());
   EXPECT_EQ(meshOriginal->GetMaterialCount(),
       meshReloaded->GetMaterialCount());
@@ -83,18 +83,18 @@ TEST_F(ColladaExporter, ExportBox)
   {
     for (unsigned int j = 0; j < meshOriginal->GetVertexCount(); ++j)
     {
-      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetVertex(j),
-          meshReloaded->GetSubMesh(i)->GetVertex(j));
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->Vertex(j),
+                meshReloaded->GetSubMesh(i)->Vertex(j));
     }
     for (unsigned int j = 0; j < meshOriginal->GetNormalCount(); ++j)
     {
-      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetNormal(j),
-          meshReloaded->GetSubMesh(i)->GetNormal(j));
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->Normal(j),
+                meshReloaded->GetSubMesh(i)->Normal(j));
     }
     for (unsigned int j = 0; j < meshOriginal->GetTexCoordCount(); ++j)
     {
-      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetTexCoord(j),
-          meshReloaded->GetSubMesh(i)->GetTexCoord(j));
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->TexCoord(j),
+                meshReloaded->GetSubMesh(i)->TexCoord(j));
     }
   }
 
@@ -150,8 +150,8 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
       "/tmp/cordless_drill_exported/meshes/cordless_drill_exported.dae");
 
   EXPECT_EQ(meshOriginal->GetName(), meshReloaded->GetName());
-  EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());
-  EXPECT_EQ(meshOriginal->GetMin(), meshReloaded->GetMin());
+  EXPECT_EQ(meshOriginal->Max(), meshReloaded->Max());
+  EXPECT_EQ(meshOriginal->Min(), meshReloaded->Min());
   EXPECT_EQ(meshOriginal->GetSubMeshCount(), meshReloaded->GetSubMeshCount());
   EXPECT_EQ(meshOriginal->GetMaterialCount(),
       meshReloaded->GetMaterialCount());
@@ -164,18 +164,18 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   {
     for (unsigned int j = 0; j < meshOriginal->GetVertexCount(); ++j)
     {
-      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetVertex(j),
-          meshReloaded->GetSubMesh(i)->GetVertex(j));
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->Vertex(j),
+          meshReloaded->GetSubMesh(i)->Vertex(j));
     }
     for (unsigned int j = 0; j < meshOriginal->GetNormalCount(); ++j)
     {
-      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetNormal(j),
-          meshReloaded->GetSubMesh(i)->GetNormal(j));
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->Normal(j),
+          meshReloaded->GetSubMesh(i)->Normal(j));
     }
     for (unsigned int j = 0; j < meshOriginal->GetTexCoordCount(); ++j)
     {
-      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetTexCoord(j),
-          meshReloaded->GetSubMesh(i)->GetTexCoord(j));
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->TexCoord(j),
+                meshReloaded->GetSubMesh(i)->TexCoord(j));
     }
   }
 

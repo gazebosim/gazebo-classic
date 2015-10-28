@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,13 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/bind.hpp>
 #include <gazebo/gazebo_config.h>
 #ifdef HAVE_SPNAV
 #include <spnav.h>
@@ -26,6 +33,33 @@
 
 using namespace gazebo;
 using namespace gui;
+
+/////////////////////////////////////////////////
+// Copied from libspnav in order to prevent an error message from
+// spnav_open() when spnav daemon is not running.
+int spnav_test_daemon(void)
+{
+#ifndef _WIN32
+  int s;
+  struct sockaddr_un addr;
+
+  if ((s = socket(PF_UNIX, SOCK_STREAM, 0)) == -1)
+    return -1;
+
+  memset(&addr, 0, sizeof addr);
+  addr.sun_family = AF_UNIX;
+  strncpy(addr.sun_path, "/var/run/spnav.sock", sizeof(addr.sun_path));
+
+  if (connect(s, (struct sockaddr*)&addr, sizeof addr) == -1)
+  {
+    close(s);
+    return -1;
+  }
+
+  close(s);
+#endif
+  return 0;
+}
 
 /////////////////////////////////////////////////
 SpaceNav::SpaceNav()
@@ -69,7 +103,10 @@ bool SpaceNav::Load()
   std::string topic = getINIProperty<std::string>("spacenav.topic",
                                                   "~/user_camera/joy_twist");
 
-  if (spnav_open() >= 0)
+  // Get whether the spacename daemon exists and is running.
+  int daemonRunning = spnav_test_daemon();
+
+  if (daemonRunning >= 0 && spnav_open() >= 0)
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
     this->dataPtr->node->Init();
@@ -79,11 +116,15 @@ bool SpaceNav::Load()
     this->dataPtr->pollThread = new boost::thread(
         boost::bind(&SpaceNav::Run, this));
   }
-  else
+  else if (daemonRunning >= 0)
   {
     gzerr << "Unable to open space navigator device."
       << "Please make sure you have run spacenavd as root.\n";
     result = false;
+  }
+  else
+  {
+    gzlog << "No spacenav daemon found. Spacenav functionality is disabled\n";
   }
 #endif
 
@@ -116,7 +157,7 @@ void SpaceNav::Run()
         break;
 
       case SPNAV_EVENT_BUTTON:
-        // update if button pressed
+        // update button press
         this->dataPtr->buttons[sev.button.bnum] = sev.button.press;
         joystickMsg.mutable_buttons()->Set(sev.button.bnum, sev.button.press);
         this->dataPtr->joyPub->Publish(joystickMsg);

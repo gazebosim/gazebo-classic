@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace gazebo
     /// \brief HeightmapShape collision shape builds a heightmap from
     /// an image.  The supplied image must be square with
     /// N*N+1 pixels per side, where N is an integer.
-    class GAZEBO_VISIBLE HeightmapShape : public Shape
+    class GZ_PHYSICS_VISIBLE HeightmapShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision object.
@@ -96,6 +96,9 @@ namespace gazebo
       /// \brief Update the heightmap from a message.
       /// \param[in] _msg Message to update from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
 
       /// \brief Get the maximum height.
       /// \return The maximum height.

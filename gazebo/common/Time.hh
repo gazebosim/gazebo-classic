@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
 
-#ifndef _TIME_HH_
-#define _TIME_HH_
+#ifndef _GAZEBO_COMMON_TIME_HH_
+#define _GAZEBO_COMMON_TIME_HH_
 
 #include <string>
 #include <stdlib.h>
@@ -34,16 +30,43 @@ namespace gazebo
 {
   namespace common
   {
+    /// \brief Convert seconds to hours. This divides the given value by
+    /// the number of seconds in an hour, which is 3600.
+    /// \param[in] _s Seconds to convert.
+    #define GZ_SEC_TO_HOUR(_s) ((_s) / 3600.0)
+
     /// \addtogroup gazebo_common
     /// \{
 
     /// \class Time Time.hh common/common.hh
     /// \brief A Time class, can be used to hold wall- or sim-time.
     ///        stored as sec and nano-sec.
-    class GAZEBO_VISIBLE Time
+    class GZ_COMMON_VISIBLE Time
     {
       /// \brief A static zero time variable set to common::Time(0, 0).
       public: static const Time Zero;
+
+      /// \brief A static time variable set to a second: common::Time(1, 0).
+      public: static const Time Second;
+
+      /// \brief A static time variable set to an hour: common::Time(3600, 0).
+      public: static const Time Hour;
+
+      /// \enum Format options
+      /// \brief Options for formatting time as a string.
+      public: enum FormatOption
+      {
+        /// \brief Days
+        DAYS = 0,
+        /// \brief Hours
+        HOURS = 1,
+        /// \brief Minutes
+        MINUTES = 2,
+        /// \brief Seconds
+        SECONDS = 3,
+        /// \brief Milliseconds
+        MILLISECONDS = 4
+      };
 
       /// \brief Constructors
       public: Time();
@@ -99,6 +122,14 @@ namespace gazebo
       /// \brief Get the time as a float
       /// \return Time as a float in seconds
       public: float Float() const;
+
+      /// \brief Get the time as a string formatted as "DD hh:mm:ss.mmm", with
+      /// the option to choose the start/end.
+      /// \param[in] _start Start point.
+      /// \param[in] _end End point.
+      /// \return String representing time.
+      public: std::string FormattedString(FormatOption _start = DAYS,
+          FormatOption _end = MILLISECONDS) const;
 
       /// \brief Sleep for the specified time
       /// \param[in] _time Sleep time
@@ -431,22 +462,30 @@ namespace gazebo
                  // In the case sec and nsec have different signs, normalize
                  if (this->sec > 0 && this->nsec < 0)
                  {
-                   int32_t n = abs(this->nsec / 1e9) + 1;
+                   int32_t n = abs(this->nsec / this->nsInSec) + 1;
                    this->sec -= n;
-                   this->nsec += n * 1e9;
+                   this->nsec += n * this->nsInSec;
                  }
                  if (this->sec < 0 && this->nsec > 0)
                  {
-                   int32_t n = abs(this->nsec / 1e9) + 1;
+                   int32_t n = abs(this->nsec / this->nsInSec) + 1;
                    this->sec += n;
-                   this->nsec -= n * 1e9;
+                   this->nsec -= n * this->nsInSec;
                  }
 
                  // Make any corrections
-                 this->sec += this->nsec / static_cast<int32_t>(1e9);
-                 this->nsec = this->nsec % static_cast<int32_t>(1e9);
+                 this->sec += this->nsec / this->nsInSec;
+                 this->nsec = this->nsec % this->nsInSec;
                }
+
       private: static struct timespec clockResolution;
+
+      /// \brief Constant multiplier to convert from nanoseconds to seconds.
+      private: static const int32_t nsInSec;
+
+      /// \brief Constant multiplier to convert from nanoseconds to
+      /// milliseconds.
+      private: static const int32_t nsInMs;
     };
     /// \}
   }

@@ -5,13 +5,13 @@ package gazebo.msgs;
 /// \brief Information about a link
 
 
-import "header.proto";
 import "inertial.proto";
 import "collision.proto";
 import "visual.proto";
 import "sensor.proto";
 import "projector.proto";
 import "pose.proto";
+import "battery.proto";
 
 message Link
 {
@@ -28,4 +28,7 @@ message Link
   repeated Sensor sensor        = 11;
   repeated Projector projector  = 12;
   optional bool canonical       = 13;
+
+  /// \brief An optional vector of batteries that are attached to this link.
+  repeated Battery battery      = 14;
 }

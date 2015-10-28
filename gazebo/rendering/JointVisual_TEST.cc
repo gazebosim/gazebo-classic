@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/JointVisual.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
+using namespace gazebo;
 class JointVisual_TEST : public ServerFixture
 {
 };
@@ -52,12 +53,13 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointMsg->set_child_id(childVis->GetId());
   jointMsg->set_name("test_joint");
   jointMsg->set_id(11111);
-  msgs::Set(jointMsg->mutable_pose(), math::Pose(1, 2, 3, 1.57, 1.57, 0));
+  msgs::Set(jointMsg->mutable_pose(),
+      ignition::math::Pose3d(1, 2, 3, 1.57, 1.57, 0));
   jointMsg->set_type(msgs::Joint::REVOLUTE2);
   jointMsg->add_angle(1.2);
   {
     msgs::Axis *axis1 = jointMsg->mutable_axis1();
-    msgs::Set(axis1->mutable_xyz(), gazebo::math::Vector3(0, 1, 0));
+    msgs::Set(axis1->mutable_xyz(), ignition::math::Vector3d(0, 1, 0));
     axis1->set_limit_lower(-1.2);
     axis1->set_limit_upper(2.3);
     axis1->set_limit_effort(6);
@@ -69,7 +71,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointMsg->add_angle(-1.2);
   {
     msgs::Axis *axis2 = jointMsg->mutable_axis2();
-    msgs::Set(axis2->mutable_xyz(), gazebo::math::Vector3(0, 0, 1));
+    msgs::Set(axis2->mutable_xyz(), ignition::math::Vector3d(0, 0, 1));
     axis2->set_limit_lower(-1.2);
     axis2->set_limit_upper(-0.3);
     axis2->set_limit_effort(3);
@@ -85,6 +87,87 @@ TEST_F(JointVisual_TEST, JointVisualTest)
       new gazebo::rendering::JointVisual(
       "model_GUIONLY_joint_vis", childVis));
   jointVis->Load(jointMsg);
+
+  // pose matches the message's pose
+  EXPECT_EQ(jointVis->GetPose(), math::Pose(1, 2, 3, 1.57, 1.57, 0));
+
+  // has axis 1 and it is visible
+  EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetArrowVisual()->GetVisible());
+
+  // has axis 2 and it is visible
+  EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
+
+  // update pose from a message
+  jointMsg.reset(new gazebo::msgs::Joint);
+  jointMsg->set_name("test_joint");
+  msgs::Set(jointMsg->mutable_pose(),
+      ignition::math::Pose3d(3, 2, 1, 0, 1.57, 0));
+  jointVis->UpdateFromMsg(jointMsg);
+
+  // pose properly updated
+  EXPECT_EQ(jointVis->GetPose(), math::Pose(3, 2, 1, 0, 1.57, 0));
+
+  // axis 1 still visible
+  EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetArrowVisual()->GetVisible());
+
+  // axis 2 still visible
+  EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
+
+  // update joint type and axis from a message
+  jointMsg.reset(new gazebo::msgs::Joint);
+  jointMsg->set_name("test_joint");
+  jointMsg->set_type(msgs::Joint::REVOLUTE);
+  jointMsg->add_angle(2.5);
+  {
+    msgs::Axis *axis1 = jointMsg->mutable_axis1();
+    msgs::Set(axis1->mutable_xyz(), ignition::math::Vector3d(1, 0, 0));
+    axis1->set_limit_lower(-1.2);
+    axis1->set_limit_upper(2.3);
+    axis1->set_limit_effort(6);
+    axis1->set_limit_velocity(1);
+    axis1->set_damping(true);
+    axis1->set_friction(true);
+    axis1->set_use_parent_model_frame(false);
+  }
+  jointVis->UpdateFromMsg(jointMsg);
+
+  // pose hasn't changed
+  EXPECT_EQ(jointVis->GetPose(), math::Pose(3, 2, 1, 0, 1.57, 0));
+
+  // axis 1 still visible
+  EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetArrowVisual()->GetVisible());
+
+  // axis 2 still there but not visible
+  EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
+  EXPECT_FALSE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
+
+  // update joint type and pose from a message
+  jointMsg.reset(new gazebo::msgs::Joint);
+  jointMsg->set_name("test_joint");
+  msgs::Set(jointMsg->mutable_pose(),
+      ignition::math::Pose3d(0, -2, 1, -1.57, 1.57, 0));
+  jointMsg->set_type(msgs::Joint::BALL);
+  jointVis->UpdateFromMsg(jointMsg);
+
+  // new pose
+  EXPECT_EQ(jointVis->GetPose(), math::Pose(0, -2, 1, -1.57, 1.57, 0));
+
+  // axis 1 still there but not visible
+  EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
+  EXPECT_FALSE(jointVis->GetArrowVisual()->GetVisible());
+
+  // axis 2 still there but not visible
+  EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
+  EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
+  EXPECT_FALSE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
 }
 
 /////////////////////////////////////////////////

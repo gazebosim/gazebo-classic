@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/ModelState.hh"
+#include "gazebo/physics/LightState.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -43,7 +44,7 @@ namespace gazebo
     /// Instances of this class contain the state of a World at a specific
     /// time. World state includes the state of all models, and their
     /// children.
-    class GAZEBO_VISIBLE WorldState : public State
+    class GZ_PHYSICS_VISIBLE WorldState : public State
     {
       /// \brief Default constructor
       public: WorldState();
@@ -89,6 +90,10 @@ namespace gazebo
       /// \return A vector of model states.
       public: const ModelState_M &GetModelStates() const;
 
+      /// \brief Get the light states.
+      /// \return A vector of light states.
+      public: const LightState_M &LightStates() const;
+
       /// \brief Get the number of model states.
       ///
       /// Returns the number of models in this instance.
@@ -101,11 +106,44 @@ namespace gazebo
       /// \throws common::Exception When the _modelName doesn't exist.
       public: ModelState GetModelState(const std::string &_modelName) const;
 
+      /// \brief Get a light state by light name.
+      /// \param[in] _lightName Name of the light state to get.
+      /// \return The light state.
+      /// \throws common::Exception When the _lightName doesn't exist.
+      public: LightState GetLightState(const std::string &_lightName) const;
+
       /// \brief Return true if WorldState has a ModelState with the given
       /// name.
       /// \param[in] _modelName Name of the model to search for.
       /// \return True if the ModelState exists.
       public: bool HasModelState(const std::string &_modelName) const;
+
+      /// \brief Return true if WorldState has a LightState with the given
+      /// name.
+      /// \param[in] _lightName Name of the light to search for.
+      /// \return True if the LightState exists.
+      public: bool HasLightState(const std::string &_lightName) const;
+
+      /// \brief Get the vector of SDF insertions.
+      /// \return A vector of SDF blocks. Each block contains the SDF of the
+      /// model to be spawned in the simulation.
+      public: const std::vector<std::string> &Insertions() const;
+
+      /// \brief Set a new vector of SDF insertions.
+      /// \param[in] _insertions Vector containing SDF blocks. Each block should
+      /// contain the SDF of the new models spawned in the current simulation
+      /// frame.
+      public: void SetInsertions(const std::vector<std::string> &_insertions);
+
+      /// \brief Get the vector of SDF deletions.
+      /// \return A vector of SDF blocks. Each block contains the SDF of the
+      /// model to be removed from the simulation.
+      public: const std::vector<std::string> &Deletions() const;
+
+      /// \brief Set a new vector of SDF deletions.
+      /// \param[in] _deletions Vector containing SDF blocks. Each block should
+      /// contain the SDF of the models removed in the current simulation frame.
+      public: void SetDeletions(const std::vector<std::string> &_deletions);
 
       /// \brief Return true if the values in the state are zero.
       ///
@@ -129,6 +167,11 @@ namespace gazebo
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
       public: virtual void SetSimTime(const common::Time &_time);
+
+      /// \brief Set the simulation interations when this state was generated
+      /// \param[in] _iterations Simulation iterations when the data was
+      /// recorded.
+      public: virtual void SetIterations(const uint64_t _iterations);
 
       /// \brief Assignment operator
       /// \param[in] _state State value
@@ -155,7 +198,8 @@ namespace gazebo
         _out << "<state world_name='" << _state.name << "'>"
           << "<sim_time>" << _state.simTime << "</sim_time>"
           << "<wall_time>" << _state.wallTime << "</wall_time>"
-          << "<real_time>" << _state.realTime << "</real_time>";
+          << "<real_time>" << _state.realTime << "</real_time>"
+          << "<iterations>" << _state.iterations << "</iterations>";
 
         // List all of the inserted models
         if (_state.insertions.size() > 0)
@@ -184,10 +228,15 @@ namespace gazebo
         }
 
         // List the model states
-        for (ModelState_M::const_iterator iter = _state.modelStates.begin();
-            iter != _state.modelStates.end(); ++iter)
+        for (const auto &model : _state.modelStates)
         {
-          _out << iter->second;
+          _out << model.second;
+        }
+
+        // List the light states
+        for (const auto &light : _state.lightStates)
+        {
+          _out << light.second;
         }
 
         _out << "</state>";
@@ -197,6 +246,9 @@ namespace gazebo
 
       /// \brief State of all the models.
       private: ModelState_M modelStates;
+
+      /// \brief A map between all the light names and their states.
+      private: LightState_M lightStates;
 
       /// \brief List of new added models. The
       /// value is the SDF that describes the model.

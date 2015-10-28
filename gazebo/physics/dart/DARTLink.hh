@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,16 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTLinkPrivate;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_dart DART Physics
     /// \brief dart physics engine wrapper
     /// \{
 
     /// \brief DART Link class
-    class GAZEBO_VISIBLE DARTLink : public Link
+    class GZ_PHYSICS_VISIBLE DARTLink : public Link
     {
       /// \brief Constructor
       public: explicit DARTLink(EntityPtr _parent);
@@ -88,6 +91,10 @@ namespace gazebo
       public: virtual void AddForceAtRelativePosition(
           const math::Vector3 &_force,
           const math::Vector3 &_relpos);
+
+      // Documentation inherited
+      public: virtual void AddLinkForce(const math::Vector3 &_force,
+          const math::Vector3 &_offset = math::Vector3::Zero);
 
       // Documentation inherited
       public: virtual void AddTorque(const math::Vector3 &_torque);
@@ -172,23 +179,12 @@ namespace gazebo
       /// \param[in] _dartChildJoint Pointer to the child joint.
       public: void AddDARTChildJoint(DARTJointPtr _dartChildJoint);
 
-      /// \brief Pointer to the DART physics engine.
-      private: DARTPhysicsPtr dartPhysics;
+      // Documentation inherited.
+      public: virtual void UpdateMass();
 
-      /// \brief Pointer to the DART BodyNode.
-      private: dart::dynamics::BodyNode *dtBodyNode;
-
-      /// \brief Pointer to the parent joint.
-      private: DARTJointPtr dartParentJoint;
-
-      /// \brief List of pointers to the child joints.
-      private: std::vector<DARTJointPtr> dartChildJoints;
-
-      /// \brief If true, freeze link to world (inertial) frame.
-      private: bool staticLink;
-
-      /// \brief Weld joint constraint for SetLinkStatic()
-      private: dart::constraint::WeldJointConstraint *weldJointConst;
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTLinkPrivate *dataPtr;
     };
     /// \}
   }

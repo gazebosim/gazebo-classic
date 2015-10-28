@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,25 +25,25 @@
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTRayShape.hh"
 
+#include "gazebo/physics/dart/DARTRayShapePrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 DARTRayShape::DARTRayShape(PhysicsEnginePtr _physicsEngine)
-  : RayShape(_physicsEngine)
+  : RayShape(_physicsEngine),
+    dataPtr(new DARTRayShapePrivate())
 {
   this->SetName("DART_ray_shape");
-  this->physicsEngine =
-    boost::static_pointer_cast<DARTPhysics>(_physicsEngine);
 }
 
 //////////////////////////////////////////////////
 DARTRayShape::DARTRayShape(CollisionPtr _parent)
-    : RayShape(_parent)
+  : RayShape(_parent),
+    dataPtr(new DARTRayShapePrivate())
 {
   this->SetName("DART_ray_shape");
-  this->physicsEngine = boost::static_pointer_cast<DARTPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 
 //////////////////////////////////////////////////
@@ -62,10 +62,6 @@ void DARTRayShape::GetIntersection(double &_dist, std::string &_entity)
 {
   _dist = 0;
   _entity = "";
-
-  if (this->physicsEngine)
-  {
-  }
 
   // Not implemented yet, please see issue #911
 }

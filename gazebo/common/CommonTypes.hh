@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 #include <boost/shared_ptr.hpp>
 #include "gazebo/util/system.hh"
 
@@ -37,8 +38,11 @@
 #if defined(__GNUC__)
 #define GAZEBO_DEPRECATED(version) __attribute__((deprecated))
 #define GAZEBO_FORCEINLINE __attribute__((always_inline))
-#elif defined(MSVC)
-#define GAZEBO_DEPRECATED(version) ()
+#elif defined(_WIN32)
+// GAZEBO_DEPRECATED should be defined as something like
+// __declspec(deprecated), but it needs to go *before* the function name,
+// and we're putting GAZEBO_DEPRECATED *after* the function.
+#define GAZEBO_DEPRECATED(version)
 #define GAZEBO_FORCEINLINE __forceinline
 #else
 #define GAZEBO_DEPRECATED(version) ()
@@ -87,6 +91,7 @@ namespace gazebo
   namespace common
   {
     class Animation;
+    class Battery;
     class Color;
     class DiagnosticTimer;
     class Image;
@@ -133,6 +138,10 @@ namespace gazebo
     /// \def SphericalCoordinatesPtr
     /// \brief Boost shared pointer to a SphericalCoordinates object
     typedef boost::shared_ptr<SphericalCoordinates> SphericalCoordinatesPtr;
+
+    /// \def BatteryPtr
+    /// \brief Standrd shared pointer to a Battery object
+    typedef std::shared_ptr<Battery> BatteryPtr;
   }
 
   namespace event

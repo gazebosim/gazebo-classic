@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,16 @@
  *
 */
 
+#include "InRegionEventSource.hh"
+#include "ExistenceEventSource.hh"
+#include "OccupiedEventSource.hh"
+#include "JointEventSource.hh"
 
 #include "SimEventsPlugin.hh"
-
 
 using namespace gazebo;
 using namespace sdf;
 using namespace physics;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimEventsPlugin::OnModelInfo(ConstModelPtr &_msg)
@@ -63,34 +65,43 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   this->sdf = _sdf;
 
   // Create a new transport node
-  transport::NodePtr node(new transport::Node());
-  // Initialize the node with the world name
-  node->Init(_parent->GetName());
-  // Create a publisher on the Rest plugin topic
-  pub = node->Advertise<gazebo::msgs::SimEvent>("/gazebo/sim_events");
-  // Subscribe to model spawning
-  spawnSub = node->Subscribe("~/model/info",
-                             &SimEventsPlugin::OnModelInfo,
-                             this);
-  // detect model deletion
-  requestSub = node->Subscribe("~/request", &SimEventsPlugin::OnRequest, this);
+  this->node = transport::NodePtr(new transport::Node());
 
-  // regions are defined outside of events, so that they can be shared
-  // between events....
-  // and we read them first
-  sdf::ElementPtr child = this->sdf->GetElement("region");
-  while (child)
+  // Initialize the node with the world name
+  this->node->Init(_parent->GetName());
+
+  // Create a publisher on the Rest plugin topic
+  this->pub = this->node->Advertise<gazebo::msgs::SimEvent>(
+      "/gazebo/sim_events");
+
+  // Subscribe to model spawning
+  this->spawnSub = this->node->Subscribe("~/model/info",
+      &SimEventsPlugin::OnModelInfo, this);
+
+  // detect model deletion
+  this->requestSub = this->node->Subscribe("~/request",
+      &SimEventsPlugin::OnRequest, this);
+
+  // read regions, if any
+  if (this->sdf->HasElement("region"))
   {
-    Region* r = new Region;
-    r->Load(child);
-    RegionPtr region;
-    region.reset(r);
-    this->regions[region->name] = region;
-    child = child->GetNextElement("region");
+    // regions are defined outside of events, so that they can be shared
+    // between events....
+    // and we read them first
+    sdf::ElementPtr child = this->sdf->GetElement("region");
+    while (child)
+    {
+      Region *r = new Region;
+      r->Load(child);
+      RegionPtr region;
+      region.reset(r);
+      this->regions[region->name] = region;
+      child = child->GetNextElement("region");
+    }
   }
 
   // Reading events
-  child = this->sdf->GetElement("event");
+  sdf::ElementPtr child = this->sdf->GetElement("event");
   while (child)
   {
     // get name and type of each event
@@ -110,17 +121,27 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
                                           this->world,
                                           this->regions));
     }
+    else if (eventType == "occupied")
+    {
+      event.reset(new OccupiedEventSource(this->pub,
+            this->world, this->regions));
+    }
     else if (eventType == "existence" )
     {
       event.reset(new ExistenceEventSource(this->pub, this->world) );
     }
+    else if (eventType == "joint")
+    {
+      event.reset(new JointEventSource(this->pub, this->world));
+    }
     else
     {
       std::string m;
-      m = "Unknown event name: \"" + eventName;
-      m += "\" of type: \"" + eventType + "\" in SimEvents plugin";
+      m = "Event \"" + eventName;
+      m += "\" is of unknown type: \"" + eventType + "\" in SimEvents plugin";
       throw SimEventsException(m.c_str());
     }
+
     if (event)
     {
       event->Load(child);
@@ -146,8 +167,6 @@ void SimEventsPlugin::Init()
     models.insert(name);
   }
 }
-
-
 
 // Register this plugin with the simulator
 GZ_REGISTER_WORLD_PLUGIN(SimEventsPlugin)

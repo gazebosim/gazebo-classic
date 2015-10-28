@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Box shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
-#ifndef _BULLETBOXSHAPE_HH_
-#define _BULLETBOXSHAPE_HH_
+#ifndef _GAZEBO_BULLETBOXSHAPE_HH_
+#define _GAZEBO_BULLETBOXSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet box collision
-    class GAZEBO_VISIBLE BulletBoxShape : public BoxShape
+    class GZ_PHYSICS_VISIBLE BulletBoxShape : public BoxShape
     {
       /// \brief Constructor
       public: BulletBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}

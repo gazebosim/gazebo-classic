@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  *
 */
-
-#ifndef _IMUSENSOR_HH_
-#define _IMUSENSOR_HH_
+#ifndef _GAZEBO_IMUSENSOR_HH_
+#define _GAZEBO_IMUSENSOR_HH_
 
 #include <vector>
 #include <string>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
@@ -63,16 +65,42 @@ namespace gazebo
 
       /// \brief Returns the angular velocity.
       /// \return Angular velocity.
-      public: math::Vector3 GetAngularVelocity() const;
+      /// \deprecated See AngularVelocity() function that returns an
+      /// ignition::math::Vector3d object.
+      public: math::Vector3 GetAngularVelocity() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Returns the imu linear acceleration
       /// \return Linear acceleration.
-      public: math::Vector3 GetLinearAcceleration() const;
+      /// \deprecated See LinearVelocity() function that returns an
+      /// ignition::math::Vector3d object.
+      public: math::Vector3 GetLinearAcceleration() const
+              GAZEBO_DEPRECATED(6.0);
 
       /// \brief get orientation of the IMU relative to the reference pose
       /// \return returns the orientation quaternion of the IMU relative to
       /// the imu reference pose.
-      public: math::Quaternion GetOrientation() const;
+      /// \deprecated See Orientation() function that returns an
+      /// ignition::math::Quaterniond object.
+      public: math::Quaternion GetOrientation() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Returns the angular velocity.
+      /// \param[in] _noiseFree True if the returned measurement should
+      /// not use noise.
+      /// \return Angular velocity.
+      public: ignition::math::Vector3d AngularVelocity(
+                  const bool _noiseFree = false) const;
+
+      /// \brief Returns the imu linear acceleration
+      /// \param[in] _noiseFree True if the returned measurement should
+      /// not use noise.
+      /// \return Linear acceleration.
+      public: ignition::math::Vector3d LinearAcceleration(
+                  const bool _noiseFree = false) const;
+
+      /// \brief get orientation of the IMU relative to the reference pose
+      /// \return returns the orientation quaternion of the IMU relative to
+      /// the imu reference pose.
+      public: ignition::math::Quaterniond Orientation() const;
 
       /// \brief Sets the current pose as the IMU reference pose
       public: void SetReferencePose();
@@ -85,16 +113,16 @@ namespace gazebo
       private: void OnLinkData(ConstLinkDataPtr &_msg);
 
       /// \brief Imu reference pose
-      private: math::Pose referencePose;
+      private: ignition::math::Pose3d referencePose;
 
       /// \brief Save previous imu linear velocity for computing acceleration.
-      private: math::Vector3 lastLinearVel;
+      private: ignition::math::Vector3d lastLinearVel;
 
-      /// \brief Imu linear acceleration
-      private: math::Vector3 linearAcc;
+      /// \brief Noise free linear acceleration
+      private: ignition::math::Vector3d linearAcc;
 
       /// \brief store gravity vector to be added to the imu output.
-      private: math::Vector3 gravity;
+      private: ignition::math::Vector3d gravity;
 
       /// \brief Imu data publisher
       private: transport::PublisherPtr pub;
@@ -120,41 +148,8 @@ namespace gazebo
       /// \brief True if new link data is received
       private: bool dataDirty;
 
-      /// \brief Which noise type we support
-      private: enum NoiseModelType
-      {
-        NONE,
-        GAUSSIAN
-      };
-
-      /// \brief If true, apply the noise model specified by other noise
-      /// parameters
-      private: bool noiseActive;
-
-      /// \brief Which type of noise we're applying
-      private: enum NoiseModelType noiseType;
-
-      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
-      /// from which we sample when adding noise to accelerations
-      private: double accelNoiseMean;
-
-      /// \brief If accelNoiseType==GAUSSIAN, the standard devation of the
-      /// distibution from which we sample when adding noise to accelerations
-      private: double accelNoiseStdDev;
-
-      /// \brief If noiseType==GAUSSIAN, the bias we'll add to acceleratations
-      private: double accelBias;
-
-      /// \brief If noiseType==GAUSSIAN, the mean of the distibution
-      /// from which we sample when adding noise to rates
-      private: double rateNoiseMean;
-
-      /// \brief If noiseType==GAUSSIAN, the standard devation of the
-      /// distibution from which we sample when adding noise to rates
-      private: double rateNoiseStdDev;
-
-      /// \brief If noiseType==GAUSSIAN, the bias we'll add to rates
-      private: double rateBias;
+      /// \brief Noise free angular velocity.
+      private: ignition::math::Vector3d angularVel;
     };
     /// \}
   }

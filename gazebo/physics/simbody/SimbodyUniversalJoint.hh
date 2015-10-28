@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief A simbody universal joint class
-    class GAZEBO_VISIBLE SimbodyUniversalJoint
+    class GZ_PHYSICS_VISIBLE SimbodyUniversalJoint
       : public UniversalJoint<SimbodyJoint>
     {
       /// \brief Constructor
@@ -62,12 +62,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;
-
-      // Documentation inherited.
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited.
-      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;

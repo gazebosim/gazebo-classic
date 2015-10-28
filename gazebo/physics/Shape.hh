@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,12 @@
 */
 #ifndef _SHAPE_HH_
 #define _SHAPE_HH_
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <string>
 
@@ -37,7 +43,7 @@ namespace gazebo
 
     /// \class Shape Shape.hh physics/physics.hh
     /// \brief Base class for all shapes.
-    class GAZEBO_VISIBLE Shape : public Base
+    class GZ_PHYSICS_VISIBLE Shape : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the shape.
@@ -64,6 +70,11 @@ namespace gazebo
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg) = 0;
+
+      /// \brief Get the volume of this shape. Implemented accurately for
+      /// simple shapes; an approximation is used for meshes, polylines, etc.
+      /// \return The shape volume in kg/m^3.
+      public: virtual double ComputeVolume() const;
 
       /// \brief This shape's collision parent.
       protected: CollisionPtr collisionParent;

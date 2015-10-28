@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/KeyFrame.hh"
@@ -27,17 +30,17 @@ namespace gazebo
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
     {
       gazebo::common::PoseAnimationPtr anim(
-          new gazebo::common::PoseAnimation("test", 1000.0, true));
+          new gazebo::common::PoseAnimation("test", 10.0, true));
 
       gazebo::common::PoseKeyFrame *key;
 
       key = anim->CreateKeyFrame(0);
-      key->SetTranslation(math::Vector3(0, 0, 0));
-      key->SetRotation(math::Quaternion(0, 0, 0));
+      key->Translation(ignition::math::Vector3d(0, 0, 0));
+      key->Rotation(ignition::math::Quaterniond(0, 0, 0));
 
-      key = anim->CreateKeyFrame(1000.0);
-      key->SetTranslation(math::Vector3(5, 0, 0));
-      key->SetRotation(math::Quaternion(0, 0, 1.5707));
+      key = anim->CreateKeyFrame(10.0);
+      key->Translation(ignition::math::Vector3d(5, 0, 0));
+      key->Rotation(ignition::math::Quaterniond(0, 0, 1.5707));
 
       _parent->SetAnimation(anim);
     }

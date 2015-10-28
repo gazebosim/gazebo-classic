@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class GAZEBO_VISIBLE Position2dInterface : public GazeboInterface
 
   /// \brief Process pose messages.
   /// \param[in] _msg A new pose message.
-  private: void OnPoseMsg(ConstPose_VPtr &_msg);
+  private: void OnPoseMsg(ConstPosesStampedPtr &_msg);
 
   /// \brief Timestamp on last data update
   private: double datatime;

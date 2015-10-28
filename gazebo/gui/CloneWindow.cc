@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ CloneWindow::CloneWindow(QWidget *_parent)
   : QDialog(_parent),
     validPort(false)
 {
-  // This name is used in the qt style sheet.
-  this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Cloning a simulation"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   // Create the main layout for this widget.
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -55,7 +55,7 @@ CloneWindow::CloneWindow(QWidget *_parent)
   QHBoxLayout *buttonLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton("Cancel");
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  this->okayButton = new QPushButton("Okay");
+  this->okayButton = new QPushButton("Ok");
   connect(this->okayButton, SIGNAL(clicked()), this, SLOT(OnOkay()));
   buttonLayout->addWidget(cancelButton);
   buttonLayout->addStretch(2);
@@ -70,6 +70,7 @@ CloneWindow::CloneWindow(QWidget *_parent)
 
   // Assign the mainlayout to this widget.
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////

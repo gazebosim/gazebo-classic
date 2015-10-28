@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -369,8 +369,12 @@ Color Image::GetMaxColor() const
 //////////////////////////////////////////////////
 void Image::Rescale(int _width, int _height)
 {
+#ifndef _WIN32
   this->bitmap = FreeImage_Rescale(this->bitmap, _width, _height,
       FILTER_LANCZOS3);
+#else
+  gzerr << "Image::Rescale is not implemented on Windows.\n";
+#endif
 }
 
 //////////////////////////////////////////////////

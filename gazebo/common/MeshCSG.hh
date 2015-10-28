@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _MESHCSG_HH_
-#define _MESHCSG_HH_
+#ifndef _GAZEBO_MESHCSG_HH_
+#define _GAZEBO_MESHCSG_HH_
+
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +38,7 @@ namespace gazebo
 
     /// \class MeshCSG MeshCSG.hh common/common.hh
     /// \brief Creates CSG meshes
-    class GAZEBO_VISIBLE MeshCSG
+    class GZ_COMMON_VISIBLE MeshCSG
     {
       /// \brief An enumeration of the boolean operations
       public: enum BooleanOperation {UNION, INTERSECTION, DIFFERENCE};
@@ -54,7 +56,8 @@ namespace gazebo
       /// \param[in] _offset _m2's pose offset from _m1
       /// \return a pointer to the created mesh
       public: Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,
-          const int _operation, const math::Pose &_offset = math::Pose::Zero);
+          const int _operation,
+          const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);
 
       /// \brief Helper method for converting Mesh to GTS Surface
       private: void ConvertMeshToGTS(const Mesh *mesh, GtsSurface *surface);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _BOX_HH_
-#define _BOX_HH_
+#ifndef _GAZEBO_BOX_HH_
+#define _GAZEBO_BOX_HH_
 
 #include <iostream>
+#include <ignition/math/Box.hh>
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
@@ -30,16 +32,21 @@ namespace gazebo
 
     /// \class Box Box.hh math/gzmath.hh
     /// \brief Mathematical representation of a box and related functions.
-    class GAZEBO_VISIBLE Box
+    class GZ_MATH_VISIBLE Box
     {
       /// \brief Default constructor
       public: Box();
+
 
       /// \brief Constructor. This constructor will compute the box's
       /// minumum and maximum corners based on the two arguments.
       /// \param[in] _vec1 One corner of the box
       /// \param[in] _vec2 Another corner of the box
       public: Box(const Vector3 &_vec1, const Vector3 &_vec2);
+
+      /// \brief Ignition math copy constructor
+      /// \param[in] _box Ignition box to convert
+      public: Box(const ignition::math::Box &_box);
 
       /// \brief Copy Constructor
       /// \param[in]  _b Box to copy
@@ -72,6 +79,15 @@ namespace gazebo
       /// \param[in]  _box Box to add to this box
       public: void Merge(const Box &_box);
 
+      /// \brief Convert this box to an ignition::math::Box.
+      /// \return This Box as an ignition::math::Box.
+      public: ignition::math::Box Ign() const;
+
+      /// \brief Assignment operator for ignition math
+      /// \param[in] _b a new value
+      /// \return The new box
+      public: Box &operator=(const ignition::math::Box &_b);
+
       /// \brief Assignment operator. Set this box to the parameter
       /// \param[in]  _b Box to copy
       /// \return The new box.
@@ -96,6 +112,11 @@ namespace gazebo
       /// \param _v The vector to use during subtraction
       /// \return The new box
       public: Box operator-(const Vector3 &_v);
+
+      /// \brief Check if a point lies inside or on the box.
+      /// \param[in] _p Point to check.
+      /// \return True if the point is inside or on the box.
+      public: bool Contains(const math::Vector3 &_p) const;
 
       /// \brief Output operator
       /// \param[in] _out Output stream

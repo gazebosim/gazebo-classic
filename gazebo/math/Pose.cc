@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,12 @@ Pose::Pose(double _x, double _y, double _z,
 //////////////////////////////////////////////////
 Pose::Pose(const Pose &_pose)
   : pos(_pose.pos), rot(_pose.rot)
+{
+}
+
+//////////////////////////////////////////////////
+Pose::Pose(const ignition::math::Pose3d &_pose)
+  : pos(_pose.Pos()), rot(_pose.Rot())
 {
 }
 
@@ -147,6 +153,14 @@ Pose &Pose::operator=(const Pose &_pose)
 }
 
 //////////////////////////////////////////////////
+Pose &Pose::operator=(const ignition::math::Pose3d &_pose)
+{
+  this->pos = _pose.Pos();
+  this->rot = _pose.Rot();
+  return *this;
+}
+
+//////////////////////////////////////////////////
 Vector3 Pose::CoordPositionAdd(const Vector3 &_pos) const
 {
   Quaternion tmp;
@@ -239,3 +253,8 @@ void Pose::Round(int _precision)
   this->pos.Round(_precision);
 }
 
+//////////////////////////////////////////////////
+ignition::math::Pose3d Pose::Ign() const
+{
+  return ignition::math::Pose3d(this->pos.Ign(), this->rot.Ign());
+}

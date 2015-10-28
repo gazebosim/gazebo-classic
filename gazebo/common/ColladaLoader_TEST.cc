@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #include "test_config.h"
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Material.hh"
 #include "gazebo/common/ColladaLoader.hh"
 #include "test/util.hh"
 
@@ -33,8 +34,8 @@ TEST_F(ColladaLoader, LoadBox)
       std::string(PROJECT_SOURCE_PATH) + "/test/data/box.dae");
 
   EXPECT_STREQ("unknown", mesh->GetName().c_str());
-  EXPECT_EQ(math::Vector3(1, 1, 1), mesh->GetMax());
-  EXPECT_EQ(math::Vector3(-1, -1, -1), mesh->GetMin());
+  EXPECT_EQ(ignition::math::Vector3d(1, 1, 1), mesh->Max());
+  EXPECT_EQ(ignition::math::Vector3d(-1, -1, -1), mesh->Min());
   // 36 vertices, 24 unique, 12 shared.
   EXPECT_EQ(24u, mesh->GetVertexCount());
   EXPECT_EQ(24u, mesh->GetNormalCount());
@@ -77,19 +78,59 @@ TEST_F(ColladaLoader, ShareVertices)
     const common::SubMesh *subMesh = mesh->GetSubMesh(i);
     for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
     {
-      math::Vector3 v = subMesh->GetVertex(j);
-      math::Vector3 n = subMesh->GetNormal(j);
+      ignition::math::Vector3d v = subMesh->Vertex(j);
+      ignition::math::Vector3d n = subMesh->Normal(j);
 
       // Verify there is no other vertex with the same position AND normal
       for (unsigned int k = j+1; k < subMesh->GetVertexCount(); ++k)
       {
-        if (v == subMesh->GetVertex(k))
+        if (v == subMesh->Vertex(k))
         {
-          EXPECT_TRUE(n != subMesh->GetNormal(k));
+          EXPECT_TRUE(n != subMesh->Normal(k));
         }
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, LoadZeroCount)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/zero_count.dae");
+  ASSERT_TRUE(mesh);
+
+  std::string log = GetLogContent();
+
+  // Expect no errors about missing values
+  EXPECT_EQ(log.find("Loading what we can..."), std::string::npos);
+  EXPECT_EQ(log.find("Vertex source missing float_array"), std::string::npos);
+  EXPECT_EQ(log.find("Normal source missing float_array"), std::string::npos);
+
+  // Expect the logs to contain information
+  EXPECT_NE(log.find("Triangle input has a count of zero"), std::string::npos);
+  EXPECT_NE(log.find("Vertex source has a float_array with a count of zero"),
+      std::string::npos);
+  EXPECT_NE(log.find("Normal source has a float_array with a count of zero"),
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
+TEST_F(ColladaLoader, Specular)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box.dae");
+  ASSERT_TRUE(mesh);
+
+  EXPECT_EQ(mesh->GetMaterialCount(), 1u);
+
+  const common::Material *mat = mesh->GetMaterial(0u);
+  ASSERT_TRUE(mat);
+
+  // Make sure we read the specular value
+  EXPECT_EQ(mat->GetSpecular(), common::Color(0.5, 0.5, 0.5, 1.0));
 }
 
 /////////////////////////////////////////////////

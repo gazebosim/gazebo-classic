@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <iostream>
 
 #include "gazebo/gui/GuiIface_TEST.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -51,6 +53,45 @@ void GuiIface_TEST::noINIFile()
   // Width and height should return the default values.
   QVERIFY(width == 100);
   QVERIFY(height == 200);
+
+  boost::filesystem::remove(path);
+  gazebo::gui::stop();
+}
+
+/////////////////////////////////////////////////
+void GuiIface_TEST::GUIINIPATHEnvVariable()
+{
+  // Get a temp directory
+  boost::filesystem::path path =
+    boost::filesystem::temp_directory_path() / "gazebo";
+  boost::filesystem::create_directories(path);
+
+  // Set the gui.ini filename
+  path /= "foo.ini";
+
+  // Make sure the INI file doesn't exist.
+  if (boost::filesystem::exists(path))
+    boost::filesystem::remove(path);
+
+  const char *filepath = path.string().c_str();
+
+  setenv("GAZEBO_GUI_INI_FILE", filepath, 1);
+
+  // False if the path didn't exist
+  QVERIFY(gazebo::gui::loadINI() == false);
+
+  // Write invalid content for an INI file
+  std::ofstream iniFile;
+  iniFile.open(filepath);
+  iniFile << "Invalid content\n";
+  iniFile.close();
+
+  // Only false when trying to read invalid content
+  QVERIFY(gazebo::gui::loadINI() == false);
+
+  // Need to clean up the variable for the next tests
+  unsetenv("GAZEBO_GUI_INI_FILE");
+  boost::filesystem::remove(path);
 
   gazebo::gui::stop();
 }
@@ -105,6 +146,7 @@ void GuiIface_TEST::setINIProperties()
   QVERIFY(width == widthOrig);
   QVERIFY(height == heightOrig);
 
+  boost::filesystem::remove(path);
   gazebo::gui::stop();
 }
 
@@ -155,6 +197,7 @@ void GuiIface_TEST::saveINIProperties()
   QVERIFY(width == widthNew);
   QVERIFY(height == heightNew);
 
+  boost::filesystem::remove(path);
   gazebo::gui::stop();
 }
 

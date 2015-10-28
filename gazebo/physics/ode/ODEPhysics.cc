@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * limitations under the License.
  *
 */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
@@ -55,6 +62,7 @@
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
 #include "gazebo/physics/ode/ODEUniversalJoint.hh"
+#include "gazebo/physics/ode/ODEFixedJoint.hh"
 
 #include "gazebo/physics/ode/ODERayShape.hh"
 #include "gazebo/physics/ode/ODEBoxShape.hh"
@@ -68,6 +76,8 @@
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
+
+#include "gazebo/physics/ode/ODEPhysicsPrivate.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -121,21 +131,24 @@ class Colliders_TBB
 
 //////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
-    : PhysicsEngine(_world), physicsStepFunc(NULL), maxContacts(0)
+    : PhysicsEngine(_world), dataPtr(new ODEPhysicsPrivate)
 {
+  this->dataPtr->physicsStepFunc = NULL;
+  this->dataPtr->maxContacts = 0;
+
   // Collision detection init
   dInitODE2(0);
 
   dAllocateODEDataForThread(dAllocateMaskAll);
 
-  this->worldId = dWorldCreate();
+  this->dataPtr->worldId = dWorldCreate();
 
-  this->spaceId = dHashSpaceCreate(0);
-  dHashSpaceSetLevels(this->spaceId, -2, 8);
+  this->dataPtr->spaceId = dHashSpaceCreate(0);
+  dHashSpaceSetLevels(this->dataPtr->spaceId, -2, 8);
 
-  this->contactGroup = dJointGroupCreate(0);
+  this->dataPtr->contactGroup = dJointGroupCreate(0);
 
-  this->colliders.resize(100);
+  this->dataPtr->colliders.resize(100);
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
@@ -147,27 +160,30 @@ ODEPhysics::~ODEPhysics()
 {
   dCloseODE();
 
-  dJointGroupDestroy(this->contactGroup);
+  dJointGroupDestroy(this->dataPtr->contactGroup);
 
   // Delete all the joint feedbacks.
   for (std::vector<ODEJointFeedback*>::iterator iter =
-      this->jointFeedbacks.begin(); iter != this->jointFeedbacks.end(); ++iter)
+      this->dataPtr->jointFeedbacks.begin(); iter !=
+          this->dataPtr->jointFeedbacks.end(); ++iter)
   {
     delete *iter;
   }
-  this->jointFeedbacks.clear();
+  this->dataPtr->jointFeedbacks.clear();
 
-  if (this->spaceId)
+  if (this->dataPtr->spaceId)
   {
-    dSpaceSetCleanup(this->spaceId, 0);
-    dSpaceDestroy(this->spaceId);
+    dSpaceSetCleanup(this->dataPtr->spaceId, 0);
+    dSpaceDestroy(this->dataPtr->spaceId);
   }
 
-  if (this->worldId)
-    dWorldDestroy(this->worldId);
+  if (this->dataPtr->worldId)
+    dWorldDestroy(this->dataPtr->worldId);
 
-  this->spaceId = NULL;
-  this->worldId = NULL;
+  this->dataPtr->spaceId = NULL;
+  this->dataPtr->worldId = NULL;
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -175,64 +191,70 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
-  this->SetMaxContacts(this->maxContacts);
+  this->dataPtr->maxContacts = _sdf->Get<unsigned int>("max_contacts");
+  this->SetMaxContacts(this->dataPtr->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
-  this->stepType = solverElem->Get<std::string>("type");
+  this->dataPtr->stepType = solverElem->Get<std::string>("type");
   if (solverElem->HasElement("use_dynamic_moi_rescaling"))
   {
-    dWorldSetQuickStepInertiaRatioReduction(this->worldId,
+    dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId,
       solverElem->Get<bool>("use_dynamic_moi_rescaling"));
   }
+  else
+  {
+    dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, true);
+  }
 
-  dWorldSetDamping(this->worldId, 0.0001, 0.0001);
+  /// \TODO: defaultvelocity decay!? This is BAD if it's true.
+  dWorldSetDamping(this->dataPtr->worldId, 0.0001, 0.0001);
 
   // Help prevent "popping of deeply embedded object
-  dWorldSetContactMaxCorrectingVel(this->worldId,
+  dWorldSetContactMaxCorrectingVel(this->dataPtr->worldId,
       odeElem->GetElement("constraints")->Get<double>(
         "contact_max_correcting_vel"));
 
   // This helps prevent jittering problems.
-  dWorldSetContactSurfaceLayer(this->worldId,
+  dWorldSetContactSurfaceLayer(this->dataPtr->worldId,
        odeElem->GetElement("constraints")->Get<double>(
         "contact_surface_layer"));
 
   // Enable auto-disable by default. Models with joints are excluded from
   // auto-disable
-  dWorldSetAutoDisableFlag(this->worldId, 1);
+  dWorldSetAutoDisableFlag(this->dataPtr->worldId, 1);
 
-  dWorldSetAutoDisableTime(this->worldId, 1);
-  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.1);
-  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.1);
-  dWorldSetAutoDisableSteps(this->worldId, 5);
+  dWorldSetAutoDisableTime(this->dataPtr->worldId, 1);
+  dWorldSetAutoDisableLinearThreshold(this->dataPtr->worldId, 0.1);
+  dWorldSetAutoDisableAngularThreshold(this->dataPtr->worldId, 0.1);
+  dWorldSetAutoDisableSteps(this->dataPtr->worldId, 5);
 
   math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
 
   if (g == math::Vector3(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
 
-  dWorldSetGravity(this->worldId, g.x, g.y, g.z);
+  dWorldSetGravity(this->dataPtr->worldId, g.x, g.y, g.z);
 
   if (odeElem->HasElement("constraints"))
   {
-    dWorldSetCFM(this->worldId,
+    dWorldSetCFM(this->dataPtr->worldId,
         odeElem->GetElement("constraints")->Get<double>("cfm"));
-    dWorldSetERP(this->worldId,
+    dWorldSetERP(this->dataPtr->worldId,
         odeElem->GetElement("constraints")->Get<double>("erp"));
   }
   else
-    dWorldSetERP(this->worldId, 0.2);
+    dWorldSetERP(this->dataPtr->worldId, 0.2);
 
-  dWorldSetQuickStepNumIterations(this->worldId, this->GetSORPGSIters());
-  dWorldSetQuickStepW(this->worldId, this->GetSORPGSW());
+  dWorldSetQuickStepNumIterations(this->dataPtr->worldId,
+    this->GetSORPGSIters());
+  dWorldSetQuickStepW(this->dataPtr->worldId, this->GetSORPGSW());
 
   // Set the physics update function
-  this->SetStepType(this->stepType);
-  if (this->physicsStepFunc == NULL)
-    gzthrow(std::string("Invalid step type[") + this->stepType);
+  this->SetStepType(this->dataPtr->stepType);
+  if (this->dataPtr->physicsStepFunc == NULL)
+    gzthrow(std::string("Invalid step type[") + this->dataPtr->stepType);
 }
 
 /////////////////////////////////////////////////
@@ -248,10 +270,18 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::ODE);
-    physicsMsg.set_solver_type(this->stepType);
+    physicsMsg.set_solver_type(this->dataPtr->stepType);
     // min_step_size is defined but not yet used
-    physicsMsg.set_min_step_size(
-        boost::any_cast<double>(this->GetParam("min_step_size")));
+    boost::any min_step_size;
+    try
+    {
+      if (this->GetParam("min_step_size", min_step_size))
+        physicsMsg.set_min_step_size(boost::any_cast<double>(min_step_size));
+    }
+    catch(boost::bad_any_cast &_e)
+    {
+      gzerr << "Failed boost::any_cast in ODEPhysics.cc: " << _e.what();
+    }
     physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
@@ -262,7 +292,10 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
       this->GetContactMaxCorrectingVel());
     physicsMsg.set_contact_surface_layer(
       this->GetContactSurfaceLayer());
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->GetGravity().Ign()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+      msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -276,6 +309,11 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_solver_type())
     this->SetStepType(_msg->solver_type());
 
@@ -307,7 +345,7 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetContactSurfaceLayer(_msg->contact_surface_layer());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
@@ -324,9 +362,6 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 
@@ -348,35 +383,35 @@ void ODEPhysics::UpdateCollision()
   DIAG_TIMER_START("ODEPhysics::UpdateCollision");
 
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-  dJointGroupEmpty(this->contactGroup);
+  dJointGroupEmpty(this->dataPtr->contactGroup);
 
   unsigned int i = 0;
-  this->collidersCount = 0;
-  this->trimeshCollidersCount = 0;
-  this->jointFeedbackIndex = 0;
+  this->dataPtr->collidersCount = 0;
+  this->dataPtr->trimeshCollidersCount = 0;
+  this->dataPtr->jointFeedbackIndex = 0;
 
   // Reset the contact count
   this->contactManager->ResetCount();
 
   // Do collision detection; this will add contacts to the contact group
-  dSpaceCollide(this->spaceId, this, CollisionCallback);
+  dSpaceCollide(this->dataPtr->spaceId, this, CollisionCallback);
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "dSpaceCollide");
 
   // Generate non-trimesh collisions.
-  for (i = 0; i < this->collidersCount; ++i)
+  for (i = 0; i < this->dataPtr->collidersCount; ++i)
   {
-    this->Collide(this->colliders[i].first,
-        this->colliders[i].second, this->contactCollisions);
+    this->Collide(this->dataPtr->colliders[i].first,
+        this->dataPtr->colliders[i].second, this->dataPtr->contactCollisions);
   }
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideShapes");
 
   // Generate trimesh collision.
   // This must happen in this thread sequentially
-  for (i = 0; i < this->trimeshCollidersCount; ++i)
+  for (i = 0; i < this->dataPtr->trimeshCollidersCount; ++i)
   {
-    ODECollision *collision1 = this->trimeshColliders[i].first;
-    ODECollision *collision2 = this->trimeshColliders[i].second;
-    this->Collide(collision1, collision2, this->contactCollisions);
+    ODECollision *collision1 = this->dataPtr->trimeshColliders[i].first;
+    ODECollision *collision2 = this->dataPtr->trimeshColliders[i].second;
+    this->Collide(collision1, collision2, this->dataPtr->contactCollisions);
   }
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideTrimeshes");
 
@@ -393,36 +428,37 @@ void ODEPhysics::UpdatePhysics()
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
     // Update the dynamical model
-    (*physicsStepFunc)(this->worldId, this->maxStepSize);
+    (*(this->dataPtr->physicsStepFunc))
+      (this->dataPtr->worldId, this->maxStepSize);
 
     math::Vector3 f1, f2, t1, t2;
 
     // Set the joint contact feedback for each contact.
-    for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
+    for (unsigned int i = 0; i < this->dataPtr->jointFeedbackIndex; ++i)
     {
-      Contact *contactFeedback = this->jointFeedbacks[i]->contact;
+      Contact *contactFeedback = this->dataPtr->jointFeedbacks[i]->contact;
       Collision *col1 = contactFeedback->collision1;
       Collision *col2 = contactFeedback->collision2;
 
       GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
       GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");
 
-      for (int j = 0; j < this->jointFeedbacks[i]->count; ++j)
+      for (int j = 0; j < this->dataPtr->jointFeedbacks[i]->count; ++j)
       {
-        dJointFeedback fb = this->jointFeedbacks[i]->feedbacks[j];
+        dJointFeedback fb = this->dataPtr->jointFeedbacks[i]->feedbacks[j];
         f1.Set(fb.f1[0], fb.f1[1], fb.f1[2]);
         f2.Set(fb.f2[0], fb.f2[1], fb.f2[2]);
         t1.Set(fb.t1[0], fb.t1[1], fb.t1[2]);
         t2.Set(fb.t2[0], fb.t2[1], fb.t2[2]);
 
         // set force torque in link frame
-        this->jointFeedbacks[i]->contact->wrench[j].body1Force =
+        this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Force =
              col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(f1);
-        this->jointFeedbacks[i]->contact->wrench[j].body2Force =
+        this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Force =
              col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(f2);
-        this->jointFeedbacks[i]->contact->wrench[j].body1Torque =
+        this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Torque =
              col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(t1);
-        this->jointFeedbacks[i]->contact->wrench[j].body2Torque =
+        this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Torque =
              col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(t2);
       }
     }
@@ -442,7 +478,7 @@ void ODEPhysics::Reset()
 {
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
   // Very important to clear out the contact group
-  dJointGroupEmpty(this->contactGroup);
+  dJointGroupEmpty(this->dataPtr->contactGroup);
 }
 
 //////////////////////////////////////////////////
@@ -452,14 +488,15 @@ LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
     gzthrow("Link must have a parent\n");
 
   std::map<std::string, dSpaceID>::iterator iter;
-  iter = this->spaces.find(_parent->GetName());
+  iter = this->dataPtr->spaces.find(_parent->GetName());
 
-  if (iter == this->spaces.end())
-    this->spaces[_parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
+  if (iter == this->dataPtr->spaces.end())
+    this->dataPtr->spaces[_parent->GetName()] =
+      dSimpleSpaceCreate(this->dataPtr->spaceId);
 
   ODELinkPtr link(new ODELink(_parent));
 
-  link->SetSpaceId(this->spaces[_parent->GetName()]);
+  link->SetSpaceId(this->dataPtr->spaces[_parent->GetName()]);
   link->SetWorld(_parent->GetWorld());
 
   return link;
@@ -516,7 +553,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
 //////////////////////////////////////////////////
 dWorldID ODEPhysics::GetWorldId()
 {
-  return this->worldId;
+  return this->dataPtr->worldId;
 }
 
 //////////////////////////////////////////////////
@@ -532,12 +569,121 @@ void ODEPhysics::ConvertMass(InertialPtr _inertial, void *_engineMass)
 }
 
 //////////////////////////////////////////////////
+Friction_Model ODEPhysics::ConvertFrictionModel(const std::string &_fricModel)
+{
+  Friction_Model result = pyramid_friction;
+  if (_fricModel.compare("pyramid_model") == 0)
+      result = pyramid_friction;
+  else if (_fricModel.compare("cone_model") == 0)
+      result = cone_friction;
+  else if (_fricModel.compare("box_model") == 0)
+      result = box_friction;
+  else
+    gzerr << "Unrecognized friction model ["
+          << _fricModel
+          << "], returning pyramid friction"
+          << std::endl;
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string ODEPhysics::ConvertFrictionModel(const Friction_Model _fricModel)
+{
+  std::string result;
+  switch (_fricModel)
+  {
+    case pyramid_friction:
+    {
+      result = "pyramid_model";
+      break;
+    }
+    case cone_friction:
+    {
+      result = "cone_model";
+      break;
+    }
+    case box_friction:
+    {
+      result = "box_model";
+      break;
+    }
+    default:
+    {
+      result = "unknown";
+      gzerr << "Unrecognized friction model [" << _fricModel << "]"
+            << std::endl;
+    }
+  }
+  return result;
+}
+
+//////////////////////////////////////////////////
+World_Solver_Type
+ODEPhysics::ConvertWorldStepSolverType(const std::string &_solverType)
+{
+  World_Solver_Type result = ODE_DEFAULT;
+  if (_solverType.compare("ODE_DANTZIG") == 0)
+    result = ODE_DEFAULT;
+  else if (_solverType.compare("DART_PGS") == 0)
+    result = DART_PGS;
+  else if (_solverType.compare("BULLET_LEMKE") == 0)
+    result = BULLET_LEMKE;
+  else if (_solverType.compare("BULLET_PGS") == 0)
+    result = BULLET_PGS;
+  else
+  {
+    gzerr << "Unrecognized world step solver ["
+          << _solverType
+          << "], returning ODE_DANTZIG"
+          << std::endl;
+  }
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string
+ODEPhysics::ConvertWorldStepSolverType(const World_Solver_Type _solverType)
+{
+  std::string result;
+  switch (_solverType)
+  {
+    case ODE_DEFAULT:
+    {
+      result = "ODE_DANTZIG";
+      break;
+    }
+    case DART_PGS:
+    {
+      result = "DART_PGS";
+      break;
+    }
+    case BULLET_LEMKE:
+    {
+      result = "BULLET_LEMKE";
+      break;
+    }
+    case BULLET_PGS:
+    {
+      result = "BULLET_PGS";
+      break;
+    }
+    default:
+    {
+      result = "unknown";
+      gzerr << "Unrecognized world step solver [" << _solverType << "]"
+            << std::endl;
+    }
+  }
+  return result;
+}
+
+//////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSPreconIters(unsigned int _iters)
 {
   this->sdf->GetElement("ode")->GetElement("solver")->
     GetElement("precon_iters")->Set(_iters);
 
-  dWorldSetQuickStepPreconIterations(this->worldId, _iters);
+  dWorldSetQuickStepPreconIterations(this->dataPtr->worldId, _iters);
 }
 
 //////////////////////////////////////////////////
@@ -545,7 +691,7 @@ void ODEPhysics::SetSORPGSIters(unsigned int _iters)
 {
   this->sdf->GetElement("ode")->GetElement(
       "solver")->GetElement("iters")->Set(_iters);
-  dWorldSetQuickStepNumIterations(this->worldId, _iters);
+  dWorldSetQuickStepNumIterations(this->dataPtr->worldId, _iters);
 }
 
 //////////////////////////////////////////////////
@@ -553,7 +699,18 @@ void ODEPhysics::SetSORPGSW(double _w)
 {
   this->sdf->GetElement("ode")->GetElement(
       "solver")->GetElement("sor")->Set(_w);
-  dWorldSetQuickStepW(this->worldId, _w);
+  dWorldSetQuickStepW(this->dataPtr->worldId, _w);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetFrictionModel(const std::string &_fricModel)
+{
+  /// Uncomment this until sdformat changes (sdformat repo issue #96)
+  ///
+  /// this->sdf->GetElement("ode")->GetElement(
+  ///   "solver")->GetElement("friction_model")->Set(_fricModel);
+  dWorldSetQuickStepFrictionModel(this->dataPtr->worldId,
+    ConvertFrictionModel(_fricModel));
 }
 
 //////////////////////////////////////////////////
@@ -563,7 +720,7 @@ void ODEPhysics::SetWorldCFM(double _cfm)
   elem = elem->GetElement("constraints");
   elem->GetElement("cfm")->Set(_cfm);
 
-  dWorldSetCFM(this->worldId, _cfm);
+  dWorldSetCFM(this->dataPtr->worldId, _cfm);
 }
 
 //////////////////////////////////////////////////
@@ -572,7 +729,7 @@ void ODEPhysics::SetWorldERP(double _erp)
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
   elem = elem->GetElement("constraints");
   elem->GetElement("erp")->Set(_erp);
-  dWorldSetERP(this->worldId, _erp);
+  dWorldSetERP(this->dataPtr->worldId, _erp);
 }
 
 //////////////////////////////////////////////////
@@ -581,7 +738,7 @@ void ODEPhysics::SetContactMaxCorrectingVel(double _vel)
   this->sdf->GetElement("ode")->GetElement(
       "constraints")->GetElement(
         "contact_max_correcting_vel")->Set(_vel);
-  dWorldSetContactMaxCorrectingVel(this->worldId, _vel);
+  dWorldSetContactMaxCorrectingVel(this->dataPtr->worldId, _vel);
 }
 
 //////////////////////////////////////////////////
@@ -589,14 +746,21 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 {
   this->sdf->GetElement("ode")->GetElement(
       "constraints")->GetElement("contact_surface_layer")->Set(_depth);
-  dWorldSetContactSurfaceLayer(this->worldId, _depth);
+  dWorldSetContactSurfaceLayer(this->dataPtr->worldId, _depth);
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->maxContacts = _maxContacts;
+  this->dataPtr->maxContacts = _maxContacts;
   this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
+}
+
+//////////////////////////////////////////////////
+void ODEPhysics::SetWorldStepSolverType(const std::string &_worldSolverType)
+{
+    dWorldSetWorldStepSolverType(this->dataPtr->worldId,
+    ConvertWorldStepSolverType(_worldSolverType));
 }
 
 //////////////////////////////////////////////////
@@ -617,6 +781,20 @@ double ODEPhysics::GetSORPGSW()
 {
   return this->sdf->GetElement("ode")->GetElement(
       "solver")->Get<double>("sor");
+}
+
+//////////////////////////////////////////////////
+std::string ODEPhysics::GetFrictionModel() const
+{
+  return ConvertFrictionModel(
+    dWorldGetQuickStepFrictionModel(this->dataPtr->worldId));
+}
+
+//////////////////////////////////////////////////
+std::string ODEPhysics::GetWorldStepSolverType() const
+{
+  return ConvertWorldStepSolverType(
+    dWorldGetWorldStepSolverType(this->dataPtr->worldId));
 }
 
 //////////////////////////////////////////////////
@@ -652,7 +830,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 //////////////////////////////////////////////////
 unsigned int ODEPhysics::GetMaxContacts()
 {
-  return this->maxContacts;
+  return this->dataPtr->maxContacts;
 }
 
 //////////////////////////////////////////////////
@@ -685,19 +863,21 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
   JointPtr joint;
 
   if (_type == "prismatic")
-    joint.reset(new ODESliderJoint(this->worldId, _parent));
+    joint.reset(new ODESliderJoint(this->dataPtr->worldId, _parent));
   else if (_type == "screw")
-    joint.reset(new ODEScrewJoint(this->worldId, _parent));
+    joint.reset(new ODEScrewJoint(this->dataPtr->worldId, _parent));
   else if (_type == "revolute")
-    joint.reset(new ODEHingeJoint(this->worldId, _parent));
+    joint.reset(new ODEHingeJoint(this->dataPtr->worldId, _parent));
   else if (_type == "gearbox")
-    joint.reset(new ODEGearboxJoint(this->worldId, _parent));
+    joint.reset(new ODEGearboxJoint(this->dataPtr->worldId, _parent));
   else if (_type == "revolute2")
-    joint.reset(new ODEHinge2Joint(this->worldId, _parent));
+    joint.reset(new ODEHinge2Joint(this->dataPtr->worldId, _parent));
   else if (_type == "ball")
-    joint.reset(new ODEBallJoint(this->worldId, _parent));
+    joint.reset(new ODEBallJoint(this->dataPtr->worldId, _parent));
   else if (_type == "universal")
-    joint.reset(new ODEUniversalJoint(this->worldId, _parent));
+    joint.reset(new ODEUniversalJoint(this->dataPtr->worldId, _parent));
+  else if (_type == "fixed")
+    joint.reset(new ODEFixedJoint(this->dataPtr->worldId, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
@@ -707,7 +887,7 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 //////////////////////////////////////////////////
 dSpaceID ODEPhysics::GetSpaceId() const
 {
-  return this->spaceId;
+  return this->dataPtr->spaceId;
 }
 
 //////////////////////////////////////////////////
@@ -722,22 +902,23 @@ void ODEPhysics::SetStepType(const std::string &_type)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
   elem->GetElement("type")->Set(_type);
-  this->stepType = _type;
+  this->dataPtr->stepType = _type;
 
   // Set the physics update function
-  if (this->stepType == "quick")
-    this->physicsStepFunc = &dWorldQuickStep;
-  else if (this->stepType == "world")
-    this->physicsStepFunc = &dWorldStep;
+  if (this->dataPtr->stepType == "quick")
+    this->dataPtr->physicsStepFunc = &dWorldQuickStep;
+  else if (this->dataPtr->stepType == "world")
+    this->dataPtr->physicsStepFunc = &dWorldStep;
   else
-    gzerr << "Invalid step type[" << this->stepType << "]" << std::endl;
+    gzerr << "Invalid step type[" << this->dataPtr->stepType
+          << "]" << std::endl;
 }
 
 //////////////////////////////////////////////////
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  dWorldSetGravity(this->worldId, _gravity.x, _gravity.y, _gravity.z);
+  dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
 }
 
 //////////////////////////////////////////////////
@@ -806,6 +987,11 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactGeom *_contactCollisions)
 {
+  // Filter collisions based on collide bitmask.
+  if ((_collision1->GetSurface()->collideBitmask &
+        _collision2->GetSurface()->collideBitmask) == 0)
+    return;
+
   // Filter collisions based on contact bitmask if collide_without_contact is
   // on.The bitmask is set mainly for speed improvements otherwise a collision
   // with collide_without_contact may potentially generate a large number of
@@ -823,16 +1009,20 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /*
   if (_collision1->GetCollisionId() && _collision2->GetCollisionId())
   {
-    const dVector3 *pos1 = (const dVector3*)dGeomGetPosition(_collision1->GetCollisionId());
-    const dVector3 *pos2 = (const dVector3*)dGeomGetPosition(_collision2->GetCollisionId());
-    std::cout << "1[" << (*pos1)[0]<< " " << (*pos1)[1] << " " << (*pos1)[2] << "] "
+    const dVector3 *pos1 =
+      (const dVector3*)dGeomGetPosition(_collision1->GetCollisionId());
+    const dVector3 *pos2 =
+      (const dVector3*)dGeomGetPosition(_collision2->GetCollisionId());
+    std::cout << "1[" << (*pos1)[0]<< " " << (*pos1)[1] << " "
+              << (*pos1)[2] << "] "
       << "2[" << (*pos2)[0]<< " " << (*pos2)[1] << " " << (*pos2)[2] << "]\n";
   }*/
 
   unsigned int numc = 0;
   dContact contact;
 
-  // maxCollide must less than the size of this->indices. Check the header
+  // maxCollide must less than the size of this->dataPtr->indices
+  // Check the header
   unsigned int maxCollide = MAX_CONTACT_JOINTS;
 
   // max_contacts specified globally
@@ -856,7 +1046,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
   // Store the indices of the contacts.
   for (int i = 0; i < MAX_CONTACT_JOINTS; i++)
-    this->indices[i] = i;
+    this->dataPtr->indices[i] = i;
 
   // Choose only the best contacts if too many were generated.
   if (numc > maxCollide)
@@ -867,7 +1057,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       if (_contactCollisions[i].depth > max)
       {
         max = _contactCollisions[i].depth;
-        this->indices[maxCollide-1] = i;
+        this->dataPtr->indices[maxCollide-1] = i;
       }
     }
 
@@ -881,6 +1071,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactSoftERP |
                          dContactSoftCFM |
                          dContactApprox1 |
+                         dContactApprox3 |
                          dContactSlip1 |
                          dContactSlip2;
 
@@ -903,7 +1094,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd = surf1->frictionPyramid.direction1;
+  math::Vector3 fd = surf1->FrictionPyramid()->direction1;
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
@@ -917,10 +1108,10 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// As a hack, we'll simply compare mu1 from
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
-  math::Vector3 fd2 = surf2->frictionPyramid.direction1;
+  math::Vector3 fd2 = surf2->FrictionPyramid()->direction1;
   if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
-        surf1->frictionPyramid.GetMuPrimary() >
-        surf2->frictionPyramid.GetMuPrimary()))
+        surf1->FrictionPyramid()->MuPrimary() >
+        surf2->FrictionPyramid()->MuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
     fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
@@ -943,17 +1134,67 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Set the friction coefficients.
-  contact.surface.mu = std::min(surf1->frictionPyramid.GetMuPrimary(),
-                                surf2->frictionPyramid.GetMuPrimary());
-  contact.surface.mu2 = std::min(surf1->frictionPyramid.GetMuSecondary(),
-                                 surf2->frictionPyramid.GetMuSecondary());
-
+  contact.surface.mu = std::min(surf1->FrictionPyramid()->MuPrimary(),
+                                surf2->FrictionPyramid()->MuPrimary());
+  contact.surface.mu2 = std::min(surf1->FrictionPyramid()->MuSecondary(),
+                                 surf2->FrictionPyramid()->MuSecondary());
+  contact.surface.mu3 = std::min(surf1->FrictionPyramid()->MuTorsion(),
+                                 surf2->FrictionPyramid()->MuTorsion());
 
   // Set the slip values
   contact.surface.slip1 = std::min(surf1->slip1,
                                    surf2->slip1);
   contact.surface.slip2 = std::min(surf1->slip2,
                                    surf2->slip2);
+  contact.surface.slip3 = std::min(surf1->slipTorsion,
+                                   surf2->slipTorsion);
+
+  // Combine torsional friction patch radius values
+  contact.surface.patch_radius =
+      std::max(surf1->FrictionPyramid()->PatchRadius(),
+               surf2->FrictionPyramid()->PatchRadius());
+
+  // For torsional friction, the curvature is combined using
+  //   1/R = 1/R1 + 1/R2
+  // we can consider doing the same for the patch radius
+  double curv1 = 0;
+  if (surf1->FrictionPyramid()->SurfaceRadius() > 0)
+    curv1 = 1 / surf1->FrictionPyramid()->SurfaceRadius();
+
+  double curv2 = 0;
+  if (surf2->FrictionPyramid()->SurfaceRadius() > 0)
+    curv2 = 1 / surf2->FrictionPyramid()->SurfaceRadius();
+
+  double curvSum = curv1 + curv2;
+  contact.surface.surface_radius = 0;
+  if (curvSum > 0)
+    contact.surface.surface_radius = 1 / curvSum;
+
+  /// \todo Not sure how to combine these logic flags
+  /// If user wanted to use patch radius, but got settings
+  /// overwritten by the logic combination, how do we make sure the
+  /// the surface radius is specified or makes sense?
+  contact.surface.use_patch_radius =
+      surf1->FrictionPyramid()->UsePatchRadius() &&
+      surf2->FrictionPyramid()->UsePatchRadius();
+
+  if (contact.surface.mu3 > 0)
+  {
+    // Patch radius
+    if ((contact.surface.use_patch_radius &&
+        contact.surface.patch_radius > 0) ||
+    // Surface radius
+        (!contact.surface.use_patch_radius &&
+        contact.surface.surface_radius > 0))
+    {
+      contact.surface.mode |= dContactMu3;
+
+      if (contact.surface.slip3 > 0)
+      {
+        contact.surface.mode |= dContactSlip3;
+      }
+    }
+  }
 
   // Set the bounce values
   contact.surface.bounce = std::min(surf1->bounce,
@@ -976,15 +1217,17 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint feedback mechanism
   if (contactFeedback)
   {
-    if (this->jointFeedbackIndex < this->jointFeedbacks.size())
-      jointFeedback = this->jointFeedbacks[this->jointFeedbackIndex];
+    if (this->dataPtr->jointFeedbackIndex <
+        this->dataPtr->jointFeedbacks.size())
+      jointFeedback =
+          this->dataPtr->jointFeedbacks[this->dataPtr->jointFeedbackIndex];
     else
     {
       jointFeedback = new ODEJointFeedback();
-      this->jointFeedbacks.push_back(jointFeedback);
+      this->dataPtr->jointFeedbacks.push_back(jointFeedback);
     }
 
-    this->jointFeedbackIndex++;
+    this->dataPtr->jointFeedbackIndex++;
     jointFeedback->count = 0;
     jointFeedback->contact = contactFeedback;
   }
@@ -992,30 +1235,31 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   // Create a joint for each contact
   for (unsigned int j = 0; j < numc; ++j)
   {
-    contact.geom = _contactCollisions[this->indices[j]];
+    contact.geom = _contactCollisions[this->dataPtr->indices[j]];
 
     // Create the contact joint. This introduces the contact constraint to
     // ODE
-    dJointID contactJoint =
-      dJointCreateContact(this->worldId, this->contactGroup, &contact);
+    dJointID contactJoint = dJointCreateContact(this->dataPtr->worldId,
+      this->dataPtr->contactGroup, &contact);
 
     // Store contact information.
     if (contactFeedback && jointFeedback)
     {
       // Store the contact depth
-      contactFeedback->depths[j] = _contactCollisions[this->indices[j]].depth;
+      contactFeedback->depths[j] =
+        _contactCollisions[this->dataPtr->indices[j]].depth;
 
       // Store the contact position
       contactFeedback->positions[j].Set(
-          _contactCollisions[this->indices[j]].pos[0],
-          _contactCollisions[this->indices[j]].pos[1],
-          _contactCollisions[this->indices[j]].pos[2]);
+          _contactCollisions[this->dataPtr->indices[j]].pos[0],
+          _contactCollisions[this->dataPtr->indices[j]].pos[1],
+          _contactCollisions[this->dataPtr->indices[j]].pos[2]);
 
       // Store the contact normal
       contactFeedback->normals[j].Set(
-          _contactCollisions[this->indices[j]].normal[0],
-          _contactCollisions[this->indices[j]].normal[1],
-          _contactCollisions[this->indices[j]].normal[2]);
+          _contactCollisions[this->dataPtr->indices[j]].normal[0],
+          _contactCollisions[this->dataPtr->indices[j]].normal[1],
+          _contactCollisions[this->dataPtr->indices[j]].normal[2]);
 
       // Set the joint feedback.
       dJointSetFeedback(contactJoint, &(jointFeedback->feedbacks[j]));
@@ -1036,34 +1280,39 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 void ODEPhysics::AddTrimeshCollider(ODECollision *_collision1,
                                     ODECollision *_collision2)
 {
-  if (this->trimeshCollidersCount >= this->trimeshColliders.size())
-    this->trimeshColliders.resize(this->trimeshColliders.size() + 100);
+  if (this->dataPtr->trimeshCollidersCount >=
+      this->dataPtr->trimeshColliders.size())
+    this->dataPtr->trimeshColliders.resize(
+      this->dataPtr->trimeshColliders.size() + 100);
 
-  this->trimeshColliders[this->trimeshCollidersCount].first  = _collision1;
-  this->trimeshColliders[this->trimeshCollidersCount].second = _collision2;
-  this->trimeshCollidersCount++;
+  this->dataPtr->trimeshColliders[this->dataPtr->trimeshCollidersCount].first  =
+    _collision1;
+  this->dataPtr->trimeshColliders[this->dataPtr->trimeshCollidersCount].second =
+    _collision2;
+  this->dataPtr->trimeshCollidersCount++;
 }
 
 /////////////////////////////////////////////////
 void ODEPhysics::AddCollider(ODECollision *_collision1,
                              ODECollision *_collision2)
 {
-  if (this->collidersCount >= this->colliders.size())
-    this->colliders.resize(this->colliders.size() + 100);
+  if (this->dataPtr->collidersCount >= this->dataPtr->colliders.size())
+    this->dataPtr->colliders.resize(this->dataPtr->colliders.size() + 100);
 
-  this->colliders[this->collidersCount].first  = _collision1;
-  this->colliders[this->collidersCount].second = _collision2;
-  this->collidersCount++;
+  this->dataPtr->colliders[this->dataPtr->collidersCount].first  = _collision1;
+  this->dataPtr->colliders[this->dataPtr->collidersCount].second = _collision2;
+  this->dataPtr->collidersCount++;
 }
 
 /////////////////////////////////////////////////
 void ODEPhysics::DebugPrint() const
 {
   dBodyID b;
-  std::cout << "Debug Print[" << dWorldGetBodyCount(this->worldId) << "]\n";
-  for (int i = 0; i < dWorldGetBodyCount(this->worldId); ++i)
+  std::cout << "Debug Print[" <<
+    dWorldGetBodyCount(this->dataPtr->worldId) << "]\n";
+  for (int i = 0; i < dWorldGetBodyCount(this->dataPtr->worldId); ++i)
   {
-    b = dWorldGetBody(this->worldId, i);
+    b = dWorldGetBody(this->dataPtr->worldId, i);
     ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
     math::Pose pose = link->GetWorldPose();
     const dReal *pos = dBodyGetPosition(b);
@@ -1119,211 +1368,133 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
 
-  if (_key == "solver_type")
+  try
   {
-    std::string value;
-    try
+    if (_key == "solver_type")
     {
-      value = boost::any_cast<std::string>(_value);
+      this->SetStepType(boost::any_cast<std::string>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "cfm")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement("cfm")->Set(value);
+      dWorldSetCFM(this->dataPtr->worldId, value);
     }
-    this->SetStepType(value);
-  }
-  else if (_key == "cfm")
-  {
-    double value;
-    try
+    else if (_key == "erp")
     {
-      value = boost::any_cast<double>(_value);
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement("erp")->Set(value);
+      dWorldSetERP(this->dataPtr->worldId, value);
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "precon_iters")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      int value = boost::any_cast<int>(_value);
+      odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
+      dWorldSetQuickStepPreconIterations(this->dataPtr->worldId, value);
     }
-    odeElem->GetElement("constraints")->GetElement("cfm")->Set(value);
-    dWorldSetCFM(this->worldId, value);
-  }
-  else if (_key == "erp")
-  {
-    double value;
-    try
+    else if (_key == "iters")
     {
-      value = boost::any_cast<double>(_value);
+      int value = boost::any_cast<int>(_value);
+      odeElem->GetElement("solver")->GetElement("iters")->Set(value);
+      dWorldSetQuickStepNumIterations(this->dataPtr->worldId, value);
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "sor")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("solver")->GetElement("sor")->Set(value);
+      dWorldSetQuickStepW(this->dataPtr->worldId, value);
     }
-    odeElem->GetElement("constraints")->GetElement("erp")->Set(value);
-    dWorldSetERP(this->worldId, value);
-  }
-  else if (_key == "precon_iters")
-  {
-    int value;
-    try
+    else if (_key == "friction_model")
+      this->SetFrictionModel(boost::any_cast<std::string>(_value));
+    else if (_key == "world_step_solver")
+      this->SetWorldStepSolverType(boost::any_cast<std::string>(_value));
+    else if (_key == "contact_max_correcting_vel")
     {
-      try
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement(
+          "contact_max_correcting_vel")->Set(value);
+      dWorldSetContactMaxCorrectingVel(this->dataPtr->worldId, value);
+    }
+    else if (_key == "contact_surface_layer")
+    {
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("constraints")->GetElement(
+          "contact_surface_layer")->Set(value);
+      dWorldSetContactSurfaceLayer(this->dataPtr->worldId, value);
+    }
+    else if (_key == "max_contacts")
+    {
+      int value = boost::any_cast<int>(_value);
+      this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
+    }
+    else if (_key == "min_step_size")
+    {
+      /// TODO: Implement min step size param
+      double value = boost::any_cast<double>(_value);
+      odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
+    }
+    else if (_key == "sor_lcp_tolerance")
+    {
+      dWorldSetQuickStepTolerance(this->dataPtr->worldId,
+          boost::any_cast<double>(_value));
+    }
+    else if (_key == "rms_error_tolerance")
+    {
+      gzwarn << "please use sor_lcp_tolerance in the future.\n";
+      dWorldSetQuickStepTolerance(this->dataPtr->worldId,
+          boost::any_cast<double>(_value));
+    }
+    else if (_key == "inertia_ratio_reduction" ||
+             _key == "use_dynamic_moi_rescaling")
+    {
+      bool value = boost::any_cast<bool>(_value);
+      dWorldSetQuickStepInertiaRatioReduction(this->dataPtr->worldId, value);
+      if (odeElem->GetElement("solver")->HasElement(
+            "use_dynamic_moi_rescaling"))
       {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
-    dWorldSetQuickStepPreconIterations(this->worldId, value);
-  }
-  else if (_key == "iters")
-  {
-    int value;
-    try
-    {
-      try
-      {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    odeElem->GetElement("solver")->GetElement("iters")->Set(value);
-    dWorldSetQuickStepNumIterations(this->worldId, value);
-  }
-  else if (_key == "sor")
-  {
-    double value = boost::any_cast<double>(_value);
-    odeElem->GetElement("solver")->GetElement("sor")->Set(value);
-    dWorldSetQuickStepW(this->worldId, value);
-  }
-  else if (_key == "contact_max_correcting_vel")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    odeElem->GetElement("constraints")->GetElement(
-        "contact_max_correcting_vel")->Set(value);
-    dWorldSetContactMaxCorrectingVel(this->worldId, value);
-  }
-  else if (_key == "contact_surface_layer")
-  {
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    odeElem->GetElement("constraints")->GetElement(
-        "contact_surface_layer")->Set(value);
-    dWorldSetContactSurfaceLayer(this->worldId, value);
-  }
-  else if (_key == "max_contacts")
-  {
-    int value;
-    try
-    {
-      try
-      {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
+        odeElem->GetElement("solver")->GetElement(
+            "use_dynamic_moi_rescaling")->Set(value);
       }
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "contact_residual_smoothing")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
-  }
-  else if (_key == "min_step_size")
-  {
-    /// TODO: Implement min step size param
-    double value;
-    try
-    {
-      value = boost::any_cast<double>(_value);
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-    odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
-  }
-  else if (_key == "max_step_size")
-  {
-    this->SetMaxStepSize(boost::any_cast<double>(_value));
-  }
-  else if (_key == "sor_lcp_tolerance")
-  {
-    dWorldSetQuickStepTolerance(this->worldId,
+      dWorldSetQuickStepContactResidualSmoothing(this->dataPtr->worldId,
         boost::any_cast<double>(_value));
-  }
-  else if (_key == "rms_error_tolerance")
-  {
-    gzwarn << "please use sor_lcp_tolerance in the future.\n";
-    dWorldSetQuickStepTolerance(this->worldId,
+    }
+    else if (_key == "contact_sor_scale")
+    {
+      dWorldSetQuickStepContactSORScalingFactor(this->dataPtr->worldId,
         boost::any_cast<double>(_value));
-  }
-  else if (_key == "inertia_ratio_reduction")
-  {
-    dWorldSetQuickStepInertiaRatioReduction(this->worldId,
+    }
+    else if (_key == "thread_position_correction")
+    {
+      dWorldSetQuickStepThreadPositionCorrection(this->dataPtr->worldId,
         boost::any_cast<bool>(_value));
+    }
+    else if (_key == "experimental_row_reordering")
+    {
+      dWorldSetQuickStepExperimentalRowReordering(this->dataPtr->worldId,
+        boost::any_cast<bool>(_value));
+    }
+    else if (_key == "warm_start_factor")
+    {
+      dWorldSetQuickStepWarmStartFactor(this->dataPtr->worldId,
+        boost::any_cast<double>(_value));
+    }
+    else if (_key == "extra_friction_iterations")
+    {
+      dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId,
+        boost::any_cast<int>(_value));
+    }
+    else
+    {
+      return PhysicsEngine::SetParam(_key, _value);
+    }
   }
-  else if (_key == "contact_residual_smoothing")
+  catch(boost::bad_any_cast &e)
   {
-    dWorldSetQuickStepContactResidualSmoothing(this->worldId,
-      boost::any_cast<double>(_value));
-  }
-  else if (_key == "experimental_row_reordering")
-  {
-    dWorldSetQuickStepExperimentalRowReordering(this->worldId,
-      boost::any_cast<bool>(_value));
-  }
-  else if (_key == "warm_start_factor")
-  {
-    dWorldSetQuickStepWarmStartFactor(this->worldId,
-      boost::any_cast<double>(_value));
-  }
-  else if (_key == "extra_friction_iterations")
-  {
-    dWorldSetQuickStepExtraFrictionIterations(this->worldId,
-      boost::any_cast<int>(_value));
-  }
-  else
-  {
-    gzwarn << _key << " is not supported in ode" << std::endl;
+    gzerr << "ODEPhysics::SetParam(" << _key << ") boost::any_cast error: "
+          << e.what() << std::endl;
     return false;
   }
   return true;
@@ -1332,63 +1503,81 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 boost::any ODEPhysics::GetParam(const std::string &_key) const
 {
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
+}
+
+//////////////////////////////////////////////////
+bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
 
   if (_key == "solver_type")
   {
-    return odeElem->GetElement("solver")->Get<std::string>("type");
+    _value = odeElem->GetElement("solver")->Get<std::string>("type");
   }
   else if (_key == "cfm")
   {
-    return odeElem->GetElement("constraints")->Get<double>("cfm");
+    _value = odeElem->GetElement("constraints")->Get<double>("cfm");
   }
   else if (_key == "erp")
-    return odeElem->GetElement("constraints")->Get<double>("erp");
+    _value = odeElem->GetElement("constraints")->Get<double>("erp");
   else if (_key == "precon_iters")
-    return odeElem->GetElement("solver")->Get<int>("precon_iters");
+    _value = odeElem->GetElement("solver")->Get<int>("precon_iters");
   else if (_key == "iters")
-    return odeElem->GetElement("solver")->Get<int>("iters");
+    _value = odeElem->GetElement("solver")->Get<int>("iters");
   else if (_key == "sor")
-    return odeElem->GetElement("solver")->Get<double>("sor");
+    _value = odeElem->GetElement("solver")->Get<double>("sor");
   else if (_key == "contact_max_correcting_vel")
-    return odeElem->GetElement("constraints")->Get<double>(
+    _value = odeElem->GetElement("constraints")->Get<double>(
         "contact_max_correcting_vel");
   else if (_key == "contact_surface_layer")
-    return odeElem->GetElement("constraints")->Get<double>(
+    _value = odeElem->GetElement("constraints")->Get<double>(
         "contact_surface_layer");
   else if (_key == "max_contacts")
-    return this->sdf->Get<int>("max_contacts");
+    _value = this->sdf->Get<int>("max_contacts");
   else if (_key == "min_step_size")
-    return odeElem->GetElement("solver")->Get<double>("min_step_size");
-  else if (_key == "max_step_size")
-    return this->GetMaxStepSize();
+    _value = odeElem->GetElement("solver")->Get<double>("min_step_size");
   else if (_key == "sor_lcp_tolerance")
-    return dWorldGetQuickStepTolerance(this->worldId);
+    _value = dWorldGetQuickStepTolerance(this->dataPtr->worldId);
   else if (_key == "rms_error_tolerance")
   {
     gzwarn << "please use sor_lcp_tolerance in the future.\n";
-    return dWorldGetQuickStepTolerance(this->worldId);
+    _value = dWorldGetQuickStepTolerance(this->dataPtr->worldId);
   }
   else if (_key == "rms_error")
-    return dWorldGetQuickStepRMSDeltaLambda(this->worldId);
+    _value = dWorldGetQuickStepRMSDeltaLambda(this->dataPtr->worldId);
   else if (_key == "constraint_residual")
-    return dWorldGetQuickStepRMSConstraintResidual(this->worldId);
+    _value = dWorldGetQuickStepRMSConstraintResidual(this->dataPtr->worldId);
   else if (_key == "num_contacts")
-    return dWorldGetQuickStepNumContacts(this->worldId);
-  else if (_key == "inertia_ratio_reduction")
-    return dWorldGetQuickStepInertiaRatioReduction(this->worldId);
+    _value = dWorldGetQuickStepNumContacts(this->dataPtr->worldId);
+  else if (_key == "inertia_ratio_reduction" ||
+           _key == "use_dynamic_moi_rescaling")
+    _value = dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
   else if (_key == "contact_residual_smoothing")
-    return dWorldGetQuickStepContactResidualSmoothing (this->worldId);
+    _value = dWorldGetQuickStepContactResidualSmoothing(this->dataPtr->worldId);
+  else if (_key == "contact_sor_scale")
+    _value = dWorldGetQuickStepContactSORScalingFactor(this->dataPtr->worldId);
+  else if (_key == "thread_position_correction")
+    _value = dWorldGetQuickStepThreadPositionCorrection(this->dataPtr->worldId);
   else if (_key == "experimental_row_reordering")
-    return dWorldGetQuickStepExperimentalRowReordering (this->worldId);
+  {
+    _value = dWorldGetQuickStepExperimentalRowReordering
+        (this->dataPtr->worldId);
+  }
   else if (_key == "warm_start_factor")
-    return dWorldGetQuickStepWarmStartFactor (this->worldId);
+    _value = dWorldGetQuickStepWarmStartFactor(this->dataPtr->worldId);
   else if (_key == "extra_friction_iterations")
-    return dWorldGetQuickStepExtraFrictionIterations (this->worldId);
+    _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
+  else if (_key == "friction_model")
+    _value = this->GetFrictionModel();
+  else if (_key == "world_step_solver")
+    _value = this->GetWorldStepSolverType();
   else
   {
-    gzwarn << _key << " is not supported in ode" << std::endl;
-    return 0;
+    return PhysicsEngine::GetParam(_key, _value);
   }
+  return true;
 }

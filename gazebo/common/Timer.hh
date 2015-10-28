@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,16 @@ namespace gazebo
 
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class GAZEBO_VISIBLE Timer
+    class GZ_COMMON_VISIBLE Timer
     {
-      /// \brief Constructor
+      /// \brief Default constructor
       public: Timer();
+
+      /// \brief Countdown constructor
+      /// \param[in] _maxTime The time to count down from.
+      /// \param[in] _countdown. Whether or not to count down. True by default
+      /// if this constructor is used.
+      public: Timer(const Time &_maxTime, const bool _countdown = true);
 
       /// \brief Destructor
       public: virtual ~Timer();
@@ -74,11 +80,18 @@ namespace gazebo
       /// \brief True if the timer is running.
       private: bool running;
 
+      /// \brief True if the timer is counting down, false otherwise.
+      /// False by default.
+      private: bool countdown;
+
       /// \brief The time of the last call to Start
       private: Time start;
 
       /// \brief The time when Stop was called.
       private: Time stop;
+
+      /// \brief Maximum time, only used in countdown.
+      private: Time maxTime;
     };
     /// \}
   }

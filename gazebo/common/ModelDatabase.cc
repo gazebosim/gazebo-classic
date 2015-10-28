@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,18 @@
 */
 
 #include <tinyxml.h>
+#ifndef _WIN32
 #include <libtar.h>
+#endif
 #include <curl/curl.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <iostream>
 
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/function.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -290,7 +294,8 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
     else
     {
       boost::mutex::scoped_lock lock2(this->dataPtr->callbacksMutex);
-
+      if (this->dataPtr->stop)
+        break;
       this->dataPtr->modelDBUpdated(this->dataPtr->modelCache);
     }
     this->dataPtr->updateCacheCompleteCondition.notify_all();
@@ -501,6 +506,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
         continue;
       }
 
+#ifndef _WIN32
       TAR *tar;
       tar_open(&tar, const_cast<char*>(tarfilename.c_str()),
           NULL, O_RDONLY, 0644, TAR_GNU);
@@ -512,6 +518,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       path = outputPath + "/" + modelName;
 
       ModelDatabase::DownloadDependencies(path);
+#endif
     }
 
     curl_easy_cleanup(curl);

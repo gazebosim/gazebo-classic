@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,20 @@ namespace gazebo
     /// \brief Private data for the Joint Visual class.
     class JointVisualPrivate : public VisualPrivate
     {
-      /// \brief The visual used to draw the joint.
+      /// \brief The joint's XYZ frame visual.
       public: AxisVisualPtr axisVisual;
 
-      /// \brief Second joint visual for hinge2 and universal joints.
+      /// \brief The visual representing the one joint axis. There can be only
+      /// one axis visual per joint visual, so joints with two axes have a 2nd
+      /// JointVisual with its own arrowVisual.
+      public: ArrowVisualPtr arrowVisual;
+
+      /// \brief Second joint visual for hinge2 and universal joints. It is a
+      /// simplified visual without an XYZ frame.
       public: JointVisualPtr parentAxisVis;
+
+      /// \brief Scale based on the size of the joint's child link.
+      public: math::Vector3 scaleToLink;
     };
   }
 }

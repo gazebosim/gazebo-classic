@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief SimbodyBallJoint class models a ball joint in Simbody.
-    class GAZEBO_VISIBLE SimbodyBallJoint : public BallJoint<SimbodyJoint>
+    class GZ_PHYSICS_VISIBLE SimbodyBallJoint : public BallJoint<SimbodyJoint>
     {
       /// \brief Simbody Ball Joint Constructor
       public: SimbodyBallJoint(SimTK::MultibodySystem *_world, BasePtr _parent);
@@ -55,12 +55,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;
-
-      // Documentation inherited.
-      public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;

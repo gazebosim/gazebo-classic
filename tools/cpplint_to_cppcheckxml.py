@@ -42,9 +42,9 @@ def parse():
             continue
         fname, lineno, rawmsg, label, score = g  
         # Protect Jenkins from bad XML, which makes it barf
-        msg = xml.sax.saxutils.escape(rawmsg)
+        msg = xml.sax.saxutils.quoteattr(rawmsg)
         severity = cpplint_score_to_cppcheck_severity(int(score))
-        sys.stderr.write('''<error file="%s" line="%s" id="%s" severity="%s" msg="%s"/>\n'''%(fname, lineno, label, severity, msg))
+        sys.stderr.write('''<error file="%s" line="%s" id="%s" severity="%s" msg=%s/>\n'''%(fname, lineno, label, severity, msg))
 
     # Write footer
     sys.stderr.write('''</results>\n''')

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <boost/bind.hpp>
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/Event.hh>
 #include "test/util.hh"
@@ -26,6 +27,9 @@ class EventTest : public gazebo::testing::AutoLogFixture { };
 
 int g_callback = 0;
 int g_callback1 = 0;
+event::EventT<void ()> g_event;
+event::ConnectionPtr g_conn;
+event::ConnectionPtr g_conn2;
 
 /////////////////////////////////////////////////
 void callback()
@@ -37,6 +41,40 @@ void callback()
 void callback1()
 {
   g_callback1++;
+}
+
+/////////////////////////////////////////////////
+// Used by the CallbackDisconnect test.
+void callbackDisconnect()
+{
+  // Remove both connections in the callback, which should not cause
+  // a segfault.
+  g_event.Disconnect(g_conn);
+  g_event.Disconnect(g_conn2);
+}
+
+/////////////////////////////////////////////////
+// Used by the CallbackDisconnect test.
+void callbackDisconnect2()
+{
+  // This function should still be called, even though it was disconnected
+  // in the callDisconnect function. The mutex in Event.hh prevents
+  // a callback from deleting active connections until the event is
+  // complete.
+  ASSERT_TRUE(true);
+}
+
+/////////////////////////////////////////////////
+// Make sure that calling disconnect in an event callback does not produce
+// a segfault.
+TEST_F(EventTest, CallbackDisconnect)
+{
+  // Create two connections
+  g_conn = g_event.Connect(boost::bind(&callbackDisconnect));
+  g_conn2 = g_event.Connect(boost::bind(&callbackDisconnect2));
+
+  // Call the event. See the callback functions for more info.
+  g_event();
 }
 
 /////////////////////////////////////////////////

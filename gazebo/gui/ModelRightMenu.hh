@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/ApplyWrenchDialog.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
@@ -35,9 +36,21 @@ namespace gazebo
 
     /// \class ModelRightMenu ModelRightMenu.hh gui/gui.hh
     /// \brief Displays a menu when the right mouse button has been pressed.
-    class GAZEBO_VISIBLE ModelRightMenu : public QObject
+    class GZ_GUI_VISIBLE ModelRightMenu : public QObject
     {
       Q_OBJECT
+
+      /// \enum EntityTypes
+      /// \brief Unique identifiers for the type of entity this menu is
+      /// attached to.
+      public: enum EntityTypes {
+                  /// \brief Model
+                  MODEL,
+                  /// \brief Light
+                  LIGHT,
+                  /// \brief Link
+                  LINK
+                };
 
       /// \brief Constructor
       public: ModelRightMenu();
@@ -45,11 +58,17 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ModelRightMenu();
 
+      /// \brief Initialize the right menu.
+      /// \return True on success.
+      public: bool Init();
+
       /// \brief Show the right menu.
-      /// \param[in] _modelName Name of the model that is active.
+      /// \param[in] _entityName Name of the entity that is active.
       /// \param[in] _pt Point on the GUI that has received the right-click
       /// request.
-      public: void Run(const std::string &_modelName, const QPoint &_pt);
+      /// \param[in] _type Type of the entity clicked.
+      public: void Run(const std::string &_entityName, const QPoint &_pt,
+          EntityTypes _type = MODEL);
 
       /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();
@@ -57,8 +76,14 @@ namespace gazebo
       /// \brief QT callback when follow has been selected.
       private slots: void OnFollow();
 
+      /// \brief QT callback when edit has been selected.
+      private slots: void OnEdit();
+
+      /// \brief QT callback when apply force/torque has been selected.
+      private slots: void OnApplyWrench();
+
       /// \brief QT callback when delete has been selected.
-      /// \param[in] _name Name of the model to delete.
+      /// \param[in] _name Name of the entity to delete.
       private slots: void OnDelete(const std::string &_name="");
 
       /// \brief QT callback when snap below has been selected.
@@ -75,20 +100,36 @@ namespace gazebo
       /// \param[in] _msg Request message to process.
       private: void OnRequest(ConstRequestPtr &_msg);
 
+      /// \brief Callback when window mode has changed.
+      /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
+      private: void OnWindowMode(const std::string &_mode);
+
       /// \brief Node for communication.
       private: transport::NodePtr node;
 
       /// \brief Subscriber to request messages.
       private: transport::SubscriberPtr requestSub;
 
-      /// \brief Name of the active model.
-      private: std::string modelName;
+      /// \brief Name of the active entity.
+      private: std::string entityName;
 
       /// \brief Action for moving the camera to an object.
       private: QAction *moveToAct;
 
-      /// \brief Action for attaching the camera to a model.
+      /// \brief Action for attaching the camera to an entity.
       private: QAction *followAct;
+
+      /// \brief Action for opening entity on Model Editor.
+      private: QAction *editAct;
+
+      /// \brief Action for applying force and torque to a model.
+      private: QAction *applyWrenchAct;
+
+      /// \brief All event connections.
+      private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief The current window mode, such as "Simulation" or "LogPlayback".
+      private: std::string windowMode;
 
       /// \brief Action for snapping an object to another object below the
       /// first.
@@ -100,17 +141,12 @@ namespace gazebo
 
       // The view state class is a friend for convenience
       private: friend class ViewState;
-
-      /// \todo In gazebo 3.0 move this function to the correct section.
-      /// \brief Initialize the right menu.
-      /// \return True on success.
-      public: bool Init();
     };
 
     /// \class ViewState ViewState.hh gui/gui.hh
     /// \brief A class for managing view visualization states.
     /// Used by ModelRightMenu.
-    class GAZEBO_VISIBLE ViewState : public QObject
+    class GZ_GUI_VISIBLE ViewState : public QObject
     {
       Q_OBJECT
 

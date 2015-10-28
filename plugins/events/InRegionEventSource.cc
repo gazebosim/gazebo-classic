@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,24 +21,22 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 InRegionEventSource::InRegionEventSource(transport::PublisherPtr _pub,
-                                         physics::WorldPtr _world,
-                                         const std::map<std::string, RegionPtr>
-                                                                      &_regions)
-  :EventSource(_pub, "region", _world), regions(_regions), isInside(false)
+    physics::WorldPtr _world, const std::map<std::string, RegionPtr> &_regions)
+  : EventSource(_pub, "region", _world), regions(_regions), isInside(false)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InRegionEventSource::Load(const sdf::ElementPtr &_sdf)
+void InRegionEventSource::Load(const sdf::ElementPtr _sdf)
 {
   EventSource::Load(_sdf);
   if (_sdf->HasElement("model"))
-    this->modelName = _sdf->GetElement("model")->Get<std::string>();
+    this->modelName = _sdf->Get<std::string>("model");
   else
     gzerr << this->name << " is missing a model element" << std::endl;
 
   if (_sdf->HasElement("region"))
-    this->regionName = _sdf->GetElement("region")->Get<std::string>();
+    this->regionName = _sdf->Get<std::string>("region");
   else
     gzerr << this->name << " is missing a region element" << std::endl;
 
@@ -69,6 +67,28 @@ void InRegionEventSource::Init()
     gzerr << this->name << ": Region '" << this->regionName
         << "' does not exist" << std::endl;
   }
+
+  this->Info();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void InRegionEventSource::Info() const
+{
+  std::stringstream ss;
+  ss << "InRegionEventSource "
+      << " model " << this->modelName << "  region [" << this->regionName
+      << "]" << std::endl;
+
+  for (auto v: this->region->boxes)
+  {
+    ss << "  Min ";
+    ss << "[" << v.min.x << ", " << v.min.y << ", " << v.min.z << "]";
+    ss << std::endl;
+    ss << "  Max ";
+    ss << "[" << v.max.x << ", " << v.max.y << ", " << v.max.z << "]\n";
+  }
+  ss << "  inside: " << this->isInside << std::endl;
+  gzmsg << ss.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,15 +97,18 @@ void InRegionEventSource::Update()
   // model must exist
   if (!this->model)
     return;
+
   // region must exist
   if (!this->region)
     return;
 
   math::Vector3 point = this->model->GetWorldPose().pos;
   bool oldState = this->isInside;
-  this->isInside = this->region->PointInRegion(point);
-  if (oldState != this->isInside)
+  bool currentState = this->region->Contains(point);
+
+  if (oldState != currentState)
   {
+    this->isInside = currentState;
     std::string json = "{";
     if (this->isInside)
     {
@@ -101,58 +124,3 @@ void InRegionEventSource::Update()
     this->Emit(json);
   }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-Volume::~Volume()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Volume::PointInVolume(const math::Vector3 &_p) const
-{
-  return _p.x >= this->min.x && _p.x <= this->max.x &&
-         _p.y >= this->min.y && _p.y <= this->max.y &&
-         _p.z >= this->min.z && _p.z <= this->max.z;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Region::PointInRegion(const math::Vector3 &_p) const
-{
-  for (unsigned int i = 0; i < this->volumes.size(); ++i)
-  {
-    if (this->volumes[i]->PointInVolume(_p))
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Region::Load(const sdf::ElementPtr &_sdf)
-{
-  sdf::ElementPtr child = _sdf->GetFirstElement();
-  while (child)
-  {
-    std::string ename = child->GetName();
-    if (ename == "volume")
-    {
-      VolumePtr volume = VolumePtr(new Volume());
-      volume->min = child->GetElement("min")->Get<math::Vector3>();
-      volume->max = child->GetElement("max")->Get<math::Vector3>();
-      this->volumes.push_back(volume);
-    }
-    else if (ename == "name")
-    {
-      this->name = child->Get<std::string>();
-    }
-    else
-    {
-      std::string m;
-      m += "Unexpected element \"" + ename + "\" in Region element";
-      throw SimEventsException(m.c_str());
-    }
-    child = child->GetNextElement();
-  }
-}
-

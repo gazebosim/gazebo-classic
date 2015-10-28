@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,14 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Rand.hh>
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/gazebo_config.h"
+#include "gazebo/math/SignalStats.hh"
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"
 
 using namespace gazebo;
@@ -39,7 +42,9 @@ class JointTestRevolute : public JointTest
   /// Measure angular velocity of links, and verify proper axis orientation.
   /// Then set joint limits and verify that links remain within limits.
   /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void RevoluteJoint(const std::string &_physicsEngine);
+  /// \param[in] _solverType Type of solver to use.
+  public: void RevoluteJoint(const std::string &_physicsEngine,
+                             const std::string &_solverType="quick");
 
   /// \brief Load a simple pendulum, simulate and compare to numerical
   /// results from SimplePendulumIntegrator.
@@ -76,9 +81,9 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
 
     // Get initial energy
     physics::LinkPtr link = joint->GetChild();
-    ASSERT_TRUE(link);
+    ASSERT_TRUE(link != NULL);
     physics::ModelPtr model = link->GetModel();
-    ASSERT_TRUE(model);
+    ASSERT_TRUE(model != NULL);
 
     double energy0 = model->GetWorldEnergy();
     EXPECT_NEAR(model->GetWorldEnergyKinetic(), 0.0, g_tolerance);
@@ -97,13 +102,6 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////
 void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 {
-  /// \TODO: bullet hinge angles are wrapped (#1074)
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "Aborting test for bullet, see issues #1074.\n";
-    return;
-  }
-
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -124,6 +122,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     ASSERT_TRUE(joint != NULL);
 
     // set velocity to 2 pi rad/s and step forward 1.5 seconds.
+    // angle should reach 3 pi rad.
     double vel = 2*M_PI;
     unsigned int stepSize = 50;
     unsigned int stepCount = 30;
@@ -134,6 +133,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 
     joint->SetVelocity(0, vel);
 
+    math::SignalMaxAbsoluteValue angleErrorMax;
     // expect that joint velocity is constant
     // and that joint angle is unwrapped
     for (unsigned int i = 0; i < stepCount; ++i)
@@ -141,16 +141,28 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
       world->Step(stepSize);
       EXPECT_NEAR(joint->GetVelocity(0), vel, g_tolerance);
       double time = world->GetSimTime().Double();
-      EXPECT_NEAR(joint->GetAngle(0).Radian(), time*vel, g_tolerance);
+      angleErrorMax.InsertData(joint->GetAngle(0).Radian() - time*vel);
+    }
+#ifndef LIBBULLET_VERSION_GT_282
+    if (_physicsEngine == "bullet")
+    {
+      gzerr << "Skipping portion of test, angle wrapping requires bullet 2.83"
+            << std::endl;
+    }
+    else
+#endif
+    {
+      EXPECT_NEAR(angleErrorMax.Value(), 0.0, g_tolerance);
     }
   }
 }
 
 
 ////////////////////////////////////////////////////////////////////////
-void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
+void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
+                                      const std::string &_solverType)
 {
-  math::Rand::SetSeed(0);
+  ignition::math::Rand::Seed(0);
   // Load world
   Load("worlds/revolute_joint_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -160,6 +172,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Set solver type
+  physics->SetParam("solver_type", _solverType);
 
   // Model names
   std::vector<std::string> modelNames;
@@ -431,6 +446,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
   // Reset world again, disable gravity, detach upper_joint
   // Then apply torque at lower_joint and verify motion
   world->Reset();
+  physics->SetGravity(math::Vector3::Zero);
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
@@ -438,23 +454,6 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
     if (model)
     {
       gzdbg << "Check SetForce for model " << *modelIter << '\n';
-      std::vector<std::string>::iterator linkIter;
-      for (linkIter  = linkNames.begin();
-           linkIter != linkNames.end(); ++linkIter)
-      {
-        link = model->GetLink(*linkIter);
-        if (link)
-        {
-          // Disable gravity for links.
-          link->SetGravityMode(false);
-        }
-        else
-        {
-          gzerr << "Error loading link " << *linkIter
-                << " of model " << *modelIter << '\n';
-          EXPECT_TRUE(link != NULL);
-        }
-      }
 
       joint = model->GetJoint("upper_joint");
       if (joint)
@@ -598,11 +597,11 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     gzthrow("Unable to get model_1");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine);
+  EXPECT_TRUE(physicsEngine != NULL);
   physics::ModelPtr model = world->GetModel("model_1");
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink("link_2");  // sphere link at end
-  EXPECT_TRUE(link);
+  EXPECT_TRUE(link != NULL);
 
   double g = 9.81;
   double l = 10.0;
@@ -679,7 +678,8 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     // test with global contact_max_correcting_vel at 100
     // here we expect much lower energy loss
     world->Reset();
-    physicsEngine->SetContactMaxCorrectingVel(100);
+    if (_physicsEngine == "ode")
+      EXPECT_TRUE(physicsEngine->SetParam("contact_max_correcting_vel", 100.0));
 
     int steps = 10;  // @todo: make this more general
     for (int i = 0; i < steps; i ++)
@@ -732,6 +732,11 @@ TEST_P(JointTestRevolute, PendulumEnergy)
 TEST_P(JointTestRevolute, RevoluteJoint)
 {
   RevoluteJoint(this->physicsEngine);
+}
+
+TEST_F(JointTestRevolute, RevoluteJointWorldStep)
+{
+  RevoluteJoint("ode", "world");
 }
 
 TEST_P(JointTestRevolute, SimplePendulum)

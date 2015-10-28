@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace gazebo
     ///
     /// This class visualizes contact points by drawing arrows in the 3D
     /// environment.
-    class GAZEBO_VISIBLE ContactVisual : public Visual
+    class GZ_RENDERING_VISIBLE ContactVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the ContactVisual

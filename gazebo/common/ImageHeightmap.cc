@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,16 @@ int ImageHeightmap::Load(const std::string &_filename)
 void ImageHeightmap::FillHeightMap(int _subSampling,
     unsigned int _vertSize, const math::Vector3 &_size,
     const math::Vector3 &_scale, bool _flipY,
+    std::vector<float> &_heights)
+{
+  this->FillHeightMap(_subSampling, _vertSize, _size.Ign(), _scale.Ign(),
+      _flipY, _heights);
+}
+
+//////////////////////////////////////////////////
+void ImageHeightmap::FillHeightMap(int _subSampling,
+    unsigned int _vertSize, const ignition::math::Vector3d &_size,
+    const ignition::math::Vector3d &_scale, bool _flipY,
     std::vector<float> &_heights)
 {
   // Resize the vector to match the size of the vertices.
@@ -91,12 +101,12 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
       double px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
       float h2 = (px3 - ((px3 - px4) * dx));
 
-      float h = (h1 - ((h1 - h2) * dy)) * _scale.z;
+      float h = (h1 - ((h1 - h2) * dy)) * _scale.Z();
 
       // invert pixel definition so 1=ground, 0=full height,
       //   if the terrain size has a negative z component
       //   this is mainly for backward compatibility
-      if (_size.z < 0)
+      if (_size.Z() < 0)
         h = 1.0 - h;
 
       // Store the height for future use

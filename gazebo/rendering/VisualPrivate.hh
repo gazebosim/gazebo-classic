@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <list>
 #include <vector>
 
+#include <boost/function.hpp>
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -33,6 +34,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -55,6 +57,32 @@ namespace gazebo
     /// \brief Private data for the Visual class
     class VisualPrivate
     {
+      /// \brief Constructor
+      public: VisualPrivate()
+              : sceneNode(NULL),
+                transparency(0),
+                castShadows(true),
+                isStatic(false),
+                staticGeom(NULL),
+                visible(true),
+                ribbonTrail(NULL),
+                skeleton(NULL),
+                animState(NULL),
+                useRTShader(true),
+                initialized(false),
+                boundingBox(NULL),
+                id(0),
+                lighting(true),
+                visibilityFlags(GZ_VISIBILITY_ALL),
+                type(Visual::VT_ENTITY),
+                layer(0),
+                geomSize(ignition::math::Vector3d::One)
+      {
+      }
+
+      /// \brief Default destructor
+      public: virtual ~VisualPrivate() = default;
+
       /// \brief Pointer to the visual's scene.
       public: ScenePtr scene;
 
@@ -75,6 +103,9 @@ namespace gazebo
 
       /// \brief Transparency value.
       public: float transparency;
+
+      /// \brief True if visual casts shadows.
+      public: bool castShadows;
 
       /// \brief True if the visual is static, which allows Ogre to improve
       /// performance.
@@ -132,13 +163,44 @@ namespace gazebo
       public: static uint32_t visualIdCount;
 
       /// \brief Scale of visual.
-      public: math::Vector3 scale;
+      public: ignition::math::Vector3d scale;
 
       /// \brief True if lighting will be applied to this visual.
       public: bool lighting;
 
       /// \brief A list of visual plugins.
       public: std::vector<VisualPluginPtr> plugins;
+
+      /// \brief The visual's mesh name.
+      public: std::string meshName;
+
+      /// \brief The visual's submesh name.
+      public: std::string subMeshName;
+
+      /// \brief Ambient color of the visual.
+      public: common::Color ambient;
+
+      /// \brief Diffuse color of the visual.
+      public: common::Color diffuse;
+
+      /// \brief Specular color of the visual.
+      public: common::Color specular;
+
+      /// \brief Emissive color of the visual.
+      public: common::Color emissive;
+
+      /// \brief Visibility flags of the visual.
+      public: uint32_t visibilityFlags;
+
+      /// \brief type
+      public: Visual::VisualType type;
+
+      /// \brief Index of the layer to which this visual belongs. Layers
+      /// act similar to layers in photoshop.
+      public: int32_t layer;
+
+      /// \brief Size of attached geometry
+      public: ignition::math::Vector3d geomSize;
     };
     /// \}
   }

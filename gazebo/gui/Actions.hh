@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,72 +26,105 @@ namespace gazebo
 {
   namespace gui
   {
-    extern QAction *g_newAct;
-    extern QAction *g_openAct;
-    extern QAction *g_importAct;
-    extern QAction *g_saveAct;
-    extern QAction *g_saveAsAct;
-    extern QAction *g_saveCfgAct;
-    extern QAction *g_cloneAct;
-    extern QAction *g_aboutAct;
-    extern QAction *g_quitAct;
+    extern GZ_GUI_VISIBLE QAction *g_newAct;
+    extern GZ_GUI_VISIBLE QAction *g_openAct;
+    extern GZ_GUI_VISIBLE QAction *g_saveAct;
+    extern GZ_GUI_VISIBLE QAction *g_saveAsAct;
+    extern GZ_GUI_VISIBLE QAction *g_saveCfgAct;
+    extern GZ_GUI_VISIBLE QAction *g_cloneAct;
+    extern GZ_GUI_VISIBLE QAction *g_hotkeyChartAct;
+    extern GZ_GUI_VISIBLE QAction *g_aboutAct;
+    extern GZ_GUI_VISIBLE QAction *g_quitAct;
 
-    extern QAction *g_dataLoggerAct;
+    extern GZ_GUI_VISIBLE QAction *g_dataLoggerAct;
 
-    extern QAction *g_resetModelsAct;
-    extern QAction *g_resetWorldAct;
-    extern QAction *g_editBuildingAct;
-    extern QAction *g_editTerrainAct;
-    extern QAction *g_editModelAct;
+    extern GZ_GUI_VISIBLE QAction *g_resetModelsAct;
+    extern GZ_GUI_VISIBLE QAction *g_resetWorldAct;
+    extern GZ_GUI_VISIBLE QAction *g_editBuildingAct;
+    extern GZ_GUI_VISIBLE QAction *g_editTerrainAct;
+    extern GZ_GUI_VISIBLE QAction *g_editModelAct;
 
-    extern QAction *g_playAct;
-    extern QAction *g_pauseAct;
-    extern QAction *g_stepAct;
+    extern GZ_GUI_VISIBLE QAction *g_playAct;
+    extern GZ_GUI_VISIBLE QAction *g_pauseAct;
+    extern GZ_GUI_VISIBLE QAction *g_stepAct;
 
-    extern QAction *g_boxCreateAct;
-    extern QAction *g_sphereCreateAct;
-    extern QAction *g_cylinderCreateAct;
-    extern QAction *g_meshCreateAct;
-    extern QAction *g_pointLghtCreateAct;
-    extern QAction *g_spotLghtCreateAct;
-    extern QAction *g_dirLghtCreateAct;
+    extern GZ_GUI_VISIBLE QAction *g_boxCreateAct;
+    extern GZ_GUI_VISIBLE QAction *g_sphereCreateAct;
+    extern GZ_GUI_VISIBLE QAction *g_cylinderCreateAct;
+    extern GZ_GUI_VISIBLE QAction *g_pointLghtCreateAct;
+    extern GZ_GUI_VISIBLE QAction *g_spotLghtCreateAct;
+    extern GZ_GUI_VISIBLE QAction *g_dirLghtCreateAct;
 
-    extern QAction *g_screenshotAct;
+    extern GZ_GUI_VISIBLE QAction *g_screenshotAct;
 
-    extern QAction *g_showCollisionsAct;
-    extern QAction *g_showGridAct;
-    extern QAction *g_showContactsAct;
-    extern QAction *g_showJointsAct;
-    extern QAction *g_showCOMAct;
-    extern QAction *g_transparentAct;
+    /// \brief Action to show/hide collision visuals for all models.
+    extern GZ_GUI_VISIBLE QAction *g_showCollisionsAct;
 
-    extern QAction *g_resetAct;
-    extern QAction *g_fullScreenAct;
-    extern QAction *g_fpsAct;
-    extern QAction *g_orbitAct;
+    /// \brief Action to show/hide the grid over the ground plane.
+    extern GZ_GUI_VISIBLE QAction *g_showGridAct;
 
-    extern QAction *g_arrowAct;
-    extern QAction *g_translateAct;
-    extern QAction *g_rotateAct;
-    extern QAction *g_scaleAct;
+    /// \brief Action to show/hide the world origin indicator.
+    extern GZ_GUI_VISIBLE QAction *g_showOriginAct;
 
-    extern QAction *g_topicVisAct;
+    /// \brief Action to show/hide contact visuals for all models.
+    extern GZ_GUI_VISIBLE QAction *g_showContactsAct;
 
-    extern QAction *g_diagnosticsAct;
+    /// \brief Action to show/hide joint visuals for all models.
+    extern GZ_GUI_VISIBLE QAction *g_showJointsAct;
 
-    extern QAction *g_viewWireframeAct;
+    /// \brief Action to show/hide CoM visuals for all models.
+    extern GZ_GUI_VISIBLE QAction *g_showCOMAct;
 
-    extern QAction *g_viewOculusAct;
+    /// \brief Action to show/hide inertia visuals for all models.
+    extern GZ_GUI_VISIBLE QAction *g_showInertiaAct;
 
-    extern QAction *g_copyAct;
-    extern QAction *g_pasteAct;
+    /// \brief Action to show/hide link frame visuals for all models.
+    extern GZ_GUI_VISIBLE QAction *g_showLinkFrameAct;
 
-    extern QWidgetAction *g_alignAct;
-    extern QAction *g_snapAct;
+    extern GZ_GUI_VISIBLE QAction *g_transparentAct;
+
+    extern GZ_GUI_VISIBLE QAction *g_resetAct;
+    extern GZ_GUI_VISIBLE QAction *g_showToolbarsAct;
+    extern GZ_GUI_VISIBLE QAction *g_fullScreenAct;
+    extern GZ_GUI_VISIBLE QAction *g_fpsAct;
+    extern GZ_GUI_VISIBLE QAction *g_orbitAct;
+    extern GZ_GUI_VISIBLE QAction *g_overlayAct;
+
+    extern GZ_GUI_VISIBLE QAction *g_arrowAct;
+    extern GZ_GUI_VISIBLE QAction *g_translateAct;
+    extern GZ_GUI_VISIBLE QAction *g_rotateAct;
+    extern GZ_GUI_VISIBLE QAction *g_scaleAct;
+
+    extern GZ_GUI_VISIBLE QAction *g_topicVisAct;
+
+    extern GZ_GUI_VISIBLE QAction *g_diagnosticsAct;
+
+    extern GZ_GUI_VISIBLE QAction *g_viewWireframeAct;
+
+    extern GZ_GUI_VISIBLE QAction *g_viewOculusAct;
+
+    /// \brief Enable orthographic projection action
+    extern GZ_GUI_VISIBLE QAction *g_cameraOrthoAct;
+
+    /// \brief Enable perspective projection action
+    extern GZ_GUI_VISIBLE QAction *g_cameraPerspectiveAct;
+
+    extern GZ_GUI_VISIBLE QAction *g_copyAct;
+    extern GZ_GUI_VISIBLE QAction *g_pasteAct;
+
+    extern GZ_GUI_VISIBLE QWidgetAction *g_alignAct;
+    extern GZ_GUI_VISIBLE QAction *g_alignButtonAct;
+    extern GZ_GUI_VISIBLE QAction *g_snapAct;
+
+    /// \brief Action to open the view angle widget.
+    extern GZ_GUI_VISIBLE QWidgetAction *g_viewAngleAct;
+
+    /// \brief Action attached to the view angle button.
+    extern GZ_GUI_VISIBLE QAction *g_viewAngleButtonAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
-    class GAZEBO_VISIBLE DeleteAction : public QAction
+    class GZ_GUI_VISIBLE DeleteAction : public QAction
     {
       Q_OBJECT
       /// \brief Constructor
@@ -111,7 +144,7 @@ namespace gazebo
     };
 
     /// \brief Action used to delete a model.
-    extern DeleteAction *g_deleteAct;
+    extern GZ_GUI_VISIBLE DeleteAction *g_deleteAct;
   }
 }
 #endif

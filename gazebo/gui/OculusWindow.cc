@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include <boost/bind.hpp>
 
 #include "gazebo/gui/OculusWindow.hh"
 #include "gazebo/rendering/OculusCamera.hh"
@@ -59,6 +60,7 @@ OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
 /////////////////////////////////////////////////
 OculusWindow::~OculusWindow()
 {
+  this->scene.reset();
   if (this->attachCameraThread)
     this->attachCameraThread->join();
   delete this->attachCameraThread;

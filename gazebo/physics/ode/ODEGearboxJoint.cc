@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,20 +143,6 @@ void ODEGearboxJoint::SetVelocity(unsigned int /*index*/, double /*_angle*/)
 {
   gzlog << "SetVelocity not implemented for gearbox\n";
   return;
-}
-
-//////////////////////////////////////////////////
-void ODEGearboxJoint::SetMaxForce(unsigned int /*index*/, double /*_t*/)
-{
-  gzlog << "SetMaxForce not implemented for gearbox\n";
-  return;
-}
-
-//////////////////////////////////////////////////
-double ODEGearboxJoint::GetMaxForce(unsigned int /*index*/)
-{
-  gzlog << "GetMaxForce not implemented for gearbox\n";
-  return 0;
 }
 
 //////////////////////////////////////////////////

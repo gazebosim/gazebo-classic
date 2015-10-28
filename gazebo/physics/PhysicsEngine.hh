@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class PhysicsEngine PhysicsEngine.hh physics/physics.hh
     /// \brief Base class for a physics engine.
-    class GAZEBO_VISIBLE PhysicsEngine
+    class GZ_PHYSICS_VISIBLE PhysicsEngine
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
@@ -136,26 +136,18 @@ namespace gazebo
       public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent = ModelPtr()) = 0;
 
-      /// \brief Return the gavity vector.
-      /// \return The gavity vector.
+      /// \brief Return the gravity vector.
+      /// \return The gravity vector.
       public: virtual math::Vector3 GetGravity() const;
 
-      /// \brief Set the gavity vector.
+      /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
       public: virtual void SetGravity(
                   const gazebo::math::Vector3 &_gravity) = 0;
 
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _cfm Constraint force mixing.
-      public: virtual void SetWorldCFM(double _cfm);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _erp Error reduction parameter.
-      public: virtual void SetWorldERP(double _erp);
+      /// \brief Return the magnetic field vector.
+      /// \return The magnetic field vector.
+      public: virtual ignition::math::Vector3d MagneticField() const;
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -165,57 +157,15 @@ namespace gazebo
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _vel Max correcting velocity.
-      public: virtual void SetContactMaxCorrectingVel(double _vel);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Access functions to set ODE parameters.
-      /// \param[in] _layerDepth Surface layer depth
-      public: virtual void SetContactSurfaceLayer(double _layerDepth);
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
       /// \brief access functions to set ODE parameters
       /// \param[in] _maxContacts Maximum number of contacts.
       public: virtual void SetMaxContacts(unsigned int _maxContacts);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
-      /// \brief Get World CFM.
-      /// \return World CFM.
-      public: virtual double GetWorldCFM() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
-      /// \brief Get World ERP.
-      /// \return World ERP.
-      public: virtual double GetWorldERP() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map
       /// \brief access functions to set ODE parameters..
       /// \return Auto disable flag.
       public: virtual bool GetAutoDisableFlag() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters.
-      /// \return Max correcting velocity.
-      public: virtual double GetContactMaxCorrectingVel() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters.
-      /// \return Contact suerface layer depth.
-      public: virtual double GetContactSurfaceLayer() {return 0;}
-
-      /// \TODO: Remove this function, and replace it with a more generic
-      /// property map.
-      /// \brief access functions to set ODE parameters.
-      /// \return Maximum number of allows contacts.
-      public: virtual unsigned int GetMaxContacts() {return 0;}
 
       /// \brief Set a parameter of the physics engine.
       /// See SetParam documentation for descriptions of duplicate parameters.
@@ -225,20 +175,20 @@ namespace gazebo
       ///          "sequential_impulse' for Bullet, "quick" for ODE
       ///          "Featherstone and Lemkes" for DART and
       ///          "Spatial Algebra and Elastic Foundation" for Simbody.
-      ///       -# "cfm" (double) - global CFM
-      ///       -# "erp" (double) - global ERP
+      ///       -# "cfm" (double) - global CFM (ODE/Bullet)
+      ///       -# "erp" (double) - global ERP (ODE/Bullet)
       ///       -# "precon_iters" (bool) - precondition iterations
-      ///          (experimental).
+      ///          (experimental). (ODE)
       ///       -# "iters" (int) - number of LCP PGS iterations. If
       ///          sor_lcp_tolerance is negative, full iteration count is
       ///          executed.  Otherwise, PGS may stop iteration early if
       ///          sor_lcp_tolerance is satisfied by the total RMS residual.
       ///       -# "sor" (double) - relaxation parameter for Projected
-      ///          Gauss-Seidel (PGS) updates.
+      ///          Gauss-Seidel (PGS) updates. (ODE/Bullet)
       ///       -# "contact_max_correcting_vel" (double) - truncates correction
-      ///          impulses from ERP by this value.
+      ///          impulses from ERP by this value. (ODE)
       ///       -# "contact_surface_layer" (double) - ERP is 0 for
-      ///          interpenetration depths below this value.
+      ///          interpenetration depths below this value. (ODE/Bullet)
       ///       -# "max_contacts" (int) - max number of contact constraints
       ///          between any pair of collision bodies.
       ///       -# "min_step_size" (double) - minimum internal step size.
@@ -257,6 +207,14 @@ namespace gazebo
       /// \return The value of the parameter
       public: virtual boost::any GetParam(const std::string &_key) const;
 
+      /// \brief Get a parameter from the physics engine with a boolean to
+      /// indicate success or failure
+      /// \param[in] _key Key of the accessed param
+      /// \param[out] _value Value of the accessed param
+      /// \return True if the parameter was successfully retrieved
+      public: virtual bool GetParam(const std::string &_key,
+                  boost::any &_value) const;
+
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;
 
@@ -268,6 +226,10 @@ namespace gazebo
       /// \return Pointer to the physics mutex.
       public: boost::recursive_mutex *GetPhysicsUpdateMutex() const
               {return this->physicsUpdateMutex;}
+
+      /// \brief Get a pointer to the SDF element for this physics engine.
+      /// \return Pointer to the physics SDF element.
+      public: sdf::ElementPtr GetSDF() const;
 
       /// \brief virtual callback for gztopic "~/request".
       /// \param[in] _msg Request message.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -254,18 +254,6 @@ double ODEScrewJoint::GetParam(unsigned int _parameter) const
     gzerr << "ODE Joint ID is invalid\n";
 
   return result;
-}
-
-//////////////////////////////////////////////////
-void ODEScrewJoint::SetMaxForce(unsigned int /*_index*/, double _t)
-{
-  this->SetParam(dParamFMax, _t);
-}
-
-//////////////////////////////////////////////////
-double ODEScrewJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return this->GetParam(dParamFMax);
 }
 
 //////////////////////////////////////////////////

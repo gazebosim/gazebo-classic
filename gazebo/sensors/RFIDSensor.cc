@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,12 @@
  * Author: Jonas Mellin & Zakiruz Zaman
  * Date: 6th December 2011
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
@@ -131,7 +137,7 @@ bool RFIDSensor::UpdateImpl(bool /*_force*/)
   if (this->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, this->entity->GetWorldPose());
+    msgs::Set(&msg, this->entity->GetWorldPose().Ign());
     this->scanPub->Publish(msg);
   }
 
@@ -146,7 +152,7 @@ void RFIDSensor::EvaluateTags()
   // iterate through the tags contained given rfid tag manager
   for (ci = this->tags.begin(); ci != this->tags.end(); ++ci)
   {
-    math::Pose pos = (*ci)->GetTagPose();
+    ignition::math::Pose3d pos = (*ci)->TagPose();
     // std::cout << "link: " << tagModelPtr->GetName() << std::endl;
     // std::cout << "link pos: x" << pos.pos.x
     //     << " y:" << pos.pos.y
@@ -158,13 +164,19 @@ void RFIDSensor::EvaluateTags()
 //////////////////////////////////////////////////
 bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
 {
+  return this->CheckTagRange(_pose.Ign());
+}
+
+//////////////////////////////////////////////////
+bool RFIDSensor::CheckTagRange(const ignition::math::Pose3d &_pose)
+{
   // copy sensor vector pos into a temp var
-  math::Vector3 v;
-  v = _pose.pos - this->entity->GetWorldPose().pos;
+  ignition::math::Vector3d v;
+  v = _pose.Pos() - this->entity->GetWorldPose().Ign().Pos();
 
   // std::cout << v.GetLength() << std::endl;
 
-  if (v.GetLength() <= 5.0)
+  if (v.Length() <= 5.0)
   {
     // std::cout << "detected " <<  v.GetLength() << std::endl;
     return true;
@@ -179,18 +191,3 @@ void RFIDSensor::AddTag(RFIDTag *_tag)
 {
   this->tags.push_back(_tag);
 }
-
-//////////////////////////////////////////////////
-/*bool RFIDSensor::CheckRayIntersection(const math::Pose &_pose)
-{
-    math::Vector3 d;
-  //calculate direction, by adding 2 vectors?
-  d = _pose.pos + entity->GetWorldPose().pos;
-
-  Ogre::Ray ray(rendering::Conversions::Convert(entity->GetWorldPose().pos),rendering::Conversions::Convert(d));
-  query->setRay(ray);
-  Ogre::RaySceneQueryResult &result = query->execute();
-  return false;
-  return false;
-}*/
-

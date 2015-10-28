@@ -6,7 +6,6 @@ package gazebo.msgs;
 
 
 
-import "header.proto";
 import "pose.proto";
 import "vector3d.proto";
 import "color.proto";

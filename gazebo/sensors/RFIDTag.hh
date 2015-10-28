@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,17 @@
  * limitations under the License.
  *
 */
-/* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
-
-#ifndef _RFIDTAG_HH_
-#define _RFIDTAG_HH_
+#ifndef _GAZEBO_RFIDTAG_HH_
+#define _GAZEBO_RFIDTAG_HH_
 
 #include <vector>
 #include <string>
+#include <ignition/math/Pose3.hh>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/math/gzmath.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/util/system.hh"
 
@@ -66,8 +63,13 @@ namespace gazebo
 
       /// \brief Returns pose of tag in world coordinate.
       /// \return Pose of object.
-      public: math::Pose GetTagPose() const
-              {return entity->GetWorldPose();}
+      /// \deprecated See TagPose() function that returns an
+      /// ignition::math::Pose3d object.
+      public: math::Pose GetTagPose() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Returns pose of tag in world coordinate.
+      /// \return Pose of object.
+      public: ignition::math::Pose3d TagPose() const;
 
       /// \brief Pointer the entity that has the RFID tag.
       private: physics::EntityPtr entity;

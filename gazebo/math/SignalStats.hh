@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class SignalStatistic SignalStats.hh math/gzmath.hh
     /// \brief Statistical properties of a discrete time scalar signal.
-    class GAZEBO_VISIBLE SignalStatistic
+    class GZ_MATH_VISIBLE SignalStatistic
     {
       /// \brief Constructor
       public: SignalStatistic();
@@ -67,7 +67,7 @@ namespace gazebo
 
     /// \class SignalMean SignalStats.hh math/gzmath.hh
     /// \brief Computing the mean value of a discretely sampled signal.
-    class GAZEBO_VISIBLE SignalMean : public SignalStatistic
+    class GZ_MATH_VISIBLE SignalMean : public SignalStatistic
     {
       // Documentation inherited.
       public: virtual double Value() const;
@@ -84,7 +84,7 @@ namespace gazebo
     /// \class SignalRootMeanSquare SignalStats.hh math/gzmath.hh
     /// \brief Computing the square root of the mean squared value
     /// of a discretely sampled signal.
-    class GAZEBO_VISIBLE SignalRootMeanSquare : public SignalStatistic
+    class GZ_MATH_VISIBLE SignalRootMeanSquare : public SignalStatistic
     {
       // Documentation inherited.
       public: virtual double Value() const;
@@ -102,7 +102,7 @@ namespace gazebo
     /// \brief Computing the maximum of the absolute value
     /// of a discretely sampled signal.
     /// Also known as the maximum norm, infinity norm, or supremum norm.
-    class GAZEBO_VISIBLE SignalMaxAbsoluteValue : public SignalStatistic
+    class GZ_MATH_VISIBLE SignalMaxAbsoluteValue : public SignalStatistic
     {
       // Documentation inherited.
       public: virtual double Value() const;
@@ -121,7 +121,7 @@ namespace gazebo
 
     /// \class SignalStats SignalStats.hh math/gzmath.hh
     /// \brief Collection of statistics for a scalar signal.
-    class GAZEBO_VISIBLE SignalStats
+    class GZ_MATH_VISIBLE SignalStats
     {
       /// \brief Constructor
       public: SignalStats();

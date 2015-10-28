@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ EventSource::EventSource(transport::PublisherPtr _pub,
                          physics::WorldPtr _world)
   :type(_type), world(_world), active(true), pub(_pub)
 {
+  GZ_ASSERT(_world, "EventSource world pointer is NULL");
+  GZ_ASSERT(_pub, "EventSource pub pointer is NULL");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,9 +43,10 @@ void EventSource::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void EventSource::Load(const sdf::ElementPtr &_sdf)
+void EventSource::Load(const sdf::ElementPtr _sdf)
 {
   this->name = _sdf->GetElement("name")->Get<std::string>();
+
   // active by default, but this can be set in the world file
   if (_sdf->HasElement("active"))
   {
@@ -54,7 +57,7 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void EventSource::Emit(const std::string& _data)
+void EventSource::Emit(const std::string &_data) const
 {
   if (this->IsActive())
   {
@@ -72,12 +75,12 @@ void EventSource::Emit(const std::string& _data)
     msgs::Set(worldStatsMsg->mutable_real_time(), this->world->GetRealTime());
     msgs::Set(worldStatsMsg->mutable_pause_time(), this->world->GetPauseTime());
     // send it on the publisher we got in the ctor
-    pub->Publish(msg);
+    this->pub->Publish(msg);
   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool EventSource::IsActive()
+bool EventSource::IsActive() const
 {
   // inactive events do not fire.
   return this->active;

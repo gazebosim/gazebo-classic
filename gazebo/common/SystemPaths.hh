@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #define LINUX
-#ifdef WINDOWS
+#ifdef _WIN32
   #include <direct.h>
   #define GetCurrentDir _getcwd
 #else
@@ -53,7 +53,7 @@ namespace gazebo
     ///            Should point to Ogre RenderSystem_GL.so et. al.
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class GAZEBO_VISIBLE SystemPaths : public SingletonT<SystemPaths>
+    class GZ_COMMON_VISIBLE SystemPaths : public SingletonT<SystemPaths>
     {
       /// Constructor for SystemPaths
       private: SystemPaths();

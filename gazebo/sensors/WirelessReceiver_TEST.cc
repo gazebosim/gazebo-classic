@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 */
 
 #include <gtest/gtest.h>
-#include <boost/algorithm/string/find.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class WirelessReceiver_TEST : public ServerFixture

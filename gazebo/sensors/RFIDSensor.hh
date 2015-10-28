@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Gazebo RFID Sensor
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
-
-#ifndef _RFIDSENSOR_HH_
-#define _RFIDSENSOR_HH_
+#ifndef _GAZEBO_RFIDSENSOR_HH_
+#define _GAZEBO_RFIDSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -81,21 +76,18 @@ namespace gazebo
       /// \brief Check the range for one RFID tag.
       /// \param[in] _pose Pose of a tag.
       /// \return Checks if tag is in range
-      private: bool CheckTagRange(const math::Pose &_pose);
+      /// \deprecated See CheckTagRange() that accepts an
+      /// ignition::math::Pose3d object.
+      private: bool CheckTagRange(const math::Pose &_pose)
+               GAZEBO_DEPRECATED(6.0);
 
-      /// \brief Checks if ray intersects RFID sensor.
-      /// \param[in] _pose Pose to compare against.
-      /// \return True if intersects, false if not.
-      // private: bool CheckRayIntersection(const math::Pose &_pose);
+      /// \brief Check the range for one RFID tag.
+      /// \param[in] _pose Pose of a tag.
+      /// \return Checks if tag is in range
+      private: bool CheckTagRange(const ignition::math::Pose3d &_pose);
 
       /// \brief Parent entity
       private: physics::EntityPtr entity;
-
-      /// \brief Unused
-      // private: physics::CollisionPtr laserCollision;
-
-      /// \brief Unused
-      // private: physics::RayShapePtr laserShape;
 
       /// \brief Publisher for RFID pose messages.
       private: transport::PublisherPtr scanPub;

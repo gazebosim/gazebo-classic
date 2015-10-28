@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,10 @@ VehiclePlugin::VehiclePlugin()
   this->frontPower = 50;
   this->rearPower = 50;
   this->wheelRadius = 0.3;
+  this->maxBrake = 0.0;
+  this->maxGas = 0.0;
+  this->steeringRatio = 1.0;
+  this->tireAngleRange = 1.0;
 }
 
 /////////////////////////////////////////////////

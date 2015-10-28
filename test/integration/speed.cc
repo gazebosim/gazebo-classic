@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,31 @@
  * limitations under the License.
  *
 */
-#include "ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 class SpeedTest : public ServerFixture,
                   public testing::WithParamInterface<const char*>
 {
+  /// \brief Spawn 500 spheres into empty.world and
+  /// verify that real-time factor is fast enough.
+  /// \param[in] _physicsEngine Physics engine to use.
   public: void BallTest(const std::string &_physicsEngine);
+
+  /// \brief Spawn 500 spheres into shapes.world and
+  /// verify that real-time factor is fast enough.
+  /// \param[in] _physicsEngine Physics engine to use.
   public: void ShapesWorld(const std::string &_physicsEngine);
+
+  /// \brief Unthrottle real-time update rate and call World::Step
+  /// in an empty world.
+  /// Verify that it goes at least 2 times faster than real-time.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void UnthrottledStep(const std::string &_physicsEngine);
 };
 
+//////////////////////////////////////////////////
 void SpeedTest::BallTest(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", false, _physicsEngine);
@@ -65,6 +79,7 @@ TEST_P(SpeedTest, BallTest)
   BallTest(GetParam());
 }
 
+//////////////////////////////////////////////////
 void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
 {
   Load("worlds/shapes.world", false, _physicsEngine);
@@ -101,6 +116,40 @@ void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
 TEST_P(SpeedTest, ShapesWorld)
 {
   ShapesWorld(GetParam());
+}
+
+//////////////////////////////////////////////////
+void SpeedTest::UnthrottledStep(const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Unthrottle physics updates
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  physics->SetRealTimeUpdateRate(0.0);
+  double dt = physics->GetMaxStepSize();
+
+  const unsigned int steps = 2000;
+  common::Time startTime = common::Time::GetWallTime();
+  for (unsigned int i = 0; i < steps; ++i)
+  {
+    world->Step(1);
+  }
+  common::Time runTime = common::Time::GetWallTime() - startTime;
+
+  double realTimeFactor = dt * steps / runTime.Double();
+  gzdbg << "realTimeFactor " << realTimeFactor << std::endl;
+  EXPECT_GT(realTimeFactor, 2.0);
+
+  RecordProperty("engine", _physicsEngine);
+  this->Record("realTimeFactor", realTimeFactor);
+}
+
+TEST_P(SpeedTest, UnthrottledStep)
+{
+  UnthrottledStep(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, SpeedTest, PHYSICS_ENGINE_VALUES);

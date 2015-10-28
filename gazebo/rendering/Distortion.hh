@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace gazebo
     /// \class Distortion Distortion.hh rendering/rendering.hh
     /// \brief Camera distortion based on Brown's model. Note that the current
     /// implementation only supports barrel distortion.
-    class GAZEBO_VISIBLE Distortion
+    class GZ_RENDERING_VISIBLE Distortion
     {
       /// \brief Constructor
       public: Distortion();

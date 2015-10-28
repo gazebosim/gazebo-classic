@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: A model state
- * Author: Nate Koenig
- */
 
-#ifndef _MODELSTATE_HH_
-#define _MODELSTATE_HH_
+#ifndef _GAZEBO_MODELSTATE_HH_
+#define _GAZEBO_MODELSTATE_HH_
 
 #include <vector>
 #include <string>
@@ -47,7 +44,7 @@ namespace gazebo
     ///
     /// State of a Model includes the state of all its child Links and
     /// Joints.
-    class GAZEBO_VISIBLE ModelState : public State
+    class GZ_PHYSICS_VISIBLE ModelState : public State
     {
       /// \brief Default constructor.
       public: ModelState();
@@ -59,8 +56,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: ModelState(const ModelPtr _model, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor.
       ///
@@ -85,8 +83,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: void Load(const ModelPtr _model, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Load state from SDF element.
       ///
@@ -171,6 +170,30 @@ namespace gazebo
       /// \return True if the joint exists in the model.
       public: bool HasJointState(const std::string &_jointName) const;
 
+      /// \brief Get the number of model states.
+      ///
+      /// This returns the number of nested model states recorded.
+      /// \return Number of nested ModelState recorded.
+      public: unsigned int NestedModelStateCount() const;
+
+      /// \brief Get a model state by model name
+      ///
+      /// Searches through all nested model states. Returns the model state with
+      /// the matching name, if any.
+      /// \param[in] _modelName Name of the model state
+      /// \return State of the Model.
+      /// \throws common::Exception When _modelName is invalid.
+      public: ModelState NestedModelState(const std::string &_modelName) const;
+
+      /// \brief Return true if there is a nested model with the specified name.
+      /// \param[in] _modelName Name of the model state.
+      /// \return True if the model exists in this model state.
+      public: bool HasNestedModelState(const std::string &_modelName) const;
+
+      /// \brief Get the nested model states.
+      /// \return A map of model names to model states.
+      public: const ModelState_M &NestedModelStates() const;
+
       /// \brief Populate a state SDF element with data from the object.
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
@@ -187,6 +210,11 @@ namespace gazebo
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
       public: virtual void SetSimTime(const common::Time &_time);
+
+      /// \brief Set the simulation iterations when this state was generated
+      /// \param[in] _iterations Simulation iterations when the data was
+      /// recorded.
+      public: virtual void SetIterations(const uint64_t _iterations);
 
       /// \brief Assignment operator
       /// \param[in] _state State value
@@ -229,6 +257,11 @@ namespace gazebo
           _out << iter->second;
         }
 
+        for (const auto &ms : _state.modelStates)
+        {
+          _out << ms.second;
+        }
+
         // Output the joint information
         // for (JointState_M::const_iterator iter =
         //     _state.jointStates.begin(); iter != _state.jointStates.end();
@@ -250,6 +283,9 @@ namespace gazebo
 
       /// \brief All the joint states.
       private: JointState_M jointStates;
+
+      /// \brief All the model states.
+      private: ModelState_M modelStates;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class GAZEBO_VISIBLE GeomUtils
+    class GZ_RENDERING_VISIBLE GeomUtils
     {
       /// \brief Create a sphere Mesh with a given name, radius, number of
       /// rings and number of segments

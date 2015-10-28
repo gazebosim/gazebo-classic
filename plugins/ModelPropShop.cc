@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/program_options.hpp>
 
 #include "gazebo/msgs/msgs.hh"
@@ -98,7 +104,7 @@ void ModelPropShop::Load(int _argc, char **_argv)
     return;
   }
 
-  sdf::ElementPtr modelElem = this->sdf->root->GetElement("model");
+  sdf::ElementPtr modelElem = this->sdf->Root()->GetElement("model");
   this->modelName = modelElem->Get<std::string>("name");
 }
 
@@ -164,7 +170,7 @@ void ModelPropShop::Update()
     gazebo::msgs::Set(lightMsg.mutable_specular(),
                       gazebo::common::Color(.2, .2, .2, 1));
     gazebo::msgs::Set(lightMsg.mutable_direction(),
-                      gazebo::math::Vector3(-0.5, 0.1, -0.9));
+                      ignition::math::Vector3d(-0.5, 0.1, -0.9));
     lightMsg.set_cast_shadows(false);
     lightMsg.set_range(1000);
     lightMsg.set_attenuation_constant(1);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -27,19 +28,17 @@
 #include "gazebo/physics/dart/DARTModel.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
 
+#include "gazebo/physics/dart/DARTJointPrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 DARTJoint::DARTJoint(BasePtr _parent)
   : Joint(_parent),
-    dtJoint(NULL),
-    dtChildBodyNode(NULL)
+    dataPtr(new DARTJointPrivate(boost::dynamic_pointer_cast<DARTPhysics>(
+      this->GetWorld()->GetPhysicsEngine())))
 {
-  this->dartPhysicsEngine = boost::dynamic_pointer_cast<DARTPhysics>(
-                              this->GetWorld()->GetPhysicsEngine());
-  this->forceApplied[0] = 0.0;
-  this->forceApplied[1] = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -47,8 +46,7 @@ DARTJoint::~DARTJoint()
 {
   this->Detach();
 
-  if (dtJoint)
-    delete dtJoint;
+  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
@@ -66,7 +64,7 @@ void DARTJoint::Init()
 
   // Name
   std::string jointName = this->GetName();
-  this->dtJoint->setName(jointName.c_str());
+  this->dataPtr->dtJoint->setName(jointName.c_str());
 
   // Parent and child link information
   DARTLinkPtr dartParentLink =
@@ -85,8 +83,8 @@ void DARTJoint::Init()
   {
     dtTransformChildBodyNode =
         DARTTypes::ConvPose(dartChildLink->GetWorldPose());
-    this->dtChildBodyNode = dartChildLink->GetDARTBodyNode();
-    this->dtChildBodyNode->setParentJoint(this->dtJoint);
+    this->dataPtr->dtChildBodyNode = dartChildLink->GetDARTBodyNode();
+    this->dataPtr->dtChildBodyNode->setParentJoint(this->dataPtr->dtJoint);
   }
   dtTransformChildLinkToJoint = DARTTypes::ConvPose(this->anchorPose);
 
@@ -94,9 +92,9 @@ void DARTJoint::Init()
   {
     dtTransformParentBodyNode =
         DARTTypes::ConvPose(dartParentLink->GetWorldPose());
-    dart::dynamics::BodyNode* dtParentBodyNode =
+    dart::dynamics::BodyNode *dtParentBodyNode =
       dartParentLink->GetDARTBodyNode();
-    dtParentBodyNode->addChildBodyNode(this->dtChildBodyNode);
+    dtParentBodyNode->addChildBodyNode(this->dataPtr->dtChildBodyNode);
   }
 
   dtTransformParentLinkToJoint = dtTransformParentBodyNode.inverse() *
@@ -104,42 +102,10 @@ void DARTJoint::Init()
                                  dtTransformChildLinkToJoint;
 
   // We assume that the joint angles are all zero.
-  this->dtJoint->setTransformFromParentBodyNode(dtTransformParentLinkToJoint);
-  this->dtJoint->setTransformFromChildBodyNode(dtTransformChildLinkToJoint);
-
-  //----------------------------------------------------------------------------
-  // TODO: Currently, dampingCoefficient seems not to be initialized when
-  //       this joint is loaded. Therefore, we need below code...
-  //----------------------------------------------------------------------------
-  if (this->sdf->HasElement("axis"))
-  {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented in DART.\n";
-      }
-    }
-  }
-
-  if (this->sdf->HasElement("axis2"))
-  {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented in DART.\n";
-      }
-    }
-  }
+  this->dataPtr->dtJoint->setTransformFromParentBodyNode(
+        dtTransformParentLinkToJoint);
+  this->dataPtr->dtJoint->setTransformFromChildBodyNode(
+        dtTransformChildLinkToJoint);
 }
 
 //////////////////////////////////////////////////
@@ -275,11 +241,11 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
     {
       if (!parentStatic && !childStatic)
       {
-        this->dtJoint->setSpringStiffness(
+        this->dataPtr->dtJoint->setSpringStiffness(
               static_cast<int>(_index), _stiffness);
-        this->dtJoint->setRestPosition(
+        this->dataPtr->dtJoint->setRestPosition(
               static_cast<int>(_index), _reference);
-        this->dtJoint->setDampingCoefficient(
+        this->dataPtr->dtJoint->setDampingCoefficient(
               static_cast<int>(_index), _damping);
         this->applyDamping = physics::Joint::ConnectJointUpdate(
           boost::bind(&DARTJoint::ApplyDamping, this));
@@ -306,7 +272,7 @@ bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
     case 0:
     case 1:
     case 2:
-      this->dtJoint->setPositionUpperLimit(_index, _angle.Radian());
+      this->dataPtr->dtJoint->setPositionUpperLimit(_index, _angle.Radian());
       return true;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
@@ -322,7 +288,7 @@ bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   case 0:
   case 1:
   case 2:
-    this->dtJoint->setPositionLowerLimit(_index, _angle.Radian());
+    this->dataPtr->dtJoint->setPositionLowerLimit(_index, _angle.Radian());
     return true;
   default:
     gzerr << "Invalid index[" << _index << "]\n";
@@ -338,7 +304,7 @@ math::Angle DARTJoint::GetHighStop(unsigned int _index)
   case 0:
   case 1:
   case 2:
-    return this->dtJoint->getPositionUpperLimit(_index);
+    return this->dataPtr->dtJoint->getPositionUpperLimit(_index);
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -354,7 +320,7 @@ math::Angle DARTJoint::GetLowStop(unsigned int _index)
   case 0:
   case 1:
   case 2:
-    return this->dtJoint->getPositionLowerLimit(_index);
+    return this->dataPtr->dtJoint->getPositionLowerLimit(_index);
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -367,7 +333,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 {
   math::Vector3 result;
 
-  if (!this->dtJoint)
+  if (!this->dataPtr->dtJoint)
   {
     gzerr << "DART joint is invalid\n";
     return result;
@@ -381,7 +347,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
-  Eigen::Isometry3d T12 = dtJoint->getLocalTransform();
+  Eigen::Isometry3d T12 = this->dataPtr->dtJoint->getLocalTransform();
 
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in
@@ -390,8 +356,9 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
-    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
-                           dartChildBody->getBodyForce());
+    F2 = -dart::math::dAdT(
+          this->dataPtr->dtJoint->getTransformFromChildBodyNode(),
+          dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
@@ -412,7 +379,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 {
   math::Vector3 result;
 
-  if (!this->dtJoint)
+  if (!this->dataPtr->dtJoint)
   {
     gzerr << "DART joint is invalid\n";
     return result;
@@ -424,7 +391,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
-  Eigen::Isometry3d T12 = dtJoint->getLocalTransform();
+  Eigen::Isometry3d T12 = this->dataPtr->dtJoint->getLocalTransform();
 
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in
@@ -434,7 +401,8 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(
-      dtJoint->getTransformFromChildBodyNode(), dartChildBody->getBodyForce());
+      this->dataPtr->dtJoint->getTransformFromChildBodyNode(),
+      dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
@@ -452,73 +420,65 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 
 //////////////////////////////////////////////////
 bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
-                             const boost::any &_value)
+                         const boost::any &_value)
 {
-  if (_key == "hi_stop")
+  // try because boost::any_cast can throw
+  try
   {
-    try
+    if (_key == "hi_stop")
     {
       this->SetHighStop(_index, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "lo_stop")
-  {
-    try
+    else if (_key == "lo_stop")
     {
       this->SetLowStop(_index, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "friction")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      this->dataPtr->dtJoint->setCoulombFriction(_index,
+                                        boost::any_cast<double>(_value));
+    }
+    else
+    {
+      gzerr << "Unable to handle joint attribute[" << _key << "]\n";
       return false;
     }
   }
-  else
+  catch(const boost::bad_any_cast &e)
   {
-    gzerr << "Unable to handle joint attribute[" << _key << "]\n";
+    gzerr << "SetParam(" << _key << ")"
+          << " boost any_cast error:" << e.what()
+          << std::endl;
     return false;
   }
+
   return true;
 }
 
 //////////////////////////////////////////////////
-double DARTJoint::GetParam(const std::string& _key,
-                               unsigned int _index)
+double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_key == "hi_stop")
+  try
   {
-    try
+    if (_key == "friction")
     {
-      return this->GetHighStop(_index).Radian();
-    }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
+      return this->dataPtr->dtJoint->getCoulombFriction(_index);
     }
   }
-  else if (_key == "lo_stop")
+  catch(const common::Exception &e)
   {
-    try
-    {
-      return this->GetLowStop(_index).Radian();
-    }
-    catch(common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else
-  {
-    gzerr << "Unable to get joint attribute[" << _key << "]\n";
+    gzerr << "GetParam(" << _key << ") error:"
+          << e.GetErrorStr()
+          << std::endl;
     return 0;
   }
+  return Joint::GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+void DARTJoint::CacheForceTorque()
+{
+  // Does nothing for now, will add when recovering pull request #1721
 }
 
 //////////////////////////////////////////////////
@@ -534,22 +494,25 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 
   Eigen::Vector6d F1 = Eigen::Vector6d::Zero();
   Eigen::Vector6d F2 = Eigen::Vector6d::Zero();
-  Eigen::Isometry3d T12 = dtJoint->getLocalTransform();
+  Eigen::Isometry3d T12 = this->dataPtr->dtJoint->getLocalTransform();
 
-  // JointWrench.body1Force contains the
-  // force applied by the parent Link on the Joint specified in
-  // the parent Link frame.
+  // JointWrench.body2Force (F2) contains
+  // the force applied by the child Link on the parent link specified
+  // in the child Link orientation frame and with respect to the joint origin
   if (theChildLink != NULL)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
-    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
+    Eigen::Isometry3d TJ2 = Eigen::Isometry3d::Identity();
+    TJ2.translation() =
+        this->dataPtr->dtJoint->getTransformFromChildBodyNode().translation();
+    F2 = -dart::math::dAdT(TJ2,
                            dartChildBody->getBodyForce());
   }
 
-  // JointWrench.body2Force contains
-  // the force applied by the child Link on the Joint specified
-  // in the child Link frame.
+  // JointWrench.body1Force (F1) contains the
+  // force applied by the parent Link on the child Link specified in
+  // the parent Link orientation frame and with respect to the joint origin
   F1 = -dart::math::dAdInvR(T12, F2);
 
   // kind of backwards here, body1 (parent) corresponds go f2, t2
@@ -581,7 +544,7 @@ double DARTJoint::GetForce(unsigned int _index)
 {
   if (_index < this->GetAngleCount())
   {
-    return this->forceApplied[_index];
+    return this->dataPtr->forceApplied[_index];
   }
   else
   {
@@ -596,7 +559,7 @@ unsigned int DARTJoint::GetAngleCount() const
 {
   unsigned int angleCount = 0;
 
-  angleCount = this->dtJoint->getNumDofs();
+  angleCount = this->dataPtr->dtJoint->getNumDofs();
 
   return angleCount;
 }
@@ -623,7 +586,7 @@ DARTModelPtr DARTJoint::GetDARTModel() const
 /////////////////////////////////////////////////
 dart::dynamics::Joint *DARTJoint::GetDARTJoint()
 {
-  return this->dtJoint;
+  return this->dataPtr->dtJoint;
 }
 
 /////////////////////////////////////////////////
@@ -633,14 +596,14 @@ void DARTJoint::SaveForce(unsigned int _index, double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->GetAngleCount())
   {
-    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    if (this->dataPtr->forceAppliedTime < this->GetWorld()->GetSimTime())
     {
       // reset forces if time step is new
-      this->forceAppliedTime = this->GetWorld()->GetSimTime();
-      this->forceApplied[0] = this->forceApplied[1] = 0.0;
+      this->dataPtr->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->dataPtr->forceApplied[0] = this->dataPtr->forceApplied[1] = 0.0;
     }
 
-    this->forceApplied[_index] += _force;
+    this->dataPtr->forceApplied[_index] += _force;
   }
   else
     gzerr << "Something's wrong, joint [" << this->GetName()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ ModelState::ModelState()
 
 /////////////////////////////////////////////////
 ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
-    const common::Time &_simTime)
-: State(_model->GetName(), _realTime, _simTime)
+    const common::Time &_simTime, const uint64_t _iterations)
+: State(_model->GetName(), _realTime, _simTime, _iterations)
 {
   this->pose = _model->GetWorldPose();
 
@@ -42,7 +42,14 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
   for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
   {
     this->linkStates.insert(std::make_pair((*iter)->GetName(),
-          LinkState(*iter, _realTime, _simTime)));
+          LinkState(*iter, _realTime, _simTime, _iterations)));
+  }
+
+  // Copy all the models
+  for (const auto &m : _model->NestedModels())
+  {
+    this->modelStates.insert(std::make_pair(m->GetName(),
+          ModelState(m, _realTime, _simTime, _iterations)));
   }
 
   // Copy all the joints
@@ -51,14 +58,14 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
        iter != joints.end(); ++iter)
   {
     this->jointStates.insert(std::make_pair((*iter)->GetName(),
-          JointState(*iter, _realTime, _simTime)));
+          JointState(*iter, _realTime, _simTime, _iterations)));
   }*/
 }
 
 /////////////////////////////////////////////////
 ModelState::ModelState(const ModelPtr _model)
 : State(_model->GetName(), _model->GetWorld()->GetRealTime(),
-        _model->GetWorld()->GetSimTime())
+        _model->GetWorld()->GetSimTime(), _model->GetWorld()->GetIterations())
 {
   this->pose = _model->GetWorldPose();
 
@@ -68,6 +75,13 @@ ModelState::ModelState(const ModelPtr _model)
   {
     this->linkStates.insert(std::make_pair((*iter)->GetName(),
           LinkState((*iter))));
+  }
+
+  // Copy all the models
+  for (const auto &m : _model->NestedModels())
+  {
+    this->modelStates.insert(std::make_pair(m->GetName(),
+          ModelState(m)));
   }
 
   // Copy all the joints
@@ -94,30 +108,29 @@ ModelState::~ModelState()
 
 /////////////////////////////////////////////////
 void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
-    const common::Time &_simTime)
+    const common::Time &_simTime, const uint64_t _iterations)
 {
   this->name = _model->GetName();
   this->wallTime = common::Time::GetWallTime();
   this->realTime = _realTime;
   this->simTime = _simTime;
+  this->iterations = _iterations;
   this->pose = _model->GetWorldPose();
 
   // Load all the links
+  this->linkStates.clear();
   const Link_V links = _model->GetLinks();
   for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
   {
-    this->linkStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime);
+    this->linkStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime,
+        _iterations);
   }
 
-  // Remove links that no longer exist. We determine this by check the time
-  // stamp on each link.
-  for (LinkState_M::iterator iter = this->linkStates.begin();
-       iter != this->linkStates.end();)
+  // Load all the models
+  this->modelStates.clear();
+  for (const auto &m : _model->NestedModels())
   {
-    if (iter->second.GetRealTime() != this->realTime)
-      this->linkStates.erase(iter++);
-    else
-      ++iter;
+    this->modelStates[m->GetName()].Load(m, _realTime, _simTime, _iterations);
   }
 
   // Copy all the joints
@@ -125,7 +138,8 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
   for (Joint_V::const_iterator iter = joints.begin();
       iter != joints.end(); ++iter)
   {
-    this->jointStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime);
+    this->jointStates[(*iter)->GetName()].Load(*iter, _realTime, _simTime,
+        _iterations);
   }
 
   // Remove joints that no longer exist. We determine this by check the time
@@ -166,6 +180,20 @@ void ModelState::Load(const sdf::ElementPtr _elem)
     }
   }
 
+  // Set all the models
+  this->modelStates.clear();
+  if (_elem->HasElement("model"))
+  {
+    sdf::ElementPtr childElem = _elem->GetElement("model");
+
+    while (childElem)
+    {
+      this->modelStates.insert(std::make_pair(
+            childElem->Get<std::string>("name"), ModelState(childElem)));
+      childElem = childElem->GetNextElement("model");
+    }
+  }
+
   // Set all the joints
   /*this->jointStates.clear();
   if (_elem->HasElement("joint"))
@@ -196,6 +224,11 @@ bool ModelState::IsZero() const
        iter != this->linkStates.end() && result; ++iter)
   {
     result = result && iter->second.IsZero();
+  }
+
+  for (const auto &ms : this->modelStates)
+  {
+    result = result && ms.second.IsZero();
   }
 
   /*for (JointState_M::const_iterator iter = this->jointStates.begin();
@@ -253,19 +286,14 @@ LinkState ModelState::GetLinkState(const std::string &_linkName) const
   if (iter != this->linkStates.end())
     return iter->second;
 
-  gzthrow("Invalid link name[" + _linkName + "]");
+  gzerr << "Invalid link name[" + _linkName + "]" << std::endl;
   return LinkState();
 }
 
 /////////////////////////////////////////////////
 bool ModelState::HasLinkState(const std::string &_linkName) const
 {
-  // Search for the link name
-  LinkState_M::const_iterator iter = this->linkStates.find(_linkName);
-  if (iter != this->linkStates.end())
-    return true;
-
-  return false;
+  return this->linkStates.find(_linkName) != this->linkStates.end();
 }
 
 /////////////////////////////////////////////////
@@ -290,7 +318,7 @@ JointState ModelState::GetJointState(unsigned int _index) const
     return iter->second;
   }
 
-  gzthrow("Index is out of range");
+  gzerr << "Index is out of range" << std::endl;
   return JointState();
 }
 
@@ -301,7 +329,7 @@ JointState ModelState::GetJointState(const std::string &_jointName) const
   if (iter != this->jointStates.end())
     return iter->second;
 
-  gzthrow("Invalid joint name[" + _jointName + "]");
+  gzerr << "Invalid joint name[" + _jointName + "]" << std::endl;
   return JointState();
 }
 
@@ -323,6 +351,36 @@ const JointState_M &ModelState::GetJointStates() const
 }
 
 /////////////////////////////////////////////////
+unsigned int ModelState::NestedModelStateCount() const
+{
+  return this->modelStates.size();
+}
+
+/////////////////////////////////////////////////
+ModelState ModelState::NestedModelState(const std::string &_modelName) const
+{
+  // Search for the model name
+  auto iter = this->modelStates.find(_modelName);
+  if (iter != this->modelStates.end())
+    return iter->second;
+
+  gzerr << "Invalid model name[" + _modelName + "]" << std::endl;
+  return ModelState();
+}
+
+/////////////////////////////////////////////////
+bool ModelState::HasNestedModelState(const std::string &_modelName) const
+{
+  return this->modelStates.find(_modelName) != this->modelStates.end();
+}
+
+/////////////////////////////////////////////////
+const ModelState_M &ModelState::NestedModelStates() const
+{
+  return this->modelStates;
+}
+
+/////////////////////////////////////////////////
 ModelState &ModelState::operator=(const ModelState &_state)
 {
   State::operator=(_state);
@@ -330,15 +388,22 @@ ModelState &ModelState::operator=(const ModelState &_state)
   // Copy the pose
   this->pose = _state.pose;
 
-  // Clear the link and joint states.
+  // Clear the link, joint, and model states.
   this->linkStates.clear();
   this->jointStates.clear();
+  this->modelStates.clear();
 
   // Copy the link states.
   for (LinkState_M::const_iterator iter =
        _state.linkStates.begin(); iter != _state.linkStates.end(); ++iter)
   {
     this->linkStates.insert(std::make_pair(iter->first, iter->second));
+  }
+
+  // Copy the model states.
+  for (const auto &ms : _state.modelStates)
+  {
+    this->modelStates.insert(std::make_pair(ms.first, ms.second));
   }
 
   // Copy the joint states.
@@ -377,6 +442,26 @@ ModelState ModelState::operator-(const ModelState &_state) const
     catch(common::Exception &)
     {
       // Ignore exception, which is just the fact that a link state may not
+      // have been recorded.
+    }
+  }
+
+  // Insert the model state diffs.
+  for (const auto &ms : this->modelStates)
+  {
+    try
+    {
+      if (_state.HasNestedModelState(ms.second.GetName()))
+      {
+        ModelState state = ms.second - _state.NestedModelState(
+            ms.second.GetName());
+        if (!state.IsZero())
+          result.modelStates.insert(std::make_pair(state.GetName(), state));
+      }
+    }
+    catch(common::Exception &)
+    {
+      // Ignore exception, which is just the fact that a model state may not
       // have been recorded.
     }
   }
@@ -434,6 +519,25 @@ ModelState ModelState::operator+(const ModelState &_state) const
     }
   }
 
+  // Insert the model state diffs.
+  for (const auto &ms : this->modelStates)
+  {
+    try
+    {
+      if (_state.HasNestedModelState(ms.second.GetName()))
+      {
+        ModelState state = ms.second + _state.NestedModelState(
+            ms.second.GetName());
+        result.modelStates.insert(std::make_pair(state.GetName(), state));
+      }
+    }
+    catch(common::Exception &)
+    {
+      // Ignore exception, which is just the fact that a model state may not
+      // have been recorded.
+    }
+  }
+
   // Insert the joint state diffs.
   for (JointState_M::const_iterator iter =
        this->jointStates.begin(); iter != this->jointStates.end(); ++iter)
@@ -472,6 +576,12 @@ void ModelState::FillSDF(sdf::ElementPtr _sdf)
     iter->second.FillSDF(elem);
   }
 
+  for (auto &ms : this->modelStates)
+  {
+    sdf::ElementPtr elem = _sdf->AddElement("model");
+    ms.second.FillSDF(elem);
+  }
+
   for (JointState_M::iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
@@ -489,6 +599,11 @@ void ModelState::SetWallTime(const common::Time &_time)
        iter != this->linkStates.end(); ++iter)
   {
     iter->second.SetWallTime(_time);
+  }
+
+  for (auto &ms : this->modelStates)
+  {
+    ms.second.SetWallTime(_time);
   }
 
   for (JointState_M::iterator iter = this->jointStates.begin();
@@ -509,6 +624,11 @@ void ModelState::SetRealTime(const common::Time &_time)
     iter->second.SetRealTime(_time);
   }
 
+  for (auto &ms : this->modelStates)
+  {
+    ms.second.SetRealTime(_time);
+  }
+
   for (JointState_M::iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
@@ -527,9 +647,31 @@ void ModelState::SetSimTime(const common::Time &_time)
     iter->second.SetSimTime(_time);
   }
 
+  for (auto &ms : this->modelStates)
+  {
+    ms.second.SetSimTime(_time);
+  }
+
   for (JointState_M::iterator iter = this->jointStates.begin();
        iter != this->jointStates.end(); ++iter)
   {
     iter->second.SetSimTime(_time);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelState::SetIterations(const uint64_t _iterations)
+{
+  State::SetIterations(_iterations);
+
+  for (auto &linkState : this->linkStates)
+    linkState.second.SetIterations(_iterations);
+
+  for (auto &ms : this->modelStates)
+  {
+    ms.second.SetIterations(_iterations);
+  }
+
+  for (auto &jointState : this->jointStates)
+    jointState.second.SetIterations(_iterations);
 }

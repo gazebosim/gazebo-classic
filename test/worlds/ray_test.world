@@ -58,6 +58,9 @@
             </box>
           </geometry>
         </collision>
+        <sensor name="box_imu_sensor" type="imu">
+          <always_on>1</always_on>
+        </sensor>
       </link>
     </model>
 

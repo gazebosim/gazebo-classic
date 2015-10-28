@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Contact sensor
- * Author: Nate Koenig
- * Date: 09 Sept. 2008
-*/
-
-#ifndef _CONTACTSENSOR_HH_
-#define _CONTACTSENSOR_HH_
+#ifndef _GAZEBO_CONTACTSENSOR_HH_
+#define _GAZEBO_CONTACTSENSOR_HH_
 
 #include <vector>
 #include <map>
@@ -29,7 +24,6 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/util/system.hh"

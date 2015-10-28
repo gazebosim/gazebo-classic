@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,17 @@
 #ifndef _GEARBOXJOINT_HH_
 #define _GEARBOXJOINT_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <string>
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -34,7 +41,7 @@ namespace gazebo
     /// \class GearboxJoint GearboxJoint.hh physics/physics.hh
     /// \brief A double axis gearbox joint
     template<class T>
-    class GAZEBO_VISIBLE GearboxJoint : public T
+    class GZ_PHYSICS_VISIBLE GearboxJoint : public T
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link
@@ -97,6 +104,15 @@ namespace gazebo
       /// \param[in] _gearRatio Gear ratio value.
       public: virtual void SetGearboxRatio(double _gearRatio) = 0;
 
+      // Documentation inherited
+      public: virtual void FillMsg(msgs::Joint &_msg)
+              {
+                Joint::FillMsg(_msg);
+                msgs::Joint::Gearbox *gearboxMsg = _msg.mutable_gearbox();
+                gearboxMsg->set_gearbox_reference_body(this->referenceBody);
+                gearboxMsg->set_gearbox_ratio(this->gearRatio);
+              }
+
       /// \brief Gearbox gearRatio
       protected: double gearRatio;
 
@@ -107,4 +123,3 @@ namespace gazebo
   }
 }
 #endif
-

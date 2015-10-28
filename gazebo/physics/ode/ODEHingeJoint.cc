@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,18 +141,6 @@ double ODEHingeJoint::GetVelocity(unsigned int /*index*/) const
 void ODEHingeJoint::SetVelocity(unsigned int _index, double _angle)
 {
   this->SetVelocityMaximal(_index, _angle);
-}
-
-//////////////////////////////////////////////////
-void ODEHingeJoint::SetMaxForce(unsigned int /*index*/, double _t)
-{
-  return this->SetParam(dParamFMax, _t);
-}
-
-//////////////////////////////////////////////////
-double ODEHingeJoint::GetMaxForce(unsigned int /*index*/)
-{
-  return this->GetParam(dParamFMax);
 }
 
 //////////////////////////////////////////////////

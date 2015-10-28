@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class AlignWidget AlignWidget.hh gui/Gui.hh
     /// \brief A gui widget for aligning models
-    class GAZEBO_VISIBLE AlignWidget : public QWidget
+    class GZ_GUI_VISIBLE AlignWidget : public QWidget
     {
       Q_OBJECT
 

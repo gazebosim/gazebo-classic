@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,11 @@
  */
 
 #include <sys/types.h>
-#include <unistd.h>
+#ifdef _WIN32
+  #include <process.h>
+#else
+  #include <unistd.h>
+#endif
 #include <ctime>
 
 #include "gazebo/math/Rand.hh"
@@ -32,7 +36,11 @@ using namespace math;
 // We don't seed with time for the cases when two processes are started the
 // same time (this mostly happens with launch scripts that start a server
 // and gui simultaneously).
-uint32_t Rand::seed = getpid();
+#ifdef _WIN32
+  uint32_t Rand::seed = _getpid();
+#else
+  uint32_t Rand::seed = getpid();
+#endif
 
 GeneratorType *Rand::randGenerator = new GeneratorType(seed);
 

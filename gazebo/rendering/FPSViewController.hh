@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class FPSViewController FPSViewController.hh rendering/rendering.hh
     /// \brief First Person Shooter style view controller
-    class GAZEBO_VISIBLE FPSViewController : public ViewController
+    class GZ_RENDERING_VISIBLE FPSViewController : public ViewController
     {
       /// \brief Constructor
       /// \param[in] Camera to controll

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,19 +31,20 @@ namespace gazebo
 
   namespace rendering
   {
-    class GUIOverlay;
-
     /// \addtogroup gazebo_rendering
     /// \{
 
     /// \class UserCamera UserCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
-    class GAZEBO_VISIBLE UserCamera : public Camera
+    class GZ_RENDERING_VISIBLE UserCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
       /// \param[in] _scene Scene to put the camera in.
-      public: UserCamera(const std::string &_name, ScenePtr _scene);
+      /// \param[in] _stereoEnabled True to enable stereo rendering. This is
+      /// here for compatibility with 3D monitors/TVs.
+      public: UserCamera(const std::string &_name, ScenePtr _scene,
+                  bool _stereoEnabled = false);
 
       /// \brief Destructor
       public: virtual ~UserCamera();
@@ -73,6 +74,15 @@ namespace gazebo
       /// \brief Set the pose in the world coordinate frame.
       /// \param[in] _pose New pose of the camera.
       public: virtual void SetWorldPose(const math::Pose &_pose);
+
+      /// \brief Set the default pose in the world coordinate frame and set
+      /// that as the current camera world pose.
+      /// \param[in] _pose New default pose of the camera.
+      public: void SetDefaultPose(const math::Pose &_pose);
+
+      /// \brief Get the default pose in the world coordinate frame.
+      /// \return Default pose of the camera.
+      public: math::Pose DefaultPose() const;
 
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.
@@ -113,14 +123,6 @@ namespace gazebo
       public: void SetViewportDimensions(float _x, float _y,
                                          float _w, float _h);
 
-      /// \brief Get the average frames per second
-      /// \return The average rendering frames per second
-      public: float GetAvgFPS() const;
-
-      /// \brief Get the triangle count.
-      /// \return The number of triangles currently being rendered.
-      public: unsigned int GetTriangleCount() const;
-
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visual Visual to move the camera to.
       public: void MoveToVisual(VisualPtr _visual);
@@ -138,12 +140,6 @@ namespace gazebo
       /// Use this only if you really know what you're doing.
       /// \param[in] _target The new rendering target.
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
-
-      /// \brief Get the GUI overlay
-      ///
-      /// An overlay allows you to draw 2D elements on the viewport.
-      /// \return Pointer to the GUIOverlay.
-      public: GUIOverlay *GetGUIOverlay();
 
       /// \brief Set whether the view controller is enabled.
       ///
@@ -194,6 +190,22 @@ namespace gazebo
       /// gz topic ~/user_camera/joy_pose.
       public: void SetJoyPoseControl(bool _value);
 
+      /// \brief Get whether stereo is enabled.
+      /// \return True if stereo is enabled.
+      public: bool StereoEnabled() const;
+
+      /// \brief Turn on/off stereo rendering. Stereo must be initially
+      /// enable in the ~/.gazebo/gui.ini file using:
+      ///
+      ///     [rendering]
+      ///     stereo=1
+      ///
+      /// \param[in] _enable True to turn on stereo, false to turn off.
+      public: void EnableStereo(bool _enable);
+
+      // Documentation inherited.
+      public: virtual bool SetProjectionType(const std::string &_type);
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
@@ -219,6 +231,8 @@ namespace gazebo
       /// \return True if the camera is now tracking the visual.
       protected: virtual bool TrackVisualImpl(VisualPtr _visual);
 
+      // Documentation inherited.
+      protected: virtual void UpdateFOV();
 
       /// \brief Toggle whether to show the visual.
       private: void ToggleShowVisual();

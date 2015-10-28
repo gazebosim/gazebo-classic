@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _EXISTENCEVENTSOURCE_HH_
-#define _EXISTENCEVENTSOURCE_HH_
+#ifndef _GAZEBO_EXISTENCEVENTSOURCE_HH_
+#define _GAZEBO_EXISTENCEVENTSOURCE_HH_
 
 #include <string>
 
@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \brief Reads the model filter and event name.
     /// \param[in] _sdf the element for this event source
-    public: virtual void Load(const sdf::ElementPtr &_sdf);
+    public: virtual void Load(const sdf::ElementPtr _sdf);
 
     /// \brief callback for gazebo event
     /// \param[in] _model the name of the model

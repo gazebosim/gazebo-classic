@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class WallSegmentItem WallSegmentItem.hh
     /// \brief 2D representation of a wall.
-    class GAZEBO_VISIBLE WallSegmentItem : public SegmentItem, public
+    class GZ_GUI_VISIBLE WallSegmentItem : public SegmentItem, public
         BuildingItem
     {
       Q_OBJECT

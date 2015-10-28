@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,10 +62,28 @@ GZ_REGISTER_WORLD_PLUGIN(RazerHydra)
 
 /////////////////////////////////////////////////
 RazerHydra::RazerHydra()
-: hidrawFd(0)
+: hidrawFd(0), lastCycleStart(common::Time::GetWallTime())
 {
   this->stop = false;
-  this->lastCycleStart = common::Time::GetWallTime();
+  this->pollThread = NULL;
+
+  for (auto &v: this->analog)
+    v = 0;
+
+  for (auto &v: this->rawAnalog)
+    v = 0;
+
+  for (auto &v: this->rawButtons)
+    v = 0;
+
+  for (auto &v: this->rawQuat)
+    v = 0;
+
+  for (auto &v: this->rawPos)
+    v = 0;
+
+  for (auto &v: this->buttons)
+    v = 0;
 
   // magic number for 50% mix at each step
   this->periodEstimate.SetFc(0.11, 1.0);
@@ -79,7 +97,8 @@ RazerHydra::~RazerHydra()
   event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 
   this->stop = true;
-  this->pollThread->join();
+  if (this->pollThread)
+    this->pollThread->join();
 }
 
 /////////////////////////////////////////////////
@@ -224,8 +243,8 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
   rightPaddle->set_button_center(this->buttons[12]);
   rightPaddle->set_button_joy(this->buttons[13]);
 
-  msgs::Set(rightPaddle->mutable_pose(), grabRight);
-  msgs::Set(leftPaddle->mutable_pose(), grabLeft);
+  msgs::Set(rightPaddle->mutable_pose(), grabRight.Ign());
+  msgs::Set(leftPaddle->mutable_pose(), grabLeft.Ign());
 
   this->pub->Publish(msg);
 }

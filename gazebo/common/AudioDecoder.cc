@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2012-2014 Open Source Robotics Foundation
+* Copyright (C) 2012-2015 Open Source Robotics Foundation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -88,14 +88,14 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
 
   if (!decodedFrame)
   {
-    if (!(decodedFrame = avcodec_alloc_frame()))
+    if (!(decodedFrame = common::AVFrameAlloc()))
     {
       gzerr << "Audio decoder out of memory\n";
       result = false;
     }
   }
   else
-    avcodec_get_frame_defaults(decodedFrame);
+    common::AVFrameUnref(decodedFrame);
 
   av_init_packet(&packet);
   while (av_read_frame(this->formatCtx, &packet) == 0)

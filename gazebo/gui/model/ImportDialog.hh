@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class ImportDialog gui/ImportDialog.hh
     /// \brief Dialog for saving to file.
-    class GAZEBO_VISIBLE ImportDialog : public QDialog
+    class GZ_GUI_VISIBLE ImportDialog : public QDialog
     {
       Q_OBJECT
 
@@ -44,18 +44,18 @@ namespace gazebo
 
       /// \brief Get name of file.
       /// \return The name of file.
-      public: std::string GetPartName() const;
+      public: std::string GetLinkName() const;
 
-      /// \brief Get the import path of the custom part.
+      /// \brief Get the import path of the custom link.
       /// \return Path of the custom location.
       public: std::string GetImportPath() const;
 
-      /// \brief Set the name of the custom part.
+      /// \brief Set the name of the custom link.
       /// \param[in] _name Name of file.
-      public: void SetPartName(const std::string &_name);
+      public: void SetLinkName(const std::string &_name);
 
-      /// \brief Set the import path of the custom part.
-      /// \param[in] _path Path to import the custom part.
+      /// \brief Set the import path of the custom link.
+      /// \param[in] _path Path to import the custom link.
       public: void SetImportPath(const std::string &_path);
 
       /// \brief Set the message to be displayed.

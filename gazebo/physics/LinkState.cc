@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ LinkState::LinkState()
 
 /////////////////////////////////////////////////
 LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
-                  const common::Time &_simTime)
-  : State(_link->GetName(), _realTime, _simTime)
+                  const common::Time &_simTime, const uint64_t _iterations)
+  : State(_link->GetName(), _realTime, _simTime, _iterations)
 {
   this->pose = _link->GetWorldPose();
   this->velocity = math::Pose(_link->GetWorldLinearVel(),
@@ -46,7 +46,7 @@ LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
 /////////////////////////////////////////////////
 LinkState::LinkState(const LinkPtr _link)
   : State(_link->GetName(), _link->GetWorld()->GetRealTime(),
-          _link->GetWorld()->GetSimTime())
+          _link->GetWorld()->GetSimTime(), _link->GetWorld()->GetIterations())
 {
   this->pose = _link->GetWorldPose();
   this->velocity = math::Pose(_link->GetWorldLinearVel(),
@@ -81,12 +81,13 @@ LinkState::~LinkState()
 
 /////////////////////////////////////////////////
 void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
-    const common::Time &_simTime)
+    const common::Time &_simTime, const uint64_t _iterations)
 {
   this->name = _link->GetName();
   this->wallTime = common::Time::GetWallTime();
   this->realTime = _realTime;
   this->simTime = _simTime;
+  this->iterations = _iterations;
 
   this->pose = _link->GetWorldPose();
   this->velocity.Set(_link->GetWorldLinearVel(),
@@ -352,4 +353,13 @@ void LinkState::SetSimTime(const common::Time &_time)
   {
     (*iter).SetSimTime(_time);
   }
+}
+
+/////////////////////////////////////////////////
+void LinkState::SetIterations(const uint64_t _iterations)
+{
+  State::SetIterations(_iterations);
+
+  for (auto &collisionState : this->collisionStates)
+    collisionState.SetIterations(_iterations);
 }

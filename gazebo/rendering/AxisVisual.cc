@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,24 @@ using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-AxisVisual::AxisVisual(const std::string &_name, VisualPtr _vis)
-  : Visual(*new AxisVisualPrivate, _name, _vis, false)
+AxisVisual::AxisVisual(const std::string &_name, VisualPtr _parent)
+  : Visual(*new AxisVisualPrivate, _name, _parent, false)
 {
+  AxisVisualPrivate *dPtr =
+      reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_GUI;
+}
+
+//////////////////////////////////////////////////
+AxisVisual::AxisVisual(VisualPrivate &_dataPtr, const std::string &_name,
+    VisualPtr _parent)
+    : Visual(_dataPtr, _name, _parent, false)
+{
+  AxisVisualPrivate *dPtr =
+      reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
+
+  dPtr->type = VT_GUI;
 }
 
 /////////////////////////////////////////////////
@@ -222,8 +237,5 @@ void AxisVisual::SetAxisVisible(unsigned int _axis, bool _visible)
       return;
   };
 
-  if (_visible)
-    this->AttachVisual(axis);
-  else
-    this->DetachVisual(axis);
+  axis->SetVisible(_visible);
 }

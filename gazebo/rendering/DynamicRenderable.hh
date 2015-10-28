@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace gazebo
     /// \class DynamicRenderable DynamicRenderable.hh rendering/rendering.hh
     /// \brief Abstract base class providing mechanisms for dynamically
     /// growing hardware buffers.
-    class GAZEBO_VISIBLE DynamicRenderable : public Ogre::SimpleRenderable
+    class GZ_RENDERING_VISIBLE DynamicRenderable : public Ogre::SimpleRenderable
     {
       /// \brief Constructor
       public: DynamicRenderable();

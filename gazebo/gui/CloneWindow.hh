@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace gazebo
     /// \class CloneConfig CloneConfig.hh gui/CloneConfig.hh
     /// \brief A dialog window used to set some parameters before cloning a
     /// simulation.
-    class GAZEBO_VISIBLE CloneWindow : public QDialog
+    class GZ_GUI_VISIBLE CloneWindow : public QDialog
     {
       Q_OBJECT
 

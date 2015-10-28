@@ -1,2 +1,7 @@
 // Automatically generated
+// avoid collision from Mac OS X's ConditionalMacros.h
+// see gazebo issue #1289
+#ifdef __MACH__
+# undef TYPE_BOOL
+#endif
 ${message_headers}

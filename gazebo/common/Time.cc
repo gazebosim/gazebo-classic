@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,30 @@
  * limitations under the License.
  *
  */
-/* Desc: Time class
- * Author: Nate Koenig
- * Date: 3 Apr 2007
- */
 
-#include <sys/time.h>
+#ifdef _WIN32
+  #include <Windows.h>
+  #include <Winsock2.h>
+  #include <cstdint>
+  struct timespec
+  {
+    int64_t tv_sec;
+    int64_t tv_nsec;
+  };
+#else
+  #include <unistd.h>
+  #include <sys/time.h>
+#endif
+
 #include <time.h>
 #include <math.h>
-#include <unistd.h>
 #include <boost/date_time.hpp>
 
 #ifdef __MACH__
-#include <mach/clock.h>
-#include <mach/mach.h>
+  #include <mach/clock.h>
+  #include <mach/mach.h>
 #endif
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 
@@ -41,8 +48,11 @@ Time Time::wallTime;
 std::string Time::wallTimeISO;
 
 struct timespec Time::clockResolution;
-
 const Time Time::Zero = common::Time(0, 0);
+const Time Time::Second = common::Time(1, 0);
+const Time Time::Hour = common::Time(3600, 0);
+const int32_t Time::nsInSec = 1000000000L;
+const int32_t Time::nsInMs = 1000000;
 
 /////////////////////////////////////////////////
 Time::Time()
@@ -52,6 +62,13 @@ Time::Time()
 
 #ifdef __MACH__
   clockResolution.tv_sec = 1 / sysconf(_SC_CLK_TCK);
+#elif defined(_WIN32)
+  LARGE_INTEGER freq;
+  QueryPerformanceFrequency(&freq);
+  double period = 1.0/freq.QuadPart;
+  clockResolution.tv_sec = static_cast<int64_t>(floor(period));
+  clockResolution.tv_nsec =
+    static_cast<int64_t>((period - floor(period)) * nsInSec);
 #else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
@@ -110,6 +127,83 @@ const Time &Time::GetWallTime()
   mach_port_deallocate(mach_task_self(), cclock);
   tv.tv_sec = mts.tv_sec;
   tv.tv_nsec = mts.tv_nsec;
+#elif defined(_WIN32)
+  // Borrowed from roscpp_core/rostime/src/time.cpp
+  // Win32 implementation
+  // unless I've missed something obvious, the only way to get high-precision
+  // time on Windows is via the QueryPerformanceCounter() call. However,
+  // this is somewhat problematic in Windows XP on some processors, especially
+  // AMD, because the Windows implementation can freak out when the CPU clocks
+  // down to save power. Time can jump or even go backwards. Microsoft has
+  // fixed this bug for most systems now, but it can still show up if you have
+  // not installed the latest CPU drivers (an oxymoron). They fixed all these
+  // problems in Windows Vista, and this API is by far the most accurate that
+  // I know of in Windows, so I'll use it here despite all these caveats
+  static LARGE_INTEGER cpuFreq, initCpuTime;
+  static uint32_t startSec = 0;
+  static uint32_t startNSec = 0;
+  if ((startSec == 0)  && (startNSec == 0))
+  {
+    QueryPerformanceFrequency(&cpuFreq);
+    QueryPerformanceCounter(&initCpuTime);
+
+    // compute an offset from the Epoch using the lower-performance timer API
+    FILETIME ft;
+    GetSystemTimeAsFileTime(&ft);
+    LARGE_INTEGER startLi;
+    startLi.LowPart = ft.dwLowDateTime;
+    startLi.HighPart = ft.dwHighDateTime;
+
+    // why did they choose 1601 as the time zero, instead of 1970?
+    // there were no outstanding hard rock bands in 1601.
+#ifdef _MSC_VER
+    startLi.QuadPart -= 116444736000000000Ui64;
+#else
+    startLi.QuadPart -= 116444736000000000ULL;
+#endif
+
+    // 100-ns units. odd.
+    startSec = static_cast<uint32_t>(startLi.QuadPart / 10000000);
+    startNSec = (startLi.LowPart % 10000000) * 100;
+  }
+
+  LARGE_INTEGER curTime;
+  QueryPerformanceCounter(&curTime);
+  LARGE_INTEGER deltaCpuTime;
+  deltaCpuTime.QuadPart = curTime.QuadPart - initCpuTime.QuadPart;
+
+  // todo: how to handle cpu clock drift. not sure it's a big deal for us.
+  // also, think about clock wraparound. seems extremely unlikey, but possible
+  double dDeltaCpuTime = deltaCpuTime.QuadPart /
+    static_cast<double>(cpuFreq.QuadPart);
+  uint32_t deltaSec = static_cast<uint32_t>(floor(dDeltaCpuTime));
+  uint32_t deltaNSec = static_cast<uint32_t>(
+      std::round((dDeltaCpuTime-deltaSec) * nsInSec));
+
+  int64_t secSum  = static_cast<int64_t>(startSec) +
+    static_cast<int64_t>(deltaSec);
+  int64_t nsecSum = static_cast<int64_t>(startNSec) +
+    static_cast<int64_t>(deltaNSec);
+
+  // Normalize
+  {
+    int64_t nsecPart = nsecSum % nsInSec;
+    int64_t secPart = secSum + nsecSum / nsInSec;
+    if (nsecPart < 0)
+    {
+      nsecPart += nsInSec;
+      --secPart;
+    }
+
+    if (secPart < 0 || secPart > UINT_MAX)
+      gzerr << "Time is out of dual 32-bit range\n";
+
+    secSum = secPart;
+    nsecSum = nsecPart;
+  }
+
+  tv.tv_sec = secSum;
+  tv.tv_nsec = nsecSum;
 #else
   clock_gettime(0, &tv);
 #endif
@@ -145,7 +239,7 @@ void Time::Set(int32_t _sec, int32_t _nsec)
 void Time::Set(double _seconds)
 {
   this->sec = (int32_t)(floor(_seconds));
-  this->nsec = (int32_t)(round((_seconds - this->sec) * 1e9));
+  this->nsec = (int32_t)(round((_seconds - this->sec) * nsInSec));
   this->Correct();
 }
 
@@ -160,6 +254,111 @@ double Time::Double() const
 float Time::Float() const
 {
   return (this->sec + this->nsec * 1e-9f);
+}
+
+/////////////////////////////////////////////////
+std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
+{
+  if (_start > MILLISECONDS)
+  {
+    gzwarn << "Invalid start [" << _start << "], using millisecond [4]." <<
+        std::endl;
+    _start = MILLISECONDS;
+  }
+
+  if (_end < _start)
+  {
+    gzwarn << "Invalid end [" << _end << "], using start [" << _start << "]."
+        << std::endl;
+    _end = _start;
+  }
+
+  if (_end > MILLISECONDS)
+  {
+    gzwarn << "Invalid end [" << _end << "], using millisecond [4]." <<
+        std::endl;
+    _end = MILLISECONDS;
+  }
+
+  std::ostringstream stream;
+  unsigned int s, msec;
+
+  stream.str("");
+
+  // Get seconds
+  s = this->sec;
+
+  // Get milliseconds
+  msec = this->nsec / nsInMs;
+
+  // Get seconds from milliseconds
+  int seconds = msec / 1000;
+  msec -= seconds * 1000;
+  s += seconds;
+
+  // Days
+  if (_start <= 0)
+  {
+    unsigned int day = s / 86400;
+    s -= day * 86400;
+    stream << std::setw(2) << std::setfill('0') << day;
+  }
+
+  // Hours
+  if (_end >= 1)
+  {
+    if (_start < 1)
+      stream << " ";
+
+    if (_start <= 1)
+    {
+      unsigned int hour = s / 3600;
+      s -= hour * 3600;
+      stream << std::setw(2) << std::setfill('0') << hour;
+    }
+  }
+
+  // Minutes
+  if (_end >= 2)
+  {
+    if (_start < 2)
+      stream << ":";
+
+    if (_start <= 2)
+    {
+      unsigned int min = s / 60;
+      s -= min * 60;
+      stream << std::setw(2) << std::setfill('0') << min;
+    }
+  }
+
+  // Seconds
+  if (_end >= 3)
+  {
+    if (_start < 3)
+      stream << ":";
+
+    if (_start <= 3)
+    {
+      stream << std::setw(2) << std::setfill('0') << s;
+    }
+  }
+
+  // Milliseconds
+  if (_end >= 4)
+  {
+    if (_start < 4)
+      stream << ".";
+    else
+      msec = msec + s * 1000;
+
+    if (_start <= 4)
+    {
+      stream << std::setw(3) << std::setfill('0') << msec;
+    }
+  }
+
+  return stream.str();
 }
 
 /////////////////////////////////////////////////
@@ -191,13 +390,46 @@ Time Time::Sleep(const common::Time &_time)
 
 #ifdef __MACH__
     if (nanosleep(&interval, &remainder) == -1)
-#else
-    if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
-#endif
     {
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
     }
+#elif defined(_WIN32)
+    // Borrowed from roscpp_core/rostime/src/time.cpp
+    HANDLE timer = NULL;
+    LARGE_INTEGER sleepTime;
+    sleepTime.QuadPart = -
+      static_cast<int64_t>(interval.tv_sec)*10000000LL -
+      static_cast<int64_t>(interval.tv_nsec) / 100LL;
+
+    timer = CreateWaitableTimer(NULL, TRUE, NULL);
+    if (timer == NULL)
+    {
+      gzerr << "Unable to create waitable timer. Sleep will be incorrect.\n";
+      return result;
+    }
+
+    if (!SetWaitableTimer (timer, &sleepTime, 0, NULL, NULL, 0))
+    {
+      gzerr << "Unable to use waitable timer. Sleep will be incorrect.\n";
+      return result;
+    }
+
+    if (WaitForSingleObject (timer, INFINITE) != WAIT_OBJECT_0)
+    {
+      gzerr << "Unable to wait for a single object. Sleep will be incorrect.\n";
+      return result;
+    }
+
+    result.sec = 0;
+    result.nsec = 0;
+#else
+    if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
+    {
+      result.sec = remainder.tv_sec;
+      result.nsec = remainder.tv_nsec;
+    }
+#endif
   }
   else
   {

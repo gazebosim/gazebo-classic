@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,19 +122,6 @@ void SimbodyUniversalJoint::SetForceImpl(unsigned int _index,
       this->simbodyPhysics->integ->updAdvancedState(),
       this->mobod, SimTK::MobilizerUIndex(_index), _torque);
   }
-}
-
-//////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodyUniversalJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented\n";
-  return 0;
 }
 
 //////////////////////////////////////////////////

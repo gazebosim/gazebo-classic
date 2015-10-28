@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ TEST_F(RoadTest, Texture)
     << "<material>"
     << "<script>"
     << "<name>primary</name>"
-    << "</material>"
     << "</script>"
+    << "</material>"
     << "</road></sdf>";
 
   sdf::ElementPtr roadSDF(new sdf::Element);
@@ -45,7 +45,7 @@ TEST_F(RoadTest, Texture)
       new physics::Road(physics::BasePtr()));
   sdf::ElementPtr scriptElem = roadSDF->GetElement(
       "material")->GetElement("script");
-  ASSERT_TRUE(scriptElem);
+  ASSERT_TRUE(scriptElem != NULL);
   road->Load(roadSDF);
 
   EXPECT_STREQ(road->GetName().c_str(), "my_road");

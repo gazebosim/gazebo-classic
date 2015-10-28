@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,6 +205,29 @@ TEST_F(QuaternionTest, Quaternion)
     EXPECT_TRUE(q.GetInverse().GetZAxis() == math::Vector3(0, 0, 1));
   }
 
+  // Test RPY fixed-body-frame convention:
+  // Rotate each unit vector in roll and pitch
+  {
+    q = math::Quaternion(M_PI/2.0, M_PI/2.0, 0);
+    math::Vector3 v1(1, 0, 0);
+    math::Vector3 r1 = q.RotateVector(v1);
+    // 90 degrees about X does nothing,
+    // 90 degrees about Y sends point down to -Z
+    EXPECT_EQ(r1, math::Vector3(0, 0, -1));
+
+    math::Vector3 v2(0, 1, 0);
+    math::Vector3 r2 = q.RotateVector(v2);
+    // 90 degrees about X sends point to +Z
+    // 90 degrees about Y sends point to +X
+    EXPECT_EQ(r2, math::Vector3(1, 0, 0));
+
+    math::Vector3 v3(0, 0, 1);
+    math::Vector3 r3 = q.RotateVector(v3);
+    // 90 degrees about X sends point to -Y
+    // 90 degrees about Y does nothing
+    EXPECT_EQ(r3, math::Vector3(0, -1, 0));
+  }
+
   {
     // now try a harder case (axis[1,2,3], rotation[0.3*pi])
     // verified with octave
@@ -283,6 +306,70 @@ TEST_F(QuaternionTest, Integrate)
     EXPECT_EQ(qRoll.GetAsEuler(),  math::Vector3::UnitX);
     EXPECT_EQ(qPitch.GetAsEuler(), math::Vector3::UnitY);
     EXPECT_EQ(qYaw.GetAsEuler(),   math::Vector3::UnitZ);
+  }
+
+  // Integrate sequentially along single axes in order XYZ,
+  // expect rotations to match Euler Angles
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qX   = q.Integrate(math::Vector3::UnitX, angle);
+    math::Quaternion qXY  = qX.Integrate(math::Vector3::UnitY, angle);
+    EXPECT_EQ(qXY.GetAsEuler(), angle*math::Vector3(1, 1, 0));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qX   = q.Integrate(math::Vector3::UnitX, angle);
+    math::Quaternion qXZ  = qX.Integrate(math::Vector3::UnitZ, angle);
+    EXPECT_EQ(qXZ.GetAsEuler(), angle*math::Vector3(1, 0, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qY   = q.Integrate(math::Vector3::UnitY, angle);
+    math::Quaternion qYZ  = qY.Integrate(math::Vector3::UnitZ, angle);
+    EXPECT_EQ(qYZ.GetAsEuler(), angle*math::Vector3(0, 1, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qX   = q.Integrate(math::Vector3::UnitX, angle);
+    math::Quaternion qXY  = qX.Integrate(math::Vector3::UnitY, angle);
+    math::Quaternion qXYZ = qXY.Integrate(math::Vector3::UnitZ, angle);
+    EXPECT_EQ(qXYZ.GetAsEuler(), angle*math::Vector3::One);
+  }
+
+  // Integrate sequentially along single axes in order ZYX,
+  // expect rotations to not match Euler Angles
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qZ   = q.Integrate(math::Vector3::UnitZ, angle);
+    math::Quaternion qZY  = qZ.Integrate(math::Vector3::UnitY, angle);
+    EXPECT_NE(qZY.GetAsEuler(), angle*math::Vector3(0, 1, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qZ   = q.Integrate(math::Vector3::UnitZ, angle);
+    math::Quaternion qZX  = qZ.Integrate(math::Vector3::UnitX, angle);
+    EXPECT_NE(qZX.GetAsEuler(), angle*math::Vector3(1, 0, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qZ   = q.Integrate(math::Vector3::UnitZ, angle);
+    math::Quaternion qZY  = qZ.Integrate(math::Vector3::UnitY, angle);
+    math::Quaternion qZYX = qZY.Integrate(math::Vector3::UnitX, angle);
+    EXPECT_NE(qZYX.GetAsEuler(), angle*math::Vector3(1, 1, 1));
+  }
+  {
+    const math::Quaternion q(1, 0, 0, 0);
+    const double angle = 0.5;
+    math::Quaternion qY   = q.Integrate(math::Vector3::UnitY, angle);
+    math::Quaternion qYX  = qY.Integrate(math::Vector3::UnitX, angle);
+    EXPECT_NE(qYX.GetAsEuler(), angle*math::Vector3(1, 1, 0));
   }
 
   // Integrate a full rotation about different axes,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,14 @@ ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VT_GUI;
   dPtr->headNode = NULL;
   dPtr->shaftNode = NULL;
   dPtr->rotationNode = NULL;
-}
 
-/////////////////////////////////////////////////
-ArrowVisual::~ArrowVisual()
-{
+  dPtr->headNodeVisible = true;
+  dPtr->shaftNodeVisible = true;
+  dPtr->rotationNodeVisible = false;
 }
 
 /////////////////////////////////////////////////
@@ -101,14 +101,10 @@ void ArrowVisual::ShowShaft(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  if (_show)
-  {
-    dPtr->sceneNode->addChild(dPtr->shaftNode);
-  }
-  else
-  {
-    dPtr->sceneNode->removeChild(dPtr->shaftNode);
-  }
+  dPtr->shaftNodeVisible = _show;
+
+  if (dPtr->shaftNode)
+    dPtr->shaftNode->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -117,14 +113,9 @@ void ArrowVisual::ShowHead(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  if (_show)
-  {
-    dPtr->sceneNode->addChild(dPtr->headNode);
-  }
-  else
-  {
-    dPtr->sceneNode->removeChild(dPtr->headNode);
-  }
+  dPtr->headNodeVisible = _show;
+  if (dPtr->headNode)
+    dPtr->headNode->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -133,20 +124,22 @@ void ArrowVisual::ShowRotation(bool _show)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  if (_show)
-  {
-    Ogre::MovableObject *rotationObj = dPtr->rotationNode->getAttachedObject(0);
-    if (rotationObj)
-    {
-      rotationObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
-      dynamic_cast<Ogre::Entity *>(rotationObj)->setMaterialName(
-          this->GetMaterialName());
-    }
-    dPtr->rotationNode->setVisible(this->GetVisible());
-    dPtr->sceneNode->addChild(dPtr->rotationNode);
-  }
-  else
-  {
-    dPtr->sceneNode->removeChild(dPtr->rotationNode);
-  }
+  dPtr->rotationNodeVisible = _show;
+
+  if (dPtr->rotationNode)
+    dPtr->rotationNode->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void ArrowVisual::SetVisible(bool _visible, bool _cascade)
+{
+  ArrowVisualPrivate *dPtr =
+      reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
+
+  dPtr->headNode->setVisible(dPtr->headNodeVisible && _visible, _cascade);
+  dPtr->shaftNode->setVisible(dPtr->shaftNodeVisible && _visible, _cascade);
+  dPtr->rotationNode->setVisible(
+      dPtr->rotationNodeVisible && _visible, _cascade);
+
+  this->dataPtr->visible = _visible;
 }

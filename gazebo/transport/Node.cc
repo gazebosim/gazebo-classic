@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,14 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
@@ -144,12 +151,10 @@ void Node::ProcessPublishers()
 
   int start, end;
   boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
+  boost::mutex::scoped_lock lock2(this->publisherMutex);
 
-  {
-    boost::mutex::scoped_lock lock2(this->publisherMutex);
-    start = 0;
-    end = this->publishers.size();
-  }
+  start = 0;
+  end = this->publishers.size();
 
   for (int i = start; i < end; ++i)
     this->publishers[i]->SendMessage();
@@ -308,7 +313,7 @@ void Node::InsertLatchedMsg(const std::string &_topic, MessagePtr _msg)
 std::string Node::GetMsgType(const std::string &_topic) const
 {
   Callback_M::const_iterator iter = this->callbacks.find(_topic);
-  if (iter != this->callbacks.end())
+  if (iter != this->callbacks.end() && !iter->second.empty())
     return iter->second.front()->GetMsgType();
 
   return std::string();

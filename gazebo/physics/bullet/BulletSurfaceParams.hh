@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _BULLETSURFACEPARAMS_HH_
-#define _BULLETSURFACEPARAMS_HH_
+#ifndef _GAZEBO_BULLETSURFACEPARAMS_HH_
+#define _GAZEBO_BULLETSURFACEPARAMS_HH_
 
 #include <sdf/sdf.hh>
 
@@ -33,7 +33,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet surface parameters.
-    class GAZEBO_VISIBLE BulletSurfaceParams : public SurfaceParams
+    class GZ_PHYSICS_VISIBLE BulletSurfaceParams : public SurfaceParams
     {
       /// \brief Constructor.
       public: BulletSurfaceParams();
@@ -51,11 +51,18 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
+      // Documentation inherited.
+      public: virtual FrictionPyramidPtr GetFrictionPyramid() const
+          GAZEBO_DEPRECATED(7.0);
+
+      // Documentation inherited.
+      public: virtual FrictionPyramidPtr FrictionPyramid() const;
+
       /// \brief Friction pyramid parameters (mu1, mu2).
       // For further documentation, see:
       // github.com/erwincoumans/bullet3/blob/master/src/BulletDynamics
       // /ConstraintSolver/btSequentialImpulseConstraintSolver.cpp#L910
-      FrictionPyramid frictionPyramid;
+      private: FrictionPyramidPtr frictionPyramid;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace gazebo
   {
     /// \class ODEGearboxJoint ODEGearboxJoint.hh physics/physics.hh
     /// \brief A double axis gearbox joint.
-    class GAZEBO_VISIBLE ODEGearboxJoint : public GearboxJoint<ODEJoint>
+    class GZ_PHYSICS_VISIBLE ODEGearboxJoint : public GearboxJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.
@@ -72,12 +72,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetVelocity(unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited
-      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited
       public: virtual double GetParam(unsigned int _parameter) const;

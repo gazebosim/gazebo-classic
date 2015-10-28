@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A slider joint
-    class GAZEBO_VISIBLE ODESliderJoint : public SliderJoint<ODEJoint>
+    class GZ_PHYSICS_VISIBLE ODESliderJoint : public SliderJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldId ODE world id.
@@ -66,12 +66,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetVelocity(unsigned int _index, double _angle);
-
-      // Documentation inherited
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited
-      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited
       public: virtual double GetParam(unsigned int _parameter) const;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _TOPICMANAGER_HH_
 
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <map>
 #include <list>
 #include <string>
@@ -48,7 +49,7 @@ namespace gazebo
 
     /// \class TopicManager TopicManager.hh transport/transport.hh
     /// \brief Manages topics and their subscriptions
-    class GAZEBO_VISIBLE TopicManager : public SingletonT<TopicManager>
+    class GZ_TRANSPORT_VISIBLE TopicManager : public SingletonT<TopicManager>
     {
       private: TopicManager();
       private: virtual ~TopicManager();

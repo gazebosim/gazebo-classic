@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,17 @@
 
 #include <tinyxml.h>
 #include <boost/filesystem.hpp>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ColladaExporterPrivate.hh"
 #include "gazebo/common/ColladaExporter.hh"
+
+#ifdef _WIN32
+  #define snprintf _snprintf
+#endif
 
 using namespace gazebo;
 using namespace common;
@@ -166,11 +171,11 @@ void ColladaExporter::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Positions", _meshID);
     count = _subMesh->GetVertexCount();
     stride = 3;
-    gazebo::math::Vector3 vertex;
+    ignition::math::Vector3d vertex;
     for (unsigned int i = 0; i < count; ++i)
     {
-      vertex = _subMesh->GetVertex(i);
-      fillData << vertex.x << " " << vertex.y << " " << vertex.z << " ";
+      vertex = _subMesh->Vertex(i);
+      fillData << vertex.X() << " " << vertex.Y() << " " << vertex.Z() << " ";
     }
   }
   if (_type == NORMAL)
@@ -178,11 +183,11 @@ void ColladaExporter::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Normals", _meshID);
     count = _subMesh->GetNormalCount();
     stride = 3;
-    gazebo::math::Vector3 normal;
+    ignition::math::Vector3d normal;
     for (unsigned int i = 0; i < count; ++i)
     {
-      normal = _subMesh->GetNormal(i);
-      fillData << normal.x << " " << normal.y << " " << normal.z << " ";
+      normal = _subMesh->Normal(i);
+      fillData << normal.X() << " " << normal.Y() << " " << normal.Z() << " ";
     }
   }
   if (_type == UVMAP)
@@ -190,11 +195,11 @@ void ColladaExporter::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-UVMap", _meshID);
     count = _subMesh->GetVertexCount();
     stride = 2;
-    gazebo::math::Vector2d inTexCoord;
+    ignition::math::Vector2d inTexCoord;
     for (unsigned int i = 0; i < count; ++i)
     {
-      inTexCoord = _subMesh->GetTexCoord(i);
-      fillData << inTexCoord.x << " " << 1-inTexCoord.y << " ";
+      inTexCoord = _subMesh->TexCoord(i);
+      fillData << inTexCoord.X() << " " << 1-inTexCoord.Y() << " ";
     }
   }
   TiXmlElement *sourceXml = new TiXmlElement("source");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,12 @@
 #ifndef _JOINTSTATE_HH_
 #define _JOINTSTATE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <vector>
 #include <string>
 
@@ -37,7 +43,7 @@ namespace gazebo
 
     /// \class JointState JointState.hh physics/physics.hh
     /// \brief keeps track of state of a physics::Joint
-    class GAZEBO_VISIBLE JointState : public State
+    class GZ_PHYSICS_VISIBLE JointState : public State
     {
       /// \brief Default constructor.
       public: JointState();
@@ -46,8 +52,9 @@ namespace gazebo
       /// \param[in] _joint Joint to get the state of.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: JointState(JointPtr _joint, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor.
       /// \param[in] _joint Joint to get the state of.

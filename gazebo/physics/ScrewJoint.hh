@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -31,7 +32,7 @@ namespace gazebo
     /// \class ScrewJoint ScrewJoint.hh physics/physics.hh
     /// \brief A screw joint, which has both  prismatic and rotational DOFs
     template<class T>
-    class GAZEBO_VISIBLE ScrewJoint : public T
+    class GZ_PHYSICS_VISIBLE ScrewJoint : public T
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.
@@ -73,6 +74,14 @@ namespace gazebo
       /// This must be implemented in a child class
       /// \return _threadPitch Thread pitch value.
       public: virtual double GetThreadPitch() = 0;
+
+      // Documentation inherited
+      public: virtual void FillMsg(msgs::Joint &_msg)
+              {
+                Joint::FillMsg(_msg);
+                msgs::Joint::Screw *screwMsg = _msg.mutable_screw();
+                screwMsg->set_thread_pitch(this->threadPitch);
+              }
 
       /// \brief Pitch of the thread.
       protected: double threadPitch;

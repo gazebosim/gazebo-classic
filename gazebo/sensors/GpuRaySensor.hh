@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,11 @@
 
 #include <vector>
 #include <string>
+#include <boost/function.hpp>
 #include <boost/thread/mutex.hpp>
+
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Pose.hh"
@@ -42,6 +46,7 @@ namespace gazebo
     /// \class GpuRaySensor GpuRaySensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
+
     /// \brief GPU based laser sensor
     ///
     /// This sensor cast rays into the world, tests for intersections, and
@@ -84,7 +89,13 @@ namespace gazebo
 
       /// \brief Get the minimum angle
       /// \return The minimum angle
-      public: math::Angle GetAngleMin() const;
+      /// \deprecated See AngleMin() function that returns an
+      /// ignition::math::Angle object.
+      public: math::Angle GetAngleMin() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the minimum angle
+      /// \return The minimum angle
+      public: ignition::math::Angle AngleMin() const;
 
       /// \brief Set the scan minimum angle
       /// \param[in] _angle The minimum angle
@@ -92,7 +103,13 @@ namespace gazebo
 
       /// \brief Get the maximum angle
       /// \return the maximum angle
-      public: math::Angle GetAngleMax() const;
+      /// \deprecated See AngleMax() function that returns an
+      /// ignition::math::Angle object.
+      public: math::Angle GetAngleMax() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the maximum angle
+      /// \return the maximum angle
+      public: ignition::math::Angle AngleMax() const;
 
       /// \brief Set the scan maximum angle
       /// \param[in] _angle The maximum angle
@@ -136,7 +153,13 @@ namespace gazebo
 
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      public: math::Angle GetVerticalAngleMin() const;
+      /// \deprecated See VerticalAngleMin() function that returns an
+      /// ignition::math::Angle object.
+      public: math::Angle GetVerticalAngleMin() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the vertical scan bottom angle
+      /// \return The minimum angle of the scan block
+      public: ignition::math::Angle VerticalAngleMin() const;
 
       /// \brief Set the vertical scan bottom angle
       /// \param[in] _angle The minimum angle of the scan block
@@ -144,7 +167,13 @@ namespace gazebo
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      public: math::Angle GetVerticalAngleMax() const;
+      /// \deprecated See VerticalAngleMax() function that returns an
+      /// ignition::math::Angle object.
+      public: math::Angle GetVerticalAngleMax() const GAZEBO_DEPRECATED(6.0);
+
+      /// \brief Get the vertical scan line top angle
+      /// \return The Maximum angle of the scan block
+      public: ignition::math::Angle VerticalAngleMax() const;
 
       /// \brief Set the vertical scan line top angle
       /// \param[in] _angle The Maximum angle of the scan block
@@ -162,7 +191,7 @@ namespace gazebo
       ///         problem by using SetActive(false) <your accessor loop>
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
-      /// \return Returns DBL_MAX for no detection.
+      /// \return Returns RangeMax for no detection.
       public: double GetRange(int _index);
 
       /// \brief Get all the ranges

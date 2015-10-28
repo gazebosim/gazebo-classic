@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
   this->setAcceptHoverEvents(true);
 
   this->SetLine(_start, _end);
-  this->setZValue(5);
+  this->zValueSelected = 8;
+  this->setZValue(this->zValueSelected);
   this->ShowHandles(false);
 
   this->value = 0;

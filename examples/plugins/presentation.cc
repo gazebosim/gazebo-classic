@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace gazebo
   class State
   {
     public: State(const std::string &_slide,
-                  const math::Vector3 _offset,
+                  const math::Vector3 &_offset,
                   double _pitch, double _yaw, double _duration)
             : slide(_slide), offset(_offset),
               pitch(_pitch), yaw(_yaw), duration(_duration) {}

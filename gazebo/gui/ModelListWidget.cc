@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,18 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -35,10 +44,6 @@
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/gui/GuiIface.hh"
-
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -93,6 +98,8 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
   this->propTreeBrowser->setObjectName("propTreeBrowser");
+  this->propTreeBrowser->setStyleSheet(
+      "QTreeView::branch:selected:active { background-color: transparent; }");
   this->variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager(this->variantManager,
                                               this->variantFactory);
@@ -189,7 +196,42 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
                                              this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
     }
+    else if (name == "GUI")
+    {
+      QtVariantProperty *item = NULL;
 
+      rendering::UserCameraPtr cam = gui::get_active_camera();
+      if (!cam)
+        return;
+
+      // Create a camera item
+      QtProperty *topItem = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("camera"));
+      auto cameraBrowser = this->propTreeBrowser->addProperty(topItem);
+
+      // Create and set the gui camera name
+      std::string cameraName = cam->GetName();
+      item = this->variantManager->addProperty(QVariant::String, tr("name"));
+      item->setValue(cameraName.c_str());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
+
+      // Create and set the gui camera pose
+      item = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("pose"));
+      {
+        topItem->addSubProperty(item);
+        ignition::math::Pose3d cameraPose = cam->GetWorldPose().Ign();
+
+        this->FillPoseProperty(msgs::Convert(cameraPose), item);
+        // set expanded to true by default for easier viewing
+        this->propTreeBrowser->setExpanded(cameraBrowser, true);
+        for (auto browser : cameraBrowser->children())
+        {
+          this->propTreeBrowser->setExpanded(browser, true);
+        }
+      }
+    }
     else
     {
       this->propTreeBrowser->clear();
@@ -434,7 +476,7 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
   }
   else if (_msg->has_type() && _msg->type() == "error")
   {
-    if (_msg->response() == "nonexistant")
+    if (_msg->response() == "nonexistent")
     {
       this->removeEntityList.push_back(this->selectedEntityName);
     }
@@ -509,7 +551,8 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
-                          this->modelTreeWidget->mapToGlobal(_pt));
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::MODEL);
     return;
   }
 
@@ -518,7 +561,16 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (i >= 0)
   {
     g_modelRightMenu->Run(item->text(0).toStdString(),
-                          this->modelTreeWidget->mapToGlobal(_pt));
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::LIGHT);
+  }
+
+  // Check to see if the selected item is a link
+  if (item->data(3, Qt::UserRole).toString().toStdString() == "Link")
+  {
+    g_modelRightMenu->Run(item->data(0, Qt::UserRole).toString().toStdString(),
+                          this->modelTreeWidget->mapToGlobal(_pt),
+                          ModelRightMenu::EntityTypes::LINK);
   }
 }
 
@@ -555,6 +607,8 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->ScenePropertyChanged(_item);
   else if (currentItem == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
+  else if (currentItem == this->guiItem)
+    this->GUIPropertyChanged(_item);
 }
 
 /////////////////////////////////////////////////
@@ -571,7 +625,7 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
             (*iter)).toString().toStdString());
     else if ((*iter)->propertyName().toStdString() == "pose")
     {
-      math::Pose pose;
+      ignition::math::Pose3d pose;
       pose.Set(this->variantManager->value(
                  this->GetChildItem((*iter), "x")).toDouble(),
                this->variantManager->value(
@@ -619,6 +673,37 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 }
 
 /////////////////////////////////////////////////
+void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
+{
+  // Only camera pose editable for now
+  QtProperty *cameraProperty = this->GetChildItem("camera");
+  if (!cameraProperty)
+    return;
+
+  QtProperty *cameraPoseProperty = this->GetChildItem(cameraProperty, "pose");
+  if (!cameraPoseProperty)
+    return;
+
+  if (cameraPoseProperty)
+  {
+    std::string changedProperty = _item->propertyName().toStdString();
+    if (changedProperty == "x"
+      || changedProperty == "y"
+      || changedProperty == "z"
+      || changedProperty == "roll"
+      || changedProperty == "pitch"
+      || changedProperty == "yaw")
+    {
+      msgs::Pose poseMsg;
+      this->FillPoseMsg(cameraPoseProperty, &poseMsg, poseMsg.GetDescriptor());
+      rendering::UserCameraPtr cam = gui::get_active_camera();
+      if (cam)
+        cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 {
   msgs::Physics msg;
@@ -629,6 +714,8 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
   {
     if ((*iter)->propertyName().toStdString() == "gravity")
       this->FillVector3Msg((*iter), msg.mutable_gravity());
+    else if ((*iter)->propertyName().toStdString() == "magnetic field")
+      this->FillVector3Msg((*iter), msg.mutable_magnetic_field());
     else if ((*iter)->propertyName().toStdString() == "enable physics")
       msg.set_enable_physics(this->variantManager->value((*iter)).toBool());
     else if ((*iter)->propertyName().toStdString() == "solver")
@@ -665,7 +752,7 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::ScenePropertyChanged(QtProperty * /*_item*/)
+void ModelListWidget::ScenePropertyChanged(QtProperty */*_item*/)
 {
   msgs::Scene msg;
 
@@ -1488,6 +1575,42 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
       item->setEnabled(false);
     }
   }
+
+  // gearbox
+  if (_msg.has_gearbox())
+  {
+    msgs::Joint::Gearbox gearboxMsg = _msg.gearbox();
+    if (gearboxMsg.has_gearbox_reference_body())
+    {
+      item = this->variantManager->addProperty(QVariant::String,
+          tr("gearbox_reference_body"));
+      item->setValue(gearboxMsg.gearbox_reference_body().c_str());
+      this->propTreeBrowser->addProperty(item);
+      item->setEnabled(false);
+    }
+    if (gearboxMsg.has_gearbox_ratio())
+    {
+      item = this->variantManager->addProperty(QVariant::Double,
+          tr("gearbox_ratio"));
+      item->setValue(gearboxMsg.gearbox_ratio());
+      this->propTreeBrowser->addProperty(item);
+      item->setEnabled(false);
+    }
+  }
+
+  // screw
+  if (_msg.has_screw())
+  {
+    msgs::Joint::Screw screwMsg = _msg.screw();
+    if (screwMsg.has_thread_pitch())
+    {
+      item = this->variantManager->addProperty(QVariant::Double,
+          tr("thread_pitch"));
+      item->setValue(screwMsg.thread_pitch());
+      this->propTreeBrowser->addProperty(item);
+      item->setEnabled(false);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1520,6 +1643,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   else
     item->setValue(true);
   this->AddProperty(item, _parent);
+  item->setEnabled(false);
 
   // gravity
   item = this->variantManager->addProperty(QVariant::Bool, tr("gravity"));
@@ -1683,6 +1807,26 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
 
     // this->FillPropertyTree(_msg.sensor(i), prop);
   }
+
+  // battery
+  for (int i = 0; i < _msg.battery_size(); ++i)
+  {
+    QtVariantProperty *batteryItem;
+    batteryItem = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(), tr("battery"));
+    batteryItem->setToolTip(tr(_msg.battery(i).name().c_str()));
+    this->AddProperty(batteryItem, _parent);
+    batteryItem->setEnabled(false);
+
+    item = this->variantManager->addProperty(QVariant::String, tr("name"));
+    item->setValue(_msg.battery(i).name().c_str());
+    batteryItem->addSubProperty(item);
+
+    // Battery::Voltage
+    item = this->variantManager->addProperty(QVariant::Double, tr("voltage"));
+    item->setValue(_msg.battery(i).voltage());
+    batteryItem->addSubProperty(item);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1755,7 +1899,9 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
     return;
   }
 
-  QtProperty *topItem = NULL;
+  QtProperty *frictionItem = NULL;
+  QtProperty *torsionalItem = NULL;
+  QtProperty *odeItem = NULL;
   QtVariantProperty *item = NULL;
 
   // Restituion Coefficient
@@ -1807,41 +1953,83 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
   _parent->addSubProperty(item);
 
   // Friction
-  topItem = this->variantManager->addProperty(
+  frictionItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
       tr("friction"));
-  _parent->addSubProperty(topItem);
+  _parent->addSubProperty(frictionItem);
 
   // Mu
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("mu"));
   item->setValue(_msg.friction().mu());
-  topItem->addSubProperty(item);
+  frictionItem->addSubProperty(item);
 
   // Mu2
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("mu2"));
   item->setValue(_msg.friction().mu2());
-  topItem->addSubProperty(item);
+  frictionItem->addSubProperty(item);
 
   // slip1
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("slip1"));
   item->setValue(_msg.friction().slip1());
-  topItem->addSubProperty(item);
+  frictionItem->addSubProperty(item);
 
   // slip2
   item = this->variantManager->addProperty(QVariant::Double,
                                            tr("slip2"));
   item->setValue(_msg.friction().slip2());
-  topItem->addSubProperty(item);
+  frictionItem->addSubProperty(item);
 
   // Fdir1
   QtProperty *fdirItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
       tr("fdir1"));
-    topItem->addSubProperty(fdirItem);
+    frictionItem->addSubProperty(fdirItem);
     this->FillVector3dProperty(_msg.friction().fdir1(), fdirItem);
+
+  // Torsional
+  torsionalItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(),
+      tr("torsional"));
+  frictionItem->addSubProperty(torsionalItem);
+
+  // Coefficient
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("coefficient"));
+  item->setValue(_msg.friction().torsional().coefficient());
+  torsionalItem->addSubProperty(item);
+
+  // Use patch radius
+  item = this->variantManager->addProperty(QVariant::Bool,
+                                           tr("use_patch_radius"));
+  item->setValue(_msg.friction().torsional().use_patch_radius());
+  torsionalItem->addSubProperty(item);
+
+  // Patch radius
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("patch_radius"));
+  item->setValue(_msg.friction().torsional().patch_radius());
+  torsionalItem->addSubProperty(item);
+
+  // Surface radius
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("surface_radius"));
+  item->setValue(_msg.friction().torsional().surface_radius());
+  torsionalItem->addSubProperty(item);
+
+  // ODE
+  odeItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(),
+      tr("ode"));
+  torsionalItem->addSubProperty(odeItem);
+
+  // slip torsional
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("slip"));
+  item->setValue(_msg.friction().torsional().ode().slip());
+  odeItem->addSubProperty(item);
 }
 
 /////////////////////////////////////////////////
@@ -2057,6 +2245,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
   item->setEnabled(false);
   this->propTreeBrowser->addProperty(item);
 
+  item = this->variantManager->addProperty(QVariant::Bool, tr("self_collide"));
+  if (_msg.has_self_collide())
+    item->setValue(_msg.self_collide());
+  else
+    item->setValue(false);
+  item->setEnabled(false);
+  this->propTreeBrowser->addProperty(item);
+
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
   QtBrowserItem *bItem = this->propTreeBrowser->addProperty(topItem);
@@ -2089,8 +2285,8 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   }
 
   QtVariantProperty *item;
-  math::Vector3 value;
-  value = msgs::Convert(_msg);
+  ignition::math::Vector3d value;
+  value = msgs::ConvertIgn(_msg);
   value.Round(6);
 
   // Add X value
@@ -2103,7 +2299,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  item->setValue(value.x);
+  item->setValue(value.X());
 
   // Add Y value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "y"));
@@ -2114,7 +2310,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(value.y);
+  item->setValue(value.Y());
 
   // Add Z value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "z"));
@@ -2125,7 +2321,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(value.z);
+  item->setValue(value.Z());
 }
 
 /////////////////////////////////////////////////
@@ -2140,11 +2336,11 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
 
   QtVariantProperty *item;
-  math::Pose value;
-  value = msgs::Convert(_msg);
+  ignition::math::Pose3d value;
+  value = msgs::ConvertIgn(_msg);
   value.Round(6);
 
-  math::Vector3 rpy = value.rot.GetAsEuler();
+  ignition::math::Vector3d rpy = value.Rot().Euler();
   rpy.Round(6);
 
   this->FillVector3dProperty(_msg.position(), _parent);
@@ -2155,10 +2351,14 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   {
     item = this->variantManager->addProperty(QVariant::Double, "roll");
     _parent->addSubProperty(item);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "decimals", 6);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "singleStep", 0.05);
   }
-  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
-  item->setValue(rpy.x);
+  item->setValue(rpy.X());
 
   // Add Pitch value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "pitch"));
@@ -2166,10 +2366,14 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   {
     item = this->variantManager->addProperty(QVariant::Double, "pitch");
     _parent->addSubProperty(item);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "decimals", 6);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "singleStep", 0.05);
   }
-  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
-  item->setValue(rpy.y);
+  item->setValue(rpy.Y());
 
   // Add Yaw value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "yaw"));
@@ -2177,10 +2381,14 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   {
     item = this->variantManager->addProperty(QVariant::Double, "yaw");
     _parent->addSubProperty(item);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "decimals", 6);
+    static_cast<QtVariantPropertyManager *>(
+        this->variantFactory->propertyManager(
+        item))->setAttribute(item, "singleStep", 0.05);
   }
-  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
-  item->setValue(rpy.z);
+  item->setValue(rpy.Z());
 }
 
 /////////////////////////////////////////////////
@@ -2256,7 +2464,7 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
 
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light/modify");
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",
@@ -2273,8 +2481,17 @@ void ModelListWidget::ResetTree()
 
   // Create the top level of items in the tree widget
   {
+    // GUI item
+    this->guiItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("GUI"))));
+    this->guiItem->setData(0, Qt::UserRole, QVariant(tr("GUI")));
+    this->modelTreeWidget->addTopLevelItem(this->guiItem);
+
+    // Scene item
     this->ResetScene();
 
+    // Spherical coordinates item
     this->sphericalCoordItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Spherical Coordinates"))));
@@ -2282,18 +2499,21 @@ void ModelListWidget::ResetTree()
         Qt::UserRole, QVariant(tr("Spherical Coordinates")));
     this->modelTreeWidget->addTopLevelItem(this->sphericalCoordItem);
 
+    // Physics item
     this->physicsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Physics"))));
     this->physicsItem->setData(0, Qt::UserRole, QVariant(tr("Physics")));
     this->modelTreeWidget->addTopLevelItem(this->physicsItem);
 
+    // Models item
     this->modelsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Models"))));
     this->modelsItem->setData(0, Qt::UserRole, QVariant(tr("Models")));
     this->modelTreeWidget->addTopLevelItem(this->modelsItem);
 
+    // Lights item
     this->lightsItem = new QTreeWidgetItem(
         static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("%1").arg(tr("Lights"))));
@@ -2470,6 +2690,20 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     this->FillVector3dProperty(xyz, gravityItem);
   }
 
+  QtProperty *magneticFieldItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("magnetic field"));
+  this->propTreeBrowser->addProperty(magneticFieldItem);
+  if (_msg.has_magnetic_field())
+    this->FillVector3dProperty(_msg.magnetic_field(), magneticFieldItem);
+  else
+  {
+    msgs::Vector3d xyz;
+    xyz.set_x(0.0);
+    xyz.set_y(0.0);
+    xyz.set_z(0.0);
+    this->FillVector3dProperty(xyz, magneticFieldItem);
+  }
+
   QtProperty *solverItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("solver"));
   this->propTreeBrowser->addProperty(solverItem);
@@ -2547,7 +2781,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
   if (_msg.has_pose())
     this->FillPoseProperty(_msg.pose(), topItem);
   else
-    this->FillPoseProperty(msgs::Convert(math::Pose()), topItem);
+    this->FillPoseProperty(msgs::Convert(ignition::math::Pose3d()), topItem);
 
   // Create and set the diffuse color property
   item = this->variantManager->addProperty(QVariant::Color, tr("diffuse"));

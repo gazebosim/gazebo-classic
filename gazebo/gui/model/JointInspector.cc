@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,169 +18,233 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
 
+#include "gazebo/rendering/Material.hh"
+
+#include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointInspector.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-JointInspector::JointInspector(JointMaker::JointType _jointType,
-  QWidget *_parent) : QDialog(_parent)
+JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
+    : QDialog(_parent), jointMaker(_jointMaker)
 {
   this->setObjectName("JointInspectorDialog");
   this->setWindowTitle(tr("Joint Inspector"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
-  this->jointType = _jointType;
+  // ConfigWidget
+  this->configWidget = new ConfigWidget;
+  msgs::Joint jointMsg;
+  this->configWidget->Load(&jointMsg);
 
-  QLabel *jointLabel = new QLabel(tr("Name:"));
-  this->jointNameLabel = new QLabel(tr(""));
-
-  QHBoxLayout *nameLayout = new QHBoxLayout;
-  nameLayout->addWidget(jointLabel);
-  nameLayout->addWidget(jointNameLabel);
-
-  QLabel *typeLabel = new QLabel(tr("Type: "));
-  this->jointTypeLabel = new QLabel("");
-  QHBoxLayout *typeLayout = new QHBoxLayout;
-  typeLayout->addWidget(typeLabel);
-  typeLayout->addWidget(this->jointTypeLabel);
-
-  QLabel *anchorXLabel = new QLabel(tr("x: "));
-  QLabel *anchorYLabel = new QLabel(tr("y: "));
-  QLabel *anchorZLabel = new QLabel(tr("z: "));
-
-  this->anchorXSpinBox = new QDoubleSpinBox;
-  this->anchorXSpinBox->setRange(-1000, 1000);
-  this->anchorXSpinBox->setSingleStep(0.01);
-  this->anchorXSpinBox->setDecimals(3);
-  this->anchorXSpinBox->setValue(0.000);
-
-  this->anchorYSpinBox = new QDoubleSpinBox;
-  this->anchorYSpinBox->setRange(-1000, 1000);
-  this->anchorYSpinBox->setSingleStep(0.01);
-  this->anchorYSpinBox->setDecimals(3);
-  this->anchorYSpinBox->setValue(0.000);
-
-  this->anchorZSpinBox = new QDoubleSpinBox;
-  this->anchorZSpinBox->setRange(-1000, 1000);
-  this->anchorZSpinBox->setSingleStep(0.01);
-  this->anchorZSpinBox->setDecimals(3);
-  this->anchorZSpinBox->setValue(0.000);
-
-  QGridLayout *anchorLayout = new QGridLayout;
-  anchorLayout->addWidget(anchorXLabel, 0, 0);
-  anchorLayout->addWidget(anchorXSpinBox, 0, 1);
-  anchorLayout->addWidget(anchorYLabel), 1, 0;
-  anchorLayout->addWidget(anchorYSpinBox, 1, 1);
-  anchorLayout->addWidget(anchorZLabel), 2, 0;
-  anchorLayout->addWidget(anchorZSpinBox, 2, 1);
-
-  QGroupBox *anchorGroupBox = new QGroupBox(tr("Anchor"));
-  anchorGroupBox->setLayout(anchorLayout);
-
-  int axisCount = 2;
-  for (int i = 0; i < axisCount; ++i)
+  // Fill with SDF default values
+  sdf::ElementPtr jointElem = msgs::JointToSDF(jointMsg);
+  sdf::ElementPtr axisElem = jointElem->GetElement("axis");
+  sdf::ElementPtr axisLimitElem = axisElem->GetElement("limit");
+  sdf::ElementPtr odeElem = jointElem->GetElement("physics")->GetElement("ode");
+  for (unsigned int i = 0; i < 2u; ++i)
   {
-    QLabel *axisXLabel = new QLabel(tr("x: "));
-    QLabel *axisYLabel = new QLabel(tr("y: "));
-    QLabel *axisZLabel = new QLabel(tr("z: "));
-
-    QDoubleSpinBox *axisXSpinBox = new QDoubleSpinBox;
-    axisXSpinBox->setRange(-1000, 1000);
-    axisXSpinBox->setSingleStep(0.01);
-    axisXSpinBox->setDecimals(3);
-    axisXSpinBox->setValue(0.000);
-    this->axisXSpinBoxes.push_back(axisXSpinBox);
-
-    QDoubleSpinBox *axisYSpinBox = new QDoubleSpinBox;
-    axisYSpinBox->setRange(-1000, 1000);
-    axisYSpinBox->setSingleStep(0.01);
-    axisYSpinBox->setDecimals(3);
-    axisYSpinBox->setValue(0.000);
-    this->axisYSpinBoxes.push_back(axisYSpinBox);
-
-    QDoubleSpinBox *axisZSpinBox = new QDoubleSpinBox;
-    axisZSpinBox->setRange(-1000, 1000);
-    axisZSpinBox->setSingleStep(0.01);
-    axisZSpinBox->setDecimals(3);
-    axisZSpinBox->setValue(0.000);
-    this->axisZSpinBoxes.push_back(axisZSpinBox);
-
-    QGridLayout *axisLayout = new QGridLayout;
-    axisLayout->addWidget(axisXLabel, 0, 0);
-    axisLayout->addWidget(axisXSpinBox, 0, 1);
-    axisLayout->addWidget(axisYLabel), 1, 0;
-    axisLayout->addWidget(axisYSpinBox, 1, 1);
-    axisLayout->addWidget(axisZLabel), 2, 0;
-    axisLayout->addWidget(axisZSpinBox, 2, 1);
-
-    QLabel *lowerLimitLabel = new QLabel(tr("Lower: "));
-    QLabel *upperLimitLabel = new QLabel(tr("Upper: "));
-
-    QDoubleSpinBox *lowerLimitSpinBox = new QDoubleSpinBox;
-    lowerLimitSpinBox->setRange(-1000, 1000);
-    lowerLimitSpinBox->setSingleStep(0.01);
-    lowerLimitSpinBox->setDecimals(3);
-    lowerLimitSpinBox->setValue(-1e16);
-    this->lowerLimitSpinBoxes.push_back(lowerLimitSpinBox);
-
-    QDoubleSpinBox *upperLimitSpinBox = new QDoubleSpinBox;
-    upperLimitSpinBox->setRange(-1000, 1000);
-    upperLimitSpinBox->setSingleStep(0.01);
-    upperLimitSpinBox->setDecimals(3);
-    upperLimitSpinBox->setValue(1e16);
-    this->upperLimitSpinBoxes.push_back(upperLimitSpinBox);
-
-
-    QGridLayout *limitLayout = new QGridLayout;
-    limitLayout->addWidget(lowerLimitLabel, 0, 0);
-    limitLayout->addWidget(lowerLimitSpinBox, 0, 1);
-    limitLayout->addWidget(upperLimitLabel), 1, 0;
-    limitLayout->addWidget(upperLimitSpinBox, 1, 1);
-
-    QGroupBox *limitGroupBox = new QGroupBox(tr("Limit"));
-    limitGroupBox->setLayout(limitLayout);
-
-    QVBoxLayout *axisAllLayout = new QVBoxLayout;
-    axisAllLayout->addLayout(axisLayout);
-    axisAllLayout->addWidget(limitGroupBox);
-
-    std::stringstream ss;
-    ss << "Axis" << (i+1);
-    QGroupBox *axisGroupBox = new QGroupBox(tr(ss.str().c_str()));
-    axisGroupBox->setLayout(axisAllLayout);
-    this->axisGroupBoxes.push_back(axisGroupBox);
+    std::stringstream axis;
+    axis << "axis" << i+1;
+    std::string axisStr = axis.str();
+    this->configWidget->SetVector3WidgetValue(axisStr + "::xyz",
+        axisElem->Get<math::Vector3>("xyz"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower",
+        axisLimitElem->Get<double>("lower"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_upper",
+        axisLimitElem->Get<double>("upper"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_effort",
+        axisLimitElem->Get<double>("effort"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_velocity",
+        axisLimitElem->Get<double>("velocity"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::damping",
+        axisElem->GetElement("dynamics")->Get<double>("damping"));
+    this->configWidget->SetDoubleWidgetValue(axisStr + "::friction",
+        axisElem->GetElement("dynamics")->Get<double>("friction"));
+    this->configWidget->SetBoolWidgetValue(axisStr + "::parent_model_frame",
+        axisElem->Get<bool>("use_parent_model_frame"));
   }
+
+  this->configWidget->SetDoubleWidgetValue("cfm",
+      odeElem->Get<double>("cfm"));
+  this->configWidget->SetDoubleWidgetValue("bounce",
+      odeElem->Get<double>("bounce"));
+  this->configWidget->SetDoubleWidgetValue("velocity",
+      odeElem->Get<double>("velocity"));
+  this->configWidget->SetDoubleWidgetValue("fudge_factor",
+      odeElem->Get<double>("fudge_factor"));
+  this->configWidget->SetDoubleWidgetValue("limit_cfm",
+      odeElem->GetElement("limit")->Get<double>("cfm"));
+  this->configWidget->SetDoubleWidgetValue("limit_erp",
+      odeElem->GetElement("limit")->Get<double>("erp"));
+  this->configWidget->SetDoubleWidgetValue("suspension_cfm",
+      odeElem->GetElement("suspension")->Get<double>("cfm"));
+  this->configWidget->SetDoubleWidgetValue("suspension_erp",
+      odeElem->GetElement("suspension")->Get<double>("erp"));
+
+  // joint type specific properties.
+  this->configWidget->SetStringWidgetValue("gearbox::gearbox_reference_body",
+      jointElem->HasElement("gearbox_reference_body") ?
+      jointElem->Get<std::string>("gearbox_reference_body") : "");
+  this->configWidget->SetDoubleWidgetValue("gearbox::gearbox_ratio",
+      jointElem->Get<double>("gearbox_ratio"));
+  this->configWidget->SetDoubleWidgetValue("screw::thread_pitch",
+      jointElem->Get<double>("thread_pitch"));
+
+  // Hide fields
+  this->configWidget->SetWidgetVisible("id", false);
+  this->configWidget->SetWidgetVisible("parent_id", false);
+  this->configWidget->SetWidgetVisible("child_id", false);
+  this->configWidget->SetWidgetVisible("parent", false);
+  this->configWidget->SetWidgetVisible("child", false);
+
+  this->configWidget->SetWidgetReadOnly("id", true);
+  this->configWidget->SetWidgetReadOnly("parent_id", true);
+  this->configWidget->SetWidgetReadOnly("child_id", true);
+  this->configWidget->SetWidgetReadOnly("parent", true);
+  this->configWidget->SetWidgetReadOnly("child", true);
+
+  // Custom parent / child widgets
+  // Parent
+  std::vector<std::string> links;
+  this->parentLinkWidget =
+      this->configWidget->CreateEnumWidget("parent", links, 0);
+  this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+  this->configWidget->AddConfigChildWidget("parentCombo",
+      this->parentLinkWidget);
+
+  // Resize parent label
+  auto parentLabel = this->parentLinkWidget->findChild<QLabel *>();
+  parentLabel->setMaximumWidth(50);
+
+  // Add parent icon
+  this->parentIcon = new QLabel();
+  this->parentIcon->setMinimumWidth(13);
+  this->parentIcon->setMaximumHeight(13);
+  auto parentLayout = qobject_cast<QHBoxLayout *>(
+      this->parentLinkWidget->layout());
+  if (parentLayout)
+  {
+    parentLayout->insertWidget(1, this->parentIcon);
+    parentLayout->setAlignment(this->parentIcon, Qt::AlignLeft);
+  }
+
+  // Child
+  this->childLinkWidget =
+      this->configWidget->CreateEnumWidget("child", links, 0);
+  this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+  this->configWidget->AddConfigChildWidget("childCombo", this->childLinkWidget);
+
+  // Resize child label
+  auto childLabel = this->childLinkWidget->findChild<QLabel *>();
+  childLabel->setMaximumWidth(50);
+
+  // Add child icon
+  QPixmap childPix(":/images/child-link.png");
+  childPix = childPix.scaled(15, 15);
+  auto childIcon = new QLabel();
+  childIcon->setPixmap(childPix);
+  childIcon->setMaximumWidth(15);
+  auto childLayout = qobject_cast<QHBoxLayout *>(
+      this->childLinkWidget->layout());
+  if (childLayout)
+  {
+    childLayout->insertWidget(1, childIcon);
+    childLayout->setAlignment(childIcon, Qt::AlignLeft);
+  }
+
+  // Swap button
+  QToolButton *swapButton = new QToolButton();
+  swapButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  swapButton->setIcon(QPixmap(":/images/swap-parent-child.png"));
+  swapButton->setFixedSize(QSize(45, 35));
+  swapButton->setIconSize(QSize(25, 25));
+  swapButton->setToolTip("Swap parent and child");
+  swapButton->setStyleSheet(
+      "QToolButton\
+      {\
+        background-color: " + ConfigWidget::bgColors[0] + ";\
+        margin-left: 10px;\
+      }");
+  connect(swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
+
+  // Links layout
+  QGridLayout *linksLayout = new QGridLayout();
+  linksLayout->setContentsMargins(0, 0, 0, 0);
+  linksLayout->addWidget(this->parentLinkWidget, 0, 0);
+  linksLayout->addWidget(this->childLinkWidget, 1, 0);
+  linksLayout->addWidget(swapButton, 0, 1, 2, 1);
+
+  // Insert on the top of config widget's layout
+  this->configWidget->InsertLayout(linksLayout, 0);
+
+  // Connect all enum value changes, which includes type, parent and child
+  QObject::connect(this->configWidget,
+      SIGNAL(EnumValueChanged(const QString &, const QString &)), this,
+      SLOT(OnEnumChanged(const QString &, const QString &)));
+
+  // Set initial joint type
+  this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
+
+  // Scroll area
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(this->configWidget);
+  scrollArea->setWidgetResizable(true);
+
+  // General layout
+  QVBoxLayout *generalLayout = new QVBoxLayout;
+  generalLayout->setContentsMargins(0, 0, 0, 0);
+  generalLayout->addWidget(scrollArea);
+
+  // Buttons
+  QToolButton *removeButton = new QToolButton(this);
+  removeButton->setFixedSize(QSize(30, 30));
+  removeButton->setToolTip("Remove joint");
+  removeButton->setIcon(QPixmap(":/images/trashcan.png"));
+  removeButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  removeButton->setIconSize(QSize(16, 16));
+  removeButton->setCheckable(false);
+  connect(removeButton, SIGNAL(clicked()), this, SLOT(OnRemove()));
+
+  QPushButton *cancelButton = new QPushButton(tr("Cancel"));
+  connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
+
+  this->applyButton = new QPushButton(tr("Apply"));
+  this->applyButton->setEnabled(true);
+  connect(this->applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
+
+  this->okButton = new QPushButton(tr("OK"));
+  this->okButton->setEnabled(true);
+  this->okButton->setDefault(true);
+  connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
-  QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
-  connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  QPushButton *applyButton = new QPushButton(tr("&Apply"));
-  connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-  QPushButton *OKButton = new QPushButton(tr("&OK"));
-  OKButton->setDefault(true);
-  connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
+  buttonsLayout->addWidget(removeButton);
+  buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(applyButton);
-  buttonsLayout->addWidget(OKButton);
+  buttonsLayout->addWidget(this->applyButton);
+  buttonsLayout->addWidget(this->okButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
+  // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addLayout(nameLayout);
-  mainLayout->addLayout(typeLayout);
-  mainLayout->addWidget(anchorGroupBox);
-  for (unsigned int i = 0; i < axisGroupBoxes.size(); ++i)
-  {
-    mainLayout->addWidget(this->axisGroupBoxes[i]);
-    this->axisGroupBoxes[i]->setVisible(false);
-  }
+  mainLayout->addLayout(generalLayout);
   mainLayout->addLayout(buttonsLayout);
-  this->setLayout(mainLayout);
-  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-  if (this->jointType)
-    this->SetType(this->jointType);
+  this->setMinimumWidth(500);
+  this->setMinimumHeight(300);
+
+  this->setLayout(mainLayout);
+
+  // Qt signal / slot connections
+  connect(this->jointMaker, SIGNAL(EmitLinkRemoved(std::string)), this,
+      SLOT(OnLinkRemoved(std::string)));
+  connect(this->jointMaker, SIGNAL(EmitLinkInserted(std::string)), this,
+      SLOT(OnLinkInserted(std::string)));
 }
 
 /////////////////////////////////////////////////
@@ -189,128 +253,216 @@ JointInspector::~JointInspector()
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAnchor(unsigned int /*_index*/) const
+void JointInspector::Update(ConstJointPtr _jointMsg)
 {
-  return math::Vector3(this->anchorXSpinBox->value(),
-      this->anchorYSpinBox->value(), this->anchorZSpinBox->value());
+  this->configWidget->UpdateFromMsg(_jointMsg.get());
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAxis(unsigned int _index) const
+void JointInspector::SetPose(const math::Pose &_pose)
 {
-  if (_index > this->axisXSpinBoxes.size())
+  this->configWidget->SetPoseWidgetValue("pose", _pose);
+}
+
+/////////////////////////////////////////////////
+msgs::Joint *JointInspector::GetData() const
+{
+  std::string currentParent =
+      this->configWidget->GetEnumWidgetValue("parentCombo");
+
+  std::string currentChild =
+      this->configWidget->GetEnumWidgetValue("childCombo");
+
+  if (currentParent == currentChild)
   {
-    gzerr << "Axis index is out of range" << std::endl;
-    return math::Vector3::Zero;
+    gzerr << "Parent link equal to child link - not updating joint."
+        << std::endl;
+    return NULL;
   }
 
-  return math::Vector3(this->axisXSpinBoxes[_index]->value(),
-      this->axisYSpinBoxes[_index]->value(),
-      this->axisZSpinBoxes[_index]->value());
+  // Get updated message from widget
+  msgs::Joint *msg = dynamic_cast<msgs::Joint *>(this->configWidget->GetMsg());
+
+  // Use parent / child from our custom widget
+  msg->set_parent(currentParent);
+  msg->set_child(currentChild);
+
+  return msg;
 }
 
 /////////////////////////////////////////////////
-double JointInspector::GetLowerLimit(unsigned int _index) const
+void JointInspector::OnEnumChanged(const QString &_name,
+    const QString &_value)
 {
-  if (_index > this->lowerLimitSpinBoxes.size())
+  if (_name == "type")
+    this->OnJointTypeChanged(_value);
+  else if (_name == "parentCombo" || _name == "childCombo")
+    this->OnLinksChanged(_value);
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnJointTypeChanged(const QString &_value)
+{
+  std::string valueStr = _value.toLower().toStdString();
+  auto type = JointMaker::ConvertJointType(valueStr);
+  unsigned int axisCount = JointMaker::GetJointAxisCount(type);
+
+  for (unsigned int i = 0; i < axisCount; ++i)
   {
-    gzerr << "Axis index is out of range" << std::endl;
-    return 0;
+    std::stringstream axis;
+    axis << "axis" << i+1;
+    std::string axisStr = axis.str();
+
+    this->configWidget->SetWidgetVisible(axisStr, true);
+    this->configWidget->SetWidgetReadOnly(axisStr, false);
+    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
   }
 
-  return this->lowerLimitSpinBoxes[_index]->value();
-}
-
-/////////////////////////////////////////////////
-double JointInspector::GetUpperLimit(unsigned int _index) const
-{
-  if (_index > this->upperLimitSpinBoxes.size())
+  for (unsigned int i = axisCount; i < 2u; ++i)
   {
-    gzerr << "Axis index is out of range" << std::endl;
-    return 0;
+    std::stringstream axis;
+    axis << "axis" << i+1;
+    std::string axisStr = axis.str();
+
+    this->configWidget->SetWidgetVisible(axisStr, false);
+    this->configWidget->SetWidgetReadOnly(axisStr, true);
+    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
   }
 
-  return this->upperLimitSpinBoxes[_index]->value();
+  // toggle field visibility according to joint type.
+  bool isGearbox = valueStr == "gearbox";
+  bool isScrew = valueStr == "screw";
+  this->configWidget->SetWidgetVisible("gearbox", isGearbox);
+  this->configWidget->SetWidgetReadOnly("gearbox", !isGearbox);
+  this->configWidget->SetWidgetVisible("screw", isScrew);
+  this->configWidget->SetWidgetReadOnly("screw", !isScrew);
+
+  // Change child icon color according to type
+  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::GetMaterialAsColor(
+      this->jointMaker->jointMaterials[type],
+      matAmbient, matDiffuse, matSpecular, matEmissive);
+
+  std::ostringstream sheet;
+  sheet << "QLabel{background-color: rgb(" <<
+          (matAmbient[0] * 255) << ", " <<
+          (matAmbient[1] * 255) << ", " <<
+          (matAmbient[2] * 255) << "); }";
+
+  this->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
 }
 
 /////////////////////////////////////////////////
-JointMaker::JointType JointInspector::GetType() const
+void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
 {
-  return this->jointType;
-}
+  std::string currentParent =
+      this->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->configWidget->GetEnumWidgetValue("childCombo");
 
-/////////////////////////////////////////////////
-void JointInspector::SetType(JointMaker::JointType _type)
-{
-  this->jointType =  _type;
-
-  std::string jointTypeStr = JointMaker::GetTypeAsString(_type);
-  int axisCount = JointMaker::GetJointAxisCount(_type);
-  GZ_ASSERT(axisCount >= 0, "Invalid axis count");
-
-  this->jointTypeLabel->setText(tr(jointTypeStr.c_str()));
-
-  for (int i = 0; i < axisCount; ++i)
-    this->axisGroupBoxes[i]->setVisible(true);
-
-  for (int i = axisCount;
-      i < static_cast<int>(this->axisGroupBoxes.size()); ++i)
+  // Warning if parent and child are equal
+  if (currentParent == currentChild)
   {
-    this->axisGroupBoxes[i]->setVisible(false);
+    this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("warning"));
+    this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("warning"));
   }
-}
-
-/////////////////////////////////////////////////
-void JointInspector::SetName(const std::string &_name)
-{
-  this->jointNameLabel->setText(tr(_name.c_str()));
-}
-
-/////////////////////////////////////////////////
-void JointInspector::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
-{
-  this->anchorXSpinBox->setValue(_anchor.x);
-  this->anchorYSpinBox->setValue(_anchor.y);
-  this->anchorZSpinBox->setValue(_anchor.z);
-}
-
-/////////////////////////////////////////////////
-void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
-{
-  if (_index > this->axisXSpinBoxes.size())
+  else
   {
-    gzerr << "Axis index is out of range" << std::endl;
-    return;
+    this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+    this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
   }
-
-  this->axisXSpinBoxes[_index]->setValue(_axis.x);
-  this->axisYSpinBoxes[_index]->setValue(_axis.y);
-  this->axisZSpinBoxes[_index]->setValue(_axis.z);
+  this->applyButton->setEnabled(currentParent != currentChild);
+  this->okButton->setEnabled(currentParent != currentChild);
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetLowerLimit(unsigned int _index, double _lower)
+void JointInspector::OnSwap()
 {
-  if (_index > this->lowerLimitSpinBoxes.size())
-  {
-    gzerr << "Axis index is out of range" << std::endl;
-    return;
-  }
+  // Get current values
+  std::string currentParent =
+      this->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->configWidget->GetEnumWidgetValue("childCombo");
 
-  this->lowerLimitSpinBoxes[_index]->setValue(_lower);
+  // Choose new values
+  this->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
+  this->configWidget->SetEnumWidgetValue("childCombo", currentParent);
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetUpperLimit(unsigned int _index, double _upper)
+void JointInspector::OnLinkInserted(const std::string &_linkName)
 {
-  if (_index > this->upperLimitSpinBoxes.size())
+  std::string leafName = _linkName;
+  size_t idx = _linkName.rfind("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+2);
+
+  this->configWidget->AddItemEnumWidget("parentCombo", leafName);
+  this->configWidget->AddItemEnumWidget("childCombo", leafName);
+
+  this->OnLinksChanged();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnLinkRemoved(const std::string &_linkName)
+{
+  std::string leafName = _linkName;
+  size_t idx = _linkName.rfind("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+2);
+
+  this->configWidget->RemoveItemEnumWidget("parentCombo", leafName);
+  this->configWidget->RemoveItemEnumWidget("childCombo", leafName);
+
+  this->OnLinksChanged();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::Open()
+{
+  // Fill link combo boxes
+  this->configWidget->ClearEnumWidget("parentCombo");
+  this->configWidget->ClearEnumWidget("childCombo");
+
+  for (const auto &link : this->jointMaker->LinkList())
   {
-    gzerr << "Axis index is out of range" << std::endl;
-    return;
+    this->configWidget->AddItemEnumWidget("parentCombo", link.second);
+    this->configWidget->AddItemEnumWidget("childCombo", link.second);
   }
 
-  this->upperLimitSpinBoxes[_index]->setValue(_upper);
+  // Select current parent / child
+  std::string currentParent =
+      this->configWidget->GetStringWidgetValue("parent");
+  std::string currentChild =
+      this->configWidget->GetStringWidgetValue("child");
+
+  this->configWidget->blockSignals(true);
+  this->configWidget->SetEnumWidgetValue("parentCombo", currentParent);
+  this->configWidget->SetEnumWidgetValue("childCombo", currentChild);
+  this->configWidget->blockSignals(false);
+
+  // Reset states
+  this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+  this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+  this->applyButton->setEnabled(true);
+  this->okButton->setEnabled(true);
+
+  this->move(QCursor::pos());
+  this->show();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetJointId(const std::string &_id)
+{
+  this->jointId = _id;
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnRemove()
+{
+  this->close();
+
+  this->jointMaker->RemoveJoint(this->jointId);
 }
 
 /////////////////////////////////////////////////
@@ -330,4 +482,10 @@ void JointInspector::OnOK()
 {
   emit Applied();
   this->accept();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::enterEvent(QEvent */*_event*/)
+{
+  QApplication::setOverrideCursor(Qt::ArrowCursor);
 }

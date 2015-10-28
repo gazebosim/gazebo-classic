@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,30 +79,16 @@ GUIExampleSpawnWidget::~GUIExampleSpawnWidget()
 /////////////////////////////////////////////////
 void GUIExampleSpawnWidget::OnButton()
 {
+  msgs::Model model;
+  model.set_name("plugin_unit_sphere_" + std::to_string(this->counter++));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(0, 0, 1.5, 0, 0, 0));
+  const double mass = 1.0;
+  const double radius = 0.5;
+  msgs::AddSphereLink(model, mass, radius);
+
   std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
-    << "<model name='plugin_unit_sphere_" << this->counter++ << "'>"
-    << "  <pose>0 0 1.5 0 0 0</pose>"
-    << "  <link name='link'>"
-    << "    <inertial><mass>1.0</mass></inertial>"
-    << "    <collision name='collision'>"
-    << "      <geometry>"
-    << "        <sphere><radius>0.5</radius></sphere>"
-    << "      </geometry>"
-    << "    </collision>"
-    << "    <visual name ='visual'>"
-    << "      <geometry>"
-    << "        <sphere><radius>0.5</radius></sphere>"
-    << "      </geometry>"
-    << "      <material>"
-    << "        <script>"
-    << "          <uri>file://media/materials/scripts/gazebo.material</uri>"
-    << "          <name>Gazebo/Grey</name>"
-    << "        </script>"
-    << "      </material>"
-    << "    </visual>"
-    << "  </link>"
-    << "  </model>"
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
   // Send the model to the gazebo server

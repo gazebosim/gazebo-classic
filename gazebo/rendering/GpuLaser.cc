@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  *
 */
 
-/* Desc: A laser sensor using OpenGL
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
- */
-
-#include <dirent.h>
 #include <sstream>
+
+#ifndef _WIN32
+  #include <dirent.h>
+#else
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  #include "gazebo/common/win_dirent.h"
+#endif
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -463,8 +466,11 @@ const float* GpuLaser::GetLaserData()
 /////////////////////////////////////////////////
 void GpuLaser::CreateOrthoCam()
 {
+  this->pitchNodeOrtho =
+    this->GetScene()->GetWorldVisual()->GetSceneNode()->createChildSceneNode();
+
   this->orthoCam = this->scene->GetManager()->createCamera(
-        this->GetName() + "_ortho_cam");
+        this->pitchNodeOrtho->getName() + "_ortho_cam");
 
   // Use X/Y as horizon, Z up
   this->orthoCam->pitch(Ogre::Degree(90));
@@ -473,10 +479,6 @@ void GpuLaser::CreateOrthoCam()
   this->orthoCam->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
 
   this->orthoCam->setDirection(1, 0, 0);
-
-  this->pitchNodeOrtho =
-    this->GetScene()->GetWorldVisual()->GetSceneNode()->createChildSceneNode(
-      this->GetName()+"OrthoPitchNode");
 
   this->pitchNodeOrtho->attachObject(this->orthoCam);
   this->orthoCam->setAutoAspectRatio(true);
@@ -527,7 +529,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
     this->firstPassViewports[_index]->setShadowsEnabled(false);
     this->firstPassViewports[_index]->setSkiesEnabled(false);
     this->firstPassViewports[_index]->setBackgroundColour(
-        Ogre::ColourValue(this->far, 0.0, 1.0));
+        Ogre::ColourValue(this->farClip, 0.0, 1.0));
     this->firstPassViewports[_index]->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
@@ -787,25 +789,25 @@ void GpuLaser::SetCosVertFOV(double _cvfov)
 //////////////////////////////////////////////////
 double GpuLaser::GetNearClip() const
 {
-  return this->near;
+  return this->nearClip;
 }
 
 //////////////////////////////////////////////////
 double GpuLaser::GetFarClip() const
 {
-  return this->far;
+  return this->farClip;
 }
 
 //////////////////////////////////////////////////
 void GpuLaser::SetNearClip(double _near)
 {
-  this->near = _near;
+  this->nearClip = _near;
 }
 
 //////////////////////////////////////////////////
 void GpuLaser::SetFarClip(double _far)
 {
-  this->far = _far;
+  this->farClip = _far;
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -46,7 +46,7 @@ void ConcaveMeshTest::SubmeshNoCollisionTest(const std::string &_physicsEngine)
 
   // No ray should interect a collision.
   for (int i = 0; i < raySensor->GetRangeCount(); ++i)
-    EXPECT_NEAR(raySensor->GetRange(i), raySensor->GetRangeMax(), 1e-2);
+    EXPECT_DOUBLE_EQ(raySensor->GetRange(i), GZ_DBL_INF);
 }
 
 /////////////////////////////////////////////////
@@ -63,26 +63,26 @@ void ConcaveMeshTest::SubmeshCollisionTest(const std::string &_physicsEngine)
     sensors::get_sensor("default::hokuyo::link::laser"));
   EXPECT_TRUE(raySensor != NULL);
 
-  EXPECT_NEAR(raySensor->GetRange(0), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(1), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(2), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(3), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(4), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(5), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(6), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(7), 10, 1e-2);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(0), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(1), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(2), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(3), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(4), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(5), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(6), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(7), GZ_DBL_INF);
   EXPECT_NEAR(raySensor->GetRange(8), 1.92439, 1e-2);
   EXPECT_NEAR(raySensor->GetRange(9), 1.86443, 1e-2);
   EXPECT_NEAR(raySensor->GetRange(10), 1.86443, 1e-2);
   EXPECT_NEAR(raySensor->GetRange(11), 1.92439, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(12), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(13), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(14), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(15), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(16), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(17), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(18), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(19), 10, 1e-2);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(12), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(13), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(14), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(15), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(16), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(17), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(18), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(19), GZ_DBL_INF);
 }
 
 /////////////////////////////////////////////////
@@ -99,10 +99,10 @@ void ConcaveMeshTest::RayTest(const std::string &_physicsEngine)
     sensors::get_sensor("default::hokuyo::link::laser"));
   EXPECT_TRUE(raySensor != NULL);
 
-  EXPECT_NEAR(raySensor->GetRange(0), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(1), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(2), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(3), 10, 1e-2);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(0), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(1), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(2), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(3), GZ_DBL_INF);
   EXPECT_NEAR(raySensor->GetRange(4), 0.972282, 1e-2);
   EXPECT_NEAR(raySensor->GetRange(5), 0.967148, 1e-2);
   EXPECT_NEAR(raySensor->GetRange(6), 0.962889, 1e-2);
@@ -112,13 +112,13 @@ void ConcaveMeshTest::RayTest(const std::string &_physicsEngine)
   EXPECT_NEAR(raySensor->GetRange(10), 0.948761, 1e-2);
   EXPECT_NEAR(raySensor->GetRange(11), 0.847463, 1e-2);
   EXPECT_NEAR(raySensor->GetRange(12), 0.847665, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(13), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(14), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(15), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(16), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(17), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(18), 10, 1e-2);
-  EXPECT_NEAR(raySensor->GetRange(19), 10, 1e-2);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(13), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(14), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(15), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(16), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(17), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(18), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->GetRange(19), GZ_DBL_INF);
 }
 
 /////////////////////////////////////////////////

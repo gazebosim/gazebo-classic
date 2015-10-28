@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
 #ifndef _KEYFRAME_HH_
 #define _KEYFRAME_HH_
 
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
+
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/util/system.hh"
@@ -30,7 +34,7 @@ namespace gazebo
 
     /// \class KeyFrame KeyFrame.hh common/common.hh
     /// \brief A key frame in an animation
-    class GAZEBO_VISIBLE KeyFrame
+    class GZ_COMMON_VISIBLE KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe in seconds
@@ -48,7 +52,7 @@ namespace gazebo
     };
 
     /// \brief A keyframe for a PoseAnimation
-    class GAZEBO_VISIBLE PoseKeyFrame : public KeyFrame
+    class GZ_COMMON_VISIBLE PoseKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time of the keyframe
@@ -59,29 +63,29 @@ namespace gazebo
 
       /// \brief Set the translation for the keyframe
       /// \param[in] _trans Translation amount
-      public: void SetTranslation(const math::Vector3 &_trans);
+      public: void Translation(const ignition::math::Vector3d &_trans);
 
       /// \brief Get the translation of the keyframe
       /// \return The translation amount
-      public: const math::Vector3 &GetTranslation() const;
+      public: ignition::math::Vector3d Translation() const;
 
       /// \brief Set the rotation for the keyframe
       /// \param[in] _rot Rotation amount
-      public: void SetRotation(const math::Quaternion &_rot);
+      public: void Rotation(const ignition::math::Quaterniond &_rot);
 
       /// \brief Get the rotation of the keyframe
       /// \return The rotation amount
-      public: const math::Quaternion &GetRotation() const;
+      public: ignition::math::Quaterniond Rotation() const;
 
       /// \brief the translation vector
-      protected: math::Vector3 translate;
+      protected: ignition::math::Vector3d translate;
 
       /// \brief the rotation quaternion
-      protected: math::Quaternion rotate;
+      protected: ignition::math::Quaterniond rotate;
     };
 
     /// \brief A keyframe for a NumericAnimation
-    class GAZEBO_VISIBLE NumericKeyFrame : public KeyFrame
+    class GZ_COMMON_VISIBLE NumericKeyFrame : public KeyFrame
     {
       /// \brief Constructor
       /// \param[in] _time Time of the keyframe

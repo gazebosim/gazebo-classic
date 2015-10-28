@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,13 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/bind.hpp>
 #include <algorithm>
 
 #include "gazebo/transport/transport.hh"
@@ -210,7 +217,7 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
   for (int i = 0; i < _msg.point_size(); ++i)
   {
-    this->points.push_back(msgs::Convert(_msg.point(i)));
+    this->points.push_back(msgs::ConvertIgn(_msg.point(i)));
   }
 
   this->mRenderOp.vertexData = new Ogre::VertexData;
@@ -248,7 +255,7 @@ void Road2d::Segment::Load(msgs::Road _msg)
   float *vertices = static_cast<float*>(
       vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
-  math::Vector3 pA, pB, tangent;
+  ignition::math::Vector3d pA, pB, tangent;
 
   math::Box bounds;
   bounds.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
@@ -305,16 +312,16 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
     // The tangent is used to calculate the two verteces to either side of
     // the point. The vertices define the triangle mesh of the road
-    double theta = atan2(tangent.x, -tangent.y);
+    double theta = atan2(tangent.X(), -tangent.Y());
 
     pA = pB = this->points[i];
     double w = (this->width * factor) * 0.5;
 
-    pA.x += cos(theta) * w;
-    pA.y += sin(theta) * w;
+    pA.X() += cos(theta) * w;
+    pA.Y() += sin(theta) * w;
 
-    pB.x -= cos(theta) * w;
-    pB.y -= sin(theta) * w;
+    pB.X() -= cos(theta) * w;
+    pB.Y() -= sin(theta) * w;
 
     bounds.min.SetToMin(pA);
     bounds.min.SetToMin(pB);
@@ -323,9 +330,9 @@ void Road2d::Segment::Load(msgs::Road _msg)
     bounds.max.SetToMax(pB);
 
     // Position
-    *vertices++ = pA.x;
-    *vertices++ = pA.y;
-    *vertices++ = pA.z;
+    *vertices++ = pA.X();
+    *vertices++ = pA.Y();
+    *vertices++ = pA.Z();
 
     // Normal
     *vertices++ = 0;
@@ -337,9 +344,9 @@ void Road2d::Segment::Load(msgs::Road _msg)
     *vertices++ = texCoord;
 
     // Position
-    *vertices++ = pB.x;
-    *vertices++ = pB.y;
-    *vertices++ = pB.z;
+    *vertices++ = pB.X();
+    *vertices++ = pB.Y();
+    *vertices++ = pB.Z();
 
     // Normal
     *vertices++ = 0;

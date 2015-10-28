@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@
 /// \class SingletonT SingletonT.hh common/common.hh
 /// \brief Singleton template class
 template <class T>
-class GAZEBO_VISIBLE SingletonT
+class GZ_COMMON_VISIBLE SingletonT
 {
   /// \brief Get an instance of the singleton
   public: static T *Instance()
@@ -57,7 +57,6 @@ class GAZEBO_VISIBLE SingletonT
 
 /// \brief Initialization of the singleton instance.
 template <class T>
-GAZEBO_VISIBLE
 T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
 /// \}
 

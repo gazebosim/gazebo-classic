@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 */
 
 #include <gtest/gtest.h>
-#include "test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -35,6 +35,10 @@ class SonarSensor_TEST : public ServerFixture,
   /// \param[in] _physicsEngine Name of physics engine to use.
   /// \param[in] _paused Start paused if true.
   public: void DemoWorld(const std::string &_physicsEngine, bool _paused);
+
+  /// \brief Test sonar with just a ground plane.
+  /// \param[in] _physicsEngine Name of physics engine to use.
+  public: void GroundPlane(const std::string &_physicsEngine);
 };
 
 static std::string sonarSensorString =
@@ -105,7 +109,7 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
   world->Step(100);
 
   // Sonar sensor name
@@ -131,13 +135,51 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
   EXPECT_DOUBLE_EQ(sensor->GetRangeMax(), 2.0);
   EXPECT_DOUBLE_EQ(sensor->GetRadius(), 0.3);
   if (_physicsEngine == "ode")
-    EXPECT_NEAR(sensor->GetRange(), 1.517, 1e-3);
+    EXPECT_NEAR(sensor->GetRange(), 1.4999, 1e-3);
   else
   {
     gzerr << "Sonar range sensing only works in ODE, issue #1038"
           << std::endl;
     return;
   }
+}
+
+/////////////////////////////////////////////////
+void SonarSensor_TEST::GroundPlane(const std::string &_physicsEngine)
+{
+  if (_physicsEngine != "ode")
+  {
+    gzerr << "Sonar range sensing only works in ODE, issue #1038"
+          << std::endl;
+    return;
+  }
+
+  Load("worlds/empty.world", false, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  sensors::SonarSensorPtr sonar = SpawnSonar("sonar", "sonar",
+      ignition::math::Pose3d(0, 0, 1, 0, 0, 0), 0, 2, 0.2);
+  ASSERT_TRUE(sonar != NULL);
+
+  physics::ModelPtr model = world->GetModel("sonar");
+  ASSERT_TRUE(model != NULL);
+
+  // Wait for collision engine to turn over
+  common::Time::MSleep(1000);
+
+  // Sonar should detect the ground plane
+  sonar->Update(true);
+  EXPECT_NEAR(sonar->GetRange(), 1.0, 0.01);
+
+  // Rotate the model, and the sonar should not see the ground plane
+  model->SetWorldPose(ignition::math::Pose3d(0, 0, 1, 0, 1.5707, 0));
+
+  // Wait for collision engine to turn over
+  common::Time::MSleep(1000);
+
+  sonar->Update(true);
+  EXPECT_NEAR(sonar->GetRange(), 2.0, 0.01);
 }
 
 TEST_P(SonarSensor_TEST, CreateSonar)
@@ -158,6 +200,12 @@ TEST_P(SonarSensor_TEST, DemoWorld)
         << " paused " << paused
         << std::endl;
   DemoWorld(physics, paused);
+}
+
+TEST_P(SonarSensor_TEST, GroundPlane)
+{
+  std::string physics = std::tr1::get<0>(GetParam());
+  GroundPlane(physics);
 }
 
 INSTANTIATE_TEST_CASE_P(SonarTests, SonarSensor_TEST,

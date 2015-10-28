@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow_TEST.hh"
 
@@ -35,12 +35,12 @@ void OnRequest(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void MainWindow_TEST::CopyPasteModel()
+void MainWindow_TEST::StepState()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -49,14 +49,78 @@ void MainWindow_TEST::CopyPasteModel()
   mainWindow->Init();
   mainWindow->show();
 
-  std::string modelName = "cylinder";
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
 
-  gazebo::rendering::Events::createScene("default");
+  QVERIFY(gazebo::gui::g_stepAct != NULL);
+  QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
+  QVERIFY(!mainWindow->IsPaused());
 
-  // trigger selection to initialize wirebox's vertex buffer creation first.
-  // Otherwise test segfaults later when selecting a model due to making
-  // this call outside the rendering thread.
-  gazebo::event::Events::setSelectedEntity(modelName, "normal");
+
+  // toggle pause and play step and check if the step action is properly
+  // enabled / disabled.
+  mainWindow->Pause();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  QVERIFY(mainWindow->IsPaused());
+  QVERIFY(gazebo::gui::g_stepAct->isEnabled());
+
+  mainWindow->Play();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  QVERIFY(!mainWindow->IsPaused());
+  QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
+
+  mainWindow->Pause();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  QVERIFY(mainWindow->IsPaused());
+  QVERIFY(gazebo::gui::g_stepAct->isEnabled());
+
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::Selection()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -69,60 +133,58 @@ void MainWindow_TEST::CopyPasteModel()
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
-  gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
 
-  gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
-  QVERIFY(modelVis != NULL);
-
-  // Select the model
-  gazebo::event::Events::setSelectedEntity(modelName, "normal");
-
-  // Wait until the model is selected
-  int sleep = 0;
-  int maxSleep = 100;
-  while (!modelVis->GetHighlighted() && sleep < maxSleep)
-  {
-    gazebo::common::Time::MSleep(30);
-    sleep++;
-  }
-  QVERIFY(modelVis->GetHighlighted());
-
-  // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
-      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+    mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
 
-  // Copy the model
-  QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
-  QTest::qWait(500);
+  gazebo::math::Vector2i glWidgetCenter(
+      glWidget->width()*0.5, glWidget->height()*0.5);
 
-  // Move to center of the screen
-  QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-  QTest::mouseMove(glWidget, moveTo);
-  QTest::qWait(500);
+  // get model at center of window - should get the box
+  gazebo::rendering::VisualPtr vis =
+      cam->GetVisual(glWidgetCenter);
+  QVERIFY(vis != NULL);
+  QVERIFY(vis->GetRootVisual()->GetName() == "box");
 
-  // Paste the model
-  QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
-  QTest::qWait(500);
+  // move camera to look at the box
+  gazebo::math::Pose cameraPose(gazebo::math::Vector3(-1, 0, 0.5),
+      gazebo::math::Vector3(0, 0, 0));
+  cam->SetWorldPose(cameraPose);
+  QVERIFY(cam->GetWorldPose() == cameraPose);
 
-  // Release and spawn the model
-  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
-  QTest::qWait(500);
+  // verify we get a box
+  gazebo::rendering::VisualPtr vis2 =
+      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  QVERIFY(vis2 != NULL);
+  QVERIFY(vis2->GetRootVisual()->GetName() == "box");
 
-  QCoreApplication::processEvents();
+  // look upwards
+  gazebo::math::Quaternion pitch90(gazebo::math::Vector3(0, -1.57, 0));
+  cam->SetWorldRotation(pitch90);
+  QVERIFY(cam->GetWorldRotation() == pitch90);
 
-  // Verify there is a clone of the model
-  gazebo::rendering::VisualPtr modelVisClone;
-  sleep = 0;
-  maxSleep = 100;
-  while (!modelVisClone && sleep < maxSleep)
-  {
-    modelVisClone = scene->GetVisual(modelName + "_clone");
-    QTest::qWait(30);
-    sleep++;
-  }
-  QVERIFY(modelVisClone);
+  // verify there is nothing in the middle of the window
+  gazebo::rendering::VisualPtr vis3 = cam->GetVisual(glWidgetCenter);
+  QVERIFY(vis3 == NULL);
+
+  // reset orientation
+  gazebo::math::Quaternion identityRot(gazebo::math::Vector3(0, 0, 0));
+  cam->SetWorldRotation(identityRot);
+  QVERIFY(cam->GetWorldRotation() == identityRot);
+
+  // verify we can still get the box
+  gazebo::rendering::VisualPtr vis4 =
+      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+  QVERIFY(vis4 != NULL);
+  QVERIFY(vis4->GetRootVisual()->GetName() == "box");
+
+  // hide the box
+  vis4->SetVisible(false);
+  gazebo::rendering::VisualPtr vis5 = cam->GetVisual(glWidgetCenter);
+
+  // verify we don't get anything now
+  QVERIFY(vis5 == NULL);
 
   cam->Fini();
   mainWindow->close();
@@ -130,7 +192,38 @@ void MainWindow_TEST::CopyPasteModel()
 }
 
 /////////////////////////////////////////////////
-void MainWindow_TEST::CopyPasteLight()
+void MainWindow_TEST::SceneDestruction()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+
+  // verify that this test case has the only scene shared pointer remaining.
+  QVERIFY(scene.use_count() == 1u);
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::UserCameraFPS()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
@@ -144,15 +237,6 @@ void MainWindow_TEST::CopyPasteLight()
   mainWindow->Init();
   mainWindow->show();
 
-  std::string lightName = "sun";
-
-  gazebo::rendering::Events::createScene("default");
-
-  // trigger selection to initialize wirebox's vertex buffer creation first.
-  // Otherwise test segfaults later when selecting a model due to making
-  // this call outside the rendering thread.
-  gazebo::event::Events::setSelectedEntity(lightName, "normal");
-
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
   {
@@ -164,62 +248,172 @@ void MainWindow_TEST::CopyPasteLight()
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
+
+  // Wait a little bit for the average FPS to even out.
+  for (unsigned int i = 0; i < 10000; ++i)
+  {
+    gazebo::common::Time::NSleep(500000);
+    QCoreApplication::processEvents();
+  }
+
+  std::cerr << "\nFPS[" << cam->GetAvgFPS() << "]\n" << std::endl;
+
+  QVERIFY(cam->GetAvgFPS() > 55.0);
+  QVERIFY(cam->GetAvgFPS() < 75.0);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::CopyPaste()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
   QVERIFY(scene != NULL);
 
-  gazebo::rendering::VisualPtr lightVis = scene->GetVisual(lightName);
-  QVERIFY(lightVis != NULL);
-
-  // Select the light
-  gazebo::event::Events::setSelectedEntity(lightName, "normal");
-
-  // Wait until the light is selected
-  int sleep = 0;
-  int maxSleep = 100;
-  while (!lightVis->GetHighlighted() && sleep < maxSleep)
-  {
-    gazebo::common::Time::MSleep(30);
-    sleep++;
-  }
-  QVERIFY(lightVis->GetHighlighted());
-
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
-      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+    mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
 
-  // Copy the light
-  QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
-  QTest::qWait(500);
-
-  // Move to center of the screen
-  QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-  QTest::mouseMove(glWidget, moveTo);
-  QTest::qWait(500);
-
-  // Paste the light
-  QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
-  QTest::qWait(500);
-
-  // Release and spawn the model
-  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
-  QTest::qWait(500);
-
-  QCoreApplication::processEvents();
-
-  // Verify there is a clone of the light
-  gazebo::rendering::LightPtr lightClone;
-  sleep = 0;
-  maxSleep = 100;
-  while (!lightClone && sleep < maxSleep)
+  // Test model copy
   {
-    lightClone = scene->GetLight(lightName + "_clone");
-    QTest::qWait(30);
-    sleep++;
-  }
-  QVERIFY(lightClone);
+    std::string modelName = "cylinder";
 
-  lightClone.reset();
+    // trigger selection to initialize wirebox's vertex buffer creation first.
+    // Otherwise test segfaults later when selecting a model due to making
+    // this call outside the rendering thread.
+    gazebo::event::Events::setSelectedEntity(modelName, "normal");
+
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+
+    gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
+    QVERIFY(modelVis != NULL);
+
+    // Select the model
+    gazebo::event::Events::setSelectedEntity(modelName, "normal");
+
+    // Wait until the model is selected
+    int sleep = 0;
+    int maxSleep = 100;
+    while (!modelVis->GetHighlighted() && sleep < maxSleep)
+    {
+      gazebo::common::Time::MSleep(30);
+      sleep++;
+    }
+    QVERIFY(modelVis->GetHighlighted());
+
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+    QVERIFY(gazebo::gui::g_copyAct != NULL);
+    QVERIFY(gazebo::gui::g_pasteAct != NULL);
+
+    // Copy the model
+    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier, 100);
+
+    // Move to center of the screen
+    QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
+    QTest::mouseMove(glWidget, moveTo, 100);
+
+    // Paste the model
+    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier, 100);
+
+    // Release and spawn the model
+    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo, 100);
+    QCoreApplication::processEvents();
+
+    // Verify there is a clone of the model
+    gazebo::rendering::VisualPtr modelVisClone;
+    sleep = 0;
+    maxSleep = 100;
+    while (!modelVisClone && sleep < maxSleep)
+    {
+      modelVisClone = scene->GetVisual(modelName + "_clone");
+      QTest::qWait(100);
+      sleep++;
+    }
+    QVERIFY(modelVisClone != NULL);
+  }
+
+  // Test light copy
+  {
+    std::string lightName = "sun";
+    // Select the light
+    gazebo::event::Events::setSelectedEntity(lightName, "normal");
+
+    gazebo::rendering::VisualPtr lightVis = scene->GetVisual(lightName);
+    QVERIFY(lightVis != NULL);
+
+    // Wait until the light is selected
+    int sleep = 0;
+    int maxSleep = 100;
+    while (!lightVis->GetHighlighted() && sleep < maxSleep)
+    {
+      gazebo::common::Time::MSleep(30);
+      sleep++;
+    }
+    QVERIFY(lightVis->GetHighlighted());
+
+    // Copy the light
+    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier, 500);
+    QCoreApplication::processEvents();
+
+    // Move to center of the screen
+    QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
+    QTest::mouseMove(glWidget, moveTo, 500);
+    QCoreApplication::processEvents();
+
+    // Paste the light
+    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier, 500);
+    QCoreApplication::processEvents();
+
+    // Release and spawn the model
+    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo, 500);
+    QCoreApplication::processEvents();
+
+    // Verify there is a clone of the light
+    gazebo::rendering::LightPtr lightClone;
+    sleep = 0;
+    maxSleep = 100;
+    while (!lightClone && sleep < maxSleep)
+    {
+      lightClone = scene->GetLight(lightName + "_clone");
+      QTest::qWait(30);
+      sleep++;
+    }
+    QVERIFY(lightClone != NULL);
+
+    lightClone.reset();
+  }
+
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
@@ -239,7 +433,7 @@ void MainWindow_TEST::Wireframe()
 
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init();
-  sub = node->Subscribe("~/request", &OnRequest, this);
+  sub = node->Subscribe("~/request", &OnRequest, true);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -400,16 +594,18 @@ void MainWindow_TEST::UserCameraJoystick()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
   // Create the main window.
   mainWindow->Load();
+
+  gazebo::rendering::create_scene(
+      gazebo::physics::get_world()->GetName(), false);
+
   mainWindow->Init();
   mainWindow->show();
-
-  gazebo::rendering::Events::createScene("default");
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -431,7 +627,7 @@ void MainWindow_TEST::UserCameraJoystick()
   node->Init();
 
   gazebo::transport::PublisherPtr joyPub =
-    node->Advertise<gazebo::msgs::Joystick>("~/spacenav/joy");
+    node->Advertise<gazebo::msgs::Joystick>("~/user_camera/joy_twist");
 
   // Test with just translation
   {
@@ -507,6 +703,415 @@ void MainWindow_TEST::UserCameraJoystick()
   }
 
   cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::ActionCreationDestruction()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+
+  QVERIFY(gazebo::gui::g_topicVisAct);
+
+  QVERIFY(gazebo::gui::g_openAct);
+
+  QVERIFY(gazebo::gui::g_saveAct);
+
+  QVERIFY(gazebo::gui::g_saveAsAct);
+
+  QVERIFY(gazebo::gui::g_saveCfgAct);
+
+  QVERIFY(gazebo::gui::g_cloneAct);
+
+  QVERIFY(gazebo::gui::g_aboutAct);
+
+  QVERIFY(gazebo::gui::g_hotkeyChartAct);
+
+  QVERIFY(gazebo::gui::g_quitAct);
+
+  QVERIFY(gazebo::gui::g_resetModelsAct);
+
+  QVERIFY(gazebo::gui::g_resetWorldAct);
+
+  QVERIFY(gazebo::gui::g_editBuildingAct);
+
+  QVERIFY(gazebo::gui::g_editTerrainAct);
+
+  QVERIFY(gazebo::gui::g_editModelAct);
+
+  QVERIFY(gazebo::gui::g_stepAct);
+
+  QVERIFY(gazebo::gui::g_playAct);
+
+  QVERIFY(gazebo::gui::g_pauseAct);
+
+  QVERIFY(gazebo::gui::g_arrowAct);
+
+  QVERIFY(gazebo::gui::g_translateAct);
+
+  QVERIFY(gazebo::gui::g_rotateAct);
+
+  QVERIFY(gazebo::gui::g_scaleAct);
+
+  QVERIFY(gazebo::gui::g_boxCreateAct);
+
+  QVERIFY(gazebo::gui::g_sphereCreateAct);
+
+  QVERIFY(gazebo::gui::g_cylinderCreateAct);
+
+  QVERIFY(gazebo::gui::g_pointLghtCreateAct);
+
+  QVERIFY(gazebo::gui::g_spotLghtCreateAct);
+
+  QVERIFY(gazebo::gui::g_dirLghtCreateAct);
+
+  QVERIFY(gazebo::gui::g_resetAct);
+
+  QVERIFY(gazebo::gui::g_showCollisionsAct);
+
+  QVERIFY(gazebo::gui::g_showGridAct);
+
+  QVERIFY(gazebo::gui::g_showOriginAct);
+
+  QVERIFY(gazebo::gui::g_showLinkFrameAct);
+
+  QVERIFY(gazebo::gui::g_transparentAct);
+
+  QVERIFY(gazebo::gui::g_viewWireframeAct);
+
+  QVERIFY(gazebo::gui::g_showCOMAct);
+
+  QVERIFY(gazebo::gui::g_showInertiaAct);
+
+  QVERIFY(gazebo::gui::g_showContactsAct);
+
+  QVERIFY(gazebo::gui::g_showJointsAct);
+
+  QVERIFY(gazebo::gui::g_showToolbarsAct);
+
+  QVERIFY(gazebo::gui::g_fullScreenAct);
+
+  QVERIFY(gazebo::gui::g_fpsAct);
+
+  QVERIFY(gazebo::gui::g_orbitAct);
+
+  QVERIFY(gazebo::gui::g_overlayAct);
+
+  QVERIFY(gazebo::gui::g_viewOculusAct);
+
+  QVERIFY(gazebo::gui::g_dataLoggerAct);
+
+  QVERIFY(gazebo::gui::g_screenshotAct);
+
+  QVERIFY(gazebo::gui::g_copyAct);
+
+  QVERIFY(gazebo::gui::g_pasteAct);
+
+  QVERIFY(gazebo::gui::g_snapAct);
+
+  QVERIFY(gazebo::gui::g_alignAct);
+
+  QVERIFY(gazebo::gui::g_viewAngleAct);
+
+  QVERIFY(gazebo::gui::g_cameraOrthoAct);
+
+  QVERIFY(gazebo::gui::g_cameraPerspectiveAct);
+
+  mainWindow->close();
+  delete mainWindow;
+
+  QVERIFY(!gazebo::gui::g_topicVisAct);
+
+  QVERIFY(!gazebo::gui::g_openAct);
+
+  QVERIFY(!gazebo::gui::g_saveAct);
+
+  QVERIFY(!gazebo::gui::g_saveAsAct);
+
+  QVERIFY(!gazebo::gui::g_saveCfgAct);
+
+  QVERIFY(!gazebo::gui::g_cloneAct);
+
+  QVERIFY(!gazebo::gui::g_aboutAct);
+
+  QVERIFY(!gazebo::gui::g_hotkeyChartAct);
+
+  QVERIFY(!gazebo::gui::g_quitAct);
+
+  QVERIFY(!gazebo::gui::g_resetModelsAct);
+
+  QVERIFY(!gazebo::gui::g_resetWorldAct);
+
+  QVERIFY(!gazebo::gui::g_editBuildingAct);
+
+  QVERIFY(!gazebo::gui::g_editTerrainAct);
+
+  QVERIFY(!gazebo::gui::g_editModelAct);
+
+  QVERIFY(!gazebo::gui::g_stepAct);
+
+  QVERIFY(!gazebo::gui::g_playAct);
+
+  QVERIFY(!gazebo::gui::g_pauseAct);
+
+  QVERIFY(!gazebo::gui::g_arrowAct);
+
+  QVERIFY(!gazebo::gui::g_translateAct);
+
+  QVERIFY(!gazebo::gui::g_rotateAct);
+
+  QVERIFY(!gazebo::gui::g_scaleAct);
+
+  QVERIFY(!gazebo::gui::g_boxCreateAct);
+
+  QVERIFY(!gazebo::gui::g_sphereCreateAct);
+
+  QVERIFY(!gazebo::gui::g_cylinderCreateAct);
+
+  QVERIFY(!gazebo::gui::g_pointLghtCreateAct);
+
+  QVERIFY(!gazebo::gui::g_spotLghtCreateAct);
+
+  QVERIFY(!gazebo::gui::g_dirLghtCreateAct);
+
+  QVERIFY(!gazebo::gui::g_resetAct);
+
+  QVERIFY(!gazebo::gui::g_showCollisionsAct);
+
+  QVERIFY(!gazebo::gui::g_showGridAct);
+
+  QVERIFY(!gazebo::gui::g_showOriginAct);
+
+  QVERIFY(!gazebo::gui::g_showLinkFrameAct);
+
+  QVERIFY(!gazebo::gui::g_transparentAct);
+
+  QVERIFY(!gazebo::gui::g_viewWireframeAct);
+
+  QVERIFY(!gazebo::gui::g_showCOMAct);
+
+  QVERIFY(!gazebo::gui::g_showInertiaAct);
+
+  QVERIFY(!gazebo::gui::g_showContactsAct);
+
+  QVERIFY(!gazebo::gui::g_showJointsAct);
+
+  QVERIFY(!gazebo::gui::g_showToolbarsAct);
+
+  QVERIFY(!gazebo::gui::g_fullScreenAct);
+
+  QVERIFY(!gazebo::gui::g_fpsAct);
+
+  QVERIFY(!gazebo::gui::g_orbitAct);
+
+  QVERIFY(!gazebo::gui::g_overlayAct);
+
+  QVERIFY(!gazebo::gui::g_viewOculusAct);
+
+  QVERIFY(!gazebo::gui::g_dataLoggerAct);
+
+  QVERIFY(!gazebo::gui::g_screenshotAct);
+
+  QVERIFY(!gazebo::gui::g_copyAct);
+
+  QVERIFY(!gazebo::gui::g_pasteAct);
+
+  QVERIFY(!gazebo::gui::g_snapAct);
+
+  QVERIFY(!gazebo::gui::g_alignAct);
+
+  QVERIFY(!gazebo::gui::g_viewAngleAct);
+
+  QVERIFY(!gazebo::gui::g_cameraOrthoAct);
+
+  QVERIFY(!gazebo::gui::g_cameraPerspectiveAct);
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::SetUserCameraPoseSDF()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/usercamera_test.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  cam->SetCaptureData(true);
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  const unsigned char *data = cam->GetImageData();
+  unsigned int width = cam->GetImageWidth();
+  unsigned int height = cam->GetImageHeight();
+  unsigned int depth = cam->GetImageDepth();
+
+  // Part 1 : The user camera should be positioned so that it sees only
+  // a white box
+  {
+    int blackCount = 0;
+
+    // Get the number of black pixels
+    for (unsigned int y = 0; y < height; ++y)
+    {
+      for (unsigned int x = 0; x < width*depth; ++x)
+      {
+        if (data[y*(width*depth) + x] <= 10)
+          blackCount++;
+      }
+    }
+
+    // Make sure the black count is zero. This means the camera is
+    // positioned correctly
+    QVERIFY(blackCount == 0);
+  }
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::MenuBar()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+
+  QList<QMenuBar *> menuBars  = mainWindow->findChildren<QMenuBar *>();
+  QVERIFY(!menuBars.empty());
+
+  std::set<std::string> mainMenus;
+  mainMenus.insert("&File");
+  mainMenus.insert("&Edit");
+  mainMenus.insert("&Camera");
+  mainMenus.insert("&View");
+  mainMenus.insert("&Window");
+  mainMenus.insert("&Help");
+
+  // verify all menus are created in the menu bar.
+  std::set<std::string> mainMenusCopy = mainMenus;
+  QMenuBar *menuBar = menuBars[0];
+  QList<QMenu *> menus  = menuBar->findChildren<QMenu *>();
+  for (auto &m : menus)
+  {
+    auto it = mainMenusCopy.find(m->title().toStdString());
+    QVERIFY(it != mainMenus.end());
+    mainMenusCopy.erase(it);
+  }
+
+  // test adding a new menu to the menu bar
+  QMenu newMenu(tr("&TEST"));
+  mainWindow->AddMenu(&newMenu);
+
+  QList<QMenu *> newMenus  = menuBar->findChildren<QMenu *>();
+  mainMenusCopy = mainMenus;
+  mainMenusCopy.insert("&TEST");
+  for (auto &m : menus)
+  {
+    std::string title = m->title().toStdString();
+    auto it = mainMenusCopy.find(title);
+    QVERIFY(it != mainMenus.end());
+    mainMenusCopy.erase(it);
+  }
+
+  // test calling ShowMenuBar and verify all menus remain the same
+  mainWindow->ShowMenuBar();
+
+  menus  = menuBar->findChildren<QMenu *>();
+  mainMenusCopy = mainMenus;
+  mainMenusCopy.insert("TEST");
+  for (auto &m : menus)
+  {
+    std::string title = m->title().toStdString();
+    auto it = mainMenusCopy.find(title);
+    QVERIFY(it != mainMenus.end());
+    mainMenusCopy.erase(title);
+  }
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::WindowModes()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check edit actions are visible
+  QVERIFY(gazebo::gui::g_resetModelsAct->isVisible());
+  QVERIFY(gazebo::gui::g_resetWorldAct->isVisible());
+  QVERIFY(gazebo::gui::g_editBuildingAct->isVisible());
+  QVERIFY(gazebo::gui::g_editModelAct->isVisible());
+
+  // Change to Model Editor mode
+  gazebo::gui::Events::windowMode("ModelEditor");
+
+  // Check edit actions are not visible
+  QVERIFY(!gazebo::gui::g_resetModelsAct->isVisible());
+  QVERIFY(!gazebo::gui::g_resetWorldAct->isVisible());
+  QVERIFY(!gazebo::gui::g_editBuildingAct->isVisible());
+  QVERIFY(!gazebo::gui::g_editModelAct->isVisible());
+
+  // Terminate
   mainWindow->close();
   delete mainWindow;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
@@ -57,7 +57,7 @@ TEST_P(SpawnModels, WirelessTransmitters)
           sensors::SensorManager::Instance()->GetSensor(sensorName));
 
       EXPECT_TRUE(this->HasEntity(modelName));
-      EXPECT_TRUE(tx);
+      EXPECT_TRUE(tx != NULL);
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ namespace gazebo
     /// \param[in] _pose Pose of the model.
     /// \param[in] _node Node for communication.
     /// \return True if the spawn message was sent.
-    private: bool ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
+    private: bool ProcessSpawn(sdf::SDFPtr _sdf,
                  const std::string &_name, const math::Pose &_pose,
                  transport::NodePtr _node);
   };

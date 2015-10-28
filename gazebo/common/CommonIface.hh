@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,18 +34,18 @@ namespace gazebo
     /// \{
 
     /// \brief Load the common library.
-    GAZEBO_VISIBLE
+    GZ_COMMON_VISIBLE
     void load();
 
     /// \brief add path sufix to common::SystemPaths
     /// \param[in] _suffix The suffix to add.
-    GAZEBO_VISIBLE
+    GZ_COMMON_VISIBLE
     void add_search_path_suffix(const std::string &_suffix);
 
     /// \brief search for file in common::SystemPaths
     /// \param[in] _file Name of the file to find.
     /// \return The path containing the file.
-    GAZEBO_VISIBLE
+    GZ_COMMON_VISIBLE
     std::string find_file(const std::string &_file);
 
     /// \brief search for file in common::SystemPaths
@@ -53,14 +53,14 @@ namespace gazebo
     /// \param[in] _searchLocalPath True to search in the current working
     /// directory.
     /// \return The path containing the file.
-    GAZEBO_VISIBLE
+    GZ_COMMON_VISIBLE
     std::string find_file(const std::string &_file,
                           bool _searchLocalPath);
 
     /// \brief search for a file in common::SystemPaths
     /// \param[in] _file the file name to look for.
     /// \return The path containing the file.
-    GAZEBO_VISIBLE
+    GZ_COMMON_VISIBLE
     std::string find_file_path(const std::string &_file);
 
     /// \brief Compute the SHA1 hash of an array of bytes.
@@ -68,16 +68,19 @@ namespace gazebo
     /// function are std::string and any STL container.
     /// \return The string representation (40 character) of the SHA1 hash.
     template<typename T>
-    GAZEBO_VISIBLE
     std::string get_sha1(const T &_buffer);
 
+    /// \brief Cross platform retrieval of an environment variable.
+    /// \param[in] _name Name of the environment variable to get.
+    /// \return Environment variable contents, or NULL on error.
+    GZ_COMMON_VISIBLE
+    const char *getEnv(const char *_name);
     /// \}
   }
 
   ///////////////////////////////////////////////
   // Implementation of get_sha1
   template<typename T>
-  GAZEBO_VISIBLE
   std::string common::get_sha1(const T &_buffer)
   {
     boost::uuids::detail::sha1 sha1;

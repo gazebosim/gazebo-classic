@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace gazebo
 
     /// \class ImportImageView ImportImageView.hh
     /// \brief Control the import image view and manage contents in the scene.
-    class GAZEBO_VISIBLE ImportImageView : public QGraphicsView
+    class GZ_GUI_VISIBLE ImportImageView : public QGraphicsView
     {
       Q_OBJECT
 

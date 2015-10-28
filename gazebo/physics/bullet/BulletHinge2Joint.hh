@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace gazebo
     /// \{
 
     /// \brief A two axis hinge joint
-    class GAZEBO_VISIBLE BulletHinge2Joint : public Hinge2Joint<BulletJoint>
+    class GZ_PHYSICS_VISIBLE BulletHinge2Joint : public Hinge2Joint<BulletJoint>
     {
       /// \brief Constructor
       public: BulletHinge2Joint(btDynamicsWorld *world, BasePtr _parent);
@@ -74,12 +74,6 @@ namespace gazebo
       public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited.
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited.
-      public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,
                   const math::Angle &_angle);
 
@@ -104,6 +98,14 @@ namespace gazebo
 
       /// \brief Pointer to bullet hinge2 constraint
       private: btHinge2Constraint *bulletHinge2;
+
+      /// \brief Offset angle used in GetAngleImpl, so that angles are reported
+      /// relative to the initial configuration.
+      private: double angleOffset[2];
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      /// in world frame.
+      private: math::Vector3 initialWorldAxis[2];
     };
 
   /// \}

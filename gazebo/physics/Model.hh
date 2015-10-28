@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
@@ -49,7 +50,7 @@ namespace gazebo
 
     /// \class Model Model.hh physics/physics.hh
     /// \brief A model is a collection of links, joints, and plugins.
-    class GAZEBO_VISIBLE Model : public Entity
+    class GZ_PHYSICS_VISIBLE Model : public Entity
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
@@ -152,6 +153,15 @@ namespace gazebo
       /// \return Get the number of joints.
       public: unsigned int GetJointCount() const;
 
+      /// \brief Get a nested model that is a direct child of this model.
+      /// \param[in] _name Name of the child model to get.
+      /// \return Pointer to the model, NULL if the name is invalid.
+      public: ModelPtr NestedModel(const std::string &_name) const;
+
+      /// \brief Get all the nested models.
+      /// \return a vector of Model's in this model
+      public: const Model_V &NestedModels() const;
+
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model
@@ -177,6 +187,20 @@ namespace gazebo
       /// \param[in] _name Name of the link to get.
       /// \return Pointer to the link, NULL if the name is invalid.
       public: LinkPtr GetLink(const std::string &_name ="canonical") const;
+
+      /// \brief If true, all links within the model will collide by default.
+      /// Two links within the same model will not collide if both have
+      /// link.self_collide == false.
+      /// link 1 and link2 collide = link1.self_collide || link2.self_collide
+      /// Bodies connected by a joint are exempt from this, and will
+      /// never collide.
+      /// \return True if self-collide enabled for this model, false otherwise.
+      public: bool GetSelfCollide() const;
+
+      /// \brief Set this model's self_collide property
+      /// \sa GetSelfCollide
+      /// \param[in] _self_collide True if self-collisions enabled by default.
+      public: void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.
@@ -328,11 +352,36 @@ namespace gazebo
       /// \return this link's total energy
       public: double GetWorldEnergy() const;
 
+      /// \brief Create a joint for this model
+      /// \param[in] _name name of joint
+      /// \param[in] _type type of joint
+      /// \param[in] _parent parent link of joint
+      /// \param[in] _child child link of joint
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(
+        const std::string &_name, const std::string &_type,
+        physics::LinkPtr _parent, physics::LinkPtr _child);
+
+      /// \brief Remove a joint for this model
+      /// \param[in] _name name of joint
+      /// \return true if successful, false if not.
+      public: bool RemoveJoint(const std::string &_name);
+
+      /// \brief Allow Model class to share itself as a boost shared_ptr
+      /// \return a shared pointer to itself
+      public: boost::shared_ptr<Model> shared_from_this();
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
       /// \brief Load all the links.
       private: void LoadLinks();
+
+      /// \brief Load all the nested models.
+      private: void LoadModels();
 
       /// \brief Load a joint helper function.
       /// \param[in] _sdf SDF parameter.
@@ -368,6 +417,9 @@ namespace gazebo
 
       /// \brief Cached list of links. This is here for performance.
       private: Link_V links;
+
+      /// \brief Cached list of nested models.
+      private: Model_V models;
 
       /// \brief All the grippers in the model.
       private: std::vector<GripperPtr> grippers;

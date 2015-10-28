@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class Vector3Stats Vector3Stats.hh math/gzmath.hh
     /// \brief Collection of statistics for a Vector3 signal.
-    class GAZEBO_VISIBLE Vector3Stats
+    class GZ_MATH_VISIBLE Vector3Stats
     {
       /// \brief Constructor
       public: Vector3Stats();

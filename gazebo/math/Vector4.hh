@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class Vector4 Vector4.hh math/gzmath.hh
     /// \brief double Generic x, y, z, w vector
-    class GAZEBO_VISIBLE Vector4
+    class GZ_MATH_VISIBLE Vector4
     {
       /// \brief Constructor
       public: Vector4();

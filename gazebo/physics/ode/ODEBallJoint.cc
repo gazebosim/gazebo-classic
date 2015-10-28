@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,17 +84,6 @@ void ODEBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 double ODEBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
   return 0;
-}
-
-//////////////////////////////////////////////////
-double ODEBallJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return 0;
-}
-
-//////////////////////////////////////////////////
-void ODEBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
 }
 
 //////////////////////////////////////////////////

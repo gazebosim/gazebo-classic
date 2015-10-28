@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _WORLD_HH_
-#define _WORLD_HH_
+#ifndef _GAZEBO_WORLD_HH_
+#define _GAZEBO_WORLD_HH_
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <vector>
 #include <list>
@@ -45,6 +51,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class.
+    class WorldPrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -56,7 +65,8 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
+    class GZ_PHYSICS_VISIBLE World :
+      public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
       /// Constructor for the World. Must specify a unique name.
@@ -112,6 +122,10 @@ namespace gazebo
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
+      /// \brief Return the preset manager.
+      /// \return Pointer to the preset manager.
+      public: PresetManagerPtr GetPresetManager() const;
+
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
       public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
@@ -131,6 +145,10 @@ namespace gazebo
       /// \return A list of all the Models in the world.
       public: Model_V GetModels() const;
 
+      /// \brief Get a list of all the lights.
+      /// \return A list of all the Lights in the world.
+      public: Light_V Lights() const;
+
       /// \brief Reset with options.
       /// The _type parameter specifies which type of eneities to reset. See
       /// Base::EntityType.
@@ -142,11 +160,6 @@ namespace gazebo
 
       /// \brief Reset time and model poses, configurations in simulation.
       public: void Reset();
-
-      /// \brief Get the selected Entity.
-      /// The selected entity is set via the GUI.
-      /// \return A point to the Entity, NULL if nothing is selected.
-      public: EntityPtr GetSelectedEntity() const;
 
       /// \brief Print Entity tree.
       /// Prints alls the entities to stdout.
@@ -194,6 +207,13 @@ namespace gazebo
       /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the Model, or NULL if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
+
+      /// \brief Get a light by name.
+      /// This function is the same as GetByName, but limits the search to
+      /// only lights.
+      /// \param[in] _name The name of the Light to find.
+      /// \return A pointer to the Light, or NULL if no light was found.
+      public: LightPtr Light(const std::string &_name);
 
       /// \brief Get a pointer to an Entity based on a name.
       /// This function is the same as GetByName, but limits the search to
@@ -270,18 +290,15 @@ namespace gazebo
 
       /// \brief Get the set world pose mutex.
       /// \return Pointer to the mutex.
-      public: boost::mutex *GetSetWorldPoseMutex() const
-        {return this->setWorldPoseMutex;}
+      public: boost::mutex *GetSetWorldPoseMutex() const;
 
       /// \brief check if physics engine is enabled/disabled.
       /// \param True if the physics engine is enabled.
-      public: bool GetEnablePhysicsEngine()
-              {return this->enablePhysicsEngine;}
+      public: bool GetEnablePhysicsEngine();
 
       /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.
-      public: void EnablePhysicsEngine(bool _enable)
-              {this->enablePhysicsEngine = _enable;}
+      public: void EnablePhysicsEngine(bool _enable);
 
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();
@@ -299,6 +316,12 @@ namespace gazebo
       /// iteration.
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
+
+      /// \brief Publish pose updates for a light.
+      /// Adds light to a list of lights to publish, which is processed and
+      /// cleared once every iteration.
+      /// \param[in] _light Pointer to the light to publish.
+      public: void PublishLightPose(const physics::LightPtr _light);
 
       /// \brief Get the total number of iterations.
       /// \return Number of iterations that simulation has taken.
@@ -326,6 +349,14 @@ namespace gazebo
       /// \param[in] _name Name of the model to remove.
       public: void RemoveModel(const std::string &_name);
 
+      /// \internal
+      /// \brief Inform the World that an Entity has moved. The Entity
+      /// is added to a list that will be processed by the World.
+      /// Only a physics engine implementation should call this function.
+      /// If you are unsure whether you should use this function, do not.
+      /// \param[in] _entity Entity that has moved.
+      public: void _AddDirty(Entity *_entity);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -351,6 +382,13 @@ namespace gazebo
       /// \param[in] _parent Parent of the model.
       /// \return Pointer to the newly created Model.
       private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent);
+
+      /// \brief Load a light.
+      /// \param[in] _sdf SDF element containing the Light description.
+      /// \param[in] _parent Parent of the light.
+      /// \return Pointer to the newly created Light.
+      private: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
+          const BasePtr &_parent);
 
       /// \brief Load an actor.
       /// \param[in] _sdf SDF element containing the Actor description.
@@ -387,13 +425,13 @@ namespace gazebo
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
 
+      /// \brief Called when log playback control message is received.
+      /// \param[in] _data The log playback control message.
+      private: void OnPlaybackControl(ConstLogPlaybackControlPtr &_data);
+
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      /// \brief Set the selected entity.
-      /// \param[in] _name Name of the entity to select.
-      private: void SetSelectedEntityCB(const std::string &_name);
 
       /// \brief Construct a scene message from the known world state
       /// \param[out] _scene Scene message to build.
@@ -444,6 +482,14 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
+      /// \brief Process all received light factory messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessLightFactoryMsgs();
+
+      /// \brief Process all received light modify messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessLightModifyMsgs();
+
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
 
@@ -458,254 +504,30 @@ namespace gazebo
 
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.
+      /// \deprecated Topic ~/light deprecated.
+      /// See OnLightFactoryMsg which subscribes to ~/factory/light and
+      /// OnLightModifyMsg which subscribes to ~/light/modify
       private: void OnLightMsg(ConstLightPtr &_msg);
 
-      /// \brief For keeping track of time step throttling.
-      private: common::Time prevStepWallTime;
-
-      /// \brief Pointer the physics engine.
-      private: PhysicsEnginePtr physicsEngine;
-
-      /// \brief Pointer the spherical coordinates data.
-      private: common::SphericalCoordinatesPtr sphericalCoordinates;
-
-      /// \brief The root of all entities in the world.
-      private: BasePtr rootElement;
-
-      /// \brief thread in which the world is updated.
-      private: boost::thread *thread;
-
-      /// \brief True to stop the world from running.
-      private: bool stop;
-
-      /// \brief The entity currently selected by the user.
-      private: EntityPtr selectedEntity;
-
-      /// \brief Name of the world.
-      private: std::string name;
-
-      /// \brief Current simulation time.
-      private: common::Time simTime;
-
-      /// \brief Amount of time simulation has been paused.
-      private: common::Time pauseTime;
-
-      /// \brief Clock time when simulation was started.
-      private: common::Time startTime;
-
-      /// \brief True if simulation is paused.
-      private: bool pause;
-
-      /// \brief Number of steps in increment by.
-      private: int stepInc;
-
-      /// \brief All the event connections.
-      private: event::Connection_V connections;
-
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-
-      /// \brief Publisher for selection messages.
-      private: transport::PublisherPtr selectionPub;
-
-      /// \brief Publisher for world statistics messages.
-      private: transport::PublisherPtr statPub;
-
-      /// \brief Publisher for diagnostic messages.
-      private: transport::PublisherPtr diagPub;
-
-      /// \brief Publisher for request response messages.
-      private: transport::PublisherPtr responsePub;
-
-      /// \brief Publisher for model messages.
-      private: transport::PublisherPtr modelPub;
-
-      /// \brief Publisher for gui messages.
-      private: transport::PublisherPtr guiPub;
-
-      /// \brief Publisher for light messages.
-      private: transport::PublisherPtr lightPub;
-
-      /// \brief Publisher for pose messages.
-      private: transport::PublisherPtr posePub;
-
-      /// \brief Publisher for local pose messages.
-      private: transport::PublisherPtr poseLocalPub;
-
-      /// \brief Subscriber to world control messages.
-      private: transport::SubscriberPtr controlSub;
-
-      /// \brief Subscriber to factory messages.
-      private: transport::SubscriberPtr factorySub;
-
-      /// \brief Subscriber to joint messages.
-      private: transport::SubscriberPtr jointSub;
-
-      /// \brief Subscriber to light messages.
-      private: transport::SubscriberPtr lightSub;
-
-      /// \brief Subscriber to model messages.
-      private: transport::SubscriberPtr modelSub;
-
-      /// \brief Subscriber to request messages.
-      private: transport::SubscriberPtr requestSub;
-
-      /// \brief Outgoing world statistics message.
-      private: msgs::WorldStatistics worldStatsMsg;
-
-      /// \brief Outgoing scene message.
-      private: msgs::Scene sceneMsg;
-
-      /// \brief Function pointer to the model update function.
-      private: void (World::*modelUpdateFunc)();
-
-      /// \brief Last time a world statistics message was sent.
-      private: common::Time prevStatTime;
-
-      /// \brief Time at which pause started.
-      private: common::Time pauseStartTime;
-
-      /// \brief Used to compute a more accurate real time value.
-      private: common::Time realTimeOffset;
-
-      /// \brief Mutex to protect incoming message buffers.
-      private: boost::recursive_mutex *receiveMutex;
-
-      /// \brief Mutex to protext loading of models.
-      private: boost::mutex *loadModelMutex;
-
-      /// \TODO: Add an accessor for this, and make it private
-      /// Used in Entity.cc.
-      /// Entity::Reset to call Entity::SetWorldPose and Entity::SetRelativePose
-      /// Entity::SetWorldPose to call Entity::setWorldPoseFunc
-      private: boost::mutex *setWorldPoseMutex;
-
-      /// \brief Used by World classs in following calls:
-      /// World::Step for then entire function
-      /// World::StepWorld for changing World::stepInc,
-      /// and waits on setpInc on World::stepIhc as it's decremented.
-      /// World::Reset while World::ResetTime, entities, World::physicsEngine
-      /// World::SetPaused to assign world::pause
-      private: boost::recursive_mutex *worldUpdateMutex;
-
-      /// \brief THe world's SDF values.
-      private: sdf::ElementPtr sdf;
-
-      /// \brief All the plugins.
-      private: std::vector<WorldPluginPtr> plugins;
-
-      /// \brief List of entities to delete.
-      private: std::list<std::string> deleteEntity;
-
-      /// \brief when physics engine makes an update and changes a link pose,
-      /// this flag is set to trigger Entity::SetWorldPose on the
-      /// physics::Link in World::Update.
-      public: std::list<Entity*> dirtyPoses;
-
-      /// \brief Request message buffer.
-      private: std::list<msgs::Request> requestMsgs;
-
-      /// \brief Factory message buffer.
-      private: std::list<msgs::Factory> factoryMsgs;
-
-      /// \brief Model message buffer.
-      private: std::list<msgs::Model> modelMsgs;
-
-      /// \brief True to reset the world on next update.
-      private: bool needsReset;
-
-      /// \brief True to reset everything.
-      private: bool resetAll;
-
-      /// \brief True to reset only the time.
-      private: bool resetTimeOnly;
-
-      /// \brief True to reset only model poses.
-      private: bool resetModelOnly;
-
-      /// \brief True if the world has been initialized.
-      private: bool initialized;
-
-      /// \brief True if the world has been loaded.
-      private: bool loaded;
-
-      /// \brief True to enable the physics engine.
-      private: bool enablePhysicsEngine;
-
-      /// \brief Ray used to test for collisions when placing entities.
-      private: RayShapePtr testRay;
-
-      /// \brief True if the plugins have been loaded.
-      private: bool pluginsLoaded;
-
-      /// \brief sleep timing error offset due to clock wake up latency
-      private: common::Time sleepOffset;
-
-      /// \brief Last time incoming messages were processed.
-      private: common::Time prevProcessMsgsTime;
-
-      /// \brief Period over which messages should be processed.
-      private: common::Time processMsgsPeriod;
-
-      /// \brief Alternating buffer of states.
-      private: std::deque<WorldState> states[2];
-
-      /// \brief Keep track of current state buffer being updated
-      private: int currentStateBuffer;
-
-      private: WorldState prevStates[2];
-      private: int stateToggle;
-
-      private: sdf::ElementPtr logPlayStateSDF;
-      private: WorldState logPlayState;
-
-      /// \brief Store a factory SDF object to improve speed at which
-      /// objects are inserted via the factory.
-      private: sdf::SDFPtr factorySDF;
-
-      /// \brief The list of models that need to publish their pose.
-      private: std::set<ModelPtr> publishModelPoses;
-
-      /// \brief Info passed through the WorldUpdateBegin event.
-      private: common::UpdateInfo updateInfo;
-
-      /// \brief The number of simulation iterations.
-      private: uint64_t iterations;
-
-      /// \brief The number of simulation iterations to take before stopping.
-      private: uint64_t stopIterations;
-
-      /// \brief Condition used for log worker.
-      private: boost::condition_variable logCondition;
-
-      /// \brief Condition used to guarantee the log worker thread doesn't
-      /// skip an interation.
-      private: boost::condition_variable logContinueCondition;
-
-      /// \brief Last iteration recorded by the log worker thread.
-      private: uint64_t logPrevIteration;
-
-      /// \brief Real time value set from a log file.
-      private: common::Time logRealTime;
-
-      /// \brief Mutex to protect the log worker thread.
-      private: boost::mutex logMutex;
-
-      /// \brief Mutex to protect the log state buffers
-      private: boost::mutex logBufferMutex;
-
-      /// \brief Mutex to protect the deleteEntity list.
-      private: boost::mutex entityDeleteMutex;
-
-      /// \brief Worker thread for logging.
-      private: boost::thread *logThread;
-
-      /// \brief A cached list of models. This is here for performance.
-      private: Model_V models;
-
-      /// \brief This mutex is used to by the ::RemoveModel and
-      /// ::ProcessFactoryMsgs functions.
-      private: boost::mutex factoryDeleteMutex;
+      /// \brief Callback when a light message is received in the
+      /// ~/factory/light topic.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightFactoryMsg(ConstLightPtr &_msg);
+
+      /// \brief Callback when a light message is received in the
+      /// ~/light/modify topic.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightModifyMsg(ConstLightPtr &_msg);
+
+      /// \internal
+      /// \brief Private data pointer.
+      private: WorldPrivate *dataPtr;
+
+      /// Friend DARTLink so that it has access to dataPtr->dirtyPoses
+      private: friend class DARTLink;
+
+      /// Friend SimbodyPhysics so that it has access to dataPtr->dirtyPoses
+      private: friend class SimbodyPhysics;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 Open Source Robotics Foundation
+ * Copyright (C) 2013-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
 
@@ -201,8 +201,6 @@ TEST_F(gzTest, Joint)
 {
   init();
 
-  std::string expectedStr;
-
   std::string helpOutput = custom_exec_str("gz help joint");
   EXPECT_NE(helpOutput.find("gz joint"), std::string::npos);
 
@@ -291,7 +289,7 @@ TEST_F(gzTest, Model)
     gazebo::msgs::Model msg;
     msg.set_name("simple_arm");
     gazebo::msgs::Set(msg.mutable_pose(),
-        gazebo::math::Pose(1.1, 2.3, 4.5, 0.1, 1.2, 3.4));
+        ignition::math::Pose3d(1.1, 2.3, 4.5, 0.1, 1.2, 3.4));
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
 
@@ -301,19 +299,17 @@ TEST_F(gzTest, Model)
 
     waitForMsg("gz model -w default -m my_box -f " + filename);
 
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
-
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
-    sdf::ElementPtr modelElem = sdf->root->GetElement("model");
+    sdf::ElementPtr modelElem = sdf->Root()->GetElement("model");
     modelElem->GetAttribute("name")->SetFromString("my_box");
 
     gazebo::msgs::Factory msg;
     msg.set_sdf(sdf->ToString());
-    gazebo::msgs::Set(msg.mutable_pose(), gazebo::math::Pose(0, 0, 0, 0, 0, 0));
+    gazebo::msgs::Set(msg.mutable_pose(),
+        ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -326,19 +322,17 @@ TEST_F(gzTest, Model)
     cmd += filename + " | gz model -w default -m my_box -s";
     waitForMsg(cmd);
 
-    std::ifstream ifs(filename.c_str());
-    EXPECT_TRUE(ifs);
-
-    boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF());
+    sdf::SDFPtr sdf(new sdf::SDF());
     EXPECT_TRUE(sdf::init(sdf));
 
     EXPECT_TRUE(sdf::readFile(filename, sdf));
-    sdf::ElementPtr modelElem = sdf->root->GetElement("model");
+    sdf::ElementPtr modelElem = sdf->Root()->GetElement("model");
     modelElem->GetAttribute("name")->SetFromString("my_box");
 
     gazebo::msgs::Factory msg;
     msg.set_sdf(sdf->ToString());
-    gazebo::msgs::Set(msg.mutable_pose(), gazebo::math::Pose(0, 0, 0, 0, 0, 0));
+    gazebo::msgs::Set(msg.mutable_pose(),
+        ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }
@@ -356,7 +350,8 @@ TEST_F(gzTest, Model)
     // Check that a few values exist. We don't check the sha1 value
     // because a few values, such as pose, are dynamic.
     EXPECT_TRUE(modelInfo.find("name: \"my_box\"") != std::string::npos);
-    EXPECT_TRUE(modelInfo.find("id: 9") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("id: 10") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("is_static: false") != std::string::npos);
     EXPECT_TRUE(modelInfo.find("name: \"my_box::link::collision\"")
         != std::string::npos);
 
@@ -624,11 +619,11 @@ TEST_F(gzTest, SDF)
   // Regenerate each sum using:
   // gz sdf -d -v <major.minor> | sha1sum'
   std::map<std::string, std::string> descSums;
-  descSums["1.0"] = "5235eb8464a96505c2a31fe96327d704e45c9cc4";
-  descSums["1.2"] = "27973b2542d7a0f7582a615b245d81797718c89a";
-  descSums["1.3"] = "30ffce1c662c17185d23f30ef3af5c110d367e10";
-  descSums["1.4"] = "9a55c2992b532e0dd4f9a5d5b86cd4c6210d9902";
-  descSums["1.5"] = "a64da1ba2cec921a8b8e446ef01a862dc3e38796";
+  descSums["1.0"] = "a02fbc1275100569c99d860044563f669934c0fc";
+  descSums["1.2"] = "f524458ace57d6aabbbc2303da208f65af37ef53";
+  descSums["1.3"] = "74a3aa8d31f97328175f43d03410be55631fa0e1";
+  descSums["1.4"] = "057f26137669d9d7eeb5a8c6f51e4f4077d9ddcf";
+  // descSums["1.5"] = "dddf642e1259439ce47b4664f853ac9f32432762";
 
   // Test each descSum
   for (std::map<std::string, std::string>::iterator iter = descSums.begin();
@@ -644,10 +639,10 @@ TEST_F(gzTest, SDF)
   // gz sdf -o -v <major.minor> | sha1sum'
   std::map<std::string, std::string> docSums;
   docSums["1.0"] = "4cf955ada785adf72503744604ffadcdf13ec0d2";
-  docSums["1.2"] = "f84c1cf1b1ba04ab4859e96f6aea881134fb5a9b";
-  docSums["1.3"] = "f3dd699687c8922710e4492aadedd1c038d678c1";
-  docSums["1.4"] = "9627b1deb0c0437ac48c1c1cbd0e9800b0327b76";
-  docSums["1.5"] = "e67df38350bed73372cb0072cfd32c8cf07f5bf9";
+  docSums["1.2"] = "27f9d91080ce8aa18eac27c9d899fde2d4b78785";
+  docSums["1.3"] = "ad80986d42eae97baf277118f52d7e8b951d8ea1";
+  docSums["1.4"] = "153ddd6ba6797c37c7fcddb2be5362c9969d97a1";
+  // docSums["1.5"] = "4e99e3a1e3497a0262d5253cbff12be4758e3c16";
 
   // Test each docSum
   for (std::map<std::string, std::string>::iterator iter = docSums.begin();
@@ -661,7 +656,7 @@ TEST_F(gzTest, SDF)
 
 
   path = TEST_PATH;
-  path /= "worlds/empty_different_name.world";
+  path /= "worlds/box_plane_low_friction_test.world";
 
   {
     // Check empty.world
@@ -678,7 +673,7 @@ TEST_F(gzTest, SDF)
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "381ce9100dd002bcf7e6f9019e33d478a37ab6f1");
+    EXPECT_EQ(shasum, "ea127f9858a5e07c40ef6d949ef6113236adddfa");
   }
 
   path = PROJECT_BINARY_PATH;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -29,16 +29,16 @@ TEST_F(Issue1124Test, SetModelPose)
 {
   Load("worlds/box_plane_low_friction_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");
-  ASSERT_TRUE(link);
+  ASSERT_TRUE(link != NULL);
 
   physics::CollisionPtr coll = link->GetCollision("collision");
-  ASSERT_TRUE(coll);
+  ASSERT_TRUE(coll != NULL);
 
   // The start pose should be centered at the origin
   EXPECT_EQ(coll->GetWorldPose(), math::Pose(0, 0, 0.5, 0, 0, 0));
@@ -66,16 +66,16 @@ TEST_F(Issue1124Test, SetLinkPose)
 {
   Load("worlds/box_plane_low_friction_test.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");
-  ASSERT_TRUE(link);
+  ASSERT_TRUE(link != NULL);
 
   physics::CollisionPtr coll = link->GetCollision("collision");
-  ASSERT_TRUE(coll);
+  ASSERT_TRUE(coll != NULL);
 
   // The start pose should be centered at the origin
   EXPECT_EQ(coll->GetWorldPose(), math::Pose(0, 0, 0.5, 0, 0, 0));
@@ -92,16 +92,16 @@ TEST_F(Issue1124Test, MovingPose)
 {
   Load("worlds/box_plane_low_friction_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");
-  ASSERT_TRUE(link);
+  ASSERT_TRUE(link != NULL);
 
   physics::CollisionPtr coll = link->GetCollision("collision");
-  ASSERT_TRUE(coll);
+  ASSERT_TRUE(coll != NULL);
 
   // The start pose should be centered at the origin
   EXPECT_EQ(coll->GetWorldPose(), math::Pose(0, 0, 0.5, 0, 0, 0));

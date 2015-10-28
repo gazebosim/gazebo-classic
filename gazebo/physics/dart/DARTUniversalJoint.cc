@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/dart/DARTJointPrivate.hh"
 #include "gazebo/physics/dart/DARTUniversalJoint.hh"
 
 using namespace gazebo;
@@ -25,16 +26,15 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTUniversalJoint::DARTUniversalJoint(BasePtr _parent)
-    : UniversalJoint<DARTJoint>(_parent),
-      dtUniveralJoint(new dart::dynamics::UniversalJoint())
+  : UniversalJoint<DARTJoint>(_parent)
 {
-  this->dtJoint = dtUniveralJoint;
+  this->dataPtr->dtJoint = new dart::dynamics::UniversalJoint();
 }
 
 //////////////////////////////////////////////////
 DARTUniversalJoint::~DARTUniversalJoint()
 {
-  delete dtUniveralJoint;
+  delete this->dataPtr->dtJoint;
 }
 
 //////////////////////////////////////////////////
@@ -52,8 +52,8 @@ void DARTUniversalJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTUniversalJoint::GetAnchor(unsigned int /*index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
-                        this->dtJoint->getTransformFromChildBodyNode();
+  Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
+                        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
   return DARTTypes::ConvVec3(worldOrigin);
@@ -66,18 +66,26 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
 
   if (_index == 0)
   {
-    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
-                          this->dtJoint->getLocalTransform().inverse() *
-                          this->dtJoint->getTransformFromParentBodyNode();
-    Eigen::Vector3d axis = this->dtUniveralJoint->getAxis1();
+    dart::dynamics::UniversalJoint *dtUniveralJoint =
+        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+          this->dataPtr->dtJoint);
+
+    Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
+        this->dataPtr->dtJoint->getLocalTransform().inverse() *
+        this->dataPtr->dtJoint->getTransformFromParentBodyNode();
+    Eigen::Vector3d axis = dtUniveralJoint->getAxis1();
 
     globalAxis = T.linear() * axis;
   }
   else if (_index == 1)
   {
-    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
-                          this->dtJoint->getTransformFromChildBodyNode();
-    Eigen::Vector3d axis = this->dtUniveralJoint->getAxis2();
+    dart::dynamics::UniversalJoint *dtUniveralJoint =
+        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+          this->dataPtr->dtJoint);
+
+    Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
+        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = dtUniveralJoint->getAxis2();
 
     globalAxis = T.linear() * axis;
   }
@@ -96,16 +104,22 @@ void DARTUniversalJoint::SetAxis(unsigned int _index,
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
       this->GetAxisFrameOffset(_index).RotateVector(_axis));
   Eigen::Isometry3d dtTransfJointLeftToParentLink
-      = this->dtJoint->getTransformFromParentBodyNode().inverse();
+      = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
   dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;
 
   if (_index == 0)
   {
-    this->dtUniveralJoint->setAxis1(dtAxis);
+    dart::dynamics::UniversalJoint *dtUniveralJoint =
+        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+          this->dataPtr->dtJoint);
+    dtUniveralJoint->setAxis1(dtAxis);
   }
   else if (_index == 1)
   {
-    this->dtUniveralJoint->setAxis2(dtAxis);
+    dart::dynamics::UniversalJoint *dtUniveralJoint =
+        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+          this->dataPtr->dtJoint);
+    dtUniveralJoint->setAxis2(dtAxis);
   }
   else
   {
@@ -120,12 +134,12 @@ math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dtJoint->getPosition(0);
+    double radianAngle = this->dataPtr->dtJoint->getPosition(0);
     result.SetFromRadian(radianAngle);
   }
   else if (_index == 1)
   {
-    double radianAngle = this->dtJoint->getPosition(1);
+    double radianAngle = this->dataPtr->dtJoint->getPosition(1);
     result.SetFromRadian(radianAngle);
   }
   else
@@ -142,9 +156,9 @@ double DARTUniversalJoint::GetVelocity(unsigned int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getVelocity(0);
+    result = this->dataPtr->dtJoint->getVelocity(0);
   else if (_index == 1)
-    result = this->dtJoint->getVelocity(1);
+    result = this->dataPtr->dtJoint->getVelocity(1);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -156,64 +170,21 @@ void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index < this->GetAngleCount())
   {
-    this->dtJoint->setVelocity(_index, _vel);
-    this->dtJoint->getSkeleton()->computeForwardKinematics(false, true, false);
+    this->dataPtr->dtJoint->setVelocity(_index, _vel);
+    this->dataPtr->dtJoint->getSkeleton()->computeForwardKinematics(
+          false, true, false);
   }
   else
     gzerr << "Invalid index[" << _index << "]\n";
-}
-
-//////////////////////////////////////////////////
-void DARTUniversalJoint::SetMaxForce(unsigned int _index, double _force)
-{
-  if (_index == 0)
-  {
-    this->dtJoint->setForceLowerLimit(0, -_force);
-    this->dtJoint->setForceUpperLimit(0, _force);
-  }
-  else if (_index == 1)
-  {
-    this->dtJoint->setForceLowerLimit(1, -_force);
-    this->dtJoint->setForceUpperLimit(1, _force);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-}
-
-//////////////////////////////////////////////////
-double DARTUniversalJoint::GetMaxForce(unsigned int _index)
-{
-  double result = 0.0;
-
-  if (_index == 0)
-  {
-    // Assume that the lower limit and upper limit has equal magnitute
-    // result = this->dtJoint->getForceLowerLimit(0);
-    result = this->dtJoint->getForceUpperLimit(0);
-  }
-  else if (_index == 1)
-  {
-    // Assume that the lower limit and upper limit has equal magnitute
-    // result = this->dtJoint->getForceLowerLimit(1);
-    result = this->dtJoint->getForceUpperLimit(1);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-
-  return result;
 }
 
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
-    this->dtJoint->setForce(0, _effort);
+    this->dataPtr->dtJoint->setForce(0, _effort);
   else if (_index == 1)
-    this->dtJoint->setForce(1, _effort);
+    this->dataPtr->dtJoint->setForce(1, _effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

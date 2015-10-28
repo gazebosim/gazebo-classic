@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class RayShape RayShape.hh physics/physics.hh
     /// \brief Base class for Ray collision geometry
-    class GAZEBO_VISIBLE RayShape : public Shape
+    class GZ_PHYSICS_VISIBLE RayShape : public Shape
     {
       /// \brief Constructor for a global ray.
       /// \param[in] _physicsEngine Pointer to the physics engine.
@@ -118,6 +118,9 @@ namespace gazebo
       /// \param[in] _msg Message to update from.
       /// \TODO Implement this function.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// Documentation inherited
+      public: virtual double ComputeVolume() const;
 
       // Contact information; this is filled out during collision
       // detection.

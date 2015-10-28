@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ TEST_F(Connection, IPWhiteList)
   transport::Connection *connection = new transport::Connection();
   EXPECT_TRUE(connection->GetIPWhiteList().empty());
   delete connection;
-  connection = NULL;
 
   // Get original value
   char *ipEnv = getenv("GAZEBO_IP_WHITE_LIST");

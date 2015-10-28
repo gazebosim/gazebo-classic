@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
@@ -31,37 +33,38 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow)
 {
   // Tips
-  QLabel *tipsLabel = new QLabel(tr(
+  this->tipsLabel = new QLabel(tr(
       "<font size=4 color='white'><b>?</b></font>"));
-  tipsLabel->setToolTip(tr("<font size=3><p><b> Tips: </b></b>"
+  this->tipsLabel->setToolTip(tr("<font size=3><p><b> Tips: </b></b>"
       "<p>Double-click an object to open an Inspector with configuration "
       "options.</p>"
       "<p>Currently, windows & doors are simple holes in the wall.</p>"
       "<p>Because Gazebo only supports simple primitive shapes, all floors "
       "will be rectangular.</p>"));
+  this->tipsLabel->installEventFilter(this);
 
   // Create the building editor tab
   this->buildingPalette = new BuildingEditorPalette;
   this->Init("buildingEditorTab", "Building Editor", this->buildingPalette,
-      tipsLabel);
+      this->tipsLabel);
 
-  this->saveAct = new QAction(tr("&Save (As)"), this->mainWindow);
-  this->saveAct->setStatusTip(tr("Save (As)"));
+  this->newAct = new QAction(tr("&New"), this->mainWindow);
+  this->newAct->setStatusTip(tr("New"));
+  this->newAct->setShortcut(tr("Ctrl+N"));
+  this->newAct->setCheckable(false);
+  connect(this->newAct, SIGNAL(triggered()), this, SLOT(New()));
+
+  this->saveAct = new QAction(tr("&Save"), this->mainWindow);
+  this->saveAct->setStatusTip(tr("Save"));
   this->saveAct->setShortcut(tr("Ctrl+S"));
   this->saveAct->setCheckable(false);
   connect(this->saveAct, SIGNAL(triggered()), this, SLOT(Save()));
 
-  this->discardAct = new QAction(tr("&Discard"), this->mainWindow);
-  this->discardAct->setStatusTip(tr("Discard"));
-  this->discardAct->setShortcut(tr("Ctrl+D"));
-  this->discardAct->setCheckable(false);
-  connect(this->discardAct, SIGNAL(triggered()), this, SLOT(Discard()));
-
-  this->doneAct = new QAction(tr("Don&e"), this->mainWindow);
-  this->doneAct->setShortcut(tr("Ctrl+E"));
-  this->doneAct->setStatusTip(tr("Done"));
-  this->doneAct->setCheckable(false);
-  connect(this->doneAct, SIGNAL(triggered()), this, SLOT(Done()));
+  this->saveAsAct = new QAction(tr("&Save As"), this->mainWindow);
+  this->saveAsAct->setStatusTip(tr("Save As"));
+  this->saveAsAct->setShortcut(tr("Ctrl+SHIFT+S"));
+  this->saveAsAct->setCheckable(false);
+  connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
 
   this->exitAct = new QAction(tr("E&xit Building Editor"), this->mainWindow);
   this->exitAct->setStatusTip(tr("Exit Building Editor"));
@@ -75,6 +78,15 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
       gui::editor::Events::ConnectFinishBuildingModel(
       boost::bind(&BuildingEditor::OnFinish, this)));
 
+  this->buildingEditorWidget = new BuildingEditorWidget(
+      this->mainWindow->GetRenderWidget());
+  this->buildingEditorWidget->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Expanding);
+  this->buildingEditorWidget->hide();
+
+  this->mainWindow->GetRenderWidget()->InsertWidget(0,
+      this->buildingEditorWidget);
+
   this->menuBar = NULL;
 }
 
@@ -86,21 +98,19 @@ BuildingEditor::~BuildingEditor()
 ////////////////////////////////////////////////
 void BuildingEditor::Save()
 {
-  gui::editor::Events::saveBuildingEditor(
-      this->buildingPalette->GetModelName());
+  gui::editor::Events::saveBuildingEditor();
+}
+
+////////////////////////////////////////////////
+void BuildingEditor::SaveAs()
+{
+  gui::editor::Events::saveAsBuildingEditor();
 }
 
 /////////////////////////////////////////////////
-void BuildingEditor::Discard()
+void BuildingEditor::New()
 {
-  gui::editor::Events::discardBuildingEditor();
-}
-
-/////////////////////////////////////////////////
-void BuildingEditor::Done()
-{
-  gui::editor::Events::doneBuildingEditor(
-      this->buildingPalette->GetModelName());
+  gui::editor::Events::newBuildingEditor();
 }
 
 /////////////////////////////////////////////////
@@ -126,9 +136,9 @@ void BuildingEditor::CreateMenus()
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  fileMenu->addAction(this->newAct);
   fileMenu->addAction(this->saveAct);
-  fileMenu->addAction(this->discardAct);
-  fileMenu->addAction(this->doneAct);
+  fileMenu->addAction(this->saveAsAct);
   fileMenu->addAction(this->exitAct);
 }
 
@@ -138,16 +148,41 @@ void BuildingEditor::OnEdit(bool _checked)
   if (_checked)
   {
     this->CreateMenus();
+    this->mainWindowPaused = this->mainWindow->IsPaused();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("buildingEditorTab");
     this->mainWindow->ShowMenuBar(this->menuBar);
-    this->mainWindow->GetRenderWidget()->ShowEditor(true);
+    this->buildingEditorWidget->show();
+    this->mainWindow->GetRenderWidget()->DisplayOverlayMsg(
+        "Building is View Only");
+    this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
+    this->mainWindow->GetRenderWidget()->ShowToolbar(false);
   }
   else
   {
+    this->buildingPalette->CustomColorDialog()->reject();
     this->mainWindow->ShowLeftColumnWidget();
-    this->mainWindow->GetRenderWidget()->ShowEditor(false);
+    this->buildingEditorWidget->hide();
+    this->mainWindow->GetRenderWidget()->DisplayOverlayMsg("");
+    this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
+    this->mainWindow->GetRenderWidget()->ShowToolbar(true);
     this->mainWindow->ShowMenuBar();
-    this->mainWindow->Play();
+    if (!this->mainWindowPaused)
+      this->mainWindow->Play();
   }
+  gui::editor::Events::toggleEditMode(_checked);
+}
+
+/////////////////////////////////////////////////
+bool BuildingEditor::eventFilter(QObject *_obj, QEvent *_event)
+{
+  QLabel *label = qobject_cast<QLabel *>(_obj);
+  if (label && label == this->tipsLabel &&
+      _event->type() == QEvent::MouseButtonRelease)
+  {
+    QToolTip::showText(this->tipsLabel->mapToGlobal(QPoint()),
+        this->tipsLabel->toolTip());
+    return true;
+  }
+  return false;
 }

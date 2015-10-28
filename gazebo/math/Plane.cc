@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,27 +19,37 @@
 using namespace gazebo;
 using namespace math;
 
-
+/////////////////////////////////////////////////
 Plane::Plane()
 {
   this->d = 0.0;
 }
 
+/////////////////////////////////////////////////
 Plane::Plane(const Vector3 &_normal, double _offset)
 {
   this->normal = _normal;
   this->d = _offset;
 }
 
+/////////////////////////////////////////////////
 Plane::Plane(const Vector3 &_normal, const Vector2d &_size, double _offset)
 {
   this->Set(_normal, _size, _offset);
 }
 
+/////////////////////////////////////////////////
+Plane::Plane(const ignition::math::Planed &_plane)
+{
+  this->Set(_plane.Normal(), _plane.Size(), _plane.Offset());
+}
+
+/////////////////////////////////////////////////
 Plane::~Plane()
 {
 }
 
+/////////////////////////////////////////////////
 void Plane::Set(const Vector3 &_n, const Vector2d &_s, double _offset)
 {
   this->normal = _n;
@@ -53,6 +63,16 @@ Plane &Plane::operator =(const Plane & _p)
   this->normal = _p.normal;
   this->size = _p.size;
   this->d = _p.d;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Plane &Plane::operator=(const ignition::math::Planed &_p)
+{
+  this->normal = _p.Normal();
+  this->size = _p.Size();
+  this->d = _p.Offset();
 
   return *this;
 }
@@ -73,4 +93,10 @@ double Plane::Distance(const Vector3 &_origin, const Vector3 &_dir) const
     double t = -(nom/denom);
     return t;
   }
+}
+
+//////////////////////////////////////////////////
+ignition::math::Planed Plane::Ign() const
+{
+  return ignition::math::Planed(this->normal.Ign(), this->size.Ign(), this->d);
 }

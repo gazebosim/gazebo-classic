@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,15 @@
 /* Desc: Handles pushing messages out on a named topic
  * Author: Nate Koenig
  */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/bind.hpp>
+
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/transport/Node.hh"
@@ -34,7 +43,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
   : topic(_topic), msgType(_msgType), queueLimit(_limit),
     updatePeriod(0)
 {
-  if (!math::equal(_hzRate, 0.0))
+  if (!ignition::math::equal(_hzRate, 0.0))
     this->updatePeriod = 1.0 / _hzRate;
 
   this->queueLimitWarned = false;
@@ -183,10 +192,12 @@ void Publisher::SendMessage()
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
       // Send the latest message.
-      this->pubIds[*pubIter] = this->publication->Publish(*iter,
+      int result = this->publication->Publish(*iter,
           boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
 
-      if (this->pubIds[*pubIter] <= 0)
+      if (result > 0)
+        this->pubIds[*pubIter] = result;
+      else
         this->pubIds.erase(*pubIter);
     }
 

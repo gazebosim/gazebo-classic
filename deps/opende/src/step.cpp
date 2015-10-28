@@ -32,14 +32,25 @@
 #include "lcp.h"
 #include "util.h"
 #include "joints/hinge.h"
+#include "gazebo/gazebo_config.h"
+
+#ifdef HAVE_DART
+#include "step_dart_pgs_wrapper.h"
+#endif
+
+#ifdef HAVE_BULLET
+#include "step_bullet_lemke_wrapper.h"
+#include "step_bullet_pgs_wrapper.h"
+#endif
+
+#ifdef HDF5_INSTRUMENT
+#include <ode/h5dump.h>
+#endif
 
 //****************************************************************************
 // misc defines
 
-#define USE_JOINT_DAMPING
-
 //#define TIMING
-
 
 #ifdef TIMING
 #define IFTIMING(x) x
@@ -270,7 +281,9 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       }
     }
   }
-
+#ifdef HDF5_INSTRUMENT
+  h5dump_world("ode_frames.hdf5", world, stepsize);
+#endif
   // get m = total constraint dimension, nub = number of unbounded variables.
   // create constraint offset array and number-of-rows array for all joints.
   // the constraints are re-ordered as follows: the purely unbounded
@@ -428,24 +441,6 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     m = mcurr;
   }
 
-
-#ifdef USE_JOINT_DAMPING
-  /************************************************************************/
-  /* for joint damping, get the total number of rows for damping jacobian */
-  /************************************************************************/
-  int m_damp; // number of rows for damped joint jacobian
-  {
-    int mcurr = 0;
-    const dJointWithInfo1 *jicurr = jointiinfos; // info1 stored in jointiinfos
-    const dJointWithInfo1 *const jiend = jicurr + nj;
-    for (; jicurr != jiend; jicurr++)
-      if (jicurr->joint->use_damping)
-        mcurr ++;
-
-    m_damp = mcurr;
-  }
-#endif
-
   // this will be set to the force due to the constraints
   dReal *cforce = context->AllocateArray<dReal> (nb*8);
   dSetZero (cforce,nb*8);
@@ -456,6 +451,8 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     // force mixing vector `cfm', and LCP low and high bound vectors, and an
     // 'findex' vector.
     dReal *lo, *hi, *J, *A, *rhs;
+    dReal *c_v_max;
+    World_Solver_Type solver_type;
     int *findex;
 
     {
@@ -473,6 +470,11 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       findex = context->AllocateArray<int> (mlocal);
       for (int i=0; i<mlocal; ++i) findex[i] = -1;
 
+
+      c_v_max = context->AllocateArray<dReal> (mlocal);
+      for(int i=0; i<mlocal; i++) c_v_max[i] = world->contactp.max_vel;
+      solver_type = world->qs.world_solver_type;
+
       int mskip = dPAD(mlocal);
       A = context->AllocateArray<dReal> (mlocal*mskip);
       dSetZero (A,mlocal*mskip);
@@ -480,23 +482,6 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
       rhs = context->AllocateArray<dReal> (mlocal);
       dSetZero (rhs,mlocal);
     }
-
-#ifdef USE_JOINT_DAMPING
-    dReal *J_damp = NULL;
-    dReal *coeff_damp = NULL;
-    {
-      int mlocal = m_damp;
-
-      const unsigned jelements = mlocal*12;
-      J_damp = context->AllocateArray<dReal> (jelements);
-      dSetZero (J_damp,jelements);
-
-      const unsigned coeffelements = mlocal;
-      coeff_damp = context->AllocateArray<dReal> (coeffelements);
-      dSetZero (coeff_damp,coeffelements);
-    }
-#endif
-
 
     // Put 'c' in the same memory as 'rhs' as they transit into each other
     dReal *c = rhs; rhs = NULL; // erase rhs pointer for now as it is not to be used yet
@@ -534,9 +519,6 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
         Jinfo.erp = world->global_erp;
 
         unsigned ofsi = 0;
-#ifdef USE_JOINT_DAMPING
-        unsigned ofsi_damp = 0;
-#endif
         const dJointWithInfo1 *jicurr = jointiinfos;
         const dJointWithInfo1 *const jiend = jicurr + nj;
         for (; jicurr != jiend; ++jicurr) {
@@ -552,27 +534,8 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
           Jinfo.lo = lo + ofsi;
           Jinfo.hi = hi + ofsi;
           Jinfo.findex = findex + ofsi;
-
-#ifdef USE_JOINT_DAMPING
-          /*******************************************************/
-          /*  allocate space for damped joint Jacobians          */
-          /*******************************************************/
-          if (jicurr->joint->use_damping)
-          {
-            // damping coefficient is in jicurr->info.damping_coefficient);
-            coeff_damp[ofsi_damp] = jicurr->joint->damping_coefficient;
-
-            // setup joint damping pointers so getinfo2 will fill in J_damp
-            dReal *const Jrow_damp = J_damp + ofsi_damp * 12;
-            Jinfo.J1ld = Jrow_damp;
-            Jinfo.J1ad = Jrow_damp + 3;
-            Jinfo.J2ld = Jrow_damp + 6;
-            Jinfo.J2ad = Jrow_damp + 9;
-            // one row of constraint per joint
-            ofsi_damp ++;
-          }
-#endif
- 
+          Jinfo.c_v_max = c_v_max + ofsi;
+            
           dxJoint *joint = jicurr->joint;
           joint->getInfo2 (&Jinfo);
           
@@ -773,10 +736,43 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     BEGIN_STATE_SAVE(context, lcpstate) {
       IFTIMING(dTimerNow ("solving LCP problem"));
 
-      // solve the LCP problem and get lambda.
-      // this will destroy A but that's OK
-      dSolveLCP (context, m, A, lambda, rhs, NULL, nub, lo, hi, findex);
-
+      if (solver_type == ODE_DEFAULT)
+      {
+        // solve the LCP problem and get lambda.
+        // this will destroy A but that's OK
+        dSolveLCP (context, m, A, lambda, rhs, NULL, nub, lo, hi, findex);
+      }
+      else if (solver_type == DART_PGS)
+      {
+#ifdef HAVE_DART
+        const int mskip = dPAD(m);
+        dSolveLCP_dart_pgs(m, mskip, A, lambda, rhs, nub, lo, hi, findex);
+#else
+        dMessage(d_ERR_LCP, "HAVE_DART is NOT defined");
+#endif
+      }
+      else if (solver_type == BULLET_LEMKE)
+      {
+#ifdef HAVE_BULLET
+#ifdef LIBBULLET_VERSION_GT_282
+        dSolveLCP_bullet_lemke(m, A, lambda, rhs, lo, hi);
+#endif
+#else
+        dMessage(d_ERR_LCP, "HAVE_BULLET is NOT defined");
+#endif
+      }
+      else if (solver_type == BULLET_PGS)
+      {
+#ifdef HAVE_BULLET
+        dSolveLCP_bullet_pgs(m, A, lambda, rhs, lo, hi, findex);
+#else
+        dMessage(d_ERR_LCP, "HAVE_DART is NOT defined");
+#endif
+      }
+      else
+      {
+        dMessage(d_ERR_LCP, "Unrecognized Solver Type");
+      }
     } END_STATE_SAVE(context, lcpstate);
 
     {
@@ -869,8 +865,21 @@ void dInternalStepIsland_x2 (dxWorldProcessContext *context,
     // (over the given timestep)
     IFTIMING(dTimerNow ("update position"));
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; ++bodycurr) {
+    dReal *cforcecurr = cforce;
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+         cforcecurr+=8, ++bodycurr)
+    {
       dxBody *b = *bodycurr;
+      {
+        // sum all forces (external and constraint) into facc and tacc
+        // so dBodyGetForce and dBodyGetTorque returns total force and torque
+        // on the body
+        for (unsigned int j = 0; j < 3; ++j)
+        {
+          b->facc[j] += cforcecurr[j];
+          b->tacc[j] += cforcecurr[4+j];
+        }
+      }
       dxStepBody (b,stepsize);
     }
   }
@@ -928,24 +937,6 @@ size_t dxEstimateStepMemoryRequirements (dxBody * const * /*body*/, int nb, dxJo
     nj = njcurr; m = mcurr;
   }
 
-#ifdef USE_JOINT_DAMPING
-  int m_damp;
-  {
-    int m_dampcurr = 0;
-    //dxJoint::SureMaxInfo info;
-    dxJoint *const *const _jend = _joint + _nj;
-    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {
-      dxJoint *j = *_jcurr;
-      /***************************/
-      /* size for damping joints */
-      /***************************/
-      if (j->use_damping)
-        m_dampcurr ++;
-    }
-    m_damp = m_dampcurr;
-  }
-#endif
-
   size_t res = 0;
 
   res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invI
@@ -962,10 +953,7 @@ size_t dxEstimateStepMemoryRequirements (dxBody * const * /*body*/, int nb, dxJo
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * mskip * m); // for A
       sub1_res2 += 3 * dEFFICIENT_SIZE(sizeof(dReal) * m); // for lo, hi, rhs
       sub1_res2 += dEFFICIENT_SIZE(sizeof(int) * m); // for findex
-#ifdef USE_JOINT_DAMPING
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m_damp); // for J_damp
-      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m_damp); // for coeff_damp
-#endif
+      sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for c_v_max
       {
         size_t sub2_res1 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for cfm
         sub2_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 2 * 8 * m); // for JinvM

@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2012-2014 Open Source Robotics Foundation
+* Copyright (C) 2012-2015 Open Source Robotics Foundation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class AudioDecoder AudioDecoder.hh common/common.hh
     /// \brief An audio decoder based on FFMPEG.
-    class GAZEBO_VISIBLE AudioDecoder
+    class GZ_COMMON_VISIBLE AudioDecoder
     {
       /// \brief Constructor.
       public: AudioDecoder();

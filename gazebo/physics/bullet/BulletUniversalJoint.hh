@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_BULLETUNIVERSALJOINT_HH_
 #define _GAZEBO_BULLETUNIVERSALJOINT_HH_
 
+#include <string>
 #include "gazebo/physics/bullet/gzBtUniversalConstraint.hh"
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
@@ -34,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \brief A bullet universal joint class
-    class GAZEBO_VISIBLE BulletUniversalJoint
+    class GZ_PHYSICS_VISIBLE BulletUniversalJoint
       : public UniversalJoint<BulletJoint>
     {
       /// \brief Constructor
@@ -62,12 +63,6 @@ namespace gazebo
       public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited.
-      public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,
                   const math::Angle &_angle);
 
@@ -86,6 +81,15 @@ namespace gazebo
 
       // Documentation inherited. \sa Joint::GetAngleImpl
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+
+      // Documentation inherited.
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
+                                      unsigned int _index);
 
       // Documentation inherited. \sa void BulletJoint::SetForceImpl
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class ViewController ViewController.hh rendering/rendering.hh
     /// \brief Base class for view controllers.
-    class GAZEBO_VISIBLE ViewController
+    class GZ_RENDERING_VISIBLE ViewController
     {
       /// \brief Constructor
       /// \param[in] _camera The user camera to controll.
@@ -45,11 +45,20 @@ namespace gazebo
 
       /// \brief Initialize with a focus point.
       /// \param[in] _focalPoint The point to look at.
-      public: virtual void Init(const math::Vector3 &_focalPoint);
+      /// \param[in] _yaw Initial yaw angle.
+      /// \param[in] _pitch Initial pitch angle.
+      public: virtual void Init(const math::Vector3 &_focalPoint,
+                  const double _yaw = 0, const double _pitch = 0);
 
       /// \brief Update the controller, which should update the position
       /// of the Camera.
       public: virtual void Update() = 0;
+
+      /// \brief Called by the UserCamera when a resize event occurs.
+      /// \param[in] _width New width
+      /// \param[in] _height New height
+      public: virtual void Resize(const unsigned int _width,
+                                  const unsigned int _height);
 
       /// \brief Set whether the controller is enabled.
       /// \param[in] _value True if the controller is enabled.

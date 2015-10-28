@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,20 +45,20 @@ TEST_F(OpenAL, DefaultDevice)
   common::load();
 
   sdf::SDFPtr sdf(new sdf::SDF);
-  sdf::initFile("world.sdf", sdf->root);
+  sdf::initFile("world.sdf", sdf->Root());
 
   std::string sdfString = "<sdf version='1.4'>"
     "<world name='default'>"
     "<audio>"
     "<device>default</device>"
-    "</device>"
+    "</audio>"
     "</world>"
     "</sdf>";
 
-  EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
+  EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
-  EXPECT_TRUE(util::OpenAL::Instance()->Load(sdf->root));
-  EXPECT_TRUE(util::OpenAL::Instance()->Load(sdf->root->GetElement("audio")));
+  EXPECT_TRUE(util::OpenAL::Instance()->Load(sdf->Root()));
+  EXPECT_TRUE(util::OpenAL::Instance()->Load(sdf->Root()->GetElement("audio")));
 }
 
 /////////////////////////////////////////////////
@@ -67,19 +67,20 @@ TEST_F(OpenAL, NonDefaultDevice)
   common::load();
 
   sdf::SDFPtr sdf(new sdf::SDF);
-  sdf::initFile("world.sdf", sdf->root);
+  sdf::initFile("world.sdf", sdf->Root());
 
   std::string sdfString = "<sdf version='1.4'>"
     "<world name='default'>"
     "<audio>"
     "<device>garbage</device>"
-    "</device>"
+    "</audio>"
     "</world>"
     "</sdf>";
 
-  EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
+  EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
-  EXPECT_FALSE(util::OpenAL::Instance()->Load(sdf->root->GetElement("audio")));
+  EXPECT_FALSE(
+    util::OpenAL::Instance()->Load(sdf->Root()->GetElement("audio")));
 }
 
 /////////////////////////////////////////////////
@@ -94,7 +95,7 @@ TEST_F(OpenAL, BadSDF)
 
   sdf::SDFPtr sdf(new sdf::SDF);
   // Bad SDF
-  EXPECT_EQ(util::OpenAL::Instance()->CreateSource(sdf->root), source);
+  EXPECT_EQ(util::OpenAL::Instance()->CreateSource(sdf->Root()), source);
 
   ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());
 }
@@ -109,7 +110,7 @@ TEST_F(OpenAL, BadValues)
   util::OpenALSourcePtr source;
 
   sdf::SDFPtr sdf(new sdf::SDF);
-  sdf::initFile("audio_source.sdf", sdf->root);
+  sdf::initFile("audio_source.sdf", sdf->Root());
 
   std::string sdfString = "<sdf version='1.4'>"
     "<audio_source>"
@@ -120,9 +121,9 @@ TEST_F(OpenAL, BadValues)
     "</audio_source>"
     "</sdf>";
 
-  EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
+  EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
-  source = util::OpenAL::Instance()->CreateSource(sdf->root);
+  source = util::OpenAL::Instance()->CreateSource(sdf->Root());
   EXPECT_TRUE(source != NULL);
 
   ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());
@@ -143,7 +144,7 @@ TEST_F(OpenAL, SourcePlay)
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
   sdf::SDFPtr sdf(new sdf::SDF);
-  sdf::initFile("audio_source.sdf", sdf->root);
+  sdf::initFile("audio_source.sdf", sdf->Root());
 
   std::string sdfString = "<sdf version='1.4'>"
     "<audio_source>"
@@ -156,9 +157,9 @@ TEST_F(OpenAL, SourcePlay)
     "</sdf>";
 
 
-  EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
+  EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
-  source = util::OpenAL::Instance()->CreateSource(sdf->root);
+  source = util::OpenAL::Instance()->CreateSource(sdf->Root());
   EXPECT_TRUE(source != NULL);
 
   EXPECT_TRUE(source->GetOnContact());
@@ -206,7 +207,7 @@ TEST_F(OpenAL, SourceVelPose)
   common::load();
 
   sdf::SDFPtr sdf(new sdf::SDF);
-  sdf::initFile("audio_source.sdf", sdf->root);
+  sdf::initFile("audio_source.sdf", sdf->Root());
 
   std::string sdfString = "<sdf version='1.4'>"
     "<audio_source>"
@@ -217,15 +218,15 @@ TEST_F(OpenAL, SourceVelPose)
     "</audio_source>"
     "</sdf>";
 
-  EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
+  EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
-  source = util::OpenAL::Instance()->CreateSource(sdf->root);
+  source = util::OpenAL::Instance()->CreateSource(sdf->Root());
   EXPECT_TRUE(source != NULL);
 
   EXPECT_FALSE(source->GetOnContact());
-  EXPECT_TRUE(source->SetVelocity(math::Vector3(1, 1, 1)));
-  EXPECT_TRUE(source->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
+  EXPECT_TRUE(source->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
+  EXPECT_TRUE(source->SetPose(ignition::math::Pose3d(1, 1, 1, 0, 0, 0)));
 }
 
 /////////////////////////////////////////////////
@@ -238,7 +239,7 @@ TEST_F(OpenAL, Sourcevalid)
   // Has pitch, gain, loop, contact
   {
     sdf::SDFPtr sdf(new sdf::SDF);
-    sdf::initFile("audio_source.sdf", sdf->root);
+    sdf::initFile("audio_source.sdf", sdf->Root());
 
     std::string sdfString = "<sdf version='1.4'>"
       "<audio_source>"
@@ -250,15 +251,15 @@ TEST_F(OpenAL, Sourcevalid)
       "</audio_source>"
       "</sdf>";
 
-    EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
+    EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
-    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root));
+    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->Root()) != NULL);
   }
 
   // No Pitch, gain, loop, contact
   {
     sdf::SDFPtr sdf(new sdf::SDF);
-    sdf::initFile("audio_source.sdf", sdf->root);
+    sdf::initFile("audio_source.sdf", sdf->Root());
 
     std::string sdfString = "<sdf version='1.4'>"
       "<audio_source>"
@@ -266,9 +267,9 @@ TEST_F(OpenAL, Sourcevalid)
       "</audio_source>"
       "</sdf>";
 
-    EXPECT_TRUE(sdf::readString(sdfString, sdf->root));
+    EXPECT_TRUE(sdf::readString(sdfString, sdf->Root()));
 
-    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->root));
+    EXPECT_TRUE(util::OpenAL::Instance()->CreateSource(sdf->Root()) != NULL);
   }
 
   ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());
@@ -303,12 +304,12 @@ TEST_F(OpenAL, SinkVelPose)
   sink = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
   EXPECT_TRUE(sink != NULL);
 
-  EXPECT_FALSE(sink->SetVelocity(math::Vector3(1, 1, 1)));
-  EXPECT_FALSE(sink->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
+  EXPECT_FALSE(sink->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
+  EXPECT_FALSE(sink->SetPose(ignition::math::Pose3d(1, 1, 1, 0, 0, 0)));
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
-  EXPECT_TRUE(sink->SetVelocity(math::Vector3(1, 1, 1)));
-  EXPECT_TRUE(sink->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
+  EXPECT_TRUE(sink->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
+  EXPECT_TRUE(sink->SetPose(ignition::math::Pose3d(1, 1, 1, 0, 0, 0)));
 }
 #endif
 

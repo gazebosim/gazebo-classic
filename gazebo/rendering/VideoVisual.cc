@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Video.hh"
 #include "gazebo/common/Events.hh"
@@ -32,6 +33,7 @@ VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
   VideoVisualPrivate *dPtr =
       reinterpret_cast<VideoVisualPrivate *>(this->dataPtr);
 
+  dPtr->type = VT_GUI;
   dPtr->video = new common::Video();
   dPtr->video->Load("/home/nkoenig/Videos/pr2_risotto/risotto_robot.mp4");
 

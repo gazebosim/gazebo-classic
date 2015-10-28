@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/function.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -65,7 +66,7 @@ namespace gazebo
     /// guarantees that all data is stored.
     ///
     /// \sa Logplay, State
-    class GAZEBO_VISIBLE LogRecord : public SingletonT<LogRecord>
+    class GZ_UTIL_VISIBLE LogRecord : public SingletonT<LogRecord>
     {
       /// \brief Constructor
       private: LogRecord();
