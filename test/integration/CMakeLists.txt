@@ -36,6 +36,7 @@ set(tests
   concave_mesh.cc
   contact_sensor.cc
   dem.cc
+  elastic_modulus.cc
   file_handling.cc
   gripper.cc
   gz_joint.cc
