@@ -365,7 +365,7 @@ namespace gazebo
       /// \brief Set whether sensors have been initialized. This should only
       /// be called by SensorManager.
       /// \param[in] _init True if sensors have been initialized.
-      public: void SetSensorsInitialized(const bool _init);
+      public: void _SetSensorsInitialized(const bool _init);
 
       /// \cond
       /// This is an internal function.

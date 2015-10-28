@@ -105,7 +105,7 @@ void SensorManager::Update(bool _force)
 
     if (!this->initSensors.empty())
     {
-      // in case things are spawn, sensors length changes
+      // in case things are spawned, sensors length changes
       for (auto &iter : this->initSensors)
       {
         GZ_ASSERT(iter != NULL, "Sensor pointer is NULL");
@@ -119,7 +119,7 @@ void SensorManager::Update(bool _force)
       }
       this->initSensors.clear();
       for (auto &iter : this->worlds)
-        iter.second->SetSensorsInitialized(false);
+        iter.second->_SetSensorsInitialized(true);
     }
 
     for (std::vector<std::string>::iterator iter = this->removeSensors.begin();
@@ -155,7 +155,7 @@ void SensorManager::Update(bool _force)
       }
       this->initSensors.clear();
       for (auto &iter : this->worlds)
-        iter.second->SetSensorsInitialized(false);
+        iter.second->_SetSensorsInitialized(false);
       this->removeAllSensors = false;
     }
   }
@@ -202,11 +202,11 @@ void SensorManager::Init()
 
   // Connect to the time reset event.
   this->timeResetConnection = event::Events::ConnectTimeReset(
-      boost::bind(&SensorManager::ResetLastUpdateTimes, this));
+      std::bind(&SensorManager::ResetLastUpdateTimes, this));
 
   // Connect to the remove sensor event.
   this->removeSensorConnection = event::Events::ConnectRemoveSensor(
-      boost::bind(&SensorManager::RemoveSensor, this, _1));
+      std::bind(&SensorManager::RemoveSensor, this, std::placeholders::_1));
 
   // Connect to the create sensor event.
   this->createSensorConnection = event::Events::ConnectCreateSensor(
@@ -215,6 +215,9 @@ void SensorManager::Init()
         std::placeholders::_3, std::placeholders::_4));
 
   this->initialized = true;
+
+  for (auto &iter : this->worlds)
+    iter.second->_SetSensorsInitialized(true);
 }
 
 //////////////////////////////////////////////////
@@ -287,7 +290,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   // initialized during the next SensorManager::Update call.
   else
   {
-    this->worlds[_worldName]->SetSensorsInitialized(false);
+    this->worlds[_worldName]->_SetSensorsInitialized(false);
     boost::recursive_mutex::scoped_lock lock(this->mutex);
     this->initSensors.push_back(sensor);
   }
@@ -409,11 +412,10 @@ void SensorManager::SensorContainer::Init()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-  Sensor_V::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+  for (auto &iter : this->sensors)
   {
-    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
-    (*iter)->Init();
+    GZ_ASSERT(iter != NULL, "Sensor is NULL");
+    iter->Init();
   }
 
   this->initialized = true;

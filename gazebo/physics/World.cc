@@ -590,7 +590,7 @@ void World::LogStep()
 }
 
 //////////////////////////////////////////////////
-void World::SetSensorsInitialized(const bool _init)
+void World::_SetSensorsInitialized(const bool _init)
 {
   this->dataPtr->sensorsInitialized = _init;
 }
@@ -1095,7 +1095,7 @@ void World::ResetTime()
 
   // Signal a reset has occurred. The SensorManager listens to this event
   // to reset each sensor's last update time.
-  event::Events::worldReset();
+  event::Events::timeReset();
 }
 
 //////////////////////////////////////////////////
