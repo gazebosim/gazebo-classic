@@ -3168,3 +3168,38 @@ ConfigChildWidget *ConfigWidget::ConfigChildWidgetByName(
   else
     return NULL;
 }
+
+/////////////////////////////////////////////////
+QString ConfigWidget::StyleSheet(const std::string &_type, const int _level)
+{
+  if (_type == "normal")
+  {
+    return "QWidget\
+        {\
+          background-color: " + ConfigWidget::bgColors[_level] + ";\
+          color: #4c4c4c;\
+        }\
+        QLabel\
+        {\
+          color: #d0d0d0;\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::widgetColors[_level] +
+        "}";
+  }
+  else if (_type == "warning")
+  {
+    return "QWidget\
+      {\
+        background-color: " + ConfigWidget::bgColors[_level] + ";\
+        color: " + ConfigWidget::redColor + ";\
+      }\
+      QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+      {\
+        background-color: " + ConfigWidget::widgetColors[_level] +
+      "}";
+  }
+  gzwarn << "Requested unknown style sheet type [" << _type << "]" << std::endl;
+  return "";
+}

@@ -173,6 +173,10 @@ namespace gazebo
       /// \brief Unique ID which identifies this joint in the joint maker.
       private: std::string jointId;
 
+      /// \brief Label holding icon which represents the parent link. The icon
+      /// color changes according to the joint type.
+      private: QLabel *parentIcon;
+
       /// \brief Flag that indicates whether current joint name is valid.
       private: bool validJointName;
 
