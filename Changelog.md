@@ -126,6 +126,9 @@ using the same arguments used in the command line.
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
+    1. Added icons for child and parent link in joint inspector
+        * [Pull request #1953](https://bitbucket.org/osrf/gazebo/pull-request/1953)
+
     1. Load and save nested models
         * [Pull request #1894](https://bitbucket.org/osrf/gazebo/pull-request/1894)
 
