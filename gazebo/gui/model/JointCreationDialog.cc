@@ -195,12 +195,18 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       this->dataPtr->configWidget->CreateVector3dWidget("axis1", 0);
   this->dataPtr->configWidget->AddConfigChildWidget("axis1",
       this->dataPtr->axis1Widget);
+  this->dataPtr->configWidget->SetVector3WidgetValue("axis1",
+      ignition::math::Vector3d::UnitX);
+  this->dataPtr->configWidget->SetWidgetReadOnly("axis1", true);
 
   // Axis2 widget
   this->dataPtr->axis2Widget =
       this->dataPtr->configWidget->CreateVector3dWidget("axis2", 0);
   this->dataPtr->configWidget->AddConfigChildWidget("axis2",
       this->dataPtr->axis2Widget);
+  this->dataPtr->configWidget->SetVector3WidgetValue("axis2",
+      ignition::math::Vector3d::UnitY);
+  this->dataPtr->configWidget->SetWidgetReadOnly("axis2", true);
 
   // Axis general layout
   auto *axisGeneralLayout = new QVBoxLayout();
@@ -329,6 +335,9 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   // Align group widget
   ConfigChildWidget *alignWidget = new ConfigChildWidget();
   alignWidget->setLayout(alignLayout);
+  this->dataPtr->configWidget->AddConfigChildWidget("align",
+      alignWidget);
+  this->dataPtr->configWidget->SetWidgetReadOnly("align", true);
 
   QWidget *alignGroupWidget =
       this->dataPtr->configWidget->CreateGroupWidget("Align links",
@@ -339,6 +348,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       this->dataPtr->configWidget->CreatePoseWidget("joint_pose", 0);
   this->dataPtr->configWidget->AddConfigChildWidget("joint_pose",
       jointPoseWidget);
+  this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", true);
 
   // Joint pose group
   QWidget *jointPoseGroupWidget =
@@ -366,6 +376,9 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   ConfigChildWidget *relativePoseGeneralWidget = new ConfigChildWidget();
   relativePoseGeneralWidget->setLayout(relativePoseGeneralLayout);
+  this->dataPtr->configWidget->AddConfigChildWidget("relative_pose_general",
+      relativePoseGeneralWidget);
+  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose_general", true);
 
   QWidget *relativePoseGroupWidget =
       this->dataPtr->configWidget->CreateGroupWidget(
@@ -453,6 +466,12 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   this->dataPtr->createButton->setEnabled(false);
   this->dataPtr->swapButton->setEnabled(false);
   this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("axis1", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("axis2", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("align", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose_general",
+      true);
   this->dataPtr->parentLinkWidget->setStyleSheet(
       ConfigWidget::StyleSheet("active", 1));
   this->dataPtr->childLinkWidget->setStyleSheet(
@@ -610,9 +629,15 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
     return;
   }
 
-  // Enable create and swap
+  // Enable features
   this->dataPtr->createButton->setEnabled(true);
   this->dataPtr->swapButton->setEnabled(true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("axis1", false);
+  this->dataPtr->configWidget->SetWidgetReadOnly("axis2", false);
+  this->dataPtr->configWidget->SetWidgetReadOnly("align", false);
+  this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", false);
+  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose_general",
+      false);
 
   // Remove empty option
   this->dataPtr->configWidget->RemoveItemEnumWidget("childCombo", "");
