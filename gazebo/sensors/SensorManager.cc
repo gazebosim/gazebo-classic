@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 

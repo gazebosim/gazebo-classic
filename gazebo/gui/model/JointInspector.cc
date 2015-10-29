@@ -18,6 +18,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
 
+#include "gazebo/rendering/Material.hh"
+
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/JointInspector.hh"
@@ -33,33 +35,6 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   this->setWindowTitle(tr("Joint Inspector"));
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
-
-  // Style sheets
-  this->normalStyleSheet =
-        "QWidget\
-        {\
-          background-color: " + ConfigWidget::bgColors[0] + ";\
-          color: #4c4c4c;\
-        }\
-        QLabel\
-        {\
-          color: #d0d0d0;\
-        }\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-        {\
-          background-color: " + ConfigWidget::widgetColors[0] +
-        "}";
-
-  this->warningStyleSheet =
-        "QWidget\
-        {\
-          background-color: " + ConfigWidget::bgColors[0] + ";\
-          color: " + ConfigWidget::redColor + ";\
-        }\
-        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
-        {\
-          background-color: " + ConfigWidget::widgetColors[0] +
-        "}";
 
   // ConfigWidget
   this->configWidget = new ConfigWidget;
@@ -138,25 +113,63 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   std::vector<std::string> links;
   this->parentLinkWidget =
       this->configWidget->CreateEnumWidget("parent", links, 0);
-  this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
   this->configWidget->AddConfigChildWidget("parentCombo",
       this->parentLinkWidget);
+
+  // Resize parent label
+  auto parentLabel = this->parentLinkWidget->findChild<QLabel *>();
+  parentLabel->setMaximumWidth(50);
+
+  // Add parent icon
+  this->parentIcon = new QLabel();
+  this->parentIcon->setMinimumWidth(13);
+  this->parentIcon->setMaximumHeight(13);
+  auto parentLayout = qobject_cast<QHBoxLayout *>(
+      this->parentLinkWidget->layout());
+  if (parentLayout)
+  {
+    parentLayout->insertWidget(1, this->parentIcon);
+    parentLayout->setAlignment(this->parentIcon, Qt::AlignLeft);
+  }
 
   // Child
   this->childLinkWidget =
       this->configWidget->CreateEnumWidget("child", links, 0);
-  this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
   this->configWidget->AddConfigChildWidget("childCombo", this->childLinkWidget);
+
+  // Resize child label
+  auto childLabel = this->childLinkWidget->findChild<QLabel *>();
+  childLabel->setMaximumWidth(50);
+
+  // Add child icon
+  QPixmap childPix(":/images/child-link.png");
+  childPix = childPix.scaled(15, 15);
+  auto childIcon = new QLabel();
+  childIcon->setPixmap(childPix);
+  childIcon->setMaximumWidth(15);
+  auto childLayout = qobject_cast<QHBoxLayout *>(
+      this->childLinkWidget->layout());
+  if (childLayout)
+  {
+    childLayout->insertWidget(1, childIcon);
+    childLayout->setAlignment(childIcon, Qt::AlignLeft);
+  }
 
   // Swap button
   QToolButton *swapButton = new QToolButton();
-  swapButton->setText("Swap");
-  swapButton->setMinimumWidth(60);
+  swapButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  swapButton->setIcon(QPixmap(":/images/swap-parent-child.png"));
+  swapButton->setFixedSize(QSize(45, 35));
+  swapButton->setIconSize(QSize(25, 25));
+  swapButton->setToolTip("Swap parent and child");
   swapButton->setStyleSheet(
       "QToolButton\
       {\
-        background-color: " + ConfigWidget::bgColors[0] +
-      "}");
+        background-color: " + ConfigWidget::bgColors[0] + ";\
+        margin-left: 10px;\
+      }");
   connect(swapButton, SIGNAL(clicked()), this, SLOT(OnSwap()));
 
   // Links layout
@@ -188,6 +201,15 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   generalLayout->addWidget(scrollArea);
 
   // Buttons
+  QToolButton *removeButton = new QToolButton(this);
+  removeButton->setFixedSize(QSize(30, 30));
+  removeButton->setToolTip("Remove joint");
+  removeButton->setIcon(QPixmap(":/images/trashcan.png"));
+  removeButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  removeButton->setIconSize(QSize(16, 16));
+  removeButton->setCheckable(false);
+  connect(removeButton, SIGNAL(clicked()), this, SLOT(OnRemove()));
+
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
@@ -201,6 +223,8 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
+  buttonsLayout->addWidget(removeButton);
+  buttonsLayout->addStretch(5);
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(this->applyButton);
   buttonsLayout->addWidget(this->okButton);
@@ -280,8 +304,8 @@ void JointInspector::OnEnumChanged(const QString &_name,
 void JointInspector::OnJointTypeChanged(const QString &_value)
 {
   std::string valueStr = _value.toLower().toStdString();
-  unsigned int axisCount = JointMaker::GetJointAxisCount(
-      JointMaker::ConvertJointType(valueStr));
+  auto type = JointMaker::ConvertJointType(valueStr);
+  unsigned int axisCount = JointMaker::GetJointAxisCount(type);
 
   for (unsigned int i = 0; i < axisCount; ++i)
   {
@@ -312,6 +336,20 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
   this->configWidget->SetWidgetReadOnly("gearbox", !isGearbox);
   this->configWidget->SetWidgetVisible("screw", isScrew);
   this->configWidget->SetWidgetReadOnly("screw", !isScrew);
+
+  // Change child icon color according to type
+  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::GetMaterialAsColor(
+      this->jointMaker->jointMaterials[type],
+      matAmbient, matDiffuse, matSpecular, matEmissive);
+
+  std::ostringstream sheet;
+  sheet << "QLabel{background-color: rgb(" <<
+          (matAmbient[0] * 255) << ", " <<
+          (matAmbient[1] * 255) << ", " <<
+          (matAmbient[2] * 255) << "); }";
+
+  this->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
 }
 
 /////////////////////////////////////////////////
@@ -325,13 +363,13 @@ void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
   // Warning if parent and child are equal
   if (currentParent == currentChild)
   {
-    this->parentLinkWidget->setStyleSheet(this->warningStyleSheet);
-    this->childLinkWidget->setStyleSheet(this->warningStyleSheet);
+    this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("warning"));
+    this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("warning"));
   }
   else
   {
-    this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
-    this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+    this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+    this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
   }
   this->applyButton->setEnabled(currentParent != currentChild);
   this->okButton->setEnabled(currentParent != currentChild);
@@ -404,13 +442,27 @@ void JointInspector::Open()
   this->configWidget->blockSignals(false);
 
   // Reset states
-  this->parentLinkWidget->setStyleSheet(this->normalStyleSheet);
-  this->childLinkWidget->setStyleSheet(this->normalStyleSheet);
+  this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+  this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
   this->applyButton->setEnabled(true);
   this->okButton->setEnabled(true);
 
   this->move(QCursor::pos());
   this->show();
+}
+
+/////////////////////////////////////////////////
+void JointInspector::SetJointId(const std::string &_id)
+{
+  this->jointId = _id;
+}
+
+/////////////////////////////////////////////////
+void JointInspector::OnRemove()
+{
+  this->close();
+
+  this->jointMaker->RemoveJoint(this->jointId);
 }
 
 /////////////////////////////////////////////////

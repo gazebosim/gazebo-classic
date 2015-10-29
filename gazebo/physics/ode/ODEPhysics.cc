@@ -626,6 +626,8 @@ ODEPhysics::ConvertWorldStepSolverType(const std::string &_solverType)
     result = ODE_DEFAULT;
   else if (_solverType.compare("DART_PGS") == 0)
     result = DART_PGS;
+  else if (_solverType.compare("BULLET_LEMKE") == 0)
+    result = BULLET_LEMKE;
   else if (_solverType.compare("BULLET_PGS") == 0)
     result = BULLET_PGS;
   else
@@ -653,6 +655,11 @@ ODEPhysics::ConvertWorldStepSolverType(const World_Solver_Type _solverType)
     case DART_PGS:
     {
       result = "DART_PGS";
+      break;
+    }
+    case BULLET_LEMKE:
+    {
+      result = "BULLET_LEMKE";
       break;
     }
     case BULLET_PGS:
@@ -1454,6 +1461,11 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepContactResidualSmoothing(this->dataPtr->worldId,
         boost::any_cast<double>(_value));
     }
+    else if (_key == "contact_sor_scale")
+    {
+      dWorldSetQuickStepContactSORScalingFactor(this->dataPtr->worldId,
+        boost::any_cast<double>(_value));
+    }
     else if (_key == "thread_position_correction")
     {
       dWorldSetQuickStepThreadPositionCorrection(this->dataPtr->worldId,
@@ -1546,6 +1558,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepInertiaRatioReduction(this->dataPtr->worldId);
   else if (_key == "contact_residual_smoothing")
     _value = dWorldGetQuickStepContactResidualSmoothing(this->dataPtr->worldId);
+  else if (_key == "contact_sor_scale")
+    _value = dWorldGetQuickStepContactSORScalingFactor(this->dataPtr->worldId);
   else if (_key == "thread_position_correction")
     _value = dWorldGetQuickStepThreadPositionCorrection(this->dataPtr->worldId);
   else if (_key == "experimental_row_reordering")

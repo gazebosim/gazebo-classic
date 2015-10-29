@@ -302,7 +302,7 @@ BasePtr Base::GetByName(const std::string &_name)
 //////////////////////////////////////////////////
 std::string Base::GetScopedName(bool _prependWorldName) const
 {
-  if (_prependWorldName)
+  if (_prependWorldName && this->world)
     return this->world->GetName() + "::" + this->scopedName;
   else
     return this->scopedName;

@@ -533,8 +533,8 @@ std::string ConfigWidget::GetEnumWidgetValue(const std::string &_name) const
 }
 
 /////////////////////////////////////////////////
-QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
-    const std::string &_name, const int _level)
+QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
+  bool _update, const std::string &_name, const int _level)
 {
   std::vector<QWidget *> newWidgets;
 
@@ -575,9 +575,9 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
         configChildWidget = this->configWidgets[scopedName];
       }
 
-      switch (field->cpp_type())
+      switch (field->type())
       {
-        case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+        case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
           double value = ref->GetDouble(*_msg, field);
           if (!math::equal(value, value))
@@ -590,7 +590,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateDoubleWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+        case google::protobuf::FieldDescriptor::TYPE_FLOAT:
         {
           float value = ref->GetFloat(*_msg, field);
           if (!math::equal(value, value))
@@ -603,7 +603,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateDoubleWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
+        case google::protobuf::FieldDescriptor::TYPE_INT64:
         {
           int64_t value = ref->GetInt64(*_msg, field);
           if (newWidget)
@@ -614,7 +614,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT64:
+        case google::protobuf::FieldDescriptor::TYPE_UINT64:
         {
           uint64_t value = ref->GetUInt64(*_msg, field);
           if (newWidget)
@@ -625,7 +625,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateUIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+        case google::protobuf::FieldDescriptor::TYPE_INT32:
         {
           int32_t value = ref->GetInt32(*_msg, field);
           if (newWidget)
@@ -636,7 +636,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT32:
+        case google::protobuf::FieldDescriptor::TYPE_UINT32:
         {
           uint32_t value = ref->GetUInt32(*_msg, field);
           if (newWidget)
@@ -647,7 +647,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateUIntWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+        case google::protobuf::FieldDescriptor::TYPE_BOOL:
         {
           bool value = ref->GetBool(*_msg, field);
           if (newWidget)
@@ -658,7 +658,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateBoolWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+        case google::protobuf::FieldDescriptor::TYPE_STRING:
         {
           std::string value = ref->GetString(*_msg, field);
           if (newWidget)
@@ -674,7 +674,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
           this->UpdateStringWidget(configChildWidget, value);
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
         {
           google::protobuf::Message *valueMsg =
               ref->MutableMessage(_msg, field);
@@ -717,8 +717,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
                 if (geomField->is_repeated())
                     continue;
 
-                if (geomField->cpp_type() !=
-                    google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE ||
+                if (geomField->type() !=
+                    google::protobuf::FieldDescriptor::TYPE_MESSAGE ||
                     !valueMsg->GetReflection()->HasField(*valueMsg, geomField))
                   continue;
 
@@ -791,8 +791,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
               const google::protobuf::FieldDescriptor *valueField =
                   valueDescriptor->field(j);
 
-              if (valueField->cpp_type() !=
-                  google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+              if (valueField->type() !=
+                  google::protobuf::FieldDescriptor::TYPE_MESSAGE)
                 continue;
 
               if (valueField->message_type()->name() == "Vector3d")
@@ -901,7 +901,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
 
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+        case google::protobuf::FieldDescriptor::TYPE_ENUM:
         {
           const google::protobuf::EnumValueDescriptor *value =
               ref->GetEnum(*_msg, field);
@@ -1000,6 +1000,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,  bool _update,
     widget->setLayout(widgetLayout);
     return widget;
   }
+
   return NULL;
 }
 
@@ -1115,8 +1116,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
 math::Vector3 ConfigWidget::ParseVector3(const google::protobuf::Message *_msg)
 {
   math::Vector3 vec3;
-  const google::protobuf::Descriptor *valueDescriptor =
-      _msg->GetDescriptor();
+  const google::protobuf::Descriptor *valueDescriptor = _msg->GetDescriptor();
   std::vector<double> values;
   for (unsigned int i = 0; i < 3; ++i)
   {
@@ -1134,14 +1134,19 @@ math::Vector3 ConfigWidget::ParseVector3(const google::protobuf::Message *_msg)
 ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // SpinBox
-  QSpinBox *valueSpinBox = new QSpinBox;
+  QSpinBox *valueSpinBox = new QSpinBox(widget);
   valueSpinBox->setRange(0, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
+  connect(valueSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnUIntValueChanged()));
 
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
@@ -1154,7 +1159,6 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
   widgetLayout->addWidget(valueSpinBox);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1167,14 +1171,19 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // SpinBox
-  QSpinBox *valueSpinBox = new QSpinBox;
+  QSpinBox *valueSpinBox = new QSpinBox(widget);
   valueSpinBox->setRange(-1e8, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
+  connect(valueSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnIntValueChanged()));
 
   // Layout
   QHBoxLayout *widgetLayout = new QHBoxLayout;
@@ -1187,7 +1196,6 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
   widgetLayout->addWidget(valueSpinBox);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1200,6 +1208,9 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
@@ -1209,11 +1220,13 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   double max = 0;
   this->GetRangeFromKey(_key, min, max);
 
-  QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *valueSpinBox = new QDoubleSpinBox(widget);
   valueSpinBox->setRange(min, max);
   valueSpinBox->setSingleStep(0.01);
   valueSpinBox->setDecimals(8);
   valueSpinBox->setAlignment(Qt::AlignRight);
+  connect(valueSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnDoubleValueChanged()));
 
   // Unit
   std::string jointType = this->GetEnumWidgetValue("type");
@@ -1236,7 +1249,6 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
     widgetLayout->addWidget(unitLabel);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->key = _key;
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
@@ -1251,6 +1263,9 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
     const int _level, const std::string &_type)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
@@ -1259,12 +1274,15 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
   QWidget *valueEdit;
   if (_type == "plain")
   {
-    valueEdit = new QPlainTextEdit();
+    valueEdit = new QPlainTextEdit(widget);
     valueEdit->setMinimumHeight(50);
+    // QPlainTextEdit's don't have editingFinished signals
   }
   else if (_type == "line")
   {
-    valueEdit = new QLineEdit;
+    valueEdit = new QLineEdit(widget);
+    connect(valueEdit, SIGNAL(editingFinished()), this,
+        SLOT(OnStringValueChanged()));
   }
   else
   {
@@ -1284,7 +1302,6 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
   widgetLayout->addWidget(valueEdit);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1297,20 +1314,30 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Label
   QLabel *keyLabel = new QLabel(tr(this->GetHumanReadableKey(_key).c_str()));
   keyLabel->setToolTip(tr(_key.c_str()));
 
   // Buttons
-  QHBoxLayout *buttonLayout = new QHBoxLayout;
-  QRadioButton *valueTrueRadioButton = new QRadioButton;
+  QRadioButton *valueTrueRadioButton = new QRadioButton(widget);
   valueTrueRadioButton->setText(tr("True"));
-  QRadioButton *valueFalseRadioButton = new QRadioButton;
+  connect(valueTrueRadioButton, SIGNAL(toggled(bool)), this,
+      SLOT(OnBoolValueChanged()));
+
+  QRadioButton *valueFalseRadioButton = new QRadioButton(widget);
   valueFalseRadioButton->setText(tr("False"));
+  connect(valueFalseRadioButton, SIGNAL(toggled(bool)), this,
+      SLOT(OnBoolValueChanged()));
+
   QButtonGroup *boolButtonGroup = new QButtonGroup;
   boolButtonGroup->addButton(valueTrueRadioButton);
   boolButtonGroup->addButton(valueFalseRadioButton);
   boolButtonGroup->setExclusive(true);
+
+  QHBoxLayout *buttonLayout = new QHBoxLayout;
   buttonLayout->addWidget(valueTrueRadioButton);
   buttonLayout->addWidget(valueFalseRadioButton);
 
@@ -1325,7 +1352,6 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
   widgetLayout->addLayout(buttonLayout);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1339,6 +1365,9 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
 ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
     const std::string &_key, const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Labels
   QLabel *vecXLabel = new QLabel(tr("X"));
   QLabel *vecYLabel = new QLabel(tr("Y"));
@@ -1352,26 +1381,32 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   double max = 0;
   this->GetRangeFromKey(_key, min, max);
 
-  QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox(widget);
   vecXSpinBox->setRange(min, max);
   vecXSpinBox->setSingleStep(0.01);
   vecXSpinBox->setDecimals(6);
   vecXSpinBox->setAlignment(Qt::AlignRight);
   vecXSpinBox->setMaximumWidth(100);
+  connect(vecXSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnVector3dValueChanged()));
 
-  QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox(widget);
   vecYSpinBox->setRange(min, max);
   vecYSpinBox->setSingleStep(0.01);
   vecYSpinBox->setDecimals(6);
   vecYSpinBox->setAlignment(Qt::AlignRight);
   vecYSpinBox->setMaximumWidth(100);
+  connect(vecYSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnVector3dValueChanged()));
 
-  QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox(widget);
   vecZSpinBox->setRange(min, max);
   vecZSpinBox->setSingleStep(0.01);
   vecZSpinBox->setDecimals(6);
   vecZSpinBox->setAlignment(Qt::AlignRight);
   vecZSpinBox->setMaximumWidth(100);
+  connect(vecZSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnVector3dValueChanged()));
 
   // This is inside a group
   int level = _level + 1;
@@ -1392,7 +1427,6 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   widgetLayout->setAlignment(vecZLabel, Qt::AlignRight);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1407,6 +1441,9 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
 ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
     const int _level)
 {
+  // ChildWidget
+  ConfigChildWidget *widget = new ConfigChildWidget();
+
   // Labels
   QLabel *colorRLabel = new QLabel(tr("R"));
   QLabel *colorGLabel = new QLabel(tr("G"));
@@ -1422,33 +1459,41 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   double max = 0;
   this->GetRangeFromKey(_key, min, max);
 
-  QDoubleSpinBox *colorRSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *colorRSpinBox = new QDoubleSpinBox(widget);
   colorRSpinBox->setRange(0, 1.0);
   colorRSpinBox->setSingleStep(0.1);
   colorRSpinBox->setDecimals(3);
   colorRSpinBox->setAlignment(Qt::AlignRight);
   colorRSpinBox->setMaximumWidth(10);
+  connect(colorRSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnColorValueChanged()));
 
-  QDoubleSpinBox *colorGSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *colorGSpinBox = new QDoubleSpinBox(widget);
   colorGSpinBox->setRange(0, 1.0);
   colorGSpinBox->setSingleStep(0.1);
   colorGSpinBox->setDecimals(3);
   colorGSpinBox->setAlignment(Qt::AlignRight);
   colorGSpinBox->setMaximumWidth(10);
+  connect(colorGSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnColorValueChanged()));
 
-  QDoubleSpinBox *colorBSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *colorBSpinBox = new QDoubleSpinBox(widget);
   colorBSpinBox->setRange(0, 1.0);
   colorBSpinBox->setSingleStep(0.1);
   colorBSpinBox->setDecimals(3);
   colorBSpinBox->setAlignment(Qt::AlignRight);
   colorBSpinBox->setMaximumWidth(10);
+  connect(colorBSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnColorValueChanged()));
 
-  QDoubleSpinBox *colorASpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *colorASpinBox = new QDoubleSpinBox(widget);
   colorASpinBox->setRange(0, 1.0);
   colorASpinBox->setSingleStep(0.1);
   colorASpinBox->setDecimals(3);
   colorASpinBox->setAlignment(Qt::AlignRight);
   colorASpinBox->setMaximumWidth(10);
+  connect(colorASpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnColorValueChanged()));
 
   // This is inside a group
   int level = _level + 1;
@@ -1472,7 +1517,6 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   widgetLayout->setAlignment(colorALabel, Qt::AlignRight);
 
   // ChildWidget
-  ConfigChildWidget *widget = new ConfigChildWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
 
@@ -1517,7 +1561,8 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
 
   for (unsigned int i = 0; i < elements.size(); ++i)
   {
-    QDoubleSpinBox *spin = new QDoubleSpinBox();
+    QDoubleSpinBox *spin = new QDoubleSpinBox(widget);
+    connect(spin, SIGNAL(editingFinished()), this, SLOT(OnPoseValueChanged()));
     widget->widgets.push_back(spin);
 
     spin->setRange(min, max);
@@ -1817,58 +1862,58 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
       ConfigChildWidget *childWidget = this->configWidgets[scopedName];
 
-      switch (field->cpp_type())
+      switch (field->type())
       {
-        case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+        case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
           QDoubleSpinBox *valueSpinBox =
               qobject_cast<QDoubleSpinBox *>(childWidget->widgets[0]);
           ref->SetDouble(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+        case google::protobuf::FieldDescriptor::TYPE_FLOAT:
         {
           QDoubleSpinBox *valueSpinBox =
               qobject_cast<QDoubleSpinBox *>(childWidget->widgets[0]);
           ref->SetFloat(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
+        case google::protobuf::FieldDescriptor::TYPE_INT64:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetInt64(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT64:
+        case google::protobuf::FieldDescriptor::TYPE_UINT64:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetUInt64(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+        case google::protobuf::FieldDescriptor::TYPE_INT32:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetInt32(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_UINT32:
+        case google::protobuf::FieldDescriptor::TYPE_UINT32:
         {
           QSpinBox *valueSpinBox =
               qobject_cast<QSpinBox *>(childWidget->widgets[0]);
           ref->SetUInt32(_msg, field, valueSpinBox->value());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_BOOL:
+        case google::protobuf::FieldDescriptor::TYPE_BOOL:
         {
           QRadioButton *valueRadioButton =
               qobject_cast<QRadioButton *>(childWidget->widgets[0]);
           ref->SetBool(_msg, field, valueRadioButton->isChecked());
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+        case google::protobuf::FieldDescriptor::TYPE_STRING:
         {
           if (qobject_cast<QLineEdit *>(childWidget->widgets[0]))
           {
@@ -1885,7 +1930,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
           }
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+        case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
         {
           google::protobuf::Message *valueMsg =
               (ref->MutableMessage(_msg, field));
@@ -2017,8 +2062,8 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
               const google::protobuf::FieldDescriptor *valueField =
                   valueDescriptor->field(j);
 
-              if (valueField->cpp_type() !=
-                  google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE)
+              if (valueField->type() !=
+                  google::protobuf::FieldDescriptor::TYPE_MESSAGE)
                 continue;
 
               if (valueField->message_type()->name() == "Vector3d")
@@ -2103,7 +2148,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
           break;
         }
-        case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+        case google::protobuf::FieldDescriptor::TYPE_ENUM:
         {
           QComboBox *valueComboBox =
               qobject_cast<QComboBox *>(childWidget->widgets[0]);
@@ -2136,8 +2181,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 void ConfigWidget::UpdateVector3Msg(google::protobuf::Message *_msg,
     const math::Vector3 &_value)
 {
-  const google::protobuf::Descriptor *valueDescriptor =
-      _msg->GetDescriptor();
+  const google::protobuf::Descriptor *valueDescriptor = _msg->GetDescriptor();
 
   std::vector<double> values;
   values.push_back(_value.x);
@@ -2617,20 +2661,173 @@ void ConfigWidget::OnItemSelection(QTreeWidgetItem *_item,
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget::OnUIntValueChanged()
+{
+  QSpinBox *spin =
+      qobject_cast<QSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit UIntValueChanged(widget->scopedName.c_str(),
+      this->GetUIntWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnIntValueChanged()
+{
+  QSpinBox *spin =
+      qobject_cast<QSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit IntValueChanged(widget->scopedName.c_str(),
+      this->GetIntWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnDoubleValueChanged()
+{
+  QDoubleSpinBox *spin =
+      qobject_cast<QDoubleSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit DoubleValueChanged(widget->scopedName.c_str(),
+      this->GetDoubleWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnBoolValueChanged()
+{
+  QRadioButton *radio =
+      qobject_cast<QRadioButton *>(QObject::sender());
+
+  if (!radio)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(radio->parent());
+
+  if (!widget)
+    return;
+
+  emit BoolValueChanged(widget->scopedName.c_str(),
+      this->GetBoolWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnStringValueChanged()
+{
+  QLineEdit *lineEdit = qobject_cast<QLineEdit *>(QObject::sender());
+  QPlainTextEdit *plainTextEdit =
+      qobject_cast<QPlainTextEdit *>(QObject::sender());
+
+  QWidget *valueEdit;
+  if (!lineEdit && !plainTextEdit)
+    return;
+  else if (lineEdit)
+    valueEdit = lineEdit;
+  else
+    valueEdit = plainTextEdit;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(valueEdit->parent());
+
+  if (!widget)
+    return;
+
+  emit StringValueChanged(widget->scopedName.c_str(),
+      this->GetStringWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnVector3dValueChanged()
+{
+  QDoubleSpinBox *spin =
+      qobject_cast<QDoubleSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit Vector3dValueChanged(widget->scopedName.c_str(),
+      this->GetVector3WidgetValue(widget).Ign());
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnColorValueChanged()
+{
+  QDoubleSpinBox *spin =
+      qobject_cast<QDoubleSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit ColorValueChanged(widget->scopedName.c_str(),
+      this->GetColorWidgetValue(widget));
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnPoseValueChanged()
+{
+  QDoubleSpinBox *spin =
+      qobject_cast<QDoubleSpinBox *>(QObject::sender());
+
+  if (!spin)
+    return;
+
+  ConfigChildWidget *widget =
+      qobject_cast<ConfigChildWidget *>(spin->parent());
+
+  if (!widget)
+    return;
+
+  emit PoseValueChanged(widget->scopedName.c_str(),
+      this->GetPoseWidgetValue(widget).Ign());
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget::OnEnumValueChanged(const QString &_value)
 {
   ConfigChildWidget *widget =
       qobject_cast<ConfigChildWidget *>(QObject::sender());
 
-  for (auto iter : this->configWidgets)
-  {
-    if (iter.second == widget)
-    {
-      std::string scopedName = iter.first;
-      emit EnumValueChanged(tr(scopedName.c_str()), _value);
-      return;
-    }
-  }
+  if (!widget)
+    return;
+
+  emit EnumValueChanged(widget->scopedName.c_str(), _value);
 }
 
 /////////////////////////////////////////////////
@@ -2650,6 +2847,7 @@ bool ConfigWidget::AddConfigChildWidget(const std::string &_name,
     return false;
   }
 
+  _child->scopedName = _name;
   this->configWidgets[_name] = _child;
   return true;
 }
@@ -2891,4 +3089,39 @@ void ConfigWidget::InsertLayout(QLayout *_layout, int _pos)
     return;
 
   boxLayout->insertLayout(_pos, _layout);
+}
+
+/////////////////////////////////////////////////
+QString ConfigWidget::StyleSheet(const std::string &_type, const int _level)
+{
+  if (_type == "normal")
+  {
+    return "QWidget\
+        {\
+          background-color: " + ConfigWidget::bgColors[_level] + ";\
+          color: #4c4c4c;\
+        }\
+        QLabel\
+        {\
+          color: #d0d0d0;\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::widgetColors[_level] +
+        "}";
+  }
+  else if (_type == "warning")
+  {
+    return "QWidget\
+      {\
+        background-color: " + ConfigWidget::bgColors[_level] + ";\
+        color: " + ConfigWidget::redColor + ";\
+      }\
+      QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+      {\
+        background-color: " + ConfigWidget::widgetColors[_level] +
+      "}";
+  }
+  gzwarn << "Requested unknown style sheet type [" << _type << "]" << std::endl;
+  return "";
 }

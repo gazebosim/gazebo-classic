@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
@@ -350,6 +351,28 @@ namespace gazebo
       /// Model::GetWorldEnergyKinetic().
       /// \return this link's total energy
       public: double GetWorldEnergy() const;
+
+      /// \brief Create a joint for this model
+      /// \param[in] _name name of joint
+      /// \param[in] _type type of joint
+      /// \param[in] _parent parent link of joint
+      /// \param[in] _child child link of joint
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(
+        const std::string &_name, const std::string &_type,
+        physics::LinkPtr _parent, physics::LinkPtr _child);
+
+      /// \brief Remove a joint for this model
+      /// \param[in] _name name of joint
+      /// \return true if successful, false if not.
+      public: bool RemoveJoint(const std::string &_name);
+
+      /// \brief Allow Model class to share itself as a boost shared_ptr
+      /// \return a shared pointer to itself
+      public: boost::shared_ptr<Model> shared_from_this();
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();

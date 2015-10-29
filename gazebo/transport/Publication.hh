@@ -19,6 +19,7 @@
 #define _PUBLICATION_HH_
 
 #include <utility>
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <list>

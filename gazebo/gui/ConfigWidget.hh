@@ -58,6 +58,9 @@ namespace gazebo
       /// \brief Widget's key value.
       public: std::string key;
 
+      /// \brief Widget's scoped name within parent config widget.
+      public: std::string scopedName;
+
       /// \brief List of widgets holding values, such as Spins and LineEdits.
       public: std::vector<QWidget *> widgets;
 
@@ -453,6 +456,16 @@ namespace gazebo
       /// \return The number of child widgets.
       public: unsigned int ConfigChildWidgetCount() const;
 
+      /// \brief Get a style sheet in string format, to be applied to a child
+      /// config widget with setStyleSheet.
+      /// \param[in] _type Type of style sheet, such as "warning", "active",
+      /// "normal".
+      /// \param[in] _level Level of widget in the tree.
+      /// \return Style sheet as string. Returns an empty string if _type is
+      /// unknown.
+      public: static QString StyleSheet(const std::string &_type,
+          const int _level = 0);
+
       /// \brief List of colors used for the background of widgets according to
       /// their level.
       public: static const std::vector<QString> bgColors;
@@ -633,13 +646,86 @@ namespace gazebo
       /// \param[in] _column Column index.
       private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
 
+      /// \brief Callback when a uint config widget's value has changed.
+      private slots: void OnUIntValueChanged();
+
+      /// \brief Callback when an int config widget's value has changed.
+      private slots: void OnIntValueChanged();
+
+      /// \brief Callback when a double config widget's value has changed.
+      private slots: void OnDoubleValueChanged();
+
+      /// \brief Callback when a bool config widget's value has changed.
+      private slots: void OnBoolValueChanged();
+
+      /// \brief Callback when a string config widget's value has changed.
+      private slots: void OnStringValueChanged();
+
+      /// \brief Callback when a vector3 config widget's value has changed.
+      private slots: void OnVector3dValueChanged();
+
+      /// \brief Callback when a color config widget's value has changed.
+      private slots: void OnColorValueChanged();
+
+      /// \brief Callback when a pose config widget's value has changed.
+      private slots: void OnPoseValueChanged();
+
       /// \brief Callback when an enum config widget's enum value has changed.
       /// \param[in] _value New enum value in string.
       private slots: void OnEnumValueChanged(const QString &_value);
 
+      /// \brief Signal that a uint config widget's value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _value New uint.
+      Q_SIGNALS: void UIntValueChanged(const QString &_name,
+          const unsigned int _value);
+
+      /// \brief Signal that an int config widget's value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _value New int.
+      Q_SIGNALS: void IntValueChanged(const QString &_name, const int _value);
+
+      /// \brief Signal that a double config widget's value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _value New double.
+      Q_SIGNALS: void DoubleValueChanged(const QString &_name,
+          const double _value);
+
+      /// \brief Signal that a bool config widget's value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _value New bool.
+      Q_SIGNALS: void BoolValueChanged(const QString &_name,
+          const bool _value);
+
+      /// \brief Signal that a string config widget's value has changed.
+      /// Note that only single line widgets will emit signals, so plain
+      /// text widgets don't emit signals.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _value New string.
+      Q_SIGNALS: void StringValueChanged(const QString &_name,
+          const std::string &_value);
+
+      /// \brief Signal that a vector3 config widget's value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _value New vector3.
+      Q_SIGNALS: void Vector3dValueChanged(const QString &_name,
+          const ignition::math::Vector3d &_value);
+
+      /// \brief Signal that a color config widget's value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _value New color.
+      Q_SIGNALS: void ColorValueChanged(const QString &_name,
+          const gazebo::common::Color &_value);
+
+      /// \brief Signal that a pose config widget's value has changed.
+      /// \param[in] _name Scoped name of widget.
+      /// \param[in] _pose New pose.
+      Q_SIGNALS: void PoseValueChanged(const QString &_name,
+          const ignition::math::Pose3d &_pose);
+
       /// \brief Signal that an enum config widget's enum value has changed.
       /// \param[in] _name Scoped name of widget.
-      /// \param[in] _name New enum value string.
+      /// \param[in] _value New enum value string.
       Q_SIGNALS: void EnumValueChanged(const QString &_name,
           const QString &_value);
 
