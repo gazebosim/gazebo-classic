@@ -30,7 +30,7 @@
 
 #include <sdf/sdf.hh>
 
-#include "ignition/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
