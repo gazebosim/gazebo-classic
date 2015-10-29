@@ -112,7 +112,10 @@ namespace gazebo
                 ///   and its associated representations
                 private: const std::vector<
                     std::tuple<std::string, ignition::math::Vector3d,
-                        std::function<float (float)> > > variants = {
+                        std::function<float (float)> > > variants =
+			std::vector<std::tuple<std::string,
+			ignition::math::Vector3d,
+			std::function<float (float)> > >{
                           std::make_tuple("sin",
                               ignition::math::Vector3d::UnitX,
                               std::function<float (float)>(
