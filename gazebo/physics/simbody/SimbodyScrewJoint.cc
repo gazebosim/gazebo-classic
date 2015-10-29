@@ -141,19 +141,6 @@ void SimbodyScrewJoint::SetForceImpl(unsigned int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
-{
-  gzdbg << "SimbodyScrewJoint::SetMaxForce: doesn't make sense in simbody...\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodyScrewJoint::GetMaxForce(unsigned int /*index*/)
-{
-  gzdbg << "SimbodyScrewJoint::GetMaxForce: doesn't make sense in simbody...\n";
-  return 0;
-}
-
-//////////////////////////////////////////////////
 math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics &&

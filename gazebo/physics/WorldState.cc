@@ -90,13 +90,23 @@ void WorldState::Load(const WorldPtr _world)
   this->iterations = _world->GetIterations();
 
   // Add a state for all the models
-  this->modelStates.clear();
   Model_V models = _world->GetModels();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
     this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
         this->simTime, this->iterations);
+  }
+
+  // Remove models that no longer exist. We determine this by check the time
+  // stamp on each model.
+  for (ModelState_M::iterator iter = this->modelStates.begin();
+       iter != this->modelStates.end();)
+  {
+    if (iter->second.GetRealTime() != this->realTime)
+      this->modelStates.erase(iter++);
+    else
+      ++iter;
   }
 
   // Add states for all the lights
@@ -209,7 +219,7 @@ ModelState WorldState::GetModelState(const std::string &_modelName) const
   if (iter != this->modelStates.end())
     return iter->second;
 
-  // Throw exception if the model name doesn't exist.
+  // Error if the model name doesn't exist.
   gzerr << "Invalid model name[" + _modelName + "]." << std::endl;
   return ModelState();
 }
@@ -222,7 +232,7 @@ LightState WorldState::GetLightState(const std::string &_lightName) const
   if (iter != this->lightStates.end())
     return iter->second;
 
-  // Throw exception if the light name doesn't exist.
+  // Error if the light name doesn't exist.
   gzerr << "Invalid light name[" + _lightName + "]." << std::endl;
   return LightState();
 }
@@ -237,6 +247,30 @@ bool WorldState::HasModelState(const std::string &_modelName) const
 bool WorldState::HasLightState(const std::string &_lightName) const
 {
   return this->lightStates.find(_lightName) != this->lightStates.end();
+}
+
+/////////////////////////////////////////////////
+const std::vector<std::string> &WorldState::Insertions() const
+{
+  return this->insertions;
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
+{
+  this->insertions = _insertions;
+}
+
+/////////////////////////////////////////////////
+const std::vector<std::string> &WorldState::Deletions() const
+{
+  return this->deletions;
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetDeletions(const std::vector<std::string> &_deletions)
+{
+  this->deletions = _deletions;
 }
 
 /////////////////////////////////////////////////

@@ -215,6 +215,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (this->model)
   {
     this->childLink = this->model->GetLink(childName);
+    if (!this->childLink)
+    {
+      // need to do this if child link belongs to another model
+      this->childLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(childName));
+    }
     this->parentLink = this->model->GetLink(parentName);
   }
   else
@@ -672,12 +678,6 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   // switch below to return this->SetLowerLimit when we implement
   // issue #1108
   return true;
-}
-
-//////////////////////////////////////////////////
-void Joint::SetAngle(unsigned int _index, math::Angle _angle)
-{
-  this->SetPosition(_index, _angle.Radian());
 }
 
 //////////////////////////////////////////////////

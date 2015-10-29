@@ -7,7 +7,24 @@ release will remove the deprecated code.
 
 ## Gazebo 6.X to 7.X
 
+### Additions
+
+1. **gazebo/physics/Model.hh**
+    + public: gazebo::physics::JointPtr CreateJoint(
+        const std::string &_name, const std::string &_type,
+        physics::LinkPtr _parent, physics::LinkPtr _child);
+    + public: bool RemoveJoint(const std::string &_name);
+    + public: boost::shared_ptr<Model> shared_from_this();
+
 ### Modifications
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Removed:*** public: void SetClipDist();
+    + ***Replacement:*** public: virtual void SetClipDist();
+    
+1. **gazebo/msgs/logical_camera_sensors.proto**
+    + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
+    + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
 
 1. **Light topic**
     + ***Removed:*** ~/light
@@ -16,7 +33,7 @@ release will remove the deprecated code.
     * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
 
 1. **gazebo/rendering/Visual.hh**
-    + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true); 
+    + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true);
     + ***Replacement:*** public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
 1. **gazebo/rendering/OribitViewController.hh**
@@ -47,11 +64,11 @@ release will remove the deprecated code.
 ### Deprecations
 
 1. **gazebo/gui/RTShaderSystem.hh**
-    + ***Deprecation:*** void AttachEntity(Visual *vis) 
+    + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***
 
 1. **gazebo/gui/RTShaderSystem.hh**
-    + ***Deprecation:*** void DetachEntity(Visual *_vis)  
+    + ***Deprecation:*** void DetachEntity(Visual *_vis)
     + ***No replacement for DetachEntity ***
 
 ### Deletions

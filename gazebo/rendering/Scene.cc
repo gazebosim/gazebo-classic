@@ -45,6 +45,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/WideAngleCamera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
@@ -549,6 +550,17 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
                                         bool _autoRender)
 {
   DepthCameraPtr camera(new DepthCamera(this->dataPtr->name + "::" + _name,
+        shared_from_this(), _autoRender));
+  this->dataPtr->cameras.push_back(camera);
+
+  return camera;
+}
+
+//////////////////////////////////////////////////
+WideAngleCameraPtr Scene::CreateWideAngleCamera(const std::string &_name,
+                                                const bool _autoRender)
+{
+  WideAngleCameraPtr camera(new WideAngleCamera(_name,
         shared_from_this(), _autoRender));
   this->dataPtr->cameras.push_back(camera);
 
@@ -2134,6 +2146,10 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
       cameraVis->SetId(_msg->id());
       cameraVis->Load(_msg->logical_camera());
       this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
+    }
+    else if (_msg->has_pose())
+    {
+      iter->second->SetPose(msgs::ConvertIgn(_msg->pose()));
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&

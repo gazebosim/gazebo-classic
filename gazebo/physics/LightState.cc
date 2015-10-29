@@ -70,9 +70,7 @@ const ignition::math::Pose3d LightState::Pose() const
 /////////////////////////////////////////////////
 bool LightState::IsZero() const
 {
-  bool result = true;
-
-  return result && this->pose == ignition::math::Pose3d::Zero;
+  return this->pose == ignition::math::Pose3d::Zero;
 }
 
 /////////////////////////////////////////////////
