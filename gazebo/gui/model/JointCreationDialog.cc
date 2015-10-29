@@ -186,6 +186,10 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QWidget *linksGroupWidget = this->dataPtr->configWidget->CreateGroupWidget(
       "Link Selections", linksWidget, 0);
 
+  // Label when joint has no axes
+  this->dataPtr->axis0Widget = new QLabel(
+      tr("The joint type chosen has no axes"));
+
   // Axis1 widget
   this->dataPtr->axis1Widget =
       this->dataPtr->configWidget->CreateVector3dWidget("axis1", 0);
@@ -202,6 +206,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   auto *axisGeneralLayout = new QVBoxLayout();
   axisGeneralLayout->setContentsMargins(0, 0, 0, 0);
   axisGeneralLayout->setSpacing(0);
+  axisGeneralLayout->addWidget(this->dataPtr->axis0Widget);
   axisGeneralLayout->addWidget(this->dataPtr->axis1Widget);
   axisGeneralLayout->addWidget(this->dataPtr->axis2Widget);
 
@@ -755,24 +760,25 @@ void JointCreationDialog::OnAlign(const int _int)
 /////////////////////////////////////////////////
 void JointCreationDialog::NewType(const int _typeInt)
 {
-//  auto type = static_cast<JointMaker::JointType>(_typeInt);
-//  unsigned int axisCount = JointMaker::GetJointAxisCount(type);
-//
-//  // Display correct number of axes for this type
-//  this->dataPtr->axis1Widget->setVisible(axisCount > 0);
-//  this->dataPtr->axis2Widget->setVisible(axisCount > 1);
-//
-//  // Change child icon color according to type
-//  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
-//  rendering::Material::GetMaterialAsColor(
-//      this->dataPtr->jointMaker->jointMaterials[type],
-//      matAmbient, matDiffuse, matSpecular, matEmissive);
-//
-//  std::ostringstream sheet;
-//  sheet << "QLabel{background-color: rgb(" <<
-//          (matAmbient[0] * 255) << ", " <<
-//          (matAmbient[1] * 255) << ", " <<
-//          (matAmbient[2] * 255) << "); }";
-//
-//  this->dataPtr->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
+  auto type = static_cast<JointMaker::JointType>(_typeInt);
+  unsigned int axisCount = JointMaker::GetJointAxisCount(type);
+
+  // Display correct number of axes for this type
+  this->dataPtr->axis0Widget->setVisible(axisCount == 0);
+  this->dataPtr->axis1Widget->setVisible(axisCount > 0);
+  this->dataPtr->axis2Widget->setVisible(axisCount > 1);
+
+  // Change parent icon color according to type
+  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::GetMaterialAsColor(
+      this->dataPtr->jointMaker->jointMaterials[type],
+      matAmbient, matDiffuse, matSpecular, matEmissive);
+
+  std::ostringstream sheet;
+  sheet << "QLabel{background-color: rgb(" <<
+          (matAmbient[0] * 255) << ", " <<
+          (matAmbient[1] * 255) << ", " <<
+          (matAmbient[2] * 255) << "); }";
+
+  this->dataPtr->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
 }
