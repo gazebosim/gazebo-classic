@@ -234,7 +234,19 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
     else
     {
       acts[i]->setVisible(simulation);
-      acts[i]->setEnabled(simulation);
+
+      // Disable undo / redo
+      if (acts[i] == g_undoAct ||
+          acts[i] == g_undoHistoryAct ||
+          acts[i] == g_redoAct ||
+          acts[i] == g_redoHistoryAct)
+      {
+        acts[i]->setEnabled(false);
+      }
+      else
+      {
+        acts[i]->setEnabled(simulation);
+      }
     }
   }
 }
