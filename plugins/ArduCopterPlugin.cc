@@ -133,21 +133,6 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
               << " direction multiplier ('cw' or 'ccw'). Default 1.\n";
       }
 
-      getSdfParam<double>(rotorSDF, "rotorDragCoefficient",
-        rotor.rotorDragCoefficient, rotor.rotorDragCoefficient);
-      getSdfParam<double>(rotorSDF, "rollingMomentCoefficient",
-        rotor.rollingMomentCoefficient, rotor.rollingMomentCoefficient);
-      getSdfParam<double>(rotorSDF, "maxRotVelocity",
-        rotor.maxRotVelocity, rotor.maxRotVelocity);
-      getSdfParam<double>(rotorSDF, "motorConstant",
-        rotor.motorConstant, rotor.motorConstant);
-      getSdfParam<double>(rotorSDF, "momentConstant",
-        rotor.momentConstant, rotor.momentConstant);
-
-      getSdfParam<double>(rotorSDF, "timeConstantUp",
-        rotor.timeConstantUp, rotor.timeConstantUp);
-      getSdfParam<double>(rotorSDF, "timeConstantDown",
-        rotor.timeConstantDown, rotor.timeConstantDown);
       getSdfParam<double>(rotorSDF, "rotorVelocitySlowdownSim",
         rotor.rotorVelocitySlowdownSim, 1);
 
@@ -157,26 +142,11 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
         rotor.samplingRate, rotor.samplingRate);
 
       /* use gazebo::math::Filter */
-      /// \TODO: compute cutoff frequency from timeConstantUp
-      /// and rotor.timeConstantDown
       rotor.velocityFilter.SetFc(rotor.frequencyCutoff, rotor.samplingRate);
       // initialize filter to zero value
       rotor.velocityFilter.SetValue(0.0);
       // note to use this
       // rotorVelocityFiltered = velocityFilter.Process(rotorVelocityRaw);
-
-      // Set the maximumForce on the joint and use Joint::SetVelocity.
-      #undef USE_SET_VEL /// use SetVelocity or use pid force control
-      #ifdef USE_SET_VEL
-        #if GAZEBO_MAJOR_VERSION < 5
-          rotor.joint->SetMaxForce(0, rotor.maxForce);
-        #else
-          // Joint::SetVelocity is deprecated in Gazebo 5.0
-          // use SetForce with PID velocity feedback control.
-          rotor.joint->SetParam("fmax", 0, 1000.0);
-          // rotor.joint->SetParam("fmax", 0, rotor.maxForce);
-        #endif
-      #endif
 
       // Overload the PID parameters if they are available.
       getSdfParam<double>(rotorSDF, "vel_p_gain", rotor.pGain, rotor.pGain);
@@ -255,18 +225,10 @@ void ArduCopterPlugin::UpdatePIDs(double _dt)
   {
     double velTarget = this->rotors[i].multiplier * this->rotors[i].cmd /
          this->rotors[i].rotorVelocitySlowdownSim;
-    #ifdef USE_SET_VEL
-      #if GAZEBO_MAJOR_VERSION < 5
-        this->rotors[i].joint->SetVelocity(0, velTarget);
-      #else
-       this->rotors[i].joint->SetParam("vel", 0, velTarget);
-      #endif
-    #else
-      double vel = this->rotors[i].joint->GetVelocity(0);
-      double error = vel - velTarget;
-      double force = this->rotors[i].pid.Update(error, _dt);
-      this->rotors[i].joint->SetForce(0, force);
-    #endif
+    double vel = this->rotors[i].joint->GetVelocity(0);
+    double error = vel - velTarget;
+    double force = this->rotors[i].pid.Update(error, _dt);
+    this->rotors[i].joint->SetForce(0, force);
   }
 }
 

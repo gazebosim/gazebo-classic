@@ -118,17 +118,9 @@ namespace gazebo
         this->multiplier = 1;
 
         // most of these coefficients are not used yet.
-        this->rotorDragCoefficient = this->kDefaultRotorDragCoefficient;
-        this->rollingMomentCoefficient = this->kDefaultRollingMomentCoefficient;
-        this->maxRotVelocity = this->kDefaultMaxRotVelocity;
-        this->motorConstant = this->kDefaultMotorConstant;
-        this->momentConstant = this->kDefaultMomentConstant;
-        this->timeConstantUp = this->kDefaultTimeConstantUp;
-        this->timeConstantDown = this->kDefaultTimeConstantDown;
         this->rotorVelocitySlowdownSim = this->kDefaultRotorVelocitySlowdownSim;
         this->frequencyCutoff = this->kDefaultFrequencyCutoff;
         this->samplingRate = this->kDefaultSamplingRate;
-        this->maxForce = this->kDefaultMaxForce;
 
         this->pGain = 0.10;
         this->iGain = 0;
@@ -180,32 +172,12 @@ namespace gazebo
       /// \brief direction multiplier for this rotor
       protected: double multiplier;
 
-      /// \brief max joint force
-      protected: double maxForce;
-
       /// \brief unused coefficients
-      protected: double rotorDragCoefficient;
-      protected: double rollingMomentCoefficient;
-      protected: double maxRotVelocity;
-      protected: double motorConstant;
-      protected: double momentConstant;
-      protected: double timeConstantUp;
-      protected: double timeConstantDown;
       protected: double rotorVelocitySlowdownSim;
       protected: double frequencyCutoff;
       protected: double samplingRate;
       protected: math::OnePole<double> velocityFilter;
 
-      private: static constexpr double kDefaultMaxForce =
-        std::numeric_limits<double>::max();
-      private: static constexpr double kDefaultMaxRotVelocity = 853;
-      private: static constexpr double kDefaultMotorConstant = 8.54858e-06;
-      private: static constexpr double kDefaultMomentConstant = 0.016;
-      private: static constexpr double kDefaultTimeConstantUp = 1.0 / 80.0;
-      private: static constexpr double kDefaultTimeConstantDown = 1.0 / 40.0;
-      private: static constexpr double kDefaulMaxRotVelocity = 838.0;
-      private: static constexpr double kDefaultRotorDragCoefficient = 1.0e-4;
-      private: static constexpr double kDefaultRollingMomentCoefficient = 1e-6;
       private: static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
       private: static constexpr double kDefaultFrequencyCutoff = 5.0;
       private: static constexpr double kDefaultSamplingRate = 0.2;
