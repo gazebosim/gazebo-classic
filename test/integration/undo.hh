@@ -29,16 +29,19 @@ class UndoTest : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Default constructor
+  public: UndoTest() = default;
+
   /// \brief Test message passing between gui::UserCmdHistory and
   /// physics::UserCmdManager.
   private slots: void MsgPassing();
 
   /// \brief UndoRedo message received
-  /// \brief _msg Message containing an undo/redo request.
+  /// \param[in] _msg Message containing an undo/redo request.
   private: void OnUndoRedo(ConstUndoRedoPtr &_msg);
 
   /// \brief UserCmdStats message received
-  /// \brief _msg Message containing statistics about user commands saved in
+  /// \param[in] _msg Message containing statistics about user commands saved in
   /// the server.
   private: void OnUserCmdStats(ConstUserCmdStatsPtr &_msg);
 

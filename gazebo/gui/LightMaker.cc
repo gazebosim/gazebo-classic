@@ -176,7 +176,6 @@ void LightMaker::CreateTheEntity()
   // Register user command on server
 gzdbg << "LightMaker::CreateTheEntity" << std::endl;
   msgs::UserCmd userCmdMsg;
-  userCmdMsg.set_id("Insert [" + dPtr->msg.name() + "]");
   userCmdMsg.set_description("Insert [" + dPtr->msg.name() + "]");
   userCmdMsg.set_type(msgs::UserCmd::INSERTING);
   userCmdMsg.set_entity_name(dPtr->msg.name());

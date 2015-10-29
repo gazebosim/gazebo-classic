@@ -37,10 +37,10 @@ using namespace physics;
 
 
 /////////////////////////////////////////////////
-UserCmd::UserCmd(std::string _id,
+UserCmd::UserCmd(const unsigned int _id,
                  physics::WorldPtr _world,
                  const std::string &_description,
-                 msgs::UserCmd::Type _type,
+                 const msgs::UserCmd::Type _type,
                  const std::string &_name)
   : dataPtr(new UserCmdPrivate())
 {
@@ -192,19 +192,19 @@ gzdbg << "UserCmd::Redo" << std::endl;
 }
 
 /////////////////////////////////////////////////
-std::string UserCmd::Id()
+unsigned int UserCmd::Id() const
 {
   return this->dataPtr->id;
 }
 
 /////////////////////////////////////////////////
-std::string UserCmd::Description()
+std::string UserCmd::Description() const
 {
   return this->dataPtr->description;
 }
 
 /////////////////////////////////////////////////
-msgs::UserCmd::Type UserCmd::Type()
+msgs::UserCmd::Type UserCmd::Type() const
 {
   return this->dataPtr->type;
 }
@@ -226,6 +226,8 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
 
   this->dataPtr->userCmdStatsPub =
     this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
+
+  this->dataPtr->idCounter = 0;
 }
 
 /////////////////////////////////////////////////
@@ -238,17 +240,16 @@ UserCmdManager::~UserCmdManager()
 /////////////////////////////////////////////////
 void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 {
+  // Generate unique id
+  unsigned int id = this->dataPtr->idCounter++;
+
   std::string name;
   if (_msg->has_entity_name())
     name = _msg->entity_name();
 
   // Create command
-  UserCmd *cmd = new UserCmd(
-      _msg->id(),
-      this->dataPtr->world,
-      _msg->description(),
-      _msg->type(),
-      name);
+  UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
+      _msg->type(), name));
 
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmd);
@@ -273,7 +274,7 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
     }
 
     // Get the last done command
-    UserCmd *cmd = this->dataPtr->undoCmds.back();
+    UserCmdPtr cmd = this->dataPtr->undoCmds.back();
 
     // If there's an id, get that command instead
     if (_msg->has_id())
@@ -320,7 +321,7 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
     }
 
     // Get last undone command
-    UserCmd *cmd = this->dataPtr->redoCmds.back();
+    UserCmdPtr cmd = this->dataPtr->redoCmds.back();
 
     // If there's an id, get that command instead
     if (_msg->has_id())

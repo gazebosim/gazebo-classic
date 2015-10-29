@@ -370,7 +370,6 @@ void ModelMaker::CreateTheEntity()
   // Register user command on server
 gzdbg << "ModelMaker::CreateTheEntity" << std::endl;
   msgs::UserCmd userCmdMsg;
-  userCmdMsg.set_id("Insert [" + modelName + "]");
   userCmdMsg.set_description("Insert [" + modelName + "]");
   userCmdMsg.set_type(msgs::UserCmd::INSERTING);
   userCmdMsg.set_entity_name(modelName);

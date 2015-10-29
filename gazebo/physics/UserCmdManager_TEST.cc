@@ -15,10 +15,11 @@
  *
 */
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 #include "gazebo/physics/UserCmdManager.hh"
-#include "sdf/sdf.hh"
 
 using namespace gazebo;
 
@@ -42,7 +43,7 @@ TEST_F(UserCmdManagerTest, CreateCmd)
   EXPECT_TRUE(manager != NULL);
 
   // Create the command
-  std::string id = "unique_id";
+  unsigned int id = 21;
   std::string description = "Command description";
   msgs::UserCmd::Type type = msgs::UserCmd::MOVING;
   physics::UserCmd *cmd = new physics::UserCmd(id, world, description, type);

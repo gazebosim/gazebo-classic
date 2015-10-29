@@ -337,7 +337,6 @@ void ModelRightMenu::OnDelete(const std::string &_name)
     // Send user command and UserCmdManager will publish delete request
   gzdbg << "ModelRightMenu::OnDelete" << std::endl;
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_id("Delete [" + name + "]");
     userCmdMsg.set_description("Delete " + name + "]");
     userCmdMsg.set_type(msgs::UserCmd::DELETING);
     userCmdMsg.set_entity_name(name);
