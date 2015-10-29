@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_LOGPLAY_HH_
 #define _GAZEBO_LOGPLAY_HH_
 
-#include <tinyxml2.h>
+#include "tinyxml2.h"
 
 #include <list>
 #include <mutex>
