@@ -480,24 +480,25 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
 /////////////////////////////////////////////////
 void JointCreationDialog::OnLinkFromDialog()
 {
-//  std::string currentParent =
-//      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
-//  std::string currentChild =
-//      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
-//
-//  // Notify so 3D is updated
-//  if (currentParent != currentChild)
-//  {
+  std::string currentParent =
+      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
+
+  // Notify so 3D is updated
+  if (currentParent != currentChild)
+  {
 //    if (currentParent != "")
 //      this->dataPtr->jointMaker->NewParentLink(currentParent);
 //    if (currentChild != "")
 //      this->dataPtr->jointMaker->NewChildLink(currentChild);
-//  }
-//
-//  this->OnParentImpl(QString::fromStdString(currentParent));
-//
-//  if (currentChild != "")
-//    this->OnChildImpl(QString::fromStdString(currentChild));
+  }
+
+  if (currentParent != "")
+    this->OnParentImpl(QString::fromStdString(currentParent));
+
+  if (currentChild != "")
+    this->OnChildImpl(QString::fromStdString(currentChild));
 }
 
 /////////////////////////////////////////////////
@@ -579,48 +580,48 @@ void JointCreationDialog::NewChild(const std::string &_linkName)
 /////////////////////////////////////////////////
 void JointCreationDialog::OnParentImpl(const QString &_linkName)
 {
-//  if (_linkName.isEmpty())
-//  {
-//    gzerr << "Empty link name for parent" << std::endl;
-//    return;
-//  }
-//
-//  // Remove empty option
-//  this->dataPtr->configWidget->RemoveItemEnumWidget("parentCombo", "");
-//
-//  // Check if links are valid
-//  this->CheckLinksValid();
-//
-//  // Enable child selection
-//  if (this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
-//  {
-//    this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", false);
-//    this->dataPtr->childLinkWidget->setStyleSheet(
-//        ConfigWidget::StyleSheet("active", 1));
-//  }
+  if (_linkName.isEmpty())
+  {
+    gzerr << "Empty link name for parent" << std::endl;
+    return;
+  }
+
+  // Remove empty option
+  this->dataPtr->configWidget->RemoveItemEnumWidget("parentCombo", "");
+
+  // Check if links are valid
+  this->CheckLinksValid();
+
+  // Enable child selection
+  if (this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
+  {
+    this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", false);
+    this->dataPtr->childLinkWidget->setStyleSheet(
+        ConfigWidget::StyleSheet("active", 1));
+  }
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::OnChildImpl(const QString &_linkName)
 {
-//  if (_linkName.isEmpty())
-//  {
-//    gzerr << "Empty link name for child" << std::endl;
-//    return;
-//  }
-//
-//  // Enable create and swap
-//  this->dataPtr->createButton->setEnabled(true);
-//  this->dataPtr->swapButton->setEnabled(true);
-//
-//  // Remove empty option
-//  this->dataPtr->configWidget->RemoveItemEnumWidget("childCombo", "");
-//
-//  // Update selection text
-//  this->dataPtr->selectionsText->setText("Select parent and child links");
-//
-//  // Check if links are valid
-//  this->CheckLinksValid();
+  if (_linkName.isEmpty())
+  {
+    gzerr << "Empty link name for child" << std::endl;
+    return;
+  }
+
+  // Enable create and swap
+  this->dataPtr->createButton->setEnabled(true);
+  this->dataPtr->swapButton->setEnabled(true);
+
+  // Remove empty option
+  this->dataPtr->configWidget->RemoveItemEnumWidget("childCombo", "");
+
+  // Hide selection text
+  this->dataPtr->selectionsText->setVisible(false);
+
+  // Check if links are valid
+  this->CheckLinksValid();
 }
 
 /////////////////////////////////////////////////
@@ -646,15 +647,15 @@ void JointCreationDialog::enterEvent(QEvent */*_event*/)
 /////////////////////////////////////////////////
 void JointCreationDialog::OnSwap()
 {
-//  // Get current values
-//  std::string currentParent =
-//      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
-//  std::string currentChild =
-//      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
-//
-//  // Choose new values
-//  this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
-//  this->dataPtr->configWidget->SetEnumWidgetValue("childCombo", currentParent);
+  // Get current values
+  std::string currentParent =
+      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
+
+  // Choose new values
+  this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
+  this->dataPtr->configWidget->SetEnumWidgetValue("childCombo", currentParent);
 }
 
 /////////////////////////////////////////////////
@@ -685,38 +686,38 @@ void JointCreationDialog::OnResetPoses()
 void JointCreationDialog::OnEnumChanged(const QString &_name,
     const QString &/*_value*/)
 {
-//  if (_name == "parentCombo" || _name == "childCombo")
-//    this->OnLinkFromDialog();
+  if (_name == "parentCombo" || _name == "childCombo")
+    this->OnLinkFromDialog();
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::CheckLinksValid()
 {
-//  std::string currentParent =
-//      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
-//  std::string currentChild =
-//      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
-//
-//  // Warning if parent is the same as the child and don't allow creation
-//  if (currentParent == currentChild)
-//  {
-//    this->dataPtr->parentLinkWidget->setStyleSheet(
-//        ConfigWidget::StyleSheet("warning", 1));
-//    this->dataPtr->childLinkWidget->setStyleSheet(
-//        ConfigWidget::StyleSheet("warning", 1));
-//    this->dataPtr->createButton->setEnabled(false);
-//  }
-//  else
-//  {
-//    this->dataPtr->parentLinkWidget->setStyleSheet(
-//        ConfigWidget::StyleSheet("normal", 1));
-//    if (!this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
-//    {
-//      this->dataPtr->childLinkWidget->setStyleSheet(
-//          ConfigWidget::StyleSheet("normal", 1));
-//      this->dataPtr->createButton->setEnabled(true);
-//    }
-//  }
+  std::string currentParent =
+      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
+  std::string currentChild =
+      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
+
+  // Warning if parent is the same as the child and don't allow creation
+  if (currentParent == currentChild)
+  {
+    this->dataPtr->parentLinkWidget->setStyleSheet(
+        ConfigWidget::StyleSheet("warning", 1));
+    this->dataPtr->childLinkWidget->setStyleSheet(
+        ConfigWidget::StyleSheet("warning", 1));
+    this->dataPtr->createButton->setEnabled(false);
+  }
+  else
+  {
+    this->dataPtr->parentLinkWidget->setStyleSheet(
+        ConfigWidget::StyleSheet("normal", 1));
+    if (!this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
+    {
+      this->dataPtr->childLinkWidget->setStyleSheet(
+          ConfigWidget::StyleSheet("normal", 1));
+      this->dataPtr->createButton->setEnabled(true);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
