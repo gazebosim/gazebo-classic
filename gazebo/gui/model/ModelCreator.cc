@@ -343,7 +343,8 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
 
 /////////////////////////////////////////////////
 NestedModelData *ModelCreator::CreateModelFromSDF(
-    const sdf::ElementPtr &_modelElem, const rendering::VisualPtr &_parentVis)
+    const sdf::ElementPtr &_modelElem, const rendering::VisualPtr &_parentVis,
+    const bool _emit)
 {
   rendering::VisualPtr modelVisual;
   std::stringstream modelNameStream;
@@ -431,7 +432,10 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
     this->allNestedModels[nestedModelName] = modelData;
 
-    gui::model::Events::nestedModelInserted(nestedModelName);
+    // fire nested inserted events only when the nested model is
+    //  not attached to the mouse
+    if (_emit)
+      gui::model::Events::nestedModelInserted(nestedModelName);
   }
 
   // Recursively load models nested in this model
@@ -446,7 +450,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
       this->canonicalModel = nestedModelName;
 
     NestedModelData *nestedModelData =
-        this->CreateModelFromSDF(nestedModelElem, modelVisual);
+        this->CreateModelFromSDF(nestedModelElem, modelVisual, _emit);
     rendering::VisualPtr nestedModelVis = nestedModelData->modelVisual;
     modelData->models[nestedModelVis->GetName()] = nestedModelVis;
     nestedModelElem = nestedModelElem->GetNextElement("model");
@@ -1169,7 +1173,6 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
   // Copy before reference is deleted.
   std::string nestedModelName(_nestedModelName);
 
-
   // remove all its models
   for (auto &modelIt : modelData->models)
     this->RemoveNestedModelImpl(modelIt.first);
@@ -1426,11 +1429,11 @@ void ModelCreator::AddEntity(sdf::ElementPtr _sdf)
   {
     // Create a top-level nested model
     NestedModelData *modelData =
-        this->CreateModelFromSDF(_sdf, this->previewVisual);
-
-    rendering::VisualPtr entityVisual = modelData->modelVisual;
+        this->CreateModelFromSDF(_sdf, this->previewVisual, false);
 
     this->addEntityType = ENTITY_MODEL;
+    rendering::VisualPtr entityVisual = modelData->modelVisual;
+
     this->mouseVisual = entityVisual;
   }
 }
@@ -1652,7 +1655,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         NestedModelData *modelData = modelIt->second;
         modelData->SetPose((
             this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
-        gui::model::Events::nestedModelInserted(this->mouseVisual->GetName());
+
+        this->EmitNestedModelInsertedEvent(this->mouseVisual);
       }
     }
 
@@ -1733,6 +1737,23 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     }
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::EmitNestedModelInsertedEvent(
+    const rendering::VisualPtr &_vis) const
+{
+  if (!_vis)
+    return;
+
+  auto modelIt = this->allNestedModels.find(_vis->GetName());
+  if (modelIt != this->allNestedModels.end())
+    gui::model::Events::nestedModelInserted(_vis->GetName());
+  else
+    return;
+
+  for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+    this->EmitNestedModelInsertedEvent(_vis->GetChild(i));
 }
 
 /////////////////////////////////////////////////

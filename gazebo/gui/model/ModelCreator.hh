@@ -374,9 +374,11 @@ namespace gazebo
       /// \param[in] _sdf SDF of a model to be loaded
       /// \param[in] _parentVis If this is not the root model, it will have a
       /// parent visual for its parent model.
+      /// \param[in] _emit True to emit nested model inserted events.
       /// \return Data describing the model.
       private: NestedModelData *CreateModelFromSDF(const sdf::ElementPtr &_sdf,
-          const rendering::VisualPtr &_parentVis = NULL);
+          const rendering::VisualPtr &_parentVis = NULL,
+          const bool _emit = true);
 
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
@@ -424,6 +426,11 @@ namespace gazebo
       /// \brief Show a model plugin's context menu
       /// \param[in] _name Name of model plugin.
       private: void ShowModelPluginContextMenu(const std::string &_name);
+
+      /// \brief Helper function to emit nestedModelInserted events.
+      /// \param[in] _vis Visual representing the nested mdoel.
+      private: void EmitNestedModelInsertedEvent(
+          const rendering::VisualPtr &_vis) const;
 
       /// \brief Qt callback when a delete signal has been emitted. This is
       /// currently triggered by the context menu via right click.
