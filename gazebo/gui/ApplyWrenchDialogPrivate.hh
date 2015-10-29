@@ -102,6 +102,10 @@ namespace gazebo
       /// \brief Publishes the wrench message.
       public: transport::PublisherPtr wrenchPub;
 
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      public: transport::PublisherPtr userCmdPub;
+
       /// \brief Visual of the targeted link.
       public: rendering::VisualPtr linkVisual;
 
