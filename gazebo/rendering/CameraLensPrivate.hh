@@ -129,7 +129,7 @@ namespace gazebo
                 ///   and its associated representations
                 private: std::vector<std::tuple<std::string,
                          ignition::math::Vector3d,
-                           std::function<float (float)>>> variants;
+                           std::function<float (float)> > > variants;
 
 
                 /// \brief Current value of enumeration
