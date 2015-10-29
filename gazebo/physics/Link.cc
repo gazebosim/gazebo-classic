@@ -1132,17 +1132,19 @@ bool Link::VisualId(const std::string &_visName, uint32_t &_visualId) const
       _visualId = iter.first;
       return true;
     }
-  gzerr << "Invalid visual name[" << _visName << "]\n";
+  gzerr << "Trying to get unique ID of visual from invalid visual name["
+        << _visName << "] for link [" << this->GetScopedName() << "]\n";
   return false;
 }
 
 //////////////////////////////////////////////////
-bool Link::VisualPose(uint32_t _id, math::Pose &_pose) const
+bool Link::VisualPose(uint32_t _id, ignition::math::Pose3d &_pose) const
 {
   auto iter = this->visuals.find(_id);
   if (iter == this->visuals.end())
   {
-    gzerr << "Invalid visual id[" << _id << "]\n";
+    gzerr << "Trying to get pose of visual from invalid visual id[" << _id
+          << "] for link [" << this->GetScopedName() << "]\n";
     return false;
   }
   const msgs::Visual &msg = iter->second;
@@ -1151,16 +1153,17 @@ bool Link::VisualPose(uint32_t _id, math::Pose &_pose) const
 }
 
 //////////////////////////////////////////////////
-bool Link::SetVisualPose(uint32_t _id, const math::Pose &_pose)
+bool Link::SetVisualPose(uint32_t _id, const ignition::math::Pose3d &_pose)
 {
   auto iter = this->visuals.find(_id);
   if (iter == this->visuals.end())
   {
-    gzerr << "Invalid visual id[" << _id << "]\n";
+    gzerr << "Trying to set pose of visual from invalid visual id[" << _id
+          << "] for link [" << this->GetScopedName() << "]\n";
     return false;
   }
   msgs::Visual &msg = iter->second;
-  msgs::Set(msg.mutable_pose(), _pose.Ign());
+  msgs::Set(msg.mutable_pose(), _pose);
   std::string linkName = this->GetScopedName();
   if (this->sdf->HasElement("visual"))
   {
@@ -1185,7 +1188,7 @@ bool Link::SetVisualPose(uint32_t _id, const math::Pose &_pose)
   visual.set_id(_id);
   visual.set_parent_name(linkName);
   visual.set_parent_id(this->GetId());
-  msgs::Set(visual.mutable_pose(), _pose.Ign());
+  msgs::Set(visual.mutable_pose(), _pose);
   this->visPub->Publish(visual);
   return true;
 }
