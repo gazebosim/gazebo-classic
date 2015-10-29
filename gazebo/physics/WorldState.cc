@@ -250,6 +250,30 @@ bool WorldState::HasLightState(const std::string &_lightName) const
 }
 
 /////////////////////////////////////////////////
+const std::vector<std::string> &WorldState::Insertions() const
+{
+  return this->insertions;
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
+{
+  this->insertions = _insertions;
+}
+
+/////////////////////////////////////////////////
+const std::vector<std::string> &WorldState::Deletions() const
+{
+  return this->deletions;
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetDeletions(const std::vector<std::string> &_deletions)
+{
+  this->deletions = _deletions;
+}
+
+/////////////////////////////////////////////////
 bool WorldState::IsZero() const
 {
   bool result = this->insertions.size() == 0 && this->deletions.size() == 0;

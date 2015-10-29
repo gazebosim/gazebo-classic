@@ -456,6 +456,16 @@ namespace gazebo
       /// \return The number of child widgets.
       public: unsigned int ConfigChildWidgetCount() const;
 
+      /// \brief Get a style sheet in string format, to be applied to a child
+      /// config widget with setStyleSheet.
+      /// \param[in] _type Type of style sheet, such as "warning", "active",
+      /// "normal".
+      /// \param[in] _level Level of widget in the tree.
+      /// \return Style sheet as string. Returns an empty string if _type is
+      /// unknown.
+      public: static QString StyleSheet(const std::string &_type,
+          const int _level = 0);
+
       /// \brief List of colors used for the background of widgets according to
       /// their level.
       public: static const std::vector<QString> bgColors;

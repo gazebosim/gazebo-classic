@@ -1,5 +1,12 @@
 ## Gazebo 7.0
 
+1. Improve overall speed of log playback. Added new functions to LogPlay.
+   Use tinyxml2 for playback.
+    * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
+
+1 Added Ignition Transport dependency.
+  * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
+
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
 `gazebo/gui/ConfigWidget.cc`, so I replaced it with `TYPE_*`.
@@ -7,7 +14,7 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 
 1. Added wide angle camera sensor.
     * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
-    
+
 1. Change the `near` and `far` members of `gazebo/msgs/logical_camera_sensors.proto` to `near_clip` and `far_clip`
     + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
 
@@ -122,6 +129,9 @@ using the same arguments used in the command line.
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
+    1. Added icons for child and parent link in joint inspector
+        * [Pull request #1953](https://bitbucket.org/osrf/gazebo/pull-request/1953)
+
     1. Load and save nested models
         * [Pull request #1894](https://bitbucket.org/osrf/gazebo/pull-request/1894)
 
@@ -141,11 +151,22 @@ using the same arguments used in the command line.
 
 ## Gazebo 6.0
 
-### Gazebo 6.x.x
+### Gazebo 6.5.0 (2015-10-22)
+
+1. Added ability to convert from spherical coordinates to local coordinates.
+    * [Pull request #1955](https://bitbucket.org/osrf/gazebo/pull-request/1955)
+
+### Gazebo 6.4.0 (2015-10-14)
+
+1. Fix ABI problem. Make `Sensor::SetPose` function non virtual.
+    * [Pull request #1947](https://bitbucket.org/osrf/gazebo/pull-request/1947)
 
 1. Update inertia properties during simulation
     * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
     * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
+    
+1. Fix transparency correction for opaque materials
+    * [Pull request #1946](https://bitbucket.org/osrf/gazebo/pull-requests/1946/fix-transparency-correction-for-opaque/diff)
 
 ### Gazebo 6.3.0 (2015-10-06)
 
