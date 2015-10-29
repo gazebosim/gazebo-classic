@@ -139,7 +139,8 @@ namespace gazebo
       private: void keyPressEvent(QKeyEvent *_event);
 
       /// \brief Enable ok button if all values in the dialog are valid.
-      private: void CheckValid();
+      /// \return True if all values are valid.
+      private: bool CheckValid();
 
       /// \brief Config widget for configuring joint properties.
       private: ConfigWidget *configWidget;
@@ -167,6 +168,10 @@ namespace gazebo
       /// \brief Unique ID which identifies this joint in the joint maker.
       private: std::string jointId;
 
+      /// \brief Label holding icon which represents the parent link. The icon
+      /// color changes according to the joint type.
+      private: QLabel *parentIcon;
+
       /// \brief Flag that indicates whether current joint name is valid.
       private: bool validJointName;
 
@@ -176,10 +181,6 @@ namespace gazebo
       /// \brief Message containing the data which was in the widget when first
       /// open.
       private: msgs::Joint originalDataMsg;
-
-      /// \brief Label holding icon which represents the parent link. The icon
-      /// color changes according to the joint type.
-      private: QLabel *parentIcon;
     };
     /// \}
   }

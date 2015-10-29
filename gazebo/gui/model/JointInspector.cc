@@ -208,9 +208,6 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
       const std::string &)), this, SLOT(OnStringChanged(const QString &,
       const std::string &)));
 
-  // Set initial joint type
-  this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
-
   // Scroll area
   QScrollArea *scrollArea = new QScrollArea;
   scrollArea->setWidget(this->configWidget);
@@ -269,6 +266,9 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Initialize variables
   this->validJointName = true;
   this->validLinks = true;
+
+  // Set initial joint type
+  this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -333,14 +333,16 @@ void JointInspector::OnEnumChanged(const QString &_name,
 void JointInspector::OnPoseChanged(const QString &/*_name*/,
     const ignition::math::Pose3d &/*_pose*/)
 {
-  emit Applied();
+  if (this->CheckValid())
+    emit Applied();
 }
 
 /////////////////////////////////////////////////
 void JointInspector::OnVector3dChanged(const QString &/*_name*/,
     const ignition::math::Vector3d &/*_vec*/)
 {
-  emit Applied();
+  if (this->CheckValid())
+    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -365,8 +367,7 @@ void JointInspector::OnStringChanged(const QString &_name,
   }
 
   // Only apply if all fields are valid
-  this->CheckValid();
-  if (this->okButton->isEnabled())
+  if (this->CheckValid())
     emit Applied();
 }
 
@@ -421,7 +422,8 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
 
   this->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
 
-  emit Applied();
+  if (this->CheckValid())
+    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -446,8 +448,7 @@ void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
   this->validLinks = currentParent != currentChild;
 
   // Only apply if all fields are valid
-  this->CheckValid();
-  if (this->okButton->isEnabled())
+  if (this->CheckValid())
     emit Applied();
 }
 
@@ -559,6 +560,9 @@ void JointInspector::RestoreOriginalData()
   this->configWidget->blockSignals(true);
   this->Update(jointPtr);
 
+  // Update joint type and parent icon
+  this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointPtr->type()).c_str()));
+
   // Update custom widgets
   this->configWidget->SetEnumWidgetValue("parentCombo",
       this->configWidget->GetStringWidgetValue("parent"));
@@ -566,7 +570,8 @@ void JointInspector::RestoreOriginalData()
       this->configWidget->GetStringWidgetValue("child"));
   this->configWidget->blockSignals(false);
 
-  emit Applied();
+  if (this->CheckValid())
+    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -580,8 +585,16 @@ void JointInspector::OnCancel()
 /////////////////////////////////////////////////
 void JointInspector::OnOK()
 {
-  emit Applied();
-  this->accept();
+  if (this->CheckValid())
+  {
+    emit Applied();
+    this->accept();
+  }
+  else
+  {
+    gzerr << "It shouldn't be possible to press Ok with invalid inputs." <<
+        std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -591,11 +604,14 @@ void JointInspector::enterEvent(QEvent */*_event*/)
 }
 
 /////////////////////////////////////////////////
-void JointInspector::CheckValid()
+bool JointInspector::CheckValid()
 {
   bool valid = this->validJointName && this->validLinks;
 
-  this->okButton->setEnabled(valid);
+  if (this->okButton)
+    this->okButton->setEnabled(valid);
+
+  return valid;
 }
 
 /////////////////////////////////////////////////

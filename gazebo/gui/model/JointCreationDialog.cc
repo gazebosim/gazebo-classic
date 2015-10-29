@@ -36,7 +36,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setWindowTitle(tr("Create Joint"));
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
-  this->setMinimumWidth(300);
+  this->setMinimumWidth(500);
   this->setMinimumHeight(1000);
 
   this->dataPtr->jointMaker = _jointMaker;
@@ -173,6 +173,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   // Links layout
   QGridLayout *linksLayout = new QGridLayout();
   linksLayout->setContentsMargins(0, 0, 0, 0);
+  linksLayout->setSpacing(0);
   linksLayout->addWidget(this->dataPtr->selectionsText, 0, 0, 1, 2);
   linksLayout->addWidget(this->dataPtr->parentLinkWidget, 1, 0);
   linksLayout->addWidget(this->dataPtr->childLinkWidget, 2, 0);
@@ -200,6 +201,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   // Axis general layout
   auto *axisGeneralLayout = new QVBoxLayout();
   axisGeneralLayout->setContentsMargins(0, 0, 0, 0);
+  axisGeneralLayout->setSpacing(0);
   axisGeneralLayout->addWidget(this->dataPtr->axis1Widget);
   axisGeneralLayout->addWidget(this->dataPtr->axis2Widget);
 
@@ -315,6 +317,9 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   alignLayout->addWidget(zAlignCenter, 2, 2);
   alignLayout->addWidget(zAlignMax, 2, 3);
   alignLayout->addWidget(this->dataPtr->alignCombo, 0, 4, 1, 3);
+  alignLayout->setAlignment(xAlignLabel, Qt::AlignRight);
+  alignLayout->setAlignment(yAlignLabel, Qt::AlignRight);
+  alignLayout->setAlignment(zAlignLabel, Qt::AlignRight);
 
   // Align group widget
   ConfigChildWidget *alignWidget = new ConfigChildWidget();
@@ -342,7 +347,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       relativePoseWidget);
 
   // Reset pose button
-  QPushButton *resetPoseButton = new QPushButton(tr("Reset"));
+  QPushButton *resetPoseButton = new QPushButton(tr(
+      "Reset parent and child poses"));
   resetPoseButton->setToolTip("Reset parent and child poses");
   connect(resetPoseButton, SIGNAL(clicked()), this,
       SLOT(OnResetPoses()));
@@ -369,6 +375,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Config Widget layout
   QVBoxLayout *configLayout = new QVBoxLayout();
+  configLayout->setSpacing(0);
   configLayout->addWidget(typesGroupWidget);
   configLayout->addWidget(linksGroupWidget);
   configLayout->addWidget(axisGroupWidget);
