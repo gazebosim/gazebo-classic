@@ -29,7 +29,7 @@
 %deps_path%\ign-math\build\install\%build_type%\lib;^
 %deps_path%\ign-transport\build\install\%build_type%\lib;^
 %deps_path%\tbb43_20141023oss\bin\intel64\vc12;^
-%deps_path%\protobuf-2.6.1\vsprojects\Release;^
+%deps_path%\protobuf-2.6.1\vsprojects\%build_type%;^
 %gz_build_path%\deps\libccd;^
 %gz_build_path%\deps\opende\OPCODE;^
 %gz_build_path%\deps\opende\ou;^

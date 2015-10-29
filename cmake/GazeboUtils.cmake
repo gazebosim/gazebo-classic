@@ -140,7 +140,6 @@ macro (gz_setup_windows)
 
     # Need for M_PI constant
     add_definitions(-D_USE_MATH_DEFINES) 
-    # add_definitions(-DPROTOBUF_USE_DLLS) 
 
     # Don't pull in the Windows min/max macros
     add_definitions(-DNOMINMAX) 
