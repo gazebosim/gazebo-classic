@@ -40,7 +40,7 @@ class PhysicsTest : public ServerFixture,
 void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
 {
   // check conservation of mementum for linear elastic collision
-  Load("worlds/collision_test.world", true, _physicsEngine);
+  Load("worlds/elastic_modulus_contact_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
