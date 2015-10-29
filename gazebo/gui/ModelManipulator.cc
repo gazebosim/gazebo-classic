@@ -97,7 +97,7 @@ void ModelManipulator::Init()
   this->dataPtr->modelPub =
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
   this->dataPtr->lightPub =
-      this->dataPtr->node->Advertise<msgs::Light>("~/light");
+      this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
@@ -565,8 +565,6 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     }
 
     msgs::UserCmd userCmdMsg;
-    userCmdMsg.set_id(description + _vis->GetName() + "]" +
-        gazebo::common::Time::GetWallTimeAsISOString());
     userCmdMsg.set_description(description + _vis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
     this->dataPtr->userCmdPub->Publish(userCmdMsg);

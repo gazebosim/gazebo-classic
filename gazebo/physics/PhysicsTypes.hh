@@ -36,6 +36,7 @@ namespace gazebo
     class World;
     class Model;
     class Actor;
+    class Light;
     class Link;
     class Collision;
     class FrictionPyramid;
@@ -44,6 +45,7 @@ namespace gazebo
     class JointController;
     class Contact;
     class PresetManager;
+    class UserCmd;
     class UserCmdManager;
     class PhysicsEngine;
     class Mass;
@@ -61,6 +63,7 @@ namespace gazebo
     class HeightmapShape;
     class PolylineShape;
     class ModelState;
+    class LightState;
     class LinkState;
     class JointState;
 
@@ -88,6 +91,10 @@ namespace gazebo
     /// \brief Boost shared pointer to an Actor object
     typedef boost::shared_ptr<Actor> ActorPtr;
 
+    /// \def LightPtr
+    /// \brief Boost shared pointer to a Light object
+    typedef boost::shared_ptr<Light> LightPtr;
+
     /// \def LinkPtr
     /// \brief Boost shared pointer to a Link object
     typedef boost::shared_ptr<Link> LinkPtr;
@@ -112,9 +119,13 @@ namespace gazebo
     /// \brief Shared pointer to a PresetManager object
     typedef boost::shared_ptr<PresetManager> PresetManagerPtr;
 
+    /// \def  UserCmdPtr
+    /// \brief Shared pointer to a UserCmd object
+    typedef std::shared_ptr<UserCmd> UserCmdPtr;
+
     /// \def  UserCmdManagerPtr
     /// \brief Shared pointer to a UserCmdManager object
-    typedef boost::shared_ptr<UserCmdManager> UserCmdManagerPtr;
+    typedef std::shared_ptr<UserCmdManager> UserCmdManagerPtr;
 
     /// \def ShapePtr
     /// \brief Boost shared pointer to a Shape object
@@ -196,6 +207,10 @@ namespace gazebo
     /// \brief Vector of JointControllerPtr
     typedef std::vector<JointControllerPtr> JointController_V;
 
+    /// \def Light_V
+    /// \brief Vector of LightPtr
+    typedef std::vector<LightPtr>  Light_V;
+
     /// \def Link_V
     /// \brief Vector of LinkPtr
     typedef std::vector<LinkPtr>  Link_V;
@@ -207,6 +222,10 @@ namespace gazebo
     /// \def ModelState_M
     /// \brief Map of model state
     typedef std::map<std::string, ModelState> ModelState_M;
+
+    /// \def LightState_M
+    /// \brief Map of light state
+    typedef std::map<std::string, LightState> LightState_M;
 
     /// \def LinkState_M
     /// \brief Map of link state

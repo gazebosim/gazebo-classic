@@ -45,9 +45,8 @@ namespace gazebo
       /// triggered undo for this command.
       public: WorldState endState;
 
-      /// \brief Unique ID identifying this command in the server. It is set by
-      /// the client which generated the user command.
-      public: std::string id;
+      /// \brief Unique ID identifying this command in the server.
+      public: unsigned int id;
 
       /// \brief Description for the command.
       public: std::string description;
@@ -65,6 +64,9 @@ namespace gazebo
       /// \brief Pointer to the world.
       public: WorldPtr world;
 
+      /// \brief Counter to generate unique ids for commands in a sequence.
+      public: unsigned int idCounter;
+
       /// \brief Transportation node.
       public: transport::NodePtr node;
 
@@ -77,11 +79,11 @@ namespace gazebo
       /// \brief Publisher of undo redo statistics messages.
       public: transport::PublisherPtr userCmdStatsPub;
 
-      /// \brief list of commands which can be undone.
-      public: std::vector<UserCmd *> undoCmds;
+      /// \brief List of commands which can be undone.
+      public: std::vector<UserCmdPtr> undoCmds;
 
-      /// \brief list of commands which can be redone.
-      public: std::vector<UserCmd *> redoCmds;
+      /// \brief List of commands which can be redone.
+      public: std::vector<UserCmdPtr> redoCmds;
     };
   }
 }

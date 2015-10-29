@@ -189,7 +189,7 @@ gzdbg << "OnUndoCmdHistory" << std::endl;
   {
     QAction *action = new QAction(QString::fromStdString(cmd.description()),
         this);
-    action->setData(QVariant(QString::fromStdString(cmd.id())));
+    action->setData(QVariant(cmd.id()));
     action->setCheckable(true);
     menu.addAction(action);
     this->dataPtr->undoActions->addAction(action);
@@ -214,7 +214,7 @@ gzdbg << "OnRedoCmdHistory" << std::endl;
   {
     QAction *action = new QAction(QString::fromStdString(cmd.description()),
         this);
-    action->setData(QVariant(QString::fromStdString(cmd.id())));
+    action->setData(QVariant(cmd.id()));
     action->setCheckable(true);
     menu.addAction(action);
     this->dataPtr->redoActions->addAction(action);

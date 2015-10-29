@@ -14,7 +14,7 @@ message UserCmd
   }
 
   /// \brief Unique id for user command.
-  required string id = 1;
+  optional uint32 id = 1;
 
   /// \brief Description for the command.
   required string description = 2;

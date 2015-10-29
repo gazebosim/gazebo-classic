@@ -104,7 +104,6 @@ void UndoTest::MsgPassing()
     world->Step(100);
 
     gazebo::msgs::UserCmd msg;
-    msg.set_id("ID_" + std::to_string(num));
     msg.set_description("description_" + std::to_string(num));
     msg.set_type(gazebo::msgs::UserCmd::MOVING);
 
@@ -204,7 +203,7 @@ void UndoTest::MsgPassing()
   {
     gazebo::msgs::UndoRedo msg;
     msg.set_undo(true);
-    msg.set_id("ID_1");
+    msg.set_id(0);
 
     undoRedoPub->Publish(msg);
   }
@@ -235,7 +234,7 @@ void UndoTest::MsgPassing()
   {
     gazebo::msgs::UndoRedo msg;
     msg.set_undo(false);
-    msg.set_id("ID_3");
+    msg.set_id(2);
 
     undoRedoPub->Publish(msg);
   }
