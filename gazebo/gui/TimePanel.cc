@@ -75,6 +75,8 @@ TimePanel::TimePanel(QWidget *_parent)
 
   this->dataPtr->worldControlPub = this->dataPtr->node->
       Advertise<msgs::WorldControl>("~/world_control");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   // Timer
   QTimer *timer = new QTimer(this);
@@ -103,6 +105,8 @@ void TimePanel::OnFullScreen(bool /*_value*/)
 TimePanel::~TimePanel()
 {
   this->dataPtr->node.reset();
+  this->dataPtr->worldControlPub.reset();
+  this->dataPtr->userCmdPub.reset();
 
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -320,10 +324,17 @@ void TimePanel::Update()
 /////////////////////////////////////////////////
 void TimePanel::OnTimeReset()
 {
+  // Publish time reset message
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(true);
   this->dataPtr->worldControlPub->Publish(msg);
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Reset time");
+  userCmdMsg.set_type(msgs::UserCmd::MOVING);
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////

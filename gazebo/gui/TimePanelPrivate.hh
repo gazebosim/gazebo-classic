@@ -39,6 +39,10 @@ namespace gazebo
       /// \brief Used to start, stop, and step simulation.
       public: transport::PublisherPtr worldControlPub;
 
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      public: transport::PublisherPtr userCmdPub;
+
       /// \brief Event based connections.
       public: std::vector<event::ConnectionPtr> connections;
 
