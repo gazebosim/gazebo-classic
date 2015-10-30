@@ -124,6 +124,27 @@ namespace gazebo
       /// \return True if the LightState exists.
       public: bool HasLightState(const std::string &_lightName) const;
 
+      /// \brief Get the vector of SDF insertions.
+      /// \return A vector of SDF blocks. Each block contains the SDF of the
+      /// model to be spawned in the simulation.
+      public: const std::vector<std::string> &Insertions() const;
+
+      /// \brief Set a new vector of SDF insertions.
+      /// \param[in] _insertions Vector containing SDF blocks. Each block should
+      /// contain the SDF of the new models spawned in the current simulation
+      /// frame.
+      public: void SetInsertions(const std::vector<std::string> &_insertions);
+
+      /// \brief Get the vector of SDF deletions.
+      /// \return A vector of SDF blocks. Each block contains the SDF of the
+      /// model to be removed from the simulation.
+      public: const std::vector<std::string> &Deletions() const;
+
+      /// \brief Set a new vector of SDF deletions.
+      /// \param[in] _deletions Vector containing SDF blocks. Each block should
+      /// contain the SDF of the models removed in the current simulation frame.
+      public: void SetDeletions(const std::vector<std::string> &_deletions);
+
       /// \brief Return true if the values in the state are zero.
       ///
       /// This will check to see if the all model states are zero.
