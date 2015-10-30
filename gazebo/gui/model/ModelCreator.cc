@@ -463,7 +463,10 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
   while (linkElem)
   {
     LinkData *linkData = this->CreateLinkFromSDF(linkElem, modelVisual);
-    linkData->nested = true;
+
+    // if its parent is not the preview visual then the link has to be nested
+    if (modelVisual != this->previewVisual)
+      linkData->nested = true;
     rendering::VisualPtr linkVis = linkData->linkVisual;
 
     modelData->links[linkVis->GetName()] = linkVis;
@@ -2110,6 +2113,7 @@ void ModelCreator::GenerateSDF()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
+
     if (linksIt.first == this->canonicalLink || link->nested)
       continue;
 

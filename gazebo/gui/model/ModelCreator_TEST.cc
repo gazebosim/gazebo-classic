@@ -215,7 +215,7 @@ void ModelCreator_TEST::SaveState()
   // Inserting a link and it still is never saved
   modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
-      scene->GetVisual("ModelPreview_0::ENTITY_0");
+      scene->GetVisual("ModelPreview_0::link_0");
   QVERIFY(cylinder != NULL);
   QCOMPARE(modelCreator->GetCurrentSaveState(),
       gui::ModelCreator::NEVER_SAVED);
@@ -305,17 +305,17 @@ void ModelCreator_TEST::Selection()
   // Inserting a few links
   modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
-      scene->GetVisual("ModelPreview_0::ENTITY_0");
+      scene->GetVisual("ModelPreview_0::link_0");
   QVERIFY(cylinder != NULL);
 
   modelCreator->AddShape(gui::ModelCreator::ENTITY_BOX);
   gazebo::rendering::VisualPtr box =
-      scene->GetVisual("ModelPreview_0::ENTITY_1");
+      scene->GetVisual("ModelPreview_0::link_1");
   QVERIFY(box != NULL);
 
   modelCreator->AddShape(gui::ModelCreator::ENTITY_SPHERE);
   gazebo::rendering::VisualPtr sphere =
-      scene->GetVisual("ModelPreview_0::ENTITY_2");
+      scene->GetVisual("ModelPreview_0::link_2");
   QVERIFY(sphere != NULL);
 
   // verify initial selected state
