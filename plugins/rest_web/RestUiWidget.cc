@@ -118,9 +118,6 @@ void RestUiWidget::Login()
 /////////////////////////////////////////////////
 void RestUiWidget::OnResponse(ConstRestResponsePtr &_msg)
 {
-  if (!_msg->has_id() || _msg->id() != this->restID)
-    return;
-
   gzmsg << "Response received:" << std::endl;
   gzmsg << " type: " << _msg->type() << std::endl;
   gzmsg << " msg:  " << _msg->msg() << std::endl;
@@ -139,25 +136,18 @@ void RestUiWidget::Update()
     this->msgRespQ.pop_front();
 
     // look for login error, and reenable the login menu if necessary
-    if (msgStr.find("There was a problem trying to login to the server") == 0)
+    if (msg->type() == msgs::RestResponse::ERROR)
     {
       this->loginMenuAction.setEnabled(true);
       this->logoutMenuAction.setEnabled(false);
-    }
-
-    if (msg->type() == msgs::RestResponse::ERROR)
-    {
-      msgStr += "\n\nUnable to log in to the server.";
-      QMessageBox::critical(this,
-                            tr(this->title.c_str()),
-                            tr(msgStr.c_str()));
+      if (!this->loginLabel->text().isEmpty())
+      {
+        msgStr += "\n\nUnable to connect to the server.";
+        QMessageBox::critical(this,
+                              tr(this->title.c_str()),
+                              tr(msgStr.c_str()));
+      }
       this->loginLabel->setText(tr(""));
-    }
-    else if (msg->type() == msgs::RestResponse::SUCCESS)
-    {
-      QMessageBox::information(this,
-                               tr(this->title.c_str()),
-                               tr(msgStr.c_str()));
     }
     else if (msg->type() == msgs::RestResponse::LOGIN)
     {
