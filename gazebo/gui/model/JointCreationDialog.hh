@@ -113,6 +113,10 @@ namespace gazebo
       /// \brief Check if the current parent and child link selection is valid.
       private: void CheckLinksValid();
 
+      /// \brief Enable ok button if all values in the dialog are valid.
+      /// \return True if all values are valid.
+      private: bool CheckValid();
+
       /// \internal
       /// \brief Handles choosing the parent link, whether it is chosen from the
       /// dialog or the 3D scene.

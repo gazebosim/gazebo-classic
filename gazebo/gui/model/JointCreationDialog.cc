@@ -438,6 +438,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Qt signal-slot connections
   connect(this, SIGNAL(rejected()), this, SLOT(OnCancel()));
+
+  // Initialize variables
+  this->dataPtr->validLinks = false;
+  this->dataPtr->validAxis1 = true;
+  this->dataPtr->validAxis2 = true;
 }
 
 /////////////////////////////////////////////////
@@ -462,21 +467,6 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
       ->setChecked(true);
   this->NewType(_type);
 
-  // Reset enabled states
-  this->dataPtr->createButton->setEnabled(false);
-  this->dataPtr->swapButton->setEnabled(false);
-  this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("axis1", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("axis2", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("align", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose_general",
-      true);
-  this->dataPtr->parentLinkWidget->setStyleSheet(
-      ConfigWidget::StyleSheet("active", 1));
-  this->dataPtr->childLinkWidget->setStyleSheet(
-      ConfigWidget::StyleSheet("normal", 1));
-
   // Clear links
   this->dataPtr->configWidget->ClearEnumWidget("parentCombo");
   this->dataPtr->configWidget->ClearEnumWidget("childCombo");
@@ -491,6 +481,31 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
     this->dataPtr->configWidget->AddItemEnumWidget("parentCombo", link.second);
     this->dataPtr->configWidget->AddItemEnumWidget("childCombo", link.second);
   }
+
+  // Reset fields
+  this->dataPtr->configWidget->SetVector3WidgetValue("axis1",
+      ignition::math::Vector3d::UnitX);
+  this->dataPtr->configWidget->SetVector3WidgetValue("axis2",
+      ignition::math::Vector3d::UnitY);
+
+  // Reset enabled states
+  this->dataPtr->createButton->setEnabled(false);
+  this->dataPtr->swapButton->setEnabled(false);
+  this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("axis1", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("axis2", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("align", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose_general",
+      true);
+  this->dataPtr->parentLinkWidget->setStyleSheet(
+      ConfigWidget::StyleSheet("active", 1));
+  this->dataPtr->childLinkWidget->setStyleSheet(
+      ConfigWidget::StyleSheet("normal", 1));
+  this->dataPtr->axis1Widget->setStyleSheet(
+      ConfigWidget::StyleSheet("normal", 1));
+  this->dataPtr->axis2Widget->setStyleSheet(
+      ConfigWidget::StyleSheet("normal", 1));
 
   this->move(0, 0);
   this->show();
@@ -534,6 +549,39 @@ void JointCreationDialog::OnPoseFromDialog(const QString &_name,
 void JointCreationDialog::OnVector3dFromDialog(const QString &_name,
     const ignition::math::Vector3d &_value)
 {
+  if (_value == ignition::math::Vector3d::Zero)
+  {
+    if (_name == "axis1")
+    {
+      this->dataPtr->axis1Widget->setStyleSheet(
+          ConfigWidget::StyleSheet("warning", 1));
+      this->dataPtr->validAxis1 = false;
+    }
+    else if (_name == "axis2")
+    {
+      this->dataPtr->axis2Widget->setStyleSheet(
+          ConfigWidget::StyleSheet("warning", 1));
+      this->dataPtr->validAxis2 = false;
+    }
+  }
+  else
+  {
+    if (_name == "axis1")
+    {
+      this->dataPtr->axis1Widget->setStyleSheet(
+          ConfigWidget::StyleSheet("normal", 1));
+      this->dataPtr->validAxis1 = true;
+    }
+    else if (_name == "axis2")
+    {
+      this->dataPtr->axis2Widget->setStyleSheet(
+          ConfigWidget::StyleSheet("normal", 1));
+      this->dataPtr->validAxis2 = true;
+    }
+  }
+
+  this->CheckValid();
+
 //  this->dataPtr->jointMaker->NewAxis(_name, _value);
 }
 
@@ -652,14 +700,14 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
 /////////////////////////////////////////////////
 void JointCreationDialog::OnCancel()
 {
-//  this->close();
-//  this->dataPtr->jointMaker->Stop();
+  this->close();
+  this->dataPtr->jointMaker->Stop();
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::OnCreate()
 {
-//  this->accept();
+  this->accept();
 //  this->dataPtr->jointMaker->CreationComplete();
 }
 
@@ -730,7 +778,7 @@ void JointCreationDialog::CheckLinksValid()
         ConfigWidget::StyleSheet("warning", 1));
     this->dataPtr->childLinkWidget->setStyleSheet(
         ConfigWidget::StyleSheet("warning", 1));
-    this->dataPtr->createButton->setEnabled(false);
+    this->dataPtr->validLinks = false;
   }
   else
   {
@@ -740,9 +788,23 @@ void JointCreationDialog::CheckLinksValid()
     {
       this->dataPtr->childLinkWidget->setStyleSheet(
           ConfigWidget::StyleSheet("normal", 1));
-      this->dataPtr->createButton->setEnabled(true);
+      this->dataPtr->validLinks = true;
     }
   }
+
+  this->CheckValid();
+}
+
+/////////////////////////////////////////////////
+bool JointCreationDialog::CheckValid()
+{
+  bool valid = this->dataPtr->validLinks && this->dataPtr->validAxis1 &&
+      this->dataPtr->validAxis2;
+
+  if (this->dataPtr->createButton)
+    this->dataPtr->createButton->setEnabled(valid);
+
+  return valid;
 }
 
 /////////////////////////////////////////////////

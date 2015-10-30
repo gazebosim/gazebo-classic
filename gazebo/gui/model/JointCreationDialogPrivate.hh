@@ -65,6 +65,9 @@ namespace gazebo
       public: ConfigChildWidget *axis2Widget;
       public: QLabel *parentIcon;
       public: QLabel *selectionsText;
+      public: bool validLinks;
+      public: bool validAxis1;
+      public: bool validAxis2;
     };
   }
 }
