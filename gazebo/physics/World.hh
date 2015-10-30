@@ -145,6 +145,10 @@ namespace gazebo
       /// \return A list of all the Models in the world.
       public: Model_V GetModels() const;
 
+      /// \brief Get a list of all the lights.
+      /// \return A list of all the Lights in the world.
+      public: Light_V Lights() const;
+
       /// \brief Reset with options.
       /// The _type parameter specifies which type of eneities to reset. See
       /// Base::EntityType.
@@ -203,6 +207,13 @@ namespace gazebo
       /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the Model, or NULL if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
+
+      /// \brief Get a light by name.
+      /// This function is the same as GetByName, but limits the search to
+      /// only lights.
+      /// \param[in] _name The name of the Light to find.
+      /// \return A pointer to the Light, or NULL if no light was found.
+      public: LightPtr Light(const std::string &_name);
 
       /// \brief Get a pointer to an Entity based on a name.
       /// This function is the same as GetByName, but limits the search to
@@ -306,6 +317,12 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
 
+      /// \brief Publish pose updates for a light.
+      /// Adds light to a list of lights to publish, which is processed and
+      /// cleared once every iteration.
+      /// \param[in] _light Pointer to the light to publish.
+      public: void PublishLightPose(const physics::LightPtr _light);
+
       /// \brief Get the total number of iterations.
       /// \return Number of iterations that simulation has taken.
       public: uint32_t GetIterations() const;
@@ -365,6 +382,13 @@ namespace gazebo
       /// \param[in] _parent Parent of the model.
       /// \return Pointer to the newly created Model.
       private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent);
+
+      /// \brief Load a light.
+      /// \param[in] _sdf SDF element containing the Light description.
+      /// \param[in] _parent Parent of the light.
+      /// \return Pointer to the newly created Light.
+      private: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
+          const BasePtr &_parent);
 
       /// \brief Load an actor.
       /// \param[in] _sdf SDF element containing the Actor description.
@@ -458,6 +482,14 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
+      /// \brief Process all received light factory messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessLightFactoryMsgs();
+
+      /// \brief Process all received light modify messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessLightModifyMsgs();
+
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
 
@@ -472,7 +504,20 @@ namespace gazebo
 
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.
+      /// \deprecated Topic ~/light deprecated.
+      /// See OnLightFactoryMsg which subscribes to ~/factory/light and
+      /// OnLightModifyMsg which subscribes to ~/light/modify
       private: void OnLightMsg(ConstLightPtr &_msg);
+
+      /// \brief Callback when a light message is received in the
+      /// ~/factory/light topic.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightFactoryMsg(ConstLightPtr &_msg);
+
+      /// \brief Callback when a light message is received in the
+      /// ~/light/modify topic.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightModifyMsg(ConstLightPtr &_msg);
 
       /// \internal
       /// \brief Private data pointer.
