@@ -260,3 +260,29 @@ TEST_F(WorldStateTest, OperatorsNoInsertionsDeletions)
   EXPECT_EQ(worldState0.GetName(), worldState1.GetName());
   EXPECT_TRUE((worldState0 - worldState1).IsZero());
 }
+
+//////////////////////////////////////////////////
+TEST_F(WorldStateTest, Times)
+{
+  // Load a world
+  this->Load("worlds/empty.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+
+  // Create the world state
+  physics::WorldState worldState(world);
+
+  // Check default times
+  EXPECT_EQ(worldState.GetSimTime(), common::Time(0));
+  EXPECT_GT(worldState.GetWallTime(), common::Time(0));
+  EXPECT_EQ(worldState.GetRealTime(), common::Time(0));
+
+  // Set times
+  worldState.SetSimTime(common::Time(1));
+  worldState.SetWallTime(common::Time(2));
+  worldState.SetRealTime(common::Time(3));
+
+  // Check times
+  EXPECT_EQ(worldState.GetSimTime(), common::Time(1));
+  EXPECT_EQ(worldState.GetWallTime(), common::Time(2));
+  EXPECT_EQ(worldState.GetRealTime(), common::Time(3));
+}
