@@ -21,11 +21,12 @@
 
 #include <ignition/math/Rand.hh>
 
-#include "gazebo/test/ServerFixture.hh"
-#include "gazebo/physics/physics.hh"
-#include "SimplePendulumIntegrator.hh"
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/test/helper_physics_generator.hh"
+#include <gazebo/msgs/msgs.hh>
+#include <gazebo/transport/transport.hh>
+#include <gazebo/test/ServerFixture.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/msgs/msgs.hh>
+#include <gazebo/test/helper_physics_generator.hh>
 
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
@@ -33,8 +34,26 @@ using namespace gazebo;
 class PhysicsTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
+  /// \brief test elastic modulus
   public: void ElasticModulusContact(const std::string &_physicsEngine);
+
+  /// \brief Callback for contact subscribers in depth test.
+  /// \param[in] _msg Contact message
+  private: void Callback(const ConstContactsPtr &_msg);
+
+  /// \brief Message to be filled with the latest contacts message.
+  private: msgs::Contacts contactsMsg;
+
+  /// \brief Mutex to protect reads and writes to contactsMsg.
+  public: mutable boost::mutex mutex;
 };
+
+/////////////////////////////////////////////////
+void PhysicsTest::Callback(const ConstContactsPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->contactsMsg = *_msg;
+}
 
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
@@ -43,6 +62,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   Load("worlds/elastic_modulus_contact_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
 
   int i = 0;
   while (!this->HasEntity("sphere") && i < 20)
@@ -54,107 +74,86 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   if (i > 20)
     gzthrow("Unable to get sphere");
 
+  // get models and links
+  physics::ModelPtr box_model = world->GetModel("box");
+  physics::LinkPtr box_link = box_model->GetLink("link");
+  physics::ModelPtr sphere_model = world->GetModel("sphere");
+  physics::LinkPtr sphere_link = box_model->GetLink("link");
+
+  // Sleep to ensure transport topics are all advertised
+  common::Time::MSleep(100);
+  std::list<std::string> topics =
+    transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  topics.sort();
+  EXPECT_FALSE(topics.empty());
+  EXPECT_EQ(topics.size(), 1u);
+
+  auto topic = topics.front();
+
+  gzdbg << "Listening to " << topic << std::endl;
+  transport::SubscriberPtr sub = this->node->Subscribe(topic,
+      &PhysicsTest::Callback, this);
+
+  // step to let contact happen and settle
+  world->Step(1000);
+
+  // Wait for contact messages to be received
+  int maxSleep = 30;
+  int sleep = 0;
+  while (this->contactsMsg.contact().size() < 1 && sleep < maxSleep)
   {
-    // todo: get parameters from drop_test.world
-    double test_duration = 1.1;
-    double dt = world->GetPhysicsEngine()->GetMaxStepSize();
-
-    physics::ModelPtr box_model = world->GetModel("box");
-    physics::LinkPtr box_link = box_model->GetLink("link");
-    double f = 1000.0;
-    double v = 0;
-    double x = 0;
-    double m = box_link->GetInertial()->GetMass();
-
-    int steps = test_duration/dt;
-
-    for (int i = 0; i < steps; ++i)
-    {
-      double t = world->GetSimTime().Double();
-
-      world->Step(1);  // theoretical contact, but
-      {
-        if (box_model)
-        {
-          math::Vector3 vel = box_model->GetWorldLinearVel();
-          math::Pose pose = box_model->GetWorldPose();
-
-          // gzdbg << "box time [" << t
-          //      << "] sim x [" << pose.pos.x
-          //      << "] ideal x [" << x
-          //      << "] sim vx [" << vel.x
-          //      << "] ideal vx [" << v
-          //      << "]\n";
-
-          if (i == 0)
-          {
-            box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
-            // The following has been failing since pull request #1284,
-            // so it has been disabled.
-            // See bitbucket.org/osrf/gazebo/issue/1394
-            // EXPECT_EQ(box_model->GetLink("link")->GetWorldForce(),
-            //   math::Vector3(f, 0, 0));
-          }
-
-          if (t > 1.000 && t < 1.01)
-          {
-            // collision transition, do nothing
-          }
-          else
-          {
-            // collision happened
-            EXPECT_NEAR(pose.pos.x, x, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
-          }
-        }
-
-        physics::ModelPtr sphere_model = world->GetModel("sphere");
-        if (sphere_model)
-        {
-          math::Vector3 vel = sphere_model->GetWorldLinearVel();
-          math::Pose pose = sphere_model->GetWorldPose();
-          // gzdbg << "sphere time [" << world->GetSimTime().Double()
-          //      << "] sim x [" << pose.pos.x
-          //      << "] ideal x [" << x
-          //      << "] sim vx [" << vel.x
-          //      << "] ideal vx [" << v
-          //      << "]\n";
-          if (t > 1.000 && t < 1.01)
-          {
-            // collision transition, do nothing
-          }
-          else if (t <= 1.00)
-          {
-            // no collision
-            EXPECT_EQ(pose.pos.x, 2);
-            EXPECT_EQ(vel.x, 0);
-          }
-          else
-          {
-            // collision happened
-            EXPECT_NEAR(pose.pos.x, x + 1.0, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
-          }
-        }
-      }
-
-      /*
-      // integrate here to see when the collision should happen
-      double impulse = dt*f;
-      if (i == 0) v = v + impulse;
-      else if (t >= 1.0) v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
-      x = x + dt * v;
-      */
-
-      // integrate here to see when the collision should happen
-      double vold = v;
-      if (i == 0)
-        v = vold + dt* (f / m);
-      else if (t >= 1.0)
-        v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
-      x = x + dt * (v + vold) / 2.0;
-    }
+    common::Time::MSleep(100);
+    sleep++;
   }
+  ASSERT_EQ(this->contactsMsg.contact().size(), 1);
+  // Copy message to local variable
+  msgs::Contacts contacts;
+  {
+    boost::mutex::scoped_lock lock(this->mutex);
+    contacts = this->contactsMsg;
+  }
+
+  // recompute stiffness by hand to double check physics
+  // sphere
+  const double nu1 = 0.4;
+  const double E1 = 600000;
+  const double m1 = 30;
+  const double R1 = 0.06;
+  // static box
+  const double nu2 = 0.3;
+  const double E2 = 500000;
+  const double R2 = 0.08;
+  double E_star = 1.0 / ((1.0 - nu1*nu1)/E1 + (1.0 - nu2*nu2)/E2);
+  double R_star = 1.0 / (1.0/R1 + 1.0/R2);
+  // contact force
+  double f_g = -physics->GetGravity().z * m1;
+
+  // get min contact depth from model
+  const double minDepth = std::min(0.0015, 0.001);
+
+  // get contact depth from contact manager
+  ASSERT_EQ(contacts.contact().size(), 1);
+  for (auto const &contact : contacts.contact())
+  {
+     gzerr << contact.collision1() << "\n";
+     // gzerr << contact.collision2() << "\n";
+     // gzerr << contact.depth() << "\n";
+  }
+  double d1 = 0;
+
+  // get contact depth from link poses and known geometry information
+  double d2 = 0;
+
+  // contact patch radius
+  double patchRadius = sqrt(R_star * d1);
+
+  gzdbg << "f_g: " << f_g
+        << "E: " << E_star
+        << "curvature: " << R_star
+        << "patch radius: " << patchRadius
+        << "\n";
+
+  // check contact information
 }
 
 TEST_P(PhysicsTest, ElasticModulusContact)

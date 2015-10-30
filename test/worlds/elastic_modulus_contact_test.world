@@ -1,7 +1,7 @@
 <sdf version='1.5'>
   <world name='default'>
     <physics name='default_physics' default='0' type='ode'>
-      <gravity>0 0 0</gravity>
+      <gravity>-100 0 0</gravity>
       <ode>
         <solver>
           <type>quick</type>
@@ -22,6 +22,7 @@
       <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     </physics>
     <model name='box'>
+      <allow_auto_disable>0</allow_auto_disable>
       <pose>0 0 0 0 -0 0</pose>
       <link name='link'>
         <inertial>
@@ -33,7 +34,7 @@
             <iyz>0</iyz>
             <izz>1</izz>
           </inertia>
-          <mass>1</mass>
+          <mass>5</mass>
         </inertial>
         <velocity_decay>
           <linear>0</linear>
@@ -47,12 +48,12 @@
           </geometry>
           <surface>
             <contact>
-              <poissons_ratio>0.495</poissons_ratio>
-              <elastic_modulus>610000.0</elastic_modulus>
+              <poissons_ratio>0.3</poissons_ratio>
+              <elastic_modulus>500000.0</elastic_modulus>
               <ode>
                 <kp>100000</kp>
                 <kd>1</kd>
-                <max_vel>0.1</max_vel>
+                <max_vel>100.0</max_vel>
                 <min_depth>0.0015</min_depth>
               </ode>
             </contact>
@@ -60,7 +61,7 @@
               <torsional>
                 <coefficient>1.0</coefficient>
                 <use_patch_radius>0</use_patch_radius>
-                <surface_radius>0.08316</surface_radius>
+                <surface_radius>0.08</surface_radius>
               </torsional>
               <ode>
                 <mu>1</mu>
@@ -83,9 +84,11 @@
           </material>
         </visual>
       </link>
+      <static>1</static>
     </model>
     <model name='sphere'>
-      <pose>2 0 0 0 -0 0</pose>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>2 0.3 0.2 0 -0 0</pose>
       <link name='link'>
         <inertial>
           <inertia>
@@ -96,7 +99,7 @@
             <iyz>0</iyz>
             <izz>1</izz>
           </inertia>
-          <mass>1</mass>
+          <mass>3</mass>
         </inertial>
         <velocity_decay>
           <linear>0</linear>
@@ -110,20 +113,20 @@
           </geometry>
           <surface>
             <contact>
-              <poissons_ratio>0.495</poissons_ratio>
-              <elastic_modulus>610000.0</elastic_modulus>
+              <poissons_ratio>0.4</poissons_ratio>
+              <elastic_modulus>600000.0</elastic_modulus>
               <ode>
                 <kp>100000</kp>
                 <kd>1</kd>
-                <max_vel>0.1</max_vel>
-                <min_depth>0.0015</min_depth>
+                <max_vel>100.0</max_vel>
+                <min_depth>0.001</min_depth>
               </ode>
             </contact>
             <friction>
               <torsional>
                 <coefficient>1.0</coefficient>
                 <use_patch_radius>0</use_patch_radius>
-                <surface_radius>0.08316</surface_radius>
+                <surface_radius>0.06</surface_radius>
               </torsional>
               <ode>
                 <mu>1</mu>
