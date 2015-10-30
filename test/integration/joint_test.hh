@@ -50,6 +50,10 @@ class JointTest : public ServerFixture,
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void JointCreationDestructionTest(const std::string &_physicsEngine);
 
+  /// \brief Create joints dynamically and verify that they will be visualized.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void DynamicJointVisualization(const std::string &_physicsEngine);
+
   // Documentation inherited.
   public: virtual void SetUp()
           {
