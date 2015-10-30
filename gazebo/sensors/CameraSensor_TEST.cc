@@ -25,16 +25,15 @@ class CameraSensor_TEST : public ServerFixture
 {
 };
 
-
 TEST_F(CameraSensor_TEST, CreateCamera)
 {
   Load("worlds/camera.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
-  // Create the Ray sensor
+  // Create the camera sensor
   std::string sensorName = "default::camera::link::camera";
 
-  // Get a pointer to the Ray sensor
+  // Get a pointer to the camera sensor
   sensors::CameraSensorPtr sensor =
      boost::dynamic_pointer_cast<sensors::CameraSensor>
      (mgr->GetSensor(sensorName));
@@ -42,42 +41,14 @@ TEST_F(CameraSensor_TEST, CreateCamera)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-
-/*  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
-
-  sdf::ElementPtr sdf(new sdf::Element);
-  sdf::initFile("sensor.sdf", sdf);
-  sdf::readString(cameraSensorString, sdf);
-
-  physics::WorldPtr world = physics::get_world("default");
-  physics::ModelPtr model = world->GetModel("ground_plane");
-  physics::LinkPtr link = model->GetLink("link");
-
-  // Create the camera sensor
-  std::string sensorName = mgr->CreateSensor(sdf, "default",
-      "ground_plane::link", link->GetId());
-
-  // Make sure the returned sensor name is correct
-  EXPECT_EQ(sensorName, std::string("default::ground_plane::link::camera"));
-
-  // Update the sensor manager so that it can process new sensors.
-  mgr->Update();
-
-  // Get a pointer to the camera sensor
-  sensors::CameraSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(
-        mgr->GetSensor(sensorName));
-
-  // Make sure the above dynamic cast worked.
-  ASSERT_TRUE(sensor != NULL);*/
-
-  // Update the sensor
-  // sensor->Update(true);
-
   EXPECT_TRUE(sensor->IsActive());
 
   EXPECT_EQ(sensor->GetImageWidth(), 320);
   EXPECT_EQ(sensor->GetImageHeight(), 240);
+  EXPECT_FALSE(sensor->GetTopic().empty());
+
+  // camera not init yet so image is null
+  EXPECT_TRUE(sensor->GetImageData() == NULL);
 }
 
 /////////////////////////////////////////////////
