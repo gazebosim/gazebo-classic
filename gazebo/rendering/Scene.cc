@@ -2105,20 +2105,25 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (!parentVis)
       return false;
 
-    Visual_M::iterator iter = this->dataPtr->visuals.find(_msg->id());
-    if (iter == this->dataPtr->visuals.end())
+    // image size is 0 if rendering is unavailable
+    if (_msg->camera().image_size().x() > 0 &&
+        _msg->camera().image_size().y() > 0)
     {
-      CameraVisualPtr cameraVis(new CameraVisual(
-            _msg->name()+"_GUIONLY_camera_vis", parentVis));
+      Visual_M::iterator iter = this->dataPtr->visuals.find(_msg->id());
+      if (iter == this->dataPtr->visuals.end())
+      {
+        CameraVisualPtr cameraVis(new CameraVisual(
+              _msg->name()+"_GUIONLY_camera_vis", parentVis));
 
-      // need to call AttachVisual in order for cameraVis to be added to
-      // parentVis' children list so that it can be properly deleted.
-      parentVis->AttachVisual(cameraVis);
+        // need to call AttachVisual in order for cameraVis to be added to
+        // parentVis' children list so that it can be properly deleted.
+        parentVis->AttachVisual(cameraVis);
 
-      cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
-      cameraVis->SetId(_msg->id());
-      cameraVis->Load(_msg->camera());
-      this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
+        cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
+        cameraVis->SetId(_msg->id());
+        cameraVis->Load(_msg->camera());
+        this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
+      }
     }
   }
   else if (_msg->type() == "logical_camera" && _msg->visualize())
