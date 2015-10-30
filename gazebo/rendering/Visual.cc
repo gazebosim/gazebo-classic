@@ -1345,6 +1345,8 @@ void Visual::SetWireframe(bool _show)
 //////////////////////////////////////////////////
 void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 {
+  float derivedTransparency = this->DerivedTransparency();
+
   for (unsigned int i = 0; i < _sceneNode->numAttachedObjects(); ++i)
   {
     Ogre::Entity *entity = NULL;
@@ -1385,7 +1387,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
             pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
           }
 
-          if (this->dataPtr->transparency > 0.0)
+          if (derivedTransparency > 0.0)
           {
             pass->setDepthWriteEnabled(false);
             pass->setDepthCheckEnabled(true);
@@ -1398,7 +1400,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 
           dc = pass->getDiffuse();
 
-          dc.a = (1.0f - this->DerivedTransparency());
+          dc.a = (1.0f - derivedTransparency);
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
 
@@ -1412,7 +1414,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
             {
               textureUnitState->setAlphaOperation(
                   Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
-                  1.0 - this->dataPtr->transparency);
+                  1.0 - derivedTransparency);
             }
           }
         }
