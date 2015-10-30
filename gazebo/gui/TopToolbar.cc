@@ -138,6 +138,12 @@ TopToolbar::TopToolbar(QWidget *_parent)
 
   this->dataPtr->toolbar->addSeparator();
 
+  // Empty space to for editor actions
+  QWidget *editorSpacer = new QWidget();
+  editorSpacer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  QAction *editorSpacerAction = this->dataPtr->toolbar->addWidget(editorSpacer);
+  editorSpacerAction->setObjectName("toolbarEditorSpacerAction");
+
   // Screenshot / logging
   if (g_screenshotAct)
     this->dataPtr->toolbar->addAction(g_screenshotAct);

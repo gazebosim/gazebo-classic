@@ -7,9 +7,14 @@ package gazebo.msgs;
 message RestLogin
 {
   /// \brief ID of this request message
-  optional int32 id        = 1;
+  optional uint32 id       = 1;
 
+  /// \brief Rest service URL
   required string url      = 2;
+
+  /// \brief Login user name
   optional string username = 3;
+
+  /// \brief Login password
   optional string password = 4;
 }

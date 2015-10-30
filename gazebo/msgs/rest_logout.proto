@@ -7,7 +7,7 @@ package gazebo.msgs;
 message RestLogout
 {
   /// \brief ID of this request message
-  optional int32 id        = 1;
+  optional uint32 id       = 1;
 
   /// \brief the web service url
   optional string url      = 2;

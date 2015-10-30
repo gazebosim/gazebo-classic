@@ -45,7 +45,7 @@ int g_restID;
 // RestPost:  string route, json
 
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // callback for SimEvent messages
 // increment a counter and keep the data around
 void ReceiveRestError(ConstRestResponsePtr &_msg)
@@ -64,7 +64,7 @@ void ReceiveRestError(ConstRestResponsePtr &_msg)
   g_count += 1;
 }
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // get the count in a thread safe way
 unsigned int GetErrorCount()
 {
@@ -72,7 +72,7 @@ unsigned int GetErrorCount()
   return g_count;
 }
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewError(unsigned int current,
@@ -80,7 +80,7 @@ unsigned int WaitForNewError(unsigned int current,
                              unsigned int ms = 100)
 {
   gzmsg << "WaitForNewError " << current << std::endl;
-  for (unsigned int i = 0; i < maxTries; i++)
+  for (unsigned int i = 0; i < maxTries; ++i)
   {
     unsigned int count = GetErrorCount();
     if (count > current)
@@ -93,17 +93,17 @@ unsigned int WaitForNewError(unsigned int current,
   return GetErrorCount();
 }
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // test macro
 TEST_P(RestWebTest, FirstTest)
 {
   FirstTest(GetParam());
 }
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // SimPauseRun:
 // Load test world, publish login and post messages
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void RestWebTest::FirstTest(const std::string &_physicsEngine)
 {
   Load("test/worlds/rest_web.world",

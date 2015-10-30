@@ -48,7 +48,7 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
                                    &RestUiWidget::OnResponse,
                                    this);
 
-  this->restID = common::Time::GetWallTime().nsec;
+  this->restID = static_cast<unsigned int>(common::Time::GetWallTime().nsec);
 
   this->toolbar = NULL;
   gui::MainWindow *mainWindow = qobject_cast<gui::MainWindow *>(_parent);
@@ -121,9 +121,9 @@ void RestUiWidget::OnResponse(ConstRestResponsePtr &_msg)
   if (!_msg->has_id() || _msg->id() != this->restID)
     return;
 
-  gzerr << "Response received:" << std::endl;
-  gzerr << " type: " << _msg->type() << std::endl;
-  gzerr << " msg:  " << _msg->msg() << std::endl;
+  gzmsg << "Response received:" << std::endl;
+  gzmsg << " type: " << _msg->type() << std::endl;
+  gzmsg << " msg:  " << _msg->msg() << std::endl;
   // add msg to queue for later processing from the GUI thread
   this->msgRespQ.push_back(_msg);
 }
@@ -147,8 +147,7 @@ void RestUiWidget::Update()
 
     if (msg->type() == msgs::RestResponse::ERROR)
     {
-      msgStr += "\n\nIf the server is not available, ";
-      msgStr += "logout to hide theses messages.";
+      msgStr += "\n\nUnable to log in to the server.";
       QMessageBox::critical(this,
                             tr(this->title.c_str()),
                             tr(msgStr.c_str()));

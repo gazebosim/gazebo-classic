@@ -22,7 +22,7 @@ message RestResponse
   }
 
   /// \brief ID of the response message
-  optional int32 id    = 1;
+  optional uint32 id   = 1;
 
   /// \brief Type of response
   required Type type   = 2;

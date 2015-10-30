@@ -192,6 +192,8 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
     gzerr << "ERROR in REST service POST request: " << response << std::endl;
   }
 
+  if (_msg->has_id())
+    msg.set_id(_msg->id());
   msg.set_msg(response);
   this->pub->Publish(msg);
 }

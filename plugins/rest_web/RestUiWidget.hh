@@ -108,7 +108,7 @@ namespace gazebo
     private: QLabel *loginLabel;
 
     /// \brief ID of this rest service client
-    private: int restID;
+    private: unsigned int restID;
   };
 }
 

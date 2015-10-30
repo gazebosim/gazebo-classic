@@ -8,8 +8,11 @@ package gazebo.msgs;
 message RestPost
 {
   /// \brief ID of this request message
-  optional int32 id     = 1;
+  optional uint32 id    = 1;
 
+  /// \brief Route to post to.
   required string route = 2;
+
+  /// \brief Data to post in JSON format
   required string json  = 3;
 }
