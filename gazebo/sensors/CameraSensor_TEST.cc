@@ -47,8 +47,15 @@ TEST_F(CameraSensor_TEST, CreateCamera)
   EXPECT_EQ(sensor->GetImageHeight(), 240);
   EXPECT_FALSE(sensor->GetTopic().empty());
 
-  // camera not init yet so image is null
-  EXPECT_TRUE(sensor->GetImageData() == NULL);
+  // wait for camera images
+  int sleep = 0;
+  int maxSleep = 20;
+  while (sleep < maxSleep && !sensor->GetImageData())
+  {
+    sleep++;
+    common::Time::MSleep(100);
+  }
+  EXPECT_TRUE(sensor->GetImageData() != NULL);
 }
 
 /////////////////////////////////////////////////
