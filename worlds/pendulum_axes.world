@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    
+    <model name='pendulum_x_axis'>
+      <pose>0.21000000000000002 0 0.18000000000000002  0.3141592653589793 0 0</pose>
+      <link name="link">
+        <pose>0 0 -0.05  0 0 0</pose>
+        <inertial>
+          <mass>0.027000000000000003</mass>
+          <inertia>
+            <ixx>2.2725000000000007e-05</ixx>
+            <iyy>2.2725000000000007e-05</iyy>
+            <izz>4.500000000000001e-07</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.01 0.01 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.01 0.01 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="joint" type="revolute">
+        <pose>0 0 0.05  0 0 0</pose>
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+    </model>
+    
+    <model name='pendulum_y_axis'>
+      <pose>0.42000000000000004 0 0.18000000000000002  0 0.3141592653589793 0</pose>
+      <link name="link">
+        <pose>0 0 -0.05  0 0 0</pose>
+        <inertial>
+          <mass>0.027000000000000003</mass>
+          <inertia>
+            <ixx>2.2725000000000007e-05</ixx>
+            <iyy>2.2725000000000007e-05</iyy>
+            <izz>4.500000000000001e-07</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.01 0.01 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.01 0.01 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="joint" type="revolute">
+        <pose>0 0 0.05  0 0 0</pose>
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+        </axis>
+      </joint>
+    </model>
+    
+  </world>
+</sdf>
