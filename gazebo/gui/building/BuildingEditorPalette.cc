@@ -126,7 +126,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QGridLayout *featuresLayout = new QGridLayout;
   featuresLayout->addWidget(windowButton, 0, 0);
   featuresLayout->addWidget(doorButton, 0, 1);
-  featuresLayout->addWidget(stairsButton, 1, 0);
+  featuresLayout->addWidget(stairsButton, 0, 2);
 
   // Colors
   QLabel *colorsLabel = new QLabel(tr(
