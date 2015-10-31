@@ -522,10 +522,10 @@ void JointCreationDialog::OnLinkFromDialog()
   // Notify so 3D is updated
   if (currentParent != currentChild)
   {
-//    if (currentParent != "")
-//      this->dataPtr->jointMaker->NewParentLink(currentParent);
-//    if (currentChild != "")
-//      this->dataPtr->jointMaker->NewChildLink(currentChild);
+    if (currentParent != "")
+      this->dataPtr->jointMaker->NewParentLink(currentParent);
+    if (currentChild != "")
+      this->dataPtr->jointMaker->NewChildLink(currentChild);
   }
 
   if (currentParent != "")
@@ -810,13 +810,13 @@ bool JointCreationDialog::CheckValid()
 /////////////////////////////////////////////////
 void JointCreationDialog::OnAlign(const int _int)
 {
-//  // Reset pose
+  // Reset pose
 //  this->dataPtr->jointMaker->NewRelativePose(ignition::math::Pose3d(), true);
-//
-//  // Reference link
+
+  // Reference link
 //  bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
-//
-//  // Button groups
+
+  // Button groups
 //  std::vector<std::string> axes = {"x", "y", "z"};
 //  std::vector<std::string> configs = {"min", "center", "max"};
 //  for (unsigned int g = 0; g < this->dataPtr->alignGroups.size(); ++g)

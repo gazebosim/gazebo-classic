@@ -163,8 +163,8 @@ namespace gazebo
       public: static std::string GetJointMaterial(const std::string &_type);
 
       /// \brief Get state
-      /// \return State of JointType if joint creation is in process, otherwise
-      /// JOINT_NONE
+      /// \return Current state of the joint maker. If it is creating a new
+      /// joint, it returns the type of joint. Otherwise, it returns JOINT_NONE.
       public: JointMaker::JointType GetState() const;
 
       /// \brief Stop the process of adding joint to the model.
@@ -282,6 +282,13 @@ namespace gazebo
       private: JointData *CreateJointLine(const std::string &_name,
           rendering::VisualPtr _parent);
 
+      private: rendering::VisualPtr LinkVisualFromName(
+          const std::string &_name);
+      private: void NewParentLink(rendering::VisualPtr _parentLink);
+      private: void NewChildLink(rendering::VisualPtr _childLink);
+      public: void NewParentLink(const std::string &_name);
+      public: void NewChildLink(const std::string &_name);
+
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
 
@@ -310,7 +317,8 @@ namespace gazebo
       private: rendering::VisualPtr hoverVis;
 
       /// \brief Currently selected visual
-      private: rendering::VisualPtr selectedVis;
+      private: rendering::VisualPtr parentVis;
+      private: rendering::VisualPtr childVis;
 
       /// \brief Name of joint that is currently being inspected.
       private: std::string inspectName;
@@ -319,7 +327,7 @@ namespace gazebo
       private: std::map<std::string, JointData *> joints;
 
       /// \brief Joint currently being created.
-      private: JointData *mouseJoint;
+      private: JointData *newJoint;
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
