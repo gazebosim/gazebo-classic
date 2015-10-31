@@ -56,6 +56,12 @@ TEST_F(CameraSensor_TEST, CreateCamera)
     common::Time::MSleep(100);
   }
   EXPECT_TRUE(sensor->GetImageData() != NULL);
+
+  // simulate the case where sensor cannot start and
+  // check that we can still read the correct camera sensor descriptions
+  sensors::SensorManager::Instance()->Fini();
+  EXPECT_EQ(sensor->GetImageWidth(), 320);
+  EXPECT_EQ(sensor->GetImageHeight(), 240);
 }
 
 /////////////////////////////////////////////////
