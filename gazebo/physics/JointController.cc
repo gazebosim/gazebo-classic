@@ -81,11 +81,10 @@ void JointController::Reset()
   this->dataPtr->positions.clear();
   this->dataPtr->velocities.clear();
   this->dataPtr->forces.clear();
-  // Should the PID's be reset as well?
-  
+ 
   if(!this->dataPtr->posPids.empty())
   {
-      for(std::size_t i=0; i < this->dataPtr->posPids.size(); ++i)
+      for(std::size_t i = 0; i < this->dataPtr->posPids.size(); ++i)
       {
          this->dataPtr->posPids[std::to_string(i)].Reset();    
       }
@@ -93,7 +92,7 @@ void JointController::Reset()
   
   if(!this->dataPtr->velPids.empty())
   {
-      for(std::size_t i=0; i < this->dataPtr->velPids.size(); ++i)
+      for(std::size_t i = 0; i < this->dataPtr->velPids.size(); ++i)
       {
           this->dataPtr->velPids[std::to_string(i)].Reset();
       }
