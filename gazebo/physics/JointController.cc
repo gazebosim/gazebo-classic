@@ -83,22 +83,19 @@ void JointController::Reset()
   this->dataPtr->forces.clear();
   // Should the PID's be reset as well?
   
-  std::map<std::string,common::PID> posPIDvect = this->dataPtr->posPids;
-  std::map<std::string,common::PID> velPIDvect = this->dataPtr->velPids;
-  
-  if(!posPIDvect.empty())
+  if(!this->dataPtr->posPids.empty())
   {
-      for(std::size_t i=0; i<posPIDvect.size(); ++i)
+      for(std::size_t i=0; i < this->dataPtr->posPids.size(); ++i)
       {
-          posPIDvect[std::to_string(i)].Reset();    
+         this->dataPtr->posPids[std::to_string(i)].Reset();    
       }
   }
   
-  if(!velPIDvect.empty())
+  if(!this->dataPtr->velPids.empty())
   {
-      for(std::size_t i=0; i<velPIDvect.size(); ++i)
+      for(std::size_t i=0; i < this->dataPtr->velPids.size(); ++i)
       {
-          velPIDvect[std::to_string(i)].Reset();
+          this->dataPtr->velPids[std::to_string(i)].Reset();
       }
   }  
   
