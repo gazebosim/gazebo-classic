@@ -83,6 +83,25 @@ void JointController::Reset()
   this->dataPtr->forces.clear();
   // Should the PID's be reset as well?
   
+  std::map<std::string,common::PID> posPIDvect = this->dataPtr->posPids;
+  std::map<std::string,common::PID> velPIDvect = this->dataPtr->velPids;
+  
+  if(!posPIDvect.empty())
+  {
+      for(std::size_t i=0; i<posPIDvect.size(); ++i)
+      {
+          posPIDvect[boost::lexical_cast<std::string>(i)].Reset();    
+      }
+  }
+  
+  if(!velPIDvect.empty())
+  {
+      for(std::size_t i=0; i<velPIDvect.size(); ++i)
+      {
+          velPIDvect[boost::lexical_cast<std::string>(i)].Reset();
+      }
+  }  
+  
 }
 
 /////////////////////////////////////////////////
