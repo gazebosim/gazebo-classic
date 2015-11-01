@@ -90,7 +90,7 @@ void JointController::Reset()
   {
       for(std::size_t i=0; i<posPIDvect.size(); ++i)
       {
-          posPIDvect[boost::lexical_cast<std::string>(i)].Reset();    
+          posPIDvect[std::to_string(i)].Reset();    
       }
   }
   
@@ -98,7 +98,7 @@ void JointController::Reset()
   {
       for(std::size_t i=0; i<velPIDvect.size(); ++i)
       {
-          velPIDvect[boost::lexical_cast<std::string>(i)].Reset();
+          velPIDvect[std::to_string(i)].Reset();
       }
   }  
   
