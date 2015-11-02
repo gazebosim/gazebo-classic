@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _VISUAL_CONFIG_HH_
-#define _VISUAL_CONFIG_HH_
+#ifndef _GAZEBO_VISUAL_CONFIG_HH_
+#define _GAZEBO_VISUAL_CONFIG_HH_
 
 #include <map>
 #include <string>
@@ -60,7 +60,7 @@ namespace gazebo
 
     /// \class VisualConfig VisualConfig.hh
     /// \brief A tab for configuring visual properties of a link.
-    class VisualConfig : public QWidget
+    class GZ_GUI_VISIBLE VisualConfig : public QWidget
     {
       Q_OBJECT
 
@@ -120,6 +120,10 @@ namespace gazebo
           const std::string &_materialName,
           const common::Color &_ambient, const common::Color &_diffuse,
           const common::Color &_specular, const common::Color &_emissive);
+
+      /// \brief Get visual config data
+      /// \return Config data for the visuals
+      public: const std::map<int, VisualConfigData *> &ConfigData() const;
 
       /// \brief Qt signal emitted when a visual is removed.
       /// \param[in] _name Name of visual removed.

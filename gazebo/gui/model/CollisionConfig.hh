@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _COLLISION_CONFIG_HH_
-#define _COLLISION_CONFIG_HH_
+#ifndef _GAZEBO_COLLISION_CONFIG_HH_
+#define _GAZEBO_COLLISION_CONFIG_HH_
 
 #include <map>
 #include <string>
@@ -60,7 +60,7 @@ namespace gazebo
 
     /// \class CollisionConfig CollisionConfig.hh
     /// \brief A tab for configuring collision properties of a link.
-    class CollisionConfig : public QWidget
+    class GZ_GUI_VISIBLE CollisionConfig : public QWidget
     {
       Q_OBJECT
 
@@ -109,6 +109,10 @@ namespace gazebo
       /// \param[in] _uri URI of the geometry.
       public: void Geometry(const std::string &_name,
           ignition::math::Vector3d &_size, std::string &_uri) const;
+
+      /// \brief Get collision config data
+      /// \return Config data for the collisions.
+      public: const std::map<int, CollisionConfigData *> &ConfigData() const;
 
       /// \brief Qt signal emitted when a collision is removed.
       /// \param[in] _name Name of collision removed.

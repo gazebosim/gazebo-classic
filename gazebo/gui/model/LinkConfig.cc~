@@ -113,7 +113,7 @@ msgs::Link *LinkConfig::GetData() const
 }
 
 /////////////////////////////////////////////////
-const ConfigWidget *LinkConfig::LinkConfigWidget() const
+const ConfigWidget *LinkConfig::ConfigWidget() const
 {
   return this->configWidget;
 }

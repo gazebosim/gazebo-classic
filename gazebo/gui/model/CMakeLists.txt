@@ -38,8 +38,15 @@ set (headers_install
   ModelEditor.hh
 )
 
+set (qt_tests_local
+  CollisionConfig_TEST.cc
+  GraphScene_TEST.cc
+  LinkConfig_TEST.cc
+  VisualConfig_TEST.cc
+)
+
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests_local
+  set (qt_tests_local  ${qt_tests_local}
     ExtrudeDialog_TEST.cc
     JointInspector_TEST.cc
     JointMaker_TEST.cc
