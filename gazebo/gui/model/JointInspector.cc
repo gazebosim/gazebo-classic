@@ -299,8 +299,8 @@ msgs::Joint *JointInspector::GetData() const
 
   if (currentParent == currentChild)
   {
-    gzerr << "Parent link equal to child link - not updating joint."
-        << std::endl;
+    gzerr << "Parent link [" << currentParent << "] equal to child link [" <<
+        "] - not updating joint." << std::endl;
     return NULL;
   }
 

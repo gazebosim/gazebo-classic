@@ -163,8 +163,9 @@ namespace gazebo
       public: static std::string GetJointMaterial(const std::string &_type);
 
       /// \brief Get state
-      /// \return Current state of the joint maker. If it is creating a new
-      /// joint, it returns the type of joint. Otherwise, it returns JOINT_NONE.
+      /// \return Current state of the joint maker. If mouse is enabled to
+      /// create a new joint, it returns the type of joint. Otherwise, it
+      /// returns JOINT_NONE.
       public: JointMaker::JointType GetState() const;
 
       /// \brief Stop the process of adding joint to the model.
@@ -316,8 +317,10 @@ namespace gazebo
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
 
-      /// \brief Currently selected visual
+      /// \brief Visual of the parent link for the new joint.
       private: rendering::VisualPtr parentVis;
+
+      /// \brief Visual of the child link for the new joint.
       private: rendering::VisualPtr childVis;
 
       /// \brief Name of joint that is currently being inspected.
@@ -380,6 +383,9 @@ namespace gazebo
 
       /// \brief Update this joint data.
       public: void Update();
+
+      /// \brief Update only the line of this joint, before there is a hotspot.
+      public: void UpdateJointLine();
 
       /// \brief Name of the joint.
       public: std::string name;

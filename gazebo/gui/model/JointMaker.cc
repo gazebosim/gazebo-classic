@@ -198,42 +198,84 @@ void JointMaker::DisableEventHandlers()
 void JointMaker::RemoveJoint(const std::string &_jointId)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  auto jointIt = this->joints.find(_jointId);
-  if (jointIt != this->joints.end())
-  {
-    // Copy the ID before it is deleted
-    std::string jointId = _jointId;
 
-    JointData *joint = jointIt->second;
-    rendering::ScenePtr scene = joint->hotspot->GetScene();
+  std::string jointId = _jointId;
+  JointData *joint = NULL;
+
+  // Existing joint
+  if (this->joints.find(jointId) != this->joints.end())
+  {
+    joint = this->joints[jointId];
+  }
+  // Joint being created
+  else if (this->newJoint)
+  {
+    joint = this->newJoint;
+    // Already has hotspot
+    if (joint->hotspot)
+      jointId = joint->hotspot->GetName();
+    // Still only line
+    else
+      jointId = "";
+  }
+
+  if (!joint)
+    return;
+
+  auto scene = rendering::get_scene();
+  if (!scene)
+    return;
+
+  if (joint->handles)
+  {
     scene->GetManager()->destroyBillboardSet(joint->handles);
+    joint->handles = NULL;
+  }
+
+  if (joint->hotspot)
+  {
     scene->RemoveVisual(joint->hotspot);
+    joint->hotspot->Fini();
+  }
+
+  if (joint->visual)
+  {
     scene->RemoveVisual(joint->visual);
     joint->visual->Fini();
-    if (joint->jointVisual)
+  }
+
+  if (joint->jointVisual)
+  {
+    auto parentAxisVis = joint->jointVisual->GetParentAxisVisual();
+    if (parentAxisVis)
     {
-      rendering::JointVisualPtr parentAxisVis = joint->jointVisual
-          ->GetParentAxisVisual();
-      if (parentAxisVis)
-      {
-        parentAxisVis->GetParent()->DetachVisual(
-            parentAxisVis->GetName());
-        scene->RemoveVisual(parentAxisVis);
-      }
-      joint->jointVisual->GetParent()->DetachVisual(
-          joint->jointVisual->GetName());
-      scene->RemoveVisual(joint->jointVisual);
+      parentAxisVis->GetParent()->DetachVisual(parentAxisVis->GetName());
+      scene->RemoveVisual(parentAxisVis);
     }
-    joint->hotspot.reset();
-    joint->visual.reset();
-    joint->jointVisual.reset();
-    joint->parent.reset();
-    joint->child.reset();
+    joint->jointVisual->GetParent()->DetachVisual(
+        joint->jointVisual->GetName());
+    scene->RemoveVisual(joint->jointVisual);
+  }
+
+  if (joint->inspector)
+  {
     joint->inspector->hide();
     delete joint->inspector;
-    delete joint;
-    this->joints.erase(jointIt);
-    gui::model::Events::modelChanged();
+    joint->inspector = NULL;
+  }
+
+  this->newJoint = NULL;
+  joint->hotspot.reset();
+  joint->visual.reset();
+  joint->jointVisual.reset();
+  joint->parent.reset();
+  joint->child.reset();
+  delete joint->inspector;
+  delete joint;
+  gui::model::Events::modelChanged();
+  if (jointId != "")
+  {
+    this->joints.erase(jointId);
     gui::model::Events::jointRemoved(jointId);
   }
 }
@@ -1384,24 +1426,30 @@ void JointMaker::NewParentLink(rendering::VisualPtr _parentLink)
         _parentLink);
   }
   // Update parent of joint being created
-//  else
-//  {
-//    // Reset previous parent
-//    this->parentLinkVis->SetWorldPose(this->parentLinkOriginalPose);
-//    this->SetHighlighted(this->parentLinkVis, false);
-//
-//    this->newJoint->SetParent(_parentLink);
-//
-//    // If joint already has parent and child
-//    if (this->newJoint->hotspot)
-//      this->newJoint->Update();
-//    // If joint has only parent
-//    else
-//      this->newJoint->UpdateJointLine();
-//  }
-//
+  else if (this->parentVis)
+  {
+    // Reset previous parent
+//    this->parentVis->SetWorldPose(this->parentOriginalPose);
+//    this->SetHighlighted(this->parentVis, false);
+
+    this->newJoint->parent = _parentLink;
+
+    // If joint already has parent and child
+    if (this->newJoint->hotspot)
+      this->newJoint->Update();
+    // If joint has only parent
+    else
+      this->newJoint->UpdateJointLine();
+  }
+  else
+  {
+    gzerr << "There's a joint being created but the parent visual hasn't been "
+        << "defined. This should never happen." << std::endl;
+    return;
+  }
+
   this->parentVis = _parentLink;
-//  this->parentLinkOriginalPose = _parentLink->GetWorldPose().Ign();
+//  this->parentOriginalPose = _parentLink->GetWorldPose().Ign();
 }
 
 /////////////////////////////////////////////////
@@ -1429,7 +1477,8 @@ void JointMaker::NewChildLink(rendering::VisualPtr _childLink)
   // Choosing child for the first time
   if (!this->childVis)
   {
-//      this->RemoveJoint("");
+    // Clear joint line connected to parent
+    this->RemoveJoint("");
 
     // Create new joint with parent and child
     this->newJoint = this->CreateJoint(this->parentVis,
@@ -1438,22 +1487,21 @@ void JointMaker::NewChildLink(rendering::VisualPtr _childLink)
     // Create hotspot visual
     this->CreateHotSpot(this->newJoint);
   }
-//    // Update child
-//    else
-//    {
-//      this->newJoint->SetChild(_childLink);
-//      this->newJoint->dirty = true;
-//      this->newJoint->Update();
-//      _childLink->AttachVisual(this->newJoint->jointVisual);
-//
-//      // Reset previous child
-//      this->childLinkVis->SetWorldPose(this->childLinkOriginalPose);
-//      this->SetHighlighted(this->childLinkVis, false);
-//    }
-//  }
+  // Update child
+  else
+  {
+    this->newJoint->child = _childLink;
+    this->newJoint->dirty = true;
+    this->newJoint->Update();
+    _childLink->AttachVisual(this->newJoint->jointVisual);
+
+    // Reset previous child
+//    this->childLinkVis->SetWorldPose(this->childOriginalPose);
+//    this->SetHighlighted(this->childLinkVis, false);
+  }
 
   this->childVis = _childLink;
-//  this->childLinkOriginalPose = _childLink->GetWorldPose().Ign();
+//  this->childOriginalPose = _childLink->GetWorldPose().Ign();
 
   this->jointType = JointMaker::JOINT_NONE;
 }
@@ -1500,5 +1548,16 @@ rendering::VisualPtr JointMaker::LinkVisualFromName(const std::string &_name)
     return NULL;
 
   return scene->GetVisual(scopedName);
+}
+
+/////////////////////////////////////////////////
+void JointData::UpdateJointLine()
+{
+  if (!this->parent)
+    return;
+
+  math::Vector3 origin = this->parent->GetWorldPose().pos
+      - this->parent->GetParent()->GetWorldPose().pos;
+  this->line->SetPoint(0, origin);
 }
 
