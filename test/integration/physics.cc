@@ -289,7 +289,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 #ifdef HAVE_BULLET
       if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
       {
-        posTolerance *= 1200;
+        posTolerance *= 1400;
       }
 #endif
       EXPECT_NEAR(pose1.pos.x, x0, posTolerance);
