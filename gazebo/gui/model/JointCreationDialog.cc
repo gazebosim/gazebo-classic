@@ -588,60 +588,59 @@ void JointCreationDialog::OnVector3dFromDialog(const QString &_name,
 /////////////////////////////////////////////////
 void JointCreationDialog::NewParent(const std::string &_linkName)
 {
-//  if (_linkName.empty())
-//  {
-//    gzerr << "Empty link name for parent" << std::endl;
-//    return;
-//  }
-//
-//  std::string leafName = _linkName;
-//  size_t idx = _linkName.find_last_of("::");
-//  if (idx != std::string::npos)
-//    leafName = _linkName.substr(idx+1);
-//
-//  this->dataPtr->configWidget->blockSignals(true);
-//  if (!this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo",
-//      leafName))
-//  {
-//    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
-//    return;
-//  }
-//  this->dataPtr->configWidget->blockSignals(false);
-//
-//  this->OnParentImpl(QString::fromStdString(_linkName));
+  if (_linkName.empty())
+  {
+    gzerr << "Empty link name for parent" << std::endl;
+    return;
+  }
+
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  this->dataPtr->configWidget->blockSignals(true);
+  if (!this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo",
+      leafName))
+  {
+    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
+    return;
+  }
+  this->dataPtr->configWidget->blockSignals(false);
+
+  this->OnParentImpl(QString::fromStdString(_linkName));
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::NewChild(const std::string &_linkName)
 {
-//  if (_linkName.empty())
-//  {
-//    gzerr << "Empty link name for child" << std::endl;
-//    return;
-//  }
-//
-//  if (this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
-//  {
-//    gzerr << "It shouldn't be possible to set child before parent."
-//        << std::endl;
-//    return;
-//  }
-//
-//  // Update child combo box
-//  std::string leafName = _linkName;
-//  size_t idx = _linkName.find_last_of("::");
-//  if (idx != std::string::npos)
-//    leafName = _linkName.substr(idx+1);
-//
-//  this->dataPtr->configWidget->blockSignals(true);
-//  if (!this->dataPtr->configWidget->SetEnumWidgetValue("childCombo", leafName))
-//  {
-//    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
-//    return;
-//  }
-//  this->dataPtr->configWidget->blockSignals(false);
-//
-//  this->OnChildImpl(QString::fromStdString(_linkName));
+  if (_linkName.empty())
+  {
+    gzerr << "Empty link name for child" << std::endl;
+    return;
+  }
+
+  if (this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
+  {
+    gzerr << "It's not possible to set child yet." << std::endl;
+    return;
+  }
+
+  // Update child combo box
+  std::string leafName = _linkName;
+  size_t idx = _linkName.find_last_of("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+1);
+
+  this->dataPtr->configWidget->blockSignals(true);
+  if (!this->dataPtr->configWidget->SetEnumWidgetValue("childCombo", leafName))
+  {
+    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
+    return;
+  }
+  this->dataPtr->configWidget->blockSignals(false);
+
+  this->OnChildImpl(QString::fromStdString(_linkName));
 }
 
 /////////////////////////////////////////////////

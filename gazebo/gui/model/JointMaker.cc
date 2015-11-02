@@ -311,7 +311,11 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  if (this->jointType == JointMaker::JOINT_NONE)
+
+  // Not in the process of selecting joint links with mouse
+  // Handle joint selection
+  if (this->jointType == JointMaker::JOINT_NONE ||
+      (this->parentVis && this->childVis))
   {
     rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
     if (vis)
@@ -349,6 +353,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       return false;
     }
   }
+  // Still selecting parent/child during new joint creation
   else
   {
     if (_event.Button() == common::MouseEvent::LEFT)
@@ -365,33 +370,24 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         // Pressed parent link
         if (!this->parentVis)
         {
-          if (this->newJoint)
-            return false;
+          this->NewParentLink(this->hoverVis);
 
-          this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-          this->parentVis = this->hoverVis;
-          this->hoverVis.reset();
-
-          // Create joint data with selected visual as parent
-          // the child will be set on the second mouse release.
-          this->newJoint = this->CreateJointLine("JOINT_LINE",
-              this->parentVis);
+          // Notify dialog if successful
+          if (this->parentVis)
+          {
+            this->jointCreationDialog->NewParent(this->parentVis->GetName());
+          }
         }
         // Pressed child link
         else if (this->parentVis != this->hoverVis)
         {
-          if (this->hoverVis)
-            this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-          if (this->parentVis)
-            this->parentVis->SetEmissive(common::Color(0, 0, 0));
+          this->NewChildLink(this->hoverVis);
 
-          this->newJoint->child = this->hoverVis;
-          JointData *jointData = this->CreateJoint(this->newJoint->parent,
-              this->newJoint->child);
-          this->Stop();
-          this->newJoint = jointData;
-          this->newJointCreated = true;
-          gui::model::Events::modelChanged();
+          // Notify dialog if successful
+          if (this->childVis)
+          {
+            this->jointCreationDialog->NewChild(this->childVis->GetName());
+          }
         }
       }
     }
