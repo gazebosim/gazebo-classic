@@ -81,23 +81,20 @@ void JointController::Reset()
   this->dataPtr->positions.clear();
   this->dataPtr->velocities.clear();
   this->dataPtr->forces.clear();
- 
-  if (!this->dataPtr->posPids.empty())
+
+  std::map<std::string, common::PID>::iterator iter;
+
+  for (iter = this->dataPtr->posPids.begin();
+  iter != this->dataPtr->posPids.end(); ++iter)
   {
-    for (std::size_t i = 0; i < this->dataPtr->posPids.size(); ++i)
-    {
-      this->dataPtr->posPids[std::to_string(i)].Reset();
-    }
+    this->dataPtr->posPids[iter->first].Reset();
   }
-  
-  if (!this->dataPtr->velPids.empty())
+
+  for (iter = this->dataPtr->velPids.begin();
+    iter != this->dataPtr->velPids.end(); ++iter)
   {
-    for (std::size_t i = 0; i < this->dataPtr->velPids.size(); ++i)
-    {
-      this->dataPtr->velPids[std::to_string(i)].Reset();
-    }
-  }  
-  
+    this->dataPtr->velPids[iter->first].Reset();
+  }
 }
 
 /////////////////////////////////////////////////
