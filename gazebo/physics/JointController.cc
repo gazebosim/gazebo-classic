@@ -82,6 +82,7 @@ void JointController::Reset()
   this->dataPtr->velocities.clear();
   this->dataPtr->forces.clear();
   // Should the PID's be reset as well?
+  
 }
 
 /////////////////////////////////////////////////
