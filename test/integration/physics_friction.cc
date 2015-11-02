@@ -24,15 +24,12 @@
 #ifdef HAVE_BULLET
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/bullet_math_inc.h"
 #endif
 
 #include "gazebo/transport/transport.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
-
-#ifdef HAVE_BULLET
-#include "gazebo/physics/bullet/bullet_math_inc.h"
-#endif
 
 using namespace gazebo;
 
@@ -256,8 +253,15 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
       {
         // Friction is small enough to allow motion
         // Expect velocity = acceleration * time
+        double vyTolerance = g_friction_tolerance;
+#ifdef HAVE_BULLET
+        if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+        {
+          vyTolerance *= 22;
+        }
+#endif
         EXPECT_NEAR(vel.y, (g.y + box->friction) * t.Double(),
-                    g_friction_tolerance);
+                    vyTolerance);
       }
     }
   }
