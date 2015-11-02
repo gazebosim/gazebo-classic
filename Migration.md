@@ -9,11 +9,15 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/rendering/RenderTypes.hh**
+    + typedefs for Visual and its derived classes have been changed from boost to std pointers.
+    + [pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
+
 1. **gazebo/gui/model/ModelEditorEvents.hh**
     + ***Removed:*** public: static event::EventT<void (bool, bool, const math::Pose &, const std::string &)> modelPropertiesChanged
     + ***Replacement:*** public: static event::EventT<void (bool, bool)> modelPropertiesChanged
     + ***Note:*** Removed last two arguments, model pose and name, from the function
-    
+
 1. **gazebo/rendering/Camera.hh**
     + ***Removed:*** public: void SetClipDist();
     + ***Replacement:*** public: virtual void SetClipDist();
