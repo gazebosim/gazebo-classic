@@ -98,6 +98,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->castShadows = true;
   this->dataPtr->visible = true;
   this->dataPtr->layer = -1;
+  this->dataPtr->inheritTransparency = true;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -136,6 +137,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->castShadows = true;
   this->dataPtr->visible = true;
   this->dataPtr->layer = -1;
+  this->dataPtr->inheritTransparency = true;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -246,6 +248,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
     result->SetWorldPose(this->GetWorldPose());
   result->ShowCollision(false);
+  result->SetInheritTransparency(this->InheritTransparency());
 
   result->SetName(_name);
   return result;
@@ -1345,7 +1348,8 @@ void Visual::SetWireframe(bool _show)
 //////////////////////////////////////////////////
 void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 {
-  float derivedTransparency = this->DerivedTransparency();
+  float derivedTransparency = this->dataPtr->inheritTransparency ?
+      this->DerivedTransparency() : this->dataPtr->transparency;
 
   for (unsigned int i = 0; i < _sceneNode->numAttachedObjects(); ++i)
   {
@@ -1399,7 +1403,6 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           }
 
           dc = pass->getDiffuse();
-
           dc.a = (1.0f - derivedTransparency);
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
@@ -1464,6 +1467,18 @@ void Visual::SetTransparency(float _trans)
 }
 
 //////////////////////////////////////////////////
+void Visual::SetInheritTransparency(const bool _inherit)
+{
+  this->dataPtr->inheritTransparency = _inherit;
+}
+
+//////////////////////////////////////////////////
+bool Visual::InheritTransparency() const
+{
+  return this->dataPtr->inheritTransparency;
+}
+
+//////////////////////////////////////////////////
 void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
@@ -1517,6 +1532,9 @@ float Visual::GetTransparency()
 //////////////////////////////////////////////////
 float Visual::DerivedTransparency() const
 {
+  if (!this->InheritTransparency())
+    return this->dataPtr->transparency;
+
   float derivedTransparency = this->dataPtr->transparency;
 
   VisualPtr worldVis = this->dataPtr->scene->GetWorldVisual();
@@ -1526,6 +1544,8 @@ float Visual::DerivedTransparency() const
   {
     derivedTransparency = 1 - ((1 - derivedTransparency) *
         (1 - vis->GetTransparency()));
+    if (!vis->InheritTransparency())
+      break;
     vis = vis->GetParent();
   }
 

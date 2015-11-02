@@ -265,6 +265,14 @@ namespace gazebo
       /// \return The derived transparency.
       public: float DerivedTransparency() const;
 
+      /// \brief Set whether to inherit transparency from parent
+      /// \param[in] _inherit True to inherit transparency.
+      public: void SetInheritTransparency(const bool _inherit);
+
+      /// \brief Get whether this visual inherits transparency from parent
+      /// \return True if the visual inherits transparency.
+      public: bool InheritTransparency() const;
+
       /// \brief Set the visual to be visually highlighted. This is most
       /// often used when an object is selected by a user via the GUI.
       /// \param[in] _highlighted True to enable the highlighting.

@@ -547,6 +547,23 @@ TEST_F(Visual_TEST, DerivedTransparency)
           visualPair.first->GetChild(i), visualPair.second->GetChild(i)));
     }
   }
+
+  // verify inherit transparency
+  EXPECT_TRUE(cylinder->InheritTransparency());
+  EXPECT_TRUE(cylinderLink->InheritTransparency());
+  EXPECT_TRUE(cylinderVisual->InheritTransparency());
+
+  cylinderLink->SetInheritTransparency(false);
+  EXPECT_TRUE(cylinder->InheritTransparency());
+  EXPECT_FALSE(cylinderLink->InheritTransparency());
+  EXPECT_TRUE(cylinderVisual->InheritTransparency());
+
+  EXPECT_FLOAT_EQ(cylinder->DerivedTransparency(), newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinderLink->DerivedTransparency(),
+      newCylinderLinkTransparency);
+  EXPECT_FLOAT_EQ(cylinderVisual->DerivedTransparency(),
+      1.0 - ((1.0 - newCylinderLinkTransparency) *
+      (1.0 - newCylinderVisualTransparency)));
 }
 
 /////////////////////////////////////////////////
