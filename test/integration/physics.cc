@@ -25,6 +25,10 @@
 #include "gazebo/msgs/msgs.hh"
 #include "helper_physics_generator.hh"
 
+#ifdef HAVE_BULLET
+#include "gazebo/physics/bullet/bullet_math_inc.h"
+#endif
+
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
@@ -281,8 +285,15 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
       x0 = modelPos[name].x;
-      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
+      double posTolerance = PHYSICS_TOL;
+#ifdef HAVE_BULLET
+      if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+      {
+        posTolerance *= 1200;
+      }
+#endif
+      EXPECT_NEAR(pose1.pos.x, x0, posTolerance);
+      EXPECT_NEAR(pose1.pos.y, 0, posTolerance);
 
       // debug
       // if (physics->GetType()  == "bullet")
@@ -943,6 +954,13 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
     for (int i = 0; i < steps; ++i)
     {
       double t = world->GetSimTime().Double();
+      double velTolerance = PHYSICS_TOL;
+#ifdef HAVE_BULLET
+      if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+      {
+        velTolerance *= 11;
+      }
+#endif
 
       world->Step(1);  // theoretical contact, but
       {
@@ -976,7 +994,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
           {
             // collision happened
             EXPECT_NEAR(pose.pos.x, x, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
+            EXPECT_NEAR(vel.x, v, velTolerance);
           }
         }
 
@@ -1005,7 +1023,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
           {
             // collision happened
             EXPECT_NEAR(pose.pos.x, x + 1.0, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
+            EXPECT_NEAR(vel.x, v, velTolerance);
           }
         }
       }

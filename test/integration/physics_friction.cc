@@ -30,6 +30,10 @@
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
 
+#ifdef HAVE_BULLET
+#include "gazebo/physics/bullet/bullet_math_inc.h"
+#endif
+
 using namespace gazebo;
 
 const double g_friction_tolerance = 1e-3;

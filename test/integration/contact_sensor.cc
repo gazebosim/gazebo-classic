@@ -15,6 +15,7 @@
  *
 */
 
+#include <cmath>
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
@@ -286,7 +287,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
         EXPECT_NEAR(contacts[k].contact(i).normal(j).x(), 0, TOL);
         EXPECT_NEAR(contacts[k].contact(i).normal(j).y(), 0, TOL);
-        EXPECT_NEAR(contacts[k].contact(i).normal(j).z(), 1, TOL);
+        EXPECT_NEAR(std::abs(contacts[k].contact(i).normal(j).z()), 1, TOL);
 
         if (body1)
         {
