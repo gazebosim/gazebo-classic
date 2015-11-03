@@ -136,14 +136,12 @@ namespace gazebo
       /// \brief Pointer to the joint maker.
       private: JointMaker *jointMaker;
 
-      /// \brief Style sheet for link widgets when there's a warning.
-      private: QString warningStyleSheet;
-
-      /// \brief Normal style sheet for link widgets.
-      private: QString normalStyleSheet;
-
       /// \brief Unique ID which identifies this joint in the joint maker.
       private: std::string jointId;
+
+      /// \brief Label holding icon which represents the parent link. The icon
+      /// color changes according to the joint type.
+      private: QLabel *parentIcon;
     };
     /// \}
   }

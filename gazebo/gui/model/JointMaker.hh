@@ -235,7 +235,7 @@ namespace gazebo
       /// \param[in] _visual Visual of the link.
       /// \return Centroid in world coordinates;
       private: math::Vector3 GetLinkWorldCentroid(
-          const rendering::VisualPtr _visual);
+          const rendering::VisualPtr &_visual);
 
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.

@@ -119,7 +119,7 @@ MainWindow::MainWindow()
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("mainTab");
   this->tabWidget->addTab(this->modelListWidget, "World");
-  this->tabWidget->addTab(insertModel, "Insert");
+  this->tabWidget->addTab(this->insertModel, "Insert");
   this->tabWidget->addTab(layersWidget, "Layers");
   this->tabWidget->setSizePolicy(QSizePolicy::Expanding,
                                  QSizePolicy::Expanding);

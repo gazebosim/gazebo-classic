@@ -33,6 +33,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/model/EditorMaterialSwitcher.hh"
+#include "gazebo/gui/model/ModelTreeWidget.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -53,9 +54,15 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow), dataPtr(new ModelEditorPrivate)
 {
   this->dataPtr->active = false;
-  // Create the model editor tab
+  // Create the model editor palette tab
   this->dataPtr->modelPalette = new ModelEditorPalette(_mainWindow);
-  this->Init("modelEditorTab", "Model Editor", this->dataPtr->modelPalette);
+  // create the model tree tab
+  this->dataPtr->modelTree = new ModelTreeWidget(_mainWindow);
+  this->dataPtr->modelTree->hide();
+  this->Init("modelEditorTab", "Insert", this->dataPtr->modelPalette);
+  this->tabWidget->addTab(this->dataPtr->modelTree, tr("Settings"));
+
+  GZ_ASSERT(this->tabWidget != NULL, "Editor tab widget is NULL");
 
   rendering::CameraPtr camera = boost::dynamic_pointer_cast<rendering::Camera>(
       gui::get_active_camera());
@@ -267,7 +274,12 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
       SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
 
+  this->dataPtr->connections.push_back(
+      gui::Events::ConnectCreateEntity(
+        boost::bind(&ModelEditor::OnCreateEntity, this, _1, _2)));
+
   this->dataPtr->menuBar = NULL;
+  this->dataPtr->insertModel = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -423,7 +435,53 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   this->dataPtr->active = !this->dataPtr->active;
   this->ToggleMaterialScheme();
   this->ToggleToolbar();
+  this->ToggleInsertWidget();
   // g_editModelAct->setChecked(this->dataPtr->active);
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::ToggleInsertWidget()
+{
+  QTabWidget *mainTab = this->mainWindow->findChild<QTabWidget *>("mainTab");
+  if (!mainTab)
+    return;
+
+  if (!this->dataPtr->active)
+  {
+    this->dataPtr->modelTree->hide();
+    mainTab->setCurrentIndex(0);
+    return;
+  }
+
+  if (!this->dataPtr->insertModel)
+  {
+    for (int i = 0; i < mainTab->count(); ++i)
+    {
+      if (mainTab->tabText(i) == tr("Insert"))
+      {
+        QWidget *insertModel = mainTab->widget(i);
+        this->dataPtr->insertModel = insertModel;
+        break;
+      }
+    }
+  }
+
+  int insertModelIdx =
+      mainTab->indexOf(this->dataPtr->insertModel);
+
+  if (insertModelIdx < 0)
+  {
+    gzerr << "Insert tab not found. It will not be available in the"
+        << " model editor" << std::endl;
+    return;
+  }
+
+  mainTab->removeTab(insertModelIdx);
+
+  this->dataPtr->modelPalette->InsertWidget(1, this->dataPtr->insertModel);
+  this->dataPtr->modelPalette->show();
+  this->dataPtr->insertModel->show();
+  this->tabWidget->setCurrentIndex(0);
 }
 
 /////////////////////////////////////////////////
@@ -456,4 +514,42 @@ void ModelEditor::ToggleToolbar()
     gui::Events::windowMode("ModelEditor");
   else
     gui::Events::windowMode("Simulation");
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::OnCreateEntity(const std::string &_type,
+                                 const std::string &_data)
+{
+  if (!this->dataPtr->active)
+    return;
+
+  if (_type == "model" && !_data.empty())
+  {
+    sdf::SDFPtr modelSDF(new sdf::SDF);
+    sdf::initFile("root.sdf", modelSDF);
+
+    if (!sdf::readFile(_data, modelSDF))
+    {
+      gzerr << "Unable to load file[" << _data << "]\n";
+      return;
+    }
+
+    if (modelSDF->Root()->HasElement("model"))
+    {
+      this->AddEntity(modelSDF->Root()->GetElement("model"));
+    }
+    else
+    {
+      gzerr << "No model in SDF\n";
+      return;
+    }
+  }
+}
+
+////////////////////////////////////////////////
+void ModelEditor::AddEntity(sdf::ElementPtr _sdf)
+{
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+  this->dataPtr->modelPalette->GetModelCreator()->AddEntity(_sdf);
 }
