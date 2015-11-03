@@ -71,7 +71,7 @@ if (HAVE_GRAPHVIZ)
     model/SchematicViewWidget.cc
   )
 
-  set (qt_tests_local
+  set (qt_tests_local ${qt_tests_local}
     GraphScene_TEST.cc
   )
 
