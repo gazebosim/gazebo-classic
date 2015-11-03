@@ -40,7 +40,6 @@ set (headers_install
 
 set (qt_tests_local
   CollisionConfig_TEST.cc
-  GraphScene_TEST.cc
   LinkConfig_TEST.cc
   VisualConfig_TEST.cc
 )
