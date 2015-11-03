@@ -291,6 +291,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
   };
   std::vector<physics::ModelPtr> models;
   std::vector<physics::JointPtr> joints;
+  std::vector<physics::LinkPtr> links;
   std::vector<double> pendulumLengths;
   std::vector<double> initialAngles;
   std::vector<double> cycleAngles;
@@ -308,6 +309,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
 
     auto link = model->GetLink();
     ASSERT_TRUE(link != NULL);
+    links.push_back(link);
 
     auto joint = model->GetJoint("joint");
     ASSERT_TRUE(joint != NULL);
@@ -329,12 +331,14 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     // hysteresis threshhold for cycle counting
     cycleAngles.push_back(angle / 2);
 
-    // counting oscillation cycles
+    // count of oscillation cycles
     cycleCount.push_back(0);
   }
 
   // unthrottle physics to allow for many timesteps
   physics->SetRealTimeUpdateRate(0.0);
+
+  // simulate 30 seconds and count oscillation cycles
   const int steps = 30000;
   const double timeStepped = steps * dt;
   for (int step = 0; step < steps; ++step)
@@ -356,6 +360,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     }
   }
 
+  // Verify that expected number of cycles is counted
   for (unsigned int i = 0; i < models.size(); ++i)
   {
     auto length = pendulumLengths[i];
@@ -365,58 +370,104 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     double freq = 0.5 * M_1_PI * sqrt(300.0 / 401.0 * g.GetLength() / length);
     // 2 cycles counted per oscillation
     double expectedCycles = 2 * freq * timeStepped;
-    EXPECT_EQ(cycles, int(expectedCycles));
+    EXPECT_EQ(cycles, static_cast<int>(expectedCycles));
   }
 
-  // const std::string modelName("cube1");
-  // auto model = world->GetModel(modelName);
-  // ASSERT_TRUE(model != NULL);
-  // auto link = model->GetLink();
-  // ASSERT_TRUE(link != NULL);
-  // auto inertial = link->GetInertial();
-  // ASSERT_TRUE(inertial != NULL);
-  // const double mass = inertial->GetMass();
-  // const math::Vector3 cog = inertial->GetCoG();
-  // const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
-  // const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
-  // EXPECT_DOUBLE_EQ(mass, 45.56250000000001);
-  // EXPECT_EQ(cog, math::Vector3::Zero);
-  // EXPECT_EQ(Ixxyyzz, 1.537734375*math::Vector3::One);
-  // EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+  // modify inertia of each named pendulum
+  for (unsigned int i = 0; i < models.size(); ++i)
+  {
+    auto model = models[i];
+    auto joint = joints[i];
+    auto link = links[i];
 
-  // // new inertial values
-  // msgs::Model msg;
-  // msg.set_name(modelName);
-  // msg.add_link();
-  // auto msgLink = msg.mutable_link(0);
-  // msgLink->set_name("link");
-  // msgLink->set_id(link->GetId());
-  // auto msgInertial = msgLink->mutable_inertial();
-  // const double newMass = 500;
-  // msgInertial->set_mass(newMass);
+    auto inertial = link->GetInertial();
+    ASSERT_TRUE(inertial != NULL);
+    const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
+    const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
 
-  // // Set inertial properties by publishing to "~/model/modify"
-  // transport::PublisherPtr modelPub =
-  //   this->node->Advertise<msgs::Model>("~/model/modify");
-  // modelPub->WaitForConnection();
-  // modelPub->Publish(msg, true);
+    // new inertial values
+    msgs::Model msg;
+    msg.set_name(modelNames[i]);
+    msg.add_link();
+    auto msgLink = msg.mutable_link(0);
+    msgLink->set_name("link");
+    msgLink->set_id(link->GetId());
+    auto msgInertial = msgLink->mutable_inertial();
+    msgInertial->set_ixx(Ixxyyzz[0] * 2);
+    msgInertial->set_iyy(Ixxyyzz[1] * 2);
+    msgInertial->set_izz(Ixxyyzz[2] * 2);
 
-  // while (!math::equal(newMass, inertial->GetMass()))
-  // {
-  //   world->Step(1);
-  //   common::Time::MSleep(1);
-  //   modelPub->Publish(msg, true);
-  // }
-  // EXPECT_DOUBLE_EQ(inertial->GetMass(), msgInertial->mass());
+    // Set inertial properties by publishing to "~/model/modify"
+    transport::PublisherPtr modelPub =
+      this->node->Advertise<msgs::Model>("~/model/modify");
+    modelPub->WaitForConnection();
+    modelPub->Publish(msg, true);
 
-  // world->Step(1000);
-  // EXPECT_LT(model->GetWorldPose().pos.z, 0.40);
+    while (Ixxyyzz[0] == inertial->GetPrincipalMoments()[0])
+    {
+      world->Step(1);
+      common::Time::MSleep(1);
+      modelPub->Publish(msg, true);
+    }
+    EXPECT_NEAR(2*Ixxyyzz[0], inertial->GetPrincipalMoments()[0], 1e-10);
+    EXPECT_NEAR(2*Ixxyyzz[1], inertial->GetPrincipalMoments()[1], 1e-10);
+    EXPECT_NEAR(2*Ixxyyzz[2], inertial->GetPrincipalMoments()[2], 1e-10);
+  }
+
+  // Reset world and cycle count to restore initial conditions
+  world->Reset();
+  for (unsigned int i = 0; i < cycleCount.size(); ++i)
+  {
+    cycleCount[i] = 0;
+    cycleAngles[i] = initialAngles[i] / 2;
+  }
+
+  // simulate 30 seconds and count oscillation cycles
+  for (int step = 0; step < steps; ++step)
+  {
+    world->Step(1);
+    for (unsigned int i = 0; i < models.size(); ++i)
+    {
+      auto model = models[i];
+      auto joint = joints[i];
+      auto initialAngle = initialAngles[i];
+      auto cycleAngle = cycleAngles[i];
+
+      auto angle = joint->GetAngle(0).Radian() - initialAngle;
+      if (angle / cycleAngle >= 1)
+      {
+        cycleAngles[i] *= -1;
+        cycleCount[i]++;
+      }
+    }
+  }
+
+  // Verify that expected number of cycles is counted
+  for (unsigned int i = 0; i < models.size(); ++i)
+  {
+    auto length = pendulumLengths[i];
+    auto cycles = cycleCount[i];
+    // expected natural frequency for box pendulum (Hz)
+    // see physics_msgs_inertia.ipynb for derivation
+    double freq = 0.5 * M_1_PI * sqrt(150.0 / 251.0 * g.GetLength() / length);
+    // 2 cycles counted per oscillation
+    double expectedCycles = 2 * freq * timeStepped;
+    EXPECT_EQ(cycles, static_cast<int>(expectedCycles));
+  }
 }
 
 /////////////////////////////////////////////////
 TEST_P(InertiaMsgsTest, SetPendulumInertia)
 {
-  SetPendulumInertia(GetParam());
+  std::string physicsEngine = GetParam();
+  if (physicsEngine == "simbody")
+  {
+    gzerr << physicsEngine
+          << " doesn't yet support dynamically changing moment of inertia"
+          << std::endl;
+    return;
+  }
+  SetPendulumInertia(physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, InertiaMsgsTest,
