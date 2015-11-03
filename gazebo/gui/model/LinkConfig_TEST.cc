@@ -15,9 +15,9 @@
  *
 */
 
+#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/model/LinkConfig.hh"
 #include "gazebo/gui/model/LinkConfig_TEST.hh"
-#include "gazebo/gui/ConfigWidget.hh"
 
 #include "test_config.h"
 

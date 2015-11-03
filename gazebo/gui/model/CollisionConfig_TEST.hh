@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the collision config object.
+/// \brief A test class for the CollisionConfig class.
 class CollisionConfig_TEST : public QTestFixture
 {
   Q_OBJECT

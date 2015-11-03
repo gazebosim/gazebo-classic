@@ -15,11 +15,10 @@
  *
 */
 
-#include <QColor>
-
 #include "gazebo/gui/qgv/QGVNode.h"
 #include "gazebo/gui/qgv/QGVEdge.h"
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/GraphScene.hh"
 #include "gazebo/gui/model/GraphScene_TEST.hh"
 
@@ -56,8 +55,9 @@ void GraphScene_TEST::NodeUpdates()
 void GraphScene_TEST::EdgeUpdates()
 {
   GraphScene gs;
-  QGVNode *node1, *node2;
-  QGVEdge *edge1;
+  QGVNode *node1 = NULL;
+  QGVNode *node2 = NULL;
+  QGVEdge *edge1 = NULL;
 
   node1 = gs.AddNode("node1");
   QVERIFY(node1 != NULL);
@@ -79,7 +79,7 @@ void GraphScene_TEST::EdgeUpdates()
 void GraphScene_TEST::EdgeColor()
 {
   GraphScene gs;
-  QGVEdge *edge1;
+  QGVEdge *edge1 = NULL;
 
   gs.AddNode("node1");
   gs.AddNode("node2");

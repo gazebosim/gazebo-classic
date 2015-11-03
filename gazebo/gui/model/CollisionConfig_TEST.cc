@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/gui/model/CollisionConfig.hh"
 #include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/model/CollisionConfig.hh"
 #include "gazebo/gui/model/CollisionConfig_TEST.hh"
 
 #include "test_config.h"

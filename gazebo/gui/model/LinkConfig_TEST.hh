@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the link config object.
+/// \brief A test class for the LinkConfig class.
 class LinkConfig_TEST : public QTestFixture
 {
   Q_OBJECT
@@ -37,10 +37,10 @@ class LinkConfig_TEST : public QTestFixture
   /// \brief Test mass update
   private slots: void MassUpdate();
 
-  /// \brief Test inertia update
+  /// \brief Test inertia matrix update
   private slots: void InertiaMatrixUpdate();
 
-  /// \brief Test inertia update
+  /// \brief Test inertia pose update
   private slots: void InertialPoseUpdate();
 };
 

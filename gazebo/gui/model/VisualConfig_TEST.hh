@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the visual config object.
+/// \brief A test class for the VisualConfig class.
 class VisualConfig_TEST : public QTestFixture
 {
   Q_OBJECT
@@ -28,7 +28,7 @@ class VisualConfig_TEST : public QTestFixture
   /// \brief Test initialization.
   private slots: void Initialization();
 
-  /// \brief Test collision data management
+  /// \brief Test visual data management
   private slots: void VisualUpdates();
 
   /// \brief Test geometry data management

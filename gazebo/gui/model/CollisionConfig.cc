@@ -335,14 +335,6 @@ void CollisionConfig::Geometry(const std::string &_name,
 const std::map<int, CollisionConfigData *> &CollisionConfig::ConfigData() const
 {
   return this->configs;
-
-/*  std::map<int, const CollisionConfigData *> result;
-
-  for (auto &it : this->configs)
-  {
-    result.insert(std::pair<int, CollisionConfigData *>(it.first, it.second));
-  }
-  return result;*/
 }
 
 /////////////////////////////////////////////////

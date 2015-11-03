@@ -20,7 +20,7 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for graph scene object.
+/// \brief A test class for GraphScene class.
 class GraphScene_TEST : public QTestFixture
 {
   Q_OBJECT
