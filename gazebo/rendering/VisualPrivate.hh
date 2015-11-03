@@ -76,7 +76,8 @@ namespace gazebo
                 visibilityFlags(GZ_VISIBILITY_ALL),
                 type(Visual::VT_ENTITY),
                 layer(0),
-                inheritTransparency(true)
+                inheritTransparency(true),
+                wireframe(false)
       {
       }
 
@@ -201,6 +202,9 @@ namespace gazebo
 
       /// \brief True to inherit transparency from parent.
       public: bool inheritTransparency;
+
+      /// \brief True if wireframe mode is enabled
+      public: bool wireframe;
     };
     /// \}
   }

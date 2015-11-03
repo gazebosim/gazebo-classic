@@ -294,6 +294,7 @@ void Visual::Init()
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
   this->dataPtr->layer = -1;
+  this->dataPtr->wireframe = false;
 
   if (this->dataPtr->useRTShader)
     RTShaderSystem::Instance()->AttachEntity(this);
@@ -1297,13 +1298,19 @@ common::Color Visual::GetEmissive() const
 //////////////////////////////////////////////////
 void Visual::SetWireframe(bool _show)
 {
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  if (this->dataPtr->type == VT_GUI || this->dataPtr->type == VT_PHYSICS ||
+      this->dataPtr->type == VT_SENSOR)
+    return;
+
+  for (auto &iter : this->dataPtr->children)
   {
-    (*iter)->SetWireframe(_show);
+    iter->SetWireframe(_show);
   }
 
+  if (this->dataPtr->wireframe == _show)
+    return;
+
+  this->dataPtr->wireframe = _show;
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
   {
@@ -1343,6 +1350,12 @@ void Visual::SetWireframe(bool _show)
       }
     }
   }
+}
+
+//////////////////////////////////////////////////
+bool Visual::Wireframe() const
+{
+  return this->dataPtr->wireframe;
 }
 
 //////////////////////////////////////////////////

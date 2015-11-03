@@ -567,6 +567,65 @@ TEST_F(Visual_TEST, DerivedTransparency)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, Wireframe)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  sdf::ElementPtr sphereSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", sphereSDF);
+  sdf::readString(GetVisualSDFString("sphere_visual", "sphere",
+      gazebo::math::Pose::Zero, 0), sphereSDF);
+  gazebo::rendering::VisualPtr sphereVis(
+      new gazebo::rendering::Visual("sphere_visual", scene));
+  sphereVis->Load(sphereSDF);
+
+  sdf::ElementPtr boxSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", boxSDF);
+  sdf::readString(GetVisualSDFString("box_visual", "box",
+      gazebo::math::Pose::Zero, 0), boxSDF);
+  gazebo::rendering::VisualPtr boxVis(
+      new gazebo::rendering::Visual("box_visual", sphereVis));
+  boxVis->Load(boxSDF);
+
+  // wireframe should be disabled by default
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+
+  // enable wireframe for box visual
+  boxVis->SetWireframe(true);
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_TRUE(boxVis->Wireframe());
+
+  // disable wireframe for box visual
+  boxVis->SetWireframe(false);
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+
+  // enable wireframe for sphere visual, it should cascade down to box visual
+  sphereVis->SetWireframe(true);
+  EXPECT_TRUE(sphereVis->Wireframe());
+  EXPECT_TRUE(boxVis->Wireframe());
+
+  // reset everything
+  sphereVis->SetWireframe(false);
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+
+  // check that certain visual types won't be affected by wireframe mode
+  boxVis->SetType(rendering::Visual::VT_GUI);
+  boxVis->SetWireframe(true);
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+
+  sphereVis->SetWireframe(true);
+  EXPECT_TRUE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+}
+
+/////////////////////////////////////////////////
 TEST_F(Visual_TEST, Material)
 {
   Load("worlds/empty.world");

@@ -246,6 +246,10 @@ namespace gazebo
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);
 
+      /// \brief Get whether wireframe is enabled for this visual.
+      /// \return True if wireframe is enabled for this visual.
+      public: bool Wireframe() const;
+
       /// \brief Set the transparency of a single visual without calling
       /// UpdateShaders.
       /// \param[in] _sceneNode The target scene node.
