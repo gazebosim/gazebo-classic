@@ -38,7 +38,6 @@ set (files
   plugin.world
   polyline.world
   population.world
-  pendulum_axes.world
   pr2.world
   presentation.world
   pressure_sensor.world
