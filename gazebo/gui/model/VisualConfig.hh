@@ -21,8 +21,6 @@
 #include <map>
 #include <string>
 
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelData.hh"
 
@@ -41,6 +39,9 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Restore the widget's data to how it was when first opened.
+      public slots: void RestoreOriginalData();
+
       /// \brief Qt callback when this item's button has been pressed.
       /// \param[in] _checked Whether it was checked or unchecked.
       private slots: void OnToggleItem(bool _checked);
@@ -56,6 +57,10 @@ namespace gazebo
 
       /// \brief Widget associated with this data.
       public: QWidget *widget;
+
+      /// \brief Message containing the data which was in the widget when first
+      /// open.
+      public: msgs::Visual originalDataMsg;
     };
 
     /// \class VisualConfig VisualConfig.hh
@@ -69,6 +74,12 @@ namespace gazebo
 
       /// \brief Destructor
       public: ~VisualConfig();
+
+      /// \brief Initialize widget.
+      public: void Init();
+
+      /// \brief Restore the widget's data to how it was when first opened.
+      public slots: void RestoreOriginalData();
 
       /// \brief Add a visual widget to the tab.
       /// \param[in] _name Name of visual added.
@@ -133,12 +144,54 @@ namespace gazebo
       /// \param[in] _name Name of visual added.
       Q_SIGNALS: void VisualAdded(const std::string &_name);
 
+      /// \brief Qt signal emitted to indicate that changes should be applied.
+      Q_SIGNALS: void Applied();
+
       /// \brief Qt callback when a visual is to be added.
       private slots: void OnAddVisual();
 
       /// \brief Qt callback when a visual is to be removed.
       /// \param[in] _id Id of item to be removed.
       private slots: void OnRemoveVisual(int _id);
+
+      /// \brief Qt callback when a pose value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnPoseChanged(const QString &_name,
+          const ignition::math::Pose3d &_value);
+
+      /// \brief Qt callback when a geometry value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New geometry value.
+      /// \param[in] _dimensions New dimensions.
+      /// \param[in] _uri New uri, for meshes.
+      private slots: void OnGeometryChanged(const std::string &_name,
+          const std::string &_value,
+          const ignition::math::Vector3d &_dimensions,
+          const std::string &_uri);
+
+      /// \brief Qt callback when a color value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnColorChanged(const QString &_name,
+          const gazebo::common::Color &_value);
+
+      /// \brief Qt callback when a double value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnDoubleChanged(const QString &_name,
+          const double _value);
+
+      /// \brief Qt callback when a string value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnStringChanged(const QString &_name,
+          const std::string &_value);
 
       /// \brief Map of id to visual config widget.
       private: std::map<int, VisualConfigData *> configs;

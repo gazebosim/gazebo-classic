@@ -15,16 +15,18 @@
  *
 */
 
-#ifndef _GAZEBO_VISUALCONFIG_TEST_HH_
-#define _GAZEBO_VISUALCONFIG_TEST_HH_
+#ifndef _GAZEBO_VISUAL_CONFIG_TEST_HH_
+#define _GAZEBO_VISUAL_CONFIG_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the VisualConfig class.
+/// \brief A test class for the visual config.
 class VisualConfig_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Constructor
+  public: VisualConfig_TEST() = default;
   /// \brief Test initialization.
   private slots: void Initialization();
 
@@ -33,6 +35,15 @@ class VisualConfig_TEST : public QTestFixture
 
   /// \brief Test geometry data management
   private slots: void GeometryUpdates();
+
+    /// \brief Test that the Applied signal is emitted when widgets are edited.
+  private slots: void AppliedSignal();  
+
+  /// \brief Slot that receives Applied signals.
+  private slots: void OnApply();
+
+  /// \brief Count how many Applied signals have been emitted.
+  private: unsigned int g_appliedSignalCount = 0;
 };
 
 #endif

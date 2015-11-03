@@ -71,6 +71,12 @@ namespace gazebo
 
       /// \brief Visual representing this model.
       public: rendering::VisualPtr modelVisual;
+
+      /// \brief Models inside this model
+      public: std::map<std::string, rendering::VisualWeakPtr> models;
+
+      /// \brief Links inside this model
+      public: std::map<std::string, rendering::VisualWeakPtr> links;
     };
 
     /// \class LinkData LinkData.hh
@@ -203,6 +209,9 @@ namespace gazebo
 
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
+
+      /// \brief Flag set to true if this is a link of a nested model.
+      public: bool nested;
     };
 
     /// \brief Helper class to store model plugin data
