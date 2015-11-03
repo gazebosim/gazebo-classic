@@ -117,6 +117,9 @@ using the same arguments used in the command line.
         * [Pull request #1887](https://bitbucket.org/osrf/gazebo/pull-request/1887)
         * [Issue #1500](https://bitbucket.org/osrf/gazebo/issue/1500)
 
+    1. Presets combo box for Vector3 config widget
+        * [Pull request #1954](https://bitbucket.org/osrf/gazebo/pull-request/1954)
+
     1. Added support for more joint types (gearbox and fixed joints).
         * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
 

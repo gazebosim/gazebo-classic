@@ -166,8 +166,8 @@ class ConfigWidget_TEST : public QTestFixture
   /// \brief Check that string has been received.
   private: bool g_stringSignalReceived = false;
 
-  /// \brief Check that vector3 has been received.
-  private: bool g_vector3SignalReceived = false;
+  /// \brief Check how many times the vector3 signal has been received.
+  private: int g_vector3SignalCount = 0;
 
   /// \brief Check that color has been received.
   private: bool g_colorSignalReceived = false;

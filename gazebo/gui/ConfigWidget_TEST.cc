@@ -1444,15 +1444,25 @@ void ConfigWidget_TEST::ChildVector3dSignal()
   QVERIFY(configWidget->GetVector3WidgetValue("vector3") ==
       gazebo::math::Vector3());
 
-  // Get signal emitting widgets
+  // Get axes spins
   QList<QDoubleSpinBox *> spins =
       vector3Widget->findChildren<QDoubleSpinBox *>();
   QCOMPARE(spins.size(), 3);
 
+  // Get preset combo
+  auto combos = vector3Widget->findChildren<QComboBox *>();
+  QCOMPARE(combos.size(), 1);
+
   // Change the X value and check new vector3 at OnVector3dValueChanged
+  QVERIFY(g_vector3SignalCount == 0);
   spins[0]->setValue(2.5);
   QTest::keyClick(spins[0], Qt::Key_Enter);
-  QVERIFY(g_vector3SignalReceived == true);
+  QVERIFY(g_vector3SignalCount == 1);
+
+  // Change the preset value and check new vector3 at OnVector3dValueChanged
+  combos[0]->setCurrentIndex(4);
+  QTest::keyClick(combos[0], Qt::Key_Enter);
+  QVERIFY(g_vector3SignalCount == 2);
 
   delete configWidget;
 }
@@ -1462,8 +1472,19 @@ void ConfigWidget_TEST::OnVector3dValueChanged(const QString &_name,
     const ignition::math::Vector3d &_vector3)
 {
   QVERIFY(_name == "vector3");
-  QVERIFY(_vector3 == ignition::math::Vector3d(2.5, 0, 0));
-  g_vector3SignalReceived = true;
+
+  // From spins
+  if (g_vector3SignalCount == 0)
+  {
+    QVERIFY(_vector3 == ignition::math::Vector3d(2.5, 0, 0));
+    g_vector3SignalCount++;
+  }
+  // From preset combo
+  else if (g_vector3SignalCount == 1)
+  {
+    QVERIFY(_vector3 == ignition::math::Vector3d(0, -1, 0));
+    g_vector3SignalCount++;
+  }
 }
 
 /////////////////////////////////////////////////
