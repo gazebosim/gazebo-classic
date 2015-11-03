@@ -71,6 +71,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
+#include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
@@ -159,6 +160,7 @@ World::World(const std::string &_name)
 World::~World()
 {
   this->dataPtr->presetManager.reset();
+  this->dataPtr->userCmdManager.reset();
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
   delete this->dataPtr->loadModelMutex;
@@ -315,6 +317,9 @@ void World::Load(sdf::ElementPtr _sdf)
   // this->dataPtr->modelUpdateFunc = &World::ModelUpdateTBB;
 
   event::Events::worldCreated(this->GetName());
+
+  this->dataPtr->userCmdManager = UserCmdManagerPtr(
+      new UserCmdManager(shared_from_this()));
 
   this->dataPtr->loaded = true;
 }
@@ -2466,4 +2471,11 @@ void World::_AddDirty(Entity *_entity)
 {
   GZ_ASSERT(_entity != NULL, "_entity is NULL");
   this->dataPtr->dirtyPoses.push_back(_entity);
+}
+
+/////////////////////////////////////////////////
+void World::ResetPhysicsStates()
+{
+  for (auto &model : this->dataPtr->models)
+    model->ResetPhysicsStates();
 }

@@ -48,6 +48,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
     * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
     * [Pull request #1895](https://bitbucket.org/osrf/gazebo/pull-request/1895)
 
+1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
+    * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
+
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
 
@@ -117,6 +120,9 @@ using the same arguments used in the command line.
         * [Pull request #1887](https://bitbucket.org/osrf/gazebo/pull-request/1887)
         * [Issue #1500](https://bitbucket.org/osrf/gazebo/issue/1500)
 
+    1. Presets combo box for Vector3 config widget
+        * [Pull request #1954](https://bitbucket.org/osrf/gazebo/pull-request/1954)
+
     1. Added support for more joint types (gearbox and fixed joints).
         * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
 
@@ -145,9 +151,16 @@ using the same arguments used in the command line.
         * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
         * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
 
+    1. Apply inspector changes in real time and add reset button
+        * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
+        * [Issue #1472](https://bitbucket.org/osrf/gazebo/issue/1472)
+
     1. Set physics to be paused when exiting model editor mode
         * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
         * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
+
+    1. Add Insert tab to model editor
+        * [Pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
 
 ## Gazebo 6.0
 
