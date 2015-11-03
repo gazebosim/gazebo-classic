@@ -1555,6 +1555,61 @@ void ConfigWidget_TEST::OnPoseValueChanged(const QString &_name,
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget_TEST::ChildGeometrySignal()
+{
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
+
+  // Create child widget
+  gazebo::gui::ConfigChildWidget *geometryWidget =
+      configWidget->CreateGeometryWidget("geometry");
+  QVERIFY(geometryWidget != NULL);
+
+  // Add to config widget
+  QVERIFY(configWidget->AddConfigChildWidget("geometry", geometryWidget));
+
+  // Connect signals
+  connect(configWidget,
+      SIGNAL(GeometryValueChanged(const std::string &, const std::string &,
+      const ignition::math::Vector3d &, const std::string &)),
+      this,
+      SLOT(OnGeometryValueChanged(const std::string &, const std::string &,
+      const ignition::math::Vector3d &, const std::string &)));
+
+  // Check default
+  ignition::math::Vector3d dimensions;
+  std::string uri;
+  std::string value = configWidget->GeometryWidgetValue("geometry",
+      dimensions, uri);
+  QVERIFY(value == "box");
+  QVERIFY(dimensions == ignition::math::Vector3d(1, 1, 1));
+  QVERIFY(uri == "");
+
+  // Get signal emitting widgets
+  QList<QDoubleSpinBox *> spins =
+      geometryWidget->findChildren<QDoubleSpinBox *>();
+  QCOMPARE(spins.size(), 5);
+
+  // Change the value and check new pose at OnGeometryValueChanged
+  spins[2]->setValue(2.0);
+  QTest::keyClick(spins[2], Qt::Key_Enter);
+  QVERIFY(g_geometrySignalReceived == true);
+
+  delete configWidget;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::OnGeometryValueChanged(const std::string &_name,
+    const std::string &_value, const ignition::math::Vector3d &_dimensions,
+    const std::string &_uri)
+{
+  QVERIFY(_name == "geometry");
+  QVERIFY(_value == "box");
+  QVERIFY(_dimensions == ignition::math::Vector3d(2, 1, 1));
+  QVERIFY(_uri == "");
+  g_geometrySignalReceived = true;
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget_TEST::ChildEnumSignal()
 {
   gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
@@ -1599,6 +1654,42 @@ void ConfigWidget_TEST::OnEnumValueChanged(const QString &_name,
   QVERIFY(_name == "enum");
   QVERIFY(_value == "value3");
   g_enumSignalReceived = true;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::GetChildWidgetByName()
+{
+  // Create config widget and check it has no children
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
+  QVERIFY(configWidget != NULL);
+  QCOMPARE(configWidget->ConfigChildWidgetCount(), 0u);
+
+  // Try to get a child widget by name
+  gazebo::gui::ConfigChildWidget *widget =
+      configWidget->ConfigChildWidgetByName("child_widget");
+  QVERIFY(widget == NULL);
+
+  widget = configWidget->ConfigChildWidgetByName("");
+  QVERIFY(widget == NULL);
+
+  // Create child widget
+  gazebo::gui::ConfigChildWidget *childWidget =
+      configWidget->CreateBoolWidget("child_widget");
+  QVERIFY(childWidget != NULL);
+
+  // Add to config widget
+  QVERIFY(configWidget->AddConfigChildWidget("child_widget", childWidget));
+  QCOMPARE(configWidget->ConfigChildWidgetCount(), 1u);
+
+  // Get the widget by name
+  widget = configWidget->ConfigChildWidgetByName("child_widget");
+  QVERIFY(widget != NULL);
+
+  // Check that a bad name returns NULL
+  widget = configWidget->ConfigChildWidgetByName("bad_name");
+  QVERIFY(widget == NULL);
+
+  delete configWidget;
 }
 
 // Generate a main function for the test

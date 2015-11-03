@@ -1604,44 +1604,55 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
 ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
     const std::string &/*_key*/, const int _level)
 {
+  // ChildWidget
+  GeometryConfigWidget *widget = new GeometryConfigWidget;
+
   // Geometry ComboBox
   QLabel *geometryLabel = new QLabel(tr("Geometry"));
   geometryLabel->setToolTip(tr("geometry"));
-  QComboBox *geometryComboBox = new QComboBox;
+  QComboBox *geometryComboBox = new QComboBox(widget);
   geometryComboBox->addItem(tr("box"));
   geometryComboBox->addItem(tr("cylinder"));
   geometryComboBox->addItem(tr("sphere"));
   geometryComboBox->addItem(tr("mesh"));
   geometryComboBox->addItem(tr("polyline"));
+  connect(geometryComboBox, SIGNAL(currentIndexChanged(const int)), this,
+      SLOT(OnGeometryValueChanged(const int)));
 
   // Size XYZ
   double min = 0;
   double max = 0;
   this->GetRangeFromKey("length", min, max);
 
-  QDoubleSpinBox *geomSizeXSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomSizeXSpinBox = new QDoubleSpinBox(widget);
   geomSizeXSpinBox->setRange(min, max);
   geomSizeXSpinBox->setSingleStep(0.01);
   geomSizeXSpinBox->setDecimals(6);
   geomSizeXSpinBox->setValue(1.000);
   geomSizeXSpinBox->setAlignment(Qt::AlignRight);
   geomSizeXSpinBox->setMaximumWidth(100);
+  connect(geomSizeXSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
-  QDoubleSpinBox *geomSizeYSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomSizeYSpinBox = new QDoubleSpinBox(widget);
   geomSizeYSpinBox->setRange(min, max);
   geomSizeYSpinBox->setSingleStep(0.01);
   geomSizeYSpinBox->setDecimals(6);
   geomSizeYSpinBox->setValue(1.000);
   geomSizeYSpinBox->setAlignment(Qt::AlignRight);
   geomSizeYSpinBox->setMaximumWidth(100);
+  connect(geomSizeYSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
-  QDoubleSpinBox *geomSizeZSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomSizeZSpinBox = new QDoubleSpinBox(widget);
   geomSizeZSpinBox->setRange(min, max);
   geomSizeZSpinBox->setSingleStep(0.01);
   geomSizeZSpinBox->setDecimals(6);
   geomSizeZSpinBox->setValue(1.000);
   geomSizeZSpinBox->setAlignment(Qt::AlignRight);
   geomSizeZSpinBox->setMaximumWidth(100);
+  connect(geomSizeZSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
   QLabel *geomSizeXLabel = new QLabel(tr("X"));
   QLabel *geomSizeYLabel = new QLabel(tr("Y"));
@@ -1676,7 +1687,9 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   // Uri
   QLabel *geomFilenameLabel = new QLabel(tr("Uri"));
   geomFilenameLabel->setToolTip(tr("uri"));
-  QLineEdit *geomFilenameLineEdit = new QLineEdit;
+  QLineEdit *geomFilenameLineEdit = new QLineEdit(widget);
+  connect(geomFilenameLineEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
   QPushButton *geomFilenameButton = new QPushButton(tr("..."));
   geomFilenameButton->setMaximumWidth(30);
 
@@ -1689,7 +1702,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeFilenameLayout->addLayout(geomSizeLayout);
   geomSizeFilenameLayout->addLayout(geomFilenameLayout);
 
-  QWidget *geomSizeWidget = new QWidget;
+  QWidget *geomSizeWidget = new QWidget(widget);
   geomSizeWidget->setLayout(geomSizeFilenameLayout);
 
   // Radius / Length
@@ -1700,21 +1713,25 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomRadiusLabel->setToolTip(tr("radius"));
   geomLengthLabel->setToolTip(tr("length"));
 
-  QDoubleSpinBox *geomRadiusSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomRadiusSpinBox = new QDoubleSpinBox(widget);
   geomRadiusSpinBox->setRange(min, max);
   geomRadiusSpinBox->setSingleStep(0.01);
   geomRadiusSpinBox->setDecimals(6);
   geomRadiusSpinBox->setValue(0.500);
   geomRadiusSpinBox->setAlignment(Qt::AlignRight);
   geomRadiusSpinBox->setMaximumWidth(100);
+  connect(geomRadiusSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
-  QDoubleSpinBox *geomLengthSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomLengthSpinBox = new QDoubleSpinBox(widget);
   geomLengthSpinBox->setRange(min, max);
   geomLengthSpinBox->setSingleStep(0.01);
   geomLengthSpinBox->setDecimals(6);
   geomLengthSpinBox->setValue(1.000);
   geomLengthSpinBox->setAlignment(Qt::AlignRight);
   geomLengthSpinBox->setMaximumWidth(100);
+  connect(geomLengthSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
   QHBoxLayout *geomRLLayout = new QHBoxLayout;
   geomRLLayout->addWidget(geomRadiusLabel);
@@ -1731,7 +1748,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomRLWidget->setLayout(geomRLLayout);
 
   // Dimensions
-  QStackedWidget *geomDimensionWidget = new QStackedWidget;
+  QStackedWidget *geomDimensionWidget = new QStackedWidget(widget);
   geomDimensionWidget->insertWidget(0, geomSizeWidget);
 
   geomDimensionWidget->insertWidget(1, geomRLWidget);
@@ -1751,7 +1768,6 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widgetLayout->addWidget(geomDimensionWidget, 2, 1, 1, 3);
 
   // ChildWidget
-  GeometryConfigWidget *widget = new GeometryConfigWidget;
   widget->setFrameStyle(QFrame::Box);
   widget->geomDimensionWidget = geomDimensionWidget;
   widget->geomLengthSpinBox = geomLengthSpinBox;
@@ -2819,6 +2835,56 @@ void ConfigWidget::OnPoseValueChanged()
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget::OnGeometryValueChanged()
+{
+  QWidget *senderWidget = qobject_cast<QWidget *>(QObject::sender());
+
+  if (!senderWidget)
+    return;
+
+  ConfigChildWidget *widget;
+  while (senderWidget->parent() != NULL)
+  {
+    senderWidget = qobject_cast<QWidget *>(senderWidget->parent());
+    widget = qobject_cast<ConfigChildWidget *>(senderWidget);
+    if (widget)
+      break;
+  }
+
+  if (!widget)
+    return;
+
+  ignition::math::Vector3d dimensions;
+  std::string uri;
+  std::string value = this->GetGeometryWidgetValue(widget, dimensions, uri);
+
+  emit GeometryValueChanged(widget->scopedName.c_str(), value, dimensions,
+      uri);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnGeometryValueChanged(const int /*_value*/)
+{
+  QComboBox *combo =
+      qobject_cast<QComboBox *>(QObject::sender());
+
+  if (!combo)
+    return;
+
+  GeometryConfigWidget *widget =
+      qobject_cast<GeometryConfigWidget *>(combo->parent());
+
+  if (!widget)
+    return;
+
+  ignition::math::Vector3d dimensions;
+  std::string uri;
+  std::string value = this->GetGeometryWidgetValue(widget, dimensions, uri);
+
+  emit GeometryValueChanged(widget->scopedName.c_str(), value, dimensions, uri);
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget::OnEnumValueChanged(const QString &_value)
 {
   ConfigChildWidget *widget =
@@ -3089,6 +3155,18 @@ void ConfigWidget::InsertLayout(QLayout *_layout, int _pos)
     return;
 
   boxLayout->insertLayout(_pos, _layout);
+}
+
+/////////////////////////////////////////////////
+ConfigChildWidget *ConfigWidget::ConfigChildWidgetByName(
+    const std::string &_name) const
+{
+  auto iter = this->configWidgets.find(_name);
+
+  if (iter != this->configWidgets.end())
+    return iter->second;
+  else
+    return NULL;
 }
 
 /////////////////////////////////////////////////
