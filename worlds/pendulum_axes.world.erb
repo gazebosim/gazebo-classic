@@ -15,11 +15,14 @@
   theta = 0.1* Math::PI
 
   pendula = {
-    "x_axis" => {:pos => [0, 0, -dd/2], :rpy => [theta, 0, 0], :size => [dd/10, dd/10, dd], :axis => [1, 0, 0]},
-    "y_axis" => {:pos => [0, 0, -dd/2], :rpy => [0, theta, 0], :size => [dd/10, dd/10, dd], :axis => [0, 1, 0]},
-  }
+    "longZ_Xaxis" => {:pose => [0, 0, -dd/2, 0, 0, 0], :size => [dd/10, dd/10, dd], :axis => [1, 0, 0]},
+    "longZ_Yaxis" => {:pose => [0, 0, -dd/2, 0, 0, 0], :size => [dd/10, dd/10, dd], :axis => [0, 1, 0]},
+    "longX_Xaxis" => {:pose => [dd/2, 0, 0, 0, Math::PI/2, 0], :size => [dd, dd/10, dd/10], :axis => [1, 0, 0]},
+    "longX_Yaxis" => {:pose => [dd/2, 0, 0, 0, Math::PI/2, 0], :size => [dd, dd/10, dd/10], :axis => [0, 1, 0]},
+    "longY_Xaxis" => {:pose => [0, -dd/2, 0, Math::PI/2, 0, 0], :size => [dd/10, dd, dd/10], :axis => [1, 0, 0]},
+    "longY_Yaxis" => {:pose => [0, -dd/2, 0, Math::PI/2, 0, 0], :size => [dd/10, dd, dd/10], :axis => [0, 1, 0]},
 
-  revolute_friction = [0.0, 0.1, 1.0, 10.0]
+  }
 %>
 <sdf version="1.5">
   <world name="default">
@@ -39,14 +42,13 @@
           ixx = 1.0 / 12 * mass * (dy*dy + dz*dz)
           iyy = 1.0 / 12 * mass * (dz*dz + dx*dx)
           izz = 1.0 / 12 * mass * (dx*dx + dy*dy)
-          pos = Vector.elements(pendula[p][:pos])
-          rpy = Vector.elements(pendula[p][:rpy])
+          pose = Vector.elements(pendula[p][:pose])
           axis = Vector.elements(pendula[p][:axis])
     %>
     <%= "<model name='#{name}'>" %>
-      <pose><%= dd*2.1*i %> 0 <%= dd*1.8 %>  <%= rpy.to_a.join(" ") %></pose>
+      <pose><%= dd*2.1*i %> 0 <%= dd*1.8 %>  <%= (theta*axis).to_a.join(" ") %></pose>
       <link name="link">
-        <pose><%= pos.to_a.join(" ") %>  0 0 0</pose>
+        <pose><%= pose.to_a.join(" ") %></pose>
         <inertial>
           <mass><%= mass %></mass>
           <inertia>
@@ -74,7 +76,7 @@
         </visual>
       </link>
       <joint name="joint" type="revolute">
-        <pose><%= (-1 * pos).to_a.join(" ") %>  0 0 0</pose>
+        <pose><%= (-1 * pose).to_a.join(" ") %></pose>
         <parent>world</parent>
         <child>link</child>
         <axis>

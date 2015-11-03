@@ -285,10 +285,16 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
   double dt = physics->GetMaxStepSize();
   EXPECT_NEAR(dt, 1e-3, 1e-6);
 
-  const std::vector<std::string> modelNames = {
-    "pendulum_x_axis",
-    "pendulum_y_axis",
-  };
+  std::vector<std::string> modelNames;
+  for (auto const &model : world->GetModels())
+  {
+    std::string name = model->GetName();
+    if (name.find("pendulum_") == 0)
+    {
+      modelNames.push_back(name);
+    }
+  }
+  ASSERT_EQ(modelNames.size(), 6u);
   std::vector<physics::ModelPtr> models;
   std::vector<physics::JointPtr> joints;
   std::vector<physics::LinkPtr> links;
@@ -325,7 +331,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
 
     double angle =
       asin(jointToCoG.Cross(g).Dot(joint->GetGlobalAxis(0)) / length / 9.8);
-    EXPECT_NEAR(angle, -M_PI / 10, 1e-6);
+    EXPECT_NEAR(angle, -M_PI / 10, 1e-5);
     initialAngles.push_back(angle);
 
     // hysteresis threshhold for cycle counting
