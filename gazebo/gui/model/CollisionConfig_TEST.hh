@@ -25,7 +25,7 @@ class CollisionConfig_TEST : public QTestFixture
 {
   Q_OBJECT
 
-    /// \brief Constructor
+  /// \brief Constructor
   public: CollisionConfig_TEST() = default;
 
   /// \brief Test initialization.
@@ -40,7 +40,7 @@ class CollisionConfig_TEST : public QTestFixture
   /// \brief Test that the Applied signal is emitted when widgets are edited.
   private slots: void AppliedSignal();
 
-    /// \brief Slot that receives Applied signals.
+  /// \brief Slot that receives Applied signals.
   private slots: void OnApply();
 
   /// \brief Count how many Applied signals have been emitted.
