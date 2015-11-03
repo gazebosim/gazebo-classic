@@ -361,8 +361,8 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     auto length = pendulumLengths[i];
     auto cycles = cycleCount[i];
     // expected natural frequency for box pendulum (Hz)
-    // write up the equations
-    double freq = sqrt(300.0 / 401.0 * g.GetLength() / length) / 2 * M_1_PI;
+    // see physics_msgs_inertia.ipynb for derivation
+    double freq = 0.5 * M_1_PI * sqrt(300.0 / 401.0 * g.GetLength() / length);
     // 2 cycles counted per oscillation
     double expectedCycles = 2 * freq * timeStepped;
     EXPECT_EQ(cycles, int(expectedCycles));
