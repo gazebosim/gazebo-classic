@@ -18,6 +18,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <math.h>
 
 #include <ignition/math/Rand.hh>
 
@@ -28,7 +29,7 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/test/helper_physics_generator.hh>
 
-#define PHYSICS_TOL 1e-2
+#define PHYSICS_TOL 0.008
 using namespace gazebo;
 
 class PhysicsTest : public ServerFixture,
@@ -58,6 +59,12 @@ void PhysicsTest::Callback(const ConstContactsPtr &_msg)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
 {
+  if (_physicsEngine != "ode")
+  {
+    gzerr << "Elastic Modulus is only implemented for ODE.\n";
+    return;
+  }
+
   // check conservation of mementum for linear elastic collision
   Load("worlds/elastic_modulus_contact_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -78,7 +85,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   physics::ModelPtr box_model = world->GetModel("box");
   physics::LinkPtr box_link = box_model->GetLink("link");
   physics::ModelPtr sphere_model = world->GetModel("sphere");
-  physics::LinkPtr sphere_link = box_model->GetLink("link");
+  physics::LinkPtr sphere_link = sphere_model->GetLink("link");
 
   // Sleep to ensure transport topics are all advertised
   common::Time::MSleep(100);
@@ -95,7 +102,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
       &PhysicsTest::Callback, this);
 
   // step to let contact happen and settle
-  world->Step(1000);
+  world->Step(3000);
 
   // Wait for contact messages to be received
   int maxSleep = 30;
@@ -117,7 +124,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   // sphere
   const double nu1 = 0.4;
   const double E1 = 600000;
-  const double m1 = 30;
+  const double m1 = 3;
   const double R1 = 0.06;
   // static box
   const double nu2 = 0.3;
@@ -126,34 +133,66 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   double E_star = 1.0 / ((1.0 - nu1*nu1)/E1 + (1.0 - nu2*nu2)/E2);
   double R_star = 1.0 / (1.0/R1 + 1.0/R2);
   // contact force
-  double f_g = -physics->GetGravity().z * m1;
+  double f1 = -physics->GetGravity().x * m1;
 
   // get min contact depth from model
   const double minDepth = std::min(0.0015, 0.001);
 
-  // get contact depth from contact manager
+  // GET CONTACT DEPTH FROM CONTACT MANAGER
   ASSERT_EQ(contacts.contact().size(), 1);
+  double d1 = 0;
   for (auto const &contact : contacts.contact())
   {
-     gzerr << contact.collision1() << "\n";
-     // gzerr << contact.collision2() << "\n";
-     // gzerr << contact.depth() << "\n";
+    gzdbg << "col1 [" << contact.collision1()
+          << "] col2 [" << contact.collision2()
+          << "]\n";
+    EXPECT_EQ(contact.depth().size(), 1);
+    for (auto const &d : contact.depth())
+    {
+      d1 = d - minDepth;
+      // gzerr << d1 << "\n";
+    }
   }
-  double d1 = 0;
+  EXPECT_FLOAT_EQ(d1, 0.0059920521);
 
-  // get contact depth from link poses and known geometry information
-  double d2 = 0;
+  // GET CONTACT DEPTH FROM LINK POSES AND KNOWN GEOMETRY INFORMATION
+  double d2 = 1.0 - (sphere_link->GetWorldPose().pos.x -
+               box_link->GetWorldPose().pos.x) - minDepth;
+
+  EXPECT_FLOAT_EQ(d1, d2);
+
+  // GET CONTACT DEPTH BASED ON CONTACT MODEL
+  // k = f / d or f = k * d.
+  // And we know that:
+  //   k = 4.0 / 3.0 * e_star * sqrt(patch_radius);
+  // or
+  //   k = 4.0 / 3.0 * e_star * sqrt(R_star * depth);
+  // So f = 4.0 / 3.0 * e_star * sqrt(R_star) * depth^1.5
+  // knowing f,
+  // solving for d yeilds:
+  double d3 = pow(f1 / (4.0 / 3.0 * E_star * sqrt(sqrt(R_star))), 1.0/1.25);
+
+  // check that d1 and d3 should be near
+  EXPECT_LT(fabs(d1-d3)/d3, PHYSICS_TOL);
+  gzdbg << "relative error: " << (d1-d3)/d3 << "\n";
 
   // contact patch radius
   double patchRadius = sqrt(R_star * d1);
 
-  gzdbg << "f_g: " << f_g
-        << "E: " << E_star
-        << "curvature: " << R_star
-        << "patch radius: " << patchRadius
-        << "\n";
+  // double check recorded stiffness
+  double stiffness = 4.0 / 3.0 * E_star * sqrt(patchRadius);
+  EXPECT_FLOAT_EQ(stiffness, 49574.125);
 
-  // check contact information
+  gzdbg << "Contact State:\n  f1 [" << f1
+        << "]\n  E* [" << E_star
+        << "]\n  R* [" << R_star
+        << "]\n  patch radius [" << patchRadius
+        << "]\n  d contact manager [" << d1
+        << "]\n  d geom [" << d2
+        << "]\n  d solution [" << d3
+        << "]\n  patch radius [" << patchRadius
+        << "]\n  stiffness [" << stiffness
+        << "] \n";
 }
 
 TEST_P(PhysicsTest, ElasticModulusContact)
