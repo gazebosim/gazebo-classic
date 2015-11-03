@@ -208,6 +208,23 @@ namespace gazebo
       /// \return The list of links, with the link scoped name and leaf name.
       public: std::map<std::string, std::string> LinkList() const;
 
+      /// \brief A new type for the joint being created has been chosen.
+      /// To be used by other classes.
+      /// \param[in] _typeInt Integer corresponding to joint type enum.
+      public slots: void NewType(const int _typeInt);
+
+      /// \brief A new parent link for the joint being created has been chosen.
+      /// To be used by other classes.
+      /// \sa NewParentLink(rendering::VisualPtr _parentLink)
+      /// \param[in] _name Link name, either the leaf or scoped.
+      public: void NewParentLink(const std::string &_name);
+
+      /// \brief A new child link for the joint being created has been chosen.
+      /// To be used by other classes.
+      /// \sa NewChildLink(rendering::VisualPtr _childLink)
+      /// \param[in] _name Link name, either the leaf or scoped.
+      public: void NewChildLink(const std::string &_name);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -285,10 +302,18 @@ namespace gazebo
 
       private: rendering::VisualPtr LinkVisualFromName(
           const std::string &_name);
+
+      /// \brief A new parent link for the joint being created has been chosen.
+      /// This function is used internally.
+      /// \sa NewParentLink(const std::string &_name)
+      /// \param[in] _parentLink Pointer to the link visual.
       private: void NewParentLink(rendering::VisualPtr _parentLink);
+
+      /// \brief A new parent link for the joint being created has been chosen.
+      /// This function is used internally.
+      /// \sa NewChildLink(const std::string &_name)
+      /// \param[in] _parentLink Pointer to the link visual.
       private: void NewChildLink(rendering::VisualPtr _childLink);
-      public: void NewParentLink(const std::string &_name);
-      public: void NewChildLink(const std::string &_name);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();

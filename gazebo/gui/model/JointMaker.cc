@@ -1507,6 +1507,22 @@ void JointMaker::NewChildLink(rendering::VisualPtr _childLink)
 }
 
 /////////////////////////////////////////////////
+void JointMaker::NewType(const int _typeInt)
+{
+//  this->jointType = static_cast<JointMaker::JointType>(_typeInt);
+  auto type = static_cast<JointMaker::JointType>(_typeInt);
+
+  if (this->newJoint && type != JOINT_NONE)
+  {
+    this->newJoint->type = type;
+    if (this->newJoint->hotspot)
+      this->newJoint->Update();
+    else
+      this->newJoint->UpdateJointLine();
+  }
+}
+
+/////////////////////////////////////////////////
 void JointMaker::NewParentLink(const std::string &_name)
 {
   auto vis = this->LinkVisualFromName(_name);
