@@ -136,21 +136,25 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       enu = sc.GlobalFromLocal(xyz);
       EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
       EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
+      EXPECT_EQ(xyz, sc.LocalFromGlobal(enu));
 
       xyz.Set(0, 1, 0);
       enu = sc.GlobalFromLocal(xyz);
       EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
       EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
+      EXPECT_EQ(xyz, sc.LocalFromGlobal(enu));
 
       xyz.Set(1, -1, 0);
       enu = sc.GlobalFromLocal(xyz);
       EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
       EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
+      EXPECT_EQ(xyz, sc.LocalFromGlobal(enu));
 
       xyz.Set(2243.52334, 556.35, 435.6553);
       enu = sc.GlobalFromLocal(xyz);
       EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
       EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
+      EXPECT_EQ(xyz, sc.LocalFromGlobal(enu));
     }
 
     // Check SphericalFromLocal
