@@ -22,6 +22,7 @@
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/model/LinkInspector.hh"
 
 #include "gazebo/gui/qt.h"
 
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class LinkConfig LinkConfig.hh
     /// \brief A tab for configuring properties of a link.
-    class LinkConfig : public QWidget
+    class GZ_GUI_VISIBLE LinkConfig : public QWidget
     {
       Q_OBJECT
 
@@ -44,7 +45,7 @@ namespace gazebo
       public: LinkConfig();
 
       /// \brief Destructor
-      public: ~LinkConfig();
+      public: virtual ~LinkConfig();
 
       /// \brief Update the link config widget with a link msg.
       /// \param[in] _linkMsg Link message.
@@ -62,6 +63,18 @@ namespace gazebo
       /// \param[in] _mass Mass to set the link to.
       public: void SetMass(const double _mass);
 
+      /// \brief Retrieve current mass value.
+      /// \return The current mass.
+      public: double Mass() const;
+
+      /// \brief Set the density of the link.
+      /// \param[in] _density Density to set the link to.
+      public: void SetDensity(const double _density);
+
+      /// \brief Retrieve current density value.
+      /// \return The current density.
+      public: double Density() const;
+
       /// \brief Set the inertia matrix of the link.
       /// \param[in] _ixx X second moment of inertia (MOI) about x axis.
       /// \param[in] _iyy Y second moment of inertia about y axis.
@@ -76,6 +89,25 @@ namespace gazebo
       /// \brief Set the inertial pose of the link.
       /// \param[in] _pose Inertial pose to set the link to.
       public: void SetInertialPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Get the configuration widget for the link
+      public: const ConfigWidget *GetConfigWidget() const;
+
+      /// \brief Signal emitted when density changes.
+      /// \param[in] _value The new density.
+      Q_SIGNALS: void DensityValueChanged(const double &_value);
+
+      /// \brief Signal emitted when mass changes.
+      /// \param[in] _value The new mass.
+      Q_SIGNALS: void MassValueChanged(const double &_value);
+
+      /// \brief Callback for density changes in config widget.
+      /// \param[in] _value The new density value.
+      private slots: void OnDensityValueChanged(const double &_value);
+
+      /// \brief Callback for mass changes in config widget.
+      /// \param[in] _value The new mass value.
+      private slots: void OnMassValueChanged(const double &_value);
 
       /// \brief config widget for configuring link properties.
       private: ConfigWidget *configWidget;

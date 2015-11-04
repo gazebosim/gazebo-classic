@@ -45,6 +45,15 @@ namespace gazebo
       /// \param[in] _checked Whether it was checked or unchecked.
       private slots: void OnToggleItem(bool _checked);
 
+      /// \brief Callback for geometry changes.
+      private slots: void OnGeometryChanged();
+
+      /// \brief Signal to indicate a collision change.
+      /// \param[in] _name Name of the collision changed.
+      /// \param[in] _type Type of change ("geometry", etc).
+      Q_SIGNALS: void CollisionChanged(const std::string &_name,
+          const std::string &_type);
+
       /// \brief Unique ID of this collision config.
       public: int id;
 
@@ -60,7 +69,7 @@ namespace gazebo
 
     /// \class CollisionConfig CollisionConfig.hh
     /// \brief A tab for configuring collision properties of a link.
-    class CollisionConfig : public QWidget
+    class GZ_GUI_VISIBLE CollisionConfig : public QWidget
     {
       Q_OBJECT
 
@@ -110,6 +119,15 @@ namespace gazebo
       public: void Geometry(const std::string &_name,
           ignition::math::Vector3d &_size, std::string &_uri) const;
 
+      /// \brief Get collision configuration data
+      public: std::map<int, const CollisionConfigData *> GetConfigData() const;
+
+      /// \brief Get collision configuration data by collision name.
+      /// \param[in] _name Name of the collision.
+      /// \return The matching configuration or NULL if not found.
+      public: const CollisionConfigData *GetConfigData(
+          const std::string &_name) const;
+
       /// \brief Qt signal emitted when a collision is removed.
       /// \param[in] _name Name of collision removed.
       Q_SIGNALS: void CollisionRemoved(const std::string &_name);
@@ -124,6 +142,18 @@ namespace gazebo
       /// \brief Qt callback when a collision is to be removed.
       /// \param[in] _id Id of item to be removed.
       private slots: void OnRemoveCollision(int _id);
+
+      /// \brief Callback for handling collision changes.
+      /// \param[in] _name Name of collision changed.
+      /// \param[in] _type Type of change.
+      private slots: void OnCollisionChanged(
+          const std::string &_name, const std::string &_type);
+
+      /// \brief Signal to indicate a collision change.
+      /// \param[in] _name Name of collision changed.
+      /// \param[in] _type Type of change.
+      Q_SIGNALS: void CollisionChanged(
+          const std::string &_name, const std::string &_type);
 
       /// \brief Map of id to collision config widget.
       private: std::map<int, CollisionConfigData *> configs;

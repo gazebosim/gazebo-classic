@@ -23,6 +23,8 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "gazebo/common/Assert.hh"
+
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -33,6 +35,7 @@
 #include "gazebo/gui/model/LinkConfig.hh"
 #include "gazebo/gui/model/CollisionConfig.hh"
 
+#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/model/ModelData.hh"
 
@@ -183,6 +186,7 @@ void LinkData::SetPose(const ignition::math::Pose3d &_pose)
 /////////////////////////////////////////////////
 void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 {
+  GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
   ignition::math::Vector3d dScale = _scale / this->scale;
@@ -590,6 +594,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
 /////////////////////////////////////////////////
 LinkData* LinkData::Clone(const std::string &_newName)
 {
+  GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
   LinkData *cloneLink = new LinkData();
 
   cloneLink->Load(this->linkSDF);
@@ -659,6 +664,210 @@ LinkData* LinkData::Clone(const std::string &_newName)
 }
 
 /////////////////////////////////////////////////
+double LinkData::ComputeVolume(const msgs::Collision &_collision)
+{
+  double volume = -1;
+
+  if (_collision.has_geometry())
+  {
+    const msgs::Geometry &geometry = _collision.geometry();
+    if (geometry.has_type())
+    {
+      switch (geometry.type())
+      {
+      case msgs::Geometry_Type_BOX:
+      case msgs::Geometry_Type_MESH:
+      case msgs::Geometry_Type_POLYLINE:
+        if (geometry.has_box())
+        {
+          const msgs::BoxGeom &box = geometry.box();
+          if (box.has_size())
+          {
+            const msgs::Vector3d &size = box.size();
+            volume = size.x() * size.y() * size.z();
+          }
+        }
+        break;
+
+      case msgs::Geometry_Type_CYLINDER:
+        if (geometry.has_cylinder())
+        {
+          const msgs::CylinderGeom &cylinder = geometry.cylinder();
+          if (cylinder.has_radius() && cylinder.has_length())
+          {
+            double r = cylinder.radius();
+            double r2 = r*r;
+            // Cylinder volume: PI * r^2 * height
+            volume = IGN_PI * r2 * cylinder.length();
+          }
+        }
+        break;
+
+      case msgs::Geometry_Type_SPHERE:
+        if (geometry.has_sphere())
+        {
+          const msgs::SphereGeom &sphere = geometry.sphere();
+          if (sphere.has_radius())
+          {
+            double r = sphere.radius();
+            double r3 = r*r*r;
+            // Sphere volume: 4/3 * PI * r^3
+            volume = 4.0 / 3.0 * IGN_PI * r3;
+          }
+        }
+        break;
+
+      default:
+        break;
+      }
+    }
+  }
+  return volume;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d LinkData::ComputeMomentOfInertia(
+    const msgs::Collision &_collision, double _mass)
+{
+  ignition::math::Vector3d result;
+  result.Set(0, 0, 0);
+
+  if (_collision.has_geometry())
+  {
+    const msgs::Geometry &geometry = _collision.geometry();
+    if (geometry.has_type())
+    {
+      switch (geometry.type())
+      {
+      case msgs::Geometry_Type_BOX:
+      case msgs::Geometry_Type_MESH:
+      case msgs::Geometry_Type_POLYLINE:
+        if (geometry.has_box())
+        {
+          const msgs::BoxGeom &box = geometry.box();
+          if (box.has_size())
+          {
+            // Box:
+            //    Ih = 1/12 * M * (w^2 + d^2)
+            //    Iw = 1/12 * M * (h^2 + d^2)
+            //    Id = 1/12 * M * (h^2 + w^2)
+            double h = box.size().x();
+            double h2 = h*h;
+            double w = box.size().y();
+            double w2 = w*w;
+            double d = box.size().z();
+            double d2 = d*d;
+
+            double Ih = 1.0 / 12.0 * _mass * (w2 + d2);
+            double Iw = 1.0 / 12.0 * _mass * (h2 + d2);
+            double Id = 1.0 / 12.0 * _mass * (h2 + w2);
+
+            result.Set(Ih, Iw, Id);
+          }
+        }
+        break;
+
+      case msgs::Geometry_Type_CYLINDER:
+        if (geometry.has_cylinder())
+        {
+          const msgs::CylinderGeom &cylinder = geometry.cylinder();
+          if (cylinder.has_radius() && cylinder.has_length())
+          {
+            // Cylinder:
+            //    central axis: I = 1/2 * M * R^2
+            //    other axes:   I = 1/4 * M * R^2 + 1/12 * M * L^2
+            double r = cylinder.radius();
+            double r2 = r*r;
+            double l = cylinder.length();
+            double l2 = l*l;
+            double Icentral = 1.0 / 2.0 * _mass * r2;
+            double Iother = (1.0 / 4.0 * _mass * r2) +
+                (1.0 / 12.0 * _mass * l2);
+            result.Set(Iother, Iother, Icentral);
+          }
+        }
+        break;
+
+      case msgs::Geometry_Type_SPHERE:
+        if (geometry.has_sphere())
+        {
+          const msgs::SphereGeom &sphere = geometry.sphere();
+          if (sphere.has_radius())
+          {
+            // Sphere: I = 2/5 * M * R^2
+            double r = sphere.radius();
+            double r2 = r*r;
+            double I = 2.0 / 5.0 * _mass * r2;
+            result.Set(I, I, I);
+          }
+        }
+        break;
+
+      default:
+        break;
+      }
+    }
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+double LinkData::ComputeVolume() const
+{
+  CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
+  double volume = 0;
+
+  GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
+  GZ_ASSERT(collisionConfig, "CollisionConfig is NULL");
+
+  for (auto const &it : this->collisions)
+  {
+    std::string name = it.first->GetName();
+    std::string linkName = this->linkVisual->GetName();
+
+    std::string leafName = name.substr(name.find(linkName)+linkName.size()+2);
+    std::string shape = it.first->GetGeometryType();
+
+    ignition::math::Vector3d size;
+    std::string uri;
+    collisionConfig->Geometry(leafName,  size, uri);
+
+    if (shape == "sphere")
+    {
+      double r = size.X() * 0.5;
+      double r3 = r*r*r;
+      // Sphere volume: 4/3 * PI * r^3
+      volume += 4.0 / 3.0 * IGN_PI * r3;
+    }
+    else if (shape == "cylinder")
+    {
+      double r = size.X() * 0.5;
+      double r2 = r*r;
+      // Cylinder volume: PI * r^2 * height
+      volume += IGN_PI * r2 * size.Z();
+    }
+    else
+    {
+      // Box, mesh, and other geometry types - use bounding box
+      volume += size.X() * size.Y() * size.Z();
+    }
+  }
+  return volume;
+}
+
+/////////////////////////////////////////////////
+void LinkData::SetLinkVisual(const rendering::VisualPtr _visual)
+{
+  this->linkVisual = _visual;
+}
+
+/////////////////////////////////////////////////
+rendering::VisualPtr LinkData::LinkVisual() const
+{
+  return this->linkVisual;
+}
+
+/////////////////////////////////////////////////
 void LinkData::OnAccept()
 {
   if (this->Apply())
@@ -674,7 +883,9 @@ void LinkData::OnApply()
 /////////////////////////////////////////////////
 bool LinkData::Apply()
 {
+  GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
   msgs::Link *linkMsg = linkConfig->GetData();
@@ -929,6 +1140,8 @@ bool LinkData::Apply()
 /////////////////////////////////////////////////
 void LinkData::OnAddVisual(const std::string &_name)
 {
+  GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
+
   // add a visual when the user adds a visual via the inspector's visual tab
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();
 
@@ -974,6 +1187,8 @@ void LinkData::OnAddVisual(const std::string &_name)
 /////////////////////////////////////////////////
 void LinkData::OnAddCollision(const std::string &_name)
 {
+  GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
+
   // add a collision when the user adds a collision via the inspector's
   // collision tab
   CollisionConfig *collisionConfig = this->inspector->GetCollisionConfig();
@@ -1026,6 +1241,8 @@ void LinkData::OnAddCollision(const std::string &_name)
 /////////////////////////////////////////////////
 void LinkData::OnRemoveVisual(const std::string &_name)
 {
+  GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
+
   // find and remove visual when the user removes it in the
   // inspector's visual tab
   std::ostringstream name;
@@ -1047,6 +1264,8 @@ void LinkData::OnRemoveVisual(const std::string &_name)
 /////////////////////////////////////////////////
 void LinkData::OnRemoveCollision(const std::string &_name)
 {
+  GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
+
   // find and remove collision visual when the user removes it in the
   // inspector's collision tab
   std::ostringstream name;

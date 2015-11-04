@@ -226,8 +226,18 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configData->id =  this->counter;
   configData->widget = item;
   configData->name = _name;
-  connect(headerButton, SIGNAL(toggled(bool)), configData,
-           SLOT(OnToggleItem(bool)));
+
+  connect(headerButton, SIGNAL(toggled(bool)),
+      configData, SLOT(OnToggleItem(bool)));
+
+  connect(configWidget, SIGNAL(GeometryChanged()),
+      configData, SLOT(OnGeometryChanged()));
+
+  connect(configData, SIGNAL(CollisionChanged(
+          const std::string &, const std::string &)),
+      this, SLOT(OnCollisionChanged(
+          const std::string &, const std::string &)));
+
   this->configs[this->counter] = configData;
 
   this->counter++;
@@ -332,10 +342,53 @@ void CollisionConfig::Geometry(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+std::map<int, const CollisionConfigData *> CollisionConfig::GetConfigData()
+  const
+{
+  std::map<int, const CollisionConfigData *> result;
+
+  for (auto &it : this->configs)
+  {
+    result.insert(std::pair<int, CollisionConfigData *>(it.first, it.second));
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+const CollisionConfigData *CollisionConfig::GetConfigData(
+    const std::string &_name) const
+{
+  const CollisionConfigData *result = NULL;
+
+  for (auto &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      result = it.second;
+      break;
+    }
+  }
+  return result;
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnCollisionChanged(const std::string &_name,
+    const std::string &_type)
+{
+  emit CollisionChanged(_name, _type);
+}
+
+/////////////////////////////////////////////////
 void CollisionConfigData::OnToggleItem(bool _checked)
 {
   if (_checked)
     this->configWidget->show();
   else
     this->configWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfigData::OnGeometryChanged()
+{
+  emit CollisionChanged(this->name, "geometry");
 }

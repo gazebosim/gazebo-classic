@@ -17,6 +17,7 @@
 
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 
 #include "gazebo/gui/model/ModelEditorEvents.hh"
@@ -91,6 +92,18 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   mainLayout->addWidget(tabWidget);
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
+
+  connect(this->linkConfig, SIGNAL(DensityValueChanged(const double &)),
+      this, SLOT(OnDensityValueChanged(const double &)));
+
+  connect(this->linkConfig, SIGNAL(MassValueChanged(const double &)),
+      this, SLOT(OnMassValueChanged(const double &)));
+
+  connect(
+      this->collisionConfig,
+      SIGNAL(CollisionChanged(const std::string &, const std::string &)),
+      this,
+      SLOT(OnCollisionChanged(const std::string &, const std::string &)));
 }
 
 /////////////////////////////////////////////////
@@ -167,7 +180,89 @@ void LinkInspector::enterEvent(QEvent */*_event*/)
 }
 
 /////////////////////////////////////////////////
+double LinkInspector::ComputeVolume() const
+{
+  double volume = 0;
+
+  for (auto it : this->collisionConfig->GetConfigData())
+  {
+    msgs::Collision *coll = this->collisionConfig->GetData(it.second->name);
+    if (coll)
+      volume += LinkData::ComputeVolume(*coll);
+  }
+  return volume;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d LinkInspector::ComputeInertia(double _mass) const
+{
+  ignition::math::Vector3d I = ignition::math::Vector3d::Zero;
+
+  // Use first collision entry
+  for (auto it : this->collisionConfig->GetConfigData())
+  {
+    msgs::Collision *coll = this->collisionConfig->GetData(it.second->name);
+    if (coll)
+    {
+      I = gui::LinkData::ComputeMomentOfInertia(*coll, _mass);
+      break;
+    }
+  }
+  return I;
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnDensityValueChanged(const double &_value)
+{
+  double volume = ComputeVolume();
+  double mass = volume * _value;
+
+  if (fabs(this->linkConfig->Mass() - mass) > DBL_EPSILON)
+  {
+    ignition::math::Vector3d I = ComputeInertia(mass);
+    this->linkConfig->SetMass(mass);
+    this->linkConfig->SetInertiaMatrix(I.X(), I.Y(), I.Z(), 0, 0, 0);
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnMassValueChanged(const double &_value)
+{
+  double volume = ComputeVolume();
+
+  if (fabs(volume - 0.0) > DBL_EPSILON)
+  {
+    double density = _value / volume;
+    if (fabs(this->linkConfig->Density() - density) > DBL_EPSILON)
+    {
+      ignition::math::Vector3d I = ComputeInertia(_value);
+      this->linkConfig->SetDensity(density);
+      this->linkConfig->SetInertiaMatrix(I.X(), I.Y(), I.Z(), 0, 0, 0);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnCollisionChanged(const std::string &/*_name*/,
+    const std::string &_type)
+{
+  if (_type == "geometry")
+  {
+    double volume = ComputeVolume();
+
+    if (fabs(volume - 0.0) > DBL_EPSILON)
+    {
+      double mass = this->linkConfig->Mass();
+      double density = mass / volume;
+
+      this->linkConfig->SetDensity(density);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void LinkInspector::SetLinkId(const std::string &_id)
 {
   this->linkId = _id;
 }
+

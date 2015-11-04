@@ -40,6 +40,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class ConfigWidget;
     class GroupWidget;
 
     /// \addtogroup gazebo_gui
@@ -100,12 +101,54 @@ namespace gazebo
       /// \brief A button for selecting the mesh filename.
       public: QWidget *geomFilenameButton;
 
-      /// brief Callback when the geometry type is changed.
+      /// \brief Callback when the geometry type is changed.
       /// \param[in] _text New geometry type in string.
-      private slots: void GeometryChanged(const QString _text);
+      private slots: void OnGeometryTypeChanged(const QString _text);
 
-      /// brief Callback when the file button is clicked.
+      /// \brief Callback when geometry size changes.
+      /// \param[in] _value Size value that changed.
+      private slots: void OnGeometrySizeChanged(double _value);
+
+      /// \brief Callback when the file button is clicked.
       private slots: void OnSelectFile();
+
+      /// \brief Signal emitted when geometry changes.
+      Q_SIGNALS: void GeometryChanged();
+    };
+
+    /// \class DensityConfigWidget ConfigWidget.hh
+    /// \brief A widget for configuring density properties.
+    class GZ_GUI_VISIBLE DensityConfigWidget : public ConfigChildWidget
+    {
+      Q_OBJECT
+
+      /// \brief Updates the widget's density value.
+      /// \param[in] _density New density value.
+      public: void SetDensity(double _density);
+
+      /// \brief Accessor for the widget's density value.
+      public: double Density() const;
+
+      /// brief Callback when the density combo box is changed.
+      /// \param[in] _text New density type in string.
+      private slots: void OnComboBoxChanged(const QString _text);
+
+      /// brief Callback when the density spin box is changed.
+      /// \param[in] _text New density type in string.
+      private slots: void OnSpinBoxChanged(const QString _text);
+
+      /// \brief Signal emitted when density has changed.
+      /// \param[in] _value Density value.
+      Q_SIGNALS: void DensityValueChanged(const double &_value);
+
+      /// \brief A combo box for selecting a material density
+      public: QComboBox *comboBox;
+
+      /// \brief A spin box for entering a density value
+      public: QDoubleSpinBox *spinBox;
+
+      /// \brief Current density value
+      private: double density;
     };
 
     /// \class EnumConfigWidget ConfigWidget.hh
@@ -266,6 +309,13 @@ namespace gazebo
           const std::string &_value, const math::Vector3 &_dimensions,
           const std::string &_uri = "");
 
+      /// \brief Set a density value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Density value to set to.
+      /// \return True if the value is set successfully.
+      public: bool SetDensityWidgetValue(const std::string &_name,
+          double _value);
+
       /// \brief Set an enum value to a child widget.
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
@@ -349,6 +399,11 @@ namespace gazebo
       /// \return Type of geometry.
       public: std::string GeometryWidgetValue(const std::string &_name,
           ignition::math::Vector3d &_dimensions, std::string &_uri) const;
+
+      /// \brief Get a density value from a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \return Density value.
+      public: double DensityWidgetValue(const std::string &_name) const;
 
       /// \brief Get an enum value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -435,6 +490,13 @@ namespace gazebo
       /// \return The newly created widget.
       public: ConfigChildWidget *CreateEnumWidget(const std::string &_key,
           const std::vector<std::string> &_values, const int _level = 0);
+
+      /// \brief Create a widget for setting a density value.
+      /// \param[in] _key A key that is used as a label for the widget.
+      /// \param[in] _level Level of the widget in the tree.
+      /// \return The newly created widget.
+      public: ConfigChildWidget *CreateDensityWidget(const std::string &_key,
+          const int _level = 0);
 
       /// \brief Register a child widget as a child of this widget, so it can
       /// be updated. Note that the widget is not automatically added to a
@@ -584,6 +646,13 @@ namespace gazebo
       private: bool UpdateEnumWidget(ConfigChildWidget *_widget,
           const std::string &_value);
 
+      /// \brief Update a child widget with a density value.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \param[in] _value Density value.
+      /// \return True if the update completed successfully.
+      private: bool UpdateDensityWidget(ConfigChildWidget *_widget,
+          double _value);
+
       /// \brief Get an integer value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
@@ -728,6 +797,28 @@ namespace gazebo
       /// \param[in] _value New enum value string.
       Q_SIGNALS: void EnumValueChanged(const QString &_name,
           const QString &_value);
+
+          /// \brief Signal emitted when density value changes.
+      /// \param[in] _value Density value.
+      Q_SIGNALS: void DensityValueChanged(const double &_value);
+
+      /// \brief Signal emitted when mass value changes.
+      /// \param[in] _value Mass value.
+      Q_SIGNALS: void MassValueChanged(const double &_value);
+
+      /// \brief Callback when density value changes in child widget.
+      /// \param[in] _value Density value.
+      private slots: void OnDensityValueChanged(const double &_value);
+
+      /// \brief Callback when mass value changes in child widget.
+      /// \param[in] _value Mass value.
+      private slots: void OnMassValueChanged(double _value);
+
+      /// \brief Callback when geometry changes.
+      private slots: void OnGeometryChanged();
+
+      /// \brief Signal emitted when geometry changes.
+      Q_SIGNALS: void GeometryChanged();
 
       /// \brief Qt event filter currently used to filter mouse wheel events.
       /// \param[in] _obj Object that is watched by the event filter.

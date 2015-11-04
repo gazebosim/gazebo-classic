@@ -34,9 +34,15 @@ LinkConfig::LinkConfig()
   this->configWidget = new ConfigWidget;
   configWidget->Load(&linkMsg);
 
+  connect(this->configWidget, SIGNAL(DensityValueChanged(const double &)),
+      this, SLOT(OnDensityValueChanged(const double &)));
+
+  connect(this->configWidget, SIGNAL(MassValueChanged(const double &)),
+      this, SLOT(OnMassValueChanged(const double &)));
+
   // set default values
   // TODO: auto-fill them with SDF defaults
-  this->configWidget->SetDoubleWidgetValue("inertial::mass", 1.0);
+
   this->configWidget->SetDoubleWidgetValue("inertial::ixx", 1.0);
   this->configWidget->SetDoubleWidgetValue("inertial::iyy", 1.0);
   this->configWidget->SetDoubleWidgetValue("inertial::izz", 1.0);
@@ -89,6 +95,12 @@ void LinkConfig::SetMass(const double _mass)
 }
 
 /////////////////////////////////////////////////
+void LinkConfig::SetDensity(const double _density)
+{
+  this->configWidget->SetDensityWidgetValue("density", _density);
+}
+
+/////////////////////////////////////////////////
 void LinkConfig::SetInertiaMatrix(const double _ixx, const double _iyy,
     const double _izz, const double _ixy, const double _ixz, const double _iyz)
 {
@@ -110,4 +122,34 @@ void LinkConfig::SetInertialPose(const ignition::math::Pose3d &_pose)
 msgs::Link *LinkConfig::GetData() const
 {
   return dynamic_cast<msgs::Link *>(this->configWidget->GetMsg());
+}
+
+/////////////////////////////////////////////////
+const ConfigWidget *LinkConfig::GetConfigWidget() const
+{
+  return const_cast<ConfigWidget *>(this->configWidget);
+}
+
+/////////////////////////////////////////////////
+void LinkConfig::OnMassValueChanged(const double &_value)
+{
+  emit MassValueChanged(_value);
+}
+
+/////////////////////////////////////////////////
+void LinkConfig::OnDensityValueChanged(const double &_value)
+{
+  emit DensityValueChanged(_value);
+}
+
+/////////////////////////////////////////////////
+double LinkConfig::Mass() const
+{
+  return this->configWidget->GetDoubleWidgetValue("inertial::mass");
+}
+
+/////////////////////////////////////////////////
+double LinkConfig::Density() const
+{
+  return this->configWidget->DensityWidgetValue("density");
 }
