@@ -212,6 +212,12 @@ unsigned int WorldState::GetModelStateCount() const
 }
 
 /////////////////////////////////////////////////
+unsigned int WorldState::LightStateCount() const
+{
+  return this->lightStates.size();
+}
+
+/////////////////////////////////////////////////
 ModelState WorldState::GetModelState(const std::string &_modelName) const
 {
   // Search for the model name
@@ -364,7 +370,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   }
 
   // Subtract the light states.
-  for (const auto &light : this->lightStates)
+  for (const auto &light : _state.lightStates)
   {
     if (this->HasLightState(light.second.GetName()))
     {
@@ -427,7 +433,7 @@ WorldState WorldState::operator+(const WorldState &_state) const
   }
 
   // Add the light states.
-  for (const auto &light : this->lightStates)
+  for (const auto &light : _state.lightStates)
   {
     LightState state = this->GetLightState(light.second.GetName()) +
         light.second;

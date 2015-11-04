@@ -507,7 +507,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
       for (unsigned int j = 0; j < childVis->GetChildCount(); ++j)
       {
         rendering::COMVisualPtr comVis =
-            boost::dynamic_pointer_cast<rendering::COMVisual>(
+            std::dynamic_pointer_cast<rendering::COMVisual>(
             childVis->GetChild(j));
 
         if (comVis)
@@ -1312,4 +1312,3 @@ void ApplyWrenchDialog::changeEvent(QEvent *_event)
     this->SetActive(this->isActiveWindow() || mainWindowActive);
   }
 }
-
