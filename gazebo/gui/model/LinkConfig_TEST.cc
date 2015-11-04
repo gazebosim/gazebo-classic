@@ -66,17 +66,15 @@ void LinkConfig_TEST::LinkMsgUpdate()
 void LinkConfig_TEST::PoseUpdate()
 {
   gazebo::gui::LinkConfig lc;
-  const ignition::math::Pose3d pose(5.0, 10.0, 15.0, -1, -1, -1);
+  const ignition::math::Pose3d pose(5.0, 10.0, 15.0, -0.1, -0.2, -0.3);
   const ConfigWidget *cw = lc.LinkConfigWidget();
 
   QVERIFY(cw != NULL);
 
   lc.SetPose(pose);
-  math::Pose p = cw->GetPoseWidgetValue("pose");
+  ignition::math::Pose3d p = cw->GetPoseWidgetValue("pose").Ign();
 
-  QCOMPARE(p.pos.x, 5.0);
-  QCOMPARE(p.pos.y, 10.0);
-  QCOMPARE(p.pos.z, 15.0);
+  QCOMPARE(p, pose);
 }
 
 /////////////////////////////////////////////////
@@ -115,17 +113,16 @@ void LinkConfig_TEST::InertiaMatrixUpdate()
 void LinkConfig_TEST::InertialPoseUpdate()
 {
   gazebo::gui::LinkConfig lc;
-  const ignition::math::Pose3d pose(5.0, 10.0, 15.0, -1, -1, -1);
+  const ignition::math::Pose3d pose(5.0, 10.0, 15.0, -0.1, -0.2, -0.3);
   const ConfigWidget *cw = lc.LinkConfigWidget();
 
   QVERIFY(cw != NULL);
 
   lc.SetInertialPose(pose);
-  math::Pose p = cw->GetPoseWidgetValue("inertial::pose");
+  ignition::math::Pose3d p = cw->GetPoseWidgetValue("inertial::pose").Ign();
 
-  QCOMPARE(p.pos.x, 5.0);
-  QCOMPARE(p.pos.y, 10.0);
-  QCOMPARE(p.pos.z, 15.0);
+  QCOMPARE(p, pose);
+  QCOMPARE(p.Pos().X(), pose.Pos().X());
 }
 
 // Generate a main function for the test
