@@ -19,6 +19,7 @@
 #define _GAZEBO_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -56,7 +57,7 @@ namespace gazebo
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
     class GZ_RENDERING_VISIBLE Visual :
-      public boost::enable_shared_from_this<Visual>
+      public std::enable_shared_from_this<Visual>
     {
       /// \brief Type of visual
       public: enum VisualType
@@ -197,6 +198,10 @@ namespace gazebo
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
 
+      /// \brief Get the scale of the visual as inherited from all parents.
+      /// \return The derived scaling factor.
+      public: ignition::math::Vector3d DerivedScale() const;
+
       /// \brief Get whether or not lighting is enabled.
       /// \return True if lighting is enabled.
       public: bool GetLighting() const;
@@ -210,20 +215,33 @@ namespace gazebo
       /// \param[in] _unique True to make the material unique, which
       /// allows the material to change without changing materials that
       /// originally had the same name.
+      /// \param[in] _cascade Whether to set this parameter in children too.
       public: void SetMaterial(const std::string &_materialName,
-                               bool _unique = true);
+                               bool _unique = true, const bool _cascade = true);
 
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
-      public: void SetAmbient(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetAmbient(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
-      public: void SetDiffuse(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetDiffuse(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
-      public: void SetSpecular(const common::Color &_color);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetSpecular(const common::Color &_color,
+          const bool _cascade = true);
+
+      /// \brief Set the emissive value.
+      /// \param[in] _color The emissive color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: virtual void SetEmissive(const common::Color &_color,
+          const bool _cascade = true);
 
       /// \brief Get the ambient color of the visual.
       /// \return Ambient color.
@@ -253,7 +271,8 @@ namespace gazebo
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.
-      public: void SetTransparency(float _trans);
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetTransparency(float _trans, const bool _cascade = true);
 
       /// \brief Get the transparency.
       /// \return The transparency.
@@ -269,10 +288,6 @@ namespace gazebo
       /// \return True if the visual is highlighted.
       public: bool GetHighlighted() const;
 
-      /// \brief Set the emissive value.
-      /// \param[in] _color The emissive color.
-      public: virtual void SetEmissive(const common::Color &_color);
-
       /// \brief Get whether the visual casts shadows.
       /// \return True if the visual casts shadows.
       public: bool GetCastShadows() const;
@@ -284,7 +299,7 @@ namespace gazebo
       /// \brief Set whether the visual is visible.
       /// \param[in] _visible set this node visible.
       /// \param[in] _cascade setting this parameter in children too.
-      public: void SetVisible(bool _visible, bool _cascade = true);
+      public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
       /// \brief Toggle whether this visual is visible.
       public: void ToggleVisible();
@@ -432,6 +447,16 @@ namespace gazebo
       /// \return The nth ancestor counting from the world.
       public: VisualPtr GetNthAncestor(unsigned int _n);
 
+      /// \brief Check if this visual is an ancestor of another visual.
+      /// \param[in] _visual The other visual.
+      /// \return True if this visual is an ancestor.
+      public: bool IsAncestorOf(const rendering::VisualPtr _visual) const;
+
+      /// \brief Check if this visual is a descendant of another visual.
+      /// \param[in] _visual The other visual.
+      /// \return True if this visual is a descendant.
+      public: bool IsDescendantOf(const rendering::VisualPtr _visual) const;
+
       /// \brief Get the depth of this visual, where 0 is the depth of the
       /// world visual.
       /// \return This visual's depth.
@@ -535,6 +560,10 @@ namespace gazebo
       /// \brief Get the geometry type.
       /// \return Type of geometry in string.
       public: std::string GetGeometryType() const;
+
+      /// \brief Get the geometry size.
+      /// \return Size of geometry.
+      public: ignition::math::Vector3d GetGeometrySize() const;
 
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
@@ -642,7 +671,7 @@ namespace gazebo
       /// \brief Helper function to update the geometry object size based on
       /// the scale of the visual.
       /// \param[in] _scale Scale of visual
-      private: void UpdateGeomSize(const math::Vector3 &_scale);
+      private: void UpdateGeomSize(const ignition::math::Vector3d &_scale);
 
       /// \internal
       /// \brief Pointer to private data.

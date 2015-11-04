@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Box shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
-#ifndef _BULLETBOXSHAPE_HH_
-#define _BULLETBOXSHAPE_HH_
+#ifndef _GAZEBO_BULLETBOXSHAPE_HH_
+#define _GAZEBO_BULLETBOXSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"

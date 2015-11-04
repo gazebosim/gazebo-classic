@@ -28,7 +28,8 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   this->setObjectName("wallInspectorDialog");
 
   this->setWindowTitle(tr("Wall Inspector"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QLabel *wallLabel = new QLabel(tr("Wall Name: "));
   this->wallNameLabel = new QLabel(tr(""));

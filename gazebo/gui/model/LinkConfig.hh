@@ -56,10 +56,49 @@ namespace gazebo
 
       /// \brief Set the pose of the link.
       /// \param[in] _pose Pose to set the link to.
-      public: void SetPose(const math::Pose &_pose);
+      public: void SetPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Set the mass of the link.
+      /// \param[in] _mass Mass to set the link to.
+      public: void SetMass(const double _mass);
+
+      /// \brief Set the inertia matrix of the link.
+      /// \param[in] _ixx X second moment of inertia (MOI) about x axis.
+      /// \param[in] _iyy Y second moment of inertia about y axis.
+      /// \param[in] _izz Z second moment of inertia about z axis.
+      /// \param[in] _ixy XY inertia.
+      /// \param[in] _ixz XZ inertia.
+      /// \param[in] _iyz YZ inertia.
+      public: void SetInertiaMatrix(const double _ixx, const double _iyy,
+          const double _izz, const double _ixy, const double _ixz,
+          const double _iyz);
+
+      /// \brief Set the inertial pose of the link.
+      /// \param[in] _pose Inertial pose to set the link to.
+      public: void SetInertialPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Initialize widget.
+      public: void Init();
+
+      /// \brief Restore the widget's data to how it was when first opened.
+      public slots: void RestoreOriginalData();
+
+      /// \brief Qt signal emitted to indicate that changes should be applied.
+      Q_SIGNALS: void Applied();
+
+      /// \brief Qt callback when a pose value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnPoseChanged(const QString &_name,
+          const ignition::math::Pose3d &_value);
 
       /// \brief config widget for configuring link properties.
       private: ConfigWidget *configWidget;
+
+      /// \brief Message containing the data which was in the widget when first
+      /// open.
+      private: msgs::Link originalDataMsg;
     };
     /// \}
   }

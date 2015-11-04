@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -48,7 +49,8 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->mainWindow = gui::get_main_window();
 
   this->setWindowTitle(tr("Apply Force and Torque"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
   this->setWindowModality(Qt::NonModal);
   this->setStyleSheet(
       "QPushButton {\
@@ -501,7 +503,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
       for (unsigned int j = 0; j < childVis->GetChildCount(); ++j)
       {
         rendering::COMVisualPtr comVis =
-            boost::dynamic_pointer_cast<rendering::COMVisual>(
+            std::dynamic_pointer_cast<rendering::COMVisual>(
             childVis->GetChild(j));
 
         if (comVis)
@@ -1282,4 +1284,3 @@ void ApplyWrenchDialog::changeEvent(QEvent *_event)
     this->SetActive(this->isActiveWindow() || mainWindowActive);
   }
 }
-

@@ -29,6 +29,8 @@ ExtrudeDialog::ExtrudeDialog(const std::string &_filename, QWidget *_parent)
 {
   this->setObjectName("ExtrudeDialog");
   this->setWindowTitle(tr("Extrude Link"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   // Title
   QLabel *titleLabel = new QLabel(tr(

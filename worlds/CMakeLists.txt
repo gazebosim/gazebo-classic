@@ -55,12 +55,14 @@ set (files
   rubble.world
   shapes.world
   shapes_layers.world
+  sim_events.world
   simple_arm.world
   simple_gripper.world
   single_rotor_demo.world
   sonar_demo.world
   sphere_atlas_demo.world
   stacks.world
+  torsional_friction_demo.world
   transporter.world
   trigger.world
   twin_rotor_demo.world
@@ -69,4 +71,4 @@ set (files
   wireless_sensors.world
 )
 
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/)
+install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/worlds/)

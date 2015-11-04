@@ -215,6 +215,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (this->model)
   {
     this->childLink = this->model->GetLink(childName);
+    if (!this->childLink)
+    {
+      // need to do this if child link belongs to another model
+      this->childLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(childName));
+    }
     this->parentLink = this->model->GetLink(parentName);
   }
   else
@@ -226,11 +232,60 @@ void Joint::Load(sdf::ElementPtr _sdf)
         this->GetWorld()->GetByName(parentName));
   }
 
+  // Link might not have been found because it is on another model
+  // or because the model name has been changed, e.g. spawning the same model
+  // twice will result in some suffix appended to the model name
+  // First try to find the link with different scopes.
   if (!this->parentLink && parentName != std::string("world"))
-    gzthrow("Couldn't Find Parent Link[" + parentName + "]");
+  {
+    BasePtr parentModel = this->model;
+    while (!this->parentLink && parentModel && parentModel->HasType(MODEL))
+    {
+      std::string scopedParentName =
+          parentModel->GetScopedName() + "::" + parentName;
+
+      this->parentLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(scopedParentName));
+
+      parentModel = parentModel->GetParent();
+    }
+    if (!this->parentLink)
+    {
+      std::string parentNameThisModel =
+          parentName.substr(parentName.find("::"));
+      parentNameThisModel = parentModel->GetName() + parentNameThisModel;
+
+      this->parentLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(parentNameThisModel));
+    }
+    if (!this->parentLink)
+      gzthrow("Couldn't Find Parent Link[" + parentName + "]");
+  }
 
   if (!this->childLink && childName != std::string("world"))
-    gzthrow("Couldn't Find Child Link[" + childName  + "]");
+  {
+    BasePtr parentModel = this->model;
+
+    while (!this->childLink && parentModel && parentModel->HasType(MODEL))
+    {
+      std::string scopedChildName =
+          parentModel->GetScopedName() + "::" + childName;
+      this->childLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(scopedChildName));
+
+        parentModel = parentModel->GetParent();
+    }
+    if (!this->childLink)
+    {
+      std::string childNameThisModel = childName.substr(childName.find("::"));
+      childNameThisModel = parentModel->GetName() + childNameThisModel;
+
+      this->childLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(childNameThisModel));
+    }
+    if (!this->childLink)
+      gzthrow("Couldn't Find Child Link[" + childName  + "]");
+  }
 
   this->LoadImpl(_sdf->Get<math::Pose>("pose"));
 }
@@ -623,12 +678,6 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   // switch below to return this->SetLowerLimit when we implement
   // issue #1108
   return true;
-}
-
-//////////////////////////////////////////////////
-void Joint::SetAngle(unsigned int _index, math::Angle _angle)
-{
-  this->SetPosition(_index, _angle.Radian());
 }
 
 //////////////////////////////////////////////////

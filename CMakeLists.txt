@@ -9,12 +9,12 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-set (GAZEBO_MAJOR_VERSION 6)
-set (GAZEBO_MINOR_VERSION 1)
+set (GAZEBO_MAJOR_VERSION 7)
+set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 0)
+set (GAZEBO_PATCH_VERSION 1)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -47,6 +47,10 @@ endif()
 
 # Documentation
 add_subdirectory(doc)
+
+# Configure documentation uploader
+configure_file("${CMAKE_SOURCE_DIR}/cmake/upload_doc.sh.in"
+  ${CMAKE_BINARY_DIR}/upload_doc.sh @ONLY)
 
 # If we're configuring only to build docs, stop here
 if (DOC_ONLY)
@@ -86,7 +90,7 @@ if(LD_LIBRARY_PATH)
 endif()
 
 
-set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/gazebo-${GAZEBO_VERSION}/gazebo")
+set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/gazebo")
 set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
 set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
 
@@ -131,9 +135,9 @@ message (STATUS "----------------------------------------\n")
 # 2. In the generation of cmake/setup.sh from cmake/setup.sh.in
 set(GAZEBO_DEFAULT_MASTER_HOST localhost)
 set(GAZEBO_DEFAULT_MASTER_PORT 11345)
-set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins)
-set(GAZEBO_MODEL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_VERSION}/models)
-set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_VERSION}:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo_models)
+set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
+set(GAZEBO_MODEL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
+set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo_models)
 set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
 set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
@@ -200,7 +204,7 @@ if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
 endif()
 
 # Will use predefined gazebo developers cflags
-# this needs to be called after HostCFlags 
+# this needs to be called after HostCFlags
 if(USE_UPSTREAM_CFLAGS)
   # use gazebo own set of flags
   unset (CMAKE_CXX_FLAGS CACHE)
@@ -289,7 +293,7 @@ else (build_errors)
   gz_install_includes("" ${PROJECT_BINARY_DIR}/gazebo/gazebo_config.h)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_VERSION}/)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/)
   # Also install the setup.sh in an unversioned location
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
 
@@ -351,45 +355,24 @@ else (build_errors)
   set(PKG_NAME ${PROJECT_NAME_UPPER})
 
   # Order is important, if A depends on B, please add B after A.
-  # The list should have at the very end the libraries 
+  # The list should have at the very end the libraries
   # without internal interdependencies
   set(PKG_LIBRARIES
     gazebo
     gazebo_client
-    gazebo_gui_building
-    gazebo_gui_viewers
-    gazebo_gui_model
     gazebo_gui
     gazebo_sensors
     gazebo_rendering
-    gazebo_selection_buffer
   )
-
-  # "Second level" deps. Depends on a variety of first level deps
-  if (HAVE_DART)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_dart)
-  endif()
-  if (HAVE_BULLET)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
-  endif()
-  if (HAVE_SIMBODY)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_simbody)
-  endif()
 
   if (INCLUDE_PLAYER)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
   endif()
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
-    gazebo_physics_ode
     gazebo_physics
     gazebo_ode
   )
-
-  # "First level" deps, mostly depends on math and/or common
-  if (${OGRE_VERSION} GREATER 1.7.4)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
-  endif()
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_transport
@@ -399,7 +382,6 @@ else (build_errors)
 
   # No other internal dependencies:
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
-    gazebo_skyx
     gazebo_gimpact
     gazebo_opcode
     gazebo_opende_ou

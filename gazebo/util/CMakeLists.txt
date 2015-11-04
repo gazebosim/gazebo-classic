@@ -25,7 +25,13 @@ if (NOT USE_EXTERNAL_TINYXML)
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
 endif()
 
-set (headers 
+if (NOT USE_EXTERNAL_TINYXML2)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp)
+endif()
+
+set (headers
   Diagnostics.hh
   LogPlay.hh
   LogRecord.hh
@@ -64,6 +70,7 @@ target_link_libraries(gazebo_util
   gazebo_transport
   gazebo_math
   gazebo_msgs
+  ${tinyxml2_LIBRARIES}
 )
 
 gz_install_library(gazebo_util)

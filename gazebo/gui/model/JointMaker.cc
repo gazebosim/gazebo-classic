@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
 #include <vector>
@@ -43,6 +44,7 @@ using namespace gazebo;
 using namespace gui;
 
 std::map<JointMaker::JointType, std::string> JointMaker::jointTypes;
+std::map<JointMaker::JointType, std::string> JointMaker::jointMaterials;
 
 /////////////////////////////////////////////////
 JointMaker::JointMaker()
@@ -59,21 +61,22 @@ JointMaker::JointMaker()
 
   this->jointMaterials[JOINT_FIXED]     = "Gazebo/Red";
   this->jointMaterials[JOINT_HINGE]     = "Gazebo/Orange";
-  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/Yellow";
+  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/DarkYellow";
   this->jointMaterials[JOINT_SLIDER]    = "Gazebo/Green";
-  this->jointMaterials[JOINT_SCREW]     = "Gazebo/Black";
+  this->jointMaterials[JOINT_SCREW]     = "Gazebo/DarkGrey";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
+  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/Indigo";
 
-
-  jointTypes[JOINT_FIXED]     = "fixed";
-  jointTypes[JOINT_HINGE]     = "revolute";
-  jointTypes[JOINT_HINGE2]    = "revolute2";
-  jointTypes[JOINT_SLIDER]    = "prismatic";
-  jointTypes[JOINT_SCREW]     = "screw";
-  jointTypes[JOINT_UNIVERSAL] = "universal";
-  jointTypes[JOINT_BALL]      = "ball";
-  jointTypes[JOINT_NONE]      = "none";
+  this->jointTypes[JOINT_FIXED]     = "fixed";
+  this->jointTypes[JOINT_HINGE]     = "revolute";
+  this->jointTypes[JOINT_HINGE2]    = "revolute2";
+  this->jointTypes[JOINT_SLIDER]    = "prismatic";
+  this->jointTypes[JOINT_SCREW]     = "screw";
+  this->jointTypes[JOINT_UNIVERSAL] = "universal";
+  this->jointTypes[JOINT_BALL]      = "ball";
+  this->jointTypes[JOINT_GEARBOX]   = "gearbox";
+  this->jointTypes[JOINT_NONE]      = "none";
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -99,6 +102,15 @@ JointMaker::JointMaker()
   connect(this->inspectAct, SIGNAL(triggered()), this, SLOT(OnOpenInspector()));
 
   this->updateMutex = new boost::recursive_mutex();
+
+  // Gazebo event connections
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkInserted(
+      boost::bind(&JointMaker::OnLinkInserted, this, _1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectLinkRemoved(
+      boost::bind(&JointMaker::OnLinkRemoved, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -137,7 +149,6 @@ void JointMaker::Reset()
   this->jointType = JointMaker::JOINT_NONE;
   this->selectedVis.reset();
   this->hoverVis.reset();
-  this->prevHoverVis.reset();
   this->inspectName = "";
   this->selectedJoints.clear();
 
@@ -184,25 +195,31 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   auto jointIt = this->joints.find(_jointId);
   if (jointIt != this->joints.end())
   {
+    // Copy the ID before it is deleted
+    std::string jointId = _jointId;
+
     JointData *joint = jointIt->second;
     rendering::ScenePtr scene = joint->hotspot->GetScene();
-    scene->GetManager()->destroyBillboardSet(joint->handles);
-    scene->RemoveVisual(joint->hotspot);
-    scene->RemoveVisual(joint->visual);
-    joint->visual->Fini();
-    if (joint->jointVisual)
+    if (scene)
     {
-      rendering::JointVisualPtr parentAxisVis = joint->jointVisual
-          ->GetParentAxisVisual();
-      if (parentAxisVis)
+      scene->GetManager()->destroyBillboardSet(joint->handles);
+      scene->RemoveVisual(joint->hotspot);
+      scene->RemoveVisual(joint->visual);
+      joint->visual->Fini();
+      if (joint->jointVisual)
       {
-        parentAxisVis->GetParent()->DetachVisual(
-            parentAxisVis->GetName());
-        scene->RemoveVisual(parentAxisVis);
+        rendering::JointVisualPtr parentAxisVis = joint->jointVisual
+            ->GetParentAxisVisual();
+        if (parentAxisVis)
+        {
+          parentAxisVis->GetParent()->DetachVisual(
+              parentAxisVis->GetName());
+          scene->RemoveVisual(parentAxisVis);
+        }
+        joint->jointVisual->GetParent()->DetachVisual(
+            joint->jointVisual->GetName());
+        scene->RemoveVisual(joint->jointVisual);
       }
-      joint->jointVisual->GetParent()->DetachVisual(
-          joint->jointVisual->GetName());
-      scene->RemoveVisual(joint->jointVisual);
     }
     joint->hotspot.reset();
     joint->visual.reset();
@@ -214,7 +231,7 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
     delete joint;
     this->joints.erase(jointIt);
     gui::model::Events::modelChanged();
-    gui::model::Events::jointRemoved(_jointId);
+    gui::model::Events::jointRemoved(jointId);
   }
 }
 
@@ -401,9 +418,9 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
 
   std::string jointVisName = jointVis->GetName();
   std::string leafName = jointVisName;
-  size_t pIdx = jointVisName.find_last_of("::");
+  size_t pIdx = jointVisName.rfind("::");
   if (pIdx != std::string::npos)
-    leafName = jointVisName.substr(pIdx+1);
+    leafName = jointVisName.substr(pIdx+2);
 
   JointData *jointData = new JointData();
   jointData->dirty = false;
@@ -427,10 +444,10 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   JointData *jointData = this->CreateJointLine(ss.str(), _parent);
   jointData->child = _child;
 
-  jointData->inspector = new JointInspector();
+  // Inspector
+  jointData->inspector = new JointInspector(this);
   jointData->inspector->setModal(false);
-  connect(jointData->inspector, SIGNAL(Applied()),
-      jointData, SLOT(OnApply()));
+  connect(jointData->inspector, SIGNAL(Applied()), jointData, SLOT(OnApply()));
 
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
@@ -446,9 +463,9 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   {
     std::string jointParentName = jointData->parent->GetName();
     std::string leafName = jointParentName;
-    size_t pIdx = jointParentName.find_last_of("::");
+    size_t pIdx = jointParentName.rfind("::");
     if (pIdx != std::string::npos)
-      leafName = jointParentName.substr(pIdx+1);
+      leafName = jointParentName.substr(pIdx+2);
 
     jointData->jointMsg->set_parent(leafName);
     jointData->jointMsg->set_parent_id(jointData->parent->GetId());
@@ -457,9 +474,9 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   {
     std::string jointChildName = jointData->child->GetName();
     std::string leafName = jointChildName;
-    size_t pIdx = jointChildName.find_last_of("::");
+    size_t pIdx = jointChildName.rfind("::");
     if (pIdx != std::string::npos)
-      leafName = jointChildName.substr(pIdx+1);
+      leafName = jointChildName.substr(pIdx+2);
 
     jointData->jointMsg->set_child(leafName);
     jointData->jointMsg->set_child_id(jointData->child->GetId());
@@ -490,8 +507,15 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
             << std::endl;
       continue;
     }
-    msgs::Set(axisMsg->mutable_xyz(),
-        this->unitVectors[i%this->unitVectors.size()]);
+    if (jointData->type == JointMaker::JOINT_GEARBOX)
+      msgs::Set(axisMsg->mutable_xyz(), ignition::math::Vector3d::UnitZ);
+
+    else
+    {
+      msgs::Set(axisMsg->mutable_xyz(),
+          this->unitVectors[i%this->unitVectors.size()]);
+    }
+
     axisMsg->set_use_parent_model_frame(false);
     axisMsg->set_limit_lower(-GZ_DBL_MAX);
     axisMsg->set_limit_upper(GZ_DBL_MAX);
@@ -517,6 +541,16 @@ JointMaker::JointType JointMaker::ConvertJointType(const std::string &_type)
       return iter.first;
 
   return JOINT_NONE;
+}
+
+/////////////////////////////////////////////////
+std::string JointMaker::GetJointMaterial(const std::string &_type)
+{
+  auto it = jointMaterials.find(ConvertJointType(_type));
+  if (it != jointMaterials.end())
+    return it->second;
+  else
+    return "";
 }
 
 /////////////////////////////////////////////////
@@ -768,8 +802,13 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
+  _joint->inspector->SetJointId(_joint->hotspot->GetName());
+
+  std::string parentName = _joint->parent->GetName();
+  std::string childName = _joint->child->GetName();
+
   gui::model::Events::jointInserted(jointId, _joint->name,
-      _joint->parent->GetName(), _joint->child->GetName());
+      jointTypes[_joint->type], parentName, childName);
 }
 
 /////////////////////////////////////////////////
@@ -783,7 +822,7 @@ void JointMaker::Update()
     this->newJointCreated = false;
   }
 
-  // update joint line and hotspot position.
+  // Update each joint
   for (auto it : this->joints)
   {
     JointData *joint = it.second;
@@ -802,97 +841,10 @@ void JointMaker::Update()
            poseUpdate = true;
          }
 
-        if (joint->dirty || poseUpdate)
-        {
-          // get origin of parent link visuals
-          math::Vector3 parentOrigin = joint->parent->GetWorldPose().pos;
-
-          // get origin of child link visuals
-          math::Vector3 childOrigin = joint->child->GetWorldPose().pos;
-
-          // set orientation of joint hotspot
-          math::Vector3 dPos = (childOrigin - parentOrigin);
-          math::Vector3 center = dPos * 0.5;
-          double length = std::max(dPos.GetLength(), 0.001);
-          joint->hotspot->SetScale(
-              math::Vector3(0.008, 0.008, length));
-          joint->hotspot->SetWorldPosition(parentOrigin + center);
-          math::Vector3 u = dPos.Normalize();
-          math::Vector3 v = math::Vector3::UnitZ;
-          double cosTheta = v.Dot(u);
-          double angle = acos(cosTheta);
-          math::Vector3 w = (v.Cross(u)).Normalize();
-          math::Quaternion q;
-          q.SetFromAxis(w, angle);
-          joint->hotspot->SetWorldRotation(q);
-
-          // set new material if joint type has changed
-          std::string material = this->jointMaterials[joint->type];
-          if (joint->hotspot->GetMaterialName() != material)
-          {
-            // Note: issue setting material when there is a billboard child,
-            // seems to hang so detach before setting and re-attach later.
-            Ogre::SceneNode *handleNode = joint->handles->getParentSceneNode();
-            joint->handles->detachFromParent();
-            joint->hotspot->SetMaterial(material);
-            joint->hotspot->SetTransparency(0.7);
-            handleNode->attachObject(joint->handles);
-            Ogre::MaterialPtr mat =
-                Ogre::MaterialManager::getSingleton().getByName(material);
-            Ogre::ColourValue color =
-                mat->getTechnique(0)->getPass(0)->getDiffuse();
-            color.a = 0.5;
-            joint->handles->getBillboard(0)->setColour(color);
-          }
-
-          // set pos of joint handle
-          joint->handles->getBillboard(0)->setPosition(
-              rendering::Conversions::Convert(parentOrigin -
-              joint->hotspot->GetWorldPose().pos));
-          joint->handles->_updateBounds();
-        }
-
         // Create / update joint visual
         if (joint->dirty || poseUpdate)
         {
-          msgs::JointPtr jointUpdateMsg = joint->jointMsg;
-          unsigned int axisCount = JointMaker::GetJointAxisCount(joint->type);
-          for (unsigned int i = axisCount; i < 2u; ++i)
-          {
-            if (i == 0u)
-              jointUpdateMsg->clear_axis1();
-            else if (i == 1u)
-              jointUpdateMsg->clear_axis2();
-          }
-
-          if (joint->jointVisual)
-          {
-            joint->jointVisual->UpdateFromMsg(jointUpdateMsg);
-          }
-          else
-          {
-            std::string childName = joint->child->GetName();
-            std::string jointVisName = childName;
-            size_t idx = childName.find("::");
-            if (idx != std::string::npos)
-              jointVisName = childName.substr(0, idx+2);
-            jointVisName += "_JOINT_VISUAL_";
-            gazebo::rendering::JointVisualPtr jointVis(
-                new gazebo::rendering::JointVisual(jointVisName, joint->child));
-
-            jointVis->Load(jointUpdateMsg);
-
-            joint->jointVisual = jointVis;
-          }
-
-          // Line now connects the child link to the joint frame
-          joint->line->SetPoint(0, joint->child->GetWorldPose().pos
-              - joint->child->GetParent()->GetWorldPose().pos);
-          joint->line->SetPoint(1,
-              joint->jointVisual->GetWorldPose().pos
-              - joint->child->GetParent()->GetWorldPose().pos);
-          joint->line->setMaterial(this->jointMaterials[joint->type]);
-          joint->dirty = false;
+          joint->Update();
         }
       }
     }
@@ -944,22 +896,17 @@ void JointMaker::GenerateSDF()
 
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
     std::string parentName = joint->parent->GetName();
-    std::string parentLeafName = parentName;
-    size_t pIdx = parentName.find_last_of("::");
+    size_t pIdx = parentName.find("::");
     if (pIdx != std::string::npos)
-      parentLeafName = parentName.substr(pIdx+1);
-
-    parentLeafName = this->GetScopedLinkName(parentLeafName);
-    parentElem->Set(parentLeafName);
+      parentName = parentName.substr(pIdx+2);
+    parentElem->Set(parentName);
 
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     std::string childName = joint->child->GetName();
-    std::string childLeafName = childName;
-    size_t cIdx = childName.find_last_of("::");
+    size_t cIdx = childName.find("::");
     if (cIdx != std::string::npos)
-      childLeafName = childName.substr(cIdx+1);
-    childLeafName = this->GetScopedLinkName(childLeafName);
-    childElem->Set(childLeafName);
+      childName = childName.substr(cIdx+2);
+    childElem->Set(childName);
   }
 }
 
@@ -1012,6 +959,10 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
   {
     return 0;
   }
+  else if (_type == JOINT_GEARBOX)
+  {
+    return 2;
+  }
 
   return 0;
 }
@@ -1024,7 +975,7 @@ JointMaker::JointType JointMaker::GetState() const
 
 /////////////////////////////////////////////////
 math::Vector3 JointMaker::GetLinkWorldCentroid(
-    const rendering::VisualPtr _visual)
+    const rendering::VisualPtr &_visual)
 {
   math::Vector3 centroid;
   int count = 0;
@@ -1050,14 +1001,64 @@ unsigned int JointMaker::GetJointCount()
 /////////////////////////////////////////////////
 void JointData::OnApply()
 {
-  this->jointMsg->CopyFrom(*this->inspector->GetData());
-  this->type = JointMaker::ConvertJointType(
-      msgs::ConvertJointType(this->jointMsg->type()));
+  // Get data from inspector
+  msgs::Joint *inspectorMsg = this->inspector->GetData();
+  if (!inspectorMsg)
+    return;
 
+  this->jointMsg->CopyFrom(*inspectorMsg);
+
+  // Name
   if (this->name != this->jointMsg->name())
     gui::model::Events::jointNameChanged(this->hotspot->GetName(),
         this->jointMsg->name());
   this->name = this->jointMsg->name();
+
+  // Type
+  this->type = JointMaker::ConvertJointType(
+      msgs::ConvertJointType(this->jointMsg->type()));
+
+  // Parent
+  if (this->parent->GetName().find(this->jointMsg->parent()) ==
+      std::string::npos)
+  {
+    // Get scoped name
+    std::string oldName = this->parent->GetName();
+    std::string scope = oldName;
+    size_t idx = oldName.rfind("::");
+    if (idx != std::string::npos)
+      scope = oldName.substr(0, idx+2);
+
+    rendering::VisualPtr parentVis = gui::get_active_camera()->GetScene()
+        ->GetVisual(scope + this->jointMsg->parent());
+    if (parentVis)
+      this->parent = parentVis;
+    else
+      gzwarn << "Invalid parent, keeping old parent" << std::endl;
+  }
+
+  // Child
+  if (this->child->GetName().find(this->jointMsg->child()) ==
+      std::string::npos)
+  {
+    // Get scoped name
+    std::string oldName = this->child->GetName();
+    std::string scope = oldName;
+    size_t idx = oldName.rfind("::");
+    if (idx != std::string::npos)
+      scope = oldName.substr(0, idx+2);
+
+    rendering::VisualPtr childVis = gui::get_active_camera()->GetScene()
+        ->GetVisual(scope + this->jointMsg->child());
+    if (childVis)
+    {
+      this->child = childVis;
+      if (this->jointVisual)
+        childVis->AttachVisual(this->jointVisual);
+    }
+    else
+      gzwarn << "Invalid child, keeping old child" << std::endl;
+  }
 
   this->dirty = true;
   gui::model::Events::modelChanged();
@@ -1073,8 +1074,107 @@ void JointData::OnOpenInspector()
 void JointData::OpenInspector()
 {
   this->inspector->Update(this->jointMsg);
-  this->inspector->move(QCursor::pos());
-  this->inspector->show();
+  this->inspector->Open();
+}
+
+/////////////////////////////////////////////////
+void JointData::Update()
+{
+  // get origin of parent link visuals
+  math::Vector3 parentOrigin = this->parent->GetWorldPose().pos;
+
+  // get origin of child link visuals
+  math::Vector3 childOrigin = this->child->GetWorldPose().pos;
+
+  // set position of joint hotspot
+  math::Vector3 dPos = (childOrigin - parentOrigin);
+  math::Vector3 center = dPos * 0.5;
+  double length = std::max(dPos.GetLength(), 0.001);
+  this->hotspot->SetScale(
+      math::Vector3(0.008, 0.008, length));
+  this->hotspot->SetWorldPosition(parentOrigin + center);
+
+  // set orientation of joint hotspot
+  math::Vector3 u = dPos.Normalize();
+  math::Vector3 v = math::Vector3::UnitZ;
+  double cosTheta = v.Dot(u);
+  double angle = acos(cosTheta);
+  math::Vector3 w = (v.Cross(u)).Normalize();
+  math::Quaternion q;
+  q.SetFromAxis(w, angle);
+  this->hotspot->SetWorldRotation(q);
+
+  // set new material if joint type has changed
+  std::string material = JointMaker::jointMaterials[this->type];
+  if (this->hotspot->GetMaterialName() != material)
+  {
+    // Note: issue setting material when there is a billboard child,
+    // seems to hang so detach before setting and re-attach later.
+    Ogre::SceneNode *handleNode = this->handles->getParentSceneNode();
+    this->handles->detachFromParent();
+    this->hotspot->SetMaterial(material);
+    this->hotspot->SetTransparency(0.7);
+    handleNode->attachObject(this->handles);
+    Ogre::MaterialPtr mat =
+        Ogre::MaterialManager::getSingleton().getByName(material);
+    Ogre::ColourValue color =
+        mat->getTechnique(0)->getPass(0)->getDiffuse();
+    color.a = 0.5;
+    this->handles->getBillboard(0)->setColour(color);
+
+    // notify joint changes
+    std::string parentName = this->parent->GetName();
+    std::string childName = this->child->GetName();
+    gui::model::Events::jointChanged(this->hotspot->GetName(), this->name,
+        JointMaker::jointTypes[this->type], parentName, childName);
+  }
+
+  // set pos of joint handle
+  this->handles->getBillboard(0)->setPosition(
+      rendering::Conversions::Convert(parentOrigin -
+      this->hotspot->GetWorldPose().pos));
+  this->handles->_updateBounds();
+
+  // Update msg
+  msgs::JointPtr jointUpdateMsg = this->jointMsg;
+  unsigned int axisCount = JointMaker::GetJointAxisCount(this->type);
+  for (unsigned int i = axisCount; i < 2u; ++i)
+  {
+    if (i == 0u)
+      jointUpdateMsg->clear_axis1();
+    else if (i == 1u)
+      jointUpdateMsg->clear_axis2();
+  }
+
+  // Joint visual
+  if (this->jointVisual)
+  {
+    this->jointVisual->UpdateFromMsg(jointUpdateMsg);
+  }
+  else
+  {
+    std::string childName = this->child->GetName();
+    std::string jointVisName = childName;
+    size_t idx = childName.find("::");
+    if (idx != std::string::npos)
+      jointVisName = childName.substr(0, idx+2);
+    jointVisName += "_JOINT_VISUAL_";
+    gazebo::rendering::JointVisualPtr jointVis(
+        new gazebo::rendering::JointVisual(jointVisName, this->child));
+
+    jointVis->Load(jointUpdateMsg);
+
+    this->jointVisual = jointVis;
+  }
+
+  // Line now connects the child link to the joint frame
+  this->line->SetPoint(0, this->child->GetWorldPose().pos
+      - this->child->GetParent()->GetWorldPose().pos);
+  this->line->SetPoint(1,
+      this->jointVisual->GetWorldPose().pos
+      - this->child->GetParent()->GetWorldPose().pos);
+  this->line->setMaterial(JointMaker::jointMaterials[this->type]);
+  this->dirty = false;
 }
 
 /////////////////////////////////////////////////
@@ -1197,7 +1297,7 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->jointMsg->set_child_id(joint->child->GetId());
 
   // Inspector
-  joint->inspector = new JointInspector();
+  joint->inspector = new JointInspector(this);
   joint->inspector->Update(joint->jointMsg);
   joint->inspector->setModal(false);
   connect(joint->inspector, SIGNAL(Applied()), joint, SLOT(OnApply()));
@@ -1221,6 +1321,32 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->dirty = true;
 
   this->CreateHotSpot(joint);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnLinkInserted(const std::string &_linkName)
+{
+  std::string leafName = _linkName;
+  size_t idx = _linkName.rfind("::");
+  if (idx != std::string::npos)
+    leafName = _linkName.substr(idx+2);
+
+  this->linkList[_linkName] = leafName;
+
+  this->EmitLinkInserted(_linkName);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::OnLinkRemoved(const std::string &_linkName)
+{
+  if (this->linkList.erase(_linkName))
+    this->EmitLinkRemoved(_linkName);
+}
+
+/////////////////////////////////////////////////
+std::map<std::string, std::string> JointMaker::LinkList() const
+{
+  return this->linkList;
 }
 
 /////////////////////////////////////////////////

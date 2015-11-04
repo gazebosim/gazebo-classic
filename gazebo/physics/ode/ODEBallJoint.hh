@@ -31,7 +31,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief An ODEBallJoint
-    class GZ_PHYSICS_ODE_VISIBLE ODEBallJoint : public BallJoint<ODEJoint>
+    class GZ_PHYSICS_VISIBLE ODEBallJoint : public BallJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.
@@ -56,12 +56,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetVelocity(unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;

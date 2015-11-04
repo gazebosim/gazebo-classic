@@ -30,6 +30,11 @@ namespace gazebo
 {
   namespace common
   {
+    /// \brief Convert seconds to hours. This divides the given value by
+    /// the number of seconds in an hour, which is 3600.
+    /// \param[in] _s Seconds to convert.
+    #define GZ_SEC_TO_HOUR(_s) ((_s) / 3600.0)
+
     /// \addtogroup gazebo_common
     /// \{
 

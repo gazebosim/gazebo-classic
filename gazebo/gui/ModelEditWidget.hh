@@ -28,7 +28,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE ModelEditWidget : public QWidget
+    class GZ_GUI_VISIBLE ModelEditWidget : public QWidget
     {
       Q_OBJECT
       public: ModelEditWidget(QWidget *_parent = 0);
@@ -39,7 +39,7 @@ namespace gazebo
       private: QTreeWidget *treeWidget;
     };
 
-    class GAZEBO_VISIBLE ModelPropertyWidget : public QWidget
+    class GZ_GUI_VISIBLE ModelPropertyWidget : public QWidget
     {
       Q_OBJECT
       public: ModelPropertyWidget(QWidget *_parent = 0);

@@ -40,7 +40,6 @@ using namespace rendering;
 //////////////////////////////////////////////////
 RTShaderSystem::RTShaderSystem()
 {
-  this->entityMutex = new boost::mutex();
   this->initialized = false;
   this->shadowsApplied = false;
   this->pssmSetup.setNull();
@@ -50,7 +49,6 @@ RTShaderSystem::RTShaderSystem()
 RTShaderSystem::~RTShaderSystem()
 {
   this->Fini();
-  delete this->entityMutex;
 }
 
 //////////////////////////////////////////////////
@@ -111,7 +109,6 @@ void RTShaderSystem::Fini()
   }
 
   this->pssmSetup.setNull();
-  this->entities.clear();
   this->scenes.clear();
   this->initialized = false;
 }
@@ -155,7 +152,6 @@ void RTShaderSystem::RemoveScene(ScenePtr _scene)
     this->shaderGenerator->removeSceneManager(_scene->GetManager());
     this->shaderGenerator->removeAllShaderBasedTechniques();
     this->shaderGenerator->flushShaderCache();
-    // this->UpdateShaders();
   }
 }
 
@@ -176,32 +172,20 @@ void RTShaderSystem::RemoveScene(const std::string &_scene)
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::AttachEntity(Visual *vis)
+void RTShaderSystem::AttachEntity(Visual * /*_vis*/)
 {
-  if (!this->initialized)
-    return;
-
-  this->entityMutex->lock();
-  this->entities.push_back(vis);
-  this->entityMutex->unlock();
-  this->GenerateShaders(vis);
+  return;
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::DetachEntity(Visual *_vis)
+void RTShaderSystem::DetachEntity(Visual * /*_vis*/)
 {
-  if (!this->initialized)
-    return;
-
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-  this->entities.remove(_vis);
+  return;
 }
 
 //////////////////////////////////////////////////
 void RTShaderSystem::Clear()
 {
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-  this->entities.clear();
 }
 
 //////////////////////////////////////////////////
@@ -228,24 +212,44 @@ void RTShaderSystem::UpdateShaders()
   if (!this->initialized)
     return;
 
-  std::list<Visual*>::iterator iter;
-
-  boost::mutex::scoped_lock lock(*this->entityMutex);
-
-  // Update all the shaders
-  for (iter = this->entities.begin(); iter != this->entities.end(); ++iter)
-    this->GenerateShaders(*iter);
+  for (auto &scene : this->scenes)
+  {
+    VisualPtr vis = scene->GetWorldVisual();
+    if (vis)
+    {
+      this->UpdateShaders(vis);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
-void RTShaderSystem::GenerateShaders(Visual *vis)
+void RTShaderSystem::UpdateShaders(VisualPtr _vis)
 {
-  if (!this->initialized)
+  if (_vis)
+  {
+    this->GenerateShaders(_vis);
+    for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
+      this->UpdateShaders(_vis->GetChild(i));
+  }
+}
+
+//////////////////////////////////////////////////
+void RTShaderSystem::GenerateShaders(Visual *_vis)
+{
+  VisualPtr vis(_vis);
+  this->GenerateShaders(vis);
+}
+
+//////////////////////////////////////////////////
+void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
+{
+  if (!this->initialized || !_vis)
     return;
 
-  for (unsigned int k = 0; k < vis->GetSceneNode()->numAttachedObjects(); k++)
+  for (unsigned int k = 0; _vis->GetSceneNode() &&
+      k < _vis->GetSceneNode()->numAttachedObjects(); ++k)
   {
-    Ogre::MovableObject *obj = vis->GetSceneNode()->getAttachedObject(k);
+    Ogre::MovableObject *obj = _vis->GetSceneNode()->getAttachedObject(k);
     Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(obj);
     if (!entity)
       continue;
@@ -292,7 +296,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
           renderState->reset();
 
           /// This doesn't seem to work properly.
-          if (vis->GetShaderType() == "normal_map_object_space")
+          if (_vis->GetShaderType() == "normal_map_object_space")
           {
             Ogre::RTShader::SubRenderState* subRenderState =
               this->shaderGenerator->createSubRenderState(
@@ -304,10 +308,10 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             normalMapSubRS->setNormalMapSpace(
                 Ogre::RTShader::NormalMapLighting::NMS_OBJECT);
 
-            normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
+            normalMapSubRS->setNormalMapTextureName(_vis->GetNormalMap());
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (vis->GetShaderType() == "normal_map_tangent_space")
+          else if (_vis->GetShaderType() == "normal_map_tangent_space")
           {
             Ogre::RTShader::SubRenderState* subRenderState =
               this->shaderGenerator->createSubRenderState(
@@ -319,11 +323,11 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             normalMapSubRS->setNormalMapSpace(
                 Ogre::RTShader::NormalMapLighting::NMS_TANGENT);
 
-            normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
+            normalMapSubRS->setNormalMapTextureName(_vis->GetNormalMap());
 
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (vis->GetShaderType() == "vertex")
+          else if (_vis->GetShaderType() == "vertex")
           {
             Ogre::RTShader::SubRenderState *perPerVertexLightModel =
               this->shaderGenerator->createSubRenderState(

@@ -103,6 +103,7 @@ namespace gazebo
     /// \def Light_M
     /// \brief Map of lights
     typedef std::map<std::string, LightPtr> Light_M;
+
     /// \def SkeletonPoseMsgs_L
     /// \brief List of skeleton messages.
     typedef std::list<boost::shared_ptr<msgs::PoseAnimation const> >
@@ -170,8 +171,11 @@ namespace gazebo
       /// \brief List of collision visual messages to process.
       public: VisualMsgs_L collisionVisualMsgs;
 
-      /// \brief List of light message to process.
-      public: LightMsgs_L lightMsgs;
+      /// \brief List of light factory message to process.
+      public: LightMsgs_L lightFactoryMsgs;
+
+      /// \brief List of light modify message to process.
+      public: LightMsgs_L lightModifyMsgs;
 
       /// \brief List of pose message to process.
       public: PoseMsgs_M poseMsgs;
@@ -224,8 +228,11 @@ namespace gazebo
       /// \brief Subscribe to visual topic
       public: transport::SubscriberPtr visSub;
 
-      /// \brief Subscribe to light topics
-      public: transport::SubscriberPtr lightSub;
+      /// \brief Subscribe to light factory topic
+      public: transport::SubscriberPtr lightFactorySub;
+
+      /// \brief Subscribe to light modify topic
+      public: transport::SubscriberPtr lightModifySub;
 
       /// \brief Subscribe to pose updates
       public: transport::SubscriberPtr poseSub;
@@ -244,9 +251,6 @@ namespace gazebo
 
       /// \brief Subscribe to model info updates
       public: transport::SubscriberPtr modelInfoSub;
-
-      /// \brief Publish light updates.
-      public: transport::PublisherPtr lightPub;
 
       /// \brief Respond to requests.
       public: transport::PublisherPtr responsePub;

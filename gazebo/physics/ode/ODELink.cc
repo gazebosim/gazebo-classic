@@ -95,48 +95,14 @@ void ODELink::Init()
   {
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
     math::Vector3 cogVec = this->inertial->GetCoG();
-    Base_V::iterator iter;
-    for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+    for (auto const &child : this->children)
     {
-      if ((*iter)->HasType(Base::COLLISION))
+      if (child->HasType(Base::COLLISION))
       {
-        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(*iter);
+        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(child);
         if (g->IsPlaceable() && g->GetCollisionId())
         {
           dGeomSetBody(g->GetCollisionId(), this->linkId);
-
-          // update pose immediately
-          math::Pose localPose = g->GetRelativePose();
-          localPose.pos -= cogVec;
-
-          dQuaternion q;
-          q[0] = localPose.rot.w;
-          q[1] = localPose.rot.x;
-          q[2] = localPose.rot.y;
-          q[3] = localPose.rot.z;
-
-          // Set the pose of the encapsulated collision; this is always relative
-          // to the CoM
-          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x,
-              localPose.pos.y, localPose.pos.z);
-          dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
-
-          // Set max_vel and min_depth
-          boost::any value;
-          if (g->GetODESurface()->maxVel < 0 && this->GetWorld()->
-              GetPhysicsEngine()->GetParam("contact_max_correcting_vel", value))
-          {
-            try
-            {
-              g->GetODESurface()->maxVel = boost::any_cast<double>(value);
-            }
-            catch(boost::bad_any_cast &_e)
-            {
-              gzerr << "Failed boost::any_cast in ODELink.cc: " << _e.what();
-            }
-          }
-          dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
-          dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
         }
       }
     }
@@ -148,8 +114,12 @@ void ODELink::Init()
           << " in ODELink::Init" << std::endl;
   }
 
-  // Update the Center of Mass.
-  this->UpdateMass();
+  // Update the Collision Offsets, Surface, and Center of Mass.
+  this->UpdateCollisionOffsets();
+  this->UpdateSurface();
+  // Only update the Center of Mass if object is dynamic
+  if (!this->GetKinematic())
+    this->UpdateMass();
 
   if (this->linkId)
   {
@@ -337,17 +307,69 @@ bool ODELink::GetEnabled() const
 }
 
 /////////////////////////////////////////////////////////////////////
+void ODELink::UpdateCollisionOffsets()
+{
+  if (this->linkId)
+  {
+    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+    math::Vector3 cogVec = this->inertial->GetCoG();
+    for (auto const &child : this->children)
+    {
+      if (child->HasType(Base::COLLISION))
+      {
+        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(child);
+        if (g->IsPlaceable() && g->GetCollisionId())
+        {
+          // update pose immediately
+          math::Pose localPose = g->GetRelativePose();
+          localPose.pos -= cogVec;
+
+          dQuaternion q;
+          q[0] = localPose.rot.w;
+          q[1] = localPose.rot.x;
+          q[2] = localPose.rot.y;
+          q[3] = localPose.rot.z;
+
+          // Set the pose of the encapsulated collision; this is always relative
+          // to the CoM
+          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x,
+              localPose.pos.y, localPose.pos.z);
+          dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
+        }
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////////////////////////
 void ODELink::UpdateSurface()
 {
-  Base_V::iterator iter;
-  Base_V::iterator iter_end = this->children.end();
-  for (iter = this->children.begin(); iter != iter_end; ++iter)
+  if (!this->linkId)
   {
-    if ((*iter)->HasType(Base::COLLISION))
+    return;
+  }
+
+  for (auto const &child : this->children)
+  {
+    if (child->HasType(Base::COLLISION))
     {
-      ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(*iter);
+      ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(child);
       if (g->IsPlaceable() && g->GetCollisionId())
       {
+        // Set max_vel and min_depth
+        boost::any value;
+        if (g->GetODESurface()->maxVel < 0 && this->GetWorld()->
+            GetPhysicsEngine()->GetParam("contact_max_correcting_vel", value))
+        {
+          try
+          {
+            g->GetODESurface()->maxVel = boost::any_cast<double>(value);
+          }
+          catch(boost::bad_any_cast &_e)
+          {
+            gzerr << "Failed boost::any_cast in ODELink.cc: " << _e.what();
+          }
+        }
         // Set surface properties max_vel and min_depth
         dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
         dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
@@ -355,6 +377,7 @@ void ODELink::UpdateSurface()
     }
   }
 }
+
 /////////////////////////////////////////////////////////////////////
 void ODELink::UpdateMass()
 {
@@ -388,6 +411,10 @@ void ODELink::UpdateMass()
     dBodySetMass(this->linkId, &odeMass);
   else
     gzthrow("Setting custom link " + this->GetScopedName() + "mass to zero!");
+
+  // In case the center of mass changed:
+  this->UpdateCollisionOffsets();
+  this->OnPoseChange();
 }
 
 //////////////////////////////////////////////////

@@ -14,91 +14,64 @@
  * limitations under the License.
  *
 */
-#ifndef _ENTITYMAKER_HH_
-#define _ENTITYMAKER_HH_
+#ifndef _GAZEBO_ENTITYMAKER_HH_
+#define _GAZEBO_ENTITYMAKER_HH_
 
-#include "gazebo/rendering/RenderTypes.hh"
+#include <boost/function.hpp>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class MouseEvent;
-  }
-
   /// \ingroup gazebo_gui
   /// \brief gui namespace
   namespace gui
   {
+    class EntityMakerPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class EntityMaker EntityMaker.hh gui/gui.hh
-    /// \brief to make an entity base class
-    class GAZEBO_VISIBLE EntityMaker
+    /// \brief To make an entity, base class
+    class GZ_GUI_VISIBLE EntityMaker
     {
-      /// \def CreateCallback
-      /// \brief boost::function with vector3 pos and vector3 scale
-      public: typedef boost::function<void(const math::Vector3 &pos,
-                  const math::Vector3 &scale)> CreateCallback;
-
-      /// \brief Constructor
-      public: EntityMaker();
-
       /// \brief Destructor
       public: virtual ~EntityMaker();
 
-      /// \brief Set whether to snap to grid
-      public: static void SetSnapToGrid(bool _snap);
+      /// \brief Start the maker.
+      public: virtual void Start();
 
-      /// \brief
-      /// \param[in] _camera Pointer to the user camera
-      public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
-      /// \brief
-      public: virtual void Stop() = 0;
+      /// \brief Stop the maker.
+      public: virtual void Stop();
 
-      /// \brief Checks if entity is active
-      public: virtual bool IsActive() const = 0;
-
-      /// \brief Callback for pushing entity with mouse
-      /// \param[in] _event MouseEvent object
-      public: virtual void OnMousePush(const common::MouseEvent &_event);
-
-      /// \brief Callback for releasing mouse button
+      /// \brief Callback when mouse button is released
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-
-      /// \brief Callback for dragging with mouse
-      /// \param[in] _event MouseEvent object
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
 
       /// \brief Callback when moving mouse
       /// \param[in] _event MouseEvent object
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
-      /// \brief Get a point snapped to a grid
-      /// \param[in] _p input point to be snapped
-      /// \return math::Vector3 with the point on the grid
-      protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
+      /// \brief Returns the entity world position.
+      /// \return Entity's position in the world frame.
+      public: virtual ignition::math::Vector3d EntityPosition() const;
+
+      /// \brief Sets the entity world position.
+      /// \param[in] _pos New position in the world frame.
+      protected: virtual void SetEntityPosition(
+          const ignition::math::Vector3d &_pos);
+
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      protected: EntityMaker(EntityMakerPrivate &_dataPtr);
 
       /// \brief Creates the entity
       protected: virtual void CreateTheEntity() = 0;
 
-      protected: rendering::UserCameraPtr camera;
-
-      protected: transport::NodePtr node;
-      protected: transport::PublisherPtr visPub;
-      protected: transport::PublisherPtr makerPub;
-      protected: transport::PublisherPtr requestPub;
-      protected: CreateCallback createCB;
-
-
-      private: static bool snapToGrid;
-      private: static double snapDistance;
-      private: static double snapGridSize;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: EntityMakerPrivate *dataPtr;
     };
   }
 }

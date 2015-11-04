@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
 #include "gazebo/util/system.hh"
@@ -27,11 +29,12 @@ namespace gazebo
 {
   namespace gui
   {
+    class TopToolbar;
     class ModelEditorPrivate;
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
-    class GZ_GUI_MODEL_VISIBLE ModelEditor : public Editor
+    class GZ_GUI_VISIBLE ModelEditor : public Editor
     {
       Q_OBJECT
 
@@ -47,6 +50,10 @@ namespace gazebo
       /// \param[in] _category Category to add the item too.
       public: void AddItemToPalette(QWidget *_item,
           const std::string &_category = "");
+
+      /// \brief Add an entity to the editor
+      /// \param[in] _sdf SDF describing the entity.
+      public: void AddEntity(sdf::ElementPtr _sdf);
 
       /// \brief Qt callback when the model editor's save action is
       /// triggered.
@@ -92,8 +99,19 @@ namespace gazebo
       /// \brief Toggle main window's toolbar to display model editor icons.
       private: void ToggleToolbar();
 
+      /// \brief Toggle the Insert tab on and off in model editor mode.
+      /// This takes the main window Insert tab and adds it to the editor
+      /// Note that ToggleToolbar restores the Insert tab in the main window
+      private: void ToggleInsertWidget();
+
       /// \brief Create menus
       private: void CreateMenus();
+
+      /// \brief Event callback used for inserting models into the editor
+      /// \param[in] _type Type of entity to be inserted
+      /// \param[in] _data Event data (e.g. name of model).
+      private: void OnCreateEntity(const std::string &_type,
+                                   const std::string &_data);
 
       /// \internal
       /// \brief Pointer to private data.

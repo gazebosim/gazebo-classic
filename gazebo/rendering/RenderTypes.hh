@@ -46,6 +46,7 @@ namespace gazebo
     class Camera;
     class UserCamera;
     class DepthCamera;
+    class WideAngleCamera;
     class GpuLaser;
     class DynamicLines;
     class Visual;
@@ -95,6 +96,10 @@ namespace gazebo
     /// \brief Shared pointer to DepthCamera
     typedef boost::shared_ptr<DepthCamera> DepthCameraPtr;
 
+    /// \def WideAngleCameraPtr
+    /// \brief Shared pointer to WideAngleCamera
+    typedef boost::shared_ptr<WideAngleCamera> WideAngleCameraPtr;
+
     /// \def GpuLaserPtr
     /// \brief Shared pointer to GpuLaser
     typedef boost::shared_ptr<GpuLaser> GpuLaserPtr;
@@ -105,11 +110,15 @@ namespace gazebo
 
     /// \def VisualPtr
     /// \brief Shared pointer to Visual
-    typedef boost::shared_ptr<Visual> VisualPtr;
+    typedef std::shared_ptr<Visual> VisualPtr;
+
+    /// \def VisualWeakPtr
+    /// \brief Weak pointer to Visual
+    typedef std::weak_ptr<Visual> VisualWeakPtr;
 
     /// \def LaserVisualPtr
     /// \brief Shared pointer to LaserVisual
-    typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;
+    typedef std::shared_ptr<LaserVisual> LaserVisualPtr;
 
     /// \def MarkerVisualPtr
     /// \brief Shared pointer to MarkerVisual
@@ -117,63 +126,63 @@ namespace gazebo
 
     /// \def SonarVisualPtr
     /// \brief Shared pointer to SonarVisual
-    typedef boost::shared_ptr<SonarVisual> SonarVisualPtr;
+    typedef std::shared_ptr<SonarVisual> SonarVisualPtr;
 
     /// \def WrenchVisualPtr
     /// \brief Shared pointer to WrenchVisual
-    typedef boost::shared_ptr<WrenchVisual> WrenchVisualPtr;
+    typedef std::shared_ptr<WrenchVisual> WrenchVisualPtr;
 
     /// \def CameraVisualPtr
     /// \brief Shared pointer to CameraVisual
-    typedef boost::shared_ptr<CameraVisual> CameraVisualPtr;
+    typedef std::shared_ptr<CameraVisual> CameraVisualPtr;
 
     /// \def LogicalCameraVisualPtr
     /// \brief Shared pointer to LogicalCameraVisual
-    typedef boost::shared_ptr<LogicalCameraVisual> LogicalCameraVisualPtr;
+    typedef std::shared_ptr<LogicalCameraVisual> LogicalCameraVisualPtr;
 
     /// \def JointVisualPtr
     /// \brief Shared pointer to JointVisual
-    typedef boost::shared_ptr<JointVisual> JointVisualPtr;
+    typedef std::shared_ptr<JointVisual> JointVisualPtr;
 
     /// \def ContactVisualPtr
     /// \brief Shared pointer to ContactVisual
-    typedef boost::shared_ptr<ContactVisual> ContactVisualPtr;
+    typedef std::shared_ptr<ContactVisual> ContactVisualPtr;
 
     /// \def ArrowVisualPtr
     /// \brief Shared pointer to ArrowVisual
-    typedef boost::shared_ptr<ArrowVisual> ArrowVisualPtr;
+    typedef std::shared_ptr<ArrowVisual> ArrowVisualPtr;
 
     /// \def AxisVisualPtr
     /// \brief Shared pointer to AxisVisual
-    typedef boost::shared_ptr<AxisVisual> AxisVisualPtr;
+    typedef std::shared_ptr<AxisVisual> AxisVisualPtr;
 
     /// \def COMVisualPtr
     /// \brief Shared pointer to COMVisual
-    typedef boost::shared_ptr<COMVisual> COMVisualPtr;
+    typedef std::shared_ptr<COMVisual> COMVisualPtr;
 
     /// \def InertiaVisualPtr
     /// \brief Shared pointer to InertiaVisual
-    typedef boost::shared_ptr<InertiaVisual> InertiaVisualPtr;
+    typedef std::shared_ptr<InertiaVisual> InertiaVisualPtr;
 
     /// \def RFIDVisual
     /// \brief Shared pointer to RFIDVisual
-    typedef boost::shared_ptr<RFIDVisual> RFIDVisualPtr;
+    typedef std::shared_ptr<RFIDVisual> RFIDVisualPtr;
 
     /// \def RFIDTagVisual
     /// \brief Shared pointer to RFIDTagVisual
-    typedef boost::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
+    typedef std::shared_ptr<RFIDTagVisual> RFIDTagVisualPtr;
 
     /// \def ApplyWrenchVisualPtr
     /// \brief Shared pointer to ApplyWrenchVisual
-    typedef boost::shared_ptr<ApplyWrenchVisual> ApplyWrenchVisualPtr;
+    typedef std::shared_ptr<ApplyWrenchVisual> ApplyWrenchVisualPtr;
 
     /// \def OriginVisualPtr
     /// \brief Shared pointer to OriginVisual
-    typedef boost::shared_ptr<OriginVisual> OriginVisualPtr;
+    typedef std::shared_ptr<OriginVisual> OriginVisualPtr;
 
     /// \def LinkFrameVisualPtr
     /// \brief Shared pointer to LinkFrameVisual
-    typedef boost::shared_ptr<LinkFrameVisual> LinkFrameVisualPtr;
+    typedef std::shared_ptr<LinkFrameVisual> LinkFrameVisualPtr;
 
     /// \def WindowManager
     /// \brief Shared pointer to WindowManager
@@ -181,7 +190,7 @@ namespace gazebo
 
     /// \def SelectionObj
     /// \brief Shared pointer to SelectionObj
-    typedef boost::shared_ptr<SelectionObj> SelectionObjPtr;
+    typedef std::shared_ptr<SelectionObj> SelectionObjPtr;
 
     /// \def RayQueryPtr
     /// \brief Shared pointer to RayQuery

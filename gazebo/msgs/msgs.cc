@@ -129,26 +129,11 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v)
-    {
-      _pt->set_x(_v.x);
-      _pt->set_y(_v.y);
-      _pt->set_z(_v.z);
-    }
-
-    /////////////////////////////////////////////
     void Set(msgs::Vector3d *_pt, const ignition::math::Vector3d &_v)
     {
       _pt->set_x(_v.X());
       _pt->set_y(_v.Y());
       _pt->set_z(_v.Z());
-    }
-
-    /////////////////////////////////////////////
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v)
-    {
-      _pt->set_x(_v.x);
-      _pt->set_y(_v.y);
     }
 
     /////////////////////////////////////////////
@@ -159,28 +144,12 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v)
-    {
-      _q->set_x(_v.x);
-      _q->set_y(_v.y);
-      _q->set_z(_v.z);
-      _q->set_w(_v.w);
-    }
-
-    /////////////////////////////////////////////
     void Set(msgs::Quaternion *_q, const ignition::math::Quaterniond &_v)
     {
       _q->set_x(_v.X());
       _q->set_y(_v.Y());
       _q->set_z(_v.Z());
       _q->set_w(_v.W());
-    }
-
-    /////////////////////////////////////////////
-    void Set(msgs::Pose *_p, const math::Pose &_v)
-    {
-      Set(_p->mutable_position(), _v.pos.Ign());
-      Set(_p->mutable_orientation(), _v.rot.Ign());
     }
 
     /////////////////////////////////////////////
@@ -229,15 +198,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
-    {
-      Set(_p->mutable_normal(), _v.normal.Ign());
-      _p->mutable_size()->set_x(_v.size.x);
-      _p->mutable_size()->set_y(_v.size.y);
-      _p->set_d(_v.d);
-    }
-
-    /////////////////////////////////////////////////
     void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v)
     {
       Set(_p->mutable_normal(), _v.Normal());
@@ -275,12 +235,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Vector3d Convert(const math::Vector3 &_v)
-    {
-      return Convert(_v.Ign());
-    }
-
-    /////////////////////////////////////////////////
     msgs::Vector3d Convert(const ignition::math::Vector3d &_v)
     {
       msgs::Vector3d result;
@@ -288,12 +242,6 @@ namespace gazebo
       result.set_y(_v.Y());
       result.set_z(_v.Z());
       return result;
-    }
-
-    /////////////////////////////////////////////////
-    msgs::Vector2d Convert(const math::Vector2d &_v)
-    {
-      return Convert(_v.Ign());
     }
 
     /////////////////////////////////////////////////
@@ -306,12 +254,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    msgs::Quaternion Convert(const math::Quaternion &_q)
-    {
-      return Convert(_q.Ign());
-    }
-
-    /////////////////////////////////////////////
     msgs::Quaternion Convert(const ignition::math::Quaterniond &_q)
     {
       msgs::Quaternion result;
@@ -320,12 +262,6 @@ namespace gazebo
       result.set_z(_q.Z());
       result.set_w(_q.W());
       return result;
-    }
-
-    /////////////////////////////////////////////
-    msgs::Pose Convert(const math::Pose &_p)
-    {
-      return Convert(_p.Ign());
     }
 
     /////////////////////////////////////////////
@@ -354,16 +290,6 @@ namespace gazebo
       msgs::Time result;
       result.set_sec(_t.sec);
       result.set_nsec(_t.nsec);
-      return result;
-    }
-
-    msgs::PlaneGeom Convert(const math::Plane &_p)
-    {
-      msgs::PlaneGeom result;
-      result.mutable_normal()->CopyFrom(Convert(_p.normal.Ign()));
-      result.mutable_size()->set_x(_p.size.x);
-      result.mutable_size()->set_y(_p.size.y);
-      result.set_d(_p.d);
       return result;
     }
 
@@ -582,21 +508,9 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    math::Vector3 Convert(const msgs::Vector3d &_v)
-    {
-      return math::Vector3(_v.x(), _v.y(), _v.z());
-    }
-
-    /////////////////////////////////////////////
     ignition::math::Vector3d ConvertIgn(const msgs::Vector3d &_v)
     {
       return ignition::math::Vector3d(_v.x(), _v.y(), _v.z());
-    }
-
-    /////////////////////////////////////////////
-    math::Vector2d Convert(const msgs::Vector2d &_v)
-    {
-      return math::Vector2d(_v.x(), _v.y());
     }
 
     /////////////////////////////////////////////
@@ -606,22 +520,9 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    math::Quaternion Convert(const msgs::Quaternion &_q)
-    {
-      return math::Quaternion(_q.w(), _q.x(), _q.y(), _q.z());
-    }
-
-    /////////////////////////////////////////////
     ignition::math::Quaterniond ConvertIgn(const msgs::Quaternion &_q)
     {
       return ignition::math::Quaterniond(_q.w(), _q.x(), _q.y(), _q.z());
-    }
-
-    /////////////////////////////////////////////
-    math::Pose Convert(const msgs::Pose &_p)
-    {
-      return math::Pose(
-          ConvertIgn(_p.position()), ConvertIgn(_p.orientation()));
     }
 
     /////////////////////////////////////////////
@@ -641,14 +542,6 @@ namespace gazebo
     common::Time Convert(const msgs::Time &_t)
     {
       return common::Time(_t.sec(), _t.nsec());
-    }
-
-    /////////////////////////////////////////////
-    math::Plane Convert(const msgs::PlaneGeom &_p)
-    {
-      return math::Plane(ConvertIgn(_p.normal()),
-          ignition::math::Vector2d(_p.size().x(), _p.size().y()),
-          _p.d());
     }
 
     /////////////////////////////////////////////
@@ -672,17 +565,8 @@ namespace gazebo
         sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
         while (pluginElem)
         {
-          msgs::Plugin *plgnMsg = result.add_plugin();
-          plgnMsg->set_name(pluginElem->Get<std::string>("name"));
-          plgnMsg->set_filename(pluginElem->Get<std::string>("filename"));
-
-          std::stringstream ss;
-          for (sdf::ElementPtr innerElem = pluginElem->GetFirstElement();
-              innerElem; innerElem = innerElem->GetNextElement(""))
-          {
-            ss << innerElem->ToString("");
-          }
-          plgnMsg->set_innerxml(ss.str());
+          msgs::Plugin *pluginMsg = result.add_plugin();
+          pluginMsg->CopyFrom(PluginFromSDF(pluginElem));
           pluginElem = pluginElem->GetNextElement("plugin");
         }
       }
@@ -718,6 +602,25 @@ namespace gazebo
               TrackVisualFromSDF(camSDF->GetElement("track_visual")));
         }
       }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    msgs::Plugin PluginFromSDF(const sdf::ElementPtr _sdf)
+    {
+      msgs::Plugin result;
+
+      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_filename(_sdf->Get<std::string>("filename"));
+
+      std::stringstream ss;
+      for (sdf::ElementPtr innerElem = _sdf->GetFirstElement();
+          innerElem; innerElem = innerElem->GetNextElement(""))
+      {
+        ss << innerElem->ToString("");
+      }
+      result.set_innerxml(ss.str());
 
       return result;
     }
@@ -1085,6 +988,219 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Collision CollisionFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Collision result;
+
+      if (_sdf->GetName() != "collision")
+      {
+        gzerr << "Cannot create a collision message from a ["
+          << _sdf->GetName() << "] SDF element." << std::endl;
+        return result;
+      }
+
+      result.set_name(_sdf->Get<std::string>("name"));
+
+      if (_sdf->HasElement("laser_retro"))
+        result.set_laser_retro(_sdf->Get<double>("laser_retro"));
+
+      if (_sdf->HasElement("max_contacts"))
+        result.set_max_contacts(_sdf->Get<double>("max_contacts"));
+
+      if (_sdf->HasElement("pose"))
+      {
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
+      }
+
+      // Load the geometry
+      if (_sdf->HasElement("geometry"))
+      {
+        auto geomMsg = result.mutable_geometry();
+        geomMsg->CopyFrom(GeometryFromSDF(_sdf->GetElement("geometry")));
+      }
+
+      // Load the surface
+      if (_sdf->HasElement("surface"))
+      {
+        auto surfaceMsg = result.mutable_surface();
+        surfaceMsg->CopyFrom(SurfaceFromSDF(_sdf->GetElement("surface")));
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Surface SurfaceFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Surface result;
+
+      if (_sdf->GetName() != "surface")
+      {
+        gzerr << "Cannot create a surface message from a ["
+          << _sdf->GetName() << "] SDF element." << std::endl;
+        return result;
+      }
+
+      // Load the friction
+      if (_sdf->HasElement("friction"))
+      {
+        auto frictionMsg = result.mutable_friction();
+        frictionMsg->CopyFrom(FrictionFromSDF(_sdf->GetElement("friction")));
+      }
+
+      // Load bounce elements
+      if (_sdf->HasElement("bounce"))
+      {
+        sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
+        if (bounceElem->HasElement("restitution_coefficient"))
+        {
+          result.set_restitution_coefficient(
+              bounceElem->Get<double>("restitution_coefficient"));
+        }
+        if (bounceElem->HasElement("threshold"))
+          result.set_bounce_threshold(bounceElem->Get<double>("threshold"));
+      }
+
+      // Load contact elements. Note the hierarchy differs in SDF and msg
+      if (_sdf->HasElement("contact"))
+      {
+        sdf::ElementPtr contactElem = _sdf->GetElement("contact");
+
+        /// \todo Getting only ODE elements, find a way to get others too
+        if (contactElem->HasElement("ode"))
+        {
+          sdf::ElementPtr odeElem = contactElem->GetElement("ode");
+
+          if (odeElem->HasElement("soft_cfm"))
+            result.set_soft_cfm(odeElem->Get<double>("soft_cfm"));
+
+          if (odeElem->HasElement("soft_erp"))
+            result.set_soft_erp(odeElem->Get<double>("soft_erp"));
+
+          if (odeElem->HasElement("kp"))
+            result.set_kp(odeElem->Get<double>("kp"));
+
+          if (odeElem->HasElement("kd"))
+            result.set_kd(odeElem->Get<double>("kd"));
+
+          if (odeElem->HasElement("max_vel"))
+            result.set_max_vel(odeElem->Get<double>("max_vel"));
+
+          if (odeElem->HasElement("min_depth"))
+            result.set_min_depth(odeElem->Get<double>("min_depth"));
+        }
+
+        if (contactElem->HasElement("collide_without_contact"))
+        {
+          result.set_collide_without_contact(
+              contactElem->Get<bool>("collide_without_contact"));
+        }
+
+        if (contactElem->HasElement("collide_without_contact_bitmask"))
+        {
+          result.set_collide_without_contact_bitmask(
+              contactElem->Get<int>("collide_without_contact_bitmask"));
+        }
+
+        if (contactElem->HasElement("collide_bitmask"))
+        {
+          result.set_collide_bitmask(contactElem->Get<int>("collide_bitmask"));
+        }
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Friction FrictionFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Friction result;
+
+      if (_sdf->GetName() != "friction")
+      {
+        gzerr << "Cannot create a friction message from a ["
+          << _sdf->GetName() << "] SDF element." << std::endl;
+        return result;
+      }
+
+      /// \todo Getting only ODE elements, find a way to get others too
+      if (_sdf->HasElement("ode"))
+      {
+        sdf::ElementPtr odeElem = _sdf->GetElement("ode");
+
+        if (odeElem->HasElement("mu"))
+          result.set_mu(odeElem->Get<double>("mu"));
+
+        if (odeElem->HasElement("mu2"))
+          result.set_mu2(odeElem->Get<double>("mu2"));
+
+        if (odeElem->HasElement("fdir1"))
+        {
+          msgs::Set(result.mutable_fdir1(),
+              odeElem->Get<ignition::math::Vector3d>("fdir1"));
+        }
+
+        if (odeElem->HasElement("slip1"))
+          result.set_slip1(odeElem->Get<double>("slip1"));
+
+        if (odeElem->HasElement("slip2"))
+          result.set_slip2(odeElem->Get<double>("slip2"));
+      }
+
+      // Load torsional friction
+      if (_sdf->HasElement("torsional"))
+      {
+        sdf::ElementPtr torsionalElem = _sdf->GetElement("torsional");
+
+        msgs::Friction::Torsional torsionalMsg;
+
+        if (torsionalElem->HasElement("coefficient"))
+        {
+          torsionalMsg.set_coefficient(
+              torsionalElem->Get<double>("coefficient"));
+        }
+
+        if (torsionalElem->HasElement("use_patch_radius"))
+        {
+          torsionalMsg.set_use_patch_radius(
+              torsionalElem->Get<bool>("use_patch_radius"));
+        }
+
+        if (torsionalElem->HasElement("patch_radius"))
+        {
+          torsionalMsg.set_patch_radius(
+              torsionalElem->Get<double>("patch_radius"));
+        }
+
+        if (torsionalElem->HasElement("surface_radius"))
+        {
+          torsionalMsg.set_surface_radius(
+              torsionalElem->Get<double>("surface_radius"));
+        }
+
+        if (torsionalElem->HasElement("ode"))
+        {
+          sdf::ElementPtr odeElem = torsionalElem->GetElement("ode");
+
+          if (odeElem->HasElement("slip"))
+          {
+            msgs::Friction::Torsional::ODE torsionalOdeMsg;
+            torsionalOdeMsg.set_slip(odeElem->Get<double>("slip"));
+
+            auto torsionalODE = torsionalMsg.mutable_ode();
+            torsionalODE->CopyFrom(torsionalOdeMsg);
+          }
+        }
+
+        auto torsional = result.mutable_torsional();
+        torsional->CopyFrom(torsionalMsg);
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     msgs::Axis AxisFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::Axis result;
@@ -1193,6 +1309,27 @@ namespace gazebo
           }
         }
       }
+
+      // gearbox
+      if (_sdf->HasElement("gearbox_reference_body"))
+      {
+        msgs::Joint::Gearbox *gearboxMsg = result.mutable_gearbox();
+        gearboxMsg->set_gearbox_reference_body(
+            _sdf->Get<std::string>("gearbox_reference_body"));
+      }
+      if (_sdf->HasElement("gearbox_ratio"))
+      {
+        msgs::Joint::Gearbox *gearboxMsg = result.mutable_gearbox();
+        gearboxMsg->set_gearbox_ratio(_sdf->Get<double>("gearbox_ratio"));
+      }
+
+      // screw
+      if (_sdf->HasElement("thread_pitch"))
+      {
+        msgs::Joint::Screw *screwMsg = result.mutable_screw();
+        screwMsg->set_thread_pitch(_sdf->Get<double>("thread_pitch"));
+      }
+
       return result;
     }
 
@@ -1469,6 +1606,150 @@ namespace gazebo
       if (_sdf->HasElement("shadows"))
         result.set_shadows(_sdf->Get<bool>("shadows"));
 
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Sensor SensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::Sensor result;
+      std::string type = _sdf->Get<std::string>("type");
+      result.set_name(_sdf->Get<std::string>("name"));
+      result.set_type(type);
+
+      if (_sdf->HasElement("always_on"))
+        result.set_always_on(_sdf->Get<bool>("always_on"));
+
+      if (_sdf->HasElement("update_rate"))
+        result.set_update_rate(_sdf->Get<double>("update_rate"));
+
+      if (_sdf->HasElement("pose"))
+      {
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
+      }
+
+      if (_sdf->HasElement("visualize"))
+        result.set_visualize(_sdf->Get<bool>("visualize"));
+
+      if (_sdf->HasElement("topic"))
+        result.set_topic(_sdf->Get<std::string>("topic"));
+
+      if (type == "camera")
+      {
+        result.mutable_camera()->CopyFrom(
+            msgs::CameraSensorFromSDF(_sdf->GetElement("camera")));
+      }
+      else if (type == "ray")
+      {
+        result.mutable_ray()->CopyFrom(msgs::RaySensorFromSDF(
+            _sdf->GetElement("ray")));
+      }
+      else if (type == "contact")
+      {
+        result.mutable_contact()->CopyFrom(
+          msgs::ContactSensorFromSDF(_sdf->GetElement("contact")));
+      }
+      else
+      {
+        gzwarn << "Conversion of sensor type[" << type << "] not suppported."
+          << std::endl;
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::CameraSensor CameraSensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::CameraSensor result;
+
+      result.set_horizontal_fov(_sdf->Get<double>("horizontal_fov"));
+
+      result.mutable_image_size()->set_x(
+          _sdf->GetElement("image")->Get<int>("width"));
+      result.mutable_image_size()->set_y(
+          _sdf->GetElement("image")->Get<int>("height"));
+
+      if (_sdf->GetElement("image")->HasElement("format"))
+      {
+        result.set_image_format(
+            _sdf->GetElement("image")->Get<std::string>("format"));
+      }
+
+      result.set_near_clip(_sdf->GetElement("clip")->Get<double>("near"));
+      result.set_far_clip(_sdf->GetElement("clip")->Get<double>("far"));
+
+      if (_sdf->HasElement("save"))
+      {
+        result.set_save_enabled(_sdf->GetElement("save")->Get<bool>("enabled"));
+        result.set_save_path(
+            _sdf->GetElement("save")->Get<std::string>("path"));
+      }
+
+      if (_sdf->HasElement("distortion"))
+      {
+        sdf::ElementPtr distElem = _sdf->GetElement("distortion");
+        msgs::Distortion *distortionMsg = result.mutable_distortion();
+
+        if (distElem->HasElement("k1"))
+          distortionMsg->set_k1(distElem->Get<double>("k1"));
+
+        if (distElem->HasElement("k2"))
+          distortionMsg->set_k2(distElem->Get<double>("k2"));
+
+        if (distElem->HasElement("k3"))
+          distortionMsg->set_k3(distElem->Get<double>("k3"));
+
+        if (distElem->HasElement("p1"))
+          distortionMsg->set_p1(distElem->Get<double>("p1"));
+
+        if (distElem->HasElement("p2"))
+          distortionMsg->set_p2(distElem->Get<double>("p2"));
+
+        if (distElem->HasElement("center"))
+        {
+          distortionMsg->mutable_center()->set_x(
+              distElem->Get<math::Vector2d>("center").x);
+          distortionMsg->mutable_center()->set_y(
+              distElem->Get<math::Vector2d>("center").y);
+        }
+      }
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::RaySensor RaySensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::RaySensor result;
+      sdf::ElementPtr rangeElem = _sdf->GetElement("range");
+      sdf::ElementPtr scanElem = _sdf->GetElement("scan");
+      sdf::ElementPtr hscanElem = scanElem->GetElement("horizontal");
+      sdf::ElementPtr vscanElem = scanElem->GetElement("vertical");
+
+      result.set_horizontal_samples(hscanElem->Get<int>("samples"));
+      result.set_horizontal_resolution(hscanElem->Get<double>("resolution"));
+      result.set_horizontal_min_angle(hscanElem->Get<double>("min_angle"));
+      result.set_horizontal_max_angle(hscanElem->Get<double>("max_angle"));
+
+      result.set_vertical_samples(vscanElem->Get<int>("samples"));
+      result.set_vertical_resolution(vscanElem->Get<double>("resolution"));
+      result.set_vertical_min_angle(vscanElem->Get<double>("min_angle"));
+      result.set_vertical_max_angle(vscanElem->Get<double>("max_angle"));
+
+      result.set_range_min(rangeElem->Get<double>("min"));
+      result.set_range_max(rangeElem->Get<double>("max"));
+      result.set_range_resolution(rangeElem->Get<double>("resolution"));
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::ContactSensor ContactSensorFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::ContactSensor result;
+      result.set_collision_name(_sdf->Get<std::string>("collision"));
       return result;
     }
 
@@ -1802,6 +2083,42 @@ namespace gazebo
           physicsEngElem->GetElement("slip1")->Set(friction.slip1());
         if (friction.has_slip2())
           physicsEngElem->GetElement("slip2")->Set(friction.slip2());
+
+        if (friction.has_torsional())
+        {
+          msgs::Friction::Torsional torsional = friction.torsional();
+          sdf::ElementPtr torsionalElem = frictionElem->GetElement("torsional");
+
+          if (torsional.has_coefficient())
+          {
+            torsionalElem->GetElement("coefficient")->Set(
+                torsional.coefficient());
+          }
+          if (torsional.has_patch_radius())
+          {
+            torsionalElem->GetElement("patch_radius")->Set(
+                torsional.patch_radius());
+          }
+          if (torsional.has_surface_radius())
+          {
+            torsionalElem->GetElement("surface_radius")->Set(
+                torsional.surface_radius());
+          }
+          if (torsional.has_use_patch_radius())
+          {
+            torsionalElem->GetElement("use_patch_radius")->Set(
+                torsional.use_patch_radius());
+          }
+          if (torsional.has_ode())
+          {
+            msgs::Friction::Torsional::ODE ode = torsional.ode();
+            sdf::ElementPtr odeElem = torsionalElem->GetElement("ode");
+            if (ode.has_slip())
+            {
+              odeElem->GetElement("slip")->Set(ode.slip());
+            }
+          }
+        }
       }
       sdf::ElementPtr bounceElem = surfaceSDF->GetElement("bounce");
       if (_msg.has_restitution_coefficient())
@@ -2112,13 +2429,6 @@ namespace gazebo
 
     ////////////////////////////////////////////////////////
     void AddBoxLink(Model &_model, const double _mass,
-                    const math::Vector3 &_size)
-    {
-      AddBoxLink(_model, _mass, _size.Ign());
-    }
-
-    ////////////////////////////////////////////////////////
-    void AddBoxLink(Model &_model, const double _mass,
                     const ignition::math::Vector3d &_size)
     {
       Geometry geometry;
@@ -2310,6 +2620,31 @@ namespace gazebo
         if (_msg.has_suspension_erp())
           suspensionElem->GetElement("erp")->Set(_msg.suspension_erp());
       }
+
+      // gearbox joint message fields
+      if (_msg.has_gearbox())
+      {
+        msgs::Joint::Gearbox gearboxMsg = _msg.gearbox();
+        if (gearboxMsg.has_gearbox_reference_body())
+        {
+          jointSDF->GetElement("gearbox_reference_body")->Set(
+              gearboxMsg.gearbox_reference_body());
+        }
+        if (gearboxMsg.has_gearbox_ratio())
+        {
+          jointSDF->GetElement("gearbox_ratio")->Set(
+              gearboxMsg.gearbox_ratio());
+        }
+      }
+
+      // screw joint message field
+      if (_msg.has_screw())
+      {
+        msgs::Joint::Screw screwMsg = _msg.screw();
+        if (screwMsg.has_thread_pitch())
+          jointSDF->GetElement("thread_pitch")->Set(screwMsg.thread_pitch());
+      }
+
       /// \todo JointToSDF currently does not convert sensor data
 
       return jointSDF;

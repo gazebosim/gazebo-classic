@@ -287,6 +287,20 @@ material Gazebo/ZincYellow
   }
 }
 
+material Gazebo/DarkYellow
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.7 0.7 0 1
+      diffuse 0.7 0.7 0 1
+      specular 0 0 0 0 0
+    }
+  }
+}
+
+
 material Gazebo/Purple
 {
   technique
@@ -324,6 +338,19 @@ material Gazebo/Orange
       ambient 1 0.5088 0.0468 1
       diffuse 1 0.5088 0.0468 1
       specular 0.5 0.5 0.5 128
+    }
+  }
+}
+
+material Gazebo/Indigo
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.33 0.0 0.5
+      diffuse 0.33 0.0 0.5
+      specular 0.1 0.1 0.1 1
     }
   }
 }
@@ -1403,6 +1430,42 @@ material Gazebo/CameraDistortionMap
   }
 }
 
+vertex_program Gazebo/WideLensMapVS glsl
+{
+  source wide_lens_map_vs.glsl
+  default_params
+  {
+    param_named ratio float 1
+  }
+}
+
+fragment_program Gazebo/WideLensMapFS glsl
+{
+  source wide_lens_map_fp.glsl
+  default_params
+  {
+    param_named envMap int 0
+    param_named c1 float 1
+    param_named c2 float 1
+    param_named c3 float 0
+    param_named f float 1
+    param_named fun float3 0 1
+    param_named cutOffAngle float 3.14
+  }
+}
+
+material Gazebo/WideLensMap
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/WideLensMapVS { }
+      fragment_program_ref Gazebo/WideLensMapFS { }
+    }
+  }
+}
+
 material Gazebo/PointCloud
 {
    technique
@@ -1489,4 +1552,3 @@ material Gazebo/Grass
     }
   }
 }
-

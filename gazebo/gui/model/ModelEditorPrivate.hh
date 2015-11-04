@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_MODEL_EDITOR_PRIVATE_HH_
 #define _GAZEBO_MODEL_EDITOR_PRIVATE_HH_
 
+#include <vector>
 #include <string>
 
 #include "gazebo/gui/qt.h"
@@ -27,6 +28,7 @@ namespace gazebo
   namespace gui
   {
     class SchematicViewWidget;
+    class ModelTreeWidget;
     class ModelEditorPalette;
 
     /// \internal
@@ -37,24 +39,18 @@ namespace gazebo
       /// \brief Menubar containing actions related to the editor.
       public: QMenuBar *menuBar;
 
-      /// \brief Contains all the model editor tools.
+      /// \brief A palette of entities that can be inserted into the editor.
       public: ModelEditorPalette *modelPalette;
+
+      /// \brief A display of model settings and its child entities
+      public: ModelTreeWidget *modelTree;
 
       /// \brief True if model editor is active.
       public: bool active;
 
-      /// \brief Qt action for selecting and adding a joint in the model editor.
-      public: QAction *jointTypeAct;
-
       /// \brief Qt action for adding a previously selected joint in the
       /// model editor.
       public: QAction *jointAct;
-
-      /// \brief A separator for the joint icon.
-      public: QAction *jointSeparatorAct;
-
-      /// \brief Qt tool button associated with the joint action.
-      public: QToolButton *jointButton;
 
       /// \brief Qt signal mapper for mapping add jointsignals.
       public: QSignalMapper *signalMapper;
@@ -83,6 +79,9 @@ namespace gazebo
       /// \brief Pointer to the schematic view widget.
       public: SchematicViewWidget *svWidget;
 
+      /// \brief Pointer to the Insert model widget in main window.
+      public: QWidget *insertModel;
+
       /// \brief Show toolbars action cloned from main window.
       public: QAction *showToolbarsAct;
 
@@ -95,8 +94,8 @@ namespace gazebo
       /// \brief Camera perspective view action cloned from main window.
       public: QAction *cameraPerspectiveAct;
 
-      /// \brief Save the main window paused state to use when returning.
-      public: bool mainWindowPaused;
+      /// \brief A list of event connections.
+      public: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

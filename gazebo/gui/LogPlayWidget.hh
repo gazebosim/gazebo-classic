@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class LogPlayWidget LogPlayWidget.hh
     /// \brief Widget which displays log playback options.
-    class GAZEBO_VISIBLE LogPlayWidget : public QWidget
+    class GZ_GUI_VISIBLE LogPlayWidget : public QWidget
     {
       Q_OBJECT
 
@@ -73,6 +73,19 @@ namespace gazebo
       /// \brief Step simulation forward.
       public slots: void OnStepForward();
 
+      /// \brief Step simulation back.
+      public slots: void OnStepBack();
+
+      /// \brief Jump to the start of the log file.
+      public slots: void OnRewind();
+
+      /// \brief Jump to the end of the log file.
+      public slots: void OnForward();
+
+      /// \brief Jump to a given time in the log file
+      /// \param[in] _time Desired time
+      public slots: void OnSeek(const common::Time &_time);
+
       /// \brief Qt signal to show the play button.
       signals: void ShowPlay();
 
@@ -105,6 +118,17 @@ namespace gazebo
       /// \param[in] _time End time.
       signals: void SetEndTime(const common::Time &_time);
 
+      /// \brief Publish a multistep message.
+      /// \param[in] _step Number of steps.
+      private: void PublishMultistep(const int _step);
+
+      /// \brief Helper function to prepare each of the buttons.
+      /// \param[in] _button Pointer to the button.
+      /// \param[in] _icon Icon uri.
+      /// \param[in] _isSmall True if the button is small.
+      private: void SetupButton(QToolButton *_button, QString _icon,
+          bool _isSmall);
+
       /// \internal
       /// \brief Pointer to private data.
       private: LogPlayWidgetPrivate *dataPtr;
@@ -112,7 +136,7 @@ namespace gazebo
 
     /// \class LogPlayView LogPlayView.hh
     /// \brief View for the timeline.
-    class GAZEBO_VISIBLE LogPlayView: public QGraphicsView
+    class GZ_GUI_VISIBLE LogPlayView: public QGraphicsView
     {
       Q_OBJECT
 
@@ -135,6 +159,19 @@ namespace gazebo
       /// \brief Draw the timeline.
       public slots: void DrawTimeline();
 
+      /// \brief Qt signal used to seek.
+      /// \param[in] _time Time to jump to.
+      signals: void Seek(const common::Time &_time);
+
+      // Documentation inherited
+      protected: void mousePressEvent(QMouseEvent *_event);
+
+      // Documentation inherited
+      protected: void mouseReleaseEvent(QMouseEvent *_event);
+
+      // Documentation inherited
+      protected: void mouseMoveEvent(QMouseEvent *_event);
+
       /// \internal
       /// \brief Pointer to private data.
       private: LogPlayViewPrivate *dataPtr;
@@ -142,7 +179,7 @@ namespace gazebo
 
     /// \class CurrentTimeItem CurrentTimeItem.hh
     /// \brief Item which represents the current time within the view.
-    class GAZEBO_VISIBLE CurrentTimeItem: public QObject,
+    class GZ_GUI_VISIBLE CurrentTimeItem: public QObject,
         public QGraphicsRectItem
     {
       Q_OBJECT

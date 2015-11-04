@@ -1,11 +1,305 @@
+# Note on deprecations
+A tick-tock release cycle allows easy migration to new software versions.
+Obsolete Gazebo code is marked as deprecated for one major release.
+Deprecated code produces compile-time warnings. These warning serve as
+notification to users that their code should be upgraded. The next major
+release will remove the deprecated code.
+
+## Gazebo 6.X to 7.X
+
+### Additions
+
+1. **gazebo/physics/Model.hh**
+    + public: gazebo::physics::JointPtr CreateJoint(
+        const std::string &_name, const std::string &_type,
+        physics::LinkPtr _parent, physics::LinkPtr _child);
+    + public: bool RemoveJoint(const std::string &_name);
+    + public: boost::shared_ptr<Model> shared_from_this();
+
+### Modifications
+
+1. **gazebo/rendering/RenderTypes.hh**
+    + typedefs for Visual and its derived classes have been changed from boost to std pointers.
+    + [pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
+
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Removed:*** public: static event::EventT<void (bool, bool, const math::Pose &, const std::string &)> modelPropertiesChanged
+    + ***Replacement:*** public: static event::EventT<void (bool, bool)> modelPropertiesChanged
+    + ***Note:*** Removed last two arguments, model pose and name, from the function
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Removed:*** public: void SetClipDist();
+    + ***Replacement:*** public: virtual void SetClipDist();
+
+1. **gazebo/msgs/logical_camera_sensors.proto**
+    + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
+    + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
+
+1. **Light topic**
+    + ***Removed:*** ~/light
+    + ***Replacement:*** ~/factory/light - for spawning new lights
+    + ***Replacement:*** ~/light/modify - for modifying existing lights
+    * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
+
+1. **gazebo/rendering/Visual.hh**
+    + ***Removed:*** public: void SetVisible(bool _visible, bool _cascade = true);
+    + ***Replacement:*** public: virtual void SetVisible(bool _visible, bool _cascade = true);
+
+1. **gazebo/rendering/OribitViewController.hh**
+    + ***Removed:*** public: OrbitViewController(UserCameraPtr _camera);
+    + ***Replacement:*** public: OrbitViewController(UserCameraPtr _camera, const std::string &_name = "OrbitViewController");
+
+1. **gazebo/test/ServerFixture.hh**
+    + ***Removed:*** protected: void RunServer(const std::string &_worldFilename);
+    + ***Removed:*** protected: void RunServer(const std::string &_worldFilename,
+      bool _paused, const std::string &_physics, const std::vector<std::string> &
+      _systemPlugins = {});
+    + ***Replacement:*** void ServerFixture::RunServer(const std::vector<:string>
+      &_args)
+    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874)
+
+1. **gazebo/gui/building/BuildingMaker.hh**
+    * Doesn't inherit from gui::EntityMaker anymore
+    * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
+
+1. **gazebo/gui/EntityMaker.hh**
+    + ***Removed:*** EntityMaker();
+    + ***Replacement:*** EntityMaker(EntityMakerPrivate &_dataPtr);
+    + ***Removed:*** public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
+    + ***Replacement:*** public: virtual void Start();
+    + ***Removed:*** public: virtual void Stop() = 0;
+    + ***Replacement:*** public: virtual void Stop();
+
+### Deprecations
+
+1. **gazebo/gui/RTShaderSystem.hh**
+    + ***Deprecation:*** void AttachEntity(Visual *vis)
+    + ***No replacement for AttachEntity ***
+
+1. **gazebo/gui/RTShaderSystem.hh**
+    + ***Deprecation:*** void DetachEntity(Visual *_vis)
+    + ***No replacement for DetachEntity ***
+
+### Deletions
+
+1. **gazebo rendering libraries**
+    * The following libraries have been removed: `libgazebo_skyx`, `libgazebo_selection_buffer`, `libgazebo_rendering_deferred`. Gazebo now combines all the different rendering libraries into `libgazebo_rendering.so`.
+    * [Pull request #1817](https://bitbucket.org/osrf/gazebo/pull-request/1817)
+
+1. **gazebo physics libraries**
+    * The following libraries have been removed: `libgazebo_ode_physics`, `libgazebo_simbody_physics`, `libgazebo_dart_physics`, and `libgazebo_bullet_physics`. Gazebo now combines all the different physics engine libraries into `libgazebo_physics.so`.
+    * [Pull request #1814](https://bitbucket.org/osrf/gazebo/pull-request/1814)
+
+1. **gazebo/gui/BoxMaker.hh**
+
+1. **gazebo/gui/CylinderMaker.hh**
+
+1. **gazebo/gui/SphereMaker.hh**
+
+1. **gazebo/gui/MeshMaker.hh**
+
+1. **gazebo/gui/EntityMaker.hh**
+    + public: typedef boost::function<void(const math::Vector3 &pos,
+                  const math::Vector3 &scale)> CreateCallback;
+    + public: static void SetSnapToGrid(bool _snap);
+    + public: virtual bool IsActive() const = 0;
+    + public: virtual void OnMousePush(const common::MouseEvent &_event);
+    + public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+    + protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
+
+
 ## Gazebo 5.X to 6.X
+
+### Deprecations
+
+1. **gazebo/common/Color.hh**
+    + ***Deprecation:*** math::Vector3 GetAsHSV() const;
+    + ***Replacement:*** ignition::math::Vector3d HSV() const;
+
+1. **gazebo/common/Dem.hh**
+    + ***Deprecation:*** void GetGeoReferenceOrigin(math::Angle &_latitude,math::Angle &_longitude);
+    + ***Replacement:*** void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,  ignition::math::Angle &_longitude) const;
+    + ***Deprecation:***void FillHeightMap(int _subSampling, unsigned int _vertSize, const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY, std::vector<float> &_heights);
+    + ***Replacement:***void FillHeightMap(const int _subSampling, const unsigned int _vertSize, const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale, const bool _flipY, std::vector<float> &_heights);
+
+1. **gazebo/common/GTSMeshUtils.hh**
+    + ***Deprecation:***static bool DelaunayTriangulation(const std::vector<math::Vector2d> &_vertices, const std::vector<math::Vector2i> &_edges, SubMesh *_submesh);
+    + ***Replacement:***static bool DelaunayTriangulation( const std::vector<ignition::math::Vector2d> &_vertices, const std::vector<ignition::math::Vector2i> &_edges, SubMesh *_submesh);
+
+1. **gazebo/common/HeightmapData.hh**
+    + ***Deprecation:***virtual void FillHeightMap(int _subSampling,unsigned int _vertSize, const math::Vector3 &_size,const math::Vector3 &_scale, bool _flipY, std::vector<float> &_heights);
+    + ***Replacement:***void FillHeightMap(int _subSampling,unsigned int _vertSize, const ignition::math::Vector3d &_size,const ignition::math::Vector3d &_scale, bool _flipY,std::vector<float> &_heights);
+
+1. **gazebo/common/KeyFrame.hh**
+    + ***Deprecation:***void SetTranslation(const math::Vector3 &_trans);
+    + ***Replacement:***void Translation(const ignition::math::Vector3d &_trans);
+    + ***Deprecation:***math::Vector3 GetTranslation() const;
+    + ***Replacement:***ignition::math::Vector3d Translation() const;
+    + ***Deprecation:***void SetRotation(const math::Quaternion &_rot);
+    + ***Replacement:***void Rotation(const ignition::math::Quaterniond &_rot);
+    + ***Deprecation:***math::Quaternion GetRotation();
+    + ***Replacement:***ignition::math::Quaterniond Rotation() const;
+
+1. **gazebo/common/Mesh.hh**
+    + ***Deprecation:***math::Vector3 GetMax() const;
+    + ***Replacement:***ignition::math::Vector3d Max() const;
+    + ***Deprecation:***math::Vector3 GetMin() const;
+    + ***Replacement:***ignition::math::Vector3d Min() const;
+    + ***Deprecation:***void GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,math::Vector3 &_max_xyz) const;
+    + ***Replacement:***void GetAABB(ignition::math::Vector3d &_center,ignition::math::Vector3d &_minXYZ,ignition::math::Vector3d &_maxXYZ) const;
+    + ***Deprecation:***void GenSphericalTexCoord(const math::Vector3 &_center);
+    + ***Replacement:***void GenSphericalTexCoord(const ignition::math::Vector3d &_center);
+    + ***Deprecation:***void SetScale(const math::Vector3 &_factor);
+    + ***Replacement:***void SetScale(const ignition::math::Vector3d &_factor);
+    + ***Deprecation:***void Center(const math::Vector3 &_center = math::Vector3::Zero);
+    + ***Replacement:***void Center(const ignition::math::Vector3d &_center =ignition::math::Vector3d::Zero);
+    + ***Deprecation:***void Translate(const math::Vector3 &_vec);
+    + ***Replacement:***void Translate(const ignition::math::Vector3d &_vec);
+    + ***Deprecation:*** void CopyVertices(const std::vector<math::Vector3> &_verts);
+    + ***Replacement:***void CopyVertices(const std::vector<ignition::math::Vector3d> &_verts);
+    + ***Deprecation:***void CopyNormals(const std::vector<math::Vector3> &_norms);
+    + ***Replacement:***void CopyNormals( const std::vector<ignition::math::Vector3d> &_norms);
+    + ***Deprecation:***void AddVertex(const math::Vector3 &_v);
+    + ***Replacement:***void AddVertex(const ignition::math::Vector3d &_v);
+    + ***Deprecation:***void AddNormal(const math::Vector3 &_n);
+    + ***Replacement:***void AddNormal(const ignition::math::Vector3d &_n);
+    + ***Deprecation:***math::Vector3 GetVertex(unsigned int _i) const;
+    + ***Replacement:***ignition::math::Vector3d Vertex(unsigned int _i) const;
+    + ***Deprecation:***void SetVertex(unsigned int _i, const math::Vector3 &_v);
+    + ***Replacement:***void SetVertex(unsigned int _i,const ignition::math::Vector3d &_v);
+    + ***Deprecation:***math::Vector3 GetNormal(unsigned int _i) const;
+    + ***Replacement:***ignition::math::Vector3d Normal(unsigned int _i) const;
+    + ***Deprecation:***void SetNormal(unsigned int _i, const math::Vector3 &_n);
+    + ***Replacement:***void SetNormal(unsigned int _i,const ignition::math::Vector3d &_n);
+    + ***Deprecation:***math::Vector2d GetTexCoord(unsigned int _i) const;
+    + ***Replacement:***ignition::math::Vector2d TexCoord(unsigned int _i) const;
+    + ***Deprecation:***void SetTexCoord(unsigned int _i, const math::Vector2d &_t);
+    + ***Replacement:***void SetTexCoord(unsigned int _i,const ignition::math::Vector2d &_t);
+    + ***Deprecation:***math::Vector3 GetMax() const;
+    + ***Replacement:***ignition::math::Vector3d Max() const;
+    + ***Deprecation:***math::Vector3 GetMin() const;
+    + ***Replacement:***ignition::math::Vector3d Min() const;
+    + ***Deprecation:***bool HasVertex(const math::Vector3 &_v) const;
+    + ***Replacement:***bool HasVertex(const ignition::math::Vector3d &_v) const;
+    + ***Deprecation:***unsigned int GetVertexIndex(const math::Vector3 &_v) const;
+    + ***Replacement:***unsigned int GetVertexIndex( const ignition::math::Vector3d &_v) const;
+    + ***Deprecation:***void GenSphericalTexCoord(const math::Vector3 &_center);
+    + ***Replacement:***void GenSphericalTexCoord(const ignition::math::Vector3d &_center);
+    + ***Deprecation:***void Center(const math::Vector3 &_center = math::Vector3::Zero);
+    + ***Replacement:***void Center(const ignition::math::Vector3d &_center =ignition::math::Vector3d::Zero);
+    + ***Deprecation:***void Translate(const math::Vector3 &_vec) ;
+    + ***Replacement:***void Translate(const ignition::math::Vector3d &_vec);
+    + ***Deprecation:***void SetScale(const math::Vector3 &_factor);
+    + ***Replacement:***void SetScale(const ignition::math::Vector3d &_factor);
+
+1. **gazebo/common/MeshCSG.hh**
+    + ***Deprecation:***Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,const int _operation, const math::Pose &_offset = math::Pose::Zero);
+    + ***Replacement:***Mesh *CreateBoolean(const Mesh *_m1, const Mesh *_m2,const int _operation,const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);
+
+1. **gazebo/common/MeshManager.hh**
+    + ***Deprecation:***void GetMeshAABB(const Mesh *_mesh,math::Vector3 &_center,math::Vector3 &_minXYZ,math::Vector3 &_maxXYZ);
+    + ***Replacement:***void GetMeshAABB(const Mesh *_mesh,ignition::math::Vector3d &_center,ignition::math::Vector3d &_min_xyz,ignition::math::Vector3d &_max_xyz);
+    + ***Deprecation:***void GenSphericalTexCoord(const Mesh *_mesh,math::Vector3 _center);
+    + ***Replacement:*** void GenSphericalTexCoord(const Mesh *_mesh,const ignition::math::Vector3d &_center);
+    + ***Deprecation:***void CreateBox(const std::string &_name, const math::Vector3 &_sides,const math::Vector2d &_uvCoords);
+    + ***Replacement:***void CreateBox(const std::string &_name,const ignition::math::Vector3d &_sides,const ignition::math::Vector2d &_uvCoords);
+    + ***Deprecation:***void CreateExtrudedPolyline(const std::string &_name, const std::vector<std::vector<math::Vector2d> > &_vertices,double _height);
+    + ***Replacement:*** void CreateExtrudedPolyline(const std::string &_name,const std::vector<std::vector<ignition::math::Vector2d> > &_vertices, double _height);
+    + ***Deprecation:***void CreatePlane(const std::string &_name,const math::Plane &_plane,const math::Vector2d &_segments,const math::Vector2d &_uvTile);
+    + ***Replacement:***void CreatePlane(const std::string &_name,const ignition::math::Planed &_plane,const ignition::math::Vector2d &_segments, const ignition::math::Vector2d &_uvTile);
+    + ***Deprecation:***void CreatePlane(const std::string &_name,const math::Vector3 &_normal,double _d,const math::Vector2d &_size,const math::Vector2d &_segments,const math::Vector2d &_uvTile);
+    + ***Replacement:***void CreatePlane(const std::string &_name,const ignition::math::Vector3d &_normal,const double _d,const ignition::math::Vector2d &_size,const ignition::math::Vector2d &_segments, const ignition::math::Vector2d &_uvTile);
+    + ***Deprecation:***void CreateBoolean(const std::string &_name, const Mesh *_m1,const Mesh *_m2, const int _operation,const math::Pose &_offset = math::Pose::Zero);
+    + ***Replacement:***void CreateBoolean(const std::string &_name, const Mesh *_m1,const Mesh *_m2, const int _operation,const ignition::math::Pose3d &_offset = ignition::math::Pose3d::Zero);
+
+1. **gazebo/common/SVGLoader.hh**
+    + ***Deprecation:***static void PathsToClosedPolylines(const std::vector<common::SVGPath> &_paths, double _tol,std::vector< std::vector<math::Vector2d> > &_closedPolys,std::vector< std::vector<math::Vector2d> > &_openPolys);
+    + ***Replacement:***static void PathsToClosedPolylines(const std::vector<common::SVGPath> &_paths,double _tol,std::vector< std::vector<ignition::math::Vector2d> > &_closedPolys,std::vector< std::vector<ignition::math::Vector2d> > &_openPolys);
+
+1. **gazebo/common/Skeleton.hh**
+    + ***Deprecation:***void SetBindShapeTransform(math::Matrix4 _trans);
+    + ***Replacement:***void SetBindShapeTransform(const ignition::math::Matrix4d &_trans);
+    + ***Deprecation:***math::Matrix4 GetBindShapeTransform();
+    + ***Replacement:***ignition::math::Matrix4d BindShapeTransform();
+    + ***Deprecation:***void SetTransform(math::Matrix4 _trans,bool _updateChildren = true);
+    + ***Replacement:***void SetTransform(const ignition::math::Matrix4d &_trans,bool _updateChildren = true);
+    + ***Deprecation:***void SetModelTransform(math::Matrix4 _trans,bool _updateChildren = true);
+    + ***Replacement:***void SetModelTransform(const ignition::math::Matrix4d &_trans,bool _updateChildren = true);
+    + ***Deprecation:***void SetInitialTransform(math::Matrix4 _tras);
+    + ***Replacement:***void SetInitialTransform(const ignition::math::Matrix4d &_tras);
+    + ***Deprecation:***math::Matrix4 GetTransform();
+    + ***Replacement:***ignition::math::Matrix4d Transform();
+    + ***Deprecation:***void SetInverseBindTransform(math::Matrix4 _invBM);
+    + ***Replacement:***void SetInverseBindTransform(const ignition::math::Matrix4d &_invBM);
+    + ***Deprecation:***math::Matrix4 GetInverseBindTransform();
+    + ***Replacement:***ignition::math::Matrix4d InverseBindTransform();
+    + ***Deprecation:***math::Matrix4 GetModelTransform();
+    + ***Replacement:***ignition::math::Matrix4d ModelTransform() const;
+    + ***Deprecation:***NodeTransform(math::Matrix4 _mat, std::string _sid = "_default_",TransformType _type = MATRIX);
+    + ***Replacement:***NodeTransform(const ignition::math::Matrix4d &_mat,const std::string &_sid = "_default_",TransformType _type = MATRIX);
+    + ***Deprecation:***void Set(math::Matrix4 _mat);
+    + ***Replacement:***void Set(const ignition::math::Matrix4d &_mat);
+    + ***Deprecation:***math::Matrix4 Get();
+    + ***Replacement:***ignition::math::Matrix4d GetTransform() const;
+    + ***Deprecation:***void SetSourceValues(math::Matrix4 _mat);
+    + ***Replacement:***void SetSourceValues(const ignition::math::Matrix4d &_mat);
+    + ***Deprecation:***void SetSourceValues(math::Vector3 _vec);
+    + ***Replacement:*** void SetSourceValues(const ignition::math::Vector3d &_vec);
+    + ***Deprecation:***void SetSourceValues(math::Vector3 _axis, double _angle);
+    + ***Replacement:***void SetSourceValues(const ignition::math::Vector3d &_axis,const double _angle);
+    + ***Deprecation:***math::Matrix4 operator* (math::Matrix4 _m);
+    + ***Replacement:***ignition::math::Matrix4d operator*(const ignition::math::Matrix4d &_m);
+
+1. **gazebo/common/SkeletonAnimation.hh**
+    + ***Deprecation:***void AddKeyFrame(const double _time, const math::Matrix4 &_trans);
+    + ***Replacement:***void AddKeyFrame(const double _time,const ignition::math::Matrix4d &_trans);
+    + ***Deprecation:***void AddKeyFrame(const double _time,const math::Pose &_pose);
+    + ***Replacement:***void AddKeyFrame(const double _time,const ignition::math::Pose3d &_pose);
+    + ***Deprecation:***void GetKeyFrame(const unsigned int _i, double &_time,math::Matrix4 &_trans);
+    + ***Replacement:***void GetKeyFrame(const unsigned int _i, double &_time,ignition::math::Matrix4d &_trans) const;
+    + ***Deprecation:***std::pair<double, math::Matrix4> GetKeyFrame(const unsigned int _i);
+    + ***Replacement:***std::pair<double, ignition::math::Matrix4d> KeyFrame(const unsigned int _i) const;
+    + ***Deprecation:***math::Matrix4 GetFrameAt(double _time, bool _loop = true) const;
+    + ***Replacement:***ignition::math::Matrix4d FrameAt(double _time, bool _loop = true) const;
+    + ***Deprecation:***void AddKeyFrame(const std::string &_node, const double _time, const math::Matrix4 &_mat);
+    + ***Replacement:***void AddKeyFrame(const std::string &_node, const double _time,const ignition::math::Matrix4d &_mat);
+    + ***Deprecation:***void AddKeyFrame(const std::string &_node, const double _time,const math::Pose &_pose);
+    + ***Replacement:***void AddKeyFrame(const std::string &_node, const double _time,const ignition::math::Pose3d &_pose);
+    + ***Deprecation:*** math::Matrix4 GetNodePoseAt(const std::string &_node,const double _time, const bool _loop = true);
+    + ***Replacement:***ignition::math::Matrix4d NodePoseAt(const std::string &_node,const double _time, const bool _loop = true);
+    + ***Deprecation:***std::map<std::string, math::Matrix4> GetPoseAt(const double _time, const bool _loop = true) const;
+    + ***Replacement:***std::map<std::string, ignition::math::Matrix4d> PoseAt(const double _time, const bool _loop = true) const;
+    + ***Deprecation:***std::map<std::string, math::Matrix4> GetPoseAtX(const double _x, const std::string &_node, const bool _loop = true) const;
+    + ***Replacement:***std::map<std::string, ignition::math::Matrix4d> PoseAtX(const double _x, const std::string &_node, const bool _loop = true) const;
+
+1. **gazebo/common/SphericalCoordinates.hh**
+    + ***Deprecation:***SphericalCoordinates(const SurfaceType _type,const math::Angle &_latitude,const math::Angle &_longitude,double _elevation,const math::Angle &_heading);
+    + ***Replacement:***SphericalCoordinates(const SurfaceType _type,const ignition::math::Angle &_latitude,const ignition::math::Angle &_longitude,double _elevation,const ignition::math::Angle &_heading);
+    + ***Deprecation:***math::Vector3 SphericalFromLocal(const math::Vector3 &_xyz) const;
+    + ***Replacement:***ignition::math::Vector3d SphericalFromLocal(const ignition::math::Vector3d &_xyz) const;
+    + ***Deprecation:***math::Vector3 GlobalFromLocal(const math::Vector3 &_xyz) const;
+    + ***Replacement:***ignition::math::Vector3d GlobalFromLocal(const ignition::math::Vector3d &_xyz) const;
+    + ***Deprecation:***static double Distance(const math::Angle &_latA,const math::Angle &_lonA,const math::Angle &_latB,const math::Angle &_lonB);
+    + ***Replacement:***static double Distance(const ignition::math::Angle &_latA,const ignition::math::Angle &_lonA,const ignition::math::Angle &_latB,const ignition::math::Angle &_lonB);
+    + ***Deprecation:*** math::Angle GetLatitudeReference() const;
+    + ***Replacement:***ignition::math::Angle LatitudeReference() const;
+    + ***Deprecation:***math::Angle GetLongitudeReference() const;
+    + ***Replacement:***ignition::math::Angle LongitudeReference() const;
+    + ***Deprecation:***math::Angle GetHeadingOffset() const;
+    + ***Replacement:***ignition::math::Angle HeadingOffset() const;
+    + ***Deprecation:***void SetLatitudeReference(const math::Angle &_angle);
+    + ***Replacement:***void SetLatitudeReference(const ignition::math::Angle &_angle);
+    + ***Deprecation:***void SetLongitudeReference(const math::Angle &_angle);
+    + ***Replacement:***void SetLongitudeReference(const ignition::math::Angle &_angle);
+    + ***Deprecation:***void SetHeadingOffset(const math::Angle &_angle);
+    + ***Replacement:***void SetHeadingOffset(const ignition::math::Angle &_angle);
 
 ### Modifications
 
 1. **gazebo/common/MouseEvent.hh**
     * Replaced all member variables with functions that use Ignition Math.
     * [Pull request #1777](https://bitbucket.org/osrf/gazebo/pull-request/1777)
- 
+
 1. **gazebo/msgs/world_stats.proto**
     + ***Removed:*** optional bool log_playback = 8;
     + ***Replacement:*** optional LogPlaybackStatistics log_playback_stats = 8;

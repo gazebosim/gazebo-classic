@@ -58,6 +58,7 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  nested_model.cc
   noise.cc
   nondefault_world.cc
   physics.cc
@@ -67,10 +68,14 @@ set(tests
   physics_inertia_ratio.cc
   physics_link.cc
   physics_msgs.cc
+  physics_msgs_inertia.cc
   physics_presets.cc
+  physics_solver.cc
   physics_thread_safe.cc
+  physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  region_events.cc
   rest_web.cc
   road.cc
   sensor.cc
@@ -88,6 +93,7 @@ set(tests
   world.cc
   world_clone.cc
   world_entity_below_point.cc
+  world_playback.cc
   world_population.cc
   worlds_installed.cc
   )
@@ -142,6 +148,7 @@ gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
+  undo.cc
 )
 
 gz_build_qt_tests(${qt_tests})

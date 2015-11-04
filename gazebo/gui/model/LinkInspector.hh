@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _LINK_INSPECTOR_HH_
-#define _LINK_INSPECTOR_HH_
+#ifndef _GAZEBO_LINK_INSPECTOR_HH_
+#define _GAZEBO_LINK_INSPECTOR_HH_
 
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
     class VisualConfig;
     class CollisionConfig;
 
-    class LinkInspector : public QDialog
+    class GZ_GUI_VISIBLE LinkInspector : public QDialog
     {
       Q_OBJECT
 
@@ -61,6 +62,13 @@ namespace gazebo
       /// \return Tab widget with visual configurations.
       public: CollisionConfig *GetCollisionConfig() const;
 
+      /// \brief Set the id for this link
+      /// \param[in] New link id.
+      public: void SetLinkId(const std::string &_id);
+
+      /// \brief Open the inspector.
+      public: void Open();
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
@@ -76,14 +84,24 @@ namespace gazebo
       /// and the inspector closed.
       Q_SIGNALS: void Accepted();
 
+      /// \brief Qt callback when the Remove button is pressed.
+      private slots: void OnRemove();
+
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
+
+      /// \brief Qt callback when one of the child configs has been applied.
+      private slots: void OnConfigApplied();
+
+      /// \brief Restore the widget's data to how it was when first opened.
+      private slots: void RestoreOriginalData();
+
+      /// \brief Qt key press event.
+      /// \param[in] _event Qt key event.
+      private: void keyPressEvent(QKeyEvent *_event);
 
       /// \brief Main tab widget within the link inspector.
       private: QTabWidget *tabWidget;
@@ -99,6 +117,9 @@ namespace gazebo
 
       /// \brief Widget with configurable collision properties.
       private: CollisionConfig *collisionConfig;
+
+      /// \brief Unique id for this link.
+      private: std::string linkId;
     };
     /// \}
   }
