@@ -56,6 +56,7 @@ set (sources
   ToolsWidget.cc
   TopicSelector.cc
   TopToolbar.cc
+  UserCmdHistory.cc
   ViewAngleWidget.cc
 )
 
@@ -94,6 +95,7 @@ set (qt_headers
   ToolsWidget.hh
   TopicSelector.hh
   TopToolbar.hh
+  UserCmdHistory.hh
   ViewAngleWidget.hh
 )
 

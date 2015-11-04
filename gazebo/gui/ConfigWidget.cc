@@ -1379,11 +1379,11 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   // Presets
   auto presetsCombo = new QComboBox(widget);
   presetsCombo->addItem("Custom", 0);
-  presetsCombo->addItem("X", 1);
+  presetsCombo->addItem(" X", 1);
   presetsCombo->addItem("-X", 2);
-  presetsCombo->addItem("Y", 3);
+  presetsCombo->addItem(" Y", 3);
   presetsCombo->addItem("-Y", 4);
-  presetsCombo->addItem("Z", 5);
+  presetsCombo->addItem(" Z", 5);
   presetsCombo->addItem("-Z", 6);
   presetsCombo->setMinimumWidth(80);
   connect(presetsCombo, SIGNAL(currentIndexChanged(const int)), this,

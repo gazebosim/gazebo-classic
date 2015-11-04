@@ -1011,7 +1011,7 @@ JointMaker::JointType JointMaker::GetState() const
 
 /////////////////////////////////////////////////
 math::Vector3 JointMaker::GetLinkWorldCentroid(
-    const rendering::VisualPtr _visual)
+    const rendering::VisualPtr &_visual)
 {
   math::Vector3 centroid;
   int count = 0;

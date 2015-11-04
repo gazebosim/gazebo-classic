@@ -114,6 +114,7 @@ LinkData::LinkData()
   this->inertiaIyy = 0;
   this->inertiaIzz = 0;
   this->mass = 0;
+  this->nested = false;
 
   this->inspector = new LinkInspector();
   this->inspector->setModal(false);

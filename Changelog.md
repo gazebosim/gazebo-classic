@@ -45,6 +45,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
     * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
     * [Pull request #1895](https://bitbucket.org/osrf/gazebo/pull-request/1895)
 
+1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
+    * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
+
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
 
@@ -152,6 +155,9 @@ using the same arguments used in the command line.
     1. Set physics to be paused when exiting model editor mode
         * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
         * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
+
+    1. Add Insert tab to model editor
+        * [Pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
 
 ## Gazebo 6.0
 
