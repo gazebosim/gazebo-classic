@@ -38,7 +38,7 @@ using namespace physics;
 UserCmd::UserCmd(const unsigned int _id,
                  physics::WorldPtr _world,
                  const std::string &_description,
-                 const msgs::UserCmd::Type _type)
+                 const msgs::UserCmd::Type &_type)
   : dataPtr(new UserCmdPrivate())
 {
   this->dataPtr->id = _id;

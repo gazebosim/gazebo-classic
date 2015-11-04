@@ -15,24 +15,27 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_CREATOR_TEST_HH_
-#define _GAZEBO_MODEL_CREATOR_TEST_HH_
+#ifndef _GAZEBO_VISUAL_CONFIG_TEST_HH_
+#define _GAZEBO_VISUAL_CONFIG_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelCreator class.
-class ModelCreator_TEST : public QTestFixture
+/// \brief A test class for the visual config.
+class VisualConfig_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Tests adding and removing nested models
-  private slots: void NestedModel();
+  /// \brief Constructor
+  public: VisualConfig_TEST() = default;
 
-  /// \brief Tests changing save states in the model editor
-  private slots: void SaveState();
+  /// \brief Test that the Applied signal is emitted when widgets are edited.
+  private slots: void AppliedSignal();
 
-  /// \brief Tests selecting links in the model editor
-  private slots: void Selection();
+  /// \brief Slot that receives Applied signals.
+  private slots: void OnApply();
+
+  /// \brief Count how many Applied signals have been emitted.
+  private: unsigned int g_appliedSignalCount = 0;
 };
 
 #endif
