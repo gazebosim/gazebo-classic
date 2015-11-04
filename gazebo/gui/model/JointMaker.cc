@@ -54,7 +54,7 @@ JointMaker::JointMaker()
   this->unitVectors.push_back(ignition::math::Vector3d::UnitZ);
 
   this->newJointCreated = false;
-  this->mouseJoint = NULL;
+  this->newJoint = NULL;
   this->modelSDF.reset();
   this->jointType = JointMaker::JOINT_NONE;
   this->jointCounter = 0;
@@ -116,10 +116,10 @@ JointMaker::JointMaker()
 /////////////////////////////////////////////////
 JointMaker::~JointMaker()
 {
-  if (this->mouseJoint)
+  if (this->newJoint)
   {
-    delete this->mouseJoint;
-    this->mouseJoint = NULL;
+    delete this->newJoint;
+    this->newJoint = NULL;
   }
 
   {
@@ -140,14 +140,14 @@ void JointMaker::Reset()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   this->newJointCreated = false;
-  if (this->mouseJoint)
+  if (this->newJoint)
   {
-    delete this->mouseJoint;
-    this->mouseJoint = NULL;
+    delete this->newJoint;
+    this->newJoint = NULL;
   }
 
   this->jointType = JointMaker::JOINT_NONE;
-  this->selectedVis.reset();
+  this->parentVis.reset();
   this->hoverVis.reset();
   this->inspectName = "";
   this->selectedJoints.clear();
@@ -174,6 +174,9 @@ void JointMaker::EnableEventHandlers()
   MouseEventHandler::Instance()->AddPressFilter("model_joint",
       boost::bind(&JointMaker::OnMousePress, this, _1));
 
+  MouseEventHandler::Instance()->AddMoveFilter("model_joint",
+      boost::bind(&JointMaker::OnMouseMove, this, _1));
+
   KeyEventHandler::Instance()->AddPressFilter("model_joint",
       boost::bind(&JointMaker::OnKeyPress, this, _1));
 }
@@ -192,42 +195,84 @@ void JointMaker::DisableEventHandlers()
 void JointMaker::RemoveJoint(const std::string &_jointId)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  auto jointIt = this->joints.find(_jointId);
-  if (jointIt != this->joints.end())
-  {
-    // Copy the ID before it is deleted
-    std::string jointId = _jointId;
 
-    JointData *joint = jointIt->second;
-    rendering::ScenePtr scene = joint->hotspot->GetScene();
+  std::string jointId = _jointId;
+  JointData *joint = NULL;
+
+  // Existing joint
+  if (this->joints.find(jointId) != this->joints.end())
+  {
+    joint = this->joints[jointId];
+  }
+  // Joint being created
+  else if (this->newJoint)
+  {
+    joint = this->newJoint;
+    // Already has hotspot
+    if (joint->hotspot)
+      jointId = joint->hotspot->GetName();
+    // Still only line
+    else
+      jointId = "";
+  }
+
+  if (!joint)
+    return;
+
+  auto scene = rendering::get_scene();
+  if (!scene)
+    return;
+
+  if (joint->handles)
+  {
     scene->GetManager()->destroyBillboardSet(joint->handles);
+    joint->handles = NULL;
+  }
+
+  if (joint->hotspot)
+  {
     scene->RemoveVisual(joint->hotspot);
+    joint->hotspot->Fini();
+  }
+
+  if (joint->visual)
+  {
     scene->RemoveVisual(joint->visual);
     joint->visual->Fini();
-    if (joint->jointVisual)
+  }
+
+  if (joint->jointVisual)
+  {
+    auto parentAxisVis = joint->jointVisual->GetParentAxisVisual();
+    if (parentAxisVis)
     {
-      rendering::JointVisualPtr parentAxisVis = joint->jointVisual
-          ->GetParentAxisVisual();
-      if (parentAxisVis)
-      {
-        parentAxisVis->GetParent()->DetachVisual(
-            parentAxisVis->GetName());
-        scene->RemoveVisual(parentAxisVis);
-      }
-      joint->jointVisual->GetParent()->DetachVisual(
-          joint->jointVisual->GetName());
-      scene->RemoveVisual(joint->jointVisual);
+      parentAxisVis->GetParent()->DetachVisual(parentAxisVis->GetName());
+      scene->RemoveVisual(parentAxisVis);
     }
-    joint->hotspot.reset();
-    joint->visual.reset();
-    joint->jointVisual.reset();
-    joint->parent.reset();
-    joint->child.reset();
+    joint->jointVisual->GetParent()->DetachVisual(
+        joint->jointVisual->GetName());
+    scene->RemoveVisual(joint->jointVisual);
+  }
+
+  if (joint->inspector)
+  {
     joint->inspector->hide();
     delete joint->inspector;
-    delete joint;
-    this->joints.erase(jointIt);
-    gui::model::Events::modelChanged();
+    joint->inspector = NULL;
+  }
+
+  this->newJoint = NULL;
+  joint->hotspot.reset();
+  joint->visual.reset();
+  joint->jointVisual.reset();
+  joint->parent.reset();
+  joint->child.reset();
+  delete joint->inspector;
+  delete joint;
+  gui::model::Events::modelChanged();
+  if (jointId != "")
+  {
+    this->joints.erase(jointId);
     gui::model::Events::jointRemoved(jointId);
   }
 }
@@ -357,33 +402,33 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
         }
 
         // Pressed parent link
-        if (!this->selectedVis)
+        if (!this->parentVis)
         {
-          if (this->mouseJoint)
+          if (this->newJoint)
             return false;
 
           this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-          this->selectedVis = this->hoverVis;
+          this->parentVis = this->hoverVis;
           this->hoverVis.reset();
 
           // Create joint data with selected visual as parent
           // the child will be set on the second mouse release.
-          this->mouseJoint = this->CreateJointLine("JOINT_LINE",
-              this->selectedVis);
+          this->newJoint = this->CreateJointLine("JOINT_LINE",
+              this->parentVis);
         }
         // Pressed child link
-        else if (this->selectedVis != this->hoverVis)
+        else if (this->parentVis != this->hoverVis)
         {
           if (this->hoverVis)
             this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-          if (this->selectedVis)
-            this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+          if (this->parentVis)
+            this->parentVis->SetEmissive(common::Color(0, 0, 0));
 
-          this->mouseJoint->child = this->hoverVis;
-          JointData *newJoint = this->CreateJoint(this->mouseJoint->parent,
-              this->mouseJoint->child);
+          this->newJoint->child = this->hoverVis;
+          JointData *joint = this->CreateJoint(this->newJoint->parent,
+              this->newJoint->child);
           this->Stop();
-          this->mouseJoint = newJoint;
+          this->newJoint = joint;
           this->newJointCreated = true;
           gui::model::Events::modelChanged();
         }
@@ -560,17 +605,8 @@ void JointMaker::AddJoint(const std::string &_type)
 void JointMaker::AddJoint(JointMaker::JointType _type)
 {
   this->jointType = _type;
-  if (_type != JointMaker::JOINT_NONE)
+  if (_type == JointMaker::JOINT_NONE)
   {
-    // Add an event filter, which allows the JointMaker to capture mouse events.
-    MouseEventHandler::Instance()->AddMoveFilter("model_joint",
-        boost::bind(&JointMaker::OnMouseMove, this, _1));
-  }
-  else
-  {
-    // Remove the event filters.
-    MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
-
     // signal the end of a joint action.
     emit JointAdded();
   }
@@ -582,21 +618,21 @@ void JointMaker::Stop()
   if (this->jointType != JointMaker::JOINT_NONE)
   {
     this->newJointCreated = false;
-    if (this->mouseJoint)
+    if (this->newJoint)
     {
-      this->mouseJoint->visual->DeleteDynamicLine(this->mouseJoint->line);
-      rendering::ScenePtr scene = this->mouseJoint->visual->GetScene();
-      scene->RemoveVisual(this->mouseJoint->visual);
-      this->mouseJoint->visual.reset();
-      delete this->mouseJoint;
-      this->mouseJoint = NULL;
+      this->newJoint->visual->DeleteDynamicLine(this->newJoint->line);
+      rendering::ScenePtr scene = this->newJoint->visual->GetScene();
+      scene->RemoveVisual(this->newJoint->visual);
+      this->newJoint->visual.reset();
+      delete this->newJoint;
+      this->newJoint = NULL;
     }
     this->AddJoint(JointMaker::JOINT_NONE);
     if (this->hoverVis)
       this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-    if (this->selectedVis)
-      this->selectedVis->SetEmissive(common::Color(0, 0, 0));
-    this->selectedVis.reset();
+    if (this->parentVis)
+      this->parentVis->SetEmissive(common::Color(0, 0, 0));
+    this->parentVis.reset();
     this->hoverVis.reset();
   }
 }
@@ -604,6 +640,10 @@ void JointMaker::Stop()
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
 {
+  // Only handle mouse move events during joint creation
+  if (this->jointType == JointMaker::JOINT_NONE)
+    return false;
+
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
@@ -620,7 +660,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   // Highlight visual on hover
   if (vis)
   {
-    if (this->hoverVis && this->hoverVis != this->selectedVis)
+    if (this->hoverVis && this->hoverVis != this->parentVis)
       this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
 
     // only highlight editor links by making sure it's not an item in the
@@ -632,43 +672,37 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
         vis->GetName().find("_UNIQUE_ID_") == std::string::npos)
     {
       this->hoverVis = vis->GetParent();
-      if (!this->selectedVis ||
-           (this->selectedVis && this->hoverVis != this->selectedVis))
+      if (!this->parentVis ||
+           (this->parentVis && this->hoverVis != this->parentVis))
         this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
     }
   }
 
   // Case when a parent link is already selected and currently
   // extending the joint line to a child link
-  if (this->selectedVis && this->hoverVis
-      && this->mouseJoint && this->mouseJoint->line)
+  if (this->parentVis && this->hoverVis && this->newJoint &&
+      this->newJoint->line && this->newJoint->parent)
   {
     math::Vector3 parentPos;
+
     // Set end point to center of child link
     if (!this->hoverVis->IsPlane())
     {
-      if (this->mouseJoint->parent)
-      {
-        parentPos =  this->GetLinkWorldCentroid(this->mouseJoint->parent)
-            - this->mouseJoint->line->GetPoint(0);
-        this->mouseJoint->line->SetPoint(1,
-            this->GetLinkWorldCentroid(this->hoverVis) - parentPos);
-      }
+      parentPos =  this->GetLinkWorldCentroid(this->newJoint->parent)
+	  - this->newJoint->line->GetPoint(0);
     }
+    // Set end point to mouse plane intersection
     else
     {
-      // Set end point to mouse plane intersection
       math::Vector3 pt;
       camera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
           math::Plane(math::Vector3(0, 0, 1)), pt);
-      if (this->mouseJoint->parent)
-      {
-        parentPos = this->GetLinkWorldCentroid(this->mouseJoint->parent)
-            - this->mouseJoint->line->GetPoint(0);
-        this->mouseJoint->line->SetPoint(1,
-            this->GetLinkWorldCentroid(this->hoverVis) - parentPos + pt);
-      }
+
+      parentPos = this->GetLinkWorldCentroid(this->newJoint->parent)
+	  - this->newJoint->line->GetPoint(0) - pt;
     }
+    this->newJoint->line->SetPoint(1,
+	this->GetLinkWorldCentroid(this->hoverVis) - parentPos);
   }
   return true;
 }
@@ -814,8 +848,8 @@ void JointMaker::Update()
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   if (this->newJointCreated)
   {
-    this->CreateHotSpot(this->mouseJoint);
-    this->mouseJoint = NULL;
+    this->CreateHotSpot(this->newJoint);
+    this->newJoint = NULL;
     this->newJointCreated = false;
   }
 
@@ -1016,7 +1050,8 @@ void JointData::OnApply()
       msgs::ConvertJointType(this->jointMsg->type()));
 
   // Parent
-  if (this->jointMsg->parent() != this->parent->GetName())
+  if (this->parent->GetName().find(this->jointMsg->parent()) ==
+      std::string::npos)
   {
     // Get scoped name
     std::string oldName = this->parent->GetName();
@@ -1034,7 +1069,8 @@ void JointData::OnApply()
   }
 
   // Child
-  if (this->jointMsg->child() != this->child->GetName())
+  if (this->child->GetName().find(this->jointMsg->child()) ==
+      std::string::npos)
   {
     // Get scoped name
     std::string oldName = this->child->GetName();
@@ -1264,15 +1300,15 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   // Parent
   std::string parentName = _modelName + "::" + jointMsg.parent();
-  rendering::VisualPtr parentVis =
+  rendering::VisualPtr parentLinkVis =
       gui::get_active_camera()->GetScene()->GetVisual(parentName);
 
   // Child
   std::string childName = _modelName + "::" + jointMsg.child();
-  rendering::VisualPtr childVis =
+  rendering::VisualPtr childLinkVis =
       gui::get_active_camera()->GetScene()->GetVisual(childName);
 
-  if (!parentVis || !childVis)
+  if (!parentLinkVis || !childLinkVis)
   {
     gzerr << "Unable to load joint. Joint child / parent not found"
         << std::endl;
@@ -1281,8 +1317,8 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   JointData *joint = new JointData();
   joint->name = jointMsg.name();
-  joint->parent = parentVis;
-  joint->child = childVis;
+  joint->parent = parentLinkVis;
+  joint->child = childLinkVis;
   joint->type = this->ConvertJointType(msgs::ConvertJointType(jointMsg.type()));
   std::string jointVisName = _modelName + "::" + joint->name;
 

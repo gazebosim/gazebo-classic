@@ -3122,6 +3122,18 @@ QString ConfigWidget::StyleSheet(const std::string &_type, const int _level)
         background-color: " + ConfigWidget::widgetColors[_level] +
       "}";
   }
+  else if (_type == "active")
+  {
+    return "QWidget\
+      {\
+        background-color: " + ConfigWidget::bgColors[_level] + ";\
+        color: " + ConfigWidget::greenColor + ";\
+      }\
+      QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+      {\
+        background-color: " + ConfigWidget::widgetColors[_level] +
+      "}";
+  }
   gzwarn << "Requested unknown style sheet type [" << _type << "]" << std::endl;
   return "";
 }

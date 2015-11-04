@@ -120,8 +120,9 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       public: void Update();
 
-      /// \brief Remove joint by name
-      /// \param[in] _jointName Name of joint to be removed.
+      /// \brief Remove joint by name.
+      /// \param[in] _jointName Name of joint to be removed, or an empty string
+      /// to remove the new joint under creation.
       public: void RemoveJoint(const std::string &_jointName);
 
       /// \brief Remove all joints connected to link.
@@ -308,8 +309,9 @@ namespace gazebo
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
 
-      /// \brief Currently selected visual
-      private: rendering::VisualPtr selectedVis;
+      /// \brief Visual currently selected to be the parent link of the new
+      /// joint being created.
+      private: rendering::VisualPtr parentVis;
 
       /// \brief Name of joint that is currently being inspected.
       private: std::string inspectName;
@@ -318,7 +320,7 @@ namespace gazebo
       private: std::map<std::string, JointData *> joints;
 
       /// \brief Joint currently being created.
-      private: JointData *mouseJoint;
+      private: JointData *newJoint;
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
