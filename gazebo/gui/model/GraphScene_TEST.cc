@@ -39,6 +39,9 @@ void GraphScene_TEST::Initialization()
 void GraphScene_TEST::NodeUpdates()
 {
   GraphScene gs;
+  QVERIFY(!gs.HasNode("node1"));
+  QVERIFY(gs.GetNode("node1") == NULL);
+
   QGVNode *node1 = gs.AddNode("node1");
 
   QVERIFY(node1 != NULL);
@@ -58,6 +61,10 @@ void GraphScene_TEST::EdgeUpdates()
   QGVNode *node1 = NULL;
   QGVNode *node2 = NULL;
   QGVEdge *edge1 = NULL;
+  QGVEdge *edgeBad = NULL;
+
+  edgeBad = gs.AddEdge("edgeBad", "nodeBad", "nodeBad2");
+  QVERIFY(edgeBad == NULL);
 
   node1 = gs.AddNode("node1");
   QVERIFY(node1 != NULL);
@@ -73,6 +80,8 @@ void GraphScene_TEST::EdgeUpdates()
   gs.RemoveEdge("edge1");
 
   QVERIFY(!gs.hasEdge(tr("edge1")));
+  QVERIFY(gs.HasNode("node1"));
+  QVERIFY(gs.HasNode("node2"));
 }
 
 /////////////////////////////////////////////////

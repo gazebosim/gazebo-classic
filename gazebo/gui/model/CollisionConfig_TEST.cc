@@ -99,6 +99,7 @@ void CollisionConfig_TEST::GeometryUpdates()
   QCOMPARE(5.0, size2.X());
   QCOMPARE(10.0, size2.Y());
   QCOMPARE(15.0, size2.Z());
+  QCOMPARE(uri, std::string(""));
 
   ignition::math::Vector3d size3(0, 0, 0);
 
@@ -107,6 +108,7 @@ void CollisionConfig_TEST::GeometryUpdates()
   QCOMPARE(0.0, size3.X());
   QCOMPARE(0.0, size3.Y());
   QCOMPARE(0.0, size3.Z());
+  QCOMPARE(uri, std::string(""));
 }
 
 /////////////////////////////////////////////////
@@ -142,7 +144,7 @@ void CollisionConfig_TEST::AppliedSignal()
   // Get combo boxes
   QList<QComboBox *> combos =
       collisionConfig->findChildren<QComboBox *>();
-  QVERIFY(combos.size() == 1);
+  QVERIFY(combos.size() == 2);
 
   // Edit collision pose (2~7)
   spins[2]->setValue(2.0);

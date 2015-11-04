@@ -37,7 +37,7 @@ class VisualConfig_TEST : public QTestFixture
   /// \brief Test geometry data management
   private slots: void GeometryUpdates();
 
-    /// \brief Test that the Applied signal is emitted when widgets are edited.
+  /// \brief Test that the Applied signal is emitted when widgets are edited.
   private slots: void AppliedSignal();
 
   /// \brief Slot that receives Applied signals.
