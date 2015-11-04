@@ -315,7 +315,7 @@ WorldState &WorldState::operator=(const WorldState &_state)
   }
 
   // Copy the light states.
-  for (const auto &light : this->lightStates)
+  for (const auto &light : _state.lightStates)
   {
     this->lightStates.insert(std::make_pair(light.first,
           LightState(light.second)));

@@ -55,6 +55,9 @@ class ConfigWidget_TEST : public QTestFixture
   /// \brief Test functions related to enum config widgets.
   private slots: void EnumConfigWidget();
 
+  /// \brief Test getting a child widget by name.
+  private slots: void GetChildWidgetByName();
+
   /// \brief Test receiving a signal from child uint widget.
   private slots: void ChildUIntSignal();
 
@@ -78,6 +81,9 @@ class ConfigWidget_TEST : public QTestFixture
 
   /// \brief Test receiving a signal from child pose widget.
   private slots: void ChildPoseSignal();
+
+  /// \brief Test receiving a signal from child geometry widget.
+  private slots: void ChildGeometrySignal();
 
   /// \brief Test receiving a signal from child enum widget.
   private slots: void ChildEnumSignal();
@@ -130,6 +136,15 @@ class ConfigWidget_TEST : public QTestFixture
   private slots: void OnPoseValueChanged(const QString &_name,
       const ignition::math::Pose3d &_value);
 
+  /// \brief Slot that receives geometry signals from child widgets.
+  /// \param[in] _name Scoped name of child widget which sent signal.
+  /// \param[in] _value New geometry value.
+  /// \param[in] _dimensions New dimensions.
+  /// \param[in] _uri New uri for meshes.
+  private slots: void OnGeometryValueChanged(const std::string &_name,
+      const std::string &_value, const ignition::math::Vector3d &_dimensions,
+      const std::string &_uri);
+
   /// \brief Slot that receives enum signals from child widgets.
   /// \param[in] _name Scoped name of child widget which sent signal.
   /// \param[in] _value New value.
@@ -151,14 +166,17 @@ class ConfigWidget_TEST : public QTestFixture
   /// \brief Check that string has been received.
   private: bool g_stringSignalReceived = false;
 
-  /// \brief Check that vector3 has been received.
-  private: bool g_vector3SignalReceived = false;
+  /// \brief Check how many times the vector3 signal has been received.
+  private: int g_vector3SignalCount = 0;
 
   /// \brief Check that color has been received.
   private: bool g_colorSignalReceived = false;
 
   /// \brief Check that pose has been received.
   private: bool g_poseSignalReceived = false;
+
+  /// \brief Check that geometry has been received.
+  private: bool g_geometrySignalReceived = false;
 
   /// \brief Check that enum has been received.
   private: bool g_enumSignalReceived = false;

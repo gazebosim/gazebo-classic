@@ -47,6 +47,7 @@ namespace gazebo
     class ModelListWidget;
     class Editor;
     class SpaceNav;
+    class UserCmdHistory;
 
     class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
@@ -381,6 +382,9 @@ namespace gazebo
 
       /// \brief Tab to insert models.
       private: InsertModelWidget *insertModel;
+
+      /// \brief Class which manages user commands and undoing / redoing them.
+      private: UserCmdHistory *userCmdHistory;
     };
   }
 }
