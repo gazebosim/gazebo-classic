@@ -28,6 +28,7 @@
 using namespace gazebo;
 using namespace common;
 
+
 /////////////////////////////////////////////////
 std::string lowercase(const std::string &_in)
 {
@@ -55,6 +56,78 @@ std::vector<std::string> &split(const std::string &_s,
     _elems.push_back(item);
   }
   return _elems;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Matrix3d ParseTransformMatrixStr(const std::string &_transformStr)
+{
+  if(_transformStr.empty())
+    return ignition::math::Matrix3d::Identity;
+
+  // _transfromStr should not have a closing paren and look like this
+  // matrix(0,0.55669897,-0.55669897,0,194.55441,-149.50402
+  // we're going to extract the transform type and numbers
+  std::vector<std::string> tx;
+  split(_transformStr, '(', tx);
+
+  std::string transform = tx[0];
+  std::vector<std::string> numbers;
+  split(tx[1], ',', numbers);
+
+  // how to unpack the values into 3x3 matrices
+  // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
+  if(transform.find("matrix") != std::string::npos)
+  {
+    gzmsg << "matrix" << std::endl;
+    double v00 = stod(numbers[0]);
+    double v10 = stod(numbers[1]);
+    double v01 = stod(numbers[2]);
+    double v11 = stod(numbers[3]);
+    double v02 = stod(numbers[4]);
+    double v12 = stod(numbers[5]);
+    ignition::math::Matrix3d m(v00, v01, v02, v10, v11, v12, 0, 0, 1);
+    return m;
+  }
+
+  if(transform.find("skewX") != std::string::npos)
+  {
+    gzmsg << "skewX" << std::endl;
+
+    ignition::math::Matrix3d m;
+    return m;
+  }
+
+  if(transform.find("skewY") != std::string::npos)
+  {
+    gzmsg << "skewY" << std::endl;
+    ignition::math::Matrix3d m;
+    return m;
+  }
+
+  if(transform.find("scale") != std::string::npos)
+  {
+    gzmsg << "scale" << std::endl;
+    ignition::math::Matrix3d m;
+    return m;
+  }
+
+  if(transform.find("translate") != std::string::npos)
+  {
+    gzmsg << "translate" << std::endl;
+    ignition::math::Matrix3d m;
+    return m;
+  }
+
+  if(transform.find("rotate") != std::string::npos)
+  {
+    gzmsg << "rotate" << std::endl;
+    ignition::math::Matrix3d m;
+    return m;
+  }
+
+  gzwarn << "Unsupported transformation: " << transform << std::endl;
+  ignition::math::Matrix3d m;
+  return m;
 }
 
 /////////////////////////////////////////////////
@@ -576,6 +649,18 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
     std::vector<ignition::math::Vector2d> &polyline = _path.polylines.back();
     p = this->SubpathToPolyline(subpath, p, polyline);
   }
+  // if necessary, apply transform to p and polyline
+  if (_path.transform != ignition::math::Matrix3d::Identity)
+  {
+    // we need to transform all the points in the path
+    for(auto &polyline: _path.polylines)
+    {
+      for (auto  &polyPoint: polyline)
+      {
+        gzerr << "trans: " << polyPoint  << std::endl;
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -597,9 +682,7 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
     }
     else if (name == "transform")
     {
-      _path.transform = value;
-      gzwarn << "transform attribute \"" << name
-        << "\" not implemented yet"  << std::endl;
+      _path.transform = ParseTransformMatrixStr(value);
     }
     else if (name == "d")
     {
