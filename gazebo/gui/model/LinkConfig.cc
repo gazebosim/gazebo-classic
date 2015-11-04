@@ -34,15 +34,8 @@ LinkConfig::LinkConfig()
   this->configWidget = new ConfigWidget;
   configWidget->Load(&linkMsg);
 
-  connect(this->configWidget, SIGNAL(DensityValueChanged(const double &)),
-      this, SLOT(OnDensityValueChanged(const double &)));
-
-  connect(this->configWidget, SIGNAL(MassValueChanged(const double &)),
-      this, SLOT(OnMassValueChanged(const double &)));
-
   // set default values
   // TODO: auto-fill them with SDF defaults
-
   this->configWidget->SetDoubleWidgetValue("inertial::ixx", 1.0);
   this->configWidget->SetDoubleWidgetValue("inertial::iyy", 1.0);
   this->configWidget->SetDoubleWidgetValue("inertial::izz", 1.0);
@@ -69,11 +62,23 @@ LinkConfig::LinkConfig()
   generalLayout->addWidget(scrollArea);
 
   this->setLayout(generalLayout);
+
+  // Connections
+  connect(this->configWidget, SIGNAL(PoseValueChanged(const QString &,
+      const ignition::math::Pose3d &)), this,
+      SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
 }
 
 /////////////////////////////////////////////////
 LinkConfig::~LinkConfig()
 {
+}
+
+/////////////////////////////////////////////////
+void LinkConfig::Init()
+{
+  // Keep original data in case user cancels
+  this->originalDataMsg.CopyFrom(*this->GetData());
 }
 
 /////////////////////////////////////////////////
@@ -131,6 +136,13 @@ const ConfigWidget *LinkConfig::GetConfigWidget() const
 }
 
 /////////////////////////////////////////////////
+void LinkConfig::OnPoseChanged(const QString &/*_name*/,
+    const ignition::math::Pose3d &/*_pose*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
 void LinkConfig::OnMassValueChanged(const double &_value)
 {
   emit MassValueChanged(_value);
@@ -140,6 +152,19 @@ void LinkConfig::OnMassValueChanged(const double &_value)
 void LinkConfig::OnDensityValueChanged(const double &_value)
 {
   emit DensityValueChanged(_value);
+}
+
+/////////////////////////////////////////////////
+void LinkConfig::RestoreOriginalData()
+{
+  msgs::LinkPtr linkPtr;
+  linkPtr.reset(new msgs::Link);
+  linkPtr->CopyFrom(this->originalDataMsg);
+
+  // Update default widgets
+  this->configWidget->blockSignals(true);
+  this->Update(linkPtr);
+  this->configWidget->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
@@ -153,3 +178,4 @@ double LinkConfig::Density() const
 {
   return this->configWidget->DensityWidgetValue("density");
 }
+
