@@ -178,7 +178,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->sceneSimTimePosesApplied = common::Time();
   this->dataPtr->sceneSimTimePosesReceived = common::Time();
 
-  this->dataPtr->markerManager.Init();
 }
 
 //////////////////////////////////////////////////
@@ -373,6 +372,13 @@ void Scene::Init()
 
   Road2d *road = new Road2d();
   road->Load(this->dataPtr->worldVisual);
+
+  // Initialize the marker manager
+  if (!this->dataPtr->markerManager.Init(shared_from_this()))
+  {
+    gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
+      << "will not work.\n";
+  }
 }
 
 //////////////////////////////////////////////////

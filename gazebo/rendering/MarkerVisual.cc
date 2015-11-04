@@ -39,6 +39,7 @@ MarkerVisual::MarkerVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 MarkerVisual::~MarkerVisual()
 {
+  std::cout << "Delete marker\n";
 }
 
 /////////////////////////////////////////////////
@@ -55,6 +56,7 @@ void MarkerVisual::Load(const msgs::Marker &_msg)
 /////////////////////////////////////////////////
 void MarkerVisual::AddModify(const msgs::Marker &_msg)
 {
+  std::cout << "MarkerVisual::AddModify\n";
   // Set the type of visual
   if (this->dPtr->msg.type() != _msg.type())
   {
@@ -63,6 +65,7 @@ void MarkerVisual::AddModify(const msgs::Marker &_msg)
     switch(_msg.type())
     {
       case msgs::Marker::CUBE:
+        std::cout << "Attach unit box\n";
         this->AttachMesh("unit_box");
         break;
       case msgs::Marker::CYLINDER:

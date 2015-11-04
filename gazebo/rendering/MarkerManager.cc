@@ -42,11 +42,17 @@ MarkerManager::~MarkerManager()
 }
 
 /////////////////////////////////////////////////
-void MarkerManager::Init()
+bool MarkerManager::Init(ScenePtr _scene)
 {
+  if (!_scene)
+  {
+    gzerr << "Scene pointer is invalid\n";
+    return false;
+  }
+
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->scene = rendering::get_scene();
+  this->dataPtr->scene = _scene;
 
   // Subscribe to the marker topic
   this->dataPtr->markerSub = this->dataPtr->node->Subscribe("~/marker",
@@ -55,6 +61,8 @@ void MarkerManager::Init()
   // Process markers on PreRender
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
       std::bind(&MarkerManager::OnPreRender, this));
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -92,23 +100,25 @@ bool MarkerManager::ProcessMarkerMsg(const msgs::Marker &_msg)
     }
     else
     {
-      std::cout << "New marker created1\n";
       std::string name = "__GZ_MARKER_VISUAL_NS_" + _msg.ns() + "_" +
         std::to_string(_msg.id());
+      std::cout << "New marker created1. Name[" << name << "]\n";
+
       MarkerVisualPtr marker(new MarkerVisual(name,
             this->dataPtr->scene->GetWorldVisual()));
       marker->Load(_msg);
-      nsIter->second[_msg.id()] = marker;
+      this->dataPtr->markers[_msg.layer()][_msg.id()] = marker;
     }
   }
   else
   {
-    std::cout << "New marker created0\n";
     std::string name = "__GZ_MARKER_VISUAL_NS_" + _msg.ns() + "_" +
       std::to_string(_msg.id());
 
+    std::cout << "New marker created0 Name[" << name << "}\n";
     MarkerVisualPtr marker(new MarkerVisual(name,
           this->dataPtr->scene->GetWorldVisual()));
+
     marker->Load(_msg);
     this->dataPtr->markers[_msg.layer()][_msg.id()] = marker;
   }

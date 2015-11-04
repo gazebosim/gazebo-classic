@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_MARKER_MANAGER_HH_
 #define _GAZEBO_MARKER_MANAGER_HH_
 
+#include "gazebo/rendering/RenderTypes.hh"
+
 namespace gazebo
 {
   namespace rendering
@@ -25,7 +27,9 @@ namespace gazebo
     // Forwared declare private data class.
     class MarkerManagerPrivate;
 
-    /// \brief Creates, deletes, and maintains marker visuals.
+    /// \internal
+    /// \brief Creates, deletes, and maintains marker visuals. Only the
+    /// Scene class should intantiate and use this class.
     class MarkerManager
     {
       /// \brief Constructor
@@ -36,7 +40,9 @@ namespace gazebo
 
       /// \brief Subscribe to the ~/marker topic and connect to the
       /// PreRenderEvent.
-      public: void Init();
+      /// \param[in] _scene Pointer to the scene.
+      /// \return True on success
+      private: bool Init(ScenePtr _scene);
 
       /// \brief Update the markers. This function is called on
       /// the PreRender event.
@@ -53,6 +59,9 @@ namespace gazebo
       /// \internal
       /// \brief Private data pointer
       private: MarkerManagerPrivate *dataPtr;
+
+      /// Make sure the Scene can access Init()
+      private: friend class Scene;
     };
   }
 }

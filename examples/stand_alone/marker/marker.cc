@@ -74,7 +74,7 @@ int main(int _argc, char **_argv)
   markerMsg.set_type(gazebo::msgs::Marker::CUBE);
   matMsg->mutable_script()->set_name("Gazebo/Green");
   gazebo::msgs::Set(markerMsg.mutable_scale(),
-                    ignition::math::Vector3d(0.4, 0.4, 0.4));
+                    ignition::math::Vector3d(1.0, 1.0, 1.0));
   gazebo::msgs::Set(markerMsg.mutable_pose(),
                     ignition::math::Pose3d(2, 0, .5, 0, 0, 0));
   gazebo::common::Time::Sleep(4);
@@ -82,11 +82,66 @@ int main(int _argc, char **_argv)
 
   gazebo::common::Time::Sleep(2);
 
-  //markerMsg.set_type(gazebo::msgs::Marker::LINE_STRIP);
+  std::cout << "Change the green cube to a cylinder\n";
+  markerMsg.set_type(gazebo::msgs::Marker::CYLINDER);
+  pub->Publish(markerMsg);
 
-  //gazebo::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(0, 0, 0.2));
-  //gazebo::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(0, 1, 0.2));
-  //gazebo::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(1, 0, 0.2));
+  gazebo::common::Time::Sleep(2);
+
+  std::cout << "Adding a line between the sphere and cylinder\n";
+  markerMsg.set_id(2);
+  markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
+  markerMsg.set_type(gazebo::msgs::Marker::LINE_LIST);
+  gazebo::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(0, 0, 1.1));
+  gazebo::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(2, 0, 0.5));
+  pub->Publish(markerMsg);
+
+  gazebo::common::Time::Sleep(2);
+
+  std::cout << "Adding a square between the sphere and cylinder\n";
+  markerMsg.set_id(3);
+  markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
+  markerMsg.set_type(gazebo::msgs::Marker::LINE_STRIP);
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(0.5, 0.5, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(0.5, -0.5, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(-0.5, -0.5, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(-0.5, 0.5, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(0.5, 0.5, 0.05));
+  pub->Publish(markerMsg);
+
+  gazebo::common::Time::Sleep(2);
+
+  std::cout << "Adding 100 points inside the square\n";
+  markerMsg.set_id(4);
+  markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
+  markerMsg.set_type(gazebo::msgs::Marker::POINTS);
+  for (int i = 0; i < 100; ++i)
+  {
+    gazebo::msgs::Set(markerMsg.add_point(),
+        ignition::math::Vector3d(
+          ignition::math::Rand::DblUniform(-0.49, 0.49),
+          ignition::math::Rand::DblUniform(-0.49, 0.49),
+          0.05);
+  }
+  pub->Publish(markerMsg);
+
+  gazebo::common::Time::Sleep(2);
+
+  std::cout << "Adding HELLO at 0, 0, 2\n";
+  markerMsg.set_id(5);
+  markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
+  markerMsg.set_type(gazebo::msgs::Marker::TEXT);
+  markerMsg.set_text("HELLO");
+  gazebo::msgs::Set(markerMsg.mutable_pose(),
+                    ignition::math::Pose3d(0, 0, 2, 0, 0, 0));
+  pub->Publish(markerMsg);
+
+  gazebo::common::Time::Sleep(2);
 
   // Make sure to shut everything down.
   gazebo::client::shutdown();

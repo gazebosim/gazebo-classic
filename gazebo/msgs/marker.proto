@@ -14,15 +14,16 @@ message Marker
   /// \brief The marker type (shape/geometry)
   enum Type
   {
-    CUBE          = 0;
-    CYLINDER      = 1;
-    LINE_STRIP    = 2;
-    LINE_LIST     = 3;
-    POINTS        = 4;
-    SPHERE        = 5;
-    TEXT          = 6;
-    TRIANGLE_FAN  = 7;
-    TRIANGLE_LIST = 8;
+    NONE          = 0;
+    CUBE          = 1;
+    CYLINDER      = 2;
+    LINE_LIST     = 4;
+    LINE_STRIP    = 3;
+    POINTS        = 5;
+    SPHERE        = 6;
+    TEXT          = 7;
+    TRIANGLE_FAN  = 8;
+    TRIANGLE_LIST = 9;
   }
 
   /// \brief How to interpret the data. 
