@@ -109,7 +109,7 @@ namespace gazebo
 
       /// \brief Qt callback when one of the child configs has been applied.
       private slots: void OnConfigApplied();
-      
+
       /// \brief Callback for density changes in link config.
       /// \param[in] _value The new density value.
       private slots: void OnDensityValueChanged(const double &_value);

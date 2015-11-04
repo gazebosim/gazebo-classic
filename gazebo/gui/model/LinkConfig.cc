@@ -34,6 +34,12 @@ LinkConfig::LinkConfig()
   this->configWidget = new ConfigWidget;
   configWidget->Load(&linkMsg);
 
+  connect(this->configWidget, SIGNAL(DensityValueChanged(const double &)),
+      this, SLOT(OnDensityValueChanged(const double &)));
+
+  connect(this->configWidget, SIGNAL(MassValueChanged(const double &)),
+      this, SLOT(OnMassValueChanged(const double &)));
+
   // set default values
   // TODO: auto-fill them with SDF defaults
   this->configWidget->SetDoubleWidgetValue("inertial::ixx", 1.0);

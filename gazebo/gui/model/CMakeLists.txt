@@ -55,15 +55,12 @@ if (ENABLE_SCREEN_TESTS)
 	${qt_tests_local}
     DensityModel_TEST.cc
     ExtrudeDialog_TEST.cc
-    JointInspector_TEST.cc
     JointMaker_TEST.cc
-    LinkInspector_TEST.cc
     ModelCreator_TEST.cc
     ModelData_TEST.cc
     ModelEditor_TEST.cc
     ModelEditorPalette_TEST.cc
     ModelTreeWidget_TEST.cc
-    ModelPluginInspector_TEST.cc
   )
 endif()
 

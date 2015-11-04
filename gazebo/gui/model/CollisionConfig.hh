@@ -86,6 +86,12 @@ namespace gazebo
       /// \brief Destructor
       public: ~CollisionConfig();
 
+      /// \brief Initializes object.
+      public: void Init();
+
+      /// \brief Restores original object state.
+      public: void RestoreOriginalData();
+
       /// \brief Add a collision widget to the tab.
       /// \param[in] _name Name of collision added.
       /// \param[in] _collisionMsg Msg containing information of the collision
@@ -153,23 +159,12 @@ namespace gazebo
       /// \param[in] _id Id of item to be removed.
       private slots: void OnRemoveCollision(int _id);
 
-/// \brief Qt callback when a pose value has changed.
+      /// \brief Qt callback when a pose value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnPoseChanged(const QString &_name,
           const ignition::math::Pose3d &_value);
-
-/// \brief Qt callback when a geometry value has changed.
-      /// \param[in] _name of widget in the config widget that emitted the
-      /// signal.
-      /// \param[in] _value New geometry value.
-      /// \param[in] _dimensions New dimensions.
-      /// \param[in] _uri New uri, for meshes.
-      private slots: void OnGeometryChanged(const std::string &_name,
-          const std::string &_value,
-          const ignition::math::Vector3d &_dimensions,
-          const std::string &_uri);
 
       /// \brief Callback for handling collision changes.
       /// \param[in] _name Name of collision changed.

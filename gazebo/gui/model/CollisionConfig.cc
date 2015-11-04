@@ -250,7 +250,18 @@ void CollisionConfig::AddCollision(const std::string &_name,
 
   connect(headerButton, SIGNAL(toggled(bool)), configData,
            SLOT(OnToggleItem(bool)));
-  
+
+  connect(headerButton, SIGNAL(toggled(bool)),
+      configData, SLOT(OnToggleItem(bool)));
+
+  connect(configWidget, SIGNAL(GeometryChanged()),
+      configData, SLOT(OnGeometryChanged()));
+
+  connect(configData, SIGNAL(CollisionChanged(
+          const std::string &, const std::string &)),
+      this, SLOT(OnCollisionChanged(
+          const std::string &, const std::string &)));
+
   this->configs[this->counter] = configData;
   this->counter++;
 }
