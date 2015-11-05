@@ -15,6 +15,7 @@
           <contact_surface_layer>0</contact_surface_layer>
         </constraints>
       </ode>
+      <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
     <model name='box'>
@@ -48,7 +49,7 @@
               <elastic_modulus>500000.0</elastic_modulus>
               <ode>
                 <kp>1</kp>
-                <kd>1.0</kd>
+                <kd>100.0</kd>
                 <max_vel>100.0</max_vel>
                 <min_depth>0.0015</min_depth>
               </ode>
@@ -113,7 +114,7 @@
               <elastic_modulus>600000.0</elastic_modulus>
               <ode>
                 <kp>1</kp>
-                <kd>1.0</kd>
+                <kd>100.0</kd>
                 <max_vel>100.0</max_vel>
                 <min_depth>0.001</min_depth>
               </ode>

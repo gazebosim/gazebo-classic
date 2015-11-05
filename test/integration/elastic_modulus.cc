@@ -101,7 +101,6 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   transport::SubscriberPtr sub = this->node->Subscribe(topic,
       &PhysicsTest::ContactCallback, this);
 
-  getchar();
   // step to let contact happen and settle
   world->Step(3000);
 
@@ -116,8 +115,9 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   ASSERT_EQ(this->contactsMsg.contact().size(), 1);
 
   // recorded from opende/src/joints/contact.cpp:208
-  const double k_converged = 71448.294771;
-  const double k_lin_converged =  11488.234018;
+  const double d_converged = 0.0258629;
+  const double k_converged = 71454.617;
+  const double k_lin_converged = 11491.286;
 
   // sphere
   const double nu1 = 0.4;
@@ -135,8 +135,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
 
   for (int n = 0; n < 30; ++n)
   {
-  getchar();
-    world->Step(200);
+    world->Step(1);
     // Copy message to local variable
     msgs::Contacts contacts;
     {
@@ -164,7 +163,9 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
         // gzerr << d1 << "\n";
       }
     }
-    EXPECT_FLOAT_EQ(d1, 0.025853707);
+    double d_convergence_error = (d1 - d_converged)/d_converged;
+    EXPECT_LT(d1, d_converged);
+    EXPECT_LT(fabs(d_convergence_error), PHYSICS_TOL);
 
     // GET CONTACT DEPTH FROM LINK POSES AND KNOWN GEOMETRY INFORMATION
     double d2 = 1.0 - (sphere_link->GetWorldPose().pos.x -
@@ -209,6 +210,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
           << "]\n  R* [" << R_star
           << "]\n  patch radius [" << patchRadius
           << "]\n  d contact manager [" << d1
+          << "]\n  d convergence error [" << d_convergence_error
           << "]\n  d geom [" << d2
           << "]\n  d solution [" << d3
           << "]\n  d relative error [" << (d1-d3)/d3
