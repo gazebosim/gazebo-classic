@@ -8,6 +8,7 @@ package gazebo.msgs;
 
 import "pose.proto";
 import "track_visual.proto";
+import "follow_model.proto";
 
 message GUICamera
 {
@@ -18,4 +19,7 @@ message GUICamera
 
   /// \brief Type of projection: "perspective" or "orthographic".
   optional string projection_type       = 5;
+
+  /// \brief Follow model parameters.
+  optional FollowModel follow           = 6;
 }

@@ -217,6 +217,11 @@ void Camera::Init()
   this->saveCount = 0;
 
   this->SetClipDist();
+
+  this->dataPtr->trackIsStatic = false;
+  this->dataPtr->trackIsRelative = true;
+  this->dataPtr->trackDistance = 0;
+  this->dataPtr->trackPos = ignition::math::Vector3d(-5.0, 0.0, 3.0);
 }
 
 //////////////////////////////////////////////////
@@ -377,19 +382,38 @@ void Camera::Update()
     this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
           currYaw + yawAdj));
 
-    double origDistance = 8.0;
-    double distance = direction.GetLength();
-    double error = origDistance - distance;
+    double error;
+    if (!this->dataPtr->trackIsStatic)
+    {
+      error = this->dataPtr->trackDistance - direction.GetLength();
+    }
+    else
+    {
+      if (this->dataPtr->trackIsRelative)
+      {
+        yaw =
+            this->dataPtr->trackedVisual->GetWorldPose().Ign().Rot().Yaw();
+        ignition::math::Quaterniond rot =
+            ignition::math::Quaterniond(0.0, 0.0, yaw);
+        direction += rot.RotateVector(this->dataPtr->trackPos);
+        error = -direction.GetLength();
+      }
+      else
+      {
+        direction = this->dataPtr->trackPos - this->GetWorldPose().Ign().Pos();
+        error = -direction.GetLength();
+      }
+    }
 
     double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
 
-    math::Vector3 displacement = direction;
+    ignition::math::Vector3d displacement = direction.Ign();
     displacement.Normalize();
     displacement *= scaling;
 
-    math::Vector3 localPos =
-      Conversions::Convert(this->sceneNode->_getDerivedPosition());
-    math::Vector3 pos = localPos + displacement;
+    ignition::math::Vector3d localPos =
+      Conversions::Convert(this->sceneNode->_getDerivedPosition()).Ign();
+    ignition::math::Vector3d pos = localPos + displacement;
 
     this->SetWorldPosition(pos);
   }
@@ -1800,4 +1824,52 @@ std::string Camera::GetProjectionType() const
   {
     return "perspective";
   }
+}
+
+/////////////////////////////////////////////////
+bool Camera::GetTrackIsStatic() const
+{
+  return this->dataPtr->trackIsStatic;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackIsStatic(bool _isStatic)
+{
+  this->dataPtr->trackIsStatic = _isStatic;
+}
+
+/////////////////////////////////////////////////
+bool Camera::GetTrackIsRelative() const
+{
+  return this->dataPtr->trackIsRelative;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackIsRelative(bool _isRelative)
+{
+  this->dataPtr->trackIsRelative = _isRelative;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Camera::GetTrackPosition() const
+{
+  return this->dataPtr->trackPos;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackPosition(const ignition::math::Vector3d &_pos)
+{
+  this->dataPtr->trackPos = _pos;
+}
+
+/////////////////////////////////////////////////
+double Camera::GetTrackDistance() const
+{
+  return this->dataPtr->trackDistance;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackDistance(double _dist)
+{
+  this->dataPtr->trackDistance = _dist;
 }

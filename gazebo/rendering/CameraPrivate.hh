@@ -91,6 +91,19 @@ namespace gazebo
 
       /// \brief Mutex to lock the various message buffers.
       public: boost::mutex receiveMutex;
+
+      /// \brief If set to true, the position of the camera is static.
+      public: bool trackIsStatic;
+
+      /// \brief If set to true, the position of the camera is relative to
+      /// the tracked model, otherwise it represents world coordinates.
+      public: bool trackIsRelative;
+
+      /// \brief Position of the camera when tracking a model.
+      public: ignition::math::Vector3d trackPos;
+
+      /// \brief Distance between the camera and tracked model;
+      public: double trackDistance;
     };
   }
 }

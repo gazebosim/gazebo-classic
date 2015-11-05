@@ -21,6 +21,7 @@ set (msgs
   factory.proto
   fluid.proto
   fog.proto
+  follow_model.proto
   friction.proto
   geometry.proto
   gps.proto
