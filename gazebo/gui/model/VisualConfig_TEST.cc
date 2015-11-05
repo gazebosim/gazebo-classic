@@ -53,7 +53,7 @@ void VisualConfig_TEST::AppliedSignal()
   // Get combo boxes
   QList<QComboBox *> combos =
       visualConfig->findChildren<QComboBox *>();
-  QVERIFY(combos.size() == 3);
+  QVERIFY(combos.size() == 4);
 
   // Edit transparency (0)
   spins[0]->setValue(0.5);

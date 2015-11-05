@@ -53,7 +53,7 @@ void CollisionConfig_TEST::AppliedSignal()
   // Get combo boxes
   QList<QComboBox *> combos =
       collisionConfig->findChildren<QComboBox *>();
-  QVERIFY(combos.size() == 1);
+  QVERIFY(combos.size() == 2);
 
   // Edit collision pose (2~7)
   spins[2]->setValue(2.0);
